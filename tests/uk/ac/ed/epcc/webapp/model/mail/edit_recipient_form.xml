@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><transition_page>
+<SummaryContent/>
+<Form>
+<table class="form">
+<tr class="even">
+<th>
+<label class="required">Recipient Email</label>
+</th>
+<td>
+<input type="email" size="64" maxlen="254" name="text" class="input" required="required"/>
+</td>
+</tr>
+</table>
+<fieldset class="action_buttons">
+<input class="input_button" type="submit" name="AddCC" value="AddCC"/>
+<input class="input_button" type="submit" name="AddTo" value="AddTo"/>
+<input class="input_button" type="submit" name="AddBcc" value="AddBcc"/>
+</fieldset>
+</Form>
+</transition_page>

@@ -1,0 +1,10 @@
+<Diff><TableSpecification name='TestClassification'>
+<Name type='String' nullable='false' max='32'/>
+<Description type='String' nullable='true' max='255'/>
+<name_key type='Index' unique='true'><Column name='Name'/></name_key>
+</TableSpecification>
+<TestClassification id='1'>
+<Name>Boris</Name>
+<Description>A test resource classification</Description>
+</TestClassification>
+</Diff>

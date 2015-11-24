@@ -1,0 +1,32 @@
+<Dump>
+<TableSpecification name='LinkTest1Test2'>
+<Test1ID reference='Test'/>
+<Test2ID reference='Test2'/>
+<Status type='String' nullable='false' max='1'/>
+</TableSpecification>
+<TableSpecification name='Test'>
+<Name type='String' nullable='true' max='32'/>
+<Number type='Double' nullable='true'/>
+<UnsignedInt type='Long' nullable='true'/>
+<Mandatory type='String' nullable='false' max='32'/>
+</TableSpecification>
+<Test id='1'>
+<Name>fred</Name>
+<Number>5.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+</Test>
+<TableSpecification name='Test2'>
+<Name type='String' nullable='true' max='32'/>
+<Number type='Double' nullable='true'/>
+</TableSpecification>
+<Test2 id='1'>
+<Name>boris</Name>
+<Number>8.0</Number>
+</Test2>
+<LinkTest1Test2 id='1'>
+<Test1ID>1</Test1ID>
+<Test2ID>1</Test2ID>
+<Status>I</Status>
+</LinkTest1Test2>
+</Dump>

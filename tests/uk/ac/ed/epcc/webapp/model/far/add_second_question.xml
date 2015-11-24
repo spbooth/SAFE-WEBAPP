@@ -1,0 +1,9 @@
+<Diff><TestFormsPageSectionQuestion id='2'>
+<Owner>1</Owner>
+<SortOrder>2</SortOrder>
+<Name>SecondQuestion</Name>
+<QuestionText>Are you a skunk yes/no</QuestionText>
+<HandlerType>BooleanQuestion</HandlerType>
+<Optional>false</Optional>
+</TestFormsPageSectionQuestion>
+</Diff>

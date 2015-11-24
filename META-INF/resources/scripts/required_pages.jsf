@@ -1,0 +1,22 @@
+<%@page import="uk.ac.ed.epcc.webapp.servlet.session.*" %>
+<% 
+    //  fragment to check for required pages. include from session
+    try{
+    Object skip=session.getAttribute("RequiredPages");
+    
+    if( session_service != null && skip==null && ! ((ServletSessionService) session_service).isSU() ){
+    	AppUserFactory<?> fac = session_service.getLoginFactory();
+    	for(RequiredPage p : fac.getRequiredPages() ){
+    		if( p.required(session_service) ){
+    			ServletFormResultVisitor vis = new ServletFormResultVisitor(conn, request, response);
+    			p.getPage().accept(vis);
+   		       return;
+    		}
+    	}
+    	// all checks passed cache for session
+    	session.setAttribute("RequiredPages","done");
+    }
+    }catch(Throwable e){
+    	conn.error(e,"Error processing required pages");
+    }
+%>

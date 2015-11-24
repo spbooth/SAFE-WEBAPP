@@ -1,0 +1,2 @@
+This directory contains a META-INF directory for use during unit tests
+This allows custom configuration for Email testing.

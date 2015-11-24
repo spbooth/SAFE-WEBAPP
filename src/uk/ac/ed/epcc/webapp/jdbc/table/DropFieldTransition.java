@@ -1,0 +1,66 @@
+// Copyright - The University of Edinburgh 2011
+/*******************************************************************************
+ * Copyright (c) - The University of Edinburgh 2010
+ *******************************************************************************/
+package uk.ac.ed.epcc.webapp.jdbc.table;
+
+
+
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.action.FormAction;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
+import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
+import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.model.data.forms.inputs.RepositoryFieldInput;
+@uk.ac.ed.epcc.webapp.Version("$Id: DropFieldTransition.java,v 1.5 2014/12/10 15:43:29 spb Exp $")
+
+
+public class DropFieldTransition<T extends TableStructureTransitionTarget> extends AbstractFormTransition<T>{
+    private final Repository res;
+    public DropFieldTransition(Repository res){
+    	this.res=res;
+    }
+	public void buildForm(Form f, T target, AppContext c)
+			throws TransitionException {
+		f.addInput("Field", "Field to drop", new RepositoryFieldInput(res));
+		f.addAction("Drop", new DropAction(target));
+	}
+	public class DropAction extends FormAction{
+		private T target;
+		public DropAction(T target){
+			super();
+			setConfirm("drop_field");
+			this.target=target;
+		}
+		@Override
+		public FormResult action(Form f) throws ActionException {
+			RepositoryFieldInput input = (RepositoryFieldInput) f.getInput("Field");
+			try {
+				SQLContext sql = res.getSQLContext();
+				StringBuilder query = new StringBuilder();
+				query.append("ALTER TABLE ");
+				res.addTable(query, true);
+				query.append(" DROP ");
+				input.getItem().addName(query, false, true);
+				query.append(" ");
+				
+				java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString());
+				
+				stmt.execute();
+				stmt.close();
+				target.resetStructure();
+				Repository.reset(res.getContext(), res.getTag());
+			} catch (Exception e) {
+				throw new ActionException("Update failed",e);
+			}
+			return new ViewTableResult(target);
+		}
+		
+	}
+}

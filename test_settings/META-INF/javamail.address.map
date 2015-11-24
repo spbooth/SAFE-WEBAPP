@@ -1,0 +1,2 @@
+# RFC-822 docs need to use the SMTP protocol
+rfc822=smtp

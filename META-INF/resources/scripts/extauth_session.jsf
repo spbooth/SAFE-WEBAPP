@@ -1,0 +1,23 @@
+<%@ include file="/service_init.jsf" %>
+<%@ page import="uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*,uk.ac.ed.epcc.webapp.model.data.*" %>
+<%--
+ Perform basic service and connection initialization
+--%>
+<%--
+ This is for use in pages protected by an container level password.
+ check the Remote user is defined
+--%>
+<%
+  	String username = null;
+    if( conn != null ){
+    	 username = conn.getService(ServletService.class).getWebName();
+    }
+	if(username == null || username.trim().length() == 0) {
+%>
+<jsp:forward page="/messages.jsp">
+<jsp:param name="message_type" value="access_denied" />
+</jsp:forward>
+<%           	 
+             return;
+	}
+%>

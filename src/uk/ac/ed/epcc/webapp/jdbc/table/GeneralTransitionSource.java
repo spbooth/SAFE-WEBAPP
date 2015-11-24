@@ -1,0 +1,106 @@
+// Copyright - The University of Edinburgh 2011
+/*******************************************************************************
+ * Copyright (c) - The University of Edinburgh 2010
+ *******************************************************************************/
+package uk.ac.ed.epcc.webapp.jdbc.table;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
+import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.ForwardTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.Transition;
+import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
+/** TransitionSource for the basic table edit operations
+ * 
+ * @author spb
+ *
+ * @param <T>
+ */
+@uk.ac.ed.epcc.webapp.Version("$Id: GeneralTransitionSource.java,v 1.6 2014/12/04 16:06:51 spb Exp $")
+
+public class GeneralTransitionSource<T extends TableStructureTransitionTarget> implements TransitionSource<T> {
+	
+	/**
+	 * 
+	 */
+	static final String ADD_FOREIGN_KEYS_KEY = "AddForeignKeys";
+	/**
+	 * 
+	 */
+	static final String DROP_TABLE_KEY = "DropTable";
+	/**
+	 * 
+	 */
+	static final String DROP_FIELD_KEY = "DropField";
+	/**
+	 * 
+	 */
+	static final String DROP_INDEX_KEY = "DropIndex";
+	/**
+	 * 
+	 */
+	static final String DROP_FOREIGN_KEY_KEY = "DropForeignKey";
+	/**
+	 * 
+	 */
+	static final String ADD_REFERENCE_FIELD_KEY = "AddReferenceField";
+	/**
+	 * 
+	 */
+	static final String ADD_DATE_FIELD_KEY = "AddDateField";
+	/**
+	 * 
+	 */
+	static final String ADD_TEXT_FIELD_KEY = "AddTextField";
+	/**
+	 * 
+	 */
+	static final String ADD_INTEGER_FIELD_KEY = "AddIntegerField";
+	/**
+	 * 
+	 */
+	static final String ADD_LONG_FIELD_KEY = "AddLongField";
+	/**
+	 * 
+	 */
+	static final String ADD_FLOAT_FIELD_KEY = "AddFloatField";
+	/**
+	 * 
+	 */
+	static final String ADD_DOUBLE_FIELD_KEY = "AddDoubleField";
+	private Map<TransitionKey<T>,Transition<T>> table_transitions = new LinkedHashMap<TransitionKey<T>,Transition<T>>();
+	
+	public GeneralTransitionSource(Repository res){
+		
+		addTransition(DROP_TABLE_KEY,new ConfirmTransition<T>(
+			     "Delete this table ? (all data will be lost)", 
+			     new DropTableTransition<T>(res.getContext()), 
+			     new ForwardTransition<T>(new MessageResult("aborted"))) );
+		addTransition(ADD_FOREIGN_KEYS_KEY,new ConfirmTransition<T>(
+			     "Add Foreign Key definitions?", 
+			     new AddForeignKeyTransition<T>(res), 
+			     new ForwardTransition<T>(new MessageResult("aborted"))) );
+	
+		addTransition(DROP_FIELD_KEY, new DropFieldTransition<T>(res));
+		addTransition(DROP_INDEX_KEY, new DropIndexTransition<T>(res));
+		addTransition(DROP_FOREIGN_KEY_KEY, new DropForeignKeyTransition<T>(res));
+		addTransition(ADD_REFERENCE_FIELD_KEY, new AddReferenceTransition<T>(res));
+		addTransition(ADD_DATE_FIELD_KEY, new AddDateFieldTransition<T>(res));
+		addTransition(ADD_TEXT_FIELD_KEY, new AddTextFieldTransition<T>(res));
+		addTransition(ADD_INTEGER_FIELD_KEY, new AddIntegerFieldTransition<T>(res));
+		addTransition(ADD_LONG_FIELD_KEY, new AddLongFieldTransition<T>(res));
+		addTransition(ADD_FLOAT_FIELD_KEY, new AddFloatFieldTransition<T>(res));
+		addTransition(ADD_DOUBLE_FIELD_KEY, new AddDoubleFieldTransition<T>(res));
+	}
+	
+	private void addTransition(String name,Transition<T> t){
+		table_transitions.put(new TransitionKey<T>(TableTransitionTarget.class, name),t);
+	}
+	public Map<TransitionKey<T>, Transition<T>> getTransitions() {
+		return table_transitions;
+	}
+
+}

@@ -1,0 +1,11 @@
+<Diff><TableSpecification name='TestMessage'>
+<Message type='Blob' nullable='true'/>
+<Status type='String' nullable='false' max='1'/>
+<OwnerID type='Integer' nullable='true'/>
+</TableSpecification>
+<TestMessage id='1'>
+<Message>RGF0ZTogU2F0LCA0IEp1bCAyMDE1IDE4OjExOjMzICswMTAwIChCU1QpDQpGcm9tOiBkdW1teUBleGFtcGxlLmNvbQ0KU2VuZGVyOiBudWxsDQpUbzogZnJlZEBleGFtcGxlLmNvbQ0KTWVzc2FnZS1JRDogPDE1NzA5NzY4ODAuMS4xNDM2MDI5ODkzMjIzLkphdmFNYWlsLnNwYkBFNzQ0MHNwYj4NClN1YmplY3Q6IA0KTUlNRS1WZXJzaW9uOiAxLjANCkNvbnRlbnQtVHlwZTogbXVsdGlwYXJ0L21peGVkOyANCglib3VuZGFyeT0iLS0tLT1fUGFydF8wXzE1Nzg4Njk3MjMuMTQzNjAyOTg5MzIwNSINClgtSGVscGRlc2s6IFNhZg0KWC1TYWYtc2VydmljZTogdGVzdA0KDQotLS0tLS09X1BhcnRfMF8xNTc4ODY5NzIzLjE0MzYwMjk4OTMyMDUNCkNvbnRlbnQtVHlwZTogdGV4dC9wbGFpbjsgY2hhcnNldD11cy1hc2NpaQ0KQ29udGVudC1UcmFuc2Zlci1FbmNvZGluZzogN2JpdA0KQ29udGVudC1EaXNwb3NpdGlvbjogaW5saW5lDQoNCg0KLS0tLS0tPV9QYXJ0XzBfMTU3ODg2OTcyMy4xNDM2MDI5ODkzMjA1LS0NCg==</Message>
+<Status>C</Status>
+<OwnerID>1</OwnerID>
+</TestMessage>
+</Diff>

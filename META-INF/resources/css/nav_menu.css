@@ -1,0 +1,128 @@
+.nav {
+  margin: 0;
+  padding: 0;
+  background: #000;
+  color: #fff;
+  position: relative;
+  text-align: left;
+  line-height: 11px;
+}
+
+.nav ul {
+  list-style: none;
+  background-color: #000;
+  text-align: left;
+  padding: 0;
+  margin: 0;
+}
+
+.nav li {
+/* font-family: 'Oswald', sans-serif;
+  font-size: 1.2em;
+  line-height: 40px;
+ */
+ line-height: 30px;
+  font-size: 1.0em;
+  text-align: left;
+}
+
+.nav a , .nav div{
+  text-decoration: none;
+  color: #fff;
+  display: block;
+  padding-left: 15px;
+  border-bottom: 1px solid #888;
+  transition: .3s background-color;
+}
+
+.nav a:hover {
+ /* background-color: #005f5f;
+  */
+    background-color: #444;
+    color: #ec0000;
+    cursor: pointer;
+}
+
+/* .nav div {
+ *	background-color: #333;
+ *}
+ */
+
+/*.nav .match a {
+ * background-color: #444;
+* }
+*/
+
+.nav a.active {
+  background-color: #aaa;
+  color: #444;
+  cursor: default;
+}
+
+/* Sub Menus */
+.nav li li {
+  font-size: .8em;
+  line-height: auto;
+}
+
+.nav li.has_role a {
+	background-color: #060;
+} 
+.nav li.missing_role a {
+	background-color: #600;
+} 
+
+/*******************************************
+   Style menu for larger screens
+
+   Using 650px (130px each * 5 items), but ems
+   or other values could be used depending on other factors
+********************************************/
+
+@media screen and (min-width: 650px) {
+  .nav{
+    height: 30px;
+    width: 100%;
+    display: block;
+  }
+  .nav ul {
+    width: 100%;
+    position: fixed;
+  }
+  .nav li {
+    width: 180px;
+    border-bottom: none;
+    height: 30px;
+    line-height: 30px;
+    font-size: 1.0em;
+    display: inline-block;
+    margin-right: -4px;
+  }
+
+  .nav a {
+    border-bottom: none;
+  }
+
+  .nav > ul > li {
+    text-align: center;
+  }
+
+  .nav > ul > li > a {
+    padding-left: 0;
+  }
+
+  /* Sub Menus */
+  .nav li ul {
+    position: absolute;
+    display: none;
+    width: inherit;
+  }
+
+  .nav li:hover ul {
+    display: block;
+  }
+
+  .nav li ul li {
+    display: block;
+  }
+}

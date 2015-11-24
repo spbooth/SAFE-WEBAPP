@@ -1,0 +1,20 @@
+<transition_page>
+	<Form>
+		<table class='form'>
+			<tr class='even'>
+				<th>
+					<label class='required'>form</label>
+				</th>
+				<td>
+					<select name='Form' class='input' required='required'>
+						<option value='1'>TestForms.1</option>
+					</select>
+				</td>
+			</tr>
+		</table>
+		<fieldset class='action_buttons'>
+			<input class='input_button' type='submit' name='Response'
+				value='Response' />
+		</fieldset>
+	</Form>
+</transition_page>

@@ -1,0 +1,48 @@
+<%!
+   // Useful methods to define in the jsp page classes
+
+    public static String ifNull(Object input, Object null_thing) {
+		return ifNull(input, input, null_thing);
+	}
+
+	public static String ifNull(Object input, Object not_null_thing, Object null_thing) {
+		if(input == null) return null_thing.toString();
+		return not_null_thing.toString();
+	}
+	// remove html markup
+	public static String strip(String input){
+		if (input == null)
+			return null;
+
+		StringBuffer output_buffer = new StringBuffer(input.length());
+
+		for (int i = 0; i < input.length(); i++) {
+			char ch = input.charAt(i);
+			switch (ch) {
+			case '\\':
+				break;
+			case '<':
+				break;
+			case '%':
+				break;
+			case '>':
+				break;
+			case '\n':
+				break;
+			default:
+				output_buffer.append(ch);
+				break;
+			}
+		}
+
+		return output_buffer.toString();
+	}
+	   public static String formatDate(java.util.Date d){
+	    	if( d == null ){
+	    		return "Unspecified";
+	    	}
+	    	
+	    	java.text.DateFormat df = java.text.DateFormat.getDateInstance();
+	        return df.format(d);
+	    }
+%>

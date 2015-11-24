@@ -1,0 +1,36 @@
+// Copyright - The University of Edinburgh 2011
+/*******************************************************************************
+ * Copyright (c) - The University of Edinburgh 2010
+ *******************************************************************************/
+package uk.ac.ed.epcc.webapp.jdbc.table;
+/** Class representing a database field specification
+ * This is intended to capture constraints on behaviour rather than fully specify
+ * implementation.
+ * <b>
+ * We use a visitor pattern to implement operations such as generating SQL fragments. This ensures that any changes to the {@link FieldType}
+ * type hierarchy.
+ * will have to be reflected in database specific implementation code.
+ * @author spb
+ *
+ * @param <T>
+ */
+public  abstract class FieldType<T> {
+   public abstract void accept(FieldTypeVisitor vis);
+   private final Class<? super T> target;
+   private final boolean can_be_null;
+   private final T default_value;
+   public FieldType(Class<? super T> clazz, boolean can_null, T default_val){
+	   target=clazz;
+	   can_be_null=can_null;
+	   default_value=default_val;
+   }
+   public Class<? super T> geTarget(){
+	   return target;
+   }
+   public boolean canBeNull(){
+	   return can_be_null;
+   }
+   public T getDefault(){
+	   return default_value;
+   }
+}

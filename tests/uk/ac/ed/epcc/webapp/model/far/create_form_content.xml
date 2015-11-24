@@ -1,0 +1,18 @@
+<transition_page>
+	<Form>
+		<table class='form'>
+			<tr class='even'>
+				<th>
+					<label class='required'>Name</label>
+				</th>
+				<td>
+					<input type='text' size='64' maxlen='64' name='Name' class='input'
+						required='required' />
+				</td>
+			</tr>
+		</table>
+		<fieldset class='action_buttons'>
+			<input class='input_button' type='submit' name='Create' value='Create' />
+		</fieldset>
+	</Form>
+</transition_page>

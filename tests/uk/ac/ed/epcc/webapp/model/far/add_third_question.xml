@@ -1,0 +1,9 @@
+<Diff><TestFormsPageSectionQuestion id='3'>
+<Owner>1</Owner>
+<SortOrder>3</SortOrder>
+<Name>ThirdQuestion</Name>
+<QuestionText>Upload file</QuestionText>
+<HandlerType>FileQuestion</HandlerType>
+<Optional>false</Optional>
+</TestFormsPageSectionQuestion>
+</Diff>

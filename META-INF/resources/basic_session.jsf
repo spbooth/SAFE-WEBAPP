@@ -1,0 +1,2 @@
+<%@ include file="/scripts/service_init.jsf" %>
+<%@ include file="/scripts/basic_session.jsf" %>

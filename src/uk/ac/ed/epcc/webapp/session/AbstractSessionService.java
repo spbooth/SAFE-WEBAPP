@@ -1,0 +1,719 @@
+// Copyright - The University of Edinburgh 2011
+package uk.ac.ed.epcc.webapp.session;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.TreeSet;
+
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
+import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
+import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
+import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+/** Abstract base implementation of {@link SessionService}
+ * 
+ * 
+ * 
+ * @author spb
+ *
+ * @param <A>
+ */
+public abstract class AbstractSessionService<A extends AppUser> implements Contexed, SessionService<A>{
+	/** Property prefix to allow role name aliasing.
+	 * The property use_role.<i>name</i> defines a role name to use
+	 * instead of name.
+	 * 
+	 */
+	public static final String USE_ROLE_PREFIX = "use_role.";
+	public static final Feature TOGGLE_ROLES_FEATURE = new Feature("toggle_roles",true,"allow some roles to toggle on/off");
+	private Map<String,Boolean> toggle_map=null;
+	protected AppContext c;
+    
+	private A person=null;
+    private AppUserFactory<A> fac=null;
+    /** Map of roles that this user can assume.
+	 * roles can either be always on or can be toggled on and off.
+	 */
+	private Map<String,Boolean> role_map;
+	
+	public static final String ROLE_PERSON_ID = "PersonID";
+	public static final String ROLE_FIELD = "Role";
+	public static final String ROLE_TABLE = "role_table";
+	
+	private static final String person_tag = "SESSION_PersonID";
+	private static final String toggle_map_tag = "SESSION_toggle_map";
+	private static final String role_map_tag = "SESSION_role_map";
+	
+	public AbstractSessionService(AppContext c) {
+		this.c=c;
+		
+	}
+
+	public static void setupRoleTable(AppContext ctx){
+		DataBaseHandlerService dbh = ctx.getService(DataBaseHandlerService.class);
+		if(dbh != null &&  ! dbh.tableExists(SimpleSessionService.ROLE_TABLE)){
+			TableSpecification s = new TableSpecification();
+			s.setField(SimpleSessionService.ROLE_PERSON_ID, new IntegerFieldType(false, null));
+			s.setField(SimpleSessionService.ROLE_FIELD, new StringFieldType(false, null,32));
+			try {
+				dbh.createTable(SimpleSessionService.ROLE_TABLE, s);
+			} catch (DataFault e) {
+				ctx.error(e,"Failed to make role_table");
+			}
+		}
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	public AppUserFactory<A> getLoginFactory() {
+		if( fac != null ){
+			return fac;
+		}
+		try{
+			Logger log =c.getService(LoggerService.class).getLogger(getClass());
+			String table=getLoginTable();
+			log.debug("login-table="+table);
+			Class<? extends AppUserFactory> clazz;
+			if( table == null ){
+				// If the login factory has a hardwired table then we specify the class
+				// name as follows
+				log.debug("looking for login-factory should be "+c.getInitParameter("class.login-factory","unset"));
+				clazz = c.getPropertyClass(getDefaultFactoryClass(), null,"login-factory");
+			}else{
+				// look up the class for this table. We ignore any login-factory
+				// specification to make sure that we cant ever have two different
+				// classes for the same repository. 
+				log.debug("lookup for "+table);
+				clazz = c.getPropertyClass(getDefaultFactoryClass(),table);
+			}
+			
+			if( clazz == null ){
+				c.error("No class found for login factory");
+				throw new ConsistencyError("No class found for login factory");
+			}
+			if( table != null ){
+				fac= c.makeParamObject(clazz,c,table);
+			}else{
+				fac= c.makeObject(clazz);
+			}
+			if( fac == null){
+				c.error("Null login factory class="+clazz.getCanonicalName());
+				throw new ConsistencyError("Null login factory "+clazz.getCanonicalName());
+			}
+			return fac;
+		}catch(ConsistencyError ce){
+			throw ce;
+		}catch(Exception e){
+			c.error(e,"Error making login factory");
+			throw new ConsistencyError("Bad login factory or bad database connection",e);
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	protected String getLoginTable() {
+		return c.getInitParameter("login-table");
+	}
+
+	protected Class<? extends AppUserFactory> getDefaultFactoryClass(){
+		return AppUserFactory.class;
+	}
+	public AppContext getContext() {
+		return c;
+	}
+	/** get the current State of a role toggle or null if not a toggle role
+	 * 
+	 * @param role
+	 * @return Boolean or null
+	 */
+	public final Boolean getToggle(String role){
+		if( toggle_map == null ){
+			setupToggleMap();
+			if( toggle_map == null){
+				return null;
+			}
+		}
+		Boolean v = toggle_map.get(role);
+		return v;
+	}
+	/** Set the toggle state of a role
+	 * 
+	 * @param name String role to set
+	 * @param value boolean value to set
+	 */
+	public void setToggle(String name, boolean value) {
+		if( toggle_map == null ){
+			setupToggleMap();
+		}
+		if( toggle_map != null && toggle_map.containsKey(name)){
+			toggle_map.put(name,Boolean.valueOf(value));
+		}else{
+			getContext().error("setToggle for non toggle role "+name);
+		}
+	}
+	/** Toggle the sate of a role
+	 * return the new value of the toggle or null if its not a togglable role
+	 * 
+	 * @param name String role to toggle
+	 * @return Boolean or null
+	 */
+	public Boolean toggleRole(String name){
+		if( toggle_map == null ){
+			setupToggleMap();
+		}
+		Boolean v = toggle_map.get(name);
+		if( v != null ){
+			v = Boolean.valueOf(! v);
+		   toggle_map.put(name, v);
+		}else{
+			getContext().error("toggleRole called for not toggle role "+name);
+		}
+		return v;
+	}
+	
+	
+
+	public Map<String,Boolean> getToggleMap(){
+		if( toggle_map == null ){
+			setupToggleMap();
+		}
+		return new HashMap<String,Boolean>(toggle_map);
+	}
+
+
+
+	@SuppressWarnings("unchecked")
+	private void setupToggleMap() {
+		if(TOGGLE_ROLES_FEATURE.isEnabled(getContext()) ){
+			toggle_map = (Map<String, Boolean>) getAttribute(toggle_map_tag);
+			if( toggle_map == null ){
+				toggle_map = getLoginFactory().makeToggleMap();
+				setAttribute(toggle_map_tag, toggle_map);
+			}
+		}
+	}
+	
+	
+	/**
+	 * Has this person a particular SAF role this is used for adding special
+	 * permissions to SAF users
+	 * 
+	 * @param name of role to be tested
+	 * @return true if person has role.
+	
+	 * 
+	 */
+	public final boolean hasRole(String name){
+		// role name aliasing
+		String role=mapRoleName(name);
+		if( ! canHaveRole(role)){
+			// check original role
+			if( canHaveRole(name)){
+				role=name;
+			}else{
+				return false;
+			}
+		}
+
+		// role new points to a real role that we can have.
+		
+		// check the toggle value if this returns null then this is
+		// a non toggling role
+		Boolean toggle = getToggle(role);
+		if( toggle != null ){
+			return toggle.booleanValue();
+		}
+		return true;
+		
+	}
+
+	/**
+	 * @param name
+	 * @return
+	 */
+	public String mapRoleName(String name) {
+		return getContext().getInitParameter(USE_ROLE_PREFIX+name, name);
+	}
+	public boolean hasRoleFromList(String ...roles){
+		if( roles == null ){
+			return false;
+		}
+		for(String role : roles){
+			if( hasRole(role)){
+				return true;
+			}
+		}
+		return false;
+	}
+	/** Get the set of toggle roles this user is capable of assuming
+	 * 
+	 * @return Set<String>
+	 */
+	public Set<String> getToggleRoles(){
+		if( toggle_map == null ){
+			setupToggleMap();
+		}
+		// have predictable order
+		Set<String> set = new TreeSet<String>();
+		if( toggle_map != null ){
+		for(String s : toggle_map.keySet()){
+			if( canHaveRole(s)){
+				set.add(s);
+			}
+		}
+		}
+		return set;
+	}
+	/** Checks if this session can have the role (ignoring toggle values).
+	 * No name mapping is applied.
+	 * 
+	 * @param role
+	 * @return
+	 */
+	public final boolean canHaveRole(String role){
+		// final so that sub-classes see the role cache.
+		if( role == null ){
+			return false;
+		}
+		if( shortcutTestRole(role)){
+			return true;
+		}
+		if (role_map == null) {
+			role_map = setupRoleMap();
+		}
+		Boolean answer = role_map.get(role);
+		if (answer == null) {
+			if( haveCurrentUser() ){
+				answer = testRole(role);
+				role_map.put(role, answer);
+			}else{
+				return false;
+			}
+			
+		}
+		return answer.booleanValue();
+		
+	}
+
+	/** perform a non-cached role-check. 
+	 * This is called every time a role is checked. If it returns true the role is allowed
+	 * for that call only. If it returns false the cache and the testRole function are queried.
+	 * This is to allow per request roles e.g. ones tied to a particular url.
+	 * 
+	 * @param role
+	 * @return
+	 */
+	protected boolean shortcutTestRole(String role){
+		return false;
+	}
+
+
+	@SuppressWarnings("unchecked")
+	private HashMap<String, Boolean> setupRoleMap() {
+		HashMap<String,Boolean> result = (HashMap<String, Boolean>) getAttribute(role_map_tag);
+		if( result != null ){
+			return result;
+		}
+		result = new HashMap<String,Boolean>();
+		setAttribute(role_map_tag, result);
+		return result;
+	}
+	/** underlying check for role membership.
+	 * Sub-classes can override this. 
+	 * No role mapping is applied
+	 * 
+	 * @param role
+	 * @return
+	 */
+	protected  Boolean testRole(String role){
+		return rawRoleQuery(getContext(),getPersonID(),role);
+	}
+
+	/** clears all record of the current person.
+	 * 
+	 * The toggle-map is not cleared. It will have no effect if a new person
+	 * does not have the role but it allows toggle state to be retained acSross a SU.
+	 * 
+	 */
+	public void clearCurrentPerson() {
+		
+		clearRoleMap();
+		person=null;
+		removeAttribute(person_tag);
+	}
+	
+	public void logOut(){
+		clearCurrentPerson();
+	}
+
+	public final  A getCurrentPerson() {
+		if( person == null && haveCurrentUser()){
+			person = lookupPerson();
+		}
+		
+		return person;
+	}
+
+	private void clearRoleMap(){
+		removeAttribute(role_map_tag);
+		role_map=null;
+	}
+	/** extension point for canLogin check.
+	 * superclasses may want to supress this check in SU mode to allow
+	 * su to non valid account.
+	 * 
+	 * @param person
+	 * @return
+	 */
+	protected boolean canLogin(A person){
+		return person.canLogin();
+	}
+
+	/** extracted method to look up person from the cached id.
+	 * This can be extended by sub-classes e.g. to add 
+	 * login tracking.
+	 * 
+	 * @return
+	 */
+	protected A lookupPerson() {
+		Integer personID = getPersonID();
+		if( personID == null ){
+			return null;
+		}
+		try {
+			person = getLoginFactory().find(personID);
+			if( person == null ){
+				// not worked for some reason
+				clearCurrentPerson();
+				return null;
+			}
+		} catch (Throwable e) {
+			clearCurrentPerson();  // clear first as error will try to report person
+			c.error(e,"Error finding person by id "+personID);
+			return null;
+		}
+		if( person != null && ! person.canLogin()){
+			
+			// login now forbidden
+			clearCurrentPerson();
+			return null;
+		}
+		return person;
+	}
+
+	public final boolean haveCurrentUser() {
+		if( person != null ){
+			return true;
+		}
+		Integer id = getPersonID();
+		return id != null && id > 0;
+	}
+	/** Get the ID of the ccurrent person. This method can be extended to 
+	 * add additional mechanisms to determine that person as it is called
+	 * by both {@link #haveCurrentUser()} and {@link #getCurrentPerson()}
+	 * 
+	 * @return
+	 */
+	protected Integer getPersonID(){
+		Integer id = (Integer)getAttribute(person_tag);
+		return id;
+	}
+	
+
+	public void setCurrentPerson(A new_person) {
+		if( new_person == null){
+			clearCurrentPerson();
+		}else{
+			// no-op if current person is the same
+			// do not call getPersonID as super-classes call this
+			// method from there.
+			Integer current = (Integer) getAttribute(person_tag);
+			if( current == null || current.intValue() != new_person.getID() ){
+				clearCurrentPerson();
+				setAttribute(person_tag,new_person.getID());
+				this.person=new_person;
+			}	
+		}
+	}
+
+	public void setCurrentPerson(int id) {
+		if( id <= 0 ){
+			clearCurrentPerson();
+		}else{
+			// no-op if current person is the same
+			// do NOT call getPersonID as superclasses call
+			// this method from the call.
+			Integer current = (Integer) getAttribute(person_tag);
+			if( current == null || current.intValue() != id ){
+				clearCurrentPerson();
+				setAttribute(person_tag,id);
+			}	
+		}
+	}
+
+	public void setCurrentRoleToggle(Map<String, Boolean> toggleMap) {
+		toggle_map=toggleMap;	
+	}
+	/** Set a temporary (not stored to database) role.
+	 * 
+	 * @param role
+	 */
+	public void setTempRole(String role){
+		if( role_map == null){
+			role_map = setupRoleMap();
+		}
+		role_map.put(role, Boolean.TRUE);
+	}
+
+	public String getName() {
+		A user = getCurrentPerson();
+		if( user != null ){
+			return user.getName();
+		}
+		return null;
+	}
+
+	public void cleanup() {
+		if( person != null){
+			person.release();
+			person=null;
+		}
+		if( fac != null ){
+			fac.release();
+			fac=null;
+		}
+	}
+
+
+
+	/** Perform a raw query of a users roles from the database
+	 * This is an extension point to allow sub-classes to extends how a role 
+	 * is implemented. This method returns a Boolean if a definitive answer is known
+	 * otherwise null, This was sub-classes only need to perform additional queries on
+	 * null results.
+	 * @param conn 
+	 * @param id 
+	 * @param role
+	 * @return boolean
+	 */
+	public static boolean rawRoleQuery(AppContext conn,int id,String role) {
+		
+		try {
+			SQLContext ctx = conn.getService(DatabaseService.class).getSQLContext();
+			StringBuilder role_query = new StringBuilder();
+			role_query.append("SELECT * FROM ");
+			ctx.quote(role_query, ROLE_TABLE);
+			role_query.append(" WHERE ");
+			ctx.quote(role_query,ROLE_PERSON_ID);
+			role_query.append("=?   AND ");
+			ctx.quote(role_query,ROLE_FIELD);
+			role_query.append("=? ");
+			PreparedStatement stmt = null;
+			try {
+				stmt = ctx.getConnection().prepareStatement(role_query.toString());
+				stmt.setInt(1, id);
+				stmt.setString(2, role);
+				ResultSet rs = stmt.executeQuery();
+				if (rs.next()) {
+					return true;
+				}
+			} finally {
+				if( stmt != null ){
+				   stmt.close();
+				}
+			}
+		} catch (SQLException e) {
+			conn.error(e,"Error checking AppUser role");
+			// maybe table missing
+			// this is null if table exists
+			setupRoleTable(conn);
+		}
+		return false;
+	}
+
+public Set<A> withRole(String role) {
+		role = mapRoleName(role);
+		AppContext conn = getContext();
+		Set<A> result = new HashSet<A>();
+		try {
+			SQLContext ctx=conn.getService(DatabaseService.class).getSQLContext();
+			StringBuilder role_query=new StringBuilder();
+			AppUserFactory<A> fac = getLoginFactory();
+			role_query.append("SELECT ");
+			ctx.quote(role_query, ROLE_PERSON_ID).append(" FROM ");
+			ctx.quote(role_query,ROLE_TABLE).append(" WHERE ");
+			ctx.quote(role_query,ROLE_FIELD).append("=? ");
+			PreparedStatement stmt = null;
+			try {
+				stmt = ctx.getConnection().prepareStatement(role_query.toString());
+				stmt.setString(1, role);
+				ResultSet rs = stmt.executeQuery();
+				while(rs.next()) {
+					try {
+						result.add(fac.find(rs.getInt(1)));
+					} catch (DataException e) {
+						conn.error(e,"Error getting person from role");
+					}
+				}
+			} finally {
+				if( stmt != null ){
+				   stmt.close();
+				}
+			}
+		} catch (SQLException e) {
+			conn.error(e,"Error checking AppUser role");
+			// maybe table missing
+			// this is null if table exists
+			setupRoleTable(conn);
+		}
+		return result;
+	}
+
+
+	public static  void removeRoleByID(AppContext context, int id, String role) throws DataFault {
+		
+	   try {
+		   SQLContext ctx=context.getService(DatabaseService.class).getSQLContext();
+			StringBuilder role_query=new StringBuilder();
+			role_query.append("DELETE FROM ");
+			ctx.quote(role_query, ROLE_TABLE).append(" WHERE ");
+			ctx.quote(role_query,ROLE_PERSON_ID).append("=? AND ");
+			ctx.quote(role_query,ROLE_FIELD).append("=?");
+					
+			PreparedStatement stmt = null;
+			try {
+				stmt = ctx.getConnection().prepareStatement(role_query.toString());
+				stmt.setInt(1, id);
+				stmt.setString(2, role);
+				stmt.executeUpdate();
+				if( context.isFeatureOn("log_query")){
+					Logger log = context.getService(LoggerService.class).getLogger(context.getClass());
+					log.debug(role_query+" id="+id+" role="+role);
+				}
+			} finally {
+				if( stmt != null){
+				  stmt.close();
+				}
+			}
+		} catch (SQLException e) {
+			throw new DataFault("SQLException ", e);
+		}
+	}
+
+
+
+	public static void addRoleByID(AppContext c, int id, String role) throws DataFault {
+		try {
+			SQLContext ctx=c.getService(DatabaseService.class).getSQLContext();
+			StringBuilder role_query=new StringBuilder();
+			role_query.append( "INSERT INTO ");
+			ctx.quote(role_query,ROLE_TABLE).append(" (");
+			ctx.quote(role_query, ROLE_PERSON_ID).append(",");
+			ctx.quote(role_query, ROLE_FIELD).append(") VALUES(?,?)");;
+					
+			PreparedStatement stmt = null;
+			try {
+				stmt = ctx.getConnection().prepareStatement(role_query.toString());
+				stmt.setInt(1, id);
+				stmt.setString(2, role);
+				stmt.executeUpdate();
+				if( c.isFeatureOn("log_query")){
+					Logger log = c.getService(LoggerService.class).getLogger(c.getClass());
+					log.debug(role_query+" id="+id+" role="+role);
+				}
+			} finally {
+				if( stmt != null ){
+				  stmt.close();
+				}
+			}
+		} catch (SQLException e) {
+			throw new DataFault("SQLException ", e);
+		}
+	}
+
+
+	public void setRole(A user, String role, boolean value)
+			throws UnsupportedOperationException {
+		boolean current = canHaveRole(user,role);
+		if( value == current){
+			return;
+		}
+		if( value ){
+			try {
+				addRoleByID(getContext(), user.getID(), role);
+			} catch (DataFault e) {
+				getContext().error(e,"Error setting role");
+			}
+		}else{
+			try {
+				removeRoleByID(getContext(), user.getID(), role);
+			} catch (DataFault e) {
+				getContext().error(e,"Error removing role");
+			}
+		}
+		// in case this is us clear the cache.
+		clearRoleMap();  
+		
+	}
+
+
+	
+	public boolean canHaveRole(A user, String role) {
+		return rawRoleQuery(getContext(), user.getID(), role);
+	}
+
+
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(getClass().getSimpleName());
+		sb.append("[");
+		if( haveCurrentUser()){
+			if( person != null ){
+				sb.append(person.getIdentifier());
+			}else{
+				sb.append(getPersonID());
+			}
+		}
+		sb.append("]");
+		return sb.toString();
+	}
+
+
+
+	public Class<SessionService> getType() {
+		return SessionService.class;
+	}
+
+
+	/** Get the Locale to use in the current context
+	 * 
+	 * @return Locale
+	 */
+	public Locale getLocale() {
+		return Locale.UK;
+	}
+	public TimeZone getTimeZone(){
+		return TimeZone.getDefault();
+	}
+
+	
+}

@@ -1,0 +1,11 @@
+This directory contains generic script fragments for use in
+any application using the common webapp framework. In particular to ecapsulate dependencies between
+jsp pages and the re-usable servlets.
+
+These are often jsf files included in jsp pages rather than full pages
+in themselves.
+
+Because these files are shared between multiple applications it is good practice to use 2 levels of 
+redirection for key files 
+e.g. a top-level include file that includes the version from the scripts directory version.
+This makes it easier to override or extend for specific applications.

@@ -1,0 +1,341 @@
+// Copyright - The University of Edinburgh 2014
+package uk.ac.ed.epcc.webapp.jdbc.expr;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
+
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
+import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
+import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataError;
+
+/** Combines SQLExpressions as a CASE statement.
+ * A CASE expression consists of a series of expressions with corresponding {@link SQLFilter}s for which records they apply to
+ * and a default {@link SQLExpression} when no filters applu.
+ * @author spb
+ * 
+ * @param <X> type of filter
+ * @param <R> return type
+ *
+ */
+@uk.ac.ed.epcc.webapp.Version("$Id: CaseExpression.java,v 1.6 2014/09/15 14:30:23 spb Exp $")
+public class CaseExpression<X,R> implements SQLExpression<R> {
+	/** encode one clause of the expression
+	 * 
+	 * @author spb
+	 *
+	 * @param <T> type of filter
+	 * @param <V> type of value
+	 */
+    public static class Clause<T,V>{
+    	/**
+		 * @param filter
+		 * @param value
+		 */
+		public Clause(SQLFilter<T> filter, SQLExpression<? extends V> value) {
+			super();
+			this.filter = filter;
+			this.value = value;
+		}
+	
+		
+		public final SQLFilter<T> filter;
+    	public final SQLExpression<? extends V> value;
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result
+					+ ((filter == null) ? 0 : filter.hashCode());
+			result = prime * result + ((value == null) ? 0 : value.hashCode());
+			return result;
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Clause other = (Clause) obj;
+			if (filter == null) {
+				if (other.filter != null)
+					return false;
+			} else if (!filter.equals(other.filter))
+				return false;
+			if (value == null) {
+				if (other.value != null)
+					return false;
+			} else if (!value.equals(other.value))
+				return false;
+			return true;
+		}
+    	
+    }
+	
+    public static class AddPatternFilterVisitor<T> implements FilterVisitor<StringBuilder, T>{
+
+    	/**
+		 * @param sb
+		 * @param qualify
+		 */
+		public AddPatternFilterVisitor(StringBuilder sb, boolean qualify) {
+			super();
+			this.sb = sb;
+			this.qualify = qualify;
+		}
+		
+		
+		
+		private final StringBuilder sb;
+    	private final boolean qualify;
+    	
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
+		 */
+		public StringBuilder visitPatternFilter(PatternFilter<? super T> fil)
+				throws Exception {
+			return  fil.addPattern(sb, qualify);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitSQLCombineFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter)
+		 */
+		public StringBuilder visitSQLCombineFilter(BaseSQLCombineFilter<? super T> fil)
+				throws Exception {
+			return  fil.addPattern(sb, qualify);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAndFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter)
+		 */
+		public StringBuilder visitAndFilter(AndFilter<? super T> fil) throws Exception {
+			throw new CannotFilterException();
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
+		 */
+		public StringBuilder visitOrderFilter(OrderFilter<? super T> fil)
+				throws Exception {
+			throw new CannotFilterException();
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter)
+		 */
+		public StringBuilder visitAcceptFilter(AcceptFilter<? super T> fil)
+				throws Exception {
+			throw new CannotFilterException();
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitJoinFilter(uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter)
+		 */
+		public StringBuilder visitJoinFilter(JoinFilter<? super T> fil)
+				throws Exception {
+			throw new CannotFilterException();
+		}
+    	
+    }
+    public static class GetListFiltervisitor<T> implements FilterVisitor<List<PatternArgument>,T>{
+
+    	/**
+		 * @param args
+		 */
+		public GetListFiltervisitor(List<PatternArgument> args) {
+			super();
+			this.args = args;
+		}
+
+		private List<PatternArgument> args;
+    	
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
+		 */
+		public List<PatternArgument> visitPatternFilter(
+				PatternFilter<? super T> fil) throws Exception {
+			return fil.getParameters(args);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitSQLCombineFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter)
+		 */
+		public List<PatternArgument> visitSQLCombineFilter(
+				BaseSQLCombineFilter<? super T> fil) throws Exception {
+			return fil.getParameters(args);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAndFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter)
+		 */
+		public List<PatternArgument> visitAndFilter(AndFilter<? super T> fil)
+				throws Exception {
+			throw new CannotFilterException();
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
+		 */
+		public List<PatternArgument> visitOrderFilter(OrderFilter<? super T> fil)
+				throws Exception {
+			throw new CannotFilterException();
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter)
+		 */
+		public List<PatternArgument> visitAcceptFilter(
+				AcceptFilter<? super T> fil) throws Exception {
+			throw new CannotFilterException();
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitJoinFilter(uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter)
+		 */
+		public List<PatternArgument> visitJoinFilter(JoinFilter<? super T> fil)
+				throws Exception {
+			throw new CannotFilterException();
+		}
+    	
+    }
+    private final Class<R> target;
+	private final SQLExpression<? extends R> default_expr;
+	private final LinkedList<Clause<X,R>> options;
+	
+	/**
+	 * @param default_expression 
+	 * @param clauses 
+	 * 
+	 */
+	public CaseExpression(Class<R> target,SQLExpression<? extends R> default_expression, Clause<X,R> ... clauses ) {
+		this.target=target;
+		this.default_expr=default_expression;
+		this.options=new LinkedList<CaseExpression.Clause<X,R>>();
+		for(Clause<X,R> c : clauses ){
+			options.add(c);
+		}
+	}
+	public CaseExpression(Class<R> target,SQLExpression<? extends R> default_expression, LinkedList<Clause<X,R>> clauses  ) {
+		this.target=target;
+		this.default_expr=default_expression;
+		this.options=new LinkedList<CaseExpression.Clause<X,R>>(clauses);
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#add(java.lang.StringBuilder, boolean)
+	 */
+	public int add(StringBuilder sb, boolean qualify) {
+		sb.append("CASE ");
+		AddPatternFilterVisitor<X> vis = new AddPatternFilterVisitor<X>(sb, qualify);
+		for( Clause<X,R> c: options){
+			sb.append("WHEN ");
+			try {
+				sb = c.filter.acceptVisitor(vis);
+			} catch (Exception e) {
+				// can't recover from this
+				throw new ConsistencyError("Bad filter", e);
+			}
+			sb.append(" THEN ");
+			c.value.add(sb, qualify);
+		}
+		if( default_expr != null ){
+			sb.append(" ELSE ");
+			default_expr.add(sb, qualify);
+		}
+		sb.append(" END");
+		return 1;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#getParameters(java.util.List)
+	 */
+	public List<PatternArgument> getParameters(List<PatternArgument> list) {
+		for( Clause<X,R> c: options){
+			GetListFiltervisitor<X> vis = new GetListFiltervisitor<X>(list);
+			try{
+				list = c.filter.acceptVisitor(vis);
+			} catch (Exception e) {
+				// can't recover from this
+				throw new ConsistencyError("Bad filter", e);
+			}
+			list = c.value.getParameters(list);
+		}
+		if( default_expr != null ){
+			list = default_expr.getParameters(list);
+		}
+		return list;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#makeObject(java.sql.ResultSet, int)
+	 */
+	public R makeObject(ResultSet rs, int pos) throws DataException {
+		try {
+			return (R)  rs.getObject(pos);
+		} catch (SQLException e) {
+			throw new DataError(e);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#getRequiredFilter()
+	 */
+	public SQLFilter getRequiredFilter() {
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
+	 */
+	public Class<? super R> getTarget() {
+		return target;
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((default_expr == null) ? 0 : default_expr.hashCode());
+		result = prime * result + ((options == null) ? 0 : options.hashCode());
+		result = prime * result + ((target == null) ? 0 : target.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CaseExpression other = (CaseExpression) obj;
+		if (default_expr == null) {
+			if (other.default_expr != null)
+				return false;
+		} else if (!default_expr.equals(other.default_expr))
+			return false;
+		if (options == null) {
+			if (other.options != null)
+				return false;
+		} else if (!options.equals(other.options))
+			return false;
+		if (target == null) {
+			if (other.target != null)
+				return false;
+		} else if (!target.equals(other.target))
+			return false;
+		return true;
+	}
+
+}

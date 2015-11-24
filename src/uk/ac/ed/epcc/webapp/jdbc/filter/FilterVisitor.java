@@ -1,0 +1,68 @@
+package uk.ac.ed.epcc.webapp.jdbc.filter;
+
+/** A visitor for {@link BaseFilter}. 
+ * 
+ * We use the visitor pattern as this makes the dependencies 
+ * between the type hierarchy and the code that uses them explicit.
+ * If a new sub-type of {@link BaseFilter} is introduced it has to either extend an existing sub-type
+ * and function only as that sub-type
+ * and/or have a new method added to the {link FilterVisitor} interface. This in turn ensures that
+ * all visitor logic needs to be updated to take account of the new type. 
+ * <p>
+ * Combinations of multiple sub-types should have an explicit interface and visit method because the visitor has to 
+ * specify how to combine the different behaviours.
+ * @author spb
+ *
+ * @param <X> return type of visitor
+ * @param <T> type of filter.
+ */
+public interface FilterVisitor<X,T> {
+	/** process a pure {@link PatternFilter}. Objects that accept via this method.
+	 * should also implement {@link SQLFilter}
+	 * 
+	 * @param fil
+	 * @return
+	 * @throws Exception
+	 */
+	public X visitPatternFilter(PatternFilter<? super T> fil) throws Exception;
+	/** process a {@link BaseSQLCombineFilter} this combines all of the sub-classes except
+	 * {@link AccceptFilter} and can be either AND or OR combinations. This only combines filters that also
+	 * implement {@link SQLFilter}.
+	 * 
+	 * @param fil
+	 * @return
+	 * @throws Exception
+	 */
+	public X visitSQLCombineFilter(BaseSQLCombineFilter<? super T> fil) throws Exception;
+	/** process a {@link AndFilter} or its sub-types. this can combine any of the filter sub-types.
+	 * 
+	 * @param fil
+	 * @return
+	 * @throws Exception
+	 */
+	public X visitAndFilter(AndFilter<? super T> fil) throws Exception;
+	/** process a pure {@link OrderFilter}. Objects that accept via this method.
+	 * should also implement {@link SQLFilter}
+	 * 
+	 * @param fil
+	 * @return
+	 * @throws Exception
+	 */
+	public X visitOrderFilter(OrderFilter<? super T> fil) throws Exception;
+	/** process a pure {@link AcceptFilter}
+	 * 
+	 * @param fil
+	 * @return
+	 * @throws Exception
+	 */
+	public X visitAcceptFilter(AcceptFilter<? super T> fil) throws Exception;
+	/** process a {@link JoinFilter}. Objects that accept via this method.
+	 * should also implement {@link SQLFilter} and should not implement any other of the
+	 * filter sub-types except {@link PatternFilter} which {@link JoinFilter} extends.
+	 * 
+	 * @param fil
+	 * @return
+	 * @throws Exception
+	 */
+	public X visitJoinFilter(JoinFilter<? super T> fil) throws Exception;
+}

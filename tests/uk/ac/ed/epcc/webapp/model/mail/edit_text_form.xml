@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?><transition_page>
+<SummaryContent/>
+<Form>
+<div class="message">
+<h4>To: fred@example.com</h4>
+<h4>CC: boris@example.xcom</h4>
+<h4>From: dummy@example.com</h4>
+<h4>Subject: to change</h4>
+<textarea rows="24" wrap="soft" cols="80" name="text" class="input"/>
+<fieldset class="action_buttons">
+<input class="input_button" type="submit" name="Update" value="Update"/>
+</fieldset>
+</div>
+</Form>
+</transition_page>

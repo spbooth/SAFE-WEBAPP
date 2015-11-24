@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- A generic stylesheet to normalise SAFE dump data to be independent of when tests were run
+
+ -->
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:strip-space elements="*" />
+<xsl:output method="xml" indent="yes" />
+	<xsl:template match="person/Updated">
+	<xsl:element name="Updated">1234567890</xsl:element>
+	</xsl:template>
+	<xsl:template match="person/SignupDate">
+	<xsl:element name="SignupDate">1234567890</xsl:element>
+	</xsl:template>
+	<xsl:template match="person/Salt">
+	<xsl:element name="Salt">FakeSalt</xsl:element>
+	</xsl:template>
+	<xsl:template match="person/Password">
+	<xsl:element name="Password">FakePassword</xsl:element>
+	</xsl:template>
+	<xsl:template match="CreationDate">
+	<xsl:element name="CreationDate">1234567890</xsl:element>
+	</xsl:template>
+	<xsl:template match="LastUpdated">
+	<xsl:element name="LastUpdated">1234567890</xsl:element>
+	</xsl:template>
+	<xsl:template match="StartTime">
+	<xsl:element name="StartTime">1234567890</xsl:element>
+	</xsl:template>
+	<xsl:template match="EndTime">
+	<xsl:element name="EndTime">1234567890</xsl:element>
+	</xsl:template>
+	<xsl:template match="Modified">
+	<xsl:element name="Modified">1234567890</xsl:element>
+	</xsl:template>
+	<xsl:template match="Message">
+	<xsl:element name="Message">removed-message</xsl:element>
+	</xsl:template>
+	 <xsl:template match="@*|node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()"/>
+    </xsl:copy>
+ 	</xsl:template>
+ 	<xsl:template match="comment()">
+    </xsl:template>
+</xsl:stylesheet>

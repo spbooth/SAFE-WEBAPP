@@ -1,0 +1,3 @@
+<dataset>
+<TableSpecification name='Test'><Number type='String' nullable='true' max='32'/></TableSpecification>    
+</dataset>

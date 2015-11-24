@@ -1,0 +1,53 @@
+<Diff><TableSpecification name='TestResponseBooleanData'>
+<QuestionID reference='TestFormsPageSectionQuestion'/>
+<ResponseID reference='TestResponse'/>
+<Modified type='Long' nullable='true'/>
+<ChangedBy type='Integer' nullable='true'/>
+<Data type='Boolean' nullable='true'/>
+<Link type='Index' unique='true'><Column name='QuestionID'/><Column name='ResponseID'/></Link>
+<LeftKey type='Index' unique='false'><Column name='QuestionID'/></LeftKey>
+<RightKey type='Index' unique='false'><Column name='ResponseID'/></RightKey>
+</TableSpecification>
+<TestResponseBooleanData id='1'>
+<QuestionID>2</QuestionID>
+<ResponseID>1</ResponseID>
+<Modified>1435490119</Modified>
+<ChangedBy>1</ChangedBy>
+<Data>true</Data>
+</TestResponseBooleanData>
+<TableSpecification name='TestResponseStreamData'>
+<QuestionID reference='TestFormsPageSectionQuestion'/>
+<ResponseID reference='TestResponse'/>
+<Modified type='Long' nullable='true'/>
+<ChangedBy type='Integer' nullable='true'/>
+<Data type='Blob' nullable='true'/>
+<Name type='String' nullable='true' max='128'/>
+<Mime type='String' nullable='true' max='64'/>
+<Link type='Index' unique='true'><Column name='QuestionID'/><Column name='ResponseID'/></Link>
+<LeftKey type='Index' unique='false'><Column name='QuestionID'/></LeftKey>
+<RightKey type='Index' unique='false'><Column name='ResponseID'/></RightKey>
+</TableSpecification>
+<TestResponseStreamData id='1'>
+<QuestionID>3</QuestionID>
+<ResponseID>1</ResponseID>
+<Modified>1435490119</Modified>
+<ChangedBy>1</ChangedBy>
+</TestResponseStreamData>
+<TableSpecification name='TestResponseStringData'>
+<QuestionID reference='TestFormsPageSectionQuestion'/>
+<ResponseID reference='TestResponse'/>
+<Modified type='Long' nullable='true'/>
+<ChangedBy type='Integer' nullable='true'/>
+<Data type='String' nullable='true' max='5592405'/>
+<Link type='Index' unique='true'><Column name='QuestionID'/><Column name='ResponseID'/></Link>
+<LeftKey type='Index' unique='false'><Column name='QuestionID'/></LeftKey>
+<RightKey type='Index' unique='false'><Column name='ResponseID'/></RightKey>
+</TableSpecification>
+<TestResponseStringData id='1'>
+<QuestionID>1</QuestionID>
+<ResponseID>1</ResponseID>
+<Modified>1435490119</Modified>
+<ChangedBy>1</ChangedBy>
+<Data>Yes I stink</Data>
+</TestResponseStringData>
+</Diff>

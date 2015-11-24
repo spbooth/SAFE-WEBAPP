@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+<TableSpecification name='Properties'>
+<Name type='String' nullable='true' max='32'/>
+<Value type='String' nullable='true' max='256'/>
+</TableSpecification>
+<Properties id='1'>
+<Name>database.property</Name>
+<Value>exists</Value>
+</Properties>
+</dataset>

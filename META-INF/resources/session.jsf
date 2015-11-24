@@ -1,0 +1,5 @@
+<%--
+ Do password change (and other required page) if required
+--%>
+<%@ include file="/basic_session.jsf" %>
+<%@ include file="/scripts/required_pages.jsf" %>

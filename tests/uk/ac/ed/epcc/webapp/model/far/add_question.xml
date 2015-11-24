@@ -1,0 +1,35 @@
+<Diff>
+<TableSpecification name='TestFormsPageSectionQuestion'>
+<Owner reference='TestFormsPageSection'/>
+<SortOrder type='Integer' nullable='false'/>
+<Name type='String' nullable='false' max='32'/>
+<QuestionText type='String' nullable='true' max='5592405'/>
+<HandlerType type='String' nullable='false' max='128'/>
+<Optional type='Boolean' nullable='false'/>
+<NameIndex type='Index' unique='true'><Column name='Owner'/><Column name='Name'/></NameIndex>
+</TableSpecification>
+<TestFormsPageSectionQuestion id='1'>
+<Owner>1</Owner>
+<SortOrder>1</SortOrder>
+<Name>FirstQuestion</Name>
+<QuestionText>Are you a skunk</QuestionText>
+<HandlerType>TextQuestion</HandlerType>
+<Optional>false</Optional>
+</TestFormsPageSectionQuestion>
+<TableSpecification name='TestFormsPageSectionQuestionConfig'>
+<Name type='String' nullable='false' max='128'/>
+<Value type='String' nullable='false' max='128'/>
+<PartID reference='TestFormsPageSectionQuestion'/>
+<PartIndex type='Index' unique='false'><Column name='PartID'/><Column name='Name'/></PartIndex>
+</TableSpecification>
+<TestFormsPageSectionQuestionConfig id='1'>
+<Name>single</Name>
+<Value>false</Value>
+<PartID>1</PartID>
+</TestFormsPageSectionQuestionConfig>
+<TestFormsPageSectionQuestionConfig id='2'>
+<Name>max_result</Name>
+<Value>80</Value>
+<PartID>1</PartID>
+</TestFormsPageSectionQuestionConfig>
+</Diff>

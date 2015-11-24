@@ -1,0 +1,25 @@
+<%@include file="/scripts/methods.jsf"%>
+<%@ page import="uk.ac.ed.epcc.webapp.*" %>
+<%@page import="uk.ac.ed.epcc.webapp.content.*" %> 
+<%@page import="uk.ac.ed.epcc.webapp.config.*" %>
+<%@page import="uk.ac.ed.epcc.webapp.session.*" %> 
+<%@page import="uk.ac.ed.epcc.webapp.logging.*" %> 
+<%@page import="uk.ac.ed.epcc.webapp.model.*" %>
+<%@page import="uk.ac.ed.epcc.webapp.model.data.*" %>
+<%@ page import="uk.ac.ed.epcc.webapp.servlet.*" %>
+<%@page import="java.util.*" %>
+<%@page import="java.text.*"%>
+<%
+  	AppContext conn = ErrorFilter.retrieveAppContext(request);
+	String web_path = request.getContextPath();
+	// path of the diretory above the css dir
+	String template_path = request.getContextPath()+"/service";	
+	String service_name  = "";
+	// error-pages do NOT go throught he filter first so we may have a null context here
+	if( conn != null ){
+		template_path = request.getContextPath()+conn.getInitParameter("template.path","/service");	
+		service_name = conn.getInitParameter("service.name","");
+	}
+	String extra_css=null;
+	String extra_head=null;
+%>

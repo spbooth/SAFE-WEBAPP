@@ -1,0 +1,20 @@
+<%-- Generate a set of registry forms using a list of names from a property 
+    While mainly intended to add FormRegistry classes any UIGenerator
+    that can be created directly by an AppContext can be inserted in this way. 
+--%>
+<%@page import="uk.ac.ed.epcc.webapp.content.UIGenerator" %>
+<%@page import="uk.ac.ed.epcc.webapp.content.HtmlBuilder" %>
+<%
+for(String name : conn.getInitParameter("form.registry.list","").split(",") ){
+	if( name.trim().length() > 0 ){
+		UIGenerator registry = conn.makeObjectWithDefault(UIGenerator.class,null,name.trim());
+		if(registry != null ){
+			HtmlBuilder reg_content = new HtmlBuilder();
+			registry.addContent(reg_content);
+%>
+<%=reg_content.toString()%>
+<%		
+		}
+	}
+}
+%>

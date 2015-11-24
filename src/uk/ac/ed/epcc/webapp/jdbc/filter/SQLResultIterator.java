@@ -1,0 +1,326 @@
+// Copyright - The University of Edinburgh 2011
+/*******************************************************************************
+ * Copyright (c) - The University of Edinburgh 2010
+ *******************************************************************************/
+
+package uk.ac.ed.epcc.webapp.jdbc.filter;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.timer.TimerService;
+/** Iterator over filter results based on the SQL parts of a filter
+ * 
+ *  * <p>
+	 * For large queries the results are generated in batches to reduce memory
+	 * use. It is up to the calling method not to retain too many references to
+	 * the generated objects.
+	 * <p>
+	 * 
+	 * Note that where the filter implements more than one of the supported
+	 * filter interfaces AcceptFilter, ConditionFilter, PatternFilter The
+	 * iterator will return the intersection of the sets selected by each
+	 * interface.
+	 * <p>
+	 * The ResultMapper, target, source and order clauses are set as methods
+	 *
+	 * @param <T> type of filter
+ * @param <O> Type of object produced.
+ * 
+ */
+public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implements java.util.Iterator<O> {
+	static final int DEFAULT_CHUNKSIZE = 1024;
+		
+    static final Feature CHUNKING_FEATURE= new Feature("chunking",true,"retrieve SQL data in chunks using limit clause");
+		private PreparedStatement stmt;
+		private ResultSet rs;
+
+		private int chunkstart;
+
+		private int maxreturn;
+
+		private int chunksize;
+
+		private int pos = 0;
+
+		private int parm_pos = 1;
+
+		private O next;
+		
+		private int chunk = DEFAULT_CHUNKSIZE;
+        private String tag;
+		private boolean use_chunking = false;
+		/**
+		 * Set the chunking this factory is to use
+		 * 
+		 * reset to default if value less than 1
+		 * 
+		 * @param i
+		 *            new value oc chunking
+		 */
+		public final void setChunkSize(int i) {
+			if (i > 1) {
+				chunk = i;
+			} else {
+				chunk = DEFAULT_CHUNKSIZE;
+			}
+		}
+		public final boolean useChunking() {
+			return use_chunking;
+		}
+		/**
+		 * Get the default chunk size for large database queries.
+		 * 
+		 * @return size of chunk
+		 */
+		protected final int getChunkSize() {
+			return chunk;
+		}
+		
+		
+        protected SQLResultIterator(AppContext c, Class<? super T> target){
+            super(c,target);
+            use_chunking = CHUNKING_FEATURE.isEnabled(getContext());
+			chunk = getContext().getIntegerParameter("chunksize", DEFAULT_CHUNKSIZE);
+        }
+		
+		
+	 
+		/**
+		 * Get the next Chunk from the stream
+		 * 
+		 * @throws SQLException
+		 * 
+		 */
+		private final void fetchChunk() throws SQLException {
+			int chunk = chunksize;
+			AppContext conn = getContext();
+			TimerService timer = conn.getService(TimerService.class);
+			
+			if (maxreturn > 0 && (!useChunking() || maxreturn < chunk)) {
+				chunk = maxreturn;
+			}
+
+			if (useChunking() || maxreturn > 0) {
+				stmt.setInt(parm_pos, chunkstart);
+				stmt.setInt(parm_pos + 1, chunk);
+				//getLogger().debug("fetchChunk "+chunkstart+","+chunk+" maxreturn "+maxreturn);
+			}
+			try{
+				if( timer != null ){
+					timer.startTimer(tag);
+				}
+			    rs = stmt.executeQuery();
+			}finally{
+				if( timer != null ){ 
+					timer.stopTimer(tag);
+				}
+			}
+			pos = 0;
+			chunkstart += chunk;
+			if (maxreturn > 0) {
+				maxreturn -= chunk;
+			}
+		}
+
+		
+
+		
+
+		public final boolean hasNext() {
+			if( next == null ){
+				close();
+				return false;
+			}
+			return true;
+		}
+
+		/**
+		 * return the next object from the stream. Once the
+		 * end of the stream is reached return null
+		 * 
+		 * @throws SQLException
+		 * @throws DataException 
+		 */
+		protected  O iterate() throws SQLException, DataException{
+            //Logger log = getLogger();
+            //
+            
+            //log.debug("In iterate");
+			O my_next=null;
+			do {
+
+				if (rs.next()) {
+					// Note that if makeEntry returns null for a result
+					// then that value is just skipped from the sequence.
+					// and the loop will continue.
+					my_next = makeEntry(rs);
+					pos++;
+					//log.debug("pos="+pos);
+				} else {
+					//log.debug("No more");
+					rs.close();
+					// may need next row
+					if (useChunking()) {
+						if (pos < chunksize - 1) {
+							// short result must be at end
+							return null;
+						} else {
+							fetchChunk();
+							my_next = null;
+						}
+					} else {
+						return null;
+					}
+				}
+			} while (my_next == null );
+			return my_next;
+		}
+
+		
+		
+	
+
+		
+
+	
+		public final O next() {
+			O result = next;
+
+			if (result != null) {
+				try {
+					next=iterate();
+				} catch (DataException e) {
+					getContext().error(e, "DataFault in ResultIterator");
+					next=null;
+				} catch (SQLException e) {
+					getContext().error(e, "SQLException in ResultIterator");
+					next=null;
+				}
+				if( next == null ){
+					close();
+				}
+			}else{
+				throw new NoSuchElementException();
+			}
+			return result;
+		}
+
+		/** close the underlying statement etc. to free resources
+		 * 
+		 */
+		public void close() {
+			if( stmt == null){
+				return;
+			}
+			try {
+				stmt.close();
+			} catch (SQLException e) {
+				getContext().error(e,"Error closing statement");
+			}
+			stmt = null;
+			rs=null;
+		}
+
+		public final void remove() {
+			throw new UnsupportedOperationException(
+					"Cannot remove in BasicDataObject.Iterator");
+		}
+
+		
+		
+		/** method to do the initialisation
+		 * 
+		 * @param f
+		 * @param start
+		 * @param max
+		 * @throws DataException 
+		 */
+		protected void setup(BaseFilter<T> f, int start, int max) throws DataException {
+			String modify=null;
+			//getLogger().debug("args "+start+","+max);
+			chunkstart = start;
+			maxreturn = max;
+			setFilter(f);
+			
+			StringBuilder query = new StringBuilder();
+			
+			
+			makeSelect(query);
+			if ( f != null && f instanceof OrderFilter) {
+				OrderFilter<?> o = (OrderFilter) f;
+				List<OrderClause> orderBy = o.OrderBy();
+				if( orderBy != null ){
+					
+
+					boolean seen=false;
+
+					if( orderBy.size() > 0){
+						StringBuilder builder = new StringBuilder();
+						builder.append(" ORDER BY ");
+						for(OrderClause c : orderBy){
+							if( seen){
+								builder.append(", ");
+							}
+							seen=true;
+							c.addClause(builder, qualify);
+						}
+						modify = builder.toString();
+					}
+					
+				}
+			}
+			if( modify == null ){
+				modify=getModify();
+			}
+			if (modify != null) {
+				query.append(" ").append(modify);
+			}
+			if (useChunking() || maxreturn > 0) {
+				query.append(" LIMIT ?,?");
+			}
+			try {
+				tag=query.toString();
+				//System.out.println("Query is "+query);
+				// We are only using the REsultSet to initialise the Record and
+				// are not concurrent anyway so give
+				// the DB the best chance of optimising the query
+				stmt = getContext().getService(DatabaseService.class).getSQLContext(getDBTag()).getConnection().prepareStatement(
+						query.toString(), ResultSet.TYPE_FORWARD_ONLY,
+						ResultSet.CONCUR_READ_ONLY);
+				List<PatternArgument> list = new LinkedList<PatternArgument>();
+				list=getTargetParameters(list);
+				if (f instanceof PatternFilter) {
+					list = ((PatternFilter<T>)f).getParameters(list);
+				}
+				list=getModifyParameters(list);
+				parm_pos = setParams(1,query, stmt, list);
+				if( DatabaseService.LOG_QUERY_FEATURE.isEnabled(getContext())){
+				  getLogger().debug("FilterIterator - Query : " + query);
+				}
+				chunksize = getChunkSize();
+				if (!useChunking() && chunksize > 0) {
+					// see if we can get the SQL to chunk for us
+					stmt.setFetchSize(chunksize);
+				}
+				rs = null;
+				// initialise the next pointer.
+
+				fetchChunk();
+
+				next=iterate();
+
+			} catch (SQLException e) {
+				throw new DataException("DataFault in FilterIterator " + query, e);
+			}
+
+		}
+	}

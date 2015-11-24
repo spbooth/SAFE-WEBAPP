@@ -1,0 +1,59 @@
+<!-- 
+The core of a standard errorpage this is included by errorpage.jsp wrapped in application specific markup.
+ -->
+<%@page import="uk.ac.ed.epcc.webapp.content.HtmlBuilder"%>
+<%@page import="java.io.PrintWriter"%>
+<%@page import="java.io.StringWriter"%>
+<%
+Number error_code = null;
+Exception error_exception =null;
+
+String extra="An error occured";
+String show = application.getInitParameter("showExceptions");
+try{
+error_code = (Number) request.getAttribute("javax.servlet.error.status_code");
+error_exception = (Exception) request.getAttribute("javax.servlet.error.exception");
+if( error_code != null ){
+	switch( error_code.intValue() ){
+	case 404: extra = "File not found"; break;
+	case 403: extra = "Access forbidden"; break;
+	case 500: extra = "Internal server error"; break;
+	default:
+	}
+}
+}catch(Throwable t){
+	// really try to make sure no exception occurs in the page
+}
+%>
+<div class="block">
+<h2>An error has occurred</h2>
+<% if( error_exception != null ){
+
+if( show != null && show.equals("yes")){
+	StringWriter sw = new StringWriter();
+	error_exception.printStackTrace(new PrintWriter(sw));
+	HtmlBuilder hb = new HtmlBuilder();
+	hb.open("pre");
+	hb.clean(error_exception.getMessage());
+	hb.clean("\n");
+	hb.clean((CharSequence)sw.toString());
+	hb.close();
+// show errors in web	
+%>
+<div class="block">
+<%= hb.toString() %>
+</div>
+<%
+}else{
+%>
+<p>
+Errors are automatically reported to the site administrators and we will attempt to fix any problems as soon as possible
+</p>
+<% 
+}
+} 
+%>
+<% if( error_code != null ){ %>
+<p> <%= error_code.intValue() %> <%= extra %>
+<% } %>
+</div>

@@ -1,0 +1,46 @@
+/*******************************************************************************
+ * Copyright (c) - The Univeristy of Edinburgh 2010
+ *******************************************************************************/
+package uk.ac.ed.epcc.webapp.forms.html;
+
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
+import uk.ac.ed.epcc.webapp.forms.factory.FormFactory;
+import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
+import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdate;
+import uk.ac.ed.epcc.webapp.session.SessionService;
+
+public class FormFactoryTester {
+	AppContext ctx;
+	public FormFactoryTester(AppContext c){
+		ctx=c;
+	}
+@SuppressWarnings("unchecked")
+public  void testFactory(FormFactory fac) throws Exception{
+	if( fac instanceof FormCreator){
+		  testCreate((FormCreator) fac);
+	  }
+	  if( fac instanceof FormUpdate){
+		  testUpdate((FormUpdate) fac);
+	  }
+}
+public void testCreate(FormCreator f){
+	HTMLCreationForm c = new HTMLCreationForm("Test",f);
+	  c.getHtmlForm(null);
+	  
+	  //System.out.println(form.getHtmlForm(null,null,new HashMap()));
+}
+@SuppressWarnings("unchecked")
+public <T> void testUpdate(FormUpdate<T> f) throws Exception{
+	  HTMLForm form = new HTMLForm(ctx);
+	  HTMLUpdateForm<T> u = new HTMLUpdateForm<T>("test",f);
+	  u.buildSelectForm(form);
+	  form.clear();
+	  if( u instanceof StandAloneFormUpdate){
+		  ((StandAloneFormUpdate)u).buildUpdateForm("Test",form,null,ctx.getService(SessionService.class));
+	  }
+	
+	  
+	  //f.buildUpdateForm(form,null);
+}
+}

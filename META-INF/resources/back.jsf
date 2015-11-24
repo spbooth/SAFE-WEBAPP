@@ -1,0 +1,4 @@
+<%@page import="uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService"%>
+<%if( ! NavigationMenuService.NAVIGATION_MENU_FEATURE.isEnabled(conn)){ %>
+<jsp:include page="/back.jsp"/>
+<%}%>

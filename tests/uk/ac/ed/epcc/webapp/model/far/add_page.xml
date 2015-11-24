@@ -1,0 +1,13 @@
+<Diff>
+<TableSpecification name='TestFormsPage'>
+<Owner reference='TestForms'/>
+<SortOrder type='Integer' nullable='false'/>
+<Name type='String' nullable='false' max='32'/>
+<NameIndex type='Index' unique='true'><Column name='Owner'/><Column name='Name'/></NameIndex>
+</TableSpecification>
+<TestFormsPage id='1'>
+<Owner>1</Owner>
+<SortOrder>1</SortOrder>
+<Name>FirstPage</Name>
+</TestFormsPage>
+</Diff>

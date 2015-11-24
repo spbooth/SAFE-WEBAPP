@@ -1,0 +1,306 @@
+// Copyright - The University of Edinburgh 2011
+/*******************************************************************************
+ * Copyright (c) - The University of Edinburgh 2010
+ *******************************************************************************/
+package uk.ac.ed.epcc.webapp.jdbc.table;
+
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
+
+/** Table Description.  
+ * We use an abstract representation to make it easier to port between database back-ends.
+ * 
+ * We can also store optional fields. These are not created by default but might
+ * be presented as options when editing the table structure.
+ * @author spb
+ *
+ */
+@uk.ac.ed.epcc.webapp.Version("$Id: TableSpecification.java,v 1.10 2015/10/26 10:07:03 spb Exp $")
+
+public class TableSpecification {
+	private String primary_key;
+	private final LinkedHashMap<String,FieldType> fields;
+	private final LinkedHashMap<String,FieldType> optional_fields;
+	private LinkedHashSet<IndexType> indexes;
+	private final Pattern field_pattern = Pattern.compile("[A-Za-z][A-Za-z0-9_]*");
+	public TableSpecification(String key){
+		this.primary_key=key;
+		fields=new LinkedHashMap<String, FieldType>();
+		optional_fields=new LinkedHashMap<String, FieldType>();
+		indexes=new LinkedHashSet<IndexType>();
+	}
+	public TableSpecification(){
+		this("PrimaryRecordID");
+	}
+	public TableSpecification(TableSpecification spec){
+		this.primary_key=spec.primary_key;
+		fields=new LinkedHashMap<String, FieldType>();
+		optional_fields=new LinkedHashMap<String, FieldType>();
+		fields.putAll(spec.fields);
+		optional_fields.putAll(spec.optional_fields);
+		indexes=new LinkedHashSet<IndexType>();
+		for(IndexType i: spec.indexes){
+			i.copy(this);
+		}
+	}
+	public void setPrimaryKey(String name){
+		if( fields.containsKey(name)){
+			throw new ConsistencyError("Primary key changed to existing field");
+		}
+		primary_key=name;
+		
+	}
+	public String getPrimaryKey(){
+		return primary_key;
+	}
+	public void setField(String name, FieldType type){
+		setField(name, type,false);
+	}
+	/** Does the specification contain this nanme
+	 * 
+	 * @param name
+	 * @return boolean
+	 */
+	public boolean hasField(String name){
+		return fields.containsKey(name);
+	}
+	public void setField(String name, FieldType type,boolean optional){
+		if( primary_key.equalsIgnoreCase(name)){
+			throw new ConsistencyError("Field name matches primary key name");
+		}
+		if( ! field_pattern.matcher(name).matches() ){
+			throw new ConsistencyError("Bad field name "+name);
+		}
+		if(optional){
+			if( fields.containsKey(name) ){
+				if( fields.get(name).geTarget() != type.geTarget()){
+					throw new ConsistencyError("Field "+name+" already exists but for different target");
+				}
+			}else{
+				optional_fields.put(name,type);
+			}
+		}else{
+			optional_fields.remove(name);
+			fields.put(name,type);
+		}
+	}
+	public void setOptionalField(String name, FieldType type){
+		setField(name, type, true);
+	}
+	
+	
+	public boolean goodFieldName(String s){
+		if( primary_key.equalsIgnoreCase(s)){
+			return false;
+		}
+		return field_pattern.matcher(s).matches();
+	}
+	/** add specifications from a map of parameter values
+	 * 
+	 * @param prefix  key values start with this
+	 * @param params
+	 */
+	public void setFromParameters(String prefix,Map<String,String> params){
+		 for(String key : params.keySet()){
+	        	String name=key.substring(prefix.length());
+	        	String type=params.get(key);
+	        	if(type.equalsIgnoreCase("double")){
+	        		setField(name, new DoubleFieldType(true, null));
+	        	}else if(type.equalsIgnoreCase("float")){
+	        		setField(name, new FloatFieldType(true, null));
+	        	}else if(type.equalsIgnoreCase("integer")){
+	        		setField(name, new IntegerFieldType(true, null));
+	        	}else if(type.equalsIgnoreCase("long")){
+	        		setField(name, new LongFieldType(true, null));
+	        	}else if(type.equalsIgnoreCase("date")){
+	        		setField(name, new DateFieldType(true, null));
+	        	}else if(type.equalsIgnoreCase("boolean")){
+	        		setField(name, new BooleanFieldType(true, Boolean.FALSE));
+	        	}else if(type.equalsIgnoreCase("required")){
+	        		promoteOptionalField(name);
+	        	}else if( type.startsWith("string")){
+	        		int length = Integer.parseInt(type.substring("string".length()));
+	        		setField(name, new StringFieldType(true, null, length));
+	        	}else{
+	        		setField(name, new ReferenceFieldType(type));
+	        	}
+	        }
+	}
+	public FieldType getField(String name){
+		if( fields.containsKey(name)){
+			return fields.get(name);
+		}
+		return optional_fields.get(name);
+	}
+	public Set<String> getFieldNames(){
+		return fields.keySet();
+	}
+	public Set<String> getOptionalFieldNames(){
+		return optional_fields.keySet();
+	}
+	public Iterator<IndexType> getIndexes(){
+		return indexes.iterator();
+	}
+	/** promote an optional field to required
+	 * 
+	 * @param name
+	 */
+	public void promoteOptionalField(String name){
+		if( optional_fields.containsKey(name)){
+			fields.put(name,optional_fields.get(name));
+			optional_fields.remove(name);
+		}
+	}
+	public Map<String,FieldType> getStdFields(){
+		LinkedHashMap<String, FieldType> result = new LinkedHashMap<String, FieldType>(fields);
+		result.putAll(optional_fields);
+		return result;
+	}
+	public abstract class IndexType {
+		private final String name;
+		private LinkedHashSet<String> index_fields = new LinkedHashSet<String>();
+		public IndexType(String name, String ...strings) throws InvalidArgument{
+			this.name=name;
+			for(String s : strings){
+				addField(s);
+			}
+			indexes.add(this);
+		}
+		public void addField(String s) throws InvalidArgument {
+			if( getFieldNames().contains(s)){
+				index_fields.add(s);
+			}else{
+				throw new InvalidArgument("Table does not contain field "+s);
+			}
+		}
+		public IndexType(IndexType i) {
+			this.name=i.name;
+			Set<String> names = getFieldNames();
+			for(String s : i.index_fields){
+				if( names.contains(s)){
+					index_fields.add(s);
+				}
+			}
+			indexes.add(this);
+		}
+		public String getName(){
+			return name;
+		}
+		
+		public Iterator<String> getindexNames(){
+			return index_fields.iterator();
+		}
+		public abstract void accept(FieldTypeVisitor vis);
+		/** Generate a copy of this index in a different specification.
+		 * 
+		 * @param spec
+		 * @return
+		 */
+		public abstract IndexType copy(TableSpecification spec);
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result
+					+ ((index_fields == null) ? 0 : index_fields.hashCode());
+			result = prime * result + ((name == null) ? 0 : name.hashCode());
+			return result;
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			IndexType other = (IndexType) obj;
+			if (!getOuterType().equals(other.getOuterType()))
+				return false;
+			if (index_fields == null) {
+				if (other.index_fields != null)
+					return false;
+			} else if (!index_fields.equals(other.index_fields))
+				return false;
+			if (name == null) {
+				if (other.name != null)
+					return false;
+			} else if (!name.equals(other.name))
+				return false;
+			return true;
+		}
+		private TableSpecification getOuterType() {
+			return TableSpecification.this;
+		}
+	}
+	public class FullTextIndex extends IndexType{
+
+		public FullTextIndex(FullTextIndex i) {
+			super(i);
+		}
+
+		public FullTextIndex(String name, String... strings)
+				throws InvalidArgument {
+			super(name, strings);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType#accept(uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor)
+		 */
+		@Override
+		public void accept(FieldTypeVisitor vis) {
+			vis.visitFullTextIndex(this);
+			
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType#copy()
+		 */
+		@Override
+		public IndexType copy(TableSpecification spec) {
+			return spec.new FullTextIndex(this);
+		}
+
+	
+		
+	}
+	public class Index extends IndexType {
+		private final boolean unique;
+		public Index(String name,boolean unique, String ...strings) throws InvalidArgument{
+			super(name,strings);
+			this.unique=unique;
+		}
+		public Index(Index i) {
+			super(i);
+			this.unique=i.unique;
+		}
+		
+		public boolean getUnique(){
+			return unique;
+		}
+		
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType#accept(uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor)
+		 */
+		public void accept(FieldTypeVisitor vis) {
+			vis.visitIndex(this);
+			
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType#copy(uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification)
+		 */
+		@Override
+		public IndexType copy(TableSpecification spec) {
+			return spec.new Index(this);
+		}
+	}
+	
+}

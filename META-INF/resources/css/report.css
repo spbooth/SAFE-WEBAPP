@@ -1,0 +1,27 @@
+
+body{
+text-align: left;
+color: black;
+font-size: medium;
+}
+p, div.fig, div.nodata, h1, h2, h3, h4{
+width: 90%;
+}
+div.fig, div.nodata{
+text-align: center;
+}
+p, div.fig , h1, h2, h3, h4, table{
+margin-left: auto;
+margin-right: auto;
+margin-top: 20px;
+margin-bottom: 20px;
+border-spacing: 2px;
+border: 1px;
+}
+table {
+border-spacing: 2px;
+border: 1px;
+}
+table td, table th{
+padding: 1px;
+}

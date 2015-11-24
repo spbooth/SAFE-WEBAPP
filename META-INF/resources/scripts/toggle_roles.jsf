@@ -1,0 +1,22 @@
+<%
+  for(Iterator<String> it=session_service.getToggleRoles().iterator(); it.hasNext(); ){
+  String role= it.next();
+  String role_name=role;
+%>
+  <div class="bar">
+  <h3> You are <%
+  	if( ! session_service.hasRole(role) ){
+  %>NOT<%
+  	}
+  %> <%=role_name%></h3>
+  <form method="post" action="<%=response.encodeURL(request.getContextPath()+"/UserServlet")%>">
+  <input type="hidden" name="page" value="<%=conn.getService(ServletService.class).encodePage()%>"/>
+  <input type="hidden" name="action" value="TOGGLE_PRIV"/>
+  <input type="hidden" name="role" value="<%=role%>" />
+  <input class="input_button" type="submit" value="  Toggle  ">
+
+  </form>
+  </div>
+<%
+	}
+%>

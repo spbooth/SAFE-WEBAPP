@@ -1,0 +1,5 @@
+Test text1: %%test_text1%%
+Test text2: %%test_text2=default text%%
+%%begin{additional_info_region}%%
+Additional info: %%additional_info%%
+%%end{additional_info_region}%%

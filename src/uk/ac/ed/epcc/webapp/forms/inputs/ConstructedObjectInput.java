@@ -1,0 +1,139 @@
+// Copyright - The University of Edinburgh 2011
+/*******************************************************************************
+ * Copyright (c) - The University of Edinburgh 2010
+ *******************************************************************************/
+package uk.ac.ed.epcc.webapp.forms.inputs;
+
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+
+/** Input to select a objects dynamically constructed from the configuration service 
+ * This defaults to the set of <b>class.</b> definitions {@link AppContext#makeObject(Class, String)}
+ * The target object is further constrained to be assignable to a specific type.
+ * For security reasons its important that this class cannot be forced to generate a class other than
+ * than those specified.
+ * @author spb
+ *
+ * @param <T>
+ */
+@uk.ac.ed.epcc.webapp.Version("$Id: ConstructedObjectInput.java,v 1.4 2014/09/15 14:30:19 spb Exp $")
+
+public class ConstructedObjectInput<T> implements ListInput<String,T>{
+    private final AppContext c;
+    private String name;
+    private String key;
+    private Class<T> clazz;
+    private Map<String,Class> reg;
+    
+	public ConstructedObjectInput(AppContext c,Class<T> target){
+    	this.c=c;
+    	clazz=target;
+    	reg = c.getClassMap(target);
+    	
+    	
+    }
+   
+	public T getItembyValue(String value) {
+		if( value == null ){
+			return null;
+		}
+		return c.makeObject(clazz, value); 
+	}
+
+	public Iterator<T> getItems() {
+		Set<T> set = new LinkedHashSet<T>();
+		for(String tag : reg.keySet()){
+			set.add(c.makeObject(clazz, tag));
+		}
+		return set.iterator();
+	}
+
+	public int getCount(){
+		return reg.size();
+	}
+	public String getTagByItem(T item) {
+		if( item == null){
+			return null;
+		}
+		for(String key : reg.keySet()){
+			if( item.getClass() == reg.get(key)){
+				return key;
+			}
+		}
+		return null;
+	}
+
+	public String getTagByValue(String value) {
+		return value;
+	}
+
+	public String getText(T item) {
+		String tag = getTagByItem(item);
+		return tag;
+	}
+
+	public String convert(Object v) throws TypeError {
+		if( v instanceof String ){
+			return (String) v;
+		}
+		return null;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public String getPrettyString(String value) {
+		return value;
+	}
+
+	public String getString(String value) {
+		return value;
+	}
+
+	public String getValue() {
+		return name;
+	}
+
+	public void setKey(String key) {
+		
+		this.key=key;
+	}
+
+	public String setValue(String v) throws TypeError {
+		String old=name;
+		name=v;
+		return old;
+	}
+
+	public void validate() throws FieldException {
+		if( name != null && reg.containsKey(name)){
+			return;
+		}
+		
+			if( name == null ){
+				throw new MissingFieldException();
+			}
+			throw new ValidateException("Invalid selection "+name);
+	}
+
+	public T getItem() {
+		return c.makeObject(clazz, getValue());
+	}
+
+	public void setItem(T item) {
+		name=getTagByItem(item);
+		
+	}
+	public <R> R accept(InputVisitor<R> vis) throws Exception {
+		return vis.visitListInput(this);
+	}
+
+}

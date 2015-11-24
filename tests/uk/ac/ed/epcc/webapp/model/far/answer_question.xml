@@ -1,0 +1,19 @@
+<Diff>
+<TableSpecification name='TestResponseStringData'>
+<QuestionID reference='TestFormsPageSectionQuestion'/>
+<ResponseID reference='TestResponse'/>
+<Modified type='Long' nullable='true'/>
+<ChangedBy type='Integer' nullable='true'/>
+<Data type='String' nullable='true' max='5592405'/>
+<Link type='Index' unique='true'><Column name='QuestionID'/><Column name='ResponseID'/></Link>
+<LeftKey type='Index' unique='false'><Column name='QuestionID'/></LeftKey>
+<RightKey type='Index' unique='false'><Column name='ResponseID'/></RightKey>
+</TableSpecification>
+<TestResponseStringData id='1'>
+<QuestionID>1</QuestionID>
+<ResponseID>1</ResponseID>
+<Modified>1435235645</Modified>
+<ChangedBy>1</ChangedBy>
+<Data>Yes I stink</Data>
+</TestResponseStringData>
+</Diff>

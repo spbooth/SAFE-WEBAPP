@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?><transition_page>
+<SummaryContent/>
+<Form>
+<table class="form">
+<tr class="even">
+<th>
+<label class="required">Attach file</label>
+</th>
+<td>
+<input type="file" name="text" class="input"/>
+</td>
+</tr>
+</table>
+<fieldset class="action_buttons">
+<input class="input_button" type="submit" name="Upload" value="Upload"/>
+</fieldset>
+</Form>
+</transition_page>

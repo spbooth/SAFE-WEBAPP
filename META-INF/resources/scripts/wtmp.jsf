@@ -1,0 +1,30 @@
+<!-- Fragment to show current logged in users if supported.
+Restrict access to this info as it is personal data.
+ -->
+<%@page import="uk.ac.ed.epcc.webapp.servlet.WtmpManager, 
+uk.ac.ed.epcc.webapp.session.SessionService, 
+uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService"%>
+ <%
+ SessionService sess = conn.getService(SessionService.class);
+ if( sess != null && sess instanceof ServletSessionService){
+	 WtmpManager man = ((ServletSessionService)sess).getWtmpManager();
+     if( man != null ){
+ %>
+<div class="wideblock">
+<H2>Current logged in users </H2>
+<table>
+<%= man.getHTMLHeader() %>
+<%
+		for(Iterator it = man.getCurrent() ; it.hasNext();){
+			WtmpManager.Wtmp w = (WtmpManager.Wtmp) it.next();
+%>
+<%= man.getHTML(w,sess) %>
+<% 
+		}
+     }
+%>
+</table>
+</div>
+<%
+}
+%>

@@ -1,0 +1,285 @@
+body {
+    color: black;
+    font-size: medium;
+}
+
+/* all divs form a centered column */
+div.block, div.bar, div.textbar,div.text, div.graph {
+    width: 95%;
+}
+div.report {
+    width: 75%;
+}
+/* common properties of all divs */
+div.block, div.bar, div.textbar,div.text, div.graph, div.report {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: left;
+    color: black;
+    font-family: "MS Arial", "Helvetiva", sans-serif;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+    font-size: medium;
+    text-decoration: none;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    white-space: normal;
+}
+
+/* The basic centered block
+ * This can hold headers paragraphs and forms.
+ */
+div.block{
+    background-color: #ffffff;
+}
+
+/* Simple single line bar contains a single h3 heading and 
+ * a submit button only form. We swap the text direction to get the button on the right
+ */
+div.bar{
+    text-align: right;
+    background-color: #FFFFFF;
+}
+
+/* simple single bar containing only text */
+div.textbar{
+    background-color: #72acd8;
+}
+
+/* text only column */
+div.text{
+    color: blue;
+}
+
+/* large table based report */
+div.report {
+    color: blue;
+    text-align: center;
+}
+div.report h2{
+    color: blue;
+    text-align: center;
+}
+/* block containing an image */
+div.graph{
+    width: 100%;
+    text-align: center;
+}
+div.graph h2{
+    text-align: center;
+}
+
+
+/* we use three levels of header as standard 
+ * h2 is the top level header in a block
+ * h3 is a secondary header or a header in a div.bar
+ * h4 is a smaller header for dubdivisions.
+*/
+
+h2, h3, h4 {
+    font-size: 110%;
+    color: black;
+    text-align: left;
+    line-height: normal;
+    margin: 0;
+    padding: 4px;
+}
+
+ /*
+  * secondary header in a block
+  */
+div h2{
+    border-style: solid;
+	border-color: #000066;
+	background-color: #eeeeff;
+}
+
+div h3{
+    background-color: #FFFFFF;
+}
+
+div h4{
+    background-color: #ffeebb;
+}
+
+label{
+    text-align: left;
+}
+
+/* A form within a block element. This can contain a nested 
+ * table for fine grain layout but submit buttons at the end of the form
+ * can be left floating.
+ */
+div.block form{
+    background-color: #ffffff;
+    margin: 2px 0px;
+    padding: 0;
+    text-align: right;
+}
+
+/* table for fine tuning the layout within a form
+ * these have an explicit border 
+ */
+table.form{
+    border: solid #72acd8;
+    border-width: 3px;
+    background-color: #ffffff;
+    margin: 5px 0px;
+}
+table.form tr {
+        width: 100%;
+}
+table.form td {
+    padding: 2px;
+    background-color: #ffffff;
+}
+
+/* auto generated table from Table class */
+table.auto {
+    width: 100%;
+}
+div.report  th {
+    color: blue;
+    background-color: #ffffff;
+}
+div.report td {
+    background-color: #eeeeee;
+}
+table.auto td.first{
+    text-align: left;
+}
+table.auto td.key{
+    text-align: left;
+}
+table.auto td.main{
+    text-align: right;
+}
+/* paragraph within a block
+ */
+div.block p, div.block ul, div.block table{
+    text-align: left;
+    margin: 4px 0px;
+}
+div.block p, div.block ul{
+    background-color: #ffffff;
+    color: black;
+    padding: 8px;
+}
+
+div.block ul{
+    list-style: inside;
+}
+div.block table {
+    width: 100%;
+    border: solid #ffffff;
+}
+
+/* supress the cell seperators for nested tables */
+div.block table table {
+    border-spacing: 0;
+    border-width: 0;
+}
+
+div.report table {
+    width: 100%;
+    border: solid grey;
+}
+
+table.compact {
+    border: none;
+    border-spacing: 0;
+    margin: 3px 0px;
+}
+
+div.bar form{
+    display: block;
+    margin: 2px;
+    text-align: right;
+    padding: 0;
+}
+
+/* heading within a bar
+ */
+div.bar h2, div.bar h3{
+    font-weight: normal;
+    display: block;
+    float: left;
+    line-height: normal;
+    margin: 2px;
+    background-color: #FFFFFF;
+}
+
+/* fixes to try and get nested tables to pick up the correct
+ * highlighting make the notice rule more explicit so it
+ * wins over ther highlight rule prefix everything with div to
+ * avoid matching legacy header footer table formatting.
+ */
+
+div tr.notice td, div tr td.notice{
+    color: black;
+    background-color: #ffcccc;
+}
+
+div  *.highlight td{
+    color: black;
+    background-color: #ffffcc;
+}
+
+div td {
+    color: black;
+    background-color: #ffffff;
+}
+td.numeric , td.notice_numeric{
+    text-align: right;
+    white-space: nowrap;
+}
+div td.notice_numeric{
+    background-color: #ffcccc;
+}
+/* a table cell intended to hold a form buton */
+div td.button {
+    text-align: center;
+    background-color: #72acd8;
+}
+div th {
+    color: black;
+    background-color: #ffffff;
+}
+.center{
+    text-align: center;
+}
+.plain {
+    background-color: #ffffff;
+}
+.warn {
+    color: #ff0000;
+}
+.notice {
+    background-color: #ffcccc;
+}
+.highlight,div.block  p.highlight {
+    background-color: #ffffcc;
+}
+.grey {
+    background-color: #3554bd;
+}
+.lightgrey{
+    background-color: #72acd8;
+}
+
+/* the header */
+div.header {
+    align: centre;
+    border-style: solid;
+	border-color: #000066;
+	padding: 2pt;
+	background-color: #eeeeff;
+}
+div.header table, div.header td {
+	background-color: #eeeeff;
+}

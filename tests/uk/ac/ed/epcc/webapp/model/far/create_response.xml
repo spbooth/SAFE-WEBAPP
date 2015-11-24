@@ -1,0 +1,9 @@
+<Diff><TableSpecification name='TestResponse'>
+<FormID reference='TestForms'/>
+<SubmitterID reference='Person'/>
+</TableSpecification>
+<TestResponse id='1'>
+<FormID>1</FormID>
+<SubmitterID>1</SubmitterID>
+</TestResponse>
+</Diff>

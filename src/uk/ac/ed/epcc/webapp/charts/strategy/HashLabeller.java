@@ -1,0 +1,145 @@
+// Copyright - The University of Edinburgh 2014
+package uk.ac.ed.epcc.webapp.charts.strategy;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.Vector;
+
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Contexed;
+
+@uk.ac.ed.epcc.webapp.Version("$Id: HashLabeller.java,v 1.3 2014/09/15 14:30:13 spb Exp $")
+/**
+ * HashLabeller implemetation class for classes that implement Labelled and builds the label
+ * vector and the mappings as data is seen. Sets are ordered according to
+ * the order the first data from that set was seen.
+ * non String internal label types are supported to allow sorting by label but
+ * these are converted to Strings
+ * 
+ * This class is often included by composition rather than directly extended
+ * 
+ * @author spb
+ * @param <T> type of object being mapped
+ * @param <K> type of key object generated
+ */
+public abstract class HashLabeller<T,K> implements Labelled,Contexed {
+
+    AppContext conn;
+	Map<K,Number> map;
+
+	Map<Object,Number> label_to_set;
+
+	Vector<String> labels;
+
+	int next_set = 0;
+
+	public HashLabeller(AppContext c) {
+		conn=c;
+		map = new HashMap<K,Number>();
+		label_to_set = new TreeMap<Object,Number>();
+		labels = new Vector<String>();
+	}
+
+	public AppContext getContext(){
+		return conn;
+	}
+	/**
+	 * Create the Key object from the object being plotted. All objects with
+	 * the same key map to the same plot, different keys may map to the same
+	 * plot if desired.
+	 * 
+	 * @param r
+	 *            Plot Object
+	 * @return key Object
+	 */
+	public abstract K getKey(T r);
+
+	/**
+	 * generates the label object we could get this either from the key or
+	 * the object itself. This will be converted to a string to generate
+	 * the chart label
+	 * 
+	 * @param key
+	 *            Key Object
+	 * @param r
+	 *            Plot Object
+	 * @return label Object
+	 */
+	public abstract Object getLabel(K key, T r);
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see uk.ac.hpcx.report.TimeChart.LabeledTransform#getLabels()
+	 */
+	public final Vector<String> getLabels() {
+
+		return labels;
+	}
+
+	/** Get a permutation array for the sets depending on the
+	 * natural ordering of the internal label objects.
+	 * 
+	 * @return
+	 */
+	public int[] getPerm(){
+		int result[] = new int[label_to_set.size()];
+		int i=0;
+		for( Object lab : label_to_set.keySet()){
+			Number n = label_to_set.get(lab);
+			result[n.intValue()]=i++;
+		}
+		return result;
+	}
+
+
+	public final int getSet(T o) {
+		K key = getKey(o);
+		return getSet(key,o);
+	}
+	protected final int getSet(K key, T o) {
+		Number set = map.get(key);
+		if (set == null) {
+			// found new value
+			set = newSet(getLabel(key, o));
+			map.put(key, set);
+		}
+		return set.intValue();
+	}
+
+	/**
+	 * Generate the Set value corresponding to a label default
+	 * implementation is to generate a new set for each new label seen. If
+	 * the label has already been used the old set number is returned
+	 * otherwise a new one is generates
+	 * 
+	 * @param lab
+	 *            the label object to use for this o
+	 * @return Number
+	 */
+	private Number newSet(Object lab) {
+
+		Number set =  label_to_set.get(lab);
+		if (set != null) {
+			// we have already seen this label
+			return set;
+		}
+		labels.add(lab.toString());
+		set = new Integer(next_set++);
+		label_to_set.put(lab, set);
+		return set;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see uk.ac.hpcx.report.TimeChart.LabeledTransform#nSets()
+	 */
+	public final int nSets() {
+
+		return labels.size();
+	}
+
+	
+}

@@ -1,0 +1,77 @@
+<%--
+A generic message fragment used for printing standardised messages
+normally included as the body of messages.jsp (which should contain the 
+application specific formatting.
+--%>
+<%@page import="uk.ac.ed.epcc.webapp.messages.MessageBundleService"%>
+<%
+// Call strip on any text provided from the request to stop external entities inserting html such as javascript
+// its ok to include html from attributes or the messages file as we control these.
+	String message_type  = (String) request.getAttribute("message_type");
+	if(message_type == null) message_type = strip(request.getParameter("message_type"));
+	String message_title = (String) request.getAttribute("message_title");	
+	if(message_title == null) message_title = strip(request.getParameter("message_title"));
+	String message_text  = (String) request.getAttribute("message_text");	
+	if(message_text == null) message_text = strip(request.getParameter("message_text"));
+	String message_extra  = (String) request.getAttribute("message_extra");	
+	if(message_extra == null) message_extra = strip(request.getParameter("message_extra"));
+
+	Object args[] = (Object[]) request.getAttribute("args");
+	if(args == null) args = new Object[0];
+
+	if( message_type != null ){
+	  ResourceBundle mess = conn.getService(MessageBundleService.class).getBundle();
+	  if( message_title == null ){
+		  try{
+			  message_title = MessageFormat.format(mess.getString(message_type + ".title"),args);
+		  }catch(MissingResourceException e){
+			  if( conn == null ){
+				  message_title="Missing AppContext (Exception occured)";
+			  }else{
+			  	conn.error(e,"missing message title for "+message_type);
+			  }
+		  }
+	  }
+	  if( message_text == null ){
+		  try{
+			  message_text = MessageFormat.format(mess.getString(message_type + ".text"),args);
+		  }catch(MissingResourceException e){
+			  if(conn != null ){
+			  	conn.error(e,"missing message text for "+message_type);
+			  }else{
+				  message_text="No message text for "+message_type;
+			  }
+		  }
+	  }
+	  if( message_extra == null ){
+		  try{
+			  message_extra = MessageFormat.format(mess.getString(message_type + ".extra"),args);
+		  }catch(MissingResourceException e){
+			  // Not an error
+		  }
+	  }
+	}
+	if( message_title == null ){
+		message_title="Information";
+		if( conn != null ){
+			conn.error("message without title");
+		}
+	}
+	if( message_text == null ){
+		message_text = "";
+		if( conn != null ){
+			conn.error("message without text");
+		}
+	}
+%>
+<div class="block">
+ <h2><%=message_title %></h2>
+ <p>
+ <%=message_text %>
+ </p>
+ <% if( message_extra != null ){ %>
+ <p>
+ <%=message_extra %>
+ </p>
+ <% } %>
+ </div>
