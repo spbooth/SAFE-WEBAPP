@@ -11,8 +11,6 @@ package uk.ac.ed.epcc.webapp;
  *
  * @param <A>
  */
-@uk.ac.ed.epcc.webapp.Version("$Id: LazyObjectCreator.java,v 1.3 2014/09/15 14:30:11 spb Exp $")
-
 public class LazyObjectCreator<A> implements Contexed {
   private final AppContext conn;
   private final Class<? super A> clazz;

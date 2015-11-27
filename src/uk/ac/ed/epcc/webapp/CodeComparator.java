@@ -11,8 +11,6 @@ import java.util.Comparator;
  * @author spb
  *
  */
-@uk.ac.ed.epcc.webapp.Version("$Id: CodeComparator.java,v 1.9 2014/09/15 14:30:11 spb Exp $")
-
 public class CodeComparator implements Comparator<String> {
 
 	public int compare(String arg0, String arg1) {

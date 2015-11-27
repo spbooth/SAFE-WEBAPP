@@ -12,7 +12,6 @@ import uk.ac.ed.epcc.webapp.time.TimePeriod;
  * @author spb
  *
  */
-@uk.ac.ed.epcc.webapp.Version("$Id: AbstractPeriodSetPlot.java,v 1.3 2014/09/15 14:30:11 spb Exp $")
 public abstract class AbstractPeriodSetPlot extends AbstractSingleValueSetPlot implements
 		PeriodSetPlot {
 

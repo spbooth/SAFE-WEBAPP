@@ -14,8 +14,6 @@ import uk.ac.ed.epcc.webapp.model.data.Duration;
  * @author spb
  *
  */
-@uk.ac.ed.epcc.webapp.Version("$Id: NumberOp.java,v 1.11 2014/09/15 14:30:11 spb Exp $")
-
 public class NumberOp {
     /** Should we use double for this Number type.
      * Any Number type we do not handle explicity

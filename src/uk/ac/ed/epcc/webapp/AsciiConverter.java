@@ -4,7 +4,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp;
 import java.text.Collator;
-@uk.ac.ed.epcc.webapp.Version("$Id: AsciiConverter.java,v 1.7 2014/09/15 14:30:11 spb Exp $")
 
 public class AsciiConverter {
 

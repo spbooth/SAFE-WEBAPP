@@ -480,10 +480,13 @@ public class DefaultServletService implements ServletService{
 			sess.invalidate();
 		}
 		if( remove_cookie){
-			for( Cookie c : getRequest().getCookies()){
-				if( c.getName().equalsIgnoreCase("JSESSIONID")){
-					c.setMaxAge(0);
-					((HttpServletResponse)res).addCookie(c);
+			HttpServletRequest request = getRequest();
+			if( request != null ){
+				for( Cookie c : request.getCookies()){
+					if( c.getName().equalsIgnoreCase("JSESSIONID")){
+						c.setMaxAge(0);
+						((HttpServletResponse)res).addCookie(c);
+					}
 				}
 			}
 		}

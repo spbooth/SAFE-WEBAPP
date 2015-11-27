@@ -8,7 +8,6 @@ import java.util.Date;
  * @author spb
  *
  */
-@uk.ac.ed.epcc.webapp.Version("$Revision: 1.1 $")
 public class CurrentTimeService implements AppContextService<CurrentTimeService> {
 
 	/* (non-Javadoc)

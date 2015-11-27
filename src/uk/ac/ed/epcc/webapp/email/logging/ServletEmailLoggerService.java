@@ -19,16 +19,20 @@ import uk.ac.ed.epcc.webapp.AppContextService;
  * @author spb
  *
  */
-@uk.ac.ed.epcc.webapp.Version("$Id: ServletEmailLoggerService.java,v 1.4 2014/09/15 14:30:16 spb Exp $")
+@uk.ac.ed.epcc.webapp.Version("$Id: ServletEmailLoggerService.java,v 1.5 2015/11/27 08:15:43 spb Exp $")
 
 public class ServletEmailLoggerService extends EmailLoggerService {
+	
     @SuppressWarnings("unchecked")
 	@Override
 	protected Hashtable getProps() {
 		Hashtable props= super.getProps();
 		if (req != null) {
 			String url = req.getRequestURL().toString();
-			if( url != null){
+			if( url != null && url.contains("password")){
+				url="redacted";
+			}
+			if( url != null ){
 				props.put("request_url", url);
 			}
 			

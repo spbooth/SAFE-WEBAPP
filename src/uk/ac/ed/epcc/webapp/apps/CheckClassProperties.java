@@ -10,9 +10,6 @@ import java.util.Properties;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
-@uk.ac.ed.epcc.webapp.Version("$Id: CheckClassProperties.java,v 1.5 2014/09/15 14:30:11 spb Exp $")
-
-
 public class CheckClassProperties implements Command {
     private final AppContext conn;
     public CheckClassProperties(AppContext conn){

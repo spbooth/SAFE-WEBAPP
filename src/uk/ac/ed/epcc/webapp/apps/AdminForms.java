@@ -18,8 +18,6 @@ import uk.ac.ed.epcc.webapp.forms.registry.FormFactoryProviderRegistry;
 import uk.ac.ed.epcc.webapp.forms.registry.FormFactoryProviderTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.registry.FormOperations;
 import uk.ac.ed.epcc.webapp.session.SessionService;
-@uk.ac.ed.epcc.webapp.Version("$Id: AdminForms.java,v 1.27 2014/09/15 14:30:11 spb Exp $")
-
 
 public class AdminForms extends GraphicsCommand implements Command {
    

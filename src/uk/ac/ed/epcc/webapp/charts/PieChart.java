@@ -18,7 +18,6 @@ import uk.ac.ed.epcc.webapp.content.InvalidArgument;
  * @author spb
  *
  */
-@uk.ac.ed.epcc.webapp.Version("$Id: PieChart.java,v 1.16 2014/09/15 14:30:12 spb Exp $")
 
 public class PieChart extends Chart {
 	protected PieChart(AppContext conn) {

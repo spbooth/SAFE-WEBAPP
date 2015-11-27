@@ -29,7 +29,7 @@ import uk.ac.ed.epcc.webapp.resource.ResourceService;
  * @author spb
  *
  */
-@uk.ac.ed.epcc.webapp.Version("$Id: TemplateFinder.java,v 1.7 2015/11/05 14:02:15 spb Exp $")
+@uk.ac.ed.epcc.webapp.Version("$Id: TemplateFinder.java,v 1.8 2015/11/25 16:29:17 spb Exp $")
 
 public class TemplateFinder {
 	private final AppContext conn;
@@ -71,10 +71,11 @@ public class TemplateFinder {
 		ResourceService serv = conn.getService(ResourceService.class);
 		String dir=conn.getInitParameter(group);
 		if( dir != null ){
-			String file=dir+"/"+name;
-			InputStream stream = serv.getResourceAsStream(file);
-			if( stream != null ){
+			for( String d : dir.split("\\s*,\\s*")){
+				String file=d+"/"+name;
+				InputStream stream = serv.getResourceAsStream(file);
 				if( stream != null ){
+
 					StringBuilder file_buffer = new StringBuilder();
 					InputStreamReader f = new InputStreamReader(stream);
 
@@ -88,10 +89,10 @@ public class TemplateFinder {
 					return expand(name,file_buffer.toString());
 
 				}
-			}else{
-				conn.getService(LoggerService.class).getLogger(getClass()).error("Template "+file+" not found");
-				return "  no template found "+name+"  ";
 			}
+			conn.getService(LoggerService.class).getLogger(getClass()).error("Template "+name+" not found in "+dir);
+			return "  no template found "+name+"  ";
+
 		}
 		throw new IOException("No template directory specified");
 	}

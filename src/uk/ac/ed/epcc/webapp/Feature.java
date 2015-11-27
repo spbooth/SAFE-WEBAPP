@@ -25,7 +25,6 @@ import uk.ac.ed.epcc.webapp.content.Table;
  * @author spb
  *
  */
-@uk.ac.ed.epcc.webapp.Version("$Id: Feature.java,v 1.17 2015/11/20 14:12:32 spb Exp $")
 public class Feature implements Comparable<Feature>{
 	private static Set<Feature> known_features = Collections.synchronizedSet( new HashSet<Feature>());
 	private static Map<String,Feature> previous = Collections.synchronizedMap(new HashMap<String, Feature>());

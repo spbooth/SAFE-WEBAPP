@@ -55,10 +55,8 @@ public class Copyright {
 			.compile("Copyright - The University of Edinburgh \\d{4}");
 	
 	public static final Pattern VERSION_REGEX = Pattern
-			.compile("@(:?uk\\.ac\\.ed\\.epcc\\.webapp\\.)?Version");
+			.compile("@(:?uk\\.ac\\.ed\\.epcc\\.webapp\\.)?Version\\([^\\)]*\\)");
 	
-	public static final Pattern START_REGEX = Pattern
-			.compile("\\s*+(?:(?:public\\s+)|(?:private\\s+)|(?:protected\\s+)|(?:static\\s+)|(?:final\\s+))++class");
 
 	/*
 	 * ##########################################################################
@@ -76,6 +74,9 @@ public class Copyright {
 		copyrightText.put("wsdl", "<!-- " + COPYRIGHT + " -->");
 		copyrightText.put("xml", "<!-- " + COPYRIGHT + " -->");
 		copyrightText.put("xsd", "<!-- " + COPYRIGHT + " -->");
+		
+		copyrightText.put("jsp", "<%-- " + COPYRIGHT + " --%>");
+		copyrightText.put("jsf", "<%-- " + COPYRIGHT + " --%>");
 	}
 
 	public static final String XML_HEADER_START = "<?xml";
@@ -275,26 +276,22 @@ public class Copyright {
 		return true;
 	}
 
+	
 	private static String addID(StringBuilder header) {
-		if( VERSION_REGEX.matcher(header).find()){
-			// already in there
-			return header.toString();
-		}
-		Matcher m = START_REGEX.matcher(header);
+		
+		Matcher m = VERSION_REGEX.matcher(header);
 		StringBuffer sb = new StringBuffer();
 		
 		if( m.find()){
-			System.out.println("found "+m.group());
-			// Break strings so CVS dioes not modify the pattern
-			m.appendReplacement(sb, "\n@uk.ac.ed.epcc.webapp.Version(\"\\$"+"Id:"+"\\$\")\n$0");
+			// removes the version annotation
+			m.appendReplacement(sb, "");
 		}
 		m.appendTail(sb);
 		return sb.toString();
 	}
-
 	/**
 	 * Convenience method for recursively adding all files in a specified
-	 * directory and the files in directories of all of its children. Hidden files
+	 * directory and the files indirrectories of all of its children. Hidden files
 	 * are not added. If a directory is hidden, it will be skipped even if it
 	 * contains files that are not hidden.
 	 * 

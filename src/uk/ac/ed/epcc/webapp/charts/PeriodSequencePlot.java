@@ -3,7 +3,6 @@ package uk.ac.ed.epcc.webapp.charts;
 
 import java.util.Iterator;
 
-import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
 /** Each set of data consists of a sequence of time periods.
@@ -12,7 +11,6 @@ import uk.ac.ed.epcc.webapp.time.TimePeriod;
  * @author spb
  *
  */
-@uk.ac.ed.epcc.webapp.Version("$Id: PeriodSequencePlot.java,v 1.3 2014/09/15 14:30:12 spb Exp $")
 public interface PeriodSequencePlot extends PeriodPlot {
 
 	/** re-scale all data values to by factor divided by the

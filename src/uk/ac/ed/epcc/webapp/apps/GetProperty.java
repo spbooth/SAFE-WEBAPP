@@ -10,7 +10,6 @@ import java.util.Properties;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
-@uk.ac.ed.epcc.webapp.Version("$Id: GetProperty.java,v 1.6 2014/09/15 14:30:11 spb Exp $")
 
 
 public class GetProperty implements Command {

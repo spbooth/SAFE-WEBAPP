@@ -11,7 +11,6 @@ package uk.ac.ed.epcc.webapp.charts;
  * @author spb
  * 
  */
-@uk.ac.ed.epcc.webapp.Version("$Id: GenericSplitSetPlot.java,v 1.7 2014/09/15 14:30:12 spb Exp $")
 
 public class GenericSplitSetPlot extends SplitSetPlot {
 	int nset = 0, ncat = 0, nitem = 0;

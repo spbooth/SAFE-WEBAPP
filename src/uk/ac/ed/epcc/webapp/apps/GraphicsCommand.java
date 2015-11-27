@@ -16,7 +16,6 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.session.SessionService;
-@uk.ac.ed.epcc.webapp.Version("$Id: GraphicsCommand.java,v 1.10 2014/09/15 14:30:11 spb Exp $")
 public abstract class GraphicsCommand implements Command{
 	
 		private final AppContext conn;

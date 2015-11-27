@@ -24,7 +24,6 @@ import uk.ac.ed.epcc.webapp.logging.debug.DebugLoggerService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SimpleSessionService;
-@uk.ac.ed.epcc.webapp.Version("$Id: CommandLauncher.java,v 1.42 2015/10/26 10:07:04 spb Exp $")
 
 /** Class to run a {@link Command} from the command-line.
  * This class can be sub-classed to customise the AppContext creation.

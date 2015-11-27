@@ -28,7 +28,6 @@ import java.util.Queue;
  * @author jgreen4
  * 
  */
-@uk.ac.ed.epcc.webapp.Version("$Id: Options.java,v 1.7 2014/11/04 20:18:49 spb Exp $")
 
 public class Options {
 

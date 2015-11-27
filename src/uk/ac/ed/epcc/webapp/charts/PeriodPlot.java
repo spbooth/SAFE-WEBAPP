@@ -8,7 +8,6 @@ import uk.ac.ed.epcc.webapp.charts.strategy.SetRangeMapper;
  * @author spb
  *
  */
-@uk.ac.ed.epcc.webapp.Version("$Id: PeriodPlot.java,v 1.3 2014/09/15 14:30:12 spb Exp $")
 public interface PeriodPlot extends SetPlot {
 	/**
 	 * Basic method for mapping an object into the plot

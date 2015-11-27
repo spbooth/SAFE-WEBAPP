@@ -9,7 +9,6 @@ import uk.ac.ed.epcc.webapp.content.Table;
  * @author spb
  *
  */
-@uk.ac.ed.epcc.webapp.Version("$Id: ClassTableCreator.java,v 1.2 2014/09/15 14:30:11 spb Exp $")
 public class ClassTableCreator {
 	private final AppContext conn;
 

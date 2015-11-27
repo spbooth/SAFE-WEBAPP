@@ -19,7 +19,6 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  * @author jgreen4
  * 
  */
-@uk.ac.ed.epcc.webapp.Version("$Id: CommandLineLoggerService.java,v 1.9 2014/09/15 14:30:11 spb Exp $")
 
 public class CommandLineLoggerService implements LoggerService, Logger {
 

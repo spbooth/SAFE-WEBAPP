@@ -145,7 +145,6 @@ TargetType t = conn.makeObject(TargetType.class,"tag-name");
  * @author spb
  * 
  */
-@Version("$Id: AppContext.java,v 1.204 2015/11/20 14:12:32 spb Exp $")
 public final class AppContext {
 	
 	public static final String CLASSDEF_PROP_PREFIX = "classdef.";
@@ -165,8 +164,6 @@ public final class AppContext {
      *
      * @param <T>
      */
-@uk.ac.ed.epcc.webapp.Version("$Id: AppContext.java,v 1.204 2015/11/20 14:12:32 spb Exp $")
-
     private static final class FactoryKey<T>{
     	private final Class<T> target;
     	private final Class<? extends T> def;

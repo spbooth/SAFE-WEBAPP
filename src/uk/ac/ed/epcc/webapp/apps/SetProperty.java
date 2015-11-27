@@ -8,8 +8,6 @@ import java.util.LinkedList;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
-@uk.ac.ed.epcc.webapp.Version("$Id: SetProperty.java,v 1.6 2014/09/15 14:30:11 spb Exp $")
-
 
 public class SetProperty implements Command {
     AppContext conn;

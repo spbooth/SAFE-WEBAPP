@@ -3,7 +3,6 @@ package uk.ac.ed.epcc.webapp.charts;
 
 import java.util.Comparator;
 
-@uk.ac.ed.epcc.webapp.Version("$Id: ListSorter.java,v 1.3 2014/09/15 14:30:12 spb Exp $")
 /**
  * ListSorter sorts an array of indecies according to the values in an array
  * 

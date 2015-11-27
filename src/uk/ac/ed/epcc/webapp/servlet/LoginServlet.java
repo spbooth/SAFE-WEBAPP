@@ -37,7 +37,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @param <T> 
  * 
  */
-@uk.ac.ed.epcc.webapp.Version("$Id: LoginServlet.java,v 1.50 2015/11/16 17:20:31 spb Exp $")
+@uk.ac.ed.epcc.webapp.Version("$Id: LoginServlet.java,v 1.51 2015/11/26 13:54:42 spb Exp $")
 @WebServlet(name="LoginServlet", urlPatterns="/LoginServlet/*")
 public class LoginServlet<T extends AppUser> extends WebappServlet {
 	
@@ -130,7 +130,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 				req.setAttribute("page_name", "the Login Page");
 				req.setAttribute("page_url", getLoginPage(conn)+"?username="
 						+ encodeCGI(username));
-				message(conn, req, res, "new_password_emailed");
+				message(conn, req, res, "new_password_emailed", username);
 				return;
 			}
 			log.info("login requested for " + username);

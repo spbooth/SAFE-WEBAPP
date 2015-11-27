@@ -9,7 +9,6 @@ import java.util.Calendar;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.charts.chart2D.BarChart2DChartData;
 import uk.ac.ed.epcc.webapp.time.Period;
-@uk.ac.ed.epcc.webapp.Version("$Id: BarTimeChart.java,v 1.11 2014/09/15 14:30:11 spb Exp $")
 
 
 

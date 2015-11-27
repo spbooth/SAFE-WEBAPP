@@ -11,7 +11,6 @@ package uk.ac.ed.epcc.webapp.charts;
  * @author spb
  * 
  */
-@uk.ac.ed.epcc.webapp.Version("$Id: GenericSetPlot.java,v 1.7 2014/09/15 14:30:12 spb Exp $")
 
 public class GenericSetPlot extends AbstractSingleValueSetPlot {
 	int nset = 0;
