@@ -1,4 +1,16 @@
-// Copyright - The University of Edinburgh 2011
+//| Copyright - The University of Edinburgh 2011                            |
+//|                                                                         |
+//| Licensed under the Apache License, Version 2.0 (the "License");         |
+//| you may not use this file except in compliance with the License.        |
+//| You may obtain a copy of the License at                                 |
+//|                                                                         |
+//|    http://www.apache.org/licenses/LICENSE-2.0                           |
+//|                                                                         |
+//| Unless required by applicable law or agreed to in writing, software     |
+//| distributed under the License is distributed on an "AS IS" BASIS,       |
+//| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
+//| See the License for the specific language governing permissions and     |
+//| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.data.expr;
 
 import java.sql.ResultSet;
@@ -28,7 +40,7 @@ import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
  * @param <D> underlying value
  * @param <X> DataObject
  */
-@uk.ac.ed.epcc.webapp.Version("$Id: TypeFilterProducerSQLValue.java,v 1.13 2014/09/15 14:30:30 spb Exp $")
+
 
 public class TypeFilterProducerSQLValue<T,D,X extends DataObject> implements  SQLAccessor<T,X>,  FilterProvider<X,T> , Targetted<T>{
 	public TypeFilterProducerSQLValue(DataObjectFactory<X> fac, TypeProducer<T, D> converter, SQLAccessor<D,X> inner) {

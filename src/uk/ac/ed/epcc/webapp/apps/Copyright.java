@@ -1,3 +1,16 @@
+//| Copyright - The University of Edinburgh 2015                            |
+//|                                                                         |
+//| Licensed under the Apache License, Version 2.0 (the "License");         |
+//| you may not use this file except in compliance with the License.        |
+//| You may obtain a copy of the License at                                 |
+//|                                                                         |
+//|    http://www.apache.org/licenses/LICENSE-2.0                           |
+//|                                                                         |
+//| Unless required by applicable law or agreed to in writing, software     |
+//| distributed under the License is distributed on an "AS IS" BASIS,       |
+//| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
+//| See the License for the specific language governing permissions and     |
+//| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.apps;
 
 import java.io.BufferedWriter;
@@ -23,6 +36,9 @@ import java.util.regex.Pattern;
  * (&lt;?xml...).
  * </p>
  * <p>
+ * The program will update the license text if it already exists but preserve the original
+ * copyright date.
+ * <p>
  * This code is run using the main method. The root directory to start from can
  * be specified as the first argument. If no arguments are present, the current
  * working directory is used.
@@ -45,14 +61,28 @@ public class Copyright {
 	/**
 	 * Copyright notice
 	 */
-	public static final String COPYRIGHT = "Copyright - The University of Edinburgh "
-			+ Calendar.getInstance().get(Calendar.YEAR);
+	public static final String COPYRIGHT[] = {"Copyright - The University of Edinburgh "
+			+ Calendar.getInstance().get(Calendar.YEAR),
+			
+			"",
+			"Licensed under the Apache License, Version 2.0 (the \"License\");",
+			"you may not use this file except in compliance with the License.",
+			"You may obtain a copy of the License at",
+			"",
+            "   http://www.apache.org/licenses/LICENSE-2.0",
+            "",
+			"Unless required by applicable law or agreed to in writing, software",
+			"distributed under the License is distributed on an \"AS IS\" BASIS,",
+			"WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.",
+			"See the License for the specific language governing permissions and",
+			"limitations under the License."
+			};
 	/**
 	 * Regular expression matching the copyright notice or any other notice at the
 	 * top of a file to be replaced by the copyright notice.
 	 */
 	public static final Pattern COPYRIGHT_REGEX = Pattern
-			.compile("Copyright - The University of Edinburgh \\d{4}");
+			.compile("(Copyright - The University of Edinburgh )(\\d{4})");
 	
 	public static final Pattern VERSION_REGEX = Pattern
 			.compile("@(:?uk\\.ac\\.ed\\.epcc\\.webapp\\.)?Version\\([^\\)]*\\)");
@@ -66,30 +96,68 @@ public class Copyright {
 	 */
 
 	// Keyed by file extension
-	public static final Map<String, String> copyrightText = new HashMap<String, String>();
+	public static final Map<String, Bounds> copyrightBounds = new HashMap<String, Bounds>();
+	public static final Map<String,Pattern> boundPatterns = new HashMap<String, Pattern>();
+	public static final Map<String,String> copyrightText = new HashMap<String, String>();
+	public static final String NEW_LINE = System.getProperty("line.separator");
 	static {
-		copyrightText.put("java", "// " + COPYRIGHT);
-		copyrightText.put("properties", "# " + COPYRIGHT);
-		copyrightText.put("sql", "-- " + COPYRIGHT);
-		copyrightText.put("wsdl", "<!-- " + COPYRIGHT + " -->");
-		copyrightText.put("xml", "<!-- " + COPYRIGHT + " -->");
-		copyrightText.put("xsd", "<!-- " + COPYRIGHT + " -->");
+		copyrightBounds.put("java", new Bounds("//| ","|"));
+		copyrightBounds.put("properties",new Bounds( "#| ","|"));
+		copyrightBounds.put("sql", new Bounds("--| ","|"));
+		copyrightBounds.put("wsdl", new Bounds("<!--| ", " |-->"));
+		copyrightBounds.put("xml", new Bounds("<!--| " , " |-->"));
+		copyrightBounds.put("xsd", new Bounds("<!--| " , " |-->"));
+		copyrightBounds.put("jsp", new Bounds("<%--| " , " |--%>"));
+		copyrightBounds.put("jsf", new Bounds("<%--| " , " |--%>"));
+		int max=0;
+		for(String line : COPYRIGHT){
+			if ( line.length() > max ){
+				max = line.length();
+			}
+		}
+		for( String s : copyrightBounds.keySet()){
+			Bounds b = copyrightBounds.get(s);
+			boundPatterns.put(s, Pattern.compile(Pattern.quote(b.start)+".*"+Pattern.quote(b.end)));
+			StringBuilder sb = new StringBuilder();
+			for(String line : COPYRIGHT){
+				sb.append(b.start);
+				sb.append(line);
+				for(int i=line.length() ; i < max ; i++){
+					sb.append(" ");
+				}
+				sb.append(b.end);
+				sb.append(NEW_LINE);
+			}
+			copyrightText.put(s, sb.toString());
+		}
 		
-		copyrightText.put("jsp", "<%-- " + COPYRIGHT + " --%>");
-		copyrightText.put("jsf", "<%-- " + COPYRIGHT + " --%>");
 	}
 
 	public static final String XML_HEADER_START = "<?xml";
 
-	public static final String NEW_LINE = System.getProperty("line.separator");
+	
+	
 
 	// sanity check
 	static {
-		assert COPYRIGHT_REGEX.matcher(COPYRIGHT).matches() : "The regular "
+		assert COPYRIGHT_REGEX.matcher(COPYRIGHT[0]).matches() : "The regular "
 				+ "expression for the copyright statement didn't match the current "
 				+ "copyright notice";
 	}
-
+	
+	private static class Bounds {
+		/**
+		 * @param start
+		 * @param end
+		 */
+		public Bounds(String start, String end) {
+			super();
+			this.start = start;
+			this.end = end;
+		}
+		public final String start;
+		public final String end;
+	}
 	private static class MutInt {
 		private int i;
 
@@ -134,12 +202,12 @@ public class Copyright {
 
 		Map<String, MutInt> modFiles = new HashMap<String, MutInt>();
 		Map<String, MutInt> numFiles = new HashMap<String, MutInt>();
-		for (String type : copyrightText.keySet()) {
+		for (String type : copyrightBounds.keySet()) {
 			modFiles.put(type, new MutInt());
 			numFiles.put(type, new MutInt());
 		}
 
-		if (args.length < 1 && args[0] != null) {
+		if (args.length < 1 || args[0] != null) {
 			root = new File(System.getProperty("user.dir"));
 		} else {
 			root = new File(args[0]);
@@ -167,7 +235,7 @@ public class Copyright {
 				skipped++;
 				continue;
 			}
-
+			
 			try {
 				numFiles.get(extension).increment();
 				if (appendCopyright(file, copyright,extension)) {
@@ -183,7 +251,7 @@ public class Copyright {
 		System.out.println("Summary:");
 		System.out.println("\tTotal files encountered: " + total);
 		System.out.println("\tTotal files skipped:     " + skipped);
-		for (String type : copyrightText.keySet()) {
+		for (String type : copyrightBounds.keySet()) {
 			System.out.printf("\tTotal encountered/modified files of file type "
 					+ "%1$14s: %2$8s/%3$-8s\n", type, numFiles.get(type), modFiles
 					.get(type));
@@ -235,18 +303,35 @@ public class Copyright {
 		}
 
 		// If a copyright notice is already present
-		if (COPYRIGHT_REGEX.matcher(line).find()) {
-			// If the copyright notice is already there, we don't need to do anything
-			// but still go on to do the version stuff
-			
-			// if we wanted to update
-			//if (! line.trim().equals(copyrightText)) {
-			//	header.append(copyrightText).append(NEW_LINE);
-			//}
-		} else {
-			header.append(copyrightText).append(NEW_LINE);
-			header.append(line).append(NEW_LINE);
+		Matcher matcher = COPYRIGHT_REGEX.matcher(line);
+		if ( matcher.find()) {
+			// Notice is already there. Update text using previous year value.
+			String start = matcher.group(1);
+			String year = matcher.group(2);
+			Matcher tmp = COPYRIGHT_REGEX.matcher(copyrightText);
+			StringBuffer sb = new StringBuffer();
+			while( tmp.find()){
+				tmp.appendReplacement(sb,start+year);
+			}
+			tmp.appendTail(sb);
+			copyrightText= sb.toString();
+			header.append(copyrightText);
+			// skip any further text that matches bound pattern
+			if( scanner.hasNext()){
+				line=scanner.nextLine();
+				Pattern p = boundPatterns.get(extension);
+				while(p.matcher(line).matches() && scanner.hasNext()){
+					line=scanner.nextLine();
+				}
+				
+			}
+		}else{
+			header.append(copyrightText);
 		}
+		while(line.isEmpty() && scanner.hasNext()){
+			line=scanner.nextLine();
+		}
+		header.append(line).append(NEW_LINE);
 
 		// Read in the whole file;
 		scanner.useDelimiter("\\Z");
@@ -282,7 +367,7 @@ public class Copyright {
 		Matcher m = VERSION_REGEX.matcher(header);
 		StringBuffer sb = new StringBuffer();
 		
-		if( m.find()){
+		while( m.find()){
 			// removes the version annotation
 			m.appendReplacement(sb, "");
 		}
@@ -339,6 +424,7 @@ public class Copyright {
 	 *           IOException If an I/O error occurs
 	 */
 	private static void save(File file, String... textChunks) throws IOException {
+		
 		BufferedWriter out = null;
 
 		// Concatenate the strings
