@@ -151,7 +151,12 @@ public class DefaultDataBaseService implements DatabaseService {
 		String pass = props.getProperty("db_password"+suffix,"").trim();
 		String type = props.getProperty("db_type"+suffix,"").trim();
 		Connection conn;
-		if( name.length() == 0 || user.length() == 0){
+		if( name.length() == 0){
+			ctx.error("No DB connection name");
+			return null;
+		}
+		
+		if( pass.length() == 0 || user.length() == 0){
 			// try a passwordless connection
 			conn = java.sql.DriverManager.getConnection(name);
 			
