@@ -73,8 +73,9 @@ try{
 <%
 for(Object key : provider.getTransitions(target)){
 
-        
-    String valueString = provider.getText(key);
+    HtmlBuilder builder = new HtmlBuilder();
+    builder.clean(provider.getText(key));
+    String valueString = builder.toString();
 
 	if( provider.allowTransition(conn,target,key) ){
 		String help=provider.getHelp(key);
