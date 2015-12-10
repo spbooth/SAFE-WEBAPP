@@ -57,12 +57,15 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 	private static final String NAME = "Name";
 	private static final String EXPIRES_FIELD = "Expires";
 	private static final String OWNER_ID ="PersonId";
-	private final  long lifetime_millis;
-	private static final long default_lifetime=40L*24L*60L*60L*1000L;
+	/**
+	 * 
+	 */
+	private static final String SERV_DATA_LIFETIME_MONTHS_PROP = "serv_data.lifetime.months";
+
 	public DataObjectDataProducer(AppContext c, String tag) {
 		super();
 		setContext(c,tag);
-		lifetime_millis = c.getLongParameter("lifetime."+tag, default_lifetime);
+		
 		
 	}
 
@@ -88,23 +91,40 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 	}
 	public static class MimeData extends DataObject {
 
+	
 		protected MimeData(Record r) {
 			super(r);
 		}
 
-		public void setData(MimeStreamData data,long lifetime){
+		public void setData(MimeStreamData data){
 			record.setProperty(NAME, data.getName());
 			record.setProperty(MIME_TYPE, data.getContentType());
 			record.setProperty(DATA, data);
-			record.setProperty(EXPIRES_FIELD, new Date(System.currentTimeMillis()+lifetime));
-		}
-		
+			touch();
+		}		
 		public MimeStreamData getData() throws DataFault{
-		    	return new MimeStreamDataWrapper(record.getStreamDataProperty(DATA),record.getStringProperty(MIME_TYPE),record.getStringProperty(NAME));
+		    return new MimeStreamDataWrapper(record.getStreamDataProperty(DATA),record.getStringProperty(MIME_TYPE),record.getStringProperty(NAME));
 		}
 		
 		public boolean allow(SessionService<?> user){
-			return user.getCurrentPerson().getID() == record.getIntProperty(OWNER_ID);
+			return user.getCurrentPerson().getID() == record.getIntProperty(OWNER_ID,0);
+		}
+		
+		public void touch(){
+			try{
+			AppContext conn = getContext();
+			int live_months = conn.getIntegerParameter(SERV_DATA_LIFETIME_MONTHS_PROP, 1);
+			if( live_months > 0 ){
+				Calendar cal = Calendar.getInstance();
+				cal.add(Calendar.MONTH, live_months);
+				record.setProperty(EXPIRES_FIELD, cal.getTime());
+				SessionService<?> sess = conn.getService(SessionService.class);
+				record.setProperty(OWNER_ID, sess.getCurrentPerson().getID());	
+				commit();
+			}
+			}catch(Exception e){
+				getLogger().error("Error setting expire date",e);
+			}
 		}
 	}
 	
@@ -112,10 +132,16 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 	
 	public MimeStreamData getData(SessionService user, List<String> path)
 			throws Exception {
+		// Auto clean the table once per user session.
+		if( user.getAttribute(CLEANED_ATTR) == null){
+			clean();
+			user.setAttribute(CLEANED_ATTR, "yes");
+		}
 		MimeData d = find(Integer.parseInt(path.get(0)));
 		if( d == null || ! d.allow(user)){
 			return null;
 		}
+		d.touch();
 		return d.getData();
 	}
 
@@ -125,7 +151,7 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 	public List<String> setData(MimeStreamData data) {
 		try {
 			MimeData obj = makeBDO();
-			obj.setData(data,lifetime_millis);
+			obj.setData(data);
 			obj.commit();
 			LinkedList<String> result = new LinkedList<String>();
 			result.addFirst(Integer.toString(obj.getID()));

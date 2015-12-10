@@ -13,11 +13,9 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.content;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-
-import uk.ac.ed.epcc.webapp.WebappTestCase;
 
 
 /**

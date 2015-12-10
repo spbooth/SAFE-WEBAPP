@@ -69,6 +69,7 @@ public class AppContextFixtureRule extends ExternalResource{
 				if( name.startsWith("db_") ){
 					Object value = sys_properties.get(name);
 					if( overrides.containsKey(name) && value != null && value.toString().trim().length() > 0){
+						System.out.println("property override "+name+"->"+value);
 						overrides.put(name, value);
 					}
 				}

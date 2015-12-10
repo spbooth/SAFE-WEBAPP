@@ -150,6 +150,7 @@ public class DefaultDataBaseService implements DatabaseService {
 		String user = props.getProperty("db_username"+suffix,"").trim();
 		String pass = props.getProperty("db_password"+suffix,"").trim();
 		String type = props.getProperty("db_type"+suffix,"").trim();
+		//System.out.println("ACTUAL "+name+" "+user+" "+pass+" "+type);
 		Connection conn;
 		if( name.length() == 0){
 			ctx.error("No DB connection name");

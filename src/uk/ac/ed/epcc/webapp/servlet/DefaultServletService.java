@@ -495,10 +495,13 @@ public class DefaultServletService implements ServletService{
 		if( remove_cookie){
 			HttpServletRequest request = getRequest();
 			if( request != null ){
-				for( Cookie c : request.getCookies()){
-					if( c.getName().equalsIgnoreCase("JSESSIONID")){
-						c.setMaxAge(0);
-						((HttpServletResponse)res).addCookie(c);
+				Cookie[] cookies = request.getCookies();
+				if( cookies != null && cookies.length > 0){
+					for( Cookie c : cookies){
+						if( c.getName().equalsIgnoreCase("JSESSIONID")){
+							c.setMaxAge(0);
+							((HttpServletResponse)res).addCookie(c);
+						}
 					}
 				}
 			}

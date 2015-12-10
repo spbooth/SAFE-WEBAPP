@@ -29,6 +29,7 @@ import java.util.Hashtable;
 
 import org.junit.Before;
 import org.junit.Test;
+import java.util.Properties;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.config.CachedConfigService;
@@ -46,7 +47,15 @@ public class AppContextTest {
 	public void setUp() throws Exception {
 		ClassLoader cl = this.getClass().getClassLoader();
 		InputStream service_props_stream = cl.getResourceAsStream("test.properties");
-		System.getProperties().load(service_props_stream);
+		Properties test_prop = new Properties();
+		Properties properties = System.getProperties();
+		test_prop.load(service_props_stream);
+		// merge unset props, existing valeus in the system properties take precidence
+		for( Object name : test_prop.keySet() ){
+			if( ! properties.containsKey(name)){
+				properties.setProperty(name.toString(), test_prop.getProperty(name.toString()));
+			}
+		}
 		//System.setProperty("saf.defaults","WEB-INF/tests/test.properties");
 		ctx = new AppContext();
 	}

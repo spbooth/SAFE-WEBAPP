@@ -25,7 +25,8 @@ public class TimeStampInput extends AbstractDateInput implements HTML5Input{
 
 	@Override
 	public String[] getFormats() {
-		return new String[] {"yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm","yyyy-MM-dd HH", "yyyy-MM-dd" };
+		// A html5 picker input will use a timestamp including the T
+		return new String[] {"yyyy-MM-dd HH:mm:ss","yyyy-MM-dd'T'HH:mm:ss","yyyy-MM-dd HH:mm","yyyy-MM-dd'T'HH:mm","yyyy-MM-dd HH", "yyyy-MM-dd" };
 	}
 
 	public TimeStampInput(long resolution) {
