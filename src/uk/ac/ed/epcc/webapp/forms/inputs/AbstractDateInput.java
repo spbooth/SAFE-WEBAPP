@@ -45,11 +45,17 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 		int length=0;
 		String formats[] = getFormats();
 		df = new DateFormat[formats.length];
+	
 		for(int i=0 ; i< formats.length;i++){
-			df[i] = getDateFormat(formats[i]);
-			df[i].setLenient(false);
-			if( formats[i].length() > length){
-				length = formats[i].length();
+			try{
+				df[i] = getDateFormat(formats[i]);
+				df[i].setLenient(false);
+				if( formats[i].length() > length){
+					length = formats[i].length();
+				}
+			}catch(IllegalArgumentException e){
+				// be lenient here in case of old java version
+				df[i]=null;
 			}
 		}
 		setBoxWidth(length);
@@ -84,8 +90,10 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 		Date d=null;
 		for(int i=0 ; i< df.length ; i++){
 			try {
-				d = df[i].parse(v);
-				break;
+				if( df[i] != null ){
+					d = df[i].parse(v);
+					break;
+				}
 			} catch (java.text.ParseException e) {
 				if( i == (df.length-1)){
 					// none worked
