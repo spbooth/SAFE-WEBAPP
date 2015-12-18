@@ -62,7 +62,7 @@ public class SessionDataProducer implements SettableServeDataProducer {
 		String counter_attr = getTag()+_COUNTER;
 		Integer counter = (Integer) session_service.getAttribute(counter_attr);
 		if( counter == null ){
-			counter = new Integer(0);
+			counter = new Integer(1); // start at 1 so DB and session behave similarly in tests 
 		}
 		int id = counter.intValue();
 		session_service.setAttribute(counter_attr, Integer.valueOf(id+1));

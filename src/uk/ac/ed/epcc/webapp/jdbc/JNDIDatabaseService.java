@@ -41,7 +41,7 @@ public class JNDIDatabaseService extends DefaultDataBaseService {
 	protected SQLContext makeSQLContext(String tag,Properties prop) throws SQLException {
 		if( tag == null){
 			String pool_resource = prop.getProperty("connection.pool");
-			if (pool_resource != null) {
+			if (pool_resource != null && pool_resource.trim().length() > 0) {
 				// if we are using resource pooling get a connection now
 				// otherwise wait until we actually need it.
 				String lookup = "java:comp/env/" + pool_resource;
