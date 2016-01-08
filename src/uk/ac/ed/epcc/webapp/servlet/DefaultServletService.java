@@ -51,7 +51,7 @@ import uk.ac.ed.epcc.webapp.session.WebNameFinder;
  * 
  * This class implements the following strategy for extracting a user from a HTTP request
  * 
- * If the login factory implements  {@link ExtAuthAppUserFactory} or if the feature {@link AppUserFactory#EXTERNAL_AUTH_ONLY_FEATURE} is defined then
+ * If the login factory implements  {@link ExtAuthAppUserFactory} or if the feature {@link DefaultServletService#EXTERNAL_AUTH_ONLY_FEATURE} is defined then
  * web-names will be used to resolve the current user for all URLs (even if these conditions are not true then a explicit authentication servlet can
  * set session in this way, which is the normal mechanism if external and password authentication is needed). web-names can be taken from the REMOTE_USER or 
  * user certificate DN if present.
@@ -83,6 +83,15 @@ public class DefaultServletService implements ServletService{
     private final ServletResponse res;
 	private String web_path="";
     private int max_forward=10; // maximum number of calls to forward per request
+	/** Feature to allow external auth logins if a webname is present. As this applies to all locations
+	 * only a single default realm can be used.
+	 * 
+	 */
+	public static final Feature ALLOW_EXTERNAL_AUTH_FEATURE = new Feature("allow_external_auth",false,"container level authorisation can be used on any url if a web-name is present");
+	/** Feature to require external auth logins for all sessions.
+	 * 
+	 */
+	public static final Feature EXTERNAL_AUTH_ONLY_FEATURE = new Feature("external_auth",false,"Default authorisation is using external container level authorisation");
 	 public DefaultServletService(AppContext conn,ServletContext ctx, ServletRequest req,
 			ServletResponse res) {
 		super();
@@ -426,7 +435,7 @@ public class DefaultServletService implements ServletService{
 		try{
 			AppContext conn = getContext();
 			String name = getWebName();
-			if( name != null && (AppUserFactory.ALLOW_EXTERNAL_AUTH_FEATURE.isEnabled(conn) || AppUserFactory.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn))){
+			if( name != null && (DefaultServletService.ALLOW_EXTERNAL_AUTH_FEATURE.isEnabled(conn) || DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn))){
 				// If there is a web-name we don't consider password login
 				AppUserFactory<A> factory = sess.getLoginFactory();
 				String remote_auth_realm = conn.getInitParameter(RemoteAuthServlet.REMOTE_AUTH_REALM_PROP, WebNameFinder.WEB_NAME);
@@ -447,7 +456,7 @@ public class DefaultServletService implements ServletService{
 				// are available
 				String realm = conn.getInitParameter(BASIC_AUTH_REALM_PARAM);
 				HttpServletRequest request = getRequest();
-				if( request != null && realm != null && realm.trim().length() > 0 && ! AppUserFactory.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn)) {
+				if( request != null && realm != null && realm.trim().length() > 0 && ! DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn)) {
 					
 					String auth = request.getHeader("Authorization");
 					AppUserFactory<A> factory = sess.getLoginFactory();

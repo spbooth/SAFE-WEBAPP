@@ -319,89 +319,14 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			h.put(PASSWORD,"locked");
 			return h;
 		}
-		public static String nonRandomString(int length) {
-			char[][] chars = { { 'x', 'x' } };
-			return DatabasePasswordComposite.randomString(chars, length);
-		}
-		/**
-		 * Generates random sequences of characters in the ranges 'a'..'z', 'A'..'Z'
-		 * and '0'..'9'.
-		 * 
-		 * @param length
-		 *            The desired length of the output String
-		 * @return String
-		 */
-		public static String randomString(int length) {
-			char[][] chars = { { 'a', 'z' }, { 'A', 'Z' }, { '0', '9' }, };
-			return DatabasePasswordComposite.randomString(chars, length);
-		}
-		/**
-		 * Generates random sequences of characters taken from the input range,
-		 * which has the format:
-		 * 
-		 * <pre>
-		 * 	 {
-		 * 	 ( {&lt;first_char&gt;, &lt;second_char&gt;}, ) | {&lt;single_char&gt;}, ) *
-		 * 	 }
-		 * 	
-		 * </pre>
-		 * 
-		 * The <code>second_char</code> value <i>must</i> be higher than the
-		 * <code>first_char</code> value or the output will be undefined or
-		 * generate an <code>Exception</code>.
-		 * 
-		 * @param chars
-		 *            An array containing ranges of characters and/or single
-		 *            characters
-		 * @param length
-		 *            The length of the desired random string
-		 * @return A random string chosen from the provided input
-		 */
-		public static String randomString(char[][] chars, int length) {
-			// Work out how many possible characters are available
-			int total_chars = 0;
-			for (int i = 0; i < chars.length; i++) {
-				char[] range = chars[i];
-				if (range.length == 0) {
-					continue; // Bad format, ignore
-				}
-				if (range.length == 1) {
-					total_chars++;
-				} else {
-					total_chars += (range[1] - range[0]) + 1;
-				}
+		public String nonRandomString(int length) {
+			StringBuilder sb = new StringBuilder();
+			for( int i = 0 ; i < length ; i++){
+				sb.append('x');
 			}
-		
-			StringBuilder buff = new StringBuilder(length);
-			for (int c = 0; c < length; c++) {
-				// Pick a random character from the ranges
-				int r = (int) (Math.random() * total_chars);
-		
-				// Work out which character we picked
-				for (int i = 0; i < chars.length; i++) {
-					char[] range = chars[i];
-					if (range.length == 0) {
-						continue;
-					}
-					if (range.length == 1) {
-						if (r == 0) {
-							buff.append(chars[i][0]);
-							break;
-						}
-						r--;
-						continue;
-					}
-					int char_range = (range[1] - range[0]) + 1;
-					if (r >= char_range) {
-						r -= char_range;
-					} else {
-						buff.append((char) (chars[i][0] + r));
-						break;
-					}
-				}
-			}
-			return buff.toString();
+			return sb.toString();
 		}
+		
 		 public class PasswordResetRequiredPage implements RequiredPage<T>{
 		    	public boolean required(SessionService<T> user){
 		    		T currentPerson = user.getCurrentPerson();
@@ -415,7 +340,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		    		return new RedirectResult("/password_update.jsp");
 		    	}
 		    }
-		/** A handler class fro any database fields specific to the ccomposite.
+		/** A handler class fro any database fields specific to the composite.
 		 * 
 		 * @author spb
 		 *
@@ -459,7 +384,8 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 					boolean use_salt = res.hasField(DatabasePasswordComposite.SALT);
 
 					if( use_salt ){
-						salt=randomString(res.getInfo(DatabasePasswordComposite.SALT).getMax());
+						RandomService serv = getContext().getService(RandomService.class);
+						salt=serv.randomString(res.getInfo(DatabasePasswordComposite.SALT).getMax());
 						if( DatabasePasswordComposite.SALT_FIRST_FEATURE.isEnabled(conn)){
 							new_password=salt+new_password;
 						}else{
@@ -541,31 +467,6 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 					commit();
 				}
 				
-				/**
-				 * Sets the password to a random value and mark as requiring change
-				 * 
-				 * @return unencrypted password
-				 * @throws DataFault
-				 */
-				public String randomisePassword() throws DataFault {
-					String new_password = DatabasePasswordComposite.randomString(DatabasePasswordComposite.GENERATED_PASSWORD_LENGTH);
-					if( DatabasePasswordComposite.NON_RANDOM_PASSWORD.isEnabled(getContext())){
-						new_password=DatabasePasswordComposite.nonRandomString(DatabasePasswordComposite.GENERATED_PASSWORD_LENGTH);
-						getLogger().debug("Non random password "+new_password);
-					}
-					if( DatabasePasswordComposite.LOG_RANDOM_PASSWORD.isEnabled(getContext())){
-						getLogger().debug("Person "+user.getIdentifier()+" password randomised to "+new_password);
-					}
-					if (!canResetPassword(user)) {
-						// hack to give some indication if person removed
-						new_password = "Account is disabled";
-					} else {
-						setPassword(new_password.trim());
-						setPasswordStatus(DatabasePasswordComposite.INVALID);
-						commit();
-					}
-					return new_password;
-				}
 				public boolean passwordFailsExceeded(){
 					int fails= record.getIntProperty(DatabasePasswordComposite.PASSWORD_FAILS, 0);
 					if( fails == 0 ){
@@ -591,28 +492,6 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			    	}
 			    }
 				
-
-				/**
-				 * Sets the password to a random value and mark as the initial password sent
-				 * to user
-				 * 
-				 * @return unencrypted password
-				 * @throws DataFault
-				 */
-				public String firstPassword() throws DataFault {
-					String new_password = DatabasePasswordComposite.randomString(DatabasePasswordComposite.GENERATED_PASSWORD_LENGTH);
-					if( DatabasePasswordComposite.NON_RANDOM_PASSWORD.isEnabled(getContext())){
-						new_password=DatabasePasswordComposite.nonRandomString(DatabasePasswordComposite.GENERATED_PASSWORD_LENGTH);
-						getLogger().debug("Non random initial password "+new_password);
-					}
-					if( DatabasePasswordComposite.LOG_RANDOM_PASSWORD.isEnabled(getContext())){
-						getLogger().debug("Person "+user.getIdentifier()+" initial password randomised to "+new_password);
-					}
-					setPassword(new_password.trim());
-					setPasswordStatus(DatabasePasswordComposite.FIRST);
-					commit();
-					return new_password;
-				}
 
 				private PasswordStatus.Value getPasswordStatus() {
 					return record.getProperty(DatabasePasswordComposite.p_status);
@@ -660,20 +539,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 					return false;
 				}
 
-				/**
-				 * randomise a persons  password and send new password in an Email
-				 * @throws Exception 
-				 * 
-				 */
-				public void newPassword() throws Exception {
-					// Make a new password
-					String new_password = randomisePassword();
-					commit();
-					Emailer m = new Emailer(getContext());
-					m.newPassword(user, new_password);
-					
-
-				}
+			
 				/**
 				 * should the user get the welcome message.
 				 * 
@@ -837,7 +703,13 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	 */
 	@Override
 	public void newPassword(T user) throws Exception {
-		getHandler(user).newPassword();	
+		Handler h = getHandler(user);	
+		
+		// Make a new password
+		String new_password = randomisePassword(h);
+		h.commit();
+		Emailer m = new Emailer(getContext());
+		m.newPassword(user, new_password);
 	}
 
 	/* (non-Javadoc)
@@ -845,15 +717,54 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	 */
 	@Override
 	public String randomisePassword(T user) throws DataFault{
-		return getHandler(user).randomisePassword();
+		return randomisePassword(getHandler(user));
 		
+	}
+	/**
+	 * Sets the password to a random value and mark as requiring change
+	 * 
+	 * @return unencrypted password
+	 * @throws DataFault
+	 */
+	private String randomisePassword(Handler h) throws DataFault{
+		RandomService serv = getContext().getService(RandomService.class);
+		String new_password = serv.randomString(DatabasePasswordComposite.GENERATED_PASSWORD_LENGTH);
+		if( DatabasePasswordComposite.NON_RANDOM_PASSWORD.isEnabled(getContext())){
+			new_password=nonRandomString(DatabasePasswordComposite.GENERATED_PASSWORD_LENGTH);
+			getLogger().debug("Non random password "+new_password);
+		}
+		if( DatabasePasswordComposite.LOG_RANDOM_PASSWORD.isEnabled(getContext())){
+			getLogger().debug("Person "+h.user.getIdentifier()+" password randomised to "+new_password);
+		}
+		if (!canResetPassword(h.user)) {
+			// hack to give some indication if person removed
+			new_password = "Account is disabled";
+		} else {
+			h.setPassword(new_password.trim());
+			h.setPasswordStatus(DatabasePasswordComposite.INVALID);
+			h.commit();
+		}
+		return new_password;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.session.PasswordAuthComposite#newSignup(uk.ac.ed.epcc.webapp.session.AppUser)
 	 */
 	@Override
 	public String firstPassword(T user) throws DataFault{
-		return getHandler(user).firstPassword();
+		Handler r = getHandler(user);
+		RandomService serv = getContext().getService(RandomService.class);
+		String new_password = serv.randomString(DatabasePasswordComposite.GENERATED_PASSWORD_LENGTH);
+		if( DatabasePasswordComposite.NON_RANDOM_PASSWORD.isEnabled(getContext())){
+			new_password=nonRandomString(DatabasePasswordComposite.GENERATED_PASSWORD_LENGTH);
+			getLogger().debug("Non random initial password "+new_password);
+		}
+		if( DatabasePasswordComposite.LOG_RANDOM_PASSWORD.isEnabled(getContext())){
+			getLogger().debug("Person "+r.user.getIdentifier()+" initial password randomised to "+new_password);
+		}
+		r.setPassword(new_password.trim());
+		r.setPasswordStatus(DatabasePasswordComposite.FIRST);
+		r.commit();
+		return new_password;
 		
 	}
 	/* (non-Javadoc)

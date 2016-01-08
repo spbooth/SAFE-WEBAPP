@@ -140,13 +140,12 @@ public class PasswordChangeRequestFactory<A extends AppUser> extends DataObjectF
 		Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
 		StringBuilder input = new StringBuilder();
 		input.append(seed);
-		for(int i=0 ; i< 64 ; i++){
-			
-			char c = (char)('A'+ ((int)(Math.random()*26)));
-			input.append(c);
-		}
+		RandomService serv = getContext().getService(RandomService.class);
+		input.append(serv.randomString(64));
+		
 		log.debug("Input is "+input.toString());
 		try {
+			// obfuscate the tag
 			MessageDigest digest = MessageDigest.getInstance("MD5");
 			digest.update(input.toString().getBytes());
 			StringBuilder output= new StringBuilder();

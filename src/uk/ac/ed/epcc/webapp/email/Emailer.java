@@ -274,7 +274,7 @@ public class Emailer {
 		Logger log = conn.getService(LoggerService.class).getLogger(getClass());
 
 		if( EMAILS_FEATURE.isEnabled(conn)  && (conn.getAttribute(SUPRESS_EMAIL_ATTR) == null)){
-					String force_email = conn.getInitParameter(EMAIL_FORCE_ADDRESS);
+			String force_email = conn.getInitParameter(EMAIL_FORCE_ADDRESS);
 			if( force_email != null){
 				log.debug("Force email to "+force_email);
 				Address old[] = m.getRecipients(RecipientType.TO).clone();
@@ -653,8 +653,9 @@ public class Emailer {
 			m.addHeader("X-Saf-service", conn.getInitParameter("service.name"));
 			m.addHeader("X-Safe-notify", "Error");
 			m.setContent(mp);
-
-			Transport.send(m);
+			if(EMAILS_FEATURE.isEnabled(conn)){
+				Transport.send(m);
+			}
             log.debug("Sent error email");
 		} catch (Exception me) {
 			// ERROR.. uh log it?
@@ -767,8 +768,9 @@ public class Emailer {
 			m.addHeader("X-Saf-service", conn.getInitParameter("service.name"));
 			m.addHeader("X-Safe-notify", "Info");
 			m.setContent(mp);
-
-			Transport.send(m);
+			if(EMAILS_FEATURE.isEnabled(conn)){
+				Transport.send(m);
+			}
 
 		} catch (Exception me) {
 			// ERROR.. uh log it?

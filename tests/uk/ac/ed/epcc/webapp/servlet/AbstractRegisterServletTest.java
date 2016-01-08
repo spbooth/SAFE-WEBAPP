@@ -54,7 +54,7 @@ public abstract class AbstractRegisterServletTest extends ServletTest {
 		AppUserFactory person_fac =  getContext().getService(SessionService.class).getLoginFactory();
 	     //PasswordAuthAppUserFactory<?> person_fac = new PasswordPersonFactory(conn,"Person");
 		MapForm f = new MapForm(getContext());
-	    FormCreator signupFormCreator = person_fac.getSignupFormCreator(null);
+	    FormCreator signupFormCreator = person_fac.getSignupFormCreator(null,null);
 	    signupFormCreator.buildCreationForm("Signup", f);
 	    f.addStringMap(req.params);
 	}

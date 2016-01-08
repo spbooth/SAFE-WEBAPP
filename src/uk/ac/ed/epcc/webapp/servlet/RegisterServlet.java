@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLCreationForm;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
@@ -31,6 +32,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.session.WebNameFinder;
 
 /**
  * Register first time visitors
@@ -47,6 +49,7 @@ public class RegisterServlet extends WebappServlet {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	public static final Feature ALLOW_SIGNUPS = new Feature("allow_signup",true,"Allow new users to sign up to the service via a signup form");
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse res,
@@ -58,11 +61,13 @@ public class RegisterServlet extends WebappServlet {
 			conn.setService(serv);
 		}
 		AppUserFactory fac =  serv.getLoginFactory();
-		if( fac == null || ! AppUserFactory.ALLOW_SIGNUPS.isEnabled(conn)){
+		if( fac == null || ! RegisterServlet.ALLOW_SIGNUPS.isEnabled(conn)){
 			message(conn,req,res,"disabled_feature");
 			return;
 		}
-		FormCreator signupFormCreator =fac.getSignupFormCreator(conn.getService(ServletService.class).getWebName());
+		String webName = conn.getService(ServletService.class).getWebName();
+		String realm=getRealm(conn);
+		FormCreator signupFormCreator =fac.getSignupFormCreator(realm,webName);
 		
 		if( signupFormCreator != null ){
 			HTMLCreationForm person_form = new HTMLCreationForm("Signup",signupFormCreator);
@@ -81,6 +86,14 @@ public class RegisterServlet extends WebappServlet {
 			}
 		}
 		message(conn, req, res, "invalid_input");
+	}
+
+	/**
+	 * @param conn
+	 * @return
+	 */
+	public static String getRealm(AppContext conn) {
+		return conn.getInitParameter(RemoteAuthServlet.REMOTE_AUTH_REALM_PROP, WebNameFinder.WEB_NAME);
 	}
 
 }

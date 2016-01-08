@@ -64,9 +64,13 @@ import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedDataCache;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
+import uk.ac.ed.epcc.webapp.servlet.RemoteAuthServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
 /** A Factory for creating {@link AppUser} objects that represent users of the system.
+ * 
+ * If the <b>bootstrap.admin</b> {@link Feature} is set then the first user in the system will automatically be given the ADMIN role (or the role
+ * specified in the <b>bootstrap-role</b> property is this is set). The role is added when the table for this factory is created not when the user is added.
  * 
  * @author spb
  *
@@ -92,19 +96,6 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 	}
 	public static final Feature BOOTSTRAP_ADMIN_FEATURE = new Feature("bootstrap.admin",true,"automatically give first user Admin role");
 	public static final String BOOTSTRAP_ROLE_PROPERTY = "bootstrap-role";
-
-	/** Feature to require external auth logins
-	 * 
-	 */
-	public static final Feature EXTERNAL_AUTH_ONLY_FEATURE = new Feature("external_auth",false,"Default authorisation is using external container level authorisation");
-	/** Feature to allow external auth logins as alternaticve
-	 * 
-	 */
-	public static final Feature WEB_LOGIN_FEATURE = new Feature("web_login",false,"container level authorisation can be used as an alternate login method");
-	/** Feature to allow external auth logins as alternaticve
-	 * 
-	 */
-	public static final Feature ALLOW_EXTERNAL_AUTH_FEATURE = new Feature("allow_external_auth",false,"container level authorisation can be used if a web-name is present");
 
 	public static final Feature REQUIRE_PERSON_UPDATE_FEATURE = new Feature("require-person-update",false,"require person update if needed");
 	
@@ -160,24 +151,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
    
     // Feature to control anonymise feature.
 	public static final Feature ANONYMISE_DATABASE_FEATURE = new Feature("anonymise_database",false,"Can the database be anonymised for developer copies");
-	public static final Feature ALLOW_SIGNUPS = new Feature("allow_signup",true,"Alow new users to sign up to the service via a signup form");
-    
-
-
-	/** Should this class support login based on an externally authenticated web-name.
-	 * This may either be external authorisation as the only access method or an
-	 * alternative login mechanism.
-	 * 
-	 * The AppContext argument allows the method to be called as part of
-	 * Context setup so this method should not call getContext() or query the repository
-	 * It is a method so sub-classes can override it.
-	 * 
-	 * @param conn AppContext
-	 * @return
-	 */
-	protected boolean allowWebLogin(AppContext conn) {
-		return WEB_LOGIN_FEATURE.isEnabled(conn)||EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn)||ALLOW_EXTERNAL_AUTH_FEATURE.isEnabled(conn);
-	}
+	
 	
 	
 	public final AU findByEmail(String email) throws DataException {
@@ -564,14 +538,17 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		
 	}
 	
-	/** Get a 
+	/** Get a {@link FormCreator} to use when users sign-up
+	 * Optionally a name and a realm can be supplied which will be set as part of signup.
+	 * This is needed for external auth when the name is known but other details need to be
+	 * gathered via the form.
 	 * 
-	 * @param webname
+	 * @param realm     String realm to set webname in (may be null)
+	 * @param webname   String name to set 
 	 * @return
 	 */
-	public FormCreator getSignupFormCreator(String webname) {
-		
-		return new SignupFormCreator<AU>(this,getDefaultRealm(),webname);
+	public FormCreator getSignupFormCreator(String realm,String webname) {
+				return new SignupFormCreator<AU>(this,realm,webname);
 		
 	}
 	/** Form for first time visitors to self register
@@ -585,7 +562,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		@Override
 		public void preCommit(T dat, Form f) throws DataException {
 			super.preCommit(dat, f);
-			if( webname != null && webname.trim().length() > 0){
+			if( realm != null && realm.trim().length() > 0  && webname != null && webname.trim().length() > 0){
 				dat.setRealmName(realm,webname);
 			}
 		}
@@ -602,6 +579,12 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		String realm;
 		String webname;
       
+		/**
+		 * 
+		 * @param fac  {@link AppUserFactory}
+		 * @param realm String realm to set webname in
+		 * @param name  String webname from external authentication.
+		 */
 		public SignupFormCreator(AppUserFactory<T> fac,String realm, String name) {
 			super(fac);
 			this.realm=realm;

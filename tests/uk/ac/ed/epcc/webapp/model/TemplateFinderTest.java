@@ -29,6 +29,7 @@ public class TemplateFinderTest extends WebappTestBase {
 		TemplateFinder finder = new TemplateFinder(getContext());
 		String text = finder.getText("toplevel.txt");
 		System.out.println(text);
+		text = text.replace("\r", ""); // running tests on windows ?
 		assertTrue(text.contains("This is the top\nThis is sub\nThis is also the top"));
 	}
 }

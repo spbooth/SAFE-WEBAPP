@@ -75,7 +75,7 @@ If you already have a password for this website:
      AppUserFactory person_fac =  session_service.getLoginFactory();
      //PasswordAuthAppUserFactory<?> person_fac = new PasswordPersonFactory(conn,"Person");
      // Normally webname will be null here but might as well check
-     HTMLCreationForm creator = new HTMLCreationForm("Signup",person_fac.getSignupFormCreator(conn.getService(ServletService.class).getWebName()));
+     HTMLCreationForm creator = new HTMLCreationForm("Signup",person_fac.getSignupFormCreator(RegisterServlet.getRealm(conn),conn.getService(ServletService.class).getWebName()));
 %>
 <div class="block">
 <%@ include file="/scripts/form_context.jsf" %>

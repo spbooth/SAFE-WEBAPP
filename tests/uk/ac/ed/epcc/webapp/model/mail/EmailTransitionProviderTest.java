@@ -173,7 +173,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		takeBaseline();
 		setTransition(prov,EditAction.Edit,target);
 		checkFormContent("/normalize.xsl","edit_text_form.xml");
-		addParam("text","Look a ö character");
+		addParam("text","Look a \u00f6 character");
 		runTransition();
 		target = new MailTarget(fac.getHandler(1,user));
 		checkViewRedirect(prov,target);

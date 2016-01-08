@@ -31,8 +31,7 @@ String page_title="Email Change Request";
 <p>This page allows you to notify this system about a change to your Email address.
 The system will then send an email to the new address giving you a URL you need to visit to 
 complete the request. Once this is done your email will be updated.
-<em>Please note that once the change has been made you will need to provide your new email address when
-logging into this site.</em>
+<em>Please note that if you use your email address to log into this site, once the change has been made you will need to provide your new email address instead of the old one.</em>
 </div>
 
 <%@ include file="/scripts/form_context.jsf" %>

@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
@@ -46,7 +47,8 @@ import uk.ac.ed.epcc.webapp.session.WebNameFinder;
 
 public class RemoteAuthServlet extends WebappServlet {
 
-	/**
+	/** Property name to use for the authentication realm. Note that this is also the
+	 * property used by {@link DefaultServletService} and {@link RegisterServlet} if global external authentication is supported.
 	 * 
 	 */
 	public static final String REMOTE_AUTH_REALM_PROP = "remote_auth.realm";
@@ -68,6 +70,13 @@ public class RemoteAuthServlet extends WebappServlet {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+
+
+	/** Feature to allow external auth logins as alternative mechanism via specific servlets linked from the
+	 * login page. Multiple alternative mechanisms can be supported this way. 
+	 * 
+	 */
+	public static final Feature WEB_LOGIN_FEATURE = new Feature("web_login",false,"container level authorisation can be used as an alternate login method");
 	
 	
 	
@@ -75,6 +84,11 @@ public class RemoteAuthServlet extends WebappServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse res,
 			AppContext conn) throws ServletException, IOException {
+		
+		if( ! WEB_LOGIN_FEATURE.isEnabled(conn)){
+			message(conn,req,res,"disabled_feature");
+			return;
+		}
 		String web_name = conn.getService(ServletService.class).getWebName();
 		try {
 			if (web_name == null || web_name.length() == 0) {

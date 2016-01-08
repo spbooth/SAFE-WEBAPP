@@ -85,7 +85,7 @@
 Please authenticate with the web-server before registering with this service.
 <p>
 </div>
-<%}else if(! AppUserFactory.ALLOW_SIGNUPS.isEnabled(conn)){ %>
+<%}else if(! RegisterServlet.ALLOW_SIGNUPS.isEnabled(conn)){ %>
 <div class="block">
 <H2>User <%=webname %> not registered</H2>
 <p>
@@ -102,7 +102,7 @@ This service is only available to pre-registered users.
 
 <%
      
-     HTMLCreationForm person_form = new HTMLCreationForm("Person",fac.getSignupFormCreator(webname));
+     HTMLCreationForm person_form = new HTMLCreationForm("Person",fac.getSignupFormCreator(RegisterServlet.getRealm(conn),webname));
 %>
 <div class="block">
 <%@ include file="/scripts/form_context.jsf" %>
@@ -197,7 +197,7 @@ if(  login_urls != null ){
 to be set, disable cookies in your browser settings.</small></small>
 </p>
 </div>
-<% if( AppUserFactory.ALLOW_SIGNUPS.isEnabled(conn)){ %>
+<% if( RegisterServlet.ALLOW_SIGNUPS.isEnabled(conn)){ %>
 <div class="block">
 <p>To create an account on this web-site click <a
 	href='<%= response.encodeURL(web_path+"/signup.jsp") %>'><b>here</b></a>.
