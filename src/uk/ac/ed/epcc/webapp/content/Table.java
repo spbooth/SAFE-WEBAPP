@@ -287,8 +287,11 @@ public class Table<C, R> {
 			}
 			if (nf != null && n instanceof Number) {
 				n = nf.format(n);
-			}
-			if (n == null) {
+			}else if( n instanceof UIGenerator){
+				TextContentBuilder tcb = new TextContentBuilder();
+				((UIGenerator)n).addContent(tcb);
+				return tcb.toString();
+			}else if (n == null) {
 				if (type_debug) {
 					return " (null)";
 				}

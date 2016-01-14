@@ -66,7 +66,7 @@ public abstract class AbstractConfigService implements Contexed, ConfigService{
 						conn.error("Failed to find config "+config_path);
 						//Throw fatal error rather than attempting to continue
 						// useful if logging is also not working
-						throw new ConsistencyError("No properties file found ["+config_path+">");
+						throw new ConsistencyError("No properties file found ["+config_path+"]");
 					}
 				}
 			} catch (Exception e) {

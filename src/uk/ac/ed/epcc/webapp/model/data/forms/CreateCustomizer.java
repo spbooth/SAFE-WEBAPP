@@ -36,7 +36,7 @@ public interface CreateCustomizer <BDO extends DataObject>{
 	 */
 	public void customiseCreationForm(Form f) throws Exception;
 	
-	/** Populate target from form.
+	/** Populate target from creation form.
 	 * This can be sub-classes to add additional information such as the requesting Person
 	 * or other information derived other than from the form parameters.
 	 * Normally the form contents have already been set in the Object but the form is passed to this method in case any
