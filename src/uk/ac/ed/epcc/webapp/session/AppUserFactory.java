@@ -46,6 +46,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.PlaceHolderFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -99,7 +100,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 
 	public static final Feature REQUIRE_PERSON_UPDATE_FEATURE = new Feature("require-person-update",false,"require person update if needed");
 	
-	
+	public static final String ALLOW_EMAIL_FIELD ="AllowEmail";
 	
     
     public class RoleFilter implements SQLFilter<AU>,JoinFilter<AU>,PatternFilter<AU>{
@@ -292,6 +293,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		// reserve position for any email field at the start
 		s.setField(EmailNameFinder.EMAIL, new PlaceHolderFieldType());
 		s.setField(AppUser.UPDATED_TIME, new DateFieldType(true, null));
+		s.setOptionalField(ALLOW_EMAIL_FIELD, new BooleanFieldType(false, true));
 		
 		return s;
 	}
@@ -317,7 +319,11 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		
 		StandAloneFormUpdate<AU> u = (StandAloneFormUpdate<AU>) getFormUpdate(getContext());
 		
-		u.buildUpdateForm("Person", f, person,person.getContext().getService(SessionService.class));
+		SessionService service = person.getContext().getService(SessionService.class);
+		u.buildUpdateForm("Person", f, person,service);
+		if( ! service.hasRole(SessionService.ADMIN_ROLE)){
+			f.removeField(ALLOW_EMAIL_FIELD);
+		}
 		if( person != null ){
 			f.getField(EmailNameFinder.EMAIL).lock();
 		}
@@ -547,7 +553,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 	 * @param webname   String name to set 
 	 * @return
 	 */
-	public FormCreator getSignupFormCreator(String realm,String webname) {
+	public final FormCreator getSignupFormCreator(String realm,String webname) {
 				return new SignupFormCreator<AU>(this,realm,webname);
 		
 	}
@@ -595,6 +601,25 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		@Override
 		public MessageResult getResult(String type_name,T dat, Form f) {
 			return new MessageResult("signup_ok",type_name);
+		}
+		
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFormFactory#getSupress()
+		 */
+		@Override
+		protected Set<String> getSupress() {
+			Set<String> supress = super.getSupress();
+			supress.add(ALLOW_EMAIL_FIELD);
+			return supress;
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFormFactory#getDefaults()
+		 */
+		@Override
+		public Map<String, Object> getDefaults() {
+			Map<String, Object> defaults = super.getDefaults();
+			defaults.put(ALLOW_EMAIL_FIELD, Boolean.TRUE);
+			return defaults;
 		}
 
 		

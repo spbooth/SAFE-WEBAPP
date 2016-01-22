@@ -112,6 +112,13 @@ public abstract class WebappTestBase implements ContextHolder{
 		}
 
 	}
+	/** Safe the contents of the specified factory. Directory is generated from the package of the
+	 * test running the method.
+	 * 
+	 * @param prefix  directory prefix (ie the source dir)
+	 * @param name    file basename
+	 * @param fac     factory to dump
+	 */
 	protected void save(String prefix,String name,DataObjectFactory<? extends DataObject> fac){
 		try{
 			Logger log = ctx.getService(LoggerService.class).getLogger(getClass());

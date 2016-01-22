@@ -246,6 +246,22 @@ public class Emailer {
 	}
 
 	/**
+	 * Send an email based on a template file to a {@link AppUser}
+	 * 
+	 * @param sendto
+	 * @param email_template
+	 * @return {@link MimeMessage}
+	 * @throws IOException
+	 * @throws MessagingException
+	 */
+	public MimeMessage templateEmail(AppUser recipient, TemplateFile email_template)
+			throws IOException, MessagingException {
+		if( recipient.allowEmail()){
+			return templateEmail(recipient.getEmail(), null, email_template);
+		}
+		return null;
+	}
+	/**
 	 * send an email from a template file to multiple recipients with custom
 	 * headers
 	 * 

@@ -83,9 +83,9 @@ If you already have a password for this website:
   <%= person_fac.addUpdateNotes(new HtmlBuilder()) %>
   <form method="post" action="<%= response.encodeURL(web_path+"/SignupServlet") %>">
      <input type="hidden" name="form_url" value="<%=HTMLForm.getFormURL(request)%>">
-      <table class="form">
-        <%= creator.getHtmlForm(request) %>
-      </table>
+     
+     <%= creator.getHtmlForm(request) %>
+      
       <div class="action_buttons">
       <input class="input_button" type="reset" value="   Clear   "/>
       </div>

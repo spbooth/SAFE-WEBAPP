@@ -16,6 +16,9 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.email.logging;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
@@ -25,6 +28,7 @@ import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.email.Emailer;
+import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -92,6 +96,25 @@ public class EmailLoggerService implements Contexed, LoggerService {
 			
 		}catch(Throwable t){
 			nested.getLogger(getClass()).error("Cannot get hostname",t);
+		}
+		try{
+			//TODO move this to a method on DatabaseService
+			DatabaseService serv = conn.getService(DatabaseService.class);
+			if( serv != null){
+				Connection conn = serv.getSQLContext().getConnection();
+				if( conn != null && ! conn.isReadOnly()){ 
+					PreparedStatement stmt = conn.prepareStatement("select @@hostname");
+					ResultSet rs = stmt.executeQuery();
+					if( rs.next()){
+						String name = rs.getString(1);
+						props.put("database.host", name);
+					}
+
+					stmt.close();
+				}
+			}
+		}catch(Throwable t){
+			nested.getLogger(getClass()).error("Cannot get database hostname");
 		}
 		ConfigService cfg = conn.getService(ConfigService.class);
 		if( cfg != null ){

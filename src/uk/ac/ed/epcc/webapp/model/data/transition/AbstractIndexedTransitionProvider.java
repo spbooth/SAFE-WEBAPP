@@ -69,7 +69,7 @@ public abstract class AbstractIndexedTransitionProvider<T extends Indexed,K>  im
 		}
 		if( USE_NAME_PARSER.isEnabled(c) && fac instanceof ParseFactory){
 			String name = ((ParseFactory)fac).getCanonicalName(target);
-			if( name != null ){
+			if( name != null && name.trim().length() > 0){
 				return name;
 			}
 		}

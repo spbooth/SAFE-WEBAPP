@@ -65,7 +65,8 @@ public class ServeDataServlet extends WebappServlet {
 		}
 		args.remove(0);
 		try{
-				
+				// Note in principle we might allow anonymous access or
+			    // access to unauthenticated sessions.
 				SessionService<?> person = conn.getService(SessionService.class);
 				MimeStreamData msd = producer.getData(person, args);
 				if( msd == null){

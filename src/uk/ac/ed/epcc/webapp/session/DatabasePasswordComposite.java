@@ -148,7 +148,8 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
 		 */
 		public boolean accept(T o) {
-			Hash h = getHandler(o).getAlgorithm();
+			Handler handler = getHandler(o);
+			Hash h = handler.getAlgorithm();
 			if( h == null){
 				getContext().error("No hash algorithm for"+o.getIdentifier());
 				return false;
@@ -156,20 +157,21 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			log.debug("Checking "+o.getName());;
 			log.debug("hash type is "+h.name());
 			String check = password;
+			
 			if( useSalt()){
 				log.debug("using salt");
 				if( DatabasePasswordComposite.SALT_FIRST_FEATURE.isEnabled(getContext())){
 					log.debug("salt is first");
-					check= getHandler(o).getSalt()+check;
+					check= handler.getSalt()+check;
 				}else{
-					check=check+getHandler(o).getSalt();
+					check=check+handler.getSalt();
 				}
 			}
 			
 			try {
-				String crypt = getHandler(o).getCryptPassword();
+				String crypt = handler.getCryptPassword();
 				if( crypt == null ){
-					log.error("Null crypt password for "+o.getEmail());
+					log.error("Null crypt password for "+o.getName());
 					return false;
 				}
 				String hash = h.getHash(check);
@@ -524,6 +526,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			    	}
 			    	return Hash.getDefault(getContext());
 			    }
+			    
 			   
 				/**
 				 * Is this user required to reset their password

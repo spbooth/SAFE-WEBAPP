@@ -33,6 +33,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamDataWrapper;
+import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionDataProducer;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 /** A {@link SettableServeDataProducer} implemented as a database table.
@@ -51,6 +52,11 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> extends DataObjectFactory<D>
 		implements SettableServeDataProducer {
+	/** ID for anonymous access
+	 * 
+	 */
+	private static final int ANONYMOUS_ID = -1;
+
 	private static final String CLEANED_ATTR = "CLEANED_ATTR";
 	private static final String DATA = "Data";
 	private static final String MIME_TYPE = "MimeType";
@@ -92,6 +98,11 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 	public static class MimeData extends DataObject {
 
 	
+		/**
+		 * 
+		 */
+		private static final int ANONYMOUS_ID = -1;
+
 		protected MimeData(Record r) {
 			super(r);
 		}
@@ -100,6 +111,24 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 			record.setProperty(NAME, data.getName());
 			record.setProperty(MIME_TYPE, data.getContentType());
 			record.setProperty(DATA, data);
+			AppContext conn = getContext();
+			int live_months = conn.getIntegerParameter("serv_data.lifetime.months", 1);
+			if( live_months > 0 ){
+				Calendar cal = Calendar.getInstance();
+				cal.add(Calendar.MONTH, live_months);
+				record.setProperty(EXPIRES_FIELD, cal.getTime());
+			}
+			// default anonymous access allows public access
+			int owner_id = ANONYMOUS_ID;
+			SessionService<?> sess = conn.getService(SessionService.class);
+			if( sess != null ){
+			
+				AppUser currentPerson = sess.getCurrentPerson();
+				if( currentPerson != null ){
+					owner_id = currentPerson.getID();
+				}
+			}
+			record.setProperty(OWNER_ID, owner_id);	
 			touch();
 		}		
 		public MimeStreamData getData() throws DataFault{
@@ -107,7 +136,11 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 		}
 		
 		public boolean allow(SessionService<?> user){
-			return user.getCurrentPerson().getID() == record.getIntProperty(OWNER_ID,0);
+			int owner_id = record.getIntProperty(OWNER_ID,0);
+			if( user == null ){
+				return owner_id == ANONYMOUS_ID;
+			}
+			return user.getCurrentPerson().getID() == owner_id;
 		}
 		
 		public void touch(){
@@ -133,7 +166,7 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 	public MimeStreamData getData(SessionService user, List<String> path)
 			throws Exception {
 		// Auto clean the table once per user session.
-		if( user.getAttribute(CLEANED_ATTR) == null){
+		if( user != null && user.getAttribute(CLEANED_ATTR) == null){
 			clean();
 			user.setAttribute(CLEANED_ATTR, "yes");
 		}
@@ -167,15 +200,7 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 	@Override
 	protected MimeData makeBDO(Record res) throws DataFault {
 		
-		AppContext conn = getContext();
-		int live_months = conn.getIntegerParameter("serv_data.lifetime.months", 1);
-		if( live_months > 0 ){
-			Calendar cal = Calendar.getInstance();
-			cal.add(Calendar.MONTH, live_months);
-			res.setProperty(EXPIRES_FIELD, cal.getTime());
-		}
-		SessionService<?> sess = conn.getService(SessionService.class);
-		res.setProperty(OWNER_ID, sess.getCurrentPerson().getID());	
+		
 		MimeData data = new MimeData(res);
 		return data;
 	}

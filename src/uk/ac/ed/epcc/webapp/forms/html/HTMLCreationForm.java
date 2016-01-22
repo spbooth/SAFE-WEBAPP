@@ -53,7 +53,7 @@ public class HTMLCreationForm {
 		this.type_name=type_name;
 	}
 
-	private HTMLForm getForm() {
+	public HTMLForm getForm() {
 		if (form != null)
 			return form;
 		form = new HTMLForm( creator.getContext());
@@ -119,6 +119,10 @@ public class HTMLCreationForm {
 
 		return o;
 	}
+	
+	public boolean parsePost(HttpServletRequest req){
+		return getForm().parsePost(req);
+	}
 
 	/**
 	 * should we use multi-part encoding for this form
@@ -129,4 +133,5 @@ public class HTMLCreationForm {
 		getForm();
 		return use_multipart;
 	}
+	
 }

@@ -87,6 +87,12 @@ public class AppUser extends DataObject implements java.security.Principal{
 		return getRealmName(EmailNameFinder.EMAIL);
 	}
 
+	public boolean allowEmail(){
+		return record.getBooleanProperty(AppUserFactory.ALLOW_EMAIL_FIELD, true);
+	}
+	public void setEmailsAllowed(boolean value){
+		record.setOptionalProperty(AppUserFactory.ALLOW_EMAIL_FIELD, value);
+	}
 	/*
 	 * (non-Javadoc)
 	 * 

@@ -168,15 +168,20 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		
 		long start=0L,aquired=0L;
 		long max_wait=conn.getLongParameter("max.transition.millis", 30000L);
-		// Transitions should take place in a transaction
-		// This keeps them atomic even on distributed infrastructure.
-		DatabaseService serv = conn.getService(DatabaseService.class);
-		if ( TRANSITION_TRANSACTIONS.isEnabled(conn)){
-			serv.startTransaction();
-		}
-		try{
-			start = System.currentTimeMillis();
-			synchronized(tp.getClass()){
+		start = System.currentTimeMillis();
+		// Synchronize outside the database transaction. If the operation is not transaction
+		// safe then we want to ensure the transaction is committed before allowing a second
+		// transaction to start. This would still go wrong on distributed infrastructure 
+		//
+		synchronized(tp.getClass()){
+			// Transitions should take place in a transaction
+			// This helps keeps them atomic even on distributed infrastructure.
+			DatabaseService serv = conn.getService(DatabaseService.class);
+			if ( TRANSITION_TRANSACTIONS.isEnabled(conn)){
+				serv.startTransaction();
+			}
+			try{
+
 				aquired=System.currentTimeMillis();
 				// to ensure consistency all modifications of target objects and the checks
 				// that operations are valid, are protected by a lock.
@@ -186,39 +191,40 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 				if( t != null ){
 					o = processTransition(conn, req, params, tp, key, target, t);
 				}
-			}
-		
-		}catch(TransitionException e){
-			// Assume no roll-back needed unless and explict fatal exceptin It might be ok 
-			// to  allways roll-back here.
-			// and assume that the DB can perform a null roll-back cheaply.
-			if( e instanceof FatalTransitionException){
-				log.error("FatalTransitionException", e);
-				serv.rollbackTransaction();
-			}
-			log.debug("transition exception", e);
-			message(conn, req, res, "transition_error",  key, e.getMessage());
-			return;
-		}catch(Throwable tr){
-			// assume this is bad and roll-back
-			serv.rollbackTransaction();
-			throw tr;
-		}finally{
-			// restore original mode (ususally auto-commit
-			serv.stopTranaction();
-			try{
-				long now = System.currentTimeMillis();
-				if((now-aquired) > max_wait){
-					long secs = (now-aquired)/1000L;
-					// This transition has taken a long time
-					log.warn("Long transition "+secs+" seconds provider="+tp.getTargetName()+" target="+getLogTag(tp,target)+" key="+key);
-				}else if( now-start > max_wait){
-					// Long time waiting for lock
-					long secs = (now-start)/1000L;
-					log.warn("Blocked transition "+secs+" seconds provider="+tp.getTargetName()+" target="+getLogTag(tp,target)+" key="+key);
+
+
+			}catch(TransitionException e){
+				// Assume no roll-back needed unless and explict fatal exceptin It might be ok 
+				// to  allways roll-back here.
+				// and assume that the DB can perform a null roll-back cheaply.
+				if( e instanceof FatalTransitionException){
+					log.error("FatalTransitionException", e);
+					serv.rollbackTransaction();
 				}
+				log.debug("transition exception", e);
+				message(conn, req, res, "transition_error",  key, e.getMessage());
+				return;
 			}catch(Throwable tr){
-				log.error("Problem reporting transition timimgs",tr);
+				// assume this is bad and roll-back
+				serv.rollbackTransaction();
+				throw tr;
+			}finally{
+				// restore original mode (ususally auto-commit
+				serv.stopTranaction();
+				try{
+					long now = System.currentTimeMillis();
+					if((now-aquired) > max_wait){
+						long secs = (now-aquired)/1000L;
+						// This transition has taken a long time
+						log.warn("Long transition "+secs+" seconds provider="+tp.getTargetName()+" target="+getLogTag(tp,target)+" key="+key);
+					}else if( now-start > max_wait){
+						// Long time waiting for lock
+						long secs = (now-start)/1000L;
+						log.warn("Blocked transition "+secs+" seconds provider="+tp.getTargetName()+" target="+getLogTag(tp,target)+" key="+key);
+					}
+				}catch(Throwable tr){
+					log.error("Problem reporting transition timimgs",tr);
+				}
 			}
 		}
 		if( o == null ){
