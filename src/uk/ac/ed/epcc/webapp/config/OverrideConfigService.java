@@ -78,6 +78,9 @@ public class OverrideConfigService extends AbstractConfigService {
 		}
 		return result;
 	}
+	public Properties getOverrides(){
+		return overrides;
+	}
 
 	
 	public void setProperty(String name, String value)

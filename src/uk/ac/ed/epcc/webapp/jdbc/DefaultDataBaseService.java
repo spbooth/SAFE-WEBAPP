@@ -27,8 +27,8 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
-import uk.ac.ed.epcc.webapp.Version;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 /** Default implementation of the {@link DatabaseService}
  * 
  * This gets connection parameters from the {@link ConfigService} but this is only queried
@@ -39,7 +39,8 @@ import uk.ac.ed.epcc.webapp.config.ConfigService;
 
 @PreRequisiteService(ConfigService.class)
 public class DefaultDataBaseService implements DatabaseService {
-	public static final Feature TRANSACTIONS_FEATURE = new Feature("database_transactions",true,"Database transactions are supproted");
+	public static final Feature TRANSACTIONS_FEATURE = new Feature("database_transactions",true,"Database transactions are supported");
+	public static final Feature TRANSACTIONS_SERIALIZE_FEATURE = new Feature("database_transactions.serialized",true,"Database transactions use serialized isolation (locks)");
 
 	protected static final String POSTGRESQL_TYPE = "postgres";
 	private static final String MYSQL_TYPE = "mysql";
@@ -50,6 +51,9 @@ public class DefaultDataBaseService implements DatabaseService {
 	// Have we already attempted to set the default connection
 	// we remember this so that we we don't keep attempting on fail
     private boolean connection_set=false;
+    
+    private int old_isolation_level;
+    private boolean in_transaction = false;
 	
     public DefaultDataBaseService(AppContext ctx){
     	this.ctx=ctx;
@@ -200,9 +204,18 @@ public class DefaultDataBaseService implements DatabaseService {
 	 */
 	@Override
 	public void startTransaction() {
+		if( in_transaction ){
+			throw new ConsistencyError("nested calls to startTransaction");
+		}
 		if( TRANSACTIONS_FEATURE.isEnabled(getContext())){
 			try {
-				getSQLContext().getConnection().setAutoCommit(false);
+				Connection connection = getSQLContext().getConnection();
+				old_isolation_level=connection.getTransactionIsolation();
+				if(old_isolation_level != Connection.TRANSACTION_SERIALIZABLE && TRANSACTIONS_SERIALIZE_FEATURE.isEnabled(getContext())){
+					connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+				}
+				connection.setAutoCommit(false);
+				in_transaction=true;
 			} catch (SQLException e) {
 				getContext().error(e,"Error starting transaction");
 			}
@@ -213,9 +226,9 @@ public class DefaultDataBaseService implements DatabaseService {
 	 */
 	@Override
 	public void rollbackTransaction() {
-		if( TRANSACTIONS_FEATURE.isEnabled(getContext())){
+		if( in_transaction &&  TRANSACTIONS_FEATURE.isEnabled(getContext())){
 			try {
-				getSQLContext().getConnection().rollback();;
+				getSQLContext().getConnection().rollback();
 			} catch (SQLException e) {
 				getContext().error(e,"Error rolling back transaction");
 			}
@@ -227,7 +240,7 @@ public class DefaultDataBaseService implements DatabaseService {
 	 */
 	@Override
 	public void commitTransaction() {
-		if( TRANSACTIONS_FEATURE.isEnabled(getContext())){
+		if( in_transaction && TRANSACTIONS_FEATURE.isEnabled(getContext())){
 			try {
 				getSQLContext().getConnection().commit();
 			} catch (SQLException e) {
@@ -240,10 +253,19 @@ public class DefaultDataBaseService implements DatabaseService {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.DatabaseService#stopTranaction()
 	 */
 	@Override
-	public void stopTranaction() {
+	public void stopTransaction() {
 		if( TRANSACTIONS_FEATURE.isEnabled(getContext())){
+			if( ! in_transaction ){
+				throw new ConsistencyError("orphan call to stopTransaction");
+			}
 			try {
-				getSQLContext().getConnection().setAutoCommit(true);
+				Connection connection = getSQLContext().getConnection();
+				connection.commit();
+				connection.setAutoCommit(true);
+				if(old_isolation_level != Connection.TRANSACTION_SERIALIZABLE && TRANSACTIONS_SERIALIZE_FEATURE.isEnabled(getContext())){
+					connection.setTransactionIsolation(old_isolation_level);
+				}
+				in_transaction=false;
 			} catch (SQLException e) {
 				getContext().error(e,"Error ending transaction");
 			}

@@ -210,6 +210,7 @@ public final class AppContext {
     	}
     	
     }
+   
 
     
 	/**
@@ -312,7 +313,12 @@ public final class AppContext {
     	}
     	return attributes.containsKey(key);
     }
-    
+    public Map<Object,Object> getAttributes(){
+    	if( attributes == null ){
+    		return new HashMap<Object, Object>();
+    	}
+    	return new HashMap<Object, Object>(attributes);
+    }
     @SuppressWarnings("unchecked")
     /** get a Service requested by the Interface class of the service.
      * This method will not allow recursive calls so pre-requisite services must be 

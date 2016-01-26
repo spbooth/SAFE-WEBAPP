@@ -40,6 +40,7 @@ public class DefaultTimerService implements Contexed,TimerService{
 	private static final String TIMER_TOTAL = "Total";
 	 private Map<String,Timer> timers=null;
 	 private AppContext conn;
+	 private String prefix="";
 	 public DefaultTimerService(AppContext conn){
 		 this.conn=conn;
 		 timers = new HashMap<String,Timer>();
@@ -70,7 +71,7 @@ public class DefaultTimerService implements Contexed,TimerService{
 					Set<Timer> stats = new TreeSet<Timer>(timers.values());
 					for(Timer t: stats){
 						if( t.getTime() > target){
-							log.info(t.getStats());
+							log.info(prefix+t.getStats());
 						}
 					}
 					}
@@ -126,6 +127,18 @@ public class DefaultTimerService implements Contexed,TimerService{
 		@Override
 		public void timerStats() {
 			timerStats(getClass());
+		}
+		/**
+		 * @return the prefix
+		 */
+		public String getPrefix() {
+			return prefix;
+		}
+		/**
+		 * @param prefix the prefix to set
+		 */
+		public void setPrefix(String prefix) {
+			this.prefix = prefix;
 		}
 		
 		

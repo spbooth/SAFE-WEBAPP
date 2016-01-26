@@ -29,6 +29,7 @@ import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.BaseForm;
 import uk.ac.ed.epcc.webapp.forms.action.NestAction;
+import uk.ac.ed.epcc.webapp.forms.exceptions.FatalTransitionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.BackResult;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
@@ -41,11 +42,12 @@ import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
-import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionProvider;
+import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
+import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** a FormResultVisitor that uses Swing windows.
@@ -105,13 +107,41 @@ public class SwingFormResultVisitor implements FormResultVisitor,Contexed {
 		Transition<T> t=null;
 		
 		try{
-		   synchronized(conn){
-			   // to ensure consistency all modifications of queries and the checks
-			   // that operations are valid are protected by a lock.
-		     t = tp.getTransition(target,key);
-		     if( t != null ){
-		    	 next_result = t.getResult(new SwingTransitionVisitor<K,T>(conn, key, tp, target,parent));
-		     }
+		   synchronized(tp.getClass()){
+			   DatabaseService db_serv = conn.getService(DatabaseService.class);
+				boolean use_transactions = db_serv != null && TransitionServlet.TRANSITION_TRANSACTIONS.isEnabled(conn);
+				if (use_transactions){
+					db_serv.startTransaction();
+					// re-fetch the target within the transaction
+					target = tp.accept(new ReFetchTargetVisitor<T, K>(target) );
+				}
+				try{
+					// to ensure consistency all modifications of queries and the checks
+					// that operations are valid are protected by a lock.
+					t = tp.getTransition(target,key);
+					if( t != null ){
+						next_result = t.getResult(new SwingTransitionVisitor<K,T>(conn, key, tp, target,parent));
+					}
+				}catch(TransitionException e){
+					if( e instanceof FatalTransitionException){
+						log.error("FatalTransitionException", e);
+						if (use_transactions){
+							db_serv.rollbackTransaction();
+						}
+					}
+					throw e;
+				}catch(Exception e){
+					if (use_transactions){
+						// assume this is bad and roll-back
+						db_serv.rollbackTransaction();
+					}
+					throw e;
+				}finally{
+					if (use_transactions){
+						// restore original mode (usually auto-commit)
+						db_serv.stopTransaction();
+					}
+				}
 		   }
 		}catch(TransitionException e){
 			doMessage( "transition_error",  key, e.getMessage());

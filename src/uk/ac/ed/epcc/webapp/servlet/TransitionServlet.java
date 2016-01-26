@@ -17,7 +17,6 @@
 package uk.ac.ed.epcc.webapp.servlet;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -46,7 +45,9 @@ import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 /** Servlet to do generic transitions.
  * 
@@ -68,6 +69,18 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 @WebServlet(name="TransitionServlet",urlPatterns=TransitionServlet.TRANSITION_SERVLET+"/*")
 public  class TransitionServlet<K,T> extends WebappServlet {
 
+	/**
+	 * 
+	 */
+	private static final String START_TRANSACTION_TIMER = "StartTransaction";
+	/**
+	 * 
+	 */
+	private static final String AQUIRE_LOCK_TIMER = "AquireProviderLock";
+	/**
+	 * 
+	 */
+	private static final String DATABASE_TRANSACTION_TIMER = "DatabaseTransaction";
 	public static final String VIEW_TRANSITION = "ViewTransition.";
 	public static final String TRANSITION_PROVIDER_PREFIX = "TransitionProvider";
 	public static final Feature TRANSITION_TRANSACTIONS = new Feature("transition.transactions", true, "Use database transaction within transitions");
@@ -88,6 +101,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		try{
 		// first find the transition provider
 		ServletService servlet_service = conn.getService(ServletService.class);
+		TimerService timer_service = conn.getService(TimerService.class);
 	
 		Map<String,Object> params = servlet_service.getParams();
 		LinkedList<String> path = servlet_service.getArgs();
@@ -164,83 +178,129 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			message(conn, req, res, "access_denied");
         	return;
 		}
-		Transition<T> t=null;
-		
-		long start=0L,aquired=0L;
-		long max_wait=conn.getLongParameter("max.transition.millis", 30000L);
-		start = System.currentTimeMillis();
-		// Synchronize outside the database transaction. If the operation is not transaction
-		// safe then we want to ensure the transaction is committed before allowing a second
-		// transaction to start. This would still go wrong on distributed infrastructure 
-		//
-		synchronized(tp.getClass()){
-			// Transitions should take place in a transaction
-			// This helps keeps them atomic even on distributed infrastructure.
-			DatabaseService serv = conn.getService(DatabaseService.class);
-			if ( TRANSITION_TRANSACTIONS.isEnabled(conn)){
-				serv.startTransaction();
-			}
-			try{
-
-				aquired=System.currentTimeMillis();
-				// to ensure consistency all modifications of target objects and the checks
+		Transition<T> t = tp.getTransition(target,key);
+		if( t != null ){
+			// check for trivial FormResults that don't need a lock
+			o = t.getResult(new ShortcutServletTransitionVisitor<K, T>(conn, key, tp, target, params));
+			if( o == null){
+				long start=0L,aquired=0L;
+				long max_wait=conn.getLongParameter("max.transition.millis", 30000L);
+				if( timer_service != null){
+					timer_service.startTimer(AQUIRE_LOCK_TIMER);
+				}
+				start = System.currentTimeMillis();
+				// to ensure consistency all access/modifications of target objects and the checks
 				// that operations are valid, are protected by a lock.
 				// We use the class of the TransitionProvider as the lock object to only
 				// sequentialise operations on the same type of object. 
-				t = tp.getTransition(target,key);
-				if( t != null ){
-					o = processTransition(conn, req, params, tp, key, target, t);
-				}
-
-
-			}catch(TransitionException e){
-				// Assume no roll-back needed unless and explict fatal exceptin It might be ok 
-				// to  allways roll-back here.
-				// and assume that the DB can perform a null roll-back cheaply.
-				if( e instanceof FatalTransitionException){
-					log.error("FatalTransitionException", e);
-					serv.rollbackTransaction();
-				}
-				log.debug("transition exception", e);
-				message(conn, req, res, "transition_error",  key, e.getMessage());
-				return;
-			}catch(Throwable tr){
-				// assume this is bad and roll-back
-				serv.rollbackTransaction();
-				throw tr;
-			}finally{
-				// restore original mode (ususally auto-commit
-				serv.stopTranaction();
-				try{
-					long now = System.currentTimeMillis();
-					if((now-aquired) > max_wait){
-						long secs = (now-aquired)/1000L;
-						// This transition has taken a long time
-						log.warn("Long transition "+secs+" seconds provider="+tp.getTargetName()+" target="+getLogTag(tp,target)+" key="+key);
-					}else if( now-start > max_wait){
-						// Long time waiting for lock
-						long secs = (now-start)/1000L;
-						log.warn("Blocked transition "+secs+" seconds provider="+tp.getTargetName()+" target="+getLogTag(tp,target)+" key="+key);
+				// Synchronize outside the database transaction. If the operation is not transaction
+				// safe then we want to ensure the transaction is committed before allowing a second
+				// transaction to start. 
+				
+				// This would still go wrong on distributed infrastructure 
+				// depending on the isolation enforced the transaction might take a database lock 
+				// which could also block and resolve this.
+				synchronized(tp.getClass()){
+					if( timer_service != null){
+						timer_service.stopTimer(AQUIRE_LOCK_TIMER);
 					}
-				}catch(Throwable tr){
-					log.error("Problem reporting transition timimgs",tr);
+					// Transitions should take place in a transaction
+					// This helps keeps them atomic even on distributed infrastructure.
+					DatabaseService serv = conn.getService(DatabaseService.class);
+					boolean use_transactions = serv != null && TRANSITION_TRANSACTIONS.isEnabled(conn);
+					if (use_transactions){
+						if(timer_service != null){
+							timer_service.startTimer(DATABASE_TRANSACTION_TIMER);
+							timer_service.startTimer(START_TRANSACTION_TIMER);
+						}
+						serv.startTransaction();
+						if(timer_service != null){
+							timer_service.stopTimer(START_TRANSACTION_TIMER);
+						}
+						// re-query for the target within the transaction to ensure consistent state
+						if( target != null && target instanceof DataObject){
+							((DataObject)target).release(); // remove from cache
+						}
+						target = getTarget(conn,tp,path);
+						if( target != null ){
+							req.setAttribute(TARGET_ATTRIBUTE, target);
+						}
+						if( ! tp.allowTransition(conn,target,key)){
+							message(conn, req, res, "access_denied");
+				        	return;
+						}
+						t = tp.getTransition(target,key); // transition may depend on target e.g confirm transition
+					}
+					try{
+
+						aquired=System.currentTimeMillis();
+						
+
+
+						if( t != null ){
+							o = processTransition(conn, req, params, tp, key, target, t);
+						}
+
+
+					}catch(TransitionException e){
+						// Assume no roll-back needed unless and explicit fatal exception It might be ok 
+						// to  allways roll-back here.
+						// and assume that the DB can perform a null roll-back cheaply.
+						if( e instanceof FatalTransitionException){
+							log.error("FatalTransitionException", e);
+							if (use_transactions){
+								serv.rollbackTransaction();
+							}
+						}
+						log.debug("transition exception", e);
+						message(conn, req, res, "transition_error",  key, e.getMessage());
+						return;
+					}catch(Throwable tr){
+						if (use_transactions){
+							// assume this is bad and roll-back
+							serv.rollbackTransaction();
+						}
+						throw tr;
+					}finally{
+						if (use_transactions){
+							// restore original mode (usually auto-commit)
+							serv.stopTransaction();
+							if(timer_service != null){
+								timer_service.stopTimer(DATABASE_TRANSACTION_TIMER);
+							}
+						}
+						try{
+							long now = System.currentTimeMillis();
+							if((now-aquired) > max_wait){
+								long secs = (now-aquired)/1000L;
+								// This transition has taken a long time
+								log.warn("Long transition "+secs+" seconds provider="+tp.getTargetName()+" target="+getLogTag(tp,target)+" key="+key);
+							}else if( now-start > max_wait){
+								// Long time waiting for lock
+								long secs = (now-start)/1000L;
+								log.warn("Blocked transition "+secs+" seconds provider="+tp.getTargetName()+" target="+getLogTag(tp,target)+" key="+key);
+							}
+						}catch(Throwable tr){
+							log.error("Problem reporting transition timimgs",tr);
+						}
+					}
 				}
 			}
 		}
 		if( o == null ){
-			// sthing has gone wrong no FormResult
+			// something has gone wrong no FormResult
 			if( t == null ){
 				// never found a transition
 				log.debug("Transition key did not resolve to a class");
-				
+
 			}else{
 				log.debug("Visitor returned null FormResult");
 			}
 			message(conn, req, res, "invalid_input");
 			return;
 		}
-		
-		
+
+
 		// handle the FormResult
 		// current target should be set as attribute by default
 		handleFormResult(conn,req,res,o);
@@ -363,7 +423,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
  	public static class GetTargetVisitor<T,K> implements TransitionFactoryVisitor<T,T, K>{
  		public GetTargetVisitor(LinkedList<String> path) {
 			super();
-			this.path = path;
+			this.path = new LinkedList<String>(path); // non destructive as we may need to re-aquire target within lock
 		}
 
 		private final LinkedList<String> path;

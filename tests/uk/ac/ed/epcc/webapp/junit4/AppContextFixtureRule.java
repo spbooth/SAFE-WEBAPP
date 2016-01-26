@@ -24,7 +24,6 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.ContextHolder;
 import uk.ac.ed.epcc.webapp.config.DefaultConfigService;
 import uk.ac.ed.epcc.webapp.config.OverrideConfigService;
-import uk.ac.ed.epcc.webapp.jdbc.DefaultDataBaseService;
 import uk.ac.ed.epcc.webapp.jdbc.config.DataBaseConfigService;
 import uk.ac.ed.epcc.webapp.logging.debug.DebugLoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintLoggerService;

@@ -14,6 +14,8 @@
 package uk.ac.ed.epcc.webapp.jdbc;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
@@ -88,6 +90,27 @@ public class MysqlSQLContext implements SQLContext {
 	public SQLExpression<String> hashFunction(Hash h, SQLExpression<String> arg)
 			throws CannotUseSQLException {
 		return new MysqlSQLHashExpression(h, arg);
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.SQLContext#getConnectionHost()
+	 */
+	@Override
+	public String getConnectionHost() {
+		String name="unknown";
+		try{
+			if( ! conn.isReadOnly()){
+				PreparedStatement stmt = conn.prepareStatement("select @@hostname");
+				ResultSet rs = stmt.executeQuery();
+				if( rs.next()){
+					name = rs.getString(1);
+				}
+				stmt.close();
+			}
+		}catch(SQLException e){
+			// report unknown
+		}
+		return name;
 	}
 
 }

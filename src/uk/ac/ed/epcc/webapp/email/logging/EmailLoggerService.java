@@ -96,22 +96,15 @@ public class EmailLoggerService implements Contexed, LoggerService {
 			
 		}catch(Throwable t){
 			nested.getLogger(getClass()).error("Cannot get hostname",t);
+			String hostname = System.getenv("HOSTNAME");
+			if( hostname != null ){
+				props.put("host.name",hostname);
+			}
 		}
 		try{
-			//TODO move this to a method on DatabaseService
 			DatabaseService serv = conn.getService(DatabaseService.class);
 			if( serv != null){
-				Connection conn = serv.getSQLContext().getConnection();
-				if( conn != null && ! conn.isReadOnly()){ 
-					PreparedStatement stmt = conn.prepareStatement("select @@hostname");
-					ResultSet rs = stmt.executeQuery();
-					if( rs.next()){
-						String name = rs.getString(1);
-						props.put("database.host", name);
-					}
-
-					stmt.close();
-				}
+				props.put("database.host", serv.getSQLContext().getConnectionHost());
 			}
 		}catch(Throwable t){
 			nested.getLogger(getClass()).error("Cannot get database hostname");

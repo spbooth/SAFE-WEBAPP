@@ -89,4 +89,12 @@ public class PostgresqlSQLContext implements SQLContext {
 		throw new CannotUseSQLException("Hash functions not yet implemetned in postrgresql");
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.SQLContext#getConnectionHost()
+	 */
+	@Override
+	public String getConnectionHost() {
+		return "Unknown";
+	}
+
 }

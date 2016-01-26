@@ -81,6 +81,12 @@ public interface SQLContext extends Contexed{
 	 * @return {@link FieldTypeVisitor}
 	 */
 	public FieldTypeVisitor getCreateVisitor(StringBuilder sb, List<Object> args);
+	
+	/** Get an identifying string for the database host we are connected to.
+	 * 
+	 * @return
+	 */
+	public String getConnectionHost();
 	/** Clean up internal state
 	 * @throws Exception 
 	 * 

@@ -16,7 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -73,7 +72,9 @@ public void startTransaction();
  */
 public void rollbackTransaction();
 
-/** flush changes since start of last commit
+/** flush changes since start of last commit.
+ * Unlike the commit method or a Connection this is a NOP if
+ * not in a transaction.
  * 
  */
 public void commitTransaction();
@@ -81,5 +82,5 @@ public void commitTransaction();
 /** finish transaction (includes commit).
  * 
  */
-public void stopTranaction();
+public void stopTransaction();
 }

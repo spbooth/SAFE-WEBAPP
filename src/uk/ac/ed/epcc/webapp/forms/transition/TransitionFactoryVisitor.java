@@ -18,9 +18,9 @@ package uk.ac.ed.epcc.webapp.forms.transition;
  * 
  * @author spb
  *
- * @param <R>
- * @param <T>
- * @param <K>
+ * @param <R> result type
+ * @param <T> target type
+ * @param <K> key type
  */
 public interface TransitionFactoryVisitor<R,T,K> {
   public  R visitTransitionProvider(TransitionProvider<K,T> prov);

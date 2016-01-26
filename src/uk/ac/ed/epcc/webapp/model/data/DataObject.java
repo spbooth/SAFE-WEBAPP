@@ -333,7 +333,10 @@ public abstract class DataObject implements ContextIndexed, Identified{
 		return;
 	}
 
-	/** This is used like a destructor - means less connections, etc lying around */
+	/** This is used like a destructor - means less connections, etc lying around 
+	 * This will also clear the record from the {@link Repository} cache if this is enabled;S
+	 * 
+	 * */
 	public void release() {
 		if( record != null ){
 		  record.clear();

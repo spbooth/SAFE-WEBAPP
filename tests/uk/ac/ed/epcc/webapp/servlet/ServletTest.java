@@ -13,54 +13,48 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.net.URL;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 
 import org.junit.After;
 import org.junit.Before;
-import org.xml.sax.InputSource;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Indexed;
-import uk.ac.ed.epcc.webapp.TestDataHelper;
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
-import uk.ac.ed.epcc.webapp.content.XMLPrinter;
-import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.config.OverrideConfigService;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
+import uk.ac.ed.epcc.webapp.jdbc.config.DataBaseConfigService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.logging.debug.DebugLoggerService;
+import uk.ac.ed.epcc.webapp.logging.print.PrintLoggerService;
 import uk.ac.ed.epcc.webapp.mock.MockRequest;
 import uk.ac.ed.epcc.webapp.mock.MockResponse;
 import uk.ac.ed.epcc.webapp.mock.MockServletContext;
 import uk.ac.ed.epcc.webapp.mock.MockSession;
 import uk.ac.ed.epcc.webapp.model.ClassificationFactory;
-import uk.ac.ed.epcc.webapp.model.data.Dumper;
 import uk.ac.ed.epcc.webapp.model.data.XMLDataUtils;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AbstractSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
-import static org.junit.Assert.*;
+import uk.ac.ed.epcc.webapp.session.SimpleSessionService;
+import uk.ac.ed.epcc.webapp.timer.DefaultTimerService;
 /** This is an abstract test class for performing high
  * level tests of operations against servlets.
  * <p>
@@ -81,7 +75,74 @@ import static org.junit.Assert.*;
 
 
 public abstract class ServletTest extends WebappTestBase{
+	/** A request to the servlet run from a seperate thread.
+	 * On creation the current request state is moved to this object and the main request reset.
+	 * A new AppContext is created for the new request 
+	 * 
+	 * @author spb
+	 *
+	 */
+	public class BrowserRunnable implements Runnable{
+		
 
+		public MockRequest req=null;
+		public MockResponse res=null;
+		public AppContext ctx;
+		public Exception e=null;
+		
+		public BrowserRunnable() throws SQLException{
+			this.req = ServletTest.this.req;
+			this.res = ServletTest.this.res;
+			this.ctx = duplicate(ServletTest.this.ctx);
+			ctx.setService(new Servlet3MultiPartServletService(ctx, serv_ctx, req, res));
+			this.req.setAttribute(ErrorFilter.APP_CONTEXT_ATTR, this.ctx); // we will retreive appcontext from request
+			ServletTest.this.resetRequest();
+			
+		}
+		private AppContext duplicate(AppContext orig) throws SQLException{
+			AppContext dup = new AppContext();
+			dup.setService(new PrintLoggerService());
+			dup.setService(new DebugLoggerService(dup));
+			SimpleSessionService service = new SimpleSessionService(dup);
+			dup.setService( service);
+			service.setCurrentPerson(orig.getService(SessionService.class).getCurrentPerson().getID());
+			dup.setService(new DataBaseConfigService(dup));
+			ConfigService serv = orig.getService(ConfigService.class);
+			if( serv instanceof OverrideConfigService){
+				dup.setService(new OverrideConfigService(((OverrideConfigService)serv).getOverrides(), dup));
+			}
+			DefaultTimerService timer_service = new DefaultTimerService(dup);
+			timer_service.setPrefix("BrowserRunnable ");
+			dup.setService(timer_service);
+			
+			return dup;
+		}
+		
+		/** Copy the request/response back to the test to be queried.
+		 * 
+		 */
+		public void restore(){
+			ServletTest.this.req=req;
+			ServletTest.this.res=res;
+			ServletTest.this.req.setAttribute(ErrorFilter.APP_CONTEXT_ATTR, ServletTest.this.ctx);
+		}
+
+		/* (non-Javadoc)
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			try {
+				servlet.doPost(req, res);
+				System.out.println("Browser thread finished");
+			} catch (Exception e) {
+				e.printStackTrace(System.err);
+				this.e=e;
+			}
+			
+		}
+	}
+	
 	protected WebappServlet servlet;
 	 /**
 	 * 
@@ -90,7 +151,6 @@ public abstract class ServletTest extends WebappTestBase{
 	public MockRequest req=null;
 	public MockResponse res=null;
 	public MockServletContext serv_ctx;
-	
 	
 	
 	
