@@ -137,7 +137,7 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 		
 		public boolean allow(SessionService<?> user){
 			int owner_id = record.getIntProperty(OWNER_ID,0);
-			if( user == null ){
+			if( user == null || ! user.haveCurrentUser() ){
 				return owner_id == ANONYMOUS_ID;
 			}
 			return user.getCurrentPerson().getID() == owner_id;
