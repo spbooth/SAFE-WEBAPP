@@ -28,6 +28,8 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
+import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
@@ -38,6 +40,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 /** A {@link TransitionSource} that depends on the default {@link TableSpecification}
@@ -57,6 +60,7 @@ public class TableSpecificationTransitionSource<T extends TableStructureTransiti
 	 * 
 	 */
 	static final String ADD_STD_FIELD = "Add Std field";
+	static final String DROP_OPTIONAL_FIELD ="Drop optional field";
 	private Repository res;
 	private TableSpecification spec;
 	static final String FIELD_FORMFIELD = "Field";
@@ -70,7 +74,7 @@ public class TableSpecificationTransitionSource<T extends TableStructureTransiti
 		@Override
 		protected void addFormParams(Form f, AppContext c) {
 			
-			f.addInput(FIELD_FORMFIELD, "Field to add", new OptionalFieldInput<FieldType>(res, spec.getStdFields()));
+			f.addInput(FIELD_FORMFIELD, "Field to add", new OptionalFieldInput<FieldType>(res,true,  spec.getStdFields()));
 			
 		}
 
@@ -78,6 +82,30 @@ public class TableSpecificationTransitionSource<T extends TableStructureTransiti
 		protected FieldType getFieldType(Form f) {
 			return (FieldType) f.getItem(FIELD_FORMFIELD);
 		}
+		
+	}
+	public class DropOptionalFieldTransition extends DropFieldTransition<T>{
+
+		public DropOptionalFieldTransition(Repository res) {
+			super(res);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.table.DropFieldTransition#getFieldInput()
+		 */
+		@Override
+		public <I extends Input & ItemInput<FieldInfo>> I getFieldInput() {
+			Map<String,FieldInfo> map = new LinkedHashMap<String, Repository.FieldInfo>();
+			for(String name : spec.getOptionalFieldNames()){
+				FieldInfo info = res.getInfo(name);
+				if( info != null){
+					map.put(name, info);
+				}
+			}
+			return (I) new OptionalFieldInput<FieldInfo>(res, false, map);
+		}
+
+		
 		
 	}
 	public class AddIndexAction extends FormAction {
@@ -144,10 +172,11 @@ public class TableSpecificationTransitionSource<T extends TableStructureTransiti
 	
 	public Map<TransitionKey<T>, Transition<T>> getTransitions() {
 		Map<TransitionKey<T>,Transition<T>> result = new HashMap<TransitionKey<T>, Transition<T>>();
-		result.put(new TransitionKey<T>(TableStructureTransitionTarget.class,ADD_STD_FIELD,"Add missing fields from the default table specification for this class"),
+		result.put(new AdminOperationKey<T>(ADD_STD_FIELD,"Add missing fields from the default table specification for this class"),
 				new AddStdFieldTransition(res));
-		result.put(new TransitionKey<T>(TableStructureTransitionTarget.class, ADD_STD_INDEX, "Add missing index from the default table specification for this class"), 
+		result.put(new AdminOperationKey<T>(ADD_STD_INDEX, "Add missing index from the default table specification for this class"), 
 				new AddStdIndexTransition());
+		result.put(new AdminOperationKey<T>(DROP_OPTIONAL_FIELD,"Drop optional existing field"),new DropOptionalFieldTransition(res));
 		return result;
 	}
 

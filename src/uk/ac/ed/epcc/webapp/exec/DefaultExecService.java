@@ -13,10 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.exec;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 

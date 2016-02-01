@@ -17,12 +17,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
-import uk.ac.ed.epcc.webapp.email.inputs.EmailInput;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.inputs.BinaryInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.DateInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
@@ -30,19 +27,17 @@ import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.LengthInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.NumberInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseMultiInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.PasswordInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.PatternInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.PhoneInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.PreSelectInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.RangedInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.URLInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnitInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnmodifiableInput;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
 
 public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	/**
@@ -52,8 +47,8 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	/**
 	 * 
 	 */
-	private static final Feature USE_HTML5_FEATURE = new Feature("html5", true,"use html5 input types");
-	private static final Feature ESCAPE_UNICODE_FEATURE = new Feature("html.input.escape_unicode",false,"Escape high code point characters in input values");
+	private static final Preference USE_HTML5_FEATURE = new Preference("html5", true,"use html5 input types");
+	private static final Preference ESCAPE_UNICODE_FEATURE = new Preference("html.input.escape_unicode",false,"Escape high code point characters in input values");
 	AppContext conn;
 	private SimpleXMLBuilder hb;
 	private boolean use_post;

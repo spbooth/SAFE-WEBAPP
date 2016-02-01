@@ -55,14 +55,14 @@ public interface ViewTransitionFactory<K, T> extends TransitionFactory<K, T> {
    /** Get tooltip help string for an operation
     * 
     * @param key
-    * @return ContentBuilder
+    * @return String or null
     */
    public String getHelp(K key);
    
    /** get custom button content. should default to the sting representation of the key
     * 
     * @param key
-    * @return
+    * @return String
     */
    public String getText(K key);
 }

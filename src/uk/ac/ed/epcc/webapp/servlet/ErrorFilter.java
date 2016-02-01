@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CleanupService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.email.logging.ServletEmailLoggerService;
 import uk.ac.ed.epcc.webapp.jdbc.JNDIDatabaseService;
@@ -75,6 +76,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
 @WebFilter(filterName="FaultFilter", urlPatterns = {"/*"} )
 public class ErrorFilter implements Filter {
 	private static final Feature SESSION_STEALING_CHECK_FEATURE = new Feature("session-stealing-check",false,"reset session if ip address changes");
+	private static final Feature CLEANUP_THREAD_FEATURE = new Feature("appcontext.cleanup_thread",true,"Close the AppContext in a thread if CleanupServices are defined");
 	private static final Feature TIMER_FEATURE = new Feature("Timer",false,"gather timing information for performance analyis");
 	private static final String LAST_ADDR_ATTR = "LastAddr";
 	public static final String APP_CONTEXT_ATTR = "AppContext";
@@ -83,6 +85,36 @@ public class ErrorFilter implements Filter {
 		
 	}
 
+	public static class Closer implements Runnable{
+		/**
+		 * @param conn
+		 * @param log
+		 */
+		public Closer(AppContext conn, CleanupService serv, Logger log) {
+			super();
+			this.conn = conn;
+			this.serv = serv;
+			this.log = log;
+		}
+		private final AppContext conn;
+		private final CleanupService serv;
+		private final Logger log;
+		/* (non-Javadoc)
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			try{
+				// Make sure Cleanup runs first
+				serv.cleanup();
+				conn.close();
+			}catch(Throwable t){
+				log.error("Error closing AppContext", t);
+			}
+			
+		}
+		
+	}
 	
 
 	protected ServletContext ctx=null;
@@ -156,7 +188,6 @@ public class ErrorFilter implements Filter {
 		try {
 			
 			chain.doFilter(req, res);
-			
 		} catch(java.net.SocketException se){
 			// usually just the browser has gone away just log this
 			log.warn("Socket exception "+se.getMessage());
@@ -200,10 +231,18 @@ public class ErrorFilter implements Filter {
 				if( timer_service != null ){
 					timer_service.stopTimer(req.getServletPath());
 				}
-				try{
-				  conn.close();
-				}catch(Throwable t){
-					getLogger().error("Error closing AppContext",t);
+				CleanupService cleanup = conn.getService(CleanupService.class);
+				if( CLEANUP_THREAD_FEATURE.isEnabled(conn) && cleanup != null && cleanup.hasActions()){
+					conn.clearService(CleanupService.class);
+					// cleanup in thread
+					Thread t = new Thread(new Closer(conn, cleanup, getLogger()));
+					t.start();
+				}else{
+					try{
+						conn.close();
+					}catch(Throwable t){
+						getLogger().error("Error closing AppContext",t);
+					}
 				}
 				conn = null;
 			}

@@ -170,11 +170,16 @@ public class TableSpecification {
 			optional_fields.remove(name);
 		}
 	}
+	/** get a map of all fields in the specification.
+	 * 
+	 * @return
+	 */
 	public Map<String,FieldType> getStdFields(){
 		LinkedHashMap<String, FieldType> result = new LinkedHashMap<String, FieldType>(fields);
 		result.putAll(optional_fields);
 		return result;
 	}
+	
 	public abstract class IndexType {
 		private final String name;
 		private LinkedHashSet<String> index_fields = new LinkedHashSet<String>();

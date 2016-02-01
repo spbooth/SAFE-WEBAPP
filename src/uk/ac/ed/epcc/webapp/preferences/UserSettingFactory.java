@@ -31,11 +31,12 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A class to hold user {@link Preference} settings.
  * @author spb
+ * @param <S> Type of Setting object
  *
  */
 
 public class UserSettingFactory<S extends UserSettingFactory.UserSetting> extends DataObjectFactory<S> {
-	public static final Feature PER_USER_SETTINGS_FEATURE = new Feature("user.preferences",false,"Allow per user preferences");
+	public static final Feature PER_USER_SETTINGS_FEATURE = new Feature("user.preferences",true,"Allow per user preferences");
 	public static final String PERSON_FIELD="PersonID";
 	public static final String SETTING_FIELD="Setting";
 	public static final String VALUE_FIELD="Value";
@@ -69,17 +70,30 @@ public class UserSettingFactory<S extends UserSettingFactory.UserSetting> extend
 		}
 		return setting.getValue();
 	}
+	public boolean hasPreference(Preference pref){
+		S setting = makeSetting(pref,false);
+		if( setting == null ){
+			return false;
+		}
+		return true;
+	}
 	
+	public void clearPreference(Preference pref) throws DataFault{
+		S setting = makeSetting(pref,false);
+		if( setting != null){
+			setting.delete();
+		}
+	}
 	public void setPreference(Preference pref, boolean value){
 		S setting = makeSetting(pref,true);
-		if( setting != null ){
-			setting.setValue(value);
-			try {
-				setting.commit();
-			} catch (DataFault e) {
-				getContext().error(e,"Error setting value");
-			}
+
+		setting.setValue(value);
+		try {
+			setting.commit();
+		} catch (DataFault e) {
+			getContext().error(e,"Error setting value");
 		}
+
 	}
 	
 	

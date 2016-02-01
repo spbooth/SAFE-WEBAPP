@@ -20,7 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -35,7 +34,10 @@ public abstract class AbstractTableRegistry implements CompositeTableTransitionR
 	 * @see uk.ac.ed.epcc.webapp.model.data.transition.TableTransitionTarget#allowTableTransition(uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey, uk.ac.ed.epcc.webapp.model.AppUser)
 	 */
 	public boolean allowTableTransition(TransitionKey name, SessionService operator) {
-		return operator.hasRole(CHANGE_TABLE_STRUCTURE_ROLE);
+		return operator.hasRole(CHANGE_TABLE_STRUCTURE_ROLE) || 
+				( name instanceof AccessControlTransitionKey && 
+				  ((AccessControlTransitionKey)name).allow(operator)		
+			);
 	}
 	
 	private Map<TransitionKey,Transition> table_transitions = new LinkedHashMap<TransitionKey,Transition>();

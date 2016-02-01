@@ -15,6 +15,8 @@ package uk.ac.ed.epcc.webapp.preferences;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.preferences.UserSettingFactory.UserSetting;
 
 /** A {@link Preference} is a {@link Feature} that only affects presentation logic so a user is allowed to
@@ -47,7 +49,25 @@ public class Preference extends Feature {
 	}
 
 	public boolean defaultSetting(AppContext conn){
-		return super.isEnabled(conn);
+		return getConfigValue(conn);
+	}
+	
+	public boolean hasPreference(AppContext conn){
+		UserSettingFactory<UserSetting> fac = new UserSettingFactory<UserSetting>(conn);
+		return fac.hasPreference(this);
+	}
+	
+	
+	public void clearPreference(AppContext conn) throws DataFault{
+		UserSettingFactory<UserSetting> fac = new UserSettingFactory<UserSetting>(conn);
+		fac.clearPreference(this);
+		conn.removeAttribute(this);
+		
+	}
+	public void setPreference(AppContext conn, boolean value){
+		UserSettingFactory<UserSetting> fac = new UserSettingFactory<UserSetting>(conn);
+		fac.setPreference(this, value);
+		conn.removeAttribute(this);
 	}
 	
 }

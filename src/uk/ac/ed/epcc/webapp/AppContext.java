@@ -213,8 +213,10 @@ public final class AppContext {
    
 
     
-	/**
-	 * closes the database connection if one exists.
+	/** Cleans up resources held by the {@link AppContext}
+	 * 
+	 *  The {@link AppContextService#cleanup()} method is called on
+	 * each service in the reverse order that services were created.
 	 * 
 	 */
 	public synchronized void close()  {

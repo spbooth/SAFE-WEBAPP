@@ -98,11 +98,6 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 	public static class MimeData extends DataObject {
 
 	
-		/**
-		 * 
-		 */
-		private static final int ANONYMOUS_ID = -1;
-
 		protected MimeData(Record r) {
 			super(r);
 		}
@@ -152,7 +147,11 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 				cal.add(Calendar.MONTH, live_months);
 				record.setProperty(EXPIRES_FIELD, cal.getTime());
 				SessionService<?> sess = conn.getService(SessionService.class);
-				record.setProperty(OWNER_ID, sess.getCurrentPerson().getID());	
+				if( sess != null && sess.haveCurrentUser()){
+					record.setProperty(OWNER_ID, sess.getCurrentPerson().getID());	
+				}else{
+					record.setProperty(OWNER_ID, ANONYMOUS_ID);
+				}
 				commit();
 			}
 			}catch(Exception e){

@@ -112,7 +112,7 @@ public class Feature implements Comparable<Feature>{
 	public static Table getFeatureTable(AppContext c){
 		Table<String, Feature> t = new Table();
 		// Use getKnownFeatures. This copies the list so
-		// avoids any conccurent modifications if the
+		// avoids any concurrent modifications if the
 		// loop code queries a new one.
 		for(Feature f : getKnownFeatures() ){
 			t.put("Name", f, f.getName());
@@ -139,13 +139,15 @@ public class Feature implements Comparable<Feature>{
 			return isDef();
 		}
 		// Feature queries may occur often so cache the result in the context
-		String tag = getTag();
 		Boolean b = (Boolean) conn.getAttribute(this);
 		if (b == null) {
-			b = new Boolean(conn.getBooleanParameter(tag,isDef()));
+			b = new Boolean(getConfigValue(conn));
 			conn.setAttribute(this, b);
 		}
 		return b.booleanValue();
+	}
+	protected boolean getConfigValue(AppContext conn) {
+		return conn.getBooleanParameter(getTag(),isDef());
 	}
 	private String getTag() {
 		return "service.feature." + getName();
@@ -176,5 +178,15 @@ public class Feature implements Comparable<Feature>{
 			return false;
 		}
 		return f.isEnabled(conn);
+	}
+	/** Locate a {@link Feature} by name
+	 * 
+	 * This is needed for transitions that operate on {@link Feature}s. However it will only
+	 * return a {@link Feature} once the class that actually defines it is loaded.
+	 * @param name
+	 * @return Feature or null.
+	 */
+	public static Feature findFeatureByName(String name){
+		return previous.get(name);
 	}
 }

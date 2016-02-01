@@ -23,25 +23,35 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
+import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.RepositoryFieldInput;
 
 
 
 public class DropFieldTransition<T extends TableStructureTransitionTarget> extends AbstractFormTransition<T>{
-    private final Repository res;
+    /**
+	 * 
+	 */
+	private static final String FIELD_INPUT = "Field";
+	private final Repository res;
     public DropFieldTransition(Repository res){
     	this.res=res;
     }
 	public void buildForm(Form f, T target, AppContext c)
 			throws TransitionException {
-		f.addInput("Field", "Field to drop", new RepositoryFieldInput(res));
+		f.addInput(FIELD_INPUT, "Field to drop", getFieldInput());
 		f.addAction("Drop", new DropAction(target));
+	}
+	public <I extends Input & ItemInput<FieldInfo>> I getFieldInput() {
+		return (I) new RepositoryFieldInput(res);
 	}
 	public class DropAction extends FormAction{
 		private T target;
@@ -52,7 +62,7 @@ public class DropFieldTransition<T extends TableStructureTransitionTarget> exten
 		}
 		@Override
 		public FormResult action(Form f) throws ActionException {
-			RepositoryFieldInput input = (RepositoryFieldInput) f.getInput("Field");
+			ItemInput<FieldInfo> input = (ItemInput<FieldInfo>) f.getInput(FIELD_INPUT);
 			try {
 				SQLContext sql = res.getSQLContext();
 				StringBuilder query = new StringBuilder();

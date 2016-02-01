@@ -30,17 +30,17 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  * element from the option map as the Item.
  * 
  * @author spb
- * @param <I> 
+ * @param <I> item type
  *
  */
 public class OptionalFieldInput<I> extends ParseAbstractInput<String> implements ListInput<String, I>{
 	
 
 	Map<String,I> fields;
-	public OptionalFieldInput(Repository res, Map<String,I> options){
+	public OptionalFieldInput(Repository res, boolean missing, Map<String,I> options){
 		fields = new HashMap<String, I>();
 		for(String name : options.keySet()){
-			if( ! res.hasField(name)){
+			if( missing == ! res.hasField(name)){
 				fields.put(name, options.get(name));
 			}
 		}

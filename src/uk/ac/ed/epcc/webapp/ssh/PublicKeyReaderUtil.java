@@ -29,7 +29,7 @@ package uk.ac.ed.epcc.webapp.ssh;
  * limitations under the License.
  *
  * Id:        $Rev$
- * Last Changed:    $Date: 2015/12/03 15:49:06 $
+ * Last Changed:    $Date: 2016/01/26 18:57:04 $
  * Last Changed By: $Author: spb $
  * 
  * Imported into WEBAPP code base. Fixed for dss keys.
@@ -59,7 +59,7 @@ import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException.Erro
  * texts.
  *
  * @author jSVNServe Team
- * @version $Id: PublicKeyReaderUtil.java,v 1.9 2015/12/03 15:49:06 spb Exp $
+ * @version $Id: PublicKeyReaderUtil.java,v 1.10 2016/01/26 18:57:04 spb Exp $
  */
 public final class PublicKeyReaderUtil
 {
@@ -178,6 +178,12 @@ public final class PublicKeyReaderUtil
     	return sb.toString();
     }
 
+    public static String normalise(String key) throws PublicKeyParseException, IOException{
+    	if( key == null || key.trim().length() == 0){
+    		return key;
+    	}
+    	return format(load(key));
+    }
    
     /**
      * <p>Extracts from the OpenSSH public key format the base64 encoded SSH

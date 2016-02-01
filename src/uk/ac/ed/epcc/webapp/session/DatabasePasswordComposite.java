@@ -80,7 +80,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	protected static final Feature JAVA_HASH = new Feature("java_password_hash",true,"process password hashes in java");
 	protected static final Feature SALT_FIRST_FEATURE = new Feature("salt_first", false, "Salt comes first in password hash");
 	public static final Feature NON_RANDOM_PASSWORD = new Feature("password.non-random",false,"Force randomly chosen passwords to be a series of x's (for bootstapping without email access)");
-	public static final Feature LOG_RANDOM_PASSWORD = new Feature("password.log-random",false,"Log randomly generatged passwords (for bootstapping without email access)");
+	public static final Feature LOG_RANDOM_PASSWORD = new Feature("password.log-random",false,"Log randomly generated passwords (for bootstrapping without email access)");
 	public static final String SALT="Salt";
 	public static final String ALG="Alg";
 	public static final String PASSWORD = "Password";
