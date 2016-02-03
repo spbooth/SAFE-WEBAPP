@@ -16,11 +16,13 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.email.logging;
 
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 
 
 
 public class EmailLogger implements Logger {
+	private static final Feature EMAIL_WARNING = new Feature("logger.email.mail_warning", false, "Send emails for warnings");
     private final Logger nested;
   
     private final EmailLoggerService serv;
@@ -33,8 +35,8 @@ public class EmailLogger implements Logger {
      * @param message
      * @param t
      */
-    public void email(Object message, Throwable t){
-    	serv.emailError(t, message.toString());
+    public void email(LogLevels level,Object message, Throwable t){
+    	serv.emailError(LogLevels.Error,t, message.toString());
     }
 	
 	public void debug(Object message) {
@@ -52,28 +54,28 @@ public class EmailLogger implements Logger {
 	public void error(Object message) {
 		if( nested != null)
 		nested.error(message);
-		email(message,null);
+		email(LogLevels.Error,message,null);
 	}
 
 	
 	public void error(Object message, Throwable t) {
 		if( nested != null)
 		nested.error(message,t);
-		email(message,t);
+		email(LogLevels.Error,message,t);
 	}
 
 
 	public void fatal(Object message) {
 		if( nested != null)
 		nested.fatal(message);
-		email(message, null);
+		email(LogLevels.Fatal,message, null);
 	}
 
 	
 	public void fatal(Object message, Throwable t) {
 		if( nested != null)
 		nested.fatal(message, t);
-		email(message,t);
+		email(LogLevels.Fatal,message,t);
 	}
 
 	
@@ -94,12 +96,18 @@ public class EmailLogger implements Logger {
 	public void warn(Object message) {
 		if( nested != null)
 		nested.warn(message);
+		if( EMAIL_WARNING.isEnabled(serv.getContext())){
+			email(LogLevels.Warn,message,null);
+		}
 	}
 
 	
 	public void warn(Object message, Throwable t) {
 		if( nested != null)
 		nested.warn(message, t);
+		if( EMAIL_WARNING.isEnabled(serv.getContext())){
+			email(LogLevels.Warn,message,t);
+		}
 
 	}
 

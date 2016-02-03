@@ -269,16 +269,12 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 		// check current value is legal
 		
 		String tag = null;
-		// can't use getTabByItem as this might not be in selected set.
-		for(Iterator<T> it = input.getItems(); it.hasNext();){
-			T item = it.next();
-			if( current.equals(item)){
-				tag=input.getTagByItem(item);
-			}
+		// can't use getTabByItem alone as this might not be in selected set.
+		if( input.isValid(current)){
+			tag = input.getTagByItem(current);
 		}
 		if( tag == null){
-			return;
-			
+			return;	
 		}
 		hb.open("input");
 		hb.attr("type","radio");

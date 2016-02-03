@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.model.data.forms.inputs;
 
 import java.util.Iterator;
+import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
@@ -46,11 +47,11 @@ public class TableInput<T> implements ListInput<String, String> {
 	}
 
 	public Iterator<String> getItems() {
-		return conn.getClassMap(target).keySet().iterator();
+		return getMap().keySet().iterator();
 	}
 
 	public int getCount(){
-		return conn.getClassMap(target).size();
+		return getMap().size();
 	}
 	public String getTagByItem(String item) {
 		return item;
@@ -120,6 +121,23 @@ public class TableInput<T> implements ListInput<String, String> {
 	}
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitListInput(this);
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
+	 */
+	@Override
+	public boolean isValid(String item) {
+		return getMap().containsKey(item);
+	}
+	private Map<String,Class> map=null;
+	/**
+	 * @return
+	 */
+	private Map<String, Class> getMap() {
+		if( map == null){
+			map =conn.getClassMap(target);
+		}
+		return map;
 	}
 
 }

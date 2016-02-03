@@ -33,6 +33,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnusedNameInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.table.AbstractTableRegistry;
 import uk.ac.ed.epcc.webapp.jdbc.table.GeneralTransitionSource;
@@ -42,6 +43,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableTransitionRegistry;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 import uk.ac.ed.epcc.webapp.model.data.forms.Updater;
@@ -366,6 +368,16 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 					return "No item";
 				}
 				return item.getName();
+			}
+
+			@Override
+			public boolean isValid(T item) {
+				
+				try {
+					return exists(new AndFilter<T>(getTarget(), getSelectFilter(),new SQLIdFilter<T>(getTarget(), res, item.getID())));
+				} catch (DataException e) {
+					return false;
+				}
 			}
 
 			

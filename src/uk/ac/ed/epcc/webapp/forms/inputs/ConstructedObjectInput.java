@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Tagged;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
@@ -146,6 +147,20 @@ public class ConstructedObjectInput<T> implements ListInput<String,T>{
 	}
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitListInput(this);
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
+	 */
+	@Override
+	public boolean isValid(T item) {
+		if( clazz.isAssignableFrom(item.getClass())){
+			if( item instanceof Tagged){
+				return reg.containsKey(((Tagged)item).getTag());
+			}
+			return reg.containsValue(item.getClass());
+		}
+		return false;
 	}
 
 }

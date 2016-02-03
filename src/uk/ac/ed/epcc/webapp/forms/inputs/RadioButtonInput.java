@@ -140,5 +140,12 @@ public class RadioButtonInput<V, T> implements ListInput<V, T>, ParseInput<V> {
 		}
 		nested.setValue(nested.convert(v));
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
+	 */
+	@Override
+	public boolean isValid(T item) {
+		return nested.isValid(item);
+	}
 
 }

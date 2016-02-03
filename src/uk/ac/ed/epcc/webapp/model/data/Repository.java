@@ -2117,6 +2117,9 @@ public final class Repository {
 		}
 		return fields.keySet();
 	}
+	public boolean hasField(FieldInfo info){
+		return fields.containsValue(info);
+	}
 	public Set<String> getIndexNames(){
 		if( indexes == null ){
 			setIndexes();

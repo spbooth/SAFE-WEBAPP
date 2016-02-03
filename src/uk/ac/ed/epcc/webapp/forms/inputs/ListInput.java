@@ -70,6 +70,13 @@ public abstract interface ListInput<V,T> extends Input<V>, ItemInput<T> {
 	 * @return String tag
 	 */
 	public abstract String getTagByItem(T item);
+	
+	/** Test if an object of the Item type is one of the possible items.
+	 * 
+	 * @param item
+	 * @return boolean
+	 */
+	public boolean isValid(T item);
 
 	/**
 	 * get the tag string from the actual value of the input

@@ -205,6 +205,16 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 	public void setOptional(boolean opt) {
 		optional=opt;
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
+	 */
+	@Override
+	public boolean isValid(Object item) {
+		if( item == null || item.equals(NULLTAG)){
+			return true;
+		}
+		return internal.isValid((T) item);
+	}
 	
 	
 

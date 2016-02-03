@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2011                            |
+//| Copyright - The University of Edinburgh 2016                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -11,33 +11,16 @@
 //| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
-package uk.ac.ed.epcc.webapp.forms.inputs;
+package uk.ac.ed.epcc.webapp.email.logging;
 
-
-/** An input that presents as a check-box.
- * 
+/**
  * @author spb
- * @param <I> type of input
  *
  */
-public interface BinaryInput<I> extends Input<I> {
-
-	/** Is the input checked or not
-	 * 
-	 * @return
-	 */
-	public abstract boolean isChecked();
-
-	/** Set the state of the input
-	 * 
-	 * @param value
-	 */
-	public abstract void setChecked(boolean value);
-	
-	/** String value corresponding to a checked input
-	 * 
-	 * @return
-	 */
-	public abstract String getChecked();
-
+public enum LogLevels {
+	Debug,
+	Info,
+	Warn,
+	Error,
+	Fatal
 }

@@ -153,5 +153,15 @@ public class TypeProducerInput<T> extends TextInput implements PreSelectInput<St
 		pre_select=value;
 		
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
+	 */
+	@Override
+	public boolean isValid(T item) {
+		if( item_set != null ){
+			return item_set.contains(item);
+		}
+		return false;
+	}
 
 }

@@ -101,5 +101,12 @@ public class OptionalFieldInput<I> extends ParseAbstractInput<String> implements
 	public String getText(I item) {
 		return getTagByItem(item);
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
+	 */
+	@Override
+	public boolean isValid(I item) {
+		return fields.containsValue(item);
+	}
 
 }

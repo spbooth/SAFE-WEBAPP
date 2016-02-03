@@ -158,5 +158,12 @@ public class ClassInput<T> implements ListInput<String,Class<? extends T>>{
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitListInput(this);
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
+	 */
+	@Override
+	public boolean isValid(Class<? extends T> item) {
+		return reg.values().contains(item);
+	}
 
 }

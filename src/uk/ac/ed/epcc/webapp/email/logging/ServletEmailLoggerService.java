@@ -112,7 +112,7 @@ public class ServletEmailLoggerService extends EmailLoggerService {
 		this.req=req;
 	}
 	@Override
-	protected synchronized void emailError(Throwable e, String text) {
+	protected synchronized void emailError(LogLevels level,Throwable e, String text) {
 		// get the inner exception for a ServletException
 		Throwable t;
 		if( e instanceof ServletException){
@@ -126,7 +126,7 @@ public class ServletEmailLoggerService extends EmailLoggerService {
 		}else{
 			t=e;
 		}
-		super.emailError(t, text);
+		super.emailError(level,t, text);
 	}
 
 	

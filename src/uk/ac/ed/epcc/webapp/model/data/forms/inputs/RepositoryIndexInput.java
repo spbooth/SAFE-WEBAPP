@@ -113,5 +113,12 @@ public class RepositoryIndexInput implements ListInput<String,String>{
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitListInput(this);
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
+	 */
+	@Override
+	public boolean isValid(String item) {
+		return res.getIndexNames().contains(item);
+	}
 
 }

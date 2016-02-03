@@ -15,7 +15,6 @@ package uk.ac.ed.epcc.webapp.preferences;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.preferences.UserSettingFactory.UserSetting;
 
@@ -38,6 +37,9 @@ public class Preference extends Feature {
 
 	@Override
 	public boolean isEnabled(AppContext conn) {
+		if( conn == null ){
+			return isDef();
+		}
 		// Preference queries may occur often so cache the result in the context
 		Boolean b = (Boolean) conn.getAttribute(this);
 		if (b == null) {

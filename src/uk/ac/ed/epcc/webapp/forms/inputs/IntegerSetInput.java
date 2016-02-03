@@ -88,5 +88,12 @@ public class IntegerSetInput extends IntegerInput implements ListInput<Integer,I
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitListInput(this);
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
+	 */
+	@Override
+	public boolean isValid(Integer item) {
+		return values.contains(item);
+	}
 
 }

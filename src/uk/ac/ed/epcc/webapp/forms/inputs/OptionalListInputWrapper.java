@@ -119,4 +119,11 @@ public class OptionalListInputWrapper<V,T> implements OptionalListInput<V, T> {
 		unselected=text;
 		
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
+	 */
+	@Override
+	public boolean isValid(T item) {
+		return inner.isValid(item);
+	}
 }

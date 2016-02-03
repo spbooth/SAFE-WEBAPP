@@ -105,7 +105,7 @@ public abstract class WebappServlet extends HttpServlet {
 			throws ServletException, IOException {
 		AppContext conn;
 
-		conn = ErrorFilter.retrieveAppContext(req);
+		conn = ErrorFilter.retrieveAppContext(req,res);
 		// pick up servlet specific init params if there are any
 		ServletConfig cfg = getServletConfig();
 		Enumeration e = cfg.getInitParameterNames();
@@ -120,7 +120,7 @@ public abstract class WebappServlet extends HttpServlet {
 			throws ServletException, IOException {
 		AppContext conn;
 
-		conn = ErrorFilter.retrieveAppContext(req);
+		conn = ErrorFilter.retrieveAppContext(req,res);
 		// pick up servlet specific init params if there are any
 		ServletConfig cfg = getServletConfig();
 		Enumeration e = cfg.getInitParameterNames();

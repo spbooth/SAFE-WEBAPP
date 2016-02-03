@@ -76,7 +76,7 @@ public class EmailerTest extends WebappTestBase {
 	
 	@Test
 	public void testErrorMail() throws IOException, MessagingException{
-		Emailer.errorEmail(ctx, "Some error text");
+		Emailer.errorEmail(ctx, null,"Some error text");
 		assertEquals("One message sent",1,MockTansport.nSent());
 		assertEquals("error@example.org", MockTansport.getAddress(0)[0].toString());
 		assertEquals("from@example.org", MockTansport.getMessage(0).getFrom()[0].toString());

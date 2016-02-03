@@ -154,5 +154,12 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
 			throw new ValidateException("Value not permitted");
 		}
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
+	 */
+	@Override
+	public boolean isValid(E item) {
+		return set.contains(item);
+	}
 
 }

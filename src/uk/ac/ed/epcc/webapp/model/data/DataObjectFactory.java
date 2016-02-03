@@ -81,6 +81,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 import uk.ac.ed.epcc.webapp.model.data.filter.Joiner;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
+import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SelfReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
@@ -329,8 +330,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			if( fil == null || ! restrict_parse){
 				return find(id);
 			}
-			AndFilter<BDO> find_fil = new AndFilter<BDO>(DataObjectFactory.this.getTarget(),fil);
-			find_fil.addFilter(new SelfReferenceFilter<BDO>(getTarget(),res, makeReference(id)));
+			AndFilter<BDO> find_fil = getValidateFilter(id);
 			try {
 				// force filter to be honoured as well
 				return  find(find_fil,true);
@@ -407,22 +407,18 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 					return;
 				}
 				try {
-					BDO o = find(num.intValue());
+					
 					if (restrict_parse && fil != null ){
-						
-							// have to do this the hard way 
-						    // filter may not be an AcceptFilter and even if it is
-						    // we can't guartantee that this represents the full
-						    // filter condition
-							for(Iterator<BDO> it = getItems(); it.hasNext(); ){
-								if( it.next().equals(o)){
-									return;
-								}
-							}
-						
-					    
-						   
-						   throw new ValidateException("Invalid input does not match selection filter");
+						AndFilter<BDO> validate_fil = getValidateFilter(num);
+						if( exists(validate_fil)){
+							return;
+						}
+
+
+
+						throw new ValidateException("Invalid input does not match selection filter");
+					}else{
+						BDO o = find(num.intValue());
 					}
 				} catch (DataNotFoundException e) {
 					
@@ -431,6 +427,14 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				    getContext().error(e,"Error in DataObjectInput");
 				    throw new ValidateException("Internal error", e);
 				}
+		}
+		/**
+		 * @param num
+		 * @return
+		 */
+		private AndFilter<BDO> getValidateFilter(Number num) {
+			return new AndFilter<BDO>(getTarget(), fil, 
+					new SQLIdFilter<BDO>(getTarget(), res, num.intValue()));
 		}
 		@Override
 		public <R> R accept(InputVisitor<R> vis) throws Exception {
@@ -442,6 +446,17 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		public void setPreSelect(boolean value) {
 			allow_pre_select=value;
 			
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
+		 */
+		@Override
+		public boolean isValid(BDO item) {
+			try {
+				return exists(getValidateFilter(item.getID()));
+			} catch (DataException e) {
+				return false;
+			}
 		}
 	}
 

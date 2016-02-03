@@ -23,7 +23,7 @@
 <%@page import="java.util.*" %>
 <%@page import="java.text.*"%>
 <%
-  	AppContext conn = ErrorFilter.retrieveAppContext(request);
+  	AppContext conn = ErrorFilter.retrieveAppContext(request,response);
 	String web_path = request.getContextPath();
 	// path of the diretory above the css dir
 	String template_path = "";	

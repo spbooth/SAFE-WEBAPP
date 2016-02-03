@@ -47,7 +47,7 @@ public class NavigationTag extends TagSupport implements Tag {
 		JspWriter out = page.getOut();
         HttpServletResponse response = (HttpServletResponse)pageContext.getResponse();
         try{
-        	AppContext conn = ErrorFilter.retrieveAppContext(request);
+        	AppContext conn = ErrorFilter.retrieveAppContext(request,response);
         	if( conn != null ){
         		// If no appContext then skip nav bar
         		NavigationMenuService serv = conn.getService(NavigationMenuService.class);

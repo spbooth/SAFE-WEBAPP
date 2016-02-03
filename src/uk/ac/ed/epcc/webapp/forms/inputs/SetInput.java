@@ -158,5 +158,13 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
+	 */
+	@Override
+	public boolean isValid(T item) {
+		return data.values().contains(item);
+	}
+
 	
 }

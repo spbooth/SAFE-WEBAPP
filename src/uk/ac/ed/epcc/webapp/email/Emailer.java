@@ -366,23 +366,7 @@ public class Emailer {
 		String subject = null;
 
 		
-		subject = (String) email_template.getProperty("subject");
-		// Try to get subject from template
-		if (subject == null) {
-			TemplateFile subject_template = email_template
-					.getTemplateRegion("Subject");
-			if (subject_template == null ) {
-				Logger log = getLogger();
-				log.info("EmailSender.doSendEmail no subject region");
-				throw new IllegalArgumentException("no subject region");
-			}
-			subject = strip(subject_template.toString());
-			if (subject == null || subject.length() == 0) {
-				Logger log = getLogger();
-				log.info("EmailSender.doSendEmail null subject");
-				throw new IllegalArgumentException("null email subject");
-			}
-		}
+		subject = getSubject(getLogger(),email_template);
 		
 		MimeMessage m = makeBlankEmail(conn, notify_emails, from, subject);
 		if (headers != null) {
@@ -416,6 +400,34 @@ public class Emailer {
 		}
 		
 		return m;
+	}
+
+	/**
+	 * @param email_template
+	 * @return
+	 */
+	private static String getSubject(Logger log,TemplateFile email_template) {
+		String subject;
+		subject = (String) email_template.getProperty("subject");
+		// Try to get subject from template
+		if (subject == null) {
+			TemplateFile subject_template = email_template
+					.getTemplateRegion("Subject");
+			if (subject_template == null ) {
+				if( log != null ){
+					log.info("EmailSender.doSendEmail no subject region");
+				}
+				throw new IllegalArgumentException("no subject region");
+			}
+			subject = strip(subject_template.toString());
+			if (subject == null || subject.length() == 0) {
+				if( log != null){
+					log.info("EmailSender.doSendEmail null subject");
+				}
+				throw new IllegalArgumentException("null email subject");
+			}
+		}
+		return subject;
 	}
 
 	public String getEncoding() {
@@ -628,7 +640,7 @@ public class Emailer {
 	 * @param conn
 	 * @param text
 	 */
-	public static void errorEmail(AppContext conn, String text) {
+	public static void errorEmail(AppContext conn, String subject,String text) {
 		Logger log = conn.getService(LoggerService.class).getLogger(conn.getClass());
 		try {
 			
@@ -642,7 +654,12 @@ public class Emailer {
 					.getInitParameter(ERROR_EMAIL_FROM_ADDRESS);
 			String tag = conn.getInitParameter("service.name", "Webapp");
 			//log.debug("tag is "+tag);
-			String emailSubject = tag + " Error";
+			String emailSubject;
+			if( subject == null){
+				emailSubject = tag + " Error";
+			}else{
+				emailSubject=subject;
+			}
             log.debug("sending "+emailSubject);
 			Session session = getSession(conn);
 
@@ -702,6 +719,7 @@ public class Emailer {
 		errorEmail = new TemplateFinder(conn).getTemplateFile("error_email.txt");
 		
 
+		
 		// Show current date and time
 		DateFormat df = DateFormat.getDateTimeInstance();
 		errorEmail.setProperty("date", df.format(new java.util.Date()));
@@ -729,8 +747,14 @@ public class Emailer {
 			errorEmail.setProperty("additional_info", additional_info);
 			errorEmail.setRegionEnabled("additional_info_region", true);
 		}
-        
-		errorEmail(conn, errorEmail.toString());
+		
+		String subject = null;
+		try{
+			subject = getSubject(null, errorEmail);
+		}catch(Throwable t){
+			// can cope with this
+		}
+		errorEmail(conn, subject,errorEmail.toString());
        
 	}
 

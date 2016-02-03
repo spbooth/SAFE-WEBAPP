@@ -262,6 +262,22 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 		public <R> R accept(InputVisitor<R> vis) throws Exception {
 			return vis.visitListInput(this);
 		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
+		 */
+		@Override
+		public boolean isValid(B item) {
+			Link l;
+			try {
+				l = getLink(user, item);
+			} catch (DataException e) {
+				return false;
+			}
+			if( l == null){
+				return false;
+			}
+			return l.hasRole(role);
+		}
     	
     }
 	/* (non-Javadoc)

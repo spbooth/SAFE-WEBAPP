@@ -25,6 +25,7 @@ package uk.ac.ed.epcc.webapp.servlet;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -80,6 +81,7 @@ public class ErrorFilter implements Filter {
 	private static final Feature TIMER_FEATURE = new Feature("Timer",false,"gather timing information for performance analyis");
 	private static final String LAST_ADDR_ATTR = "LastAddr";
 	public static final String APP_CONTEXT_ATTR = "AppContext";
+	public static final String SERVLET_CONTEXT_ATTR = "ServletContext";
 
 	public ErrorFilter(){
 		
@@ -130,8 +132,8 @@ public class ErrorFilter implements Filter {
 		  ctx=filterConfig.getServletContext();
 	    
 		} catch (Throwable e) {
-			 getLogger().fatal("ErrorFilter: Exception ", e);	
-			 throw new ServletException("Problem in Filter init",e);
+			// Can't log
+			throw new ServletException("Problem in Filter init",e);
 		}
 		
    }
@@ -140,57 +142,25 @@ public class ErrorFilter implements Filter {
 
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
+		boolean toplevel=false;  // Is this the highest nested instance of this filter
 		
-		AppContext conn = null;
-		Logger log = getLogger();
-		
-		AppUser user=null;
-		// IF there is already an AppContext in the request then this is a recursive filter call so skip
-		if( req.getAttribute(APP_CONTEXT_ATTR) == null ){
-		try {
-		
-			conn = makeContext(ctx,request,response);
-			// report error logs by email with page info
-			conn.setService( new ServletEmailLoggerService(conn,req));
-			if( TIMER_FEATURE.isEnabled(conn)){
-				DefaultTimerService timer_service = new DefaultTimerService(conn);
-				conn.setService( timer_service);
-				timer_service.startTimer(req.getServletPath());
-			}else{
-				conn.clearService(TimerService.class);
-			}
-			log = conn.getService(LoggerService.class).getLogger(getClass());
-			//check for session stealing
-			HttpSession sess = req.getSession(false);
-			if( SESSION_STEALING_CHECK_FEATURE.isEnabled(conn) && sess != null ){
-				String host=(String) sess.getAttribute(LAST_ADDR_ATTR);
-				if( host != null ){
-					if( ! host.equals(req.getRemoteAddr())){ // host address has changed in a session
-						conn.error("Possible session stealing remote address has changed "+host+" != "+req.getRemoteAddr());
-						if(  conn.getBooleanParameter("session.ipcheck", true)){
-						   conn.getService(SessionService.class).clearCurrentPerson();
-						}
-					}
-				}else{
-					sess.setAttribute(LAST_ADDR_ATTR, req.getRemoteAddr());
-				}
-			}
-			
-			req.setAttribute(APP_CONTEXT_ATTR, conn);
-			
-		} catch (Throwable e1) {
-
-			log.error("Exception making AppContext " , e1);
-			res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,e1.getMessage());
-			return;
+		if( req.getAttribute(SERVLET_CONTEXT_ATTR) == null){
+			toplevel=true;
+			req.setAttribute(SERVLET_CONTEXT_ATTR, ctx);
 		}
-		}
+		
+		
+		
+		
+		long start = System.currentTimeMillis();
+		
+		
 		try {
 			
 			chain.doFilter(req, res);
 		} catch(java.net.SocketException se){
 			// usually just the browser has gone away just log this
-			log.warn("Socket exception "+se.getMessage());
+			getCustomLogger(req, res).warn("Socket exception "+se.getMessage());
 	    }catch (ServletException e) {
 	    	
 			Throwable root = e.getRootCause();
@@ -200,7 +170,7 @@ public class ErrorFilter implements Filter {
 					root = e;
 				}
 			}
-			log.error("caught exception in filter",root);
+			getCustomLogger(req, res).error("caught exception in filter",root);
 			String show = ctx.getInitParameter("showExceptions");
 			if( show != null && show.equals("yes")){
 				// we are trying to debug a remote deployment without logger access
@@ -215,33 +185,35 @@ public class ErrorFilter implements Filter {
 		} catch( Throwable t){
 			
 			// generic throwable catch
-			log.error("caught Error in filter",t);
+			getCustomLogger(req, res).error("caught Error in filter",t);
 			// Note that Servlet2.4 spec says exceptions thrown from a filter
 			// are not handled by error-page but error codes are
 			res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}finally{
-			if( user != null ){
-				user.release();
-			}
-			if (conn != null) {
+			
+			
+			AppContext conn = (AppContext) req.getAttribute(APP_CONTEXT_ATTR);
+			if (conn != null && toplevel) {
+				long elapsed = System.currentTimeMillis()-start;
+				long max_wait=conn.getLongParameter("max.request.millis", 30000L);
+				if( elapsed > max_wait){
+					conn.getService(LoggerService.class).getLogger(getClass()).error("Long running page "+elapsed);
+				}
 				// remove the cached AppContext as this request object may be passed to
 				// the error-page and we are about to invalidate it
 				req.setAttribute(APP_CONTEXT_ATTR, null);
-				TimerService timer_service = conn.getService(TimerService.class);
-				if( timer_service != null ){
-					timer_service.stopTimer(req.getServletPath());
-				}
+				
 				CleanupService cleanup = conn.getService(CleanupService.class);
 				if( CLEANUP_THREAD_FEATURE.isEnabled(conn) && cleanup != null && cleanup.hasActions()){
 					conn.clearService(CleanupService.class);
 					// cleanup in thread
-					Thread t = new Thread(new Closer(conn, cleanup, getLogger()));
+					Thread t = new Thread(new Closer(conn, cleanup, getLocalLogger(req,res)));
 					t.start();
 				}else{
 					try{
 						conn.close();
 					}catch(Throwable t){
-						getLogger().error("Error closing AppContext",t);
+						getLocalLogger(req,res).error("Error closing AppContext",t);
 					}
 				}
 				conn = null;
@@ -306,27 +278,86 @@ public class ErrorFilter implements Filter {
 	 * 
 	 * @return Logger
 	 */
-	public Logger getLogger(){
+	public static Logger getLocalLogger(HttpServletRequest req,HttpServletResponse res ){
+		ServletContext ctx = (ServletContext) req.getAttribute(SERVLET_CONTEXT_ATTR);
 	    if( ctx != null ){	
 	    	return new ServletWrapper(ctx);
 	    }
 		return new PrintWrapper();
 	 }
+	
+	public static Logger getCustomLogger(HttpServletRequest req,HttpServletResponse res ){
+		AppContext conn=null;
+		try {
+			conn = retrieveAppContext(req,res);
+		} catch (ServletException e) {
+			// already want a logger
+			Logger log = getLocalLogger(req, res);
+			log.error("Error getting custom logger", e);
+			return log;
+		}
+		if( conn == null){
+			return getLocalLogger(req,res);
+		}
+		return conn.getService(LoggerService.class).getLogger(ErrorFilter.class);
+	}
 	/**
 	 * create the required AppContext. We use a factory method like this so we
 	 * have the choice of either using a constructor. Or or retrieving an
 	 * existing object cached as an attribute.
 	 * 
+	 * Currently we crate it in a lazy fashion (so no AppContext created for static content)
+	 * then cache in the request.
+	 * 
 	 * @param req
+	 * @param res 
 	 * @return ServletAppContext
+	 * @throws ServletException 
 	 */
 	public static AppContext retrieveAppContext(
-			HttpServletRequest req) {
-		// AppContext c = new ServletAppContext(serv.getServletContext());
-		AppContext c = (AppContext) req
+			HttpServletRequest req, HttpServletResponse res) throws ServletException {
+		AppContext conn = (AppContext) req
 				.getAttribute(APP_CONTEXT_ATTR);
-		return c;
-	
+		// IF there is already an AppContext in the request then this is a recursive filter call so skip
+		if( req.getAttribute(APP_CONTEXT_ATTR) == null ){
+			try {
+
+				conn = makeContext((ServletContext) req.getAttribute(SERVLET_CONTEXT_ATTR),req,res);
+				// report error logs by email with page info
+				conn.setService( new ServletEmailLoggerService(conn,req));
+				if( TIMER_FEATURE.isEnabled(conn)){
+					DefaultTimerService timer_service = new DefaultTimerService(conn);
+					conn.setService( timer_service);
+					// Note this timer won't be stopped explicitly
+					timer_service.startTimer(req.getServletPath());
+				}else{
+					conn.clearService(TimerService.class);
+				}
+
+				//check for session stealing
+				HttpSession sess = req.getSession(false);
+				if( SESSION_STEALING_CHECK_FEATURE.isEnabled(conn) && sess != null ){
+					String host=(String) sess.getAttribute(LAST_ADDR_ATTR);
+					if( host != null ){
+						if( ! host.equals(req.getRemoteAddr())){ // host address has changed in a session
+							conn.error("Possible session stealing remote address has changed "+host+" != "+req.getRemoteAddr());
+							if(  conn.getBooleanParameter("session.ipcheck", true)){
+								conn.getService(SessionService.class).clearCurrentPerson();
+							}
+						}
+					}else{
+						sess.setAttribute(LAST_ADDR_ATTR, req.getRemoteAddr());
+					}
+				}
+
+				req.setAttribute(APP_CONTEXT_ATTR, conn);
+
+			} catch (Throwable e1) {
+				throw new ServletException("Exception making AppContext", e1);
+			}
+		}
+		return conn;
+
 	}
 
 	

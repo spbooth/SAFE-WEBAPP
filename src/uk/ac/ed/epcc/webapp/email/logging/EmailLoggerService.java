@@ -128,11 +128,13 @@ public class EmailLoggerService implements Contexed, LoggerService {
 		
 		return props;
 	}
-	protected synchronized void emailError(Throwable e, String text) {
+	protected synchronized void emailError(LogLevels level,Throwable e, String text) {
 		if( ! in_error ){
 			try{
 				in_error=true;
-				Emailer.errorEmail(getContext(), e, getProps(), text);
+				Hashtable props = getProps();
+				props.put("report_level", level.toString());
+				Emailer.errorEmail(getContext(), e, props, text);
 			}catch(Throwable t){
 				if( nested != null ){
 					Logger l = nested.getLogger(getClass());
