@@ -45,6 +45,7 @@ public class OrphanFilter<T extends DataObject, BDO extends DataObject> extends 
 	private final Repository remote_res;
 	/**
 	 * 
+	 * @param target type of target
 	 * @param join_field String reference field
 	 * @param res        Repository of target
 	 * @param remote_res Repository of remote
@@ -57,10 +58,7 @@ public class OrphanFilter<T extends DataObject, BDO extends DataObject> extends 
 	}
 		
 		
-		
-		
-		
-		@SuppressWarnings("unchecked")
+	
 		
 		public final List<PatternArgument> getParameters(List<PatternArgument> list) {
 			return list;

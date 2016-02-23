@@ -1,3 +1,7 @@
+/* The nav div reserves space for the fixed navigation bar in the
+ * default top position. This allows the top of the page content to
+ * be seen.
+ */
 .nav {
   margin: 0;
   padding: 0;
@@ -7,7 +11,8 @@
   text-align: left;
   line-height: 11px;
 }
-
+/* First level menu stacks left to right across the page. This also sets defaults for all levels
+ */
 .nav ul {
   list-style: none;
   background-color: #000;
@@ -26,15 +31,20 @@
   text-align: left;
 }
 
+/* content of a menu is a link or a div. Format them the same
+ */
 .nav a , .nav div{
   text-decoration: none;
   color: #fff;
   display: block;
   padding-left: 15px;
+  height: 30px;
   border-bottom: 1px solid #888;
   transition: .3s background-color;
 }
 
+/*  links change colour on hover
+ */
 .nav a:hover {
  /* background-color: #005f5f;
   */
@@ -59,10 +69,10 @@
   cursor: default;
 }
 
-/* Sub Menus */
+/* Sub Menus use smaller font */
 .nav li li {
   font-size: .8em;
-  line-height: auto;
+/*  line-height: auto; */
 }
 
 .nav li.has_role a {
@@ -80,11 +90,15 @@
 ********************************************/
 
 @media screen and (min-width: 650px) {
+/* reserve parking space at top 
+ */	
   .nav{
-    height: 30px;
+    min-height: 30px;
     width: 100%;
     display: block;
   }
+/* first level menu fixed at top of page and covers entire width horizontally
+ */
   .nav ul {
     width: 100%;
     position: fixed;
@@ -99,10 +113,22 @@
     margin-right: -4px;
   }
 
-  .nav a {
+/* content elements
+ */
+  .nav a, .nav div {
     border-bottom: none;
+    height: 30px;
   }
+  
+/*  This seems to stop image links being pushed down
+ */
+ .nav a img{
+    margin-bottom: 3px;
+    height: 1em;
+ }
 
+/*  First level menu shows centered
+ */
   .nav > ul > li {
     text-align: center;
   }
@@ -111,18 +137,45 @@
     padding-left: 0;
   }
 
-  /* Sub Menus */
+  /* Sub Menus 
+  * invisible by default 
+  */
   .nav li ul {
     position: absolute;
     display: none;
     width: inherit;
+    
   }
-
-  .nav li:hover ul {
+  /* Sub-Sub menus 
+   * are included static in the parent menu
+   * so their size is included in the parent menu scrolling works
+   * If made absolute (and dynamic)  the parent menu would have to use overflow: visible
+   */ 
+  .nav ul li ul ul{
+    position: initial;
+    display: initial;
+    width: inherit;
+  }
+  /* sub-menu items need to auto-calculate height
+   * so the sub-menu can do overflow properly
+   */
+  .nav ul li ul li{
+    height: auto;
+  }
+  /* sub-menus add vertical scroll above a certain length
+   */
+  .nav > ul > li > ul {
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: visible;
+  }
+  
+  
+  /* Show pull-down menu on hover
+   */
+  .nav li:hover > ul {
     display: block;
   }
 
-  .nav li ul li {
-    display: block;
-  }
+  
 }

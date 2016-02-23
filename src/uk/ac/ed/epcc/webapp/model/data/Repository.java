@@ -1412,6 +1412,10 @@ public final class Repository {
 			if (!isDirty()) {
 				return false;
 			}
+			TimerService time = ctx.getService(TimerService.class);
+			if( time != null ){
+				time.startTimer(getTag()+"-update");
+			}
 			StringBuilder buff = new StringBuilder("UPDATE ");
 			sql.quote(buff, table_name);
 			buff.append(" SET ");
@@ -1437,6 +1441,7 @@ public final class Repository {
 				addUniqueName(buff, false, true);
 				buff.append('=');
 				buff.append(getID());
+				boolean updated=false;
 				if (update) {
 					PreparedStatement stmt = sql.getConnection()
 							.prepareStatement(buff.toString());
@@ -1462,9 +1467,12 @@ public final class Repository {
 						throw new ConsistencyError(
 								"incorrect number of rows changes "+buff.toString());
 					}
-					return true;
+					updated = true;
 				}
-				return false;
+				if( time != null ){
+					time.stopTimer(getTag()+"-update");
+				}
+				return updated;
 
 			} catch (SQLException e) {
 				// report the problem SQL to aid debugging
@@ -2395,6 +2403,10 @@ public final class Repository {
 			if( READ_ONLY_FEATURE.isEnabled(ctx)){
 				return -1;
 			}
+			TimerService time = ctx.getService(TimerService.class);
+			if( time != null ){
+				time.startTimer(getTag()+"-insert");
+			}
 	        int id;
 			// Ok, now we should save the object in the database before
 			// anything else happens
@@ -2454,6 +2466,9 @@ public final class Repository {
 					}
 				}
 				int count = stmt.executeUpdate();
+				if( time != null ){
+					time.stopTimer(getTag()+"-insert");
+				}
 				if (count != 1) {
 					throw new DataFault("Wrong count from INSERT");
 				}

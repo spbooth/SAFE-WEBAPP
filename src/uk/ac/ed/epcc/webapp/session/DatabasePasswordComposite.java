@@ -39,7 +39,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.CannotUseSQLException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
@@ -113,7 +113,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		try{
 			if( getRepository().hasField(DatabasePasswordComposite.ALG)){
 				log.debug("Has alg field");
-				OrFilter<T> of = new OrFilter<T>(getFactory().getTarget());
+				SQLOrFilter<T> of = new SQLOrFilter<T>(getFactory().getTarget());
 				AppContext conn = getContext();
 				for(Hash h : Hash.values()){
 					if( conn.getBooleanParameter(h.name()+".allowed", h.enableByDefault())){

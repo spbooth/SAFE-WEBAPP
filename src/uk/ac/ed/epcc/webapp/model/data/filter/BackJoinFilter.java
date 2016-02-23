@@ -56,7 +56,7 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 	private final String join_field;
 	private final Repository res;
 	private final Repository remote_res;
-	private final SQLFilter<T> fil;
+	private final SQLFilter<? super T> fil;
 	/**
 	 * 
 	 * @param join_field String reference field
@@ -64,7 +64,7 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 	 * @param remote_res Repository of remote
 	 * @param fil 
 	 */
-	public BackJoinFilter( Class<? super BDO> target,String join_field, Repository res, Repository remote_res, SQLFilter<T> fil){
+	public BackJoinFilter( Class<? super BDO> target,String join_field, Repository res, Repository remote_res, SQLFilter<? super T> fil){
 		this.target=target;
 		this.join_field=join_field;
 		this.res=res;

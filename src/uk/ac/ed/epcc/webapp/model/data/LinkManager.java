@@ -33,6 +33,8 @@ import uk.ac.ed.epcc.webapp.forms.inputs.ConstantInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultIterator;
@@ -623,8 +625,68 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		}
 	}
 
+	/** A wrapper to convert a non SQL filter on the link object into an {@link AcceptFilter}
+	 * on the left object
+	 * 
+	 * @author spb
+	 *
+	 */
+    public class LeftAcceptFilter extends  AbstractAcceptFilter<L>{
+    	/**
+		 * @param target
+		 * @param fil
+		 */
+		public LeftAcceptFilter( BaseFilter<T> fil) {
+			super(getLeftFactory().getTarget());
+			this.fil = fil;
+		}
 
-	
+		private final BaseFilter<T> fil;
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
+		 */
+		@Override
+		public boolean accept(L o) {
+			try {
+				return exists(new LinkFilter(o, null, fil));
+			} catch (DataException e) {
+				getLogger().error("Error in filter", e);
+				return false;
+			}
+		}
+    }
+    /** A wrapper to convert a non SQL filter on the link object into an {@link AcceptFilter}
+	 * on the right object
+	 * 
+	 * @author spb
+	 *
+	 */
+    public class RightAcceptFilter extends  AbstractAcceptFilter<R>{
+    	/**
+		 * @param target
+		 * @param fil
+		 */
+		public RightAcceptFilter( BaseFilter<T> fil) {
+			super(getRightFactory().getTarget());
+			this.fil = fil;
+		}
+
+		private final BaseFilter<T> fil;
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
+		 */
+		@Override
+		public boolean accept(R o) {
+			try {
+				return exists(new LinkFilter(null, o,fil));
+			} catch (DataException e) {
+				getLogger().error("Error in filter", e);
+				return false;
+			}
+		}
+    }
 
 	protected LinkManager(AppContext c, String table,DataObjectFactory<L> left_fac,
 			String left_field, DataObjectFactory<R> right_fac, String right_field) {

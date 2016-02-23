@@ -23,8 +23,10 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
@@ -159,6 +161,25 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
 				throws Exception {
 			throw new CannotFilterException();
 		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFiler(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
+		 */
+		@Override
+		public StringBuilder visitOrFiler(OrFilter<? super T> fil) throws Exception {
+			if( fil.nonSQL() ){
+				throw new CannotFilterException();
+			}
+			return fil.getSQLFilter().acceptVisitor(this);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
+		 */
+		@Override
+		public StringBuilder visitDualFilter(DualFilter<? super T> fil) throws Exception {
+			return visitPatternFilter(fil);
+		}
     	
     }
     public static class GetListFiltervisitor<T> implements FilterVisitor<List<PatternArgument>,T>{
@@ -220,7 +241,24 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
 				throws Exception {
 			throw new CannotFilterException();
 		}
-    	
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFiler(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
+		 */
+		@Override
+		public List<PatternArgument> visitOrFiler(OrFilter<? super T> fil) throws Exception {
+			if( fil.nonSQL() ){
+				throw new CannotFilterException();
+			}
+			return fil.getSQLFilter().acceptVisitor(this);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
+		 */
+		@Override
+		public List<PatternArgument> visitDualFilter(DualFilter<? super T> fil) throws Exception {
+			return visitPatternFilter(fil);
+		}
     }
     private final Class<R> target;
 	private final SQLExpression<? extends R> default_expr;

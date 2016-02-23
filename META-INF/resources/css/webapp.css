@@ -196,6 +196,16 @@ padding: 0;
 div.form {
 text-align: left;
 }
+
+
+
+
+/*  keep the label widths limited so inputs are closer to the label
+ */
+table.form th {
+	width: 33%;
+}
+
 /* block of action buttons at the end of a form
 */
 .action_buttons{
@@ -227,6 +237,7 @@ table.form{
     background-color: #cccccc;
     margin: 5px 0px;
     text-align: left;
+   
 }
 
 

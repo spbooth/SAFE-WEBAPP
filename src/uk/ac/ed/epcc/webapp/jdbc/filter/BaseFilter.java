@@ -23,7 +23,11 @@ import uk.ac.ed.epcc.webapp.Targetted;
  * 
  * There are multiple sub-interfaces that provide different functionality 
  * and but we also need to support composite filters that combine this functionality.
- * Code that uses filters and the composite types need to be updated if a new sub-interface is
+ * 
+ * We therefore use the visitor-pattern. Though a filter can implement combinations of the interfaces it has to choose to accept
+ * only one of the methods in {@link FilterVisitor}. 
+ * 
+ * Code that uses filters and the composite types need to be updated if a new visitor target is
  * introduced. We therefore require that filters either implement just one of the sub-types or
  * extend one of the canonical combining types. This is enforced using the 
  * visitor pattern.

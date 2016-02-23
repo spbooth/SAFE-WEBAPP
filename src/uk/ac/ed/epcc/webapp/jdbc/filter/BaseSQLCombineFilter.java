@@ -38,6 +38,13 @@ public abstract class BaseSQLCombineFilter<T> extends BaseCombineFilter<T> imple
 		// TODO Auto-generated constructor stub
 	}
 
+	/** Is this combining filter empty (contains no sub-clauses).
+	 * 
+	 * @return
+	 */
+	public boolean isEmpty(){
+		return filters.isEmpty();
+	}
 	
 	@Override
 	protected final void addAccept(AcceptFilter<? super T> filter) throws ConsistencyError {

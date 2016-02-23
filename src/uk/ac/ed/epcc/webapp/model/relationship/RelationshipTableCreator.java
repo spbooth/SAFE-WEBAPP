@@ -30,6 +30,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.ClassInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableListResult;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NewTableInput;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.TableInput;
 
@@ -76,8 +77,10 @@ public class RelationshipTableCreator implements FormCreator,Contexed{
 				if( peer_table == null ){
 					throw new ConsistencyError("Peer table is null");
 				}
-			    
-			    Relationship.makeTable(conn,table_name, peer_table);
+			    if( ! DataObjectFactory.AUTO_CREATE_TABLES_FEATURE.isEnabled(conn)){
+			    	// make a relationship table if class won't auto create
+			    	Relationship.makeTable(conn,table_name, peer_table);
+			    }
 			    	
 				return new TableListResult();
 			}catch(Exception e){

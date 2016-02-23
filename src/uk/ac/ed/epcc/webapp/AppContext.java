@@ -885,6 +885,10 @@ public final class AppContext {
 	 * @return instance
 	 */
 	public final <T> T makeObject(Class<T> clazz, String tag){
+		if( clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())){
+			// can't use as default so use null
+			return makeObjectWithDefault(clazz, null, tag);
+		}
 		return makeObjectWithDefault(clazz, clazz, tag);
 	}
 	@Deprecated

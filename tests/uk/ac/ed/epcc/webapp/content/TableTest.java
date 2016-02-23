@@ -691,7 +691,14 @@ public class TableTest {
 		Table<String, String> t = new Table<String, String>();
 		t.put("col1", "row1", 100);
 		t.setKeyName("keys_column");
-		assertEquals("keys_column \tcol1\t\n\nrow1:\t100\t\n", t.toString());
+		String s = t.toString();
+		System.out.println(s);
+		assertEquals(
+				"+-----------++----+\n"+
+				"|keys_column||col1|\n"+
+				"+-----------++----+\n"+
+				"|row1       || 100|\n"+
+				"+-----------++----+\n", s);
 	}
 	
 	/**
@@ -826,5 +833,34 @@ public class TableTest {
 		assertEquals(20, t.get("col1", "row2"));
 		t.getCol("col1").add("row2", 100);
 		assertEquals(120, t.get("col1", "row2"));
+	}
+	@Test
+	public void testToString(){
+		
+		Table<String, String> t = new Table<String, String>();
+		t.put("col1", "row1", "Something");
+		t.put("col1", "row2", "Short");
+		t.put("col2", "row1", "x");
+		t.put("col2", "row2", "Something very long");
+		assertEquals(t.toString(), 
+				"+---------+-------------------+\n"+
+				"|     col1|               col2|\n"+
+				"+---------+-------------------+\n"+
+				"|Something|                  x|\n"+
+				"|    Short|Something very long|\n"+
+				"+---------+-------------------+\n"
+				);
+		t.setKeyName("Stuff");
+	
+		assertEquals(t.toString(), 
+				"+-----++---------+-------------------+\n"+
+				"|Stuff||     col1|               col2|\n"+
+				"+-----++---------+-------------------+\n"+
+				"|row1 ||Something|                  x|\n"+
+				"|row2 ||    Short|Something very long|\n"+
+				"+-----++---------+-------------------+\n"
+				);
+		
+		
 	}
 }

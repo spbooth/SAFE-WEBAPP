@@ -29,6 +29,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -63,7 +64,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 /** Link class that encodes a relationship between an AppUser and a
- * domain object and used to implement {@link RoleSelector} for the domain object.
+ * domain object and used to implement {@link RelationshipProvider} and {@link RoleSelector} for the domain object.
  *
  * 
  * Possible roles are encoded as boolean fields in the table.
@@ -82,7 +83,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 public class Relationship<A extends AppUser,B extends DataObject> extends 
          TableStructureLinkManager<Relationship.Link<A,B>,A,B> implements 
-         RelationshipProvider<A, B>{
+         RelationshipProvider<A, B>, RoleSelector<B>{
     
 	// This is the default field sub-classes may use a different value
 	private static final String TARGET_ID = "TargetID";
@@ -304,7 +305,7 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 			hb.addHeading(3,"Roles");
 			ExtendedXMLBuilder xml = hb.getText();
 			xml.open("ul");
-			for(String role : getRoles()){
+			for(String role : getRelationships()){
 				xml.open("li");
 				xml.clean(role);
 				xml.close();
@@ -363,7 +364,7 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 		if( ! getLeftFactory().isMine(user) || ! getRightFactory().isMine(target)){
 			throw new ConsistencyError("Factory types do not match");
 		}
-		if( ! getRoles().contains(role)){
+		if( ! getRelationships().contains(role)){
 			getContext().error("Invalid role "+role);
 			return;
 		}
@@ -385,7 +386,7 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.safe.accounting.db.RelationshipProvider#getRoles()
 	 */
-	public Set<String> getRoles(){
+	public Set<String> getRelationships(){
 		Set<String> result = new HashSet<String>();
 		for( String s: res.getFields()){
 			if( res.getInfo(s).isBoolean()){
@@ -425,5 +426,22 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 	public DataObjectFactory<B> getTargetFactory() {
 		return getRightFactory();
 	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider#hasRelationFilter(uk.ac.ed.epcc.webapp.session.SessionService, java.lang.String)
+	 */
+	@Override
+	public BaseFilter<B> hasRelationFilter(SessionService<A> sess, String role) {
+		return getTargetFilter(sess.getCurrentPerson(), role);
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider#personInRelationFilter(uk.ac.ed.epcc.webapp.session.SessionService, java.lang.String, uk.ac.ed.epcc.webapp.model.data.DataObject)
+	 */
+	@Override
+	public BaseFilter<A> personInRelationFilter(SessionService<A> sess, String role, B target) {
+		return getUserFilter(target, role);
+	}
+
 
 }

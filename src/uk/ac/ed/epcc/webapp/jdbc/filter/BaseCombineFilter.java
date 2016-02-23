@@ -30,12 +30,11 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
  * @param <T> Type of target 
  *
  */
-public abstract class BaseCombineFilter<T> implements PatternFilter<T>, JoinFilter<T> , OrderFilter<T>{
-		private Class<? super T> target;
+public abstract class BaseCombineFilter<T> extends FilterSet<T> implements PatternFilter<T>, JoinFilter<T> , OrderFilter<T>{
 		protected LinkedHashSet<PatternFilter<? super T>> filters;
 	    protected LinkedHashSet<OrderClause> order=null;
 	    public BaseCombineFilter(Class<? super T> target){
-	    	this.target=target;
+	    	super(target);
 	    	filters = new LinkedHashSet<PatternFilter<? super T>>();
 	    }
 	    /** A {@link FilterVisitor} that encodes the rules for adding a filter.
@@ -43,7 +42,7 @@ public abstract class BaseCombineFilter<T> implements PatternFilter<T>, JoinFilt
 	     * @author spb
 	     *
 	     */
-	    private class AddFilterVisitor implements FilterVisitor<Boolean,T>{
+	    class AddFilterVisitor implements FilterVisitor<Boolean,T>{
 
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
@@ -126,39 +125,29 @@ public abstract class BaseCombineFilter<T> implements PatternFilter<T>, JoinFilt
 				addJoin(fil.getJoin());
 				return null;
 			}
-	    	
-	    }
-	    protected final BaseCombineFilter<T> add(BaseFilter<? super T> fil,boolean check_types){
-	    	
-	    	if( fil == null || fil==this){
-	    		return this;
-	    	}
-	    	if( check_types){
-	    		if( target == null ){
-	    			target=fil.getTarget();
-	    		}else{
-	    			// Its OK to add a super-type filter to a more specific filter but
-	    			// not the other way round.
-	    			Class target2 = fil.getTarget();
-	    			if( target2 != null && target != null && ! target2.isAssignableFrom(target)){
-	    				if( target.isAssignableFrom(target2)){
-	    					// adding more restricive target
-	    					target=target2;
-	    				}else{
-	    					//TODO check this always but run as assertion for a bit.
-	    					assert(false);
-	    					//throw new ConsistencyError("Incompatible filter types "+target2.getCanonicalName()+","+target.getCanonicalName());
-	    				}
-	    			}
-	    		}
-	    	}
-	    	try {
-				fil.acceptVisitor(new AddFilterVisitor());
-			} catch (Exception e) {
-				throw new ConsistencyError("Fatal filter combine error",e);
+
+			/* (non-Javadoc)
+			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFiler(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
+			 */
+			@Override
+			public Boolean visitOrFiler(OrFilter<? super T> fil) throws Exception {
+				addAccept(fil);
+				return null;
 			}
-	    	return this;
+
+			/* (non-Javadoc)
+			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
+			 */
+			@Override
+			public Boolean visitDualFilter(DualFilter<? super T> fil) throws Exception {
+				return visitPatternFilter(fil);
+			}
+	    	
 	    }
+	    @Override
+		protected FilterVisitor getAddVisitor() {
+			return new AddFilterVisitor();
+		}
 
 		protected final void addOrder(List<OrderClause> new_order) throws ConsistencyError {
 			if( new_order == null || new_order.size() == 0 ){
@@ -257,9 +246,5 @@ public abstract class BaseCombineFilter<T> implements PatternFilter<T>, JoinFilt
 		 * @return String
 		 */
 		protected abstract String getCombiner();
-		
-		public Class<? super T> getTarget(){
-			return target;
-		}
 
 }

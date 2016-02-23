@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /** Input to select a target class from the set of definitions from the configuration service.
  * This defaults to the set of <b>classdef</b> definitions {@link AppContext#getPropertyClass(Class,String)}
@@ -60,9 +61,9 @@ public class ClassInput<T> implements ListInput<String,Class<? extends T>>{
 						reg.put(tag, cand);
 					}
 				}
-			} catch (ClassNotFoundException e) {
+			} catch (Throwable e) {
 				// just skip
-				c.error(e,"Class "+params.get(name)+" from parameter "+name+" not found");
+				c.getService(LoggerService.class).getLogger(getClass()).error("Class "+params.get(name)+" from parameter "+name+" not found",e);
 			}
     	}
     }

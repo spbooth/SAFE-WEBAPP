@@ -31,6 +31,7 @@ import uk.ac.ed.epcc.webapp.charts.TimeChart;
 import uk.ac.ed.epcc.webapp.charts.strategy.LabelledSetRangeMapper;
 import uk.ac.ed.epcc.webapp.charts.strategy.RangeMapper;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpressionMatchFilter;
@@ -39,11 +40,16 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
+import uk.ac.ed.epcc.webapp.jdbc.table.DefaultTableTransitionRegistry;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableTransitionRegistry;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableTransitionTarget;
+import uk.ac.ed.epcc.webapp.jdbc.table.TransitionSource;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.data.BasicType;
 import uk.ac.ed.epcc.webapp.model.data.CachedIndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
@@ -54,10 +60,13 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
+import uk.ac.ed.epcc.webapp.model.data.filter.FilterUpdate;
 import uk.ac.ed.epcc.webapp.model.data.iterator.DecoratingIterator;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
 import uk.ac.ed.epcc.webapp.model.data.table.TableStructureDataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
+import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 /**
  * Class to generate History objects. As History objects are only manipulated
@@ -86,7 +95,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	
 
 	public static final Feature HISTORY_CACHE_FEATURE = new Feature("history_cache",true,"should history factories cache the peer objects to save on lookups");
-
+	public static final Feature HISTORY_STATUS_FEATURE = new Feature("history_status",false,"should history factories store tail status");
 
 	/**
 	 * Class Representing time history of and object.
@@ -264,20 +273,26 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 			setPeerID(peer.getID());
 			setStartTime(new Date());
 			setEndTime(new Date(ENDTIME));
+			setStatus(TAIL);
 			// make sure we don't have a field clash
 			Map<String,Object> hash = peer.getMap();
 			hash.remove(history_factory.getPeerName());
 			hash.remove(START_TIME_FIELD);
 			hash.remove(END_TIME_FIELD);
+			hash.remove(status.getField());
 			record.putAll(hash);
 		}
 
+		protected void setStatus(Status.Value val){
+			record.setOptionalProperty(status, val);
+		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.history.History#terminate()
 		 */
 		public final void terminate() {
 
 			setEndTime(new Date());
+			setStatus(EXPIRED);
 		}
 
 		@Override
@@ -294,6 +309,8 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 			history_factory=null;
 			super.release();
 		}
+
+		
 	}
     
 	/**
@@ -415,6 +432,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		}
     	
     }
+    
 	static protected long ENDTIME = java.lang.Long.MAX_VALUE;
 
 	protected static final String START_TIME_FIELD = "StartTime";
@@ -422,7 +440,48 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	protected static final String END_TIME_FIELD = "EndTime";
 
 	
+	private static final class Status extends BasicType<Status.Value>{
+		
+		/**
+		 * @param field
+		 */
+		protected Status() {
+			super("HistoryStatus");
+		}
+
+		private class Value extends BasicType.Value{
+
+			/**
+			 * @param parent
+			 * @param tag
+			 * @param name
+			 */
+			protected Value(String tag, String name) {
+				super(Status.this, tag, name);
+			}
+			
+		}
+	}
 	
+	/** Type of record depending on position in a sequence.
+	 * This class must continue to work even if this field does not exist.
+	 */
+	private static final Status status = new Status();
+	/** Values from the main sequence with a known successor.
+	 * This value is set when a record is truncated.
+	 */
+	private static final Status.Value SEQUENCE = status.new Value("S","Sequence");
+	/** potential tail value no known successor.
+	 * 
+	 */
+	private static final Status.Value TAIL = status.new Value("T","Tail");
+	/** Value from the main sequence which was not explicitly marked as {@link #SEQUENCE}.
+	 * Normally a time expired period but may any tail value that is detected as ending
+	 * before the current time. For example a sequence value from before the status field is added.
+	 * 
+	 * 
+	 */
+	private static final Status.Value EXPIRED = status.new Value("E","Expired");
 	
 	protected IndexedTypeProducer getPeerReference(){
 		FieldInfo info = res.getInfo(getPeerName());
@@ -489,13 +548,20 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	}
 	@Override
 	public TableSpecification getDefaultTableSpecification(AppContext c,String homeTable){
+		boolean tail_status = HISTORY_STATUS_FEATURE.isEnabled(c);
 		TableSpecification spec = new TableSpecification("HistoryID");
 		spec.setField(getPeerName(), new IntegerFieldType());
 		spec.setField(START_TIME_FIELD, new DateFieldType(true, null));
 		spec.setField(END_TIME_FIELD, new DateFieldType(true,null));
+		if( tail_status){
+			spec.setField(status.getField(), status.getFieldType(TAIL));
+		}
 		try{
 		Index search = spec.new Index("SearchIndex", false, END_TIME_FIELD, START_TIME_FIELD);
 		Index finder = spec.new Index("PeerIndex", false, getPeerName(), END_TIME_FIELD, START_TIME_FIELD);
+		if( tail_status){
+			Index tail = spec.new Index("TailIndex", false, getPeerName(), status.getField(),END_TIME_FIELD);
+		}
 		}catch(Exception e){
 			c.getService(LoggerService.class).getLogger(getClass()).error("Error making index",e); 
 		}
@@ -556,14 +622,26 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	public final H find(P peer, Date time)
 			throws uk.ac.ed.epcc.webapp.jdbc.exception.DataException,
 			IllegalArgumentException {
-
+		return find(peer,time,false);
+	}
+	protected final H find(P peer, Date time, boolean want_tail)
+				throws uk.ac.ed.epcc.webapp.jdbc.exception.DataException,
+				IllegalArgumentException {	
+		
 		if (peer == null || !isPeerType(peer)) {
 			throw (new IllegalArgumentException("Wrong peer type passed"));
+		}
+		TimerService timer = getContext().getService(TimerService.class);
+		if( timer != null ){
+			timer.startTimer(getTag()+"findPeer");
 		}
 		SQLAndFilter<H> fil =new  SQLAndFilter<H>(getTarget());
 		fil.addFilter(new ReferenceFilter<H,P>(this, getPeerName(),peer));
 		fil.addFilter(new TimeFilter(START_TIME_FIELD,MatchCondition.LE,time));
 		fil.addFilter(new TimeFilter(END_TIME_FIELD,MatchCondition.GT,time));
+		if( want_tail && res.hasField(status.getField())){
+			fil.addFilter(status.getSQLFilter(this, TAIL));
+		}
 		H current=null;
 		try{
 		  current = find(fil);
@@ -576,6 +654,9 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	      // Try again
 		  current = find(fil);	
 			
+		}
+		if( timer != null ){
+			timer.stopTimer(getTag()+"findPeer");
 		}
 		return  current;
 	}
@@ -668,6 +749,9 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	@Override
 	protected List<OrderClause> getOrder() {
 		List<OrderClause> order = super.getOrder();
+		// This typically requires mysql to resort the results
+		// as the sort order does not come naturally from the key but
+		// usually we are querying for single records.
 		order.add(res.getOrder(START_TIME_FIELD, false));
 		return order;
 	}
@@ -678,10 +762,29 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		if (!isPeerType(o)) {
 			throw new ConsistencyError("Object does not match peer type");
 		}
-		for (Iterator it = getIterator(o, null, null); it.hasNext();) {
-			HistoryRecord h = (HistoryRecord) it.next();
-			h.delete();
+		FilterDelete<H> del = new FilterDelete<H>(res);
+		del.delete(new HistoryFilter(o, null, null));
+	}
+	
+	/** expire any {@link #TAIL} records from this sequence that end
+	 * before the specified time
+	 * 
+	 * @param peer (optionally null for all sequences)
+	 * @param time
+	 * @throws DataFault 
+	 */
+	private void expireSequence(P peer, Date time) throws DataFault{
+		if( ! res.hasField(status.getField())){
+			return;
 		}
+		SQLAndFilter<H> fil = new SQLAndFilter<H>(getTarget());
+		if( peer != null){
+			fil.addFilter(new ReferenceFilter<H,P>(HistoryFactory.this,getPeerName(),peer));
+		}
+		fil.addFilter(status.getSQLFilter(this, TAIL));
+		fil.addFilter(new TimeFilter(END_TIME_FIELD,MatchCondition.LT,time) );
+		FilterUpdate<H> update = new FilterUpdate<H>(res);
+		update.update(res.getStringExpression(getTarget(), status.getField()), EXPIRED.getTag(), fil);
 	}
 
 	/* (non-Javadoc)
@@ -721,8 +824,9 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		// so
 		// regions match up exactly
 		HistoryRecord<P> tail = null;
+		Date now = now();
 		try {
-			tail = find(peer, now());
+			tail = find(peer, now,true);
 		} catch (uk.ac.ed.epcc.webapp.jdbc.exception.DataException e) {
 			// log.info("Matching History object not found");
 		}
@@ -735,7 +839,13 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 			// log.info("Made new object");
 			if (tail != null) {
 				tail.setEndTime(new_value.getStartTimeAsDate());
+				tail.setStatus(SEQUENCE);
 				tail.commit();
+			}else{
+				// we may have lost sequence due to a gap in the data
+				// there will be a dangling tail record at the end of the
+				// previous sequence.
+				expireSequence(peer, now);
 			}
 			tail = new_value;
 		}
@@ -743,7 +853,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		// now update the end Time, we rely on commit not
 		// making edit if the endTime is unchanged.
 		if (tail != null) {
-			tail.setEndTime(expireTime(peer, now()));
+			tail.setEndTime(expireTime(peer, now));
 			tail.commit();
 		}
 		return tail;
@@ -911,6 +1021,18 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	protected void postCreateTableSetup(AppContext c, String table) {
 		// additional side effects needed.
 		setPeerFactory(peer_factory);
+	}
+	@Override
+	public void resetStructure() {
+		super.resetStructure();
+		// We may be adding a HistoryStatus field 
+		// actually we won't trigger till the following transition but its still good 
+		// to do.
+		try {
+			expireSequence(null, new Date());
+		} catch (DataFault e) {
+			getLogger().error("Problem expiring records",e);
+		}
 	}
 
 }

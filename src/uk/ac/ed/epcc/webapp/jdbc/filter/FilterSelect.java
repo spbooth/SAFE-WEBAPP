@@ -38,7 +38,7 @@ public class FilterSelect<T> {
    * @param query
    * @param qualify
    */
-  protected void makeWhere(BaseFilter<T> my_filter,StringBuilder query,boolean qualify) {
+  protected void makeWhere(BaseFilter<? super T> my_filter,StringBuilder query,boolean qualify) {
 	  //TODO Use {@link SQLFilterVisitor} this assumes all queries are {@link PatternFilter}
 		boolean seen = false;
 		if (my_filter != null && my_filter instanceof PatternFilter) {

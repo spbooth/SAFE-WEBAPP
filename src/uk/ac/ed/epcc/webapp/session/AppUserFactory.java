@@ -42,7 +42,7 @@ import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -272,6 +272,10 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 	/** Create the initial map of toggle role statuses.
 	 * These are roles that a user can switch between.
 	 * 
+	 * List is defined in the property <b>toggle_roles</b>.
+	 * Initial value defaults to off but can be changed by setting the boolean parameter
+	 * <b>toggle_roles.initial_value.<em>role</em></b>
+	 * 
 	 * @return Map<String,Boolean>
 	 */
 	public Map<String,Boolean> makeToggleMap(){
@@ -281,7 +285,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		String additions = getContext().getInitParameter("toggle_roles");
 		if( additions != null ){
 			for(String s : additions.split(",")){
-				map.put(s,Boolean.FALSE);
+				map.put(s,getContext().getBooleanParameter("toggle_roles.initial_value."+s, false));
 			}
 		}
 		return  map;
@@ -456,7 +460,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		return getStringFinderFilter(name, false);
 	}
 	public   SQLFilter<AU> getStringFinderFilter(String name,boolean require_user_supplied){
-		OrFilter<AU> fil = new OrFilter<AU>(getTarget());
+		SQLOrFilter<AU> fil = new SQLOrFilter<AU>(getTarget());
 		for(  AppUserNameFinder<AU,?> finder : getRealms()){
 			if( finder.userVisible() || ! require_user_supplied){
 				fil.addFilter(finder.getStringFinderFilter(getTarget(), name));

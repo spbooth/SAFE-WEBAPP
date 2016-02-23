@@ -31,13 +31,23 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.DualFalseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.data.Composite;
+import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
+import uk.ac.ed.epcc.webapp.model.relationship.GlobalRoleFilter;
+import uk.ac.ed.epcc.webapp.model.relationship.RelationshipProvider;
 /** Abstract base implementation of {@link SessionService}
  * 
  * 
@@ -726,6 +736,223 @@ public Set<A> withRole(String role) {
 	public TimeZone getTimeZone(){
 		return TimeZone.getDefault();
 	}
+
+	// map of roles to filters.
+	private Map<String,BaseFilter> roles = new HashMap<String, BaseFilter>();
+	@Override
+	public final <T extends DataObject> BaseFilter<? super T> getRelationshipRoleFilter(DataObjectFactory<T> fac,
+			String role) {
+		// We may be storing roles from different types so prefix all tags with the type.
+		// prefix is never seen outsite this cache.
+		String store_tag=fac.getTag()+"."+role;
+		BaseFilter<? super T> result = roles.get(store_tag);
+		if( result == null ){
+			result = makeRelationshipRoleFilter(fac,getContext().getInitParameter("use_relationship."+fac.getTag()+"."+role, role));
+			roles.put(store_tag, result);
+		}
+		return result;
+	}
+	@Override
+	public final <T extends DataObject> BaseFilter<A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac,
+			String role, T target) {
+		// We may be storing roles from different types so prefix all tags with the type.
+		// prefix is never seen outsite this cache.
+		String store_tag="PersonFilter."+fac.getTag()+"."+role;
+		BaseFilter<A> result = roles.get(store_tag);
+		if( result == null ){
+			result = makePersonInRelationshipRoleFilter(fac,getContext().getInitParameter("use_relationship."+fac.getTag()+"."+role, role),target);
+			roles.put(store_tag, result);
+		}
+		return result;
+	}
+	private Set<String> searching_roles = new HashSet<String>();
+	/** actually construct the filter.
+	 * 
+	 * A role can be mapped to a different implementation by setting:
+	 * <b>use_relationship.<em>factory-tag</em>.<em>role</em></b>
+	 * If this is a comma separated list it implies an OR of the component parts.
+	 * within this AND combinations can be specified as + separated terms.
+	 * 
+	 * The factory (or its {@link Composite}s) can implement {@link AccessRoleProvider} to provide roles.
+	 * 
+	 * Role names containing a period are qualified names the qualifier can be:
+	 * <ul>
+	 * <li> <b>global</b> the role is a global role not a relationship.</li>
+	 * <li> <em>factory-tag</em> un-modified role from factory or {@link Composite}.</li>
+	 * <li> The tag of a {@link RelationshipProvider} for the target.</li>
+	 * <li> The tag of a {@link AccessRoleProvider}</li>
+	 * </ul>
+	 * 
+	 * @param fac2
+	 * @param role
+	 * @return
+	 */
+	protected <T extends DataObject> BaseFilter<? super T> makeRelationshipRoleFilter(DataObjectFactory<T> fac2, String role) {
+		if( searching_roles.contains(role)){
+			// recursive creation
+			return new DualFalseFilter<T>(fac2.getTarget()); 
+		}
+		searching_roles.add(role);
+		try{
+		if( role.contains(",")){
+			// OR combination of filters
+			OrFilter<T> or = new OrFilter<T>(fac2.getTarget(), fac2);
+			for( String  s  : role.split(",")){
+				or.addFilter(getRelationshipRoleFilter(fac2, s));
+			}
+			return or;
+		}
+		if( role.contains("+")){
+			// OR combination of filters
+			AndFilter<T> and = new AndFilter<T>(fac2.getTarget());
+			for( String  s  : role.split("+")){
+				and.addFilter(getRelationshipRoleFilter(fac2, s));
+			}
+			return and;
+		}
+		// should be a single filter now.
+		
+	    if( role.contains(".")){
+	    	// qualified role
+	    	int pos = role.indexOf('.');
+	    	String base =role.substring(0, pos);
+	    	String sub = role.substring(pos+1);
+	    	if( base.equals("global")){
+	    		return new GlobalRoleFilter<T>(this, sub);
+	    	}
+	    	if( base.equals(fac2.getTag())){
+	    		// This is to reference a factory/composite role from within a redefined
+	    		// definition. direct roles can be qualified if we want qualified names cannot
+	    		// be overridden. 
+	    		BaseFilter<? super T> result = makeDirectRelationshipRoleFilter(fac2, sub);
+	    		if( result != null ){
+	    			return result;
+	    		}
+	    	}
+	    	AccessRoleProvider arp = getContext().makeObjectWithDefault(AccessRoleProvider.class,null,base);
+	    	if( arp != null ){
+	    		return arp.hasRelationFilter(this, sub);
+	    	}
+	    }else{
+	    	// direct roles can be un-qualified though not if we want multiple levels of qualification.
+	    	BaseFilter<? super T> result = makeDirectRelationshipRoleFilter(fac2, role);
+			if( result != null ){
+				return result;
+			}
+	    }
+		
+		return new DualFalseFilter<T>(fac2.getTarget());
+		}finally{
+			searching_roles.remove(role);
+		}
+	}
+	protected <T extends DataObject> BaseFilter<A> makePersonInRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,T target) {
+		AppUserFactory<A> login_fac = getLoginFactory();
+		Class<? super A> target_type = login_fac.getTarget();
+		if( searching_roles.contains(role)){
+			// recursive creation
+			
+			return new DualFalseFilter<A>(target_type); 
+		}
+		searching_roles.add(role);
+		try{
+		if( role.contains(",")){
+			// OR combination of filters
+			OrFilter<A> or = new OrFilter<A>(target_type, login_fac);
+			for( String  s  : role.split(",")){
+				or.addFilter(getPersonInRelationshipRoleFilter(fac2, s,target));
+			}
+			return or;
+		}
+		if( role.contains("+")){
+			// OR combination of filters
+			AndFilter<A> and = new AndFilter<A>(target_type);
+			for( String  s  : role.split("+")){
+				and.addFilter(getPersonInRelationshipRoleFilter(fac2, s,target));
+			}
+			return and;
+		}
+		// should be a single filter now.
+		
+	    if( role.contains(".")){
+	    	// qualified role
+	    	int pos = role.indexOf('.');
+	    	String base =role.substring(0, pos);
+	    	String sub = role.substring(pos+1);
+	    	if( base.equals("global")){
+	    		// roles don't enumerate
+	    		return new DualFalseFilter<A>(target_type);
+	    	}
+	    	if( base.equals(fac2.getTag())){
+	    		// This is to reference a factory/composite role from within a redefined
+	    		// definition. direct roles can be qualified if we want qualified names cannot
+	    		// be overridden. 
+	    		BaseFilter<A> result = makeDirectPersonInRelationshipRoleFilter(fac2, sub,target);
+	    		if( result != null ){
+	    			return result;
+	    		}
+	    	}
+	    	AccessRoleProvider<A,T> arp = getContext().makeObjectWithDefault(AccessRoleProvider.class,null,base);
+	    	if( arp != null ){
+	    		return arp.personInRelationFilter(this, role, target);
+	    	}
+	    }else{
+	    	// direct roles can be un-qualified though not if we want multiple levels of qualification.
+	    	BaseFilter<A> result = makeDirectPersonInRelationshipRoleFilter(fac2, role,target);
+			if( result != null ){
+				return result;
+			}
+	    }
+		
+		return new DualFalseFilter<A>(target_type);
+		}finally{
+			searching_roles.remove(role);
+		}
+	}
+	/**
+	 * @param fac2
+	 * @param role
+	 */
+	protected <T extends DataObject> BaseFilter<? super T> makeDirectRelationshipRoleFilter(DataObjectFactory<T> fac2, String role) {
+		BaseFilter<? super T> result=null;
+	    if( fac2 instanceof AccessRoleProvider){  // first check factory itself.
+	    	result = ((AccessRoleProvider<A,T>)fac2).hasRelationFilter(this, role);
+	    	if( result != null){
+	    		return result;
+	    	}
+	    }
+	    // then check composites
+	    for(AccessRoleProvider prov : fac.getComposites(AccessRoleProvider.class)){
+	    	result = prov.hasRelationFilter(this, role);
+	    	if( result != null){
+	    		return result;
+	    	}
+	    }
+	    return null;
+	}
+	protected <T extends DataObject> BaseFilter<A> makeDirectPersonInRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,T target) {
+		BaseFilter<A> result=null;
+	    if( fac2 instanceof AccessRoleProvider){  // first check factory itself.
+	    	result = ((AccessRoleProvider<A,T>)fac2).personInRelationFilter(this, role, target);
+	    	if( result != null){
+	    		return result;
+	    	}
+	    }
+	    // then check composites
+	    for(AccessRoleProvider prov : fac.getComposites(AccessRoleProvider.class)){
+	    	result = prov.personInRelationFilter(this, role, target);
+	    	if( result != null){
+	    		return result;
+	    	}
+	    }
+	    return null;
+	}
+	@Override
+	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target, String role) {
+		return fac.matches(getRelationshipRoleFilter(fac, role), target);
+	}
+
+	
 
 	
 }

@@ -732,31 +732,6 @@ public class Table<C, R> {
 		c.addAttribute(row, name, value);
 	}
 
-	
-
-	public void addBody(StringBuilder hb) {
-		for (R row_key : getRows()) {
-			boolean first_col = true;
-			if (printKeys()) {
-				hb.append(getKeyText(row_key));
-				if (first_col) {
-					hb.append(":");
-					first_col = false;
-				}
-				hb.append("\t");
-				first_col = false;
-			}
-			for (C key : getColumNames()) {
-				hb.append(getText(key, row_key));
-				if (first_col) {
-					hb.append(":");
-					first_col = false;
-				}
-				hb.append("\t");
-			}
-			hb.append("\n");
-		}
-	}
 
 	/**
 	 * Generate a series of column sums grouped into categories based on the
@@ -1013,28 +988,6 @@ public class Table<C, R> {
 		}
 	}
 
-	public void addText(StringBuilder hb) {
-
-		boolean first_col = true;
-		if (printKeys()) {
-			hb.append(getKeyName());
-			hb.append(" \t");
-			first_col = false;
-		}
-		for (C key : getColumNames()) {
-			Col c = getCol(key);
-			if (first_col) {
-				hb.append(c.getName());
-				hb.append(" \t");
-				first_col = false;
-			} else {
-				hb.append(c.getName());
-				hb.append("\t");
-			}
-		}
-		hb.append("\n\n");
-		addBody(hb);
-	}
 
 	/**
 	 * Add a totals entry to column
@@ -1716,7 +1669,8 @@ public class Table<C, R> {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		addText(sb);
+		TextTableFormatter< C, R> fmt = new TextTableFormatter<C, R>(this);
+		fmt.add(sb);
 		return sb.toString();
 	}
 

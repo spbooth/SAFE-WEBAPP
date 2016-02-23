@@ -23,6 +23,9 @@ import java.util.TimeZone;
 
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 /** Service for managing session information.
  * This encodes all information about the current authenticated user, most importantly their
  * roles. The users may also have a database representation as an AppUser object which can also be 
@@ -199,4 +202,37 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @return String actual role to use
 	 */
 	public String mapRoleName(String role);
+	
+	/** get a {@link BaseFilter} representing the set of target objects that the current user has
+	 * a particular relationship-role with.
+	 * 
+	 * @param fac {@link DataObjectFactory} for target object
+	 * @param role 
+	 * @return {@link BaseFilter}
+	 */
+	public <T extends DataObject> BaseFilter<? super T> getRelationshipRoleFilter(DataObjectFactory<T> fac, String role);
+	/** get a {@link BaseFilter} representing the set of {@link AppUser}s that are in a particular
+	 * relationship-role with a target object.
+	 * A null target selects all {@link AppUser}s that have the specified role with any target.
+	 * @param fac
+	 * @param role
+	 * @param target
+	 * @return
+	 */
+	public <T extends DataObject> BaseFilter<A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,T target);
+	/** convenience method to check relationships.
+	 * 
+	 * Note that {@link #getRelationshipRoleFilter(DataObjectFactory, String)} is sufficient for this but
+	 * adding a method to {@link SessionService} reduces code duplication.
+	 * 
+	 * 
+	 * @param fac     {@link DataObjectFactory}
+	 * @param target  {@link DataObject} to test for relationship
+	 * @param role    String role to test
+	 * @return  boolean true if has relationship
+	 */
+	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target,String role);
+	
+	
+	
 }

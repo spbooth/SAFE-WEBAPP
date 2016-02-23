@@ -970,6 +970,10 @@ public class TemplateFile {
 			}
 			return;
 		}
+		if( value instanceof Number){
+			writePropertyValue(out, value.toString());
+			return;
+		}
 		// Damn, it's something we don't know how to write
 		throw new RuntimeException(
 				"Invalid type of Object found in property values - "

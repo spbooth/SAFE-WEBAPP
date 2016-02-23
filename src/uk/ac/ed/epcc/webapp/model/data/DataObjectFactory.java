@@ -55,8 +55,12 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.ConvertPureAcceptFilterVisitor;
+import uk.ac.ed.epcc.webapp.jdbc.filter.DualFalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterConverter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterFinder;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FilterMatcher;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.NoSQLFilterException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
@@ -66,7 +70,6 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.ResultIterator;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultMapper;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLResultIterator;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
@@ -83,7 +86,6 @@ import uk.ac.ed.epcc.webapp.model.data.filter.Joiner;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
-import uk.ac.ed.epcc.webapp.model.data.filter.SelfReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.Updater;
@@ -193,7 +195,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @param <BDO> type produced by factory
  */
 @SuppressWarnings("javadoc")
-public abstract class DataObjectFactory<BDO extends DataObject> implements Tagged, ContextCached, Owner, IndexedProducer<BDO>, Selector<DataObjectItemInput<BDO>> , FormCreatorProducer,FormUpdateProducer<BDO>{
+public abstract class DataObjectFactory<BDO extends DataObject> implements Tagged, ContextCached, Owner, IndexedProducer<BDO>, Selector<DataObjectItemInput<BDO>> , FormCreatorProducer,FormUpdateProducer<BDO>,FilterMatcher<BDO>{
     public static final Feature AUTO_CREATE_TABLES_FEATURE = new Feature("auto_create.tables",false,"attempt to make database tables if they don't exist");
 
     public static final Feature REJECT_MULTIPLE_RESULT_FEATURE = new Feature("multiple_result.error",true,"Throw an error if a filter find has multiple matching records");
@@ -934,7 +936,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 * @param join_field  field referencing remote oject
 		 * @param join_fac {@link DataObjectFactory} for remote object
 		 */
-		public RemoteFilter(SQLFilter<T> fil, String join_field, DataObjectFactory<T> join_fac){
+		public RemoteFilter(SQLFilter<? super T> fil, String join_field, DataObjectFactory<T> join_fac){
         	super(DataObjectFactory.this.getTarget(),fil,join_field,res,join_fac.res);
         }
 	}
@@ -1333,6 +1335,27 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		
 			Iterator<BDO> it = new FilterIterator(s);
 			return it.hasNext();
+		}
+	}
+	private final ConvertPureAcceptFilterVisitor<BDO> accept_converter = new ConvertPureAcceptFilterVisitor<BDO>();
+	public final boolean matches(BaseFilter<? super BDO> fil, BDO o) {
+		try {
+			// Use AcceptFilter by preference.
+			AcceptFilter<? super BDO> accept = fil.acceptVisitor(accept_converter);
+			if( accept != null){
+				return accept.accept(o);
+			}
+		} catch (Exception e1) {
+			getLogger().error("Error converting to AcceptFilter", e1);
+		}
+		// Have to do a SQL query
+		@SuppressWarnings("unchecked")
+		AndFilter<BDO> and = new AndFilter<BDO>(getTarget(), fil, new SQLIdFilter<BDO>(getTarget(), res, o.getID()) );
+		try {
+			return exists(and);
+		} catch (DataException e) {
+			getLogger().error("Error checking for filter match", e);
+			return false;
 		}
 	}
 	protected <I extends Indexed> Set<I> getReferenced(IndexedTypeProducer<I,? extends IndexedProducer<I>> producer, SQLFilter<BDO> fil) throws DataFault{
@@ -1893,6 +1916,41 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 */
     protected <F,D> F getProperty(BDO o, TypeProducer<F, D> prod, F def){
     	return o.record.getProperty(prod,def);
+    }
+    
+    /** Generate a Relationship filter based on a relationship on a remote object.
+     * 
+     * @param remote
+     * @param field
+     * @param role
+     * @return
+     */
+    protected <R extends DataObject> BaseFilter<BDO> getRemoteReleationshipFilter(DataObjectFactory<R> remote, String field, String role){
+    	BaseFilter<R> fil = getContext().getService(SessionService.class).getRelationshipRoleFilter(remote, role);
+    	if( fil == null ){
+    		return new DualFalseFilter<BDO>(getTarget());
+    	}
+    	try {
+			SQLFilter<R> sqlfil = fil.acceptVisitor(new FilterConverter<R>());
+			return new Joiner<R, BDO>(getTarget(), sqlfil, field, res, remote.res);
+		} catch (Exception e) {
+			try {
+				AcceptFilter<R> acceptfil = (AcceptFilter<R>) fil.acceptVisitor(new ConvertPureAcceptFilterVisitor<R>());
+				return new RemoteAcceptFilter<BDO,R>(getTarget(),remote,field,acceptfil);
+			} catch (Exception e1) {
+				getLogger().error("Cannot convert Relationship filter", e1);
+				return new DualFalseFilter<BDO>(getTarget());
+			}
+		}
+    }
+    
+    /** get a filter that selects a particular target object.
+     * 
+     * @param target
+     * @return
+     */
+    public SQLFilter<BDO> getFilter(BDO target){
+    	return new SQLIdFilter<BDO>(getTarget(), res, target.getID());
     }
 	/**
 	 * simple convenience routine to build Sets out of Iterators.

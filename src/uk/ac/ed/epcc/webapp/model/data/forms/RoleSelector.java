@@ -25,11 +25,14 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * Available selections may be restricted to those where the AppUser has a specified role 
  * with respect to the target objects. How this role is defined is implementation specific. 
  * 
+ * This is deprecated in favour of querying relationships directly but is still in use.
+ * 
  * @see Selector
  * @author spb
  *
  * @param <B> Type of object relationship is for.
  */
+@Deprecated
 public interface RoleSelector<B extends DataObject> {
 
 	/** Get the Input where the AppUser has the specified role with 

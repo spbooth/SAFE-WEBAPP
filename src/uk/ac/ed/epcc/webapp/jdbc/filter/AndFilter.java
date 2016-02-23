@@ -45,6 +45,9 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
     public boolean hasAcceptFilters(){
     	return ! accepts.isEmpty();
     }
+    public boolean hasPatternFilters(){
+    	return ! filters.isEmpty();
+    }
     /** accept based on target object
      * 
      * This method is final to ensure all accept clauses are applied.
@@ -103,7 +106,16 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 		res.addOrder(OrderBy());
 		return res;
 	}
-	
+	/** Make a pure {@link AcceptFilter} version of the current state if possible
+	 * 
+	 * @return {@link AcceptFilter} or null if not possible
+	 */
+	public AcceptFilter<T> getAcceptFilter(){
+		if( hasPatternFilters() ){
+			return null;
+		}
+		return new AndAcceptFilter<T>(getTarget(), accepts);
+	}
 	public final AndFilter<T> addFilter(BaseFilter<? super T> fil){
 		return (AndFilter<T>) super.add(fil,true);
 	}

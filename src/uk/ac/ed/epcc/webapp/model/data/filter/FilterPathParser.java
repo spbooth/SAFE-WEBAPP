@@ -21,7 +21,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseInput;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -79,7 +79,7 @@ public class FilterPathParser<T extends DataObject> {
 			}else if( p.equals("AND(")){
 				base.addFilter(parseFilter(new SQLAndFilter<T>(target), path));
 			}else if( p.equals("OR(")){
-				base.addFilter(parseFilter(new OrFilter<T>(target), path));
+				base.addFilter(parseFilter(new SQLOrFilter<T>(target), path));
 			}else if( index > 0  && index < (p.length()-1)){
 				String name=p.substring(0, index);
 				String value=p.substring(index+1);

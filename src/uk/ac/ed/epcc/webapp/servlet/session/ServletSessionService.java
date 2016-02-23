@@ -306,14 +306,14 @@ public boolean canSU(A new_person) {
 		return false;
 	}
 	// We re looking for a specific person Check for a sudo table
-	RelationshipProvider<A, A> pr = getPersonRelationship();
+	PersonRelationship<A> pr = getPersonRelationship();
 	if( pr != null ){
 		return pr.hasRole(this,new_person, PersonRelationship.SUDO_ROLE);
 	}
 	return false;
 }
 
-public RelationshipProvider<A, A> getPersonRelationship(){
+public PersonRelationship<A> getPersonRelationship(){
 	String sudo_table= getContext().getInitParameter(PERSON_RELATIONSHIP_TABLE);
 	if( sudo_table != null ){
 		return new PersonRelationship<A>(getContext(), sudo_table);

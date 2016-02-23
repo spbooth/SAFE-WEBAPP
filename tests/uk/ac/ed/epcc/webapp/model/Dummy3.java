@@ -51,86 +51,43 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @author spb
  *
  */
-public class Dummy1 extends DataObject {
+public class Dummy3 extends DataObject {
 	public static final String NAME = "Name";
 	public static final String MANDATORY ="Mandatory";
-	public static final String NUMBER = "Number";
-	public static final String UNSIGNED = "UnsignedInt";
-	public static final String TIME="Time";
-	public static final String DEFAULT_TABLE = "Test";
+	
+	public static final String PERSON_ID = "PersonID";
+	public static final String DEFAULT_TABLE = "Test3";
 	
 
-	public Dummy1(Repository.Record res) {
+	public Dummy3(Repository.Record res) {
 		super(res);
 	}
 
-	public Dummy1(AppContext ctx) {
+	public Dummy3(AppContext ctx) {
 		super(getRecord(ctx,DEFAULT_TABLE));
 	}
 
 	public String getName(){
 		return record.getStringProperty(NAME);
 	}
-	public int getNumber(){
-		return record.getIntProperty(NUMBER, 0);
-	}
+	
 	public void setName(String n){
 		record.setProperty(NAME, n);
 	}
-	public void setNumber(int n){
-		record.setProperty(NUMBER, n);
-	}
-	public long getUnsigned(){
-		// regression test for mysql bug where unsigned fields returned corrupt long values
-		return record.getLongProperty(UNSIGNED,0);
-	}
-	public void setUnsigned(long i){
-		record.setProperty(UNSIGNED,i);
-	}
 	
-	public Date getDateTime(){
-		return record.getDateProperty(TIME);
+	public void setPerson(AppUser person){
+		record.setProperty(PERSON_ID, person.getID());
 	}
-
-	public void setDateTime(Date d){
-		record.setProperty(TIME, d);
+	public AppUser getPerson(){
+		return (AppUser) getContext().getService(SessionService.class).getLoginFactory().find(record.getNumberProperty(PERSON_ID));
 	}
-	
-	
-    public static class Factory extends DataObjectFactory<Dummy1> {
+    public static class Factory extends DataObjectFactory<Dummy3> implements AccessRoleProvider<AppUser, Dummy3>{
     	 /**
 		 * 
 		 */
 		
-		public class NumberFilter extends SQLValueFilter<Dummy1>{
-         	public NumberFilter(Number n){
-         		super(Factory.this.getTarget(),res,NUMBER,n);
-         	}
-         }
-    	 public class NumberAcceptFilter implements AcceptFilter<Dummy1>{
-    		 Number n;
-          	public NumberAcceptFilter(Number n){
-          		this.n=n;
-          	}
-			public boolean accept(Dummy1 d) {
-				return n.intValue() == d.getNumber();
-			}
-			/* (non-Javadoc)
-			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-			 */
-			public <X> X acceptVisitor(FilterVisitor<X, ? extends Dummy1> vis)
-					throws Exception {
-				return vis.visitAcceptFilter(this);
-			}
-			/* (non-Javadoc)
-			 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
-			 */
-			public Class<? super Dummy1> getTarget() {
-				return Factory.this.getTarget();
-			}
-			
-          }
-         public class StringFilter extends SQLValueFilter<Dummy1>{
+		
+         public class StringFilter extends SQLValueFilter<Dummy3>{
          	public StringFilter(String s){
          		super(Factory.this.getTarget(),res,NAME,s);
          	}
@@ -138,12 +95,12 @@ public class Dummy1 extends DataObject {
 		public Factory(AppContext c) {
 			setContext(c,DEFAULT_TABLE);
 		}
-        public long count(SQLFilter<Dummy1> f) throws DataException{
+        public long count(SQLFilter<Dummy3> f) throws DataException{
         	return getCount(f);
         }
 		@Override
 		protected DataObject makeBDO(Repository.Record res) throws DataFault {
-			return new Dummy1(res);
+			return new Dummy3(res);
 		}
     	public void nuke() throws DataFault{
     		for(Iterator it = getAllIterator(); it.hasNext();){
@@ -151,22 +108,11 @@ public class Dummy1 extends DataObject {
     			o.delete();
     		}
     	}
-		@Override
-		protected List<OrderClause> getOrder() {
-			List<OrderClause> result = new LinkedList<OrderClause>();
-			result.add(res.getOrder(NUMBER, false));
-			return result;
-		}
 		
-		public FilterResult<Dummy1> getReverse() throws DataFault{
-			AndFilter<Dummy1>fil = new AndFilter<Dummy1>(getTarget());
-			fil.addFilter(new FieldOrderFilter<Dummy1>(Factory.this.getTarget(),res, NUMBER, true));
-			return new FilterSet(fil);
-			
-		}
+	
 		
-		public FilterResult<Dummy1> getWithFilter() throws DataFault{
-			AndFilter<Dummy1>fil = new AndFilter<Dummy1>(getTarget());
+		public FilterResult<Dummy3> getWithFilter() throws DataFault{
+			AndFilter<Dummy3>fil = new AndFilter<Dummy3>(getTarget());
 			return new FilterSet(fil);
 			
 		}
@@ -175,10 +121,10 @@ public class Dummy1 extends DataObject {
 				String table) {
 			TableSpecification spec = new TableSpecification();
 			spec.setField(NAME, new StringFieldType(true, "", 32));
-			spec.setField(NUMBER, new DoubleFieldType(true, 0.0));
-			spec.setField(UNSIGNED, new LongFieldType(true, 0L));
+			
 			spec.setField(MANDATORY, new StringFieldType(false, "Junk", 32));
-			spec.setField(TIME,new DateFieldType(true, null));
+		    spec.setField(PERSON_ID, new ReferenceFieldType(true, c.getService(SessionService.class).getLoginFactory().getTag()));
+			
 			return spec;
 		}
 		public Set<String> getNullFields(){
@@ -187,6 +133,23 @@ public class Dummy1 extends DataObject {
 		}
 		public boolean fieldExists(String name){
 			return res.hasField(name);
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider#hasRelationFilter(uk.ac.ed.epcc.webapp.session.SessionService, java.lang.String)
+		 */
+		@Override
+		public BaseFilter<Dummy3> hasRelationFilter(SessionService<AppUser> sess, String role) {
+			if( role.equals("self")){
+				return new SQLValueFilter<Dummy3>(getTarget(), res, PERSON_ID, sess.getCurrentPerson().getID());
+			}
+			return null;
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider#personInRelationFilter(uk.ac.ed.epcc.webapp.session.SessionService, java.lang.String, uk.ac.ed.epcc.webapp.model.data.DataObject)
+		 */
+		@Override
+		public BaseFilter<AppUser> personInRelationFilter(SessionService<AppUser> sess, String role, Dummy3 target) {
+			return sess.getLoginFactory().getFilter(target.getPerson());
 		}
     }
 }
