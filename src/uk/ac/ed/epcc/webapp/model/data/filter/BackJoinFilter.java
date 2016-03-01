@@ -101,8 +101,9 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 	        res.addUniqueName(sb, true, true);
 	        if( fil != null ){
 	        	sb.append(" AND ");
+	        	makeWhere(fil, sb, true);
 	        }
-	        makeWhere(fil, sb, true);
+	        
 			sb.append(")");
 			return sb;
 		}

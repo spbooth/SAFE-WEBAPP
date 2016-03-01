@@ -43,7 +43,6 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.model.data.filter.Joiner;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
@@ -505,7 +504,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			try {
 				l = selectLink(getLeftFactory().find(left), getRightFactory().find(right));
 			} catch (Exception e) {
-				getContext().error("error in LinkInput");
+				getLogger().error("error in LinkInput");
 				throw new ValidateException("Selected item does not exist",e);
 			}
 			if (l == null) {
@@ -788,40 +787,71 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @param fil SQLFilter on self
 	 * @return SQLFilter on left peer
 	 */
-	public SQLFilter<L> getLeftFilter(SQLFilter<T> fil){
-		return new Joiner<T, L>(getLeftFactory().getTarget(),fil, getLeftField(), getLeftFactory().res, res,false);
+	public BaseFilter<L> getLeftFilter(BaseFilter<T> fil){
+		return convertToDestinationFilter(getLeftFactory(), getLeftField(), fil);
 	}
-	/** Get a filter for the link from a filter on the left peer
+	/** Get a filter for the left peer from a filter on the link
+	 * 
+	 * @param fil SQLFilter on self
+	 * @return SQLFilter on left peer
+	 */
+	public SQLFilter<L> getLeftFilter(SQLFilter<T> fil){
+		return new DestFilter<L>(fil, getLeftField(), getLeftFactory());
+	}
+	/** Get a {@link SQLFilter} for the link from a {@link SQLFilter} on the left peer
 	 * 
 	 * @param fil SQLFilter on left peer
 	 * @return SQLFilter on self
 	 */
-	public SQLFilter<T> getLeftJoinFilter(SQLFilter<L> fil){
-		return new Joiner<L,T>(getTarget(),fil,getLeftField(),res,getLeftFactory().res,true);
+	public SQLFilter<T> getLeftJoinFilter(SQLFilter<? super L> fil){
+		return new RemoteFilter<L>(fil, getLeftField(), getLeftFactory());
+	}
+	/** get a {@link BaseFilter} for the link from a {@link BaseFilter} on the left peer
+	 * 
+	 * @param fil {@link BaseFilter} on left peer
+	 * @return {@link BaseFilter} on self
+	 */
+	public BaseFilter<T> getLeftRemoteFilter(BaseFilter<? super L> fil){
+		return getRemoteFilter(getLeftFactory(), getLeftField(), fil);
 	}
 	
 	public FilterResult<L> getLeftResult(R right, BaseFilter<? super T> fil) throws DataFault{
 		return new LeftResult(right, fil);
 	}
-	/** Get a filter for the left peer from a filter on the link.
+	/** Get a filter for the right peer from a filter on the link.
+	 * 
+	 * 
+	 * @param fil SQLFilter on self
+	 * @return SQLFilter on left peer
+	 */
+	public BaseFilter<R> getRightFilter(BaseFilter<T> fil){
+		return convertToDestinationFilter(getRightFactory(), getRightField(), fil);
+	}
+	/** Get a {@link SQLFilter} for the right peer from a {@link SQLFilter} on the link.
 	 * 
 	 * 
 	 * @param fil SQLFilter on self
 	 * @return SQLFilter on left peer
 	 */
 	public SQLFilter<R> getRightFilter(SQLFilter<T> fil){
-		return new Joiner<T, R>(getRightFactory().getTarget(),fil, getRightField(), getRightFactory().res, res,false);
+		return new DestFilter<R>(fil, getRightField(), getRightFactory());
 	}
-	
-	/** Get a filter for the link from a filter on the right peer
+	/** Get a {@link SQLFilter} for the link from a {@link SQLFilter} on the right peer
 	 * 
-	 * @param fil SQLFilter on right peer
-	 * @return SQLFilter on self
+	 * @param fil {@link SQLFilter} on right peer
+	 * @return {@link SQLFilter} on self
 	 */
-	public SQLFilter<T> getRightJoinFilter(SQLFilter<R> fil){
-		return new Joiner<R,T>(getTarget(),fil,getRightField(),res,getRightFactory().res,true);
+	public SQLFilter<T> getRightJoinFilter(SQLFilter<? super R> fil){
+		return new RemoteFilter<R>(fil, getRightField(), getRightFactory());
 	}
-	
+	/** get a {@link BaseFilter} for the link from a {@link BaseFilter} on the right peer.
+	 * 
+	 * @param fil {@link BaseFilter} in right peer
+	 * @return {@link BaseFilter} on self
+	 */
+	public BaseFilter<T> getRightRemoteFilter(BaseFilter<? super R> fil){
+		return getRemoteFilter(getRightFactory(), getRightField(), fil);
+	}
 	public FilterResult<R> getRightResult(L left, BaseFilter<? super T> fil) throws DataFault{
 		return new RightResult(left, fil);
 	}

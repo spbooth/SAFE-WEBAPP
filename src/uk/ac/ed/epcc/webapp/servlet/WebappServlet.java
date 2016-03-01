@@ -26,7 +26,6 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -260,7 +259,7 @@ public abstract class WebappServlet extends HttpServlet {
     	/* we have to show the dialog box and return here */
     	String my_url = req.getRequestURI();
     	if( my_url == null ){
-    		conn.error("null Request URI");
+    		getLogger(conn).error("null Request URI");
     		return null;
     	}
     	req.setAttribute(CONFIRM_POST_URL,my_url);

@@ -26,6 +26,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.charts.chart2D.Chart2DTimeChartData;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 //import uk.ac.ed.epcc.webapp.charts.jfreechart.JFreeChartData;
 import uk.ac.ed.epcc.webapp.time.CalendarFieldSplitPeriod;
 import uk.ac.ed.epcc.webapp.time.RegularSplitPeriod;
@@ -197,7 +198,7 @@ public class TimeChart<P extends PeriodSequencePlot> extends PeriodChart<P>{
 		try {
 			t.setChartData(c.makeObject(clazz));
 		} catch (Exception e) {
-			c.error(e,"Error making TimeChartData");
+			c.getService(LoggerService.class).getLogger(TimeChart.class).error("Error making TimeChartData",e);
 		}
 		
 		return t;

@@ -117,13 +117,13 @@ public class ActionMessageVisitor extends AbstractVisitor {
 	@Override
 	public void doIOError(MessageWalker w, IOException e)
 			throws WalkerException {
-		w.getContext().error(e,"Error in ActionVisitor");
+		getLogger().error("Error in ActionVisitor",e);
 	}
 
 	@Override
 	public void doMessageError(MessageWalker w, MessagingException e)
 			throws WalkerException {
-		w.getContext().error(e,"Error in ActionVisitor");
+		getLogger().error("Error in ActionVisitor",e);
 	}
 
 	
@@ -135,7 +135,7 @@ public class ActionMessageVisitor extends AbstractVisitor {
 				deleteRecipient(messageWalker.getCurrentMessage(), javax.mail.Message.RecipientType.BCC, i);
                 modified=true;
 			} catch (MessagingException e) {
-				messageWalker.getContext().error(e,"Error deleting recipient");
+				getLogger().error("Error deleting recipient",e);
 			}
 		}
 	}
@@ -148,7 +148,7 @@ public class ActionMessageVisitor extends AbstractVisitor {
 				deleteRecipient(messageWalker.getCurrentMessage(), javax.mail.Message.RecipientType.CC, i);
                 modified=true;
 			} catch (MessagingException e) {
-				messageWalker.getContext().error(e,"Error deleting recipient");
+				getLogger().error("Error deleting recipient",e);
 			}
 		}
 	}
@@ -188,7 +188,7 @@ public class ActionMessageVisitor extends AbstractVisitor {
 				deleteRecipient(messageWalker.getCurrentMessage(), javax.mail.Message.RecipientType.TO, i);
 	            modified=true;
 			} catch (MessagingException e) {
-				messageWalker.getContext().error(e,"Error deleting recipient");
+				getLogger().error("Error deleting recipient",e);
 			}
 		}
 	}
@@ -208,7 +208,7 @@ public class ActionMessageVisitor extends AbstractVisitor {
 			modified = true;
 		}
 		}catch(Exception e){
-			messageWalker.getContext().error(e,"Error removing single part multipart");
+			getLogger().error("Error removing single part multipart",e);
 		}
 	}
 

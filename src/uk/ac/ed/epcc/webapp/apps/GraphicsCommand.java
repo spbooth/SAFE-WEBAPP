@@ -58,7 +58,7 @@ public abstract class GraphicsCommand implements Command{
 				try {
 					handler.process(new ChainedTransitionResult<T, K>(tp, target, key));
 				} catch (Exception e1) {
-					conn.error(e1,"Error performing transition");
+					log.error("Error performing transition",e1);
 				}
 			}
 			

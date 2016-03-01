@@ -28,6 +28,8 @@ import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 /** Factory class for a set of FormFactoryProviders
@@ -45,6 +47,9 @@ public abstract class FormFactoryProviderRegistry<T extends FormFactoryProvider>
 	
 	public AppContext getContext(){
 		return conn;
+	}
+	protected final Logger getLogger(){
+		return conn.getService(LoggerService.class).getLogger(getClass());
 	}
 	
 	@SuppressWarnings("unchecked")

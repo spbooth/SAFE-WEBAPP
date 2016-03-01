@@ -210,19 +210,21 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @param role 
 	 * @return {@link BaseFilter}
 	 */
-	public <T extends DataObject> BaseFilter<? super T> getRelationshipRoleFilter(DataObjectFactory<T> fac, String role);
+	public <T extends DataObject> BaseFilter<? super T> getRelationshipRoleFilter(DataObjectFactory<T> fac, String role) throws UnknownRelationshipException;
 	/** get a {@link BaseFilter} representing the set of {@link AppUser}s that are in a particular
 	 * relationship-role with a target object.
-	 * A null target selects all {@link AppUser}s that have the specified role with any target.
+	 * A null target selects all {@link AppUser}s that have the specified role with any target matched by the
+	 * factories default  {@link DataObjectFactory#getDefaultRelationshipFilter()}.
 	 * @param fac
 	 * @param role
 	 * @param target
-	 * @return
+	 * @return {@link BaseFilter}
 	 */
-	public <T extends DataObject> BaseFilter<A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,T target);
-	/** convenience method to check relationships.
+	public <T extends DataObject> BaseFilter<A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,T target) throws UnknownRelationshipException;
+	/** Method to check relationships on a specified target object.
 	 * 
-	 * Note that {@link #getRelationshipRoleFilter(DataObjectFactory, String)} is sufficient for this but
+	 * Note that {@link #getRelationshipRoleFilter(DataObjectFactory, String)} is sufficient for this
+	 * in combination with {@link DataObjectFactory#matches(BaseFilter, DataObject)} but
 	 * adding a method to {@link SessionService} reduces code duplication.
 	 * 
 	 * 
@@ -230,8 +232,9 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @param target  {@link DataObject} to test for relationship
 	 * @param role    String role to test
 	 * @return  boolean true if has relationship
+	 * @throws UnknownRelationshipException 
 	 */
-	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target,String role);
+	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target,String role) throws UnknownRelationshipException;
 	
 	
 	

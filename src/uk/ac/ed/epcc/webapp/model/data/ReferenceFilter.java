@@ -28,7 +28,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  * fields that reference other DataObject tables. In this case it is a good idea to subclass
  * again so as to improve type safety and hide the field name.
  * <p>
- * 
+ * @see ReferenceAcceptFilter
  * @author spb
  * @param <BDO> type of factory
  * @param <R> indexed type

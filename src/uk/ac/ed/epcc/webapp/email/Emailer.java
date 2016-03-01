@@ -334,9 +334,9 @@ public class Emailer {
 			}else{
 				Transport.send(m);
 			}
-			log.info("mail sent ok");
+			log.info("mail sent ok "+m.getSubject()+" "+m.getAllRecipients().toString());
 		}else{
-			log.info("email send supressed");
+			log.info("email send supressed "+m.getSubject());
 			try{
 				ByteArrayStreamData data = new ByteArrayStreamData();
 				data.read(m.getInputStream());

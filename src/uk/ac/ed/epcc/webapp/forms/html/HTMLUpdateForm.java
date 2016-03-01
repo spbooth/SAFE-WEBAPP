@@ -74,9 +74,8 @@ public class HTMLUpdateForm<T> extends UpdateForm<T> {
 	private HTMLForm getForm(HttpServletRequest req) {
 		if (!haveTarget()) {
 			String error_text="object not specified for HTMLUpdateForm ";
-			AppContext c = getContext();
 			
-			c.error(error_text);
+			getLogger().error(error_text);
 			
 			return null;
 		}

@@ -21,6 +21,8 @@ import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.Version;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.resource.ResourceService;
 /** Base {@link ConfigService} that supports the recursive loading of properties from
  * a {@link ResourceService}
@@ -63,19 +65,38 @@ public abstract class AbstractConfigService implements Contexed, ConfigService{
 					props.setProperty(CONFIG_LOADED+config_path, "true");
 				} else {
 					if( required ){
-						conn.error("Failed to find config "+config_path);
+						error("Failed to find config "+config_path);
 						//Throw fatal error rather than attempting to continue
 						// useful if logging is also not working
 						throw new ConsistencyError("No properties file found ["+config_path+"]");
 					}
 				}
 			} catch (Exception e) {
-				conn.error("Exception while loading service properties file: "
+				error("Exception while loading service properties file: "
 						+ config_path);
 			}
 		}
 		result = processAdditions(props, serv);
 		return result;
+	}
+	
+	/**
+	 * Report an application error.
+	 * Needs to handle the possiblity of the LoggerService not being present as
+	 * we can't make it a pre-requisite here
+	 * 
+	 * @param errors
+	 *            Text of error.
+	 */
+	
+	final void error(String errors) {
+		LoggerService serv = getContext().getService(LoggerService.class);
+		if( serv != null ){
+			Logger log = serv.getLogger(getClass());
+			if( log != null ){
+				log.error(errors);
+			}
+		}
 	}
 
 
@@ -101,7 +122,7 @@ public abstract class AbstractConfigService implements Contexed, ConfigService{
 
 							}
 						}catch(Exception e){
-							conn.error("Exception while loading service properties file: "
+							error("Exception while loading service properties file: "
 									+ file);
 						}
 					}

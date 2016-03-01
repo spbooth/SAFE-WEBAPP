@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2011                            |
+//| Copyright - The University of Edinburgh 2016                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -11,22 +11,39 @@
 //| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
-package uk.ac.ed.epcc.webapp;
-/** Interface for {@link Contexed} objects that can be queried for their
- * configuration tag. Usually this is the database table.
- * If an object implements this interface (at it is being used) then a call to {@link AppContext#getClassFromName}
- * should either fail or resolve to the tagged class.
- * 
- * Different classes that return the same tag value should be considered mutually incompatible alternatives.
- * 
- * 
+package uk.ac.ed.epcc.webapp.jdbc.filter;
+
+import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+
+/** A Negating filter that works with any base filter.
  * @author spb
  *
  */
-public interface Tagged extends Contexed {
-	/** get the construction tag
-	 * 
-	 * @return String tag
+public class NotAcceptFilter<T extends DataObject> extends AbstractAcceptFilter<T> {
+
+	/**
+	 * @param target
+	 * @param fac
+	 * @param fil
 	 */
-	public String getTag();
+	public NotAcceptFilter(DataObjectFactory<T> fac, BaseFilter<T> fil) {
+		super(fac.getTarget());
+		this.fac = fac;
+		this.fil = fil;
+	}
+
+
+	private final DataObjectFactory<T> fac;
+	private final BaseFilter<T> fil;
+	
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
+	 */
+	@Override
+	public boolean accept(T o) {
+		return ! fac.matches(fil, o);
+	}
+
 }

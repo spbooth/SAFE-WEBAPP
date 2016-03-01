@@ -42,6 +42,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T> {
 		sql_filters=new SQLOrFilter<T>(target);
 		pure_accept_filters = new LinkedHashSet<AcceptFilter<? super T>>();
 		mixed_filters = new LinkedHashSet<BaseFilter<? super T>>();
+		dual_filters = new LinkedHashSet<DualFilter<? super T>>();
 	}
 
 	
@@ -49,6 +50,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T> {
 	private SQLOrFilter<T> sql_filters;
 	private LinkedHashSet<AcceptFilter<? super T>> pure_accept_filters;
 	private LinkedHashSet<BaseFilter<? super T>> mixed_filters;
+	private LinkedHashSet<DualFilter<? super T>> dual_filters;
 	
 	private class AddFilterVisitor implements FilterVisitor<Boolean, T>{
 
@@ -131,9 +133,8 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T> {
 		 */
 		@Override
 		public Boolean visitDualFilter(DualFilter<? super T> fil) throws Exception {
-			// we are implementsing AcceptFilter so better to use a DualFilter
-			// as one of these to save  on SQL operations
-			return visitAcceptFilter(fil);
+			dual_filters.add(fil);
+			return null;
 		}
 		
 	}
@@ -161,7 +162,11 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T> {
 				return true;
 			}
 		}
-		
+		for( AcceptFilter<? super T> accept : dual_filters){
+			if(accept.accept(o)){
+				return true;
+			}
+		}
 		if( ! sql_filters.isEmpty()){
 			if( filterMatches(sql_filters, o)){
 				return true;
@@ -200,7 +205,11 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T> {
 		if( nonSQL()){
 			throw new NoSQLFilterException("OrFilter contains non SQL filter");
 		}
-		return new SQLOrFilter<T>(target,sql_filters);
+		SQLOrFilter<T> or = new SQLOrFilter<T>(target,sql_filters);
+		for(DualFilter<? super T> fil : dual_filters){
+			or.addFilter(new DualtoSQLWrapper<T>(fil));
+		}
+		return or;
 	}
 	/**
 	 * @return

@@ -28,6 +28,8 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultMapper;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 /** A  base class for ResultMappers that use SQL Group-By queries 
  * there are methods to add various select clauses to the target string.
  * @author spb
@@ -249,5 +251,8 @@ public abstract class SQLGroupMapper<O> implements ResultMapper<O>, Contexed {
 		}
 		public final AppContext getContext(){
 			return c;
+		}
+		protected final Logger getLogger(){
+			return c.getService(LoggerService.class).getLogger(getClass());
 		}
 }

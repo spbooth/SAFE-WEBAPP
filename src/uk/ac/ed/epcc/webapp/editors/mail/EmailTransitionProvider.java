@@ -121,13 +121,13 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 				mw.setTarget(target.getPath(), true);
 				mw.visitMessage(target.getHandler().getMessageProvider().getMessage(),vis);
 			}catch(Exception e){
-				conn.error(e,"Error building content");
+				getLogger().error("Error building content",e);
 			}
 			return cb;
 		}
 		
 	}
-	public static class SendTransition extends DirectMailTransition{
+	public class SendTransition extends DirectMailTransition{
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
@@ -137,13 +137,13 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 			try {
 				return ((MessageComposer)target.getHandler()).send(c.getService(SessionService.class));
 			} catch (Exception e) {
-				c.error(e,"Error sending message");
+				getLogger().error("Error sending message",e);
 				throw new TransitionException("Send failed");
 			}
 		}
 		
 	}
-	public static class AbortTransition extends DirectMailTransition{
+	public class AbortTransition extends DirectMailTransition{
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
@@ -153,7 +153,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 			try {
 				return ((MessageComposer)target.getHandler()).abort();
 			} catch (Exception e) {
-				c.error(e,"Error aborting message");
+				getLogger().error("Error aborting message",e);
 				throw new TransitionException("Abort failed");
 			}
 		}
@@ -172,7 +172,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 				target = new MailTarget(comp, comp.getMessageProvider().getMessageHash(), null);
 				return new ViewTransitionResult<MailTarget, EditAction>(EmailTransitionProvider.this, target);
 			} catch (Exception e) {
-				c.error(e,"Error reverting message");
+				getLogger().error("Error reverting message",e);
 				throw new TransitionException("StartOver failed");
 			}
 		}
@@ -286,7 +286,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 				}
 				return new ViewTransitionResult<MailTarget, EditAction>(EmailTransitionProvider.this, target);
 			}catch(Exception e){
-				c.error(e,"Error in direct edit");
+				getLogger().error("Error in direct edit",e);
 				throw new TransitionException("Internal error");
 			}
 		}
@@ -625,6 +625,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 	public <R> R accept(TransitionFactoryVisitor<R,MailTarget, EditAction> vis) {
 		return vis.visitPathTransitionProvider(this);
 	}
+	
 	public Logger getLogger(){
 		return getContext().getService(LoggerService.class).getLogger(getClass());
 	}

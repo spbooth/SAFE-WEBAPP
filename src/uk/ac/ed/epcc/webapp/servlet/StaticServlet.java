@@ -150,14 +150,14 @@ public class StaticServlet extends SessionServlet {
 		Logger log = conn.getService(LoggerService.class).getLogger(conn.getClass());
 		String param_basedir=conn.getInitParameter("static.basedir");
 		if( param_basedir == null ){
-			conn.error("static.basedir not set in StaticServlet");
+			getLogger(conn).error("static.basedir not set in StaticServlet");
 			message(conn, req, res, "invalid_argument");
 			return;
 		}
 		StringBuilder basedir = new StringBuilder(param_basedir);
         log.debug("In StaticServlet");
 		if (basedir == null || basedir.length() == 0) {
-			conn.error("No basedir specified in Staticservlet");
+			getLogger(conn).error("No basedir specified in Staticservlet");
 			return;
 		}
 		log.debug("basedir="+basedir);

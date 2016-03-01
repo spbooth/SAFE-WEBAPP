@@ -29,6 +29,8 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 /** Default implementation of the {@link DatabaseService}
  * 
  * This gets connection parameters from the {@link ConfigService} but this is only queried
@@ -118,7 +120,7 @@ public class DefaultDataBaseService implements DatabaseService {
 			try {
 				conn.close();
 			} catch (Exception e) {
-				getContext().error(e,"Error closing old connection");
+				error(e,"Error closing old connection");
 			}
 		}
 		map.put("Default", c);
@@ -142,12 +144,12 @@ public class DefaultDataBaseService implements DatabaseService {
 		try {
 			
 			if(driver_name==null || driver_name.trim().length()==0){
-				ctx.error("No database driver defined");
+				error("No database driver defined");
 				return null;
 			}
 			Class.forName(driver_name);
 		} catch (Exception e) {
-			ctx.error(e,"Could not load database driver: "+driver_name);
+			error(e,"Could not load database driver: "+driver_name);
 			return null;
 		}
 		String name = props.getProperty("db_name"+suffix,"").trim();
@@ -157,7 +159,7 @@ public class DefaultDataBaseService implements DatabaseService {
 		//System.out.println("ACTUAL "+name+" "+user+" "+pass+" "+type);
 		Connection conn;
 		if( name.length() == 0){
-			ctx.error("No DB connection name");
+			error("No DB connection name");
 			return null;
 		}
 		
@@ -187,7 +189,7 @@ public class DefaultDataBaseService implements DatabaseService {
 					try {
 						c.close();
 					} catch (Exception e) {
-						getContext().error(e,"Error closing database connection");
+						error(e,"Error closing database connection");
 					}
 				}
 		}
@@ -217,7 +219,7 @@ public class DefaultDataBaseService implements DatabaseService {
 				connection.setAutoCommit(false);
 				in_transaction=true;
 			} catch (SQLException e) {
-				getContext().error(e,"Error starting transaction");
+				error(e,"Error starting transaction");
 			}
 		}
 	}
@@ -230,7 +232,7 @@ public class DefaultDataBaseService implements DatabaseService {
 			try {
 				getSQLContext().getConnection().rollback();
 			} catch (SQLException e) {
-				getContext().error(e,"Error rolling back transaction");
+				error(e,"Error rolling back transaction");
 			}
 
 		}
@@ -244,7 +246,7 @@ public class DefaultDataBaseService implements DatabaseService {
 			try {
 				getSQLContext().getConnection().commit();
 			} catch (SQLException e) {
-				getContext().error(e,"Error committing transaction");
+				error(e,"Error committing transaction");
 			}
 
 		}
@@ -267,11 +269,37 @@ public class DefaultDataBaseService implements DatabaseService {
 				}
 				in_transaction=false;
 			} catch (SQLException e) {
-				getContext().error(e,"Error ending transaction");
+				error(e,"Error ending transaction");
 			}
 		}
 
 	}
-
+	/**
+	 * Report an application error.
+	 * Needs to handle the possiblity of the LoggerService not being present as
+	 * we can't make it a pre-requisite here
+	 * 
+	 * @param errors
+	 *            Text of error.
+	 */
+	
+	final void error(String errors) {
+		LoggerService serv = getContext().getService(LoggerService.class);
+		if( serv != null ){
+			Logger log = serv.getLogger(getClass());
+			if( log != null ){
+				log.error(errors);
+			}
+		}
+	}
+	final void error(Throwable t,String errors) {
+		LoggerService serv = getContext().getService(LoggerService.class);
+		if( serv != null ){
+			Logger log = serv.getLogger(getClass());
+			if( log != null ){
+				log.error(errors,t);
+			}
+		}
+	}
 	
 }

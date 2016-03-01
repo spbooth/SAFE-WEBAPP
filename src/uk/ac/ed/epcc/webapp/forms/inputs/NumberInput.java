@@ -141,10 +141,10 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 		}
 		Number n = (Number) o;
 		if (min != null && n.doubleValue() < min.doubleValue()) {
-			throw new ValidateException("Too small");
+			throw new ValidateException("Too small minimum value="+formatRange(min));
 		}
 		if (max != null && n.doubleValue() > max.doubleValue()) {
-			throw new ValidateException("Too large");
+			throw new ValidateException("Too large maximum value="+formatRange(max));
 		}
 	}
 

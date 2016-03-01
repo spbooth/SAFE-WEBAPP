@@ -21,6 +21,7 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.forms.registry.FormFactoryProvider;
 import uk.ac.ed.epcc.webapp.forms.registry.FormFactoryProviderRegistry;
@@ -99,14 +100,14 @@ public class ConfigFormProvider extends FormFactoryProviderRegistry {
 		}
 		private final String name;
 		public boolean canCreate(SessionService p) {
-			if( getContext().isFeatureOn("all.Create"+name)){
+			if( Feature.checkDynamicFeature(getContext(),"all.Create"+name,false)){
 				return true;
 			}
 			return p.hasRole(SessionService.ADMIN_ROLE)||p.hasRole("Create"+tag)||p.hasRole("Create"+name);
 		}
 
 		public boolean canUpdate(SessionService p) {
-			if( getContext().isFeatureOn("all.Update"+name)){
+			if( Feature.checkDynamicFeature(getContext(),"all.Update"+name,false)){
 				return true;
 			}
 			return p.hasRole(SessionService.ADMIN_ROLE)||p.hasRole("Update"+tag)||p.hasRole("Update"+name);

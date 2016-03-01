@@ -277,7 +277,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			if( text != null ){
 				return text;
 			}
-			getContext().error("TextFileOverlay "+getIdentifier()+" file="+getName()+" no readable file found");
+			getLogger().error("TextFileOverlay "+getIdentifier()+" file="+getName()+" no readable file found");
 			return "";
 		}
 		

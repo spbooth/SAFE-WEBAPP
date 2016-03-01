@@ -92,7 +92,7 @@ public class RemoteAuthServlet extends WebappServlet {
 		String web_name = conn.getService(ServletService.class).getWebName();
 		try {
 			if (web_name == null || web_name.length() == 0) {
-				conn.error("missing web_name");
+				getLogger(conn).error("missing web_name");
 				// we must have a remote user name
 				message(conn, req, res, "invalid_input");
 				return;

@@ -32,6 +32,8 @@ import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimePart;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /** Class that traverses the tree structure of a Mail message (or a MultiPart) applying a visitor class.
  * As the tree is walked it builds a path object that represents the position in the tree.
@@ -139,6 +141,9 @@ public class MessageWalker {
 	public AppContext getContext(){
 		return conn;
 	}
+	protected Logger getLogger(){
+		return conn.getService(LoggerService.class).getLogger(getClass());
+	}
 	public MimeMessage getCurrentMessage(){
 		return current_message;
 	}
@@ -223,7 +228,7 @@ public class MessageWalker {
 		current_message=m;
 		try{
 			if( m == null ){
-				conn.error("null message passed to MessageVisitor");
+				getLogger().error("null message passed to MessageVisitor");
 				return;
 			}
 			if( v.startMessage(parent,m, this)){
@@ -269,7 +274,7 @@ public class MessageWalker {
 		}else if( content instanceof MimeMessage){
 			visitSubMessage(parent,(MimeMessage)content,v);
 		}else{
-			conn.error("MessageVisitor: Unknown Message content "+content.getClass().getName());
+			getLogger().error("MessageVisitor: Unknown Message content "+content.getClass().getName());
 		}
 	}
 	public final void visitMultiPart(MimePart parent, MimeMultipart mp, Visitor v) throws WalkerException{

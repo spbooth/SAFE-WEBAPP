@@ -25,6 +25,8 @@ import javax.xml.validation.Schema;
 import org.w3c.dom.Document;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
@@ -48,6 +50,9 @@ public class TestXMLTargetFactory implements XMLTargetFactory {
 	 */
 	public AppContext getContext() {
 		return c;
+	}
+	protected final Logger getLogger(){
+		return c.getService(LoggerService.class).getLogger(getClass());
 	}
 	public Schema getSchema() {
 		return null;
@@ -94,7 +99,7 @@ public class TestXMLTargetFactory implements XMLTargetFactory {
 					DOMResult res = new DOMResult();
 					InputStream stream = getClass().getResourceAsStream(name);
 					if( stream == null ){
-						getContext().error("Resource "+name+" not found");
+						getLogger().error("Resource "+name+" not found");
 						return null;
 					}
 					StreamSource src = new StreamSource(stream);
@@ -102,7 +107,7 @@ public class TestXMLTargetFactory implements XMLTargetFactory {
 					t.transform(src, res);
 					doc =  (Document) res.getNode();
 				}catch(Exception e){
-					getContext().error(e,"Error reading document");
+					getLogger().error("Error reading document",e);
 					return null;
 				}
 			}

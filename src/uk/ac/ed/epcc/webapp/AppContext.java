@@ -105,22 +105,11 @@ TargetType t = conn.makeObject(TargetType.class,"tag-name");
  * Note that there may be legacy methods in AppContext for functionality that was once part of the class proper but has been moved 
  * into a separate service.
  * <p> 
- * Different implementations are used for applications running in a servlet
- * container or stand alone command line applications. This is particularly important for
- * writing unit tests as the stand-alone AppContext allows unit tests to be run
- * outside of a servlet container. There AppContext class is final so all specialisations need to be implemetned via services.
- * .
+ *  The AppContext class is final so all specialisations need to be implemented via {@link AppContextService}s.
  * <p>
  * 
  * 
  * <p>
- * Key functions
- * provided by AppContext include:
- * <ul>
- * <li> retrieving configuration parameters </li>
- * <li> logging </li>
- *  <li> error reporting </li>
- * </ul>
  *<h3>Configuration parameters</h3>
  *The AppContext provides mechanisms for retrieving configuration parameters. e.g.
  *<code>
@@ -162,6 +151,7 @@ public final class AppContext {
 	public static final String CLASSDEF_PROP_PREFIX = "classdef.";
 	public static final Feature CONTEXT_CACHE_FEATURE = new Feature("ContextCache",true,"cache objects that implement ContextCache in the AppContext");
 	public static final Feature DATABASE_FEATURE = new Feature("database",true,"use database");
+	public static final Feature TAG_CHECK_FEATURE = new Feature("appcontext.tag_check",false,"appcontext checks tags against values used to construct");
 	public static final String CLASS_PREFIX = "class.";
 	// a hastable for caching objects in the AppContext
 	private Map<Object,Object> attributes = null;
@@ -275,6 +265,7 @@ public final class AppContext {
 	 * @param errors
 	 *            Text of error.
 	 */
+	
 	public final void error(String errors) {
 		LoggerService serv = getService(LoggerService.class);
 		if( serv != null ){
@@ -896,6 +887,7 @@ public final class AppContext {
 		return makeObject(clazz,tag);
 	}
 	
+	
 	/** Construct an object identified by a string tag.
 	 * 
 	 * The exact class to construct can be set using the property
@@ -991,6 +983,11 @@ public final class AppContext {
 			}
 			if( key != null && result != null ){
 				setAttribute(key, result);
+			}
+			if( result instanceof Tagged){
+				if( TAG_CHECK_FEATURE.isEnabled(this) && ! name.equals(((Tagged)result).getTag())){
+					error("tag missmatch "+name+"->"+((Tagged)result).getTag()+" "+result.getClass().getCanonicalName());
+				}
 			}
 			return result;
 		}catch(Throwable e){
@@ -1182,8 +1179,6 @@ public final class AppContext {
 		return getClassFromName(template, null, name);
 	}
 	
-
-	
 	
 	@Deprecated
 	public boolean isFeatureOn(String f) {
@@ -1242,23 +1237,6 @@ public final class AppContext {
 		attributes.put(key, value);
 	}
 
-	
-	
-	
-
-	/** get an Logger
-	 * 
-	 * Should use LoggerService but some legacy jsps may still use this
-	 * @return Logger
-	 */
-	@Deprecated
-	public Logger getLogger(){
-		LoggerService service = getService(LoggerService.class);
-		if(service == null){
-			return null;
-		}
-		return service.getLogger(getClass());
-	}
 
 
 	

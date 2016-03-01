@@ -60,7 +60,10 @@ public interface AccessRoleProvider<U extends AppUser,T extends DataObject> {
 	 * This is the inverse of {@link #hasRelationFilter(SessionService, String)} used to generate a list
 	 * of {@link AppUser} with the relation. 
 	 * 
-	 * @return
+	 * If the target is null it should generate a filter for any user in relation with targets
+	 * selected by {@link DataObjectFactory#getDefaultRelationshipFilter()}. If this is not possible
+	 * it should return null;
+	 * @return {@link BaseFilter} or null
 	 */
     public BaseFilter<U> personInRelationFilter(SessionService<U> sess, String role, T target);
 }

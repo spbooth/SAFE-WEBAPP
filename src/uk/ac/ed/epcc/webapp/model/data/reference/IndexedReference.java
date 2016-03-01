@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Indexed;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.IndexedFieldValue;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.IndexedError;
 
@@ -68,7 +69,7 @@ public final class IndexedReference<I extends Indexed> {
 	  IndexedProducer<I> producer;
 	  producer =  makeIndexedProducer(c,clazz,table);
 	  if( producer == null){
-		  c.error("Failed to mape producer class="+clazz.getCanonicalName()+" table "+table);
+		  c.getService(LoggerService.class).getLogger(getClass()).error("Failed to make producer class="+clazz.getCanonicalName()+" table "+table);
 		  return null;
 	  }else{
 		  return producer.find(id);

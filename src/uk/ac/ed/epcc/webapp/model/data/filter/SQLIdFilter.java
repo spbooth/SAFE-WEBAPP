@@ -18,8 +18,10 @@ import java.util.List;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.ConstPatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.model.data.PatternArg;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 /** Filter to select an entry by Id.
  * 
@@ -51,14 +53,14 @@ public class SQLIdFilter<T extends DataObject> implements SQLFilter<T>, PatternF
 
 	
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
+		list.add(new ConstPatternArgument<Integer>(Integer.class, id));
 		return list;
 	}
 
 	
 	public StringBuilder addPattern(StringBuilder sb, boolean qualify) {
 		res.addUniqueName(sb, qualify, true);
-		sb.append("=");
-		sb.append(Integer.toString(id));
+		sb.append("=?");
 		return sb;
 	}
 

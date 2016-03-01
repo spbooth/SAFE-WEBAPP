@@ -66,7 +66,7 @@ public class HeirarchyFormRegistry extends FormFactoryProviderRegistry {
 					
 				}
 		}else{
-			conn.error("Failed to find root class for registry "+root_class);
+			getLogger().error("Failed to find root class for registry "+root_class);
 		}
 			
 	}

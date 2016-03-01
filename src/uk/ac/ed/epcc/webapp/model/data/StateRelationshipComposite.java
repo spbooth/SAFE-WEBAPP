@@ -134,7 +134,9 @@ public class StateRelationshipComposite<U extends AppUser,BDO extends DataObject
 	 */
 	@Override
 	public BaseFilter<U> personInRelationFilter(SessionService<U> sess, String role, BDO target) {
-		
+		if( target== null){
+			return null;
+		}
 		return new PersonFilter<U>(target);
 	}
 

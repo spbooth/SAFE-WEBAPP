@@ -340,7 +340,7 @@ public class ErrorFilter implements Filter {
 					String host=(String) sess.getAttribute(LAST_ADDR_ATTR);
 					if( host != null ){
 						if( ! host.equals(req.getRemoteAddr())){ // host address has changed in a session
-							conn.error("Possible session stealing remote address has changed "+host+" != "+req.getRemoteAddr());
+							getCustomLogger(req, res).error("Possible session stealing remote address has changed "+host+" != "+req.getRemoteAddr());
 							if(  conn.getBooleanParameter("session.ipcheck", true)){
 								conn.getService(SessionService.class).clearCurrentPerson();
 							}

@@ -94,7 +94,7 @@ public class BaseForm implements Form {
 		String shortcut = action.getShortcut();
 		if( shortcut != null ){
 			if( shortcuts.containsValue(shortcut)){
-				conn.error("Duplicate shortcut in form:"+shortcut);
+				log.error("Duplicate shortcut in form:"+shortcut);
 			}
 			shortcuts.put(name, shortcut);
 		}

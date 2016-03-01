@@ -28,7 +28,7 @@ public class EmailTransitionFactoryCreator implements TransitionFactoryCreator<E
 	/**
 	 * 
 	 */
-	public static final String MESSAGE_PROVIDER_FACTORY_TAG_PREFIX = "MessageProviderFactory.";
+	public static final String MESSAGE_PROVIDER_FACTORY_TAG_PREFIX = "MessageProviderFactory";
 	private final AppContext conn;
 	public EmailTransitionFactoryCreator(AppContext conn){
 		this.conn=conn;
@@ -43,7 +43,7 @@ public class EmailTransitionFactoryCreator implements TransitionFactoryCreator<E
 			MessageHandlerFactoryCreator creator = conn.makeObject(MessageHandlerFactoryCreator.class, "MessageProviderFactoryCreator."+tag.substring(0, index));
 			fac = creator.getMessageHandlerFactory(tag.substring(index+1));
 		}else{
-			fac = conn.makeObjectWithDefault(MessageHandlerFactory.class,null, MESSAGE_PROVIDER_FACTORY_TAG_PREFIX+tag);
+			fac = conn.makeObjectWithDefault(MessageHandlerFactory.class,null, MESSAGE_PROVIDER_FACTORY_TAG_PREFIX,tag);
 			if( fac == null ){
 				fac = conn.makeObjectWithDefault(MessageHandlerFactory.class,null,tag);
 			}

@@ -65,6 +65,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  */
 public abstract class WebappTestBase implements ContextHolder{
 	protected AppContext ctx;
+	protected Logger log;
 	@Rule
 	public DBFixtureRule db = new DBFixtureRule(this);
 	@Rule
@@ -73,6 +74,7 @@ public abstract class WebappTestBase implements ContextHolder{
 	
 	public void setContext(AppContext c){
 		this.ctx=c;
+		this.log = c.getService(LoggerService.class).getLogger(getClass());
 	}
 	public AppContext getContext(){
 		return ctx;

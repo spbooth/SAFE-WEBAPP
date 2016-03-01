@@ -151,7 +151,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			Handler handler = getHandler(o);
 			Hash h = handler.getAlgorithm();
 			if( h == null){
-				getContext().error("No hash algorithm for"+o.getIdentifier());
+				getLogger().error("No hash algorithm for"+o.getIdentifier());
 				return false;
 			}
 			log.debug("Checking "+o.getName());;
@@ -179,7 +179,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 				log.debug("result="+result);
 				return result;
 			} catch (NoSuchAlgorithmException e) {
-				getContext().error(e,"bad hash");
+				getLogger().error("bad hash",e);
 				return false;
 			}
 		}
@@ -333,7 +333,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		    	public boolean required(SessionService<T> user){
 		    		T currentPerson = user.getCurrentPerson();
 		    		if( currentPerson == null ){
-		    			getContext().error("No current person in PasswordResetRequired");
+		    			getLogger().error("No current person in PasswordResetRequired");
 		    			return false;
 		    		}
 					return getHandler(currentPerson).mustChangePassword();
@@ -450,7 +450,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 							stmt.executeUpdate();
 							stmt.close();
 						} catch (CannotUseSQLException e) {
-							getContext().error(e,"Error setting password by sql");
+							getLogger().error("Error setting password by sql",e);
 							try {
 								setCryptPassword(salt,h.getHash(new_password));
 							} catch (NoSuchAlgorithmException e2) {
@@ -476,7 +476,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 					}
 					if( fails % getContext().getIntegerParameter("notify_password_fails", 20) == 0){
 						// report as error
-						getContext().error("Large number of password fails for "+user.getIdentifier()+" "+fails);
+						getLogger().error("Large number of password fails for "+user.getIdentifier()+" "+fails);
 					}
 					int target = getContext().getIntegerParameter("max_password_fails",0);
 					if( target > 0 && fails > target){
@@ -490,7 +490,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			    	record.setOptionalProperty(DatabasePasswordComposite.PASSWORD_FAILS, 0);
 			    	record.commit();
 			    	}catch(DataException e){
-			    		getContext().error(e,"Error resetting password fails");
+			    		getLogger().error("Error resetting password fails",e);
 			    	}
 			    }
 				
@@ -587,7 +587,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		try{
 			length = h.getHash("text").length();
 		}catch(NoSuchAlgorithmException e){
-			ctx.error(e,"Default hash algorithm not supported");
+			getLogger().error("Default hash algorithm not supported",e);
 		}
 		s.setField(DatabasePasswordComposite.PASSWORD, new StringFieldType(false, "locked", length));
 		return s;
@@ -643,7 +643,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 							adder.update(getRepository().<Integer,T>getNumberExpression(getFactory().getTarget(),Integer.class, DatabasePasswordComposite.PASSWORD_FAILS), Integer.valueOf(1), nameFilter);
 							
 						} catch (DataFault e) {
-							getContext().error(e,"Error updating password fails");
+							getLogger().error("Error updating password fails",e);
 						}
 						
 					}

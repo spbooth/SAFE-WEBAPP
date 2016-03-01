@@ -189,4 +189,17 @@ public class Feature implements Comparable<Feature>{
 	public static Feature findFeatureByName(String name){
 		return previous.get(name);
 	}
+	/** checks a feature that is only defined by name (ie the name is generated dynamically)
+	 * 
+	 * @param conn
+	 * @param name
+	 * @return
+	 */
+	public static boolean checkDynamicFeature(AppContext conn, String name, boolean def){
+		Feature f = previous.get(name);
+		if( f == null ){
+			f= new Feature(name,def,"dynamic feature");
+		}
+		return f.isEnabled(conn);
+	}
 }

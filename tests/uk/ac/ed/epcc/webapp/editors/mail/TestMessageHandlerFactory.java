@@ -25,6 +25,8 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.email.inputs.EmailInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -74,7 +76,7 @@ public class TestMessageHandlerFactory implements MessageHandlerFactory{
 	    			   }
 	    			   return   (int) hash;
 	    		   } catch (Exception e) {
-	    			   getContext().error(e,"Error making message hash");
+	    			   getLogger().error("Error making message hash",e);
 	    			    return -1;
 	    		   }
 	    	   
@@ -93,7 +95,7 @@ public class TestMessageHandlerFactory implements MessageHandlerFactory{
 					return s;
 				}
 			} catch (Exception e) {
-				getContext().error(e, "Error getting subject");
+				getLogger().error( "Error getting subject",e);
 			}
 			return "";
 		}
@@ -118,7 +120,7 @@ public class TestMessageHandlerFactory implements MessageHandlerFactory{
 				}
 				return sb.toString();
 			} catch (Exception e) {
-				getContext().error(e, "Error getting recipients");
+				getLogger().error("Error getting recipients",e);
 			}
 			return "";
 		}
@@ -137,7 +139,7 @@ public class TestMessageHandlerFactory implements MessageHandlerFactory{
 					return sb.toString();
 				}
 			} catch (Exception e) {
-				getContext().error(e, "Error getting sender");
+				getLogger().error("Error getting sender",e);
 			}
 			return "Unknown";
 		}
@@ -303,6 +305,9 @@ public class TestMessageHandlerFactory implements MessageHandlerFactory{
 	 */
 	public AppContext getContext() {
 		return conn;
+	}
+	protected final Logger getLogger(){
+		return conn.getService(LoggerService.class).getLogger(getClass());
 	}
 
 	/* (non-Javadoc)

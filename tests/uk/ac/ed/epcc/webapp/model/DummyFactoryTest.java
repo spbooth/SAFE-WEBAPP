@@ -47,7 +47,7 @@ public class DummyFactoryTest extends DataObjectFactoryTestCase {
 	    try{
 	    	((Dummy1.Factory) getFactory()).nuke();
 	    }catch(Exception e){
-	    	ctx.error(e, "Error nuking table");
+	    	log.error( "Error nuking table",e);
 	    }
 	}
 	

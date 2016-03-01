@@ -46,7 +46,7 @@ public class TestSQLAndFilter extends WebappTestBase {
 	    d1_fac.nuke();
 		d2_fac.nuke();
 	    }catch(Exception e){
-	    	ctx.error(e, "Error nuking table");
+	    	log.error("Error nuking table",e);
 	    }
 	}
 	

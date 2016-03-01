@@ -24,6 +24,7 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.charts.chart2D.PieChart2DChartData;
 import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.content.InvalidArgument;
 /** A basic piechart where the data comes from a Table or Map
  * 
@@ -101,7 +102,7 @@ public class PieChart extends Chart {
 		try {
 			ptc.setChartData(c.makeObject(clazz));
 		} catch (Exception e) {
-			c.error(e,"Error making TimeChartData");
+			c.getService(LoggerService.class).getLogger(PieChart.class).error("Error making TimeChartData",e);
 		}
 		
 		return ptc;

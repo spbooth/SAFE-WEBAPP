@@ -140,7 +140,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			if( name != null ){
 				key = tp.lookupTransition(target,name);
 				if( key == null ){
-					conn.error("Transition key lookup failed for "+name+" provider="+tp.getTargetName());
+					getLogger(conn).error("Transition key lookup failed for "+name+" provider="+tp.getTargetName());
 					message(conn, req, res, "invalid_input");
 					return;
 				}

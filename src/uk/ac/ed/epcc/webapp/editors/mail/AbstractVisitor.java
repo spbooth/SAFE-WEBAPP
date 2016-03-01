@@ -30,6 +30,8 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageWalker.WalkerException;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 /** Implementation of the Visitor interface with default implementations of methods to
  * make it easier to produce classes that implement the interface correctly.
  * 
@@ -205,5 +207,8 @@ public void doBCC(Address address, int i, int length,
 	@Override
 	public final AppContext getContext() {
 		return conn;
+	}
+	protected final Logger getLogger(){
+		return conn.getService(LoggerService.class).getLogger(getClass());
 	}
 }

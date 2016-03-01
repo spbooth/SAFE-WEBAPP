@@ -96,7 +96,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			try {
 				dbh.createTable(SimpleSessionService.ROLE_TABLE, s);
 			} catch (DataFault e) {
-				ctx.error(e,"Failed to make role_table");
+				ctx.getService(LoggerService.class).getLogger(AbstractSessionService.class).error("Failed to make role_table",e);
 			}
 		}
 	}
@@ -126,7 +126,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			}
 			
 			if( clazz == null ){
-				c.error("No class found for login factory");
+				error("No class found for login factory");
 				throw new ConsistencyError("No class found for login factory");
 			}
 			if( table != null ){
@@ -135,14 +135,14 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 				fac= c.makeObject(clazz);
 			}
 			if( fac == null){
-				c.error("Null login factory class="+clazz.getCanonicalName());
+				error("Null login factory class="+clazz.getCanonicalName());
 				throw new ConsistencyError("Null login factory "+clazz.getCanonicalName());
 			}
 			return fac;
 		}catch(ConsistencyError ce){
 			throw ce;
 		}catch(Exception e){
-			c.error(e,"Error making login factory");
+			error(e,"Error making login factory");
 			throw new ConsistencyError("Bad login factory or bad database connection",e);
 		}
 	}
@@ -187,7 +187,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		if( toggle_map != null && toggle_map.containsKey(name)){
 			toggle_map.put(name,Boolean.valueOf(value));
 		}else{
-			getContext().error("setToggle for non toggle role "+name);
+			error("setToggle for non toggle role "+name);
 		}
 	}
 	/** Toggle the sate of a role
@@ -205,7 +205,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			v = Boolean.valueOf(! v);
 		   toggle_map.put(name, v);
 		}else{
-			getContext().error("toggleRole called for not toggle role "+name);
+			error("toggleRole called for not toggle role "+name);
 		}
 		return v;
 	}
@@ -428,7 +428,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			}
 		} catch (Throwable e) {
 			clearCurrentPerson();  // clear first as error will try to report person
-			c.error(e,"Error finding person by id "+personID);
+			error(e,"Error finding person by id "+personID);
 			return null;
 		}
 		if( person != null && ! person.canLogin()){
@@ -562,7 +562,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 				}
 			}
 		} catch (SQLException e) {
-			conn.error(e,"Error checking AppUser role");
+			conn.getService(LoggerService.class).getLogger(AbstractSessionService.class).error("Error checking AppUser role",e);
 			// maybe table missing
 			// this is null if table exists
 			setupRoleTable(conn);
@@ -591,7 +591,7 @@ public Set<A> withRole(String role) {
 					try {
 						result.add(fac.find(rs.getInt(1)));
 					} catch (DataException e) {
-						conn.error(e,"Error getting person from role");
+						error(e,"Error getting person from role");
 					}
 				}
 			} finally {
@@ -600,7 +600,7 @@ public Set<A> withRole(String role) {
 				}
 			}
 		} catch (SQLException e) {
-			conn.error(e,"Error checking AppUser role");
+			error(e,"Error checking AppUser role");
 			// maybe table missing
 			// this is null if table exists
 			setupRoleTable(conn);
@@ -625,7 +625,7 @@ public Set<A> withRole(String role) {
 				stmt.setInt(1, id);
 				stmt.setString(2, role);
 				stmt.executeUpdate();
-				if( context.isFeatureOn("log_query")){
+				if( DatabaseService.LOG_QUERY_FEATURE.isEnabled(context)){
 					Logger log = context.getService(LoggerService.class).getLogger(context.getClass());
 					log.debug(role_query+" id="+id+" role="+role);
 				}
@@ -656,7 +656,7 @@ public Set<A> withRole(String role) {
 				stmt.setInt(1, id);
 				stmt.setString(2, role);
 				stmt.executeUpdate();
-				if( c.isFeatureOn("log_query")){
+				if( DatabaseService.LOG_QUERY_FEATURE.isEnabled(c)){
 					Logger log = c.getService(LoggerService.class).getLogger(c.getClass());
 					log.debug(role_query+" id="+id+" role="+role);
 				}
@@ -681,13 +681,13 @@ public Set<A> withRole(String role) {
 			try {
 				addRoleByID(getContext(), user.getID(), role);
 			} catch (DataFault e) {
-				getContext().error(e,"Error setting role");
+				error(e,"Error setting role");
 			}
 		}else{
 			try {
 				removeRoleByID(getContext(), user.getID(), role);
 			} catch (DataFault e) {
-				getContext().error(e,"Error removing role");
+				error(e,"Error removing role");
 			}
 		}
 		// in case this is us clear the cache.
@@ -739,28 +739,30 @@ public Set<A> withRole(String role) {
 
 	// map of roles to filters.
 	private Map<String,BaseFilter> roles = new HashMap<String, BaseFilter>();
+	
+	
 	@Override
 	public final <T extends DataObject> BaseFilter<? super T> getRelationshipRoleFilter(DataObjectFactory<T> fac,
-			String role) {
+			String role) throws UnknownRelationshipException {
 		// We may be storing roles from different types so prefix all tags with the type.
 		// prefix is never seen outsite this cache.
 		String store_tag=fac.getTag()+"."+role;
 		BaseFilter<? super T> result = roles.get(store_tag);
 		if( result == null ){
-			result = makeRelationshipRoleFilter(fac,getContext().getInitParameter("use_relationship."+fac.getTag()+"."+role, role));
+			result = makeRelationshipRoleFilter(fac,role);
 			roles.put(store_tag, result);
 		}
 		return result;
 	}
 	@Override
 	public final <T extends DataObject> BaseFilter<A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac,
-			String role, T target) {
+			String role, T target) throws UnknownRelationshipException {
 		// We may be storing roles from different types so prefix all tags with the type.
 		// prefix is never seen outsite this cache.
 		String store_tag="PersonFilter."+fac.getTag()+"."+role;
 		BaseFilter<A> result = roles.get(store_tag);
 		if( result == null ){
-			result = makePersonInRelationshipRoleFilter(fac,getContext().getInitParameter("use_relationship."+fac.getTag()+"."+role, role),target);
+			result = makePersonInRelationshipRoleFilter(fac, role,target);
 			roles.put(store_tag, result);
 		}
 		return result;
@@ -786,11 +788,12 @@ public Set<A> withRole(String role) {
 	 * @param fac2
 	 * @param role
 	 * @return
+	 * @throws UnknownRelationshipException 
 	 */
-	protected <T extends DataObject> BaseFilter<? super T> makeRelationshipRoleFilter(DataObjectFactory<T> fac2, String role) {
+	protected <T extends DataObject> BaseFilter<? super T> makeRelationshipRoleFilter(DataObjectFactory<T> fac2, String role) throws UnknownRelationshipException {
 		if( searching_roles.contains(role)){
 			// recursive creation
-			return new DualFalseFilter<T>(fac2.getTarget()); 
+			throw new UnknownRelationshipException("recursive definition of "+role);
 		}
 		searching_roles.add(role);
 		try{
@@ -821,15 +824,17 @@ public Set<A> withRole(String role) {
 	    		return new GlobalRoleFilter<T>(this, sub);
 	    	}
 	    	if( base.equals(fac2.getTag())){
-	    		// This is to reference a factory/composite role from within a redefined
+	    		// This is a reference a factory/composite role from within a redefined
 	    		// definition. direct roles can be qualified if we want qualified names cannot
 	    		// be overridden. 
 	    		BaseFilter<? super T> result = makeDirectRelationshipRoleFilter(fac2, sub);
 	    		if( result != null ){
 	    			return result;
 	    		}
+	    		// unrecognised direct role alias maybe
+	    		return getRelationshipRoleFilter(fac2, sub);
 	    	}
-	    	AccessRoleProvider arp = getContext().makeObjectWithDefault(AccessRoleProvider.class,null,base);
+	    	AccessRoleProvider<A,T> arp = getContext().makeObjectWithDefault(AccessRoleProvider.class,null,base);
 	    	if( arp != null ){
 	    		return arp.hasRelationFilter(this, sub);
 	    	}
@@ -841,18 +846,17 @@ public Set<A> withRole(String role) {
 			}
 	    }
 		
-		return new DualFalseFilter<T>(fac2.getTarget());
+		throw new UnknownRelationshipException(role);
 		}finally{
 			searching_roles.remove(role);
 		}
 	}
-	protected <T extends DataObject> BaseFilter<A> makePersonInRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,T target) {
+	protected <T extends DataObject> BaseFilter<A> makePersonInRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,T target) throws UnknownRelationshipException {
 		AppUserFactory<A> login_fac = getLoginFactory();
 		Class<? super A> target_type = login_fac.getTarget();
 		if( searching_roles.contains(role)){
 			// recursive creation
-			
-			return new DualFalseFilter<A>(target_type); 
+			throw new UnknownRelationshipException("recursive definition of "+role);
 		}
 		searching_roles.add(role);
 		try{
@@ -891,10 +895,12 @@ public Set<A> withRole(String role) {
 	    		if( result != null ){
 	    			return result;
 	    		}
+	    		// unrecognised role
+	    		throw new UnknownRelationshipException(role);
 	    	}
 	    	AccessRoleProvider<A,T> arp = getContext().makeObjectWithDefault(AccessRoleProvider.class,null,base);
 	    	if( arp != null ){
-	    		return arp.personInRelationFilter(this, role, target);
+	    		return arp.personInRelationFilter(this, sub, target);
 	    	}
 	    }else{
 	    	// direct roles can be un-qualified though not if we want multiple levels of qualification.
@@ -904,7 +910,7 @@ public Set<A> withRole(String role) {
 			}
 	    }
 		
-		return new DualFalseFilter<A>(target_type);
+		throw new UnknownRelationshipException(role);
 		}finally{
 			searching_roles.remove(role);
 		}
@@ -912,8 +918,10 @@ public Set<A> withRole(String role) {
 	/**
 	 * @param fac2
 	 * @param role
+	 * @throws UnknownRelationshipException 
 	 */
-	protected <T extends DataObject> BaseFilter<? super T> makeDirectRelationshipRoleFilter(DataObjectFactory<T> fac2, String role) {
+	protected <T extends DataObject> BaseFilter<? super T> makeDirectRelationshipRoleFilter(DataObjectFactory<T> fac2, String role) throws UnknownRelationshipException {
+		// look for directly implemented relations first
 		BaseFilter<? super T> result=null;
 	    if( fac2 instanceof AccessRoleProvider){  // first check factory itself.
 	    	result = ((AccessRoleProvider<A,T>)fac2).hasRelationFilter(this, role);
@@ -922,15 +930,21 @@ public Set<A> withRole(String role) {
 	    	}
 	    }
 	    // then check composites
-	    for(AccessRoleProvider prov : fac.getComposites(AccessRoleProvider.class)){
+	    for(AccessRoleProvider prov : fac2.getComposites(AccessRoleProvider.class)){
 	    	result = prov.hasRelationFilter(this, role);
 	    	if( result != null){
 	    		return result;
 	    	}
 	    }
-	    return null;
+	    // Its not one of the directly implemented roles maybe its derived
+	    String defn = getContext().getInitParameter("use_relationship."+fac2.getTag()+"."+role);
+	    if( defn != null){
+	    	return makeRelationshipRoleFilter(fac2, defn);
+	    }
+	    // unrecognised role
+	    throw new UnknownRelationshipException(role);
 	}
-	protected <T extends DataObject> BaseFilter<A> makeDirectPersonInRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,T target) {
+	protected <T extends DataObject> BaseFilter<A> makeDirectPersonInRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,T target) throws UnknownRelationshipException {
 		BaseFilter<A> result=null;
 	    if( fac2 instanceof AccessRoleProvider){  // first check factory itself.
 	    	result = ((AccessRoleProvider<A,T>)fac2).personInRelationFilter(this, role, target);
@@ -939,20 +953,51 @@ public Set<A> withRole(String role) {
 	    	}
 	    }
 	    // then check composites
-	    for(AccessRoleProvider prov : fac.getComposites(AccessRoleProvider.class)){
+	    for(AccessRoleProvider prov : fac2.getComposites(AccessRoleProvider.class)){
 	    	result = prov.personInRelationFilter(this, role, target);
 	    	if( result != null){
 	    		return result;
 	    	}
 	    }
-	    return null;
+	 // Its not one of the directly implemented roles maybe its derived
+	    String defn = getContext().getInitParameter("use_relationship."+fac2.getTag()+"."+role);
+	    if( defn != null){
+	    	return makePersonInRelationshipRoleFilter(fac2, defn,target);
+	    }
+	    // unrecognised role
+	    throw new UnknownRelationshipException(role);
 	}
 	@Override
-	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target, String role) {
+	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target, String role) throws UnknownRelationshipException {
 		return fac.matches(getRelationshipRoleFilter(fac, role), target);
 	}
 
+	/**
+	 * Report an application error.
+	 * Needs to handle the possiblity of the LoggerService not being present as
+	 * we can't make it a pre-requisite here
+	 * 
+	 * @param errors
+	 *            Text of error.
+	 */
 	
-
+	final void error(String errors) {
+		LoggerService serv = getContext().getService(LoggerService.class);
+		if( serv != null ){
+			Logger log = serv.getLogger(getClass());
+			if( log != null ){
+				log.error(errors);
+			}
+		}
+	}
+	final void error(Throwable t,String errors) {
+		LoggerService serv = getContext().getService(LoggerService.class);
+		if( serv != null ){
+			Logger log = serv.getLogger(getClass());
+			if( log != null ){
+				log.error(errors,t);
+			}
+		}
+	}
 	
 }

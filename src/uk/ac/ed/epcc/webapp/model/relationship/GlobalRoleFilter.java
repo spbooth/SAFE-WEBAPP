@@ -13,8 +13,12 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.relationship;
 
+import java.util.List;
+
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
+import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -24,7 +28,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @author spb
  *
  */
-public class GlobalRoleFilter<T> implements AcceptFilter<T> {
+public class GlobalRoleFilter<T> implements DualFilter<T> {
 
 	/**
 	 * @param session
@@ -43,7 +47,7 @@ public class GlobalRoleFilter<T> implements AcceptFilter<T> {
 	 */
 	@Override
 	public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
-		return vis.visitAcceptFilter(this);
+		return vis.visitDualFilter(this);
 	}
 
 	/* (non-Javadoc)
@@ -91,6 +95,27 @@ public class GlobalRoleFilter<T> implements AcceptFilter<T> {
 		} else if (!role.equals(other.role))
 			return false;
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter#getParameters(java.util.List)
+	 */
+	@Override
+	public List<PatternArgument> getParameters(List<PatternArgument> list) {
+		return list;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter#addPattern(java.lang.StringBuilder, boolean)
+	 */
+	@Override
+	public StringBuilder addPattern(StringBuilder sb, boolean qualify) {
+		if( session.hasRole(role)){
+			sb.append("true");
+		}else{
+			sb.append("false");
+		}
+		return sb;
 	}
 
 }

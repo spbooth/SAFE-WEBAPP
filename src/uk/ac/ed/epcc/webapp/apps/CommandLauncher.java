@@ -140,7 +140,7 @@ public class CommandLauncher implements Contexed{
 		try {
 			c = conn.makeContexedObject(comm);
 		} catch (Exception e) {
-			conn.error(e,"error making object");
+			conn.getService(LoggerService.class).getLogger(getClass()).error("error making object",e);
 			return;
 		}
 		
@@ -255,10 +255,10 @@ public class CommandLauncher implements Contexed{
 					if( user != null ){
 						sess.setCurrentPerson(user);
 					}else{
-						context.error("user "+username+" not found");
+						log.error("user "+username+" not found");
 					}
 				}catch(Exception e){
-					context.error(e,"Error setting user");
+					log.error("Error setting user",e);
 				}
 			}
 			if( opts.containsOption(OPT_ROLE)){

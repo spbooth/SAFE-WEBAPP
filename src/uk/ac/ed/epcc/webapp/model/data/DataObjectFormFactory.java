@@ -214,7 +214,7 @@ protected final DataObjectFactory<BDO> factory;
 				try{
 					input = conn.makeObject(c);
 				}catch(Exception e){
-					conn.error(e,"Failed to make input");
+					conn.getService(LoggerService.class).getLogger(DataObjectFormFactory.class).error("Failed to make input",e);
 				}
 			}
 		}
@@ -282,7 +282,7 @@ protected final DataObjectFactory<BDO> factory;
 								try {
 									o = conn.makeObject(c);
 								} catch (Exception e1) {
-									conn.error("Unable to construct "+c.getCanonicalName()+" for table "+ref_table);
+									conn.getService(LoggerService.class).getLogger(DataObjectFormFactory.class).error("Unable to construct "+c.getCanonicalName()+" for table "+ref_table);
 								}
 							}
 						}

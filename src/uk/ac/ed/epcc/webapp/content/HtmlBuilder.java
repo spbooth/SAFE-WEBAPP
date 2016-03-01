@@ -36,6 +36,8 @@ import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.PrefixInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TagInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 
 /** A {@link HtmlPrinter} that also implements {@link ContentBuilder} 
@@ -137,7 +139,7 @@ public void addButton(AppContext conn,String text, FormResult action) {
 	try {
 		action.accept(vis);
 	} catch (Exception e) {
-		conn.error(e,"Error adding Button");
+		getLogger(conn).error("Error adding Button",e);
 	}
 }
 public void addButton(AppContext conn,String text, String hover,FormResult action) {
@@ -145,7 +147,7 @@ public void addButton(AppContext conn,String text, String hover,FormResult actio
 	try {
 		action.accept(vis);
 	} catch (Exception e) {
-		conn.error(e,"Error adding Button");
+		getLogger(conn).error("Error adding Button",e);
 	}
 }
 public void addLink(AppContext conn,String text, FormResult action) {
@@ -157,7 +159,7 @@ public void addLink(AppContext conn,String text, FormResult action) {
 	try {
 		action.accept(vis);
 	} catch (Exception e) {
-		conn.error(e,"Error adding Link");
+		getLogger(conn).error("Error adding Link",e);
 	}
 }
 public <C,R> void addTable(AppContext conn,Table<C,R> t,String style) {
@@ -264,7 +266,7 @@ public void addFormTable(AppContext conn,Iterable<Field> form) {
 				clean('\n');
 				even = ! even;
 			} catch (Exception e) {
-				conn.error(e,"Error making html from form");
+				getLogger(conn).error("Error making html from form",e);
 			}
 		}
 		close();
@@ -312,7 +314,7 @@ public <I> void addFormLabel(AppContext conn,Field<I> f) {
 				attr("for",id);
 			}
 		} catch (Exception e) {
-			conn.error(e,"Error getting id");
+			getLogger(conn).error("Error getting id",e);
 		}
 	}else{
 		open("span");
@@ -378,7 +380,7 @@ public <I,T> void addFormInput(AppContext conn,Field<I> f,T item) {
 		vis.setUseRequired(use_required);
 		i.accept(vis);
 	}catch(Exception e){
-		conn.error(e,"Error generating input");
+		getLogger(conn).error("Error generating input",e);
 	}
 	if( i instanceof TagInput){
 		clean(((TagInput)i).getTag());
@@ -542,5 +544,8 @@ public void addScriptFile(String path){
 	attr("src", path);
 	endOpen();
 	close();
+}
+protected final Logger getLogger(AppContext conn){
+	return conn.getService(LoggerService.class).getLogger(getClass());
 }
 }

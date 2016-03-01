@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
 
 /** Tests of relationships
  * @author spb
@@ -62,7 +63,7 @@ public class RelationshipTest extends WebappTestBase {
 		
 	}
 	@Test
-	public void testGlobal() throws DataException{
+	public void testGlobal() throws DataException, UnknownRelationshipException{
 		SessionService service = ctx.getService(SessionService.class);
 		AppUserFactory login = service.getLoginFactory();
 		
@@ -88,7 +89,7 @@ public class RelationshipTest extends WebappTestBase {
 	}
 	
 	@Test
-	public void testRelation() throws DataException{
+	public void testRelation() throws DataException, UnknownRelationshipException{
 		SessionService service = ctx.getService(SessionService.class);
 		AppUserFactory login = service.getLoginFactory();
 		
@@ -114,7 +115,7 @@ public class RelationshipTest extends WebappTestBase {
 	
 	
 	@Test
-	public void testDirect() throws DataException{
+	public void testDirect() throws DataException, UnknownRelationshipException{
 		SessionService service = ctx.getService(SessionService.class);
 		AppUserFactory login = service.getLoginFactory();
 		
@@ -142,7 +143,7 @@ public class RelationshipTest extends WebappTestBase {
 	}
 	
 	@Test
-	public void testBogus() throws DataException{
+	public void testBogus() throws DataException, UnknownRelationshipException{
 		SessionService service = ctx.getService(SessionService.class);
 		AppUserFactory login = service.getLoginFactory();
 		
@@ -159,13 +160,26 @@ public class RelationshipTest extends WebappTestBase {
 		Dummy3 t2 = fac.find(fac.new StringFilter("Test2"));
 		
 		Assert.assertNotNull(t2);
+		boolean thrown=false;
+		try{
 		
-		Assert.assertFalse(fac.matches(service.getRelationshipRoleFilter(fac, "bogus"), t));
-		
-		
-		Assert.assertFalse(fac.matches(service.getRelationshipRoleFilter(fac, "really.bogus"), t2));
-		
-		
+		boolean matches = fac.matches(service.getRelationshipRoleFilter(fac, "bogus"), t);
+		Assert.assertFalse(matches);
+		}catch(UnknownRelationshipException e){
+			System.out.println("bad role "+e.getMessage());
+			// expected
+			thrown=true;
+		}
+		Assert.assertTrue("Expecting exception",thrown);
+		thrown = false;
+		try{
+		boolean matches2 = fac.matches(service.getRelationshipRoleFilter(fac, "really.bogus"), t2);
+		Assert.assertFalse(matches2);
+		}catch(UnknownRelationshipException e2){
+			System.out.println("bad role "+e2.getMessage());
+			thrown=true;
+		}
+		Assert.assertTrue("Expecting exception",thrown);
 	
 	}
 }

@@ -39,6 +39,7 @@ import org.apache.commons.codec.binary.Base64;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -107,7 +108,7 @@ public class DefaultServletService implements ServletService{
 				try {
 					req.setCharacterEncoding(default_charset);
 				} catch (UnsupportedEncodingException e) {
-					conn.error(e,"Problem with default charset");
+					error(e,"Problem with default charset");
 				}
 			}
 		}
@@ -190,7 +191,7 @@ public class DefaultServletService implements ServletService{
 	public void forward(String url) throws ServletException, IOException {
 		conn.getService(LoggerService.class).getLogger(getClass()).debug("forwarding to "+url);
 		if( max_forward--  == 0 ){
-			conn.error("too many calls to forward url="+url);
+			error("too many calls to forward url="+url);
 			if( res instanceof HttpServletResponse){
 				((HttpServletResponse)res).sendError(HttpServletResponse.SC_BAD_REQUEST);
 			}
@@ -200,7 +201,7 @@ public class DefaultServletService implements ServletService{
 		   ctx.getRequestDispatcher(url).forward(req, res);
 		   return;
 		}else{
-			conn.error("Badly formed url in forward url="+url);
+			error("Badly formed url in forward url="+url);
 			if( res instanceof HttpServletResponse){
 				((HttpServletResponse)res).sendError(HttpServletResponse.SC_BAD_REQUEST);
 			}
@@ -477,7 +478,7 @@ public class DefaultServletService implements ServletService{
 											sess.setCurrentPerson(person);
 										}
 								} catch (DataException e) {
-									conn.error(e,"Error looking up person");
+									error(e,"Error looking up person");
 								}
 							}
 						}
@@ -485,7 +486,7 @@ public class DefaultServletService implements ServletService{
 				}
 			}
 		}catch(Exception e){
-			getContext().error(e,"Error populating sesion from request");
+			error(e,"Error populating sesion from request");
 		}
 	}
 
@@ -519,5 +520,32 @@ public class DefaultServletService implements ServletService{
 
 	protected static String decode(String base64) {
 		return new String(Base64.decodeBase64(base64));
+	}
+	/**
+	 * Report an application error.
+	 * Needs to handle the possiblity of the LoggerService not being present as
+	 * we can't make it a pre-requisite here
+	 * 
+	 * @param errors
+	 *            Text of error.
+	 */
+	
+	final void error(String errors) {
+		LoggerService serv = getContext().getService(LoggerService.class);
+		if( serv != null ){
+			Logger log = serv.getLogger(getClass());
+			if( log != null ){
+				log.error(errors);
+			}
+		}
+	}
+	final void error(Throwable t,String errors) {
+		LoggerService serv = getContext().getService(LoggerService.class);
+		if( serv != null ){
+			Logger log = serv.getLogger(getClass());
+			if( log != null ){
+				log.error(errors,t);
+			}
+		}
 	}
 }
