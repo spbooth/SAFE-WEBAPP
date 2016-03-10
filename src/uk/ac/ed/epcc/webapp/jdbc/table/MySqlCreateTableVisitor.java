@@ -160,10 +160,13 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 			String desc = Repository.getForeignKeyDescriptor(ctx.getContext(),tag,true);
 			if( desc != null ){
 				sb.append(",\n");
-				sb.append("FOREIGN KEY ( ");
+				sb.append("FOREIGN KEY ");
+				ctx.quote(sb, name+"_ref_key");
+				sb.append(" ( ");
 				ctx.quote(sb, name);
 				sb.append(" ) REFERENCES ");
 				sb.append(desc);
+				sb.append(" ON UPDATE CASCADE");
 			}
 		}
 	}

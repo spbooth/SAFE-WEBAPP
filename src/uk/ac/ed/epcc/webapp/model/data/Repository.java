@@ -2686,6 +2686,8 @@ public final class Repository {
 			if( seq == 1 ){
 				FieldInfo info = fields.get(field);
 				if(info.isNumeric()){
+					String name = REFERENCE_PREFIX+param_name+"."+info.getName(false);
+					table=ctx.getInitParameter(name,table); // use param in preference because of windows case mangle
 					String tag = TableToTag(ctx, table);
 					//log.debug("field "+field+" references "+table);
 					info.setReference(true,key_name,tag);

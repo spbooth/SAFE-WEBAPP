@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.lifecycle;
 
+import uk.ac.ed.epcc.webapp.Targetted;
+
 /** An object that needs to perform some cascaded operations after
  * a trigger event takes place on a target object.
  * 
@@ -25,7 +27,7 @@ package uk.ac.ed.epcc.webapp.model.lifecycle;
  * @param <R> type of target.
  */
 
-public interface ActionListener<R> {
+public interface ActionListener<R> extends Targetted<R> {
 
 	/** Does the {@link ActionListener} want to allow the event to take place. This is to give the 
 	 * listener a chance to veto the event when it knows in advance its not capable of supporting the operation in its current state. 

@@ -77,7 +77,7 @@ application specific formatting.
 		}
 	}
 %>
-<div class="block">
+<div class="block" role="main">
  <h2><%=message_title %></h2>
  <p>
  <%=message_text %>

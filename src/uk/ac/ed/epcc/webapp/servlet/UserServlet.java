@@ -95,6 +95,7 @@ public class UserServlet<T extends AppUser> extends SessionServlet {
 			resetNavigationMenu(conn, req, res, params, sess);
 			return;
 		}
+		message(conn, req, res, "invalid_input");
 		return;
 	}
 	
@@ -169,7 +170,7 @@ public class UserServlet<T extends AppUser> extends SessionServlet {
 	        	person.postUpdate(orig);
 	        }
 	        res.sendRedirect(res.encodeRedirectURL(req.getContextPath()
-	        		+ "/main.jsp"));
+	        		+ conn.getInitParameter("person-update.redirect","/personal_update.jsp")));
 			// Everything went ok.
 			return true;
 		}

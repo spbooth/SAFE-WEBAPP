@@ -256,7 +256,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 		 * @param max
 		 * @throws DataException 
 		 */
-		protected void setup(BaseFilter<T> f, int start, int max) throws DataException {
+		protected void setup(BaseFilter<? super T> f, int start, int max) throws DataException {
 			String modify=null;
 			//getLogger().debug("args "+start+","+max);
 			chunkstart = start;

@@ -84,7 +84,7 @@ public class ContentMessageVisitor extends AbstractVisitor {
 				return;
 			}
 		} catch (MessagingException e) {
-			w.getContext().error(e,"Error showing part as link");
+			getLogger().error("Error showing part as link",e);
 			// just default to standard text
 		}
 		try {
@@ -123,7 +123,7 @@ public class ContentMessageVisitor extends AbstractVisitor {
 						return;
 					}catch(TransformerException e){
 						// transform failed.
-						w.getContext().error(e,"Error formatting html");
+						getLogger().error("Error formatting html",e);
 					}
 				}
 				// try quick and dirty html strip
@@ -137,7 +137,7 @@ public class ContentMessageVisitor extends AbstractVisitor {
 				string = string.replace("&\\#\\d+;", "");
 			}
 		} catch (Exception e) {
-			w.getContext().error(e,"Error checking for html");
+			getLogger().error("Error checking for html",e);
 
 		}
 		sb.cleanFormatted(getContext().getIntegerParameter(EMAIL_FORMAT_WRAP_THRESHOLD_CFG,MessageWalker.MAXLENGTH), string);

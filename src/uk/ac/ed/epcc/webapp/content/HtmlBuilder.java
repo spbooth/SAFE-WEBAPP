@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.content;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -104,23 +105,35 @@ protected static final class Text extends HtmlPrinter {
 			return new HtmlPrinter(this);
 		}
 	}
-  protected static final class Panel extends HtmlBuilder {
+  public static final class Panel extends HtmlBuilder {
+	  Map<String,String> attr = new LinkedHashMap<String, String>();
 	  String type;
 	  Panel(HtmlBuilder parent, String type){
 		  super(parent);
+		  attr.put("class", type);
 		  this.type=type;
 	  }
 		@Override
 		public HtmlBuilder appendParent() throws UnsupportedOperationException {
 			HtmlBuilder parent = (HtmlBuilder) getParent();
 			parent.open("div");
-			parent.attr("class", type);
+			for(String key : attr.keySet()){
+				parent.attr(key,attr.get(key));
+			}
 			parent.clean("\n");
 			super.appendParent();
 			parent.clean("\n");
 			parent.close();
 			parent.clean("\n");
 			return parent;
+		}
+		/** Add an attribute to the container itself.
+		 * 
+		 * @param key
+		 * @param value
+		 */
+		public void addAttr(String key, String value){
+			attr.put(key, value);
 		}
 	}
 public HtmlBuilder(){
@@ -496,7 +509,11 @@ public void setTableSections(boolean value){
  * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addList(java.util.Collection)
  */
 public <X> void addList(Iterable<X> list) {
+	addList(null,list);
+}
+public <X> void addList(Map<String,String> attr,Iterable<X> list) {
 	open("ul");
+	attr(attr);
 	for(X target : list){
 		open("li");
 		if( target instanceof UIGenerator){
@@ -509,7 +526,7 @@ public <X> void addList(Iterable<X> list) {
 		close();
 	}
 	close();
-	
+	clean("\n");
 }
 public <X> void addList(X[] list) {
 	open("ul");
@@ -525,7 +542,7 @@ public <X> void addList(X[] list) {
 		close();
 	}
 	close();
-	
+	clean("\n");
 }
 /** Add a script element to HTML. 
  * This only works for html so classes that want to add script elements

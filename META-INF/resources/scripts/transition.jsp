@@ -124,7 +124,7 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 <% if( multi ){ %>
    enctype="multipart/form-data"
 <% } %>
-action="<%= response.encodeURL(web_path+TransitionServlet.getURL(conn,tp,target))%>">
+action="<%= response.encodeURL(web_path+TransitionServlet.getURL(conn,tp,target))%>" role="main">
 <input type='hidden' name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>' value='<%=action %>'/>
 <input type='hidden' name='transition_form' value='true'/>
 <input type='hidden' name='form_url' value='/scripts/transition.jsp'/>

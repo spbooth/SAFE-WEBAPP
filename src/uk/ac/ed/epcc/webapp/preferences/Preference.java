@@ -17,6 +17,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.preferences.UserSettingFactory.UserSetting;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link Preference} is a {@link Feature} that only affects presentation logic so a user is allowed to
  * override the system-wide value with their own setting.
@@ -26,13 +27,19 @@ import uk.ac.ed.epcc.webapp.preferences.UserSettingFactory.UserSetting;
 
 public class Preference extends Feature {
 
+	private String[] required_roles=null;
+	
 	/**
 	 * @param name
 	 * @param def
 	 * @param description
 	 */
 	public Preference(String name, boolean def, String description) {
+		this(name,def,description,null);
+	}
+	public Preference(String name, boolean def, String description, String required_roles[]) {
 		super(name, def, description);
+		this.required_roles=required_roles;
 	}
 
 	@Override
@@ -70,6 +77,18 @@ public class Preference extends Feature {
 		UserSettingFactory<UserSetting> fac = new UserSettingFactory<UserSetting>(conn);
 		fac.setPreference(this, value);
 		conn.removeAttribute(this);
+	}
+	
+	/** Does the current user have permissions to set/view this preference.
+	 * 
+	 * @param sess
+	 * @return
+	 */
+	public boolean canView(SessionService<?> sess){
+		if( required_roles == null || required_roles.length == 0){
+			return true;
+		}
+		return sess.hasRoleFromList(required_roles);
 	}
 	
 }

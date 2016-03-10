@@ -38,7 +38,7 @@ Update personal details
 %>
 <%@ include file="/scripts/form_context.jsf" %>
 
-<div class="block">
+<div class="block" role="main">
 <h2>This page is to allow you to update your contact details.</h2>
 
 <h3>Your current details:</h3>

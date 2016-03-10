@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2015                            |
+//| Copyright - The University of Edinburgh 2016                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -13,32 +13,12 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet.navigation;
 
-import uk.ac.ed.epcc.webapp.servlet.ServletService;
-
-/** a {@link Node} which matches the target url exactly.
+/**
  * @author spb
  *
  */
-
-public class ExactNode extends Node {
-
-	/**
-	 * 
-	 */
-	public ExactNode() {
-		// TODO Auto-generated constructor stub
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.servlet.navigation.Node#matches(javax.servlet.http.HttpServletRequest)
-	 */
-	public boolean matches(ServletService serv) {
-		
-		String targetPath = getTargetPath(serv.getContext());
-		if( targetPath == null ){
-			return false;
-		}
-		return targetPath.equals(serv.encodePage());
-	}
-
+interface Visitor {
+	public void visitContainer(NodeContainer container);
+	
+	public void visitNode(Node n);
 }

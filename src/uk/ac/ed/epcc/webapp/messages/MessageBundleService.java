@@ -12,6 +12,8 @@
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.messages;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -32,20 +34,24 @@ import uk.ac.ed.epcc.webapp.config.ConfigService;
 public class MessageBundleService implements Contexed, AppContextService<MessageBundleService> {
 	private static ListControl control = new ListControl();
 	private AppContext context;
-	private ResourceBundle bundle=null;
+	private Map<String,ResourceBundle> bundle_map=new HashMap<String, ResourceBundle>();
 	public MessageBundleService(AppContext c){
 		context=c;
 	}
-	
 	public ResourceBundle getBundle(){
+		return getBundle("messages");
+	}
+	public ResourceBundle getBundle(String tag){
+		ResourceBundle bundle = bundle_map.get(tag);
 		if( bundle == null ){
-			bundle=makeBundle();
+			bundle=makeBundle(tag);
+			bundle_map.put(tag, bundle);
 		}
 		return bundle;
 	}
-	protected ResourceBundle makeBundle(){
+	protected ResourceBundle makeBundle(String tag){
 		ConfigService config = context.getService(ConfigService.class);
-		String bundles= config.getServiceProperties().getProperty("messages.bundle.list", "messages");
+		String bundles= config.getServiceProperties().getProperty(tag+".bundle.list", tag);
 		return ResourceBundle.getBundle(bundles, control);
 
 	}

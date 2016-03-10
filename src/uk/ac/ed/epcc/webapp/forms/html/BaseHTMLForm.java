@@ -83,7 +83,9 @@ public abstract class BaseHTMLForm extends MapForm {
 	 */
 	protected String getHtmlFieldTable(Collection<String> missing_fields, Map<String,String> errors,
 			Map<String,Object> post_params) {
-		return getHtmlFieldTable(new HtmlBuilder(), missing_fields, errors, post_params).toString();
+		HtmlBuilder result = new HtmlBuilder();
+		result.setFormID("form");
+		return getHtmlFieldTable(result, missing_fields, errors, post_params).toString();
 	}
 
 	

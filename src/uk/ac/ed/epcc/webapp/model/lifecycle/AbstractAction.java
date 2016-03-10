@@ -21,11 +21,12 @@ package uk.ac.ed.epcc.webapp.model.lifecycle;
  */
 public class AbstractAction<R> implements ActionListener<R>{
 
+	private final Class<? super R> clazz;
 	/**
 	 * 
 	 */
-	public AbstractAction() {
-		super();
+	public AbstractAction(Class<? super R> clazz) {
+		this.clazz=clazz;
 	}
 
 	public boolean allow(R target, boolean throw_reason) throws LifeCycleException {
@@ -34,6 +35,14 @@ public class AbstractAction<R> implements ActionListener<R>{
 
 	public void action(R target) {
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
+	 */
+	@Override
+	public final Class<? super R> getTarget() {
+		return clazz;
 	}
 
 }

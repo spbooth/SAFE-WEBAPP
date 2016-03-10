@@ -39,7 +39,7 @@ public class ExternalNode extends Node {
 
 	@Override
 	public String getTargetURL(ServletService service)  {
-		return getTargetPath();
+		return getTargetPath(service.getContext());
 	}
 
 }

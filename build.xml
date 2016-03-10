@@ -44,6 +44,7 @@
 	<!-- ==== Clean Target ==== -->
 
 	<target name="clean" description="Delete old build directories.">
+		<delete file="jacoco.exec"/>
 		<delete dir="${report.dir}" />
 		<delete dir="${test.home}" />
 		<delete dir="${build.home}" />
@@ -106,9 +107,11 @@
 	</target>
 
 	<target name="build-jar" depends="compile" description="Create a JAR file from the current build.">
+		<delete file="${webapp.lib}/webapp.jar" />
 		<jar destfile="${webapp.lib}/webapp.jar" basedir="${build.home}" />
 	</target>
 	<target name="build-test-jar" depends="compile-test" description="Create a JAR file of tests from the current build.">
+		<delete file="${webapp.testlib}/webapp-test.jar" />
 		<jar destfile="${webapp.testlib}/webapp-test.jar">
 			<fileset dir="${test.home}" />
 			<fileset dir="${basedir}/test_settings"/>
@@ -180,7 +183,7 @@
 			<report todir="${report.dir}" />
 		</junitreport>
 	</target>
-	<target name="jacoco-report">
+	<target name="jacoco-report" depends="coverage">
 		<jacoco:report>
 			<executiondata>
 				<file file="jacoco.exec"/>
@@ -205,7 +208,7 @@
 		<delete dir="${doc.dir}" />
 		<mkdir dir="${doc.dir}/api" />
 		<javadoc
-            source="1.5"
+            source="1.6"
             destdir="${doc.dir}/api"
             additionalparam="-breakiterator">
 			<packageset dir="${basedir}/src">

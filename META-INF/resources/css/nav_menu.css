@@ -11,6 +11,22 @@
   text-align: left;
   line-height: 11px;
 }
+/* Don't display accessability headings
+ */
+ 
+ .nav h1, .nav h2, .nav h3, .nav h4 , .nav h5{
+ display: none;
+ }
+ .nav h3{
+  background-color: inherit;
+  color: inherit;
+  margin: 0;
+  border:0;
+  padding:0;
+  font-size: inherit;
+  text-align: inherit;
+  line-height: inherit;
+ }
 /* First level menu stacks left to right across the page. This also sets defaults for all levels
  */
 .nav ul {
@@ -27,7 +43,7 @@
   line-height: 40px;
  */
  line-height: 30px;
-  font-size: 1.0em;
+  font-size: 0.8em;
   text-align: left;
 }
 
@@ -35,7 +51,7 @@
  */
 .nav a , .nav div{
   text-decoration: none;
-  color: #fff;
+  color: #ffffff;
   display: block;
   padding-left: 15px;
   height: 30px;
@@ -45,11 +61,11 @@
 
 /*  links change colour on hover
  */
-.nav a:hover {
+.nav a:hover , .nav a:focus{
  /* background-color: #005f5f;
   */
     background-color: #444;
-    color: #ec0000;
+    color: #ff4040;
     cursor: pointer;
 }
 
@@ -69,6 +85,7 @@
   cursor: default;
 }
 
+
 /* Sub Menus use smaller font */
 .nav li li {
   font-size: .8em;
@@ -82,6 +99,14 @@
 	background-color: #600;
 } 
 
+.nav li.notify >  a {
+	background-color: #bf7a00;
+	color: black;
+}
+.nav li.notify >  a:hover , .nav li.notify > a:focus{
+	background-color: #ffa300;
+	color: #800000;
+}
 /*******************************************
    Style menu for larger screens
 
@@ -172,10 +197,20 @@
   
   
   /* Show pull-down menu on hover
+   *
+   * We can also trigger this on focus on the link or the li
+   * (we need to add tabindex to the li to make it accept focus)
+   * this shows the sub-menu and another tab will progress to the first item
+   * in the sub-menu. However at this point the sub-menu disappears.
+   * firefox and ie then progress to the next top-level menu item of a further press
+   * crome goes back to the first tab position.
+   * 
    */
-  .nav li:hover > ul {
+  .nav li:hover > ul , .nav li:focus > ul, .nav li a:focus + ul{
     display: block;
   }
 
-  
+  .nav li > ul :focus {
+  	display: block;
+  } 
 }

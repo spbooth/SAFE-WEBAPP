@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.content;
 
+import java.util.Map;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
@@ -100,6 +102,14 @@ public interface ContentBuilder {
 	 * @param list
 	 */
 	public abstract <X> void addList(Iterable<X> list);
+	
+	/** add a bullet list of objects to the content.
+	 * Any {@link UIGenerator}s will generate their content otherwise 
+	 * a suitable text representation will be used.
+	 * @param attr 
+	 * @param list
+	 */
+	public abstract <X> void addList(Map<String,String> attr,Iterable<X> list);
 	
 	/** add a bullet list of objects to the content.
 	 * Any {@link UIGenerator}s will generate their content otherwise 

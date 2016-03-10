@@ -125,6 +125,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T> {
 			sql_filters.addFilter(fil.sql_filters);
 			pure_accept_filters.addAll(fil.pure_accept_filters);
 			mixed_filters.addAll(fil.mixed_filters);
+			dual_filters.addAll(fil.dual_filters);
 			return null;
 		}
 

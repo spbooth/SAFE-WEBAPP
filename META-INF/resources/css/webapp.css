@@ -117,7 +117,7 @@ table.navbar tr td a {
 div.report {
     text-align: left;
 }
-div.report h2{
+div.report h1, div.report h2{
 text-align: center;
 }
 div.report  th {
@@ -135,23 +135,23 @@ div.graph{
 	width: 100%;
 	text-align: center;
 }
-div.graph h2{
+div.graph h1, div.graph h2{
 	text-align: center;
 }
 /* supress normal formatting in reports
 */
-div.report h2, div.report h3, div.report h4{
+div.report h1, div.report h2, div.report h3, div.report h4{
 	color: black;
 	background-color: #ffffff;
 }
 
 /* we use three levels of header as standard 
- * h2 is the top level header in a block
+ * h1 or h2 is the top level header in a block
  * h3 is a secondary header or a header in a div.bar
  * h4 is a smaller header for dubdivisions.
 */
 
-h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6 {
 	font-size: 110%;
 	color: black;
     text-align: left;
@@ -338,7 +338,7 @@ div.bar form{
 
 /* heading within a bar
  */
-div.bar h2, div.bar h3{
+div.bar h1, div.bar h2, div.bar h3{
 font-weight: normal;
 display: inline;
 /*float: left;*/

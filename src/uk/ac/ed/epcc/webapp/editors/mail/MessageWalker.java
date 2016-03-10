@@ -441,7 +441,7 @@ protected  boolean showAsLink(MimePart parent, String string) {
 	try {
 		disp = parent.getDisposition();
 	} catch (MessagingException e) {
-		conn.error(e,"Error getting disposition");
+		getLogger().error("Error getting disposition",e);
 		// default treat as unknown
 	}
 	if( disp != null && disp.equalsIgnoreCase(Part.ATTACHMENT)){
@@ -452,7 +452,7 @@ protected  boolean showAsLink(MimePart parent, String string) {
 			return true;
 		}
 	} catch (MessagingException e) {
-		conn.error(e,"Error getting mime type");
+		getLogger().error("Error getting mime type",e);
 		// default treat as text
 	}
     if( string.length() > conn.getIntegerParameter(MESSAGE_MAX_INLINE_CONFIG_PARAM, ContentMessageVisitor.MAX_INLINE_LENGTH)){

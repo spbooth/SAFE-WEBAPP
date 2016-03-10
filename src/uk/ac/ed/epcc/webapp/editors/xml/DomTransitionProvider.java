@@ -111,7 +111,7 @@ public class DomTransitionProvider extends AbstractViewTransitionFactory<XMLTarg
 			d.setMimeType("text/xml");
 			return new ServeDataResult(producer, producer.setData(d));
 			}catch(Exception e){
-				c.error(e,"Error making download");
+				c.getService(LoggerService.class).getLogger(getClass()).error("Error making download",e);
 				throw new TransitionException("Internal error");
 			}
 		}
@@ -138,7 +138,7 @@ public class DomTransitionProvider extends AbstractViewTransitionFactory<XMLTarg
 			try {
 				target.commit();
 			} catch (Exception e) {
-				c.error(e,"Error updating document");
+				c.getService(LoggerService.class).getLogger(getClass()).error("Error updating document",e);
 				throw new TransitionException("Operation failed");
 			}
 			return new ViewXMLTargetResult(next);
@@ -175,7 +175,7 @@ public class DomTransitionProvider extends AbstractViewTransitionFactory<XMLTarg
 			try {
 				target.commit();
 			} catch (Exception e) {
-				target.getContext().error(e,"Error updating document");
+				target.getContext().getService(LoggerService.class).getLogger(getClass()).error("Error updating document",e);
 				throw new TransitionException("Operation failed");
 			}
 			return new ViewXMLTargetResult(target);
@@ -222,7 +222,7 @@ public class DomTransitionProvider extends AbstractViewTransitionFactory<XMLTarg
 			try {
 				target.commit();
 			} catch (Exception e) {
-				target.getContext().error(e,"Error updating document");
+				target.getContext().getService(LoggerService.class).getLogger(getClass()).error("Error updating document",e);
 				throw new TransitionException("Operation failed");
 			}
 			LinkedList<String> path=target.getTargetPath();
@@ -247,7 +247,7 @@ public class DomTransitionProvider extends AbstractViewTransitionFactory<XMLTarg
 				f.addInput(TEXT_FORM_FIELD, "Node text", input);
 				f.addAction("Update", new EditNodeAction(target));
 			} catch (Exception e) {
-				conn.error(e,"Error building node edit form");
+				conn.getService(LoggerService.class).getLogger(getClass()).error("Error building node edit form",e);
 				throw new TransitionException("Internal error");
 			}
 			
@@ -475,7 +475,7 @@ public class DomTransitionProvider extends AbstractViewTransitionFactory<XMLTarg
 			t.transform(source, result);
 			res=walker;
 		} catch (Exception e) {
-			getContext().error(e,"Error in validate");
+			getContext().getService(LoggerService.class).getLogger(getClass()).error("Error in validate",e);
 		}
 		}
 		DomVisitor val = fac.getValidatingVisitor();

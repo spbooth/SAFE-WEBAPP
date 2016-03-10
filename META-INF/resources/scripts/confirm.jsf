@@ -23,6 +23,7 @@ the dialog box if missing.
 
 --%>
 <%@ page import="java.util.*, java.text.*, uk.ac.ed.epcc.webapp.*,uk.ac.ed.epcc.webapp.servlet.*" %>
+<%@page import="uk.ac.ed.epcc.webapp.messages.MessageBundleService"%>
 <%
 String message_type  = (String) request.getAttribute(WebappServlet.CONFIRM_TYPE);
 String message_title=null;
@@ -36,7 +37,8 @@ Object args[] = (Object[]) request.getAttribute(WebappServlet.ARGS);
 if(args == null) args = new Object[0];
 
 if( message_type != null ){
-  ResourceBundle mess = ResourceBundle.getBundle("confirm");
+	MessageBundleService serv = conn.getService(MessageBundleService.class);
+	ResourceBundle mess = serv.getBundle("confirm");
   yes_text = mess.getString("yes");
   no_text = mess.getString("no");
   if( message_title == null ){
@@ -63,7 +65,7 @@ if( message_type != null ){
 	String post_url = (String) request.getAttribute(WebappServlet.CONFIRM_POST_URL);
 	if( post_url == null ) post_url = 	request.getParameter(WebappServlet.CONFIRM_POST_URL);
 %>
-<div class="block">
+<div class="block" role="main">
 <h2><%=message_title %></h2>
 <%if( extra_html != null ){ %>
 <%= extra_html %>

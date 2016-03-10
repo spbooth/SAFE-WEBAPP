@@ -22,6 +22,8 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /** MessageComposerFormat generates the html edit forms
  * from a MessageComposer
@@ -72,7 +74,7 @@ public class MessageComposerFormat {
 		v.allowNewAttachments(messageProvider.allowNewAttachments());
 		mw.visitMessage(messageProvider.getMessage(),v);
 		}catch(Exception e){
-			conn.error(e,"Error getting Edit HTML");
+			getLogger().error("Error getting Edit HTML",e);
 			sb.addText(" Internal error ");
 		}
 		return sb;
@@ -99,9 +101,12 @@ public class MessageComposerFormat {
 
 		mw.visitMessage(composer.getMessageProvider().getMessage(),v);
 		}catch(Exception e){
-			conn.error(e,"Error getting EditPart HTML");
+			getLogger().error("Error getting EditPart HTML",e);
 			sb.clean(" Internal error ");
 		}
 		return sb.toString();
+	}
+	protected Logger getLogger(){
+		return conn.getService(LoggerService.class).getLogger(getClass());
 	}
 }

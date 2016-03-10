@@ -21,10 +21,11 @@ package uk.ac.ed.epcc.webapp.model.lifecycle;
 public abstract class AbstractListener<R> extends AbstractAction<R> implements LifeCycleListener<R> {
 
 	/**
+	 * @param clazz type of target
 	 * 
 	 */
-	public AbstractListener() {
-		
+	public AbstractListener(Class<? super R> clazz) {
+		super(clazz);
 	}
 
 	/* (non-Javadoc)

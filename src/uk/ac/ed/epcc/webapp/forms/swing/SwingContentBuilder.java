@@ -21,6 +21,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
@@ -513,6 +514,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 		
 		
 	}
+	
 	/* (non-Javadoc)
 	 */
 	public <X> void addList(Iterable<X> list) {
@@ -533,6 +535,13 @@ public class SwingContentBuilder  implements ContentBuilder{
 		}
 		
 		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addList(java.util.Map, java.lang.Iterable)
+	 */
+	@Override
+	public <X> void addList(Map<String, String> attr, Iterable<X> list) {
+		addList(list);
 	}
 
 }

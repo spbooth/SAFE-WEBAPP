@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet.navigation;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -27,9 +28,11 @@ import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.FilteredProperties;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
+import uk.ac.ed.epcc.webapp.content.HtmlBuilder.Panel;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -59,7 +62,8 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 	 */
 	private static final String NAVIGATION_MENU_ATTR = "NavigationMenu";
 	public static final String NAVIGATIONAL_PREFIX = "navigation";
-	public static final Feature NAVIGATION_MENU_FEATURE = new Feature("navigation_menu", false, "Support for navigation menu code");
+	public static final Feature NAVIGATION_MENU_FEATURE = new Preference("navigation_menu", false, "Support for navigation menu code");
+	
 	private final AppContext conn;
 	/**
 	 * 
@@ -99,7 +103,8 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 			return null;
 		}
 		NodeContainer menu = (NodeContainer) service.getAttribute(NAVIGATION_MENU_ATTR);
-		if( menu == null ){
+		Date too_old = new Date(System.currentTimeMillis()-getContext().getLongParameter("navigation.expire_millis", 600000));
+		if( menu == null || menu.getDate().before(too_old)){
 			menu = makeMenu();
 			if( menu != null ){
 				service.setAttribute(NAVIGATION_MENU_ATTR, menu);
@@ -159,20 +164,37 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 		if( role != null && ! conn.getService(SessionService.class).hasRoleFromList(role.split("\\s*,\\s*"))){
 			return null;
 		}
+		String required_feature = menu_prop.getProperty(name+".required_feature");
+		if( required_feature != null && ! Feature.checkDynamicFeature(conn, required_feature, false)){
+			return null;
+		}
+		String disable_feature = menu_prop.getProperty(name+".disable_feature");
+		if( disable_feature != null && Feature.checkDynamicFeature(conn, disable_feature, false)){
+			return null;
+		}
+		String required_parameter = menu_prop.getProperty(name+".require_parameter");
+		if( required_parameter != null && conn.getInitParameter(required_parameter, null) == null){
+			return null;
+		}
 		try{
 			String path = conn.expandText(menu_prop.getProperty(name+".path"));
 			String type = conn.expandText(menu_prop.getProperty(name+".type","default_node_type"));
 			String child_list = conn.expandText(menu_prop.getProperty(name+".list"));
 			String image = menu_prop.getProperty(name+".image");
+			String key = menu_prop.getProperty(name+".accesskey");
 			NodeMaker maker = getContext().makeObjectWithDefault(NodeMaker.class, ParentNodeMaker.class, type);
 			Node n = maker.makeNode(name, menu_prop);
 			if( n != null ){
+				n.setID(name);
 				// Default to maker set text or failing that name
 				String menu_text = n.getMenuText(getContext());
 				n.setMenuText(conn.expandText(menu_prop.getProperty(name+".text", menu_text == null ? name : menu_text)));
 				n.setImage(image);
 				if( path != null){
 					n.setTargetPath(path);
+				}
+				if( key != null && key.length() > 0){
+					n.setAccessKey(key.charAt(0));
 				}
 				// Add config nodes first
 				if( child_list != null ){
@@ -203,7 +225,9 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 	public HtmlBuilder getNavigation(HttpServletRequest request, HtmlBuilder builder){
 		NodeContainer nav = getMenu();
 		if( nav != null && ! nav.isEmpty() && request.getAttribute(DISABLE_NAVIGATION_ATTR)==null){
-			HtmlBuilder panel = (HtmlBuilder) builder.getPanel("nav");
+			HtmlBuilder.Panel panel =  (Panel) builder.getPanel("nav");
+			panel.addAttr("role", "navigation");
+			panel.addHeading(2, "Navigation");
 			NodeGenerator gen = new NodeGenerator(getContext(), nav, request);
 			gen.addContent(panel);
 			panel.addParent();

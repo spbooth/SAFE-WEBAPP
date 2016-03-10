@@ -210,6 +210,14 @@ public abstract class AbstractXMLBuilder implements SimpleXMLBuilder {
 		return this;
 	}
 
+	public final SimpleXMLBuilder attr(Map<String,String> attr){
+		if( attr != null ){
+			for(String key : attr.keySet()){
+				attr(key,attr.get(key));
+			}
+		}
+		return this;
+	}
 
 	public final SimpleXMLBuilder attr(String name, CharSequence s) {
 		attributes.put(name, s);

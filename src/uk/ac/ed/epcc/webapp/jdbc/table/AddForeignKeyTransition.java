@@ -62,11 +62,12 @@ public class AddForeignKeyTransition<T extends TableStructureTransitionTarget> e
 						query.append("ADD FOREIGN KEY ");
 						// This adds a name that can be used to 
 						// delete index note foreign key will need to be dropped first
-						sql.quote(query, ref+"_ref_key");
+						sql.quote(query, field+"_ref_key");
 						query.append(" (");
 						info.addName(query, false, true);
 						query.append(") REFERENCES ");
 						query.append(desc);
+						query.append(" ON UPDATE CASCADE");
 					}
 				}
 			}

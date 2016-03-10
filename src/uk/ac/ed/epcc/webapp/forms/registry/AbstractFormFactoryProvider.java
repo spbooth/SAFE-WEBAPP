@@ -22,6 +22,7 @@ import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreatorProducer;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdateProducer;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 /** 
  * This type is intended to provide a way of producing lists of classes that can be modified via forms.
@@ -82,7 +83,7 @@ public abstract class AbstractFormFactoryProvider<F extends Contexed, T> impleme
 				return policy.canUpdate(p);
 			}
 		} catch (Exception e) {
-			p.getContext().error(e,"Error making factory");
+			p.getContext().getService(LoggerService.class).getLogger(getClass()).error("Error making factory",e);
 		}
 		return false;
 	}
@@ -99,7 +100,7 @@ public abstract class AbstractFormFactoryProvider<F extends Contexed, T> impleme
 				return policy.canCreate(p);
 			}
 		} catch (Exception e) {
-			p.getContext().error(e,"Error making factory");
+			p.getContext().getService(LoggerService.class).getLogger(getClass()).error("Error making factory",e);
 		}
 		return false;
 	}

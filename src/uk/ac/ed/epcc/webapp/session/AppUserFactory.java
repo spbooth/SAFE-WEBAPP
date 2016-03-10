@@ -263,33 +263,19 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		AbstractSessionService.setupRoleTable(ctx);
 		if( BOOTSTRAP_ADMIN_FEATURE.isEnabled(ctx)){
 			try{
-				SimpleSessionService.addRoleByID(ctx, 1, ctx.getInitParameter(BOOTSTRAP_ROLE_PROPERTY, SessionService.ADMIN_ROLE));
+				String roles = ctx.getInitParameter(BOOTSTRAP_ROLE_PROPERTY, SessionService.ADMIN_ROLE);
+				if( roles != null && ! roles.isEmpty()){
+					// allow property to contain a comma seperated list
+					for(String role : roles.split("\\s*,\\s*")){
+						SimpleSessionService.addRoleByID(ctx, 1, role);
+					}
+				}
 			}catch(Throwable t){
 				ctx.error(t,"Error adding Admin to first user");
 			}
 		}
 	}
-	/** Create the initial map of toggle role statuses.
-	 * These are roles that a user can switch between.
-	 * 
-	 * List is defined in the property <b>toggle_roles</b>.
-	 * Initial value defaults to off but can be changed by setting the boolean parameter
-	 * <b>toggle_roles.initial_value.<em>role</em></b>
-	 * 
-	 * @return Map<String,Boolean>
-	 */
-	public Map<String,Boolean> makeToggleMap(){
-		HashMap<String,Boolean> map = new HashMap<String,Boolean>();
-
-		map.put(SessionService.ADMIN_ROLE, Boolean.FALSE);
-		String additions = getContext().getInitParameter("toggle_roles");
-		if( additions != null ){
-			for(String s : additions.split(",")){
-				map.put(s,getContext().getBooleanParameter("toggle_roles.initial_value."+s, false));
-			}
-		}
-		return  map;
-	}
+	
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext ctx,String table) {
 		TableSpecification s = new TableSpecification("PersonID");

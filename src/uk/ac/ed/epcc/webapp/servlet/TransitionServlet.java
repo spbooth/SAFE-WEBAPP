@@ -41,6 +41,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -181,8 +182,9 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		Transition<T> t = tp.getTransition(target,key);
 		if( t != null ){
 			// check for trivial FormResults that don't need a lock
-			o = t.getResult(new ShortcutServletTransitionVisitor<K, T>(conn, key, tp, target, params));
+			o = t.getResult(getShortcutVisitor(conn, params, tp, target, key));
 			if( o == null){
+				log.debug("No shortcut result");
 				long start=0L,aquired=0L;
 				long max_wait=conn.getLongParameter("max.transition.millis", 30000L);
 				if( timer_service != null){
@@ -285,6 +287,8 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 						}
 					}
 				}
+			}else{
+				log.debug("shortcut result generated");
 			}
 		}
 		if( o == null ){
@@ -307,6 +311,10 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		}catch(Throwable tr){
 			conn.error(tr,"Exception caught in TransitionServlet");
 		}
+	}
+	protected TransitionVisitor<T> getShortcutVisitor(AppContext conn, Map<String, Object> params,
+			TransitionFactory<K, T> tp, T target, K key) {
+		return new ShortcutServletTransitionVisitor<K, T>(conn, key, tp, target, params);
 	}
 	/** Extension point for missing authorisation
 	 * @param conn

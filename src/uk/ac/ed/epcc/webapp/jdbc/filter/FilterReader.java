@@ -39,7 +39,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 public abstract class FilterReader<T,O> extends FilterSelect<T> implements Contexed, Targetted<T>{
 	private final AppContext ctx;
 	private final Class<? super T> target;
-	private BaseFilter<T> my_filter;
+	private BaseFilter<? super T> my_filter;
 
 	private ResultMapper<O> mapper;
 	
@@ -76,7 +76,7 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 	 * 
 	 * @return BaseFilter
 	 */
-	protected final BaseFilter<T> getFilter() {
+	protected final BaseFilter<? super T> getFilter() {
 		@SuppressWarnings("unchecked")
 		SQLFilter<T> mapper_filter = mapper.getRequiredFilter();
 		if( mapper_filter == null ){
@@ -100,7 +100,7 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 			}
 		}
 	}
-	protected final void setFilter(BaseFilter<T> f){
+	protected final void setFilter(BaseFilter<? super T> f){
 		if( f != null ){
 			Class<? super T> fil_target = f.getTarget();
 			//TODO enforce this always but run with assert for a bit.
@@ -123,7 +123,7 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 	protected final void makeSelect(StringBuilder query) {
 		String join="";
 		boolean use_join=false;
-		BaseFilter<T> filter = getFilter();
+		BaseFilter<? super T> filter = getFilter();
 		if( filter instanceof JoinFilter ){
 			join = ((JoinFilter) filter).getJoin();
 			if( join != null && join.trim().length()>0){

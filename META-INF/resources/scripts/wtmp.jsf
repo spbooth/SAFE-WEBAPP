@@ -24,7 +24,7 @@ uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService"%>
      if( man != null ){
  %>
 <div class="wideblock">
-<H2>Current logged in users </H2>
+<H2>Current users  logged in to the <%=website_name %></H2>
 <table>
 <%= man.getHTMLHeader() %>
 <%

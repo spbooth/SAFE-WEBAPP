@@ -24,13 +24,13 @@
 <%
        return;
     }	
-String page_title=custom_page.getTitle();
+String page_title=conn.expandText(custom_page.getTitle());
 HtmlBuilder hb = new HtmlBuilder();
 custom_page.addContent(conn, hb);
 %>
 <%@ include file="/std_header.jsf" %>
 <%@ include file="/main__logged_in.jsf" %>
-<div class="block">
+<div class="block" role="main">
 <%=hb.toString()%>
 </div>
 <%@ include file="/std_footer.jsf" %>

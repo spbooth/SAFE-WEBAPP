@@ -11,42 +11,33 @@
 <%--| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. |--%>
 <%--| See the License for the specific language governing permissions and      |--%>
 <%--| limitations under the License.                                           |--%>
-<%-- 
-    password_update.jsp - Page used to change password.
+<%--
+ A generic - landing page that generates an in-page view of
+ a fragment of the navigation menus.
 
-
-   
 --%>
-<%@page import="uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService"%>
-<%@ page	
-   import="uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*, uk.ac.ed.epcc.webapp.session.*,uk.ac.ed.epcc.webapp.forms.html.*"
+<%@ include file="/scripts/service_init.jsf"%>
+<%@page import="uk.ac.ed.epcc.webapp.servlet.navigation.*" %>
+<%
+	String node_name = (String) request.getAttribute("MenuNode");
+	if( node_name == null){
+		node_name = request.getParameter("MenuNode");
+	}
+    
+    String 	page_title=service_name+" "+website_name+ " "+node_name+" Menu";
 %>
-<%@ include file="/service_init.jsf" %>
-<%	
-	String page_title = service_name+" Change "+website_name+" Password";
-	PageHTMLForm form = (PageHTMLForm) request.getAttribute("Form");
+<%@ include file="/std_header.jsf"%>
+
+<% if( NavigationMenuService.NAVIGATION_MENU_FEATURE.isEnabled(conn)){
+	NavigationMenuService serv = conn.getService(NavigationMenuService.class);
+	NodeContainer menu = serv.getMenu();
+	HtmlBuilder builder = new HtmlBuilder();
+	LandingPageVisitor vis = new LandingPageVisitor(conn,builder,node_name);
+	menu.accept(vis);
 %>
-<%if( form == null ){ %>
-<jsp:forward page="/messages.jsp?message_type=access_denied" />
-<%} %>
-<%@ include file="/std_header.jsf" %>
+<%=builder.toString() %>
+<%
+}
+%>
 
-<%@ include file="/scripts/form_context.jsf" %>
-<div class="block" role="main">
-<h2>Please set a password for use with the <%=website_name %></h2>
-<% if( form.hasSubmitted() && form.hasError()){ %>
-<h3>This form contains errors:</h3>
-<p class="warn">	
-<%= form.getGeneralError() %>
-</p>
-<%} %>
-<form>
-<%= form.getHtmlForm() %>
-<div class="action_buttons">
-<input type="submit" value="Set Password"/>
-</div>
-</form>
-</div>
-
-
-<%@ include file="/std_footer.jsf" %>
+<%@ include file="/std_footer.jsf"%>

@@ -19,6 +19,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 
 /** This represents a node in the navigational menu.
@@ -30,7 +31,7 @@ import uk.ac.ed.epcc.webapp.servlet.ServletService;
  */
 
 public abstract class Node extends NodeContainer implements Externalizable{
-	
+	public static final Feature AUTO_LANDING_FEATURE = new Feature("navigation_menu.auto_landing_page", true, "Auto-generate a landing page if one not specified.");
 	public Node() {
 		super();
 	}
@@ -39,6 +40,8 @@ public abstract class Node extends NodeContainer implements Externalizable{
 	private  String menu_text;
 	private String image;
 	private String display_class;
+	private char access_key=0;
+	private NodeContainer parent;
     /* (non-Javadoc)
 	 * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
 	 */
@@ -64,6 +67,7 @@ public abstract class Node extends NodeContainer implements Externalizable{
 		}else{
 			out.writeObject(display_class);
 		}
+		out.writeChar(access_key);
 		super.writeExternal(out);
 		
 	}
@@ -77,6 +81,7 @@ public abstract class Node extends NodeContainer implements Externalizable{
 		setMenuText((String)in.readObject());
 		setImage((String) in.readObject());
 		setDisplayClass((String)in.readObject());
+		setAccessKey(in.readChar());
 		super.readExternal(in);
 		
 	}
@@ -84,7 +89,12 @@ public abstract class Node extends NodeContainer implements Externalizable{
 	/** get the location (url not including the context path) the menu item should navigate to.
 	 * @return
 	 */
-	public String getTargetPath() {
+	public String getTargetPath(AppContext conn) {
+
+		if( target_url == null && AUTO_LANDING_FEATURE.isEnabled(conn)){
+			return "/scripts/landingpage.jsp?MenuNode="+getID();
+		}
+
 		return target_url;
 	}
 
@@ -95,7 +105,7 @@ public abstract class Node extends NodeContainer implements Externalizable{
 	 */
 	public String getTargetURL(ServletService servlet_service) {
 		 
-		return servlet_service.encodeURL(getTargetPath());
+		return servlet_service.encodeURL(getTargetPath(servlet_service.getContext()));
 	}
 	/** get the menu text
 	 * 
@@ -107,6 +117,9 @@ public abstract class Node extends NodeContainer implements Externalizable{
 	
 	public String getDisplayClass(AppContext conn){
 		return display_class;
+	}
+	public char getAccessKey(AppContext conn){
+		return access_key;
 	}
 	/** set the location (notmally not including the context path the menu item should navigate to.
 	 * 
@@ -134,6 +147,9 @@ public abstract class Node extends NodeContainer implements Externalizable{
 			display_class=text;
 		}
 	}
+	public void setAccessKey(char key){
+		access_key=key;
+	}
 	/** does the original requested page match the target space
 	 * 
 	 * @param serv
@@ -151,5 +167,16 @@ public abstract class Node extends NodeContainer implements Externalizable{
 		}else{
 			this.image = image;
 		}
+	}
+
+	public void setParent(NodeContainer parent){
+		this.parent=parent;
+	}
+	public NodeContainer getParent(){
+		return parent;
+	}
+	@Override
+	public void accept(Visitor vis) {
+		vis.visitNode(this);
 	}
 }

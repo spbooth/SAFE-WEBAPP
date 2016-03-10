@@ -71,7 +71,7 @@
 		return;
 	}
 	log.debug("Showing login page");
-	String page_title = service_name+" Login";
+	String page_title = service_name+" "+website_name+" Login";
 %>
 <%@ include file="/std_header.jsf"%>
 <%
@@ -94,7 +94,7 @@ This service is only available to pre-registered users.
 </div>
 <%}else{ %>
 
-<div class="block">
+<div class="block" role="main">
 <h2>Register <%=webname %></h2>
 <p>Welcome to the <%=service_name%>. </p>
 <p> Please fill in this form to register with this service</p>
@@ -121,16 +121,15 @@ This service is only available to pre-registered users.
    }else{ 
       // offer password based login   
 %>
-<div class="block">
-<h2>Login</h2>
+<div class="block" role="main">
+<h2><%=page_title %></h2>
 <%=conn.getExpandedProperty("login.welcome","Welcome to ${service.name}")%>
 <%=conn.getExpandedProperty("login.link","")%>
 <% if("login".equals(request.getParameter("error"))) { %>
 <h3>Incorrect <%=fac.getNameLabel()%> or Password</h3>
 <p><b>please check your details and try again</b> <br />
 <small>If you have forgotten your password, enter your Email address and
-click <b>Email</b> and we will send you a new password for your web
-account.</small> <br />
+click <b>Email</b> and we will send you a new password for the <%=website_name %>.</small> <br />
 </p>
 <% } %> <% if("session".equals(request.getParameter("error"))) { %>
 <h3>Session invalid or expired</h3>
@@ -193,13 +192,13 @@ if(  login_urls != null ){
 } 
 %>
 <p>
-<small><small>As part of its normal functioning when you log-in this website will install a temporary session cookie that will be removed when you log-off or close your browser. If you do not wish this cookie 
+<small><small>As part of its normal functioning when you log-in the <%=website_name %> will install a temporary session cookie that will be removed when you log-off or close your browser. If you do not wish this cookie 
 to be set, disable cookies in your browser settings.</small></small>
 </p>
 </div>
 <% if( RegisterServlet.ALLOW_SIGNUPS.isEnabled(conn)){ %>
 <div class="block">
-<p>To create an account on this web-site click <a
+<p>To create an account on the <%=website_name %> click <a
 	href='<%= response.encodeURL(web_path+"/signup.jsp") %>'><b>here</b></a>.
 </p>
 </div>

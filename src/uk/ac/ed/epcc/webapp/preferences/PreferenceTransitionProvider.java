@@ -122,7 +122,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		 */
 		@Override
 		public String getTitle() {
-			return "Features and preferences";
+			return "${service.name} ${service.website-name} Preferences";
 		}
 
 		/* (non-Javadoc)
@@ -130,6 +130,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		 */
 		@Override
 		public ContentBuilder addContent(AppContext conn, ContentBuilder cb) {
+			cb.addHeading(2, conn.expandText(getTitle()));
 			cb.addTable(getContext(), getIndexTable(conn.getService(SessionService.class)));
 			return cb;
 		}
@@ -196,6 +197,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 			 */
 			public SetFeatureAction(Feature f) {
 				this.feature = f;
+				setConfirm("change_feature");
 			}
 
 			private final Feature feature;
@@ -309,6 +311,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		t.put("Current setting",target, getText(target.isEnabled(c)));
 		if( c.getService(SessionService.class).hasRole(SessionService.ADMIN_ROLE)){
 			t.put( "Default value", target, getText(target.isDef()));
+			t.setHighlight(target, target.isEnabled(c) != target.isDef());
 		}
 		if( target instanceof Preference){
 			Preference p = (Preference) target;
@@ -318,8 +321,8 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 				t.put("User preference", target, getText(p.isEnabled(c)));
 			}
 			t.put("System default setting", target, getText(p.defaultSetting(c)));
+			t.setHighlight(target, target.isEnabled(c) != p.defaultSetting(c));
 		}
-		t.setHighlight(target, target.isEnabled(c) != target.isDef());
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#getSummaryContent(uk.ac.ed.epcc.webapp.AppContext, uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object)
@@ -365,10 +368,13 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		if( sess == null || ! sess.haveCurrentUser()){
 			return false;
 		}
-		if( target instanceof Preference){
-			return true;  // normal users can only view Preferences.
+		if(sess.hasRole(SessionService.ADMIN_ROLE) ){
+			return true;
 		}
-		return sess.hasRole(SessionService.ADMIN_ROLE);
+		if( target instanceof Preference){
+			return ((Preference)target).canView(sess);
+		}
+		return false;
 	}
 
 	/* (non-Javadoc)

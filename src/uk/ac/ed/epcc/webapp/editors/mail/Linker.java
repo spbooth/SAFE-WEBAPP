@@ -25,6 +25,8 @@ import java.util.List;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 
 
@@ -42,7 +44,7 @@ public class Linker implements MessageEditLinker, Contexed{
 		try {
 			cb.addButton(conn, text, new MailEditResult(conn,composer, path, action));
 		} catch (Exception e) {
-			conn.error(e,"Error making MailEditResult");
+			getLogger().error("Error making MailEditResult",e);
 		}
 		
 	}
@@ -59,7 +61,7 @@ public class Linker implements MessageEditLinker, Contexed{
 		try {
 			builder.addLink(conn, text,new MailEditResult(conn,composer, args, EditAction.Serve) );
 		} catch (Exception e) {
-			conn.error(e,"Error making link");
+			getLogger().error("Error making link",e);
 		}
 
 	}
@@ -71,6 +73,9 @@ public class Linker implements MessageEditLinker, Contexed{
 
 	public AppContext getContext() {
 		return conn;
+	}
+	protected Logger getLogger(){
+		return conn.getService(LoggerService.class).getLogger(getClass());
 	}
 	
 }

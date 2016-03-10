@@ -51,7 +51,7 @@ signup.jsp - Page used to sign up for an account using password auth.
    }
 
 	
-	String page_title = service_name+" Web-site Signup";
+	String page_title = service_name+" "+website_name+" Signup";
 %>
 <%@ include file="/std_header.jsf" %>
 
@@ -77,7 +77,7 @@ If you already have a password for this website:
      // Normally webname will be null here but might as well check
      HTMLCreationForm creator = new HTMLCreationForm("Signup",person_fac.getSignupFormCreator(RegisterServlet.getRealm(conn),conn.getService(ServletService.class).getWebName()));
 %>
-<div class="block">
+<div class="block" role="main">
 <%@ include file="/scripts/form_context.jsf" %>
   <h2>Your Details:</h2>
   <%= person_fac.addUpdateNotes(new HtmlBuilder()) %>

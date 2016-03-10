@@ -38,7 +38,7 @@ if( error_code != null ){
 	// really try to make sure no exception occurs in the page
 }
 %>
-<div class="block">
+<div class="block" role="main">
 <h2>An error has occurred</h2>
 <% if( error_exception != null ){
 

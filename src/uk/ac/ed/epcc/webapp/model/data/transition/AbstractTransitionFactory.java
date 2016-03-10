@@ -84,6 +84,5 @@ public abstract class AbstractTransitionFactory<T , K extends TransitionKey<T>> 
 
 	public final AppContext getContext() {
 		return conn;
-	}
-	
+	}	
 }

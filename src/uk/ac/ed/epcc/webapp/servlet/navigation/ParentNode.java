@@ -34,7 +34,7 @@ public class ParentNode extends Node {
 	@Override
 	public boolean matches(ServletService serv) {
 		
-		String targetPath = getTargetPath();
+		String targetPath = getTargetPath(serv.getContext());
 		if( targetPath == null ){
 			return false;
 		}

@@ -209,7 +209,27 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		}
 		return v;
 	}
-	
+	/** Create the initial map of toggle role statuses.
+	 * These are roles that a user can switch between.
+	 * 
+	 * List is defined in the property <b>toggle_roles</b>.
+	 * Initial value defaults to off but can be changed by setting the boolean parameter
+	 * <b>toggle_roles.initial_value.<em>role</em></b>
+	 * 
+	 * @return Map<String,Boolean>
+	 */
+	public Map<String,Boolean> makeToggleMap(){
+		HashMap<String,Boolean> map = new HashMap<String,Boolean>();
+
+		map.put(SessionService.ADMIN_ROLE, Boolean.FALSE);
+		String additions = getContext().getInitParameter("toggle_roles");
+		if( additions != null ){
+			for(String s : additions.split(",")){
+				map.put(s,getContext().getBooleanParameter("toggle_roles.initial_value."+s, false));
+			}
+		}
+		return  map;
+	}
 	
 
 	public Map<String,Boolean> getToggleMap(){
@@ -226,7 +246,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		if(TOGGLE_ROLES_FEATURE.isEnabled(getContext()) ){
 			toggle_map = (Map<String, Boolean>) getAttribute(toggle_map_tag);
 			if( toggle_map == null ){
-				toggle_map = getLoginFactory().makeToggleMap();
+				toggle_map = makeToggleMap();
 				setAttribute(toggle_map_tag, toggle_map);
 			}
 		}
@@ -244,17 +264,27 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 */
 	public final boolean hasRole(String name){
 		// role name aliasing
-		String role=mapRoleName(name);
-		if( ! canHaveRole(role)){
-			// check original role
-			if( canHaveRole(name)){
-				role=name;
-			}else{
-				return false;
+		String role=null;
+		if( canHaveRole(name)){ // check queried role first
+			role = name;
+		}else{
+			String list=mapRoleName(name);
+			if( ! list.equals(name)){
+				// consider each equivalent role in turn
+				for(String r : list.split(",")){
+					if( canHaveRole(r)){
+						role=r;
+					}
+				}
 			}
 		}
+		if( role == null){
+			// none of the equivalents are allowed
+			return false;
+		}
+		
 
-		// role new points to a real role that we can have.
+		// role now points to a real role that we can have.
 		
 		// check the toggle value if this returns null then this is
 		// a non toggling role

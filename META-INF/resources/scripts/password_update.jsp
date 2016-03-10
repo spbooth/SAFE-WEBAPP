@@ -23,7 +23,7 @@
 %>
 <%@ include file="/basic_session.jsf" %>
 <%	
-	String page_title = service_name+" Change Password";
+	String page_title = "Change "+service_name+" "+website_name+" Password";
 	SessionService sess = conn.getService(SessionService.class);
 	PasswordAuthComposite comp = (PasswordAuthComposite) sess.getLoginFactory().getComposite(PasswordAuthComposite.class);
 	if( comp.mustResetPassword(sess.getCurrentPerson()) ){	
@@ -40,9 +40,9 @@
 if( comp.mustResetPassword(sess.getCurrentPerson()) ){
 %>
 <div class="block">
-<h2>Please change your website password</h2>
+<h2>Please change your <%=website_name %> password</h2>
 <p class="warn">
-Your website password has expired and should be changed
+Your <%=website_name %> password has expired and should be changed
 </p>
 </div>
 
@@ -93,8 +93,8 @@ Your new password is the same as the old one.<br/><br/>
 	  </div>
 <% } %>
 <div class="block">
-<h2>Change Web Password</h2>
-<p>This form allows you to change the password you use to log into this web-site.</p>
+<h2><%=page_title %></h2>
+<p>This form allows you to change the password you use to log into the <%=website_name %>.</p>
   <form method="post" action="<%= response.encodeURL(web_path+"/UserServlet") %>">
 	<input type="hidden" name="action" value="CHANGE_PASSWORD"/>
     <table class="form">

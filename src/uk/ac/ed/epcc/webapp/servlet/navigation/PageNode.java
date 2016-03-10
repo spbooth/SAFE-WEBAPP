@@ -28,7 +28,7 @@ public class PageNode extends ExactNode {
 	@Override
 	public String getTargetURL(ServletService servlet_service) {
 		
-		return servlet_service.encodeURL(getTargetPath()+"?page="+servlet_service.encodePage());
+		return servlet_service.encodeURL(getTargetPath(servlet_service.getContext())+"?page="+servlet_service.encodePage());
 	}
 
 }

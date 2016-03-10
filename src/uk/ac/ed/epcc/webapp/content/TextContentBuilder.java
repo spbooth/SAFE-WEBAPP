@@ -1,6 +1,8 @@
 // Copyright - The University of Edinburgh 2016
 package uk.ac.ed.epcc.webapp.content;
 
+import java.util.Map;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
@@ -322,6 +324,14 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 	@Override
 	public void br() {
 		sb.append("\n");
+		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addList(java.util.Map, java.lang.Iterable)
+	 */
+	@Override
+	public <X> void addList(Map<String, String> attr, Iterable<X> list) {
+		addList(list);
 		
 	}
 }

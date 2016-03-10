@@ -101,7 +101,7 @@ public abstract class PrefixVisitor<M extends TextMailBuilder> extends AbstractV
 	@Override
 	public void doIOError(MessageWalker w, IOException e) throws WalkerException {
 		// do the best we can, log and continue
-		w.getContext().error(e,"IO error in PrefixVisitor");
+		getLogger().error("IO error in PrefixVisitor",e);
 		getMailBuilder().addText("[Corrupt text]\n");
 	}
 
@@ -109,7 +109,7 @@ public abstract class PrefixVisitor<M extends TextMailBuilder> extends AbstractV
 	public void doMessageError(MessageWalker w, MessagingException e)
 			throws WalkerException {
 				// do the best we can, log and continue
-				w.getContext().error(e,"MessageError in PrefixVisitor");
+				getLogger().error("MessageError in PrefixVisitor",e);
 			}
 
 	@Override
@@ -157,7 +157,7 @@ public abstract class PrefixVisitor<M extends TextMailBuilder> extends AbstractV
 		    try {
 				mb.separate(seperator);
 			} catch (MessagingException e) {
-				w.getContext().error(e, "Error adding seperator");
+				getLogger().error("Error adding seperator",e);
 			}
 		}
 	}

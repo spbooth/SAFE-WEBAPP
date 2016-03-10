@@ -45,7 +45,7 @@ public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
 	
    protected O make() throws DataException{
 	   StringBuilder query = new StringBuilder();
-		BaseFilter<T> f = getFilter();
+		BaseFilter<? super T> f = getFilter();
 		if( f != null && ! (f instanceof SQLFilter)){
 			// null filter is ok
 			throw new ConsistencyError("Illegal filter in FilterMaker");

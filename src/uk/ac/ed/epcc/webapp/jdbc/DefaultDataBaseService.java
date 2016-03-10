@@ -170,6 +170,7 @@ public class DefaultDataBaseService implements DatabaseService {
 		}else{
 			conn =java.sql.DriverManager.getConnection(name, user, pass);
 		}
+		conn.setAutoCommit(true); // just in case
 		if( type.contains(POSTGRESQL_TYPE) || driver_name.contains(POSTGRESQL_TYPE)){
 			return new PostgresqlSQLContext(ctx,conn);
 		}

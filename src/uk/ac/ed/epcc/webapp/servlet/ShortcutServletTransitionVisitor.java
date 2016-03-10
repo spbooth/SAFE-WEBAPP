@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractTransitionVisitor;
 import uk.ac.ed.epcc.webapp.forms.transition.BaseFormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.DirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
@@ -47,7 +48,7 @@ public class ShortcutServletTransitionVisitor<K,T> extends AbstractTransitionVis
  			super(c,tag,tp,target);
  			this.params=params;
  		}
- 		@SuppressWarnings("unchecked")
+ 		
 		public FormResult doBaseFormTransition(BaseFormTransition<T> ft) throws TransitionException{
 			if( target == null ){
  				throw new TransitionException("No target specified");
@@ -63,7 +64,7 @@ public class ShortcutServletTransitionVisitor<K,T> extends AbstractTransitionVis
 			return null;
 		    
 		}
-		@SuppressWarnings("unchecked")
+		
 		public FormResult doTargetLessTransition(TargetLessTransition<T> ft) throws TransitionException{
 			String transition_form = (String) params.get("transition_form");
 			
@@ -90,6 +91,11 @@ public class ShortcutServletTransitionVisitor<K,T> extends AbstractTransitionVis
 		public FormResult doValidatingFormTransition(
 				ValidatingFormTransition<T> t) throws TransitionException {
 			return doBaseFormTransition(t);
+		}
+		@Override
+		public FormResult doDirectTransition(DirectTransition<T> t) throws TransitionException {
+			// DirectTransitions take a target so may have side effects.
+			return null;
 		}
 		
  	}

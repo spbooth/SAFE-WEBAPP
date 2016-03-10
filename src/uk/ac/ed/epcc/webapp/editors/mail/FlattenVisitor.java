@@ -80,7 +80,7 @@ public class FlattenVisitor extends PrefixVisitor<MultipartMailBuilder> {
 					try {
 						mb.flushText();
 					} catch (MessagingException e) {
-						messageWalker.getContext().error(e,"MessageError in FlattenVisitor");
+						getLogger().error("MessageError in FlattenVisitor",e);
 					}
 				}
 			}
@@ -97,7 +97,7 @@ public class FlattenVisitor extends PrefixVisitor<MultipartMailBuilder> {
 		try {
 			mb.addBodyPart(p);
 		} catch (MessagingException e) {
-			w.getContext().error(e,"MessageError in FlattenVisitor");
+			getLogger().error("MessageError in FlattenVisitor",e);
 		}
 		}
 	}
