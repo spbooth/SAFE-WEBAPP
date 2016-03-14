@@ -155,6 +155,7 @@ public class Emailer {
 			PasswordChangeRequest request = fac.createRequest(person);
 			if( request != null ){
 				email_template.setRegionEnabled("password_reset.url_region", true);
+				email_template.setRegionEnabled("password_value.region", false);
 				email_template.setProperty("password_reset.tag", request.getTag());
 			}
 			
@@ -211,6 +212,7 @@ public class Emailer {
 			PasswordChangeRequest request = fac.createRequest(person);
 			if( request != null ){
 				email_template.setRegionEnabled("password_reset.url_region", true);
+				email_template.setRegionEnabled("password_value.region", false);
 				email_template.setProperty("password_reset.tag", request.getTag());
 			}
 			

@@ -14,30 +14,18 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
 <%@ page contentType="text/html;charset=UTF-8"  pageEncoding="UTF-8"%>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
 <html lang="en">
 <head>
  <title><%= page_title %></title>
- <meta name="description" content="<%=service_name%> Website">
+ <meta name="description" content="<%=service_name%> <%=website_name%>">
  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<wb:headings extraCSS="<%=extra_css%>"/>
 <%
-// before our css so ours can override.
 if( extra_head != null ){ %>
 <%=extra_head %>
 <%} %>
-<link title="default css" href="<%= response.encodeURL(template_path+"/css/webapp.css")%>" rel="stylesheet" type="text/css">
-<link href="<%= response.encodeURL(template_path+"/css/nav_menu.css")%>" rel="stylesheet" type="text/css">
-<link href="<%=response.encodeURL(template_path+"/css/extra.css")%>" rel="stylesheet" type="text/css">
-<% 
-if(extra_css != null && extra_css.trim().length() > 0){ 
-	for( String css : extra_css.split(",")){
-%>
- <link href="<%= response.encodeURL(template_path +"/css/"+css) %>" rel="stylesheet" type="text/css">
-<%
-	}
-}
-%>
 </head>
 <body>
-<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
 <wb:navigation/>
 <jsp:include page="/page_header.jsp"/>

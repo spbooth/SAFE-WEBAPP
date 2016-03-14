@@ -37,19 +37,24 @@ public class MenuVisitor implements Visitor{
 	public void visitContainer(NodeContainer container) {
 		List<Node> children = container.getChildren();
 		boolean top = (! (container instanceof Node));
+		boolean top_two = top || ! (((Node)container).getParent() instanceof Node) ;
 		if( children != null && ! children.isEmpty()){
-			// do explicitly so we can add attry
-			builder.open("ul");
+			// do ul explicitly so we can add attry
+			// merge lower levels to work round IE11 bug
+			if( top_two){
+				builder.open("ul");
+			}
 			if( top){
-				builder.attr("role", "menubar");
+				//builder.attr("role", "menubar");
+			    builder.attr("id","navbar");
 				// at top id goes on the list for sub-nodes it is the node itself
 				String id = container.getID();
 				if( id != null ){
 					builder.attr("id",id);
 				}
 			}else{
-				builder.attr("role","menu");
-				builder.attr("aria-hidden","true");
+				//builder.attr("role","menu");
+				//builder.attr("aria-hidden","true");
 				String id = container.getID();
 				if( id != null ){
 					builder.attr("id",id+"_list");
@@ -59,7 +64,9 @@ public class MenuVisitor implements Visitor{
 			for(Node n : children){
 				visitNode(n);
 			}
-			builder.close();	
+			if( top_two){
+				builder.close();
+			}
 		}
 	}
 
@@ -70,21 +77,28 @@ public class MenuVisitor implements Visitor{
 	public void visitNode(Node node) {
 		boolean top = ! (node.getParent() instanceof Node);
 		builder.open("li");
-		builder.attr("role","menuitem");
-		if( top ){
-			builder.attr("aria-haspopup","true");
-		}
+		//builder.attr("role","menuitem");
+		//if( top ){
+		//	builder.attr("aria-haspopup","true");
+		//}
 		String targetPath = node.getTargetPath(conn);
 		ServletService servlet_service = conn.getService(ServletService.class);
 		//if( node.matches(servlet_service) ){
 		//	builder.attr("class", "match");
 		//}
 		
+		String class_string = "";
+		//class_string = "menu-item";
+		//if( top && ! node.isEmpty()){
+		//	class_string = "menu-parent";
+		//}
+		
 		String display_class = node.getDisplayClass(conn);
 		if( display_class != null ){
-			builder.attr("class","menu-item "+display_class);
-		}else{
-			builder.attr("class","menu-item");
+			class_string = class_string +" "+ display_class;
+		}
+		if( ! class_string.isEmpty()){
+			builder.attr("class",class_string);
 		}
 		String id = node.getID();
 		if( id != null){

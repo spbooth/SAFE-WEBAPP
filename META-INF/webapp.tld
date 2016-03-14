@@ -14,4 +14,11 @@
     <name>navigation</name>
     <tag-class>uk.ac.ed.epcc.webapp.tags.NavigationTag</tag-class>
   </tag>
+  <tag>
+  	<name>headings</name>
+  	<tag-class>uk.ac.ed.epcc.webapp.tags.WebappHeadTag</tag-class>
+  	<attribute><name>extraCSS</name><required>false</required>
+  	<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  </tag>
 </taglib>

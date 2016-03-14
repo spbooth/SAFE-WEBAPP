@@ -74,6 +74,10 @@ public class LandingPageVisitor implements Visitor{
 				if( id != null){
 					builder.attr("id",id+"_page_entry");
 				}
+				String display_class = node.getDisplayClass(conn);
+				if( display_class != null ){
+					builder.attr("class",display_class);
+				}
 				if( targetPath != null ){
 
 					builder.open("a");

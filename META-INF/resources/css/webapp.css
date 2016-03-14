@@ -72,7 +72,7 @@ div.overflowblock .headcolhead {
 	top:auto;
 	border-right: 0px none black;
 	border-top: 0px none black;
-	border-top-width:3px;*/ /*only relevant for first row*/
+	border-top-width:3px; /*only relevant for first row*/
 	margin-top:-3px; /*compensate for top border*/
 }
 
@@ -85,7 +85,7 @@ div.overflowblock .headcol {
 	top:auto;
 	border-right: 0px none black;
 	border-top: 0px none black;
-	border-top-width:3px;*/ /*only relevant for first row*/
+	border-top-width:3px; /*only relevant for first row*/
 	margin-top:-3px; /*compensate for top border*/
 }
 
@@ -216,6 +216,11 @@ fieldset.action_buttons{
 border: solid #e7e7e7;
 border-width: 3px;
 margin: 5px 0px;
+}
+/** Single button forms in an actionbutton block
+ */
+.action_buttons form{
+	display: inline;
 }
 
 
@@ -616,7 +621,7 @@ div.xml_comment{
 	background-color: #ccccff;
 	border-radius: 20px;
 	margin-top: 20px;
-	margin-botton: 20px;
+	margin-bottom: 20px;
 	margin-right: 20px;
 	padding: 10px;
 }

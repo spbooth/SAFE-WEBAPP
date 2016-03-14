@@ -63,7 +63,8 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 	private static final String NAVIGATION_MENU_ATTR = "NavigationMenu";
 	public static final String NAVIGATIONAL_PREFIX = "navigation";
 	public static final Feature NAVIGATION_MENU_FEATURE = new Preference("navigation_menu", false, "Support for navigation menu code");
-	
+	public static final Feature NAVIGATION_MENU_JS_FEATURE = new Preference("navigation_menu.script", false, "Add javascript for keyboard access to navigaition menu sub-menus");
+
 	private final AppContext conn;
 	/**
 	 * 
@@ -227,7 +228,7 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 		if( nav != null && ! nav.isEmpty() && request.getAttribute(DISABLE_NAVIGATION_ATTR)==null){
 			HtmlBuilder.Panel panel =  (Panel) builder.getPanel("nav");
 			panel.addAttr("role", "navigation");
-			panel.addHeading(2, "Navigation");
+			//panel.addHeading(2, "Navigation");
 			NodeGenerator gen = new NodeGenerator(getContext(), nav, request);
 			gen.addContent(panel);
 			panel.addParent();

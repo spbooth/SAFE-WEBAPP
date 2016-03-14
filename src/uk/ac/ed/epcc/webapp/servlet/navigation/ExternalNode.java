@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet.navigation;
 
+import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 
 /** A Node representing an external URL
@@ -40,6 +41,14 @@ public class ExternalNode extends Node {
 	@Override
 	public String getTargetURL(ServletService service)  {
 		return getTargetPath(service.getContext());
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.servlet.navigation.Node#getDisplayClass(uk.ac.ed.epcc.webapp.AppContext)
+	 */
+	@Override
+	public String getDisplayClass(AppContext conn) {
+		return "external"; // hardwire class attribute so all external links marked up the same.
 	}
 
 }

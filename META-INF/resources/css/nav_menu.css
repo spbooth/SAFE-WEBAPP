@@ -17,16 +17,6 @@
  .nav h1, .nav h2, .nav h3, .nav h4 , .nav h5{
  display: none;
  }
- .nav h3{
-  background-color: inherit;
-  color: inherit;
-  margin: 0;
-  border:0;
-  padding:0;
-  font-size: inherit;
-  text-align: inherit;
-  line-height: inherit;
- }
 /* First level menu stacks left to right across the page. This also sets defaults for all levels
  */
 .nav ul {
@@ -107,6 +97,9 @@
 	background-color: #ffa300;
 	color: #800000;
 }
+.nav li.external > a:after {
+  	content: " " url("link.png");
+  }
 /*******************************************
    Style menu for larger screens
 
@@ -123,10 +116,15 @@
     display: block;
   }
 /* first level menu fixed at top of page and covers entire width horizontally
+ * must stack above other content like datatables mark-up
  */
   .nav ul {
     width: 100%;
     position: fixed;
+    z-index: 10;
+  }
+   .nav ul ul {
+     width: inherit;
   }
   .nav li {
     width: 180px;
@@ -136,6 +134,13 @@
     font-size: 1.0em;
     display: inline-block;
     margin-right: -4px;
+  }
+  
+ 
+  /* restore second level to being a list ;
+   */
+  .nav li li {
+     display: list-item;
   }
 
 /* content elements
@@ -165,7 +170,7 @@
   /* Sub Menus 
   * invisible by default 
   */
-  .nav li ul {
+   .nav li > ul {
     position: absolute;
     display: none;
     width: inherit;
@@ -196,21 +201,14 @@
   }
   
   
-  /* Show pull-down menu on hover
-   *
-   * We can also trigger this on focus on the link or the li
-   * (we need to add tabindex to the li to make it accept focus)
-   * this shows the sub-menu and another tab will progress to the first item
-   * in the sub-menu. However at this point the sub-menu disappears.
-   * firefox and ie then progress to the next top-level menu item of a further press
-   * crome goes back to the first tab position.
-   * 
+  /* Show pull-down menu on hover or a JS setting
+   * The scripts will add show-menu if they are in control
    */
-  .nav li:hover > ul , .nav li:focus > ul, .nav li a:focus + ul{
+  .nav li:hover > ul , .nav li:focus > ul, .nav li > ul.show-menu {
     display: block;
   }
+  
+ 
 
-  .nav li > ul :focus {
-  	display: block;
-  } 
+  
 }
