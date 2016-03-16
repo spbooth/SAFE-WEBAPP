@@ -26,7 +26,7 @@ public enum PreferenceAction {
 
 	@Override
 	public boolean allow(SessionService sess, Feature f) {
-		return f != null && sess != null && sess.hasRole(SessionService.ADMIN_ROLE);
+		return f != null && sess != null && sess.hasRole(SET_FEATURES_ROLE);
 	}
 
 	@Override
@@ -79,6 +79,10 @@ public enum PreferenceAction {
 		  
 	  }
   ;
-  public abstract boolean allow(SessionService sess, Feature f);
+  /**
+	 * 
+	 */
+	public static final String SET_FEATURES_ROLE = "SetFeatures";
+public abstract boolean allow(SessionService sess, Feature f);
   public abstract String getHelp();
 }
