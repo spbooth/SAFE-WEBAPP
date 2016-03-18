@@ -45,6 +45,9 @@ public class TransitionNodeMaker<T,K> extends AbstractNodeMaker {
 		Node n = new ParentNode();
 		@SuppressWarnings("unchecked")
 		TransitionFactory<K, T> fac = getTransitionFactory(name, props);
+		if( fac == null){
+			return null;
+		}
 		// look for an explicit named targetless transition
 		String key = props.getProperty(name+".key");
 		if( key != null ){
@@ -62,7 +65,7 @@ public class TransitionNodeMaker<T,K> extends AbstractNodeMaker {
 				K index = itf.getIndexTransition();
 				if( index != null ){
 					// Don't set index explicitly to simplify url to common prefix path
-					n.setTargetPath(TransitionServlet.getURL(getContext(), fac,null,null));
+					n.setTargetPath(TransitionServlet.getURL(getContext(), fac,null,index));
 				}
 			}
 		}
