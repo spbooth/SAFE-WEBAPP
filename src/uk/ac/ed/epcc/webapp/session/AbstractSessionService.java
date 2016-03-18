@@ -788,8 +788,9 @@ public Set<A> withRole(String role) {
 	public final <T extends DataObject> BaseFilter<A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac,
 			String role, T target) throws UnknownRelationshipException {
 		// We may be storing roles from different types so prefix all tags with the type.
-		// prefix is never seen outsite this cache.
-		String store_tag="PersonFilter."+fac.getTag()+"."+role;
+		// prefix is never seen outside this cache.
+		// This filter is also parameterised by the target
+		String store_tag="PersonFilter."+fac.getTag()+(target == null ? "" : "."+target.getID())+"."+role;
 		BaseFilter<A> result = roles.get(store_tag);
 		if( result == null ){
 			result = makePersonInRelationshipRoleFilter(fac, role,target);
