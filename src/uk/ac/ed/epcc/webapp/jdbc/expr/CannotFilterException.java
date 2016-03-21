@@ -15,8 +15,17 @@
  * Copyright (c) - The University of Edinburgh 2010
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.expr;
+
+import uk.ac.ed.epcc.webapp.jdbc.filter.NoSQLFilterException;
+
 /** Exception thrown when the requested Filter cannot be generated.
  * 
+ * This is a very strong assertion that the expression cannot be generated at all.
+ * If a {@link FilterProvider} has insufficient information to generate the filter
+ * (for example it is relying on a nested class that does not implement {@link FilterProvider}
+ * it should throw {@link NoSQLFilterException} instead.
+ * 
+ * @see NoSQLFilterException
  * @author spb
  *
  */
