@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 
 
@@ -83,7 +84,13 @@ public class SQLSelectValue<T> implements SQLValue<T> {
 		for(int i=0;i<accessors.length;i++){
 			T tmp = accessors[i].makeObject(rs, pos+offsets[i]);
 			if( tmp != null ){
-				return tmp;
+				if( tmp instanceof IndexedReference){
+					if( ! ((IndexedReference)tmp).isNull()){
+						return tmp;
+					}
+				}else{
+					return tmp;
+				}
 			}
 		}
 		return null;
