@@ -852,7 +852,12 @@ public Set<A> withRole(String role) {
 	    	String base =role.substring(0, pos);
 	    	String sub = role.substring(pos+1);
 	    	if( base.equals("global")){
+	    		// Only the global role filter can allow relationship without a current person
+	    		// as roles may be asserted from the container.
 	    		return new GlobalRoleFilter<T>(this, sub);
+	    	}
+	    	if( ! haveCurrentUser()){
+	    		return new DualFalseFilter<T>(fac2.getTarget());
 	    	}
 	    	if( base.equals(fac2.getTag())){
 	    		// This is a reference a factory/composite role from within a redefined
@@ -870,6 +875,9 @@ public Set<A> withRole(String role) {
 	    		return arp.hasRelationFilter(this, sub);
 	    	}
 	    }else{
+	    	if( ! haveCurrentUser()){
+	    		return new DualFalseFilter<T>(fac2.getTarget());
+	    	}
 	    	// direct roles can be un-qualified though not if we want multiple levels of qualification.
 	    	BaseFilter<? super T> result = makeDirectRelationshipRoleFilter(fac2, role);
 			if( result != null ){
