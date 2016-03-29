@@ -13,7 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
-/**
+/** An abstract class for implementing {@link AcceptFilter}.
+ * 
  * @author spb
  *
  */

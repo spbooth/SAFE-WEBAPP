@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
@@ -79,17 +80,7 @@ public class DummyFactoryTest extends DataObjectFactoryTestCase {
 		}
 		AndFilter<Dummy1> fil = new AndFilter<Dummy1>(fac.getTarget());
 		// Dummy accept filter to force non sQLFilter
-		fil.addFilter(new AcceptFilter<Dummy1>() {
-
-			public <X> X acceptVisitor(FilterVisitor<X, ? extends Dummy1> vis)
-					throws Exception {
-				return vis.visitAcceptFilter(this);
-			}
-
-			public Class<? super Dummy1> getTarget() {
-				return Dummy1.class;
-			}
-
+		fil.addFilter(new AbstractAcceptFilter<Dummy1>(Dummy1.class) {
 			public boolean accept(Dummy1 o) {
 				return true;
 			}

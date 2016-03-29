@@ -133,7 +133,13 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			return new AcceptHashFilter(password);
 		}
 	}
-	
+	/** An {@link AcceptFilter} that selects records that match a password.
+	 * 
+	 * This should be combined with a filter to select by username.
+	 * 
+	 * @author spb
+	 *
+	 */
 	public class AcceptHashFilter implements AcceptFilter<T>{
 		Logger log;
         public AcceptHashFilter(String password) {

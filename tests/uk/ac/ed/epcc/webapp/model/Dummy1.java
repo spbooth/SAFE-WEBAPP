@@ -24,6 +24,7 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
@@ -107,28 +108,15 @@ public class Dummy1 extends DataObject {
          		super(Factory.this.getTarget(),res,NUMBER,n);
          	}
          }
-    	 public class NumberAcceptFilter implements AcceptFilter<Dummy1>{
+    	 public class NumberAcceptFilter extends AbstractAcceptFilter<Dummy1>{
     		 Number n;
           	public NumberAcceptFilter(Number n){
+          		super(Factory.this.getTarget());
           		this.n=n;
           	}
 			public boolean accept(Dummy1 d) {
 				return n.intValue() == d.getNumber();
 			}
-			/* (non-Javadoc)
-			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-			 */
-			public <X> X acceptVisitor(FilterVisitor<X, ? extends Dummy1> vis)
-					throws Exception {
-				return vis.visitAcceptFilter(this);
-			}
-			/* (non-Javadoc)
-			 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
-			 */
-			public Class<? super Dummy1> getTarget() {
-				return Factory.this.getTarget();
-			}
-			
           }
          public class StringFilter extends SQLValueFilter<Dummy1>{
          	public StringFilter(String s){

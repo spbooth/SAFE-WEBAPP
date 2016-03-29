@@ -30,6 +30,7 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
@@ -141,12 +142,12 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		
     }
 
-	public static class AcceptTypeFilter<T extends BasicType.Value, I extends DataObject>  implements AcceptFilter<I>{
-		private final Class<? super I> owner;
+	public static class AcceptTypeFilter<T extends BasicType.Value, I extends DataObject>  extends AbstractAcceptFilter<I>{
+		
         private final T target;
         private final BasicType<T> type;
 		public AcceptTypeFilter(Class<? super I> owner,BasicType<T> type,T target){
-		   this.owner=owner;
+		   super(owner);
 	       this.target = target;
 	       this.type=type;
 	    }
@@ -158,19 +159,6 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		public boolean accept(I d) {
 			return target == d.record.getProperty(type);
 		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-		 */
-		public <X> X acceptVisitor(FilterVisitor<X, ? extends I> vis) throws Exception {
-			return vis.visitAcceptFilter(this);
-		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#getType()
-		 */
-		public Class<? super I> getTarget() {
-			return owner;
-		}
-		
 
 	}
 	public static class TypeSetSQLFilter<T extends BasicType.Value,I> implements PatternFilter<I>, SQLFilter<I>{
@@ -234,32 +222,18 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		
 		
 	}
-	public static class TypeSetAcceptFilter<T extends BasicType.Value, I extends DataObject> implements AcceptFilter<I>{
-		private final Class<? super I> owner;
+	public static class TypeSetAcceptFilter<T extends BasicType.Value, I extends DataObject> extends AbstractAcceptFilter<I>{
+		
 		private final Set<T> set;
 	    private final BasicType<T> type;
         public TypeSetAcceptFilter(Class<? super I> owner,     BasicType<T> type, Set<T> set){
-        	this.owner=owner;
+        	super(owner);
         	this.set=set;
         	this.type=type;
         }
 		public boolean accept(I d) {
 			return set.contains( d.record.getProperty(type));
 		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-		 */
-		public <X> X acceptVisitor(FilterVisitor<X, ? extends I> vis) throws Exception {
-			return vis.visitAcceptFilter(this);
-		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#getType()
-		 */
-		public Class<? super I> getTarget() {
-			return owner;
-		}
-		
-		
 	}
 	/**
 	 * Value inner class representing a possible value of the enclosing

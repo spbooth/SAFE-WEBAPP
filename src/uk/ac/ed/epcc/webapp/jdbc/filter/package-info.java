@@ -52,7 +52,9 @@ own explicit accept method indicating that they need special treatment. These ar
 as representing the intersection of the behaviours of their different interfaces.
 The basic filters
 should only implement one of the interfaces, Where possible the use of 
-<CODE>AcceptFilter</CODE> should be avoided. 
+<CODE>AcceptFilter</CODE> should be avoided. Note that OR combinations of SQL and accept-filters are particularly expensive as
+the SQL branches of the combined query need to be converted to accept filters that will require an additional query per record
+to evaluate. 
 </P>
 <P>All filters are generic with the type
 they select and implement {@link uk.ac.ed.epcc.webapp.Targetted} so that these

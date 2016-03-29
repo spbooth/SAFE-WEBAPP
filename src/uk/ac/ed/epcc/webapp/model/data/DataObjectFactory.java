@@ -1033,13 +1033,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	}
 	
 	
-	public static class  TimeAcceptFilter<T extends DataObject> implements AcceptFilter<T>{
-		private final Class<? super T> target;
+	public static class  TimeAcceptFilter<T extends DataObject> extends AbstractAcceptFilter<T>{
+	
         private final String field;
         private final MatchCondition cond;
         private final Date point;
 		public TimeAcceptFilter(Class<? super T> target,String field, MatchCondition cond, Date point){
-			this.target=target;
+			super(target);
         	this.field=field;
         	this.cond=cond;
         	this.point=point;
@@ -1055,21 +1055,6 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			}
 			return false;
 		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-		 */
-		public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
-			return vis.visitAcceptFilter(this);
-		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
-		 */
-		public Class<? super T> getTarget() {
-			return target;
-		}
-		
-		
-		
 	}
 	private AppContext conn=null;
 	protected Repository res=null;
