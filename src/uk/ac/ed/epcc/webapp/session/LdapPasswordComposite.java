@@ -47,7 +47,14 @@ import uk.ac.ed.epcc.webapp.ssl.SSLService;
  * 
  * All the password-change functionality is not supported but
  * database records will be auto-created when an authentication succeeds.
- * The ldap name is stored as the web-name.
+ * 
+ * We assume all users are at the same level of the ldap tree and the supplied username corresponds to
+ * a unique attribute (default to uid) of the user record. This allows a LdapName for the record to be
+ * generated simply and does not require an anonymous bind to search for the user.
+ * 
+ * An anonymous bind can be introduced by sub-classing.
+ * 
+ * The identifying attribute name is stored as the web-name.
  * 
  * @author spb
  * @param <T> type of {@link AppUser}
@@ -56,6 +63,14 @@ import uk.ac.ed.epcc.webapp.ssl.SSLService;
 
 public class LdapPasswordComposite<T extends AppUser> extends PasswordAuthComposite<T> {
 
+	/**
+	 * 
+	 */
+	private static final String AUTHENTICATION_LDAP_NAME_ATTR = "authentication.ldap.name_attr";
+	/**
+	 * 
+	 */
+	private static final String AUTHENTICATION_LDAP_FACTORY = "authentication.ldap.factory";
 	/**
 	 * 
 	 */
@@ -86,11 +101,36 @@ public class LdapPasswordComposite<T extends AppUser> extends PasswordAuthCompos
 	 */
 	private static final String AUTHENTICATION_LDAP_SSL = "authentication.ldap.ssl";
 
+	protected final String ldap_url;
+	protected final boolean use_ssl;
+	protected final LdapName base_name;
+	protected final String factory;
+	protected final String filter;
+	protected final String name_attr;
 	/**
 	 * @param fac
 	 */
 	public LdapPasswordComposite(AppUserFactory<T> fac) {
 		super(fac);
+		AppContext context = fac.getContext();
+		ldap_url = context.getInitParameter(AUTHENTICATION_LDAP_URL);
+		use_ssl = context.getBooleanParameter(AUTHENTICATION_LDAP_SSL, ldap_url == null ? false : ldap_url.startsWith("ldaps"));
+		String base= context.getInitParameter(AUTHENTICATION_LDAP_BASE);
+		if( base == null){
+			base_name=null;
+		}else{
+			LdapName tmp=null;
+			try {
+				tmp=new LdapName(base);
+			} catch (InvalidNameException e) {
+				context.getService(LoggerService.class).getLogger(getClass()).error("mal-formed base", e);
+			}
+			base_name=tmp;
+		}
+		// probably only change the factory for mock object testing
+		factory = context.getInitParameter(AUTHENTICATION_LDAP_FACTORY,"com.sun.jndi.ldap.LdapCtxFactory");
+		filter = context.getInitParameter(AUTHENTICATION_LDAP_FILTER, DEFAULT_LDAP_FILTER);
+		name_attr = context.getInitParameter(AUTHENTICATION_LDAP_NAME_ATTR, "uid");
 	}
 
 	/* (non-Javadoc)
@@ -120,12 +160,12 @@ public class LdapPasswordComposite<T extends AppUser> extends PasswordAuthCompos
 
 		AppContext context = getContext();
 		Logger log = getLogger();
-		String ldap_url = context.getInitParameter(AUTHENTICATION_LDAP_URL);
-		if( ldap_url == null ){
-			log.error("No LDAP connection URL");
+		
+		if( ldap_url == null || base_name == null){
+			log.error("No LDAP connection URL or basename");
 			return null;
 		}
-		boolean use_ssl = context.getBooleanParameter(AUTHENTICATION_LDAP_SSL, ldap_url.startsWith("ldaps"));
+		
 		
 		if( use_ssl){
 			try {
@@ -136,39 +176,20 @@ public class LdapPasswordComposite<T extends AppUser> extends PasswordAuthCompos
 		}
 		
 		try {
-			String base= context.getInitParameter(AUTHENTICATION_LDAP_BASE);
-			if( base == null ){
-				getLogger().error("No LDAP base");
-				return null;
-			}
-
-			LdapName base_name = new LdapName(base);
-			
-			Hashtable<String,String> env = new Hashtable<String,String>();
-			// probably only change the factory for mock object testing
-			String factory = context.getInitParameter("authentication.ldap.factory","com.sun.jndi.ldap.LdapCtxFactory");
-			env.put(Context.INITIAL_CONTEXT_FACTORY, factory);
-			env.put(Context.SECURITY_AUTHENTICATION, "simple");
 			
 			
-			env.put(Context.SECURITY_PRINCIPAL, getConnectionName(name, base_name));
-			env.put(Context.SECURITY_CREDENTIALS, password);
-			if( use_ssl ){
-				env.put(Context.SECURITY_PROTOCOL, "ssl");
-			}
-			log.debug("ldap url="+ldap_url);
-			env.put(Context.PROVIDER_URL, ldap_url);
-			DirContext dctx = new InitialDirContext(env);
+			
+			DirContext dctx = getContext(name, password);
 
 			SearchControls sc = new SearchControls();
 			//String[] attributeFilter = { "cn", "mail" };
 			//sc.setReturningAttributes(attributeFilter);
 		     sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
-		     String filter = context.getInitParameter(AUTHENTICATION_LDAP_FILTER, DEFAULT_LDAP_FILTER);
 		     
 		     
-			NamingEnumeration results = dctx.search(getPrincipal(name, base_name),filter,  sc);
+		     
+			NamingEnumeration results = dctx.search(getPrincipal(name),filter,  sc);
 		     if(results.hasMore()) {
 		    	 log.debug("found an entry");
 		    	 // we have a result
@@ -209,19 +230,53 @@ public class LdapPasswordComposite<T extends AppUser> extends PasswordAuthCompos
 		}
 	}
 
-	private String getConnectionName(String name, LdapName base_name) throws InvalidNameException{
+	/**
+	 * @param name
+	 * @param password
+	 * @return
+	 * @throws InvalidNameException
+	 * @throws NamingException
+	 */
+	protected DirContext getContext(String name, String password) throws InvalidNameException, NamingException {
+		Hashtable<String,String> env = new Hashtable<String,String>();
+		
+		
+		env.put(Context.INITIAL_CONTEXT_FACTORY, factory);
+		env.put(Context.SECURITY_AUTHENTICATION, "simple");
+		
+		
+		env.put(Context.SECURITY_PRINCIPAL, getConnectionName(name));
+		env.put(Context.SECURITY_CREDENTIALS, password);
+		if( use_ssl ){
+			env.put(Context.SECURITY_PROTOCOL, "ssl");
+		}
+		env.put(Context.PROVIDER_URL, ldap_url);
+		DirContext dctx = new InitialDirContext(env);
+		return dctx;
+	}
+
+	private String getConnectionName(String name) throws InvalidNameException{
 		String connection_domain = getContext().getInitParameter(LDAP_CONNECTION_DOMAIN);
 		if( connection_domain != null ){
-			// Active directory allows username@domain as well as the LDAP principal
-			// 
+			// Active directory also allows username@domain as well as the LDAP principal
+			// can avoid sub-org search this way
 			return name+"@"+connection_domain;
 		}
-		return getPrincipal(name, base_name).toString();
+		return getPrincipal(name).toString();
 	}
-	private Name getPrincipal(String name, LdapName base_name) throws InvalidNameException {
-		// This assumes the canonical name comes from appending the user supplied name to
-		// the basename.
-		return base_name.add(new Rdn("cn", name));
+	/** generate the name of the authenticating user from the supplied id.
+	 * 
+	 * @param name
+	 * @param base_name
+	 * @return
+	 * @throws InvalidNameException
+	 */
+	private Name getPrincipal(String name) throws InvalidNameException {
+		// This assumes all users are at the same level of the heirarchy.
+		// if this is not the case we can sub-class here to bind anonymously and search
+		// for a record.
+		LdapName result = (LdapName) base_name.clone();
+		return result.add(new Rdn(name_attr, name));
 	}
 
 	/* (non-Javadoc)
