@@ -39,6 +39,7 @@
  * <li><b>Roles</b> These represent capabilities belonging to users. They are represented as strings. Role-mappings can be defined in configuration parameters so that
  * a small number of meta-roles can be assigned to users which are then mapped to a large number of specific roles used to access different functions of the application.</li>
  * <li><b>Relationships</b> These are like roles but apply to specific model objects. For example a user might have the <em>manager</em> relationship with one project but not with another.</li>
+ * </ul>
  * <p> 
  * Roles can be set to be <em>togglable</em>. In this case the user with the role can turn it on and off during their session. 
  * The role mechanism is also a key extension point and can be customised by creating a new {@link uk.ac.ed.epcc.webapp.session.SessionService} class. Though role settings are normally stored in the database, roles defined in the servlet container can be imported 
