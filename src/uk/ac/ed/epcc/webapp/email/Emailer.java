@@ -147,6 +147,10 @@ public class Emailer {
 
 		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("request_password.txt");
 
+		if( email_template == null ){
+			getLogger().debug(new_password);
+			return;
+		}
 		email_template.setProperty("person.name", person.getName());
 		email_template.setProperty("person.password", new_password);
 		email_template.setProperty("person.email", person.getEmail());
@@ -199,6 +203,10 @@ public class Emailer {
 			throws Exception {
 
 		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("new_signup.txt");
+		if( email_template == null){
+			getLogger().debug(new_password);
+			return;
+		}
 
 		String name = person.getName();
 		if( name == null || name.trim().length() == 0){
