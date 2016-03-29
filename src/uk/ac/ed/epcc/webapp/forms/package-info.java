@@ -51,16 +51,18 @@ allows us to use generic code to build Forms of different types. The
 Form validation code is also the same for all form types. 
 </P>
 <P>There are 2 levels of validation. Each field/Input can validate
-its own inputs independently and generate field specific errors. the
-overall form can also be validated and generate a generic error. This
-is done by adding a <CODE>FormValidator</CODE> object to the form. 
+its own inputs independently and generate field specific errors. Every Input class has its own
+built in validation code and this can be augmented by adding a {@link uk.ac.ed.epcc.webapp.forms.FieldValidator} to the corresponding field of the form.
+The overall form can also be validated and generate a generic error. This
+is done by adding a <CODE>FormValidator</CODE> object to the form. These can be used to validate constraints that affect multiple fields for example if
+one value should be less than another.
 </P>
 <P>The activation pattern for HTML and GUI forms are significantly
 different. In a GUI there is a single Form instance each field can be
 validated as it is edited. Each edit invokes an appropriate
 call-back. In HTML form generation and parsing are separated into two
 separate phases on different instances and progress in batch mode.
-The Form editing methods are therefore specific to the subclass. The
+The Form editing methods are therefore specific to the subclass or handled using a visitor pattern. The
 flow of control is as follows: 
 </P>
 <UL>
@@ -78,6 +80,10 @@ flow of control is as follows:
 	to the model classes that need to be modified.
 	</P></LI>
 </UL>
+<p> To improve the user interface inputs that correspond to HTML5 input types can implement
+{@link uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input} to take advantage of browser level field validation.
+In general we rely on html5 features rather than introducing additional javascript.
+</p>
 <P>The Input classes are kept generic to all different types of Form.
 The Form class has to implement the different types of edit operation
 depending on the kind of selector. This allows us to use inheritance

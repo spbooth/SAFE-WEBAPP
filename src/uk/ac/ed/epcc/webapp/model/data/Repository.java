@@ -129,7 +129,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * The cache only holds non-dirty data so could hold normal Map objects rather than actual Records.
  * Currently this is left as a future optimisation.
  * <p>
- * Note that lookups via a {@TypeProducer} may also	utilise this caching mechanism.
+ * Note that lookups via a {@link TypeProducer} may also	utilise this caching mechanism.
  * <p>
  * Repositories are intended to be local to a parent AppContext which should represent a
  * single thread of execution. However synchronisation is implemented within the code.

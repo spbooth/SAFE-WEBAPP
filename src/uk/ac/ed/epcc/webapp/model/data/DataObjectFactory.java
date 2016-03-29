@@ -174,7 +174,8 @@ import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
  * <p>
  * The {@link FilterSet} class is a simple wrapper round a {@link FilterIterator}
  * that implements {@link Iterable} and is therefore more compatible
- * with the java-5 extended for-loop syntax.
+ * with the java-5 extended for-loop syntax. The {@link #getResult(BaseFilter)} method returns a
+ * {@link uk.ac.ed.epcc.webapp.jdbc.filter.FilterSet} corresponding to a filter.
  * <p>
  * This class also implements {@link Selector} which means that it can provide a default form <code>Input</code>
  * for the type of object it creates.
