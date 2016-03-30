@@ -48,11 +48,10 @@ public interface AccessRoleProvider<U extends AppUser,T extends DataObject> {
 	 * This method should not be called directly only via a call to {@link SessionService#getRelationshipRoleFilter(DataObjectFactory, String)}
 	 * to allow the {@link SessionService} to combine and customise access rules.
 	 * 
-	 * @param sess {@link SessionService}
 	 * @param role
 	 * @return {@link BaseFilter} or null
 	 */
-	public BaseFilter<T> hasRelationFilter(SessionService<U> sess, String role, U user);
+	public BaseFilter<T> hasRelationFilter(String role, U user);
 	
 	/** Get a {@link BaseFilter} for {@link AppUser}s that are in the specified relationship with
 	 * the target object.

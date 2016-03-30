@@ -124,7 +124,7 @@ public abstract class AbstractRelationship<A extends AppUser,B extends DataObjec
 	 */
 	@SuppressWarnings("unchecked")
 	public final DataObjectItemInput<B> getInput(String role, SessionService user) {
-		return getRightFactory().getInput(hasRelationFilter(user, role));
+		return getRightFactory().getInput(hasRelationFilter(role,(A)user.getCurrentPerson()));
 	}
 	
 
@@ -210,9 +210,9 @@ public abstract class AbstractRelationship<A extends AppUser,B extends DataObjec
 	 * @see uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider#hasRelationFilter(uk.ac.ed.epcc.webapp.session.SessionService, java.lang.String)
 	 */
 	@Override
-	public final BaseFilter<B> hasRelationFilter(SessionService<A> sess, String role) {
+	public final BaseFilter<B> hasRelationFilter(String role, A user) {
 		try {
-			return getTargetFilter(sess.getCurrentPerson(), role);
+			return getTargetFilter(user, role);
 		} catch (UnknownRelationshipException e) {
 			return null;
 		}

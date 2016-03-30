@@ -98,6 +98,7 @@ import uk.ac.ed.epcc.webapp.model.data.iterator.SortingIterator;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
+import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
 
@@ -1922,10 +1923,10 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      * @param role
      * @return
      */
-    protected <R extends DataObject> BaseFilter<BDO> getRemoteReleationshipFilter(DataObjectFactory<R> remote, String field, String role){
+    protected <R extends DataObject,A extends AppUser> BaseFilter<BDO> getRemoteRelationshipFilter(DataObjectFactory<R> remote, String field, String role,A user){
     	BaseFilter<R> fil=null;
 		try {
-			fil = getContext().getService(SessionService.class).getRelationshipRoleFilter(remote, role);
+			fil = getContext().getService(SessionService.class).getTargetInRelationshipRoleFilter(remote, role,user);
 		} catch (UnknownRelationshipException e2) {
 			getLogger().error("Error making remote relationship",e2);
 		}
