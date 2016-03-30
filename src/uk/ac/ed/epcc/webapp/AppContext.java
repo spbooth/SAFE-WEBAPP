@@ -1239,6 +1239,12 @@ public final class AppContext {
 		attributes.put(key, value);
 	}
 
+	public final void clearAttributes(){
+		if( attributes != null ){
+			attributes.clear();
+		}
+		attributes=null;
+	}
 
 
 	
