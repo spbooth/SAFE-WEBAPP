@@ -1953,6 +1953,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      * @return
      */
     public SQLFilter<BDO> getFilter(BDO target){
+    	if( ! isMine(target)){
+    		throw new ConsistencyError("unexpected target "+target.getFactoryTag());
+    	}
     	return new SQLIdFilter<BDO>(getTarget(), res, target.getID());
     }
 	/**

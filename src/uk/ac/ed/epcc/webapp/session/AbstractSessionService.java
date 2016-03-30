@@ -807,7 +807,9 @@ public Set<A> withRole(String role) {
 		String store_tag="TargetFilter."+fac.getTag()+"."+person.getID()+"."+role;
 		BaseFilter<? super T> result = roles.get(store_tag);
 		if( result == null ){
-			result = makeRelationshipRoleFilter(fac,role,person);
+			result = new AndFilter<T>(fac.getTarget(),
+					fac.getDefaultRelationshipFilter(),
+					makeRelationshipRoleFilter(fac,role,person));
 			roles.put(store_tag, result);
 		}
 		return result;
@@ -851,7 +853,7 @@ public Set<A> withRole(String role) {
 				if( person == null){
 					or.addFilter(getRelationshipRoleFilter(fac2, s));
 				}else{
-					or.addFilter(getTargetInRelationshipRoleFilter(fac2, role, person));
+					or.addFilter(getTargetInRelationshipRoleFilter(fac2, s, person));
 				}
 			}
 			return or;
@@ -863,7 +865,7 @@ public Set<A> withRole(String role) {
 				if( person == null ){
 					and.addFilter(getRelationshipRoleFilter(fac2, s));
 				}else{
-					and.addFilter(getTargetInRelationshipRoleFilter(fac2, role, person));
+					and.addFilter(getTargetInRelationshipRoleFilter(fac2, s, person));
 				}
 			}
 			return and;
