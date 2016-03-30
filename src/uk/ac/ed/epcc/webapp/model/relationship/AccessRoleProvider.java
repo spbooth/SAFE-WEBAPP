@@ -21,7 +21,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
-/**  Interface for classes that provide relationship roles between the current operator (encoded in a {@link SessionService})
+/**  Interface for classes that provide relationship roles between an {@link AppUser}
  * and a target object.
  * 
  * {@link DataObjectFactory}s and {@link Composite}s should implement this interface for roles provided by
@@ -52,7 +52,7 @@ public interface AccessRoleProvider<U extends AppUser,T extends DataObject> {
 	 * @param role
 	 * @return {@link BaseFilter} or null
 	 */
-	public BaseFilter<T> hasRelationFilter(SessionService<U> sess, String role);
+	public BaseFilter<T> hasRelationFilter(SessionService<U> sess, String role, U user);
 	
 	/** Get a {@link BaseFilter} for {@link AppUser}s that are in the specified relationship with
 	 * the target object.
