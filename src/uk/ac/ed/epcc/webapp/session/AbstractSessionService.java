@@ -807,9 +807,11 @@ public Set<A> withRole(String role) {
 		String store_tag="TargetFilter."+fac.getTag()+"."+person.getID()+"."+role;
 		BaseFilter<? super T> result = roles.get(store_tag);
 		if( result == null ){
-			result = new AndFilter<T>(fac.getTarget(),
-					fac.getDefaultRelationshipFilter(),
-					makeRelationshipRoleFilter(fac,role,person));
+			// adding in the default filter breaks everything for some reason
+			//result = new AndFilter<T>(fac.getTarget(),
+			//		fac.getDefaultRelationshipFilter(),
+			//		makeRelationshipRoleFilter(fac,role,person));
+			result = makeRelationshipRoleFilter(fac,role,person);
 			roles.put(store_tag, result);
 		}
 		return result;
