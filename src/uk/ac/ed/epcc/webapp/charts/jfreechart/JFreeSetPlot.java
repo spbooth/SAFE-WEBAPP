@@ -22,6 +22,7 @@ import org.jfree.data.general.DatasetGroup;
 import org.jfree.data.general.PieDataset;
 
 import uk.ac.ed.epcc.webapp.charts.GenericSetPlot;
+import uk.ac.ed.epcc.webapp.time.Period;
 
 /**
  * @author spb
@@ -34,8 +35,8 @@ public class JFreeSetPlot extends GenericSetPlot implements PieDataset {
 	/**
 	 * @param i
 	 */
-	public JFreeSetPlot(int i) {
-		super(i);
+	public JFreeSetPlot(Period p,int i) {
+		super(p,i);
 	}
 
 	/* (non-Javadoc)

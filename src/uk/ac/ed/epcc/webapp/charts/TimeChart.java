@@ -23,10 +23,13 @@ import java.util.Date;
 import java.util.Vector;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.charts.chart2D.Chart2DTimeChartData;
+import uk.ac.ed.epcc.webapp.charts.jfreechart.JFreeTimeChartData;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
 //import uk.ac.ed.epcc.webapp.charts.jfreechart.JFreeChartData;
 import uk.ac.ed.epcc.webapp.time.CalendarFieldSplitPeriod;
 import uk.ac.ed.epcc.webapp.time.RegularSplitPeriod;
@@ -61,7 +64,7 @@ import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
 public class TimeChart<P extends PeriodSequencePlot> extends PeriodChart<P>{
 	
-
+	public static final Feature JFREE_TIMECHART_FEATURE = new Feature("chart.timechart.use_jfreechart", false, "Use JFreechart for time-charts");
 	
 
 	
@@ -193,13 +196,13 @@ public class TimeChart<P extends PeriodSequencePlot> extends PeriodChart<P>{
 	/* {{{ public TimeChart(){ */
 	private static TimeChart getInstance(AppContext c) {
 		TimeChart t = new TimeChart(c);
-		Class<? extends TimeChartData> clazz = c.getPropertyClass(TimeChartData.class, Chart2DTimeChartData.class, "TimeChartData");
 		
-		try {
-			t.setChartData(c.makeObject(clazz));
-		} catch (Exception e) {
-			c.getService(LoggerService.class).getLogger(TimeChart.class).error("Error making TimeChartData",e);
+		if( JFREE_TIMECHART_FEATURE.isEnabled(c)){
+			t.setChartData(new JFreeTimeChartData());
+		}else{
+			t.setChartData(new Chart2DTimeChartData());
 		}
+		
 		
 		return t;
 	}

@@ -17,7 +17,6 @@
 package uk.ac.ed.epcc.webapp.charts.jfreechart;
 
 import java.awt.Color;
-import java.awt.GradientPaint;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -25,17 +24,26 @@ import org.jfree.data.general.DefaultPieDataset;
 
 import uk.ac.ed.epcc.webapp.charts.GenericSetPlot;
 import uk.ac.ed.epcc.webapp.charts.PieChartData;
+import uk.ac.ed.epcc.webapp.charts.PieTimeChartData;
+import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
 
 
-public class JFreePieChartData extends JFreeChartData<GenericSetPlot> implements PieChartData<GenericSetPlot> {
+public class JFreePieChartData extends JFreeChartData<GenericSetPlot> implements PieTimeChartData<GenericSetPlot> {
 
 //	public static final Feature JFREE_3D_PIE = new Feature("jfreechat.3dpiechart", false,"Use 3D effecct on piecharts");
 	GenericSetPlot ds;
 	
+	private TimePeriod period=null;
+	public TimePeriod getPeriod() {
+		return period;
+	}
 
+	public void setPeriod(TimePeriod period) {
+		this.period = period;
+	}
 	public GenericSetPlot addPieChart(int nset) {
-		ds= new GenericSetPlot(nset);
+		ds= new GenericSetPlot(period,nset);
 		return ds;
 	}
 
@@ -72,7 +80,7 @@ public class JFreePieChartData extends JFreeChartData<GenericSetPlot> implements
 	}
 
 	public GenericSetPlot makeDataSet(int i) {
-		return new GenericSetPlot(i);
+		return new GenericSetPlot(period,i);
 	}
 
 	public GenericSetPlot addPieChart(int nset, Color[] custom_colours) {

@@ -22,9 +22,12 @@ import java.util.List;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.charts.chart2D.PieChart2DChartData;
+import uk.ac.ed.epcc.webapp.charts.jfreechart.JFreePieChartData;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.content.InvalidArgument;
 /** A basic piechart where the data comes from a Table or Map
  * 
@@ -33,6 +36,7 @@ import uk.ac.ed.epcc.webapp.content.InvalidArgument;
  */
 
 public class PieChart extends Chart {
+	public static final Feature JFREE_PIE_FEATURE = new Preference("chart.piechart.use_jfreechart", false, "Use JFreechart for pie charts");
 	protected PieChart(AppContext conn) {
 		super(conn);
 	}
@@ -97,14 +101,11 @@ public class PieChart extends Chart {
 	}
 	public static  PieChart getInstance(AppContext c) {
 		PieChart ptc = new PieChart(c);
-		Class<? extends PieChartData> clazz = c.getPropertyClass(PieChartData.class, PieChart2DChartData.class, "PieChartData");
-		
-		try {
-			ptc.setChartData(c.makeObject(clazz));
-		} catch (Exception e) {
-			c.getService(LoggerService.class).getLogger(PieChart.class).error("Error making TimeChartData",e);
+		if( JFREE_PIE_FEATURE.isEnabled(c)){
+			ptc.setChartData(new JFreePieChartData());
+		}else{
+			ptc.setChartData(new PieChart2DChartData());
 		}
-		
 		return ptc;
 	}
 }

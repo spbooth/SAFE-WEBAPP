@@ -24,8 +24,11 @@ import java.awt.Color;
 import java.util.Calendar;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.charts.chart2D.PieChart2DChartData;
+import uk.ac.ed.epcc.webapp.charts.jfreechart.JFreePieChartData;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
 //import uk.ac.ed.epcc.webapp.charts.jfreechart.JFreePieChartData;
 import uk.ac.ed.epcc.webapp.time.Period;
 
@@ -41,6 +44,9 @@ import uk.ac.ed.epcc.webapp.time.Period;
 
 
 public final class PieTimeChart<P extends PeriodSetPlot> extends SetPeriodChart<P> {
+	public static final Feature JFREE_PIE_TIMECHART_FEATURE = new Preference("chart.pie_timechart.use_jfreechart", false, "Use JFreechart for pie-time-charts");
+	
+
 	private P plot=null;
 	/*
 	 * (non-Javadoc)
@@ -64,18 +70,14 @@ public final class PieTimeChart<P extends PeriodSetPlot> extends SetPeriodChart<
 
 	public static  PieTimeChart getInstance(AppContext c, Period p) {
 		PieTimeChart ptc = new PieTimeChart(c,p);
-		Class<? extends PieTimeChartData> clazz = c.getPropertyClass(PieTimeChartData.class, PieChart2DChartData.class, "PieTimeChartData");
-		PieTimeChartData chart2;
-		try {
-			chart2 = c.makeObject(clazz);
-			chart2.setPeriod(p);
-			ptc.setChartData(chart2);
-		} catch (Exception e) {
-			c.getService(LoggerService.class).getLogger(PieTimeChart.class).error("Error making chart data",e);
-			return null;
+		PieTimeChartData chart;
+		if(JFREE_PIE_TIMECHART_FEATURE.isEnabled(c)){
+			chart = new JFreePieChartData();
+		}else{
+			chart = new PieChart2DChartData();
 		}
-		
-		
+		chart.setPeriod(p);
+		ptc.setChartData(chart);
 		return ptc;
 	}
 
