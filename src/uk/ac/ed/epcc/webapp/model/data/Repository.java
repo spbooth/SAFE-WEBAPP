@@ -1731,7 +1731,7 @@ public final class Repository {
     /** is it OK to store a null value in a Record */
 	private boolean allow_null_value = true;
 	/** is it ok to allow html in DB fields */
-	private boolean allow_html = false;
+	private boolean allow_html = true;
 
 	/**
 	 * default number of milliseconds per tick when using an integer type to
@@ -2424,7 +2424,7 @@ public final class Repository {
 				String field =  it.next();
 				FieldInfo info = getInfo(field);
                 // as this is an insert we should skip null fields and allow the database default to
-				// take precidence
+				// take precedence
 				if( r.get(field) != null){
 					if (atleastone) {
 						query.append(", ");
@@ -2994,7 +2994,7 @@ public final class Repository {
 		if (r == null) {
 			try{
 				r = new Repository(c, tag);
-				r.setAllowHtml( c.getBooleanParameter("allow_html."+tag, false));
+				r.setAllowHtml( c.getBooleanParameter("allow_html."+tag, true));
 				c.setAttribute(key, r);
 			}catch(Exception e){
 				c.error(e,"Error making repository");

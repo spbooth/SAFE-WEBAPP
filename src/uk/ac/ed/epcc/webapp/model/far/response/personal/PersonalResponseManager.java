@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.model.far.response.personal;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -24,8 +25,10 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
+import uk.ac.ed.epcc.webapp.model.far.response.CompleteVisitor;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseTransitionProvider;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -43,15 +46,15 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 	/**
 	 * 
 	 */
-	private static final String RESPONSE_TAG = "Response";
+	protected static final String RESPONSE_TAG = "Response";
 	/**
 	 * 
 	 */
-	private static final String PART_TAG = "Part";
+	protected static final String PART_TAG = "Part";
 	/**
 	 * 
 	 */
-	private static final String SUBMITTER_ID = "SubmitterID";
+	protected static final String SUBMITTER_ID = "SubmitterID";
 
 	public static class PersonalResponse<D extends DynamicForm> extends ResponseManager.Response<D>{
 
@@ -78,6 +81,10 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 			return isSubmitter(sess);
 		}
 		
+		public String getDescriptor() {
+			return "";
+		}
+		
 		public boolean isSubmitter(SessionService<?> sess){
 			return sess.getCurrentPerson().getID() == record.getIntProperty(SUBMITTER_ID);
 		}
@@ -87,6 +94,22 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 		public AppUser getPerson() throws DataException{
 			return (AppUser) getContext().getService(SessionService.class).getLoginFactory().find(record.getIntProperty(SUBMITTER_ID));
 		}
+		
+		@Override
+		public MessageResult submit() throws Exception {
+			return new MessageResult("personal_response_created");
+		}
+
+		@Override
+		public boolean validate() throws DataException {
+			CompleteVisitor<D, PersonalResponse<D>> vis = new CompleteVisitor<D, PersonalResponse<D>>(this);
+			return vis.visitForm(this.getForm());
+		}
+		
+		@Override
+		public ByteArrayMimeStreamData getPDFStream() throws DataException {
+			return null;
+		}
 	}
 	/**
 	 * @param conn 
@@ -95,9 +118,13 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 	 */
 	@SuppressWarnings("unchecked")
 	public PersonalResponseManager(AppContext conn, String tag) throws Exception {
-		super(conn.makeContexedObject(DynamicFormManager.class, conn.getInitParameter("form_manager."+tag)),tag);
+		super(conn.makeContexedObject(DynamicFormManager.class, conn.getInitParameter("form_manager.Forms")),tag);
 	}
 
+	public PersonalResponseManager(DynamicFormManager<D> manager, String tag) {
+		super(manager, tag);
+	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */
@@ -126,6 +153,8 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 		return result;
 	}
 
+	
+	
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c,
 			String table) {
@@ -150,7 +179,7 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 		if( tag.equals(PART_TAG)){
 			return getPathResponseProvider();
 		}else if ( tag.equals(RESPONSE_TAG)){
-			return getPersonalResponseManager();
+			return getPersonalResponseTransitionProvider();
 		}
 		return null;
 	}
@@ -159,7 +188,7 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 	 * @param tag
 	 * @return
 	 */
-	public PersonalResponseTransitionProvider getPersonalResponseManager() {
+	public PersonalResponseTransitionProvider getPersonalResponseTransitionProvider() {
 		return new PersonalResponseTransitionProvider(getTag()+TransitionFactoryCreator.TYPE_SEPERATOR+RESPONSE_TAG, this);
 	}
 

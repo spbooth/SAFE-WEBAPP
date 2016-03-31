@@ -43,7 +43,9 @@ public class EditSectionVisitor<X extends ContentBuilder> extends ContentVisitor
 		if( prov != null && response.canEdit(sess) ){
 			// go straight to edit transition from page view
 			ContentBuilder buttons =  builder.getPanel("action_buttons");
-			buttons.addButton(s.getContext(), "Edit", prov.new EditResult(new ResponseTarget(response, s)));
+			if (!s.isReadOnly()) {
+				buttons.addButton(s.getContext(), "Edit", prov.new EditResult(new ResponseTarget(response, s)));
+			}
 			buttons.addParent();
 		}
 		return builder;

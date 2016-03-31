@@ -14,15 +14,6 @@
 package uk.ac.ed.epcc.webapp.model.far.response;
 
 import java.util.Date;
-
-
-
-
-
-
-
-
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
@@ -123,7 +114,11 @@ public abstract class ResponseDataManager<D extends ResponseDataManager.Response
 				ExtendedXMLBuilder answer = builder.getSpan();
 				Object dat = getData();
 				Input input = getQuestion().getInput();
-				answer.clean(input.getPrettyString(dat));
+				String ans = input.getPrettyString(dat);
+				if (ans.equals("no value") || ans == null) {
+					ans = "n/a";
+				}
+				answer.clean(ans);
 				answer.appendParent();
 			}catch(Exception e){
 				getLogger().error("Problem generating content",e);

@@ -15,8 +15,10 @@ package uk.ac.ed.epcc.webapp.model.far.response;
 
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.Control;
+import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.content.Label;
 import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.content.XMLPrinter;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
 import uk.ac.ed.epcc.webapp.model.far.SectionManager.Section;
@@ -56,6 +58,10 @@ public class SectionEditVisitor<X extends ContentBuilder> extends ContentVisitor
 	public <C extends ContentBuilder> C visitSection(C builder, Section s)
 			throws Exception {
 		super.visitSection(builder, s);
+		XMLPrinter raw = s.getSectionRawHtml();
+		if( raw != null && builder instanceof HtmlBuilder){
+			((HtmlBuilder)builder).append(raw);
+		}
 		if( target.equals(s)){
 			builder.addActionButtons(f);
 		}

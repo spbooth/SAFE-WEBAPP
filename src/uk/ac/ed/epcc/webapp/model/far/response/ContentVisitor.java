@@ -17,10 +17,8 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
-import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.far.PageManager;
@@ -76,7 +74,7 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 	}
 	public <C extends ContentBuilder> C visitSection(C builder, Section s) throws Exception{
 		
-		builder.addHeading(3, "Section "+s.getName());
+		builder.addHeading(3, "Section: " + s.getName());
 		builder.addText(s.getSectionText());
 		QuestionManager manager = (QuestionManager)((SectionManager) s.getFactory()).getChildManager();
 		t = new Table<String, Question>();

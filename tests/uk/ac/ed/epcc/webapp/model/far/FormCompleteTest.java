@@ -59,7 +59,7 @@ public class FormCompleteTest<D extends DynamicForm,R extends PersonalResponseMa
 		D form = form_manager.findFromString("FirstForm");
 		
 		PersonalResponseManager<R, D> response_manager = new PersonalResponseManager<R,D>(getContext(),"TestResponse" );
-		PersonalResponseTransitionProvider provider = response_manager.getPersonalResponseManager();
+		PersonalResponseTransitionProvider provider = response_manager.getPersonalResponseTransitionProvider();
 		
 		takeBaseline();
 		setTransition(provider, PersonalResponseTransitionProvider.CREATE, null);

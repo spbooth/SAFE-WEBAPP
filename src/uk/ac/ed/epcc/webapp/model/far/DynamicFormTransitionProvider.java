@@ -16,8 +16,6 @@ package uk.ac.ed.epcc.webapp.model.far;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.apache.batik.parser.PathParser;
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.Table;
@@ -28,21 +26,19 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnusedNameInput;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
-import uk.ac.ed.epcc.webapp.forms.result.CustomPageResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractTargetLessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraTargetLessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.forms.CreateTransition;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
-import uk.ac.ed.epcc.webapp.model.far.PartManager.Part;
-import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+
 
 /** {@link TransitionProvider} for manipulating {@link DynamicForm} objects.
  * 
@@ -90,7 +86,31 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 
 		@Override
 		public boolean allow(DynamicForm target, SessionService<?> sess) {
-			return target != null && target.canEdit(sess) && ! target.isFrozen();
+			return target != null && target.canEdit(sess) && ! target.isActive();
+		}
+	};
+	
+	public final DynamicFormTransitionKey<T> RENEW = new DynamicFormTransitionKey<T>("Renew","Change the form status to New") {
+
+		@Override
+		public boolean allow(DynamicForm target, SessionService<?> sess) {
+			return target != null && target.canView(sess) && target.isActive();
+		}
+	};
+	
+	public final DynamicFormTransitionKey<T> ACTIVATE = new DynamicFormTransitionKey<T>("Activate","Change the form status to Active") {
+
+		@Override
+		public boolean allow(DynamicForm target, SessionService<?> sess) {
+			return target != null && target.canView(sess) && (target.isNew() || target.isRetired());
+		}
+	};
+	
+	public final DynamicFormTransitionKey<T> RETIRE = new DynamicFormTransitionKey<T>("Retire","Change the form status to Retire") {
+
+		@Override
+		public boolean allow(DynamicForm target, SessionService<?> sess) {
+			return target != null && target.canView(sess) && target.isActive();
 		}
 	};
 	
@@ -144,15 +164,41 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 		public <X extends ContentBuilder> X getExtraHtml(X cb,
 				SessionService<?> op, T target) {
 			try{
-				cb.addHeading(2, "Active Dynamic Forms");
-				LinkedList<Linker> list = new LinkedList<Linker>();
-				for(T f : manager.getActive()){
-					list.add(new Linker(f));
+				
+				
+				cb.addHeading(2, manager.getTag() + " List");
+				
+				cb.addHeading(3, "New");
+				LinkedList<Linker> new_list = new LinkedList<Linker>();
+				for(T f : manager.getNew()){
+					new_list.add(new Linker(f));
 				}
-				if( list.size() > 0){
-					cb.addList(list);
+				if( new_list.size() > 0){
+					cb.addList(new_list);
 				}else{
-					cb.addText("No active dynamic forms");
+					cb.addText("No new forms");
+				}
+				
+				cb.addHeading(3, "Active");
+				LinkedList<Linker> active_list = new LinkedList<Linker>();
+				for(T f : manager.getActive()){
+					active_list.add(new Linker(f));
+				}
+				if( active_list.size() > 0){
+					cb.addList(active_list);
+				}else{
+					cb.addText("No active forms");
+				}
+				
+				cb.addHeading(3, "Retired");
+				LinkedList<Linker> retired_list = new LinkedList<Linker>();
+				for(T f : manager.getRetired()){
+					retired_list.add(new Linker(f));
+				}
+				if( retired_list.size() > 0){
+					cb.addList(retired_list);
+				}else{
+					cb.addText("No retired forms");
 				}
 			}catch(Exception e){
 				getLogger().error("Exception making index",e);
@@ -186,6 +232,10 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 		addTransition(CREATE, new Creator());
 		addTransition(INDEX, new IndexTransition());
 		addTransition(ADD, new CreateChildTransition());
+		
+		addTransition(RENEW, new RenewTransition());
+		addTransition(ACTIVATE, new ActivateTransition());
+		addTransition(RETIRE, new RetireTransition());
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#canView(java.lang.Object, uk.ac.ed.epcc.webapp.session.SessionService)
@@ -195,7 +245,7 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 		if( target == null ){
 			return manager.canEdit(sess);
 		}
-		return target.canEdit(sess);
+		return target.canView(sess);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#getTargetName()
@@ -253,7 +303,7 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 	@Override
 	public <X extends ContentBuilder> X getTopContent(X cb, T target,
 			SessionService<?> sess) {
-		cb.addLink(getContext(), "Active form list", new ChainedTransitionResult<T, DynamicFormTransitionKey<T>>(this, null, INDEX));
+		cb.addLink(getContext(), manager.getTag() + " List", new ChainedTransitionResult<T, DynamicFormTransitionKey<T>>(this, null, INDEX));
 		return cb;
 	}
 	/* (non-Javadoc)
@@ -267,15 +317,19 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 	public <X extends ContentBuilder> X getLogContent(X cb, T target,
 			SessionService<?> sess) {
 		cb.addHeading(2, target.getName());
+		
+		DynamicFormManager<T> tm = manager;
+		
 		PartManager pm = manager.getChildManager();
 		if( pm != null ){
-			
-			
 			try {
 				Table t = pm.getPartTable(target);
 				if( t.hasData()){
+					AppContext c = getContext();
+										
 					cb.addHeading(3,"Form pages");
-					cb.addTable(getContext(), t);
+					cb.addTable(c, t);
+								
 				}else{
 					cb.addText("No content");
 				}
@@ -283,9 +337,65 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 				getLogger().error("Error getting child table",e);
 			}
 		}
+		
+		
 		return cb;
 	}
 	
 	
-
+	
+	
+    public class RenewTransition extends AbstractDirectTransition<T>{
+		
+		@Override
+		public FormResult doTransition(T target, AppContext c) 
+				throws TransitionException {
+			
+			try {
+				return target.renew();
+			} catch (Exception e) {
+				getLogger().error("Error doing renew transition",e);
+				throw new TransitionException("Internal error");
+			}
+			
+		}
+		
+	}
+    
+    
+    public class ActivateTransition extends AbstractDirectTransition<T>{
+		
+		@Override
+		public FormResult doTransition(T target, AppContext c) 
+				throws TransitionException {
+			
+			try {
+				return target.activate();
+			} catch (Exception e) {
+				getLogger().error("Error doing activate transition",e);
+				throw new TransitionException("Internal error");
+			}
+	
+		}
+	
+	}
+        
+    
+    public class RetireTransition extends AbstractDirectTransition<T>{
+		
+		@Override
+		public FormResult doTransition(T target, AppContext c) 
+				throws TransitionException {
+			
+			try {
+				return target.retire();
+			} catch (Exception e) {
+				getLogger().error("Error doing retire transition",e);
+				throw new TransitionException("Internal error");
+			}
+			
+		}
+	
+	}
+        
 }

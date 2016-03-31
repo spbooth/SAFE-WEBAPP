@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -28,13 +29,10 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager;
-import uk.ac.ed.epcc.webapp.model.far.PartManager.Part;
 import uk.ac.ed.epcc.webapp.model.far.AbstractPartTransitionProvider;
-import uk.ac.ed.epcc.webapp.model.far.PartOwner;
-import uk.ac.ed.epcc.webapp.model.far.QuestionManager;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
 import uk.ac.ed.epcc.webapp.model.far.handler.QuestionFormHandler;
@@ -100,6 +98,14 @@ public abstract class ResponseManager<R extends ResponseManager.Response<F>,F ex
 		
 		public abstract boolean canEdit(SessionService<?> sess);
 		
+		public abstract String getDescriptor();
+		
+		public abstract MessageResult submit() throws Exception;
+		
+		public abstract boolean validate() throws DataException;
+		
+		public abstract ByteArrayMimeStreamData getPDFStream() throws DataException;
+				
 	}
 
 	public <T> T  getData(Question q, R response) throws Exception{
@@ -168,7 +174,7 @@ public abstract class ResponseManager<R extends ResponseManager.Response<F>,F ex
 	public SQLFilter<R> getFormFilter(F form){
 		return new ReferenceFilter<R, F>(this, FORM_ID, form);
 	}
-
+	
 	public <T> ServeDataResult getServeResult(ResponseData<T, R,F> wrapper) throws DataException{
 		LinkedList<String> args = new LinkedList<String>();
 		R response = wrapper.getResponse();

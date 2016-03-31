@@ -43,7 +43,7 @@ public class ResponseTransitionKey<D extends DynamicForm, R extends Response<D>>
 	}
 	
 	public boolean allow(ResponseTarget<D, R> target, SessionService<?> sess){
-		return target.getResponse().canEdit(sess);
+		return target.getResponse().canView(sess);
 	}
 
 }

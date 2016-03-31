@@ -13,7 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -22,7 +21,6 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.Button;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
-import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
@@ -36,11 +34,9 @@ import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.PathTransitionProvider;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
 import uk.ac.ed.epcc.webapp.model.far.PartManager.Part;
 import uk.ac.ed.epcc.webapp.model.far.handler.PartConfigFactory;
@@ -69,7 +65,7 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 				return false;
 			}
 			DynamicForm f = target.getForm();
-			if( f.canEdit(sess)  && ! f.isFrozen()){
+			if( f.canEdit(sess)  && ! f.isActive()){
 				if( target.getFactory().getChildManager() == null ){
 					// bottom factory of the stack.
 					return false;
@@ -91,7 +87,7 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 		}
 		
 	};
-	/** A {@link PartTransitionKey} for edit operations on {@link Part}s of an unfrozen {@link DynamicForm}.
+	/** A {@link PartTransitionKey} for edit operations on {@link Part}s of a new {@link DynamicForm}.
 	 * @author spb
 	 *
 	 */
@@ -110,7 +106,7 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 				return false;
 			}
 			DynamicForm f = target.getForm();
-			if( f.canEdit(sess)  && ! f.isFrozen()){
+			if( f.canEdit(sess)  && ! f.isActive()){
 				return true;
 			}
 			return false;

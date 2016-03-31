@@ -28,7 +28,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  * @param <N> type of result object
  * 
  */
-public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N> implements UnitInput, RangedInput<N> {
+public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N> implements LabelInput, UnitInput, RangedInput<N> {
 	
 
 	private Number min = null;
@@ -39,6 +39,7 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 	private Number step = null;
 	
 	private String unit = null;
+	private String label = null;
 
 	protected NumberFormat nf = null;
 	public NumberInput(){
@@ -48,6 +49,15 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 		setBoxWidth(32);
 	}
 
+	/**
+	 * return unit this field is in.
+	 * 
+	 * @return String the label describing this input or null if not defined
+	 */
+	public String getLabel() {
+		return label;
+	}
+	
 	/**
 	 * return unit this field is in.
 	 * 
@@ -110,6 +120,19 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 		return old;
 	}
 
+	/**
+	 * set the units for the field
+	 * 
+	 * @param l
+	 *            String describing input to use
+	 * @return previous label value
+	 */
+	public String setLabel(String l) {
+		String old = label;
+		label = l;
+		return old;
+	}
+	
 	/**
 	 * set the units for the field
 	 * 

@@ -13,7 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far.response;
 
-import java.awt.print.PageFormat;
 import java.util.LinkedList;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -29,15 +28,13 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.CustomFormContent;
-import uk.ac.ed.epcc.webapp.forms.transition.ExtraFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
-import uk.ac.ed.epcc.webapp.jdbc.table.ViewTableResult;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.far.AbstractPartTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.far.PageManager;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
 import uk.ac.ed.epcc.webapp.model.far.PageManager.Page;
-import uk.ac.ed.epcc.webapp.model.far.PartManager;
 import uk.ac.ed.epcc.webapp.model.far.PartManager.Part;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
@@ -111,6 +108,25 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 		}
 		
 	};
+	
+	public final ResponseTransitionKey<D, R> SUBMIT = new ResponseTransitionKey<D, R>("Submit", "Submit form response"){
+
+		@Override
+		public boolean allow(ResponseTarget<D, R> target, SessionService<?> sess) {
+			try {
+				R rsp = target.getResponse();
+				return super.allow(target, sess) && (target.getSibling(true) == null) && rsp.validate() && rsp.canEdit(sess);
+			} catch (DataFault e) {
+				getLogger().error("Problem in allow", e);
+				return false;
+			} catch (DataException e) {
+				getLogger().error("Problem in allow", e);
+				return false;
+			}
+		}
+		
+	};
+	
 	public class EditSectionTransition extends AbstractFormTransition<ResponseTarget<D, R>> implements CustomFormContent<ResponseTarget<D,R>>, FormTransition<ResponseTarget<D,R>>{
 
 		public class CancelAction extends FormAction{
@@ -253,8 +269,6 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 	}
 	public class ParentTransition extends AbstractDirectTransition<ResponseTarget<D,R>>{
 		
-
-
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
 		 */
@@ -264,6 +278,30 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 				return new ViewResult(target.getParent());
 		}	
 	}
+	
+	public class SubmitTransition extends AbstractDirectTransition<ResponseTarget<D,R>>{
+		
+		public SubmitTransition() {
+			super();
+		}
+		
+				
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
+		 */
+		@Override
+		public FormResult doTransition(ResponseTarget<D, R> target, AppContext c) 
+				throws TransitionException {
+			
+			try {
+				return target.getResponse().submit();
+			} catch (Exception e) {
+				getLogger().error("Error doing submission transition",e);
+				throw new TransitionException("Internal error");
+			}
+		}	
+	}
+	
 	public ResponseTransitionProvider(String target_name,ResponseManager<R,D> manager){
 		super(target_name,manager.getManager());
 		this.manager=manager;
@@ -271,6 +309,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 		addTransition(UP, new ParentTransition());
 		addTransition(EDIT, new EditSectionTransition());
 		addTransition(NEXT, new SiblingTransition(true));
+		addTransition(SUBMIT, new SubmitTransition());
 	}
 
 	
@@ -336,7 +375,8 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 	public <X extends ContentBuilder> X getLogContent(X cb,
 			ResponseTarget<D, R> target, SessionService<?> sess) {
 		Part p = target.getPart();
-		cb.addHeading(2, p.getTypeName()+": "+p.getName());
+		cb.addHeading(2, target.getResponse().getDescriptor());
+		cb.addHeading(2, p.getTypeName() + ": " + p.getName());
 		EditSectionVisitor<X> vis = new EditSectionVisitor<X>(cb, sess,p instanceof Page ? this: null,target.getResponse());
 		target.getPart().visit(vis);		
 		return cb;

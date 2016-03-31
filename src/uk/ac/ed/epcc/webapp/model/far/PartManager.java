@@ -145,8 +145,34 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 			return getOwner().getForm();
 		}
 		public String getName(){
+			return getRawName();
+		}
+		public String getRawName(){
 			return record.getStringProperty(NAME_FIELD,manager.getPartTag()+Integer.toString(getID()));
 		}
+		
+		public String getSpacedName() {
+			String name = "";
+			String name_parts[] = getRawName().split("(?=[A-Z])");
+			boolean single_capitals = false;
+			for (int i = 0; i < name_parts.length; i++) {
+				if (name_parts[i].length() == 1) {
+					if (single_capitals) {
+						name += name_parts[i];
+					}
+					else {
+						single_capitals = true;
+						name += " " + name_parts[i];
+					}
+				}
+				else {
+					single_capitals = false;
+					name += " " + name_parts[i];
+				}
+		    }
+			return name;
+		}
+		
 		public abstract String getTypeName();
 		@Override
 		public ContentBuilder addContent(ContentBuilder builder) {

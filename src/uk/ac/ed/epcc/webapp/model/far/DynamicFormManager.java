@@ -18,13 +18,15 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.ParseFactory;
 import uk.ac.ed.epcc.webapp.model.data.BasicType;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -32,6 +34,7 @@ import uk.ac.ed.epcc.webapp.model.data.FilterResult;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
+import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.Status.Value;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** Each {@link DynamicForm} instance represents a single version of
@@ -55,7 +58,7 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 		/**
 		 * @param field
 		 */
-		protected Status() {
+		public Status() {
 			super("Status");
 		}
 
@@ -66,22 +69,25 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 			 * @param tag
 			 * @param name
 			 */
-			protected Value(String tag, String name) {
+			public Value(String tag, String name) {
 				super(Status.this, tag, name);
 			}
 			
 		}
 	}
 	private static final Status status=new Status();
-	private static final Status.Value COMPOSE = status.new Value("C","Compose");
-	private static final Status.Value FROZEN = status.new Value("F","Frozen");
+	private static final Status.Value NEW = status.new Value("N","New");
+	private static final Status.Value ACTIVE = status.new Value("A","Active");
 	private static final Status.Value RETIRED = status.new Value("R","Retired");
+	
+		
 	public static final String NAME_FIELD = "Name";
+	
 	
 	public static final String PART_TAG = "Part";
 	public static final String  FORM_TAG = "Form";
 	
-	public class DynamicForm extends PartOwner{
+	public static class DynamicForm extends PartOwner{
 		private final DynamicFormManager manager;
 		/**
 		 * @param r
@@ -102,19 +108,73 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 			return manager;
 		}
 		
+		
 		public String getName(){
 			return record.getStringProperty(NAME_FIELD);
 		}
+		
 		public boolean canEdit(SessionService<?> sess){
-			return DynamicFormManager.this.canEdit(sess);
+			return manager.canEdit(sess) && isNew();
 		}
 		public boolean canView(SessionService<?> sess){
-			return DynamicFormManager.this.canEdit(sess);
+			return manager.canEdit(sess);
 		}
-		public boolean isFrozen(){
-			return record.getProperty(status) != COMPOSE;
+		public boolean isNew(){
+			return record.getProperty(status) == NEW;
 		}
-
+		public boolean isActive(){
+			return record.getProperty(status) == ACTIVE;
+		}
+		public boolean isRetired(){
+			return record.getProperty(status) == RETIRED;
+		}
+		
+		
+		public Value getStatus(){
+			return record.getProperty(status);
+		}
+		public void setStatus(Status.Value val){
+			record.setProperty(status, val);
+		}
+		
+		
+		public MessageResult renew() throws Exception {
+			MessageResult msg = new MessageResult("form_renewal_failed");
+			
+			if (isActive()) {
+				setStatus(NEW);
+				commit();
+				msg = new MessageResult("form_renewed");
+			}
+			
+			return msg;
+		}
+		
+		public MessageResult activate() throws Exception {
+			MessageResult msg = new MessageResult("form_activation_failed");
+			
+			if (isNew() || isRetired()) {
+				setStatus(ACTIVE);
+				commit();
+				msg = new MessageResult("form_activated");
+			}
+			
+			return msg;		
+		}
+		
+		public MessageResult retire() throws Exception {
+			MessageResult msg = new MessageResult("form_retiral_failed");
+			
+			if (isActive()) {
+				setStatus(RETIRED);
+				commit();
+				msg = new MessageResult("form_retired");
+			}
+			
+			return msg;
+		}
+		
+		
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.far.PartOwner#getViewResult()
 		 */
@@ -143,7 +203,7 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 	public Class getTarget(){
 		return DynamicForm.class;
 	}
-
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.far.PartOwnerFactory#getChildManager()
@@ -173,7 +233,8 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 			String table) {
 		TableSpecification spec = new TableSpecification("FormID");
 		spec.setField(NAME_FIELD, new StringFieldType(false, null, 64));
-		spec.setField(status.getField(), status.getFieldType(COMPOSE));
+		
+		spec.setField(status.getField(), status.getFieldType(NEW));
 		try {
 			spec.new Index("NameIndex", true, NAME_FIELD);
 		} catch (InvalidArgument e) {
@@ -197,16 +258,35 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 	public SQLValueFilter<F> getNameFilter(String name) {
 		return new SQLValueFilter<F>(getTarget(), res, NAME_FIELD, name);
 	}
-	public FilterResult<F> getActive() throws DataFault{
-		return new FilterSet(status.getExcludeFilter(this, RETIRED));
+	
+	public FilterResult<F> getNew() throws DataFault{
+		return new FilterSet(getNewFilter());
 	}
+	public SQLFilter<F> getNewFilter() {
+		return status.getSQLFilter(this, NEW);
+	}
+	
+	public FilterResult<F> getActive() throws DataFault{
+		return new FilterSet(getActiveFilter());
+	}
+	public BaseFilter<F> getActiveFilter() {
+		return status.getSQLFilter(this, ACTIVE);
+	}
+	
+	public FilterResult<F> getRetired() throws DataFault{
+		return new FilterSet(getRetiredFilter());
+	}
+	public SQLFilter<F> getRetiredFilter() {
+		return status.getSQLFilter(this, RETIRED);
+	}
+	
 	/** Is the specified person allowed to perform targetless operations.
 	 * 
 	 * @param sess
 	 * @return
 	 */
 	public boolean canEdit(SessionService<?> sess){
-		return sess.hasRole(SessionService.ADMIN_ROLE);
+		return sess.hasRole(SessionService.ADMIN_ROLE);			
 	}
 
 	@Override

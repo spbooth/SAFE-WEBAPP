@@ -17,12 +17,13 @@ import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
+
 /** A {@link TransitionKey} used by {@link DynamicFormTransitionProvider}
  * @author spb
  *
  */
 
-public abstract class DynamicFormTransitionKey<T extends DynamicForm> extends TransitionKey<T> {
+public class DynamicFormTransitionKey<T extends DynamicForm> extends TransitionKey<T> {
 
 	/**
 	 * @param name
@@ -46,5 +47,8 @@ public abstract class DynamicFormTransitionKey<T extends DynamicForm> extends Tr
 	 * @param sess
 	 * @return
 	 */
-	public abstract boolean allow(DynamicForm target, SessionService<?> sess);
+	public boolean allow(DynamicForm target, SessionService<?> sess) { 
+		return true;
+	}
+	
 }
