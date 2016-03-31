@@ -16,7 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.charts.jfreechart;
 
-import java.awt.Color;
 import java.awt.Font;
 
 import org.jfree.chart.ChartFactory;
@@ -26,12 +25,9 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultPieDataset;
 
 import uk.ac.ed.epcc.webapp.charts.BarTimeChartData;
 import uk.ac.ed.epcc.webapp.charts.GenericSetPlot;
-import uk.ac.ed.epcc.webapp.charts.PieChartData;
-import uk.ac.ed.epcc.webapp.charts.PieTimeChartData;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
 
@@ -76,6 +72,7 @@ public class JFreeBarTimeChartData extends JFreeChartData<GenericSetPlot> implem
 		Font tickLabelFont = axis.getTickLabelFont();
 		axis.setTickLabelFont(tickLabelFont.deriveFont(tickLabelFont.getSize()-4.0F));
 		Font labelFont = axis.getLabelFont();
+		axis.setMaximumCategoryLabelLines(3);
 		//axis.setLabelFont(labelFont.d);
 		// axis.setLabel("Pingu"); This works so we can modify
 			
@@ -102,10 +99,6 @@ public class JFreeBarTimeChartData extends JFreeChartData<GenericSetPlot> implem
 		return new GenericSetPlot(period,i);
 	}
 
-	public GenericSetPlot addBarChart(int nset, Color[] custom_colours) {
-		// TODO support colors
-		return addBarChart(nset);
-	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.charts.BarTimeChartData#addBarChart(int)

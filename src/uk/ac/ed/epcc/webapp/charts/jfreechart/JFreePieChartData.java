@@ -17,9 +17,11 @@
 package uk.ac.ed.epcc.webapp.charts.jfreechart;
 
 import java.awt.Color;
+import java.util.LinkedList;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PiePlot;
 import org.jfree.data.general.DefaultPieDataset;
 
 import uk.ac.ed.epcc.webapp.charts.GenericSetPlot;
@@ -33,7 +35,7 @@ public class JFreePieChartData extends JFreeChartData<GenericSetPlot> implements
 
 //	public static final Feature JFREE_3D_PIE = new Feature("jfreechat.3dpiechart", false,"Use 3D effecct on piecharts");
 	GenericSetPlot ds;
-	
+	LinkedList<Color> colours=new LinkedList<Color>();
 	private TimePeriod period=null;
 	public TimePeriod getPeriod() {
 		return period;
@@ -58,7 +60,16 @@ public class JFreePieChartData extends JFreeChartData<GenericSetPlot> implements
 				pieDataset, // Dataset
 				true // Show legend
 				, false, false);
-		
+		if(! colours.isEmpty()){
+			String legends[] = ds.getLegends();
+			PiePlot plot = (PiePlot) chart.getPlot();
+			for (int i = 0; i < ds.getNumSets(); i++) {
+				if (legends != null && legends.length > i && colours.size() > i) {
+					Color c = colours.get(i);
+					plot.setSectionPaint(legends[i], c);
+				}
+			}
+		}
 			
 		return chart;
 
@@ -84,7 +95,9 @@ public class JFreePieChartData extends JFreeChartData<GenericSetPlot> implements
 	}
 
 	public GenericSetPlot addPieChart(int nset, Color[] custom_colours) {
-		// TODO support colors
+		for(Color c : custom_colours){
+			colours.add(c);
+		}
 		return addPieChart(nset);
 	}
 
