@@ -21,8 +21,13 @@ import java.util.LinkedList;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.labels.PieSectionLabelGenerator;
+import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.PiePlot;
+import org.jfree.chart.title.LegendTitle;
 import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.ui.RectangleEdge;
+import org.jfree.util.SortOrder;
 
 import uk.ac.ed.epcc.webapp.charts.GenericSetPlot;
 import uk.ac.ed.epcc.webapp.charts.PieChartData;
@@ -56,13 +61,22 @@ public class JFreePieChartData extends JFreeChartData<GenericSetPlot> implements
 
 		
 	
-		JFreeChart chart = ChartFactory.createPieChart(quantity, // Title
+		JFreeChart chart = ChartFactory.createPieChart(title, // Title
 				pieDataset, // Dataset
 				true // Show legend
 				, false, false);
+		PiePlot plot = (PiePlot) chart.getPlot();
+		
+		StandardPieSectionLabelGenerator gen = new StandardPieSectionLabelGenerator("{0} ({2})");
+		
+		plot.setLabelGenerator(gen);
+		
+		LegendTitle leg = chart.getLegend();
+		
+		leg.setPosition(RectangleEdge.RIGHT);
 		if(! colours.isEmpty()){
 			String legends[] = ds.getLegends();
-			PiePlot plot = (PiePlot) chart.getPlot();
+			
 			for (int i = 0; i < ds.getNumSets(); i++) {
 				if (legends != null && legends.length > i && colours.size() > i) {
 					Color c = colours.get(i);
@@ -95,8 +109,10 @@ public class JFreePieChartData extends JFreeChartData<GenericSetPlot> implements
 	}
 
 	public GenericSetPlot addPieChart(int nset, Color[] custom_colours) {
-		for(Color c : custom_colours){
-			colours.add(c);
+		if( custom_colours != null){
+			for(Color c : custom_colours){
+				colours.add(c);
+			}
 		}
 		return addPieChart(nset);
 	}

@@ -21,6 +21,7 @@ import java.awt.Font;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.CategoryDataset;
@@ -52,7 +53,23 @@ public class JFreeBarTimeChartData extends JFreeChartData<GenericSetPlot> implem
 
 	@Override
 	public JFreeChart getJFreeChart() {
-		CategoryDataset data = makeDataSet();
+		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+		double counts[] = ds.getCounts();
+		String legends[] = ds.getLegends();
+		int max_len=0;
+		for (int i = 0; i < ds.getNumSets(); i++) {
+			if (legends != null && legends.length > i) {
+				dataset.addValue(new Double(counts[i]), "Series-1",legends[i] );
+				int leg_len = legends[i].length();
+				if( leg_len > max_len){
+					max_len = leg_len;
+				}
+				//System.out.println(legends[i] + counts[i]);
+			} else {
+				dataset.addValue(new Double(counts[i]), "Series-1",Integer.toString(i) );
+			}
+		}
+		CategoryDataset data = dataset;
 		
 
 		
@@ -69,8 +86,13 @@ public class JFreeBarTimeChartData extends JFreeChartData<GenericSetPlot> implem
 				
 		CategoryPlot categoryPlot = chart.getCategoryPlot();
 		CategoryAxis axis = categoryPlot.getDomainAxis();
+		if( max_len > 8 ){
+			axis.setCategoryLabelPositions(CategoryLabelPositions.DOWN_45);
+		}
 		Font tickLabelFont = axis.getTickLabelFont();
-		axis.setTickLabelFont(tickLabelFont.deriveFont(tickLabelFont.getSize()-4.0F));
+		if( ds.getNumSets() > 24){
+		  axis.setTickLabelFont(tickLabelFont.deriveFont(tickLabelFont.getSize()-2.0F));
+		}
 		Font labelFont = axis.getLabelFont();
 		axis.setMaximumCategoryLabelLines(3);
 		//axis.setLabelFont(labelFont.d);
@@ -78,21 +100,6 @@ public class JFreeBarTimeChartData extends JFreeChartData<GenericSetPlot> implem
 			
 		return chart;
 
-	}
-
-	protected CategoryDataset makeDataSet() {
-		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-		double counts[] = ds.getCounts();
-		String legends[] = ds.getLegends();
-		for (int i = 0; i < ds.getNumSets(); i++) {
-			if (legends != null && legends.length > i) {
-				dataset.addValue(new Double(counts[i]), "Series-1",legends[i] );
-				//System.out.println(legends[i] + counts[i]);
-			} else {
-				dataset.addValue(new Double(counts[i]), "Series-1",Integer.toString(i) );
-			}
-		}
-		return dataset;
 	}
 
 	public GenericSetPlot makeDataSet(int i) {

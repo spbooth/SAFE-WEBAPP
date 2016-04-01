@@ -64,7 +64,7 @@ import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
 public class TimeChart<P extends PeriodSequencePlot> extends PeriodChart<P>{
 	
-	public static final Feature JFREE_TIMECHART_FEATURE = new Feature("chart.timechart.use_jfreechart", false, "Use JFreechart for time-charts");
+	public static final Feature JFREE_TIMECHART_FEATURE = new Preference("chart.timechart.use_jfreechart", false, "Use JFreechart for time-charts");
 	
 
 	
