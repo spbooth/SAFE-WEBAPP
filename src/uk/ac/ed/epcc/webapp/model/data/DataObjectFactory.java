@@ -1443,7 +1443,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * which options are valid unless the value of {@link #restrictDefaultInput()} is also changed.
 	 * @return
 	 */
-    protected BaseFilter<BDO> getSelectFilter(){
+    public BaseFilter<BDO> getSelectFilter(){
     	// By default just supply the default ordering if there is one.
     	String order = OrderBy(false);
     	Logger log = getLogger();
