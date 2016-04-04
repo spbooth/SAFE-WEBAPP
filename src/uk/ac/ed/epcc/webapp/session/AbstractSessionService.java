@@ -556,10 +556,6 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 
 
 	/** Perform a raw query of a users roles from the database
-	 * This is an extension point to allow sub-classes to extends how a role 
-	 * is implemented. This method returns a Boolean if a definitive answer is known
-	 * otherwise null, This was sub-classes only need to perform additional queries on
-	 * null results.
 	 * @param conn 
 	 * @param id 
 	 * @param role
