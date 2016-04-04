@@ -151,12 +151,17 @@ public class NumberOp {
 		return Integer.valueOf(a.intValue() * b.intValue());
 	}
 	public static Number div(Number a, Number b) {
+		
+		
 		if (a == null) {
 			return b;
 		}
 		if (b == null) {
 			return a;
 		}
+		
+		// We return always return zero for 0/0 rather than any of the other possibilities
+		// mainly this is to get a valid charge fraction for property for failed/sub jobs
 		if( useDuration(a) ){
 			// use scale of 1 as this will be the unit returned by a Duration.longValue
 			// only consider the first arg as a duration divide by duration makes
