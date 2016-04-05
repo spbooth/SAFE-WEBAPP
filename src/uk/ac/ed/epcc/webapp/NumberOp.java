@@ -124,12 +124,10 @@ public class NumberOp {
 		return Integer.valueOf(a.intValue() - b.intValue());
 	}
 	public static Number mult(Number a, Number b) {
-		if (a == null) {
-			return b;
+		if (a == null || b == null) {
+			return null;
 		}
-		if (b == null) {
-			return a;
-		}
+		
 		if( useDuration(a) ){
 			// use scale of 1 as this will be the unit returned by a Duration.longValue
 			// scale by double as this may be fractional
@@ -151,13 +149,8 @@ public class NumberOp {
 		return Integer.valueOf(a.intValue() * b.intValue());
 	}
 	public static Number div(Number a, Number b) {
-		
-		
-		if (a == null) {
-			return b;
-		}
-		if (b == null) {
-			return a;
+		if (a == null || b == null) {
+			return null;
 		}
 		
 		// We return always return zero for 0/0 rather than any of the other possibilities
@@ -221,6 +214,9 @@ public class NumberOp {
 		}
 	}
 	public static Number negate(Number a){
+		if( a == null){
+			return null;
+		}
 		if(useDuration(a)){
 			//durations are the same backwards
 			return a;
