@@ -13,7 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far.response;
 
-import java.awt.print.PageFormat;
 import java.util.LinkedList;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -29,15 +28,12 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.CustomFormContent;
-import uk.ac.ed.epcc.webapp.forms.transition.ExtraFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
-import uk.ac.ed.epcc.webapp.jdbc.table.ViewTableResult;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.far.AbstractPartTransitionProvider;
-import uk.ac.ed.epcc.webapp.model.far.PageManager;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
+import uk.ac.ed.epcc.webapp.model.far.PageManager;
 import uk.ac.ed.epcc.webapp.model.far.PageManager.Page;
-import uk.ac.ed.epcc.webapp.model.far.PartManager;
 import uk.ac.ed.epcc.webapp.model.far.PartManager.Part;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
