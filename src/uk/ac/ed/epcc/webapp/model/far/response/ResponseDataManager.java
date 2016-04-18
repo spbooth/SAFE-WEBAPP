@@ -58,7 +58,6 @@ public abstract class ResponseDataManager<D extends ResponseDataManager.Response
 		 */
 		public ResponseData(ResponseDataManager<?,R,F> man, Record res) {
 			super(man, res);
-			
 		}
 
 		/* (non-Javadoc)
@@ -108,16 +107,20 @@ public abstract class ResponseDataManager<D extends ResponseDataManager.Response
 			 }
 		 }
 
+		public String getDataAsString() throws Exception {
+			Input input = getQuestion().getInput();
+			String str = input.getPrettyString(getData());
+			if (str.equals("no value") || str == null) {
+				str = "n/a";
+			}
+			return str;
+		}
+		
 		@Override
 		public ContentBuilder addContent(ContentBuilder builder) {
 			try{
 				ExtendedXMLBuilder answer = builder.getSpan();
-				Object dat = getData();
-				Input input = getQuestion().getInput();
-				String ans = input.getPrettyString(dat);
-				if (ans.equals("no value") || ans == null) {
-					ans = "n/a";
-				}
+				String ans = getDataAsString();
 				answer.clean(ans);
 				answer.appendParent();
 			}catch(Exception e){

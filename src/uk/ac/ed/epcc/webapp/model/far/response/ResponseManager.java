@@ -188,9 +188,12 @@ public abstract class ResponseManager<R extends ResponseManager.Response<F>,F ex
 		}
 		Question q = wrapper.getQuestion();
 		args = AbstractPartTransitionProvider.getID(args, q);
+		args.pop(); // remove the form id
+		args.push(Integer.toString(response.getID())); // replace with response id
 		
 		return new ServeDataResult(this, args);
 	}
+	
 	@Override
 	public MimeStreamData getData(SessionService user, List<String> path)
 			throws Exception {
@@ -200,11 +203,14 @@ public abstract class ResponseManager<R extends ResponseManager.Response<F>,F ex
 		}else{
 			list=new LinkedList<String>(path);
 		}
+		
 		R response = find(Integer.parseInt(list.pop()));
 		if( ! response.canView(user)){
 			return null;
 		}
-		Question q = (Question) AbstractPartTransitionProvider.getTarget(response.getForm(), getManager().getChildManager(), list);
+		
+		F response_form = response.getForm();
+		Question q = (Question) AbstractPartTransitionProvider.getTarget(response_form, getManager().getChildManager(), list);
  		if( q == null){
  			getLogger().error("question not found");
  			return null;
@@ -212,6 +218,5 @@ public abstract class ResponseManager<R extends ResponseManager.Response<F>,F ex
 		return getWrapper(q, response).getServeData();
 	}
 
-	
 	
 }
