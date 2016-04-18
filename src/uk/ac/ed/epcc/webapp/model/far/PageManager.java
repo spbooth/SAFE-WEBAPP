@@ -17,6 +17,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
+import uk.ac.ed.epcc.webapp.model.far.SectionManager.Section;
 
 /**
  * @author spb
@@ -48,6 +49,19 @@ public class PageManager extends PartManager<DynamicFormManager.DynamicForm,Page
 		@Override
 		public String getTypeName() {
 			return "Page";
+		}
+		
+		public boolean isReadOnly() throws DataFault {
+			boolean readOnly = true;
+			PageManager fac = (PageManager) this.getFactory();
+			for(Section s : ((SectionManager)fac.getChildManager()).getParts(this)){
+				if (!s.isReadOnly()) {
+					readOnly = false;
+					break;
+				}
+			}
+			
+			return readOnly;
 		}
 		
 	}
