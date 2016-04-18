@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Map;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -309,7 +310,12 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		// current target should be set as attribute by default
 		handleFormResult(conn,req,res,o);
 		}catch(Throwable tr){
-			conn.error(tr,"Exception caught in TransitionServlet");
+			getLogger(conn).error("Exception caught in TransitionServlet",tr);
+			try {
+				message(conn, req, res, "internal_error");
+			}catch(Exception e){
+				getLogger(conn).error("Exception sending message in TransitionServlet",e);
+			}
 		}
 	}
 	protected TransitionVisitor<T> getShortcutVisitor(AppContext conn, Map<String, Object> params,
