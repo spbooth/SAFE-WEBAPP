@@ -36,7 +36,6 @@ import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.chart.renderer.xy.XYStepAreaRenderer;
 import org.jfree.chart.renderer.xy.XYStepRenderer;
 import org.jfree.chart.title.LegendTitle;
-import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.util.SortOrder;
 
@@ -60,6 +59,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 	int ndatasets=0;
 	LinkedList<TimeChartDataSet> plots = new LinkedList<TimeChartDataSet>();
 	boolean use_bar=false;
+	private boolean use_step=false;
 
 	@Override
 	public JFreeChart getJFreeChart() {
@@ -85,7 +85,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 
 
 		if( ! use_bar ){
-			if( getItems() < STEP_THRESHOLD){
+			if( getItems() < STEP_THRESHOLD || useStep()){
 				//XYAreaRenderer renderer = new XYAreaRenderer(XYAreaRenderer.AREA);
 				XYStepAreaRenderer renderer = new XYStepAreaRenderer(XYStepAreaRenderer.AREA);
 
@@ -161,7 +161,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 
 	public TimeChartDataSet addLineGraph(TimeChartDataSet plot) throws InvalidArgument {
 		TimeChartDataSet myplot = addTimeSeries(plot);
-		if( use_bar || getItems() < STEP_THRESHOLD){
+		if( use_bar || getItems() < STEP_THRESHOLD || use_step){
 			XYStepRenderer renderer = new XYStepRenderer();
 			((XYPlot)chart.getPlot()).setRenderer(myplot.getDatasetId(), renderer, false);
 		}
@@ -180,6 +180,9 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 	 */
 	public void setPeriod(SplitTimePeriod period, int nsplit) {
 		this.period=period;
+		if( nsplit <= 1){
+			use_bar=true;
+		}
 		if( period.getNsplit() == 1){
 			// old chart2D classes had to have 2 splits
 			// keep minimum number of plots the same
@@ -226,6 +229,24 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 		if( chart != null ){
 			chart.setTitle(s);
 		}
+	}
+
+
+
+	/**
+	 * @return the use_step
+	 */
+	public boolean useStep() {
+		return use_step;
+	}
+
+
+
+	/**
+	 * @param use_step the use_step to set
+	 */
+	public void setUseStep(boolean use_step) {
+		this.use_step = use_step;
 	}
 
 }

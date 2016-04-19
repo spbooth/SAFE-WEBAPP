@@ -65,7 +65,7 @@ import uk.ac.ed.epcc.webapp.time.TimePeriod;
 public class TimeChart<P extends PeriodSequencePlot> extends PeriodChart<P>{
 	
 	public static final Feature JFREE_TIMECHART_FEATURE = new Preference("chart.timechart.use_jfreechart", false, "Use JFreechart for time-charts");
-	
+	public static final Feature JFREE_TIMECHART_STEP_FEATURE = new Feature("chart.jfreechart.timechart.use_step", false, "Use step rendering for timecharts");
 
 	
    
@@ -198,7 +198,9 @@ public class TimeChart<P extends PeriodSequencePlot> extends PeriodChart<P>{
 		TimeChart t = new TimeChart(c);
 		
 		if( JFREE_TIMECHART_FEATURE.isEnabled(c)){
-			t.setChartData(new JFreeTimeChartData());
+			JFreeTimeChartData chart2 = new JFreeTimeChartData();
+			chart2.setUseStep(JFREE_TIMECHART_STEP_FEATURE.isEnabled(c));
+			t.setChartData(chart2);
 		}else{
 			t.setChartData(new Chart2DTimeChartData());
 		}
