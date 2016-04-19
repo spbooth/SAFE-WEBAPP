@@ -37,6 +37,7 @@ import org.jfree.chart.renderer.xy.StandardXYBarPainter;
 import org.jfree.chart.renderer.xy.XYAreaRenderer;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.renderer.xy.XYStepAreaRenderer;
 import org.jfree.chart.renderer.xy.XYStepRenderer;
 import org.jfree.chart.title.LegendTitle;
@@ -129,17 +130,27 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
     		if( field == unit.getCalendarField()){
     			TickUnits units = new TickUnits();
     			int count = period.getCount();
+    			int nsplit = period.getNsplit();
+    			if( count == 1 && nsplit == 1){
+    				return null; // let jfree work it out.
+    			}
+    			if( nsplit > 50 ){
+    				return null;  // period unit is too small
+    			}
 				// include all multiples of period that divide count
 				for( int i = 1; i<= count; i++){
 					if( count % i == 0){
 						units.add(new DateTickUnit(unit, i));
 					}
 				}
-				// now larger multiples
-				for( int i : new int[]{ 2, 3, 4, 5,6, 8,9,10,12,15,20,50,100}){
-					units.add(new DateTickUnit(unit, i*count));
+				
+				
+				// now larger multiples of count that factor nsplit
+				for( int i=2 ; i< nsplit && i < 50 ; i++){
+					if( nsplit % i == 0 ){
+						units.add(new DateTickUnit(unit, i*count));
+					}
 				}
-    		
 				return units;
     		}
     	}
@@ -210,7 +221,9 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 			renderer.setAutoPopulateSeriesFillPaint(true);
 			((XYPlot)chart.getPlot()).setRenderer(myplot.getDatasetId(), renderer, false);
 		}else{
-			//TODO do we need to add explicit renderer here to get colors right
+			XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(true, false);
+			renderer.setAutoPopulateSeriesFillPaint(true);
+			((XYPlot)chart.getPlot()).setRenderer(myplot.getDatasetId(), renderer, false);
 		}
 		return myplot;
 	}
