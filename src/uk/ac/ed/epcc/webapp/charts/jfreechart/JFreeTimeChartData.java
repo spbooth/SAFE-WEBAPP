@@ -27,12 +27,16 @@ import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.DateTickUnit;
 import org.jfree.chart.axis.DateTickUnitType;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.TickUnits;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
+import org.jfree.chart.plot.DrawingSupplier;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.AbstractRenderer;
 import org.jfree.chart.renderer.xy.StandardXYBarPainter;
 import org.jfree.chart.renderer.xy.XYAreaRenderer;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYStepAreaRenderer;
 import org.jfree.chart.renderer.xy.XYStepRenderer;
 import org.jfree.chart.title.LegendTitle;
@@ -54,6 +58,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 	 */
 	private static final int STEP_THRESHOLD = 10;
 	JFreeChart chart;
+	DrawingSupplier drawing;
 	SplitTimePeriod period;
 	int nsplits;
 	int ndatasets=0;
@@ -117,12 +122,25 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 		return myplot;
 
 	}
-
-    private DateTickUnit getUnit(CalendarFieldSplitPeriod period){
+	
+    private TickUnits getUnits(CalendarFieldSplitPeriod period){
     	int field = period.getField();
     	for( DateTickUnitType unit : new DateTickUnitType[]{ DateTickUnitType.SECOND,DateTickUnitType.MINUTE,DateTickUnitType.HOUR,DateTickUnitType.DAY,DateTickUnitType.MONTH,DateTickUnitType.YEAR}){
     		if( field == unit.getCalendarField()){
-    			return new DateTickUnit(unit, period.getCount());
+    			TickUnits units = new TickUnits();
+    			int count = period.getCount();
+				// include all multiples of period that divide count
+				for( int i = 1; i<= count; i++){
+					if( count % i == 0){
+						units.add(new DateTickUnit(unit, i));
+					}
+				}
+				// now larger multiples
+				for( int i : new int[]{ 2, 3, 4, 5,6, 8,9,10,12,15,20,50,100}){
+					units.add(new DateTickUnit(unit, i*count));
+				}
+    		
+				return units;
     		}
     	}
     	return null;
@@ -132,21 +150,26 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 		if( dataset == null){
 			dataset = makeDataSet(1);
 		}
+		
 		if( chart == null ){
 			chart = ChartFactory.createTimeSeriesChart(title, "Time", quantity, dataset, true, false, false); 
-			DateAxis axis= (DateAxis) ((XYPlot)chart.getPlot()).getDomainAxis();
+			XYPlot xyPlot = (XYPlot)chart.getPlot();
+			
+			DateAxis axis= (DateAxis) xyPlot.getDomainAxis();
 			axis.setRange(period.getStart(), period.getEnd());
+			
 			if( period instanceof CalendarFieldSplitPeriod){
-				DateTickUnit u = getUnit((CalendarFieldSplitPeriod)period);
+				TickUnits u = getUnits((CalendarFieldSplitPeriod)period);
 				if(u != null ){
-					axis.setTickUnit(u, false, false);
+					axis.setStandardTickUnits(u);
 				}
 			}
 			LegendTitle leg = chart.getLegend();
 			leg.setSortOrder(SortOrder.DESCENDING);
 			leg.setPosition(RectangleEdge.RIGHT);
 		}else{
-			((XYPlot)chart.getPlot()).setDataset(ndatasets, dataset);
+			XYPlot xyPlot = (XYPlot)chart.getPlot();
+			xyPlot.setDataset(ndatasets, dataset);
 		}
 		dataset.setDatasetId(ndatasets);
 		ndatasets++;
@@ -155,23 +178,49 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 
 	public TimeChartDataSet addAreaGraph(TimeChartDataSet plot,
 			Color[] custom_colours) throws InvalidArgument {
-		//TODO add colours
-		return addAreaGraph(plot);
+		TimeChartDataSet ds = addAreaGraph(plot);
+		setColours(custom_colours, ds);
+		return ds;
+	}
+
+
+
+	protected void setColours(Color[] custom_colours, TimeChartDataSet ds) {
+		if( custom_colours == null ){
+			return;
+		}
+		XYItemRenderer rend = ((XYPlot)chart.getPlot()).getRenderer(ds.getDatasetId());
+		if( rend == null ){
+			rend = ((XYPlot)chart.getPlot()).getRenderer();
+		}
+		if( rend == null ){
+			return;
+		}
+		for(int i=0; i< custom_colours.length;i++){
+			if( custom_colours[i] != null){
+				rend.setSeriesPaint(i, custom_colours[i]);
+			}
+		}
 	}
 
 	public TimeChartDataSet addLineGraph(TimeChartDataSet plot) throws InvalidArgument {
 		TimeChartDataSet myplot = addTimeSeries(plot);
 		if( use_bar || getItems() < STEP_THRESHOLD || use_step){
 			XYStepRenderer renderer = new XYStepRenderer();
+			renderer.setAutoPopulateSeriesFillPaint(true);
 			((XYPlot)chart.getPlot()).setRenderer(myplot.getDatasetId(), renderer, false);
+		}else{
+			//TODO do we need to add explicit renderer here to get colors right
 		}
 		return myplot;
 	}
 
 	public TimeChartDataSet addLineGraph(TimeChartDataSet plot,
 			Color[] custom_colors) throws InvalidArgument {
-		//TODO add colours
-		return addTimeSeries(plot);
+	
+		TimeChartDataSet ds = addLineGraph(plot);
+		setColours(custom_colors, ds);
+		return ds;
 	}
 
 
