@@ -26,12 +26,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
+import uk.ac.ed.epcc.webapp.session.PasswordUpdateFormBuilder;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
@@ -195,49 +199,26 @@ public class UserServlet<T extends AppUser> extends SessionServlet {
 
 	protected  boolean doChangePassword(HttpServletRequest req, HttpServletResponse res,
 			AppContext conn, PasswordAuthComposite<T> composite, T person) throws ServletException,
-			DataException, IOException {
-		
-		/* Retrieve user input. */
-		String password = req.getParameter("password");
-		if (password != null)
-			password = password.trim();
-		String password1 = req.getParameter("password1");
-		if (password1 != null)
-			password1 = password1.trim();
-		String password2 = req.getParameter("password2");
-		if (password2 != null)
-			password2 = password2.trim();
-		if( ! composite.canResetPassword(person)){
-			res.sendRedirect(res.encodeRedirectURL(req.getContextPath()
-					+ "/password_update.jsp?error=cannot_change"));
+	DataException, IOException {
+
+		HTMLForm f = new HTMLForm(conn);
+		PasswordUpdateFormBuilder fac = new PasswordUpdateFormBuilder(composite, person);
+		fac.buildForm(f);
+
+		boolean ok = f.parsePost(req);
+
+		if( !ok){
+			HTMLForm.doFormError(conn,req,res);
 			return false;
 		}
-		if (empty(password) || !composite.checkPassword(person,password)) {
-			res.sendRedirect(res.encodeRedirectURL(req.getContextPath()
-					+ "/password_update.jsp?error=bad_password"));
-			return false;
+		Map<String,Object> params = conn.getService(ServletService.class).getParams();
+		try {
+			FormResult result =  f.doAction(params);
+			handleFormResult(conn, req, res, result);
+		} catch (Exception e) {
+			getLogger(conn).error("Error processing form", e);
+			message(conn, req, res, "internal_error");
 		}
-		if (empty(password1) || empty(password2)
-				|| !password1.equals(password2)) {
-			res.sendRedirect(res.encodeRedirectURL(req.getContextPath()
-					+ "/password_update.jsp?error=password_mismatch"));
-			return false;
-		}
-		if (password1.length() < minPasswordLength(conn)) {
-			res.sendRedirect(res.encodeRedirectURL(req.getContextPath()
-					+ "/password_update.jsp?error=short_password"));
-			return false;
-		}
-		if( password.equals(password1)){
-			res.sendRedirect(res.encodeRedirectURL(req.getContextPath()
-					+ "/password_update.jsp?error=unchanged_password"));
-			return false;
-		}
-			composite.setPassword(person,password1);
-			person.commit();
-		
-		// Tell the use it worked
-		message(conn, req, res, "password_changed");
 		return true;
 	}
 
