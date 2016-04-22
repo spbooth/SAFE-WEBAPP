@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model;
 
+import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
@@ -21,6 +22,6 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  * @author spb
  *
  */
-public interface AnonymisingFactory {
+public interface AnonymisingFactory extends Contexed {
 	public void anonymise() throws DataFault;
 }
