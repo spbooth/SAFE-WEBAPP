@@ -38,14 +38,14 @@
 <% if( form.hasSubmitted() && form.hasError()){ %>
 <h3>This form contains errors:</h3>
 <p class="warn">	
-<%= form.getGeneralError() %>
+<% String error = form.getGeneralError(); %>
+<%= error == null ? "" : error %>
 </p>
 <%} %>
 <p><%=policy %>
 </p>
 <form>
 <%= form.getHtmlForm() %>
-<%= form.getActionButtons() %>
 </form>
 </div>
 

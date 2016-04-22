@@ -262,7 +262,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 	}
 	
 	public int minPasswordLength() {
-		return getContext().getIntegerParameter("password.min_length", 6);
+		return getContext().getIntegerParameter("password.min_length", 8);
 	}
 	public int minDiffChars() {
 		int min = getContext().getIntegerParameter("password.min_diff_char", 6);
