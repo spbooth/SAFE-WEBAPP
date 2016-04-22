@@ -18,6 +18,7 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.FormValidator;
@@ -27,13 +28,16 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.PasswordInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
+import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.ExtraFormTransition;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 /** A class that build password update forms
  * @author spb
+ * @param <U> type of AppUser
  *
  */
-public class PasswordUpdateFormBuilder<U extends AppUser>  {
+public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormTransition<U> implements ExtraFormTransition<U>{
 	
 	private static final Feature CHECK_COMPLEXITY = new Feature("password.check_complexity",true,"Perform complexity check on user generated passwords");
     /**
@@ -54,13 +58,13 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  {
 	 * @param comp
 	 * @param user
 	 */
-	public PasswordUpdateFormBuilder(PasswordAuthComposite<U> comp, U user) {
+	public PasswordUpdateFormBuilder(PasswordAuthComposite<U> comp,boolean check_old) {
 		super();
 		this.comp = comp;
-		this.user = user;
+		this.check_old=check_old;
 	}
 	private final PasswordAuthComposite<U> comp;
-    private final U user;
+   private final boolean check_old;
     
     /** Checks the field matches the current password
      * 
@@ -69,6 +73,14 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  {
      */
     private class MatchValidator implements FieldValidator<String>{
 
+    	/**
+		 * @param user
+		 */
+		public MatchValidator(U user) {
+			super();
+			this.user = user;
+		}
+		private final U user;
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.FieldValidator#validate(java.lang.Object)
 		 */
@@ -156,6 +168,16 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  {
     
     private class CanChangeValidator implements FormValidator{
 
+    	/**
+		 * @param user
+		 */
+		public CanChangeValidator(U user) {
+			super();
+			this.user = user;
+		}
+
+		private final U user;
+    	
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.FormValidator#validate(uk.ac.ed.epcc.webapp.forms.Form)
 		 */
@@ -189,25 +211,33 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  {
     	
     }
     
-    public void buildForm(Form f){
-    	
-    	f.addInput(PASSWORD_FIELD, "Current Password:", new PasswordInput());
-    	f.getField(PASSWORD_FIELD).setValidator(new MatchValidator());
+    public void buildForm(Form f,U user, AppContext conn){
+    	if( check_old ){
+    		f.addInput(PASSWORD_FIELD, "Current Password:", new PasswordInput());
+    		f.getField(PASSWORD_FIELD).setValidator(new MatchValidator(user));
+    		f.addValidator(new ChangeValidator());
+    	}
     	f.addInput(NEW_PASSWORD1, "New Password:", makeNewInput());
     	f.addInput(NEW_PASSWORD2, "New Password (again):", makeNewInput());
     	f.addValidator(new SamePasswordValidator());
-    	f.addValidator(new ChangeValidator());
-    	f.addValidator(new CanChangeValidator());
+    	
+    	f.addValidator(new CanChangeValidator(user));
     	if( CHECK_COMPLEXITY.isEnabled(getContext())){
     		f.addValidator(new ComplexityValidator());
     	}
-    	
-    
-    	f.addAction(" Change ", new UpdateAction());
+    	f.addAction(" Change ", new UpdateAction(user));
     }
     
     public class UpdateAction extends FormAction{
 
+    	/**
+		 * @param user
+		 */
+		public UpdateAction(U user) {
+			super();
+			this.user = user;
+		}
+		private final U user;
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#action(uk.ac.ed.epcc.webapp.forms.Form)
 		 */
@@ -294,4 +324,18 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  {
 		}
 		return "Passwords must be at least "+minPasswordLength()+" characters long";
 	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.ExtraContent#getExtraHtml(uk.ac.ed.epcc.webapp.content.ContentBuilder, uk.ac.ed.epcc.webapp.session.SessionService, java.lang.Object)
+	 */
+	@Override
+	public <X extends ContentBuilder> X getExtraHtml(X cb, SessionService<?> op, U target) {
+		cb.addText(getPasswordPolicy());
+		return cb;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.BaseFormTransition#buildForm(uk.ac.ed.epcc.webapp.forms.Form, java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
+	 */
+	
 }

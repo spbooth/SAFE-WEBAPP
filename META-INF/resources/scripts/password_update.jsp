@@ -65,8 +65,8 @@ Your <%=website_name %> password has expired and should be changed.
 
 <%
 HTMLForm f = new HTMLForm(conn);
-PasswordUpdateFormBuilder fac = new PasswordUpdateFormBuilder(comp, sess.getCurrentPerson());
-fac.buildForm(f);
+PasswordUpdateFormBuilder fac = new PasswordUpdateFormBuilder(comp, true);
+fac.buildForm(f,sess.getCurrentPerson(),conn);
 
 
 %>

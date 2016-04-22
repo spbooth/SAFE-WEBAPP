@@ -202,8 +202,8 @@ public class UserServlet<T extends AppUser> extends SessionServlet {
 	DataException, IOException {
 
 		HTMLForm f = new HTMLForm(conn);
-		PasswordUpdateFormBuilder fac = new PasswordUpdateFormBuilder(composite, person);
-		fac.buildForm(f);
+		PasswordUpdateFormBuilder fac = new PasswordUpdateFormBuilder(composite, true);
+		fac.buildForm(f,person,conn);
 
 		boolean ok = f.parsePost(req);
 

@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.servlet;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -24,17 +25,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.forms.Form;
-import uk.ac.ed.epcc.webapp.forms.FormValidator;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.html.PageHTMLForm;
-import uk.ac.ed.epcc.webapp.forms.inputs.PasswordInput;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory.PasswordChangeRequest;
+import uk.ac.ed.epcc.webapp.session.PasswordUpdateFormBuilder;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 /** Servlet to handle web password resets.
  *
@@ -44,63 +43,20 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  *
  * @author spb
+ * @param <A> type of AppUser
  *
  */
 
 @WebServlet(name="PasswordChangeRequestServlet",urlPatterns="/PasswordChangeRequestServlet/*")
 public class PasswordChangeRequestServlet<A extends AppUser> extends WebappServlet {
-
-	/**
-	 * @author spb
-	 *
-	 */
-	private static final class PasswordValidator implements FormValidator {
-		/**
-		 * @param conn
-		 */
-		public PasswordValidator(AppContext conn) {
-			super();
-			this.conn = conn;
-		}
-		private final AppContext conn;
-		@Override
-		public void validate(Form f) throws ValidateException {
-			String pass1 = (String) f.get(PASSWORD1);
-			String pass2 = (String) f.get(PASSWORD2);
-			if( ! pass1.equals(pass2)){
-				throw new ValidateException("Passwords don't match");
-			}
-			int minPasswordLength = UserServlet.minPasswordLength(conn);
-			if( pass1.length() < minPasswordLength){
-				throw new ValidateException("Password too short, must be at least "+minPasswordLength);
-			}
-		}
-	}
-
-	/**
-	 * 
-	 */
-	private static final String PASSWORD2 = "password2";
-	/**
-	 * 
-	 */
-	private static final String PASSWORD1 = "password1";
-
-	public static  PageHTMLForm getForm(AppContext conn){
-		PageHTMLForm form = new PageHTMLForm(conn);
-		form.addInput(PASSWORD1, "New password", new PasswordInput());
-		form.addInput(PASSWORD2, "New password (Again)", new PasswordInput());
-		form.addValidator(new PasswordValidator(conn));
-		return form;
-	}
-	
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse res,
 			AppContext conn) throws ServletException, IOException {
 		try{
+		@SuppressWarnings("unchecked")
 		SessionService<A> service = conn.getService(SessionService.class);
 		ServletService serv = conn.getService(ServletService.class);
-		PasswordChangeRequestFactory<A> fac = new PasswordChangeRequestFactory(service.getLoginFactory());
+		PasswordChangeRequestFactory<A> fac = new PasswordChangeRequestFactory<A>(service.getLoginFactory());
 		Logger log = conn.getService(LoggerService.class).getLogger(getClass());
 		
 			log.debug("path is "+req.getPathInfo());
@@ -115,36 +71,41 @@ public class PasswordChangeRequestServlet<A extends AppUser> extends WebappServl
 			}
 			PasswordChangeRequestFactory<A>.PasswordChangeRequest request = fac.findByTag(tag);
 			if( request != null ){
-				PageHTMLForm form = getForm(conn);
+				@SuppressWarnings("unchecked")
+				PasswordAuthComposite<A> comp = (PasswordAuthComposite<A>) service.getLoginFactory().getComposite(PasswordAuthComposite.class);
+				A user = request.getUser();
+				PasswordUpdateFormBuilder<A> builder = new PasswordUpdateFormBuilder<A>(comp, false);
+				PageHTMLForm form = new PageHTMLForm(conn);
+				builder.buildForm(form, user, conn);
+				
 				if ( ! form.hasSubmitted(req) || ! form.parsePost(req)){
 					req.setAttribute("Form", form);
+					req.setAttribute("policy", builder.getPasswordPolicy());
 					serv.forward("/scripts/password_change_request.jsp");
 					return;
 				}
-				String new_password = (String) form.get(PASSWORD1);
-				PasswordAuthComposite<A> comp = (PasswordAuthComposite<A>) service.getLoginFactory().getComposite(PasswordAuthComposite.class);
-				A user = request.getUser();
-				if( comp != null && comp.canResetPassword(user) && user.canLogin()){
-					comp.setPassword(user, new_password);
-					user.commit();
-					service.setCurrentPerson(user);
+				
+				
+				Map<String,Object> params = conn.getService(ServletService.class).getParams();
+				try {
+					FormResult result =  form.doAction(params); // this sets the password
 					request.delete();
+					service.setCurrentPerson(user);
 					if (comp.doWelcome(user)) {
 						log.debug("Doing welcome page");
 						// Ok, got a first time visit from a new user - send
-						// them to the welcome page
+						// them to the welcome page insras
 						res.sendRedirect(res.encodeRedirectURL(req
 								.getContextPath()
 								+ LoginServlet.getWelcomePage(conn)));
 						return;
-					}else{
-						log.debug("redirect to main");
-						res.sendRedirect(res.encodeRedirectURL(req
-								.getContextPath()
-								+ LoginServlet.getMainPage(conn)));
-						return;
 					}
+					handleFormResult(conn, req, res, result);
+				} catch (Exception e) {
+					getLogger(conn).error("Error processing form", e);
+					message(conn, req, res, "internal_error");
 				}
+				return;
 				
 			}
 			message(conn, req, res, "password_change_request_denied");
