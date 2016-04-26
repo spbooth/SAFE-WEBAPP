@@ -101,8 +101,9 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 			}else{
 				XYAreaRenderer renderer = new XYAreaRenderer(XYAreaRenderer.AREA);
 				//XYStepAreaRenderer renderer = new XYStepAreaRenderer(XYStepAreaRenderer.AREA);
-
+				
 				renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator());
+				
 				((XYPlot)chart.getPlot()).setRenderer(myplot.getDatasetId(), renderer, false);
 			}
 		}else{
@@ -167,7 +168,9 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 			XYPlot xyPlot = (XYPlot)chart.getPlot();
 			
 			DateAxis axis= (DateAxis) xyPlot.getDomainAxis();
-			axis.setRange(period.getStart(), period.getEnd());
+			//axis.setRange(period.getStart(), period.getEnd());
+			//axis.setLowerMargin(0.0);
+			//axis.setUpperMargin(0.0);
 			
 			if( period instanceof CalendarFieldSplitPeriod){
 				TickUnits u = getUnits((CalendarFieldSplitPeriod)period);

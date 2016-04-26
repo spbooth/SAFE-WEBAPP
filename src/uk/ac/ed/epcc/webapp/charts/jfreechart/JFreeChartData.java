@@ -39,12 +39,12 @@ public abstract class JFreeChartData<P extends Plot> implements ChartData<P> {
 	/**
 	 * 
 	 */
-	private static final int DEFAULT_Y_SIZE = 400;
+	private static final int DEFAULT_Y_SIZE = 345;
 
 	/**
 	 * 
 	 */
-	private static final int DEFAULT_X_SIZE = 800;
+	private static final int DEFAULT_X_SIZE = 690;
 
 	//String labels[];
 
