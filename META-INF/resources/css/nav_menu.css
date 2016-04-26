@@ -214,3 +214,12 @@
 
   
 }
+/**************************
+ * Supress navigation on print
+ ******************************/
+ @media print {
+ .nav {
+   display: none;
+ }
+ 
+ }
