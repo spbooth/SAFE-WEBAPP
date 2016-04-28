@@ -14,6 +14,7 @@
 <!-- 
 The core of a standard errorpage this is included by errorpage.jsp wrapped in application specific markup.
  -->
+<%@page isErrorPage="true" %>
 <%@page import="uk.ac.ed.epcc.webapp.content.HtmlBuilder"%>
 <%@page import="java.io.PrintWriter"%>
 <%@page import="java.io.StringWriter"%>
@@ -30,6 +31,7 @@ if( error_code != null ){
 	switch( error_code.intValue() ){
 	case 404: extra = "File not found"; break;
 	case 403: extra = "Access forbidden"; break;
+	case 401: extra = "Unauthorized"; break;
 	case 500: extra = "Internal server error"; break;
 	default:
 	}
