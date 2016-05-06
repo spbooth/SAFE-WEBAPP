@@ -514,11 +514,11 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 					}
 				}
 				if( use_html5 && use_required ){
-				if( ! (input instanceof OptionalInput) || ! ((OptionalInput) input).isOptional()){
-					//Note we have to set
-					// formnovalidate for non validating submit elements.
-					result.attr("required",null);
-				}
+					if( ! (input instanceof OptionalInput) || ! ((OptionalInput) input).isOptional()){
+						//Note we have to set
+						// formnovalidate for non validating submit elements.
+						result.attr("required",null);
+					}
 				}
 			}
 			result.close();
@@ -538,6 +538,13 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			result.attr("class","input");
 			if( id != null ){
 				result.attr("id", id);
+			}
+			if( use_html5 && use_required ){
+				if( ! (input instanceof OptionalInput) || ! ((OptionalInput) input).isOptional()){
+					//Note we have to set
+					// formnovalidate for non validating submit elements.
+					result.attr("required",null);
+				}
 			}
 			if (default_value != null && default_value.length() > 0) {
 				result.clean(default_value);
