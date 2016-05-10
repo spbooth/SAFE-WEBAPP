@@ -45,10 +45,16 @@ public abstract class AbstractList<T extends DataObject,L extends Targetted> ext
 		this.conn=factory.getContext();
 		String list = conn.getInitParameter(factory.getConfigTag()+"."+list_name,"");
 		for(String action : list.split("\\s*,\\s*")){
-			@SuppressWarnings("unchecked")
-			L a = (L) conn.makeObject(getTemplate(), action);
-			if( ! a.getTarget().isAssignableFrom(factory.getTarget())){
-				getLogger().error("Incompatible targets for listener "+a.getTarget().getCanonicalName()+" "+factory.getTarget().getCanonicalName());;
+			if( ! action.isEmpty()){
+				@SuppressWarnings("unchecked")
+				L a = (L) conn.makeObject(getTemplate(), action);
+				if( a == null){
+					getLogger().error(action+" failed to resolve to "+getTemplate().getCanonicalName());
+				}else if( ! a.getTarget().isAssignableFrom(factory.getTarget())){
+					getLogger().error("Incompatible targets for listener "+a.getTarget().getCanonicalName()+" "+factory.getTarget().getCanonicalName());;
+				}else{
+					add(a);
+				}
 			}
 		}
 	}
@@ -62,8 +68,11 @@ public abstract class AbstractList<T extends DataObject,L extends Targetted> ext
 		return conn;
 	}
 	
-	
+	private Logger logger=null;
 	public Logger getLogger(){
-		return conn.getService(LoggerService.class).getLogger(getClass());
+		if( logger == null){
+			logger=conn.getService(LoggerService.class).getLogger(getClass());
+		}
+		return logger;
 	}
 }
