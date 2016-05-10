@@ -526,6 +526,9 @@ public final class AppContext {
 		}
 		return service.getServiceProperties().getProperty(name);
 	}
+	/** A regexp for parameter expansion
+	 * 
+	 */
     private final Pattern expand_pattern = Pattern.compile("\\$\\{([^\\s}]+)\\}");
     /** Query an environmental parameter with nested parameter expansion
      * 
@@ -541,6 +544,9 @@ public final class AppContext {
 
 	/** perform config parameter expansion on a text fragment.
 	 * 
+	 * Text of the form ${name} is replaced with the corresponding config parameter
+	 * A fall-back value can be specified by using ${name:fallback}
+	 * 
 	 * @param text_to_expand
 	 * @return expanded text
 	 */
@@ -551,8 +557,14 @@ public final class AppContext {
 		StringBuffer result = new StringBuffer();
 		Matcher m = expand_pattern.matcher(text_to_expand);
 		while(m.find()){
+			String default_text ="";
 			String subname = m.group(1);
-			String text = getInitParameter(subname,"");
+			if( subname.contains(":")){
+				int pos = subname.indexOf(':');
+				subname=subname.substring(0, pos);
+				default_text = subname.substring(pos+1);
+			}
+			String text = getInitParameter(subname,default_text);
 			// supress unintended back subs
 			 text = text.replace("\\", "\\\\");
 			text = text.replace("$", "\\$");
