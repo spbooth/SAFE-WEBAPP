@@ -13,39 +13,39 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.lifecycle;
 
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import java.util.LinkedList;
 
-/** A {@link AbstractListener} that implements {@link Contexed}
+import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+
+/** A {@link LinkedList} of {@link AbstractAction}s that is populated
+ * from configuration parameters.
+ * 
+ * The aim is to remove unnecessary code dependencies 
+ * 
+ * 
+ * This looks in the parameter <b><em>tag</em>.<em>list-name</em></b> where
+ * <b>tag</b> is the configuration tag for the parent factory.
+ * This value is interpreted as a comma separated list of class tags and used to create the
+ * listeners. The target classes for the listeners and the factory are checked for type conflicts.
+ * 
  * @author spb
- * @param <R> 
+ * @param <T> 
  *
  */
-public class AbstractContextedListener<R> extends AbstractListener<R> implements Contexed {
+public class ListenerList<T extends DataObject> extends AbstractList<T,LifeCycleListener<T>> {
 
-	private final AppContext conn;
-	/**
-	 * @param conn 
-	 * @param clazz 
-	 * 
-	 */
-	public AbstractContextedListener(AppContext conn, Class<? super R> clazz) {
-		super(clazz);
-		this.conn=conn;
+	
+	public ListenerList(DataObjectFactory<T> factory,String list_name){
+		super(factory,list_name);
 	}
+
 	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
+	 * @see uk.ac.ed.epcc.webapp.model.lifecycle.AbstractList#getTemplate()
 	 */
 	@Override
-	public final AppContext getContext() {
-		// TODO Auto-generated method stub
-		return conn;
+	protected Class<? super LifeCycleListener> getTemplate() {
+		return LifeCycleListener.class;
 	}
 	
-	public Logger getLogger(){
-		return conn.getService(LoggerService.class).getLogger(getClass());
-	}
-
 }

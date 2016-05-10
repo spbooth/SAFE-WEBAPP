@@ -13,39 +13,57 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.lifecycle;
 
+import java.util.LinkedList;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.Targetted;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
-/** A {@link AbstractListener} that implements {@link Contexed}
+/** A {@link LinkedList} of {@link Targetted} objects that is populated
+ * from configuration parameters.
+ * 
+ * The aim is to remove unecessary code dependencies 
+ * 
+ * 
+ * This looks in the parameter <b><em>tag</em>.<em>list-name</em></b> where
+ * <b>tag</b> is the configuration tag for the parent factory.
+ * This value is interpreted as a comma separated list of class tags and used to create the
+ * listeners. The target classes for the listeners and the factory are checked for type conflicts.
+ * 
  * @author spb
- * @param <R> 
  *
  */
-public class AbstractContextedListener<R> extends AbstractListener<R> implements Contexed {
+public abstract class AbstractList<T extends DataObject,L extends Targetted> extends LinkedList<L> implements Contexed{
 
 	private final AppContext conn;
-	/**
-	 * @param conn 
-	 * @param clazz 
-	 * 
-	 */
-	public AbstractContextedListener(AppContext conn, Class<? super R> clazz) {
-		super(clazz);
-		this.conn=conn;
+	public AbstractList(DataObjectFactory<T> factory,String list_name){
+		super();
+		this.conn=factory.getContext();
+		String list = conn.getInitParameter(factory.getConfigTag()+"."+list_name,"");
+		for(String action : list.split("\\s*,\\s*")){
+			@SuppressWarnings("unchecked")
+			L a = (L) conn.makeObject(getTemplate(), action);
+			if( ! a.getTarget().isAssignableFrom(factory.getTarget())){
+				getLogger().error("Incompatible targets for listener "+a.getTarget().getCanonicalName()+" "+factory.getTarget().getCanonicalName());;
+			}
+		}
 	}
+	
+	protected abstract Class<? super L> getTemplate();
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
 	 */
 	@Override
-	public final AppContext getContext() {
-		// TODO Auto-generated method stub
+	public AppContext getContext() {
 		return conn;
 	}
+	
 	
 	public Logger getLogger(){
 		return conn.getService(LoggerService.class).getLogger(getClass());
 	}
-
 }

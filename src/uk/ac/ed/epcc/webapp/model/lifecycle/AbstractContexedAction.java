@@ -18,20 +18,17 @@ import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
-/** A {@link AbstractListener} that implements {@link Contexed}
+/** A {@link AbstractAction} that implements {@link Contexed}
  * @author spb
- * @param <R> 
  *
  */
-public class AbstractContextedListener<R> extends AbstractListener<R> implements Contexed {
-
+public class AbstractContexedAction<R> extends AbstractAction<R> implements Contexed{
 	private final AppContext conn;
 	/**
 	 * @param conn 
-	 * @param clazz 
-	 * 
+	 * @param clazz
 	 */
-	public AbstractContextedListener(AppContext conn, Class<? super R> clazz) {
+	public AbstractContexedAction(AppContext conn,Class<? super R> clazz) {
 		super(clazz);
 		this.conn=conn;
 	}
@@ -40,12 +37,10 @@ public class AbstractContextedListener<R> extends AbstractListener<R> implements
 	 */
 	@Override
 	public final AppContext getContext() {
-		// TODO Auto-generated method stub
 		return conn;
 	}
 	
 	public Logger getLogger(){
 		return conn.getService(LoggerService.class).getLogger(getClass());
 	}
-
 }

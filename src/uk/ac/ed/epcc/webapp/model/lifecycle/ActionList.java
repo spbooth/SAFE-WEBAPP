@@ -15,17 +15,13 @@ package uk.ac.ed.epcc.webapp.model.lifecycle;
 
 import java.util.LinkedList;
 
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
 /** A {@link LinkedList} of {@link AbstractAction}s that is populated
  * from configuration parameters.
  * 
- * The aim is to remove unecessary code dependencies 
+ * The aim is to remove unnecessary code dependencies 
  * 
  * 
  * This looks in the parameter <b><em>tag</em>.<em>list-name</em></b> where
@@ -34,32 +30,22 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
  * listeners. The target classes for the listeners and the factory are checked for type conflicts.
  * 
  * @author spb
+ * @param <T> 
  *
  */
-public class ActionList<T extends DataObject> extends LinkedList<AbstractAction<T>> implements Contexed{
+public class ActionList<T extends DataObject> extends AbstractList<T,ActionListener<T>> {
 
-	private final AppContext conn;
+	
 	public ActionList(DataObjectFactory<T> factory,String list_name){
-		super();
-		this.conn=factory.getContext();
-		String list = conn.getInitParameter(factory.getConfigTag()+"."+list_name,"");
-		for(String action : list.split("\\s*,\\s*")){
-			@SuppressWarnings("unchecked")
-			AbstractAction<T> a = conn.makeObject(AbstractAction.class, action);
-			if( ! a.getTarget().isAssignableFrom(factory.getTarget())){
-				getLogger().error("Incompatible targets for listener "+a.getTarget().getCanonicalName()+" "+factory.getTarget().getCanonicalName());;
-			}
-		}
+		super(factory,list_name);
 	}
+
 	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
+	 * @see uk.ac.ed.epcc.webapp.model.lifecycle.AbstractList#getTemplate()
 	 */
 	@Override
-	public AppContext getContext() {
-		return conn;
+	protected Class<? super ActionListener> getTemplate() {
+		return ActionListener.class;
 	}
 	
-	public Logger getLogger(){
-		return conn.getService(LoggerService.class).getLogger(getClass());
-	}
 }
