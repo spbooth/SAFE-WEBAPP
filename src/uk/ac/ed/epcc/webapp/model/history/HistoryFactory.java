@@ -39,6 +39,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.DefaultTableTransitionRegistry;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
@@ -61,6 +62,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterUpdate;
+import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.iterator.DecoratingIterator;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
@@ -638,13 +640,16 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		SQLAndFilter<H> fil =new  SQLAndFilter<H>(getTarget());
 		fil.addFilter(new ReferenceFilter<H,P>(this, getPeerName(),peer));
 		fil.addFilter(new TimeFilter(START_TIME_FIELD,MatchCondition.LE,time));
-		fil.addFilter(new TimeFilter(END_TIME_FIELD,MatchCondition.GT,time));
+		SQLOrFilter<H> end_fil = new SQLOrFilter<H>(getTarget());
+		end_fil.addFilter(new TimeFilter(END_TIME_FIELD,MatchCondition.GT,time));
+		end_fil.addFilter(new NullFieldFilter<H>(getTarget(), res, END_TIME_FIELD, true));
+		fil.addFilter(end_fil);
 		if( want_tail && res.hasField(status.getField())){
 			fil.addFilter(status.getSQLFilter(this, TAIL));
 		}
 		H current=null;
 		try{
-		  current = find(fil);
+		  current = find(fil,true);  // null is allowed
 		}catch(MultipleResultException e){
 		  // Somehow we have multiple matching records. sequence is corrupt
 	      Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
