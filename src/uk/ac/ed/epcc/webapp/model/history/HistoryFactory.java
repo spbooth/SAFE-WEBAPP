@@ -804,8 +804,10 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		HistoryRecord tail = null;
 		try {
 			tail = find(peer, now());
-			tail.terminate();
-			tail.commit();
+			if( tail != null ){
+				tail.terminate();
+				tail.commit();
+			}
 		} catch (DataNotFoundException e) {
 			log.info("Matching History object not found");
 		}
