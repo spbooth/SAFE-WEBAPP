@@ -30,7 +30,11 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  * 
  * sub-classes may be constrained to generate values that are constrained to day/hour/min boundaries.
  * 
- * This class uses a series of {@link DateFormat}s applied in turn so as to support multiple fomats
+ * This class uses a series of {@link DateFormat}s applied in turn so as to support multiple formats
+ * the first format should be the one compatible with the format defined in the standard for the corresponding Html5 input.
+ * However  {@link #getHintIndex()} specifies the format that should be suggested to a user when
+ * defaulting to a text input
+ * 
  * @author spb
  *
  */
@@ -121,11 +125,19 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 
 		return df[0].format(date);
 	}
+	
+	/** 
+	 * 
+	 * @return
+	 */
+	protected int getHintIndex(){
+		return 0;
+	}
 
 	public String getFormatHint() {
-		//With html5 enabled this shows as a placehoder so if the browser overrides
+		//With html5 enabled this shows as a placeholder so if the browser overrides
 		// format to show a date picker this is hidden.
-		return getFormats()[0].toUpperCase();
+		return getFormats()[getHintIndex()].toUpperCase();
 	}
 
 	@Override
