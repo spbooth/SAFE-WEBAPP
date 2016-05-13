@@ -29,6 +29,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.LengthInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.MultipleInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseMultiInput;
@@ -531,6 +532,11 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 				}
 				if( use_html5 && format_hint != null){
 					result.attr("placeholder",format_hint);
+				}
+				if( use_html5 && input instanceof MultipleInput){
+					if(((MultipleInput)input).isMultiple()){
+						result.attr("multiple", "multiple");
+					}
 				}
 			}
 			result.close();
