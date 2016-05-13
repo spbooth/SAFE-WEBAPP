@@ -237,7 +237,7 @@ public void addChildren(Node parent, String name, FilteredProperties props) {
 			n.setTargetPath(TransitionServlet.getURL(conn, getTransitionProvider(t), null,FormOperations.Create));
 			parent.addChild(n);
 		}
-		if( t.canCreate(session_service) ){
+		if( t.canUpdate(session_service) ){
 			Node n = new ParentNode();
 			n.setMenuText("Update "+t.getName());
 			n.setTargetPath(TransitionServlet.getURL(conn, getTransitionProvider(t), null,FormOperations.Update));

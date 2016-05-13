@@ -96,7 +96,7 @@ public class WebappHeadTag extends TagSupport implements Tag {
 		out.println("\" rel=\"stylesheet\" type=\"text/css\">");
 	}
 	protected void doIcon(JspWriter out, HttpServletResponse response, String template_path,String type,String file) throws IOException {
-		out.print("<link rel=\"icon\"");
+		out.print("<link rel=\"icon\" ");
 		if( type != null ){
 			out.print("type=\"");
 	

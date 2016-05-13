@@ -117,8 +117,8 @@ public class MenuVisitor implements Visitor{
 					builder.clean(node.getMenuText(conn));
 				}else{
 					builder.open("img");
-					builder.attr("src", servlet_service.encodeURL(image));
-					builder.attr("alt", node.getMenuText(conn));
+					  builder.attr("src", servlet_service.encodeURL(image));
+					  builder.attr("alt", node.getMenuText(conn));
 					builder.close();
 				}
 			builder.close();

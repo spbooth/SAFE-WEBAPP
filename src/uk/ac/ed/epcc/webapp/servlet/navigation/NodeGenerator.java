@@ -13,15 +13,12 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet.navigation;
 
-import java.util.Iterator;
-
 import javax.servlet.http.HttpServletRequest;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
-import uk.ac.ed.epcc.webapp.model.data.iterator.DecoratingIterator;
 
 /** Adds the contents of {@link NodeContainer}
  * Assumed to be passed a {@link HtmlBuilder}
@@ -30,13 +27,12 @@ import uk.ac.ed.epcc.webapp.model.data.iterator.DecoratingIterator;
  */
 
 public class NodeGenerator implements UIGenerator {
-	/**
-	 * 
-	 */
-	private static final int TOPLEVEL = 2;
+
 
 	/**
+	 * @param conn 
 	 * @param n
+	 * @param req 
 	 */
 	public NodeGenerator(AppContext conn,NodeContainer n,HttpServletRequest req) {
 		super();
