@@ -33,7 +33,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
  * @param <T> 
  *
  */
-public class ListenerList<T extends DataObject> extends AbstractList<T,LifeCycleListener<T>> {
+public class ListenerList<T extends DataObject> extends AbstractList<T,LifeCycleListener<T>> implements LifeCycleListener<T>{
 
 	
 	public ListenerList(DataObjectFactory<T> factory,String list_name){
@@ -46,6 +46,49 @@ public class ListenerList<T extends DataObject> extends AbstractList<T,LifeCycle
 	@Override
 	protected Class<? super LifeCycleListener> getTemplate() {
 		return LifeCycleListener.class;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.lifecycle.ActionListener#allow(java.lang.Object, boolean)
+	 */
+	@Override
+	public boolean allow(T target, boolean throw_reason) throws LifeCycleException {
+		for(ActionListener<T> l  : this){
+			if( ! l.allow(target, throw_reason)){
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.lifecycle.ActionListener#action(java.lang.Object)
+	 */
+	@Override
+	public void action(T target) {
+		for(ActionListener<T> l  : this){
+			l.action(target);
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.lifecycle.LifeCycleListener#prepare(java.lang.Object)
+	 */
+	@Override
+	public void prepare(T target) throws Exception {
+		for(ActionListener<T> l  : this){
+			prepare(target);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.lifecycle.LifeCycleListener#abort(java.lang.Object)
+	 */
+	@Override
+	public void abort(T target) {
+		for(ActionListener<T> l  : this){
+			abort(target);
+		}
 	}
 	
 }

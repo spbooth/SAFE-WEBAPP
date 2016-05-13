@@ -37,12 +37,14 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
  * @author spb
  *
  */
-public abstract class AbstractList<T extends DataObject,L extends Targetted> extends LinkedList<L> implements Contexed{
+public abstract class AbstractList<T extends DataObject,L extends Targetted> extends LinkedList<L> implements Contexed,Targetted<T>{
 
 	private final AppContext conn;
+	private final Class<? super T> target;
 	public AbstractList(DataObjectFactory<T> factory,String list_name){
 		super();
 		this.conn=factory.getContext();
+		this.target=factory.getTarget();
 		String list = conn.getInitParameter(factory.getConfigTag()+"."+list_name,"");
 		for(String action : list.split("\\s*,\\s*")){
 			if( ! action.isEmpty()){
@@ -74,5 +76,8 @@ public abstract class AbstractList<T extends DataObject,L extends Targetted> ext
 			logger=conn.getService(LoggerService.class).getLogger(getClass());
 		}
 		return logger;
+	}
+	public final Class<? super T> getTarget(){
+		return target;
 	}
 }

@@ -33,7 +33,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
  * @param <T> 
  *
  */
-public class ActionList<T extends DataObject> extends AbstractList<T,ActionListener<T>> {
+public class ActionList<T extends DataObject> extends AbstractList<T,ActionListener<T>> implements ActionListener<T>  {
 
 	
 	public ActionList(DataObjectFactory<T> factory,String list_name){
@@ -46,6 +46,31 @@ public class ActionList<T extends DataObject> extends AbstractList<T,ActionListe
 	@Override
 	protected Class<? super ActionListener> getTemplate() {
 		return ActionListener.class;
+	}
+
+	
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.lifecycle.ActionListener#allow(java.lang.Object, boolean)
+	 */
+	@Override
+	public boolean allow(T target, boolean throw_reason) throws LifeCycleException {
+		for(ActionListener<T> l  : this){
+			if( ! l.allow(target, throw_reason)){
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.lifecycle.ActionListener#action(java.lang.Object)
+	 */
+	@Override
+	public void action(T target) {
+		for(ActionListener<T> l  : this){
+			l.action(target);
+		}
 	}
 	
 }
