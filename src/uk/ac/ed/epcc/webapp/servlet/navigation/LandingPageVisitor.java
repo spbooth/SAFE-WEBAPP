@@ -46,7 +46,7 @@ public class LandingPageVisitor implements Visitor{
 				builder.open("ul");
 			}
 			for(Node n : children){
-				visitNode(n);
+				visitNode(n,true);
 			}
 			if( active ){ 
 				builder.close();
@@ -58,7 +58,7 @@ public class LandingPageVisitor implements Visitor{
 	 * @see uk.ac.ed.epcc.webapp.servlet.navigation.Visitor#visitNode(uk.ac.ed.epcc.webapp.servlet.navigation.Node)
 	 */
 	@Override
-	public void visitNode(Node node) {
+	public void visitNode(Node node,boolean recurse) {
 		boolean target_node = target_name.equals(node.getID());
 		if( target_node){
 			active=true;
@@ -98,7 +98,7 @@ public class LandingPageVisitor implements Visitor{
 				}
 			}
 		}
-		if( ! node.isEmpty()){
+		if( recurse && ! node.isEmpty()){
 			visitContainer(node);
 		}
 		if( active){

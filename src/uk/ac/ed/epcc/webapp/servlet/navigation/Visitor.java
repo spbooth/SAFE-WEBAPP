@@ -20,5 +20,5 @@ package uk.ac.ed.epcc.webapp.servlet.navigation;
 interface Visitor {
 	public void visitContainer(NodeContainer container);
 	
-	public void visitNode(Node n);
+	public void visitNode(Node n, boolean recurse);
 }

@@ -135,7 +135,12 @@
     line-height: 30px;
     font-size: 1.0em;
     display: inline-block;
-    margin-right: -4px;
+    white-space: nowrap;
+/* This is probably necessary for multi-level menus but it looks
+ * odd at the top level and we force to 2 levels
+ *
+ *   margin-right: -4px; 
+ */
   }
   
  

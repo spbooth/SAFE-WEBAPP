@@ -41,9 +41,9 @@ public class MenuVisitor implements Visitor{
 		if( children != null && ! children.isEmpty()){
 			// do ul explicitly so we can add attry
 			// merge lower levels to work round IE11 bug
-			if( top_two){
-				builder.open("ul");
-			}
+			
+			builder.open("ul");
+			
 			if( top){
 				//builder.attr("role", "menubar");
 			    builder.attr("id","navbar");
@@ -62,11 +62,14 @@ public class MenuVisitor implements Visitor{
 			}
 			
 			for(Node n : children){
-				visitNode(n);
+				if( top ){
+					visitNode(n,true);
+				}else{
+					appendLinear(n);
+				}
 			}
-			if( top_two){
-				builder.close();
-			}
+			
+			builder.close();
 		}
 	}
 
@@ -74,7 +77,7 @@ public class MenuVisitor implements Visitor{
 	 * @see uk.ac.ed.epcc.webapp.servlet.navigation.Visitor#visitNode(uk.ac.ed.epcc.webapp.servlet.navigation.Node)
 	 */
 	@Override
-	public void visitNode(Node node) {
+	public void visitNode(Node node,boolean recurse) {
 		boolean top = ! (node.getParent() instanceof Node);
 		builder.open("li");
 		//builder.attr("role","menuitem");
@@ -95,7 +98,11 @@ public class MenuVisitor implements Visitor{
 		
 		String display_class = node.getDisplayClass(conn);
 		if( display_class != null ){
-			class_string = class_string +" "+ display_class;
+			if( class_string.isEmpty()){
+				class_string = display_class;
+			}else{
+				class_string = class_string +" "+ display_class;
+			}
 		}
 		if( ! class_string.isEmpty()){
 			builder.attr("class",class_string);
@@ -129,10 +136,22 @@ public class MenuVisitor implements Visitor{
 			}
 			builder.addText(node.getMenuText(conn));
 		}
-		if( ! node.isEmpty()){
+		if( recurse &&  ! node.isEmpty()){
 			visitContainer(node);
 		}
 		builder.close(); // close node
+	}
+	/** adds a node and all its children without nesting 
+	 * 
+	 * @param n
+	 */
+	public void appendLinear(Node n){
+		visitNode(n, false);
+		if( ! n.isEmpty()){
+			for(Node child : n.getChildren()){
+				appendLinear(child);
+			}
+		}
 	}
 	
 }
