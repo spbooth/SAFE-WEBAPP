@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2013                            |
+//| Copyright - The University of Edinburgh 2016                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -13,26 +13,43 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-/** An Input where the values must come from a numerical range.
- * 
- * This can be used to add HTML5 validation 
+/**
  * @author spb
  *
- * @param <N>
  */
-
-public interface RangedInput<N extends Number> extends BoundedInput<N>{
-
-	
-	/** Step value
-	 * defines step value. Valid values should be a multiple of the setp value.
-	 * null value implies unconstrained.
-	 * This is used to drive the html number input.
+public interface BoundedInput<T> extends HTML5Input {
+	/** Minimum valid  value.
+	 * null value implies no minimum.
 	 * 
+	 * @return T
+	 */
+	public abstract T getMin();
+
+	/** Maximum  valid value
+	 * null value implies no maximum
+	 * 
+	 * @return T
+	 */
+	public abstract T getMax();
+	
+	/** format step/range values compatible to the way they are  
+	 * presented. for example a percent imput may use 0.0 and 1.0 but present as 0, 100
+	 * used  to generate HTML5 ranges.
+	 * 
+	 * @param n
 	 * @return
 	 */
-	public abstract Number getStep();
-	
-	
-
+	public abstract String formatRange(T n);
+	/** Set the minimum value
+	 * 
+	 * @param val
+	 * @return previous limit
+	 */
+	public abstract T setMin(T val);
+	/** set the maximum value
+	 * 
+	 * @param val
+	 * @return previous limit
+	 */
+	public abstract T setMax(T val);
 }

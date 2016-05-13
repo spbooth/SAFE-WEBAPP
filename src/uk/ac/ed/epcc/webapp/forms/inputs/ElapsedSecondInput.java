@@ -30,7 +30,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  */
 
 
-public class ElapsedSecondInput extends ParseAbstractInput<Number> implements TagInput{
+public class ElapsedSecondInput extends ParseAbstractInput<Number> implements FormatHintInput{
 
 	public ElapsedSecondInput() {
 		super();
@@ -80,8 +80,8 @@ public class ElapsedSecondInput extends ParseAbstractInput<Number> implements Ta
 		return total+":"+min+":"+seconds;
 	}
 
-	public String getTag() {
-		return "(HH:MM:SS)";
+	public String getFormatHint() {
+		return "HH:MM:SS";
 	}
 
 	@Override

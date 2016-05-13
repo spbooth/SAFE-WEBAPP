@@ -20,7 +20,9 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.inputs.BinaryInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
@@ -458,6 +460,10 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	private void emitTextParam(SimpleXMLBuilder result,Input input,String name, String id, int boxwid, int max_result_length,
 			boolean force_single, boolean force_password,String default_value) {
 	
+		String format_hint=null;
+		if( input instanceof FormatHintInput){
+			format_hint = ((FormatHintInput)input).getFormatHint();
+		}
 		boolean old_escape = result.setEscapeUnicode(! force_password && ESCAPE_UNICODE_FEATURE.isEnabled(conn));
 		if (force_single || max_result_length <= 2 * boxwid) {
 			int size = max_result_length;
@@ -494,22 +500,25 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			if( use_html5){
 				if( input instanceof PatternInput){
 					result.attr("pattern",((PatternInput)input).getPattern());
-				}else if( input instanceof RangedInput){
-					RangedInput ranged = (RangedInput) input;
-					if( ranged.getType() != null){
-						Number min = ranged.getMin();
+				}else if( input instanceof BoundedInput){
+					BoundedInput bounded = (BoundedInput) input;
+					if( bounded.getType() != null){
+						Object min = bounded.getMin();
 						if( min != null ){
-							result.attr("min",((RangedInput) input).formatRange(min));
+							result.attr("min",bounded.formatRange(min));
 						}
-						Number max = ranged.getMax();
+						Object max = bounded.getMax();
 						if( max != null){
-							result.attr("max", ((RangedInput) input).formatRange(max));
+							result.attr("max", bounded.formatRange(max));
 						}
-						Number step = ranged.getStep();
-						if( step == null ){
-							result.attr("step", "any");
-						}else{
-							result.attr("step",((RangedInput) input).formatRange(step));
+						if( input instanceof RangedInput){
+							RangedInput ranged = (RangedInput)input;
+							Number step = ranged.getStep();
+							if( step == null ){
+								result.attr("step", "any");
+							}else{
+								result.attr("step",ranged.formatRange(step));
+							}
 						}
 					}
 				}
@@ -519,6 +528,9 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 						// formnovalidate for non validating submit elements.
 						result.attr("required",null);
 					}
+				}
+				if( use_html5 && format_hint != null){
+					result.attr("placeholder",format_hint);
 				}
 			}
 			result.close();
@@ -546,12 +558,18 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 					result.attr("required",null);
 				}
 			}
+			if( use_html5 && format_hint != null){
+				result.attr("placeholder",format_hint);
+			}
 			if (default_value != null && default_value.length() > 0) {
 				result.clean(default_value);
 			}else{
 				result.clean("");
 			}
 			result.close();
+		}
+		if( format_hint != null && ! use_html5){
+			result.clean(format_hint);
 		}
 		result.setEscapeUnicode(old_escape);
 	}

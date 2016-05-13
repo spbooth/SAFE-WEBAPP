@@ -27,7 +27,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
 
 
-public class MonthInput extends ParseAbstractInput<Date> implements TagInput {
+public class MonthInput extends ParseAbstractInput<Date> implements FormatHintInput {
     private static final String DEFAULT_FORMAT = "MM-yyyy";
 	DateFormat df;
  
@@ -96,8 +96,8 @@ public class MonthInput extends ParseAbstractInput<Date> implements TagInput {
 		return df.format(date);
 	}
 
-	public String getTag() {
-		return "("+DEFAULT_FORMAT.toUpperCase()+")";
+	public String getFormatHint() {
+		return DEFAULT_FORMAT.toUpperCase();
 	}
 
 	@Override
