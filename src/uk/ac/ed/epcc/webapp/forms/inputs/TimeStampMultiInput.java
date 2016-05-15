@@ -36,7 +36,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  */
 
 
-public class TimeStampMultiInput extends MultiInput<Date,Input<Integer>> implements ParseInput<Date> {
+public class TimeStampMultiInput extends MultiInput<Date,Input<Integer>> implements ParseInput<Date>, BoundedInput<Date> {
 	private final IntegerRangeInput hour_input;
 	private final IntegerRangeInput min_input;
 	private final IntegerRangeInput sec_input;
@@ -342,6 +342,49 @@ public class TimeStampMultiInput extends MultiInput<Date,Input<Integer>> impleme
 		if( max_date != null && max_date.before(val)){
 			throw new ValidateException("After "+df.format(max_date));
 		}
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input#getType()
+	 */
+	@Override
+	public String getType() {
+		// supress html5
+		return null;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput#getMin()
+	 */
+	@Override
+	public Date getMin() {
+		return min_date;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput#getMax()
+	 */
+	@Override
+	public Date getMax() {
+		return max_date;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput#formatRange(java.lang.Object)
+	 */
+	@Override
+	public String formatRange(Date n) {
+		return getString(n);
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput#setMin(java.lang.Object)
+	 */
+	@Override
+	public Date setMin(Date val) {
+		return setMinDate(val);
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput#setMax(java.lang.Object)
+	 */
+	@Override
+	public Date setMax(Date val) {
+		return setMaxDate(val);
 	}
 
 	
