@@ -14,7 +14,6 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -36,82 +35,33 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  */
 
 
-public class TimeStampMultiInput extends MultiInput<Date,Input<Integer>> implements ParseInput<Date>, BoundedInput<Date> {
-	private final IntegerRangeInput hour_input;
-	private final IntegerRangeInput min_input;
-	private final IntegerRangeInput sec_input;
-	private final IntegerInput year_input;
-    private final CalendarMonthInput month_input;
-    private final IntegerRangeInput day_input;
-    private final long resolution;
+public class TimeStampMultiInput extends AbstractCalendarMultiInput implements ParseInput<Date>, BoundedInput<Date> {
+	private final long resolution;
 
     private final DateFormat df;
 
-    private Calendar c=null;
+    Calendar c=null;
     private Date min_date=null;
     private Date max_date=null;
     public TimeStampMultiInput(){
     	this(1000L,Calendar.SECOND);
     }
     public TimeStampMultiInput(long resolution,int max_field){
+    	super(max_field);
     	this.resolution=resolution;
     	//df = new RelativeDateFormat("yyyy-MM-dd HH:mm:ss");
     	
-    	NumberFormat nf = NumberFormat.getIntegerInstance();
-    	nf.setMinimumIntegerDigits(2);
-    	nf.setMaximumIntegerDigits(2);
+    	
     	StringBuilder time_format = new StringBuilder();
     	if( max_field >= Calendar.HOUR){
-    		hour_input = new IntegerRangeInput(0, 24);
-    		hour_input.setNumberFormat(nf);
-    		addInput("hour",hour_input);
     		time_format.append("HH");
-    	}else{
-    		hour_input=null;
     	}
     	if( max_field >= Calendar.MINUTE){
-    		min_input = new IntegerRangeInput(0, 60);
-    		min_input.setNumberFormat(nf);
-    		addInput("min",":",min_input);
     		time_format.append(":mm");
-    	}else{
-    		min_input=null;
     	}
     	if( max_field >= Calendar.SECOND){
-    		sec_input = new IntegerRangeInput(0, 60);
-    		sec_input.setNumberFormat(nf);
-    		addInput("sec",":",sec_input);
     		time_format.append(":ss");
-    	}else{
-    		sec_input=null;
     	}
-    	
-    	
-		if( max_field >= Calendar.DAY_OF_MONTH){
-			String label="";
-			if( hour_input != null){
-				if( min_input == null ){
-					label=":00 on ";
-				}else{
-					label=" on ";
-				}
-			}
-    		day_input = new IntegerRangeInput(1, 31);
-    		addInput("day", label,day_input);
-    	}else{
-    		day_input = null;
-    	}
-    	
-    	if( max_field >= Calendar.MONTH){
-    		month_input= new CalendarMonthInput();
-    		addInput("month", month_input);
-    	}else{
-    		month_input=null;
-    	}
-    	year_input = new IntegerInput();
-    	year_input.setMaxResultLength(4);
-    	year_input.setBoxWidth(4);
-    	addInput("year", year_input);
     	
     	// Use ISO/Web date format for string
     	StringBuilder date_format = new StringBuilder();
@@ -130,17 +80,6 @@ public class TimeStampMultiInput extends MultiInput<Date,Input<Integer>> impleme
     	df = new RelativeDateFormat(date_format.toString());
     	
     }
-	private Calendar makeCalendar(){
-		Calendar cal=Calendar.getInstance();
-    	cal.set(Calendar.MILLISECOND,0);
-    	cal.set(Calendar.SECOND,0);
-    	cal.set(Calendar.MINUTE,0);
-    	cal.set(Calendar.HOUR_OF_DAY,0);
-    	cal.set(Calendar.DAY_OF_MONTH,1);
-    	cal.set(Calendar.MONTH,0);
-    	return cal;
-	}
-
 	public Date convert(Object v) throws TypeError {
 		if( v == null ){
 			return null;
@@ -174,72 +113,6 @@ public class TimeStampMultiInput extends MultiInput<Date,Input<Integer>> impleme
 		}
 		return c.getTime();
 	}
-	/** edit a Calendar from the inputs. 
-	 * Allocate a new Calendar if necessary
-	 * 
-	 * @param in
-	 * @return modified object
-	 */
-	protected Calendar setCalendarFromInputs(Calendar in) {
-		if( in != null ){
-			// we don't store milliseconds so default to zero.
-			in.set(Calendar.MILLISECOND, 0);
-		}
-		if( sec_input != null ){
-			Integer sec_value = sec_input.getValue();
-			if( sec_value != null ){
-				if( in == null){
-					in = makeCalendar();
-				}
-				in.set(Calendar.SECOND,sec_value);
-			}
-		}
-		if( min_input != null ){
-			Integer min_value = min_input.getValue();
-			if( min_value != null ){
-				if( in == null){
-					in=makeCalendar();
-				}
-				in.set(Calendar.MINUTE,min_value);
-			}
-		}
-		if( hour_input != null ){
-			Integer hour_value = hour_input.getValue();
-			if( hour_value != null ){
-				if( in == null ){
-					in=makeCalendar();
-				}
-				in.set(Calendar.HOUR_OF_DAY,hour_value);
-			}
-		}
-		if( day_input != null ){
-			Integer value = day_input.getValue();
-			if( value != null){
-				if( in== null){
-					in=makeCalendar();
-				}
-				in.set(Calendar.DAY_OF_MONTH, value);
-			}
-		}
-		if( month_input != null ){
-			Integer value2 = month_input.getValue();
-			if( value2 != null){
-				if( in == null){
-					in=makeCalendar();
-				}
-				in.set(Calendar.MONTH, value2);
-			}
-		}
-		Integer value3 = year_input.getValue();
-		if(value3 !=null){
-			if( in == null){
-				in=makeCalendar();
-			}
-			in.set(Calendar.YEAR, value3);
-		}
-		return in;
-	}
-
 	@Override
 	public final Date setValue(Date v) throws TypeError {
 		Date old = getValue();
@@ -255,44 +128,6 @@ public class TimeStampMultiInput extends MultiInput<Date,Input<Integer>> impleme
 			c=null;
 		}
 		return old;
-	}
-	protected void setInputsFromCalendar(Calendar in) throws TypeError {
-		if( in == null ){
-			if( sec_input != null){
-				sec_input.setValue(null);
-			}
-			if( min_input != null ){
-				min_input.setValue(null);
-			}
-			if( hour_input != null ){
-				hour_input.setValue(null);
-			}
-			if( day_input != null ){
-				day_input.setValue(null);
-			}
-			if( month_input != null ){
-				month_input.setValue(null);
-			}
-			year_input.setValue(null);
-			c=null;
-		}else{
-			if( sec_input != null){
-				sec_input.setValue(in.get(Calendar.SECOND));
-			}
-			if( min_input != null ){
-				min_input.setValue(in.get(Calendar.MINUTE));
-			}
-			if( hour_input != null ){
-				hour_input.setValue(in.get(Calendar.HOUR_OF_DAY));
-			}
-			if( day_input != null ){
-				day_input.setValue(in.get(Calendar.DAY_OF_MONTH));
-			}
-			if( month_input != null ){
-				month_input.setValue(in.get(Calendar.MONTH));
-			}
-			year_input.setValue(in.get(Calendar.YEAR));
-		}
 	}
 	public Date setMinDate(Date d){
 		Date old = min_date;
@@ -344,14 +179,6 @@ public class TimeStampMultiInput extends MultiInput<Date,Input<Integer>> impleme
 		}
 	}
 	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input#getType()
-	 */
-	@Override
-	public String getType() {
-		// supress html5
-		return null;
-	}
-	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput#getMin()
 	 */
 	@Override
@@ -385,6 +212,13 @@ public class TimeStampMultiInput extends MultiInput<Date,Input<Integer>> impleme
 	@Override
 	public Date setMax(Date val) {
 		return setMaxDate(val);
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AbstractCalendarMultiInput#setNull()
+	 */
+	@Override
+	protected void setNull() {
+		c=null;
 	}
 
 	
