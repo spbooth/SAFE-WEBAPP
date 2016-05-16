@@ -561,8 +561,8 @@ public final class AppContext {
 			String subname = m.group(1);
 			if( subname.contains(":")){
 				int pos = subname.indexOf(':');
-				subname=subname.substring(0, pos);
 				default_text = subname.substring(pos+1);
+				subname=subname.substring(0, pos);
 			}
 			String text = getInitParameter(subname,default_text);
 			// supress unintended back subs
