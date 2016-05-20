@@ -99,8 +99,7 @@
 }
 .nav li.external > a:after {
 	content:   url("link.png");
-	float: right;
-  	margin-right: 20px;
+  	margin-left: 15px;
   }
 /*******************************************
    Style menu for larger screens
@@ -126,10 +125,10 @@
     z-index: 10;
   }
    .nav ul ul {
-     width: inherit;
+     width: auto;
   }
   .nav li {
-    width: 170px;
+    min-width: 170px;
     border-bottom: none;
     height: 30px;
     line-height: 30px;
