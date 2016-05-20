@@ -39,6 +39,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.TagInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
 
 
 /** A {@link HtmlPrinter} that also implements {@link ContentBuilder} 
@@ -52,8 +53,8 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 public class HtmlBuilder extends HtmlPrinter implements ContentBuilder  {
   
-public static final Feature HTML_USE_LABEL_FEATURE = new Feature("html.use_label",true,"generate html labels in automatic forms");
-public static final Feature HTML_TABLE_SECTIONS_FEATURE = new Feature("html.table_sections",false,"generate thead/tbody in tables");
+public static final Feature HTML_USE_LABEL_FEATURE = new Preference("html.use_label",true,"generate html labels in automatic forms");
+public static final Feature HTML_TABLE_SECTIONS_FEATURE = new Preference("html.table_sections",false,"generate thead/tbody in tables");
 Boolean use_table_section=null;
 
 protected static final class Text extends HtmlPrinter {
