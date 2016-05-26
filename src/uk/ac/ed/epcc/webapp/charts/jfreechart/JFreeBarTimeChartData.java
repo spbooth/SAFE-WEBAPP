@@ -86,7 +86,7 @@ public class JFreeBarTimeChartData extends JFreeChartData<GenericSetPlot> implem
 				
 		CategoryPlot categoryPlot = chart.getCategoryPlot();
 		CategoryAxis axis = categoryPlot.getDomainAxis();
-		if( max_len > 8 || ds.getNumSets() > 16 ){
+		if( max_len > 8 || ds.getNumSets() > 16 || (max_len * ds.getNumSets()) > 50 ){
 			axis.setCategoryLabelPositions(CategoryLabelPositions.DOWN_45);
 		}
 		Font tickLabelFont = axis.getTickLabelFont();
