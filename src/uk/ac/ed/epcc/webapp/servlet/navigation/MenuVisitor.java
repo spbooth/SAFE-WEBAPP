@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.servlet.navigation;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 /** A {@link Visitor} that generates the menu HTML
@@ -26,6 +27,7 @@ import uk.ac.ed.epcc.webapp.servlet.ServletService;
 public class MenuVisitor implements Visitor{
 	private final AppContext conn;
 	private final HtmlBuilder builder;
+	public static final Feature MULTI_LEVEL_MENU_FEATURE=new Feature("navigation.multi_level_menu",false,"Should navigation menus support multiple levels");
 	public MenuVisitor(AppContext conn,HtmlBuilder builder){
 		this.conn=conn;
 		this.builder=builder;
@@ -37,7 +39,7 @@ public class MenuVisitor implements Visitor{
 	public void visitContainer(NodeContainer container) {
 		List<Node> children = container.getChildren();
 		boolean top = (! (container instanceof Node));
-		boolean top_two = top || ! (((Node)container).getParent() instanceof Node) ;
+		boolean recurse = top || MULTI_LEVEL_MENU_FEATURE.isEnabled(conn);
 		if( children != null && ! children.isEmpty()){
 			// do ul explicitly so we can add attry
 			// merge lower levels to work round IE11 bug
@@ -62,8 +64,8 @@ public class MenuVisitor implements Visitor{
 			}
 			
 			for(Node n : children){
-				if( top ){
-					visitNode(n,true);
+				if( recurse ){
+					n.accept(this);
 				}else{
 					appendLinear(n);
 				}
@@ -77,6 +79,10 @@ public class MenuVisitor implements Visitor{
 	 * @see uk.ac.ed.epcc.webapp.servlet.navigation.Visitor#visitNode(uk.ac.ed.epcc.webapp.servlet.navigation.Node)
 	 */
 	@Override
+	public void visitNode(Node node){
+		visitNode(node,true);
+	}
+	
 	public void visitNode(Node node,boolean recurse) {
 		boolean top = ! (node.getParent() instanceof Node);
 		builder.open("li");

@@ -192,12 +192,7 @@
     display: initial;
     width: inherit;
   }
-  /* sub-menu items need to auto-calculate height
-   * so the sub-menu can do overflow properly
-   */
-  .nav ul li ul li{
-    height: auto;
-  }
+  
   /* sub-menus add vertical scroll above a certain length
    */
   .nav > ul > li > ul {
@@ -205,6 +200,24 @@
     overflow-y: auto;
     overflow-x: visible;
   }
+  /*  alternate rules for dynamic sub-menu
+  .nav ul li ul ul{
+    position: absolute;
+    z-index: 12;
+    left: 100px;
+  }
+  .nav > ul > li > ul {
+  	overflow-x: visible;
+  	overflow-y: visible;
+  }
+  */
+  /* sub-menu items need to auto-calculate height
+   * so the sub-menu can do overflow properly
+   */
+  .nav ul li ul li{
+    height: auto;
+  }
+  
   
   
   /* Show pull-down menu on hover or a JS setting

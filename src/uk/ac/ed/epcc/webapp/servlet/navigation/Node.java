@@ -177,7 +177,7 @@ public abstract class Node extends NodeContainer implements Externalizable{
 	}
 	@Override
 	public void accept(Visitor vis) {
-		vis.visitNode(this,true);
+		vis.visitNode(this);
 	}
 	@Override
 	public String toString(){
