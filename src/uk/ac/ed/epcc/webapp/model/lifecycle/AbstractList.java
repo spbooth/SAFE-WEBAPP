@@ -48,6 +48,7 @@ public abstract class AbstractList<T extends DataObject,L extends Targetted> ext
 		String list = conn.getInitParameter(factory.getConfigTag()+"."+list_name,"");
 		for(String action : list.split("\\s*,\\s*")){
 			if( ! action.isEmpty()){
+				try{
 				@SuppressWarnings("unchecked")
 				L a = (L) conn.makeObject(getTemplate(), action);
 				if( a == null){
@@ -56,6 +57,9 @@ public abstract class AbstractList<T extends DataObject,L extends Targetted> ext
 					getLogger().error("Incompatible targets for listener "+a.getTarget().getCanonicalName()+" "+factory.getTarget().getCanonicalName());;
 				}else{
 					add(a);
+				}
+				}catch(Throwable t){
+					getLogger().error("Error making listener list for action="+action,t);
 				}
 			}
 		}
