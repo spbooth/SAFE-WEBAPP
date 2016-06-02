@@ -255,6 +255,13 @@ public class Emailer {
 		return templateEmail(sendto, null, email_template);
 	}
 
+	
+	public String getEmail(AppUser recipient){
+		if( recipient.allowEmail()){
+			return recipient.getEmail();
+		}
+		return getContext().getInitParameter("disabled_email.map_address");
+	}
 	/**
 	 * Send an email based on a template file to a {@link AppUser}
 	 * 
@@ -266,8 +273,9 @@ public class Emailer {
 	 */
 	public MimeMessage templateEmail(AppUser recipient, TemplateFile email_template)
 			throws IOException, MessagingException {
-		if( recipient.allowEmail()){
-			return templateEmail(recipient.getEmail(), null, email_template);
+		String email = getEmail(recipient);
+		if( email != null ){
+			return templateEmail(email, null, email_template);
 		}
 		return null;
 	}
