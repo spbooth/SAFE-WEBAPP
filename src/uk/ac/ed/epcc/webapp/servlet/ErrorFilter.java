@@ -38,6 +38,7 @@ import javax.servlet.http.HttpSession;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CleanupService;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.email.logging.EmailLoggerService;
 import uk.ac.ed.epcc.webapp.email.logging.ServletEmailLoggerService;
 import uk.ac.ed.epcc.webapp.jdbc.JNDIDatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.config.DataBaseConfigService;
@@ -107,6 +108,8 @@ public class ErrorFilter implements Filter {
 		@Override
 		public void run() {
 			try{
+				// we no longer have the request so use normal logger service
+				conn.setService(new EmailLoggerService(conn));
 				// Make sure Cleanup runs first
 				serv.cleanup();
 				conn.close();
@@ -323,7 +326,7 @@ public class ErrorFilter implements Filter {
 			try {
 
 				conn = makeContext((ServletContext) req.getAttribute(SERVLET_CONTEXT_ATTR),req,res);
-				// report error logs by email with page info
+				// report error logs by email with page info need to replace this within closer
 				conn.setService( new ServletEmailLoggerService(conn,req));
 				if( TIMER_FEATURE.isEnabled(conn)){
 					DefaultTimerService timer_service = new DefaultTimerService(conn);

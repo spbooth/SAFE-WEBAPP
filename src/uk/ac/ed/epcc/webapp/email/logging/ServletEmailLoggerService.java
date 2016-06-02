@@ -39,8 +39,13 @@ public class ServletEmailLoggerService extends EmailLoggerService {
 	@Override
 	protected Hashtable getProps() {
 		Hashtable props= super.getProps();
-		if (req != null) {
-			String url = req.getRequestURL().toString();
+		try{
+		if (req != null ) {
+			String url = null;
+			StringBuffer buf =  req.getRequestURL();
+			if( buf != null ){
+				url = buf.toString();
+			}
 			if( url != null && url.contains("password")){
 				url="redacted";
 			}
@@ -103,6 +108,9 @@ public class ServletEmailLoggerService extends EmailLoggerService {
 			if (psb.length() > 0) {
 				props.put("parameters", psb.toString());
 			}
+		}
+		}catch(Throwable t){
+			
 		}
 		return props;
 	}

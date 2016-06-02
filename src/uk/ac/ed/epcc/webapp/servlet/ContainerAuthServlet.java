@@ -21,6 +21,7 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 
@@ -36,6 +37,7 @@ public abstract class ContainerAuthServlet extends WebappServlet {
 		String user = req.getRemoteUser();
 		if( verify(user )){
 		   doPost(req,res,conn,user);
+		   HttpSession sess = req.getSession(false);
 		   return;
 		}
 		res.sendError(HttpServletResponse.SC_FORBIDDEN,"Not Authenticated");
