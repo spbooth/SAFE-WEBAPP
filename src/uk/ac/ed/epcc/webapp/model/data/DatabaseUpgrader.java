@@ -83,9 +83,22 @@ public class DatabaseUpgrader extends Object implements Command {
 		System.out.println("upgrade to utf8");
 		stmt.executeUpdate("ALTER TABLE "+table_name+" CHARACTER SET utf8 COLLATE utf8_unicode_ci");
 		stmt.executeUpdate("ALTER TABLE "+table_name+" CONVERT TO  CHARACTER SET utf8 COLLATE utf8_unicode_ci");
+		StringBuilder primary_update = new StringBuilder();
+		primary_update.append("ALTER TABLE ");
+		primary_update.append(table_name);
+		primary_update.append(" CHANGE ");
+		res.addUniqueName(primary_update, false, true);
+		primary_update.append(" ");
+		res.addUniqueName(primary_update, false, true);
+		primary_update.append(" INT(11) NOT NULL auto_increment");
+		stmt.executeUpdate(primary_update.toString());
 		for( String field : res.getFields()){
 			FieldInfo info = res.getInfo(field);
 			if( info.isReference()){
+				stmt.executeUpdate("UPDATE "+table_name+" SET "+info.getName(true)+"=NULL WHERE "+info.getName(true)+" <= 0");
+				if(  res.hasIndex(field+"_ref_key")){
+					stmt.executeUpdate("ALTER TABLE "+table_name+" DROP FOREIGN KEY "+field+"_ref_key");
+				}
 				System.out.println("add foreign key "+name+"."+field);
 				StringBuilder query = new StringBuilder();
 				query.append("ALTER TABLE ");
@@ -96,10 +109,12 @@ public class DatabaseUpgrader extends Object implements Command {
 				query.append("_ref_key (");
 				info.addName(query, false, true);
 				query.append(") REFERENCES ");		
-			
+
 				query.append(Repository.getForeignKeyDescriptor(getContext(), ref, true));
+				query.append(" ON UPDATE CASCADE ");
 				System.out.println(query.toString());
 				stmt.executeUpdate(query.toString());
+
 			}else if( info.isNumeric()){
 				System.out.println(info.getName(true)+" not index?");
 			}
