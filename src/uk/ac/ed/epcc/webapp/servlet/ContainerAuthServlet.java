@@ -38,6 +38,14 @@ public abstract class ContainerAuthServlet extends WebappServlet {
 		if( verify(user )){
 		   doPost(req,res,conn,user);
 		   HttpSession sess = req.getSession(false);
+		   if( sess != null){
+			   // If we have a session with nothing stored try to delete it
+			   // This servlet is for script access so we don't need them
+			   // but we don't want to lose a session for a logged in user visiting the servlet in a browser.
+			   if( ! sess.getAttributeNames().hasMoreElements()){
+				   sess.invalidate();
+			   }
+		   }
 		   return;
 		}
 		res.sendError(HttpServletResponse.SC_FORBIDDEN,"Not Authenticated");

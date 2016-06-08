@@ -74,6 +74,18 @@ public class Table<C, R> {
 		private Map<R, Map<String, String>> element_attr = null; // per element
 																	// attributes
 
+		public void clear(){
+			data.clear();
+			format=null;
+			if( attr != null){
+				attr.clear();
+				attr=null;
+			}
+			if( element_attr != null ){
+				element_attr.clear();
+				element_attr=null;
+			}
+		}
 		private Col(C key) {
 			this.col_key = key;
 			if (key instanceof String) {
@@ -1394,6 +1406,11 @@ public class Table<C, R> {
 	 * @param key
 	 */
 	public void removeCol(C key) {
+		Col col = cols.get(key);
+		if( col != null ){
+			col.clear();
+			cols.remove(key);
+		}
 		col_keys.remove(key);
 
 	}
