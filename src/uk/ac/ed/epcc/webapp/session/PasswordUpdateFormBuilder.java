@@ -116,7 +116,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 			   char c = data.charAt(i);
 			   if( Character.isDigit(c)){
 				   numbers++;
-			   }else if( ! Character.isAlphabetic(c)){
+			   }else if( ! Character.isLetter(c)){
 				   specials++;
 			   }
 			   chars.add(Character.valueOf(c));
