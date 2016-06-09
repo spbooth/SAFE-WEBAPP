@@ -13,33 +13,34 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms;
 
-import java.util.Set;
+import static org.junit.Assert.fail;
 
-import org.junit.Test;
+import uk.ac.ed.epcc.webapp.WebappTestBase;
+import uk.ac.ed.epcc.webapp.email.inputs.RestrictedEmailFieldValidator;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
-import uk.ac.ed.epcc.webapp.email.inputs.EmailInput;
-import uk.ac.ed.epcc.webapp.email.inputs.RestrictedEmailInput;
 
-
-public class RestrictedEmailInputTest extends EmailInputTest {
-	@Test
-	public void dummy(){
+public class RestrictedEmailfieldValidatorTest extends WebappTestBase {
+	
+	
+	public void testBadAddresses() throws ValidateException{
+		RestrictedEmailFieldValidator val = new RestrictedEmailFieldValidator("gmail,yahoo,hotmail");
 		
+		for(String bad : new String[]{ "fred@gmail.com","fred@hotmail.com", "fred@yahoo.com"}){
+			try{
+				val.validate(bad);
+				fail("Passed bad email "+bad);
+			}catch(ValidateException e){
+				
+			}
+		}
+		for(String good : new String[]{ "fred@exmple.com","fred@ed.ac.uk"}){
+			
+				val.validate(good);
+				
+		}
 	}
 	
-	@Override
-	public EmailInput getInput() {
-		return  new RestrictedEmailInput("gmail,yahoo,hotmail");
-	}
 	
-	@Override
-	public Set<String> getBadData() {
-		
 	
-		Set<String> badData = super.getBadData();
-		badData.add("fred@gmail.com");
-		badData.add("fred@hotmail.com");
-		badData.add("fred@yahoo.com");
-		return badData;
-	}
 }

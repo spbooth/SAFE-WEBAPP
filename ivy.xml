@@ -85,11 +85,7 @@
 		<dependency org="com.sun" name="mail" rev="1.4.5">
     		<artifact name="mail" ext="jar"/>
 		</dependency>
-		<!--
-		<dependency org="org.apache" name="servlet-api" rev="2.4">
-    		<artifact name="servlet-api" ext="jar"/>
-		</dependency>
-		-->
+	
 		<dependency org="com.mysql" name="mysql-connector-java" rev="5.1.16">
     		<artifact name="mysql-connector-java" m:classifier="bin" ext="jar"/>
 		</dependency>

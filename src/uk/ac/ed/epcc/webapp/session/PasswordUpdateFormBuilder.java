@@ -214,7 +214,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
     public void buildForm(Form f,U user, AppContext conn){
     	if( check_old ){
     		f.addInput(PASSWORD_FIELD, "Current Password:", new PasswordInput());
-    		f.getField(PASSWORD_FIELD).setValidator(new MatchValidator(user));
+    		f.getField(PASSWORD_FIELD).addValidator(new MatchValidator(user));
     		f.addValidator(new ChangeValidator());
     	}
     	f.addInput(NEW_PASSWORD1, "New Password:", makeNewInput());

@@ -131,7 +131,7 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	public void customiseUpdateForm(Form f, AU target, SessionService operator) {
 		Field ff = f.getField(getField());
 		if( ff != null ){
-			ff.setValidator(new ParseFactoryValidator<AU>(this, target));
+			ff.addValidator(new ParseFactoryValidator<AU>(this, target));
 			if( ! operator.hasRole(SessionService.ADMIN_ROLE)){
 				// only admin can edit in update
 				ff.lock();
@@ -143,7 +143,7 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	public void customiseForm(Form f) {
 		Field ff = f.getField(getField());
 		if( ff != null ){
-			ff.setValidator(new ParseFactoryValidator<AU>(this, null));
+			ff.addValidator(new ParseFactoryValidator<AU>(this, null));
 		}
 	}
 

@@ -29,6 +29,43 @@ import uk.ac.ed.epcc.webapp.model.ParseFactory;
 
 public class ParseFactoryValidator<BDO> implements FieldValidator<String> {
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((existing == null) ? 0 : existing.hashCode());
+		result = prime * result + ((parser == null) ? 0 : parser.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ParseFactoryValidator other = (ParseFactoryValidator) obj;
+		if (existing == null) {
+			if (other.existing != null)
+				return false;
+		} else if (!existing.equals(other.existing))
+			return false;
+		if (parser == null) {
+			if (other.parser != null)
+				return false;
+		} else if (!parser.equals(other.parser))
+			return false;
+		return true;
+	}
+
 	/**
 	 * @param parser
 	 * @param existing
