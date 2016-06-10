@@ -113,7 +113,8 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 	public void customiseUpdateForm(Form f, AU target, SessionService operator) {
 		
 		Field field = f.getField(EMAIL);
-		// Current target is allowed.
+		// Current target is allowed have to replace the default validator
+		field.removeValidator(new ParseFactoryValidator<AU>(this, null));
 		field.addValidator(new ParseFactoryValidator<AU>(this, target));
 		if( ! operator.hasRole(SessionService.ADMIN_ROLE)){
 			// only admin can edit in update
