@@ -1827,6 +1827,8 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 						
 						logger.error("Cannot make composite "+comp, e);
 					}
+				}else{
+					logger.error("Unrecognised composite tag "+comp);
 				}
 			}
 		}
