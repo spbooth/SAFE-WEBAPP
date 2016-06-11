@@ -27,7 +27,6 @@ import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.relationship.PersonRelationship;
-import uk.ac.ed.epcc.webapp.model.relationship.RelationshipProvider;
 import uk.ac.ed.epcc.webapp.servlet.DefaultServletService;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 import uk.ac.ed.epcc.webapp.servlet.WtmpManager;
