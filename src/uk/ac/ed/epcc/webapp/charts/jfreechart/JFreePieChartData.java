@@ -70,6 +70,9 @@ public class JFreePieChartData extends JFreeChartData<GenericSetPlot> implements
 		StandardPieSectionLabelGenerator gen = new StandardPieSectionLabelGenerator("{0} ({2})");
 		
 		plot.setLabelGenerator(gen);
+		plot.setMaximumLabelWidth(0.07);
+		plot.setLabelFont(plot.getLabelFont().deriveFont(9.0F));
+		
 		
 		LegendTitle leg = chart.getLegend();
 		
