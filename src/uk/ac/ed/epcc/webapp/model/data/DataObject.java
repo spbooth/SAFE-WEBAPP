@@ -169,7 +169,7 @@ public abstract class DataObject implements ContextIndexed, Identified{
 	}
 	/** Extension point called at end of commit
 	 * 
-	 * @param changed
+	 * @param changed record was changed by commit.
 	 */
 	protected void post_commit(boolean changed)throws DataFault{
 		
