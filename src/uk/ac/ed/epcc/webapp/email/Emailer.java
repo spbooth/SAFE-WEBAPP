@@ -165,7 +165,7 @@ public class Emailer {
 			
 		}
 
-		templateEmail(person.getEmail(), email_template);
+		templateEmail(person, email_template);
 
 	}
 
@@ -225,7 +225,7 @@ public class Emailer {
 			}
 			
 		}
-		templateEmail(person.getEmail(), email_template);
+		templateEmail(person, email_template);
 
 	}
 
@@ -273,9 +273,13 @@ public class Emailer {
 	 */
 	public MimeMessage templateEmail(AppUser recipient, TemplateFile email_template)
 			throws IOException, MessagingException {
+		Logger log = getLogger();
 		String email = getEmail(recipient);
-		if( email != null ){
+		log.debug("Email mapped "+recipient.getEmail()+"->"+email);
+		if( email != null && email.trim().length() > 0){
 			return templateEmail(email, null, email_template);
+		}else{
+			log.warn("Email to "+recipient.getIdentifier()+" mapped to null");
 		}
 		return null;
 	}
