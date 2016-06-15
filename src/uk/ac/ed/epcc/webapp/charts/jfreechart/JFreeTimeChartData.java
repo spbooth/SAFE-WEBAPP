@@ -127,6 +127,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 	
     private TickUnits getUnits(CalendarFieldSplitPeriod period){
     	int field = period.getField();
+    	boolean good_match=false;
     	for( DateTickUnitType unit : new DateTickUnitType[]{ DateTickUnitType.SECOND,DateTickUnitType.MINUTE,DateTickUnitType.HOUR,DateTickUnitType.DAY,DateTickUnitType.MONTH,DateTickUnitType.YEAR}){
     		if( field == unit.getCalendarField()){
     			TickUnits units = new TickUnits();
@@ -138,10 +139,13 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
     			if( nsplit > 50 ){
     				return null;  // period unit is too small
     			}
-				// include all multiples of period that divide count
+				// include all multiples that are exact factors of count
 				for( int i = 1; i<= count; i++){
 					if( count % i == 0){
 						units.add(new DateTickUnit(unit, i));
+						if( i > 1 &&  (count/i) < 8 ){
+							good_match=true;
+						}
 					}
 				}
 				
@@ -150,14 +154,37 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 				for( int i=2 ; i< nsplit && i < 50 ; i++){
 					if( nsplit % i == 0 ){
 						units.add(new DateTickUnit(unit, i*count));
+						if( i > 1 && (nsplit/i) < 8 ){
+							good_match=true;
+						}
 					}
 				}
-				return units;
+				
+				if( good_match){
+					return units;
+				}
+				return null;
     		}
     	}
     	return null;
     }
-
+    private TickUnits getUnits(){
+    	TickUnits units = new TickUnits();
+    	units.add(new DateTickUnit(DateTickUnitType.SECOND, 1));
+    	units.add(new DateTickUnit(DateTickUnitType.MINUTE, 1));
+    	units.add(new DateTickUnit(DateTickUnitType.MINUTE, 10));
+    	units.add(new DateTickUnit(DateTickUnitType.MINUTE, 15));
+    	units.add(new DateTickUnit(DateTickUnitType.HOUR, 1));
+    	units.add(new DateTickUnit(DateTickUnitType.HOUR, 12));
+    	units.add(new DateTickUnit(DateTickUnitType.DAY, 1));
+    	units.add(new DateTickUnit(DateTickUnitType.DAY, 7));
+    	units.add(new DateTickUnit(DateTickUnitType.MONTH, 1));
+    	units.add(new DateTickUnit(DateTickUnitType.MONTH, 3));
+    	units.add(new DateTickUnit(DateTickUnitType.MONTH, 6));
+    	units.add(new DateTickUnit(DateTickUnitType.YEAR, 1));
+    	units.add(new DateTickUnit(DateTickUnitType.YEAR, 10));
+    	return units;
+    }
 	private TimeChartDataSet addTimeSeries(TimeChartDataSet dataset) throws InvalidArgument {
 		if( dataset == null){
 			dataset = makeDataSet(1);
@@ -178,6 +205,8 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 					axis.setStandardTickUnits(u);
 				}
 			}
+			axis.setMinimumDate(period.getStart());
+			axis.setMaximumDate(period.getEnd());
 			LegendTitle leg = chart.getLegend();
 			leg.setSortOrder(SortOrder.DESCENDING);
 			leg.setPosition(RectangleEdge.RIGHT);
