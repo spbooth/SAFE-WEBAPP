@@ -66,6 +66,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 	LinkedList<TimeChartDataSet> plots = new LinkedList<TimeChartDataSet>();
 	boolean use_bar=false;
 	private boolean use_step=false;
+	private boolean is_cumulative=false;
 
 	@Override
 	public JFreeChart getJFreeChart() {
@@ -341,6 +342,30 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 	 */
 	public void setUseStep(boolean use_step) {
 		this.use_step = use_step;
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.charts.TimeChartData#setCumulative(boolean)
+	 */
+	@Override
+	public void setCumulative(boolean value) {
+		is_cumulative=value;
+		if( value){
+			use_step=false;
+		}
+		
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.charts.TimeChartData#isCumulative()
+	 */
+	@Override
+	public boolean isCumulative() {
+		return is_cumulative;
 	}
 
 }

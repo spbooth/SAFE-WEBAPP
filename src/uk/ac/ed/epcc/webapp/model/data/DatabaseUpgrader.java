@@ -54,13 +54,14 @@ public class DatabaseUpgrader extends Object implements Command {
 	Set<String> seen = new HashSet<String>();
 	
 	private void process(Connection c,Statement stmt,String name) throws SQLException{
-		if( seen.contains(name)){
+		if( seen.contains(name) || conn.getBooleanParameter(name+".no_innodb", false)){
 			return;
 		}
 		System.out.println("processing "+name);
 		// ensure table created
 		DataObjectFactory fac = getContext().makeObject(DataObjectFactory.class,name);
 		
+		Repository.reset(getContext(), name);
 		Repository res = Repository.getInstance(getContext(), name);
 		String table_name =res.getTable();
 		System.out.println("table is "+table_name);
@@ -96,24 +97,24 @@ public class DatabaseUpgrader extends Object implements Command {
 			FieldInfo info = res.getInfo(field);
 			if( info.isReference()){
 				stmt.executeUpdate("UPDATE "+table_name+" SET "+info.getName(true)+"=NULL WHERE "+info.getName(true)+" <= 0");
-				if(  res.hasIndex(field+"_ref_key")){
-					stmt.executeUpdate("ALTER TABLE "+table_name+" DROP FOREIGN KEY "+field+"_ref_key");
-				}
-				System.out.println("add foreign key "+name+"."+field);
-				StringBuilder query = new StringBuilder();
-				query.append("ALTER TABLE ");
-				res.addTable(query, true);
-				String ref = info.getReferencedTable();
-				query.append(" ADD FOREIGN KEY ");
-				query.append(field);
-				query.append("_ref_key (");
-				info.addName(query, false, true);
-				query.append(") REFERENCES ");		
+				String index_name = field+"_ref_key";
+				if(  ! res.hasIndex(index_name)){
+					System.out.println("add foreign key "+name+"."+field);
+					StringBuilder query = new StringBuilder();
+					query.append("ALTER TABLE ");
+					res.addTable(query, true);
+					String ref = info.getReferencedTable();
+					query.append(" ADD FOREIGN KEY ");
+					query.append(field);
+					query.append("_ref_key (");
+					info.addName(query, false, true);
+					query.append(") REFERENCES ");		
 
-				query.append(Repository.getForeignKeyDescriptor(getContext(), ref, true));
-				query.append(" ON UPDATE CASCADE ");
-				System.out.println(query.toString());
-				stmt.executeUpdate(query.toString());
+					query.append(Repository.getForeignKeyDescriptor(getContext(), ref, true));
+					query.append(" ON UPDATE CASCADE ");
+					System.out.println(query.toString());
+					stmt.executeUpdate(query.toString());
+				}
 
 			}else if( info.isNumeric()){
 				System.out.println(info.getName(true)+" not index?");
