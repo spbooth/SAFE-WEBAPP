@@ -1117,6 +1117,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		return (X) composites.get(clazz);
 	}
 	
+	public <X extends Composite> boolean hasComposite(Class<X> clazz){
+		return composites.containsKey(clazz);
+	}
 	/** Get all composites that are assignable to a particular type.
 	 * 
 	 * @param template
@@ -1827,6 +1830,8 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 						
 						logger.error("Cannot make composite "+comp, e);
 					}
+				}else{
+					logger.error("Unrecognised composite tag "+comp);
 				}
 			}
 		}

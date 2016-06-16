@@ -589,8 +589,12 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 
 
 		@Override
-		public MessageResult getResult(String type_name,T dat, Form f) {
-			return new MessageResult("signup_ok",type_name);
+		public FormResult getResult(String type_name,T dat, Form f) {
+			if( getFactory().getComposite(PasswordAuthComposite.class)!=null){			
+				return new MessageResult("signup_ok_password",type_name);
+			}else{
+				return new MessageResult("signup_ok",type_name);
+			}
 		}
 		
 		/* (non-Javadoc)
