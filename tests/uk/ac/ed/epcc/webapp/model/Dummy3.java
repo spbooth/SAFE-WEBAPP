@@ -138,9 +138,9 @@ public class Dummy3 extends DataObject {
 		 * @see uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider#hasRelationFilter(uk.ac.ed.epcc.webapp.session.SessionService, java.lang.String)
 		 */
 		@Override
-		public BaseFilter<Dummy3> hasRelationFilter(SessionService<AppUser> sess, String role) {
+		public BaseFilter<Dummy3> hasRelationFilter( String role,AppUser user) {
 			if( role.equals("self")){
-				return new SQLValueFilter<Dummy3>(getTarget(), res, PERSON_ID, sess.getCurrentPerson().getID());
+				return new SQLValueFilter<Dummy3>(getTarget(), res, PERSON_ID, user.getID());
 			}
 			return null;
 		}

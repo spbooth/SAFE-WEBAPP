@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.charts.strategy;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -20,6 +21,7 @@ import java.util.Vector;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.forms.Identified;
 
 
 /**
@@ -46,10 +48,28 @@ public abstract class HashLabeller<T,K> implements Labelled,Contexed {
 
 	int next_set = 0;
 
+	@SuppressWarnings("unchecked")
 	public HashLabeller(AppContext c) {
 		conn=c;
 		map = new HashMap<K,Number>();
-		label_to_set = new TreeMap<Object,Number>();
+		label_to_set = new TreeMap<Object,Number>(new Comparator() {
+
+			@Override
+			public int compare(Object o1, Object o2) {
+				if( o1 instanceof Comparable){
+					try{
+						return ((Comparable)o1).compareTo(o2);
+					}catch(Throwable t){
+
+					}
+				}
+				if( o1 instanceof Identified && o2 instanceof Identified){
+					return ((Identified)o1).getIdentifier().compareTo(((Identified)o2).getIdentifier());
+				}
+				// default to comparing string rep.
+				return o1.toString().compareTo(o2.toString());
+			}
+		});
 		labels = new Vector<String>();
 	}
 

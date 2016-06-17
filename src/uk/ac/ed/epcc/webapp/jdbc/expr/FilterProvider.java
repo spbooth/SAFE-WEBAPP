@@ -29,9 +29,10 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  * an exception is thrown. Higher levels of the code might still be able to make a filter by
  * introducing a non SQL filter.
  * 
- * Note that a {@link CannotFilterException} implies no filtering is possible
+ * Note that a {@link CannotFilterException} implies no filtering is possible for example if the property used is not supported.
  * A {@link NoSQLFilterException} implies that only an SQL filter is impossible. Throwing a {@link NoSQLFilterException}
- * should give the same behaviour as not implementing the interface at all.
+ * gives the same behaviour as not implementing the interface at all. Therefore this is the exception that should be thrown when
+ * the class is only unable to fulfil its contract. For example if a nested Accessor does not implement {@link FilterProvider}.  
  * 
  * @author spb
  *

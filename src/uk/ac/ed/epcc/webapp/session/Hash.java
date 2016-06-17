@@ -98,6 +98,11 @@ public enum Hash{
 	public boolean enableByDefault(){
 		return false;
 	}
+	
+	public boolean isEnabled(AppContext conn){
+		return conn.getBooleanParameter(name()+".allowed", enableByDefault());
+	}
+	
 	public static Hash getDefault(AppContext c){
 		return c.getEnumParameter(Hash.class, "password.hash",MD5);
 	}

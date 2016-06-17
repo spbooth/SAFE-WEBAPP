@@ -16,6 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
 /**
  * Input for a password field. Works the same as a TextInput but is displayed
@@ -27,6 +29,16 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 
 public class PasswordInput extends TextInput {
+	
+	@Override
+	public void validate() throws FieldException {
+		super.validate();
+		if( minimum_length > 0 && getValue().length() < minimum_length){
+			throw new ValidateException("Password is too short must be at least "+minimum_length+" characters");
+		}
+	}
+
+	private int minimum_length=0;
 
 	/**
 	 * 
@@ -40,6 +52,13 @@ public class PasswordInput extends TextInput {
 	@Override
 	public final <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitPasswordInput(this);
+	}
+	
+	public void setMinimumLength(int min){
+		this.minimum_length=min;
+	}
+	public int getMinimumLength(){
+		return minimum_length;
 	}
 
 }

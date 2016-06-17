@@ -22,7 +22,9 @@ import java.util.List;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-/** Base class for Filters than combines multiple filters. 
+/** Base class for Filters than combines multiple SQL filters. 
+ * 
+ * Only the SQL parts of the filters are considered by this class.
  * 
  * This class assumes it is ok to supress multiple copies of equal filters.
  * 

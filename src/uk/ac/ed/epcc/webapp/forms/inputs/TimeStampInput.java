@@ -24,9 +24,14 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 public class TimeStampInput extends AbstractDateInput implements HTML5Input{
 
 	@Override
+	protected int getHintIndex() {
+		return 1;
+	}
+
+	@Override
 	public String[] getFormats() {
 		// A html5 picker input will use a timestamp including the T
-		return new String[] {"yyyy-MM-dd HH:mm:ss","yyyy-MM-dd'T'HH:mm:ss","yyyy-MM-dd HH:mm","yyyy-MM-dd'T'HH:mm","yyyy-MM-dd HH", "yyyy-MM-dd" };
+		return new String[] {"yyyy-MM-dd'T'HH:mm:ss","yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm","yyyy-MM-dd'T'HH:mm","yyyy-MM-dd HH", "yyyy-MM-dd" };
 	}
 
 	public TimeStampInput(long resolution) {

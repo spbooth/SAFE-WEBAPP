@@ -21,8 +21,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.config.FilteredProperties;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
@@ -30,6 +33,10 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
+import uk.ac.ed.epcc.webapp.servlet.navigation.Node;
+import uk.ac.ed.epcc.webapp.servlet.navigation.NodeMaker;
+import uk.ac.ed.epcc.webapp.servlet.navigation.ParentNode;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 /** Factory class for a set of FormFactoryProviders
@@ -38,7 +45,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  * @param <T>
  */
-public abstract class FormFactoryProviderRegistry<T extends FormFactoryProvider> implements Contexed ,UIGenerator,TransitionFactoryCreator<TransitionProvider>{
+public abstract class FormFactoryProviderRegistry<T extends FormFactoryProvider> implements Contexed ,UIGenerator,TransitionFactoryCreator<TransitionProvider>, NodeMaker{
 	public static final char TAG_SEPERATOR = ':';
 	private AppContext conn;
 	public FormFactoryProviderRegistry(AppContext conn){
@@ -202,5 +209,41 @@ public ContentBuilder addContent(ContentBuilder builder) {
 		content.addParent();
 	}
 	return builder;
+}
+
+@Override
+public Node makeNode(String name, FilteredProperties props) {
+	ParentNode node = new ParentNode();
+	node.setMenuText(getTitle());
+	SessionService<?> session_service = getContext().getService(SessionService.class);
+	for(Iterator<T> it=getTypes(); it.hasNext(); ){
+		T t =  it.next();
+		if( t.canCreate(session_service) || t.canUpdate(session_service)){
+			return node;
+		}
+	}
+	return null;
+}
+
+@Override
+public void addChildren(Node parent, String name, FilteredProperties props) {
+	SessionService<?> session_service = getContext().getService(SessionService.class);
+	for(Iterator<T> it=getTypes(); it.hasNext(); ){
+		T t =  it.next();
+		
+		if( t.canCreate(session_service) ){
+			Node n = new ParentNode();
+			n.setMenuText("Create "+t.getName());
+			n.setTargetPath(TransitionServlet.getURL(conn, getTransitionProvider(t), null,FormOperations.Create));
+			parent.addChild(n);
+		}
+		if( t.canUpdate(session_service) ){
+			Node n = new ParentNode();
+			n.setMenuText("Update "+t.getName());
+			n.setTargetPath(TransitionServlet.getURL(conn, getTransitionProvider(t), null,FormOperations.Update));
+			parent.addChild(n);
+		}
+	}
+	
 }
 }

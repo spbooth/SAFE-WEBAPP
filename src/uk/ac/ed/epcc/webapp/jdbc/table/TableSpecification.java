@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -38,14 +39,15 @@ import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 
 public class TableSpecification {
 	private String primary_key;
-	private final LinkedHashMap<String,FieldType> fields;
-	private final LinkedHashMap<String,FieldType> optional_fields;
+	private final LinkedHashMap<String,FieldType> all_fields;
+	private final Set<String> required_field_names;
 	private LinkedHashSet<IndexType> indexes;
 	private final Pattern field_pattern = Pattern.compile("[A-Za-z][A-Za-z0-9_]*");
 	public TableSpecification(String key){
 		this.primary_key=key;
-		fields=new LinkedHashMap<String, FieldType>();
-		optional_fields=new LinkedHashMap<String, FieldType>();
+		all_fields=new LinkedHashMap<String, FieldType>();
+		required_field_names=new HashSet<String>();
+		
 		indexes=new LinkedHashSet<IndexType>();
 	}
 	public TableSpecification(){
@@ -53,17 +55,17 @@ public class TableSpecification {
 	}
 	public TableSpecification(TableSpecification spec){
 		this.primary_key=spec.primary_key;
-		fields=new LinkedHashMap<String, FieldType>();
-		optional_fields=new LinkedHashMap<String, FieldType>();
-		fields.putAll(spec.fields);
-		optional_fields.putAll(spec.optional_fields);
+		all_fields=new LinkedHashMap<String, FieldType>();
+		required_field_names=new HashSet<String>();
+		all_fields.putAll(spec.all_fields);
+		required_field_names.addAll(spec.required_field_names);
 		indexes=new LinkedHashSet<IndexType>();
 		for(IndexType i: spec.indexes){
 			i.copy(this);
 		}
 	}
 	public void setPrimaryKey(String name){
-		if( fields.containsKey(name)){
+		if( all_fields.containsKey(name)){
 			throw new ConsistencyError("Primary key changed to existing field");
 		}
 		primary_key=name;
@@ -75,13 +77,13 @@ public class TableSpecification {
 	public void setField(String name, FieldType type){
 		setField(name, type,false);
 	}
-	/** Does the specification contain this nanme
+	/** Does the specification contain this name
 	 * 
 	 * @param name
 	 * @return boolean
 	 */
 	public boolean hasField(String name){
-		return fields.containsKey(name);
+		return required_field_names.contains(name);
 	}
 	public void setField(String name, FieldType type,boolean optional){
 		if( primary_key.equalsIgnoreCase(name)){
@@ -90,17 +92,9 @@ public class TableSpecification {
 		if( ! field_pattern.matcher(name).matches() ){
 			throw new ConsistencyError("Bad field name "+name);
 		}
-		if(optional){
-			if( fields.containsKey(name) ){
-				if( fields.get(name).geTarget() != type.geTarget()){
-					throw new ConsistencyError("Field "+name+" already exists but for different target");
-				}
-			}else{
-				optional_fields.put(name,type);
-			}
-		}else{
-			optional_fields.remove(name);
-			fields.put(name,type);
+		all_fields.put(name, type);
+		if(! optional){
+			required_field_names.add(name);
 		}
 	}
 	public void setOptionalField(String name, FieldType type){
@@ -146,16 +140,29 @@ public class TableSpecification {
 	        }
 	}
 	public FieldType getField(String name){
-		if( fields.containsKey(name)){
-			return fields.get(name);
-		}
-		return optional_fields.get(name);
+		return all_fields.get(name);
 	}
 	public Set<String> getFieldNames(){
-		return fields.keySet();
+		// ordered set in the canonical order
+		// we want promoted fields to still retain their original order
+		LinkedHashSet<String> result = new LinkedHashSet<String>();
+		for(String name : all_fields.keySet()){
+			if( required_field_names.contains(name)){
+				result.add(name);
+			}
+		}
+		return result;
 	}
 	public Set<String> getOptionalFieldNames(){
-		return optional_fields.keySet();
+		// ordered set in the canonical order
+		// we want promoted fields to still retain their original order
+		LinkedHashSet<String> result = new LinkedHashSet<String>();
+		for(String name : all_fields.keySet()){
+			if( ! required_field_names.contains(name)){
+				result.add(name);
+			}
+		}
+		return result;
 	}
 	public Iterator<IndexType> getIndexes(){
 		return indexes.iterator();
@@ -165,9 +172,8 @@ public class TableSpecification {
 	 * @param name
 	 */
 	public void promoteOptionalField(String name){
-		if( optional_fields.containsKey(name)){
-			fields.put(name,optional_fields.get(name));
-			optional_fields.remove(name);
+		if( all_fields.containsKey(name)){
+			required_field_names.add(name);
 		}
 	}
 	/** get a map of all fields in the specification.
@@ -175,9 +181,7 @@ public class TableSpecification {
 	 * @return
 	 */
 	public Map<String,FieldType> getStdFields(){
-		LinkedHashMap<String, FieldType> result = new LinkedHashMap<String, FieldType>(fields);
-		result.putAll(optional_fields);
-		return result;
+		return (Map<String, FieldType>) all_fields.clone();
 	}
 	
 	public abstract class IndexType {

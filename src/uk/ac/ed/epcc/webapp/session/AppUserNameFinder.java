@@ -93,6 +93,9 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 	 */
 	@Override
 	public AU findFromString(String name) {
+		if( name == null || name.trim().isEmpty()){
+			return null;
+		}
 		try {
 			return getFactory().find(getStringFinderFilter(getFactory().getTarget(), name),true);
 		} catch ( DataNotFoundException dne){

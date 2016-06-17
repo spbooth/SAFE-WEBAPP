@@ -16,6 +16,9 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.LockedInput;
@@ -33,11 +36,11 @@ import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
 public final class Field<I> {
 	@Override
 	public String toString() {
-		return "Field [validator=" + validator + ", label=" + label + ", value="+(sel.getValue()==null?"null":sel.getPrettyString(sel.getValue()))+", sel="
+		return "Field [validators=" + validators + ", label=" + label + ", value="+(sel.getValue()==null?"null":sel.getPrettyString(sel.getValue()))+", sel="
 				+ sel + "]";
 	}
 
-	FieldValidator<I> validator = null;
+	Set<FieldValidator<I>> validators = null;
 
 	private String label;
 
@@ -141,10 +144,17 @@ public final class Field<I> {
 	 *            FieldValidator to set
 	 * @return the previous validator
 	 */
-	public FieldValidator<I> setValidator(FieldValidator<I> v) {
-		FieldValidator<I> f = validator;
-		validator = v;
-		return f;
+	public void addValidator(FieldValidator<I> v) {
+		if( validators == null){
+			validators=new HashSet<FieldValidator<I>>();
+		}
+		validators.add(v);
+	}
+	
+	public void removeValidator(FieldValidator<I> v){
+		if( validators != null){
+			validators.remove(v);
+		}
 	}
 
 	/**
@@ -175,10 +185,12 @@ public final class Field<I> {
 	 */
 	public void validate() throws FieldException {
 		sel.validate();
-		if (validator != null) {
+		if (validators != null) {
 			I dat = getValue();
 			if (dat != null) {
-				validator.validate(dat);
+				for( FieldValidator<I> validator : validators){
+					validator.validate(dat);
+				}
 			}
 		}
 	}

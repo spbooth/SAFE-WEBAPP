@@ -98,6 +98,7 @@ import uk.ac.ed.epcc.webapp.model.data.iterator.SortingIterator;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
+import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
 
@@ -174,7 +175,8 @@ import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
  * <p>
  * The {@link FilterSet} class is a simple wrapper round a {@link FilterIterator}
  * that implements {@link Iterable} and is therefore more compatible
- * with the java-5 extended for-loop syntax.
+ * with the java-5 extended for-loop syntax. The {@link #getResult(BaseFilter)} method returns a
+ * {@link uk.ac.ed.epcc.webapp.jdbc.filter.FilterSet} corresponding to a filter.
  * <p>
  * This class also implements {@link Selector} which means that it can provide a default form <code>Input</code>
  * for the type of object it creates.
@@ -1032,13 +1034,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	}
 	
 	
-	public static class  TimeAcceptFilter<T extends DataObject> implements AcceptFilter<T>{
-		private final Class<? super T> target;
+	public static class  TimeAcceptFilter<T extends DataObject> extends AbstractAcceptFilter<T>{
+	
         private final String field;
         private final MatchCondition cond;
         private final Date point;
 		public TimeAcceptFilter(Class<? super T> target,String field, MatchCondition cond, Date point){
-			this.target=target;
+			super(target);
         	this.field=field;
         	this.cond=cond;
         	this.point=point;
@@ -1054,21 +1056,6 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			}
 			return false;
 		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-		 */
-		public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
-			return vis.visitAcceptFilter(this);
-		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
-		 */
-		public Class<? super T> getTarget() {
-			return target;
-		}
-		
-		
-		
 	}
 	private AppContext conn=null;
 	protected Repository res=null;
@@ -1130,6 +1117,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		return (X) composites.get(clazz);
 	}
 	
+	public <X extends Composite> boolean hasComposite(Class<X> clazz){
+		return composites.containsKey(clazz);
+	}
 	/** Get all composites that are assignable to a particular type.
 	 * 
 	 * @param template
@@ -1456,7 +1446,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * which options are valid unless the value of {@link #restrictDefaultInput()} is also changed.
 	 * @return
 	 */
-    protected BaseFilter<BDO> getSelectFilter(){
+    public BaseFilter<BDO> getSelectFilter(){
     	// By default just supply the default ordering if there is one.
     	String order = OrderBy(false);
     	Logger log = getLogger();
@@ -1840,6 +1830,8 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 						
 						logger.error("Cannot make composite "+comp, e);
 					}
+				}else{
+					logger.error("Unrecognised composite tag "+comp);
 				}
 			}
 		}
@@ -1936,10 +1928,10 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      * @param role
      * @return
      */
-    protected <R extends DataObject> BaseFilter<BDO> getRemoteReleationshipFilter(DataObjectFactory<R> remote, String field, String role){
+    protected <R extends DataObject,A extends AppUser> BaseFilter<BDO> getRemoteRelationshipFilter(DataObjectFactory<R> remote, String field, String role,A user){
     	BaseFilter<R> fil=null;
 		try {
-			fil = getContext().getService(SessionService.class).getRelationshipRoleFilter(remote, role);
+			fil = getContext().getService(SessionService.class).getTargetInRelationshipRoleFilter(remote, role,user);
 		} catch (UnknownRelationshipException e2) {
 			getLogger().error("Error making remote relationship",e2);
 		}
@@ -1966,6 +1958,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      * @return
      */
     public SQLFilter<BDO> getFilter(BDO target){
+    	if( ! isMine(target)){
+    		throw new ConsistencyError("unexpected target "+target.getFactoryTag());
+    	}
     	return new SQLIdFilter<BDO>(getTarget(), res, target.getID());
     }
 	/**

@@ -114,6 +114,9 @@ public class PasswordChangeRequestFactory<A extends AppUser> extends DataObjectF
 	}
 	public PasswordChangeRequest findByTag(String tag) throws DataException{
 		PasswordChangeRequest request = find(new SQLValueFilter<PasswordChangeRequestFactory<A>.PasswordChangeRequest>(getTarget(),res,TAG,tag),true );
+		if( request == null ){
+			return null;
+		}
 		A user = request.getUser();
 		PasswordAuthComposite<A> comp = user_fac.getComposite(PasswordAuthComposite.class);
 		if( comp == null ){

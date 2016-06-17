@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2015                            |
+//| Copyright - The University of Edinburgh 2016                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -11,9 +11,36 @@
 //| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
-/** Classes related to session management and logins.
- * 
- * 
- * 
- * 
+package uk.ac.ed.epcc.webapp.model.lifecycle;
+
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
+
+/** A {@link AbstractAction} that implements {@link Contexed}
+ * @author spb
+ *
  */
+public class AbstractContexedAction<R> extends AbstractAction<R> implements Contexed{
+	private final AppContext conn;
+	/**
+	 * @param conn 
+	 * @param clazz
+	 */
+	public AbstractContexedAction(AppContext conn,Class<? super R> clazz) {
+		super(clazz);
+		this.conn=conn;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
+	 */
+	@Override
+	public final AppContext getContext() {
+		return conn;
+	}
+	
+	public Logger getLogger(){
+		return conn.getService(LoggerService.class).getLogger(getClass());
+	}
+}

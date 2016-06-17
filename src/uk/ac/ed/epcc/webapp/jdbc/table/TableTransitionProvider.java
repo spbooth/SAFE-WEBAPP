@@ -38,7 +38,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 /** Class implementing transitions on factory classes identified by table.
  * The target factory has implement {@link TableTransitionTarget} and have its
  * class registered as a configuration property.
- * This TransitionProvider needs to be registered under the name <b>Table<b> 
+ * This TransitionProvider needs to be registered under the name <b>Table</b> 
  * to enable this feature.
  * 
  * @author spb

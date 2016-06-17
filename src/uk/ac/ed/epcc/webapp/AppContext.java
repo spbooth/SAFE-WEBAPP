@@ -84,7 +84,10 @@ TargetType t = conn.makeObject(TargetType.class,"tag-name");
  *  The target type can be an interface or a superclass of desired object. If the target type is a non
  *  abstract class it will be used as the default if no class is configured using parameters.
  *  The AppContext will attempt various constructor signatures when creating an object in this way attempting to pass the
- *  tag-name and the AppContext. 
+ *  tag-name and the AppContext. Some of these include the tag-name so its possible to refer to several instances of the same type
+ *  by different tag-names. Factory classes that correspond to different database tables often follow this pattern, using the table name as the tag.
+ *  If a class implements the {@link Tagged} interface the value returned by the {@link Tagged#getTag()} method should be the same
+ *  as the tag used to construct the object.
  *  <p>
  * The AppContext also acts as a composite policy object allowing different behaviours 
  * to be selected depending on the environment. In general this should be done using the <code>getService</code> method.
@@ -134,10 +137,9 @@ TargetType t = conn.makeObject(TargetType.class,"tag-name");
   }
  </pre> 
  * </code>
- * These are forwarded onto an underlying {@link LoggerService} so its probably better to use a {@link Logger} specific to 
+ * These are forwarded onto an underlying {@link LoggerService} so it is better to use a {@link Logger} specific to 
  * the class where the exception is caught unless reporting error from within a {@link AppContextService}.
- * In the servlet context the error method is usually configured to generate an email error report. In the stand-alone context
- * errors are just printed.
+ * We will probably remove or reduce the visibility of the AppContext methods in the near future.
  * <p>
 
  * 
@@ -524,6 +526,9 @@ public final class AppContext {
 		}
 		return service.getServiceProperties().getProperty(name);
 	}
+	/** A regexp for parameter expansion
+	 * 
+	 */
     private final Pattern expand_pattern = Pattern.compile("\\$\\{([^\\s}]+)\\}");
     /** Query an environmental parameter with nested parameter expansion
      * 
@@ -539,6 +544,9 @@ public final class AppContext {
 
 	/** perform config parameter expansion on a text fragment.
 	 * 
+	 * Text of the form ${name} is replaced with the corresponding config parameter
+	 * A fall-back value can be specified by using ${name:fallback}
+	 * 
 	 * @param text_to_expand
 	 * @return expanded text
 	 */
@@ -549,8 +557,14 @@ public final class AppContext {
 		StringBuffer result = new StringBuffer();
 		Matcher m = expand_pattern.matcher(text_to_expand);
 		while(m.find()){
+			String default_text ="";
 			String subname = m.group(1);
-			String text = getInitParameter(subname,"");
+			if( subname.contains(":")){
+				int pos = subname.indexOf(':');
+				default_text = subname.substring(pos+1);
+				subname=subname.substring(0, pos);
+			}
+			String text = getInitParameter(subname,default_text);
 			// supress unintended back subs
 			 text = text.replace("\\", "\\\\");
 			text = text.replace("$", "\\$");
@@ -1237,6 +1251,12 @@ public final class AppContext {
 		attributes.put(key, value);
 	}
 
+	public final void clearAttributes(){
+		if( attributes != null ){
+			attributes.clear();
+		}
+		attributes=null;
+	}
 
 
 	

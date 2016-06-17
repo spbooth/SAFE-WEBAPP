@@ -23,7 +23,13 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
-
+/** A constant value {@link SQLAccessor}
+ * 
+ * @author spb
+ *
+ * @param <T>  type of constant
+ * @param <R> type of target object
+ */
 public final class ConstExpression<T,R> implements SQLExpression<T>, SQLAccessor<T,R>, GroupingSQLValue<T> {
 	  	private final T n;
 	    private final Class<T> target;

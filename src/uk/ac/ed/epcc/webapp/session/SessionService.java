@@ -26,9 +26,9 @@ import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-/** Service for managing session information.
+/** {@link AppContextService} for managing session information.
  * This encodes all information about the current authenticated user, most importantly their
- * roles. The users may also have a database representation as an AppUser object which can also be 
+ * roles. The users may also have a database representation as an {@link AppUser} object which can also be 
  * stored in this service.
  * If no database representation of the users is required then the getLoginFactory should return null
  * but the getName and role methods can still be used.
@@ -221,6 +221,15 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @return {@link BaseFilter}
 	 */
 	public <T extends DataObject> BaseFilter<A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,T target) throws UnknownRelationshipException;
+	
+	/** get a {@link BaseFilter} representing the set of targets that a specified {@link AppUser} is in a particular
+	 * relationship-role with.
+	 * @param fac
+	 * @param role
+	 * @param person
+	 * @return {@link BaseFilter}
+	 */
+	public <T extends DataObject> BaseFilter<? super T> getTargetInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,A person) throws UnknownRelationshipException;
 	/** Method to check relationships on a specified target object.
 	 * 
 	 * Note that {@link #getRelationshipRoleFilter(DataObjectFactory, String)} is sufficient for this

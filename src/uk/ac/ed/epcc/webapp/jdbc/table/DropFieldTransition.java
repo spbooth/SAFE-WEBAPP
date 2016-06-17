@@ -50,7 +50,7 @@ public class DropFieldTransition<T extends TableStructureTransitionTarget> exten
 		f.addInput(FIELD_INPUT, "Field to drop", getFieldInput());
 		f.addAction("Drop", new DropAction(target));
 	}
-	public <I extends Input & ItemInput<FieldInfo>> I getFieldInput() {
+	public <I extends Input<String> & ItemInput<FieldInfo>> I getFieldInput() {
 		return (I) new RepositoryFieldInput(res);
 	}
 	public class DropAction extends FormAction{

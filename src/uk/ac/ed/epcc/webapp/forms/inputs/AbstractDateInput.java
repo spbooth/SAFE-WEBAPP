@@ -20,7 +20,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
 
 
@@ -28,13 +30,18 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
  * 
  * sub-classes may be constrained to generate values that are constrained to day/hour/min boundaries.
  * 
- * This class uses a series of {@link DateFormat}s applied in turn so as to support multiple fomats
+ * This class uses a series of {@link DateFormat}s applied in turn so as to support multiple formats
+ * the first format should be the one compatible with the format defined in the standard for the corresponding Html5 input.
+ * However  {@link #getHintIndex()} specifies the format that should be suggested to a user when
+ * defaulting to a text input
+ * 
  * @author spb
  *
  */
-public abstract class AbstractDateInput extends ParseAbstractInput<Date> implements TagInput {
+public abstract class AbstractDateInput extends ParseAbstractInput<Date> implements BoundedInput<Date>, FormatHintInput {
 	DateFormat df[];
-   
+    Date min=null;
+    Date max=null;
     long resolution=1000L; // number of milliseconds in a tick
     public AbstractDateInput(){
     	this(1000L);
@@ -118,12 +125,19 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 
 		return df[0].format(date);
 	}
+	
+	/** 
+	 * 
+	 * @return
+	 */
+	protected int getHintIndex(){
+		return 0;
+	}
 
-	public String getTag() {
-		//TODO this is confusing if the browser overrides
-		// format to show a date picker with text format selected from
-		// locale.
-		return "(date e.g. "+getFormats()[0].toUpperCase()+")";
+	public String getFormatHint() {
+		//With html5 enabled this shows as a placeholder so if the browser overrides
+		// format to show a date picker this is hidden.
+		return getFormats()[getHintIndex()].toUpperCase();
 	}
 
 	@Override
@@ -149,6 +163,44 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 	 */
 	public String getType() {
 		return "date";
+	}
+	@Override
+	public Date getMin() {
+		return min;
+	}
+	@Override
+	public Date getMax() {
+		return max;
+	}
+	@Override
+	public Date setMin(Date val){
+		Date old = min;
+		min=val;
+		return old;
+	}
+	@Override
+	public Date setMax(Date val){
+		Date old = max;
+		max=val;
+		return old;
+	}
+	@Override
+	public String formatRange(Date n) {
+		return getString(n);
+	}
+	@Override
+	public void validate() throws FieldException {
+		super.validate();
+		Date value = getValue();
+		if( value == null ){
+			return;
+		}
+		if( min != null && value.before(min)){
+			throw new ValidateException("Value must be after "+getString(min));
+		}
+		if( max != null && value.after(max)){
+			throw new ValidateException("Value must be before "+getString(max));
+		}
 	}
 
 	

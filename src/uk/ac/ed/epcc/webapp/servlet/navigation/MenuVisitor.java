@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.servlet.navigation;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 /** A {@link Visitor} that generates the menu HTML
@@ -26,6 +27,7 @@ import uk.ac.ed.epcc.webapp.servlet.ServletService;
 public class MenuVisitor implements Visitor{
 	private final AppContext conn;
 	private final HtmlBuilder builder;
+	public static final Feature MULTI_LEVEL_MENU_FEATURE=new Feature("navigation.multi_level_menu",false,"Should navigation menus support multiple levels");
 	public MenuVisitor(AppContext conn,HtmlBuilder builder){
 		this.conn=conn;
 		this.builder=builder;
@@ -37,13 +39,13 @@ public class MenuVisitor implements Visitor{
 	public void visitContainer(NodeContainer container) {
 		List<Node> children = container.getChildren();
 		boolean top = (! (container instanceof Node));
-		boolean top_two = top || ! (((Node)container).getParent() instanceof Node) ;
+		boolean recurse = top || MULTI_LEVEL_MENU_FEATURE.isEnabled(conn);
 		if( children != null && ! children.isEmpty()){
 			// do ul explicitly so we can add attry
 			// merge lower levels to work round IE11 bug
-			if( top_two){
-				builder.open("ul");
-			}
+			
+			builder.open("ul");
+			
 			if( top){
 				//builder.attr("role", "menubar");
 			    builder.attr("id","navbar");
@@ -62,11 +64,14 @@ public class MenuVisitor implements Visitor{
 			}
 			
 			for(Node n : children){
-				visitNode(n);
+				if( recurse ){
+					n.accept(this);
+				}else{
+					appendLinear(n);
+				}
 			}
-			if( top_two){
-				builder.close();
-			}
+			
+			builder.close();
 		}
 	}
 
@@ -74,7 +79,11 @@ public class MenuVisitor implements Visitor{
 	 * @see uk.ac.ed.epcc.webapp.servlet.navigation.Visitor#visitNode(uk.ac.ed.epcc.webapp.servlet.navigation.Node)
 	 */
 	@Override
-	public void visitNode(Node node) {
+	public void visitNode(Node node){
+		visitNode(node,true);
+	}
+	
+	public void visitNode(Node node,boolean recurse) {
 		boolean top = ! (node.getParent() instanceof Node);
 		builder.open("li");
 		//builder.attr("role","menuitem");
@@ -95,7 +104,11 @@ public class MenuVisitor implements Visitor{
 		
 		String display_class = node.getDisplayClass(conn);
 		if( display_class != null ){
-			class_string = class_string +" "+ display_class;
+			if( class_string.isEmpty()){
+				class_string = display_class;
+			}else{
+				class_string = class_string +" "+ display_class;
+			}
 		}
 		if( ! class_string.isEmpty()){
 			builder.attr("class",class_string);
@@ -117,8 +130,8 @@ public class MenuVisitor implements Visitor{
 					builder.clean(node.getMenuText(conn));
 				}else{
 					builder.open("img");
-					builder.attr("src", servlet_service.encodeURL(image));
-					builder.attr("alt", node.getMenuText(conn));
+					  builder.attr("src", servlet_service.encodeURL(image));
+					  builder.attr("alt", node.getMenuText(conn));
 					builder.close();
 				}
 			builder.close();
@@ -129,10 +142,22 @@ public class MenuVisitor implements Visitor{
 			}
 			builder.addText(node.getMenuText(conn));
 		}
-		if( ! node.isEmpty()){
+		if( recurse &&  ! node.isEmpty()){
 			visitContainer(node);
 		}
 		builder.close(); // close node
+	}
+	/** adds a node and all its children without nesting 
+	 * 
+	 * @param n
+	 */
+	public void appendLinear(Node n){
+		visitNode(n, false);
+		if( ! n.isEmpty()){
+			for(Node child : n.getChildren()){
+				appendLinear(child);
+			}
+		}
 	}
 	
 }

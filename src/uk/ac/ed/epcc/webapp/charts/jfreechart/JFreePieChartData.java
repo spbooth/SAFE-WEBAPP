@@ -17,25 +17,40 @@
 package uk.ac.ed.epcc.webapp.charts.jfreechart;
 
 import java.awt.Color;
-import java.awt.GradientPaint;
+import java.util.LinkedList;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.labels.PieSectionLabelGenerator;
+import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
+import org.jfree.chart.plot.PiePlot;
+import org.jfree.chart.title.LegendTitle;
 import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.ui.RectangleEdge;
+import org.jfree.util.SortOrder;
 
 import uk.ac.ed.epcc.webapp.charts.GenericSetPlot;
 import uk.ac.ed.epcc.webapp.charts.PieChartData;
+import uk.ac.ed.epcc.webapp.charts.PieTimeChartData;
+import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
 
 
-public class JFreePieChartData extends JFreeChartData<GenericSetPlot> implements PieChartData<GenericSetPlot> {
+public class JFreePieChartData extends JFreeChartData<GenericSetPlot> implements PieTimeChartData<GenericSetPlot> {
 
 //	public static final Feature JFREE_3D_PIE = new Feature("jfreechat.3dpiechart", false,"Use 3D effecct on piecharts");
 	GenericSetPlot ds;
-	
+	LinkedList<Color> colours=new LinkedList<Color>();
+	private TimePeriod period=null;
+	public TimePeriod getPeriod() {
+		return period;
+	}
 
+	public void setPeriod(TimePeriod period) {
+		this.period = period;
+	}
 	public GenericSetPlot addPieChart(int nset) {
-		ds= new GenericSetPlot(nset);
+		ds= new GenericSetPlot(period,nset);
 		return ds;
 	}
 
@@ -46,11 +61,32 @@ public class JFreePieChartData extends JFreeChartData<GenericSetPlot> implements
 
 		
 	
-		JFreeChart chart = ChartFactory.createPieChart(quantity, // Title
+		JFreeChart chart = ChartFactory.createPieChart(title, // Title
 				pieDataset, // Dataset
 				true // Show legend
 				, false, false);
+		PiePlot plot = (PiePlot) chart.getPlot();
 		
+		StandardPieSectionLabelGenerator gen = new StandardPieSectionLabelGenerator("{0} ({2})");
+		
+		plot.setLabelGenerator(gen);
+		plot.setMaximumLabelWidth(0.07);
+		plot.setLabelFont(plot.getLabelFont().deriveFont(9.0F));
+		
+		
+		LegendTitle leg = chart.getLegend();
+		
+		leg.setPosition(RectangleEdge.RIGHT);
+		if(! colours.isEmpty()){
+			String legends[] = ds.getLegends();
+			
+			for (int i = 0; i < ds.getNumSets(); i++) {
+				if (legends != null && legends.length > i && colours.size() > i) {
+					Color c = colours.get(i);
+					plot.setSectionPaint(legends[i], c);
+				}
+			}
+		}
 			
 		return chart;
 
@@ -72,11 +108,15 @@ public class JFreePieChartData extends JFreeChartData<GenericSetPlot> implements
 	}
 
 	public GenericSetPlot makeDataSet(int i) {
-		return new GenericSetPlot(i);
+		return new GenericSetPlot(period,i);
 	}
 
 	public GenericSetPlot addPieChart(int nset, Color[] custom_colours) {
-		// TODO support colors
+		if( custom_colours != null){
+			for(Color c : custom_colours){
+				colours.add(c);
+			}
+		}
 		return addPieChart(nset);
 	}
 

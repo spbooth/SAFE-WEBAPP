@@ -94,7 +94,7 @@ public class TableSpecificationTransitionSource<T extends TableStructureTransiti
 		 * @see uk.ac.ed.epcc.webapp.jdbc.table.DropFieldTransition#getFieldInput()
 		 */
 		@Override
-		public <I extends Input & ItemInput<FieldInfo>> I getFieldInput() {
+		public <I extends Input<String> & ItemInput<FieldInfo>> I getFieldInput() {
 			Map<String,FieldInfo> map = new LinkedHashMap<String, Repository.FieldInfo>();
 			for(String name : spec.getOptionalFieldNames()){
 				FieldInfo info = res.getInfo(name);

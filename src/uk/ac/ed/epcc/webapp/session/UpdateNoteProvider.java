@@ -16,7 +16,7 @@ package uk.ac.ed.epcc.webapp.session;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 
-/** Interface tot allow {@link Composite}s to add notes to the update form.
+/** Interface to allow {@link Composite}s to add notes to the update form.
  * @author spb
  *
  */

@@ -16,6 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.charts;
 
+import uk.ac.ed.epcc.webapp.time.TimePeriod;
+
 /**
  * generic version of plot for use where the underlying data-model of the
  * graphics class is radically different
@@ -24,14 +26,15 @@ package uk.ac.ed.epcc.webapp.charts;
  * 
  */
 
-public class GenericSetPlot extends AbstractSingleValueSetPlot {
+public class GenericSetPlot extends AbstractPeriodSetPlot {
 	int nset = 0;
 
 	float data[];
 
 	
 
-	public GenericSetPlot(int i) {
+	public GenericSetPlot(TimePeriod p,int i) {
+		super(p);
 		setNumSets(i);
 	}
 

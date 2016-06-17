@@ -19,12 +19,16 @@ package uk.ac.ed.epcc.webapp.charts;
 import java.util.Calendar;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.charts.chart2D.BarChart2DChartData;
+import uk.ac.ed.epcc.webapp.charts.jfreechart.JFreeBarTimeChartData;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.time.Period;
 
 
 
 public final class BarTimeChart<P extends PeriodSetPlot> extends SetPeriodChart<P> {
+	public static final Feature JFREE_BAR_FEATURE = new Preference("chart.barchart.use_jfreechart", false, "Use JFreechart for bar charts");
 	private P plot=null;
 	/*
 	 * (non-Javadoc)
@@ -46,10 +50,12 @@ public final class BarTimeChart<P extends PeriodSetPlot> extends SetPeriodChart<
 
 	public static  BarTimeChart getInstance(AppContext c, Period p) throws Exception {
 		BarTimeChart ptc = new BarTimeChart(c,p);
-		Class<? extends BarTimeChartData> clazz = c.getPropertyClass(BarTimeChartData.class, BarChart2DChartData.class, "BarChartData");
-		
-		
-		BarTimeChartData chartData = c.makeObject(clazz);
+		BarTimeChartData chartData;
+		if( JFREE_BAR_FEATURE.isEnabled(c)){
+			chartData = new JFreeBarTimeChartData();
+		}else{
+			chartData = new BarChart2DChartData();
+		}
 		chartData.setPeriod(p);
 		ptc.setChartData(chartData);
 		

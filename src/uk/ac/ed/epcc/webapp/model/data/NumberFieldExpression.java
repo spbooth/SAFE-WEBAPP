@@ -31,8 +31,8 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
  * to store values at a different resolution use a {@link DurationFieldValue}.
  * @author spb
  *
- * @param <T>
- * @param <X>
+ * @param <T> type of expression.
+ * @param <X> type of hosting {@link DataObject}
  */
 public class NumberFieldExpression<T extends Number,X extends DataObject> extends FieldExpression<T,X>{
 	protected NumberFieldExpression(Class<? super X> filter_type,Class<T> target,Repository res,String field) {
@@ -43,6 +43,10 @@ public class NumberFieldExpression<T extends Number,X extends DataObject> extend
 		Number n = r.getNumberProperty(name);
 		if( n == null ){
 			return null;
+		}
+		if( target.isAssignableFrom(n.getClass())){
+			// result is directly assignable.
+			return (T) n;
 		}
 		// we can't use the record.getIntProperty calls as these return default
 		// values on null

@@ -39,7 +39,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  *
  */
 
-@WebServlet(name="HeartbeatServlet",urlPatterns="/HearbeatServlet/*")
+@WebServlet(name="HeartbeatServlet",urlPatterns="/HearbeatServlet/*,/HeartbeatServlet/*")
 public class HeartbeatServlet extends ContainerAuthServlet {
 
 	private static Date last_call;

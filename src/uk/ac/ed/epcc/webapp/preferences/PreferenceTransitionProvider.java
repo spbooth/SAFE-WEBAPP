@@ -309,7 +309,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		t.put("Name", target,target.getName());
 		t.put("Description", target, target.getDescription());
 		t.put("Current setting",target, getText(target.isEnabled(c)));
-		if( c.getService(SessionService.class).hasRole(SessionService.ADMIN_ROLE)){
+		if( c.getService(SessionService.class).hasRole(PreferenceAction.SET_FEATURES_ROLE)){
 			t.put( "Default value", target, getText(target.isDef()));
 			t.setHighlight(target, target.isEnabled(c) != target.isDef());
 		}
@@ -368,7 +368,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		if( sess == null || ! sess.haveCurrentUser()){
 			return false;
 		}
-		if(sess.hasRole(SessionService.ADMIN_ROLE) ){
+		if(sess.hasRole(PreferenceAction.SET_FEATURES_ROLE) ){
 			return true;
 		}
 		if( target instanceof Preference){

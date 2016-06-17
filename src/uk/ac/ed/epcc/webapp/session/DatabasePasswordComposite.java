@@ -111,12 +111,13 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			return new AcceptHashFilter(password);
 		}
 		try{
+			Hash default_hash = Hash.getDefault(getContext());
 			if( getRepository().hasField(DatabasePasswordComposite.ALG)){
 				log.debug("Has alg field");
 				SQLOrFilter<T> of = new SQLOrFilter<T>(getFactory().getTarget());
 				AppContext conn = getContext();
 				for(Hash h : Hash.values()){
-					if( conn.getBooleanParameter(h.name()+".allowed", h.enableByDefault())){
+					if( h.equals(default_hash) || h.isEnabled(conn)){
 						SQLAndFilter<T> clause = new SQLAndFilter<T>(getFactory().getTarget());
 						of.addFilter(clause);
 						clause.addFilter(new SQLValueFilter<T>(getFactory().getTarget(),getRepository(), DatabasePasswordComposite.ALG, h.ordinal()));
@@ -125,15 +126,21 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 				}
 				return of;
 			}else{
-				Hash h = Hash.getDefault(getContext());
-				log.debug("SQL filter for defautl hash "+h.name());
-				return new SQLHashFilter(getContext(),h, password);
+				
+				log.debug("SQL filter for default hash "+default_hash.name());
+				return new SQLHashFilter(getContext(),default_hash, password);
 			}
 		}catch(CannotUseSQLException e){
 			return new AcceptHashFilter(password);
 		}
 	}
-	
+	/** An {@link AcceptFilter} that selects records that match a password.
+	 * 
+	 * This should be combined with a filter to select by username.
+	 * 
+	 * @author spb
+	 *
+	 */
 	public class AcceptHashFilter implements AcceptFilter<T>{
 		Logger log;
         public AcceptHashFilter(String password) {
@@ -516,15 +523,23 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			    }
 			    protected Hash getAlgorithm(){
 			    	Repository res = record.getRepository();
+			    	Hash default_hash = Hash.getDefault(getContext());
 			    	if(res.hasField(DatabasePasswordComposite.ALG)){
 			    		int ord = record.getIntProperty(DatabasePasswordComposite.ALG, -1);
 			    		for(Hash h : Hash.values()){
 			    			if( ord == h.ordinal()){
+			    				if( default_hash.equals(h)){
+			    					return h;
+			    				}
+			    				if(! h.isEnabled(getContext())){
+			    					return null;
+			    				}
 			    				return h;
 			    			}
 			    		}
 			    	}
-			    	return Hash.getDefault(getContext());
+			    	
+					return default_hash;
 			    }
 			    
 			   

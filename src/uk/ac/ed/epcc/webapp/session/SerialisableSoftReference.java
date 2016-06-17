@@ -20,6 +20,9 @@ import java.io.ObjectOutput;
 import java.lang.ref.SoftReference;
 
 /** A Serializable wrapper that around a SoftReference. 
+ * 
+ * optionally the reference can be forced to null by serialisation to limit the
+ * amount of data serialised.
  * @author spb
  * @param <T> Type referenced this should be a primitive type or Serializable
  *
@@ -28,7 +31,22 @@ import java.lang.ref.SoftReference;
 public class SerialisableSoftReference<T>  implements Externalizable{
 
 	private SoftReference<T> ref=null;
+	private boolean force_null_on_serialise=false;
 	
+	/**
+	 * @return the force_null_on_serialise
+	 */
+	public boolean isForceNullOnSerialise() {
+		return force_null_on_serialise;
+	}
+
+	/**
+	 * @param force_null_on_serialise the force_null_on_serialise to set
+	 */
+	public void setForceNullOnSerialise(boolean force_null_on_serialise) {
+		this.force_null_on_serialise = force_null_on_serialise;
+	}
+
 	public SerialisableSoftReference(){
 		
 	}
@@ -59,6 +77,9 @@ public class SerialisableSoftReference<T>  implements Externalizable{
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
 		T data = getData();
+		if( force_null_on_serialise){
+			data=null;
+		}
 		out.writeObject(data);
 		
 	}

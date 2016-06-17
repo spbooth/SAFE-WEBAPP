@@ -29,6 +29,10 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  * 
  * To support earlier servlet versions there is a version that uses the apache fileupload library instead
  * 
+ * Note this will only work if the servlet has the @MultiPartConfig annotation or you are using tomcat with
+ * the allowCasualMultipartParsing attribute set to true in the Context. Unfortunately adding the annotation to a servlet
+ * breaks the old implementation as the parts will already have been removed
+ * 
  * @see MultiPartServletService
  * @author spb
  *
@@ -50,6 +54,7 @@ public class Servlet3MultiPartServletService extends DefaultServletService imple
 			HttpServletRequest request = req;
 			try {
 				for(Part part : request.getParts()){
+					if( part.getSize() > 0 ){
 					PartStreamData sd = new PartStreamData(conn,part);
 					String filename = sd.getName();
 					if( filename == null ){
@@ -63,7 +68,7 @@ public class Servlet3MultiPartServletService extends DefaultServletService imple
 					}else{
 						h.put(part.getName(),sd);
 					}
-					
+					}
 				}
 			} catch (Exception e) {
 				log.error("Error decoding multi-part form",e);

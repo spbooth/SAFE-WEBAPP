@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.DefaultServletService;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 
@@ -37,7 +38,7 @@ import uk.ac.ed.epcc.webapp.servlet.ServletService;
 
 public class MimeStreamDataVisitor extends AbstractVisitor{
 
-	public static final Feature USE_RFC822 = new Feature("email.serve_rfc822",false,"Always Serve emails to browsers as RFC822");
+	public static final Feature USE_RFC822 = new Preference("email.serve_rfc822",false,"Always Serve email downloads to browsers as RFC822 so they display in an email client instead of as text");
 	
 	private final Logger log;
 	private ByteArrayMimeStreamData data=null;

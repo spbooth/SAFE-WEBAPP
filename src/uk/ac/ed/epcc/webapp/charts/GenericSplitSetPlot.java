@@ -46,6 +46,21 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 				}
 			}
 		}
+		notifyChange();
+	}
+	public float getMaximum() {
+		float max = data[0][0][0];
+		// assumes sets are plotted front to back
+		for (int i = 0; i < nset; i++) {
+			for (int j = 0; j < ncat; j++) {
+				for (int k = 0; k < nitem; k++) {
+					if( data[i][j][k] > max ){
+						max=data[i][j][k];
+					}
+				}
+			}
+		}
+		return max;
 
 	}
 
@@ -88,6 +103,7 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 	public void set(int i, int j, int k, float f) {
 		grow(i + 1, j + 1, k + 1);
 		data[i][j][k] = f;
+		notifyChange();
 	}
 
 	@Override
@@ -133,5 +149,7 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 		
 	}
 
-
+	protected void notifyChange() {
+	}
+	
 }

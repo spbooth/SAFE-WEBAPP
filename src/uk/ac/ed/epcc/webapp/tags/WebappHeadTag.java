@@ -50,6 +50,10 @@ public class WebappHeadTag extends TagSupport implements Tag {
         		// If no appContext then skip nav bar
         		String template_path = request.getContextPath()+conn.getInitParameter("template.path","");	
         		
+        		String favicon = conn.getInitParameter("favicon");
+        		if( favicon != null && ! favicon.isEmpty()){
+        			doIcon(out, response, template_path, conn.getInitParameter("favicon.type", "image/png"), favicon);
+        		}
         		doCSS(out, response, template_path,"default css","webapp.css");
         		if( NavigationMenuService.NAVIGATION_MENU_FEATURE.isEnabled(conn)){
         			doCSS(out, response, template_path,null,"nav_menu.css");
@@ -90,6 +94,18 @@ public class WebappHeadTag extends TagSupport implements Tag {
 		out.print("href=\"");
 		out.print(response.encodeURL(template_path+"/css/"+file));
 		out.println("\" rel=\"stylesheet\" type=\"text/css\">");
+	}
+	protected void doIcon(JspWriter out, HttpServletResponse response, String template_path,String type,String file) throws IOException {
+		out.print("<link rel=\"icon\" ");
+		if( type != null ){
+			out.print("type=\"");
+	
+			out.print(type);
+			out.print("\" ");
+		}
+		out.print("href=\"");
+		out.print(response.encodeURL(template_path+"/"+file));
+		out.println("\" >");
 	}
 	protected void doScript(JspWriter out, HttpServletRequest request, HttpServletResponse response, String location) throws IOException {
 		out.print("<script type=\"text/javascript\" charset=\"utf8\" src=\"");

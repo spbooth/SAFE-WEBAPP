@@ -28,10 +28,8 @@ import java.io.OutputStream;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 
-import uk.ac.ed.epcc.webapp.charts.Chart;
 import uk.ac.ed.epcc.webapp.charts.ChartData;
 import uk.ac.ed.epcc.webapp.charts.Plot;
-import uk.ac.ed.epcc.webapp.charts.SetPlot;
 
 public abstract class JFreeChartData<P extends Plot> implements ChartData<P> {
 	
@@ -41,13 +39,13 @@ public abstract class JFreeChartData<P extends Plot> implements ChartData<P> {
 	/**
 	 * 
 	 */
+	//private static final int DEFAULT_Y_SIZE = 345;
 	private static final int DEFAULT_Y_SIZE = 400;
-
 	/**
 	 * 
 	 */
+	//private static final int DEFAULT_X_SIZE = 690;
 	private static final int DEFAULT_X_SIZE = 800;
-
 	//String labels[];
 
 	
@@ -101,7 +99,7 @@ public abstract class JFreeChartData<P extends Plot> implements ChartData<P> {
 		return quantity;
 	}
     public void setTitle(String t){
-    	this.title=title;
+    	this.title=t;
     }
 
 	public Dimension getSize() {

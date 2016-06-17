@@ -129,7 +129,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * The cache only holds non-dirty data so could hold normal Map objects rather than actual Records.
  * Currently this is left as a future optimisation.
  * <p>
- * Note that lookups via a {@TypeProducer} may also	utilise this caching mechanism.
+ * Note that lookups via a {@link TypeProducer} may also	utilise this caching mechanism.
  * <p>
  * Repositories are intended to be local to a parent AppContext which should represent a
  * single thread of execution. However synchronisation is implemented within the code.
@@ -2289,7 +2289,13 @@ public final class Repository {
 		}
 		return indexes.containsKey(index);
 	}
-	
+	/** get a {@link NumberFieldExpression} for a field.
+	 * 
+	 * @param filter_type type of the hosting object
+	 * @param target desired numeric type for the field.
+	 * @param key field name
+	 * @return {@link NumberFieldExpression}
+	 */
 	public <T extends Number,X extends DataObject> NumberFieldExpression<T,X> getNumberExpression(Class<? super X> filter_type,Class<T> target,String key){
 		FieldInfo info = getInfo(key);
 		if( info == null || ! info.isNumeric()){
@@ -2297,6 +2303,12 @@ public final class Repository {
 		}
 		return new NumberFieldExpression<T,X>(filter_type,target,this,key);
 	}
+	/** get a {@link BooleanFieldExpression} for a field
+	 * 
+	 * @param filter_type type of hosting object
+	 * @param key field name
+	 * @return {@link BooleanFieldExpression}
+	 */
 	public <X extends DataObject> BooleanFieldExpression<X> getBooleanExpression(Class<? super X> filter_type,String key){
 	
 		FieldInfo info = getInfo(key);
@@ -2305,6 +2317,12 @@ public final class Repository {
 		}
 		return new BooleanFieldExpression(filter_type,this,key);
 	}
+	/** get a {@link StringFieldExpression} for a field
+	 * 
+	 * @param filter_type type of hosting object
+	 * @param key field name
+	 * @return {@link StringFieldExpression}
+	 */
 	public <X extends DataObject> StringFieldExpression<X> getStringExpression(Class<? super X> filter_type,String key) {
 		
 		FieldInfo info = getInfo(key);
@@ -2316,6 +2334,14 @@ public final class Repository {
 		return new StringFieldExpression<X>(filter_type,this,key);
 		
 	}
+	/** get a {@link Date} valued {@link FieldValue} for a field.
+	 * 
+	 * The underlying database field may be a time-stamp or a numeric field.
+	 * 
+	 * @param target type of hosting object
+	 * @param key field name
+	 * @return {@link FieldValue}
+	 */
 	public <X extends DataObject> FieldValue<Date,X> getDateExpression(Class<? super X> target,String key) {
 		
 		FieldInfo info = getInfo(key);

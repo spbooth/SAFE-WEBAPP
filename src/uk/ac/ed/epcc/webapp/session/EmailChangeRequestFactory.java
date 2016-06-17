@@ -163,7 +163,8 @@ public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequ
 	    	}
 			f.addInput(EmailNameFinder.EMAIL, "New Email Address", input);
 			// Must not change to existing email unless already taken by same user.
-			f.getField(EmailNameFinder.EMAIL).setValidator(new ParseFactoryValidator<AppUser>(factory, user));
+			f.getField(EmailNameFinder.EMAIL).removeValidator(new ParseFactoryValidator<AppUser>(factory, null));
+			f.getField(EmailNameFinder.EMAIL).addValidator(new ParseFactoryValidator<AppUser>(factory, user));
 	    	f.addAction("Request", new RequestAction(user));
 	    }
 }

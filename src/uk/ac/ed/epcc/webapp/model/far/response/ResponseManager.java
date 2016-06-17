@@ -31,8 +31,8 @@ import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
-import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager;
 import uk.ac.ed.epcc.webapp.model.far.AbstractPartTransitionProvider;
+import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
 import uk.ac.ed.epcc.webapp.model.far.handler.QuestionFormHandler;
@@ -42,7 +42,9 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** a factory for responses to {@link DynamicForm}s.
  * This class is abstract because much of the behaviour (specifically how responses are created and the rules for who can
- * edit  a response) are very specific to the surronding logic
+ * edit  a response) are very specific to the surrounding logic.
+ * 
+ * ResponseManagers implement {@link ServeDataProducer} allowing any user
  * @author spb
  * @param <R> 
  * @param <F> 

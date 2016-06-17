@@ -72,7 +72,7 @@ public class IntegerHandler implements QuestionFormHandler<Integer> {
 	public Input<Integer> parseConfiguration(Form f) {
 		IntegerInput input = new IntegerInput();
 		input.setMin((Integer) f.get(MINIMUM)); 
-		input.setMax((Number) f.get(MAXIMUM));
+		input.setMax((Integer) f.get(MAXIMUM));
 		input.setStep((Integer) f.get(STEP));
 		input.setUnit((String)f.get(UNIT));
 		return input;

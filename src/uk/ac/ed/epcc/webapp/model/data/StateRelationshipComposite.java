@@ -94,7 +94,7 @@ public class StateRelationshipComposite<U extends AppUser,BDO extends DataObject
 	 * @see uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider#hasRelationFilter(uk.ac.ed.epcc.webapp.session.SessionService, java.lang.String)
 	 */
 	@Override
-	public BaseFilter<BDO> hasRelationFilter(SessionService<U> sess, String role) {
+	public BaseFilter<BDO> hasRelationFilter( String role,U u) {
 		if( role.equals(field)){
 			return new Filter();
 		}

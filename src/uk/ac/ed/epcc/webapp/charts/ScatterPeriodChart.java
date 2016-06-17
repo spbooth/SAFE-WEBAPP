@@ -15,7 +15,6 @@ package uk.ac.ed.epcc.webapp.charts;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.charts.jfreechart.JFreeScatterPeriodChartData;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.time.SplitTimePeriod;
 
 /** A {@link ScatterPeriodChart} is a scatter plot where each point 
@@ -39,16 +38,12 @@ public class ScatterPeriodChart<P extends ScatterPeriodPlot> extends Chart<P> {
 	
 	public static ScatterPeriodChart getInstance(AppContext conn, SplitTimePeriod period, int nsplit){
 		ScatterPeriodChart chart = new ScatterPeriodChart(conn);
-		Class<? extends ScatterPeriodChartData> clazz = conn.getPropertyClass(ScatterPeriodChartData.class, JFreeScatterPeriodChartData.class, "ScatterPeriodChartData");
-		
-		try {
-			ScatterPeriodChartData chart_data = conn.makeObject(clazz);
-			chart_data.setPeriod(period, nsplit);
-			chart.setChartData(chart_data);
-		} catch (Exception e) {
-			conn.getService(LoggerService.class).getLogger(ScatterPeriodChart.class).error("Error making TimeChartData",e);
-			return null;
-		}
+
+		ScatterPeriodChartData chart_data = new JFreeScatterPeriodChartData();
+
+		chart_data.setPeriod(period, nsplit);
+		chart.setChartData(chart_data);
+
 		
 		return chart;
 	}

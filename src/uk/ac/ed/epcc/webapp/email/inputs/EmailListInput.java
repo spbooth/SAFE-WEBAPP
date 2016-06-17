@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.email.inputs;
 import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.forms.inputs.MultipleInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 /** Input for a list of email addresses.
  * 
@@ -27,7 +28,23 @@ import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
  */
 
 
-public class EmailListInput extends TextInput {
+public class EmailListInput extends TextInput implements MultipleInput {
+	/**
+	 * 
+	 */
+	public EmailListInput() {
+		super();
+		setSingle(true); // can't be a textarea and an html5 email input
+	}
+
+	/**
+	 * @param allow_null
+	 */
+	public EmailListInput(boolean allow_null) {
+		super(allow_null);
+		setSingle(true); // can't be a textarea and an html5 email input
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -44,5 +61,21 @@ public class EmailListInput extends TextInput {
 		if (!Emailer.checkAddressList(getString())) {
 			throw new ValidateException("Expecting comma seperated email addresses");
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input#getType()
+	 */
+	@Override
+	public String getType() {
+		return "email";
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.MultipleInput#isMultiple()
+	 */
+	@Override
+	public boolean isMultiple() {
+		return true;
 	}
 }

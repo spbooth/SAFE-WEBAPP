@@ -179,4 +179,11 @@ public abstract class Node extends NodeContainer implements Externalizable{
 	public void accept(Visitor vis) {
 		vis.visitNode(this);
 	}
+	@Override
+	public String toString(){
+		if( menu_text != null ){
+			return menu_text;
+		}
+		return super.toString();
+	}
 }

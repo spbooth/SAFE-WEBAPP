@@ -48,6 +48,7 @@ public class Chart2DTimeChartData extends Chart2DChartData<Chart2DSplitSetPlot> 
 	private static final int TOO_MANY_MAJOR = 12;
 	SplitTimePeriod period;
 	boolean force_multi=true;
+	private boolean is_cumulative;
 	int nsplit;
 	private LinkedList<Chart2DSplitSetPlot> plots = new LinkedList<Chart2DSplitSetPlot>();
 	// custom colours for use in line graphs
@@ -293,5 +294,20 @@ public class Chart2DTimeChartData extends Chart2DChartData<Chart2DSplitSetPlot> 
 	public void setGraphical(boolean val) {
 		force_multi=val;
 		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.charts.TimeChartData#setCumulative(boolean)
+	 */
+	@Override
+	public void setCumulative(boolean value) {
+		is_cumulative=value;
+		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.charts.TimeChartData#isCumulative()
+	 */
+	@Override
+	public boolean isCumulative() {
+		return is_cumulative;
 	}
 }

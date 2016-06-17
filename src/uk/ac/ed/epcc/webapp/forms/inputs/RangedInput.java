@@ -21,21 +21,8 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
  * @param <N>
  */
 
-public interface RangedInput<N extends Number> extends HTML5Input{
+public interface RangedInput<N extends Number> extends BoundedInput<N>{
 
-	/** Minimum valid number value.
-	 * null value implies no minimum.
-	 * 
-	 * @return Number
-	 */
-	public abstract Number getMin();
-
-	/** Maximum  valid number value
-	 * null value implies no maximum
-	 * 
-	 * @return
-	 */
-	public abstract Number getMax();
 	
 	/** Step value
 	 * defines step value. Valid values should be a multiple of the setp value.
@@ -46,13 +33,6 @@ public interface RangedInput<N extends Number> extends HTML5Input{
 	 */
 	public abstract Number getStep();
 	
-	/** format step/range values compatible to the way they are  
-	 * presented. for example a percent imput may use 0.0 and 1.0 but present as 0, 100
-	 * used  to generate HTML5 ranges.
-	 * 
-	 * @param n
-	 * @return
-	 */
-	public abstract String formatRange(Number n);
+	
 
 }

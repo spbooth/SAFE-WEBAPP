@@ -67,7 +67,11 @@ public class TemplateFinder {
 		this(conn,"email.template_directory");
 	}
 	public TemplateFile getTemplateFile(String name) throws Exception{
-		return new TemplateFile(getText(name));
+		String text = getText(name);
+		if( text == null){
+			return null;
+		}
+		return new TemplateFile(text);
 	}
 	public String getText(String name)throws Exception{
 		if( cache.containsKey(name)){
@@ -103,7 +107,7 @@ public class TemplateFinder {
 				}
 			}
 			conn.getService(LoggerService.class).getLogger(getClass()).error("Template "+name+" not found in "+dir);
-			return "  no template found "+name+"  ";
+			return null;
 
 		}
 		throw new IOException("No template directory specified");

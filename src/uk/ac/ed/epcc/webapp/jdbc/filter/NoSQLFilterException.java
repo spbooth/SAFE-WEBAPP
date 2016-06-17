@@ -13,9 +13,17 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
+import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
+import uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider;
 
 /** Exception that indicates a filter cannot be converted to a {@link SQLFilter}
  * 
+ * This covers both the case where the expression cannot be implemented in SQL and when a {@link FilterProvider}
+ * has insufficient information to generate the filter and a fall-back algorithm is required.
+ * 
+ * If the expression is impossible to implement use {@link CannotFilterException} instead.
+ * 
+ * @see CannotFilterException
  * @author spb
  *
  */

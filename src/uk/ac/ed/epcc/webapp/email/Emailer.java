@@ -147,6 +147,10 @@ public class Emailer {
 
 		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("request_password.txt");
 
+		if( email_template == null ){
+			getLogger().debug(new_password);
+			return;
+		}
 		email_template.setProperty("person.name", person.getName());
 		email_template.setProperty("person.password", new_password);
 		email_template.setProperty("person.email", person.getEmail());
@@ -161,7 +165,7 @@ public class Emailer {
 			
 		}
 
-		templateEmail(person.getEmail(), email_template);
+		templateEmail(person, email_template);
 
 	}
 
@@ -199,6 +203,10 @@ public class Emailer {
 			throws Exception {
 
 		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("new_signup.txt");
+		if( email_template == null){
+			getLogger().debug(new_password);
+			return;
+		}
 
 		String name = person.getName();
 		if( name == null || name.trim().length() == 0){
@@ -217,7 +225,7 @@ public class Emailer {
 			}
 			
 		}
-		templateEmail(person.getEmail(), email_template);
+		templateEmail(person, email_template);
 
 	}
 
@@ -247,6 +255,13 @@ public class Emailer {
 		return templateEmail(sendto, null, email_template);
 	}
 
+	
+	public String getEmail(AppUser recipient){
+		if( recipient.allowEmail()){
+			return recipient.getEmail();
+		}
+		return getContext().getInitParameter("disabled_email.map_address");
+	}
 	/**
 	 * Send an email based on a template file to a {@link AppUser}
 	 * 
@@ -258,8 +273,17 @@ public class Emailer {
 	 */
 	public MimeMessage templateEmail(AppUser recipient, TemplateFile email_template)
 			throws IOException, MessagingException {
-		if( recipient.allowEmail()){
-			return templateEmail(recipient.getEmail(), null, email_template);
+		return templateEmail(recipient, null, email_template);
+	}
+	public MimeMessage templateEmail(AppUser recipient, Hashtable headers,TemplateFile email_template)
+				throws IOException, MessagingException {
+		Logger log = getLogger();
+		String email = getEmail(recipient);
+		log.debug("Email mapped "+recipient.getEmail()+"->"+email);
+		if( email != null && email.trim().length() > 0){
+			return templateEmail(email, headers, email_template);
+		}else{
+			log.warn("Email to "+recipient.getIdentifier()+" mapped to null");
 		}
 		return null;
 	}

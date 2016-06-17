@@ -46,7 +46,7 @@ public class LandingPageVisitor implements Visitor{
 				builder.open("ul");
 			}
 			for(Node n : children){
-				visitNode(n);
+				n.accept(this);
 			}
 			if( active ){ 
 				builder.close();
@@ -98,7 +98,7 @@ public class LandingPageVisitor implements Visitor{
 				}
 			}
 		}
-		if( ! node.isEmpty()){
+		if(  ! node.isEmpty()){
 			visitContainer(node);
 		}
 		if( active){

@@ -25,6 +25,7 @@
 <%	
 	String page_title = service_name+" Change "+website_name+" Password";
 	PageHTMLForm form = (PageHTMLForm) request.getAttribute("Form");
+	String policy = (String) request.getAttribute("policy");
 %>
 <%if( form == null ){ %>
 <jsp:forward page="/messages.jsp?message_type=access_denied" />
@@ -37,14 +38,14 @@
 <% if( form.hasSubmitted() && form.hasError()){ %>
 <h3>This form contains errors:</h3>
 <p class="warn">	
-<%= form.getGeneralError() %>
+<% String error = form.getGeneralError(); %>
+<%= error == null ? "" : error %>
 </p>
 <%} %>
+<p><%=policy %>
+</p>
 <form>
 <%= form.getHtmlForm() %>
-<div class="action_buttons">
-<input type="submit" value="Set Password"/>
-</div>
 </form>
 </div>
 

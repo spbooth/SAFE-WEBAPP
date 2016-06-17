@@ -125,7 +125,12 @@ public class SessionDataProducer implements SettableServeDataProducer {
 			oos.close();
 			Object attribute = stream.toByteArray();
 			if( SOFT_REFERENCE_FEATURE.isEnabled(conn)){
-				attribute = new SerialisableSoftReference<byte[]>((byte[])attribute);
+				int max_len = conn.getIntegerParameter("SessionDataProducer.max_serialise",0);
+				SerialisableSoftReference<byte[]> ref = new SerialisableSoftReference<byte[]>((byte[])attribute);
+				if( max_len > 0 && data.getLength() > max_len){
+					ref.setForceNullOnSerialise(true);
+				}
+				attribute = ref;
 			}
 			session_service.setAttribute(getTag()+_DATA+next, attribute);
 			LinkedList<String> res = new LinkedList<String>();

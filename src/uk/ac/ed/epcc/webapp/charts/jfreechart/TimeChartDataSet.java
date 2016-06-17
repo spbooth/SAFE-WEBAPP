@@ -14,34 +14,40 @@
 package uk.ac.ed.epcc.webapp.charts.jfreechart;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.jfree.data.DomainOrder;
+import org.jfree.data.Range;
 import org.jfree.data.general.DatasetChangeEvent;
 import org.jfree.data.general.DatasetChangeListener;
 import org.jfree.data.general.DatasetGroup;
 import org.jfree.data.xy.IntervalXYDataset;
+import org.jfree.data.xy.TableXYDataset;
+import org.jfree.data.xy.XYDomainInfo;
+import org.jfree.data.xy.XYRangeInfo;
 
 import uk.ac.ed.epcc.webapp.charts.GenericSplitSetPlot;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.time.SplitTimePeriod;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
-/** A {@link GenericSplitSetPlot} that implements the appropriate JFrrChart 
+/** A {@link GenericSplitSetPlot} that implements the appropriate JFreeChart 
  * interfaces. We implement {@link IntervalXYDataset} to represent the actual time periods
  * so the data can be plotted as bar-chart and return the middle of the period as the data point.
  * @author spb
  *
  */
 
-public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYDataset {
+public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYDataset,TableXYDataset, XYDomainInfo, XYRangeInfo {
 
 	DatasetGroup group;
 	Set<DatasetChangeListener> listeners;
-	double times[];
-	double starts[];
-	double ends[];
+	private final double times[];
+	private final double starts[];
+	private final double ends[];
 	int dataset_id;
+	private final int nitem;
 	
 	/**
 	 * @throws InvalidArgument 
@@ -50,7 +56,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	public TimeChartDataSet(int nset, SplitTimePeriod period, int nsplit) throws InvalidArgument {
 		super();
 		setSplits(nset, period, nsplit,false);
-		int nitem = period.getNsplit()*nsplit;
+		nitem = period.getNsplit()*nsplit;
 		times = new double[nitem];
 		starts = new double[nitem];
 		ends = new double[nitem];
@@ -61,6 +67,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 			long end = p.getEnd().getTime();
 			long step = (end-start)/nsplit;
 			long off=step/2;
+			//long off=0L; // align with start
 			for(int i=0;i<nsplit;i++){
 				starts[pos]=start;
 				times[pos]=start+off;
@@ -155,7 +162,11 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	 * @see org.jfree.data.xy.XYDataset#getItemCount(int)
 	 */
 	public int getItemCount(int arg0) {
-		return getNumCats()*getNumItems();
+		if( arg0 < 0 || arg0 >= getNumSets()){
+			throw new IllegalArgumentException("Series out of range ");
+		}
+		return getItemCount();
+		
 	}
 	
 
@@ -188,14 +199,10 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	}
 
 
-	@Override
-	public void set(int i, int j, int k, float f) {
-		super.set(i, j, k, f);
-		notifyChange();
-	}
+	
 
 
-	private void notifyChange() {
+	protected void notifyChange() {
 		if( listeners != null){
 			for(DatasetChangeListener l : listeners){
 				l.datasetChanged(new DatasetChangeEvent(this, this));
@@ -234,7 +241,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	 * @see org.jfree.data.xy.IntervalXYDataset#getEndY(int, int)
 	 */
 	public Number getEndY(int arg0, int arg1) {
-		return null;
+		return getYValue(arg0, arg1);
 	}
 
 
@@ -266,7 +273,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	 * @see org.jfree.data.xy.IntervalXYDataset#getStartY(int, int)
 	 */
 	public Number getStartY(int arg0, int arg1) {
-		return null;
+		return getYValue(arg0, arg1);
 	}
 
 
@@ -275,6 +282,35 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	 */
 	public double getStartYValue(int arg0, int arg1) {
 		return getYValue(arg0, arg1);
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.jfree.data.xy.TableXYDataset#getItemCount()
+	 */
+	@Override
+	public int getItemCount() {
+		return getNumCats()*getNumItems();
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.jfree.data.xy.XYDomainInfo#getDomainBounds(java.util.List, boolean)
+	 */
+	@Override
+	public Range getDomainBounds(List arg0, boolean arg1) {
+		// Ignore arguments as all series have the same Xx range
+		return new Range(starts[0],ends[nitem-1]);
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.jfree.data.xy.XYRangeInfo#getRangeBounds(java.util.List, org.jfree.data.Range, boolean)
+	 */
+	@Override
+	public Range getRangeBounds(List visibleSeriesKeys, Range xrange, boolean include_int) {
+		// start with just global range
+		return new Range(0.0,getMaximum());
 	}
 
 }

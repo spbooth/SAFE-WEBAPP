@@ -69,7 +69,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  * Though it is possible to refer to DataObjects via their integer handle this should be done sparingly.
  * Any method call that takes an integer handle as a parameter is intrinsically less type safe then one that takes a
  * reference to the appropriate object. The {@link IndexedReference} class exists to implement type-safe lightweight references to 
- * objects (like {@link DataObject} that implement {@link Indexed}
+ * objects (like {@link DataObject}) that implement {@link Indexed}
  * <p>
  * Most sub-classes will also override the <code>getIdentifier()</code> method. This generates
  * a unique text identifier for the <code>DataObject</code>. This is used in pull down menus etc.
@@ -169,7 +169,7 @@ public abstract class DataObject implements ContextIndexed, Identified{
 	}
 	/** Extension point called at end of commit
 	 * 
-	 * @param changed
+	 * @param changed record was changed by commit.
 	 */
 	protected void post_commit(boolean changed)throws DataFault{
 		

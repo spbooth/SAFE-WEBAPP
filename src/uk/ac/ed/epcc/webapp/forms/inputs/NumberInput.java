@@ -31,12 +31,12 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N> implements LabelInput, UnitInput, RangedInput<N> {
 	
 
-	private Number min = null;
+	private N min = null;
 
-	private Number max = null;
+	private N max = null;
 	// step value for use in html5 input
 	// this only controls the html5 control not the validation
-	private Number step = null;
+	private N step = null;
 	
 	private String unit = null;
 	private String label = null;
@@ -70,7 +70,7 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.RangedInput#getMin()
 	 */
-	public Number getMin(){
+	public N getMin(){
 		return min;
 	}
 
@@ -85,23 +85,23 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 		}
 		return null;
 	}
-	public void setStep(Number s){
+	public void setStep(N s){
 		this.step=s;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.RangedInput#getMax()
 	 */
-	public Number getMax(){
+	public N getMax(){
 		return max;
 	}
-	public Number setMax(Number m) {
-		Number old = max;
+	public N setMax(N m) {
+		N old = max;
 		max = m;
 		return old;
 	}
 
-	public Number setMin(Number m) {
-		Number old = min;
+	public N setMin(N m) {
+		N old = min;
 		min = m;
 		return old;
 	}

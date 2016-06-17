@@ -22,6 +22,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.ElapsedSecondInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TagInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
@@ -34,7 +35,7 @@ import uk.ac.ed.epcc.webapp.model.data.Duration;
  */
 
 
-public class DurationInput extends ParseAbstractInput<Duration> implements TagInput{
+public class DurationInput extends ParseAbstractInput<Duration> implements FormatHintInput{
 
 	public DurationInput() {
 		super();
@@ -84,8 +85,8 @@ public class DurationInput extends ParseAbstractInput<Duration> implements TagIn
 		return total+":"+min+":"+seconds;
 	}
 
-	public String getTag() {
-		return "(HH:MM:SS)";
+	public String getFormatHint() {
+		return "HH:MM:SS";
 	}
 
 	@Override

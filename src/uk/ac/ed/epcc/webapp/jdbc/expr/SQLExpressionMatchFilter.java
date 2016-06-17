@@ -28,17 +28,17 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 
 public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilter<T> {
 	private final Class<? super T> target;
-    private final SQLExpression<V> expr1;
-    private final SQLExpression<V> expr2;
+    private final SQLExpression<? extends V> expr1;
+    private final SQLExpression<? extends V> expr2;
   
     private final MatchCondition match;
-	public SQLExpressionMatchFilter(Class<? super T> target,SQLExpression<V> expr1,SQLExpression<V> expr2){
+	public SQLExpressionMatchFilter(Class<? super T> target,SQLExpression<? extends V> expr1,SQLExpression<? extends V> expr2){
 		this.target=target;
     	this.expr1=expr1;
     	this.expr2=expr2;
     	this.match=null;
     }
-	public SQLExpressionMatchFilter(Class<? super T> target,SQLExpression<V> expr1,MatchCondition match,SQLExpression<V> expr2){
+	public SQLExpressionMatchFilter(Class<? super T> target,SQLExpression<? extends V> expr1,MatchCondition match,SQLExpression<? extends V> expr2){
 		this.target=target;
     	this.expr1=expr1;
     	this.match=match;

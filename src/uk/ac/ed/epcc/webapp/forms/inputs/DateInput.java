@@ -24,7 +24,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
  * @author spb
  *
  */
-public class DateInput extends AbstractDateInput implements TagInput, HTML5Input {
+public class DateInput extends AbstractDateInput implements HTML5Input {
     private static final String DEFAULT_FORMAT = "yyyy-MM-dd";
 
     public DateInput(){

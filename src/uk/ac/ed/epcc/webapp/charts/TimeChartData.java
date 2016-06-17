@@ -31,6 +31,14 @@ import uk.ac.ed.epcc.webapp.time.SplitTimePeriod;
  */
 public interface TimeChartData<P extends PeriodSequencePlot> extends PeriodChartData<P> {
 	
+	/** Set a hint that we are going to use this data in a cummulative plot
+	 * 
+	 * @param value
+	 */
+	public void setCumulative(boolean value);
+	
+	public boolean isCumulative();
+	
 	public void setPeriod(SplitTimePeriod period, int nsplit);
 	
 	

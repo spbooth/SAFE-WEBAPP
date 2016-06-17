@@ -38,7 +38,7 @@ public class EmailInput extends TextInput implements HTML5Input {
 	public static final int MAX_EMAIL_LENGTH = 254;
 	public EmailInput(){
 		super();
-		setBoxWidth(64);
+		setBoxWidth(32); // 64 is too long for EmailChangeRequest page
 		setMaxResultLength(MAX_EMAIL_LENGTH);
 		setSingle(true);
 	}

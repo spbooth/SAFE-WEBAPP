@@ -77,6 +77,10 @@ public enum Operator {
 		  if( a == null || b == null ){
 			  return null;
 		  }
+		  if( a.doubleValue() == 0.0){
+			  // no loss. See underlying method
+			  return NumberOp.div(a, b);
+		  }
 		  // In general division gives a fraction not programmer rounding.
 		  // but don't promote to double unless we have too.
 		  double divide = a.doubleValue()/b.doubleValue();

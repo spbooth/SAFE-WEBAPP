@@ -54,13 +54,14 @@ public class DatabaseUpgrader extends Object implements Command {
 	Set<String> seen = new HashSet<String>();
 	
 	private void process(Connection c,Statement stmt,String name) throws SQLException{
-		if( seen.contains(name)){
+		if( seen.contains(name) || conn.getBooleanParameter(name+".no_innodb", false)){
 			return;
 		}
 		System.out.println("processing "+name);
 		// ensure table created
 		DataObjectFactory fac = getContext().makeObject(DataObjectFactory.class,name);
 		
+		Repository.reset(getContext(), name);
 		Repository res = Repository.getInstance(getContext(), name);
 		String table_name =res.getTable();
 		System.out.println("table is "+table_name);
@@ -83,23 +84,38 @@ public class DatabaseUpgrader extends Object implements Command {
 		System.out.println("upgrade to utf8");
 		stmt.executeUpdate("ALTER TABLE "+table_name+" CHARACTER SET utf8 COLLATE utf8_unicode_ci");
 		stmt.executeUpdate("ALTER TABLE "+table_name+" CONVERT TO  CHARACTER SET utf8 COLLATE utf8_unicode_ci");
+		StringBuilder primary_update = new StringBuilder();
+		primary_update.append("ALTER TABLE ");
+		primary_update.append(table_name);
+		primary_update.append(" CHANGE ");
+		res.addUniqueName(primary_update, false, true);
+		primary_update.append(" ");
+		res.addUniqueName(primary_update, false, true);
+		primary_update.append(" INT(11) NOT NULL auto_increment");
+		stmt.executeUpdate(primary_update.toString());
 		for( String field : res.getFields()){
 			FieldInfo info = res.getInfo(field);
 			if( info.isReference()){
-				System.out.println("add foreign key "+name+"."+field);
-				StringBuilder query = new StringBuilder();
-				query.append("ALTER TABLE ");
-				res.addTable(query, true);
-				String ref = info.getReferencedTable();
-				query.append(" ADD FOREIGN KEY ");
-				query.append(field);
-				query.append("_ref_key (");
-				info.addName(query, false, true);
-				query.append(") REFERENCES ");		
-			
-				query.append(Repository.getForeignKeyDescriptor(getContext(), ref, true));
-				System.out.println(query.toString());
-				stmt.executeUpdate(query.toString());
+				stmt.executeUpdate("UPDATE "+table_name+" SET "+info.getName(true)+"=NULL WHERE "+info.getName(true)+" <= 0");
+				String index_name = field+"_ref_key";
+				if(  ! res.hasIndex(index_name)){
+					System.out.println("add foreign key "+name+"."+field);
+					StringBuilder query = new StringBuilder();
+					query.append("ALTER TABLE ");
+					res.addTable(query, true);
+					String ref = info.getReferencedTable();
+					query.append(" ADD FOREIGN KEY ");
+					query.append(field);
+					query.append("_ref_key (");
+					info.addName(query, false, true);
+					query.append(") REFERENCES ");		
+
+					query.append(Repository.getForeignKeyDescriptor(getContext(), ref, true));
+					query.append(" ON UPDATE CASCADE ");
+					System.out.println(query.toString());
+					stmt.executeUpdate(query.toString());
+				}
+
 			}else if( info.isNumeric()){
 				System.out.println(info.getName(true)+" not index?");
 			}

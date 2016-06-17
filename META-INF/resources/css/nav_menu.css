@@ -99,8 +99,7 @@
 }
 .nav li.external > a:after {
 	content:   url("link.png");
-	float: right;
-  	margin-right: 20px;
+  	margin-left: 15px;
   }
 /*******************************************
    Style menu for larger screens
@@ -126,16 +125,21 @@
     z-index: 10;
   }
    .nav ul ul {
-     width: inherit;
+     width: auto;
   }
   .nav li {
-    width: 195px;
+    min-width: 170px;
     border-bottom: none;
     height: 30px;
     line-height: 30px;
     font-size: 1.0em;
     display: inline-block;
-    margin-right: -4px;
+    white-space: nowrap;
+/* This is probably necessary for multi-level menus but it looks
+ * odd at the top level and we force to 2 levels
+ *
+ *   margin-right: -4px; 
+ */
   }
   
  
@@ -188,12 +192,7 @@
     display: initial;
     width: inherit;
   }
-  /* sub-menu items need to auto-calculate height
-   * so the sub-menu can do overflow properly
-   */
-  .nav ul li ul li{
-    height: auto;
-  }
+  
   /* sub-menus add vertical scroll above a certain length
    */
   .nav > ul > li > ul {
@@ -201,6 +200,24 @@
     overflow-y: auto;
     overflow-x: visible;
   }
+  /*  alternate rules for dynamic sub-menu
+  .nav ul li ul ul{
+    position: absolute;
+    z-index: 12;
+    left: 100px;
+  }
+  .nav > ul > li > ul {
+  	overflow-x: visible;
+  	overflow-y: visible;
+  }
+  */
+  /* sub-menu items need to auto-calculate height
+   * so the sub-menu can do overflow properly
+   */
+  .nav ul li ul li{
+    height: auto;
+  }
+  
   
   
   /* Show pull-down menu on hover or a JS setting
@@ -214,3 +231,12 @@
 
   
 }
+/**************************
+ * Supress navigation on print
+ ******************************/
+ @media print {
+ .nav {
+   display: none;
+ }
+ 
+ }

@@ -556,10 +556,6 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 
 
 	/** Perform a raw query of a users roles from the database
-	 * This is an extension point to allow sub-classes to extends how a role 
-	 * is implemented. This method returns a Boolean if a definitive answer is known
-	 * otherwise null, This was sub-classes only need to perform additional queries on
-	 * null results.
 	 * @param conn 
 	 * @param id 
 	 * @param role
@@ -779,7 +775,7 @@ public Set<A> withRole(String role) {
 		String store_tag=fac.getTag()+"."+role;
 		BaseFilter<? super T> result = roles.get(store_tag);
 		if( result == null ){
-			result = makeRelationshipRoleFilter(fac,role);
+			result = makeRelationshipRoleFilter(fac,role,null);
 			roles.put(store_tag, result);
 		}
 		return result;
@@ -788,8 +784,9 @@ public Set<A> withRole(String role) {
 	public final <T extends DataObject> BaseFilter<A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac,
 			String role, T target) throws UnknownRelationshipException {
 		// We may be storing roles from different types so prefix all tags with the type.
-		// prefix is never seen outsite this cache.
-		String store_tag="PersonFilter."+fac.getTag()+"."+role;
+		// prefix is never seen outside this cache.
+		// This filter is also parameterised by the target
+		String store_tag="PersonFilter."+fac.getTag()+(target == null ? "" : "."+target.getID())+"."+role;
 		BaseFilter<A> result = roles.get(store_tag);
 		if( result == null ){
 			result = makePersonInRelationshipRoleFilter(fac, role,target);
@@ -797,6 +794,25 @@ public Set<A> withRole(String role) {
 		}
 		return result;
 	}
+	@Override
+	public <T extends DataObject> BaseFilter<? super T> getTargetInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,
+			A person) throws UnknownRelationshipException {
+		if( person == null){
+			return getRelationshipRoleFilter(fac, role);
+		}
+		String store_tag="TargetFilter."+fac.getTag()+"."+person.getID()+"."+role;
+		BaseFilter<? super T> result = roles.get(store_tag);
+		if( result == null ){
+			// adding in the default filter breaks everything for some reason
+			//result = new AndFilter<T>(fac.getTarget(),
+			//		fac.getDefaultRelationshipFilter(),
+			//		makeRelationshipRoleFilter(fac,role,person));
+			result = makeRelationshipRoleFilter(fac,role,person);
+			roles.put(store_tag, result);
+		}
+		return result;
+	}
+
 	private Set<String> searching_roles = new HashSet<String>();
 	/** actually construct the filter.
 	 * 
@@ -815,12 +831,13 @@ public Set<A> withRole(String role) {
 	 * <li> The tag of a {@link AccessRoleProvider}</li>
 	 * </ul>
 	 * 
-	 * @param fac2
-	 * @param role
+	 * @param fac2   target factory
+	 * @param role   relationship string
+	 * @param person person to query (null for current person)
 	 * @return
 	 * @throws UnknownRelationshipException 
 	 */
-	protected <T extends DataObject> BaseFilter<? super T> makeRelationshipRoleFilter(DataObjectFactory<T> fac2, String role) throws UnknownRelationshipException {
+	protected <T extends DataObject> BaseFilter<? super T> makeRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,A person) throws UnknownRelationshipException {
 		if( searching_roles.contains(role)){
 			// recursive creation
 			throw new UnknownRelationshipException("recursive definition of "+role);
@@ -831,7 +848,11 @@ public Set<A> withRole(String role) {
 			// OR combination of filters
 			OrFilter<T> or = new OrFilter<T>(fac2.getTarget(), fac2);
 			for( String  s  : role.split(",")){
-				or.addFilter(getRelationshipRoleFilter(fac2, s));
+				if( person == null){
+					or.addFilter(getRelationshipRoleFilter(fac2, s));
+				}else{
+					or.addFilter(getTargetInRelationshipRoleFilter(fac2, s, person));
+				}
 			}
 			return or;
 		}
@@ -839,7 +860,11 @@ public Set<A> withRole(String role) {
 			// OR combination of filters
 			AndFilter<T> and = new AndFilter<T>(fac2.getTarget());
 			for( String  s  : role.split("+")){
-				and.addFilter(getRelationshipRoleFilter(fac2, s));
+				if( person == null ){
+					and.addFilter(getRelationshipRoleFilter(fac2, s));
+				}else{
+					and.addFilter(getTargetInRelationshipRoleFilter(fac2, s, person));
+				}
 			}
 			return and;
 		}
@@ -851,26 +876,48 @@ public Set<A> withRole(String role) {
 	    	String base =role.substring(0, pos);
 	    	String sub = role.substring(pos+1);
 	    	if( base.equals("global")){
-	    		return new GlobalRoleFilter<T>(this, sub);
+	    		if( person == null){
+	    			// Only the global role filter can allow relationship without a current person
+	    			// as roles may be asserted from the container.
+	    			return new GlobalRoleFilter<T>(this, sub);
+	    		}else{
+	    			return new DualFalseFilter<T>(fac2.getTarget());
+	    		}
 	    	}
+	    	if( person == null && ! haveCurrentUser()){
+	    		return new DualFalseFilter<T>(fac2.getTarget());
+	    	}
+	    	
 	    	if( base.equals(fac2.getTag())){
 	    		// This is a reference a factory/composite role from within a redefined
 	    		// definition. direct roles can be qualified if we want qualified names cannot
 	    		// be overridden. 
-	    		BaseFilter<? super T> result = makeDirectRelationshipRoleFilter(fac2, sub);
+	    		BaseFilter<? super T> result = makeDirectRelationshipRoleFilter(fac2, sub,person);
 	    		if( result != null ){
 	    			return result;
 	    		}
 	    		// unrecognised direct role alias maybe
-	    		return getRelationshipRoleFilter(fac2, sub);
+	    		if( person == null){
+	    			return getRelationshipRoleFilter(fac2, sub);
+	    		}else{
+	    			return getTargetInRelationshipRoleFilter(fac2, sub, person);
+	    		}
 	    	}
 	    	AccessRoleProvider<A,T> arp = getContext().makeObjectWithDefault(AccessRoleProvider.class,null,base);
 	    	if( arp != null ){
-	    		return arp.hasRelationFilter(this, sub);
+	    		if( person == null){
+	    			person=getCurrentPerson();
+	    		}
+	    		return arp.hasRelationFilter(sub,person);
 	    	}
 	    }else{
+	    	if( person == null){
+	    		if( ! haveCurrentUser()){
+	    			return new DualFalseFilter<T>(fac2.getTarget());
+	    		}
+	    	}
 	    	// direct roles can be un-qualified though not if we want multiple levels of qualification.
-	    	BaseFilter<? super T> result = makeDirectRelationshipRoleFilter(fac2, role);
+	    	BaseFilter<? super T> result = makeDirectRelationshipRoleFilter(fac2, role,person);
 			if( result != null ){
 				return result;
 			}
@@ -950,18 +997,18 @@ public Set<A> withRole(String role) {
 	 * @param role
 	 * @throws UnknownRelationshipException 
 	 */
-	protected <T extends DataObject> BaseFilter<? super T> makeDirectRelationshipRoleFilter(DataObjectFactory<T> fac2, String role) throws UnknownRelationshipException {
+	protected <T extends DataObject> BaseFilter<? super T> makeDirectRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,A person) throws UnknownRelationshipException {
 		// look for directly implemented relations first
 		BaseFilter<? super T> result=null;
 	    if( fac2 instanceof AccessRoleProvider){  // first check factory itself.
-	    	result = ((AccessRoleProvider<A,T>)fac2).hasRelationFilter(this, role);
+	    	result = ((AccessRoleProvider<A,T>)fac2).hasRelationFilter(role,person == null ? getCurrentPerson():person);
 	    	if( result != null){
 	    		return result;
 	    	}
 	    }
 	    // then check composites
 	    for(AccessRoleProvider prov : fac2.getComposites(AccessRoleProvider.class)){
-	    	result = prov.hasRelationFilter(this, role);
+	    	result = prov.hasRelationFilter( role,person==null?getCurrentPerson():person);
 	    	if( result != null){
 	    		return result;
 	    	}
@@ -969,7 +1016,7 @@ public Set<A> withRole(String role) {
 	    // Its not one of the directly implemented roles maybe its derived
 	    String defn = getContext().getInitParameter("use_relationship."+fac2.getTag()+"."+role);
 	    if( defn != null){
-	    	return makeRelationshipRoleFilter(fac2, defn);
+	    	return makeRelationshipRoleFilter(fac2, defn,person);
 	    }
 	    // unrecognised role
 	    throw new UnknownRelationshipException(role);

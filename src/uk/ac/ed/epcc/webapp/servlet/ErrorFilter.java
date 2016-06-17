@@ -25,7 +25,6 @@ package uk.ac.ed.epcc.webapp.servlet;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -38,6 +37,7 @@ import javax.servlet.http.HttpSession;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CleanupService;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.email.logging.EmailLoggerService;
 import uk.ac.ed.epcc.webapp.email.logging.ServletEmailLoggerService;
 import uk.ac.ed.epcc.webapp.jdbc.JNDIDatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.config.DataBaseConfigService;
@@ -49,7 +49,6 @@ import uk.ac.ed.epcc.webapp.servlet.config.ServletContextConfigService;
 import uk.ac.ed.epcc.webapp.servlet.logging.ServletWrapper;
 import uk.ac.ed.epcc.webapp.servlet.resource.ServletResourceService;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
-import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.timer.DefaultTimerService;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
@@ -107,6 +106,8 @@ public class ErrorFilter implements Filter {
 		@Override
 		public void run() {
 			try{
+				// we no longer have the request so use normal logger service
+				conn.setService(new EmailLoggerService(conn));
 				// Make sure Cleanup runs first
 				serv.cleanup();
 				conn.close();
@@ -323,7 +324,7 @@ public class ErrorFilter implements Filter {
 			try {
 
 				conn = makeContext((ServletContext) req.getAttribute(SERVLET_CONTEXT_ATTR),req,res);
-				// report error logs by email with page info
+				// report error logs by email with page info need to replace this within closer
 				conn.setService( new ServletEmailLoggerService(conn,req));
 				if( TIMER_FEATURE.isEnabled(conn)){
 					DefaultTimerService timer_service = new DefaultTimerService(conn);

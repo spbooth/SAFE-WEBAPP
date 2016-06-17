@@ -124,12 +124,10 @@ public class NumberOp {
 		return Integer.valueOf(a.intValue() - b.intValue());
 	}
 	public static Number mult(Number a, Number b) {
-		if (a == null) {
-			return b;
+		if (a == null || b == null) {
+			return null;
 		}
-		if (b == null) {
-			return a;
-		}
+		
 		if( useDuration(a) ){
 			// use scale of 1 as this will be the unit returned by a Duration.longValue
 			// scale by double as this may be fractional
@@ -151,26 +149,41 @@ public class NumberOp {
 		return Integer.valueOf(a.intValue() * b.intValue());
 	}
 	public static Number div(Number a, Number b) {
-		if (a == null) {
-			return b;
+		if (a == null || b == null) {
+			return null;
 		}
-		if (b == null) {
-			return a;
-		}
+		
+		// We return always return zero for 0/0 rather than any of the other possibilities
+		// mainly this is to get a valid charge fraction for property for failed/sub jobs
 		if( useDuration(a) ){
 			// use scale of 1 as this will be the unit returned by a Duration.longValue
 			// only consider the first arg as a duration divide by duration makes
 			// little sense.
+			if( a.longValue() == 0L){
+				return new Duration(0L);
+			}
 			return new Duration((long)(a.longValue()/b.doubleValue()),1L);
 		}
 		if ( useDouble(a) || useDouble(b) ){
+			if( a.doubleValue() == 0.0){
+				return Double.valueOf(0.0);
+			}
 			return Double.valueOf(a.doubleValue() / b.doubleValue());
 		}
 		if (a instanceof Float || b instanceof Float) {
+			if( a.floatValue() == 0.0f){
+				return Float.valueOf(0.0f);
+			}
 			return Float.valueOf(a.floatValue() / b.floatValue());
 		}
 		if (a instanceof Long || b instanceof Long) {
+			if( a.longValue() == 0L){
+				return Long.valueOf(0l);
+			}
 			return Long.valueOf(a.longValue() / b.longValue());
+		}
+		if( a.intValue() == 0){
+			return Integer.valueOf(0);
 		}
 		return Integer.valueOf(a.intValue() / b.intValue());
 	}
@@ -201,6 +214,9 @@ public class NumberOp {
 		}
 	}
 	public static Number negate(Number a){
+		if( a == null){
+			return null;
+		}
 		if(useDuration(a)){
 			//durations are the same backwards
 			return a;

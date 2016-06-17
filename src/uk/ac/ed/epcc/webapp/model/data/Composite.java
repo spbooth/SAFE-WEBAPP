@@ -40,10 +40,10 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * for example by creating the composite during field initialisation.
  * <p>
  * {@link Composite}s that have a single argument constructor that takes the 
- * {@link DataObjectFactory} as the argument (optionally followed , can be added to a factory 
+ * {@link DataObjectFactory} as the argument (optionally followed by a String), can be added to a factory 
  * by setting a (comma separated) list of classdef or property class names in the parameter <em>factory-tag</em><b>.composites</b>
  * and these will be added in the {@link DataObjectFactory#setContext(uk.ac.ed.epcc.webapp.AppContext, String)} method and can therefore 
- * modify the table specification.
+ * modify the table specification. If the constructor takes the String parameter the construction tag of the composite will be passed.
  * <p>
  * The areas that {@link Composite}s can customise can be extended by having a factory check all composites for specific interfaces for example
  * {@link TableStructureDataObjectFactory} check the composites for {@link TransitionSource}

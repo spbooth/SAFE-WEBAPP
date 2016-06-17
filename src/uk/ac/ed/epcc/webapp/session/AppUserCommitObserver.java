@@ -23,6 +23,18 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  */
 
 public interface AppUserCommitObserver<AU extends AppUser> {
+	/**  AppUser has been edited and is about to be comitted
+	 * 
+	 * @param person {@link AppUser} being changed
+	 * @param dirty  boolean record is known to contain changes
+	 * @throws DataFault
+	 */
   public void pre_commit(AU person,boolean dirty) throws DataFault;
+  /** {@link AppUser} has been edited
+   * 
+   * @param person {@link AppUser} that was edited
+   * @param changed boolean contents have changed
+   * @throws DataFault
+   */
   public void post_commit(AU person, boolean changed)throws DataFault;
 }
