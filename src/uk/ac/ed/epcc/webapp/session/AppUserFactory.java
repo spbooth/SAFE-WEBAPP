@@ -356,7 +356,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 	private Map<String,AppUserNameFinder> realms=null;
 	private  Map<String,AppUserNameFinder> getRealmMap(){
 		if( realms == null){
-			// Generate lazily only want to do this AFTER factory is construted
+			// Generate lazily only want to do this AFTER factory is constructed
 			// as order of construction is complicated
 			realms = new LinkedHashMap<String, AppUserNameFinder>();
 			for( AppUserNameFinder finder : getComposites(AppUserNameFinder.class)){
