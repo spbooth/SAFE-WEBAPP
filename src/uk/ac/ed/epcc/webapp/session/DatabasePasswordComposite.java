@@ -622,6 +622,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		supress.add(DatabasePasswordComposite.PASSWORD_FAILS);
 		supress.add(DatabasePasswordComposite.SALT);
 		supress.add(DatabasePasswordComposite.ALG);
+		supress.add(DatabasePasswordComposite.PASSWORD_CHANGED);
 		return supress;
 	}
 
