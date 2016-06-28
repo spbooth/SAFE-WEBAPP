@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -371,8 +372,9 @@ public final class Repository {
          * @param r
          * @return
          * @throws DataFault 
+         * @throws IOException 
          */
-        String dump(Record r) throws DataFault{
+        String dump(Record r) throws DataFault, IOException{
         	if( r.getProperty(name) == null){
         		return null;
         	}
@@ -915,8 +917,9 @@ public final class Repository {
 		 * @param name
 		 *            Property to get
 		 * @return String value
+		 * @throws  
 		 */
-		public final String getStringProperty(String name) {
+		public final String getStringProperty(String name)  {
 			Object o = getProperty(name);
 			if (o == null)
 				return null;
@@ -927,7 +930,7 @@ public final class Repository {
 				ByteArrayOutputStream dat = new ByteArrayOutputStream();
 				try {
 					s.write(dat);
-				} catch (DataFault e) {
+				} catch (Exception e) {
 					getContext().error(e, "error converting StreamData to string");
 					return null;
 				}

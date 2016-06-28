@@ -21,39 +21,35 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 public abstract class AbstractStreamData implements StreamData {
 
-	public final void read(InputStream in) throws DataFault {
+	public final void read(InputStream in) throws DataFault, IOException {
 		OutputStream out = getOutputStream();
 		if( out == null){
 			throw new DataFault("Cannot get output stream");
 		}
 		int i;
-		try {
+		
 			while((i=in.read())!=-1){
 				out.write(i);
 			}
 			in.close();
 			out.close();
-		} catch (IOException e) {
-			throw new DataFault("error reading from stream",e);
-		}
+		
 	
 	}
 
-	public final void write(OutputStream out) throws DataFault {
+	public final void write(OutputStream out) throws DataFault, IOException {
 		InputStream in = getInputStream();
 		if( in == null){
 			throw new DataFault("Cannot get input stream");
 		}
 		int i;
-		try {
+		
 			while((i=in.read())!=-1){
 				out.write(i);
 			}
 			in.close();
 			out.close();
-		} catch (IOException e) {
-			throw new DataFault("error writing to stream",e);
-		}
+		
 		
 	}
 

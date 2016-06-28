@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data.stream;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -56,7 +57,7 @@ public interface StreamData {
 	 *            InputStream
 	 * @throws DataFault
 	 */
-	public void read(InputStream in) throws DataFault;
+	public void read(InputStream in) throws DataFault, IOException;
 
 	/**
 	 * write contents to an OutputStrean
@@ -65,6 +66,6 @@ public interface StreamData {
 	 *            OutputStream
 	 * @throws DataFault
 	 */
-	public void write(OutputStream out) throws DataFault;
+	public void write(OutputStream out) throws DataFault, IOException;
 
 }

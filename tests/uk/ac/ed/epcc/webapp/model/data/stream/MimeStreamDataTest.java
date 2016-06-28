@@ -49,7 +49,7 @@ public class MimeStreamDataTest {
 		
 	}
 	@Test
-	public void setDataTest() throws DataFault{
+	public void setDataTest() throws DataFault, IOException{
 		ByteArrayMimeStreamData msd = new ByteArrayMimeStreamData();
 		PrintWriter pw = new PrintWriter(msd.getOutputStream());
 		pw.print("hello world");

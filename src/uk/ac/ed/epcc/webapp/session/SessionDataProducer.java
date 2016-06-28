@@ -84,7 +84,7 @@ public class SessionDataProducer implements SettableServeDataProducer {
 			attribute= ((SerialisableSoftReference)attribute).getData();
 		}
 		byte data[] = (byte[]) attribute;
-		if( data == null ){
+		if( data == null || data.length == 0){
 			return null;
 		}
 		try {

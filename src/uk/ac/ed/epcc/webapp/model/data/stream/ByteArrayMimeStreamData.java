@@ -42,7 +42,7 @@ public class ByteArrayMimeStreamData extends ByteArrayStreamData implements
 		super();
 	}
 
-	public ByteArrayMimeStreamData(MimeStreamData other) throws DataFault{
+	public ByteArrayMimeStreamData(MimeStreamData other) throws DataFault, IOException{
 		this();
 		if( other == null){
 			return;

@@ -171,7 +171,7 @@ public class Dumper implements Contexed{
 							sb.close();
 							sb.clean("\n");
 						}
-					} catch (DataFault e) {
+					} catch (Exception e) {
 						conn.getService(LoggerService.class).getLogger(getClass()).error("Error dumping field",e);
 					}
 					
