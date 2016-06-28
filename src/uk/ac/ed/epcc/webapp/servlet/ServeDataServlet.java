@@ -79,12 +79,13 @@ public class ServeDataServlet extends WebappServlet {
 				return;
 			
 		}catch(DataException e){
+			getLogger(conn).error("Data error in ServeDataServlet",e);
 			res.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 
 		}
 		}catch(Throwable t){
-			conn.error(t,"Error caught in ServeDataServlet");
+			getLogger(conn).error("Error caught in ServeDataServlet",t);
 		}
 	}
 	
