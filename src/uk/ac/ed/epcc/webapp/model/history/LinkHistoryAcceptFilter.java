@@ -18,8 +18,10 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.IndexedLinkManager;
 
 
@@ -35,7 +37,7 @@ import uk.ac.ed.epcc.webapp.model.data.IndexedLinkManager;
  */
 
 
-public class LinkHistoryAcceptFilter<L extends Indexed, R extends Indexed, T extends IndexedLinkManager.Link<L,R>> implements AcceptFilter<History<T>>{
+public class LinkHistoryAcceptFilter<L extends Indexed, R extends Indexed, T extends IndexedLinkManager.Link<L,R>> extends AbstractAcceptFilter<History<T>> implements AcceptFilter<History<T>>{
 	/**
 	 * 
 	 */
@@ -48,6 +50,7 @@ public class LinkHistoryAcceptFilter<L extends Indexed, R extends Indexed, T ext
 	boolean has_right_field;
 	Map<Integer,Boolean> cache;
 	public LinkHistoryAcceptFilter(LinkHistoryHandler<L, R, T> linkHistoryHandler, L left, R right){
+		super(History.class);
 		this.linkHistoryHandler = linkHistoryHandler;
 		this.left=left;
 		this.right=right;
@@ -76,7 +79,7 @@ public class LinkHistoryAcceptFilter<L extends Indexed, R extends Indexed, T ext
 					T l = h.getPeer();
 					ok = l.isLeftPeer(left);
 				} catch (DataException e) {
-					this.linkHistoryHandler.getContext().error(e,"error getting peer in LinkHistoryFilter");
+					this.linkHistoryHandler.getContext().getService(LoggerService.class).getLogger(getClass()).error("error getting peer in LinkHistoryFilter",e);
 					ok=false;;
 				}
 				cache.put(key, new Boolean(ok));
@@ -109,18 +112,6 @@ public class LinkHistoryAcceptFilter<L extends Indexed, R extends Indexed, T ext
 		}
 		return true;
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-	 */
-	public <X> X acceptVisitor(FilterVisitor<X, ? extends History<T>> vis)
-			throws Exception {
-		return vis.visitAcceptFilter(this);
-	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
-	 */
-	public Class<? super History<T>> getTarget() {
-		return History.class;
-	}
+	
 	
 }
