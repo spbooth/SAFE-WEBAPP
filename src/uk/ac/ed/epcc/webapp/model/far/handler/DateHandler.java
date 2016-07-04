@@ -14,7 +14,6 @@ import uk.ac.ed.epcc.webapp.model.far.response.ResponseDataManager;
  * @author michaelbareford
  *
  */
-@uk.ac.ed.epcc.webapp.Version("$Revision:$")
 public class DateHandler implements QuestionFormHandler<Date> {
 
 	private static final String FORMAT = "Format";
@@ -26,18 +25,12 @@ public class DateHandler implements QuestionFormHandler<Date> {
 
 	@Override
 	public void buildConfigForm(Form f) {
-		SetInput<String> format_list = new SetInput<String>();
-		String format_array[] = new DateInput().getFormats();
-		for(String format : format_array){
-			format_list.addChoice(format, format);
-		}
-		
-		f.addInput(FORMAT, "Format", format_list);
+		// We could configure min/max date here.
 	}
 
 	@Override
 	public Input<Date> parseConfiguration(Form f) {
-		// todo: need to pass the selected format to the DateInput object
+		
 		DateInput input = new DateInput(); 
 		input.setValue(new Date());
 		return input;
@@ -50,7 +43,7 @@ public class DateHandler implements QuestionFormHandler<Date> {
 
 	@Override
 	public boolean hasConfig() {
-		return true;
+		return false;
 	}
 
 }

@@ -16,7 +16,6 @@ import uk.ac.ed.epcc.webapp.model.far.response.StringDataManager;
  * @author michaelbareford
  *
  */
-@uk.ac.ed.epcc.webapp.Version("$Revision:$")
 public class MultiIntegerHandler implements QuestionFormHandler<MultiInput> {
 
 	public class MultiIntegerInput extends MultiInput<String,Input<Integer>> {

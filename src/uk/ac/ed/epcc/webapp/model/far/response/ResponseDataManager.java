@@ -133,11 +133,7 @@ public abstract class ResponseDataManager<D extends ResponseDataManager.Response
 	public D makeData(Question q, R response) throws Exception{
 		return makeLink(q, response);
 	}
-	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 	
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c,

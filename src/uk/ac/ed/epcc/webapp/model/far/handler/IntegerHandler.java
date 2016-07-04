@@ -14,7 +14,6 @@ import uk.ac.ed.epcc.webapp.model.far.response.ResponseDataManager;
  * @author michaelbareford
  *
  */
-@uk.ac.ed.epcc.webapp.Version("$Revision:$")
 public class IntegerHandler implements QuestionFormHandler<Integer> {
 
 	private static final String STEP = "step";

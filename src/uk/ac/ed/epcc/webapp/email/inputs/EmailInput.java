@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.email.inputs;
 import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 
@@ -30,7 +31,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
  */
 
 
-public class EmailInput extends TextInput implements HTML5Input {
+public class EmailInput extends TextInput implements HTML5Input , FormatHintInput{
 
 	/**
 	 * 
@@ -65,6 +66,13 @@ public class EmailInput extends TextInput implements HTML5Input {
 	 */
 	public String getType() {
 		return "email";
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput#getFormatHint()
+	 */
+	@Override
+	public String getFormatHint() {
+		return "name@example.com";
 	}
 
 }

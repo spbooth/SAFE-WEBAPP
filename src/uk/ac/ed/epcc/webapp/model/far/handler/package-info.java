@@ -11,7 +11,9 @@
 //| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
-/**
+/** package of {@link uk.ac.ed.epcc.webapp.model.far.handler.QuestionFormHandler}s
+ * 
+ * These are the classes that build and configure the {@link uk.ac.ed.epcc.webapp.forms.inputs.Input}s 
  * @author spb
  *
  */

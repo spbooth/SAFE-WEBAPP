@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -25,7 +26,6 @@ import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
  * @param <F> {@link DynamicForm} type
  *
  */
-@uk.ac.ed.epcc.webapp.Version("$Revision: 1.3 $")
 public class DateDataManager<R extends Response<F>,F extends DynamicForm> extends ResponseDataManager<DateDataManager<R,F>.DateData, R, F> {
 
 	private static final String DATA_FIELD="Data";
@@ -50,17 +50,7 @@ public class DateDataManager<R extends Response<F>,F extends DynamicForm> extend
 		 */
 		@Override
 		public Date getData() {
-			SimpleDateFormat parser = new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy");
-			Date d = null;
-			
-			try {
-				d = parser.parse(record.getStringProperty(DATA_FIELD));
-			} catch (ParseException e) {
-				e.printStackTrace();
-				d = null;
-			}
-			
-			return d;
+			return record.getDateProperty(DATA_FIELD);
 		}
 
 		/* (non-Javadoc)
@@ -76,7 +66,8 @@ public class DateDataManager<R extends Response<F>,F extends DynamicForm> extend
 		 */
 		@Override
 		public MimeStreamData getServeData() throws Exception{
-			ByteArrayMimeStreamData data = new ByteArrayMimeStreamData(getData().toString().getBytes(StandardCharsets.UTF_8.name()));
+			SimpleDateFormat df = new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy");
+			ByteArrayMimeStreamData data = new ByteArrayMimeStreamData(df.format(getData()).getBytes(StandardCharsets.UTF_8.name()));
 			data.setMimeType("text/plain");
 			data.setName(getQuestion().getName());
 			return data;
@@ -103,7 +94,7 @@ public class DateDataManager<R extends Response<F>,F extends DynamicForm> extend
 		
 		TableSpecification spec = super.getDefaultTableSpecification(c, table, leftFac, leftField,
 						rightFac, rightField);
-		spec.setField(DATA_FIELD, new StringFieldType(true, null, 4096));
+		spec.setField(DATA_FIELD, new DateFieldType(true, null));
 		return spec;
 	}
 }
