@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2011                            |
+//| Copyright - The University of Edinburgh 2016                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -11,47 +11,22 @@
 //| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
-package uk.ac.ed.epcc.webapp.model.data.stream;
+package uk.ac.ed.epcc.webapp.session;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+/** A trivial sub-class of {@link FieldNameFinder}.
+ * 
+ * This is to allow more than one {@link FieldNameFinder} to be installed within the same class.
+ * @author spb
+ *
+ */
+public class TertiaryNameFinder<AU extends AppUser> extends FieldNameFinder<AU, TertiaryNameFinder> {
 
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-
-public abstract class AbstractStreamData implements StreamData {
-
-	public final void read(InputStream in) throws DataFault, IOException {
-		OutputStream out = getOutputStream();
-		if( out == null){
-			throw new DataFault("Cannot get output stream");
-		}
-		int i;
-		
-			while((i=in.read())!=-1){
-				out.write(i);
-			}
-			in.close();
-			out.close();
-		
-	
+	/**
+	 * @param factory
+	 * @param realm
+	 */
+	public TertiaryNameFinder(AppUserFactory factory, String realm) {
+		super(factory, realm);
 	}
 
-	public final void write(OutputStream out) throws DataFault, IOException {
-		InputStream in = getInputStream();
-		if( in == null){
-			throw new DataFault("Cannot get input stream");
-		}
-		int i;
-		
-			while((i=in.read())!=-1){
-				out.write(i);
-			}
-			in.close();
-			out.close();
-		
-		
-	}
-
-	
 }

@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
+import uk.ac.ed.epcc.webapp.content.HourTransform;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FatalTransitionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.BackResult;
@@ -277,11 +278,11 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 							if((now-aquired) > max_wait){
 								long secs = (now-aquired)/1000L;
 								// This transition has taken a long time
-								log.warn("Long transition "+secs+" seconds provider="+tp.getTargetName()+" target="+getLogTag(tp,target)+" key="+key);
+								log.warn("Long transition "+secs+" seconds ("+HourTransform.toHrsMinSec(secs)+") provider="+tp.getTargetName()+" target="+getLogTag(tp,target)+" key="+key);
 							}else if( now-start > max_wait){
 								// Long time waiting for lock
 								long secs = (now-start)/1000L;
-								log.warn("Blocked transition "+secs+" seconds provider="+tp.getTargetName()+" target="+getLogTag(tp,target)+" key="+key);
+								log.warn("Blocked transition "+secs+" seconds ("+HourTransform.toHrsMinSec(secs)+") provider="+tp.getTargetName()+" target="+getLogTag(tp,target)+" key="+key);
 							}
 						}catch(Throwable tr){
 							log.error("Problem reporting transition timimgs",tr);

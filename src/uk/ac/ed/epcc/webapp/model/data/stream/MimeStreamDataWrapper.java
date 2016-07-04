@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data.stream;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -63,12 +64,12 @@ public class MimeStreamDataWrapper implements MimeStreamData, DataSource {
 		return sd.getOutputStream();
 	}
 
-	public void read(InputStream in) throws DataFault {
+	public void read(InputStream in) throws DataFault, IOException {
 		sd.read(in);
 
 	}
 
-	public void write(OutputStream out) throws DataFault {
+	public void write(OutputStream out) throws DataFault, IOException {
 		sd.write(out);
 	}
 

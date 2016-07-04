@@ -26,17 +26,28 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
  * {@link AppUserNameFinder}s where {@link #userVisible()} return false have to be explicitly requests and are not
  * included in the {@link AppUserFactory} {@link NameFinder} implementation. 
  * 
+ * Though the normal operation of a {@link AppUserNameFinder} is to locate existing database records it is also possible to
+ * to have it query an external directory and lazily create database records. 
+ * 
  * @author spb
+ * @param <AU> 
+ * @param <X> 
  *
  */
 
 public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNameFinder> extends Composite<AU, X> implements ParseFactory<AU>{
+	
 	private final String realm;
 	/**
-	 * @param factory
+	 * @param factory {@link AppUserFactory} we are adding finder to.
+	 * @param realm   The realm to implement (can be prefixed by <b>Namefinder.</b>)
 	 */
 	public AppUserNameFinder(AppUserFactory<AU> factory,String realm) {
 		super(factory);
+		if( realm.contains(".")){
+			// realm names should be unqualified so strip of any qualifying prefix.
+			realm=realm.substring(realm.lastIndexOf('.'));
+		}
 		this.realm=realm;
 	}
 

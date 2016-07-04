@@ -17,6 +17,8 @@ package uk.ac.ed.epcc.webapp.session;
 import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,7 +46,9 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
+import uk.ac.ed.epcc.webapp.jdbc.table.LongFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -81,10 +85,15 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	protected static final Feature SALT_FIRST_FEATURE = new Feature("salt_first", false, "Salt comes first in password hash");
 	public static final Feature NON_RANDOM_PASSWORD = new Feature("password.non-random",false,"Force randomly chosen passwords to be a series of x's (for bootstapping without email access)");
 	public static final Feature LOG_RANDOM_PASSWORD = new Feature("password.log-random",false,"Log randomly generated passwords (for bootstrapping without email access)");
+	/** config parameter name for maximum age of password.
+	 * 
+	 */
+	private static final String PASSWORD_EXPIRY_DAYS = "password.expiry_days";
 	public static final String SALT="Salt";
 	public static final String ALG="Alg";
 	public static final String PASSWORD = "Password";
 	public static final String PASSWORD_FAILS = "PasswordFails";
+	public static final String PASSWORD_CHANGED = "PasswordChanged";
 	/** Number of characters generated randomly for initial passwords
 	 * If ('a'-'z') + ('A'-'Z') + ('0'-'9') = 62 ~= 64 ~= 6 bits,
 	 * 16 characters gives nearly 96 bits
@@ -355,6 +364,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		 *
 		 */
 		public class Handler {
+			
 			/**
 			 * @param record
 			 * @param user
@@ -428,6 +438,10 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 								res.getInfo(DatabasePasswordComposite.ALG).addName(sb, false, false);
 								sb.append("=? , ");
 							}
+							if( res.hasField(DatabasePasswordComposite.PASSWORD_CHANGED)){
+								res.getInfo(DatabasePasswordComposite.PASSWORD_CHANGED).addName(sb, false, false);
+								sb.append("=? , ");
+							}
 							res.getInfo(DatabasePasswordComposite.PASSWORD).addName(sb, false, false);
 							SQLExpression<String> crypt = sqlContext.hashFunction(h, new ConstExpression<String, AppUser>(String.class,new_password , false));
 							sb.append("=");
@@ -446,6 +460,10 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 							}
 							if( res.hasField(DatabasePasswordComposite.ALG)){
 								stmt.setInt(pos++, h.ordinal());
+							}
+							if( res.hasField(DatabasePasswordComposite.PASSWORD_CHANGED)){
+								stmt.setLong(pos++,(new Date().getTime())/res.getResolution() );
+							
 							}
 							List<PatternArgument> list = crypt.getParameters(new LinkedList<PatternArgument>());
 							for(PatternArgument arg : list){
@@ -508,6 +526,10 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			    protected String getCryptPassword(){
 			    	return record.getStringProperty(DatabasePasswordComposite.PASSWORD,"");
 			    }
+			    
+			    public Date getPasswordChanged(){
+			    	return record.getDateProperty(PASSWORD_CHANGED);
+			    }
 			    /** method to set the encrypted password.
 			     * This will only be used when importing hashes from
 			     * an external system or when hashes are calculated in java.
@@ -519,6 +541,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			    	record.setOptionalProperty(DatabasePasswordComposite.SALT, salt);
 			    	record.setProperty(DatabasePasswordComposite.PASSWORD, crypt);
 			    	record.setOptionalProperty(DatabasePasswordComposite.PASSWORD_FAILS, 0);
+			    	record.setOptionalProperty(PASSWORD_CHANGED, new Date());
 			    	setPasswordStatus(DatabasePasswordComposite.VALID);
 			    }
 			    protected Hash getAlgorithm(){
@@ -554,6 +577,20 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 					if (v == DatabasePasswordComposite.INVALID || v == DatabasePasswordComposite.FIRST) {
 						return true;
 					}
+					Date last_changed = getPasswordChanged();
+					if( last_changed != null ){
+						int max_age_days = getContext().getIntegerParameter(PASSWORD_EXPIRY_DAYS, 0);
+						if( max_age_days > 0 ){
+							Calendar last = Calendar.getInstance();
+							last.setTime(last_changed);
+							last.add(Calendar.DAY_OF_YEAR, max_age_days); // date password expires
+							Calendar now = Calendar.getInstance();
+							if(now.after(last)){
+								return true;
+							}
+						}
+						
+					}
 					return false;
 				}
 
@@ -585,6 +622,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		supress.add(DatabasePasswordComposite.PASSWORD_FAILS);
 		supress.add(DatabasePasswordComposite.SALT);
 		supress.add(DatabasePasswordComposite.ALG);
+		supress.add(DatabasePasswordComposite.PASSWORD_CHANGED);
 		return supress;
 	}
 
@@ -605,6 +643,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			getLogger().error("Default hash algorithm not supported",e);
 		}
 		s.setField(DatabasePasswordComposite.PASSWORD, new StringFieldType(false, "locked", length));
+		s.setOptionalField(PASSWORD_CHANGED, new LongFieldType(true, null));
 		return s;
 	}
 	/**

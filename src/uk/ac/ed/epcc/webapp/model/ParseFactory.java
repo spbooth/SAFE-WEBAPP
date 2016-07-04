@@ -13,7 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model;
 
-import uk.ac.ed.epcc.webapp.Version;
+
 
 /** Simple interface for factories that can find objects by name.
  * 

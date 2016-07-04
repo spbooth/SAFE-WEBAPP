@@ -60,7 +60,7 @@ public class FileUploadDecorator extends MultiInput<String,Input> implements Opt
 			ByteArrayOutputStream stream = new ByteArrayOutputStream();
 			try {
 				data.write(stream);
-			} catch (DataFault e) {
+			} catch (Exception e) {
 				throw new TypeError(e);
 			}
 			return stream.toString();

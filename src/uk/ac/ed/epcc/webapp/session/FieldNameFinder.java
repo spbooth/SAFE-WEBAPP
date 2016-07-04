@@ -26,6 +26,10 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 
 /** A generic {@link AppUserNameFinder} that stores the name in a database field.
  * 
+ * This composite can be used directly with the realm-name set from the construction tag of the composite. However only one
+ * composite of this exact type can exist in a factory so trivial sub-classes are needed to install more than one {@link FieldNameFinder},
+ * Because {@link WebNameFinder} is already a sub-class you can install a {@link FieldNameFinder} and a {@link WebNameFinder} without problems.
+ * 
  * Configuration parameters:
  * <ul>
  * <li> <em><b>NameFinder.</b>realm<b>.field</b></em> field name defaults to realm.</li> 

@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.editors.mail;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
@@ -76,7 +77,7 @@ public class DeDupVisitor extends AbstractVisitor {
 	
 	
 	
-	protected Object read(InputStream stream) throws DataFault{
+	protected Object read(InputStream stream) throws DataFault, IOException{
 		ByteArrayStreamData data = new ByteArrayStreamData();
 		data.read(stream);
 		return data;

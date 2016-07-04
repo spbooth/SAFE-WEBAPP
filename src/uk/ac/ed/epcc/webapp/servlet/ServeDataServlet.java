@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.annotation.WebServlet;
@@ -78,13 +79,19 @@ public class ServeDataServlet extends WebappServlet {
 				msd.write(res.getOutputStream());
 				return;
 			
+		}catch(IOException e){
+			if( ! res.isCommitted()){
+				res.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			}
+			return;
 		}catch(DataException e){
+			getLogger(conn).error("Data error in ServeDataServlet",e);
 			res.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 
 		}
 		}catch(Throwable t){
-			conn.error(t,"Error caught in ServeDataServlet");
+			getLogger(conn).error("Error caught in ServeDataServlet",t);
 		}
 	}
 	

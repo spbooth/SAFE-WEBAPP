@@ -79,7 +79,7 @@ public class PropertyFactory extends DataObjectFactory<Property> {
 				props.setProperty(name, value);
 			}
 		} catch (DataFault e) {
-			getContext().error(e,"Error loading properties from "+getTag());
+			getLogger().error("Error loading properties from "+getTag(),e);
 		}
     }
     public Property findByName(String name) throws DataException{

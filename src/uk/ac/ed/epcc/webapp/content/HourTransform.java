@@ -27,6 +27,11 @@ public class HourTransform implements NumberTransform{
 	public HourTransform(){
 		this("0:00:00");
 	}
+	/** Convert a {@link Number} of seconds into a HH:MM:SS string
+	 * 
+	 * @param d
+	 * @return
+	 */
 	 public static String toHrsMinSec(Number d) {
          String result = "";
          long value = d.longValue();
