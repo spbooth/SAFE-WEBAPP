@@ -612,9 +612,11 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		return getURL(conn, tp, target,null);
 	}
 	public static <A,B> String getURL(HttpServletRequest req,HttpServletResponse res,AppContext conn, TransitionFactory<A, B> tp,B target){
-		return res.encodeRedirectURL(req.getContextPath()+getURL(conn, tp, target,null));
+		return getURL(req,res,conn, tp, target,null);
 	}
-	
+	public static <A,B> String getURL(HttpServletRequest req,HttpServletResponse res,AppContext conn, TransitionFactory<A, B> tp,B target, A operation){
+		return res.encodeRedirectURL(req.getContextPath()+getURL(conn, tp, target,operation));
+	}
 	public static <A,B> String getURL(AppContext conn, TransitionFactory<A, B> tp,B target, A operation){
 		StringBuilder url = new StringBuilder();
 		url.append(TRANSITION_SERVLET);

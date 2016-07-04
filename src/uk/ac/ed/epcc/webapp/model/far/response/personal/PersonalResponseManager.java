@@ -34,7 +34,7 @@ import uk.ac.ed.epcc.webapp.model.far.response.ResponseTransitionProvider;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
-/**
+/** A {@link ResponseManager} where each registered user is allowed to submit a response to the forms.
  * @author spb
  * @param <R>
  * @param <D> 
@@ -43,6 +43,10 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 public class PersonalResponseManager<R extends PersonalResponseManager.PersonalResponse<D>, D extends DynamicForm> extends ResponseManager<R, D> implements TransitionFactoryCreator<TransitionFactory>{
 
+	/**
+	 * 
+	 */
+	public static final String FORM_MANAGER_CONF_PREFIX = "form_manager.";
 	/**
 	 * 
 	 */
@@ -111,16 +115,25 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 			return null;
 		}
 	}
-	/**
+	/** Direct construction of the response class. 
+	 * 
+	 * The parameter <b>form_maanger.<i>my-tag</i></b> needs to be set to the construction
+	 * tag of the corresponding {@link DynamicFormManager} class. 
+	 * 
 	 * @param conn 
 	 * @param tag 
 	 * @throws Exception 
 	 */
 	@SuppressWarnings("unchecked")
 	public PersonalResponseManager(AppContext conn, String tag) throws Exception {
-		super(conn.makeContexedObject(DynamicFormManager.class, conn.getInitParameter("form_manager.Forms")),tag);
+		super(conn.makeContexedObject(DynamicFormManager.class, conn.getInitParameter(FORM_MANAGER_CONF_PREFIX+tag)),tag);
 	}
 
+	/** Standard constructor. Notm
+	 * 
+	 * @param manager
+	 * @param tag
+	 */
 	public PersonalResponseManager(DynamicFormManager<D> manager, String tag) {
 		super(manager, tag);
 	}

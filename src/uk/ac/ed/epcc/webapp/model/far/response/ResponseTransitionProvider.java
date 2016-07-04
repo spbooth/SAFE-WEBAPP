@@ -29,6 +29,8 @@ import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.CustomFormContent;
 import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.far.AbstractPartTransitionProvider;
@@ -43,10 +45,13 @@ import uk.ac.ed.epcc.webapp.model.far.SectionManager.Section;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
-/**
+/** a generic {@link TransitionProvider} for editing {@link DynamicForm} {@link Response}s.
+ * 
+ * The {@link ResponseManager} or some other class has to  act as the {@link TransitionFactoryCreator} allowing the 
+ * {@link ResponseManager} to be passed to the constructor. 
  * @author spb
- * @param <D> 
- * @param <R> 
+ * @param <D> type of {@link DynamicForm}
+ * @param <R> type of {@link Response}
  *
  */
 
