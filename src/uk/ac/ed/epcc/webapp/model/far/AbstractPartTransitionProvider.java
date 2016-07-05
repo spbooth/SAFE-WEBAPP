@@ -19,6 +19,7 @@ import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.forms.transition.PathTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
+import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewPathTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
@@ -29,7 +30,7 @@ import uk.ac.ed.epcc.webapp.model.far.PartManager.Part;
  *
  */
 
-public abstract class AbstractPartTransitionProvider<T,K extends TransitionKey<T>> extends AbstractViewTransitionFactory<T, K>
+public abstract class AbstractPartTransitionProvider<T,K extends TransitionKey<T>> extends AbstractViewPathTransitionProvider<T, K>
 		implements PathTransitionProvider<K, T> {
 	
 	private final String target_name;
@@ -48,18 +49,6 @@ public abstract class AbstractPartTransitionProvider<T,K extends TransitionKey<T
 	@Override
 	public final String getTargetName() {
 		return target_name;
-	}
-
-	
-
-	
-	
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#accept(uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor)
-	 */
-	@Override
-	public final  <R> R accept(TransitionFactoryVisitor<R, T, K> vis) {
-		return vis.visitPathTransitionProvider(this);
 	}
 
 	public static Part getTarget(PartOwner owner, PartOwnerFactory<?> fac,LinkedList<String> path){

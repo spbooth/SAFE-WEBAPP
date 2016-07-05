@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2015                            |
+//| Copyright - The University of Edinburgh 2016                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -14,18 +14,30 @@
 package uk.ac.ed.epcc.webapp.model.data.transition;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.transition.PathTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
-import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionProvider;
 
-public abstract class AbstractViewTransitionProvider<T, K extends TransitionKey<T>> extends AbstractViewTransitionFactory<T, K> implements ViewTransitionProvider<K, T>{
+/**
+ * @author spb
+ *
+ */
+public abstract class AbstractViewPathTransitionProvider<T, K extends TransitionKey<T>> extends AbstractViewTransitionFactory<T, K> implements PathTransitionProvider<K, T> {
 
-	
-	public AbstractViewTransitionProvider(AppContext c) {
+	/**
+	 * @param c
+	 */
+	public AbstractViewPathTransitionProvider(AppContext c) {
 		super(c);
 	}
 
-	public final <R> R accept(TransitionFactoryVisitor<R,T, K> vis) {
-		return vis.visitTransitionProvider(this);
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#accept(uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor)
+	 */
+	@Override
+	public final <R> R accept(TransitionFactoryVisitor<R, T, K> vis) {
+		return vis.visitPathTransitionProvider(this);
 	}
+
+	
 
 }

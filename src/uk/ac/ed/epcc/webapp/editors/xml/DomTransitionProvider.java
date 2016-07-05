@@ -51,6 +51,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
+import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewPathTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.model.serv.ServeDataProducer;
 import uk.ac.ed.epcc.webapp.model.serv.SettableServeDataProducer;
@@ -67,7 +68,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * 
  * @author spb
  */
-public class DomTransitionProvider extends AbstractViewTransitionFactory<XMLTarget, XMLKey> implements PathTransitionProvider<XMLKey, XMLTarget>, ViewTransitionFactory<XMLKey,XMLTarget> {
+public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XMLTarget, XMLKey> implements PathTransitionProvider<XMLKey, XMLTarget>, ViewTransitionFactory<XMLKey,XMLTarget> {
 	public static final class HasParentKey extends XMLKey {
 		public HasParentKey(String name, String help) {
 			super(name, help);
@@ -492,11 +493,5 @@ public class DomTransitionProvider extends AbstractViewTransitionFactory<XMLTarg
 		}
 		return res;
 	}
-
-
-	public <R> R accept(TransitionFactoryVisitor<R,XMLTarget, XMLKey> vis) {
-		return vis.visitPathTransitionProvider(this);
-	}
-
 	
 }
