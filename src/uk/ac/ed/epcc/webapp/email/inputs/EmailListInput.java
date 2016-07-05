@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.email.inputs;
 import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.MultipleInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 /** Input for a list of email addresses.
@@ -28,7 +29,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
  */
 
 
-public class EmailListInput extends TextInput implements MultipleInput {
+public class EmailListInput extends TextInput implements MultipleInput, FormatHintInput {
 	/**
 	 * 
 	 */
@@ -77,5 +78,14 @@ public class EmailListInput extends TextInput implements MultipleInput {
 	@Override
 	public boolean isMultiple() {
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput#getFormatHint()
+	 */
+	@Override
+	public String getFormatHint() {
+		
+		return "name@example.com, name2@example.com";
 	}
 }

@@ -97,6 +97,7 @@ public class SectionManager extends PartManager<PageManager.Page,SectionManager.
 	 */
 	public SectionManager(PageManager owner_fac) {
 		super(owner_fac.form_manager,owner_fac, "Section");
+		res.setAllowHtml(true);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)

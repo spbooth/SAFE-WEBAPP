@@ -137,7 +137,7 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 	public String getFormatHint() {
 		//With html5 enabled this shows as a placeholder so if the browser overrides
 		// format to show a date picker this is hidden.
-		return getFormats()[getHintIndex()].toUpperCase();
+		return getFormats()[getHintIndex()].toLowerCase();
 	}
 
 	@Override

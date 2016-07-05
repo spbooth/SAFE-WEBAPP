@@ -11,17 +11,19 @@
 <!--| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. |-->
 <!--| See the License for the specific language governing permissions and      |-->
 <!--| limitations under the License.                                           |-->
-<Diff>
-<TableSpecification name='TestFormsPageSection'>
+<Diff><TableSpecification name='TestFormsPageSection'>
 <Owner reference='TestFormsPage'/>
 <SortOrder type='Integer' nullable='false'/>
 <Name type='String' nullable='false' max='32'/>
 <SectionText type='String' nullable='true' max='5592405'/>
+<SectionRawHTML type='String' nullable='true' max='5592405'/>
+<SectionReadOnly type='Boolean' nullable='true'/>
 <NameIndex type='Index' unique='true'><Column name='Owner'/><Column name='Name'/></NameIndex>
 </TableSpecification>
 <TestFormsPageSection id='1'>
 <Owner>1</Owner>
 <SortOrder>1</SortOrder>
 <Name>FirstSection</Name>
+<SectionReadOnly>false</SectionReadOnly>
 </TestFormsPageSection>
 </Diff>

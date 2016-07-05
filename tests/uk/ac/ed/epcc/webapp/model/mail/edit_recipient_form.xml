@@ -20,7 +20,7 @@
 <label class="required">Recipient Email</label>
 </th>
 <td>
-<input type="email" size="32" maxlen="254" name="text" class="input" required="required"/>
+<input type="email" size="32" maxlen="254" name="text" class="input" required="required" placeholder="name@example.com"/>
 </td>
 </tr>
 </table>

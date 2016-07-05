@@ -1734,7 +1734,7 @@ public final class Repository {
     /** is it OK to store a null value in a Record */
 	private boolean allow_null_value = true;
 	/** is it ok to allow html in DB fields */
-	private boolean allow_html = true;
+	private boolean allow_html = false;
 
 	/**
 	 * default number of milliseconds per tick when using an integer type to
@@ -3023,7 +3023,7 @@ public final class Repository {
 		if (r == null) {
 			try{
 				r = new Repository(c, tag);
-				r.setAllowHtml( c.getBooleanParameter("allow_html."+tag, true));
+				r.setAllowHtml( c.getBooleanParameter("allow_html."+tag, false));
 				c.setAttribute(key, r);
 			}catch(Exception e){
 				c.error(e,"Error making repository");
