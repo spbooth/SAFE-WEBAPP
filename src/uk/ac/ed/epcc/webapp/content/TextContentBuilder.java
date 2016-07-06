@@ -78,7 +78,7 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#getPanel(java.lang.String)
 	 */
 	@Override
-	public ContentBuilder getPanel(String type) throws UnsupportedOperationException {
+	public ContentBuilder getPanel(String ... type) throws UnsupportedOperationException {
 		return new TextContentBuilder(this);
 	}
 

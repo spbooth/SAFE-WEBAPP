@@ -140,6 +140,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 			 */
 			public CancelAction(ResponseTarget<D, R> target) {
 				super();
+				setMustValidate(false);
 				this.target = target;
 			}
 
@@ -183,18 +184,28 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 						response.setData(q, f.get(q.getName()));
 					}
 					Section next_sec = factory.getSibling(s, true);
+					UnAnsweredVisitor<D, R> no_answer_vis = new UnAnsweredVisitor<D, R>(response);
 					if( next_sec != null ){
-						return new ChainedResult(new ResponseTarget<D, R>(response, next_sec),EDIT);
+						if( ! next_sec.visit(no_answer_vis)){
+							// edit next section if its not been answered
+						    return new ChainedResult(new ResponseTarget<D, R>(response, next_sec),EDIT);
+						}else{
+							return new ViewResult(target);
+						}
 					}
+					// we are last part
 					Page owner = s.getOwner();
 					Page next_page = ((PageManager)owner.getFactory()).getSibling(owner, true);
 					if( next_page != null ){
 						Section first = factory.getFirst(next_page);
 						if( first != null ){
-							return new ChainedResult(new ResponseTarget<D, R>(response, first), EDIT);
+							if( first.visit(no_answer_vis)){
+								return new ChainedResult(new ResponseTarget<D, R>(response, first), EDIT);
+							}
 						}
+						return new ViewResult(new ResponseTarget<D, R>(response, next_page));
 					}
-					return new ChainedResult(new ResponseTarget<D, R>(response, owner),null);
+					return new ViewResult(new ResponseTarget<D, R>(response, owner));
 				}catch(Exception e){
 					throw new ActionException("Internal error",e);
 				}
@@ -219,12 +230,13 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 				for( Question q : man.getParts(s)){
 					Input input = q.getInput();
 					if( input instanceof OptionalInput){
-						((OptionalInput)input).setOptional(true);
+						((OptionalInput)input).setOptional(q.isOptional());
 					}
 					input.setValue(response.getData(q));
 					f.addInput(q.getName(), q.getQuestionText(), input);
 				}
 				f.addAction("Submit", new EditAction(target));
+				f.addAction("Cancel", new CancelAction(target));
 			}catch(Exception e){
 				getLogger().error("Error building form",e);
 				throw new TransitionException("Internal error");
@@ -381,7 +393,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 			ResponseTarget<D, R> target, SessionService<?> sess) {
 		Part p = target.getPart();
 		cb.addHeading(2, target.getResponse().getDescriptor());
-		cb.addHeading(2, p.getTypeName() + ": " + p.getName());
+		
 		EditSectionVisitor<X> vis = new EditSectionVisitor<X>(cb, sess,p instanceof Page ? this: null,target.getResponse());
 		target.getPart().visit(vis);		
 		return cb;

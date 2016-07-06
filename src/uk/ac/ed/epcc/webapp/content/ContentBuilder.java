@@ -82,11 +82,11 @@ public interface ContentBuilder {
 	
 	/** create a nested content panel
 	 * 
-	 * @param type
+	 * @param type Strings specifying a formatting types for the panel.
 	 * @return ContentBuilder for panel
 	 * @throws UnsupportedOperationException 
 	 */
-	public ContentBuilder getPanel(String type) throws UnsupportedOperationException;
+	public ContentBuilder getPanel(String ... type) throws UnsupportedOperationException;
 	
 	/** append a nested panel to its parent content.
 	 * @return parent ContentBuilder

@@ -652,6 +652,16 @@ td.answer{
  border-style: solid;
  padding: 5px;
 }
+
+td.answer.incomplete {
+	border-color: red;
+	border-width: 3px;
+}
+div.complete > h3:after, div.complete > h2:after {
+	content: " \2714";
+	color: green;
+} 
+
 div.dynamic_form_section{
  border-width: 1px;
  border-style: solid;

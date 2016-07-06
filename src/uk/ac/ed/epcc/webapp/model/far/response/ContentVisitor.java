@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far.response;
 
+import java.util.concurrent.CompletionException;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
@@ -23,6 +25,7 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.far.PageManager;
 import uk.ac.ed.epcc.webapp.model.far.PageManager.Page;
+import uk.ac.ed.epcc.webapp.model.far.PartManager;
 import uk.ac.ed.epcc.webapp.model.far.PartVisitor;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
@@ -49,6 +52,8 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 	protected static final String QUESTION_COL = "Question";
 	protected final SessionService sess;
 	protected final Response<?> response;
+	protected final CompleteVisitor complete_viz;
+	protected final HasQuestionsVisitor has_question_viz;
 	private final X cb;
 	private Table<String,Question> t;	
 	/**
@@ -58,13 +63,25 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 		this.cb=cb;
 		this.sess=sess;
 		this.response=response;
+		this.complete_viz = new CompleteVisitor(response);
+		this.has_question_viz = new HasQuestionsVisitor<>(sess.getContext());
 	}
 
+	
 	public <C extends ContentBuilder> C visitPage(C builder, Page p) throws Exception{
-		ContentBuilder block = builder.getPanel("dynamic_form_page");
+		//
+		// If the part contains questions add the
+		// complete/incomplete classes
+		//
+		boolean page_complete = p.visit(complete_viz);
+		boolean has_questions = p.visit(has_question_viz);
+		ContentBuilder block = builder.getPanel("dynamic_form_page", has_questions? (page_complete ? "complete" : "incomplete") : null );
+		block.addHeading(2, p.getTypeName() + ": " + p.getName());
 		SectionManager manager = (SectionManager)((PageManager) p.getFactory()).getChildManager();
 		for( Section s : manager.getParts(p)){
-			ContentBuilder section_block = builder.getPanel("dynamic_form_section");
+			boolean section_complete = s.visit(complete_viz);
+			boolean section_has_questions = s.visit(has_question_viz);
+			ContentBuilder section_block = block.getPanel("dynamic_form_section",section_has_questions ? (section_complete ? "complete" : "incomplete"): null);
 			visitSection(section_block, s);
 			section_block.addParent();
 		}
@@ -81,8 +98,8 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 		for( Question q : manager.getParts(s)){
 			visitQuestion(t, q);
 		}
-		t.addColAttribute(QUESTION_COL, "class", "question");
-		t.addColAttribute(ANSWER_COL, "class", "answer");
+		
+		
 		t.setPrintHeadings(false);
 		builder.addTable(sess.getContext(), t);
 		t=null;
@@ -97,9 +114,10 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 		public ContentBuilder addContent(ContentBuilder cb) {
 			ExtendedXMLBuilder hb = cb.getSpan();
 			hb.open("span");
-			hb.attr("warning","true" );
+			hb.attr("class","warn" );
 			hb.clean("No answer");
 			hb.close();
+			hb.appendParent();
 			return cb;
 		}
 		
@@ -107,6 +125,7 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 	public void visitQuestion(Table<String, Question> t, Question q) throws Exception{
 		
 		t.put(QUESTION_COL, q, q.getQuestionText());
+		
 		ResponseData<Object, ?,?> wrapper = response.getWrapper(q);
 		if( wrapper == null ){			
 			t.put(ANSWER_COL, q, new NoAnswer());
@@ -114,7 +133,16 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 			t.put(ANSWER_COL, q, wrapper);
 			// This allows the wrapper to customise content
 			// in particular uploaded files can be shown as links.
-			
+		}
+		if( q.isOptional()){
+			t.addAttribute(QUESTION_COL,q, "class", "question optional");
+		}else{
+			t.addAttribute(QUESTION_COL,q, "class", "question");
+		}
+		if( q.visit(complete_viz)){
+			t.addAttribute(ANSWER_COL, q, "class", "answer complete");
+		}else{
+			t.addAttribute(ANSWER_COL, q, "class", "answer incomplete");
 		}
 	}
 

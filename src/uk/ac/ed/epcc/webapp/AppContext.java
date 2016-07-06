@@ -988,7 +988,7 @@ public final class AppContext {
 			if( Contexed.class.isAssignableFrom(target)){
 				result =  (T) makeContexedObject((Class<? extends Contexed>)target, name);
 			}else{
-				Constructor<? extends T> c = findConstructor(target, String.class);
+				Constructor<? extends T> c = findConstructor(target, name);
 				if( c != null ){
 					result =  c.newInstance(name);
 				}else{

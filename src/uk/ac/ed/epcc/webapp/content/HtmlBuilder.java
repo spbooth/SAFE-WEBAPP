@@ -208,9 +208,18 @@ public ContentBuilder getHeading(int level) {
 }
 
 
-public ContentBuilder getPanel(String type)
+public ContentBuilder getPanel(String ... type)
 		throws UnsupportedOperationException {
-	return new Panel(this,type);
+	StringBuilder classes = new StringBuilder();
+	for(String class_name : type){
+		if( class_name != null && class_name.trim().length() > 0){
+			if( classes.length() > 0){
+				classes.append(" ");
+			}
+			classes.append(class_name.trim());
+		}
+	}
+	return new Panel(this,classes.toString());
 }
 
 

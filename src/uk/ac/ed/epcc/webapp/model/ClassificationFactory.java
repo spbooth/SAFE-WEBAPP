@@ -30,6 +30,7 @@ import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.inputs.AlternateItemInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.CodeListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
+import uk.ac.ed.epcc.webapp.forms.inputs.NameInputProvider;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnusedNameInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -65,7 +66,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 
 
-public class ClassificationFactory<T extends Classification> extends TableStructureDataObjectFactory<T> implements Comparable<ClassificationFactory>, NameFinder<T>{
+public class ClassificationFactory<T extends Classification> extends TableStructureDataObjectFactory<T> implements Comparable<ClassificationFactory>, NameFinder<T>,NameInputProvider{
 	
     public ClassificationFactory(AppContext ctx, String homeTable){
     	setContext(ctx, homeTable);

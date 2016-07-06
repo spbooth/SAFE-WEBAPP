@@ -13,8 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far.response;
 
-import java.nio.charset.StandardCharsets;
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;

@@ -103,14 +103,15 @@ public class SwingContentBuilder  implements ContentBuilder{
 		log=conn.getService(LoggerService.class).getLogger(getClass());
 		log.debug("made SwingContentBuilder");
 	}
-	private SwingContentBuilder(SwingContentBuilder parent,String type, String type_class){
+	private SwingContentBuilder(SwingContentBuilder parent,String type, String ... type_classes){
 		this(parent.conn,parent.frame);
 		this.parent=parent;
 		this.form_dialog=parent.form_dialog;
 		this.listener=parent.listener;
 		// parse config parameters.
 		this.type=type;
-		this.type_class=type_class;
+		//TODO handle multiple type classes
+		this.type_class=type_classes[0];
 		ConfigService cfg = parent.conn.getService(ConfigService.class);
 		Properties prop = cfg.getServiceProperties();
 		this.font=parseFont(prop.getProperty("style.font."+type+"."+type_class,prop.getProperty("style.font."+type)),parent.font);
@@ -352,9 +353,10 @@ public class SwingContentBuilder  implements ContentBuilder{
 		SwingContentBuilder builder = new SwingContentBuilder(this,"h"+level,"");
 		return builder;
 	}
-	public ContentBuilder getPanel(String type)
+	public ContentBuilder getPanel(String ... type)
 			throws UnsupportedOperationException {
 		log.debug("getPanel");
+		
 		SwingContentBuilder panel = new SwingContentBuilder(this,"div",type);
 		panel.content.setLayout(new BoxLayout(panel.content, BoxLayout.Y_AXIS));
 		return panel;
