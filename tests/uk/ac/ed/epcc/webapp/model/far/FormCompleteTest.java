@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.model.far;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -104,9 +105,10 @@ public class FormCompleteTest<D extends DynamicForm,R extends PersonalResponseMa
 		setTransition(provider, provider.EDIT, new ResponseTarget(response, first_section));
 		
 		addParam(q.getName(), "Yes I stink");
+		setAction("Submit");
 		runTransition();
         // this should also be last section so will go to view page
-		checkViewForward(provider, new ResponseTarget(response, first));
+		checkViewRedirect(provider, new ResponseTarget(response, first));
 		checkDiff("/cleanup.xsl", "answer_question.xml");
 	}
 	
@@ -162,6 +164,7 @@ public class FormCompleteTest<D extends DynamicForm,R extends PersonalResponseMa
 			
 			addParam(q1.getName(), "Yes I stink");
 			addParam(q2.getName(), "true");
+			setAction("Submit");
 			ByteArrayMimeStreamData msd = new ByteArrayMimeStreamData();
 			
 // Can't mock file-uploads yet
@@ -173,14 +176,14 @@ public class FormCompleteTest<D extends DynamicForm,R extends PersonalResponseMa
 //			addParam(q3.getName(), msd);
 			runTransition();
 	        // this should also be last section so will go to view page
-			checkViewForward(provider, new ResponseTarget(response, first));
+			checkViewRedirect(provider, new ResponseTarget(response, first));
 			
 			
 			checkDiff("/cleanup.xsl", "answer_all_questions.xml");
 			
 			
 			CompleteVisitor<D, R> vis = new CompleteVisitor<D, R>(response);
-			assertFalse("form should not be complete",first_section.visit(vis));
+			assertTrue("form should be complete",first_section.visit(vis));
 		}
 		
 }

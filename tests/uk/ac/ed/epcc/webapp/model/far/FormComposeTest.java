@@ -224,6 +224,7 @@ public class FormComposeTest<D extends DynamicForm> extends AbstractTransitionSe
 		addParam(PartManager.NAME_FIELD, "ThirdQuestion");
 		addParam(QuestionManager.QUESTION_TEXT_FIELD,"Upload file");
 		addParam(QuestionManager.HANDLER_TYPE_FIELD,"FileQuestion");
+		addParam(QuestionManager.OPTIONAL_FIELD,"true");
 		runTransition();
 		
 		Question question = question_manger.findByParentAndName(section, "ThirdQuestion");

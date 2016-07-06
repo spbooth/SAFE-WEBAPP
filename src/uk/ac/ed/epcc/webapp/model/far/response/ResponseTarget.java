@@ -92,5 +92,8 @@ public class ResponseTarget<D extends DynamicForm, R extends Response<D>> {
 			return false;
 		return true;
 	}
+	public String toString(){
+		return "ResponseTarget["+response+","+part+"]";
+	}
 
 }

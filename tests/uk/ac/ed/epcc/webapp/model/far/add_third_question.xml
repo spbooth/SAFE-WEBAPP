@@ -17,6 +17,6 @@
 <Name>ThirdQuestion</Name>
 <QuestionText>Upload file</QuestionText>
 <HandlerType>FileQuestion</HandlerType>
-<Optional>false</Optional>
+<Optional>true</Optional>
 </TestFormsPageSectionQuestion>
 </Diff>
