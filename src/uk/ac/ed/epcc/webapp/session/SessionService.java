@@ -234,7 +234,7 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * 
 	 * Note that {@link #getRelationshipRoleFilter(DataObjectFactory, String)} is sufficient for this
 	 * in combination with {@link DataObjectFactory#matches(BaseFilter, DataObject)} but
-	 * adding a method to {@link SessionService} reduces code duplication.
+	 * adding a method to {@link SessionService} reduces code duplication and adds to possibility of caching the results.
 	 * 
 	 * 
 	 * @param fac     {@link DataObjectFactory}

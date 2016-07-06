@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
+import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,6 +28,7 @@ import java.util.TreeSet;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
@@ -45,6 +47,7 @@ import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.model.relationship.GlobalRoleFilter;
 import uk.ac.ed.epcc.webapp.model.relationship.RelationshipProvider;
@@ -64,6 +67,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 */
 	public static final String USE_ROLE_PREFIX = "use_role.";
 	public static final Feature TOGGLE_ROLES_FEATURE = new Feature("toggle_roles",true,"allow some roles to toggle on/off");
+	public static final Feature CACHE_RELATIONSHIP_FEATURE = new Feature("cache_relationships",true,"cache relationship test results in the session");
 	private Map<String,Boolean> toggle_map=null;
 	protected AppContext c;
     
@@ -82,6 +86,62 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	private static final String toggle_map_tag = "SESSION_toggle_map";
 	private static final String role_map_tag = "SESSION_role_map";
 	
+	/** A keying object representing a relationship.
+	 * 
+	 * @author spb
+	 *
+	 */
+	static class RelationshipTag implements Serializable{
+		
+		/* (non-Javadoc)
+		 * @see java.lang.Object#hashCode()
+		 */
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + id;
+			result = prime * result + ((role == null) ? 0 : role.hashCode());
+			result = prime * result + ((tag == null) ? 0 : tag.hashCode());
+			return result;
+		}
+		/* (non-Javadoc)
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			RelationshipTag other = (RelationshipTag) obj;
+			if (id != other.id)
+				return false;
+			if (role == null) {
+				if (other.role != null)
+					return false;
+			} else if (!role.equals(other.role))
+				return false;
+			if (tag == null) {
+				if (other.tag != null)
+					return false;
+			} else if (!tag.equals(other.tag))
+				return false;
+			return true;
+		}
+		public RelationshipTag(String tag, int id, String role) {
+			super();
+			this.tag = tag;
+			this.id = id;
+			this.role = role;
+		}
+		public final String tag;
+		public final int id;
+		public final String role;
+	}
+	private Map<RelationshipTag,Boolean> relationship_map=null;
 	public AbstractSessionService(AppContext c) {
 		this.c=c;
 		
@@ -1046,7 +1106,20 @@ public Set<A> withRole(String role) {
 	}
 	@Override
 	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target, String role) throws UnknownRelationshipException {
-		return fac.matches(getRelationshipRoleFilter(fac, role), target);
+		// For the moment we only cache relationships within a request
+		// to avoid stale values as a users state changes
+		if( relationship_map == null && CACHE_RELATIONSHIP_FEATURE.isEnabled(getContext())){
+			relationship_map = new HashMap<RelationshipTag,Boolean>();
+		}
+		RelationshipTag tag = new RelationshipTag(fac.getTag(), target.getID(), role);
+		if( relationship_map != null && relationship_map.containsKey(tag)){
+			return relationship_map.get(tag).booleanValue();
+		}
+		boolean result = fac.matches(getRelationshipRoleFilter(fac, role), target);
+		if( relationship_map != null ){
+			relationship_map.put(tag, result);
+		}
+		return result;
 	}
 
 	/**

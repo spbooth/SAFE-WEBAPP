@@ -86,7 +86,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 			try {
 				return super.allow(target, sess) && (target.getSibling(false) != null);
 			} catch (DataFault e) {
-				getLogger().error("Problem in allow", e);
+				getLogger(sess.getContext()).error("Problem in allow", e);
 				return false;
 			}
 		}
@@ -107,7 +107,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 			try {
 				return super.allow(target, sess) && (target.getSibling(true) != null);
 			} catch (DataFault e) {
-				getLogger().error("Problem in allow", e);
+				getLogger(sess.getContext()).error("Problem in allow", e);
 				return false;
 			}
 		}
@@ -122,10 +122,10 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 				R rsp = target.getResponse();
 				return super.allow(target, sess) && (target.getSibling(true) == null) && rsp.validate() && rsp.canEdit(sess);
 			} catch (DataFault e) {
-				getLogger().error("Problem in allow", e);
+				getLogger(sess.getContext()).error("Problem in allow", e);
 				return false;
 			} catch (DataException e) {
-				getLogger().error("Problem in allow", e);
+				getLogger(sess.getContext()).error("Problem in allow", e);
 				return false;
 			}
 		}
