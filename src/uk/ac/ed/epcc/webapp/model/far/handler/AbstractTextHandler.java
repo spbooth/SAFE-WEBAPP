@@ -13,13 +13,13 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far.handler;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Text;
+
 
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseDataManager;
 import uk.ac.ed.epcc.webapp.model.far.response.StringDataManager;
 
-/** Abstract superclass for {@link Text} inputs that don't need configuration.
+/** Abstract superclass for Text inputs that don't need configuration.
  * @author spb
  *
  */
