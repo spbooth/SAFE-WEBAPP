@@ -186,7 +186,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 					Section next_sec = factory.getSibling(s, true);
 					UnAnsweredVisitor<D, R> no_answer_vis = new UnAnsweredVisitor<D, R>(response);
 					if( next_sec != null ){
-						if( ! next_sec.visit(no_answer_vis)){
+						if( ! (Boolean)next_sec.visit(no_answer_vis)){
 							// edit next section if its not been answered
 						    return new ChainedResult(new ResponseTarget<D, R>(response, next_sec),EDIT);
 						}else{
@@ -199,7 +199,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 					if( next_page != null ){
 						Section first = factory.getFirst(next_page);
 						if( first != null ){
-							if( first.visit(no_answer_vis)){
+							if( (Boolean)first.visit(no_answer_vis)){
 								return new ChainedResult(new ResponseTarget<D, R>(response, first), EDIT);
 							}
 						}

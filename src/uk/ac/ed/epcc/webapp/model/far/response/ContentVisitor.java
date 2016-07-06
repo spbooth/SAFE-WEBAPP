@@ -73,14 +73,14 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 		// If the part contains questions add the
 		// complete/incomplete classes
 		//
-		boolean page_complete = p.visit(complete_viz);
-		boolean has_questions = p.visit(has_question_viz);
+		boolean page_complete = (Boolean)p.visit(complete_viz);
+		boolean has_questions = (Boolean)p.visit(has_question_viz);
 		ContentBuilder block = builder.getPanel("dynamic_form_page", has_questions? (page_complete ? "complete" : "incomplete") : null );
 		block.addHeading(2, p.getTypeName() + ": " + p.getName());
 		SectionManager manager = (SectionManager)((PageManager) p.getFactory()).getChildManager();
 		for( Section s : manager.getParts(p)){
-			boolean section_complete = s.visit(complete_viz);
-			boolean section_has_questions = s.visit(has_question_viz);
+			boolean section_complete = (Boolean)s.visit(complete_viz);
+			boolean section_has_questions = (Boolean)s.visit(has_question_viz);
 			ContentBuilder section_block = block.getPanel("dynamic_form_section",section_has_questions ? (section_complete ? "complete" : "incomplete"): null);
 			visitSection(section_block, s);
 			section_block.addParent();
@@ -139,7 +139,7 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 		}else{
 			t.addAttribute(QUESTION_COL,q, "class", "question");
 		}
-		if( q.visit(complete_viz)){
+		if( (Boolean)q.visit(complete_viz)){
 			t.addAttribute(ANSWER_COL, q, "class", "answer complete");
 		}else{
 			t.addAttribute(ANSWER_COL, q, "class", "answer incomplete");
