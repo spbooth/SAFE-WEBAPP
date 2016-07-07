@@ -124,10 +124,10 @@ public class PartConfigFactory<O extends PartOwner,P extends Part<O>> extends Da
 		return new SQLValueFilter<Config<P>>(getTarget(), res, NAME_FIELD, name);
 	}
 
-	public void setValues(P owner,Map<String,String> values) throws DataException{
+	public void setValues(P owner,Map<String,Object> values) throws DataException{
 		for(String name : values.keySet()){
 			Config<P> entry = makeEntry(owner, name);
-			entry.setValue(values.get(name));
+			entry.setValue(values.get(name).toString());
 			entry.commit();
 		}
 		// now check for deletes.

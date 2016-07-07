@@ -122,6 +122,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		 * 
 		 * @return
 		 */
+		@Override
 		public PartManager<O,? extends Part<O>> getFactory(){
 			return manager;
 		}
@@ -150,7 +151,12 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		public String getRawName(){
 			return record.getStringProperty(NAME_FIELD,manager.getPartTag()+Integer.toString(getID()));
 		}
-		
+		void setName(String name){
+			record.setProperty(NAME_FIELD, name);
+		}
+		void setOwner(O owner){
+			record.setProperty(OWNER_FIELD, owner.getID());
+		}
 		public String getSpacedName() {
 			String name = "";
 			String name_parts[] = getRawName().split("(?=[A-Z])");
@@ -205,7 +211,15 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 			return new LinkedHashMap<String, Object>();
 		}
 		
+		/** visit a {@link PartVisitor}
+		 * 
+		 * @param vis
+		 * @return
+		 */
 		public abstract <X> X visit(PartVisitor<X> vis);
+		
+		
+		
 	}
 	public class PartUpdater extends Updater<P>{
 
@@ -297,6 +311,8 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 	public PartOwnerFactory<O> getOwnerFactory(){
 		return owner_fac;
 	}
+	
+	
 	/** Get all the parts belonging to an owner.
 	 * 
 	 * @param owner
@@ -575,6 +591,20 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 			config_factory = makeConfigFactory();
 		}
 		return config_factory;
+	}
+	/** create a (uncommitted) duplicate copy of a part with a new owner
+	 * 
+	 * @param new_owner
+	 * @param original
+	 * @return
+	 * @throws DataFault 
+	 */
+	public P duplicate(O new_owner, P original) throws DataFault{
+		P result = makeBDO();
+		result.setOwner(new_owner);
+		result.setName(original.getName());
+		result.setSortOrder(original.getSortOrder().intValue());
+		return result;
 	}
 	
 }

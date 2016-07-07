@@ -178,6 +178,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 				try{
 					R response = target.getResponse();
 					Section s = (Section) target.getPart();
+					Page owner = s.getOwner();
 					SectionManager factory = (SectionManager) s.getFactory();
 					QuestionManager man = (QuestionManager) factory.getChildManager();
 					for( Question q : man.getParts(s)){
@@ -186,15 +187,15 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 					Section next_sec = factory.getSibling(s, true);
 					UnAnsweredVisitor<D, R> no_answer_vis = new UnAnsweredVisitor<D, R>(response);
 					if( next_sec != null ){
-						if( ! (Boolean)next_sec.visit(no_answer_vis)){
+						if( (Boolean)next_sec.visit(no_answer_vis)){
 							// edit next section if its not been answered
 						    return new ChainedResult(new ResponseTarget<D, R>(response, next_sec),EDIT);
 						}else{
-							return new ViewResult(target);
+							return new ViewResult(target.getParent());
 						}
 					}
 					// we are last part
-					Page owner = s.getOwner();
+				
 					Page next_page = ((PageManager)owner.getFactory()).getSibling(owner, true);
 					if( next_page != null ){
 						Section first = factory.getFirst(next_page);
@@ -205,7 +206,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 						}
 						return new ViewResult(new ResponseTarget<D, R>(response, next_page));
 					}
-					return new ViewResult(new ResponseTarget<D, R>(response, owner));
+					return new ViewResult(target.getParent());
 				}catch(Exception e){
 					throw new ActionException("Internal error",e);
 				}

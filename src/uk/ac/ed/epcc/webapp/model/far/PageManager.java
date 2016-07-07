@@ -26,6 +26,11 @@ import uk.ac.ed.epcc.webapp.model.far.SectionManager.Section;
 
 public class PageManager extends PartManager<DynamicFormManager.DynamicForm,PageManager.Page> {
 
+	/**
+	 * 
+	 */
+	public static final String PAGE_TYPE_NAME = "Page";
+
 	public class Page extends PartManager.Part<DynamicFormManager.DynamicForm>{
 
 		/**
@@ -48,7 +53,7 @@ public class PageManager extends PartManager<DynamicFormManager.DynamicForm,Page
 		 */
 		@Override
 		public String getTypeName() {
-			return "Page";
+			return PAGE_TYPE_NAME;
 		}
 		
 		public boolean isReadOnly() throws DataFault {
@@ -69,7 +74,7 @@ public class PageManager extends PartManager<DynamicFormManager.DynamicForm,Page
 	 * @param owner_fac
 	 */
 	public PageManager(DynamicFormManager<?> owner_fac) {
-		super(owner_fac,(PartOwnerFactory<DynamicForm>) owner_fac, "Page");
+		super(owner_fac,(PartOwnerFactory<DynamicForm>) owner_fac, PAGE_TYPE_NAME);
 	}
 	
 	public SectionManager makeChildManager(){
@@ -92,7 +97,7 @@ public class PageManager extends PartManager<DynamicFormManager.DynamicForm,Page
 	 */
 	@Override
 	public String getChildTypeName() {
-		return "Sections";
+		return SectionManager.SECTION_TYPE_NAME;
 	}
 
 }

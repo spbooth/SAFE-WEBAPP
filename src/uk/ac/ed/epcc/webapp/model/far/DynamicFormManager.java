@@ -13,9 +13,12 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.content.XMLPrinter;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
@@ -34,7 +37,10 @@ import uk.ac.ed.epcc.webapp.model.data.FilterResult;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
+import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
+import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.Status.Value;
+import uk.ac.ed.epcc.webapp.model.serv.ServeDataProducer;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** Each {@link DynamicForm} instance represents a single version of
@@ -53,7 +59,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 
-public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extends PartOwnerFactory<F> implements ParseFactory<F>, TransitionFactoryCreator<TransitionFactory>{
+public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extends PartOwnerFactory<F> implements ParseFactory<F>, TransitionFactoryCreator<TransitionFactory>, ServeDataProducer{
 	public static class Status extends BasicType<Status.Value>{
 		/**
 		 * @param field
@@ -112,7 +118,9 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 		public String getName(){
 			return record.getStringProperty(NAME_FIELD);
 		}
-		
+		void setName(String name){
+			record.setProperty(NAME_FIELD, name);
+		}
 		public boolean canEdit(SessionService<?> sess){
 			return manager.canEdit(sess) && isNew();
 		}
@@ -181,6 +189,14 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 		@Override
 		public FormResult getViewResult() {
 			return manager.getDynamicFormProvider().new ViewResult(this);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.far.PartOwner#getPartOwnerFactory()
+		 */
+		@Override
+		public DynamicFormManager getFactory() {
+			return manager;
 		}
 		
 	}
@@ -311,5 +327,58 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 	@Override
 	public String getCanonicalName(F object) {
 		return object.getName();
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.serv.ServeDataProducer#getData(uk.ac.ed.epcc.webapp.session.SessionService, java.util.List)
+	 */
+	@Override
+	public MimeStreamData getData(SessionService user, List<String> path) throws Exception {
+		LinkedList<String> list;
+		if( path instanceof LinkedList){
+			list=(LinkedList<String>) path;
+		}else{
+			list=new LinkedList<String>(path);
+		}
+		
+		F form = find(Integer.parseInt(list.pop()));
+		if( ! form.canView(user)){
+			return null;
+		}
+		
+		if( ! list.isEmpty()  && list.peekLast().endsWith(".xml")){
+			// remove last element this should be the file-name
+			list.removeLast();
+		}
+		
+		XMLPrinter printer = new XMLPrinter();
+		XMLVisitor<XMLPrinter> vis = new XMLVisitor<XMLPrinter>(getContext(), printer);
+		String name;
+		
+		if( list.isEmpty() ){
+			name = form.getName();
+			printer.open("Form");
+				vis.visitOwner(this, form);
+			printer.close();
+		}else{
+			PartManager.Part p =  AbstractPartTransitionProvider.getTarget(form, getChildManager(), list);
+			if( p == null ){
+				return null;
+			}
+			p.visit(vis);
+			name=p.getName();
+		}
+		ByteArrayMimeStreamData data = new ByteArrayMimeStreamData(printer.toString().getBytes("UTF8"));
+		data.setMimeType("text/xml");
+		data.setName(name+".xml");
+		return data;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.far.PartOwnerFactory#getChildTypeName()
+	 */
+	@Override
+	public String getChildTypeName() {
+		return PageManager.PAGE_TYPE_NAME;
 	}
 }

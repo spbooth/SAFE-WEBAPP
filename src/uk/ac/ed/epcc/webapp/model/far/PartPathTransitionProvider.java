@@ -81,6 +81,7 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 	public static final PartTransitionKey MOVE_UP = new CheckSiblingKey("Move up", "Swap position with previous sibling",false);
 	public static final PartTransitionKey MOVE_DOWN = new CheckSiblingKey("Move down","Swap position with next sibling",true); 
 	public static final PartTransitionKey EDIT = new EditKey("Update", "Edit/update this part");
+	public static final PartTransitionKey PARENT = new ViewKey("Parent", "Go to parent object");
 	public static final PartTransitionKey CONFIG = new EditKey("Configure", "Edit configuration"){
 		public boolean allow(Part target, SessionService sess) {
 			return super.allow(target,sess) && target.hasConfig();
@@ -107,6 +108,31 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 			}
 			DynamicForm f = target.getForm();
 			if( f.canEdit(sess)  && ! f.isActive()){
+				return true;
+			}
+			return false;
+		}
+	}
+	/** A {@link PartTransitionKey} for view operations on a {@link DynamicForm}.
+	 * @author spb
+	 *
+	 */
+	private static class ViewKey extends PartTransitionKey {
+		/**
+		 * @param name
+		 * @param help
+		 */
+		private ViewKey(String name, String help) {
+			super(name, help);
+		}
+
+		@Override
+		public boolean allow(Part target, SessionService sess) {
+			if( target == null ){
+				return false;
+			}
+			DynamicForm f = target.getForm();
+			if( f.canView(sess)  ){
 				return true;
 			}
 			return false;
@@ -164,6 +190,27 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 				return getPartManager(target).getSibling(target, go_up).getViewResult();
 			} catch (Exception e) {
 				getLogger().error("Problem doing sibling navigation",e);
+				throw new TransitionException("Internal error");
+			}
+		}
+	}
+	public class GotoParentTransition extends AbstractDirectTransition<T>{
+		public GotoParentTransition() {
+			super();
+		}
+
+		
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
+		 */
+		@Override
+		public FormResult doTransition(T target, AppContext c)
+				throws TransitionException {
+			try {
+				return target.getOwner().getViewResult();
+			} catch (Exception e) {
+				getLogger().error("Problem doing parent navigation",e);
 				throw new TransitionException("Internal error");
 			}
 		}
@@ -273,12 +320,12 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 			 */
 			@Override
 			public FormResult action(Form f) throws ActionException {
-				Map<String,String> map = new LinkedHashMap<String, String>();
+				Map<String,Object> map = new LinkedHashMap<String, Object>();
 				for(Iterator<String> it = f.getFieldIterator() ; it.hasNext();){
 					String field = it.next();
 					Object val = f.get(field);
 					if( val != null ){
-						map.put(field,val.toString());
+						map.put(field,val);
 					}
 				}
 				try {
@@ -318,6 +365,7 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 		addTransition(CREATE, new CreateChildTransition());
 		addTransition(EDIT, new EditPartTransition());
 		addTransition(CONFIG, new ConfigTransition());
+		addTransition(PARENT, new GotoParentTransition());
 		addTransition(DELETE, new ConfirmTransition<T>("Do you wish to delete this element and all its children?", new DeleteChildTransition(), new ViewTransition()));
 		addTransition(MOVE_DOWN, new SwapSiblingTransition(true));
 		addTransition(NEXT, new GotoSiblingTransition(true));
@@ -398,24 +446,34 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 	public <X extends ContentBuilder> X getLogContent(X cb, T target,
 			SessionService<?> sess) {
 		cb.addHeading(2, target.getName());
+		Table t = new Table();
 		Map<String,Object> info = target.getInfo();
 		if( info.size() > 0 ){
-			Table t = new Table();
 			t.addMap("Values", info);
+		}
+		PartConfigFactory<O, T> config = getPartManager(target).getConfigFactory();
+		if( config != null ){
+			try {
+				t.addMap("Values", config.getValues(target));
+			} catch (DataFault e) {
+				getLogger().error("error getting config settings");
+			}
+		}
+		if( t.hasData()){
 			t.setKeyName("Property");
 			cb.addColumn(getContext(), t, "Values");
 		}
-		Table t=null;
+		Table tc=null;
 		try {
-			t = getPartManager(target).getChildTable(target);
+			tc = getPartManager(target).getChildTable(target);
 		} catch (DataFault e) {
 			getLogger().error("Error making child table",e);
 		}
-		if( t != null ){
-			String childTypeName = getPartManager(target).getChildTypeName();
+		if( tc != null ){
+			String childTypeName = getPartManager(target).getChildTypeName()+"s";
 			cb.addHeading(3, childTypeName);
-			if( t.hasData()){
-				cb.addTable(getContext(), t);
+			if( tc.hasData()){
+				cb.addTable(getContext(), tc);
 			}else{
 				
 				cb.addText("No "+childTypeName);

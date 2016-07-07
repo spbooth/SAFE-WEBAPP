@@ -29,4 +29,10 @@ public abstract class PartOwnerFactory<O extends PartOwner> extends DataObjectFa
 	 * @return {@link PartManager} or null
 	 */
 	public abstract PartManager getChildManager();
+	
+	/** get the type-name for the child type.
+	 * 
+	 * @return
+	 */
+	public abstract String getChildTypeName();
 }

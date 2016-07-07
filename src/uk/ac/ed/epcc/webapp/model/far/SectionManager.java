@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.far.PageManager.Page;
 
 /**
  * @author spb
@@ -34,11 +35,16 @@ public class SectionManager extends PartManager<PageManager.Page,SectionManager.
 	/**
 	 * 
 	 */
-	private static final String SECTION_TEXT_FIELD = "SectionText";
-	private static final String SECTION_RAW_HTML_FIELD = "SectionRawHTML";
-	private static final String SECTION_READ_ONLY_FIELD = "SectionReadOnly";
-	
+	static final String SECTION_TEXT_FIELD = "SectionText";
+	static final String SECTION_RAW_HTML_FIELD = "SectionRawHTML";
+	static final String SECTION_READ_ONLY_FIELD = "SectionReadOnly";
+	/**
+	 * 
+	 */
+	public static final String SECTION_TYPE_NAME = "Section";
 	public class Section extends PartManager.Part<PageManager.Page>{
+
+		
 
 		@Override
 		public Map<String, Object> getInfo() {
@@ -55,6 +61,9 @@ public class SectionManager extends PartManager<PageManager.Page,SectionManager.
 		public String getSectionText(){
 			return record.getStringProperty(SECTION_TEXT_FIELD);
 		}
+		void setSectionText(String text){
+			record.setProperty(SECTION_TEXT_FIELD, text);
+		}
 		private class RawPrinter extends XMLPrinter{
 			public RawPrinter(String raw ){
 				super();
@@ -68,8 +77,15 @@ public class SectionManager extends PartManager<PageManager.Page,SectionManager.
 			}
 			return new RawPrinter(raw);
 		}
+		void setSectionRawHtml(String text){
+			record.setProperty(SECTION_RAW_HTML_FIELD, text);
+		}
+		
 		public boolean getSectionReadOnly(){
 			return record.getBooleanProperty(SECTION_READ_ONLY_FIELD);
+		}
+		void setSectionReadOnly(boolean val){
+			record.setProperty(SECTION_READ_ONLY_FIELD, val);
 		}
 		
 		/* (non-Javadoc)
@@ -84,7 +100,7 @@ public class SectionManager extends PartManager<PageManager.Page,SectionManager.
 		 */
 		@Override
 		public String getTypeName() {
-			return "Section";
+			return SECTION_TYPE_NAME;
 		}
 		
 		public boolean isReadOnly() {
@@ -96,7 +112,7 @@ public class SectionManager extends PartManager<PageManager.Page,SectionManager.
 	 * @param owner_fac
 	 */
 	public SectionManager(PageManager owner_fac) {
-		super(owner_fac.form_manager,owner_fac, "Section");
+		super(owner_fac.form_manager,owner_fac, SECTION_TYPE_NAME);
 		res.setAllowHtml(true);
 	}
 	/* (non-Javadoc)
@@ -131,7 +147,18 @@ public class SectionManager extends PartManager<PageManager.Page,SectionManager.
 	 */
 	@Override
 	public String getChildTypeName() {
-		return "Questions";
+		return QuestionManager.QUESTION_TYPE_NAME;
+	}
+	@Override
+	public Section duplicate(Page new_owner, Section original) throws DataFault {
+		Section result =  super.duplicate(new_owner, original);
+		result.setSectionReadOnly(original.getSectionReadOnly());
+		result.setSectionText(original.getSectionText());
+		XMLPrinter raw = original.getSectionRawHtml();
+		if( raw != null ){
+			result.setSectionRawHtml(raw.toString());
+		}
+		return result;
 	}
 
 }

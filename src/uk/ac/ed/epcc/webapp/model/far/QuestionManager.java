@@ -19,7 +19,6 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.MapForm;
-import uk.ac.ed.epcc.webapp.forms.inputs.BooleanInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ClassInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
@@ -28,7 +27,6 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
 import uk.ac.ed.epcc.webapp.model.far.SectionManager.Section;
 import uk.ac.ed.epcc.webapp.model.far.handler.PartConfigFactory;
 import uk.ac.ed.epcc.webapp.model.far.handler.QuestionFormHandler;
@@ -52,8 +50,13 @@ public class QuestionManager extends PartManager<SectionManager.Section,Question
 	 * 
 	 */
 	public static final String QUESTION_TEXT_FIELD = "QuestionText";
+	/**
+	 * 
+	 */
+	public static final String QUESTION_TYPE_NAME = "Question";
 	public class Question extends PartManager.Part<SectionManager.Section> implements UIGenerator{
 
+		
 		@Override
 		public void makeConfigForm(Form f) {
 			try {
@@ -73,25 +76,36 @@ public class QuestionManager extends PartManager<SectionManager.Section,Question
 		public String getQuestionText(){
 			return record.getStringProperty(QUESTION_TEXT_FIELD);
 		}
+		void setQuestionText(String val){
+			record.setProperty(QUESTION_TEXT_FIELD, val);
+		}
 		private QuestionFormHandler handler = null;
 		@SuppressWarnings("unchecked")
 		public QuestionFormHandler getHandler() throws Exception{
 			if( handler == null ){
 				AppContext conn = getContext();
-				Class<? extends QuestionFormHandler> clazz = conn.getClassDef(QuestionFormHandler.class, record.getStringProperty(HANDLER_TYPE_FIELD));
+				Class<? extends QuestionFormHandler> clazz = conn.getClassDef(QuestionFormHandler.class, getHandlerTag());
 				handler =  conn.makeObject(clazz);
 			}
 			return handler;
 		}
+		
 
 		@Override
 		public Map<String, Object> getInfo() {
 			Map<String, Object> info = super.getInfo();
-			info.put("Handler", record.getStringProperty(HANDLER_TYPE_FIELD));
+			info.put("Handler", getHandlerTag());
 			info.put("Question text", getQuestionText());
+			info.put("Optional", isOptional()?"Optional":"Required");
 			return info;
 		}
 
+		protected String getHandlerTag() {
+			return record.getStringProperty(HANDLER_TYPE_FIELD);
+		}
+		void setHandlerTag(String tag){
+			record.setProperty(HANDLER_TYPE_FIELD, tag);
+		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.far.PartManager.Part#visit(uk.ac.ed.epcc.webapp.model.far.PartVisitor)
 		 */
@@ -102,6 +116,9 @@ public class QuestionManager extends PartManager<SectionManager.Section,Question
 
 		public boolean isOptional(){
 			return record.getBooleanProperty(OPTIONAL_FIELD,false);
+		}
+		void setOptional(boolean optional){
+			record.setProperty(OPTIONAL_FIELD, optional);
 		}
 		public <T> Input<T> getInput() throws Exception{
 			
@@ -130,14 +147,14 @@ public class QuestionManager extends PartManager<SectionManager.Section,Question
 		 */
 		@Override
 		public String getTypeName() {
-			return "Question";
+			return QUESTION_TYPE_NAME;
 		}
 	}
 	/**
 	 * @param owner_fac
 	 */
 	public QuestionManager(SectionManager owner_fac) {
-		super(owner_fac.form_manager,owner_fac, "Question");
+		super(owner_fac.form_manager,owner_fac, QUESTION_TYPE_NAME);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
@@ -182,7 +199,15 @@ public class QuestionManager extends PartManager<SectionManager.Section,Question
 	 */
 	@Override
 	public String getChildTypeName() {
-		return "Unicorns";  // no valid children.
+		return "Unicorn";  // no valid children.
+	}
+	@Override
+	public Question duplicate(Section new_owner, Question original) throws DataFault {
+		Question duplicate = super.duplicate(new_owner, original);
+		duplicate.setOptional(original.isOptional());
+		duplicate.setQuestionText(original.getQuestionText());
+		duplicate.setHandlerTag(original.getHandlerTag());
+		return duplicate;
 	}
 
 }

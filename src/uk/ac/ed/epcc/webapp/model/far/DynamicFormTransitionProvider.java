@@ -13,8 +13,13 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
@@ -24,15 +29,19 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.inputs.FileUploadDecorator;
+import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnusedNameInput;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractTargetLessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraTargetLessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.forms.CreateTransition;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider;
@@ -51,6 +60,84 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 	private final DynamicFormManager<T> manager;
 	private final String target_name;
 
+	/** Key for targetless edit transitions.
+	 * @author spb
+	 *
+	 */
+	private static final class DynamicFormTargetlessKey<T extends DynamicForm> extends DynamicFormTransitionKey<T> {
+		/**
+		 * @param name
+		 * @param help
+		 */
+		private DynamicFormTargetlessKey(String name, String help) {
+			super(name, help);
+		}
+
+		@Override
+		public boolean allow(DynamicForm target, SessionService<?> sess) {
+			return target == null;
+		}
+	}
+	/** key for form editing transitions.
+	 * 
+	 * @author spb
+	 *
+	 * @param <T>
+	 */
+	private static final class DynamicFormComposeKey<T extends DynamicForm> extends DynamicFormTransitionKey<T> {
+		/**
+		 * @param name
+		 * @param help
+		 */
+		private DynamicFormComposeKey(String name, String help) {
+			super(name, help);
+		}
+
+		@Override
+		public boolean allow(DynamicForm target, SessionService<?> sess) {
+			return target != null && target.isNew();
+		}
+	}
+	/** key for transitions on active/released forms.
+	 * 
+	 * @author spb
+	 *
+	 * @param <T>
+	 */
+	private static final class DynamicFormActiveKey<T extends DynamicForm> extends DynamicFormTransitionKey<T> {
+		/**
+		 * @param name
+		 * @param help
+		 */
+		private DynamicFormActiveKey(String name, String help) {
+			super(name, help);
+		}
+
+		@Override
+		public boolean allow(DynamicForm target, SessionService<?> sess) {
+			return target != null && target.isActive();
+		}
+	}
+	/** key for transitions on any forms.
+	 * 
+	 * @author spb
+	 *
+	 * @param <T>
+	 */
+	private static final class DynamicFormAnyKey<T extends DynamicForm> extends DynamicFormTransitionKey<T> {
+		/**
+		 * @param name
+		 * @param help
+		 */
+		private DynamicFormAnyKey(String name, String help) {
+			super(name, help);
+		}
+
+		@Override
+		public boolean allow(DynamicForm target, SessionService<?> sess) {
+			return target != null;
+		}
+	}
 	public class Linker implements UIGenerator{
 		public Linker(T target) {
 			super();
@@ -68,52 +155,18 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 			return builder;
 		}
 	}
-	public final DynamicFormTransitionKey<T> CREATE = new DynamicFormTransitionKey<T>("Create","Create a new Dynamic form") {
-
-		@Override
-		public boolean allow(DynamicForm target, SessionService<?> sess) {
-			return target == null && manager.canEdit(sess);
-		}
-	};
-	public final DynamicFormTransitionKey<T> INDEX = new DynamicFormTransitionKey<T>("Index","List existing Dynamic Forms") {
-
-		@Override
-		public boolean allow(DynamicForm target, SessionService<?> sess) {
-			return target == null && manager.canEdit(sess);
-		}
-	};
-	public final DynamicFormTransitionKey<T> ADD = new DynamicFormTransitionKey<T>("Add","Add a child page") {
-
-		@Override
-		public boolean allow(DynamicForm target, SessionService<?> sess) {
-			return target != null && target.canEdit(sess) && ! target.isActive();
-		}
-	};
+	public static final DynamicFormTransitionKey CREATE = new DynamicFormTargetlessKey("Create", "Create a new Dynamic form");
+	public static final DynamicFormTransitionKey INDEX = new DynamicFormTargetlessKey("Index","List existing Dynamic Forms"); 
+	public static final DynamicFormTransitionKey ADD = new DynamicFormComposeKey("Add","Add a child page"); 
 	
-	public final DynamicFormTransitionKey<T> RENEW = new DynamicFormTransitionKey<T>("Renew","Change the form status to New") {
-
-		@Override
-		public boolean allow(DynamicForm target, SessionService<?> sess) {
-			return target != null && target.canView(sess) && target.isActive();
-		}
-	};
+	public static final DynamicFormTransitionKey RENEW = new DynamicFormActiveKey("Renew","Change the form status to New");
 	
-	public final DynamicFormTransitionKey<T> ACTIVATE = new DynamicFormTransitionKey<T>("Activate","Change the form status to Active") {
-
-		@Override
-		public boolean allow(DynamicForm target, SessionService<?> sess) {
-			return target != null && target.canView(sess) && (target.isNew() || target.isRetired());
-		}
-	};
+	public static final DynamicFormTransitionKey ACTIVATE = new DynamicFormComposeKey("Activate","Change the form status to Active");
 	
-	public final DynamicFormTransitionKey<T> RETIRE = new DynamicFormTransitionKey<T>("Retire","Change the form status to Retire") {
-
-		@Override
-		public boolean allow(DynamicForm target, SessionService<?> sess) {
-			return target != null && target.canView(sess) && target.isActive();
-		}
-	};
-	
+	public static final DynamicFormTransitionKey RETIRE = new DynamicFormActiveKey("Retire","Change the form status to Retire");
+	public static final DynamicFormTransitionKey CLONE = new DynamicFormAnyKey<>("Clone", "Generate a complete copy of this form in New state");
+	public static final DynamicFormTransitionKey DOWNLOAD = new DynamicFormAnyKey<>("Download", "Download a XML description of this form");
+	public static final DynamicFormTransitionKey UPLOAD = new DynamicFormComposeKey("Upload","Upload a XML descriptiona and add to this form"); 
 	public class Creator extends CreateTransition<T>{
 
 		/**
@@ -207,6 +260,48 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 		}
 		
 	}
+	public class DuplicateTransition extends AbstractFormTransition<T>{
+		public class DuplicateAction extends FormAction{
+
+			public DuplicateAction(T original) {
+				super();
+				this.original = original;
+			}
+			private final T original;
+			/* (non-Javadoc)
+			 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#action(uk.ac.ed.epcc.webapp.forms.Form)
+			 */
+			@Override
+			public FormResult action(Form f) throws ActionException {
+				String name = (String) f.get(DynamicFormManager.NAME_FIELD);
+				T duplicate;
+				try {
+					duplicate = manager.makeBDO();
+					duplicate.setName(name);
+					duplicate.commit();
+					
+					DuplicateVisitor vis = new DuplicateVisitor(duplicate);
+					vis.visitOwner(manager, original);
+					
+					return duplicate.getViewResult();
+				} catch (DataException e) {
+					throw new ActionException("Error in duplicate", e);
+				}
+			}
+			
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.transition.BaseFormTransition#buildForm(uk.ac.ed.epcc.webapp.forms.Form, java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
+		 */
+		@Override
+		public void buildForm(Form f, T target, AppContext conn) throws TransitionException {
+			f.addInput(DynamicFormManager.NAME_FIELD, "New Form Name", new UnusedNameInput(manager));
+			f.addAction("Clone", new DuplicateAction(target));
+			
+		}
+		
+	}
 
 	public class CreateChildTransition extends AbstractFormTransition<T>{
 
@@ -225,6 +320,61 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 		}
 		
 	}
+	
+	public class AddXMLTransition extends AbstractFormTransition<T>{
+
+		/**
+		 * 
+		 */
+		private static final String DATA = "data";
+
+		public class XMLUploadAction extends FormAction{
+			public XMLUploadAction(T target) {
+				super();
+				this.target = target;
+			}
+			private final T target;
+			/* (non-Javadoc)
+			 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#action(uk.ac.ed.epcc.webapp.forms.Form)
+			 */
+			@Override
+			public FormResult action(Form f) throws ActionException {
+				XMLFormReader<T, PartOwnerFactory<T>> reader = new XMLFormReader<>(getContext());
+				try {
+					reader.read(target.getManager(), target, (String)f.get(DATA));
+				} catch (Exception e) {
+					throw new ActionException("Error parsing upload",e);
+				} 
+				return target.getViewResult();
+			}
+			
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.transition.BaseFormTransition#buildForm(uk.ac.ed.epcc.webapp.forms.Form, java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
+		 */
+		@Override
+		public void buildForm(Form f, T target, AppContext conn)
+				throws TransitionException {
+			TextInput input = new TextInput();
+			input.setMaxResultLength(8*1024*1024);
+			f.addInput(DATA, "Upload XML Data", new FileUploadDecorator(input));
+			f.addAction("Add", new XMLUploadAction(target));
+		}
+		
+	}
+	public class DownloadTransition extends AbstractDirectTransition<T>{
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
+		 */
+		@Override
+		public FormResult doTransition(T target, AppContext c) throws TransitionException {
+			LinkedList<String> args = new LinkedList<String>();
+			args.add(Integer.toString(target.getID()));
+			return new ServeDataResult(manager, args);
+		}
+		
+	}
 	public DynamicFormTransitionProvider(String target_name,DynamicFormManager<T> manager) {
 		super(manager.getContext());
 		this.target_name=target_name;
@@ -232,7 +382,9 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 		addTransition(CREATE, new Creator());
 		addTransition(INDEX, new IndexTransition());
 		addTransition(ADD, new CreateChildTransition());
-		
+		addTransition(DOWNLOAD, new DownloadTransition());
+		addTransition(UPLOAD, new AddXMLTransition());
+		addTransition(CLONE, new DuplicateTransition());
 		addTransition(RENEW, new RenewTransition());
 		addTransition(ACTIVATE, new ActivateTransition());
 		addTransition(RETIRE, new RetireTransition());
@@ -260,7 +412,8 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 	@Override
 	public boolean allowTransition(AppContext c, T target,
 			DynamicFormTransitionKey<T> key) {
-		return key.allow(target, c.getService(SessionService.class));
+		SessionService service = c.getService(SessionService.class);
+		return key.allow(target, service) && manager.canEdit(service);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#getSummaryContent(uk.ac.ed.epcc.webapp.AppContext, uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object)

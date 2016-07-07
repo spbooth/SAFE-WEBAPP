@@ -44,4 +44,10 @@ public abstract class PartOwner extends DataObject {
 	 * @return
 	 */
 	public abstract FormResult getViewResult();
+	
+	/** get the {@link PartOwnerFactory} corresponding to this {@link PartOwner}
+	 * 
+	 * @return {@link PartOwnerFactory}
+	 */
+	public abstract PartOwnerFactory getFactory();
 }
