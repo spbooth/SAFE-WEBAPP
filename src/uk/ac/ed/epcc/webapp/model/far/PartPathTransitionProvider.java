@@ -28,8 +28,11 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.factory.EditFormBuilder;
 import uk.ac.ed.epcc.webapp.forms.factory.EditTransition;
+import uk.ac.ed.epcc.webapp.forms.inputs.FileUploadDecorator;
+import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
@@ -38,6 +41,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
+import uk.ac.ed.epcc.webapp.model.far.DynamicFormTransitionProvider.AddXMLTransition.XMLUploadAction;
 import uk.ac.ed.epcc.webapp.model.far.PartManager.Part;
 import uk.ac.ed.epcc.webapp.model.far.handler.PartConfigFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -82,6 +86,9 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 	public static final PartTransitionKey MOVE_DOWN = new CheckSiblingKey("Move down","Swap position with next sibling",true); 
 	public static final PartTransitionKey EDIT = new EditKey("Update", "Edit/update this part");
 	public static final PartTransitionKey PARENT = new ViewKey("Parent", "Go to parent object");
+	public static final PartTransitionKey DOWNLOAD = new ViewKey("Download", "Download this part as XML");
+	public static final PartTransitionKey UPLOAD = new EditKey("Upload", "Upload a XML description and add to this part");
+
 	public static final PartTransitionKey CONFIG = new EditKey("Configure", "Edit configuration"){
 		public boolean allow(Part target, SessionService sess) {
 			return super.allow(target,sess) && target.hasConfig();
@@ -356,7 +363,60 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 		
 	}
 	
-	
+	public class DownloadTransition extends AbstractDirectTransition<T>{
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
+		 */
+		@Override
+		public FormResult doTransition(T target, AppContext c) throws TransitionException {
+			LinkedList<String> args = getID(target);
+			return new ServeDataResult(target.getFactory().form_manager, args);
+
+		}
+		
+	}
+	public class AddXMLTransition extends AbstractFormTransition<T>{
+
+		/**
+		 * 
+		 */
+		private static final String DATA = "data";
+
+		public class XMLUploadAction extends FormAction{
+			public XMLUploadAction(T target) {
+				super();
+				this.target = target;
+			}
+			private final T target;
+			/* (non-Javadoc)
+			 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#action(uk.ac.ed.epcc.webapp.forms.Form)
+			 */
+			@Override
+			public FormResult action(Form f) throws ActionException {
+				XMLFormReader<T, PartOwnerFactory<T>> reader = new XMLFormReader<>(getContext());
+				try {
+					reader.read((PartOwnerFactory<T>) target.getFactory(), target, (String)f.get(DATA));
+				} catch (Exception e) {
+					throw new ActionException("Error parsing upload",e);
+				} 
+				return target.getViewResult();
+			}
+			
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.transition.BaseFormTransition#buildForm(uk.ac.ed.epcc.webapp.forms.Form, java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
+		 */
+		@Override
+		public void buildForm(Form f, T target, AppContext conn)
+				throws TransitionException {
+			TextInput input = new TextInput();
+			input.setMaxResultLength(8*1024*1024);
+			f.addInput(DATA, "Upload XML Data", new FileUploadDecorator(input));
+			f.addAction("Add", new XMLUploadAction(target));
+		}
+		
+	}
 	public PartPathTransitionProvider(String target_name,DynamicFormManager man){
 		super(target_name,man);
 		
@@ -365,6 +425,8 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 		addTransition(CREATE, new CreateChildTransition());
 		addTransition(EDIT, new EditPartTransition());
 		addTransition(CONFIG, new ConfigTransition());
+		addTransition(DOWNLOAD, new DownloadTransition());
+		addTransition(UPLOAD, new AddXMLTransition());
 		addTransition(PARENT, new GotoParentTransition());
 		addTransition(DELETE, new ConfirmTransition<T>("Do you wish to delete this element and all its children?", new DeleteChildTransition(), new ViewTransition()));
 		addTransition(MOVE_DOWN, new SwapSiblingTransition(true));

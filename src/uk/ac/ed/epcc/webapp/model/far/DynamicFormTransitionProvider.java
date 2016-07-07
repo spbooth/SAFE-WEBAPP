@@ -166,7 +166,7 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 	public static final DynamicFormTransitionKey RETIRE = new DynamicFormActiveKey("Retire","Change the form status to Retire");
 	public static final DynamicFormTransitionKey CLONE = new DynamicFormAnyKey<>("Clone", "Generate a complete copy of this form in New state");
 	public static final DynamicFormTransitionKey DOWNLOAD = new DynamicFormAnyKey<>("Download", "Download a XML description of this form");
-	public static final DynamicFormTransitionKey UPLOAD = new DynamicFormComposeKey("Upload","Upload a XML descriptiona and add to this form"); 
+	public static final DynamicFormTransitionKey UPLOAD = new DynamicFormComposeKey("Upload","Upload a XML description and add to this form"); 
 	public class Creator extends CreateTransition<T>{
 
 		/**
