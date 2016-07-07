@@ -289,6 +289,31 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 	}
 	public class EditPartTransition extends EditTransition<T>{
 
+		public class CancelAction extends FormAction{
+			public CancelAction(T target) {
+				super();
+				this.target = target;
+				setMustValidate(false);
+			}
+			private final T target;
+			/* (non-Javadoc)
+			 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#action(uk.ac.ed.epcc.webapp.forms.Form)
+			 */
+			@Override
+			public FormResult action(Form f) throws ActionException {
+				return target.getViewResult();
+			}
+			
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.factory.EditTransition#buildForm(uk.ac.ed.epcc.webapp.forms.Form, java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
+		 */
+		@Override
+		public void buildForm(Form f, T dat, AppContext c) throws TransitionException {
+			super.buildForm(f, dat, c);
+			f.addAction("Cancel", new CancelAction(dat));
+		}
+
 		/**
 		 * @param type_name
 		 */

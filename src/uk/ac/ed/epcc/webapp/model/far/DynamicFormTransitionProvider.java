@@ -38,6 +38,7 @@ import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractTargetLessTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraTargetLessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
@@ -385,7 +386,7 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 		addTransition(DOWNLOAD, new DownloadTransition());
 		addTransition(UPLOAD, new AddXMLTransition());
 		addTransition(CLONE, new DuplicateTransition());
-		addTransition(RENEW, new RenewTransition());
+		addTransition(RENEW, new ConfirmTransition<>("Re-editing a active form may corrupt existing responses. Consider retiring and cloning the form instead. Do you really want to re-edit?", new RenewTransition(),new ViewTransition()));
 		addTransition(ACTIVATE, new ActivateTransition());
 		addTransition(RETIRE, new RetireTransition());
 	}
@@ -514,7 +515,22 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 		}
 		
 	}
-    
+public class ViewTransition extends AbstractDirectTransition<T>{
+		
+		@Override
+		public FormResult doTransition(T target, AppContext c) 
+				throws TransitionException {
+			
+			try {
+				return target.getViewResult();
+			} catch (Exception e) {
+				getLogger().error("Error doing renew transition",e);
+				throw new TransitionException("Internal error");
+			}
+			
+		}
+		
+	}
     
     public class ActivateTransition extends AbstractDirectTransition<T>{
 		
