@@ -61,7 +61,7 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 		this.sess=sess;
 		this.response=response;
 		this.complete_viz = new CompleteVisitor(response);
-		this.has_question_viz = new HasQuestionsVisitor<>(sess.getContext());
+		this.has_question_viz = new HasQuestionsVisitor(sess.getContext());
 	}
 
 	
