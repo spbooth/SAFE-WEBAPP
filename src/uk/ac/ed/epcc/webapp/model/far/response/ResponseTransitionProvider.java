@@ -29,6 +29,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.CustomFormContent;
 import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.ShowDisabledTransitions;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -56,10 +57,45 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 
 public class ResponseTransitionProvider<D extends DynamicForm,R extends Response<D>> extends
-	AbstractPartTransitionProvider<ResponseTarget<D, R>,ResponseTransitionKey<D, R>>  {
+	AbstractPartTransitionProvider<ResponseTarget<D, R>,ResponseTransitionKey<D, R>> 
+    implements ShowDisabledTransitions<ResponseTransitionKey<D, R>,ResponseTarget<D, R>> {
 
 	private final ResponseManager<R, D> manager;
 	
+	/**
+	 * @author spb
+	 *
+	 */
+	private final class SubmitKey extends ResponseTransitionKey<D, R> implements ShowButton<D,R> {
+		/**
+		 * @param name
+		 * @param help
+		 */
+		private SubmitKey(String name, String help) {
+			super(name, help);
+		}
+
+		@Override
+		public boolean allow(ResponseTarget<D, R> target, SessionService<?> sess) {
+			try {
+				R rsp = target.getResponse();
+				return showButton(target,sess) && rsp.validate();
+			} catch (DataException e) {
+				getLogger(sess.getContext()).error("Problem in allow/validate", e);
+				return false;
+			}
+		}
+
+		public boolean showButton(ResponseTarget<D,R> target, SessionService<?> sess) {
+			try {
+				R rsp = target.getResponse();
+				return super.allow(target, sess) && (target.getSibling(true) == null) &&  rsp.canEdit(sess);
+			} catch (DataFault e) {
+				getLogger(sess.getContext()).error("Problem in showButton", e);
+				return false;
+			}
+		}
+	}
 	public class ChainedResult extends ChainedTransitionResult<ResponseTarget<D, R>, ResponseTransitionKey<D, R>>{
 		public ChainedResult(ResponseTarget<D,R> target, ResponseTransitionKey<D,R> key){
 			super(ResponseTransitionProvider.this,target,key);
@@ -114,23 +150,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 		
 	};
 	
-	public final ResponseTransitionKey<D, R> SUBMIT = new ResponseTransitionKey<D, R>("Submit", "Submit form response"){
-
-		@Override
-		public boolean allow(ResponseTarget<D, R> target, SessionService<?> sess) {
-			try {
-				R rsp = target.getResponse();
-				return super.allow(target, sess) && (target.getSibling(true) == null) && rsp.validate() && rsp.canEdit(sess);
-			} catch (DataFault e) {
-				getLogger(sess.getContext()).error("Problem in allow", e);
-				return false;
-			} catch (DataException e) {
-				getLogger(sess.getContext()).error("Problem in allow", e);
-				return false;
-			}
-		}
-		
-	};
+	public final ResponseTransitionKey<D, R> SUBMIT = new SubmitKey("Submit", "Submit form response");
 	
 	public class EditSectionTransition extends AbstractFormTransition<ResponseTarget<D, R>> implements CustomFormContent<ResponseTarget<D,R>>, FormTransition<ResponseTarget<D,R>>{
 
@@ -398,6 +418,19 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 		EditSectionVisitor<X> vis = new EditSectionVisitor<X>(cb, sess,p instanceof Page ? this: null,target.getResponse());
 		target.getPart().visit(vis);		
 		return cb;
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.ShowDisabledTransitions#showDisabledTransition(uk.ac.ed.epcc.webapp.AppContext, java.lang.Object, java.lang.Object)
+	 */
+	@Override
+	public boolean showDisabledTransition(AppContext c, ResponseTarget<D, R> target, ResponseTransitionKey<D, R> key) {
+		if( key instanceof ShowButton){
+			return ((ShowButton<D, R>)key).showButton(target, c.getService(SessionService.class));
+		}
+		return false;
 	}
 
 }
