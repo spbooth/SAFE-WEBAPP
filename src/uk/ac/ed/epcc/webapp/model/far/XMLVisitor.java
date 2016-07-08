@@ -84,9 +84,9 @@ public class XMLVisitor<X extends XMLPrinter> implements PartVisitor<X> {
 	private <P extends Part> X closePart(P part) {
 		try{
 			
-			PartManager<?, P> my_manager = (PartManager<?, P>) part.getFactory();
+			PartManager my_manager = (PartManager) part.getFactory();
 			visitOwner(my_manager, part);
-			PartConfigFactory<?, P> config = my_manager.getConfigFactory();
+			PartConfigFactory config = my_manager.getConfigFactory();
 			if( config != null ){
 				X conf = (X) printer.getNested();
 				Map<String,Object> values = config.getValues(part);
