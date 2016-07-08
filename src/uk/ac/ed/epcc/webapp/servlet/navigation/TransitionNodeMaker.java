@@ -21,7 +21,13 @@ import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 
-/**
+/** Create a navigation {@link Node} corresponding to a transition
+ * 
+ * Config properties (without navigation.prefix:
+ * <ul>
+ * <li> <b><em>name</em>.transition</b> transition provider name (defaults to name).
+ * <li> <b><em>name</em>.key</b> transition key to use (if unset look for IndexTransition).
+ * </ul>
  * @author spb
  * @param <T> Transition Target type
  * @param <K> Transition key type
@@ -43,9 +49,10 @@ public class TransitionNodeMaker<T,K> extends AbstractNodeMaker {
 	@Override
 	public Node makeNode(String name, FilteredProperties props) {
 		Node n = new ParentNode();
-		@SuppressWarnings("unchecked")
+	
 		TransitionFactory<K, T> fac = getTransitionFactory(name, props);
 		if( fac == null){
+			getLogger().warn("Failed to find transition factory for "+name);
 			return null;
 		}
 		// look for an explicit named targetless transition

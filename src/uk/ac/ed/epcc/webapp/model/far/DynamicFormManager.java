@@ -22,7 +22,6 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.XMLPrinter;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.inputs.ClassInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInputWrapper;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
@@ -44,7 +43,6 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.Status.Value;
-import uk.ac.ed.epcc.webapp.model.far.handler.QuestionFormHandler;
 import uk.ac.ed.epcc.webapp.model.far.response.CompleteVisitor;
 import uk.ac.ed.epcc.webapp.model.serv.ServeDataProducer;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -431,5 +429,14 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 		DuplicateVisitor vis = new DuplicateVisitor(duplicate);
 		vis.visitOwner(this, original);
 		return duplicate;
+	}
+
+	public boolean hasActive() {
+		try {
+			return exists(getActiveFilter());
+		} catch (DataException e) {
+			getLogger().error("Error checking for active forms", e);
+		}
+		return false;
 	}
 }

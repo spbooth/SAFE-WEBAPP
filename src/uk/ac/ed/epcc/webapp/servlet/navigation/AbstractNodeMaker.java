@@ -15,6 +15,8 @@ package uk.ac.ed.epcc.webapp.servlet.navigation;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.config.FilteredProperties;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /**
  * @author spb
@@ -43,5 +45,9 @@ public abstract class AbstractNodeMaker implements NodeMaker{
 	@Override
 	public void addChildren(Node parent, String name, FilteredProperties props) {
 		return;
+	}
+	
+	protected Logger getLogger(){
+		return conn.getService(LoggerService.class).getLogger(getClass());
 	}
 }
