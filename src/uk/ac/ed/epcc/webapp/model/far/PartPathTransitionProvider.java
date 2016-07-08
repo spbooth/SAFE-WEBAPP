@@ -46,7 +46,7 @@ import uk.ac.ed.epcc.webapp.model.far.PartManager.Part;
 import uk.ac.ed.epcc.webapp.model.far.handler.PartConfigFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
-/**
+/** A {@link PathTransitionProvider} for editing the components of a {@link DynamicForm}
  * @author spb
  *
  */

@@ -233,6 +233,16 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		public FormResult getResult(String typeName, P dat, Form f) {
 			if( dat.hasConfig()){
 				return new ChainedTransitionResult<P, PartTransitionKey<P>>(form_manager.getPartPathProvider(), dat, PartPathTransitionProvider.CONFIG);
+			}else{
+				// we may have edited from a state that had config to one that did not
+				PartConfigFactory<O, P> config = (PartConfigFactory<O, P>) dat.getFactory().getConfigFactory();
+				if( config != null ){
+					try {
+						config.clearAll(dat);
+					} catch (DataFault e) {
+						getLogger().error("Error clearing config", e);
+					}
+				}
 			}
 			return dat.getViewResult();
 		}

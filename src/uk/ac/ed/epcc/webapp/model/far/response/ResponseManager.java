@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -102,9 +103,9 @@ public abstract class ResponseManager<R extends ResponseManager.Response<F>,F ex
 		
 		public abstract String getDescriptor();
 		
-		public abstract MessageResult submit() throws Exception;
+		public abstract FormResult submit() throws Exception;
 		
-		public abstract boolean validate() throws DataException;
+		public abstract boolean validate() throws Exception;
 		
 		public abstract ByteArrayMimeStreamData getPDFStream() throws DataException;
 				

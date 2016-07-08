@@ -105,8 +105,9 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 		}
 
 		@Override
-		public boolean validate() throws DataException {
-			CompleteVisitor<D, PersonalResponse<D>> vis = new CompleteVisitor<D, PersonalResponse<D>>(this);
+		public boolean validate() throws Exception {
+			Class<? extends CompleteVisitor> clazz = getForm().getCompleteVisitor();
+			CompleteVisitor<D, PersonalResponse<D>> vis = getContext().makeParamObject(clazz, this);
 			return vis.visitForm(this.getForm());
 		}
 		

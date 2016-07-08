@@ -15,11 +15,15 @@ package uk.ac.ed.epcc.webapp.model.far;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.XMLPrinter;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
+import uk.ac.ed.epcc.webapp.forms.inputs.ClassInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInputWrapper;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
@@ -40,6 +44,8 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.Status.Value;
+import uk.ac.ed.epcc.webapp.model.far.handler.QuestionFormHandler;
+import uk.ac.ed.epcc.webapp.model.far.response.CompleteVisitor;
 import uk.ac.ed.epcc.webapp.model.serv.ServeDataProducer;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -88,7 +94,7 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 	
 		
 	public static final String NAME_FIELD = "Name";
-	
+	public static final String VALIDATING_VISITOR_FIELD = "ValidatingVisitor";
 	
 	public static final String PART_TAG = "Part";
 	public static final String  FORM_TAG = "Form";
@@ -201,6 +207,26 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 			return manager;
 		}
 		
+		/** get the visitor class to use for completion tests
+		 * 
+		 * @return
+		 */
+		public Class<? extends CompleteVisitor> getCompleteVisitor(){
+			String tag = getCompleteVisitorTag();
+			if( tag == null ){
+				return CompleteVisitor.class;
+			}
+			return getContext().getPropertyClass(CompleteVisitor.class, tag);
+		}
+
+		String getCompleteVisitorTag() {
+			return record.getStringProperty(VALIDATING_VISITOR_FIELD,getContext().getInitParameter("dynamic_form.default.validator"));
+		}
+		void setCompleteVisitorTag(String tag){
+			record.setOptionalProperty(VALIDATING_VISITOR_FIELD, tag);
+		}
+		
+		
 	}
 	/**
 	 * 
@@ -253,6 +279,7 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 		spec.setField(NAME_FIELD, new StringFieldType(false, null, 64));
 		
 		spec.setField(status.getField(), status.getFieldType(NEW));
+		spec.setOptionalField(VALIDATING_VISITOR_FIELD, new StringFieldType(true,null,128));
 		try {
 			spec.new Index("NameIndex", true, NAME_FIELD);
 		} catch (InvalidArgument e) {
@@ -313,6 +340,17 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 		supress.add(status.getField());
 		return supress;
 	}
+	@Override
+	protected Map<String, Object> getSelectors() {
+		Map<String, Object> selectors = super.getSelectors();
+		ClassInput<CompleteVisitor> input =  new ClassInput<CompleteVisitor>(getContext(), CompleteVisitor.class);
+		OptionalListInputWrapper<String, Class<? extends CompleteVisitor>> optional_input = new OptionalListInputWrapper<String,Class<? extends CompleteVisitor>>(input,"use default");
+		optional_input.setOptional(true);
+		selectors.put(VALIDATING_VISITOR_FIELD, optional_input);
+		
+		return selectors;
+	}
+
 	/**
 	 * @return
 	 */
@@ -382,5 +420,16 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 	@Override
 	public String getChildTypeName() {
 		return PageManager.PAGE_TYPE_NAME;
+	}
+	
+	public F duplicate(F original, String name) throws DataException{
+		F duplicate = makeBDO();
+		duplicate.setName(name);
+		duplicate.setCompleteVisitorTag(original.getCompleteVisitorTag());
+		duplicate.commit();
+		
+		DuplicateVisitor vis = new DuplicateVisitor(duplicate);
+		vis.visitOwner(this, original);
+		return duplicate;
 	}
 }

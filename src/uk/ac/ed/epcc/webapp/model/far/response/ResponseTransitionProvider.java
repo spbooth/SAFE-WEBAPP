@@ -80,7 +80,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 			try {
 				R rsp = target.getResponse();
 				return showButton(target,sess) && rsp.validate();
-			} catch (DataException e) {
+			} catch (Exception e) {
 				getLogger(sess.getContext()).error("Problem in allow/validate", e);
 				return false;
 			}

@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.result;
 
+import uk.ac.ed.epcc.webapp.forms.html.WebFormResultVisitor;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
 
 
@@ -25,10 +26,11 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
  * a {@link TransitionVisitor}.
  * Certain environments may define additional types and need to
  * sub-class this interface. In this case the additional result types
- * will need to cast the visitor to the sub-type.
+ * will need to cast the visitor to the sub-type. The prime example of this is {@link WebFormResultVisitor} which handles
+ * html-only result-types.
  * 
  * @author spb
- *
+ * @see WebFormResultVisitor
  */
 public interface FormResultVisitor {
   public <T,K> void visitChainedTransitionResult(ChainedTransitionResult<T,K> res) throws Exception;
