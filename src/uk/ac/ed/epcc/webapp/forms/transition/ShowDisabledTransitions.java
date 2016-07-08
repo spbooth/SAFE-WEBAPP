@@ -15,13 +15,13 @@ package uk.ac.ed.epcc.webapp.forms.transition;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 
-/**
+/** An extension interface to allow a {@link TransitionFactory} to show disabled actions 
  * @author spb
  *
  */
 
 public interface ShowDisabledTransitions<K,T> extends TransitionFactory<K, T> {
-	/** If the transition is NOT allowed but this method returns true the button is stills hown but disabled.
+	/** If the transition is NOT allowed but this method returns true the button is stills shown but disabled.
 	 * @param c AppContext
 	 * @param target target object
 	 * @param key identifying key object for transition

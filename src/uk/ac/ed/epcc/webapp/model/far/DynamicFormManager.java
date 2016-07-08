@@ -137,7 +137,9 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 			return record.getProperty(status) == RETIRED;
 		}
 		
-		
+		public String getStatusName(){
+			return getStatus().getName();
+		}
 		public Value getStatus(){
 			return record.getProperty(status);
 		}

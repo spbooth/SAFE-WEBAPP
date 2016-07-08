@@ -21,6 +21,7 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 
@@ -30,7 +31,7 @@ import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
  * Each transition is logically a
  * method on the target type. The parameters of the method (if any) are
  * represented by a form and the method returns an object (the return value of
- * the FormAction). It is also possible to define target-less transitions which are equivalent to 
+ * the {@link FormAction}). It is also possible to define target-less transitions which are equivalent to 
  * static methods.
  * <p>
  * This interface does not require the target and key types to implement any particular interface.
@@ -39,7 +40,9 @@ import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
  * The operations are identified using a key type. This is intended to be a lightweight type and 
  * may be as simple as a String or enum. Each key value must have a String representation as key values 
  * might be transferred as Strings. This String representation should be unique for the set of operations supported by any given target.
- * 
+ * The keys should be available as static constants as they will be needed to construct links and results that reference the transition. The same is not true
+ * of the transition classes. It is often convenient to make these inner classes of the {@link TransitionFactory}.
+ * <p>
  * The separation into key and transition is not essential (they could be the same object or
  * tightly bound together). Operations that act on the 
  * set of all possible operations usually use the key type so instantiating all possible transition classes can be avoided 
@@ -59,6 +62,9 @@ import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
  * @author spb
  * @param <K> key type
  * @param <T> target type
+ * @see TransitionProvider
+ * @see PathTransitionProvider
+ * @see ViewTransitionFactory
  * 
  */
 public interface TransitionFactory<K,T> extends Contexed{

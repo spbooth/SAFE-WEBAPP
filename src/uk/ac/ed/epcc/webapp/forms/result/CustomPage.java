@@ -21,7 +21,23 @@ import uk.ac.ed.epcc.webapp.content.ContentBuilder;
  *
  */
 public interface CustomPage {
+	/** This is the tag used to store the {@link CustomPage} object in the request while forwarding
+	 * to the display page.
+	 * 
+	 */
 	public static final String CUSTOM_PAGE_TAG="CustomPage";
+	/** Get the title to show on the page
+	 * 
+	 * @return
+	 */
    public String getTitle();
+   /** get content to show on the page
+    * 
+    * This is formatted within a display block
+    * 
+    * @param conn
+    * @param cb {@link ContentBuilder} to add content
+    * @return modified {@link ContentBuilder}
+    */
    public ContentBuilder addContent(AppContext conn,ContentBuilder cb);
 }

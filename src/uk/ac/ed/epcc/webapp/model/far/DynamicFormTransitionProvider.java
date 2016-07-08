@@ -424,10 +424,7 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 			T target) {
 		if( target != null){
 			cb.addHeading(2, target.getName());
-		}else{
-			
 		}
-		cb.addText("Summary Content");
 		return cb;
 	}
 	/* (non-Javadoc)

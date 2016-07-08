@@ -21,12 +21,16 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link TransitionFactory} that can use the generic view_target pages.
  * These show a html summary of the object and give buttons to invoke the possible
- * transitions on the target.
+ * transitions on the target. The view page is shown if no specific transition is requested.
+ * This is incompatible with {@link DefaultingTransitionFactory} if both interfaces are implemented the
+ * view operation will take precedence.
  * 
  * @author spb
  *
  * @param <K> key type
  * @param <T> target type
+ * @see ViewTransitionProvider
+ * @see ViewPathTransitionProvider
  */
 public interface ViewTransitionFactory<K, T> extends TransitionFactory<K, T> {
 	/** Can the current person view this target

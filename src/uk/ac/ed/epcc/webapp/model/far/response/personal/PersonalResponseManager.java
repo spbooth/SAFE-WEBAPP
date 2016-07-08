@@ -145,7 +145,8 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 	protected DataObject makeBDO(Record res) throws DataFault {
 		return new PersonalResponse(this,res);
 	}
-	/** get/make a response for the specified form and the current user
+	/** get/make a response for the specified form and the current user.
+	 * This assumes only a single response per user and form.
 	 * 
 	 * @param form
 	 * @return
@@ -155,7 +156,7 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 		SessionService<?> sess = getContext().getService(SessionService.class);
 		SQLAndFilter<R> fil = new SQLAndFilter<R>(getTarget());
 		fil.addFilter(getFormFilter(form));
-		fil.addFilter(new ReferenceFilter<R, AppUser>(this, SUBMITTER_ID, (AppUser) sess.getCurrentPerson()));
+		fil.addFilter(getMyResponsesFilter(sess));
 		R result = find(fil,true);
 		if( result == null ){
 			result=makeBDO();
@@ -164,6 +165,10 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 			result.commit();
 		}
 		return result;
+	}
+
+	public ReferenceFilter<R, AppUser> getMyResponsesFilter(SessionService<?> sess) {
+		return new ReferenceFilter<R, AppUser>(this, SUBMITTER_ID, (AppUser) sess.getCurrentPerson());
 	}
 
 	

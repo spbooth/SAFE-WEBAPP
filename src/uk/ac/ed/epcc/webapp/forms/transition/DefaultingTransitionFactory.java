@@ -16,6 +16,9 @@ package uk.ac.ed.epcc.webapp.forms.transition;
 
 /** TransitionProvider that can generate a default transition for a target
  * if no other transition is specified.
+ * 
+  * This is incompatible with {@link ViewTransitionFactory} if both interfaces are implemented the
+ * view operation will take precedence.
  * @author spb
  *
  * @param <K>
@@ -26,7 +29,7 @@ public interface DefaultingTransitionFactory<K, T> extends
 
 	/** Get the key for the default transition.
 	 * 
-	 * This method can return null if a sub-class wants to supress the default transition or if
+	 * This method can return null if a sub-class wants to suppress the default transition or if
 	 * there is no valid default for the target.
 	 * @param target 
 	 * @return transition key
