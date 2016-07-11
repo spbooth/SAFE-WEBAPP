@@ -336,6 +336,38 @@ public class MapForm extends BaseForm {
 		action_name=name;
 	}
 
+	public String locateAction(Map<String,Object> params) throws ActionException{
+		for (Iterator<String> it = getActionNames(); it.hasNext();) {
+			String name = it.next();
+			if( action_name != null ){
+				String val = (String) params.get(action_name);
+				if( val != null && val.trim().equals(name.trim())){
+					return name;
+				}
+			}else{
+				//log.debug("looking for action <" + name + "> " + params.size());
+				if (params.get(name) != null || params.get(name.trim()) != null) {
+					//log.debug("found action");
+					return name;
+				}
+			}
+		}
+		// check for explicit but illegal name
+		if( action_name != null ){
+			String val = (String) params.get(action_name);
+			if( val != null  && val.trim().length() > 0){
+				throw new ActionException("Unexpected action "+val);
+			}
+		}
+
+		String defname = getSingleActionName();
+		if( defname != null ){
+			// BUG in IE8 with single text field. No action param sent.
+			// take this a default fall-back for any map form.
+			return defname;
+		}
+		return null;
+	}
 	/**
 	 * perform any action requested for this form.
 	 * 
@@ -347,34 +379,12 @@ public class MapForm extends BaseForm {
 	 */
 	public FormResult doAction(Map<String,Object> params) throws FieldException, ActionException {
 		//Logger log = getContext().getLogger();
-		for (Iterator<String> it = getActionNames(); it.hasNext();) {
-			String name = it.next();
-			if( action_name != null ){
-				String val = (String) params.get(action_name);
-				if( val != null && val.trim().equals(name.trim())){
-					return doAction(name);
-				}
-			}else{
-				//log.debug("looking for action <" + name + "> " + params.size());
-				if (params.get(name) != null || params.get(name.trim()) != null) {
-					//log.debug("found action");
-					return doAction(name);
-				}
-			}
+		String found_action = locateAction(params);
+		
+		if( found_action != null ){
+			return doAction(found_action);
 		}
-		// check for explicit but illegal name
-		if( action_name != null ){
-			String val = (String) params.get(action_name);
-			if( val != null  && val.trim().length() > 0){
-				throw new ActionException("Unexpected action "+val);
-			}
-		}
-		String defname = getSingleActionName();
-		if( defname != null ){
-			// BUG in IE8 with single text field. No action param sent.
-			// take this a default fall-back for any map form.
-			return doAction(defname);
-		}
+		
 		throw new ActionException("No matching action found");
 	}
 

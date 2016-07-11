@@ -13,14 +13,18 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far.response;
 
+import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.html.ErrorProcessingFormAction;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
@@ -30,6 +34,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.CustomFormContent;
 import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ShowDisabledTransitions;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -179,7 +184,8 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 				return "Cancel form submition and view parent";
 			}
 		}
-		public class EditAction extends FormAction{
+		public class EditAction extends ErrorProcessingFormAction<ResponseTarget<D, R>,ResponseTransitionKey<D, R>>{
+			
 			/**
 			 * @param target
 			 */
@@ -231,6 +237,32 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 					throw new ActionException("Internal error",e);
 				}
 			}
+			/* (non-Javadoc)
+			 * @see uk.ac.ed.epcc.webapp.forms.html.ErrorProcessingFormAction#processError(uk.ac.ed.epcc.webapp.AppContext, uk.ac.ed.epcc.webapp.forms.Form, uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory, java.lang.Object, java.lang.Object, java.util.Collection, java.util.Map)
+			 */
+			@Override
+			public FormResult processError(AppContext conn, Form f,
+					TransitionFactory<ResponseTransitionKey<D, R>, ResponseTarget<D, R>> provider,
+					ResponseTarget<D, R> target, ResponseTransitionKey<D, R> key, Collection<String> missing,
+					Map<String, String> errors) {
+				// save any valid answers
+				R response = target.getResponse();
+				Section s = (Section) target.getPart();
+				Page owner = s.getOwner();
+				SectionManager factory = (SectionManager) s.getFactory();
+				QuestionManager man = (QuestionManager) factory.getChildManager();
+				try {
+					for( Question q : man.getParts(s)){
+						String name = q.getName();
+						if( ! missing.contains(name) && ! errors.containsKey(name)){
+							response.setData(q, f.get(name));
+						}
+					}
+				} catch (Exception e) {
+					
+				}
+				return super.processError(conn, f, provider, target, key, missing, errors);
+			}
 
 			@Override
 			public String getHelp() {
@@ -272,6 +304,11 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 			R response = target.getResponse();
 			Section s = (Section) target.getPart();
 			Page p = s.getOwner();
+			if( cb instanceof HtmlBuilder){
+				// We want to be able to process a partially filled in form
+				// can't do this if browser won't submit 
+				((HtmlBuilder)cb).setUseRequired(false);
+			}
 			SectionEditVisitor<X> vis = new SectionEditVisitor<X>(cb, op, response, f, s);
 			vis.visitPage(p);
 			return cb;

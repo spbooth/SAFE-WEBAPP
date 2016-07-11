@@ -22,6 +22,7 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionValidationException;
 import uk.ac.ed.epcc.webapp.forms.html.ErrorFormResult;
+import uk.ac.ed.epcc.webapp.forms.html.ErrorProcessingFormAction;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.ConfirmTransitionResult;
@@ -85,7 +86,12 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 		    	}
 		    	if (! f.parsePost(req)){
 		    		// Not all ok
+		    		FormAction action = f.getAction(f.locateAction(params));
+		    		if( action instanceof ErrorProcessingFormAction){
+		    			return ((ErrorProcessingFormAction<T, K>)action).processError(getContext(), f, provider, target, tag, HTMLForm.getMissing(req), HTMLForm.getErrors(req));
+		    		}
 		    		return new ErrorFormResult<T, K>(provider, target, tag, HTMLForm.getErrors(req), HTMLForm.getMissing(req));
+		    		
 		    	}
 
 		    	String confirm_action = f.mustConfirm(params);

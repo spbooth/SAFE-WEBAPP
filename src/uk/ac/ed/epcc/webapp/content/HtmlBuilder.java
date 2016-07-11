@@ -374,8 +374,10 @@ public <I> void addFormLabel(AppContext conn,Field<I> f) {
  * 
  */
 private boolean use_required=true;
-public void setUseRequired(boolean use_required){
+public boolean setUseRequired(boolean use_required){
+	boolean old_value = use_required;
 	this.use_required=use_required;
+	return old_value;
 }
 /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormInput(uk.ac.ed.epcc.webapp.forms.Field)

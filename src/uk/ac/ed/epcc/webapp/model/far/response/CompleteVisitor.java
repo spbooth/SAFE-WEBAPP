@@ -13,6 +13,10 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far.response;
 
+import uk.ac.ed.epcc.webapp.forms.BaseForm;
+import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
+import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -87,16 +91,23 @@ public class CompleteVisitor<D extends DynamicForm, R extends Response<D>> imple
 	public Boolean visitSection(Section s) {
 		SectionManager fac = (SectionManager) s.getFactory();
 		try {
+			Form f = new BaseForm(s.getContext());
 			for(Question q : ((QuestionManager)fac.getChildManager()).getParts(s)){
 				if( ! visitQuestion(q)){
 					return Boolean.FALSE;
 				}
+				Input input = q.getInput();
+				if( input instanceof OptionalInput){
+					((OptionalInput)input).setOptional(q.isOptional());
+				}
+				input.setValue(response.getData(q));
+				f.addInput(q.getName(), q.getQuestionText(), input);
 			}
-		} catch (DataFault e) {
+			return f.validate();
+		} catch (Exception e) {
 			getLogger()	.error("Error checking completness", e);
 			return Boolean.FALSE;
 		}
-		return Boolean.TRUE;
 	}
 
 	/* (non-Javadoc)
