@@ -145,6 +145,14 @@ public HtmlBuilder(){
   
   public HtmlBuilder(HtmlBuilder htmlBuilder) {
 	super(htmlBuilder);
+	if( htmlBuilder != null ){
+		setUseRequired(htmlBuilder.use_required);
+		setFormID(htmlBuilder.form_id);
+		setActionName(htmlBuilder.action_name);
+		if( htmlBuilder.use_table_section != null ){
+			setTableSections(htmlBuilder.use_table_section);
+		}
+	}
 }
 
 
@@ -222,7 +230,11 @@ public ContentBuilder getPanel(String ... type)
 	return new Panel(this,classes.toString());
 }
 
-
+public ContentBuilder getPanel(String type)
+		throws UnsupportedOperationException {
+	
+	return new Panel(this,type);
+}
 public ContentBuilder addParent() throws UnsupportedOperationException {
 	return (ContentBuilder) appendParent();
 }

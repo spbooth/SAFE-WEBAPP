@@ -47,7 +47,7 @@ public class CompleteVisitor<D extends DynamicForm, R extends Response<D>> imple
 		this.response = response;
 	}
 
-	private final R response;
+	protected final R response;
 
 	public Boolean visitForm(D f) {
 		DynamicFormManager<D>fac = f.getManager();

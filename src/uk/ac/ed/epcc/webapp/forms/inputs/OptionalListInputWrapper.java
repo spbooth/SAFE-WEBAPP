@@ -26,7 +26,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
  */
 public class OptionalListInputWrapper<V,T> implements OptionalListInput<V, T> {
 	private ListInput<V,T> inner;
-	private String unselected="Not selected";
+	private String unselected="Not Selected";
 	private boolean is_optional=true;
 	public OptionalListInputWrapper(ListInput<V,T> inner){
 		this.inner=inner;
