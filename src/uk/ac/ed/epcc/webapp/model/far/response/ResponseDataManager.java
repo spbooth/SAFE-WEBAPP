@@ -109,8 +109,9 @@ public abstract class ResponseDataManager<D extends ResponseDataManager.Response
 
 		public String getDataAsString() throws Exception {
 			Input input = getQuestion().getInput();
-			String str = input.getPrettyString(getData());
-			if (str.equals("no value") || str == null) {
+			T data = getData();
+			String str = input.getPrettyString(data);
+			if (str==null || str.equals("no value")) {
 				str = "n/a";
 			}
 			return str;
