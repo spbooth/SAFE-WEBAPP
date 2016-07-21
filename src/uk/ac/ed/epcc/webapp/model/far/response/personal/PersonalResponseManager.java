@@ -113,7 +113,7 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 		}
 		
 		@Override
-		public MimeStreamData getPDFStream() throws DataException {
+		public MimeStreamData getDataStream() throws DataException {
 			return null;
 		}
 	}

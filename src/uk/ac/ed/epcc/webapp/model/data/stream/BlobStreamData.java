@@ -65,33 +65,36 @@ public class BlobStreamData implements StreamData {
 		}
 	}
 
-	public void read(InputStream in) throws DataFault {
+	public void read(InputStream in) throws DataFault, IOException {
 		OutputStream out = getOutputStream();
 		int i;
-		try {
-			while ((i = in.read()) != -1) {
-				out.write(i);
-			}
-			in.close();
-			out.close();
-		} catch (IOException e) {
-			throw new DataFault("error reading from stream", e);
+
+		while ((i = in.read()) != -1) {
+			out.write(i);
 		}
+		in.close();
+		out.close();
+
 
 	}
 
-	public void write(OutputStream out) throws DataFault {
+	public void write(OutputStream out) throws DataFault, IOException {
+		append(out);
+		out.close();
+
+	}
+
+	/**
+	 * @param out
+	 * @throws IOException
+	 */
+	public void append(OutputStream out) throws IOException {
 		InputStream in = getInputStream();
 		int i;
-		try {
-			while ((i = in.read()) != -1) {
-				out.write(i);
-			}
-			in.close();
-			out.close();
-		} catch (IOException e) {
-			throw new DataFault("error writing to stream", e);
-		}
 
+		while ((i = in.read()) != -1) {
+			out.write(i);
+		}
+		in.close();
 	}
 }

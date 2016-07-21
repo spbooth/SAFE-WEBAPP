@@ -72,5 +72,7 @@ public class MimeStreamDataWrapper implements MimeStreamData, DataSource {
 	public void write(OutputStream out) throws DataFault, IOException {
 		sd.write(out);
 	}
-
+	public void append(OutputStream out) throws DataFault, IOException {
+		sd.append(out);
+	}
 }

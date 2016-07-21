@@ -38,19 +38,29 @@ public abstract class AbstractStreamData implements StreamData {
 	}
 
 	public final void write(OutputStream out) throws DataFault, IOException {
+		append(out);
+		out.close();
+
+
+	}
+
+	/**
+	 * @param out
+	 * @throws DataFault
+	 * @throws IOException
+	 */
+	@Override
+	public final void append(OutputStream out) throws DataFault, IOException {
 		InputStream in = getInputStream();
 		if( in == null){
 			throw new DataFault("Cannot get input stream");
 		}
 		int i;
-		
-			while((i=in.read())!=-1){
-				out.write(i);
-			}
-			in.close();
-			out.close();
-		
-		
+
+		while((i=in.read())!=-1){
+			out.write(i);
+		}
+		in.close();
 	}
 
 	

@@ -60,12 +60,20 @@ public interface StreamData {
 	public void read(InputStream in) throws DataFault, IOException;
 
 	/**
-	 * write contents to an OutputStrean
+	 * write contents to an OutputStream and close
 	 * 
 	 * @param out
 	 *            OutputStream
 	 * @throws DataFault
 	 */
 	public void write(OutputStream out) throws DataFault, IOException;
+	/**
+	 * write contents to an OutputStream without closing.
+	 * 
+	 * @param out
+	 *            OutputStream
+	 * @throws DataFault
+	 */
+	public void append(OutputStream out) throws DataFault, IOException;
 
 }
