@@ -128,7 +128,10 @@ public class StreamDataDataManager<R extends Response<F>,F extends DynamicForm> 
 		public MimeStreamData getServeData() {
 			return getData();
 		}
-		
+		@Override
+		public boolean isAttchement() {
+			return true;
+		}
 	}
 
 	/* (non-Javadoc)
@@ -156,6 +159,8 @@ public class StreamDataDataManager<R extends Response<F>,F extends DynamicForm> 
 		spec.setField(MIME_FIELD, new StringFieldType(true, null, 64));
 		return spec;
 	}
+
+	
 
 	
 }

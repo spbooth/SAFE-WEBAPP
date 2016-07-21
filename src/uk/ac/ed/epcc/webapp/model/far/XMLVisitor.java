@@ -26,7 +26,7 @@ import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
 import uk.ac.ed.epcc.webapp.model.far.SectionManager.Section;
 import uk.ac.ed.epcc.webapp.model.far.handler.PartConfigFactory;
 
-/**
+/** A {@link PartVisitor} that generates a XML version of the form.
  * @author spb
  * @param <X> type of {@link XMLPrinter}
  * @see XMLFormParser

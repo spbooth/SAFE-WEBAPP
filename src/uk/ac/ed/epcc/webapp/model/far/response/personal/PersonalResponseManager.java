@@ -26,6 +26,7 @@ import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
+import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
 import uk.ac.ed.epcc.webapp.model.far.response.CompleteVisitor;
@@ -112,7 +113,7 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 		}
 		
 		@Override
-		public ByteArrayMimeStreamData getPDFStream() throws DataException {
+		public MimeStreamData getPDFStream() throws DataException {
 			return null;
 		}
 	}

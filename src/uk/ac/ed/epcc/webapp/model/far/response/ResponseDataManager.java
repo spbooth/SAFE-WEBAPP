@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.model.far.response;
 
 import java.util.Date;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
@@ -23,12 +24,11 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.LinkManager;
+import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
-import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
@@ -65,7 +65,7 @@ public abstract class ResponseDataManager<D extends ResponseDataManager.Response
 		 */
 		@Override
 		protected void setup() throws Exception {
-			// TODO Auto-generated method stub
+			
 			
 		}
 		/** return a {@link MimeStreamData} if the content can be served via a link
@@ -128,7 +128,9 @@ public abstract class ResponseDataManager<D extends ResponseDataManager.Response
 			}
 			return builder;
 		}
-
+		public boolean isAttchement(){
+			return false;
+		}
 	}
 	public D makeData(Question q, R response) throws Exception{
 		return makeLink(q, response);

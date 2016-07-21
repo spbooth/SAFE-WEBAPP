@@ -107,7 +107,7 @@ public abstract class ResponseManager<R extends ResponseManager.Response<F>,F ex
 		
 		public abstract boolean validate() throws Exception;
 		
-		public abstract ByteArrayMimeStreamData getPDFStream() throws DataException;
+		public abstract MimeStreamData getPDFStream() throws DataException;
 				
 	}
 
