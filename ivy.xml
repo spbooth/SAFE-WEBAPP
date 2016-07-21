@@ -86,8 +86,8 @@
     		<artifact name="mail" ext="jar"/>
 		</dependency>
 	
-		<dependency org="com.mysql" name="mysql-connector-java" rev="5.1.16">
-    		<artifact name="mysql-connector-java" m:classifier="bin" ext="jar"/>
+		<dependency org="com.mysql" name="mysql-connector-java" rev="5.1.39">
+    		<artifact name="mysql-connector-java" ext="jar"/>
 		</dependency>
 		
 		<dependency org="org.hamcrest" name="hamcrest-core" rev="1.3">

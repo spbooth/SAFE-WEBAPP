@@ -2765,9 +2765,11 @@ public final class Repository {
 				id_name = name;
 			} else {
 				// log.debug("Metadata "+name+" "+meta_data.getColumnType(i));
+				int columnType = meta_data.getColumnType(i);
+				int columnDisplaySize = meta_data.getColumnDisplaySize(i);
 				fields.put(dbFieldtoTag(name), new FieldInfo(name,
-						meta_data.getColumnType(i), meta_data
-								.getColumnDisplaySize(i), can_null));
+						columnType, 
+						columnDisplaySize, can_null));
 			}
 		}
 		if (use_id && !seen_key) {
