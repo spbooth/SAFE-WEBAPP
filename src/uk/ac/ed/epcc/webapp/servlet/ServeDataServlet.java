@@ -105,14 +105,14 @@ public class ServeDataServlet extends WebappServlet {
 				sb.append(s);
 			}
 		}
-		MimeStreamData msd = producer.getData(conn.getService(SessionService.class), args);
-		if( msd != null ){
-			String name=msd.getName();
-			if(name != null ){
-				sb.append("/");
-				sb.append(name);
-			}
-		}	
+		// If this is a dynamically generated object then try to use the more lightweight method
+		String name = producer.getDownloadName(conn.getService(SessionService.class), args);
+
+		if(name != null && name.length() > 0){
+			sb.append("/");
+			sb.append(name);
+		}
+			
 		
 		return sb.toString();
 	}

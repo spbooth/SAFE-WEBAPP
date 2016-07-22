@@ -412,6 +412,13 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 		return data;
 	}
 
+	public String getDownloadName(SessionService user, List<String> path) throws Exception{
+		MimeStreamData data = getData(user, path);
+		if( data == null){
+			return null;
+		}
+		return data.getName();
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.far.PartOwnerFactory#getChildTypeName()
 	 */

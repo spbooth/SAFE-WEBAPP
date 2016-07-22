@@ -220,6 +220,15 @@ public abstract class ResponseManager<R extends ResponseManager.Response<F>,F ex
  		}
 		return getWrapper(q, response).getServeData();
 	}
+	
+	public String getDownloadName(SessionService user, List<String> path) throws Exception{
+		MimeStreamData data = getData(user, path);
+		if( data == null ){
+			return null;
+		}
+		// Could add name method direct to wrapper but overhead is small.
+		return data.getName();
+	}
 
 	
 }

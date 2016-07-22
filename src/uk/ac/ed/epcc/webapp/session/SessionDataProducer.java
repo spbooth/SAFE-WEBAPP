@@ -142,6 +142,17 @@ public class SessionDataProducer implements SettableServeDataProducer {
 		}
 		
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.serv.ServeDataProducer#getDownloadName(uk.ac.ed.epcc.webapp.session.SessionService, java.util.List)
+	 */
+	@Override
+	public String getDownloadName(SessionService user, List<String> path) throws Exception {
+		MimeStreamData data = getData(user, path);
+		if( data == null ){
+			return null;
+		}
+		return data.getName();
+	}
 	
 
 }

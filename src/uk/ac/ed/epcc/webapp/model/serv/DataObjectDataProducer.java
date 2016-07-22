@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.table.BlobType;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
@@ -127,7 +128,14 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 			touch();
 		}		
 		public MimeStreamData getData() throws DataFault{
-		    return new MimeStreamDataWrapper(record.getStreamDataProperty(DATA),record.getStringProperty(MIME_TYPE),record.getStringProperty(NAME));
+		    return new MimeStreamDataWrapper(record.getStreamDataProperty(DATA),record.getStringProperty(MIME_TYPE),getName());
+		}
+
+		/**
+		 * @return
+		 */
+		public String getName() {
+			return record.getStringProperty(NAME);
 		}
 		
 		public boolean allow(SessionService<?> user){
@@ -161,9 +169,7 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 	}
 	
 
-	
-	public MimeStreamData getData(SessionService user, List<String> path)
-			throws Exception {
+	public MimeData getMimeData(SessionService user, List<String> path) throws Exception{
 		// Auto clean the table once per user session.
 		if( user != null && user.getAttribute(CLEANED_ATTR) == null){
 			clean();
@@ -174,9 +180,24 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 			return null;
 		}
 		d.touch();
+		return d;
+	}
+	public MimeStreamData getData(SessionService user, List<String> path)
+			throws Exception {
+		MimeData d = getMimeData(user, path);
+		if( d == null ){
+			return null;
+		}
 		return d.getData();
 	}
 
+	public String getDownloadName(SessionService user, List<String> path) throws Exception{
+		MimeData d = getMimeData(user, path);
+		if( d == null ){
+			return null;
+		}
+		return d.getName();
+	}
 	
 
 	

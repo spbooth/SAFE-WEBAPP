@@ -47,4 +47,17 @@ public interface ServeDataProducer extends Contexed,Tagged{
 	 */
 	public MimeStreamData getData(SessionService user, List<String> path) throws Exception;
 	
+	/** get a download file-name to be added to a download link.
+	 * 
+	 * This should be the same as the value returned by {@link MimeStreamData#getName()} if {@link #getData(SessionService, List)} returns a non-null value.
+	 * However this method may be called by display content generation code so if the result is generated on the fly it might be possible to generate the download name in
+	 * a more lightweight fashion. It should also work to always return null thought he browser will use the last part of the selection path as the download
+	 * 
+	 * @param user
+	 * @param path
+	 * @return
+	 * @throws Exception
+	 */
+	public String getDownloadName(SessionService user, List<String> path) throws Exception;
+	
 }
