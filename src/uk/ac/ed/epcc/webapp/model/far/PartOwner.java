@@ -39,6 +39,24 @@ public abstract class PartOwner extends DataObject {
 	 * @return the {@link DynamicForm}
 	 */
 	public abstract DynamicForm getForm();
+	
+	/** Get the local name for the object.
+	 * 
+	 * If the object has a parent this will be unique amongst siblings.
+	 * 
+	 * @return
+	 */
+	public abstract String getName();
+
+	
+	/** Get the qualified name for the object.
+	 * 
+	 * This will be the local name qualified by the name of its parent 
+	 * (if any) resulting in a globally unique name.
+	 * 
+	 * @return
+	 */
+	public abstract String getQualifiedName();
 	/** get a {@link FormResult} to view this object.
 	 * 
 	 * @return

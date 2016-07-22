@@ -129,6 +129,17 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		public O getOwner(){
 			return manager.owner_fac.find(getOwnerID());
 		}
+		
+		public final String getQualifiedName(){
+			O owner = getOwner();
+			if( owner instanceof Part){
+				// Use underscore so this is a valid property name
+				return owner.getQualifiedName()+"_"+getName();
+			}
+			// Don't want to include form name. Not needed
+			// but also does not correspond to name pattern
+			return getName();
+		}
 
 		/**
 		 * @return

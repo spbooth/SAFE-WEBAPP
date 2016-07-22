@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far.response;
 
+import java.util.Map;
+
 import uk.ac.ed.epcc.webapp.forms.BaseForm;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
@@ -33,6 +35,8 @@ import uk.ac.ed.epcc.webapp.model.far.response.ResponseDataManager.ResponseData;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
 
 /** visitor to check if the response to a part is complete.
+ * 
+ * Optionally it can also build a map of all the data it sees.
  * @author spb
  *
  */
@@ -43,11 +47,17 @@ public class CompleteVisitor<D extends DynamicForm, R extends Response<D>> imple
 	 * @param response
 	 */
 	public CompleteVisitor(R response) {
+		this(response,null);
+	}
+	public CompleteVisitor(R response,Map<String,Object> data){
 		super();
 		this.response = response;
+		this.data=data;
 	}
+	
 
 	protected final R response;
+	protected final Map<String,Object> data;
 
 	public Boolean visitForm(D f) {
 		DynamicFormManager<D>fac = f.getManager();
@@ -116,6 +126,16 @@ public class CompleteVisitor<D extends DynamicForm, R extends Response<D>> imple
 	@Override
 	public Boolean visitQuestion(Question q) {
 		if( q.isOptional()){
+			if( data != null ){
+				try {
+					ResponseData<Object, ? extends Response<D>,D> wrapper=response.getWrapper(q);
+					if( wrapper != null && wrapper.hasData()){
+						data.put(q.getQualifiedName(), wrapper.getData());
+					}
+				} catch (Exception e) {
+					getLogger()	.error("Error getting data", e);
+				}
+			}
 			return Boolean.TRUE;
 		}
 		ResponseData<Object, ? extends Response<D>,D> wrapper;
@@ -124,7 +144,14 @@ public class CompleteVisitor<D extends DynamicForm, R extends Response<D>> imple
 			if( wrapper == null){
 				return Boolean.FALSE;
 			}
-			return wrapper.hasData();
+			if( wrapper.hasData()){
+				if( data != null){
+					data.put(q.getQualifiedName(), wrapper.getData());
+					
+				}
+				return Boolean.TRUE;
+			}
+			return Boolean.FALSE;
 		} catch (Exception e) {
 			getLogger()	.error("Error checking completness", e);
 			return Boolean.FALSE;
@@ -138,6 +165,5 @@ public class CompleteVisitor<D extends DynamicForm, R extends Response<D>> imple
 	protected Logger getLogger() {
 		return response.getContext().getService(LoggerService.class).getLogger(getClass());
 	}
-	
 	
 }

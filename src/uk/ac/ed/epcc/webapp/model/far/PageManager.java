@@ -68,6 +68,7 @@ public class PageManager extends PartManager<DynamicFormManager.DynamicForm,Page
 			
 			return readOnly;
 		}
+
 		
 	}
 	/** create a {@link PageManager} 

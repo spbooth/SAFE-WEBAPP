@@ -73,7 +73,7 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 		boolean page_complete = (Boolean)p.visit(complete_viz);
 		boolean has_questions = (Boolean)p.visit(has_question_viz);
 		ContentBuilder block = builder.getPanel("dynamic_form_page", has_questions? (page_complete ? "complete" : "incomplete") : null );
-		block.addHeading(2, p.getTypeName() + ": " + p.getName());
+		block.addHeading(2, p.getName());
 		SectionManager manager = (SectionManager)((PageManager) p.getFactory()).getChildManager();
 		for( Section s : manager.getParts(p)){
 			boolean section_complete = (Boolean)s.visit(complete_viz);
@@ -88,7 +88,7 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 	}
 	public <C extends ContentBuilder> C visitSection(C builder, Section s) throws Exception{
 		
-		builder.addHeading(3, "Section: " + s.getName());
+		builder.addHeading(3,  s.getName());
 		builder.addText(s.getSectionText());
 		QuestionManager manager = (QuestionManager)((SectionManager) s.getFactory()).getChildManager();
 		t = new Table<String, Question>();

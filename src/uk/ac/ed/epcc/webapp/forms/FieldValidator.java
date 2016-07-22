@@ -16,13 +16,17 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms;
 
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 
 /**
  * Interface for an additional external validator that can be added to a Field.
  * 
- * Ad {@link FieldValidator}s are stored in Sets it is good practice to implement
+ * As {@link FieldValidator}s are stored in Sets it is good practice to implement
  * {@link #hashCode()} and {@link #equals(Object)}.
+ * 
+ * 
+ * Note that a {@link FieldValidator} could throw a {@link MissingFieldException} 
  * 
  * @author spb
  * @param <D> Type of input data
@@ -30,5 +34,5 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 public interface FieldValidator<D> {
 
 	public  void validate(D data)
-			throws ValidateException;
+			throws FieldException;
 }

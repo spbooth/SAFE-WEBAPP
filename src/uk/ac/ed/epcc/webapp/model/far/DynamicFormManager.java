@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.content.XMLPrinter;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.inputs.ClassInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInputWrapper;
+import uk.ac.ed.epcc.webapp.forms.inputs.PatternTextInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
@@ -222,6 +223,14 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 		}
 		void setCompleteVisitorTag(String tag){
 			record.setOptionalProperty(VALIDATING_VISITOR_FIELD, tag);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.far.PartOwner#getQualifiedName()
+		 */
+		@Override
+		public String getQualifiedName() {
+			return getName();
 		}
 		
 		

@@ -34,10 +34,10 @@ import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.CustomFormContent;
 import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ShowDisabledTransitions;
+import uk.ac.ed.epcc.webapp.forms.transition.TitleTransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.far.AbstractPartTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
@@ -63,7 +63,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 public class ResponseTransitionProvider<D extends DynamicForm,R extends Response<D>> extends
 	AbstractPartTransitionProvider<ResponseTarget<D, R>,ResponseTransitionKey<D, R>> 
-    implements ShowDisabledTransitions<ResponseTransitionKey<D, R>,ResponseTarget<D, R>> {
+    implements ShowDisabledTransitions<ResponseTransitionKey<D, R>,ResponseTarget<D, R>>, TitleTransitionFactory<ResponseTransitionKey<D, R>,ResponseTarget<D, R>> {
 
 	private final ResponseManager<R, D> manager;
 	
@@ -468,6 +468,32 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 			return ((ShowButton<D, R>)key).showButton(target, c.getService(SessionService.class));
 		}
 		return false;
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.TitleTransitionFactory#getTitle(java.lang.Object, java.lang.Object)
+	 */
+	@Override
+	public String getTitle(ResponseTransitionKey<D, R> key, ResponseTarget<D, R> target) {
+		if( key == null ){
+			return target.getResponse().getDescriptor()+": "+target.getPart().getSpacedName();
+		}
+		if( key == EDIT){
+			return "Edit "+target.getResponse().getDescriptor()+": "+target.getPart().getSpacedName();
+		}
+		return key.toString();
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.TitleTransitionFactory#getHeading(java.lang.Object, java.lang.Object)
+	 */
+	@Override
+	public String getHeading(ResponseTransitionKey<D, R> key, ResponseTarget<D, R> target) {
+		return getTitle(key, target);
 	}
 
 }
