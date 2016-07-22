@@ -16,8 +16,8 @@
 <Owner reference='TestFormsPageSection'/>
 <SortOrder type='Integer' nullable='false'/>
 <Name type='String' nullable='false' max='32'/>
-<QuestionText type='String' nullable='true' max='5592405'/>
 <HandlerType type='String' nullable='false' max='128'/>
+<QuestionText type='String' nullable='true' max='5592405'/>
 <Optional type='Boolean' nullable='false'/>
 <NameIndex type='Index' unique='true'><Column name='Owner'/><Column name='Name'/></NameIndex>
 </TableSpecification>
@@ -25,8 +25,8 @@
 <Owner>1</Owner>
 <SortOrder>1</SortOrder>
 <Name>FirstQuestion</Name>
-<QuestionText>Are you a skunk</QuestionText>
 <HandlerType>TextQuestion</HandlerType>
+<QuestionText>Are you a skunk</QuestionText>
 <Optional>false</Optional>
 </TestFormsPageSectionQuestion>
 <TableSpecification name='TestFormsPageSectionQuestionConfig'>

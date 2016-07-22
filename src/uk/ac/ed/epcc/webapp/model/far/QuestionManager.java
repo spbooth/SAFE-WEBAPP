@@ -19,7 +19,6 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.MapForm;
-import uk.ac.ed.epcc.webapp.forms.inputs.ClassInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
@@ -36,16 +35,13 @@ import uk.ac.ed.epcc.webapp.model.far.handler.QuestionFormHandler;
  *
  */
 
-public class QuestionManager extends PartManager<SectionManager.Section,QuestionManager.Question> {
+public class QuestionManager extends HandlerPartManager<SectionManager.Section,QuestionFormHandler,QuestionManager.Question> {
 
 	/**
 	 * 
 	 */
 	public static final String OPTIONAL_FIELD = "Optional";
-	/**
-	 * 
-	 */
-	public static final String HANDLER_TYPE_FIELD = "HandlerType";
+
 	/**
 	 * 
 	 */
@@ -54,7 +50,7 @@ public class QuestionManager extends PartManager<SectionManager.Section,Question
 	 * 
 	 */
 	public static final String QUESTION_TYPE_NAME = "Question";
-	public class Question extends PartManager.Part<SectionManager.Section> implements UIGenerator{
+	public class Question extends HandlerPartManager.HandlerPart<SectionManager.Section,QuestionFormHandler> implements UIGenerator{
 
 		
 		@Override
@@ -79,33 +75,18 @@ public class QuestionManager extends PartManager<SectionManager.Section,Question
 		void setQuestionText(String val){
 			record.setProperty(QUESTION_TEXT_FIELD, val);
 		}
-		private QuestionFormHandler handler = null;
-		@SuppressWarnings("unchecked")
-		public QuestionFormHandler getHandler() throws Exception{
-			if( handler == null ){
-				AppContext conn = getContext();
-				Class<? extends QuestionFormHandler> clazz = conn.getClassDef(QuestionFormHandler.class, getHandlerTag());
-				handler =  conn.makeObject(clazz);
-			}
-			return handler;
-		}
+		
 		
 
 		@Override
 		public Map<String, Object> getInfo() {
 			Map<String, Object> info = super.getInfo();
-			info.put("Handler", getHandlerTag());
 			info.put("Question text", getQuestionText());
 			info.put("Optional", isOptional()?"Optional":"Required");
 			return info;
 		}
 
-		protected String getHandlerTag() {
-			return record.getStringProperty(HANDLER_TYPE_FIELD);
-		}
-		void setHandlerTag(String tag){
-			record.setProperty(HANDLER_TYPE_FIELD, tag);
-		}
+		
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.far.PartManager.Part#visit(uk.ac.ed.epcc.webapp.model.far.PartVisitor)
 		 */
@@ -149,6 +130,8 @@ public class QuestionManager extends PartManager<SectionManager.Section,Question
 		public String getTypeName() {
 			return QUESTION_TYPE_NAME;
 		}
+
+		
 	}
 	/**
 	 * @param owner_fac
@@ -162,6 +145,13 @@ public class QuestionManager extends PartManager<SectionManager.Section,Question
 	@Override
 	protected DataObject makeBDO(Record res) throws DataFault {
 		return new Question(res);
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.far.HandlerPartManager.HandlerPart#getHandlerClass()
+	 */
+	@Override
+	protected Class<QuestionFormHandler> getHandlerClass() {
+		return QuestionFormHandler.class;
 	}
 	@Override
 	public Class<? super Question> getTarget() {
@@ -180,19 +170,12 @@ public class QuestionManager extends PartManager<SectionManager.Section,Question
 			String table) {
 		TableSpecification spec = super.getDefaultTableSpecification(c, table);
 		spec.setField(QUESTION_TEXT_FIELD, new StringFieldType(false, "", 4096));
-		spec.setField(HANDLER_TYPE_FIELD, new StringFieldType(false, "", 128));
 		spec.setField(OPTIONAL_FIELD, new BooleanFieldType(false, false));
 		return spec;
 	}
 	@Override
 	protected PartConfigFactory<Section, Question> makeConfigFactory() {
 		return new PartConfigFactory<SectionManager.Section, QuestionManager.Question>(this);
-	}
-	@Override
-	protected Map<String, Object> getSelectors() {
-		Map<String, Object> selectors = super.getSelectors();
-		selectors.put(HANDLER_TYPE_FIELD, new ClassInput<QuestionFormHandler>(getContext(), QuestionFormHandler.class));
-		return selectors;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.far.PartManager#getChildTypeName()
@@ -206,7 +189,6 @@ public class QuestionManager extends PartManager<SectionManager.Section,Question
 		Question duplicate = super.duplicate(new_owner, original);
 		duplicate.setOptional(original.isOptional());
 		duplicate.setQuestionText(original.getQuestionText());
-		duplicate.setHandlerTag(original.getHandlerTag());
 		return duplicate;
 	}
 

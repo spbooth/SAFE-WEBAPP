@@ -15,8 +15,8 @@
 <Owner>1</Owner>
 <SortOrder>2</SortOrder>
 <Name>SecondQuestion</Name>
-<QuestionText>Are you a skunk yes/no</QuestionText>
 <HandlerType>BooleanQuestion</HandlerType>
+<QuestionText>Are you a skunk yes/no</QuestionText>
 <Optional>false</Optional>
 </TestFormsPageSectionQuestion>
 </Diff>

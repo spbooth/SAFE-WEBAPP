@@ -15,8 +15,8 @@
 <Owner>1</Owner>
 <SortOrder>3</SortOrder>
 <Name>ThirdQuestion</Name>
-<QuestionText>Upload file</QuestionText>
 <HandlerType>FileQuestion</HandlerType>
+<QuestionText>Upload file</QuestionText>
 <Optional>true</Optional>
 </TestFormsPageSectionQuestion>
 </Diff>

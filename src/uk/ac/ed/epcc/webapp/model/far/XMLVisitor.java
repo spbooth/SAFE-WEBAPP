@@ -20,6 +20,7 @@ import uk.ac.ed.epcc.webapp.content.XMLPrinter;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.far.HandlerPartManager.HandlerPart;
 import uk.ac.ed.epcc.webapp.model.far.PageManager.Page;
 import uk.ac.ed.epcc.webapp.model.far.PartManager.Part;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
@@ -83,7 +84,12 @@ public class XMLVisitor<X extends XMLPrinter> implements PartVisitor<X> {
 	}
 	private <P extends Part> X closePart(P part) {
 		try{
-			
+			if( part instanceof HandlerPart){
+				HandlerPart h = (HandlerPart) part;
+				printer.open(HandlerPartManager.HANDLER_TYPE_FIELD);
+				printer.clean(h.getHandlerTag());
+				printer.close();
+			}
 			PartManager my_manager = (PartManager) part.getFactory();
 			visitOwner(my_manager, part);
 			PartConfigFactory config = my_manager.getConfigFactory();
@@ -136,9 +142,6 @@ public class XMLVisitor<X extends XMLPrinter> implements PartVisitor<X> {
 		question.attr(QuestionManager.OPTIONAL_FIELD, Boolean.toString(q.isOptional()));
 		question.open(QuestionManager.QUESTION_TEXT_FIELD);
 		question.clean(q.getQuestionText());
-		question.close();
-		question.open(QuestionManager.HANDLER_TYPE_FIELD);
-		question.clean(q.getHandlerTag());
 		question.close();
 		return closePart(q);
 	}

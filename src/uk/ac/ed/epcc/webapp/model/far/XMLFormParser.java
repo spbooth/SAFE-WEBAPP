@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
+import uk.ac.ed.epcc.webapp.model.far.HandlerPartManager.HandlerPart;
 import uk.ac.ed.epcc.webapp.model.far.PartManager.Part;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
 import uk.ac.ed.epcc.webapp.model.far.SectionManager.Section;
@@ -175,25 +176,27 @@ public class XMLFormParser implements Contexed, ContentHandler {
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		try{
-		if( owner instanceof Section){
-			
-			Section section = (Section)owner;
-			if( qName.equals(SectionManager.SECTION_TEXT_FIELD)){
-				section.setSectionText(text.toString());
-			}else if( qName.equals(SectionManager.SECTION_RAW_HTML_FIELD)){
-				section.setSectionRawHtml(text.toString());
+			if( owner instanceof HandlerPart && qName.equals(HandlerPartManager.HANDLER_TYPE_FIELD)){
+				HandlerPart part = (HandlerPart) owner;
+				part.setHandlerTag(text.toString());
+				part.commit();
+			}else if( owner instanceof Section){
+
+				Section section = (Section)owner;
+				if( qName.equals(SectionManager.SECTION_TEXT_FIELD)){
+					section.setSectionText(text.toString());
+				}else if( qName.equals(SectionManager.SECTION_RAW_HTML_FIELD)){
+					section.setSectionRawHtml(text.toString());
+				}
+				section.commit();
+			}else if( owner instanceof Question){
+
+				Question question=(Question)owner;
+				if( qName.equals(QuestionManager.QUESTION_TEXT_FIELD)){
+					question.setQuestionText(text.toString());
+				}
+				question.commit();
 			}
-			section.commit();
-		}else if( owner instanceof Question){
-			
-			Question question=(Question)owner;
-			if( qName.equals(QuestionManager.HANDLER_TYPE_FIELD)){
-				question.setHandlerTag(text.toString());
-			}else if( qName.equals(QuestionManager.QUESTION_TEXT_FIELD)){
-				question.setQuestionText(text.toString());
-			}
-			question.commit();
-		}
 		}catch(Exception e){
 			throw new SAXException(e);
 		}
