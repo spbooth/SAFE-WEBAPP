@@ -17,6 +17,10 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.XMLPrinter;
+import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.FormValidator;
+import uk.ac.ed.epcc.webapp.forms.MapForm;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -24,13 +28,19 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.far.PageManager.Page;
+import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
+import uk.ac.ed.epcc.webapp.model.far.SectionManager.Section;
+import uk.ac.ed.epcc.webapp.model.far.handler.PartConfigFactory;
+import uk.ac.ed.epcc.webapp.model.far.handler.QuestionFormHandler;
+import uk.ac.ed.epcc.webapp.model.far.handler.SectionFormHandler;
+import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
 
 /**
  * @author spb
  *
  */
 
-public class SectionManager extends PartManager<PageManager.Page,SectionManager.Section> {
+public class SectionManager extends HandlerPartManager<PageManager.Page,SectionFormHandler,SectionManager.Section> {
 
 	/**
 	 * 
@@ -42,7 +52,7 @@ public class SectionManager extends PartManager<PageManager.Page,SectionManager.
 	 * 
 	 */
 	public static final String SECTION_TYPE_NAME = "Section";
-	public class Section extends PartManager.Part<PageManager.Page>{
+	public class Section extends HandlerPartManager.HandlerPart<PageManager.Page,SectionFormHandler>{
 
 		
 
@@ -106,7 +116,18 @@ public class SectionManager extends PartManager<PageManager.Page,SectionManager.
 		public boolean isReadOnly() {
 			return getSectionReadOnly();
 		}
-		
+		public <R extends Response> FormValidator getValidator(R response) throws Exception{
+			
+			SectionFormHandler handler = getHandler();
+			handler.setSection(this, response);
+			Form f = new MapForm(getContext());
+			if( handler.hasConfig()){
+				handler.buildConfigForm(f);
+				PartConfigFactory<Page, Section> config_fac = getConfigFactory();
+				f.setContents(config_fac.getValues(this));	
+			}
+			return handler.parseConfiguration(f);
+		}
 	}
 	/**
 	 * @param owner_fac
@@ -159,6 +180,13 @@ public class SectionManager extends PartManager<PageManager.Page,SectionManager.
 			result.setSectionRawHtml(raw.toString());
 		}
 		return result;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.far.HandlerPartManager#getHandlerClass()
+	 */
+	@Override
+	protected Class<SectionFormHandler> getHandlerClass() {
+		return SectionFormHandler.class;
 	}
 
 }

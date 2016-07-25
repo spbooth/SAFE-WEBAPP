@@ -13,6 +13,9 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far.response;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
@@ -70,26 +73,37 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 		// If the part contains questions add the
 		// complete/incomplete classes
 		//
+		
 		boolean page_complete = (Boolean)p.visit(complete_viz);
 		boolean has_questions = (Boolean)p.visit(has_question_viz);
 		ContentBuilder block = builder.getPanel("dynamic_form_page", has_questions? (page_complete ? "complete" : "incomplete") : null );
 		block.addHeading(2, p.getName());
 		SectionManager manager = (SectionManager)((PageManager) p.getFactory()).getChildManager();
 		for( Section s : manager.getParts(p)){
+			Map<String,String> errors = new LinkedHashMap<String,String>();
+			complete_viz.setErrors(errors);
 			boolean section_complete = (Boolean)s.visit(complete_viz);
 			boolean section_has_questions = (Boolean)s.visit(has_question_viz);
 			ContentBuilder section_block = block.getPanel("dynamic_form_section",section_has_questions ? (section_complete ? "complete" : "incomplete"): null);
-			visitSection(section_block, s);
+			complete_viz.setErrors(null);
+			visitSection(section_block,errors, s);
 			section_block.addParent();
 		}
 		block.addParent();
 		
 		return builder;
 	}
-	public <C extends ContentBuilder> C visitSection(C builder, Section s) throws Exception{
+	public <C extends ContentBuilder> C visitSection(C builder, Map<String,String> errors, Section s) throws Exception{
 		
 		builder.addHeading(3,  s.getName());
 		builder.addText(s.getSectionText());
+		if( errors != null && ! errors.isEmpty()){
+			C warnings = (C) builder.getPanel("warn");
+			for(String error : errors.values()){
+				warnings.addText(error);
+			}
+			warnings.addParent();
+		}
 		QuestionManager manager = (QuestionManager)((SectionManager) s.getFactory()).getChildManager();
 		t = new Table<String, Question>();
 		for( Question q : manager.getParts(s)){
@@ -170,7 +184,7 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 	@Override
 	public final X visitSection(Section s) {
 		try {
-			return visitSection(cb, s);
+			return visitSection(cb, null,s);
 		} catch (Exception e) {
 			getLogger().error("problem formatting section",e);
 		}

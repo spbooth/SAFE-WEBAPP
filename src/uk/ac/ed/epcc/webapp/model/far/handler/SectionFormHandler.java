@@ -14,6 +14,8 @@
 package uk.ac.ed.epcc.webapp.model.far.handler;
 
 import uk.ac.ed.epcc.webapp.forms.FormValidator;
+import uk.ac.ed.epcc.webapp.model.far.SectionManager.Section;
+import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
 
 /** Interface for classes that add {@link FormValidator}s to section forms.
  * @author spb
@@ -22,4 +24,13 @@ import uk.ac.ed.epcc.webapp.forms.FormValidator;
 
 public interface SectionFormHandler extends FormHandler<FormValidator> {
 	
+	/** Inform the handler of the section and response it is being applied to.
+	 * 
+	 * The {@link Response} is supplied to allow access to the global response state
+	 * this allows cross section validation rules to be constructed. 
+	 * 
+	 * @param s
+	 * @param response
+	 */
+	public void setSection(Section s, Response response);
 }

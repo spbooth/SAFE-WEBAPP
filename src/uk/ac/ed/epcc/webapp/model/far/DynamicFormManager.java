@@ -225,14 +225,6 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 			record.setOptionalProperty(VALIDATING_VISITOR_FIELD, tag);
 		}
 
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.model.far.PartOwner#getQualifiedName()
-		 */
-		@Override
-		public String getQualifiedName() {
-			return getName();
-		}
-		
 		
 	}
 	/**

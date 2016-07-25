@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far.response;
 
+import java.util.Map;
+
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.model.far.SectionManager.Section;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
@@ -37,9 +39,9 @@ public class EditSectionVisitor<X extends ContentBuilder> extends ContentVisitor
 		this.prov=provider;
 	}
 
-	
-	public <C extends ContentBuilder> C visitSection(C builder, Section s) throws Exception{
-		builder = super.visitSection(builder, s);
+	@Override
+	public <C extends ContentBuilder> C visitSection(C builder, Map<String,String> errors,Section s) throws Exception{
+		builder = super.visitSection(builder,errors, s);
 		if( prov != null && response.canEdit(sess) ){
 			// go straight to edit transition from page view
 			ContentBuilder buttons =  builder.getPanel("action_buttons");

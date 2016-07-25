@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far.response;
 
+import java.util.Map;
+
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.Control;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
@@ -55,9 +57,9 @@ public class SectionEditVisitor<X extends ContentBuilder> extends ContentVisitor
 		}
 	}
 	@Override
-	public <C extends ContentBuilder> C visitSection(C builder, Section s)
+	public <C extends ContentBuilder> C visitSection(C builder,Map<String,String> errors, Section s)
 			throws Exception {
-		super.visitSection(builder, s);
+		super.visitSection(builder,errors, s);
 		XMLPrinter raw = s.getSectionRawHtml();
 		if( raw != null && builder instanceof HtmlBuilder){
 			((HtmlBuilder)builder).append(raw);

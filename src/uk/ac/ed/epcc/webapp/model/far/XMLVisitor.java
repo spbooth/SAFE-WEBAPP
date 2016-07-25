@@ -17,9 +17,7 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.XMLPrinter;
-import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.far.HandlerPartManager.HandlerPart;
 import uk.ac.ed.epcc.webapp.model.far.PageManager.Page;
 import uk.ac.ed.epcc.webapp.model.far.PartManager.Part;
@@ -33,7 +31,7 @@ import uk.ac.ed.epcc.webapp.model.far.handler.PartConfigFactory;
  * @see XMLFormParser
  *
  */
-public class XMLVisitor<X extends XMLPrinter> implements PartVisitor<X> {
+public class XMLVisitor<X extends XMLPrinter> extends AbstractPartVisitor<X> implements PartVisitor<X> {
 	/**
 	 * 
 	 */
@@ -48,14 +46,10 @@ public class XMLVisitor<X extends XMLPrinter> implements PartVisitor<X> {
 	public static final String CONFIG_ELEMENT = "Config";
 
 	public XMLVisitor(AppContext conn,X pr) {
-		super();
+		super(conn);
 		this.printer = pr;
-		this.conn=conn;
-		this.log = conn.getService(LoggerService.class).getLogger(getClass());
 	}
 
-	private final AppContext conn;
-	private final Logger log;
 	private X printer;
 
 	/* (non-Javadoc)
@@ -73,14 +67,6 @@ public class XMLVisitor<X extends XMLPrinter> implements PartVisitor<X> {
 		part.attr(PartManager.ORDER_FIELD,p.getSortOrder().toString());
 		printer=part;
 		return part;
-	}
-	public <O extends PartOwner> void visitOwner(PartOwnerFactory<O> my_manager, O owner) throws DataFault{
-		PartManager<O,?> manager = my_manager.getChildManager();
-		if( manager != null ){
-			for(Part child : manager.getParts(owner)){
-				child.visit(this);
-			}
-		}
 	}
 	private <P extends Part> X closePart(P part) {
 		try{

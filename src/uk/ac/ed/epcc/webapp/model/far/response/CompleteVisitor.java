@@ -13,10 +13,12 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far.response;
 
+import java.util.Collection;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.forms.BaseForm;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.MapForm;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -47,17 +49,14 @@ public class CompleteVisitor<D extends DynamicForm, R extends Response<D>> imple
 	 * @param response
 	 */
 	public CompleteVisitor(R response) {
-		this(response,null);
-	}
-	public CompleteVisitor(R response,Map<String,Object> data){
 		super();
 		this.response = response;
-		this.data=data;
 	}
 	
 
 	protected final R response;
-	protected final Map<String,Object> data;
+	private Collection<String> missing_fields=null;
+	private Map<String,String> errors=null;
 
 	public Boolean visitForm(D f) {
 		DynamicFormManager<D>fac = f.getManager();
@@ -101,7 +100,7 @@ public class CompleteVisitor<D extends DynamicForm, R extends Response<D>> imple
 	public Boolean visitSection(Section s) {
 		SectionManager fac = (SectionManager) s.getFactory();
 		try {
-			Form f = new BaseForm(s.getContext());
+			MapForm f = new MapForm(s.getContext());
 			for(Question q : ((QuestionManager)fac.getChildManager()).getParts(s)){
 				if( ! visitQuestion(q)){
 					return Boolean.FALSE;
@@ -113,7 +112,7 @@ public class CompleteVisitor<D extends DynamicForm, R extends Response<D>> imple
 				input.setValue(response.getData(q));
 				f.addInput(q.getName(), q.getQuestionText(), input);
 			}
-			return f.validate();
+			return f.validate(missing_fields,errors);
 		} catch (Exception e) {
 			getLogger()	.error("Error checking completness", e);
 			return Boolean.FALSE;
@@ -126,16 +125,6 @@ public class CompleteVisitor<D extends DynamicForm, R extends Response<D>> imple
 	@Override
 	public Boolean visitQuestion(Question q) {
 		if( q.isOptional()){
-			if( data != null ){
-				try {
-					ResponseData<Object, ? extends Response<D>,D> wrapper=response.getWrapper(q);
-					if( wrapper != null && wrapper.hasData()){
-						data.put(q.getQualifiedName(), wrapper.getData());
-					}
-				} catch (Exception e) {
-					getLogger()	.error("Error getting data", e);
-				}
-			}
 			return Boolean.TRUE;
 		}
 		ResponseData<Object, ? extends Response<D>,D> wrapper;
@@ -145,10 +134,6 @@ public class CompleteVisitor<D extends DynamicForm, R extends Response<D>> imple
 				return Boolean.FALSE;
 			}
 			if( wrapper.hasData()){
-				if( data != null){
-					data.put(q.getQualifiedName(), wrapper.getData());
-					
-				}
 				return Boolean.TRUE;
 			}
 			return Boolean.FALSE;
@@ -164,6 +149,26 @@ public class CompleteVisitor<D extends DynamicForm, R extends Response<D>> imple
 	 */
 	protected Logger getLogger() {
 		return response.getContext().getService(LoggerService.class).getLogger(getClass());
+	}
+
+
+	public Collection<String> getMissingFields() {
+		return missing_fields;
+	}
+
+
+	public void setMissingFields(Collection<String> missing_fields) {
+		this.missing_fields = missing_fields;
+	}
+
+
+	public Map<String, String> getErrors() {
+		return errors;
+	}
+
+
+	public void setErrors(Map<String, String> errors) {
+		this.errors = errors;
 	}
 	
 }

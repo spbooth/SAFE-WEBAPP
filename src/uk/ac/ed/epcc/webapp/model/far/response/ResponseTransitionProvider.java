@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.FormValidator;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
@@ -48,6 +49,7 @@ import uk.ac.ed.epcc.webapp.model.far.QuestionManager;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
 import uk.ac.ed.epcc.webapp.model.far.SectionManager;
 import uk.ac.ed.epcc.webapp.model.far.SectionManager.Section;
+import uk.ac.ed.epcc.webapp.model.far.handler.SectionFormHandler;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -287,6 +289,10 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 					}
 					input.setValue(response.getData(q));
 					f.addInput(q.getName(), q.getQuestionText(), input);
+				}
+				FormValidator val = s.getValidator(response);
+				if( val != null ){
+					f.addValidator(val);
 				}
 				f.addAction("Submit", new EditAction(target));
 				f.addAction("Cancel", new CancelAction(target));
