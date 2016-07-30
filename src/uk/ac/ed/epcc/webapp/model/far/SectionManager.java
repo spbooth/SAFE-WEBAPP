@@ -20,7 +20,6 @@ import uk.ac.ed.epcc.webapp.content.XMLPrinter;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.FormValidator;
 import uk.ac.ed.epcc.webapp.forms.MapForm;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -28,10 +27,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.far.PageManager.Page;
-import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
-import uk.ac.ed.epcc.webapp.model.far.SectionManager.Section;
 import uk.ac.ed.epcc.webapp.model.far.handler.PartConfigFactory;
-import uk.ac.ed.epcc.webapp.model.far.handler.QuestionFormHandler;
 import uk.ac.ed.epcc.webapp.model.far.handler.SectionFormHandler;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
 
@@ -40,7 +36,7 @@ import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
  *
  */
 
-public class SectionManager extends HandlerPartManager<PageManager.Page,SectionFormHandler,SectionManager.Section> {
+public class SectionManager extends HandlerPartManager<PageManager.Page,uk.ac.ed.epcc.webapp.model.far.handler.SectionFormHandler,SectionManager.Section> {
 
 	/**
 	 * 
@@ -52,7 +48,7 @@ public class SectionManager extends HandlerPartManager<PageManager.Page,SectionF
 	 * 
 	 */
 	public static final String SECTION_TYPE_NAME = "Section";
-	public class Section extends HandlerPartManager.HandlerPart<PageManager.Page,SectionFormHandler>{
+	public class Section extends HandlerPartManager.HandlerPart<PageManager.Page,uk.ac.ed.epcc.webapp.model.far.handler.SectionFormHandler>{
 
 		
 
