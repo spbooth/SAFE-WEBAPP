@@ -115,6 +115,9 @@ public class SectionManager extends HandlerPartManager<PageManager.Page,uk.ac.ed
 		public <R extends Response> FormValidator getValidator(R response) throws Exception{
 			
 			SectionFormHandler handler = getHandler();
+			if( handler == null ){
+				return null;
+			}
 			handler.setSection(this, response);
 			Form f = new MapForm(getContext());
 			if( handler.hasConfig()){
