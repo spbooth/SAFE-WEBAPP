@@ -106,7 +106,14 @@ public abstract class HandlerPartManager<O extends PartOwner, X extends FormHand
 		@Override
 		public boolean hasConfig() {
 			try {
-				return super.hasConfig() && getHandler().hasConfig();
+				if( ! super.hasConfig()){
+					return false;
+				}
+				X h = getHandler();
+				if( h == null ){
+					return false;
+				}
+				return h.hasConfig();
 			} catch (Exception e) {
 				getLogger().error("Error checking for config",e);
 				return false;

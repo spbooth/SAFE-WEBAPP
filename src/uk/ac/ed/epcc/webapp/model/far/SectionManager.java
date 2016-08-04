@@ -187,5 +187,8 @@ public class SectionManager extends HandlerPartManager<PageManager.Page,uk.ac.ed
 	protected Class<SectionFormHandler> getHandlerClass() {
 		return SectionFormHandler.class;
 	}
-
+	@Override
+	protected boolean requireHandler(){
+		return false;
+	}
 }
