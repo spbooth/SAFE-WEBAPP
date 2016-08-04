@@ -550,12 +550,18 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			}
 			result.open("textarea");
 			result.attr("rows",Integer.toString(rows));
-			result.attr("wrap","soft");
+			if( use_html5 ){
+				result.attr("wrap","soft");
+			}
 			result.attr("cols",Integer.toString(size));
 			result.attr("name", name );
 			result.attr("class","input");
 			if( id != null ){
 				result.attr("id", id);
+			}
+			if( use_html5 && max_result_length > 0){
+				// html5 allows maxlen in textarea
+				result.attr("maxlen",Integer.toString(max_result_length));
 			}
 			if( use_html5 && use_required ){
 				if( ! (input instanceof OptionalInput) || ! ((OptionalInput) input).isOptional()){
