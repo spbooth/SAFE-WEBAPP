@@ -85,8 +85,9 @@ public class XMLDataUtils implements Contexed{
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 * @throws IOException
+	 * @throws DataFault 
 	 */
-	public void readFixtures(Class clazz, String ... fixtures) throws ParserConfigurationException, SAXException, IOException{
+	public void readFixtures(Class clazz, String ... fixtures) throws ParserConfigurationException, SAXException, IOException, DataFault{
 		AppContext c = getContext();
 		XMLReader r = getXMLReader();
 		TimerService serv = c.getService(TimerService.class);
@@ -101,7 +102,7 @@ public class XMLDataUtils implements Contexed{
 			if( stm != null ){
 				r.parse(new InputSource(stm));
 			}else{
-				System.out.println("Resource not found "+fixture_name);
+				throw new DataFault("Resource not found "+fixture_name);
 			}
 			if( serv != null ){
 				serv.stopTimer(fixtures[i]);
