@@ -73,6 +73,7 @@ public class Dumper implements Contexed{
 	public static final String BLOB_TYPE ="Blob";
 	public static final String INDEX_TYPE="Index";
 	public static final String REFERENCE_ATTR = "reference";
+	public static final String DEFAULT_ATTR ="default"; // This can't be generated easily but this is the attribute the parser understands
 	public static final String TYPE_ATTR = "type";
 	public static final String MAX_ATTR = "max";
 	public static final String NULLABLE_ATTR = "nullable";
