@@ -279,6 +279,7 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 		}else if( state == State.Schema && spec != null){
 			String type = arg3.getValue(Dumper.TYPE_ATTR);
 			String ref = arg3.getValue(Dumper.REFERENCE_ATTR);
+			String def = arg3.getValue(Dumper.DEFAULT_ATTR);
 			if( ref != null ){
 				spec.setField(name,new ReferenceFieldType(ref));
 			}else if( type.equals(Dumper.INDEX_TYPE)){
@@ -291,21 +292,30 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 				}
 			}else{
 				boolean nullable= Boolean.parseBoolean(arg3.getValue(Dumper.NULLABLE_ATTR));
+				
 				if( type.equals(Dumper.STRING_TYPE)){
 					int max = Integer.parseInt(arg3.getValue(Dumper.MAX_ATTR));
-					spec.setField(name, new StringFieldType(nullable, nullable? null : "", max));
+					spec.setField(name, new StringFieldType(nullable, nullable? null : def != null ? def : "", max));
 				}else if( type.equals(Dumper.BOOLEAN_TYPE)){
-					spec.setField(name, new BooleanFieldType(nullable, false));
+					spec.setField(name, new BooleanFieldType(nullable,def != null ? Boolean.valueOf(def) : false));
 				}else if( type.equals(Dumper.DATE_TYPE)){
 					spec.setField(name,new DateFieldType(nullable, null));
 				}else if(type.equals(Dumper.INTEGER_TYPE)){
-					spec.setField(name,new IntegerFieldType(nullable, nullable? null : 0));
+					Integer default_val = nullable? null : 0;
+					if( def != null ) default_val = new Integer(def);
+					spec.setField(name,new IntegerFieldType(nullable, default_val));
 				}else if( type.equals(Dumper.LONG_TYPE)){
-					spec.setField(name,new LongFieldType(nullable, nullable? null : 0L));
+					Long default_val = nullable? null : 0L;
+					if( def != null) default_val = new Long(def);
+					spec.setField(name,new LongFieldType(nullable, default_val));
 				}else if( type.equals(Dumper.FLOAT_TYPE)){
-					spec.setField(name,new FloatFieldType(nullable, nullable ? null : 0.0F));
+					Float default_val = nullable ? null : 0.0F;
+					if( def != null ) default_val = new Float(def);
+					spec.setField(name,new FloatFieldType(nullable, default_val));
 				}else if( type.equals(Dumper.DOUBLE_TYPE)){
-					spec.setField(name,new DoubleFieldType(nullable, nullable ? null : 0.0));
+					Double default_val = nullable ? null : 0.0;
+					if( def != null) default_val = new Double(def);
+					spec.setField(name,new DoubleFieldType(nullable, default_val));
 				}else if( type.equals(Dumper.BLOB_TYPE)){
 					spec.setField(name, new BlobType());
 				}else{
