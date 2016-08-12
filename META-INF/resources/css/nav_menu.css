@@ -1,3 +1,6 @@
+body{
+	margin: 0;
+}
 /* The nav div reserves space for the fixed navigation bar in the
  * default top position. This allows the top of the page content to
  * be seen.

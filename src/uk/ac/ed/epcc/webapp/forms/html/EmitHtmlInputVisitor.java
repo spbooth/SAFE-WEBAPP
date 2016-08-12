@@ -490,7 +490,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 				result.attr("size",Integer.toString(size));
 			}
 			if( max_result_length > 0){
-				result.attr("maxlen",Integer.toString(max_result_length));
+				result.attr("maxlength",Integer.toString(max_result_length));
 			}
 			result.attr("name", name );
 			if (default_value != null && default_value.length() > 0) {
@@ -561,7 +561,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			}
 			if( use_html5 && max_result_length > 0){
 				// html5 allows maxlen in textarea
-				result.attr("maxlen",Integer.toString(max_result_length));
+				result.attr("maxlength",Integer.toString(max_result_length));
 			}
 			if( use_html5 && use_required ){
 				if( ! (input instanceof OptionalInput) || ! ((OptionalInput) input).isOptional()){
