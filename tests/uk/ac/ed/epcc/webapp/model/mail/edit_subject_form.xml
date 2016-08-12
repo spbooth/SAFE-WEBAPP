@@ -17,7 +17,7 @@
 <div class="message">
 <h4>To: fred@example.com</h4>
 <h4>From: dummy@example.com</h4>
-<input type="text" size="64" maxlen="255" name="text" class="input" required="required"/>
+<input type="text" size="64" maxlength="255" name="text" class="input" required="required"/>
 <fieldset class="action_buttons">
 <input class="input_button" type="submit" name="Update" value="Update"/>
 </fieldset>

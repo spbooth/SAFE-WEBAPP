@@ -19,7 +19,7 @@
 <h4>CC: boris@example.xcom</h4>
 <h4>From: dummy@example.com</h4>
 <h4>Subject: to change</h4>
-<textarea rows="24" wrap="soft" cols="80" name="text" class="input" maxlen="81920" required="required"/>
+<textarea rows="24" wrap="soft" cols="80" name="text" class="input" maxlength="81920" required="required"/>
 <fieldset class="action_buttons">
 <input class="input_button" type="submit" name="Update" value="Update"/>
 </fieldset>

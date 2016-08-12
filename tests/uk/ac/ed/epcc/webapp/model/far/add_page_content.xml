@@ -23,7 +23,7 @@
 					<label class='required'>Name</label>
 				</th>
 				<td>
-					<input type='text' size='32' maxlen='32' name='Name' class='input'
+					<input type='text' size='32' maxlength='32' name='Name' class='input'
 						required='required' />
 				</td>
 			</tr>
