@@ -52,6 +52,7 @@ public abstract class BaseSQLCombineFilter<T> extends BaseCombineFilter<T> imple
 	}
 	
 	public final BaseSQLCombineFilter<T> addFilter(SQLFilter<? super T> fil){
+		assert( fil != this ); // probably a typo
 		return (BaseSQLCombineFilter<T>) super.add(fil,true);
 	}
 	public final void accept(T o) {
