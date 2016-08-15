@@ -61,7 +61,7 @@ public interface FilterVisitor<X,T> {
 	 * @return
 	 * @throws Exception
 	 */
-	public X visitOrFiler(OrFilter<? super T> fil) throws Exception;
+	public X visitOrFilter(OrFilter<? super T> fil) throws Exception;
 	/** process a pure {@link OrderFilter}. Objects that accept via this method.
 	 * should also implement {@link SQLFilter}
 	 * 

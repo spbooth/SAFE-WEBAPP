@@ -132,8 +132,13 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFiler(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
 			 */
 			@Override
-			public Boolean visitOrFiler(OrFilter<? super T> fil) throws Exception {
-				addAccept(fil);
+			public Boolean visitOrFilter(OrFilter<? super T> fil) throws Exception {
+				if( fil.nonSQL()){
+					addAccept(fil);
+				}else{
+					// Add in as SQL by preference
+					FilterConverter.convert(fil).acceptVisitor(this);
+				}
 				return null;
 			}
 

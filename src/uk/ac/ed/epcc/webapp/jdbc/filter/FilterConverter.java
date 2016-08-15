@@ -91,7 +91,7 @@ public class FilterConverter<T> implements FilterVisitor<SQLFilter<T>, T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFiler(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
 	 */
 	@Override
-	public SQLFilter<T> visitOrFiler(OrFilter<? super T> fil) throws Exception {
+	public SQLFilter<T> visitOrFilter(OrFilter<? super T> fil) throws Exception {
 		return (SQLFilter<T>) fil.getSQLFilter();
 	}
 

@@ -166,7 +166,7 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFiler(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
 		 */
 		@Override
-		public StringBuilder visitOrFiler(OrFilter<? super T> fil) throws Exception {
+		public StringBuilder visitOrFilter(OrFilter<? super T> fil) throws Exception {
 			if( fil.nonSQL() ){
 				throw new CannotFilterException();
 			}
@@ -245,7 +245,7 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFiler(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
 		 */
 		@Override
-		public List<PatternArgument> visitOrFiler(OrFilter<? super T> fil) throws Exception {
+		public List<PatternArgument> visitOrFilter(OrFilter<? super T> fil) throws Exception {
 			if( fil.nonSQL() ){
 				throw new CannotFilterException();
 			}

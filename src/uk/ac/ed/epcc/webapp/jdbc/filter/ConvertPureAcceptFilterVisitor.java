@@ -98,7 +98,7 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFiler(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
 	 */
 	@Override
-	public AcceptFilter<? super T> visitOrFiler(OrFilter<? super T> fil) throws Exception {
+	public AcceptFilter<? super T> visitOrFilter(OrFilter<? super T> fil) throws Exception {
 		// A OrFilter is and AcceptFilter even though it uses SQL to do this
 		return fil;
 	}

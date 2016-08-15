@@ -14,9 +14,10 @@
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseCombineFilter.AddFilterVisitor;
 
-/**
+/** Abstract class for a set of Filters 
+ * 
+ * This class performs type checking.
  * @author spb
  *
  * @param <T>
@@ -33,6 +34,10 @@ public abstract class FilterSet<T> {
 		this.target=target;
 	}
 
+	/** get a visitor to add the visitors target to the set.
+	 * 
+	 * @return
+	 */
 	protected abstract FilterVisitor getAddVisitor();
 	protected final FilterSet<T> add(BaseFilter<? super T> fil, boolean check_types) {
 		

@@ -79,7 +79,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T> {
 		public Boolean visitAndFilter(AndFilter<? super T> fil) throws Exception {
 			// An ANDFilter could be in any of the 3 categories.
 			AcceptFilter<? super T> accept = fil.getAcceptFilter();
-			if( accept != null ){
+			if( accept != null ){  // This is a pure accept filter
 				pure_accept_filters.add(accept);
 				return null;
 			}
@@ -121,7 +121,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T> {
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFiler(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
 		 */
 		@Override
-		public Boolean visitOrFiler(OrFilter<? super T> fil) throws Exception {
+		public Boolean visitOrFilter(OrFilter<? super T> fil) throws Exception {
 			sql_filters.addFilter(fil.sql_filters);
 			pure_accept_filters.addAll(fil.pure_accept_filters);
 			mixed_filters.addAll(fil.mixed_filters);
@@ -144,7 +144,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T> {
 	 */
 	@Override
 	public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
-		return vis.visitOrFiler(this);
+		return vis.visitOrFilter(this);
 	}
 	public final OrFilter<T> addFilter(BaseFilter<? super T> fil){
 		add(fil, true);
