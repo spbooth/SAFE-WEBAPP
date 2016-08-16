@@ -532,7 +532,7 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 	@Override
 	public <X extends ContentBuilder> X getLogContent(X cb, T target,
 			SessionService<?> sess) {
-		cb.addHeading(2, target.getName());
+		cb.addHeading(2, target.getSpacedName());
 		Table t = new Table();
 		Map<String,Object> info = target.getInfo();
 		if( info.size() > 0 ){

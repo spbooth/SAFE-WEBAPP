@@ -77,7 +77,7 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 		boolean page_complete = (Boolean)p.visit(complete_viz);
 		boolean has_questions = (Boolean)p.visit(has_question_viz);
 		ContentBuilder block = builder.getPanel("dynamic_form_page", has_questions? (page_complete ? "complete" : "incomplete") : null );
-		block.addHeading(2, p.getName());
+		block.addHeading(2, p.getSpacedName());
 		SectionManager manager = (SectionManager)((PageManager) p.getFactory()).getChildManager();
 		for( Section s : manager.getParts(p)){
 			Map<String,String> errors = new LinkedHashMap<String,String>();
@@ -95,7 +95,7 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 	}
 	public <C extends ContentBuilder> C visitSection(C builder, Map<String,String> errors, Section s) throws Exception{
 		
-		builder.addHeading(3,  s.getName());
+		builder.addHeading(3,  s.getSpacedName());
 		builder.addText(s.getSectionText());
 		if( errors != null && ! errors.isEmpty()){
 			C warnings = (C) builder.getPanel("warn");

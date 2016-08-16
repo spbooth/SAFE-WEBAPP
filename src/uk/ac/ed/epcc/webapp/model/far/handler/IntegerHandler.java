@@ -20,6 +20,7 @@ public class IntegerHandler implements QuestionFormHandler<Integer> {
 	private static final String MAXIMUM = "maximum";
 	private static final String MINIMUM = "minimum";
 	private static final String UNIT = "unit";
+	private static final String DEFAULT_VALUE = "default";
 
 	@Override
 	public Class<? super Integer> getTarget() {
@@ -47,6 +48,10 @@ public class IntegerHandler implements QuestionFormHandler<Integer> {
 		unit_input.setMaxResultLength(16);
 		f.addInput(UNIT, "Unit", unit_input);
 		
+		IntegerInput def_input = new IntegerInput();
+		def_input.setOptional(true);
+		f.addInput(DEFAULT_VALUE, "Default value", def_input);
+		
 		f.addValidator(new FormValidator() {
 			
 			@Override
@@ -62,6 +67,16 @@ public class IntegerHandler implements QuestionFormHandler<Integer> {
 				if( rem != 0){
 					throw new ValidateException("Maximum minus Minimum must be a multiple of step");
 				}
+				
+				Integer default_val = (Integer) f.get(DEFAULT_VALUE);
+				if( default_val != null ){
+					if( min != null && default_val.intValue() < min.intValue()){
+						throw new ValidateException("Default less than minimum");
+					}
+					if( max != null && default_val.intValue() > max.intValue()){
+						throw new ValidateException("Default more than maximum");
+					}
+				}
 			}
 			
 		});
@@ -74,6 +89,7 @@ public class IntegerHandler implements QuestionFormHandler<Integer> {
 		input.setMax((Integer) f.get(MAXIMUM));
 		input.setStep((Integer) f.get(STEP));
 		input.setUnit((String)f.get(UNIT));
+		input.setValue((Integer) f.get(DEFAULT_VALUE));
 		return input;
 	}
 

@@ -184,7 +184,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		public abstract String getTypeName();
 		@Override
 		public ContentBuilder addContent(ContentBuilder builder) {
-			builder.addLink(getContext(), getName(), getViewResult());
+			builder.addLink(getContext(), getSpacedName(), getViewResult());
 			return builder;
 		}
 		
