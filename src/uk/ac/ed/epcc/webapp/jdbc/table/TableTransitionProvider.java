@@ -16,21 +16,33 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
+import java.io.StringReader;
 import java.util.Set;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.inputs.FileUploadDecorator;
+import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.IndexTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractTargetLessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionProvider;
+import uk.ac.ed.epcc.webapp.model.data.UnDumper;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.TableInput;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -47,6 +59,8 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 public class TableTransitionProvider implements ViewTransitionProvider<TransitionKey,TableTransitionTarget>, IndexTransitionProvider<TransitionKey, TableTransitionTarget>,Contexed{
+	
+	public static final Feature UPLOAD_XML_FEATURE = new Feature("table_transition.upload_xml",false,"Allow XML tables to be uploaded via a transition");
     /**
 	 * 
 	 */
@@ -60,6 +74,7 @@ public class TableTransitionProvider implements ViewTransitionProvider<Transitio
 	private final AppContext conn;
     
     public static final TransitionKey INDEX = new TransitionKey(TableTransitionProvider.class, "Index");
+    public static final TransitionKey UPLOAD = new TransitionKey(TableTransitionProvider.class, "Upload");
     public TableTransitionProvider(AppContext conn){
     	this.conn=conn;
     }
@@ -78,11 +93,46 @@ public class TableTransitionProvider implements ViewTransitionProvider<Transitio
 		}
     	
     }
+    public class UploadTransition extends AbstractTargetLessTransition<TableTransitionTarget>{
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition#buildForm(uk.ac.ed.epcc.webapp.forms.Form, uk.ac.ed.epcc.webapp.AppContext)
+		 */
+		@Override
+		public void buildForm(Form f, AppContext c) throws TransitionException {
+			TextInput update_input = new TextInput();
+			update_input.setMaxResultLength(23*1024*2024);
+			FileUploadDecorator decorator = new FileUploadDecorator(update_input);
+			f.addInput("data", "Update text", decorator);
+			f.addAction("Update", new FormAction() {
+				
+				@Override
+				public FormResult action(Form f) throws ActionException {
+					String update = (String) f.get("data");
+					UnDumper undumper = new UnDumper(getContext());
+					SAXParserFactory spf = SAXParserFactory.newInstance();
+
+					SAXParser parser;
+					try {
+						parser = spf.newSAXParser();
+						XMLReader reader = parser.getXMLReader();
+						reader.setContentHandler(undumper);
+						reader.parse(new InputSource(new StringReader(update)));
+					} catch (Exception e) {
+						throw new ActionException("Error readind dump", e);
+					}
+					return new IndexTransitionResult<TableTransitionTarget,TransitionKey>(TableTransitionProvider.this);
+				}
+			});
+		}
+    	
+    }
+    
 	public boolean allowTransition(AppContext c,TableTransitionTarget target,
 			TransitionKey name) {
 		if( target == null ){
 			// Restrict Index to Admin
-			return name == INDEX && c.getService(SessionService.class).hasRoleFromList(SessionService.ADMIN_ROLE,TABLE_INDEX_ROLE);
+			return (name == INDEX || name == UPLOAD) && c.getService(SessionService.class).hasRoleFromList(SessionService.ADMIN_ROLE,TABLE_INDEX_ROLE);
 		}
 		return getRegistry(target).allowTableTransition(name,c.getService(SessionService.class));
 	}
@@ -118,6 +168,9 @@ public class TableTransitionProvider implements ViewTransitionProvider<Transitio
 	public Transition<TableTransitionTarget> getTransition(TableTransitionTarget target,TransitionKey name) {
 		if( name == INDEX){
 			return new IndexTransition();
+		}
+		if( name == UPLOAD && UPLOAD_XML_FEATURE.isEnabled(getContext())){
+			return new UploadTransition();
 		}
 		return getRegistry(target).getTableTransition(name);
 	}
