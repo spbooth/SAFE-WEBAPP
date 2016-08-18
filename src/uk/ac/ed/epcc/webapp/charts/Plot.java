@@ -13,7 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.charts;
 
-/**
+/** A class representing plot data
  * @author spb
  *
  */

@@ -323,6 +323,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 						added=true;
 						int set = key.intValue();
 						float val = dat.get(key).floatValue();
+						
 						// Note that datasets can grow the number of sets
 						if (set < 0) {
 							throw new InvalidTransformException("Set out of range");
