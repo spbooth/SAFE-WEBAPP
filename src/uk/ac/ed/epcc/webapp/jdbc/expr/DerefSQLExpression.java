@@ -20,14 +20,13 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.IndexedFieldValue;
 /** A join based SQLExpression for accessing remote tables.
  * 
  * @author spb
  *
  * @param <H> home object
  * @param <R> remote object
- * @param <T> target type
+ * @param <T> target type of expression
  */
 
 
@@ -36,7 +35,7 @@ public class DerefSQLExpression<H extends DataObject,R extends DataObject,T> imp
 	private SQLExpression<T> remote_expression;
 	private SQLFilter required_filter;
 	@SuppressWarnings("unchecked")
-	public DerefSQLExpression(IndexedFieldValue<H,R> a,SQLExpression<T> expr ) throws Exception {
+	public DerefSQLExpression(IndexedSQLValue<H,R> a,SQLExpression<T> expr ) throws Exception {
 		remote_expression = expr;
 		required_filter = a.getSQLFilter(remote_expression.getRequiredFilter());
 	}

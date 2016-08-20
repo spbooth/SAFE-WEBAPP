@@ -26,6 +26,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider;
+import uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter;
@@ -51,7 +52,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
  */
 
 
-public class IndexedFieldValue<T extends DataObject,I extends DataObject> implements FieldValue<IndexedReference<I>,T>,SQLValue<IndexedReference<I>> ,FilterProvider<T,IndexedReference<I>>,Selector{
+public class IndexedFieldValue<T extends DataObject,I extends DataObject> implements FieldValue<IndexedReference<I>,T>,IndexedSQLValue<T,I> ,Selector{
 	private final Class<? super T> target;
 	private final Repository repository;
 	private final IndexedTypeProducer<I,? extends DataObjectFactory<I>> producer;
