@@ -24,7 +24,13 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 
 
-
+/** A {@link SQLFilter} that compares a {@link SQLExpression} to null.
+ * 
+ * @author spb
+ *
+ * @param <T>
+ * @param <V>
+ */
 public class SQLExpressionNullFilter<T,V> implements SQLFilter<T>, PatternFilter<T> {
 	private final Class<? super T> target;
     private final SQLExpression<V> expr;

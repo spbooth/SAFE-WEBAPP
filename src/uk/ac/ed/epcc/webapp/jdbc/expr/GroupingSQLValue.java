@@ -19,7 +19,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 
 /** A variant of {@link SQLValue} which can produce an alternative
  * SQL fragment for group-by clauses. This allows complex transformations
- * that do not change the grouping result to be supressed
+ * that do not change the grouping result to be .
  * 
  * 
  * @author spb

@@ -25,11 +25,11 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
-/** SQLValue that converts an SQLValue of a different type to a string
+/** {@link SQLExpression} that converts an {@link SQLExpression} of a different type to a string
  * 
  * @author spb
  *
- * @param <T> type of nested SQLAccessor
+ * @param <T> type of nested {@link SQLExpression}
  */
 
 

@@ -25,7 +25,14 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 
 
-
+/** a {@link SQLAccessor} that returns the first non-null result from a set of nested {@link SQLAccessor}s.
+ * 
+ * This is a SELECT statement in SQL so the {@link SQLAccessor}s also need to be {@link SQLExpression}s.
+ * @author spb
+ *
+ * @param <T>
+ * @param <R>
+ */
 public class SQLSelectAccessor<T,R> implements SQLAccessor<T,R> {
     private final Class<? super T> target;
     private final SQLAccessor<T,R> accessors[];

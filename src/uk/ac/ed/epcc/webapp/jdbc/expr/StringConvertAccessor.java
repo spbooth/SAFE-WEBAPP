@@ -19,7 +19,13 @@ package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 
 
-
+/** A {@link Accessor} that converts the result of a nested {@link Accessor} to a string.
+ * 
+ * @author spb
+ *
+ * @param <T>
+ * @param <R>
+ */
 public class StringConvertAccessor<T,R> implements Accessor<String,R> {
 
 	protected Accessor<T,R> a;

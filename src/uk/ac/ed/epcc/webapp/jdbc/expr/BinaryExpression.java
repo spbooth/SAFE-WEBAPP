@@ -28,7 +28,13 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 
 
-
+/** A binary numerical {@link SQLExpression}
+ * 
+ * There is a factory method for generating these that can implement simple simplifications.
+ * 
+ * @author spb
+ *
+ */
 public final class BinaryExpression implements SQLExpression<Number> {
 	public static final Feature SIMPLIFY_EXPRESSION = new Feature("sqlexpression.simplify",true,"simplify SQL exopressions");
 	

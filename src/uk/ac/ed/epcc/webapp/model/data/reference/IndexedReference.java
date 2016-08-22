@@ -20,8 +20,8 @@ import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Indexed;
+import uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.model.data.IndexedFieldValue;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.IndexedError;
 
 /** A lightweight class that holds the id of an Indexed type 
@@ -29,7 +29,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.IndexedError;
  * This is intended to be as efficient as using and Integer object but with better type safety 
  * and the ability to retrieve the target directly.
  * An id of zero always denotes an unknown value.
- * Note that {@link IndexedFieldValue} will generate a IndexedReference with id of zero for 
+ * Note that {@link IndexedSQLValue} will generate a IndexedReference with id of zero for 
  * a null reference
  * 
  * We can't implement a sensible sort order (other than numeric) without an {@link AppContext} reference.

@@ -15,7 +15,11 @@
  * Copyright (c) - The University of Edinburgh 2010
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.expr;
-
+/** functions that can be applied to {@link SQLExpression}s.
+ * 
+ * @author spb
+ *
+ */
 public enum SQLFunc {
   MAX,
   MIN,

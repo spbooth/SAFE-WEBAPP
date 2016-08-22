@@ -20,8 +20,9 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-/** An {@link OrderFilter} implemented using {@link SQLExpression}s.
+/** An {@link OrderFilter} implemented directly using {@link SQLExpression}s.
  * 
+ * might be better to use a {@link SQLExpressionOrderClause}.
  * @author spb
  *
  * @param <I>

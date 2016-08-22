@@ -22,6 +22,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  * 
  * This also supports the necessary methods to join through to the remote table. 
  * @see DerefSQLExpression
+ * @see RemoteSQLValue
  * @author spb
  * @param <T> Type of owning/home table.
  * @param <I> Type of remote table

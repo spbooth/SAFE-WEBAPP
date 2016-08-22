@@ -25,7 +25,13 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 
 
-
+/** A {@link SQLFilter} that compares two {@link SQLExpression}s.
+ * 
+ * @author spb
+ *
+ * @param <T>
+ * @param <V>
+ */
 public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilter<T> {
 	private final Class<? super T> target;
     private final SQLExpression<? extends V> expr1;

@@ -75,7 +75,7 @@ public class SQLAverageValue implements SQLValue<AverageValue>{
 		try {
 			return new AverageValue(value.makeObject(rs, pos).doubleValue(), rs.getLong(pos+1));
 		} catch (SQLException e) {
-			throw new DataException("Errir getting count", e);
+			throw new DataException("Error getting count", e);
 		}
 	}
 

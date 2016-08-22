@@ -28,7 +28,9 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.model.data.FieldValue;
 
 
-
+/** A {@link SQLFilter} that compares a {@link SQLExpression} to a constant value.
+ * 
+ */
 public class SQLExpressionFilter<T,V> implements SQLFilter<T>, PatternFilter<T> {
 	private final Class<? super T> target;
     private final SQLExpression<V> expr;

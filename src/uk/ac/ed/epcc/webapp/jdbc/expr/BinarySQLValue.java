@@ -26,7 +26,14 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 
 
-
+/** a numerical binary {@link SQLValue}.
+ * 
+ * Normally {@link BinaryExpression}s should be used in preference but this is needed if the arguments are {@link SQLValue}s but
+ * not {@link SQLExpression}s
+ * @see BinaryExpression
+ * @author spb
+ *
+ */
 public class BinarySQLValue implements GroupingSQLValue<Number> {
 	private AppContext conn;
     private final SQLValue<? extends Number> a,b;

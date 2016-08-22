@@ -26,7 +26,12 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 
-
+/** A {@link SQLValue} that returns the first non null result from a set of {@link SQLValue}s
+ * 
+ * @author spb
+ *
+ * @param <T>
+ */
 public class SQLSelectValue<T> implements SQLValue<T> {
     private final Class<? super T> target;
     private final SQLValue<T> accessors[];
