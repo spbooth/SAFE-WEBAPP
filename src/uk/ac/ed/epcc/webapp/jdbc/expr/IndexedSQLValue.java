@@ -21,22 +21,25 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 /** A {@link SQLValue} that generates a {@link IndexedReference} to a remote table.
  * 
  * This also supports the necessary methods to join through to the remote table. 
+ * @see DerefSQLExpression
  * @author spb
+ * @param <T> Type of owning/home table.
+ * @param <I> Type of remote table
  */
 public interface IndexedSQLValue<T extends DataObject,I extends DataObject> extends SQLValue<IndexedReference<I>>,
 FilterProvider<T,IndexedReference<I>> {
-	/** Create a filter for the home table out of a a filter on the target object
+	/** Create a filter for the home table out of a a filter on the target object.
 	 * 
 	 * This adds any necessary join filters. If fil is null it only returns the necessary join filter.
 	 * @param fil
-	 * @return SQLFilter<T>
+	 * @return {@link SQLFilter}
 	 * @throws CannotFilterException
 	 */
 	public SQLFilter<T> getSQLFilter(SQLFilter<I> fil) throws CannotFilterException;
 	
 	/** get the remote {@link DataObjectFactory}
 	 * 
-	 * @return
+	 * @return {@link DataObjectFactory}
 	 * @throws Exception
 	 */
 	public DataObjectFactory<I> getFactory() throws Exception;
