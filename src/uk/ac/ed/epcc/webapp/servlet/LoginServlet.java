@@ -81,6 +81,11 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 			HttpServletResponse res) throws IOException {
 		SessionService<T> serv = conn.getService(SessionService.class);
 		serv.logOut();
+		if( serv.haveCurrentUser()){
+			// must be a SU operation go to main page
+			res.sendRedirect(res.encodeRedirectURL(getMainPage(conn)));
+			return;
+		}
 		res.sendRedirect(res.encodeRedirectURL(conn.getInitParameter(LOGOUT_URL_PARAM, req.getContextPath() + getLoginPage(conn))));
 	}
 
