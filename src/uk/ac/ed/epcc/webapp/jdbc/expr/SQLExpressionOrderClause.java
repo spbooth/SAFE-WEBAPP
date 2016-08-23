@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.jdbc.expr;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 /** Use a {@link SQLExpression} as an {@link OrderClause}
  * 
+ * Note this does not include any required filter needed by the {@link SQLExpression}
  * @author spb
  *
  * @param <T>

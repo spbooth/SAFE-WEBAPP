@@ -18,11 +18,12 @@ import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 /** An {@link OrderFilter} implemented directly using {@link SQLExpression}s.
  * 
- * might be better to use a {@link SQLExpressionOrderClause}.
+ * 
  * @author spb
  *
  * @param <I>
@@ -32,7 +33,17 @@ public class SQLExpressionOrderFilter<I,T> implements OrderFilter<T> , SQLFilter
 	private final Class<? super T> target;
 	private final boolean descending;
 	private final SQLExpression<I> expr;
-	public SQLExpressionOrderFilter(Class<? super T> target,boolean descending,SQLExpression<I> expr) {
+	@SuppressWarnings("unchecked")
+	public static <I,T> SQLFilter<T> getFilter(Class<? super T> target,boolean descending,SQLExpression<I> expr) {
+		SQLExpressionOrderFilter<I, T> fil = new SQLExpressionOrderFilter<>(target, descending, expr);
+		SQLFilter<T> req = expr.getRequiredFilter();
+    	if( req == null){
+    		return fil;
+    	}
+    	return new SQLAndFilter<T>(target,fil,req);
+
+	}
+	private SQLExpressionOrderFilter(Class<? super T> target,boolean descending,SQLExpression<I> expr) {
 		this.target=target;
 		this.descending=descending;
 		this.expr=expr;

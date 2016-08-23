@@ -23,6 +23,7 @@ import java.util.List;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.model.data.FieldValue;
@@ -30,19 +31,43 @@ import uk.ac.ed.epcc.webapp.model.data.FieldValue;
 
 /** A {@link SQLFilter} that compares a {@link SQLExpression} to a constant value.
  * 
+ * Note this does not include any filter required by the {@link SQLExpression} so factory methods are
+ * used to ensure these are in place.
+ * @param <T> Type of filter
+ * @param <V> Type of expression
  */
 public class SQLExpressionFilter<T,V> implements SQLFilter<T>, PatternFilter<T> {
 	private final Class<? super T> target;
     private final SQLExpression<V> expr;
     private final V value;
     private final MatchCondition match;
-	public SQLExpressionFilter(Class<? super T> target,SQLExpression<V> expr,V value){
+
+    @SuppressWarnings("unchecked")
+	public static <T,V> SQLFilter<T> getFilter(Class<? super T> target,SQLExpression<V> expr,MatchCondition m,V value){
+    	SQLExpressionFilter<T, V> fil = new SQLExpressionFilter<>(target, expr, m,value);
+    	
+		SQLFilter<T> req = expr.getRequiredFilter();
+    	if( req == null){
+    		return fil;
+    	}
+    	return new SQLAndFilter<T>(target,fil,req);
+    }
+    @SuppressWarnings("unchecked")
+	public static <T,V> SQLFilter<T> getFilter(Class<? super T> target,SQLExpression<V> expr,V value){
+    	SQLExpressionFilter<T, V> fil = new SQLExpressionFilter<>(target, expr, value);
+		SQLFilter<T> req = expr.getRequiredFilter();
+    	if( req == null){
+    		return fil;
+    	}
+    	return new SQLAndFilter<T>(target,fil,req);
+    }
+    private SQLExpressionFilter(Class<? super T> target,SQLExpression<V> expr,V value){
 		this.target=target;
     	this.expr=expr;
     	this.match=null;
     	this.value=value;
     }
-	public SQLExpressionFilter(Class<? super T> target,SQLExpression<V> expr,MatchCondition match,V value){
+	private SQLExpressionFilter(Class<? super T> target,SQLExpression<V> expr,MatchCondition match,V value){
 		this.target=target;
     	this.expr=expr;
     	this.match=match;

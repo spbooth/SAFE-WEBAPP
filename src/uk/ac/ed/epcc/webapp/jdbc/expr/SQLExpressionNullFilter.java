@@ -20,12 +20,15 @@ import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 
 
 /** A {@link SQLFilter} that compares a {@link SQLExpression} to null.
  * 
+ * Note that the class does not include any filter required by the expression so 
+ * factory methods are used to ensure these are in place.
  * @author spb
  *
  * @param <T>
@@ -35,7 +38,18 @@ public class SQLExpressionNullFilter<T,V> implements SQLFilter<T>, PatternFilter
 	private final Class<? super T> target;
     private final SQLExpression<V> expr;
     private final boolean is_null;
-	public SQLExpressionNullFilter(Class<? super T> target,SQLExpression<V> expr,boolean is_null){
+    
+    @SuppressWarnings("unchecked")
+	public static <T,V> SQLFilter<T> getFilter(Class<? super T> target,SQLExpression<V> expr,boolean is_null){
+    	SQLExpressionNullFilter<T, V> fil = new SQLExpressionNullFilter<>(target, expr, is_null);
+    	SQLFilter<T> req = expr.getRequiredFilter();
+    	if( req == null){
+    		return fil;
+    	}
+    	return new SQLAndFilter<T>(target,fil,req);
+
+    }
+	private SQLExpressionNullFilter(Class<? super T> target,SQLExpression<V> expr,boolean is_null){
 		this.target=target;
     	this.expr=expr;
     	this.is_null=is_null;

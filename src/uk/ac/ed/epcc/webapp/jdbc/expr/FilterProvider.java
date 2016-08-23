@@ -34,6 +34,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  * gives the same behaviour as not implementing the interface at all. Therefore this is the exception that should be thrown when
  * the class is only unable to fulfil its contract. For example if a nested Accessor does not implement {@link FilterProvider}.  
  * 
+ * If implemented by a {@link SQLValue} the returned filter should contain any required filter.
  * @author spb
  *
  * @param <T> type of target

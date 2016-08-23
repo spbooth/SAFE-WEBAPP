@@ -21,11 +21,15 @@ import java.util.List;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 
 
 /** A {@link SQLFilter} that compares two {@link SQLExpression}s.
+ * 
+ * Note these do not include any filter required by the {@link SQLExpression} so factory methods are used to ensure these
+ * are in place.
  * 
  * @author spb
  *
@@ -38,13 +42,36 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
     private final SQLExpression<? extends V> expr2;
   
     private final MatchCondition match;
-	public SQLExpressionMatchFilter(Class<? super T> target,SQLExpression<? extends V> expr1,SQLExpression<? extends V> expr2){
+    
+    @SuppressWarnings("unchecked")
+	public static <T,V>  SQLFilter<T> getFilter(Class<? super T> target,SQLExpression<? extends V> expr1,SQLExpression<? extends V> expr2){
+    	SQLExpressionMatchFilter<T, V> fil = new SQLExpressionMatchFilter<>(target, expr1, expr2);
+    	SQLFilter<T> req1 = expr1.getRequiredFilter();
+    	SQLFilter<T> req2 = expr1.getRequiredFilter();
+    	if( req1 == null && req2 == null){
+    		return fil;
+    	}
+    	return new SQLAndFilter<T>(target,fil,req1,req2);
+
+    }
+    @SuppressWarnings("unchecked")
+	public static <T,V>  SQLFilter<T> getFilter(Class<? super T> target,SQLExpression<? extends V> expr1,MatchCondition m,SQLExpression<? extends V> expr2){
+    	SQLExpressionMatchFilter<T, V> fil = new SQLExpressionMatchFilter<>(target, expr1, m,expr2);
+    	SQLFilter<T> req1 = expr1.getRequiredFilter();
+    	SQLFilter<T> req2 = expr1.getRequiredFilter();
+    	if( req1 == null && req2 == null){
+    		return fil;
+    	}
+    	return new SQLAndFilter<T>(target,fil,req1,req2);
+
+    }
+	private SQLExpressionMatchFilter(Class<? super T> target,SQLExpression<? extends V> expr1,SQLExpression<? extends V> expr2){
 		this.target=target;
     	this.expr1=expr1;
     	this.expr2=expr2;
     	this.match=null;
     }
-	public SQLExpressionMatchFilter(Class<? super T> target,SQLExpression<? extends V> expr1,MatchCondition match,SQLExpression<? extends V> expr2){
+	private SQLExpressionMatchFilter(Class<? super T> target,SQLExpression<? extends V> expr1,MatchCondition match,SQLExpression<? extends V> expr2){
 		this.target=target;
     	this.expr1=expr1;
     	this.match=match;

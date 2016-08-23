@@ -81,7 +81,7 @@ public class TypeConverterSQLValue<H,T,D> implements  SQLValue<T>, FilterProvide
 		if( inner instanceof FilterProvider){
 			return ((FilterProvider<H, D>)inner).getFilter(null, equiv);
 		}else if( inner instanceof SQLExpression){
-			return new SQLExpressionFilter<H, D>(target,(SQLExpression<D>)inner, equiv);
+			return SQLExpressionFilter.getFilter(target,(SQLExpression<D>)inner, equiv);
 		}
 		throw new CannotFilterException();
 	}

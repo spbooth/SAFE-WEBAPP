@@ -971,7 +971,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		if( deletes > 0 ){
 			SQLAndFilter<H> delete_fil = new SQLAndFilter<H>(getTarget());
 			delete_fil.addFilter(new ReferenceFilter<H,P>(HistoryFactory.this,getPeerName(),peer));
-			delete_fil.addFilter(new SQLExpressionMatchFilter<H, Date>(getTarget(), 
+			delete_fil.addFilter(SQLExpressionMatchFilter.getFilter(getTarget(), 
 					(SQLExpression<Date>)res.getDateExpression(getTarget(), START_TIME_FIELD),
 					(SQLExpression<Date>)res.getDateExpression(getTarget(), END_TIME_FIELD)));
 			FilterDelete<H> reaper = new FilterDelete<H>(res);
