@@ -207,6 +207,12 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 					}
 				}
 				maker.addChildren(n, name, menu_prop);
+			}else{
+				// A null node may just be disabled by the maker look for a substitute node
+				String replacement = menu_prop.getProperty(name+".replacement");
+				if( replacement != null ){
+					return makeNode(seen,replacement,menu_prop);
+				}
 			}
 			return n;
 		}catch(Throwable t){
