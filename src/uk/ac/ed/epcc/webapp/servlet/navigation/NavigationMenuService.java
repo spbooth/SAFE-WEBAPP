@@ -45,6 +45,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * <li> <b>navigation.<em>name</em>.list</b> - comma separated list of additional child node names</li> 
  * <li> <b>navigation.<em>name</em>.type</b> - type of {@link NodeMaker} to make node</li> 
  * <li> <b>navigation.<em>name</em>.path</b> - path to set for the node</li> 
+ * <li> <b>navigation.<em>name</em>.replacement<b> - Name of a node to substitute if the {@link NodeMaker} returns null. The configuration properties of the original node are not automatically inherited. 
  * </ul>
  * @author spb
  *

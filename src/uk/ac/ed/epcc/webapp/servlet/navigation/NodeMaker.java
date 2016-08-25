@@ -28,6 +28,9 @@ import uk.ac.ed.epcc.webapp.config.FilteredProperties;
 public interface NodeMaker extends Contexed{
 	/** Create a {@link Node} for a named menu item.
 	 * 
+	 * This is allowed to return null to indicate that nodes of this type are disabled/empty and should be
+	 * suppressed. The {@link NavigationMenuService} can be configured to substitute a different node
+	 * in this case (for example to host child nodes added by the configuration). 
 	 * @param name  name of the node 
 	 * @param props {@link FilteredProperties} containing the navigation menu configuration
 	 * @return {@link Node}
