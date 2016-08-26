@@ -108,7 +108,11 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 			return null;
 		}
 		try {
-			return getFactory().find(getStringFinderFilter(getFactory().getTarget(), name),true);
+			AU user = getFactory().find(getStringFinderFilter(getFactory().getTarget(), name),true);
+			if( user == null ){
+				return createFromString(name);
+			}
+			return user;
 		} catch ( DataNotFoundException dne){
 			return createFromString(name);
 		} catch (DataException e) {
