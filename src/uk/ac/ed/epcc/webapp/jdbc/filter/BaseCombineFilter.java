@@ -50,14 +50,17 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
 			 */
 			public Boolean visitPatternFilter(PatternFilter<? super T> fil) {
-				if( BaseCombineFilter.this.getClass().isAssignableFrom(fil.getClass())){
+				if( BaseCombineFilter.this.getClass().isAssignableFrom(fil.getClass()) 
+						|| ( fil instanceof BaseCombineFilter && ((BaseCombineFilter)fil).filters.size() == 1)){
 		    		// This is a filter of the same type or super type so merge
 					// pattern filters
+					// also merge if there is only one inner filter as the type of combination is irrelevant then
 		    		// directly to avoid redundant braces and possible duplication
 					// of clauses.
 		    		BaseCombineFilter<T> comb = (BaseCombineFilter<T>) fil;
 		    		for(PatternFilter<? super T> nest : comb.filters){
-		    			addPatternFilter(nest);
+		    			// call same method recursively in case the contents are also a BaseCombineFilter
+		    			visitPatternFilter(nest);
 		    		}
 		    	}else{
 		    		// just add the nested filter

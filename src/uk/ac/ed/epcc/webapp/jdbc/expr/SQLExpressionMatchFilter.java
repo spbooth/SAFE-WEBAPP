@@ -45,6 +45,10 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
     
     @SuppressWarnings("unchecked")
 	public static <T,V>  SQLFilter<T> getFilter(Class<? super T> target,SQLExpression<? extends V> expr1,SQLExpression<? extends V> expr2){
+    	if( expr1 instanceof DateSQLExpression && expr2 instanceof DateSQLExpression){
+    		// compare underlying value
+    		return getFilter(target, ((DateSQLExpression)expr1).getMillis(), ((DateSQLExpression)expr2).getMillis());
+    	}
     	SQLExpressionMatchFilter<T, V> fil = new SQLExpressionMatchFilter<>(target, expr1, expr2);
     	SQLFilter<T> req1 = expr1.getRequiredFilter();
     	SQLFilter<T> req2 = expr1.getRequiredFilter();
@@ -56,6 +60,10 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
     }
     @SuppressWarnings("unchecked")
 	public static <T,V>  SQLFilter<T> getFilter(Class<? super T> target,SQLExpression<? extends V> expr1,MatchCondition m,SQLExpression<? extends V> expr2){
+    	if( expr1 instanceof DateSQLExpression && expr2 instanceof DateSQLExpression){
+    		// compare underlying value
+    		return getFilter(target, ((DateSQLExpression)expr1).getMillis(), m, ((DateSQLExpression)expr2).getMillis());
+    	}
     	SQLExpressionMatchFilter<T, V> fil = new SQLExpressionMatchFilter<>(target, expr1, m,expr2);
     	SQLFilter<T> req1 = expr1.getRequiredFilter();
     	SQLFilter<T> req2 = expr1.getRequiredFilter();

@@ -22,7 +22,11 @@ import java.util.List;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-
+/** convert a numeric {@link SQLExpression} to a {@link DateSQLExpression}
+ * 
+ * @author spb
+ *
+ */
 public class MysqlDateConverter implements DateSQLExpression{
 
 	public MysqlDateConverter(long res, SQLExpression<? extends Number> val) {
