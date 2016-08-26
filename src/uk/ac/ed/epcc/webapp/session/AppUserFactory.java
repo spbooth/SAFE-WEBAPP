@@ -350,7 +350,11 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		if(realm == null || realm.trim().length()==0){
 			return map.values().iterator().next();
 		}
-		return map.get(realm);
+		AppUserNameFinder finder = map.get(realm);
+		if( finder != null ){
+			getLogger().debug("realm "+realm+" -> "+finder.getClass().getCanonicalName());
+		}
+		return finder;
 	}
 	
 	private Map<String,AppUserNameFinder> realms=null;
