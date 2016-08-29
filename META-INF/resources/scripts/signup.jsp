@@ -80,6 +80,7 @@ If you already have a password for this website:
 <div class="block" role="main">
 <%@ include file="/scripts/form_context.jsf" %>
   <h2>Your Details:</h2>
+  <p>Fields marked in <b>bold</b> are mandatory.</p>
   <%= person_fac.addUpdateNotes(new HtmlBuilder()) %>
   <form method="post" action="<%= response.encodeURL(web_path+"/SignupServlet") %>">
      <input type="hidden" name="form_url" value="<%=HTMLForm.getFormURL(request)%>">

@@ -192,7 +192,7 @@ if(  login_urls != null ){
 } 
 %>
 <p>
-<small><small>As part of its normal functioning when you log-in the <%=website_name %> will install a temporary session cookie that will be removed when you log-off or close your browser. If you do not wish this cookie 
+<small><small>As part of its normal functioning when you log in the <%=website_name %> will install a temporary session cookie that will be removed when you log off or close your browser. If you do not wish this cookie 
 to be set, disable cookies in your browser settings.</small></small>
 </p>
 </div>

@@ -13,11 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.ssh;
 
-import java.io.IOException;
 import java.security.PublicKey;
 import java.security.interfaces.RSAKey;
-import java.util.HashSet;
-import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
@@ -25,8 +22,6 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
 import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
 
 
