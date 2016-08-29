@@ -45,7 +45,7 @@ public class FilterSelect<T> {
 			((PatternFilter) my_filter).addPattern(query, qualify);
 		}else{
 			// match all condition
-			query.append(" 1=1 ");
+			query.append(" true ");
 		}
 	}
   

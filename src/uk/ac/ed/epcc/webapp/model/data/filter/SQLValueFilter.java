@@ -71,7 +71,7 @@ public class SQLValueFilter<T> implements SQLFilter<T>, PatternFilter<T> {
 
 	public final StringBuilder addPattern(StringBuilder result,boolean qualify) {
 		if( peer == null ){
-			result.append("1=1"); // default to true
+			result.append("true"); // default to true
 			return result;
 		}
 		
