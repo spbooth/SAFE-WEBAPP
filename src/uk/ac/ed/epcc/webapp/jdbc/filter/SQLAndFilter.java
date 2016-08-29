@@ -40,17 +40,16 @@ public class SQLAndFilter<T> extends BaseSQLCombineFilter<T>  {
 			addFilter(f);
 		}
 	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseCombineFilter#getFilterCombiner()
+	 */
+	@Override
+	protected FilterCombination getFilterCombiner() {
+		return FilterCombination.AND;
+	}
 	
-	@Override
-	protected final String getCombiner() {
-		return "AND";
-	}
-
-	@Override
-	protected final String getDefaultPattern() {
-		return "1=1";
-	}
-
+	
 	
 	
 

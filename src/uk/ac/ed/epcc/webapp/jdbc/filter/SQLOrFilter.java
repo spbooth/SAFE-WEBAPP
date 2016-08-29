@@ -38,17 +38,14 @@ public class SQLOrFilter<T> extends BaseSQLCombineFilter<T> {
 			addFilter(f);
 		}
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseCombineFilter#getFilterCombiner()
+	 */
 	@Override
-	protected final String getCombiner() {
-		return "OR";
+	protected FilterCombination getFilterCombiner() {
+		return FilterCombination.OR;
 	}
-
-
-	@Override
-	protected final String getDefaultPattern() {
-		// No OR clauses means no selection
-		return "1 != 1";
-	}
+	
 
 	
 }

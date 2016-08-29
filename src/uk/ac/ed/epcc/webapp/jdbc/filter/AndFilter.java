@@ -66,15 +66,7 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 	protected final void addAccept(AcceptFilter<? super T> filter) throws ConsistencyError {
 		accepts.add(filter);
 	}
-	@Override
-	protected final String getCombiner() {
-		return "AND";
-	}
-	@Override
-	protected final String getDefaultPattern() {
-		return "1=1";
-	}
-	
+
 	
 	
 	public final <X> X acceptVisitor(FilterVisitor<X,? extends T> vis) throws Exception {
@@ -118,5 +110,12 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 	}
 	public final AndFilter<T> addFilter(BaseFilter<? super T> fil){
 		return (AndFilter<T>) super.add(fil,true);
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseCombineFilter#getFilterCombiner()
+	 */
+	@Override
+	protected final FilterCombination getFilterCombiner() {
+		return FilterCombination.AND;
 	}
 }

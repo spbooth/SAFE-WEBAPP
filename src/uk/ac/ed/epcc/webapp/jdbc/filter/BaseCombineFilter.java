@@ -50,9 +50,10 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
 			 */
 			public Boolean visitPatternFilter(PatternFilter<? super T> fil) {
-				if( BaseCombineFilter.this.getClass().isAssignableFrom(fil.getClass()) 
-						|| ( fil instanceof BaseCombineFilter && ((BaseCombineFilter)fil).filters.size() == 1)){
-		    		// This is a filter of the same type or super type so merge
+				if( fil instanceof BaseCombineFilter &&
+						(((BaseCombineFilter)fil).getFilterCombiner() == getFilterCombiner() || ((BaseCombineFilter)fil).filters.size()==1)
+				){
+					// This is a filter of the same combination type so merge
 					// pattern filters
 					// also merge if there is only one inner filter as the type of combination is irrelevant then
 		    		// directly to avoid redundant braces and possible duplication
@@ -209,12 +210,9 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			}
 			return sb.toString();
 		}
-		@SuppressWarnings("unchecked")
 		public final  List<PatternArgument> getParameters(List<PatternArgument> res) {
-			for(BaseFilter f: filters){
-				if( f instanceof PatternFilter){
-					((PatternFilter)f).getParameters(res);
-				}
+			for(PatternFilter<? super T> f: filters){
+				f.getParameters(res);
 			}
 			return res;
 		}
@@ -245,16 +243,22 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			}
 			return sb;
 		}
+		
+		protected abstract FilterCombination getFilterCombiner();
 		/** Default SQL pattern to use if no filter clauses provided
 		 * 
 		 * @return String
 		 */
-		protected abstract String getDefaultPattern();
+		protected final String getDefaultPattern(){
+			return getFilterCombiner().getDefault();
+		}
 
 		/** The SQL combining clause ie. AND or OR
 		 * 
 		 * @return String
 		 */
-		protected abstract String getCombiner();
+		protected final String getCombiner(){
+			return getFilterCombiner().getCombiner();
+		}
 
 }
