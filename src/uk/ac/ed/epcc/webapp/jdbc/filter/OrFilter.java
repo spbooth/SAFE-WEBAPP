@@ -32,7 +32,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
  * @author spb
  *
  */
-public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T> {
+public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, BinaryFilter<T> {
 	/**
 	 * @param target
 	 */
@@ -51,7 +51,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T> {
 	private LinkedHashSet<AcceptFilter<? super T>> pure_accept_filters;
 	private LinkedHashSet<BaseFilter<? super T>> mixed_filters;
 	private LinkedHashSet<DualFilter<? super T>> dual_filters;
-	
+	private boolean force_value=false;
 	private class AddFilterVisitor implements FilterVisitor<Boolean, T>{
 
 		/* (non-Javadoc)
@@ -137,6 +137,17 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T> {
 			dual_filters.add(fil);
 			return null;
 		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
+		 */
+		@Override
+		public Boolean visitBinaryFilter(BinaryFilter<? super T> fil) throws Exception {
+			if( fil.getBooleanResult()){
+				force_value=true;
+			}
+			return null;
+		}
 		
 	}
 	/* (non-Javadoc)
@@ -144,6 +155,9 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T> {
 	 */
 	@Override
 	public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+		if( force_value){
+			return vis.visitBinaryFilter(this);
+		}
 		return vis.visitOrFilter(this);
 	}
 	public final OrFilter<T> addFilter(BaseFilter<? super T> fil){
@@ -157,6 +171,9 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T> {
 	 */
 	@Override
 	public boolean accept(T o) {
+		if( force_value){
+			return true;
+		}
 		// Start with pure accept filters
 		for( AcceptFilter<? super T> accept : pure_accept_filters){
 			if(accept.accept(o)){
@@ -203,6 +220,9 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T> {
 	 * @throws NoSQLFilterException 
 	 */
 	public SQLFilter<T> getSQLFilter() throws NoSQLFilterException{
+		if( force_value){
+			return new SQLBinaryFilter<T>(target, true);
+		}
 		if( nonSQL()){
 			throw new NoSQLFilterException("OrFilter contains non SQL filter");
 		}
@@ -216,6 +236,16 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T> {
 	 * @return
 	 */
 	public boolean nonSQL() {
+		if( force_value){
+			return false; // know the value
+		}
 		return ! (pure_accept_filters.isEmpty() && mixed_filters.isEmpty());
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter#getBooleanResult()
+	 */
+	@Override
+	public boolean getBooleanResult() {
+		return force_value;
 	}
 }

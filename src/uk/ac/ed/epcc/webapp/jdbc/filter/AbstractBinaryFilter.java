@@ -20,22 +20,26 @@ import java.util.List;
  *
  * @param <T>
  */
-public abstract class AbstractFalseFilter<T> implements PatternFilter<T>, BinaryFilter<T>{
+public abstract class AbstractBinaryFilter<T> implements PatternFilter<T>, BinaryFilter<T>{
 
 	
 
 	protected final Class<? super T> target;
+	protected boolean value;
 
 	/**
 	 * 
 	 */
-	public AbstractFalseFilter(Class<? super T> target) {
+	public AbstractBinaryFilter(Class<? super T> target,boolean value) {
 		super();
 		this.target=target;
+		this.value=value;
 	}
 
 	public final StringBuilder addPattern(StringBuilder sb, boolean qualify) {
-		sb.append(" false ");
+		sb.append(" ");
+		sb.append(Boolean.toString(value));
+		sb.append(" ");
 		return sb;
 	}
 
@@ -46,9 +50,11 @@ public abstract class AbstractFalseFilter<T> implements PatternFilter<T>, Binary
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter#getBooleanResult()
 	 */
 	@Override
-	public boolean getBooleanResult() {
-		return false;
+	public final boolean getBooleanResult() {
+		return value;
 	}
+	
+	
 	public final Class<? super T> getTarget() {
 		return target;
 	}
@@ -75,11 +81,13 @@ public abstract class AbstractFalseFilter<T> implements PatternFilter<T>, Binary
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AbstractFalseFilter other = (AbstractFalseFilter) obj;
+		AbstractBinaryFilter other = (AbstractBinaryFilter) obj;
 		if (target == null) {
 			if (other.target != null)
 				return false;
-		} else if (!target.equals(other.target))
+		} else if (!target.equals(other.target)){
+			return false;
+		}else if( value != other.value)
 			return false;
 		return true;
 	}

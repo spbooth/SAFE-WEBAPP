@@ -93,4 +93,13 @@ public interface FilterVisitor<X,T> {
 	 * @return
 	 */
 	public X visitDualFilter(DualFilter<? super T> fil) throws Exception;
+	
+	/** process a {@link BinaryFilter} Objects that accept this method should generate a
+	 * <em>true</em> or a <em>false</em> selection value.
+	 * 
+	 * @param fil
+	 * @return
+	 * @throws Exception
+	 */
+	public X visitBinaryFilter(BinaryFilter<? super T> fil) throws Exception;
 }

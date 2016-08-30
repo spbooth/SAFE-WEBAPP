@@ -70,6 +70,10 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 	
 	
 	public final <X> X acceptVisitor(FilterVisitor<X,? extends T> vis) throws Exception {
+		if( useBinary()){
+			// If forced we don't need to wory about the accept filters
+			return vis.visitBinaryFilter(this);
+		}
 		return vis.visitAndFilter(this);
 	}
 	/** Make a pure SQL version of the current state if possible.
@@ -77,7 +81,8 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 	 * @throws NoSQLFilterException 
 	 */
 	public SQLFilter<T> getSQLFilter() throws NoSQLFilterException{
-		if( hasAcceptFilters()){
+		if( hasAcceptFilters() && ! isForced()){
+			// does not matter if we have added accept to a forced filter we know the value
 			StringBuilder sb = new StringBuilder();
 			for(AcceptFilter<? super T>  a : accepts){
 				sb.append(" ");
@@ -86,8 +91,12 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 			throw new NoSQLFilterException("Cannot convert to SQL contains AcceptFilter"+sb.toString());
 		}
 		SQLAndFilter<T> res = new SQLAndFilter<T>(getTarget());
-		for(PatternFilter<? super T> pat : filters){
-			res.addPatternFilter(pat);
+		if( isForced()){
+			res.addFilter(new SQLBinaryFilter<T>(target, getBooleanResult()));
+		}else{
+			for(PatternFilter<? super T> pat : filters){
+				res.addPatternFilter(pat);
+			}
 		}
 		Set<String> joins = getJoins();
 		if( joins != null ){
@@ -103,6 +112,9 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 	 * @return {@link AcceptFilter} or null if not possible
 	 */
 	public AcceptFilter<T> getAcceptFilter(){
+		if( isForced()){
+			return new BinaryAcceptFilter<T>(target, getBooleanResult());
+		}
 		if( hasPatternFilters() ){
 			return null;
 		}

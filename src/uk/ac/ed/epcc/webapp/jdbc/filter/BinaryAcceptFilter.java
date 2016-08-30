@@ -17,41 +17,23 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
  * @author spb
  *
  */
-public enum FilterCombination {
-	AND{
+public class BinaryAcceptFilter<T> extends AbstractBinaryFilter<T> implements AcceptFilter<T> {
 
-		@Override
-		public String getCombiner() {
-			return "AND";
-		}
+	public BinaryAcceptFilter(Class<? super T> target,boolean value) {
+		super(target,value);
+	}
 
-		@Override
-		public boolean getDefault() {
-			return true;
-		}
-		
-	},
-	OR{
 
-		@Override
-		public String getCombiner() {
-			return "OR";
-		}
-
-		@Override
-		public boolean getDefault() {
-			return false;
-		}
-		
-	};
-	/** Get the SQL keyword to combine two clauses
-	 * 
-	 * @return
+	
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
-	public abstract String getCombiner();
-	/** Get the default value for an empty filter.
-	 * 
-	 * @return
-	 */
-	public abstract boolean getDefault();
+	@Override
+	public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+		return vis.visitAcceptFilter(this);
+	}
+
+	public final boolean accept(T o){
+		return getBooleanResult();
+	}
 }

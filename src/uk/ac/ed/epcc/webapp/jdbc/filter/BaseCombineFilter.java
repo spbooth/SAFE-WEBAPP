@@ -32,12 +32,14 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
  * @param <T> Type of target 
  *
  */
-public abstract class BaseCombineFilter<T> extends FilterSet<T> implements PatternFilter<T>, JoinFilter<T> , OrderFilter<T>{
+public abstract class BaseCombineFilter<T> extends FilterSet<T> implements PatternFilter<T>, JoinFilter<T> , OrderFilter<T>, BinaryFilter<T>{
 		protected LinkedHashSet<PatternFilter<? super T>> filters;
 	    protected LinkedHashSet<OrderClause> order=null;
+	    private boolean force_value;
 	    public BaseCombineFilter(Class<? super T> target){
 	    	super(target);
 	    	filters = new LinkedHashSet<PatternFilter<? super T>>();
+	    	force_value=getFilterCombiner().getDefault();
 	    }
 	    /** A {@link FilterVisitor} that encodes the rules for adding a filter.
 	     * 
@@ -153,6 +155,17 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			public Boolean visitDualFilter(DualFilter<? super T> fil) throws Exception {
 				return visitPatternFilter(fil);
 			}
+
+			/* (non-Javadoc)
+			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
+			 */
+			@Override
+			public Boolean visitBinaryFilter(BinaryFilter<? super T> fil) throws Exception {
+				if( fil.getBooleanResult() != getFilterCombiner().getDefault()){
+					force_value=fil.getBooleanResult();
+				}
+				return null;
+			}
 	    	
 	    }
 	    @Override
@@ -211,6 +224,9 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			return sb.toString();
 		}
 		public final  List<PatternArgument> getParameters(List<PatternArgument> res) {
+			if( isForced()){
+				return res;
+			}
 			for(PatternFilter<? super T> f: filters){
 				f.getParameters(res);
 			}
@@ -224,6 +240,13 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			return new LinkedList<OrderClause>(order);
 		}
 		public final StringBuilder addPattern(StringBuilder sb,boolean qualify) {
+			if( isForced()){
+				sb.append(" ");
+				sb.append(Boolean.toString(force_value));
+				sb.append(" ");
+				return sb;
+			}
+			
 			boolean seen =false;
 			
 			for(PatternFilter<? super T> f: filters){
@@ -244,13 +267,21 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			return sb;
 		}
 		
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter#getBooleanResult()
+		 */
+		@Override
+		public boolean getBooleanResult() {
+			return force_value;
+		}
+
 		protected abstract FilterCombination getFilterCombiner();
 		/** Default SQL pattern to use if no filter clauses provided
 		 * 
 		 * @return String
 		 */
 		protected final String getDefaultPattern(){
-			return getFilterCombiner().getDefault();
+			return Boolean.toString(getFilterCombiner().getDefault());
 		}
 
 		/** The SQL combining clause ie. AND or OR
@@ -261,4 +292,20 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			return getFilterCombiner().getCombiner();
 		}
 
+		/** has the filter been forced to a fixed value
+		 * 
+		 * @return
+		 */
+		protected boolean isForced(){
+			return force_value != getFilterCombiner().getDefault();
+		}
+		/** Is this filter exactly a {@link BinaryFilter}
+		 * ie it has a foced value and no joins or order clauses.
+		 * 
+		 * @return
+		 */
+		protected boolean useBinary(){
+			// If forced value and no joins/order act as binary filter
+			return isForced() && join==null && order==null;
+		}
 }

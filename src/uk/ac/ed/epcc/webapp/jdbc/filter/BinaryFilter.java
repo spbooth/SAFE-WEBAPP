@@ -13,45 +13,11 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
-/**
+/** a {@link BaseFilter} that encodes a true/false value.
  * @author spb
  *
  */
-public enum FilterCombination {
-	AND{
+public interface BinaryFilter<T> extends BaseFilter<T> {
 
-		@Override
-		public String getCombiner() {
-			return "AND";
-		}
-
-		@Override
-		public boolean getDefault() {
-			return true;
-		}
-		
-	},
-	OR{
-
-		@Override
-		public String getCombiner() {
-			return "OR";
-		}
-
-		@Override
-		public boolean getDefault() {
-			return false;
-		}
-		
-	};
-	/** Get the SQL keyword to combine two clauses
-	 * 
-	 * @return
-	 */
-	public abstract String getCombiner();
-	/** Get the default value for an empty filter.
-	 * 
-	 * @return
-	 */
-	public abstract boolean getDefault();
+	public boolean getBooleanResult();
 }

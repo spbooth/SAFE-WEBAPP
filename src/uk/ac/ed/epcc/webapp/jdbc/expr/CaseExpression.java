@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
@@ -180,6 +181,15 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
 		public StringBuilder visitDualFilter(DualFilter<? super T> fil) throws Exception {
 			return visitPatternFilter(fil);
 		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
+		 */
+		@Override
+		public StringBuilder visitBinaryFilter(BinaryFilter<? super T> fil) throws Exception {
+			sb.append(Boolean.toString(fil.getBooleanResult()));
+			return sb;
+		}
     	
     }
     public static class GetListFiltervisitor<T> implements FilterVisitor<List<PatternArgument>,T>{
@@ -258,6 +268,14 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
 		@Override
 		public List<PatternArgument> visitDualFilter(DualFilter<? super T> fil) throws Exception {
 			return visitPatternFilter(fil);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
+		 */
+		@Override
+		public List<PatternArgument> visitBinaryFilter(BinaryFilter<? super T> fil) throws Exception {
+			return args;
 		}
     }
     private final Class<R> target;

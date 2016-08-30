@@ -59,6 +59,9 @@ public abstract class BaseSQLCombineFilter<T> extends BaseCombineFilter<T> imple
 
 	}
 	public final <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+		if( useBinary()){
+			return vis.visitBinaryFilter(this);
+		}
 		return vis.visitSQLCombineFilter(this);
 	}
 
