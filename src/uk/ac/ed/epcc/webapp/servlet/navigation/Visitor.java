@@ -13,11 +13,11 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet.navigation;
 
-/**
+/** a visitor class for navigation menu items
  * @author spb
  *
  */
-interface Visitor {
+public interface Visitor {
 	public void visitContainer(NodeContainer container);
 	
 	public void visitNode(Node n);
