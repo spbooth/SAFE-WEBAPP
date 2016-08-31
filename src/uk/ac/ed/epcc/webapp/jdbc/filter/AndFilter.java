@@ -92,7 +92,7 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 		}
 		SQLAndFilter<T> res = new SQLAndFilter<T>(getTarget());
 		if( isForced()){
-			res.addFilter(new SQLBinaryFilter<T>(target, getBooleanResult()));
+			res.addFilter(new GenericBinaryFilter<T>(target, getBooleanResult()));
 		}else{
 			for(PatternFilter<? super T> pat : filters){
 				res.addPatternFilter(pat);
@@ -113,7 +113,7 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 	 */
 	public AcceptFilter<T> getAcceptFilter(){
 		if( isForced()){
-			return new BinaryAcceptFilter<T>(target, getBooleanResult());
+			return new BinaryAcceptFilter<T>(this);
 		}
 		if( hasPatternFilters() ){
 			return null;

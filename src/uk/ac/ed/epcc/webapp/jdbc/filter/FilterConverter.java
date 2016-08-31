@@ -96,19 +96,13 @@ public class FilterConverter<T> implements FilterVisitor<SQLFilter<T>, T> {
 	}
 
 	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
-	 */
-	@Override
-	public SQLFilter<T> visitDualFilter(DualFilter<? super T> fil) throws Exception {
-		
-		return new DualtoSQLWrapper<T>(fil);
-	}
-
-	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
 	 */
 	@Override
 	public SQLFilter<T> visitBinaryFilter(BinaryFilter<? super T> fil) throws Exception {
-		return new SQLBinaryFilter<T>(fil.getTarget(), fil.getBooleanResult());
+		if( fil instanceof SQLFilter){
+			return (SQLFilter<T>) fil;
+		}
+		return new GenericBinaryFilter<T>(fil.getTarget(), fil.getBooleanResult());
 	}
 }

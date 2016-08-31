@@ -103,20 +103,13 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 		return fil;
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
-	 */
-	@Override
-	public AcceptFilter<? super T> visitDualFilter(DualFilter<? super T> fil) throws Exception {
-		return fil;
-	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
 	 */
 	@Override
 	public AcceptFilter<? super T> visitBinaryFilter(BinaryFilter<? super T> fil) throws Exception {
-		return new BinaryAcceptFilter<T>(fil.getTarget(), fil.getBooleanResult());
+		return new BinaryAcceptFilter<T>(fil);
 	}
 
 }

@@ -13,45 +13,17 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
-import java.util.List;
-
-/** superclass for filters that never select anything.
+/** {@link BaseFilter} that select true/false.
+ * 
+ * This class is a {@link BinaryFilter} and marked as an {@link SQLFilter}
+ * 
  * @author spb
  *
  * @param <T>
  */
-public abstract class AbstractFalseFilter<T> implements PatternFilter<T>, BinaryFilter<T>{
+public class GenericBinaryFilter<T> implements SQLFilter<T>, BinaryFilter<T>{
 
 	
-
-	protected final Class<? super T> target;
-
-	/**
-	 * 
-	 */
-	public AbstractFalseFilter(Class<? super T> target) {
-		super();
-		this.target=target;
-	}
-
-	public final StringBuilder addPattern(StringBuilder sb, boolean qualify) {
-		sb.append(" false ");
-		return sb;
-	}
-
-	public final List<PatternArgument> getParameters(List<PatternArgument> list) {
-		return list;
-	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter#getBooleanResult()
-	 */
-	@Override
-	public boolean getBooleanResult() {
-		return false;
-	}
-	public final Class<? super T> getTarget() {
-		return target;
-	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -61,6 +33,7 @@ public abstract class AbstractFalseFilter<T> implements PatternFilter<T>, Binary
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((target == null) ? 0 : target.hashCode());
+		result = prime * result + (value ? 1231 : 1237);
 		return result;
 	}
 
@@ -75,13 +48,61 @@ public abstract class AbstractFalseFilter<T> implements PatternFilter<T>, Binary
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AbstractFalseFilter other = (AbstractFalseFilter) obj;
+		GenericBinaryFilter other = (GenericBinaryFilter) obj;
 		if (target == null) {
 			if (other.target != null)
 				return false;
 		} else if (!target.equals(other.target))
 			return false;
+		if (value != other.value)
+			return false;
 		return true;
 	}
+
+
+	protected final Class<? super T> target;
+	protected boolean value;
+
+	/**
+	 * 
+	 */
+	public GenericBinaryFilter(Class<? super T> target,boolean value) {
+		super();
+		this.target=target;
+		this.value=value;
+	}
+
+	
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter#getBooleanResult()
+	 */
+	@Override
+	public final boolean getBooleanResult() {
+		return value;
+	}
+	
+	
+	public final Class<? super T> getTarget() {
+		return target;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
+	 */
+	@Override
+	public final <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+		// Default is to act as a binary filter
+		return vis.visitBinaryFilter(this);
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter#accept(java.lang.Object)
+	 */
+	@Override
+	public void accept(T o) {
+		
+	}
+
+	
 
 }

@@ -148,13 +148,6 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 				return null;
 			}
 
-			/* (non-Javadoc)
-			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
-			 */
-			@Override
-			public Boolean visitDualFilter(DualFilter<? super T> fil) throws Exception {
-				return visitPatternFilter(fil);
-			}
 
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)

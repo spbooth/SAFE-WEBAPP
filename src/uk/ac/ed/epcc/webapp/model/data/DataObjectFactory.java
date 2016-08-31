@@ -57,11 +57,11 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ConvertPureAcceptFilterVisitor;
-import uk.ac.ed.epcc.webapp.jdbc.filter.DualFalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterConverter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterFinder;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterMatcher;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
+import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.NoSQLFilterException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
@@ -79,7 +79,6 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.ParseFactory;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory.DestFilter;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
@@ -1936,7 +1935,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			getLogger().error("Error making remote relationship",e2);
 		}
     	if( fil == null ){
-    		return new DualFalseFilter<BDO>(getTarget());
+    		return new GenericBinaryFilter<BDO>(getTarget(),false);
     	}
     	try {
 			SQLFilter<R> sqlfil = fil.acceptVisitor(new FilterConverter<R>());
@@ -1947,7 +1946,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				return new RemoteAcceptFilter<BDO,R>(getTarget(),remote,field,acceptfil);
 			} catch (Exception e1) {
 				getLogger().error("Cannot convert Relationship filter", e1);
-				return new DualFalseFilter<BDO>(getTarget());
+				return new GenericBinaryFilter<BDO>(getTarget(),false);
 			}
 		}
     }

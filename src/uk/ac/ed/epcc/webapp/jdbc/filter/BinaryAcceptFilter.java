@@ -15,13 +15,20 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
 
 /**
  * @author spb
+ * @param <T> type of filter
  *
  */
-public class BinaryAcceptFilter<T> extends AbstractBinaryFilter<T> implements AcceptFilter<T> {
+public class BinaryAcceptFilter<T> implements AcceptFilter<T> {
 
-	public BinaryAcceptFilter(Class<? super T> target,boolean value) {
-		super(target,value);
+	
+
+	public BinaryAcceptFilter(BinaryFilter<? super T> nested) {
+		super();
+		this.nested = nested;
 	}
+
+	private final BinaryFilter<? super T> nested;
+	
 
 
 	
@@ -34,6 +41,15 @@ public class BinaryAcceptFilter<T> extends AbstractBinaryFilter<T> implements Ac
 	}
 
 	public final boolean accept(T o){
-		return getBooleanResult();
+		return nested.getBooleanResult();
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
+	 */
+	@Override
+	public Class<? super T> getTarget() {
+		// TODO Auto-generated method stub
+		return nested.getTarget();
 	}
 }

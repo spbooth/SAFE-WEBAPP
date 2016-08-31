@@ -28,14 +28,13 @@ import java.util.TreeSet;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
-import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.DualFalseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
@@ -47,7 +46,6 @@ import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.model.relationship.GlobalRoleFilter;
 import uk.ac.ed.epcc.webapp.model.relationship.RelationshipProvider;
@@ -941,11 +939,11 @@ public Set<A> withRole(String role) {
 	    			// as roles may be asserted from the container.
 	    			return new GlobalRoleFilter<T>(this, sub);
 	    		}else{
-	    			return new DualFalseFilter<T>(fac2.getTarget());
+	    			return new GenericBinaryFilter<T>(fac2.getTarget(),false);
 	    		}
 	    	}
 	    	if( person == null && ! haveCurrentUser()){
-	    		return new DualFalseFilter<T>(fac2.getTarget());
+	    		return new GenericBinaryFilter<T>(fac2.getTarget(),false);
 	    	}
 	    	
 	    	if( base.equals(fac2.getTag())){
@@ -973,7 +971,7 @@ public Set<A> withRole(String role) {
 	    }else{
 	    	if( person == null){
 	    		if( ! haveCurrentUser()){
-	    			return new DualFalseFilter<T>(fac2.getTarget());
+	    			return new GenericBinaryFilter<T>(fac2.getTarget(),false);
 	    		}
 	    	}
 	    	// direct roles can be un-qualified though not if we want multiple levels of qualification.
@@ -1022,7 +1020,7 @@ public Set<A> withRole(String role) {
 	    	String sub = role.substring(pos+1);
 	    	if( base.equals("global")){
 	    		// roles don't enumerate
-	    		return new DualFalseFilter<A>(target_type);
+	    		return new GenericBinaryFilter<A>(target_type,false);
 	    	}
 	    	if( base.equals(fac2.getTag())){
 	    		// This is to reference a factory/composite role from within a redefined

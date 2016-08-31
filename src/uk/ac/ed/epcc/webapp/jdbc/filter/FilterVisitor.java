@@ -87,13 +87,6 @@ public interface FilterVisitor<X,T> {
 	 */
 	public X visitJoinFilter(JoinFilter<? super T> fil) throws Exception;
 	
-	/** process a {@link DualFilter}. Objects that accept this method should generate the
-	 * <em>same</em> selection if treated as a {@link PatternFilter} or an {@link AcceptFilter}
-	 * allowing the visitor to choose which behaviour to use.
-	 * @return
-	 */
-	public X visitDualFilter(DualFilter<? super T> fil) throws Exception;
-	
 	/** process a {@link BinaryFilter} Objects that accept this method should generate a
 	 * <em>true</em> or a <em>false</em> selection value.
 	 * 

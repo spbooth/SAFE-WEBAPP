@@ -16,7 +16,7 @@ package uk.ac.ed.epcc.webapp.model.relationship;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -28,7 +28,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @author spb
  *
  */
-public class GlobalRoleFilter<T> implements DualFilter<T> {
+public class GlobalRoleFilter<T> implements BinaryFilter<T> {
 
 	/**
 	 * @param session
@@ -47,7 +47,7 @@ public class GlobalRoleFilter<T> implements DualFilter<T> {
 	 */
 	@Override
 	public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
-		return vis.visitDualFilter(this);
+		return vis.visitBinaryFilter(this);
 	}
 
 	/* (non-Javadoc)
@@ -56,14 +56,6 @@ public class GlobalRoleFilter<T> implements DualFilter<T> {
 	@Override
 	public Class<? super T> getTarget() {
 		return (Class<? super T>) DataObject.class;
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
-	 */
-	@Override
-	public boolean accept(T o) {
-		return session.hasRole(role);
 	}
 
 	/* (non-Javadoc)
@@ -97,25 +89,14 @@ public class GlobalRoleFilter<T> implements DualFilter<T> {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter#getParameters(java.util.List)
-	 */
-	@Override
-	public List<PatternArgument> getParameters(List<PatternArgument> list) {
-		return list;
-	}
+	
 
 	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter#addPattern(java.lang.StringBuilder, boolean)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter#getBooleanResult()
 	 */
 	@Override
-	public StringBuilder addPattern(StringBuilder sb, boolean qualify) {
-		if( session.hasRole(role)){
-			sb.append("true");
-		}else{
-			sb.append("false");
-		}
-		return sb;
+	public boolean getBooleanResult() {
+		return session.hasRole(role);
 	}
 
 }
