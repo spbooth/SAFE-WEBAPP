@@ -61,7 +61,7 @@ public class MakeSelectVisitor<T> implements FilterVisitor<StringBuilder, T>{
 	@Override
 	public StringBuilder visitOrFilter(OrFilter<? super T> fil) throws Exception {
 		if( fil.nonSQL() ){
-			visitAcceptFilter(fil);
+			return visitAcceptFilter(fil);
 		}
 		return fil.getSQLFilter().acceptVisitor(this);
 	}

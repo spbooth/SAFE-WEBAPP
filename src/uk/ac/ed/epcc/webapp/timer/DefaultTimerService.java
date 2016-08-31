@@ -91,8 +91,8 @@ public class DefaultTimerService implements Contexed,TimerService{
 				if( n_timers > MAX_TIMERS ){
 					return;
 				}
-				Logger log = conn.getService(LoggerService.class).getLogger(getClass());
-				log.debug("making timer "+name);
+				//Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+				//log.debug("making timer "+name);
 				t = new Timer(name);
 				timers.put(name, t);
 			}
