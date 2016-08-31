@@ -109,17 +109,17 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 <%@ include file="/scripts/form_context.jsf" %>
 <div class="block">
 <h2><%=page_heading %></h2>
-<A name="summary"/>
+<A name="summary"></A>
 <% if(target != null ){ %>
 <%= tp.getSummaryContent(conn,new HtmlBuilder(),target).toString() %>
 <% } %>
 <%
 	if( t instanceof ExtraContent ){
 %>
-<A name="extra"/>
+<A name="extra"></A>
 <%=((ExtraContent) t).getExtraHtml(new HtmlBuilder(),session_service,target).toString()%>
 <%} %>
-<A name="form"/>
+<A name="form"></A>
 <form method="post" 
 <% if( multi ){ %>
    enctype="multipart/form-data"
