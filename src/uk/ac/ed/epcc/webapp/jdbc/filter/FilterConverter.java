@@ -91,7 +91,7 @@ public class FilterConverter<T> implements FilterVisitor<SQLFilter<T>, T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFiler(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
 	 */
 	@Override
-	public SQLFilter<T> visitOrFilter(OrFilter<? super T> fil) throws Exception {
+	public SQLFilter<T> visitOrFilter(OrFilter<? super T> fil) throws NoSQLFilterException {
 		return (SQLFilter<T>) fil.getSQLFilter();
 	}
 
@@ -99,10 +99,18 @@ public class FilterConverter<T> implements FilterVisitor<SQLFilter<T>, T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
 	 */
 	@Override
-	public SQLFilter<T> visitBinaryFilter(BinaryFilter<? super T> fil) throws Exception {
+	public SQLFilter<T> visitBinaryFilter(BinaryFilter<? super T> fil)  {
 		if( fil instanceof SQLFilter){
 			return (SQLFilter<T>) fil;
 		}
 		return new GenericBinaryFilter<T>(fil.getTarget(), fil.getBooleanResult());
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
+	 */
+	@Override
+	public SQLFilter<T> visitDualFilter(DualFilter<? super T> fil)  {
+		return (SQLFilter<T>) fil.getSQLFilter();
 	}
 }

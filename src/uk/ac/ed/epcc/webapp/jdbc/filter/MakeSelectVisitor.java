@@ -108,4 +108,13 @@ public class MakeSelectVisitor<T> implements FilterVisitor<StringBuilder, T>{
 		sb.append(" true ");
 		return sb;
 	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
+	 */
+	@Override
+	public StringBuilder visitDualFilter(DualFilter<? super T> fil) throws Exception {
+		
+		return fil.getSQLFilter().acceptVisitor(this);
+	}
 }

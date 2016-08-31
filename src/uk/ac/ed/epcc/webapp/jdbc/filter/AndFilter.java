@@ -22,8 +22,9 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 /** Combining filter that selects the intersection of multiple filters.
  * 
- * This is a {@link PatternFilter} and an {@link AcceptFilter}. 
- * It can combine {@link AcceptFilter} and  {@link PatternFilter}.
+ * This is a {@link PatternFilter}, {@link BinaryFilter} and an {@link AcceptFilter} though it has its own
+ * target method in {@link FilterVisitor}. 
+ * It can combine {@link AcceptFilter}, {@link BinaryFilter} and  {@link PatternFilter}.
  * 
  * @author spb
  * @param <T> Type of object selected

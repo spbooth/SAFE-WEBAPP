@@ -109,5 +109,13 @@ public class GetListFilterVisitor<T> implements FilterVisitor<List<PatternArgume
 		return list;
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
+	 */
+	@Override
+	public List<PatternArgument> visitDualFilter(DualFilter<? super T> fil) throws Exception {
+		return fil.getSQLFilter().acceptVisitor(this);
+	}
+
 	
 }

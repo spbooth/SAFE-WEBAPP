@@ -88,11 +88,19 @@ public interface FilterVisitor<X,T> {
 	public X visitJoinFilter(JoinFilter<? super T> fil) throws Exception;
 	
 	/** process a {@link BinaryFilter} Objects that accept this method should generate a
-	 * <em>true</em> or a <em>false</em> selection value.
+	 * <em>true</em> or a <em>false</em> selection value. They can also implement {@link SQLFilter}.
 	 * 
 	 * @param fil
 	 * @return
 	 * @throws Exception
 	 */
 	public X visitBinaryFilter(BinaryFilter<? super T> fil) throws Exception;
+	
+	/** process a {@link DualFilter}.
+	 * 
+	 * @param fil
+	 * @return
+	 * @throws Exception
+	 */
+	public X visitDualFilter(DualFilter<? super T> fil) throws Exception;
 }

@@ -42,6 +42,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		sql_filters=new SQLOrFilter<T>(target);
 		pure_accept_filters = new LinkedHashSet<AcceptFilter<? super T>>();
 		mixed_filters = new LinkedHashSet<BaseFilter<? super T>>();
+		dual_filters = new LinkedHashSet<DualFilter<? super T>>();
 	}
 
 	
@@ -49,6 +50,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 	private SQLOrFilter<T> sql_filters;
 	private LinkedHashSet<AcceptFilter<? super T>> pure_accept_filters;
 	private LinkedHashSet<BaseFilter<? super T>> mixed_filters;
+	private LinkedHashSet<DualFilter<? super T>> dual_filters;
 	private boolean force_value=false;
 	private class AddFilterVisitor implements FilterVisitor<Boolean, T>{
 
@@ -123,6 +125,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 			sql_filters.addFilter(fil.sql_filters);
 			pure_accept_filters.addAll(fil.pure_accept_filters);
 			mixed_filters.addAll(fil.mixed_filters);
+			dual_filters.addAll(fil.dual_filters);
 			return null;
 		}
 
@@ -135,6 +138,15 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 			if( fil.getBooleanResult()){
 				force_value=true;
 			}
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
+		 */
+		@Override
+		public Boolean visitDualFilter(DualFilter<? super T> fil) throws Exception {
+			dual_filters.add(fil);
 			return null;
 		}
 		
@@ -166,6 +178,11 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		// Start with pure accept filters
 		for( AcceptFilter<? super T> accept : pure_accept_filters){
 			if(accept.accept(o)){
+				return true;
+			}
+		}
+		for( DualFilter<? super T> dual : dual_filters){
+			if(dual.getAcceptFilter().accept(o)){
 				return true;
 			}
 		}
@@ -211,6 +228,9 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 			throw new NoSQLFilterException("OrFilter contains non SQL filter");
 		}
 		SQLOrFilter<T> or = new SQLOrFilter<T>(target,sql_filters);
+		for(DualFilter<? super T> fil : dual_filters){
+			or.addFilter(fil.getSQLFilter());
+		}
 		return or;
 	}
 	/**

@@ -159,6 +159,14 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 				}
 				return null;
 			}
+
+			/* (non-Javadoc)
+			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
+			 */
+			@Override
+			public Boolean visitDualFilter(DualFilter<? super T> fil) throws Exception {
+				return fil.getSQLFilter().acceptVisitor(this);
+			}
 	    	
 	    }
 	    @Override
@@ -260,8 +268,10 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			return sb;
 		}
 		
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter#getBooleanResult()
+		/** get the boolean value of the filter if defined.
+		 * If the filter itself does not accept the {@link BinaryFilter} visitor method then
+		 * the returned value does not represent the full filter condition.
+		 * 
 		 */
 		@Override
 		public boolean getBooleanResult() {

@@ -84,4 +84,12 @@ public class CheckEmptyVisitor<T> implements FilterVisitor<Boolean, T> {
 		return ! fil.getBooleanResult();
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
+	 */
+	@Override
+	public Boolean visitDualFilter(DualFilter<? super T> fil) throws Exception {
+		return fil.getSQLFilter().acceptVisitor(this);
+	}
+
 }
