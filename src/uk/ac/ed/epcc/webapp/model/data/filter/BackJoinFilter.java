@@ -79,10 +79,7 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 		@SuppressWarnings("unchecked")
 		
 		public List<PatternArgument> getParameters(List<PatternArgument> list) {
-			if( fil != null && fil instanceof PatternFilter){
-				((PatternFilter<T>)fil).getParameters(list);
-			}
-			return list;
+			return getFilterArguments(fil, list);
 		}
 		
 		public StringBuilder addPattern(StringBuilder sb, boolean qualify) {

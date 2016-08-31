@@ -63,7 +63,7 @@ public class RelationshipTest extends WebappTestBase {
 		
 	}
 	@Test
-	public void testGlobal() throws DataException, UnknownRelationshipException{
+	public void testGlobalMissing() throws DataException, UnknownRelationshipException{
 		SessionService service = ctx.getService(SessionService.class);
 		AppUserFactory login = service.getLoginFactory();
 		
@@ -80,14 +80,31 @@ public class RelationshipTest extends WebappTestBase {
 		
 		Assert.assertFalse(fac.matches(service.getRelationshipRoleFilter(fac, "Manager"), t));
 		
-		serv.setTempRole("Manager");
+		
+		
+	
+	}
+	@Test
+	public void testGlobalSet() throws DataException, UnknownRelationshipException{
+		SessionService service = ctx.getService(SessionService.class);
+		AppUserFactory login = service.getLoginFactory();
+		
+		AppUser bill = login.findByEmail("bill@example.com");
+		Assert.assertNotNull(bill);
+		
+		SessionService serv = service;
+		serv.setCurrentPerson(bill);
+		serv.setTempRole("Manager"); // Note role state is cached as part of the filter so set this before querying roles
+		
+		Dummy3 t = fac.find(fac.new StringFilter("Test1"));
+		
+		Assert.assertNotNull(t);
 		
 		Assert.assertTrue(fac.matches(service.getRelationshipRoleFilter(fac, "Manager"), t));
 		
 		
 	
 	}
-	
 	@Test
 	public void testRelation() throws DataException, UnknownRelationshipException{
 		SessionService service = ctx.getService(SessionService.class);

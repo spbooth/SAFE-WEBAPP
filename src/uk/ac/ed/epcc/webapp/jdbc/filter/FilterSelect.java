@@ -22,6 +22,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+
 
 
 /** Base class that holds the rules for turning filters into SQL 
@@ -32,23 +34,54 @@ import java.util.List;
  * @param <T>
  */
 public class FilterSelect<T> {
-  /**  create the WHERE clause for the filter
+	/** is the filter known to match no records without running any sql.
+	 * 
+	 * @param my_filter
+	 * @return
+	 */
+	protected boolean isEmpty(BaseFilter<? super T> my_filter){
+		if( my_filter == null){
+			return false;
+		}
+		try {
+			return my_filter.acceptVisitor(new CheckEmptyVisitor<T>());
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	/**  create the WHERE clause for the filter
    * 
    * @param my_filter
    * @param query
    * @param qualify
+	 * @throws Exception 
    */
-  protected void makeWhere(BaseFilter<? super T> my_filter,StringBuilder query,boolean qualify) {
-	  //TODO Use {@link SQLFilterVisitor} this assumes all queries are {@link PatternFilter}
-		boolean seen = false;
-		if (my_filter != null && my_filter instanceof PatternFilter) {
-			((PatternFilter) my_filter).addPattern(query, qualify);
-		}else{
-			// match all condition
-			query.append(" true ");
-		}
-	}
+  protected void makeWhere(BaseFilter<? super T> my_filter,StringBuilder query,boolean qualify){
+	  if( my_filter == null){
+		  query.append(" true ");
+		  return;
+	  }
+	  MakeSelectVisitor<T> vis = new MakeSelectVisitor<T>(query, qualify, false);
+	  try {
+		  my_filter.acceptVisitor(vis);
+	  } catch (Exception e) {
+		  // should not get an exception with require_sql=false
+		  throw new ConsistencyError("Unexpected exception",e);
+	  }
+  }
   
+  protected List<PatternArgument> getFilterArguments(BaseFilter<? super T> my_filter, List<PatternArgument> list) {
+	  if( my_filter == null ){
+		  return list;
+	  }
+	  GetListFilterVisitor<T> vis = new GetListFilterVisitor<T>(list, false);
+	  try {
+		return my_filter.acceptVisitor(vis);
+	} catch (Exception e) {
+		// should not get an exception with require_sql=false
+		throw new ConsistencyError("Unexpected exception",e);
+	}
+  }
 protected final int setParams(int pos, StringBuilder q, PreparedStatement stmt,
 		List<PatternArgument> args) throws SQLException {
 	if( args == null ){

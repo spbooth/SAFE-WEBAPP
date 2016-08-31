@@ -113,6 +113,10 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 		 * 
 		 */
 		private final void fetchChunk() throws SQLException {
+			if( stmt == null ){
+				return; // known empty query
+			}
+			
 			int chunk = chunksize;
 			AppContext conn = getContext();
 			TimerService timer = conn.getService(TimerService.class);
@@ -165,7 +169,9 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 		protected  O iterate() throws SQLException, DataException{
             //Logger log = getLogger();
             //
-            
+            if( rs == null ){
+            	return null; // a known empty result
+            }
             //log.debug("In iterate");
 			O my_next=null;
 			do {
@@ -257,6 +263,11 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 		 * @throws DataException 
 		 */
 		protected void setup(BaseFilter<? super T> f, int start, int max) throws DataException {
+			
+			if( isEmpty(f)){
+				return;
+			}
+			
 			String modify=null;
 			//getLogger().debug("args "+start+","+max);
 			chunkstart = start;
@@ -310,9 +321,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 						ResultSet.CONCUR_READ_ONLY);
 				List<PatternArgument> list = new LinkedList<PatternArgument>();
 				list=getTargetParameters(list);
-				if (f instanceof PatternFilter) {
-					list = ((PatternFilter<T>)f).getParameters(list);
-				}
+				list=getFilterArguments(f, list);
 				list=getModifyParameters(list);
 				parm_pos = setParams(1,query, stmt, list);
 				if( DatabaseService.LOG_QUERY_FEATURE.isEnabled(getContext())){

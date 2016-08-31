@@ -42,8 +42,10 @@ public class FilterDelete<T extends DataObject> extends FilterSelect<T>{
     	res=r;
     }
 	
-    @SuppressWarnings("unchecked")
 	public int delete(SQLFilter<T> my_filter) throws DataFault{
+    	if( isEmpty(my_filter)){
+    		return 0;
+    	}
     	StringBuilder sql = new StringBuilder();
     	sql.append("DELETE from ");
     	res.addTable(sql, true);
@@ -56,10 +58,7 @@ public class FilterDelete<T extends DataObject> extends FilterSelect<T>{
     		PreparedStatement stmt = res.getSQLContext().getConnection().prepareStatement(
     				sql.toString());
     		List<PatternArgument> list = new LinkedList<PatternArgument>();
-			
-    		if (my_filter != null && my_filter instanceof PatternFilter) {
-    			list = ((PatternFilter<T>) my_filter).getParameters(list);
-    		}
+			list=getFilterArguments(my_filter, list);
     		setParams(1, sql, stmt, list);
     		if( DatabaseService.LOG_QUERY_FEATURE.isEnabled(res.getContext())){
     			res.getContext().getService(LoggerService.class).getLogger(getClass()).debug("Query is "+sql);

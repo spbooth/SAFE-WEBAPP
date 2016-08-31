@@ -46,6 +46,9 @@ public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
    protected O make() throws DataException{
 	   StringBuilder query = new StringBuilder();
 		BaseFilter<? super T> f = getFilter();
+		if( isEmpty(f)){
+			return makeDefault();
+		}
 		if( f != null && ! (f instanceof SQLFilter)){
 			// null filter is ok
 			throw new ConsistencyError("Illegal filter in FilterMaker");
@@ -72,9 +75,7 @@ public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
 					ResultSet.CONCUR_READ_ONLY);
 			List<PatternArgument> list = new LinkedList<PatternArgument>();
 			list=getTargetParameters(list);
-			if (f instanceof PatternFilter) {
-				list = ((PatternFilter<T>)f).getParameters(list);
-			}
+			list=getFilterArguments(f, list);
 			list=getModifyParameters(list);
 			setParams(1,query, stmt, list);
 			if( DatabaseService.LOG_QUERY_FEATURE.isEnabled(conn)){

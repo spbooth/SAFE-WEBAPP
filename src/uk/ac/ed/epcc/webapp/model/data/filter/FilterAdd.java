@@ -47,6 +47,9 @@ public class FilterAdd<T> extends FilterSelect<T> {
 		
 	    @SuppressWarnings("unchecked")
 		public <R extends Number> int update(FieldValue<R,T> target, R value,SQLFilter<T> my_filter) throws DataFault{
+	    	if( isEmpty(my_filter)){
+	    		return 0;
+	    	}
 	    	StringBuilder sql = new StringBuilder();
 	    	sql.append("UPDATE ");
 	    	res.addTable(sql, true);
@@ -65,10 +68,7 @@ public class FilterAdd<T> extends FilterSelect<T> {
 	    				sql.toString());
 	    		List<PatternArgument> list = new LinkedList<PatternArgument>();
 				list.add(new ConstPatternArgument<R>(target.getTarget(), value));
-	    		
-	    		if (my_filter != null && my_filter instanceof PatternFilter) {
-	    			list = ((PatternFilter)my_filter).getParameters(list);
-	    		}
+	    		list=getFilterArguments(my_filter, list);
 	    		setParams(1, sql, stmt, list);
 	    		if( DatabaseService.LOG_UPDATE.isEnabled(res.getContext())){
 	    			res.getContext().getService(LoggerService.class).getLogger(getClass()).debug("Query is "+sql);

@@ -20,16 +20,9 @@ import java.util.List;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
-import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.GetListFilterVisitor;
+import uk.ac.ed.epcc.webapp.jdbc.filter.MakeSelectVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataError;
 
@@ -98,169 +91,8 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
     	
     }
 	
-    public static class AddPatternFilterVisitor<T> implements FilterVisitor<StringBuilder, T>{
-
-    	/**
-		 * @param sb
-		 * @param qualify
-		 */
-		public AddPatternFilterVisitor(StringBuilder sb, boolean qualify) {
-			super();
-			this.sb = sb;
-			this.qualify = qualify;
-		}
-		
-		
-		
-		private final StringBuilder sb;
-    	private final boolean qualify;
-    	
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
-		 */
-		public StringBuilder visitPatternFilter(PatternFilter<? super T> fil)
-				throws Exception {
-			return  fil.addPattern(sb, qualify);
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitSQLCombineFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter)
-		 */
-		public StringBuilder visitSQLCombineFilter(BaseSQLCombineFilter<? super T> fil)
-				throws Exception {
-			return  fil.addPattern(sb, qualify);
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAndFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter)
-		 */
-		public StringBuilder visitAndFilter(AndFilter<? super T> fil) throws Exception {
-			throw new CannotFilterException();
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
-		 */
-		public StringBuilder visitOrderFilter(OrderFilter<? super T> fil)
-				throws Exception {
-			throw new CannotFilterException();
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter)
-		 */
-		public StringBuilder visitAcceptFilter(AcceptFilter<? super T> fil)
-				throws Exception {
-			throw new CannotFilterException();
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitJoinFilter(uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter)
-		 */
-		public StringBuilder visitJoinFilter(JoinFilter<? super T> fil)
-				throws Exception {
-			throw new CannotFilterException();
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFiler(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
-		 */
-		@Override
-		public StringBuilder visitOrFilter(OrFilter<? super T> fil) throws Exception {
-			if( fil.nonSQL() ){
-				throw new CannotFilterException();
-			}
-			return fil.getSQLFilter().acceptVisitor(this);
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
-		 */
-		@Override
-		public StringBuilder visitBinaryFilter(BinaryFilter<? super T> fil) throws Exception {
-			sb.append(Boolean.toString(fil.getBooleanResult()));
-			return sb;
-		}
-    	
-    }
-    public static class GetListFiltervisitor<T> implements FilterVisitor<List<PatternArgument>,T>{
-
-    	/**
-		 * @param args
-		 */
-		public GetListFiltervisitor(List<PatternArgument> args) {
-			super();
-			this.args = args;
-		}
-
-		private List<PatternArgument> args;
-    	
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
-		 */
-		public List<PatternArgument> visitPatternFilter(
-				PatternFilter<? super T> fil) throws Exception {
-			return fil.getParameters(args);
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitSQLCombineFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter)
-		 */
-		public List<PatternArgument> visitSQLCombineFilter(
-				BaseSQLCombineFilter<? super T> fil) throws Exception {
-			return fil.getParameters(args);
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAndFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter)
-		 */
-		public List<PatternArgument> visitAndFilter(AndFilter<? super T> fil)
-				throws Exception {
-			throw new CannotFilterException();
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
-		 */
-		public List<PatternArgument> visitOrderFilter(OrderFilter<? super T> fil)
-				throws Exception {
-			throw new CannotFilterException();
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter)
-		 */
-		public List<PatternArgument> visitAcceptFilter(
-				AcceptFilter<? super T> fil) throws Exception {
-			throw new CannotFilterException();
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitJoinFilter(uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter)
-		 */
-		public List<PatternArgument> visitJoinFilter(JoinFilter<? super T> fil)
-				throws Exception {
-			throw new CannotFilterException();
-		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFiler(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
-		 */
-		@Override
-		public List<PatternArgument> visitOrFilter(OrFilter<? super T> fil) throws Exception {
-			if( fil.nonSQL() ){
-				throw new CannotFilterException();
-			}
-			return fil.getSQLFilter().acceptVisitor(this);
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
-		 */
-		@Override
-		public List<PatternArgument> visitBinaryFilter(BinaryFilter<? super T> fil) throws Exception {
-			return args;
-		}
-    }
+    
+   
     private final Class<R> target;
 	private final SQLExpression<? extends R> default_expr;
 	private final LinkedList<Clause<X,R>> options;
@@ -288,7 +120,7 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
 	 */
 	public int add(StringBuilder sb, boolean qualify) {
 		sb.append("CASE ");
-		AddPatternFilterVisitor<X> vis = new AddPatternFilterVisitor<X>(sb, qualify);
+		MakeSelectVisitor<X> vis = new MakeSelectVisitor<X>(sb, qualify,true);
 		for( Clause<X,R> c: options){
 			sb.append("WHEN ");
 			try {
@@ -313,7 +145,7 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
 	 */
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
 		for( Clause<X,R> c: options){
-			GetListFiltervisitor<X> vis = new GetListFiltervisitor<X>(list);
+			GetListFilterVisitor<X> vis = new GetListFilterVisitor<X>(list,true);
 			try{
 				list = c.filter.acceptVisitor(vis);
 			} catch (Exception e) {
