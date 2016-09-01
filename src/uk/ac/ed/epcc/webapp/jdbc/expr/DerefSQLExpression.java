@@ -59,5 +59,34 @@ public class DerefSQLExpression<H extends DataObject,R extends DataObject,T> imp
 	public Class<? super T> getTarget() {
 		return remote_expression.getTarget();
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((remote_expression == null) ? 0 : remote_expression.hashCode());
+		result = prime * result + ((required_filter == null) ? 0 : required_filter.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DerefSQLExpression other = (DerefSQLExpression) obj;
+		if (remote_expression == null) {
+			if (other.remote_expression != null)
+				return false;
+		} else if (!remote_expression.equals(other.remote_expression))
+			return false;
+		if (required_filter == null) {
+			if (other.required_filter != null)
+				return false;
+		} else if (!required_filter.equals(other.required_filter))
+			return false;
+		return true;
+	}
 
 }

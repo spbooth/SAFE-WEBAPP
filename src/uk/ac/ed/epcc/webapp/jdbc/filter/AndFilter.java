@@ -131,4 +131,27 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 	protected final FilterCombination getFilterCombiner() {
 		return FilterCombination.AND;
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((accepts == null) ? 0 : accepts.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AndFilter other = (AndFilter) obj;
+		if (accepts == null) {
+			if (other.accepts != null)
+				return false;
+		} else if (!accepts.equals(other.accepts))
+			return false;
+		return true;
+	}
 }

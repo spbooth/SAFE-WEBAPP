@@ -311,4 +311,44 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			// If forced value and no joins/order act as binary filter
 			return isForced() && join==null && order==null;
 		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = super.hashCode();
+			result = prime * result + ((filters == null) ? 0 : filters.hashCode());
+			result = prime * result + (force_value ? 1231 : 1237);
+			result = prime * result + ((join == null) ? 0 : join.hashCode());
+			result = prime * result + ((order == null) ? 0 : order.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (!super.equals(obj))
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			BaseCombineFilter other = (BaseCombineFilter) obj;
+			if (filters == null) {
+				if (other.filters != null)
+					return false;
+			} else if (!filters.equals(other.filters))
+				return false;
+			if (force_value != other.force_value)
+				return false;
+			if (join == null) {
+				if (other.join != null)
+					return false;
+			} else if (!join.equals(other.join))
+				return false;
+			if (order == null) {
+				if (other.order != null)
+					return false;
+			} else if (!order.equals(other.order))
+				return false;
+			return true;
+		}
 }

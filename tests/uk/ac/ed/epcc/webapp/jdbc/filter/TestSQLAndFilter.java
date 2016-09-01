@@ -17,6 +17,8 @@
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 
@@ -105,6 +107,31 @@ public class TestSQLAndFilter extends WebappTestBase {
 		assertEquals(1, inter_count(fil2, 1.0, "fred"));
 		fil2.addFilter(d1_fac.new NumberAcceptFilter(0.0));
 		assertEquals(0, inter_count(fil2, null, null));
+		
+		// check explicit binary filters
+		assertEquals(8, d1_fac.count(new GenericBinaryFilter<Dummy1>(d1_fac.getTarget(), true)));
+		assertEquals(8, inter_count(new GenericBinaryFilter<Dummy1>(d1_fac.getTarget(), true),null,null));
+		
+		fil= new SQLAndFilter<Dummy1>(d1_fac.getTarget());
+		fil.addFilter(new GenericBinaryFilter<Dummy1>(d1_fac.getTarget(), true));
+		assertEquals(8,d1_fac.count(fil));
+		assertEquals(8,inter_count(fil,null,null));
+		
+		assertEquals(0, d1_fac.count(new GenericBinaryFilter<Dummy1>(d1_fac.getTarget(), false)));
+		assertEquals(0, inter_count(new GenericBinaryFilter<Dummy1>(d1_fac.getTarget(), false),null,null));
+		fil= new SQLAndFilter<Dummy1>(d1_fac.getTarget());
+		fil.addFilter(new GenericBinaryFilter<Dummy1>(d1_fac.getTarget(), false));
+		assertEquals(0,d1_fac.count(fil));
+		assertEquals(0,inter_count(fil,null,null));
+	}
+	
+	@Test
+	public void testAddFalse(){
+		SQLAndFilter<Dummy1> fil = new SQLAndFilter<Dummy1>(Dummy1.class);
+		
+		assertTrue(fil.getBooleanResult());
+		fil.addFilter(new FalseFilter<Dummy1>(Dummy1.class));
+		assertFalse("Filter should be forced false",fil.getBooleanResult()); 
 	}
 	
 	private int inter_count(BaseFilter<Dummy1> f, Number n, String s) throws DataFault{

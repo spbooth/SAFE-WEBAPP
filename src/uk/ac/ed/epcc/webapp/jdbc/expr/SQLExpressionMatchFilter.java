@@ -23,7 +23,9 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
+import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 
 
 /** A {@link SQLFilter} that compares two {@link SQLExpression}s.
@@ -45,10 +47,16 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
     
     @SuppressWarnings("unchecked")
 	public static <T,V>  SQLFilter<T> getFilter(Class<? super T> target,SQLExpression<? extends V> expr1,SQLExpression<? extends V> expr2){
+    	if( expr1 instanceof ConstExpression &&  expr1 instanceof ConstExpression){
+    		ConstExpression<V,T> const1 = (ConstExpression<V,T>) expr1;
+    		ConstExpression<V,T> const2 = (ConstExpression<V,T>) expr2;
+    		return new GenericBinaryFilter<T>(target,const1.getValue().equals(const2.getValue()));
+    	}
     	if( expr1 instanceof DateSQLExpression && expr2 instanceof DateSQLExpression){
     		// compare underlying value
     		return getFilter(target, ((DateSQLExpression)expr1).getMillis(), ((DateSQLExpression)expr2).getMillis());
     	}
+    	
     	SQLExpressionMatchFilter<T, V> fil = new SQLExpressionMatchFilter<>(target, expr1, expr2);
     	SQLFilter<T> req1 = expr1.getRequiredFilter();
     	SQLFilter<T> req2 = expr1.getRequiredFilter();
@@ -60,10 +68,16 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
     }
     @SuppressWarnings("unchecked")
 	public static <T,V>  SQLFilter<T> getFilter(Class<? super T> target,SQLExpression<? extends V> expr1,MatchCondition m,SQLExpression<? extends V> expr2){
+    	if( expr1 instanceof ConstExpression &&  expr1 instanceof ConstExpression){
+    		ConstExpression<V,T> const1 = (ConstExpression<V,T>) expr1;
+    		ConstExpression<V,T> const2 = (ConstExpression<V,T>) expr2;
+    		return new GenericBinaryFilter<T>(target,m.compare(const1.getValue(), const2.getValue()));
+    	}
     	if( expr1 instanceof DateSQLExpression && expr2 instanceof DateSQLExpression){
     		// compare underlying value
     		return getFilter(target, ((DateSQLExpression)expr1).getMillis(), m, ((DateSQLExpression)expr2).getMillis());
     	}
+    	
     	SQLExpressionMatchFilter<T, V> fil = new SQLExpressionMatchFilter<>(target, expr1, m,expr2);
     	SQLFilter<T> req1 = expr1.getRequiredFilter();
     	SQLFilter<T> req2 = expr1.getRequiredFilter();

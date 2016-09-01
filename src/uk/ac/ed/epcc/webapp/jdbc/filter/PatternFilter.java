@@ -23,6 +23,7 @@ import java.util.List;
 
 /** Type of filter that specifies the SQL using  parameterised query
  * 
+ * These should implement as working {@link #hashCode()} and {@link #equals(Object)}
  * @author spb
  * @param <T> type of object selected
  * 
@@ -46,4 +47,6 @@ public interface PatternFilter<T> extends BaseSQLFilter<T> {
 	 * @return modified StringBuilder
 	 */
 	public StringBuilder addPattern(StringBuilder sb,boolean qualify);
+	
+	
 }

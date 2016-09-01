@@ -249,4 +249,54 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 	public boolean getBooleanResult() {
 		return force_value;
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((dual_filters == null) ? 0 : dual_filters.hashCode());
+		result = prime * result + (force_value ? 1231 : 1237);
+		result = prime * result + ((matcher == null) ? 0 : matcher.hashCode());
+		result = prime * result + ((mixed_filters == null) ? 0 : mixed_filters.hashCode());
+		result = prime * result + ((pure_accept_filters == null) ? 0 : pure_accept_filters.hashCode());
+		result = prime * result + ((sql_filters == null) ? 0 : sql_filters.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		OrFilter other = (OrFilter) obj;
+		if (dual_filters == null) {
+			if (other.dual_filters != null)
+				return false;
+		} else if (!dual_filters.equals(other.dual_filters))
+			return false;
+		if (force_value != other.force_value)
+			return false;
+		if (matcher == null) {
+			if (other.matcher != null)
+				return false;
+		} else if (!matcher.equals(other.matcher))
+			return false;
+		if (mixed_filters == null) {
+			if (other.mixed_filters != null)
+				return false;
+		} else if (!mixed_filters.equals(other.mixed_filters))
+			return false;
+		if (pure_accept_filters == null) {
+			if (other.pure_accept_filters != null)
+				return false;
+		} else if (!pure_accept_filters.equals(other.pure_accept_filters))
+			return false;
+		if (sql_filters == null) {
+			if (other.sql_filters != null)
+				return false;
+		} else if (!sql_filters.equals(other.sql_filters))
+			return false;
+		return true;
+	}
 }

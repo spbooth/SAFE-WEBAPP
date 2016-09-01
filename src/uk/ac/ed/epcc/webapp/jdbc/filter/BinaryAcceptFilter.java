@@ -52,4 +52,29 @@ public class BinaryAcceptFilter<T> implements AcceptFilter<T> {
 		// TODO Auto-generated method stub
 		return nested.getTarget();
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((nested == null) ? 0 : nested.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BinaryAcceptFilter other = (BinaryAcceptFilter) obj;
+		if (nested == null) {
+			if (other.nested != null)
+				return false;
+		} else if (!nested.equals(other.nested))
+			return false;
+		return true;
+	}
 }
