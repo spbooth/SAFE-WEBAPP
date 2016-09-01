@@ -147,7 +147,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 				req.setAttribute("page_name", "the Login Page");
 				req.setAttribute("page_url", getLoginPage(conn)+"?username="
 						+ encodeCGI(username));
-				message(conn, req, res, "new_password_emailed", username);
+				message(conn, req, res, "new_password_emailed", username, Emailer.PASSWORD_RESET_SERVLET.isEnabled(conn)? "password reset link" :"new password");
 				return;
 			}
 			log.info("login requested for " + username);

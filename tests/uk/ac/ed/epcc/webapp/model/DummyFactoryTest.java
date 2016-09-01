@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.model;
 
 import static org.junit.Assert.*;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import org.junit.After;
@@ -28,6 +29,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
@@ -169,4 +171,16 @@ public class DummyFactoryTest extends DataObjectFactoryTestCase {
 		assertTrue(fac.fieldExists(Dummy1.MANDATORY));
 		assertFalse(nullable.contains(Dummy1.MANDATORY));
 	}
+	
+	
+	@Test
+	public void testFalse() throws DataFault{
+		Dummy1.Factory fac = (Dummy1.Factory) getFactory();
+		Dummy1 d = new Dummy1(ctx);
+		d.setName("Fred");
+		d.commit();
+		Iterator it = fac.getResult(new FalseFilter<>(Dummy1.class)).iterator();
+		assertFalse(it.hasNext());
+	}
+	
 }
