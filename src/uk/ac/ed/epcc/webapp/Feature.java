@@ -149,7 +149,7 @@ public class Feature implements Comparable<Feature>{
 	protected boolean getConfigValue(AppContext conn) {
 		return conn.getBooleanParameter(getTag(),isDef());
 	}
-	private String getTag() {
+	protected String getTag() {
 		return "service.feature." + getName();
 	}
 	

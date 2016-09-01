@@ -109,7 +109,7 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 <%@ include file="/scripts/form_context.jsf" %>
 <div class="block">
 <h2><%=page_heading %></h2>
-<A name="summary"></A>
+<A name="summary"></A><%--Browsers don't like single tag anchors--%>
 <% if(target != null ){ %>
 <%= tp.getSummaryContent(conn,new HtmlBuilder(),target).toString() %>
 <% } %>

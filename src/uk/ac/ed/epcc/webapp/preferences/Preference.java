@@ -21,6 +21,9 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link Preference} is a {@link Feature} that only affects presentation logic so a user is allowed to
  * override the system-wide value with their own setting.
+ * 
+ * This can be dynamically degraded to a non-settable {@link Feature} busing the boolean config parameter
+ * <b>service.feature.<i>name</i>.settable</b>
  * @author spb
  *
  */
@@ -50,13 +53,20 @@ public class Preference extends Feature {
 		// Preference queries may occur often so cache the result in the context
 		Boolean b = (Boolean) conn.getAttribute(this);
 		if (b == null) {
-			UserSettingFactory<UserSetting> fac = new UserSettingFactory<UserSetting>(conn);
-			b = new Boolean(fac.getPreference(this));
+			if( canUserSet(conn)){
+				UserSettingFactory<UserSetting> fac = new UserSettingFactory<UserSetting>(conn);
+				b = new Boolean(fac.getPreference(this));
+			}else{
+				b = new Boolean(defaultSetting(conn));
+			}
 			conn.setAttribute(this, b);
 		}
 		return b.booleanValue();
 	}
 
+	public boolean canUserSet(AppContext conn){
+		return conn.getBooleanParameter(getTag()+".settable", true);
+	}
 	public boolean defaultSetting(AppContext conn){
 		return getConfigValue(conn);
 	}
@@ -85,10 +95,13 @@ public class Preference extends Feature {
 	 * @return
 	 */
 	public boolean canView(SessionService<?> sess){
-		if( required_roles == null || required_roles.length == 0){
-			return true;
+		if( canUserSet(sess.getContext())){
+			if( required_roles == null || required_roles.length == 0){
+				return true;
+			}
+			return sess.hasRoleFromList(required_roles);
 		}
-		return sess.hasRoleFromList(required_roles);
+		return false;
 	}
 	
 }
