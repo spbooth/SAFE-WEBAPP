@@ -173,6 +173,10 @@ public abstract class WebappServlet extends HttpServlet {
 	 * standard way for a servlet to generate output other than redirecting to a
 	 * submitting page.
 	 * 
+	 * Pre-formatted messages are defined in bundles and pass through {@link AppContext#expandText(String)}
+	 * before being shown
+	 * 
+	 * @see MessageBundleService
 	 * @param context
 	 * @param req
 	 * @param res
@@ -192,6 +196,11 @@ public abstract class WebappServlet extends HttpServlet {
 	 * only be called once as it won't work if any output is committed its the
 	 * standard way for a servlet to generate output other than redirecting to a
 	 * submitting page.
+	 * 
+	 * Pre-formatted messages are defined in bundles and pass through {@link AppContext#expandText(String)}
+	 * before being shown
+	 * 
+	 * @see MessageBundleService
 	 * 
 	 * @param context
 	 *            AppContext

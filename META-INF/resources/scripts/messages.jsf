@@ -15,6 +15,9 @@
 A generic message fragment used for printing standardised messages
 normally included as the body of messages.jsp (which should contain the 
 application specific formatting.
+
+If there is no AppContext the text has to be passed by request attribute and cannot perform
+AppContext text expansion.
 --%>
 <%@page import="uk.ac.ed.epcc.webapp.messages.MessageBundleService"%>
 <%
@@ -32,33 +35,25 @@ application specific formatting.
 	Object args[] = (Object[]) request.getAttribute("args");
 	if(args == null) args = new Object[0];
 
-	if( message_type != null ){
+	if( message_type != null && conn != null){
 	  ResourceBundle mess = conn.getService(MessageBundleService.class).getBundle();
 	  if( message_title == null ){
 		  try{
-			  message_title = MessageFormat.format(mess.getString(message_type + ".title"),args);
+			  message_title = MessageFormat.format(conn.expandText(mess.getString(message_type + ".title")),args);
 		  }catch(MissingResourceException e){
-			  if( conn == null ){
-				  message_title="Missing AppContext (Exception occured)";
-			  }else{
 			  	conn.error(e,"missing message title for "+message_type);
-			  }
 		  }
 	  }
 	  if( message_text == null ){
 		  try{
-			  message_text = MessageFormat.format(mess.getString(message_type + ".text"),args);
+			  message_text = MessageFormat.format(conn.expandText(mess.getString(message_type + ".text")),args);
 		  }catch(MissingResourceException e){
-			  if(conn != null ){
-			  	conn.error(e,"missing message text for "+message_type);
-			  }else{
-				  message_text="No message text for "+message_type;
-			  }
+			  conn.error(e,"missing message text for "+message_type);
 		  }
 	  }
 	  if( message_extra == null ){
 		  try{
-			  message_extra = MessageFormat.format(mess.getString(message_type + ".extra"),args);
+			  message_extra = MessageFormat.format(conn.expandText(mess.getString(message_type + ".extra")),args);
 		  }catch(MissingResourceException e){
 			  // Not an error
 		  }
