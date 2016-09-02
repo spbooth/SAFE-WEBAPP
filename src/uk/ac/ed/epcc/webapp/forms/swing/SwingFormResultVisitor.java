@@ -220,18 +220,18 @@ public class SwingFormResultVisitor implements FormResultVisitor,Contexed {
 		String message_extra="";
 		Object body="No message";
 		 try{
-			  message_title = MessageFormat.format(mess.getString(message_type + ".title"),args);
+			  message_title = MessageFormat.format(conn.expandText(mess.getString(message_type + ".title")),args);
 		  }catch(MissingResourceException e){
 			  conn.error(e,"missing message title for "+message_type);
 		  }
 		  try{
-			  message_text = MessageFormat.format(mess.getString(message_type + ".text"),args);
+			  message_text = MessageFormat.format(conn.expandText(mess.getString(message_type + ".text")),args);
 			  body = message_text;
 		  }catch(MissingResourceException e){
 			  conn.error(e,"missing message text for "+message_type);
 		  }
 		  try{
-			  message_extra = MessageFormat.format(mess.getString(message_type + ".extra"),args);
+			  message_extra = MessageFormat.format(conn.expandText(mess.getString(message_type + ".extra")),args);
 			  if( message_extra != null ){
 				  body = new Object[]{message_text,message_extra};
 			  }
