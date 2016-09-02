@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue;
@@ -27,6 +28,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.NoSQLFilterException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.Joiner;
+import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 /** a {@link IndexedSQLValue} that resolves to a constant value.
@@ -144,7 +146,8 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	 */
 	@Override
 	public DataObjectFactory<I> getFactory() throws Exception {
-		return (DataObjectFactory<I>) IndexedReference.makeIndexedProducer(conn, val.getFactoryClass(), val.getTag());
+		IndexedProducer producer = IndexedReference.makeIndexedProducer(conn, val.getFactoryClass(), val.getTag());
+		return (DataObjectFactory<I>) producer;
 	}
 
 	/* (non-Javadoc)
