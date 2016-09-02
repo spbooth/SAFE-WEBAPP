@@ -45,7 +45,11 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.IndexedError;
 
 
 public final class IndexedReference<I extends Indexed> {
-  private final int id;
+  /**
+	 * 
+	 */
+	public static final String INDEXED_REFERENCE_NAME_REGEXP = "IndexedReference\\((\\d+),([\\w\\.\\$]*),(\\w*)\\)";
+private final int id;
   private final Class<? extends IndexedProducer> clazz;
   // table is allowed to be null if and only if the factory clazz hardwires the table
   private final String table;
@@ -120,7 +124,7 @@ public Class<? extends IndexedProducer> getFactoryClass() {
 	return clazz;
 }
 
-private final static Pattern NAME_PATTERN=Pattern.compile("IndexedReference\\((\\d+),([\\w\\.\\$]*),(\\w*)\\)");
+public final static Pattern NAME_PATTERN=Pattern.compile(INDEXED_REFERENCE_NAME_REGEXP);
 /* (non-Javadoc)
  * @see java.lang.Object#toString()
  */

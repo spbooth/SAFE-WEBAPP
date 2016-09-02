@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 /** Filter to join two tables, selecting entries based on a filter on the remote table 
  *
@@ -61,4 +62,17 @@ public class Joiner<T extends DataObject, BDO extends DataObject> extends SQLAnd
 				add(f,false); // remote end filter
 			}
      }
+		/** Join to a fixed row of the remote table.
+		 * 
+		 * @param target
+		 * @param fil
+		 * @param remote_res
+		 * @param ref
+		 */
+		public Joiner(Class<? super BDO> target, SQLFilter<? super T> fil, Repository remote_res,int ref){
+			super(target);
+			addFilter(new ConstJoinerFilter<T,BDO>(target, ref, remote_res));
+			SQLFilter f = fil;
+			add(f,false);
+		}
 }
