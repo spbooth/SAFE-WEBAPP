@@ -21,8 +21,7 @@ signup.jsp - Page used to sign up for an account using password auth.
 	SignupServlet POST - Validates details and creates database records if appropriate
 
 --%>
-<%@ page	session="false"
-   import="java.util.*, uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*,uk.ac.ed.epcc.webapp.forms.html.*,uk.ac.ed.epcc.webapp.session.AppUserFactory"
+<%@ page import="java.util.*, uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*,uk.ac.ed.epcc.webapp.forms.html.*,uk.ac.ed.epcc.webapp.session.AppUserFactory"
 %>
 <%@page session="false" %>
 <%@ include file="/service_init.jsf" %>
@@ -38,7 +37,6 @@ signup.jsp - Page used to sign up for an account using password auth.
     }
    /* Retrieve obj for person currently logged in - 
     * if an error is returned, return to login page. */
-	//AppContext conn = (AppContext) new ServletAppContext(this);
     SessionService<?> session_service = conn.getService(SessionService.class);
     if(session_service != null){
 	  AppUser person = session_service.getCurrentPerson();
@@ -52,44 +50,48 @@ signup.jsp - Page used to sign up for an account using password auth.
 
 	
 	String page_title = service_name+" "+website_name+" Signup";
+	String privacy_policy=conn.getInitParameter("service.url.privacypolicy");
 %>
 <%@ include file="/std_header.jsf" %>
 
+<script language="javascript">
+function open_privacy_popup() {
+	window.open("<%= privacy_policy %>", "singup_privacy_popup_window", "scrollbars=1, toolbar=0, resizable=1, height=440, width=400");
+	return false;
+}
+</script>
 
 <div class="block">
-<H2>New Person Signup Form</H2>
-
-
-<p>
-
-This is the <%=service_name%> Administration Service.  
-If you already have a password for this website:
-<b>
- <a href="<%= response.encodeURL(web_path+"/login.jsp") %>">Go to Login</a></b>
- 
+<H2><%=page_title%></H2>
+<p class="highlight">
+This is the <%=service_name%> <%=website_name%>.  
 </p>
 </div>
 
 
+<%@ include file="/scripts/form_context.jsf" %>
 <%
-     AppUserFactory person_fac =  session_service.getLoginFactory();
-     //PasswordAuthAppUserFactory<?> person_fac = new PasswordPersonFactory(conn,"Person");
-     // Normally webname will be null here but might as well check
-     HTMLCreationForm creator = new HTMLCreationForm("Signup",person_fac.getSignupFormCreator(RegisterServlet.getRealm(conn),conn.getService(ServletService.class).getWebName()));
+AppUserFactory person_fac =  session_service.getLoginFactory();
+HTMLCreationForm creator = new HTMLCreationForm("Signup",person_fac.getSignupFormCreator(RegisterServlet.getRealm(conn),conn.getService(ServletService.class).getWebName()));
+boolean multi = creator.useMultiPart();
 %>
 <div class="block" role="main">
-<%@ include file="/scripts/form_context.jsf" %>
-  <h2>Your Details:</h2>
-  <p>Fields marked in <b>bold</b> are mandatory.</p>
-  <%= person_fac.addUpdateNotes(new HtmlBuilder()) %>
-  <form method="post" action="<%= response.encodeURL(web_path+"/SignupServlet") %>">
-     <input type="hidden" name="form_url" value="<%=HTMLForm.getFormURL(request)%>">
-     
-     <%= creator.getHtmlForm(request) %>
-      
-      <div class="action_buttons">
-      <input class="input_button" type="reset" value="   Clear   "/>
-      </div>
+<h2>Registration form</h2>
+<p>Fields marked in <b>bold</b> are mandatory.</p>
+<%= person_fac.addUpdateNotes(new HtmlBuilder()) %>
+<% if( privacy_policy != null ){ %>
+<p>
+<small>All information supplied is held and processed in accordance with the <%=service_name%> Personal Data and Privacy Policy.
+	  You can find full details <a href="<%= privacy_policy%>" onClick="return open_privacy_popup();"><b>here</b></a>.</small>
+</p>
+<% } %>
+  <form method="post" 
+<% if( multi ){ %>
+   enctype="multipart/form-data"
+<% } %>  
+  action="<%= response.encodeURL(web_path+"/SignupServlet") %>">
+<input type="hidden" name="form_url" value="<%=HTMLForm.getFormURL(request)%>">
+<%= creator.getHtmlForm(request) %>
   </form>
 </div>
 

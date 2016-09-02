@@ -21,6 +21,8 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
+import uk.ac.ed.epcc.webapp.AppContext;
+
 /** A {@link ResourceBundle.Control} that allows multiple bundles to 
  * be specified as a comma separated list. contents will be merged 
  * into a single bundle.
@@ -29,6 +31,12 @@ import java.util.ResourceBundle;
  */
 
 public class ListControl extends ResourceBundle.Control{
+	public ListControl(AppContext conn) {
+		super();
+		this.conn = conn;
+	}
+
+	private final AppContext conn;
 
 	/**
 	 * 
@@ -55,9 +63,9 @@ public class ListControl extends ResourceBundle.Control{
 				InputStream stream = loader.getResourceAsStream(resourceName);
 				if( stream != null){
 					if( props == null){
-						props=new Properties();
+						props=new SubstitutionProperties(conn);
 					}else{
-						props = new Properties(props);
+						props = new SubstitutionProperties(conn,props);
 					}
 					props.load(stream);
 				}

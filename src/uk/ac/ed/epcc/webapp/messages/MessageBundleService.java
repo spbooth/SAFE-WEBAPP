@@ -32,11 +32,12 @@ import uk.ac.ed.epcc.webapp.config.ConfigService;
 
 @PreRequisiteService(ConfigService.class)
 public class MessageBundleService implements Contexed, AppContextService<MessageBundleService> {
-	private static ListControl control = new ListControl();
+	private final ListControl control;
 	private AppContext context;
 	private Map<String,ResourceBundle> bundle_map=new HashMap<String, ResourceBundle>();
 	public MessageBundleService(AppContext c){
 		context=c;
+		control = new ListControl(c);
 	}
 	public ResourceBundle getBundle(){
 		return getBundle("messages");
