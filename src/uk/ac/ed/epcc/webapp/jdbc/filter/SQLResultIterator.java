@@ -113,9 +113,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 		 * 
 		 */
 		private final void fetchChunk() throws SQLException {
-			if( stmt == null ){
-				return; // known empty query
-			}
+			assert(stmt != null); // known empty query won't make stmt but this should not be called
 			
 			int chunk = chunksize;
 			AppContext conn = getContext();
@@ -169,9 +167,9 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 		protected  O iterate() throws SQLException, DataException{
             //Logger log = getLogger();
             //
-            if( rs == null ){
-            	return null; // a known empty result
-            }
+			
+            assert( rs != null ); // known empty query would not make result set but this should not be called
+            
             //log.debug("In iterate");
 			O my_next=null;
 			do {
