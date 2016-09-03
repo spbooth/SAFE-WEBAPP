@@ -41,13 +41,5 @@ public class MessageServiceTest extends WebappTestBase {
 		assertEquals("Hello I am called B",messages.getString("b.text"));
 	}
 	
-	@Test
-	public void testMessageSubstitution(){
-		MessageBundleService serv = getContext().getService(MessageBundleService.class);
-		
-		ResourceBundle messages = serv.getBundle();
-		assertEquals("This is A sub found it!",messages.getString("a_sub.title"));
-		assertEquals("I have found it!",messages.getString("a_sub.text"));
-	}
 
 }
