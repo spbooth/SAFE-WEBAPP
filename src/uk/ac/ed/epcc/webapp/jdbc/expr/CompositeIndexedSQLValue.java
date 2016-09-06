@@ -134,4 +134,13 @@ implements IndexedSQLValue<H,T>{
 		return branch.getFactory();
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return base.toString()+"["+branch.toString()+"]";
+	}
+
 }

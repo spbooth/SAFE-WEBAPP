@@ -21,11 +21,15 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
+import uk.ac.ed.epcc.webapp.forms.result.ConfirmTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 //import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataException;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
@@ -106,12 +110,36 @@ public class HTMLCreationForm {
 		AppContext conn = creator.getContext();
 		if (f == null)
 			return null;
+		Map<String,Object> params = conn.getService(ServletService.class).getParams();
+		FormAction shortcut = f.getShortcutAction(params);
+    	if( shortcut != null ){
+    		FormResult result=null;
+    		String confirm_action = shortcut.getConfirm(f);
+    		if( confirm_action != null ){
+				result = confirmTransition(req, conn, confirm_action,null);
+				if( result != null ){
+					return result;
+				}
+				
+			}
+    		result = shortcut.action(f);
+			if( result != null ){
+				return result;
+			}
+    	}
 		boolean ok = f.parsePost(req);
 		if (!ok) {
 			conn.getService(LoggerService.class).getLogger(getClass()).debug("form failed to parse");
 			return null;
 		}
-		Map<String,Object> params = conn.getService(ServletService.class).getParams();
+		String confirm_action = f.mustConfirm(params);
+
+		if( confirm_action != null ){
+			FormResult result = confirmTransition(req, conn, confirm_action,null);
+			if( result != null ){
+				return result;
+			}
+		}
 		FormResult o =  f.doAction(params);
 		if (o == null) {
 			conn.error(null,"error in create doAction");
@@ -120,6 +148,19 @@ public class HTMLCreationForm {
 		return o;
 	}
 	
+	/**
+	 * @param req
+	 * @param conn
+	 * @param confirm_action
+	 * @param object
+	 * @return
+	 */
+	private FormResult confirmTransition(HttpServletRequest req, AppContext conn, String confirm_action,
+			Object object) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	public boolean parsePost(HttpServletRequest req){
 		return getForm().parsePost(req);
 	}
