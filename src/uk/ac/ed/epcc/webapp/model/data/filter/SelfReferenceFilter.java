@@ -51,7 +51,7 @@ public class SelfReferenceFilter<T extends DataObject> implements SQLFilter<T> ,
 	 * 
 	 * @param target factory target Class
 	 * @param res {@link Repository}
-	 * @param exclude if true matches everything but reference
+	 * @param exclude if true, matches everything but reference
 	 * @param ref {@link IndexedReference}
 	 */
 	public SelfReferenceFilter(Class<? super T> target,Repository res, boolean exclude ,IndexedReference<T> ref){

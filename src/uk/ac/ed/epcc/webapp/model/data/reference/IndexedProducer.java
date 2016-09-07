@@ -53,7 +53,8 @@ public interface IndexedProducer<A extends Indexed> extends TypeConverter<A, Num
 	 */
 	public IndexedReference<A> makeReference(int id);
 	
-	/** Test if an IndexedReference belongs to this producer
+	/** Test if an IndexedReference belongs to this producer.
+	 * This returns false for any null reference.
 	 * 
 	 * @param ref
 	 * @return boolean
