@@ -57,6 +57,7 @@ public class DatabaseUpgrader extends Object implements Command {
 		if( seen.contains(name) || conn.getBooleanParameter(name+".no_innodb", false)){
 			return;
 		}
+		try{
 		System.out.println("processing "+name);
 		// ensure table created
 		DataObjectFactory fac = getContext().makeObject(DataObjectFactory.class,name);
@@ -126,6 +127,10 @@ public class DatabaseUpgrader extends Object implements Command {
 			}else if( info.isNumeric()){
 				System.out.println(info.getName(true)+" not index?");
 			}
+		}
+		}catch(Throwable t){
+			System.err.println("Error processing table");
+			t.printStackTrace(System.err);
 		}
 	}
 	/* (non-Javadoc)
