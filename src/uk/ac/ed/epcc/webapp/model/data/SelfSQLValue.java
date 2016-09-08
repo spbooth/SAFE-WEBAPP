@@ -52,8 +52,11 @@ public class SelfSQLValue<T extends DataObject> implements SQLAccessor<IndexedRe
 	}
 	
 	public IndexedReference<T> getValue(Record r) {
-		// again if not set we use a zero id value
-		return makeReference(r.getID());
+		if( r.hasID()){
+			// again if not set we use a zero id value
+			return makeReference(r.getID());
+		}
+		return null;
 	}
 	
 	public int add(StringBuilder sb, boolean qualify) {
