@@ -63,7 +63,14 @@ public class DatabaseUpgrader extends Object implements Command {
 		
 		Repository.reset(getContext(), name);
 		Repository res = Repository.getInstance(getContext(), name);
+		if( res ==null){
+			return;
+		}
 		String table_name =res.getTable();
+		Set<String> fields = res.getFields();
+		if( fields == null || fields.size() <= 0){
+			return;
+		}
 		System.out.println("table is "+table_name);
 		System.out.println("upgrade "+table_name+" to InnoDB");
 		stmt.executeUpdate("ALTER TABLE "+table_name+" ENGINE=InnoDB");
@@ -166,6 +173,7 @@ public class DatabaseUpgrader extends Object implements Command {
 	}
 	
 	public static void main(String args[]){
+		System.out.println("Sarting upgrade");
 		AppContext c = new AppContext();
 		CommandLauncher launcher = new CommandLauncher(c);
 		launcher.run(DatabaseUpgrader.class, args);
