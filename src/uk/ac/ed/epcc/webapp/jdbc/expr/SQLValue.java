@@ -36,6 +36,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  *
  * @param <T> type produced
  * @see SQLExpression 
+ * @see GroupingSQLValue
  * 
  */
 public interface SQLValue<T> extends Targetted<T>{
