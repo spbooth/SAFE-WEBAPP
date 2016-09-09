@@ -33,7 +33,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 /** A  base class for ResultMappers that use SQL Group-By queries 
  * there are methods to add various select clauses to the target string.
  * @author spb
- *
+ * @see GroupingSQLValue
  * @param <O> Type being produced
  */
 public abstract class SQLGroupMapper<O> implements ResultMapper<O>, Contexed {
@@ -73,11 +73,12 @@ public abstract class SQLGroupMapper<O> implements ResultMapper<O>, Contexed {
 	    
 	    /** add a field both as a clause and as an group by key
 	     * 
+	     * Note the {@link SQLValue} can implement {@link GroupingSQLValue} to customise behaviours. Literal constants 
+	     * are not legal in group-by clauses so {@link GroupingSQLValue} must be implemented when the SQL representation is a constant.
 	     * @param exp
 	     * @param name 
 	     */
 	    public  void addKey(SQLValue<?> exp, String name){
-	    	   
 	    	    key_list.add(addClause(exp,name));
 	    }
 	    /** Add a column to the table output

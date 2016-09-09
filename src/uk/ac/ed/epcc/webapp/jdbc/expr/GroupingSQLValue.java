@@ -19,11 +19,16 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 
 /** A variant of {@link SQLValue} which can produce an alternative
  * SQL fragment for group-by clauses. This allows complex transformations
- * that do not change the grouping result to be .
+ * that do not change the grouping result to be optimised.
+ * 
+ * If the SQL representation of the {@link SQLValue} is a literal constant it
+ * is required to implement this to suppress the group-by clause as literal constants 
+ * are illegal in group-by clauses
  * 
  * 
  * @author spb
- * @param <T> 
+ * @see SQLGroupMapper
+ * @param <T> type of {@link SQLValue}
  *
  */
 

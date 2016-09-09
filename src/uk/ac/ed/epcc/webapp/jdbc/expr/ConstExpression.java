@@ -112,7 +112,7 @@ public final class ConstExpression<T,R> implements SQLExpression<T>, SQLAccessor
 		 * @see uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue#addGroup(java.lang.StringBuilder, boolean)
 		 */
 		public int addGroup(StringBuilder sb, boolean qualify) {
-			// constnat does not affect group-by
+			// constant does not affect group-by
 			return 0;
 		}
 		/* (non-Javadoc)

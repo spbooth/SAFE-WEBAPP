@@ -20,7 +20,9 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
+import uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue;
+import uk.ac.ed.epcc.webapp.jdbc.expr.SQLGroupMapper;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ConstPatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
@@ -33,12 +35,16 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 /** a {@link IndexedSQLValue} that resolves to a constant value.
  * 
- * It adds the id of the reference to the SQL statement.
+ * It adds the id of the reference to the SQL statement. This is therefore illegal in a GROUP BY clause
+ * so the class implements {@link GroupingSQLValue}.
+ * 
+ * 
+ * @see SQLGroupMapper
  * @author spb
  * @param <T> Type of owning/home table.
  * @param <I> Type of remote table
  */
-public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> implements IndexedSQLValue<T, I> {
+public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> implements IndexedSQLValue<T, I> , GroupingSQLValue<IndexedReference<I>>{
 
 	public ConstIndexedSQLValue(AppContext conn, Class<? super T> clazz, IndexedReference<I> val) {
 		super();
@@ -186,7 +192,20 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 			return false;
 		return true;
 	}
-
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue#addGroup(java.lang.StringBuilder, boolean)
+	 */
+	public int addGroup(StringBuilder sb, boolean qualify) {
+		// constant does not affect group-by
+		return 0;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue#getGroupParameters(java.util.List)
+	 */
+	public List<PatternArgument> getGroupParameters(
+			List<PatternArgument> list) {
+		return list;
+	}
 	public String toString(){
 		return "CONST("+val.toString()+")";
 	}
