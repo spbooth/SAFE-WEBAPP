@@ -376,7 +376,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			}
 			private final Record record;
 			private final T user;
-			 protected String getSalt(){
+			 public String getSalt(){
 			    	return record.getStringProperty(DatabasePasswordComposite.SALT, "");
 			    }
 			 private void setPasswordStatus(PasswordStatus.Value v) {
@@ -413,7 +413,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 					}
 					if( DatabasePasswordComposite.JAVA_HASH.isEnabled(conn)){
 						try {
-							setCryptPassword(salt,h.getHash(new_password));
+							setCryptPassword(h,salt,h.getHash(new_password));
 						} catch (NoSuchAlgorithmException e) {
 							throw new DataFault("bad hash algorithm", e);
 						}
@@ -477,7 +477,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 						} catch (CannotUseSQLException e) {
 							getLogger().error("Error setting password by sql",e);
 							try {
-								setCryptPassword(salt,h.getHash(new_password));
+								setCryptPassword(h,salt,h.getHash(new_password));
 							} catch (NoSuchAlgorithmException e2) {
 								throw new DataFault("bad hash algorithm", e2);
 							}
@@ -523,7 +523,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 				private PasswordStatus.Value getPasswordStatus() {
 					return record.getProperty(DatabasePasswordComposite.p_status);
 				}
-			    protected String getCryptPassword(){
+			    public String getCryptPassword(){
 			    	return record.getStringProperty(DatabasePasswordComposite.PASSWORD,"");
 			    }
 			    
@@ -537,14 +537,15 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			     * @param salt
 			     * @param crypt
 			     */
-			    public void setCryptPassword(String salt,String crypt){
+			    public void setCryptPassword(Hash h,String salt,String crypt){
+			    	record.setOptionalProperty(ALG, h.ordinal());
 			    	record.setOptionalProperty(DatabasePasswordComposite.SALT, salt);
 			    	record.setProperty(DatabasePasswordComposite.PASSWORD, crypt);
 			    	record.setOptionalProperty(DatabasePasswordComposite.PASSWORD_FAILS, 0);
 			    	record.setOptionalProperty(PASSWORD_CHANGED, new Date());
 			    	setPasswordStatus(DatabasePasswordComposite.VALID);
 			    }
-			    protected Hash getAlgorithm(){
+			    public Hash getAlgorithm(){
 			    	Repository res = record.getRepository();
 			    	Hash default_hash = Hash.getDefault(getContext());
 			    	if(res.hasField(DatabasePasswordComposite.ALG)){
@@ -829,7 +830,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	 */
 	@Override
 	public void lockPassword(T user) {
-		getHandler(user).setCryptPassword("", "Locked");
+		getHandler(user).setCryptPassword(Hash.getDefault(getContext()),"", "Locked");
 	}
 
 	@Override

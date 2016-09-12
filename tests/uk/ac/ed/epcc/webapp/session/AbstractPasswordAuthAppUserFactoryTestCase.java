@@ -46,7 +46,7 @@ public abstract class AbstractPasswordAuthAppUserFactoryTestCase<F extends AppUs
 			assertNotNull(copy);
 			assertEquals(user.getEmail(), copy.getEmail());
 			// Note we HAVE to reset on copy as user still sees the original value as clean
-			hc.setCryptPassword(salt,old);
+			hc.setCryptPassword(h.getAlgorithm(),salt,old);
 			copy.commit();
 			fac.findByEmail(email);
 			String old2 = h.getCryptPassword();
