@@ -519,6 +519,9 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	}
 	/** A {@link FilterResult} for link objects.
 	 * 
+	 * This generates a {@link LinkFilterIterator} to pre-populate the end-links if known.
+	 * 
+	 * @see FilterSet
 	 * @author spb
 	 *
 	 */
