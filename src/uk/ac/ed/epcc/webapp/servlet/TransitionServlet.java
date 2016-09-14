@@ -254,15 +254,17 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 							log.error("FatalTransitionException", e);
 							if (use_transactions){
 								serv.rollbackTransaction();
+								log.warn("Rolling back transaction in TransitionServlet");
 							}
 						}
-						log.debug("transition exception", e);
+						log.error("transition exception", e);
 						message(conn, req, res, "transition_error",  key, e.getMessage());
 						return;
 					}catch(Throwable tr){
 						if (use_transactions){
 							// assume this is bad and roll-back
 							serv.rollbackTransaction();
+							log.warn("Rolling back transaction in TransitionServlet");
 						}
 						throw tr;
 					}finally{
