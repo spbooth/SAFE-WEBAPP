@@ -16,7 +16,7 @@
  a fragment of the navigation menus.
 
 --%>
-<%@ include file="/scripts/service_init.jsf"%>
+<%@ include file="/basic_session.jsf" %>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.navigation.*" %>
 <%
 	String node_name = (String) request.getAttribute("MenuNode");
