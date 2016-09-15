@@ -251,13 +251,16 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 						// to  allways roll-back here.
 						// and assume that the DB can perform a null roll-back cheaply.
 						if( e instanceof FatalTransitionException){
+							// Normally we would log before throwing this to inform the user of failure
+							// however to be safe log again.
 							log.error("FatalTransitionException", e);
 							if (use_transactions){
 								serv.rollbackTransaction();
 								log.warn("Rolling back transaction in TransitionServlet");
 							}
 						}
-						log.error("transition exception", e);
+						// These are typically user errors
+						log.info("transition exception", e);
 						message(conn, req, res, "transition_error",  key, e.getMessage());
 						return;
 					}catch(Throwable tr){

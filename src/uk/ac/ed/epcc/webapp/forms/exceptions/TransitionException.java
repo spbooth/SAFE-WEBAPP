@@ -16,18 +16,23 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.exceptions;
 
-
-/**
+/** An {@link ActionException} with a custom message for the user.
  * Exception thrown if requested transition is invalid for this
  * target/operator The message string should be presented as an error
- * message to the operator. This should only be used when there are 
+ * message to the operator. Normally you should try to pick up invalid input at the form validation
+ * stage but in rare cases a problem can become apparent when the action is run.
+ * 
+ * 
+ * This should only be used when there are 
  * no data-base modifications to be rolled-back. If roll-back is required use the 
  * sub-class {@link FatalTransitionException}.
  * 
  * If you want the message shown as a form-error (so the form can be re-submitted)
  * then use a {@link TransitionValidationException}.
  * 
+ * @see FatalTransitionException
  * @see TransitionValidationException
+ * 
  * @author spb
  * 
  */

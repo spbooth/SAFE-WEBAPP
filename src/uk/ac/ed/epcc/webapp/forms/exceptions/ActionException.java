@@ -22,6 +22,7 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
  * 
  * @see TransitionException
  * @see TransitionValidationException
+ * @see FatalTransitionException
  */
 
 public class ActionException extends Exception {
