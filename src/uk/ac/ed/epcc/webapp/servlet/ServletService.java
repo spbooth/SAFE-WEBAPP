@@ -57,17 +57,24 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * Forward request to a different page.
 	 * 
 	 * @param url
-	 *            String page to forward to
+	 *            String page to forward to relative to the context path
 	
 	 * @throws ServletException
 	 * @throws IOException
 	 */
 	public void forward(String url) throws ServletException, IOException ;
+	/**
+	 * Redirect request to a different page.
+	 * 
+	 * @param url
+	 *            String page to forward to relative to the context path
 	
+	 * @throws ServletException
+	 * @throws IOException
+	 */
     public void redirect(String url) throws IOException ;
    
 	
-
 	/**
 	 * Extract a Map of the request parameters from the request. This is made a
 	 * method on the ServletAppContext to allow access to logging/configuration

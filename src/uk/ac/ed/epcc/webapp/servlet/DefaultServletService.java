@@ -52,8 +52,8 @@ import uk.ac.ed.epcc.webapp.session.WebNameFinder;
  * 
  * This class implements the following strategy for extracting a user from a HTTP request
  * 
- * If the login factory implements  {@link ExtAuthAppUserFactory} or if the feature {@link DefaultServletService#EXTERNAL_AUTH_ONLY_FEATURE} is defined then
- * web-names will be used to resolve the current user for all URLs (even if these conditions are not true then a explicit authentication servlet can
+ * If the the feature {@link DefaultServletService#EXTERNAL_AUTH_ONLY_FEATURE} is defined then
+ * web-names will be used to resolve the current user for all URLs (even if not true then a explicit authentication servlet can
  * set session in this way, which is the normal mechanism if external and password authentication is needed). web-names can be taken from the REMOTE_USER or 
  * user certificate DN if present.
  * <p>
