@@ -41,6 +41,14 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 	/**
 	 * 
 	 */
+	private static final String UN_RETIRE = " UnRetire ";
+	/**
+	 * 
+	 */
+	public static final String RETIRE = " Retire ";
+	/**
+	 * 
+	 */
 	private static final String UPDATE = " Update ";
 
 	/**
@@ -93,9 +101,9 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 				f.addAction(UPDATE, new UpdateAction<BDO>(type_name,this, dat));
 				if (dat instanceof Retirable ){
 					if(((Retirable) dat).canRetire()) {
-						f.addAction(" Retire ", new RetireAction(type_name, dat));
+						f.addAction(RETIRE, new RetireAction(type_name, dat));
 					}else if( dat instanceof UnRetirable && ((UnRetirable)dat).canRestore()){
-						f.addAction(" UnRetire ", new UnRetireAction(type_name, dat));
+						f.addAction(UN_RETIRE, new UnRetireAction(type_name, dat));
 					}
 				}
 				customiseUpdateForm(f, dat);
