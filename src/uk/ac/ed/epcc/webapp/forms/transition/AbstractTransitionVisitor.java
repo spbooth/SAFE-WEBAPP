@@ -17,6 +17,8 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 public abstract class AbstractTransitionVisitor<K,T> implements TransitionVisitor<T>, Contexed {
 	protected final AppContext conn;
@@ -41,5 +43,8 @@ public abstract class AbstractTransitionVisitor<K,T> implements TransitionVisito
 	}
 	public AppContext getContext() {
 		return conn;
+	}
+	protected Logger getLogger(){
+		return conn.getService(LoggerService.class).getLogger(getClass());
 	}
 }

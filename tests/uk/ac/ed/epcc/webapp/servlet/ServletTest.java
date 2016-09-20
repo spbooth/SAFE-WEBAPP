@@ -295,7 +295,7 @@ public abstract class ServletTest extends WebappTestBase{
 	 * @param action The action String specifed in the {@link Form}
 	 */
 	public void setAction(String action) {
-		req.params.put(action, action);
+		req.params.put(action.trim(), action.trim());
 	}
 	
 	protected final void doPost() throws ServletException, IOException{
