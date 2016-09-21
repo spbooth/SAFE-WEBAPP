@@ -17,7 +17,6 @@
 package uk.ac.ed.epcc.webapp.servlet;
 
 import java.io.IOException;
-import java.security.MessageDigest;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -48,7 +47,7 @@ import uk.ac.ed.epcc.webapp.session.WebNameFinder;
  *This servlet also supports the use of a remote authentication server rather than expecting the name to be provided by
  *the container. This should only be needed for methods the container cannot support directly.
  *In this mode the user is redirected to a remote server. A session token will be included as the url parameter <b>token</b>.
- *The server should authenticate the user and (if successful) redirect back to this servlet setting the <b>auth_name</b> patameter to the authenticated
+ *The server should authenticate the user and (if successful) redirect back to this servlet setting the <b>auth_name</b> parameter to the authenticated
  *user. The response should also contain the <b>check_token</b> parameter which should be a hex encoded hash value calculated from the  concatenation of
  * the <i>user-name</i>, <i>the-token</i> and a <i>secret-value</i> shared between the two servers.  
  *<ul>
