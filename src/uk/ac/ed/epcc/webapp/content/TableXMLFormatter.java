@@ -216,6 +216,10 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 		addContent(n);
 	}
 	protected void addContent(Object n){
+		if( hb instanceof ContentBuilder && n instanceof UIProvider){
+			((UIProvider)n).getUIGenerator().addContent(((ContentBuilder)hb));
+			return;
+		}
 		if( hb instanceof ContentBuilder && n instanceof UIGenerator){
 			((UIGenerator)n).addContent(((ContentBuilder)hb));
 			return;

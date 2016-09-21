@@ -540,29 +540,33 @@ public <X> void addList(Map<String,String> attr,Iterable<X> list) {
 	attr(attr);
 	for(X target : list){
 		open("li");
-		if( target instanceof UIGenerator){
-			((UIGenerator)target).addContent(this);
-		}else if( target instanceof Identified){
-			clean(((Identified)target).getIdentifier());
-		}else{
-			clean(target.toString());
-		}
+		addObject(target);
 		close();
 	}
 	close();
 	clean("\n");
 }
+
+
+/**
+ * @param target
+ */
+protected <X> void addObject(X target) {
+	if( target instanceof UIProvider){
+		((UIProvider)target).getUIGenerator().addContent(this);
+	}else if( target instanceof UIGenerator){
+		((UIGenerator)target).addContent(this);
+	}else if( target instanceof Identified){
+		clean(((Identified)target).getIdentifier());
+	}else{
+		clean(target.toString());
+	}
+}
 public <X> void addList(X[] list) {
 	open("ul");
 	for(X target : list){
 		open("li");
-		if( target instanceof UIGenerator){
-			((UIGenerator)target).addContent(this);
-		}else if( target instanceof Identified){
-			clean(((Identified)target).getIdentifier());
-		}else{
-			clean(target.toString());
-		}
+		addObject(target);
 		close();
 	}
 	close();
