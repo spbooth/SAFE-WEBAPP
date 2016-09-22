@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFormFactory;
+import uk.ac.ed.epcc.webapp.model.data.RestrictedRetirable;
 import uk.ac.ed.epcc.webapp.model.data.Retirable;
 import uk.ac.ed.epcc.webapp.model.data.TableStructureContributer;
 import uk.ac.ed.epcc.webapp.model.data.UnRetirable;
@@ -99,7 +100,7 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 				}
 				f.setContents(getDefaults());
 				f.addAction(UPDATE, new UpdateAction<BDO>(type_name,this, dat));
-				if (dat instanceof Retirable ){
+				if (dat instanceof Retirable && ( ! (dat instanceof RestrictedRetirable)  || ((RestrictedRetirable)dat).allowRetire(operator))){
 					if(((Retirable) dat).canRetire()) {
 						f.addAction(RETIRE, new RetireAction(type_name, dat));
 					}else if( dat instanceof UnRetirable && ((UnRetirable)dat).canRestore()){
