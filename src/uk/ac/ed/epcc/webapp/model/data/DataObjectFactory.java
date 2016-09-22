@@ -1075,6 +1075,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      * This is actually called inside the {@link Composite} constructor so the object may not be fully constructed at this point.
      * However its ok to take a reference.
      * 
+     * 
      * @param c
      */
     final void registerComposite(Composite c){
@@ -1084,7 +1085,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     /** Observer {@link Composite}s as they are registered.
      * 
      * Note that as this can be called during factory construction no assumptions can be made about
-     * factory attribute state. 
+     * factory attribute state. The {@link Composite#preRegister()} method needs to be used to set attribute state that is going to be used by this method.
      * 
      * @param c
      */

@@ -20,7 +20,7 @@ import java.lang.reflect.Constructor;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 
-/** A variant of BasicType for fields that encode the sub-class in a multi-class
+/** A variant of {@link BasicType} for fields that encode the sub-class in a multi-class
  * factory
  * 
  * @author spb

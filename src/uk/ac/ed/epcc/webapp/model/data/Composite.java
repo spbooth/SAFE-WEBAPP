@@ -67,7 +67,15 @@ public abstract class Composite<BDO extends DataObject, X extends Composite> imp
 	protected final DataObjectFactory<BDO> fac;
 	protected Composite(DataObjectFactory<BDO> fac){
 		this.fac=fac;
+		preRegister();
 		fac.registerComposite(this);
+	}
+	/** extension point called before the composite is registered. This is to allow the class setup to be completed
+	 * that cant wait till after registration.
+	 * 
+	 */
+	protected void preRegister(){
+		
 	}
 	/** Returns the type  the composite should be registered under.
 	 * 

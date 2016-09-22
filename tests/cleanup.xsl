@@ -43,7 +43,10 @@
 	</xsl:template>
 	 <xsl:template match="@*|node()">
     <xsl:copy>
-      <xsl:apply-templates select="@*|node()"/>
+      <xsl:apply-templates select="@*"/>
+      <xsl:apply-templates select="node()">
+      <xsl:sort select="name()" />
+      </xsl:apply-templates>
     </xsl:copy>
  	</xsl:template>
  	<xsl:template match="comment()">
