@@ -43,7 +43,7 @@ public class WebappHeadTag extends TagSupport implements Tag {
 	 */
 	public static final String REQUEST_CSS_ATTR = "request_css";
 	private String extra_css;
-	private Set<String> scripts = new HashSet<String>();
+	 
 	public void setextraCSS(String extra){
 		extra_css=extra;
 	}
@@ -56,6 +56,7 @@ public class WebappHeadTag extends TagSupport implements Tag {
 		String request_script = (String) request.getAttribute(REQUEST_SCRIPT_ATTR);
 		JspWriter out = page.getOut();
         HttpServletResponse response = (HttpServletResponse)pageContext.getResponse();
+        Set<String> scripts = new HashSet<String>(); // don't emit the same script twice 
         try{
         	AppContext conn = ErrorFilter.retrieveAppContext(request,response);
         	if( conn != null ){
@@ -79,13 +80,13 @@ public class WebappHeadTag extends TagSupport implements Tag {
         		}
         		
         		if( NavigationMenuService.NAVIGATION_MENU_JS_FEATURE.isEnabled(conn)){
-        			doScript(out,request,response,"//code.jquery.com/jquery-1.10.2.min.js");
-        			doScript(out, request,response, "/scripts/menubar.js");
+        			doScript(scripts,out,request,response,"//code.jquery.com/jquery-1.10.2.min.js");
+        			doScript(scripts,out, request,response, "/scripts/menubar.js");
         		}
         		if( request_script != null && request_script.trim().length() > 0 ){
         			// allow escaped commas in in-line scripts
         			for(String script : request_script.split("(?<!\\\\),")){
-        				doScript(out,request,response,script.replace("\\,", ","));
+        				doScript(scripts,out,request,response,script.replace("\\,", ","));
         			}
         		}
         		if(request_css != null && request_css.trim().length() > 0){ 
@@ -115,7 +116,11 @@ public class WebappHeadTag extends TagSupport implements Tag {
 			out.print("\" ");
 		}
 		out.print("href=\"");
-		out.print(response.encodeURL(template_path+"/css/"+file));
+		if( file.startsWith("//")){
+			out.print(file);
+		}else{
+			out.print(response.encodeURL(template_path+"/css/"+file));
+		}
 		out.println("\" rel=\"stylesheet\" type=\"text/css\">");
 	}
 	protected void doIcon(JspWriter out, HttpServletResponse response, String template_path,String type,String file) throws IOException {
@@ -130,7 +135,7 @@ public class WebappHeadTag extends TagSupport implements Tag {
 		out.print(response.encodeURL(template_path+"/"+file));
 		out.println("\" >");
 	}
-	protected void doScript(JspWriter out, HttpServletRequest request, HttpServletResponse response, String location) throws IOException {
+	protected void doScript(Set<String> scripts, JspWriter out, HttpServletRequest request, HttpServletResponse response, String location) throws IOException {
 		// only include scripts once.
 		if( scripts.contains(location)){
 			return;
@@ -149,7 +154,7 @@ public class WebappHeadTag extends TagSupport implements Tag {
 			// in-line script
 			out.print("<script type=\"text/javascript\" charset=\"utf8\" >");
 			out.print(location);
-			out.print("</script>");
+			out.println("</script>");
 		}
 	}
 	
