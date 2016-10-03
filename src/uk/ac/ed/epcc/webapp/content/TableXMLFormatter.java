@@ -244,9 +244,11 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 		}
 		if( hb instanceof ContentBuilder && n instanceof Iterable){
 			((ContentBuilder)hb).addList((Iterable)n);
+			return;
 		}
 		if( hb instanceof ContentBuilder && n instanceof Object[]){
 			((ContentBuilder)hb).addList((Object[])n);
+			return;
 		}
 		hb.clean(n.toString());
 	}
