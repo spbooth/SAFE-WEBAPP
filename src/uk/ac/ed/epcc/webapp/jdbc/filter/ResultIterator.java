@@ -118,6 +118,9 @@ public abstract class ResultIterator<O> extends SQLResultIterator<O,O> implement
 			if (f instanceof AcceptFilter) {
 				this.f = (AcceptFilter<? super O>) f;
 			}
+			if( f instanceof ResultVisitor){
+				setVisitor((ResultVisitor<O>) f);
+			}
 			super.setup(f,start,max);
 		}
 

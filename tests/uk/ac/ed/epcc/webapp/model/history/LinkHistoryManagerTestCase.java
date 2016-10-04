@@ -41,10 +41,11 @@ public abstract class LinkHistoryManagerTestCase<L extends LinkHistoryHandler> e
 	@Test
 	public void testhasChanged() throws IllegalArgumentException, DataException{
 		L fac = makeFactory();
-		LinkManager lm = (LinkManager) fac.getLinkManager();
+		LinkManager<?,?,?> lm = (LinkManager) fac.getLinkManager();
 		
-		for( Iterator<LinkManager.Link> it = lm.getLinkIterator(null, null, null); it.hasNext(); ){
-			LinkManager.Link item = it.next();
+		for( LinkManager.Link item : lm.getFilterResult(null, null, null)){
+	
+			
 			System.out.println(item.getIdentifier());
 			try{
 				// ensure history is up to date

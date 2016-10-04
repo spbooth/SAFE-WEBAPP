@@ -96,41 +96,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  */
 public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,L extends Indexed,R extends Indexed> extends DataObjectFactory<T> {
 
-	/**
-	 * Decorator to turn Iterators over Links into Left objects
-	 * 
-	 * @author spb
-	 * 
-	 */
-
-
-	public class LeftIterator extends DecoratingIterator<L,T> {
-
-		public LeftIterator(Iterator<? extends T> i) {
-			super(i);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see uk.ac.ed.epcc.webapp.model.data.DecoratingIterator#next()
-		 */
-		@Override
-		public L next() {
-			T o = nextInput();
-			try {
-				L result = o.getLeft();
-				assert(result != null);
-				o.release();
-				return result;
-			} catch (DataException e) {
-				o.getContext().error(e, "Error getting left object");
-				return null;
-			}
-		}
-
-	}
-
+	
 	/**
 	 * Link is an object representing an entry in a linkage table. Link objects
 	 * are not primary model objects themselves but represent many to one
@@ -332,16 +298,20 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		protected abstract void setup() throws Exception;
 	}
 
+	protected interface LinkProvider<T extends IndexedLinkManager.Link<L,R>,L extends Indexed,R extends Indexed> extends BaseFilter<T>, ResultVisitor<T>{
+		public L getLeftTarget();
+		public R getRightTarget();
+	}
 	/**
 	 * Filter for link objects This class handles filtering by the end points
 	 * and can be extended by composition for example to select objects with a
 	 * particular status. This class also initialises the cache links for the
-	 * objects it knows about.
+	 * objects it knows about if its the top level filter.
 	 * 
 	 * @author spb
 	 * 
 	 */
-	protected final class LinkFilter extends AndFilter<T> implements ResultVisitor<T>{
+	protected final class LinkFilter extends AndFilter<T> implements LinkProvider<T,L,R>{
 		private L left_target = null;
 
 		private R right_target = null;
@@ -376,10 +346,10 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 			}
 		}
 
-		protected L getLeftTarget(){
+		public L getLeftTarget(){
 			return left_target;
 		}
-		protected R getRightTarget(){
+		public R getRightTarget(){
 			return right_target;
 		}
         public void visit(T l) {
@@ -396,12 +366,12 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 * Filter for link objects This class handles filtering by the end points
 	 * and can be extended by composition for example to select objects with a
 	 * particular status. This class also initialises the cache links for the
-	 * objects it knows about.
+	 * objects it knows about if its the top level filter.
 	 * 
 	 * @author spb
 	 * 
 	 */
-	protected final class SQLLinkFilter extends SQLAndFilter<T> implements ResultVisitor<T>{
+	protected final class SQLLinkFilter extends SQLAndFilter<T> implements LinkProvider<T,L,R>{
 		private L left_target = null;
 
 		private R right_target = null;
@@ -436,10 +406,10 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 			}
 		}
 
-		protected L getLeftTarget(){
+		public L getLeftTarget(){
 			return left_target;
 		}
-		protected R getRightTarget(){
+		public R getRightTarget(){
 			return right_target;
 		}
         public void visit(T l) {
@@ -451,65 +421,11 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		}
 	}
    
-	public class LinkFilterIterator extends ResultIterator<T> {
-
-		public LinkFilterIterator(LinkFilter fil) throws DataFault {
-			super(IndexedLinkManager.this.getContext(),IndexedLinkManager.this.getTarget());
-			setMapper(new FilterAdapter());
-			setVisitor(fil);
-	    	try {
-				setup(fil,0,-1);
-			} catch (DataException e) {
-				throw new DataFault("Error in setup", e);
-			}
-		}
-
-		@Override
-		protected void addSource(StringBuilder sb) {
-			res.addTable(sb, true);
-			
-		}
-
-		@Override
-		protected String getDBTag() {
-			return res.getDBTag();
-		}
-	}
+	
 	
 	
 
-	/**
-	 * Decorator to turn Iterators over Links into Left objects
-	 * 
-	 * @author spb
-	 * 
-	 */
-	public  class RightIterator extends DecoratingIterator<R,T> {
-
-		public RightIterator(Iterator<? extends T> i) {
-			super(i);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see uk.ac.ed.epcc.webapp.model.data.DecoratingIterator#next()
-		 */
-		@Override
-		public R next() {
-			T o =  nextInput();
-			try {
-				R result = o.getRight();
-				assert(result != null);
-				o.release();
-				return result;
-			} catch (DataException e) {
-				o.getContext().error(e, "Error getting right object");
-				return null;
-			}
-		}
-
-	}
+	
 
 	/**
 	 * 
@@ -616,32 +532,18 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
     public SQLFilter<T> getLeftFilter(L l){
     	return new ReferenceFilter<T,L>(this,left_field,l);
     }
-	/**
-	 * create an Iterator over Left objects
-	 * 
-	 
-	 * @param r
-	 *            Right {@link Indexed} required null for any
-	 * @param f
-	 *            extension Filter
-	 * @return Iterator over Left Objects
-	 * @throws DataFault
-	 */
-	public Iterator<L> getLeftIterator( R r, BaseFilter<? super T> f)
-			throws DataFault {
-		return new LeftIterator(getLinkIterator(null, r, f));
-	}
+	
 	/** Get a Set of Left  objects
 	 * 
 	 * @param r Right {@link Indexed} required null for any
 	 * @param f extension Filter
 	 * @return Set of Left objects
-	 * @throws DataFault
+	 * @throws DataException 
 	 */
-	public Set<L> getLeftSet( R r ,BaseFilter<? super T> f) throws DataFault{
+	public Set<L> getLeftSet( R r ,BaseFilter<? super T> f) throws DataException{
 		Set<L> res= new LinkedHashSet<L>();
-		for (Iterator<L> it = getLeftIterator(r, f); it.hasNext();){
-			res.add(it.next());
+		for(T link : getFilterResult(null, r, f)){
+			res.add(link.getLeft());
 		}
 		return res;
 	}
@@ -690,23 +592,6 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	}
 
 	
-
-	/**
-	 * create an Iterator over Link objects
-	 * 
-	 * @param l
-	 *            Left {@link Indexed} required null for any
-	 * @param r
-	 *            Right {@link Indexed} required null for any
-	 * @param f
-	 *            extension Filter
-	 * @return Iterator over Link
-	 * @throws DataFault 
-	 * @throws DataFault
-	 */
-	public Iterator<T> getLinkIterator(L l, R r, BaseFilter<? super T> f) throws DataFault{
-		return new LinkFilterIterator(new LinkFilter(l, r, f));
-	}
 	/**
 	 * create a {@link FilterResult} of Link objects
 	 * 
@@ -720,7 +605,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 * @throws DataFault 
 	 * @throws DataFault
 	 */
-	public FilterResult<T> getFilterResult(L l, R r, BaseFilter<T> fil) throws DataFault{
+	public FilterResult<T> getFilterResult(L l, R r, BaseFilter<? super T> fil) throws DataFault{
 		return new FilterSet(new LinkFilter(l, r, fil));
 	}
 	
@@ -735,31 +620,18 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
     	return new ReferenceFilter<T,R>(this,right_field,r);
     }
     
-	/**
-	 * create an Iterator over Right objects
-	 * 
-	 * @param l
-	 *            Left DataObject required null for any
-	 * @param f
-	 *            extension Filter
-	 * @return Iterator over Right Objects
-	 * @throws DataFault
-	 */
-	public Iterator<R> getRightIterator(L l,  BaseFilter<? super T> f)
-			throws DataFault {
-		return new RightIterator(getLinkIterator(l, null, f));
-	}
+	
 	/** Get a Set of Right  objects
 	 * 
 	 * 	 * @param l Left DataObject required null for any
 	 * @param f extension Filter
 	 * @return Set of Right objects
-	 * @throws DataFault
+	 * @throws DataException 
 	 */
-	public Set<R> getRightSet(L l ,BaseFilter<? super T> f) throws DataFault{
+	public Set<R> getRightSet(L l ,BaseFilter<? super T> f) throws DataException{
 		Set<R> res= new LinkedHashSet<R>();
-		for (Iterator<R> it = getRightIterator(l,f); it.hasNext();){
-			res.add(it.next());
+		for(T link : getFilterResult(l, null, f)){
+			res.add(link.getRight());
 		}
 		return res;
 	}
