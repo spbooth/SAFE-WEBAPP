@@ -70,7 +70,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
  * <p>
  * LinkManager can navigate the links in either direction the subclass may
  * choose only to expose one direction of navigation. Internally this is implemented using the
- * <code>LinkFilter</code> and <code>LinkFilterIterator</code> classes which select a set a <code>Link</code> objects
+ * {@link LinkFilter} or {@link SQLLinkFilter} classes which select a set a <code>Link</code> objects
  * based on the value of one or other end.
 <code>
 <pre>
@@ -96,6 +96,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
  * 
  */
 
+@SuppressWarnings("javadoc")
 public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends DataObject,R extends DataObject> extends IndexedLinkManager<T,L,R> {
 
 	public static final Feature USE_JOIN = new Feature("linkmanager.use_join",true,"Use joins to pre-fetch link ends");

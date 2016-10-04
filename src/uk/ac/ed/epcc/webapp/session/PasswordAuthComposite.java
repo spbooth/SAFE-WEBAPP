@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
