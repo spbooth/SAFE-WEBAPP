@@ -40,10 +40,13 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultIterator;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultMapper;
+import uk.ac.ed.epcc.webapp.jdbc.filter.ResultVisitor;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.filter.JoinerFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
@@ -166,9 +169,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 *
 	 */
     public class JoinLinkMapper implements ResultMapper<T>{
-        LinkProvider<T,L,R> fil;
-        public JoinLinkMapper(LinkProvider<T,L,R> f,boolean join_left, boolean join_right){
-        	fil=f;
+        public JoinLinkMapper(boolean join_left, boolean join_right){
         	this.qualify=join_left || join_right;
         	this.join_left=join_left;
         	this.join_right=join_right;
@@ -181,45 +182,37 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			this.qualify = qualify;
 			return old;
 		}
-		public T makeObject(ResultSet rs) throws DataFault {
-			LinkManager<T,L,R> lm = LinkManager.this;
-			T link = lm.makeObject(rs,true);
+        public T makeObject(ResultSet rs) throws DataFault {
+        	LinkManager<T,L,R> lm = LinkManager.this;
+        	T link = lm.makeObject(rs,true);
 
-			if (fil.getLeftTarget() == null) {
-				if( join_left ){
-					L left =  getLeftFactory().makeObject(rs,qualify);
-					link.setLeft(left);
-				}
-			}else{
-				link.setLeft(fil.getLeftTarget());
-			}
-			if (fil.getRightTarget() == null) {
-				if( join_right ){
-					R right = getRightFactory().makeObject(rs,qualify);
-					link.setRight(right);
-				}
-			}else{
-				link.setRight(fil.getRightTarget());
-			}
-			// This probably just duplicated the setLeft/setRight but we may extend.
-			fil.visit(link);
 
-			return link;
+        	if( join_left ){
+        		L left =  getLeftFactory().makeObject(rs,qualify);
+        		link.setLeft(left);
+        	}
+
+        	if( join_right ){
+        		R right = getRightFactory().makeObject(rs,qualify);
+        		link.setRight(right);
+        	}
+
+        	return link;
 		}
     	
 		public String getTarget() {
 			StringBuilder target = new StringBuilder();
 			res.addTable(target, true);
 			target.append(".* ");
-			if (fil.getLeftTarget() != null && fil.getRightTarget() != null) {
+			if ( ! (join_left || join_right)) {
 				return target.toString();
 			}
-			if (fil.getLeftTarget() == null && join_left) {
+			if (join_left) {
 				target.append(", ");
 				getLeftFactory().res.addTable(target, true);
 				target.append(".* ");
 			}
-			if (fil.getRightTarget() == null && join_right) {
+			if (join_right) {
 				target.append(", ");
 				getRightFactory().res.addTable(target, true);
 				target.append(".* ");
@@ -234,9 +227,20 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			return null;
 		}
 		public SQLFilter getRequiredFilter() {
-			// TODO Should we put reference filters here instead of
-			// {@link JoinLinkFilterIterator.addSource}
-			return null;
+			if( ! (join_left || join_right)){
+				return null;
+			}
+			// Use JoinerFilters so that if additional joins are added explicitly
+			// The join clauses will be identical and not duplicated.
+			Class<? super T> target = LinkManager.this.getTarget();
+			SQLAndFilter<T> fil = new SQLAndFilter<T>(target);
+			if( join_left ){
+				fil.addFilter(new JoinerFilter<L,T>(target, getLeftField(), res, getLeftFactory().res, true));
+			}
+			if( join_right ){
+				fil.addFilter(new JoinerFilter<R,T>(target, getRightField(), res, getRightFactory().res, true));
+			}
+			return fil;
 		}
 		public List<PatternArgument> getTargetParameters(
 				List<PatternArgument> list) {
@@ -258,70 +262,35 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * 
 	 */
 	public class JoinLinkFilterIterator extends ResultIterator<T> {
-        private final LinkProvider<T,L,R> fil;
+       
         private final boolean join_left;
         private final boolean join_right;
 		public JoinLinkFilterIterator(LinkProvider<T,L,R> fil) throws DataFault {
         	this(fil,fil.getLeftTarget()==null,fil.getRightTarget()==null);
         }
-    	public JoinLinkFilterIterator(LinkProvider<T,L,R> fil,boolean join_left,boolean join_right) throws DataFault {
+    	public JoinLinkFilterIterator(BaseFilter<T> fil,boolean join_left,boolean join_right) throws DataFault {
 			super(LinkManager.this.getContext(),LinkManager.this.getTarget());
-			this.fil=fil;
 			this.join_left=join_left;
 			this.join_right=join_right;
 			boolean use_join = join_left || join_right;
 			setQualify(use_join);
-			setMapper(new JoinLinkMapper(fil,join_left,join_right));
-			setVisitor(fil);
+			setMapper(new JoinLinkMapper(join_left,join_right));
+			if( fil instanceof ResultVisitor){
+				setVisitor((ResultVisitor<T>)fil);
+			}
 			try {
 				setup(fil,0,-1);
 			} catch (DataException e) {
 				throw new DataFault("Error in setup",e);
 			}
 		}
-
 		public void addSource(StringBuilder source) {
-			res.addTable(source, true);
-			
-		
-			if (fil == null ) {
-				return;
-			}
-			
-			if (joinLeft()) {
-				source.append(" JOIN ");
-				getLeftFactory().res.addTable(source, true);
-				source.append(" ON ");
-				res.getInfo(getLeftField()).addName(source, true, true);
-				source.append("=");
-				getLeftFactory().res.addUniqueName(source, true, true);
-			}
-			if (joinRight()) {
-				source.append(" JOIN ");
-				getRightFactory().res.addTable(source, true);
-				source.append(" ON ");
-				res.getInfo(getRightField()).addName(source, true, true);
-				source.append("=");
-				getRightFactory().res.addUniqueName(source, true, true);
-			}
-
-
-		}
-
-		private boolean joinRight() {
-			return join_right && res.getDBTag() == getRightFactory().res.getDBTag();
-		}
-
-		private boolean joinLeft() {
-			return join_left && res.getDBTag() == getLeftFactory().res.getDBTag();
+			res.addTable(source, true);	
 		}
 		@Override
 		protected String getDBTag() {
 			return res.getDBTag();
 		}
-
-	
-		
 	}
 
 	/**

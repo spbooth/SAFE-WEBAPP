@@ -3094,4 +3094,7 @@ public final class Repository {
 			return false;
 		return true;
 	}
+	public String toString(){
+		return "Repository-"+table_name;
+	}
 }
