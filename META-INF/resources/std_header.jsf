@@ -27,5 +27,9 @@ if( extra_head != null ){ %>
 <%} %>
 </head>
 <body>
+<nav>
 <wb:navigation/>
+</nav>
+<header>
 <jsp:include page="/page_header.jsp"/>
+</header>
