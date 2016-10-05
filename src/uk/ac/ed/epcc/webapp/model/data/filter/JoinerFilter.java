@@ -66,6 +66,7 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 		this.res=res;
 		this.remote_res=remote_res;
 		this.target_references=target_references;
+		assert(target_references ? res.hasField(join_field) : remote_res.hasField(join_field));
 	}
 		
 		
@@ -91,13 +92,11 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 			join.append("(");
 			if( target_references){
 	     		FieldInfo info = res.getInfo(join_field);
-	     		assert(info != null);
 				info.addName(join, true, true);
 	         	join.append(" = ");
 	         	remote_res.addUniqueName(join, true, true);
 	     	}else{
 	     		FieldInfo info = remote_res.getInfo(join_field);
-	     		assert(info !=null);
 				info.addName(join, true, true);
 	         	join.append(" = ");
 	         	res.addUniqueName(join, true, true);

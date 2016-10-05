@@ -2276,6 +2276,7 @@ public final class Repository {
 		if (fields == null) {
 			setMetaData();
 		}
+		assert(key != null);
 		return fields.containsKey(key);
 	}
 	/** Is there a named index of the specified name for this table.

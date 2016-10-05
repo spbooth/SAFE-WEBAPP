@@ -61,6 +61,7 @@ public class SQLValueFilter<T> implements SQLFilter<T>, PatternFilter<T> {
     	 this.field=field;
     	 this.peer=peer;
     	 this.match=match;
+    	 assert(parent.hasField(field));
      }
 	public final List<PatternArgument> getParameters(List<PatternArgument> list){
 		if( peer != null ){

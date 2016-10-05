@@ -50,6 +50,7 @@ public abstract class FieldExpression<T,X extends DataObject> implements FieldSQ
 		this.target=target;
 		this.name=name;
 		this.filter_type=filter_type;
+		assert(repository.hasField(name));
 	}
 	public int add(StringBuilder sb, boolean qualify) {
 		// quote when adding to a SQL fragment
