@@ -46,6 +46,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.filter.JoinerFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
@@ -182,19 +183,29 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			this.qualify = qualify;
 			return old;
 		}
-        public T makeObject(ResultSet rs) throws DataFault {
+        public T makeObject(ResultSet rs) throws DataException {
         	LinkManager<T,L,R> lm = LinkManager.this;
         	T link = lm.makeObject(rs,true);
 
 
         	if( join_left ){
-        		L left =  getLeftFactory().makeObject(rs,qualify);
-        		link.setLeft(left);
+        		try{
+        			L left =  getLeftFactory().makeObject(rs,qualify);
+        			link.setLeft(left);
+        		}catch(DataNotFoundException e){
+        			// reference link is bad
+        			getLogger().error("Bad left link value "+link.getIdentifier());
+        		}
         	}
 
         	if( join_right ){
-        		R right = getRightFactory().makeObject(rs,qualify);
-        		link.setRight(right);
+        		try{
+        			R right = getRightFactory().makeObject(rs,qualify);
+        			link.setRight(right);
+        		}catch(DataNotFoundException e){
+        			// reference link is bad
+        			getLogger().error("Bad right link value "+link.getIdentifier());
+        		}
         	}
 
         	return link;

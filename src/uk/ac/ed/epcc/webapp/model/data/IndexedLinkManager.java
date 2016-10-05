@@ -296,6 +296,14 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		 * 
 		 */
 		protected abstract void setup() throws Exception;
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.DataObject#pre_commit(boolean)
+		 */
+		@Override
+		protected void pre_commit(boolean dirty) throws DataFault {
+			assert(getLeftID().intValue() > 0);
+			assert(getRightID().intValue() > 0);
+		}
 	}
 
 	protected interface LinkProvider<T extends IndexedLinkManager.Link<L,R>,L extends Indexed,R extends Indexed> extends BaseFilter<T>, ResultVisitor<T>{
@@ -476,14 +484,14 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 			IndexedProducer<R> rightFac, String rightField) {
 		TableSpecification s = new TableSpecification();
 		if( leftFac instanceof DataObjectFactory){
-			s.setField(leftField, ((DataObjectFactory)leftFac).getReferenceFieldType());
+			s.setField(leftField, ((DataObjectFactory)leftFac).getReferenceFieldType(false));
 		}else{
-			s.setField(leftField, new IntegerFieldType());
+			s.setField(leftField, new IntegerFieldType(false,null));
 		}
 		if( rightFac instanceof DataObjectFactory){
-			s.setField(rightField, ((DataObjectFactory)rightFac).getReferenceFieldType());
+			s.setField(rightField, ((DataObjectFactory)rightFac).getReferenceFieldType(false));
 		}else{
-			s.setField(rightField, new IntegerFieldType());
+			s.setField(rightField, new IntegerFieldType(false,null));
 		}
 		try {
 			s.new Index("Link", true, leftField, rightField);

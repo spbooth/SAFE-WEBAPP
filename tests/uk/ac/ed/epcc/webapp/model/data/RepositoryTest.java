@@ -442,7 +442,7 @@ public class RepositoryTest extends WebappTestBase {
 	}
 	
 	@Test
-	public void testSetContents() throws DataFault, SQLException{
+	public void testSetContents() throws SQLException, DataException{
 		Record r = res.new Record();
 		r.put("Name","fred");
 		r.put("Number", new Integer(12));

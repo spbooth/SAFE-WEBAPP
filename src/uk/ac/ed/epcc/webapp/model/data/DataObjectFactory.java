@@ -511,7 +511,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 */
     public class FilterAdapter implements ResultMapper<BDO>{
     	boolean qualify = false;
-		public BDO makeObject(ResultSet rs) throws DataFault {
+		public BDO makeObject(ResultSet rs) throws DataException {
 				   return  DataObjectFactory.this.makeObject(rs,qualify);
 		}
 
@@ -1523,6 +1523,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	public ReferenceFieldType getReferenceFieldType(){
 		return new ReferenceFieldType(getTag());
 	}
+	/** Get a {@link ReferenceFieldType} for this factory.
+	 * @param allow_null
+	 * @return ReferenceFieldType
+	 */
+	public ReferenceFieldType getReferenceFieldType(boolean allow_null){
+		return new ReferenceFieldType(allow_null,getTag());
+	}
 
 	/**
 	 * Get a Map of selectors to use for forms of this type.
@@ -1683,11 +1690,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param rs
 	
 	 * @return DataObject
-	 * @throws DataFault
+	 * @throws DataException 
 	 */
 
        @SuppressWarnings("unchecked")
-	protected BDO makeObject(ResultSet rs,boolean qualify) throws DataFault {
+	protected BDO makeObject(ResultSet rs,boolean qualify) throws DataException {
                 Repository.Record record = res.new Record();
 		record.setContents(rs,qualify);
 		BDO o =  (BDO) makeBDO(record);
