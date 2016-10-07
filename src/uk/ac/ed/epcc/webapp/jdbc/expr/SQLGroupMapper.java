@@ -209,26 +209,36 @@ public abstract class SQLGroupMapper<O> implements ResultMapper<O>, Contexed {
 			}
 			return list;
 		}
-		protected final void  addKeyList(String seperator,StringBuilder sb) {
+		/** add group by clauses corresponding to key list
+		 * @return true is any added.
+		 */
+		protected boolean addKeyList(String seperator,StringBuilder sb) {
 			boolean sep=false;
 			for(SQLValue<?> o : key_list){
 				if(sep){
 					sb.append(seperator);
 				}
 				if( o instanceof GroupingSQLValue){
-				  ((GroupingSQLValue)o).addGroup(sb, qualify);	
+				  if( ((GroupingSQLValue)o).addGroup(sb, qualify) > 0 ){
+					  sep=true;
+				  }
 				}else{
 				   o.add(sb,qualify);
+				   sep=true;
 				}
-				sep=true;
+				
 			}
+			return sep;
 		}
 		public final String getModify() {
 			
 			StringBuilder modify = new StringBuilder();
 			if( hasKeys() ){
 				modify.append(" GROUP BY ");
-				addKeyList(",",modify);
+				if( ! addKeyList(",",modify)){
+					// actually no fields
+					return "";
+				}
 			}
 	        return modify.toString();
 		}
