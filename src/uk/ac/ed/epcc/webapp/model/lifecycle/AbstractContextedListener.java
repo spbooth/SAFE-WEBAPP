@@ -40,7 +40,6 @@ public class AbstractContextedListener<R> extends AbstractListener<R> implements
 	 */
 	@Override
 	public final AppContext getContext() {
-		// TODO Auto-generated method stub
 		return conn;
 	}
 	
