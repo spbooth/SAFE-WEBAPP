@@ -510,6 +510,10 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 *
 	 */
     public class FilterAdapter implements ResultMapper<BDO>{
+    	private final boolean use_order;
+    	public FilterAdapter(boolean use_order){
+    		this.use_order=use_order;
+    	}
     	boolean qualify = false;
 		public BDO makeObject(ResultSet rs) throws DataException {
 				   return  DataObjectFactory.this.makeObject(rs,qualify);
@@ -531,7 +535,10 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 
 		public String getModify() {
-			return OrderBy(false);
+			if(use_order){
+				return OrderBy(false);
+			}
+			return null;
 		}
 
 		public BDO makeDefault() {
@@ -776,7 +783,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 */
 		protected FilterIterator(){
 	    	super(DataObjectFactory.this.getContext(),DataObjectFactory.this.getTarget());
-	    	setMapper(new FilterAdapter());
+	    	setMapper(new FilterAdapter(true));
 	    }
 		
 	    public FilterIterator(BaseFilter<? super BDO> fil) throws DataFault{
@@ -866,7 +873,8 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
         }
 		public Finder(boolean allow_null) {
 			super(allow_null);
-			setMapper(new FilterAdapter());
+			// Don't care about order if multiple results is an error
+			setMapper(new FilterAdapter(! DataObjectFactory.REJECT_MULTIPLE_RESULT_FEATURE.isEnabled(conn)));
 		}
 	}
 	
