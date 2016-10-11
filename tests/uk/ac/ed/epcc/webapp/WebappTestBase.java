@@ -57,6 +57,7 @@ import uk.ac.ed.epcc.webapp.model.data.Dumper;
 import uk.ac.ed.epcc.webapp.model.data.UnDumper;
 import uk.ac.ed.epcc.webapp.model.data.XMLDataUtils;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 /** A base class for Junit4 tests that require an {@link AppContext}
  * 
@@ -225,7 +226,8 @@ public abstract class WebappTestBase implements ContextHolder{
 	 */
 	public void checkDiff(String normalize_transform,String expected_xml) throws DataException, Exception{
 		XMLPrinter diff = new XMLPrinter();	
-		
+		TimerService timer = ctx.getService(TimerService.class);
+		if( timer !=null){ timer.startTimer("diff"); }
 		diff.open("Diff");
 	    StringReader reader = new StringReader(baseline.toString());
 		utils.getDiff(diff, new InputSource(reader));
@@ -235,6 +237,7 @@ public abstract class WebappTestBase implements ContextHolder{
 		//This is a XSL transform to edit the dates in the project log as these will depend on the time the test is run.
 		TransformerFactory tfac = TransformerFactory.newInstance();
 		Source source = XMLDataUtils.readResourceAsSource(getClass(), normalize_transform);
+		if( timer !=null){ timer.stopTimer("diff"); }
 		assertNotNull(source);
 		Transformer t = tfac.newTransformer(source);
 		assertNotNull(t);

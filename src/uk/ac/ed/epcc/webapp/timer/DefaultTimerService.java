@@ -23,6 +23,7 @@ import java.util.TreeSet;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -37,12 +38,21 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 public class DefaultTimerService implements Contexed,TimerService{
 	private static final String TIMER_TOTAL = "Total";
+	private static final Feature GLOBAL_TIMERS = new Feature("global_timers",false,"Are timers global/static rather than per session");
+	 private static Map<String,Timer> global_timers=null;
 	 private Map<String,Timer> timers=null;
 	 private AppContext conn;
 	 private String prefix="";
 	 public DefaultTimerService(AppContext conn){
 		 this.conn=conn;
-		 timers = new HashMap<String,Timer>();
+		 if( GLOBAL_TIMERS.isEnabled(conn)){
+			 if( global_timers != null){
+				 timers=global_timers;
+			 }
+		 }
+		 if( timers == null){
+			 timers = new HashMap<String,Timer>();
+		 }
  		startTimer(TIMER_TOTAL);
 	 }
 	    
@@ -53,6 +63,10 @@ public class DefaultTimerService implements Contexed,TimerService{
 			if( timers != null ){
 				stopTimer(TIMER_TOTAL);
 			    timerStats();
+			    //closeAll();
+			    if( GLOBAL_TIMERS.isEnabled(getContext())){
+			    	global_timers=timers;
+			    }
 			    timers=null;
 			}
 		}
@@ -62,7 +76,7 @@ public class DefaultTimerService implements Contexed,TimerService{
 		public void timerStats(Class clazz) {
 			if( timers != null ){
 				
-				long target = (long) (0.01 * timers.get(TIMER_TOTAL).getTime());
+				long target = (long) (0.005 * timers.get(TIMER_TOTAL).getTime());
 				LoggerService service = conn.getService(LoggerService.class);
 				if( service != null){
 					Logger log=service.getLogger(clazz);
@@ -76,6 +90,14 @@ public class DefaultTimerService implements Contexed,TimerService{
 					}
 				}
 				
+			}
+		}
+		public void closeAll(){
+			if( timers == null){
+				return;
+			}
+			for(Timer t : timers.values()){
+				t.terminate();
 			}
 		}
 		/* (non-Javadoc)

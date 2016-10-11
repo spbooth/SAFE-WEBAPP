@@ -100,6 +100,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
+import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 /**
  * Factory object for producing DataObjects.
@@ -1792,6 +1793,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 		// set local reference so composites can find
 		this.conn=ctx;
+		TimerService timer = ctx.getService(TimerService.class);
+		if( timer != null ){ timer.startTimer("setContext"); timer.startTimer("setContext:"+homeTable);}
+		try{
 		setComposites(ctx, homeTable);
 		
 		res = Repository.getInstance(ctx, homeTable);
@@ -1800,9 +1804,17 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				TableSpecification spec = getFinalTableSpecification(ctx,
 						homeTable);
 				if( spec != null ){
-					return makeTable(ctx, homeTable, spec);
+					if( timer != null ){ timer.startTimer("makeTable"); timer.startTimer("makeTable:"+homeTable);}
+					try{
+						return makeTable(ctx, homeTable, spec);
+					}finally{
+						if( timer != null ){ timer.stopTimer("makeTable"); timer.stopTimer("makeTable:"+homeTable);}
+					}
 				}
 			}
+		}
+		}finally{
+			if( timer != null ){ timer.stopTimer("setContext:"+homeTable); timer.stopTimer("setContext");}
 		}
 		return false;
 

@@ -244,6 +244,8 @@ public class XMLDataUtils implements Contexed{
 	 */
 	public void dropAllTables(){
 		AppContext c = getContext();
+		TimerService timer = c.getService(TimerService.class);
+		if( timer != null ){ timer.startTimer("dropAllTables");}
 		try{
 			if( DROP_TABLES_FEATURE.isEnabled(c)){
 				DataBaseHandlerService handler = c.getService(DataBaseHandlerService.class);
@@ -257,6 +259,8 @@ public class XMLDataUtils implements Contexed{
 			}
 		}catch(Throwable t){
 			c.error(t,"Error in dropAllTables");
+		}finally{
+			if( timer != null ){ timer.stopTimer("dropAllTables");}
 		}
 		
 	}

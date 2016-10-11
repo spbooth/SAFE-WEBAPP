@@ -50,6 +50,15 @@ public class Timer implements Comparable<Timer>{
 		   time += System.currentTimeMillis() - start;
 	   }
    }
+   /** stop all timer nest
+    * 
+    */
+   public synchronized void terminate(){
+	   if( depth > 0){
+		   depth=0;
+		   time += System.currentTimeMillis() - start;
+	   }
+   }
    public long getTime(){
 	   if( depth == 0 ){
 	      return time;
@@ -79,10 +88,12 @@ public class Timer implements Comparable<Timer>{
 	  
    }
 public int compareTo(Timer o) {
-    if( time < o.time ){
+	long time1 = getTime();
+	long time2 = o.getTime();
+    if( time1 < time2 ){
     	return -2;
     }
-    if( time > o.time ){
+    if( time1 > time2 ){
     	return 2;
     }
 	return name.compareTo(o.name);
