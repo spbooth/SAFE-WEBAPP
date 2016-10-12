@@ -58,32 +58,51 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 			AppContext conn, String user) throws ServletException, IOException {
 		TimerService serv = conn.getService(TimerService.class);
 		long max_wait=conn.getLongParameter("max.heartbeat.millis", 60000L);
-		if( serv != null ) serv.startTimer("Heartbeatlistener");
-		last_call=new Date();
+		boolean ok=true;
 		res.setContentType("text/plain");
-		String listeners = conn.getInitParameter("heartbeat.listeners");
 		ServletOutputStream out = res.getOutputStream();
-		if( listeners == null || listeners.trim().length()==0){
-			out.println("No listeners");
-			return;
-		}
 		Logger log = getLogger(conn);
-		for(String l : listeners.split("\\s*,\\s*")){
-			if( serv != null ) serv.startTimer("HeartbeatListener."+l);
-			HeartbeatListener listener = conn.makeObject(HeartbeatListener.class, l);
-			if( listener != null ){
-				out.println("Running"+l);
-				log.debug("Running "+l);
-				Date next = listener.run();
-				out.println("Next run expected "+next);
-				log.debug("Next run expected "+next);
-			}else{
-				log.error("No HearBeatListener constructed for tag "+l);
+		if( serv != null ) serv.startTimer("Heartbeatlistener");
+		try{
+			last_call=new Date();
+
+			String listeners = conn.getInitParameter("heartbeat.listeners");
+
+			if( listeners == null || listeners.trim().length()==0){
+				out.println("No listeners");
+				return;
 			}
-			if( serv != null ) serv.stopTimer("HeartbeatListener."+l);
+
+
+			for(String l : listeners.split("\\s*,\\s*")){
+				if( serv != null ) serv.startTimer("HeartbeatListener."+l);
+				try{
+					HeartbeatListener listener = conn.makeObject(HeartbeatListener.class, l);
+					if( listener != null ){
+						out.println("Running"+l);
+						log.debug("Running "+l);
+						Date next = listener.run();
+						out.println("Next run expected "+next);
+						log.debug("Next run expected "+next);
+					}else{
+						log.error("No HearBeatListener constructed for tag "+l);
+					}
+				}catch(Throwable t){
+					ok=false;
+					log.error("Error in hearbeatlistener "+l,t);
+				}finally{
+					if( serv != null ) serv.stopTimer("HeartbeatListener."+l);
+				}
+			}
+
+		}finally{
+			if( serv != null ) serv.stopTimer("Heartbeatlistener");
 		}
-		out.println("OK");
-		if( serv != null ) serv.stopTimer("Heartbeatlistener");
+		if( ok ){
+			out.println("OK");
+		}else{
+			out.println("FAIL");
+		}
 		long elapsed = (System.currentTimeMillis() - last_call.getTime());
 		if( elapsed > max_wait ){
 			log.warn("Long heartbeat run "+(elapsed/1000L)+" seconds");
