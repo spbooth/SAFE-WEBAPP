@@ -39,6 +39,8 @@ import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.table.FieldType;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.IndexInfo;
@@ -87,16 +89,25 @@ public class Dumper implements Contexed{
 		this.conn = conn;
 		this.builder=builder;
 		seen = new HashMap<String, Set<Integer>>();
+		specifications = new HashMap<>();
 	}
 
 	private final AppContext conn;
     private final SimpleXMLBuilder builder;
     private final Map<String,Set<Integer>>seen;
+    // A map of externally generated specifications These are optional but can augment
+    // the dump
+    private final Map<String,TableSpecification> specifications;
+    
 	public AppContext getContext() {
 		return conn;
 	}
 	public void dump(DataObject obj){
 		dump(obj.record);
+	}
+	
+	public void addSpecification(String table, TableSpecification spec){
+		specifications.put(table, spec);
 	}
 	/** add an entry to the record of "seen" records
 	 * @param res {@link Repository} if not null dump this schema when new table encountered
@@ -209,6 +220,7 @@ public class Dumper implements Contexed{
 		}
 	}
 	public void dumpSchema(Repository res){
+		TableSpecification spec = specifications.get(res.getTable());
 		SimpleXMLBuilder sb = builder.getNested();
 		sb.open(TABLE_SPECIFICATION);
 		sb.attr(NAME_ATTR, res.getTag());
@@ -242,6 +254,16 @@ public class Dumper implements Contexed{
 				sb.attr(NULLABLE_ATTR,Boolean.toString(field.getNullable()));
 				if( field.isString()){
 					sb.attr(MAX_ATTR,Integer.toString(field.getMax()));
+				}
+				if( spec != null ){
+					// If we have a cached specification look for a default value from that
+					FieldType type = spec.getField(name);
+					if( type != null ){
+						Object def = type.getDefault();
+						if( def != null ){
+							sb.attr(DEFAULT_ATTR, def.toString());
+						}
+					}
 				}
 			}
 			sb.close();

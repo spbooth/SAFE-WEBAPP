@@ -476,7 +476,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	}
 
 	// make final to stop people overriding the wrong method.
-	protected final TableSpecification getDefaultTableSpecification(AppContext c,String table){
+	public final TableSpecification getDefaultTableSpecification(AppContext c,String table){
 		return super.getDefaultTableSpecification(c, table);
 	}
 	protected TableSpecification getDefaultTableSpecification(AppContext c,String table,

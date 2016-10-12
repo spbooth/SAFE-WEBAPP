@@ -100,6 +100,9 @@ public abstract class AbstractIndexedTransitionProvider<T extends Indexed,K>  im
 			}
 			
 			return fac.find(Integer.parseInt(id));
+		}catch(NumberFormatException nfe){
+			// Not worth reporing
+			return null;
 		} catch (DataException e) {
 			c.getService(LoggerService.class).getLogger(AbstractIndexedTransitionProvider.class).error("Error making SimpleTransitionProvider target",e);
 			return null;
