@@ -421,6 +421,14 @@ text-align: center;
 .warn, .warn.sorting_1 {
 	color: #ff0000;
 }
+.pass:after {
+	content: " \2714";
+	color: green;
+}
+.fail:after {
+	content: " \2718";
+	color: red;
+}
 .notice, .notice.sorting_1 {
 	background-color: #ffcccc;
 	}
