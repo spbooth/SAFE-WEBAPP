@@ -220,7 +220,7 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @param target
 	 * @return {@link BaseFilter}
 	 */
-	public <T extends DataObject> BaseFilter<A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,T target) throws UnknownRelationshipException;
+	public <T extends DataObject> BaseFilter<? super A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,T target) throws UnknownRelationshipException;
 	
 	/** get a {@link BaseFilter} representing the set of targets that a specified {@link AppUser} is in a particular
 	 * relationship-role with.

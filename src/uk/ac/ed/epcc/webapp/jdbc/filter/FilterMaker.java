@@ -62,11 +62,12 @@ public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
 		}
 		AppContext conn = getContext();
 		String q = query.toString();
+		TimerService timer = conn.getService(TimerService.class);
+		if( timer != null ){
+			timer.startTimer("FilterMaker: "+q);
+		}
 		try {
-			TimerService timer = conn.getService(TimerService.class);
-			if( timer != null ){
-				timer.startTimer("FilterMaker: "+q);
-			}
+			
 			// We are only using the REsultSet to initialise the Record and
 			// are not concurrent anyway so give
 			// the DB the best chance of optimising the query
@@ -101,14 +102,13 @@ public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
 				result = makeDefault();
 			}
 			stmt.close();
-			
-			if( timer != null ){
-				timer.stopTimer("FilterMaker: "+q);
-			}
-			
 			return result;
 		} catch (SQLException e) {
 			throw new DataException("DataFault in FilterFinder " + query, e);
+		}finally{
+			if( timer != null ){
+				timer.stopTimer("FilterMaker: "+q);
+			}
 		}
    }
 

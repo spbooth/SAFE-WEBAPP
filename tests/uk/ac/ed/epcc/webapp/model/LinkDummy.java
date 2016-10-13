@@ -78,11 +78,11 @@ public class LinkDummy extends LinkManager<LinkDummy.DummyLink,Dummy1,Dummy2> {
 		if( l == null ) return false;
 		return l.getStatus() == ACTIVE;
 	}
-	public Set getDummy2(Dummy1 arg) throws DataFault{
-		return makeSet(getRightIterator(arg,status.getFilter(this,ACTIVE)));
+	public Set getDummy2(Dummy1 arg) throws DataException{
+		return getRightSet(arg, status.getFilter(this,ACTIVE));
 	}
-	public Set getDummy1(Dummy2 arg) throws DataFault{
-		return makeSet(getLeftIterator(arg,status.getFilter(this,ACTIVE)));
+	public Set getDummy1(Dummy2 arg) throws DataException{
+		return getLeftSet(arg,status.getFilter(this,ACTIVE));
 	}
 	public void nuke() throws DataFault{
 		for(Iterator it = getAllIterator(); it.hasNext();){

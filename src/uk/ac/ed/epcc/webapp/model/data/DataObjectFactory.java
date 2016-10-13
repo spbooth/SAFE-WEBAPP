@@ -100,6 +100,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
+import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 /**
  * Factory object for producing DataObjects.
@@ -510,8 +511,12 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 *
 	 */
     public class FilterAdapter implements ResultMapper<BDO>{
+    	private final boolean use_order;
+    	public FilterAdapter(boolean use_order){
+    		this.use_order=use_order;
+    	}
     	boolean qualify = false;
-		public BDO makeObject(ResultSet rs) throws DataFault {
+		public BDO makeObject(ResultSet rs) throws DataException {
 				   return  DataObjectFactory.this.makeObject(rs,qualify);
 		}
 
@@ -531,7 +536,10 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 
 		public String getModify() {
-			return OrderBy(false);
+			if(use_order){
+				return OrderBy(false);
+			}
+			return null;
 		}
 
 		public BDO makeDefault() {
@@ -776,7 +784,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 */
 		protected FilterIterator(){
 	    	super(DataObjectFactory.this.getContext(),DataObjectFactory.this.getTarget());
-	    	setMapper(new FilterAdapter());
+	    	setMapper(new FilterAdapter(true));
 	    }
 		
 	    public FilterIterator(BaseFilter<? super BDO> fil) throws DataFault{
@@ -866,7 +874,8 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
         }
 		public Finder(boolean allow_null) {
 			super(allow_null);
-			setMapper(new FilterAdapter());
+			// Don't care about order if multiple results is an error
+			setMapper(new FilterAdapter(! DataObjectFactory.REJECT_MULTIPLE_RESULT_FEATURE.isEnabled(conn)));
 		}
 	}
 	
@@ -1523,6 +1532,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	public ReferenceFieldType getReferenceFieldType(){
 		return new ReferenceFieldType(getTag());
 	}
+	/** Get a {@link ReferenceFieldType} for this factory.
+	 * @param allow_null
+	 * @return ReferenceFieldType
+	 */
+	public ReferenceFieldType getReferenceFieldType(boolean allow_null){
+		return new ReferenceFieldType(allow_null,getTag());
+	}
 
 	/**
 	 * Get a Map of selectors to use for forms of this type.
@@ -1683,11 +1699,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param rs
 	
 	 * @return DataObject
-	 * @throws DataFault
+	 * @throws DataException 
 	 */
 
        @SuppressWarnings("unchecked")
-	protected BDO makeObject(ResultSet rs,boolean qualify) throws DataFault {
+	protected BDO makeObject(ResultSet rs,boolean qualify) throws DataException {
                 Repository.Record record = res.new Record();
 		record.setContents(rs,qualify);
 		BDO o =  (BDO) makeBDO(record);
@@ -1777,6 +1793,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 		// set local reference so composites can find
 		this.conn=ctx;
+		TimerService timer = ctx.getService(TimerService.class);
+		if( timer != null ){ timer.startTimer("setContext"); timer.startTimer("setContext:"+homeTable);}
+		try{
 		setComposites(ctx, homeTable);
 		
 		res = Repository.getInstance(ctx, homeTable);
@@ -1785,9 +1804,17 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				TableSpecification spec = getFinalTableSpecification(ctx,
 						homeTable);
 				if( spec != null ){
-					return makeTable(ctx, homeTable, spec);
+					if( timer != null ){ timer.startTimer("makeTable"); timer.startTimer("makeTable:"+homeTable);}
+					try{
+						return makeTable(ctx, homeTable, spec);
+					}finally{
+						if( timer != null ){ timer.stopTimer("makeTable"); timer.stopTimer("makeTable:"+homeTable);}
+					}
 				}
 			}
+		}
+		}finally{
+			if( timer != null ){ timer.stopTimer("setContext:"+homeTable); timer.stopTimer("setContext");}
 		}
 		return false;
 

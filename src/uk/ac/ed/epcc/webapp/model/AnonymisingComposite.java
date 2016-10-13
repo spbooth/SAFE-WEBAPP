@@ -11,40 +11,17 @@
 //| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
-package uk.ac.ed.epcc.webapp.model.lifecycle;
+package uk.ac.ed.epcc.webapp.model;
 
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.data.Composite;
+import uk.ac.ed.epcc.webapp.model.data.DataObject;
 
-/** A {@link AbstractListener} that implements {@link Contexed}
+/** and interface for {@link Composite} that support anonymisation.
+ * 
+ * These should be called from the {@link AnonymisingFactory#anonymise()} method
  * @author spb
- * @param <R> 
  *
  */
-public class AbstractContextedListener<R> extends AbstractListener<R> implements Contexed {
-
-	private final AppContext conn;
-	/**
-	 * @param conn 
-	 * @param clazz 
-	 * 
-	 */
-	public AbstractContextedListener(AppContext conn, Class<? super R> clazz) {
-		super(clazz);
-		this.conn=conn;
-	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public final AppContext getContext() {
-		return conn;
-	}
-	
-	public Logger getLogger(){
-		return conn.getService(LoggerService.class).getLogger(getClass());
-	}
-
+public interface AnonymisingComposite<BDO extends DataObject> {
+	public void anonymise(BDO target);
 }

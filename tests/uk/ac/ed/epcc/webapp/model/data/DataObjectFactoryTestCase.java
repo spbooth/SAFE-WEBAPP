@@ -231,10 +231,15 @@ ListInputInterfaceTest
 			   String key = (String) it2.next();
 			   Input i = form.getInput(key);
 			   //System.out.println(key);
-			   Object dat_value = i.convert(h.get(key));
+			   Object v = h.get(key);
+			Object dat_value = i.convert(v);
 			   Object form_value = m.get(key);
 			   // map to strings as some inputs handle null in a special fashion
-			   assertEquals(i.getString(dat_value), i.getString(form_value));
+			   String expect = i.getString(dat_value);
+			String string = i.getString(form_value);
+			if( ! string.equals(expect)){
+				assertEquals(expect, string);
+			}
 			   if( dat_value != null ){
 				   assertEquals(dat_value, form_value);
 			   }

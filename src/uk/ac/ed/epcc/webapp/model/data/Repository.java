@@ -1097,8 +1097,8 @@ public final class Repository {
 		 * 
 		 * @throws ConsistencyError
 		 */
-		void setContents(ResultSet rs) throws DataFault,
-				ConsistencyError {
+		void setContents(ResultSet rs) throws DataException
+				{
 			setFromResultSet(this,rs, false);
 		}
 		/**
@@ -1115,8 +1115,7 @@ public final class Repository {
 		 * 
 		 * @throws ConsistencyError
 		 */
-		void setContents(ResultSet rs,boolean qualify) throws DataFault,
-		ConsistencyError {
+		void setContents(ResultSet rs,boolean qualify) throws DataException {
 			setFromResultSet(this,rs, qualify);
 		}
 	
@@ -2276,6 +2275,7 @@ public final class Repository {
 		if (fields == null) {
 			setMetaData();
 		}
+		assert(key != null);
 		return fields.containsKey(key);
 	}
 	/** Is there a named index of the specified name for this table.
@@ -2574,7 +2574,7 @@ public final class Repository {
 	 * @throws ConsistencyError
 	 */
 	void setFromResultSet(Record r,ResultSet rs, boolean qualify)
-			throws DataFault, ConsistencyError {
+			throws DataFault, DataNotFoundException {
 		int id;
 		synchronized(r){
 		r.clear();
@@ -2584,13 +2584,16 @@ public final class Repository {
 			 * by col number
 			 */
 			if( use_id ){
-				id = rs.getInt(getUniqueIdName(qualify));
+				String uniqueIdName = getUniqueIdName(qualify);
+				id = rs.getInt(uniqueIdName);
 				r.setInitialID(id);
 
 				// for backwards compatibility
 
 				if (id <= 0) {
-					throw new ConsistencyError("Bad ID value found");
+					// This can happen with a join used to pre-populate a cached link
+					// when the reference value is invalid
+					throw new DataNotFoundException("No ID value found "+uniqueIdName+":"+id);
 				}
 			}else{
 				id=0;
@@ -3093,5 +3096,8 @@ public final class Repository {
 		} else if (!tag_name.equals(other.tag_name))
 			return false;
 		return true;
+	}
+	public String toString(){
+		return "Repository-"+table_name;
 	}
 }

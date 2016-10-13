@@ -30,6 +30,7 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory.UpdatePersonRequiredPage;
 
 /**
@@ -47,6 +48,8 @@ public class AppUser extends DataObject implements java.security.Principal{
 	public static final String UPDATED_TIME="Updated";
 	
 	private AppUserFactory<?> factory;
+
+	private String logname = null;
 
 	public AppUser(AppUserFactory factory, Repository.Record res) {
 		super(res);
@@ -222,5 +225,38 @@ public class AppUser extends DataObject implements java.security.Principal{
 		for(AppUserCommitObserver c : factory.getComposites(AppUserCommitObserver.class)){
 			c.post_commit(this,changed);
 		}
+	}
+
+
+	/**
+	 * 
+	 * return name and SU identity if it exists.
+	 * 
+	 * We need to query the session to do this. This is used when logging
+	 * resource allocations so we can tell the difference between something done
+	 * by a user or and admin SU'd as that user.
+	 * 
+	 * @param req
+	 *            Request object
+	 * @return String
+	 * 
+	 */
+	public String getLogName() {
+		String result = getName();
+		if (logname == null ) {
+			SessionService serv = (SessionService) getContext().getService(SessionService.class);
+			if( serv instanceof ServletSessionService){
+				@SuppressWarnings("unchecked")
+				ServletSessionService<?> sss = (ServletSessionService) serv;
+				if( sss.isSU()){
+					AppUser p = sss.getSuperPerson();
+					logname = "(" + p.getName() + ")";
+				}
+			}
+		}
+		if( logname != null){
+			result = result + logname;
+		}
+		return result;
 	}
 }

@@ -20,6 +20,7 @@ attribute.
 Note that as the target and provider are encoded in the servlet-path
 the form could just submit to self. This might break form error reporting though.
 --%>
+<%@page import="uk.ac.ed.epcc.webapp.tags.WebappHeadTag"%>
 <%@ page import="uk.ac.ed.epcc.webapp.forms.html.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.forms.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.forms.transition.*" %>
@@ -55,11 +56,13 @@ the form could just submit to self. This might break form error reporting though
 		page_title = service_name+" "+action+" "+type_title;
 		page_heading = action+" "+type_title;
     }
+   
     // Add per tranistion css for script augmented transitions.
-    String param_name="transition_css."+action;
-    String transition_css = conn.getInitParameter(param_name);
-    if( transition_css != null && transition_css.trim().length() > 0){
-    	extra_css= extra_css+","+transition_css;
+   
+    if( tp instanceof ScriptTransitionFactory){
+    	ScriptTransitionFactory st = (ScriptTransitionFactory)tp;
+    	request.setAttribute(WebappHeadTag.REQUEST_CSS_ATTR, st.getAdditionalCSS(key));
+    	request.setAttribute(WebappHeadTag.REQUEST_SCRIPT_ATTR, st.getAdditionalScript(key));
     }
 %>
 <%@ include file="/std_header.jsf" %>
@@ -71,8 +74,8 @@ the form could just submit to self. This might break form error reporting though
 }
 %>
 <%
-HTMLForm f = new HTMLForm(conn);
 Transition t = tp.getTransition(target,key);
+HTMLForm f = new HTMLForm(conn);
 try{
 if( t instanceof BaseFormTransition ){
 	BaseFormTransition ft = (BaseFormTransition) t;

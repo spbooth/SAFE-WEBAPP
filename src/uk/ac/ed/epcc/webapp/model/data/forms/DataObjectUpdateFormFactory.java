@@ -116,7 +116,19 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 
 	public void postUpdate(BDO o, Form f, Map<String,Object> origs)
 			throws DataException {
+		compositesPostUpdate(o, f, origs);
+	}
 
+	/**
+	 * @param o
+	 * @param f
+	 * @param origs
+	 * @throws DataException
+	 */
+	protected void compositesPostUpdate(BDO o, Form f, Map<String, Object> origs) throws DataException {
+		for(TableStructureContributer c : factory.getTableStructureContributers()){
+			c.postUpdate(o, f, origs);
+		}
 	}
 
 	public FormResult getResult(String typeName, BDO dat, Form f) {

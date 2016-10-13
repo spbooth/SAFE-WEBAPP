@@ -53,6 +53,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.data.BasicType;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -69,7 +70,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  *
  */
 
-public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthComposite<T> implements RequiredPageProvider<T> {
+public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthComposite<T> implements RequiredPageProvider<T> , AnonymisingComposite<T>{
 	protected static class PasswordStatus extends BasicType<PasswordStatus.Value> {
 	    class Value extends BasicType.Value {
 			private Value(String tag, String name) {
@@ -845,5 +846,14 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	@Override
 	public boolean mustResetPassword(T user) {
 		return getHandler(user).mustChangePassword();
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.AnonymisingComposite#anonymise(uk.ac.ed.epcc.webapp.model.data.DataObject)
+	 */
+	@Override
+	public void anonymise(T target) {
+		lockPassword(target);
+		
 	}
 }

@@ -17,7 +17,6 @@ import java.sql.ResultSet;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue;
@@ -51,6 +50,7 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 		this.conn = conn;
 		this.clazz = clazz;
 		this.val = val;
+		assert( val != null);
 	}
 
 	private final AppContext conn;

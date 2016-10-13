@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
@@ -39,10 +40,14 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultIterator;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultMapper;
+import uk.ac.ed.epcc.webapp.jdbc.filter.ResultVisitor;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
+import uk.ac.ed.epcc.webapp.model.data.filter.JoinerFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
@@ -69,7 +74,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
  * <p>
  * LinkManager can navigate the links in either direction the subclass may
  * choose only to expose one direction of navigation. Internally this is implemented using the
- * <code>LinkFilter</code> and <code>LinkFilterIterator</code> classes which select a set a <code>Link</code> objects
+ * {@link LinkFilter} or {@link SQLLinkFilter} classes which select a set a <code>Link</code> objects
  * based on the value of one or other end.
 <code>
 <pre>
@@ -95,9 +100,10 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
  * 
  */
 
+@SuppressWarnings("javadoc")
 public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends DataObject,R extends DataObject> extends IndexedLinkManager<T,L,R> {
 
-	
+	public static final Feature USE_JOIN = new Feature("linkmanager.use_join",true,"Use joins to pre-fetch link ends");
 
 	/**
 	 * Link is an object representing an entry in a linkage table. Link objects
@@ -158,10 +164,13 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
        
 	}
 
-    public class LinkMapper implements ResultMapper<T>{
-        LinkFilter fil;
-        public LinkMapper(LinkFilter f,boolean join_left, boolean join_right){
-        	fil=f;
+	/** A {@link ResultMapper} that handles setting the links from joins.
+	 * 
+	 * @author spb
+	 *
+	 */
+    public class JoinLinkMapper implements ResultMapper<T>{
+        public JoinLinkMapper(boolean join_left, boolean join_right){
         	this.qualify=join_left || join_right;
         	this.join_left=join_left;
         	this.join_right=join_right;
@@ -174,43 +183,47 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			this.qualify = qualify;
 			return old;
 		}
-		public T makeObject(ResultSet rs) throws DataFault {
-			LinkManager<T,L,R> lm = LinkManager.this;
-			T link = lm.makeObject(rs,true);
+        public T makeObject(ResultSet rs) throws DataException {
+        	LinkManager<T,L,R> lm = LinkManager.this;
+        	T link = lm.makeObject(rs,true);
 
-			if (fil.getLeftTarget() == null) {
-				if( join_left ){
-					L left =  getLeftFactory().makeObject(rs,qualify);
-					link.setLeft(left);
-				}
-			}else{
-				link.setLeft(fil.getLeftTarget());
-			}
-			if (fil.getRightTarget() == null) {
-				if( join_right ){
-					R right = getRightFactory().makeObject(rs,qualify);
-					link.setRight(right);
-				}
-			}else{
-				link.setRight(fil.getRightTarget());
-			}
 
-			return link;
+        	if( join_left ){
+        		try{
+        			L left =  getLeftFactory().makeObject(rs,qualify);
+        			link.setLeft(left);
+        		}catch(DataNotFoundException e){
+        			// reference link is bad
+        			getLogger().error("Bad left link value "+link.getIdentifier());
+        		}
+        	}
+
+        	if( join_right ){
+        		try{
+        			R right = getRightFactory().makeObject(rs,qualify);
+        			link.setRight(right);
+        		}catch(DataNotFoundException e){
+        			// reference link is bad
+        			getLogger().error("Bad right link value "+link.getIdentifier());
+        		}
+        	}
+
+        	return link;
 		}
     	
 		public String getTarget() {
 			StringBuilder target = new StringBuilder();
 			res.addTable(target, true);
 			target.append(".* ");
-			if (fil.getLeftTarget() != null && fil.getRightTarget() != null) {
+			if ( ! (join_left || join_right)) {
 				return target.toString();
 			}
-			if (fil.getLeftTarget() == null && join_left) {
+			if (join_left) {
 				target.append(", ");
 				getLeftFactory().res.addTable(target, true);
 				target.append(".* ");
 			}
-			if (fil.getRightTarget() == null && join_right) {
+			if (join_right) {
 				target.append(", ");
 				getRightFactory().res.addTable(target, true);
 				target.append(".* ");
@@ -225,9 +238,20 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			return null;
 		}
 		public SQLFilter getRequiredFilter() {
-			// TODO Should we put reference filters here instead of
-			// {@link JoinLinkFilterIterator.addSource}
-			return null;
+			if( ! (join_left || join_right)){
+				return null;
+			}
+			// Use JoinerFilters so that if additional joins are added explicitly
+			// The join clauses will be identical and not duplicated.
+			Class<? super T> target = LinkManager.this.getTarget();
+			SQLAndFilter<T> fil = new SQLAndFilter<T>(target);
+			if( join_left ){
+				fil.addFilter(new JoinerFilter<L,T>(target, getLeftField(), res, getLeftFactory().res, true));
+			}
+			if( join_right ){
+				fil.addFilter(new JoinerFilter<R,T>(target, getRightField(), res, getRightFactory().res, true));
+			}
+			return fil;
 		}
 		public List<PatternArgument> getTargetParameters(
 				List<PatternArgument> list) {
@@ -239,30 +263,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		}
     }
 
-	public class LinkFilterIterator extends ResultIterator<T> {
-
-		public LinkFilterIterator(LinkFilter fil) throws DataFault {
-			super(LinkManager.this.getContext(),LinkManager.this.getTarget());
-			setMapper(new FilterAdapter());
-			setVisitor(fil);
-	    	try {
-				setup(fil,0,-1);
-			} catch (DataException e) {
-				throw new DataFault("Error in setup", e);
-			}
-		}
-
-		@Override
-		protected void addSource(StringBuilder sb) {
-			res.addTable(sb, true);
-			
-		}
-
-		@Override
-		protected String getDBTag() {
-			return res.getDBTag();
-		}
-	}
+	
 	/**
 	 * Version of FilterIterator that optimises the end object caches by
 	 * performing a join on target tables.
@@ -272,70 +273,35 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * 
 	 */
 	public class JoinLinkFilterIterator extends ResultIterator<T> {
-        private final LinkFilter fil;
+       
         private final boolean join_left;
         private final boolean join_right;
-		public JoinLinkFilterIterator(LinkFilter fil) throws DataFault {
+		public JoinLinkFilterIterator(LinkProvider<T,L,R> fil) throws DataFault {
         	this(fil,fil.getLeftTarget()==null,fil.getRightTarget()==null);
         }
-    	public JoinLinkFilterIterator(LinkFilter fil,boolean join_left,boolean join_right) throws DataFault {
+    	public JoinLinkFilterIterator(BaseFilter<T> fil,boolean join_left,boolean join_right) throws DataFault {
 			super(LinkManager.this.getContext(),LinkManager.this.getTarget());
-			this.fil=fil;
 			this.join_left=join_left;
 			this.join_right=join_right;
 			boolean use_join = join_left || join_right;
 			setQualify(use_join);
-			setMapper(new LinkMapper(fil,join_left,join_right));
-			setVisitor(fil);
+			setMapper(new JoinLinkMapper(join_left,join_right));
+			if( fil instanceof ResultVisitor){
+				setVisitor((ResultVisitor<T>)fil);
+			}
 			try {
 				setup(fil,0,-1);
 			} catch (DataException e) {
 				throw new DataFault("Error in setup",e);
 			}
 		}
-
 		public void addSource(StringBuilder source) {
-			res.addTable(source, true);
-			
-		
-			if (fil == null ) {
-				return;
-			}
-			
-			if (joinLeft()) {
-				source.append(" JOIN ");
-				getLeftFactory().res.addTable(source, true);
-				source.append(" ON ");
-				res.getInfo(getLeftField()).addName(source, true, true);
-				source.append("=");
-				getLeftFactory().res.addUniqueName(source, true, true);
-			}
-			if (joinRight()) {
-				source.append(" JOIN ");
-				getRightFactory().res.addTable(source, true);
-				source.append(" ON ");
-				res.getInfo(getRightField()).addName(source, true, true);
-				source.append("=");
-				getRightFactory().res.addUniqueName(source, true, true);
-			}
-
-
-		}
-
-		private boolean joinRight() {
-			return join_right && res.getDBTag() == getRightFactory().res.getDBTag();
-		}
-
-		private boolean joinLeft() {
-			return join_left && res.getDBTag() == getLeftFactory().res.getDBTag();
+			res.addTable(source, true);	
 		}
 		@Override
 		protected String getDBTag() {
 			return res.getDBTag();
 		}
-
-	
-		
 	}
 
 	/**
@@ -557,75 +523,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		}
 	}
 
-	/** A {@link FilterResult} for left link objects.
-	 * 
-	 * @author spb
-	 *
-	 */
-	public class LeftResult extends AbstractFilterResult<L> implements FilterResult<L>{
-		public LeftResult(R right, BaseFilter<? super T> fil) throws DataFault {
-			super();
-			this.right = right;
-			this.fil = fil;
-			iter=getLeftIterator(right, fil);
-		}
 
-		private final R right;
-		private final BaseFilter<? super T> fil;
-		private Iterator<L> iter;
-
-		/* (non-Javadoc)
-		 * @see java.lang.Iterable#iterator()
-		 */
-		public Iterator<L> iterator() {
-			try {
-				if( iter != null ){
-					Iterator<L> result=iter;
-					iter=null;
-					return result;
-				}
-				return getLeftIterator(right, fil);
-			} catch (DataFault e) {
-				LinkManager.this.getLogger().error("Error making iterator for LeftResult", e);
-				return null;
-			}
-		}
-	}
-
-	/** A {@link FilterResult} for right link objects.
-	 * 
-	 * @author spb
-	 *
-	 */
-	public class RightResult extends AbstractFilterResult<R> implements FilterResult<R>{
-		public RightResult(L left, BaseFilter<? super T> fil) throws DataFault {
-			super();
-			this.left = left;
-			this.fil = fil;
-			iter=getRightIterator(left, fil);
-		}
-
-		private final L left;
-		private final BaseFilter<? super T> fil;
-		private Iterator<R> iter;
-
-		/* (non-Javadoc)
-		 * @see java.lang.Iterable#iterator()
-		 */
-		public Iterator<R> iterator() {
-			try {
-				if( iter != null ){
-					Iterator<R> result=iter;
-					iter=null;
-					return result;
-				}
-				return getRightIterator(left, fil);
-			} catch (DataFault e) {
-				LinkManager.this.getLogger().error("Error making iterator for RightResult", e);
-				return null;
-			}
-		}
-	}
 
 	/** A wrapper to convert a non SQL filter on the link object into an {@link AcceptFilter}
 	 * on the left object
@@ -751,16 +649,17 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @throws DataFault 
 	 * @throws DataFault
 	 */
-	@Override
-	public Iterator<T> getLinkIterator(L l, R r, BaseFilter<? super T> f) throws DataFault{
-		return getLinkIterator(l, r, f, true);
+	
+	private Iterator<T> getLinkIterator(L l, R r, BaseFilter<? super T> f) throws DataFault{
+		return getLinkIterator(l, r, f, USE_JOIN.isEnabled(getContext()));
 	}
 	public Iterator<T> getLinkIterator(L l, R r, BaseFilter<? super T> f, boolean use_join)
 			throws DataFault {
 		if (use_join) {
 			return this.new JoinLinkFilterIterator(new LinkFilter(l, r, f));
 		}
-		return new LinkFilterIterator(new LinkFilter(l, r, f));
+		// This will still set the known links as LinkFilter is a ResultVisitor
+		return new FilterIterator(new LinkFilter(l, r, f));
 	}
 	public long getLinkCount(L l, R r,BaseFilter<? super T> f) throws DataException{
 		return getCount(new LinkFilter(l, r, f));
@@ -777,7 +676,8 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @return {@link FilterResult}
 	 * @throws DataFault
 	 */
-	public FilterResult<T> getResult(L left, R right, BaseFilter<? super T> fil) throws DataFault{
+	@Override
+	public FilterResult<T> getFilterResult(L left, R right, BaseFilter<? super T> fil) throws DataFault{
 		return new LinkResult(left, right, fil);
 	}
 
@@ -818,9 +718,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		return getRemoteFilter(getLeftFactory(), getLeftField(), fil);
 	}
 	
-	public FilterResult<L> getLeftResult(R right, BaseFilter<? super T> fil) throws DataFault{
-		return new LeftResult(right, fil);
-	}
+
 	/** Get a filter for the right peer from a filter on the link.
 	 * 
 	 * 
@@ -855,9 +753,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	public BaseFilter<T> getRightRemoteFilter(BaseFilter<? super R> fil){
 		return getRemoteFilter(getRightFactory(), getRightField(), fil);
 	}
-	public FilterResult<R> getRightResult(L left, BaseFilter<? super T> fil) throws DataFault{
-		return new RightResult(left, fil);
-	}
+
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.IndexedLinkManager#isLeft(java.lang.Object)
 	 */
@@ -874,20 +770,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		return getRightFactory().isMine(o);
 	}
 
-	@Override
-	public Iterator<L> getLeftIterator(R r, BaseFilter<? super T> f)
-			throws DataFault {
-		// Force join to left only
-		return new LeftIterator(new JoinLinkFilterIterator(new LinkFilter(null, r, f),true,false));
-	}
-
-	@Override
-	public Iterator<R> getRightIterator(L l, BaseFilter<? super T> f)
-			throws DataFault {
-		// Force join to right only
-		return new RightIterator(new JoinLinkFilterIterator(new LinkFilter(l, null, f),false,true));
-	}
-
+	
 	/**
 	 * @return
 	 */

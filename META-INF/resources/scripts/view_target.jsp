@@ -17,6 +17,7 @@ This should always be invoked as a forward from the TransitionServlet.
 Note that as the target and provider are encoded in the servlet-path
 the form could just submit to self. 
 --%>
+<%@page import="uk.ac.ed.epcc.webapp.tags.WebappHeadTag"%>
 <%@ page import="uk.ac.ed.epcc.webapp.content.*,uk.ac.ed.epcc.webapp.forms.html.*,uk.ac.ed.epcc.webapp.forms.*, uk.ac.ed.epcc.webapp.forms.transition.*" %>
 <%@ page %>
 <%@ include file="/session.jsf" %>
@@ -47,6 +48,11 @@ the form could just submit to self.
 %>
 <jsp:forward page="/messages.jsp?message_type=access_denied" />
 <%    	
+    }
+    if( tp instanceof ScriptTransitionFactory){
+    	ScriptTransitionFactory st = (ScriptTransitionFactory)tp;
+    	request.setAttribute(WebappHeadTag.REQUEST_CSS_ATTR, st.getAdditionalCSS(null));
+    	request.setAttribute(WebappHeadTag.REQUEST_SCRIPT_ATTR, st.getAdditionalScript(null));
     }
 %>
 <%	

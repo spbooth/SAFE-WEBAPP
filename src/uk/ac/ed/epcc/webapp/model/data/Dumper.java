@@ -38,6 +38,7 @@ import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.IndexInfo;
@@ -184,7 +185,7 @@ public class Dumper implements Contexed{
 			sb.appendParent();
 		}
 	}
-	public void dumpAll(Repository res) throws DataFault, ConsistencyError{
+	public void dumpAll(Repository res) throws ConsistencyError, DataException{
 		StringBuilder query= new StringBuilder();
 		query.append("SELECT * from ");
 		res.addTable(query, true);

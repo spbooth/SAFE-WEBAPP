@@ -24,6 +24,7 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.resource.ResourceService;
+import uk.ac.ed.epcc.webapp.timer.TimerService;
 /** Base {@link ConfigService} that supports the recursive loading of properties from
  * a {@link ResourceService}
  * 
@@ -50,7 +51,8 @@ public abstract class AbstractConfigService implements Contexed, ConfigService{
 		//Logger log=conn.getLogger();
 		Properties props = new Properties(parent_props);
 		Properties result = props;
-		
+		TimerService timer = conn.getService(TimerService.class);
+		if( timer != null ){ timer.startTimer(config_list);}
 		//log.debug("param="+param+" def="+def+" config_path="+config_path);
 		ResourceService serv = conn.getService(ResourceService.class);
 		for(String config_path : config_list.split(SPLIT_REGEX)){
@@ -77,6 +79,7 @@ public abstract class AbstractConfigService implements Contexed, ConfigService{
 			}
 		}
 		result = processAdditions(props, serv);
+		if( timer != null ){ timer.stopTimer(config_list);}
 		return result;
 	}
 	

@@ -14,6 +14,8 @@
 package uk.ac.ed.epcc.webapp.tags;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,8 +34,16 @@ import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
  *
  */
 public class WebappHeadTag extends TagSupport implements Tag {
+	/**
+	 * 
+	 */
+	public static final String REQUEST_SCRIPT_ATTR = "request_script";
+	/**
+	 * 
+	 */
+	public static final String REQUEST_CSS_ATTR = "request_css";
 	private String extra_css;
-	
+	 
 	public void setextraCSS(String extra){
 		extra_css=extra;
 	}
@@ -42,8 +52,11 @@ public class WebappHeadTag extends TagSupport implements Tag {
 	public int doStartTag() throws JspException {
 		PageContext page = pageContext;
 		HttpServletRequest request = (HttpServletRequest) page.getRequest();
+		String request_css = (String) request.getAttribute(REQUEST_CSS_ATTR);
+		String request_script = (String) request.getAttribute(REQUEST_SCRIPT_ATTR);
 		JspWriter out = page.getOut();
         HttpServletResponse response = (HttpServletResponse)pageContext.getResponse();
+        Set<String> scripts = new HashSet<String>(); // don't emit the same script twice 
         try{
         	AppContext conn = ErrorFilter.retrieveAppContext(request,response);
         	if( conn != null ){
@@ -65,11 +78,22 @@ public class WebappHeadTag extends TagSupport implements Tag {
         				doCSS(out, response, template_path, null,css);		 
         			}
         		}
-        		if( NavigationMenuService.NAVIGATION_MENU_JS_FEATURE.isEnabled(conn)){
-        			doScript(out,request,response,"//code.jquery.com/jquery-1.10.2.min.js");
-        			doScript(out, request,response, "/scripts/menubar.js");
-        		}
         		
+        		if( NavigationMenuService.NAVIGATION_MENU_JS_FEATURE.isEnabled(conn)){
+        			doScript(scripts,out,request,response,"//code.jquery.com/jquery-1.10.2.min.js");
+        			doScript(scripts,out, request,response, "/scripts/menubar.js");
+        		}
+        		if( request_script != null && request_script.trim().length() > 0 ){
+        			// allow escaped commas in in-line scripts
+        			for(String script : request_script.split("(?<!\\\\),")){
+        				doScript(scripts,out,request,response,script.replace("\\,", ","));
+        			}
+        		}
+        		if(request_css != null && request_css.trim().length() > 0){ 
+        			for( String css : request_css.split(",")){
+        				doCSS(out, response, template_path, null,css);		 
+        			}
+        		}
         	}
         	return EVAL_PAGE;
         } catch (Exception e) {
@@ -92,7 +116,11 @@ public class WebappHeadTag extends TagSupport implements Tag {
 			out.print("\" ");
 		}
 		out.print("href=\"");
-		out.print(response.encodeURL(template_path+"/css/"+file));
+		if( file.startsWith("//")){
+			out.print(file);
+		}else{
+			out.print(response.encodeURL(template_path+"/css/"+file));
+		}
 		out.println("\" rel=\"stylesheet\" type=\"text/css\">");
 	}
 	protected void doIcon(JspWriter out, HttpServletResponse response, String template_path,String type,String file) throws IOException {
@@ -107,14 +135,27 @@ public class WebappHeadTag extends TagSupport implements Tag {
 		out.print(response.encodeURL(template_path+"/"+file));
 		out.println("\" >");
 	}
-	protected void doScript(JspWriter out, HttpServletRequest request, HttpServletResponse response, String location) throws IOException {
-		out.print("<script type=\"text/javascript\" charset=\"utf8\" src=\"");
-		if( location.startsWith("//")){
-		    out.print(location);
-		}else{
-			out.print(response.encodeURL(request.getContextPath()+location));
+	protected void doScript(Set<String> scripts, JspWriter out, HttpServletRequest request, HttpServletResponse response, String location) throws IOException {
+		// only include scripts once.
+		if( scripts.contains(location)){
+			return;
 		}
-		out.println("\"></script>");
+		scripts.add(location);
+		if( location.startsWith("/")){
+			// script file
+			out.print("<script type=\"text/javascript\" charset=\"utf8\" src=\"");
+			if( location.startsWith("//")){
+				out.print(location);
+			}else {
+				out.print(response.encodeURL(request.getContextPath()+location));		
+			}
+			out.println("\"></script>");
+		}else{
+			// in-line script
+			out.print("<script type=\"text/javascript\" charset=\"utf8\" >");
+			out.print(location);
+			out.println("</script>");
+		}
 	}
 	
 }

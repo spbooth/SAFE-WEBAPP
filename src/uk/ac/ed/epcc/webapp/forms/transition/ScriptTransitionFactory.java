@@ -11,40 +11,20 @@
 //| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
-package uk.ac.ed.epcc.webapp.model.lifecycle;
+package uk.ac.ed.epcc.webapp.forms.transition;
 
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.tags.WebappHeadTag;
 
-/** A {@link AbstractListener} that implements {@link Contexed}
+/** Interface for {@link TransitionFactory}s
+ * that need to add additional CSS and ECMAScript to the html of a transition.
+ * Only has any effect in the html context
+ * form.
+ * @see WebappHeadTag
  * @author spb
- * @param <R> 
+ * @param <K> type of transition key
  *
  */
-public class AbstractContextedListener<R> extends AbstractListener<R> implements Contexed {
-
-	private final AppContext conn;
-	/**
-	 * @param conn 
-	 * @param clazz 
-	 * 
-	 */
-	public AbstractContextedListener(AppContext conn, Class<? super R> clazz) {
-		super(clazz);
-		this.conn=conn;
-	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public final AppContext getContext() {
-		return conn;
-	}
-	
-	public Logger getLogger(){
-		return conn.getService(LoggerService.class).getLogger(getClass());
-	}
-
+public interface ScriptTransitionFactory<K> {
+	public String getAdditionalCSS(K key);
+	public String getAdditionalScript(K key);
 }

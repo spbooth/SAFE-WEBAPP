@@ -24,6 +24,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 
 /** Filter to join two tables.
  * 
@@ -65,6 +66,7 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 		this.res=res;
 		this.remote_res=remote_res;
 		this.target_references=target_references;
+		assert(target_references ? res.hasField(join_field) : remote_res.hasField(join_field));
 	}
 		
 		
@@ -89,11 +91,13 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 			// this is the clause that matches the tables.
 			join.append("(");
 			if( target_references){
-	     		res.getInfo(join_field).addName(join, true, true);
+	     		FieldInfo info = res.getInfo(join_field);
+				info.addName(join, true, true);
 	         	join.append(" = ");
 	         	remote_res.addUniqueName(join, true, true);
 	     	}else{
-	     		remote_res.getInfo(join_field).addName(join, true, true);
+	     		FieldInfo info = remote_res.getInfo(join_field);
+				info.addName(join, true, true);
 	         	join.append(" = ");
 	         	res.addUniqueName(join, true, true);
 	     	}

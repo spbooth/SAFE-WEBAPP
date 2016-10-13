@@ -23,16 +23,27 @@ import java.util.Date;
  * A class to represent durations of time. Java does not have such a notion in a
  * simple form - the java Duration object is quite complex, allowing durations
  * in months and years that can't necessarily be compared. This is a simple
- * implementation that just wraps around a <code>long</code> holding a number of milliseconds. 
- * This object can persist to the database (where it will be stored as a number of milliseconds) end exteds
+ * implementation that just wraps around a <code>long</code>.
+ * 
+ * These constructors for these objects always work in seconds. 
+ * Seconds were chosen primarily because the SI unit of time is a
+ * second, so it seems as good a choice as any. Many durations stored in various
+ * formats are accurate to at least seconds but not necessarily any more.
+ * 
+ * Internally the value is stored in a finer resolution unit that defaults to milliseconds but can be overridden
+ * when constructing the object.
+ * {@link Duration} extends {@link Number} and the numerical value is the duration in the internal units.
+ * 
+ * This is the value used when storing {@link Duration}s to the database. However by default  If you wish to persist objects in custom units a 
+ * {@link DurationFieldValue} with a custom resolution must be installed in the factory. So if the 
+ *  holding a number of milliseconds. 
+ * This object can persist to the database (where it will be stored as a number of milliseconds) end extends
  * {@link Number} (again representing a number of milliseconds).
  * </p>
  * <p>
  * Though the numerical value is held in milliseconds the accuracy of the 
  * duration is not guaranteed to anything finer than a
- * second. Seconds were chosen primarily because the SI unit of time is a
- * second, so it seems as good a choice as any. Many durations stored in various
- * formats are accurate to at least seconds but not necessarily any more.
+ * second.
  * Currently, the implementation stores durations in milliseconds so will be
  * accurate to the millisecond. As
  * with any measurement, this object will only be as accurate as the values
