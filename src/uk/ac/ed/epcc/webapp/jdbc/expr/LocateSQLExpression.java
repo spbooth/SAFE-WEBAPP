@@ -19,6 +19,7 @@ import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
@@ -42,12 +43,12 @@ public class LocateSQLExpression implements SQLExpression<Integer>{
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#add(java.lang.StringBuilder, boolean)
 	 */
 	public int add(StringBuilder sb, boolean qualify) {
-		sb.append("LOCATE('");
-    	str.add(sb, false);
-    	sb.append("',");
+		sb.append("LOCATE(");
+    	str.add(sb, qualify);
+    	sb.append(",");
     	col.add(sb, qualify);
     	sb.append(",");
-    	pos.add(sb, false);
+    	pos.add(sb, qualify);
     	sb.append(")");
     	return 1;
 	}
@@ -86,7 +87,10 @@ public class LocateSQLExpression implements SQLExpression<Integer>{
 	 */
 	@Override
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
-		return null;
+		list = str.getParameters(list);
+		list = col.getParameters(list);
+		list = pos.getParameters(list);
+		return list;
 	}
 
 	/* (non-Javadoc)
@@ -94,7 +98,19 @@ public class LocateSQLExpression implements SQLExpression<Integer>{
 	 */
 	@Override
 	public SQLFilter getRequiredFilter() {
-		return null;
+		SQLAndFilter required= null;
+		for( SQLExpression part : new SQLExpression[]{str,col,pos} ){
+			SQLFilter f = part.getRequiredFilter();
+			if( f != null ){
+				if( required == null){
+					required = new SQLAndFilter(f.getTarget(),f);
+				}else{
+					required.addFilter(f);
+				}
+			}
+			
+		}
+		return required;
 	}
 	
 	
