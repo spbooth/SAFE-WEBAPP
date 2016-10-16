@@ -1427,6 +1427,30 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	public final DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil){
 		return new DataObjectInput(fil);
 	}
+	public class FilterSelector implements Selector<DataObjectItemInput<BDO>>{
+		public FilterSelector(BaseFilter<BDO> fil) {
+			super();
+			this.fil = fil;
+		}
+
+		private final BaseFilter<BDO> fil;
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#getInput()
+		 */
+		@Override
+		public DataObjectItemInput<BDO> getInput() {
+			return DataObjectFactory.this.getInput(fil);
+		}
+	}
+	/** create a {@link Selector} from a filter.
+	 * 
+	 * @param fil
+	 * @return
+	 */
+	public final Selector<DataObjectItemInput<BDO>> getSelector(BaseFilter<BDO> fil){
+		return new FilterSelector(fil);
+	}
 	
 	/** Create a {@link FilterResult} from a filter
 	 * 
