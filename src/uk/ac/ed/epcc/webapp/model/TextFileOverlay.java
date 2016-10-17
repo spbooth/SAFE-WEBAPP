@@ -230,6 +230,13 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			}
 			return false;
 		}
+		/** Do we have an override text;
+		 * 
+		 * @return
+		 */
+		boolean hasText(){
+			return getText() != null;
+		}
 		
 		public String getName(){
 			return record.getStringProperty(NAME).trim();
@@ -290,7 +297,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		}
 		@Override
 		public String getIdentifier(int max) {
-			return getGroup()+":"+getName();
+			return getGroup()+":"+getName()+(hasText()?"[M]":"");
 		}
 		public boolean canRetire() {
 			return true;
@@ -388,8 +395,24 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			if( file != null ){
 				f.addInput("File", "File location", new InfoInput(file.toString()));
 			}
-			boolean from_file = dat.getText()==null;
-			f.addInput("Location", "Location",new InfoInput(from_file ? "File" : "Database"));
+			boolean from_file = ! dat.hasText();
+			String location;
+			if( from_file ){
+				location = "File";
+			}else{
+				String resource_text = dat.getResourceString();
+				if( resource_text == null){
+					location ="Database-only";
+				}else{
+					if( resource_text.equals(dat.getText())){
+						location = "Database-unchanged";
+					}else{
+						location = "Database";
+					}
+				}
+			}
+			
+			f.addInput("Location", "Location",new InfoInput(location));
 			Map<String,Object> sel = getSelectors();
 			Input<String> text = (Input<String>) sel.get(TEXT);
 			text.setValue(dat.getData());

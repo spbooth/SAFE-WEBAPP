@@ -29,7 +29,6 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 public class TextFileOverlayTest extends DataObjectFactoryTestCase {
 
 	
-
 	@Override
 	public DataObjectFactory getFactory() {
 		return new TextFileOverlay(ctx);
