@@ -20,7 +20,10 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.junit.Before;
 
@@ -33,6 +36,7 @@ import uk.ac.ed.epcc.webapp.forms.MapForm;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
+import uk.ac.ed.epcc.webapp.forms.result.CustomPage;
 import uk.ac.ed.epcc.webapp.forms.transition.BaseFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.CustomFormContent;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
@@ -448,23 +452,10 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		builder.close();
 		 
 		 
-		 TransformerFactory tfac = TransformerFactory.newInstance();
-		 Transformer tt;
-		 if( normalize_transform == null ){
-			 normalize_transform="/normalize.xsl";
-		 }
-			 Source source = XMLDataUtils.readResourceAsSource(getClass(), normalize_transform);
-			 assertNotNull(source);
-			 tt = tfac.newTransformer(source);
-		 
-		 assertNotNull(tt);
-		 String result = XMLDataUtils.transform(tt, builder.toString());
-		 System.out.println(result);
-		 String expected = XMLDataUtils.transform(tt,getClass(), expected_xml);
-		 
-		 String differ = TestDataHelper.diff(expected, result);
-		 assertTrue("Unexpected result:\n"+differ,differ.trim().length()==0);
+		String content = builder.toString();
+		 checkContent(normalize_transform, expected_xml, content);
 		 return target;
 	}
+	
 	
 }

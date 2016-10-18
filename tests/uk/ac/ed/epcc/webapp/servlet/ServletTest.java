@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.servlet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -25,17 +26,26 @@ import java.util.ResourceBundle;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.junit.After;
 import org.junit.Before;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Indexed;
+import uk.ac.ed.epcc.webapp.TestDataHelper;
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.OverrideConfigService;
+import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.result.CustomPage;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.jdbc.config.DataBaseConfigService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -335,5 +345,61 @@ public abstract class ServletTest extends WebappTestBase{
 		}
 		return  sess;
 	}
-	
+	/** Generates a XML (mostly HTML) representation of the 
+	 * contents of the view_custompage that can be directly 
+	 * influenced by the transform. This is then (optionally) put through a
+	 * normalisation XLST transform to remove time dependent 
+	 * output and compared with a file of expected output.
+	 * 
+	 * 
+	 * @param normalise_transform
+	 * @param expected
+
+	 * @throws Exception 
+	 */
+	public void checkViewCustomPage(String normalize_transform, String expected_xml) throws Exception{
+		checkForward("/scripts/view_custom_page.jsp");
+		CustomPage custom_page =(CustomPage) req.getAttribute(CustomPage.CUSTOM_PAGE_TAG);
+		assertNotNull(custom_page);
+		HtmlBuilder builder = new HtmlBuilder();
+		builder.setValidXML(true);
+		builder.open("view_page");
+		custom_page.addContent(getContext(), builder);
+		
+		builder.close();
+		 
+		String content = builder.toString();
+		 checkContent(normalize_transform, expected_xml, content);
+		
+	}
+
+
+	/**
+	 * @param normalize_transform
+	 * @param expected_xml
+	 * @param content
+	 * @throws TransformerFactoryConfigurationError
+	 * @throws TransformerConfigurationException
+	 * @throws TransformerException
+	 */
+	public void checkContent(String normalize_transform, String expected_xml, String content)
+			throws TransformerFactoryConfigurationError, TransformerConfigurationException, TransformerException {
+		TransformerFactory tfac = TransformerFactory.newInstance();
+		 Transformer tt;
+		 if( normalize_transform == null ){
+			 normalize_transform="/normalize.xsl";
+		 }
+			 Source source = XMLDataUtils.readResourceAsSource(getClass(), normalize_transform);
+			 assertNotNull(source);
+			 tt = tfac.newTransformer(source);
+		 
+		 assertNotNull(tt);
+		 
+		String result = XMLDataUtils.transform(tt, content);
+		 System.out.println(result);
+		 String expected = XMLDataUtils.transform(tt,getClass(), expected_xml);
+		 
+		 String differ = TestDataHelper.diff(expected, result);
+		 assertTrue("Unexpected result:\n"+differ,differ.trim().length()==0);
+	}
 }
