@@ -29,13 +29,13 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  */
 
 public class LocateSQLValue implements SQLValue<Integer>{
+	private SQLValue<String> substr;
 	private SQLValue<String> str;
-	private SQLValue<String> col;
 	private SQLValue<Integer> pos;
 	
-	public LocateSQLValue(SQLValue<String> str, SQLValue<String> col, SQLValue<Integer> pos){
+	public LocateSQLValue(SQLValue<String> substr, SQLValue<String> str, SQLValue<Integer> pos){
+		this.substr = substr;
 		this.str = str;
-		this.col = col;
 		this.pos = pos;
 	}
 	
@@ -44,9 +44,9 @@ public class LocateSQLValue implements SQLValue<Integer>{
 	 */
 	public int add(StringBuilder sb, boolean qualify) {
 		int added=0;
-    	added+=str.add(sb, qualify);
+    	added+=substr.add(sb, qualify);
     	sb.append(",");
-    	added+=col.add(sb, qualify);
+    	added+=str.add(sb, qualify);
     	sb.append(",");
     	added+=pos.add(sb, qualify);
     	assert(added==3); // we assume one field per value
@@ -72,17 +72,24 @@ public class LocateSQLValue implements SQLValue<Integer>{
 	 */
 	@Override
 	public Integer makeObject(ResultSet rs, int loc) throws DataException {
-		
-		
 		try {
-			String str_val = rs.getString(loc);
-			String col_val = rs.getString(loc+1);
-			int pos_val = rs.getInt(loc+2);
-			return col_val.indexOf(str_val, pos_val-1); // Java index from zero but SQL and our syntax from 1
+			String substr_val = rs.getString(loc);
+			String str_val = rs.getString(loc+1);
+			Integer pos_val = rs.getInt(loc+2);
+			Integer loc_val = -1;
+			if (pos_val >= 1 && pos_val <= str_val.length()) {
+				// note, pos_val is converted to zero-based indexing
+				loc_val = str_val.indexOf(substr_val, pos_val-1);
+				if (-1 != loc_val) {
+					// substr_val found, convert loc_val to one-based indexing
+					loc_val += 1;
+				}
+			}
+			return loc_val;
 		} catch (SQLException e) {
-			throw new DataFault("Error finding '" + str
-					+ "' in column " + col
-					+ " starting at position " + pos + ".",e);
+			throw new DataFault("Error finding '" + substr
+					+ "' in string '" + str
+					+ "' starting at position " + pos + ".",e);
 		}
 	}
 	
@@ -92,8 +99,8 @@ public class LocateSQLValue implements SQLValue<Integer>{
 	 */
 	@Override
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
+		list = substr.getParameters(list);
 		list = str.getParameters(list);
-		list = col.getParameters(list);
 		list = pos.getParameters(list);
 		return list;
 	}
@@ -104,7 +111,7 @@ public class LocateSQLValue implements SQLValue<Integer>{
 	@Override
 	public SQLFilter getRequiredFilter() {
 		SQLAndFilter required= null;
-		for( SQLValue part : new SQLValue[]{str,col,pos} ){
+		for( SQLValue part : new SQLValue[]{substr,str,pos} ){
 			SQLFilter f = part.getRequiredFilter();
 			if( f != null ){
 				if( required == null){
@@ -119,12 +126,12 @@ public class LocateSQLValue implements SQLValue<Integer>{
 	}
 	
 	
-	public SQLValue getString() {
-		return str;
+	public SQLValue getSubstring() {
+		return substr;
 	}
 
-	public SQLValue getColumn() {
-		return col;
+	public SQLValue getString() {
+		return str;
 	}
 
 	public SQLValue getPosition() {
@@ -135,8 +142,8 @@ public class LocateSQLValue implements SQLValue<Integer>{
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((substr == null) ? 0 : substr.hashCode());
 		result = prime * result + ((str == null) ? 0 : str.hashCode());
-		result = prime * result + ((col == null) ? 0 : col.hashCode());
 		result = prime * result + ((pos == null) ? 0 : pos.hashCode());
 		return result;
 	}
@@ -150,15 +157,15 @@ public class LocateSQLValue implements SQLValue<Integer>{
 		if (getClass() != obj.getClass())
 			return false;
 		LocateSQLValue other = (LocateSQLValue) obj;
+		if (substr == null) {
+			if (other.substr != null)
+				return false;
+		} else if (!substr.equals(other.substr))
+			return false;
 		if (str == null) {
 			if (other.str != null)
 				return false;
 		} else if (!str.equals(other.str))
-			return false;
-		if (col == null) {
-			if (other.col != null)
-				return false;
-		} else if (!col.equals(other.col))
 			return false;
 		if (pos != other.pos)
 			return false;
