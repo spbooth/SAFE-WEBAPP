@@ -29,13 +29,13 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  */
 
 public class LocateSQLExpression implements SQLExpression<Integer>{
+	private SQLExpression<String> substr;
 	private SQLExpression<String> str;
-	private SQLExpression<String> col;
 	private SQLExpression<Integer> pos;
 	
-	public LocateSQLExpression(SQLExpression<String> str, SQLExpression<String> col, SQLExpression<Integer> pos){
+	public LocateSQLExpression(SQLExpression<String> substr, SQLExpression<String> str, SQLExpression<Integer> pos){
+		this.substr = substr;
 		this.str = str;
-		this.col = col;
 		this.pos = pos;
 	}
 	
@@ -44,9 +44,9 @@ public class LocateSQLExpression implements SQLExpression<Integer>{
 	 */
 	public int add(StringBuilder sb, boolean qualify) {
 		sb.append("LOCATE(");
-    	str.add(sb, qualify);
+		substr.add(sb, qualify);
     	sb.append(",");
-    	col.add(sb, qualify);
+    	str.add(sb, qualify);
     	sb.append(",");
     	pos.add(sb, qualify);
     	sb.append(")");
@@ -75,9 +75,9 @@ public class LocateSQLExpression implements SQLExpression<Integer>{
 		try {
 			return rs.getInt(loc);
 		} catch (SQLException e) {
-			throw new DataFault("Error finding '" + str
-					+ "' in column " + col
-					+ " starting at position " + pos + ".",e);
+			throw new DataFault("Error finding '" + substr
+					+ "' in string '" + str
+					+ "' starting at position " + pos + ".",e);
 		}
 	}
 	
@@ -87,8 +87,8 @@ public class LocateSQLExpression implements SQLExpression<Integer>{
 	 */
 	@Override
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
+		list = substr.getParameters(list);
 		list = str.getParameters(list);
-		list = col.getParameters(list);
 		list = pos.getParameters(list);
 		return list;
 	}
@@ -99,7 +99,7 @@ public class LocateSQLExpression implements SQLExpression<Integer>{
 	@Override
 	public SQLFilter getRequiredFilter() {
 		SQLAndFilter required= null;
-		for( SQLExpression part : new SQLExpression[]{str,col,pos} ){
+		for( SQLExpression part : new SQLExpression[]{substr,str,pos} ){
 			SQLFilter f = part.getRequiredFilter();
 			if( f != null ){
 				if( required == null){
@@ -114,12 +114,12 @@ public class LocateSQLExpression implements SQLExpression<Integer>{
 	}
 	
 	
-	public SQLExpression getString() {
-		return str;
+	public SQLExpression getSubstring() {
+		return substr;
 	}
 
-	public SQLExpression getColumn() {
-		return col;
+	public SQLExpression getString() {
+		return str;
 	}
 
 	public SQLExpression getPosition() {
@@ -130,8 +130,8 @@ public class LocateSQLExpression implements SQLExpression<Integer>{
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((substr == null) ? 0 : substr.hashCode());
 		result = prime * result + ((str == null) ? 0 : str.hashCode());
-		result = prime * result + ((col == null) ? 0 : col.hashCode());
 		result = prime * result + ((pos == null) ? 0 : pos.hashCode());
 		return result;
 	}
@@ -145,15 +145,15 @@ public class LocateSQLExpression implements SQLExpression<Integer>{
 		if (getClass() != obj.getClass())
 			return false;
 		LocateSQLExpression other = (LocateSQLExpression) obj;
+		if (substr == null) {
+			if (other.substr != null)
+				return false;
+		} else if (!substr.equals(other.substr))
+			return false;
 		if (str == null) {
 			if (other.str != null)
 				return false;
 		} else if (!str.equals(other.str))
-			return false;
-		if (col == null) {
-			if (other.col != null)
-				return false;
-		} else if (!col.equals(other.col))
 			return false;
 		if (pos != other.pos)
 			return false;
