@@ -429,19 +429,16 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		for(Object key : provider.getTransitions(target)){
 			if( provider.allowTransition(getContext(),target,key) ){
 				builder.open("active");
-				  builder.open(key.toString());
+				  builder.attr("value", key.toString());
 				  String help=provider.getHelp(key);
 				  if( help != null ){
 					builder.attr("help",help);
 				  }
-				
-				  builder.close();
 				builder.close();
 			}else{
 				if( provider instanceof ShowDisabledTransitions){
 					builder.open("disabled");
-					  builder.open(key.toString());
-					  builder.close();
+					  builder.attr("value",key.toString());
 					builder.close();
 				}
 			}

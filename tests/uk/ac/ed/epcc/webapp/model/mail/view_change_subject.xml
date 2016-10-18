@@ -63,14 +63,8 @@
 </div>
 </log>
 <buttons>
-<active>
-<Send help="Send Message"/>
-</active>
-<active>
-<Abort help="Abort Message"/>
-</active>
-<active>
-<StartOver help="Undo all edits"/>
-</active>
+<active value="Send" help="Send Message"/>
+<active value="Abort" help="Abort Message"/>
+<active value="StartOver" help="Undo all edits"/>
 </buttons>
 </view_page>

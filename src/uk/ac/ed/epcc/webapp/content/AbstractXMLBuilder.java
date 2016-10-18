@@ -189,6 +189,7 @@ public abstract class AbstractXMLBuilder implements SimpleXMLBuilder {
 	public final SimpleXMLBuilder open(String tag) {
 		endOpen();
 		tag = tag.trim();
+		assert(! tag.contains(" ") );
 		tags.push(tag);
 		in_open = true;
 		return this;
