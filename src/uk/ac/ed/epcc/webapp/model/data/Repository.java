@@ -1867,6 +1867,11 @@ public final class Repository {
 
 		}else if ( info.isBoolean()){
 			return convertBoolean(value,null);
+		}else if( info.isString()){
+			if( value instanceof Boolean){
+				return ((Boolean) value).booleanValue() ? "Y" : "N";
+			}
+			return value.toString();
 		}else{
 		
 			return value;

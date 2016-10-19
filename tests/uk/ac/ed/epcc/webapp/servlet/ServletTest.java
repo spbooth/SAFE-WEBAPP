@@ -281,13 +281,16 @@ public abstract class ServletTest extends WebappTestBase{
  * @param value
  */
 	public void addParam(String name, String value) {
+		req.removeAttribute(DefaultServletService.PARAMS_KEY_NAME);
 		req.params.put(name, value);
 	}
 	
 	public void addParam(String name, int value){
+		req.removeAttribute(DefaultServletService.PARAMS_KEY_NAME);
 		req.params.put(name,Integer.toString(value));
 	}
 	public void addParam(String name, MimeStreamData value) {
+		req.removeAttribute(DefaultServletService.PARAMS_KEY_NAME);
 		req.params.put(name, value);
 	}
 
