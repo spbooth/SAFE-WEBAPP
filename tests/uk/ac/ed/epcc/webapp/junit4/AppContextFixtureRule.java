@@ -21,6 +21,7 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CleanupService;
 import uk.ac.ed.epcc.webapp.ContextHolder;
 import uk.ac.ed.epcc.webapp.config.DefaultConfigService;
 import uk.ac.ed.epcc.webapp.config.OverrideConfigService;
@@ -46,6 +47,10 @@ public class AppContextFixtureRule extends ExternalResource{
 	AppContext ctx;
 	@Override
 	protected void after() {
+		CleanupService serv = ctx.getService(CleanupService.class);
+		if( serv != null ){
+			serv.reset(); // don't run cleanups
+		}
 		ctx.close();
 	}
 

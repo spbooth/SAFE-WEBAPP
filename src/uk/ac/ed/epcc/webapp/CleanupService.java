@@ -76,6 +76,12 @@ public class CleanupService implements AppContextService<CleanupService> , Conte
 	public boolean hasActions(){
 		return ! actions.isEmpty();
 	}
+	public void reset(){
+		actions.clear();
+	}
+	public LinkedHashSet<Runnable> getActions(){
+		return (LinkedHashSet<Runnable>) actions.clone();
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.AppContextService#getType()
 	 */
