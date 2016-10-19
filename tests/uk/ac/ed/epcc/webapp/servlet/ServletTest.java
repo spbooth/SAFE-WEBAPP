@@ -315,18 +315,7 @@ public abstract class ServletTest extends WebappTestBase{
 		servlet.doPost(req, res);
 	}
 	
-/** ensure that all registered classifier tables have been created
- * 
- */
-	public void bootstrapClassifiers() {
-		AppContext context = getContext();
-		Map<String,Class> classifiers = context.getClassMap(ClassificationFactory.class);
-		for(String tag : classifiers.keySet()){
-			ClassificationFactory fac = context.makeObject(ClassificationFactory.class, tag);
-		}
-	}
-
-	/** Lookup a user by email and install them as the current person in the session.
+/** Lookup a user by email and install them as the current person in the session.
 	 * @param email
 	 * @return
 	 * @throws DataException

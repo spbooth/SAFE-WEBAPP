@@ -36,7 +36,6 @@ public class ClassifierFormTest extends AbstractTransitionServletTest {
 	@Test
 	public void testCreateClassifier() throws Exception{
 		MockTansport.clear();
-		bootstrapClassifiers();
 		AppUser admin = setupPerson();
 	
 		TransitionFactory provider = TransitionServlet.getProviderFromName(getContext(), "Classifiers:TestClassification");
@@ -54,7 +53,6 @@ public class ClassifierFormTest extends AbstractTransitionServletTest {
 	@DataBaseFixtures("classification.xml")
 	public void testSelectClassification() throws Exception{
 		MockTansport.clear();
-		bootstrapClassifiers();
 		AppUser admin = setupPerson();
 	
 		ClassificationFactory fac = new ClassificationFactory(getContext(), "TestClassification");
@@ -73,7 +71,6 @@ public class ClassifierFormTest extends AbstractTransitionServletTest {
 	@DataBaseFixtures("classification.xml")
 	public void testEditClassifier() throws Exception{
 		MockTansport.clear();
-		bootstrapClassifiers();
 		AppUser admin = setupPerson();
 	
 		ClassificationFactory fac = new ClassificationFactory(getContext(), "TestClassification");
@@ -103,7 +100,6 @@ public class ClassifierFormTest extends AbstractTransitionServletTest {
 	@DataBaseFixtures("classification.xml")
 	public void testSelectAndEditClassifier() throws Exception{
 		MockTansport.clear();
-		bootstrapClassifiers();
 		AppUser admin = setupPerson();
 	
 		ClassificationFactory fac = new ClassificationFactory(getContext(), "TestClassification");

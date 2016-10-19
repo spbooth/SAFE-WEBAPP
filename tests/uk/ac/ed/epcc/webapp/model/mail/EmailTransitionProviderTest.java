@@ -51,7 +51,6 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		setupPerson();
 		TestingMessageHandlerFactory fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
-		bootstrapClassifiers();
 		takeBaseline();
 		setTransition(prov,EditAction.New,null);
 		runTransition();
@@ -66,7 +65,6 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		SessionService user  = setupPerson();
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
-		bootstrapClassifiers();
 		MessageHandler hand = fac.getHandler(1,user);
 		LinkedList<String> path = new LinkedList<String>();
 		path.add("Subject");
@@ -92,7 +90,6 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		SessionService user  = setupPerson();
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
-		bootstrapClassifiers();
 		MessageHandler hand = fac.getHandler(1,user);
 		LinkedList<String> path = new LinkedList<String>();
 		MailTarget target = new MailTarget(hand,0,path);
@@ -114,7 +111,6 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		SessionService user  = setupPerson();
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
-		bootstrapClassifiers();
 		MessageHandler hand = fac.getHandler(1,user);
 		LinkedList<String> path = new LinkedList<String>();
 		MailTarget target = new MailTarget(hand,0,path);
@@ -141,7 +137,6 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		SessionService user  = setupPerson();
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
-		bootstrapClassifiers();
 		MessageHandler hand = fac.getHandler(1,user);
 		LinkedList<String> path = new LinkedList<String>();
 		//path.add("0");
@@ -164,7 +159,6 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		SessionService user  = setupPerson();
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
-		bootstrapClassifiers();
 		MessageHandler hand = fac.getHandler(1,user);
 		LinkedList<String> path = new LinkedList<String>();
 		//path.add("0");
