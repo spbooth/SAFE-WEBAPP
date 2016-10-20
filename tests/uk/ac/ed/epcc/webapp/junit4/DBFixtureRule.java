@@ -85,8 +85,8 @@ public class DBFixtureRule implements TestRule {
 	 * Override to tear down your specific external resource.
 	 */
 	protected void after() {
-		XMLDataUtils utils = getUtils();
-		utils.dropAllTables();
+		//XMLDataUtils utils = getUtils();
+		//utils.dropAllTables();
 	}
 
 	
