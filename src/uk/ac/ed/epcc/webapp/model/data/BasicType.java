@@ -401,18 +401,20 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		return getSQLFilter(fac, val);
 	}
 	public <I extends DataObject> BaseFilter<I> getFilter(DataObjectFactory<I> fac, T ... val) {
-		LinkedHashSet<T> values = new LinkedHashSet<T>();
-		for(T i : val){
-			values.add(i);
-		}
+		LinkedHashSet<T> values = getValues(val);
 		// default filter is SQL
 		return getSQLFilter(fac, values);
 	}
-	public <I extends DataObject> SQLFilter<I> getSQLFilter(DataObjectFactory<I> fac, T ... val) {
+
+	public LinkedHashSet<T> getValues(T... val) {
 		LinkedHashSet<T> values = new LinkedHashSet<T>();
 		for(T i : val){
 			values.add(i);
 		}
+		return values;
+	}
+	public <I extends DataObject> SQLFilter<I> getSQLFilter(DataObjectFactory<I> fac, T ... val) {
+		LinkedHashSet<T> values = getValues(val);
 		return getSQLFilter(fac, values);
 	}
 	public <I extends DataObject> SQLFilter<I> getSQLFilter(DataObjectFactory<I> fac, T val) {
