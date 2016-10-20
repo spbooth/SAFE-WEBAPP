@@ -373,11 +373,11 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	 * @param o
 	 * @return Value or null if invalid
 	 */
-	public T find(String o) {
+	public final T find(String o) {
 		return  values.get(o);
 	}
 
-	public FieldType<String> getFieldType(T def){
+	public final FieldType<String> getFieldType(T def){
 		int len=1;
 		for( String tag : values.keySet()){
 			if( tag.length() > len){
@@ -391,7 +391,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	 * 
 	 * @return String
 	 */
-	public String getField() {
+	public final String getField() {
 		return field;
 	}
 	
@@ -401,12 +401,11 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		return getSQLFilter(fac, val);
 	}
 	public <I extends DataObject> BaseFilter<I> getFilter(DataObjectFactory<I> fac, T ... val) {
-		LinkedHashSet<T> values = getValues(val);
 		// default filter is SQL
-		return getSQLFilter(fac, values);
+		return getSQLFilter(fac, getValues(val));
 	}
 
-	public LinkedHashSet<T> getValues(T... val) {
+	public final LinkedHashSet<T> getValues(T... val) {
 		LinkedHashSet<T> values = new LinkedHashSet<T>();
 		for(T i : val){
 			values.add(i);
@@ -414,8 +413,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		return values;
 	}
 	public <I extends DataObject> SQLFilter<I> getSQLFilter(DataObjectFactory<I> fac, T ... val) {
-		LinkedHashSet<T> values = getValues(val);
-		return getSQLFilter(fac, values);
+		return getSQLFilter(fac, getValues(val));
 	}
 	public <I extends DataObject> SQLFilter<I> getSQLFilter(DataObjectFactory<I> fac, T val) {
 		if( val == null ){
@@ -463,11 +461,19 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	 * @return BaseFilter
 	 */
 	public <I extends DataObject> BaseFilter<I> getExcludeFilter(DataObjectFactory<I> fac,T ... val){
-		Set<T> s = getValues(new HashSet<T>());
+		return getFilter(fac,getExcludeValues(val));
+	}
+
+	/**
+	 * @param val
+	 * @return
+	 */
+	public final LinkedHashSet<T> getExcludeValues(T... val) {
+		LinkedHashSet<T> s = getValues(new LinkedHashSet<T>());
 		for( T i : val ){
 			s.remove(i);
 		}
-		return getFilter(fac,s);
+		return s;
 	}
 	/** Get a filter excluding a value
 	 * @param <I> type of filter
@@ -558,10 +564,10 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	public Iterator<T> getValues() {
 		return values.values().iterator();
 	}
-	public Set<T> getValueSet(){
+	public final Set<T> getValueSet(){
 		return getValues(new LinkedHashSet<T>());
 	}
-	public <X extends Set<T>> X getValues(X set){
+	public final <X extends Set<T>> X getValues(X set){
 		set.addAll(values.values());
 		return set;
 	}
