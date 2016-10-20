@@ -70,7 +70,14 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 		
 	}
 	private void constantHTML(SimpleXMLBuilder hb,UnmodifiableInput input) {
-		hb.clean( input.getLabel());
+		String label = input.getLabel();
+		if( label.trim().contains("\n")){
+			hb.open("pre");
+			hb.clean(label);
+			hb.close();
+		}else{
+			hb.clean( label);
+		}
 	}
 	
 	public void setRadioTarget(Object o){
