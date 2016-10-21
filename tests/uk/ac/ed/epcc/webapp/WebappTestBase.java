@@ -33,7 +33,10 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -302,5 +305,34 @@ public abstract class WebappTestBase implements ContextHolder{
 		}
 		reader.close();
 		return fileData.toString();
+	}
+	
+	/** Check the contents of some test generated XML contenet
+	 * @param normalize_transform
+	 * @param expected_xml
+	 * @param content
+	 * @throws TransformerFactoryConfigurationError
+	 * @throws TransformerConfigurationException
+	 * @throws TransformerException
+	 */
+	public void checkContent(String normalize_transform, String expected_xml, String content)
+			throws TransformerFactoryConfigurationError, TransformerConfigurationException, TransformerException {
+		TransformerFactory tfac = TransformerFactory.newInstance();
+		 Transformer tt;
+		 if( normalize_transform == null ){
+			 normalize_transform="/normalize.xsl";
+		 }
+			 Source source = XMLDataUtils.readResourceAsSource(getClass(), normalize_transform);
+			 assertNotNull(source);
+			 tt = tfac.newTransformer(source);
+		 
+		 assertNotNull(tt);
+		 
+		String result = XMLDataUtils.transform(tt, content);
+		 System.out.println(result);
+		 String expected = XMLDataUtils.transform(tt,getClass(), expected_xml);
+		 
+		 String differ = TestDataHelper.diff(expected, result);
+		 assertTrue("Unexpected result:\n"+differ,differ.trim().length()==0);
 	}
 }

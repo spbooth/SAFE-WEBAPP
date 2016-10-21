@@ -349,25 +349,9 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 
 		 }
 		 builder.close();
+		 String xml = builder.toString();
+		 checkContent(normalize_transform, expected_xml, xml);
 		 
-		 
-		 TransformerFactory tfac = TransformerFactory.newInstance();
-		 Transformer tt;
-		 if( normalize_transform == null ){
-			 normalize_transform="/normalize.xsl";
-		 }
-			 Source source = XMLDataUtils.readResourceAsSource(getClass(), normalize_transform);
-			 assertNotNull(source);
-			 tt = tfac.newTransformer(source);
-		 
-		 assertNotNull(tt);
-
-		//System.out.println(builder.toString());
-		 String result = XMLDataUtils.transform(tt, builder.toString());
-		 System.out.println(result);
-		 String expected = XMLDataUtils.transform(tt,getClass(), expected_xml);
-		 String differ = TestDataHelper.diff(expected, result);
-		 assertTrue("Unexpected result:\n"+differ,differ.trim().length()==0);
 	}
 	/** Generates a XML (mostly HTML) representation of the 
 	 * contents of the view page that can be directly 
