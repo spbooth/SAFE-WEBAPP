@@ -23,7 +23,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultMapper;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-/** A resultMapper that returns a single value specified by a SQLExpression
+/** A resultMapper that returns a single value specified by a {@link SQLValue}
  * 
  * @author spb
  *

@@ -76,14 +76,13 @@ public class LocateSQLValue implements SQLValue<Integer>{
 			String substr_val = rs.getString(loc);
 			String str_val = rs.getString(loc+1);
 			Integer pos_val = rs.getInt(loc+2);
-			Integer loc_val = -1;
+			Integer loc_val = 0;
 			if (pos_val >= 1 && pos_val <= str_val.length()) {
 				// note, pos_val is converted to zero-based indexing
 				loc_val = str_val.indexOf(substr_val, pos_val-1);
-				if (-1 != loc_val) {
-					// substr_val found, convert loc_val to one-based indexing
-					loc_val += 1;
-				}
+
+				// convert loc_val to one-based indexing
+				loc_val += 1;
 			}
 			return loc_val;
 		} catch (SQLException e) {
