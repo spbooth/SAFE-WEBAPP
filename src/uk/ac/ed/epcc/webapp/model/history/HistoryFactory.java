@@ -558,6 +558,14 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		if( tail_status){
 			spec.setField(status.getField(), status.getFieldType(TAIL));
 		}
+		if( peer_factory != null){
+			if( peer_factory instanceof HistoryFieldContributor){
+				((HistoryFieldContributor)peer_factory).addToHistorySpecification(spec);
+			}
+			for(HistoryFieldContributor cont : peer_factory.getComposites(HistoryFieldContributor.class)){
+				cont.addToHistorySpecification(spec);
+			}
+		}
 		try{
 		Index search = spec.new Index("SearchIndex", false, END_TIME_FIELD, START_TIME_FIELD);
 		Index finder = spec.new Index("PeerIndex", false, getPeerName(), END_TIME_FIELD, START_TIME_FIELD);
