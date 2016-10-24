@@ -166,6 +166,10 @@ public final class Repository {
 	public static final Feature REQUIRE_ID_KEY = new Feature("require.id_key", true, "Require all tables to have an integer primary key");
 
 	public static final Feature READ_ONLY_FEATURE = new Feature("read-only",false,"supress (most) database writes");
+	
+	// default to true as html escaping should be handled at content generation not database persistence.
+	public static final Feature ALLOW_HTML = new Feature("allow-html",true,"Default allow html to be stored in string data");
+	
 	private static final DateFormat dump_format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss SSS");
 	
 	/** information about indexes
@@ -1787,7 +1791,7 @@ public final class Repository {
 		use_cache = new Feature(CACHE_FEATURE_PREFIX+tag_name, false,"Use record cache for "+tag_name).isEnabled(c);
 		
 		use_id = REQUIRE_ID_KEY.isEnabled(c) || new Feature(USE_ID_PREFIX+tag_name,true,"Use integer id-key for table "+tag_name).isEnabled(c);
-		
+		allow_html = ALLOW_HTML.isEnabled(c);
 	}
 	public static String TableToTag(AppContext c, String tag) {
 		return c.getInitParameter("tag."+tag,tag);
@@ -2563,7 +2567,6 @@ public final class Repository {
 		allow_html = f;
 		return old;
 	}
-	public 
 	/**
 	 * populate an object from a ResultSet
 	 * 
@@ -2578,7 +2581,7 @@ public final class Repository {
 	 * 
 	 * @throws ConsistencyError
 	 */
-	void setFromResultSet(Record r,ResultSet rs, boolean qualify)
+	public void setFromResultSet(Record r,ResultSet rs, boolean qualify)
 			throws DataFault, DataNotFoundException {
 		int id;
 		synchronized(r){
@@ -2979,8 +2982,12 @@ public final class Repository {
 				}
 			} else {
 				// don't want to end up escaping the closing string
-				if (allow_html || (ch != '<' && ch != '>')) {
+				if (ch != '<' && ch != '>') {
 					buff.append(ch);
+				}else{
+					if( allow_html ){
+						buff.append(ch);
+					}
 				}
 			}
 		}
