@@ -133,7 +133,6 @@ public class SectionManager extends HandlerPartManager<PageManager.Page,uk.ac.ed
 	 */
 	public SectionManager(PageManager owner_fac) {
 		super(owner_fac.form_manager,owner_fac, SECTION_TYPE_NAME);
-		res.setAllowHtml(true);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)

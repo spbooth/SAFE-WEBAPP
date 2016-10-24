@@ -572,36 +572,6 @@ public class RepositoryTest extends WebappTestBase {
 		}
 	}
 	
-	@Test
-	public void testEscape() throws DataException, ConsistencyError{
-		// List of Strings and what they should map to
-		// Full escaping should remove all quotes and backslash
-		// default propery escaping should just remove html
-	   String list[][] = {
-			   {" hohi"," hohi"," hohi"},
-			   {"<div>","div","div"},
-			   {"hello\"","hello","hello\""},
-			   {"hello'","hello","hello'"},
-			   {"world\\\"","world","world\\\""},
-			   {"thingy\r\n","thingy\r\n","thingy\r\n"},
-			   {"\\w.\\d+","w.d+","\\w.\\d+"},
-			   {"fred\\","fred","fred\\"}
-	   };
-	   for(int i=0;i<list.length;i++){
-		   System.out.print(list[i][1]);
-		   System.out.print("<->");
-		   System.out.println(list[i][0]);
-	       assertEquals(list[i][1], Repository.escape(list[i][0]));
-	    
-	       Record r =res.new Record();
-	       r.put("Name", list[i][0]);
-	       r.commit();
-	       Record p = res.new Record();
-	       p.setID(r.getID());
-	       assertEquals( list[i][2],p.get("Name"));
-	       r.delete();
-	   }
-	}
 	
 	@Test
 	public void testEncoded() throws DataException, ConsistencyError{

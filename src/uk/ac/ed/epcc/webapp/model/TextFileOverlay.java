@@ -53,7 +53,6 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.FilterResult;
-import uk.ac.ed.epcc.webapp.model.data.HtmlDataObject;
 import uk.ac.ed.epcc.webapp.model.data.Retirable;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
@@ -90,7 +89,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @param <T> 
  *
  */
-@SuppressWarnings("deprecation")
+
 
 
 public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObjectFactory<T> {
@@ -146,7 +145,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 	// this allows the TextFileOverlay to be inserted into 
 	// a URL resolver class
 	private URL url_base=null;
-	public static class TextFile extends HtmlDataObject implements Retirable{
+	public static class TextFile extends DataObject implements Retirable{
 
 		private final  URL base_url;
 		

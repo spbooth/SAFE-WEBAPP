@@ -168,9 +168,6 @@ public final class Repository {
 
 	public static final Feature READ_ONLY_FEATURE = new Feature("read-only",false,"supress (most) database writes");
 	
-	// default to true as html escaping should be handled at content generation not database persistence.
-	public static final Feature ALLOW_HTML = new Feature("allow-html",true,"Default allow html to be stored in string data");
-	
 	private static final DateFormat dump_format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss SSS");
 	
 	/** information about indexes
@@ -1390,14 +1387,8 @@ public final class Repository {
 							.getLength());
 					buff.append("file");
 				} else {
-					if (value instanceof String) {
-						// quotes are ok here as we are using setObject
-						value = escape((String) value, allow_html,true);
-						buff.append(value);
-					} else {
-						// needs to work with null values
-						buff.append(String.valueOf(value));
-					}
+					// needs to work with null values
+					buff.append(String.valueOf(value));
 					setObject(stmt, pos, key, value);
 				}
 			} catch (SQLException e) {
@@ -1739,8 +1730,6 @@ public final class Repository {
 	private boolean allow_bogus_put = false;
     /** is it OK to store a null value in a Record */
 	private boolean allow_null_value = true;
-	/** is it ok to allow html in DB fields */
-	private boolean allow_html = false;
 
 	/**
 	 * default number of milliseconds per tick when using an integer type to
@@ -1794,7 +1783,6 @@ public final class Repository {
 		use_cache = new Feature(CACHE_FEATURE_PREFIX+tag_name, false,"Use record cache for "+tag_name).isEnabled(c);
 		
 		use_id = REQUIRE_ID_KEY.isEnabled(c) || new Feature(USE_ID_PREFIX+tag_name,true,"Use integer id-key for table "+tag_name).isEnabled(c);
-		allow_html = ALLOW_HTML.isEnabled(c);
 	}
 	public static String TableToTag(AppContext c, String tag) {
 		return c.getInitParameter("tag."+tag,tag);
@@ -2565,16 +2553,6 @@ public final class Repository {
 		allow_null_value = f;
 		return old;
 	}
-    /** control if we allow html to be stored in the string fields of this table
-     * 
-     * @param f boolean
-     * @return previous value
-     */
-	public boolean setAllowHtml(boolean f){
-		boolean old = allow_html;
-		allow_html = f;
-		return old;
-	}
 	/**
 	 * populate an object from a ResultSet
 	 * 
@@ -2945,58 +2923,9 @@ public final class Repository {
 		return false;
 	}
 
-	/**
-	 * Escapes <code>Strings</code> so they can be safely quoted This version
-	 * is called to construct in-line SQL queries so set the most restrictive
-	 * settings
-	 * 
-	 * @param input
-	 * @return escaped String
-	 */
-	public static String escape(String input) {
-		return escape(new StringBuilder(),input, false,false).toString();
-	}
+	
 
-	/**
-	 * Escapes <code>Strings</code> so they can be used safely
-	 * This provides a second line of defence for HTML/SQL insertion attacks but we should
-	 * really be validating all input and output explicitly.
-	 * @param input
-	 * @param allow_html
-	 *            should we strip html
-	 * @param allow_quotes should we strip string marks and backslash
-	 * @return String
-	 */
-	public static String escape(String input,boolean allow_html,boolean allow_quotes) {
-		if( input == null ){
-			return null;
-		}
-		if( allow_html && allow_quotes){
-			return input;
-		}
-		return escape(new StringBuilder(),input,allow_html,allow_quotes).toString();
-	}
-	public static StringBuilder escape(StringBuilder buff,String input, boolean allow_html,boolean allow_quotes) {
-		if (input == null)
-			return buff;
-		if( allow_html && allow_quotes){
-			return buff.append(input);
-		}
-		for (int i = 0; i < input.length(); i++) {
-			char ch = input.charAt(i);
-			if (ch == '\\' || ch == '"' || ch == '\'') {
-				// don't want to end up escaping the closing string
-				if( allow_quotes ){
-					buff.append(ch);
-				}
-			} else {
-				if (allow_html || (ch != '<' && ch != '>')) {
-					buff.append(ch);
-				}
-			}
-		}
-		return buff;
-	}
+	
 
 	/** Get a foreign key descriptor by tag.
 	 * 
@@ -3044,7 +2973,6 @@ public final class Repository {
 		if (r == null) {
 			try{
 				r = new Repository(c, tag);
-				r.setAllowHtml( c.getBooleanParameter("allow_html."+tag, false));
 				c.setAttribute(key, r);
 			}catch(Exception e){
 				c.error(e,"Error making repository");
