@@ -225,6 +225,8 @@ public abstract class ServletTest extends WebappTestBase{
 	}
 	/** Check that the response has been redirected to the supplied url
 	 * 
+	 * 
+	 * 
 	 * @param url URL to check
 	 */
 	public void checkRedirect(String url){

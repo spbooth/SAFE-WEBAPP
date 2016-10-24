@@ -96,6 +96,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	 * @throws TransitionException 
 	 */
 	public <K,T> void setTransition(TransitionFactory<K, T> provider, K key, T target) throws TransitionException{
+		
 		req.servlet_path="TransitionServlet";
 		StringBuilder path = new StringBuilder();
 		path.append(provider.getTargetName());
@@ -262,6 +263,9 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		assertEquals(error, errors.get(param));
 	}
 	
+	public void checkGeneralError(String error){
+		checkError(HTMLForm.GENERAL_ERROR,error);
+	}
 	/** Generates a XML (mostly HTML) representation of the 
 	 * contents of the transition form page that can be directly 
 	 * influenced by the transform. This is then (optionally) put through a
