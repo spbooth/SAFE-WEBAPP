@@ -143,6 +143,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  *   <li>Date time values can be stored as integers. These are always relative to the Unix epoch and default to
  *   being seconds. A different time unit can be selected by setting <b>repository.resolution.<i>table-name</i></b> to be the
  *   number of milliseconds in the desired unit.</li>
+ *   <li>StreamData values are always added as binary streams so they can be stored in blob types.</li> 
  * </ul>
  * @author spb
  * 
@@ -1357,7 +1358,9 @@ public final class Repository {
     	}
 
 		/**
-		 * output the value of a field to a prepared statment
+		 * output the value of a field to a prepared statement
+		 * 
+		 * Note that {@link StreamData} objects are added as binary streams.
 		 * 
 		 * @param buff
 		 *            query buffer. We append additional info to this to provide
@@ -1860,6 +1863,10 @@ public final class Repository {
 		if (value == null || key == null) {
 			return value;
 		}
+		if( value instanceof StreamData){
+			// StreamData objects are always written as binary streams
+			return value;
+		}
 		FieldInfo info = getInfo(key);
 		if (info == null) {
 			return value;
@@ -1875,7 +1882,8 @@ public final class Repository {
 			if( value instanceof Boolean){
 				return ((Boolean) value).booleanValue() ? "Y" : "N";
 			}
-			return value.toString();
+			// Don't coerce to string here
+			return value;
 		}else{
 		
 			return value;
@@ -2977,17 +2985,13 @@ public final class Repository {
 		for (int i = 0; i < input.length(); i++) {
 			char ch = input.charAt(i);
 			if (ch == '\\' || ch == '"' || ch == '\'') {
+				// don't want to end up escaping the closing string
 				if( allow_quotes ){
 					buff.append(ch);
 				}
 			} else {
-				// don't want to end up escaping the closing string
-				if (ch != '<' && ch != '>') {
+				if (allow_html || (ch != '<' && ch != '>')) {
 					buff.append(ch);
-				}else{
-					if( allow_html ){
-						buff.append(ch);
-					}
 				}
 			}
 		}
