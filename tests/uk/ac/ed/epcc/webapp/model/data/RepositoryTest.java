@@ -572,26 +572,6 @@ public class RepositoryTest extends WebappTestBase {
 		}
 	}
 	
-	
-	@Test
-	public void testEncoded() throws DataException, ConsistencyError{
-		String patterns[] = { "hello", "<h1>hello</h1>","A->b","void *p=&a;\n","w\\p","hello \"world\"","'hi there'" };
-		for(int i=0;i<patterns.length;i++){
-			   System.out.print(patterns[i]);
-			   
-		       Record r =res.new Record();
-		       r.setEncodedProperty("Name", patterns[i]);
-		       assertEquals(patterns[i], r.getEncodedProperty("Name"));
-		       r.commit();
-		       assertEquals(patterns[i], r.getEncodedProperty("Name"));
-		       Record p = res.new Record();
-		       p.setID(r.getID());
-		       assertEquals(p.getEncodedProperty("Name"), patterns[i]);
-		       r.delete();
-		   }
-		
-	}
-	
 	@Test
 	public void testFactory(){
 		assertSame("Factory must return the same object for same Context",res,Repository.getInstance(ctx,"Test"));

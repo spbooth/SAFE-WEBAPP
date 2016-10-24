@@ -1571,71 +1571,8 @@ public final class Repository {
 				throw new DataFault("SQL Exception " + buff.toString(), e);
 			}
 		}
-/** Get a String property that was set with setEncodedProperty
- * 
- * @param key
- * @return String
- */
-		public String getEncodedProperty(String key) {
+
 		
-			return decode(getStringProperty(key));
-		}
- /** Set a String property that we want to be sure is returned exactly 
-  * as we set it, so Encode any chars that would be stripped by escape
-  * 
-  * @param key
-  * @param s
-  */
-		public void setEncodedProperty(String key, String s) {
-		
-			setProperty(key,encode(s));
-		}
-		/** encode chars that would be modified by the escape routine
-		 * 
-		 * @param input
-		 * @return String
-		 */
-		 private String encode(String input){
-		    	StringBuilder sb = new StringBuilder();
-		    	for(int i=0;i<input.length();i++){
-		    		char c = input.charAt(i);
-		    		switch(c){
-		    		case '>': sb.append("&g"); break;
-		    		case '<': sb.append("&l"); break;
-		    		case '"': sb.append("&q"); break;
-		    		case '&': sb.append("&&"); break;
-		    		case '\'': sb.append("&s"); break;
-		    		default: sb.append(c);
-		    		}
-		    	}
-		    	return sb.toString();
-		    }
-		 /** reverse a encode operation
-		  * 
-		  * @param input
-		  * @return String
-		  */
-		    private String decode(String input){
-		    	StringBuilder sb = new StringBuilder();
-		    	for(int i=0;i<input.length();i++){
-		    		char c = input.charAt(i);
-		    		if( c == '&'){
-		    			i++;
-		    			c = input.charAt(i);
-		    			switch(c){
-		    			case 'g': sb.append('>'); break;
-		    			case 'l': sb.append('<'); break;
-		    			case 'q': sb.append('"'); break;
-		    			case '&': sb.append('&'); break;
-		    			case 's': sb.append('\''); break;
-		    			default: ;
-		    			}
-		    		}else{
-		    			sb.append(c);
-		    		}
-		    	}
-		    	return sb.toString();
-		    }
 		    @Override
 			public String toString(){
 		    	StringBuilder sb = new StringBuilder();

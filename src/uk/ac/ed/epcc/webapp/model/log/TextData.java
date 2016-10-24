@@ -24,8 +24,8 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 /** Simple class to hold Text data in a table.
- * We want to store this information uncorrupted as it might contain
- * scripts etc so encode anything the Repository class might not like in this class
+ *
+ * For historical reasons the text is stored in a encoded form.
  * 
  * @author spb
  *
@@ -50,11 +50,57 @@ public class TextData extends DataObject implements Removable {
 		spec.setField(TEXT, new StringFieldType(true, null, 4096));
 		return spec;
 	}
+	/** 
+	 * 
+	 * @param input
+	 * @return String
+	 */
+	 private String encode(String input){
+	    	StringBuilder sb = new StringBuilder();
+	    	for(int i=0;i<input.length();i++){
+	    		char c = input.charAt(i);
+	    		switch(c){
+	    		case '>': sb.append("&g"); break;
+	    		case '<': sb.append("&l"); break;
+	    		case '"': sb.append("&q"); break;
+	    		case '&': sb.append("&&"); break;
+	    		case '\'': sb.append("&s"); break;
+	    		default: sb.append(c);
+	    		}
+	    	}
+	    	return sb.toString();
+	    }
+	 /** reverse a encode operation
+	  * 
+	  * @param input
+	  * @return String
+	  */
+	    private String decode(String input){
+	    	StringBuilder sb = new StringBuilder();
+	    	for(int i=0;i<input.length();i++){
+	    		char c = input.charAt(i);
+	    		if( c == '&'){
+	    			i++;
+	    			c = input.charAt(i);
+	    			switch(c){
+	    			case 'g': sb.append('>'); break;
+	    			case 'l': sb.append('<'); break;
+	    			case 'q': sb.append('"'); break;
+	    			case '&': sb.append('&'); break;
+	    			case 's': sb.append('\''); break;
+	    			default: ;
+	    			}
+	    		}else{
+	    			sb.append(c);
+	    		}
+	    	}
+	    	return sb.toString();
+	    }
 	public String getText(){
-		return record.getEncodedProperty(TEXT);
+		return decode(record.getStringProperty(TEXT));
 	}
 	public void setText(String s){
-		record.setEncodedProperty(TEXT, s);
+		record.setProperty(TEXT, encode(s));
 	}
 	public void remove() throws DataException {
 		delete();
