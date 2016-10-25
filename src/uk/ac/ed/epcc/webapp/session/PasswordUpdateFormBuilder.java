@@ -30,6 +30,8 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraFormTransition;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 /** A class that build password update forms
@@ -250,6 +252,14 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 			} catch (DataFault e) {
 				throw new ActionException("Error setting password",e);
 			}
+			try{
+				PasswordChangeListener listener = getContext().makeObjectWithDefault(PasswordChangeListener.class,null, PasswordChangeListener.PASSWORD_LISTENER_PROP);
+				if( listener != null ){
+					listener.setPassword(user, new_password);
+				}
+			}catch(Throwable t){
+				getLogger().error("Error calling PasswordChangeListener", t);
+			}
 			return new MessageResult("password_changed");
 		}
     	
@@ -334,8 +344,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 		return cb;
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.transition.BaseFormTransition#buildForm(uk.ac.ed.epcc.webapp.forms.Form, java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
-	 */
-	
+	public Logger getLogger(){
+		return getContext().getService(LoggerService.class).getLogger(getClass());
+	}
 }

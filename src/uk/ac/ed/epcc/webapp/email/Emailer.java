@@ -63,6 +63,7 @@ import uk.ac.ed.epcc.webapp.model.TemplateFinder;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory.EmailChangeRequest;
+import uk.ac.ed.epcc.webapp.session.PasswordChangeListener;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory.PasswordChangeRequest;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -164,9 +165,16 @@ public class Emailer {
 			}
 			
 		}
-
+		
 		templateEmail(person, email_template);
-
+		try{
+			PasswordChangeListener listener = ctx.makeObjectWithDefault(PasswordChangeListener.class,null, PasswordChangeListener.PASSWORD_LISTENER_PROP);
+			if( listener != null ){
+				listener.passwordInvalid(person);
+			}
+		}catch(Throwable t){
+			getLogger().error("Error calling PasswordChangeListener", t);
+		}
 	}
 
 	/** Send an email requesting confiormation of a new Email address.
