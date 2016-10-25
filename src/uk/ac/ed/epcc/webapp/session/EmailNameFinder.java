@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
+import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
 
 /** A {@link AppUserNameFinder} to handle users canonical Email
  * 
@@ -34,7 +35,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  *
  */
 
-public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,EmailNameFinder<AU>> {
+public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,EmailNameFinder<AU>> implements HistoryFieldContributor{
 
 	/** property to set the email input box width
 	 * 
@@ -55,6 +56,14 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 	}
 
 	
+
+	@Override
+	public void addToHistorySpecification(TableSpecification spec) {
+		spec.setField(EmailNameFinder.EMAIL, new StringFieldType(true, null, EmailInput.MAX_EMAIL_LENGTH));
+		
+	}
+
+
 
 	@Override
 	public Map<String, Object> addSelectors(Map<String, Object> selectors) {

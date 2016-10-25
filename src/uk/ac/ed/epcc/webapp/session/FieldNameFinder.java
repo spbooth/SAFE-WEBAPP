@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
+import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
 
 /** A generic {@link AppUserNameFinder} that stores the name in a database field.
  * 
@@ -40,7 +41,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  *
  */
 
-public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> extends AppUserNameFinder<AU,F> {
+public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> extends AppUserNameFinder<AU,F> implements HistoryFieldContributor{
 
 	/**
 	 * 
@@ -106,6 +107,12 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 			getLogger().error("Problem making index ",e);
 		}
 		return spec;
+	}
+
+	@Override
+	public void addToHistorySpecification(TableSpecification spec) {
+		spec.setField(getField(), new StringFieldType(true, null, getContext().getIntegerParameter(PROPERTY_PREFIX+getRealm()+".length", 128)));
+		
 	}
 
 	@Override
