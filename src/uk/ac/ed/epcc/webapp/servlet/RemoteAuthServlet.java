@@ -151,6 +151,7 @@ public class RemoteAuthServlet extends WebappServlet {
 						web_name=remote_name;
 						session_service.removeAttribute(REMOTE_AUTH_TOKEN_ATTR);
 					}else{
+						web_name=null;
 						message(conn, req, res, "invalid_input");
 						return;
 					}
@@ -185,6 +186,8 @@ public class RemoteAuthServlet extends WebappServlet {
 				parser.setName(person, web_name);
 				try {
 					person.commit();
+					message(conn, req, res, "remote_auth_set",web_name);
+					return;
 				} catch (DataFault e) {
 					getLogger(conn).error("error in RemoteAuthServlet",e);
 					throw new ServletException(e);
