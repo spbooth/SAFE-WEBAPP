@@ -28,9 +28,11 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
+import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.model.data.forms.DataObjectUpdateFormFactory;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
@@ -159,7 +161,7 @@ public class UserServlet<T extends AppUser> extends SessionServlet {
 	}
 	protected <T extends AppUser> boolean doUpdateUser(AppUserFactory<T> fac, T person, HttpServletRequest req, HttpServletResponse res,
             AppContext conn) throws Exception {
-	
+			
 	        HTMLForm f = new HTMLForm(conn);
 	        fac.buildUpdateForm(f, person);
 	        boolean ok  = f.parsePost(req);
@@ -167,12 +169,12 @@ public class UserServlet<T extends AppUser> extends SessionServlet {
 	            HTMLForm.doFormError(conn,req,res);
 	            return false;
 	        }
-	        Map orig = person.getMap();
-	        person.formUpdate(f);
+	        
+	        // ignore def result
+	        f.doAction(DataObjectUpdateFormFactory.UPDATE);
 	        person.markDetailsUpdated();
-	        if( person.commit() ){
-	        	person.postUpdate(orig);
-	        }
+	        person.commit();
+	       
 	        res.sendRedirect(res.encodeRedirectURL(req.getContextPath()
 	        		+ conn.getInitParameter("person-update.redirect","/personal_update.jsp")));
 			// Everything went ok.

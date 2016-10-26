@@ -27,6 +27,8 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.forms.BaseForm;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -203,13 +205,7 @@ public class AppUser extends DataObject implements java.security.Principal{
 		}
 		return false;
 	}
-	/** Extension point to allow side effects based on the update
-	 * 
-	 * @param orig Map of pre-update state.
-	 */
-	public void postUpdate(Map orig){
-		
-	}
+	
 
 
 	/* (non-Javadoc)

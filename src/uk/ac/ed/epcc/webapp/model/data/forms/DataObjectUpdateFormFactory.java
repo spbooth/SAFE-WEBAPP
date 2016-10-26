@@ -50,7 +50,7 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 	/**
 	 * 
 	 */
-	private static final String UPDATE = " Update ";
+	public static final String UPDATE = " Update ";
 
 	/**
 	 * @param fac

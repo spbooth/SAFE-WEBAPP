@@ -158,10 +158,7 @@ public class BaseForm implements Form {
 	 * @throws ActionException
 	 */
 	public FormResult doAction(String name) throws FieldException, ActionException {
-		if( name == null ){
-			throw new ActionException("Unknown action");
-		}
-		FormAction action = actions.get(name);
+		FormAction action = getAction(name);
 		if (action == null) {
 			throw new ActionException("Unknown action");
 		}
@@ -174,7 +171,7 @@ public class BaseForm implements Form {
 		if( name == null ){
 			return null;
 		}
-		return actions.get(name);
+		return actions.get(name.trim());
 	}
 	/**
 	 * get the value associated with a Form field.
