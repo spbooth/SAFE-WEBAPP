@@ -23,6 +23,18 @@
 	<xsl:template match="person/Password">
 	<xsl:element name="Password">FakePassword</xsl:element>
 	</xsl:template>
+	<xsl:template match="Person/Updated">
+	<xsl:element name="Updated">1234567890</xsl:element>
+	</xsl:template>
+	<xsl:template match="Person/SignupDate">
+	<xsl:element name="SignupDate">1234567890</xsl:element>
+	</xsl:template>
+	<xsl:template match="Person/Salt">
+	<xsl:element name="Salt">FakeSalt</xsl:element>
+	</xsl:template>
+	<xsl:template match="Person/Password">
+	<xsl:element name="Password">FakePassword</xsl:element>
+	</xsl:template>
 	<xsl:template match="CreationDate">
 	<xsl:element name="CreationDate">1234567890</xsl:element>
 	</xsl:template>

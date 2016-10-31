@@ -1,0 +1,31 @@
+<Diff><TableSpecification name='Person'>
+<Email type='String' nullable='true' max='254'/>
+<Updated type='Long' nullable='true'/>
+<WebName type='String' nullable='true' max='128'/>
+<SignupDate type='Long' nullable='true'/>
+<PasswordFails type='Integer' nullable='false'/>
+<PasswordStatus type='String' nullable='false' max='1'/>
+<Salt type='String' nullable='false' max='16'/>
+<Alg type='Integer' nullable='false'/>
+<Password type='String' nullable='false' max='32'/>
+<Email_index type='Index' unique='true'><Column name='Email'/></Email_index>
+<WebName_index type='Index' unique='true'><Column name='WebName'/></WebName_index>
+</TableSpecification>
+<Person id='1'>
+<Email>thing@example.com</Email>
+<SignupDate>1477951350</SignupDate>
+<PasswordFails>0</PasswordFails>
+<PasswordStatus>F</PasswordStatus>
+<Salt>Mz0EibHjVcKTu0Mm</Salt>
+<Alg>0</Alg>
+<Password>0447a67f83fcb2f501193dbe16abbf54</Password>
+</Person>
+<TableSpecification name='role_table'>
+<PersonID type='Integer' nullable='false'/>
+<Role type='String' nullable='false' max='32'/>
+</TableSpecification>
+<role_table id='1'>
+<PersonID>1</PersonID>
+<Role>Admin</Role>
+</role_table>
+</Diff>

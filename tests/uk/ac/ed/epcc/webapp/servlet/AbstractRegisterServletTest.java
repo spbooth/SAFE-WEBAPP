@@ -36,6 +36,7 @@ public abstract class AbstractRegisterServletTest extends ServletTest {
 		servlet=makeServlet();
 		MockServletConfig config = new MockServletConfig(serv_ctx, "RegisterServlet");
 		servlet.init(config);
+		req.servlet_path="/SignupServlet";
 	}
 
 	/**
@@ -47,15 +48,5 @@ public abstract class AbstractRegisterServletTest extends ServletTest {
 	
 	
 	
-	public void prepareSignup() throws Exception{
-		
-		req.servlet_path="/SignupServlet";
-		req.params.put("form_url", "/scripts/signup.jsp");
-		AppUserFactory person_fac =  getContext().getService(SessionService.class).getLoginFactory();
-	     //PasswordAuthAppUserFactory<?> person_fac = new PasswordPersonFactory(conn,"Person");
-		MapForm f = new MapForm(getContext());
-	    FormCreator signupFormCreator = person_fac.getSignupFormCreator(null,null);
-	    signupFormCreator.buildCreationForm("Signup", f);
-	    f.addStringMap(req.params);
-	}
+	
 }

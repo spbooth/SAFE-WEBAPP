@@ -106,10 +106,6 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		req.servlet_path="LoginServlet";
 	}
 
-	@Override
-	public void tearDown() throws Exception {
-		// TODO Auto-generated method stub
-		super.tearDown();
-	}
+	
 
 }
