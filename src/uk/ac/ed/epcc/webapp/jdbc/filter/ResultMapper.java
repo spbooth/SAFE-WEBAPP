@@ -79,7 +79,7 @@ public interface ResultMapper<O> {
    */
   public String getModify();
   
-  /** Add parameters for the target clause to a list.
+  /** Add parameters for the GROUP/ORDER  clause to a list.
 	 * @param list to modify
 	 * 
 	 * @return modified list of parameter objects

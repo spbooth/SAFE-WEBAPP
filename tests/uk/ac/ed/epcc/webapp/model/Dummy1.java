@@ -24,6 +24,7 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
@@ -152,7 +153,9 @@ public class Dummy1 extends DataObject {
 			return new FilterSet(fil);
 			
 		}
-		
+		public SQLExpression<String> getNameExpression(){
+			return res.getStringExpression(getTarget(), NAME);
+		}
 		public FilterResult<Dummy1> getWithFilter() throws DataFault{
 			AndFilter<Dummy1>fil = new AndFilter<Dummy1>(getTarget());
 			return new FilterSet(fil);

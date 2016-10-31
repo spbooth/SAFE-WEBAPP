@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.model;
 import java.util.Iterator;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.table.DoubleFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.LongFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
@@ -81,6 +82,9 @@ public class Dummy2 extends DataObject {
     			o.delete();
     		}
     	}
+		public SQLExpression<String> getNameExpression(){
+			return res.getStringExpression(getTarget(), NAME);
+		}
 		@Override
 		protected TableSpecification getDefaultTableSpecification(AppContext c,
 				String table) {

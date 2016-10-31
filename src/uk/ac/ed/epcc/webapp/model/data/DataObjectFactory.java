@@ -18,7 +18,6 @@ package uk.ac.ed.epcc.webapp.model.data;
 
 import java.lang.reflect.Constructor;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
@@ -627,55 +626,6 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return list;
 		}
     }
-    public static class ExistsMapper implements ResultMapper<Boolean>{
-
-		
-		public boolean setQualify(boolean qualify) {
-			return false;
-		}
-
-		
-		public Boolean makeObject(ResultSet rs) throws DataFault {
-			try {
-				return rs.getBoolean(1);
-			} catch (SQLException e) {
-				throw new DataFault("Error in EXISTS",e);
-			}
-		}
-
-		
-		public Boolean makeDefault() {
-			return false;
-		}
-
-		
-		public String getTarget() {
-			return " EXISTS( SELECT 1 ";
-		}
-
-		
-		public List<PatternArgument> getTargetParameters(
-				List<PatternArgument> list) {
-			return list;
-		}
-
-		
-		public String getModify() {
-			return ")";
-		}
-
-	
-		public List<PatternArgument> getModifyParameters(
-				List<PatternArgument> list) {
-			return list;
-		}
-
-		
-		public SQLFilter getRequiredFilter() {
-			return null;
-		}
-    	
-    }
     public class FilterExists extends FilterFinder<BDO,Boolean>{
 		public FilterExists() {
 			super(DataObjectFactory.this.getContext(),DataObjectFactory.this.getTarget());
@@ -692,50 +642,6 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return res.getDBTag();
 		}
     	
-    }
-    public static class CounterMapper implements ResultMapper<Long>{
-		public Long makeObject(ResultSet rs) throws DataFault {
-			try {
-				if( rs.first()){
-				    return rs.getLong(1);
-				}else{
-					return null;
-				}
-			} catch (SQLException e) {
-				throw new DataFault("No count data",e);
-			}
-		}
-
-		public String getTarget() {
-			return "count(1)";
-		}
-
-		public Long makeDefault() {
-			return new Long(0);
-		}
-
-		public String getModify() {
-			return null;
-		}
-
-		public boolean setQualify(boolean qualify) {
-			return false;
-		}
-
-		public SQLFilter getRequiredFilter() {
-			return null;
-		}
-
-		public List<PatternArgument> getTargetParameters(
-				List<PatternArgument> list) {
-			
-			return list;
-		}
-
-		public List<PatternArgument> getModifyParameters(
-				List<PatternArgument> list) {
-			return list;
-		}
     }
     protected abstract class AbstractFinder<X> extends FilterFinder<BDO, X>{
 		public AbstractFinder(boolean allow_null) {

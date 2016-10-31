@@ -18,14 +18,13 @@ package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.util.List;
 
+import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
+import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
-import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 
 
 /** A {@link SQLFilter} that compares two {@link SQLExpression}s.
@@ -35,8 +34,8 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
  * 
  * @author spb
  *
- * @param <T>
- * @param <V>
+ * @param <T> type of target
+ * @param <V> type of expression
  */
 public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilter<T> {
 	private final Class<? super T> target;

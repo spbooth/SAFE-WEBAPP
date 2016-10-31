@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @param <D> Type of object produced
  */
-public interface FilterResult<D extends DataObject>  extends Iterable<D>{
+public interface FilterResult<D>  extends Iterable<D>{
 
 	/** Generate a {@link List} representing the contents of the {@link FilterResult}
 	 * 

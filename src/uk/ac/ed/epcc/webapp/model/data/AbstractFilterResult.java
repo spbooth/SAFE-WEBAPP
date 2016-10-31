@@ -24,7 +24,7 @@ import java.util.List;
  *
  */
 
-public abstract class AbstractFilterResult<D extends DataObject> implements FilterResult<D> {
+public abstract class AbstractFilterResult<D> implements FilterResult<D> {
 	
 	  /* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.model.data.FilterResult#toCollection()
