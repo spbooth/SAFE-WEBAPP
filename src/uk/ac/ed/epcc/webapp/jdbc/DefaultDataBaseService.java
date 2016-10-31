@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.jdbc;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLNonTransientConnectionException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,6 +32,7 @@ import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataError;
 /** Default implementation of the {@link DatabaseService}
  * 
  * This gets connection parameters from the {@link ConfigService} but this is only queried
@@ -188,6 +190,11 @@ public class DefaultDataBaseService implements DatabaseService {
 		for(SQLContext c : map.values()){
 				if( c != null ){
 					try {
+						Connection connection = c.getConnection();
+						if( connection != null ){
+							// Make sure we don't leave a pooled connection in transaction mode.
+							connection.setAutoCommit(true);
+						}
 						c.close();
 					} catch (Exception e) {
 						error(e,"Error closing database connection");
@@ -231,7 +238,9 @@ public class DefaultDataBaseService implements DatabaseService {
 	public void rollbackTransaction() {
 		if( in_transaction &&  TRANSACTIONS_FEATURE.isEnabled(getContext())){
 			try {
-				getSQLContext().getConnection().rollback();
+				Connection connection = getSQLContext().getConnection();
+				connection.rollback();
+				in_transaction = ! connection.getAutoCommit();
 			} catch (SQLException e) {
 				error(e,"Error rolling back transaction");
 			}
@@ -248,6 +257,8 @@ public class DefaultDataBaseService implements DatabaseService {
 				getSQLContext().getConnection().commit();
 			} catch (SQLException e) {
 				error(e,"Error committing transaction");
+				// Make this fatal don't want to try continuing if this happens
+				throw new DataError("Error committing transaction", e);
 			}
 
 		}
@@ -271,6 +282,7 @@ public class DefaultDataBaseService implements DatabaseService {
 				in_transaction=false;
 			} catch (SQLException e) {
 				error(e,"Error ending transaction");
+				throw new DataError("Error ending transaction", e);
 			}
 		}
 

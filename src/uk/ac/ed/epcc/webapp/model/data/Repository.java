@@ -1463,20 +1463,30 @@ public final class Repository {
 			
 					int rows_changed = stmt.executeUpdate();
 					stmt.close();
-					if (rows_changed != 1) {
+					
+					if (rows_changed > 1 || rows_changed < 0) {
 						throw new ConsistencyError(
-								"incorrect number of rows changes "+buff.toString());
+								"incorrect number of rows changes "+rows_changed+" "+buff.toString());
+					}else if( rows_changed == 0){
+						LoggerService serv = getContext().getService(LoggerService.class);
+						if( serv != null ){
+							// Same update may have happened between read and commit. 
+							serv.getLogger(getClass()).warn("No update when one was expected "+buff.toString());
+						}
+					}else{
+						updated = true;
 					}
-					updated = true;
 				}
-				if( time != null ){
-					time.stopTimer(getTag()+"-update");
-				}
+				
 				return updated;
 
 			} catch (SQLException e) {
 				// report the problem SQL to aid debugging
 				throw new DataFault("SQL Exception " + buff.toString(), e);
+			}finally{
+				if( time != null ){
+					time.stopTimer(getTag()+"-update");
+				}
 			}
 		}
 

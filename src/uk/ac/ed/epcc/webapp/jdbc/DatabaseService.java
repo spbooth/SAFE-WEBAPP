@@ -73,7 +73,7 @@ public void startTransaction();
 public void rollbackTransaction();
 
 /** flush changes since start of last commit.
- * Unlike the commit method or a Connection this is a NOP if
+ * Unlike the commit method of a Connection this is a NOP if
  * not in a transaction.
  * 
  */
