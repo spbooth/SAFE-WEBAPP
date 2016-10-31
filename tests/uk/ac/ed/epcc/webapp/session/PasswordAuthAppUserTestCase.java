@@ -14,7 +14,10 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import org.junit.Before;
+import org.junit.Test;
 
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 /**
@@ -45,4 +48,14 @@ public class PasswordAuthAppUserTestCase extends
 		return new AppUserFactory<AppUser>(getContext(),"TestPasswordAuthAppUser");
 	}
 
+	@Test
+	@ConfigFixtures("sqlfilter.properties")
+	public void testSQLFilter() throws DataException{
+		testFindByEmailPassword();
+	}
+	@Test
+	@ConfigFixtures("sqlfilter.properties")
+	public void testSQLPasswordExpiry() throws DataException{
+		testPasswordExpiry();
+	}
 }

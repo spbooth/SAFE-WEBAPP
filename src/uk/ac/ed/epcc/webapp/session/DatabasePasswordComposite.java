@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
@@ -41,12 +42,11 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.CannotUseSQLException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.LongFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
@@ -56,8 +56,8 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.data.BasicType;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterAdd;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
@@ -463,7 +463,8 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 								stmt.setInt(pos++, h.ordinal());
 							}
 							if( res.hasField(DatabasePasswordComposite.PASSWORD_CHANGED)){
-								stmt.setLong(pos++,(new Date().getTime())/res.getResolution() );
+								CurrentTimeService cts = getContext().getService(CurrentTimeService.class);
+								stmt.setLong(pos++,(cts.getCurrentTime().getTime())/res.getResolution() );
 							
 							}
 							List<PatternArgument> list = crypt.getParameters(new LinkedList<PatternArgument>());
@@ -543,7 +544,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			    	record.setOptionalProperty(DatabasePasswordComposite.SALT, salt);
 			    	record.setProperty(DatabasePasswordComposite.PASSWORD, crypt);
 			    	record.setOptionalProperty(DatabasePasswordComposite.PASSWORD_FAILS, 0);
-			    	record.setOptionalProperty(PASSWORD_CHANGED, new Date());
+			    	record.setOptionalProperty(PASSWORD_CHANGED, getContext().getService(CurrentTimeService.class).getCurrentTime());
 			    	setPasswordStatus(DatabasePasswordComposite.VALID);
 			    }
 			    public Hash getAlgorithm(){
@@ -586,8 +587,9 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 							Calendar last = Calendar.getInstance();
 							last.setTime(last_changed);
 							last.add(Calendar.DAY_OF_YEAR, max_age_days); // date password expires
-							Calendar now = Calendar.getInstance();
-							if(now.after(last)){
+							CurrentTimeService cts = getContext().getService(CurrentTimeService.class);
+							Date now = cts.getCurrentTime();
+							if(now.after(last.getTime())){
 								return true;
 							}
 						}
@@ -665,7 +667,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			AndFilter<T> fil = new AndFilter<T>(getFactory().getTarget());
 			fil.addFilter(new SQLIdFilter<T>(getFactory().getTarget(),getRepository(), u.getID()));
 			fil.addFilter(getPasswordFilter(password));
-			T temp = getFactory().find(fil,false);
+			T temp = getFactory().find(fil,true);
 			if (temp == null) {
 				return false;
 			}

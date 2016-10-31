@@ -83,7 +83,7 @@ public class EmailLoggerService implements Contexed, LoggerService {
 			AppUser person = service.getCurrentPerson();
 			if (person != null) {
 				props.put("person_id", "" + person.getID());
-				String name = person.getName();
+				String name = person.getLogName();
 				if(name != null ){
 					props.put("person", name);
 				}
