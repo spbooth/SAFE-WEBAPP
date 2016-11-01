@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.config;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -167,31 +168,35 @@ public class DataBaseConfigService implements ConfigService {
 			
 			setup();
 		
-			
-			if( prop_table != null ){
+			if( sql != null && prop_table != null ){
 				boolean changed=false;
 				db_props = new Properties(nested.getServiceProperties());
 				AppContext conn = getContext();
 				try {
-					Statement select = sql.getConnection().createStatement();
-					StringBuilder query = new StringBuilder();
-					query.append("SELECT ");
-					sql.quote(query,"Name");
-					query.append(",");
-					sql.quote(query,"Value");
-					query.append(" FROM ");
-					sql.quote(query,prop_table);
-					ResultSet res = select.executeQuery(query.toString());
-					while( res.next()){
-						String value = res.getString(2);
-						if(value != null && value.trim().length() > 0){
-							db_props.setProperty(res.getString(1), value);
-							changed=true;
+					Connection connection = sql.getConnection();
+					if( connection == null){
+						conn.error("No database connection");
+					}else{
+						Statement select = connection.createStatement();
+						StringBuilder query = new StringBuilder();
+						query.append("SELECT ");
+						sql.quote(query,"Name");
+						query.append(",");
+						sql.quote(query,"Value");
+						query.append(" FROM ");
+						sql.quote(query,prop_table);
+						ResultSet res = select.executeQuery(query.toString());
+						while( res.next()){
+							String value = res.getString(2);
+							if(value != null && value.trim().length() > 0){
+								db_props.setProperty(res.getString(1), value);
+								changed=true;
+							}
 						}
+						res.close();
+						select.close();
 					}
-					res.close();
-					select.close();
-				} catch (SQLException e) {
+				} catch (Throwable e) {
 					conn.error(e,"Error reading property table");
 					db_props= null; // DB props are required, this may be a transient error so try again later.
 					ctx.getService(ConfigService.class).clearServiceProperties();
@@ -225,7 +230,7 @@ public class DataBaseConfigService implements ConfigService {
 			return;
 		}
 		
-		if( prop_table != null ){
+		if( sql != null && prop_table != null ){
 			try{
 				
 				// first delete

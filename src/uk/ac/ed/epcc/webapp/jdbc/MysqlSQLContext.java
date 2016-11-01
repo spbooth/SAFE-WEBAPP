@@ -38,6 +38,7 @@ public class MysqlSQLContext implements SQLContext {
 	public MysqlSQLContext(AppContext ctx,Connection conn) {
 		this.ctx=ctx;
 		this.conn=conn;
+		assert(conn != null);
 	}
 
 	public Connection getConnection() {
