@@ -142,6 +142,7 @@ public abstract class AbstractPasswordAuthAppUserFactoryTestCase<F extends AppUs
 		DatabasePasswordComposite comp = (DatabasePasswordComposite) fac.getComposite(PasswordAuthComposite.class);
 		assertNotNull(comp);
 		String email = ctx.getInitParameter("test.email");
+		assertNotNull(email);
 		U user =  fac.findByEmail(email);
 		Handler h = comp.getHandler(user);
 		comp.setPassword(user, "boris");
@@ -169,7 +170,7 @@ public abstract class AbstractPasswordAuthAppUserFactoryTestCase<F extends AppUs
 		assertEquals(1,MockTansport.nSent());
 		Message message = MockTansport.getMessage(0);
 		assertEquals(email, message.getAllRecipients()[0].toString());
-		assertEquals("test Account Password Request",message.getSubject());
+		assertEquals(ctx.expandText("${service.name} Account Password Request"),message.getSubject());
 		
 	}
 }
