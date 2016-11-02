@@ -24,7 +24,6 @@ import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLAccessor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;

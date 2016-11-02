@@ -73,12 +73,16 @@ public class DumperTestCase extends WebappTestBase {
 	"<UnsignedInt type='Long' nullable='true'/>\n"+
 	"<Mandatory type='String' nullable='false' max='32'/>\n"+
 	"<Time type='Long' nullable='true'/>\n"+
+	"<Beatles type='String' nullable='false' max='6'/>\n"+
+	"<Ruttles type='Integer' nullable='false'/>\n"+
 	"</TableSpecification>\n" +
 	"<Test id='1'>\n" +
 	"<Name>fred</Name>\n" +
 	"<Number>5.0</Number>\n" +
 	"<UnsignedInt>0</UnsignedInt>\n"+
 	"<Mandatory>Junk</Mandatory>\n"+
+	"<Beatles>Paul</Beatles>\n"+
+	"<Ruttles>2</Ruttles>\n"+
 	"</Test>\n"+
 	"<TableSpecification name='Test2'>\n" +
 	"<Name type='String' nullable='true' max='32'/>\n" +

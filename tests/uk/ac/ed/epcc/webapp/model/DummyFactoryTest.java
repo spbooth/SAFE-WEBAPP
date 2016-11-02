@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.model;
 
 import static org.junit.Assert.*;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -32,6 +33,8 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.model.Dummy1.Beatle;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactoryTestCase;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -181,6 +184,68 @@ public class DummyFactoryTest extends DataObjectFactoryTestCase {
 		d.commit();
 		Iterator it = fac.getResult(new FalseFilter<>(Dummy1.class)).iterator();
 		assertFalse(it.hasNext());
+	}
+	
+	@Test
+	public void testFields() throws DataException{
+		
+		Dummy1.Factory fac = (Dummy1.Factory) getFactory();
+		
+		
+		Dummy1 d = new Dummy1(ctx);
+		d.setName("Fred");
+		d.setBeatle(Beatle.George);
+		d.setRuttle(Beatle.Paul);
+		d.setNumber(12);
+		
+		d.commit();
+		
+		SQLFilter<Dummy1> fil = fac.getFilter(d);
+		
+		Dummy1 peer = fac.find(fil, true);
+		assertTrue(d.equals(d));
+		assertTrue(peer.equals(d));
+		assertTrue(d.equals(peer));
+		assertFalse(d.equals(null));
+		assertEquals("Fred", peer.getName());
+		assertEquals(Beatle.George,peer.getBeatle());
+		assertEquals(Beatle.Paul,peer.getRuttle());
+		assertEquals(12, d.getNumber());
+		
+		peer.delete();
+		
+		assertNull(fac.find(fil,true));
+	}
+	
+	@Test
+	public void testEquals() throws DataException{
+	Dummy1.Factory fac = (Dummy1.Factory) getFactory();
+		
+		
+		Dummy1 d = new Dummy1(ctx);
+		d.setBeatle(Beatle.Ringo);
+		d.commit();
+
+		Dummy1 d2 = new Dummy1(ctx);
+		d2.setBeatle(Beatle.Ringo);
+		assertFalse(d.equals(d2));
+		assertFalse(d2.equals(d));
+		
+		d2.commit();
+		assertFalse(d.equals(d2));
+		assertFalse(d2.equals(d));
+		
+		Dummy1 d3 = fac.find(d.getID());
+		assertTrue(d.equals(d3));
+		assertEquals(d.hashCode(), d3.hashCode());
+		
+		Dummy2.Factory fac2 = new Dummy2.Factory(ctx);
+		Dummy2 dd = fac2.makeBDO();
+		dd.setName("Hank");
+		dd.commit();
+		
+		assertFalse(d.equals(dd));
+		assertEquals(d.getID(),dd.getID());
 	}
 	
 }

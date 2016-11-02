@@ -1932,22 +1932,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     	}
     	return new SQLIdFilter<BDO>(getTarget(), res, target.getID());
     }
-	/**
-	 * simple convenience routine to build Sets out of Iterators.
-	 * @param <T> type os set to create
-	 * 
-	 * @param it
-	 *            Iterator
-	 * @return Set
-	 */
-	public static <T> Set<T> makeSet(Iterator<T> it) {
-		Set<T> s = new HashSet<T>();
-		while (it.hasNext()) {
-			T val = it.next();
-			s.add(val);
-		}
-		return s;
-	}
+
 
 
 	@Override

@@ -43,6 +43,8 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.FilterResult;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.convert.EnumProducer;
+import uk.ac.ed.epcc.webapp.model.data.convert.NumericEnumProducer;
 import uk.ac.ed.epcc.webapp.model.data.filter.FieldOrderFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
@@ -60,8 +62,15 @@ public class Dummy1 extends DataObject {
 	public static final String UNSIGNED = "UnsignedInt";
 	public static final String TIME="Time";
 	public static final String DEFAULT_TABLE = "Test";
-	
-
+	public static enum Beatle{
+		John,
+		Paul,
+		Ringo,
+		George
+	};
+   	public static final EnumProducer<Beatle> beatles = new EnumProducer<>(Beatle.class, "Beatles");
+  	public static final NumericEnumProducer<Beatle> ruttles = new NumericEnumProducer<>(Beatle.class, "Ruttles");
+  	 
 	public Dummy1(Repository.Record res) {
 		super(res);
 	}
@@ -70,6 +79,21 @@ public class Dummy1 extends DataObject {
 		super(getRecord(ctx,DEFAULT_TABLE));
 	}
 
+	public Beatle getBeatle(){
+		return record.getProperty(beatles);
+	}
+	
+	public void setBeatle(Beatle b){
+		record.setProperty(beatles, b);
+	}
+	
+	public Beatle getRuttle(){
+		return record.getProperty(ruttles);
+	}
+	
+	public void setRuttle(Beatle b){
+		record.setProperty(ruttles, b);
+	}
 	public String getName(){
 		return record.getStringProperty(NAME);
 	}
@@ -170,6 +194,8 @@ public class Dummy1 extends DataObject {
 			spec.setField(UNSIGNED, new LongFieldType(true, 0L));
 			spec.setField(MANDATORY, new StringFieldType(false, "Junk", 32));
 			spec.setField(TIME,new DateFieldType(true, null));
+			spec.setField(beatles.getField(), beatles.getFieldType(Beatle.Paul));
+			spec.setField(ruttles.getField(), ruttles.getFieldType(Beatle.Ringo));
 			return spec;
 		}
 		public Set<String> getNullFields(){
