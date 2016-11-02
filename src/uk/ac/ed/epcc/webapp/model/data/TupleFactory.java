@@ -85,7 +85,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 	public T makeTuple(){
 		return (T) new Tuple<A>();
 	}
-	protected void addSource(StringBuilder sb) {
+	public void addSource(StringBuilder sb) {
 		boolean seen=false;
 		for ( AF fac : factories.values()){
 			if(seen){
@@ -95,7 +95,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 			seen=true;
 		}
 	}
-	protected String getDBTag() {
+	public String getDBTag() {
 		return factories.values().iterator().next().res.getDBTag();
 	}
 	/** A combination filter for {@link Tuple}s

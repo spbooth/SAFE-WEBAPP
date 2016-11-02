@@ -2316,15 +2316,7 @@ public final class Repository {
 			String key){
 		return new TimestampDateFieldExpression<X>(target,this, key);
 	}
-	public SQLExpression<? extends Number> convertDateExpression(SQLExpression<Date> d){
-		if( d instanceof DateSQLExpression){
-			return ((DateSQLExpression)d).getMillis();
-		}
-		return sql.convertToMilliseconds(d);
-	}
-	public SQLExpression<Date> convertMilliExpression(SQLExpression<? extends Number> d){
-		return sql.convertToDate(d,1L);
-	}	
+	
 	
 	/** Get a {@link IndexedFieldValue} for a reference field
 	 * @param self type of owning object
