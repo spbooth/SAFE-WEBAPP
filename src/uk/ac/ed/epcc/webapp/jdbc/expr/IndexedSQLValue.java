@@ -27,7 +27,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  * @param <T> Type of owning/home table.
  * @param <I> Type of remote table
  */
-public interface IndexedSQLValue<T extends DataObject,I extends DataObject> extends SQLValue<IndexedReference<I>>,
+public interface IndexedSQLValue<T,I extends DataObject> extends SQLValue<IndexedReference<I>>,
 FilterProvider<T,IndexedReference<I>> {
 	/** Create a filter for the home table out of a a filter on the target object.
 	 * 

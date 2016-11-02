@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import java.sql.ResultSet;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -255,7 +256,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 		public String getTarget() {
 			StringBuilder sb = new StringBuilder();
 			boolean seen=false;
-			for ( AF fac : factories.values()){
+			for ( AF fac : getMemberFactories()){
 				if(seen){
 					sb.append(",");
 				}
@@ -282,7 +283,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 			StringBuilder sb = new StringBuilder();
 			sb.append(" ORDER BY ");
 			boolean seen=false;
-			for ( AF fac : factories.values()){
+			for ( AF fac : getMemberFactories()){
 				if(seen){
 					sb.append(",");
 				}
@@ -477,5 +478,12 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 	@Override
 	public Class getTarget() {
 		return Tuple.class;
+	}
+
+	/** get the component factories of the tuples
+	 * @return
+	 */
+	public Collection<AF> getMemberFactories() {
+		return factories.values();
 	}
 }

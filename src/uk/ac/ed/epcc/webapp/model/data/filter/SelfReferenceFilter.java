@@ -17,25 +17,29 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
+import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 /** Filter to select by IndexedReference
  * 
+ * It selects on the primary key of the provided repository using a reference to the corresponding
+ * data object.
+ * 
+ * The type of the filter is specified separately as this might be a composite object made from a join
+ * 
  * @author spb
  *
- * @param <T>
+ * @param <T> type of filter
  */
 
 
-public class SelfReferenceFilter<T extends DataObject> implements SQLFilter<T> , PatternFilter<T>{
+public class SelfReferenceFilter<T> implements SQLFilter<T> , PatternFilter<T>{
 
 	private final Class<? super T> target;
-	private final IndexedReference<T> ref;
+	private final IndexedReference ref;
 	private final Repository res;
 	private final boolean exclude;
 	/** Filter that matches an {@link IndexedReference} 
@@ -44,7 +48,7 @@ public class SelfReferenceFilter<T extends DataObject> implements SQLFilter<T> ,
 	 * @param res  {@link Repository}
 	 * @param ref {@link IndexedReference}
 	 */
-	public SelfReferenceFilter(Class<? super T> target,Repository res, IndexedReference<T> ref){
+	public SelfReferenceFilter(Class<? super T> target,Repository res, IndexedReference ref){
 		this(target,res,false,ref);
 	}
 	/** 
@@ -54,7 +58,7 @@ public class SelfReferenceFilter<T extends DataObject> implements SQLFilter<T> ,
 	 * @param exclude if true, matches everything but reference
 	 * @param ref {@link IndexedReference}
 	 */
-	public SelfReferenceFilter(Class<? super T> target,Repository res, boolean exclude ,IndexedReference<T> ref){
+	public SelfReferenceFilter(Class<? super T> target,Repository res, boolean exclude ,IndexedReference ref){
 		this.target=target;
 		this.res=res;
 		this.exclude=exclude;
