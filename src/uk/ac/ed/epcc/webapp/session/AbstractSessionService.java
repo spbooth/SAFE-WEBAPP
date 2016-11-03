@@ -140,11 +140,20 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		public final String role;
 	}
 	private Map<RelationshipTag,Boolean> relationship_map=null;
+	// map of roles to filters.
+	private Map<String,BaseFilter> roles = new HashMap<String, BaseFilter>();
 	public AbstractSessionService(AppContext c) {
 		this.c=c;
 		
 	}
 
+	/** clear all cached relationships
+	 * 
+	 */
+	private void flushRelationships(){
+		relationship_map=null;
+		roles.clear();
+	}
 	public static void setupRoleTable(AppContext ctx){
 		DataBaseHandlerService dbh = ctx.getService(DataBaseHandlerService.class);
 		if(dbh != null &&  ! dbh.tableExists(SimpleSessionService.ROLE_TABLE)){
@@ -239,6 +248,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * @param value boolean value to set
 	 */
 	public void setToggle(String name, boolean value) {
+		flushRelationships();
 		if( toggle_map == null ){
 			setupToggleMap();
 		}
@@ -463,7 +473,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * 
 	 */
 	public void clearCurrentPerson() {
-		
+		flushRelationships();
 		clearRoleMap();
 		person=null;
 		removeAttribute(person_tag);
@@ -590,6 +600,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			role_map = setupRoleMap();
 		}
 		role_map.put(role, Boolean.TRUE);
+		flushRelationships();
 	}
 
 	public String getName() {
@@ -821,8 +832,7 @@ public Set<A> withRole(String role) {
 		return TimeZone.getDefault();
 	}
 
-	// map of roles to filters.
-	private Map<String,BaseFilter> roles = new HashMap<String, BaseFilter>();
+	
 	
 	
 	@Override
