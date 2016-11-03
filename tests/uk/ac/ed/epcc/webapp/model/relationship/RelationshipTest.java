@@ -13,12 +13,15 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.relationship;
 
+import static org.junit.Assert.*;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.model.Dummy3;
 import uk.ac.ed.epcc.webapp.model.Dummy3;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -32,6 +35,10 @@ import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
  *
  */
 public class RelationshipTest extends WebappTestBase {
+	/**
+	 * 
+	 */
+	private static final String MANAGER = "Manager";
 	Dummy3.Factory fac;
 	
 	@Before
@@ -78,7 +85,7 @@ public class RelationshipTest extends WebappTestBase {
 		Assert.assertNotNull(t);
 		
 		
-		Assert.assertFalse(fac.matches(service.getRelationshipRoleFilter(fac, "Manager"), t));
+		Assert.assertFalse(fac.matches(service.getRelationshipRoleFilter(fac, MANAGER), t));
 		
 		
 		
@@ -94,39 +101,48 @@ public class RelationshipTest extends WebappTestBase {
 		
 		SessionService serv = service;
 		serv.setCurrentPerson(bill);
-		serv.setTempRole("Manager"); // Note role state is cached as part of the filter so set this before querying roles
+		serv.setTempRole(MANAGER); // Note role state is cached as part of the filter so set this before querying roles
 		
 		Dummy3 t = fac.find(fac.new StringFilter("Test1"));
 		
 		Assert.assertNotNull(t);
 		
-		Assert.assertTrue(fac.matches(service.getRelationshipRoleFilter(fac, "Manager"), t));
+		Assert.assertTrue(fac.matches(service.getRelationshipRoleFilter(fac, MANAGER), t));
 		
 		
 	
 	}
 	@Test
 	public void testRelation() throws DataException, UnknownRelationshipException{
-		SessionService service = ctx.getService(SessionService.class);
+		SessionService<AppUser> service = ctx.getService(SessionService.class);
 		AppUserFactory login = service.getLoginFactory();
 		
 		AppUser fred = login.findByEmail("fred@example.com");
 		Assert.assertNotNull(fred);
 		
-		SessionService serv = service;
+		SessionService<AppUser> serv = service;
 		serv.setCurrentPerson(fred);
 		
 		Dummy3 t = fac.find(fac.new StringFilter("Test1"));
 		
 		Assert.assertNotNull(t);
-		Relationship<AppUser, Dummy3> rel = new Relationship<AppUser, Dummy3>(ctx, "TestRelationship");
+		Relationship<AppUser, Dummy3> rel = ctx.makeObject(Relationship.class, "TestRelationship");
 		Assert.assertTrue(rel.hasRole(fred, t, "shark"));
 		
-		Assert.assertTrue(fac.matches(service.getRelationshipRoleFilter(fac, "Manager"), t));
+		Assert.assertTrue(fac.matches(service.getRelationshipRoleFilter(fac, MANAGER), t));
 		
-		serv.setTempRole("Manager");
+		serv.setTempRole(MANAGER);
 		
-		Assert.assertTrue(fac.matches(service.getRelationshipRoleFilter(fac, "Manager"), t));
+		Assert.assertTrue(fac.matches(service.getRelationshipRoleFilter(fac, MANAGER), t));
+		
+		AppUser manager = (AppUser) login.find(service.getPersonInRelationshipRoleFilter(fac, MANAGER, t),true);
+		assertNotNull(manager);
+		assertTrue(fred.equals(manager));
+		
+		Dummy3.Factory fac = new Dummy3.Factory(ctx);
+		Dummy3 client = fac.find((BaseFilter<Dummy3>) service.getTargetInRelationshipRoleFilter(fac, MANAGER, fred),true);
+		assertNotNull(client);
+		assertTrue(client.equals(t));
 		
 	}
 	

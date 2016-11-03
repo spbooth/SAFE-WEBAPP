@@ -24,6 +24,7 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
@@ -494,6 +495,12 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	public class LinkResult extends AbstractFilterResult<T> implements FilterResult<T>{
 		public LinkResult(L left, R right, BaseFilter<? super T> fil) throws DataFault {
 			super();
+			if( left != null && ! isLeft(left)){
+				throw new ClassCastException("Invalid object passed as left peer");
+			}
+			if( right != null && ! isRight(right)){
+				throw new ClassCastException("Invalid object passed as right peer");
+			}
 			this.left=left;
 			this.right = right;
 			this.fil = fil;

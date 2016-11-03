@@ -151,6 +151,9 @@ public class Dummy1 extends DataObject {
 		public Factory(AppContext c) {
 			setContext(c,DEFAULT_TABLE);
 		}
+		public Factory(AppContext c,String table) {
+			setContext(c,table);
+		}
         public long count(SQLFilter<Dummy1> f) throws DataException{
         	return getCount(f);
         }

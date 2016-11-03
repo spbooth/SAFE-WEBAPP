@@ -1653,6 +1653,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	}
    
 	public IndexedReference<BDO> makeReference(BDO obj){
+		if( ! isMine(obj)){
+			throw new ConsistencyError("Reference taken for wrong type/table");
+		}
     	return makeReference(obj.getID());
     }
 	 @SuppressWarnings("unchecked")

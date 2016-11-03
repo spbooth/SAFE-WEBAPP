@@ -39,6 +39,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactoryTestCase;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
+import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 public class DummyFactoryTest extends DataObjectFactoryTestCase {
 
@@ -228,6 +229,8 @@ public class DummyFactoryTest extends DataObjectFactoryTestCase {
 
 		Dummy1 d2 = new Dummy1(ctx);
 		d2.setBeatle(Beatle.Ringo);
+		assertTrue(d.equals(d));
+		assertFalse(d.equals(null));
 		assertFalse(d.equals(d2));
 		assertFalse(d2.equals(d));
 		
@@ -246,6 +249,49 @@ public class DummyFactoryTest extends DataObjectFactoryTestCase {
 		
 		assertFalse(d.equals(dd));
 		assertEquals(d.getID(),dd.getID());
+		
+		Dummy1.Factory fac_alt = new Dummy1.Factory(ctx,"OtherTable");
+		Dummy1 alt = fac_alt.makeBDO();
+		alt.setBeatle(Beatle.Ringo);
+		alt.commit();
+		assertFalse(d.equals(alt));
+	}
+	
+	@Test
+	public void testReference() throws DataFault{
+		Dummy1.Factory fac = (Dummy1.Factory) getFactory();
+		
+		
+		Dummy1 d = new Dummy1(ctx);
+		d.setBeatle(Beatle.Ringo);
+		d.commit();
+		IndexedReference<Dummy1> ref1 = fac.makeReference(d);
+		assertTrue(fac.isMine(d));
+		assertTrue(fac.isMyReference(ref1));
+		assertFalse(fac.isMyReference(null));
+		
+		
+		Dummy2.Factory fac2 = new Dummy2.Factory(ctx);
+		Dummy2 dd = fac2.makeBDO();
+		dd.setName("Hank");
+		dd.commit();
+		IndexedReference<Dummy2> ref2 = fac2.makeReference(dd);
+		
+		assertFalse(fac.isMine(dd));
+		assertFalse(fac.isMyReference(ref2));
+		
+		Dummy1.Factory fac_alt = new Dummy1.Factory(ctx,"OtherTable");
+		Dummy1 alt = fac_alt.makeBDO();
+		alt.setBeatle(Beatle.Ringo);
+		alt.commit();
+		
+		assertFalse(fac.isMine(alt));
+		assertTrue(fac_alt.isMine(alt));
+		IndexedReference alt_ref = fac_alt.makeReference(alt);
+		assertFalse(fac.isMyReference(alt_ref));
+		assertTrue(fac_alt.isMyReference(alt_ref));
+		
+		
 	}
 	
 }
