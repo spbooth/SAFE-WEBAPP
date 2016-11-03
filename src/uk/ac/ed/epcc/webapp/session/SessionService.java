@@ -156,14 +156,14 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public boolean canHaveRole(A user,String role);
 	
-	/** get the set of users with the specified role.
-	 * This only queries the roles managed directly by the session service.
-	 * This method should reflect the state set by setRole and should not be used to query 
-	 * the current roles of the current user.
-	 * @param role
-	 * @return Set of AppUser
-	 */
-	public Set<A> withRole(String role);
+//	/** get the set of users with the specified role.
+//	 * This only queries the roles managed directly by the session service.
+//	 * This method should reflect the state set by setRole and should not be used to query 
+//	 * the current roles of the current user.
+//	 * @param role
+//	 * @return Set of AppUser
+//	 */
+//	public Set<A> withRole(String role);
 	
 	/** Store an object in the session. 
 	 * Objects stored in the session should not contain references to the 

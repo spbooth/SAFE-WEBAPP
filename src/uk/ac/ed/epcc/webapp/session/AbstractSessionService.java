@@ -665,43 +665,43 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		return false;
 	}
 
-public Set<A> withRole(String role) {
-		role = mapRoleName(role);
-		AppContext conn = getContext();
-		Set<A> result = new HashSet<A>();
-		try {
-			SQLContext ctx=conn.getService(DatabaseService.class).getSQLContext();
-			StringBuilder role_query=new StringBuilder();
-			AppUserFactory<A> fac = getLoginFactory();
-			role_query.append("SELECT ");
-			ctx.quote(role_query, ROLE_PERSON_ID).append(" FROM ");
-			ctx.quote(role_query,ROLE_TABLE).append(" WHERE ");
-			ctx.quote(role_query,ROLE_FIELD).append("=? ");
-			PreparedStatement stmt = null;
-			try {
-				stmt = ctx.getConnection().prepareStatement(role_query.toString());
-				stmt.setString(1, role);
-				ResultSet rs = stmt.executeQuery();
-				while(rs.next()) {
-					try {
-						result.add(fac.find(rs.getInt(1)));
-					} catch (DataException e) {
-						error(e,"Error getting person from role");
-					}
-				}
-			} finally {
-				if( stmt != null ){
-				   stmt.close();
-				}
-			}
-		} catch (SQLException e) {
-			error(e,"Error checking AppUser role");
-			// maybe table missing
-			// this is null if table exists
-			setupRoleTable(conn);
-		}
-		return result;
-	}
+//public Set<A> withRole(String role) {
+//		role = mapRoleName(role);
+//		AppContext conn = getContext();
+//		Set<A> result = new HashSet<A>();
+//		try {
+//			SQLContext ctx=conn.getService(DatabaseService.class).getSQLContext();
+//			StringBuilder role_query=new StringBuilder();
+//			AppUserFactory<A> fac = getLoginFactory();
+//			role_query.append("SELECT ");
+//			ctx.quote(role_query, ROLE_PERSON_ID).append(" FROM ");
+//			ctx.quote(role_query,ROLE_TABLE).append(" WHERE ");
+//			ctx.quote(role_query,ROLE_FIELD).append("=? ");
+//			PreparedStatement stmt = null;
+//			try {
+//				stmt = ctx.getConnection().prepareStatement(role_query.toString());
+//				stmt.setString(1, role);
+//				ResultSet rs = stmt.executeQuery();
+//				while(rs.next()) {
+//					try {
+//						result.add(fac.find(rs.getInt(1)));
+//					} catch (DataException e) {
+//						error(e,"Error getting person from role");
+//					}
+//				}
+//			} finally {
+//				if( stmt != null ){
+//				   stmt.close();
+//				}
+//			}
+//		} catch (SQLException e) {
+//			error(e,"Error checking AppUser role");
+//			// maybe table missing
+//			// this is null if table exists
+//			setupRoleTable(conn);
+//		}
+//		return result;
+//	}
 
 
 	public static  void removeRoleByID(AppContext context, int id, String role) throws DataFault {
@@ -925,9 +925,9 @@ public Set<A> withRole(String role) {
 			return or;
 		}
 		if( role.contains("+")){
-			// OR combination of filters
+			// AND combination of filters
 			AndFilter<T> and = new AndFilter<T>(fac2.getTarget());
-			for( String  s  : role.split("+")){
+			for( String  s  : role.split("\\+")){
 				if( person == null ){
 					and.addFilter(getRelationshipRoleFilter(fac2, s));
 				}else{
@@ -1016,7 +1016,7 @@ public Set<A> withRole(String role) {
 		if( role.contains("+")){
 			// OR combination of filters
 			AndFilter<A> and = new AndFilter<A>(target_type);
-			for( String  s  : role.split("+")){
+			for( String  s  : role.split("\\+")){
 				and.addFilter(getPersonInRelationshipRoleFilter(fac2, s,target));
 			}
 			return and;

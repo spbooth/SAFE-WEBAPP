@@ -27,6 +27,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
@@ -149,7 +150,10 @@ public class Dummy3 extends DataObject {
 		 */
 		@Override
 		public BaseFilter<AppUser> personInRelationFilter(SessionService<AppUser> sess, String role, Dummy3 target) {
-			return sess.getLoginFactory().getFilter(target.getPerson());
+			if( role.equals("self")){
+				return sess.getLoginFactory().getFilter(target.getPerson());
+			}
+			return null;
 		}
     }
 }

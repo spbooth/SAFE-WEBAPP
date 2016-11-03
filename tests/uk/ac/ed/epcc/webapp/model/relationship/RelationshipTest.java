@@ -13,9 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.relationship;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -40,6 +38,7 @@ public class RelationshipTest extends WebappTestBase {
 	 * 
 	 */
 	private static final String MANAGER = "Manager";
+	private static final String DOUBLE_MANAGER = "DoubleManager";
 	Dummy3.Factory fac;
 	
 	@Before
@@ -135,22 +134,35 @@ public class RelationshipTest extends WebappTestBase {
 		Assert.assertTrue(rel.hasRole(fred, t, "shark"));
 		
 		Assert.assertTrue(fac.matches(service.getRelationshipRoleFilter(fac, MANAGER), t));
-		
+		assertFalse(fac.matches(service.getRelationshipRoleFilter(fac, DOUBLE_MANAGER), t));
 		
 		
 		// caching call
 		assertTrue(service.hasRelationship(fac, t, MANAGER));
+		assertFalse(service.hasRelationship(fac, t, DOUBLE_MANAGER));
 		
 		//people with role should be fred 
 		AppUser manager = (AppUser) login.find(service.getPersonInRelationshipRoleFilter(fac, MANAGER, t),true);
 		assertNotNull(manager);
 		assertTrue(fred.equals(manager));
+		assertNull(login.find(service.getPersonInRelationshipRoleFilter(fac, DOUBLE_MANAGER, t),true));
 		
 		// fred 
 		Dummy3.Factory fac = new Dummy3.Factory(ctx);
 		Dummy3 client = fac.find((BaseFilter<Dummy3>) service.getTargetInRelationshipRoleFilter(fac, MANAGER, fred),true);
+		assertNull(fac.find((BaseFilter<Dummy3>) service.getTargetInRelationshipRoleFilter(fac, DOUBLE_MANAGER, fred),true));
 		assertNotNull(client);
 		assertTrue(client.equals(t));
+		service.setTempRole(MANAGER);
+		service.setToggle(MANAGER, true);
+		assertTrue(service.hasRelationship(fac, t, DOUBLE_MANAGER));
+		assertTrue(fac.matches(service.getRelationshipRoleFilter(fac, DOUBLE_MANAGER), t));
+
+		
+		// does not affect filters
+		assertNull(login.find(service.getPersonInRelationshipRoleFilter(fac, DOUBLE_MANAGER, t),true));
+		assertNull(fac.find((BaseFilter<Dummy3>) service.getTargetInRelationshipRoleFilter(fac, DOUBLE_MANAGER, fred),true));
+		
 		
 	}
 	
