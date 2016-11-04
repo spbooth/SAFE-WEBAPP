@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -391,7 +392,16 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		if( toggle_map == null ){
 			setupToggleMap();
 		}
-		return toggle_map.keySet();
+		// have predictable order
+		LinkedHashSet<String> set = new LinkedHashSet<>();
+		if( toggle_map != null ){
+		for(String s : toggle_map.keySet()){
+			if( canHaveRole(s)){
+				set.add(s);
+			}
+		}
+		}
+		return set;
 	}
 	/** Checks if this session can have the role (ignoring toggle values).
 	 * No name mapping is applied.

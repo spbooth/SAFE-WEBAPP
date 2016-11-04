@@ -21,6 +21,7 @@ import javax.servlet.ServletException;
 
 import org.junit.Test;
 
+import uk.ac.ed.epcc.webapp.forms.MapForm;
 import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -44,14 +45,9 @@ public class UserServletTest<A extends AppUser> extends ServletTest {
 		req.servlet_path="UserServlet";
 	}
 
-	/**
-	 * @throws DataFault 
-	 * @throws IOException 
-	 * @throws ServletException 
-	 * 
-	 */
+	
 	@Test
-	public void UserServletTest() throws DataFault, ServletException, IOException {
+	public void testPasswordChange() throws DataFault, ServletException, IOException {
 		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
 		A user =  fac.makeBDO();
 		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
@@ -71,5 +67,69 @@ public class UserServletTest<A extends AppUser> extends ServletTest {
 		doPost();
 		checkMessage("password_changed");
 	}
-
+	
+	@Test
+	public void testWrongPassword() throws DataFault, ServletException, IOException {
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		String sent = composite.firstPassword(user);
+		user.commit();
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setCurrentPerson(user);
+		assertTrue(sess.haveCurrentUser());
+		
+		addParam("form_url","/scripts/password_update.jsp");
+		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD1,"BorisTheSpider");
+		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD2,"BorisTheSpider");
+		// Do we really need this to be provided on a forced update
+		addParam(PasswordUpdateFormBuilder.PASSWORD_FIELD,"womble");
+		addParam("action",UserServlet.CHANGE_PASSWORD); 
+		doPost();
+		checkError("/scripts/password_update.jsp",PasswordUpdateFormBuilder.PASSWORD_FIELD,"Does not match your current password");
+	}
+	@Test
+	public void testMisMatch() throws DataFault, ServletException, IOException {
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		String sent = composite.firstPassword(user);
+		user.commit();
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setCurrentPerson(user);
+		assertTrue(sess.haveCurrentUser());
+		
+		addParam("form_url","/scripts/password_update.jsp");
+		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD1,"BorisTheSpider");
+		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD2,"BorisTheRussian");
+		// Do we really need this to be provided on a forced update
+		addParam(PasswordUpdateFormBuilder.PASSWORD_FIELD,sent);
+		addParam("action",UserServlet.CHANGE_PASSWORD); 
+		doPost();
+		checkError("/scripts/password_update.jsp",MapForm.GENERAL_ERROR,"New Passwords don't match");
+	}
+	
+	@Test
+	public void testSimple() throws DataFault, ServletException, IOException {
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		String sent = composite.firstPassword(user);
+		user.commit();
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setCurrentPerson(user);
+		assertTrue(sess.haveCurrentUser());
+		
+		addParam("form_url","/scripts/password_update.jsp");
+		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD1,"Boris");
+		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD2,"Boris");
+		// Do we really need this to be provided on a forced update
+		addParam(PasswordUpdateFormBuilder.PASSWORD_FIELD,sent);
+		addParam("action",UserServlet.CHANGE_PASSWORD); 
+		doPost();
+		checkError("/scripts/password_update.jsp",PasswordUpdateFormBuilder.NEW_PASSWORD1,"Password is too short must be at least 8 characters");
+	}
 }

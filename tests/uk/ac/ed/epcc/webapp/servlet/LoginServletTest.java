@@ -22,6 +22,8 @@ import javax.servlet.ServletException;
 
 import org.junit.Test;
 
+import uk.ac.ed.epcc.webapp.email.MockTansport;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -76,10 +78,14 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		A user =  fac.makeBDO();
 		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
 		user.setEmail("fred@example.com");
-		composite.firstPassword(user);
+		String first = composite.firstPassword(user);
 		user.commit();
 		SessionService<A> sess = ctx.getService(SessionService.class);
-		sess.setCurrentPerson(user);
+		//sess.setCurrentPerson(user);
+		addParam("username","fred@example.com");
+		addParam("password",first);
+		doPost();
+		checkRedirect("/welcome.jsp");
 		assertTrue(sess.haveCurrentUser());
 		
 		Set<RequiredPage<A>> pages = fac.getRequiredPages();
@@ -126,6 +132,28 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		
 		
 		
+	}
+	
+	@Test
+	public void testRequestNewPassword() throws DataException, Exception{
+		MockTansport.clear();
+		takeBaseline();
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		addParam("username","fred@example.com");
+		addParam("email_password","true");
+		doPost();
+		checkMessage("new_password_emailed");
+		assertEquals(1,MockTansport.nSent());
+		assertEquals(ctx.expandText("${service.name} Account Password Request"),MockTansport.getMessage(0).getSubject());
+		checkDiff("/cleanup.xsl", "new_password.xml");
+		
+		user=fac.find(user.getID());
+		assertTrue(composite.mustResetPassword(user));
 	}
 
 

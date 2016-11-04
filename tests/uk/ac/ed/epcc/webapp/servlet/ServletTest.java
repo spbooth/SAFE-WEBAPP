@@ -45,6 +45,7 @@ import uk.ac.ed.epcc.webapp.config.OverrideConfigService;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
 import uk.ac.ed.epcc.webapp.forms.result.CustomPage;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
@@ -248,7 +249,12 @@ public abstract class ServletTest extends WebappTestBase{
 	}
 	
 	
-	
+	public void checkError(String expected_url,String param, String error){
+		checkForward(expected_url);
+		Map<String,String> errors = HTMLForm.getErrors(req);
+		//assertTrue(errors.containsKey(param));
+		assertEquals(error, errors.get(param));
+	}
 	/** Check that the specified confirm message has been requested
 	 * then reset the response and modify the request with the specified confirmation
 	 * 

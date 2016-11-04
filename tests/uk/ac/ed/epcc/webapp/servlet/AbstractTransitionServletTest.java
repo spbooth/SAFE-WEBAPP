@@ -257,10 +257,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	 * @param error
 	 */
 	public void checkError(String param, String error){
-		checkForward("/scripts/transition.jsp");
-		Map<String,String> errors = HTMLForm.getErrors(req);
-		assertTrue(errors.containsKey(param));
-		assertEquals(error, errors.get(param));
+		checkError("/scripts/transition.jsp", param,error);
 	}
 	
 	public void checkGeneralError(String error){
