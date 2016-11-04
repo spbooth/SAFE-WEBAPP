@@ -43,6 +43,10 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 
 
 public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequestFactory.EmailChangeRequest> {
+	/**
+	 * 
+	 */
+	public static final String REQUEST_ACTION = "Request";
 	static final String NEW_EMAIL="NewEmail";
 	static final String TAG="Tag";
 	static final String USER_ID="UserID";
@@ -165,6 +169,6 @@ public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequ
 			// Must not change to existing email unless already taken by same user.
 			f.getField(EmailNameFinder.EMAIL).removeValidator(new ParseFactoryValidator<AppUser>(factory, null));
 			f.getField(EmailNameFinder.EMAIL).addValidator(new ParseFactoryValidator<AppUser>(factory, user));
-	    	f.addAction("Request", new RequestAction(user));
+	    	f.addAction(REQUEST_ACTION, new RequestAction(user));
 	    }
 }

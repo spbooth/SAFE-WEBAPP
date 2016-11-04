@@ -1,0 +1,9 @@
+<Diff><Person id='1'>
+<Email>bilbo@example.com</Email>
+<PasswordFails>0</PasswordFails>
+<PasswordStatus>F</PasswordStatus>
+<Salt></Salt>
+<Alg>0</Alg>
+<Password>locked</Password>
+</Person>
+</Diff>

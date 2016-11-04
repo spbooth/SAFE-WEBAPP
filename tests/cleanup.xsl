@@ -11,6 +11,9 @@
     <xsl:template match="PasswordChangeRequest/Tag">
     <xsl:element name="Tag">FakeTag</xsl:element>
     </xsl:template>
+     <xsl:template match="EmailChangeRequest/Tag">
+    <xsl:element name="Tag">1-xxxxxxxxxxxxxxxx</xsl:element>
+    </xsl:template>
 	<xsl:template match="person/Updated">
 	<xsl:element name="Updated">1234567890</xsl:element>
 	</xsl:template>
