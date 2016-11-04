@@ -46,6 +46,7 @@ import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.CustomPage;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.jdbc.config.DataBaseConfigService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -367,6 +368,17 @@ public abstract class ServletTest extends WebappTestBase{
 		
 	}
 
-
+	/** Process a {@link FormResult} directly
+	 * 
+	 * This is to simulate a {@link FormResult} handled in a jsp.
+	 * use {@link #doPost()} to simulate posts to servlets.
+	 * 
+	 * @param result
+	 * @throws Exception
+	 */
+    public void doFormResult(FormResult result) throws Exception{
+    	ServletFormResultVisitor vis = new ServletFormResultVisitor(ErrorFilter.retrieveAppContext(req, res), req, res);
+		result.accept(vis);
+    }
 	
 }

@@ -13,19 +13,22 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
+import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
+import uk.ac.ed.epcc.webapp.session.RequiredPage;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
@@ -51,15 +54,42 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		user.setEmail("fred@example.com");
 		composite.setPassword(user,"FredIsDead");
 		user.commit();
-		LoginServlet serv = new LoginServlet();
 		
-		req.addParameter("username", "fred@example.com");
-		req.addParameter("password", "FredIsDead");
-		serv.doPost(req, res,ctx);
-		assertEquals("test/main.jsp",res.redirect);
 		
+		addParam("username", "fred@example.com");
+		addParam("password", "FredIsDead");
+		doPost();
+		checkRedirect("/main.jsp");
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		assertTrue(sess.haveCurrentUser());
+		
+		Set<RequiredPage<A>> pages = fac.getRequiredPages();
+		assertEquals(1,pages.size());
+		RequiredPage page = pages.iterator().next();
+		assertFalse(page.required(sess));
 		
 	}
+	@ConfigFixtures("password_auth.properties")
+	@Test
+	public void testFirstPassword() throws Exception{
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.firstPassword(user);
+		user.commit();
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setCurrentPerson(user);
+		assertTrue(sess.haveCurrentUser());
+		
+		Set<RequiredPage<A>> pages = fac.getRequiredPages();
+		assertEquals(1,pages.size());
+		RequiredPage page = pages.iterator().next();
+		assertTrue(page.required(sess));
+		doFormResult(page.getPage());
+		checkRedirect("/password_update.jsp");
+	}
+	
 	
 	@ConfigFixtures("password_auth.properties")
 	@Test
@@ -70,13 +100,12 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		user.setEmail("fred@example.com");
 		composite.setPassword(user,"FredIsDead");
 		user.commit();
-		LoginServlet serv = new LoginServlet();
 		
-		req.addParameter("username", "bill@example.com");
-		req.addParameter("password", "FredIsDead");
-		serv.doPost(req, res,ctx);
-		assertEquals("test/login.jsp?error=login",res.redirect);
-		
+		addParam("username", "bill@example.com");
+		addParam("password", "FredIsDead");
+		doPost();
+		checkRedirect("/login.jsp?error=login");
+	
 		
 	}
 	@ConfigFixtures("password_auth.properties")
@@ -88,12 +117,13 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		user.setEmail("fred@example.com");
 		composite.setPassword(user,"FredIsDead");
 		user.commit();
-		LoginServlet serv = new LoginServlet();
 		
-		req.addParameter("username", "fred@example.com");
-		req.addParameter("password", "FredIsAlive");
-		serv.doPost(req, res,ctx);
-		assertEquals("test/login.jsp?error=login",res.redirect);
+		
+		addParam("username", "fred@example.com");
+		addParam("password", "FredIsAlive");
+		doPost();
+		checkRedirect("/login.jsp?error=login");
+		
 		
 		
 	}
@@ -103,6 +133,9 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 	public void setUp() throws Exception {
 		// TODO Auto-generated method stub
 		super.setUp();
+		servlet=new LoginServlet<A>();
+		MockServletConfig config = new MockServletConfig(serv_ctx, "LoginServlet");
+		servlet.init(config);
 		req.servlet_path="LoginServlet";
 	}
 

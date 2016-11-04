@@ -41,19 +41,23 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  */
 public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormTransition<U> implements ExtraFormTransition<U>{
 	
+	/**
+	 * 
+	 */
+	public static final String CHANGE_ACTION = " Change ";
 	private static final Feature CHECK_COMPLEXITY = new Feature("password.check_complexity",true,"Perform complexity check on user generated passwords");
     /**
 	 * 
 	 */
-	private static final String NEW_PASSWORD2 = "password2";
+	public static final String NEW_PASSWORD2 = "password2";
 	/**
 	 * 
 	 */
-	private static final String NEW_PASSWORD1 = "password1";
+	public static final String NEW_PASSWORD1 = "password1";
 	/**
 	 * 
 	 */
-	private static final String PASSWORD_FIELD = "password";
+	public static final String PASSWORD_FIELD = "password";
 
 
 	/**
@@ -227,7 +231,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
     	if( CHECK_COMPLEXITY.isEnabled(getContext())){
     		f.addValidator(new ComplexityValidator());
     	}
-    	f.addAction(" Change ", new UpdateAction(user));
+    	f.addAction(CHANGE_ACTION, new UpdateAction(user));
     }
     
     public class UpdateAction extends FormAction{
