@@ -71,6 +71,32 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		assertFalse(page.required(sess));
 		
 	}
+	
+	@ConfigFixtures({"password_auth.properties","wtmp.properties"})
+	@Test
+	public void testLoginWithWtmp() throws DataException, Exception{
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		takeBaseline();
+		
+		req.header.put("user-agent", "junit");
+		addParam("username", "fred@example.com");
+		addParam("password", "FredIsDead");
+		doPost();
+		checkRedirect("/main.jsp");
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		assertTrue(sess.haveCurrentUser());
+		
+		Set<RequiredPage<A>> pages = fac.getRequiredPages();
+		assertEquals(1,pages.size());
+		RequiredPage page = pages.iterator().next();
+		assertFalse(page.required(sess));
+		checkDiff("/cleanup.xsl", "login_wtmp.xml");
+	}
 	@ConfigFixtures("password_auth.properties")
 	@Test
 	public void testFirstPassword() throws Exception{
@@ -156,6 +182,28 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		assertTrue(composite.mustResetPassword(user));
 	}
 
+	@Test
+	@ConfigFixtures("password_server.properties")
+	public void testRequestNewPasswordFromServlet() throws DataException, Exception{
+		MockTansport.clear();
+		takeBaseline();
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		addParam("username","fred@example.com");
+		addParam("email_password","true");
+		doPost();
+		checkMessage("new_password_emailed");
+		assertEquals(1,MockTansport.nSent());
+		assertEquals(ctx.expandText("${service.name} Account Password Request"),MockTansport.getMessage(0).getSubject());
+		checkDiff("/cleanup.xsl", "new_password_from_server.xml");
+		
+		user=fac.find(user.getID());
+		assertTrue(composite.mustResetPassword(user)); 
+	}
 
 	@Override
 	public void setUp() throws Exception {

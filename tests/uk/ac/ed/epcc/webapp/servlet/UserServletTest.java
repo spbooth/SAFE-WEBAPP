@@ -66,6 +66,7 @@ public class UserServletTest<A extends AppUser> extends ServletTest {
 		addParam("action",UserServlet.CHANGE_PASSWORD); 
 		doPost();
 		checkMessage("password_changed");
+		assertTrue(composite.checkPassword(user, "BorisTheSpider"));
 	}
 	
 	@Test

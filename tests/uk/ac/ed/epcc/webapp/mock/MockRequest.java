@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,6 +49,7 @@ import java.util.Hashtable;
 public class MockRequest implements HttpServletRequest {
     public Hashtable<String,Object> params=new Hashtable<String,Object>();
     public HashMap<String,Object> attr = new HashMap<String,Object>();
+    public HashMap<String,String> header = new HashMap<String,String>();
     public Set<String> roles = new HashSet<String>();
     public Map<String,Part> parts = new HashMap<String,Part>();
     public String context_path;
@@ -56,6 +58,7 @@ public class MockRequest implements HttpServletRequest {
     public MockSession session;
     public String remote_user=null;
     public String content_type=null;
+    public Principal principal=null;
     public MockRequest(String path){
     	context_path=path;
     }
@@ -83,12 +86,12 @@ public class MockRequest implements HttpServletRequest {
 
 	public String getHeader(String arg0) {
 		
-		return null;
+		return header.get(arg0);
 	}
 
 	public Enumeration getHeaderNames() {
 		
-		return null;
+		return Collections.enumeration(header.keySet());
 	}
 
 	public Enumeration getHeaders(String arg0) {
@@ -165,7 +168,7 @@ public class MockRequest implements HttpServletRequest {
 
 	public Principal getUserPrincipal() {
 		
-		return null;
+		return principal;
 	}
 
 	public boolean isRequestedSessionIdFromCookie() {
@@ -231,7 +234,7 @@ public class MockRequest implements HttpServletRequest {
 
 	public String getLocalName() {
 		
-		return null;
+		return "localhost";
 	}
 
 	public int getLocalPort() {
@@ -306,7 +309,7 @@ public class MockRequest implements HttpServletRequest {
 
 	public String getRemoteHost() {
 		
-		return null;
+		return "localhost";
 	}
 
 	public int getRemotePort() {

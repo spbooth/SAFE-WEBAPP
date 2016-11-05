@@ -28,6 +28,7 @@ import uk.ac.ed.epcc.webapp.config.OverrideConfigService;
 import uk.ac.ed.epcc.webapp.jdbc.config.DataBaseConfigService;
 import uk.ac.ed.epcc.webapp.logging.debug.DebugLoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintLoggerService;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.SimpleSessionService;
 import uk.ac.ed.epcc.webapp.timer.DefaultTimerService;
 
@@ -96,6 +97,8 @@ public class AppContextFixtureRule extends ExternalResource{
 			InputStream stream = holder.getClass().getResourceAsStream(fix);
 			if( stream != null ){
 				overrides.load(stream);
+			}else{
+				throw new DataFault("Resource not found "+fix);
 			}
 		}
 		ctx = new AppContext();
