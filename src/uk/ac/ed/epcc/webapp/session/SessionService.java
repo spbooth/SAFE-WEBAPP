@@ -103,6 +103,13 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @param person
 	 */
 	public void setCurrentPerson(A person);
+	
+	/** does the current session correspond to the person.
+	 * 
+	 * @param person
+	 * @return boolean 
+	 */
+	public boolean isCurrentPerson(A person);
 	/** Set the current person by id
 	 * 
 	 * @param id

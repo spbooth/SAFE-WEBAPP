@@ -575,6 +575,12 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		}
 	}
 
+	public boolean isCurrentPerson(A person){
+		if( person == null || ! haveCurrentUser()){
+			return false;
+		}
+		return getPersonID() == person.getID();
+	}
 	public void setCurrentPerson(int id) {
 		if( id <= 0 ){
 			clearCurrentPerson();
