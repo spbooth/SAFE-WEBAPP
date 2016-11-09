@@ -20,12 +20,17 @@ package uk.ac.ed.epcc.webapp.content;
 
 
 public class HourTransform implements NumberTransform{
-	private String default_value;
-	public HourTransform(String def){
-		default_value = def;
-	}
+	private String default_value="0:00:00";
+	
+	
 	public HourTransform(){
-		this("0:00:00");
+	}
+	
+	public String getDefaultValue() {
+		return default_value;
+	}
+	public void setDefaultValue(String default_value) {
+		this.default_value = default_value;
 	}
 	/** Convert a {@link Number} of seconds into a HH:MM:SS string
 	 * 

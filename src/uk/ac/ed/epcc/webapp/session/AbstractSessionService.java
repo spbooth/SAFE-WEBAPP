@@ -19,13 +19,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.TreeSet;
+import java.util.TreeMap;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
@@ -33,7 +32,6 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
@@ -289,7 +287,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * @return Map<String,Boolean>
 	 */
 	public Map<String,Boolean> makeToggleMap(){
-		LinkedHashMap<String,Boolean> map = new LinkedHashMap<String,Boolean>();
+		Map<String,Boolean> map = new TreeMap<String,Boolean>();
 
 		map.put(SessionService.ADMIN_ROLE, Boolean.FALSE);
 		String additions = getContext().getInitParameter("toggle_roles");
