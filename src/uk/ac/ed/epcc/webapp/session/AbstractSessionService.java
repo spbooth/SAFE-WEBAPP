@@ -19,12 +19,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.TreeMap;
+import java.util.TreeSet;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
@@ -287,7 +286,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * @return Map<String,Boolean>
 	 */
 	public Map<String,Boolean> makeToggleMap(){
-		Map<String,Boolean> map = new TreeMap<String,Boolean>();
+		HashMap<String,Boolean> map = new HashMap<String,Boolean>();
 
 		map.put(SessionService.ADMIN_ROLE, Boolean.FALSE);
 		String additions = getContext().getInitParameter("toggle_roles");
@@ -391,7 +390,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			setupToggleMap();
 		}
 		// have predictable order
-		LinkedHashSet<String> set = new LinkedHashSet<>();
+		Set<String> set = new TreeSet<String>();
 		if( toggle_map != null ){
 		for(String s : toggle_map.keySet()){
 			if( canHaveRole(s)){
