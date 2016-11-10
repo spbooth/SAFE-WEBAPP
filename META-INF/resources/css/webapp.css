@@ -425,9 +425,16 @@ text-align: center;
 	content: " \2714";
 	color: green;
 }
+.fail {
+	color: red;
+}
 .fail:after {
 	content: " \2718";
 	color: red;
+}
+.sufficient:after {
+	content: " \2190";
+	color: orange;
 }
 .notice, .notice.sorting_1 {
 	background-color: #ffcccc;
