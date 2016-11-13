@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Set;
 
@@ -30,11 +31,14 @@ import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.config.CachedConfigService;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.ConfigServiceListener;
+import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
+import uk.ac.ed.epcc.webapp.model.Property;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
 
@@ -232,6 +236,25 @@ public class DataBaseConfigService implements ConfigService {
 		
 		if( sql != null && prop_table != null ){
 			try{
+//				LinkedList args = new LinkedList();
+//				TableSpecification spec = new TableSpecification();
+//				spec.setField("Name", new StringFieldType(false,null,255));
+//				spec.setField("Value", new StringFieldType(false,null,255));
+//				try {
+//					spec.new Index("name_key", true, "Name");
+//				} catch (InvalidArgument e) {
+//					ctx.error(e,"Failed to create name key");
+//				}
+//				DataBaseHandlerService handler = ctx.getService(DataBaseHandlerService.class);
+//				
+//				StringBuilder create = new StringBuilder();
+//				create.append(handler.createTableText(true,prop_table, spec, sql, args));
+//				PreparedStatement p = sql.getConnection().prepareStatement(create.toString());
+//				int pos=1;
+//				for(Object o : args){
+//					p.setObject(pos++, o);
+//				}
+//				p.executeUpdate();
 				
 				// first delete
 				StringBuilder query = new StringBuilder();

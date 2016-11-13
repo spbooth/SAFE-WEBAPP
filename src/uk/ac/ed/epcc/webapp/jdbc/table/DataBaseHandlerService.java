@@ -31,6 +31,7 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
@@ -53,6 +54,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 
 public class DataBaseHandlerService implements Contexed, AppContextService<DataBaseHandlerService>{
+	public static final Feature CLEAR_DATABASE = new Feature("clear_database", false, "Is the clear database feature enabled");
     private AppContext conn;
     public DataBaseHandlerService(AppContext c){
     	conn=c;
@@ -140,7 +142,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     			}
     		}
     	}catch(Exception e){
-    		log.error("Failed to create table using "+text);
+    		log.error("Failed to create table using "+text,e);
     		throw new DataFault("Cannot create table "+name,e);
     	}
     }
@@ -152,11 +154,18 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 	 * @param args
 	 * @return
 	 */
-	public String createTableText(String name, TableSpecification s,
+    public String createTableText(String name, TableSpecification s,
+			SQLContext c, List<Object> args) {
+    	return createTableText(false, name, s, c, args);
+    }
+	public String createTableText(boolean check_exists,String name, TableSpecification s,
 			SQLContext c, List<Object> args) {
 		StringBuilder sb = new StringBuilder();
 		FieldTypeVisitor vis = c.getCreateVisitor(sb,args);
 		sb.append("CREATE TABLE ");
+		if( check_exists){
+			sb.append(" IF NOT EXISTS ");
+		}
 		c.quote(sb, name);
 		sb.append(" ( ");
 		c.quote(sb,s.getPrimaryKey());
@@ -265,6 +274,25 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     	}
     }
 
+    public void clearDatabase() throws Exception{
+    	if( CLEAR_DATABASE.isEnabled(getContext())){
+    		try{
+
+    			SQLContext c = conn.getService(DatabaseService.class).getSQLContext();
+    			Connection connection = c.getConnection();
+    			String db_name = connection.getCatalog();
+    			Statement stmt = connection.createStatement();
+    			StringBuilder sb = new StringBuilder();
+    			stmt.executeUpdate("DROP DATABASE "+db_name);
+    			stmt.executeUpdate("CREATE DATABASE "+db_name);
+
+    			stmt.close();
+    			connection.setCatalog(db_name);
+    		}catch(SQLException e){
+    			throw new DataFault("Cannot clear database",e);
+    		}
+    	}
+    }
 	public void cleanup() {
 		
 	}

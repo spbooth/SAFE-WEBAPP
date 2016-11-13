@@ -17,7 +17,9 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
+import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.ContextHolder;
+import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.model.data.XMLDataUtils;
 
 public class DBFixtureRule implements TestRule {
@@ -73,6 +75,11 @@ public class DBFixtureRule implements TestRule {
 	protected void before(String global_fixtures[],String fixtures[]) throws Throwable {
 		XMLDataUtils utils = getUtils();
 		utils.dropAllTables();
+		AppContext conn = ctx.getContext();
+		if( conn != null){
+			conn.clearAttributes();
+			conn.getService(ConfigService.class).clearServiceProperties();
+		}
 		if( global_fixtures != null && global_fixtures.length > 0){
 			utils.readFixtures(ctx.getClass(), global_fixtures);
 		}

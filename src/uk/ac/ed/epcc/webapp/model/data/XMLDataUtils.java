@@ -249,12 +249,18 @@ public class XMLDataUtils implements Contexed{
 		try{
 			if( DROP_TABLES_FEATURE.isEnabled(c)){
 				DataBaseHandlerService handler = c.getService(DataBaseHandlerService.class);
-				if( handler != null){
+				
+				if (DataBaseHandlerService.CLEAR_DATABASE.isEnabled(c)){
+					// This is better if we have foreign keys
+					handler.clearDatabase();
+				}else{
+					if( handler != null){
 					for( String name : handler.getTables()){
 						handler.deleteTable(name);
 					}
 					// we may have deleted the properties table
 					c.getService(ConfigService.class).clearServiceProperties();
+				}
 				}
 			}
 		}catch(Throwable t){
