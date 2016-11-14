@@ -284,7 +284,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     			Statement stmt = connection.createStatement();
     			StringBuilder sb = new StringBuilder();
     			stmt.executeUpdate("DROP DATABASE "+db_name);
-    			stmt.executeUpdate("CREATE DATABASE "+db_name);
+    			stmt.executeUpdate("CREATE DATABASE "+db_name+" CHARACTER SET utf8 COLLATE utf8_general_ci");
 
     			stmt.close();
     			connection.setCatalog(db_name);
