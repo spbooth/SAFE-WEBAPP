@@ -257,11 +257,12 @@ public class Dumper implements Contexed{
 				}
 				if( spec != null ){
 					// If we have a cached specification look for a default value from that
+					// Convert to the correct representation for the actual database.
 					FieldType type = spec.getField(name);
 					if( type != null ){
 						Object def = type.getDefault();
 						if( def != null ){
-							sb.attr(DEFAULT_ATTR, def.toString());
+							sb.attr(DEFAULT_ATTR, res.convert(name, def).toString());
 						}
 					}
 				}
