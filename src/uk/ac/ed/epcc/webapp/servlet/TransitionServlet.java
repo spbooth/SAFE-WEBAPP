@@ -41,6 +41,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.PathTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryFinder;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
@@ -85,7 +86,6 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	 */
 	private static final String DATABASE_TRANSACTION_TIMER = "DatabaseTransaction";
 	public static final String VIEW_TRANSITION = "ViewTransition.";
-	public static final String TRANSITION_PROVIDER_PREFIX = "TransitionProvider";
 	public static final Feature TRANSITION_TRANSACTIONS = new Feature("transition.transactions", true, "Use database transaction within transitions");
 	/**
 	 * 
@@ -372,33 +372,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
  */
 	
     public static TransitionFactory getProviderFromName(AppContext conn, String type) {
-	TransitionFactory result=null;
-	if( type==null || type.trim().length() ==0 ){
-		return null;
-	}
-	int index = type.indexOf(TransitionFactoryCreator.TYPE_SEPERATOR);
-	if( index > 0){
-		// must be a parameterised TransitionProviderFactory
-		String group = type.substring(0, index);
-		String tag = type.substring(index+1);
-		TransitionFactoryCreator<TransitionFactory> f = conn.makeObjectWithDefault(TransitionFactoryCreator.class,null, group);
-		if( f != null ){
-			result = f.getTransitionProvider(tag);
-		}
-	}else{
-		result = conn.makeObjectWithDefault(TransitionFactory.class,null,TRANSITION_PROVIDER_PREFIX,type);
-		if( result == null ){
-			TransitionFactoryCreator<TransitionFactory> f = conn.makeObjectWithDefault(TransitionFactoryCreator.class,null, type);
-			if( f != null ){
-				result = f.getTransitionProvider(type);
-			}
-		}
-	}
-	
-	// check targetName matches type
-	assert(result == null || result.getTargetName().equals(type));
-	
-	return result;
+	return new TransitionFactoryFinder(conn).getProviderFromName(type);
 }
     /** Static method for jsp pages to retrieve the TransitionProvider 
      * in a way compatible with the TransitionSerlvet

@@ -59,7 +59,7 @@ public class ViewTransitionGenerator<X> implements UIGenerator{
 			}
 		}
 		SessionService sess = conn.getService(SessionService.class);
-		TransitionFactory<?, X> fac =TransitionServlet.getProviderFromName(conn, transition_tag);
+		TransitionFactory<?, X> fac =new TransitionFactoryFinder(conn).getProviderFromName(transition_tag);
 		if( fac != null && fac instanceof ViewTransitionFactory && ((ViewTransitionFactory)fac).canView(target, sess)){
 			builder.addLink(conn, text, new ViewTransitionResult((ViewTransitionFactory)fac, target));
 		}else{
