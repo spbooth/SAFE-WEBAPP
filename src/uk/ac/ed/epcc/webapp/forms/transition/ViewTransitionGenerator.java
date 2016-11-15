@@ -19,7 +19,6 @@ import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.content.UIProvider;
 import uk.ac.ed.epcc.webapp.forms.Identified;
 import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
-import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** An adapter that implements {@link UIGenerator} for the target of {@link ViewTransitionFactory}
