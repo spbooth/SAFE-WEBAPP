@@ -207,7 +207,7 @@ public abstract class WebappTestBase implements ContextHolder{
 	 * @throws DataException
 	 * @throws ConsistencyError
 	 */
-	public void takeBaseline() throws DataFault, DataException, ConsistencyError{
+	public final void takeBaseline() throws DataFault, DataException, ConsistencyError{
 		
 		// make a baseline dump
 		baseline.clear();
@@ -227,7 +227,7 @@ public abstract class WebappTestBase implements ContextHolder{
 	 * @throws DataException
 	 * @throws Exception
 	 */
-	public void checkDiff(String normalize_transform,String expected_xml) throws DataException, Exception{
+	public final void checkDiff(String normalize_transform,String expected_xml) throws DataException, Exception{
 		XMLPrinter diff = new XMLPrinter();	
 		TimerService timer = ctx.getService(TimerService.class);
 		if( timer !=null){ timer.startTimer("diff"); }
@@ -256,7 +256,7 @@ public abstract class WebappTestBase implements ContextHolder{
 	 * @throws DataException
 	 * @throws Exception
 	 */
-	public void checkUnchanged() throws DataException, Exception{
+	public final void checkUnchanged() throws DataException, Exception{
 		XMLPrinter diff = new XMLPrinter();	
 		
 		diff.open("Diff");
