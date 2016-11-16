@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.charts.PeriodSequencePlot;
 import uk.ac.ed.epcc.webapp.charts.SetPlot;
@@ -755,7 +756,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	}
 
 	private final Date now() {
-		return new Date();
+		return getContext().getService(CurrentTimeService.class).getCurrentTime();  // so tests can fix time
 	}
 
 	
