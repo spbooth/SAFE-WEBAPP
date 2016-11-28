@@ -14,10 +14,11 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
+import uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
-/** Field value for the current record
+/** {@link SQLValue} of a Reference to the current record
  * 
  * @author spb
  *
@@ -32,7 +33,7 @@ public class SelfSQLValue<T extends DataObject> extends AbstractSelfSQLValue<T, 
 	
 	@Override
 	public String toString(){
-		return "SelfId";
+		return "SelfIndex";
 	}
 	
 	

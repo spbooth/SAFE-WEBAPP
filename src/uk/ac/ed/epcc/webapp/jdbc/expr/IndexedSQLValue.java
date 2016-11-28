@@ -44,4 +44,12 @@ FilterProvider<T,IndexedReference<I>> {
 	 * @throws Exception
 	 */
 	public DataObjectFactory<I> getFactory() throws Exception;
+	
+	/** Get a Integer valued {@link SQLExpression} for the id of the referenced value.
+	 * 
+	 * This is used to provide match filters for two references.
+	 * 
+	 * @return {@link SQLExpression}
+	 */
+	public SQLExpression<Integer> getIDExpression();
 }

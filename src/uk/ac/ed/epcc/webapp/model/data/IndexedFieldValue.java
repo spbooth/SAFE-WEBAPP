@@ -25,10 +25,12 @@ import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue;
+import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
+import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FieldOrderFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.Joiner;
@@ -187,6 +189,27 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 	 */
 	public Class<? super T> getFilterType() {
 		return target;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue#getIDExpression()
+	 */
+	@Override
+	public SQLExpression<Integer> getIDExpression() {
+		
+		return new FieldExpression<Integer, T>(getFilterType(), repository, Integer.class, getFieldName()) {
+
+			@Override
+			protected Integer getValue(Record r) {
+				return r.getIntProperty(getFieldName());
+			}
+
+			@Override
+			protected void setValue(Record r, Integer value) {
+				r.setProperty(getFieldName(), value.intValue());
+				
+			}
+		};
 	}
 
 }

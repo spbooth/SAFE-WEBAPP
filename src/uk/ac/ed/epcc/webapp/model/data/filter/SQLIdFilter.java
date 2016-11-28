@@ -15,13 +15,12 @@ package uk.ac.ed.epcc.webapp.model.data.filter;
 
 import java.util.List;
 
+import uk.ac.ed.epcc.webapp.jdbc.filter.ConstPatternArgument;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.ConstPatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.PatternArg;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 /** Filter to select an entry by Id.
  * 

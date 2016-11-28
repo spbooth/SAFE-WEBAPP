@@ -139,8 +139,15 @@ implements IndexedSQLValue<H,T>{
 	 */
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return base.toString()+"["+branch.toString()+"]";
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue#getIDExpression()
+	 */
+	@Override
+	public SQLExpression<Integer> getIDExpression() {
+		return branch.getIDExpression();
 	}
 
 }

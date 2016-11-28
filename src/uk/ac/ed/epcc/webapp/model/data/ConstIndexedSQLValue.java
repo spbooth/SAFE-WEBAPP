@@ -19,8 +19,10 @@ import java.util.List;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
+import uk.ac.ed.epcc.webapp.jdbc.expr.ConstExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue;
+import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLGroupMapper;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ConstPatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
@@ -208,6 +210,14 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	}
 	public String toString(){
 		return "CONST("+val.toString()+")";
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue#getIDExpression()
+	 */
+	@Override
+	public SQLExpression<Integer> getIDExpression() {
+		return new ConstExpression<Integer, T>(Integer.class, Integer.valueOf(val.getID()));
 	}
 	
 

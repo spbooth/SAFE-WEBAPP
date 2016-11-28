@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider;
 import uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLAccessor;
+import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
@@ -46,6 +47,15 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 
 public abstract class AbstractSelfSQLValue<T extends DataObject,R> implements SQLAccessor<IndexedReference<T>,R>,FilterProvider<R, IndexedReference<T>>,IndexedSQLValue<R, T> {
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue#getIDExpression()
+	 */
+	@Override
+	public SQLExpression<Integer> getIDExpression() {
+		return new SelfIdExpression(fac.res);
+	}
+
+
 	private final DataObjectFactory<T> fac;
 	public AbstractSelfSQLValue(DataObjectFactory<T> fac) {
 		this.fac=fac;
