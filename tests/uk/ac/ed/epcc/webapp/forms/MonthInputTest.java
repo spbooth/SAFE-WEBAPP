@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import uk.ac.ed.epcc.webapp.forms.inputs.MonthInput;
 
@@ -39,8 +38,8 @@ public class MonthInputTest<I extends MonthInput> extends ParseAbstractInputTest
 
 	public Set<String> getGoodParseData() {
 		HashSet<String> set=new HashSet<String>();
-		set.add("12-1965");
-		set.add("09-2008");
+		set.add("1965-12");
+		set.add("2008-09");
 		return set;
 	}
 
