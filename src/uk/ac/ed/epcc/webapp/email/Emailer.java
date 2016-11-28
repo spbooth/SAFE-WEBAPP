@@ -770,6 +770,7 @@ public class Emailer {
 			errorEmail.setProperties(props);
 		}
 		if (e != null) {
+			errorEmail.setProperty("subject_message", e.getMessage());
 			errorEmail.setProperty("exception_message", e.getMessage());
 			// Show stack trace
 			StringWriter stackTraceWriter = new StringWriter();
@@ -784,6 +785,10 @@ public class Emailer {
 			printWriter.flush();
 			errorEmail.setProperty("exception_stack_trace", stackTraceWriter
 					.toString());
+		}else{
+			if( additional_info != null && additional_info.length() < 64){
+				errorEmail.setProperty("subject_message", additional_info);
+			}
 		}
 
 		if (additional_info != null) {

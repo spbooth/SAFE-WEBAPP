@@ -1,3 +1,6 @@
+%%begin{Subject}%%
+%%service.name=Unknown service%% %%report_level=Error%% Report %%subject_message%%
+%%end{Subject}%%
 Error Report from %%service.name%%
 =============================
 
