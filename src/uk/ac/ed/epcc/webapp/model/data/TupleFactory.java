@@ -72,7 +72,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 	
 	
 	
-	public static class Tuple<A extends DataObject> extends HashMap<String, A>{
+	public static class Tuple<A extends DataObject> extends LinkedHashMap<String, A>{
 		
 		
 	}

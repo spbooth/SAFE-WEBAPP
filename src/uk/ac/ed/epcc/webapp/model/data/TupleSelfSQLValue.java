@@ -14,25 +14,26 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
+import uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterConverter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
-import uk.ac.ed.epcc.webapp.jdbc.filter.NoSQLFilterException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.TupleFactory.Tuple;
 import uk.ac.ed.epcc.webapp.model.data.TupleFactory.TupleAndFilter;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
-/**
+/** A {@link SQLValue} to reference a component of a {@link Tuple}
  * @author spb
+ * @param <A> 
+ * @param <T> 
  *
  */
-public class TupleSelfSQLValue<A extends DataObject,T extends Tuple<A>> extends AbstractSelfSQLValue<A,T> {
+public class TupleSelfSQLValue<A extends DataObject,AF extends DataObjectFactory<A>,T extends Tuple<A>> extends AbstractSelfSQLValue<A,T> {
 
-	private final TupleFactory<A, DataObjectFactory<A>, Tuple<A>> tuple_fac;
+	private final TupleFactory<A, AF, T> tuple_fac;
 	/**
 	 * @param fac
 	 */
-	public TupleSelfSQLValue(TupleFactory<A, DataObjectFactory<A>, Tuple<A>> tuple_fac,DataObjectFactory fac) {
+	public TupleSelfSQLValue(TupleFactory<A, AF, T> tuple_fac,AF fac) {
 		super(fac);
 		this.tuple_fac=tuple_fac;
 	}
