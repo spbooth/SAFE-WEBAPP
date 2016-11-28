@@ -27,8 +27,8 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
 
 
-public class MonthInput extends ParseAbstractInput<Date> implements FormatHintInput {
-    private static final String DEFAULT_FORMAT = "MM-yyyy";
+public class MonthInput extends ParseAbstractInput<Date> implements FormatHintInput, HTML5Input {
+    private static final String DEFAULT_FORMAT = "yyyy-MM";
 	DateFormat df;
  
     long resolution=1000L; // number of milliseconds in a tick
@@ -116,6 +116,13 @@ public class MonthInput extends ParseAbstractInput<Date> implements FormatHintIn
 			}
 		}
 		throw new TypeError(v.getClass());
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input#getType()
+	 */
+	@Override
+	public String getType() {
+		return "month";
 	}
 
 	
