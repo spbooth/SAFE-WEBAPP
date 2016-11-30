@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
@@ -44,8 +45,12 @@ public class SQLExpressionFilter<T,V> implements SQLFilter<T>, PatternFilter<T> 
 
     @SuppressWarnings("unchecked")
 	public static <T,V> SQLFilter<T> getFilter(Class<? super T> target,SQLExpression<V> expr,MatchCondition m,V value){
-    	SQLExpressionFilter<T, V> fil = new SQLExpressionFilter<>(target, expr, m,value);
-    	
+    	SQLExpressionFilter<T, V> fil;
+    	if( expr instanceof DateSQLExpression){
+    		fil = new SQLExpressionFilter(target, ((DateSQLExpression) expr).getMillis(), m,((Date)value).getTime());
+    	}else{
+    		fil = new SQLExpressionFilter<>(target, expr, m,value);
+    	}
 		SQLFilter<T> req = expr.getRequiredFilter();
     	if( req == null){
     		return fil;

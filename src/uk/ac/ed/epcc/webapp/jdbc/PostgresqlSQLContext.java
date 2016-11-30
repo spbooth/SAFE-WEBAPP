@@ -19,7 +19,9 @@ import java.util.Date;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.jdbc.expr.DateDerefSQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.DateSQLExpression;
+import uk.ac.ed.epcc.webapp.jdbc.expr.DerefSQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.PostgresqlDateConverter;
 import uk.ac.ed.epcc.webapp.jdbc.expr.PostgresqlMillisecondConverter;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
@@ -55,10 +57,19 @@ public class PostgresqlSQLContext implements SQLContext {
 		quote(sb,name);
 		return sb;
 	}
-	public SQLExpression<Number> convertToMilliseconds(SQLExpression<Date> expr) {
+	public SQLExpression<? extends Number> convertToMilliseconds(SQLExpression<Date> expr) {
+		if( expr instanceof DateSQLExpression){
+			return ((DateSQLExpression) expr).getMillis();
+		}
+		if( expr instanceof DerefSQLExpression){
+			return DerefSQLExpression.convertToMillis(this, (DerefSQLExpression) expr);
+		}
 		return new PostgresqlMillisecondConverter(expr);
 	}
 	public DateSQLExpression convertToDate(SQLExpression<? extends Number> val, long res) {
+		if( val instanceof DerefSQLExpression){
+			return DateDerefSQLExpression.convertToDate(this, (DerefSQLExpression) val,res);
+		}
 		return new PostgresqlDateConverter(res, val);
 	}
 

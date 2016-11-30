@@ -21,7 +21,9 @@ import java.util.Date;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.jdbc.expr.DateDerefSQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.DateSQLExpression;
+import uk.ac.ed.epcc.webapp.jdbc.expr.DerefSQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.MysqlDateConverter;
 import uk.ac.ed.epcc.webapp.jdbc.expr.MysqlMillisecondConverter;
 import uk.ac.ed.epcc.webapp.jdbc.expr.MysqlSQLHashExpression;
@@ -59,10 +61,19 @@ public class MysqlSQLContext implements SQLContext {
 		quote(sb,name);
 		return sb;
 	}
-	public SQLExpression<Number> convertToMilliseconds(SQLExpression<Date> expr) {
+	public SQLExpression<? extends Number> convertToMilliseconds(SQLExpression<Date> expr) {
+		if( expr instanceof DateSQLExpression){
+			return ((DateSQLExpression) expr).getMillis();
+		}
+		if( expr instanceof DerefSQLExpression){
+			return DerefSQLExpression.convertToMillis(this, (DerefSQLExpression) expr);
+		}
 		return new MysqlMillisecondConverter(expr);
 	}
 	public DateSQLExpression convertToDate(SQLExpression<? extends Number> val, long res) {
+		if( val instanceof DerefSQLExpression){
+			return DateDerefSQLExpression.convertToDate(this, (DerefSQLExpression) val,res);
+		}
 		return new MysqlDateConverter(res, val);
 	}
 

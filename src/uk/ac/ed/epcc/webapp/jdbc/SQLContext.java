@@ -56,7 +56,7 @@ public interface SQLContext extends Contexed{
 	 * @return SQLExpression
 	 */
 	
-	public SQLExpression<Number> convertToMilliseconds(SQLExpression<Date> expr);
+	public SQLExpression<? extends Number> convertToMilliseconds(SQLExpression<Date> expr);
 	/** Convert a Number {@link SQLExpression} to a date.
 	 * 
 	 * @param val
