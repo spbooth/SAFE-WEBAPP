@@ -27,7 +27,6 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
-import uk.ac.ed.epcc.webapp.forms.inputs.AlternateItemInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.CodeListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.NameInputProvider;
@@ -67,7 +66,10 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 public class ClassificationFactory<T extends Classification> extends TableStructureDataObjectFactory<T> implements Comparable<ClassificationFactory>, NameFinder<T>,NameInputProvider{
-	
+	/** Maximum size of pull-down menu in update form.
+	 * 
+	 */
+	private static final int CLASSIFICATION_MAX_MENU = 200;
     public ClassificationFactory(AppContext ctx, String homeTable){
     	setContext(ctx, homeTable);
     }
@@ -287,6 +289,7 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 	}
 	public static class ClassificationUpdater<C extends Classification> extends Updater<C>{
 
+		
 		private final boolean allow_name_change;
 		protected ClassificationUpdater(ClassificationFactory<C> dataObjectFactory) {
 			super(dataObjectFactory);
@@ -312,11 +315,19 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 		 */
 		@Override
 		public DataObjectItemInput<C> getSelectInput() {
-			DataObjectAlternateInput<C, DataObjectItemParseInput<C>> input = new DataObjectAlternateInput<C, DataObjectItemParseInput<C>>();
-			input.addInput("Menu", "Select ", super.getSelectInput());
-			input.addInput("Name", " or specify name ", getClassificationFactory().new NameItemInput());
-			
-			return input;
+			try{
+				if( getClassificationFactory().getCount(getClassificationFactory().getSelectFilter()) < CLASSIFICATION_MAX_MENU){
+
+
+					DataObjectAlternateInput<C, DataObjectItemParseInput<C>> input = new DataObjectAlternateInput<C, DataObjectItemParseInput<C>>();
+					input.addInput("Menu", "Select ", super.getSelectInput());
+					input.addInput("Name", " or specify name ", getClassificationFactory().new NameItemInput());
+					return input;
+				}
+			}catch(Exception e){
+				getLogger().error("Error making alt input", e);;
+			}
+			return getClassificationFactory().new NameItemInput();
 		}
 
 		
