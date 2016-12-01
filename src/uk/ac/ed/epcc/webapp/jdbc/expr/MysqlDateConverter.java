@@ -141,6 +141,13 @@ public class MysqlDateConverter implements DateSQLExpression{
 		sb.append(")");
 		return sb.toString();
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.DateSQLExpression#preferSeconds()
+	 */
+	@Override
+	public boolean preferSeconds() {
+		return res == 1000L;
+	}
 	
 
 }

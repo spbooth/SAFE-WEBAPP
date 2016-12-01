@@ -47,7 +47,12 @@ public class SQLExpressionFilter<T,V> implements SQLFilter<T>, PatternFilter<T> 
 	public static <T,V> SQLFilter<T> getFilter(Class<? super T> target,SQLExpression<V> expr,MatchCondition m,V value){
     	SQLExpressionFilter<T, V> fil;
     	if( expr instanceof DateSQLExpression){
-    		fil = new SQLExpressionFilter(target, ((DateSQLExpression) expr).getMillis(), m,((Date)value).getTime());
+    		DateSQLExpression dse = (DateSQLExpression) expr;
+    		if( dse.preferSeconds()){
+    			fil = new SQLExpressionFilter(target, dse.getSeconds(), m,((Date)value).getTime()/1000L);
+    		}else{
+    			fil = new SQLExpressionFilter(target, dse.getMillis(), m,((Date)value).getTime());
+    		}
     	}else{
     		fil = new SQLExpressionFilter<>(target, expr, m,value);
     	}

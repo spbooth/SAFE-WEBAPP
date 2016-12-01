@@ -15,7 +15,6 @@ package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.util.Date;
 
-import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -64,5 +63,12 @@ public class DateDerefSQLExpression<H extends DataObject,R extends DataObject> e
 	@Override
 	public SQLExpression<? extends Number> getSeconds() {
 		return new DerefSQLExpression<>(a,((DateSQLExpression)remote_expression).getSeconds(),required_filter);
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.DateSQLExpression#preferSeconds()
+	 */
+	@Override
+	public boolean preferSeconds() {
+		return ((DateSQLExpression)remote_expression).preferSeconds();
 	}
 }

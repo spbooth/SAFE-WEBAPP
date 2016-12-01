@@ -34,9 +34,15 @@ public interface DateSQLExpression extends SQLExpression<Date>{
 	 */
       public SQLExpression<? extends Number> getMillis();
       
-      /** get an {@link SQLExpression} for the second value of the  date
+    /** get an {@link SQLExpression} for the second value of the  date
   	 * 
   	 * @return {@link SQLExpression} giving seconds since epoch
   	 */
       public SQLExpression<? extends Number> getSeconds();
+      
+      /** Would this expression preferentially use seconds
+       * 
+       * @return boolean
+       */
+      public boolean preferSeconds();
 }

@@ -83,5 +83,12 @@ public class TimestampDateFieldExpression<T extends DataObject> extends FieldExp
 			throws CannotFilterException {
 		return new FieldOrderFilter<T>(filter_type,repository, name, descending);
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.DateSQLExpression#preferSeconds()
+	 */
+	@Override
+	public boolean preferSeconds() {
+		return res == 1000L;
+	}
 	
 }

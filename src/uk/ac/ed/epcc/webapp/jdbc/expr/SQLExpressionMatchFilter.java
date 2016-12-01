@@ -74,7 +74,12 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
     	}
     	if( expr1 instanceof DateSQLExpression && expr2 instanceof DateSQLExpression){
     		// compare underlying value
-    		return getFilter(target, ((DateSQLExpression)expr1).getMillis(), m, ((DateSQLExpression)expr2).getMillis());
+    		DateSQLExpression dse1 = (DateSQLExpression)expr1;
+			DateSQLExpression dse2 = (DateSQLExpression)expr2;
+			if( dse1.preferSeconds()){
+				return getFilter(target, dse1.getSeconds(), m, dse2.getSeconds());
+			}
+			return getFilter(target, dse1.getMillis(), m, dse2.getMillis());
     	}
     	
     	SQLExpressionMatchFilter<T, V> fil = new SQLExpressionMatchFilter<>(target, expr1, m,expr2);
