@@ -85,6 +85,15 @@ public class DefaultDataBaseService implements DatabaseService {
 			throw new SQLException("No Database connection");
 		}
 		SQLContext conn = map.get(key);
+		if( conn != null && conn.getConnection().isClosed()){
+			// looks like we got a closed connection from a pool
+			// force remake
+			conn = null;
+			map.remove(key);
+			if( tag == null ){
+				connection_set=false;
+			}
+		}
 		if (conn == null) {
 			if(tag != null ||  ! connection_set ){
 				// try to make one 
