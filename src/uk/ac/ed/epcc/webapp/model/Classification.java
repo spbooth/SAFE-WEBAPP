@@ -86,10 +86,12 @@ public class Classification extends DataObject implements Principal, Comparable<
      * @param c
      * @return TableSpecification
      */
-    public static TableSpecification getTableSpecification(AppContext c){
+    public static TableSpecification getTableSpecification(AppContext c,String table){
     	TableSpecification s = new TableSpecification();
-    	s.setField(NAME, new StringFieldType(false, null, c.getIntegerParameter("classifier.name.length", 32)));
-    	s.setField(DESCRIPTION, new StringFieldType(true, null, c.getIntegerParameter("classifier.description.length", 255)));
+    	s.setField(NAME, new StringFieldType(false, null, c.getIntegerParameter(table+".name.length", c.getIntegerParameter("classifier.name.length", 32))));
+    	if( c.getBooleanParameter(table+".use_description", true)){
+    		s.setField(DESCRIPTION, new StringFieldType(true, null, c.getIntegerParameter(table+".description.length", c.getIntegerParameter("classifier.description.length", 255))));
+    	}
     	s.setOptionalField(SORT_ORDER, new IntegerFieldType(false, 0));
     	try {
 			s.new Index("name_key",true,NAME);

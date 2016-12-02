@@ -75,7 +75,7 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
     }
     @Override
     public TableSpecification getDefaultTableSpecification(AppContext c,String homeTable){
-      TableSpecification spec = Classification.getTableSpecification(c);
+      TableSpecification spec = Classification.getTableSpecification(c,homeTable);
 	return spec;	
     }
     
