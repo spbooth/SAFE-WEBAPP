@@ -19,7 +19,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 
 /** Similar to {@link NameFinder} this interface supports a 
  * many-to-one name lookup. Where {@linkNameFinder} is intended to lookup
- * an object by name. This is intended to looup an owning object by the name of
+ * an object by name. This is intended to lookup an owning object by the name of
  * a client object.
  * 
  * @author spb
