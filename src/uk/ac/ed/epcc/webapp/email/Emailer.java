@@ -770,8 +770,16 @@ public class Emailer {
 			errorEmail.setProperties(props);
 		}
 		if (e != null) {
-			errorEmail.setProperty("subject_message", e.getMessage());
-			errorEmail.setProperty("exception_message", e.getMessage());
+			String message = e.getMessage();
+			String subject_message = message;
+			if( subject_message.contains("\n")){
+				subject_message.substring(0, subject_message.indexOf('\n'));
+			}
+			if( subject_message.length() > 64){
+				subject_message.substring(0, 64);
+			}
+			errorEmail.setProperty("subject_message", message);
+			errorEmail.setProperty("exception_message", message);
 			// Show stack trace
 			StringWriter stackTraceWriter = new StringWriter();
 			PrintWriter printWriter = new PrintWriter(stackTraceWriter);
