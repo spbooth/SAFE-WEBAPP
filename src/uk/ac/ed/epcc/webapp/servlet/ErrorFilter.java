@@ -198,7 +198,10 @@ public class ErrorFilter implements Filter {
 				long elapsed = System.currentTimeMillis()-start;
 				long max_wait=conn.getLongParameter("max.request.millis", 30000L);
 				if( elapsed > max_wait){
-					conn.getService(LoggerService.class).getLogger(getClass()).error("Long running page "+elapsed);
+					long milli = elapsed % 1000L;
+					long seconds = (elapsed / 1000L)%60;
+					long min = elapsed / 60000L;
+					conn.getService(LoggerService.class).getLogger(getClass()).error("Long running page "+String.format("%d:%02d.%03d", min,seconds,milli));
 				}
 				// remove the cached AppContext as this request object may be passed to
 				// the error-page and we are about to invalidate it
