@@ -89,7 +89,11 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	public void visitStringFieldType(StringFieldType stringFieldType) {
 		int len = stringFieldType.getMaxLEngth();
 		if( len < 256 ){
-			sb.append("VARCHAR(");
+			if( len < ctx.getContext().getIntegerParameter("table.min_varchar", 8) ){
+				sb.append("CHAR(");
+			}else{
+				sb.append("VARCHAR(");
+			}
 			sb.append(len);
 			sb.append(")");
 			doNull(stringFieldType);
