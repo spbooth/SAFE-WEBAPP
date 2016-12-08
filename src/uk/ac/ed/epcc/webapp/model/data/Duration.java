@@ -63,7 +63,7 @@ public class Duration extends Number implements Comparable<Duration> {
 	 * The ratio of seconds to value stored (1:SCALE). Changing this value will
 	 * change the accuracy of the object (larger numbers => greater accuracy).
 	 */
-	private static final long SCALE = 1000;
+	public static final long SCALE = 1000;
 
 	/**
 	 * SCALE represented as a double. DO NOT ALTER THIS VARIABLE. Alter SCALE

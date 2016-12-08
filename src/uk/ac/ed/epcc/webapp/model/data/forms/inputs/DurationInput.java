@@ -37,11 +37,20 @@ import uk.ac.ed.epcc.webapp.model.data.Duration;
 
 public class DurationInput extends ParseAbstractInput<Duration> implements FormatHintInput{
 
-	public DurationInput() {
+	private final long resolution;
+	public DurationInput(){
+		this(Duration.SCALE);
+	}
+	/** Constructor with custom resolution
+	 * 
+	 * @param resolution default resolution when converting from numbers
+	 */
+	public DurationInput(long resolution) {
 		super();
 		setBoxWidth(10);
 		setMaxResultLength(16);
 		setSingle(true);
+		this.resolution=resolution;
 	}
 
 	public void parse(String v) throws ParseException {
@@ -107,7 +116,7 @@ public class DurationInput extends ParseAbstractInput<Duration> implements Forma
 			return (Duration)v;
 		}
 		if( v instanceof Number){
-			return new Duration((Number)v);
+			return new Duration((Number)v,resolution);
 		}
 		throw new TypeError(v.getClass());
 	}
