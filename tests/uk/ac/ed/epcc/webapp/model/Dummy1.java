@@ -208,5 +208,12 @@ public class Dummy1 extends DataObject {
 		public boolean fieldExists(String name){
 			return res.hasField(name);
 		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getTarget()
+		 */
+		@Override
+		public Class<? super Dummy1> getTarget() {
+			return Dummy1.class;
+		}
     }
 }
