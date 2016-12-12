@@ -101,7 +101,7 @@ public class CommandLauncherTest extends WebappTestBase {
 		user.setRealmName(WebNameFinder.WEB_NAME,"fred");
 		user.setEmail("fred@example.com");
 		user.commit();
-		launcher.run(new String[]{"-U","fred@example.com","TestCommand","-E","fred"});
+		launcher.run(new String[]{"-U","fred@example.com","TestCommand","-E","fred@example.com"});
 		
 	}
 }
