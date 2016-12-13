@@ -208,7 +208,12 @@ public class ErrorFilter implements Filter {
 				req.setAttribute(APP_CONTEXT_ATTR, null);
 				
 				CleanupService cleanup = conn.getService(CleanupService.class);
-				if( CLEANUP_THREAD_FEATURE.isEnabled(conn) && cleanup != null && cleanup.hasActions()){
+				// Run cleanup in a seperate thread IF interactive and cleanup actions
+				// non interactive jobs always wait as they may be processing a lot of data in
+				// a loop and we don't want to exhaust the connection pool
+				SessionService sess = conn.getService(SessionService.class);
+				boolean interactive = sess != null && sess.haveCurrentUser();
+				if( interactive && CLEANUP_THREAD_FEATURE.isEnabled(conn) && cleanup != null && cleanup.hasActions()){
 					conn.clearService(CleanupService.class);
 					// cleanup in thread
 					Thread t = new Thread(new Closer(conn, cleanup, getLocalLogger(req,res)));
