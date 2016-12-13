@@ -107,6 +107,7 @@ public class DefaultDataBaseService implements DatabaseService {
 					}
 				}catch(SQLException e){
 					bad_tags.add(key);
+					error(e,"Failed to make SQLContext");
 					throw e;
 				}
 			}else{
