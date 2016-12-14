@@ -1773,7 +1773,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param homeTable
 	 */
 	protected void setComposites(AppContext ctx, String homeTable) {
-		String composite_list = ctx.getInitParameter(homeTable+".composites");
+		String composite_list = ctx.getExpandedProperty(homeTable+".composites");
 		// can't use getLogger as context not set yet
 		Logger logger = ctx.getService(LoggerService.class).getLogger(getClass());
 		

@@ -66,7 +66,7 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 		try{
 			last_call=new Date();
 
-			String listeners = conn.getInitParameter("heartbeat.listeners");
+			String listeners = conn.getExpandedProperty("heartbeat.listeners");
 
 			if( listeners == null || listeners.trim().length()==0){
 				out.println("No listeners");
