@@ -354,7 +354,6 @@ public final class AppContext {
 				setService(res);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new ConsistencyError("Error creating AppContextService "+clazz.getCanonicalName(),e);
 		} finally{
 			disable_service_creation = false;
