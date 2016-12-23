@@ -220,6 +220,9 @@ public class ErrorFilter implements Filter {
 					t.start();
 				}else{
 					try{
+						if( cleanup != null && cleanup.hasActions()){
+							cleanup.action();
+						}
 						conn.close();
 					}catch(Throwable t){
 						getLocalLogger(req,res).error("Error closing AppContext",t);
