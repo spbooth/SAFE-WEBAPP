@@ -274,7 +274,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		void setup(P peer) {
 
 			setPeerID(peer.getID());
-			setStartTime(new Date());
+			setStartTime(now(getContext())); 
 			setEndTime(new Date(ENDTIME));
 			setStatus(TAIL);
 			// make sure we don't have a field clash
@@ -300,7 +300,9 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 
 		@Override
 		public final void pre_commit(boolean dirty) throws DataFault {
-			if( getEndTimeAsDate().before(getStartTimeAsDate())){
+			Date end = getEndTimeAsDate();
+			Date start = getStartTimeAsDate();
+			if( end.before(start)){
 				throw new ConsistencyError("History object with reversed dates");
 			}
 		}
@@ -755,8 +757,8 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		return h;
 	}
 
-	private final Date now() {
-		return getContext().getService(CurrentTimeService.class).getCurrentTime();  // so tests can fix time
+	private static final Date now(AppContext conn) {
+		return conn.getService(CurrentTimeService.class).getCurrentTime();  // so tests can fix time
 	}
 
 	
@@ -812,7 +814,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 
 		HistoryRecord tail = null;
 		try {
-			tail = find(peer, now());
+			tail = find(peer, now(getContext()));
 			if( tail != null ){
 				tail.terminate();
 				tail.commit();
@@ -840,7 +842,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		// so
 		// regions match up exactly
 		HistoryRecord<P> tail = null;
-		Date now = now();
+		Date now = now(getContext());
 		try {
 			tail = find(peer, now,true);
 		} catch (uk.ac.ed.epcc.webapp.jdbc.exception.DataException e) {
