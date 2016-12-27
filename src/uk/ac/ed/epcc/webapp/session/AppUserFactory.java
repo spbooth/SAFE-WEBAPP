@@ -42,10 +42,10 @@ import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.PlaceHolderFieldType;
@@ -65,7 +65,6 @@ import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedDataCache;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
-import uk.ac.ed.epcc.webapp.servlet.RemoteAuthServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
 /** A Factory for creating {@link AppUser} objects that represent users of the system.
@@ -314,9 +313,6 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		if( ! service.hasRole(SessionService.ADMIN_ROLE)){
 			f.removeField(ALLOW_EMAIL_FIELD);
 		}
-		if( person != null ){
-			f.getField(EmailNameFinder.EMAIL).lock();
-		}
 	}
 	/** add Notes to be included in a signup/update form.
 	 * This is included within the block element above the
@@ -475,7 +471,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#makeFromString(java.lang.String)
 	 */
 	@Override
-	public AU makeFromString(String name) throws DataFault {
+	public final AU makeFromString(String name) throws DataFault {
 		AU result = findFromString(name);
 		if( result != null ){
 			return result;
@@ -484,12 +480,24 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		if(default_finder == null){
 			return null;
 		}
-		if( getContext().getBooleanParameter("auto_create_person."+getConfigTag(), false)){
-			result = makeBDO();
+		result = makeUser();
+		if( result != null){
 			default_finder.setName(result, name);
 			result.commit();
 		}
 		return result;
+	}
+	/** make an uncommited user suitable for automatic user creation.
+	 *  return null if automatic creation is not supported.
+	 * 
+	 * @return
+	 * @throws DataFault
+	 */
+	public AU makeUser() throws DataFault{
+		if( getContext().getBooleanParameter("auto_create_person."+getConfigTag(), false)){
+			return makeBDO();
+		}
+		return null;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#getDataCache()

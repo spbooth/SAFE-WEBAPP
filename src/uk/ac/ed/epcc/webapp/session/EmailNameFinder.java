@@ -125,8 +125,10 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		// Current target is allowed have to replace the default validator
 		field.removeValidator(new ParseFactoryValidator<AU>(this, null));
 		field.addValidator(new ParseFactoryValidator<AU>(this, target));
-		if( ! operator.hasRole(SessionService.ADMIN_ROLE)){
-			// only admin can edit in update
+		if( target.getEmail() != null && ! operator.hasRole(SessionService.ADMIN_ROLE)){
+			// only admin can edit in update However allow if email is unset
+			// This could happen if a external auth person is auto created outside of
+			// normal registration
 			field.lock();
 		}
 	}

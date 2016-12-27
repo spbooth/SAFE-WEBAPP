@@ -36,7 +36,6 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
  */
 
 public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNameFinder> extends Composite<AU, X> implements ParseFactory<AU>{
-	
 	private final String realm;
 	/**
 	 * @param factory {@link AppUserFactory} we are adding finder to.
@@ -109,29 +108,16 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 		}
 		try {
 			AU user = getFactory().find(getStringFinderFilter(getFactory().getTarget(), name),true);
-			if( user == null ){
-				return createFromString(name);
-			}
 			return user;
 		} catch ( DataNotFoundException dne){
-			return createFromString(name);
+			return null;
 		} catch (DataException e) {
 			getLogger().error("Error in name lookup",e);
 			return null;
 		}
 	}
 
-	/** An extension point to allow the {@link AppUser} to be automatically created from the name if not found.
-	 * 
-	 * This would be used if the external authentication mechanism can be queried for enough information to
-	 * create the account. Otherwise the user will be sent to the login/registration page.
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public AU createFromString(String name){
-		return null;
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#getType()
