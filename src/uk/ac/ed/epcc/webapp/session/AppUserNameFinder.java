@@ -35,7 +35,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
  *
  */
 
-public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNameFinder> extends Composite<AU, X> implements ParseFactory<AU>{
+public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNameFinder> extends AppUserComposite<AU, X> implements ParseFactory<AU>{
 	private final String realm;
 	/**
 	 * @param factory {@link AppUserFactory} we are adding finder to.

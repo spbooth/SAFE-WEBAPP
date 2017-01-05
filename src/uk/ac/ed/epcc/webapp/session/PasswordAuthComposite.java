@@ -14,7 +14,6 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
@@ -26,7 +25,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  *
  */
 
-public abstract class PasswordAuthComposite<T extends AppUser> extends Composite<T, PasswordAuthComposite<T>> {
+public abstract class PasswordAuthComposite<T extends AppUser> extends AppUserComposite<T, PasswordAuthComposite<T>> {
 	
 
 	/**
