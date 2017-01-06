@@ -104,7 +104,7 @@ for(Object key : provider.getTransitions(target)){
 			 	  <% 
 				}else{
 					%>
-					<button disabled name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>' title='<%=help %>'  value='<%=key.toString() %>' ><%=valueString%></button>
+					<button disabled name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>' title='<%=help %> (disabled)'  value='<%=key.toString() %>' ><%=valueString%></button>
 					<% 		
 				}
 			}
