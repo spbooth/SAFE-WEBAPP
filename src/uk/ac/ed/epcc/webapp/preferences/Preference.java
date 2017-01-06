@@ -103,5 +103,17 @@ public class Preference extends Feature {
 		}
 		return false;
 	}
-	
+	/** checks a {@link Preference} that is only defined by name (ie the name is generated dynamically)
+	 * 
+	 * @param conn
+	 * @param name
+	 * @return
+	 */
+	public static boolean checkDynamicPreference(AppContext conn, String name, boolean def,String desc){
+		Feature f = Feature.findFeatureByName(name);
+		if( f == null ){
+			f= new Preference(name,def,desc);
+		}
+		return f.isEnabled(conn);
+	}
 }
