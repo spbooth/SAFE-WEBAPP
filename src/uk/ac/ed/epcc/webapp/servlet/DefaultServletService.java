@@ -331,14 +331,7 @@ public class DefaultServletService implements ServletService{
 	 */
 	public Map<String,Object> makeParams(HttpServletRequest req)  {
 		Hashtable<String,Object> h = new Hashtable<String,Object>();
-		// h.putAll(req.getParameterMap());
-		for (Enumeration e = req.getParameterNames(); e.hasMoreElements();) {
-			String key =  (String) e.nextElement();
-			Object data=req.getParameter(key);
-			if( data != null ){
-			   h.put(key, data);
-			}
-		}
+		
 
 		String path = req.getPathInfo();
 		if (path != null) {
@@ -354,6 +347,16 @@ public class DefaultServletService implements ServletService{
 					key = val.substring(0, id).trim();
 					data = val.substring(id + 1).trim();
 				}
+				h.put(key, data);
+			}
+		}
+		// h.putAll(req.getParameterMap());
+		
+		// normal request parameters are higher precidence than those passed on the path
+		for (Enumeration e = req.getParameterNames(); e.hasMoreElements();) {
+			String key =  (String) e.nextElement();
+			Object data=req.getParameter(key);
+			if( data != null ){
 				h.put(key, data);
 			}
 		}
