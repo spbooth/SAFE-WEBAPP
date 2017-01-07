@@ -429,6 +429,10 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 					if(((ShowDisabledTransitions)provider).showDisabledTransition(ctx, target, key)){
 					builder.open("disabled");
 					  builder.attr("value",key.toString());
+					  String help=provider.getHelp(key);
+					  if( help != null ){
+						builder.attr("help",help+" (disabled)");
+					  }
 					builder.close();
 					}
 				}
