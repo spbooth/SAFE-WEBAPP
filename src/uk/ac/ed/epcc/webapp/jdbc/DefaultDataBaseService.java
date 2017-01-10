@@ -18,7 +18,6 @@ package uk.ac.ed.epcc.webapp.jdbc;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.SQLNonTransientConnectionException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -29,6 +28,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
+import uk.ac.ed.epcc.webapp.config.FilteredProperties;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -37,6 +37,14 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataError;
  * 
  * This gets connection parameters from the {@link ConfigService} but this is only queried
  * at the point where a database connection is required.
+ * 
+ * The following config parameters are read:
+ * <ul>
+ * <li> <b>db_name<i>[.tag]</b> connection url</li>
+ * <li> <b>db_type<i>[.tag]</b> connection type [mysql or postgres]</li>
+ * <li> <b>db_name<i>[.tag]</b> connection url</li>
+ * </ul>
+ * 
  * @author spb
  *
  */
@@ -168,20 +176,28 @@ public class DefaultDataBaseService implements DatabaseService {
 		String user = props.getProperty("db_username"+suffix,"").trim();
 		String pass = props.getProperty("db_password"+suffix,"").trim();
 		String type = props.getProperty("db_type"+suffix,"").trim();
+		
+		FilteredProperties db_props = new FilteredProperties(props, "db_prop",tag);
+		if( ! user.isEmpty()){
+			db_props.setProperty("user", user);
+		}
+		if( ! pass.isEmpty()){
+			db_props.setProperty("password", pass);
+		}
 		//System.out.println("ACTUAL "+name+" "+user+" "+pass+" "+type);
 		Connection conn;
 		if( name.length() == 0){
 			error("No DB connection name");
 			return null;
 		}
-		
-		if( pass.length() == 0 || user.length() == 0){
-			// try a passwordless connection
-			conn = java.sql.DriverManager.getConnection(name);
-			
-		}else{
-			conn =java.sql.DriverManager.getConnection(name, user, pass);
-		}
+		conn = java.sql.DriverManager.getConnection(name,db_props);
+//		if( pass.length() == 0 || user.length() == 0){
+//			// try a passwordless connection
+//			conn = java.sql.DriverManager.getConnection(name);
+//			
+//		}else{
+//			conn =java.sql.DriverManager.getConnection(name, user, pass);
+//		}
 		conn.setAutoCommit(true); // just in case
 		if( type.contains(POSTGRESQL_TYPE) || driver_name.contains(POSTGRESQL_TYPE)){
 			return new PostgresqlSQLContext(ctx,conn);

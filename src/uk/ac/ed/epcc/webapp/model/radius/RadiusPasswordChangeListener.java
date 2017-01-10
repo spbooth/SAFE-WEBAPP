@@ -40,12 +40,14 @@ public class RadiusPasswordChangeListener implements PasswordChangeListener, Con
 	private static final char[][] salt_chars = { { 'a', 'z' }, { 'A', 'Z' }, { '0', '9' }, {'.'},{'/'}};
 	private final AppContext conn;
 	private final String realm; // realm to use as username
+	private final String name_suffix;
 	/**
 	 * 
 	 */
 	public RadiusPasswordChangeListener(AppContext conn) {
 		this.conn=conn;
 		realm=conn.getInitParameter("radius.realmname",WebNameFinder.WEB_NAME);
+		name_suffix=conn.getInitParameter("radius.name_suffix");
 	}
 
 	/* (non-Javadoc)
@@ -71,7 +73,7 @@ public class RadiusPasswordChangeListener implements PasswordChangeListener, Con
 	public void setPassword(AppUser u, String password) {
 		RandomService serv = conn.getService(RandomService.class);
 		String salt = serv.randomString(salt_chars, 16);
-		String hash = Crypt.crypt(password.getBytes(), "$6$"+salt+"$");
+		String hash = Crypt.crypt(password.getBytes(), "$5$"+salt+"$");
 		update(getName(u), hash);
 	}
 	
@@ -101,6 +103,10 @@ public class RadiusPasswordChangeListener implements PasswordChangeListener, Con
 	}
 
 	private String getName(AppUser u){
-		return u.getRealmName(realm);
+		String realmName = u.getRealmName(realm);
+		if( name_suffix != null ){
+			return realmName+name_suffix;
+		}
+		return realmName;
 	}
 }

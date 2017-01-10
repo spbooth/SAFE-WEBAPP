@@ -128,7 +128,7 @@ public class SSLService implements Contexed, ConfigServiceListener, AppContextSe
         }
         InputStream fis = resources.getResourceAsStream(keystore);
         if( fis == null ){
-        	throw new ConsistencyError("No resoruce at "+keystore);
+        	throw new ConsistencyError("No resource at "+keystore);
         }
         KeyStore ks=KeyStore.getInstance(keytype);
         ks.load(fis, keypass.toCharArray());
