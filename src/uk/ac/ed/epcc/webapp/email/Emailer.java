@@ -178,7 +178,7 @@ public class Emailer {
 		}
 	}
 
-	/** Send an email requesting confiormation of a new Email address.
+	/** Send an email requesting confirmation of a new Email address.
 	 * 
 	 * @param person
 	 * @param req
