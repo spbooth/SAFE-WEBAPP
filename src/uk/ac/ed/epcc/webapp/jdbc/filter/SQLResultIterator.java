@@ -28,6 +28,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.model.data.Removable;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 /** Iterator over filter results based on the SQL parts of a filter
  * 
@@ -66,6 +67,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 		private int parm_pos = 1;
 
 		private O next;
+		private O prev = null;
 		
 		private int chunk = DEFAULT_CHUNKSIZE;
         private String tag;
@@ -227,6 +229,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 			}else{
 				throw new NoSuchElementException();
 			}
+			prev=result;
 			return result;
 		}
 
@@ -247,6 +250,15 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 		}
 
 		public final void remove() {
+			if( prev != null && prev instanceof Removable){
+				try {
+					((Removable) prev).remove();
+					chunkstart--;
+				} catch (DataException e) {
+					throw new UnsupportedOperationException(e);
+				}
+				
+			}
 			throw new UnsupportedOperationException(
 					"Cannot remove in BasicDataObject.Iterator");
 		}
@@ -270,6 +282,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 			//getLogger().debug("args "+start+","+max);
 			chunkstart = start;
 			maxreturn = max;
+			prev=null;
 			setFilter(f);
 			
 			StringBuilder query = new StringBuilder();
