@@ -128,7 +128,9 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 			if (useChunking() || maxreturn > 0) {
 				stmt.setInt(parm_pos, chunkstart);
 				stmt.setInt(parm_pos + 1, chunk);
-				//getLogger().debug("fetchChunk "+chunkstart+","+chunk+" maxreturn "+maxreturn);
+				if( DatabaseService.LOG_QUERY_FEATURE.isEnabled(conn)){
+				  getLogger().debug("fetchChunk "+chunkstart+","+chunk+" maxreturn "+maxreturn);
+				}
 			}
 			try{
 				if( timer != null ){
@@ -254,6 +256,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 				try {
 					((Removable) prev).remove();
 					chunkstart--;
+					return;
 				} catch (DataException e) {
 					throw new UnsupportedOperationException(e);
 				}

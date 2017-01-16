@@ -294,4 +294,29 @@ public class DummyFactoryTest extends DataObjectFactoryTestCase {
 		
 	}
 	
+	@Test
+	public void testRemove() throws DataException{
+		Dummy1.Factory fac = (Dummy1.Factory) getFactory();
+		
+		for(int i=0 ; i< 27 ; i++){
+			Dummy1 d = new Dummy1(ctx);
+			d.setName("Name"+i);
+			d.setNumber(i);
+			d.commit();
+		}
+		
+		assertEquals(27,fac.count(null));
+		
+		int count=0;
+		for(Iterator<Dummy1> it = fac.getResult(null).iterator(); it.hasNext();){
+			Dummy1 d = it.next();
+			it.remove();
+			count++;
+			assertEquals("number remaining" ,27-count,fac.count(null));
+		}
+		assertEquals(27, count);
+		assertEquals(0,fac.count(null));
+		assertFalse(fac.exists(null));
+	}
+	
 }

@@ -671,13 +671,21 @@ public final class Repository {
 				sb.append("=");
 				sb.append(getID());
 				Statement stmt = conn.createStatement();
-				int results = stmt.executeUpdate(sb.toString());
+				String query = sb.toString();
+				int results = stmt.executeUpdate(query);
+				if( DatabaseService.LOG_UPDATE.isEnabled(getContext())){
+					LoggerService serv = getContext().getService(LoggerService.class);
+					if( serv != null ){
+						serv.getLogger(getClass()).debug("delete query is "+query);
+					}
+				}
 				stmt.close();
 				// Destroy the connection to reduce strangeness of mis-use
 				boolean ok = (results == 1);
 				if (ok) {
 					clear();
 				}
+				
 
 			} catch (SQLException e) {
 				throw new DataFault("SQL Exception", e);
