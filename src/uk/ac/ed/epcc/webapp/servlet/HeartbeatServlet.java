@@ -15,19 +15,16 @@ package uk.ac.ed.epcc.webapp.servlet;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-
-
-
-
-
-
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -35,6 +32,14 @@ import uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 /** A servlet to trigger timed events from a remote cron job
+ * 
+ * Alternatively if the parameter <b>HeartbeatServlet.run_thread</b> is set to true
+ * the heartbeat will be run from a thread at a frequency of <b>HeartbeatServlet.repeat</b> minutes.
+ * 
+ * The default is not to run a thread but trigger the heartbeatservet from an external cron.
+ * this is to avoid multiple heartbeats in a fail-over or parallel deployment configuration 
+ * 
+ * 
  * @author spb
  *
  */
@@ -56,12 +61,28 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 	@Override
 	protected synchronized void doPost(HttpServletRequest req, HttpServletResponse res,
 			AppContext conn, String user) throws ServletException, IOException {
-		TimerService serv = conn.getService(TimerService.class);
-		long max_wait=conn.getLongParameter("max.heartbeat.millis", 60000L);
+		
+		
 		boolean ok=true;
 		res.setContentType("text/plain");
 		ServletOutputStream out = res.getOutputStream();
+		ok = runHeartbeat(conn, out);
+		if( ok ){
+			out.println("OK");
+		}else{
+			out.println("FAIL");
+		}
+		return;
+	}
+	public synchronized static Date getLastCall(){
+		return last_call;
+	}
+	
+	public synchronized boolean runHeartbeat(AppContext conn, ServletOutputStream out) throws IOException{
+		boolean ok=true;
+		long max_wait=conn.getLongParameter("max.heartbeat.millis", 60000L);
 		Logger log = getLogger(conn);
+		TimerService serv = conn.getService(TimerService.class);
 		if( serv != null ) serv.startTimer("Heartbeatlistener");
 		try{
 			last_call=new Date();
@@ -69,8 +90,10 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 			String listeners = conn.getExpandedProperty("heartbeat.listeners");
 
 			if( listeners == null || listeners.trim().length()==0){
-				out.println("No listeners");
-				return;
+				if( out != null ){
+					out.println("No listeners");
+				}
+				return ok;
 			}
 
 
@@ -79,10 +102,14 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 				try{
 					HeartbeatListener listener = conn.makeObject(HeartbeatListener.class, l);
 					if( listener != null ){
-						out.println("Running"+l);
+						if( out != null ){ 
+							out.println("Running"+l);
+						}
 						log.debug("Running "+l);
 						Date next = listener.run();
-						out.println("Next run expected "+next);
+						if( out != null ){ 
+							out.println("Next run expected "+next);
+						}
 						log.debug("Next run expected "+next);
 					}else{
 						log.error("No HearBeatListener constructed for tag "+l);
@@ -98,19 +125,78 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 		}finally{
 			if( serv != null ) serv.stopTimer("Heartbeatlistener");
 		}
-		if( ok ){
-			out.println("OK");
-		}else{
-			out.println("FAIL");
-		}
+		
 		long elapsed = (System.currentTimeMillis() - last_call.getTime());
 		if( elapsed > max_wait ){
 			log.warn("Long heartbeat run "+(elapsed/1000L)+" seconds");
 		}
-		return;
+		return ok;
 	}
-	public synchronized static Date getLastCall(){
-		return last_call;
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.GenericServlet#init(javax.servlet.ServletConfig)
+	 */
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+		try{
+
+			AppContext conn = ErrorFilter.makeContext(config.getServletContext(), null, null);
+			boolean run_thread = conn.getBooleanParameter("HeartbeatServlet.run_thread",false);
+			long repeat = conn.getLongParameter("HeartbeatServlet.repeat", 5);
+
+
+			if( run_thread ){
+				runner = new Runner(config);
+				ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
+				service.scheduleWithFixedDelay(runner, repeat, repeat, TimeUnit.MINUTES);
+			}
+		}catch(Throwable t){
+			config.getServletContext().log("Error checking for heartbeat-thread", t);
+		}
+	}
+	public Runner runner=null;
+	public ScheduledExecutorService service=null;
+	public class Runner implements Runnable{
+		public Runner(ServletConfig config) {
+			super();
+			this.config = config;
+			
+		}
+
+		private final ServletConfig config;
+		
+		/* (non-Javadoc)
+		 * @see java.lang.Thread#run()
+		 */
+		@Override
+		public void run() {
+			
+			try {
+				AppContext conn = ErrorFilter.makeContext(config.getServletContext(), null, null);
+				runHeartbeat(conn, null);
+				conn.close();
+			} catch (Exception e) {
+				config.getServletContext().log("Error in Runner", e);
+			}
+
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.GenericServlet#destroy()
+	 */
+	@Override
+	public void destroy() {
+		if( service != null ){
+			try {
+				service.awaitTermination(15, TimeUnit.MINUTES);
+			} catch (InterruptedException e) {
+				
+			}
+			service.shutdown();
+		}
+		super.destroy();
 	}
 
 }
