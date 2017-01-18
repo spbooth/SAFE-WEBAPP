@@ -112,7 +112,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	}
 
 	public abstract static class Entry<L extends Indexed, F extends LogFactory, O extends DataObject>
-			extends DataObject {
+			extends DataObject implements Removable {
 		protected F item_factory;
 
 		private O my_query;

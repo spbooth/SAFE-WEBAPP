@@ -36,7 +36,7 @@ public interface Removable {
 	 * 
 	 * It should delete any dependent data then call {@link DataObject#delete}
 	 * 
-	 * @throws DataException
+	 * @throws Exception 
 	 */
-  public void remove() throws DataException;
+  public void remove() throws Exception;
 }

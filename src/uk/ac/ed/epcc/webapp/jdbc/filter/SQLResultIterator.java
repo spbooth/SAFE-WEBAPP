@@ -257,7 +257,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 					((Removable) prev).remove();
 					chunkstart--;
 					return;
-				} catch (DataException e) {
+				} catch (Exception e) {
 					throw new UnsupportedOperationException(e);
 				}
 				
