@@ -179,7 +179,9 @@ public abstract class DataObject implements ContextIndexed, Identified{
 	 * Used to remove the data from the database - USE WITH CAUTION!
 	 * 
 	 * In particular deleting records from within an iterator may 
-	 * throw off record chunking.
+	 * throw off record chunking. Instead the object should implement {@link Removable}
+	 * and be removed from iterator (which will recursively call delete).
+	 * 
 	 * @return <code>true</code> if the object was successfully deleted.
 	 * @throws DataFault
 	 */

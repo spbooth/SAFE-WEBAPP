@@ -145,11 +145,21 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  *   number of milliseconds in the desired unit.</li>
  *   <li>StreamData values are always added as binary streams so they can be stored in blob types.</li> 
  * </ul>
+ * 
+ * If a string attribute {@link Repository#BACKUP_SUFFIX_ATTR} is stored in the {@link AppContext}
+ * then this name will be used as a table name suffix to create backup tables where deleted records will be
+ * copied before being deleted in the main table. This is intended to allow
+ * old data to be backed up as part of a purge of data from a live table.
  * @author spb
  * 
  */
 
 public final class Repository {
+	/**
+	 * 
+	 */
+	public static final String BACKUP_SUFFIX_ATTR = "BackupSuffix";
+
 	/**
 	 * 
 	 */
@@ -613,7 +623,8 @@ public final class Repository {
 		 */
         @SuppressWarnings("unchecked")
 	    synchronized void copy(Record r){
-        	if( Repository.this != r.getRepository() ){
+        	// We allow copy to backup tables.
+        	if( Repository.this != r.getRepository()  ){
         		throw new ConsistencyError("copying Record from different repository");
         	}
         	clear();
@@ -625,6 +636,22 @@ public final class Repository {
         	if( r.dirty != null){
         		dirty=new HashSet( r.dirty );
         	}
+        }
+        
+        public void backup() throws DataFault{
+        	Repository store = getBackup();
+        	if( store == null ){
+        		return;
+        	}
+        	Record b = store.new Record();
+        	b.putAll(this);
+        	try {
+				b.setID(getID(), false);
+			} catch (DataException e) {
+				// should not get this if require existing is false
+				throw new ConsistencyError("unexpected exception", e);
+			} 
+        	b.commit();
         }
         /** Get a map of the contents without the UniqueID field
          * 
@@ -646,14 +673,15 @@ public final class Repository {
 		 * delete the corresponding database entry and restore the Record to
 		 * uninitialised state.
 		 * 
-		 * @throws DataFault
 		 * @throws ConsistencyError
+		 * @throws DataFault 
 		 */
-		public synchronized void delete() throws DataFault, ConsistencyError {
+		public synchronized void delete() throws ConsistencyError, DataFault {
 			if (!have_id) {
 				clear();
 				return;
 			}
+			backup();
 			try {
 				Connection conn = sql.getConnection();
 				if (conn == null) {
@@ -1738,6 +1766,40 @@ public final class Repository {
 		use_cache = new Feature(CACHE_FEATURE_PREFIX+tag_name, false,"Use record cache for "+tag_name).isEnabled(c);
 		
 		use_id = REQUIRE_ID_KEY.isEnabled(c) || new Feature(USE_ID_PREFIX+tag_name,true,"Use integer id-key for table "+tag_name).isEnabled(c);
+	}
+	
+	public void createBackupTable(String name) throws SQLException{
+		Connection c = sql.getConnection();
+		Statement stmt = c.createStatement();
+		StringBuilder sb = new StringBuilder();
+		sb.append("CREATE TABLE IF NOT EXISTS ");
+		sql.quote(sb, name);
+		sb.append(" LIKE ");
+		addTable(sb, true);
+		stmt.executeUpdate(sb.toString());
+		stmt.close();
+	}
+	private Repository backup=null;
+	/** create a backup table structured like this one if backups are enabled.
+	 *  
+	 * @return Repository or null
+	 * @throws DataFault
+	 */
+	public Repository getBackup() throws DataFault{
+		try{
+			String suffix = (String) getContext().getAttribute(BACKUP_SUFFIX_ATTR);
+			if( suffix == null){
+				return null;
+			}
+			if( backup == null ){
+				String backup_name = table_name+suffix;
+				createBackupTable(backup_name);
+				backup = getInstance(getContext(), backup_name);
+			}
+			return backup;
+		}catch(Throwable t){
+			throw new DataFault("Error creating backup repository",t);
+		}
 	}
 	public static String TableToTag(AppContext c, String tag) {
 		return c.getInitParameter("tag."+tag,tag);

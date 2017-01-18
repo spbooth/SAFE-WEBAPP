@@ -265,8 +265,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 			if (data instanceof Removable) {
 				((Removable) data).remove();
 			}
-			setLink(null);
-			commit();
+			delete();
 		}
 
 		/**
@@ -556,16 +555,10 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	public final void purge(O q) throws DataFault{
 		for (Iterator<T> it = getLog(q); it.hasNext();) {
 			T i = it.next();
-			try {
-				// clear data and mark item as ready for purge.
-				// This is NOT safe if multiple purges are run on the same
-				// owner at the same time.
-				i.remove();
-			} catch (Exception e) {
-				getContext().error(e, "Error removing LogItem");
-			}
+			it.remove();
+			
 		}
-		purgeMarked(q);
+		
 	}
 	/** purge all orphan entries.
 	 * Only works if the {@link LogOwner} is a {@link DataObjectFactory}.
@@ -573,31 +566,12 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 */
 	public final void purgeOrphan() throws DataFault{
 		if( owner_factory instanceof DataObjectFactory){
-			for (T i : new FilterSet(new OrphanReferenceFilter(this, OWNER_ID, (DataObjectFactory) owner_factory))){
-				try {
-					// clear data and mark item as ready for purge.
-					i.remove();
-				} catch (Exception e) {
-					getContext().error(e, "Error removing LogItem");
-				}
+			for (Iterator<T> it =new FilterIterator(new OrphanReferenceFilter(this, OWNER_ID, (DataObjectFactory) owner_factory)); it.hasNext();){
+				it.remove();
 			}
-			purgeMarked(null);
 		}
 	}
-	/** Purge any log-items that are marked for deletion
-	 * 
-	 * @param q
-	 * @throws DataFault 
-	 */
-	protected final void purgeMarked(O q) throws DataFault{
-		SQLAndFilter<T> delete_fil = new SQLAndFilter<T>(getTarget());
-		if( q != null ){
-			delete_fil.addFilter(new ReferenceFilter<T, O>(this, OWNER_ID, q));
-		}
-		delete_fil.addFilter(new SQLValueFilter<T>(getTarget(), res, LINK_ID, 0));
-		FilterDelete<T> deleter = new FilterDelete<T>(res);
-		deleter.delete(delete_fil);
-	}
+	
 	public Iterator<T> getLog(O q) throws DataFault {
 		return new FilterIterator(new ReferenceFilter<T, O>(this, OWNER_ID, q));
 	}

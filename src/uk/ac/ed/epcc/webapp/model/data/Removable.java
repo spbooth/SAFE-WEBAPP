@@ -19,15 +19,25 @@ package uk.ac.ed.epcc.webapp.model.data;
 import com.sun.org.apache.xalan.internal.xsltc.dom.FilterIterator;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-/** Interface for objects that can be removed from a {@link FilterIterator}
+/** Interface for {@link DataObject}s that can be removed from a {@link FilterIterator}
+ * Classes that implement this should therefore have a well defined iteration order
+ * that won't per permuted if elements from the start of the sequence are removed.
+ * 
  * 
  * It is also implemented by the target classes of Log Entry
- * If this interface is implemeted the class provides a method to be called when the
+ * If this interface is implemented the class provides a method to be called when the
  * parent Entry is deleted.
  * 
  * @author spb
  *
  */
 public interface Removable {
+
+	/** This method removes the record
+	 * 
+	 * It should delete any dependent data then call {@link DataObject#delete}
+	 * 
+	 * @throws DataException
+	 */
   public void remove() throws DataException;
 }
