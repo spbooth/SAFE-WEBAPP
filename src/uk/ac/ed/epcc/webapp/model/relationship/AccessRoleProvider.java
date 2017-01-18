@@ -48,6 +48,7 @@ public interface AccessRoleProvider<U extends AppUser,T extends DataObject> {
 	 * to allow the {@link SessionService} to combine and customise access rules.
 	 * 
 	 * @param role
+	 * @param user 
 	 * @return {@link BaseFilter} or null
 	 */
 	public BaseFilter<T> hasRelationFilter(String role, U user);
