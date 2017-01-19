@@ -57,6 +57,7 @@ import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.Removable;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
 import uk.ac.ed.epcc.webapp.model.data.filter.OrphanFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
@@ -261,9 +262,15 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		 * @throws Exception
 		 */
 		public final void remove() throws Exception {
-			L data = getLink();
-			if (data instanceof Removable) {
-				((Removable) data).remove();
+			try{
+				L data = getLink();
+				if (data != null && data instanceof Removable) {
+					((Removable) data).remove();
+				}
+			}catch(DataNotFoundException e){
+				// We are removing anyway so carry on
+				// Might be something we already removed
+				getLogger().error("Link not found",e);
 			}
 			delete();
 		}
