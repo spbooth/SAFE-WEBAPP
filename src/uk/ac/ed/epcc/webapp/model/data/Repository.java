@@ -660,7 +660,7 @@ public final class Repository {
         			stmt.executeUpdate();
         			return;
         		}catch(SQLException e){
-        			e.printStackTrace();
+        			throw new DataFault("Error in backup "+sb.toString(),e);
         		}
         	}
         	Record b = store.new Record();
