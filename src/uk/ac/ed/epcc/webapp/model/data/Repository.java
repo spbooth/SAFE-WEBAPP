@@ -660,7 +660,7 @@ public final class Repository {
         			stmt.executeUpdate();
         			return;
         		}catch(SQLException e){
-        			
+        			e.printStackTrace();
         		}
         	}
         	Record b = store.new Record();
