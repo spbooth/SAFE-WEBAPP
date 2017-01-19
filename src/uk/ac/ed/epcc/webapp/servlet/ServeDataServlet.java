@@ -24,6 +24,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.model.serv.ServeDataProducer;
 import uk.ac.ed.epcc.webapp.session.SessionDataProducer;
@@ -83,6 +84,10 @@ public class ServeDataServlet extends WebappServlet {
 			if( ! res.isCommitted()){
 				res.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			}
+			return;
+		}catch(DataNotFoundException dne){
+			// No logging just an expired/wrong url
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}catch(DataException e){
 			getLogger(conn).error("Data error in ServeDataServlet",e);
