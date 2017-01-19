@@ -648,7 +648,7 @@ public final class Repository {
         		StringBuilder sb = new StringBuilder();
         		try{
 
-        			sb.append("INSERT INTO ");
+        			sb.append("REPLACE INTO ");
         			store.addTable(sb, true);
         			sb.append(" SELECT * FROM ");
         			getRepository().addTable(sb, true);
