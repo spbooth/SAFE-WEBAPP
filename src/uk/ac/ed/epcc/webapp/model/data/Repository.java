@@ -178,6 +178,7 @@ public final class Repository {
 
 	public static final Feature READ_ONLY_FEATURE = new Feature("read-only",false,"supress (most) database writes");
 	
+	public static final Feature BACKUP_WITH_SELECT = new Feature("repository.backup_by_select",true,"Use select/insert when backing up a record");
 	private static final DateFormat dump_format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss SSS");
 	
 	/** information about indexes
@@ -643,15 +644,34 @@ public final class Repository {
         	if( store == null ){
         		return;
         	}
-        	Record b = store.new Record();
-        	b.putAll(this);
-        	try {
-				b.setID(getID(), false);
-			} catch (DataException e) {
-				// should not get this if require existing is false
-				throw new ConsistencyError("unexpected exception", e);
-			} 
-        	b.commit();
+        	if( BACKUP_WITH_SELECT.isEnabled(getContext())){
+        		try{
+        			StringBuilder sb = new StringBuilder();
+        			sb.append("INSERT INTO ");
+        			store.addTable(sb, true);
+        			sb.append(" SELECT * FROM ");
+        			getRepository().addTable(sb, true);
+        			sb.append(" WHERE ");
+        			getRepository().addUniqueName(sb, true, true);
+        			sb.append("=?");
+        			PreparedStatement stmt = sql.getConnection().prepareStatement(sb.toString());
+        			stmt.setInt(1, getID());
+        			stmt.executeUpdate();
+
+        		}catch(SQLException e){
+        			throw new DataFault("Error in backup", e);
+        		}
+        	}else{
+        		Record b = store.new Record();
+        		b.putAll(this);
+        		try {
+        			b.setID(getID(), false);
+        		} catch (DataException e) {
+        			// should not get this if require existing is false
+        			throw new ConsistencyError("unexpected exception", e);
+        		} 
+        		b.commit();
+        	}
         }
         /** Get a map of the contents without the UniqueID field
          * 
