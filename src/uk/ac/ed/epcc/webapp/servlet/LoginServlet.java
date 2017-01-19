@@ -127,18 +127,23 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 					return;
 				}
 				if (person_fac.isRegisteredUsername(username)) {
-					log.info("new password requested for " + username);
-					T user = person_fac
-							.findByEmail(username);
-					if( ! user.canLogin() ){
-						message(conn,req,res,"login_disabled");
-						return;
+					try{
+						log.info("new password requested for " + username);
+						T user = person_fac
+								.findFromString(username); // This corresponds to the registered username test above
+						if( ! user.canLogin() ){
+							message(conn,req,res,"login_disabled");
+							return;
+						}
+						if( ! password_auth.canResetPassword(user)){
+							message(conn, req, res, "new_password_failed");
+							return;
+						}
+						password_auth.newPassword(user);
+					}catch(Throwable t){
+						getLogger(conn).error("Error getting registered user or sending new password",t);
+						message(conn,req,res,"internal_error");
 					}
-					if( ! password_auth.canResetPassword(user)){
-						message(conn, req, res, "new_password_failed");
-						return;
-					}
-					password_auth.newPassword(user);
 				} else {
 					log.warn(" new password requested for invalid account "
 							+ username);
