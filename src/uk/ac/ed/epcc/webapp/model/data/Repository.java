@@ -645,8 +645,9 @@ public final class Repository {
         		return;
         	}
         	if( BACKUP_WITH_SELECT.isEnabled(getContext())){
+        		StringBuilder sb = new StringBuilder();
         		try{
-        			StringBuilder sb = new StringBuilder();
+
         			sb.append("INSERT INTO ");
         			store.addTable(sb, true);
         			sb.append(" SELECT * FROM ");
@@ -657,21 +658,21 @@ public final class Repository {
         			PreparedStatement stmt = sql.getConnection().prepareStatement(sb.toString());
         			stmt.setInt(1, getID());
         			stmt.executeUpdate();
-
+        			return;
         		}catch(SQLException e){
-        			throw new DataFault("Error in backup", e);
+        			
         		}
-        	}else{
-        		Record b = store.new Record();
-        		b.putAll(this);
-        		try {
-        			b.setID(getID(), false);
-        		} catch (DataException e) {
-        			// should not get this if require existing is false
-        			throw new ConsistencyError("unexpected exception", e);
-        		} 
-        		b.commit();
         	}
+        	Record b = store.new Record();
+        	try {
+        		b.setID(getID(), false);
+        	} catch (DataException e) {
+        		// should not get this if require existing is false
+        		throw new ConsistencyError("unexpected exception", e);
+        	} 
+        	b.putAll(this);
+        	b.commit();
+
         }
         /** Get a map of the contents without the UniqueID field
          * 
