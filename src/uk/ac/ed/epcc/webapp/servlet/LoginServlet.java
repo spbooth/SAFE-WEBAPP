@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -70,6 +71,8 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	
+	public static final Feature REPORT_ACCOUNT_NOT_FOUND = new Feature("login.report_account_not_found",true,"Users are explicitly informed if resetting an account hat is not found");
 	/**
 	 * 
 	 */
@@ -122,15 +125,13 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 					message(conn, req, res, "no_email_specified");
 					return;
 				}
-				if( ! Emailer.checkAddress(username)){
-					message(conn, req, res, "new_password_failed");
-					return;
-				}
-				if (person_fac.isRegisteredUsername(username)) {
+				T user = person_fac
+						.findFromString(username);
+				// User can supply any of their valid ids not just email.
+				if (user != null ) {
 					try{
 						log.info("new password requested for " + username);
-						T user = person_fac
-								.findFromString(username); // This corresponds to the registered username test above
+						 // This corresponds to the registered username test above
 						if( ! user.canLogin() ){
 							message(conn,req,res,"login_disabled");
 							return;
@@ -145,6 +146,15 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 						message(conn,req,res,"internal_error");
 					}
 				} else {
+					if(REPORT_ACCOUNT_NOT_FOUND.isEnabled(conn)){
+						message(conn,req,res,"account_not_found",username);
+						return;
+					}
+					// Non matching ids give an error if not an error
+					if( ! Emailer.checkAddress(username)){
+						message(conn, req, res, "new_password_failed");
+						return;
+					}
 					log.warn(" new password requested for invalid account "
 							+ username);
 				}
@@ -152,7 +162,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 				req.setAttribute("page_name", "the Login Page");
 				req.setAttribute("page_url", getLoginPage(conn)+"?username="
 						+ encodeCGI(username));
-				message(conn, req, res, "new_password_emailed", username, Emailer.PASSWORD_RESET_SERVLET.isEnabled(conn)? "password reset link" :"new password");
+				message(conn, req, res, "new_password_emailed", username , Emailer.PASSWORD_RESET_SERVLET.isEnabled(conn)? "password reset link" :"new password");
 				return;
 			}
 			log.info("login requested for " + username);
