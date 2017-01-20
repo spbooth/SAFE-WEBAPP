@@ -28,6 +28,8 @@ import java.util.TreeSet;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.PreRequisiteService;
+import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
@@ -50,16 +52,47 @@ import uk.ac.ed.epcc.webapp.model.relationship.GlobalRoleFilter;
 import uk.ac.ed.epcc.webapp.model.relationship.RelationshipProvider;
 /** Abstract base implementation of {@link SessionService}
  * 
+ * A config parameter of the form <b>use_role.<i>role-name</i></b> defines a role-name mapping
+ * the value of the parameter is the actual role queried. 
  * 
+ * 
+ * Relationships are configured via the {@link ConfigService} by setting:
+ * <b>use_relationship.<em>factory-tag</em>.<em>role</em></b>
+ * If this is a comma separated list it implies an OR of the component parts.
+ * within this AND combinations can be specified as + separated terms.
+ * 
+ * The factory (or its {@link Composite}s) can implement {@link AccessRoleProvider} to provide roles.
+ * 
+ * Role names containing a period are qualified names the qualifier can be:
+ * <ul>
+ * <li> <b>global</b> the role is a global role not a relationship.</li>
+ * <li> <b>boolean</b> Use a boolean filter so all/none relationships match.</li>
+ * <li> <em>factory-tag</em> un-modified role from factory or {@link Composite}.</li>
+ * <li> The tag of a {@link RelationshipProvider} for the target.</li>
+ * <li> The tag of a {@link AccessRoleProvider}</li>
+ * </ul> 
  * 
  * @author spb
  *
  * @param <A>
  */
+@PreRequisiteService(ConfigService.class)
 public abstract class AbstractSessionService<A extends AppUser> implements Contexed, SessionService<A>{
+	/** prefix for relationship definitions that map to a global role
+	 * 
+	 */
+	private static final String GLOBAL_ROLE_RELATIONSHIP_BASE = "global";
+	/** prefix for relationship definitions that map to a boolean filter
+	 * 
+	 */
+	private static final String BOOLEAN_RELATIONSHIP_BASE = "boolean";
+	/**
+	 * 
+	 */
+	private static final String USE_RELATIONSHIP_PREFIX = "use_relationship.";
 	/** Property prefix to allow role name aliasing.
-	 * The property use_role.<i>name</i> defines a role name to use
-	 * instead of name.
+	 * The property use_role.<i>name</i> defines a role-name mapping. 
+	 * 
 	 * 
 	 */
 	public static final String USE_ROLE_PREFIX = "use_role.";
@@ -137,6 +170,13 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		public final String tag;
 		public final int id;
 		public final String role;
+		/* (non-Javadoc)
+		 * @see java.lang.Object#toString()
+		 */
+		@Override
+		public String toString() {
+			return "RelationshipTag [tag=" + tag + ", id=" + id + ", role=" + role + "]";
+		}
 	}
 	private Map<RelationshipTag,Boolean> relationship_map=null;
 	// map of roles to filters.
@@ -848,7 +888,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		String store_tag=fac.getTag()+"."+role;
 		BaseFilter<? super T> result = roles.get(store_tag);
 		if( result == null ){
-			result = makeRelationshipRoleFilter(fac,role,null);
+			result = makeRelationshipRoleFilter(fac,role,null,null);
 			roles.put(store_tag, result);
 		}
 		return result;
@@ -880,7 +920,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			//result = new AndFilter<T>(fac.getTarget(),
 			//		fac.getDefaultRelationshipFilter(),
 			//		makeRelationshipRoleFilter(fac,role,person));
-			result = makeRelationshipRoleFilter(fac,role,person);
+			result = makeRelationshipRoleFilter(fac,role,person,null);
 			roles.put(store_tag, result);
 		}
 		return result;
@@ -899,6 +939,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * Role names containing a period are qualified names the qualifier can be:
 	 * <ul>
 	 * <li> <b>global</b> the role is a global role not a relationship.</li>
+	 * <li> <b>boolean</b> Use a boolean filter so all/none relationships match.</li>
 	 * <li> <em>factory-tag</em> un-modified role from factory or {@link Composite}.</li>
 	 * <li> The tag of a {@link RelationshipProvider} for the target.</li>
 	 * <li> The tag of a {@link AccessRoleProvider}</li>
@@ -907,10 +948,11 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * @param fac2   target factory
 	 * @param role   relationship string
 	 * @param person person to query (null for current person)
+	 * @param def default query to use if no definition (pass null to throw exception)
 	 * @return
 	 * @throws UnknownRelationshipException 
 	 */
-	protected <T extends DataObject> BaseFilter<? super T> makeRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,A person) throws UnknownRelationshipException {
+	protected <T extends DataObject> BaseFilter<? super T> makeRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,A person,BaseFilter<T> def) throws UnknownRelationshipException {
 		if( searching_roles.contains(role)){
 			// recursive creation
 			throw new UnknownRelationshipException("recursive definition of "+role);
@@ -948,7 +990,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    	int pos = role.indexOf('.');
 	    	String base =role.substring(0, pos);
 	    	String sub = role.substring(pos+1);
-	    	if( base.equals("global")){
+	    	if( base.equals(GLOBAL_ROLE_RELATIONSHIP_BASE)){
 	    		if( person == null){
 	    			// Only the global role filter can allow relationship without a current person
 	    			// as roles may be asserted from the container.
@@ -956,6 +998,11 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    		}else{
 	    			return new GenericBinaryFilter<T>(fac2.getTarget(),false);
 	    		}
+	    	}
+	    	if( base.equals(BOOLEAN_RELATIONSHIP_BASE)){
+	    		
+	    		return new GenericBinaryFilter<T>(fac2.getTarget(),Boolean.valueOf(sub));
+	    		
 	    	}
 	    	if( person == null && ! haveCurrentUser()){
 	    		return new GenericBinaryFilter<T>(fac2.getTarget(),false);
@@ -965,7 +1012,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    		// This is a reference a factory/composite role from within a redefined
 	    		// definition. direct roles can be qualified if we want qualified names cannot
 	    		// be overridden. 
-	    		BaseFilter<? super T> result = makeDirectRelationshipRoleFilter(fac2, sub,person);
+	    		BaseFilter<? super T> result = makeDirectRelationshipRoleFilter(fac2, sub,person,null);
 	    		if( result != null ){
 	    			return result;
 	    		}
@@ -990,13 +1037,15 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    		}
 	    	}
 	    	// direct roles can be un-qualified though not if we want multiple levels of qualification.
-	    	BaseFilter<? super T> result = makeDirectRelationshipRoleFilter(fac2, role,person);
+	    	BaseFilter<? super T> result = makeDirectRelationshipRoleFilter(fac2, role,person,null);
 			if( result != null ){
 				return result;
 			}
 	    }
-		
-		throw new UnknownRelationshipException(role);
+		if( def == null){
+			throw new UnknownRelationshipException(role);
+		}
+		return def;
 		}finally{
 			searching_roles.remove(role);
 		}
@@ -1033,7 +1082,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    	int pos = role.indexOf('.');
 	    	String base =role.substring(0, pos);
 	    	String sub = role.substring(pos+1);
-	    	if( base.equals("global")){
+	    	if( base.equals(GLOBAL_ROLE_RELATIONSHIP_BASE)){
 	    		// roles don't enumerate
 	    		return new GenericBinaryFilter<A>(target_type,false);
 	    	}
@@ -1070,7 +1119,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * @param role
 	 * @throws UnknownRelationshipException 
 	 */
-	protected <T extends DataObject> BaseFilter<? super T> makeDirectRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,A person) throws UnknownRelationshipException {
+	protected <T extends DataObject> BaseFilter<? super T> makeDirectRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,A person,BaseFilter<T> def) throws UnknownRelationshipException {
 		// look for directly implemented relations first
 		BaseFilter<? super T> result=null;
 	    if( fac2 instanceof AccessRoleProvider){  // first check factory itself.
@@ -1087,9 +1136,13 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    	}
 	    }
 	    // Its not one of the directly implemented roles maybe its derived
-	    String defn = getContext().getInitParameter("use_relationship."+fac2.getTag()+"."+role);
+	    String defn = getContext().getInitParameter(USE_RELATIONSHIP_PREFIX+fac2.getTag()+"."+role);
 	    if( defn != null){
-	    	return makeRelationshipRoleFilter(fac2, defn,person);
+	    	// don't pass def as it is the sub-defn that is not resolving
+	    	return makeRelationshipRoleFilter(fac2, defn,person,null);
+	    }
+	    if( def != null){
+	    	return def;
 	    }
 	    // unrecognised role
 	    throw new UnknownRelationshipException(role);
@@ -1110,7 +1163,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    	}
 	    }
 	 // Its not one of the directly implemented roles maybe its derived
-	    String defn = getContext().getInitParameter("use_relationship."+fac2.getTag()+"."+role);
+	    String defn = getContext().getInitParameter(USE_RELATIONSHIP_PREFIX+fac2.getTag()+"."+role);
 	    if( defn != null){
 	    	return makePersonInRelationshipRoleFilter(fac2, defn,target);
 	    }
