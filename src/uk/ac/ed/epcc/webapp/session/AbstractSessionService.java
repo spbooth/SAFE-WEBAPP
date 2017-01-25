@@ -368,27 +368,29 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * 
 	 * @param name of role to be tested
 	 * @return true if person has role.
-	
 	 * 
 	 */
 	public final boolean hasRole(String name){
 		// role name aliasing
+		
+		//The cahHaveRole method caches its result
+		// but we still want to save the answer for
+		// the original query. shortcutTest must bypass
+		// all caching
 		String role=null;
-		if( canHaveRole(name)){ // check queried role first
+		if( shortcutTestRole(name) || canHaveRole(name)){ // check queried role first
 			role = name;
 		}else{
-			String list=mapRoleName(name);
-			if( ! list.equals(name)){
-				// consider each equivalent role in turn
-				for(String r : list.split(",")){
-					if( canHaveRole(r)){
-						role=r;
-					}
+			for(String r : getRoleSet(null, name)){
+				if( ! r.equals(name) && canHaveRole(r)){
+					role=r;
+					cacheRole(name, true); // remember result of expansion
 				}
 			}
 		}
 		if( role == null){
 			// none of the equivalents are allowed
+			cacheRole(name, false);
 			return false;
 		}
 		
@@ -405,12 +407,34 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		
 	}
 
-	/**
+	/** map role name to a comma separated list of alternative roles to check.
+	 * 
+	 * Note the original name should always be checked explicitly first
+	 * with the alternatives only checked if 
+	 * 
 	 * @param name
-	 * @return
+	 * @return 
 	 */
 	public String mapRoleName(String name) {
 		return getContext().getInitParameter(USE_ROLE_PREFIX+name, name);
+	}
+	
+	private Set<String> getRoleSet(Set<String> set, String name){
+		Set<String> result=set;
+		if( set == null){
+			set = new HashSet<>();
+		}
+		if( set.contains(name)){
+			return set;
+		}
+		set.add(name);
+		String alt_list = mapRoleName(name);
+		if( alt_list != null && ! alt_list.isEmpty()){
+			for(String c : alt_list.split("\\s*,\\s*")){
+				getRoleSet(set,c);
+			}
+		}
+		return set;
 	}
 	public boolean hasRoleFromList(String ...roles){
 		if( roles == null ){
@@ -453,9 +477,6 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		if( role == null ){
 			return false;
 		}
-		if( shortcutTestRole(role)){
-			return true;
-		}
 		if (role_map == null) {
 			role_map = setupRoleMap();
 		}
@@ -471,6 +492,18 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		}
 		return answer.booleanValue();
 		
+	}
+	
+	/** updates the cached result
+	 * 
+	 * @param role
+	 * @param value
+	 */
+	private void cacheRole(String role, boolean value){
+		if (role_map == null) {
+			role_map = setupRoleMap();
+		}
+		role_map.put(role, Boolean.valueOf(value));
 	}
 
 	/** perform a non-cached role-check. 
@@ -868,8 +901,8 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * @return
 	 */
     private boolean canHaveRoleWithMapping(A user, String role){
-    	for(String sub_role : mapRoleName(role).split(",")){
-    		if( canHaveRole(user, sub_role)){
+    	for(String r : getRoleSet(null, role)){
+    		if( canHaveRole(user,r)){
     			return true;
     		}
     	}
