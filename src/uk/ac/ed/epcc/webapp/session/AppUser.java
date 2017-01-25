@@ -255,4 +255,13 @@ public class AppUser extends DataObject implements java.security.Principal{
 		}
 		return result;
 	}
+	
+	/**
+	 * 
+	 * @param role
+	 * @return
+	 */
+	public boolean checkStateRole(String role){
+		return false;
+	}
 }

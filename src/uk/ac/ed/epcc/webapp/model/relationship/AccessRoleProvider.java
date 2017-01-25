@@ -17,11 +17,15 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**  Interface for classes that provide relationship roles between an {@link AppUser}
  * and a target object.
+ * 
+ * If the relationship only depends on the target object not on the {@link AppUser} then
+ * use {@link NamedFilterProvider}.
  * 
  * {@link DataObjectFactory}s and {@link Composite}s should implement this interface for roles provided by
  * {@link AppUser} references. In this case it is a good idea to return a {@link DualFilter} to allow tests
@@ -30,6 +34,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * It can also be implemented by stand-alone plug-ins. 
  * 
  * @see RelationshipProvider
+ * @see NamedFilterProvider
  * @see SessionService
  * @author spb
  * @param <U> AppUser type

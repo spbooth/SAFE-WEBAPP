@@ -46,6 +46,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.model.relationship.GlobalRoleFilter;
@@ -54,6 +55,7 @@ import uk.ac.ed.epcc.webapp.model.relationship.RelationshipProvider;
  * 
  * A config parameter of the form <b>use_role.<i>role-name</i></b> defines a role-name mapping
  * the value of the parameter is the actual role queried. 
+ * 
  * 
  * 
  * Relationships are configured via the {@link ConfigService} by setting:
@@ -67,7 +69,7 @@ import uk.ac.ed.epcc.webapp.model.relationship.RelationshipProvider;
  * <ul>
  * <li> <b>global</b> the role is a global role not a relationship.</li>
  * <li> <b>boolean</b> Use a boolean filter so all/none relationships match.</li>
- * <li> <em>factory-tag</em> un-modified role from factory or {@link Composite}.</li>
+ * <li> <em>factory-tag</em> un-modified role from factory or {@link Composite} or a named filter if the factory implements {@link NamedFilterProvider}</li>
  * <li> The tag of a {@link RelationshipProvider} for the target.</li>
  * <li> The tag of a {@link AccessRoleProvider}</li>
  * </ul> 
@@ -502,7 +504,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * @return
 	 */
 	protected  Boolean testRole(String role){
-		return rawRoleQuery(getContext(),getPersonID(),role);
+	    return canHaveRole(getCurrentPerson(), role);
 	}
 
 	/** clears all record of the current person.
@@ -838,9 +840,41 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 
 	
 	public boolean canHaveRole(A user, String role) {
-		return rawRoleQuery(getContext(), user.getID(), role);
+		if( user == null || role == null){
+			return false;
+		}
+		if( rawRoleQuery(getContext(), user.getID(), role)){
+			return true;
+		}
+		AppUserFactory<A> login_fac = getLoginFactory();
+		if( login_fac instanceof StateRoleProvider){
+			if(((StateRoleProvider<A>)login_fac).testRole(user, role)){
+				return true;
+			}
+		}
+		for(StateRoleProvider<A> comp : login_fac.getComposites(StateRoleProvider.class)){
+			if( comp.testRole(user, role)){
+				return true;
+			}
+		}
+		return false;
 	}
-
+	/** Check a specific user for role membership including name mapping
+	 * 
+	 * toggle roles evaluate as enabled.
+	 * 
+	 * @param user
+	 * @param role
+	 * @return
+	 */
+    private boolean canHaveRoleWithMapping(A user, String role){
+    	for(String sub_role : mapRoleName(role).split(",")){
+    		if( canHaveRole(user, sub_role)){
+    			return true;
+    		}
+    	}
+    	return false;
+    }
 
 
 	@Override
@@ -996,7 +1030,8 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    			// as roles may be asserted from the container.
 	    			return new GlobalRoleFilter<T>(this, sub);
 	    		}else{
-	    			return new GenericBinaryFilter<T>(fac2.getTarget(),false);
+	    			
+	    			return new GenericBinaryFilter<T>(fac2.getTarget(),canHaveRole(person, role));
 	    		}
 	    	}
 	    	if( base.equals(BOOLEAN_RELATIONSHIP_BASE)){
@@ -1005,6 +1040,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    		
 	    	}
 	    	if( person == null && ! haveCurrentUser()){
+	    		// No users specified
 	    		return new GenericBinaryFilter<T>(fac2.getTarget(),false);
 	    	}
 	    	
@@ -1031,8 +1067,10 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    		return arp.hasRelationFilter(sub,person);
 	    	}
 	    }else{
+	    	// Non qualified name
 	    	if( person == null){
 	    		if( ! haveCurrentUser()){
+	    			// No target person to filter against
 	    			return new GenericBinaryFilter<T>(fac2.getTarget(),false);
 	    		}
 	    	}
@@ -1135,12 +1173,19 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    		return result;
 	    	}
 	    }
+	    if( fac2 instanceof NamedFilterProvider){
+	    	result = ((NamedFilterProvider)fac2).getNamedFilter(role);
+	    	if( result != null){
+	    		return result;
+	    	}
+	    }
 	    // Its not one of the directly implemented roles maybe its derived
 	    String defn = getContext().getInitParameter(USE_RELATIONSHIP_PREFIX+fac2.getTag()+"."+role);
 	    if( defn != null){
 	    	// don't pass def as it is the sub-defn that is not resolving
 	    	return makeRelationshipRoleFilter(fac2, defn,person,null);
 	    }
+	   
 	    if( def != null){
 	    	return def;
 	    }
