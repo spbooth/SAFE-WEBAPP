@@ -375,7 +375,10 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		
 		//The cahHaveRole method caches its result
 		// but we still want to save the answer for
-		// the original query. shortcutTest must bypass
+		// the original query provided its not a toggle
+		// 
+		
+		// shortcutTest must bypass
 		// all caching
 		String role=null;
 		if( shortcutTestRole(name) || canHaveRole(name)){ // check queried role first
@@ -384,12 +387,17 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			for(String r : getRoleSet(null, name)){
 				if( ! r.equals(name) && canHaveRole(r)){
 					role=r;
-					cacheRole(name, true); // remember result of expansion
+					if( getToggle(name) == null && getToggle(role) == null){
+						// neither original nor delegate are toggle roles
+						// safe to cache
+						cacheRole(name,true);
+					}
 				}
 			}
 		}
 		if( role == null){
 			// none of the equivalents are allowed
+			// safe to cache
 			cacheRole(name, false);
 			return false;
 		}
@@ -403,6 +411,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		if( toggle != null ){
 			return toggle.booleanValue();
 		}
+		
 		return true;
 		
 	}
