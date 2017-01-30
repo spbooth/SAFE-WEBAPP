@@ -42,7 +42,8 @@ public interface ParseMapInput {
 	 * sub input.
 	 * 
 	 * @param v
+	 * @return 
 	 * @throws ParseException
 	 */
-	public abstract void parse(Map<String,Object> v) throws ParseException;
+	public abstract boolean parse(Map<String,Object> v) throws ParseException;
 }
