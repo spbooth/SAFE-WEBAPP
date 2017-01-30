@@ -181,6 +181,23 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		user=fac.find(user.getID());
 		assertTrue(composite.mustResetPassword(user));
 	}
+	
+	@Test
+	public void testRequestNewPasswordForBadUser() throws DataException, Exception{
+		MockTansport.clear();
+		takeBaseline();
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		addParam("username","freddy@example.com");
+		addParam("email_password","true");
+		doPost();
+		checkMessage("account_not_found");
+		
+	}
 
 	@Test
 	@ConfigFixtures("password_server.properties")

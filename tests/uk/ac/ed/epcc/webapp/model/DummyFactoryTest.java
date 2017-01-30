@@ -37,6 +37,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.Dummy1.Beatle;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactoryTestCase;
+import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
@@ -292,6 +293,64 @@ public class DummyFactoryTest extends DataObjectFactoryTestCase {
 		assertTrue(fac_alt.isMyReference(alt_ref));
 		
 		
+	}
+	
+	@Test
+	public void testRemove() throws DataException{
+		Dummy1.Factory fac = (Dummy1.Factory) getFactory();
+		
+		for(int i=0 ; i< 27 ; i++){
+			Dummy1 d = new Dummy1(ctx);
+			d.setName("Name"+i);
+			d.setNumber(i);
+			d.commit();
+		}
+		
+		assertEquals(27,fac.count(null));
+		
+		int count=0;
+		for(Iterator<Dummy1> it = fac.getResult(null).iterator(); it.hasNext();){
+			Dummy1 d = it.next();
+			it.remove();
+			count++;
+			assertEquals("number remaining" ,27-count,fac.count(null));
+		}
+		assertEquals(27, count);
+		assertEquals(0,fac.count(null));
+		assertFalse(fac.exists(null));
+	}
+	
+	@Test
+	public void testRemoveWithBackup() throws Exception{
+		Dummy1.Factory fac = (Dummy1.Factory) getFactory();
+		
+		takeBaseline();
+		
+		for(int i=0 ; i< 27 ; i++){
+			Dummy1 d = new Dummy1(ctx);
+			d.setName("Name"+i);
+			d.setNumber(i);
+			d.commit();
+		}
+		
+		assertEquals(27,fac.count(null));
+		
+		int count=0;
+		for(Iterator<Dummy1> it = fac.getResult(null).iterator(); it.hasNext();){
+			Dummy1 d = it.next();
+			it.remove();
+			count++;
+			if( count > 2 ){
+				// start backing up after a few deletes
+				getContext().setAttribute(Repository.BACKUP_SUFFIX_ATTR, "TestBackup");
+			}
+			assertEquals("number remaining" ,27-count,fac.count(null));
+		}
+		assertEquals(27, count);
+		assertEquals(0,fac.count(null));
+		assertFalse(fac.exists(null));
+		
+		checkDiff("/cleanup.xsl", "backup.xml");
 	}
 	
 }

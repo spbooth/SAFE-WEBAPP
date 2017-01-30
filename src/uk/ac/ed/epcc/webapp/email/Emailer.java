@@ -178,7 +178,7 @@ public class Emailer {
 		}
 	}
 
-	/** Send an email requesting confiormation of a new Email address.
+	/** Send an email requesting confirmation of a new Email address.
 	 * 
 	 * @param person
 	 * @param req
@@ -786,7 +786,7 @@ public class Emailer {
 			}
 			// Show stack trace
 			StringWriter stackTraceWriter = new StringWriter();
-			PrintWriter printWriter = new PrintWriter(stackTraceWriter);
+			PrintWriter printWriter = new PrintWriter(stackTraceWriter,true);
 			e.printStackTrace(printWriter);
 			Throwable rc = e.getCause();
 			while(rc != null){
@@ -795,8 +795,8 @@ public class Emailer {
 				rc = rc.getCause();
 			}
 			printWriter.flush();
-			errorEmail.setProperty("exception_stack_trace", stackTraceWriter
-					.toString());
+			printWriter.close();
+			errorEmail.setProperty("exception_stack_trace", stackTraceWriter.toString());
 		}else{
 			if( additional_info != null && additional_info.length() < 64){
 				errorEmail.setProperty("subject_message", additional_info);

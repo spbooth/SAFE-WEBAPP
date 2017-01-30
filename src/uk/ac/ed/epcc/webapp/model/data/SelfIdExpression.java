@@ -30,7 +30,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  * @author spb
  *
  */
-class SelfIdExpression implements SQLExpression<Integer> {
+public class SelfIdExpression implements SQLExpression<Integer> {
 
 	private final Repository res;
 	/**

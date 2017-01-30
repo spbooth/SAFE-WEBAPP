@@ -31,6 +31,7 @@ import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.session.WebNameFinder;
 
 /**
  * @author spb
@@ -73,6 +74,28 @@ public class RemoteAuthServletTest<A extends AppUser> extends ServletTest {
 		checkDiff("/cleanup.xsl", "remote_set.xml");
 	}
 	
+	
+	@Test
+	@DataBaseFixtures("remote_set.xml")
+	public void testReRegister() throws ConsistencyError, Exception{
+		MockTansport.clear();
+		takeBaseline();
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred2@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		ctx.getService(SessionService.class).setCurrentPerson(user);
+		
+		req.remote_user="fred";
+		doPost();
+		checkMessage("remote_auth_set");
+		checkDiff("/cleanup.xsl", "remote_reset.xml");
+		
+		A old_user  = fac.findByEmail("fred@example.com");
+		assertNull(old_user.getRealmName(WebNameFinder.WEB_NAME));
+	}
 	
 	@Test
 	@DataBaseFixtures("remote_set.xml")

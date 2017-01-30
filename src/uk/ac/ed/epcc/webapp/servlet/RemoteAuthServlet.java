@@ -157,9 +157,9 @@ public class RemoteAuthServlet extends WebappServlet {
 					}
 				}
 				if( empty(web_name)){
-					getLogger(conn).error("missing web_name");
+					getLogger(conn).warn("missing web_name");
 					// we must have a remote user name
-					message(conn, req, res, "invalid_input");
+					message(conn, req, res, "remote_auth_missing");
 					return;
 				}
 			}
@@ -183,7 +183,19 @@ public class RemoteAuthServlet extends WebappServlet {
 					session_service.setCurrentPerson(person);
 				
 			} else {
-				parser.setName(person, web_name);
+				// Check for existing binding
+				// and replace rather than duplicate
+				AppUser existing = parser.findFromString(web_name);
+				if( existing != null){
+					if( ! existing.equals(person)){
+						getLogger(conn).warn("Replacing remote-auth binding "+web_name+" "+existing.getIdentifier()+"->"+person.getIdentifier());
+						parser.setName(existing, null);
+						existing.commit();
+						parser.setName(person, web_name);
+					}
+				}else{
+					parser.setName(person, web_name);
+				}
 				try {
 					person.commit();
 					message(conn, req, res, "remote_auth_set",web_name);
