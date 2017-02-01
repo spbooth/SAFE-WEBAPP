@@ -15,17 +15,27 @@ package uk.ac.ed.epcc.webapp.servlet;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.email.MockTansport;
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
+import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.session.AppUser;
+import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.EmailNameFinder;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
  * @author spb
  *
  */
-@ConfigFixtures("passowrd_auth.properties")
 public class RegisterServletTest extends AbstractRegisterServletTest {
 
 	/**
@@ -46,4 +56,60 @@ public class RegisterServletTest extends AbstractRegisterServletTest {
 		assertEquals(1,MockTansport.nSent());
 	}
 
+	
+	@ConfigFixtures("/extauth.properties")
+	@Test
+	public void testExtAuthRegister() throws ConsistencyError, Exception{
+		req.remote_user="fred";
+		MockTansport.clear();
+		takeBaseline();
+		addParam("form_url", "/scripts/signup.jsp");
+		addParam(EmailNameFinder.EMAIL, "thing@example.com");
+		doPost();
+		checkMessage("signup_ok");
+		checkDiff("/cleanup.xsl","signup_extauth.xml");
+		assertEquals(0,MockTansport.nSent());
+	}
+	
+	
+	
+	@ConfigFixtures("/extauth.properties")
+	@Test
+	public void testExtAuthRegisterNoWebname() throws ConsistencyError, Exception{
+		req.remote_user=null;
+		MockTansport.clear();
+		takeBaseline();
+		addParam("form_url", "/scripts/signup.jsp");
+		addParam(EmailNameFinder.EMAIL, "thing@example.com");
+		doPost();
+		checkMessage("access_denied");
+		checkUnchanged();
+		assertEquals(0,MockTansport.nSent());
+	}
+	
+	
+	@ConfigFixtures("/auto_create.properties")
+	@DataBaseFixtures("noregister.xml")
+	@Test
+	public void testAutoCreateRegister() throws ConsistencyError, Exception{
+		req.remote_user="fred";
+		MockTansport.clear();
+		
+		AppUserFactory login = getContext().getService(SessionService.class).getLoginFactory();
+		AppUser fred = login.findFromString("fred");
+		assertNotNull(fred);
+		assertNull(fred.getEmail());
+		assertTrue(login.mustRegister(fred));
+		takeBaseline();
+		addParam("form_url", "/scripts/signup.jsp");
+		addParam(EmailNameFinder.EMAIL, "thing@example.com");
+		doPost();
+		checkMessage("signup_ok");
+		fred = login.findFromString("fred");
+		assertNotNull(fred);
+		assertEquals("thing@example.com",fred.getEmail());
+		checkDiff("/cleanup.xsl","signup_autocreate.xml");
+		assertEquals(0,MockTansport.nSent());
+		assertFalse(login.mustRegister(fred));
+	}
 }

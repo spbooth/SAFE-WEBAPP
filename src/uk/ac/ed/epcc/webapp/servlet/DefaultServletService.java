@@ -217,7 +217,15 @@ public class DefaultServletService implements ServletService{
     }
    
 
-	
+    public void message(String message, Object ... args) throws IOException, ServletException {
+    	if( req instanceof HttpServletRequest && res instanceof HttpServletResponse){
+    		WebappServlet.messageWithArgs(getContext(),
+    				(HttpServletRequest)req,
+    				(HttpServletResponse)res,
+    				message,
+    				args);
+    	}
+    }
 
 
 
@@ -414,7 +422,7 @@ public class DefaultServletService implements ServletService{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.servlet.ServletService#requestAuthorization()
 	 */
-	public <A extends AppUser> void requestAuthentication(SessionService<A> sess) throws IOException {
+	public <A extends AppUser> void requestAuthentication(SessionService<A> sess) throws IOException, ServletException {
 		AppUserFactory<A> factory = sess.getLoginFactory();
 		PasswordAuthComposite<A> composite = (PasswordAuthComposite<A>) factory.getComposite(PasswordAuthComposite.class);
 		if( composite != null ){
@@ -426,9 +434,17 @@ public class DefaultServletService implements ServletService{
 				return;
 			}
 		}
-		// standard login page supports both custom password login and self-register for external-auth
-		String login_page=LoginServlet.getLoginPage(conn);
-		redirect(login_page+"?error=session&page="+encodePage());
+		if( (getWebName() == null || ! RegisterServlet.ALLOW_SIGNUPS.isEnabled(getContext())) 
+				&& 
+			( composite == null || EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(getContext()))){
+			// We require external auth so must have web-name
+			// even if we have a web-name may not allow signups.
+			message( "access_denied", null);
+		}else{
+			// standard login page supports both custom password login and self-register for external-auth
+			String login_page=LoginServlet.getLoginPage(conn);
+			redirect(login_page+"?error=session&page="+encodePage());
+		}
 	}
 
 
@@ -456,12 +472,20 @@ public class DefaultServletService implements ServletService{
 							person.commit();
 						}
 					}
-					if( person != null && person.canLogin()){
-						sess.setCurrentPerson(person);
-						
+					if( person != null ){
+						if( person.canLogin()){
+
+							if( factory.mustRegister(person)){
+								// don't populate session this will trigger redirect to
+								// the registration page
+								return;
+							}
+							sess.setCurrentPerson(person);
+						}	
 					}
 
 				}
+			}else if (DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn) ){
 			}else{
 				// only consider basic-auth if no webname found
 				// Note we pick up the top level config service so that per-servlet parameters

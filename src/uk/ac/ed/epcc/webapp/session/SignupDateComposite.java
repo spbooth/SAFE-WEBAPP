@@ -81,6 +81,9 @@ public class SignupDateComposite<BDO extends DataObject> extends CreateComposite
 		getRecord(dat).setOptionalProperty(SIGNUP_DATE, new Date());
 	}
 
+	public Date getSignupDate(BDO dat){
+		return getRecord(dat).getDateProperty(SIGNUP_DATE);
+	}
 
 	
 }

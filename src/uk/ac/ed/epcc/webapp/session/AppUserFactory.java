@@ -61,6 +61,8 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
+import uk.ac.ed.epcc.webapp.model.data.forms.UpdateAction;
+import uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedDataCache;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
@@ -78,12 +80,12 @@ import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
  */
 
 
-public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> implements RequiredPageProvider<AU>,NameFinder<AU>  
+public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> implements RequiredPageProvider<AU>,NameFinder<AU> ,RegisterTrigger<AU>
 {
 	
 	EmailNameFinder<AU> email_finder = new EmailNameFinder<AU>(this);
 	WebNameFinder<AU> web_name_finder = new WebNameFinder<AU>(this);
-	SignupDateComposite<AU> signup_date = new SignupDateComposite<AU>(this);
+	RegistrationDateComposite<AU> signup_date = new RegistrationDateComposite<AU>(this);
 	/**
 	 * 
 	 */
@@ -566,23 +568,43 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 	 *
 	 * @param <T>
 	 */
-	public  static class SignupFormCreator<T extends  AppUser> extends Creator<T>  {
+	public  static class SignupFormCreator<T extends  AppUser> extends Creator<T> implements UpdateTemplate<T>  {
+		/**
+		 * 
+		 */
+		private static final String REGISTER_ACTION = " Register ";
+
 		@Override
 		public void preCommit(T dat, Form f) throws DataException {
 			super.preCommit(dat, f);
 			if( realm != null && realm.trim().length() > 0  && webname != null && webname.trim().length() > 0){
 				dat.setRealmName(realm,webname);
 			}
+			getAppUserFactory().postRegister(dat);
 		}
 		@Override
 		public void postCreate(T dat, Form f) throws Exception {
 			super.postCreate(dat, f);
-			((AppUserFactory)getFactory()).newSignup(dat);
+			getAppUserFactory().newSignup(dat);
 			
+		}
+		/**
+		 * @return
+		 */
+		protected AppUserFactory<T> getAppUserFactory() {
+			return (AppUserFactory<T>)getFactory();
 		}
 		@Override
 		public void setAction(String type_name,Form f) {
-			f.addAction(" Register ", new CreateAction<T>(type_name,this));
+			// Check for a placeholder record and update that instead if it exists
+			if( webname != null && ! webname.isEmpty()){
+				T existing = getAppUserFactory().findFromString(webname);
+				if( existing != null ){
+					f.addAction(REGISTER_ACTION, new UpdateAction<T>("Person", this, existing));
+					return;
+				}
+			}
+			f.addAction(REGISTER_ACTION, new CreateAction<T>(type_name,this));
 		}
 		String realm;
 		String webname;
@@ -627,7 +649,47 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 			defaults.put(ALLOW_EMAIL_FIELD, Boolean.TRUE);
 			return defaults;
 		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate#postUpdate(uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.forms.Form, java.util.Map)
+		 */
+		@Override
+		public void postUpdate(T o, Form f, Map<String, Object> orig) throws Exception {
+			postCreate(o, f);
+			
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate#preCommit(uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.forms.Form, java.util.Map)
+		 */
+		@Override
+		public final void preCommit(T dat, Form f, Map<String, Object> orig) throws DataException {
+			// forward to  creation version
+			preCommit(dat, f);	
+		}
 
 		
 	}
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.session.RegisterTrigger#mustRegister(uk.ac.ed.epcc.webapp.session.AppUser)
+	 */
+	@Override
+	public boolean mustRegister(AU user) {
+		for( RegisterTrigger<AU> trigger : getComposites(RegisterTrigger.class)){
+			if( trigger.mustRegister(user)){
+				return true;
+			}
+		}
+		return false;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.session.RegisterTrigger#postRegister(uk.ac.ed.epcc.webapp.session.AppUser)
+	 */
+	@Override
+	public void postRegister(AU user) {
+		for( RegisterTrigger<AU> trigger : getComposites(RegisterTrigger.class)){
+			trigger.postRegister(user);
+		}
+	}
+	
 }

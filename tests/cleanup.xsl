@@ -29,7 +29,7 @@
 	<xsl:template match="Person/Updated">
 	<xsl:element name="Updated">1234567890</xsl:element>
 	</xsl:template>
-	<xsl:template match="Person/SignupDate">
+	<xsl:template match="SignupDate">
 	<xsl:element name="SignupDate">1234567890</xsl:element>
 	</xsl:template>
 	<xsl:template match="Person/Salt">
