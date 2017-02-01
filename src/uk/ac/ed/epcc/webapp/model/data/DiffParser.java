@@ -23,6 +23,7 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.model.data.Repository.IdMode;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
@@ -87,7 +88,7 @@ public class DiffParser extends DumpParser {
 		if( skip != null ){
 			fields.removeAll(skip);
 		}
-		int id = rec.findDuplicate(parse_id,fields);
+		int id = rec.findDuplicate(parse_id,fields,true);
 		
 		// If the record has changed the id will be <= 0 and only the table will be makrd as seen.
 		dumper.markSeen(rec.getRepository().getTag(), id);
@@ -112,6 +113,18 @@ public class DiffParser extends DumpParser {
 	@Override
 	public boolean skipSpecification(String table) {
 		return true;
+	}
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.data.DumpParser#getIdMode()
+	 */
+	@Override
+	protected IdMode getIdMode() {
+		// Need to ignore the DB state becasue we are
+		// parsing a previous dump and merge will
+		// fail to detect null -> value change
+		return IdMode.IgnoreExisting;
 	}
 
 }
