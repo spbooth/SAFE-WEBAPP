@@ -96,7 +96,7 @@ This service is only available to pre-registered users.
 
 <div class="block" role="main">
 <h2>Register <%=webname %></h2>
-<p>Welcome to the <%=service_name%>. </p>
+<p>Welcome to the <%=service_name%> <%=website_name%>.</p>
 <p> Please fill in this form to register with this service</p>
 </div>
 
