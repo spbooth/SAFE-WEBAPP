@@ -13,7 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
-import com.sun.xml.internal.ws.client.sei.ResponseBuilder.Composite;
+import uk.ac.ed.epcc.webapp.model.data.Composite;
 
 /** An interface for objects (Usually the {@link AppUserFactory} or its
  * {@link Composite}s that can trigger an existing user to visit the

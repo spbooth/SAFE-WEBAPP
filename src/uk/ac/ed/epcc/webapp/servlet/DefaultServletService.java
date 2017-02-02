@@ -41,7 +41,6 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.AppUserNameFinder;
@@ -58,7 +57,7 @@ import uk.ac.ed.epcc.webapp.session.WebNameFinder;
  * user certificate DN if present.
  * <p>
  * If the parameter <em>basic_auth.realm</em> is defined then missing authentication will
- * trigger HTTP Basic auth with the specified realm  (obviously the login factory needs to implement {@link PasswordAuthAppUserFactory} for this to succeed.
+ * trigger HTTP Basic auth with the specified realm  (obviously the login factory needs to contain a {@link PasswordAuthComposite} for this to succeed.
  <p>
  * Note that as this parameter can be set for specific servlets via serlvet init-parameters. 
  * This can be used to replace the custom login page entirely if set globally but
@@ -181,10 +180,6 @@ public class DefaultServletService implements ServletService{
 	 * 
 	 * @param url
 	 *            String page to forward to
-	 * @param req
-	 *            HttpServletRequest
-	 * @param res
-	 *            HttpServletResponse
 	 * @throws ServletException
 	 * @throws IOException
 	 */
@@ -240,9 +235,7 @@ public class DefaultServletService implements ServletService{
 	 * method on the ServletAppContext to allow access to logging/configuration
 	 * and to allow the application specific customisation.
 	 * 
-	 * @param req
 	 * @return Map of parameters
-	 * @throws DataFault
 	 */
 	@SuppressWarnings("unchecked")
 	public Map<String,Object> getParams() {
@@ -401,7 +394,7 @@ public class DefaultServletService implements ServletService{
 	/** Is the specified mime-type supported by the client.
 	 * 
 	 * @param type
-	 * @return
+	 * @return boolean true if mime type supported
 	 */
 	public boolean supportsMime(String type){
 		if(req instanceof HttpServletRequest){
@@ -424,6 +417,7 @@ public class DefaultServletService implements ServletService{
 	 */
 	public <A extends AppUser> void requestAuthentication(SessionService<A> sess) throws IOException, ServletException {
 		AppUserFactory<A> factory = sess.getLoginFactory();
+		@SuppressWarnings("unchecked")
 		PasswordAuthComposite<A> composite = (PasswordAuthComposite<A>) factory.getComposite(PasswordAuthComposite.class);
 		if( composite != null ){
 			// Should we attempt basic auth
@@ -434,12 +428,12 @@ public class DefaultServletService implements ServletService{
 				return;
 			}
 		}
-		if( (getWebName() == null || ! RegisterServlet.ALLOW_SIGNUPS.isEnabled(getContext())) 
+		if( getWebName() == null  
 				&& 
 			( composite == null || EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(getContext()))){
 			// We require external auth so must have web-name
-			// even if we have a web-name may not allow signups.
-			message( "access_denied", null);
+			warn("No webname when required");
+			message( "access_denied", (Object[])null);
 		}else{
 			// standard login page supports both custom password login and self-register for external-auth
 			String login_page=LoginServlet.getLoginPage(conn);
@@ -496,6 +490,7 @@ public class DefaultServletService implements ServletService{
 					
 					String auth = request.getHeader("Authorization");
 					AppUserFactory<A> factory = sess.getLoginFactory();
+					@SuppressWarnings("unchecked")
 					PasswordAuthComposite<A> comp = factory.getComposite(PasswordAuthComposite.class);
 					if( auth != null && comp != null ){
 						Matcher m = auth_patt.matcher(auth);
@@ -571,6 +566,15 @@ public class DefaultServletService implements ServletService{
 			Logger log = serv.getLogger(getClass());
 			if( log != null ){
 				log.error(errors);
+			}
+		}
+	}
+	final void warn(String errors) {
+		LoggerService serv = getContext().getService(LoggerService.class);
+		if( serv != null ){
+			Logger log = serv.getLogger(getClass());
+			if( log != null ){
+				log.warn(errors);
 			}
 		}
 	}
