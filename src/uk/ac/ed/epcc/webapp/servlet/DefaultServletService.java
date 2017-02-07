@@ -447,6 +447,10 @@ public class DefaultServletService implements ServletService{
 	 */
 	public <A extends AppUser>void populateSession(SessionService<A> sess) {
 		try{
+			if( res.isCommitted()){
+				// Can't make a servlet session 
+				return;
+			}
 			AppContext conn = getContext();
 			String name = getWebName();
 			if( name != null && (DefaultServletService.ALLOW_EXTERNAL_AUTH_FEATURE.isEnabled(conn) || DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn))){
@@ -586,5 +590,14 @@ public class DefaultServletService implements ServletService{
 				log.error(errors,t);
 			}
 		}
+	}
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.servlet.ServletService#isComitted()
+	 */
+	@Override
+	public boolean isComitted() {
+		return res.isCommitted();
 	}
 }

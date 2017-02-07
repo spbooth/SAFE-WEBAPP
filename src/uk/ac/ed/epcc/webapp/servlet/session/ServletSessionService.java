@@ -101,7 +101,9 @@ public void setAttribute(String key, Object value) {
     //need a session if we are storing anything
 	HttpSession sess = null;
 	if( ss instanceof DefaultServletService){
-		sess = ((DefaultServletService)ss).getSession(true);
+		DefaultServletService dss = (DefaultServletService)ss;
+		// can't create session if comitted response
+		sess = dss.getSession(! dss.isComitted());
 	}
 	if( value != null &&  ! (value instanceof Serializable)){
 		LoggerService serv = getContext().getService(LoggerService.class);
@@ -264,16 +266,24 @@ protected Integer getPersonID() {
 	if( id != null ){
 		return id;
 	}
-	ss.populateSession(this);
-	id = super.getPersonID();
-	if( id != null ){
-		return id;
+	try{
+		if( ! ss.isComitted() ){
+			// We can't make a session once response is comitted so
+			// no point doing the lookup we can't store it.
+			// We should not need to do person lookup after the fact
+			ss.populateSession(this);
+			id = super.getPersonID();
+			if( id != null ){
+				return id;
+			}
+		}	
+		// At one stage we explicitly stored 0 as the personid to prevent additional lookups.
+		// This breaks the sign-up code as the newly created user is remembered as being
+		// non-valid best to slow down unregistered users.
+		clearCurrentPerson();
+	}catch(Throwable t){
+		getContext().error(t, "Error populating session");
 	}
-	
-	// At one stage we explicitly stored 0 as the personid to prevent additional lookups.
-	// This breaks the sign-up code as the newly created user is remembered as being
-	// non-valid best to slow down unregistered users.
-	clearCurrentPerson();
 	return 0;
 }
 public void su(A new_person){

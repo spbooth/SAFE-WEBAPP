@@ -129,4 +129,10 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * @return
 	 */
 	public String defaultCharset();
+	
+	/** Has the response been comitted.
+	 * 
+	 * @return
+	 */
+	public boolean isComitted();
 }
