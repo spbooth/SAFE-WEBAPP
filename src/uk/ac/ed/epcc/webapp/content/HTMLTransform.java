@@ -16,9 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.content;
 
-import uk.ac.ed.epcc.webapp.Version;
-
-
 /** A Table.Formatter. If the SimpleXMLBuilder is really a
  * HTMLBuilder then convert whitespaces into non breaking spaces.
  * 
