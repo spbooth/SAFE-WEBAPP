@@ -37,6 +37,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
@@ -100,6 +101,8 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	public static final String USE_ROLE_PREFIX = "use_role.";
 	public static final Feature TOGGLE_ROLES_FEATURE = new Feature("toggle_roles",true,"allow some roles to toggle on/off");
 	public static final Feature CACHE_RELATIONSHIP_FEATURE = new Feature("cache_relationships",true,"cache relationship test results in the session");
+	public static final Feature APPLY_DEFAULT_PERSON_RELATIONSHIP_FILTER = new Feature("relationships.apply_default_person_filter",true,"Apply the default person relationship filter when generating a filter on person");
+	public static final Feature APPLY_DEFAULT_TARGET_RELATIONSHIP_FILTER = new Feature("relationships.apply_default_target_filter",true,"Apply the default target relationship filter when generating a filter");
 	private Map<String,Boolean> toggle_map=null;
 	protected AppContext c;
     
@@ -978,7 +981,15 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		String store_tag="PersonFilter."+fac.getTag()+(target == null ? "" : "."+target.getID())+"."+role;
 		BaseFilter<? super A> result = roles.get(store_tag);
 		if( result == null ){
+			
 			result = makePersonInRelationshipRoleFilter(fac, role,target);
+			if(APPLY_DEFAULT_PERSON_RELATIONSHIP_FILTER.isEnabled(getContext())){
+				// Add in the default relationship filte on person
+				SQLFilter<? super A> fil = getLoginFactory().getDefaultRelationshipFilter();
+				if( fil != null ){
+					result = new AndFilter<A>(getLoginFactory().getTarget(),result,fil);
+				}
+			}
 			roles.put(store_tag, result);
 		}
 		return result;
@@ -992,11 +1003,17 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		String store_tag="TargetFilter."+fac.getTag()+"."+person.getID()+"."+role;
 		BaseFilter<? super T> result = roles.get(store_tag);
 		if( result == null ){
-			// adding in the default filter breaks everything for some reason
-			//result = new AndFilter<T>(fac.getTarget(),
-			//		fac.getDefaultRelationshipFilter(),
-			//		makeRelationshipRoleFilter(fac,role,person));
 			result = makeRelationshipRoleFilter(fac,role,person,null);
+			if(APPLY_DEFAULT_TARGET_RELATIONSHIP_FILTER.isEnabled(getContext())){
+				// Add in the default relationship filter on target
+				//
+				// TODO This breaks everything for some reasons
+				//
+				SQLFilter<? super T> fil = fac.getDefaultRelationshipFilter();
+				if( fil != null ){
+					result = new AndFilter<T>(fac.getTarget(),result,fil);
+				}
+			}
 			roles.put(store_tag, result);
 		}
 		return result;
