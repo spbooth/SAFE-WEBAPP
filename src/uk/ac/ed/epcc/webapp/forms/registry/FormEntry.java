@@ -58,6 +58,9 @@ import uk.ac.ed.epcc.webapp.Contexed;
 		
 				F res;
 				if( config_tag == null ){
+					if( c.getInitParameter("accounting.tables") == null){
+						return null; // will thow exception if no tables specified
+					}
 					res = c.makeObject(f);
 				}else{
 					res= c.makeObject(f,config_tag);
