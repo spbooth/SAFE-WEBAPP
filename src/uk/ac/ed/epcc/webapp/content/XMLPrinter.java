@@ -115,5 +115,7 @@ public class XMLPrinter extends AbstractXMLBuilder {
 		sb.append(s);
 	}
 
-	
+	public boolean hasContent(){
+		return sb.length() > 0;
+	}
 }
