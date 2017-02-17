@@ -1262,7 +1262,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 		// Have to do a SQL query
 		@SuppressWarnings("unchecked")
-		AndFilter<BDO> and = new AndFilter<BDO>(getTarget(), fil, new SQLIdFilter<BDO>(getTarget(), res, o.getID()) );
+		AndFilter<BDO> and = new AndFilter<BDO>(getTarget(), fil, getFilter(o) );
 		try {
 			return exists(and);
 		} catch (DataException e) {

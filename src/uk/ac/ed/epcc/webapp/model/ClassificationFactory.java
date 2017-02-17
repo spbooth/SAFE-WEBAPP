@@ -386,7 +386,7 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 			public boolean isValid(T item) {
 				
 				try {
-					return exists(new AndFilter<T>(getTarget(), getSelectFilter(),new SQLIdFilter<T>(getTarget(), res, item.getID())));
+					return exists(new AndFilter<T>(getTarget(), getSelectFilter(),getFilter(item)));
 				} catch (DataException e) {
 					return false;
 				}
