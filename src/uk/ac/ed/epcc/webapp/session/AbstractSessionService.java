@@ -48,6 +48,7 @@ import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
+import uk.ac.ed.epcc.webapp.model.data.NamedFilterWrapper;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.model.relationship.GlobalRoleFilter;
@@ -70,13 +71,14 @@ import uk.ac.ed.epcc.webapp.model.relationship.RelationshipProvider;
  * <ul>
  * <li> <b>global</b> the role is a global role not a relationship.</li>
  * <li> <b>boolean</b> Use a boolean filter so all/none relationships match.</li>
- * <li> <em>factory-tag</em> un-modified role from factory or {@link Composite} or a named filter if the factory implements {@link NamedFilterProvider}</li>
+ * <li> <em>factory-tag</em> un-modified role from factory or a named filter from
+ * a {@link NamedFilterWrapper} wrapping the factory.
  * <li> The tag of a {@link RelationshipProvider} for the target.</li>
  * <li> The tag of a {@link AccessRoleProvider}</li>
  * </ul> 
  * 
  * @author spb
- *
+ * @see NamedFilterWrapper
  * @param <A>
  */
 @PreRequisiteService(ConfigService.class)
@@ -1232,12 +1234,11 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    		return result;
 	    	}
 	    }
-	    if( fac2 instanceof NamedFilterProvider){
-	    	result = ((NamedFilterProvider)fac2).getNamedFilter(role);
-	    	if( result != null){
-	    		return result;
-	    	}
+	    result = makeNamedFilter(fac2, role);
+	    if( result != null){
+	    	return result;
 	    }
+	    
 	    // Its not one of the directly implemented roles maybe its derived
 	    String defn = getContext().getInitParameter(USE_RELATIONSHIP_PREFIX+fac2.getTag()+"."+role);
 	    if( defn != null){
@@ -1250,6 +1251,13 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    }
 	    // unrecognised role
 	    throw new UnknownRelationshipException(role);
+	}
+	/** look for a named filter from the factory or composites.
+	 * 
+	 */
+	protected <T extends DataObject> BaseFilter<? super T> makeNamedFilter(DataObjectFactory<T> fac2, String name){
+		NamedFilterWrapper<T> wrapper = new NamedFilterWrapper<>(fac2);
+		return wrapper.getNamedFilter(name);
 	}
 	protected <T extends DataObject> BaseFilter<? super A> makeDirectPersonInRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,T target) throws UnknownRelationshipException {
 		BaseFilter<? super A> result=null;
@@ -1266,6 +1274,13 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    		return result;
 	    	}
 	    }
+	    // Maybe its a named filter this will translate to a binary filter on the app-user
+	    BaseFilter<? super T> fil = makeNamedFilter(fac2, role);
+	    if( fil != null){
+	    	boolean matches = fac2.matches(fil, target);
+	    	return new GenericBinaryFilter<>(AppUser.class, matches);
+	    }
+	    
 	 // Its not one of the directly implemented roles maybe its derived
 	    String defn = getContext().getInitParameter(USE_RELATIONSHIP_PREFIX+fac2.getTag()+"."+role);
 	    if( defn != null){
