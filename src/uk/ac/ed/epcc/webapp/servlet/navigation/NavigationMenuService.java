@@ -199,7 +199,7 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 					n.setAccessKey(key.charAt(0));
 				}
 				// Add config nodes first
-				if( child_list != null ){
+				if( child_list != null && ! child_list.isEmpty()){
 					for(String child_name : child_list.trim().split("\\s*,\\s*")){
 						Node c = makeNode(seen,child_name, menu_prop);
 						if( c != null ){

@@ -57,7 +57,7 @@ public class ServiceFilterComposite<BDO extends DataObject> extends Composite<BD
 	 */
 	@Override
 	public TableSpecification modifyDefaultTableSpecification(TableSpecification spec, String table) {
-		spec.setField(SERVICE_NAME_FIELD, new StringFieldType(true, null, 16));
+		spec.setOptionalField(SERVICE_NAME_FIELD, new StringFieldType(true, null, 16));
 		
 		return spec;
 	}
