@@ -49,14 +49,17 @@ import uk.ac.ed.epcc.webapp.model.far.QuestionManager;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
 import uk.ac.ed.epcc.webapp.model.far.SectionManager;
 import uk.ac.ed.epcc.webapp.model.far.SectionManager.Section;
-import uk.ac.ed.epcc.webapp.model.far.handler.SectionFormHandler;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** a generic {@link TransitionProvider} for editing {@link DynamicForm} {@link Response}s.
  * 
  * The {@link ResponseManager} or some other class has to  act as the {@link TransitionFactoryCreator} allowing the 
- * {@link ResponseManager} to be passed to the constructor. 
+ * {@link ResponseManager} to be passed to the constructor.
+ * 
+ *  All the customisation therefore lives in the {@link Response} object and this class can
+ *  be used to implement the edit and navigation logic.
+ *  
  * @author spb
  * @param <D> type of {@link DynamicForm}
  * @param <R> type of {@link Response}
@@ -69,7 +72,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 
 	private final ResponseManager<R, D> manager;
 	
-	/**
+	/** Key for the SubmitTransition
 	 * @author spb
 	 *
 	 */

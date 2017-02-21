@@ -22,7 +22,6 @@ import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
  * @param <F> {@link DynamicForm} type
  *
  */
-@uk.ac.ed.epcc.webapp.Version("$Revision: 1.3 $")
 public class IntegerDataManager<R extends Response<F>,F extends DynamicForm> extends ResponseDataManager<IntegerDataManager<R,F>.IntegerData, R, F> {
 
 	private static final String DATA_FIELD="Data";

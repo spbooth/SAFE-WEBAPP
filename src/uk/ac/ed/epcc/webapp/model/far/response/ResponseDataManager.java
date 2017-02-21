@@ -35,7 +35,8 @@ import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
-/**
+/** a linking table that links a response to a specific question in the targetted form.
+ * This is sub-classed for each type of data produced and holds the actual response data in the linking table.
  * @author spb
  * @param <D> type of link class
  * @param <R> Response type

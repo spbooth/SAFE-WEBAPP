@@ -28,7 +28,7 @@ import uk.ac.ed.epcc.webapp.model.far.SectionManager;
 import uk.ac.ed.epcc.webapp.model.far.SectionManager.Section;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
 
-/** visitor to check if a part contains any questions
+/** {@link PartVisitor} to check if a part contains any questions
  * @author spb
  *
  */

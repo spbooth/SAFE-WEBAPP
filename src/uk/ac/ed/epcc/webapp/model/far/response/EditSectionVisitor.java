@@ -20,7 +20,7 @@ import uk.ac.ed.epcc.webapp.model.far.SectionManager.Section;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
-/** A {@link ContentVisitor} that adds edit buttons to sections.
+/** A {@link ContentVisitor} that adds edit buttons to each of the shown sections.
  * @author spb
  *
  */
