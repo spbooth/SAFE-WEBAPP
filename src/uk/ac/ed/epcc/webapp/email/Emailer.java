@@ -86,6 +86,10 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 public class Emailer {
+	/**
+	 * 
+	 */
+	private static final String MAIL_SIGNER = "MailSigner";
 	/** Default string encoding to use.
 	 * 
 	 */
@@ -360,6 +364,10 @@ public class Emailer {
 			// make sure send date is right as many mail clients sort by sent date.
 			m.setSentDate(new Date());
 			m.saveChanges();
+			SignMailVisitor vis = getContext().makeObjectWithDefault(SignMailVisitor.class, null, MAIL_SIGNER);
+			if( vis != null ){
+				m = vis.update(m);
+			}
 			if( DEBUG_SEND.isEnabled(getContext())){
 				ByteArrayOutputStream stream = new ByteArrayOutputStream();
 				Session s = getSession();
