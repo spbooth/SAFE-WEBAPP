@@ -16,22 +16,27 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
-import java.util.Map;
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.model.ClassificationFactory;
+import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.model.data.forms.inputs.TableInput;
 
-import uk.ac.ed.epcc.webapp.forms.transition.Transition;
-/** Interface for objects that can augment the table {@link Transition}s of a
- * {@link TableTransitionTarget}.
- * 
- * @author spb
- *
- * @param <T>
- */
-public interface TransitionSource<T extends TableTransitionTarget> {
-	/** Generate a {@link Map} of {@link Transition}s to be added to the
-	 * table transitions of the {@link TableTransitionTarget}. 
-	 * 
-	 * @return
-	 */
-	public Map<TableTransitionKey<T>,Transition<T>> getTransitions();
+
+
+public class AddClassificationReferenceTransition<T extends TableStructureTransitionTarget> extends AddFieldTransition<T> {
+	private static final String TABLE = "Table";
+	public AddClassificationReferenceTransition(Repository res){
+		super(res);
+	}
+	
+	@Override
+	protected void addFormParams(Form f, AppContext c) {
+		f.addInput(TABLE, "Classification Table to reference", new TableInput<ClassificationFactory>(c,ClassificationFactory.class ));
+	}
+	@Override
+	protected FieldType getFieldType(Form f) {
+		return new ReferenceFieldType((String) f.get(TABLE));
+	}
 
 }

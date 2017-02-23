@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2011                            |
+//| Copyright - The University of Edinburgh 2016                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -11,27 +11,38 @@
 //| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
-/*******************************************************************************
- * Copyright (c) - The University of Edinburgh 2010
- *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
-import java.util.Map;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 
-import uk.ac.ed.epcc.webapp.forms.transition.Transition;
-/** Interface for objects that can augment the table {@link Transition}s of a
- * {@link TableTransitionTarget}.
- * 
+/**
  * @author spb
+ * @param <T> target type
  *
- * @param <T>
  */
-public interface TransitionSource<T extends TableTransitionTarget> {
-	/** Generate a {@link Map} of {@link Transition}s to be added to the
-	 * table transitions of the {@link TableTransitionTarget}. 
+public class TableDeveloperKey<T extends TableStructureTransitionTarget> extends TableTransitionKey<T> {
+	/**
 	 * 
-	 * @return
 	 */
-	public Map<TableTransitionKey<T>,Transition<T>> getTransitions();
+	public static final String CHANGE_TABLE_STRUCTURE_ROLE = "ChangeTableStructure";
+	
+	
+	
+
+	public TableDeveloperKey(Class<? super T> t, String name, String help) {
+		super(t, name, help);
+	}
+
+	public TableDeveloperKey(Class<? super T> t, String name) {
+		super(t, name);
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.table.AccessControlTransitionKey#allow(uk.ac.ed.epcc.webapp.session.SessionService)
+	 */
+	@Override
+	public boolean allow(SessionService serv,T target) {
+		return serv.hasRole(CHANGE_TABLE_STRUCTURE_ROLE);
+	}
 
 }

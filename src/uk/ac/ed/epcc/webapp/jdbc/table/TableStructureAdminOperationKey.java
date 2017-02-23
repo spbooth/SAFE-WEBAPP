@@ -13,31 +13,33 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
-import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
  * @author spb
- * @param <T> target type of transition
+ * @param <T> target type
  *
  */
-public abstract class AccessControlTransitionKey<T> extends TransitionKey<T> {
+public class TableStructureAdminOperationKey<T extends TableStructureTransitionTarget> extends TableTransitionKey<T> {
+	
+	
+	
+	
 
-	/**
-	 * @param t
-	 * @param name
-	 * @param help
-	 */
-	public AccessControlTransitionKey(Class<? super T> t, String name, String help) {
-		super(t, name, help);
-		
+	public TableStructureAdminOperationKey(String name, String help) {
+		super(TableStructureTransitionTarget.class, name, help);
 	}
 
-	/** Access control to the transition.
-	 * This is used to widen the default permissions
-	 * 
-	 * @param serv
-	 * @return true if operation allowed
+	public TableStructureAdminOperationKey( String name) {
+		super(TableStructureTransitionTarget.class, name);
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.table.AccessControlTransitionKey#allow(uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
-	public abstract boolean allow(SessionService<?> serv);
+	@Override
+	public boolean allow(SessionService serv,T target) {
+		return serv.hasRoleFromList(SessionService.ADMIN_ROLE,TableDeveloperKey.CHANGE_TABLE_STRUCTURE_ROLE);
+	}
+
 }

@@ -24,7 +24,6 @@ import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ForwardTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
-import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 /** TransitionSource for the basic table edit operations
  * 
  * @author spb
@@ -59,6 +58,7 @@ public class GeneralTransitionSource<T extends TableStructureTransitionTarget> i
 	 * 
 	 */
 	static final String ADD_REFERENCE_FIELD_KEY = "AddReferenceField";
+	
 	/**
 	 * 
 	 */
@@ -83,7 +83,7 @@ public class GeneralTransitionSource<T extends TableStructureTransitionTarget> i
 	 * 
 	 */
 	static final String ADD_DOUBLE_FIELD_KEY = "AddDoubleField";
-	private Map<TransitionKey<T>,Transition<T>> table_transitions = new LinkedHashMap<TransitionKey<T>,Transition<T>>();
+	private Map<TableTransitionKey<T>,Transition<T>> table_transitions = new LinkedHashMap<TableTransitionKey<T>,Transition<T>>();
 	
 	public GeneralTransitionSource(Repository res){
 		
@@ -109,9 +109,9 @@ public class GeneralTransitionSource<T extends TableStructureTransitionTarget> i
 	}
 	
 	private void addTransition(String name,Transition<T> t){
-		table_transitions.put(new TransitionKey<T>(TableTransitionTarget.class, name),t);
+		table_transitions.put(new TableDeveloperKey<T>(TableStructureTransitionTarget.class, name),t);
 	}
-	public Map<TransitionKey<T>, Transition<T>> getTransitions() {
+	public Map<TableTransitionKey<T>, Transition<T>> getTransitions() {
 		return table_transitions;
 	}
 
