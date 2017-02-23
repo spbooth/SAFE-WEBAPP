@@ -41,7 +41,7 @@ public class TableDeveloperKey<T extends TableStructureTransitionTarget> extends
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.AccessControlTransitionKey#allow(uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
 	@Override
-	public boolean allow(SessionService serv,T target) {
+	public boolean allow(SessionService<?> serv,T target) {
 		return serv.hasRole(CHANGE_TABLE_STRUCTURE_ROLE);
 	}
 
