@@ -19,6 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
@@ -89,10 +90,12 @@ public class TableSpecificationTransitionSource<T extends TableStructureTransiti
 		@Override
 		public <I extends Input<String> & ItemInput<FieldInfo>> I getFieldInput() {
 			Map<String,FieldInfo> map = new LinkedHashMap<String, Repository.FieldInfo>();
-			for(String name : spec.getOptionalFieldNames()){
-				FieldInfo info = res.getInfo(name);
-				if( info != null){
-					map.put(name, info);
+			Set<String> optionalFieldNames = spec.getOptionalFieldNames();
+			Set<String> fieldNames = spec.getFieldNames();
+			for(String name : res.getFields()){
+				// optional are marked optional or not in spec
+				if( optionalFieldNames.contains(name) || ! fieldNames.contains(name)){
+					map.put(name, res.getInfo(name));
 				}
 			}
 			return (I) new OptionalFieldInput<FieldInfo>(res, false, map);
