@@ -38,7 +38,7 @@ public class TableStructureAdminOperationKey<T extends TableStructureTransitionT
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.AccessControlTransitionKey#allow(uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
 	@Override
-	public boolean allow(SessionService serv,T target) {
+	public boolean allow(SessionService<?> serv,T target) {
 		return serv.hasRoleFromList(SessionService.ADMIN_ROLE,TableDeveloperKey.CHANGE_TABLE_STRUCTURE_ROLE);
 	}
 
