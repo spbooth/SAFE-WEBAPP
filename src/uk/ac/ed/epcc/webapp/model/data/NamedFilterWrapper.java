@@ -15,6 +15,8 @@ package uk.ac.ed.epcc.webapp.model.data;
 
 
 
+import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
@@ -28,6 +30,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
  * be constructed via field <i>field_name</i> and the same algorithm applied on the remote factory.
  * Only references registered in the {@link Repository} can be de-referenced.
  * @author spb
+ * @param <T> targe type of filters
  *
  */
 public class NamedFilterWrapper<T extends DataObject> implements NamedFilterProvider<T> {
@@ -87,5 +90,19 @@ public class NamedFilterWrapper<T extends DataObject> implements NamedFilterProv
 			return fac.getRemoteFilter(remote_fac, remote, fil);
 		}
 		return null;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider#addFilterNames(java.util.Set)
+	 */
+	@Override
+	public void addFilterNames(Set<String> names) {
+		if( fac instanceof NamedFilterProvider){
+			((NamedFilterProvider<T>)fac).addFilterNames(names);
+			
+		}
+		for(NamedFilterProvider<T> nfp : fac.getComposites(NamedFilterProvider.class)){
+			nfp.addFilterNames(names);
+		}
+		
 	}
 }

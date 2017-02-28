@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.data;
 
+import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 
@@ -39,4 +41,12 @@ public interface NamedFilterProvider<T> {
 	 * @return {@link BaseFilter} or null
 	 */
 	public BaseFilter<T> getNamedFilter(String name);
+	
+	/** Add names of all the directly supported filters.
+	 * 
+	 * This does not include remote filters referenced through a {@link NamedFilterWrapper}
+	 * 
+	 * @param names
+	 */
+	public void addFilterNames(Set<String> names);
 }

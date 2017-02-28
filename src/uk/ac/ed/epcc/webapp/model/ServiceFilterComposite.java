@@ -137,7 +137,15 @@ public class ServiceFilterComposite<BDO extends DataObject> extends Composite<BD
 		}
 		return null;
 	}
-
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider#addFilterNames(java.util.Set)
+	 */
+	@Override
+	public void addFilterNames(Set<String> names) {
+		names.add(THIS_SERVICE_FILTER_NAME);
+		names.add(OTHER_SERVICE_FILTER_NAME);
+		
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#addSelectors(java.util.Map)
 	 */
@@ -174,4 +182,6 @@ public class ServiceFilterComposite<BDO extends DataObject> extends Composite<BD
 		return id;
 		
 	}
+
+	
 }
