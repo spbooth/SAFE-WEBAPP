@@ -113,6 +113,10 @@ public class MenuVisitor implements Visitor{
 		if( ! class_string.isEmpty()){
 			builder.attr("class",class_string);
 		}
+		String help = node.getHelpText();
+		if( help != null && ! help.isEmpty()){
+			builder.attr("title",help);
+		}
 		String id = node.getID();
 		if( id != null){
 			builder.attr("id",id);
