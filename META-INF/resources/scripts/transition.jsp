@@ -85,6 +85,7 @@ if( t instanceof BaseFormTransition ){
 	((TargetLessTransition)t).buildForm(f,conn);
 }
 
+String default_charset = conn.getService(ServletService.class).defaultCharset();
 boolean multi = f.containsInput(FileInput.class);
 HtmlBuilder form_content = new HtmlBuilder();
 // Don't use period to be jquery compatible
@@ -119,13 +120,16 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 <%
 	if( t instanceof ExtraContent ){
 %>
-<A name="extra"></A>
+<div id="extra">
 <%=((ExtraContent) t).getExtraHtml(new HtmlBuilder(),session_service,target).toString()%>
+</div>
 <%} %>
-<A name="form"></A>
-<form method="post" 
+
+<form id="form" method="post" 
 <% if( multi ){ %>
    enctype="multipart/form-data"
+<% } %>
+<% if( default_charset != null && ! default_charset.isEmpty()){ %> accept-charset="<%=default_charset %>"
 <% } %>
 action="<%= response.encodeURL(web_path+TransitionServlet.getURL(conn,tp,target))%>" role="main">
 <input type='hidden' name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>' value='<%=action %>'/>

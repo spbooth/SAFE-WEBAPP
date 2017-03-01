@@ -73,8 +73,7 @@ try{
 <%= provider.getTopContent(new HtmlBuilder(),target,session_service).toString() %>
 <div class="block" role="main">
 <%= provider.getLogContent(new HtmlBuilder(),target,session_service).toString() %>
-<A name="form"/>
-<form action="<%=response.encodeURL(web_path +TransitionServlet.getURL(conn,provider,target)+"#form") %>" method="post">
+<form id="form" action="<%=response.encodeURL(web_path +TransitionServlet.getURL(conn,provider,target)+"#form") %>" method="post">
 <div class="action_buttons">
 <%
 for(Object key : provider.getTransitions(target)){
