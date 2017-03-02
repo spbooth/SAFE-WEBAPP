@@ -334,4 +334,11 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 		addList(list);
 		
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#getDetails(java.lang.String)
+	 */
+	@Override
+	public ContentBuilder getDetails(String summary_text) {
+		return getPanel();
+	}
 }

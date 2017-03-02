@@ -545,5 +545,12 @@ public class SwingContentBuilder  implements ContentBuilder{
 	public <X> void addList(Map<String, String> attr, Iterable<X> list) {
 		addList(list);
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#getDetails(java.lang.String)
+	 */
+	@Override
+	public ContentBuilder getDetails(String summary_text) {
+		return getPanel();
+	}
 
 }

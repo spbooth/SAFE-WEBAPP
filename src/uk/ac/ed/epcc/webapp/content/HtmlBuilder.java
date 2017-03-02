@@ -108,16 +108,18 @@ protected static final class Text extends HtmlPrinter {
 	}
   public static final class Panel extends HtmlBuilder {
 	  Map<String,String> attr = new LinkedHashMap<String, String>();
+	  String element;
 	  String type;
-	  Panel(HtmlBuilder parent, String type){
+	  Panel(String element,HtmlBuilder parent, String type){
 		  super(parent);
+		  this.element=element;
 		  attr.put("class", type);
 		  this.type=type;
 	  }
 		@Override
 		public HtmlBuilder appendParent() throws UnsupportedOperationException {
 			HtmlBuilder parent = (HtmlBuilder) getParent();
-			parent.open("div");
+			parent.open(element);
 			for(String key : attr.keySet()){
 				parent.attr(key,attr.get(key));
 			}
@@ -227,13 +229,13 @@ public ContentBuilder getPanel(String ... type)
 			classes.append(class_name.trim());
 		}
 	}
-	return new Panel(this,classes.toString());
+	return new Panel("div",this,classes.toString());
 }
 
 public ContentBuilder getPanel(String type)
 		throws UnsupportedOperationException {
 	
-	return new Panel(this,type);
+	return new Panel("div",this,type);
 }
 public ContentBuilder addParent() throws UnsupportedOperationException {
 	return (ContentBuilder) appendParent();
@@ -592,5 +594,20 @@ public void addScriptFile(String path){
 }
 protected final Logger getLogger(AppContext conn){
 	return conn.getService(LoggerService.class).getLogger(getClass());
+}
+
+
+/* (non-Javadoc)
+ * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#getDetails(java.lang.String)
+ */
+@Override
+public ContentBuilder getDetails(String summary_text) {
+	Panel details = new Panel("details",this,"details");
+	if( summary_text != null && ! summary_text.isEmpty()){
+		details.open("summary");
+		details.clean(summary_text);
+		details.close();
+	}
+	return details;
 }
 }

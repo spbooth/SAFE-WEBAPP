@@ -88,6 +88,14 @@ public interface ContentBuilder {
 	 */
 	public ContentBuilder getPanel(String ... type) throws UnsupportedOperationException;
 	
+	/** get an expanding/folding section if supported
+	 * 
+	 *  Otherwise this just maps to {@link #getPanel(String...)}
+	 * 
+	 * @param summary_text
+	 * @return
+	 */
+	public ContentBuilder getDetails(String summary_text);
 	/** append a nested panel to its parent content.
 	 * @return parent ContentBuilder
 	 * 
