@@ -175,11 +175,14 @@ public void addButton(AppContext conn,String text, String hover,FormResult actio
 	}
 }
 public void addLink(AppContext conn,String text, FormResult action) {
+	addLink(conn,text,null,action);
+}
+public void addLink(AppContext conn,String text, String hover,FormResult action) {
 	if( action == null){
 		clean(text);
 		return;
 	}
-	AddLinkVisitor vis = new AddLinkVisitor(conn, this, text);
+	AddLinkVisitor vis = new AddLinkVisitor(conn, this, text,hover);
 	try {
 		action.accept(vis);
 	} catch (Exception e) {

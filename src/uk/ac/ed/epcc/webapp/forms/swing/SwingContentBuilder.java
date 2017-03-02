@@ -20,7 +20,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
 
@@ -33,9 +32,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
-
-
-
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
@@ -288,7 +284,11 @@ public class SwingContentBuilder  implements ContentBuilder{
 		addButton(c,text, action);
 
 	}
+	public void addLink(AppContext c,String text, String hover,FormResult action) {
+		log.debug("add link");
+		addButton(c,text, hover,action);
 
+	}
 	public <C,R> void addTable(AppContext conn,Table<C,R> t) {
 		log.debug("add table");
 		JPanel table=new JPanel(new GridBagLayout());

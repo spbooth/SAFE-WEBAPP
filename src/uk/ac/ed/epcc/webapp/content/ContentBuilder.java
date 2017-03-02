@@ -149,6 +149,15 @@ public interface ContentBuilder {
 	 */
 	public abstract void addLink(AppContext conn,String text, FormResult action);
 	
+	/** Add an action link to the Content
+	 * @param conn AppContext
+	 * 
+	 * @param text  link text
+	 * @param hover tooltip text
+	 * @param action FormResult to navigate to.
+	 */
+	public abstract void addLink(AppContext conn,String text, String hover,FormResult action);
+	
 	/** Add a table to the content.
 	 * 
 	 * Table content that implements {@link UIGenerator} should be added via {@link UIGenerator#addContent(ContentBuilder)}

@@ -39,10 +39,12 @@ public class AddLinkVisitor implements WebFormResultVisitor {
     private final ExtendedXMLBuilder hb;
     private final AppContext conn;
     private final String text;
-    public AddLinkVisitor(AppContext c, ExtendedXMLBuilder hb,String text){
+    private final String title;
+    public AddLinkVisitor(AppContext c, ExtendedXMLBuilder hb,String text,String title){
     	conn=c;
     	this.hb=hb;
     	this.text=text;
+    	this.title=title;
     }
     private String encodeURL(String url){
     	ServletService serv = conn.getService(ServletService.class);
@@ -67,6 +69,9 @@ public class AddLinkVisitor implements WebFormResultVisitor {
 			throw new UnsupportedResultException("Cannot link with forward attributes");
 		}
 		hb.open("a");
+		if( title != null && ! title.isEmpty()){
+			hb.attr("title", title);
+		}
 		hb.attr("href", encodeURL(res.getURL()));
 		hb.clean(text);
 		hb.close();
@@ -77,6 +82,9 @@ public class AddLinkVisitor implements WebFormResultVisitor {
 
 	public void visitRedirectResult(RedirectResult res) throws Exception {
 		hb.open("a");
+		if( title != null && ! title.isEmpty()){
+			hb.attr("title", title);
+		}
 		hb.attr("href", encodeURL(res.getURL()));
 		hb.clean(text);
 		hb.close();
