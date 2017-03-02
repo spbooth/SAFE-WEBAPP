@@ -1246,7 +1246,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return it.hasNext();
 		}
 	}
-	private final ConvertPureAcceptFilterVisitor<BDO> accept_converter = new ConvertPureAcceptFilterVisitor<BDO>();
+	// Note this is used to implement FilterMatcher so
+	// we can't pass ourselves as the matcher arg
+	private final ConvertPureAcceptFilterVisitor<BDO> accept_converter = new ConvertPureAcceptFilterVisitor<BDO>(null);
 	public final boolean matches(BaseFilter<? super BDO> fil, BDO o) {
 		if( fil == null){
 			return false;
@@ -1924,7 +1926,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return new Joiner<R, BDO>(getTarget(), sqlfil, field, res, remote.res);
 		} catch (Exception e) {
 			try {
-				AcceptFilter<R> acceptfil = (AcceptFilter<R>) fil.acceptVisitor(new ConvertPureAcceptFilterVisitor<R>());
+				ConvertPureAcceptFilterVisitor<R> vis = new ConvertPureAcceptFilterVisitor<R>(remote);
+				vis.setThrowException(true);
+				AcceptFilter<R> acceptfil = (AcceptFilter<R>) fil.acceptVisitor(vis);
 				return new RemoteAcceptFilter<BDO,R>(getTarget(),remote,field,acceptfil);
 			} catch (Exception e1) {
 				getLogger().error("Cannot convert Relationship filter", e1);
@@ -1998,7 +2002,12 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 		
 	}
-	
+	/** A {@link FilterVisitor} for making a local filter from a filter on a referenced table.
+	 * 
+	 * @author spb
+	 *
+	 * @param <R>
+	 */
 	public class MakeRemoteFilterVisitor<R extends DataObject> implements FilterVisitor<BaseFilter<BDO>, R>{
 		private final DataObjectFactory<R> remote_fac;
 		private final String field;
@@ -2007,6 +2016,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			this.remote_fac=remote_fac;
 			this.field=field;
 		}
+		/** default mechanism
+		 * if the filter can be converted to a pure {@link SQLFilter} use that
+		 * otherwise a {@link RemoteAcceptFilter}
+		 * 
+		 * @param fil
+		 * @return
+		 */
 		public BaseFilter<BDO> visitBaseFilter(BaseFilter<? super R> fil){
 			try{
 				SQLFilter<? super R> sqlfilter = FilterConverter.convert(fil);
@@ -2039,7 +2055,16 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 */
 		@Override
 		public BaseFilter<BDO> visitAndFilter(AndFilter<? super R> fil) throws Exception {
-			return visitBaseFilter(fil);
+			try{
+				SQLFilter<? super R> sqlfilter = FilterConverter.convert(fil);
+				return new RemoteFilter<R>(remote_fac,field,sqlfilter);
+			}catch(NoSQLFilterException e){
+				BaseFilter<BDO> result =new RemoteAcceptFilter<BDO, R>(getTarget(), remote_fac, field, fil);
+				if( fil.hasPatternFilters() ){
+					result = new AndFilter<BDO>(getTarget(),result, new RemoteFilter<R>(remote_fac,field,fil.getNarrowingFilter()));
+				}
+				return result;
+			}
 		}
 
 		/* (non-Javadoc)

@@ -18,10 +18,21 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
  * If the conversion is not possible then return null, unless throw_exception is set.
  * 
  * @author spb
+ * @param <T> type of filter
  *
  */
 public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFilter<? super T>, T> {
 
+	/**
+	 * 
+	 * @param matcher and optional {@link FilterMatcher}
+	 */
+	public ConvertPureAcceptFilterVisitor(FilterMatcher<T> matcher) {
+		super();
+		this.matcher = matcher;
+	}
+
+	private final FilterMatcher<T> matcher;
 	private boolean throw_exception=false;
 	
 	public boolean getThrowException() {
@@ -41,7 +52,10 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
 	 */
 	@Override
-	public AcceptFilter<? super T> visitPatternFilter(PatternFilter<? super T> fil) throws Exception {
+	public AcceptFilter<T> visitPatternFilter(PatternFilter<? super T> fil) throws Exception {
+		if( matcher != null ){
+			return new ConvertToAcceptFilter<T>(fil, matcher);
+		}
 		doThrow();
 		return null;
 	}
@@ -50,7 +64,10 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitSQLCombineFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter)
 	 */
 	@Override
-	public AcceptFilter<? super T> visitSQLCombineFilter(BaseSQLCombineFilter<? super T> fil) throws Exception {
+	public AcceptFilter<T> visitSQLCombineFilter(BaseSQLCombineFilter<? super T> fil) throws Exception {
+		if( matcher != null ){
+			return new ConvertToAcceptFilter<T>(fil, matcher);
+		}
 		// Might be able to do something if all contents are DualFilters
 		doThrow();
 		return null;
@@ -60,8 +77,8 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAndFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter)
 	 */
 	@Override
-	public AcceptFilter<? super T> visitAndFilter(AndFilter<? super T> fil) throws Exception {
-		AcceptFilter<? super T> res = fil.getAcceptFilter();
+	public AcceptFilter<T> visitAndFilter(AndFilter<? super T> fil) throws Exception {
+		AcceptFilter<T> res = ((AndFilter)fil).getAcceptFilter( matcher);
 		if( res == null ){
 			doThrow();
 		}
@@ -99,7 +116,7 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	 */
 	@Override
 	public AcceptFilter<? super T> visitOrFilter(OrFilter<? super T> fil) throws Exception {
-		// A OrFilter is and AcceptFilter even though it uses SQL to do this
+		// A OrFilter is an AcceptFilter even though it uses SQL to do this
 		return fil;
 	}
 
