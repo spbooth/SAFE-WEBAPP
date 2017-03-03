@@ -49,6 +49,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
 import uk.ac.ed.epcc.webapp.model.data.NamedFilterWrapper;
+import uk.ac.ed.epcc.webapp.model.data.RemoteAccessRoleProvider;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.model.relationship.GlobalRoleFilter;
@@ -64,9 +65,13 @@ import uk.ac.ed.epcc.webapp.model.relationship.RelationshipProvider;
  * <b>use_relationship.<em>factory-tag</em>.<em>role</em></b>
  * If this is a comma separated list it implies an OR of the component parts.
  * within this AND combinations can be specified as + separated terms.
- * 
+ * <p>
  * The factory (or its {@link Composite}s) can implement {@link AccessRoleProvider} to provide roles.
- * 
+ * <p>
+ * Roles of the form <i>field</i><b>-></b><i>remote_role</i> denotes a remote filter
+ * joined via the reference field <i>field</i> A person has these roles with the targer object
+ * if they have the <i>remote_role</i> on the object the target references. The remote role must be unqualified.
+ * <p>
  * Role names containing a period are qualified names the qualifier can be:
  * <ul>
  * <li> <b>global</b> the role is a global role not a relationship.</li>
@@ -79,10 +84,23 @@ import uk.ac.ed.epcc.webapp.model.relationship.RelationshipProvider;
  * 
  * @author spb
  * @see NamedFilterWrapper
+ * @see RemoteAccessRoleProvider
  * @param <A>
  */
 @PreRequisiteService(ConfigService.class)
 public abstract class AbstractSessionService<A extends AppUser> implements Contexed, SessionService<A>{
+	/**
+	 * 
+	 */
+	private static final String RELATIONSHIP_DEREF = "->";
+	/** string that separates OR combination of relationship defns
+	 * 
+	 */
+	private static final String OR_RELATIONSHIP_COMBINER = ",";
+	/** string that separates AND combinations of relationship defns
+	 * 
+	 */
+	private static final String AND_RELATIONSHIP_COMBINER = "+";
 	/** prefix for relationship definitions that map to a global role
 	 * 
 	 */
@@ -91,7 +109,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * 
 	 */
 	private static final String BOOLEAN_RELATIONSHIP_BASE = "boolean";
-	/**
+	/** property prefix for relationship defns
 	 * 
 	 */
 	private static final String USE_RELATIONSHIP_PREFIX = "use_relationship.";
@@ -182,7 +200,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		 */
 		@Override
 		public String toString() {
-			return "RelationshipTag [tag=" + tag + ", id=" + id + ", role=" + role + "]";
+			return "RelationshipTag [tag=" + tag + ", id=" + id + ", role=" + role + "]"+hashCode();
 		}
 	}
 	private Map<RelationshipTag,Boolean> relationship_map=null;
@@ -1031,6 +1049,10 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * 
 	 * The factory (or its {@link Composite}s) can implement {@link AccessRoleProvider} to provide roles.
 	 * 
+	 * Roles of the form <i>field</i><b>-></b><i>remote_role</i> denotes a remote filter
+	 * joined via the reference field <i>field</i> A person has these roles with the targer object
+	 * if they have the <i>remote_role</i> on the object the target references. The remote role must be unqualified.
+	 * 
 	 * Role names containing a period are qualified names the qualifier can be:
 	 * <ul>
 	 * <li> <b>global</b> the role is a global role not a relationship.</li>
@@ -1054,7 +1076,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		}
 		searching_roles.add(role);
 		try{
-		if( role.contains(",")){
+		if( role.contains(OR_RELATIONSHIP_COMBINER)){
 			// OR combination of filters
 			OrFilter<T> or = new OrFilter<T>(fac2.getTarget(), fac2);
 			for( String  s  : role.split(",")){
@@ -1066,7 +1088,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			}
 			return or;
 		}
-		if( role.contains("+")){
+		if( role.contains(AND_RELATIONSHIP_COMBINER)){
 			// AND combination of filters
 			AndFilter<T> and = new AndFilter<T>(fac2.getTarget());
 			for( String  s  : role.split("\\+")){
@@ -1127,6 +1149,14 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    		}
 	    		return arp.hasRelationFilter(sub,person);
 	    	}
+	    }else if( role.contains(RELATIONSHIP_DEREF)){
+	    	// This is a remote relationship
+	    	// Note this will also catch remote NamedRoles
+	    	int pos = role.indexOf(RELATIONSHIP_DEREF);
+	    	String link_field = role.substring(0, pos);
+	    	String remote_role = role.substring(pos+RELATIONSHIP_DEREF.length());
+	    	RemoteAccessRoleProvider<A, T, ?> rarp = new RemoteAccessRoleProvider<>(this, fac2, link_field);
+	    	return rarp.hasRelationFilter(remote_role, person);
 	    }else{
 	    	// Non qualified name
 	    	if( person == null){
@@ -1158,7 +1188,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		}
 		searching_roles.add(role);
 		try{
-		if( role.contains(",")){
+		if( role.contains(OR_RELATIONSHIP_COMBINER)){
 			// OR combination of filters
 			OrFilter<A> or = new OrFilter<A>(target_type, login_fac);
 			for( String  s  : role.split(",")){
@@ -1166,7 +1196,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			}
 			return or;
 		}
-		if( role.contains("+")){
+		if( role.contains(AND_RELATIONSHIP_COMBINER)){
 			// OR combination of filters
 			AndFilter<A> and = new AndFilter<A>(target_type);
 			for( String  s  : role.split("\\+")){
@@ -1200,6 +1230,14 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    	if( arp != null ){
 	    		return arp.personInRelationFilter(this, sub, target);
 	    	}
+	    }else if( role.contains(RELATIONSHIP_DEREF)){
+	    	// This is a remote relationship
+	    	// Note this will also catch remote NamedRoles
+	    	int pos = role.indexOf(RELATIONSHIP_DEREF);
+	    	String link_field = role.substring(0, pos);
+	    	String remote_role = role.substring(pos+RELATIONSHIP_DEREF.length());
+	    	RemoteAccessRoleProvider<A, T, ?> rarp = new RemoteAccessRoleProvider<>(this, fac2, link_field);
+	    	return rarp.personInRelationFilter(this, remote_role, target);
 	    }else{
 	    	// direct roles can be un-qualified though not if we want multiple levels of qualification.
 	    	BaseFilter<? super A> result = makeDirectPersonInRelationshipRoleFilter(fac2, role,target);
