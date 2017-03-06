@@ -15,17 +15,20 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
 
 /** Convert a {@link BaseFilter} to a pure {@link AcceptFilter}.
  * 
+ * If a non-null {@link FilterMatcher} is supplied on construction then the conversion will always succeed.
+ * 
  * If the conversion is not possible then return null, unless throw_exception is set.
  * 
  * @author spb
  * @param <T> type of filter
+ * @see ConvertToAcceptFilter
  *
  */
 public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFilter<? super T>, T> {
 
 	/**
 	 * 
-	 * @param matcher and optional {@link FilterMatcher}
+	 * @param matcher an optional {@link FilterMatcher}
 	 */
 	public ConvertPureAcceptFilterVisitor(FilterMatcher<T> matcher) {
 		super();

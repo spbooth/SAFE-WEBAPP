@@ -21,7 +21,6 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
-import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 /** Filter to join two tables, selecting entries based on a filter on the remote table 
  *
