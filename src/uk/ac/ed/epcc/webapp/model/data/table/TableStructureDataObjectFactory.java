@@ -26,7 +26,7 @@ import uk.ac.ed.epcc.webapp.model.data.TableStructureContributer;
 
 /** A  {@link DataObjectFactory} with a default implementation of {@link TableStructureTransitionTarget}.
  * 
- * Though this behaviour is mostly added by composition it is still useful to have default superclass that can be extended to to futher reduce code duplication. 
+ * Though this behaviour is mostly added by composition it is still useful to have default superclass that can be extended to to further reduce code duplication. 
  * @author spb
  * @param <BDO> 
  *
