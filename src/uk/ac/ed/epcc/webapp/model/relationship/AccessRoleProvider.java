@@ -13,7 +13,9 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.relationship;
 
+import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
@@ -62,7 +64,9 @@ public interface AccessRoleProvider<U extends AppUser,T extends DataObject> {
 	 * the target object.
 	 * 
 	 * This is the inverse of {@link #hasRelationFilter(SessionService, String)} used to generate a list
-	 * of {@link AppUser} with the relation. 
+	 * of {@link AppUser} with the relation. It can always be implemented (inefficiently) by creating an {@link AcceptFilter}
+	 * that uses {@link #hasRelationFilter(String, AppUser)} to check each person in turn but though it is usually possible to find some {@link SQLFilter}
+	 * to narrow the selection first even if a full SQL implementation is not possible.
 	 * 
 	 * If the target is null it should generate a filter for any user in relation with targets
 	 * selected by {@link DataObjectFactory#getDefaultRelationshipFilter()}. If this is not possible
