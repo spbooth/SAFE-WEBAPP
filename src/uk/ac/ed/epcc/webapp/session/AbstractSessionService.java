@@ -1156,7 +1156,11 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    	String link_field = role.substring(0, pos);
 	    	String remote_role = role.substring(pos+RELATIONSHIP_DEREF.length());
 	    	RemoteAccessRoleProvider<A, T, ?> rarp = new RemoteAccessRoleProvider<>(this, fac2, link_field);
-	    	return rarp.hasRelationFilter(remote_role, person);
+	    	BaseFilter<T> fil = rarp.hasRelationFilter(remote_role, person);
+	    	if( fil == null ){
+	    		throw new UnknownRelationshipException(role);
+	    	}
+			return fil;
 	    }else{
 	    	// Non qualified name
 	    	if( person == null){
@@ -1237,7 +1241,11 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    	String link_field = role.substring(0, pos);
 	    	String remote_role = role.substring(pos+RELATIONSHIP_DEREF.length());
 	    	RemoteAccessRoleProvider<A, T, ?> rarp = new RemoteAccessRoleProvider<>(this, fac2, link_field);
-	    	return rarp.personInRelationFilter(this, remote_role, target);
+	    	BaseFilter<? super A> fil = rarp.personInRelationFilter(this, remote_role, target);
+	    	if( fil == null ){
+	    		throw new UnknownRelationshipException(role);
+	    	}
+			return fil;
 	    }else{
 	    	// direct roles can be un-qualified though not if we want multiple levels of qualification.
 	    	BaseFilter<? super A> result = makeDirectPersonInRelationshipRoleFilter(fac2, role,target);
