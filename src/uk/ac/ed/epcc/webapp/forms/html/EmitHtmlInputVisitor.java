@@ -15,10 +15,12 @@ package uk.ac.ed.epcc.webapp.forms.html;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.forms.inputs.AutocompleteTextInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.BinaryInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
@@ -478,6 +480,13 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			if (max_result_length > boxwid) {
 				size = boxwid;
 			}
+			boolean autocomplete = input instanceof AutocompleteTextInput;
+
+			if (autocomplete) {
+				result.open("div");
+				result.attr("class", "ui-widget");
+			}
+			
 			result.open("input");
 			if( id != null ){
 				result.attr("id", id);
@@ -504,6 +513,10 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 				result.attr("value",default_value);
 			}
 			result.attr("class","input");
+			if ((autocomplete) && (use_html5)) {
+				// add list attribute
+				result.attr("list", name + "_list");
+			}
 			// Now for html verification
 			if( use_html5){
 				if( input instanceof PatternInput){
@@ -547,6 +560,26 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 				}
 			}
 			result.close();
+			
+			if (autocomplete) {
+				if (use_html5) {
+					// add actual list of completions
+					result.open("noscript");
+					result.open("datalist");
+					result.attr("id", name + "_list");
+					Set<String> suggestions = ((AutocompleteTextInput)input).getSuggestions();
+					Iterator<String> it = suggestions.iterator();
+					while (it.hasNext()) {
+						String suggestion = it.next();
+						result.open("option");
+						result.attr("value", suggestion);
+						result.close();
+					}
+					result.close(); // datalist
+					result.close(); // noscript
+				}
+				result.close(); // close the <div>
+			}
 		} else {
 			int rows = ((max_result_length + boxwid - 1) / boxwid);
 			int size = (max_result_length + rows - 1) / rows;
