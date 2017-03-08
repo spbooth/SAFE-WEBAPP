@@ -17,7 +17,7 @@
 	<property name="test.home" value="${basedir}/test-classes" />
 	<property name="work.home" value="${basedir}/work" />
 	<property name="report.dir" value="${basedir}/report" />
-	<property name="doc.dir" value="${basedir}/docs" />
+	<property name="doc.dir" value="${basedir}/doc" />
 	<property name="tomcat.home" value="/home/sbooth/tomcat/apache-tomcat-7.0.27" />
 	<property name="umldoc.home" value="/scratch/yworks-uml-doclet-3.0_02-jdk1.5" />
 	<property name="webapp.lib" value="lib/safe"/>

@@ -64,7 +64,9 @@ import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
 public class TimeChart<P extends PeriodSequencePlot> extends PeriodChart<P>{
 	
-	
+	public static final Feature JFREE_TIMECHART_FEATURE = new Preference("chart.timechart.use_jfreechart", false, "Use JFreechart for time-charts");
+	public static final Feature JFREE_TIMECHART_STEP_FEATURE = new Feature("chart.jfreechart.timechart.use_step", false, "Use step rendering for timecharts");
+
 	
    
 	protected TimeChart(AppContext c) {
@@ -191,7 +193,21 @@ public class TimeChart<P extends PeriodSequencePlot> extends PeriodChart<P>{
 		((TimeChartData)getChartData()).addWarningLevel(value);
 	}
 	
-
+	/* {{{ public TimeChart(){ */
+	private static TimeChart getInstance(AppContext c) {
+		TimeChart t = new TimeChart(c);
+		
+		if( JFREE_TIMECHART_FEATURE.isEnabled(c)){
+			JFreeTimeChartData chart2 = new JFreeTimeChartData();
+			chart2.setUseStep(JFREE_TIMECHART_STEP_FEATURE.isEnabled(c));
+			t.setChartData(chart2);
+		}else{
+			t.setChartData(new Chart2DTimeChartData());
+		}
+		
+		
+		return t;
+	}
 
 	public static TimeChart getInstance(AppContext c, Calendar s, Calendar e,
 			int major, int minor) throws InvalidArgument {
@@ -286,7 +302,7 @@ public class TimeChart<P extends PeriodSequencePlot> extends PeriodChart<P>{
 	/* }}} */
 	public static TimeChart getInstance(AppContext c, SplitTimePeriod p, int minor) throws InvalidArgument {
 		assert(p!=null);
-		TimeChart t = c.getService(GraphService.class).getTimeChart();
+		TimeChart t = getInstance(c);
 	
 		TimeChartData chartData = t.getChartData();
 	
