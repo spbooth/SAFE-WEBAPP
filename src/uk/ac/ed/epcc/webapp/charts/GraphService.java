@@ -15,7 +15,7 @@ package uk.ac.ed.epcc.webapp.charts;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
-
+import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.time.Period;
 import uk.ac.ed.epcc.webapp.time.SplitTimePeriod;
 
@@ -23,7 +23,7 @@ import uk.ac.ed.epcc.webapp.time.SplitTimePeriod;
  * @author spb
  *
  */
-public abstract class GraphService implements AppContextService<GraphService>{
+public abstract class GraphService implements AppContextService<GraphService>, Contexed{
 	
 	protected final AppContext conn;
 	/**
@@ -94,6 +94,14 @@ public void cleanup() {
 @Override
 public final  Class<? super GraphService> getType() {
 	return GraphService.class;
+}
+
+/* (non-Javadoc)
+ * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
+ */
+@Override
+public AppContext getContext() {
+	return conn;
 } 
 
 }
