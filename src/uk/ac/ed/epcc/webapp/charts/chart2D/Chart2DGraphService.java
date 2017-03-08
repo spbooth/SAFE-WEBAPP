@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.charts.chart2D;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.charts.BarTimeChartData;
 import uk.ac.ed.epcc.webapp.charts.ChartData;
 import uk.ac.ed.epcc.webapp.charts.GraphService;
 import uk.ac.ed.epcc.webapp.charts.PieTimeChartData;
@@ -58,6 +59,15 @@ public void cleanup() {
 
 
 	
+}
+
+/* (non-Javadoc)
+ * @see uk.ac.ed.epcc.webapp.charts.GraphService#getBarTimeChartData()
+ */
+@Override
+protected BarTimeChartData getBarTimeChartData() {
+	
+	return new BarChart2DChartData();
 }
 
 

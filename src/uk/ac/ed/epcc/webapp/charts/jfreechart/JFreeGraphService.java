@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.charts.jfreechart;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.charts.BarTimeChartData;
 import uk.ac.ed.epcc.webapp.charts.ChartData;
 import uk.ac.ed.epcc.webapp.charts.GraphService;
 import uk.ac.ed.epcc.webapp.charts.PieTimeChartData;
@@ -67,6 +68,17 @@ protected PieTimeChartData getPieTimeChartData() {
 @Override
 protected ScatterPeriodChartData getScatterPeriodChartData() {
 	return new JFreeScatterPeriodChartData();
+}
+
+
+
+
+/* (non-Javadoc)
+ * @see uk.ac.ed.epcc.webapp.charts.GraphService#getBarTimeChartData()
+ */
+@Override
+protected BarTimeChartData getBarTimeChartData() {
+	return new JFreeBarTimeChartData();
 } 
 
 }

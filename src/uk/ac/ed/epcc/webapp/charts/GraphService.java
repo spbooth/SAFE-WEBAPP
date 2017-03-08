@@ -78,6 +78,21 @@ public abstract class GraphService implements AppContextService<GraphService>, C
 	 */
 	protected abstract  ScatterPeriodChartData getScatterPeriodChartData() ;
 
+	public final BarTimeChart getBarTimeChart( Period p) throws Exception {
+		BarTimeChart ptc = new BarTimeChart(conn,p);
+		BarTimeChartData chartData=getBarTimeChartData();
+		
+		chartData.setPeriod(p);
+		ptc.setChartData(chartData);
+		
+		
+		return ptc;
+	}	
+	
+/**
+	 * @return
+	 */
+	protected abstract BarTimeChartData getBarTimeChartData() ;
 /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.AppContextService#cleanup()
  */
