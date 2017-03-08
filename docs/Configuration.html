@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Configuration</title>
+</head>
+<body>
+<h1>Configuration</h1>
+The Framework is configured using java properties. 
+Configuration properties for a specific applications usually live in the files 
+<b>WEB-INF/classes/service-config.properties</b> and <b>WEB-INF/classes/deploy-config.properties</b>
+ within the war-file.  Properties can be placed in either of the two files. The purpose of the deploy-config file is to allow a second level of customisation, so a test instance of the application might use a different deploy-config file from the production version. Additional properties can also be set on the tomcat/JVM command line though these do not override any entries in the built-in configuration files.  Properties can also be added the web.xml, context.xml files and to the Properties database table. Database Properties have a higher precedence than the configuration files so this table can be used to dynamically change the configuration of a running instance. This is the mechanism used by built-in administration forms to change the configuration. 
+In most cases the top-level war-file will be built specialised for the site deploying the application. 
+Properties are loaded from the following locations in order:
+<ol>
+<li> Standard java properties including JVM  <b>-Dproperty=value</b>  flags.</li>
+<li>Two levels of configuration files. 
+For each level a configuration property (that could be set in a previous level) can be used to specify a comma separated set of locations. These locations can either be resources on the java classpath or an absolute file-location. 
+<table>
+<tr><th>Location parameter</th><th>Default value</th><th>Files must exist</th></tr>
+<tr><td>config.path</td><td>service-config.properties</td><td>yes</td></tr>
+<tr><td>deploy.path</td><td>deploy-config.properties</td><td>no</td></tr>
+</table>
+</li>
+<li>Init parameters set in the Context  or Servlet elements of the application XML files. Parameters set in the Servlet elements are only visible to requests to that servlet. Parameters in the Context are global. As a Context configuration can be set outside of the warfile this is a good mechanism for setting parameters without having to rebuild the war-file.
+</li>
+<li>Values in the Properties database table. The database connection must be fully configured by the previous sections.
+</li>
+</ol>
+
+If you want to override properties from the java command line the easiest
+ way to do this is to use a JVM parameter to add an additional property file 
+ to the deploy.path and then add the override properties to that file: e.g. <br>
+ <b>-Ddeploy.path=deploy-config.properties,/etc/safe/safe.properties</b> .
+</body>
+</html>
