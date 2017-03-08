@@ -24,11 +24,6 @@ import java.awt.Color;
 import java.util.Calendar;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Feature;
-import uk.ac.ed.epcc.webapp.charts.chart2D.PieChart2DChartData;
-import uk.ac.ed.epcc.webapp.charts.jfreechart.JFreePieChartData;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.preferences.Preference;
 //import uk.ac.ed.epcc.webapp.charts.jfreechart.JFreePieChartData;
 import uk.ac.ed.epcc.webapp.time.Period;
 

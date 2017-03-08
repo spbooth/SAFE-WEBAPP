@@ -21,7 +21,6 @@ import java.util.Calendar;
 
 import org.junit.Test;
 
-import uk.ac.ed.epcc.webapp.charts.chart2D.Chart2DChartData;
 import uk.ac.ed.epcc.webapp.content.Table;
 
 public class TimeChartTest extends ChartTestCase {
@@ -40,7 +39,6 @@ public class TimeChartTest extends ChartTestCase {
 		  plot.doConvertToStacked();
 		  int nsets = plot.getNumSets();
 		  System.out.println(nsets);
-	//	  String legs[] = ((Chart2DChartData)tc.getChartData()).getLegends();
 		ChartData<?> c = tc.getChartData();
 		c.createPNG(new File(System.getProperty("java.io.tmpdir")+"/daystrip"+".png"));
 		  c.getSize();
