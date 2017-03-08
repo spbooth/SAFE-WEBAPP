@@ -36,7 +36,7 @@ import uk.ac.ed.epcc.webapp.content.InvalidArgument;
  */
 
 public class PieChart extends Chart {
-	public static final Feature JFREE_PIE_FEATURE = new Preference("chart.piechart.use_jfreechart", false, "Use JFreechart for pie charts");
+	
 	protected PieChart(AppContext conn) {
 		super(conn);
 	}
@@ -100,12 +100,6 @@ public class PieChart extends Chart {
 		return chart.addPieChart(nset);
 	}
 	public static  PieChart getInstance(AppContext c) {
-		PieChart ptc = new PieChart(c);
-		if( JFREE_PIE_FEATURE.isEnabled(c)){
-			ptc.setChartData(new JFreePieChartData());
-		}else{
-			ptc.setChartData(new PieChart2DChartData());
-		}
-		return ptc;
+		return c.getService(GraphService.class).getPieChart();
 	}
 }

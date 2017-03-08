@@ -44,7 +44,6 @@ import uk.ac.ed.epcc.webapp.time.Period;
 
 
 public final class PieTimeChart<P extends PeriodSetPlot> extends SetPeriodChart<P> {
-	public static final Feature JFREE_PIE_TIMECHART_FEATURE = new Preference("chart.pie_timechart.use_jfreechart", false, "Use JFreechart for pie-time-charts");
 	
 
 	private P plot=null;
@@ -69,16 +68,7 @@ public final class PieTimeChart<P extends PeriodSetPlot> extends SetPeriodChart<
 	}
 
 	public static  PieTimeChart getInstance(AppContext c, Period p) {
-		PieTimeChart ptc = new PieTimeChart(c,p);
-		PieTimeChartData chart;
-		if(JFREE_PIE_TIMECHART_FEATURE.isEnabled(c)){
-			chart = new JFreePieChartData();
-		}else{
-			chart = new PieChart2DChartData();
-		}
-		chart.setPeriod(p);
-		ptc.setChartData(chart);
-		return ptc;
+		return c.getService(GraphService.class).getPieTimeChart(p);
 	}
 
 	public static  PieTimeChart getInstance(AppContext c, Calendar s, Calendar e) {
