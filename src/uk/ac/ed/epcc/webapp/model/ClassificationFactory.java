@@ -353,7 +353,7 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 
 			public Iterator<T> getItems() {
 				try {
-					return new FilterIterator(getSelectFilter());
+					return new FilterIterator(getFinalSelectFilter());
 				} catch (DataFault e) {
 					getContext().error(e,"Error getting item iterator");
 					return null;
@@ -361,7 +361,7 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 			}
 			public int getCount(){
 				try{
-					return (int) ClassificationFactory.this.getCount(getSelectFilter());
+					return (int) ClassificationFactory.this.getCount(getFinalSelectFilter());
 				}catch(Exception e){
 					getContext().error(e,"Error getting select count");
 					return 0;
@@ -386,7 +386,7 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 			public boolean isValid(T item) {
 				
 				try {
-					return exists(new AndFilter<T>(getTarget(), getSelectFilter(),getFilter(item)));
+					return exists(new AndFilter<T>(getTarget(), getFinalSelectFilter(),getFilter(item)));
 				} catch (DataException e) {
 					return false;
 				}

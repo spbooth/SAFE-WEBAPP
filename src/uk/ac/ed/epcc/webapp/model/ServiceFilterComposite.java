@@ -14,6 +14,7 @@ import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
+import uk.ac.ed.epcc.webapp.model.data.SelectModifier;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
@@ -26,7 +27,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  * @param <BDO>
  */
-public class ServiceFilterComposite<BDO extends DataObject> extends Composite<BDO, ServiceFilterComposite> implements NamedFilterProvider<BDO>{
+public class ServiceFilterComposite<BDO extends DataObject> extends Composite<BDO, ServiceFilterComposite> implements NamedFilterProvider<BDO>, SelectModifier<BDO>{
 
 	private static final String SERVICE_CLASSIFIER="Services";
 	/**
@@ -181,6 +182,14 @@ public class ServiceFilterComposite<BDO extends DataObject> extends Composite<BD
 		}
 		return id;
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.data.SelectModifier#getSelectFilter()
+	 */
+	@Override
+	public BaseFilter<BDO> getSelectFilter() {
+		return getCurrentServiceFilter();
 	}
 
 	

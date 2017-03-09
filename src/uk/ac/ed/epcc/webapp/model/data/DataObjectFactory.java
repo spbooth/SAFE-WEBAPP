@@ -1327,15 +1327,24 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		return false;
 	}
 
+	public final BaseFilter<BDO> getFinalSelectFilter(){
+		AndFilter<BDO> fil = new AndFilter<>(getTarget());
+		fil.addFilter(getSelectFilter());
+		for(SelectModifier mod : getComposites(SelectModifier.class)){
+			fil.addFilter(mod.getSelectFilter());
+		}
+		return fil;
+	}
 	/**
 	 * get the default {@link Input} for this Factory
 	 * Default behaviour is to use the {@link #getSelectFilter()} method to generate a {@link DataObjectInput}
 	 * but <em>not</em> to restrict the parse values (default value of {@link #restrictDefaultInput()} so existing values that don't
 	 * match the select filter are still valid.
 	 */
-	public  DataObjectItemInput<BDO> getInput() {
-		return new DataObjectInput(getSelectFilter(),restrictDefaultInput());
+	public DataObjectItemInput<BDO> getInput() {
+		return new DataObjectInput(getFinalSelectFilter(),restrictDefaultInput());
 	}
+	
 	/** Create an {@link Input} from a filter
 	 * 
 	 * @param fil
@@ -1443,7 +1452,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      * @return
      */
     public SQLFilter<BDO> getDefaultRelationshipFilter(){
-    	BaseFilter<BDO> fil = getSelectFilter();
+    	BaseFilter<BDO> fil = getFinalSelectFilter();
     	try {
 			return FilterConverter.convert(fil);
 		} catch (NoSQLFilterException e) {
