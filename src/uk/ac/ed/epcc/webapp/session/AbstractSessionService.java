@@ -33,6 +33,7 @@ import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
@@ -1323,7 +1324,16 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    // Maybe its a named filter this will translate to a binary filter on the app-user
 	    BaseFilter<? super T> fil = makeNamedFilter(fac2, role);
 	    if( fil != null){
-	    	boolean matches = fac2.matches(fil, target);
+	    	boolean matches=false;
+	    	if( target == null ){
+	    		try {
+					matches = fac2.exists((BaseFilter<T>) fil);
+				} catch (DataException e) {
+					error(e, "Error checking for null target");
+				}
+	    	}else{
+	    		matches= fac2.matches(fil, target);
+	    	}
 	    	return new GenericBinaryFilter<>(AppUser.class, matches);
 	    }
 	    

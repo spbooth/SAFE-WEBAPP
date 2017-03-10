@@ -1250,7 +1250,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	// we can't pass ourselves as the matcher arg
 	private final ConvertPureAcceptFilterVisitor<BDO> accept_converter = new ConvertPureAcceptFilterVisitor<BDO>(null);
 	public final boolean matches(BaseFilter<? super BDO> fil, BDO o) {
-		if( fil == null){
+		if( fil == null || o == null){
 			return false;
 		}
 		try {
@@ -1586,6 +1586,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return boolean true if object belongs
 	 */
 	public final boolean isMine(DataObject o) {
+		if( o == null){
+			return false;
+		}
 		return getTag().equals(o.getFactoryTag());
 	}
 
@@ -1919,6 +1922,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      * @return
      */
     public SQLFilter<BDO> getFilter(BDO target){
+    	if( target == null){
+    		throw new ConsistencyError("null target in getFilter");
+    	}
     	if( ! isMine(target)){
     		throw new ConsistencyError("unexpected target "+target.getFactoryTag());
     	}
