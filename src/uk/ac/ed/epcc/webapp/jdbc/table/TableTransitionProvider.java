@@ -17,6 +17,8 @@
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
 import java.io.StringReader;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.xml.parsers.SAXParser;
@@ -42,9 +44,10 @@ import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionProvider;
+import uk.ac.ed.epcc.webapp.model.data.Composite;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.UnDumper;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.TableInput;
-import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** Class implementing transitions on factory classes identified by table.
@@ -212,6 +215,21 @@ public class TableTransitionProvider implements ViewTransitionProvider<TableTran
 	public <X extends ContentBuilder> X getLogContent(X hb,TableTransitionTarget target, SessionService<?> sess) {
 		hb.addHeading(2, "Table "+target.getTableTransitionID());
 		hb.addHeading(3,"Table Type:"+target.getClass().getSimpleName());
+		if( target instanceof DataObjectFactory){
+			DataObjectFactory fac = (DataObjectFactory) target;
+			Collection<Composite> comps = fac.getComposites();
+			if( ! comps.isEmpty()){
+				hb.addHeading(4, "Composites");
+				LinkedHashSet<String> names = new LinkedHashSet<String>();
+				for( Composite c : comps){
+					names.add(c.getClass().getSimpleName());
+				}
+				hb.addList(names);
+			}
+		}
+		if( target instanceof TableContentProvider){
+			((TableContentProvider)target).addSummaryContent(hb);
+		}
 		getRegistry(target).getTableTransitionSummary(hb,sess );
 		return hb;
 	}
