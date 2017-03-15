@@ -24,7 +24,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
  * @author spb
  *
  */
-public class DateInput extends AbstractDateInput implements HTML5Input {
+public class DateInput extends AbstractDateInput implements HTML5Input, PatternInput {
     private static final String DEFAULT_FORMAT = "yyyy-MM-dd";
 
     public DateInput(){
@@ -45,6 +45,13 @@ public class DateInput extends AbstractDateInput implements HTML5Input {
 	 */
 	public String getType() {
 		return "date";
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.PatternInput#getPattern()
+	 */
+	@Override
+	public String getPattern() {
+		return "\\d{4}-[0-1]\\d-[0-3]\\d";
 	}
 
 	
