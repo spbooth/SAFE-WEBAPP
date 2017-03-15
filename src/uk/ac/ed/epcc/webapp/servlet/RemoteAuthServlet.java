@@ -38,7 +38,7 @@ import uk.ac.ed.epcc.webapp.session.WebNameFinder;
  * This servlet is to support authentication from the container. This servlet
  * should be configured with server level authentication and the user redirects
  * through this servlet to either login based on the remote username or to
- * change their remote username
+ * change their remote username if the servlet is visited after logging in.
  *<p>
  *The property <b>remote_auth.realm</b> (which may be set as a servlet parameter) defines the name realm used by the servlet.
  *Multiple types of external authentication can be supported by including the servlet at multiple paths, one for each realm.
@@ -63,6 +63,12 @@ import uk.ac.ed.epcc.webapp.session.WebNameFinder;
 
 
 public class RemoteAuthServlet extends WebappServlet {
+
+	/**
+	 * 
+	 */
+	private static final String EXTAUTH_REGISTER_ID_ATTR = "EXTAUTH_REGISTER_ID_ATTR";
+
 
 	/**
 	 * 
@@ -166,7 +172,7 @@ public class RemoteAuthServlet extends WebappServlet {
 			AppUser person = null;
 
 			
-			person = session_service.getCurrentPerson();
+			person = getTargetAppUser(session_service);
 			String remote_auth_realm = conn.getInitParameter(REMOTE_AUTH_REALM_PROP, WebNameFinder.WEB_NAME);
 			AppUserFactory<?> fac = session_service.getLoginFactory();
 			AppUserNameFinder parser = fac.getRealmFinder(remote_auth_realm);
@@ -221,7 +227,59 @@ public class RemoteAuthServlet extends WebappServlet {
 		}
 	}
 
-
+	/** Set the user that should be registered (and logged in) if the
+	 * external authentication succeeds. This is for when a user registers
+	 * and id given an opportunity to bind an existing id. If the binding succeeds the
+	 * user has a proven id (even though the email is not verified) and can be logged in
+	 * if the external auth succeeds.
+	 * 
+	 * If the session already contains a user this user must match the
+	 * supplied arguement.
+	 * 
+	 * @param conn
+	 * @param user
+	 * @return true if binding should be offered.
+	 */
+    public static boolean registerNewUser(AppContext conn, AppUser user){
+    	SessionService sess = conn.getService(SessionService.class);
+    	if( sess.haveCurrentUser()){
+    		return sess.isCurrentPerson(user);
+    	}else{
+    		sess.setAttribute(EXTAUTH_REGISTER_ID_ATTR, user.getID());
+    		return true;
+    	}
+    }
+    
+    /** Test if the bind external id should be offered 
+     * ie is there an existing session user or a stored newly registered user.
+     * 
+     * @param conn
+     * @return
+     */
+    public static boolean canRegisterNewUser(AppContext conn){
+    	SessionService sess = conn.getService(SessionService.class);
+    	return WEB_LOGIN_FEATURE.isEnabled(conn) && 
+    			sess != null && 
+    			( 
+    			sess.haveCurrentUser() || 
+    			sess.getAttribute(EXTAUTH_REGISTER_ID_ATTR) != null
+    			);
+    }
+    
+    private <A extends AppUser> A getTargetAppUser(SessionService<A> sess){
+   
+    	A person = sess.getCurrentPerson();
+    	if( person != null ){
+    		return person;
+    	}
+    	Integer register_id = (Integer) sess.getAttribute(EXTAUTH_REGISTER_ID_ATTR);
+    	if( register_id != null){
+    		A user = sess.getLoginFactory().find(register_id);
+    		sess.setCurrentPerson(user);
+			return user;
+    	}
+    	return null;
+    }
 
 	/**
 	 * @param token

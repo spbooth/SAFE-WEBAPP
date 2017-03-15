@@ -67,6 +67,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedDataCache;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
+import uk.ac.ed.epcc.webapp.servlet.RemoteAuthServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
 /** A Factory for creating {@link AppUser} objects that represent users of the system.
@@ -586,6 +587,9 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		public void postCreate(T dat, Form f) throws Exception {
 			super.postCreate(dat, f);
 			getAppUserFactory().newSignup(dat);
+			// Store user in session so we can bind remote-ids and
+			// login if the user has a valid external id to bind.
+			RemoteAuthServlet.registerNewUser(getContext(), dat);
 			
 		}
 		/**
@@ -598,7 +602,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		public void setAction(String type_name,Form f) {
 			// Check for a placeholder record and update that instead if it exists
 			if( webname != null && ! webname.isEmpty()){
-				T existing = getAppUserFactory().findFromString(webname);
+				T existing = getAppUserFactory().getRealmFinder(realm).findFromString(webname);
 				if( existing != null ){
 					f.addAction(REGISTER_ACTION, new UpdateAction<T>("Person", this, existing));
 					return;
