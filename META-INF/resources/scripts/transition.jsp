@@ -64,6 +64,7 @@ the form could just submit to self. This might break form error reporting though
     	request.setAttribute(WebappHeadTag.REQUEST_CSS_ATTR, st.getAdditionalCSS(key));
     	request.setAttribute(WebappHeadTag.REQUEST_SCRIPT_ATTR, st.getAdditionalScript(key));
     }
+    request.setAttribute(WebappHeadTag.FORM_PAGE_ATTR, Boolean.TRUE);
 %>
 <%@ include file="/std_header.jsf" %>
 <%@ include file="/main__logged_in.jsf" %>

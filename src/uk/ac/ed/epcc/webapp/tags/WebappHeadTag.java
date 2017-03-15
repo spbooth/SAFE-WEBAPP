@@ -26,6 +26,7 @@ import javax.servlet.jsp.tagext.Tag;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.ErrorFilter;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
 
@@ -34,6 +35,7 @@ import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
  *
  */
 public class WebappHeadTag extends TagSupport implements Tag {
+	public static final Preference SCRIPT_FORMS_FEATURE = new Preference("script.forms",true,"Augment unsupported html5 inputs using javascript");
 	/**
 	 * 
 	 */
@@ -42,6 +44,10 @@ public class WebappHeadTag extends TagSupport implements Tag {
 	 * 
 	 */
 	public static final String REQUEST_CSS_ATTR = "request_css";
+	/** request attribute denoting a page containing a form
+	 * 
+	 */
+	public static final String FORM_PAGE_ATTR = "form_page";
 	private String extra_css;
 	 
 	public void setextraCSS(String extra){
@@ -71,6 +77,9 @@ public class WebappHeadTag extends TagSupport implements Tag {
         		if( NavigationMenuService.NAVIGATION_MENU_FEATURE.isEnabled(conn)){
         			doCSS(out, response, template_path,null,"nav_menu.css");
         		}
+        		if(SCRIPT_FORMS_FEATURE.isEnabled(conn) && request.getAttribute(FORM_PAGE_ATTR) != null){
+        			doCSS(out, response, template_path,null,"//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css");
+        		}
         		doCSS(out, response, template_path,null,"extra.css");
         	
         		if(extra_css != null && extra_css.trim().length() > 0){ 
@@ -82,6 +91,12 @@ public class WebappHeadTag extends TagSupport implements Tag {
         		if( NavigationMenuService.NAVIGATION_MENU_JS_FEATURE.isEnabled(conn)){
         			doScript(scripts,out,request,response,"//code.jquery.com/jquery-1.10.2.min.js");
         			doScript(scripts,out, request,response, "/scripts/menubar.js");
+        		}
+        		if(SCRIPT_FORMS_FEATURE.isEnabled(conn)&& request.getAttribute(FORM_PAGE_ATTR) != null){
+        			doScript(scripts,out,request,response,"//code.jquery.com/jquery-1.10.2.min.js");
+        			doScript(scripts,out,request,response,"//code.jquery.com/ui/1.12.1/jquery-ui.min.js");
+        			doScript(scripts,out,request,response,"/js/modernizr-custom.js");
+        			doScript(scripts,out,request,response,"/js/fixinputs.js");
         		}
         		if( request_script != null && request_script.trim().length() > 0 ){
         			// allow escaped commas in in-line scripts
