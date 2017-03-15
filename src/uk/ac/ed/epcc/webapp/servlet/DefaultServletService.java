@@ -528,7 +528,7 @@ public class DefaultServletService implements ServletService{
 	 *
 	 * 
 	 * 
-	 * @param remove_cookie should cokkie be removed
+	 * @param remove_cookie should cookie be removed
 	 * 
 	 */
 	public void logout(boolean remove_cookie){

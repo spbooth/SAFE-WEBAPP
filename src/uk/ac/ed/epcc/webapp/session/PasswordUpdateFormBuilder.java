@@ -248,8 +248,47 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
     		f.addValidator(new ComplexityValidator());
     	}
     	f.addAction(CHANGE_ACTION, new UpdateAction(user));
+    	if( comp.mustResetPassword(user)){
+    		f.addAction("Cancel", new CancelAction());
+    	}
     }
     
+    public class CancelAction extends FormAction{
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#getHelp()
+		 */
+		@Override
+		public String getHelp() {
+			return "Cancel this password change and logout. You will still need to reset the password the next time you login.";
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#getText()
+		 */
+		@Override
+		public String getText() {
+			return "Cancel/Logout";
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#action(uk.ac.ed.epcc.webapp.forms.Form)
+		 */
+		@Override
+		public FormResult action(Form f) throws ActionException {
+			getContext().getService(SessionService.class).logOut();
+			return new MessageResult("password_change_cancel");
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#getMustValidate()
+		 */
+		@Override
+		public boolean getMustValidate() {
+			return false;
+		}
+    	
+    }
     public class UpdateAction extends FormAction{
 
     	/**
