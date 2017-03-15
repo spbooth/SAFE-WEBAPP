@@ -59,15 +59,31 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 	 */
 	public static final String PASSWORD_FIELD = "password";
 
+	/** Do we ask for the old web password when changing.
+	 * 
+	 * This is a protection against users leaving their terminal unattended
+	 * and is therefore an archaic practice in the era of personal devices.
+	 * enabling this feature will also prevent a user with an alternative
+	 * login mechanism from resetting a forgotten password using that.
+	 * 
+	 * 
+	 */
+	public static final Feature REQUIRE_OLD_PASSWORD= new Feature("password_change.require_old_password",false,"Do website password changes need the old password from a logged in user");
 
-	/**
-	 * @param comp
-	 * @param user
+	/** create the form builder.
+	 * 
+	 * This is used both for an externally authenticated link reset
+	 * and a reset for a logged in user.
+	 * In the latter case check_old should be true but this can still be
+	 * supressed via a feature.
+	 * 
+	 * @param comp {@link PasswordAuthComposite}
+	 * @param check_old do we ask for the old password (if feature enabled)
 	 */
 	public PasswordUpdateFormBuilder(PasswordAuthComposite<U> comp,boolean check_old) {
 		super();
 		this.comp = comp;
-		this.check_old=check_old;
+		this.check_old= REQUIRE_OLD_PASSWORD.isEnabled(comp.getContext()) && check_old;
 	}
 	private final PasswordAuthComposite<U> comp;
    private final boolean check_old;
