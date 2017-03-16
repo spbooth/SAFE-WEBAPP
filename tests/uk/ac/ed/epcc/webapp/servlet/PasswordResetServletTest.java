@@ -64,6 +64,7 @@ public class PasswordResetServletTest extends ServletTest {
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD2,"BorisTheSpider");
 		addParam("submitted","true");
 		addParam("action",UserServlet.CHANGE_PASSWORD); 
+		setAction(PasswordUpdateFormBuilder.CHANGE_ACTION);
 		doPost();
 		checkMessage("password_changed");
 		SessionService sess = ctx.getService(SessionService.class);
