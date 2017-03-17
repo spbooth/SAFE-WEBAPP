@@ -18,13 +18,14 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 
-/** A {@link FormAction} used to denote a disabled (but present input).
+/** A {@link FormAction} used to denote a disabled (but present) action.
  * @author spb
  *
  */
 
-public class DisabledAction extends FormAction {
+public final class DisabledAction extends FormAction {
 
+	private String help;
 	/**
 	 * 
 	 */
@@ -38,6 +39,17 @@ public class DisabledAction extends FormAction {
 	@Override
 	public FormResult action(Form f) throws ActionException {
 		return new MessageResult("invalid_input");
+	}
+
+	public void setHelp(String help){
+		this.help=help;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#getHelp()
+	 */
+	@Override
+	public String getHelp() {
+		return help;
 	}
 
 }

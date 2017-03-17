@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
+	<title>Roles and Relationships</title>
+	<meta name="generator" content="LibreOffice 5.1.5.2 (Windows)"/>
+	<meta name="created" content="2017-03-06T20:25:08.683000000"/>
+	<meta name="changed" content="2017-03-07T10:30:17.136000000"/>
+	<style type="text/css">
+		@page { margin: 2cm }
+		p { margin-bottom: 0.25cm; line-height: 120% }
+		h1 { margin-bottom: 0.21cm }
+		h1.western { font-family: "Liberation Sans", sans-serif; font-size: 18pt }
+		h1.cjk { font-family: "Microsoft YaHei"; font-size: 18pt }
+		h1.ctl { font-family: "Mangal"; font-size: 18pt }
+	</style>
+</head>
+<body lang="en-GB" dir="ltr">
+<p align="center" style="margin-top: 0.42cm; margin-bottom: 0.21cm; line-height: 100%; page-break-after: avoid">
+<font face="Liberation Sans, sans-serif"><font size="5" style="font-size: 20pt"><b>Roles
+and Relationships</b></font></font></p>
+<h1 class="western">Introduction</h1>
+<p>This is the documentation for the permission system used by the
+Webapp framework (and particularly the SAFE). The permission system
+is handled by the SessionService object returned by the AppContext.</p>
+<h1 class="western">Roles</h1>
+<p>A <i>role</i>< is the simplest of
+the permission states. It is a named global capability that can be
+assigned to a user or a login session. In a web-context roles <i>may</i>
+be inherited from the Servlet framework. In this case the role only
+applies to the current logged in session. In all other cases roles
+are defined in terms of an AppUser (These are ther objects/records
+that represent registered users of the application). The mapping
+between users and roles are stored in the <b>role_table
+</b> database
+table. There is a standard form that allows a users assigned roles to
+be changed.  The
+list of roles available to this form can be extended by adding names
+to a comma separated list stored in the 
+<b>role_list</b>
+ configuration parameter.</p>
+<p>In
+practice the number of different roles checked by the application can
+be very large to allow fine-tuning of permissions. However roles that
+are actively assigned to users may be meta-roles that represent a
+number of underlying permissions. An underlying role can be mapped to
+a meta-role by setting a config parameter:
+<br>
+<code>
+ <b>use_role.</b><i>role-name</i>=<i>meta-role-list</i>
+ </code>
+ <br>
+ Where role-list is a comma separated list of meta-roles that inherit the permissions of the underlying role. 
+</p>
+<p>Some roles can be
+marked at &ldquo;togglable&rdquo; roles. These roles are not active
+by default and a user with access to them needs to perform an action
+(such as clicking a web-menu) to enable the role before use. These
+are intended for administrative roles where the user may also want to
+view the application as an unprivileged user.
+The set of togglable roles is defined in the <b>toggle_roles</b> configuration parameter.
+</p>
+<h1 class="western">Relationships</h1>
+<p>Relationships are similar to roles in that they are named
+capabilities. However they define a relationship with a particular
+domain object (such as manager or owner)</p>
+
+Relationships are configured via the <b> ConfigService</b> by setting:
+ <b>use_relationship.<em>factory-tag</em>.<em>role</em></b>
+  If this is a comma separated list it implies an OR of the component parts.
+  within this AND combinations can be specified as <b>+</b> separated terms.
+  <p>
+  The factory (or its <b> Composite</b>s) can implement <b>AccessRoleProvider</b> to provide roles.
+  <p>
+  Roles of the form <i>field</i><b>-></b><i>remote_role</i> denotes a remote filter
+  joined via the reference field <i>field</i> A person has these roles with the target object
+  if they have the <i>remote_role</i> on the object the target references. The remote role must be unqualified.
+  <p>
+  Role names containing a period are qualified names the qualifier can be:
+  <ul>
+  <li> <b>global</b> the role is a global role not a relationship.</li>
+  <li> <b>boolean</b> Use a boolean filter so all/none relationships match.</li>
+  <li> <em>factory-tag</em> un-modified role from factory or a named filter from
+  a <b> NamedFilterWrapper</b> wrapping the factory.
+  <li> The tag of a <b> RelationshipProvider</b> for the target.</li>
+  <li> The tag of a <b> AccessRoleProvider</b></li>
+  </ul> 
+
+</body>
+</html>

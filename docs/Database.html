@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 5.1.5.2 (Windows)"/>
+	<meta name="created" content="2017-03-07T20:35:44.534000000"/>
+	<meta name="changed" content="2017-03-07T20:36:42.192000000"/>
+	<style type="text/css">
+		h2.western { font-family: "Albany", sans-serif; font-size: 16pt }
+		h2.cjk { font-family: "SimSun"; font-size: 16pt }
+		h2.ctl { font-family: "Mangal"; font-size: 16pt }
+		pre.cjk { font-family: "NSimSun", monospace }
+		code { font-family: "Courier New", monospace }
+	</style>
+</head>
+<body lang="en-GB" dir="ltr">
+<h2 class="western">Database configuration</h2>
+<p>The SAFE stores state in a MySQL database. The connection to this
+database needs to be configured using properties. This can either be
+done explicitly:</p>
+<p align="left" style="margin-bottom: 0cm"><font color="#000000"><font face="Consolas, serif"><font size="2" style="font-size: 10pt">db_name=</font></font></font><font color="#2a00ff"><font face="Consolas, serif"><font size="2" style="font-size: 10pt">jdbc:mysql://</font></font></font><font color="#2a00ff"><font face="Consolas, serif"><font size="2" style="font-size: 10pt"><u>localhost</u></font></font></font><font color="#2a00ff"><font face="Consolas, serif"><font size="2" style="font-size: 10pt">/safe</font></font></font><font color="#2a00ff"><font face="Consolas, serif"><font size="2" style="font-size: 10pt"><u>db</u></font></font></font><font color="#2a00ff"><font face="Consolas, serif"><font size="2" style="font-size: 10pt">?characterEncoding=utf8</font></font></font></p>
+<p align="left" style="margin-bottom: 0cm"><font color="#000000"><font face="Consolas, serif"><font size="2" style="font-size: 10pt">db_driver=</font></font></font><font color="#2a00ff"><font face="Consolas, serif"><font size="2" style="font-size: 10pt">com.mysql.jdbc.Driver</font></font></font></p>
+<p align="left" style="margin-bottom: 0cm"><font color="#000000"><font face="Consolas, serif"><font size="2" style="font-size: 10pt">db_username=</font></font></font><font color="#2a00ff"><font face="Consolas, serif"><font size="2" style="font-size: 10pt"><u>database-username</u></font></font></font></p>
+<p style="margin-bottom: 0cm"><font color="#000000"><font face="Consolas, serif"><font size="2" style="font-size: 10pt">db_password=</font></font></font><font color="#2a00ff"><font face="Consolas, serif"><font size="2" style="font-size: 10pt">database-password</font></font></font></p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<p style="margin-bottom: 0cm">Or a pool of database connections can
+be configured in tomcat
+<a href="https://tomcat.apache.org/tomcat-7.0-doc/jndi-datasource-examples-howto.html#MySQL_DBCP_Example">https://tomcat.apache.org/tomcat-7.0-doc/jndi-datasource-examples-howto.html#MySQL_DBCP_Example</a>
+and the corresponding resource name set as a configuration property:</p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<p style="margin-bottom: 0cm"><font color="#000000"><font face="Consolas, serif"><font size="2" style="font-size: 10pt"><span style="background: #e8f2fe">connection.pool=</span></font></font></font><font color="#2a00ff"><font face="Consolas, serif"><font size="2" style="font-size: 10pt"><span style="background: #e8f2fe">safeDB</span></font></font></font></p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<p style="margin-bottom: 0cm">As the pool is configured in the
+Context it is often convenient to set this parameter in the same file
+as an init-parameter. 
+</p>
+<p style="margin-bottom: 0cm">You usually need to add the jar-file
+containing the database driver to the <b>lib </b>directory of the
+tomcat deployment.</p>
+<p style="margin-bottom: 0cm">Whichever way you configure the
+database the access account usually needs full access to the database
+the application will use.</p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<pre class="western" style="margin-bottom: 0.5cm">Mysql&gt; GRANT ALL ON safedb.* TO 'database-username'@'localhost' IDENTIFIED BY &ldquo;database-password&rdquo;;</pre><p style="margin-bottom: 0cm">
+We would recommend that the InnoDB database engine is used by default
+and the mysql parameter i<b>nnodb_file_per_table</b> is set to place
+each database table in its own file. If you are going to be using the
+helpdesk code set the <b>max_allowed_packet</b> parameter to be large
+enough to hold the largest email message you intend to support.</p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<p style="margin-bottom: 0cm">The database should use case
+insensitive matching and we recommend the use of the UTF8 character
+set.</p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+<pre class="western" style="margin-bottom: 0.5cm"><code>Mysql&gt; ALTER DATABASE safedb CHARACTER SET utf8 COLLATE utf8_general_ci;</code></pre><p style="margin-bottom: 0cm">
+<br/>
+
+</p>
+<p style="margin-bottom: 0cm">The application will usually create all
+tables that it needs within the database (This can be turned off by
+setting the property <b>service.feature.auto_create.tables=off </b>).
+In addition we write the code to be tolerant of database schema
+changes to make it easier to upgrade application versions without
+requiring downtime. Newer versions of the application can use
+databases created for older versions (though if new fields are
+required in an existing table the corresponding new functionality
+will remain disabled until the required field is created). Similarly
+the code is written to be tolerant of unexpected database fields so
+older versions should continue to run even after the required field
+has been created. 
+</p>
+<p style="margin-bottom: 0cm">Some of the configuration changes
+described below will automatically change the database specification.
+If you make the configuration changes before starting the application
+for the first time the tables will be created appropriate to those
+settings. If the settings are changed after the tables have been
+created you will have to use the table edit forms to make the
+appropriate changes.</p>
+</body>
+</html>

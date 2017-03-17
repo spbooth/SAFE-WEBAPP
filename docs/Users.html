@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 5.1.5.2 (Windows)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changed" content="2017-03-07T20:46:20.690000000"/>
+	<style type="text/css">
+		h2.western { font-family: "Albany", sans-serif; font-size: 16pt }
+		h2.cjk { font-family: "SimSun"; font-size: 16pt }
+		h2.ctl { font-family: "Mangal"; font-size: 16pt }
+	</style>
+</head>
+<body lang="en-GB" dir="ltr">
+<p align="center" style="margin-top: 0.42cm; page-break-after: avoid">
+<br/>
+<br/>
+
+</h2>
+<h2 class="western"><a name="__RefHeading___Toc859_1125766554"></a>Users</h2>
+<p style="margin-bottom: 0cm">Every user in the application has an
+entry in the <b>person</b> table that holds their details. 
+</p>
+<p style="margin-bottom: 0cm">In the normal configuration users
+self-register with the application (a process that verifies the users
+email address) and authenticates using a password. The application
+supports password change and recovery via email. It is also possible
+to enable alternative web-based login mechanisms such as
+Shibboleth/UKAMF. These mechanisms are typically implemented in the
+apache httpd front-end.</p>
+<p style="margin-bottom: 0cm">If all potential users are known to be
+able to use an external authenticator it is also possible to
+configure the application to only use an external web-based
+authentication.</p>
+<p style="margin-bottom: 0cm">Access to additional permissions within
+the application is granted by a set of roles stored in the <b>role_table</b>
+database table. Key roles include:</p>
+<ul>
+	<li/>
+<p style="margin-bottom: 0cm"><b>Admin</b>
+	which gives access to the internal administration forms (The first
+	user to register with a new application instance is usually given
+	this role automatically unless you disable the
+	<i>service.feature.bootstrap.admin</i> feature).</p>
+	<li/>
+<p style="margin-bottom: 0cm"><b>Developer</b> <span style="font-weight: normal">this
+	gives access to additional very low-level (and dangerous) functions
+	like setting additional configuration properties or modifying the
+	database tables.</span></p>
+</ul>
+<p style="margin-bottom: 0cm; font-weight: normal">Both of the above
+are usually set as &ldquo;toggleable-roles&rdquo; which can be
+explicitly turned on and off during a user session.</p>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+
+
+</body>
+</html>

@@ -78,8 +78,8 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		@Override
 		public Boolean visitAndFilter(AndFilter<? super T> fil) throws Exception {
 			// An ANDFilter could be in any of the 3 categories.
-			AcceptFilter<? super T> accept = fil.getAcceptFilter();
-			if( accept != null ){  // This is a pure accept filter
+			AcceptFilter<? super T> accept = fil.getAcceptFilter(null);
+			if( accept != null ){  // This is a pure accept filter as matcher was null
 				pure_accept_filters.add(accept);
 				return null;
 			}

@@ -13,7 +13,9 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
-/**
+import java.util.Enumeration;
+
+/** An {@link Enumeration} of the different types of filter combination.
  * @author spb
  *
  */

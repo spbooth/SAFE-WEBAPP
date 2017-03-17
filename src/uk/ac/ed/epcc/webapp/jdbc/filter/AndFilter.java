@@ -91,6 +91,15 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 			}
 			throw new NoSQLFilterException("Cannot convert to SQL contains AcceptFilter"+sb.toString());
 		}
+		return getNarrowingFilter();
+	}
+	/** get a filter that represents only the SQL portion of this filter.
+	 * 
+	 * 
+	 * 
+	 * @return {@link SQLFilter}
+	 */
+	public SQLFilter<T> getNarrowingFilter()  {
 		SQLAndFilter<T> res = new SQLAndFilter<T>(getTarget());
 		if( isForced()){
 			res.addFilter(new GenericBinaryFilter<T>(target, getBooleanResult()));
@@ -108,15 +117,24 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 		res.addOrder(OrderBy());
 		return res;
 	}
-	/** Make a pure {@link AcceptFilter} version of the current state if possible
+	/** Make a pure {@link AcceptFilter} version of the current state if 
+	 * possible.
+	 * 
+	 * Passing a valid {@link FilterMatcher} will always return a valid filter 
+	 * Passing null will return null if the
+	 * 
+	 * @param matcher An optional {@link FilterMatcher}
 	 * 
 	 * @return {@link AcceptFilter} or null if not possible
 	 */
-	public AcceptFilter<T> getAcceptFilter(){
+	public AcceptFilter<T> getAcceptFilter(FilterMatcher<T> matcher){
 		if( isForced()){
 			return new BinaryAcceptFilter<T>(this);
 		}
 		if( hasPatternFilters() ){
+			if( matcher != null ){
+				return new ConvertToAcceptFilter<>(this, matcher);
+			}
 			return null;
 		}
 		return new AndAcceptFilter<T>(getTarget(), accepts);

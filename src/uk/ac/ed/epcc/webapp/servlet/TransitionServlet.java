@@ -334,8 +334,9 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	 * @param req
 	 * @param res
 	 * @throws IOException 
+	 * @throws ServletException 
 	 */
-	protected void sessionError(AppContext conn, SessionService sess,HttpServletRequest req, HttpServletResponse res) throws IOException {
+	protected void sessionError(AppContext conn, SessionService sess,HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
 		conn.getService(ServletService.class).requestAuthentication(sess);
 		
 	}

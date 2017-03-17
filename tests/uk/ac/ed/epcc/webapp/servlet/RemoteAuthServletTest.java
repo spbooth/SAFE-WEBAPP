@@ -13,20 +13,17 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-
-import javax.servlet.ServletException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.email.MockTansport;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
 import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
@@ -74,6 +71,29 @@ public class RemoteAuthServletTest<A extends AppUser> extends ServletTest {
 		checkDiff("/cleanup.xsl", "remote_set.xml");
 	}
 	
+	
+	@Test
+	public void testSignupRegister() throws ConsistencyError, Exception{
+		MockTansport.clear();
+		takeBaseline();
+		SessionService sess = ctx.getService(SessionService.class);
+		AppUserFactory<A> fac = sess.getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		//  Calling registerNewuser should allow a user to bind
+		// an existing is and login
+		RemoteAuthServlet.registerNewUser(ctx, user);
+		assertFalse(sess.haveCurrentUser());
+		
+		req.remote_user="fred";
+		doPost();
+		checkMessage("remote_auth_set");
+		assertTrue(sess.isCurrentPerson(user));
+		checkDiff("/cleanup.xsl", "remote_set.xml");
+	}
 	
 	@Test
 	@DataBaseFixtures("remote_set.xml")

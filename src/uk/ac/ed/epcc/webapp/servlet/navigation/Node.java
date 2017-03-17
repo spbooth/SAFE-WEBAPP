@@ -40,6 +40,7 @@ public abstract class Node extends NodeContainer implements Externalizable{
 	private  String menu_text;
 	private String image;
 	private String display_class;
+	private String help_text;
 	private char access_key=0;
 	private NodeContainer parent;
     /* (non-Javadoc)
@@ -67,6 +68,11 @@ public abstract class Node extends NodeContainer implements Externalizable{
 		}else{
 			out.writeObject(display_class);
 		}
+		if( help_text == null ){
+			out.writeObject("");
+		}else{
+			out.writeObject(help_text);
+		}
 		out.writeChar(access_key);
 		super.writeExternal(out);
 		
@@ -81,6 +87,7 @@ public abstract class Node extends NodeContainer implements Externalizable{
 		setMenuText((String)in.readObject());
 		setImage((String) in.readObject());
 		setDisplayClass((String)in.readObject());
+		setHelpText((String)in.readObject());
 		setAccessKey(in.readChar());
 		super.readExternal(in);
 		
@@ -185,5 +192,23 @@ public abstract class Node extends NodeContainer implements Externalizable{
 			return menu_text;
 		}
 		return super.toString();
+	}
+
+	/**
+	 * @return the help_text
+	 */
+	public String getHelpText() {
+		return help_text;
+	}
+
+	/**
+	 * @param help_text the help_text to set
+	 */
+	public void setHelpText(String help_text) {
+		if( help_text != null && help_text.isEmpty()){
+			help_text = null;
+		}else{
+			this.help_text = help_text;
+		}
 	}
 }

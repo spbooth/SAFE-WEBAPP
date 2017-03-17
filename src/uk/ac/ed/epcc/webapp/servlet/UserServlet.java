@@ -121,9 +121,10 @@ public class UserServlet<T extends AppUser> extends SessionServlet {
 	 * @param res
 	 * @param sess
 	 * @throws IOException
+	 * @throws ServletException 
 	 */
 	protected void doToggleRole(AppContext conn,HttpServletRequest req,
-			HttpServletResponse res, Map<String,Object> params, SessionService sess) throws IOException {
+			HttpServletResponse res, Map<String,Object> params, SessionService sess) throws IOException, ServletException {
 		String role = (String) params.get("role");
 		if( sess == null || empty(role) ){
 			conn.getService(ServletService.class).requestAuthentication(sess);

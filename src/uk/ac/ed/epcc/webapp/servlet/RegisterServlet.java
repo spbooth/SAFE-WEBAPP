@@ -60,12 +60,18 @@ public class RegisterServlet extends WebappServlet {
 			serv = new ServletSessionService(conn);
 			conn.setService(serv);
 		}
+		String webName = conn.getService(ServletService.class).getWebName();
+		if( webName == null && DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn) ){
+			message(conn,req,res,"access_denied");
+			return;
+		}
 		AppUserFactory fac =  serv.getLoginFactory();
 		if( fac == null || ! RegisterServlet.ALLOW_SIGNUPS.isEnabled(conn)){
 			message(conn,req,res,"disabled_feature");
 			return;
 		}
-		String webName = conn.getService(ServletService.class).getWebName();
+		
+		
 		String realm=getRealm(conn);
 		FormCreator signupFormCreator =fac.getSignupFormCreator(realm,webName);
 		

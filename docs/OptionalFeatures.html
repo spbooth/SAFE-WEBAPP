@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 5.1.5.2 (Windows)"/>
+	<meta name="created" content="2017-03-07T20:39:23.449000000"/>
+	<meta name="changed" content="2017-03-07T20:39:42.513000000"/>
+	<style type="text/css">
+		h2.western { font-family: "Albany", sans-serif; font-size: 16pt }
+		h2.cjk { font-family: "SimSun"; font-size: 16pt }
+		h2.ctl { font-family: "Mangal"; font-size: 16pt }
+	</style>
+</head>
+<body lang="en-GB" dir="ltr">
+<h2 class="western">Optional Features</h2>
+<p style="font-weight: normal">The framework supports a large
+number of optional features. There are two standard mechanisms for
+enabling and disabling standard features:</p>
+<ol>
+	<li/>
+<p><span style="font-weight: normal">Configuration parameters
+	of the form </span><b>service.feature.</b><i><b>&lt;feature-name&gt;</b></i>
+	<span style="font-weight: normal">are used to enable and disable
+	optional features. The page </span><b>/scripts/view_features.jsp</b>
+	<span style="font-weight: normal">generates a list of the features
+	of this type together with a short description together with their
+	current and default setting. This mechanism controls global features
+	that are normally either on or off. The exception to this are
+	</span><i><span style="font-weight: normal">preferences</span></i>
+	<span style="font-weight: normal">these are features that only
+	affect presentation not functionality.</span> <span style="font-weight: normal">In
+	this case users are able to specify their own preferred behaviour
+	via the preferences menu that overrides the global system setting. A
+	user with the </span><b>Developer</b> <span style="font-weight: normal">role
+	enabled can also use the preference menu to edit the global setting
+	of any feature. In this case the new property values will be stored
+	in the database.</span></p>
+	<li/>
+<p><span style="font-weight: normal">Some optional features
+	are enabled and disabled by the presence or absence of optional
+	database fields. This mechanism is usually used when adding
+	additional customisation options to an object type. Without the
+	field a single global setting will apply to all affected objects.
+	Users with the </span><b>RootManager</b> <span style="font-weight: normal">or
+	</span><b>Admin</b> <span style="font-weight: normal">role can go to
+	the page </span><b>/tables/index.jsp</b> <span style="font-weight: normal">and
+	view details about the major database tables in the application.
+	When viewing a table in this way users with sufficient privilege
+	will see an option to add additional &ldquo;Standard&rdquo; fields.
+	These can either be additional fields introduced as part of a
+	configuration-change/software-update or optional fields that are not
+	created by default. Instead they are only created via the forms in
+	order to activate</span> <span style="font-weight: normal">the
+	optional capabilities.</span></p>
+</ol>
+<h2 class="western"></h2>
+</body>
+</html>

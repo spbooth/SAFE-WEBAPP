@@ -19,8 +19,8 @@ import uk.ac.ed.epcc.webapp.Tagged;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.session.AppUser;
-/** Interface for stand-alone classes that provide relationship roles between {@link AppUser}s
- * and a target object.
+/** Interface for {@link AccessRoleProvider} classes that provide relationship roles between {@link AppUser}s
+ * and a target object where the set of provided relationships can be queried.
  * These can be constructed dynamically.
  * @author spb
  *

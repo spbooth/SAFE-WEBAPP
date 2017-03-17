@@ -55,7 +55,7 @@ public class AppContextFixtureRule extends ExternalResource{
 		ctx.close();
 	}
 
-	protected void before(String fixtures[]) throws Throwable {
+	protected void before(String global_fixtures[],String fixtures[]) throws Throwable {
 		ClassLoader cl = this.getClass().getClassLoader();
 		InputStream service_props_stream = cl.getResourceAsStream("test.properties");
 		Properties overrides = new Properties();
@@ -92,11 +92,20 @@ public class AppContextFixtureRule extends ExternalResource{
 			
 			
 		}
-		
+		for(String fix : global_fixtures){
+			InputStream stream = holder.getClass().getResourceAsStream(fix);
+			if( stream != null ){
+				overrides.load(stream);
+				stream.close();
+			}else{
+				throw new DataFault("Resource not found "+fix);
+			}
+		}
 		for(String fix : fixtures){
 			InputStream stream = holder.getClass().getResourceAsStream(fix);
 			if( stream != null ){
 				overrides.load(stream);
+				stream.close();
 			}else{
 				throw new DataFault("Resource not found "+fix);
 			}
@@ -116,6 +125,14 @@ public class AppContextFixtureRule extends ExternalResource{
 		return statement(base,description);
 	}
 	private Statement statement(final Statement base,final Description d) {
+		ConfigFixtures gfix = holder.getClass().getAnnotation(ConfigFixtures.class);
+		final String global_fixtures[];
+		if( gfix == null ){
+			global_fixtures = new String[0];
+		}else{
+			global_fixtures = gfix.value();
+		}
+		
 		ConfigFixtures fix = d.getAnnotation(ConfigFixtures.class);
 		final String fixtures[];
 		if( fix == null){
@@ -127,7 +144,7 @@ public class AppContextFixtureRule extends ExternalResource{
 			
 			@Override
 			public void evaluate() throws Throwable {
-				before(fixtures);
+				before(global_fixtures,fixtures);
 				try {
 					base.evaluate();
 				} finally {

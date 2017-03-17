@@ -52,17 +52,23 @@ import uk.ac.ed.epcc.webapp.Contexed;
 	public abstract class FormEntry<F extends Contexed,T> extends AbstractFormFactoryProvider<F,T> {
 		
 		private final Class<? extends F> f;
-		private final String config_tag;;
+		private final String config_tag;
 		@Override
 		protected F getFactory(AppContext c) throws Exception{
 		
-				F res;
+				F res=null;
 				if( config_tag == null ){
-					res = c.makeObject(f);
+					if( allowNullTag(c)){
+						res = c.makeObject(f);
+					}
 				}else{
 					res= c.makeObject(f,config_tag);
 				}
 				return res;
+		}
+		
+		public boolean allowNullTag(AppContext c){
+			return true;
 		}
 	    
 

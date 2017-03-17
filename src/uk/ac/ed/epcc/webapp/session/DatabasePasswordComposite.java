@@ -665,7 +665,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		// route all password checks through the same code
 		try {
 			AndFilter<T> fil = new AndFilter<T>(getFactory().getTarget());
-			fil.addFilter(new SQLIdFilter<T>(getFactory().getTarget(),getRepository(), u.getID()));
+			fil.addFilter(getFactory().getFilter(u));
 			fil.addFilter(getPasswordFilter(password));
 			T temp = getFactory().find(fil,true);
 			if (temp == null) {

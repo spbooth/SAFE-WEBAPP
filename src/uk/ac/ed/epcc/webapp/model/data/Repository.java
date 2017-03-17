@@ -155,6 +155,16 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  */
 
 public final class Repository {
+	/** modes supported by {@link Record#setID}
+	 * 
+	 * @author spb
+	 *
+	 */
+	public enum IdMode{
+		RequireExisting,
+		UseExistingIfPresent,
+		IgnoreExisting
+	};
 	/**
 	 * 
 	 */
@@ -665,7 +675,7 @@ public final class Repository {
         	}
         	Record b = store.new Record();
         	try {
-        		b.setID(getID(), false);
+        		b.setID(getID(), IdMode.IgnoreExisting);
         	} catch (DataException e) {
         		// should not get this if require existing is false
         		throw new ConsistencyError("unexpected exception", e);
@@ -1222,7 +1232,7 @@ public final class Repository {
  * @throws DataException
  */
 		public Record setID(int id2) throws DataException {
-			return setID(id2, true);
+			return setID(id2, IdMode.RequireExisting);
 		}
 		/**initialise a record using the id integer.
 		 * 
@@ -1237,7 +1247,7 @@ public final class Repository {
 		 * @return
 		 * @throws DataException
 		 */
-		Record setID(int id2,boolean require_existing) throws DataException {
+		Record setID(int id2,IdMode mode) throws DataException {
 			if (have_id) {
 				throw new ConsistencyError("Resetting id of Record");
 			}
@@ -1245,7 +1255,7 @@ public final class Repository {
 				throw new ConsistencyError("Setting id on non indexed table");
 			}
           
-			if( use_cache ){
+			if( use_cache && mode == IdMode.RequireExisting ){
 				synchronized(Repository.this){
 					Map<Integer,Record> cache=getCache(); 
 					if (cache != null ){
@@ -1260,16 +1270,21 @@ public final class Repository {
 							assert(id == id2);
 						}else{
 							// set contents will store in cache.
-							populate(id2, require_existing);
+							populate(id2, true);
 						}
 					}else{
 						// set contents will store in cache.
-						populate(id2, require_existing);
+						populate(id2, true);
 					}
 					cache=null;
 				}
 			}else{
-				populate(id2, require_existing);
+				if( mode == IdMode.IgnoreExisting){
+					// just remember desired id
+					id = id2;
+				}else{
+					populate(id2, mode == IdMode.RequireExisting);
+				}
 			}
             assert(id == id2);
             if( id != id2 ){
@@ -1557,7 +1572,7 @@ public final class Repository {
 		 * @throws DataFault
 		 */
 		public int findDuplicate() throws ConsistencyError, DataFault {
-			return findDuplicate(-1,getFields());
+			return findDuplicate(-1,getFields(),false);
 		}
 		/** Get the id of an identical (up to id) record in the database
 		 * normally called on an uncommitted record so only the set fields
@@ -1568,12 +1583,13 @@ public final class Repository {
 		 * 
 		 * @param id to match (if greater than zero)
 		 * @param fields {@link Set} of field names to check.
+		 * @param check_all Should all fields be checked not just the set/dirty fields.
 		 * @return id of duplicate 
 		 * @throws ConsistencyError
 		 * @throws DataFault
 		 */
-		synchronized public int findDuplicate(int id, Set<String> fields) throws ConsistencyError, DataFault {
-			if (have_id && ! isDirty() && this.id==id) {
+		synchronized public int findDuplicate(int id, Set<String> fields,boolean check_all) throws ConsistencyError, DataFault {
+			if (have_id && ! (check_all || isDirty()) && this.id==id) {
 				return id;
 			}
 			int pattern_count=1;
@@ -1597,14 +1613,28 @@ public final class Repository {
 				
 				for (String key: fields) {
 					FieldInfo info = getInfo(key);
-					if( isDirty(key) ){
+					if( check_all || isDirty(key) ){
 						if (atleastone) {
 							buff.append(" AND ");
 						}
-						info.addName(buff, false, true);
-						buff.append("=?");
+						if( containsKey(key)){
+							info.addName(buff, false, true);
+							buff.append("=?");
+							pattern_count++;
+						}else{
+							
+							if( info.isReference()){
+								// various was a reference can be missing/null
+								// but mysql specific
+								buff.append("COALESCE(");
+								info.addName(buff, false, true);
+								buff.append(",0)<=0");
+							}else{
+								info.addName(buff, false, true);
+								buff.append(" IS NULL ");
+							}
+						}
 						atleastone = true;
-						pattern_count++;
 					}
 				}
 				

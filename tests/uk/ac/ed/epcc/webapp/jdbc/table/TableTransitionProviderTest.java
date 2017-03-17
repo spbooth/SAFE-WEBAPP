@@ -40,22 +40,22 @@ import uk.ac.ed.epcc.webapp.session.SimpleSessionService;
  *
  */
 
-public class TableTransitionProviderTest extends WebappTestBase implements ViewTransitionFactoryDataProvider<TransitionKey, TableTransitionTarget>,
-TransitionProviderInterfaceTest<TableTransitionTarget, TransitionKey, TableTransitionProviderTest>,
-IndexTransitionFactoryInterfaceTest<TableTransitionTarget, TransitionKey, TableTransitionProviderTest>,
-ViewTransitionFactoryInterfaceTest<TableTransitionTarget, TransitionKey, TableTransitionProviderTest>
+public class TableTransitionProviderTest extends WebappTestBase implements ViewTransitionFactoryDataProvider<TableTransitionKey, TableTransitionTarget>,
+TransitionProviderInterfaceTest<TableTransitionTarget, TableTransitionKey, TableTransitionProviderTest>,
+IndexTransitionFactoryInterfaceTest<TableTransitionTarget, TableTransitionKey, TableTransitionProviderTest>,
+ViewTransitionFactoryInterfaceTest<TableTransitionTarget, TableTransitionKey, TableTransitionProviderTest>
 
 {
 	
-	public TransitionProviderInterfaceTest<TableTransitionTarget, TransitionKey, TableTransitionProviderTest> transition_provider_test = new TransitionProviderInterfaceTestImpl<TableTransitionTarget, TransitionKey, TableTransitionProviderTest>(this);
+	public TransitionProviderInterfaceTest<TableTransitionTarget, TableTransitionKey, TableTransitionProviderTest> transition_provider_test = new TransitionProviderInterfaceTestImpl<TableTransitionTarget, TableTransitionKey, TableTransitionProviderTest>(this);
    
-	public IndexTransitionFactoryInterfaceTest<TableTransitionTarget, TransitionKey, TableTransitionProviderTest> index_factory_test = new IndexTransitionFactoryInterfaceTestImpl<TableTransitionTarget, TransitionKey, TableTransitionProviderTest>(this);
+	public IndexTransitionFactoryInterfaceTest<TableTransitionTarget, TableTransitionKey, TableTransitionProviderTest> index_factory_test = new IndexTransitionFactoryInterfaceTestImpl<TableTransitionTarget, TableTransitionKey, TableTransitionProviderTest>(this);
     
-    public ViewTransitionFactoryInterfaceTest<TableTransitionTarget, TransitionKey, TableTransitionProviderTest> view_factory_test = new ViewTransitionFactoryInterfaceTestImpl<TableTransitionTarget, TransitionKey, TableTransitionProviderTest>(this);
+    public ViewTransitionFactoryInterfaceTest<TableTransitionTarget, TableTransitionKey, TableTransitionProviderTest> view_factory_test = new ViewTransitionFactoryInterfaceTestImpl<TableTransitionTarget, TableTransitionKey, TableTransitionProviderTest>(this);
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryDataProvider#getTransitionFactory()
 	 */
-	public ViewTransitionFactory<TransitionKey, TableTransitionTarget> getTransitionFactory() {
+	public ViewTransitionFactory<TableTransitionKey, TableTransitionTarget> getTransitionFactory() {
 		return new TableTransitionProvider(ctx);
 	}
 

@@ -68,9 +68,11 @@ public class RoleNodeMaker extends AbstractNodeMaker {
 			  if( session_service.hasRole(role_name)){
 				  node.setMenuText("-"+role_name);
 				  node.setDisplayClass("has_role");
+				  node.setHelpText("Remove access to role "+role_name);
 			  }else{
 				  node.setMenuText("+"+role_name);
 				  node.setDisplayClass("missing_role");
+				  node.setHelpText("Enable access to role "+role_name);
 			  }
 			  parent.addChild(node);
 		 }

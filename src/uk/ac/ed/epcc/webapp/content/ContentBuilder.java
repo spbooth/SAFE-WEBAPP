@@ -88,6 +88,14 @@ public interface ContentBuilder {
 	 */
 	public ContentBuilder getPanel(String ... type) throws UnsupportedOperationException;
 	
+	/** get an expanding/folding section if supported
+	 * 
+	 *  Otherwise this just maps to {@link #getPanel(String...)}
+	 * 
+	 * @param summary_text
+	 * @return
+	 */
+	public ContentBuilder getDetails(String summary_text);
 	/** append a nested panel to its parent content.
 	 * @return parent ContentBuilder
 	 * 
@@ -140,6 +148,15 @@ public interface ContentBuilder {
 	 * @param action FormResult to navigate to.
 	 */
 	public abstract void addLink(AppContext conn,String text, FormResult action);
+	
+	/** Add an action link to the Content
+	 * @param conn AppContext
+	 * 
+	 * @param text  link text
+	 * @param hover tooltip text
+	 * @param action FormResult to navigate to.
+	 */
+	public abstract void addLink(AppContext conn,String text, String hover,FormResult action);
 	
 	/** Add a table to the content.
 	 * 

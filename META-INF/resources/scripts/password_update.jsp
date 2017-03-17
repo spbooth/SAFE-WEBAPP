@@ -64,6 +64,7 @@ Your <%=website_name %> password has expired and should be changed.
 <%@ include file="/scripts/form_context.jsf" %>
 
 <%
+String default_charset = conn.getService(ServletService.class).defaultCharset();
 HTMLForm f = new HTMLForm(conn);
 PasswordUpdateFormBuilder fac = new PasswordUpdateFormBuilder(comp, true);
 fac.buildForm(f,sess.getCurrentPerson(),conn);
@@ -75,7 +76,11 @@ fac.buildForm(f,sess.getCurrentPerson(),conn);
 <p>
 <%=fac.getPasswordPolicy() %>
 </p>
- <form method="post" action="<%= response.encodeURL(web_path+"/UserServlet") %>">
+ <form method="post" action="<%= response.encodeURL(web_path+"/UserServlet") %>"
+<% if( default_charset != null && ! default_charset.isEmpty()){%> 
+accept-charset="<%=default_charset %>"
+<% } %>
+ >
 	<input type="hidden" name="action" value="CHANGE_PASSWORD"/>
 	<input type='hidden' name='form_url' value='/scripts/password_update.jsp'/>
     <%= f.getHtmlFieldTable(request) %>

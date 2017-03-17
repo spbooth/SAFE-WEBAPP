@@ -49,6 +49,10 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 		notifyChange();
 	}
 	public float getMaximum() {
+		if( nset == 0 || ncat == 0 || nitem == 0){
+			// There is no data
+			return 0.0F;
+		}
 		float max = data[0][0][0];
 		// assumes sets are plotted front to back
 		for (int i = 0; i < nset; i++) {
@@ -108,6 +112,7 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 
 	@Override
 	protected void setSize(int new_nset, int new_numCats, int new_numItems) {
+		
 		if (new_nset == nset && new_numCats == ncat
 				&& new_numItems == nitem) {
 			return;

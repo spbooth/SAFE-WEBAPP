@@ -13,7 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
-/**
+/** A filter than never slects any records.
  * @author spb
  *
  */

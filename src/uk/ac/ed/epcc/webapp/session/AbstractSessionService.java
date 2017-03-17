@@ -33,10 +33,12 @@ import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
@@ -47,6 +49,8 @@ import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
+import uk.ac.ed.epcc.webapp.model.data.NamedFilterWrapper;
+import uk.ac.ed.epcc.webapp.model.data.RemoteAccessRoleProvider;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.model.relationship.GlobalRoleFilter;
@@ -62,24 +66,42 @@ import uk.ac.ed.epcc.webapp.model.relationship.RelationshipProvider;
  * <b>use_relationship.<em>factory-tag</em>.<em>role</em></b>
  * If this is a comma separated list it implies an OR of the component parts.
  * within this AND combinations can be specified as + separated terms.
- * 
+ * <p>
  * The factory (or its {@link Composite}s) can implement {@link AccessRoleProvider} to provide roles.
- * 
+ * <p>
+ * Roles of the form <i>field</i><b>-></b><i>remote_role</i> denotes a remote filter
+ * joined via the reference field <i>field</i> A person has these roles with the targer object
+ * if they have the <i>remote_role</i> on the object the target references. The remote role must be unqualified.
+ * <p>
  * Role names containing a period are qualified names the qualifier can be:
  * <ul>
  * <li> <b>global</b> the role is a global role not a relationship.</li>
  * <li> <b>boolean</b> Use a boolean filter so all/none relationships match.</li>
- * <li> <em>factory-tag</em> un-modified role from factory or {@link Composite} or a named filter if the factory implements {@link NamedFilterProvider}</li>
+ * <li> <em>factory-tag</em> un-modified role from factory or a named filter from
+ * a {@link NamedFilterWrapper} wrapping the factory.
  * <li> The tag of a {@link RelationshipProvider} for the target.</li>
  * <li> The tag of a {@link AccessRoleProvider}</li>
  * </ul> 
  * 
  * @author spb
- *
+ * @see NamedFilterWrapper
+ * @see RemoteAccessRoleProvider
  * @param <A>
  */
 @PreRequisiteService(ConfigService.class)
 public abstract class AbstractSessionService<A extends AppUser> implements Contexed, SessionService<A>{
+	/**
+	 * 
+	 */
+	private static final String RELATIONSHIP_DEREF = "->";
+	/** string that separates OR combination of relationship defns
+	 * 
+	 */
+	private static final String OR_RELATIONSHIP_COMBINER = ",";
+	/** string that separates AND combinations of relationship defns
+	 * 
+	 */
+	private static final String AND_RELATIONSHIP_COMBINER = "+";
 	/** prefix for relationship definitions that map to a global role
 	 * 
 	 */
@@ -88,7 +110,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * 
 	 */
 	private static final String BOOLEAN_RELATIONSHIP_BASE = "boolean";
-	/**
+	/** property prefix for relationship defns
 	 * 
 	 */
 	private static final String USE_RELATIONSHIP_PREFIX = "use_relationship.";
@@ -100,6 +122,8 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	public static final String USE_ROLE_PREFIX = "use_role.";
 	public static final Feature TOGGLE_ROLES_FEATURE = new Feature("toggle_roles",true,"allow some roles to toggle on/off");
 	public static final Feature CACHE_RELATIONSHIP_FEATURE = new Feature("cache_relationships",true,"cache relationship test results in the session");
+	public static final Feature APPLY_DEFAULT_PERSON_RELATIONSHIP_FILTER = new Feature("relationships.apply_default_person_filter",true,"Apply the default person relationship filter when generating a filter on person");
+	public static final Feature APPLY_DEFAULT_TARGET_RELATIONSHIP_FILTER = new Feature("relationships.apply_default_target_filter",true,"Apply the default target relationship filter when generating a filter");
 	private Map<String,Boolean> toggle_map=null;
 	protected AppContext c;
     
@@ -177,7 +201,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		 */
 		@Override
 		public String toString() {
-			return "RelationshipTag [tag=" + tag + ", id=" + id + ", role=" + role + "]";
+			return "RelationshipTag [tag=" + tag + ", id=" + id + ", role=" + role + "]"+hashCode();
 		}
 	}
 	private Map<RelationshipTag,Boolean> relationship_map=null;
@@ -978,7 +1002,15 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		String store_tag="PersonFilter."+fac.getTag()+(target == null ? "" : "."+target.getID())+"."+role;
 		BaseFilter<? super A> result = roles.get(store_tag);
 		if( result == null ){
+			
 			result = makePersonInRelationshipRoleFilter(fac, role,target);
+			if(APPLY_DEFAULT_PERSON_RELATIONSHIP_FILTER.isEnabled(getContext())){
+				// Add in the default relationship filte on person
+				SQLFilter<? super A> fil = getLoginFactory().getDefaultRelationshipFilter();
+				if( fil != null ){
+					result = new AndFilter<A>(getLoginFactory().getTarget(),result,fil);
+				}
+			}
 			roles.put(store_tag, result);
 		}
 		return result;
@@ -992,11 +1024,17 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		String store_tag="TargetFilter."+fac.getTag()+"."+person.getID()+"."+role;
 		BaseFilter<? super T> result = roles.get(store_tag);
 		if( result == null ){
-			// adding in the default filter breaks everything for some reason
-			//result = new AndFilter<T>(fac.getTarget(),
-			//		fac.getDefaultRelationshipFilter(),
-			//		makeRelationshipRoleFilter(fac,role,person));
 			result = makeRelationshipRoleFilter(fac,role,person,null);
+			if(APPLY_DEFAULT_TARGET_RELATIONSHIP_FILTER.isEnabled(getContext())){
+				// Add in the default relationship filter on target
+				//
+				// TODO This breaks everything for some reasons
+				//
+				SQLFilter<? super T> fil = fac.getDefaultRelationshipFilter();
+				if( fil != null ){
+					result = new AndFilter<T>(fac.getTarget(),result,fil);
+				}
+			}
 			roles.put(store_tag, result);
 		}
 		return result;
@@ -1011,6 +1049,10 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * within this AND combinations can be specified as + separated terms.
 	 * 
 	 * The factory (or its {@link Composite}s) can implement {@link AccessRoleProvider} to provide roles.
+	 * 
+	 * Roles of the form <i>field</i><b>-></b><i>remote_role</i> denotes a remote filter
+	 * joined via the reference field <i>field</i> A person has these roles with the targer object
+	 * if they have the <i>remote_role</i> on the object the target references. The remote role must be unqualified.
 	 * 
 	 * Role names containing a period are qualified names the qualifier can be:
 	 * <ul>
@@ -1035,7 +1077,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		}
 		searching_roles.add(role);
 		try{
-		if( role.contains(",")){
+		if( role.contains(OR_RELATIONSHIP_COMBINER)){
 			// OR combination of filters
 			OrFilter<T> or = new OrFilter<T>(fac2.getTarget(), fac2);
 			for( String  s  : role.split(",")){
@@ -1047,7 +1089,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			}
 			return or;
 		}
-		if( role.contains("+")){
+		if( role.contains(AND_RELATIONSHIP_COMBINER)){
 			// AND combination of filters
 			AndFilter<T> and = new AndFilter<T>(fac2.getTarget());
 			for( String  s  : role.split("\\+")){
@@ -1108,6 +1150,18 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    		}
 	    		return arp.hasRelationFilter(sub,person);
 	    	}
+	    }else if( role.contains(RELATIONSHIP_DEREF)){
+	    	// This is a remote relationship
+	    	// Note this will also catch remote NamedRoles
+	    	int pos = role.indexOf(RELATIONSHIP_DEREF);
+	    	String link_field = role.substring(0, pos);
+	    	String remote_role = role.substring(pos+RELATIONSHIP_DEREF.length());
+	    	RemoteAccessRoleProvider<A, T, ?> rarp = new RemoteAccessRoleProvider<>(this, fac2, link_field);
+	    	BaseFilter<T> fil = rarp.hasRelationFilter(remote_role, person);
+	    	if( fil == null ){
+	    		throw new UnknownRelationshipException(role);
+	    	}
+			return fil;
 	    }else{
 	    	// Non qualified name
 	    	if( person == null){
@@ -1139,7 +1193,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		}
 		searching_roles.add(role);
 		try{
-		if( role.contains(",")){
+		if( role.contains(OR_RELATIONSHIP_COMBINER)){
 			// OR combination of filters
 			OrFilter<A> or = new OrFilter<A>(target_type, login_fac);
 			for( String  s  : role.split(",")){
@@ -1147,7 +1201,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			}
 			return or;
 		}
-		if( role.contains("+")){
+		if( role.contains(AND_RELATIONSHIP_COMBINER)){
 			// OR combination of filters
 			AndFilter<A> and = new AndFilter<A>(target_type);
 			for( String  s  : role.split("\\+")){
@@ -1181,6 +1235,18 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    	if( arp != null ){
 	    		return arp.personInRelationFilter(this, sub, target);
 	    	}
+	    }else if( role.contains(RELATIONSHIP_DEREF)){
+	    	// This is a remote relationship
+	    	// Note this will also catch remote NamedRoles
+	    	int pos = role.indexOf(RELATIONSHIP_DEREF);
+	    	String link_field = role.substring(0, pos);
+	    	String remote_role = role.substring(pos+RELATIONSHIP_DEREF.length());
+	    	RemoteAccessRoleProvider<A, T, ?> rarp = new RemoteAccessRoleProvider<>(this, fac2, link_field);
+	    	BaseFilter<? super A> fil = rarp.personInRelationFilter(this, remote_role, target);
+	    	if( fil == null ){
+	    		throw new UnknownRelationshipException(role);
+	    	}
+			return fil;
 	    }else{
 	    	// direct roles can be un-qualified though not if we want multiple levels of qualification.
 	    	BaseFilter<? super A> result = makeDirectPersonInRelationshipRoleFilter(fac2, role,target);
@@ -1215,12 +1281,11 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    		return result;
 	    	}
 	    }
-	    if( fac2 instanceof NamedFilterProvider){
-	    	result = ((NamedFilterProvider)fac2).getNamedFilter(role);
-	    	if( result != null){
-	    		return result;
-	    	}
+	    result = makeNamedFilter(fac2, role);
+	    if( result != null){
+	    	return result;
 	    }
+	    
 	    // Its not one of the directly implemented roles maybe its derived
 	    String defn = getContext().getInitParameter(USE_RELATIONSHIP_PREFIX+fac2.getTag()+"."+role);
 	    if( defn != null){
@@ -1233,6 +1298,13 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    }
 	    // unrecognised role
 	    throw new UnknownRelationshipException(role);
+	}
+	/** look for a named filter from the factory or composites.
+	 * 
+	 */
+	protected <T extends DataObject> BaseFilter<? super T> makeNamedFilter(DataObjectFactory<T> fac2, String name){
+		NamedFilterWrapper<T> wrapper = new NamedFilterWrapper<>(fac2);
+		return wrapper.getNamedFilter(name);
 	}
 	protected <T extends DataObject> BaseFilter<? super A> makeDirectPersonInRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,T target) throws UnknownRelationshipException {
 		BaseFilter<? super A> result=null;
@@ -1249,6 +1321,22 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    		return result;
 	    	}
 	    }
+	    // Maybe its a named filter this will translate to a binary filter on the app-user
+	    BaseFilter<? super T> fil = makeNamedFilter(fac2, role);
+	    if( fil != null){
+	    	boolean matches=false;
+	    	if( target == null ){
+	    		try {
+					matches = fac2.exists((BaseFilter<T>) fil);
+				} catch (DataException e) {
+					error(e, "Error checking for null target");
+				}
+	    	}else{
+	    		matches= fac2.matches(fil, target);
+	    	}
+	    	return new GenericBinaryFilter<>(AppUser.class, matches);
+	    }
+	    
 	 // Its not one of the directly implemented roles maybe its derived
 	    String defn = getContext().getInitParameter(USE_RELATIONSHIP_PREFIX+fac2.getTag()+"."+role);
 	    if( defn != null){

@@ -761,7 +761,15 @@ public final class AppContext {
 		return  c.newInstance(this);
 	}
 	
-	
+	/** Method to check a class implements one of the supported constructors
+	 * for {@link #canMakeContexedObject(Class)}
+	 * 
+	 * @param clazz
+	 * @return
+	 */
+	public <T extends Contexed> boolean canMakeContexedObject(Class<T> clazz){
+		return findConstructorFromParamSignature(clazz, getClass()) != null;
+	}
 	/** Create an instance from a class.
 	 * The target object is assumed to either have a public no argument constructor or to 
 	 * implement Contexed and take an AppContext as a constructor parameter.
@@ -782,6 +790,18 @@ public final class AppContext {
 			  return  clazz.newInstance();
 		  }
 		
+	}
+	/** Method to check if a class implements one of the permitted constructors for {@link #makeObject(Class)}
+	 * 
+	 * @param clazz
+	 * @return
+	 */
+	public <T> boolean canMakeObject(Class<T> clazz){
+		 if( Contexed.class.isAssignableFrom(clazz)){
+			 return canMakeContexedObject((Class)clazz);
+		 }else{
+			 return findConstructorFromParamSignature(clazz) != null;
+		 }
 	}
 	
 	

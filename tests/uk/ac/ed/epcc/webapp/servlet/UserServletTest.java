@@ -22,6 +22,7 @@ import javax.servlet.ServletException;
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.forms.MapForm;
+import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -64,12 +65,14 @@ public class UserServletTest<A extends AppUser> extends ServletTest {
 		// Do we really need this to be provided on a forced update
 		addParam(PasswordUpdateFormBuilder.PASSWORD_FIELD,sent);
 		addParam("action",UserServlet.CHANGE_PASSWORD); 
+		setAction(PasswordUpdateFormBuilder.CHANGE_ACTION);
 		doPost();
 		checkMessage("password_changed");
 		assertTrue(composite.checkPassword(user, "BorisTheSpider"));
 	}
 	
 	@Test
+	@ConfigFixtures("old_password.properties")
 	public void testWrongPassword() throws DataFault, ServletException, IOException {
 		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
 		A user =  fac.makeBDO();
@@ -87,6 +90,8 @@ public class UserServletTest<A extends AppUser> extends ServletTest {
 		// Do we really need this to be provided on a forced update
 		addParam(PasswordUpdateFormBuilder.PASSWORD_FIELD,"womble");
 		addParam("action",UserServlet.CHANGE_PASSWORD); 
+		setAction(PasswordUpdateFormBuilder.CHANGE_ACTION);
+		setAction(PasswordUpdateFormBuilder.CHANGE_ACTION);
 		doPost();
 		checkError("/scripts/password_update.jsp",PasswordUpdateFormBuilder.PASSWORD_FIELD,"Does not match your current password");
 	}
@@ -107,7 +112,8 @@ public class UserServletTest<A extends AppUser> extends ServletTest {
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD2,"BorisTheRussian");
 		// Do we really need this to be provided on a forced update
 		addParam(PasswordUpdateFormBuilder.PASSWORD_FIELD,sent);
-		addParam("action",UserServlet.CHANGE_PASSWORD); 
+		addParam("action",UserServlet.CHANGE_PASSWORD);
+		setAction(PasswordUpdateFormBuilder.CHANGE_ACTION);
 		doPost();
 		checkError("/scripts/password_update.jsp",MapForm.GENERAL_ERROR,"New Passwords don't match");
 	}

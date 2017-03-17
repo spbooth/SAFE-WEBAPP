@@ -86,7 +86,7 @@ public class GetListFilterVisitor<T> implements FilterVisitor<List<PatternArgume
 		if( require_sql){
 			throw new NoSQLFilterException();
 		}
-		return doTrue();
+		return list;
 	}
 
 	/* (non-Javadoc)
@@ -105,9 +105,7 @@ public class GetListFilterVisitor<T> implements FilterVisitor<List<PatternArgume
 		return list;
 	}
 	
-	private List<PatternArgument> doTrue(){
-		return list;
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)

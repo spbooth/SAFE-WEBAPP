@@ -71,6 +71,7 @@ This is the <%=service_name%> <%=website_name%>.
 
 <%@ include file="/scripts/form_context.jsf" %>
 <%
+String default_charset = conn.getService(ServletService.class).defaultCharset();
 AppUserFactory person_fac =  session_service.getLoginFactory();
 HTMLCreationForm creator = new HTMLCreationForm("Signup",person_fac.getSignupFormCreator(RegisterServlet.getRealm(conn),conn.getService(ServletService.class).getWebName()));
 boolean multi = creator.useMultiPart();
@@ -89,6 +90,11 @@ boolean multi = creator.useMultiPart();
 <% if( multi ){ %>
    enctype="multipart/form-data"
 <% } %>  
+<% 
+if( default_charset != null && ! default_charset.isEmpty()){
+%> accept-charset="<%=default_charset %>"
+<% } %>
+  autocomplete="on"
   action="<%= response.encodeURL(web_path+"/SignupServlet") %>">
 <input type="hidden" name="form_url" value="<%=HTMLForm.getFormURL(request)%>">
 <%= creator.getHtmlForm(request) %>

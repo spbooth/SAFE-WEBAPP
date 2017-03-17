@@ -54,7 +54,7 @@ public abstract class TableStructureLinkManager<T extends LinkManager.Link<L,R>,
 	}
 	
 	protected TableTransitionRegistry makeTableRegistry() {
-		TableSpecification spec = getDefaultTableSpecification(getContext(), getTag(),getLeftFactory(),getLeftField(),getRightFactory(),getRightField());
+		TableSpecification spec = getFinalTableSpecification(getContext(), getTag(),getLeftFactory(),getLeftField(),getRightFactory(),getRightField());
 		return new DefaultTableTransitionRegistry<TableStructureLinkManager<Link<L,R>, L, R>>(res, spec);
 	}
 	protected void resetTransitionRegistry(){

@@ -1,0 +1,7 @@
+<Diff>
+<TestAutoCreateAppUser id='1'>
+<WebName>fred</WebName>
+<Email>thing@example.com</Email>
+<SignupDate>1477951350</SignupDate>
+</TestAutoCreateAppUser>
+</Diff>

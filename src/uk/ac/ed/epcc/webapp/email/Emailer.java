@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 import javax.mail.Address;
 import javax.mail.Message;
@@ -86,6 +87,10 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 public class Emailer {
+	/**
+	 * 
+	 */
+	private static final String MAIL_SIGNER = "MailSigner";
 	/** Default string encoding to use.
 	 * 
 	 */
@@ -128,9 +133,18 @@ public class Emailer {
 
 	public static final Feature DEBUG_SEND = new Feature("email.send.debug", false, "Log send internal operations");
 	AppContext ctx;
-
+	private Pattern dont_send_pattern=null;
+	
 	public Emailer(AppContext c) {
 		ctx = c;
+		try{
+			String pattern_text = c.getInitParameter("email.dont_send_pattern");
+			if( pattern_text != null){
+				dont_send_pattern = Pattern.compile(pattern_text);
+			}
+		}catch(Throwable t){
+			getLogger().error("Error making dont_send_pattern", t);
+		}
 	}
 
 	protected AppContext getContext() {
@@ -320,6 +334,17 @@ public class Emailer {
 	    return doSend(m);
 	
 	}
+	
+	
+	public boolean supressSend(Address a){
+		if( dont_send_pattern != null && a instanceof InternetAddress){
+			InternetAddress ia = (InternetAddress) a;
+			if( dont_send_pattern.matcher(ia.getAddress()).matches()  ){
+				return true;
+			}
+		}
+		return false;
+	}
 	public MimeMessage doSend(MimeMessage m) throws MessagingException{
 		AppContext conn = getContext();
 		Logger log = conn.getService(LoggerService.class).getLogger(getClass());
@@ -332,11 +357,13 @@ public class Emailer {
 			// in an email
 			db.commitTransaction();
 		}
+		
 		if( EMAILS_FEATURE.isEnabled(conn)  && (conn.getAttribute(SUPRESS_EMAIL_ATTR) == null)){
 			String force_email = conn.getInitParameter(EMAIL_FORCE_ADDRESS);
+			Address[] recipients = m.getRecipients(RecipientType.TO);
 			if( force_email != null){
 				log.debug("Force email to "+force_email);
-				Address old[] = m.getRecipients(RecipientType.TO).clone();
+				Address old[] = recipients.clone();
 				if( old != null && old.length > 0){
 					// allow emails to designated testers.
 					Set<String> allow = new HashSet<String>();
@@ -356,10 +383,28 @@ public class Emailer {
 				m.setRecipients(RecipientType.CC,(Address[]) null);
 				m.setRecipients(RecipientType.BCC,(Address[]) null);
 				m.saveChanges();
+			}else{
+				// apply blacklist pattern
+				LinkedHashSet<Address> use_address = new LinkedHashSet<>();
+				for(Address a :  recipients){
+					if( ! supressSend(a)){
+						use_address.add(a);
+					}
+				}
+				if( recipients.length != use_address.size()){
+					// re
+					m.setRecipients(RecipientType.TO, use_address.toArray(new Address[use_address.size()]));
+					m.saveChanges();
+				}
 			}
+
 			// make sure send date is right as many mail clients sort by sent date.
 			m.setSentDate(new Date());
 			m.saveChanges();
+			SignMailVisitor vis = getContext().makeObjectWithDefault(SignMailVisitor.class, null, MAIL_SIGNER);
+			if( vis != null ){
+				m = vis.update(m);
+			}
 			if( DEBUG_SEND.isEnabled(getContext())){
 				ByteArrayOutputStream stream = new ByteArrayOutputStream();
 				Session s = getSession();

@@ -721,3 +721,15 @@ div.mail {
 div.mail pre, div.message pre, p.longlines{
 	overflow: auto;
 }
+input[type=number][size="4"] {
+	width: 5em;
+}
+input[type=number][size="3"] {
+	width: 4em;
+}
+input[type=number][size="2"] {
+	width: 3em;
+}
+input[type=number][size="1"] {
+	width: 2em;
+}

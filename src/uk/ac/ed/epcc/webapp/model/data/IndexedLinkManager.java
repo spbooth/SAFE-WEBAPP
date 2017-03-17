@@ -456,14 +456,15 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 
 	protected IndexedLinkManager(AppContext c, String table,IndexedProducer<L> left_fac,
 			String left_field, IndexedProducer<R> right_fac, String right_field) {
-		SetContext(c, table, left_fac, left_field, right_fac, right_field);
+		setContext(c, table, left_fac, left_field, right_fac, right_field);
 	}
 	protected IndexedLinkManager(){
 		
 	}
-	protected void SetContext(AppContext c, String table,IndexedProducer<L> left_fac,
+	protected void setContext(AppContext c, String table,IndexedProducer<L> left_fac,
 				String left_field, IndexedProducer<R> right_fac, String right_field) {	
 		if( DataObjectFactory.AUTO_CREATE_TABLES_FEATURE.isEnabled(c)){
+			setComposites(c, table);
 			setContextWithMake(c, table,getFinalTableSpecification(c,table,left_fac,left_field,right_fac,right_field));
 		}else{
 			setContext(c, table,false);
@@ -668,7 +669,9 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 * @param spec
 	 */
 	public void modifyHistoryTable(TableSpecification spec){
-		
+		for(LinkComposite l : getComposites(LinkComposite.class)){
+			l.modifyHistoryTable(spec);
+		}
 	}
 	/**
 	 * Return a link creating one and calling setup if it does not exist. These

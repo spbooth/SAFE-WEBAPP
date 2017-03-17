@@ -47,7 +47,6 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		// TODO Auto-generated constructor stub
 	}
 	
-	@ConfigFixtures("password_auth.properties")
 	@Test
 	public void testLogin() throws DataFault, ServletException, IOException{
 		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
@@ -72,7 +71,7 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		
 	}
 	
-	@ConfigFixtures({"password_auth.properties","wtmp.properties"})
+	@ConfigFixtures("wtmp.properties")
 	@Test
 	public void testLoginWithWtmp() throws DataException, Exception{
 		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
@@ -97,7 +96,7 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		assertFalse(page.required(sess));
 		checkDiff("/cleanup.xsl", "login_wtmp.xml");
 	}
-	@ConfigFixtures("password_auth.properties")
+	
 	@Test
 	public void testFirstPassword() throws Exception{
 		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
@@ -123,7 +122,7 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 	}
 	
 	
-	@ConfigFixtures("password_auth.properties")
+	
 	@Test
 	public void testBadLogin() throws DataFault, ServletException, IOException{
 		AppUserFactory<A> fac =  ctx.getService(SessionService.class).getLoginFactory();
@@ -140,7 +139,7 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 	
 		
 	}
-	@ConfigFixtures("password_auth.properties")
+	
 	@Test
 	public void testBadPassword() throws DataFault, ServletException, IOException{
 		AppUserFactory<A> fac =  ctx.getService(SessionService.class).getLoginFactory();
