@@ -30,7 +30,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
  */
 public interface ParseMapInput {
 	/**
-	 * get a map of String representation of the values in teh input that is compatible
+	 * get a map of String representation of the values in the input that is compatible
 	 * with the way the input parses the map
 	 * @return Map or null if no value
 	 */
@@ -39,10 +39,10 @@ public interface ParseMapInput {
 	
 	/**
 	 * Set the value of the input by parsing a textual representation of the
-	 * sub input.
+	 * sub inputs.
 	 * 
 	 * @param v
-	 * @return 
+	 * @return true if non leaf value used.
 	 * @throws ParseException
 	 */
 	public abstract boolean parse(Map<String,Object> v) throws ParseException;

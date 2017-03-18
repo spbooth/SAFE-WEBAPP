@@ -16,10 +16,11 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.action;
 
+import uk.ac.ed.epcc.webapp.content.UIGenerator;
+import uk.ac.ed.epcc.webapp.content.UIProvider;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 
 
@@ -71,11 +72,11 @@ String confirm = null;  //
 	public String getHelp(){
 		return null;
 	}
-	/** Get optional button text to use instead of the action name. 
-	 * 
-	 * @return
+	/** Get optional button content to use instead of the action name. 
+	 * This can be a {@link UIProvider} or {@link UIGenerator} but should not include active content 
+	 * @return Object to add
 	 */
-	public String getText(){
+	public Object getText(){
 		return null;
 	}
 	/** Return an optional shortcut key for this action.

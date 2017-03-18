@@ -182,7 +182,7 @@ public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> implements Op
 				Object val = v.get(i.getKey());
 				if( val != null  && ! (val instanceof String)){
 					try{
-					// Non sting object
+					// Non string object
 						i.setValue(i.convert(val));
 					}catch(TypeError e){
 						// report the error.

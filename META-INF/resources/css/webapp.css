@@ -116,6 +116,7 @@ table.navbar tr td a {
 /* large table based report */
 div.report {
     text-align: left;
+    background-color: white;
 }
 div.report h1, div.report h2{
 text-align: center;
