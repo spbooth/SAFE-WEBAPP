@@ -66,18 +66,18 @@ public class LinkHistorySQLFilter<L extends Indexed, R extends Indexed,
 				addFilter(new ReferenceFilter<H,L>(this.linkHistoryManager,left_field,left));
 			}else{
 				// join with parent
-				addFilter(((DataObjectFactory<H>)linkHistoryManager).new RemoteFilter<T>(new ReferenceFilter<T,L>(linkHistoryManager.getLinkManager(), left_field,left),
+				addFilter(((DataObjectFactory<H>)linkHistoryManager).new RemoteFilter<T>(linkHistoryManager.getLinkManager(),
 						linkHistoryManager.getPeerName(),
-						linkHistoryManager.getLinkManager()));
+						new ReferenceFilter<T,L>(linkHistoryManager.getLinkManager(), left_field,left)));
 			}
 		}else if( right != null){
 			if(has_right_field && right != null){
 				addFilter(new ReferenceFilter<H,R>(this.linkHistoryManager,right_field,right));
 			}else{
 				// join with parent 
-				addFilter(((DataObjectFactory<H>)linkHistoryManager).new RemoteFilter<T>(new ReferenceFilter<T,R>(linkHistoryManager.getLinkManager(), right_field,right),
+				addFilter(((DataObjectFactory<H>)linkHistoryManager).new RemoteFilter<T>(linkHistoryManager.getLinkManager(),
 						linkHistoryManager.getPeerName(),
-						linkHistoryManager.getLinkManager()));
+						new ReferenceFilter<T,R>(linkHistoryManager.getLinkManager(), right_field,right)));
 			}
 		}
 

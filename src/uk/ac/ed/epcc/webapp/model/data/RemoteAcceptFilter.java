@@ -19,6 +19,13 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.Joiner;
 
 /** An {@link AcceptFilter} version of a {@link Joiner}
+ * 
+ * If you need a remote filter which is not known to be a 
+ * {@link AcceptFilter} use 
+ * {@link DataObjectFactory#getRemoteFilter(DataObjectFactory, String, BaseFilter)}
+ * as this uses a visitor to produce an optimised implementation strategy 
+ * 
+ * 
  * @author spb
  * @param <T> type of filter
  * @param <R> remote type

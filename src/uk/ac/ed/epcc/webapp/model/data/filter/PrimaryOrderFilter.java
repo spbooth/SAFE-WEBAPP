@@ -21,7 +21,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
-/** An OrderFilter that enforces use of the PrimaryKey
+/** An {@link OrderFilter} that enforces use of the PrimaryKey
  * 
  * This is for modification loops that might change the default ordering and therefore 
  * might fall foul of the chunking code.

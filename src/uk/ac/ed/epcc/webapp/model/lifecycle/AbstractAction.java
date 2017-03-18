@@ -29,6 +29,14 @@ public class AbstractAction<R> implements ActionListener<R>{
 		this.clazz=clazz;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
+
 	public boolean allow(R target, boolean throw_reason) throws LifeCycleException {
 		return true;
 	}

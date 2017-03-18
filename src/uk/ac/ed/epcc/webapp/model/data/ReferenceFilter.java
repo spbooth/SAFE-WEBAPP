@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.model.data;
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
+import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 /** Generic  SQL filter for selecting records using a
  * peer Object that implements Indexed referenced from a
@@ -39,7 +40,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 public final class ReferenceFilter< BDO extends DataObject,R extends Indexed> extends SQLValueFilter<BDO> implements SQLFilter<BDO>{
 
 
-	/** Make the filter
+	/** Make the filter from a peer object
      * 
      * @param field field referencing the peer
      * @param peer Indexed Object null for all records
@@ -47,6 +48,16 @@ public final class ReferenceFilter< BDO extends DataObject,R extends Indexed> ex
      */
     public ReferenceFilter(DataObjectFactory<BDO> factory, String field,R peer){
     	super(factory.getTarget(),factory.res,field,peer == null ? null : peer.getID());
+    }
+    
+    /** Make the filter from an {@link IndexedReference}
+     * 
+     * @param factory {@link DataObjectFactory} the filter is for
+     * @param field field referencing the peer
+     * @param index {@link IndexedReference} null for all records
+     */
+    public ReferenceFilter(DataObjectFactory<BDO> factory,String field,IndexedReference<R> index){
+    	super(factory.getTarget(),factory.res,field,index == null || index.isNull() ? null : index.getID());
     }
 	
 }

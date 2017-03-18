@@ -19,7 +19,6 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
-import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 /** Interface for objects that can augment the table {@link Transition}s of a
  * {@link TableTransitionTarget}.
  * 
@@ -33,6 +32,6 @@ public interface TransitionSource<T extends TableTransitionTarget> {
 	 * 
 	 * @return
 	 */
-	public Map<TransitionKey<T>,Transition<T>> getTransitions();
+	public Map<TableTransitionKey<T>,Transition<T>> getTransitions();
 
 }

@@ -34,6 +34,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.DropTableTransition;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableStructureAdminOperationKey;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableTransitionRegistry;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
@@ -79,7 +80,7 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 	/** Extension constructor to allow sub-classes to set factory and field
 	 * 
 	 */
-	@SuppressWarnings("unchecked")
+	
 	protected Relationship(AppContext c,String tag, DataObjectFactory<B> b_fac, String field) {
 		super(c,tag,PERSON_ID,b_fac,field);
 	}
@@ -89,7 +90,7 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 	 * @param tag
 	 * @param target_fac
 	 */
-	@SuppressWarnings("unchecked")
+	
 	protected Relationship(AppContext c, String tag,DataObjectFactory<B> target_fac){
 		this(c,tag,target_fac,TARGET_ID);
 	}
@@ -167,9 +168,9 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 	public class RelationshipTableRegistry extends AbstractTableRegistry{
 
 		public RelationshipTableRegistry(){
-			addTableTransition(new TransitionKey<Relationship>(Relationship.class, "DropTable"), new DropTableTransition<Relationship>(getContext()));
-			addTableTransition(new TransitionKey<Relationship>(Relationship.class, "DropField"), new DropFieldTransition<Relationship>(res));
-			addTableTransition(new TransitionKey<Relationship>(Relationship.class, "AddRole"), new AddBooleanFieldTransition<Relationship>(res));
+			addTableTransition(new TableStructureAdminOperationKey<Relationship>("DropTable"), new DropTableTransition<Relationship>(getContext()));
+			addTableTransition(new TableStructureAdminOperationKey<Relationship>("DropField"), new DropFieldTransition<Relationship>(res));
+			addTableTransition(new TableStructureAdminOperationKey<Relationship>( "AddRole"), new AddBooleanFieldTransition<Relationship>(res));
 		}
 		public boolean allowTableTransition(TransitionKey name,SessionService operator) {
 			return operator.hasRole(SessionService.ADMIN_ROLE);

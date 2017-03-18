@@ -17,10 +17,13 @@
 package uk.ac.ed.epcc.webapp.forms.factory;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 
-public class FormCreatorTransition<X> extends CreatorTransition<X> {
+public class FormCreatorTransition<X> extends CreatorTransition<X> implements ExtraContent<X>{
     private final FormCreator creator;
     public FormCreatorTransition(String type_name,FormCreator creator){
     	super(type_name);
@@ -29,6 +32,16 @@ public class FormCreatorTransition<X> extends CreatorTransition<X> {
 	@Override
 	public FormCreator getCreator(AppContext c) {
 		return creator;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.ExtraContent#getExtraHtml(uk.ac.ed.epcc.webapp.content.ContentBuilder, uk.ac.ed.epcc.webapp.session.SessionService, java.lang.Object)
+	 */
+	@Override
+	public <C extends ContentBuilder> C getExtraHtml(C cb, SessionService<?> op, X target) {
+		if( creator instanceof ExtraContent){
+			return ((ExtraContent<X>)creator).getExtraHtml(cb, op, target);
+		}
+		return cb;
 	}
 
 }

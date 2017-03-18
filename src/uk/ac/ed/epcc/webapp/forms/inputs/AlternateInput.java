@@ -171,17 +171,18 @@ public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> implements Op
 		return m;
 	}
 
-	public void parse(Map<String, Object> v) throws ParseException {
+	public boolean parse(Map<String, Object> v) throws ParseException {
 		String default_value = (String) v.get(getKey()); // value corresponding to this input
+		boolean result = false;
 		for(Iterator<Input<T>> it = getInputs(); it.hasNext();){
 			Input<T> i = it.next();
 			if( i instanceof ParseMapInput){
-				((ParseMapInput)i).parse(v);
+				result |= ((ParseMapInput)i).parse(v);
 			}else if( i instanceof ParseInput){
 				Object val = v.get(i.getKey());
 				if( val != null  && ! (val instanceof String)){
 					try{
-					// Non sting object
+					// Non string object
 						i.setValue(i.convert(val));
 					}catch(TypeError e){
 						// report the error.
@@ -191,6 +192,7 @@ public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> implements Op
 				}else{
 					String text = (String) val;
 					if(text == null){
+						result = true;
 						text=default_value;
 					}
 					((ParseInput)i).parse(text);
@@ -200,9 +202,10 @@ public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> implements Op
 			}
 			// we want to abort parse on the first good match
 			if( i.getValue() != null ){
-				return;
+				return result;
 			}
 		}
+		return result;
 	
 	}
 

@@ -59,7 +59,8 @@ public class Classification extends DataObject implements Principal, Comparable<
 	public String getName()     { return record.getStringProperty(NAME); }
     public void setName(String name){ record.setProperty(NAME, name); }
     public String getDescription()     { return record.getStringProperty(DESCRIPTION); }
-
+    public void setDescription(String desc){ record.setOptionalProperty(DESCRIPTION, desc); }
+    
     protected Classification(Repository.Record res){
     	super(res);
     }

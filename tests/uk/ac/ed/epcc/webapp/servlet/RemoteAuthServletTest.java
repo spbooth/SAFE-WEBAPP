@@ -13,24 +13,22 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-
-import javax.servlet.ServletException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.email.MockTansport;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
 import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.session.WebNameFinder;
 
 /**
  * @author spb
@@ -73,6 +71,51 @@ public class RemoteAuthServletTest<A extends AppUser> extends ServletTest {
 		checkDiff("/cleanup.xsl", "remote_set.xml");
 	}
 	
+	
+	@Test
+	public void testSignupRegister() throws ConsistencyError, Exception{
+		MockTansport.clear();
+		takeBaseline();
+		SessionService sess = ctx.getService(SessionService.class);
+		AppUserFactory<A> fac = sess.getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		//  Calling registerNewuser should allow a user to bind
+		// an existing is and login
+		RemoteAuthServlet.registerNewUser(ctx, user);
+		assertFalse(sess.haveCurrentUser());
+		
+		req.remote_user="fred";
+		doPost();
+		checkMessage("remote_auth_set");
+		assertTrue(sess.isCurrentPerson(user));
+		checkDiff("/cleanup.xsl", "remote_set.xml");
+	}
+	
+	@Test
+	@DataBaseFixtures("remote_set.xml")
+	public void testReRegister() throws ConsistencyError, Exception{
+		MockTansport.clear();
+		takeBaseline();
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred2@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		ctx.getService(SessionService.class).setCurrentPerson(user);
+		
+		req.remote_user="fred";
+		doPost();
+		checkMessage("remote_auth_set");
+		checkDiff("/cleanup.xsl", "remote_reset.xml");
+		
+		A old_user  = fac.findByEmail("fred@example.com");
+		assertNull(old_user.getRealmName(WebNameFinder.WEB_NAME));
+	}
 	
 	@Test
 	@DataBaseFixtures("remote_set.xml")

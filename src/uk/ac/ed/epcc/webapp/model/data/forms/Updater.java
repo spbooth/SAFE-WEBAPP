@@ -16,12 +16,15 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data.forms;
 
+import java.util.Map;
+
 import uk.ac.ed.epcc.webapp.editors.xml.DomTransitionProvider.EditTransition;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdate;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
@@ -67,6 +70,15 @@ public class Updater<BDO extends DataObject> extends DataObjectUpdateFormFactory
 	public BDO getSelected(Form f) {
 		ItemInput<BDO> i = (ItemInput<BDO>) f.getInput(TARGET);
 		return i.getItem();
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate#preCommit(uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.forms.Form, java.util.Map)
+	 */
+	@Override
+	public void preCommit(BDO dat, Form f, Map<String, Object> orig) throws DataException {
+		
+		
 	}
 	
 }

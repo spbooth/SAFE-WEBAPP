@@ -64,7 +64,7 @@ public class DummyReferenceFactory extends DataObjectFactory<DummyReference> {
 
 	public SQLFilter<DummyReference> getRemoteNameFilter(String name){
 		Dummy1.Factory fac = new Dummy1.Factory(getContext());
-		return new RemoteFilter<Dummy1>(fac.new StringFilter(name), DummyReference.REF_FIELD, fac);
+		return new RemoteFilter<Dummy1>(fac, DummyReference.REF_FIELD, fac.new StringFilter(name));
 	}
 	
 	public Set<Dummy1> geReferencedDummy(String name) throws DataFault{

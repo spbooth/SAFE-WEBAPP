@@ -36,6 +36,7 @@ import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.content.TemplateFile;
+import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 
 /** Mock based tests of {@link Emailer}.
  * 
@@ -57,7 +58,7 @@ public class EmailerTest extends WebappTestBase {
 		Emailer mailer = new Emailer(getContext());
 		Session sess = mailer.getSession();
 		Transport t = sess.getTransport("smtp");
-		assertEquals("Transport", MockTansport.class,t.getClass());;
+		assertEquals("Transport", MockTansport.class,t.getClass());
 	}
 	@Test
 	public void testUndisclosed() throws AddressException{
@@ -104,6 +105,17 @@ public class EmailerTest extends WebappTestBase {
 		assertTrue(MockTansport.nSent()==1);
 		assertEquals("user@example.com", MockTansport.getAddress(0)[0].toString());
 		assertEquals("A test Email",MockTansport.getMessage(0).getSubject());
+		
+	}
+	
+	@Test(expected=javax.mail.SendFailedException.class)
+	@ConfigFixtures("blacklist.properties")
+	public void testBlacklist() throws IOException, MessagingException{
+		Emailer mailer = new Emailer(ctx);
+		File f = new File("test_templates/test_email.txt");
+		TemplateFile tf = TemplateFile.getTemplateFile(f.getAbsolutePath()); // Load the page template
+
+		mailer.templateEmail("user@example.com", tf);
 		
 	}
 }

@@ -119,13 +119,20 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * 
 	 * @param sess {@link SessionService}
 	 * @throws IOException 
+	 * @throws ServletException 
 	 * 
 	 */
-	public <A extends AppUser> void requestAuthentication(SessionService<A> sess) throws IOException;
+	public <A extends AppUser> void requestAuthentication(SessionService<A> sess) throws IOException, ServletException;
 	
 	/** Return the default charset we want to use.
 	 * 
 	 * @return
 	 */
 	public String defaultCharset();
+	
+	/** Has the response been comitted.
+	 * 
+	 * @return
+	 */
+	public boolean isComitted();
 }

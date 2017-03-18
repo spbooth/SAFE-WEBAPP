@@ -17,24 +17,27 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
  * @author spb
+ * @param <T> target type
  *
  */
-public class AdminOperationKey<T extends TableStructureTransitionTarget> extends AccessControlTransitionKey<T> {
+public class AdminOperationKey<T extends TableTransitionTarget> extends TableTransitionKey<T> {
 
-	/**
-	 * @param t
-	 * @param name
-	 * @param help
-	 */
-	public AdminOperationKey( String name, String help) {
-		super(TableStructureTransitionTarget.class, name, help);
+	
+	
+
+	public AdminOperationKey(Class<? super T> t, String name, String help) {
+		super(t, name, help);
+	}
+
+	public AdminOperationKey(Class<? super T> t, String name) {
+		super(t, name);
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.AccessControlTransitionKey#allow(uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
 	@Override
-	public boolean allow(SessionService serv) {
+	public boolean allow(SessionService<?> serv,T target) {
 		return serv.hasRole(SessionService.ADMIN_ROLE);
 	}
 

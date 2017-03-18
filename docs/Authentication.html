@@ -1,0 +1,278 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 5.1.5.2 (Windows)"/>
+	<meta name="created" content="2017-03-07T20:40:46.520000000"/>
+	<meta name="changed" content="2017-03-07T20:40:58.610000000"/>
+	<style type="text/css">
+		h2.western { font-family: "Albany", sans-serif; font-size: 16pt }
+		h2.cjk { font-family: "SimSun"; font-size: 16pt }
+		h2.ctl { font-family: "Mangal"; font-size: 16pt }
+		h3.western { font-family: "Albany", sans-serif }
+		h3.cjk { font-family: "SimSun" }
+		h3.ctl { font-family: "Mangal" }
+		h4 { margin-top: 0.42cm; margin-bottom: 0.5cm }
+		h4.western { font-family: "Albany", sans-serif; font-size: 14pt; font-weight: normal }
+		h4.cjk { font-family: "SimSun"; font-size: 14pt; font-weight: normal }
+		h4.ctl { font-family: "Mangal"; font-size: 14pt; font-weight: normal }
+		pre.cjk { font-family: "NSimSun", monospace }
+	</style>
+</head>
+<body lang="en-GB" dir="ltr">
+<h2 class="western">Configuring application authentication</h2>
+<p>The default behaviour of the application is to use password based
+authentication with login passwords stored (encrypted and salted)
+within the person database table. This is implemented by a Composite.
+Users self-register with the application and the users Email address
+is verified as part of the sign-up process. This is chosen as the
+default mechanism because it is the most flexible, anybody with an
+email account and a web-browser is capable of using this
+configuration. However the application can also be configured to use
+different authentication mechanisms, depending on your requirements:</p>
+<h3 class="western">Internal password authentication</h3>
+<p>This is the default configuration. Password based authentication
+is supported if the person table contains a composite registered
+under the <b>PasswordAuthComposite</b> type. The default is to
+register a <b>DatabasePasswordComposite</b> that stores an encrypted
+and salted password in database fields of the person table. The
+following parameters allow fine-tuning of the password configuration.</p>
+<ul>
+	<li/>
+<p>Property <b>password.salt_length</b> <span style="font-weight: normal">length
+	of password salt used.</span></p>
+	<li/>
+<p>Property <b>password.hash</b> <span style="font-weight: normal">password
+	hash algorithm. This should be one of </span><b>MD5</b><span style="font-weight: normal">,</span><b>SHA1</b><span style="font-weight: normal">,</span><b>SHA256</b><span style="font-weight: normal">,</span><b>SHA384</b><span style="font-weight: normal">,</span><b>SHA512</b><span style="font-weight: normal">.
+	Provided the </span><b>Alg</b> <span style="font-weight: normal">field
+	exists in the person table (to store the hash algorithm used when
+	the password was set) you can change this parameter without breaking
+	existing entries. You may however have to change the length of the
+	password field in the database. </span>
+	</p>
+	<li/>
+<p>Property <i>hash-name</i><b>.allowed</b> <span style="font-weight: normal">Set
+	this to true/false so enable/disable the use of a particular
+	password algorithm. The default algorithm is always allowed. If a
+	non-default algorithm is allowed users whose password were stored
+	using that algorithm will still be able to login using their old
+	password. They will be updated to the new default the next time they
+	change their password.</span></p>
+	<li/>
+<p>Property <b>max_password_fails</b> <span style="font-weight: normal">number
+	of consecutive password fails before the account is locked and the
+	user has to change their password.</span></p>
+	<li/>
+<p>Property <b>notify_password_fails</b> <span style="font-weight: normal">number
+	of consecutive password fails before failed attempts are logged as
+	errors.</span></p>
+	<li/>
+<p>Property <b>service.feature.password.check_complexity</b>
+	enable complexity checking of user supplied passwords.</p>
+	<ul>
+		<li/>
+<p><b>password.min_length</b> <span style="font-weight: normal">minimum
+		password length (not counting repeated letters or letters
+		consecutive in the alphabet)</span></p>
+		<li/>
+<p><b>password.min_diff_char</b> <span style="font-weight: normal">minimum
+		number of different characters that should occur within the
+		password this should</span> <span style="font-weight: normal">give
+		better password entropy than requiring characters from particular
+		sets like digits because all characters are treated equally. </span>
+		</p>
+		<li/>
+<p><b>password.min_digits</b> <span style="font-weight: normal">minimum
+		number of digits needed in a password.</span></p>
+		<li/>
+<p><b>password.min_special</b> <span style="font-weight: normal">minimum
+		number of non alpha-numeric characters needed in a password.</span></p>
+	</ul>
+</ul>
+<h3 class="western">Mandatory external authentication</h3>
+<p>If all of your users already have existing web-credentials (for
+example a campus/federated Single-Sign-On system) you may want to
+configure the application to use this external authentication system
+instead of internal passwords. These changes should ideally be
+performed when setting up the system for the first time rather than
+being applied to an existing application instance.</p>
+<ol>
+	<li/>
+<p>Configure apache level authentication to use the existing
+	web-credentials. This is usually done using a <b>Location</b>
+	statement within the apache configuration. The exact syntax depends
+	on the version of httpd and the SSO system you are using. It is not
+	necessary to protect every application URL (In fact you probably
+	want different authentication for URLs accessed via scripts. The
+	minimum set of URLs to protect are:</p>
+</ol>
+<ul>
+	<ul>
+		<li/>
+<p>/login.jsp</p>
+		<li/>
+<p>/RegisterServlet</p>
+		<li/>
+<p>/ (Not strictly required but this is the default URL that
+		users will usually visit first)</p>
+	</ul>
+</ul>
+<p><br/>
+<br/>
+
+</p>
+<ol start="2">
+	<li/>
+<p>Edit the <b>person.composites</b> property to remove the
+	<b>DatabasePasswordComposite</b> and replace it with
+	<b>AppUserNameFinder.WebName</b><span style="font-weight: normal">.
+	If you are making this change to an existing database that was
+	originally created for password based authentication, you will also
+	have to use the table edit forms to drop the Password related
+	database fields and add the WebName field. You will also have to
+	edit any existing users (With the Developer role active) to set the
+	WebName field to the REMOTE_USER</span> <span style="font-weight: normal">string
+	for that user. </span>
+	</p>
+	<li/>
+<p style="font-weight: normal">Set the property
+	<b>service.feature.allow_external_auth=on</b>. With this feature
+	enabled the application will try to match any REMOTE_USER identity
+	generated by Apache to WebName values in the person table and
+	automatically log-in if a match is found. 
+	</p>
+	<li/>
+<p style="font-weight: normal">The default behaviour is if the
+	REMOTE_USER name does not correspond to the WebName field for any
+	existing database record then the user will be presented with a
+	sign-up form and a record will be created for them. If you don't
+	want users to self-register the first time they visit the
+	application you will have to set <b>service.feature.allow_signup=off</b>
+	in which case you will have to manually create each user (using the
+	<i>Create person</i> form or an automated data upload) before they
+	can log-in to the application. 
+	</p>
+	<li/>
+<p style="font-weight: normal">It is also possible to install
+	a custom <b>AppUserNameFinder</b> that can query some external
+	directory (such as a LDAP server) and automatically create the
+	record based on information from the directory. However (at the time
+	of writing) there is not a generic configurable plug-in that does
+	this only custom solutions for particular cases. If you require this
+	get in touch with the application developers.</p>
+</ol>
+<h4 class="western"></h4>
+<h3 class="western">Secondary external authentication</h3>
+<p>You can also use an external SSO system as a secondary login
+system in addition to a password mechanism. Every application user
+will still have a password as in the default configuration but (if
+they have an identity in the SSO system) they have the option of
+binding this identity to their application account and using this as
+an alternative login mechanism. You don't need to know users
+identities in advance to do this because the SSO identities are
+captured when the user links their identity to the application.</p>
+<ol>
+	<li/>
+<p>Configure apache level authentication to use the existing
+	web-credentials. Pick a top-level URL the application to protect
+	that is specific to this for example <b>/Campus-sso</b></p>
+	<li/>
+<p style="font-weight: normal">Edit the application web.xml
+	file to bind a RemoteAuthServlet to this location.</p>
+</ol>
+<pre class="western" style="margin-bottom: 0.5cm"> <font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&lt;</font></font></font><font color="#3f7f7f"><font face="Monospace"><font size="2" style="font-size: 10pt">servlet</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&gt;</font></font></font></pre><p align="left" style="margin-bottom: 0cm">
+<font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&lt;</font></font></font><font color="#3f7f7f"><font face="Monospace"><font size="2" style="font-size: 10pt">description</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&gt;</font></font></font><font color="#1a1a1a"><font face="Monospace"><font size="2" style="font-size: 10pt">Allows
+access from campus</font></font></font><font color="#1a1a1a">
+</font><font color="#1a1a1a"><font face="Monospace"><font size="2" style="font-size: 10pt">logins</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&lt;/</font></font></font><font color="#3f7f7f"><font face="Monospace"><font size="2" style="font-size: 10pt">description</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&gt;</font></font></font></p>
+<p align="left" style="margin-bottom: 0cm"><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&lt;</font></font></font><font color="#3f7f7f"><font face="Monospace"><font size="2" style="font-size: 10pt">servlet-name</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&gt;</font></font></font><font color="#1a1a1a"><font face="Monospace"><font size="2" style="font-size: 10pt">SSOServlet</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&lt;/</font></font></font><font color="#3f7f7f"><font face="Monospace"><font size="2" style="font-size: 10pt">servlet-name</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&gt;</font></font></font></p>
+<p align="left" style="margin-bottom: 0cm"><br/>
+
+</p>
+<p align="left" style="margin-bottom: 0cm"><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&lt;</font></font></font><font color="#3f7f7f"><font face="Monospace"><font size="2" style="font-size: 10pt">servlet-class</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&gt;</font></font></font><font color="#1a1a1a"><font face="Monospace"><font size="2" style="font-size: 10pt">uk.ac.ed.epcc.webapp.servlet.RemoteAuthServlet</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&lt;/</font></font></font><font color="#3f7f7f"><font face="Monospace"><font size="2" style="font-size: 10pt">servlet-class</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&gt;</font></font></font></p>
+<p align="left" style="margin-bottom: 0cm"><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&lt;/</font></font></font><font color="#3f7f7f"><font face="Monospace"><font size="2" style="font-size: 10pt">servlet</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&gt;</font></font></font></p>
+<p align="left" style="margin-bottom: 0cm"><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&lt;</font></font></font><font color="#3f7f7f"><font face="Monospace"><font size="2" style="font-size: 10pt">servlet</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&gt;</font></font></font></p>
+<p align="left" style="margin-bottom: 0cm"><br/>
+
+</p>
+<p align="left" style="margin-bottom: 0cm"><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&lt;</font></font></font><font color="#3f7f7f"><font face="Monospace"><font size="2" style="font-size: 10pt">servlet-mapping</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&gt;</font></font></font></p>
+<p align="left" style="margin-bottom: 0cm"><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&lt;</font></font></font><font color="#3f7f7f"><font face="Monospace"><font size="2" style="font-size: 10pt">servlet-name</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&gt;</font></font></font><font color="#1a1a1a"><font face="Monospace"><font size="2" style="font-size: 10pt">SSOServlet</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&lt;/</font></font></font><font color="#3f7f7f"><font face="Monospace"><font size="2" style="font-size: 10pt">servlet-name</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&gt;</font></font></font></p>
+<p align="left" style="margin-bottom: 0cm"><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&lt;</font></font></font><font color="#3f7f7f"><font face="Monospace"><font size="2" style="font-size: 10pt">url-pattern</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&gt;</font></font></font><font color="#1a1a1a"><font face="Monospace"><font size="2" style="font-size: 10pt">/Campus-sso</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&lt;/</font></font></font><font color="#3f7f7f"><font face="Monospace"><font size="2" style="font-size: 10pt">url-pattern</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&gt;</font></font></font></p>
+<p align="left" style="margin-bottom: 0cm; font-weight: normal"><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&lt;/</font></font></font><font color="#3f7f7f"><font face="Monospace"><font size="2" style="font-size: 10pt">servlet-mapping</font></font></font><font color="#008080"><font face="Monospace"><font size="2" style="font-size: 10pt">&gt;</font></font></font></p>
+<p align="left" style="margin-bottom: 0cm"><br/>
+
+</p>
+<ol start="3">
+	<li/>
+<p>Add <b>AppUserNameFinder.WebName</b> <span style="font-weight: normal">to
+	the </span><b>person.composites</b> <span style="font-weight: normal">list.
+	If you are adding this to an existing application you will also have
+	to create the WebName database field in the person table via the
+	table admin forms.</span></p>
+	<li/>
+<p>Set property <b>service.feature.web_login=on</b></p>
+	<li/>
+<p style="font-weight: normal">Set property
+	<b>service.web_login.url=/Campus-sso</b></p>
+	<li/>
+<p style="font-weight: normal">Set property
+	<b>service.web_login.login-text=Login using Campus SSO</b>. This is
+	the text that appears on the login page form.</p>
+	<li/>
+<p style="font-weight: normal">Set property
+	<b>service.web_login.update-text=Register Campus SSO identity.</b>
+	This is the text that appears on the form where users can link their
+	identities to the application.</p>
+</ol>
+<p style="font-weight: normal">If you need a choice of secondary
+methods you can configure more than one RemoteAuthServlet instances
+to handle different authentication mechanisms. Each mechanism
+corresponds do a different naming &ldquo;realm&rdquo;. 
+</p>
+<ol>
+	<li/>
+<p style="font-weight: normal">The <b>service.web_login
+	</b>configuration parameters become comma separated lists of values
+	one for each mechanism.</p>
+	<li/>
+<p style="font-weight: normal">The additional servlets needs
+	to be configured with an init-parameter <b>remote_auth.realm</b> to
+	change the realm from the default <b>WebName</b> realm.</p>
+	<li/>
+<p style="font-weight: normal">Additional composites need to
+	be added to implement the new realms e.g.</p>
+</ol>
+<ul>
+	<ul>
+		<li/>
+<p><span style="font-weight: normal">Define the property</span>
+		<b>class.Realm2=FieldnameFinder </b><span style="font-weight: normal">and
+		add the composite </span><b>Realm2</b> <span style="font-weight: normal">to
+		</span><b>person.composites</b><span style="font-weight: normal">.
+		The REMOTE_USER value for this realm will be stored in field Realm2
+		in the person table.</span></p>
+		<li/>
+<p><span style="font-weight: normal">If you need a third
+		realm use </span><b>SecondaryNameFinder</b> <span style="font-weight: normal">rather
+		than FieldNameFinder.</span> <span style="font-weight: normal">This
+		works exactly the same as the FieldNameFinder but registers under a
+		different type allowing it to co-exist with the FieldNameFinder and
+		the default WebNameFinder.</span></p>
+	</ul>
+</ul>
+<h3 class="western">LDAP password authentication</h3>
+<p>It is also possible to perform password authentication directly
+against an LDAP server rather than storing the passwords in the
+internal database. This is done using a custom <b>PasswordAuthComposite</b>
+that verifies the users password against an external LDAP (and
+creates the corresponding database entry if one does not already
+exist). However (at the time of writing) there is not a generic
+configurable plug-in that does this only custom solutions for
+particular cases. If you require this get in touch with the
+application developers.</p>
+<h1><br/>
+<br/>
+
+</h1>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<Diff><TableSpecification name='TestTestBackup'>
+<Name type='String' nullable='true' max='32'/>
+<Number type='Double' nullable='true'/>
+<UnsignedInt type='Long' nullable='true'/>
+<Mandatory type='String' nullable='false' max='32'/>
+<Time type='Long' nullable='true'/>
+<Beatles type='String' nullable='false' max='6'/>
+<Ruttles type='Integer' nullable='false'/>
+</TableSpecification>
+<TestTestBackup id='4'>
+<Name>Name3</Name>
+<Number>3.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='5'>
+<Name>Name4</Name>
+<Number>4.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='6'>
+<Name>Name5</Name>
+<Number>5.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='7'>
+<Name>Name6</Name>
+<Number>6.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='8'>
+<Name>Name7</Name>
+<Number>7.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='9'>
+<Name>Name8</Name>
+<Number>8.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='10'>
+<Name>Name9</Name>
+<Number>9.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='11'>
+<Name>Name10</Name>
+<Number>10.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='12'>
+<Name>Name11</Name>
+<Number>11.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='13'>
+<Name>Name12</Name>
+<Number>12.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='14'>
+<Name>Name13</Name>
+<Number>13.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='15'>
+<Name>Name14</Name>
+<Number>14.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='16'>
+<Name>Name15</Name>
+<Number>15.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='17'>
+<Name>Name16</Name>
+<Number>16.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='18'>
+<Name>Name17</Name>
+<Number>17.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='19'>
+<Name>Name18</Name>
+<Number>18.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='20'>
+<Name>Name19</Name>
+<Number>19.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='21'>
+<Name>Name20</Name>
+<Number>20.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='22'>
+<Name>Name21</Name>
+<Number>21.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='23'>
+<Name>Name22</Name>
+<Number>22.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='24'>
+<Name>Name23</Name>
+<Number>23.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='25'>
+<Name>Name24</Name>
+<Number>24.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='26'>
+<Name>Name25</Name>
+<Number>25.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+<TestTestBackup id='27'>
+<Name>Name26</Name>
+<Number>26.0</Number>
+<UnsignedInt>0</UnsignedInt>
+<Mandatory>Junk</Mandatory>
+<Beatles>Paul</Beatles>
+<Ruttles>2</Ruttles>
+</TestTestBackup>
+</Diff>

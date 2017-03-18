@@ -73,7 +73,8 @@ public class AppUser extends DataObject implements java.security.Principal{
 	public boolean canLogin() {
 		return true;
 	}
-
+	
+	
 	public String getRealmName(String realm){
 		AppUserNameFinder finder = getFactory().getRealmFinder(realm);
 		if( finder != null){
@@ -127,14 +128,7 @@ public class AppUser extends DataObject implements java.security.Principal{
 		return getFactory().getSortName(this);
 	}
 	
-	/** Is this a placeholder record that we are expecting somebody to sign up
-     * for later
-     * 
-     * @return boolean
-     */
-    public boolean isPlaceholder(){
-    	return false;
-    }
+	
 	
     
     public void setRealmName(String realm, String name){
@@ -254,5 +248,14 @@ public class AppUser extends DataObject implements java.security.Principal{
 			result = result + logname;
 		}
 		return result;
+	}
+	
+	/**
+	 * 
+	 * @param role
+	 * @return
+	 */
+	public boolean checkStateRole(String role){
+		return false;
 	}
 }

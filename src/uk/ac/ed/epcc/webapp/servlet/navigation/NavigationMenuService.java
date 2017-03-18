@@ -104,7 +104,13 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 		if( service == null || ! service.haveCurrentUser() || ! NAVIGATION_MENU_FEATURE.isEnabled(conn)){
 			return null;
 		}
-		NodeContainer menu = (NodeContainer) service.getAttribute(NAVIGATION_MENU_ATTR);
+		NodeContainer menu = null;
+		try{
+			menu = (NodeContainer) service.getAttribute(NAVIGATION_MENU_ATTR);
+		}catch(Throwable t){
+			// Any de-serialisation problem will probably jus destory the session
+			// but just to be fail-safe trap all throwables.
+		}
 		Date too_old = new Date(System.currentTimeMillis()-getContext().getLongParameter("navigation.expire_millis", 600000));
 		if( menu == null || menu.getDate().before(too_old)){
 			menu = makeMenu();
@@ -180,6 +186,7 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 		}
 		try{
 			String path = conn.expandText(menu_prop.getProperty(name+".path"));
+			String help = conn.expandText(menu_prop.getProperty(name+".help"));
 			String type = conn.expandText(menu_prop.getProperty(name+".type","default_node_type"));
 			String child_list = conn.expandText(menu_prop.getProperty(name+".list"));
 			String image = menu_prop.getProperty(name+".image");
@@ -198,8 +205,11 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 				if( key != null && key.length() > 0){
 					n.setAccessKey(key.charAt(0));
 				}
+				if( help != null && ! help.isEmpty()){
+					n.setHelpText(help);
+				}
 				// Add config nodes first
-				if( child_list != null ){
+				if( child_list != null && ! child_list.isEmpty()){
 					for(String child_name : child_list.trim().split("\\s*,\\s*")){
 						Node c = makeNode(seen,child_name, menu_prop);
 						if( c != null ){

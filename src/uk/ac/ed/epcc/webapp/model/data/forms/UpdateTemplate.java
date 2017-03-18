@@ -33,16 +33,24 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
  * @param <BDO>
  */
 public interface UpdateTemplate<BDO extends DataObject> {
-
+	/** extension point for update side effects that should be applied before the commit. 
+	 * 
+	 * @param dat
+	 * @param f
+	 * @param orig
+	 * @throws DataException
+	 */
+	
+	public void preCommit(BDO dat,Form f,Map<String,Object> orig) throws DataException;
 	/** perform side-effects after a form update
 	 * 
 	 * 
 	 * @param o object being updated
 	 * @param f Form used for update
 	 * @param orig Map of object state before update.
-	 * @throws DataException
+	 * @throws Exception
 	 */
-	public abstract void postUpdate(BDO o, Form f,Map<String,Object> orig) throws DataException;
+	public abstract void postUpdate(BDO o, Form f,Map<String,Object> orig) throws Exception;
 	
 	public AppContext getContext();
 	

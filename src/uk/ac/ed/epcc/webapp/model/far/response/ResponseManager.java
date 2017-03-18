@@ -20,7 +20,6 @@ import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -30,7 +29,6 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
-import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.model.far.AbstractPartTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager;
@@ -47,8 +45,8 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * 
  * ResponseManagers implement {@link ServeDataProducer} allowing any user
  * @author spb
- * @param <R> 
- * @param <F> 
+ * @param <R> type of {@link Response}
+ * @param <F> type of {@link DynamicForm}
  *
  */
 
@@ -64,11 +62,25 @@ public abstract class ResponseManager<R extends ResponseManager.Response<F>,F ex
 		this.form_manager=manager;
 		setContext(manager.getContext(), tag);
 	}
-	
+	/** Get the {@link DynamicFormManager} corresponding to this response
+	 * 
+	 * @return
+	 */
 	public DynamicFormManager<F> getManager(){
 		return form_manager;
 	}
 
+	/** This represents a response to a {@link DynamicForm}
+	 * 
+	 * The logic for how a response is generated (and how the form we are responding to is selected)
+	 * is up to the sub-class. For example this may be an application to a particular funding call
+	 * and the form to be completed is encoded in funding-call object. Or the system might
+	 * have a single application form where the current valid form is specified in some manner.
+	 * 
+	 * @author spb
+	 *
+	 * @param <D>
+	 */
 	public abstract static class Response<D extends DynamicForm> extends DataObject{
 
 		private final ResponseManager manager;
@@ -82,35 +94,111 @@ public abstract class ResponseManager<R extends ResponseManager.Response<F>,F ex
 		public ResponseManager<? extends Response<D>, D> getResponseManager(){
 			return manager;
 		}
+		/** Get the {@link DynamicForm} we are in response to.
+		 * This should be a frozen form as we assume it is static.
+		 * 
+		 * @return
+		 * @throws DataException
+		 */
 		public D getForm() throws DataException{
 			return (D) manager.form_manager.find(record.getIntProperty(FORM_ID));
 		}
+		/** Set the {@link DynamicForm}. 
+		 * This should be set once when the response if first created.
+		 * 
+		 * @param form
+		 */
 		public void setForm(D form){
 			record.setProperty(FORM_ID, form.getID());
 		}
+		/** set the data in response to a question
+		 * 
+		 * @param q
+		 * @param data
+		 * @throws Exception
+		 */
 		public <T> void setData(Question q, T data) throws Exception{
 			manager.setData(q, this, data);
 		}
+		/** get the data provided in response to a particular question.
+		 * 
+		 * @param q
+		 * @return
+		 * @throws Exception
+		 */
 		public <T> T getData(Question q) throws Exception{
 			return (T) manager.getData(q, this);
 		}
+		/** get the data-object that contains the response data.
+		 * 
+		 * 
+		 * @param q
+		 * @return
+		 * @throws Exception
+		 */
 		public <T> ResponseData<T, ? extends Response<D>,D>getWrapper(Question q) throws Exception{
 			return manager.getWrapper(q, this);
 		}
+		/** Access control method to view the response
+		 * 
+		 * 
+		 * @param sess
+		 * @return boolean
+		 */
 		public abstract boolean canView(SessionService<?> sess);
-		
+		/** Access control method to edit the response
+		 * 
+		 * @param sess
+		 * @return
+		 */
 		public abstract boolean canEdit(SessionService<?> sess);
-		
+		/** a text descriptor for the response.
+		 * For example the name of the application being made in response to an application form. 
+		 * 
+		 * @return
+		 */
 		public abstract String getDescriptor();
 		
+		/** method to be called when the form is finally submitted.
+		 * 
+		 * This should usually change internal state and freeze the response (changing the
+		 * value returned by {@link #canEdit(SessionService)} so
+		 * the response contents don't change while the response is reviewed.
+		 * 
+		 * Other submit time side-effects could also be included here
+		 * 
+		 * The reviewers could return the response to the submitter returning it
+		 * to a previous state
+		 * 
+		 * @return FormResult
+		 * @throws Exception
+		 */
 		public abstract FormResult submit() throws Exception;
 		
+		/** This method must return true before the form edit transition allows
+		 * the submit button to be pressed.
+		 * 
+		 * @return boolean
+		 * @throws Exception
+		 */
 		public abstract boolean validate() throws Exception;
 		
+		/** get a {@link MimeStreamData} representing a downloadable version of the response
+		 * 
+		 * @return
+		 * @throws DataException
+		 */
 		public abstract MimeStreamData getDataStream() throws DataException;
 				
 	}
 
+	/** get the data from a Question from a response
+	 * 
+	 * @param q
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public <T> T  getData(Question q, R response) throws Exception{
 		ResponseData<T, R,F> link = getWrapper(q, response);
 		if( link == null ){
@@ -137,7 +225,13 @@ public abstract class ResponseManager<R extends ResponseManager.Response<F>,F ex
 		ResponseData<T, R,F> link = (ResponseData<T, R,F>) manager.getLink(q, response);
 		return link;
 	}
-	
+	/** set the data for a question and response
+	 * 
+	 * @param q
+	 * @param response
+	 * @param data
+	 * @throws Exception
+	 */
 	public <T> void setData(Question q, R response, T data) throws Exception{
 		ResponseDataManager<?, R, F> manager = getDataManager(q);
 		ResponseData<T, R,F> link = (ResponseData<T, R,F>) manager.makeData(q, response);
@@ -145,8 +239,9 @@ public abstract class ResponseManager<R extends ResponseManager.Response<F>,F ex
 		link.commit();
 	}
 
-	/**
-	 * @param q
+	/** get the {@link ResponseDataManager} that handles the data generated by
+	 * a question. Questions with the same type of response data can share a {@link ResponseDataManager}.
+	 * @param q the {@link Question}
 	 * @return
 	 * @throws Exception
 	 * @throws NoSuchMethodException
@@ -174,10 +269,21 @@ public abstract class ResponseManager<R extends ResponseManager.Response<F>,F ex
 		return spec;
 	}
 
+	/** get a filter for all responses to a particular form.
+	 * 
+	 * @param form
+	 * @return
+	 */
 	public SQLFilter<R> getFormFilter(F form){
 		return new ReferenceFilter<R, F>(this, FORM_ID, form);
 	}
 	
+	/** get a {@link ServeDataResult} (for a download link) from a {@link ResponseData}
+	 * 
+	 * @param wrapper
+	 * @return
+	 * @throws DataException
+	 */
 	public <T> ServeDataResult getServeResult(ResponseData<T, R,F> wrapper) throws DataException{
 		LinkedList<String> args = new LinkedList<String>();
 		R response = wrapper.getResponse();

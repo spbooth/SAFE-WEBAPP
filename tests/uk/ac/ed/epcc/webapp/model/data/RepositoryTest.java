@@ -50,6 +50,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
+import uk.ac.ed.epcc.webapp.model.data.Repository.IdMode;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
@@ -266,7 +267,7 @@ public class RepositoryTest extends WebappTestBase {
 	public void testSpecifyID() throws DataException{
 		Record r = res.new Record();
 		
-		r.setID(354, false);
+		r.setID(354, IdMode.IgnoreExisting);
 		r.put("Name","fred");
 		r.put("Number", new Integer(12));
 		// date is default null this should be ok

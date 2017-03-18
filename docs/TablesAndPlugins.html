@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 5.1.5.2 (Windows)"/>
+	<meta name="created" content="2017-03-07T20:40:07.457000000"/>
+	<meta name="changed" content="2017-03-07T20:40:24.804000000"/>
+	<style type="text/css">
+		h2.western { font-family: "Albany", sans-serif; font-size: 16pt }
+		h2.cjk { font-family: "SimSun"; font-size: 16pt }
+		h2.ctl { font-family: "Mangal"; font-size: 16pt }
+	</style>
+</head>
+<body lang="en-GB" dir="ltr">
+<h2 class="western">Tables and plug-ins</h2>
+<p>Many of the more advanced application configuration options will
+use properties to specify which java class should be used in a
+specific context, rather than hard-coding a specific class. This
+allows customised logic to be inserted into the application in
+various places. The properties used follow some common conventions
+that are described here. Though it is not necessary to understand
+this level of configuration entirely understanding these common
+conventions will hopefully make it easier to understand some of the
+more advanced configuration recipes outlined in this document.</p>
+<ul>
+	<li/>
+<p><b>classdef</b>.<i>name</i>=<i>fully-qualified-java-class </i><span style="font-variant: normal"><span style="font-style: normal">A
+	property of this form defines an alias for java-class that can be
+	used elsewhere in the configuration files. </span></span>
+	</p>
+	<li/>
+<p><i>class-specification</i><span style="font-variant: normal">
+	</span><span style="font-variant: normal"><span style="font-style: normal"><b>:=
+	[</b></span></span> <i>classdef-name</i><span style="font-variant: normal">
+	</span><span style="font-variant: normal"><span style="font-style: normal"><b>|</b></span></span><span style="font-variant: normal">
+	</span><i>fully-qualified-java-class</i><span style="font-variant: normal">
+	</span><span style="font-variant: normal"><span style="font-style: normal"><b>]</b></span></span><span style="font-variant: normal">
+	</span><span style="font-variant: normal"><span style="font-style: normal">Classdef
+	names or fully qualified java class names can usually be used
+	interchangeably.</span></span></p>
+	<li/>
+<p><span style="font-variant: normal"><span style="font-style: normal"><b>class</b></span></span><span style="font-variant: normal"><span style="font-style: normal">.</span></span><i>name</i><span style="font-variant: normal"><span style="font-style: normal">=
+	</span></span><i>class-specification</i><span style="font-variant: normal">
+	</span><span style="font-variant: normal"><span style="font-style: normal">A
+	property of this form defines a plug-in or handler class. Usually
+	the handler class is required to implement a certain interface or
+	extend a particular super-class. Every database table in the
+	application has a handler class and the usual convention is that a
+	property of this form (where name is the name of the table) is used
+	to define the handler class of that table. New tables can be added
+	to the application by adding properties of this form and the
+	behaviour of some of the standard tables can be customised by
+	changing these parameters to point to a specialised version of the
+	handler class. Not all properties of this form correspond to
+	database tables however the same syntax is used for some other types
+	of plug-ins as well.</span></span></p>
+	<li/>
+<p><i>class-specification-list</i> <b>:= [</b>
+	<i>class-specification</i> <b>|</b> <i>class-specification-list</i>
+	<b>,</b> <i>class-specification</i> <b>]</b> 
+	</p>
+	<li/>
+<p><i>table-name</i><span style="font-variant: normal"><span style="font-style: normal">.</span></span><span style="font-variant: normal"><span style="font-style: normal"><b>composites</b></span></span><span style="font-variant: normal">
+	</span><span style="font-variant: normal"><span style="font-style: normal">=
+	</span></span><i>class-specification-list </i><span style="font-variant: normal"><span style="font-style: normal">A
+	property of this form defines a set of composite objects that are
+	added to the database table handler class. This is a way of
+	augmenting the behaviour of a table without changing any of the
+	existing behaviour. For example if you want to add a field to the
+	person table to track the gender of your users this can done by
+	adding a </span></span><span style="font-variant: normal"><span style="font-style: normal"><b>GenderComposite</b></span></span><span style="font-variant: normal">
+	</span><span style="font-variant: normal"><span style="font-style: normal">to
+	the </span></span><span style="font-variant: normal"><span style="font-style: normal"><b>person</b></span></span><span style="font-variant: normal">
+	</span><span style="font-variant: normal"><span style="font-style: normal">table.
+	Composites usually operate on their own distinct set of database
+	fields in the parent table. Composites register themselves as
+	implementing a specific type that defines the capabilities of the
+	composite. All composites registered with a database table handler
+	class have to have distinct registration types. Adding a composite
+	to a handler class will usually change the database table
+	specification generated by that handler. If you add the composite
+	before the table has been created the table will be created
+	including all the fields needed by the composite. If you add a
+	composite to the handler of a table that already exists then the
+	database table will not be modified automatically instead the new
+	fields will appear as options in the table editing forms. </span></span>
+	</p>
+	<li/>
+<p><span style="font-variant: normal"><span style="font-style: normal"><b>class.TransitionProvider</b></span></span><span style="font-variant: normal"><span style="font-style: normal">.</span></span><i>transition-name
+	= </i><i><span style="font-weight: normal">class-specification </span></i><span style="font-variant: normal"><span style="font-style: normal"><span style="font-weight: normal">A
+	property of this form identifies a plug-in that provides a set of
+	&ldquo;Transitions&rdquo; which are a set of related forms operating
+	on the same type of object. For example the application provides
+	transitions to allow users to view and perform operations on the
+	unix accounts that belong to them. If the web-page to perform an
+	operation is at a URL </span></span></span><span style="font-variant: normal"><span style="font-style: normal"><b>/TransitionServlet/</b></span></span><i><b>transition-name/*
+	</b></i><span style="font-variant: normal"><span style="font-style: normal"><span style="font-weight: normal">then
+	it is a transition. This is another potential customisation point
+	for the application as additional sets of transitions (or customised
+	versions of existing ones) can be added to the application by
+	setting parameters of this form.</span></span></span></p>
+</ul>
+</body>
+</html>

@@ -13,12 +13,13 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-import uk.ac.ed.epcc.webapp.forms.MapForm;
 import uk.ac.ed.epcc.webapp.forms.html.PageHTMLForm;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
@@ -63,6 +64,7 @@ public class PasswordResetServletTest extends ServletTest {
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD2,"BorisTheSpider");
 		addParam("submitted","true");
 		addParam("action",UserServlet.CHANGE_PASSWORD); 
+		setAction(PasswordUpdateFormBuilder.CHANGE_ACTION);
 		doPost();
 		checkMessage("password_changed");
 		SessionService sess = ctx.getService(SessionService.class);

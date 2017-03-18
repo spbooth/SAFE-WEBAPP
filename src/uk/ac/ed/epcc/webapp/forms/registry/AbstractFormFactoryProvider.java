@@ -73,6 +73,9 @@ public abstract class AbstractFormFactoryProvider<F extends Contexed, T> impleme
 	public boolean canUpdate(SessionService p){
 		try {
 			F factory = getFactory(p.getContext());
+			if( factory == null ){
+				return false;
+			}
 			if( factory instanceof FormUpdateProducer || factory instanceof FormUpdate){
 				if( disabled(p.getContext())){
 					return false;
@@ -90,6 +93,9 @@ public abstract class AbstractFormFactoryProvider<F extends Contexed, T> impleme
 	public boolean canCreate(SessionService p){
 		try {
 			F factory = getFactory(p.getContext());
+			if( factory == null){
+				return false;
+			}
 			if( factory instanceof FormCreatorProducer || factory instanceof FormCreator){
 				if( disabled(p.getContext())){
 					return false;

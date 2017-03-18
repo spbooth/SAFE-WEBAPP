@@ -13,15 +13,21 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.relationship;
 
+import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**  Interface for classes that provide relationship roles between an {@link AppUser}
  * and a target object.
+ * 
+ * If the relationship only depends on the target object not on the {@link AppUser} then
+ * use {@link NamedFilterProvider}.
  * 
  * {@link DataObjectFactory}s and {@link Composite}s should implement this interface for roles provided by
  * {@link AppUser} references. In this case it is a good idea to return a {@link DualFilter} to allow tests
@@ -30,6 +36,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * It can also be implemented by stand-alone plug-ins. 
  * 
  * @see RelationshipProvider
+ * @see NamedFilterProvider
  * @see SessionService
  * @author spb
  * @param <U> AppUser type
@@ -48,6 +55,7 @@ public interface AccessRoleProvider<U extends AppUser,T extends DataObject> {
 	 * to allow the {@link SessionService} to combine and customise access rules.
 	 * 
 	 * @param role
+	 * @param user 
 	 * @return {@link BaseFilter} or null
 	 */
 	public BaseFilter<T> hasRelationFilter(String role, U user);
@@ -56,7 +64,9 @@ public interface AccessRoleProvider<U extends AppUser,T extends DataObject> {
 	 * the target object.
 	 * 
 	 * This is the inverse of {@link #hasRelationFilter(SessionService, String)} used to generate a list
-	 * of {@link AppUser} with the relation. 
+	 * of {@link AppUser} with the relation. It can always be implemented (inefficiently) by creating an {@link AcceptFilter}
+	 * that uses {@link #hasRelationFilter(String, AppUser)} to check each person in turn but though it is usually possible to find some {@link SQLFilter}
+	 * to narrow the selection first even if a full SQL implementation is not possible.
 	 * 
 	 * If the target is null it should generate a filter for any user in relation with targets
 	 * selected by {@link DataObjectFactory#getDefaultRelationshipFilter()}. If this is not possible

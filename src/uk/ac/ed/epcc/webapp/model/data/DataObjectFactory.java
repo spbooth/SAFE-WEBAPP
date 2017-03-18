@@ -55,17 +55,23 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ConvertPureAcceptFilterVisitor;
+import uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterConverter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterFinder;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterMatcher;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.NoSQLFilterException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
+import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultIterator;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultMapper;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
@@ -851,18 +857,21 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * takes {@link DataObjectFactory} classes as argument instead of the underlying {@link Repository}.
 	 * This is an inner class of the factory that makes the reference.
 	 * 
+	 * If you need a remote filter which is not known to be a 
+	 * {@link SQLFilter} use 
+	 * {@link DataObjectFactory#getRemoteFilter(DataObjectFactory, String, BaseFilter)}
+	 * 
 	 * @author spb
 	 * @see RemoteAcceptFilter
 	 * @param <T> type of remote table
 	 */
 	public class RemoteFilter<T extends DataObject> extends Joiner<T,BDO> implements SQLFilter<BDO>{
 		/** Make filter from remote filter 
-		 * 
-		 * @param fil  {@link SQLFilter} on remote object
-		 * @param join_field  field referencing remote oject
 		 * @param join_fac {@link DataObjectFactory} for remote object
+		 * @param join_field  field referencing remote oject
+		 * @param fil  {@link SQLFilter} on remote object
 		 */
-		public RemoteFilter(SQLFilter<? super T> fil, String join_field, DataObjectFactory<T> join_fac){
+		public RemoteFilter(DataObjectFactory<T> join_fac, String join_field, SQLFilter<? super T> fil){
         	super(DataObjectFactory.this.getTarget(),fil,join_field,res,join_fac.res);
         }
 	}
@@ -1237,9 +1246,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return it.hasNext();
 		}
 	}
-	private final ConvertPureAcceptFilterVisitor<BDO> accept_converter = new ConvertPureAcceptFilterVisitor<BDO>();
+	// Note this is used to implement FilterMatcher so
+	// we can't pass ourselves as the matcher arg
+	private final ConvertPureAcceptFilterVisitor<BDO> accept_converter = new ConvertPureAcceptFilterVisitor<BDO>(null);
 	public final boolean matches(BaseFilter<? super BDO> fil, BDO o) {
-		if( fil == null){
+		if( fil == null || o == null){
 			return false;
 		}
 		try {
@@ -1253,7 +1264,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 		// Have to do a SQL query
 		@SuppressWarnings("unchecked")
-		AndFilter<BDO> and = new AndFilter<BDO>(getTarget(), fil, new SQLIdFilter<BDO>(getTarget(), res, o.getID()) );
+		AndFilter<BDO> and = new AndFilter<BDO>(getTarget(), fil, getFilter(o) );
 		try {
 			return exists(and);
 		} catch (DataException e) {
@@ -1316,15 +1327,24 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		return false;
 	}
 
+	public final BaseFilter<BDO> getFinalSelectFilter(){
+		AndFilter<BDO> fil = new AndFilter<>(getTarget());
+		fil.addFilter(getSelectFilter());
+		for(SelectModifier mod : getComposites(SelectModifier.class)){
+			fil.addFilter(mod.getSelectFilter());
+		}
+		return fil;
+	}
 	/**
 	 * get the default {@link Input} for this Factory
 	 * Default behaviour is to use the {@link #getSelectFilter()} method to generate a {@link DataObjectInput}
 	 * but <em>not</em> to restrict the parse values (default value of {@link #restrictDefaultInput()} so existing values that don't
 	 * match the select filter are still valid.
 	 */
-	public  DataObjectItemInput<BDO> getInput() {
-		return new DataObjectInput(getSelectFilter(),restrictDefaultInput());
+	public DataObjectItemInput<BDO> getInput() {
+		return new DataObjectInput(getFinalSelectFilter(),restrictDefaultInput());
 	}
+	
 	/** Create an {@link Input} from a filter
 	 * 
 	 * @param fil
@@ -1432,7 +1452,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      * @return
      */
     public SQLFilter<BDO> getDefaultRelationshipFilter(){
-    	BaseFilter<BDO> fil = getSelectFilter();
+    	BaseFilter<BDO> fil = getFinalSelectFilter();
     	try {
 			return FilterConverter.convert(fil);
 		} catch (NoSQLFilterException e) {
@@ -1566,6 +1586,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return boolean true if object belongs
 	 */
 	public final boolean isMine(DataObject o) {
+		if( o == null){
+			return false;
+		}
 		return getTag().equals(o.getFactoryTag());
 	}
 
@@ -1893,43 +1916,15 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     	return o.record.getProperty(prod,def);
     }
     
-    /** Generate a Relationship filter based on a relationship on a remote object.
-     * 
-     * @param remote
-     * @param field
-     * @param role
-     * @return
-     */
-    protected <R extends DataObject,A extends AppUser> BaseFilter<BDO> getRemoteRelationshipFilter(DataObjectFactory<R> remote, String field, String role,A user){
-    	BaseFilter<R> fil=null;
-		try {
-			fil = getContext().getService(SessionService.class).getTargetInRelationshipRoleFilter(remote, role,user);
-		} catch (UnknownRelationshipException e2) {
-			getLogger().error("Error making remote relationship",e2);
-		}
-    	if( fil == null ){
-    		return new GenericBinaryFilter<BDO>(getTarget(),false);
-    	}
-    	try {
-			SQLFilter<R> sqlfil = fil.acceptVisitor(new FilterConverter<R>());
-			return new Joiner<R, BDO>(getTarget(), sqlfil, field, res, remote.res);
-		} catch (Exception e) {
-			try {
-				AcceptFilter<R> acceptfil = (AcceptFilter<R>) fil.acceptVisitor(new ConvertPureAcceptFilterVisitor<R>());
-				return new RemoteAcceptFilter<BDO,R>(getTarget(),remote,field,acceptfil);
-			} catch (Exception e1) {
-				getLogger().error("Cannot convert Relationship filter", e1);
-				return new GenericBinaryFilter<BDO>(getTarget(),false);
-			}
-		}
-    }
-    
     /** get a filter that selects a particular target object.
      * 
      * @param target
      * @return
      */
     public SQLFilter<BDO> getFilter(BDO target){
+    	if( target == null){
+    		throw new ConsistencyError("null target in getFilter");
+    	}
     	if( ! isMine(target)){
     		throw new ConsistencyError("unexpected target "+target.getFactoryTag());
     	}
@@ -1989,17 +1984,136 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 		
 	}
+	/** A {@link FilterVisitor} for making a local filter from a filter on a referenced table.
+	 * 
+	 * @author spb
+	 *
+	 * @param <R>
+	 */
+	public class MakeRemoteFilterVisitor<R extends DataObject> implements FilterVisitor<BaseFilter<BDO>, R>{
+		private final DataObjectFactory<R> remote_fac;
+		private final String field;
+		
+		public MakeRemoteFilterVisitor(DataObjectFactory<R> remote_fac,String field){
+			this.remote_fac=remote_fac;
+			this.field=field;
+		}
+		/** default mechanism
+		 * if the filter can be converted to a pure {@link SQLFilter} use that
+		 * otherwise a {@link RemoteAcceptFilter}
+		 * 
+		 * @param fil
+		 * @return
+		 */
+		public BaseFilter<BDO> visitBaseFilter(BaseFilter<? super R> fil){
+			try{
+				SQLFilter<? super R> sqlfilter = FilterConverter.convert(fil);
+				return new RemoteFilter<R>(remote_fac,field,sqlfilter);
+			}catch(NoSQLFilterException e){
+				return new RemoteAcceptFilter<BDO, R>(getTarget(), remote_fac, field, fil);
+			}
+		}
+		public RemoteFilter<R> visitSQLFilter(SQLFilter<R> fil){
+			return new RemoteFilter<>(remote_fac, field, fil);
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
+		 */
+		@Override
+		public BaseFilter<BDO> visitPatternFilter(PatternFilter<? super R> fil) throws Exception {
+			return visitSQLFilter((SQLFilter<R>) fil);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitSQLCombineFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter)
+		 */
+		@Override
+		public BaseFilter<BDO> visitSQLCombineFilter(BaseSQLCombineFilter<? super R> fil) throws Exception {
+			return visitSQLFilter((SQLFilter<R>) fil);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAndFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter)
+		 */
+		@Override
+		public BaseFilter<BDO> visitAndFilter(AndFilter<? super R> fil) throws Exception {
+			try{
+				if( ! fil.hasAcceptFilters()){
+					SQLFilter<? super R> sqlfilter = FilterConverter.convert(fil);
+					return new RemoteFilter<R>(remote_fac,field,sqlfilter);
+				}
+			}catch(NoSQLFilterException e){
+			}
+			BaseFilter<BDO> result =new RemoteAcceptFilter<BDO, R>(getTarget(), remote_fac, field, fil);
+			if( fil.hasPatternFilters() ){
+				result = new AndFilter<BDO>(getTarget(),result, new RemoteFilter<R>(remote_fac,field,fil.getNarrowingFilter()));
+			}
+			return result;
+
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
+		 */
+		@Override
+		public BaseFilter<BDO> visitOrFilter(OrFilter<? super R> fil) throws Exception {
+			return visitBaseFilter(fil);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
+		 */
+		@Override
+		public BaseFilter<BDO> visitOrderFilter(OrderFilter<? super R> fil) throws Exception {
+			return visitSQLFilter((SQLFilter<R>) fil);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter)
+		 */
+		@Override
+		public BaseFilter<BDO> visitAcceptFilter(AcceptFilter<? super R> fil) throws Exception {
+	
+			return new RemoteAcceptFilter<BDO,R>(getTarget(), remote_fac, field, fil);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitJoinFilter(uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter)
+		 */
+		@Override
+		public BaseFilter<BDO> visitJoinFilter(JoinFilter<? super R> fil) throws Exception {
+			return visitSQLFilter((SQLFilter<R>) fil);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
+		 */
+		@Override
+		public BaseFilter<BDO> visitBinaryFilter(BinaryFilter<? super R> fil) throws Exception {
+			// A remote binary filter can become a local binary filter
+			return new GenericBinaryFilter<BDO>(getTarget(), fil.getBooleanResult());
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
+		 */
+		@Override
+		public BaseFilter<BDO> visitDualFilter(DualFilter<? super R> fil) throws Exception {
+			return visitBaseFilter(fil);
+		}
+		
+	}
 	/** Create a BDO {@link BaseFilter} from a {@link BaseFilter} on a referenced factory.
 	 * 
 	 * @param fil
 	 * @return
 	 */
-	protected <R extends DataObject> BaseFilter<BDO> getRemoteFilter(DataObjectFactory<R> remote_fac, String link_field,BaseFilter<? super R> fil){
-		try{
-			SQLFilter<? super R> sqlfilter = FilterConverter.convert(fil);
-			return new RemoteFilter<R>(sqlfilter,link_field,remote_fac);
-		}catch(NoSQLFilterException e){
-			return new RemoteAcceptFilter<BDO, R>(getTarget(), remote_fac, link_field, fil);
+	public <R extends DataObject> BaseFilter<BDO> getRemoteFilter(DataObjectFactory<R> remote_fac, String link_field,BaseFilter<? super R> fil){
+		try {
+			return fil.acceptVisitor(new MakeRemoteFilterVisitor<R>(remote_fac, link_field));
+		} catch (Exception e1) {
+			getLogger().error("Impossible error", e1);
+			return null;
 		}
 		
 	}

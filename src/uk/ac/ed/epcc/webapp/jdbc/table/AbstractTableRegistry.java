@@ -22,31 +22,18 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
-import uk.ac.ed.epcc.webapp.session.SessionService;
 
 public abstract class AbstractTableRegistry implements CompositeTableTransitionRegistry {
 
-	/**
-	 * 
-	 */
-	public static final String CHANGE_TABLE_STRUCTURE_ROLE = "ChangeTableStructure";
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.data.transition.TableTransitionTarget#allowTableTransition(uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey, uk.ac.ed.epcc.webapp.model.AppUser)
-	 */
-	public boolean allowTableTransition(TransitionKey name, SessionService operator) {
-		return operator.hasRole(CHANGE_TABLE_STRUCTURE_ROLE) || 
-				( name instanceof AccessControlTransitionKey && 
-				  ((AccessControlTransitionKey)name).allow(operator)		
-			);
-	}
 	
-	private Map<TransitionKey,Transition> table_transitions = new LinkedHashMap<TransitionKey,Transition>();
+	
+	private Map<TableTransitionKey,Transition> table_transitions = new LinkedHashMap<TableTransitionKey,Transition>();
 	/** Method to allow sub-classes to add table transitions
 	 * 
 	 * @param key
 	 * @param t
 	 */
-	protected <X extends TableTransitionTarget> void addTableTransition(TransitionKey<X> key, Transition<X> t){
+	protected <X extends TableTransitionTarget> void addTableTransition(TableTransitionKey<X> key, Transition<X> t){
     	table_transitions.put(key,t);
     }
 	/* (non-Javadoc)
@@ -56,8 +43,8 @@ public abstract class AbstractTableRegistry implements CompositeTableTransitionR
 		if( source == null ){
 			return;
 		}
-		Map<TransitionKey<X>,Transition<X>> map = source.getTransitions();
-		for(TransitionKey<X> key : map.keySet()){
+		Map<TableTransitionKey<X>,Transition<X>> map = source.getTransitions();
+		for(TableTransitionKey<X> key : map.keySet()){
 			addTableTransition(key, map.get(key));
 		}
 	}
@@ -66,13 +53,13 @@ public abstract class AbstractTableRegistry implements CompositeTableTransitionR
 	 */
 	@SuppressWarnings("unchecked")
 	public Transition<TableTransitionTarget> getTableTransition(
-			TransitionKey name) {
+			TableTransitionKey name) {
 		return table_transitions.get(name);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.transition.TableTransitionTarget#getTableTransitionKeys()
 	 */
-	public Set<TransitionKey> getTableTransitionKeys() {
+	public Set<TableTransitionKey> getTableTransitionKeys() {
 		return table_transitions.keySet();
 	}
 	

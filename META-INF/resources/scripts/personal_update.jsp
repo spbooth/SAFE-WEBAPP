@@ -30,6 +30,7 @@ Update personal details
 <%@ include file="/std_header.jsf" %>
 <%@page import="uk.ac.ed.epcc.webapp.forms.*" %>
 <%
+    String default_charset = conn.getService(ServletService.class).defaultCharset();
 	AppUserFactory fac = conn.getService(SessionService.class).getLoginFactory();
     StandAloneFormUpdate u = (StandAloneFormUpdate) fac.getFormUpdate(conn);
    HTMLForm form = new HTMLForm(conn);
@@ -45,7 +46,12 @@ Update personal details
   <form method="post" 
 <% if( multi ){ %>
    enctype="multipart/form-data"
-<% } %>  
+<% } %> 
+<% 
+if( default_charset != null && ! default_charset.isEmpty()){
+%> accept-charset="<%=default_charset %>"
+<% } %>
+  autocomplete="on" 
   action="<%= response.encodeURL(web_path+"/UserServlet") %>">
 	<input type="hidden" name="form_url" value="/personal_update.jsp"/>
 	<input type="hidden" name="action" value="MODIFY_PERSON"/>

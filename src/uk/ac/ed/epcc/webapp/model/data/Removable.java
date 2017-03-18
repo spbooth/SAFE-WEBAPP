@@ -14,16 +14,29 @@
 /*******************************************************************************
  * Copyright (c) - The University of Edinburgh 2010
  *******************************************************************************/
-package uk.ac.ed.epcc.webapp.model.log;
+package uk.ac.ed.epcc.webapp.model.data;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-/** Interface implemented by the target classes of Log Entry
- * If this interface is implemeted the class provides a method to be called when the
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory.FilterIterator;
+/** Interface for {@link DataObject}s that can be removed from a {@link FilterIterator}
+ * Classes that implement this should therefore have a well defined iteration order
+ * that won't per permuted if elements from the start of the sequence are removed.
+ * 
+ * 
+ * It is also implemented by the target classes of Log Entry
+ * If this interface is implemented the class provides a method to be called when the
  * parent Entry is deleted.
  * 
  * @author spb
  *
  */
 public interface Removable {
-  public void remove() throws DataException;
+
+	/** This method removes the record
+	 * 
+	 * It should delete any dependent data then call {@link DataObject#delete}
+	 * 
+	 * @throws Exception 
+	 */
+  public void remove() throws Exception;
 }

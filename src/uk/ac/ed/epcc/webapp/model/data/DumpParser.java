@@ -39,6 +39,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
+import uk.ac.ed.epcc.webapp.model.data.Repository.IdMode;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
@@ -239,7 +240,7 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 					
 					if( getPreserveIds()){
 						// Edit existing record or use parsed id in insert.
-						current.setID(id, false);
+						current.setID(id, getIdMode());
 					}else{
 						// If we already have a map for this parse_id assume this is an update for an existing record
 						if( id_map != null ){
@@ -333,6 +334,12 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 		}
 		// ignore container elements of fields where repository 
 		// lookup failed
+	}
+	/**
+	 * @return
+	 */
+	protected IdMode getIdMode() {
+		return IdMode.UseExistingIfPresent;
 	}
 	public void startPrefixMapping(String arg0, String arg1)
 			throws SAXException {

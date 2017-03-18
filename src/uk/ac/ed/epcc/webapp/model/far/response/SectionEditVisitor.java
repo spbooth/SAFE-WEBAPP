@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.model.far.response;
 
 import java.util.Map;
 
+
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.Control;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
@@ -27,7 +28,9 @@ import uk.ac.ed.epcc.webapp.model.far.SectionManager.Section;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
-/**
+/** A {@link ContentVisitor} that converts a specific target {@link Section} into
+ * an edit form.
+ * The rest of the page is shown as in the super class
  * @author spb
  *
  */

@@ -148,11 +148,18 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addLink(uk.ac.ed.epcc.webapp.AppContext, java.lang.String, uk.ac.ed.epcc.webapp.forms.result.FormResult)
 	 */
 	@Override
+	public void addLink(AppContext conn, String text,String hover, FormResult action) {
+		sb.append(text);
+		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addLink(uk.ac.ed.epcc.webapp.AppContext, java.lang.String, uk.ac.ed.epcc.webapp.forms.result.FormResult)
+	 */
+	@Override
 	public void addLink(AppContext conn, String text, FormResult action) {
 		sb.append(text);
 		
 	}
-
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addTable(uk.ac.ed.epcc.webapp.AppContext, uk.ac.ed.epcc.webapp.content.Table)
 	 */
@@ -333,5 +340,12 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 	public <X> void addList(Map<String, String> attr, Iterable<X> list) {
 		addList(list);
 		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#getDetails(java.lang.String)
+	 */
+	@Override
+	public ContentBuilder getDetails(String summary_text) {
+		return getPanel();
 	}
 }

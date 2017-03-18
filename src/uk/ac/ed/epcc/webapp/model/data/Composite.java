@@ -57,7 +57,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * as {@link DataObject} has to the {@link DataObjectFactory}.
  * 
  * @author spb
- * @param <BDO> 
+ * @param <BDO> target type
  * @Param <X> type the {@link Composite} is registered under.
  */
 @SuppressWarnings("javadoc")

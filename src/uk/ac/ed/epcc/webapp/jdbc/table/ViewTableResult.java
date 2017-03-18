@@ -17,11 +17,10 @@
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
 import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
-import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 
 
 
-public class ViewTableResult extends ViewTransitionResult<TableTransitionTarget, TransitionKey> {
+public class ViewTableResult extends ViewTransitionResult<TableTransitionTarget, TableTransitionKey> {
 
 	public ViewTableResult(TableTransitionTarget target) {
 		super(new TableTransitionProvider(target.getContext()),target);

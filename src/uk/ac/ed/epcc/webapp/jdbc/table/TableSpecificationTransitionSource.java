@@ -16,14 +16,12 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
@@ -32,17 +30,13 @@ import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 /** A {@link TransitionSource} that depends on the default {@link TableSpecification}
  * for the target table. For example to add missing fields from the specification.
  * @author spb
@@ -96,10 +90,12 @@ public class TableSpecificationTransitionSource<T extends TableStructureTransiti
 		@Override
 		public <I extends Input<String> & ItemInput<FieldInfo>> I getFieldInput() {
 			Map<String,FieldInfo> map = new LinkedHashMap<String, Repository.FieldInfo>();
-			for(String name : spec.getOptionalFieldNames()){
-				FieldInfo info = res.getInfo(name);
-				if( info != null){
-					map.put(name, info);
+			Set<String> optionalFieldNames = spec.getOptionalFieldNames();
+			Set<String> fieldNames = spec.getFieldNames();
+			for(String name : res.getFields()){
+				// optional are marked optional or not in spec
+				if( optionalFieldNames.contains(name) || ! fieldNames.contains(name)){
+					map.put(name, res.getInfo(name));
 				}
 			}
 			return (I) new OptionalFieldInput<FieldInfo>(res, false, map);
@@ -170,13 +166,13 @@ public class TableSpecificationTransitionSource<T extends TableStructureTransiti
 	}
 	
 	
-	public Map<TransitionKey<T>, Transition<T>> getTransitions() {
-		Map<TransitionKey<T>,Transition<T>> result = new HashMap<TransitionKey<T>, Transition<T>>();
-		result.put(new AdminOperationKey<T>(ADD_STD_FIELD,"Add missing fields from the default table specification for this class"),
+	public Map<TableTransitionKey<T>, Transition<T>> getTransitions() {
+		Map<TableTransitionKey<T>,Transition<T>> result = new HashMap<TableTransitionKey<T>, Transition<T>>();
+		result.put(new TableStructureAdminOperationKey<T>(ADD_STD_FIELD,"Add missing fields from the default table specification for this class"),
 				new AddStdFieldTransition(res));
-		result.put(new AdminOperationKey<T>(ADD_STD_INDEX, "Add missing index from the default table specification for this class"), 
+		result.put(new TableStructureAdminOperationKey<T>(ADD_STD_INDEX, "Add missing index from the default table specification for this class"), 
 				new AddStdIndexTransition());
-		result.put(new AdminOperationKey<T>(DROP_OPTIONAL_FIELD,"Drop optional existing field"),new DropOptionalFieldTransition(res));
+		result.put(new TableStructureAdminOperationKey<T>(DROP_OPTIONAL_FIELD,"Drop optional existing field"),new DropOptionalFieldTransition(res));
 		return result;
 	}
 

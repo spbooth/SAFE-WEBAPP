@@ -145,11 +145,31 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  *   number of milliseconds in the desired unit.</li>
  *   <li>StreamData values are always added as binary streams so they can be stored in blob types.</li> 
  * </ul>
+ * 
+ * If a string attribute {@link Repository#BACKUP_SUFFIX_ATTR} is stored in the {@link AppContext}
+ * then this name will be used as a table name suffix to create backup tables where deleted records will be
+ * copied before being deleted in the main table. This is intended to allow
+ * old data to be backed up as part of a purge of data from a live table.
  * @author spb
  * 
  */
 
 public final class Repository {
+	/** modes supported by {@link Record#setID}
+	 * 
+	 * @author spb
+	 *
+	 */
+	public enum IdMode{
+		RequireExisting,
+		UseExistingIfPresent,
+		IgnoreExisting
+	};
+	/**
+	 * 
+	 */
+	public static final String BACKUP_SUFFIX_ATTR = "BackupSuffix";
+
 	/**
 	 * 
 	 */
@@ -168,6 +188,7 @@ public final class Repository {
 
 	public static final Feature READ_ONLY_FEATURE = new Feature("read-only",false,"supress (most) database writes");
 	
+	public static final Feature BACKUP_WITH_SELECT = new Feature("repository.backup_by_select",true,"Use select/insert when backing up a record");
 	private static final DateFormat dump_format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss SSS");
 	
 	/** information about indexes
@@ -613,7 +634,8 @@ public final class Repository {
 		 */
         @SuppressWarnings("unchecked")
 	    synchronized void copy(Record r){
-        	if( Repository.this != r.getRepository() ){
+        	// We allow copy to backup tables.
+        	if( Repository.this != r.getRepository()  ){
         		throw new ConsistencyError("copying Record from different repository");
         	}
         	clear();
@@ -625,6 +647,42 @@ public final class Repository {
         	if( r.dirty != null){
         		dirty=new HashSet( r.dirty );
         	}
+        }
+        
+        public void backup() throws DataFault{
+        	Repository store = getBackup();
+        	if( store == null ){
+        		return;
+        	}
+        	if( BACKUP_WITH_SELECT.isEnabled(getContext())){
+        		StringBuilder sb = new StringBuilder();
+        		try{
+
+        			sb.append("REPLACE INTO ");
+        			store.addTable(sb, true);
+        			sb.append(" SELECT * FROM ");
+        			getRepository().addTable(sb, true);
+        			sb.append(" WHERE ");
+        			getRepository().addUniqueName(sb, true, true);
+        			sb.append("=?");
+        			PreparedStatement stmt = sql.getConnection().prepareStatement(sb.toString());
+        			stmt.setInt(1, getID());
+        			stmt.executeUpdate();
+        			return;
+        		}catch(SQLException e){
+        			throw new DataFault("Error in backup "+sb.toString(),e);
+        		}
+        	}
+        	Record b = store.new Record();
+        	try {
+        		b.setID(getID(), IdMode.IgnoreExisting);
+        	} catch (DataException e) {
+        		// should not get this if require existing is false
+        		throw new ConsistencyError("unexpected exception", e);
+        	} 
+        	b.putAll(this);
+        	b.commit();
+
         }
         /** Get a map of the contents without the UniqueID field
          * 
@@ -646,14 +704,15 @@ public final class Repository {
 		 * delete the corresponding database entry and restore the Record to
 		 * uninitialised state.
 		 * 
-		 * @throws DataFault
 		 * @throws ConsistencyError
+		 * @throws DataFault 
 		 */
-		public synchronized void delete() throws DataFault, ConsistencyError {
+		public synchronized void delete() throws ConsistencyError, DataFault {
 			if (!have_id) {
 				clear();
 				return;
 			}
+			backup();
 			try {
 				Connection conn = sql.getConnection();
 				if (conn == null) {
@@ -671,13 +730,21 @@ public final class Repository {
 				sb.append("=");
 				sb.append(getID());
 				Statement stmt = conn.createStatement();
-				int results = stmt.executeUpdate(sb.toString());
+				String query = sb.toString();
+				int results = stmt.executeUpdate(query);
+				if( DatabaseService.LOG_UPDATE.isEnabled(getContext())){
+					LoggerService serv = getContext().getService(LoggerService.class);
+					if( serv != null ){
+						serv.getLogger(getClass()).debug("delete query is "+query);
+					}
+				}
 				stmt.close();
 				// Destroy the connection to reduce strangeness of mis-use
 				boolean ok = (results == 1);
 				if (ok) {
 					clear();
 				}
+				
 
 			} catch (SQLException e) {
 				throw new DataFault("SQL Exception", e);
@@ -1165,7 +1232,7 @@ public final class Repository {
  * @throws DataException
  */
 		public Record setID(int id2) throws DataException {
-			return setID(id2, true);
+			return setID(id2, IdMode.RequireExisting);
 		}
 		/**initialise a record using the id integer.
 		 * 
@@ -1180,7 +1247,7 @@ public final class Repository {
 		 * @return
 		 * @throws DataException
 		 */
-		Record setID(int id2,boolean require_existing) throws DataException {
+		Record setID(int id2,IdMode mode) throws DataException {
 			if (have_id) {
 				throw new ConsistencyError("Resetting id of Record");
 			}
@@ -1188,7 +1255,7 @@ public final class Repository {
 				throw new ConsistencyError("Setting id on non indexed table");
 			}
           
-			if( use_cache ){
+			if( use_cache && mode == IdMode.RequireExisting ){
 				synchronized(Repository.this){
 					Map<Integer,Record> cache=getCache(); 
 					if (cache != null ){
@@ -1203,16 +1270,21 @@ public final class Repository {
 							assert(id == id2);
 						}else{
 							// set contents will store in cache.
-							populate(id2, require_existing);
+							populate(id2, true);
 						}
 					}else{
 						// set contents will store in cache.
-						populate(id2, require_existing);
+						populate(id2, true);
 					}
 					cache=null;
 				}
 			}else{
-				populate(id2, require_existing);
+				if( mode == IdMode.IgnoreExisting){
+					// just remember desired id
+					id = id2;
+				}else{
+					populate(id2, mode == IdMode.RequireExisting);
+				}
 			}
             assert(id == id2);
             if( id != id2 ){
@@ -1500,7 +1572,7 @@ public final class Repository {
 		 * @throws DataFault
 		 */
 		public int findDuplicate() throws ConsistencyError, DataFault {
-			return findDuplicate(-1,getFields());
+			return findDuplicate(-1,getFields(),false);
 		}
 		/** Get the id of an identical (up to id) record in the database
 		 * normally called on an uncommitted record so only the set fields
@@ -1511,12 +1583,13 @@ public final class Repository {
 		 * 
 		 * @param id to match (if greater than zero)
 		 * @param fields {@link Set} of field names to check.
+		 * @param check_all Should all fields be checked not just the set/dirty fields.
 		 * @return id of duplicate 
 		 * @throws ConsistencyError
 		 * @throws DataFault
 		 */
-		synchronized public int findDuplicate(int id, Set<String> fields) throws ConsistencyError, DataFault {
-			if (have_id && ! isDirty() && this.id==id) {
+		synchronized public int findDuplicate(int id, Set<String> fields,boolean check_all) throws ConsistencyError, DataFault {
+			if (have_id && ! (check_all || isDirty()) && this.id==id) {
 				return id;
 			}
 			int pattern_count=1;
@@ -1540,14 +1613,28 @@ public final class Repository {
 				
 				for (String key: fields) {
 					FieldInfo info = getInfo(key);
-					if( isDirty(key) ){
+					if( check_all || isDirty(key) ){
 						if (atleastone) {
 							buff.append(" AND ");
 						}
-						info.addName(buff, false, true);
-						buff.append("=?");
+						if( containsKey(key)){
+							info.addName(buff, false, true);
+							buff.append("=?");
+							pattern_count++;
+						}else{
+							
+							if( info.isReference()){
+								// various was a reference can be missing/null
+								// but mysql specific
+								buff.append("COALESCE(");
+								info.addName(buff, false, true);
+								buff.append(",0)<=0");
+							}else{
+								info.addName(buff, false, true);
+								buff.append(" IS NULL ");
+							}
+						}
 						atleastone = true;
-						pattern_count++;
 					}
 				}
 				
@@ -1730,6 +1817,40 @@ public final class Repository {
 		use_cache = new Feature(CACHE_FEATURE_PREFIX+tag_name, false,"Use record cache for "+tag_name).isEnabled(c);
 		
 		use_id = REQUIRE_ID_KEY.isEnabled(c) || new Feature(USE_ID_PREFIX+tag_name,true,"Use integer id-key for table "+tag_name).isEnabled(c);
+	}
+	
+	public void createBackupTable(String name) throws SQLException{
+		Connection c = sql.getConnection();
+		Statement stmt = c.createStatement();
+		StringBuilder sb = new StringBuilder();
+		sb.append("CREATE TABLE IF NOT EXISTS ");
+		sql.quote(sb, name);
+		sb.append(" LIKE ");
+		addTable(sb, true);
+		stmt.executeUpdate(sb.toString());
+		stmt.close();
+	}
+	private Repository backup=null;
+	/** create a backup table structured like this one if backups are enabled.
+	 *  
+	 * @return Repository or null
+	 * @throws DataFault
+	 */
+	public Repository getBackup() throws DataFault{
+		try{
+			String suffix = (String) getContext().getAttribute(BACKUP_SUFFIX_ATTR);
+			if( suffix == null){
+				return null;
+			}
+			if( backup == null ){
+				String backup_name = table_name+suffix;
+				createBackupTable(backup_name);
+				backup = getInstance(getContext(), backup_name);
+			}
+			return backup;
+		}catch(Throwable t){
+			throw new DataFault("Error creating backup repository",t);
+		}
 	}
 	public static String TableToTag(AppContext c, String tag) {
 		return c.getInitParameter("tag."+tag,tag);

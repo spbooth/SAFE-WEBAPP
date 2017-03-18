@@ -15,7 +15,7 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
 
 /** An interface for an object that can test if a filter matches a specific object.
  *
- * For example a factory object can combine the filter with another that only selectes the
+ * For example a factory object can combine the filter with another that only selects the
  * candidate and see if that returns a result.
  * @author spb
  * @param <T> 

@@ -13,7 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
-/**
+/** A wrapper that converts a {@link BinaryFilter} to an {@link AcceptFilter}
  * @author spb
  * @param <T> type of filter
  *

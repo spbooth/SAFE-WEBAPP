@@ -439,6 +439,15 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 
 		public FormResult getResult(String typeName, T dat, Form f) {
 			return new MessageResult("object_updated",typeName);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate#preCommit(uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.forms.Form, java.util.Map)
+		 */
+		@Override
+		public void preCommit(T dat, Form f, Map<String, Object> orig) throws DataException {
+			// TODO Auto-generated method stub
+			
 		}		
 		
 	}

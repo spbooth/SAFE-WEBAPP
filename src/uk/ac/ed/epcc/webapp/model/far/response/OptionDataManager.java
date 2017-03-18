@@ -16,13 +16,13 @@ import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
 
-/** A {@link ResponseDataManager} for storing date data.
+/** A {@link ResponseDataManager} for storing option data.
  * @author spb
  * @param <R> {@link Response} type
  * @param <F> {@link DynamicForm} type
  *
  */
-@uk.ac.ed.epcc.webapp.Version("$Revision: 1.3 $")
+
 public class OptionDataManager<R extends Response<F>,F extends DynamicForm> extends ResponseDataManager<OptionDataManager<R,F>.OptionData, R, F> {
 
 	private static final String DATA_FIELD="Data";
