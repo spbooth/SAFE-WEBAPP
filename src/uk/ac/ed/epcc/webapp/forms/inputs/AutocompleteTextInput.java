@@ -17,15 +17,39 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.util.Set;
 
-/**
+/** A {@link TextInput} with an auto-complete list.
+ * 
+ * This may also be displayed as a text-box plus pull-down. It is an {@link ItemInput}
+ * to allow the suggestions to show expanded selection text but it it possible to set String values that
+ * don't correspond to an Item.
  * @author James
  *
  */
-public abstract class AutocompleteTextInput extends TextInput {
+public abstract class AutocompleteTextInput<T> extends TextInput implements ItemInput<T> {
 	public AutocompleteTextInput(boolean allow_null) {
 		super(allow_null);
 	}
 	
+	/** Get the set of Items corresponding to a suggested values
+	 * 
+	 * @return
+	 */
 	// subclasses should override to return a list of possible completions
-	abstract public Set<String> getSuggestions();
+	abstract public Set<T> getSuggestions();
+	
+	/** Map an item to the corresponding value (compatible with the parse method).
+	 * 
+	 * @param item
+	 * @return String value
+	 */
+	public abstract String getValue(T item);
+
+	/** get the suggestion text. This can be an expanded form of the value
+	 * 
+	 * @param item
+	 * @return
+	 */
+	public String getSuggestionText(T item){
+		return getValue(item);
+	}
 }

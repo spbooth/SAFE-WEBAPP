@@ -563,22 +563,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			
 			if (autocomplete) {
 				if (use_html5) {
-					// add actual list of completions
-					
-					// can't put in noscritp as some browsers show all noscript contents as text.
-					//result.open("noscript");
-					result.open("datalist");
-					result.attr("id", name + "_list");
-					Set<String> suggestions = ((AutocompleteTextInput)input).getSuggestions();
-					Iterator<String> it = suggestions.iterator();
-					while (it.hasNext()) {
-						String suggestion = it.next();
-						result.open("option");
-						result.attr("value", suggestion);
-						result.close();
-					}
-					result.close(); // datalist
-					//result.close(); // noscript
+					emitDataList(result, (AutocompleteTextInput) input, name);
 				}
 				result.close(); // close the <div>
 			}
@@ -626,6 +611,38 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			result.clean(format_hint);
 		}
 		result.setEscapeUnicode(old_escape);
+	}
+	/**
+	 * @param result
+	 * @param input
+	 * @param name
+	 */
+	private <T> void emitDataList(SimpleXMLBuilder result, AutocompleteTextInput<T> input, String name) {
+		// add actual list of completions
+		
+		// can't put in noscritp as some browsers show all noscript contents as text.
+		
+		result.open("datalist");
+		result.attr("id", name + "_list");
+		// As susggested in the HTML standard if the datalist element is
+		// not recognised can use a select with the same input name as the text input
+		// if datalist is recognised then select element will have no effect
+		result.open("select");
+		result.attr("name", name);
+		Set<T> suggestions = input.getSuggestions();
+		for(T item : suggestions){
+			String value = input.getValue(item);
+			String text = input.getSuggestionText(item);
+			result.open("option");
+			result.attr("value", value);
+			if( ! text.equals(value)){
+				result.clean(text);
+			}
+			result.close();
+		}
+		result.close(); // select
+		result.close(); // datalist
+		//result.close(); // noscript
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor#visitParseMultiInput(uk.ac.ed.epcc.webapp.forms.inputs.ParseMultiInput)
