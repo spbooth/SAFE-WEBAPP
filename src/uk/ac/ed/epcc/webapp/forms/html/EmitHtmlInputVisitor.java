@@ -564,7 +564,9 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			if (autocomplete) {
 				if (use_html5) {
 					// add actual list of completions
-					result.open("noscript");
+					
+					// can't put in noscritp as some browsers show all noscript contents as text.
+					//result.open("noscript");
 					result.open("datalist");
 					result.attr("id", name + "_list");
 					Set<String> suggestions = ((AutocompleteTextInput)input).getSuggestions();
@@ -576,7 +578,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 						result.close();
 					}
 					result.close(); // datalist
-					result.close(); // noscript
+					//result.close(); // noscript
 				}
 				result.close(); // close the <div>
 			}
