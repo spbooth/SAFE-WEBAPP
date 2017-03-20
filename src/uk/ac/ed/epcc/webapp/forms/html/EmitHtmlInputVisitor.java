@@ -520,8 +520,12 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			// Now for html verification
 			if( use_html5){
 				if( input instanceof PatternInput){
-					result.attr("pattern",((PatternInput)input).getPattern());
-				}else if( input instanceof BoundedInput){
+					String pattern = ((PatternInput)input).getPattern();
+					if( pattern != null){
+						result.attr("pattern",pattern);
+					}
+				}
+				if( input instanceof BoundedInput){
 					BoundedInput bounded = (BoundedInput) input;
 					if( bounded.getType() != null){
 						Object min = bounded.getMin();

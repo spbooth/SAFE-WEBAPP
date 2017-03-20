@@ -52,4 +52,15 @@ public abstract class AutocompleteTextInput<T> extends TextInput implements Item
 	public String getSuggestionText(T item){
 		return getValue(item);
 	}
+
+	
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#setItem(java.lang.Object)
+	 */
+	@Override
+	public void setItem(T item) {
+		setValue(getValue(item));
+		
+	}
 }

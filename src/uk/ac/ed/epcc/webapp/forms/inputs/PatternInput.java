@@ -21,6 +21,10 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 public interface PatternInput {
 
+	/** return ECMAScript pattern (or null to supress pattern validation)
+	 * 
+	 * @return
+	 */
 	public abstract String getPattern();
 
 }
