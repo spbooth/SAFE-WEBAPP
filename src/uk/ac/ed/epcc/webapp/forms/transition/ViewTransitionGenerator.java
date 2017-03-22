@@ -35,9 +35,14 @@ public class ViewTransitionGenerator<X> implements UIGenerator{
 	private final String transition_tag;
 	private final X target;
 	private String text;
+	private String title;
 	public ViewTransitionGenerator(AppContext conn,String transition_tag,X target, String text){
+		this(conn,transition_tag,target,text,null);
+	}
+	public ViewTransitionGenerator(AppContext conn,String transition_tag,X target, String text,String title){
 		this(conn,transition_tag,target);
 		this.text=text;
+		this.title=title;
 	}
 	public ViewTransitionGenerator(AppContext conn, String transition_tag, X target) {
 		super();
@@ -60,7 +65,7 @@ public class ViewTransitionGenerator<X> implements UIGenerator{
 		SessionService sess = conn.getService(SessionService.class);
 		TransitionFactory<?, X> fac =new TransitionFactoryFinder(conn).getProviderFromName(transition_tag);
 		if( fac != null && fac instanceof ViewTransitionFactory && ((ViewTransitionFactory)fac).canView(target, sess)){
-			builder.addLink(conn, text, new ViewTransitionResult((ViewTransitionFactory)fac, target));
+			builder.addLink(conn, text, title,new ViewTransitionResult((ViewTransitionFactory)fac, target));
 		}else{
 			builder.getSpan().clean(text).appendParent();
 		}

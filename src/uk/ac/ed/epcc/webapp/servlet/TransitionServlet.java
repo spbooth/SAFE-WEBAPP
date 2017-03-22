@@ -557,7 +557,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	 * @param text 
 	 * @return modified HtmlBuilder
 	 */
-	public static <A,B, X extends  ExtendedXMLBuilder> X addLink(AppContext c,X hb, TransitionFactory<A,B> tp, A operation, B target,String text ){
+	public static <A,B, X extends  ExtendedXMLBuilder> X addLink(AppContext c,X hb, TransitionFactory<A,B> tp, A operation, B target,String text, String hover ){
 	    // as the servlet uses getParams we can pass the parameters in the servlet path
 		String url = getURL(c, tp, target, operation);
 		hb.open("a");
@@ -567,6 +567,9 @@ public  class TransitionServlet<K,T> extends WebappServlet {
          } else {
         	hb.attr("href",url.toString()); 
          }
+         if( hover != null && ! hover.isEmpty() && ! hover.equals(text)){
+        	 hb.attr("title", hover);
+         }
          hb.clean(text);
          hb.close();
 		return hb;
@@ -574,7 +577,11 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	
 	@SuppressWarnings("unchecked")
 	public static  ExtendedXMLBuilder addLink(AppContext c, ExtendedXMLBuilder hb,ChainedTransitionResult next, String text){
-		return addLink(c,hb,next.getProvider(),next.getTransition(),next.getTarget(),text);
+		return addLink(c,hb,next.getProvider(),next.getTransition(),next.getTarget(),text,null);
+	}
+	@SuppressWarnings("unchecked")
+	public static  ExtendedXMLBuilder addLink(AppContext c, ExtendedXMLBuilder hb,ChainedTransitionResult next, String text,String hover){
+		return addLink(c,hb,next.getProvider(),next.getTransition(),next.getTarget(),text,hover);
 	}
 	/** Get the TransitionServlet URL for a given TransitionProvider and target.
 	 * If the TransitionProvider implements ViewTransitionProvider this will be the view URL

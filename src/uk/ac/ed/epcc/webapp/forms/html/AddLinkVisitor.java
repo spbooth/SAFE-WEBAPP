@@ -55,7 +55,7 @@ public class AddLinkVisitor implements WebFormResultVisitor {
     }
 	public <T, K> void visitChainedTransitionResult(
 			ChainedTransitionResult<T, K> res) throws Exception {
-		TransitionServlet.addLink(conn, hb, res, text);
+		TransitionServlet.addLink(conn, hb, res, text,title);
 	}
 
 	public <T, K> void visitConfirmTransitionResult(
