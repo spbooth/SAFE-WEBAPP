@@ -994,6 +994,22 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		return result;
 	}
 	@Override
+	public final <T extends DataObject> BaseFilter<? super T> getRelationshipRoleFilter(DataObjectFactory<T> fac,
+			String role,BaseFilter<T> fallback) {
+		
+		BaseFilter<? super T> result;
+		try {
+			result = makeRelationshipRoleFilter(fac,role,null,fallback);
+			// narrow the selection
+			result = new AndFilter<T>(fac.getTarget(),result,fallback);
+		} catch (UnknownRelationshipException e) {
+			// should never be thrown with a default specified.
+			return fallback;
+		}
+		
+		return result;
+	}
+	@Override
 	public final <T extends DataObject> BaseFilter<? super A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac,
 			String role, T target) throws UnknownRelationshipException {
 		// We may be storing roles from different types so prefix all tags with the type.

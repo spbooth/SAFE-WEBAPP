@@ -218,6 +218,20 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @return {@link BaseFilter}
 	 */
 	public <T extends DataObject> BaseFilter<? super T> getRelationshipRoleFilter(DataObjectFactory<T> fac, String role) throws UnknownRelationshipException;
+	
+	/** get a {@link BaseFilter} representing the set of target objects that the current user has
+	 * a particular relationship-role with.
+	 * 
+	 * If the named relationship is defined it is used to narrow the selection of the fallback filter.
+	 * Otherwise just the fallback filter is returned. 
+	 * 
+	 * @param fac {@link DataObjectFactory} for target object
+	 * @param role 
+	 * @param fallback {@link BaseFilter} to use by default.
+	 * @return {@link BaseFilter}
+	 */
+	public <T extends DataObject> BaseFilter<? super T> getRelationshipRoleFilter(DataObjectFactory<T> fac, String role,BaseFilter<T> fallback);
+
 	/** get a {@link BaseFilter} representing the set of {@link AppUser}s that are in a particular
 	 * relationship-role with a target object.
 	 * A null target selects all {@link AppUser}s that have the specified role with any target matched by the
