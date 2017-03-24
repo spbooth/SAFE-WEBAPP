@@ -48,7 +48,6 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
 import uk.ac.ed.epcc.webapp.model.data.NamedFilterWrapper;
 import uk.ac.ed.epcc.webapp.model.data.RemoteAccessRoleProvider;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -70,7 +69,7 @@ import uk.ac.ed.epcc.webapp.model.relationship.RelationshipProvider;
  * The factory (or its {@link Composite}s) can implement {@link AccessRoleProvider} to provide roles.
  * <p>
  * Roles of the form <i>field</i><b>-></b><i>remote_role</i> denotes a remote filter
- * joined via the reference field <i>field</i> A person has these roles with the targer object
+ * joined via the reference field <i>field</i> A person has these roles with the target object
  * if they have the <i>remote_role</i> on the object the target references. The remote role must be unqualified.
  * <p>
  * Role names containing a period are qualified names the qualifier can be:
@@ -1087,11 +1086,12 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * @throws UnknownRelationshipException 
 	 */
 	protected <T extends DataObject> BaseFilter<? super T> makeRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,A person,BaseFilter<T> def) throws UnknownRelationshipException {
-		if( searching_roles.contains(role)){
+		String search_tag = fac2.getTag()+":"+role;
+		if( searching_roles.contains(search_tag)){
 			// recursive creation
-			throw new UnknownRelationshipException("recursive definition of "+role);
+			throw new UnknownRelationshipException("recursive definition of "+search_tag);
 		}
-		searching_roles.add(role);
+		searching_roles.add(search_tag);
 		try{
 		if( role.contains(OR_RELATIONSHIP_COMBINER)){
 			// OR combination of filters
@@ -1118,8 +1118,21 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			return and;
 		}
 		// should be a single filter now.
-		
-	    if( role.contains(".")){
+		if( role.contains(RELATIONSHIP_DEREF)){
+		    	// This is a remote relationship
+		    	// Note this will also catch remote NamedRoles
+				// Match this first as the remote relationship
+			    // might be qualified but the field name never is
+		    	int pos = role.indexOf(RELATIONSHIP_DEREF);
+		    	String link_field = role.substring(0, pos);
+		    	String remote_role = role.substring(pos+RELATIONSHIP_DEREF.length());
+		    	RemoteAccessRoleProvider<A, T, ?> rarp = new RemoteAccessRoleProvider<>(this, fac2, link_field);
+		    	BaseFilter<T> fil = rarp.hasRelationFilter(remote_role, person);
+		    	if( fil == null ){
+		    		throw new UnknownRelationshipException(role);
+		    	}
+				return fil;
+		}else if( role.contains(".")){
 	    	// qualified role
 	    	int pos = role.indexOf('.');
 	    	String base =role.substring(0, pos);
@@ -1166,18 +1179,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    		}
 	    		return arp.hasRelationFilter(sub,person);
 	    	}
-	    }else if( role.contains(RELATIONSHIP_DEREF)){
-	    	// This is a remote relationship
-	    	// Note this will also catch remote NamedRoles
-	    	int pos = role.indexOf(RELATIONSHIP_DEREF);
-	    	String link_field = role.substring(0, pos);
-	    	String remote_role = role.substring(pos+RELATIONSHIP_DEREF.length());
-	    	RemoteAccessRoleProvider<A, T, ?> rarp = new RemoteAccessRoleProvider<>(this, fac2, link_field);
-	    	BaseFilter<T> fil = rarp.hasRelationFilter(remote_role, person);
-	    	if( fil == null ){
-	    		throw new UnknownRelationshipException(role);
-	    	}
-			return fil;
+	  
 	    }else{
 	    	// Non qualified name
 	    	if( person == null){
@@ -1197,17 +1199,18 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		}
 		return def;
 		}finally{
-			searching_roles.remove(role);
+			searching_roles.remove(search_tag);
 		}
 	}
 	protected <T extends DataObject> BaseFilter<? super A> makePersonInRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,T target) throws UnknownRelationshipException {
 		AppUserFactory<A> login_fac = getLoginFactory();
 		Class<? super A> target_type = login_fac.getTarget();
-		if( searching_roles.contains(role)){
+		String search_tag = fac2.getTag()+":"+role;
+		if( searching_roles.contains(search_tag)){
 			// recursive creation
 			throw new UnknownRelationshipException("recursive definition of "+role);
 		}
-		searching_roles.add(role);
+		searching_roles.add(search_tag);
 		try{
 		if( role.contains(OR_RELATIONSHIP_COMBINER)){
 			// OR combination of filters
@@ -1273,7 +1276,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		
 		throw new UnknownRelationshipException(role);
 		}finally{
-			searching_roles.remove(role);
+			searching_roles.remove(search_tag);
 		}
 	}
 	/**
