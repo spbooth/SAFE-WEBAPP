@@ -25,30 +25,28 @@ import java.util.Set;
  * @author James
  *
  */
-public abstract class AutocompleteTextInput<T> extends TextInput implements ItemInput<T> {
+public abstract class AutocompleteTextInput<T> extends TextInput implements ItemInput<T>, AutoComplete<T,String> {
 	public AutocompleteTextInput(boolean allow_null) {
 		super(allow_null);
 	}
 	
-	/** Get the set of Items corresponding to a suggested values
-	 * 
-	 * @return
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AutoComplete#getSuggestions()
 	 */
 	// subclasses should override to return a list of possible completions
+	@Override
 	abstract public Set<T> getSuggestions();
 	
-	/** Map an item to the corresponding value (compatible with the parse method).
-	 * 
-	 * @param item
-	 * @return String value
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AutoComplete#getValue(T)
 	 */
+	@Override
 	public abstract String getValue(T item);
 
-	/** get the suggestion text. This can be an expanded form of the value
-	 * 
-	 * @param item
-	 * @return
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AutoComplete#getSuggestionText(T)
 	 */
+	@Override
 	public String getSuggestionText(T item){
 		return getValue(item);
 	}

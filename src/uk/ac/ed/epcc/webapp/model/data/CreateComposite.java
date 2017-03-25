@@ -14,12 +14,10 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import uk.ac.ed.epcc.webapp.forms.Form;
-import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.forms.CreateCustomizer;
-import uk.ac.ed.epcc.webapp.model.data.forms.CreateTemplate;
 
-/**
+/** abstract superclass for {@link Composite}s that implement {@link CreateCustomizer}
  * @author spb
  *
  */

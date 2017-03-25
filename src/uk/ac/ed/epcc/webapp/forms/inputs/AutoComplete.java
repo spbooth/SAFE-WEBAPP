@@ -11,37 +11,37 @@
 //| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
-package uk.ac.ed.epcc.webapp.session;
+package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.model.data.Composite;
+import java.util.Set;
 
-/** An interface for objects (Usually the {@link AppUserFactory} or its
- * {@link Composite}s that can trigger an existing user to visit the
- * registration page.
- * 
- * This is intended for auto-created accounts that may be populated before the
- * actual user visits the application for the first time. It only makes sense
- * when used with mandatory external authentication where the registration form
- * can locate the existing record via the externally provided identity or if 
- * the user is sent an email link to claim the account.
+/** Interface for i
  * @author spb
  *
+ * @param <T> item type
+ * @param <V> input type
  */
-public interface RegisterTrigger<AU extends AppUser> {
-	
-	/** Should this person register
+public interface AutoComplete<T,V> extends ItemInput<T>, ParseInput<V> {
+
+	/** Get the set of Items corresponding to a suggested values
 	 * 
-	 * @param user
 	 * @return
 	 */
-	public boolean mustRegister(AU user);
-	
-	/** user has registered.
-	 * This should record a state change so the {@link #mustRegister(AppUser)}
-	 * method returns false in the future.
+	// subclasses should override to return a list of possible completions
+	Set<T> getSuggestions();
+
+	/** Map an item to the corresponding value (compatible with the parse method).
 	 * 
-	 * @param user
+	 * @param item
+	 * @return String value
 	 */
-	public void postRegister(AU user);
+	String getValue(T item);
+
+	/** get the suggestion text. This can be an expanded form of the value
+	 * 
+	 * @param item
+	 * @return
+	 */
+	String getSuggestionText(T item);
 
 }

@@ -20,6 +20,7 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.forms.inputs.AutoComplete;
 import uk.ac.ed.epcc.webapp.forms.inputs.AutocompleteTextInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.BinaryInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput;
@@ -480,7 +481,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			if (max_result_length > boxwid) {
 				size = boxwid;
 			}
-			boolean autocomplete = input instanceof AutocompleteTextInput;
+			boolean autocomplete = input instanceof AutoComplete;
 
 			if (autocomplete) {
 				result.open("div");
@@ -567,7 +568,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			
 			if (autocomplete) {
 				if (use_html5) {
-					emitDataList(result, (AutocompleteTextInput) input, name);
+					emitDataList(result, (AutoComplete) input, name);
 				}
 				result.close(); // close the <div>
 			}
@@ -621,7 +622,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	 * @param input
 	 * @param name
 	 */
-	private <T> void emitDataList(SimpleXMLBuilder result, AutocompleteTextInput<T> input, String name) {
+	private <T,V> void emitDataList(SimpleXMLBuilder result, AutoComplete<T,V> input, String name) {
 		// add actual list of completions
 		
 		// can't put in noscritp as some browsers show all noscript contents as text.
@@ -634,15 +635,17 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 		result.open("select");
 		result.attr("name", name);
 		Set<T> suggestions = input.getSuggestions();
-		for(T item : suggestions){
-			String value = input.getValue(item);
-			String text = input.getSuggestionText(item);
-			result.open("option");
-			result.attr("value", value);
-			if( ! text.equals(value)){
-				result.clean(text);
+		if(suggestions!=null){
+			for(T item : suggestions){
+				String value = input.getValue(item);
+				String text = input.getSuggestionText(item);
+				result.open("option");
+				result.attr("value", value);
+				if( ! text.equals(value)){
+					result.clean(text);
+				}
+				result.close();
 			}
-			result.close();
 		}
 		result.close(); // select
 		result.close(); // datalist
