@@ -463,11 +463,13 @@ public class DefaultServletService implements ServletService{
 
 					A person = finder.findFromString(name);
 					if( person == null ){
-						// See if we can auto-create users.
-						person = factory.makeUser();
-						if( person != null ){
-							finder.setName(person, name);
-							person.commit();
+						// See if we should auto-create users.
+						if( factory.autoCreate()){
+							person = factory.makeUser();
+							if( person != null ){
+								finder.setName(person, name);
+								person.commit();
+							}
 						}
 					}
 					if( person != null ){

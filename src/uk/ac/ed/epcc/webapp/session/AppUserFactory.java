@@ -519,7 +519,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 
 			@Override
 			protected AU findIndexed(String key) throws DataException {
-				if( getContext().getBooleanParameter("auto_create_person."+getConfigTag(), false)){
+				if( autoCreate()){
 					return makeFromString(key);
 				}else{
 					return findFromString(key);
@@ -699,6 +699,12 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		for( RegisterTrigger<AU> trigger : getComposites(RegisterTrigger.class)){
 			trigger.postRegister(user);
 		}
+	}
+	/**
+	 * @return
+	 */
+	public boolean autoCreate() {
+		return getContext().getBooleanParameter("auto_create_person."+getConfigTag(), false);
 	}
 	
 }
