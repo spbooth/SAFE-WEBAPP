@@ -1229,8 +1229,19 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			return and;
 		}
 		// should be a single filter now.
-		
-	    if( role.contains(".")){
+		if( role.contains(RELATIONSHIP_DEREF)){
+	    	// This is a remote relationship
+	    	// Note this will also catch remote NamedRoles
+	    	int pos = role.indexOf(RELATIONSHIP_DEREF);
+	    	String link_field = role.substring(0, pos);
+	    	String remote_role = role.substring(pos+RELATIONSHIP_DEREF.length());
+	    	RemoteAccessRoleProvider<A, T, ?> rarp = new RemoteAccessRoleProvider<>(this, fac2, link_field);
+	    	BaseFilter<? super A> fil = rarp.personInRelationFilter(this, remote_role, target);
+	    	if( fil == null ){
+	    		throw new UnknownRelationshipException(role);
+	    	}
+			return fil;
+		}else if( role.contains(".")){
 	    	// qualified role
 	    	int pos = role.indexOf('.');
 	    	String base =role.substring(0, pos);
@@ -1254,18 +1265,6 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    	if( arp != null ){
 	    		return arp.personInRelationFilter(this, sub, target);
 	    	}
-	    }else if( role.contains(RELATIONSHIP_DEREF)){
-	    	// This is a remote relationship
-	    	// Note this will also catch remote NamedRoles
-	    	int pos = role.indexOf(RELATIONSHIP_DEREF);
-	    	String link_field = role.substring(0, pos);
-	    	String remote_role = role.substring(pos+RELATIONSHIP_DEREF.length());
-	    	RemoteAccessRoleProvider<A, T, ?> rarp = new RemoteAccessRoleProvider<>(this, fac2, link_field);
-	    	BaseFilter<? super A> fil = rarp.personInRelationFilter(this, remote_role, target);
-	    	if( fil == null ){
-	    		throw new UnknownRelationshipException(role);
-	    	}
-			return fil;
 	    }else{
 	    	// direct roles can be un-qualified though not if we want multiple levels of qualification.
 	    	BaseFilter<? super A> result = makeDirectPersonInRelationshipRoleFilter(fac2, role,target);
