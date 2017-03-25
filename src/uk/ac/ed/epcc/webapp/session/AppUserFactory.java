@@ -40,6 +40,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
@@ -64,6 +65,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 import uk.ac.ed.epcc.webapp.model.data.forms.UpdateAction;
 import uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
+import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NameFinderInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedDataCache;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
@@ -417,7 +419,9 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		}
 		return sb.toString();
 	}
-
+	public final DataObjectItemInput<AU> getNameInput(BaseFilter<AU> fil,boolean create,boolean restrict){
+		return new NameFinderInput<AU,AppUserFactory<AU>>(this, create, restrict, fil);
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.ParseFactory#getCanonicalName(java.lang.Object)
 	 */
@@ -497,10 +501,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 	 * @throws DataFault
 	 */
 	public AU makeUser() throws DataFault{
-		if( getContext().getBooleanParameter("auto_create_person."+getConfigTag(), false)){
-			return makeBDO();
-		}
-		return null;
+		return makeBDO();
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#getDataCache()
@@ -518,7 +519,11 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 
 			@Override
 			protected AU findIndexed(String key) throws DataException {
-				return makeFromString(key);
+				if( getContext().getBooleanParameter("auto_create_person."+getConfigTag(), false)){
+					return makeFromString(key);
+				}else{
+					return findFromString(key);
+				}
 			}
 		};
 	}
