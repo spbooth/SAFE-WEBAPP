@@ -36,7 +36,6 @@ public interface ParseFactory<T> {
 
 	/** Find an existing entry by name.
      * 
-    
      * 
      * @param name
      * @return Matching T or null

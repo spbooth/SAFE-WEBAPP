@@ -29,7 +29,7 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	/**
 	 * 
 	 */
-	private final F factory;
+	protected final F factory;
 	/** create input
 	 * 
 	 * @param create   make entry if not found

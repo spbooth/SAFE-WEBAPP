@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
@@ -89,6 +90,14 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 	 */
 	public abstract  void setName(AU user, String name);
 
+	/** Extension point to validate the format of the name before construction 
+	 * 
+	 * @param name
+	 * @throws ParseException
+	 */
+	public void validateName(String name) throws ParseException{
+		
+	}
 	/** Is this a name we might expect the user to know or an internal generated id.
 	 * 
 	 * @return

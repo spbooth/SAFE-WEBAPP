@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.model;
 
 import uk.ac.ed.epcc.webapp.Indexed;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataCache;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -45,7 +46,7 @@ public interface NameFinder<T extends DataObject> extends ParseFactory<T> {
 	 * @return T or null
 	 * @throws DataFault 
 	 */
-	public abstract T makeFromString(String name) throws DataFault;
+	public abstract T makeFromString(String name) throws DataFault, ParseException;
 
 	/** get a filter than locates the target object from a String.
 	 * 

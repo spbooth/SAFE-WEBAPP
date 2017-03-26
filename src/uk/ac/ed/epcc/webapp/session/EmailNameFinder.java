@@ -15,9 +15,11 @@ package uk.ac.ed.epcc.webapp.session;
 
 import java.util.Map;
 
+import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.email.inputs.EmailInput;
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -152,6 +154,18 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 	@Override
 	public boolean active() {
 		return getRepository().hasField(EMAIL);
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.session.AppUserNameFinder#validateName(java.lang.String)
+	 */
+	@Override
+	public void validateName(String name) throws ParseException {
+		if( ! Emailer.checkAddress(name)){
+			throw new ParseException("Not a valid email address");
+		}
 	}
 
 

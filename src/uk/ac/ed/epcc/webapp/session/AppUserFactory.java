@@ -33,9 +33,12 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdate;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
+import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
@@ -419,8 +422,63 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		}
 		return sb.toString();
 	}
+	public static class  AppUserNameInput<A extends AppUser> extends NameFinderInput<A, AppUserFactory<A>> implements HTML5Input, FormatHintInput{
+
+		/**
+		 * @param factory
+		 * @param create
+		 * @param restrict
+		 * @param autocomplete
+		 */
+		public AppUserNameInput(AppUserFactory<A> factory, boolean create, boolean restrict,
+				BaseFilter<A> autocomplete) {
+			super(factory, create, restrict, autocomplete);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput#getFormatHint()
+		 */
+		@Override
+		public String getFormatHint() {
+			if( useEmail()){
+				return "name@example.com";
+			}
+			return null;
+		}
+
+		/**
+		 * @return
+		 */
+		public boolean useEmail() {
+			AppUserNameFinder default_finder = factory.getRealmFinder(factory.getDefaultRealm());
+			if( default_finder != null){
+				return default_finder instanceof EmailNameFinder;
+			}
+			return false;
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input#getType()
+		 */
+		@Override
+		public String getType() {
+			if( useEmail()){
+				return "email";
+			}
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.forms.inputs.NameFinderInput#getSuggestionText(uk.ac.ed.epcc.webapp.model.data.DataObject)
+		 */
+		@Override
+		public String getSuggestionText(A item) {
+			return getValue(item)+": "+item.getName();
+		}
+		
+	}
 	public final DataObjectItemInput<AU> getNameInput(BaseFilter<AU> fil,boolean create,boolean restrict){
-		return new NameFinderInput<AU,AppUserFactory<AU>>(this, create, restrict, fil);
+		return new AppUserNameInput<AU>(this, create, restrict, fil);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.ParseFactory#getCanonicalName(java.lang.Object)
@@ -478,7 +536,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#makeFromString(java.lang.String)
 	 */
 	@Override
-	public final AU makeFromString(String name) throws DataFault {
+	public final AU makeFromString(String name) throws DataFault, ParseException {
 		AU result = findFromString(name);
 		if( result != null ){
 			return result;
@@ -487,6 +545,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		if(default_finder == null){
 			return null;
 		}
+		default_finder.validateName(name);
 		result = makeUser();
 		if( result != null){
 			default_finder.setName(result, name);
@@ -520,7 +579,11 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 			@Override
 			protected AU findIndexed(String key) throws DataException {
 				if( autoCreate()){
-					return makeFromString(key);
+					try {
+						return makeFromString(key);
+					} catch (ParseException e) {
+						throw new DataFault("Bad format", e);
+					}
 				}else{
 					return findFromString(key);
 				}
