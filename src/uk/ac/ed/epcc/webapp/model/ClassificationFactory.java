@@ -34,6 +34,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnusedNameInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.table.AbstractTableRegistry;
 import uk.ac.ed.epcc.webapp.jdbc.table.GeneralTransitionSource;
@@ -43,13 +44,13 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableTransitionRegistry;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 import uk.ac.ed.epcc.webapp.model.data.forms.Updater;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectAlternateInput;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemParseInput;
+import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NameFinderInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedDataCache;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
@@ -412,6 +413,8 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 	public String getCanonicalName(T object) {
 		return object.getName();
 	}
-	
+	public final DataObjectItemInput<T> getNameInput(BaseFilter<T> fil,boolean create,boolean restrict){
+		return new NameFinderInput<T,ClassificationFactory<T>>(this, create, restrict, fil);
+	}
 	
 }
