@@ -904,8 +904,41 @@ public class Table<C, R> {
 
 	
 
+	/** Add a {@link Map} of data into a column
+	 * If the data is a Number it is accumulated.
+	 * 
+	 * @param col_name
+	 * @param data {@link Map} of data
+	 */
 	public void addMap(C col_name, Map<R, ?> data) {
 		for (R key : data.keySet()) {
+			Object thing = data.get(key);
+			if (thing instanceof Number) {
+				Number num = (Number) thing;
+				addNumber(col_name, key, num);
+
+			} else {
+				put(col_name, key, thing);
+			}
+		}
+
+	}
+	/** Add a {@link Map} of data into a column
+	 * If the data is a Number it is accumulated.
+	 * 
+	 * Row mapping translate the data keys into table row-keys
+	 * if no mapping exists the data-key is used unchanged.
+	 * 
+	 * @param col_name
+	 * @param row_mapping (optional row translations).
+	 * @param data {@link Map} of data
+	 */
+	public void addMap(C col_name,Map<R,R> row_mapping, Map<R, ?> data) {
+		for (R key : data.keySet()) {
+			R row = row_mapping.get(key);
+			if( row == null ){
+				row=key;
+			}
 			Object thing = data.get(key);
 			if (thing instanceof Number) {
 				Number num = (Number) thing;

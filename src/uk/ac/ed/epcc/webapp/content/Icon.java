@@ -52,9 +52,10 @@ public class Icon implements UIGenerator {
 			p.attr("alt", text);
 			p.attr("src",service.encodeURL(image));
 			p.close();
-		}else{
-			p.clean(text);
 		}
+		//}else{
+			p.clean(text);
+		//}
 	}
 	public String toString(){
 		return text;

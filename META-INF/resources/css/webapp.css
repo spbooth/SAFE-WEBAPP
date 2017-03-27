@@ -46,6 +46,9 @@ div.block, div.wideblock{
 background-color: #cccccc;
 }
 
+div.scrollwrapper {
+	overflow: auto;
+}
 div div.overflowblock{
 	overflow: scroll;
 	margin-left:6em;
