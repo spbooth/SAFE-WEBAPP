@@ -25,6 +25,12 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  */
 
 public class URLInput extends TextInput implements HTML5Input{
+	
+	public URLInput(){
+		super();
+		setSingle(true);
+		setTrim(true);
+	}
 
 	@Override
 	public void validate() throws FieldException {
@@ -37,17 +43,12 @@ public class URLInput extends TextInput implements HTML5Input{
 	}
 
 	/**
-	 * 
-	 */
-	public URLInput() {
-		super();
-	}
-
-	/**
 	 * @param allow_null
 	 */
 	public URLInput(boolean allow_null) {
 		super(allow_null);
+		setSingle(true);
+		setTrim(true);
 	}
 
 	/* (non-Javadoc)
