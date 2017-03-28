@@ -35,6 +35,9 @@ public class URLInput extends TextInput implements HTML5Input{
 	@Override
 	public void validate() throws FieldException {
 		super.validate();
+		if( value == null ){
+			return; // super handles optional
+		}
 		try {
 			URL url = new URL(value);
 		} catch (MalformedURLException e) {

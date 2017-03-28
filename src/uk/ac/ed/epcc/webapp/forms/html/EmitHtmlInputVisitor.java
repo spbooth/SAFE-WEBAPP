@@ -42,6 +42,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.PreSelectInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.RangedInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnitInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnmodifiableInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.WrappedInput;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 
@@ -475,6 +476,10 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 		if( input instanceof FormatHintInput){
 			format_hint = ((FormatHintInput)input).getFormatHint();
 		}
+		String wrapper=null;
+		if( input instanceof WrappedInput){
+			wrapper=((WrappedInput)input).getWrapperClass();
+		}
 		boolean old_escape = result.setEscapeUnicode(! force_password && ESCAPE_UNICODE_FEATURE.isEnabled(conn));
 		if (force_single || max_result_length <= 2 * boxwid) {
 			int size = max_result_length;
@@ -483,9 +488,9 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			}
 			boolean autocomplete = input instanceof AutoComplete;
 
-			if (autocomplete) {
+			if (wrapper != null) {
 				result.open("div");
-				result.attr("class", "ui-widget");
+				result.attr("class", wrapper);
 			}
 			
 			result.open("input");
@@ -570,6 +575,8 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 				if (use_html5) {
 					emitDataList(result, (AutoComplete) input, name);
 				}
+			}
+			if( wrapper != null){
 				result.close(); // close the <div>
 			}
 		} else {
