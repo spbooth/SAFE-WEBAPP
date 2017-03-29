@@ -100,5 +100,10 @@ public abstract class FilterSet<T> {
 			return false;
 		return true;
 	}
+	/** is the set of selection filters empty
+	 * 
+	 * @return
+	 */
+	public abstract boolean isEmpty();
 
 }

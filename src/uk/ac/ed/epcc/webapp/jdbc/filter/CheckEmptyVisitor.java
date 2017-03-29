@@ -92,4 +92,12 @@ public class CheckEmptyVisitor<T> implements FilterVisitor<Boolean, T> {
 		return fil.getSQLFilter().acceptVisitor(this);
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter)
+	 */
+	@Override
+	public Boolean visitBinaryAcceptFilter(BinaryAcceptFilter<? super T> fil) throws Exception {
+		return visitBinaryFilter(fil);
+	}
+
 }

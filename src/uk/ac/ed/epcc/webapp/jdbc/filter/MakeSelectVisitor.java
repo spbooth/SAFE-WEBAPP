@@ -117,4 +117,12 @@ public class MakeSelectVisitor<T> implements FilterVisitor<StringBuilder, T>{
 		
 		return fil.getSQLFilter().acceptVisitor(this);
 	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter)
+	 */
+	@Override
+	public StringBuilder visitBinaryAcceptFilter(BinaryAcceptFilter<? super T> fil) throws Exception {
+		return visitBinaryFilter(fil);
+	}
 }

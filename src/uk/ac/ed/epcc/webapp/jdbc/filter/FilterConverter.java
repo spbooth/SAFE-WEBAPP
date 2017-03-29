@@ -113,4 +113,12 @@ public class FilterConverter<T> implements FilterVisitor<SQLFilter<T>, T> {
 	public SQLFilter<T> visitDualFilter(DualFilter<? super T> fil)  {
 		return (SQLFilter<T>) fil.getSQLFilter();
 	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter)
+	 */
+	@Override
+	public SQLFilter<T> visitBinaryAcceptFilter(BinaryAcceptFilter<? super T> fil) throws Exception {
+		return visitBinaryFilter(fil);
+	}
 }

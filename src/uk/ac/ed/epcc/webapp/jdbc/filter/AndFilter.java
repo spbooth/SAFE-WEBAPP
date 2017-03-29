@@ -71,8 +71,8 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 	
 	
 	public final <X> X acceptVisitor(FilterVisitor<X,? extends T> vis) throws Exception {
-		if( useBinary()){
-			// If forced we don't need to wory about the accept filters
+		if( useBinary(false)){
+			// If forced we don't need to worry about the accept filters
 			return vis.visitBinaryFilter(this);
 		}
 		return vis.visitAndFilter(this);
@@ -137,6 +137,11 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 			}
 			return null;
 		}
+		if( accepts.size() == 1){
+			// first filter will do wrapping a single filter in
+			// a AndAcceptFilter will inhibit optimisation later
+			return (AcceptFilter<T>) accepts.getFirst();
+		}
 		return new AndAcceptFilter<T>(getTarget(), accepts);
 	}
 	public final AndFilter<T> addFilter(BaseFilter<? super T> fil){
@@ -171,5 +176,13 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 		} else if (!accepts.equals(other.accepts))
 			return false;
 		return true;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseCombineFilter#isEmpty()
+	 */
+	@Override
+	public boolean isEmpty() {
+		
+		return super.isEmpty() && accepts.isEmpty();
 	}
 }

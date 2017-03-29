@@ -77,6 +77,16 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		 */
 		@Override
 		public Boolean visitAndFilter(AndFilter<? super T> fil) throws Exception {
+			if( fil.isEmpty()){
+				// nothing to do here
+				return null;
+			}
+			if( fil.useBinary(true)){
+				// Trap this explicitly The Andfilter will only add as binary if there are no
+				// order clauses. These are irrelevant in an OR combination
+				return visitBinaryFilter(fil);
+			}
+			
 			// An ANDFilter could be in any of the 3 categories.
 			AcceptFilter<? super T> accept = fil.getAcceptFilter(null);
 			if( accept != null ){  // This is a pure accept filter as matcher was null
@@ -105,6 +115,9 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		 */
 		@Override
 		public Boolean visitAcceptFilter(AcceptFilter<? super T> fil) throws Exception {
+			if( fil instanceof BinaryAcceptFilter){
+				return visitBinaryFilter((BinaryFilter<? super T>) fil);
+			}
 			pure_accept_filters.add(fil);
 			return null;
 		}
@@ -148,6 +161,14 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		public Boolean visitDualFilter(DualFilter<? super T> fil) throws Exception {
 			dual_filters.add(fil);
 			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter)
+		 */
+		@Override
+		public Boolean visitBinaryAcceptFilter(BinaryAcceptFilter<? super T> fil) throws Exception {
+			return visitBinaryFilter(fil);
 		}
 		
 	}
@@ -224,6 +245,9 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		if( force_value){
 			return new GenericBinaryFilter<T>(target, true);
 		}
+		if( isEmpty()){
+			return new GenericBinaryFilter<T>(target, false);
+		}
 		if( nonSQL()){
 			throw new NoSQLFilterException("OrFilter contains non SQL filter");
 		}
@@ -298,5 +322,36 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		} else if (!sql_filters.equals(other.sql_filters))
 			return false;
 		return true;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterSet#isEmpty()
+	 */
+	@Override
+	public boolean isEmpty() {
+		
+		return sql_filters.isEmpty() && pure_accept_filters.isEmpty() && mixed_filters.isEmpty() && dual_filters.isEmpty();
+	}
+	public String toString(){
+		StringBuilder sb = new StringBuilder();
+		boolean seen=false;
+		sb.append("OrFilter(");
+		if( ! sql_filters.isEmpty()){
+			sb.append(sql_filters);
+			seen=true;
+		}
+		for(BaseFilter a : pure_accept_filters){
+			if( seen ){ sb.append(","); }else{ seen=true; }
+			sb.append(a);
+		}
+		for(BaseFilter a : mixed_filters){
+			if( seen ){ sb.append(","); }else{ seen=true; }
+			sb.append(a);
+		}
+		for(BaseFilter a : dual_filters){
+			if( seen ){ sb.append(","); }else{ seen=true; }
+			sb.append(a);
+		}
+		sb.append(")");
+		return sb.toString();
 	}
 }

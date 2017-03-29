@@ -162,6 +162,14 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			public final Boolean visitDualFilter(DualFilter<? super X> fil) throws Exception {
 				return fil.getSQLFilter().acceptVisitor(this);
 			}
+
+			/* (non-Javadoc)
+			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter)
+			 */
+			@Override
+			public final Boolean visitBinaryAcceptFilter(BinaryAcceptFilter<? super X> fil) throws Exception {
+				return visitBinaryFilter(fil);
+			}
 	    	
 	    }
 	    class AddFilterVisitor extends AbstractAddFilterVisitor<T>{
@@ -177,8 +185,6 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 				addAccept(fil);
 				return null;
 			}
-
-			
 	    	
 	    }
 	    @Override
@@ -315,15 +321,18 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			return force_value != getFilterCombiner().getDefault();
 		}
 		/** Is this filter exactly a {@link BinaryFilter}
-		 * ie it has a foced value and no joins or order clauses.
+		 * ie it has a forced value and no joins or order clauses.
 		 * 
 		 * @return
 		 */
-		protected boolean useBinary(){
-			// If forced value and no joins/order act as binary filter
-			return isForced() && join==null && order==null;
+		protected boolean useBinary(boolean ignore_order){
+			// If forced/empty value and no joins/order act as binary filter
+			return (isEmpty() || isForced()) && join==null && (ignore_order || order==null);
 		}
 
+		public boolean isEmpty(){
+			return filters.isEmpty();
+		}
 		@Override
 		public int hashCode() {
 			final int prime = 31;

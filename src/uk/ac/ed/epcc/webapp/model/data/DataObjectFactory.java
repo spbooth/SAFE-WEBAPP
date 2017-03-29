@@ -56,6 +56,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ConvertPureAcceptFilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter;
@@ -2100,6 +2101,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		@Override
 		public BaseFilter<BDO> visitDualFilter(DualFilter<? super R> fil) throws Exception {
 			return visitBaseFilter(fil);
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter)
+		 */
+		@Override
+		public BaseFilter<BDO> visitBinaryAcceptFilter(BinaryAcceptFilter<? super R> fil) throws Exception {
+			return visitBinaryFilter(fil);
 		}
 		
 	}

@@ -38,13 +38,7 @@ public abstract class BaseSQLCombineFilter<T> extends BaseCombineFilter<T> imple
 		// TODO Auto-generated constructor stub
 	}
 
-	/** Is this combining filter empty (contains no sub-clauses).
-	 * 
-	 * @return
-	 */
-	public boolean isEmpty(){
-		return filters.isEmpty();
-	}
+	
 	
 	@Override
 	protected final void addAccept(AcceptFilter<? super T> filter) throws ConsistencyError {
@@ -59,7 +53,7 @@ public abstract class BaseSQLCombineFilter<T> extends BaseCombineFilter<T> imple
 
 	}
 	public final <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
-		if( useBinary()){
+		if( useBinary(false)){
 			return vis.visitBinaryFilter(this);
 		}
 		return vis.visitSQLCombineFilter(this);

@@ -15,8 +15,6 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
 
 import java.util.List;
 
-import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
-
 /** a {@link FilterVisitor} that extracts any {@link PatternArgument}s needed by the filter.
  * 
  * This has to correspond to the arguments needed by the {@link MakeSelectVisitor}.
@@ -113,6 +111,14 @@ public class GetListFilterVisitor<T> implements FilterVisitor<List<PatternArgume
 	@Override
 	public List<PatternArgument> visitDualFilter(DualFilter<? super T> fil) throws Exception {
 		return fil.getSQLFilter().acceptVisitor(this);
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter)
+	 */
+	@Override
+	public List<PatternArgument> visitBinaryAcceptFilter(BinaryAcceptFilter<? super T> fil) throws Exception {
+		return visitBinaryFilter(fil);
 	}
 
 	

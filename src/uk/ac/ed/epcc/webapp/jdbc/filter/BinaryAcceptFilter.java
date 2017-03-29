@@ -14,11 +14,17 @@
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
 /** A wrapper that converts a {@link BinaryFilter} to an {@link AcceptFilter}
+ * 
+ * This is essentially just a cast operation to allow any {@link BinaryFilter}
+ * to be used where and {@link AcceptFilter} is required
+ * 
+ * visitors will usually treat as a binary filter 
+ * 
  * @author spb
  * @param <T> type of filter
  *
  */
-public class BinaryAcceptFilter<T> implements AcceptFilter<T> {
+public class BinaryAcceptFilter<T> implements AcceptFilter<T>, BinaryFilter<T> {
 
 	
 
@@ -37,7 +43,7 @@ public class BinaryAcceptFilter<T> implements AcceptFilter<T> {
 	 */
 	@Override
 	public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
-		return vis.visitAcceptFilter(this);
+		return vis.visitBinaryAcceptFilter(this);
 	}
 
 	public final boolean accept(T o){
@@ -76,5 +82,16 @@ public class BinaryAcceptFilter<T> implements AcceptFilter<T> {
 		} else if (!nested.equals(other.nested))
 			return false;
 		return true;
+	}
+	public String toString(){
+		return "BinaryAcceptFilter("+nested.getBooleanResult()+","+nested+")";
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter#getBooleanResult()
+	 */
+	@Override
+	public boolean getBooleanResult() {
+		return nested.getBooleanResult();
 	}
 }

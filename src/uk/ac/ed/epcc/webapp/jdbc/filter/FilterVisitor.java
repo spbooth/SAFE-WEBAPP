@@ -96,6 +96,14 @@ public interface FilterVisitor<X,T> {
 	 */
 	public X visitBinaryFilter(BinaryFilter<? super T> fil) throws Exception;
 	
+	/** process a {@link BinaryAcceptFilter} Objects that accept this method
+	 *  can either act as a {@link BinaryFilter} or an {@link AcceptFilter}
+	 * 
+	 * @param fil
+	 * @return
+	 * @throws Exception
+	 */
+	public X visitBinaryAcceptFilter(BinaryAcceptFilter<? super T> fil) throws Exception;
 	/** process a {@link DualFilter}.
 	 * 
 	 * @param fil
