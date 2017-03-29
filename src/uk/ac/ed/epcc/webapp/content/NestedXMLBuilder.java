@@ -18,7 +18,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.DocumentFragment;
 
-import uk.ac.ed.epcc.webapp.Version;
 
 /** A {@link SimpleXMLBuilder} that also implements {@link XMLGenerator} so XML content can be
  * added to a table.`
