@@ -113,7 +113,7 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 %>
 <%@ include file="/scripts/form_context.jsf" %>
 <div class="block">
-<h2><%=page_heading %></h2>
+<h2><%=new HtmlBuilder().clean(page_heading).toString() %></h2>
 <A name="summary"></A><%--Browsers don't like single tag anchors--%>
 <% if(target != null ){ %>
 <%= tp.getSummaryContent(conn,new HtmlBuilder(),target).toString() %>
@@ -156,7 +156,7 @@ if( t instanceof CustomFormContent ){
 	<p> An error has occurred while creating this form. 
 	</p>
 	<p>
-	<span class="warn"><%=e.getMessage() %></span>
+	<span class="warn"><%=new HtmlBuilder().clean(e.getMessage()) %></span>
 	</p>
 	</div>
 <%

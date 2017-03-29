@@ -42,10 +42,11 @@
 <% 
 AppUserFactory<?> fac = session_service.getLoginFactory();
 for(AppUser u : fac.all()){
-	if( !((ServletSessionService)session_service).canSU(u)) {
-	
+	if( ((ServletSessionService)session_service).canSU(u)) {
+	HtmlBuilder hb = new HtmlBuilder();
+	hb.clean(u.getName());
 %>
-<li> <a href="<%= response.encodeURL(web_path+"/BecomeUserServlet?person_id="+u.getID()) %>"><%=u.getName() %></a></li>
+<li> <a href="<%= response.encodeURL(web_path+"/BecomeUserServlet?person_id="+u.getID()) %>"><%=hb %></a></li>
 <%
 	}
 }

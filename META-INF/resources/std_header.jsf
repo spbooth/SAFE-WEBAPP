@@ -17,7 +17,7 @@
 <%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
 <html lang="en">
 <head>
- <title><%= page_title %></title>
+ <title><%= strip(page_title) %></title>
  <meta name="description" content="<%=service_name%> <%=website_name%>">
  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <wb:headings extraCSS="<%=extra_css%>"/>

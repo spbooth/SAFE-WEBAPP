@@ -15,7 +15,7 @@
 <%@page import="uk.ac.ed.epcc.webapp.forms.*" %>
 <%@page import="uk.ac.ed.epcc.webapp.forms.inputs.*" %> 
 <%@page import="uk.ac.ed.epcc.webapp.forms.html.*" %>
-
+<%@page import="uk.ac.ed.epcc.webapp.content.*" %>
 <%!
 	 public static java.util.Map<String,String> getErrors(HttpServletRequest req) {
 		 return HTMLForm.getErrors(req);
@@ -51,11 +51,14 @@ a <span class="warn">*</span>.
 	}else{
 		general_error = "See individual field errors";
 	}
+	HtmlBuilder hb = new HtmlBuilder();
+	hb.clean(general_error);
+	
 %>
 <div class="block">
 <h3>This form contains errors:</h3>
 <p class="warn">	
-<%= general_error %>
+<%= hb %>
 </p>
 </div>
  <% } %>
