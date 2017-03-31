@@ -31,10 +31,18 @@ public class TextInputTest<I extends TextInput> extends ParseAbstractInputTestCa
 
 	@SuppressWarnings("unchecked")
 	public I getInput() {
-		return (I) new TextInput(allowNull());
+		I i = (I) new TextInput(allowNull());
+		i.setNoSpaces(forbidSpace());
+		i.setTrim(requireTrim());
+		return i;
+	}
+	public boolean requireTrim(){
+		return true;
 	}
 
-	
+	public boolean forbidSpace(){
+		return false;
+	}
 	public Set<String> getBadData() {
 		return new HashSet<String>();
 	}

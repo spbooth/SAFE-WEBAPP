@@ -38,6 +38,8 @@ ParseInputInterfaceTest<T, I, ParseAbstractInputTestCase<T, I>>{
 	public boolean allowNull(){
 		return true;
 	}
+	
+	
 	@Override
 	@Test
 	public final void parseNull() throws Exception {

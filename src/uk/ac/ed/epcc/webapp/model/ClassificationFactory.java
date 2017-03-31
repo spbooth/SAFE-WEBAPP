@@ -30,6 +30,7 @@ import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.inputs.CodeListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.NameInputProvider;
+import uk.ac.ed.epcc.webapp.forms.inputs.NoHtmlInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnusedNameInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -243,6 +244,13 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 			UnusedNameInput<T> input = new UnusedNameInput<T>(ClassificationFactory.this);
 			input.setMaxResultLength(res.getInfo(Classification.NAME).getMax());
 			result.put(Classification.NAME, input);
+			
+			// Description is likely to be displayed to user so inhibit html by default
+			NoHtmlInput desc_input = new NoHtmlInput();
+			if( res.hasField(Classification.DESCRIPTION)){
+				desc_input.setMaxResultLength(res.getInfo(Classification.DESCRIPTION).getMax());
+			}
+			result.put(Classification.DESCRIPTION,desc_input);
 			return result;
 		}
 		

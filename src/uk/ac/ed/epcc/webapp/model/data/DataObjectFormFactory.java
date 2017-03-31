@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.factory.FormFactory;
 import uk.ac.ed.epcc.webapp.forms.inputs.BooleanInput;
@@ -35,6 +36,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.LongInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.NoHtmlInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.RealInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
@@ -61,7 +63,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  * @param <BDO>
  */
 public  abstract class DataObjectFormFactory<BDO extends DataObject> implements FormFactory, IndexedProducer<BDO>{
-   
+   public static final Feature DEFAULT_FORBID_HTML = new Feature("form_factory.default_forbid_html_text",true,"Forbid HTML in auto generated text inputs for database fields");
 
 
 protected final DataObjectFactory<BDO> factory;
@@ -151,7 +153,12 @@ protected final DataObjectFactory<BDO> factory;
 					case Types.CHAR:
 					case Types.VARCHAR:
 					case Types.LONGVARCHAR:
-						TextInput ti = new TextInput(info.getNullable());
+						TextInput ti;
+						if( DEFAULT_FORBID_HTML.isEnabled(conn)){
+							ti = new NoHtmlInput(info.getNullable());
+						}else{
+							ti= new TextInput(info.getNullable());
+						}
 						ti.setMaxResultLength(info.getMax());
 						ti.setBoxWidth(maxwid);
 						input = ti;

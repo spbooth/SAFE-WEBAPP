@@ -16,6 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import java.util.regex.Pattern;
+
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
@@ -26,8 +28,10 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
 public class TextInput extends ParseAbstractInput<String> {
 
+	private static final Pattern WHITESPACE = Pattern.compile("\\s");
 	private boolean allow_null;
 	private boolean trim=true;
+	private boolean no_spaces=false;
 	public TextInput() {
 		this(false);
 	}
@@ -78,6 +82,10 @@ public class TextInput extends ParseAbstractInput<String> {
 					throw new MissingFieldException(getKey() + " missing");
 				}
 			}
+			
+			if( s != null && no_spaces && WHITESPACE.matcher(s).find()){
+				throw new ValidateException("Input must not contain whitespace");
+			}
 		
 	}
 
@@ -87,6 +95,20 @@ public class TextInput extends ParseAbstractInput<String> {
 
 	public void setTrim(boolean trim) {
 		this.trim = trim;
+	}
+
+	/**
+	 * @return the no_spaces
+	 */
+	public boolean isNoSpaces() {
+		return no_spaces;
+	}
+
+	/**
+	 * @param no_spaces the no_spaces to set
+	 */
+	public void setNoSpaces(boolean no_spaces) {
+		this.no_spaces = no_spaces;
 	}
 
 }

@@ -21,10 +21,12 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 
 /** An input that checks for existing records of the same name.
  * 
+ * This extends {@link NoHtmlInput} as these are user selected names that
+ * are likely to be displayed in pages.
  * @author spb
  *
  */
-public class UnusedNameInput<F extends DataObject> extends TextInput{
+public class UnusedNameInput<F extends DataObject> extends NoHtmlInput{
 	private final ParseFactory<F> fac;
 	private F existing=null;
 	public UnusedNameInput(ParseFactory<F> fac,F existing){
@@ -39,6 +41,7 @@ public class UnusedNameInput<F extends DataObject> extends TextInput{
     	this.fac=fac;
     	setSingle(true);
     	setOptional(false);
+    	setNoSpaces(true);
     }
 	@Override
 	public boolean isOptional() {
