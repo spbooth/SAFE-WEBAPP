@@ -70,9 +70,15 @@ public class TransitionNodeMaker<T,K> extends AbstractNodeMaker {
 			if( fac instanceof IndexTransitionFactory){
 				IndexTransitionFactory<K, T> itf = (IndexTransitionFactory<K, T>) fac;
 				K index = itf.getIndexTransition();
+				
 				if( index != null ){
+					if( ! fac.allowTransition(getContext(), null, index)){
+						return null;
+					}
 					// Don't set index explicitly to simplify url to common prefix path
 					n.setTargetPath(TransitionServlet.getURL(getContext(), fac,null,index));
+				}else{
+					return null;
 				}
 			}
 		}
