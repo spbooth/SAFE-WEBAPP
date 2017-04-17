@@ -45,11 +45,11 @@
 	    <dependency org="org.apache" name="batik-all" rev="1.8">
     		<artifact name="batik-all" ext="jar"/>
 		</dependency>
-		
+		<!--
 		<dependency org="net.sourceforge" name="Chart2D" rev="1.0">
     		<artifact name="Chart2D" m:classifier="epcc" ext="jar"/>
 		</dependency>
-		
+		-->
 		<dependency org="org.apache" name="commons-codec" rev="1.7">
     		<artifact name="commons-codec" ext="jar"/>
 		</dependency>
