@@ -125,6 +125,15 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 				+ df.format(end_bound[i][getNumItems() - 1]);
 	}
 	
+	/** Does this plot represent a cummulative plot.
+	 * 
+	 * This return value controls how items are combined in 
+	 * {@link #getCatCounts(boolean)}
+	 * 
+	 * @return
+	 */
+	public abstract boolean isCummulative();
+	
 	/**
 	 * create a table from a Plot for this Timechart
 	 * @param t 
@@ -132,7 +141,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 	 * @param ds
 	 *            Plot to convert
 	 * @param lab
-	 *            Labels for the catabories
+	 *            Labels for the catagories
 	 * @param start
 	 * 			  index of first label in this set
 	 * @return number of labels used;
@@ -185,16 +194,27 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 	 * @return double[cat][set]
 	 */
 	public final double[][] getCatCounts() {
+		boolean cummulative = isCummulative();
 		int nset = getNumSets();
 		int ncat = getNumCats();
 		double count[][] = new double[ncat][nset];
 		// log.debug("other_frac "+other_frac);
 		for (int i = 0; i < getNumCats(); i++) {
-			for (int j = 0; j < getNumItems(); j++) {
+			if( cummulative){
+				int j = getNumItems()-1;
 				for (int k = 0; k < nset; k++) {
 					float value = get(k, i, j);
 
 					count[i][k] += value;
+				}
+			}else{
+				// Sum the items
+				for (int j = 0; j < getNumItems(); j++) {
+					for (int k = 0; k < nset; k++) {
+						float value = get(k, i, j);
+
+						count[i][k] += value;
+					}
 				}
 			}
 		}

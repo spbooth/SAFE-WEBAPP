@@ -28,6 +28,7 @@ import org.jfree.data.xy.XYDomainInfo;
 import org.jfree.data.xy.XYRangeInfo;
 
 import uk.ac.ed.epcc.webapp.charts.GenericSplitSetPlot;
+import uk.ac.ed.epcc.webapp.charts.TimeChartData;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.time.SplitTimePeriod;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
@@ -53,8 +54,8 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	 * @throws InvalidArgument 
 	 * 
 	 */
-	public TimeChartDataSet(int nset, SplitTimePeriod period, int nsplit) throws InvalidArgument {
-		super();
+	public TimeChartDataSet(TimeChartData chart,int nset, SplitTimePeriod period, int nsplit) throws InvalidArgument {
+		super(chart);
 		setSplits(nset, period, nsplit,false);
 		nitem = period.getNsplit()*nsplit;
 		times = new double[nitem];

@@ -81,7 +81,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 	}
 
 	public TimeChartDataSet makeDataSet(int i) throws InvalidArgument {
-		return new TimeChartDataSet(i, period, nsplits);
+		return new TimeChartDataSet(this,i, period, nsplits);
 	}
 
 	

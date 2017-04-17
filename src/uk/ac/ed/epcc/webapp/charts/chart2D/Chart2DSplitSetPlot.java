@@ -93,4 +93,12 @@ public class Chart2DSplitSetPlot extends SplitSetPlot {
 		super.setLegends(leg);
 		chart_data.updateLegends();
 	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.charts.SplitSetPlot#isCummulative()
+	 */
+	@Override
+	public boolean isCummulative() {
+		return chart_data.isCumulative();
+	}
 }

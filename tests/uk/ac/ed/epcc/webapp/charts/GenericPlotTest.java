@@ -32,14 +32,14 @@ public class GenericPlotTest extends WebappTestBase {
     
     @Test
 	public void testGetNumSets() {
-		GenericSplitSetPlot p = new GenericSplitSetPlot();
+		GenericSplitSetPlot p = new GenericSplitSetPlot(null);
 		p.setSize(5, 4, 3);
 		assertEquals(5, p.getNumSets());
 	}
 
     @Test
 	public void testGetNumCats() {
-		GenericSplitSetPlot p = new GenericSplitSetPlot();
+		GenericSplitSetPlot p = new GenericSplitSetPlot(null);
 		p.setSize(5, 4, 3);
 		assertEquals(4, p.getNumCats());
 		
@@ -47,14 +47,14 @@ public class GenericPlotTest extends WebappTestBase {
 
     @Test
 	public void testGetNumItems() {
-		GenericSplitSetPlot p = new GenericSplitSetPlot();
+		GenericSplitSetPlot p = new GenericSplitSetPlot(null);
 		p.setSize(5, 4, 3);
 		assertEquals(3, p.getNumItems());
 	}
 
     @Test
 	public void testGet() {
-		GenericSplitSetPlot p = new GenericSplitSetPlot();
+		GenericSplitSetPlot p = new GenericSplitSetPlot(null);
 		p.set(1, 3, 8, 12.0f);
 		assertEquals(12.0f,p.get(1,3,8),0.0);
 		
@@ -62,7 +62,7 @@ public class GenericPlotTest extends WebappTestBase {
 
     @Test
 	public void testGrow(){
-		GenericSplitSetPlot p = new GenericSplitSetPlot();
+		GenericSplitSetPlot p = new GenericSplitSetPlot(null);
 		for(int i=0;i<10;i++){
 			p.set(i,i,i,i);
 		}

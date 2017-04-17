@@ -28,11 +28,13 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 	int nset = 0, ncat = 0, nitem = 0;
 
 	float data[][][];
+	private final TimeChartData chart_data;
 
-	public GenericSplitSetPlot(){
-		
+	public GenericSplitSetPlot(TimeChartData chart){
+		chart_data=chart;
 	}
-	public GenericSplitSetPlot(int i, int j, int k) {
+	public GenericSplitSetPlot(TimeChartData chart,int i, int j, int k) {
+		this(chart);
 		setSize(i, j, k);
 	}
 
@@ -155,6 +157,13 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 	}
 
 	protected void notifyChange() {
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.charts.SplitSetPlot#isCummulative()
+	 */
+	@Override
+	public boolean isCummulative() {
+		return chart_data.isCumulative();
 	}
 	
 }

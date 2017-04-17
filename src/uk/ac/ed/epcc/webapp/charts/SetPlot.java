@@ -22,6 +22,7 @@ import uk.ac.ed.epcc.webapp.content.Table;
 /**
  * Plot represents the Data in the chart being created.
  * 
+ * The data is grouped into sets with each set being displayed separately. 
  * @author spb
  * 
  */
