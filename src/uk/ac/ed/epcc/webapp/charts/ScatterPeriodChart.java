@@ -37,14 +37,6 @@ public class ScatterPeriodChart<P extends ScatterPeriodPlot> extends Chart<P> {
 	}
 	
 	public static ScatterPeriodChart getInstance(AppContext conn, SplitTimePeriod period, int nsplit){
-		ScatterPeriodChart chart = new ScatterPeriodChart(conn);
-
-		ScatterPeriodChartData chart_data = new JFreeScatterPeriodChartData();
-
-		chart_data.setPeriod(period, nsplit);
-		chart.setChartData(chart_data);
-
-		
-		return chart;
+		return conn.getService(GraphService.class).getScatterPeriodChart(period, nsplit);
 	}
 }

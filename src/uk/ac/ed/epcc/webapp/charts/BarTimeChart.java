@@ -20,8 +20,6 @@ import java.util.Calendar;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
-import uk.ac.ed.epcc.webapp.charts.chart2D.BarChart2DChartData;
-import uk.ac.ed.epcc.webapp.charts.jfreechart.JFreeBarTimeChartData;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.time.Period;
 
@@ -49,18 +47,8 @@ public final class BarTimeChart<P extends PeriodSetPlot> extends SetPeriodChart<
 
 
 	public static  BarTimeChart getInstance(AppContext c, Period p) throws Exception {
-		BarTimeChart ptc = new BarTimeChart(c,p);
-		BarTimeChartData chartData;
-		if( JFREE_BAR_FEATURE.isEnabled(c)){
-			chartData = new JFreeBarTimeChartData();
-		}else{
-			chartData = new BarChart2DChartData();
-		}
-		chartData.setPeriod(p);
-		ptc.setChartData(chartData);
-		
-		
-		return ptc;
+		return c.getService(GraphService.class).getBarTimeChart(p);
+
 	}
 
 	public static  BarTimeChart getInstance(AppContext c, Calendar s, Calendar e) throws Exception {

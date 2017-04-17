@@ -217,6 +217,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 		}
 		dataset.setDatasetId(ndatasets);
 		ndatasets++;
+		plots.add(dataset);
 		return dataset;
 	}
 
