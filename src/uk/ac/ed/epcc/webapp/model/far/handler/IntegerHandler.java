@@ -58,14 +58,19 @@ public class IntegerHandler implements QuestionFormHandler<Integer> {
 			public void validate(Form f) throws ValidateException {
 				Integer min = (Integer) f.get(MINIMUM);
 				Integer max = (Integer) f.get(MAXIMUM);
-				if( min != null && max != null && min.intValue() > max.intValue()){
-					throw new ValidateException("Minimum must be less than maximum");
-				}
+				if( min != null && max != null) {
+
+					if (min.intValue() > max.intValue()){
+						throw new ValidateException("Minimum must be less than maximum");
+					}
 				
-				Integer step = (Integer) f.get(STEP);
-				double rem = (max.intValue() - min.intValue()) % step.intValue();
-				if( rem != 0){
-					throw new ValidateException("Maximum minus Minimum must be a multiple of step");
+					Integer step = (Integer) f.get(STEP);
+					if (step != null) {
+						double rem = (max.intValue() - min.intValue()) % step.intValue();
+						if( rem != 0){
+							throw new ValidateException("Maximum minus Minimum must be a multiple of step");
+						}
+					}
 				}
 				
 				Integer default_val = (Integer) f.get(DEFAULT_VALUE);
