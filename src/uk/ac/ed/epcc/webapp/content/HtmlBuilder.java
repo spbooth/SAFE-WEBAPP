@@ -154,6 +154,9 @@ public HtmlBuilder(){
 		if( htmlBuilder.use_table_section != null ){
 			setTableSections(htmlBuilder.use_table_section);
 		}
+		setMissingFields(htmlBuilder.missing_fields);
+		setErrors(htmlBuilder.errors);
+		setPostParams(htmlBuilder.post_params);
 	}
 }
 
@@ -326,12 +329,7 @@ private boolean isMissing(String field){
 }
 private String getError(String field){
 	if( errors == null ){
-		HtmlBuilder parent = (HtmlBuilder) getParent();
-		if( parent != null){
-			return parent.getError(field);
-		}else{
-			return null;
-		}
+		return null;
 	}
 	return errors.get(field);
 }
