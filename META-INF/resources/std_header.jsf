@@ -20,11 +20,7 @@
  <title><%= strip(page_title) %></title>
  <meta name="description" content="<%=service_name%> <%=website_name%>">
  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<wb:headings extraCSS="<%=extra_css%>"/>
-<%
-if( extra_head != null ){ %>
-<%=extra_head %>
-<%} %>
+<wb:headings />
 </head>
 <body>
 <nav>

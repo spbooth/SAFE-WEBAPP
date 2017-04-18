@@ -22,6 +22,7 @@
 <%@ page import="uk.ac.ed.epcc.webapp.servlet.*" %>
 <%@page import="java.util.*" %>
 <%@page import="java.text.*"%>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
 <%
   	AppContext conn = ErrorFilter.retrieveAppContext(request,response);
 	String web_path = request.getContextPath();
@@ -35,6 +36,4 @@
 		service_name = conn.getInitParameter("service.name","");
 		website_name = conn.getInitParameter("service.website-name","");
 	}
-	String extra_css=null;
-	String extra_head=null;
 %>

@@ -28,7 +28,7 @@ the form could just submit to self. This might break form error reporting though
 <%@ page import="uk.ac.ed.epcc.webapp.forms.inputs.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.content.*" %>
 <%@ include file="/session.jsf" %>
-<% extra_css="service_desk.css"; %>
+<wb:css url="service_desk.css"/>
 <%
     TransitionFactory tp = TransitionServlet.getProvider(conn,request);
     Object key =  request.getAttribute(TransitionServlet.TRANSITION_KEY_ATTR);
@@ -61,8 +61,8 @@ the form could just submit to self. This might break form error reporting though
    
     if( tp instanceof ScriptTransitionFactory){
     	ScriptTransitionFactory st = (ScriptTransitionFactory)tp;
-    	request.setAttribute(WebappHeadTag.REQUEST_CSS_ATTR, st.getAdditionalCSS(key));
-    	request.setAttribute(WebappHeadTag.REQUEST_SCRIPT_ATTR, st.getAdditionalScript(key));
+    	WebappHeadTag.addCss(conn, request, st.getAdditionalCSS(key));
+    	WebappHeadTag.addScript(conn,request,st.getAdditionalScript(key));
     }
     request.setAttribute(WebappHeadTag.FORM_PAGE_ATTR, Boolean.TRUE);
 %>

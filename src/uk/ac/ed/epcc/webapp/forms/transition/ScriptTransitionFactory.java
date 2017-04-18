@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.transition;
 
+import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.tags.WebappHeadTag;
 
 /** Interface for {@link TransitionFactory}s
@@ -25,6 +27,6 @@ import uk.ac.ed.epcc.webapp.tags.WebappHeadTag;
  *
  */
 public interface ScriptTransitionFactory<K> {
-	public String getAdditionalCSS(K key);
-	public String getAdditionalScript(K key);
+	public Set<String> getAdditionalCSS(K key);
+	public Set<String> getAdditionalScript(K key);
 }

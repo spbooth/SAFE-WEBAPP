@@ -22,4 +22,18 @@
   	<rtexprvalue>true</rtexprvalue>
   	</attribute>
   </tag>
+  <tag>
+  	<name>css</name>
+  	<tag-class>uk.ac.ed.epcc.webapp.tags.WebappCss</tag-class>
+  	<attribute><name>url</name><required>true</required>
+  	<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  </tag>
+  <tag>
+  	<name>script</name>
+  	<tag-class>uk.ac.ed.epcc.webapp.tags.WebappScript</tag-class>
+  	<attribute><name>url</name><required>true</required>
+  	<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  </tag>
 </taglib>

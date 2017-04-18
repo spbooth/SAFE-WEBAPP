@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.tags;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,11 +40,11 @@ public class WebappHeadTag extends TagSupport implements Tag {
 	/**
 	 * 
 	 */
-	public static final String REQUEST_SCRIPT_ATTR = "request_script";
+	private static final String REQUEST_SCRIPT_ATTR = "request_script";
 	/**
 	 * 
 	 */
-	public static final String REQUEST_CSS_ATTR = "request_css";
+	private static final String REQUEST_CSS_ATTR = "request_css";
 	/** request attribute denoting a page containing a form
 	 * 
 	 */
@@ -58,8 +59,8 @@ public class WebappHeadTag extends TagSupport implements Tag {
 	public int doStartTag() throws JspException {
 		PageContext page = pageContext;
 		HttpServletRequest request = (HttpServletRequest) page.getRequest();
-		String request_css = (String) request.getAttribute(REQUEST_CSS_ATTR);
-		String request_script = (String) request.getAttribute(REQUEST_SCRIPT_ATTR);
+		Set<String> request_css = (Set<String>) request.getAttribute(REQUEST_CSS_ATTR);
+		Set<String> request_script = (Set<String>) request.getAttribute(REQUEST_SCRIPT_ATTR);
 		JspWriter out = page.getOut();
         HttpServletResponse response = (HttpServletResponse)pageContext.getResponse();
         Set<String> scripts = new HashSet<String>(); // don't emit the same script twice 
@@ -78,7 +79,7 @@ public class WebappHeadTag extends TagSupport implements Tag {
         			doCSS(out, response, template_path,null,"nav_menu.css");
         		}
         		if(SCRIPT_FORMS_FEATURE.isEnabled(conn) && request.getAttribute(FORM_PAGE_ATTR) != null){
-        			doCSS(out, response, template_path,null,"//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css");
+        			doCSS(out, response, template_path,null,"${jquery-ui.css}");
         		}
         		doCSS(out, response, template_path,null,"extra.css");
         	
@@ -89,23 +90,23 @@ public class WebappHeadTag extends TagSupport implements Tag {
         		}
         		
         		if( NavigationMenuService.NAVIGATION_MENU_JS_FEATURE.isEnabled(conn)){
-        			doScript(scripts,out,request,response,"//code.jquery.com/jquery-1.10.2.min.js");
+        			doScript(scripts,out,request,response,"${jquery.script}");
         			doScript(scripts,out, request,response, "/scripts/menubar.js");
         		}
         		if(SCRIPT_FORMS_FEATURE.isEnabled(conn)&& request.getAttribute(FORM_PAGE_ATTR) != null){
-        			doScript(scripts,out,request,response,"//code.jquery.com/jquery-1.10.2.min.js");
-        			doScript(scripts,out,request,response,"//code.jquery.com/ui/1.12.1/jquery-ui.min.js");
+        			doScript(scripts,out,request,response,"${jquery.script}");
+        			doScript(scripts,out,request,response,"${jquery-ui.script}");
         			doScript(scripts,out,request,response,"/js/modernizr-custom.js");
         			doScript(scripts,out,request,response,"/js/fixinputs.js");
         		}
-        		if( request_script != null && request_script.trim().length() > 0 ){
+        		if( request_script != null  ){
         			// allow escaped commas in in-line scripts
-        			for(String script : request_script.split("(?<!\\\\),")){
-        				doScript(scripts,out,request,response,script.replace("\\,", ","));
+        			for(String script : request_script){
+        				doScript(scripts,out,request,response,script);
         			}
         		}
-        		if(request_css != null && request_css.trim().length() > 0){ 
-        			for( String css : request_css.split(",")){
+        		if(request_css != null ){ 
+        			for( String css : request_css){
         				doCSS(out, response, template_path, null,css);		 
         			}
         		}
@@ -160,8 +161,10 @@ public class WebappHeadTag extends TagSupport implements Tag {
 			// script file
 			out.print("<script type=\"text/javascript\" charset=\"utf8\" src=\"");
 			if( location.startsWith("//")){
+				// remote script file
 				out.print(location);
 			}else {
+				// local script file
 				out.print(response.encodeURL(request.getContextPath()+location));		
 			}
 			out.println("\"></script>");
@@ -173,4 +176,48 @@ public class WebappHeadTag extends TagSupport implements Tag {
 		}
 	}
 	
+	public static void addScript(AppContext conn,HttpServletRequest request, Set<String> script){
+		if( script == null){
+			return;
+		}
+		for(String s : script){
+			addScript(conn, request, s);
+		}
+	}
+	/** Add a script to be included by the head tag.
+	 * 
+	 * must be called before the head tag.
+	 * parameters are expanded. If the value starts with a / it is a url.
+	 * If it starts with // it is a remote url.
+	 * 
+	 * This method is to include scripts from a java fragment.
+	 * 
+	 * @param conn
+	 * @param request
+	 * @param script
+	 */
+	public static void addScript(AppContext conn,HttpServletRequest request, String script){
+		Set<String> scripts = (Set<String>) request.getAttribute(REQUEST_SCRIPT_ATTR);
+		if( scripts == null ){
+			scripts=new LinkedHashSet<String>();
+			request.setAttribute(REQUEST_SCRIPT_ATTR, scripts);
+		}
+		scripts.add(conn.expandText(script));
+	}
+	public static void addCss(AppContext conn,HttpServletRequest request, Set<String> css){
+		if( css == null){
+			return;
+		}
+		for(String c : css){
+			addCss(conn,request,c);
+		}
+	}
+	public static void addCss(AppContext conn,HttpServletRequest request, String css){
+		Set<String> stylesheets = (Set<String>) request.getAttribute(REQUEST_CSS_ATTR);
+		if( stylesheets == null ){
+			stylesheets=new LinkedHashSet<String>();
+			request.setAttribute(REQUEST_CSS_ATTR, stylesheets);
+		}
+		stylesheets.add(conn.expandText(css));
+	}
 }

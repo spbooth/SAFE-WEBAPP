@@ -13,9 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.tags;
 
-import java.io.IOException;
-
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
@@ -27,7 +24,6 @@ import javax.servlet.jsp.tagext.TagSupport;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.servlet.ErrorFilter;
-import uk.ac.ed.epcc.webapp.servlet.WebappServlet;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
 
 /** A custom {@link Tag} that inserts the navigation menu
