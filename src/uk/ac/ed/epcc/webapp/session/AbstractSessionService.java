@@ -1250,6 +1250,11 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    		// roles don't enumerate
 	    		return new GenericBinaryFilter<A>(target_type,false);
 	    	}
+	    	if( base.equals(BOOLEAN_RELATIONSHIP_BASE)){
+	    		
+	    		return new GenericBinaryFilter<A>(target_type,Boolean.valueOf(sub));
+	    		
+	    	}
 	    	if( base.equals(fac2.getTag())){
 	    		// This is to reference a factory/composite role from within a redefined
 	    		// definition. direct roles can be qualified if we want qualified names cannot
