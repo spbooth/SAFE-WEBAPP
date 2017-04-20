@@ -1719,7 +1719,7 @@ public class Table<C, R> {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		TextTableFormatter< C, R> fmt = new TextTableFormatter<C, R>(this);
+		TextTableFormatter< C, R> fmt = new TextTableFormatter<C, R>(null,this);
 		fmt.add(sb);
 		return sb.toString();
 	}

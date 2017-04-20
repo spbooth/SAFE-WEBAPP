@@ -41,7 +41,7 @@ public class TableXMLGenerator implements XMLGenerator {
 	 */
 	public SimpleXMLBuilder addContent(SimpleXMLBuilder builder) {
 		if( builder instanceof ContentBuilder){
-			((ContentBuilder )builder).addTable(conn, t);
+			((ContentBuilder )builder).addTable(conn,nf, t);
 		}else{
 			TableXMLFormatter f = new TableXMLFormatter(builder, nf);
 			f.add(t);

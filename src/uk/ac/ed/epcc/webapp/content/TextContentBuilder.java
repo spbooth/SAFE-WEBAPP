@@ -1,6 +1,7 @@
 // Copyright - The University of Edinburgh 2016
 package uk.ac.ed.epcc.webapp.content;
 
+import java.text.NumberFormat;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -164,20 +165,26 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addTable(uk.ac.ed.epcc.webapp.AppContext, uk.ac.ed.epcc.webapp.content.Table)
 	 */
 	@Override
-	public <C, R> void addTable(AppContext conn, Table<C, R> t) {
-		sb.append(t.toString());
-		
+	public <C, R> void addTable(AppContext conn, NumberFormat nf,Table<C, R> t) {
+		TextTableFormatter< C, R> fmt = new TextTableFormatter<C, R>(nf,t);
+		fmt.add(sb);
 	}
-
+	@Override
+	public <C, R> void addTable(AppContext conn, Table<C, R> t) {
+		addTable(conn,null,t);
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addTable(uk.ac.ed.epcc.webapp.AppContext, uk.ac.ed.epcc.webapp.content.Table, java.lang.String)
 	 */
 	@Override
-	public <C, R> void addTable(AppContext conn, Table<C, R> t, String style) {
-		addTable(conn, t);
+	public <C, R> void addTable(AppContext conn, Table<C, R> t, NumberFormat nf,String style) {
+		addTable(conn, nf, t);
 		
 	}
-
+	@Override
+	public <C, R> void addTable(AppContext conn, Table<C, R> t, String style) {
+		addTable(conn,t,null,style);
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addColumn(uk.ac.ed.epcc.webapp.AppContext, uk.ac.ed.epcc.webapp.content.Table, java.lang.Object)
 	 */

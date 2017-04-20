@@ -20,6 +20,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.text.NumberFormat;
 import java.util.Map;
 import java.util.Properties;
 
@@ -237,7 +238,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 			return null;
 		}
 	}
-    private <C,R> void addCell(Table<C,R> t, C key, R row_key,SwingContentBuilder dest){
+    private <C,R> void addCell(Table<C,R> t, C key, R row_key,NumberFormat nf,SwingContentBuilder dest){
     	Object n = t.get(key,row_key);
 		Table.Formatter format = t.getColFormat(key);
 		if( format != null){
@@ -259,9 +260,13 @@ public class SwingContentBuilder  implements ContentBuilder{
 			return;
 		}
 		if( n instanceof Table ){
-			dest.addTable(conn, (Table) n, "inner");
+			dest.addTable(conn, (Table) n, nf,"inner");
 		}
-		dest.addText(n.toString());
+		if( n instanceof Number && n != null ){
+			dest.addText(nf.format((Number)n));
+		}else{
+			dest.addText(n.toString());
+		}
     }
 
 	public void addButton(AppContext c,String text, FormResult action) {
@@ -290,6 +295,9 @@ public class SwingContentBuilder  implements ContentBuilder{
 
 	}
 	public <C,R> void addTable(AppContext conn,Table<C,R> t) {
+		addTable(conn,null,t);
+	}
+	public <C,R> void addTable(AppContext conn,NumberFormat nf,Table<C,R> t) {
 		log.debug("add table");
 		JPanel table=new JPanel(new GridBagLayout());
 		
@@ -329,7 +337,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 				c.gridx++;
 			}
 			for(C col : t.getCols()){
-				addCell(t,col,row,inner);
+				addCell(t,col,row,nf,inner);
 				c.gridx++;
 			}
 			c.gridy++;
@@ -388,7 +396,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 				c.gridx++;
 			}
 			
-			addCell(t,col,row,inner);
+			addCell(t,col,row,null,inner);
 			c.gridx++;
 			
 			c.gridy++;
@@ -431,9 +439,11 @@ public class SwingContentBuilder  implements ContentBuilder{
 		addComponent(comp);
 		return result;
 	}
-	
 	public <C, R> void addTable(AppContext conn, Table<C, R> t, String style) {
-		addTable(conn, t);
+		addTable(conn,t,null,style);
+	}
+	public <C, R> void addTable(AppContext conn, Table<C, R> t, NumberFormat nf,String style) {
+		addTable(conn, nf,t);
 		
 	}
 	/* (non-Javadoc)

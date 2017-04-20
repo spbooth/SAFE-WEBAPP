@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.content;
 
+import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -193,7 +194,10 @@ public void addLink(AppContext conn,String text, String hover,FormResult action)
 	}
 }
 public <C,R> void addTable(AppContext conn,Table<C,R> t,String style) {
-	TableXMLFormatter<C,R> fmt = new TableXMLFormatter<C,R>(this, null,style);
+	addTable(conn,t,null,style);
+}
+public <C,R> void addTable(AppContext conn,Table<C,R> t,NumberFormat nf,String style) {
+	TableXMLFormatter<C,R> fmt = new TableXMLFormatter<C,R>(this, nf,style);
 	if( use_table_section != null){
 		// If set explicitly this takes preference.
 		fmt.setTableSections(use_table_section);
@@ -270,9 +274,11 @@ public void addHeading(int level, String text) {
 }
 
 
-
 public <C, R> void addTable(AppContext conn, Table<C, R> t) {
-	addTable(conn, t, "auto");
+	addTable(conn,null,t);
+}
+public <C, R> void addTable(AppContext conn, NumberFormat nf,Table<C, R> t) {
+	addTable(conn, t, nf, "auto");
 	
 }
 

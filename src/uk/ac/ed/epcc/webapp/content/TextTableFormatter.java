@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.content;
 
+import java.text.NumberFormat;
 import java.util.List;
 
 /** format a table as text.
@@ -25,7 +26,11 @@ public class TextTableFormatter<C,R> {
 	 * @param table
 	 */
 	public TextTableFormatter(Table<C, R> table) {
+		this(null,table);
+	}
+	public TextTableFormatter(NumberFormat nf,Table<C, R> table) {
 		super();
+		this.nf=nf;
 		this.table = table;
 		 List<C> cols = table.getCols();
 			int ncols = cols.size();	
@@ -58,6 +63,7 @@ public class TextTableFormatter<C,R> {
 	}
 
 	private final Table<C,R> table;
+	private final NumberFormat nf;
 	private int wid[];
 	
 	public void add(StringBuilder sb){
@@ -111,7 +117,7 @@ public class TextTableFormatter<C,R> {
 			sb.append("||");
 		}
 		for( C col : table.getColumNames()){
-			rightJustify(sb,table.getText(col, row),wid[pos++]);
+			rightJustify(sb,table.getText(nf,col, row),wid[pos++]);
 			sb.append("|");
 		}
 		sb.append("\n");

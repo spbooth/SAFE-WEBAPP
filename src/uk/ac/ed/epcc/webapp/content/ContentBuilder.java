@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.content;
 
+import java.text.NumberFormat;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -174,6 +175,25 @@ public interface ContentBuilder {
 	 * @param style
 	 */
 	public <C,R> void addTable(AppContext conn,Table<C,R> t,String style);
+	
+	/** Add a table to the content.
+	 * 
+	 * Table content that implements {@link UIGenerator} should be added via {@link UIGenerator#addContent(ContentBuilder)}
+	 * @param conn
+	 * @param nf 
+	 * @param t
+	 */
+	public <C,R> void addTable(AppContext conn,NumberFormat nf,Table<C,R> t);
+	
+	/** Add a table to the content.
+	 * 
+	 * Table content that implements {@link UIGenerator} should be added via {@link UIGenerator#addContent(ContentBuilder)}
+	 * @param conn
+	 * @param t
+	 * @param nf 
+	 * @param style
+	 */
+	public <C,R> void addTable(AppContext conn,Table<C,R> t,NumberFormat nf,String style);
 	/** Add the data from a single column of a {@link Table} formatted in
 	 * 2 columns (key and data).
 	 * 

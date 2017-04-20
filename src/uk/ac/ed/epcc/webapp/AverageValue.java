@@ -49,5 +49,12 @@ public class AverageValue extends Number{
 	public long getCount(){
 		return count;
 	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return Double.toString(doubleValue());
+	}
 
 }
