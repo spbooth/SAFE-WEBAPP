@@ -77,7 +77,7 @@ public final class CreateAction<BDO extends DataObject> extends FormAction {
 			log.debug("postCreate");
 			postCreate(o,f);
 		} catch (Exception e) {
-			log.error("exception in CreateAction.action");
+			log.error("exception in CreateAction.action",e);
 			throw new ActionException("Create failed", e);
 		}
 		return creator.getResult(type_name,o, f);
