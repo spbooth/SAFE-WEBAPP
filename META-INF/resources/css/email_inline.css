@@ -1,0 +1,31 @@
+td.GREEN , span.GREEN{
+	background-color: green;
+}
+td.YELLOW, span.YELLOW{
+	background-color: yellow;
+}
+td.AMBER, span.AMBER{
+	background-color: orange;
+}
+td.ORANGE,  span.ORANGE{
+   background-color: orange;
+}
+td.RED, span.RED{
+   background-color: red;
+}
+td.PURPLE,  span.PURPLE{
+   background-color: purple;
+}
+td.AQUA,  span.AQUA{
+	background-color: aqua;
+}
+td.LIME,  span.LIME{
+	background-color: lime;
+}
+th{
+	background-color: #e7e7e7;
+}
+table {
+	border: solid black;
+	border-width: 1px;
+}

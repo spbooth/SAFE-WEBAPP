@@ -47,7 +47,7 @@ public class XMLBuilderSaxHandler implements ContentHandler {
 		this.data=data;
 	}
 	public void characters(char[] arg0, int arg1, int arg2) throws SAXException {
-		builder.clean(String.valueOf(arg0).subSequence(arg1, arg2));
+		builder.clean(String.valueOf(arg0).subSequence(arg1, arg1+arg2));
 	}
 
 	public void endDocument() throws SAXException {

@@ -200,7 +200,22 @@ public class TemplateFile {
 					+ "end: " + end + ", " + "[" + stuff + "]" + "}";
 		}
 	}
-
+	/** Interface for policy object to add objects to template output.
+	 * Custom implementations can be used to add special rules for example when generating
+	 * XML/HTML output.
+	 * @author spb
+	 *
+	 */
+    public interface PropertyPolicy{
+    	/**
+    	 * 
+    	 * @param out {@link Writer} to append to
+    	 * @param name Name of parameter
+    	 * @param value Object to add
+    	 * @throws IOException
+    	 */
+    	void writePropertyValue(Writer out, String name,Object value)throws IOException;
+    }
 	// Enables or disables debugging (shows stuff in output)
 	static boolean DEBUG = false;
 
@@ -763,6 +778,9 @@ public class TemplateFile {
 	 * @throws IOException
 	 */
 	public void write(Writer out) throws IOException {
+		write(new DefaultPropertyPolicy(),out);
+	}
+	public void write(PropertyPolicy policy,Writer out) throws IOException {
 		if (DEBUG) {
 			try {
 				prettyPrint(out);
@@ -772,7 +790,7 @@ public class TemplateFile {
 
 			}
 		}
-		writeRegion(out, top_region);
+		writeRegion(out, policy,top_region);
 
 		out.flush();
 	}
@@ -780,7 +798,7 @@ public class TemplateFile {
 	/*
 	 * Helper methods for writing
 	 */
-	protected void writeRegion(Writer out, Region region) throws IOException {
+	protected void writeRegion(Writer out, PropertyPolicy policy,Region region) throws IOException {
 		int position = Math.max(region.start, 0);
 
 		// Iterate through elements, writing them
@@ -791,7 +809,7 @@ public class TemplateFile {
 
 				out.write(file_contents, position, prop.position - position);
 
-				writePropertyValue(out, template_values[prop.value_index]);
+				policy.writePropertyValue(out, prop.name,template_values[prop.value_index]);
 
 				position = prop.position;
 			} else {
@@ -805,7 +823,7 @@ public class TemplateFile {
 					// Recursively write sub-regions (if enabled)
 					if (((Boolean) template_values[sub_region.enabled_index])
 							.booleanValue()) {
-						writeRegion(out, sub_region);
+						writeRegion(out, policy,sub_region);
 					}
 
 					position = sub_region.end;
@@ -924,8 +942,8 @@ public class TemplateFile {
 
 		return template;
 	}
-
-	protected static void writePropertyValue(Writer out, Object value)
+    public static class DefaultPropertyPolicy implements PropertyPolicy{
+	public void writePropertyValue(Writer out, String name,Object value)
 			throws IOException {
 		// Ignore null values
 		if (value == null)
@@ -941,7 +959,7 @@ public class TemplateFile {
 		// Recurse into contained template
 		if (value instanceof TemplateFile) {
 			// Uh oh, need to recurse into this value
-			((TemplateFile) value).write(out);
+			((TemplateFile) value).write(this,out);
 			return;
 		}
 
@@ -952,7 +970,7 @@ public class TemplateFile {
 				if( i > 0 ){
 					out.write(", ");
 				}
-				writePropertyValue(out, objects[i]);
+				writePropertyValue(out,name+i, objects[i]);
 			}
 			return;
 		}
@@ -961,25 +979,24 @@ public class TemplateFile {
 		if( value instanceof Iterable){
 			Iterable c = (Iterable) value;
 			boolean seen=false;
+			int i=0;
 			for(Object o : c){
 				if( seen){
 					out.write(", ");
 				}
-				writePropertyValue(out, o);
+				writePropertyValue(out,name+i, o);
 				seen=true;
+				i++;
 			}
 			return;
 		}
-		if( value instanceof Number){
-			writePropertyValue(out, value.toString());
-			return;
-		}
-		// Damn, it's something we don't know how to write
-		throw new RuntimeException(
-				"Invalid type of Object found in property values - "
-						+ value.getClass().getName());
+		
+		// Default to String representation
+		writePropertyValue(out,name, value.toString());
+		return;
+		
 	}
-
+    }
 	/*
 	 * public static void main(String args[]) throws Exception {
 	 * 

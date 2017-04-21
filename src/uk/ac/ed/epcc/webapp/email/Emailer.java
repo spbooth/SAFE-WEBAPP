@@ -22,6 +22,7 @@ package uk.ac.ed.epcc.webapp.email;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -55,7 +56,10 @@ import javax.mail.internet.MimeMultipart;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
+import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.content.TemplateFile;
+import uk.ac.ed.epcc.webapp.content.XMLPrintWriterPolicy;
+import uk.ac.ed.epcc.webapp.content.XMLPrinterWriter;
 import uk.ac.ed.epcc.webapp.email.logging.EmailLogger;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -63,6 +67,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 //import uk.ac.ed.epcc.webapp.logging.email.EmailLogger;
 import uk.ac.ed.epcc.webapp.model.TemplateFinder;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
+import uk.ac.ed.epcc.webapp.resource.ResourceService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory.EmailChangeRequest;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeListener;
@@ -115,6 +120,8 @@ public class Emailer {
 	public static final String EMAIL_BYPASS_FORCE_ADDRESS = "email.bypass_force.address";
 	public static final Feature EMAILS_FEATURE = new Feature("emails",true,"emails enabled");
     public static final Feature PASSWORD_RESET_SERVLET = new Feature("password_reset.servlet",false,"Send reset url in reset email");
+    
+    public static final Feature HTML_ALTERNATIVE = new Feature("email.html_alternative",true,"Look for a tempalte region conatining html alternative content");
 	private static final String MAIL_SMTP_HOST = "mail.smtp.host";
 
 	private static final String ERROR_EMAIL_FROM_ADDRESS = "error.email_from_address";
@@ -468,22 +475,74 @@ public class Emailer {
 		}
 		
 		String text = email_template.toString();
+		MimeBodyPart html_part = null;
+		if( HTML_ALTERNATIVE.isEnabled(conn)){
+			TemplateFile html = email_template.getTemplateRegion("html");
+			if( html != null ){
+				
+				try {
+					
+					HtmlBuilder hb = new HtmlBuilder();
+					hb.open("html");
+					// copy in standard inline css
+					ResourceService rs = getContext().getService(ResourceService.class);
+					 InputStream style = rs.getResourceAsStream("/css/email_inline.css");
+					 if( style != null){
+						 hb.open("style");
+						 int c;
+						 while((c=style.read()) > 0) {
+							 hb.clean((char)c);
+						 }
+						 hb.close();
+					 }
+					 html.write(new XMLPrintWriterPolicy(new TemplateFile.DefaultPropertyPolicy()), new XMLPrinterWriter(hb));
+					hb.close();
+					html_part = new MimeBodyPart();
+					html_part.setContent(hb.toString(), "text/html");
+				} catch (Exception e) {
+					getLogger().error("Error making html alternative", e);
+				}
+			}
+		}
 		if( multipart ){
 		  MimeMultipart mp = new MimeMultipart("mixed");
-		  MimeBodyPart mbp = new MimeBodyPart();
+		  MimeBodyPart mbp = new MimeBodyPart(); // plain text
 		  if( needsEncoding(text)){
 			  mbp.setText(text,getEncoding());
 		  }else{
 			  mbp.setText(text);
 		  }
-		  mbp.setDisposition(Part.INLINE);
-		  mp.addBodyPart(mbp);
+		  if( html_part != null ){
+			  MimeMultipart alt = new MimeMultipart("alternative");
+			  alt.addBodyPart(html_part);
+			  alt.addBodyPart(mbp);
+			  MimeBodyPart cont = new MimeBodyPart();
+			  cont.setContent(alt);
+			  cont.setDisposition(Part.INLINE);
+			  mp.addBodyPart(cont);
+		  }else{
+		      mbp.setDisposition(Part.INLINE);
+		      mp.addBodyPart(mbp);
+		  }
 		  m.setContent(mp);
 		}else{
-			if( needsEncoding(text)){
-				m.setText(text,getEncoding());
+			if( html_part != null ){
+				MimeMultipart alt = new MimeMultipart("alternative");
+				alt.addBodyPart(html_part);
+				MimeBodyPart mbp = new MimeBodyPart(); // plain text
+				  if( needsEncoding(text)){
+					  mbp.setText(text,getEncoding());
+				  }else{
+					  mbp.setText(text);
+				  }
+				alt.addBodyPart(mbp);
+				m.setContent(alt);
 			}else{
-				m.setText(text);
+				if( needsEncoding(text)){
+					m.setText(text,getEncoding());
+				}else{
+					m.setText(text);
+				}
 			}
 		}
 		
