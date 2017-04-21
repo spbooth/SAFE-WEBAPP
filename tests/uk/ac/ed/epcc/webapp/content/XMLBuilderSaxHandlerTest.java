@@ -39,7 +39,7 @@ public class XMLBuilderSaxHandlerTest {
 		attrs.addAttribute(null, "attr1_name", null, null, "attr1_value");
 		try {
 			saxHandler.startElement(null, null, "tag1", attrs);
-			saxHandler.characters("zzz test text".toCharArray(), 4, 13);
+			saxHandler.characters("zzz test text".toCharArray(), 4, 9);
 			saxHandler.endElement(null, null, null);
 		} catch (SAXException e) {
 			Assert.fail("SAXException.");
