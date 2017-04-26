@@ -279,7 +279,9 @@ public class TimeChart<P extends PeriodSequencePlot> extends PeriodChart<P>{
 	/* }}} */
 	public static TimeChart getInstance(AppContext c, SplitTimePeriod p, int minor) throws InvalidArgument {
 		assert(p!=null);
-		TimeChart t = c.getService(GraphService.class).getTimeChart();
+		GraphService service = c.getService(GraphService.class);
+		assert(service !=null);
+		TimeChart t = service.getTimeChart();
 	
 		TimeChartData chartData = t.getChartData();
 	
