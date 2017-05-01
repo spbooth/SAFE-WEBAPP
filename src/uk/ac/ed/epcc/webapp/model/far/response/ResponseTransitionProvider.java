@@ -186,7 +186,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 
 			@Override
 			public String getHelp() {
-				return "Cancel form submition and view parent";
+				return "Cancel edits and view parent";
 			}
 		}
 		public class EditAction extends ErrorProcessingFormAction<ResponseTarget<D, R>,ResponseTransitionKey<D, R>>{
@@ -266,12 +266,13 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 				} catch (Exception e) {
 					
 				}
-				return super.processError(conn, f, provider, target, key, missing, errors);
+				// return to parent
+				return new ViewResult(target.getParent());
 			}
 
 			@Override
 			public String getHelp() {
-				return "Submit answers and go to next section";
+				return "Save answers and view parent";
 			}
 			
 		}
@@ -297,7 +298,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 				if( val != null ){
 					f.addValidator(val);
 				}
-				f.addAction("Submit", new EditAction(target));
+				f.addAction("Save", new EditAction(target));
 				f.addAction("Cancel", new CancelAction(target));
 			}catch(Exception e){
 				getLogger().error("Error building form",e);
