@@ -56,6 +56,7 @@ public class ProcessHandler extends Thread implements ProcessProxy {
 				OutputStream stdin = process.getOutputStream();
 				try {
 					stdin.write(input);
+					stdin.close();
 				} catch (IOException e) {
 					input_exception=e;
 				}
