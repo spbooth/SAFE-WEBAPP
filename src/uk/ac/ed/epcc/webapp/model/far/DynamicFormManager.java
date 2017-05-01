@@ -119,6 +119,10 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 			return manager;
 		}
 		
+		@Override
+		public String getIdentifier(int maxLength) {
+			return getName();
+		}
 		
 		public String getName(){
 			return record.getStringProperty(NAME_FIELD);
