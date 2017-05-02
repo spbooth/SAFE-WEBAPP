@@ -514,8 +514,8 @@ public class Emailer {
 		  }
 		  if( html_part != null ){
 			  MimeMultipart alt = new MimeMultipart("alternative");
-			  alt.addBodyPart(html_part);
 			  alt.addBodyPart(mbp);
+			  alt.addBodyPart(html_part); // clients usually show last alternative they support.
 			  MimeBodyPart cont = new MimeBodyPart();
 			  cont.setContent(alt);
 			  cont.setDisposition(Part.INLINE);
@@ -528,7 +528,6 @@ public class Emailer {
 		}else{
 			if( html_part != null ){
 				MimeMultipart alt = new MimeMultipart("alternative");
-				alt.addBodyPart(html_part);
 				MimeBodyPart mbp = new MimeBodyPart(); // plain text
 				  if( needsEncoding(text)){
 					  mbp.setText(text,getEncoding());
@@ -536,6 +535,7 @@ public class Emailer {
 					  mbp.setText(text);
 				  }
 				alt.addBodyPart(mbp);
+				alt.addBodyPart(html_part);
 				m.setContent(alt);
 			}else{
 				if( needsEncoding(text)){
