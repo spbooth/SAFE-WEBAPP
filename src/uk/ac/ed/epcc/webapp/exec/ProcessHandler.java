@@ -17,7 +17,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /** Wrapper thread to wait for a process in a thread. 
- * 
+ *
+ * This serves two purposes. This thread can be used to provide input to the process.
+ * and it allows a timeout that kills the process as the thread will kill the process when interrupted.
+
  * Additional threads are spawned to capture any output
  * When the process exits the thread also exits so waiting for the thread is equivalent to
  * waiting for the process. If the thread is interrupted the process will be destroyed.
@@ -41,9 +44,22 @@ public class ProcessHandler extends Thread implements ProcessProxy {
 	private InputStreamThread err;
 	private TimeoutThread timeout=null;
 	boolean terminated=false;
+	/** Create a {@link ProcessHandler}
+	 * 
+	 * No input is provided for the process. If any is required this must be 
+	 * provided by a different thread.
+	 * 
+	 * @param process
+	 */
 	public ProcessHandler(Process process){
 		this(null,process);
 	}
+	/** Create a {@link ProcessHandler} with specified input
+	 * The input will be delivered to the process stdin (and the stream closed)
+	 * when the handler is run
+	 * @param input
+	 * @param process
+	 */
 	public ProcessHandler(byte input[],Process process) {
 		this.input=input;
 		this.process = process;
@@ -51,11 +67,13 @@ public class ProcessHandler extends Thread implements ProcessProxy {
 	@Override
 	public void run() {
 		try { 
-			// don't close as main thread may be providing input.
+			// don't close without input as main thread may be providing input.
 			if( input != null ){
 				OutputStream stdin = process.getOutputStream();
 				try {
 					stdin.write(input);
+					// important to close here as process may be waiting for
+					// close of stdin.
 					stdin.close();
 				} catch (IOException e) {
 					input_exception=e;
@@ -113,10 +131,14 @@ public class ProcessHandler extends Thread implements ProcessProxy {
 	
 	@Override
 	public synchronized void start() {
+		// Maybe this should be in the run method
 		out = new InputStreamThread(process.getInputStream());
 		out.start();
 		err = new InputStreamThread(process.getErrorStream());
 		err.start();
+		
+		// Only use the timeout thread if this is running as a Thread not
+		// a runnable.
 		if( timeout != null ){
 			timeout.start();
 		}
