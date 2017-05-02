@@ -49,4 +49,15 @@ public class TableXMLGenerator implements XMLGenerator {
 		return builder;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		TextTableFormatter f = new TextTableFormatter(nf, t);
+		StringBuilder sb = new StringBuilder();
+		f.add(sb);
+		return sb.toString();
+	}
+
 }
