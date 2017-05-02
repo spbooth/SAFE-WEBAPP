@@ -20,7 +20,7 @@
 				</th>
 				<td>
 					<select name='Form' class='input' required='required'>
-						<option value='1'>TestForms.1</option>
+						<option value='1'>FirstForm</option>
 					</select>
 				</td>
 			</tr>

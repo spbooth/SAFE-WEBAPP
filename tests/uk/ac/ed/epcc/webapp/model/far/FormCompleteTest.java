@@ -105,7 +105,7 @@ public class FormCompleteTest<D extends DynamicForm,R extends PersonalResponseMa
 		setTransition(provider, provider.EDIT, new ResponseTarget(response, first_section));
 		
 		addParam(q.getName(), "Yes I stink");
-		setAction("Submit");
+		setAction(ResponseTransitionProvider.EditSectionTransition.SAVE_ACTION);
 		runTransition();
         // this should also be last section so will go to view page
 		checkViewRedirect(provider, new ResponseTarget(response, first));
@@ -164,7 +164,7 @@ public class FormCompleteTest<D extends DynamicForm,R extends PersonalResponseMa
 			
 			addParam(q1.getName(), "Yes I stink");
 			addParam(q2.getName(), "true");
-			setAction("Submit");
+			setAction(ResponseTransitionProvider.EditSectionTransition.SAVE_ACTION);
 			ByteArrayMimeStreamData msd = new ByteArrayMimeStreamData();
 			
 // Can't mock file-uploads yet

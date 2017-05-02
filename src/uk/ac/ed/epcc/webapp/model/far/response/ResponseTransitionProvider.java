@@ -163,7 +163,15 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 	public final ResponseTransitionKey<D, R> SUBMIT = new SubmitKey("Submit", "Submit form response");
 	
 	public class EditSectionTransition extends AbstractFormTransition<ResponseTarget<D, R>> implements CustomFormContent<ResponseTarget<D,R>>, FormTransition<ResponseTarget<D,R>>{
-
+		/**
+		 * 
+		 */
+		public static final String CANCEL_ACTION = "Cancel";
+		/**
+		 * 
+		 */
+		public static final String SAVE_ACTION = "Save";
+		
 		public class CancelAction extends FormAction{
 			/**
 			 * @param target
@@ -298,8 +306,8 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 				if( val != null ){
 					f.addValidator(val);
 				}
-				f.addAction("Save", new EditAction(target));
-				f.addAction("Cancel", new CancelAction(target));
+				f.addAction(SAVE_ACTION, new EditAction(target));
+				f.addAction(CANCEL_ACTION, new CancelAction(target));
 			}catch(Exception e){
 				getLogger().error("Error building form",e);
 				throw new TransitionException("Internal error");
