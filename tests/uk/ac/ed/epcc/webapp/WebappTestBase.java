@@ -47,6 +47,7 @@ import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.XMLPrinter;
 import uk.ac.ed.epcc.webapp.content.XMLWriter;
+import uk.ac.ed.epcc.webapp.email.MockTansport;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
@@ -334,5 +335,9 @@ public abstract class WebappTestBase implements ContextHolder{
 		 
 		 String differ = TestDataHelper.diff(expected, result);
 		 assertTrue("Unexpected result:\n"+differ,differ.trim().length()==0);
+	}
+	@Before
+	public void clearEmails() {
+		MockTansport.clear();
 	}
 }
