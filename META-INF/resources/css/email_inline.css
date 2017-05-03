@@ -25,7 +25,7 @@ td.LIME,  span.LIME{
 th{
 	background-color: #e7e7e7;
 }
-table {
+table, td, th {
 	border: solid black;
 	border-width: 1px;
 }
