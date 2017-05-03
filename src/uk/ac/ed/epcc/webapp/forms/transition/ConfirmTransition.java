@@ -35,6 +35,14 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 public class ConfirmTransition<T> implements ExtraFormTransition<T>{
+	/**
+	 * 
+	 */
+	public static final String NO = "No";
+	/**
+	 * 
+	 */
+	public static final String YES = "Yes";
 	private final DirectTransition<T> yes_transition;
 	private final DirectTransition<T> no_transition;
 	private final String name;
@@ -45,8 +53,8 @@ public class ConfirmTransition<T> implements ExtraFormTransition<T>{
 	}
 	public void buildForm(Form f, T target, AppContext c)
 			throws TransitionException {
-		f.addAction("Yes", new ChainAction<T>(target,c,yes_transition));
-		f.addAction("No", new ChainAction<T>(target,c,no_transition));
+		f.addAction(YES, new ChainAction<T>(target,c,yes_transition));
+		f.addAction(NO, new ChainAction<T>(target,c,no_transition));
 		
 		
 	}

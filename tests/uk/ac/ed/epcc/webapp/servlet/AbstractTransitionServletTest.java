@@ -38,6 +38,7 @@ import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.CustomPage;
 import uk.ac.ed.epcc.webapp.forms.transition.BaseFormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.CustomFormContent;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
 import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
@@ -448,5 +449,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		 return target;
 	}
 	
-	
+	public void setConfirmTransition(boolean yes_no){
+		setAction(yes_no ? ConfirmTransition.YES : ConfirmTransition.NO);
+	}
 }
