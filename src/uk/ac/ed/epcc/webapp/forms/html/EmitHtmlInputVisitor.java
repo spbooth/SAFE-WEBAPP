@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.inputs.AutoComplete;
@@ -56,6 +57,8 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	 */
 	private static final Preference USE_HTML5_FEATURE = new Preference("html5", true,"use html5 input types");
 	private static final Preference ESCAPE_UNICODE_FEATURE = new Preference("html.input.escape_unicode",false,"Escape high code point characters in input values");
+	private static final Feature USE_DATALIST = new Feature("html5.use_datalist",true,"Use html5 datalist syntax, disable to test the fallback mode (as if browser does not userstand datalist)");
+	
 	AppContext conn;
 	private SimpleXMLBuilder hb;
 	private boolean use_post;
@@ -71,7 +74,6 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 		this.post_params=post_params;
 		this.id_vis = new InputIdVisitor(prefix);
 		use_html5 = conn==null || USE_HTML5_FEATURE.isEnabled(conn);
-		
 	}
 	private void constantHTML(SimpleXMLBuilder hb,UnmodifiableInput input) {
 		String label = input.getLabel();
@@ -487,7 +489,8 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 				size = boxwid;
 			}
 			boolean autocomplete = input instanceof AutoComplete;
-
+			boolean use_datalist = autocomplete && use_html5 && USE_DATALIST.isEnabled(conn);
+			
 			if (wrapper != null) {
 				result.open("div");
 				result.attr("class", wrapper);
@@ -519,7 +522,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 				result.attr("value",default_value);
 			}
 			result.attr("class","input");
-			if ((autocomplete) && (use_html5)) {
+			if (use_datalist) {
 				// add list attribute
 				result.attr("list", name + "_list");
 			}
@@ -553,7 +556,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 						}
 					}
 				}
-				if( use_html5 && use_required ){
+				if( use_html5 && use_required && (use_datalist || ! autocomplete)){
 					if( ! (input instanceof OptionalInput) || ! ((OptionalInput) input).isOptional()){
 						//Note we have to set
 						// formnovalidate for non validating submit elements.
@@ -573,7 +576,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			
 			if (autocomplete) {
 				if (use_html5) {
-					emitDataList(result, (AutoComplete) input, name);
+					emitDataList(result, use_datalist,(AutoComplete) input, name);
 				}
 			}
 			if( wrapper != null){
@@ -629,13 +632,15 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	 * @param input
 	 * @param name
 	 */
-	private <T,V> void emitDataList(SimpleXMLBuilder result, AutoComplete<T,V> input, String name) {
+	private <T,V> void emitDataList(SimpleXMLBuilder result, boolean use_datalist, AutoComplete<T,V> input, String name) {
 		// add actual list of completions
 		
 		// can't put in noscritp as some browsers show all noscript contents as text.
 		
-		result.open("datalist");
-		result.attr("id", name + "_list");
+		if( use_datalist){
+			result.open("datalist");
+			result.attr("id", name + "_list");
+		}
 		// As susggested in the HTML standard if the datalist element is
 		// not recognised can use a select with the same input name as the text input
 		// if datalist is recognised then select element will have no effect
@@ -655,7 +660,9 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			}
 		}
 		result.close(); // select
-		result.close(); // datalist
+		if( use_datalist){
+			result.close(); // datalist
+		}
 		//result.close(); // noscript
 	}
 	/* (non-Javadoc)

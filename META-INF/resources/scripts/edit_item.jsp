@@ -30,6 +30,7 @@ if( item == null ){
 <%	
 	String page_title = service_name+"Edit Item";
 %>
+<wb:formpage/>
 <%@ include file="/std_header.jsf" %>
 <%@ include file="/main__logged_in.jsf" %>
 

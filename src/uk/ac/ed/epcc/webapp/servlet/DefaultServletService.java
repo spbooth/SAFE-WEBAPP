@@ -356,9 +356,18 @@ public class DefaultServletService implements ServletService{
 		// normal request parameters are higher precidence than those passed on the path
 		for (Enumeration e = req.getParameterNames(); e.hasMoreElements();) {
 			String key =  (String) e.nextElement();
-			Object data=req.getParameter(key);
-			if( data != null ){
-				h.put(key, data);
+			
+			String[] values = req.getParameterValues(key);
+			if( values.length == 1){
+				h.put(key, values[0]);
+			}else{
+				// Consider parameters with multiple values and take the first non empty one
+				for(String data : values){
+					if( data != null && ! data.isEmpty() ){
+						h.put(key, data);
+						break;
+					}
+				}
 			}
 		}
 		return h;

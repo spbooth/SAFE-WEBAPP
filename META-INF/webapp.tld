@@ -36,4 +36,8 @@
   	<rtexprvalue>true</rtexprvalue>
   	</attribute>
   </tag>
+  <tag>
+  	<name>formpage</name>
+  	<tag-class>uk.ac.ed.epcc.webapp.tags.WebappFormPage</tag-class>
+  </tag>
 </taglib>

@@ -73,6 +73,7 @@
 	log.debug("Showing login page");
 	String page_title = service_name+" "+website_name+" Login";
 %>
+<wb:formpage/>
 <%@ include file="/std_header.jsf"%>
 <%
     PasswordAuthComposite password_auth = fac.getComposite(PasswordAuthComposite.class);

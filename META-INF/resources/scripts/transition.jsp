@@ -28,6 +28,7 @@ the form could just submit to self. This might break form error reporting though
 <%@ page import="uk.ac.ed.epcc.webapp.forms.inputs.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.content.*" %>
 <%@ include file="/session.jsf" %>
+<wb:formpage/>
 <wb:css url="service_desk.css"/>
 <%
     TransitionFactory tp = TransitionServlet.getProvider(conn,request);

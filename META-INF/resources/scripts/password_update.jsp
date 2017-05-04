@@ -22,6 +22,7 @@
    import="uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*, uk.ac.ed.epcc.webapp.session.*"
 %>
 <%@ include file="/basic_session.jsf" %>
+<wb:formpage/>
 <%	
 	String page_title = "Change "+service_name+" "+website_name+" Password";
 	SessionService sess = conn.getService(SessionService.class);

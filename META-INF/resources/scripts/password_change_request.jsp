@@ -22,6 +22,7 @@
    import="uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*, uk.ac.ed.epcc.webapp.session.*,uk.ac.ed.epcc.webapp.forms.html.*"
 %>
 <%@ include file="/service_init.jsf" %>
+<wb:formpage/>
 <%	
 	String page_title = service_name+" Change "+website_name+" Password";
 	PageHTMLForm form = (PageHTMLForm) request.getAttribute("Form");

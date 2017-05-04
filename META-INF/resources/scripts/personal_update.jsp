@@ -27,6 +27,7 @@ Update personal details
 		request.setAttribute(NavigationMenuService.DISABLE_NAVIGATION_ATTR, Boolean.TRUE);
 	}
 %>
+<wb:formpage/>
 <%@ include file="/std_header.jsf" %>
 <%@page import="uk.ac.ed.epcc.webapp.forms.*" %>
 <%

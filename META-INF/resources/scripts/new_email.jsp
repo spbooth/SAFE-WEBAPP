@@ -19,6 +19,7 @@ details update.
 --%>
 <%@ include file="/basic_session.jsf" %>
 <%@ page import="uk.ac.ed.epcc.webapp.forms.*,uk.ac.ed.epcc.webapp.forms.html.*" %>
+<wb:formpage/>
 <%
 String page_title="Email Change Request";
 

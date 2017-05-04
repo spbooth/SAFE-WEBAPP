@@ -24,6 +24,7 @@ signup.jsp - Page used to sign up for an account using password auth.
 <%@ page import="java.util.*, uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*,uk.ac.ed.epcc.webapp.forms.html.*,uk.ac.ed.epcc.webapp.session.AppUserFactory"
 %>
 <%@page session="false" %>
+<wb:formpage/>
 <%@ include file="/service_init.jsf" %>
 <%
     if( conn == null ){

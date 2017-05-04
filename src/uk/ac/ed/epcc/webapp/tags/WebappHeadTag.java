@@ -220,4 +220,12 @@ public class WebappHeadTag extends TagSupport implements Tag {
 		}
 		stylesheets.add(conn.expandText(css));
 	}
+	/** mark a page as continaing a form.
+	 * This must be done before the header is generated
+	 * @see WebappFormPage
+	 * @param request
+	 */
+	public static void markAsFormPage(HttpServletRequest request){
+		request.setAttribute(FORM_PAGE_ATTR, Boolean.TRUE);
+	}
 }
