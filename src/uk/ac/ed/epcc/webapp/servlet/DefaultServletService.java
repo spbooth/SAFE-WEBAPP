@@ -362,8 +362,11 @@ public class DefaultServletService implements ServletService{
 				h.put(key, values[0]);
 			}else{
 				// Consider parameters with multiple values and take the first non empty one
+				// ignore pure whitespace too. This is really only used by the fall-back
+				// for auto-complete inputs. If the UA respects required but does not
+				// understand datalist of the JS fixup then a space can be added to the text box.
 				for(String data : values){
-					if( data != null && ! data.isEmpty() ){
+					if( data != null && ! data.trim().isEmpty() ){
 						h.put(key, data);
 						break;
 					}
