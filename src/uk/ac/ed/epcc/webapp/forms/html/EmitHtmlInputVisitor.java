@@ -22,7 +22,6 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.inputs.AutoComplete;
-import uk.ac.ed.epcc.webapp.forms.inputs.AutocompleteTextInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.BinaryInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
@@ -646,6 +645,12 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 		// if datalist is recognised then select element will have no effect
 		result.open("select");
 		result.attr("name", name);
+		
+		// Must have a not selected first entry
+		result.open("option");
+		result.attr("value", "");
+		result.clean("Not selected");
+		result.close();
 		Set<T> suggestions = input.getSuggestions();
 		if(suggestions!=null){
 			for(T item : suggestions){
