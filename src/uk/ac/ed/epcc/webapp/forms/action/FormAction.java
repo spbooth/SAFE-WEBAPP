@@ -62,6 +62,15 @@ String confirm = null;  //
 		return confirm;
 	}
 
+	/** Method to supply arguments to a form confirmation.
+	 * 
+	 * @param f Form calling action.
+	 * @return  null or arguement list
+	 */
+	public String[] getConfirmArgs(Form f){
+		return null;
+	}
+	
 	public void setConfirm(String c) {
 		confirm = c;
 	}

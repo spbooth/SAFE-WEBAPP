@@ -100,6 +100,7 @@ public class ServletFormResultVisitor implements WebFormResultVisitor{
 			ConfirmTransitionResult<T, K> res) throws Exception {
 		req.setAttribute(WebappServlet.CONFIRM_POST_URL, req.getContextPath()+TransitionServlet.getURL(conn, res.getProvider(),res.getTarget(),res.getTransition()));
 		req.setAttribute(WebappServlet.CONFIRM_TYPE,res.getType());
+		req.setAttribute(WebappServlet.ARGS, res.getArgs());
 		conn.getService(ServletService.class).forward(WebappServlet.SCRIPTS_CONFIRM_JSP);
 		return;
 	}

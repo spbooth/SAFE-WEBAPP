@@ -73,7 +73,7 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 		    		FormResult result=null;
 		    		String confirm_action = shortcut.getConfirm(f);
 		    		if( confirm_action != null ){
-						result = confirmTransition(req, conn, provider, tag, target,confirm_action,null);
+						result = confirmTransition(req, conn, provider, tag, target,confirm_action,shortcut.getConfirmArgs(f));
 						if( result != null ){
 							return result;
 						}
@@ -97,7 +97,8 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 		    	String confirm_action = f.mustConfirm(params);
 
 				if( confirm_action != null ){
-					FormResult result = confirmTransition(req, conn, provider, tag, target,confirm_action,null);
+					FormAction action = f.getAction(f.locateAction(params));
+					FormResult result = confirmTransition(req, conn, provider, tag, target,confirm_action,action.getConfirmArgs(f));
 					if( result != null ){
 						return result;
 					}
