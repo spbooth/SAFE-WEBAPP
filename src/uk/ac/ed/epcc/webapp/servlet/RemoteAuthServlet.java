@@ -49,7 +49,10 @@ import uk.ac.ed.epcc.webapp.session.WebNameFinder;
  *In this mode the user is redirected to a remote server. A session token will be included as the url parameter <b>token</b>.
  *The server should authenticate the user and (if successful) redirect back to this servlet setting the <b>auth_name</b> parameter to the authenticated
  *user. The response should also contain the <b>check_token</b> parameter which should be a hex encoded hash value calculated from the  concatenation of
- * the <i>user-name</i>, <i>the-token</i> and a <i>secret-value</i> shared between the two servers.  
+ * the <i>user-name</i>, <i>the-token</i> and a <i>secret-value</i> shared between the two servers.  Optionally the server can pre-pend the
+ * response with a salt string. In this case the salt should also be returned as a parameter named <b>salt</b>. Adding a salt to the check_token
+ * may make it harder for a malicious user to reverse engineer the check_token as the unknown parts of the input vary each call. This should not be required for a 
+ * well implemented hash function.  
  *<ul>
  *<li><b>remote_auth_server.url</b> A URL of a remote server the user will be redirected to. </li>
  *<li><b>remote_auth_server.secret</b> The shared secret.</li>
@@ -139,7 +142,7 @@ public class RemoteAuthServlet extends WebappServlet {
 						RandomService random_serv = conn.getService(RandomService.class);
 						token = random_serv.randomString(conn.getIntegerParameter("remote_auth_server.token_len", 64));
 						session_service.setAttribute(REMOTE_AUTH_TOKEN_ATTR, token);
-						// redirect to remote waht about non cookie sessions.
+						// redirect to remote what about non cookie sessions.
 						String redirect_url =auth_url+"?token="+token;
 						// Use method on Response as this is not an internal url.
 						res.sendRedirect(res.encodeRedirectURL(redirect_url));
@@ -152,7 +155,11 @@ public class RemoteAuthServlet extends WebappServlet {
 					// is actually from the authentication server
 					Hash h = conn.getEnumParameter(Hash.class, "remote_auth_server.hash", Hash.SHA512);
 					String auth_secret = conn.getInitParameter("remote_auth_server.secret");
-					if( check_token.equals(h.getHash(remote_name+token+auth_secret))){
+					String salt = (String) params.get("salt");
+					if( salt == null){
+						salt="";
+					}
+					if( check_token.equals(h.getHash(salt+remote_name+token+auth_secret))){
 						// all as expected set the web_name
 						web_name=remote_name;
 						session_service.removeAttribute(REMOTE_AUTH_TOKEN_ATTR);
