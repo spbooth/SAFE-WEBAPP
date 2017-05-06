@@ -1182,12 +1182,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	  
 	    }else{
 	    	// Non qualified name
-	    	if( person == null){
-	    		if( ! haveCurrentUser()){
-	    			// No target person to filter against
-	    			return new GenericBinaryFilter<T>(fac2.getTarget(),false);
-	    		}
-	    	}
+	    	
 	    	// direct roles can be un-qualified though not if we want multiple levels of qualification.
 	    	BaseFilter<? super T> result = makeDirectRelationshipRoleFilter(fac2, role,person,null);
 			if( result != null ){
@@ -1291,22 +1286,25 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	protected <T extends DataObject> BaseFilter<? super T> makeDirectRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,A person,BaseFilter<T> def) throws UnknownRelationshipException {
 		// look for directly implemented relations first
 		BaseFilter<? super T> result=null;
-	    if( fac2 instanceof AccessRoleProvider){  // first check factory itself.
-	    	result = ((AccessRoleProvider<A,T>)fac2).hasRelationFilter(role,person == null ? getCurrentPerson():person);
-	    	if( result != null){
-	    		return result;
-	    	}
-	    }
-	    // then check composites
-	    for(AccessRoleProvider prov : fac2.getComposites(AccessRoleProvider.class)){
-	    	result = prov.hasRelationFilter( role,person==null?getCurrentPerson():person);
-	    	if( result != null){
-	    		return result;
-	    	}
-	    }
-	    result = makeNamedFilter(fac2, role);
+		result = makeNamedFilter(fac2, role);
 	    if( result != null){
 	    	return result;
+	    }
+	    if( person != null || haveCurrentUser()){
+
+	    	if( fac2 instanceof AccessRoleProvider){  // first check factory itself.
+	    		result = ((AccessRoleProvider<A,T>)fac2).hasRelationFilter(role,person == null ? getCurrentPerson():person);
+	    		if( result != null){
+	    			return result;
+	    		}
+	    	}
+	    	// then check composites
+	    	for(AccessRoleProvider prov : fac2.getComposites(AccessRoleProvider.class)){
+	    		result = prov.hasRelationFilter( role,person==null?getCurrentPerson():person);
+	    		if( result != null){
+	    			return result;
+	    		}
+	    	}
 	    }
 	    
 	    // Its not one of the directly implemented roles maybe its derived
