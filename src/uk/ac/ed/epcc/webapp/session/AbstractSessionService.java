@@ -36,6 +36,7 @@ import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -1368,6 +1369,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	}
 	@Override
 	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target, String role) throws UnknownRelationshipException {
+		
 		// For the moment we only cache relationships within a request
 		// to avoid stale values as a users state changes
 		if( relationship_map == null && CACHE_RELATIONSHIP_FEATURE.isEnabled(getContext())){
@@ -1377,7 +1379,13 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		if( relationship_map != null && relationship_map.containsKey(tag)){
 			return relationship_map.get(tag).booleanValue();
 		}
-		boolean result = fac.matches(getRelationshipRoleFilter(fac, role), target);
+		FalseFilter<T> fallback = null;
+		if( ! haveCurrentUser() ){
+				// A missing person will act like a missing role 
+			    // without a fallback.
+				fallback= new FalseFilter<>(fac.getTarget());
+		}
+		boolean result = fac.matches(getRelationshipRoleFilter(fac, role,fallback), target);
 		if( relationship_map != null ){
 			relationship_map.put(tag, result);
 		}
