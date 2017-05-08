@@ -334,7 +334,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		 */
 		@Override
 		public Map<String, Object> addDefaults(Map<String,Object> h) {
-			h.put(DatabasePasswordComposite.p_status.getField(), DatabasePasswordComposite.FIRST.getTag());
+			h.put(DatabasePasswordComposite.p_status.getField(), DatabasePasswordComposite.INVALID.getTag());
 			h.put(PASSWORD,"locked");
 			return h;
 		}
@@ -636,7 +636,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			TableSpecification s, String table) {
 		AppContext ctx=getContext();
 		s.setField(DatabasePasswordComposite.PASSWORD_FAILS, new IntegerFieldType(false, 0));
-		s.setField(DatabasePasswordComposite.p_status.getField(), DatabasePasswordComposite.p_status.getFieldType(DatabasePasswordComposite.FIRST));
+		s.setField(DatabasePasswordComposite.p_status.getField(), DatabasePasswordComposite.p_status.getFieldType(DatabasePasswordComposite.INVALID));
 		s.setField(DatabasePasswordComposite.SALT, new StringFieldType(false, "", ctx.getIntegerParameter("password.salt_length", 16)));
 		Hash h = Hash.getDefault(ctx);
 		s.setField(DatabasePasswordComposite.ALG, new IntegerFieldType(false, h.ordinal()));
