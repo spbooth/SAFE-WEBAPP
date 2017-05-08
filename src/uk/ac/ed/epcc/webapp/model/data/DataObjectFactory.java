@@ -1312,7 +1312,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return hashtable of default properties
 	 */
 	protected Map<String, Object> getDefaults() {
-		return new HashMap<String,Object>();
+		HashMap<String, Object> defaults = new HashMap<String,Object>();
+		for(TableStructureContributer<BDO> t : getTableStructureContributers()){
+			t.addDefaults(defaults);
+		}
+		return defaults;
 	}
 
 	

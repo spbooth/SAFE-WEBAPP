@@ -249,6 +249,7 @@ public abstract class WebappTestBase implements ContextHolder{
 		String expected = XMLDataUtils.transform(t,getClass(), expected_xml);
 		System.out.println("Expected: "+expected);
 		String result = XMLDataUtils.transform(t, diff.toString());
+		//System.out.println("Got: "+result);
 		String differ = TestDataHelper.diff(expected, result);
 		assertTrue("Unexpected result:\n"+differ,differ.trim().length()==0);
 	}

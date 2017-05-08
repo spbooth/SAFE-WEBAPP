@@ -60,12 +60,6 @@ public class SignupDateComposite<BDO extends DataObject> extends CreateComposite
 	}
 
 
-	@Override
-	public Map<String, Object> addDefaults(Map<String, Object> defaults) {
-		defaults.put(SIGNUP_DATE, new Long(System.currentTimeMillis() / 1000));
-		return defaults;
-	}
-
 
 	@Override
 	public TableSpecification modifyDefaultTableSpecification(TableSpecification spec, String table) {
