@@ -115,7 +115,9 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
         	
     	
     		SQLContext c = conn.getService(DatabaseService.class).getSQLContext();
-			
+			if( c == null){
+				return;
+			}
 			LinkedList<Object> args = new LinkedList<Object>();	
 			 
 			text = createTableText(name, s, c, args);
