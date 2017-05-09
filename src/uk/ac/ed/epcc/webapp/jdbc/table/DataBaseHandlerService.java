@@ -174,10 +174,13 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 		vis.visitAutoIncrement();
 		sb.append(",\n");
 		for(String s2: s.getFieldNames()){
-			c.quote(sb,s2);
-			sb.append(" ");
-			s.getField(s2).accept(vis);
-			sb.append(",\n");
+			FieldType field = s.getField(s2);
+			if( ! ( field instanceof PlaceHolderFieldType)){
+				c.quote(sb,s2);
+				sb.append(" ");
+				field.accept(vis);
+				sb.append(",\n");
+			}
 		}
 		sb.append("PRIMARY KEY (");
 		c.quote(sb,s.getPrimaryKey());
