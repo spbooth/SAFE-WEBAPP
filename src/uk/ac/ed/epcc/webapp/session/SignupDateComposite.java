@@ -14,19 +14,15 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import java.util.Date;
-import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.forms.Form;
-import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.CreateComposite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.forms.CreateTemplate;
 
 /** Add a field to record the date the record was created.
  * @author spb
@@ -41,7 +37,7 @@ public class SignupDateComposite<BDO extends DataObject> extends CreateComposite
 	/**
 	 * @param fac
 	 */
-	protected SignupDateComposite(DataObjectFactory<BDO> fac) {
+	public SignupDateComposite(DataObjectFactory<BDO> fac) {
 		super(fac);
 		// TODO Auto-generated constructor stub
 	}
