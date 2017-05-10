@@ -36,8 +36,12 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * functionality based on those fields.
  * <p>
  * For this class to affect the table specification it needs to be registered before the
- * {@link DataObjectFactory#setContext(uk.ac.ed.epcc.webapp.AppContext, String)}method is called
- * for example by creating the composite during field initialisation.
+ * {@link DataObjectFactory#setContext(uk.ac.ed.epcc.webapp.AppContext, String)}method is called.
+ * The easiest way to do this is to specify them as configuration parameters.
+ * You <i>can</i> create the composite during field initialisation. If you do this you <em>MUST</em>
+ * call the setContext method from the constructor body in the same class not recurse to the superclass constructor that calls setContext.
+ * This is because superclass constructors run before field initialisation but local constructor bodies run afterwards.
+ * 
  * <p>
  * {@link Composite}s that have a single argument constructor that takes the 
  * {@link DataObjectFactory} as the argument (optionally followed by a String), can be added to a factory 
