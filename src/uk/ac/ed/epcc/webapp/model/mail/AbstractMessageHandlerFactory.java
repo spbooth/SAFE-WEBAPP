@@ -215,7 +215,14 @@ public abstract class AbstractMessageHandlerFactory<H extends AbstractMessageHan
 		@Override
 		public void repopulate(SessionService<?> operator) throws Exception {
 			Emailer es = new Emailer(getContext());
-			MimeMessage m = es.makeBlankEmail(getContext(), provider.getdefaultRecipients(), new InternetAddress(getContext().getService(SessionService.class).getCurrentPerson().getEmail()), null);
+			InternetAddress from = null;
+			if( operator.haveCurrentUser()){
+				String email = operator.getCurrentPerson().getEmail();
+				if( email != null){
+					from = new InternetAddress(email);
+				}
+			}
+			MimeMessage m = es.makeBlankEmail(getContext(), provider.getdefaultRecipients(), from, null);
 			MimeMultipart mp = new MimeMultipart("mixed");
 			  MimeBodyPart mbp = new MimeBodyPart();
 			  mbp.setText("");

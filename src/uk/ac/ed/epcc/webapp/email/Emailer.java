@@ -176,7 +176,12 @@ public class Emailer {
 		}
 		email_template.setProperty("person.name", person.getName());
 		email_template.setProperty("person.password", new_password);
-		email_template.setProperty("person.email", person.getEmail());
+		String email = person.getEmail();
+		if( email == null){
+			getLogger().error("New password for user with null email "+person.getIdentifier());;
+			return;
+		}
+		email_template.setProperty("person.email", email);
 		if( PASSWORD_RESET_SERVLET.isEnabled(ctx)){
 			PasswordChangeRequestFactory fac = new PasswordChangeRequestFactory(ctx.getService(SessionService.class).getLoginFactory());
 			PasswordChangeRequest request = fac.createRequest(person);
@@ -244,7 +249,12 @@ public class Emailer {
 		}
 		email_template.setProperty("person.name", name);
 		email_template.setProperty("person.password", new_password);
-		email_template.setProperty("person.email", person.getEmail());
+		String email = person.getEmail();
+		if( email == null){
+			getLogger().error("Signup email destination not known "+person.getIdentifier());;
+			return;
+		}
+		email_template.setProperty("person.email", email);
 		if( PASSWORD_RESET_SERVLET.isEnabled(ctx)){
 			PasswordChangeRequestFactory fac = new PasswordChangeRequestFactory(ctx.getService(SessionService.class).getLoginFactory());
 			PasswordChangeRequest request = fac.createRequest(person);
