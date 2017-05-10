@@ -14,6 +14,10 @@
 package uk.ac.ed.epcc.webapp.session;
 
 /** A {@link SignupDateComposite} that implements {@link RegisterTrigger}
+ * 
+ * This is used to force an auto-created account to the registration page the first time
+ * a user logs in. Normally only mekes sense when used with mandatory external auth
+ * but still capturing user meta-data at registration.
  * @author spb
  *
  */

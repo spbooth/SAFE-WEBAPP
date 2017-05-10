@@ -24,6 +24,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
+import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
 
@@ -37,7 +38,7 @@ import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
  *
  */
 
-public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,EmailNameFinder<AU>> implements HistoryFieldContributor{
+public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,EmailNameFinder<AU>> implements HistoryFieldContributor,SummaryContributer<AU>{
 
 	/** property to set the email input box width
 	 * 
@@ -166,6 +167,20 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		if( ! Emailer.checkAddress(name)){
 			throw new ParseException("Not a valid email address");
 		}
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.SummaryContributer#addAttributes(java.util.Map, uk.ac.ed.epcc.webapp.model.data.DataObject)
+	 */
+	@Override
+	public void addAttributes(Map<String, Object> attributes, AU target) {
+		String email = target.getEmail();
+		if( email != null){
+			attributes.put(EMAIL, email);
+		}
+		
 	}
 
 

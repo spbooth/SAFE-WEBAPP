@@ -89,9 +89,8 @@ import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> implements RequiredPageProvider<AU>,NameFinder<AU> ,RegisterTrigger<AU>
 {
 	
-	EmailNameFinder<AU> email_finder = new EmailNameFinder<AU>(this);
-	WebNameFinder<AU> web_name_finder = new WebNameFinder<AU>(this);
-	RegistrationDateComposite<AU> signup_date = new RegistrationDateComposite<AU>(this);
+	
+	//RegistrationDateComposite<AU> signup_date = new RegistrationDateComposite<AU>(this);
 	/**
 	 * 
 	 */
