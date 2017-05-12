@@ -319,7 +319,7 @@ div.block table table.auto td, div.block table table.auto th{
 */
 
 
-table.compact {
+div.block > table.compact, table.compact {
 	    border: none;
 		border-spacing: 0;
 		margin: 3px 0px;	

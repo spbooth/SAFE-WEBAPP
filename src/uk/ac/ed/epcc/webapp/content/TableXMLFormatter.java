@@ -140,7 +140,7 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 			boolean first_col = true;
 			int col=0;
 			if (t.printKeys()) {
-				hb.open("td", new String[][]{
+				hb.open(t.isPrintHeadings()?"td":"th", new String[][]{
 						{ "class","key"},
 						{"count",Integer.toString(col++)}
 						});
