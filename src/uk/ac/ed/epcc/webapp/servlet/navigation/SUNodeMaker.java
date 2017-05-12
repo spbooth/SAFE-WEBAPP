@@ -16,12 +16,10 @@ package uk.ac.ed.epcc.webapp.servlet.navigation;
 import java.util.HashSet;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.config.FilteredProperties;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.MenuContributor;
-import uk.ac.ed.epcc.webapp.session.RoleNodeMaker;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
@@ -31,9 +29,6 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 public class SUNodeMaker extends AbstractNodeMaker  {
 
-	public static final Feature UPDATE_DETAILS_FEATURE = new Feature("update_person_details", true, "The auto generated person menu contains a link to update personal details");
-	public static final Feature PREFERENCE_MENU_FEATURE = new Feature("person_menu.preferences", true, "The auto generated person menu contains a link to preference transitions");
-	public static final Feature TOGGLE_ROLE_MENU_FEATURE = new Feature("person_menu.toggle_roles", true, "The auto generated person menu contains role toggle buttons");
 	/**
 	 * @param conn 
 	 * 
@@ -50,24 +45,21 @@ public class SUNodeMaker extends AbstractNodeMaker  {
 	@Override
 	public Node makeNode(String name, FilteredProperties props) {
 		SUNode n = new SUNode();
-		addChildrenFromComposite(n);
-		if( UPDATE_DETAILS_FEATURE.isEnabled(getContext())){
-			Node u = new ParentNode();
-			u.setMenuText("Update personal details");
-			u.setHelpText("Update the information we hold about you");
-			u.setTargetPath("/scripts/personal_update.jsp");
-			n.addChild(u);
+		addChildrenFromComposite(n,props);
+		String additions = props.getProperty(name+".head", "Details");
+		if( additions != null){
+			addConfigNodes(n, props, additions.split(","));
 		}
 		return n;
 	}
 	
-	private <AU extends AppUser> void addChildrenFromComposite(Node parent){
+	private <AU extends AppUser> void addChildrenFromComposite(Node parent,FilteredProperties props){
 		SessionService<AU> service = getContext().getService(SessionService.class);
 		AppUserFactory<AU> fac = service.getLoginFactory();
 		AU user = service.getCurrentPerson();
 		
 		for(MenuContributor<AU> mc : fac.getComposites(MenuContributor.class)){
-			mc.addMenuItems(parent, user);
+			addConfigNodes(parent, props, mc.additionalMenuItems(user));
 		}
 	}
 
@@ -78,21 +70,30 @@ public class SUNodeMaker extends AbstractNodeMaker  {
 	 */
 	@Override
 	public void addChildren(Node parent, String name, FilteredProperties props) {
-		if( PREFERENCE_MENU_FEATURE.isEnabled(getContext())){
-			Node p = new ParentNode();
-			p.setMenuText("Preferences");
-			p.setTargetPath("/TransitionServlet/Preferences");
-			parent.addChild(p);
+		String additions = props.getProperty(name+".tail", "Preferences,Role");
+		if( additions != null){
+			addConfigNodes(parent, props, additions.split(","));
 		}
-		if(TOGGLE_ROLE_MENU_FEATURE.isEnabled(getContext())){
-			// Use menu props
-			NavigationMenuService serv = getContext().getService(NavigationMenuService.class);
-			Node r = serv.makeNode(new HashSet<String>(), "Role", props);
+	}
+
+
+
+	/**
+	 * @param parent
+	 * @param props
+	 * @param role
+	 */
+	public void addConfigNodes(Node parent, FilteredProperties props, String names[]) {
+		if(names==null || names.length == 0){
+			return;
+		}
+		NavigationMenuService serv = getContext().getService(NavigationMenuService.class);
+				for(String role: names){
+			Node r = serv.makeNode(new HashSet<String>(), role, props);
 			if( r != null){
 				parent.addChild(r);
 			}
 		}
-		
 	}
 
 }

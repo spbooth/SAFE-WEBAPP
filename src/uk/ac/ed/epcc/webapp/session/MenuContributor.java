@@ -13,19 +13,16 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
-import uk.ac.ed.epcc.webapp.servlet.navigation.NodeContainer;
-
 /** An interface for {@link AppUserComposite}s that add specific actions to the person menu
  * @author spb
  * @param <AU> 
  *
  */
 public interface MenuContributor<AU extends AppUser> {
-	/** Adds additional menu items appropriate to the user
+	/** Returns id names of additional menu items appropriate to the user
 	 * 
-	 * @param parent {@link NodeContainer} to add too.
 	 * @param user current {@link AppUser}
 	 */
-	public void addMenuItems(NodeContainer parent, AU user);
+	public String[] additionalMenuItems(AU user);
 
 }

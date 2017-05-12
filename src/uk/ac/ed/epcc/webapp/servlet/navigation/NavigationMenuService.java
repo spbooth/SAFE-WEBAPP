@@ -45,7 +45,15 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * <li> <b>navigation.<em>name</em>.list</b> - comma separated list of additional child node names</li> 
  * <li> <b>navigation.<em>name</em>.type</b> - type of {@link NodeMaker} to make node</li> 
  * <li> <b>navigation.<em>name</em>.path</b> - path to set for the node</li> 
- * <li> <b>navigation.<em>name</em>.replacement<b> - Name of a node to substitute if the {@link NodeMaker} returns null. The configuration properties of the original node are not automatically inherited. 
+ * <li> <b>navigation.<em>name</em>.help</b> - tooltip help text</li> 
+ * <li> <b>navigation.<em>name</em>.path</b> - path to set for the node</li> 
+ * <li> <b>navigation.<em>name</em>.role</b> - Role user must have to see item</li> 
+ * <li> <b>navigation.<em>name</em>.require_feature</b> - Feature that must be enabled to see item</li> 
+ * <li> <b>navigation.<em>name</em>.disable_feature</b> - Feature that must be disabled to see item</li> 
+ * <li> <b>navigation.<em>name</em>.require_parameter</b> - config parameter that must be non null to see item</li> 
+ * <li> <b>navigation.<em>name</em>.image</b> - image name for menu item</li>
+ * <li> <b>navigation.<em>name</em>.access_key</b> - access_key the node</li> 
+ * <li> <b>navigation.<em>name</em>.replacement</b> - Name of a node to substitute if the {@link NodeMaker} returns null. The configuration properties of the original node are not automatically inherited. 
  * </ul>
  * @author spb
  *

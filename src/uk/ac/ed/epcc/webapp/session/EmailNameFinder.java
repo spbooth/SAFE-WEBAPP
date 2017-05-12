@@ -27,9 +27,6 @@ import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
-import uk.ac.ed.epcc.webapp.servlet.navigation.Node;
-import uk.ac.ed.epcc.webapp.servlet.navigation.NodeContainer;
-import uk.ac.ed.epcc.webapp.servlet.navigation.ParentNode;
 
 /** A {@link AppUserNameFinder} to handle users canonical Email
  * 
@@ -192,16 +189,11 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 	 * @see uk.ac.ed.epcc.webapp.session.MenuContributor#addMenuItems(uk.ac.ed.epcc.webapp.servlet.navigation.NodeContainer, uk.ac.ed.epcc.webapp.session.AppUser)
 	 */
 	@Override
-	public void addMenuItems(NodeContainer parent, AU user) {
+	public String[] additionalMenuItems( AU user) {
 		if( user == null || ! active()){
-			return;
+			return new String[0];
 		}
-		Node n = new ParentNode();
-		n.setMenuText("Update email");
-		n.setHelpText("Change the email address we use to contact you");
-		n.setTargetPath("/scripts/new_email.jsp");
-		parent.addChild(n);
-		
+		return new String[]{"Email"};
 	}
 
 
