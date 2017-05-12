@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet.navigation;
 
+import java.util.HashSet;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.config.FilteredProperties;
@@ -83,10 +85,10 @@ public class SUNodeMaker extends AbstractNodeMaker  {
 			parent.addChild(p);
 		}
 		if(TOGGLE_ROLE_MENU_FEATURE.isEnabled(getContext())){
-			RoleNodeMaker maker = new RoleNodeMaker(getContext());
-			Node r = maker.makeNode("Role", props); // Note these are the props for the person menu
+			// Use menu props
+			NavigationMenuService serv = getContext().getService(NavigationMenuService.class);
+			Node r = serv.makeNode(new HashSet<String>(), "Role", props);
 			if( r != null){
-				maker.addChildren(r, "Role", props);
 				parent.addChild(r);
 			}
 		}
