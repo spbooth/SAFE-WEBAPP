@@ -98,11 +98,19 @@ public abstract class Node extends NodeContainer implements Externalizable{
 	 */
 	public String getTargetPath(AppContext conn) {
 
-		if( target_url == null && AUTO_LANDING_FEATURE.isEnabled(conn)){
+		if( useLandingPage(conn)){
 			return "/scripts/landingpage.jsp?MenuNode="+getID();
 		}
 
 		return target_url;
+	}
+
+	/**
+	 * @param conn
+	 * @return
+	 */
+	public boolean useLandingPage(AppContext conn) {
+		return target_url == null && AUTO_LANDING_FEATURE.isEnabled(conn);
 	}
 
 	/** get the full url for the target location

@@ -27,6 +27,9 @@ import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
+import uk.ac.ed.epcc.webapp.servlet.navigation.Node;
+import uk.ac.ed.epcc.webapp.servlet.navigation.NodeContainer;
+import uk.ac.ed.epcc.webapp.servlet.navigation.ParentNode;
 
 /** A {@link AppUserNameFinder} to handle users canonical Email
  * 
@@ -38,7 +41,7 @@ import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
  *
  */
 
-public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,EmailNameFinder<AU>> implements HistoryFieldContributor,SummaryContributer<AU>{
+public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,EmailNameFinder<AU>> implements HistoryFieldContributor,SummaryContributer<AU>,MenuContributor<AU>{
 
 	/** property to set the email input box width
 	 * 
@@ -180,6 +183,24 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		if( email != null){
 			attributes.put(EMAIL, email);
 		}
+		
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.session.MenuContributor#addMenuItems(uk.ac.ed.epcc.webapp.servlet.navigation.NodeContainer, uk.ac.ed.epcc.webapp.session.AppUser)
+	 */
+	@Override
+	public void addMenuItems(NodeContainer parent, AU user) {
+		if( user == null || ! active()){
+			return;
+		}
+		Node n = new ParentNode();
+		n.setMenuText("Update email");
+		n.setHelpText("Change the email address we use to contact you");
+		n.setTargetPath("/scripts/new_email.jsp");
+		parent.addChild(n);
 		
 	}
 

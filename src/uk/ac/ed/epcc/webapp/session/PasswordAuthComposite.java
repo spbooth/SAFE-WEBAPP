@@ -16,6 +16,9 @@ package uk.ac.ed.epcc.webapp.session;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.servlet.navigation.Node;
+import uk.ac.ed.epcc.webapp.servlet.navigation.NodeContainer;
+import uk.ac.ed.epcc.webapp.servlet.navigation.ParentNode;
 
 /** An abstract {@link Composite} that implements password authentication.
  * If a {@link AppUserFactory} contains a composite of this type then it supports password authentication
@@ -25,7 +28,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  *
  */
 
-public abstract class PasswordAuthComposite<T extends AppUser> extends AppUserComposite<T, PasswordAuthComposite<T>> {
+public abstract class PasswordAuthComposite<T extends AppUser> extends AppUserComposite<T, PasswordAuthComposite<T>> implements MenuContributor<T> {
 	
 
 	/**
@@ -134,6 +137,21 @@ public abstract class PasswordAuthComposite<T extends AppUser> extends AppUserCo
 	 */
 	public boolean doWelcome(T person) {
 		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.session.MenuContributor#addMenuItems(uk.ac.ed.epcc.webapp.servlet.navigation.NodeContainer, uk.ac.ed.epcc.webapp.session.AppUser)
+	 */
+	@Override
+	public void addMenuItems(NodeContainer parent, T target) {
+		if( target == null || ! canResetPassword(target)){
+			return;
+		}
+		Node n = new ParentNode();
+		n.setMenuText(getContext().expandText("Change ${service.website-name} password"));
+		n.setHelpText("Update the password for this web-site");
+		n.setTargetPath("/password_update.jsp");
+		parent.addChild(n);
 	}
 	
 }

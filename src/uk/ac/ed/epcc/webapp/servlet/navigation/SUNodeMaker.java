@@ -15,6 +15,10 @@ package uk.ac.ed.epcc.webapp.servlet.navigation;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.config.FilteredProperties;
+import uk.ac.ed.epcc.webapp.session.AppUser;
+import uk.ac.ed.epcc.webapp.session.AppUserFactory;
+import uk.ac.ed.epcc.webapp.session.MenuContributor;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
  * @author spb
@@ -38,7 +42,19 @@ public class SUNodeMaker extends AbstractNodeMaker  {
 	 */
 	@Override
 	public Node makeNode(String name, FilteredProperties props) {
-		return new SUNode();
+		SUNode n = new SUNode();
+		addChildrenFromComposite(n);
+		return n;
+	}
+	
+	private <AU extends AppUser> void addChildrenFromComposite(Node parent){
+		SessionService<AU> service = getContext().getService(SessionService.class);
+		AppUserFactory<AU> fac = service.getLoginFactory();
+		AU user = service.getCurrentPerson();
+		
+		for(MenuContributor<AU> mc : fac.getComposites(MenuContributor.class)){
+			mc.addMenuItems(parent, user);
+		}
 	}
 
 }
