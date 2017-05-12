@@ -14,10 +14,12 @@
 package uk.ac.ed.epcc.webapp.servlet.navigation;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.config.FilteredProperties;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.MenuContributor;
+import uk.ac.ed.epcc.webapp.session.RoleNodeMaker;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
@@ -27,6 +29,9 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 public class SUNodeMaker extends AbstractNodeMaker  {
 
+	public static final Feature UPDATE_DETAILS_FEATURE = new Feature("update_person_details", true, "The auto generated person menu contains a link to update personal details");
+	public static final Feature PREFERENCE_MENU_FEATURE = new Feature("person_menu.preferences", true, "The auto generated person menu contains a link to preference transitions");
+	public static final Feature TOGGLE_ROLE_MENU_FEATURE = new Feature("person_menu.toggle_roles", true, "The auto generated person menu contains role toggle buttons");
 	/**
 	 * @param conn 
 	 * 
@@ -44,6 +49,13 @@ public class SUNodeMaker extends AbstractNodeMaker  {
 	public Node makeNode(String name, FilteredProperties props) {
 		SUNode n = new SUNode();
 		addChildrenFromComposite(n);
+		if( UPDATE_DETAILS_FEATURE.isEnabled(getContext())){
+			Node u = new ParentNode();
+			u.setMenuText("Update personal details");
+			u.setHelpText("Update the information we hold about you");
+			u.setTargetPath("/scripts/personal_update.jsp");
+			n.addChild(u);
+		}
 		return n;
 	}
 	
@@ -55,6 +67,30 @@ public class SUNodeMaker extends AbstractNodeMaker  {
 		for(MenuContributor<AU> mc : fac.getComposites(MenuContributor.class)){
 			mc.addMenuItems(parent, user);
 		}
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.servlet.navigation.AbstractNodeMaker#addChildren(uk.ac.ed.epcc.webapp.servlet.navigation.Node, java.lang.String, uk.ac.ed.epcc.webapp.config.FilteredProperties)
+	 */
+	@Override
+	public void addChildren(Node parent, String name, FilteredProperties props) {
+		if( PREFERENCE_MENU_FEATURE.isEnabled(getContext())){
+			Node p = new ParentNode();
+			p.setMenuText("Preferences");
+			p.setTargetPath("/TransitionServlet/Preferences");
+			parent.addChild(p);
+		}
+		if(TOGGLE_ROLE_MENU_FEATURE.isEnabled(getContext())){
+			RoleNodeMaker maker = new RoleNodeMaker(getContext());
+			Node r = maker.makeNode("Role", props); // Note these are the props for the person menu
+			if( r != null){
+				maker.addChildren(r, "Role", props);
+				parent.addChild(r);
+			}
+		}
+		
 	}
 
 }

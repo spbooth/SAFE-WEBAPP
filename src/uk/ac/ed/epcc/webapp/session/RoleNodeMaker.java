@@ -17,14 +17,19 @@ import java.util.Iterator;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.config.FilteredProperties;
 import uk.ac.ed.epcc.webapp.servlet.navigation.AbstractNodeMaker;
 import uk.ac.ed.epcc.webapp.servlet.navigation.Node;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NodeMaker;
 import uk.ac.ed.epcc.webapp.servlet.navigation.PageNode;
 import uk.ac.ed.epcc.webapp.servlet.navigation.ParentNode;
+import uk.ac.ed.epcc.webapp.servlet.navigation.SUNodeMaker;
 
 /** A {@link NodeMaker} that adds role toggle links.
+ * 
+ * This can be invoked using configuration parameters
+ * or called directly by {@link SUNodeMaker} under control of a {@link Feature}
  * @author spb
  *
  */

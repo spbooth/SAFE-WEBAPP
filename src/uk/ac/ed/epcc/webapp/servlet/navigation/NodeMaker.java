@@ -31,6 +31,10 @@ public interface NodeMaker extends Contexed{
 	 * This is allowed to return null to indicate that nodes of this type are disabled/empty and should be
 	 * suppressed. The {@link NavigationMenuService} can be configured to substitute a different node
 	 * in this case (for example to host child nodes added by the configuration). 
+	 * <p>
+	 * Automatic child nodes can be added in this method and will appear first. Followed by nodes from the configuration
+	 * then nodes from {@link #addChildren(Node, String, FilteredProperties)}
+	 * 
 	 * @param name  name of the node 
 	 * @param props {@link FilteredProperties} containing the navigation menu configuration
 	 * @return {@link Node}
@@ -41,7 +45,9 @@ public interface NodeMaker extends Contexed{
 	 * 
 	 * This is intended for {@link Node}s based on the current user or their roles.
 	 * It is a separate method so the dynamically generated nodes are added after any 
-	 * specified in the configuration.
+	 * specified in the configuration. Dynamic nodes that should appear first can be
+	 * added directly in {@link #makeNode(String, FilteredProperties)}
+	 * 
 	 * 
 	 * @param parent
 	 * @param name

@@ -16,23 +16,18 @@ package uk.ac.ed.epcc.webapp.preferences;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.apache.tomcat.util.digester.SetPropertiesRule;
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.Table;
-import uk.ac.ed.epcc.webapp.content.Table.Col;
 import uk.ac.ed.epcc.webapp.content.Transform;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
-import uk.ac.ed.epcc.webapp.forms.inputs.BooleanInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.OnOffInput;
-import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.CustomPageResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.IndexTransitionResult;
