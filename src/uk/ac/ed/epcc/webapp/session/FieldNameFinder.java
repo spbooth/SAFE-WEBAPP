@@ -36,6 +36,7 @@ import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
  * <li> <em><b>NameFinder.</b>realm<b>.field</b></em> field name defaults to realm.</li> 
  * <li> <em><b>NameFinder.</b>realm<b>.label</b></em> label defaults to realm.</li> 
  * <li> <em><b>NameFinder.</b>realm<b>.user_supplied</b></em> Is name user supplied default false</li> 
+ * <li> <em><b>NameFinder.</b>realm<b>.user_visible</b></em> Is name user visible default as <b>user_supplied</b></li> 
  * <li> <em><b>NameFinder.</b>realm<b>.length</b></em> field width.</li> 
  * @author spb
  *
@@ -95,7 +96,7 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 
 	@Override
 	public boolean userVisible() {
-		return getContext().getBooleanParameter(PROPERTY_PREFIX+getRealm()+".user_supplied", false);
+		return getContext().getBooleanParameter(PROPERTY_PREFIX+getRealm()+".user_visible", userSet());
 	}
 
 	@Override
@@ -135,7 +136,7 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	}
 
 	protected boolean userSet() {
-		return userVisible();
+		return getContext().getBooleanParameter(PROPERTY_PREFIX+getRealm()+".user_supplied", false);
 	}
 
 	@Override

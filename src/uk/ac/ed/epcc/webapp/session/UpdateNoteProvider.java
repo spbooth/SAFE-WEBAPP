@@ -21,13 +21,14 @@ import uk.ac.ed.epcc.webapp.model.data.Composite;
  *
  */
 
-public interface UpdateNoteProvider {
+public interface UpdateNoteProvider<T extends AppUser> {
 	/** add Notes to be included in a signup/update form.
 	 * This is included within the block element above the
 	 * form.
 	 * 
 	 * @param cb
+	 * @param user
 	 * @return
 	 */
-	public <CB extends ContentBuilder> CB addUpdateNotes(CB cb);
+	public <CB extends ContentBuilder> CB addUpdateNotes(CB cb,T user);
 }

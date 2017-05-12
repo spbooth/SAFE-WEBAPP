@@ -328,10 +328,10 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 	 * @param cb
 	 * @return
 	 */
-	public <CB extends ContentBuilder> CB addUpdateNotes(CB cb){
+	public <CB extends ContentBuilder> CB addUpdateNotes(CB cb,AU target){
 		for(Composite<AU,?> c : getComposites()){
 			if( c instanceof UpdateNoteProvider){
-				cb = ((UpdateNoteProvider) c).addUpdateNotes(cb);
+				cb = ((UpdateNoteProvider<AU>) c).addUpdateNotes(cb,target);
 			}
 		}
 		return cb;

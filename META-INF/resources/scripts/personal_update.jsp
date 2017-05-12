@@ -22,7 +22,8 @@ Update personal details
 <%
 	AppUser user = session_service.getCurrentPerson();
 	String page_title = service_name + " Update Personal Details";
-	if( user.needDetailsUpdate()){
+    boolean update_required=user.needDetailsUpdate();
+	if( update_required){
 		// Need to complete
 		request.setAttribute(NavigationMenuService.DISABLE_NAVIGATION_ATTR, Boolean.TRUE);
 	}
@@ -36,15 +37,30 @@ Update personal details
     StandAloneFormUpdate u = (StandAloneFormUpdate) fac.getFormUpdate(conn);
    HTMLForm form = new HTMLForm(conn);
    u.buildUpdateForm("Person",form,session_service.getCurrentPerson(),session_service);
+   Date last_update = user.getLastTimeDetailsUpdated();
+   DateFormat df = DateFormat.getDateInstance();
    boolean multi = form.containsInput(FileInput.class);
 %>
-<%@ include file="/scripts/form_context.jsf" %>
-
-<div class="block" role="main">
+<%if(update_required){ 
+%>
+<div class="block">
+<h2>Update required</h2>
+<%=conn.getInitParameter("person_update_required.html", "") %>
+</div>
+<%}%>
+<div class="block">
 <h2>This page is to allow you to update your contact details.</h2>
-
+<%= fac.addUpdateNotes(new HtmlBuilder(),user) %>
+</div>
+<%@ include file="/scripts/form_context.jsf" %>
+<div class="block" role="main">
 <h3>Your current details:</h3>
-  <form method="post" 
+<% 
+if( last_update != null ){
+%><p>Last updated: <%=df.format(last_update) %></p><%
+}
+%>
+<form method="post" 
 <% if( multi ){ %>
    enctype="multipart/form-data"
 <% } %> 
@@ -56,11 +72,20 @@ if( default_charset != null && ! default_charset.isEmpty()){
   action="<%= response.encodeURL(web_path+"/UserServlet") %>">
 	<input type="hidden" name="form_url" value="/personal_update.jsp"/>
 	<input type="hidden" name="action" value="MODIFY_PERSON"/>
-
-          <table class="form">
-          <%= form.getHtmlFieldTable(request) %>
-          </table>
-	    <input class="input_button" type="submit" value=" Commit Update "/>
+	<% HtmlBuilder result = new HtmlBuilder();
+	result.setFormID("update");
+	if(HTMLForm.hasError(request)){
+		// show errors
+		result = form.getHtmlFieldTable(result, request);
+	}else{
+		// validate current state
+		result = form.getHtmlFieldTable(result);
+	}
+	%>
+    <%= result.toString() %>
+    <div class="action_buttons">
+	<input class="input_button" type="submit" value=" Commit Update "/>
+	</div>
   </form>
 </div>
 <%@ include file="/std_footer.jsf" %>

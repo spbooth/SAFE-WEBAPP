@@ -81,7 +81,7 @@ boolean multi = creator.useMultiPart();
 <div class="block" role="main">
 <h2>Registration form</h2>
 <p>Fields marked in <b>bold</b> are mandatory.</p>
-<%= person_fac.addUpdateNotes(new HtmlBuilder()) %>
+<%= person_fac.addUpdateNotes(new HtmlBuilder(),null) %>
 <% if( privacy_policy != null ){ %>
 <p>
 <small>All information supplied is held and processed in accordance with the <%=service_name%> Personal Data and Privacy Policy.
