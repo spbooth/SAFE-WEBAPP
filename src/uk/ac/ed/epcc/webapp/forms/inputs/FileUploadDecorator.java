@@ -14,8 +14,8 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.io.ByteArrayOutputStream;
+
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
 
 /** A Input that decorated a String Input with a file-upload button
