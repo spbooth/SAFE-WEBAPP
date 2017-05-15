@@ -1004,6 +1004,9 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			result = new AndFilter<T>(fac.getTarget(),result,fallback);
 		} catch (UnknownRelationshipException e) {
 			// should never be thrown with a default specified.
+			// but log the problem
+			error(e,"Bad relationship specification");
+			
 			return fallback;
 		}
 		
