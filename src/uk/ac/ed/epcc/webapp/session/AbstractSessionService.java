@@ -1306,6 +1306,25 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    			return result;
 	    		}
 	    	}
+	    }else{
+	    	// Can't test directly without a person as null person will select all targets
+	    	if( fac2 instanceof AccessRoleProvider){  // first check factory itself.
+	    		if(((AccessRoleProvider<A,T>)fac2).providesRelationship(role)){
+	    			if( def != null ){
+	    				return def;
+	    			}
+	    			return new FalseFilter<>(fac2.getTarget());
+	    		}
+	    	}
+	    	// then check composites
+	    	for(AccessRoleProvider prov : fac2.getComposites(AccessRoleProvider.class)){
+	    		if( prov.providesRelationship(role)){
+	    			if( def != null ){
+	    				return def;
+	    			}
+	    			return new FalseFilter<>(fac2.getTarget());
+	    		}
+	    	}
 	    }
 	    
 	    // Its not one of the directly implemented roles maybe its derived

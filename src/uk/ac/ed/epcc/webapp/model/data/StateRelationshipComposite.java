@@ -140,4 +140,12 @@ public class StateRelationshipComposite<U extends AppUser,BDO extends DataObject
 		return new PersonFilter<U>(target);
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider#providesRelationship(java.lang.String)
+	 */
+	@Override
+	public boolean providesRelationship(String role) {
+		return role.equals(field);
+	}
+
 }

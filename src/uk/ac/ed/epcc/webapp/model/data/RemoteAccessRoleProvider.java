@@ -102,5 +102,18 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 			return null;
 		}
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider#providesRelationship(java.lang.String)
+	 */
+	@Override
+	public boolean providesRelationship(String role) {
+		try {
+			sess.getPersonInRelationshipRoleFilter(remote_fac, role, null);
+			return true;
+		} catch (UnknownRelationshipException e) {
+			return false;
+		}
+		
+	}
 
 }

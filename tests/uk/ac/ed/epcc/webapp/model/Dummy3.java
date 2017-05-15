@@ -87,6 +87,10 @@ public class Dummy3 extends DataObject {
     	 /**
 		 * 
 		 */
+		private static final String SELF = "self";
+		/**
+		 * 
+		 */
 		
 		
          public class StringFilter extends SQLValueFilter<Dummy3>{
@@ -141,7 +145,7 @@ public class Dummy3 extends DataObject {
 		 */
 		@Override
 		public BaseFilter<Dummy3> hasRelationFilter( String role,AppUser user) {
-			if( role.equals("self")){
+			if( role.equals(SELF)){
 				return new SQLValueFilter<Dummy3>(getTarget(), res, PERSON_ID, user.getID());
 			}
 			return null;
@@ -151,7 +155,7 @@ public class Dummy3 extends DataObject {
 		 */
 		@Override
 		public BaseFilter<AppUser> personInRelationFilter(SessionService<AppUser> sess, String role, Dummy3 target) {
-			if( role.equals("self")){
+			if( role.equals(SELF)){
 				return sess.getLoginFactory().getFilter(target.getPerson());
 			}
 			return null;
@@ -173,6 +177,13 @@ public class Dummy3 extends DataObject {
 		public void addFilterNames(Set<String> names) {
 			names.add("CalledTest1");
 			
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider#providesRelationship(java.lang.String)
+		 */
+		@Override
+		public boolean providesRelationship(String role) {
+			return role.equals(SELF);
 		}
     }
 }

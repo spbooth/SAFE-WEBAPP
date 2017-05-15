@@ -74,4 +74,13 @@ public interface AccessRoleProvider<U extends AppUser,T extends DataObject> {
 	 * @return {@link BaseFilter} or null
 	 */
     public BaseFilter<? super U> personInRelationFilter(SessionService<U> sess, String role, T target);
+    
+    /** Does this class provide the named relationship.
+     * 
+     * 
+     * 
+     * @param role
+     * @return true if relationship provided by this class.
+     */
+    public boolean providesRelationship(String role);
 }

@@ -229,6 +229,9 @@ public abstract class AbstractRelationship<A extends AppUser,B extends DataObjec
 			return null;
 		}
 	}
-
+	@Override
+	public final  boolean providesRelationship(String role) {
+		return getRelationships().contains(role);
+	}
 
 }
