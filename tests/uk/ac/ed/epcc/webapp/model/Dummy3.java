@@ -40,6 +40,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.FilterResult;
+import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FieldOrderFilter;
@@ -82,7 +83,7 @@ public class Dummy3 extends DataObject {
 	public AppUser getPerson(){
 		return (AppUser) getContext().getService(SessionService.class).getLoginFactory().find(record.getNumberProperty(PERSON_ID));
 	}
-    public static class Factory extends DataObjectFactory<Dummy3> implements AccessRoleProvider<AppUser, Dummy3>{
+    public static class Factory extends DataObjectFactory<Dummy3> implements AccessRoleProvider<AppUser, Dummy3>, NamedFilterProvider<Dummy3>{
     	 /**
 		 * 
 		 */
@@ -154,6 +155,24 @@ public class Dummy3 extends DataObject {
 				return sess.getLoginFactory().getFilter(target.getPerson());
 			}
 			return null;
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider#getNamedFilter(java.lang.String)
+		 */
+		@Override
+		public BaseFilter<Dummy3> getNamedFilter(String name) {
+			if( name.equals("CalledTest1")){
+				return new SQLValueFilter<>(getTarget(), res, NAME, "Test1");
+			}
+			return null;
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider#addFilterNames(java.util.Set)
+		 */
+		@Override
+		public void addFilterNames(Set<String> names) {
+			names.add("CalledTest1");
+			
 		}
     }
 }

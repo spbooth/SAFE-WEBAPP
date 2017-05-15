@@ -1004,9 +1004,6 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			result = new AndFilter<T>(fac.getTarget(),result,fallback);
 		} catch (UnknownRelationshipException e) {
 			// should never be thrown with a default specified.
-			// but log the problem
-			error(e,"Bad relationship specification");
-			
 			return fallback;
 		}
 		
@@ -1372,7 +1369,6 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	}
 	@Override
 	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target, String role) throws UnknownRelationshipException {
-		
 		// For the moment we only cache relationships within a request
 		// to avoid stale values as a users state changes
 		if( relationship_map == null && CACHE_RELATIONSHIP_FEATURE.isEnabled(getContext())){
@@ -1382,13 +1378,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		if( relationship_map != null && relationship_map.containsKey(tag)){
 			return relationship_map.get(tag).booleanValue();
 		}
-		FalseFilter<T> fallback = null;
-		if( ! haveCurrentUser() ){
-				// A missing person will act like a missing role 
-			    // without a fallback.
-				fallback= new FalseFilter<>(fac.getTarget());
-		}
-		boolean result = fac.matches(getRelationshipRoleFilter(fac, role,fallback), target);
+		boolean result = fac.matches(getRelationshipRoleFilter(fac, role), target);
 		if( relationship_map != null ){
 			relationship_map.put(tag, result);
 		}

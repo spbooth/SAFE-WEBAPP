@@ -201,8 +201,29 @@ public class RelationshipTest extends WebappTestBase {
 	    Dummy3 target = fac.find(service.getTargetInRelationshipRoleFilter(fac, "self", bill));
 	    assertTrue(t2.equals(target));
 	    
+	    //Test globals
+	    assertTrue(service.hasRelationship(fac, t, "YES"));
+	    assertFalse(service.hasRelationship(fac, t, "NO"));
+	    
+	    // Named filters
+	    assertTrue(service.hasRelationship(fac, t, "CalledTest1"));
+	    assertFalse(service.hasRelationship(fac, t2, "CalledTest1"));
 	}
-	
+	@Test
+	public void testNoUser() throws DataException, UnknownRelationshipException{
+		SessionService service = ctx.getService(SessionService.class);
+		Dummy3 t = fac.find(fac.new StringFilter("Test1"));
+		Dummy3 t2 = fac.find(fac.new StringFilter("Test2"));
+		assertFalse(service.haveCurrentUser());
+		//Test globals
+	    assertTrue(service.hasRelationship(fac, t, "YES"));
+	    assertFalse(service.hasRelationship(fac, t, "NO"));
+	    assertFalse(service.hasRelationship(fac, t, MANAGER));
+	    assertFalse(service.hasRelationship(fac, t, DOUBLE_MANAGER));
+	 // Named filters
+	    assertTrue(service.hasRelationship(fac, t, "CalledTest1"));
+	    assertFalse(service.hasRelationship(fac, t2, "CalledTest1"));
+	}
 	@Test
 	public void testBogus() throws DataException, UnknownRelationshipException{
 		SessionService service = ctx.getService(SessionService.class);
@@ -233,6 +254,17 @@ public class RelationshipTest extends WebappTestBase {
 		}
 		Assert.assertTrue("Expecting exception",thrown);
 		thrown = false;
+		try{
+			
+			boolean matches = service.hasRelationship( fac,t, "bogus");
+			Assert.assertFalse(matches);
+			}catch(UnknownRelationshipException e){
+				System.out.println("bad role "+e.getMessage());
+				// expected
+				thrown=true;
+			}
+			Assert.assertTrue("Expecting exception",thrown);
+			thrown = false;
 		try{
 		boolean matches2 = fac.matches(service.getRelationshipRoleFilter(fac, "really.bogus"), t2);
 		Assert.assertFalse(matches2);
