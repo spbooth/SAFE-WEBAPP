@@ -47,7 +47,7 @@ public class SUNodeMaker extends AbstractNodeMaker  {
 		SUNode n = new SUNode();
 		addChildrenFromComposite(n,props);
 		String additions = props.getProperty(name+".head", "Details");
-		if( additions != null){
+		if( additions != null && ! additions.trim().isEmpty()){
 			addConfigNodes(n, props, additions.split(","));
 		}
 		return n;
@@ -71,7 +71,7 @@ public class SUNodeMaker extends AbstractNodeMaker  {
 	@Override
 	public void addChildren(Node parent, String name, FilteredProperties props) {
 		String additions = props.getProperty(name+".tail", "Preferences,Role");
-		if( additions != null){
+		if( additions != null && ! additions.trim().isEmpty()){
 			addConfigNodes(parent, props, additions.split(","));
 		}
 	}

@@ -55,6 +55,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.PlaceHolderFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
+import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.CreateAction;
 import uk.ac.ed.epcc.webapp.model.data.DataCache;
@@ -75,6 +76,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 import uk.ac.ed.epcc.webapp.servlet.RemoteAuthServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
+
 /** A Factory for creating {@link AppUser} objects that represent users of the system.
  * 
  * If the <b>bootstrap.admin</b> {@link Feature} is set then the first user in the system will automatically be given the ADMIN role (or the role
@@ -86,7 +88,7 @@ import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
  */
 
 
-public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> implements RequiredPageProvider<AU>,NameFinder<AU> ,RegisterTrigger<AU>
+public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> implements RequiredPageProvider<AU>,NameFinder<AU> ,RegisterTrigger<AU>, SummaryContributer<AU>
 {
 	
 	
@@ -502,7 +504,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 	 * 
 	 * @return
 	 */
-	protected String getDefaultRealm(){
+	public String getDefaultRealm(){
 		return getContext().getInitParameter(getConfigTag()+".default_realm");
 	}
 
@@ -768,5 +770,16 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 	public boolean autoCreate() {
 		return getContext().getBooleanParameter("auto_create_person."+getConfigTag(), false);
 	}
-	
+	@Override
+	public void addAttributes(Map<String, Object> attributes, AU target) {
+		attributes.put("Name", target.getName());
+		//attributes.put("Email",target.getEmail());
+		
+		
+		// Catch all for remaining SummaryContibuters
+		for( SummaryContributer<AU> c : getComposites(SummaryContributer.class)){
+			c.addAttributes(attributes, target);
+		}
+		
+	}
 }
