@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
@@ -51,21 +52,10 @@ public class DirectoryComposite<AU extends AppUser> extends AppUserComposite<AU,
 		try{
 			
 			
-			Hashtable<String,String> env = new Hashtable<String,String>();
-			
-			
-			env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-			env.put(Context.SECURITY_AUTHENTICATION, "simple");
-			
-			
-			//env.put(Context.SECURITY_PRINCIPAL, getConnectionName(name));
-			//env.put(Context.SECURITY_CREDENTIALS, password);
-			
-			env.put(Context.SECURITY_PROTOCOL, "ssl");
-			
-			String url = getContext().getInitParameter("directory_info.url");
-			env.put(Context.PROVIDER_URL, url);
-			DirContext dctx = new InitialDirContext(env);
+			DirContext dctx = makeDirContext();
+			if( dctx == null){
+				return null;
+			}
 			SearchControls sc = new SearchControls();
 			
 		     sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -103,6 +93,33 @@ public class DirectoryComposite<AU extends AppUser> extends AppUserComposite<AU,
 			
 		}
 		return null;
+	}
+
+	private DirContext dircontext=null;
+	private boolean error=false;
+	private DirContext makeDirContext() throws NamingException {
+		if( error ){
+			return null;
+		}
+		if( dircontext != null){
+			return dircontext;
+		}
+		Hashtable<String,String> env = new Hashtable<String,String>();
+		
+		
+		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+		env.put(Context.SECURITY_AUTHENTICATION, "simple");
+		
+		
+		//env.put(Context.SECURITY_PRINCIPAL, getConnectionName(name));
+		//env.put(Context.SECURITY_CREDENTIALS, password);
+		
+		env.put(Context.SECURITY_PROTOCOL, "ssl");
+		
+		String url = getContext().getInitParameter("directory_info.url");
+		env.put(Context.PROVIDER_URL, url);
+		dircontext = new InitialDirContext(env);
+		return dircontext;
 	}
 	
 	@Override
