@@ -44,6 +44,7 @@ import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.OverrideConfigService;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
 import uk.ac.ed.epcc.webapp.forms.result.CustomPage;
@@ -339,8 +340,15 @@ public abstract class ServletTest extends WebappTestBase{
 			sess.setCurrentPerson(person);
 		}else{
 			// Try to make a scratch user
-			person = (AppUser) fac.makeBDO();
-			person.setEmail(email);
+			try {
+				person = fac.makeFromString(email);
+			} catch (ParseException e) {
+				
+			}
+			if( person == null){
+				person = (AppUser) fac.makeBDO();
+				person.setEmail(email);
+			}
 			person.commit();
 			sess.setCurrentPerson(person);
 		}
