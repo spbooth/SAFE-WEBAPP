@@ -22,6 +22,9 @@ import uk.ac.ed.epcc.webapp.model.data.Composite;
 /** Object representing a page that a user is redirected to if certain conditions are met.
  * e.g. a password reset page.
  * 
+ * You must ensure that any JSP referenced in this way does not include
+ * the redirect checks itself.
+ * 
  * {@link Composite}s in the {@link AppUserFactory} can add these if they implement {@link RequiredPageProvider}
  * 
  * @author spb

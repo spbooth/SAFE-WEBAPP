@@ -21,6 +21,7 @@
 <%@ page	
    import="uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*, uk.ac.ed.epcc.webapp.session.*"
 %>
+<%--Must be only basic_session as this may be a required page --%>
 <%@ include file="/basic_session.jsf" %>
 <wb:formpage/>
 <%	

@@ -18,7 +18,8 @@ Update personal details
 <%@ page	
    import="java.util.*, uk.ac.ed.epcc.webapp.*,  uk.ac.ed.epcc.webapp.model.*,uk.ac.ed.epcc.webapp.forms.html.*,uk.ac.ed.epcc.webapp.forms.factory.*,uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService"
 %>
-<%@ include file="/session.jsf" %>
+<%--Must be only basic_session as this may be a required page --%>
+<%@ include file="/basic_session.jsf" %>
 <%
 	AppUser user = session_service.getCurrentPerson();
 	String page_title = service_name + " Update Personal Details";

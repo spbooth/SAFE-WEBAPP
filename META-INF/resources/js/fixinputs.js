@@ -4,5 +4,4 @@ $(document).ready( function(){if (!Modernizr.inputtypes.date) {
     	//TODO pick up min max dates from attributes if they exist
         dateFormat: 'yy-mm-dd'
     });
-}
 });
