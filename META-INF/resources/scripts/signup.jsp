@@ -82,7 +82,7 @@ boolean multi = creator.useMultiPart();
 <h2>Registration form</h2>
 <p>Fields marked in <b>bold</b> are mandatory.</p>
 <%= person_fac.addUpdateNotes(new HtmlBuilder(),null) %>
-<% if( privacy_policy != null ){ %>
+<% if( privacy_policy != null && ! privacy_policy.isEmpty() ){ %>
 <p>
 <small>All information supplied is held and processed in accordance with the <%=service_name%> Personal Data and Privacy Policy.
 	  You can find full details <a href="<%= privacy_policy%>" onClick="return open_privacy_popup();"><b>here</b></a>.</small>
