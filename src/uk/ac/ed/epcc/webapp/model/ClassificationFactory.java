@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
@@ -72,6 +73,7 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 	 * 
 	 */
 	private static final int CLASSIFICATION_MAX_MENU = 200;
+	private static final Pattern WHITESPACE = Pattern.compile("\\s");
     public ClassificationFactory(AppContext ctx, String homeTable){
     	setContext(ctx, homeTable);
     }
@@ -178,6 +180,10 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 	protected boolean allowNameChange(){
 		return false;
 	}
+	
+	protected boolean allowSpacesInName(){
+		return false;
+	}
 	/** An {@link DataObjectItemInput} that uses the {@link ParseFactory#findFromString(String)} method to locate
 	 * 
 	 * Note this is not constrained by the select filter so can be used to locate retired obects.
@@ -216,6 +222,9 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 				setValue(null);
 				return;
 			}
+			if( ! allowSpacesInName() && WHITESPACE.matcher(v).matches()){
+				throw new ParseException("No whitespace allowed");
+			}
 			setItem(findFromString(v));
 		}
 
@@ -243,6 +252,7 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 			// the update form has to rely on the sql update generating an error.
 			UnusedNameInput<T> input = new UnusedNameInput<T>(ClassificationFactory.this);
 			input.setMaxResultLength(res.getInfo(Classification.NAME).getMax());
+			input.setNoSpaces(! allowSpacesInName());
 			result.put(Classification.NAME, input);
 			
 			// Description is likely to be displayed to user so inhibit html by default
@@ -313,7 +323,9 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 			// don't allow edits to the name
 			super.customiseUpdateForm(f, o);
 			if( allow_name_change){
-				f.getField(Classification.NAME).setInput(new UnusedNameInput<C>(getClassificationFactory(),o));
+				UnusedNameInput<C> input = new UnusedNameInput<C>(getClassificationFactory(),o);
+				input.setNoSpaces(! getClassificationFactory().allowSpacesInName());
+				f.getField(Classification.NAME).setInput(input);
 			}else{
 				f.getField(Classification.NAME).lock();
 			}
@@ -422,7 +434,20 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 		return object.getName();
 	}
 	public final DataObjectItemInput<T> getNameInput(BaseFilter<T> fil,boolean create,boolean restrict){
-		return new NameFinderInput<T,ClassificationFactory<T>>(this, create, restrict, fil);
+		NameFinderInput<T, ClassificationFactory<T>> input = new NameFinderInput<T,ClassificationFactory<T>>(this, create, restrict, fil);
+		return input;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#validateNameFormat(java.lang.String)
+	 */
+	@Override
+	public void validateNameFormat(String name) throws ParseException {
+		if( ! allowSpacesInName() && WHITESPACE.matcher(name).matches()){
+			throw new ParseException("No whitespace allowed");
+		}
+		if( name.length() > res.getInfo(Classification.NAME).getMax()){
+			throw new ParseException("Too long");
+		}
 	}
 	
 }

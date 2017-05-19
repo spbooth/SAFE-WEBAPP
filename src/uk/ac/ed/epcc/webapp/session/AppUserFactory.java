@@ -782,4 +782,12 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		}
 		
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#validateNameFormat(java.lang.String)
+	 */
+	@Override
+	public void validateNameFormat(String name) throws ParseException {
+		//TODO consider checking if single realsm
+		
+	}
 }

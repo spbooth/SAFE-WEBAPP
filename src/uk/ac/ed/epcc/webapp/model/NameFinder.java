@@ -30,6 +30,13 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  * @param <T>
  */
 public interface NameFinder<T extends DataObject> extends ParseFactory<T> {
+	
+	/** Check formatting constraints on the  input string.
+	 * 
+	 * @param name
+	 * @throws ParseException
+	 */
+	public abstract void validateNameFormat(String name) throws ParseException;
     /** Find an existing entry by name
      * 
      * This should use the same logic as {@link #getStringFinderFilter(String)}.

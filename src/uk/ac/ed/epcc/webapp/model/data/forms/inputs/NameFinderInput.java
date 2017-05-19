@@ -49,7 +49,7 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	private final BaseFilter<T> autocomplete;
 	@Override
 	public void parse(String v) throws ParseException {
-		//TODO add format validation to NameFinder
+		factory.validateNameFormat(v);
 		try{
 			if( create){
 				setItem(factory.makeFromString(v));

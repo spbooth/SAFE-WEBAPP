@@ -55,6 +55,16 @@ import uk.ac.ed.epcc.webapp.ssl.SSLService;
  * An anonymous bind can be introduced by sub-classing.
  * 
  * The identifying attribute name is stored as the web-name.
+ * <p>
+ * Configuration properties:
+ * <ul>
+ * <li><b>authentication.ldap.factory</b> factory class defaults to <b>com.sun.jndi.ldap.LdapCtxFactory</b></li>
+ * <li><b>authentication.ldap.url</b> connection url </li>
+ * <li><b>authentication.ldap.base</b> base dn, this should be the path immediately above the user records</li>
+ * <li><b>ldap.connection_domain</b> AD domain. If set LDAP authentication will be as <i>username</i>@<i>domain</i> instead of LDAP principal DN.</li>
+ * <li><b>authentication.ldap.name_attr</b> Name component to add to base_dn to generate user DN defaults to <i>uid</i></li>
+ * <li><b>authentication.ldap.property.</b><i>attributeName</i> name of DB field to store attribute</li>
+ * </ul>
  * 
  * @author spb
  * @param <T> type of {@link AppUser}
