@@ -584,6 +584,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		clearRoleMap();
 		person=null;
 		removeAttribute(person_tag);
+		assert( ! haveCurrentUser());
 	}
 	
 	public void logOut(){
@@ -621,7 +622,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 */
 	protected A lookupPerson() {
 		Integer personID = getPersonID();
-		if( personID == null ){
+		if( personID == null  || personID.intValue() == 0){
 			return null;
 		}
 		try {

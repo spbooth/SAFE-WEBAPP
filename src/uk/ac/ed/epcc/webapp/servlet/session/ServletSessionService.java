@@ -64,6 +64,8 @@ public class ServletSessionService<A extends AppUser> extends AbstractSessionSer
 	private static final String WTMP_EXPIRY_DATE = "SESSION_WTMP_EXPIRTY_DATE";
 	private static final String NAME_ATTR="UserName";
 	
+	// Flag to supress re-populate if we logged out
+	private boolean force_no_person=false;
 	private ServletService ss;
 	private HttpServletRequest request;
   public ServletSessionService(AppContext c){
@@ -183,6 +185,7 @@ protected A lookupPerson() {
 public void clearCurrentPerson() {
 	
 	super.clearCurrentPerson();
+	force_no_person=true;
 	try{
 		WtmpManager man = getWtmpManager();
 		if( man != null ){
@@ -214,6 +217,7 @@ public void logOut(){
 			return;
 		}
 	}
+	force_no_person=true;
 	super.logOut();
 	
 	if( ss instanceof DefaultServletService){
@@ -232,6 +236,7 @@ public A getSuperPerson(){
 public void setCurrentPerson(A person) {
 	
 	super.setCurrentPerson(person);
+	force_no_person=false;
 	try {
 		AppContext c = getContext();
 		WtmpManager man = getWtmpManager();
@@ -261,14 +266,16 @@ public void setCurrentPerson(A person) {
 
 @Override
 protected Integer getPersonID() {
-	
+	if( force_no_person ){
+		return null;
+	}
 	Integer id = super.getPersonID();
 	if( id != null ){
 		return id;
 	}
 	try{
 		if( ! ss.isComitted() ){
-			// We can't make a session once response is comitted so
+			// We can't make a session once response is committed so
 			// no point doing the lookup we can't store it.
 			// We should not need to do person lookup after the fact
 			ss.populateSession(this);

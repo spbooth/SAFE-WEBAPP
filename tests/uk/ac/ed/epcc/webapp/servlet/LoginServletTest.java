@@ -27,11 +27,15 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
+import uk.ac.ed.epcc.webapp.session.RegistrationDateComposite;
 import uk.ac.ed.epcc.webapp.session.RequiredPage;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.session.SignupDateComposite;
+import uk.ac.ed.epcc.webapp.session.WebNameFinder;
 
 /**
  * @author spb
@@ -221,6 +225,127 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		assertTrue(composite.mustResetPassword(user)); 
 	}
 
+	@Test
+	public void testLogout() throws Exception{
+		SessionService sess = ctx.getService(SessionService.class);
+		AppUserFactory<A> fac = sess.getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		sess.setCurrentPerson(user);
+		addParam("logout", "");
+		doPost();
+		assertFalse(sess.haveCurrentUser());
+		checkRedirect("/login.jsp");
+		
+		
+	}
+	
+	@Test
+	@ConfigFixtures("external_logout.properties")
+	public void testLogoutWithExternal() throws Exception{
+		SessionService sess = ctx.getService(SessionService.class);
+		AppUserFactory<A> fac = sess.getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		sess.setCurrentPerson(user);
+		addParam("logout", "");
+		doPost();
+		assertFalse(sess.haveCurrentUser());
+		checkRedirect("http://www.example.com/logout");
+		
+		
+	}
+	
+	@Test
+	@ConfigFixtures("external_logout.properties")
+	public void testLogoutWithSU() throws Exception{
+		ServletSessionService sess = (ServletSessionService) ctx.getService(SessionService.class);
+		AppUserFactory<A> fac = sess.getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		sess.setCurrentPerson(user);
+		sess.setTempRole(ServletSessionService.BECOME_USER_ROLE);
+		
+		A user2 = fac.makeBDO();
+		user2.setEmail("bill@example.com");
+		composite.setPassword(user2,"BillIsDead");
+		user2.commit();
+		
+		assertTrue(sess.canSU(user2));
+		sess.su(user2);
+		assertTrue(sess.isCurrentPerson(user2));
+		addParam("logout", "");
+		doPost();
+		assertTrue(sess.haveCurrentUser());
+		assertTrue(sess.isCurrentPerson(user));
+		checkRedirect("/main.jsp");
+		
+		
+	}
+	
+	@Test
+	@ConfigFixtures("/extauth.properties")
+	public void testExtAuthLogout() throws Exception{
+		req.remote_user="fred";
+		ServletSessionService sess = (ServletSessionService) ctx.getService(SessionService.class);
+		AppUserFactory<A> fac = sess.getLoginFactory();
+		A user =  fac.makeBDO();
+		// Need to mark this as properly registered or the session won't auto-populate
+		user.setRealmName(WebNameFinder.WEB_NAME, "fred");
+		user.setEmail("fred@example.com");
+		SignupDateComposite comp = fac.getComposite(SignupDateComposite.class); 
+		comp.markSignup(user);
+		user.commit();
+		// This should auto-populate from remote_user
+		assertTrue(sess.isCurrentPerson(user));
+		assertTrue(sess.haveCurrentUser());
+		addParam("logout", "");
+		doPost();
+		assertFalse(sess.haveCurrentUser());
+		checkRedirect("/login.jsp");
+		
+	}
+	
+	@Test
+	@ConfigFixtures("/extauth.properties")
+	public void testExtAuthLogoutWithSU() throws Exception{
+		req.remote_user="fred";
+		ServletSessionService sess = (ServletSessionService) ctx.getService(SessionService.class);
+		AppUserFactory<A> fac = sess.getLoginFactory();
+		A user =  fac.makeBDO();
+		// Need to mark this as properly registered or the session won't auto-populate
+		user.setRealmName(WebNameFinder.WEB_NAME, "fred");
+		user.setEmail("fred@example.com");
+		SignupDateComposite comp = fac.getComposite(SignupDateComposite.class); 
+		comp.markSignup(user);
+		user.commit();
+		// This should auto-populate from remote_user
+		assertTrue(sess.isCurrentPerson(user));
+		assertTrue(sess.haveCurrentUser());
+		sess.setTempRole(ServletSessionService.BECOME_USER_ROLE);
+		A user2 = fac.makeBDO();
+		user2.setEmail("bill@example.com");
+		user2.setRealmName(WebNameFinder.WEB_NAME, "bill");
+		user2.commit();
+		
+		assertTrue(sess.canSU(user2));
+		sess.su(user2);
+		assertTrue(sess.isCurrentPerson(user2));
+		addParam("logout", "");
+		doPost();
+		assertTrue(sess.haveCurrentUser());
+		assertTrue(sess.isCurrentPerson(user));
+		checkRedirect("/main.jsp");
+	}
 	@Override
 	public void setUp() throws Exception {
 		// TODO Auto-generated method stub
@@ -229,6 +354,7 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		MockServletConfig config = new MockServletConfig(serv_ctx, "LoginServlet");
 		servlet.init(config);
 		req.servlet_path="LoginServlet";
+		
 	}
 
 	

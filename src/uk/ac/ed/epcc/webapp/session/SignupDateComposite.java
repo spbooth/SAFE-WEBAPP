@@ -68,6 +68,14 @@ public class SignupDateComposite<BDO extends DataObject> extends CreateComposite
 	public void preCommit(BDO dat, Form f) throws DataException {
 		// This is only called from the creation form.
 		// make it optional in case a legacy database does not have the field
+		markSignup(dat);
+	}
+
+
+	/**
+	 * @param dat
+	 */
+	public void markSignup(BDO dat) {
 		getRecord(dat).setOptionalProperty(SIGNUP_DATE, new Date());
 	}
 
