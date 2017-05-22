@@ -70,6 +70,10 @@ import uk.ac.ed.epcc.webapp.session.WebNameFinder;
  *
  */
 public class DefaultServletService implements ServletService{
+	/**
+	 * 
+	 */
+	private static final String LOGOUT_REMOVE_COOKIE_PREFIX = "logout.remove_cookie.";
 	public static final String BASIC_AUTH_REALM_PARAM="basic_auth.realm";
 	public static final Feature NEED_CERTIFICATE_FEATURE = new Feature("need-certificate", true,"try additional mechanisms to retrieve certificate DN as web-name");
 	public static final String PARAMS_KEY_NAME = "Params";
@@ -556,7 +560,7 @@ public class DefaultServletService implements ServletService{
 				Cookie[] cookies = request.getCookies();
 				if( cookies != null && cookies.length > 0){
 					for( Cookie c : cookies){
-						if( c.getName().equalsIgnoreCase("JSESSIONID")){
+						if( c.getName().equalsIgnoreCase("JSESSIONID") || getContext().getBooleanParameter(LOGOUT_REMOVE_COOKIE_PREFIX+c.getName(), false)){
 							c.setMaxAge(0);
 							((HttpServletResponse)res).addCookie(c);
 						}
