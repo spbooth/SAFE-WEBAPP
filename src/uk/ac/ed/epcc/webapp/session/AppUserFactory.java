@@ -639,6 +639,15 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 	 * @param <T>
 	 */
 	public  static class SignupFormCreator<T extends  AppUser> extends Creator<T> implements UpdateTemplate<T>  {
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.forms.Creator#customiseCreationForm(uk.ac.ed.epcc.webapp.forms.Form)
+		 */
+		@Override
+		public void customiseCreationForm(Form f) throws Exception {
+			for(SignupCustomiser c : getAppUserFactory().getComposites(SignupCustomiser.class)){
+				c.customiseSignupForm(f);
+			}
+		}
 		/**
 		 * 
 		 */
@@ -787,7 +796,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 	 */
 	@Override
 	public void validateNameFormat(String name) throws ParseException {
-		//TODO consider checking if single realsm
+		//TODO consider checking if single realm
 		
 	}
 }
