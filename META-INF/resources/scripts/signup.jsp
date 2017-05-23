@@ -80,6 +80,12 @@ boolean multi = creator.useMultiPart();
 %>
 <div class="block" role="main">
 <h2>Registration form</h2>
+<% if( person_fac.hasComposite(PasswordAuthComposite.class)){ %>
+<p class="highlight"> This form is to sign-up for a new <%=website_name%> account.
+If you already have an account or have forgotten your password go
+<a href="<%= response.encodeURL(web_path+"/login.jsp") %>">here</a>.
+</p>
+<%} %>
 <p>Fields marked in <b>bold</b> are mandatory.</p>
 <%= person_fac.addUpdateNotes(new HtmlBuilder(),null) %>
 <% if( privacy_policy != null && ! privacy_policy.isEmpty() ){ %>
@@ -87,12 +93,6 @@ boolean multi = creator.useMultiPart();
 <small>All information supplied is held and processed in accordance with the <%=service_name%> Personal Data and Privacy Policy.
 	  You can find full details <a href="<%= privacy_policy%>" onClick="return open_privacy_popup();"><b>here</b></a>.</small>
 </p>
-<% if( person_fac.hasComposite(PasswordAuthComposite.class)){ %>
-<p> This form is to sign-up for a new <%=website_name%> account.
-If you already have an account or have forgotten your password go
-<a href="<%= response.encodeURL(web_path+"/login.jsp") %>">here</a>.
-</p>
-<%} %>
 <% } %>
   <form method="post" 
 <% if( multi ){ %>
