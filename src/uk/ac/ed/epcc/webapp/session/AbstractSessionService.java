@@ -354,8 +354,8 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	public Map<String,Boolean> makeToggleMap(){
 		HashMap<String,Boolean> map = new HashMap<String,Boolean>();
 
-		map.put(SessionService.ADMIN_ROLE, Boolean.FALSE);
-		String additions = getContext().getInitParameter("toggle_roles");
+		
+		String additions = getContext().getInitParameter("toggle_roles",SessionService.ADMIN_ROLE);
 		if( additions != null ){
 			for(String s : additions.split(",")){
 				map.put(s,getContext().getBooleanParameter("toggle_roles.initial_value."+s, false));
@@ -395,58 +395,51 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * 
 	 */
 	public final boolean hasRole(String name){
+		return hasRole(null,name);
+	}
+	
+	/** underlying role check. We want to skip recursive definitions
+	 * so we include a skip list
+	 * 
+	 * @param skip set of roles already checked
+	 * @param name name of role to check
+	 * @return
+	 */
+	private final boolean hasRole(Set<String> skip,String name){
+		if( skip == null){
+			skip = new HashSet();
+		}
+		skip.add(name);
 		// role name aliasing
-		
-		//The canHaveRole method caches its result
-		// but we still want to save the answer for
-		// the original query provided its not a toggle
-		// 
 		
 		// shortcutTest must bypass
 		// all caching
-		String role=null;
+		boolean result=false;
 		if( shortcutTestRole(name) || canHaveRole(name)){ // check queried role first
-			role = name;
+			result=true;
 		}else{
-			boolean role_is_toggle=true;
-			for(String r : getRoleSet(null, name)){
-				if( ! r.equals(name) && canHaveRole(r)){
-					boolean delegate_is_not_toggle = getToggle(r) == null;
-					if( getToggle(name) == null && delegate_is_not_toggle){
-						// neither original nor delegate are toggle roles
-						// safe to cache
-						cacheRole(name,true);
-						role=r;
-						role_is_toggle=false;
-					}else if( delegate_is_not_toggle ){
-						// First toggle role seen (or a non toggle delegate)
-						role=r;
-						role_is_toggle=false;
-					}else if( getToggle(r).booleanValue()){
-						// Take active role in preference
-						role=r;
-					}else if( role == null){
-						// delegate is not active but no other matches yet
-						role=r;
-					}
+			String alt_list = mapRoleName(name);
+			if( alt_list != null && ! alt_list.isEmpty()){
 
+				for(String r : alt_list.split("\\s*,\\s*")){
+					if( ! skip.contains(r)){
+						if( hasRole(skip,r)){
+							result=true;
+							break;
+						}
+					}
 				}
 			}
 		}
-		if( role == null){
-			// none of the equivalents are allowed
-			// safe to cache
-			cacheRole(name, false);
+		
+		if( ! result ){
 			return false;
 		}
-		
 
-		// role now points to a real role that we can have.
-		// chosen a non-toggle by preference then an enabled role
 		
 		// check the toggle value if this returns null then we have a
 		// a non toggling role
-		Boolean toggle = getToggle(role);
+		Boolean toggle = getToggle(name);
 		if( toggle != null ){
 			// only match was a toggle
 			return toggle.booleanValue();
@@ -468,23 +461,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		return getContext().getInitParameter(USE_ROLE_PREFIX+name, name);
 	}
 	
-	private Set<String> getRoleSet(Set<String> set, String name){
-		Set<String> result=set;
-		if( set == null){
-			set = new HashSet<>();
-		}
-		if( set.contains(name)){
-			return set;
-		}
-		set.add(name);
-		String alt_list = mapRoleName(name);
-		if( alt_list != null && ! alt_list.isEmpty()){
-			for(String c : alt_list.split("\\s*,\\s*")){
-				getRoleSet(set,c);
-			}
-		}
-		return set;
-	}
+	
 	public boolean hasRoleFromList(String ...roles){
 		if( roles == null ){
 			return false;
@@ -942,23 +919,6 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		}
 		return false;
 	}
-	/** Check a specific user for role membership including name mapping
-	 * 
-	 * toggle roles evaluate as enabled.
-	 * 
-	 * @param user
-	 * @param role
-	 * @return
-	 */
-    private boolean canHaveRoleWithMapping(A user, String role){
-    	for(String r : getRoleSet(null, role)){
-    		if( canHaveRole(user,r)){
-    			return true;
-    		}
-    	}
-    	return false;
-    }
-
 
 	@Override
 	public String toString() {

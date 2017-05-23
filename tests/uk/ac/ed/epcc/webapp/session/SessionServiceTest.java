@@ -14,6 +14,8 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
+import uk.ac.ed.epcc.webapp.config.ConfigService;
+import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 import static org.junit.Assert.*;
@@ -94,6 +96,41 @@ public class SessionServiceTest extends WebappTestBase {
 		
 		assertNull(serv.getToggle("Wombat"));
 	}
-	
-	
+	@Test
+	@ConfigFixtures("toggle.properties")
+	public void testMultiValueRole() throws DataFault{
+		
+		SessionService sess = ctx.getService(SessionService.class);
+		AppUserFactory login = ctx.getService(SessionService.class).getLoginFactory();
+		AppUser fred = (AppUser) login.makeBDO();
+		fred.setEmail("fred@example.com");
+		fred.commit();
+		sess.setCurrentPerson(fred);
+		
+		
+		
+		sess.setTempRole("B");
+		sess.setToggle("B", false);
+		sess.setTempRole("AA");
+		sess.setToggle("AA", false);
+		sess.setTempRole("AB");
+		sess.setToggle("AB", false);
+		
+		comb(sess,false,false,false,false);
+		comb(sess,false,false,false,true);
+		comb(sess,false,false,true,false);
+		comb(sess,false,false,true,true);
+		
+		comb(sess,false,true,false,false);
+		comb(sess,true,true,false,true);
+		comb(sess,true,true,true,false);
+		comb(sess,true,true,true,true);
+		
+	}
+	private void comb(SessionService s, boolean expected, boolean a, boolean aa, boolean ab){
+		s.setToggle("A", a);
+		s.setToggle("AB",ab);
+		s.setToggle("AA", aa);
+		assertEquals(expected, s.hasRole("R"));
+	}
 }
