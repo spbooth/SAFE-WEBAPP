@@ -225,7 +225,5 @@ public class UserServlet<T extends AppUser> extends SessionServlet {
 		return true;
 	}
 
-public static int minPasswordLength(AppContext conn) {
-	return conn.getIntegerParameter("password.min_length", 6);
-}
+
 }

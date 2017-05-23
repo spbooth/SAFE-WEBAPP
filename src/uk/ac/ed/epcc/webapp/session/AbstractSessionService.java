@@ -397,7 +397,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	public final boolean hasRole(String name){
 		// role name aliasing
 		
-		//The cahHaveRole method caches its result
+		//The canHaveRole method caches its result
 		// but we still want to save the answer for
 		// the original query provided its not a toggle
 		// 
@@ -408,14 +408,28 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		if( shortcutTestRole(name) || canHaveRole(name)){ // check queried role first
 			role = name;
 		}else{
+			boolean role_is_toggle=true;
 			for(String r : getRoleSet(null, name)){
 				if( ! r.equals(name) && canHaveRole(r)){
-					role=r;
-					if( getToggle(name) == null && getToggle(role) == null){
+					boolean delegate_is_not_toggle = getToggle(r) == null;
+					if( getToggle(name) == null && delegate_is_not_toggle){
 						// neither original nor delegate are toggle roles
 						// safe to cache
 						cacheRole(name,true);
+						role=r;
+						role_is_toggle=false;
+					}else if( delegate_is_not_toggle ){
+						// First toggle role seen (or a non toggle delegate)
+						role=r;
+						role_is_toggle=false;
+					}else if( getToggle(r).booleanValue()){
+						// Take active role in preference
+						role=r;
+					}else if( role == null){
+						// delegate is not active but no other matches yet
+						role=r;
 					}
+
 				}
 			}
 		}
@@ -428,11 +442,13 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		
 
 		// role now points to a real role that we can have.
+		// chosen a non-toggle by preference then an enabled role
 		
-		// check the toggle value if this returns null then this is
+		// check the toggle value if this returns null then we have a
 		// a non toggling role
 		Boolean toggle = getToggle(role);
 		if( toggle != null ){
+			// only match was a toggle
 			return toggle.booleanValue();
 		}
 		
