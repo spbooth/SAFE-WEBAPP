@@ -95,6 +95,10 @@ public class Emailer {
 	/**
 	 * 
 	 */
+	private static final String DEFAULT_HEADER_PREFIX = "X-Saf-";
+	/**
+	 * 
+	 */
 	private static final String MAIL_SIGNER = "MailSigner";
 	/** Default string encoding to use.
 	 * 
@@ -456,9 +460,9 @@ public class Emailer {
 		return templateMessage(notify_emails,headers,null,false,email_template);
 	}
 	public MimeMessage templateMessage(String[] notify_emails, Hashtable headers, InternetAddress from, boolean multipart, TemplateFile email_template) throws MessagingException, UnsupportedEncodingException {
-		return templateMessage(notify_emails, headers, from, multipart, email_template,null);
+		return templateMessage(notify_emails, DEFAULT_HEADER_PREFIX,headers, from, multipart, email_template,null);
 	}
-	public MimeMessage templateMessage(String[] notify_emails, Hashtable headers, InternetAddress from, boolean multipart, TemplateFile email_template,Map<String,String> params) throws MessagingException, UnsupportedEncodingException {
+	public MimeMessage templateMessage(String[] notify_emails, String header_prefix,Hashtable headers, InternetAddress from, boolean multipart, TemplateFile email_template,Map<String,String> params) throws MessagingException, UnsupportedEncodingException {
 			
 		AppContext conn = getContext();
 		
@@ -479,7 +483,7 @@ public class Emailer {
 				String key = (String) it.next();
 				String val = headers.get(key).toString().trim();
 				if (val != null && val.length() > 0) {
-					m.addHeader("X-Saf-" + key, val);
+					m.addHeader(header_prefix + key, val);
 				}
 			}
 		}

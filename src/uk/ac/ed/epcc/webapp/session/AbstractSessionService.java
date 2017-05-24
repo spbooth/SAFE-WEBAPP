@@ -577,7 +577,6 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		clearRoleMap();
 		person=null;
 		removeAttribute(person_tag);
-		assert( ! haveCurrentUser());
 	}
 	
 	public void logOut(){

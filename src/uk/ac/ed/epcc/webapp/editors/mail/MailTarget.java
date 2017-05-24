@@ -30,6 +30,14 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 public class MailTarget {
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "MailTarget [handler=" + handler + ", hash=" + hash + ", path=" + path + "]";
+	}
+
 	public static final Feature IGNORE_HASH_FEATURE = new Feature("mail.ignore_hash",false,"Treat all message hashes as zero. This it to allow repeatable tests do not use in production");
 	/** create a MailTarget with the hash derived from the handler.
 	 * This is appropriate when the target is created directly for example

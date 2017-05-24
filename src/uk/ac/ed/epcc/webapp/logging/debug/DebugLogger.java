@@ -54,7 +54,10 @@ public class DebugLogger implements Logger {
 	public void error(Object message, Throwable t) {
 		if( nested != null)
 		nested.error(message,t);
-		throw new FatalError(message.toString(),t);
+		if( ! (t instanceof FatalError)){
+			// avoid loops
+			throw new FatalError(message.toString(),t);
+		}
 	}
 
 
