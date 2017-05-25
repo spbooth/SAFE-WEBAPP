@@ -95,8 +95,11 @@ public class DefaultServletService implements ServletService{
 	/** Feature to require external auth logins for all sessions.
 	 * 
 	 */
-	public static final Feature EXTERNAL_AUTH_ONLY_FEATURE = new Feature("external_auth",false,"Default authorisation is using external container level authorisation");
-	 public DefaultServletService(AppContext conn,ServletContext ctx, ServletRequest req,
+	public static final Feature EXTERNAL_AUTH_ONLY_FEATURE = new Feature("external_auth",false,"Default authorisation is using external container level authorisation on all URLs");
+
+	public static final Feature EXTERNAL_AUTH_VIA_lOGIN_FEATURE = new Feature("external_auth.use_login",false,"Mandatory external auth with only login.jsp protected externally");
+
+	public DefaultServletService(AppContext conn,ServletContext ctx, ServletRequest req,
 			ServletResponse res) {
 		super();
 		this.conn=conn;
@@ -439,13 +442,13 @@ public class DefaultServletService implements ServletService{
 			// Should we attempt basic auth
 			String realm = conn.getInitParameter(BASIC_AUTH_REALM_PARAM);
 			if( realm != null && realm.trim().length() > 0 && res instanceof HttpServletResponse){
-				((HttpServletResponse)res).setHeader("WWW-Authenticate", "Basic realm=\""+conn.getInitParameter(BASIC_AUTH_REALM_PARAM)+"\"");
+				((HttpServletResponse)res).setHeader("WWW-Authenticate", "Basic realm=\""+realm+"\"");
 				((HttpServletResponse)res).sendError(HttpServletResponse.SC_UNAUTHORIZED);
 				return;
 			}
 		}
 		if( getWebName() == null  
-				&& 
+				&& (! EXTERNAL_AUTH_VIA_lOGIN_FEATURE.isEnabled(conn)) &&
 			( composite == null || EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(getContext()))){
 			// We require external auth so must have web-name
 			warn("No webname when required");
