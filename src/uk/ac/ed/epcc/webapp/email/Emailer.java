@@ -61,6 +61,7 @@ import uk.ac.ed.epcc.webapp.content.TemplateFile;
 import uk.ac.ed.epcc.webapp.content.XMLPrintWriterPolicy;
 import uk.ac.ed.epcc.webapp.content.XMLPrinterWriter;
 import uk.ac.ed.epcc.webapp.email.logging.EmailLogger;
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -652,6 +653,9 @@ public class Emailer {
 			m.setRecipients(RecipientType.CC, new InternetAddress[0]);
 		}
 		m.setRecipients(RecipientType.TO, ia);
+		if( fromAddress == null ){
+			throw new ConsistencyError("No sender address configured");
+		}
 		InternetAddress sender=new InternetAddress(fromAddress, fromName);
         if( from == null ){
 		   m.setFrom(sender);

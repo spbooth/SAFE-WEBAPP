@@ -34,7 +34,7 @@ public interface FieldTypeVisitor {
     public void visitIndex(Index i);
     public void visitFullTextIndex(FullTextIndex i);
     public void visitPlaceHolderFieldType(PlaceHolderFieldType p);
-   
+    public void additions(boolean create);
     /** Do we use this type of index
      * 
      * @param i

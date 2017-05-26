@@ -182,5 +182,14 @@ public class PostgresqlCreateTableVisitor implements FieldTypeVisitor {
 		
 		
 	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor#additions(boolean)
+	 */
+	@Override
+	public void additions(boolean create) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

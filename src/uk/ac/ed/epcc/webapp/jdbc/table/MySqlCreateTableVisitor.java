@@ -33,11 +33,14 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	public static final Feature FOREIGN_KEY_FEATURE=new Feature("foreign-key",false,"Generate foreign keys");
 	private final MysqlSQLContext ctx;
 	private final StringBuilder sb;
+	// Keep table in memory if we can only use for unit tests
+	private boolean use_memory=false;
 	private final List<Object> args;
 	public MySqlCreateTableVisitor(MysqlSQLContext ctx,StringBuilder sb, List<Object> args){
 		this.ctx=ctx;
 		this.sb=sb;
 		this.args=args;
+		this.use_memory = ctx.getContext().getBooleanParameter("create_table.use_memory", use_memory);
 	}
 	 
 	public void visitDateFieldType(DateFieldType dateFieldType) {
@@ -109,6 +112,7 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 			}
 		}else{
 			sb.append("mediumtext"); // cannot specify default 
+			use_memory=false;
 		}
 		
 	}
@@ -126,6 +130,7 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	}
 	public void visitBlobType(BlobType blobType) {
 		sb.append("LONGBLOB");
+		use_memory=false;
 	}
 	public void visitIndex(Index idx) {
 		if( idx.getUnique()){
@@ -213,6 +218,16 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	public void visitPlaceHolderFieldType(PlaceHolderFieldType p) {
 		
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor#additions(boolean)
+	 */
+	@Override
+	public void additions(boolean create) {
+		if( create && use_memory){
+			sb.append(" ENGINE=MEMORY");
+		}
 	}
 	
 }

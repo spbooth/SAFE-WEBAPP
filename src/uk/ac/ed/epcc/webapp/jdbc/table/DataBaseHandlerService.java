@@ -201,7 +201,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 			}
 		}
 		sb.append(")");
- 		
+ 		vis.additions(true);
  		String text=sb.toString();
 		return text;
 	}
@@ -257,6 +257,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 				s.getField(s2).accept(vis);
 			}
 		}
+		vis.additions(false);
  		String text=sb.toString();
 		return text;
 	}

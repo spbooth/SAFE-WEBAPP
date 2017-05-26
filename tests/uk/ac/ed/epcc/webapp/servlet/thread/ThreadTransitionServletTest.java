@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.servlet.AbstractTransitionServletTest;
 import uk.ac.ed.epcc.webapp.servlet.thread.TestFactory.TestData;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -22,6 +23,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @author spb
  *
  */
+@ConfigFixtures("no_memory_tables.properties")
 public class ThreadTransitionServletTest extends AbstractTransitionServletTest {
 	
 	
