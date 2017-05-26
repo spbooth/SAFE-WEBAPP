@@ -88,9 +88,7 @@ public class SetMapper<O> implements ResultMapper<Set<O>> {
 		
 	}
 
-	public String getModify() {
-		return "";
-	}
+	
 
 	public SQLFilter getRequiredFilter() {
 		return target.getRequiredFilter();
@@ -99,8 +97,15 @@ public class SetMapper<O> implements ResultMapper<Set<O>> {
 	public List<PatternArgument> getTargetParameters(List<PatternArgument> list) {
 		return target.getParameters(list);
 	}
-
+	public String getModify() {
+		//TODO is it always valid to order by an arbitrary SQLValue
+		//StringBuilder sb = new StringBuilder();
+		//sb.append(" ORDER BY ");
+		//target.add(sb, qualify);
+		return null;
+	}
 	public List<PatternArgument> getModifyParameters(List<PatternArgument> list) {
+		//target.getParameters(list);
 		return list;
 	}
 

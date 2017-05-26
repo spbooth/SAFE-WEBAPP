@@ -517,9 +517,8 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 *
 	 */
     public class FilterAdapter implements ResultMapper<BDO>{
-    	private final boolean use_order;
-    	public FilterAdapter(boolean use_order){
-    		this.use_order=use_order;
+ 
+    	public FilterAdapter(){
     	}
     	boolean qualify = false;
 		public BDO makeObject(ResultSet rs) throws DataException {
@@ -542,9 +541,6 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 
 		public String getModify() {
-			if(use_order){
-				return OrderBy(false);
-			}
 			return null;
 		}
 
@@ -619,7 +615,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return old;
 		}
 		public String getModify() {
-			return null;
+			// Use a defined order
+			StringBuilder sb = new StringBuilder();
+			sb.append(" ORDER BY ");
+			res.getInfo(field).addName(sb, qualify, true);
+			return sb.toString();
 		}
 		public SQLFilter getRequiredFilter() {
 			return null;
@@ -690,6 +690,14 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * 
 	 */
 	public class FilterIterator extends ResultIterator<BDO> {
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.SQLResultIterator#fallbackOrder()
+		 */
+		@Override
+		protected String fallbackOrder() {
+			return OrderBy(qualify);
+		}
+
 		/** protected constructor to allow sub-classes to initialise fields before
 		 * calling setup
 		 * 
@@ -697,7 +705,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 */
 		protected FilterIterator(){
 	    	super(DataObjectFactory.this.getContext(),DataObjectFactory.this.getTarget());
-	    	setMapper(new FilterAdapter(true));
+	    	setMapper(new FilterAdapter());
 	    }
 		
 	    public FilterIterator(BaseFilter<? super BDO> fil) throws DataFault{
@@ -711,7 +719,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	    /**
 		 * Initialise using a filter. A null filter selects the entire table.
 		 * This allows the sequence to be limited to a subset. This constructor
-		 * only applies to SQLFilters as the accept method would futher reduce
+		 * only applies to SQLFilters as the accept method would further reduce
 		 * the number of objects returned
 		 * 
 		 * @param f
@@ -788,7 +796,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		public Finder(boolean allow_null) {
 			super(allow_null);
 			// Don't care about order if multiple results is an error
-			setMapper(new FilterAdapter(! DataObjectFactory.REJECT_MULTIPLE_RESULT_FEATURE.isEnabled(conn)));
+			setMapper(new FilterAdapter());
 		}
 	}
 	

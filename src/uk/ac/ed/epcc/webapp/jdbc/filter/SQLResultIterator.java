@@ -266,6 +266,15 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 					"Cannot remove in BasicDataObject.Iterator");
 		}
 
+		/** last ditch order clause to use if no other modify string
+		 * 
+		 * inlcude "ORDER BY" if set.
+		 * 
+		 * @return
+		 */
+		protected String fallbackOrder(){
+			return null;
+		}
 		
 		
 		/** method to do the initialisation
@@ -292,6 +301,10 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 			
 			
 			makeSelect(query);
+			// Use mapper/sub-class modify by preference
+			modify=getModify();
+			if( modify == null || modify.isEmpty()){
+				// Nor take order filter
 			if ( f != null && f instanceof OrderFilter) {
 				OrderFilter<?> o = (OrderFilter) f;
 				List<OrderClause> orderBy = o.OrderBy();
@@ -315,8 +328,10 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 					
 				}
 			}
+			
+			}
 			if( modify == null ){
-				modify=getModify();
+				modify = fallbackOrder();
 			}
 			if (modify != null) {
 				query.append(" ").append(modify);

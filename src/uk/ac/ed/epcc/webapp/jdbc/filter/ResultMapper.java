@@ -74,7 +74,7 @@ public interface ResultMapper<O> {
 
   
   /** provide an override GROUP/ORDER by clause
-   *  null to use default
+   *  null to use default order from filters
    * @return String SQL clause
    */
   public String getModify();
