@@ -27,7 +27,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
-import java.net.URL;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -236,7 +235,7 @@ public abstract class WebappTestBase implements ContextHolder{
 	    StringReader reader = new StringReader(baseline.toString());
 		utils.getDiff(diff, new InputSource(reader));
 		diff.close();
-		System.out.println(diff.toString());
+		//System.out.println(diff.toString());
 		
 		//This is a XSL transform to edit the dates in the project log as these will depend on the time the test is run.
 		TransformerFactory tfac = TransformerFactory.newInstance();
@@ -247,11 +246,20 @@ public abstract class WebappTestBase implements ContextHolder{
 		assertNotNull(t);
 
 		String expected = XMLDataUtils.transform(t,getClass(), expected_xml);
-		System.out.println("Expected: "+expected);
+		
 		String result = XMLDataUtils.transform(t, diff.toString());
-		//System.out.println("Got: "+result);
+		
 		String differ = TestDataHelper.diff(expected, result);
-		assertTrue("Unexpected result:\n"+differ,differ.trim().length()==0);
+		boolean same = differ.trim().length()==0;
+		if( ! same){
+			System.out.println("Raw:");
+			System.out.println(diff.toString());
+			System.out.println("====================================================================");
+			System.out.println("Got: "+result);
+			System.out.println("--------------------------------------------------------------------");
+			System.out.println("Expected: "+expected);
+		}
+		assertTrue("Unexpected result:\n"+differ,same);
 	}
 	/** Check database has not changed.
 	 * 
@@ -265,7 +273,7 @@ public abstract class WebappTestBase implements ContextHolder{
 	    StringReader reader = new StringReader(baseline.toString());
 		utils.getDiff(diff, new InputSource(reader));
 		diff.close();
-		System.out.println(diff.toString());
+		//System.out.println(diff.toString());
 		
 		assertEquals("No change","<Diff/>", diff.toString());
 	}
@@ -331,7 +339,7 @@ public abstract class WebappTestBase implements ContextHolder{
 		 assertNotNull(tt);
 		 
 		String result = XMLDataUtils.transform(tt, content);
-		 System.out.println(result);
+		 //System.out.println(result);
 		 String expected = XMLDataUtils.transform(tt,getClass(), expected_xml);
 		 
 		 String differ = TestDataHelper.diff(expected, result);

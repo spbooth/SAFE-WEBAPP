@@ -335,6 +335,8 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 			}
 			if (modify != null) {
 				query.append(" ").append(modify);
+			}else{
+				getLogger().warn("No order clasue");
 			}
 			if (useChunking() || maxreturn > 0) {
 				query.append(" LIMIT ?,?");

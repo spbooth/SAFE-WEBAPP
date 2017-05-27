@@ -769,6 +769,8 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		// as the sort order does not come naturally from the key but
 		// usually we are querying for single records.
 		order.add(res.getOrder(START_TIME_FIELD, false));
+		// Tie breake for common start times
+		order.add(res.getOrder(null, false));
 		return order;
 	}
 	/* (non-Javadoc)

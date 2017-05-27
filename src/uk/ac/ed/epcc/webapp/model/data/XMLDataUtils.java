@@ -93,7 +93,7 @@ public class XMLDataUtils implements Contexed{
 		TimerService serv = c.getService(TimerService.class);
 		for( int i=0 ; i< fixtures.length ; i++){
 			String fixture_name = c.expandText(fixtures[i]);
-			System.out.println("Loading "+fixture_name);
+			//System.out.println("Loading "+fixture_name);
 			if( serv != null ){
 				serv.startTimer(fixtures[i]);
 			}
