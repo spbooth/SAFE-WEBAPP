@@ -13,7 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model;
 
-import java.util.Iterator;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;

@@ -246,6 +246,8 @@ public class ErrorFilter implements Filter {
 	 * @throws Exception
 	 */
 	public static AppContext makeContext(ServletContext ctx,ServletRequest request,ServletResponse response) throws Exception{
+		
+		// This includes the default services like DeaultDatabaseService
 		AppContext  conn = new AppContext();
 		
 		// allow use of ServletContext for resource location

@@ -60,6 +60,11 @@ public class RegisterServlet extends WebappServlet {
 			serv = new ServletSessionService(conn);
 			conn.setService(serv);
 		}
+		if( serv.haveCurrentUser()){
+			// this servlet for should not be visited with a populated session
+			message(conn,req,res,"access_denied");
+			return;
+		}
 		String webName = conn.getService(ServletService.class).getWebName();
 		if( webName == null && DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn) ){
 			message(conn,req,res,"access_denied");
