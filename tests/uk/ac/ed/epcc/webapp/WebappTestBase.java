@@ -339,11 +339,15 @@ public abstract class WebappTestBase implements ContextHolder{
 		 assertNotNull(tt);
 		 
 		String result = XMLDataUtils.transform(tt, content);
-		 //System.out.println(result);
+		
 		 String expected = XMLDataUtils.transform(tt,getClass(), expected_xml);
 		 
 		 String differ = TestDataHelper.diff(expected, result);
-		 assertTrue("Unexpected result:\n"+differ,differ.trim().length()==0);
+		 boolean same = differ.trim().length()==0;
+		 if( ! same ){
+			 System.out.println(result);
+		 }
+		assertTrue("Unexpected result:\n"+differ,same);
 	}
 	@Before
 	public void clearEmails() {
