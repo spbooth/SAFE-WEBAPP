@@ -40,11 +40,13 @@ import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 import javax.mail.Address;
+import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.AddressException;
@@ -93,6 +95,14 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 public class Emailer {
+	/** Config property to set an password for authenticated sends
+	 * 
+	 */
+	private static final String MAIL_SMTP_PASSWORD = "mail.smtp.password";
+	/** Config property to set the username for authenticated sends.
+	 * 
+	 */
+	private static final String MAIL_SMTP_USER = "mail.smtp.user";
 	/**
 	 * 
 	 */
@@ -703,6 +713,20 @@ public class Emailer {
 		}
 		return session;
 	}
+	public static class PasswordAuth extends Authenticator{
+		public PasswordAuth(String username, String password) {
+			super();
+			this.username = username;
+			this.password = password;
+		}
+		private final String username;
+		private final String password;
+		@Override
+        protected PasswordAuthentication getPasswordAuthentication() {
+            return new PasswordAuthentication(username,
+                    password);
+        }
+	}
 	public static Session getSession(AppContext conn){
 		Properties props = conn.getService(ConfigService.class).getServiceProperties();
 
@@ -715,7 +739,13 @@ public class Emailer {
 			log.debug("mailhost is "+mailhost);
 		}
 		// don't use getDefaultInstance
-		Session session = Session.getInstance(props, null);
+		Authenticator auth=null;
+		String smtp_user = props.getProperty(MAIL_SMTP_USER);
+		String smtp_pass = props.getProperty(MAIL_SMTP_PASSWORD);
+		if( smtp_user != null && smtp_pass != null ){
+			auth = new PasswordAuth(smtp_user.trim(), smtp_pass.trim());
+		}
+		Session session = Session.getInstance(props, auth);
 		if( log != null ){
 			log.debug("session mailhost is "+session.getProperty(MAIL_SMTP_HOST));
 		}
