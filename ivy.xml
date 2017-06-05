@@ -75,7 +75,7 @@
     		<artifact name="mysql-connector-java" ext="jar"/>
 		</dependency>
 		<!-- Note log4j adds an old javamail jar-file so add later in load -->
-		<dependency org="log4j" name="log4j" rev="1.2.17">
+		<dependency org="log4j" name="log4j" rev="1.2.17" transitive="false">
     		<artifact name="log4j" ext="jar"/>
 		</dependency>
 		<dependency org="org.incava" name="java-diff" rev="1.1">
