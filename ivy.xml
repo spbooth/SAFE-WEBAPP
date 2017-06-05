@@ -67,6 +67,9 @@
     		<artifact name="jfreechart" ext="jar"/>
 		</dependency>
 		
+		<dependency org="org.jfree" name="jcommon" rev="1.0.24">
+    		<artifact name="jcommon" ext="jar"/>
+		</dependency>
 		
 		<dependency org="mysql" name="mysql-connector-java" rev="5.1.42">
     		<artifact name="mysql-connector-java" ext="jar"/>
