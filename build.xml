@@ -54,10 +54,10 @@
 		<delete dir="${coverage.dir}" />
 	</target>
 	<path id="lib.classpath">
-		<fileset dir="${ext-lib.dir}">
+		<fileset dir="${tomcat.home}/lib">
 			<include name="*.jar" />
 		</fileset>
-		<fileset dir="${tomcat.home}/lib">
+		<fileset dir="${ext-lib.dir}">
 			<include name="*.jar" />
 		</fileset>
 	</path>
