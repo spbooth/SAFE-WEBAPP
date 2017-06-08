@@ -66,8 +66,7 @@ public class Log4JWebappContextListener extends WebappContextListener {
 		serv.getLogger(getClass()).debug("Context started");
 		conn.close();
 		}catch(Throwable t){
-			System.out.println("Error starting Log4JWebappContextListener");
-			t.printStackTrace();
+			arg0.getServletContext().log("Error starting Log4JWebappContextListener",t);
 		}
 	}
 

@@ -28,7 +28,11 @@ public class JFreeSetupListener extends WebappContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
-		JFreeSetup.setup();
+		try{
+			JFreeSetup.setup();
+		}catch(Throwable t){
+			arg0.getServletContext().log("Error setting up JFreeChart", t);
+		}
 	}
 
 }
