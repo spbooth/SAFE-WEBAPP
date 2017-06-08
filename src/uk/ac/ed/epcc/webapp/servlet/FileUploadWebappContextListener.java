@@ -16,29 +16,21 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.servlet;
 
-import javax.servlet.ServletContextEvent;
-import org.apache.commons.io.FileCleaningTracker;
-import org.apache.commons.io.FileCleaner;
+import org.apache.commons.fileupload.servlet.FileCleanerCleanup;
 /** ContextListener that ensures threads created by apache commons file upload
  * are shutdown.
  * 
  * failing to shutdown or delaying initialisation seems to cause classloader 
  * memory leaks.
  * 
+ * This now just extends the official commons listener.
  * @author spb
  *
  */
 
 
-public class FileUploadWebappContextListener extends WebappContextListener {
+public class FileUploadWebappContextListener extends FileCleanerCleanup {
    
-	@Override
-	public void contextDestroyed(ServletContextEvent arg0) {
-		//TODO update jars
-		//FileCleaningTracker tracker = FileCleaningTracker.g
-		FileCleaner.exitWhenFinished();
-	}
-
 	
 
 }
