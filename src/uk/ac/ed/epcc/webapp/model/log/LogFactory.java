@@ -323,7 +323,17 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 
 		public final void setOwner(O q) {
 			my_query = q;
-			record.setProperty(OWNER_ID, q.getID());
+			int id = q.getID();
+			if( id < 0 ){
+				try {
+					q.commit();
+				} catch (DataFault e) {
+					getLogger().error("Error forcing owner id",e);
+				}
+				id= q.getID();
+				assert(id > 0);
+			}
+			record.setProperty(OWNER_ID, id);
 		}
 		
 
