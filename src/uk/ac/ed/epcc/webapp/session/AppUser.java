@@ -26,6 +26,7 @@ import java.util.Date;
 
 import uk.ac.ed.epcc.webapp.forms.BaseForm;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -106,12 +107,22 @@ public class AppUser extends DataObject implements java.security.Principal{
 		return getFactory().getCanonicalName(this);
 	}
 
-	/**
-	 * get the name of the user
+	/** get the presentation name of the user
+	 * 
+	 * 
+	 * By default this looks for a {@link Composite} that implements {@link NameComposite}
+	 * then falls back to the default realm name.
+	 * This method can also be overridden to directly generate a more friendly presentation name
 	 * 
 	 * @return String
 	 */
 	public String getName(){
+		for(NameComposite nc : ((AppUserFactory<?>)getFactory()).getComposites(NameComposite.class)){
+			String name = nc.getPresentationName(this);
+			if( name != null){
+				return name;
+			}
+		}
 		return getFactory().getCanonicalName(this);
 	}
 	
