@@ -62,8 +62,8 @@ the form could just submit to self. This might break form error reporting though
    
     if( tp instanceof ScriptTransitionFactory){
     	ScriptTransitionFactory st = (ScriptTransitionFactory)tp;
-    	WebappHeadTag.addCss(conn, request, st.getAdditionalCSS(key));
     	WebappHeadTag.addScript(conn,request,st.getAdditionalScript(key));
+    	WebappHeadTag.addCss(conn, request, st.getAdditionalCSS(key));
     }
     request.setAttribute(WebappHeadTag.FORM_PAGE_ATTR, Boolean.TRUE);
 %>

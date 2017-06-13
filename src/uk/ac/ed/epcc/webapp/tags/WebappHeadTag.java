@@ -79,7 +79,7 @@ public class WebappHeadTag extends TagSupport implements Tag {
         			doCSS(out, response, template_path,null,"nav_menu.css");
         		}
         		if(SCRIPT_FORMS_FEATURE.isEnabled(conn) && request.getAttribute(FORM_PAGE_ATTR) != null){
-        			doCSS(out, response, template_path,null,"${jquery-ui.css}");
+        			doCSS(out, response, template_path,null,conn.expandText("${jquery-ui.css}"));
         		}
         		doCSS(out, response, template_path,null,"extra.css");
         	
@@ -90,12 +90,12 @@ public class WebappHeadTag extends TagSupport implements Tag {
         		}
         		
         		if( NavigationMenuService.NAVIGATION_MENU_JS_FEATURE.isEnabled(conn)){
-        			doScript(scripts,out,request,response,"${jquery.script}");
+        			doScript(scripts,out,request,response,conn.expandText("${jquery.script}"));
         			doScript(scripts,out, request,response, "/scripts/menubar.js");
         		}
         		if(SCRIPT_FORMS_FEATURE.isEnabled(conn)&& request.getAttribute(FORM_PAGE_ATTR) != null){
-        			doScript(scripts,out,request,response,"${jquery.script}");
-        			doScript(scripts,out,request,response,"${jquery-ui.script}");
+        			doScript(scripts,out,request,response,conn.expandText("${jquery.script}"));
+        			doScript(scripts,out,request,response,conn.expandText("${jquery-ui.script}"));
         			doScript(scripts,out,request,response,"/js/modernizr-custom.js");
         			doScript(scripts,out,request,response,"/js/fixinputs.js");
         		}
