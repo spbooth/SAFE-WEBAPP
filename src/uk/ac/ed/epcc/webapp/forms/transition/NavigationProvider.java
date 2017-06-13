@@ -16,7 +16,7 @@ package uk.ac.ed.epcc.webapp.forms.transition;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 
 /** Interface for a {@link TransitionFactory} that 
- * provides additional top/botton content for navication
+ * provides additional top/botton content for navigation
  * @author spb
  *
  */
