@@ -47,6 +47,18 @@
 	<xsl:template match="StartTime">
 	<xsl:element name="StartTime">1234567890</xsl:element>
 	</xsl:template>
+	<xsl:template match="StartDate">
+	<xsl:element name="StartDate">1234567890</xsl:element>
+	</xsl:template>
+	<xsl:template match="Date">
+	<xsl:element name="Date">1234567890</xsl:element>
+	</xsl:template>
+	<xsl:template match="LastContact">
+	<xsl:element name="LastContact">1234567890</xsl:element>
+	</xsl:template>
+	<xsl:template match="ModifyDate">
+	<xsl:element name="ModifyDate">1234567890</xsl:element>
+	</xsl:template>
 	<xsl:template match="EndTime">
 	<xsl:element name="EndTime">1234567890</xsl:element>
 	</xsl:template>
