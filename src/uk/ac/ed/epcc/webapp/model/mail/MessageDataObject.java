@@ -202,11 +202,22 @@ public abstract class MessageDataObject extends DataObject implements
 				return sb.toString();
 			}
 		} catch (Exception e) {
-			getContext().error(e, "Error getting sender");
+			getLogger().error("Error getting sender",e);
 		}
 		return "Unknown";
 	}
 
+	public final String getMessageID(){
+		try{
+			MimeMessage m = getMessage();
+			if( m != null){
+				return m.getMessageID();
+			}
+		}catch(Exception e){
+			getLogger().error("Error getting messageID", e);
+		}
+		return null;
+	}
 	
 	public static void anonymise(AppContext c, String table) throws DataFault{
 		try{
