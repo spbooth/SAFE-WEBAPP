@@ -208,7 +208,7 @@ public class Emailer {
 			
 		}
 		
-		templateEmail(person, email_template);
+		doSend(templateMessage(person,email_template));
 		try{
 			PasswordChangeListener listener = ctx.makeObjectWithDefault(PasswordChangeListener.class,null, PasswordChangeListener.PASSWORD_LISTENER_PROP);
 			if( listener != null ){
@@ -236,7 +236,7 @@ public class Emailer {
 		email_template.setProperty("request.tag", req.getTag());
 		
 
-		templateEmail(req.getEmail(), email_template);
+		doSend(templateMessage(req.getEmail(), null, email_template));
 
 	}
 	/**
@@ -280,37 +280,22 @@ public class Emailer {
 			}
 			
 		}
-		templateEmail(person, email_template);
+		doSend(templateMessage(person,email_template));
 
 	}
 
-	public MimeMessage templateEmail(String sendto, Hashtable h,
+	public MimeMessage templateMessage(String sendto, Hashtable h,
 			TemplateFile email_template) throws IOException, MessagingException {
 		Logger log = getLogger();
 		// change destination depending on sendto:
 		String email = mapRecipients(sendto);
 		
 		log.info("EmailSender sending an email to " + email);
-		return templateEmail(new String[] { email }, h, email_template);
+		return templateMessage(new String[] { email }, h, email_template);
 	}
     public String mapRecipients(String sendto){
     	return sendto;
     }
-	/**
-	 * Send an email based on a template file to a single recipient
-	 * 
-	 * @param sendto
-	 * @param email_template
-	 * @return {@link MimeMessage}
-	 * @throws IOException
-	 * @throws MessagingException
-	 */
-	public MimeMessage templateEmail(String sendto, TemplateFile email_template)
-			throws IOException, MessagingException {
-		return templateEmail(sendto, null, email_template);
-	}
-
-	
 	public String getEmail(AppUser recipient){
 		if( recipient.allowEmail()){
 			return recipient.getEmail();
@@ -326,48 +311,23 @@ public class Emailer {
 	 * @throws IOException
 	 * @throws MessagingException
 	 */
-	public MimeMessage templateEmail(AppUser recipient, TemplateFile email_template)
+	public MimeMessage templateMessage(AppUser recipient, TemplateFile email_template)
 			throws IOException, MessagingException {
-		return templateEmail(recipient, null, email_template);
-	}
-	public MimeMessage templateEmail(AppUser recipient, Hashtable headers,TemplateFile email_template)
-				throws IOException, MessagingException {
-		Logger log = getLogger();
-		String email = getEmail(recipient);
-		log.debug("Email mapped "+recipient.getEmail()+"->"+email);
-		if( email != null && email.trim().length() > 0){
-			return templateEmail(email, headers, email_template);
-		}else{
-			log.warn("Email to "+recipient.getIdentifier()+" mapped to null");
-		}
-		return null;
-	}
-	/**
-	 * send an email from a template file to multiple recipients with custom
-	 * headers
-	 * 
-	 * @param notify_emails
-	 *            destination addresses
-	 * @param headers
-	 *            Hashtable of extra header info
-	 * @param email_template
-	 *            TemplateFile to sue to generate message
-     * @return MimeMessage sent
-	 * @throws UnsupportedEncodingException
-	 * @throws MessagingException
-	 */
-	public MimeMessage templateEmail(String[] notify_emails, Hashtable headers,
-			TemplateFile email_template) throws UnsupportedEncodingException,
-			MessagingException {
-
-		
-		
-		MimeMessage m = templateMessage(notify_emails,headers,email_template);
-	    return doSend(m);
-	
+		return templateMessage(recipient, null, email_template);
 	}
 	
-	
+	public MimeMessage templateMessage(AppUser recipient, Hashtable headers,TemplateFile email_template)
+			throws IOException, MessagingException {
+	Logger log = getLogger();
+	String email = getEmail(recipient);
+	log.debug("Email mapped "+recipient.getEmail()+"->"+email);
+	if( email != null && email.trim().length() > 0){
+		return templateMessage(email, headers, email_template);
+	}else{
+		log.warn("Email to "+recipient.getIdentifier()+" mapped to null");
+	}
+	return null;
+}
 	public boolean supressSend(Address a){
 		if( dont_send_pattern != null && a instanceof InternetAddress){
 			InternetAddress ia = (InternetAddress) a;
@@ -378,6 +338,9 @@ public class Emailer {
 		return false;
 	}
 	public MimeMessage doSend(MimeMessage m) throws MessagingException{
+		if( m == null ){
+			return null;
+		}
 		AppContext conn = getContext();
 		Logger log = conn.getService(LoggerService.class).getLogger(getClass());
 
@@ -467,6 +430,20 @@ public class Emailer {
 		}
 		return m;
 	}
+	/**
+	 * make an email from a template file to multiple recipients with custom
+	 * headers
+	 * 
+	 * @param notify_emails
+	 *            destination addresses
+	 * @param headers
+	 *            Hashtable of extra header info
+	 * @param email_template
+	 *            TemplateFile to sue to generate message
+     * @return MimeMessage sent
+	 * @throws UnsupportedEncodingException
+	 * @throws MessagingException
+	 */
 	public MimeMessage templateMessage(String[] notify_emails, Hashtable headers, TemplateFile email_template) throws MessagingException, UnsupportedEncodingException {
 		return templateMessage(notify_emails,headers,null,false,email_template);
 	}
@@ -760,12 +737,25 @@ public class Emailer {
 	 * @throws UnsupportedEncodingException
 	 * @throws MessagingException
 	 */
-	public void templateEmail(String[] notify_emails,
+	public MimeMessage templateEmail(String[] notify_emails,
 			TemplateFile email_template) throws UnsupportedEncodingException,
 			MessagingException {
-		templateEmail(notify_emails, null, email_template);
+		return doSend(templateMessage(notify_emails,email_template));
 	}
-
+	/**
+	 * make an email from a template file to multiple recipients
+	 * 
+	 * @param notify_emails
+	 * @param email_template
+	 * @return message
+	 * @throws UnsupportedEncodingException
+	 * @throws MessagingException
+	 */
+	public MimeMessage templateMessage(String[] notify_emails,
+			TemplateFile email_template) throws UnsupportedEncodingException,
+			MessagingException {
+		return templateMessage(notify_emails, null, email_template);
+	}
 	/**
 	 * check the validity of an Email address
 	 * 
