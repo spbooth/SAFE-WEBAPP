@@ -175,9 +175,7 @@ protected A lookupPerson() {
 						Integer id = (Integer) getAttribute(WTMP_ID);
 						if( id != null ){
 							Wtmp w = man.find(id);
-							if( w.update() ){
-								setCrossCookie(man, w);
-							}
+							w.update();
 						}
 					}
 				}
@@ -281,18 +279,28 @@ public void setCurrentPerson(A person) {
  * @param w
  * @throws DataFault
  */
-public void setCrossCookie(WtmpManager man, Wtmp w) throws DataFault {
-	if(CROSS_APP_COOKIE_LOGIN_FEATURE.isEnabled(getContext()) &&  (ss instanceof DefaultServletService)){
-		CrossCookieComposite comp = man.getComposite(CrossCookieComposite.class);
-		if( comp != null){
-			String value = comp.getFullData(w);
-			if( value != null ){
-				Cookie ck = new Cookie(WEBAPP_SESSION_COOKIE_NAME, value);
-				ck.setSecure(true);
-				ck.setMaxAge(-1);
-				((DefaultServletService)ss).addCookie(ck);
+public void setCrossCookie(WtmpManager man, Wtmp w)  {
+	try{
+		if(CROSS_APP_COOKIE_LOGIN_FEATURE.isEnabled(getContext()) &&  (ss instanceof DefaultServletService)){
+			CrossCookieComposite comp = man.getComposite(CrossCookieComposite.class);
+			if( comp != null){
+				String value = comp.getFullData(w);
+				if( value != null ){
+					Cookie ck = new Cookie(WEBAPP_SESSION_COOKIE_NAME, value);
+					//ck.setSecure(true);
+					ck.setMaxAge(-1);
+					String domain = getContext().getInitParameter("cross_cookie.domain");
+					if( domain != null){
+						// Don't set cookies without a domain
+						ck.setDomain(domain);
+						ck.setPath("/");
+						((DefaultServletService)ss).addCookie(ck);
+					}
+				}
 			}
 		}
+	}catch(Throwable t){
+		getContext().error(t,"Error setting cross app cookie");
 	}
 }
 
@@ -316,24 +324,32 @@ protected Integer getPersonID() {
 				return id;
 			}
 			if( CROSS_APP_COOKIE_LOGIN_FEATURE.isEnabled(getContext())){
-				// look for a cross-login cookie
-				for(Cookie c : request.getCookies()){
-					if( c.getName().equals(WEBAPP_SESSION_COOKIE_NAME) && c.getSecure()){
-						String value = c.getValue();
-						WtmpManager man = getWtmpManager();
-						if( man != null ){
-							CrossCookieComposite ccs = man.getComposite(CrossCookieComposite.class);
-							if( ccs != null){
-								Wtmp w = man.find(ccs.getFilter(value),true);
-								if( w != null){
-									Date now = new Date();
-									if( w.getEndTime().after(now)){
-										setCurrentPerson((A) w.getPerson());
+				try{
+					// look for a cross-login cookie
+					for(Cookie c : request.getCookies()){
+						if( c.getName().equals(WEBAPP_SESSION_COOKIE_NAME) ){
+							String value = c.getValue();
+							WtmpManager man = getWtmpManager();
+							if( man != null ){
+								CrossCookieComposite ccs = man.getComposite(CrossCookieComposite.class);
+								if( ccs != null){
+									Wtmp w = man.find(ccs.getFilter(value),true);
+									if( w != null){
+										Date now = new Date();
+										if( w.getEndTime().after(now)){
+											AppUser person = w.getPerson();
+											setCurrentPerson((A) person);
+											setAttribute(WTMP_ID, w.getID());
+											setAttribute(WTMP_EXPIRY_DATE, w.getEndTime());
+											return person.getID();
+										}
 									}
 								}
 							}
 						}
 					}
+				}catch(Throwable t){
+					getContext().error(t,"Error reading cross app cookie");
 				}
 			}
 		}	

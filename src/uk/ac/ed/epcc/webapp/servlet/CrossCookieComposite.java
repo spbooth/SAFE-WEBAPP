@@ -15,8 +15,6 @@ package uk.ac.ed.epcc.webapp.servlet;
 
 import java.util.Set;
 
-import javax.servlet.http.Cookie;
-
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
@@ -46,7 +44,7 @@ public class CrossCookieComposite extends Composite<WtmpManager.Wtmp,CrossCookie
 	/**
 	 * @param fac
 	 */
-	protected CrossCookieComposite(WtmpManager fac) {
+	public CrossCookieComposite(WtmpManager fac) {
 		super(fac);
 	}
 
