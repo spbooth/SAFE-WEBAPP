@@ -19,16 +19,18 @@ package uk.ac.ed.epcc.webapp.servlet.session;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
-import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.logging.debug.FatalError;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.relationship.PersonRelationship;
+import uk.ac.ed.epcc.webapp.servlet.CrossCookieComposite;
 import uk.ac.ed.epcc.webapp.servlet.DefaultServletService;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 import uk.ac.ed.epcc.webapp.servlet.WtmpManager;
@@ -65,6 +67,11 @@ public class ServletSessionService<A extends AppUser> extends AbstractSessionSer
 	private static final String WTMP_ID = "SESSION_WTMP_ID";
 	private static final String WTMP_EXPIRY_DATE = "SESSION_WTMP_EXPIRTY_DATE";
 	private static final String NAME_ATTR="UserName";
+	public static final Feature CROSS_APP_COOKIE_LOGIN_FEATURE = new Feature("cross_app_cookie",false,"Support cross app SSO via cookies");
+	/**
+	 * 
+	 */
+	private static final String WEBAPP_SESSION_COOKIE_NAME = "WEBAPP_SESSION";
 	
 	// Flag to supress re-populate if we logged out
 	private boolean force_no_person=false;
@@ -168,7 +175,9 @@ protected A lookupPerson() {
 						Integer id = (Integer) getAttribute(WTMP_ID);
 						if( id != null ){
 							Wtmp w = man.find(id);
-							w.update();
+							if( w.update() ){
+								setCrossCookie(man, w);
+							}
 						}
 					}
 				}
@@ -252,6 +261,7 @@ public void setCurrentPerson(A person) {
 			}
 			if( request != null){
 				Wtmp w = man.create(person, request);
+				setCrossCookie(man, w);
 				setAttribute(WTMP_ID, w.getID());
 				setAttribute(WTMP_EXPIRY_DATE, w.getEndTime());
 			}
@@ -264,6 +274,26 @@ public void setCurrentPerson(A person) {
 	// Store name as an attribute.We don't use this
 	// but it helps to identify users from the tomcat manager app.
 	setAttribute(NAME_ATTR, person.getName());
+}
+
+/**
+ * @param man
+ * @param w
+ * @throws DataFault
+ */
+public void setCrossCookie(WtmpManager man, Wtmp w) throws DataFault {
+	if(CROSS_APP_COOKIE_LOGIN_FEATURE.isEnabled(getContext()) &&  (ss instanceof DefaultServletService)){
+		CrossCookieComposite comp = man.getComposite(CrossCookieComposite.class);
+		if( comp != null){
+			String value = comp.getFullData(w);
+			if( value != null ){
+				Cookie ck = new Cookie(WEBAPP_SESSION_COOKIE_NAME, value);
+				ck.setSecure(true);
+				ck.setMaxAge(-1);
+				((DefaultServletService)ss).addCookie(ck);
+			}
+		}
+	}
 }
 
 @Override
@@ -284,6 +314,27 @@ protected Integer getPersonID() {
 			id = super.getPersonID();
 			if( id != null ){
 				return id;
+			}
+			if( CROSS_APP_COOKIE_LOGIN_FEATURE.isEnabled(getContext())){
+				// look for a cross-login cookie
+				for(Cookie c : request.getCookies()){
+					if( c.getName().equals(WEBAPP_SESSION_COOKIE_NAME) && c.getSecure()){
+						String value = c.getValue();
+						WtmpManager man = getWtmpManager();
+						if( man != null ){
+							CrossCookieComposite ccs = man.getComposite(CrossCookieComposite.class);
+							if( ccs != null){
+								Wtmp w = man.find(ccs.getFilter(value),true);
+								if( w != null){
+									Date now = new Date();
+									if( w.getEndTime().after(now)){
+										setCurrentPerson((A) w.getPerson());
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}	
 		// At one stage we explicitly stored 0 as the personid to prevent additional lookups.

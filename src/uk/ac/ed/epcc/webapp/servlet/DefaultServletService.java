@@ -573,6 +573,11 @@ public class DefaultServletService implements ServletService{
 		}
 	}
 
+	public void addCookie(Cookie c){
+		if( ! isComitted()){
+			((HttpServletResponse)res).addCookie(c);
+		}
+	}
 	protected static String decode(String base64) {
 		return new String(Base64.decodeBase64(base64));
 	}

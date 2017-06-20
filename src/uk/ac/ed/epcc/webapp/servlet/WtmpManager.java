@@ -129,12 +129,18 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> {
 			record.setProperty(START_TIME, d);
 		}
 
-		public void update() throws DataFault {
+		/** update the Wtmp entry
+		 * 
+		 * @return true if modified
+		 * @throws DataFault
+		 */
+		public boolean update() throws DataFault {
 			Date n = new Date();
 			if (n.after(getEndTime())) {
 				setEndTime(new Date(n.getTime() + Window));
-				commit();
+				return commit();
 			}
+			return false;
 		}
 
 		public void logout() throws DataFault {
