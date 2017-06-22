@@ -75,14 +75,16 @@ public class CrossCookieComposite extends Composite<WtmpManager.Wtmp,CrossCookie
 		Repository res = getRepository();
 		
 		int pos = fulldata.indexOf("-");
-		if( pos < 1 || ! res.hasField(COOKIE_DATA_FIELD)){
+		// Important to check length to not match blank data wtmp.
+		if( pos < 1 || (fulldata.length()-pos) != DATA_LEN || ! res.hasField(COOKIE_DATA_FIELD)){
 			return new FalseFilter<WtmpManager.Wtmp>(target);
 		}
 		AndFilter fil = new AndFilter<>(target);
 		Integer id = Integer.parseInt(fulldata.substring(0, pos));
 		
 		fil.addFilter(new SQLIdFilter<>(target, res, id));
-		fil.addFilter(new SQLValueFilter<>(target, res, COOKIE_DATA_FIELD, fulldata.substring(pos+1)));
+		String data = fulldata.substring(pos+1);
+		fil.addFilter(new SQLValueFilter<>(target, res, COOKIE_DATA_FIELD, data));
 		return fil;
 	}
 	/* (non-Javadoc)
@@ -111,6 +113,10 @@ public class CrossCookieComposite extends Composite<WtmpManager.Wtmp,CrossCookie
 		}
 		int id=w.getID();
 		return Integer.toString(id)+"-"+rand;
+	}
+	
+	public void invalidate(Wtmp w){
+		getRecord(w).setProperty(COOKIE_DATA_FIELD, "");
 	}
 	
 

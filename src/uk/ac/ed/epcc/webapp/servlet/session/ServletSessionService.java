@@ -28,7 +28,6 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.relationship.PersonRelationship;
 import uk.ac.ed.epcc.webapp.servlet.CrossCookieComposite;
 import uk.ac.ed.epcc.webapp.servlet.DefaultServletService;
@@ -91,7 +90,6 @@ public class ServletSessionService<A extends AppUser> extends AbstractSessionSer
   @Override
   public String getName(){
 	  String name = super.getName();
-	  AppContext c = getContext();
 	  if( name == null ){
 		  // this for when we are not using a login table.
 		  return ss.getWebName();
@@ -228,7 +226,26 @@ public void logOut(){
 	}
 	force_no_person=true;
 	super.logOut();
-	
+	try{
+		WtmpManager man = getWtmpManager();
+		if( man != null ){
+			Integer wtmp_id = (Integer) getAttribute(WTMP_ID);
+			if( wtmp_id != null ){
+				Wtmp w = man.find(wtmp_id);
+				if( w != null){
+					w.setEndTime(new Date());
+					CrossCookieComposite cc = man.getComposite(CrossCookieComposite.class);
+					if( cc != null ){
+						cc.invalidate(w);
+					}
+					w.commit();
+				}
+			}
+			setCookie(false, "");
+		}
+	}catch(Throwable t){
+		getContext().error(t, "Error closing Wtmp");
+	}
 	if( ss instanceof DefaultServletService){
 		DefaultServletService defss = (DefaultServletService)ss;
 		defss.logout(true);
@@ -247,7 +264,6 @@ public void setCurrentPerson(A person) {
 	super.setCurrentPerson(person);
 	force_no_person=false;
 	try {
-		AppContext c = getContext();
 		WtmpManager man = getWtmpManager();
 		if( man != null ){
 
@@ -277,7 +293,6 @@ public void setCurrentPerson(A person) {
 /**
  * @param man
  * @param w
- * @throws DataFault
  */
 public void setCrossCookie(WtmpManager man, Wtmp w)  {
 	try{
@@ -286,21 +301,35 @@ public void setCrossCookie(WtmpManager man, Wtmp w)  {
 			if( comp != null){
 				String value = comp.getFullData(w);
 				if( value != null ){
-					Cookie ck = new Cookie(WEBAPP_SESSION_COOKIE_NAME, value);
-					//ck.setSecure(true);
-					ck.setMaxAge(-1);
-					String domain = getContext().getInitParameter("cross_cookie.domain");
-					if( domain != null){
-						// Don't set cookies without a domain
-						ck.setDomain(domain);
-						ck.setPath("/");
-						((DefaultServletService)ss).addCookie(ck);
-					}
+					setCookie(true,value);
 				}
 			}
 		}
 	}catch(Throwable t){
 		getContext().error(t,"Error setting cross app cookie");
+	}
+}
+
+/**
+ * @param value
+ */
+private void setCookie(boolean add,String value) {
+	if( ! (ss instanceof DefaultServletService)){
+		return;
+	}
+	Cookie ck = new Cookie(WEBAPP_SESSION_COOKIE_NAME, value);
+	//ck.setSecure(true);
+	if( add){
+		ck.setMaxAge(-1);
+	}else{
+		ck.setMaxAge(0);
+	}
+	String domain = getContext().getInitParameter("cross_cookie.domain");
+	if( domain != null){
+		// Don't set cookies without a domain
+		ck.setDomain(domain);
+		ck.setPath("/");
+		((DefaultServletService)ss).addCookie(ck);
 	}
 }
 

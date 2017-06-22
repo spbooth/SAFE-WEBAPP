@@ -564,8 +564,14 @@ public class DefaultServletService implements ServletService{
 				if( cookies != null && cookies.length > 0){
 					for( Cookie c : cookies){
 						if( c.getName().equalsIgnoreCase("JSESSIONID") || getContext().getBooleanParameter(LOGOUT_REMOVE_COOKIE_PREFIX+c.getName(), false)){
-							c.setMaxAge(0);
-							((HttpServletResponse)res).addCookie(c);
+							Cookie c2 = (Cookie) c.clone();
+							c2.setMaxAge(0); // This should request a delete
+							if( c2.getPath() == null ){
+								String contextPath = request.getContextPath();
+								c2.setPath(contextPath+"/"); // browser did not include path. This will only work if path matched exactly
+							}
+							c2.setValue("");
+							((HttpServletResponse)res).addCookie(c2);
 						}
 					}
 				}
