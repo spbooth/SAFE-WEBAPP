@@ -74,9 +74,10 @@ public class MockRequest implements HttpServletRequest {
 		context_path=path;
 	}
 
+	public Cookie cookies[] = null;
 	public Cookie[] getCookies() {
 		
-		return null;
+		return cookies;
 	}
 
 	public long getDateHeader(String arg0) {

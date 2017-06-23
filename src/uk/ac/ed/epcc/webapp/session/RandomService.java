@@ -72,7 +72,7 @@ public class RandomService implements AppContextService<RandomService> {
 		StringBuilder buff = new StringBuilder(length);
 		for (int c = 0; c < length; c++) {
 			// Pick a random character from the ranges
-			int r = random.nextInt(total_chars);
+			int r = randomInt(total_chars);
 	
 			// Work out which character we picked
 			for (int i = 0; i < chars.length; i++) {
@@ -98,6 +98,14 @@ public class RandomService implements AppContextService<RandomService> {
 			}
 		}
 		return buff.toString();
+	}
+
+	/**
+	 * @param total_chars
+	 * @return
+	 */
+	protected int randomInt(int total_chars) {
+		return random.nextInt(total_chars);
 	}
 	/**
 	 * Generates random sequences of characters in the ranges 'a'..'z', 'A'..'Z'

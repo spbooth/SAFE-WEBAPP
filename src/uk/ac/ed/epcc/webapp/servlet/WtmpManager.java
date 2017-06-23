@@ -23,6 +23,7 @@ import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
@@ -144,7 +145,11 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> {
 		}
 
 		public void logout() throws DataFault {
-			setEndTime(new Date());
+			CurrentTimeService cts = getContext().getService(CurrentTimeService.class);
+			setEndTime(cts.getCurrentTime());
+			for(LogoutListener l : WtmpManager.this.getComposites(LogoutListener.class)){
+				l.logout(this);
+			}
 			commit();
 		}
 

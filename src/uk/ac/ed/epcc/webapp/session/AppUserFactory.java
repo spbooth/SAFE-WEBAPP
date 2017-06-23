@@ -489,10 +489,10 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		
 		AppUserNameFinder<AU,?> finder = getRealmFinder(getDefaultRealm());
 		if( finder != null ){
-			assert(finder.userVisible());
+			//assert(finder.userVisible());
 			return finder.getCanonicalName(object);
 		}
-		// Use the first userSuppied canonical name.
+		// Use the first userSupplied canonical name.
 		for(  AppUserNameFinder<AU,?> f : getRealms()){
 			if( f.userVisible()){
 				return f.getCanonicalName(object);

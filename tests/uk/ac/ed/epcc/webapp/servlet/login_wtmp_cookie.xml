@@ -1,0 +1,56 @@
+<Diff><TableSpecification name='Person'>
+<Email type='String' nullable='true' max='254'/>
+<Updated type='Long' nullable='true'/>
+<PasswordFails type='Integer' nullable='false'/>
+<PasswordStatus type='String' nullable='false' max='1'/>
+<Salt type='String' nullable='false' max='16'/>
+<Alg type='Integer' nullable='false'/>
+<Password type='String' nullable='false' max='32'/>
+<WebName type='String' nullable='true' max='128'/>
+<SignupDate type='Long' nullable='true'/>
+<Email_index type='Index' unique='true'><Column name='Email'/></Email_index>
+<WebName_index type='Index' unique='true'><Column name='WebName'/></WebName_index>
+</TableSpecification>
+<Person id='1'>
+<Email>fred@example.com</Email>
+<PasswordFails>0</PasswordFails>
+<PasswordStatus>V</PasswordStatus>
+<Salt>abcdefghijklmnop</Salt>
+<Alg>0</Alg>
+<Password>f37588aa6f7cca950347968cbcdc32c8</Password>
+</Person>
+<TableSpecification name='Properties'>
+<Name type='String' nullable='false' max='255'/>
+<Value type='String' nullable='false' max='255'/>
+<name_key type='Index' unique='true'><Column name='Name'/></name_key>
+</TableSpecification>
+<Properties id='1'>
+<Name>reference.Wtmp.PersonID</Name>
+<Value>Person</Value>
+</Properties>
+<TableSpecification name='role_table'>
+<PersonID type='Integer' nullable='false'/>
+<Role type='String' nullable='false' max='32'/>
+</TableSpecification>
+<role_table id='1'>
+<PersonID>1</PersonID>
+<Role>Admin</Role>
+</role_table>
+<TableSpecification name='Wtmp'>
+<PersonID reference='Person'/>
+<StartTime type='Long' nullable='true'/>
+<EndTime type='Long' nullable='true'/>
+<Browser type='String' nullable='true' max='5592405'/>
+<Host type='String' nullable='true' max='128'/>
+<CookieData type='String' nullable='true' max='64'/>
+<login_index type='Index' unique='false'><Column name='PersonID'/><Column name='EndTime'/></login_index>
+</TableSpecification>
+<Wtmp id='1'>
+<PersonID>1</PersonID>
+<StartTime>1498220399</StartTime>
+<EndTime>1498222199</EndTime>
+<Browser>junit</Browser>
+<Host>localhost</Host>
+<CookieData>qrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqr</CookieData>
+</Wtmp>
+</Diff>

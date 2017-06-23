@@ -37,7 +37,7 @@ import uk.ac.ed.epcc.webapp.session.RandomService;
  * @author spb
  *
  */
-public class CrossCookieComposite extends Composite<WtmpManager.Wtmp,CrossCookieComposite> {
+public class CrossCookieComposite extends Composite<WtmpManager.Wtmp,CrossCookieComposite> implements LogoutListener {
 
 	private static final String COOKIE_DATA_FIELD="CookieData";
 	private static final int DATA_LEN=64;
@@ -76,7 +76,7 @@ public class CrossCookieComposite extends Composite<WtmpManager.Wtmp,CrossCookie
 		
 		int pos = fulldata.indexOf("-");
 		// Important to check length to not match blank data wtmp.
-		if( pos < 1 || (fulldata.length()-pos) != DATA_LEN || ! res.hasField(COOKIE_DATA_FIELD)){
+		if( pos < 1 || (fulldata.length()-(pos+1)) != DATA_LEN || ! res.hasField(COOKIE_DATA_FIELD)){
 			return new FalseFilter<WtmpManager.Wtmp>(target);
 		}
 		AndFilter fil = new AndFilter<>(target);
@@ -115,7 +115,11 @@ public class CrossCookieComposite extends Composite<WtmpManager.Wtmp,CrossCookie
 		return Integer.toString(id)+"-"+rand;
 	}
 	
-	public void invalidate(Wtmp w){
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.servlet.LogoutListener#logout(uk.ac.ed.epcc.webapp.servlet.WtmpManager.Wtmp)
+	 */
+	@Override
+	public void logout(Wtmp w){
 		getRecord(w).setProperty(COOKIE_DATA_FIELD, "");
 	}
 	
