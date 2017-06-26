@@ -13,41 +13,12 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
-/** A {@link SignupDateComposite} that implements {@link RegisterTrigger}
- * 
- * This is used to force an auto-created account to the registration page the first time
- * a user logs in. Normally only makes sense when used with mandatory external auth
- * but still capturing user meta-data at registration.
+/** An interface for {@link AppUserComposite}s that need to implements side-effects
+ * when a user re-registers an account.
  * @author spb
  *
  */
-public class RegistrationDateComposite<AU extends AppUser> extends SignupDateComposite<AU> implements RegisterTrigger<AU>{
+public interface ReRegisterComposite<A extends AppUser> {
 
-	/**
-	 * @param fac
-	 */
-	public RegistrationDateComposite(AppUserFactory fac) {
-		super(fac);
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.session.RegisterTrigger#mustRegister(uk.ac.ed.epcc.webapp.session.AppUser)
-	 */
-	@Override
-	public boolean mustRegister(AU user) {
-		if( getRepository().hasField(SIGNUP_DATE)){
-			return getSignupDate(user) == null;
-		}
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.session.RegisterTrigger#postRegister(uk.ac.ed.epcc.webapp.session.AppUser)
-	 */
-	@Override
-	public void postRegister(AU user) {
-		// Not needed performed in postCommit
-		
-	}
-
+	public void reRegister(A user);
 }

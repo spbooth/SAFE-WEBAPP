@@ -72,11 +72,18 @@ public class SignupDateComposite<BDO extends DataObject> extends CreateComposite
 	}
 
 
-	/**
+	/** mark the record as signed up at the current time
 	 * @param dat
 	 */
 	public void markSignup(BDO dat) {
 		getRecord(dat).setOptionalProperty(SIGNUP_DATE, new Date());
+	}
+	/** clear the signup record.
+	 * 
+	 * @param dat
+	 */
+	protected void clearSignup(BDO dat){
+		getRecord(dat).setOptionalProperty(SIGNUP_DATE, null);
 	}
 
 	public Date getSignupDate(BDO dat){

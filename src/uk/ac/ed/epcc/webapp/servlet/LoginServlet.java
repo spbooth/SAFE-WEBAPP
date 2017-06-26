@@ -37,6 +37,7 @@ import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
+import uk.ac.ed.epcc.webapp.session.ReRegisterComposite;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 // import uk.ac.hpcx.HpcxMain;
@@ -132,7 +133,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 					try{
 						log.info("new password requested for " + username);
 						 // This corresponds to the registered username test above
-						if( ! user.canLogin() ){
+						if( (! user.canLogin()) && (! user.canReregister()) ){
 							message(conn,req,res,"login_disabled");
 							return;
 						}
@@ -140,6 +141,15 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 							message(conn, req, res, "new_password_failed");
 							return;
 						}
+						if( ! user.canLogin()){
+							// Need to reset the account.
+							user.reRegister();
+							for(ReRegisterComposite<T> c : person_fac.getComposites(ReRegisterComposite.class)){
+								c.reRegister(user);
+							}
+							user.commit();
+						}
+						
 						password_auth.newPassword(user);
 					}catch(Throwable t){
 						getLogger(conn).error("Error getting registered user or sending new password",t);

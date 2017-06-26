@@ -61,15 +61,31 @@ public class AppUser extends DataObject implements java.security.Principal{
 		return factory;
 	}
 	/**
-	 * Is this user allowed to login applications should overide this method to
+	 * Is this user allowed to login applications should override this method to
 	 * implement the necessary logic for this.
 	 * 
 	 * This will also disable forgotten password requests.
 	 * 
+	 * @see #canReregister()
 	 * @return boolean true for permitted.
 	 */
 	public boolean canLogin() {
 		return true;
+	}
+	/** Return true if the account is not permitted to login but a forgotten password 
+	 * request will re-register the user.
+	 * 
+	 * @return
+	 */
+	public boolean canReregister(){
+		return false;
+	}
+	
+	/** Re-register a retired account
+	 * 
+	 */
+	public void reRegister(){
+		
 	}
 	
 	
