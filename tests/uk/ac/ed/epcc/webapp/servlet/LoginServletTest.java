@@ -293,7 +293,7 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		SessionService sess = ctx.getService(SessionService.class);
 		AppUserFactory<A> fac = sess.getLoginFactory();
 		
-		Cookie c = new Cookie(ServletSessionService.WEBAPP_SESSION_COOKIE_NAME, "1-qrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqr");
+		Cookie c = new Cookie(ctx.getInitParameter("cross_cookie.cookie_name"), "1-qrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqr");
 		req.cookies = new Cookie[]{c};
 		
 		A person = (A) sess.getCurrentPerson();

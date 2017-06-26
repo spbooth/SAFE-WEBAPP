@@ -67,11 +67,8 @@ public class ServletSessionService<A extends AppUser> extends AbstractSessionSer
 	private static final String WTMP_ID = "SESSION_WTMP_ID";
 	private static final String WTMP_EXPIRY_DATE = "SESSION_WTMP_EXPIRTY_DATE";
 	private static final String NAME_ATTR="UserName";
-	public static final Feature CROSS_APP_COOKIE_LOGIN_FEATURE = new Feature("cross_app_cookie",false,"Support cross app SSO via cookies");
-	/**
-	 * 
-	 */
-	public static final String WEBAPP_SESSION_COOKIE_NAME = "WEBAPP_SESSION";
+	
+	
 	
 	// Flag to supress re-populate if we logged out
 	private boolean force_no_person=false;
@@ -293,13 +290,17 @@ protected void setCurrentPersonNoWtmp(A person) {
 	force_no_person=false;
 }
 
+private String getCrossAppCookieName(){
+	return getContext().getInitParameter("cross_cookie.cookie_name");
+}
 /**
  * @param man
  * @param w
  */
 public void setCrossCookie(WtmpManager man, Wtmp w)  {
 	try{
-		if(CROSS_APP_COOKIE_LOGIN_FEATURE.isEnabled(getContext()) &&  (ss instanceof DefaultServletService)){
+		String name = getCrossAppCookieName();
+		if(name != null &&  (ss instanceof DefaultServletService)){
 			CrossCookieComposite comp = man.getComposite(CrossCookieComposite.class);
 			if( comp != null){
 				String value = comp.getFullData(w);
@@ -320,7 +321,11 @@ private void setCookie(boolean add,String value) {
 	if( ! (ss instanceof DefaultServletService)){
 		return;
 	}
-	Cookie ck = new Cookie(WEBAPP_SESSION_COOKIE_NAME, value);
+	String name = getCrossAppCookieName();
+	if( name == null){
+		return;
+	}
+	Cookie ck = new Cookie(name, value);
 	//ck.setSecure(true);
 	if( add){
 		ck.setMaxAge(-1);
@@ -355,13 +360,14 @@ protected Integer getPersonID() {
 			if( id != null ){
 				return id;
 			}
-			if( CROSS_APP_COOKIE_LOGIN_FEATURE.isEnabled(getContext())){
+			String name = getCrossAppCookieName();
+			if( name != null){
 				try{
 					// look for a cross-login cookie
 					Cookie[] cookies = request.getCookies();
 					if( cookies != null){
 						for(Cookie c : cookies){
-							if( c.getName().equals(WEBAPP_SESSION_COOKIE_NAME) ){
+							if( c.getName().equals(name) ){
 								String value = c.getValue();
 								WtmpManager man = getWtmpManager();
 								if( man != null ){
