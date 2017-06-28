@@ -37,7 +37,7 @@ import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
  *
  */
 
-public class TransitionFactoryInterfaceTestImpl<T,K,X extends TransitionFactoryDataProvider<K,T>> implements TransitionFactoryInterfaceTest<T,K,X> {
+public abstract class TransitionFactoryInterfaceTestImpl<T,K,X extends TransitionFactoryDataProvider<K,T>> implements TransitionFactoryInterfaceTest<T,K,X> {
 
 	protected final X provider;
 	public TransitionFactoryInterfaceTestImpl(X test){
