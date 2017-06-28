@@ -320,7 +320,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 			 builder.close();
 		 }
 		 Transition t = factory.getTransition(target,key);
-		 assertNotNull(t);
+		 assertNotNull("Transition not null",t);
 		 if( t instanceof ExtraContent ){
 			 builder.open("ExtraContent");
 			 	((ExtraContent)t).getExtraHtml(builder, getContext().getService(SessionService.class), target);

@@ -133,21 +133,24 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 					try{
 						log.info("new password requested for " + username);
 						 // This corresponds to the registered username test above
-						if( (! user.canLogin()) && (! user.canReregister()) ){
-							message(conn,req,res,"login_disabled");
-							return;
-						}
-						if( ! password_auth.canResetPassword(user)){
+						if( ! user.canLogin() ){
+							if( user.canReregister()){
+								// Need to reset the account.
+								// The reregister settingonly comes into force if the user is denied login
+								// This also bypasses the canResetPassword check. 
+								user.reRegister();
+								for(ReRegisterComposite<T> c : person_fac.getComposites(ReRegisterComposite.class)){
+									c.reRegister(user);
+								}
+								user.commit();
+								assert(password_auth.canResetPassword(user) && user.canLogin()); //Would be odd id the user can't reset password after reregister 
+							}else{
+								message(conn,req,res,"login_disabled");
+								return;
+							}
+						}else if( ! password_auth.canResetPassword(user)){
 							message(conn, req, res, "new_password_failed");
 							return;
-						}
-						if( ! user.canLogin()){
-							// Need to reset the account.
-							user.reRegister();
-							for(ReRegisterComposite<T> c : person_fac.getComposites(ReRegisterComposite.class)){
-								c.reRegister(user);
-							}
-							user.commit();
 						}
 						
 						password_auth.newPassword(user);
