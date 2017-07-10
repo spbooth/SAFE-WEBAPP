@@ -23,6 +23,40 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
  */
 public class SQLExpressionOrderClause<T> implements OrderClause {
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (descending ? 1231 : 1237);
+		result = prime * result + ((expr == null) ? 0 : expr.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SQLExpressionOrderClause other = (SQLExpressionOrderClause) obj;
+		if (descending != other.descending)
+			return false;
+		if (expr == null) {
+			if (other.expr != null)
+				return false;
+		} else if (!expr.equals(other.expr))
+			return false;
+		return true;
+	}
+
 	private final SQLExpression<T> expr;
 	boolean descending;
 	public SQLExpressionOrderClause(boolean descending,SQLExpression<T> expr) {

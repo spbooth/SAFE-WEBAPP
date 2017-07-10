@@ -1704,6 +1704,41 @@ public final class Repository {
 	 *
 	 */
 	public final class Order implements OrderClause{
+		/* (non-Javadoc)
+		 * @see java.lang.Object#hashCode()
+		 */
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result + (desc ? 1231 : 1237);
+			result = prime * result + ((info == null) ? 0 : info.hashCode());
+			return result;
+		}
+		/* (non-Javadoc)
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Order other = (Order) obj;
+			if (!getOuterType().equals(other.getOuterType()))
+				return false;
+			if (desc != other.desc)
+				return false;
+			if (info == null) {
+				if (other.info != null)
+					return false;
+			} else if (!info.equals(other.info))
+				return false;
+			return true;
+		}
 		private final boolean desc;
 		private final FieldInfo info;
 		/**
@@ -1725,6 +1760,9 @@ public final class Repository {
 				sb.append(" DESC");
 			}
 			return sb;
+		}
+		private Repository getOuterType() {
+			return Repository.this;
 		}
 	}
 	final private AppContext ctx;
