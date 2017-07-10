@@ -1366,10 +1366,15 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	public final DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil){
 		return new DataObjectInput(fil);
 	}
+	public final DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil,boolean restrict){
+		return new DataObjectInput(fil,restrict);
+	}
 	public class FilterSelector implements Selector<DataObjectItemInput<BDO>>{
-		public FilterSelector(BaseFilter<BDO> fil) {
+		private final boolean restrict;
+		public FilterSelector(BaseFilter<BDO> fil,boolean restrict) {
 			super();
 			this.fil = fil;
+			this.restrict=restrict;
 		}
 
 		private final BaseFilter<BDO> fil;
@@ -1379,7 +1384,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 */
 		@Override
 		public DataObjectItemInput<BDO> getInput() {
-			return DataObjectFactory.this.getInput(fil);
+			return DataObjectFactory.this.getInput(fil,restrict);
 		}
 	}
 	/** create a {@link Selector} from a filter.
@@ -1388,9 +1393,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return
 	 */
 	public final Selector<DataObjectItemInput<BDO>> getSelector(BaseFilter<BDO> fil){
-		return new FilterSelector(fil);
+		return new FilterSelector(fil,true);
 	}
-	
+	public final Selector<DataObjectItemInput<BDO>> getSelector(BaseFilter<BDO> fil,boolean restrict){
+		return new FilterSelector(fil,restrict);
+	}
 	/** Create a {@link FilterResult} from a filter
 	 * 
 	 * @param fil {@link BaseFilter} to select object set.
