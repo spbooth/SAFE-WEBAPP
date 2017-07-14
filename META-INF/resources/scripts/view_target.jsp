@@ -51,8 +51,8 @@ the form could just submit to self.
     }
     if( tp instanceof ScriptTransitionFactory){
     	ScriptTransitionFactory st = (ScriptTransitionFactory)tp;
-    	WebappHeadTag.addScript(conn, request, st.getAdditionalCSS(null));
-    	WebappHeadTag.addCss(conn, request, st.getAdditionalScript(null));
+    	WebappHeadTag.addCss(conn, request, st.getAdditionalCSS(null));
+    	WebappHeadTag.addScript(conn, request, st.getAdditionalScript(null));
     }
 %>
 <%	
