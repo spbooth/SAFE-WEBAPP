@@ -1792,6 +1792,14 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		res = Repository.getInstance(ctx, homeTable);
 		if( create){
 			if( ! isValid()){
+				// Make sure we don't attempt this more than once per context
+				// Reference fields should trigger creation of targets and
+				// we need to worry about mutual cross references
+				String create_tag = "auto_create_"+homeTable;
+				if( ctx.getAttribute(create_tag) != null){
+					return false;
+				}
+				ctx.setAttribute(create_tag, Boolean.TRUE);
 				TableSpecification spec = getFinalTableSpecification(ctx,
 						homeTable);
 				if( spec != null ){

@@ -20,11 +20,14 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.jdbc.MysqlSQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.FullTextIndex;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
@@ -163,10 +166,19 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor#visitForeignKey(uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType)
 	 */
 	public void visitForeignKey(String name,ReferenceFieldType referenceField) {
-		if( FOREIGN_KEY_FEATURE.isEnabled(ctx.getContext())){
+		AppContext conn = ctx.getContext();
+		if( FOREIGN_KEY_FEATURE.isEnabled(conn)){
 			String tag = referenceField.getRemoteTable();
+			try{
+				// Try to make referenced factory.
+				// This is to endure the referenced table is auto-created before the
+				// current one (in case we have a foreign key)
+				conn.makeContexedObject(DataObjectFactory.class, tag);
+			}catch(Throwable t){
+				conn.getService(LoggerService.class).getLogger(getClass()).error("Problem making referenced facory for "+tag);
+			}
 			// Note this will only work if the table has already been created.
-			String desc = Repository.getForeignKeyDescriptor(ctx.getContext(),tag,true);
+			String desc = Repository.getForeignKeyDescriptor(conn,tag,true);
 			if( desc != null ){
 				sb.append(",\n");
 				sb.append("FOREIGN KEY ");
