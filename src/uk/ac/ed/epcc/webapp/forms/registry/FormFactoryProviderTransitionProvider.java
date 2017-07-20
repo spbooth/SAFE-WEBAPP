@@ -21,6 +21,7 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreatorTransition;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdateTransition;
@@ -108,8 +109,12 @@ public class FormFactoryProviderTransitionProvider<T> implements
 	public Transition<T> getTransition(T target, FormOperations key) {
 		try{
 			if (key.equals(FormOperations.Create)) {
-				return new FormCreatorTransition<T>(form_factory_provider.getName(),form_factory_provider
-						.getFormCreator(c));
+				FormCreator formCreator = form_factory_provider
+						.getFormCreator(c);
+				if( formCreator == null){
+					return null;
+				}
+				return new FormCreatorTransition<T>(form_factory_provider.getName(),formCreator);
 			}
 			FormUpdate<T> formUpdate = form_factory_provider.getFormUpdate(c);
 			if (formUpdate instanceof StandAloneFormUpdate) {

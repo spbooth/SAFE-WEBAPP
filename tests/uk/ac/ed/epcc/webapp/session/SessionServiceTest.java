@@ -107,7 +107,15 @@ public class SessionServiceTest extends WebappTestBase {
 		fred.commit();
 		sess.setCurrentPerson(fred);
 		
+		// Role can be from either A or B
+		// A has two equivalent roles AA,AB
+		// All are toggle roles.
+		//
+		//
 		
+		// use_role.R=A,B
+		// use_role.A=AA,AB
+		// toggle_roles=A,B,AA,AB
 		
 		sess.setTempRole("B");
 		sess.setToggle("B", false);

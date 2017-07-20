@@ -27,6 +27,7 @@ public class FormCreatorTransition<X> extends CreatorTransition<X> implements Ex
     private final FormCreator creator;
     public FormCreatorTransition(String type_name,FormCreator creator){
     	super(type_name);
+    	assert(creator != null);
     	this.creator=creator;
     }
 	@Override

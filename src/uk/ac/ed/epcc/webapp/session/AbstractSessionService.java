@@ -431,7 +431,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 				}
 			}
 		}
-		
+		skip.remove(name);
 		if( ! result ){
 			return false;
 		}
