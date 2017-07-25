@@ -112,16 +112,23 @@ public class MimeStreamDataVisitor extends AbstractVisitor{
 	 * @return mime type
 	 */
 	public final String getMessageContentType(){
-		if( USE_RFC822.isEnabled(getContext())){
+		if( useRFC822(getContext())){
 			return "message/rfc822";
 		}
-		ServletService serv = getContext().getService(ServletService.class);
+		return "text/plain";
+	}
+	public static boolean useRFC822(AppContext conn){
+		if( USE_RFC822.isEnabled(conn)){
+			return true;
+		}
+		ServletService serv = conn.getService(ServletService.class);
 		if( serv != null && serv instanceof DefaultServletService){
 			if(((DefaultServletService)serv).supportsMime("message/rfc822")){
-				return "message/rfc822";
+				return true;
 			}
 		}
-		return "text/plain";
+		return false;
+
 	}
 
 
