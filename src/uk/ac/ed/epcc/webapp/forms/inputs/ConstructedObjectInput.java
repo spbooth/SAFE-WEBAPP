@@ -45,14 +45,27 @@ public class ConstructedObjectInput<T> implements ListInput<String,T>{
     private Class<T> clazz;
     private Map<String,Class> reg;
     
+    /** Construct input for all dynamically created types assignable to target
+     * 
+     * @param c
+     * @param target
+     */
 	public ConstructedObjectInput(AppContext c,Class<T> target){
+    	this(c,target,c.getClassMap(target));
+    }
+	/** Constructor for filtered values.
+	 * map should be a sub-map of that returned by {@link AppContext#getClassMap(Class)}
+	 * @param c
+	 * @param target
+	 * @param map
+	 */
+	public ConstructedObjectInput(AppContext c,Class<T> target,Map<String,Class> map){
     	this.c=c;
     	clazz=target;
-    	reg = c.getClassMap(target);
+    	reg = map;
     	
     	
     }
-   
 	public T getItembyValue(String value) {
 		if( value == null ){
 			return null;
