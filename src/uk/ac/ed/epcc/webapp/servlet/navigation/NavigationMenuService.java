@@ -138,7 +138,7 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 	/** Populate a {@link NodeContainer} with the appropriate navigational {@link Node}s for the current user.
 	 * @return {@link NodeContainer} for the navigation menu or null
 	 */
-	private NodeContainer makeMenu() {
+	public NodeContainer makeMenu() {
 		ConfigService cfg = getContext().getService(ConfigService.class);
 		if( cfg==null){
 			return null;
