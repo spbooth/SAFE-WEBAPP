@@ -1086,6 +1086,14 @@ public final class Repository {
 				throw new UnsupportedOperationException(
 						"Invalid field specified "+getTable()+"." + key + ":" + value);
 			}
+			// Length check for optional
+			if( optional && value instanceof String ){
+				FieldInfo info = getInfo(key);
+				if( info.isString() && info.getMax() < ((String)value).length()){
+					// Skip optional strings that are too long
+					return get(key);
+				}
+			}
 			if( ! isDirty()){
 				// once dirty it should not be in cache. I'm assuming the dirty check is slightly cheaper 
 				// than deCache as there is no synchronisation 

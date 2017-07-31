@@ -107,7 +107,7 @@ public abstract class WebappTestBase implements ContextHolder{
 						d.dump(o);
 					}
 				}catch(Throwable t){
-					log.warn("Error in dump", t);
+					log.warn("Error in dump of "+tab, t);
 				}
 			}
 			builder.close();
