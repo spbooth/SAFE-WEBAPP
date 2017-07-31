@@ -165,7 +165,7 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 	@Override
 	public void validateName(String name) throws ParseException {
 		if( ! Emailer.checkAddress(name)){
-			throw new ParseException("Not a valid email address");
+			throw new ParseException("Not a valid email address: "+name);
 		}
 	}
 

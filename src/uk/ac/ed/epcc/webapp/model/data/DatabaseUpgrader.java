@@ -179,7 +179,7 @@ public class DatabaseUpgrader extends Object implements Command {
 	}
 	
 	public static void main(String args[]){
-		System.out.println("Sarting upgrade");
+		System.out.println("Starting upgrade");
 		AppContext c = new AppContext();
 		CommandLauncher launcher = new CommandLauncher(c);
 		launcher.run(DatabaseUpgrader.class, args);
