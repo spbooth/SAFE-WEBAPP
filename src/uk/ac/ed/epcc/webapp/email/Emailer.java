@@ -604,9 +604,8 @@ public class Emailer {
 		}
 		String force_email = conn.getInitParameter(EMAIL_FORCE_ADDRESS);
 		log.debug("Force email is "+force_email);
-		InternetAddress ia[];
+		Set<InternetAddress> set = new LinkedHashSet<InternetAddress>();
 		if (force_email == null) {
-			ia = new InternetAddress[notify_emails.length];
 			for (int i = 0; i < notify_emails.length; i++) {
 				log.debug("Add recipient "+notify_emails[i]);
 				if (text_recip == null) {
@@ -614,11 +613,20 @@ public class Emailer {
 				} else {
 					text_recip += "," + notify_emails[i];
 				}
-				ia[i] = new InternetAddress(notify_emails[i]);
+				set.add(new InternetAddress(notify_emails[i]));
+				try{
+					// Hack to allow some emails to be automatically
+					// sent to two locations
+					String additional = conn.getInitParameter("email.alsoto."+notify_emails[i]);
+					if( additional != null ){
+						set.add(new InternetAddress(additional));
+					}
+				}catch(Throwable t){
+					getLogger().error("Error in alsoto hack", t);
+				}
 			}
-
 		} else {
-			Set<InternetAddress> set = new HashSet<InternetAddress>();
+			
 			set.add(new InternetAddress(force_email));
 			text_recip=force_email;
 			Set<String> allowed = new HashSet<String>();
@@ -634,12 +642,11 @@ public class Emailer {
 					log.debug("Blacklist email "+email);
 				}
 			}
-			ia = set.toArray(new InternetAddress[0]);
 			// make sure not other fields set.
 			m.setRecipients(RecipientType.BCC, new InternetAddress[0]);
 			m.setRecipients(RecipientType.CC, new InternetAddress[0]);
 		}
-		m.setRecipients(RecipientType.TO, ia);
+		m.setRecipients(RecipientType.TO, set.toArray(new InternetAddress[0]));
 		if( fromAddress == null ){
 			throw new ConsistencyError("No sender address configured");
 		}
