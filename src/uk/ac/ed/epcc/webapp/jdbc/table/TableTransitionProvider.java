@@ -222,7 +222,7 @@ public class TableTransitionProvider implements ViewTransitionProvider<TableTran
 				hb.addHeading(4, "Composites");
 				LinkedHashSet<String> names = new LinkedHashSet<String>();
 				for( Composite c : comps){
-					names.add(c.getClass().getSimpleName());
+					names.add(c.toString());
 				}
 				hb.addList(names);
 			}

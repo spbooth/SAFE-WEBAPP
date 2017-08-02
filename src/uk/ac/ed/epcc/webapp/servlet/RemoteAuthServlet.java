@@ -128,7 +128,7 @@ public class RemoteAuthServlet extends WebappServlet {
 			
 			if (empty(web_name)) {
 				// Might have bounce-server authentication on this server
-				String auth_url = conn.getInitParameter("remote_auth_server.url");
+				String auth_url = conn.getExpandedProperty("remote_auth_server.url");
 				
 				if( auth_url != null && auth_url.trim().length() > 0 ){
 					String token = (String) session_service.getAttribute(REMOTE_AUTH_TOKEN_ATTR);
@@ -154,7 +154,7 @@ public class RemoteAuthServlet extends WebappServlet {
 					// the session token (stops re-use of responses) and a shared secret (proves the response 
 					// is actually from the authentication server
 					Hash h = conn.getEnumParameter(Hash.class, "remote_auth_server.hash", Hash.SHA512);
-					String auth_secret = conn.getInitParameter("remote_auth_server.secret");
+					String auth_secret = conn.getExpandedProperty("remote_auth_server.secret");
 					String salt = (String) params.get("salt");
 					if( salt == null){
 						salt="";
@@ -180,7 +180,7 @@ public class RemoteAuthServlet extends WebappServlet {
 
 			
 			person = getTargetAppUser(session_service);
-			String remote_auth_realm = conn.getInitParameter(REMOTE_AUTH_REALM_PROP, WebNameFinder.WEB_NAME);
+			String remote_auth_realm = conn.getExpandedProperty(REMOTE_AUTH_REALM_PROP, WebNameFinder.WEB_NAME);
 			AppUserFactory<?> fac = session_service.getLoginFactory();
 			AppUserNameFinder parser = fac.getRealmFinder(remote_auth_realm);
 			if (person == null) {

@@ -177,4 +177,11 @@ public abstract class Composite<BDO extends DataObject, X extends Composite> imp
 	public void customiseUpdateForm(Form f, BDO target, SessionService operator) {
 		
 	}
+	
+	/** used to list composites on table structure page.
+	 * 
+	 */
+	public String toString(){
+		return getClass().getSimpleName();
+	}
 }

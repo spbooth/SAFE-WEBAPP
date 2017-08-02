@@ -51,6 +51,9 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 		this.realm=realm;
 	}
 
+	public String toString(){
+		return getClass().getSimpleName()+"("+realm+")";
+	}
 	
 	/** Get a user presented label asking for the login name of the supported type. If this method returns null or an empty string
 	 * then the finder may still be included in a user supplied lookup but will not be acknowledged in the form label.
