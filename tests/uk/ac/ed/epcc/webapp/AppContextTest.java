@@ -88,6 +88,18 @@ public class AppContextTest {
 		assertEquals(value,"Have I found it! yet? found it!");
 	}
 	@Test
+	public void testGetTripleExpandedParameter(){
+		AppContext c = new AppContext();
+		String value = c.getExpandedProperty("test.triple.expand.value");
+		assertEquals(value,"[Have I found it! yet? found it!]");
+	}
+	@Test
+	public void testGetRecursiveParameter(){
+		AppContext c = new AppContext();
+		String value = c.getExpandedProperty("test.recursive");
+		assertEquals(value,"I eat myself .");
+	}
+	@Test
 	public void testExpandText(){
 		AppContext c = new AppContext();
 		String value = c.expandText("A ${test.value} B ${test.value} C");

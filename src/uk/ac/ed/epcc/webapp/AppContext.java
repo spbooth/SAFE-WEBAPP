@@ -534,11 +534,15 @@ public final class AppContext {
      */
 	public final String getExpandedProperty(String name){
 		String text_to_expand = getInitParameter(name);
-		return expandText(text_to_expand);
+		Map<String,String> values = new HashMap<String,String>();
+		values.put(name, "");
+		return expandText(values,text_to_expand);
 	}
 	public final String getExpandedProperty(String name,String def){
 		String text_to_expand = getInitParameter(name,def);
-		return expandText(text_to_expand);
+		Map<String,String> values = new HashMap<String,String>();
+		values.put(name, "");
+		return expandText(values,text_to_expand);
 	}
 
 	/** perform config parameter expansion on a text fragment.
@@ -550,6 +554,9 @@ public final class AppContext {
 	 * @return expanded text
 	 */
 	public String expandText(String text_to_expand) {
+		return expandText(new HashMap<String,String>(), text_to_expand);
+	}
+	private String expandText(Map<String,String> values,String text_to_expand) {
 		if( text_to_expand == null || text_to_expand.length() == 0){
 			return text_to_expand;
 		}
@@ -563,7 +570,12 @@ public final class AppContext {
 				default_text = subname.substring(pos+1);
 				subname=subname.substring(0, pos);
 			}
-			String text = getInitParameter(subname,default_text);
+			String text = values.get(subname);
+			if( text == null){
+				text=getInitParameter(subname,default_text);
+				values.put(subname, ""); // recursive go to empty string
+				values.put(subname, text=expandText(values,text));
+			}
 			// supress unintended back subs
 			 text = text.replace("\\", "\\\\");
 			text = text.replace("$", "\\$");
