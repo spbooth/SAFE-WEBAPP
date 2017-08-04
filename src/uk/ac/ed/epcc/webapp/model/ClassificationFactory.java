@@ -182,7 +182,7 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 	}
 	
 	protected boolean allowSpacesInName(){
-		return false;
+		return getContext().getBooleanParameter(getConfigTag()+".allow_space_in_name", false);
 	}
 	/** An {@link DataObjectItemInput} that uses the {@link ParseFactory#findFromString(String)} method to locate
 	 * 
