@@ -21,11 +21,11 @@ import uk.ac.ed.epcc.webapp.model.log.LogFactory.ItemType.ItemValue;
  * @author spb
  *
  */
-public interface LogComposite<T extends LogFactory.Entry> {
+public interface LogComposite<T extends LogFactory.ItemType> {
 
 	/** register additional item types
 	 * 
 	 * @param type
 	 */
-	public void registerItems(LogFactory.ItemType<T> type);
+	public void registerItems(T type);
 }

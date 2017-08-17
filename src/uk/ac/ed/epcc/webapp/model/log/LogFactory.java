@@ -394,7 +394,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 * 
 	 * @param <E>
 	 */
-	protected static class ItemType<E extends Entry> extends
+	public static class ItemType<E extends Entry> extends
 			ClassType<ItemType.ItemValue<E>, E> {
 		public static class ItemValue<E extends Entry> extends
 		    ClassType.ClassValue<E> {
@@ -402,7 +402,10 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 					Class<? extends E> c) {
 				super(parent, tag, name, c);
 			}
-			
+			protected ItemValue(String tag, String name,
+					Class<? extends E> c) {
+				super(tag, name, c);
+			}
 		}
 
 		public ItemType(String field) {
