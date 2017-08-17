@@ -49,17 +49,15 @@ import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.ClassType;
+import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.FilterResult;
 import uk.ac.ed.epcc.webapp.model.data.OrphanReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.Removable;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
-import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
-import uk.ac.ed.epcc.webapp.model.data.filter.OrphanFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.table.TableStructureDataObjectFactory;
@@ -413,6 +411,9 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		public ItemType(ItemType<E> parent){
 			super(parent);
 		}
+		public void adopt(ItemValue<E> value){
+			register(value);
+		}
 		
 	}
 	
@@ -445,10 +446,13 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 
 	protected static final String DATE = "Date";
 
-	protected LogOwner<O> owner_factory;
-    protected AppUserFactory<?> user_factory;
+	protected final LogOwner<O> owner_factory;
+    protected final AppUserFactory<?> user_factory;
+    // This is a per-instance ItemType that can also include ItemValues registered by composite
+    protected final ItemType<T> use_type;
 	public LogFactory(LogOwner<O> fac, String table,AppUserFactory<?> uf) {
 		AppContext ctx = fac.getContext();
+		use_type=new ItemType<T>(getStaticItemType());
 		if( DataObjectFactory.AUTO_CREATE_TABLES_FEATURE.isEnabled(ctx)){
     		if( setContextWithMake(ctx, table,getDefaultTableSpecification(ctx,fac,uf,table))){
     			// table created
@@ -459,6 +463,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
     	}
 		owner_factory = fac;
 		user_factory = uf;
+		use_type.lock();
 	}
 	/** create LogItem tables that don't have factories.
 	 * 
@@ -481,6 +486,17 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 			}
 		}
 		
+		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#observeComposite(uk.ac.ed.epcc.webapp.model.data.Composite)
+	 */
+	@Override
+	protected void observeComposite(Composite c) {
+		// Allow composites to add to the use_type
+		if( c instanceof LogComposite){
+			((LogComposite)c).registerItems(use_type);
+		}
 		
 	}
 	protected Map<String,TableSpecification> getPrereqTables(){
@@ -559,8 +575,20 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		}
 		return owners;
 	}
-	protected abstract ItemType<T> getItemType();
-
+	/** Get the final {@link ItemType} to use for this class.
+	 * This can include dynamic additions.
+	 * 
+	 * @return
+	 */
+	protected final ItemType<T> getItemType(){
+		return use_type;
+	}
+	/** Get the most specific non-dynamic {@link ItemType}
+	 * sub-classes override this to generate a statically configured type.
+	 * which is then used to create a per-instance version including dynamic additions.
+	 * @return
+	 */
+	protected abstract ItemType<T> getStaticItemType();
 	protected final DataObject makeBDO(Record res) throws DataFault {
 		return getItemType().makeBDO(this, res);
 	}
