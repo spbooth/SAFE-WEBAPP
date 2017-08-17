@@ -48,6 +48,10 @@ public abstract class ClassType<T extends ClassType.ClassValue<D>, D extends Dat
 			super(parent,tag, name);
 			this.c=c;
 		}
+		protected ClassValue(String tag, String name, Class<? extends S> c) {
+			super(tag, name);
+			this.c=c;
+		}
 		protected final  Constructor<? extends S> getConstructor(DataObjectFactory fac){
 			if( cons == null){
 				cons = makeConstructor(fac);

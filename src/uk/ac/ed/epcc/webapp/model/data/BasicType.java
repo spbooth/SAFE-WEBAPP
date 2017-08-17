@@ -251,8 +251,22 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 
 		private String Name; // printable version of Name
 
+		
+		/** Construct a Value without registration.
+		 * This allows sub-classes to construct static Values in
+		 * composites that are registered in the type when the composite is added to the parent type. 
+		 * @param tag
+		 * @param name
+		 */
+		protected Value(String tag,String name){
+			this.tag = tag;
+			this.Name = name;
+		}
 		/**
 		 * Construct a Value and register it with the parent BasicType
+		 * 
+		 * Normally this is the only constructor to be called by sub-classes
+		 * to ensure that all {@link Value}s are registered.
 		 * 
 		 * @param tag
 		 *            identifying String in database
@@ -261,8 +275,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		 */
 		@SuppressWarnings("unchecked")
 		protected Value(BasicType parent,  String tag, String name) {
-			this.tag = tag;
-			this.Name = name;
+			this(tag,name);
 			parent.register(this);
 
 		}
@@ -343,11 +356,11 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 			register(v);
 		}
 	}
-	/** register a value in the BasicType. This should be called in the constructor of the value.
+	/** register a value in the BasicType. This should normally be called in the constructor of the value.
 	 * 
 	 * @param value
 	 */
-	private void register(T value) {
+	protected void register(T value) {
 		if( locked){
 			throw new ConsistencyError("Register called after lock "+value.getTag()+" in "+getClass().getCanonicalName());
 		}
@@ -362,8 +375,18 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	}
 
 
+	/** lock the type preventing futher additions
+	 * 
+	 */
 	public final void lock(){
 		locked=true;
+	}
+	/** has the type been locked
+	 * 
+	 * @return
+	 */
+	public boolean isLocked(){
+		return locked;
 	}
 	/**
 	 * retrieve a Value from the registry.
@@ -585,8 +608,14 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	 * @throws ParseException 
 	 */
 	public T parse(String name) throws ParseException{
+		// look for tag first
+		T result = find(name);
+		if( result != null){
+			return result;
+		}
+		// look for name
 		for( T  res : values.values() ){
-			if( res.getTag().equals(name) || res.getName().equals(name)){
+			if( res.getName().equals(name)){
 				return res;
 			}
 		}
