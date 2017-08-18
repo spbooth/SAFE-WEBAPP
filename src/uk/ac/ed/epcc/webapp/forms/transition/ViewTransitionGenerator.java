@@ -29,7 +29,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @author spb
  *
  */
-public class ViewTransitionGenerator<X> implements UIGenerator{
+public class ViewTransitionGenerator<X> implements UIGenerator, Comparable<ViewTransitionGenerator<X>>{
 
 	private final AppContext conn;
 	private final String transition_tag;
@@ -72,5 +72,15 @@ public class ViewTransitionGenerator<X> implements UIGenerator{
 		}
 		return builder;
 	}
+	/* (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	@Override
+	public int compareTo(ViewTransitionGenerator<X> arg0) {
+		return text.compareTo(arg0.text);
+	}
 
+	public String toString(){
+		return text;
+	}
 }
