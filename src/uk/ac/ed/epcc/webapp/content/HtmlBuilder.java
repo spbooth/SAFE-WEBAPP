@@ -368,7 +368,14 @@ public <I> void addFormLabel(AppContext conn,Field<I> f) {
 	}else{
 		attr("class","required");
 	}
-	clean(f.getLabel());
+	Object details=f.getDetails();
+	if(details==null){
+		clean(f.getLabel());
+	}else{
+		ContentBuilder dt = getDetails(f.getLabel());
+		dt.addObject(details);
+		dt.addParent();
+	}
 	close(); // span or label
 
 	if (missing) {
@@ -560,13 +567,15 @@ public <X> void addList(Map<String,String> attr,Iterable<X> list) {
 /**
  * @param target
  */
-protected <X> void addObject(X target) {
+public <X> void addObject(X target) {
 	if( target instanceof UIProvider){
 		((UIProvider)target).getUIGenerator().addContent(this);
 	}else if( target instanceof UIGenerator){
 		((UIGenerator)target).addContent(this);
 	}else if( target instanceof Identified){
 		clean(((Identified)target).getIdentifier());
+	}else if( target  instanceof Iterable){
+		addList((Iterable)target);
 	}else{
 		clean(target.toString());
 	}

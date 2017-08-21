@@ -42,9 +42,30 @@ public final class Field<I> {
 
 	Set<FieldValidator<I>> validators = null;
 
+	/** text label of this field presented to the user.
+	 * 
+	 */
 	private String label;
+	
+	/** Additional details/information
+	 * 
+	 */
+	private Object details;
 
 //	private String key;
+
+	/**
+	 * @return the details
+	 */
+	public Object getDetails() {
+		return details;
+	}
+	/**
+	 * @param details the details to set
+	 */
+	public void setDetails(Object details) {
+		this.details = details;
+	}
 
 	private Input<I> sel;
 
@@ -102,9 +123,7 @@ public final class Field<I> {
     	  sel.setKey(key);
     	}
     }
-    public I convert(Object o){
-    	return sel.convert(o);
-    }
+    
 	/**
 	 * get the key associated with this field
 	 * 

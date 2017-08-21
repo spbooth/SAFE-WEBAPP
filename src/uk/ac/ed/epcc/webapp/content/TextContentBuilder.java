@@ -7,6 +7,7 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.Identified;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 
 /** A {@link ContentBuilder} that generates plain text.
@@ -93,7 +94,19 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 		}
 		return parent;
 	}
-
+	public <X> void addObject(X target) {
+		if( target instanceof UIProvider){
+			((UIProvider)target).getUIGenerator().addContent(this);
+		}else if( target instanceof UIGenerator){
+			((UIGenerator)target).addContent(this);
+		}else if( target instanceof Identified){
+			clean(((Identified)target).getIdentifier());
+		}else if( target  instanceof Iterable){
+			addList((Iterable)target);
+		}else{
+			clean(target.toString());
+		}
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addList(java.lang.Iterable)
 	 */
@@ -101,11 +114,7 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 	public <X> void addList(Iterable<X> list) {
 		sb.append("\n");
 		for(X item : list){
-			if( item instanceof UIGenerator){
-				((UIGenerator) item).addContent(this);
-			}else{
-				sb.append(item.toString());
-			}
+			addObject(item);
 			sb.append("\n");
 		}
 		
@@ -118,11 +127,7 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 	public <X> void addList(X[] list) {
 		sb.append("\n");
 		for(X item : list){
-			if( item instanceof UIGenerator){
-				((UIGenerator) item).addContent(this);
-			}else{
-				sb.append(item.toString());
-			}
+			addObject(item);
 			sb.append("\n");
 		}
 		

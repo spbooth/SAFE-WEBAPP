@@ -58,8 +58,7 @@ public class BaseForm implements Form {
 	private LinkedHashMap<String,Field> fields;
 
 	private LinkedHashMap<String,FormAction> actions;
-    private HashMap<String,String> tooltips;
-    private HashMap<String,String> shortcuts;
+    
 	protected Set<FormValidator> validators = new HashSet<FormValidator>();
 	
 
@@ -70,8 +69,7 @@ public class BaseForm implements Form {
 	public BaseForm(AppContext c) {
 		fields = new LinkedHashMap<String,Field>();
 		actions = new LinkedHashMap<String,FormAction>();
-		tooltips = new HashMap<String,String>();
-		shortcuts = new HashMap<String,String>();
+		
 		conn = c;
 		log = c.getService(LoggerService.class).getLogger(getClass());
 	}
@@ -87,17 +85,6 @@ public class BaseForm implements Form {
 	public void addAction(String name, FormAction action) {
 		name=name.trim(); 
 		actions.put(name, action);
-		String tip = action.getHelp();
-		if( tip != null ){
-			tooltips.put(name, tip);
-		}
-		String shortcut = action.getShortcut();
-		if( shortcut != null ){
-			if( shortcuts.containsValue(shortcut)){
-				log.error("Duplicate shortcut in form:"+shortcut);
-			}
-			shortcuts.put(name, shortcut);
-		}
 	}
 
 	/**
@@ -226,12 +213,7 @@ public class BaseForm implements Form {
 			action.setConfirm(conf);
 		}
 	}
-    public String getHelp(String name){
-    	return tooltips.get(name);
-    }
-    public String getShortcut(String name){
-    	return shortcuts.get(name);
-    }
+    
 	/**
 	 * get the contents of a form as a Map
 	 * 

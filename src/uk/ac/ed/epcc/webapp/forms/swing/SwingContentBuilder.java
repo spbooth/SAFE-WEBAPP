@@ -42,6 +42,7 @@ import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlPrinter;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
+import uk.ac.ed.epcc.webapp.content.UIProvider;
 import uk.ac.ed.epcc.webapp.content.XMLGenerator;
 import uk.ac.ed.epcc.webapp.content.XMLPrinter;
 import uk.ac.ed.epcc.webapp.forms.Field;
@@ -526,7 +527,19 @@ public class SwingContentBuilder  implements ContentBuilder{
 		
 		
 	}
-	
+	public <X> void addObject(X target) {
+		if( target instanceof UIProvider){
+			((UIProvider)target).getUIGenerator().addContent(this);
+		}else if( target instanceof UIGenerator){
+			((UIGenerator)target).addContent(this);
+		}else if( target instanceof Identified){
+			addText(((Identified)target).getIdentifier());
+		}else if( target  instanceof Iterable){
+			addList((Iterable)target);
+		}else{
+			addText(target.toString());
+		}
+	}
 	/* (non-Javadoc)
 	 */
 	public <X> void addList(Iterable<X> list) {

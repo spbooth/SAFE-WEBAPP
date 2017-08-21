@@ -104,6 +104,12 @@ public interface ContentBuilder {
 	 */
 	public ContentBuilder addParent() throws UnsupportedOperationException;
 	
+	/** Add an object depending on its type.
+	 * 
+	 * @param target
+	 */
+	public <X> void addObject(X target);
+	
 	/** add a bullet list of objects to the content.
 	 * Any {@link UIGenerator}s will generate their content otherwise 
 	 * a suitable text representation will be used.
