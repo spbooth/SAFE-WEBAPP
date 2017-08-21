@@ -55,20 +55,14 @@ public class ViewTransitionGenerator<X> implements UIGenerator, Comparable<ViewT
 	 */
 	@Override
 	public ContentBuilder addContent(ContentBuilder builder) {
-		if( text == null){
-			if( target instanceof Identified){
-				text = ((Identified)target).getIdentifier();
-			}else{
-				text=target.toString();
-			}
-		}
+		
 		SessionService sess = conn.getService(SessionService.class);
 		TransitionFactory<?, X> fac =new TransitionFactoryFinder(conn).getProviderFromName(transition_tag);
 		// Check for current user so as not to add links in emails for public viewable objects
 		if( fac != null && sess.haveCurrentUser() && fac instanceof ViewTransitionFactory && ((ViewTransitionFactory)fac).canView(target, sess)){
-			builder.addLink(conn, text, title,new ViewTransitionResult((ViewTransitionFactory)fac, target));
+			builder.addLink(conn, toString(), title,new ViewTransitionResult((ViewTransitionFactory)fac, target));
 		}else{
-			builder.getSpan().clean(text).appendParent();
+			builder.getSpan().clean(toString()).appendParent();
 		}
 		return builder;
 	}
@@ -77,10 +71,17 @@ public class ViewTransitionGenerator<X> implements UIGenerator, Comparable<ViewT
 	 */
 	@Override
 	public int compareTo(ViewTransitionGenerator<X> arg0) {
-		return text.compareTo(arg0.text);
+		return toString().compareTo(arg0.toString());
 	}
 
 	public String toString(){
+		if( text == null){
+			if( target instanceof Identified){
+				text = ((Identified)target).getIdentifier();
+			}else{
+				text=target.toString();
+			}
+		}
 		return text;
 	}
 }

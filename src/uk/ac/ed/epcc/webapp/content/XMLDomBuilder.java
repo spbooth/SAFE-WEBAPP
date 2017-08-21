@@ -49,7 +49,9 @@ public class XMLDomBuilder implements SimpleXMLBuilder {
     	return frag;
     }
 	public SimpleXMLBuilder clean(CharSequence s) {
-		addString(s.toString());
+		if( s != null ){
+			addString(s.toString());
+		}
 		return this;
 	}
 	public void addString(String s){
