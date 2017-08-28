@@ -201,6 +201,9 @@ public abstract class MessageDataObject extends DataObject implements
 				}
 				return sb.toString();
 			}
+		}catch(MessagingException me){
+			// bogus email probably
+			getLogger().warn("Error getting sender",me);
 		} catch (Exception e) {
 			getLogger().error("Error getting sender",e);
 		}
