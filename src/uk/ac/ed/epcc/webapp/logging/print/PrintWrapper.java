@@ -45,7 +45,9 @@ public class PrintWrapper implements Logger {
 
 	public void debug(Object message, Throwable t) {
 		dest.println(message);
-		t.printStackTrace(System.err);
+		if( t != null ){
+			t.printStackTrace(System.err);
+		}
 	}
 
 	public void error(Object message) {
@@ -55,8 +57,9 @@ public class PrintWrapper implements Logger {
 
 	public void error(Object message, Throwable t) {
 		dest.println(message);
-		t.printStackTrace(System.err);
-
+		if( t != null ){
+			t.printStackTrace(System.err);
+		}
 	}
 
 	public void fatal(Object message) {
@@ -66,8 +69,9 @@ public class PrintWrapper implements Logger {
 
 	public void fatal(Object message, Throwable t) {
 		dest.println(message);
-		t.printStackTrace(System.err);
-
+		if( t != null ){
+			t.printStackTrace(System.err);
+		}
 	}
 
 	public void info(Object message) {
@@ -76,8 +80,9 @@ public class PrintWrapper implements Logger {
 
 	public void info(Object message, Throwable t) {
 		dest.println(message);
-		t.printStackTrace(System.err);
-
+		if( t != null ){
+			t.printStackTrace(System.err);
+		}
 	}
 
 	public void warn(Object message) {
@@ -87,8 +92,9 @@ public class PrintWrapper implements Logger {
 
 	public void warn(Object message, Throwable t) {
 		dest.println(message);
-		t.printStackTrace(System.err);
-
+		if( t != null ){
+			t.printStackTrace(System.err);
+		}
 	}
 
 }
