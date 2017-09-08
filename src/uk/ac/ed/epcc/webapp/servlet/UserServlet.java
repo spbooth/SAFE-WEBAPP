@@ -82,7 +82,7 @@ public class UserServlet<T extends AppUser> extends SessionServlet {
 		PasswordAuthComposite<T> password_comp = fac.getComposite(PasswordAuthComposite.class);
 		if ( action.equals(MODIFY_PERSON)){
 			if( ! USER_SELF_UPDATE_FEATURE.isEnabled(conn)){
-				message(conn, req, res, "disabled_feature");
+				message(conn, req, res, "disabled_feature_error");
 				return;
 			}
 			

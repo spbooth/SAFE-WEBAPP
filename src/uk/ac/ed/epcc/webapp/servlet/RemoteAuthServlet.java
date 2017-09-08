@@ -118,7 +118,7 @@ public class RemoteAuthServlet extends WebappServlet {
 			AppContext conn) throws ServletException, IOException {
 		
 		if( ! WEB_LOGIN_FEATURE.isEnabled(conn)){
-			message(conn,req,res,"disabled_feature");
+			message(conn,req,res,"disabled_feature_error");
 			return;
 		}
 		SessionService session_service = conn.getService(SessionService.class);

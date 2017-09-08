@@ -114,7 +114,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 				return;
 			}
 			if( DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn)){
-				message(conn,req,res,"disabled_feature");
+				message(conn,req,res,"disabled_feature_error");
 				return;
 			}
 			AppUserFactory<T> person_fac = serv.getLoginFactory();
