@@ -133,6 +133,8 @@
 						value="${db_password}" />
 			<classpath refid="test.classpath"/>
 			<formatter type="xml"/>
+			<!-- Note skipNonTests requires ant 1.9.3+ which is greater than the default
+			    on RHEL and Centos -->
 			<batchtest skipNonTests="true" fork="no" todir="${report.dir}" >
 				<fileset dir="${test.home}" >
 					<include name="**/*.class" />
