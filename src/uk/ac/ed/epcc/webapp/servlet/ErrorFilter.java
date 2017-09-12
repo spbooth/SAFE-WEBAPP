@@ -77,7 +77,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
 public class ErrorFilter implements Filter {
 	private static final Feature SESSION_STEALING_CHECK_FEATURE = new Feature("session-stealing-check",false,"reset session if ip address changes");
 	private static final Feature CLEANUP_THREAD_FEATURE = new Feature("appcontext.cleanup_thread",true,"Close the AppContext in a thread if CleanupServices are defined");
-	private static final Feature TIMER_FEATURE = new Feature("Timer",false,"gather timing information for performance analyis");
+	public static final Feature TIMER_FEATURE = new Feature("Timer",false,"gather timing information for performance analyis");
 	private static final String LAST_ADDR_ATTR = "LastAddr";
 	public static final String APP_CONTEXT_ATTR = "AppContext";
 	public static final String SERVLET_CONTEXT_ATTR = "ServletContext";
