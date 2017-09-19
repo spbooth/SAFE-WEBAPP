@@ -454,10 +454,10 @@ public class Emailer {
 			
 		AppContext conn = getContext();
 		
-		email_template.setProperties(params);
 		//		 Set a lot of standard properties from init parameters
 		email_template.setProperties(conn.getInitParameters("service."));
 		email_template.setProperties(conn.getInitParameters("email."));
+		// explicit values override ones from config
 		email_template.setProperties(params);
 
 		String subject = null;
