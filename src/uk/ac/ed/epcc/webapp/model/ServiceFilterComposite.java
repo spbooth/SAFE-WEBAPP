@@ -37,6 +37,8 @@ public abstract class ServiceFilterComposite<BDO extends DataObject> extends  Co
 	protected static final String THIS_SERVICE_FILTER_NAME = "ThisService";
 	
 	protected static final String SERVICE_NAME_PARAM = "service.name";
+	
+	protected static final String SERVICE_LIST_PARAM = "service.list";
 
 	
 	/** The access role needed to edit service mappings.

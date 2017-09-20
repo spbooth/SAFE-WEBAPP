@@ -7,6 +7,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -71,11 +72,14 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	public SQLFilter<BDO> getCurrentServiceFilter(){
 		Class<? super BDO> target = getFactory().getTarget();
 		if(getRepository().hasField(SERVICE_ID_FIELD)){
-
-			return new SQLOrFilter<>(target, 
-					new SQLValueFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, getCurrentID()),
-					new NullFieldFilter<BDO>(target,getRepository(),SERVICE_ID_FIELD,true)
-					);
+			int[] ids = getCurrentIDs();
+			SQLFilter<BDO>[] filters = new SQLFilter[ids.length+1];
+			int i;
+			for (i = 0; i < ids.length; i++) {
+				filters[i] = new SQLValueFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, ids[i]);
+			}
+			filters[i] = new NullFieldFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, true);
+			return new SQLOrFilter<>(target, filters);
 		}else{
 			return new GenericBinaryFilter<BDO>(target, true);
 		}
@@ -88,8 +92,13 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	public SQLFilter<BDO> getOtherServiceFilter(){
 		Class<? super BDO> target = getFactory().getTarget();
 		if(getRepository().hasField(SERVICE_ID_FIELD)){
-
-			return new SQLValueFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, MatchCondition.NE, getCurrentID());
+			int[] ids = getCurrentIDs();
+			SQLFilter<BDO>[] filters = new SQLFilter[ids.length];
+			int i;
+			for (i = 0; i < ids.length; i++) {
+				filters[i] = new SQLValueFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, MatchCondition.NE, ids[i]);
+			}
+			return new SQLAndFilter<>(target, filters);
 		}else{
 			return new GenericBinaryFilter<>(target, false);
 		}
@@ -98,7 +107,12 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	
 	public boolean isCurrentService(BDO obj){
 		int id = getRecord(obj).getIntProperty(SERVICE_ID_FIELD, 0);
-		return id==0 || id == getCurrentID();
+		if (id == 0) return true;
+		int[] ids = getCurrentIDs();
+		for (int currid: ids) {
+			if (id == currid) return true;
+		}
+		return false;
 	}
 
 	/* (non-Javadoc)
@@ -152,24 +166,36 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 		return getContext().makeObject(ClassificationFactory.class, SERVICE_CLASSIFIER);
 	}
 	
-	private int id=0;
-	private int getCurrentID(){
-		if( id > 0 || ! getRepository().hasField(SERVICE_ID_FIELD)){
-			return id;
+	private int[] ids=null;
+	
+	private int[] getCurrentIDs(){
+		if ((ids == null) && (!getRepository().hasField(SERVICE_ID_FIELD))) {
+			ids = new int[1];
+			ids[0] = 0;
 		}
 		
+		if (ids != null) return ids;
+		
 		try {
-			String name = getContext().getInitParameter(SERVICE_NAME_PARAM);
-			Classification current= getServicesFactory().makeFromString(name);
-			if( current != null){
-				current.commit();
-				id = current.getID();
+			String namelist = getContext().getInitParameter(SERVICE_LIST_PARAM);
+			if (namelist == null) {
+				namelist = getContext().getInitParameter(SERVICE_NAME_PARAM);
 			}
+			String[] names = namelist.split(",");
+			ids = new int[names.length];
+			for (int i = 0; i < names.length; i++) {
+				String name = names[i];
+				Classification current = getServicesFactory().makeFromString(name);
+				if (current != null) {
+					current.commit();
+					ids[i] = current.getID();
+				}
+			}
+			
 		} catch (DataFault e) {
 			getLogger().error("Error looking up serviceID", e);
 		}
-		return id;
-		
+		return ids;
 	}
 
 	/* (non-Javadoc)
