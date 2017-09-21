@@ -37,6 +37,7 @@ import javax.servlet.http.HttpSession;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CleanupService;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.config.OverrideConfigService;
 import uk.ac.ed.epcc.webapp.email.logging.EmailLoggerService;
 import uk.ac.ed.epcc.webapp.email.logging.ServletEmailLoggerService;
 import uk.ac.ed.epcc.webapp.jdbc.JNDIDatabaseService;
@@ -283,6 +284,15 @@ public class ErrorFilter implements Filter {
 			Class<? extends ServletService> clazz = conn.getPropertyClass(ServletService.class,DefaultServletService.class,  "servlet.service");
 			conn.setService(conn.makeParamObject(clazz, conn,ctx,request,response));
 			conn.setService(conn.makeObject(ServletSessionService.class, "session.service"));
+			// Check for a per view override
+			if( request instanceof HttpServletRequest) {
+				String path = ((HttpServletRequest)request).getContextPath();
+				String view_prop = "view_properties"+path.replace('/', '.');
+				String config_list = conn.getInitParameter(view_prop);
+				if( config_list != null) {
+					conn.setService(new OverrideConfigService(null, config_list, conn));
+				}
+			}
 		}
 		return conn;
 	}
