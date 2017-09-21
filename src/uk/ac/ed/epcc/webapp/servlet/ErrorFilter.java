@@ -77,6 +77,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
 @WebFilter(filterName="FaultFilter", urlPatterns = {"/*"} )
 public class ErrorFilter implements Filter {
 	private static final Feature SESSION_STEALING_CHECK_FEATURE = new Feature("session-stealing-check",false,"reset session if ip address changes");
+	private static final Feature CONTEXT_CONFIG_FEATURE = new Feature("context.configuration",false,"Allow additional properties files based on the application Context");
 	private static final Feature CLEANUP_THREAD_FEATURE = new Feature("appcontext.cleanup_thread",true,"Close the AppContext in a thread if CleanupServices are defined");
 	public static final Feature TIMER_FEATURE = new Feature("Timer",false,"gather timing information for performance analyis");
 	private static final String LAST_ADDR_ATTR = "LastAddr";
@@ -285,7 +286,13 @@ public class ErrorFilter implements Filter {
 			conn.setService(conn.makeParamObject(clazz, conn,ctx,request,response));
 			conn.setService(conn.makeObject(ServletSessionService.class, "session.service"));
 			// Check for a per view override
-			if( request instanceof HttpServletRequest) {
+			
+// Allow additional configuration files based on the application context.
+// This allows view customisation from a single war-file mapped to multiple contexts
+// using context.xml files with docBase set
+// Unfortunately this is cumbersome to use with parallel deployment
+// as versioned context.xml files need to be uploaded
+			if( request instanceof HttpServletRequest && CONTEXT_CONFIG_FEATURE.isEnabled(conn)) {
 				String path = ((HttpServletRequest)request).getContextPath();
 				String view_prop = "view_properties"+path.replace('/', '.');
 				String config_list = conn.getInitParameter(view_prop);
