@@ -173,7 +173,7 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 	}
 	/** Does the update allow name changes.
 	 * defaults to false. Override for tables that are not auto
-	 * populated so allow edits.
+	 * populated to allow edits.
 	 * 
 	 * @return boolean
 	 */

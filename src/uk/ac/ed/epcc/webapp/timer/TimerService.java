@@ -34,7 +34,11 @@ public interface TimerService extends AppContextService<TimerService>{
 	 */
 	public abstract void timerStats(Class clazz);
 
-	
+	/** write stats to a {@link StringBuilder}
+	 * 
+	 * @param sb
+	 */
+	public void timerStats(StringBuilder sb);
 	/** Start a named timer
 	 * 
 	 * @param name
