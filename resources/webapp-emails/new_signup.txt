@@ -3,7 +3,7 @@
 %%end{Subject}%%
 Dear %%person.name%%,
 
-A Web-site account has been created for you to administer your use of
+A %%service.website-name=Web-site%% account has been created for you to administer your use of
 the %%service.name%% Service.
 
 To use this service you must use a web-browser to connect to the following URL:
@@ -18,7 +18,7 @@ Go directly to this URL:
 to complete registration and choose your own password.
 %%end{password_reset.url_region}%%
 %%begin{password_value.region,true}%%
-Your initial password for the %%service.name%% %%service.website-name%% is:
+Your initial password for the %%service.name%% %%service.website-name=Web-site%% is:
   %%person.password%%
 if you log in for the first time with this password you will be asked to change it to
 one of your own choosing.

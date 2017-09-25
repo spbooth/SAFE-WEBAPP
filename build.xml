@@ -93,6 +93,11 @@
 				<filename name="**/*.properties" />
 			</fileset>
 		</copy>
+		<copy todir="${build.home}" verbose="true" overwrite="true" >
+					<fileset dir="${basedir}/resources">
+						<filename name="**/*.*" />
+					</fileset>
+		</copy>
 		<copy todir="${build.home}/META-INF" verbose="true" overwrite="true">
 			<fileset dir="${basedir}/META-INF">
 				<filename name="**/*.*" />
