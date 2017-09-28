@@ -1170,6 +1170,12 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			throw new UnknownRelationshipException(role);
 		}
 		return def;
+		}catch(UnknownRelationshipException ur){
+			if( ur.getMessage().equals(role)){
+				throw ur;
+			}else{
+				throw new UnknownRelationshipException(role, ur);
+			}
 		}finally{
 			searching_roles.remove(search_tag);
 		}
@@ -1251,6 +1257,12 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    }
 		
 		throw new UnknownRelationshipException(role);
+		}catch(UnknownRelationshipException ur){
+			if( ur.getMessage().equals(role)){
+				throw ur;
+			}else{
+				throw new UnknownRelationshipException(role, ur);
+			}
 		}finally{
 			searching_roles.remove(search_tag);
 		}
