@@ -124,6 +124,8 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	public static final Feature CACHE_RELATIONSHIP_FEATURE = new Feature("cache_relationships",true,"cache relationship test results in the session");
 	public static final Feature APPLY_DEFAULT_PERSON_RELATIONSHIP_FILTER = new Feature("relationships.apply_default_person_filter",true,"Apply the default person relationship filter when generating a filter on person");
 	public static final Feature APPLY_DEFAULT_TARGET_RELATIONSHIP_FILTER = new Feature("relationships.apply_default_target_filter",true,"Apply the default target relationship filter when generating a filter");
+	public static final Feature ALLOW_UNKNOWN_RELATIONSHIP_IN_OR_FEATURE = new Feature("relationship.allow_unknown_in_or",true,"Only skip the bad branches of a mis defined OR relationship");
+
 	private Map<String,Boolean> toggle_map=null;
 	protected AppContext c;
     
@@ -1074,10 +1076,18 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			// OR combination of filters
 			OrFilter<T> or = new OrFilter<T>(fac2.getTarget(), fac2);
 			for( String  s  : role.split(",")){
-				if( person == null){
-					or.addFilter(getRelationshipRoleFilter(fac2, s));
-				}else{
-					or.addFilter(getTargetInRelationshipRoleFilter(fac2, s, person));
+				try{
+					if( person == null){
+						or.addFilter(getRelationshipRoleFilter(fac2, s));
+					}else{
+						or.addFilter(getTargetInRelationshipRoleFilter(fac2, s, person));
+					}
+				}catch(UnknownRelationshipException e){
+					if(ALLOW_UNKNOWN_RELATIONSHIP_IN_OR_FEATURE.isEnabled(getContext())){
+						error(e, "Bad relationship in OR branch");
+					}else{
+						throw e;
+					}
 				}
 			}
 			return or;
@@ -1194,7 +1204,15 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			// OR combination of filters
 			OrFilter<A> or = new OrFilter<A>(target_type, login_fac);
 			for( String  s  : role.split(",")){
-				or.addFilter(getPersonInRelationshipRoleFilter(fac2, s,target));
+				try{
+					or.addFilter(getPersonInRelationshipRoleFilter(fac2, s,target));
+				}catch(UnknownRelationshipException e){
+					if(ALLOW_UNKNOWN_RELATIONSHIP_IN_OR_FEATURE.isEnabled(getContext())){
+						error(e, "Bad relationship in OR branch");
+					}else{
+						throw e;
+					}
+				}
 			}
 			return or;
 		}
