@@ -306,6 +306,11 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 				}else{
 					tag="[M]"; // modified
 				}
+			}else {
+				String resource = getResourceString();
+				if( resource == null ){
+					tag = "[E]"; // no text or database
+				}
 			}
 			return getGroup()+":"+getName()+tag;
 		}
@@ -433,7 +438,12 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			boolean from_file = ! dat.hasText();
 			String location;
 			if( from_file ){
-				location = "File";
+				String resource_text = dat.getResourceString();
+				if( resource_text == null){
+					location = "No content";
+				}else {
+					location = "File";
+				}
 			}else{
 				String resource_text = dat.getResourceString();
 				if( resource_text == null){

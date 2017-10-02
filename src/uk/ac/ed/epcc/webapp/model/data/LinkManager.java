@@ -671,6 +671,9 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	public long getLinkCount(L l, R r,BaseFilter<? super T> f) throws DataException{
 		return getCount(new LinkFilter(l, r, f));
 	}
+	public T find(L l, R r,BaseFilter<? super T> f) throws DataException{
+		return find(new LinkFilter(l, r, f));
+	}
 	public DataObjectFactory<R> getRightFactory(){
 		return (DataObjectFactory<R>) getRightProducer();
 	}
