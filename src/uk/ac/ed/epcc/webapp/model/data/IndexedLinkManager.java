@@ -463,16 +463,16 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	}
 	protected void setContext(AppContext c, String table,IndexedProducer<L> left_fac,
 				String left_field, IndexedProducer<R> right_fac, String right_field) {	
+		// Composites may wan to query these
+		this.left_field = left_field;
+		this.right_field = right_field;
 		if( DataObjectFactory.AUTO_CREATE_TABLES_FEATURE.isEnabled(c)){
 			setComposites(c, table);
 			setContextWithMake(c, table,getFinalTableSpecification(c,table,left_fac,left_field,right_fac,right_field));
 		}else{
 			setContext(c, table,false);
 		}
-		
-		this.left_field = left_field;
 		res.addTypeProducer(new IndexedTypeProducer<L,IndexedProducer<L>>(c,left_field, left_fac));
-		this.right_field = right_field;
 		res.addTypeProducer(new IndexedTypeProducer<R,IndexedProducer<R>>(c,right_field, right_fac));
 	}
 

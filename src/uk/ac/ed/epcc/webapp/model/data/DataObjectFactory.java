@@ -1775,18 +1775,18 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	   setContext(ctx, homeTable, AUTO_CREATE_TABLES_FEATURE.isEnabled(ctx));
 	}
 	protected final boolean setContext(AppContext ctx, String homeTable,boolean create) {
-		if (res != null || conn != null ){
-			getLogger().debug("Attempt to reset the AppContext");
+		if (res != null  ){
+			getLogger().debug("Attempt to reset Repository");
 			return false;
 		}
 		if (homeTable == null) {
 			throw new ConsistencyError("No table specified");
 		}
-		// set local reference so composites can find
-		this.conn=ctx;
+		
 		TimerService timer = ctx.getService(TimerService.class);
 		if( timer != null ){ timer.startTimer("setContext"); timer.startTimer("setContext:"+homeTable);}
 		try{
+		// This sets the AppContext if not already set.
 		setComposites(ctx, homeTable);
 		
 		res = Repository.getInstance(ctx, homeTable);
@@ -1827,6 +1827,12 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param homeTable
 	 */
 	protected void setComposites(AppContext ctx, String homeTable) {
+		if( conn != null ) {
+			// Only call setComposites once
+			return;
+		}
+		// set local reference so composites can find
+		this.conn = ctx;
 		String composite_list = ctx.getExpandedProperty(homeTable+".composites");
 		// can't use getLogger as context not set yet
 		Logger logger = ctx.getService(LoggerService.class).getLogger(getClass());

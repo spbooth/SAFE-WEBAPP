@@ -861,6 +861,10 @@ public final class AppContext {
 	 */
 
 	public <T> Constructor<T> findConstructor(Class<T> clazz, Object... param){
+		if( clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) {
+			error("Cannot get construtor for abstract/interface class "+clazz.getCanonicalName());
+			return null;
+		}
 		Class sig[] = new Class[param.length];
 		for(int i=0;i<param.length;i++){
 			if( param[i] == null ){
