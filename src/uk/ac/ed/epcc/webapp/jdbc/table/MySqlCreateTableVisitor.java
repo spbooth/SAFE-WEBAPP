@@ -220,6 +220,12 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor#useIndex(uk.ac.ed.epcc.webapp.jdbc.table.IndexType)
 	 */
 	public boolean useIndex(IndexType i) {
+		if( FOREIGN_KEY_FEATURE.isEnabled(ctx.getContext())) {
+			if( i.isRef()) {
+				// This will duplicate the automatic foreign key
+				return false;
+			}
+		}
 		return true;
 	}
 
