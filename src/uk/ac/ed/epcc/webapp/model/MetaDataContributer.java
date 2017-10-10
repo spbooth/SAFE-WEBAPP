@@ -15,31 +15,29 @@ package uk.ac.ed.epcc.webapp.model;
 
 import java.util.Map;
 
-import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
-/** Interface for providing summary information.
+/** Interface for providing machine readable MetaData
  * 
  * This is usually implemented by a {@link DataObjectFactory} or {@link Composite}
- * and is intended to build a {@link Map} of attributes that provide summary information about
+ * and is intended to build a {@link Map} of attributes that provide meta-data information about
  * the target object.
- * These will usually be added to a {@link Table} so the data should be of a
- * type that can be displayed by {@link Table}s
+ * These will usually be added to a XML or JSON document describing the target
  * 
- * The keys should be display text.
+ * The keys should be valid element/key names.
  * 
- * @see MetaDataContributer
+ * @see SummaryContributer
  * @author spb
  *
  */
-public interface SummaryContributer<T extends DataObject> {
+public interface MetaDataContributer<T extends DataObject> {
 
-	/** Add to the set of attributes.
+	/** Add to the set of meta-data.
 	 * 
 	 * @param attributes
 	 * @param target
 	 */
-	public void addAttributes(Map<String,Object> attributes,T target);
+	public void addMetaData(Map<String,String> attributes,T target);
 }

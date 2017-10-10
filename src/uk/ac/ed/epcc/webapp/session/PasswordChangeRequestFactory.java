@@ -34,7 +34,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 /** Holds an one use id-string associated with a user for resetting the login password.
  * 
- * if knows the current encrypted password is also stored and the tag won't match unlesss this is unchanged
+ * if known the current encrypted password is also stored and the tag won't match unlesss this is unchanged
  * preventing the tag from being used once the password has been changed. 
  * 
  * @author spb

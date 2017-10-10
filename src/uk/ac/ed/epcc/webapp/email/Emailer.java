@@ -134,8 +134,8 @@ public class Emailer {
 	public static final String EMAIL_FORCE_ADDRESS = "email.force.address";
 	public static final String EMAIL_BYPASS_FORCE_ADDRESS = "email.bypass_force.address";
 	public static final Feature EMAILS_FEATURE = new Feature("emails",true,"emails enabled");
-    public static final Feature PASSWORD_RESET_SERVLET = new Feature("password_reset.servlet",false,"Send reset url in reset email");
-    
+	public static final Feature PASSWORD_RESET_SERVLET = new Feature("password_reset.servlet",false,"Send reset url in reset email");
+	 
     public static final Feature HTML_ALTERNATIVE = new Feature("email.html_alternative",true,"Look for a tempalte region conatining html alternative content");
 	private static final String MAIL_SMTP_HOST = "mail.smtp.host";
 
