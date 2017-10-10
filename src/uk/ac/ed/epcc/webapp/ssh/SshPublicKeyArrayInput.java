@@ -19,8 +19,6 @@ import java.security.interfaces.RSAKey;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.sun.javafx.binding.BidirectionalBinding.StringConversionBidirectionalBinding;
-
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
@@ -118,17 +116,20 @@ public class SshPublicKeyArrayInput extends ParseAbstractInput<String> implement
 		}
 		Set<PublicKey> set = new LinkedHashSet<>();
 		for(String v : value.split("\\s*,\\s*")) {
-			set.add(PublicKeyReaderUtil.load(v));
+			set.add(PublicKeyReaderUtil.load(v.trim()));
 		}
 		return (PublicKey[]) set.toArray(new PublicKey[set.size()]);
 	}
 	
 	public static String format(PublicKey keys[]) throws PublicKeyParseException, IOException {
+		if( keys == null) {
+			return null;
+		}
 		StringBuilder sb = new StringBuilder();
 		boolean seen=false;
 		for(PublicKey key : keys) {
 			if( seen) {
-				sb.append(",");
+				sb.append(",\n");
 			}
 			sb.append(PublicKeyReaderUtil.format(key));
 			seen=true;
