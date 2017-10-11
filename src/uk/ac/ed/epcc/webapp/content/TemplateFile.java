@@ -995,14 +995,15 @@ public class TemplateFile {
 
         	int i=0;
         	for(Map.Entry e : m.entrySet()){
-        		writePropertyValue(out, name+i+"key", e.getKey());
-        		out.write("->");
-        		writePropertyValue(out, name+i+"value", e.getValue());
         		if( i > 0 ){
         			out.write(", ");
         		}
+        		writePropertyValue(out, name+i+"key", e.getKey());
+        		out.write("->");
+        		writePropertyValue(out, name+i+"value", e.getValue());
         		i++;
         	}
+        	return;
         }
 		// Iterate over array of properties
 		if( value instanceof Iterable){

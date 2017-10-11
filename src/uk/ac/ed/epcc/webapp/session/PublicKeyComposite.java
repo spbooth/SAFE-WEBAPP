@@ -1,7 +1,6 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import java.io.IOException;
-import java.security.PublicKey;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,7 +8,6 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileUploadDecorator;
-import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
@@ -18,10 +16,7 @@ import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.MetaDataContributer;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
-import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil;
 import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
-import uk.ac.ed.epcc.webapp.ssh.RsaPublicKeyInput;
-import uk.ac.ed.epcc.webapp.ssh.SshPublicKeyInput;
 
 /** A {@link Composite} that adds a SSH public key to an {@link AppUser}
  * 
