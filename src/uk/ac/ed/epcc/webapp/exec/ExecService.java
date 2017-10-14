@@ -37,7 +37,7 @@ public interface ExecService extends AppContextService<ExecService> {
 	public ProcessProxy exec(long timeout_milliseconds,String command) throws Exception;
 	
 
-	/** un a external command with supplied input (waiting for it to complete) 
+	/** Run a external command with supplied input (waiting for it to complete) 
 	 * 
 	 * @param input
 	 * @param timeout_milliseconds
@@ -48,4 +48,13 @@ public interface ExecService extends AppContextService<ExecService> {
 	 * @throws Exception 
 	 */
 	public ProcessProxy exec(String input, long timeout_milliseconds,String command) throws Exception;
+	
+	
+	/** Make a {@link DeferredProcessProxy} to be run later.
+	 * 
+	 * @param input
+	 * @param command
+	 * @return
+	 */
+	public DeferredProcessProxy exec_deferred(byte input[], String command) throws Exception;
 }

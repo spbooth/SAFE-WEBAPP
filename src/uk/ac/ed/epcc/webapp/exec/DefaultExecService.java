@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.exec;
 
+import java.io.IOException;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 
@@ -50,16 +52,13 @@ public class DefaultExecService implements ExecService,Contexed {
 	 * @see uk.ac.ed.epcc.webapp.exec.ExecService#exec(java.lang.String)
 	 */
 	public ProcessProxy exec(String input ,long timeout,String line) throws Exception {
-		Runtime rt = Runtime.getRuntime();
-		String result=null;
-		Process p =rt.exec(line);
+		
 
 
 		if( timeout < 0L){
 			timeout=0L;
 		}
-
-		ProcessHandler worker = new ProcessHandler(input == null ? null :input.getBytes(),p);
+		DeferredProcessProxy worker = exec_deferred(input == null ? null :input.getBytes(), line);
 		worker.execute(timeout);
 
 		return worker;
@@ -80,6 +79,18 @@ public class DefaultExecService implements ExecService,Contexed {
 	public ProcessProxy exec(long timeout_milliseconds, String command)
 			throws Exception {
 		return exec(null,timeout_milliseconds,command);
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.exec.ExecService#exec_deferred(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public DeferredProcessProxy exec_deferred(byte input[], String command) throws IOException {
+		Runtime rt = Runtime.getRuntime();
+		String result=null;
+		Process p =rt.exec(command);
+		return new ProcessHandler(input,p);
+		
 	}
 
 }

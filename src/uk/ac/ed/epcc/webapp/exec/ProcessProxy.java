@@ -42,4 +42,7 @@ public interface ProcessProxy {
 	 * @return
 	 */
 	public abstract boolean wasTerminated();
+	
+	
+	
 }
