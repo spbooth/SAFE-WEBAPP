@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.sun.xml.internal.bind.CycleRecoverable.Context;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
@@ -616,6 +618,11 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 			m.newSignup(user, new_password);
 		}
 		
+		PreferredViewComposite<AU> pvcomp = getComposite(PreferredViewComposite.class);
+		if (pvcomp != null) {
+			// Set the user's preferred view to the one they're currently signing up on
+			pvcomp.setPreferredView(user, getContext().getInitParameter("service.saf.url"));
+		}
 	}
 	
 	/** Get a {@link FormCreator} to use when users sign-up

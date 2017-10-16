@@ -76,6 +76,7 @@ import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory.EmailChangeRequest
 import uk.ac.ed.epcc.webapp.session.PasswordChangeListener;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory.PasswordChangeRequest;
+import uk.ac.ed.epcc.webapp.session.PreferredViewComposite;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
@@ -156,6 +157,8 @@ public class Emailer {
 	public static final Feature DEBUG_SEND = new Feature("email.send.debug", false, "Log send internal operations");
 	AppContext ctx;
 	private Pattern dont_send_pattern=null;
+
+	private String preferredView = null;
 	
 	public Emailer(AppContext c) {
 		ctx = c;
@@ -322,6 +325,8 @@ public class Emailer {
 	String email = getEmail(recipient);
 	log.debug("Email mapped "+recipient.getEmail()+"->"+email);
 	if( email != null && email.trim().length() > 0){
+		PreferredViewComposite<AppUser> pvcomp = (PreferredViewComposite<AppUser>)recipient.getFactory().getComposite(PreferredViewComposite.class);
+		preferredView = pvcomp.getPreferredView(recipient);
 		return templateMessage(email, headers, email_template);
 	}else{
 		log.warn("Email to "+recipient.getIdentifier()+" mapped to null");
@@ -460,6 +465,11 @@ public class Emailer {
 		email_template.setProperties(conn.getInitParameters("email."));
 		email_template.setProperties(params);
 
+		if ((preferredView != null) && (!preferredView.equals(""))) {
+			// Override SAFE URL with user's preferred view, if set
+			email_template.setProperty("service.saf.url", preferredView);
+		}
+		
 		String subject = null;
 
 		
