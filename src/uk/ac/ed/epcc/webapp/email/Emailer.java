@@ -925,10 +925,10 @@ public class Emailer {
 				String subject_message = message;
 
 				if( subject_message.contains("\n")){
-					subject_message.substring(0, subject_message.indexOf('\n'));
+					subject_message = subject_message.substring(0, subject_message.indexOf('\n'));
 				}
 				if( subject_message.length() > 64){
-					subject_message.substring(0, 64);
+					subject_message = subject_message.substring(0, 64);
 				}
 				errorEmail.setProperty("subject_message", subject_message);
 				errorEmail.setProperty("exception_message", message);
