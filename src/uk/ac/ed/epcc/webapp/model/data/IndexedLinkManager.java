@@ -225,11 +225,11 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		/**
 		 * pass in a copy of the Left end object to initialise the cache.
 		 * 	 Note that this method will do <em>NOTHING</em> if the argument is not the 
-		 * current Left peer.
+		 * current Left peer or the reference is not yet set.
 		 * @param o
 		 *            DataObject
 		 */
-		protected final void setLeft(L o) {
+		protected final void setCachedLeft(L o) {
 			if (o == null || left != null) {
 				return;
 			}
@@ -257,11 +257,11 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		/**
 		 * pass in a copy of the Right end object to initialise the cache.
 		 * Note that this method will do <em>NOTHING</em> if the argument is not the 
-		 * current Right peer.
+		 * current Right peer or the reference is not yet set.
 		 * @param o
 		 *            DataObject
 		 */
-		protected final void setRight(R o) {
+		protected final void setCachedRight(R o) {
 			if (o == null || right != null) {
 				return;
 			}
@@ -364,8 +364,8 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 				// Set cache values where we can. This happened in the LinkMapper if
 				// we are using LinkFilterIterator but we have to do it here if we are using
 				// a standard LinkFilter
-				l.setLeft(left_target);
-				l.setRight(right_target);
+				l.setCachedLeft(left_target);
+				l.setCachedRight(right_target);
 		}
 	}
    
@@ -424,8 +424,8 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 				// Set cache values where we can. This happened in the LinkMapper if
 				// we are using LinkFilterIterator but we have to do it here if we are using
 				// a standard LinkFilter
-				l.setLeft(left_target);
-				l.setRight(right_target);
+				l.setCachedLeft(left_target);
+				l.setCachedRight(right_target);
 		}
 	}
    
@@ -586,8 +586,8 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 			T l = find(fil,true);
 			
 			if( l != null ){
-			  l.setLeft(left_end);
-			  l.setRight(right_end);
+			  l.setCachedLeft(left_end);
+			  l.setCachedRight(right_end);
 			}
 			return l;
 		} catch (MultipleResultException e) {
@@ -696,8 +696,8 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		T l = getLink(left_end, right_end);
 		if (l == null) {
 			l =  makeBDO();
-			l.setLeft(left_end);
-			l.setRight(right_end);
+			l.setCachedLeft(left_end);
+			l.setCachedRight(right_end);
 			l.setup();
 			l.commit();
 		}
