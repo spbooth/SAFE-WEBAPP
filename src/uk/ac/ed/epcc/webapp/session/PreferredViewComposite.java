@@ -14,7 +14,9 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import java.util.Map;
+import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 
@@ -39,7 +41,7 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 
 	@Override
 	public TableSpecification modifyDefaultTableSpecification(TableSpecification spec, String table) {
-		spec.setField(PREFERRED_VIEW, new StringFieldType(true, null, 256));
+		spec.setField(PREFERRED_VIEW, new StringFieldType(true, "", 255));
 		return spec;
 	}
 
@@ -49,11 +51,35 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 		return labels;
 	}
 
+	@Override
+	public Set<String> addOptional(Set<String> optional) {
+		optional.add(PREFERRED_VIEW);
+		return optional;
+	}
+	
+	@Override
+	public Set<String> addSuppress(Set<String> suppress) {
+		// don't let normal users edit this, but admin can
+		SessionService sess = getContext().getService(SessionService.class);
+		if( sess == null || !sess.hasRole(SessionService.ADMIN_ROLE)){
+			suppress.add(PREFERRED_VIEW);
+		}
+		return suppress;
+	}
+
+	@Override
+	public Map<String, Object> addSelectors(Map<String, Object> selectors) {
+		TextInput ti = new TextInput();
+		ti.setSingle(true);
+		selectors.put(PREFERRED_VIEW, ti);
+		return selectors;
+	}
+	
 	public String getPreferredView(AU person) {
 		return getRecord(person).getStringProperty(PREFERRED_VIEW);
 	}
 	
 	public void setPreferredView(AU person, String prefview) {
-		getRecord(person).setProperty(PREFERRED_VIEW, prefview);
+		getRecord(person).setOptionalProperty(PREFERRED_VIEW, prefview);
 	}
 }

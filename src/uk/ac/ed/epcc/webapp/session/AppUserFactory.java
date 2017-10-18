@@ -610,18 +610,18 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 	 */
 	public void newSignup(AU user) throws Exception {
 		
+		PreferredViewComposite<AU> pvcomp = getComposite(PreferredViewComposite.class);
+		if (pvcomp != null) {
+			// Set the user's preferred view to the one they're currently signing up on
+			pvcomp.setPreferredView(user, getContext().getInitParameter("service.saf.url"));
+		}
+		
 		PasswordAuthComposite<AU> comp = getComposite(PasswordAuthComposite.class);
 		if( comp != null){
 			// Make a new password
 			String new_password = comp.firstPassword(user);
 			Emailer m = new Emailer(getContext());
 			m.newSignup(user, new_password);
-		}
-		
-		PreferredViewComposite<AU> pvcomp = getComposite(PreferredViewComposite.class);
-		if (pvcomp != null) {
-			// Set the user's preferred view to the one they're currently signing up on
-			pvcomp.setPreferredView(user, getContext().getInitParameter("service.saf.url"));
 		}
 	}
 	
@@ -659,7 +659,8 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		 * 
 		 */
 		private static final String REGISTER_ACTION = " Register ";
-
+		private static final String PREFERRED_VIEW_FIELD = "PreferredView";
+		
 		@Override
 		public void preCommit(T dat, Form f) throws DataException {
 			super.preCommit(dat, f);
@@ -713,6 +714,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 
 		@Override
 		public FormResult getResult(String type_name,T dat, Form f) {
+			System.out.println("In getResult();");
 			if( getFactory().getComposite(PasswordAuthComposite.class)!=null){			
 				return new MessageResult("signup_ok_password",type_name);
 			}else{
@@ -727,6 +729,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		protected Set<String> getSupress() {
 			Set<String> supress = super.getSupress();
 			supress.add(ALLOW_EMAIL_FIELD);
+			supress.add(PREFERRED_VIEW_FIELD);
 			return supress;
 		}
 		/* (non-Javadoc)
@@ -736,6 +739,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		public Map<String, Object> getDefaults() {
 			Map<String, Object> defaults = super.getDefaults();
 			defaults.put(ALLOW_EMAIL_FIELD, Boolean.TRUE);
+			defaults.put(PREFERRED_VIEW_FIELD, getContext().getInitParameter("service.saf.url"));
 			return defaults;
 		}
 		/* (non-Javadoc)
