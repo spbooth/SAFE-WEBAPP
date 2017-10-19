@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import uk.ac.ed.epcc.webapp.NumberOp;
+import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 
 /**
  * 
@@ -701,6 +703,10 @@ public class Table<C, R> {
 			put(my_col_key,row_key,t.get(col_key,my_col_key ));
 		}
 	}
+	/** Add contents of existing table 
+	 * 
+	 * @param t
+	 */
 	public void add(Table<C, R> t) {
 		addRows(t);
 		for (C col : t.col_keys) {
@@ -712,6 +718,62 @@ public class Table<C, R> {
 		}
 	}
 
+	/** Add contents from donor table transforming the keys
+	 * 
+	 * @param key_transform {@link Transform} to map donor rows to local rows
+	 * @param table
+	 */
+	public <X> void addTable(Transform key_transform,Table<C,X> donor ) {
+		for(X donor_row : donor.row_keys) {
+			R new_row = (R) key_transform.convert(donor_row);
+			for (C col : donor.col_keys) {
+				Col dest = getCol(col);
+				Object val = donor.get(col, donor_row);
+				if( val != null) {
+					if( val instanceof Number) {
+						dest.combine(Operator.ADD, new_row, (Number) val);
+					}else {
+						dest.put(new_row, val);
+					}
+				}
+			}
+		}
+	}
+	/** Add contents from donor table taking the keys to use from a Column in
+	 * the donor table. This can be used to create a table which merges rows
+	 * based on the value in a col.
+	 * The key_col is not imported from the donor.
+	 * 
+	 * @param key_col column in donor table containing row key values to use
+	 * @param table
+	 */
+	public <X> void addTable(C key_col,Table<C,X> donor ) {
+
+
+		Map<X,R> mapping = (Map<X, R>) donor.getCol(key_col).data;
+		for (C col : donor.col_keys) {
+			Col dest = getCol(col);
+			Table<C,X>.Col donor_col = donor.getCol(col);
+			Formatter<C, X> format = donor_col.getFormat();
+			if( format instanceof TransformFormatter) {
+				dest.setFormat(((TransformFormatter)format).getTransform());
+			}
+			for(X donor_row : donor.row_keys) {
+				R new_row = mapping.get(donor_row);
+				if( new_row != null) {	
+					Object val = donor.get(col, donor_row);
+					if( val != null) {
+						if( val instanceof Number) {
+							dest.combine(Operator.ADD, new_row, (Number) val);
+						}else {
+							dest.put(new_row, val);
+						}
+					}
+				}
+			}
+		}
+
+	}
 	/** Add rows (including formatting) from a table. 
 	 * @param t
 	 */
@@ -1768,4 +1830,32 @@ public class Table<C, R> {
 		this.id = id;
 	}
 
+	/** Remove all rows based on values in a column
+	 * row is removed if <b>col-value <i>Condition</i> value = true</b>
+	 * @param col    Column to query
+	 * @param cond   {@link MatchCondition} to compare
+	 * @param value  value
+	 */
+	public <T>void thresholdRows(C col, MatchCondition cond, T value ){
+		Col c  = getCol(col);
+		if( c != null ) {
+			Set<R> remove = new LinkedHashSet<>();
+			for(R row : row_keys) {
+				Object val = c.get(row);
+				if( val != null) {
+					if( cond == null ) {
+						if( val.equals(value) ) {
+							remove.add(row);
+						}
+					}else if( cond.compare(val, value)) {
+						remove.add(row);
+					}
+				}
+			}
+			for(R row : remove) {
+				removeRow(row);
+			}
+			remove.clear();
+		}
+	}
 }

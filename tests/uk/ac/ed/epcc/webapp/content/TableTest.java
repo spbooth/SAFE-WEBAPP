@@ -37,6 +37,8 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
+
 
 public class TableTest {
 
@@ -862,5 +864,57 @@ public class TableTest {
 				);
 		
 		
+	}
+	
+	@Test
+	public void testMergeRow() {
+		Table t = new Table();
+		
+		Table t1 = new Table();
+		t1.put("Person", 1, "fred");
+		t1.put("Value", 1, 9.0);
+		t1.put("Person", 2, "fred");
+		t1.put("Value", 2, 11.0);
+		t1.put("Person", 3, "bill");
+		t1.put("Value", 3, 13.0);
+		t1.put("Person", 4, "bill");
+		t1.put("Value", 4, 17.0);
+		
+		t.addTable("Person", t1);
+		
+		assertEquals(20.0, t.get("Value", "fred"));
+		assertEquals("fred", t.get("Person", "fred"));
+		assertEquals(30.0, t.get("Value", "bill"));
+		assertEquals("bill", t.get("Person", "bill"));
+		
+		assertEquals(2, t.nCols());
+		assertEquals(2, t.nRows());
+	}
+	
+	@Test
+	public void testThreshold() {
+		
+		
+		Table t1 = new Table();
+		t1.put("Value", 1, 9.0);
+		t1.put("Value", 2, 11.0);
+		t1.put("Value", 3, 13.0);
+		t1.put("Value", 4, 17.0);
+		t1.put("Value", 5, 12.0);
+		t1.setKeyName("int");
+		
+		t1.thresholdRows("Value", null, 12.0);
+		t1.thresholdRows("Value", MatchCondition.GT, 13.0);
+		t1.thresholdRows("Value", MatchCondition.LT, 11.0);
+		
+		System.out.println(t1.toString());
+		assertEquals(2, t1.nRows());
+		
+		
+		assertEquals(11.0, t1.get("Value", 2));
+		assertEquals(13.0, t1.get("Value", 3));
+		
+		
+		assertEquals(2, t1.nCols());
 	}
 }
