@@ -168,7 +168,7 @@ public class DefaultDataBaseService implements DatabaseService {
 				return null;
 			}
 			Class.forName(driver_name);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			error(e,"Could not load database driver: "+driver_name);
 			return null;
 		}

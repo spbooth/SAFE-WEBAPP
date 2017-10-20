@@ -188,7 +188,13 @@ public class ErrorFilter implements Filter {
 		} catch( Throwable t){
 			
 			// generic throwable catch
-			getCustomLogger(req, res).error("caught Error in filter",t);
+			try {
+				getCustomLogger(req, res).error("caught Error in filter",t);
+			}catch(Throwable t2) {
+				// Things are really bad
+				System.err.println("Unloggable error in filter");
+				t.printStackTrace(); // should go to catalina.out
+			}
 			// Note that Servlet2.4 spec says exceptions thrown from a filter
 			// are not handled by error-page but error codes are
 			res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
