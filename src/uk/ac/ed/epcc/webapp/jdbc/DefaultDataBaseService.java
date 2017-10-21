@@ -112,6 +112,9 @@ public class DefaultDataBaseService implements DatabaseService {
 							connection_set=true;
 						}
 						map.put(key,conn);
+					}else {
+						bad_tags.add(key);
+						error("Failed to make SQLContext");
 					}
 				}catch(SQLException e){
 					bad_tags.add(key);
@@ -198,6 +201,9 @@ public class DefaultDataBaseService implements DatabaseService {
 //		}else{
 //			conn =java.sql.DriverManager.getConnection(name, user, pass);
 //		}
+		if( conn == null) {
+			return null;
+		}
 		conn.setAutoCommit(true); // just in case
 		if( type.contains(POSTGRESQL_TYPE) || driver_name.contains(POSTGRESQL_TYPE)){
 			return new PostgresqlSQLContext(ctx,conn);
