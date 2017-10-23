@@ -217,6 +217,11 @@ public final class AppContext {
 		disable_service_creation=true;
 		
 		if (attributes != null) {
+			for( Object o : attributes.values()) {
+				if( o instanceof AppContextCleanup) {
+					((AppContextCleanup)o).cleanup();
+				}
+			}
 			attributes.clear();
 			attributes = null;
 		}

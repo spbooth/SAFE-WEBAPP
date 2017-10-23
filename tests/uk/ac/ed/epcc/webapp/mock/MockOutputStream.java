@@ -17,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 
 /**
  * @author spb
@@ -42,5 +43,21 @@ public class MockOutputStream extends ServletOutputStream {
 
 	public String toString(){
 		return inner.toString();
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.ServletOutputStream#isReady()
+	 */
+
+	public boolean isReady() {
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.ServletOutputStream#setWriteListener(javax.servlet.WriteListener)
+	 */
+	
+	public void setWriteListener(WriteListener arg0) {
+		
 	}
 }

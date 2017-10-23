@@ -165,15 +165,17 @@ public class DefaultDataBaseService implements DatabaseService {
 		// Make a database connection
 		String driver_name = props.getProperty("db_driver"+suffix,"").trim();
 		try {
-			
-			if(driver_name==null || driver_name.trim().length()==0){
-				error("No database driver defined");
-				return null;
+			// It is no longer necessary to force the driver class to be
+			// registered in this way. The jar file should include 
+			//META-INF/services/java.sql.Driver to mark it as a driver
+			// or it can be added to the jdbc.drivers property
+			// However if we do have a class name loading it should ensure
+			// it is registered.
+			if(driver_name!=null && ! driver_name.isEmpty()){
+				Class.forName(driver_name);
 			}
-			Class.forName(driver_name);
 		} catch (Throwable e) {
 			error(e,"Could not load database driver: "+driver_name);
-			return null;
 		}
 		String name = props.getProperty("db_name"+suffix,"").trim();
 		String user = props.getProperty("db_username"+suffix,"").trim();

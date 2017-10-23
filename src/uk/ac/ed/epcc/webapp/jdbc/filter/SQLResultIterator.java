@@ -239,16 +239,26 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 		 * 
 		 */
 		public void close() {
+			try {
+				if( rs != null && ! rs.isClosed()) {
+					rs.close();
+				}
+			} catch (SQLException e) {
+				getContext().error(e,"Error closing ResultSet");
+			}
+			rs=null;
 			if( stmt == null){
 				return;
 			}
 			try {
-				stmt.close();
+				if( ! stmt.isClosed()) {
+					stmt.close();
+				}
 			} catch (SQLException e) {
 				getContext().error(e,"Error closing statement");
 			}
 			stmt = null;
-			rs=null;
+			
 		}
 
 		public final void remove() {

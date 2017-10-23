@@ -47,14 +47,13 @@ import java.util.Set;
 import org.apache.commons.codec.binary.Base64;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.AppContextCleanup;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.expr.DateSQLExpression;
-import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataError;
@@ -154,7 +153,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * 
  */
 
-public final class Repository {
+public final class Repository implements AppContextCleanup{
 	/** modes supported by {@link Record#setID}
 	 * 
 	 * @author spb
@@ -3095,7 +3094,12 @@ public final class Repository {
 	 * @param tag
 	 */
 	public static void reset(AppContext c, String tag){
-		c.removeAttribute(new Tag(tag));
+		Tag key = new Tag(tag);
+		Repository res = (Repository) c.getAttribute(key);
+		if( res != null ) {
+			res.cleanup();
+		}
+		c.removeAttribute(key);
 	}
 	
 	/** Used as AppContext attribute key for Repository.
@@ -3149,5 +3153,20 @@ public final class Repository {
 	}
 	public String toString(){
 		return "Repository-"+table_name;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.AppContextCleanup#cleanup()
+	 */
+	@Override
+	public void cleanup() {
+	    try {
+			if(find_statement != null && ! find_statement.isClosed()) {
+				find_statement.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		find_statement=null;
 	}
 }

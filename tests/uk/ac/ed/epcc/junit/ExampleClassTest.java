@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.ContextHolder;
@@ -31,11 +32,10 @@ public class ExampleClassTest implements ContextHolder,ExampleInterfaceTest<Exam
 	public ExampleInterfaceTestImpl<ExampleClassTest> example_interface = new ExampleInterfaceTestImpl<ExampleClassTest>(this);
 	private  AppContext c;
 	
+	// Need appcontext first
 	@Rule
-	public DBFixtureRule db = new DBFixtureRule(this);
-	
-	@Rule
-	public AppContextFixtureRule afr = new AppContextFixtureRule(this);
+	public RuleChain chain = RuleChain.outerRule(new AppContextFixtureRule(this)).around(new DBFixtureRule(this));
+		
 	
 	
 	public  ExampleClass getTarget(){
