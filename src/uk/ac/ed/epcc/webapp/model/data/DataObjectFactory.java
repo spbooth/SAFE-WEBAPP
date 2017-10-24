@@ -1047,7 +1047,23 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      */
 	@SuppressWarnings("unchecked")
 	public <X extends Composite> X getComposite(Class<X> clazz){
-		return (X) composites.get(clazz);
+		X found = (X) composites.get(clazz);
+		assert( found != null || checkComposite(clazz));
+		return found;
+	}
+	
+	public <X extends Composite> boolean checkComposite(Class<X> clazz) {
+		if( clazz.isInterface()) {
+			return true; // can't check
+		}
+		AppContext conn = getContext();
+		if( conn.findConstructorFromParamSignature(clazz, getClass()) != null) {
+			return true;
+		}
+		if( conn.findConstructorFromParamSignature(clazz, getClass(),String.class) != null) {
+			return true;
+		}
+		return false;
 	}
 	
 	public <X extends Composite> boolean hasComposite(Class<X> clazz){

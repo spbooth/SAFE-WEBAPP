@@ -888,7 +888,7 @@ public final class AppContext {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private <T> Constructor<T> findConstructorFromParamSignature(Class<T> clazz,Class ... param ){
+	public <T> Constructor<T> findConstructorFromParamSignature(Class<T> clazz,Class ... param ){
 		//Logger log = getLogger();
 		for(  Constructor<?>  c : clazz.getConstructors()){
 			//log.debug("consider "+c.toGenericString());
