@@ -143,7 +143,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	private static final String person_tag = "SESSION_PersonID";
 	private static final String toggle_map_tag = "SESSION_toggle_map";
 	private static final String role_map_tag = "SESSION_role_map";
-	
+	private boolean apply_toggle=true;
 	/** A keying object representing a relationship.
 	 * 
 	 * @author spb
@@ -300,6 +300,9 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * @return Boolean or null
 	 */
 	public final Boolean getToggle(String role){
+		if( ! apply_toggle ) {
+			return null;
+		}
 		if( toggle_map == null ){
 			setupToggleMap();
 			if( toggle_map == null){
@@ -1436,6 +1439,14 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 				log.error(errors,t);
 			}
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.session.SessionService#setApplyToggle(boolean)
+	 */
+	@Override
+	public void setApplyToggle(boolean value) {
+		apply_toggle=value;
 	}
 	
 }

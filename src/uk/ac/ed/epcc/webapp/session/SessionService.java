@@ -80,6 +80,12 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public void setToggle(String name, boolean value);
 	
+	/** enable/disable the toggle checks for this session
+	 * 
+	 * @param value
+	 */
+	public void setApplyToggle(boolean value);
+	
 	/** Toggle the sate of a role
 	 * return the new value of the toggle or null if its not a togglable role
 	 * 
