@@ -90,7 +90,7 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
     	addChoice(key, label, item);
     }
 	public T getItembyValue(String value) {
-		return data.get(value);
+		return data.get(mapTag(value));
 	}
 
 	public Iterator<T> getItems() {
@@ -191,6 +191,28 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
 	 */
 	public void setCaseInsensative(boolean case_insensative) {
 		this.case_insensative = case_insensative;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AbstractInput#getString(java.lang.Object)
+	 */
+	@Override
+	public String getString(String val) {
+		if( val instanceof String) {
+			return mapTag((String)val);
+		}
+		return super.getString(val);
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AbstractInput#convert(java.lang.Object)
+	 */
+	@Override
+	public String convert(Object v) throws TypeError {
+		if( v instanceof String) {
+			return mapTag((String)v);
+		}
+		return super.convert(v);
 	}
 	
 }

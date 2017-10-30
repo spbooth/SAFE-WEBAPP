@@ -28,10 +28,10 @@ import uk.ac.ed.epcc.webapp.forms.ParseAbstractInputTestCase;
  *
  */
 
-public class SetInputTestCase extends ParseAbstractInputTestCase<String, SetInput<Number>> implements
-ListInputInterfaceTest<String, Number, SetInput<Number>, SetInputTestCase> {
+public class CaseInsensativeSetInputTestCase extends ParseAbstractInputTestCase<String, SetInput<Number>> implements
+ListInputInterfaceTest<String, Number, SetInput<Number>, CaseInsensativeSetInputTestCase> {
 
-	public ListInputInterfaceTest<String, Number, SetInput<Number>, SetInputTestCase> list_test = new ListInputInterfaceTestImpl<String, Number, SetInput<Number>, SetInputTestCase>(this);
+	public ListInputInterfaceTest<String, Number, SetInput<Number>, CaseInsensativeSetInputTestCase> list_test = new ListInputInterfaceTestImpl<String, Number, SetInput<Number>, CaseInsensativeSetInputTestCase>(this);
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestParseDataProvider#getGoodParseData()
 	 */
@@ -40,6 +40,9 @@ ListInputInterfaceTest<String, Number, SetInput<Number>, SetInputTestCase> {
 		good.add("One");
 		good.add("Three");
 		good.add("Five");
+		good.add("OnE");
+		good.add("three");
+		good.add("FiVe");
 		return good;
 	}
 
@@ -51,7 +54,6 @@ ListInputInterfaceTest<String, Number, SetInput<Number>, SetInputTestCase> {
 		bad.add("Two");
 		bad.add("Four");
 		bad.add("Eight");
-		bad.add("ONE");
 		return bad;
 	}
 
@@ -59,7 +61,14 @@ ListInputInterfaceTest<String, Number, SetInput<Number>, SetInputTestCase> {
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getGoodData()
 	 */
 	public Set<String> getGoodData() throws Exception {
-		return getGoodParseData();
+		Set<String> good = new HashSet<String>();
+		good.add("one");
+		good.add("three");
+		good.add("five");
+		good.add("one");
+		good.add("three");
+		good.add("five");
+		return good;
 	}
 
 	/* (non-Javadoc)
@@ -74,6 +83,7 @@ ListInputInterfaceTest<String, Number, SetInput<Number>, SetInputTestCase> {
 	 */
 	public SetInput<Number> getInput() throws Exception {
 		SetInput<Number> input = new SetInput<Number>();
+		input.setCaseInsensative(true);
 		input.addChoice("One", 1);
 		input.addChoice("Three",3);
 		input.addChoice("Five", 5);
