@@ -39,6 +39,7 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
     private Map<String,T> data = new LinkedHashMap<String,T>();
     private Map<T,String> labels = new LinkedHashMap<T,String>();
     private Map<T,String> tags = new LinkedHashMap<T,String>();
+    private boolean case_insensative=false;
     public SetInput(){
     	
     }
@@ -66,6 +67,7 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
      * @param item  item associated with key.
      */
     public void addChoice(String tag,String label, T item) {
+    	tag=mapTag(tag);
     	data.put(tag, item);
     	labels.put(item, label);
     	tags.put(item, tag);
@@ -113,7 +115,7 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
 	}
 
 	public String getTagByValue(String value) {
-		return value;
+		return mapTag(value);
 	}
 
 	public String getText(T item) {
@@ -135,7 +137,8 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
 		if (v.trim().length() == 0) {
 			setValue(null);
 			return;
-		}		
+		}
+		v=mapTag(v);
 		if( data.containsKey(v)){
 			setValue(v);
 			return;
@@ -166,5 +169,28 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
 		return data.values().contains(item);
 	}
 
+	private String mapTag(String tag) {
+		if(tag == null) {
+			return null;
+		}
+		if( case_insensative) {
+			return tag.toLowerCase();
+		}
+		return tag;
+	}
+
+	/**
+	 * @return the case_insensative
+	 */
+	public boolean isCaseInsensative() {
+		return case_insensative;
+	}
+
+	/**
+	 * @param case_insensative the case_insensative to set
+	 */
+	public void setCaseInsensative(boolean case_insensative) {
+		this.case_insensative = case_insensative;
+	}
 	
 }
