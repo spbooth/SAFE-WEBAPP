@@ -166,6 +166,14 @@ public class TestMessageHandlerFactory implements MessageHandlerFactory{
 			// TODO Auto-generated method stub
 			return false;
 		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#bccOnly()
+		 */
+		@Override
+		public boolean bccOnly() {
+			return false;
+		}
 		
 	}
 	private class TestComposer implements MessageComposer{
