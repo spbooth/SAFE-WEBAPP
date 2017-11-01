@@ -16,8 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.content;
 
-
-
+import uk.ac.ed.epcc.webapp.model.data.Duration;
 
 public class HourTransform implements NumberTransform{
 	private String default_value="0:00:00";
@@ -39,7 +38,12 @@ public class HourTransform implements NumberTransform{
 	 */
 	 public static String toHrsMinSec(Number d) {
          String result = "";
-         long value = d.longValue();
+         long value;
+         if( d instanceof Duration) {
+        	 value=((Duration)d).getSeconds();
+         }else {
+        	 value= d.longValue();
+         }
          if( value < 0L){
         	 result = result+"-";
         	 value = -value;

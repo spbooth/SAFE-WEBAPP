@@ -1397,6 +1397,14 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	}
 	@Override
 	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target, String role) throws UnknownRelationshipException {
+		// We could interpret null target as hasRelationship with any target
+		// and cache result using an id of 0.
+		// but at the moment do 
+		// fac.exists(this.getRelationshipRoleFilter(fac,role)
+		// explicitly
+		if( target == null) {
+			return false;
+		}
 		// For the moment we only cache relationships within a request
 		// to avoid stale values as a users state changes
 		if( relationship_map == null && CACHE_RELATIONSHIP_FEATURE.isEnabled(getContext())){
