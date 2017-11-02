@@ -128,6 +128,9 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 	public String getPublicKey(AppUser person){
 		return getRecord(person).getStringProperty(PUBLIC_KEY);
 	}
+	public String getNormalisedPublicKey(AppUser person) throws PublicKeyParseException, IOException{
+		return normalise(getPublicKey(person));
+	}
 	public void setPublickey(AppUser person,String key){
 		getRecord(person).setOptionalProperty(PUBLIC_KEY, key);
 	}
