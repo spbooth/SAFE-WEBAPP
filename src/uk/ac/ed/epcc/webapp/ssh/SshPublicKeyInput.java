@@ -22,6 +22,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
 import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
 
 
@@ -100,5 +101,40 @@ public class SshPublicKeyInput extends ParseAbstractInput<String> implements Ite
 			throw new ParseException("Invalid public key", e);
 		}
 		
+	}
+
+	@Override
+	public String getString(String val) {
+		if( val == null){
+			return null;
+		}
+		try{
+			// Try to normalise form
+			return PublicKeyReaderUtil.format(PublicKeyReaderUtil.load(val));
+		}catch(Exception e){
+			return val;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AbstractInput#convert(java.lang.Object)
+	 */
+	@Override
+	public String convert(Object v) throws TypeError {
+		if( v == null ) {
+			return null;
+		}
+		try {
+			// Try to force into canonical form
+			if( v instanceof PublicKey) {
+				return PublicKeyReaderUtil.format((PublicKey)v);
+			}
+			if( v instanceof String) {
+				return getString((String)v);
+			}
+		}catch(Exception e) {
+
+		}
+		return super.convert(v);
 	}
 }
