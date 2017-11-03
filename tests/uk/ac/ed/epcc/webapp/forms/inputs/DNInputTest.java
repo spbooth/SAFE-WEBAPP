@@ -13,6 +13,9 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,11 +27,8 @@ import javax.naming.ldap.Rdn;
 
 import org.junit.Test;
 
-import uk.ac.ed.epcc.webapp.forms.AbstractInputTestCase;
 import uk.ac.ed.epcc.webapp.forms.ParseAbstractInputTestCase;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-
-import static org.junit.Assert.*;
 /**
  * @author spb
  *

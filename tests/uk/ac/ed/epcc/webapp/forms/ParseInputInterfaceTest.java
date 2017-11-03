@@ -16,15 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms;
 
-import java.util.Set;
-
-import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseInput;
 
 

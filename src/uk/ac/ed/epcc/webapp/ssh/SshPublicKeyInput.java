@@ -129,9 +129,9 @@ public class SshPublicKeyInput extends ParseAbstractInput<String> implements Ite
 			if( v instanceof PublicKey) {
 				return PublicKeyReaderUtil.format((PublicKey)v);
 			}
-			if( v instanceof String) {
-				return getString((String)v);
-			}
+//			if( v instanceof String) {
+//				return getString((String)v);
+//			}
 		}catch(Exception e) {
 
 		}
