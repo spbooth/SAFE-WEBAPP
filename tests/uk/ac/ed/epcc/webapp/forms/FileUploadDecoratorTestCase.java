@@ -49,8 +49,8 @@ ParseMapInputInterfaceTest<String, FileUploadDecorator, FileUploadDecoratorTestC
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getGoodData()
 	 */
 	@Override
-	public Set getGoodData() throws Exception {
-		Set good=new HashSet<>();
+	public Set<String> getGoodData() throws Exception {
+		Set<String> good=new HashSet<>();
 		good.add("john");
 		good.add("paul");
 		return good;
