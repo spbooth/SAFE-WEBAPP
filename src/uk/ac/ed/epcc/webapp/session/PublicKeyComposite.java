@@ -101,16 +101,23 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 
 	@Override
 	public TableSpecification modifyDefaultTableSpecification(TableSpecification spec, String table) {
-		spec.setField(PUBLIC_KEY, new StringFieldType(true, null, 4096),OPTIONAL_PUBLIC_KEY_FEATURE.isEnabled(getContext()));
+		spec.setField(PUBLIC_KEY, new StringFieldType(true, null, 4096),isOptional());
 		return spec;
 	}
 
 	@Override
 	public Set<String> addOptional(Set<String> optional) {
-		if(OPTIONAL_PUBLIC_KEY_FEATURE.isEnabled(getContext())){
+		if(isOptional()){
 			optional.add(PUBLIC_KEY);
 		}
 		return optional;
+	}
+
+	/**
+	 * @return
+	 */
+	protected boolean isOptional() {
+		return OPTIONAL_PUBLIC_KEY_FEATURE.isEnabled(getContext());
 	}
 
 	public boolean usePublicKey(){
@@ -119,7 +126,7 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 	@Override
 	public <CB extends ContentBuilder> CB addUpdateNotes(CB cb,AppUser person) {
 		if( usePublicKey() ){
-			if(OPTIONAL_PUBLIC_KEY_FEATURE.isEnabled(getContext())){
+			if(isOptional()){
 			cb.addText("Login systems may have different levels of support for any ssh keys you register here. See the individual system documentation for more details.");
 			}
 		}

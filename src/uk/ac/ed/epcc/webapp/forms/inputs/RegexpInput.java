@@ -30,6 +30,12 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
  */
 public class RegexpInput extends TextInput implements TagInput{
 
+	 /**
+	 * 
+	 */
+	public RegexpInput() {
+		super(true);
+	}
 	/*
 	 * (non-Javadoc)
 	 * 
