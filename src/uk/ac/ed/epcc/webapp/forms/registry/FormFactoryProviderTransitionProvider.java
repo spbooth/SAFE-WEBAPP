@@ -96,7 +96,6 @@ public class FormFactoryProviderTransitionProvider<T> implements
 	}
 
 	public <X extends ContentBuilder> X getSummaryContent(AppContext c,X cb,T target) {
-		cb.addHeading(3, "plaing");
 		if(form_factory_provider instanceof SummaryContentProvider) {
 			cb = ((SummaryContentProvider<T>)form_factory_provider).getSummaryContent(c, cb, target);
 		}
