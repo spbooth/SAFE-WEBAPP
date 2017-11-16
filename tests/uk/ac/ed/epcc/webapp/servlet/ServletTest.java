@@ -281,13 +281,21 @@ public abstract class ServletTest extends WebappTestBase{
 		}
 	}
 	/** Check that the response has forwarded to the messages page to show the
-	 * specified messate
+	 * specified message
 	 * 
 	 * @param message
 	 */
 	public void checkMessage(String message){
 		checkForward("/messages.jsp");
 		assertEquals(message, req.getAttribute("message_type"));
+	}
+	
+	public void checkTransitionException(String message){
+		checkForward("/messages.jsp");
+		assertEquals("transition_error", req.getAttribute("message_type"));
+		Object args[] = (Object[]) req.getAttribute("args");
+		assertNotNull(args);
+		assertEquals(message,args[1]);
 	}
 /** Add a form parameter to the request.
  * 
