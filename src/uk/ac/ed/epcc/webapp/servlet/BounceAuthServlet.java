@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.AppUserNameFinder;
 import uk.ac.ed.epcc.webapp.session.Hash;
@@ -72,13 +73,13 @@ public class BounceAuthServlet extends SessionServlet {
 		}
 		String realm = conn.getExpandedProperty("remote_auth_servlet.realm");
 		AppUserFactory fac = conn.getService(SessionService.class).getLoginFactory();
-		AppUserNameFinder realmFinder = fac.getRealmFinder(realm);
+		AppUserNameFinder<AppUser, ?> realmFinder = fac.getRealmFinder(realm);
 		if( realm == null || realmFinder == null ){
 			getLogger(conn).error("No realm");
 			return;
 		}
 		
-		String name = realmFinder.getCanonicalName(person);
+		String name = realmFinder.getCanonicalName(person.getCurrentPerson());
 		if( name == null ){
 			message(conn, req, res, "invalid_argument");
 			return;
