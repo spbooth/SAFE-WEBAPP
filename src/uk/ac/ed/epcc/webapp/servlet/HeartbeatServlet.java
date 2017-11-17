@@ -99,6 +99,7 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 
 			for(String l : listeners.split("\\s*,\\s*")){
 				if( serv != null ) serv.startTimer("HeartbeatListener."+l);
+				long begin=System.currentTimeMillis();
 				try{
 					HeartbeatListener listener = conn.makeObject(HeartbeatListener.class, l);
 					if( listener != null ){
@@ -120,16 +121,17 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 				}finally{
 					if( serv != null ) serv.stopTimer("HeartbeatListener."+l);
 				}
+				long elapsed = (System.currentTimeMillis() - begin);
+				if( elapsed > max_wait ){
+					log.error("Long heartbeat call "+l+" "+(elapsed/1000L)+" seconds");
+				}
 			}
 
 		}finally{
 			if( serv != null ) serv.stopTimer("Heartbeatlistener");
 		}
 		
-		long elapsed = (System.currentTimeMillis() - last_call.getTime());
-		if( elapsed > max_wait ){
-			log.warn("Long heartbeat run "+(elapsed/1000L)+" seconds");
-		}
+		
 		return ok;
 	}
 
@@ -176,7 +178,7 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 				AppContext conn = ErrorFilter.makeContext(config.getServletContext(), null, null);
 				runHeartbeat(conn, null);
 				conn.close();
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				config.getServletContext().log("Error in Runner", e);
 			}
 
