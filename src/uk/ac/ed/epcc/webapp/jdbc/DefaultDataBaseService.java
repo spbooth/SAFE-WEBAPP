@@ -52,7 +52,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataError;
 @PreRequisiteService(ConfigService.class)
 public class DefaultDataBaseService implements DatabaseService {
 	public static final Feature TRANSACTIONS_FEATURE = new Feature("database_transactions",true,"Database transactions are supported");
-	public static final Feature TRANSACTIONS_SERIALIZE_FEATURE = new Feature("database_transactions.serialized",true,"Database transactions use serialized isolation (locks)");
+	public static final Feature TRANSACTIONS_SERIALIZE_FEATURE = new Feature("database_transactions.serialized",false,"Database transactions use serialized isolation (locks)");
 
 	protected static final String POSTGRESQL_TYPE = "postgres";
 	private static final String MYSQL_TYPE = "mysql";
