@@ -52,7 +52,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataError;
 @PreRequisiteService(ConfigService.class)
 public class DefaultDataBaseService implements DatabaseService {
 	public static final Feature TRANSACTIONS_FEATURE = new Feature("database_transactions",true,"Database transactions are supported");
-	public static final Feature TRANSACTIONS_SERIALIZE_FEATURE = new Feature("database_transactions.serialized",false,"Database transactions use serialized isolation (locks)");
+	public static final Feature TRANSACTIONS_SERIALIZE_FEATURE = new Feature("database_transactions.serialized",true,"Database transactions use serialized isolation (locks)");
 
 	protected static final String POSTGRESQL_TYPE = "postgres";
 	private static final String MYSQL_TYPE = "mysql";
@@ -243,6 +243,15 @@ public class DefaultDataBaseService implements DatabaseService {
 	public Class<DatabaseService> getType() {
 		return DatabaseService.class;
 	}
+	
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.DatabaseService#inTransaction()
+	 */
+	@Override
+	public boolean inTransaction() {
+
+		return in_transaction;
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.DatabaseService#startTransaction()
 	 */
@@ -255,8 +264,8 @@ public class DefaultDataBaseService implements DatabaseService {
 			try {
 				Connection connection = getSQLContext().getConnection();
 				old_isolation_level=connection.getTransactionIsolation();
-				if(old_isolation_level != Connection.TRANSACTION_SERIALIZABLE && TRANSACTIONS_SERIALIZE_FEATURE.isEnabled(getContext())){
-					connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+				if(old_isolation_level != getTargetIsolationLevel() && TRANSACTIONS_SERIALIZE_FEATURE.isEnabled(getContext())){
+					connection.setTransactionIsolation(getTargetIsolationLevel());
 				}
 				connection.setAutoCommit(false);
 				in_transaction=true;
@@ -264,6 +273,13 @@ public class DefaultDataBaseService implements DatabaseService {
 				error(e,"Error starting transaction");
 			}
 		}
+	}
+	/**
+	 * @return
+	 */
+	public int getTargetIsolationLevel() {
+		//return Connection.TRANSACTION_READ_COMMITTED;
+		return Connection.TRANSACTION_SERIALIZABLE;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.DatabaseService#rollbackTransaction()
@@ -310,7 +326,7 @@ public class DefaultDataBaseService implements DatabaseService {
 				Connection connection = getSQLContext().getConnection();
 				connection.commit();
 				connection.setAutoCommit(true);
-				if(old_isolation_level != Connection.TRANSACTION_SERIALIZABLE && TRANSACTIONS_SERIALIZE_FEATURE.isEnabled(getContext())){
+				if(old_isolation_level != getTargetIsolationLevel() && TRANSACTIONS_SERIALIZE_FEATURE.isEnabled(getContext())){
 					connection.setTransactionIsolation(old_isolation_level);
 				}
 				in_transaction=false;
@@ -348,5 +364,4 @@ public class DefaultDataBaseService implements DatabaseService {
 			}
 		}
 	}
-	
 }

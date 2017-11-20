@@ -62,8 +62,15 @@ public SQLContext getSQLContext() throws SQLException;
  */
 public SQLContext getSQLContext(String tag) throws SQLException;
 
-/** Start a database transaction 
+/** Are we already in a transaction
  * 
+ * @return
+ */
+
+public boolean inTransaction();
+
+/** Start a database transaction 
+ * Transactions cannot be nested to use {@link #inTransaction()} if possible doubt.
  */
 public void startTransaction();
 
