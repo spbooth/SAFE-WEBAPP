@@ -589,7 +589,7 @@ public class Emailer {
 			UnsupportedEncodingException {
 		Logger log = getLogger();
 		String fromAddress = conn.getInitParameter(EMAIL_FROM_ADDRESS);
-		String fromName = conn.getInitParameter(EMAIL_FROM_NAME);
+		String fromName = conn.getExpandedProperty(EMAIL_FROM_NAME);
 		Session session = getSession();
 		String text_recip = null;
 		MimeMessage m = new MimeMessage(session);
