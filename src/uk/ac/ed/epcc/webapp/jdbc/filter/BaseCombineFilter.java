@@ -325,9 +325,9 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 		 * 
 		 * @return
 		 */
-		protected boolean useBinary(boolean ignore_order){
+		protected boolean useBinary(boolean ignore_order_or_join){
 			// If forced/empty value and no joins/order act as binary filter
-			return (isEmpty() || isForced()) && join==null && (ignore_order || order==null);
+			return (isEmpty() || isForced())  && (ignore_order_or_join || (order==null && join==null));
 		}
 
 		public boolean isEmpty(){

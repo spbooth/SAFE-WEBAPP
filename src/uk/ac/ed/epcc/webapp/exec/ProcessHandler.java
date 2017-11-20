@@ -30,7 +30,7 @@ import java.io.OutputStream;
  * @author spb
  *
  */
-public class ProcessHandler extends Thread implements ProcessProxy {
+public class ProcessHandler extends Thread implements DeferredProcessProxy {
 	
 	/** time to wait for output threads after process exits.
 	 * 

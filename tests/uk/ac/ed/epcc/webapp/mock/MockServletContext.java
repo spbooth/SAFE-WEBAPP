@@ -408,4 +408,13 @@ public class MockServletContext implements ServletContext {
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.servlet.ServletContext#getVirtualServerName()
+	 */
+	
+	public String getVirtualServerName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

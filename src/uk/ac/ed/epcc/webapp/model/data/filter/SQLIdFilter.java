@@ -22,7 +22,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
-/** Filter to select an entry by Id.
+/** Filter to select/exclude an entry by Id.
  * 
  * @author spb
  *
@@ -32,15 +32,21 @@ public class SQLIdFilter<T extends DataObject> implements SQLFilter<T>, PatternF
 
 	
 	public SQLIdFilter(Class<? super T> target,Repository res, int id) {
+		this( target,res,id,false);
+	}
+		
+	public SQLIdFilter(Class<? super T> target,Repository res, int id,boolean exclude) {
 		super();
 		this.target=target;
 		this.res = res;
 		this.id=id;
+		this.exclude=exclude;
 	}
 
 	private final Class<? super T> target;
 	private final Repository res;
 	private final int id;
+	private final boolean exclude;
 	
 	
 	
@@ -59,7 +65,11 @@ public class SQLIdFilter<T extends DataObject> implements SQLFilter<T>, PatternF
 	
 	public StringBuilder addPattern(StringBuilder sb, boolean qualify) {
 		res.addUniqueName(sb, qualify, true);
-		sb.append("=?");
+		if( exclude) {
+			sb.append("!=?");
+		}else {
+			sb.append("=?");
+		}
 		return sb;
 	}
 

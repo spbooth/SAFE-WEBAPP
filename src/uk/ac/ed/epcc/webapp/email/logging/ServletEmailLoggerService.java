@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
+import uk.ac.ed.epcc.webapp.timer.TimerService;
 /** An EmailLoggerService that adds information about the servlet request
  * parameters to error emails.
  * 
@@ -107,6 +108,14 @@ public class ServletEmailLoggerService extends EmailLoggerService {
 
 			if (psb.length() > 0) {
 				props.put("parameters", psb.toString());
+			}
+		}
+		TimerService timer = getContext().getService(TimerService.class);
+		if( timer != null){
+			StringBuilder sb = new StringBuilder();
+			timer.timerStats(sb);
+			if( sb.length() > 0){
+				props.put("timers", sb.toString());
 			}
 		}
 		}catch(Throwable t){

@@ -45,18 +45,4 @@ public class RsaPublicKeyInput extends SshPublicKeyInput {
 		}
 	}
 
-
-	@Override
-	public String getString(String val) {
-		if( val == null){
-			return null;
-		}
-		try{
-			// Try to normalise form
-			return PublicKeyReaderUtil.format(PublicKeyReaderUtil.load(val));
-		}catch(Exception e){
-			return val;
-		}
-	}
-
 }

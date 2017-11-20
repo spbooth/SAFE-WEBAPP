@@ -1,7 +1,7 @@
 %%begin{Subject}%%
 %%service.name=Unknown service%% %%report_level=Error%% Report %%subject_message%%
 %%end{Subject}%%
-Error Report from %%service.name%%
+%%report_level=Error%% Report from %%service.name%%
 =============================
 
 Exception:     %%exception_message%%
@@ -11,6 +11,9 @@ Exception:     %%exception_message%%
 
 Date:          %%date%%
 Server:        %%server_url=<null>%%
+Hostname:	   %%host.name=<Unknown>%%
+DatabaseHost:  %%database.host=<Unknown>%%
+ProxyHost:     %%http.proxyHost=<Unset>%%
 Servlet:       %%servlet%%
 Request URL:   %%request_url=<Unknown>%%
 Stack Trace:
@@ -26,6 +29,7 @@ User Info:
 %%parameters= <none>%%
   Services:
 %%services= <none>%%
-
+ Timers:
+%%timers= <none>%%
 Submitted by:  %%sender%%
 

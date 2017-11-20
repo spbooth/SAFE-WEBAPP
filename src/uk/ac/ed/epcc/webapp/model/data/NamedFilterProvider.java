@@ -44,7 +44,7 @@ public interface NamedFilterProvider<T> {
 	
 	/** Add names of all the directly supported filters.
 	 * 
-	 * This does not include remote filters referenced through a {@link NamedFilterWrapper}
+	 * This does not include any qualified name filters referenced through a {@link NamedFilterWrapper}
 	 * 
 	 * @param names
 	 */

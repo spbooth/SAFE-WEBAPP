@@ -56,7 +56,12 @@ public class DefaultConfigService extends AbstractConfigService implements Confi
 				// method
 			
 				// Initialise to an empty Properties object:
-				service_props = System.getProperties();
+				try {
+					service_props = System.getProperties();
+				}catch(SecurityException sex) {
+					// must have a restrictive manager inplace
+					service_props = new Properties();
+				}
 			
 				// default is fine for deployment but may want to override in Junit tests
 			

@@ -30,7 +30,14 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 
 
-
+/** A {@link SQLExpression} that applies a {@link SQLFunc} to
+ * and inner {@link SQLExpression}. if the inner expression is null a constant
+ * value <b>1</b> is used.
+ * 
+ * @author spb
+ *
+ * @param <T>
+ */
 public class FuncExpression<T> implements SQLExpression<T> {
 	
 	public static <T> SQLExpression<T> apply(AppContext c,SQLFunc f, Class<T> target, SQLExpression<? extends T> e){

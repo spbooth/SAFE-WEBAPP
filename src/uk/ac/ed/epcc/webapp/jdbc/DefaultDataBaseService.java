@@ -112,6 +112,9 @@ public class DefaultDataBaseService implements DatabaseService {
 							connection_set=true;
 						}
 						map.put(key,conn);
+					}else {
+						bad_tags.add(key);
+						error("Failed to make SQLContext");
 					}
 				}catch(SQLException e){
 					bad_tags.add(key);
@@ -162,15 +165,17 @@ public class DefaultDataBaseService implements DatabaseService {
 		// Make a database connection
 		String driver_name = props.getProperty("db_driver"+suffix,"").trim();
 		try {
-			
-			if(driver_name==null || driver_name.trim().length()==0){
-				error("No database driver defined");
-				return null;
+			// It is no longer necessary to force the driver class to be
+			// registered in this way. The jar file should include 
+			//META-INF/services/java.sql.Driver to mark it as a driver
+			// or it can be added to the jdbc.drivers property
+			// However if we do have a class name loading it should ensure
+			// it is registered.
+			if(driver_name!=null && ! driver_name.isEmpty()){
+				Class.forName(driver_name);
 			}
-			Class.forName(driver_name);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			error(e,"Could not load database driver: "+driver_name);
-			return null;
 		}
 		String name = props.getProperty("db_name"+suffix,"").trim();
 		String user = props.getProperty("db_username"+suffix,"").trim();
@@ -198,6 +203,9 @@ public class DefaultDataBaseService implements DatabaseService {
 //		}else{
 //			conn =java.sql.DriverManager.getConnection(name, user, pass);
 //		}
+		if( conn == null) {
+			return null;
+		}
 		conn.setAutoCommit(true); // just in case
 		if( type.contains(POSTGRESQL_TYPE) || driver_name.contains(POSTGRESQL_TYPE)){
 			return new PostgresqlSQLContext(ctx,conn);
@@ -235,6 +243,15 @@ public class DefaultDataBaseService implements DatabaseService {
 	public Class<DatabaseService> getType() {
 		return DatabaseService.class;
 	}
+	
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.DatabaseService#inTransaction()
+	 */
+	@Override
+	public boolean inTransaction() {
+
+		return in_transaction;
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.DatabaseService#startTransaction()
 	 */
@@ -247,8 +264,8 @@ public class DefaultDataBaseService implements DatabaseService {
 			try {
 				Connection connection = getSQLContext().getConnection();
 				old_isolation_level=connection.getTransactionIsolation();
-				if(old_isolation_level != Connection.TRANSACTION_SERIALIZABLE && TRANSACTIONS_SERIALIZE_FEATURE.isEnabled(getContext())){
-					connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+				if(old_isolation_level != getTargetIsolationLevel() && TRANSACTIONS_SERIALIZE_FEATURE.isEnabled(getContext())){
+					connection.setTransactionIsolation(getTargetIsolationLevel());
 				}
 				connection.setAutoCommit(false);
 				in_transaction=true;
@@ -256,6 +273,13 @@ public class DefaultDataBaseService implements DatabaseService {
 				error(e,"Error starting transaction");
 			}
 		}
+	}
+	/**
+	 * @return
+	 */
+	public int getTargetIsolationLevel() {
+		//return Connection.TRANSACTION_READ_COMMITTED;
+		return Connection.TRANSACTION_SERIALIZABLE;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.DatabaseService#rollbackTransaction()
@@ -302,7 +326,7 @@ public class DefaultDataBaseService implements DatabaseService {
 				Connection connection = getSQLContext().getConnection();
 				connection.commit();
 				connection.setAutoCommit(true);
-				if(old_isolation_level != Connection.TRANSACTION_SERIALIZABLE && TRANSACTIONS_SERIALIZE_FEATURE.isEnabled(getContext())){
+				if(old_isolation_level != getTargetIsolationLevel() && TRANSACTIONS_SERIALIZE_FEATURE.isEnabled(getContext())){
 					connection.setTransactionIsolation(old_isolation_level);
 				}
 				in_transaction=false;
@@ -340,5 +364,4 @@ public class DefaultDataBaseService implements DatabaseService {
 			}
 		}
 	}
-	
 }

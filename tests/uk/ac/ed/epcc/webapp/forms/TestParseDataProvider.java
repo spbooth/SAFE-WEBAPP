@@ -21,7 +21,7 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 
 /** Data provider that can test parse info
- * usually extends TestDataPtovider
+ * usually extends TestDataProvider
  * 
  * @author spb
  * @param <T> type returned by input
@@ -29,7 +29,19 @@ import uk.ac.ed.epcc.webapp.forms.inputs.Input;
  *
  */
 public interface TestParseDataProvider<T,I extends Input<T>> extends TestDataProvider<T,I> {
+  /** Get strings that should parse
+   * 	
+   * @return
+   */
   public Set<String> getGoodParseData();
+  /** Get strings that should not parse
+   * 
+   * @return
+   */
   public Set<String> getBadParseData();
+  /** it it ok to parse a null value (should set input value to null)
+   * 
+   * @return
+   */
   public boolean allowNull();
 }

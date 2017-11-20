@@ -54,7 +54,20 @@ public class DebugLogger implements Logger {
 	public void error(Object message, Throwable t) {
 		if( nested != null)
 		nested.error(message,t);
-		if( ! (t instanceof FatalError)){
+		throwError(message, t);
+	}
+
+
+	/**
+	 * @param message
+	 * @param t
+	 * @throws FatalError
+	 */
+	private void throwError(Object message, Throwable t) throws FatalError {
+		if( t == null){
+			throw new FatalError(message.toString());
+		}
+		if(! (t instanceof FatalError)){
 			// avoid loops
 			throw new FatalError(message.toString(),t);
 		}
@@ -71,7 +84,7 @@ public class DebugLogger implements Logger {
 	public void fatal(Object message, Throwable t) {
 		if( nested != null)
 		nested.fatal(message, t);
-		throw new FatalError(message.toString(), t);
+		throwError(message.toString(),t);
 	}
 
 	

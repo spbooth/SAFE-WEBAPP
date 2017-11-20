@@ -217,6 +217,11 @@ public final class AppContext {
 		disable_service_creation=true;
 		
 		if (attributes != null) {
+			for( Object o : attributes.values()) {
+				if( o instanceof AppContextCleanup) {
+					((AppContextCleanup)o).cleanup();
+				}
+			}
 			attributes.clear();
 			attributes = null;
 		}
@@ -861,6 +866,10 @@ public final class AppContext {
 	 */
 
 	public <T> Constructor<T> findConstructor(Class<T> clazz, Object... param){
+		if( clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) {
+			error("Cannot get construtor for abstract/interface class "+clazz.getCanonicalName());
+			return null;
+		}
 		Class sig[] = new Class[param.length];
 		for(int i=0;i<param.length;i++){
 			if( param[i] == null ){
@@ -879,7 +888,7 @@ public final class AppContext {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private <T> Constructor<T> findConstructorFromParamSignature(Class<T> clazz,Class ... param ){
+	public <T> Constructor<T> findConstructorFromParamSignature(Class<T> clazz,Class ... param ){
 		//Logger log = getLogger();
 		for(  Constructor<?>  c : clazz.getConstructors()){
 			//log.debug("consider "+c.toGenericString());

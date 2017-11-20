@@ -827,6 +827,9 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 
 	}
 
+	public boolean skipUpdate(P peer){
+		return false;
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.history.HistoryHandler#update(P)
 	 */
@@ -836,6 +839,9 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		if (peer == null) {
 			throw new IllegalArgumentException(
 					"Null peer passed to History.update");
+		}
+		if( skipUpdate(peer)){
+			return null;
 		}
 		// Logger log = getLogger();
 		// log.info("History.Factory.update() ");

@@ -13,14 +13,16 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
-import uk.ac.ed.epcc.webapp.WebappTestBase;
-import uk.ac.ed.epcc.webapp.config.ConfigService;
-import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+
+import uk.ac.ed.epcc.webapp.WebappTestBase;
+import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 /**
  * @author spb
  *
@@ -94,6 +96,30 @@ public class SessionServiceTest extends WebappTestBase {
 		assertFalse(serv.hasRole("Boris"));
 		
 		
+		assertNull(serv.getToggle("Wombat"));
+	}
+	
+	@Test 
+	public void testApplyToggle() throws DataFault{
+		AppUserFactory login = ctx.getService(SessionService.class).getLoginFactory();
+		AppUser fred = (AppUser) login.makeBDO();
+		fred.setEmail("fred@example.com");
+		SessionService serv = ctx.getService(SessionService.class);
+		serv.setCurrentPerson(fred);
+		serv.setApplyToggle(false);
+		
+		assertFalse(serv.hasRole("Manager"));
+		serv.setRole(fred, "Manager", true);
+		assertTrue(serv.hasRole("Manager"));
+		serv.setToggle("Manager", true);
+		assertTrue(serv.hasRole("Manager"));
+		serv.setToggle("Manager", false);
+		assertTrue(serv.hasRole("Manager"));
+		serv.setToggle("Manager", true);
+		serv.setRole(fred, "Boris", false);
+		assertFalse(serv.hasRole("Boris"));
+		
+		assertNull(serv.getToggle("Manager"));
 		assertNull(serv.getToggle("Wombat"));
 	}
 	@Test

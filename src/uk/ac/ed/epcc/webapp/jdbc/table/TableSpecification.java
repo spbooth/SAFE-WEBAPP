@@ -214,7 +214,20 @@ public class TableSpecification {
 		public String getName(){
 			return name;
 		}
-		
+		/** is this and index containing a single reference field
+		 *  
+		 * @return
+		 */
+		public boolean isRef() {
+			if(index_fields.size() == 1 ) {
+				for(String s : index_fields) {
+					if( getField(s) instanceof ReferenceFieldType) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
 		public Iterator<String> getindexNames(){
 			return index_fields.iterator();
 		}

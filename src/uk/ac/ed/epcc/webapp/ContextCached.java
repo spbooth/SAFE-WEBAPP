@@ -23,6 +23,6 @@ package uk.ac.ed.epcc.webapp;
  * @author spb
  *
  */
-public interface ContextCached {
+public interface ContextCached extends Contexed{
 
 }

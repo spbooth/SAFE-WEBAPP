@@ -72,7 +72,7 @@ public class RegisterServlet extends WebappServlet {
 		}
 		AppUserFactory fac =  serv.getLoginFactory();
 		if( fac == null || ! RegisterServlet.ALLOW_SIGNUPS.isEnabled(conn)){
-			message(conn,req,res,"disabled_feature");
+			message(conn,req,res,"disabled_feature_error");
 			return;
 		}
 		

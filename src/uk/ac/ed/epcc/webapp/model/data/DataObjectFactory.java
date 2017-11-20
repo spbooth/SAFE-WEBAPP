@@ -1047,7 +1047,23 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      */
 	@SuppressWarnings("unchecked")
 	public <X extends Composite> X getComposite(Class<X> clazz){
-		return (X) composites.get(clazz);
+		X found = (X) composites.get(clazz);
+		assert( found != null || checkComposite(clazz));
+		return found;
+	}
+	
+	public <X extends Composite> boolean checkComposite(Class<X> clazz) {
+		if( clazz.isInterface()) {
+			return true; // can't check
+		}
+		AppContext conn = getContext();
+		if( conn.findConstructorFromParamSignature(clazz, getClass()) != null) {
+			return true;
+		}
+		if( conn.findConstructorFromParamSignature(clazz, getClass(),String.class) != null) {
+			return true;
+		}
+		return false;
 	}
 	
 	public <X extends Composite> boolean hasComposite(Class<X> clazz){
@@ -1775,18 +1791,18 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	   setContext(ctx, homeTable, AUTO_CREATE_TABLES_FEATURE.isEnabled(ctx));
 	}
 	protected final boolean setContext(AppContext ctx, String homeTable,boolean create) {
-		if (res != null || conn != null ){
-			getLogger().debug("Attempt to reset the AppContext");
+		if (res != null  ){
+			getLogger().debug("Attempt to reset Repository");
 			return false;
 		}
 		if (homeTable == null) {
 			throw new ConsistencyError("No table specified");
 		}
-		// set local reference so composites can find
-		this.conn=ctx;
+		
 		TimerService timer = ctx.getService(TimerService.class);
 		if( timer != null ){ timer.startTimer("setContext"); timer.startTimer("setContext:"+homeTable);}
 		try{
+		// This sets the AppContext if not already set.
 		setComposites(ctx, homeTable);
 		
 		res = Repository.getInstance(ctx, homeTable);
@@ -1827,6 +1843,12 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param homeTable
 	 */
 	protected void setComposites(AppContext ctx, String homeTable) {
+		if( conn != null ) {
+			// Only call setComposites once
+			return;
+		}
+		// set local reference so composites can find
+		this.conn = ctx;
 		String composite_list = ctx.getExpandedProperty(homeTable+".composites");
 		// can't use getLogger as context not set yet
 		Logger logger = ctx.getService(LoggerService.class).getLogger(getClass());
@@ -1953,15 +1975,22 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      * @return
      */
     public SQLFilter<BDO> getFilter(BDO target){
+    	return getFilter(target, false);
+    }
+    /** get a filter that selects/excludes a particular target object.
+     * 
+     * @param target
+     * @return
+     */
+    public SQLFilter<BDO> getFilter(BDO target,boolean exclude){
     	if( target == null){
     		throw new ConsistencyError("null target in getFilter");
     	}
     	if( ! isMine(target)){
     		throw new ConsistencyError("unexpected target "+target.getFactoryTag());
     	}
-    	return new SQLIdFilter<BDO>(getTarget(), res, target.getID());
+    	return new SQLIdFilter<BDO>(getTarget(), res, target.getID(),exclude);
     }
-
 
 
 	@Override

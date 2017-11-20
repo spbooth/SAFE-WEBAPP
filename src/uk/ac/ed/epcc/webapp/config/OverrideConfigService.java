@@ -54,6 +54,18 @@ public class OverrideConfigService extends AbstractConfigService {
 		this.overrides = processAdditions(overrides,c.getService(ResourceService.class));
 	}
 
+	/** Constructs {@link OverrideConfigService} where the override properties are loaded
+	 * from a file.
+	 * 
+	 * @param parent parent {@link Properties} for the overrides
+	 * @param config_list file to load
+	 * @param c {@link AppContext}
+	 */
+	public OverrideConfigService(Properties parent,String config_list,AppContext c) {
+		super(c);
+		this.parent = c.getService(ConfigService.class);
+		this.overrides =loadFile(parent, config_list, false);
+	}
 	/*
 	 * (non-Javadoc)
 	 * 

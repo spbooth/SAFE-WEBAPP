@@ -24,7 +24,6 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
-import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
@@ -192,7 +191,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
         	if( join_left ){
         		try{
         			L left =  getLeftFactory().makeObject(rs,qualify);
-        			link.setLeft(left);
+        			link.setCachedLeft(left);
         		}catch(DataNotFoundException e){
         			// reference link is bad
         			getLogger().error("Bad left link value "+link.getIdentifier());
@@ -202,7 +201,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
         	if( join_right ){
         		try{
         			R right = getRightFactory().makeObject(rs,qualify);
-        			link.setRight(right);
+        			link.setCachedRight(right);
         		}catch(DataNotFoundException e){
         			// reference link is bad
         			getLogger().error("Bad right link value "+link.getIdentifier());
@@ -670,6 +669,9 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	}
 	public long getLinkCount(L l, R r,BaseFilter<? super T> f) throws DataException{
 		return getCount(new LinkFilter(l, r, f));
+	}
+	public T find(L l, R r,BaseFilter<? super T> f) throws DataException{
+		return find(new LinkFilter(l, r, f));
 	}
 	public DataObjectFactory<R> getRightFactory(){
 		return (DataObjectFactory<R>) getRightProducer();

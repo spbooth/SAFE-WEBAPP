@@ -54,7 +54,7 @@ Form validation code is also the same for all form types.
 its own inputs independently and generate field specific errors. Every Input class has its own
 built in validation code and this can be augmented by adding a {@link uk.ac.ed.epcc.webapp.forms.FieldValidator} to the corresponding field of the form.
 The overall form can also be validated and generate a generic error. This
-is done by adding a <CODE>FormValidator</CODE> object to the form. These can be used to validate constraints that affect multiple fields for example if
+is done by adding a {@link uk.ac.ed.epcc.webapp.forms.FormValidator} object to the form. These can be used to validate constraints that affect multiple fields for example if
 one value should be less than another.
 </P>
 <P>The activation pattern for HTML and GUI forms are significantly
@@ -82,7 +82,10 @@ flow of control is as follows:
 </UL>
 <p> To improve the user interface inputs that correspond to HTML5 input types can implement
 {@link uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input} to take advantage of browser level field validation.
-In general we rely on html5 features rather than introducing additional javascript.
+In general we prefer to rely on html5 features rather than introducing additional javascript. In principal we could allow inputs and validators
+to add additional javascript though this would require each validation rule to be implemented and maintained in two different languages.
+I
+
 </p>
 <P>The Input classes are kept generic to all different types of Form.
 The Form class has to implement the different types of edit operation

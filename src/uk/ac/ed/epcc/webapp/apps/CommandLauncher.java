@@ -198,11 +198,15 @@ public class CommandLauncher implements Contexed{
 		if( prop.size() > 0 ){
 			// set in the system properties so the
 			// AppContext can use them when setting DB connection
-			Properties new_sys = new Properties(System.getProperties());
-			for( Object key : prop.keySet()){
-				new_sys.setProperty(key.toString(), prop.getProperty(key.toString()));
+			try {
+				Properties new_sys = new Properties(System.getProperties());
+				for( Object key : prop.keySet()){
+					new_sys.setProperty(key.toString(), prop.getProperty(key.toString()));
+				}
+				System.setProperties(new_sys);
+			}catch(SecurityException sex) {
+				// ignore
 			}
-			System.setProperties(new_sys);
 		}
         
        

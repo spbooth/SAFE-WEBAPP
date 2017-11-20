@@ -663,6 +663,16 @@ public class TemplateFile {
 
 		}
 	}
+	public void setUnsetProperties(Map h) {
+		if( h != null ){
+			for (Object key : h.keySet()) {
+				if( ! isSet(key.toString())) {
+					setProperty(key.toString(), h.get(key));
+				}
+			}
+
+		}
+	}
 
 	/**
 	 * Sets all named tokens in the resource properties to be the resource
@@ -719,7 +729,13 @@ public class TemplateFile {
 			template_values[((Property) element).value_index] = property_value;
 		}
 	}
-
+	public boolean isSet(String property_name) {
+		Object element = template_elements.get(property_name);
+		if ((element != null) && (element instanceof Property)) {
+			return template_values[((Property) element).value_index] != null;
+		}
+		return false;
+	}
 	/**
 	 * Sets a region to be enabled/disabled (in fact sets all regions with that
 	 * name)  Any spaces in the region_name parameter will be mapped to underscores 
@@ -979,14 +995,15 @@ public class TemplateFile {
 
         	int i=0;
         	for(Map.Entry e : m.entrySet()){
-        		writePropertyValue(out, name+i+"key", e.getKey());
-        		out.write("->");
-        		writePropertyValue(out, name+i+"value", e.getValue());
         		if( i > 0 ){
         			out.write(", ");
         		}
+        		writePropertyValue(out, name+i+"key", e.getKey());
+        		out.write("->");
+        		writePropertyValue(out, name+i+"value", e.getValue());
         		i++;
         	}
+        	return;
         }
 		// Iterate over array of properties
 		if( value instanceof Iterable){

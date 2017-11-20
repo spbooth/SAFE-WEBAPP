@@ -61,7 +61,8 @@
 <jsp:param name="message_type" value="internal_error"/>
 <jsp:param name="message_extra" value="No Login Factory"/>
 </jsp:forward>
-		<%		
+		<%
+		return;
 	}
 	if(serv != null && serv.haveCurrentUser()) {
 		 log.debug("We have a user");
@@ -77,6 +78,7 @@
 <%@ include file="/std_header.jsf"%>
 <%
     PasswordAuthComposite password_auth = fac.getComposite(PasswordAuthComposite.class);
+    boolean use_reset_page = LoginServlet.RESET_PASSWORD_PAGE.isEnabled(conn);
 	if( password_auth == null ){
       String webname = conn.getService(ServletService.class).getWebName(); 
       if( webname==null || webname.trim().length() == 0  ){ %>
@@ -150,21 +152,21 @@ click <b>Email</b> and we will send you a new password for the <%=website_name %
    <table class="form">
 	<tr>
 		<td><b><%=fac.getNameLabel() %>:</b></td>
-		<td><input type="text" class="input" name="username" /></td>
+		<td><input type="text" class="input" name="username" required/></td>
 		<td>&nbsp;</td>
 	</tr>
 	<tr>
 
 		<td><b>Password:</b></td>
-		<td><input type="password" class="input" name="password" /></td>
+		<td><input type="password" class="input" name="password" <%= use_reset_page ? "required" :"" %>/></td>
 		<td><input class="input_button" type="submit" value="Login" /></td>
 	</tr>
 	<tr>
 		<td colspan="3">&nbsp;</td>
 	</tr>
-<% if( password_auth.canResetPassword(null) ){ %>
+<% if( password_auth.canResetPassword(null) && ! use_reset_page){ %>
 	<tr>
-		<td colspan="2"><b>Request a new website password:</b></td>
+		<td colspan="2"><b>Request a new <%=website_name %> password:</b></td>
 		<td><input type="submit" name="email_password" value="Email"
 			class="input_button" /></td>
 	</tr>
@@ -197,6 +199,12 @@ if(  login_urls != null ){
 to be set, disable cookies in your browser settings.</small></small>
 </p>
 </div>
+<% if( password_auth.canResetPassword(null) && use_reset_page){ %>
+<div class = "block">
+<p>To recover a forgotten password for the <%=website_name %> click
+<a href="<%=response.encodeURL(web_path+"/reset_password.jsp") %>">this link</a>.</p>
+</div>
+<%} %>
 <% if( RegisterServlet.ALLOW_SIGNUPS.isEnabled(conn)){ %>
 <div class="block">
 <p>To create an account on the <%=website_name %> click <a

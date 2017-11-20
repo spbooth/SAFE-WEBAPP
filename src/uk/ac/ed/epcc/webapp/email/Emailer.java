@@ -135,8 +135,8 @@ public class Emailer {
 	public static final String EMAIL_FORCE_ADDRESS = "email.force.address";
 	public static final String EMAIL_BYPASS_FORCE_ADDRESS = "email.bypass_force.address";
 	public static final Feature EMAILS_FEATURE = new Feature("emails",true,"emails enabled");
-    public static final Feature PASSWORD_RESET_SERVLET = new Feature("password_reset.servlet",false,"Send reset url in reset email");
-    
+	public static final Feature PASSWORD_RESET_SERVLET = new Feature("password_reset.servlet",false,"Send reset url in reset email");
+	 
     public static final Feature HTML_ALTERNATIVE = new Feature("email.html_alternative",true,"Look for a tempalte region conatining html alternative content");
 	private static final String MAIL_SMTP_HOST = "mail.smtp.host";
 
@@ -459,10 +459,10 @@ public class Emailer {
 			
 		AppContext conn = getContext();
 		
-		email_template.setProperties(params);
 		//		 Set a lot of standard properties from init parameters
 		email_template.setProperties(conn.getInitParameters("service."));
 		email_template.setProperties(conn.getInitParameters("email."));
+		// explicit values override ones from config
 		email_template.setProperties(params);
 
 		if ((preferredView != null) && (!preferredView.equals(""))) {
@@ -599,7 +599,7 @@ public class Emailer {
 			UnsupportedEncodingException {
 		Logger log = getLogger();
 		String fromAddress = conn.getInitParameter(EMAIL_FROM_ADDRESS);
-		String fromName = conn.getInitParameter(EMAIL_FROM_NAME);
+		String fromName = conn.getExpandedProperty(EMAIL_FROM_NAME);
 		Session session = getSession();
 		String text_recip = null;
 		MimeMessage m = new MimeMessage(session);
@@ -935,10 +935,10 @@ public class Emailer {
 				String subject_message = message;
 
 				if( subject_message.contains("\n")){
-					subject_message.substring(0, subject_message.indexOf('\n'));
+					subject_message = subject_message.substring(0, subject_message.indexOf('\n'));
 				}
 				if( subject_message.length() > 64){
-					subject_message.substring(0, 64);
+					subject_message = subject_message.substring(0, 64);
 				}
 				errorEmail.setProperty("subject_message", subject_message);
 				errorEmail.setProperty("exception_message", message);

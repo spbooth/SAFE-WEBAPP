@@ -92,6 +92,23 @@ public class DefaultTimerService implements Contexed,TimerService{
 				
 			}
 		}
+		public void timerStats(StringBuilder sb) {
+			if( timers != null ){
+				
+				long target = (long) (0.005 * timers.get(TIMER_TOTAL).getTime());
+				LoggerService service = conn.getService(LoggerService.class);
+				if( service != null){
+					Set<Timer> stats = new TreeSet<Timer>(timers.values());
+					for(Timer t: stats){
+						if( t.getTime() > target){
+							sb.append(prefix+t.getStats());
+							sb.append('\n');
+						}
+					}
+				}
+				
+			}
+		}
 		public void closeAll(){
 			if( timers == null){
 				return;

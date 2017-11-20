@@ -83,7 +83,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 			}
 			if( fil.useBinary(true)){
 				// Trap this explicitly The Andfilter will only add as binary if there are no
-				// order clauses. These are irrelevant in an OR combination
+				// joins or order clauses. These are irrelevant in an OR combination
 				return visitBinaryFilter(fil);
 			}
 			

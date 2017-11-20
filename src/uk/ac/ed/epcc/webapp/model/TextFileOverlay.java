@@ -296,7 +296,23 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		}
 		@Override
 		public String getIdentifier(int max) {
-			return getGroup()+":"+getName()+(hasText()?"[M]":"");
+			String tag ="";
+			if( hasText()){
+				String resource = getResourceString();
+				if( resource == null ){
+					tag = "[D]"; // database only
+				}else if( getText().equals(resource)){
+					tag = "[U]"; // unmodified
+				}else{
+					tag="[M]"; // modified
+				}
+			}else {
+				String resource = getResourceString();
+				if( resource == null ){
+					tag = "[E]"; // no text or database
+				}
+			}
+			return getGroup()+":"+getName()+tag;
 		}
 		public boolean canRetire() {
 			return true;
@@ -370,6 +386,31 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		}
 		
 	}
+	public static class TextFileRevertAction extends FormAction{
+		TextFile dat;
+		String type_name;
+		public TextFileRevertAction(
+				String type_name,
+				TextFile dat) {
+			this.type_name=type_name;
+			this.dat=dat;
+			setMustValidate(false);
+		}
+
+		@Override
+		public MessageResult action(Form f) throws ActionException {
+			
+			dat.setText(null);
+			try {
+				dat.commit();
+			} catch (DataFault e) {
+				dat.getContext().error(e,"Revert failed");
+				throw new ActionException("Revert failed");
+			}
+			return new MessageResult("object_updated",type_name);
+		}
+		
+	}
 	public class TextFileUpdator implements StandAloneFormUpdate<T>, UpdateTemplate<T>{
 
 		public void buildSelectForm(Form f, String label, T dat) {
@@ -397,7 +438,12 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			boolean from_file = ! dat.hasText();
 			String location;
 			if( from_file ){
-				location = "File";
+				String resource_text = dat.getResourceString();
+				if( resource_text == null){
+					location = "No content";
+				}else {
+					location = "File";
+				}
 			}else{
 				String resource_text = dat.getResourceString();
 				if( resource_text == null){
@@ -419,8 +465,9 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			f.addInput(TEXT, TEXT, text);
 			f.addAction("Update", new TextFileUpdateAction(type_name,dat));
 			if( ! from_file ){
-				f.addAction("Revert",new RetireAction<T>(type_name,dat));
+				f.addAction("Revert",new TextFileRevertAction(type_name,dat));
 			}
+			f.addAction("Delete",new RetireAction<T>(type_name,dat));
 		}
 
 		@SuppressWarnings("unchecked")

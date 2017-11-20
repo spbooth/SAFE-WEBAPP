@@ -52,7 +52,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * The areas that {@link Composite}s can customise can be extended by having a factory check all composites for specific interfaces for example
  * {@link TableStructureDataObjectFactory} check the composites for {@link TransitionSource}
  * <p>
- * Each {@link Composite} provides a type {@link Class} that it is registered under. A factory cannot contain two {@link Composite}s registered under the same class.
+ * Each {@link Composite} provides a type {@link Class} that it is registered under. It should itself be assignable to that type. A factory cannot contain two {@link Composite}s registered under the same class.
  * Any functionality that should only be included once (but has many implementations) should use the same registration class and can be retrieved by the registration type.
  * <p>
  * Composites augment a {@link DataObjectFactory} so it is easiest to add behaviour to the factory rather than the {@link DataObject}.

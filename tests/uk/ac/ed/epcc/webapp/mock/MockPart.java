@@ -155,5 +155,15 @@ public class MockPart  implements Part {
 			return false;
 		return true;
 	}
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.Part#getSubmittedFileName()
+	 */
+	@Override
+	public String getSubmittedFileName() {
+		if( data != null) {
+			return data.getName();
+		}
+		return null;
+	}
 
 }

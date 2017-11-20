@@ -124,6 +124,8 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	public static final Feature CACHE_RELATIONSHIP_FEATURE = new Feature("cache_relationships",true,"cache relationship test results in the session");
 	public static final Feature APPLY_DEFAULT_PERSON_RELATIONSHIP_FILTER = new Feature("relationships.apply_default_person_filter",true,"Apply the default person relationship filter when generating a filter on person");
 	public static final Feature APPLY_DEFAULT_TARGET_RELATIONSHIP_FILTER = new Feature("relationships.apply_default_target_filter",true,"Apply the default target relationship filter when generating a filter");
+	public static final Feature ALLOW_UNKNOWN_RELATIONSHIP_IN_OR_FEATURE = new Feature("relationship.allow_unknown_in_or",true,"Only skip the bad branches of a mis defined OR relationship");
+
 	private Map<String,Boolean> toggle_map=null;
 	protected AppContext c;
     
@@ -141,7 +143,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	private static final String person_tag = "SESSION_PersonID";
 	private static final String toggle_map_tag = "SESSION_toggle_map";
 	private static final String role_map_tag = "SESSION_role_map";
-	
+	private boolean apply_toggle=true;
 	/** A keying object representing a relationship.
 	 * 
 	 * @author spb
@@ -298,6 +300,9 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * @return Boolean or null
 	 */
 	public final Boolean getToggle(String role){
+		if( ! apply_toggle ) {
+			return null;
+		}
 		if( toggle_map == null ){
 			setupToggleMap();
 			if( toggle_map == null){
@@ -1074,10 +1079,18 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			// OR combination of filters
 			OrFilter<T> or = new OrFilter<T>(fac2.getTarget(), fac2);
 			for( String  s  : role.split(",")){
-				if( person == null){
-					or.addFilter(getRelationshipRoleFilter(fac2, s));
-				}else{
-					or.addFilter(getTargetInRelationshipRoleFilter(fac2, s, person));
+				try{
+					if( person == null){
+						or.addFilter(getRelationshipRoleFilter(fac2, s));
+					}else{
+						or.addFilter(getTargetInRelationshipRoleFilter(fac2, s, person));
+					}
+				}catch(UnknownRelationshipException e){
+					if(ALLOW_UNKNOWN_RELATIONSHIP_IN_OR_FEATURE.isEnabled(getContext())){
+						error(e, "Bad relationship in OR branch");
+					}else{
+						throw e;
+					}
 				}
 			}
 			return or;
@@ -1170,6 +1183,12 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			throw new UnknownRelationshipException(role);
 		}
 		return def;
+		}catch(UnknownRelationshipException ur){
+			if( ur.getMessage().equals(role)){
+				throw ur;
+			}else{
+				throw new UnknownRelationshipException(role, ur);
+			}
 		}finally{
 			searching_roles.remove(search_tag);
 		}
@@ -1188,7 +1207,15 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			// OR combination of filters
 			OrFilter<A> or = new OrFilter<A>(target_type, login_fac);
 			for( String  s  : role.split(",")){
-				or.addFilter(getPersonInRelationshipRoleFilter(fac2, s,target));
+				try{
+					or.addFilter(getPersonInRelationshipRoleFilter(fac2, s,target));
+				}catch(UnknownRelationshipException e){
+					if(ALLOW_UNKNOWN_RELATIONSHIP_IN_OR_FEATURE.isEnabled(getContext())){
+						error(e, "Bad relationship in OR branch");
+					}else{
+						throw e;
+					}
+				}
 			}
 			return or;
 		}
@@ -1251,6 +1278,12 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    }
 		
 		throw new UnknownRelationshipException(role);
+		}catch(UnknownRelationshipException ur){
+			if( ur.getMessage().equals(role)){
+				throw ur;
+			}else{
+				throw new UnknownRelationshipException(role, ur);
+			}
 		}finally{
 			searching_roles.remove(search_tag);
 		}
@@ -1364,6 +1397,14 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	}
 	@Override
 	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target, String role) throws UnknownRelationshipException {
+		// We could interpret null target as hasRelationship with any target
+		// and cache result using an id of 0.
+		// but at the moment do 
+		// fac.exists(this.getRelationshipRoleFilter(fac,role)
+		// explicitly
+		if( target == null) {
+			return false;
+		}
 		// For the moment we only cache relationships within a request
 		// to avoid stale values as a users state changes
 		if( relationship_map == null && CACHE_RELATIONSHIP_FEATURE.isEnabled(getContext())){
@@ -1406,6 +1447,14 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 				log.error(errors,t);
 			}
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.session.SessionService#setApplyToggle(boolean)
+	 */
+	@Override
+	public void setApplyToggle(boolean value) {
+		apply_toggle=value;
 	}
 	
 }

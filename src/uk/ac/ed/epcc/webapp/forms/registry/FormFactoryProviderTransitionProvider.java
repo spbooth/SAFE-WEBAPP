@@ -31,6 +31,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
+import uk.ac.ed.epcc.webapp.model.data.forms.registry.SummaryContentProvider;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
@@ -95,6 +96,9 @@ public class FormFactoryProviderTransitionProvider<T> implements
 	}
 
 	public <X extends ContentBuilder> X getSummaryContent(AppContext c,X cb,T target) {
+		if(form_factory_provider instanceof SummaryContentProvider) {
+			cb = ((SummaryContentProvider<T>)form_factory_provider).getSummaryContent(c, cb, target);
+		}
 		return cb;
 	}
 
