@@ -29,6 +29,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -72,11 +73,12 @@ import uk.ac.ed.epcc.webapp.model.TemplateFinder;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
 import uk.ac.ed.epcc.webapp.resource.ResourceService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
+import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory.EmailChangeRequest;
+import uk.ac.ed.epcc.webapp.session.EmailParamContributor;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeListener;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory.PasswordChangeRequest;
-import uk.ac.ed.epcc.webapp.session.PreferredViewComposite;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
@@ -157,8 +159,6 @@ public class Emailer {
 	public static final Feature DEBUG_SEND = new Feature("email.send.debug", false, "Log send internal operations");
 	AppContext ctx;
 	private Pattern dont_send_pattern=null;
-
-	private String preferredView = null;
 	
 	public Emailer(AppContext c) {
 		ctx = c;
@@ -296,6 +296,15 @@ public class Emailer {
 		log.info("EmailSender sending an email to " + email);
 		return templateMessage(new String[] { email }, h, email_template);
 	}
+	public MimeMessage templateMessage(String sendto, Hashtable h,
+			TemplateFile email_template,Map<String,String> params) throws IOException, MessagingException {
+		Logger log = getLogger();
+		// change destination depending on sendto:
+		String email = mapRecipients(sendto);
+		
+		log.info("EmailSender sending an email to " + email);
+		return templateMessage(new String[] { email }, DEFAULT_HEADER_PREFIX,h,null,false, email_template,params);
+	}
     public String mapRecipients(String sendto){
     	return sendto;
     }
@@ -325,9 +334,14 @@ public class Emailer {
 	String email = getEmail(recipient);
 	log.debug("Email mapped "+recipient.getEmail()+"->"+email);
 	if( email != null && email.trim().length() > 0){
-		PreferredViewComposite<AppUser> pvcomp = (PreferredViewComposite<AppUser>)recipient.getFactory().getComposite(PreferredViewComposite.class);
-		preferredView = pvcomp.getPreferredView(recipient);
-		return templateMessage(email, headers, email_template);
+		Map<String,String> params = new HashMap<>();
+		if( recipient != null) {
+			AppUserFactory<?> factory = recipient.getFactory();
+			for(EmailParamContributor epc : factory.getComposites(EmailParamContributor.class)) {
+				epc.addParams(params, recipient);
+			}
+		}
+		return templateMessage(email, headers, email_template,params);
 	}else{
 		log.warn("Email to "+recipient.getIdentifier()+" mapped to null");
 	}
@@ -465,11 +479,6 @@ public class Emailer {
 		// explicit values override ones from config
 		email_template.setProperties(params);
 
-		if ((preferredView != null) && (!preferredView.equals(""))) {
-			// Override SAFE URL with user's preferred view, if set
-			email_template.setProperty("service.saf.url", preferredView);
-		}
-		
 		String subject = null;
 
 		

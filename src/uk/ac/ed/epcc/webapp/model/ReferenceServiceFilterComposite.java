@@ -23,7 +23,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 /** A {@link ServiceFilterComposite} that uses a reference to a classifier table
  * to indicate the service.
  * 
- * This ony supports filtering where each target is in a single service or all services.
+ * An object is considered to be part of the 
  * 
  * @author spb
  *
@@ -67,19 +67,18 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 
 	/** get a filter for records that match the current service
 	 * 
-	 * @return
+	 * @return {@link SQLFilter}
 	 */
 	public SQLFilter<BDO> getCurrentServiceFilter(){
 		Class<? super BDO> target = getFactory().getTarget();
 		if(getRepository().hasField(SERVICE_ID_FIELD)){
-			int[] ids = getCurrentIDs();
-			SQLFilter<BDO>[] filters = new SQLFilter[ids.length+1];
-			int i;
-			for (i = 0; i < ids.length; i++) {
-				filters[i] = new SQLValueFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, ids[i]);
+			// Match any id in current view list or null.
+			SQLOrFilter<BDO> fil = new SQLOrFilter<>(target);
+			for(int id : getCurrentIDs()) {
+				fil.addFilter(new SQLValueFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, id) );
 			}
-			filters[i] = new NullFieldFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, true);
-			return new SQLOrFilter<>(target, filters);
+			fil.addFilter(new NullFieldFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, true));
+			return fil;
 		}else{
 			return new GenericBinaryFilter<BDO>(target, true);
 		}
@@ -87,18 +86,16 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	
 	/** get a filter for records that are not part of the current service
 	 * 
-	 * @return
+	 * @return {@link SQLFilter}
 	 */
 	public SQLFilter<BDO> getOtherServiceFilter(){
 		Class<? super BDO> target = getFactory().getTarget();
 		if(getRepository().hasField(SERVICE_ID_FIELD)){
-			int[] ids = getCurrentIDs();
-			SQLFilter<BDO>[] filters = new SQLFilter[ids.length];
-			int i;
-			for (i = 0; i < ids.length; i++) {
-				filters[i] = new SQLValueFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, MatchCondition.NE, ids[i]);
+			SQLAndFilter<BDO> fil = new SQLAndFilter<>(target);
+			for( int id : getCurrentIDs()) {
+				fil.addFilter(new SQLValueFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, MatchCondition.NE, id));
 			}
-			return new SQLAndFilter<>(target, filters);
+			return fil;
 		}else{
 			return new GenericBinaryFilter<>(target, false);
 		}
