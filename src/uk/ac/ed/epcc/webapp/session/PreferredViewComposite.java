@@ -56,7 +56,7 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 
 	@Override
 	public TableSpecification modifyDefaultTableSpecification(TableSpecification spec, String table) {
-		spec.setField(PREFERRED_VIEW, new StringFieldType(true, "", 255));
+		spec.setOptionalField(PREFERRED_VIEW, new StringFieldType(true, "", 255));
 		return spec;
 	}
 
