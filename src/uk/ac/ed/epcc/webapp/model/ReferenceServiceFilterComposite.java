@@ -71,10 +71,11 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	 */
 	public SQLFilter<BDO> getCurrentServiceFilter(){
 		Class<? super BDO> target = getFactory().getTarget();
-		if(getRepository().hasField(SERVICE_ID_FIELD)){
+		int[] currentIDs = getCurrentIDs();
+		if(currentIDs != null && currentIDs.length > 0){
 			// Match any id in current view list or null.
 			SQLOrFilter<BDO> fil = new SQLOrFilter<>(target);
-			for(int id : getCurrentIDs()) {
+			for(int id : currentIDs) {
 				fil.addFilter(new SQLValueFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, id) );
 			}
 			fil.addFilter(new NullFieldFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, true));
@@ -90,9 +91,11 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	 */
 	public SQLFilter<BDO> getOtherServiceFilter(){
 		Class<? super BDO> target = getFactory().getTarget();
-		if(getRepository().hasField(SERVICE_ID_FIELD)){
+		int[] currentIDs = getCurrentIDs();
+		if(currentIDs != null && currentIDs.length > 0){
 			SQLAndFilter<BDO> fil = new SQLAndFilter<>(target);
-			for( int id : getCurrentIDs()) {
+			
+			for( int id : currentIDs) {
 				fil.addFilter(new SQLValueFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, MatchCondition.NE, id));
 			}
 			return fil;
@@ -106,6 +109,9 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 		int id = getRecord(obj).getIntProperty(SERVICE_ID_FIELD, 0);
 		if (id == 0) return true;
 		int[] ids = getCurrentIDs();
+		if( ids == null || ids.length ==0 ) {
+			return true;
+		}
 		for (int currid: ids) {
 			if (id == currid) return true;
 		}
@@ -164,11 +170,13 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	}
 	
 	private int[] ids=null;
-	
+	/** get an array of the services in the current view
+	 * a null value or a zero length list means show all services.
+	 * @return
+	 */
 	private int[] getCurrentIDs(){
 		if ((ids == null) && (!getRepository().hasField(SERVICE_ID_FIELD))) {
-			ids = new int[1];
-			ids[0] = 0;
+			ids = new int[0];
 		}
 		
 		if (ids != null) return ids;
@@ -178,9 +186,8 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 			if (namelist == null || namelist.isEmpty()) {
 				namelist = getContext().getInitParameter(SERVICE_NAME_PARAM);
 			}
-			if( namelist == null || namelist.isEmpty(){
-				ids = new int[1];
-				ids[0] = 0;
+			if( namelist == null || namelist.isEmpty()){
+				ids = new int[0];
 				return ids;
 			}
 			String[] names = namelist.trim().split(",");
