@@ -175,17 +175,24 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 		
 		try {
 			String namelist = getContext().getInitParameter(SERVICE_LIST_PARAM);
-			if (namelist == null) {
+			if (namelist == null || namelist.isEmpty()) {
 				namelist = getContext().getInitParameter(SERVICE_NAME_PARAM);
 			}
-			String[] names = namelist.split(",");
+			if( namelist == null || namelist.isEmpty(){
+				ids = new int[1];
+				ids[0] = 0;
+				return ids;
+			}
+			String[] names = namelist.trim().split(",");
 			ids = new int[names.length];
 			for (int i = 0; i < names.length; i++) {
-				String name = names[i];
-				Classification current = getServicesFactory().makeFromString(name);
-				if (current != null) {
-					current.commit();
-					ids[i] = current.getID();
+				String name = names[i].trim();
+				if( ! name.isEmpty() ){
+					Classification current = getServicesFactory().makeFromString(name);
+					if (current != null) {
+						current.commit();
+						ids[i] = current.getID();
+					}
 				}
 			}
 			
