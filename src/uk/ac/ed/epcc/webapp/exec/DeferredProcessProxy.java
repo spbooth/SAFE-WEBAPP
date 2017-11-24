@@ -48,7 +48,7 @@ public interface DeferredProcessProxy extends ProcessProxy {
 	/** Set an automatic timeout for the {@link DeferredProcessProxy} implemented by a thread.
 	 * This can be used if the spawning thread is not going to wait for completion.
 	 * 
-	 * @param timeout
+	 * @param timeout_millis
 	 */
-	public void setTimeout(long timeout);
+	public void setTimeout(long timeout_millis);
 }
