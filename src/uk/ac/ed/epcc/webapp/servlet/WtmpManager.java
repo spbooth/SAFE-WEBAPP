@@ -33,10 +33,12 @@ import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.filter.FilterUpdate;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -48,7 +50,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 
 
-public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> {
+public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements AnonymisingFactory{
 	private static final String END_TIME = "EndTime";
 
 	private static final String START_TIME = "StartTime";
@@ -229,6 +231,15 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> {
 	@Override
 	public Class<? super Wtmp> getTarget() {
 		return Wtmp.class;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.AnonymisingFactory#anonymise()
+	 */
+	@Override
+	public void anonymise() throws DataFault {
+		FilterUpdate<Wtmp> update = new FilterUpdate<>(res);
+		update.update(res.getStringExpression(getTarget(), HOST), "Removed", null);
+		
 	}
 
 
