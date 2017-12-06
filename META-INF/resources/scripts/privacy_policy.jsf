@@ -1,0 +1,15 @@
+<%
+	String privacy_policy=conn.getInitParameter("service.url.privacypolicy");
+    if( privacy_policy != null && ! privacy_policy.isEmpty() ){ 
+%>
+<script language="javascript">
+function open_privacy_popup() {
+	window.open("<%= privacy_policy %>", "singup_privacy_popup_window", "scrollbars=1, toolbar=0, resizable=1, height=440, width=400");
+	return false;
+}
+</script>
+<p>
+<small>All information supplied is held and processed in accordance with the <%=service_name%> Personal Data and Privacy Policy.
+	  You can find full details <a href="<%= privacy_policy%>" onClick="return open_privacy_popup();"><b>here</b></a>.</small>
+</p>
+<% } %>
