@@ -29,14 +29,12 @@ String page_title="Email Change Request";
 
 <div class='block'>
 <h2>Email Change Request Form</h2>
-<p>This page allows you to notify this system about a change to your Email address.
-The <%=website_name %> will then send an email to the new address giving you a URL you need to visit to 
-complete the request. Once this is done your email will be updated.
+<p><wb:content message="change_email"/>
 <% 
 AppUserFactory login_fac = session_service.getLoginFactory();
 AppUserNameFinder realm = login_fac.getRealmFinder(EmailNameFinder.EMAIL);
 if( login_fac.hasComposite(PasswordAuthComposite.class) && realm != null && realm.userVisible()){ %>
-<em>Please note that if you use your email address to log into the <%=website_name %>, once the change has been made you will need to provide your new email address instead of the old one.</em>
+<em><wb:content message="change_email_password"/></em>
 <% } %>
 </div>
 

@@ -57,7 +57,7 @@ Update personal details
 
 <%@ include file="/scripts/form_context.jsf" %>
 <div class="block" role="main">
-<h3>Your x current details:</h3>
+<h3>Your current details:</h3>
 <% 
 if( last_update != null ){
 %><p>Last updated: <%=df.format(last_update) %></p><%
