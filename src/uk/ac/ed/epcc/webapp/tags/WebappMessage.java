@@ -25,6 +25,7 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
+import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 import uk.ac.ed.epcc.webapp.servlet.ErrorFilter;
@@ -37,7 +38,7 @@ import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
 public class WebappMessage extends TagSupport implements Tag {
 
 	private String message=null;
-	private String bundle="content";
+	private String bundle=null;
 	
 	
 	/**
@@ -75,13 +76,8 @@ public class WebappMessage extends TagSupport implements Tag {
         try{
         	AppContext conn = ErrorFilter.retrieveAppContext(request,response);
         	if( conn != null ){
-        		 ResourceBundle mess = conn.getService(MessageBundleService.class).getBundle(bundle);
-        		 String val = conn.expandText(mess.getString(message));
-        		 if(val !=null) {
-        		   out.print(val);
-        		 }else {
-        			 conn.getService(LoggerService.class).getLogger(getClass()).error("missing content "+bundle+":"+message);
-        		 }
+        		PreDefinedContent content = new PreDefinedContent(conn,bundle, message);
+        		out.print(content.toString());
         	}
         	return EVAL_PAGE;
         } catch (Exception e) {
