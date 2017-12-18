@@ -190,6 +190,10 @@ public class RemoteAuthServlet extends WebappServlet {
 			boolean allow_login = canLogin(conn, remote_auth_realm);
 			AppUserFactory<?> fac = session_service.getLoginFactory();
 			AppUserNameFinder parser = fac.getRealmFinder(remote_auth_realm);
+			if( parser == null) {
+				getLogger(conn).error("No realm finder found for "+remote_auth_realm);
+				message(conn,req,res,"internal_error","No realm finder found");
+			}
 			if (person == null) {
 				person = parser.findFromString(web_name);
 				if (person == null) {
