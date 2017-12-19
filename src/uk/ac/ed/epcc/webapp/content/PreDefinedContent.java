@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.content;
 
+import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -21,12 +22,12 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 
 /** A {@link XMLPrinter} containing pre-defined content from 
- * a message bundle. This is to allow pre-defiend content
+ * a message bundle. This is to allow pre-defined content
  * to be added to a {@link ContentBuilder}
  * @author spb
  *
  */
-public class PreDefinedContent extends XMLPrinter implements Contexed, XMLGenerator {
+public class PreDefinedContent extends XMLPrinter implements Contexed, XMLGenerator,UIGenerator {
 
 	private final AppContext conn;
 	/**
@@ -39,16 +40,20 @@ public class PreDefinedContent extends XMLPrinter implements Contexed, XMLGenera
 	public PreDefinedContent(AppContext conn,String message) {
 		this(conn,DEFAULT_BUNDLE,message);
 	}
+	
+	public PreDefinedContent(AppContext conn,String message,Object ...args) {
+		this(conn,DEFAULT_BUNDLE,message,args);
+	}
 	/**
 	 * 
 	 */
-	public PreDefinedContent(AppContext conn,String bundle,String message) {
+	public PreDefinedContent(AppContext conn,String bundle,String message, Object ... args) {
 		this.conn=conn;
 		if(bundle==null) {
 			bundle=DEFAULT_BUNDLE;
 		}
 		ResourceBundle mess = conn.getService(MessageBundleService.class).getBundle(bundle);
-		 String val = conn.expandText(mess.getString(message));
+		 String val = MessageFormat.format(conn.expandText(mess.getString(message)),args);
 		 if(val !=null) {
 			 append(process(val));
 		 }else {
@@ -81,6 +86,21 @@ public class PreDefinedContent extends XMLPrinter implements Contexed, XMLGenera
 	@Override
 	public AppContext getContext() {
 		return conn;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.content.UIGenerator#addContent(uk.ac.ed.epcc.webapp.content.ContentBuilder)
+	 */
+	@Override
+	public ContentBuilder addContent(ContentBuilder builder) {
+		if( builder instanceof XMLPrinter) {
+			((XMLPrinter)builder).append(this);
+		}else {
+			ExtendedXMLBuilder span = builder.getSpan();
+			addContent(span);
+			span.appendParent();
+		}
+		return builder;
 	}
 
 }
