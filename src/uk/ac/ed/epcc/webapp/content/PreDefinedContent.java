@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.content;
 
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -23,13 +24,16 @@ import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 
 /** A {@link XMLPrinter} containing pre-defined content from 
  * a message bundle. This is to allow pre-defined content
- * to be added to a {@link ContentBuilder}
+ * to be added to a {@link ContentBuilder}. The message text is allowed to contain
+ * raw HTML formatting
  * @author spb
  *
  */
-public class PreDefinedContent extends XMLPrinter implements Contexed, XMLGenerator,UIGenerator {
+public class PreDefinedContent implements Contexed, XMLGenerator,UIGenerator {
 
 	private final AppContext conn;
+	private final MessageFormat fmt;
+	private final Object args[];
 	/**
 	 * 
 	 */
@@ -53,12 +57,15 @@ public class PreDefinedContent extends XMLPrinter implements Contexed, XMLGenera
 			bundle=DEFAULT_BUNDLE;
 		}
 		ResourceBundle mess = conn.getService(MessageBundleService.class).getBundle(bundle);
-		 String val = MessageFormat.format(conn.expandText(mess.getString(message)),args);
-		 if(val !=null) {
-			 append(process(val));
-		 }else {
-			 conn.getService(LoggerService.class).getLogger(getClass()).error("missing content "+bundle+":"+message);
-		 }
+		String pattern = conn.expandText(mess.getString(message));
+		if( pattern != null) {
+			fmt = new MessageFormat(pattern);
+			this.args=args;
+		}else {
+			fmt=null;
+			this.args=null;
+			conn.getService(LoggerService.class).getLogger(getClass()).error("missing content "+bundle+":"+message);
+		}
 	}
 
 	/** extension point to apply additional processing
@@ -76,7 +83,19 @@ public class PreDefinedContent extends XMLPrinter implements Contexed, XMLGenera
 	@Override
 	public SimpleXMLBuilder addContent(SimpleXMLBuilder builder) {
 		if( builder instanceof XMLPrinter) {
-			((XMLPrinter)builder).append(this);
+			MessageFormat fmt2 = (MessageFormat) fmt.clone();
+			if( args != null && builder instanceof HtmlBuilder) {
+				// apply HtmlFormat 
+				for(int i=0 ; i< args.length; i++) {
+					Object a = args[i];
+					if( !( a instanceof Number || a instanceof Date || a instanceof String)) {
+						fmt2.setFormatByArgumentIndex(i, new HtmlContentFormat());
+					}
+				}
+			}
+			StringBuffer buffer = new StringBuffer();
+			fmt2.format(args, buffer, null);
+			((XMLPrinter)builder).append(buffer);
 		}
 		return builder;
 	}
@@ -94,13 +113,24 @@ public class PreDefinedContent extends XMLPrinter implements Contexed, XMLGenera
 	@Override
 	public ContentBuilder addContent(ContentBuilder builder) {
 		if( builder instanceof XMLPrinter) {
-			((XMLPrinter)builder).append(this);
+			addContent((XMLPrinter)builder);
 		}else {
 			ExtendedXMLBuilder span = builder.getSpan();
 			addContent(span);
 			span.appendParent();
 		}
 		return builder;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		if( fmt == null) {
+			return "";
+		}
+		return fmt.format(args, new StringBuffer(), null).toString();
 	}
 
 }

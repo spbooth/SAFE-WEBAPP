@@ -26,6 +26,7 @@ import javax.servlet.jsp.tagext.TagSupport;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
+import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 import uk.ac.ed.epcc.webapp.servlet.ErrorFilter;
@@ -77,7 +78,9 @@ public class WebappMessage extends TagSupport implements Tag {
         	AppContext conn = ErrorFilter.retrieveAppContext(request,response);
         	if( conn != null ){
         		PreDefinedContent content = new PreDefinedContent(conn,bundle, message);
-        		out.print(content.toString());
+        		HtmlBuilder hb = new HtmlBuilder();
+        		content.addContent((SimpleXMLBuilder) hb);
+        		out.print(hb.toString());
         	}
         	return EVAL_PAGE;
         } catch (Exception e) {

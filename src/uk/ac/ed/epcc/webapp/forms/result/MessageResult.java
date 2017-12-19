@@ -29,22 +29,22 @@ import java.util.List;
 
 public class MessageResult implements FormResult {
    private final String message;
-   private List<String> args=null;
+   private List<Object> args=null;
    public MessageResult(String mess){
 	   message=mess;
    }
-   public MessageResult(String mess, String ... args){
+   public MessageResult(String mess, Object ... args){
 	   this(mess);
-	   for(String a : args){
+	   for(Object a : args){
 		   addArg(a);
 	   }
    }
    public String getMessage(){
 	   return message;
    }
-   public void addArg(String a){
+   public void addArg(Object a){
 	   if( args == null ){
-		   args=new LinkedList<String>();
+		   args=new LinkedList<Object>();
 	   }
 	   args.add(a);
    }

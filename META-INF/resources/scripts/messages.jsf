@@ -20,6 +20,7 @@ If there is no AppContext the text has to be passed by request attribute and can
 AppContext text expansion.
 --%>
 <%@page import="uk.ac.ed.epcc.webapp.messages.MessageBundleService"%>
+<%@page import="uk.ac.ed.epcc.webapp.content.*"%>
 <%
 // Call strip on any text provided from the request to stop external entities inserting html such as javascript
 // its ok to include html from attributes or the messages file as we control these.
@@ -46,7 +47,19 @@ AppContext text expansion.
 	  }
 	  if( message_text == null ){
 		  try{
-			  message_text = MessageFormat.format(conn.expandText(mess.getString(message_type + ".text")),args);
+			  MessageFormat fmt = new MessageFormat(conn.expandText(mess.getString(message_type + ".text")));
+				if( args != null ) {
+					// apply HtmlFormat 
+					for(int i=0 ; i< args.length; i++) {
+						Object a = args[i];
+						if( !( a instanceof Number || a instanceof java.util.Date || a instanceof String)) {
+							fmt.setFormatByArgumentIndex(i, new HtmlContentFormat());
+						}
+					}
+				}
+				StringBuffer buffer = new StringBuffer();
+				fmt.format(args, buffer, null);
+			  message_text = buffer.toString();
 		  }catch(MissingResourceException e){
 			  conn.error(e,"missing message text for "+message_type);
 		  }
