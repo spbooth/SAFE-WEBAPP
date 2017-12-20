@@ -87,6 +87,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	private static final String DATABASE_TRANSACTION_TIMER = "DatabaseTransaction";
 	public static final String VIEW_TRANSITION = "ViewTransition.";
 	public static final Feature TRANSITION_TRANSACTIONS = new Feature("transition.transactions", true, "Use database transaction within transitions");
+	public static final Feature MODIFY_ON_POST_ONL= new Feature("transition.modify_on_post_only",false,"Only allow modification via post operations");
 	/**
 	 * 
 	 */
@@ -187,6 +188,10 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			o = t.getResult(getShortcutVisitor(conn, params, tp, target, key));
 			if( o == null){
 				log.debug("No shortcut result");
+				if( ! req.getMethod().equalsIgnoreCase("POST")) {
+					// Its dubious to allow modification from a get operation
+					getLogger(conn).warn("Modify not from POST");
+				}
 				long start=0L,aquired=0L;
 				long max_wait=conn.getLongParameter("max.transition.millis", 30000L);
 				if( timer_service != null){
