@@ -193,7 +193,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 				log.debug("No shortcut result");
 				if( ! (allow_get || req.getMethod().equalsIgnoreCase("POST"))) {
 					// Its dubious to allow modification from a get operation
-					getLogger(conn).warn("Modify not from POST");
+					getLogger(conn).error("Modify not from POST");
 					if( MODIFY_ON_POST_ONLY.isEnabled(conn)) {
 						res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			        	return;
