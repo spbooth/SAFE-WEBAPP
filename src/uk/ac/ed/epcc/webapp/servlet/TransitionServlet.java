@@ -87,7 +87,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	private static final String DATABASE_TRANSACTION_TIMER = "DatabaseTransaction";
 	public static final String VIEW_TRANSITION = "ViewTransition.";
 	public static final Feature TRANSITION_TRANSACTIONS = new Feature("transition.transactions", true, "Use database transaction within transitions");
-	public static final Feature MODIFY_ON_POST_ONL= new Feature("transition.modify_on_post_only",false,"Only allow modification via post operations");
+	public static final Feature MODIFY_ON_POST_ONLY= new Feature("transition.modify_on_post_only",false,"Only allow modification via post operations");
 	/**
 	 * 
 	 */
@@ -150,6 +150,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 				}
 			}
 		}
+		boolean allow_get=false; // allow get method
 		log.debug("transition="+key);
 		if( key == null){
 			if( target != null && tp instanceof ViewTransitionFactory){
@@ -167,8 +168,10 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			// IndexTransitionProvider can generate an index
 			if( target == null && tp instanceof IndexTransitionFactory){
 				key = ((IndexTransitionFactory<K, T>)tp).getIndexTransition();
+				allow_get=true; // non modifying usually
 			}else if( target != null && tp instanceof DefaultingTransitionFactory){
 				key = ((DefaultingTransitionFactory<K, T>)tp).getDefaultTransition(target);
+				allow_get = true; // non modifying usually
 			}
 			if( key == null ){
 				log.debug("No transition");
@@ -188,9 +191,13 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			o = t.getResult(getShortcutVisitor(conn, params, tp, target, key));
 			if( o == null){
 				log.debug("No shortcut result");
-				if( ! req.getMethod().equalsIgnoreCase("POST")) {
+				if( ! (allow_get || req.getMethod().equalsIgnoreCase("POST"))) {
 					// Its dubious to allow modification from a get operation
 					getLogger(conn).warn("Modify not from POST");
+					if( MODIFY_ON_POST_ONLY.isEnabled(conn)) {
+						res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+			        	return;
+					}
 				}
 				long start=0L,aquired=0L;
 				long max_wait=conn.getLongParameter("max.transition.millis", 30000L);
