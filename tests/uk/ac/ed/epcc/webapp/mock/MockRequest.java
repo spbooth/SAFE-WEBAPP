@@ -56,6 +56,7 @@ public class MockRequest implements HttpServletRequest {
     public String context_path;
     public String servlet_path;
     public String path_info="";
+    public String method="POST";
     public MockSession session;
     public String remote_user=null;
     public String content_type=null;
@@ -108,7 +109,7 @@ public class MockRequest implements HttpServletRequest {
 
 	public String getMethod() {
 		
-		return "POST";
+		return method;
 	}
 
 	public String getPathInfo() {

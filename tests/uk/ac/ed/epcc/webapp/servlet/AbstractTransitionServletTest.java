@@ -223,6 +223,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		// Setup the transition for next operation
 		resetRequest();
 		setTransition(fac, key, target);
+		req.method="GET";
 		return;
 	}
 	

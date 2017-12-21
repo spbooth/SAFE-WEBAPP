@@ -305,6 +305,7 @@ public abstract class ServletTest extends WebappTestBase{
 	public void addParam(String name, String value) {
 		req.removeAttribute(DefaultServletService.PARAMS_KEY_NAME);
 		req.params.put(name, value);
+		req.method="POST";
 	}
 	
 	public void addParam(String name, int value){
@@ -331,6 +332,7 @@ public abstract class ServletTest extends WebappTestBase{
 	 */
 	public void setAction(String action) {
 		req.params.put(action.trim(), action.trim());
+		req.method="POST";
 	}
 	
 	protected final void doPost() throws ServletException, IOException{
