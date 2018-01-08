@@ -107,7 +107,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     	TableSpecification s = new TableSpecification(orig);
     	// look for config overrides to specification
     	String prefix ="create_table."+name+".";
-    	s.setFromParameters(prefix, conn.getInitParameters(prefix));
+    	s.setFromParameters(conn,prefix, conn.getInitParameters(prefix));
     	Logger log = conn.getService(LoggerService.class).getLogger(getClass());
     	String text="unknown";
     	try{
