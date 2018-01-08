@@ -85,7 +85,7 @@ public abstract class WebappServlet extends HttpServlet {
 	}
 
 	@Override
-	public final void doGet(HttpServletRequest req, HttpServletResponse res)
+	public void doGet(HttpServletRequest req, HttpServletResponse res)
 			throws ServletException, java.io.IOException {
 
 		// Delegate GETs to doPost()

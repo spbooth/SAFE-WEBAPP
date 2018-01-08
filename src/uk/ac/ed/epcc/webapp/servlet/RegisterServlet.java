@@ -106,5 +106,10 @@ public class RegisterServlet extends WebappServlet {
 	public static String getRealm(AppContext conn) {
 		return conn.getInitParameter(RemoteAuthServlet.REMOTE_AUTH_REALM_PROP, WebNameFinder.WEB_NAME);
 	}
+	@Override
+	public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+		return;
+	}
 
 }
