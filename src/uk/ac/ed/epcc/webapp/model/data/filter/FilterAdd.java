@@ -52,7 +52,7 @@ public class FilterAdd<T> extends FilterSelect<T> {
 	    	}
 	    	StringBuilder sql = new StringBuilder();
 	    	sql.append("UPDATE ");
-	    	res.addTable(sql, true);
+	    	res.addSource(sql, true);
 	    	sql.append(" SET ");
 	    	target.add(sql, false);
 	    	sql.append("=");

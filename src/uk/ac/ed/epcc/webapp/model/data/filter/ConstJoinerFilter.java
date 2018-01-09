@@ -56,7 +56,7 @@ public final class ConstJoinerFilter<T extends DataObject, BDO extends DataObjec
 		public String getJoin() {
 			StringBuilder join=new StringBuilder();
 			join.append(" join ");
-			remote_res.addTable(join, true);
+			remote_res.addSource(join, true);
 			join.append(" on ");
 			remote_res.addUniqueName(join, true, true);
 			join.append("=");

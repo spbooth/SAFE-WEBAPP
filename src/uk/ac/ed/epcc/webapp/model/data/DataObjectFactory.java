@@ -534,7 +534,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				if( DatabaseService.USE_SQL_DISTICT_FEATURE.isEnabled(getContext())){
 					sb.append(" DISTINCT ");
 				}
-				return res.addTable(sb, true).append(".*").toString();
+				return res.addAlias(sb, true).append(".*").toString();
 			}else{
 				return "*";
 			}
@@ -641,7 +641,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 
 		@Override
 		protected void addSource(StringBuilder sb) {
-			res.addTable(sb, true);
+			res.addSource(sb, true);
 		}
 
 		@Override
@@ -660,7 +660,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 		@Override
 		protected final void addSource(StringBuilder sb) {
-			res.addTable(sb, true);
+			res.addSource(sb, true);
 			
 		}
 
@@ -743,7 +743,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 
 		@Override
 		protected void addSource(StringBuilder sb) {
-			res.addTable(sb, true);
+			res.addSource(sb, true);
 			
 		}
 
@@ -780,7 +780,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 
 		@Override
 		protected void addSource(StringBuilder sb) {
-			res.addTable(sb, true);
+			res.addSource(sb, true);
 			
 		}
 

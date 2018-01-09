@@ -115,7 +115,7 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 
 		@Override
 		protected void addSource(StringBuilder sb) {
-			res.addTable(sb, true);
+			res.addSource(sb, true);
 			
 		}
 
@@ -149,7 +149,7 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 
 		@Override
 		protected void addSource(StringBuilder sb) {
-			res.addTable(sb, true);
+			res.addSource(sb, true);
 			
 		}
 
@@ -173,7 +173,7 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 
 		@Override
 		protected void addSource(StringBuilder sb) {
-			res.addTable(sb, true);
+			res.addSource(sb, true);
 			
 		}
 
@@ -196,7 +196,7 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 
 		@Override
 		protected void addSource(StringBuilder sb) {
-			res.addTable(sb, true);
+			res.addSource(sb, true);
 			
 		}
 
@@ -219,7 +219,7 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 
 		@Override
 		protected void addSource(StringBuilder sb) {
-			res.addTable(sb, true);
+			res.addSource(sb, true);
 			
 		}
 
@@ -242,7 +242,7 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 
 		@Override
 		protected void addSource(StringBuilder sb) {
-			res.addTable(sb, true);
+			res.addSource(sb, true);
 			
 		}
 

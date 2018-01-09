@@ -213,19 +213,19 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
     	
 		public String getTarget() {
 			StringBuilder target = new StringBuilder();
-			res.addTable(target, true);
+			res.addAlias(target, true);
 			target.append(".* ");
 			if ( ! (join_left || join_right)) {
 				return target.toString();
 			}
 			if (join_left) {
 				target.append(", ");
-				getLeftFactory().res.addTable(target, true);
+				getLeftFactory().res.addAlias(target, true);
 				target.append(".* ");
 			}
 			if (join_right) {
 				target.append(", ");
-				getRightFactory().res.addTable(target, true);
+				getRightFactory().res.addAlias(target, true);
 				target.append(".* ");
 			}
 			return target.toString();
@@ -296,7 +296,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			}
 		}
 		public void addSource(StringBuilder source) {
-			res.addTable(source, true);	
+			res.addSource(source, true);	
 		}
 		@Override
 		protected String getDBTag() {

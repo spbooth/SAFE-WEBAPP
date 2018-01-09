@@ -80,7 +80,7 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 			StringBuilder join=new StringBuilder();
 			// see comments for reason for left join
 			join.append(" left join ");
-			remote_res.addTable(join, true);
+			remote_res.addSource(join, true);
 			join.append(" on ");
 			addPattern(join, true);
 			return join.toString();

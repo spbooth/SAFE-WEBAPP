@@ -92,7 +92,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 			if(seen){
 				sb.append(" join ");
 			}
-			fac.res.addTable(sb, true);
+			fac.res.addSource(sb, true);
 			seen=true;
 		}
 	}
@@ -260,7 +260,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 				if(seen){
 					sb.append(",");
 				}
-				fac.res.addTable(sb, true);
+				fac.res.addAlias(sb, true);
 				sb.append(".*");
 				seen=true;
 			}

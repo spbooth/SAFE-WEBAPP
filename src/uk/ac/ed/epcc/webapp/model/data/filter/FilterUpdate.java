@@ -53,7 +53,7 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    	}
 	    	StringBuilder sql = new StringBuilder();
 	    	sql.append("UPDATE ");
-	    	res.addTable(sql, true);
+	    	res.addSource(sql, true);
 	    	sql.append(" SET ");
 	    	target.add(sql, false);
 	    	sql.append("=?");
@@ -82,7 +82,7 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 		public <R> int updateExpression(FieldSQLExpression<R,T> target, SQLExpression<R> value,SQLFilter<T> my_filter) throws DataFault{
 	    	StringBuilder sql = new StringBuilder();
 	    	sql.append("UPDATE ");
-	    	res.addTable(sql, true);
+	    	res.addSource(sql, true);
 	    	sql.append(" SET ");
 	    	target.add(sql, false);
 	    	sql.append("=");
