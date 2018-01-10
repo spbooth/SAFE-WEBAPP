@@ -179,6 +179,8 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 				return;
 			}
 			
+		}else if( key instanceof ViewTransitionKey) {
+			allow_get = ((ViewTransitionKey<T>)key).isNonModifying(target);
 		}
 	    // this is the access control
 		if( ! tp.allowTransition(conn,target,key)){
