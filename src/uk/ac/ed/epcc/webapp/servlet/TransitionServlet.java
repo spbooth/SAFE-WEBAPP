@@ -87,6 +87,15 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	private static final String DATABASE_TRANSACTION_TIMER = "DatabaseTransaction";
 	public static final String VIEW_TRANSITION = "ViewTransition.";
 	public static final Feature TRANSITION_TRANSACTIONS = new Feature("transition.transactions", true, "Use database transaction within transitions");
+	
+	/** This is a security control. It is intended to prevent a malicious web-page from including
+	 * image links that will be automatically fetched causing un-approved side effects.
+	 * Real form transitions will always show the form page first which submits via post.
+	 * Index and view transitions are always assumed to be safe and may be presented as links.
+	 * Other direct transitions will not be accessible via a link unless the key implements
+	 * {@link ViewTransitionKey} and reports the transition as safe.
+	 * 
+	 */
 	public static final Feature MODIFY_ON_POST_ONLY= new Feature("transition.modify_on_post_only",false,"Only allow modification via post operations");
 	/**
 	 * 
@@ -574,6 +583,12 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	public static <A,B, X extends  ExtendedXMLBuilder> X addLink(AppContext c,X hb, TransitionFactory<A,B> tp, A operation, B target,String text, String hover ){
 	    // as the servlet uses getParams we can pass the parameters in the servlet path
 		String url = getURL(c, tp, target, operation);
+		// Check that MODIFY_ON_POST check will pass
+		if( operation != null ) {
+			if( (! (operation instanceof ViewTransitionKey)) || ! ((ViewTransitionKey) operation).isNonModifying(target)) {
+				c.getService(LoggerService.class).getLogger(TransitionServlet.class).error("Link to modifying transition "+url);
+			}
+		}
 		hb.open("a");
 		ServletService serv = c.getService(ServletService.class);
          if (serv != null) {

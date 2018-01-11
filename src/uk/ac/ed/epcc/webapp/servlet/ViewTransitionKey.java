@@ -17,11 +17,19 @@ package uk.ac.ed.epcc.webapp.servlet;
  * implement bookmarkable non-modifying direct transitions that are
  * safe to access via direct GET URLs.
  * 
+ * @see TransitionServlet#MODIFY_ON_POST_ONLY
  * 
  * @author spb
  * @param <T> type of target
  *
  */
 public interface ViewTransitionKey<T> {
+  /** Does this transition result in any side effects that change model state.
+   * 
+   * Updates to session state etc are ok.
+   * 
+   * @param target
+   * @return
+   */
   public boolean isNonModifying(T target);
 }
