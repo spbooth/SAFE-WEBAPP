@@ -112,16 +112,11 @@ public class SplitTransition<T extends TimePeriod,K> extends AbstractFormTransit
 			throws TransitionException {
 		Date start=target.getStart();
 		Date end = target.getEnd();
-		
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.MILLISECOND,0);
-		cal.set(Calendar.SECOND,0);
-		cal.set(Calendar.MINUTE,0);
-		cal.set(Calendar.HOUR_OF_DAY,0);
-		cal.set(Calendar.DAY_OF_MONTH,1);
-		cal.add(Calendar.MONTH,1);
+		Date guess;
+		guess = guessSplit(start,end);
 		BoundedDateInput input = fac.getDateInput();
-		input.setValue(cal.getTime());
+		
+		input.setValue(guess);
 		input.setMin(start);
 		input.setMax(end);
 		f.addInput("Date", "Split date", input );
@@ -134,6 +129,35 @@ public class SplitTransition<T extends TimePeriod,K> extends AbstractFormTransit
 		
 		f.addAction("<<Split", new SplitAction(target,  true));
 		f.addAction("Split>>", new SplitAction(target,  false));
+	}
+
+	/**
+	 * @return
+	 */
+	public Date guessSplit(Date start,Date end) {
+		Date guess;
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.MILLISECOND,0);
+		cal.set(Calendar.SECOND,0);
+		cal.set(Calendar.MINUTE,0);
+		cal.set(Calendar.HOUR_OF_DAY,0);
+		cal.set(Calendar.DAY_OF_MONTH,1);
+		cal.add(Calendar.MONTH,1);
+		guess = cal.getTime();
+		if( start.after(guess)) {
+			cal.setTime(start);
+			cal.set(Calendar.MILLISECOND,0);
+			cal.set(Calendar.SECOND,0);
+			cal.set(Calendar.MINUTE,0);
+			cal.set(Calendar.HOUR_OF_DAY,0);
+			cal.set(Calendar.DAY_OF_MONTH,1);
+			cal.add(Calendar.MONTH,1);
+			guess = cal.getTime();
+		}
+		if( ! guess.before(end) ) {
+			return start;
+		}
+		return guess;
 	}
 	
 }
