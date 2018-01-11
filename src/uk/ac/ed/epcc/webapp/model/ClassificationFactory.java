@@ -151,7 +151,7 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#makeByName(java.lang.String)
 	 */
 	public T makeFromString(String name) throws DataFault{
-		if( name == null ){
+		if( name == null || name.isEmpty()){
 			return null;
 		}
 		T c = findFromString(name);

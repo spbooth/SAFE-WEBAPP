@@ -67,7 +67,7 @@ public class OrphanFilter<T extends DataObject, BDO extends DataObject> extends 
 		public final StringBuilder addPattern(StringBuilder sb, boolean qualify) {
 			// this is the clause that matches the tables.
 			sb.append("NOT EXISTS( SELECT 1 FROM ");
-			remote_res.addTable(sb, true);
+			remote_res.addSource(sb, true);
 			
 			sb.append(" WHERE ");
 	     	res.getInfo(join_field).addName(sb, true, true);

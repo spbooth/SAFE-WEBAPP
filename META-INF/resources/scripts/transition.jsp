@@ -121,11 +121,18 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 <% } %>
 <%
 	if( t instanceof ExtraContent ){
+		HtmlBuilder extra=(HtmlBuilder)((ExtraContent) t).getExtraHtml(new HtmlBuilder(),session_service,target);
+		if( extra != null){
 %>
 <div id="extra">
-<%=((ExtraContent) t).getExtraHtml(new HtmlBuilder(),session_service,target).toString()%>
+<%=extra.toString()%>
 </div>
-<%} %>
+<%
+		}else{
+		  conn.error("Null builder from ExtraContent");
+    	}
+	}
+%>
 
 <form id="form" method="post" 
 <% if( multi ){ %>

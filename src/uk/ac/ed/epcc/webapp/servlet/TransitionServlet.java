@@ -87,6 +87,16 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	private static final String DATABASE_TRANSACTION_TIMER = "DatabaseTransaction";
 	public static final String VIEW_TRANSITION = "ViewTransition.";
 	public static final Feature TRANSITION_TRANSACTIONS = new Feature("transition.transactions", true, "Use database transaction within transitions");
+	
+	/** This is a security control. It is intended to prevent a malicious web-page from including
+	 * image links that will be automatically fetched causing un-approved side effects.
+	 * Real form transitions will always show the form page first which submits via post.
+	 * Index and view transitions are always assumed to be safe and may be presented as links.
+	 * Other direct transitions will not be accessible via a link unless the key implements
+	 * {@link ViewTransitionKey} and reports the transition as safe.
+	 * 
+	 */
+	public static final Feature MODIFY_ON_POST_ONLY= new Feature("transition.modify_on_post_only",false,"Only allow modification via post operations");
 	/**
 	 * 
 	 */
@@ -149,6 +159,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 				}
 			}
 		}
+		boolean allow_get=false; // allow get method
 		log.debug("transition="+key);
 		if( key == null){
 			if( target != null && tp instanceof ViewTransitionFactory){
@@ -166,8 +177,10 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			// IndexTransitionProvider can generate an index
 			if( target == null && tp instanceof IndexTransitionFactory){
 				key = ((IndexTransitionFactory<K, T>)tp).getIndexTransition();
+				allow_get=true; // non modifying usually
 			}else if( target != null && tp instanceof DefaultingTransitionFactory){
 				key = ((DefaultingTransitionFactory<K, T>)tp).getDefaultTransition(target);
+				allow_get = true; // non modifying usually
 			}
 			if( key == null ){
 				log.debug("No transition");
@@ -175,6 +188,8 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 				return;
 			}
 			
+		}else if( key instanceof ViewTransitionKey) {
+			allow_get = ((ViewTransitionKey<T>)key).isNonModifying(target);
 		}
 	    // this is the access control
 		if( ! tp.allowTransition(conn,target,key)){
@@ -187,6 +202,14 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			o = t.getResult(getShortcutVisitor(conn, params, tp, target, key));
 			if( o == null){
 				log.debug("No shortcut result");
+				if( ! (allow_get || req.getMethod().equalsIgnoreCase("POST"))) {
+					// Its dubious to allow modification from a get operation
+					getLogger(conn).error("Modify not from POST");
+					if( MODIFY_ON_POST_ONLY.isEnabled(conn)) {
+						res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+			        	return;
+					}
+				}
 				long start=0L,aquired=0L;
 				long max_wait=conn.getLongParameter("max.transition.millis", 30000L);
 				if( timer_service != null){
@@ -560,6 +583,12 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	public static <A,B, X extends  ExtendedXMLBuilder> X addLink(AppContext c,X hb, TransitionFactory<A,B> tp, A operation, B target,String text, String hover ){
 	    // as the servlet uses getParams we can pass the parameters in the servlet path
 		String url = getURL(c, tp, target, operation);
+		// Check that MODIFY_ON_POST check will pass
+		if( operation != null ) {
+			if( (! (operation instanceof ViewTransitionKey)) || ! ((ViewTransitionKey) operation).isNonModifying(target)) {
+				c.getService(LoggerService.class).getLogger(TransitionServlet.class).error("Link to modifying transition "+url);
+			}
+		}
 		hb.open("a");
 		ServletService serv = c.getService(ServletService.class);
          if (serv != null) {

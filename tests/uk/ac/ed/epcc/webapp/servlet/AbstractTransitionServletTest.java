@@ -223,6 +223,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		// Setup the transition for next operation
 		resetRequest();
 		setTransition(fac, key, target);
+		req.method="GET";
 		return;
 	}
 	
@@ -245,7 +246,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		}
 		assertNotNull(key);
 		assertEquals(key, req.getAttribute(TransitionServlet.TRANSITION_KEY_ATTR));
-		assertEquals(fac, req.getAttribute(TransitionServlet.TRANSITION_PROVIDER_ATTR));
+		assertEquals(fac.getTargetName(), ((TransitionFactory)req.getAttribute(TransitionServlet.TRANSITION_PROVIDER_ATTR)).getTargetName());
 		checkForward("/scripts/transition.jsp");
 		resetRequest();
 		setTransition(fac, key, target);

@@ -7,6 +7,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -22,7 +23,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 /** A {@link ServiceFilterComposite} that uses a reference to a classifier table
  * to indicate the service.
  * 
- * This ony supports filtering where each target is in a single service or all services.
+ * An object is considered to be part of the 
  * 
  * @author spb
  *
@@ -66,16 +67,19 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 
 	/** get a filter for records that match the current service
 	 * 
-	 * @return
+	 * @return {@link SQLFilter}
 	 */
 	public SQLFilter<BDO> getCurrentServiceFilter(){
 		Class<? super BDO> target = getFactory().getTarget();
-		if(getRepository().hasField(SERVICE_ID_FIELD)){
-
-			return new SQLOrFilter<>(target, 
-					new SQLValueFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, getCurrentID()),
-					new NullFieldFilter<BDO>(target,getRepository(),SERVICE_ID_FIELD,true)
-					);
+		int[] currentIDs = getCurrentIDs();
+		if(currentIDs != null && currentIDs.length > 0){
+			// Match any id in current view list or null.
+			SQLOrFilter<BDO> fil = new SQLOrFilter<>(target);
+			for(int id : currentIDs) {
+				fil.addFilter(new SQLValueFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, id) );
+			}
+			fil.addFilter(new NullFieldFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, true));
+			return fil;
 		}else{
 			return new GenericBinaryFilter<BDO>(target, true);
 		}
@@ -83,13 +87,18 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	
 	/** get a filter for records that are not part of the current service
 	 * 
-	 * @return
+	 * @return {@link SQLFilter}
 	 */
 	public SQLFilter<BDO> getOtherServiceFilter(){
 		Class<? super BDO> target = getFactory().getTarget();
-		if(getRepository().hasField(SERVICE_ID_FIELD)){
-
-			return new SQLValueFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, MatchCondition.NE, getCurrentID());
+		int[] currentIDs = getCurrentIDs();
+		if(currentIDs != null && currentIDs.length > 0){
+			SQLAndFilter<BDO> fil = new SQLAndFilter<>(target);
+			
+			for( int id : currentIDs) {
+				fil.addFilter(new SQLValueFilter<BDO>(target, getRepository(), SERVICE_ID_FIELD, MatchCondition.NE, id));
+			}
+			return fil;
 		}else{
 			return new GenericBinaryFilter<>(target, false);
 		}
@@ -98,7 +107,15 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	
 	public boolean isCurrentService(BDO obj){
 		int id = getRecord(obj).getIntProperty(SERVICE_ID_FIELD, 0);
-		return id==0 || id == getCurrentID();
+		if (id == 0) return true;
+		int[] ids = getCurrentIDs();
+		if( ids == null || ids.length ==0 ) {
+			return true;
+		}
+		for (int currid: ids) {
+			if (id == currid) return true;
+		}
+		return false;
 	}
 
 	/* (non-Javadoc)
@@ -152,24 +169,44 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 		return getContext().makeObject(ClassificationFactory.class, SERVICE_CLASSIFIER);
 	}
 	
-	private int id=0;
-	private int getCurrentID(){
-		if( id > 0 || ! getRepository().hasField(SERVICE_ID_FIELD)){
-			return id;
+	private int[] ids=null;
+	/** get an array of the services in the current view
+	 * a null value or a zero length list means show all services.
+	 * @return
+	 */
+	private int[] getCurrentIDs(){
+		if ((ids == null) && (!getRepository().hasField(SERVICE_ID_FIELD))) {
+			ids = new int[0];
 		}
 		
+		if (ids != null) return ids;
+		
 		try {
-			String name = getContext().getInitParameter(SERVICE_NAME_PARAM);
-			Classification current= getServicesFactory().makeFromString(name);
-			if( current != null){
-				current.commit();
-				id = current.getID();
+			String namelist = getContext().getInitParameter(SERVICE_LIST_PARAM);
+			if (namelist == null || namelist.isEmpty()) {
+				namelist = getContext().getInitParameter(SERVICE_NAME_PARAM);
 			}
+			if( namelist == null || namelist.isEmpty()){
+				ids = new int[0];
+				return ids;
+			}
+			String[] names = namelist.trim().split(",");
+			ids = new int[names.length];
+			for (int i = 0; i < names.length; i++) {
+				String name = names[i].trim();
+				if( ! name.isEmpty() ){
+					Classification current = getServicesFactory().makeFromString(name);
+					if (current != null) {
+						current.commit();
+						ids[i] = current.getID();
+					}
+				}
+			}
+			
 		} catch (DataFault e) {
 			getLogger().error("Error looking up serviceID", e);
 		}
-		return id;
-		
+		return ids;
 	}
 
 	/* (non-Javadoc)

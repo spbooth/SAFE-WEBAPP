@@ -51,6 +51,7 @@ ListInputInterfaceTest<String, Number, SetInput<Number>, SetInputTestCase> {
 		bad.add("Two");
 		bad.add("Four");
 		bad.add("Eight");
+		bad.add("ONE");
 		return bad;
 	}
 

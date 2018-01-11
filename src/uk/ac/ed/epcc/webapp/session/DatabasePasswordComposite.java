@@ -661,7 +661,9 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	 * 
 	 */
 	public boolean checkPassword(T u, String password) {
-
+		if( u == null) {
+			return false;
+		}
 		// route all password checks through the same code
 		try {
 			AndFilter<T> fil = new AndFilter<T>(getFactory().getTarget());

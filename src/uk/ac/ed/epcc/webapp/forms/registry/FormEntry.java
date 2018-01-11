@@ -20,6 +20,10 @@ package uk.ac.ed.epcc.webapp.forms.registry;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.jdbc.filter.GetListFilterVisitor;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.data.forms.registry.SummaryContentProvider;
 
 
 
@@ -49,8 +53,24 @@ import uk.ac.ed.epcc.webapp.Contexed;
 	 * @param <T> Target type
 	 *
 	 */
-	public abstract class FormEntry<F extends Contexed,T> extends AbstractFormFactoryProvider<F,T> {
+	public abstract class FormEntry<F extends Contexed,T> extends AbstractFormFactoryProvider<F,T> implements SummaryContentProvider<T>{
 		
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.forms.registry.SummaryContentProvider#getSummaryContent(uk.ac.ed.epcc.webapp.AppContext, uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object)
+		 */
+		@Override
+		public <X extends ContentBuilder> X getSummaryContent(AppContext c, X cb, T target) {
+			try {
+			F fac = getFactory(c);
+			if( fac instanceof SummaryContentProvider) {
+				cb = ((SummaryContentProvider<T>)fac).getSummaryContent(c, cb, target);
+			}
+			}catch(Throwable t) {
+				c.getService(LoggerService.class).getLogger(getClass()).error("Error makings SummaryContent", t);
+			}
+			return cb;
+		}
+
 		private final Class<? extends F> f;
 		private final String config_tag;
 		@Override

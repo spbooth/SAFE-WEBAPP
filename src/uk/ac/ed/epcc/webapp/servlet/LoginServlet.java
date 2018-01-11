@@ -74,6 +74,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 
 	
 	public static final Feature REPORT_ACCOUNT_NOT_FOUND = new Feature("login.report_account_not_found",true,"Users are explicitly informed if resetting an account hat is not found");
+	public static final Feature RESET_PASSWORD_PAGE = new Feature("login.reset_password_page",false,"Use a separate reset password page");
 	/**
 	 * 
 	 */

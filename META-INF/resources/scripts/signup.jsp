@@ -52,16 +52,8 @@ signup.jsp - Page used to sign up for an account using password auth.
 
 	
 	String page_title = service_name+" "+website_name+" Signup";
-	String privacy_policy=conn.getInitParameter("service.url.privacypolicy");
 %>
 <%@ include file="/std_header.jsf" %>
-
-<script language="javascript">
-function open_privacy_popup() {
-	window.open("<%= privacy_policy %>", "singup_privacy_popup_window", "scrollbars=1, toolbar=0, resizable=1, height=440, width=400");
-	return false;
-}
-</script>
 
 <div class="block">
 <H2><%=page_title%></H2>
@@ -88,12 +80,7 @@ If you already have an account or have forgotten your password go
 <%} %>
 <p>Fields marked in <b>bold</b> are mandatory.</p>
 <%= person_fac.addUpdateNotes(new HtmlBuilder(),null) %>
-<% if( privacy_policy != null && ! privacy_policy.isEmpty() ){ %>
-<p>
-<small>All information supplied is held and processed in accordance with the <%=service_name%> Personal Data and Privacy Policy.
-	  You can find full details <a href="<%= privacy_policy%>" onClick="return open_privacy_popup();"><b>here</b></a>.</small>
-</p>
-<% } %>
+<%@ include file="/scripts/privacy_policy.jsf" %>
   <form method="post" 
 <% if( multi ){ %>
    enctype="multipart/form-data"

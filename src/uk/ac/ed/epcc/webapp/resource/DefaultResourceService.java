@@ -26,7 +26,7 @@ import java.net.URL;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Version;
-/** DefaultResoruceService
+/** DefaultResourceService
  * USe ClassLoader resource location with fall-back to file-system
  * 
  * 
@@ -65,20 +65,25 @@ public class DefaultResourceService implements ResourceService, Contexed {
 		if( name == null){
 			return null;
 		}
+		
 		//Logger log = conn.getService(LoggerService.class).getLogger(getClass());
 		URL result = getClass().getClassLoader().getResource(mapForClassloader(name));
 		//System.out.println("lookup of "+name+" returns "+result);
 		if( result != null ){
 			return result;
 		}
-		File f = new File(name);
-		if( f.exists() && f.canRead()){
-			//System.out.println("file exists");
-			try {
-				return f.toURI().toURL();
-			} catch (MalformedURLException e) {
-				
+		try {
+			File f = new File(name);
+			if( f.exists() && f.canRead()){
+				//System.out.println("file exists");
+				try {
+					return f.toURI().toURL();
+				} catch (MalformedURLException e) {
+
+				}
 			}
+		}catch(SecurityException sex) {
+			// Ignore
 		}
 		return null;
 	}
@@ -94,14 +99,18 @@ public class DefaultResourceService implements ResourceService, Contexed {
 			//log.debug("get of "+name+" returns "+stream);
 			return stream;
 		}
-		File f = new File(name);
-		if( f.exists() && f.canRead()){
-			//log.debug("file exists");
-			
+		try {
+			File f = new File(name);
+			if( f.exists() && f.canRead()){
+				//log.debug("file exists");
+
 				return new FileInputStream(f);
-			
-		}else{
-			//log.debug("file not found or unreadable");
+
+			}else{
+				//log.debug("file not found or unreadable");
+			}
+		}catch(SecurityException sex) {
+			//ignore
 		}
 		return null;
 	}

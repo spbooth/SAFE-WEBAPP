@@ -241,11 +241,14 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		return new FilterIterator(t.getFilter());
 	}
 
+	public FilterResult<M> getResult(Template t) throws DataFault{
+		return getResult(t.getFilter());
+	}
 	/**
 	 * Find a MultiLink object corresponding to a complete Tempalte
 	 * 
 	 * @param t
-	 *            Tamplate
+	 *            Template
 	 * @return MultiLink or null if it does not exist
 	 * @throws DataException
 	 */

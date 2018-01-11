@@ -54,6 +54,7 @@ public class AppContextFixtureRule extends ExternalResource{
 			serv.reset(); // don't run cleanups
 		}
 		ctx.close();
+		ctx=null;
 	}
 
 	protected void before(String global_fixtures[],String fixtures[]) throws Throwable {

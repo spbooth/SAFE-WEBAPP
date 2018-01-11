@@ -50,15 +50,20 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * modify the table specification. If the constructor takes the String parameter the construction tag of the composite will be passed.
  * <p>
  * The areas that {@link Composite}s can customise can be extended by having a factory check all composites for specific interfaces for example
- * {@link TableStructureDataObjectFactory} check the composites for {@link TransitionSource}
+ * {@link TableStructureDataObjectFactory} checks the composites for {@link TransitionSource}
+ * If you find yourself testing for the existence of multiple composites at the same location consider extracting an interface for
+ * that all the contributing composites can implement. 
  * <p>
- * Each {@link Composite} provides a type {@link Class} that it is registered under. A factory cannot contain two {@link Composite}s registered under the same class.
- * Any functionality that should only be included once (but has many implementations) should use the same registration class and can be retrieved by the registration type.
+ * Each {@link Composite} provides a type {@link Class} that it is registered under. It should itself be assignable to that type. A factory cannot contain two {@link Composite}s registered under the same class.
+ * Any functionality that should only be included once (but has many implementations) should use the same registration class (which should be an interface or abstract supertype representing the operation)
+ * and can be retrieved by the registration type. Otherwise composites usually register under their own type. This does mean that if you want to add several copies of the same composite you need to introduce 
+ * trivial sub-classes.
  * <p>
  * Composites augment a {@link DataObjectFactory} so it is easiest to add behaviour to the factory rather than the {@link DataObject}.
  * To add behaviour to {@link DataObject} is easier if the object is an inner class or contains a reference to its factory.
  * You can also introduce additional handler classes that wrap the repository these can have the same relation to the {@link Composite}
  * as {@link DataObject} has to the {@link DataObjectFactory}.
+ * <b>
  * 
  * @author spb
  * @param <BDO> target type
@@ -75,7 +80,7 @@ public abstract class Composite<BDO extends DataObject, X extends Composite> imp
 		fac.registerComposite(this);
 	}
 	/** extension point called before the composite is registered. This is to allow the class setup to be completed
-	 * that cant wait till after registration.
+	 * that can't wait till after registration.
 	 * 
 	 */
 	protected void preRegister(){
@@ -161,12 +166,21 @@ public abstract class Composite<BDO extends DataObject, X extends Composite> imp
 	protected final Repository getRepository(){
 		return fac.res;
 	}
+	/** return the {@link DataObjectFactory} the {@link Composite} is registered with.
+	 * 
+	 * @return
+	 */
 	public final DataObjectFactory<BDO> getFactory(){
 		return fac;
 	}
+	
 	public final AppContext getContext(){
 		return fac.getContext();
 	}
+	/** get a {@link Logger} for this class
+	 * 
+	 * @return
+	 */
 	protected final  Logger getLogger() {
 		return getContext().getService(LoggerService.class).getLogger(getClass());
 	}

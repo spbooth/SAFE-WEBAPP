@@ -43,6 +43,8 @@ public class IndexProducerTransitionProvider<T extends Indexed> extends SimpleTr
 	private final TransitionKey<T> update;
 	private final TransitionKey<T> create;
 	private final TransitionKey<T> edit;
+	
+	private final SummaryContentProvider<T> prov;
 	@SuppressWarnings("unchecked")
 	public IndexProducerTransitionProvider(AppContext c,IndexedProducer<T> fac,FormPolicy policy,String target_name) {
 		super(c,fac,target_name);
@@ -64,6 +66,11 @@ public class IndexProducerTransitionProvider<T extends Indexed> extends SimpleTr
 			edit=null;
 			update=null;
 		}
+		if( fac instanceof SummaryContentProvider) {
+			prov = (SummaryContentProvider)fac;
+		}else {
+			prov=null;
+		}
 	}
 
 	
@@ -78,6 +85,9 @@ public class IndexProducerTransitionProvider<T extends Indexed> extends SimpleTr
 	}
 
 	public <X extends ContentBuilder> X getSummaryContent(AppContext c,X cb,T target) {
+		if( prov != null) {
+			cb = prov.getSummaryContent(c, cb, target);
+		}
 		return cb;
 	}
 

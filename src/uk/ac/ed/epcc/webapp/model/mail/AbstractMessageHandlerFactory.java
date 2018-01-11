@@ -111,6 +111,14 @@ public abstract class AbstractMessageHandlerFactory<H extends AbstractMessageHan
 		}
 
 		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#bccOnly()
+		 */
+		@Override
+		public boolean bccOnly() {
+			return false;
+		}
+
+		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#allowNewAttachments()
 		 */
 		@Override

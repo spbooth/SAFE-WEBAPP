@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
+import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -25,7 +26,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  *
  */
 
-public abstract class PasswordAuthComposite<T extends AppUser> extends AppUserComposite<T, PasswordAuthComposite<T>> implements MenuContributor<T> {
+public abstract class PasswordAuthComposite<T extends AppUser> extends AppUserComposite<T, PasswordAuthComposite<T>> implements MenuContributor<T> , NewSignupAction<T> {
 	
 
 	/**
@@ -146,5 +147,16 @@ public abstract class PasswordAuthComposite<T extends AppUser> extends AppUserCo
 		}
 		return new String[]{"Password"};
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.session.NewSignupAction#newSignup(uk.ac.ed.epcc.webapp.session.AppUser)
+	 */
+	@Override
+	public void newSignup(T user) throws Exception {
+		// Make a new password
+		String new_password = firstPassword(user);
+		Emailer m = new Emailer(getContext());
+		m.newSignup(user, new_password);
+	}
+
 }

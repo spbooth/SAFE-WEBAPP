@@ -29,15 +29,8 @@ package uk.ac.ed.epcc.webapp;
  
  *
  */
-public interface AppContextService<X extends AppContextService<X>> {
+public interface AppContextService<X extends AppContextService<X>> extends AppContextCleanup {
 
-	/** {@link AppContext} is being closed.
-	 * Only use this for cleanup that can't be handled by
-	 * normal garbage collection or for state which is never returned by reference.
-	 * 
-	 */
-	public void cleanup();
-	
 	/** Returns the type of service the class should be registered under.
 	 * 
 	 * @return registration type

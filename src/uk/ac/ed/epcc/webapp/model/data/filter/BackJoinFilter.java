@@ -85,7 +85,7 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 		public StringBuilder addPattern(StringBuilder sb, boolean qualify) {
 			// this is the clause that matches the tables.
 			sb.append("EXISTS( SELECT 1 FROM ");
-			remote_res.addTable(sb, true);
+			remote_res.addSource(sb, true);
 			if( fil != null && fil instanceof JoinFilter){
 				final String join = ((JoinFilter)fil).getJoin();
 				if( join != null ){

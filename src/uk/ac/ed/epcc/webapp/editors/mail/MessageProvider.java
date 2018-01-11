@@ -48,6 +48,7 @@ public interface MessageProvider {
 
 	public abstract String getSender();
 	public abstract boolean editRecipients();
+	public abstract boolean bccOnly();
 	public abstract boolean allowNewAttachments();
     public boolean commit() throws DataFault;
 }

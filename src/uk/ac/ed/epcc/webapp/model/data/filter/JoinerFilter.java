@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.model.data.filter;
 
 import java.util.List;
 
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseCombineFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
@@ -29,7 +30,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 /** Filter to join two tables.
  * 
  * This performs a left join so records without references are
- * available for selection but it also adds the joining clause
+ * available for selection but the filter visitor in {@link BaseCombineFilter} also adds the joining clause
  * to the WHERE condition which would normally suppress these. This is to allow
  * OR combinations of filters to work. The records without references are
  * available to OR branches that do not contain this filter.
@@ -38,6 +39,8 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
  * if different remote peers match different branches of an OR then the target will 
  * be matched multiple times so we should consider using a {@link BackJoinFilter} instead for these
  * if we don't actually need the joined fields in the result.
+ * 
+ * This filter cannot be used if multiple joins to the same table are required because table aliases are not supported.
  * 
  * @author spb
  *
@@ -77,7 +80,7 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 			StringBuilder join=new StringBuilder();
 			// see comments for reason for left join
 			join.append(" left join ");
-			remote_res.addTable(join, true);
+			remote_res.addSource(join, true);
 			join.append(" on ");
 			addPattern(join, true);
 			return join.toString();

@@ -14,8 +14,11 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
 
 /** A Input that decorated a String Input with a file-upload button
@@ -23,7 +26,7 @@ import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
  *
  */
 
-public class FileUploadDecorator extends MultiInput<String,Input> implements OptionalInput{
+public class FileUploadDecorator extends ParseMultiInput<String,Input> implements OptionalInput, ParseInput<String>{
 	
 
 	private ParseAbstractInput<String> master;
@@ -52,7 +55,7 @@ public class FileUploadDecorator extends MultiInput<String,Input> implements Opt
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#convert(java.lang.Object)
 	 */
 	public String convert(Object v) throws TypeError {
-		if( v == null || v instanceof String ){
+		if( v == null ){
 			return (String) v;
 		}
 		if( v instanceof StreamData){
@@ -116,5 +119,52 @@ public class FileUploadDecorator extends MultiInput<String,Input> implements Opt
 	 */
 	public void setOptional(boolean opt) {
 		optional=opt;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ParseInput#parse(java.lang.String)
+	 */
+	@Override
+	public void parse(String v) throws ParseException {
+		master.parse(v);
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ParseMapInput#getMap()
+	 */
+	@Override
+	public Map<String, Object> getMap() {
+		Map<String,Object> map = new HashMap<>();
+		map.put(master.getKey(),master.getString());
+		map.put(file.getKey(), file.getValue());
+		return map;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ParseMapInput#parse(java.util.Map)
+	 */
+	@Override
+	public boolean parse(Map<String, Object> v) throws ParseException {
+		
+		boolean is_leaf=true;
+		// First consider a global param-name
+		Object data = v.get(getKey());
+		if( data != null) {
+			master.parse(convert(data));
+			is_leaf=false;
+		}
+		// Parse master input (overrides a global value)
+		Object text = v.get(master.getKey());
+		if( text != null ) {
+			master.parse(master.convert(text));
+			is_leaf=true;
+		}
+		// finally override with any file-upload
+		Object f = v.get(file.getKey());
+		if( f != null ) {
+			master.parse(convert(f));
+			is_leaf=true;
+		}
+		return is_leaf;
 	}
 }

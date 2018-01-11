@@ -70,6 +70,12 @@ public class RemoteAuthServlet extends WebappServlet {
 	/**
 	 * 
 	 */
+	private static final String REMOTE_AUTH_ALLOW_LOGIN_PREFIX = "remote_auth.allow_login.";
+
+
+	/**
+	 * 
+	 */
 	private static final String EXTAUTH_REGISTER_ID_ATTR = "EXTAUTH_REGISTER_ID_ATTR";
 
 
@@ -181,20 +187,26 @@ public class RemoteAuthServlet extends WebappServlet {
 			
 			person = getTargetAppUser(session_service);
 			String remote_auth_realm = conn.getExpandedProperty(REMOTE_AUTH_REALM_PROP, WebNameFinder.WEB_NAME);
+			boolean allow_login = canLogin(conn, remote_auth_realm);
 			AppUserFactory<?> fac = session_service.getLoginFactory();
 			AppUserNameFinder parser = fac.getRealmFinder(remote_auth_realm);
+			if( parser == null) {
+				getLogger(conn).error("No realm finder found for "+remote_auth_realm);
+				message(conn,req,res,"internal_error","No realm finder found");
+			}
 			if (person == null) {
+				person = parser.findFromString(web_name);
+				if (person == null) {
+						String register_text = session_service.getContext().getInitParameter(SERVICE_WEB_LOGIN_UPDATE_TEXT,REGISTER_IDENTITY_DEFAULT_TEXT);
+						message(conn, req, res, "unknown_web_login", register_text);
+						return;
+				}
+				if( allow_login ) {
 				// attempt a login
-				
-				
-					person = parser.findFromString(web_name);
-					if (person == null) {
-							String register_text = session_service.getContext().getInitParameter(SERVICE_WEB_LOGIN_UPDATE_TEXT,REGISTER_IDENTITY_DEFAULT_TEXT);
-							message(conn, req, res, "unknown_web_login", register_text);
-							return;
-					}
 					session_service.setCurrentPerson(person);
-				
+				}else{
+					message(conn, req, res, "remote_auth_binding_only",web_name,person.getIdentifier());
+				}
 			} else {
 				// Check for existing binding
 				// and replace rather than duplicate
@@ -273,6 +285,9 @@ public class RemoteAuthServlet extends WebappServlet {
     			);
     }
     
+    public static boolean canLogin(AppContext conn, String realm) {
+    	return conn.getBooleanParameter(REMOTE_AUTH_ALLOW_LOGIN_PREFIX+realm, true);
+    }
     private <A extends AppUser> A getTargetAppUser(SessionService<A> sess){
    
     	A person = sess.getCurrentPerson();

@@ -123,6 +123,8 @@ public abstract class AbstractConfigService implements Contexed, ConfigService{
 								// mark this resource as loaded
 								result.setProperty(CONFIG_LOADED+file, "true");
 
+							}else{
+								error("failed to find included properties file "+file);
 							}
 						}catch(Exception e){
 							error("Exception while loading service properties file: "

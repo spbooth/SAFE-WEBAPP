@@ -18,7 +18,11 @@ package uk.ac.ed.epcc.webapp.session;
  *
  */
 public class UnknownRelationshipException extends Exception {
-   public UnknownRelationshipException(String msg){
-	   super(msg);
-   }
+	public UnknownRelationshipException(String msg){
+		super(msg);
+	}
+
+	public UnknownRelationshipException(String msg, UnknownRelationshipException nested) {
+		super(msg, nested);
+	}
 }

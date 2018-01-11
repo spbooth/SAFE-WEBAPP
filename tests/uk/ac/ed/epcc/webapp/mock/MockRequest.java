@@ -42,6 +42,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
 import java.util.Hashtable;
@@ -55,6 +56,7 @@ public class MockRequest implements HttpServletRequest {
     public String context_path;
     public String servlet_path;
     public String path_info="";
+    public String method="POST";
     public MockSession session;
     public String remote_user=null;
     public String content_type=null;
@@ -107,7 +109,7 @@ public class MockRequest implements HttpServletRequest {
 
 	public String getMethod() {
 		
-		return "POST";
+		return method;
 	}
 
 	public String getPathInfo() {
@@ -474,5 +476,28 @@ public class MockRequest implements HttpServletRequest {
 	public void logout() throws ServletException {
 		// TODO Auto-generated method stub
 		
+	}
+	/* (non-Javadoc)
+	 * @see javax.servlet.ServletRequest#getContentLengthLong()
+	 */
+	
+	public long getContentLengthLong() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServletRequest#changeSessionId()
+	 */
+	
+	public String changeSessionId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServletRequest#upgrade(java.lang.Class)
+	 */
+	
+	public <T extends HttpUpgradeHandler> T upgrade(Class<T> arg0) throws IOException, ServletException {
+		return null;
 	}
 }

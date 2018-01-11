@@ -52,7 +52,9 @@ Update personal details
 <div class="block">
 <h2>This page is to allow you to update your contact details.</h2>
 <%= fac.addUpdateNotes(new HtmlBuilder(),user) %>
+<%@ include file="/scripts/privacy_policy.jsf" %>
 </div>
+
 <%@ include file="/scripts/form_context.jsf" %>
 <div class="block" role="main">
 <h3>Your current details:</h3>

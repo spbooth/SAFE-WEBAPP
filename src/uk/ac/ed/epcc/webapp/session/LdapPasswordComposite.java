@@ -167,10 +167,13 @@ public class LdapPasswordComposite<T extends AppUser> extends PasswordAuthCompos
 	@Override
 	public T findByLoginNamePassword(String name, String password)
 			throws DataException {
-
+		
 		AppContext context = getContext();
 		Logger log = getLogger();
 		
+		if( name == null || password == null) {
+			return null;
+		}
 		if( ldap_url == null || base_name == null){
 			log.error("No LDAP connection URL or basename");
 			return null;

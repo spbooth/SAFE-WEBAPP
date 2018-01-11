@@ -29,6 +29,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -72,7 +73,9 @@ import uk.ac.ed.epcc.webapp.model.TemplateFinder;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
 import uk.ac.ed.epcc.webapp.resource.ResourceService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
+import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory.EmailChangeRequest;
+import uk.ac.ed.epcc.webapp.session.EmailParamContributor;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeListener;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory.PasswordChangeRequest;
@@ -134,8 +137,8 @@ public class Emailer {
 	public static final String EMAIL_FORCE_ADDRESS = "email.force.address";
 	public static final String EMAIL_BYPASS_FORCE_ADDRESS = "email.bypass_force.address";
 	public static final Feature EMAILS_FEATURE = new Feature("emails",true,"emails enabled");
-    public static final Feature PASSWORD_RESET_SERVLET = new Feature("password_reset.servlet",false,"Send reset url in reset email");
-    
+	public static final Feature PASSWORD_RESET_SERVLET = new Feature("password_reset.servlet",false,"Send reset url in reset email");
+	 
     public static final Feature HTML_ALTERNATIVE = new Feature("email.html_alternative",true,"Look for a tempalte region conatining html alternative content");
 	private static final String MAIL_SMTP_HOST = "mail.smtp.host";
 
@@ -293,6 +296,15 @@ public class Emailer {
 		log.info("EmailSender sending an email to " + email);
 		return templateMessage(new String[] { email }, h, email_template);
 	}
+	public MimeMessage templateMessage(String sendto, Hashtable h,
+			TemplateFile email_template,Map<String,String> params) throws IOException, MessagingException {
+		Logger log = getLogger();
+		// change destination depending on sendto:
+		String email = mapRecipients(sendto);
+		
+		log.info("EmailSender sending an email to " + email);
+		return templateMessage(new String[] { email }, DEFAULT_HEADER_PREFIX,h,null,false, email_template,params);
+	}
     public String mapRecipients(String sendto){
     	return sendto;
     }
@@ -322,7 +334,14 @@ public class Emailer {
 	String email = getEmail(recipient);
 	log.debug("Email mapped "+recipient.getEmail()+"->"+email);
 	if( email != null && email.trim().length() > 0){
-		return templateMessage(email, headers, email_template);
+		Map<String,String> params = new HashMap<>();
+		if( recipient != null) {
+			AppUserFactory<?> factory = recipient.getFactory();
+			for(EmailParamContributor epc : factory.getComposites(EmailParamContributor.class)) {
+				epc.addParams(params, recipient);
+			}
+		}
+		return templateMessage(email, headers, email_template,params);
 	}else{
 		log.warn("Email to "+recipient.getIdentifier()+" mapped to null");
 	}
@@ -589,7 +608,7 @@ public class Emailer {
 			UnsupportedEncodingException {
 		Logger log = getLogger();
 		String fromAddress = conn.getInitParameter(EMAIL_FROM_ADDRESS);
-		String fromName = conn.getInitParameter(EMAIL_FROM_NAME);
+		String fromName = conn.getExpandedProperty(EMAIL_FROM_NAME);
 		Session session = getSession();
 		String text_recip = null;
 		MimeMessage m = new MimeMessage(session);
@@ -925,10 +944,10 @@ public class Emailer {
 				String subject_message = message;
 
 				if( subject_message.contains("\n")){
-					subject_message.substring(0, subject_message.indexOf('\n'));
+					subject_message = subject_message.substring(0, subject_message.indexOf('\n'));
 				}
 				if( subject_message.length() > 64){
-					subject_message.substring(0, 64);
+					subject_message = subject_message.substring(0, 64);
 				}
 				errorEmail.setProperty("subject_message", subject_message);
 				errorEmail.setProperty("exception_message", message);

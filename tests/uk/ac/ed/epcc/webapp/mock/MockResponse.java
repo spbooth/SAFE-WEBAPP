@@ -228,4 +228,13 @@ public class MockResponse implements HttpServletResponse {
 		return 0;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.servlet.ServletResponse#setContentLengthLong(long)
+	 */
+	
+	public void setContentLengthLong(long arg0) {
+		
+		
+	}
+
 }

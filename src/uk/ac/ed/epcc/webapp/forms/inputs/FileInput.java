@@ -36,7 +36,7 @@ public class FileInput extends AbstractInput<StreamData> {
     long max_upload=0;
     /** Set the maximum upload size for this input.
      * 
-     * @param val max uplaod size in bytes
+     * @param val max upload size in bytes
      * @return previous value
      */
     public long setMaxUpload(long val){

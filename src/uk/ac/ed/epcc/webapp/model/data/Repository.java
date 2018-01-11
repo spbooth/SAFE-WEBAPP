@@ -47,14 +47,13 @@ import java.util.Set;
 import org.apache.commons.codec.binary.Base64;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.AppContextCleanup;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.expr.DateSQLExpression;
-import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataError;
@@ -154,7 +153,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * 
  */
 
-public final class Repository {
+public final class Repository implements AppContextCleanup{
 	/** modes supported by {@link Record#setID}
 	 * 
 	 * @author spb
@@ -227,7 +226,6 @@ public final class Repository {
 	public class FieldInfo {
 		/** field name  as stored in database*/
 		private final String name;
-		private final String qualified_name;
 
 		/** SQL type of field */
 		private final int type;
@@ -259,7 +257,6 @@ public final class Repository {
 			this.type = type;
 			this.max = max;
 			this.can_null = can_null;
-			this.qualified_name = table_name+"."+name;
 		}
 		/** get the max display width for the field
 		 * 
@@ -293,7 +290,7 @@ public final class Repository {
 		 */
 		public String getName(boolean qualify){
 			if( qualify){
-				return qualified_name;
+				return addName(new StringBuilder(), qualify, false).toString();
 			}
 			return name;
 		}
@@ -307,9 +304,11 @@ public final class Repository {
 		public StringBuilder addName(StringBuilder sb, boolean qualify, boolean quote){
 			if( qualify ){
 				if( quote ){
-					sql.quoteQualified(sb, table_name, name);
+					sql.quoteQualified(sb, alias_name, name);
 				}else{
-					sb.append(qualified_name);
+					sb.append(alias_name);
+					sb.append(".");
+					sb.append(name);
 				}
 			}else{
 				if(quote){
@@ -661,7 +660,7 @@ public final class Repository {
         			sb.append("REPLACE INTO ");
         			store.addTable(sb, true);
         			sb.append(" SELECT * FROM ");
-        			getRepository().addTable(sb, true);
+        			getRepository().addSource(sb, true);
         			sb.append(" WHERE ");
         			getRepository().addUniqueName(sb, true, true);
         			sb.append("=?");
@@ -1784,6 +1783,12 @@ public final class Repository {
 	 * 
 	 */
 	final private String table_name;
+	
+	/** This is the table alias used in selects
+	 * 
+	 * If this is the same as table_name no alias is used
+	 */
+	final private String alias_name;
 	/** This is the tag used in configuration parameters.
 	 * This is normally the same as the creation tag but may be re-directed 
 	 * to make it easy to support table rolling.
@@ -1859,6 +1864,9 @@ public final class Repository {
 		tag_name=TableToTag(c, tag);
 		param_name=c.getInitParameter( "config."+tag,tag);
 		table_name = tagToTable(ctx,tag);
+		// Setting this allows multiple joins to the same table by
+		// having more than one tag for the same table with different aliases
+		alias_name = c.getInitParameter("table_alias."+tag, table_name);
 		setResolution(c.getIntegerParameter("repository.resolution."+tag_name, DEFAULT_RESOLUTION));
 		use_cache = new Feature(CACHE_FEATURE_PREFIX+tag_name, false,"Use record cache for "+tag_name).isEnabled(c);
 		
@@ -1910,7 +1918,7 @@ public final class Repository {
 	 */
 	public StringBuilder addUniqueName(StringBuilder sb, boolean qualify, boolean quote){
 		if( qualify ){
-			addTable(sb, quote);
+			addAlias(sb, quote);
 			sb.append(".");
 		}
 		return sql.quote(sb, getUniqueIdName());
@@ -1919,6 +1927,11 @@ public final class Repository {
 	 * 
 	 * If this method is used to construct SQL statements then Repository sub-classes
 	 * can implement table name mangling if required.
+	 * 
+	 * Use this for schema updates but use{@link #addSource(StringBuilder, boolean)} in preference
+	 * for select/update statements as qualified field names will use the alias 
+	 * 
+	 * @see #addSource(StringBuilder, boolean)
 	 * 
 	 * @param sb StringBuilder
 	 * @param quote request quoting if supported
@@ -1930,6 +1943,38 @@ public final class Repository {
 		}else{
 			return sb.append(table_name);
 		}
+	}
+	/** Add the table alias
+	 * 
+	 * @param sb
+	 * @param quote
+	 * @return
+	 */
+	public StringBuilder addAlias(StringBuilder sb, boolean quote) {
+		if( quote ){
+			return sql.quote(sb, alias_name);
+		}else{
+			return sb.append(alias_name);
+		}
+	}
+	/** Add the table as a query source. 
+	 * 
+	 * Normally the same as {@link #addTable(StringBuilder, boolean)}
+	 * but is allowed to add an "AS alias" clause as well
+	 * 
+	 * 
+	 * 
+	 * @param sb
+	 * @param quote
+	 * @return
+	 */
+	public StringBuilder addSource(StringBuilder sb, boolean quote) {
+		addTable(sb, quote);
+		if( ! table_name.equals(alias_name)) {
+			sb.append(" AS ");
+			addAlias(sb, quote);
+		}
+		return sb;
 	}
 
 	public String getTable(){
@@ -2883,7 +2928,7 @@ public final class Repository {
 		}
 		// cache the qualified form as this is used frequently
 		StringBuilder sb = new StringBuilder();
-		sb.append(table_name);
+		sb.append(alias_name);
 		sb.append(".");
 		sb.append(id_name);
 		qualified_id_name = sb.toString();
@@ -3095,7 +3140,12 @@ public final class Repository {
 	 * @param tag
 	 */
 	public static void reset(AppContext c, String tag){
-		c.removeAttribute(new Tag(tag));
+		Tag key = new Tag(tag);
+		Repository res = (Repository) c.getAttribute(key);
+		if( res != null ) {
+			res.cleanup();
+		}
+		c.removeAttribute(key);
 	}
 	
 	/** Used as AppContext attribute key for Repository.
@@ -3149,5 +3199,20 @@ public final class Repository {
 	}
 	public String toString(){
 		return "Repository-"+table_name;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.AppContextCleanup#cleanup()
+	 */
+	@Override
+	public void cleanup() {
+	    try {
+			if(find_statement != null && ! find_statement.isClosed()) {
+				find_statement.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		find_statement=null;
 	}
 }

@@ -79,7 +79,9 @@ public class ErrorFilter implements Filter {
 	private static final Feature SESSION_STEALING_CHECK_FEATURE = new Feature("session-stealing-check",false,"reset session if ip address changes");
 	private static final Feature CONTEXT_CONFIG_FEATURE = new Feature("context.configuration",false,"Allow additional properties files based on the application Context");
 	private static final Feature CLEANUP_THREAD_FEATURE = new Feature("appcontext.cleanup_thread",true,"Close the AppContext in a thread if CleanupServices are defined");
+	private static final Feature EMAIL_LOGGING_FEATURE = new Feature("logging.send_email",true,"Send error reports by email");
 	public static final Feature TIMER_FEATURE = new Feature("Timer",false,"gather timing information for performance analyis");
+	
 	private static final String LAST_ADDR_ATTR = "LastAddr";
 	public static final String APP_CONTEXT_ATTR = "AppContext";
 	public static final String SERVLET_CONTEXT_ATTR = "ServletContext";
@@ -108,8 +110,12 @@ public class ErrorFilter implements Filter {
 		@Override
 		public void run() {
 			try{
-				// we no longer have the request so use normal logger service
-				conn.setService(new EmailLoggerService(conn));
+				if( EMAIL_LOGGING_FEATURE.isEnabled(conn)) {
+					// we no longer have the request so use normal logger service
+					// this will automatically pick up the nested logger if the
+					// current logger is a [Servlet]EmailLoggerservice 
+					conn.setService(new EmailLoggerService(conn));
+				}
 				// Make sure Cleanup runs first
 				serv.cleanup();
 				conn.close();
@@ -188,7 +194,13 @@ public class ErrorFilter implements Filter {
 		} catch( Throwable t){
 			
 			// generic throwable catch
-			getCustomLogger(req, res).error("caught Error in filter",t);
+			try {
+				getCustomLogger(req, res).error("caught Error in filter",t);
+			}catch(Throwable t2) {
+				// Things are really bad
+				System.err.println("Unloggable error in filter");
+				t.printStackTrace(); // should go to catalina.out
+			}
 			// Note that Servlet2.4 spec says exceptions thrown from a filter
 			// are not handled by error-page but error codes are
 			res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -354,8 +366,10 @@ public class ErrorFilter implements Filter {
 			try {
 
 				conn = makeContext((ServletContext) req.getAttribute(SERVLET_CONTEXT_ATTR),req,res);
-				// report error logs by email with page info need to replace this within closer
-				conn.setService( new ServletEmailLoggerService(conn,req));
+				if( EMAIL_LOGGING_FEATURE.isEnabled(conn)) {
+					// report error logs by email with page info need to replace this within closer
+					conn.setService( new ServletEmailLoggerService(conn,req));
+				}
 				if( TIMER_FEATURE.isEnabled(conn)){
 					DefaultTimerService timer_service = new DefaultTimerService(conn);
 					conn.setService( timer_service);

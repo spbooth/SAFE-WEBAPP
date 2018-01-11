@@ -37,6 +37,7 @@ uk.ac.ed.epcc.webapp.logging
 uk.ac.ed.epcc.webapp.logging.buffer
 uk.ac.ed.epcc.webapp.logging.commons
 uk.ac.ed.epcc.webapp.logging.debug
+uk.ac.ed.epcc.webapp.logging.java
 uk.ac.ed.epcc.webapp.logging.log4j
 uk.ac.ed.epcc.webapp.logging.print
 uk.ac.ed.epcc.webapp.messages

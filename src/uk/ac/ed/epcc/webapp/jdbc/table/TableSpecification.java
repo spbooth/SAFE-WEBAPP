@@ -24,8 +24,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /** Table Description.  
  * We use an abstract representation to make it easier to port between database back-ends.
@@ -113,31 +115,35 @@ public class TableSpecification {
 	 * @param prefix  key values start with this
 	 * @param params
 	 */
-	public void setFromParameters(String prefix,Map<String,String> params){
-		 for(String key : params.keySet()){
-	        	String name=key.substring(prefix.length());
-	        	String type=params.get(key);
-	        	if(type.equalsIgnoreCase("double")){
-	        		setField(name, new DoubleFieldType(true, null));
-	        	}else if(type.equalsIgnoreCase("float")){
-	        		setField(name, new FloatFieldType(true, null));
-	        	}else if(type.equalsIgnoreCase("integer")){
-	        		setField(name, new IntegerFieldType(true, null));
-	        	}else if(type.equalsIgnoreCase("long")){
-	        		setField(name, new LongFieldType(true, null));
-	        	}else if(type.equalsIgnoreCase("date")){
-	        		setField(name, new DateFieldType(true, null));
-	        	}else if(type.equalsIgnoreCase("boolean")){
-	        		setField(name, new BooleanFieldType(true, Boolean.FALSE));
-	        	}else if(type.equalsIgnoreCase("required")){
-	        		promoteOptionalField(name);
-	        	}else if( type.startsWith("string")){
-	        		int length = Integer.parseInt(type.substring("string".length()));
-	        		setField(name, new StringFieldType(true, null, length));
-	        	}else{
-	        		setField(name, new ReferenceFieldType(type));
-	        	}
-	        }
+	public void setFromParameters(AppContext conn,String prefix,Map<String,String> params){
+		for(String key : params.keySet()){
+			String name=key.substring(prefix.length());
+			String type=params.get(key);
+			try {
+				if(type.equalsIgnoreCase("double")){
+					setField(name, new DoubleFieldType(true, null));
+				}else if(type.equalsIgnoreCase("float")){
+					setField(name, new FloatFieldType(true, null));
+				}else if(type.equalsIgnoreCase("integer")){
+					setField(name, new IntegerFieldType(true, null));
+				}else if(type.equalsIgnoreCase("long")){
+					setField(name, new LongFieldType(true, null));
+				}else if(type.equalsIgnoreCase("date")){
+					setField(name, new DateFieldType(true, null));
+				}else if(type.equalsIgnoreCase("boolean")){
+					setField(name, new BooleanFieldType(true, Boolean.FALSE));
+				}else if(type.equalsIgnoreCase("required")){
+					promoteOptionalField(name);
+				}else if( type.startsWith("string")){
+					int length = Integer.parseInt(type.substring("string".length()));
+					setField(name, new StringFieldType(true, null, length));
+				}else{
+					setField(name, new ReferenceFieldType(type));
+				}
+			}catch(Throwable t) {
+				conn.getService(LoggerService.class).getLogger(getClass()).error("Error parsing table specification parameter "+name+"="+type,t);
+			}
+		}
 	}
 	public FieldType getField(String name){
 		return all_fields.get(name);
@@ -214,7 +220,20 @@ public class TableSpecification {
 		public String getName(){
 			return name;
 		}
-		
+		/** is this and index containing a single reference field
+		 *  
+		 * @return
+		 */
+		public boolean isRef() {
+			if(index_fields.size() == 1 ) {
+				for(String s : index_fields) {
+					if( getField(s) instanceof ReferenceFieldType) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
 		public Iterator<String> getindexNames(){
 			return index_fields.iterator();
 		}

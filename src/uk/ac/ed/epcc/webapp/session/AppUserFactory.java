@@ -31,7 +31,6 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
-import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
@@ -62,6 +61,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataCache;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.PatternArg;
+import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
@@ -607,15 +607,9 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 	 * 
 	 */
 	public void newSignup(AU user) throws Exception {
-		
-		PasswordAuthComposite<AU> comp = getComposite(PasswordAuthComposite.class);
-		if( comp != null){
-			// Make a new password
-			String new_password = comp.firstPassword(user);
-			Emailer m = new Emailer(getContext());
-			m.newSignup(user, new_password);
+		for( NewSignupAction<AU> action : getComposites(NewSignupAction.class)) {
+			action.newSignup(user);
 		}
-		
 	}
 	
 	/** Get a {@link FormCreator} to use when users sign-up
@@ -729,6 +723,26 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		public Map<String, Object> getDefaults() {
 			Map<String, Object> defaults = super.getDefaults();
 			defaults.put(ALLOW_EMAIL_FIELD, Boolean.TRUE);
+			
+			// look for defaults set in properties
+			AppContext conn = getFactory().getContext();
+			for (String field : getFields()) {
+				FieldInfo info = getAppUserFactory().res.getInfo(field);
+				String property = "service.signup_default." + field;
+				if (info.isNumeric()) {
+					int value = conn.getIntegerParameter(property, -1);
+					if (value >= 0) {
+						defaults.put(field, new Integer(value));
+					}
+				}
+				else if (info.isString()) {
+					String value = conn.getInitParameter(property);
+					if (value != null) {
+						defaults.put(field, value);
+					}
+				}
+			}
+			
 			return defaults;
 		}
 		/* (non-Javadoc)

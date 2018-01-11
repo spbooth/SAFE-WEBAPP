@@ -24,7 +24,11 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 
-
+/** A {@link LoggerService} that uses apache commons logging.
+ * 
+ * @author spb
+ *
+ */
 public class CommonsLoggerService implements LoggerService, Contexed {
     LogFactory fac;
     private final AppContext c;

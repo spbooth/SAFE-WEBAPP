@@ -282,4 +282,12 @@ public class AppUser extends DataObject implements java.security.Principal{
 	public boolean checkStateRole(String role){
 		return false;
 	}
+	/** Extension point for when updates to person state may need to be
+	 * notified to external parties.
+	 * 
+	 * @param extra
+	 */
+	public void notifyChange(String extra) {
+		
+	}
 }

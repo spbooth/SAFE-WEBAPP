@@ -66,12 +66,14 @@ public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
 		if( timer != null ){
 			timer.startTimer("FilterMaker: "+q);
 		}
+		PreparedStatement stmt=null;
+		ResultSet rs=null;
 		try {
 			
 			// We are only using the REsultSet to initialise the Record and
 			// are not concurrent anyway so give
 			// the DB the best chance of optimising the query
-			PreparedStatement stmt = conn.getService(DatabaseService.class).getSQLContext(getDBTag()).getConnection().prepareStatement(
+			stmt = conn.getService(DatabaseService.class).getSQLContext(getDBTag()).getConnection().prepareStatement(
 					q, ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			List<PatternArgument> list = new LinkedList<PatternArgument>();
@@ -82,7 +84,7 @@ public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
 			if( DatabaseService.LOG_QUERY_FEATURE.isEnabled(conn)){
 				getLogger().debug("Query is "+query);
 			}
-			ResultSet rs = stmt.executeQuery();
+			rs = stmt.executeQuery();
 			O result = null;
 			if( rs.next()){ // need to position the REsultSet before making object
 				result = makeEntry(rs);
@@ -102,10 +104,26 @@ public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
 				result = makeDefault();
 			}
 			stmt.close();
+			stmt=null;
 			return result;
 		} catch (SQLException e) {
 			throw new DataException("DataFault in FilterFinder " + query, e);
 		}finally{
+			try {
+				if( rs != null && ! rs.isClosed()) {
+					rs.close();
+				}
+			}catch(SQLException e) {
+				e.printStackTrace(); // 
+			}
+			try {
+				if( stmt != null && ! stmt.isClosed()) {
+					stmt.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
 			if( timer != null ){
 				timer.stopTimer("FilterMaker: "+q);
 			}

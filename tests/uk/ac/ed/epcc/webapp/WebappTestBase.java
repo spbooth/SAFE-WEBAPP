@@ -39,6 +39,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.junit.Before;
 import org.junit.Rule;
+import org.junit.rules.RuleChain;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
@@ -70,10 +71,11 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
 public abstract class WebappTestBase implements ContextHolder{
 	protected AppContext ctx;
 	protected Logger log;
+	
+	// Need appcontext first
 	@Rule
-	public DBFixtureRule db = new DBFixtureRule(this);
-	@Rule
-	public AppContextFixtureRule afr = new AppContextFixtureRule(this);
+	public RuleChain chain = RuleChain.outerRule(new AppContextFixtureRule(this)).around(new DBFixtureRule(this));
+	
 	
 	
 	public void setContext(AppContext c){

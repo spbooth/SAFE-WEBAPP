@@ -15,16 +15,8 @@ package uk.ac.ed.epcc.webapp.editors.xml;
 
 import java.util.LinkedList;
 
-import javax.xml.validation.Schema;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.model.xml.XMLOverlay;
-import uk.ac.ed.epcc.webapp.model.xml.XMLOverlay.XMLFile;
-import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** Default implementation of {@link XMLTarget}
  * @author spb
