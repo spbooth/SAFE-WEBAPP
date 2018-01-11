@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.BooleanInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.BoundedDateInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TimeStampMultiInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
@@ -154,10 +155,10 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 				}
 			}
 		}
-		TimeStampMultiInput input = fac.getDateInput();
+		BoundedDateInput input = fac.getDateInput();
 		input.setValue(def);
-		input.setMinDate(min_date);
-		input.setMaxDate(max_date);
+		input.setMin(min_date);
+		input.setMax(max_date);
 		f.addInput(MoveDateTransition.DATE_FIELD, label, input);
 		if( move_split ){
 			f.addInput(MoveDateTransition.MOVE_SPLIT_FIELD,"Move boundary with neighbour",new BooleanInput());

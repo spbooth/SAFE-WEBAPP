@@ -35,7 +35,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  */
 
 
-public class TimeStampMultiInput extends AbstractCalendarMultiInput implements ParseInput<Date>, BoundedInput<Date> {
+public class TimeStampMultiInput extends AbstractCalendarMultiInput implements ParseInput<Date>, BoundedDateInput {
 	private final long resolution;
 
     private final DateFormat df;

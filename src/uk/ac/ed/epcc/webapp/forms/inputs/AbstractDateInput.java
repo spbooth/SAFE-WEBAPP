@@ -38,7 +38,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  * @author spb
  *
  */
-public abstract class AbstractDateInput extends ParseAbstractInput<Date> implements BoundedInput<Date>, FormatHintInput {
+public abstract class AbstractDateInput extends ParseAbstractInput<Date> implements BoundedDateInput, FormatHintInput {
 	DateFormat df[];
     Date min=null;
     Date max=null;

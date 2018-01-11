@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.model.period;
 import java.util.Date;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.forms.inputs.BoundedDateInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TimeStampMultiInput;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 /** Interface for class that can split {@link TimePeriod}s
@@ -30,7 +31,7 @@ public interface SplitManager<T extends TimePeriod> {
 	 * 
 	 * @return
 	 */
-	public abstract TimeStampMultiInput getDateInput();
+	public abstract BoundedDateInput getDateInput();
 
 	/** Validate a proposed split. The location of the split within the period is validated 
 	 * explicitly. This is for additional constraints specific to the class logic.

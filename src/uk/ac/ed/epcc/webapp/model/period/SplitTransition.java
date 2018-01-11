@@ -23,7 +23,7 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.forms.inputs.TimeStampMultiInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.BoundedDateInput;
 import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
@@ -120,10 +120,13 @@ public class SplitTransition<T extends TimePeriod,K> extends AbstractFormTransit
 		cal.set(Calendar.HOUR_OF_DAY,0);
 		cal.set(Calendar.DAY_OF_MONTH,1);
 		cal.add(Calendar.MONTH,1);
-		TimeStampMultiInput input = fac.getDateInput();
+		BoundedDateInput input = fac.getDateInput();
 		input.setValue(cal.getTime());
+		input.setMin(start);
+		input.setMax(end);
 		f.addInput("Date", "Split date", input );
-		
+		// This ensures within the range were min/max allow
+		// values on the boundary
 		f.addValidator(new RangeValidator("Date", 
 					start,
 					end));
