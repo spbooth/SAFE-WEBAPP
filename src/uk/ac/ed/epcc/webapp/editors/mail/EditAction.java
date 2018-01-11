@@ -23,7 +23,10 @@ package uk.ac.ed.epcc.webapp.editors.mail;
  * @author spb
  *
  */
-public enum EditAction{
+
+import uk.ac.ed.epcc.webapp.servlet.ViewTransitionKey;
+
+public enum EditAction implements ViewTransitionKey<MailTarget>{
 	Edit,
 	EditSubject,
 	Update,
@@ -38,11 +41,22 @@ public enum EditAction{
 	AddCC,
 	AddTo,
 	AddBcc,
-	Serve,
+	Serve{
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.editors.mail.EditAction#isNonModifying(uk.ac.ed.epcc.webapp.editors.mail.MailTarget)
+		 */
+		@Override
+		public boolean isNonModifying(MailTarget target) {
+			// Serve is accessed by link but does not modify
+			return true;
+		}
+		
+	},
 	AddAttachment,
 	Upload,
 	New;
-	private final String help;
+	private final String help; 
 	private EditAction(String h){
 		help=h;
 	}
@@ -51,5 +65,12 @@ public enum EditAction{
 	}
 	public String getHelp(){
 		return help;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.servlet.ViewTransitionKey#isNonModifying(java.lang.Object)
+	 */
+	@Override
+	public boolean isNonModifying(MailTarget target) {
+		return false;
 	}
 }
