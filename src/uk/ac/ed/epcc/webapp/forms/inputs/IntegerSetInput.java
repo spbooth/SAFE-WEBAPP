@@ -58,6 +58,19 @@ public class IntegerSetInput extends IntegerInput implements ListInput<Integer,I
 	}
 
 	public Iterator<Integer> getItems() {
+		Number min = getMin();
+		Number max = getMax();
+		if( min != null || max != null) {
+			// return items that are in range
+			LinkedHashSet<Integer> tmp = new LinkedHashSet<>();
+			for(Integer i : values) {
+				if( (min == null || i.intValue() >= min.intValue()) &&
+					(max == null || i.intValue() <= max.intValue())) {
+					tmp.add(i);
+				}
+			}
+			return tmp.iterator();
+		}
 		return values.iterator();
 	}
 	public int getCount(){

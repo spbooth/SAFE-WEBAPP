@@ -23,6 +23,7 @@ import java.util.Date;
  */
 public abstract class AbstractCalendarMultiInput extends MultiInput<Date, Input<Integer>> implements ParseInput<Date>,BoundedInput<Date> {
 
+	protected final int max_field;
 	protected final IntegerRangeInput hour_input;
 	protected final IntegerRangeInput min_input;
 	protected final IntegerRangeInput sec_input;
@@ -35,6 +36,7 @@ public abstract class AbstractCalendarMultiInput extends MultiInput<Date, Input<
 	 */
 	public AbstractCalendarMultiInput(int max_field) {
 		super();
+		this.max_field=max_field;
 		NumberFormat nf = NumberFormat.getIntegerInstance();
     	nf.setMinimumIntegerDigits(2);
     	nf.setMaximumIntegerDigits(2);

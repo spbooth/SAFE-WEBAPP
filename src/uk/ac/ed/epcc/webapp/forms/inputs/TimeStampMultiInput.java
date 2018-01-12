@@ -132,11 +132,13 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements P
 	public Date setMinDate(Date d){
 		Date old = min_date;
 		min_date=d;
+		setBounds();
 		return old;
 	}
 	public Date setMaxDate(Date d){
 		Date old = max_date;
 		max_date=d;
+		setBounds();
 		return old;
 	}
 	public void parse(String v) throws ParseException {
@@ -172,9 +174,15 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements P
 		super.validate();
 		Date val = getValue();
 		if( min_date != null && min_date.after(val)){
+			if( (min_date.getTime() - val.getTime()) < 1000L  ) {
+				// This is a boundary case min and value will format the same
+				// even though min is technically after value
+				throw new ValidateException("Must be after "+df.format(min_date));
+			}
 			throw new ValidateException("Before "+df.format(min_date));
 		}
 		if( max_date != null && max_date.before(val)){
+			// boundary ok as will format as day before
 			throw new ValidateException("After "+df.format(max_date));
 		}
 	}
@@ -205,6 +213,50 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements P
 	@Override
 	public Date setMin(Date val) {
 		return setMinDate(val);
+	}
+	protected void setBounds() {
+		if( min_date == null && max_date == null ) {
+			year_input.setMin(null);
+			month_input.setMin(null);
+			day_input.setMin(null);
+			year_input.setMax(null);
+			month_input.setMax(null);
+			day_input.setMax(null);
+			return;
+		}
+		Calendar min_cal=null;
+		Calendar max_cal=null;
+		if( min_date != null) {
+			min_cal = Calendar.getInstance();
+			min_cal.setTime(min_date);
+			year_input.setMin(min_cal.get(Calendar.YEAR));
+		}else {
+			year_input.setMin(null);
+			month_input.setMin(null);
+			day_input.setMin(null);
+		}
+		if( max_date != null) {
+			max_cal = Calendar.getInstance();
+			max_cal.setTime(max_date);
+			year_input.setMax(max_cal.get(Calendar.YEAR));
+		}else {
+			year_input.setMax(null);
+			month_input.setMax(null);
+			day_input.setMax(null);
+		}
+		// if same year set month min/max
+		if( min_cal != null && max_cal != null && min_cal.get(Calendar.YEAR) == max_cal.get(Calendar.YEAR)) {
+			int min_month = min_cal.get(Calendar.MONTH);
+			month_input.setMin(min_month);
+			int max_month = max_cal.get(Calendar.MONTH);
+			month_input.setMax(max_month);
+			if(min_month == max_month) {
+				day_input.setMin(min_cal.get(Calendar.DAY_OF_MONTH));
+				day_input.setMax(max_cal.get(Calendar.DAY_OF_MONTH));
+			}
+			
+		}
+		
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput#setMax(java.lang.Object)

@@ -117,8 +117,8 @@ public class SplitTransition<T extends TimePeriod,K> extends AbstractFormTransit
 		BoundedDateInput input = fac.getDateInput();
 		
 		input.setValue(guess);
-		input.setMin(start);
-		input.setMax(end);
+		input.setMin(new Date(start.getTime()+1));
+		input.setMax(new Date(end.getTime()-1));
 		f.addInput("Date", "Split date", input );
 		// This ensures within the range were min/max allow
 		// values on the boundary
