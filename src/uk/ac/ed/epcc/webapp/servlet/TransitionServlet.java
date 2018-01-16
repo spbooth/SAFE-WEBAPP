@@ -36,8 +36,12 @@ import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AnonymousTransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.DefaultingTransitionFactory;
+import uk.ac.ed.epcc.webapp.forms.transition.DirectTargetlessTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.DirectTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.PathTransitionProvider;
+import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
@@ -45,6 +49,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryFinder;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
+import uk.ac.ed.epcc.webapp.forms.transition.ValidatingFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -586,7 +591,44 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		// Check that MODIFY_ON_POST check will pass
 		if( operation != null ) {
 			if( (! (operation instanceof ViewTransitionKey)) || ! ((ViewTransitionKey) operation).isNonModifying(target)) {
-				c.getService(LoggerService.class).getLogger(TransitionServlet.class).error("Link to modifying transition "+url);
+				// Not permitted to link to a direct transition should use a post form.
+				// generate an error if we display the link don't wait
+				// for user to click on it.
+				try {
+					tp.getTransition(target, operation).getResult(new TransitionVisitor<B>() {
+
+						@Override
+						public FormResult doDirectTransition(DirectTransition<B> t) throws TransitionException {
+							throw new TransitionException("Direct Transition");
+						}
+
+						@Override
+						public FormResult doDirectTargetlessTransition(DirectTargetlessTransition<B> t)
+								throws TransitionException {
+							throw new TransitionException("DirectTargetless Transition");
+						}
+
+						@Override
+						public FormResult doFormTransition(FormTransition<B> t) throws TransitionException {
+							// form transition will display form page
+							return null;
+						}
+
+						@Override
+						public FormResult doValidatingFormTransition(ValidatingFormTransition<B> t)
+								throws TransitionException {
+							return null;
+						}
+
+						@Override
+						public FormResult doTargetLessTransition(TargetLessTransition<B> t) throws TransitionException {
+							return null;
+						}
+					});
+				} catch (Throwable e) {
+					c.getService(LoggerService.class).getLogger(TransitionServlet.class).error("Link to modifying transition "+url,e);
+				}
+				
 			}
 		}
 		hb.open("a");
