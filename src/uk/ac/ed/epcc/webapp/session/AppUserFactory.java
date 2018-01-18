@@ -392,6 +392,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		if( name == null || name.trim().length() == 0){
 			return null;
 		}
+		name = name.trim();
 		try {
 			return find(getStringFinderFilter(name));
 		}catch(DataNotFoundException e){

@@ -127,6 +127,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 					message(conn, req, res, "no_email_specified");
 					return;
 				}
+				username=username.trim();
 				T user = person_fac
 						.findFromString(username);
 				// User can supply any of their valid ids not just email.
