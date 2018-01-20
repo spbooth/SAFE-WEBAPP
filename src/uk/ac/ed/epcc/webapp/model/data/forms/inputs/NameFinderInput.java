@@ -49,13 +49,25 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	private final BaseFilter<T> autocomplete;
 	@Override
 	public void parse(String v) throws ParseException {
+		if( v == null || v.trim().isEmpty()) {
+			setItem(null);
+			return;
+		}
 		factory.validateNameFormat(v);
 		try{
+			T target=null;
 			if( create){
-				setItem(factory.makeFromString(v));
+				target=factory.makeFromString(v);
 			}else{
-				setItem(factory.findFromString(v));
+				target=factory.findFromString(v);
+				
 			}
+			if(target == null) {
+				throw new ParseException("Not found");
+			}
+			setItem(target);
+		}catch(ParseException p) {
+			throw p;
 		}catch(Exception e){
 			throw new ParseException(e);
 		}

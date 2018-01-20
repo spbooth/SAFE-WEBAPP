@@ -25,6 +25,14 @@ import uk.ac.ed.epcc.webapp.servlet.ServletService;
  *
  */
 public class MenuVisitor implements Visitor{
+	/**
+	 * 
+	 */
+	private static final String LIST_SUFFIX = "_list";
+	/**
+	 * 
+	 */
+	private static final String MENU_ID_PREFIX = "menu_";
 	private final AppContext conn;
 	private final HtmlBuilder builder;
 	public static final Feature MULTI_LEVEL_MENU_FEATURE=new Feature("navigation.multi_level_menu",false,"Should navigation menus support multiple levels");
@@ -52,14 +60,14 @@ public class MenuVisitor implements Visitor{
 				// at top id goes on the list for sub-nodes it is the node itself
 				String id = container.getID();
 				if( id != null ){
-					builder.attr("id",id);
+					builder.attr("id",MENU_ID_PREFIX+id);
 				}
 			}else{
 				//builder.attr("role","menu");
 				//builder.attr("aria-hidden","true");
 				String id = container.getID();
 				if( id != null ){
-					builder.attr("id",id+"_list");
+					builder.attr("id",MENU_ID_PREFIX+id+LIST_SUFFIX);
 				}
 			}
 			
@@ -119,7 +127,7 @@ public class MenuVisitor implements Visitor{
 		}
 		String id = node.getID();
 		if( id != null){
-			builder.attr("id",id);
+			builder.attr("id",MENU_ID_PREFIX+id);
 		}
 		if( targetPath != null ){
 			

@@ -655,13 +655,16 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 		if(suggestions!=null){
 			for(T item : suggestions){
 				String value = input.getValue(item);
-				String text = input.getSuggestionText(item);
-				result.open("option");
-				result.attr("value", value);
-				if( ! text.equals(value)){
-					result.clean(text);
+				if( value != null && ! value.isEmpty()) {
+					String text = input.getSuggestionText(item).trim();
+					value=value.trim();
+					result.open("option");
+					result.attr("value", value);
+					if( ! text.equals(value)){
+						result.clean(text);
+					}
+					result.close();
 				}
-				result.close();
 			}
 		}
 		result.close(); // select

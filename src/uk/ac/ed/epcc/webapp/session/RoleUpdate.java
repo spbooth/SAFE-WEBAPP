@@ -39,7 +39,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 public  class RoleUpdate<U extends AppUser> implements Contexed, StandAloneFormUpdate<U>, IndexedProducer<U>{
     public static final String ROLE_LIST_CONFIG = "role_list";
-	private static final String PERSON = "Person";
+	private static final String PERSON = "RoleOwner";
 	AppUserFactory<U> fac;
     SessionService<U> serv;
     @SuppressWarnings("unchecked")
@@ -48,7 +48,7 @@ public  class RoleUpdate<U extends AppUser> implements Contexed, StandAloneFormU
     	fac =serv.getLoginFactory();
     }
 	public void buildSelectForm(Form f, String label, U dat) {
-		f.addInput(PERSON, PERSON, fac.getInput());
+		f.addInput(PERSON, "Role owner", fac.getInput());
 	}
 
 	public Set<String> getRoles(){

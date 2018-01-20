@@ -8,4 +8,13 @@ function(){
         dateFormat: 'yy-mm-dd'
     });
   }
+  
+  if (!Modernizr.input.list) {
+	  jQuery('input[list]').each(function () {
+          var availableTags = jQuery('#' + $(this).attr("list")).find('option').map(function () {
+              return this.value;
+          }).get();
+          jQuery(this).autocomplete({ source: availableTags });
+       });
+  }
 });

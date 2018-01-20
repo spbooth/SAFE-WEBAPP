@@ -15,7 +15,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.util.Set;
 
-/** Interface for i
+/** Interface for inputs that provide auto-complete text.
  * @author spb
  *
  * @param <T> item type

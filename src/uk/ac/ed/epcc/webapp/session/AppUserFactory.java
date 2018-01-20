@@ -61,6 +61,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataCache;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.PatternArg;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory.DataObjectInput;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -73,6 +74,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NameFinderInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedDataCache;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.RemoteAuthServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
@@ -107,7 +109,7 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 	public static final String BOOTSTRAP_ROLE_PROPERTY = "bootstrap-role";
 
 	public static final Feature REQUIRE_PERSON_UPDATE_FEATURE = new Feature("require-person-update",false,"require person update if needed");
-	
+	 public static final Feature AUTO_COMPLETE_APPUSER_INPUT = new Preference("app_user.autocomplete_input",false,"Use auto-complete input as the default person input");
 	public static final String ALLOW_EMAIL_FIELD ="AllowEmail";
 	
     
@@ -479,6 +481,27 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		}
 		
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getInput()
+	 */
+	@Override
+	public DataObjectItemInput<AU> getInput() {
+		if( useAutoCompleteForSelect()) {
+			//return getNameInput(getFinalSelectFilter(),false, restrictDefaultInput() );
+			return getNameInput(getFinalSelectFilter(),false, restrictDefaultInput() );
+		}
+		return super.getInput();
+	}
+	/** Are we using an auto-complete input for {@link #getInput()}
+	 * 
+	 * If this is true and {@link #restrictDefaultInput()} also returns true
+	 * we can afford to be more restritive in the default filter applied
+	 * @return
+	 */
+	protected boolean useAutoCompleteForSelect() {
+		return AUTO_COMPLETE_APPUSER_INPUT.isEnabled(getContext());
+	}
+	
 	public final DataObjectItemInput<AU> getNameInput(BaseFilter<AU> fil,boolean create,boolean restrict){
 		return new AppUserNameInput<AU>(this, create, restrict, fil);
 	}
