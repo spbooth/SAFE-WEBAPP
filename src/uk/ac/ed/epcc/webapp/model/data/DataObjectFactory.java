@@ -1371,7 +1371,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * match the select filter are still valid.
 	 */
 	public DataObjectItemInput<BDO> getInput() {
-		return new DataObjectInput(getFinalSelectFilter(),restrictDefaultInput());
+		return getInput(getFinalSelectFilter(),restrictDefaultInput());
 	}
 	
 	/** Create an {@link Input} from a filter
@@ -1380,9 +1380,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return {@link DataObjectItemInput}
 	 */
 	public final DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil){
-		return new DataObjectInput(fil);
+		return getInput(fil,true);
 	}
-	public final DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil,boolean restrict){
+	public DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil,boolean restrict){
 		return new DataObjectInput(fil,restrict);
 	}
 	public class FilterSelector implements Selector<DataObjectItemInput<BDO>>{

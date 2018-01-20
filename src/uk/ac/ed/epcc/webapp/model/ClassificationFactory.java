@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model;
 
+import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
@@ -69,6 +71,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 public class ClassificationFactory<T extends Classification> extends TableStructureDataObjectFactory<T> implements Comparable<ClassificationFactory>, NameFinder<T>,NameInputProvider{
+	
 	/** Maximum size of pull-down menu in update form.
 	 * 
 	 */
@@ -337,12 +340,15 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 		@Override
 		public DataObjectItemInput<C> getSelectInput() {
 			try{
-				if( getClassificationFactory().getCount(getClassificationFactory().getSelectFilter()) < CLASSIFICATION_MAX_MENU){
+				ClassificationFactory<C> cf = getClassificationFactory();
+				if( cf.getCount(cf.getSelectFilter()) < CLASSIFICATION_MAX_MENU){
 
-
+					if( cf.useAutoCompleteInput()) {
+						return cf.getInput();
+					}
 					DataObjectAlternateInput<C, DataObjectItemParseInput<C>> input = new DataObjectAlternateInput<C, DataObjectItemParseInput<C>>();
 					input.addInput("Menu", "Select ", super.getSelectInput());
-					input.addInput("Name", " or specify name ", getClassificationFactory().new NameItemInput());
+					input.addInput("Name", " or specify name ", cf.new NameItemInput());
 					return input;
 				}
 			}catch(Exception e){
@@ -450,4 +456,25 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 		}
 	}
 	
+	public boolean useAutoCompleteInput() {
+		if( Feature.checkDynamicFeature(getContext(), getConfigTag()+".autocomplete", false)) {
+			return true;
+		}
+		try {
+			return getCount(getFinalSelectFilter()) > getContext().getIntegerParameter(getConfigTag()+".max_pulldown", 100);
+		} catch (DataException e) {
+			getLogger().error("Error checking option count", e);
+			return false;
+		}
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getInput()
+	 */
+	@Override
+	public DataObjectItemInput<T> getInput() {
+		if( useAutoCompleteInput()) {
+			return new NameFinderInput<>(this, false, restrictDefaultInput(), getFinalSelectFilter());
+		}
+		return super.getInput();
+	}
 }
