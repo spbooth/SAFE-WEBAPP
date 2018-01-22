@@ -343,7 +343,7 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 				ClassificationFactory<C> cf = getClassificationFactory();
 				if( cf.getCount(cf.getSelectFilter()) < CLASSIFICATION_MAX_MENU){
 
-					if( cf.useAutoCompleteInput()) {
+					if( cf.useAutoCompleteInput(cf.getFinalSelectFilter())) {
 						return cf.getInput();
 					}
 					DataObjectAlternateInput<C, DataObjectItemParseInput<C>> input = new DataObjectAlternateInput<C, DataObjectItemParseInput<C>>();
@@ -439,7 +439,7 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 	public String getCanonicalName(T object) {
 		return object.getName();
 	}
-	public final DataObjectItemInput<T> getNameInput(BaseFilter<T> fil,boolean create,boolean restrict){
+	public final DataObjectItemInput<T> getAutocompleteInput(BaseFilter<T> fil,boolean create,boolean restrict){
 		NameFinderInput<T, ClassificationFactory<T>> input = new NameFinderInput<T,ClassificationFactory<T>>(this, create, restrict, fil);
 		return input;
 	}
@@ -456,12 +456,12 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 		}
 	}
 	
-	public boolean useAutoCompleteInput() {
-		if( Feature.checkDynamicFeature(getContext(), getConfigTag()+".autocomplete", false)) {
-			return true;
+	public boolean useAutoCompleteInput(BaseFilter<T> fil) {
+		if( Feature.checkDynamicFeature(getContext(), getConfigTag()+".use_list_input", false)) {
+			return false;
 		}
 		try {
-			return getCount(getFinalSelectFilter()) > getContext().getIntegerParameter(getConfigTag()+".max_pulldown", 100);
+			return getCount(fil) > getContext().getIntegerParameter(getConfigTag()+".max_pulldown", 100);
 		} catch (DataException e) {
 			getLogger().error("Error checking option count", e);
 			return false;
@@ -471,9 +471,9 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getInput()
 	 */
 	@Override
-	public DataObjectItemInput<T> getInput() {
-		if( useAutoCompleteInput()) {
-			return new NameFinderInput<>(this, false, restrictDefaultInput(), getFinalSelectFilter());
+	public DataObjectItemInput<T> getInput(BaseFilter<T> fil, boolean restrict) {
+		if( useAutoCompleteInput(fil)) {
+			return new NameFinderInput<>(this, false, restrict, fil);
 		}
 		return super.getInput();
 	}
