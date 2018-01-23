@@ -181,7 +181,7 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 	 * @return boolean
 	 */
 	protected boolean allowNameChange(){
-		return false;
+		return getContext().getBooleanParameter(getConfigTag()+".allow_name_change", false);
 	}
 	
 	protected boolean allowSpacesInName(){

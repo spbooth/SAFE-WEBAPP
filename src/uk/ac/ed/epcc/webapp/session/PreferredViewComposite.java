@@ -15,10 +15,11 @@ package uk.ac.ed.epcc.webapp.session;
 
 import java.util.Map;
 import java.util.Set;
-
-import uk.ac.ed.epcc.webapp.forms.inputs.URLInput;
-import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
+import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.model.Classification;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
 
 /** An {@link AppUserComposite} that returns an optional  preferred view for 
  * {@link AppUser}s. This is when there are multiple flavours of an applications
@@ -38,7 +39,7 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 	/**
 	 * 
 	 */
-	private static final String SERVICE_SAF_URL = "service.saf.url";
+	
 	private static final String PREFERRED_VIEW_PROP = "prefered_view_default";
 	public static final String PREFERRED_VIEW = "PreferredView";
 
@@ -46,6 +47,16 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 		super(fac);
 	}
 	
+	PreferedViewFactory pvf= null;
+	private PreferedViewFactory getViewFactory() {
+		if( pvf == null) {
+			pvf=getContext().makeObject(PreferedViewFactory.class, PREFERRED_VIEW);
+		}
+		return pvf;
+	}
+	private IndexedTypeProducer<PreferedView, PreferedViewFactory> getProducer(){
+		return new IndexedTypeProducer<PreferedView, PreferedViewFactory>(getContext(), PREFERRED_VIEW, getViewFactory());
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#getType()
 	 */
@@ -56,7 +67,7 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 
 	@Override
 	public TableSpecification modifyDefaultTableSpecification(TableSpecification spec, String table) {
-		spec.setOptionalField(PREFERRED_VIEW, new StringFieldType(true, "", 255));
+		spec.setOptionalField(PREFERRED_VIEW, new IntegerFieldType(true, null));
 		return spec;
 	}
 
@@ -84,17 +95,18 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 
 	@Override
 	public Map<String, Object> addSelectors(Map<String, Object> selectors) {
-		URLInput ti = new URLInput();
-		selectors.put(PREFERRED_VIEW, ti);
+		
+		selectors.put(PREFERRED_VIEW, getViewFactory());
 		return selectors;
 	}
 	
-	public String getPreferredView(AU person) {
-		return getRecord(person).getStringProperty(PREFERRED_VIEW);
+	public PreferedView getPreferredView(AU person) {
+		return  getRecord(person).getProperty(getProducer());
 	}
 	
-	public void setPreferredView(AU person, String prefview) {
-		getRecord(person).setOptionalProperty(PREFERRED_VIEW, prefview);
+	public void setPreferredView(AU person, PreferedView c) {
+		getRecord(person).setOptionalProperty(getProducer(),c);
+		
 	}
 
 	/* (non-Javadoc)
@@ -102,15 +114,30 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 	 */
 	@Override
 	public Map<String, Object> addDefaults(Map<String, Object> defaults) {
-		defaults.put(PREFERRED_VIEW, getDefaultView());
+
+		PreferedView c = getDefaultView();
+		if( c != null ) {
+			defaults.put(PREFERRED_VIEW, c.getID());
+		}
+
+
 		return super.addDefaults(defaults);
 	}
 
 	/**
 	 * @return
 	 */
-	public String getDefaultView() {
-		return getContext().getExpandedProperty(PREFERRED_VIEW_PROP,"");
+	public PreferedView getDefaultView() {
+		String url = getContext().getExpandedProperty(PREFERRED_VIEW_PROP,"");
+		if( url == null || url.isEmpty()) {
+			return null;
+		}
+		try {
+			return getViewFactory().makeFromString(url);
+		} catch (DataFault e) {
+			getLogger().error("Error getting default view", e);
+			return null;
+		}
 	}
 
 	/* (non-Javadoc)
@@ -118,7 +145,9 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 	 */
 	@Override
 	public void newSignup(AU user) throws Exception {
-		setPreferredView(user, getDefaultView());
+		PreferedView dv = getDefaultView();
+		setPreferredView(user, dv);
+		
 	}
 
 	/* (non-Javadoc)
@@ -129,9 +158,10 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 		if( user == null ) {
 			return;
 		}
-		String preferredView = getPreferredView(user);
-		if( preferredView != null && ! preferredView.isEmpty()) {
-			params.put(SERVICE_SAF_URL,preferredView);
+		PreferedView preferredView = getPreferredView(user);
+		if( preferredView != null ) {
+			// This allows sub-classes to set more params.
+			preferredView.addEmailParams(params);
 		}
 		
 	}
