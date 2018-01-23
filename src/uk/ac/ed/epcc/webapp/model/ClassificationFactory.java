@@ -475,6 +475,6 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 		if( useAutoCompleteInput(fil)) {
 			return new NameFinderInput<>(this, false, restrict, fil);
 		}
-		return super.getInput();
+		return super.getInput(fil,restrict);
 	}
 }
