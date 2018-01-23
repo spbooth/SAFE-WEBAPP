@@ -1185,6 +1185,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 	}
 	public Integer getIndex(BDO value) {
+		if( value == null ) {
+			return null;
+		}
 		return value.getID();
 	}
 

@@ -106,7 +106,6 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 	
 	public void setPreferredView(AU person, PreferedView c) {
 		getRecord(person).setOptionalProperty(getProducer(),c);
-		
 	}
 
 	/* (non-Javadoc)

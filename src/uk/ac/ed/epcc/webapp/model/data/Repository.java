@@ -1361,6 +1361,10 @@ public final class Repository implements AppContextCleanup{
     	 *            The Value to set.
     	 */
     	public final <F,D> void setOptionalProperty(TypeProducer<? super F,D> t, F v) {
+    		if( v == null ) {
+    			setOptionalProperty(t.getField(), null);
+    			return;
+    		}
     		D tag = t.getIndex(v);
     		if (tag != null) {
     			setOptionalProperty(t.getField(), tag);
