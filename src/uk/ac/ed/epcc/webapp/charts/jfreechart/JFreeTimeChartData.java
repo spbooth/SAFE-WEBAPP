@@ -279,13 +279,13 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 		if( nsplit <= 1){
 			use_bar=true;
 		}
-		if( period.getNsplit() == 1){
-			// old chart2D classes had to have 2 splits
-			// keep minimum number of plots the same
-			this.nsplits=2*nsplit;
-		}else{
+//		if( period.getNsplit() == 1){
+//			// old chart2D classes had to have 2 splits
+//			// keep minimum number of plots the same
+//			this.nsplits=2*nsplit;
+//		}else{
 			this.nsplits=nsplit;
-		}
+//		}
 	}
 
 
