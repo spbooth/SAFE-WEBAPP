@@ -269,7 +269,7 @@ public abstract class ServletTest extends WebappTestBase{
 	 * @param type
 	 */
 	public void runConfirm(String type, boolean response){
-		ResourceBundle mess = ResourceBundle.getBundle("confirm");
+		ResourceBundle mess = getContext().getService(MessageBundleService.class).getBundle("confirm");
 		
 		assertNotNull(mess.getString(type+".title"));
 		assertNotNull(mess.getString(type+".text"));

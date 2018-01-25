@@ -13,35 +13,27 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.Map;
 
 import javax.servlet.ServletException;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.junit.Before;
 
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.TestDataHelper;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
-import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.MapForm;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
-import uk.ac.ed.epcc.webapp.forms.result.CustomPage;
 import uk.ac.ed.epcc.webapp.forms.transition.BaseFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.CustomFormContent;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
-import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.NavigationProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.PathTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.ShowDisabledTransitions;
@@ -51,12 +43,8 @@ import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
-import uk.ac.ed.epcc.webapp.mock.MockRequest;
-import uk.ac.ed.epcc.webapp.mock.MockResponse;
 import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
-import uk.ac.ed.epcc.webapp.model.data.XMLDataUtils;
 import uk.ac.ed.epcc.webapp.session.SessionService;
-import static org.junit.Assert.*;
 /** A Customised version {@link ServletTest} for testing the
  * {@link TransitionServlet}. Many different operations use {@link Transition}s
  * this can be used to build high level tests of them.
@@ -102,6 +90,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		StringBuilder path = new StringBuilder();
 		path.append(provider.getTargetName());
 		TransitionFactory<K,T> prov2 = TransitionServlet.getProviderFromName(getContext(), provider.getTargetName());
+		assertNotNull("Provider not registered "+provider.getTargetName(),prov2);
 		assertEquals("Provider targetName does not generate same class",provider.getClass(), prov2.getClass());
 		assertEquals("generated provider does not produce same target name", provider.getTargetName(),prov2.getTargetName());
 		if( target != null ){
@@ -204,6 +193,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	public <K,T> void checkViewForward(ViewTransitionFactory<K, T> provider, T target){
 		checkAttributes(provider, null, target);
 		checkForward("/scripts/view_target.jsp");
+		resetRequest(); // if we are continuing its via a new transition
 	}
 	
 	/** This is the normal view result. These should always redirect to the canonical url to

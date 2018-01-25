@@ -118,6 +118,10 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	@Override
 	public void validate() throws FieldException {
 		super.validate();
+		if( getValue() == null) {
+			// optional input
+			return;
+		}
 		if( restrict){
 			if( ! this.factory.matches(autocomplete, getItem())){
 				throw new ValidateException("Input does not match required filter");

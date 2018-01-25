@@ -25,7 +25,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
-/**
+/** Tests of the TransitionServlet itself (not transitions)
  * @author spb
  *
  */
