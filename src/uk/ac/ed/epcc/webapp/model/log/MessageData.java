@@ -20,10 +20,15 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageProvider;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Removable;
+import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.mail.MessageDataObject;
 /** Table to hold message data
@@ -41,6 +46,42 @@ import uk.ac.ed.epcc.webapp.model.mail.MessageDataObject;
 
 
 public class MessageData extends MessageDataObject implements MessageProvider , Removable{
+	/** A Factory for {@link MessageData}
+	 * 
+	 * This is not actually needed by the application but makes the
+	 * tests easier to write as these rely on a handler factory
+	 * 
+	 * @author spb
+	 *
+	 * @param <M>
+	 */
+	public static class Factory<M extends MessageData> extends DataObjectFactory<M>{
+		public Factory(AppContext c,String table){
+    		setContext(c,table);
+    	}
+    	@Override
+		protected TableSpecification getDefaultTableSpecification(AppContext c, String table){
+			return MessageDataObject.getTableSpecification();
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
+		 */
+		@Override
+		protected DataObject makeBDO(Record res) throws DataFault {
+			
+			return new MessageData(res);
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getTarget()
+		 */
+		@Override
+		public Class<? super M> getTarget() {
+			return MessageData.class;
+		}
+		
+	}
+	
 	public static final String DEFAULT_TABLE = "MailMessage";
 
 	
@@ -55,7 +96,9 @@ public class MessageData extends MessageDataObject implements MessageProvider , 
 			serv.createTable(DEFAULT_TABLE, getTableSpecification());
 		}
 	}
-	
+	public MessageData(Record rec) {
+		super(rec);
+	}
 	public MessageData(AppContext conn, int id) throws DataException {
 		super(getRecord(conn,DEFAULT_TABLE, id));
 	}

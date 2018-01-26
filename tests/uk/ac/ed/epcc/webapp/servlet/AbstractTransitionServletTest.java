@@ -85,7 +85,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	 * @throws TransitionException 
 	 */
 	public <K,T> void setTransition(TransitionFactory<K, T> provider, K key, T target) throws TransitionException{
-		
+		resetRequest();
 		req.servlet_path="TransitionServlet";
 		StringBuilder path = new StringBuilder();
 		path.append(provider.getTargetName());
@@ -193,7 +193,6 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	public <K,T> void checkViewForward(ViewTransitionFactory<K, T> provider, T target){
 		checkAttributes(provider, null, target);
 		checkForward("/scripts/view_target.jsp");
-		resetRequest(); // if we are continuing its via a new transition
 	}
 	
 	/** This is the normal view result. These should always redirect to the canonical url to
@@ -362,11 +361,15 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		HtmlBuilder builder = new HtmlBuilder();
 		builder.setValidXML(true);
 		builder.open("view_page");
-		String name = req.path_info;
-		if( name.contains("/")){
-			name = name.substring(0, name.indexOf('/'));
+		
+		TransitionFactory<K, T> tp = (TransitionFactory<K, T>) req.getAttribute(TransitionServlet.TRANSITION_PROVIDER_ATTR);
+		if( tp == null) {
+			String name = req.path_info;
+			if( name.contains("/")){
+				name = name.substring(0, name.indexOf('/'));
+			}
+			tp = TransitionServlet.getProviderFromName(getContext(), name);
 		}
-		TransitionFactory<K, T> tp = TransitionServlet.getProviderFromName(getContext(), name);
 			Object target =   TransitionServlet.getTarget(getContext(),tp,req); // This looks in the attribute
 		    if( target == null ){
 		    	// do things the hard way as per TransitionsServlet

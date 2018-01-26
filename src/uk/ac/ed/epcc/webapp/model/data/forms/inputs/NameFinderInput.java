@@ -9,6 +9,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.AutoComplete;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -16,6 +17,7 @@ import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 /** An {@link DataObjectItemInput} for {@link NameFinder} factories.
  * 
@@ -122,8 +124,13 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 			// optional input
 			return;
 		}
+		T item = getItem();
+		if( item == null) {
+			throw new ValidateException("Value does not correspond to item");
+		}
 		if( restrict){
-			if( ! this.factory.matches(autocomplete, getItem())){
+			
+			if( ! this.factory.matches(autocomplete, item)){
 				throw new ValidateException("Input does not match required filter");
 			}
 		}
@@ -155,6 +162,36 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	 */
 	public void setCreate(boolean create) {
 		this.create = create;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AbstractInput#convert(java.lang.Object)
+	 */
+	@Override
+	public Integer convert(Object v) throws TypeError {
+		if( v instanceof DataObject){
+			if( factory.isMine(v)){
+				return Integer.valueOf(((T)v).getID());
+			}else{
+				throw new TypeError("DataObject "+v.getClass().getCanonicalName()+" passed to "+getClass().getCanonicalName());
+			}
+		}
+		if( v instanceof IndexedReference ){
+			if( factory.isMyReference((IndexedReference) v)){
+				return Integer.valueOf(((IndexedReference)v).getID());
+			}else{
+				throw new TypeError("IndexedReference "+v.toString()+" passed to "+getClass().getCanonicalName());
+			}
+		}
+		if( v instanceof Number) {
+			return Integer.valueOf(((Number)v).intValue());
+		}
+		if(v instanceof String) {
+			T item = factory.findFromString((String)v);
+			if( item != null) {
+				return item.getID();
+			}
+		}
+		return super.convert(v);
 	}
 	
 }
