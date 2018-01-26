@@ -34,10 +34,12 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	public static final Feature FOREIGN_KEY_FEATURE=new Feature("foreign-key",false,"Generate foreign keys");
+    public static final Feature FORCE_MYISAM_ON_FULLTEXT_FEATURE=new Feature("mysql.force_myisam_on_fulltext",false,"Always use MyISAM if table contains fulltext index");
 	private final MysqlSQLContext ctx;
 	private final StringBuilder sb;
 	// Keep table in memory if we can only use for unit tests
 	private boolean use_memory=false;
+	private boolean use_myisam=false; // older versions of mysql need this for fulltext
 	private final List<Object> args;
 	public MySqlCreateTableVisitor(MysqlSQLContext ctx,StringBuilder sb, List<Object> args){
 		this.ctx=ctx;
@@ -213,6 +215,9 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 			ctx.quote(sb,name);
 		}
 		sb.append(")");
+		if( FORCE_MYISAM_ON_FULLTEXT_FEATURE.isEnabled(ctx.getContext())) {
+			use_myisam=true;
+		}
 		
 	}
 
@@ -243,8 +248,12 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	 */
 	@Override
 	public void additions(boolean create) {
-		if( create && use_memory){
-			sb.append(" ENGINE=MEMORY");
+		if( create ){
+			if( use_myisam) {
+				sb.append(" ENGINE=MyISAM");
+			}else if( use_memory) {
+				sb.append(" ENGINE=MEMORY");
+			}
 		}
 	}
 	

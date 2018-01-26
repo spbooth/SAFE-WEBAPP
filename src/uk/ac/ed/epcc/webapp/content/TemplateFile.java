@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 
+import uk.ac.ed.epcc.webapp.forms.Identified;
 import uk.ac.ed.epcc.webapp.model.TemplateFinder;
 
 //import uk.ac.hpcx.HpcxMain;
@@ -1020,7 +1021,10 @@ public class TemplateFile {
 			}
 			return;
 		}
-		
+		if( value instanceof Identified) {
+			writePropertyValue(out, name, ((Identified)value).getIdentifier());
+			return;
+		}
 		// Default to String representation
 		writePropertyValue(out,name, value.toString());
 		return;
