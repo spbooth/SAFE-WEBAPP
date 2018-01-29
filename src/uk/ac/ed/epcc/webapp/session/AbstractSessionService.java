@@ -1296,10 +1296,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	protected <T extends DataObject> BaseFilter<? super T> makeDirectRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,A person,BaseFilter<T> def) throws UnknownRelationshipException {
 		// look for directly implemented relations first
 		BaseFilter<? super T> result=null;
-		result = makeNamedFilter(fac2, role);
-	    if( result != null){
-	    	return result;
-	    }
+		
 	    if( person != null || haveCurrentUser()){
 
 	    	if( fac2 instanceof AccessRoleProvider){  // first check factory itself.
@@ -1342,7 +1339,10 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    	// don't pass def as it is the sub-defn that is not resolving
 	    	return makeRelationshipRoleFilter(fac2, defn,person,null);
 	    }
-	   
+	    result = makeNamedFilter(fac2, role);
+	    if( result != null){
+	    	return result;
+	    }
 	    if( def != null){
 	    	return def;
 	    }
@@ -1371,7 +1371,15 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    		return result;
 	    	}
 	    }
-	    // Maybe its a named filter this will translate to a binary filter on the app-user
+	    
+	    
+	 // Its not one of the directly implemented roles maybe its derived
+	    String defn = getContext().getInitParameter(USE_RELATIONSHIP_PREFIX+fac2.getTag()+"."+role);
+	    if( defn != null){
+	    	return makePersonInRelationshipRoleFilter(fac2, defn,target);
+	    }
+	    
+	 // Maybe its a named filter this will translate to a binary filter on the app-user
 	    BaseFilter<? super T> fil = makeNamedFilter(fac2, role);
 	    if( fil != null){
 	    	boolean matches=false;
@@ -1385,12 +1393,6 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    		matches= fac2.matches(fil, target);
 	    	}
 	    	return new GenericBinaryFilter<>(AppUser.class, matches);
-	    }
-	    
-	 // Its not one of the directly implemented roles maybe its derived
-	    String defn = getContext().getInitParameter(USE_RELATIONSHIP_PREFIX+fac2.getTag()+"."+role);
-	    if( defn != null){
-	    	return makePersonInRelationshipRoleFilter(fac2, defn,target);
 	    }
 	    // unrecognised role
 	    throw new UnknownRelationshipException(role);
