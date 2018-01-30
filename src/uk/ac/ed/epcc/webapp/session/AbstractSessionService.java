@@ -58,14 +58,15 @@ import uk.ac.ed.epcc.webapp.model.relationship.RelationshipProvider;
 /** Abstract base implementation of {@link SessionService}
  * <p>
  * A config parameter of the form <b>use_role.<i>role-name</i></b> defines a role-name mapping
- * the value of the parameter is the actual role queried. A comma seperated list of sufficient roles 
+ * the value of the parameter is the actual role queried. A comma separated list of sufficient roles 
  * may also be specified.
  * <p>
  * A role of the form <b><i>tag</i>%<i>rel[@name]</i></b> is possessed by a user if that user
  * has relationship (see below) <i>rel</i> against one of the records from factory constructed using <i>tag</i>.
  * If the optional name-filter  <i>name</i> is specified it must be one of the records that match that filter.
- * 
- * 
+ * <p>
+ * The {@link AppUserFactory} or its {@link Composite}s can provide roles by implementing
+ * {@link StateRoleProvider}. 
  * <p>
  * Relationships are configured via the {@link ConfigService} by setting:
  * <b>use_relationship.<em>factory-tag</em>.<em>relationship</em></b>

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
@@ -37,6 +38,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.LongFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.model.data.DataCache;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.FilterResult;
@@ -83,7 +85,7 @@ public class Dummy3 extends DataObject {
 	public AppUser getPerson(){
 		return (AppUser) getContext().getService(SessionService.class).getLoginFactory().find(record.getNumberProperty(PERSON_ID));
 	}
-    public static class Factory extends DataObjectFactory<Dummy3> implements AccessRoleProvider<AppUser, Dummy3>, NamedFilterProvider<Dummy3>{
+    public static class Factory extends DataObjectFactory<Dummy3> implements AccessRoleProvider<AppUser, Dummy3>, NamedFilterProvider<Dummy3>, NameFinder<Dummy3>{
     	 /**
 		 * 
 		 */
@@ -184,6 +186,62 @@ public class Dummy3 extends DataObject {
 		@Override
 		public boolean providesRelationship(String role) {
 			return role.equals(SELF);
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.ParseFactory#getCanonicalName(java.lang.Object)
+		 */
+		@Override
+		public String getCanonicalName(Dummy3 object) {
+			return object.getName();
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.NameFinder#validateNameFormat(java.lang.String)
+		 */
+		@Override
+		public void validateNameFormat(String name) throws ParseException {
+	
+			
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.NameFinder#findFromString(java.lang.String)
+		 */
+		@Override
+		public Dummy3 findFromString(String name) {
+
+			try {
+				return find(getStringFinderFilter(name),true);
+			} catch (DataException e) {
+				getLogger().error("Error in fingFromString", e);
+				return null;
+			}
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.NameFinder#makeFromString(java.lang.String)
+		 */
+		@Override
+		public Dummy3 makeFromString(String name) throws DataFault, ParseException {
+			
+			return null;
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.NameFinder#getStringFinderFilter(java.lang.String)
+		 */
+		@Override
+		public SQLFilter<Dummy3> getStringFinderFilter(String name) {
+			return new StringFilter(name);
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.NameFinder#getDataCache()
+		 */
+		@Override
+		public DataCache<String, Dummy3> getDataCache() {
+			return new DataCache<String, Dummy3>() {
+				
+				@Override
+				protected Dummy3 find(String key) throws DataException {
+					return findFromString(key);
+				}
+			};
 		}
     }
 }
