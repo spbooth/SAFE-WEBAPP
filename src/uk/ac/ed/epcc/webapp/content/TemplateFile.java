@@ -664,6 +664,18 @@ public class TemplateFile {
 
 		}
 	}
+	public void setProperties(String prefix,Map h) {
+		if( h != null ){
+		for (Object key : h.keySet()) {
+			if( prefix == null) {
+				setProperty(key.toString(), h.get(key));
+			}else {
+				setProperty(prefix+key.toString(), h.get(key));
+			}
+		}
+
+		}
+	}
 	public void setUnsetProperties(Map h) {
 		if( h != null ){
 			for (Object key : h.keySet()) {

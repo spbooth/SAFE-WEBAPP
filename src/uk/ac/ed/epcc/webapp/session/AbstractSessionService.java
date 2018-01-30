@@ -56,29 +56,35 @@ import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.model.relationship.GlobalRoleFilter;
 import uk.ac.ed.epcc.webapp.model.relationship.RelationshipProvider;
 /** Abstract base implementation of {@link SessionService}
- * 
+ * <p>
  * A config parameter of the form <b>use_role.<i>role-name</i></b> defines a role-name mapping
- * the value of the parameter is the actual role queried. 
+ * the value of the parameter is the actual role queried. A comma seperated list of sufficient roles 
+ * may also be specified.
+ * <p>
+ * A role of the form <b><i>tag</i>%<i>rel[@name]</i></b> is possessed by a user if that user
+ * has relationship (see below) <i>rel</i> against one of the records from factory constructed using <i>tag</i>.
+ * If the optional name-filter  <i>name</i> is specified it must be one of the records that match that filter.
  * 
  * 
- * 
+ * <p>
  * Relationships are configured via the {@link ConfigService} by setting:
- * <b>use_relationship.<em>factory-tag</em>.<em>role</em></b>
+ * <b>use_relationship.<em>factory-tag</em>.<em>relationship</em></b>
  * If this is a comma separated list it implies an OR of the component parts.
  * within this AND combinations can be specified as + separated terms.
  * <p>
- * The factory (or its {@link Composite}s) can implement {@link AccessRoleProvider} to provide roles.
+ * The factory (or its {@link Composite}s) can implement {@link AccessRoleProvider} to provide relationships.
  * <p>
- * Roles of the form <i>field</i><b>-></b><i>remote_role</i> denotes a remote filter
- * joined via the reference field <i>field</i> A person has these roles with the target object
- * if they have the <i>remote_role</i> on the object the target references. The remote role must be unqualified.
+ * Roles of the form <i>field</i><b>-></b><i>remote_relationship/i> denotes a remote filter
+ * joined via the reference field <i>field</i> A person has these relationships with the target object
+ * if they have the <i>remote_relationship</i> on the object the target references. The remote relationship must be unqualified.
  * <p>
- * Role names containing a period are qualified names the qualifier can be:
+ * Relationship names containing a period are qualified names the qualifier can be:
  * <ul>
- * <li> <b>global</b> the role is a global role not a relationship.</li>
+ * <li> <b>global</b> the relationship is a global role not a relationship.</li>
  * <li> <b>boolean</b> Use a boolean filter so all/none relationships match.</li>
- * <li> <em>factory-tag</em> un-modified role from factory or a named filter from
- * a {@link NamedFilterWrapper} wrapping the factory.
+ * <li> <em>factory-tag</em> un-modified relationship from factory or a named filter from
+ * a {@link NamedFilterWrapper} wrapping the factory. Named filters resolve true/false depending
+ * on whether any targets exist that match the filter.
  * <li> The tag of a {@link RelationshipProvider} for the target.</li>
  * <li> The tag of a {@link AccessRoleProvider}</li>
  * </ul> 
@@ -902,10 +908,47 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	}
 
 
-	
+	private boolean checkRelationshipRole(A user,String tag, String relationship, String name_filter) {
+		try {
+			DataObjectFactory fac = getContext().makeObject(DataObjectFactory.class, tag);
+			if( fac == null) {
+				error("tag "+tag+" failed to resolve to DataObjectFactory");
+				return false;
+			}
+			AndFilter fil = new AndFilter(fac.getTarget());
+			fil.addFilter(getTargetInRelationshipRoleFilter(fac, relationship, user));
+			if( name_filter != null ) {
+				BaseFilter nf = makeNamedFilter(fac, name_filter);
+				if( nf == null ) {
+					error("Name filter "+name_filter+" failed to resolve on "+tag);
+					return false;
+				}
+				fil.addFilter(nf);
+			}
+			// Does a target object exist which matches the named filter and
+			// the designated relationship
+			return fac.exists(fil);
+		}catch(Throwable t) {
+			error(t,"Error checking relationship based role");
+			return false;
+		}
+	}
 	public boolean canHaveRole(A user, String role) {
 		if( user == null || role == null){
 			return false;
+		}
+		int pos = role.indexOf('%');
+		if( pos > 0) {
+			// role based on relationship and optional nameFilter
+		    String tag = role.substring(0, pos);
+		    String rel = role.substring(pos+1);
+		    String name=null;
+		    int namepos = rel.indexOf('@');
+		    if( namepos > 0) {
+		    	name=rel.substring(namepos+1);
+		    	rel=rel.substring(0, namepos);
+		    }
+		    return checkRelationshipRole(user ,tag, rel, name);
 		}
 		if( rawRoleQuery(getContext(), user.getID(), role)){
 			return true;

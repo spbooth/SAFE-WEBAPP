@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
@@ -33,13 +34,19 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
  * The factory itself and its {@link Composite}s are checked if they implement {@link NamedFilterProvider}
  * A name of the form <b><i>field_name</i>-><i>remote_name</i></b> indicates a remote filter should 
  * be constructed via field <i>field_name</i> and the same algorithm applied on the remote factory.
+ * If the name starts with <b>name:</b> and the factory is a {@link NameFinder} then the remainder of
+ * the name is passed to {@link NameFinder#getStringFinderFilter(String)}. 
  * Only references registered in the {@link Repository} can be de-referenced.
  * @author spb
- * @param <T> targe type of filters
+ * @param <T> target type of filters
  *
  */
 public class NamedFilterWrapper<T extends DataObject> implements NamedFilterProvider<T>,Contexed {
 
+	/**
+	 * 
+	 */
+	private static final String NAME_PREFIX = "name:";
 	private final AppContext conn;
 	private final DataObjectFactory<T> fac;
 	private final Set<String> missing=new HashSet<>();
@@ -87,6 +94,9 @@ public class NamedFilterWrapper<T extends DataObject> implements NamedFilterProv
 				getLogger().warn("Bad explicit NamedFilterProvider "+provider);
 			}
 			return null;
+		}
+		if( fac instanceof NameFinder && name.startsWith(NAME_PREFIX)) {
+			return ((NameFinder)fac).getStringFinderFilter(name.substring(NAME_PREFIX.length()));
 		}
 		
 		BaseFilter<T> result=null;
