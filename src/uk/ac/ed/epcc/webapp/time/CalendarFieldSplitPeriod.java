@@ -23,6 +23,14 @@ public class CalendarFieldSplitPeriod extends SplitPeriod {
 	private final int count;
 	private final int nsplit;
 	private final Calendar cal;
+	/** Make a new period consisting of nsplit blocks each
+	 * of count calendar units.
+	 * 
+	 * @param start the start time
+	 * @param field the field of the time interval
+	 * @param count multiple of field in each block
+	 * @param nsplit number of blocks
+	 */
 	public CalendarFieldSplitPeriod(Calendar start, int field, int count, int nsplit) {
 		super(makeSplits(start,field,count,nsplit));
 		this.cal=start;
@@ -37,8 +45,8 @@ public class CalendarFieldSplitPeriod extends SplitPeriod {
 	 * 
 	 * @param start the start time
 	 * @param field the field of the time interval
-	 * @param count the count the number of intervals
-	 * @param nsplit 
+	 * @param count multiple of field in each block
+	 * @param nsplit number of blocks
 	 * @return array of splits
 	 */
 	public static long[] makeSplits(Calendar start, int field, int count, int nsplit) {
