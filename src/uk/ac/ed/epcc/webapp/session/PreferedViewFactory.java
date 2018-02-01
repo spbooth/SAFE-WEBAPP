@@ -17,6 +17,8 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.inputs.URLInput;
+import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.Classification;
 import uk.ac.ed.epcc.webapp.model.ClassificationFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -29,6 +31,9 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  */
 public class PreferedViewFactory extends ClassificationFactory<PreferedView> {
 
+	private static final String SAFE_URL = "SafeURL";
+	private static final String DOCUMENTATION_URL = "DocumentationURL";
+	
 	/**
 	 * @param ctx
 	 * @param homeTable
@@ -68,5 +73,13 @@ public class PreferedViewFactory extends ClassificationFactory<PreferedView> {
 	@Override
 	public Class<? super PreferedView> getTarget() {
 		return PreferedView.class;
+	}
+	
+	@Override
+	public TableSpecification getDefaultTableSpecification(AppContext c,String homeTable){
+		TableSpecification spec = super.getDefaultTableSpecification(c, homeTable);
+		spec.setField(SAFE_URL, new StringFieldType(true, null, 255));
+		spec.setField(DOCUMENTATION_URL, new StringFieldType(true, null, 255));
+		return spec;
 	}
 }
