@@ -18,10 +18,12 @@ package uk.ac.ed.epcc.webapp.model;
 
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
+import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
@@ -41,7 +43,18 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  */
 
 public class PropertyFactory extends DataObjectFactory<Property> {
-    public PropertyFactory(AppContext c, String table){
+    /* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getSelectors()
+	 */
+	@Override
+	protected Map<String, Object> getSelectors() {
+		Map<String, Object> selectors = super.getSelectors();
+		// default input may forbid html but this should be allowed in props
+		TextInput prop_input = new TextInput();
+		selectors.put(Property.VALUE, prop_input);
+		return selectors;
+	}
+	public PropertyFactory(AppContext c, String table){
     	initContext(c,table);
     }
     public PropertyFactory(AppContext c){
