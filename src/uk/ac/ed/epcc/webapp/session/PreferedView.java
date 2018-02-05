@@ -20,6 +20,12 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 
 public class PreferedView extends Classification{
 	private static final String SERVICE_SAF_URL = "service.saf.url";
+	private static final String SERVICE_NAME = "service.name";
+	private static final String SERVICE_SAFE_DOCUMENTATION = "service.safe-documentation";
+	
+	private static final String SAFE_URL = "SafeURL";
+	private static final String DOCUMENTATION_URL = "DocumentationURL";
+
 	/**
 	 * @param res
 	 */
@@ -28,7 +34,11 @@ public class PreferedView extends Classification{
 		// TODO Auto-generated constructor stub
 	}
 	public void addEmailParams(Map<String, String> params) {
-		params.put(SERVICE_SAF_URL,getName());
+		params.put(SERVICE_NAME, getName());
+		String safeUrl = record.getStringProperty(SAFE_URL);
+		if (safeUrl != null) params.put(SERVICE_SAF_URL,  safeUrl);
+		String docUrl = record.getStringProperty(DOCUMENTATION_URL);
+		if (docUrl != null) params.put(SERVICE_SAFE_DOCUMENTATION, docUrl);
 	}
 	
 }
