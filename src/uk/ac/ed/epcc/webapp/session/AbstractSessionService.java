@@ -1119,6 +1119,9 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		}
 		searching_roles.add(search_tag);
 		try{
+			if( role == null || role.trim().isEmpty()) {
+				throw new UnknownRelationshipException("empty role requested");
+			}
 		if( role.contains(OR_RELATIONSHIP_COMBINER)){
 			// OR combination of filters
 			OrFilter<T> or = new OrFilter<T>(fac2.getTarget(), fac2);
@@ -1332,12 +1335,15 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			searching_roles.remove(search_tag);
 		}
 	}
-	/**
+	/** Make filter for objects in relation to a person for directly implemented roles
 	 * @param fac2
 	 * @param role
 	 * @throws UnknownRelationshipException 
 	 */
 	protected <T extends DataObject> BaseFilter<? super T> makeDirectRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,A person,BaseFilter<T> def) throws UnknownRelationshipException {
+		if( role == null || role.trim().isEmpty()) {
+			throw new UnknownRelationshipException("empty role requested");
+		}
 		// look for directly implemented relations first
 		BaseFilter<? super T> result=null;
 		
