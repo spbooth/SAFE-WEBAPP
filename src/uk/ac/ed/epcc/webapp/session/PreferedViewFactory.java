@@ -31,8 +31,8 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  */
 public class PreferedViewFactory extends ClassificationFactory<PreferedView> {
 
-	private static final String SAFE_URL = "SafeURL";
-	private static final String DOCUMENTATION_URL = "DocumentationURL";
+	static final String SAFE_URL = "SafeURL";
+	static final String DOCUMENTATION_URL = "DocumentationURL";
 	
 	/**
 	 * @param ctx
@@ -49,7 +49,8 @@ public class PreferedViewFactory extends ClassificationFactory<PreferedView> {
 	@Override
 	protected Map<String, Object> getSelectors() {
 		Map<String, Object> selectors = super.getSelectors();
-		selectors.put(Classification.NAME, new URLInput());
+		selectors.put(SAFE_URL, new URLInput());
+		selectors.put(DOCUMENTATION_URL, new URLInput());
 		return selectors;
 	}
 

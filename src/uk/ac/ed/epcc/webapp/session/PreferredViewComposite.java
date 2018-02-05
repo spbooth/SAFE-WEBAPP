@@ -127,12 +127,12 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 	 * @return
 	 */
 	public PreferedView getDefaultView() {
-		String url = getContext().getExpandedProperty(PREFERRED_VIEW_PROP,"");
-		if( url == null || url.isEmpty()) {
+		String name = getContext().getExpandedProperty(PREFERRED_VIEW_PROP,"");
+		if( name == null || name.isEmpty()) {
 			return null;
 		}
 		try {
-			return getViewFactory().makeFromString(url);
+			return getViewFactory().makeFromString(name);
 		} catch (DataFault e) {
 			getLogger().error("Error getting default view", e);
 			return null;
