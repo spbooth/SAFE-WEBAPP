@@ -179,4 +179,19 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 		public Class<? super BDO> getTarget() {
 			return target;
 		}
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			sb.append(getClass().getSimpleName());
+			sb.append("(");
+			if( target_references) {
+				res.getInfo(join_field).addName(sb, true, false);
+				sb.append("=");
+				remote_res.addUniqueName(sb, true, false);
+			}else {
+				remote_res.getInfo(join_field).addName(sb, true, false);
+				sb.append("=");
+				res.addUniqueName(sb, true, false);
+			}
+			return sb.toString();
+		}
 }

@@ -182,5 +182,18 @@ public class SQLExpressionFilter<T,V> implements SQLFilter<T>, PatternFilter<T> 
 		return target;
 	}
 	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("SQLExpressionFilter(");
+		sb.append(expr.toString());
+		if( match != null){
+			sb.append(match.match());
+		}else{
+		    sb.append("=");
+		}
+		sb.append(value.toString());
+		sb.append(")");
+		return sb.toString();
+	}
 
 }

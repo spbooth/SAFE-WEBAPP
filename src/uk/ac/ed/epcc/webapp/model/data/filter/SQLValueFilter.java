@@ -163,4 +163,13 @@ public class SQLValueFilter<T> implements SQLFilter<T>, PatternFilter<T> {
 	public final void OrderBy(){
 		
 	}
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("SQLValueFilter(");
+		sb.append(field);
+		sb.append(match);
+		sb.append(peer.toString());
+		sb.append(")");
+		return sb.toString();
+	}
 }

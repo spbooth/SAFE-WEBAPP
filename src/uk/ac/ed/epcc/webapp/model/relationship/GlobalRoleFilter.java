@@ -99,4 +99,7 @@ public class GlobalRoleFilter<T> implements BinaryFilter<T> {
 		return session.hasRole(role);
 	}
 
+	public String toString() {
+		return "GlobalRoleFilter("+role+")";
+	}
 }

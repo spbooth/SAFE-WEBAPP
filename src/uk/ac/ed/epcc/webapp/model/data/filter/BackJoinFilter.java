@@ -135,4 +135,18 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 		public Class<? super BDO> getTarget() {
 			return target;
 		}
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			sb.append(getClass().getSimpleName());
+			sb.append("(");
+			remote_res.getInfo(join_field).addName(sb, true, false);
+			sb.append("=");
+			res.addUniqueName(sb, true, false);
+			if( fil != null ) {
+				sb.append(" remote_filter=");
+				sb.append(fil.toString());
+			}
+			sb.append(")");
+			return sb.toString();
+		}
 }

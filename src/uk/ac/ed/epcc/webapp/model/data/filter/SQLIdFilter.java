@@ -88,5 +88,13 @@ public class SQLIdFilter<T extends DataObject> implements SQLFilter<T>, PatternF
 	public Class<? super T> getTarget() {
 		return target;
 	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("SQLIdFilter(id=");
+		sb.append(Integer.toString(id));
+		sb.append(")");
+		return sb.toString();
+	}
 
 }

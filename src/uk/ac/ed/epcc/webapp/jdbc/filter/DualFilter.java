@@ -85,4 +85,7 @@ public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
 			return false;
 		return true;
 	}
+	public String toString() {
+		return "DualFilter("+accept.toString()+","+sql.toString()+")";
+	}
 }

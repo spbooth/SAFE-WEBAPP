@@ -185,4 +185,15 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 		
 		return super.isEmpty() && accepts.isEmpty();
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseCombineFilter#listContents(java.lang.StringBuilder)
+	 */
+	@Override
+	protected void listContents(StringBuilder sb) {
+		if( ! accepts.isEmpty()) {
+			sb.append(" accepts=");
+			sb.append(accepts.toString());
+		}
+		super.listContents(sb);
+	}
 }

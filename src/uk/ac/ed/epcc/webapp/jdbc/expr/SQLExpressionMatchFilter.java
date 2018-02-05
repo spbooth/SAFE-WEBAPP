@@ -176,4 +176,17 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
 	public Class<? super T> getTarget() {
 		return target;
 	}
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("SQLExpressionMatchFilter(");
+		sb.append(expr1.toString());
+		if( match != null){
+			sb.append(match.match());
+		}else{
+		    sb.append("=");
+		}
+		sb.append(expr2.toString());
+		sb.append(")");
+		return sb.toString();
+	}
 }

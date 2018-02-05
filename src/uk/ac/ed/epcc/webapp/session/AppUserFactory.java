@@ -155,8 +155,9 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 		public Class<? super AU> getTarget() {
 			return AppUserFactory.this.getTarget();
 		}
-		
-		
+		public String toString() {
+			return "RoleFilter("+role+")";
+		}
 	
     }
    

@@ -102,7 +102,9 @@ public class GenericBinaryFilter<T> implements SQLFilter<T>, BinaryFilter<T>{
 	public void accept(T o) {
 		
 	}
-
+	public String toString() {
+		return "GenericBinaryFilter("+value+")";
+	}
 	
 
 }

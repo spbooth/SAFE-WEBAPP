@@ -1775,6 +1775,14 @@ public final class Repository implements AppContextCleanup{
 		private Repository getOuterType() {
 			return Repository.this;
 		}
+		
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			sb.append("Order(");
+			addClause(sb, true);
+			sb.append(")");
+			return sb.toString();
+		}
 	}
 	final private AppContext ctx;
 	final private SQLContext sql;

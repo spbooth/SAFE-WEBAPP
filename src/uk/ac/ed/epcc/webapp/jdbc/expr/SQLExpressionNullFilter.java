@@ -125,4 +125,15 @@ public class SQLExpressionNullFilter<T,V> implements SQLFilter<T>, PatternFilter
 	public Class<? super T> getTarget() {
 		return target;
 	}
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("SQLExpressionNullFilter(");
+		sb.append(expr.toString());
+		if( is_null) {
+			sb.append("==null)");
+		}else {
+			sb.append("==null)");
+		}
+		return sb.toString();
+	}
 }

@@ -111,5 +111,16 @@ public class NullFieldFilter<T> implements PatternFilter<T>, SQLFilter<T>{
 	public Class<? super T> getTarget() {
 		return target;
 	}
-	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("NullFieldFilter(");
+		sb.append(field);
+		if( match_null) {
+			sb.append("==NULL");
+		}else {
+			sb.append("!=NULL");
+		}
+		sb.append(")");
+		return sb.toString();
+	}
 }

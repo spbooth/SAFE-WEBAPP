@@ -137,6 +137,9 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 			return owner;
 		}
 		
+		public String toString() {
+			return "SQLTypeFilter("+type.getField()+"="+target.getName()+")";
+		}
 		
     }
 
@@ -216,7 +219,23 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		public Class<? super I> getTarget() {
 			return owner;
 		}
-		
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			sb.append("TypeSetSQLFilter(");
+			boolean seen=false;
+			for(T val : set){
+				   if(! seen ){
+					   seen=true;
+				   }else{
+					   sb.append(" OR ");
+				   }
+				   sb.append( type.getField()); 
+				   sb.append("=" );
+				   sb.append(val.getName());
+				}
+			sb.append(")");
+			return sb.toString();
+		}
 		
 		
 	}

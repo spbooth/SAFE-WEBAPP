@@ -70,5 +70,8 @@ public class SQLNotFilter<Q> implements SQLFilter<Q>,PatternFilter<Q>{
 	public Class<? super Q> getTarget() {
 		return nested.getTarget();
 	}
+	public String toString() {
+		return "SQLNotFilter("+nested+")";
+	}
 
 }

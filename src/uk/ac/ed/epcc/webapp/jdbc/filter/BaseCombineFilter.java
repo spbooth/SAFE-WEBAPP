@@ -372,4 +372,29 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 				return false;
 			return true;
 		}
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			sb.append(getClass().getSimpleName());
+			sb.append("(");
+			listContents(sb);
+			sb.append(")");
+			return sb.toString();
+			
+		}
+
+		/** extension point for the {@link #toString()} method
+		 * @param sb
+		 */
+		protected void listContents(StringBuilder sb) {
+			if( ! filters.isEmpty()) {
+				sb.append(" filters=");
+				sb.append(filters.toString());
+			}
+			if( order != null && ! order.isEmpty()) {
+				sb.append(" order=");
+				sb.append(order.toString());
+			}
+			sb.append(" force=");
+			sb.append(force_value);
+		}
 }
