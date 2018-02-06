@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.resource;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -35,7 +36,7 @@ public class ResourceServiceTestCase extends WebappTestBase {
 	private static final String DATA_TEST_FILE = "/data/test_file.txt";
 	private static final String DATA_TEST_FILE_MOD = "/data//test_file.txt";
 	private static final String DATA_TEST_FILE2 = "/data/test/test_file.txt";
-	
+	private static final String BOGUS_TEST_FILE = "/data/bogus_file.txt";
 	@Test
 	public void testGetData() throws Exception{
 		ResourceService serv = ctx.getService(ResourceService.class);
@@ -119,5 +120,16 @@ public class ResourceServiceTestCase extends WebappTestBase {
 		assertEquals("WEB-INF/report-templates/DART.xml", DefaultResourceService.mapForClassloader("/WEB-INF/report-templates/"+"/"+"DART.xml"));
 		
 		assertEquals("WEB-INF/report-templates/DART.xml", DefaultResourceService.mapForClassloader("/WEB-INF/report-templates"+"/"+"DART.xml"));
+	}
+	@Test
+	public void testNoResource() {
+		ResourceService serv = ctx.getService(ResourceService.class);
+		
+		URL direct = getClass().getResource(BOGUS_TEST_FILE);
+		assertNull(direct);
+		
+		URL serv_url = serv.getResource(BOGUS_TEST_FILE);
+		assertNull(serv_url);
+		
 	}
 }

@@ -209,7 +209,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		 * 
 		 * @return boolean true if resouce exists
 		 */
-		private boolean hasResourceStream(){
+		boolean hasResourceStream(){
 			AppContext conn = getContext();
 			Logger log = conn.getService(LoggerService.class).getLogger(getClass());
 			ResourceService serv = conn.getService(ResourceService.class);
@@ -336,10 +336,10 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			tf.setGroup(group);
 			tf.setName(name);
 			tf.setText(null);
-			URL f = tf.getURL();
-			if( f == null ){
+			if( ! tf.hasResourceStream()) {
 				return null;
 			}
+			
 			tf.commit();
 		}
 		
