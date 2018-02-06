@@ -327,4 +327,12 @@ public class XMLOverlay<X extends XMLOverlay.XMLFile> extends TextFileOverlay<X>
 	public DomVisitor getValidatingVisitor() {
 		return null;
 	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.TextFileOverlay#splitNormalised(java.lang.String)
+	 */
+	@Override
+	protected String[] splitNormalised(String input) {
+		return input.replaceAll(">\\s*<", ">\n<").split("\r?\n");
+	}
 }

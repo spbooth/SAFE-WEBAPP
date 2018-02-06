@@ -27,6 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.incava.util.diff.Diff;
+import org.incava.util.diff.Difference;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.Form;
@@ -43,6 +46,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
+import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
@@ -60,7 +64,11 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 import uk.ac.ed.epcc.webapp.model.data.forms.RetireAction;
 import uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate;
+import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
+import uk.ac.ed.epcc.webapp.model.serv.ServeDataProducer;
+import uk.ac.ed.epcc.webapp.model.serv.SettableServeDataProducer;
 import uk.ac.ed.epcc.webapp.resource.ResourceService;
+import uk.ac.ed.epcc.webapp.session.SessionDataProducer;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** TextFileOverlay represents a DB overlay above the local file-system
@@ -273,6 +281,10 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 				return null;
 			}
 		}
+		/** get a string representation of the current data balue
+		 * 
+		 * @return
+		 */
 		public String getData(){
 			String text = getText();
 			if( text != null ){
@@ -357,6 +369,98 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 	public URL getBaseURL(){
 		return url_base;
 	}
+	/** Normalise and split input.
+	 * 
+	 * Used for diff operations.
+	 * 
+	 * @param input
+	 * @return
+	 */
+	protected String[] splitNormalised(String input) {
+		return input.split("\r?\n");
+	}
+	public class TextFileDiffAction extends FormAction{
+		TextFile tf;
+		/**
+		 * 
+		 */
+		public TextFileDiffAction(TextFile tf) {
+			this.tf=tf;
+			setMustValidate(false);
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#action(uk.ac.ed.epcc.webapp.forms.Form)
+		 */
+		@Override
+		public FormResult action(Form f) throws ActionException {
+			try {
+
+				String originalArray[] = splitNormalised(tf.getResourceString());
+				String newArray[] = splitNormalised(tf.getText());
+				Diff<String> diff = new Diff<String>(originalArray,newArray);
+				StringBuilder result = new StringBuilder();
+				for (Object object :diff.diff()) {
+					Difference difference = (Difference)object;
+
+					int as = difference.getAddedStart();
+					int ae = difference.getAddedEnd();
+					int ds = difference.getDeletedStart();
+					int de = difference.getDeletedEnd();
+
+					if (difference.getDeletedEnd() == -1) {
+						result.append(
+								ds+"a"+
+										(as+1)+","+
+										(ae+1)
+										+"\n");
+						for (int i = as; i <= ae; i++) {
+							result.append("> "+newArray[i]+"\n");
+						}
+
+					} else if (ae == -1) {
+						result.append(
+								(as)+
+								"d"+
+								(ds+1)+","+
+								(de+1)
+								+"\n");
+						for (int i = ds; i <= de; i++) {
+							result.append("< "+originalArray[i]+"\n");
+						}            	
+
+					} else {
+						result.append(ds+1);
+						if (ds != de) {
+							result.append(","+(de+1));
+						}
+						result.append("c");
+						result.append(as+1);
+						if (as != ae) {
+							result.append(","+(ae+1));
+						}
+						result.append("\n");
+
+						for (int i = difference.getDeletedStart(); i <= difference.getDeletedEnd(); i++) {
+							result.append("< "+originalArray[i]+"\n");
+						}
+						result.append("---\n");
+						for (int i = difference.getAddedStart(); i <= difference.getAddedEnd(); i++) {
+							result.append("> "+newArray[i]+"\n");
+						}
+					}
+
+				}
+				SettableServeDataProducer producer = getContext().makeObjectWithDefault(SettableServeDataProducer.class, SessionDataProducer.class, ServeDataProducer.DEFAULT_SERVE_DATA_TAG);
+				ByteArrayMimeStreamData diffdata = new ByteArrayMimeStreamData(result.toString().getBytes());
+				diffdata.setMimeType("text/plain");
+				diffdata.setName("diffdata.txt");
+				return new ServeDataResult(producer, producer.setData(diffdata));
+			}catch(Throwable t) {
+				throw new ActionException("internal_error", t);
+			}
+		}
+
+	}
 	public static class TextFileUpdateAction extends FormAction{
 		TextFile dat;
 		String type_name;
@@ -426,6 +530,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 
 		@SuppressWarnings("unchecked")
 		public void buildUpdateForm(String type_name,Form f, T dat,SessionService<?> operator) throws DataException {
+			boolean show_diff=false;
 			if(dat == null ||  ! isValid()){
 				return;
 			}
@@ -453,6 +558,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 						location = "Database-unchanged";
 					}else{
 						location = "Database";
+						show_diff=true;
 					}
 				}
 			}
@@ -466,6 +572,9 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			f.addAction("Update", new TextFileUpdateAction(type_name,dat));
 			if( ! from_file ){
 				f.addAction("Revert",new TextFileRevertAction(type_name,dat));
+			}
+			if( show_diff ) {
+				f.addAction("Diff", new TextFileDiffAction(dat));
 			}
 			f.addAction("Delete",new RetireAction<T>(type_name,dat));
 		}
