@@ -73,7 +73,7 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 
 	@Override
 	public Map<String, String> addTranslations(Map<String, String> labels) {
-		labels.put(PREFERRED_VIEW, "URL of preferred SAFE view (for inclusion in emails)");
+		labels.put(PREFERRED_VIEW, getContext().expandText("Preferred ${service.website-name} view (used in emails)"));
 		return labels;
 	}
 
