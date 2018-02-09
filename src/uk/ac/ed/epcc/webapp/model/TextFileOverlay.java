@@ -570,10 +570,8 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		
 			f.addInput(TEXT, TEXT, text);
 			f.addAction("Update", new TextFileUpdateAction(type_name,dat));
-			if( ! from_file ){
-				f.addAction("Revert",new TextFileRevertAction(type_name,dat));
-			}
 			if( show_diff ) {
+				f.addAction("Revert",new TextFileRevertAction(type_name,dat));
 				f.addAction("Diff", new TextFileDiffAction(dat));
 			}
 			f.addAction("Delete",new RetireAction<T>(type_name,dat));
