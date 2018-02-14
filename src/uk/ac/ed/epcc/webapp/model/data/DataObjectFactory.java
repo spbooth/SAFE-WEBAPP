@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.Comparator;
@@ -695,7 +696,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 */
 		@Override
 		protected String fallbackOrder() {
-			return OrderBy(qualify);
+			return OrderBy(getQualify());
 		}
 
 		/** protected constructor to allow sub-classes to initialise fields before
@@ -1053,7 +1054,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	}
 	
 	public <X extends Composite> boolean checkComposite(Class<X> clazz) {
-		if( clazz.isInterface()) {
+		if( clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) {
 			return true; // can't check
 		}
 		AppContext conn = getContext();

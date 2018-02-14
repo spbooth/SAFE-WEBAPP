@@ -331,7 +331,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 								builder.append(", ");
 							}
 							seen=true;
-							c.addClause(builder, qualify);
+							c.addClause(builder, getQualify());
 						}
 						modify = builder.toString();
 					}

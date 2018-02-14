@@ -44,7 +44,7 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 	private ResultMapper<O> mapper;
 	
 	
-	protected boolean qualify=false;
+	private boolean qualify=false;
 	public FilterReader(AppContext c,Class<? super T> target){
 		ctx=c;
 		this.target=target;
@@ -117,8 +117,17 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 	 * 
 	 * @param q
 	 */
-	protected final void setQualify(boolean q){
+	public final void setQualify(boolean q){
 		qualify=q;
+	}
+	/** Should field names be qualified.
+	 * 
+	 * Sub-classes can override to force this to true;
+	 * 
+	 * @return
+	 */
+	public boolean getQualify() {
+		return qualify;
 	}
 	protected final void makeSelect(StringBuilder query) {
 		String join="";
@@ -131,7 +140,7 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 			}
 		}
 		
-		if( use_join || qualify){
+		if( use_join || getQualify()){
 			mapper.setQualify(true);
 			qualify=true;
 		}
@@ -144,7 +153,7 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 			  query.append(join);
 		}
 		query.append(" WHERE ");
-		makeWhere(my_filter,query,qualify);
+		makeWhere(my_filter,query,getQualify());
 	}
 
 	

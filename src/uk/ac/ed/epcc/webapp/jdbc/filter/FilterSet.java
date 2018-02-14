@@ -58,8 +58,8 @@ public abstract class FilterSet<T> {
 						target=target2;
 					}else{
 						//TODO check this always but run as assertion for a bit.
-						assert(false);
-						//throw new ConsistencyError("Incompatible filter types "+target2.getCanonicalName()+","+target.getCanonicalName());
+						//assert(false);
+						throw new ConsistencyError("Incompatible filter types "+target2.getCanonicalName()+","+target.getCanonicalName());
 					}
 				}
 			}
