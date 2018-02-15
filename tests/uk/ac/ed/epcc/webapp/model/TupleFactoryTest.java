@@ -18,8 +18,12 @@ import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpressionMatchFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.TupleFactory;
 import uk.ac.ed.epcc.webapp.model.data.TupleFactory.Tuple;
 import uk.ac.ed.epcc.webapp.model.data.TupleFactory.TupleAndFilter;
@@ -31,17 +35,17 @@ import java.util.Iterator;
  * @author spb
  *
  */
-public class TupleFactoryTest<T extends TupleFactory.Tuple> extends WebappTestBase {
+public class TupleFactoryTest<A extends DataObject,AF extends DataObjectFactory<A>,T extends TupleFactory.Tuple<A>> extends WebappTestBase {
 
 	Dummy1.Factory fac1;
 	Dummy2.Factory fac2;
-	TupleFactory<?,?,T> fac;
+	TupleFactory<A,AF,T> fac;
 	
 	@Before
 	public void setUp() throws DataFault {
 		fac1 = new Dummy1.Factory(ctx);
 		fac2 = new Dummy2.Factory(ctx);
-		fac = new TupleFactory(ctx, fac1,fac2);
+		fac = new TupleFactory<A,AF,T>(ctx, (AF)fac1,(AF)fac2);
 		
 		Dummy1 d1a = new Dummy1(ctx);
 		d1a.setName("Name1");
@@ -130,9 +134,11 @@ public class TupleFactoryTest<T extends TupleFactory.Tuple> extends WebappTestBa
 	@Test
 	public void testFilteredJoin() throws DataException{
 		TupleAndFilter fil = fac.new TupleAndFilter();
-		SQLFilter join = SQLExpressionMatchFilter.getFilter(fac.getTarget(), fac1.getNameExpression(), fac2.getNameExpression());
+		SQLExpression<String> nameExpression = fac1.getNameExpression();
+		SQLExpression<String> nameExpression2 = fac2.getNameExpression();
+		SQLFilter join = SQLExpressionMatchFilter.getFilter(fac.getTarget(), nameExpression, nameExpression2);
 		fil.addFilter(join);
-		assertEquals(2,fac.getCount(fil));
+		assertEquals(2,fac.getCount((BaseFilter<T>)fil));
 	}
 	
 	@Test
@@ -140,7 +146,7 @@ public class TupleFactoryTest<T extends TupleFactory.Tuple> extends WebappTestBa
 		TupleAndFilter fil = fac.new TupleAndFilter();
 		fil.addFilter(SQLExpressionMatchFilter.getFilter(fac.getTarget(), fac1.getNameExpression(), fac2.getNameExpression()));
 		fil.addMemberFilter(fac1.getTag(), fac1.new NumberFilter(Integer.valueOf(1)));
-		assertEquals(1,fac.getCount(fil));
+		assertEquals(1,fac.getCount((BaseFilter<T>)fil));
 	}
 	
 	@Test
@@ -148,6 +154,6 @@ public class TupleFactoryTest<T extends TupleFactory.Tuple> extends WebappTestBa
 		TupleAndFilter fil = fac.new TupleAndFilter();
 		fil.addFilter(SQLExpressionMatchFilter.getFilter(fac.getTarget(), fac1.getNameExpression(), fac2.getNameExpression()));
 		fil.addMemberFilter(fac1.getTag(), fac1.new NumberAcceptFilter(Integer.valueOf(1)));
-		assertEquals(1,fac.getCount(fil));
+		assertEquals(1,fac.getCount((BaseFilter<T>)fil));
 	}
 }
