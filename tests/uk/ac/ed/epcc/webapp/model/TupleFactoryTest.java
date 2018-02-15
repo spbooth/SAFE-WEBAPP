@@ -93,7 +93,7 @@ public class TupleFactoryTest<A extends DataObject,AF extends DataObjectFactory<
 		
 		count=0;
 		
-		Iterator<Tuple> it = (Iterator<Tuple>) fac.makeResult(null).iterator(); 
+		Iterator<T> it =  fac.makeResult(null).iterator(); 
 		for(Dummy1 d1 : fac1.all()){
 			for(Dummy2 d2 : fac2.all()){
 				Tuple t = it.next();
@@ -109,7 +109,7 @@ public class TupleFactoryTest<A extends DataObject,AF extends DataObjectFactory<
 	@Test 
 	public void testOffsetIterateWithoutFilter() throws DataFault{
 		int count = 0;
-		Iterator<Tuple> it = (Iterator<Tuple>) fac.makeResult(null,0,4).iterator(); 
+		Iterator<T> it = fac.makeResult(null,0,4).iterator(); 
 		for(Dummy1 d1 : fac1.getResult(null,0,2)){
 			for(Dummy2 d2 : fac2.all()){
 				Tuple t = it.next();
@@ -119,7 +119,7 @@ public class TupleFactoryTest<A extends DataObject,AF extends DataObjectFactory<
 			}
 		}
 		assertEquals(4,count);
-		it = (Iterator<Tuple>) fac.makeResult(null,4,100).iterator(); 
+		it =  fac.makeResult(null,4,100).iterator(); 
 		for(Dummy1 d1 : fac1.getResult(null, 2, 100)){
 			for(Dummy2 d2 : fac2.all()){
 				Tuple t = it.next();
