@@ -31,11 +31,11 @@ import java.util.Iterator;
  * @author spb
  *
  */
-public class TupleFactoryTest extends WebappTestBase {
+public class TupleFactoryTest<T extends TupleFactory.Tuple> extends WebappTestBase {
 
 	Dummy1.Factory fac1;
 	Dummy2.Factory fac2;
-	TupleFactory<?,?,?> fac;
+	TupleFactory<?,?,T> fac;
 	
 	@Before
 	public void setUp() throws DataFault {
@@ -129,7 +129,9 @@ public class TupleFactoryTest extends WebappTestBase {
 	
 	@Test
 	public void testFilteredJoin() throws DataException{
-		SQLFilter fil = SQLExpressionMatchFilter.getFilter(fac.getTarget(), fac1.getNameExpression(), fac2.getNameExpression());
+		TupleAndFilter fil = fac.new TupleAndFilter();
+		SQLFilter join = SQLExpressionMatchFilter.getFilter(fac.getTarget(), fac1.getNameExpression(), fac2.getNameExpression());
+		fil.addFilter(join);
 		assertEquals(2,fac.getCount(fil));
 	}
 	
