@@ -49,6 +49,10 @@ public class PropertyFactory extends DataObjectFactory<Property> {
 	@Override
 	protected Map<String, Object> getSelectors() {
 		Map<String, Object> selectors = super.getSelectors();
+		TextInput name_input = new TextInput();
+		name_input.setSingle(true);
+		name_input.setNoSpaces(true);
+		selectors.put(Property.NAME, name_input);
 		// default input may forbid html but this should be allowed in props
 		TextInput prop_input = new TextInput();
 		selectors.put(Property.VALUE, prop_input);

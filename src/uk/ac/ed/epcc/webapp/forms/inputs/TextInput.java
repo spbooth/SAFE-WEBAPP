@@ -109,6 +109,9 @@ public class TextInput extends ParseAbstractInput<String> {
 	 */
 	public void setNoSpaces(boolean no_spaces) {
 		this.no_spaces = no_spaces;
+		if( no_spaces) {
+			setTrim(true);
+		}
 	}
 
 }
