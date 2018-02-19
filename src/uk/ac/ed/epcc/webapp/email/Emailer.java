@@ -79,6 +79,8 @@ import uk.ac.ed.epcc.webapp.session.EmailParamContributor;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeListener;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory.PasswordChangeRequest;
+import uk.ac.ed.epcc.webapp.session.PreferedView;
+import uk.ac.ed.epcc.webapp.session.PreferredViewComposite;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
@@ -340,6 +342,9 @@ public class Emailer {
 			for(EmailParamContributor epc : factory.getComposites(EmailParamContributor.class)) {
 				epc.addParams(params, recipient);
 			}
+			PreferredViewComposite pvc = factory.getComposite(PreferredViewComposite.class);
+			PreferedView pv = pvc.getPreferredView(recipient);
+			email_template.setPreferredView(pv.getName());
 		}
 		return templateMessage(email, headers, email_template,params);
 	}else{
