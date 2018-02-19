@@ -25,6 +25,10 @@ import javax.servlet.http.HttpServletRequest;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.expr.FuncExpression;
+import uk.ac.ed.epcc.webapp.jdbc.expr.SQLFunc;
+import uk.ac.ed.epcc.webapp.jdbc.expr.ValueResultMapper;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -41,7 +45,9 @@ import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterUpdate;
+import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.session.AppUser;
+import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
@@ -249,6 +255,33 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 		update.update(res.getStringExpression(getTarget(), HOST), "Removed", fil);
 		
 	}
-
-
+	public class LoginFinder extends AbstractFinder<Date>{
+		public LoginFinder() {
+			Class<? super Wtmp> target = WtmpManager.this.getTarget();
+			setMapper(new ValueResultMapper<Date>(res.getDateExpression(target, START_TIME)){
+				public String getTarget(){
+					StringBuilder sb = new StringBuilder();
+					sb.append("MAX(");
+					sb.append(super.getTarget());
+					sb.append(")");
+					return sb.toString();
+				}
+			});
+		}
+	}
+	public Date lastLogin(AppUser person) throws DataException {
+		LoginFinder finder = new LoginFinder();
+		return finder.find(new ReferenceFilter<WtmpManager.Wtmp, AppUser>(WtmpManager.this, PERSON_ID, person),true);
+	}
+	/** Get a filter for {@link AppUser}s who have logged in since
+	 * a target date.
+	 * 
+	 * @param d
+	 * @return
+	 */
+    public SQLFilter<AppUser> getActiveFilter(Date d){
+    	AppUserFactory<AppUser> login = getContext().getService(SessionService.class).getLoginFactory();
+    	
+    	return (SQLFilter<AppUser>) convertToDestinationFilter(login, PERSON_ID, new TimeFilter(START_TIME,MatchCondition.GT, d) );
+    }
 }

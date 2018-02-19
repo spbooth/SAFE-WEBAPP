@@ -62,6 +62,9 @@ public class ValueResultMapper<O> implements ResultMapper<O> {
 		this.qualify=qualify;
 		return old;
 	}
+	protected boolean getQualify() {
+		return qualify;
+	}
 	public SQLFilter getRequiredFilter() {
 		return expr.getRequiredFilter();
 	}
