@@ -774,22 +774,16 @@ public class TemplateFile {
 				template_values[((Region) element).enabled_index] = Boolean.FALSE;
 		}
 	}
-	/**
-	 * Sets the preferred view to be used. If the template contains a region
-	 * matching the (lower case) preferred view name, this region will be enabled
-	 * and the "generic" region (enabled by default) will be disabled. If not,
-	 * nothing will happen
+	/** test to see if a region exists
+	 * 
 	 */
-	public void setPreferredView(String preferred_view) {
-		// check if the template has a matching region
-		String region_name = preferred_view.toLowerCase();
+	public boolean hasRegion(String region_name) {
 		Object element = template_elements.get(region_name);
-		if ((element != null) && (element instanceof Region)) {
-			// found region so enable it and disable "generic"
-			setRegionEnabled(region_name, true);
-			setRegionEnabled("generic", false);
-		}
+	
+		return (element != null) && (element instanceof Region);
 	}
+	
+	
 	
 	/**
 	 * @return A <code>String</code> containing the current contents of the

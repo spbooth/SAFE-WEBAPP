@@ -18,6 +18,8 @@ package uk.ac.ed.epcc.webapp.model.data;
 
 import java.util.Date;
 
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+
 /**
  * <p>
  * A class to represent durations of time. Java does not have such a notion in a
@@ -132,6 +134,9 @@ public class Duration extends Number implements Comparable<Duration> {
 	}
 
 	public Duration(Date start, Date end) {
+		if( start == null || end == null ) {
+			throw new ConsistencyError("Null duration bound "+start+" "+end);
+		}
 		this.value = end.getTime() - start.getTime();
 	}
 

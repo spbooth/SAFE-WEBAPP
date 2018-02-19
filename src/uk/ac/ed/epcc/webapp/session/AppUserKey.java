@@ -20,7 +20,7 @@ import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
  *
  */
 
-public class AppUserKey<T extends AppUser> extends TransitionKey<T> {
+public abstract class AppUserKey<T extends AppUser> extends TransitionKey<T> {
 
 	/**
 	 * @param t
@@ -29,7 +29,6 @@ public class AppUserKey<T extends AppUser> extends TransitionKey<T> {
 	 */
 	public AppUserKey(Class<? super T> t, String name, String help) {
 		super(t, name, help);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -38,7 +37,8 @@ public class AppUserKey<T extends AppUser> extends TransitionKey<T> {
 	 */
 	public AppUserKey(Class<? super T> t, String name) {
 		super(t, name);
-		// TODO Auto-generated constructor stub
 	}
+	
+	public abstract boolean allow(T user,SessionService<T> op);
 
 }

@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2017                            |
+//| Copyright - The University of Edinburgh 2018                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -15,16 +15,14 @@ package uk.ac.ed.epcc.webapp.session;
 
 import java.util.Map;
 
-import uk.ac.ed.epcc.webapp.content.TemplateFile;
+import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 
-/** An interface implemented by {@link AppUserComposite}
- * this specifies additional/override email template parameters that should
- * be set when email-ing the {@link AppUser}
+/**
  * @author spb
  *
  */
-public interface EmailParamContributor<AU extends AppUser> {
-	public void addParams(Map<String,String> params, AU user);
-	
-	public void setRegions(TemplateFile template,AU user);
+public interface AppUserTransitionContributor<AU extends AppUser>
+{
+
+	Map<AppUserKey<AU>,Transition<AU>> getTransitions();
 }

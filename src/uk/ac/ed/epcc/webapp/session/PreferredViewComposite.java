@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.session;
 import java.util.Map;
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.content.TemplateFile;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -163,5 +164,26 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 			preferredView.addEmailParams(params);
 		}
 		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.session.EmailParamContributor#setRegions(uk.ac.ed.epcc.webapp.content.TemplateFile)
+	 */
+	@Override
+	public void setRegions(TemplateFile template,AU user) {
+		PreferedView preferred_view = getPreferredView(user);
+		if( preferred_view == null) {
+			template.setRegionEnabled("generic", true);
+		}else {
+			// check if the template has a matching region
+			String region_name = preferred_view.getName().toLowerCase();
+
+			if( template.hasRegion(region_name)) {
+				template.setRegionEnabled(region_name, true);
+				template.setRegionEnabled("generic", false);
+			}else {
+				template.setRegionEnabled("generic", true);
+			}
+
+		}
 	}
 }

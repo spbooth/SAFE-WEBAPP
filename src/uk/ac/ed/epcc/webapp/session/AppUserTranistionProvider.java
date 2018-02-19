@@ -13,8 +13,15 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.forms.transition.Transition;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractTransitionProvider;
 
 /**
@@ -24,12 +31,18 @@ import uk.ac.ed.epcc.webapp.model.data.transition.AbstractTransitionProvider;
 
 public class AppUserTranistionProvider<T extends AppUser,K extends AppUserKey<T>> extends AbstractTransitionProvider<T, K> {
 
+	private final AppUserFactory<T> fac;
 	/**
 	 * @param c
 	 */
 	public AppUserTranistionProvider(AppContext c) {
 		super(c);
-		// TODO Auto-generated constructor stub
+		fac = c.getService(SessionService.class).getLoginFactory();
+		for(AppUserTransitionContributor<T> cont : fac.getComposites(AppUserTransitionContributor.class)) {
+			for(Entry<AppUserKey<T>, Transition<T>> e : cont.getTransitions().entrySet()) {
+				addTransition((K) e.getKey(), e.getValue());
+			}
+		}
 	}
 
 	/* (non-Javadoc)
@@ -37,8 +50,14 @@ public class AppUserTranistionProvider<T extends AppUser,K extends AppUserKey<T>
 	 */
 	@Override
 	public T getTarget(String id) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return fac.find(Integer.parseInt(id));
+		} catch (NumberFormatException e) {
+			return null;
+		} catch (DataException e) {
+			getLogger().error("Error getting AppUser",e );
+			return null;
+		}
 	}
 
 	/* (non-Javadoc)
@@ -46,8 +65,7 @@ public class AppUserTranistionProvider<T extends AppUser,K extends AppUserKey<T>
 	 */
 	@Override
 	public String getID(T target) {
-		// TODO Auto-generated method stub
-		return null;
+		return Integer.toString(target.getID());
 	}
 
 	/* (non-Javadoc)
@@ -55,8 +73,7 @@ public class AppUserTranistionProvider<T extends AppUser,K extends AppUserKey<T>
 	 */
 	@Override
 	public String getTargetName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Person";
 	}
 
 	/* (non-Javadoc)
@@ -64,8 +81,7 @@ public class AppUserTranistionProvider<T extends AppUser,K extends AppUserKey<T>
 	 */
 	@Override
 	public boolean allowTransition(AppContext c, T target, K key) {
-		// TODO Auto-generated method stub
-		return false;
+		return key.allow(target, c.getService(SessionService.class));
 	}
 
 	/* (non-Javadoc)
@@ -73,8 +89,15 @@ public class AppUserTranistionProvider<T extends AppUser,K extends AppUserKey<T>
 	 */
 	@Override
 	public <X extends ContentBuilder> X getSummaryContent(AppContext c, X cb, T target) {
-		// TODO Auto-generated method stub
-		return null;
+		Map<String,Object> attr = new LinkedHashMap<>();
+		fac.addAttributes(attr, target);
+		Table t = new Table();
+		String col = "Value";
+		t.addMap(col, attr);
+		if( t.hasData()) {
+			cb.addColumn(getContext(), t, col);
+		}
+		return cb;
 	}
 
 }
