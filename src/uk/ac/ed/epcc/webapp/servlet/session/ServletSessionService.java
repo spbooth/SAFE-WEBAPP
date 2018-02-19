@@ -58,6 +58,11 @@ public class ServletSessionService<A extends AppUser> extends AbstractSessionSer
 	/**
 	 * 
 	 */
+	public static final String WTMP_TABLE_PROP = "wtmp.table";
+
+	/**
+	 * 
+	 */
 	public static final String PERSON_RELATIONSHIP_TABLE = "person.relationship.table";
 
 	public static final String BECOME_USER_ROLE = "BecomeUser";
@@ -149,7 +154,7 @@ public Object getAttribute(String key) {
 }
 public WtmpManager getWtmpManager() {
 	AppContext c = getContext();
-	String table = c.getInitParameter("wtmp.table");
+	String table = c.getInitParameter(WTMP_TABLE_PROP);
 	if( table != null ){
 		return c.makeObjectWithDefault(WtmpManager.class, WtmpManager.class, table);
 	}

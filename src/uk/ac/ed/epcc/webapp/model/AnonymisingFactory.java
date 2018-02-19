@@ -17,7 +17,9 @@ import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
-/** Interface for {@link DataObjectFactory}s that can anonymise their data
+/** Interface for {@link DataObjectFactory}s that can anonymise ALL their data
+ * 
+ * This is intended for the creation of anonymised debug databases.
  * 
  * @author spb
  *

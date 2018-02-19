@@ -15,9 +15,9 @@ package uk.ac.ed.epcc.webapp.session;
 
 import java.util.Map;
 import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.Classification;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
 

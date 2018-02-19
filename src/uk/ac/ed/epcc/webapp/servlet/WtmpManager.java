@@ -27,6 +27,7 @@ import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
@@ -36,6 +37,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterUpdate;
@@ -237,8 +239,14 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	 */
 	@Override
 	public void anonymise() throws DataFault {
+		anonymise(null);
+	}
+	public void anonymiseAppUser(AppUser person) throws DataFault {
+		anonymise(new ReferenceFilter<Wtmp, AppUser>(this, PERSON_ID, person));
+	}
+	public void anonymise(SQLFilter<Wtmp> fil) throws DataFault {
 		FilterUpdate<Wtmp> update = new FilterUpdate<>(res);
-		update.update(res.getStringExpression(getTarget(), HOST), "Removed", null);
+		update.update(res.getStringExpression(getTarget(), HOST), "Removed", fil);
 		
 	}
 

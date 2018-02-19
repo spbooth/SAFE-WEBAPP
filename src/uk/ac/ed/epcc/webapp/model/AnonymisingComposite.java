@@ -18,7 +18,10 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 
 /** and interface for {@link Composite} that support anonymisation.
  * 
- * These should be called from the {@link AnonymisingFactory#anonymise()} method
+ * These should be called from the {@link AnonymisingFactory#anonymise()} method.
+ * 
+ * They can ALSO be used to erase the data for specific users within a production database for
+ * data protection reasons.
  * @author spb
  *
  */
