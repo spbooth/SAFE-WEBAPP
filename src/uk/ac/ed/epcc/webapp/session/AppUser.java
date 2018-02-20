@@ -139,7 +139,11 @@ public class AppUser extends DataObject implements java.security.Principal{
 				return name;
 			}
 		}
-		return getFactory().getCanonicalName(this);
+		String canonicalName = getFactory().getCanonicalName(this);
+		if( canonicalName != null) {
+			return canonicalName;
+		}
+		return "Anonymous-"+getID();
 	}
 	
 	

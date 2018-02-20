@@ -21,8 +21,8 @@ import uk.ac.ed.epcc.webapp.forms.transition.Transition;
  * @author spb
  *
  */
-public interface AppUserTransitionContributor<AU extends AppUser>
+public interface AppUserTransitionContributor
 {
 
-	Map<AppUserKey<AU>,Transition<AU>> getTransitions();
+	Map<AppUserKey,Transition<AppUser>> getTransitions();
 }

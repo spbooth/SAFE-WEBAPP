@@ -20,25 +20,25 @@ import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
  *
  */
 
-public abstract class AppUserKey<T extends AppUser> extends TransitionKey<T> {
+public abstract class AppUserKey extends TransitionKey<AppUser> {
 
 	/**
 	 * @param t
 	 * @param name
 	 * @param help
 	 */
-	public AppUserKey(Class<? super T> t, String name, String help) {
-		super(t, name, help);
+	public AppUserKey(String name, String help) {
+		super(AppUser.class, name, help);
 	}
 
 	/**
 	 * @param t
 	 * @param name
 	 */
-	public AppUserKey(Class<? super T> t, String name) {
-		super(t, name);
+	public AppUserKey( String name) {
+		super(AppUser.class, name);
 	}
 	
-	public abstract boolean allow(T user,SessionService<T> op);
+	public abstract boolean allow(AppUser user,SessionService op);
 
 }

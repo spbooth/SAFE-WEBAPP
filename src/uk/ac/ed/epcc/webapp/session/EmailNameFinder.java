@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
@@ -38,7 +39,7 @@ import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
  *
  */
 
-public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,EmailNameFinder<AU>> implements HistoryFieldContributor,SummaryContributer<AU>,MenuContributor<AU>{
+public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,EmailNameFinder<AU>> implements HistoryFieldContributor,SummaryContributer<AU>,MenuContributor<AU>,AnonymisingComposite<AU>{
 
 	/** property to set the email input box width
 	 * 
@@ -194,6 +195,17 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 			return new String[0];
 		}
 		return new String[]{"Email"};
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.AnonymisingComposite#anonymise(uk.ac.ed.epcc.webapp.model.data.DataObject)
+	 */
+	@Override
+	public void anonymise(AU target) {
+		setName(target, null);
+		
 	}
 
 

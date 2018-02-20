@@ -20,36 +20,69 @@ import java.util.Map.Entry;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.model.data.transition.AbstractTransitionProvider;
+import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider;
+import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
-/**
+/** A {@link TransitionProvider} for operations on {@link AppUser}s
  * @author spb
  *
  */
 
-public class AppUserTranistionProvider<T extends AppUser,K extends AppUserKey<T>> extends AbstractTransitionProvider<T, K> {
+public class AppUserTransitionProvider extends AbstractViewTransitionProvider<AppUser, AppUserKey> {
+	public static final String VIEW_PERSON_RELATIONSHIP = "ViewPerson";
+	public static final AppUserKey SU_KEY = new AppUserKey("SU","Become another user") {
 
-	private final AppUserFactory<T> fac;
+		@Override
+		public boolean allow(AppUser user, SessionService op) {
+			if( op instanceof ServletSessionService) {
+				return user != null && ((ServletSessionService)op).canSU(user);
+			}
+			return false;
+		}
+	};
+	
+	public static final class SUTransition extends AbstractDirectTransition<AppUser>{
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
+		 */
+		@Override
+		public FormResult doTransition(AppUser target, AppContext c) throws TransitionException {
+			SessionService sess = c.getService(SessionService.class);
+			if( sess instanceof ServletSessionService) {
+				((ServletSessionService)sess).su(target);
+			}
+			return new RedirectResult("/main.jsp");
+		}
+		
+	}
+	private final AppUserFactory<?> fac;
 	/**
 	 * @param c
 	 */
-	public AppUserTranistionProvider(AppContext c) {
+	public AppUserTransitionProvider(AppContext c) {
 		super(c);
 		fac = c.getService(SessionService.class).getLoginFactory();
-		for(AppUserTransitionContributor<T> cont : fac.getComposites(AppUserTransitionContributor.class)) {
-			for(Entry<AppUserKey<T>, Transition<T>> e : cont.getTransitions().entrySet()) {
-				addTransition((K) e.getKey(), e.getValue());
+		for(AppUserTransitionContributor cont : fac.getComposites(AppUserTransitionContributor.class)) {
+			for(Entry<AppUserKey, Transition<AppUser>> e : cont.getTransitions().entrySet()) {
+				addTransition( e.getKey(), e.getValue());
 			}
 		}
+		addTransition(SU_KEY, new SUTransition());
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider#getTarget(java.lang.String)
 	 */
 	@Override
-	public T getTarget(String id) {
+	public AppUser getTarget(String id) {
 		try {
 			return fac.find(Integer.parseInt(id));
 		} catch (NumberFormatException e) {
@@ -64,7 +97,7 @@ public class AppUserTranistionProvider<T extends AppUser,K extends AppUserKey<T>
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider#getID(java.lang.Object)
 	 */
 	@Override
-	public String getID(T target) {
+	public String getID(AppUser target) {
 		return Integer.toString(target.getID());
 	}
 
@@ -80,7 +113,7 @@ public class AppUserTranistionProvider<T extends AppUser,K extends AppUserKey<T>
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#allowTransition(uk.ac.ed.epcc.webapp.AppContext, java.lang.Object, java.lang.Object)
 	 */
 	@Override
-	public boolean allowTransition(AppContext c, T target, K key) {
+	public boolean allowTransition(AppContext c, AppUser target, AppUserKey key) {
 		return key.allow(target, c.getService(SessionService.class));
 	}
 
@@ -88,16 +121,31 @@ public class AppUserTranistionProvider<T extends AppUser,K extends AppUserKey<T>
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#getSummaryContent(uk.ac.ed.epcc.webapp.AppContext, uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object)
 	 */
 	@Override
-	public <X extends ContentBuilder> X getSummaryContent(AppContext c, X cb, T target) {
+	public <X extends ContentBuilder> X getSummaryContent(AppContext c, X cb, AppUser target) {
+		cb.addHeading(2, "Person details");
 		Map<String,Object> attr = new LinkedHashMap<>();
-		fac.addAttributes(attr, target);
+		((AppUserFactory)fac).addAttributes(attr, target);
 		Table t = new Table();
 		String col = "Value";
 		t.addMap(col, attr);
+		t.setKeyName("Property");
 		if( t.hasData()) {
 			cb.addColumn(getContext(), t, col);
 		}
 		return cb;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#canView(java.lang.Object, uk.ac.ed.epcc.webapp.session.SessionService)
+	 */
+	@Override
+	public boolean canView(AppUser target, SessionService<?> sess) {
+		try {
+			return ((SessionService)sess).isCurrentPerson(target) || ((SessionService)sess).hasRelationship((AppUserFactory)sess.getLoginFactory(), target, VIEW_PERSON_RELATIONSHIP);
+		} catch (UnknownRelationshipException e) {
+			getLogger().error("Error checking view", e);
+			return false;
+		}
 	}
 
 }
