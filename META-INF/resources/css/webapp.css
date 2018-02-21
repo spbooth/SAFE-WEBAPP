@@ -39,6 +39,16 @@ color: black;
         white-space: normal;
 	}
 
+/** nested block have same width as parent
+ * but keep top-bottom spacing
+ */
+div.block div.block {
+	margin-left: 0px;
+	margin-right: 0px;
+	padding-left: 0px;
+	padding-right: 0px;
+	width: 100%;
+}
 /* The basic centered Grey block
  * This can hold headers paragraphs and forms.
  */
