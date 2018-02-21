@@ -32,7 +32,6 @@ import uk.ac.ed.epcc.webapp.charts.TimeChart;
 import uk.ac.ed.epcc.webapp.charts.strategy.LabelledSetRangeMapper;
 import uk.ac.ed.epcc.webapp.charts.strategy.RangeMapper;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpressionMatchFilter;
@@ -42,13 +41,9 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.DefaultTableTransitionRegistry;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableTransitionRegistry;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableTransitionTarget;
-import uk.ac.ed.epcc.webapp.jdbc.table.TransitionSource;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.BasicType;
@@ -68,7 +63,6 @@ import uk.ac.ed.epcc.webapp.model.data.iterator.DecoratingIterator;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
 import uk.ac.ed.epcc.webapp.model.data.table.TableStructureDataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 /**
@@ -271,10 +265,10 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		 * @param peer
 		 *            DataObject to act as peer
 		 */
-		void setup(P peer) {
+		void setup(Date now,P peer) {
 
 			setPeerID(peer.getID());
-			setStartTime(now(getContext())); 
+			setStartTime(now); 
 			setEndTime(new Date(ENDTIME));
 			setStatus(TAIL);
 			// make sure we don't have a field clash
@@ -746,14 +740,14 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	 * @throws ConsistencyError
 	 * @throws DataFault
 	 */
-	protected final HistoryRecord<P> makeHistory(P peer)
+	protected final HistoryRecord<P> makeHistory(Date now,P peer)
 			throws ConsistencyError, DataFault {
 		// default implementation is to initialise from Hashtable
 		// this picks up any field the two tables have in common.
 		HistoryRecord<P> h = makeBDO();
 
 		// intialise the timestamps.
-		h.setup(peer);
+		h.setup(now,peer);
 		return h;
 	}
 
@@ -827,6 +821,11 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 
 	}
 
+	/** extension point to allow history to be skipped based on peer state
+	 * 
+	 * @param peer
+	 * @return
+	 */
 	public boolean skipUpdate(P peer){
 		return false;
 	}
@@ -860,7 +859,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 
 			// log.info("Making new object");
 			// make a new entry
-			HistoryRecord<P> new_value = makeHistory(peer);
+			HistoryRecord<P> new_value = makeHistory(now,peer);
 			new_value.commit();
 			// log.info("Made new object");
 			if (tail != null) {
