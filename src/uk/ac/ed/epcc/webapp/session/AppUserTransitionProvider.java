@@ -19,6 +19,7 @@ import java.util.Map.Entry;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
@@ -132,6 +133,21 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 		if( t.hasData()) {
 			cb.addColumn(getContext(), t, col);
 		}
+		String privacy_policy=c.getInitParameter("service.url.privacypolicy");
+	    if( privacy_policy != null && ! privacy_policy.isEmpty() ){ 
+	    	ExtendedXMLBuilder text = cb.getText();
+	    	text.open("small");
+	    	text.clean(c.expandText("All information supplied is held and processed in accordance with the ${service.name} Personal Data and Privacy Policy.\n" + 
+	    			"You can find full details "));
+	    	text.open("a");
+	    		text.attr("href",privacy_policy);
+	    		text.attr("target", "_blank");
+	    		text.clean("here");
+	    	text.close();
+	    	text.clean(".");
+	    	text.close();
+	    	text.appendParent();
+	    }
 		return cb;
 	}
 
