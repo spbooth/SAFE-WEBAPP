@@ -13,13 +13,17 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.model.IndexTableContributor;
 import uk.ac.ed.epcc.webapp.model.data.CreateComposite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
@@ -29,11 +33,11 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
  *
  */
 
-public class SignupDateComposite<BDO extends DataObject> extends CreateComposite<BDO, SignupDateComposite<BDO>> {
-
+public class SignupDateComposite<BDO extends DataObject> extends CreateComposite<BDO, SignupDateComposite<BDO>> 
+ implements IndexTableContributor<BDO>{
 	public static final String SIGNUP_DATE = "SignupDate";
 
-
+	private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	/**
 	 * @param fac
 	 */
@@ -88,6 +92,18 @@ public class SignupDateComposite<BDO extends DataObject> extends CreateComposite
 
 	public Date getSignupDate(BDO dat){
 		return getRecord(dat).getDateProperty(SIGNUP_DATE);
+	}
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.SummaryContributer#addAttributes(java.util.Map, uk.ac.ed.epcc.webapp.model.data.DataObject)
+	 */
+	@Override
+	public void addAttributes(Map<String, Object> attributes, BDO target) {
+		Date signupDate = getSignupDate(target);
+		if( signupDate != null) {
+			attributes.put("Signup Date", df.format(signupDate));
+		}
 	}
 
 	
