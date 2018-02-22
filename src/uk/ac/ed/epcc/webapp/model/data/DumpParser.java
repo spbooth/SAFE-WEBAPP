@@ -14,7 +14,9 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -71,6 +73,7 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 	private State state;
 	private int depth;
 	private Repository.Record current=null;
+	private Set<String> fields_set = new HashSet<>();
 	private Repository res=null;
 	private FieldInfo field=null;
 	private Integer id=null;
@@ -140,6 +143,11 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 					if( current != null ){
 						// end of record
 						Record rec = current;
+						for(String field : res.getFields()) {
+							if( ! fields_set.contains(field)) {
+								rec.setProperty(field, null);
+							}
+						}
 						int new_id = processRecord(id,rec);
 						if( new_id != 0 && id_map != null){
 							Map<Integer,Integer> map = id_map.get(res.getTag());
@@ -156,6 +164,7 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 					res=null;
 					current=null;
 					field=null;
+					fields_set.clear();
 				}
 			}
 		}else if (state == State.Schema){
@@ -237,7 +246,7 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 					id = Integer.parseInt(id_str);
 					res=Repository.getInstance(conn, name);
 					current = res.new Record();
-					
+					fields_set.clear();
 					if( getPreserveIds()){
 						// Edit existing record or use parsed id in insert.
 						current.setID(id, getIdMode());
@@ -249,7 +258,7 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 								Integer new_id = map.get(id);
 								if( new_id != null ){
 									// load existing values from database.
-									current.setID(new_id.intValue());
+									current.setID(new_id.intValue(), getIdMode());
 								}
 							}
 						}
@@ -276,6 +285,7 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 		}else if( state == State.Record && res != null ){
 			// must be field element
 			field=res.getInfo(name);
+			fields_set.add(name);
 			sb.setLength(0);
 		}else if( state == State.Schema && spec != null){
 			String type = arg3.getValue(Dumper.TYPE_ATTR);

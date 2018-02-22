@@ -1628,7 +1628,7 @@ public final class Repository implements AppContextCleanup{
 						if (atleastone) {
 							buff.append(" AND ");
 						}
-						if( containsKey(key)){
+						if( containsKey(key) && get(key) != null){
 							info.addName(buff, false, true);
 							buff.append("=?");
 							pattern_count++;
@@ -1653,7 +1653,7 @@ public final class Repository implements AppContextCleanup{
 							.prepareStatement(buff.toString());
 					int pos = 1;
 					for (String key : fields) {
-						if( isDirty(key)){
+						if( isDirty(key) && containsKey(key)){
 							setValue(buff, stmt, pos, key);
 							pos++;
 						}
@@ -1665,6 +1665,9 @@ public final class Repository implements AppContextCleanup{
 						}
 					}
 					//ctx.getService(LoggerService.class).getLogger(getClass()).debug("update :"+buff+" pos="+pos+" count="+pattern_count+" fieldcount="+fields.size()+" dirty"+dirty.size());
+					if( pos != pattern_count) {
+						System.out.println("pos "+pos+" count "+pattern_count);
+					}
 					assert(pos == pattern_count);
 					ResultSet rs = stmt.executeQuery();
 					if( rs.first()){
