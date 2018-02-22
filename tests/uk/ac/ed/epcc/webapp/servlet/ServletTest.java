@@ -273,7 +273,7 @@ public abstract class ServletTest extends WebappTestBase{
 		
 		assertNotNull(mess.getString(type+".title"));
 		assertNotNull(mess.getString(type+".text"));
-		assertEquals(type, req.getAttribute(WebappServlet.CONFIRM_TYPE));
+		assertEquals("Confirm type",type, req.getAttribute(WebappServlet.CONFIRM_TYPE));
 		checkForward(WebappServlet.SCRIPTS_CONFIRM_JSP);
 		res = new MockResponse();
 		ctx.setService(new DefaultServletService(ctx, serv_ctx, req, res));

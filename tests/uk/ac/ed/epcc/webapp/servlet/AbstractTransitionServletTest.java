@@ -442,7 +442,10 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		 checkContent(normalize_transform, expected_xml, content);
 		 return target;
 	}
-	
+	/** Select which direct transition from a {@link ConfirmTransition} is to be run
+	 * 
+	 * @param yes_no
+	 */
 	public void setConfirmTransition(boolean yes_no){
 		setAction(yes_no ? ConfirmTransition.YES : ConfirmTransition.NO);
 	}

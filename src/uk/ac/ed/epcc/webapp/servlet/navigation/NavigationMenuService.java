@@ -128,7 +128,11 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 		}
 		return menu;
 	}
-	
+	/** reset the Navigation menu so it is re-calculated for the next page view.
+	 * This needs to be called when the account state changes in a way that will
+	 * change the menu structure.
+	 * 
+	 */
 	public void resetMenu(){
 		SessionService service = getContext().getService(SessionService.class);
 		if( service != null ){
