@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.data;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -27,6 +28,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.BlobType;
 import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
@@ -75,6 +77,7 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 	private Repository.Record current=null;
 	private Repository res=null;
 	private FieldInfo field=null;
+	private boolean null_value=false;
 	private Integer id=null;
 	private StringBuilder sb = new StringBuilder();
 	private String table_name;
@@ -130,10 +133,14 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 					}
 					current.setProperty(field.getName(false), value);
 				}else{
-					try {
-						field.unDump(current, text);
-					} catch (Exception e) {
-						throw new SAXException("undump parse error", e);
+					if( field.getNullable() && null_value ) {
+						current.setProperty(field.getName(false), null);
+					}else {
+						try {
+							field.unDump(current, text);
+						} catch (Exception e) {
+							throw new SAXException("undump parse error", e);
+						}
 					}
 				}
 				field=null;
@@ -189,9 +196,10 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 	 * @param rec uncommitted {@link Record} parsed from the file
 	 * @return int id to record in id_map.
 	 * @throws ConsistencyError
-	 * @throws DataFault
+	 * @throws DataException 
+	 * @throws IOException 
 	 */
-	public abstract int processRecord(int parse_id,Record rec) throws ConsistencyError, DataFault;
+	public abstract int processRecord(int parse_id,Record rec) throws ConsistencyError, DataException, IOException;
 	/** handle a {@link TableSpecification} once we have parsed it.
 	 * 
 	 * @param table
@@ -279,6 +287,7 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 			// must be field element
 			field=res.getInfo(name);
 			sb.setLength(0);
+			null_value = arg3.getValue(Dumper.NULL_VALUE_ATTR) != null;
 		}else if( state == State.Schema && spec != null){
 			String type = arg3.getValue(Dumper.TYPE_ATTR);
 			String ref = arg3.getValue(Dumper.REFERENCE_ATTR);

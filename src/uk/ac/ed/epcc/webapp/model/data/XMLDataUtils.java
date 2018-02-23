@@ -151,9 +151,10 @@ public class XMLDataUtils implements Contexed{
 	 * @throws DataException
 	 * @throws DataFault
 	 * @throws ConsistencyError
+	 * @throws IOException 
 	 */
 	public void dumpAllTables(Dumper dumper) throws DataException, DataFault,
-			ConsistencyError {
+			ConsistencyError, IOException {
 		DataBaseHandlerService handler = getContext().getService(DataBaseHandlerService.class);
 		if( handler != null){
 			// we want the order to be the same on all OS including windows that 

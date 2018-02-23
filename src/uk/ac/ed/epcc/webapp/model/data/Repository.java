@@ -402,7 +402,13 @@ public final class Repository implements AppContextCleanup{
         	if( r.getProperty(name) == null){
         		return null;
         	}
-        	if( isString()){
+        	if( isReference()) {
+        		int id = r.getIntProperty(name, -1);
+        		if(id <= 0) {
+        			return null;
+        		}
+        		return Integer.toString(id);
+        	}else if( isString()){
         		return r.getStringProperty(name);
         	}else if( isBoolean()){
         		return Boolean.toString(r.getBooleanProperty(name));
@@ -427,7 +433,10 @@ public final class Repository implements AppContextCleanup{
         	if( text == null ){
         		return;
         	}
-        	if( isString()){
+        	if( isReference()) {
+        		r.setProperty(name,Integer.parseInt(text));
+    			return;
+        	}else if( isString()){
         		r.setProperty(name, text);
         	}else if ( isBoolean()){
         		r.setProperty(name, Boolean.parseBoolean(text));
@@ -868,7 +877,9 @@ public final class Repository implements AppContextCleanup{
 		 *             if id not defined yet
 		 */
 		public final int getID() throws ConsistencyError {
-			if (have_id) {
+			// Use value not have_id as this may be an uncommitted
+			// record with id IgnoreExisting
+			if (id > 0) {
 				return id;
 			}
 			throw new ConsistencyError("Cannot get ID of uncommited object");
@@ -1252,7 +1263,7 @@ public final class Repository implements AppContextCleanup{
 		 * as part of a constructor.
 		 * 
 		 * @param id2
-		 * @param require_existing
+		 * @param mode {@link IdMode}
 		 * @return
 		 * @throws DataException
 		 */

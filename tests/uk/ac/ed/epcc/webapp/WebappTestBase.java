@@ -208,8 +208,9 @@ public abstract class WebappTestBase implements ContextHolder{
 	 * @throws DataFault
 	 * @throws DataException
 	 * @throws ConsistencyError
+	 * @throws IOException 
 	 */
-	public final void takeBaseline() throws DataFault, DataException, ConsistencyError{
+	public final void takeBaseline() throws DataFault, DataException, ConsistencyError, IOException{
 		
 		// make a baseline dump
 		baseline.clear();

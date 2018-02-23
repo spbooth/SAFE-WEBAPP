@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.data;
 
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -62,9 +63,11 @@ import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
  *
  */
 public class Dumper implements Contexed{
+
 	/**
 	 * 
 	 */
+	public static final String DELETED_ATTR = "deleted";
 	public static final String COLUMN = "Column";
 	public static final String DOUBLE_TYPE = "Double";
 	public static final String FLOAT_TYPE = "Float";
@@ -82,6 +85,7 @@ public class Dumper implements Contexed{
 	public static final String NULLABLE_ATTR = "nullable";
 	public static final String UNIQUE_ATTR = "unique";
 	public static final String NAME_ATTR = "name";
+	public static final String NULL_VALUE_ATTR = "null";
 	public static final String ID = "id";
 	public static final String TABLE_SPECIFICATION = "TableSpecification";
 	public Dumper(AppContext conn,SimpleXMLBuilder builder) {
@@ -94,15 +98,21 @@ public class Dumper implements Contexed{
 
 	private final AppContext conn;
     private final SimpleXMLBuilder builder;
+    /** records that have already been processed so should
+     * not be dumped if referenced again.
+     */
     private final Map<String,Set<Integer>>seen;
-    // A map of externally generated specifications These are optional but can augment
-    // the dump
+    /** A map of externally generated specifications These are optional but can augment
+     * the dump
+     */
     private final Map<String,TableSpecification> specifications;
+    private boolean dump_null_values=false;
+    private boolean verbose_diff=true;
     
 	public AppContext getContext() {
 		return conn;
 	}
-	public void dump(DataObject obj){
+	public void dump(DataObject obj) throws DataFault, IOException{
 		dump(obj.record);
 	}
 	
@@ -136,6 +146,20 @@ public class Dumper implements Contexed{
 		dumped.add(id);
 		return true;
 	}
+	/** Has a specified record already been processed.
+	 * 
+	 * @param tag
+	 * @param id
+	 * @return
+	 */
+	public boolean beenSeen(String tag,int id) {
+		String key = tag.toLowerCase(Locale.ENGLISH);
+		Set<Integer> dumped = seen.get(key);
+		if( dumped == null ){
+			return false;
+		}
+		return dumped.contains(id);
+	}
 	/** Mark a record as "seen" so it will be excluded if encountered in the dump
 	 * process.
 	 * 
@@ -145,7 +169,7 @@ public class Dumper implements Contexed{
 	public void markSeen(String tag,int id){
 		register(null,tag,id);
 	}
-	public void dump(Repository.Record rec){
+	protected void dump(Repository.Record rec) throws DataFault, IOException{
 		Repository res = rec.getRepository();
 		int id = rec.getID();
 		String tag = res.getTag();
@@ -167,28 +191,21 @@ public class Dumper implements Contexed{
 							
 						}
 					}
-					int remote_id = rec.getIntProperty(name,-1);
-					if( remote_id > 0){
-						sb.open(name);
-						sb.clean(Integer.toString(remote_id));
-						sb.close();
-						sb.clean("\n");
-					}
-				}else{
-					String dat;
-					try {
-						dat = field.dump(rec);
-						if( dat != null ){
-							sb.open(name);
-							sb.clean(dat);
-							sb.close();
-							sb.clean("\n");
-						}
-					} catch (Exception e) {
-						conn.getService(LoggerService.class).getLogger(getClass()).error("Error dumping field",e);
-					}
-					
 				}
+				String dat;
+
+				dat = field.dump(rec);
+				if( dat != null ){
+					sb.open(name);
+					sb.clean(dat);
+					sb.close();
+					sb.clean("\n");
+				}else if( dump_null_values) {
+					sb.open(name);
+					sb.attr(NULL_VALUE_ATTR, "true");
+					sb.close();
+				}
+
 
 			}
 			sb.close();
@@ -196,7 +213,76 @@ public class Dumper implements Contexed{
 			sb.appendParent();
 		}
 	}
-	public void dumpAll(Repository res) throws ConsistencyError, DataException{
+	/** Compare a {@link Record} with a baseline.
+	 * 
+	 * If the records are the same, record is just marked as seen.
+	 * If they differ dump the fields that have changed.
+	 * 
+	 * @param rec
+	 * @param orig
+	 */
+	
+	private boolean compare(String a, String b) {
+		if( a == null ) {
+			return b==null;
+		}
+		if( b == null ) {
+			return false;
+		}
+		return a.equals(b);
+	}
+	protected boolean dumpDiff(Repository.Record rec,Repository.Record baseline) throws DataFault, IOException{
+		if( rec == null) {
+			// assume this means the record has been deleted
+			int id = baseline.getID();
+			String tag = baseline.getRepository().getTag();
+			builder.open(tag);
+			builder.attr(ID, Integer.toString(id));
+			builder.attr(DELETED_ATTR, "true");
+			builder.close();
+			return true;
+		}
+		Repository res = rec.getRepository();
+		int id = rec.getID();
+		String tag = res.getTag();
+		boolean differs=false;
+
+		SimpleXMLBuilder sb = builder.getNested();
+		sb.open(tag);
+		sb.attr(ID, Integer.toString(id));
+		sb.clean("\n");
+		for(FieldInfo field : res.getInfo()){
+			String name = field.getName(false);
+			String modified = field.dump(rec);
+			String baseline_value = field.dump(baseline);
+			boolean field_differs = ! compare(modified, baseline_value);
+			if( field_differs) {
+				differs=true;
+			}
+			if( field_differs || verbose_diff) {
+				if( modified != null ){
+					sb.open(name);
+					sb.clean(modified);
+					sb.close();
+					sb.clean("\n");
+				}else if( field_differs || dump_null_values){
+					// Always mark a null if the field changed
+					sb.open(name);
+					sb.attr(NULL_VALUE_ATTR, "true");
+					sb.close();
+				}
+			}
+		}
+		sb.close();
+		sb.clean("\n");
+		if( differs) {
+			// add diff to dump
+			sb.appendParent();
+		}
+		markSeen(tag, id);
+		return differs;
+	}
+	public void dumpAll(Repository res) throws ConsistencyError, DataException, IOException{
 		StringBuilder query= new StringBuilder();
 		query.append("SELECT * from ");
 		res.addTable(query, true);
@@ -290,6 +376,27 @@ public class Dumper implements Contexed{
 		sb.close();
 		sb.clean("\n");
 		sb.appendParent();
+	}
+	/**
+	 * @return the dump_null_values
+	 */
+	public boolean dumpNullValues() {
+		return dump_null_values;
+	}
+	public void setDumpNullValues(boolean dump) {
+		dump_null_values=dump;
+	}
+	/**
+	 * @return the verbose_diff
+	 */
+	public boolean verboseDiff() {
+		return verbose_diff;
+	}
+	/**
+	 * @param verbose_diff the verbose_diff to set
+	 */
+	public void setVerboseDiff(boolean verbose_diff) {
+		this.verbose_diff = verbose_diff;
 	}
 
 }
