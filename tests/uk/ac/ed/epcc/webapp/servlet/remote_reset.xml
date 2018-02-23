@@ -1,10 +1,4 @@
 <Diff><Person id='1'>
-<Email>fred@example.com</Email>
-<PasswordFails>0</PasswordFails>
-<PasswordStatus>V</PasswordStatus>
-<Salt>HYSeRHOzNK9mKy3z</Salt>
-<Alg>0</Alg>
-<Password>60884ea4f36dff85f59f91bc66f2d27f</Password>
 <WebName null='true'/>
 </Person>
 <Person id='2'>

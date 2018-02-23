@@ -93,7 +93,7 @@ public class XMLDataUtilsTest extends WebappTestBase {
 		 reader = new StringReader(baseline.toString());
 		 utils.getDiff(diff, new InputSource(reader));
 		 System.out.println(diff.toString());
-		 assertEquals("<Test id='1'>\n<Name>fred</Name>\n<Number>19998.0</Number>\n<UnsignedInt>0</UnsignedInt>\n<Mandatory>Junk</Mandatory>\n</Test>\n",diff.toString());
+		 assertEquals("<Test id='1'>\n<Number>19998.0</Number>\n</Test>\n",diff.toString());
 		
 	}
 	

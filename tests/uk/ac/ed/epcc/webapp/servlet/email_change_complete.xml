@@ -2,10 +2,5 @@
 <EmailChangeRequest id='1' deleted='true'/>
 <Person id='1'>
 <Email>bilbo@example.com</Email>
-<PasswordFails>0</PasswordFails>
-<PasswordStatus>I</PasswordStatus>
-<Salt></Salt>
-<Alg>0</Alg>
-<Password>locked</Password>
 </Person>
 </Diff>

@@ -18,10 +18,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Comparator;
 import java.util.Locale;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -62,7 +60,7 @@ public class XMLDataUtils implements Contexed{
 	 * 
 	 */
 	private static final Feature DROP_TABLES_FEATURE = new Feature("test.drop-tables", false,"drop all tables before test not just fixtures");
-
+	private static final Feature MINIMAL_DIFF_FEATURE = new Feature("test.minimal-diff", false,"Only show changed fields in a diff");
 	private final AppContext conn;
 	private XMLReader reader=null;
 	private SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -132,6 +130,7 @@ public class XMLDataUtils implements Contexed{
 	
 	public void getDiff(SimpleXMLBuilder output,InputSource baseline) throws DataException, Exception{
 		Dumper dumper = new Dumper(getContext(), output);
+		dumper.setVerboseDiff(! MINIMAL_DIFF_FEATURE.isEnabled(getContext()));
 		DiffParser diff_parser = new DiffParser(getContext(), dumper);
 		
 		getDiff(diff_parser, baseline);
