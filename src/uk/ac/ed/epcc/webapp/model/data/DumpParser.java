@@ -120,18 +120,23 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 				Object value=null;
 				String tab = field.getReferencedTable();
 				if( tab != null){
-					int doc_id = Integer.parseInt(text);
-					if( id_map != null ){
-						Map<Integer, Integer> map = id_map.get(tab);
-						if( map != null ){
-							value = map.get(doc_id);
+					if( field.getNullable() && null_value ) {
+						current.setProperty(field.getName(false), null);
+					}else {
+						// Have to explicitly apply mappings
+						int doc_id = Integer.parseInt(text);
+						if( id_map != null ){
+							Map<Integer, Integer> map = id_map.get(tab);
+							if( map != null ){
+								value = map.get(doc_id);
+							}
 						}
+						if( value == null ){
+							// have to assume the dump is using the same id-space as currently loaded.
+							value=doc_id;
+						}
+						current.setProperty(field.getName(false), value);
 					}
-					if( value == null ){
-						// have to assume the dump is using the same id-space as currently loaded.
-						value=doc_id;
-					}
-					current.setProperty(field.getName(false), value);
 				}else{
 					if( field.getNullable() && null_value ) {
 						current.setProperty(field.getName(false), null);
