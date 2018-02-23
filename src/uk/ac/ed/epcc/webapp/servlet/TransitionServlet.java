@@ -518,8 +518,13 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		public String visitPathTransitionProvider(
 				PathTransitionProvider<K, T> prov) {
 			StringBuilder path = new StringBuilder();
+			boolean seen=false;
 			for(String pe : prov.getID(target)){
-				path.append("/");
+				if( seen ) {
+					path.append("/");
+				}else {
+					seen=true;
+				}
 				path.append(pe);
 			}
 			return path.toString();
@@ -687,6 +692,13 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			url.append(tp.accept(vis));
 		}
 		if( operation != null ){
+			if( tp instanceof DefaultingTransitionFactory) {
+				A def = ((DefaultingTransitionFactory<A, B>)tp).getDefaultTransition(target);
+				if( def != null && operation.equals(def)) {
+					// Don't need to specify
+					return url.toString();
+				}
+			}
 			url.append("/");
 			url.append(DefaultServletService.ARG_TERRMINATOR);
 			url.append("/");
