@@ -391,6 +391,8 @@ public final class Repository implements AppContextCleanup{
         /** method to dump the field value to a canonical text
          * representation.
          * 
+         * returns null of the field is null.
+         * 
          * @param r
          * @return
          * @throws DataFault 
