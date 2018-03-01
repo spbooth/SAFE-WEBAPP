@@ -31,12 +31,23 @@ public class RegularPeriodInput extends MultiInput<RegularSplitPeriod, Input> {
 	public RegularPeriodInput(){
 		this(1000L,Calendar.SECOND);
 	}
+	public RegularPeriodInput(Date current_time){
+		this(current_time,1000L,Calendar.SECOND);
+	}
 	public RegularPeriodInput(long res,int finest){
+		this(null,res,finest);
+	}
+	public RegularPeriodInput(Date current_time,long res,int finest){
 		start = new TimeStampMultiInput(res,finest);
 		end = new TimeStampMultiInput(res,finest);
 		splits = new IntegerInput();
 		splits.setMin(2);
 		Calendar cal = Calendar.getInstance();
+		if( current_time != null) {
+			// allowing the current time to be passed
+			// in is needed to support time dependent tests.
+			cal.setTime(current_time);
+		}
 		cal.set(Calendar.MILLISECOND,0);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MINUTE,0);

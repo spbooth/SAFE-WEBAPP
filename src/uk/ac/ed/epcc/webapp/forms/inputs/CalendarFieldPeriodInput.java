@@ -50,11 +50,23 @@ public class CalendarFieldPeriodInput extends MultiInput<CalendarFieldSplitPerio
 	public CalendarFieldPeriodInput(){
 		this(Calendar.SECOND);
 	}
+	public CalendarFieldPeriodInput(Date now){
+		this(now,Calendar.SECOND);
+	}
 	public CalendarFieldPeriodInput(int finest_field){
 		this(finest_field,0);
 	}
+	public CalendarFieldPeriodInput(Date now,int finest_field){
+		this(now,finest_field,0);
+	}
 	public CalendarFieldPeriodInput(int finest_field, int fixed_blocks){
+		this(null,finest_field,fixed_blocks);
+	}
+	public CalendarFieldPeriodInput(Date now,int finest_field, int fixed_blocks){
 		Calendar cal = Calendar.getInstance();
+		if( now != null) {
+			cal.setTime(now);
+		}
 		cal.set(Calendar.MILLISECOND,0);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MINUTE,0);
