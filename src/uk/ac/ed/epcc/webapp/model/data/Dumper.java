@@ -184,11 +184,14 @@ public class Dumper implements Contexed{
 				if( field.isReference()){
 					TypeProducer prod = field.getTypeProducer();
 					if( prod != null){
-						DataObject remote = (DataObject) rec.getProperty(prod);
-						if( remote != null ){
-							// write dependencies before record
-							dump(remote.record);
-							
+						Object val = rec.getProperty(prod);
+						if( val instanceof DataObject) {
+							DataObject remote = (DataObject) val;
+							if( remote != null ){
+								// write dependencies before record
+								dump(remote.record);
+
+							}
 						}
 					}
 				}

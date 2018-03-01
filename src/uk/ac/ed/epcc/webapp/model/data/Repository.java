@@ -402,7 +402,7 @@ public final class Repository implements AppContextCleanup{
         	if( r.getProperty(name) == null){
         		return null;
         	}
-        	if( isReference()) {
+        	if( isReference() && isNumeric()) {
         		int id = r.getIntProperty(name, -1);
         		if(id <= 0) {
         			return null;
@@ -433,7 +433,7 @@ public final class Repository implements AppContextCleanup{
         	if( text == null ){
         		return;
         	}
-        	if( isReference()) {
+        	if( isReference()&& isNumeric()) {
         		r.setProperty(name,Integer.parseInt(text));
     			return;
         	}else if( isString()){
