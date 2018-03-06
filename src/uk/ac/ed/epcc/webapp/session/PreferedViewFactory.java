@@ -65,7 +65,7 @@ public class PreferedViewFactory extends ClassificationFactory<PreferedView> {
 	 */
 	@Override
 	protected DataObject makeBDO(Record res) throws DataFault {
-		return new PreferedView(res);
+		return new PreferedView(res, this);
 	}
 
 	/* (non-Javadoc)

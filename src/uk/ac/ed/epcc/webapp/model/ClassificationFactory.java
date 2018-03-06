@@ -59,6 +59,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedDataCache;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 import uk.ac.ed.epcc.webapp.model.data.table.TableStructureDataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.history.HistoryFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** Factory class for Classification objects.
@@ -77,9 +78,24 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 	 */
 	private static final int CLASSIFICATION_MAX_MENU = 200;
 	private static final Pattern WHITESPACE = Pattern.compile("\\s");
+	
+	private HistoryFactory<T,HistoryFactory.HistoryRecord<T>> hist_fac;
+	
     public ClassificationFactory(AppContext ctx, String homeTable){
     	setContext(ctx, homeTable);
+    	
+    	// create history factory if history table configured
+    	hist_fac = null;
+    	String histTable = ctx.getInitParameter(homeTable + ".history_table");
+    	if (histTable != null) {
+    		hist_fac = new HistoryFactory<>(ctx, histTable);
+    	}
     }
+    
+    public HistoryFactory<T,HistoryFactory.HistoryRecord<T>> getHistoryFactory() {
+    	return hist_fac;
+    }
+    
     @Override
     public TableSpecification getDefaultTableSpecification(AppContext c,String homeTable){
       TableSpecification spec = Classification.getTableSpecification(c,homeTable);
@@ -122,7 +138,7 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
     }
 	@Override
 	protected DataObject makeBDO(Record res) throws DataFault {
-		return new Classification(res);
+		return new Classification(res, this);
 	}
 	@Override
 	public Class<? super T> getTarget() {

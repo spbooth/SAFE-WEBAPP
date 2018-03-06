@@ -23,11 +23,14 @@ import java.security.Principal;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.history.HistoryFactory;
 
 
 
@@ -61,8 +64,11 @@ public class Classification extends DataObject implements Principal, Comparable<
     public String getDescription()     { return record.getStringProperty(DESCRIPTION); }
     public void setDescription(String desc){ record.setOptionalProperty(DESCRIPTION, desc); }
     
-    protected Classification(Repository.Record res){
+    protected ClassificationFactory fac;
+    
+    protected Classification(Repository.Record res, ClassificationFactory fac){
     	super(res);
+    	this.fac = fac;
     }
 
     /* (non-Javadoc)
@@ -118,5 +124,22 @@ public class Classification extends DataObject implements Principal, Comparable<
 		}
 		return result;
 	}
-
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.data.DataObject#post_commit(boolean)
+	 */
+	@Override
+	protected void post_commit(boolean changed) throws DataFault {
+		if ((changed) && (fac != null)) {
+			HistoryFactory hist_fac = fac.getHistoryFactory();
+			if (hist_fac != null) {
+				try {
+					hist_fac.update(this);
+				}
+				catch (DataException ex) {
+					getContext().error(ex, "Error updating history table");
+				}
+			}
+		}
+	}
+	
 }

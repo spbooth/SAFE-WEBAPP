@@ -27,8 +27,8 @@ public class PreferedView extends Classification{
 	/**
 	 * @param res
 	 */
-	protected PreferedView(Record res) {
-		super(res);
+	protected PreferedView(Record res, PreferedViewFactory fac) {
+		super(res, fac);
 	}
 	public void addEmailParams(Map<String, String> params) {
 		params.put(SERVICE_NAME, getName());
