@@ -88,7 +88,7 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
     	hist_fac = null;
     	String histTable = ctx.getInitParameter(homeTable + ".history_table");
     	if (histTable != null) {
-    		hist_fac = new HistoryFactory<>(ctx, histTable);
+    		hist_fac = new HistoryFactory<>(this, histTable);
     	}
     }
     
