@@ -26,15 +26,20 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 public class BufferLogger implements Logger {
     private final StringBuffer buffer;
     private Logger nested;
+    private int max_length=0;
 	/**
 	 * 
 	 */
-	public BufferLogger(StringBuffer buffer, Logger nested) {
+	public BufferLogger(StringBuffer buffer, int max_length, Logger nested) {
 		this.buffer=buffer;
 		this.nested=nested;
+		this.max_length=max_length;
 	}
 
 	private void doLog(Object message,Throwable t){
+		if( max_length > 0 && buffer.length() > max_length) {
+			buffer.setLength(0);
+		}
 		if(message != null ){
 			buffer.append(message);
 			buffer.append("\n");
@@ -46,6 +51,7 @@ public class BufferLogger implements Logger {
 			t.printStackTrace(new PrintWriter(writer));
 			buffer.append(writer.toString());
 		}
+		
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.logging.Logger#debug(java.lang.Object)
@@ -132,5 +138,7 @@ public class BufferLogger implements Logger {
 		nested.warn(message, t);
 		doLog(message, t);
 	}
+
+	
 
 }
