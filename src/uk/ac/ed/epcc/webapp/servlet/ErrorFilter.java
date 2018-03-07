@@ -381,7 +381,7 @@ public class ErrorFilter implements Filter {
 
 				//check for session stealing
 				HttpSession sess = req.getSession(false);
-				if( SESSION_STEALING_CHECK_FEATURE.isEnabled(conn) && sess != null ){
+				if( sess != null && SESSION_STEALING_CHECK_FEATURE.isEnabled(conn) ){
 					String host=(String) sess.getAttribute(LAST_ADDR_ATTR);
 					if( host != null ){
 						if( ! host.equals(req.getRemoteAddr())){ // host address has changed in a session
