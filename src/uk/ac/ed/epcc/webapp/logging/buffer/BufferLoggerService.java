@@ -27,6 +27,7 @@ public class BufferLoggerService implements LoggerService, Contexed{
     private final AppContext conn;
     private final LoggerService nested;
     private final StringBuffer buffer;
+    private int max_length=0;
 	/**
 	 * 
 	 */
@@ -53,14 +54,14 @@ public Class<? super LoggerService> getType() {
  * @see uk.ac.ed.epcc.webapp.logging.LoggerService#getLogger(java.lang.String)
  */
 public Logger getLogger(String name) {
-	return new BufferLogger(buffer, nested.getLogger(name));
+	return new BufferLogger(buffer, max_length,nested.getLogger(name));
 }
 
 /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.logging.LoggerService#getLogger(java.lang.Class)
  */
 public Logger getLogger(Class c) {
-	return new BufferLogger(buffer, nested.getLogger(c));
+	return new BufferLogger(buffer,max_length, nested.getLogger(c));
 }
 /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
@@ -71,6 +72,19 @@ public Logger getLogger(Class c) {
 	
 	public StringBuffer getBuffer(){
 		return buffer;
+	}
+	/**
+	 * @return the max_length
+	 */
+	public int getMaxLength() {
+		return max_length;
+	}
+
+	/**
+	 * @param max_length the max_length to set
+	 */
+	public void setMaxLength(int max_length) {
+		this.max_length = max_length;
 	}
 }
 	

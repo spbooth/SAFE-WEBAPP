@@ -92,7 +92,12 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
     	hist_fac = null;
     	String histTable = ctx.getInitParameter(homeTable + ".history_table");
     	if (histTable != null) {
-    		hist_fac = new HistoryFactory<>(this, histTable);
+    		// Allow sub-classing provided consrucor interface matches that of HistoryFactory
+    		try {
+				hist_fac = ctx.makeParamObject(ctx.getPropertyClass(HistoryFactory.class, histTable), this,histTable);
+			} catch (Exception e) {
+				getLogger().error("Error making histoy facory", e);
+			}
     	}
     }
     
