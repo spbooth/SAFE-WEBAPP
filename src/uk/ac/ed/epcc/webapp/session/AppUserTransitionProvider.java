@@ -38,7 +38,7 @@ import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
 public class AppUserTransitionProvider extends AbstractViewTransitionProvider<AppUser, AppUserKey> {
 	public static final String VIEW_PERSON_RELATIONSHIP = "ViewPerson";
-	public static final AppUserKey SU_KEY = new AppUserKey("SU","Become another user") {
+	public static final AppUserKey SU_KEY = new AppUserKey("SU","Become User","Switch to this user identity") {
 
 		@Override
 		public boolean allow(AppUser user, SessionService op) {
@@ -162,6 +162,14 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 			getLogger().error("Error checking view", e);
 			return false;
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionFactory#getText(uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey)
+	 */
+	@Override
+	public String getText(AppUserKey key) {
+		return key.getText();
 	}
 
 }

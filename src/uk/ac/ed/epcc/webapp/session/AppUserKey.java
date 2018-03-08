@@ -21,24 +21,39 @@ import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
  */
 
 public abstract class AppUserKey extends TransitionKey<AppUser> {
-
+	private final String button_text;
 	/**
-	 * @param t
 	 * @param name
 	 * @param help
 	 */
 	public AppUserKey(String name, String help) {
 		super(AppUser.class, name, help);
+		button_text=null;
 	}
 
+	public AppUserKey(String name, String text,String help) {
+		super(AppUser.class, name, help);
+		button_text=text;
+	}
 	/**
 	 * @param t
 	 * @param name
 	 */
 	public AppUserKey( String name) {
 		super(AppUser.class, name);
+		button_text=null;
 	}
 	
 	public abstract boolean allow(AppUser user,SessionService op);
 
+	/** get the button text to use
+	 * 
+	 * @return
+	 */
+	public String getText() {
+		if( button_text != null) {
+			return button_text;
+		}
+		return toString();
+	}
 }

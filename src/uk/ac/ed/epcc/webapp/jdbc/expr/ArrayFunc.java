@@ -21,6 +21,9 @@ package uk.ac.ed.epcc.webapp.jdbc.expr;
  *
  */
 public enum ArrayFunc {
+	/** select the greatest value from the array
+	 * 
+	 */
     GREATEST{
 
 		@Override
@@ -35,6 +38,9 @@ public enum ArrayFunc {
 		}
 	  
   },
+    /** select the least value from the array.
+     * 
+     */
   LEAST{
 
 	@Override
