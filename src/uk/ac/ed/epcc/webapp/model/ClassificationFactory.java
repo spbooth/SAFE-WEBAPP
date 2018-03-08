@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -60,6 +61,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 import uk.ac.ed.epcc.webapp.model.data.table.TableStructureDataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.history.HistoryFactory;
+import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** Factory class for Classification objects.
@@ -71,7 +73,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 
 
-public class ClassificationFactory<T extends Classification> extends TableStructureDataObjectFactory<T> implements Comparable<ClassificationFactory>, NameFinder<T>,NameInputProvider{
+public class ClassificationFactory<T extends Classification> extends TableStructureDataObjectFactory<T> implements Comparable<ClassificationFactory>, HistoryFieldContributor, NameFinder<T>,NameInputProvider{
 	
 	/** Maximum size of pull-down menu in update form.
 	 * 
@@ -80,10 +82,12 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 	private static final Pattern WHITESPACE = Pattern.compile("\\s");
 	
 	private HistoryFactory<T,HistoryFactory.HistoryRecord<T>> hist_fac;
+	private String homeTable;
 	
     public ClassificationFactory(AppContext ctx, String homeTable){
     	setContext(ctx, homeTable);
     	
+    	this.homeTable = homeTable;
     	// create history factory if history table configured
     	hist_fac = null;
     	String histTable = ctx.getInitParameter(homeTable + ".history_table");
@@ -492,5 +496,20 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 			return new NameFinderInput<>(this, false, restrict, fil);
 		}
 		return super.getInput(fil,restrict);
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor#addToHistorySpecification(uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification)
+	 */
+	@Override
+	public void addToHistorySpecification(TableSpecification spec) {
+		// add all the fields to the history specification, except the name since that shouldn't change
+		TableSpecification ts = getDefaultTableSpecification(getContext(), homeTable);
+		Set<String> fields = ts.getFieldNames();
+		for (String field : fields) {
+			if (!field.equals(Classification.NAME)) {
+				spec.setField(field, ts.getField(field));
+			}
+		}
 	}
 }
