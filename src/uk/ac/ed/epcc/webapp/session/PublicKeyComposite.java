@@ -6,6 +6,8 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.content.TemplateContributor;
+import uk.ac.ed.epcc.webapp.content.TemplateFile;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileUploadDecorator;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
@@ -25,7 +27,7 @@ import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
  *
  *
  */
-public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, PublicKeyComposite> implements UpdateNoteProvider<AppUser> , AnonymisingComposite<AppUser>, SummaryContributer<AppUser>, MetaDataContributer<AppUser>{
+public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, PublicKeyComposite> implements UpdateNoteProvider<AppUser> , AnonymisingComposite<AppUser>, SummaryContributer<AppUser>, MetaDataContributer<AppUser>, TemplateContributor<AppUser>{
 	/**
 	 * 
 	 */
@@ -182,6 +184,17 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 				getLogger().error("Error adding normalised key", e);
 			}
 
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.content.TemplateContributor#setTemplateContent(uk.ac.ed.epcc.webapp.content.TemplateFile, java.lang.String, uk.ac.ed.epcc.webapp.model.data.DataObject)
+	 */
+	@Override
+	public void setTemplateContent(TemplateFile template, String prefix, AppUser target) {
+		String key=getPublicKey(target);
+		if(key != null){
+			template.setProperty(prefix+"publickey", key);
 		}
 	}
 }

@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.content.TemplateContributor;
+import uk.ac.ed.epcc.webapp.content.TemplateFile;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.inputs.DNInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -13,7 +15,7 @@ import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.MetaDataContributer;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 
-public class CertificateComposite extends AppUserComposite<AppUser, CertificateComposite> implements AnonymisingComposite<AppUser>, SummaryContributer<AppUser>,MetaDataContributer<AppUser> {
+public class CertificateComposite extends AppUserComposite<AppUser, CertificateComposite> implements AnonymisingComposite<AppUser>, SummaryContributer<AppUser>,MetaDataContributer<AppUser>,TemplateContributor<AppUser> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#addOptional(java.util.Set)
 	 */
@@ -117,6 +119,17 @@ public class CertificateComposite extends AppUserComposite<AppUser, CertificateC
 			attributes.put("Certificate",dn);
 		}
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.content.TemplateContributor#setTemplateContent(uk.ac.ed.epcc.webapp.content.TemplateFile, java.lang.String, uk.ac.ed.epcc.webapp.model.data.DataObject)
+	 */
+	@Override
+	public void setTemplateContent(TemplateFile template, String prefix, AppUser target) {
+		String cert=getPersonalCertificateDn(target);
+		if(cert != null){
+			template.setProperty(prefix+"certificate", cert);
+		}
 	}
 
 }
