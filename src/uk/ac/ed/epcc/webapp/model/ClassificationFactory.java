@@ -81,27 +81,29 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 	private static final int CLASSIFICATION_MAX_MENU = 200;
 	private static final Pattern WHITESPACE = Pattern.compile("\\s");
 	
-	private HistoryFactory<T,HistoryFactory.HistoryRecord<T>> hist_fac;
+	private HistoryFactory<T,HistoryFactory.HistoryRecord<T>> hist_fac=null;
 	private String homeTable;
 	
     public ClassificationFactory(AppContext ctx, String homeTable){
     	setContext(ctx, homeTable);
     	
     	this.homeTable = homeTable;
-    	// create history factory if history table configured
-    	hist_fac = null;
-    	String histTable = ctx.getInitParameter(homeTable + ".history_table");
-    	if (histTable != null) {
-    		// Allow sub-classing provided consrucor interface matches that of HistoryFactory
-    		try {
-				hist_fac = ctx.makeParamObject(ctx.getPropertyClass(HistoryFactory.class, histTable), this,histTable);
-			} catch (Exception e) {
-				getLogger().error("Error making histoy facory", e);
-			}
-    	}
+    	
     }
     
     public HistoryFactory<T,HistoryFactory.HistoryRecord<T>> getHistoryFactory() {
+    	if( hist_fac == null) {
+    		// create history factory if history table configured
+        	String histTable = getContext().getInitParameter(homeTable + ".history_table");
+        	if (histTable != null) {
+        		// Allow sub-classing provided consrucor interface matches that of HistoryFactory
+        		try {
+    				hist_fac = getContext().makeParamObject(getContext().getPropertyClass(HistoryFactory.class, histTable), this,histTable);
+    			} catch (Exception e) {
+    				getLogger().error("Error making history factory "+histTable+" for "+homeTable, e);
+    			}
+        	}
+    	}
     	return hist_fac;
     }
     
