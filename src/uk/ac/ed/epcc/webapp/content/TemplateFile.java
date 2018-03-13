@@ -535,7 +535,7 @@ public class TemplateFile {
 				template.template_values.length);
 	}
 
-	String getFilename() {
+	public String getFilename() {
 		return filename;
 	}
 
@@ -555,7 +555,9 @@ public class TemplateFile {
 	Enumeration getPropertyNames() {
 		return template_elements.keys();
 	}
-
+    public boolean isEmpty() {
+    	return file_contents == null || file_contents.isEmpty();
+    }
 	public Set<String> propertyNames(){
 		return template_elements.keySet();
 	}

@@ -65,6 +65,7 @@ import uk.ac.ed.epcc.webapp.content.XMLPrintWriterPolicy;
 import uk.ac.ed.epcc.webapp.content.XMLPrinterWriter;
 import uk.ac.ed.epcc.webapp.email.logging.EmailLogger;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -288,7 +289,7 @@ public class Emailer {
 	}
 
 	public MimeMessage templateMessage(String sendto, Hashtable h,
-			TemplateFile email_template) throws IOException, MessagingException {
+			TemplateFile email_template) throws IOException, MessagingException, InvalidArgument {
 		Logger log = getLogger();
 		// change destination depending on sendto:
 		String email = mapRecipients(sendto);
@@ -297,7 +298,7 @@ public class Emailer {
 		return templateMessage(new String[] { email }, h, email_template);
 	}
 	public MimeMessage templateMessage(String sendto, Hashtable h,
-			TemplateFile email_template,Map<String,String> params) throws IOException, MessagingException {
+			TemplateFile email_template,Map<String,String> params) throws IOException, MessagingException, InvalidArgument {
 		Logger log = getLogger();
 		// change destination depending on sendto:
 		String email = mapRecipients(sendto);
@@ -322,14 +323,15 @@ public class Emailer {
 	 * @return {@link MimeMessage}
 	 * @throws IOException
 	 * @throws MessagingException
+	 * @throws InvalidArgument 
 	 */
 	public MimeMessage templateMessage(AppUser recipient, TemplateFile email_template)
-			throws IOException, MessagingException {
+			throws IOException, MessagingException, InvalidArgument {
 		return templateMessage(recipient, null, email_template);
 	}
 	
 	public MimeMessage templateMessage(AppUser recipient, Hashtable headers,TemplateFile email_template)
-			throws IOException, MessagingException {
+			throws IOException, MessagingException, InvalidArgument {
 	Logger log = getLogger();
 	String email = getEmail(recipient);
 	log.debug("Email mapped "+recipient.getEmail()+"->"+email);
@@ -463,16 +465,23 @@ public class Emailer {
      * @return MimeMessage sent
 	 * @throws UnsupportedEncodingException
 	 * @throws MessagingException
+	 * @throws InvalidArgument 
 	 */
-	public MimeMessage templateMessage(String[] notify_emails, Hashtable headers, TemplateFile email_template) throws MessagingException, UnsupportedEncodingException {
+	public MimeMessage templateMessage(String[] notify_emails, Hashtable headers, TemplateFile email_template) throws MessagingException, UnsupportedEncodingException, InvalidArgument {
 		return templateMessage(notify_emails,headers,null,false,email_template);
 	}
-	public MimeMessage templateMessage(String[] notify_emails, Hashtable headers, InternetAddress from, boolean multipart, TemplateFile email_template) throws MessagingException, UnsupportedEncodingException {
+	public MimeMessage templateMessage(String[] notify_emails, Hashtable headers, InternetAddress from, boolean multipart, TemplateFile email_template) throws MessagingException, UnsupportedEncodingException, InvalidArgument {
 		return templateMessage(notify_emails, DEFAULT_HEADER_PREFIX,headers, from, multipart, email_template,null);
 	}
-	public MimeMessage templateMessage(String[] notify_emails, String header_prefix,Hashtable headers, InternetAddress from, boolean multipart, TemplateFile email_template,Map<String,String> params) throws MessagingException, UnsupportedEncodingException {
+	public MimeMessage templateMessage(String[] notify_emails, String header_prefix,Hashtable headers, InternetAddress from, boolean multipart, TemplateFile email_template,Map<String,String> params) throws MessagingException, UnsupportedEncodingException, InvalidArgument {
 			
 		AppContext conn = getContext();
+		if( email_template == null ) {
+			throw new InvalidArgument("Null email template");
+		}
+		if( email_template.isEmpty()) {
+			throw new InvalidArgument("Empty template");
+		}
 		
 		//		 Set a lot of standard properties from init parameters
 		email_template.setProperties(conn.getInitParameters("service."));
@@ -763,10 +772,11 @@ public class Emailer {
 	 * @param email_template
 	 * @throws UnsupportedEncodingException
 	 * @throws MessagingException
+	 * @throws InvalidArgument 
 	 */
 	public MimeMessage templateEmail(String[] notify_emails,
 			TemplateFile email_template) throws UnsupportedEncodingException,
-			MessagingException {
+			MessagingException, InvalidArgument {
 		return doSend(templateMessage(notify_emails,email_template));
 	}
 	/**
@@ -777,10 +787,11 @@ public class Emailer {
 	 * @return message
 	 * @throws UnsupportedEncodingException
 	 * @throws MessagingException
+	 * @throws InvalidArgument 
 	 */
 	public MimeMessage templateMessage(String[] notify_emails,
 			TemplateFile email_template) throws UnsupportedEncodingException,
-			MessagingException {
+			MessagingException, InvalidArgument {
 		return templateMessage(notify_emails, null, email_template);
 	}
 	/**

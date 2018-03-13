@@ -24,7 +24,7 @@ import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
 
-/** A {@link SessionServlet} that will look for user/password parameters in the url/post parameters to
+/** A {@link SessionServlet} that will look for person/password parameters in the url/post parameters to
  * perform login if the session is un-authenticated
  * @author spb
  *

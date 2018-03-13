@@ -36,6 +36,7 @@ import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.content.TemplateFile;
+import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 
 /** Mock based tests of {@link Emailer}.
@@ -97,7 +98,7 @@ public class EmailerTest extends WebappTestBase {
 		assertTrue(stream.toString().contains("Penguins"));
 	}
 	@Test
-	public void testTemplateEmail() throws IOException, MessagingException{
+	public void testTemplateEmail() throws IOException, MessagingException, InvalidArgument{
 		Emailer mailer = new Emailer(ctx);
 		File f = new File("test_templates/test_email.txt");
 		TemplateFile tf = TemplateFile.getTemplateFile(f.getAbsolutePath()); // Load the page template
@@ -110,7 +111,7 @@ public class EmailerTest extends WebappTestBase {
 	
 	@Test(expected=javax.mail.SendFailedException.class)
 	@ConfigFixtures("blacklist.properties")
-	public void testBlacklist() throws IOException, MessagingException{
+	public void testBlacklist() throws IOException, MessagingException, InvalidArgument{
 		Emailer mailer = new Emailer(ctx);
 		File f = new File("test_templates/test_email.txt");
 		TemplateFile tf = TemplateFile.getTemplateFile(f.getAbsolutePath()); // Load the page template
