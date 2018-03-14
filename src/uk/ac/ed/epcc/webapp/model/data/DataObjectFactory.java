@@ -1013,8 +1013,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      * @param c
      */
     final void registerComposite(Composite c){
-    	composites.put(c.getType(), c);
-    	observeComposite(c);
+    	Class type = c.getType();
+    	if( type == null) {
+    		getLogger().error("Composite "+c.getClass().getCanonicalName()+" registered ass null type");
+    	}else {
+    		composites.put(type, c);
+    		observeComposite(c);
+    	}
     }
     /** Observer {@link Composite}s as they are registered.
      * 
