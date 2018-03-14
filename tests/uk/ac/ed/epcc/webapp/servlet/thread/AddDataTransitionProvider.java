@@ -14,6 +14,7 @@ import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.transition.SimpleTransitionProvider;
+import uk.ac.ed.epcc.webapp.model.data.transition.SimpleViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 import uk.ac.ed.epcc.webapp.servlet.thread.TestFactory.TestData;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -22,7 +23,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @author spb
  *
  */
-public class AddDataTransitionProvider extends SimpleTransitionProvider<TestFactory.TestData, TransitionKey<TestFactory.TestData>> implements ViewTransitionProvider<TransitionKey<TestFactory.TestData>, TestData> {
+public class AddDataTransitionProvider extends SimpleViewTransitionProvider<TestFactory.TestData, TransitionKey<TestFactory.TestData>> implements ViewTransitionProvider<TransitionKey<TestFactory.TestData>, TestData> {
 
 	public static final TransitionKey<TestData> ADD = new TransitionKey<TestFactory.TestData>(TestData.class, "ADD");
 
@@ -119,13 +120,6 @@ public class AddDataTransitionProvider extends SimpleTransitionProvider<TestFact
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#getSummaryContent(uk.ac.ed.epcc.webapp.AppContext, uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object)
-	 */
-	@Override
-	public <X extends ContentBuilder> X getSummaryContent(AppContext c, X cb, TestData target) {
-		return cb;
-	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#canView(java.lang.Object, uk.ac.ed.epcc.webapp.session.SessionService)
@@ -145,30 +139,10 @@ public class AddDataTransitionProvider extends SimpleTransitionProvider<TestFact
 		return cb;
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#getLogContent(uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object, uk.ac.ed.epcc.webapp.session.SessionService)
-	 */
-	@Override
-	public <X extends ContentBuilder> X getLogContent(X cb, TestData target, SessionService<?> sess) {
-		return cb;
-	}
+	
+	
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#getHelp(java.lang.Object)
-	 */
-	@Override
-	public String getHelp(TransitionKey<TestData> key) {
-		return key.getHelp();
-	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#getText(java.lang.Object)
-	 */
-	@Override
-	public String getText(TransitionKey<TestData> key) {
-		// TODO Auto-generated method stub
-		return key.toString();
-	}
 	public TestFactory getFactory(){
 		return (TestFactory) getProducer();
 	}

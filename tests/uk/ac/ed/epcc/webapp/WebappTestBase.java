@@ -350,7 +350,7 @@ public abstract class WebappTestBase implements ContextHolder{
 		 if( ! same ){
 			 System.out.println(result);
 		 }
-		assertTrue("Unexpected result:\n"+differ,same);
+		assertEquals("Unexpected result:\n"+differ,expected,result);
 	}
 	@Before
 	public void clearEmails() {
