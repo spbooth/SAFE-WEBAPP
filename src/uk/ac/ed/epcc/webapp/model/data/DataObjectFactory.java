@@ -104,9 +104,7 @@ import uk.ac.ed.epcc.webapp.model.data.iterator.SortingIterator;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
-import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
-import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 /**
@@ -1015,7 +1013,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     final void registerComposite(Composite c){
     	Class type = c.getType();
     	if( type == null) {
-    		getLogger().error("Composite "+c.getClass().getCanonicalName()+" registered ass null type");
+    		getLogger().error("Composite "+c.getClass().getCanonicalName()+" registered as null type");
+    	}else if( ! type.isAssignableFrom(c.getClass())) {
+    		getLogger().error("Composite "+c.getClass().getCanonicalName()+" registered under incompatible type "+type.getCanonicalName());
     	}else {
     		composites.put(type, c);
     		observeComposite(c);
