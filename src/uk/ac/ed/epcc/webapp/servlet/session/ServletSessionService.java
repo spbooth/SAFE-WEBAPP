@@ -155,7 +155,7 @@ public Object getAttribute(String key) {
 public WtmpManager getWtmpManager() {
 	AppContext c = getContext();
 	String table = c.getInitParameter(WTMP_TABLE_PROP);
-	if( table != null ){
+	if( table != null && table.length() > 0){
 		return c.makeObjectWithDefault(WtmpManager.class, WtmpManager.class, table);
 	}
 	return null;

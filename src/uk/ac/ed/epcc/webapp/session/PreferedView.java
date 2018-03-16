@@ -19,9 +19,9 @@ import uk.ac.ed.epcc.webapp.model.Classification;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 
 public class PreferedView extends Classification{
-	private static final String SERVICE_SAF_URL = "service.saf.url";
-	private static final String SERVICE_NAME = "service.name";
-	private static final String SERVICE_SAFE_DOCUMENTATION = "service.safe-documentation";
+	private static final String SERVICE_SAF_URL_CONF = "service.saf.url";
+	private static final String SERVICE_NAME_CONF = "service.name";
+	private static final String SERVICE_SAFE_DOCUMENTATION_CONF = "service.safe-documentation";
 	
 	
 	/**
@@ -31,11 +31,17 @@ public class PreferedView extends Classification{
 		super(res, fac);
 	}
 	public void addEmailParams(Map<String, String> params) {
-		params.put(SERVICE_NAME, getName());
+		params.put(SERVICE_NAME_CONF, getName());
 		String safeUrl = record.getStringProperty(PreferedViewFactory.SAFE_URL);
-		if (safeUrl != null) params.put(SERVICE_SAF_URL,  safeUrl);
+		if (safeUrl != null) params.put(SERVICE_SAF_URL_CONF,  safeUrl);
 		String docUrl = record.getStringProperty(PreferedViewFactory.DOCUMENTATION_URL);
-		if (docUrl != null) params.put(SERVICE_SAFE_DOCUMENTATION, docUrl);
+		if (docUrl != null) params.put(SERVICE_SAFE_DOCUMENTATION_CONF, docUrl);
+	}
+	public void setURL(String url) {
+		record.setOptionalProperty(PreferedViewFactory.SAFE_URL, url);
+	}
+	public void setDocURL(String url) {
+		record.setOptionalProperty(PreferedViewFactory.DOCUMENTATION_URL, url);
 	}
 	
 }

@@ -262,7 +262,7 @@ public abstract class WebappTestBase implements ContextHolder{
 			System.out.println("--------------------------------------------------------------------");
 			System.out.println("Expected: "+expected);
 		}
-		assertTrue("Unexpected result:\n"+differ,same);
+		assertEquals("Unexpected result:"+expected_xml+"\n"+differ,expected,result);
 	}
 	/** Check database has not changed.
 	 * 
@@ -350,7 +350,7 @@ public abstract class WebappTestBase implements ContextHolder{
 		 if( ! same ){
 			 System.out.println(result);
 		 }
-		assertEquals("Unexpected result:\n"+differ,expected,result);
+		assertEquals("Unexpected result:"+expected_xml+"\n"+differ,expected,result);
 	}
 	@Before
 	public void clearEmails() {
