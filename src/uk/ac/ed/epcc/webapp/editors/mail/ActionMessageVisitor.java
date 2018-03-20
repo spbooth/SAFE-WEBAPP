@@ -242,9 +242,20 @@ public class ActionMessageVisitor extends AbstractVisitor {
 						MultipartMailBuilder mb;
 						if( o instanceof MimeMultipart){
 							mb = new MultipartMailBuilder((MimeMultipart) o);
-						}else{
+						}else if( o instanceof String){
 							mb = new MultipartMailBuilder();
 							mb.addText((String)o);
+						}else if( o instanceof MimeMessage) {
+							// This seems to happend if all parts except an attached message
+							// are deleted
+							mb = new MultipartMailBuilder();
+							mb.addMessage((MimeMessage)o);
+						}else if( o instanceof MimeBodyPart) {
+							// Never seen this but this is how we would handle it.
+							mb = new MultipartMailBuilder();
+							mb.addBodyPart((MimeBodyPart)o);
+						}else {
+							throw new WalkerException("Unexpected content type "+o.getClass().getCanonicalName());
 						}
 						mb.addDataSource(msd, "", msd.getName());
 						m.setContent(mb.getMultipart());
