@@ -23,7 +23,6 @@ import uk.ac.ed.epcc.webapp.content.XMLPrinter;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.inputs.ClassInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInputWrapper;
-import uk.ac.ed.epcc.webapp.forms.inputs.PatternTextInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
@@ -311,21 +310,21 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 		return new FilterSet(getNewFilter());
 	}
 	public SQLFilter<F> getNewFilter() {
-		return status.getSQLFilter(this, NEW);
+		return status.getFilter(this, NEW);
 	}
 	
 	public FilterResult<F> getActive() throws DataFault{
 		return new FilterSet(getActiveFilter());
 	}
 	public BaseFilter<F> getActiveFilter() {
-		return status.getSQLFilter(this, ACTIVE);
+		return status.getFilter(this, ACTIVE);
 	}
 	
 	public FilterResult<F> getRetired() throws DataFault{
 		return new FilterSet(getRetiredFilter());
 	}
 	public SQLFilter<F> getRetiredFilter() {
-		return status.getSQLFilter(this, RETIRED);
+		return status.getFilter(this, RETIRED);
 	}
 	
 	/** Is the specified person allowed to perform targetless operations.

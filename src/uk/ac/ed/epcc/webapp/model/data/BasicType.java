@@ -29,9 +29,6 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
@@ -143,25 +140,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		
     }
 
-	public static class AcceptTypeFilter<T extends BasicType.Value, I extends DataObject>  extends AbstractAcceptFilter<I>{
-		
-        private final T target;
-        private final BasicType<T> type;
-		public AcceptTypeFilter(Class<? super I> owner,BasicType<T> type,T target){
-		   super(owner);
-	       this.target = target;
-	       this.type=type;
-	    }
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see uk.ac.hpcx.model.data.BasicDataObject.Filter#accept(uk.ac.hpcx.model.data.BasicDataObject)
-		 */
-		public boolean accept(I d) {
-			return target == d.record.getProperty(type);
-		}
-
-	}
+	
 	public static class TypeSetSQLFilter<T extends BasicType.Value,I> implements PatternFilter<I>, SQLFilter<I>{
 		private final Class<? super I> owner; 
 		private final Set<T> set;
@@ -239,19 +218,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		
 		
 	}
-	public static class TypeSetAcceptFilter<T extends BasicType.Value, I extends DataObject> extends AbstractAcceptFilter<I>{
-		
-		private final Set<T> set;
-	    private final BasicType<T> type;
-        public TypeSetAcceptFilter(Class<? super I> owner,     BasicType<T> type, Set<T> set){
-        	super(owner);
-        	this.set=set;
-        	this.type=type;
-        }
-		public boolean accept(I d) {
-			return set.contains( d.record.getProperty(type));
-		}
-	}
+	
 	/**
 	 * Value inner class representing a possible value of the enclosing
 	 * <code>BasicType</code>. Each <code>BasicType</code> subclass should have its own <code>Value</code> class
@@ -436,14 +403,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	}
 	
 
-	public <I extends DataObject> BaseFilter<I> getFilter(DataObjectFactory<I> fac, T val) {
-		// default filter is SQL
-		return getSQLFilter(fac, val);
-	}
-	public <I extends DataObject> BaseFilter<I> getFilter(DataObjectFactory<I> fac, T ... val) {
-		// default filter is SQL
-		return getSQLFilter(fac, getValues(val));
-	}
+	
 
 	public final LinkedHashSet<T> getValues(T... val) {
 		LinkedHashSet<T> values = new LinkedHashSet<T>();
@@ -452,64 +412,29 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		}
 		return values;
 	}
-	public <I extends DataObject> SQLFilter<I> getSQLFilter(DataObjectFactory<I> fac, T ... val) {
-		return getSQLFilter(fac, getValues(val));
-	}
-	public <I extends DataObject> SQLFilter<I> getSQLFilter(DataObjectFactory<I> fac, T val) {
+	
+	public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac, T val) {
 		if( val == null ){
 			return null;
 		}
 		return new SQLTypeFilter<T,I>(fac.getTarget(),this,fac.res, val);
 	}
-	public <I extends DataObject> AcceptFilter<I> getAcceptFilter(DataObjectFactory<I> fac, T val) {
-		return new AcceptTypeFilter<T,I>(fac.getTarget(),this,val);
-	}
-
-	public <I extends DataObject> BaseFilter<I> getFilter(DataObjectFactory<I> fac,Set<T> val) {
-		return getSQLFilter(fac,val);
-	}
-	public <I extends DataObject> SQLFilter<I> getSQLFilter(DataObjectFactory<I> fac,Set<T> val) {
-		if( fac == null){
-		    return new TypeSetSQLFilter<T,I>(fac.getTarget(),this,null, val);
-		}else{
-			return new TypeSetSQLFilter<T,I>(fac.getTarget(),this,fac.res, val);
-		}
-	}
 	
 
-	public <I extends DataObject> AcceptFilter<I> getAcceptFilter(DataObjectFactory<I> fac, Set<T> val) {
-		return new TypeSetAcceptFilter<T,I>(fac.getTarget(),this,val);
-		
+	
+	public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac,Set<T> val) {
+		return new TypeSetSQLFilter<T,I>(fac.getTarget(),this,fac.res, val);
 	}
 	
-
-	/** Get a filter excluding a value
-	 * @param <I> Type of filter
-	 * @param fac Factory we are selecting for
-	 * @param val
-	 * @return BaseFilter
-	 */
-	public <I extends DataObject> BaseFilter<I> getExcludeFilter(DataObjectFactory<I> fac,T val){
-		Set<T> s = getValues(new HashSet<T>());
-		s.remove(val);
-		return getFilter(fac,s);
+	public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac,T ... val) {
+		return new TypeSetSQLFilter<T,I>(fac.getTarget(),this,fac.res,getValues(val) );
 	}
-	/** Get a filter excluding multiple value
-	 * @param <I> Type of filter
-	 * @param fac Factory we are selecting for
-	 * @param val
-	 * @return BaseFilter
-	 */
-	public <I extends DataObject> BaseFilter<I> getExcludeFilter(DataObjectFactory<I> fac,T ... val){
-		return getFilter(fac,getExcludeValues(val));
-	}
-
 	/**
 	 * @param val
 	 * @return
 	 */
-	public final LinkedHashSet<T> getExcludeValues(T... val) {
-		LinkedHashSet<T> s = getValues(new LinkedHashSet<T>());
+	public final Set<T> getExcludeValues(T... val) {
+		Set<T> s = getValueSet();
 		for( T i : val ){
 			s.remove(i);
 		}
@@ -522,10 +447,10 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	 * @param val
 	 * @return SQLFilter
 	 */
-	public <I extends DataObject> SQLFilter<I> getSQLExcludeFilter(DataObjectFactory<I> fac,T val){
+	public <I extends DataObject> SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,T val){
 		Set<T> s = getValues(new HashSet<T>());
 		s.remove(val);
-		return getSQLFilter(fac,s);
+		return getFilter(fac,s);
 	}
 	/** Get a filter excluding multiple value
 	 * @param <I> type of filter
@@ -534,61 +459,17 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	 * @param val
 	 * @return SQLFilter
 	 */
-	public <I extends DataObject> SQLFilter<I> getSQLExcludeFilter(DataObjectFactory<I> fac,T ... val){
-		Set<T> s = getValues(new HashSet<T>());
-		for( T i : val ){
-			s.remove(i);
-		}
-		return getSQLFilter(fac,s);
+	public <I extends DataObject> SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,T ... val){
+		return getFilter(fac,getExcludeValues(val));
 	}
-	/** Get a filter excluding a value
-	 * @param <I> type of filter
-	 * @param fac 
-	 * 
-	 * @param val
-	 * @return AccceptFilter
-	 */
-	public <I extends DataObject> AcceptFilter<I> getAcceptExcludeFilter(DataObjectFactory<I> fac, T val){
-		Set<T> s = getValues(new HashSet<T>());
-		s.remove(val);
-		return getAcceptFilter(fac,s);
-	}
-//	/** Get a filter excluding a value
-//	 * 
-//	 * @param val
-//	 * @return BaseFilter
-//	 */
-//	public BaseFilter getExcludeFilter(Set<T> val){
-//		return getExcludeFilter(null,val);
-//	}
-	public <I extends DataObject> BaseFilter<I> getExcludeFilter(DataObjectFactory<I> fac,Set<T> val){
+	
+
+	public <I extends DataObject>SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,Set<T> val){
 		Set<T> s = getValues(new HashSet<T>());
 		s.removeAll(val);
 		return getFilter(fac,s);
 	}
-//	/** Get a filter excluding a set of value
-//	 * 
-//	 * @param val
-//	 * @return SQLFilter
-//	 */
-//	public SQLFilter getSQLExcludeFilter(Set<T> val){
-//		return getSQLExcludeFilter(null,val);
-//	}
-	public <I extends DataObject>SQLFilter<I> getSQLExcludeFilter(DataObjectFactory<I> fac,Set<T> val){
-		Set<T> s = getValues(new HashSet<T>());
-		s.removeAll(val);
-		return getSQLFilter(fac,s);
-	}
-	/** Get a filter excluding a set of value
-	 * 
-	 * @param val Set
-	 * @return AcceptFilter
-	 */
-	public <I extends DataObject> AcceptFilter<I> getAcceptExcludeFilter(DataObjectFactory<I> fac,Set<T> val){
-		Set<T> s = getValues(new HashSet<T>());
-		s.removeAll(val);
-		return getAcceptFilter(fac,s);
-	}
+	
 	public BasicTypeInput<T> getInput() {
 		BasicTypeInput<T> input = new BasicTypeInput<T>(this);
 		input.setOptional(true);

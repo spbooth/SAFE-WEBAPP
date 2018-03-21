@@ -650,7 +650,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		end_fil.addFilter(new NullFieldFilter<H>(getTarget(), res, END_TIME_FIELD, true));
 		fil.addFilter(end_fil);
 		if( want_tail && res.hasField(status.getField())){
-			fil.addFilter(status.getSQLFilter(this, TAIL));
+			fil.addFilter(status.getFilter(this, TAIL));
 		}
 		H current=null;
 		try{
@@ -793,7 +793,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		if( peer != null){
 			fil.addFilter(new ReferenceFilter<H,P>(HistoryFactory.this,getPeerName(),peer));
 		}
-		fil.addFilter(status.getSQLFilter(this, TAIL));
+		fil.addFilter(status.getFilter(this, TAIL));
 		fil.addFilter(new TimeFilter(END_TIME_FIELD,MatchCondition.LT,time) );
 		FilterUpdate<H> update = new FilterUpdate<H>(res);
 		update.update(res.getStringExpression(getTarget(), status.getField()), EXPIRED.getTag(), fil);

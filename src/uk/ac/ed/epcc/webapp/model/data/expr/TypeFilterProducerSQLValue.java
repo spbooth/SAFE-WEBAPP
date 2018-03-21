@@ -82,12 +82,12 @@ public class TypeFilterProducerSQLValue<T,D,X extends DataObject> implements  SQ
 			throws CannotFilterException {
 		if( converter instanceof TypeFilterProducer){
 			if( match == null ){
-				return ((TypeFilterProducer<T,D>)converter).getSQLFilter(fac, val);
+				return ((TypeFilterProducer<T,D>)converter).getFilter(fac, val);
 			}
 			if( match == MatchCondition.NE){
 				Set<T> vals = new HashSet<T>();
 				vals.add(val);
-				return ((TypeFilterProducer<T,D>)converter).getSQLExcludeFilter(fac, vals);
+				return ((TypeFilterProducer<T,D>)converter).getExcludeFilter(fac, vals);
 			}
 		}
 		throw new CannotFilterException("Class "+converter.getClass().getCanonicalName()+" not a TypeFilterProducer");

@@ -14,29 +14,44 @@
 /*******************************************************************************
  * Copyright (c) - The University of Edinburgh 2010
  *******************************************************************************/
-package uk.ac.ed.epcc.webapp.model.data.convert;
+package uk.ac.ed.epcc.webapp.jdbc.expr;
 
-import java.util.Set;
+import uk.ac.ed.epcc.webapp.content.Operator;
 
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-
-/** TypeProducer with methods to create Filters.
- * 
- * Methods are available to explicitly produce SQL and Accept 
- * filters as well as a default Filter.
- * 
+/** Reduction operators.
+ * <p>
+ * The INDEX reduction is equivalent to the SQL GROUP BY CLAUSE, when combined with other
+ * Reductions it requests that multiple results should be returned, with reductions only happending
+ * across sets of records where the INDEX property is the same.
+ * </p>
+ * <p>
+ * AVG is a mean value except when doing overlap mapping when it becomes a time average
+ * </p>
+ * <p>
+ * SELECT just selects a value without adding to the SQL GROUP BY. The expression is assumed to be
+ * derivable from the INDEXs or the same for all records.
+ * </p>
  * @author spb
  *
- * @param <T> Type of object produced
- * @param <D> Type of Object stored in DB field.
  */
-public interface TypeFilterProducer<T,D> extends TypeProducer<T,D>  {
-	public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac, T  val );
-	public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac, T ... val );
-	public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac,Set<T> val);
-	public <I extends DataObject> SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,T val);
-	public <I extends DataObject> SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,T ... val);
-	public <I extends DataObject> SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,Set<T> val);
+public enum Reduction {
+  SUM(Operator.ADD),
+  AVG(Operator.AVG),
+  MIN(Operator.MIN),
+  MAX(Operator.MAX),
+  INDEX(Operator.MERGE),
+  SELECT(Operator.MERGE),
+  DISTINCT(Operator.MERGE);
+  
+  private final Operator op;
+  private Reduction(Operator o){
+	  this.op=o;
+  }
+  /** get a {@link Operator} suitable for combing partial results.
+   * 
+   * @return {@link Operator}
+   */
+  public Operator operator(){
+	  return op;
+  }
 }

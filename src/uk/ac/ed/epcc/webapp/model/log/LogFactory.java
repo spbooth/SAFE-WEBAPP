@@ -384,7 +384,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		public ItemDateFilter(O q, Set<ItemType.ItemValue<T>> set, Date s, Date e) {
 			super(s,e);
 			addFilter(new ReferenceFilter<T, O>(LogFactory.this, OWNER_ID, q));
-			addFilter(getItemType().getSQLFilter(LogFactory.this, set));
+			addFilter(getItemType().getFilter(LogFactory.this, set));
 		}
 	}
 	/**
@@ -432,7 +432,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 
 		public TypeFilter(ItemType.ItemValue<T> item, L target, Date s, Date e) {
 			super(s,e);
-			addFilter(getItemType().getSQLFilter(LogFactory.this, item));
+			addFilter(getItemType().getFilter(LogFactory.this, item));
 			if (target != null) {
 				addFilter(new ReferenceFilter<T, L>(LogFactory.this, LINK_ID,
 						target));
@@ -531,7 +531,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 			throws DataException {
 		SQLAndFilter<T> fil = new SQLAndFilter<T>(getTarget());
 		fil.addFilter(new ReferenceFilter<T, O>(this, OWNER_ID, q));
-		fil.addFilter(getItemType().getSQLFilter(this, v));
+		fil.addFilter(getItemType().getFilter(this, v));
 		fil.addFilter(new SQLValueFilter<T>(getTarget(),res, LINK_ID, link));
 		return find(fil,allow_null);
 		
@@ -560,7 +560,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	private SQLAndFilter<T> getItemFilter(ItemType.ItemValue v, int link) {
 		SQLAndFilter<T> fil;
 		fil = new SQLAndFilter<T>(getTarget());
-		fil.addFilter(getItemType().getSQLFilter(this, v));
+		fil.addFilter(getItemType().getFilter(this, v));
 		fil.addFilter(new SQLValueFilter<T>(getTarget(),res, LINK_ID, link));
 		return fil;
 	}
@@ -679,7 +679,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 * @return
 	 */
 	protected SQLFilter<T> getItemFilter(ItemType.ItemValue<T> v) {
-		return getItemType().getSQLFilter(LogFactory.this, v);
+		return getItemType().getFilter(LogFactory.this, v);
 	}
 	
 	
