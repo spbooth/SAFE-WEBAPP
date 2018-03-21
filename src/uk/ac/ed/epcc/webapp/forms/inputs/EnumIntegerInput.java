@@ -91,6 +91,7 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
 	public void setItem(E v) {
 		if( v == null ){
 			setValue(null);
+			return;
 		}
 		setValue(v.ordinal());
 	}

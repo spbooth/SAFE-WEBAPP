@@ -80,6 +80,76 @@ public class DummyReferenceTest extends WebappTestBase{
 		
 		
 	}
+	
+	@Test
+	public void testGetByRemoteNumber() throws DataFault{
+		
+		DummyReferenceFactory ref_fac = new DummyReferenceFactory(ctx);
+		FilterResult<DummyReference> result = ref_fac.getResult(ref_fac.getRemoteNumberFilter(14));
+		Collection<DummyReference> coll = result.toCollection();
+		
+		assertTrue(coll.size() > 0);
+		
+		for( DummyReference ref : coll ){
+			int i = ref.getNumber();
+			assertTrue(i%3 == 2);
+		}
+		
+		
+		
+	}
+	
+	@Test
+	public void testGetByRemoteNumberAccept() throws DataFault{
+		
+		DummyReferenceFactory ref_fac = new DummyReferenceFactory(ctx);
+		FilterResult<DummyReference> result = ref_fac.getResult(ref_fac.getRemoteNumberAcceptFilter(14));
+		Collection<DummyReference> coll = result.toCollection();
+		
+		assertTrue(coll.size() > 0);
+		
+		for( DummyReference ref : coll ){
+			int i = ref.getNumber();
+			assertTrue(i%3 == 2);
+		}
+		
+		
+		
+	}
+	@Test
+	public void testGetByRemoteNumberAnd() throws DataFault{
+		
+		DummyReferenceFactory ref_fac = new DummyReferenceFactory(ctx);
+		FilterResult<DummyReference> result = ref_fac.getResult(ref_fac.getRemoteNumberAndFilter(14));
+		Collection<DummyReference> coll = result.toCollection();
+		
+		assertTrue(coll.size() > 0);
+		
+		for( DummyReference ref : coll ){
+			int i = ref.getNumber();
+			assertTrue(i%3 == 2);
+		}
+		
+		
+		
+	}
+	@Test
+	public void testGetByRemoteNumberDual() throws DataFault{
+		
+		DummyReferenceFactory ref_fac = new DummyReferenceFactory(ctx);
+		FilterResult<DummyReference> result = ref_fac.getResult(ref_fac.getRemoteNumberDualFilter(14));
+		Collection<DummyReference> coll = result.toCollection();
+		
+		assertTrue(coll.size() > 0);
+		
+		for( DummyReference ref : coll ){
+			int i = ref.getNumber();
+			assertTrue(i%3 == 2);
+		}
+		
+		
+		
+	}
 	@Test
 	public void testByReferenceName() throws DataFault{
 		DummyReferenceFactory ref_fac = new DummyReferenceFactory(ctx);
@@ -94,6 +164,7 @@ public class DummyReferenceTest extends WebappTestBase{
 		assertFalse(it.hasNext());
 		
 	}
+	
 	
 	@Test
 	public void testReferencedIterator() throws DataFault{

@@ -151,7 +151,11 @@ public class ConstructedObjectInput<T> implements ListInput<String,T>{
 	}
 
 	public T getItem() {
-		return c.makeObject(clazz, getValue());
+		String value = getValue();
+		if( value == null) {
+			return null;
+		}
+		return c.makeObject(clazz, value);
 	}
 
 	public void setItem(T item) {

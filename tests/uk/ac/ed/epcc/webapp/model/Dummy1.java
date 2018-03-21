@@ -216,8 +216,15 @@ public class Dummy1 extends DataObject implements Removable {
 		public Class<? super Dummy1> getTarget() {
 			return Dummy1.class;
 		}
-		
-		
+		public NumberFilter getNumberFilter(Number n) {
+			return new NumberFilter(n);
+		}
+		public NumberAcceptFilter getNumberAcceptFilter(Number n) {
+			return new NumberAcceptFilter(n);
+		}
+		public StringFilter getStringFilter(String name) {
+			return new StringFilter(name);
+		}
 		
     }
 

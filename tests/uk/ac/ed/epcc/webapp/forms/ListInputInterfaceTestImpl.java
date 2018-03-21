@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.forms;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
@@ -93,6 +94,10 @@ public class ListInputInterfaceTestImpl<T,D,I extends Input<T> , X extends TestD
 			assertFalse(s.contains(item));
 			s.add(item);
 		}
+		// check can set to null
+		input.setItem(null);
+		assertNull(input.getItem());
+		assertNull(input.getValue());
 		if( target.getInput() instanceof ListInput){
 			// If this is an alternate input things not in the
 			// item set might be valid
@@ -111,6 +116,8 @@ public class ListInputInterfaceTestImpl<T,D,I extends Input<T> , X extends TestD
 				// bad value might throw excpetion instead
 			}
 		}
+		
+		
 	}
 
 	public void testGetTagByItem() throws Exception {
@@ -160,6 +167,8 @@ public class ListInputInterfaceTestImpl<T,D,I extends Input<T> , X extends TestD
 			assertFalse("Duplicate label "+text,s.contains(text));
 			s.add(text);
 		}
+		
+		assertNull(input.getText(null));
 		
 	}
 	
