@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
@@ -144,6 +145,9 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 	public Date convert(Object v) throws TypeError {
 		if( v instanceof Date || v == null){
 		   return (Date) v;
+		}
+		if( v instanceof Calendar) {
+			return ((Calendar)v).getTime();
 		}
 		if( v instanceof Number ){
 			return new Date(((Number)v).longValue()*resolution);

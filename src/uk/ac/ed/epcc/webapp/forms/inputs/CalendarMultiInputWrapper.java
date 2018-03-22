@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import java.util.Calendar;
 import java.util.Date;
 
+import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
 /** A wrapepr to convert a {@link AbstractDateInput} into a {@link MultiInput}.
@@ -133,6 +134,9 @@ public class CalendarMultiInputWrapper extends AbstractCalendarMultiInput {
 	    }else{
 	    	input.setValue(c.getTime());
 	    }
+	    if( c == null ) {
+	    	return null;
+	    }
 		return c.getTime();
 	}
 
@@ -151,5 +155,21 @@ public class CalendarMultiInputWrapper extends AbstractCalendarMultiInput {
 		}
 		return old;
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.MultiInput#getString(java.lang.Object)
+	 */
+	@Override
+	public String getString(Date val) {
+		return input.getString(val);
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.MultiInput#validate()
+	 */
+	@Override
+	public void validate() throws FieldException {
+		super.validate();
+		input.validate();
+	}
+	
 
 }
