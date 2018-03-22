@@ -94,5 +94,81 @@ public class NumberTableTest extends WebappTestBase {
 		// 9 90 -1000     309
 			
 		assertEquals("Select value", 309.0, val.doubleValue(),0.001);
+
+		
+	}
+	
+	@Test
+	public void testCaseExprFilter() throws DataException {
+		NumberTableFactory fac = new NumberTableFactory(getContext());
+		Clause<NumberTable, Double> clause1 = new CaseExpression.Clause<NumberTable,Double>(
+				SQLExpressionMatchFilter.getFilter(fac.getTarget(),fac.getNumber1Expr(),MatchCondition.LT,fac.getNumber2Expr()),
+				fac.getNumber2Expr());
+		Clause<NumberTable, Double> clause2 = new CaseExpression.Clause<NumberTable,Double>(
+				SQLExpressionMatchFilter.getFilter(fac.getTarget(),fac.getNumber1Expr(),MatchCondition.GT,fac.getNumber2Expr()),
+				fac.getNumber1Expr());
+		CaseExpression< NumberTable,Double> expr = 
+				new CaseExpression< NumberTable,Double>(Double.class, 
+						fac.getNumber3Expr(), 
+						clause1,
+						clause2
+						
+						);
+		
+		
+
+		// 0 0 -1000      0
+		// 1 -1000 10     10
+		// 2 20 20 3      13
+		// 3 30 -1000     43
+		// 4 -1000 40     83
+		// 5 50 50 3      83
+		// 6 60 -1000     83
+		// 7 -1000 70     153
+		// 8 80 80 3      153
+		// 9 90 -1000     153
+
+		Double val = fac.getSum(SQLExpressionFilter.getFilter(fac.getTarget(), fac.getNumber1Expr(), MatchCondition.LE,  30.0),expr);
+		assertEquals("Select value", 153.0, val.doubleValue(),0.001);
+	}
+	
+	
+	@Test
+	public void testCaseExprNullFilter() throws DataException {
+		NumberTableFactory fac = new NumberTableFactory(getContext());
+		Clause<NumberTable, Double> clause1 = new CaseExpression.Clause<NumberTable,Double>(
+				SQLExpressionMatchFilter.getFilter(fac.getTarget(),fac.getNumber1Expr(),MatchCondition.LT,fac.getNumber2Expr()),
+				fac.getNumber2Expr());
+		Clause<NumberTable, Double> clause2 = new CaseExpression.Clause<NumberTable,Double>(
+				SQLExpressionMatchFilter.getFilter(fac.getTarget(),fac.getNumber1Expr(),MatchCondition.GT,fac.getNumber2Expr()),
+				fac.getNumber1Expr());
+		CaseExpression< NumberTable,Double> expr = 
+				new CaseExpression< NumberTable,Double>(Double.class, 
+						fac.getNumber3Expr(), 
+						clause1,
+						clause2
+						
+						);
+		
+		
+
+		// 0 0 -1000      0      0
+		// 1 -1000 10     10     0
+		// 2 20 20 3      10     3
+		// 3 30 -1000     40     3
+		// 4 -1000 40     80     3
+		// 5 50 50 3      80     6
+		// 6 60 -1000     140    6
+		// 7 -1000 70     210    6
+		// 8 80 80 3      210    9
+		// 9 90 -1000     300    9
+
+		Double val2 = fac.getSum(SQLExpressionNullFilter.getFilter(fac.getTarget(), fac.getNumber3Expr(), false),expr);
+		assertEquals("Select value", 9.0, val2.doubleValue(),0.001);
+		
+		Double val = fac.getSum(SQLExpressionNullFilter.getFilter(fac.getTarget(), fac.getNumber3Expr(), true),expr);
+		assertEquals("Select value", 300.0, val.doubleValue(),0.001);
+		
+		
 	}
 }

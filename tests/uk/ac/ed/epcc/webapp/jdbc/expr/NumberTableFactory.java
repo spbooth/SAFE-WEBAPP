@@ -74,7 +74,7 @@ public class NumberTableFactory extends DataObjectFactory<NumberTableFactory.Num
 		TableSpecification spec = new TableSpecification();
 		spec.setField(NUM1, new DoubleFieldType(true, 0.0));
 		spec.setField(NUM2, new DoubleFieldType(true, 0.0));
-		spec.setField(NUM3, new DoubleFieldType(true, 0.0));
+		spec.setField(NUM3, new DoubleFieldType(true, null));
 		return spec;
 	}
 	public NumberFieldExpression<Double,NumberTable> getNumber1Expr(){
