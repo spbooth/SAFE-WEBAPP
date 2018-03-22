@@ -205,11 +205,11 @@ public class SwingField<I>  {
 
 		public void actionPerformed(ActionEvent e) {
 
-			TextChanged(input, e);
+			textChanged(input, e);
 
 		}
 
-		private void TextChanged(ParseInput i, ActionEvent event) {
+		private void textChanged(ParseInput i, ActionEvent event) {
 			JTextComponent c = (JTextComponent) event.getSource();
 			String text = c.getText();
 			//System.out.println("changed " + text);
@@ -377,6 +377,7 @@ public class SwingField<I>  {
 					f = new JTextArea(rows, maxwid);
 				}
 				f.setWrapStyleWord(true);
+				f.addFocusListener(new TextFocusListener(input));
 				result = f;
 			}
 			JTextComponent j = result;
@@ -400,6 +401,7 @@ public class SwingField<I>  {
 			JPasswordField p = new JPasswordField();
 			p.setColumns(input.getMaxResultLength());
 			p.addActionListener(new TextActionListener(input));
+			p.addFocusListener(new TextFocusListener(input));
 			return p;
 		}
 

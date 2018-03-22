@@ -93,14 +93,17 @@ public class JFormDialog extends JDialog implements Contexed{
 					}
 					dispose();
 				}else{
+					log.debug("form not valid");
 					JOptionPane.showMessageDialog(getParent(), "Form not valid",
 							"General error", JOptionPane.ERROR_MESSAGE);
 				}
 			} catch (ValidateException e1) {
+				log.debug("validate exception",e1);
 				JOptionPane.showMessageDialog(getParent(), "Validation failed: "+e1.getMessage(),
 						"General error", JOptionPane.ERROR_MESSAGE);
 				return;
 			} catch (Exception e1) {
+				log.debug("other exception",e1);
 				String message = e1.getMessage();
 				if( message == null || message.length() == 0){
 					message = e1.toString();
