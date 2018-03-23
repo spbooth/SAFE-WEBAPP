@@ -154,6 +154,11 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  */
 
 public final class Repository implements AppContextCleanup{
+	/**
+	 * 
+	 */
+	protected static final String CONFIG_TAG_PREFIX = "config.";
+
 	/** modes supported by {@link Record#setID}
 	 * 
 	 * @author spb
@@ -1890,7 +1895,7 @@ public final class Repository implements AppContextCleanup{
 		db_tag = ctx.getInitParameter("db-tag."+tag,null);
 		sql = ctx.getService(DatabaseService.class).getSQLContext(db_tag);
 		tag_name=TableToTag(c, tag);
-		param_name=c.getInitParameter( "config."+tag,tag);
+		param_name=c.getInitParameter( CONFIG_TAG_PREFIX+tag,tag);
 		table_name = tagToTable(ctx,tag);
 		// Setting this allows multiple joins to the same table by
 		// having more than one tag for the same table with different aliases

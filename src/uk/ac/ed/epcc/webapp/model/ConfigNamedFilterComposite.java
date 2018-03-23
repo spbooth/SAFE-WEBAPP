@@ -28,19 +28,22 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link Composite} that generates named filters based on boolean
  * database fields. 
  * 
  * This is a generic way of adding per-object configuration that is only used to 
  * control relationship clauses.
- * 
+ * <p>
  * The list of fields/filter-names is given in the config parameter;
- * <b><i>factory-tag</i>.config_namefilters</b>.
- * 
+ * <b><i>factory-tag</i>.config_namefilters</b>. 
+ * <p>
  * A form label for the field can be set using the property:
  * <b><i>factory-tag</i>.<i>field</i>.label</b>
- * 
+ * <p>
+ * Editing the fields can be made role dependent by setting the parameter
+ * <b><i>factory-rag</i>.<i>field</i>.edit_role</b> to the required global role name.
  * @author spb
  *
  */
@@ -50,7 +53,7 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 	/**
 	 * @param fac
 	 */
-	protected ConfigNamedFilterComposite(DataObjectFactory<BDO> fac) {
+	public ConfigNamedFilterComposite(DataObjectFactory<BDO> fac,String comp_tag) {
 		super(fac);
 		String name_list = getContext().getInitParameter(fac.getConfigTag()+".config_namefilters");
 		if( name_list != null ) {
@@ -135,6 +138,21 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 			selectors.put(name, new BooleanInput());
 		}
 		return selectors;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#addSuppress(java.util.Set)
+	 */
+	@Override
+	public Set<String> addSuppress(Set<String> suppress) {
+		SessionService serv = getContext().getService(SessionService.class);
+		for(String name : names) {
+			String role = getContext().getInitParameter(getFactory().getConfigTag()+"."+name+".edit_role");
+			if( role != null || ! serv.hasRole(role) ) {
+				suppress.add(name);
+			}
+		}
+		return suppress;
 	}
 
 }

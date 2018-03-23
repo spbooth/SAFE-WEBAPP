@@ -989,6 +989,10 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 	}
 	private AppContext conn=null;
+	// This should match the repository tag but
+	// we store a copy here so we can make getTag and
+	// getConfigTag work before the repository is constructed
+	private String tag=null; 
 	protected Repository res=null;
     private Finder finder=null;
     private Map<Class,Composite<BDO,?>> composites;
@@ -1591,14 +1595,20 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 *  
 	 * @return String
 	 */
-	public String getTag(){
+	public final String getTag(){
+		if( res == null) {
+			return tag;
+		}
 		return res.getTag();
 	}
 	/** Return the tag used to qualify configuration parameters
 	 * 
 	 * @return string tag
 	 */
-	public String getConfigTag(){
+	public final String getConfigTag(){
+		if( res == null ) {
+			return conn.getInitParameter(Repository.CONFIG_TAG_PREFIX+tag,tag);
+		}
 		return res.getParamTag();
 	}
 	/**
@@ -1856,8 +1866,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			// Only call setComposites once
 			return;
 		}
-		// set local reference so composites can find
+		// set local reference so composites can 
+		// use the getContext and getConfigTag methods
+		// in their constructors.
 		this.conn = ctx;
+		this.tag = homeTable;
 		String composite_list = ctx.getExpandedProperty(homeTable+".composites");
 		// can't use getLogger as context not set yet
 		Logger logger = ctx.getService(LoggerService.class).getLogger(getClass());
