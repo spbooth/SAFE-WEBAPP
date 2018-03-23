@@ -148,7 +148,7 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 		SessionService serv = getContext().getService(SessionService.class);
 		for(String name : names) {
 			String role = getContext().getInitParameter(getFactory().getConfigTag()+"."+name+".edit_role");
-			if( role != null || ! serv.hasRole(role) ) {
+			if( role != null && ! serv.hasRole(role) ) {
 				suppress.add(name);
 			}
 		}
