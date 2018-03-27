@@ -21,9 +21,15 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link ServiceFilterComposite} that uses a reference to a classifier table
- * to indicate the service.
- * 
- * An object is considered to be part of the 
+ * to indicate the service. This is used to support different views of the same database.
+ * <p>
+ * An object is considered to be part of the view if it has a null reference to a service or if it references one of the
+ * services in the parameter <b>service.list</b> (comma separated service names from the classifier <b>Services</b>).
+ * <p>
+ * The default selector will also be narrowed to the current view unless the parameter
+ * <b>ServiceFilterComposite.<i>config-tag</i>.auto_narrow</b> is set to false. In which case the owning factory should have
+ * an explicit relationship for setting the selector which can reference the named filters. Narrowing the seelctors to the current view is a sensible
+ * default though we may want to put in exceptions for some users.
  * 
  * @author spb
  *
@@ -34,11 +40,13 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	private static final String SERVICE_CLASSIFIER="Services";
 	
 	
-	
+	protected static final String SERVICE_LIST_PARAM = "service.list";
 	private static final String SERVICE_ID_FIELD = "ServicesID";
 
+	private boolean auto_narrow=true;
 	public ReferenceServiceFilterComposite(DataObjectFactory<BDO> fac) {
 		super(fac);
+		auto_narrow = fac.getContext().getBooleanParameter("ServiceFilterComposite."+fac.getConfigTag()+".auto_narrow", true);
 	}
 
 	
@@ -170,6 +178,10 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	}
 	
 	private int[] ids=null;
+
+
+
+	
 	/** get an array of the services in the current view
 	 * a null value or a zero length list means show all services.
 	 * @return
@@ -182,7 +194,7 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 		if (ids != null) return ids;
 		
 		try {
-			String namelist = getContext().getInitParameter(SERVICE_LIST_PARAM);
+			String namelist = getContext().getInitParameter(ReferenceServiceFilterComposite.SERVICE_LIST_PARAM);
 			if (namelist == null || namelist.isEmpty()) {
 				namelist = getContext().getInitParameter(SERVICE_NAME_PARAM);
 			}
@@ -214,7 +226,10 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	 */
 	@Override
 	public BaseFilter<BDO> getSelectFilter() {
-		return getCurrentServiceFilter();
+		if( auto_narrow) {
+			return getCurrentServiceFilter();
+		}
+		return null;
 	}
 
 	

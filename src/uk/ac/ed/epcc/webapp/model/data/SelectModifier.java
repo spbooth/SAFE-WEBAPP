@@ -17,9 +17,14 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 
 /** An interface for {@link Composite}s that can narrow the select filter
  * @author spb
+ * @param <T> type of parent factory.
  *
  */
 public interface SelectModifier<T> {
 
+	/** get an optional {@link BaseFilter} to add to the select filter for the parent factory.
+	 * 
+	 * @return {@link BaseFilter} or null
+	 */
 	public BaseFilter<T> getSelectFilter();
 }

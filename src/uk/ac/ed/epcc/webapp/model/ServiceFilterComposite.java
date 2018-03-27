@@ -5,17 +5,23 @@ import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
-import uk.ac.ed.epcc.webapp.model.data.SelectModifier;
 
 /** An abstract {@link Composite} to allow records to be filtered by service.name
  * This is to provide different views of the same database.
- * Composites should register under this type
+ * Composites should register under this type.
+ * 
+ * It provides two named filters:
+ * <ul>
+ * <li><b>ThisService</b> for objects that are part of the current view</li>
+ * <li><b>OtherService</b> for objects that are not part of the current view</li>
+ * </ul>
+ * 
  * 
  * @author spb
  *
- * @param <BDO>
+ * @param <BDO> type of owning factory
  */
-public abstract class ServiceFilterComposite<BDO extends DataObject> extends  Composite<BDO, ServiceFilterComposite> implements NamedFilterProvider<BDO>, SelectModifier<BDO>{
+public abstract class ServiceFilterComposite<BDO extends DataObject> extends  Composite<BDO, ServiceFilterComposite> implements NamedFilterProvider<BDO>{
 
 	
 	public ServiceFilterComposite(DataObjectFactory<BDO> fac) {
@@ -37,9 +43,6 @@ public abstract class ServiceFilterComposite<BDO extends DataObject> extends  Co
 	protected static final String THIS_SERVICE_FILTER_NAME = "ThisService";
 	
 	protected static final String SERVICE_NAME_PARAM = "service.name";
-	
-	protected static final String SERVICE_LIST_PARAM = "service.list";
-
 	
 	/** The access role needed to edit service mappings.
 	 * 

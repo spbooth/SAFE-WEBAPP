@@ -351,6 +351,8 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 			if( seen ){ sb.append(","); }else{ seen=true; }
 			sb.append(a);
 		}
+		sb.append(" force=");
+		sb.append(Boolean.toString(force_value));
 		sb.append(")");
 		return sb.toString();
 	}
