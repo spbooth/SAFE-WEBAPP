@@ -70,6 +70,8 @@ public class DebugLogger implements Logger {
 		if(! (t instanceof FatalError)){
 			// avoid loops
 			throw new FatalError(message.toString(),t);
+		}else {
+			throw (FatalError) t;
 		}
 	}
 

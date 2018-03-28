@@ -378,7 +378,7 @@ public class Emailer {
 		if( EMAILS_FEATURE.isEnabled(conn)  && (conn.getAttribute(SUPRESS_EMAIL_ATTR) == null)){
 			String force_email = conn.getInitParameter(EMAIL_FORCE_ADDRESS);
 			Address[] recipients = m.getRecipients(RecipientType.TO);
-			if( force_email != null){
+			if( force_email != null && ! force_email.trim().isEmpty()){
 				log.debug("Force email to "+force_email);
 				Address old[] = recipients.clone();
 				if( old != null && old.length > 0){
