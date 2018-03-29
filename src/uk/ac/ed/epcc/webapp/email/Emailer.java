@@ -406,6 +406,8 @@ public class Emailer {
 				for(Address a :  recipients){
 					if( ! supressSend(a)){
 						use_address.add(a);
+					}else {
+						log.debug("Supress email to "+a.toString());
 					}
 				}
 				if( recipients.length != use_address.size()){

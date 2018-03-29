@@ -387,6 +387,7 @@ public <I> void addFormLabel(AppContext conn,Field<I> f) {
 		close(); //b
 	}
 	if (error != null) {
+		nbs();
 		open("b");
 		open("span");
 		attr("class", "warn");
