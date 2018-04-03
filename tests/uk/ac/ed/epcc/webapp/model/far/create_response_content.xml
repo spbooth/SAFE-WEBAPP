@@ -18,11 +18,7 @@
 				<th>
 					<label class='required'>form</label>
 				</th>
-				<td>
-					<select name='Form' class='input' required='required'>
-						<option value='1'>FirstForm</option>
-					</select>
-				</td>
+				<td>FirstForm<input type="hidden" name="Form" value="1"/></td>
 			</tr>
 		</table>
 		<fieldset class='action_buttons'>

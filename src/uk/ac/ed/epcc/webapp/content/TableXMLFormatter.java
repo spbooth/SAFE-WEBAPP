@@ -16,6 +16,8 @@ package uk.ac.ed.epcc.webapp.content;
 import java.text.NumberFormat;
 import java.util.Map;
 
+import uk.ac.ed.epcc.webapp.forms.Identified;
+
 /** Policy object to map a {@link Table} to a {@link SimpleXMLBuilder}
  * 
  * @author spb
@@ -234,6 +236,10 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 			add((Table)n);
 			return;
 		}
+		if( n instanceof Identified) {
+			hb.clean(((Identified)n).getIdentifier());
+			return;
+		}
 		if( n instanceof Number){
 			hb.attr("numeric", "true");
 		}
@@ -241,6 +247,7 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 			hb.clean(nf.format(n));
 			return;
 		}
+	
 		if (n == null) {
 			return;
 		}

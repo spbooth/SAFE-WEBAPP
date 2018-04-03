@@ -55,6 +55,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	 * 
 	 */
 	private static final Preference USE_HTML5_FEATURE = new Preference("html5", true,"use html5 input types");
+	private static final Preference LOCK_SINGLE_CHOICE_UNPUT_FEATURE = new Preference("html.lock_single_choice_inputs", true,"Single choice pull-downs shown as text fields");
 	private static final Preference ESCAPE_UNICODE_FEATURE = new Preference("html.input.escape_unicode",false,"Escape high code point characters in input values");
 	private static final Feature USE_DATALIST = new Feature("html5.use_datalist",true,"Use html5 datalist syntax, disable to test the fallback mode (as if browser does not userstand datalist)");
 	
@@ -161,6 +162,21 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	}
 	private  <X,T> void emitListHTML(SimpleXMLBuilder hb,boolean use_post, ListInput<X,T> input, String param) {
 		assert(input!=null);
+		boolean optional = input instanceof OptionalInput && ((OptionalInput)input).isOptional();
+		
+		if( ! optional && input.getCount() == 1) {
+			Iterator<T> iter = input.getItems();
+			T item = iter.next();
+			hb.clean(input.getText(item));
+			// only one option
+			hb.open("input");
+			hb.attr("type", "hidden");
+			hb.attr("name",input.getKey());
+			hb.attr("value",input.getTagByItem(item));
+			hb.close();
+			return;
+		}
+		
 		Iterator<T> iter = input.getItems();
 		if( iter.hasNext()){
 		hb.open("select");
@@ -174,7 +190,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 		}
 		hb.attr("name",input.getKey());
 		hb.attr("class","input");
-		boolean optional = input instanceof OptionalInput && ((OptionalInput)input).isOptional();
+		
 		if( use_html5 && use_required && ! optional){
 			hb.attr("required",null);
 		}
