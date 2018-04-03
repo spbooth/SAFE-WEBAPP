@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.content;
 
+import java.security.Principal;
 import java.text.NumberFormat;
 import java.util.Map;
 
@@ -234,6 +235,10 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 		}
 		if( n instanceof Table){
 			add((Table)n);
+			return;
+		}
+		if( n instanceof Principal) {
+			hb.clean(((Principal)n).getName());
 			return;
 		}
 		if( n instanceof Identified) {
