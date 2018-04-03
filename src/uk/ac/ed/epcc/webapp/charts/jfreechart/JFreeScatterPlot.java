@@ -18,9 +18,11 @@ import java.util.Date;
 import org.jfree.data.xy.XYSeries;
 
 import uk.ac.ed.epcc.webapp.charts.InvalidTransformException;
+import uk.ac.ed.epcc.webapp.charts.Plot;
 import uk.ac.ed.epcc.webapp.charts.ScatterPeriodPlot;
 import uk.ac.ed.epcc.webapp.charts.strategy.RangeMapper;
 import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.time.RegularSplitPeriod;
 import uk.ac.ed.epcc.webapp.time.SplitTimePeriod;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
@@ -85,6 +87,19 @@ public class JFreeScatterPlot implements ScatterPeriodPlot {
 	public void addPoint(float x, float y) {
 		series.add(x,y);
 		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.charts.Plot#addData(uk.ac.ed.epcc.webapp.charts.Plot)
+	 */
+	@Override
+	public void addData(Plot plot) {
+		if( ! ( plot instanceof JFreeScatterPlot)) {
+			throw new ConsistencyError("Unexpected plot type "+plot.getClass().getCanonicalName()+" expecting JFreeScatterPlot");
+		}
+		JFreeScatterPlot p = (JFreeScatterPlot)plot;
+		for(int i=0 ; i< p.series.getItemCount();i++) {
+			series.add(p.series.getDataItem(i));
+		}
 	}
 
 	

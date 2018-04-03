@@ -25,5 +25,11 @@ public interface Plot {
 	 * @param scale
 	 */
 	public abstract void scale(float scale);
+	
+	/** add the data from another plot of the same type as this one.
+	 * 
+	 * @param p
+	 */
+	public void addData(Plot p);
 
 }

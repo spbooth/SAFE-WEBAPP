@@ -16,6 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.charts;
 
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+
 /**
  * generic version of plot for use where the underlying datamodel of the
  * graphics class is radically different
@@ -164,6 +166,26 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 	@Override
 	public boolean isCummulative() {
 		return chart_data.isCumulative();
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.charts.Plot#addData(uk.ac.ed.epcc.webapp.charts.Plot)
+	 */
+	@Override
+	public void addData(Plot plot) {
+		if( !( plot instanceof GenericSplitSetPlot)) {
+			throw new ConsistencyError("Unexpected plot type "+plot.getClass().getCanonicalName()+" expecting GenericSplitSetPlot");
+		}
+		GenericSplitSetPlot p = (GenericSplitSetPlot)plot;
+		grow(p.getNumSets(),p.getNumCats(),p.getNumItems());
+		for(int i=0 ; i< p.getNumSets(); i++) {
+			for(int j=0 ; j < p.getNumCats(); j++) {
+				for(int k=0; k< p.getNumItems(); k++) {
+					add(i,j,k,p.get(i, j, k));
+				}
+			}
+		}
+	
+		
 	}
 	
 }

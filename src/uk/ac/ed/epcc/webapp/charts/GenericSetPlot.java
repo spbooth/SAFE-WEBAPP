@@ -16,6 +16,9 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.charts;
 
+import javax.xml.ws.WebServiceProvider;
+
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
 /**
@@ -87,5 +90,16 @@ public class GenericSetPlot extends AbstractPeriodSetPlot {
 		
 	}
 
-
+	@Override
+    public void addData(Plot plot) {
+    	if( ! (plot instanceof GenericSetPlot)) {
+    		throw new ConsistencyError("Unexpected plot type "+plot.getClass().getCanonicalName()+" expecting GenericSetPlot");
+    	}
+    	GenericSetPlot setplot = (GenericSetPlot) plot;
+    	grow(setplot.nset);
+    	for(int i =0 ; i< nset ; i++) {
+    		add(i,setplot.get(i));
+    	}
+    	
+    }
 }

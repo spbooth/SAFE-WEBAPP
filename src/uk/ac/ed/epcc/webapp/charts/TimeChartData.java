@@ -19,7 +19,6 @@ package uk.ac.ed.epcc.webapp.charts;
 import java.awt.Color;
 import java.util.List;
 
-import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.time.SplitTimePeriod;
 
 /**

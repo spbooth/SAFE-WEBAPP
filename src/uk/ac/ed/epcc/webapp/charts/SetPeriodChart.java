@@ -16,16 +16,20 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.charts;
 
-import java.util.Date;
-import java.util.Map;
-
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.charts.strategy.QueryMapper;
-import uk.ac.ed.epcc.webapp.charts.strategy.SetRangeMapper;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.time.Period;
-import uk.ac.ed.epcc.webapp.time.TimePeriod;
-
+/** {@link PeriodChart}s that represent a set of values such as 
+ * a pie-chart of bar-chart.
+ * 
+ * Unlike {@link TimeChart}s only a single dataset is plotted. This defaults to the
+ * last created {@link Plot} but can be reset using the {@link #setPlot(PeriodSetPlot)} method.
+ * 
+ * 
+ * @author spb
+ *
+ * @param <P>
+ */
 public abstract class SetPeriodChart<P extends PeriodSetPlot> extends PeriodChart<P> {
 
 	protected SetPeriodChart(AppContext c, Period p) {
@@ -51,5 +55,5 @@ public abstract class SetPeriodChart<P extends PeriodSetPlot> extends PeriodChar
 
 	public abstract  P getPlot();
 	
-
+    public abstract void setPlot(P ds);
 }

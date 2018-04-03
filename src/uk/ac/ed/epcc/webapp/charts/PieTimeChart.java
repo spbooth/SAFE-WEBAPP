@@ -32,6 +32,9 @@ import uk.ac.ed.epcc.webapp.time.Period;
  * of quantities over a period and uses the same mapping classes the intention
  * is that you can use this to generate piecharts and timecharts interchangably.
  * 
+ * Unlike {@link TimeChart}s only a single dataset is plotted. This defaults to the
+ * last created {@link Plot} but can be reset using the {@link #setPlot(PeriodSetPlot)} method.
+ * 
  * @author spb
  * @param <P> type of Plot object
  * 
@@ -74,5 +77,10 @@ public final class PieTimeChart<P extends PeriodSetPlot> extends SetPeriodChart<
 	public P getPlot() {
 		return plot;
 	}
+	@Override
+    public void setPlot(P ds) {
+    	this.plot=ds;
+    }
+
 
 }

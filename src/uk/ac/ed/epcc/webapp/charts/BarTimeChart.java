@@ -23,10 +23,22 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.time.Period;
 
-
+/**
+ * BarTimeChart This is the bar chart equivalent of a TimeChart 
+ * and is functionally equivalent to {@link PieTimeChart}.
+ * It plots the sum
+ * of quantities over a period and uses the same mapping classes the intention
+ * is that you can use this to generate barcharts and timecharts interchangably.
+ * 
+ * Unlike {@link TimeChart}s only a single dataset is plotted. This defaults to the
+ * last created {@link Plot} but can be reset using the {@link #setPlot(PeriodSetPlot)} method.
+ * 
+ * @author spb
+ * @param <P> type of Plot object
+ * 
+ */
 
 public final class BarTimeChart<P extends PeriodSetPlot> extends SetPeriodChart<P> {
-	public static final Feature JFREE_BAR_FEATURE = new Preference("chart.barchart.use_jfreechart", false, "Use JFreechart for bar charts");
 	private P plot=null;
 	/*
 	 * (non-Javadoc)
@@ -55,11 +67,12 @@ public final class BarTimeChart<P extends PeriodSetPlot> extends SetPeriodChart<
 		return getInstance(c, new Period(s.getTime(),e.getTime()));
 	}
 
-
-
 	@Override
 	public P getPlot() {
 		return plot;
 	}
-
+	@Override
+    public void setPlot(P ds) {
+    	this.plot=ds;
+    }
 }
