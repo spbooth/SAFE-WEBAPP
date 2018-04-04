@@ -53,7 +53,7 @@ public  class RoleUpdate<U extends AppUser> implements Contexed, StandAloneFormU
 
 	public Set<String> getRoles(){
 		Set<String> result = new LinkedHashSet<String>();
-		for(String s :fac.getContext().getInitParameter(ROLE_LIST_CONFIG, SessionService.ADMIN_ROLE).split(",")){
+		for(String s :fac.getContext().getExpandedProperty(ROLE_LIST_CONFIG, SessionService.ADMIN_ROLE).split(",")){
 			result.add(s);
 		}
 		return result;
