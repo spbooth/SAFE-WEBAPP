@@ -205,17 +205,22 @@ public class ErrorFilter implements Filter {
 			// are not handled by error-page but error codes are
 			res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}finally{
-			
-			
 			AppContext conn = (AppContext) req.getAttribute(APP_CONTEXT_ATTR);
 			if (conn != null && toplevel) {
+				SessionService sess = conn.getService(SessionService.class);
+				boolean interactive = sess != null && sess.haveCurrentUser();
+		
 				long elapsed = System.currentTimeMillis()-start;
 				long max_wait=conn.getLongParameter("max.request.millis", 30000L);
+				if( ! interactive ) {
+					// allow longer thresh for automatic
+					max_wait = conn.getLongParameter("max.script.millis", 300000L);
+				}
 				if( elapsed > max_wait){
-					long milli = elapsed % 1000L;
-					long seconds = (elapsed / 1000L)%60;
-					long min = elapsed / 60000L;
-					conn.getService(LoggerService.class).getLogger(getClass()).error("Long running page "+String.format("%d:%02d.%03d", min,seconds,milli));
+						long milli = elapsed % 1000L;
+						long seconds = (elapsed / 1000L)%60;
+						long min = elapsed / 60000L;
+						conn.getService(LoggerService.class).getLogger(getClass()).error("Long running page "+String.format("%d:%02d.%03d", min,seconds,milli));
 				}
 				// remove the cached AppContext as this request object may be passed to
 				// the error-page and we are about to invalidate it
@@ -225,8 +230,7 @@ public class ErrorFilter implements Filter {
 				// Run cleanup in a seperate thread IF interactive and cleanup actions
 				// non interactive jobs always wait as they may be processing a lot of data in
 				// a loop and we don't want to exhaust the connection pool
-				SessionService sess = conn.getService(SessionService.class);
-				boolean interactive = sess != null && sess.haveCurrentUser();
+				
 				if( interactive && CLEANUP_THREAD_FEATURE.isEnabled(conn) && cleanup != null && cleanup.hasActions()){
 					conn.clearService(CleanupService.class);
 					// cleanup in thread
