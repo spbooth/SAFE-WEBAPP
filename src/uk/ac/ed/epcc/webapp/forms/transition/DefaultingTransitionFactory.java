@@ -13,12 +13,17 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.transition;
 
+import uk.ac.ed.epcc.webapp.servlet.ViewTransitionKey;
 
 /** TransitionProvider that can generate a default transition for a target
  * if no other transition is specified.
  * 
   * This is incompatible with {@link ViewTransitionFactory} if both interfaces are implemented the
  * view operation will take precedence.
+ * 
+ * <p> 
+ * An default transition should usually not modify state. Consider having the key
+ * implement {@link ViewTransitionKey}
  * @author spb
  *
  * @param <K>

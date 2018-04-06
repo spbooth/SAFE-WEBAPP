@@ -13,11 +13,15 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.transition;
 
+import uk.ac.ed.epcc.webapp.servlet.ViewTransitionKey;
 
 /** TransitionProvider that can generate a default transition
  * i.e. a {@link TargetLessTransition} for selecting a target or a navigation transition
  * to an index page.
- * It can also be used to supply a default transition for a target
+ * It can also be used to supply a default transition for a target.
+ * 
+ * An Index transition should usually not modify state. Consider having the key
+ * implement {@link ViewTransitionKey}
  * 
  * @author spb
  *
