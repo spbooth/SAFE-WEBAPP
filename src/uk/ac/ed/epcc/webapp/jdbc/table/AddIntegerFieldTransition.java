@@ -33,7 +33,7 @@ public class AddIntegerFieldTransition<T extends DataObjectFactory> extends AddF
 	}
 
 	@Override
-	protected void addFormParams(Form f, AppContext c) {
+	protected void addFormParams(Form f, T target,AppContext c) {
 		IntegerInput input = new IntegerInput();
 		input.setOptional(true);
 		f.addInput(DEFAULT,"Default value", input);

@@ -40,7 +40,7 @@ public class TableStructureAdminOperationKey extends TableTransitionKey {
 	 */
 	@Override
 	public boolean allow(SessionService<?> serv,DataObjectFactory target) {
-		return serv.hasRoleFromList(SessionService.ADMIN_ROLE,TableDeveloperKey.CHANGE_TABLE_STRUCTURE_ROLE);
+		return serv.hasRoleFromList(SessionService.ADMIN_ROLE,TableDeveloperKey.CHANGE_TABLE_STRUCTURE_ROLE) && (target.getTableSpecification() != null);
 	}
 
 }

@@ -33,7 +33,7 @@ public class AddBooleanFieldTransition<T extends DataObjectFactory> extends AddF
 	}
 
 	@Override
-	protected void addFormParams(Form f, AppContext c) {
+	protected void addFormParams(Form f, T target,AppContext c) {
 		BooleanInput input = new BooleanInput();
 		f.addInput(DEFAULT, "Default true", input);
 		

@@ -30,7 +30,7 @@ public class AddReferenceTransition<T extends DataObjectFactory> extends AddFiel
 	}
 	
 	@Override
-	protected void addFormParams(Form f, AppContext c) {
+	protected void addFormParams(Form f, T target,AppContext c) {
 		f.addInput(TABLE, "Table to reference", new TableInput<DataObjectFactory>(c,DataObjectFactory.class ));
 	}
 	@Override

@@ -21,30 +21,22 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
-import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.jdbc.table.AbstractTableRegistry;
-import uk.ac.ed.epcc.webapp.jdbc.table.AddBooleanFieldTransition;
 import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
-import uk.ac.ed.epcc.webapp.jdbc.table.DropFieldTransition;
-import uk.ac.ed.epcc.webapp.jdbc.table.DropTableTransition;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableContentProvider;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableStructureAdminOperationKey;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableTransitionRegistry;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
-import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 import uk.ac.ed.epcc.webapp.session.AppUser;
-import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
 
 
@@ -66,7 +58,7 @@ import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
 
 
 public class Relationship<A extends AppUser,B extends DataObject> extends 
-         AbstractRelationship<A,B,Relationship.Link<A,B>> {
+         AbstractRelationship<A,B,Relationship.Link<A,B>> implements TableContentProvider{
     
 	// This is the default field sub-classes may use a different value
 	private static final String TARGET_ID = "TargetID";
@@ -160,40 +152,9 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 		}
 		return new SQLValueFilter<Link<A,B>>(getTarget(),res,role,Boolean.TRUE);
 	}
-	
-   
-	
-	
-
-	public class RelationshipTableRegistry extends AbstractTableRegistry{
-
-		public RelationshipTableRegistry(){
-			addTableTransition(new TableStructureAdminOperationKey("DropTable"), new DropTableTransition<Relationship>(getContext()));
-			addTableTransition(new TableStructureAdminOperationKey("DropField"), new DropFieldTransition<Relationship>());
-			addTableTransition(new TableStructureAdminOperationKey( "AddRole"), new AddBooleanFieldTransition<Relationship>());
-		}
-		public boolean allowTableTransition(TransitionKey name,SessionService operator) {
-			return operator.hasRole(SessionService.ADMIN_ROLE);
-		}
-
-		public void getTableTransitionSummary(ContentBuilder hb,SessionService operator) {
-			hb.addHeading(3,"Roles");
-			ExtendedXMLBuilder xml = hb.getText();
-			xml.open("ul");
-			for(String role : getRelationships()){
-				xml.open("li");
-				xml.clean(role);
-				xml.close();
-			}
-			xml.close();
-			xml.appendParent();
-		}
 		
-	}
 	
-	protected TableTransitionRegistry makeTableRegistry() {
-		return new RelationshipTableRegistry();
-	}
+	
 	public static void makeTable(AppContext conn,
 			String my_table, String peer_table) throws DataFault {
 		assert(peer_table != null);
@@ -227,5 +188,14 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 			}
 		}
 		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.table.TableContentProvider#addSummaryContent(uk.ac.ed.epcc.webapp.content.ContentBuilder)
+	 */
+	@Override
+	public void addSummaryContent(ContentBuilder cb) {
+		cb.addHeading(3,"Roles");
+		cb.addList(getRelationships());
 	}
 }

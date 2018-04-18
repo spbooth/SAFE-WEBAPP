@@ -513,6 +513,9 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		}
 		return spec;
 	}
+	public final TableSpecification getTableSpecification() {
+		return getFinalTableSpecification(getContext(), getTag(), getLeftProducer(), getLeftField(), getRightProducer(), getRightField());
+	}
 	public final  HistoryHandler<T> getHistoryHandler() {
 
 		if (link_history == null) {

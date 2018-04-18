@@ -28,7 +28,6 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.forms.RoleSelector;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
-import uk.ac.ed.epcc.webapp.model.data.table.TableStructureLinkManager;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
@@ -49,7 +48,7 @@ import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
 
 
 public abstract class AbstractRelationship<A extends AppUser,B extends DataObject, L extends AbstractRelationship.Link<A, B>> extends 
-         TableStructureLinkManager<L,A,B> implements 
+         LinkManager<L,A,B> implements 
          RelationshipProvider<A, B>, RoleSelector<B>{
     
 	

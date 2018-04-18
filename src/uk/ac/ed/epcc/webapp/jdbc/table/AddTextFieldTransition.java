@@ -39,7 +39,7 @@ public class AddTextFieldTransition<T extends DataObjectFactory> extends AddFiel
 	}
 
 	@Override
-	protected void addFormParams(Form f, AppContext c) {
+	protected void addFormParams(Form f, T target,AppContext c) {
 		IntegerInput length = new IntegerInput();
 		BooleanInput null_input = new BooleanInput();
 		length.setMin(1);

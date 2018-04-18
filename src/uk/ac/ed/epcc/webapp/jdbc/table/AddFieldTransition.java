@@ -47,12 +47,12 @@ public abstract class AddFieldTransition<T extends DataObjectFactory>
 	public final void buildForm(Form f, T target, AppContext c)
 			throws TransitionException {
 		f.addInput(FIELD, "New Field Name", new NewFieldInput(getRepository(target)));
-		addFormParams(f, c);
+		addFormParams(f,target, c);
 		f.addAction(ADD_ACTION, new AddFieldAction(target));
 
 	}
 
-	protected abstract void addFormParams(Form f, AppContext c);
+	protected abstract void addFormParams(Form f, T target, AppContext c);
 
 	protected abstract FieldType getFieldType(Form f);
 

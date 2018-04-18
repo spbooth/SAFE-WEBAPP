@@ -1922,6 +1922,18 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 		return spec;
 	}
+	
+	/** Get the default {@link TableSpecification} from a fully constructed factory.
+	 * 
+	 * This can only be called after auto-table generation.
+	 * @return
+	 */
+	public TableSpecification getTableSpecification() {
+		if( conn == null) {
+			throw new ConsistencyError("TableSepcification requested without context");
+		}
+		return getFinalTableSpecification(getContext(), getTag());
+	}
 	/** Get the default table specification if the table is to be created.
 	 * A null result means that a default specification is not available and the table will not be created.
 	 * @param c AppContext

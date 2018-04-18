@@ -32,7 +32,7 @@ public class AddClassificationReferenceTransition<T extends DataObjectFactory> e
 	}
 	
 	@Override
-	protected void addFormParams(Form f, AppContext c) {
+	protected void addFormParams(Form f, T target, AppContext c) {
 		f.addInput(TABLE, "Classification Table to reference", new TableInput<ClassificationFactory>(c,ClassificationFactory.class ));
 	}
 	@Override

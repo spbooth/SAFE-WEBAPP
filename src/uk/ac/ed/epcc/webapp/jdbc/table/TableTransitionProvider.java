@@ -39,7 +39,10 @@ import uk.ac.ed.epcc.webapp.forms.inputs.FileUploadDecorator;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.IndexTransitionResult;
+import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractTargetLessTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.ForwardTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
@@ -85,12 +88,94 @@ public class TableTransitionProvider extends AbstractTransitionProvider<DataObje
     	
     };
     public static final TableTransitionKey UPLOAD = new AdminOperationKey(DataObjectFactory.class, "Upload");
+    /**
+	 * 
+	 */
+	static final TableTransitionKey ADD_FOREIGN_KEYS_KEY = new TableDeveloperKey("AddForeignKeys");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey DROP_TABLE_KEY = new TableDeveloperKey("DropTable");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey DROP_FIELD_KEY = new TableDeveloperKey("DropField");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey DROP_INDEX_KEY = new TableDeveloperKey("DropIndex");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey DROP_FOREIGN_KEY_KEY = new TableDeveloperKey("DropForeignKey");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey ADD_REFERENCE_FIELD_KEY = new TableDeveloperKey("AddReferenceField");
+	
+	/**
+	 * 
+	 */
+	static final TableTransitionKey ADD_DATE_FIELD_KEY = new TableDeveloperKey("AddDateField");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey ADD_TEXT_FIELD_KEY = new TableDeveloperKey("AddTextField");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey ADD_INTEGER_FIELD_KEY = new TableDeveloperKey("AddIntegerField");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey ADD_LONG_FIELD_KEY = new TableDeveloperKey("AddLongField");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey ADD_FLOAT_FIELD_KEY = new TableDeveloperKey("AddFloatField");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey ADD_DOUBLE_FIELD_KEY = new TableDeveloperKey("AddDoubleField");
+
+	/**
+	 * 
+	 */
+	static final TableTransitionKey ADD_STD_INDEX = new TableStructureAdminOperationKey("Add Std index", "Add missing index from the default table specification for this class");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey ADD_STD_FIELD = new TableStructureAdminOperationKey("Add Std field","Add missing fields from the default table specification for this class");
+	static final TableTransitionKey DROP_OPTIONAL_FIELD =new TableStructureAdminOperationKey("Drop optional field","Drop optional existing field");
+
     public TableTransitionProvider(AppContext conn){
     	super(conn);
     	addTransition(INDEX, new IndexTransition());
     	if( UPLOAD_XML_FEATURE.isEnabled(conn)) {
     		addTransition(UPLOAD, new UploadTransition());
     	}
+    	addTransition(DROP_TABLE_KEY,new ConfirmTransition<DataObjectFactory>(
+			     "Delete this table ? (all data will be lost)", 
+			     new DropTableTransition<DataObjectFactory>(conn), 
+			     new ForwardTransition<DataObjectFactory>(new MessageResult("aborted"))) );
+		addTransition(ADD_FOREIGN_KEYS_KEY,new ConfirmTransition<DataObjectFactory>(
+			     "Add Foreign Key definitions?", 
+			     new AddForeignKeyTransition<DataObjectFactory>(), 
+			     new ForwardTransition<DataObjectFactory>(new MessageResult("aborted"))) );
+	
+		addTransition(DROP_FIELD_KEY, new DropFieldTransition<DataObjectFactory>());
+		addTransition(DROP_INDEX_KEY, new DropIndexTransition<DataObjectFactory>());
+		addTransition(DROP_FOREIGN_KEY_KEY, new DropForeignKeyTransition<DataObjectFactory>());
+		addTransition(ADD_REFERENCE_FIELD_KEY, new AddReferenceTransition<DataObjectFactory>());
+		addTransition(ADD_DATE_FIELD_KEY, new AddDateFieldTransition<DataObjectFactory>());
+		addTransition(ADD_TEXT_FIELD_KEY, new AddTextFieldTransition<DataObjectFactory>());
+		addTransition(ADD_INTEGER_FIELD_KEY, new AddIntegerFieldTransition<DataObjectFactory>());
+		addTransition(ADD_LONG_FIELD_KEY, new AddLongFieldTransition<DataObjectFactory>());
+		addTransition(ADD_FLOAT_FIELD_KEY, new AddFloatFieldTransition<DataObjectFactory>());
+		addTransition(ADD_DOUBLE_FIELD_KEY, new AddDoubleFieldTransition<DataObjectFactory>());
+		addTransition(ADD_STD_FIELD, new AddStdFieldTransition<DataObjectFactory>());
+		addTransition(ADD_STD_INDEX, new AddStdIndexTransition<>());
+		addTransition(DROP_OPTIONAL_FIELD, new DropOptionalFieldTransition<>());
     }
     public class IndexTransition extends AbstractTargetLessTransition<DataObjectFactory>{
 		public void buildForm(Form f, AppContext c) throws TransitionException {
@@ -149,7 +234,10 @@ public class TableTransitionProvider extends AbstractTransitionProvider<DataObje
     
 	public boolean allowTransition(AppContext c,DataObjectFactory target,
 			TableTransitionKey name) {
-		return name.allow(c.getService(SessionService.class),target);
+		if( name.allow(c.getService(SessionService.class),target)) {
+			return true;
+		}
+		return false;
 	}
 
 	public String getID(DataObjectFactory target) {
@@ -163,9 +251,6 @@ public class TableTransitionProvider extends AbstractTransitionProvider<DataObje
 		return getLogContent(cb, target, c.getService(SessionService.class));
 	}
 
-	protected TableTransitionRegistry getRegistry(TableTransitionTarget target) {
-		return target.getTableTransitionRegistry();
-	}
 
 	public DataObjectFactory getTarget(String id) {
 		if( id == null || id.length() == 0){

@@ -44,6 +44,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableStructureListener;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.BasicType;
@@ -62,7 +63,6 @@ import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.iterator.DecoratingIterator;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
-import uk.ac.ed.epcc.webapp.model.data.table.TableStructureDataObjectFactory;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 /**
@@ -88,7 +88,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 
 
-public class HistoryFactory<P extends DataObject,H extends HistoryFactory.HistoryRecord<P>> extends TableStructureDataObjectFactory<H> implements HistoryHandler<P> {
+public class HistoryFactory<P extends DataObject,H extends HistoryFactory.HistoryRecord<P>> extends DataObjectFactory<H> implements HistoryHandler<P>, TableStructureListener {
 	
 
 	public static final Feature HISTORY_CACHE_FEATURE = new Feature("history_cache",true,"should history factories cache the peer objects to save on lookups");
@@ -1049,7 +1049,6 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	}
 	@Override
 	public void resetStructure() {
-		super.resetStructure();
 		// We may be adding a HistoryStatus field 
 		// actually we won't trigger till the following transition but its still good 
 		// to do.
