@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
@@ -20,16 +21,16 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @param <T> target type
  *
  */
-public class AdminOperationKey<T extends TableTransitionTarget> extends TableTransitionKey<T> {
+public class AdminOperationKey extends TableTransitionKey {
 
 	
 	
 
-	public AdminOperationKey(Class<? super T> t, String name, String help) {
+	public AdminOperationKey(Class<? super DataObjectFactory> t, String name, String help) {
 		super(t, name, help);
 	}
 
-	public AdminOperationKey(Class<? super T> t, String name) {
+	public AdminOperationKey(Class<? super DataObjectFactory> t, String name) {
 		super(t, name);
 	}
 
@@ -37,7 +38,7 @@ public class AdminOperationKey<T extends TableTransitionTarget> extends TableTra
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.AccessControlTransitionKey#allow(uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
 	@Override
-	public boolean allow(SessionService<?> serv,T target) {
+	public boolean allow(SessionService<?> serv,DataObjectFactory target) {
 		return serv.hasRole(SessionService.ADMIN_ROLE);
 	}
 

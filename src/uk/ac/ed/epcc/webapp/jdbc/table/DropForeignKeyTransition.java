@@ -24,25 +24,23 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.RepositoryForeignKeyInput;
 
 
 
-public class DropForeignKeyTransition<T extends TableStructureTransitionTarget> extends AbstractFormTransition<T>{
+public class DropForeignKeyTransition<T extends DataObjectFactory> extends EditTableFormTransition<T>{
     /**
 	 * 
 	 */
 	private static final String INDEX_FIELD = "Index";
-	private final Repository res;
-    public DropForeignKeyTransition(Repository res){
-    	this.res=res;
+    public DropForeignKeyTransition(){
     }
 	public void buildForm(Form f, T target, AppContext c)
 			throws TransitionException {
-		f.addInput(INDEX_FIELD, "Index to drop", new RepositoryForeignKeyInput(res));
+		f.addInput(INDEX_FIELD, "Index to drop", new RepositoryForeignKeyInput(getRepository(target)));
 		f.addAction("Drop", new DropAction(target));
 	}
 	public class DropAction extends FormAction{
@@ -56,6 +54,7 @@ public class DropForeignKeyTransition<T extends TableStructureTransitionTarget> 
 		public FormResult action(Form f) throws ActionException {
 			RepositoryForeignKeyInput input = (RepositoryForeignKeyInput) f.getInput(INDEX_FIELD);
 			try {
+				Repository res = getRepository(target);
 				SQLContext sql = res.getSQLContext();
 				StringBuilder query = new StringBuilder();
 				query.append("ALTER TABLE ");
@@ -66,8 +65,7 @@ public class DropForeignKeyTransition<T extends TableStructureTransitionTarget> 
 				
 				stmt.execute();
 				stmt.close();
-				target.resetStructure();
-				Repository.reset(res.getContext(), res.getTag());
+				resetStructure(target);
 			} catch (Exception e) {
 				throw new ActionException("Update failed",e);
 			}

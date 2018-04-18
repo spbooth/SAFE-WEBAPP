@@ -25,9 +25,5 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
  * @author spb
  *
  */
-public interface TableStructureTransitionTarget extends TableTransitionTarget {
-	/** Table structure has changed
-	 * 
-	 */
-	public void resetStructure();
+public interface TableStructureTransitionTarget extends TableTransitionTarget, TableStructureListener {
 }

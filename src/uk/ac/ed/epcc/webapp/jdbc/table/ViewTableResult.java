@@ -17,12 +17,13 @@
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
 import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
 
 
-public class ViewTableResult extends ViewTransitionResult<TableTransitionTarget, TableTransitionKey> {
+public class ViewTableResult extends ViewTransitionResult<DataObjectFactory, TableTransitionKey> {
 
-	public ViewTableResult(TableTransitionTarget target) {
+	public ViewTableResult(DataObjectFactory target) {
 		super(new TableTransitionProvider(target.getContext()),target);
 	}
    

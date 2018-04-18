@@ -19,16 +19,17 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.inputs.DoubleInput;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 
-public class AddDoubleFieldTransition<T extends TableStructureTransitionTarget> extends AddFieldTransition<T> {
+public class AddDoubleFieldTransition<T extends DataObjectFactory> extends AddFieldTransition<T> {
 
 	private static final String DEFAULT = "Default";
 
-	public AddDoubleFieldTransition(Repository res) {
-		super(res);
+	public AddDoubleFieldTransition() {
+		super();
 	}
 
 	@Override

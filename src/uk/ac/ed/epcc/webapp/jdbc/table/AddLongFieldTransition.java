@@ -19,16 +19,17 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.inputs.LongInput;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 
-public class AddLongFieldTransition<T extends TableStructureTransitionTarget> extends AddFieldTransition<T> {
+public class AddLongFieldTransition<T extends DataObjectFactory> extends AddFieldTransition<T> {
 
 	private static final String DEFAULT = "Default";
 
-	public AddLongFieldTransition(Repository res) {
-		super(res);
+	public AddLongFieldTransition() {
+		super();
 	}
 
 	@Override

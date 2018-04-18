@@ -168,9 +168,9 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 	public class RelationshipTableRegistry extends AbstractTableRegistry{
 
 		public RelationshipTableRegistry(){
-			addTableTransition(new TableStructureAdminOperationKey<Relationship>("DropTable"), new DropTableTransition<Relationship>(getContext()));
-			addTableTransition(new TableStructureAdminOperationKey<Relationship>("DropField"), new DropFieldTransition<Relationship>(res));
-			addTableTransition(new TableStructureAdminOperationKey<Relationship>( "AddRole"), new AddBooleanFieldTransition<Relationship>(res));
+			addTableTransition(new TableStructureAdminOperationKey("DropTable"), new DropTableTransition<Relationship>(getContext()));
+			addTableTransition(new TableStructureAdminOperationKey("DropField"), new DropFieldTransition<Relationship>());
+			addTableTransition(new TableStructureAdminOperationKey( "AddRole"), new AddBooleanFieldTransition<Relationship>());
 		}
 		public boolean allowTableTransition(TransitionKey name,SessionService operator) {
 			return operator.hasRole(SessionService.ADMIN_ROLE);

@@ -35,6 +35,7 @@ import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 /** A {@link TransitionSource} that depends on the default {@link TableSpecification}
@@ -43,7 +44,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
  *
  * @param <T>
  */
-public class TableSpecificationTransitionSource<T extends TableStructureTransitionTarget> implements
+public class TableSpecificationTransitionSource<T extends DataObjectFactory> implements
 		TransitionSource<T> {
 
 	/**
@@ -61,8 +62,7 @@ public class TableSpecificationTransitionSource<T extends TableStructureTransiti
 	static final String INDEX_FORMFIELD = "Index";
 	public class AddStdFieldTransition extends AddFieldTransition<T>{
 
-		public AddStdFieldTransition(Repository res) {
-			super(res);
+		public AddStdFieldTransition() {
 		}
 
 		@Override
@@ -80,15 +80,15 @@ public class TableSpecificationTransitionSource<T extends TableStructureTransiti
 	}
 	public class DropOptionalFieldTransition extends DropFieldTransition<T>{
 
-		public DropOptionalFieldTransition(Repository res) {
-			super(res);
+		public DropOptionalFieldTransition() {
+			super();
 		}
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.table.DropFieldTransition#getFieldInput()
 		 */
 		@Override
-		public <I extends Input<String> & ItemInput<FieldInfo>> I getFieldInput() {
+		public <I extends Input<String> & ItemInput<FieldInfo>> I getFieldInput(T target) {
 			Map<String,FieldInfo> map = new LinkedHashMap<String, Repository.FieldInfo>();
 			Set<String> optionalFieldNames = spec.getOptionalFieldNames();
 			Set<String> fieldNames = spec.getFieldNames();
@@ -104,47 +104,8 @@ public class TableSpecificationTransitionSource<T extends TableStructureTransiti
 		
 		
 	}
-	public class AddIndexAction extends FormAction {
-
-		private final T target;
-		public AddIndexAction(T target) {
-			this.target=target;
-		}
-
-		@Override
-		public FormResult action(Form f)
-				throws uk.ac.ed.epcc.webapp.forms.exceptions.ActionException {
-			try {
-				SQLContext sql = res.getSQLContext();
-				StringBuilder query = new StringBuilder();
-				query.append("ALTER TABLE ");
-				res.addTable(query, true);
-				query.append(" ADD ");
-				String name = (String) f.get(INDEX_FORMFIELD);
-				IndexType type = (IndexType) f.getItem(INDEX_FORMFIELD);
-				List<Object> args = new LinkedList<Object>();
-				
-				type.accept(sql.getCreateVisitor(query, args));
-				Logger log = res.getContext().getService(LoggerService.class).getLogger(getClass());
-				log.debug("Query is "+query.toString());
-				java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString());
-				int pos=1;
-				for(Object o: args){
-					stmt.setObject(pos++, o);
-				}
-				stmt.execute();
-				stmt.close();
-				
-				target.resetStructure();
-				Repository.reset(res.getContext(), res.getTag());
-			} catch (Exception e) {
-				throw new ActionException("Update failed",e);
-			}
-			return new ViewTableResult(target);
-		}
-
-	}
-	public class AddStdIndexTransition extends AbstractFormTransition<T>{
+	
+	public class AddStdIndexTransition extends EditTableFormTransition<T>{
 		
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.BaseFormTransition#buildForm(uk.ac.ed.epcc.webapp.forms.Form, java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
@@ -159,6 +120,45 @@ public class TableSpecificationTransitionSource<T extends TableStructureTransiti
 			f.addInput(INDEX_FORMFIELD, "Index to add", new OptionalIndexInput(res, indexes));
 			f.addAction("Add", new AddIndexAction(target));
 		}
+		public class AddIndexAction extends FormAction {
+
+			private final T target;
+			public AddIndexAction(T target) {
+				this.target=target;
+			}
+
+			@Override
+			public FormResult action(Form f)
+					throws uk.ac.ed.epcc.webapp.forms.exceptions.ActionException {
+				try {
+					SQLContext sql = res.getSQLContext();
+					StringBuilder query = new StringBuilder();
+					query.append("ALTER TABLE ");
+					res.addTable(query, true);
+					query.append(" ADD ");
+					String name = (String) f.get(INDEX_FORMFIELD);
+					IndexType type = (IndexType) f.getItem(INDEX_FORMFIELD);
+					List<Object> args = new LinkedList<Object>();
+					
+					type.accept(sql.getCreateVisitor(query, args));
+					Logger log = res.getContext().getService(LoggerService.class).getLogger(getClass());
+					log.debug("Query is "+query.toString());
+					java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString());
+					int pos=1;
+					for(Object o: args){
+						stmt.setObject(pos++, o);
+					}
+					stmt.execute();
+					stmt.close();
+					
+					resetStructure(target);
+				} catch (Exception e) {
+					throw new ActionException("Update failed",e);
+				}
+				return new ViewTableResult(target);
+			}
+
+		}
 	}
 	public TableSpecificationTransitionSource(Repository res,TableSpecification spec){
 		this.res=res;
@@ -166,13 +166,13 @@ public class TableSpecificationTransitionSource<T extends TableStructureTransiti
 	}
 	
 	
-	public Map<TableTransitionKey<T>, Transition<T>> getTransitions() {
-		Map<TableTransitionKey<T>,Transition<T>> result = new HashMap<TableTransitionKey<T>, Transition<T>>();
-		result.put(new TableStructureAdminOperationKey<T>(ADD_STD_FIELD,"Add missing fields from the default table specification for this class"),
-				new AddStdFieldTransition(res));
-		result.put(new TableStructureAdminOperationKey<T>(ADD_STD_INDEX, "Add missing index from the default table specification for this class"), 
+	public Map<TableTransitionKey, Transition<T>> getTransitions() {
+		Map<TableTransitionKey,Transition<T>> result = new HashMap<TableTransitionKey, Transition<T>>();
+		result.put(new TableStructureAdminOperationKey(ADD_STD_FIELD,"Add missing fields from the default table specification for this class"),
+				new AddStdFieldTransition());
+		result.put(new TableStructureAdminOperationKey(ADD_STD_INDEX, "Add missing index from the default table specification for this class"), 
 				new AddStdIndexTransition());
-		result.put(new TableStructureAdminOperationKey<T>(DROP_OPTIONAL_FIELD,"Drop optional existing field"),new DropOptionalFieldTransition(res));
+		result.put(new TableStructureAdminOperationKey(DROP_OPTIONAL_FIELD,"Drop optional existing field"),new DropOptionalFieldTransition());
 		return result;
 	}
 

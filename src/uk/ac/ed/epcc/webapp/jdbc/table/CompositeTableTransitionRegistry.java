@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+
 /** A {@link TableTransitionRegistry} that can be augmented with additionanal transitions.
  * @author spb
  *
@@ -20,7 +22,7 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 
 public interface CompositeTableTransitionRegistry extends TableTransitionRegistry{
 
-	public abstract <X extends TableTransitionTarget> void addTransitionSource(
+	public abstract <X extends DataObjectFactory> void addTransitionSource(
 			TransitionSource<X> source);
 
 }

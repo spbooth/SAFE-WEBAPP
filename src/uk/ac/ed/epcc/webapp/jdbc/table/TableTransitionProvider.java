@@ -48,6 +48,7 @@ import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.UnDumper;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.TableInput;
+import uk.ac.ed.epcc.webapp.model.data.transition.AbstractTransitionProvider;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** Class implementing transitions on factory classes identified by table.
@@ -61,7 +62,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 
 
-public class TableTransitionProvider implements ViewTransitionProvider<TableTransitionKey,TableTransitionTarget>, IndexTransitionProvider<TableTransitionKey, TableTransitionTarget>,Contexed{
+public class TableTransitionProvider extends AbstractTransitionProvider<DataObjectFactory, TableTransitionKey> implements ViewTransitionProvider<TableTransitionKey,DataObjectFactory>, IndexTransitionProvider<TableTransitionKey, DataObjectFactory>,Contexed{
 	
 	public static final Feature UPLOAD_XML_FEATURE = new Feature("table_transition.upload_xml",false,"Allow XML tables to be uploaded via a transition");
     /**
@@ -74,29 +75,32 @@ public class TableTransitionProvider implements ViewTransitionProvider<TableTran
 	 */
 	public static final String TABLE_TRANSITION_TAG = "Table";
 
-	private final AppContext conn;
     
-    public static final TableTransitionKey INDEX = new TableTransitionKey(TableTransitionProvider.class, "Index"){
+    public static final TableTransitionKey INDEX = new TableTransitionKey(DataObjectFactory.class, "Index"){
 
 		@Override
-		public boolean allow(SessionService serv, TableTransitionTarget target) {
+		public boolean allow(SessionService serv, DataObjectFactory target) {
 			return serv.hasRoleFromList(SessionService.ADMIN_ROLE,TABLE_INDEX_ROLE);
 		}
     	
     };
-    public static final TableTransitionKey UPLOAD = new AdminOperationKey(TableTransitionProvider.class, "Upload");
+    public static final TableTransitionKey UPLOAD = new AdminOperationKey(DataObjectFactory.class, "Upload");
     public TableTransitionProvider(AppContext conn){
-    	this.conn=conn;
+    	super(conn);
+    	addTransition(INDEX, new IndexTransition());
+    	if( UPLOAD_XML_FEATURE.isEnabled(conn)) {
+    		addTransition(UPLOAD, new UploadTransition());
+    	}
     }
-    public class IndexTransition extends AbstractTargetLessTransition<TableTransitionTarget>{
+    public class IndexTransition extends AbstractTargetLessTransition<DataObjectFactory>{
 		public void buildForm(Form f, AppContext c) throws TransitionException {
-			f.addInput("table", TABLE_TRANSITION_TAG, new TableInput<TableStructureTransitionTarget>(c, TableStructureTransitionTarget.class));
+			f.addInput("table", TABLE_TRANSITION_TAG, new TableInput<DataObjectFactory>(c, DataObjectFactory.class));
 			f.addAction("View", new FormAction() {
 				
 				@Override
 				public FormResult action(Form f) throws ActionException {
 					String table = (String) f.get("table");
-					TableStructureTransitionTarget target = getContext().makeObject(TableStructureTransitionTarget.class, table);
+					DataObjectFactory target = getContext().makeObject(DataObjectFactory.class, table);
 					return new ViewTableResult(target);
 				}
 			});
@@ -108,7 +112,7 @@ public class TableTransitionProvider implements ViewTransitionProvider<TableTran
      * @author spb
      *
      */
-    public class UploadTransition extends AbstractTargetLessTransition<TableTransitionTarget>{
+    public class UploadTransition extends AbstractTargetLessTransition<DataObjectFactory>{
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition#buildForm(uk.ac.ed.epcc.webapp.forms.Form, uk.ac.ed.epcc.webapp.AppContext)
@@ -136,104 +140,71 @@ public class TableTransitionProvider implements ViewTransitionProvider<TableTran
 					} catch (Exception e) {
 						throw new ActionException("Error readind dump", e);
 					}
-					return new IndexTransitionResult<TableTransitionTarget,TableTransitionKey>(TableTransitionProvider.this);
+					return new IndexTransitionResult<DataObjectFactory,TableTransitionKey>(TableTransitionProvider.this);
 				}
 			});
 		}
     	
     }
     
-	public boolean allowTransition(AppContext c,TableTransitionTarget target,
+	public boolean allowTransition(AppContext c,DataObjectFactory target,
 			TableTransitionKey name) {
 		return name.allow(c.getService(SessionService.class),target);
 	}
 
-	public String getID(TableTransitionTarget target) {
+	public String getID(DataObjectFactory target) {
 		if( target == null){
 			return null;
 		}
-		return target.getTableTransitionID();
+		return target.getTag();
 	}
 
-	public <X extends ContentBuilder> X getSummaryContent(AppContext c,X cb,TableTransitionTarget target) {
-		SessionService operator = c.getService(SessionService.class);
-		getRegistry(target).getTableTransitionSummary(cb,operator );
-		return cb;
+	public <X extends ContentBuilder> X getSummaryContent(AppContext c,X cb,DataObjectFactory target) {
+		return getLogContent(cb, target, c.getService(SessionService.class));
 	}
 
 	protected TableTransitionRegistry getRegistry(TableTransitionTarget target) {
 		return target.getTableTransitionRegistry();
 	}
 
-	public TableTransitionTarget getTarget(String id) {
+	public DataObjectFactory getTarget(String id) {
 		if( id == null || id.length() == 0){
 			return null;
 		}
-		return conn.makeObjectWithDefault(TableTransitionTarget.class, null,id);
+		return getContext().makeObjectWithDefault(DataObjectFactory.class, null,id);
 	}
 
 	public String getTargetName() {
 		return TABLE_TRANSITION_TAG;
 	}
-
-	public Transition<TableTransitionTarget> getTransition(TableTransitionTarget target,TableTransitionKey name) {
-		if( name == INDEX){
-			return new IndexTransition();
-		}
-		if( name == UPLOAD && UPLOAD_XML_FEATURE.isEnabled(getContext())){
-			return new UploadTransition();
-		}
-		return getRegistry(target).getTableTransition(name);
-	}
-
-	public Set<TableTransitionKey> getTransitions(TableTransitionTarget target) {
-		return getRegistry(target).getTableTransitionKeys();
-	}
-
-	public TableTransitionKey lookupTransition(TableTransitionTarget target,String name) {
-		if( target == null){
-			if( INDEX.getName().equals(name)){
-				return INDEX;
-			}
-		}else{
-		for(TableTransitionKey key : getRegistry(target).getTableTransitionKeys()){
-			if( key.getName().equals(name)){
-				return key;
-			}
-		}
-		}
-		return null;
-	}
-
-	public AppContext getContext() {
-		return conn;
-	}
-	public boolean canView(TableTransitionTarget target, SessionService<?> sess) {
+	
+	public boolean canView(DataObjectFactory target, SessionService<?> sess) {
 		
 		return sess.hasRoleFromList(SessionService.ADMIN_ROLE,TABLE_INDEX_ROLE);
 	}
-	public <X extends ContentBuilder> X getLogContent(X hb,TableTransitionTarget target, SessionService<?> sess) {
-		hb.addHeading(2, "Table "+target.getTableTransitionID());
+	public <X extends ContentBuilder> X getLogContent(X hb,DataObjectFactory target, SessionService<?> sess) {
+		hb.addHeading(2, "Table "+target.getTag());
 		hb.addHeading(3,"Table Type:"+target.getClass().getSimpleName());
-		if( target instanceof DataObjectFactory){
-			DataObjectFactory fac = (DataObjectFactory) target;
-			Collection<Composite> comps = fac.getComposites();
-			if( ! comps.isEmpty()){
-				hb.addHeading(4, "Composites");
-				LinkedHashSet<String> names = new LinkedHashSet<String>();
-				for( Composite c : comps){
-					names.add(c.toString());
-				}
-				hb.addList(names);
+
+
+		Collection<Composite> comps = target.getComposites();
+		if( ! comps.isEmpty()){
+			hb.addHeading(4, "Composites");
+			LinkedHashSet<String> names = new LinkedHashSet<String>();
+			for( Composite c : comps){
+				names.add(c.toString());
 			}
+			hb.addList(names);
 		}
-		if( target instanceof TableContentProvider){
+		if( target instanceof TableContentProvider) {
 			((TableContentProvider)target).addSummaryContent(hb);
 		}
-		getRegistry(target).getTableTransitionSummary(hb,sess );
+		for(TableContentProvider prov : ((DataObjectFactory<?>)target).getComposites(TableContentProvider.class)) {
+			prov.addSummaryContent(hb);
+		}
 		return hb;
 	}
-	public <X extends ContentBuilder> X getTopContent(X hb,TableTransitionTarget target, SessionService<?> sess) {
+	public <X extends ContentBuilder> X getTopContent(X hb,DataObjectFactory target, SessionService<?> sess) {
 		return hb;
 	}
 	public String getHelp(TableTransitionKey key) {
@@ -247,7 +218,7 @@ public class TableTransitionProvider implements ViewTransitionProvider<TableTran
 	}
 
 	public <R> R accept(
-			TransitionFactoryVisitor<R,TableTransitionTarget, TableTransitionKey> vis) {
+			TransitionFactoryVisitor<R,DataObjectFactory, TableTransitionKey> vis) {
 		return vis.visitTransitionProvider(this);
 		
 	}

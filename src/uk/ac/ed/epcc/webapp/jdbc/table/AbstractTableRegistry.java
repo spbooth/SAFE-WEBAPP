@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 
 public abstract class AbstractTableRegistry implements CompositeTableTransitionRegistry {
@@ -33,18 +34,18 @@ public abstract class AbstractTableRegistry implements CompositeTableTransitionR
 	 * @param key
 	 * @param t
 	 */
-	protected <X extends TableTransitionTarget> void addTableTransition(TableTransitionKey<X> key, Transition<X> t){
+	protected <X extends DataObjectFactory> void addTableTransition(TableTransitionKey key, Transition<X> t){
     	table_transitions.put(key,t);
     }
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.CompositeTableTransitionRegistry#addTransitionSource(uk.ac.ed.epcc.webapp.jdbc.table.TransitionSource)
 	 */
-	public <X extends TableTransitionTarget> void  addTransitionSource(TransitionSource<X> source){
+	public <X extends DataObjectFactory> void  addTransitionSource(TransitionSource<X> source){
 		if( source == null ){
 			return;
 		}
-		Map<TableTransitionKey<X>,Transition<X>> map = source.getTransitions();
-		for(TableTransitionKey<X> key : map.keySet()){
+		Map<TableTransitionKey,Transition<X>> map = source.getTransitions();
+		for(TableTransitionKey key : map.keySet()){
 			addTableTransition(key, map.get(key));
 		}
 	}

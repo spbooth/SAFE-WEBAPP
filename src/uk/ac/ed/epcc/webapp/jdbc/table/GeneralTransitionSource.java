@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ForwardTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 /** TransitionSource for the basic table edit operations
  * 
@@ -32,7 +33,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  */
 
 
-public class GeneralTransitionSource<T extends TableStructureTransitionTarget> implements TransitionSource<T> {
+public class GeneralTransitionSource<T extends DataObjectFactory> implements TransitionSource<T> {
 	
 	/**
 	 * 
@@ -83,7 +84,7 @@ public class GeneralTransitionSource<T extends TableStructureTransitionTarget> i
 	 * 
 	 */
 	static final String ADD_DOUBLE_FIELD_KEY = "AddDoubleField";
-	private Map<TableTransitionKey<T>,Transition<T>> table_transitions = new LinkedHashMap<TableTransitionKey<T>,Transition<T>>();
+	private Map<TableTransitionKey,Transition<T>> table_transitions = new LinkedHashMap<TableTransitionKey,Transition<T>>();
 	
 	public GeneralTransitionSource(Repository res){
 		
@@ -93,25 +94,25 @@ public class GeneralTransitionSource<T extends TableStructureTransitionTarget> i
 			     new ForwardTransition<T>(new MessageResult("aborted"))) );
 		addTransition(ADD_FOREIGN_KEYS_KEY,new ConfirmTransition<T>(
 			     "Add Foreign Key definitions?", 
-			     new AddForeignKeyTransition<T>(res), 
+			     new AddForeignKeyTransition<T>(), 
 			     new ForwardTransition<T>(new MessageResult("aborted"))) );
 	
-		addTransition(DROP_FIELD_KEY, new DropFieldTransition<T>(res));
-		addTransition(DROP_INDEX_KEY, new DropIndexTransition<T>(res));
-		addTransition(DROP_FOREIGN_KEY_KEY, new DropForeignKeyTransition<T>(res));
-		addTransition(ADD_REFERENCE_FIELD_KEY, new AddReferenceTransition<T>(res));
-		addTransition(ADD_DATE_FIELD_KEY, new AddDateFieldTransition<T>(res));
-		addTransition(ADD_TEXT_FIELD_KEY, new AddTextFieldTransition<T>(res));
-		addTransition(ADD_INTEGER_FIELD_KEY, new AddIntegerFieldTransition<T>(res));
-		addTransition(ADD_LONG_FIELD_KEY, new AddLongFieldTransition<T>(res));
-		addTransition(ADD_FLOAT_FIELD_KEY, new AddFloatFieldTransition<T>(res));
-		addTransition(ADD_DOUBLE_FIELD_KEY, new AddDoubleFieldTransition<T>(res));
+		addTransition(DROP_FIELD_KEY, new DropFieldTransition<T>());
+		addTransition(DROP_INDEX_KEY, new DropIndexTransition<T>());
+		addTransition(DROP_FOREIGN_KEY_KEY, new DropForeignKeyTransition<T>());
+		addTransition(ADD_REFERENCE_FIELD_KEY, new AddReferenceTransition<T>());
+		addTransition(ADD_DATE_FIELD_KEY, new AddDateFieldTransition<T>());
+		addTransition(ADD_TEXT_FIELD_KEY, new AddTextFieldTransition<T>());
+		addTransition(ADD_INTEGER_FIELD_KEY, new AddIntegerFieldTransition<T>());
+		addTransition(ADD_LONG_FIELD_KEY, new AddLongFieldTransition<T>());
+		addTransition(ADD_FLOAT_FIELD_KEY, new AddFloatFieldTransition<T>());
+		addTransition(ADD_DOUBLE_FIELD_KEY, new AddDoubleFieldTransition<T>());
 	}
 	
 	private void addTransition(String name,Transition<T> t){
-		table_transitions.put(new TableDeveloperKey<T>(TableStructureTransitionTarget.class, name),t);
+		table_transitions.put(new TableDeveloperKey(DataObjectFactory.class, name),t);
 	}
-	public Map<TableTransitionKey<T>, Transition<T>> getTransitions() {
+	public Map<TableTransitionKey, Transition<T>> getTransitions() {
 		return table_transitions;
 	}
 

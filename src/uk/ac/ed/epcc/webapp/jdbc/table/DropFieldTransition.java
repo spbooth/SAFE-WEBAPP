@@ -28,28 +28,28 @@ import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.RepositoryFieldInput;
 
 
 
-public class DropFieldTransition<T extends TableStructureTransitionTarget> extends AbstractFormTransition<T>{
+public class DropFieldTransition<T extends DataObjectFactory> extends EditTableFormTransition<T>{
     /**
 	 * 
 	 */
 	private static final String FIELD_INPUT = "Field";
-	private final Repository res;
-    public DropFieldTransition(Repository res){
-    	this.res=res;
+	
+    public DropFieldTransition(){
     }
 	public void buildForm(Form f, T target, AppContext c)
 			throws TransitionException {
-		f.addInput(FIELD_INPUT, "Field to drop", getFieldInput());
+		f.addInput(FIELD_INPUT, "Field to drop", getFieldInput(target));
 		f.addAction("Drop", new DropAction(target));
 	}
-	public <I extends Input<String> & ItemInput<FieldInfo>> I getFieldInput() {
-		return (I) new RepositoryFieldInput(res);
+	public <I extends Input<String> & ItemInput<FieldInfo>> I getFieldInput(T target) {
+		return (I) new RepositoryFieldInput(getRepository(target));
 	}
 	public class DropAction extends FormAction{
 		private T target;
@@ -62,6 +62,7 @@ public class DropFieldTransition<T extends TableStructureTransitionTarget> exten
 		public FormResult action(Form f) throws ActionException {
 			ItemInput<FieldInfo> input = (ItemInput<FieldInfo>) f.getInput(FIELD_INPUT);
 			try {
+				Repository res = getRepository(target);
 				SQLContext sql = res.getSQLContext();
 				StringBuilder query = new StringBuilder();
 				query.append("ALTER TABLE ");
@@ -74,8 +75,7 @@ public class DropFieldTransition<T extends TableStructureTransitionTarget> exten
 				
 				stmt.execute();
 				stmt.close();
-				target.resetStructure();
-				Repository.reset(res.getContext(), res.getTag());
+				resetStructure(target);
 			} catch (Exception e) {
 				throw new ActionException("Update failed",e);
 			}

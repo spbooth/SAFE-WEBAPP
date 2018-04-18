@@ -13,14 +13,14 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
  * @author spb
- * @param <T> target type
  *
  */
-public class TableDeveloperKey<T extends TableStructureTransitionTarget> extends TableTransitionKey<T> {
+public class TableDeveloperKey extends TableTransitionKey {
 	/**
 	 * 
 	 */
@@ -29,11 +29,11 @@ public class TableDeveloperKey<T extends TableStructureTransitionTarget> extends
 	
 	
 
-	public TableDeveloperKey(Class<? super T> t, String name, String help) {
+	public TableDeveloperKey(Class<? super DataObjectFactory> t, String name, String help) {
 		super(t, name, help);
 	}
 
-	public TableDeveloperKey(Class<? super T> t, String name) {
+	public TableDeveloperKey(Class<? super DataObjectFactory> t, String name) {
 		super(t, name);
 	}
 
@@ -41,7 +41,7 @@ public class TableDeveloperKey<T extends TableStructureTransitionTarget> extends
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.AccessControlTransitionKey#allow(uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
 	@Override
-	public boolean allow(SessionService<?> serv,T target) {
+	public boolean allow(SessionService<?> serv,DataObjectFactory target) {
 		return serv.hasRole(CHANGE_TABLE_STRUCTURE_ROLE);
 	}
 

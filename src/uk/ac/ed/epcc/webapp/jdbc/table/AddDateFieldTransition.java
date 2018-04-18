@@ -19,16 +19,17 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.inputs.DateInput;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 
-public class AddDateFieldTransition<T extends TableStructureTransitionTarget> extends AddFieldTransition<T> {
+public class AddDateFieldTransition<T extends DataObjectFactory> extends AddFieldTransition<T> {
 
 	private static final String DEFAULT = "Default";
 
-	public AddDateFieldTransition(Repository res) {
-		super(res);
+	public AddDateFieldTransition() {
+		super();
 	}
 
 	@Override

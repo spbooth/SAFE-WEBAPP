@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 /** Interface for objects that can augment the table {@link Transition}s of a
  * {@link TableTransitionTarget}.
  * 
@@ -26,12 +27,12 @@ import uk.ac.ed.epcc.webapp.forms.transition.Transition;
  *
  * @param <T>
  */
-public interface TransitionSource<T extends TableTransitionTarget> {
+public interface TransitionSource<T extends DataObjectFactory> {
 	/** Generate a {@link Map} of {@link Transition}s to be added to the
-	 * table transitions of the {@link TableTransitionTarget}. 
+	 * table transitions of the table. 
 	 * 
 	 * @return
 	 */
-	public Map<TableTransitionKey<T>,Transition<T>> getTransitions();
+	public Map<TableTransitionKey,Transition<T>> getTransitions();
 
 }

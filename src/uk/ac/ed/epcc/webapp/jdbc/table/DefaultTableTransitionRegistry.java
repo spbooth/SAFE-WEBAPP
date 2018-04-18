@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -22,7 +23,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 
-public class DefaultTableTransitionRegistry<X extends TableStructureTransitionTarget> extends AbstractTableRegistry {
+public class DefaultTableTransitionRegistry<X extends DataObjectFactory> extends AbstractTableRegistry {
 
 	/**
 	 * 

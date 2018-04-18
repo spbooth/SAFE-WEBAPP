@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 
@@ -29,13 +30,12 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
  *
  */
 
-public class AddForeignKeyTransition<T extends TableStructureTransitionTarget> extends AbstractDirectTransition<T>{
-	private final Repository res;
+public class AddForeignKeyTransition<T extends DataObjectFactory> extends EditTableDirectTransition<T>{
+	
 	/**
 	 * 
 	 */
-	public AddForeignKeyTransition(Repository res) {
-		this.res=res;
+	public AddForeignKeyTransition() {
 	}
 
 	/* (non-Javadoc)
@@ -44,6 +44,7 @@ public class AddForeignKeyTransition<T extends TableStructureTransitionTarget> e
 	public FormResult doTransition(T target, AppContext c)
 			throws TransitionException {
 		try {
+			Repository res = getRepository(target);
 			SQLContext sql = res.getSQLContext();
 			StringBuilder query = new StringBuilder();
 			query.append("ALTER TABLE ");
@@ -78,8 +79,7 @@ public class AddForeignKeyTransition<T extends TableStructureTransitionTarget> e
 
 				stmt.execute();
 				stmt.close();
-				target.resetStructure();
-				Repository.reset(res.getContext(), res.getTag());
+				resetStructure(target);
 			}
 		} catch (Exception e) {
 			c.error(e,"Error adding foreign keys");
