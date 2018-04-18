@@ -31,7 +31,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link Composite} adds behaviour to a {@link DataObjectFactory}
  * by composition but persisted to the same database table.
- * It specifies additional fields for the
+ * It is a {@link TableStructureContributer} so specifies additional fields for the
  * {@link Repository} and methods to customise the forms and may be extended to add
  * functionality based on those fields.
  * <p>

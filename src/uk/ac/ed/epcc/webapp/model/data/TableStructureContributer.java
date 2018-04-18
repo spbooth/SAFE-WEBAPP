@@ -88,8 +88,9 @@ public interface TableStructureContributer<BDO extends DataObject> {
 
 	/**
 	 * Extension hook to allow additional Form customisation generic to all
-	 * types of Form For example adding a FormValidator .
+	 * types of Form (create and update) For example adding a FormValidator .
 	 * 
+	 * Logic that requires an existing object can be added to {@link #customiseUpdateForm(Form, DataObject, SessionService)}
 	 * @param f
 	 *            Form to modify
 	 */
@@ -99,6 +100,7 @@ public interface TableStructureContributer<BDO extends DataObject> {
 	 * of an existing object. 
 	 * This can also add constraints based on the relationship of the operator to the object being updated.
 	 * 
+	 * Logic that does not require an existing object can be added to {@link #customiseForm(Form)}
 	 * @param f
 	 * @param target
 	 * @param operator 
