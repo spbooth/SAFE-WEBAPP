@@ -18,7 +18,9 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 
 import java.io.StringReader;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.SAXParser;
@@ -51,11 +53,10 @@ import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.UnDumper;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.TableInput;
-import uk.ac.ed.epcc.webapp.model.data.transition.AbstractTransitionProvider;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** Class implementing transitions on factory classes identified by table.
- * The target factory has implement {@link TableTransitionTarget} and have its
+ * The target factory must have its
  * class registered as a configuration property.
  * This TransitionProvider needs to be registered under the name <b>Table</b> 
  * to enable this feature.
@@ -65,7 +66,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 
 
-public class TableTransitionProvider extends AbstractTransitionProvider<DataObjectFactory, TableTransitionKey> implements ViewTransitionProvider<TableTransitionKey,DataObjectFactory>, IndexTransitionProvider<TableTransitionKey, DataObjectFactory>,Contexed{
+public class TableTransitionProvider  implements ViewTransitionProvider<TableTransitionKey,DataObjectFactory>, IndexTransitionProvider<TableTransitionKey, DataObjectFactory>,Contexed{
 	
 	public static final Feature UPLOAD_XML_FEATURE = new Feature("table_transition.upload_xml",false,"Allow XML tables to be uploaded via a transition");
     /**
@@ -148,34 +149,54 @@ public class TableTransitionProvider extends AbstractTransitionProvider<DataObje
 	static final TableTransitionKey ADD_STD_FIELD = new TableStructureAdminOperationKey("Add Std field","Add missing fields from the default table specification for this class");
 	static final TableTransitionKey DROP_OPTIONAL_FIELD =new TableStructureAdminOperationKey("Drop optional field","Drop optional existing field");
 
+	private final AppContext conn;
     public TableTransitionProvider(AppContext conn){
-    	super(conn);
-    	addTransition(INDEX, new IndexTransition());
-    	if( UPLOAD_XML_FEATURE.isEnabled(conn)) {
-    		addTransition(UPLOAD, new UploadTransition());
+    	this.conn=conn;
+    	
+    }
+    
+    private Map<TableTransitionKey,Transition<? extends DataObjectFactory>> getTransitionMap(DataObjectFactory target){
+    	LinkedHashMap<TableTransitionKey, Transition<? extends DataObjectFactory>> map = new LinkedHashMap<>();
+    	if( target == null ) {
+    		map.put(INDEX, new IndexTransition());
     	}
-    	addTransition(DROP_TABLE_KEY,new ConfirmTransition<DataObjectFactory>(
+    	if( UPLOAD_XML_FEATURE.isEnabled(conn)) {
+    		map.put(UPLOAD, new UploadTransition());
+    	}
+    	map.put(DROP_TABLE_KEY,new ConfirmTransition<DataObjectFactory>(
 			     "Delete this table ? (all data will be lost)", 
 			     new DropTableTransition<DataObjectFactory>(conn), 
 			     new ForwardTransition<DataObjectFactory>(new MessageResult("aborted"))) );
-		addTransition(ADD_FOREIGN_KEYS_KEY,new ConfirmTransition<DataObjectFactory>(
+		map.put(ADD_FOREIGN_KEYS_KEY,new ConfirmTransition<DataObjectFactory>(
 			     "Add Foreign Key definitions?", 
 			     new AddForeignKeyTransition<DataObjectFactory>(), 
 			     new ForwardTransition<DataObjectFactory>(new MessageResult("aborted"))) );
 	
-		addTransition(DROP_FIELD_KEY, new DropFieldTransition<DataObjectFactory>());
-		addTransition(DROP_INDEX_KEY, new DropIndexTransition<DataObjectFactory>());
-		addTransition(DROP_FOREIGN_KEY_KEY, new DropForeignKeyTransition<DataObjectFactory>());
-		addTransition(ADD_REFERENCE_FIELD_KEY, new AddReferenceTransition<DataObjectFactory>());
-		addTransition(ADD_DATE_FIELD_KEY, new AddDateFieldTransition<DataObjectFactory>());
-		addTransition(ADD_TEXT_FIELD_KEY, new AddTextFieldTransition<DataObjectFactory>());
-		addTransition(ADD_INTEGER_FIELD_KEY, new AddIntegerFieldTransition<DataObjectFactory>());
-		addTransition(ADD_LONG_FIELD_KEY, new AddLongFieldTransition<DataObjectFactory>());
-		addTransition(ADD_FLOAT_FIELD_KEY, new AddFloatFieldTransition<DataObjectFactory>());
-		addTransition(ADD_DOUBLE_FIELD_KEY, new AddDoubleFieldTransition<DataObjectFactory>());
-		addTransition(ADD_STD_FIELD, new AddStdFieldTransition<DataObjectFactory>());
-		addTransition(ADD_STD_INDEX, new AddStdIndexTransition<>());
-		addTransition(DROP_OPTIONAL_FIELD, new DropOptionalFieldTransition<>());
+		map.put(DROP_FIELD_KEY, new DropFieldTransition<DataObjectFactory>());
+		map.put(DROP_INDEX_KEY, new DropIndexTransition<DataObjectFactory>());
+		map.put(DROP_FOREIGN_KEY_KEY, new DropForeignKeyTransition<DataObjectFactory>());
+		map.put(ADD_REFERENCE_FIELD_KEY, new AddReferenceTransition<DataObjectFactory>());
+		map.put(ADD_DATE_FIELD_KEY, new AddDateFieldTransition<DataObjectFactory>());
+		map.put(ADD_TEXT_FIELD_KEY, new AddTextFieldTransition<DataObjectFactory>());
+		map.put(ADD_INTEGER_FIELD_KEY, new AddIntegerFieldTransition<DataObjectFactory>());
+		map.put(ADD_LONG_FIELD_KEY, new AddLongFieldTransition<DataObjectFactory>());
+		map.put(ADD_FLOAT_FIELD_KEY, new AddFloatFieldTransition<DataObjectFactory>());
+		map.put(ADD_DOUBLE_FIELD_KEY, new AddDoubleFieldTransition<DataObjectFactory>());
+		if( target == null) {
+			return map;
+		}
+		if( target.getTableSpecification() != null ) {
+			map.put(ADD_STD_FIELD, new AddStdFieldTransition<DataObjectFactory>());
+			map.put(ADD_STD_INDEX, new AddStdIndexTransition<>());
+			map.put(DROP_OPTIONAL_FIELD, new DropOptionalFieldTransition<>());
+		}
+		if(target instanceof TableTransitionContributor) {
+			map.putAll(((TableTransitionContributor)target).getTableTransitions());
+		}
+		for(TableTransitionContributor c : ((DataObjectFactory<?>)target).getComposites(TableTransitionContributor.class)) {
+			map.putAll(c.getTableTransitions());
+		}
+    	return map;
     }
     public class IndexTransition extends AbstractTargetLessTransition<DataObjectFactory>{
 		public void buildForm(Form f, AppContext c) throws TransitionException {
@@ -306,6 +327,43 @@ public class TableTransitionProvider extends AbstractTransitionProvider<DataObje
 			TransitionFactoryVisitor<R,DataObjectFactory, TableTransitionKey> vis) {
 		return vis.visitTransitionProvider(this);
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#getTransitions(java.lang.Object)
+	 */
+	@Override
+	public Set<TableTransitionKey> getTransitions(DataObjectFactory target) {
+		return getTransitionMap(target).keySet();
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#getTransition(java.lang.Object, java.lang.Object)
+	 */
+	@Override
+	public Transition<DataObjectFactory> getTransition(DataObjectFactory target, TableTransitionKey key) {
+		return (Transition<DataObjectFactory>) getTransitionMap(target).get(key);
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#lookupTransition(java.lang.Object, java.lang.String)
+	 */
+	@Override
+	public TableTransitionKey lookupTransition(DataObjectFactory target, String name) {
+		for(TableTransitionKey key : getTransitions(target)) {
+			if( key.getName().equals(name)) {
+				return key;
+			}
+		}
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
+	 */
+	@Override
+	public AppContext getContext() {
+		return conn;
 	}
 	
 

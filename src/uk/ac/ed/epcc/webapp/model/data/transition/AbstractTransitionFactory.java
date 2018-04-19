@@ -60,9 +60,11 @@ public abstract class AbstractTransitionFactory<T , K extends TransitionKey<T>> 
 		return key_map.get(name);
 	}
     public final Transition<T> getTransition(T target, K name) {
+		return getTransition(name);
+	}
+    public final Transition<T> getTransition(K name) {
 		return transition_map.get(name);
 	}
-
 	public final Set<K> getTransitions(T target) {
 		LinkedHashSet<K> result = new LinkedHashSet<K>();
 		for( K key : transition_map.keySet()){

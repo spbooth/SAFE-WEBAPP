@@ -34,6 +34,12 @@ public class AdminOperationKey extends TableTransitionKey {
 		super(t, name);
 	}
 
+	public AdminOperationKey(String name) {
+		this(DataObjectFactory.class,name);
+	}
+	public AdminOperationKey(String name,String help) {
+		this(DataObjectFactory.class,name,help);
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.AccessControlTransitionKey#allow(uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
