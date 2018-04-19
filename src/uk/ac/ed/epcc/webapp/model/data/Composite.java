@@ -190,6 +190,12 @@ public abstract class Composite<BDO extends DataObject, X extends Composite> imp
 		
 	}
 	
+	/** perform extra clean-up when factory is released 
+	 * 
+	 */
+	protected void release() {
+		
+	}
 	/** used to list composites on table structure page.
 	 * 
 	 */

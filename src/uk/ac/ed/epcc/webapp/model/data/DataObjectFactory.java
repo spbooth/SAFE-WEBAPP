@@ -1102,6 +1102,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		res=null;
 		finder=null;
 		if( composites != null ){
+			for(Composite c : composites.values()) {
+				c.release();
+			}
 			composites.clear();
 		}
 		composites=null;
