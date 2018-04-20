@@ -460,7 +460,7 @@ public abstract class DataObject implements ContextIndexed, Identified{
 	 * @param obj
 	 * @return
 	 */
-	public static <D extends DataObject> DataObjectFactory<D> getFactory(AppContext conn, D obj){
+	public static <D extends DataObject> DataObjectFactory<D> getFactory( D obj){
 		if( obj == null ) {
 			return null;
 		}
@@ -468,7 +468,7 @@ public abstract class DataObject implements ContextIndexed, Identified{
 			return ((Owned)obj).getFactory();
 		}
 		try {
-			return conn.makeContexedObject(DataObjectFactory.class, obj.getFactoryTag());
+			return obj.getContext().makeContexedObject(DataObjectFactory.class, obj.getFactoryTag());
 		} catch (Exception e) {
 			return null;
 		}
