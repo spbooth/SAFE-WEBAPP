@@ -430,7 +430,7 @@ public abstract class DataObject implements ContextIndexed, Identified{
 
 	/**
 	 * A utility method for putting values into hashtables in the constructors
-	 * only modifies table if key noit already in use.
+	 * only modifies table if key not already in use.
 	 * 
 	 * @param table
 	 *            original Hashtable
@@ -450,5 +450,27 @@ public abstract class DataObject implements ContextIndexed, Identified{
 
 	public static boolean empty(String input) {
 		return ((input == null) || (input.length() == 0));
+	}
+	/** A static method to locate the {@link DataObjectFactory} used to create a {@link DataObject}
+	 * This will necessary when behaviour added as {@link Composite}s is required but
+	 * only the {@link DataObject} is available.
+	 * 
+	 * 
+	 * @param conn
+	 * @param obj
+	 * @return
+	 */
+	public static <D extends DataObject> DataObjectFactory<D> getFactory(AppContext conn, D obj){
+		if( obj == null ) {
+			return null;
+		}
+		if( obj instanceof Owned) {
+			return ((Owned)obj).getFactory();
+		}
+		try {
+			return conn.makeContexedObject(DataObjectFactory.class, obj.getFactoryTag());
+		} catch (Exception e) {
+			return null;
+		}
 	}
 }

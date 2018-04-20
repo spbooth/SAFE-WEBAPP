@@ -28,6 +28,8 @@ import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.Owned;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.history.HistoryFactory;
@@ -50,7 +52,7 @@ Table entries rarely change and may be populated manually.
 */
 
 
-public class Classification extends DataObject implements Principal, Comparable<Classification>{
+public class Classification extends DataObject implements Principal, Comparable<Classification>, Owned{
 
     /**
 	 * 
@@ -140,6 +142,13 @@ public class Classification extends DataObject implements Principal, Comparable<
 				}
 			}
 		}
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.data.Owned#getFactory()
+	 */
+	@Override
+	public final ClassificationFactory getFactory() {
+		return fac;
 	}
 	
 }

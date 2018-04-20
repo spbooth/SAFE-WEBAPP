@@ -17,7 +17,6 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -29,7 +28,6 @@ import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.ResultIterator;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -38,7 +36,6 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
 import uk.ac.ed.epcc.webapp.model.data.forms.Updater;
-import uk.ac.ed.epcc.webapp.model.data.iterator.DecoratingIterator;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
 import uk.ac.ed.epcc.webapp.model.history.HistoryHandler;
@@ -117,7 +114,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 * @param <R> Right end type
 	 * 
 	 */
-	public abstract static class Link<L extends Indexed, R extends Indexed> extends DataObject {
+	public abstract static class Link<L extends Indexed, R extends Indexed> extends DataObject implements Owned{
 		private L left = null;
 		private R right = null;
 		
@@ -134,6 +131,9 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		 */
         protected IndexedLinkManager getIndexedLinkManager(){
         	return manager;
+        }
+        public DataObjectFactory getFactory() {
+        	return getIndexedLinkManager();
         }
 		/*
 		 * (non-Javadoc)

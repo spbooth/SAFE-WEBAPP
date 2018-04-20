@@ -40,7 +40,7 @@ public abstract class AttributeObjectFactory<O extends DataObject,A extends Attr
 	public static final String OWNER_FIELD="OwnerID";
 	
 	private final DataObjectFactory<O> owner_fac;
-	public static class AttributeObject<O extends DataObject> extends DataObject{
+	public static class AttributeObject<O extends DataObject> extends DataObject implements Owned{
 		private final AttributeObjectFactory<O, ?> fac;
 		/**
 		 * @param r
@@ -64,6 +64,13 @@ public abstract class AttributeObjectFactory<O extends DataObject,A extends Attr
 		 */
 		public void setOwner(O owner){
 			record.setProperty(OWNER_FIELD, owner.getID());
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.Owned#getFactory()
+		 */
+		@Override
+		public DataObjectFactory getFactory() {
+			return fac;
 		}
 	}
 	/** 

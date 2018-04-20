@@ -662,7 +662,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	      // Try to fix this set of records.
 	      fixSeries(peer, new FilterIterator(fil));
 	      // Try again
-		  current = find(fil);	
+		  current = find(fil,true);	
 			
 		}
 		if( timer != null ){
@@ -852,7 +852,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		Date now = now(getContext());
 		try {
 			tail = find(peer, now,true);
-		} catch (uk.ac.ed.epcc.webapp.jdbc.exception.DataException e) {
+		} catch (uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException e) {
 			// log.info("Matching History object not found");
 		}
 		if (tail == null || tail.hasChanged(peer)) {
