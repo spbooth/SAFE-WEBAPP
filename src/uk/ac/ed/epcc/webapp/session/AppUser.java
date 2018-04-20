@@ -28,6 +28,7 @@ import uk.ac.ed.epcc.webapp.forms.BaseForm;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.model.data.Owned;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
@@ -43,7 +44,7 @@ import uk.ac.ed.epcc.webapp.session.AppUserFactory.UpdatePersonRequiredPage;
  * @author spb
  * 
  */
-public class AppUser extends DataObject implements java.security.Principal{
+public class AppUser extends DataObject implements java.security.Principal, Owned{
 
 	public static final String UPDATED_TIME="Updated";
 	

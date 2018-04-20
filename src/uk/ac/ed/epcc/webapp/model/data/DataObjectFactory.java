@@ -205,7 +205,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * @param <BDO> type produced by factory
  */
 @SuppressWarnings("javadoc")
-public abstract class DataObjectFactory<BDO extends DataObject> implements Tagged, ContextCached, Owner, IndexedProducer<BDO>, Selector<DataObjectItemInput<BDO>> , FormCreatorProducer,FormUpdateProducer<BDO>,FilterMatcher<BDO>{
+public abstract class DataObjectFactory<BDO extends DataObject> implements Tagged, ContextCached, Owner<BDO>, IndexedProducer<BDO>, Selector<DataObjectItemInput<BDO>> , FormCreatorProducer,FormUpdateProducer<BDO>,FilterMatcher<BDO>{
     public static final Feature AUTO_CREATE_TABLES_FEATURE = new Feature("auto_create.tables",false,"attempt to make database tables if they don't exist");
 
     public static final Feature REJECT_MULTIPLE_RESULT_FEATURE = new Feature("multiple_result.error",true,"Throw an error if a filter find has multiple matching records");
