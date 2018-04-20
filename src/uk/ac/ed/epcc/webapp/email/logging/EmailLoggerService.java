@@ -43,6 +43,7 @@ public class EmailLoggerService implements Contexed, LoggerService {
     	nested=conn.getService(LoggerService.class);
     	if( nested == this){
     		nested = null; // we got ourselves somehow.
+    		emailError(LogLevels.Error, new Exception(), "EmailLoggerServer registration error, own parent");
     	}
     	while( nested != null && nested instanceof EmailLoggerService){
     		nested = ((EmailLoggerService)nested).nested;
