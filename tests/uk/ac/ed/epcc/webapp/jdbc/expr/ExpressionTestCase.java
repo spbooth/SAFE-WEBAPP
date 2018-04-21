@@ -272,6 +272,18 @@ public class ExpressionTestCase extends WebappTestBase {
 				new ArrayFuncExpression<>(fac.getTarget(), ArrayFunc.LEAST, Number.class, fac.getIntA(),fac.getIntB()));
 		assertEquals(5, res);
 	}
+	@Test
+	public void testArrayFuncValue() throws DataException {
+		obj.setIntA(7);
+		obj.setIntB(5);
+		obj.commit();
+		Number res = fac.evaluate(obj, 
+				new ArrayFuncValue<>(fac.getTarget(), ArrayFunc.GREATEST, Number.class, fac.getIntA(),fac.getIntB()));
+		assertEquals(7, res);
+		res = fac.evaluate(obj, 
+				new ArrayFuncValue<>(fac.getTarget(), ArrayFunc.LEAST, Number.class, fac.getIntA(),fac.getIntB()));
+		assertEquals(5, res);
+	}
 	
 	@Test
 	public void testArrayFuncDate() throws DataException {
@@ -294,7 +306,27 @@ public class ExpressionTestCase extends WebappTestBase {
 				new ArrayFuncExpression<>(fac.getTarget(), ArrayFunc.LEAST, Date.class,new SQLExpression[] { (SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()}));
 		assertEquals(least, res);
 	}
-	
+	@Test
+	public void testArrayFuncValueDate() throws DataException {
+		Calendar c = Calendar.getInstance();
+		
+		c.clear();
+		c.set(1975,Calendar.DECEMBER, 12);
+		
+		Date least = c.getTime();
+		obj.setDateA( least);
+		
+		c.set(1975,Calendar.DECEMBER,25);
+		Date later = c.getTime();
+		obj.setDateB(later);
+		obj.commit();
+		Date res = fac.evaluate(obj, 
+				new ArrayFuncValue<>(fac.getTarget(), ArrayFunc.GREATEST, Date.class,new SQLExpression[] { (SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()}));
+		assertEquals(later, res);
+		res = fac.evaluate(obj, 
+				new ArrayFuncValue<>(fac.getTarget(), ArrayFunc.LEAST, Date.class,new SQLExpression[] { (SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()}));
+		assertEquals(least, res);
+	}
 	@Test 
 	public void testCompare() throws DataException {
 		obj.setIntA(7);
@@ -313,10 +345,27 @@ public class ExpressionTestCase extends WebappTestBase {
 		res = fac.evaluate(obj, new CompareSQLExpression<>(fac.getIntA(), null, fac.getIntB()));
 		assertTrue(res);
 	}
-	
+	@Test 
+	public void testCompareValue() throws DataException {
+		obj.setIntA(7);
+		obj.setIntB(5);
+		obj.commit();
+		
+		Boolean res = fac.evaluate(obj, new CompareSQLValue(ctx,fac.getIntA(), MatchCondition.GT, fac.getIntB()));
+		assertTrue(res);
+		res = fac.evaluate(obj, new CompareSQLValue<>(ctx,fac.getIntA(), null, fac.getIntB()));
+		assertFalse(res);
+		res = fac.evaluate(obj, new CompareSQLValue<>(ctx,fac.getIntA(), MatchCondition.LT, fac.getIntB()));
+		assertFalse(res);
+		
+		obj.setIntB(7);
+		obj.commit();
+		res = fac.evaluate(obj, new CompareSQLValue<>(ctx,fac.getIntA(), null, fac.getIntB()));
+		assertTrue(res);
+	}
 	@Test 
 	public void testCompareDate() throws DataException {
-Calendar c = Calendar.getInstance();
+		Calendar c = Calendar.getInstance();
 		
 		c.clear();
 		c.set(1975,Calendar.DECEMBER, 12);
@@ -339,6 +388,33 @@ Calendar c = Calendar.getInstance();
 		obj.setDateB(later);
 		obj.commit();
 		res = fac.evaluate(obj, new CompareSQLExpression<>((SQLExpression<Date>)fac.getDateA(), null,(SQLExpression<Date>) fac.getDateB()));
+		assertTrue(res);
+	}
+	@Test 
+	public void testCompareValueDate() throws DataException {
+		Calendar c = Calendar.getInstance();
+		
+		c.clear();
+		c.set(1975,Calendar.DECEMBER, 12);
+		
+		Date least = c.getTime();
+		obj.setDateB( least);
+		
+		c.set(1975,Calendar.DECEMBER,25);
+		Date later = c.getTime();
+		obj.setDateA(later);
+		obj.commit();
+		
+		Boolean res = fac.evaluate(obj, new CompareSQLValue<>(ctx,(SQLExpression<Date>)fac.getDateA(), MatchCondition.GT,(SQLExpression<Date>) fac.getDateB()));
+		assertTrue(res);
+		res = fac.evaluate(obj, new CompareSQLValue<>(ctx,(SQLExpression<Date>)fac.getDateA(), null,(SQLExpression<Date>) fac.getDateB()));
+		assertFalse(res);
+		res = fac.evaluate(obj, new CompareSQLValue<>(ctx,(SQLExpression<Date>)fac.getDateA(), MatchCondition.LT,(SQLExpression<Date>) fac.getDateB()));
+		assertFalse(res);
+		
+		obj.setDateB(later);
+		obj.commit();
+		res = fac.evaluate(obj, new CompareSQLValue<>(ctx,(SQLExpression<Date>)fac.getDateA(), null,(SQLExpression<Date>) fac.getDateB()));
 		assertTrue(res);
 	}
 }

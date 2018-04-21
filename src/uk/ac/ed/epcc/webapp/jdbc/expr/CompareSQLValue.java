@@ -52,6 +52,9 @@ public class CompareSQLValue<C extends Comparable> implements SQLValue<Boolean> 
     public Boolean makeObject(ResultSet rs, int pos) throws DataException{
     		C obja = a.makeObject(rs, pos);
 			C objb = b.makeObject(rs, pos+offset);
+			if(op == null) {
+				return obja.equals(objb);
+			}
 			return op.compare(obja, objb);
     }
 
