@@ -51,7 +51,7 @@ public class CompareSQLExpression<C extends Comparable> implements SQLExpression
 		if( m == null){
 			sb.append("=");
 		}else{
-			sb.append(m.toString());
+			sb.append(m.match());
 		}
 		b.add(sb,qualify);
 		sb.append(")");
