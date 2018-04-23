@@ -225,6 +225,20 @@ public class ExpressionTestCase extends WebappTestBase {
 		assertEquals(12L, res);
 	}
 	@Test
+	public void longValue() throws DataException {
+		obj.setStringA("12");
+		obj.commit();
+		Object res = fac.evaluate(obj, new LongConvertSQLValue<>(fac.getStringA()) );
+		assertEquals(12L, res);
+	}
+	@Test
+	public void longValue2() throws DataException {
+		obj.setDoubleA(12.0);
+		obj.commit();
+		Object res = fac.evaluate(obj, new LongConvertSQLValue<>(fac.getDoubleA()) );
+		assertEquals(12L, res);
+	}
+	@Test
 	public void doubleExpression() throws DataException {
 		obj.setStringA("12");
 		obj.commit();
@@ -236,6 +250,21 @@ public class ExpressionTestCase extends WebappTestBase {
 		obj.setIntA(12);
 		obj.commit();
 		Object res = fac.evaluate(obj, new CastDoubleSQLExpression<>(fac.getIntA()) );
+		assertEquals(12.0, res);
+	}
+	
+	@Test
+	public void doubleValue() throws DataException {
+		obj.setStringA("12");
+		obj.commit();
+		Object res = fac.evaluate(obj, new DoubleConvertSQLValue<>(fac.getStringA()) );
+		assertEquals(12.0, res);
+	}
+	@Test
+	public void doubleValue2() throws DataException {
+		obj.setIntA(12);
+		obj.commit();
+		Object res = fac.evaluate(obj, new DoubleConvertSQLValue<>(fac.getIntA()) );
 		assertEquals(12.0, res);
 	}
 	@Test
