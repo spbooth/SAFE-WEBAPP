@@ -3228,10 +3228,15 @@ public final class Repository implements AppContextCleanup{
 				return false;
 		} else if (!tag_name.equals(other.tag_name))
 			return false;
+		if (alias_name == null) {
+			if (other.alias_name != null)
+				return false;
+		} else if (!alias_name.equals(other.alias_name))
+			return false;
 		return true;
 	}
 	public String toString(){
-		return "Repository-"+table_name;
+		return "Repository-"+alias_name+"["+table_name+"]";
 	}
 
 	/* (non-Javadoc)

@@ -349,9 +349,9 @@ public abstract class ServletTest extends WebappTestBase{
 	public void addParam(String name,Indexed i){
 		addParam(name, Integer.toString(i.getID()));
 	}
-	/** Set the form action. This only needs to be called when there is more than one action specified 
+	/** Set the form action. This only needs to be called when there is more than one action (submit button) specified 
 	 * 
-	 * @param action The action String specifed in the {@link Form}
+	 * @param action The action String specified in the {@link Form}
 	 */
 	public void setAction(String action) {
 		req.params.put(action.trim(), action.trim());

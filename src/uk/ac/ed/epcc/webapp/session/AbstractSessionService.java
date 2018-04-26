@@ -75,7 +75,7 @@ import uk.ac.ed.epcc.webapp.model.relationship.RelationshipProvider;
  * <p>
  * The factory (or its {@link Composite}s) can implement {@link AccessRoleProvider} to provide relationships.
  * <p>
- * Roles of the form <i>field</i><b>-></b><i>remote_relationship/i> denotes a remote filter
+ * Roles of the form <i>field</i><b>-></b><i>remote_relationship</i> denotes a remote filter
  * joined via the reference field <i>field</i> A person has these relationships with the target object
  * if they have the <i>remote_relationship</i> on the object the target references. The remote relationship must be unqualified.
  * <p>
