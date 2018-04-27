@@ -2194,6 +2194,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	}
 	/** Create a BDO {@link BaseFilter} from a {@link BaseFilter} on a referenced factory.
 	 * 
+	 * If you have more than one field that references the same table and want to combine remote filters for them
+	 * register the remote factory under multiple tags (one per reference field) and set table_alias.tag properties 
+	 * to specify aliases to use in the SQL.
 	 * @param fil
 	 * @return
 	 */
