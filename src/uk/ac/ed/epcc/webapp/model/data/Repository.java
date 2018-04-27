@@ -101,8 +101,10 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * </ul>
  * The {@link #getParamTag()} method returns a String to be used in looking up configuration parameters for the
  * enclosing object. This defaults to tag but can be overridden by setting the <b>config.</b><em>tag</em> property.
- * 
- * 
+ * <p>
+ * If the <b>table_alias.<i>tag</i><\b> property is set this is used as an alias string when constructing SQL statements.
+ * This is needed because the join filter classes assume a single reference between tables. If you have multiple fields that reference the same table
+ * you can register the same table under different tags with different aliases allowing multiple joins to the same table.
  * <p> 
  * New <code>Repository</code> objects are obtained using a static method.
  * <code>
