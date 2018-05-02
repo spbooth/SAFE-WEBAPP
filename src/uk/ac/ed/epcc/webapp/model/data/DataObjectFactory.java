@@ -78,6 +78,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.ResultIterator;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultMapper;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrderFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLResultIterator;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
@@ -1472,7 +1473,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     	Logger log = getLogger();
     	log.debug("selectfilter get order by of "+order);
     	if( order != null && order.trim().length() > 0){
-    		return new OrderFilter<BDO>() {
+    		return new SQLOrderFilter<BDO>() {
 
 			
 				public List<OrderClause> OrderBy() {
@@ -1486,6 +1487,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 
 				public Class<? super BDO> getTarget() {
 					return DataObjectFactory.this.getTarget();
+				}
+
+				@Override
+				public void accept(BDO o) {
+					
 				}
 
 				
@@ -2146,7 +2152,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
 		 */
 		@Override
-		public BaseFilter<BDO> visitOrderFilter(OrderFilter<? super R> fil) throws Exception {
+		public BaseFilter<BDO> visitOrderFilter(SQLOrderFilter<? super R> fil) throws Exception {
 			return visitSQLFilter((SQLFilter<R>) fil);
 		}
 

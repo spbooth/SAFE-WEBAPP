@@ -78,7 +78,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			 */
 			public final Boolean visitSQLCombineFilter(BaseSQLCombineFilter<? super X> fil) {
 				visitPatternFilter(fil);
-				visitOrderFilter(fil);
+				handleOrderClause(fil);
 				Set<String> joins = fil.getJoins();
 				if( joins != null ){
 					for(String join : joins){
@@ -100,7 +100,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 				}
 				visitAcceptFilter(fil);
 				visitPatternFilter(fil);
-				visitOrderFilter(fil);
+				handleOrderClause(fil);
 				Set<String> joins = fil.getJoins();
 				if( joins != null ){
 					for(String join : joins){
@@ -113,11 +113,13 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
 			 */
-			public final Boolean visitOrderFilter(OrderFilter<? super X> fil) {
+			public final Boolean visitOrderFilter(SQLOrderFilter<? super X> fil) {
+			    return handleOrderClause(fil);
+			}
+			private final Boolean handleOrderClause(OrderFilter<? super X> fil) {
 			    addOrder(fil.OrderBy());
 				return null;
 			}
-
 			
 
 			/* (non-Javadoc)

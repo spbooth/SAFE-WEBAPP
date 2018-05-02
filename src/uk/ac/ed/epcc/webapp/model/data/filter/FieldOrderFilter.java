@@ -16,10 +16,9 @@ package uk.ac.ed.epcc.webapp.model.data.filter;
 import java.util.LinkedList;
 import java.util.List;
 
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
+import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrderFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 /** An OrderFilter that uses a single field
  * 
@@ -32,7 +31,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  */
 
 
-public class FieldOrderFilter<T> implements OrderFilter<T>, SQLFilter<T> {
+public class FieldOrderFilter<T> implements SQLOrderFilter<T>{
 
 	private final Class<? super T> target;
 	private final Repository res;

@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrderFilter;
 /** An {@link OrderFilter} implemented directly using {@link SQLExpression}s.
  * 
  * 
@@ -29,7 +30,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  * @param <I>
  * @param <T>
  */
-public class SQLExpressionOrderFilter<I,T> implements OrderFilter<T> , SQLFilter<T>{
+public class SQLExpressionOrderFilter<I,T> implements SQLOrderFilter<T> {
 	private final Class<? super T> target;
 	private final boolean descending;
 	private final SQLExpression<I> expr;

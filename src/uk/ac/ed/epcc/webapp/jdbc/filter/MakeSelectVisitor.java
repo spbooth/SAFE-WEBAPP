@@ -70,7 +70,7 @@ public class MakeSelectVisitor<T> implements FilterVisitor<StringBuilder, T>{
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
 	 */
 	@Override
-	public StringBuilder visitOrderFilter(OrderFilter<? super T> fil) throws Exception {
+	public StringBuilder visitOrderFilter(SQLOrderFilter<? super T> fil) throws Exception {
 		return doTrue();
 	}
 

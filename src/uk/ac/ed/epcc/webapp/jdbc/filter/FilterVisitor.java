@@ -69,7 +69,7 @@ public interface FilterVisitor<X,T> {
 	 * @return
 	 * @throws Exception
 	 */
-	public X visitOrderFilter(OrderFilter<? super T> fil) throws Exception;
+	public X visitOrderFilter(SQLOrderFilter<? super T> fil) throws Exception;
 	/** process a pure {@link AcceptFilter}
 	 * 
 	 * @param fil

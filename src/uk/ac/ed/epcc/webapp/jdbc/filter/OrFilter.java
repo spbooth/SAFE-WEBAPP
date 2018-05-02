@@ -106,7 +106,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
 		 */
 		@Override
-		public Boolean visitOrderFilter(OrderFilter<? super T> fil) throws Exception {
+		public Boolean visitOrderFilter(SQLOrderFilter<? super T> fil) throws Exception {
 			return null;
 		}
 
