@@ -101,8 +101,10 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * </ul>
  * The {@link #getParamTag()} method returns a String to be used in looking up configuration parameters for the
  * enclosing object. This defaults to tag but can be overridden by setting the <b>config.</b><em>tag</em> property.
- * 
- * 
+ * <p>
+ * If the <b>table_alias.<i>tag</i><\b> property is set this is used as an alias string when constructing SQL statements.
+ * This is needed because the join filter classes assume a single reference between tables. If you have multiple fields that reference the same table
+ * you can register the same table under different tags with different aliases allowing multiple joins to the same table.
  * <p> 
  * New <code>Repository</code> objects are obtained using a static method.
  * <code>
@@ -3228,10 +3230,15 @@ public final class Repository implements AppContextCleanup{
 				return false;
 		} else if (!tag_name.equals(other.tag_name))
 			return false;
+		if (alias_name == null) {
+			if (other.alias_name != null)
+				return false;
+		} else if (!alias_name.equals(other.alias_name))
+			return false;
 		return true;
 	}
 	public String toString(){
-		return "Repository-"+table_name;
+		return "Repository-"+alias_name+"["+table_name+"]";
 	}
 
 	/* (non-Javadoc)
