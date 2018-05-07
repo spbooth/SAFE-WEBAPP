@@ -56,7 +56,7 @@ public class CheckEmptyVisitor<T> implements FilterVisitor<Boolean, T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
 	 */
 	@Override
-	public Boolean visitOrderFilter(OrderFilter<? super T> fil)  {
+	public Boolean visitOrderFilter(SQLOrderFilter<? super T> fil)  {
 		return false;
 	}
 

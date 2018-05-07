@@ -92,7 +92,7 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
 	 */
 	@Override
-	public AcceptFilter<? super T> visitOrderFilter(OrderFilter<? super T> fil) throws Exception {
+	public AcceptFilter<? super T> visitOrderFilter(SQLOrderFilter<? super T> fil) throws Exception {
 		doThrow();
 		return null;
 	}

@@ -16,10 +16,10 @@ package uk.ac.ed.epcc.webapp.model.data.filter;
 import java.util.LinkedList;
 import java.util.List;
 
+import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrderFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 /** An {@link OrderFilter} that enforces use of the PrimaryKey
  * 
@@ -32,7 +32,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  */
 
 
-public class PrimaryOrderFilter<T> implements OrderFilter<T> , SQLFilter<T>{
+public class PrimaryOrderFilter<T> implements SQLOrderFilter<T> {
 	private final Class<? super T> target;
 	private final Repository res;
 	private final boolean descending;

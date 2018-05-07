@@ -72,7 +72,7 @@ public class GetListFilterVisitor<T> implements FilterVisitor<List<PatternArgume
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
 	 */
 	@Override
-	public List<PatternArgument> visitOrderFilter(OrderFilter<? super T> fil) throws Exception {
+	public List<PatternArgument> visitOrderFilter(SQLOrderFilter<? super T> fil) throws Exception {
 		return list;
 	}
 

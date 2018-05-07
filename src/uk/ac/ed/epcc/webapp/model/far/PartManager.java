@@ -44,6 +44,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrderFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
@@ -395,7 +396,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		}
 		
 	}
-	private class PartOrderFilter implements OrderFilter<P>, SQLFilter<P>{
+	private class PartOrderFilter implements SQLOrderFilter<P>{
 		private LinkedList<OrderClause> order;
 		/** create filter that generates canonical sort order.
 		 * @param down should order be reversed

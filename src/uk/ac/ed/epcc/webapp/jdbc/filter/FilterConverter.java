@@ -63,11 +63,8 @@ public class FilterConverter<T> implements FilterVisitor<SQLFilter<T>, T> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
 	 */
-	public SQLFilter<T> visitOrderFilter(OrderFilter<? super T> fil) throws NoSQLFilterException {
-		if( fil instanceof SQLFilter){
-			return (SQLFilter<T>) fil;
-		}
-		throw new NoSQLFilterException("Filter Not an SQLFilter "+fil.getClass().getCanonicalName());
+	public SQLFilter<T> visitOrderFilter(SQLOrderFilter<? super T> fil) throws NoSQLFilterException {
+		return (SQLFilter<T>) fil;
 	}
 
 	/* (non-Javadoc)
