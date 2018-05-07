@@ -116,8 +116,8 @@ public class Dumper implements Contexed{
 		dump(obj.record);
 	}
 	
-	public void addSpecification(String table, TableSpecification spec){
-		specifications.put(table, spec);
+	public void addSpecification(String tag, TableSpecification spec){
+		specifications.put(normaliseTag(tag), spec);
 	}
 	/** add an entry to the record of "seen" records
 	 * @param res {@link Repository} if not null dump this schema when new table encountered
@@ -172,7 +172,7 @@ public class Dumper implements Contexed{
 	protected void dump(Repository.Record rec) throws DataFault, IOException{
 		Repository res = rec.getRepository();
 		int id = rec.getID();
-		String tag = res.getTag();
+		String tag = normaliseTag(res.getTag());
 		if( register(res, tag, id)){
 
 			SimpleXMLBuilder sb = builder.getNested();
@@ -309,17 +309,18 @@ public class Dumper implements Contexed{
 		}
 	}
 	public void dumpSchema(Repository res){
-		TableSpecification spec = specifications.get(res.getTable());
+		String tag = normaliseTag(res.getTag());
+		TableSpecification spec = specifications.get(tag);
 		SimpleXMLBuilder sb = builder.getNested();
 		sb.open(TABLE_SPECIFICATION);
-		sb.attr(NAME_ATTR, res.getTag());
+		sb.attr(NAME_ATTR, tag);
 		sb.clean("\n");
 		for(FieldInfo field : res.getInfo()){
 			String name = field.getName(false);
 			sb.open(name);
 			String ref = field.getReferencedTable();
 			if(ref != null ){
-				sb.attr(REFERENCE_ATTR, Repository.tagToTable(getContext(), ref));
+				sb.attr(REFERENCE_ATTR, normaliseTag(ref));
 			}else{
 				if( field.isString()){
 					sb.attr(TYPE_ATTR,STRING_TYPE);
@@ -402,4 +403,7 @@ public class Dumper implements Contexed{
 		this.verbose_diff = verbose_diff;
 	}
 
+	public String normaliseTag(String tag) {
+		return Repository.TableToTag(getContext(), Repository.tagToTable(getContext(), tag));
+	}
 }

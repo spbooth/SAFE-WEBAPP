@@ -75,17 +75,18 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	private static final Pattern WHITESPACE = Pattern.compile("\\s");
 	
 	private HistoryFactory<T,HistoryFactory.HistoryRecord<T>> hist_fac=null;
-	private String homeTable;
 	
+	
+	protected ClassificationFactory() {
+		super();
+	}
     public ClassificationFactory(AppContext ctx, String homeTable){
     	setContext(ctx, homeTable);
-    	
-    	this.homeTable = homeTable;
-    	
     }
     
     public HistoryFactory<T,HistoryFactory.HistoryRecord<T>> getHistoryFactory() {
     	if( hist_fac == null) {
+    		String homeTable = getTag();
     		// create history factory if history table configured
         	String histTable = getContext().getInitParameter(homeTable + ".history_table");
         	if (histTable != null) {
@@ -174,7 +175,9 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	 * 
 	 */
 	protected void postMakeByName(T c, String name){
-		
+		for(ClassificationCreateContributor<T> ccc : getComposites(ClassificationCreateContributor.class)) {
+			ccc.postMakeByName(c, name);
+		}
 	}
 	/** Does the update allow name changes.
 	 * defaults to false. Override for tables that are not auto
@@ -486,7 +489,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	@Override
 	public void addToHistorySpecification(TableSpecification spec) {
 		// add all the fields to the history specification, except the name since that shouldn't change
-		TableSpecification ts = getDefaultTableSpecification(getContext(), homeTable);
+		TableSpecification ts = getFinalTableSpecification(getContext(), getTag());
 		Set<String> fields = ts.getFieldNames();
 		for (String field : fields) {
 			if (!field.equals(Classification.NAME)) {
