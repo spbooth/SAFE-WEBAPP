@@ -772,7 +772,7 @@ public final class AppContext {
 			c =findConstructorFromParamSignature(clazz, getClass());
 		}
 		if( c == null ){
-			error("Cannot make Contexted object no valid constructor"+clazz.getCanonicalName());
+			error("Cannot make Contexted object no valid constructor "+clazz.getCanonicalName());
 			return null;
 		}
 		return  c.newInstance(this);
