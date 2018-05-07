@@ -319,7 +319,7 @@ public class Dumper implements Contexed{
 			sb.open(name);
 			String ref = field.getReferencedTable();
 			if(ref != null ){
-				sb.attr(REFERENCE_ATTR, ref);
+				sb.attr(REFERENCE_ATTR, Repository.tagToTable(getContext(), ref));
 			}else{
 				if( field.isString()){
 					sb.attr(TYPE_ATTR,STRING_TYPE);
