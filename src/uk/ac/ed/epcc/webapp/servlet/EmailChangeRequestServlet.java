@@ -56,6 +56,10 @@ public class EmailChangeRequestServlet extends WebappServlet {
 			log.debug("path is "+req.getPathInfo());
 			// should be request link
 			String tag = req.getPathInfo();
+			if( tag == null || tag.isEmpty()) {
+				message(conn, req, res, "invalid_input");
+				return;
+			}
 			if( tag.startsWith("/", 0)){
 				tag= tag.substring(1);
 			}
