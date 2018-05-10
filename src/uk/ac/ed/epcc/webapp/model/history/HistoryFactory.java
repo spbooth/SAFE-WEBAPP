@@ -434,9 +434,9 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
     
 	static protected long ENDTIME = java.lang.Long.MAX_VALUE;
 
-	protected static final String START_TIME_FIELD = "StartTime";
+	public static final String START_TIME_FIELD = "StartTime";
 
-	protected static final String END_TIME_FIELD = "EndTime";
+	public static final String END_TIME_FIELD = "EndTime";
 
 	
 	private static final class Status extends BasicType<Status.Value>{
@@ -491,7 +491,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	}
 	private DataObjectFactory<P> peer_factory=null;
 	@SuppressWarnings("unchecked")
-	protected DataObjectFactory<P> getPeerFactory(){
+	public DataObjectFactory<P> getPeerFactory(){
 		if( peer_factory == null){
 			setPeerFactory((DataObjectFactory<P>) getPeerReference().getProducer());
 		}
@@ -522,11 +522,19 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	 * @param table table to store data
 	 */
 	public HistoryFactory(DataObjectFactory<P> fac,String table) {
-		peer_factory=fac; // need to cache this NOW as getDefaultTableSpecification will retreive it in sub-classes.
+		this(fac);
 		AppContext c = fac.getContext();
 		
     	setContext(c, table);
 		
+	}
+	/** Constructor to allow sub-classes to set factory before calling 
+	 * {@link #setContext(AppContext, String)}
+	 * 
+	 * @param fac
+	 */
+	protected HistoryFactory(DataObjectFactory<P> fac) {
+		peer_factory=fac; // need to cache this NOW as getDefaultTableSpecification will retreive it in sub-classes.
 	}
 	@SuppressWarnings("unchecked")
 	protected void setPeerFactory(DataObjectFactory<P> fac) {

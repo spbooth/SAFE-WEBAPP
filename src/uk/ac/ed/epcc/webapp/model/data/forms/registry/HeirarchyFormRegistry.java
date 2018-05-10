@@ -32,9 +32,14 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A FormProviderRegistry that automatically includes all tables whose implementation class is
  * a sub-class of the class defined by <b>class.root.</b><em>tag</em>.
- 
- * Update/create priviledge is given to users via the (<b>Update</b>|<b>Create</b>)(<em>tag</em>|<em>table-name</em>)
+ * <p>
+ * The name used for the form defaults to the construction tag of the factory but can be changed by setting
+ * <em>registry-tag</em><b>.</b><em>factory-tag</em><b>.name</b>
+  <p>
+ * Update/create privilege is given to users via the (<b>Update</b>|<b>Create</b>)(<em>tag</em>|<em>table-name</em>)
  * role.
+ * <p>
+ * Update/Create can be supressed for all users by setting config parameter (<em>tag</em>|<em>name</em>)<b>.(allow_create|allow_update)</b> to false.
  * @author spb
  *
  */
@@ -93,26 +98,35 @@ public class HeirarchyFormRegistry extends FormFactoryProviderRegistry {
 
 		private final String name;
 		public boolean canCreate(SessionService p) {
-			if( p.hasRole(SessionService.ADMIN_ROLE)||p.hasRole("Create"+tag)||p.hasRole("Create"+name)){
-				return true;
-			}
-			String role_list=getContext().getInitParameter("sufficient_create_roles."+tag);
-			if( role_list != null  ){
-				if( p.hasRoleFromList(role_list.split(","))){
+			AppContext conn = p.getContext();
+			if( conn.getBooleanParameter(name+".allow_create", true) &&
+					conn.getBooleanParameter(tag+".allow_create", true)	) {
+				if( p.hasRole(SessionService.ADMIN_ROLE)||p.hasRole("Create"+tag)||p.hasRole("Create"+name)){
 					return true;
+				}
+				String role_list=getContext().getInitParameter("sufficient_create_roles."+tag);
+				if( role_list != null  ){
+					if( p.hasRoleFromList(role_list.split(","))){
+						return true;
+					}
 				}
 			}
 			return false;
 		}
 
 		public boolean canUpdate(SessionService p) {
-			if(p.hasRole(SessionService.ADMIN_ROLE)||p.hasRole("Update"+tag)||p.hasRole("Update"+name)){
-				return true;
-			}
-			String role_list=getContext().getInitParameter("sufficient_update_roles."+tag);
-			if( role_list != null  ){
-				if( p.hasRoleFromList(role_list.split(","))){
+			AppContext conn = p.getContext();
+			if( conn.getBooleanParameter(tag+".allow_update", true) &&
+				conn.getBooleanParameter(name+".allow_update", true)	
+				) {
+				if(p.hasRole(SessionService.ADMIN_ROLE)||p.hasRole("Update"+tag)||p.hasRole("Update"+name)){
 					return true;
+				}
+				String role_list=getContext().getInitParameter("sufficient_update_roles."+tag);
+				if( role_list != null  ){
+					if( p.hasRoleFromList(role_list.split(","))){
+						return true;
+					}
 				}
 			}
 			return false;

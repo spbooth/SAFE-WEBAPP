@@ -1818,6 +1818,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	protected final void setContext(AppContext ctx, String homeTable) {
 	   setContext(ctx, homeTable, AUTO_CREATE_TABLES_FEATURE.isEnabled(ctx));
 	}
+	protected void postSetContext() {
+		
+	}
 	protected final boolean setContext(AppContext ctx, String homeTable,boolean create) {
 		if (res != null  ){
 			getLogger().debug("Attempt to reset Repository");
@@ -1858,6 +1861,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 		}finally{
 			if( timer != null ){ timer.stopTimer("setContext:"+homeTable); timer.stopTimer("setContext");}
+			postSetContext();
 		}
 		return false;
 

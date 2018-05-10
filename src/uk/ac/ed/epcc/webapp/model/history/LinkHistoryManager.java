@@ -39,6 +39,9 @@ import uk.ac.ed.epcc.webapp.model.data.IndexedLinkManager;
 
 public  class LinkHistoryManager<L extends Indexed, R extends Indexed, T extends IndexedLinkManager.Link<L,R>,H extends HistoryFactory.HistoryRecord<T>> extends HistoryFactory<T,H> implements LinkHistoryHandler<L, R, T> {
 
+	protected LinkHistoryManager(IndexedLinkManager<T,L,R> fac) {
+		super(fac);
+	}
 	public LinkHistoryManager(IndexedLinkManager<T,L,R> fac,String table) {
 		super(fac,table);
 	}
