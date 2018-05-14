@@ -271,7 +271,16 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @throws UnknownRelationshipException 
 	 */
 	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target,String role) throws UnknownRelationshipException;
-	
+	/** Method to check relationships on a specified target object.
+	 * 
+	 * 
+	 * @param fac     {@link DataObjectFactory}
+	 * @param target  {@link DataObject} to test for relationship
+	 * @param role    String role to test
+	 * @param fallback boolean value to use if relationship undefined
+	 * @return  boolean true if has relationship
+	 */
+	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target,String role,boolean fallback);
 	
 	
 }

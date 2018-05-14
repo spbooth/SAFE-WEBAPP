@@ -19,7 +19,8 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.session.RandomService;
 
-/**
+/** A {@link Command} that generates a random password
+ * from the {@link RandomService}
  * @author spb
  *
  */
@@ -64,11 +65,9 @@ public class GetRandomPassword implements Command, Contexed {
 	 */
 	@Override
 	public String help() {
-		// TODO Auto-generated method stub
 		return "";
 	}
 	public static void main(String args[]){
-		System.out.println("Starting upgrade");
 		AppContext c = new AppContext();
 		CommandLauncher launcher = new CommandLauncher(c);
 		launcher.run(GetRandomPassword.class, args);

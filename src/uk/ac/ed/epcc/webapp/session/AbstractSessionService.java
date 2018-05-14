@@ -1472,6 +1472,14 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 		}
 		return result;
 	}
+	@Override
+	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target, String role, boolean fallback) {
+		try {
+			return hasRelationship(fac, target, role);
+		}catch(UnknownRelationshipException e) {
+			return fallback;
+		}
+	}
 
 	/**
 	 * Report an application error.
