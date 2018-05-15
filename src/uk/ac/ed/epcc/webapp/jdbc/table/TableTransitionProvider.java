@@ -29,10 +29,12 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
@@ -50,6 +52,8 @@ import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
+import uk.ac.ed.epcc.webapp.model.data.ConfigParamProvider;
+import uk.ac.ed.epcc.webapp.model.data.ConfigTransition;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.UnDumper;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.TableInput;
@@ -196,8 +200,27 @@ public class TableTransitionProvider  implements ViewTransitionProvider<TableTra
 		for(TableTransitionContributor c : ((DataObjectFactory<?>)target).getComposites(TableTransitionContributor.class)) {
 			map.putAll(c.getTableTransitions());
 		}
+		Set<String> configs = getConfigProperties(target);
+		if( configs != null && ! configs.isEmpty()){
+			map.put(new AdminOperationKey( "Configure","Edit configuration parameters directly"), new ConfigTransition(getContext(), configs));
+		}
     	return map;
     }
+    /** get a set of configuration parameters that configure this object.
+	 * This is used to produce a generic configuration table transtition.
+	 * 
+	 * @return
+	 */
+	public Set<String> getConfigProperties(DataObjectFactory<?> target){
+		Set<String> params = new  LinkedHashSet<>();
+		if( target instanceof ConfigParamProvider) {
+			((ConfigParamProvider)target).addConfigParameters(params);
+		}
+		for(ConfigParamProvider c : target.getComposites(ConfigParamProvider.class)) {
+			c.addConfigParameters(params);
+		}
+		return params;
+	}
     public class IndexTransition extends AbstractTargetLessTransition<DataObjectFactory>{
 		public void buildForm(Form f, AppContext c) throws TransitionException {
 			f.addInput("table", TABLE_TRANSITION_TAG, new TableInput<DataObjectFactory>(c, DataObjectFactory.class));
@@ -308,8 +331,20 @@ public class TableTransitionProvider  implements ViewTransitionProvider<TableTra
 		for(TableContentProvider prov : ((DataObjectFactory<?>)target).getComposites(TableContentProvider.class)) {
 			prov.addSummaryContent(hb);
 		}
+		Set<String> configs = getConfigProperties(target);
+		if( configs != null && ! configs.isEmpty()){
+			hb.addHeading(3, "Configuration parameters");
+			Table t = new Table();
+			for(String param : configs){
+				t.put("Value",param, getContext().getInitParameter(param, "Not-set"));
+			}
+			t.setKeyName("Parameter");
+			hb.addTable(getContext(), t);
+		}
 		return hb;
 	}
+	
+
 	public <X extends ContentBuilder> X getTopContent(X hb,DataObjectFactory target, SessionService<?> sess) {
 		return hb;
 	}
