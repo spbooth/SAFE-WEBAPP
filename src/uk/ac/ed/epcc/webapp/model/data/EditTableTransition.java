@@ -20,7 +20,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableStructureListener;
  * @author spb
  *
  */
-public abstract class EditTableTransition<T extends DataObjectFactory<?>> implements Transition<T> {
+public abstract class EditTableTransition<T extends DataObjectFactory> implements Transition<T> {
     
 	protected final Repository getRepository(T fac) {
 		return fac.res;
@@ -29,7 +29,7 @@ public abstract class EditTableTransition<T extends DataObjectFactory<?>> implem
 		if( fac instanceof TableStructureListener) {
 			((TableStructureListener)fac).resetStructure();
 		}
-		for(TableStructureListener l : fac.getComposites(TableStructureListener.class)) {
+		for(TableStructureListener l : ((DataObjectFactory<?>)fac).getComposites(TableStructureListener.class)) {
 			l.resetStructure();
 		}
 		Repository.reset(fac.getContext(), fac.getTag());

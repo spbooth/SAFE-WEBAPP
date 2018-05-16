@@ -24,7 +24,7 @@ import uk.ac.ed.epcc.webapp.model.data.EditTableTransition;
  * @author spb
  *
  */
-public abstract class EditTableFormTransition<T extends DataObjectFactory<?>> extends EditTableTransition<T> implements FormTransition<T>{
+public abstract class EditTableFormTransition<T extends DataObjectFactory> extends EditTableTransition<T> implements FormTransition<T>{
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.Transition#getResult(uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor)
