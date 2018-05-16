@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
@@ -20,26 +21,26 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @param <T> target type
  *
  */
-public class TableStructureAdminOperationKey<T extends TableStructureTransitionTarget> extends TableTransitionKey<T> {
+public class TableStructureAdminOperationKey extends TableTransitionKey {
 	
 	
 	
 	
 
 	public TableStructureAdminOperationKey(String name, String help) {
-		super(TableStructureTransitionTarget.class, name, help);
+		super(DataObjectFactory.class, name, help);
 	}
 
 	public TableStructureAdminOperationKey( String name) {
-		super(TableStructureTransitionTarget.class, name);
+		super(DataObjectFactory.class, name);
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.AccessControlTransitionKey#allow(uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
 	@Override
-	public boolean allow(SessionService<?> serv,T target) {
-		return serv.hasRoleFromList(SessionService.ADMIN_ROLE,TableDeveloperKey.CHANGE_TABLE_STRUCTURE_ROLE);
+	public boolean allow(SessionService<?> serv,DataObjectFactory target) {
+		return serv.hasRoleFromList(SessionService.ADMIN_ROLE,TableDeveloperKey.CHANGE_TABLE_STRUCTURE_ROLE) && (target.getTableSpecification() != null);
 	}
 
 }

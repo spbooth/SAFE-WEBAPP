@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2017                            |
+//| Copyright - The University of Edinburgh 2018                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -13,31 +13,26 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
-import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.model.data.EditTableTransition;
 
-/** a {@link TransitionKey} for table transitions
+/**
  * @author spb
- * @param <T> type of target
  *
  */
-public abstract class TableTransitionKey extends TransitionKey<DataObjectFactory> {
+public abstract class EditTableFormTransition<T extends DataObjectFactory<?>> extends EditTableTransition<T> implements FormTransition<T>{
 
-	public TableTransitionKey(Class<? super DataObjectFactory> t, String name, String help) {
-		super(t, name, help);
-	}
-
-	public TableTransitionKey(Class<? super DataObjectFactory> t, String name) {
-		super(t, name);
-	}
-
-	/** Access control to the transition.
-	 * This is used to widen the default permissions
-	 * 
-	 * @param serv
-	 * @param target
-	 * @return true if operation allowed
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.Transition#getResult(uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor)
 	 */
-	public abstract boolean allow(SessionService<?> serv, DataObjectFactory target);
+	@Override
+	public FormResult getResult(TransitionVisitor<T> vis) throws TransitionException {
+		return vis.doFormTransition(this);
+	}
+    
+	
 }

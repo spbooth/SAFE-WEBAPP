@@ -15,16 +15,16 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.model.data.table.TableStructureDataObjectFactory;
 
 /** A concrete example of a {@link TableStructureDataObjectFactory} for testing.
  * @author spb
  *
  */
 
-public class TableStructureTestFactory extends TableStructureDataObjectFactory<TableStructureTestFactory.TableStructureTestObject> {
+public class TableStructureTestFactory extends DataObjectFactory<TableStructureTestFactory.TableStructureTestObject> {
 
 	/**
 	 * 

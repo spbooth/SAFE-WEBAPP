@@ -19,19 +19,20 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.model.ClassificationFactory;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.TableInput;
 
 
 
-public class AddClassificationReferenceTransition<T extends TableStructureTransitionTarget> extends AddFieldTransition<T> {
+public class AddClassificationReferenceTransition<T extends DataObjectFactory> extends AddFieldTransition<T> {
 	private static final String TABLE = "Table";
-	public AddClassificationReferenceTransition(Repository res){
-		super(res);
+	public AddClassificationReferenceTransition(){
+		super();
 	}
 	
 	@Override
-	protected void addFormParams(Form f, AppContext c) {
+	protected void addFormParams(Form f, T target, AppContext c) {
 		f.addInput(TABLE, "Classification Table to reference", new TableInput<ClassificationFactory>(c,ClassificationFactory.class ));
 	}
 	@Override

@@ -24,7 +24,7 @@
 <p>This page lists the current tables in the accounting database and gives access to the built-in administration operations for each table</p>
 </div>
 <%
-Map<String,Class> map = conn.getClassMap(TableTransitionTarget.class);
+Map<String,Class> map = conn.getClassMap(DataObjectFactory.class);
 TableTransitionProvider provider = new TableTransitionProvider(conn);
 for(String table : map.keySet()){ 
 %>
@@ -33,7 +33,7 @@ for(String table : map.keySet()){
 <% 
     Class clazz = map.get(table);
 	if(clazz != null ){
-		TableTransitionTarget target = (TableTransitionTarget) conn.makeObject(clazz, table);
+		DataObjectFactory target = (DataObjectFactory) conn.makeObject(clazz, table);
 %>
 	<h4>Table Type: <%=clazz.getSimpleName() %></h4>
 	<form action="<%=response.encodeURL(request.getContextPath()+TransitionServlet.getURL(conn, provider, target))%>" method="post">

@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2017                            |
+//| Copyright - The University of Edinburgh 2018                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -13,31 +13,15 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
-import uk.ac.ed.epcc.webapp.session.SessionService;
+import java.util.Map;
 
-/** a {@link TransitionKey} for table transitions
+import uk.ac.ed.epcc.webapp.forms.transition.Transition;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+
+/**
  * @author spb
- * @param <T> type of target
  *
  */
-public abstract class TableTransitionKey extends TransitionKey<DataObjectFactory> {
-
-	public TableTransitionKey(Class<? super DataObjectFactory> t, String name, String help) {
-		super(t, name, help);
-	}
-
-	public TableTransitionKey(Class<? super DataObjectFactory> t, String name) {
-		super(t, name);
-	}
-
-	/** Access control to the transition.
-	 * This is used to widen the default permissions
-	 * 
-	 * @param serv
-	 * @param target
-	 * @return true if operation allowed
-	 */
-	public abstract boolean allow(SessionService<?> serv, DataObjectFactory target);
+public interface TableTransitionContributor {
+	public Map<TableTransitionKey,Transition<? extends DataObjectFactory>> getTableTransitions();
 }

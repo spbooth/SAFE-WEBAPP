@@ -23,22 +23,23 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.inputs.BooleanInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 
-public class AddTextFieldTransition<T extends TableStructureTransitionTarget> extends AddFieldTransition<T> {
+public class AddTextFieldTransition<T extends DataObjectFactory> extends AddFieldTransition<T> {
 
 	private static final String DEFAULT = "Default";
 	private static final String SIZE = "Size";
 	private static final String ALLOW_NULL ="AllowNull";
 
-	public AddTextFieldTransition(Repository res) {
-		super(res);
+	public AddTextFieldTransition() {
+		super();
 	}
 
 	@Override
-	protected void addFormParams(Form f, AppContext c) {
+	protected void addFormParams(Form f, T target,AppContext c) {
 		IntegerInput length = new IntegerInput();
 		BooleanInput null_input = new BooleanInput();
 		length.setMin(1);

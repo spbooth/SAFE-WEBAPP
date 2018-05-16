@@ -15,11 +15,10 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 
-/** Interface for factories that want to add content directly to the table transition
+/** Interface for factories/composites that want to add content directly to the table transition
  * @author spb
  *
  */
-public interface TableContentProvider extends TableTransitionTarget {
-
-		public void addSummaryContent(ContentBuilder cb);
+public interface TableContentProvider  {
+	public void addSummaryContent(ContentBuilder cb);
 }

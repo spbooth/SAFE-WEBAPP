@@ -19,20 +19,21 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.inputs.BooleanInput;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 
-public class AddBooleanFieldTransition<T extends TableStructureTransitionTarget> extends AddFieldTransition<T> {
+public class AddBooleanFieldTransition<T extends DataObjectFactory> extends AddFieldTransition<T> {
 
 	private static final String DEFAULT = "Default";
 	
-	public AddBooleanFieldTransition(Repository res) {
-		super(res);
+	public AddBooleanFieldTransition() {
+		super();
 	}
 
 	@Override
-	protected void addFormParams(Form f, AppContext c) {
+	protected void addFormParams(Form f, T target,AppContext c) {
 		BooleanInput input = new BooleanInput();
 		f.addInput(DEFAULT, "Default true", input);
 		

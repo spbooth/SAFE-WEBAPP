@@ -60,7 +60,6 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
-import uk.ac.ed.epcc.webapp.model.data.table.TableStructureDataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.transition.SimpleTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -79,7 +78,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 
 public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
-		extends TableStructureDataObjectFactory<T> {
+		extends DataObjectFactory<T> {
 	
 	public static final EntryKey EDIT_ITEM = new EntryKey("EditItem","Edit the log entry");
 

@@ -18,7 +18,9 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 
 import java.io.StringReader;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.SAXParser;
@@ -27,10 +29,12 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
@@ -39,19 +43,24 @@ import uk.ac.ed.epcc.webapp.forms.inputs.FileUploadDecorator;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.IndexTransitionResult;
+import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractTargetLessTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.ForwardTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
+import uk.ac.ed.epcc.webapp.model.data.ConfigParamProvider;
+import uk.ac.ed.epcc.webapp.model.data.ConfigTransition;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.UnDumper;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.TableInput;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** Class implementing transitions on factory classes identified by table.
- * The target factory has implement {@link TableTransitionTarget} and have its
+ * The target factory must have its
  * class registered as a configuration property.
  * This TransitionProvider needs to be registered under the name <b>Table</b> 
  * to enable this feature.
@@ -61,7 +70,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 
 
-public class TableTransitionProvider implements ViewTransitionProvider<TableTransitionKey,TableTransitionTarget>, IndexTransitionProvider<TableTransitionKey, TableTransitionTarget>,Contexed{
+public class TableTransitionProvider  implements ViewTransitionProvider<TableTransitionKey,DataObjectFactory>, IndexTransitionProvider<TableTransitionKey, DataObjectFactory>,Contexed{
 	
 	public static final Feature UPLOAD_XML_FEATURE = new Feature("table_transition.upload_xml",false,"Allow XML tables to be uploaded via a transition");
     /**
@@ -74,29 +83,153 @@ public class TableTransitionProvider implements ViewTransitionProvider<TableTran
 	 */
 	public static final String TABLE_TRANSITION_TAG = "Table";
 
-	private final AppContext conn;
     
-    public static final TableTransitionKey INDEX = new TableTransitionKey(TableTransitionProvider.class, "Index"){
+    public static final TableTransitionKey INDEX = new TableTransitionKey(DataObjectFactory.class, "Index"){
 
 		@Override
-		public boolean allow(SessionService serv, TableTransitionTarget target) {
+		public boolean allow(SessionService serv, DataObjectFactory target) {
 			return serv.hasRoleFromList(SessionService.ADMIN_ROLE,TABLE_INDEX_ROLE);
 		}
     	
     };
-    public static final TableTransitionKey UPLOAD = new AdminOperationKey(TableTransitionProvider.class, "Upload");
+    public static final TableTransitionKey UPLOAD = new AdminOperationKey(DataObjectFactory.class, "Upload");
+    /**
+	 * 
+	 */
+	static final TableTransitionKey ADD_FOREIGN_KEYS_KEY = new TableDeveloperKey("AddForeignKeys");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey DROP_TABLE_KEY = new TableDeveloperKey("DropTable");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey DROP_FIELD_KEY = new TableDeveloperKey("DropField");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey DROP_INDEX_KEY = new TableDeveloperKey("DropIndex");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey DROP_FOREIGN_KEY_KEY = new TableDeveloperKey("DropForeignKey");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey ADD_REFERENCE_FIELD_KEY = new TableDeveloperKey("AddReferenceField");
+	
+	/**
+	 * 
+	 */
+	static final TableTransitionKey ADD_DATE_FIELD_KEY = new TableDeveloperKey("AddDateField");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey ADD_TEXT_FIELD_KEY = new TableDeveloperKey("AddTextField");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey ADD_INTEGER_FIELD_KEY = new TableDeveloperKey("AddIntegerField");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey ADD_LONG_FIELD_KEY = new TableDeveloperKey("AddLongField");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey ADD_FLOAT_FIELD_KEY = new TableDeveloperKey("AddFloatField");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey ADD_DOUBLE_FIELD_KEY = new TableDeveloperKey("AddDoubleField");
+
+	/**
+	 * 
+	 */
+	static final TableTransitionKey ADD_STD_INDEX = new TableStructureAdminOperationKey("Add Std index", "Add missing index from the default table specification for this class");
+	/**
+	 * 
+	 */
+	static final TableTransitionKey ADD_STD_FIELD = new TableStructureAdminOperationKey("Add Std field","Add missing fields from the default table specification for this class");
+	static final TableTransitionKey DROP_OPTIONAL_FIELD =new TableStructureAdminOperationKey("Drop optional field","Drop optional existing field");
+
+	private final AppContext conn;
     public TableTransitionProvider(AppContext conn){
     	this.conn=conn;
+    	
     }
-    public class IndexTransition extends AbstractTargetLessTransition<TableTransitionTarget>{
+    
+    private Map<TableTransitionKey,Transition<? extends DataObjectFactory>> getTransitionMap(DataObjectFactory target){
+    	LinkedHashMap<TableTransitionKey, Transition<? extends DataObjectFactory>> map = new LinkedHashMap<>();
+    	if( target == null ) {
+    		map.put(INDEX, new IndexTransition());
+    	}
+    	if( UPLOAD_XML_FEATURE.isEnabled(conn)) {
+    		map.put(UPLOAD, new UploadTransition());
+    	}
+    	map.put(DROP_TABLE_KEY,new ConfirmTransition<DataObjectFactory>(
+			     "Delete this table ? (all data will be lost)", 
+			     new DropTableTransition<DataObjectFactory>(conn), 
+			     new ForwardTransition<DataObjectFactory>(new MessageResult("aborted"))) );
+		map.put(ADD_FOREIGN_KEYS_KEY,new ConfirmTransition<DataObjectFactory>(
+			     "Add Foreign Key definitions?", 
+			     new AddForeignKeyTransition<DataObjectFactory>(), 
+			     new ForwardTransition<DataObjectFactory>(new MessageResult("aborted"))) );
+	
+		map.put(DROP_FIELD_KEY, new DropFieldTransition<DataObjectFactory>());
+		map.put(DROP_INDEX_KEY, new DropIndexTransition<DataObjectFactory>());
+		map.put(DROP_FOREIGN_KEY_KEY, new DropForeignKeyTransition<DataObjectFactory>());
+		map.put(ADD_REFERENCE_FIELD_KEY, new AddReferenceTransition<DataObjectFactory>());
+		map.put(ADD_DATE_FIELD_KEY, new AddDateFieldTransition<DataObjectFactory>());
+		map.put(ADD_TEXT_FIELD_KEY, new AddTextFieldTransition<DataObjectFactory>());
+		map.put(ADD_INTEGER_FIELD_KEY, new AddIntegerFieldTransition<DataObjectFactory>());
+		map.put(ADD_LONG_FIELD_KEY, new AddLongFieldTransition<DataObjectFactory>());
+		map.put(ADD_FLOAT_FIELD_KEY, new AddFloatFieldTransition<DataObjectFactory>());
+		map.put(ADD_DOUBLE_FIELD_KEY, new AddDoubleFieldTransition<DataObjectFactory>());
+		if( target == null) {
+			return map;
+		}
+		if( target.getTableSpecification() != null ) {
+			map.put(ADD_STD_FIELD, new AddStdFieldTransition<DataObjectFactory>());
+			map.put(ADD_STD_INDEX, new AddStdIndexTransition<>());
+			map.put(DROP_OPTIONAL_FIELD, new DropOptionalFieldTransition<>());
+		}
+		if(target instanceof TableTransitionContributor) {
+			map.putAll(((TableTransitionContributor)target).getTableTransitions());
+		}
+		for(TableTransitionContributor c : ((DataObjectFactory<?>)target).getComposites(TableTransitionContributor.class)) {
+			map.putAll(c.getTableTransitions());
+		}
+		Set<String> configs = getConfigProperties(target);
+		if( configs != null && ! configs.isEmpty()){
+			map.put(new AdminOperationKey( "Configure","Edit configuration parameters directly"), new ConfigTransition(getContext(), configs));
+		}
+    	return map;
+    }
+    /** get a set of configuration parameters that configure this object.
+	 * This is used to produce a generic configuration table transtition.
+	 * 
+	 * @return
+	 */
+	public Set<String> getConfigProperties(DataObjectFactory<?> target){
+		Set<String> params = new  LinkedHashSet<>();
+		if( target instanceof ConfigParamProvider) {
+			((ConfigParamProvider)target).addConfigParameters(params);
+		}
+		for(ConfigParamProvider c : target.getComposites(ConfigParamProvider.class)) {
+			c.addConfigParameters(params);
+		}
+		return params;
+	}
+    public class IndexTransition extends AbstractTargetLessTransition<DataObjectFactory>{
 		public void buildForm(Form f, AppContext c) throws TransitionException {
-			f.addInput("table", TABLE_TRANSITION_TAG, new TableInput<TableStructureTransitionTarget>(c, TableStructureTransitionTarget.class));
+			f.addInput("table", TABLE_TRANSITION_TAG, new TableInput<DataObjectFactory>(c, DataObjectFactory.class));
 			f.addAction("View", new FormAction() {
 				
 				@Override
 				public FormResult action(Form f) throws ActionException {
 					String table = (String) f.get("table");
-					TableStructureTransitionTarget target = getContext().makeObject(TableStructureTransitionTarget.class, table);
+					DataObjectFactory target = getContext().makeObject(DataObjectFactory.class, table);
 					return new ViewTableResult(target);
 				}
 			});
@@ -108,7 +241,7 @@ public class TableTransitionProvider implements ViewTransitionProvider<TableTran
      * @author spb
      *
      */
-    public class UploadTransition extends AbstractTargetLessTransition<TableTransitionTarget>{
+    public class UploadTransition extends AbstractTargetLessTransition<DataObjectFactory>{
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition#buildForm(uk.ac.ed.epcc.webapp.forms.Form, uk.ac.ed.epcc.webapp.AppContext)
@@ -136,104 +269,83 @@ public class TableTransitionProvider implements ViewTransitionProvider<TableTran
 					} catch (Exception e) {
 						throw new ActionException("Error readind dump", e);
 					}
-					return new IndexTransitionResult<TableTransitionTarget,TableTransitionKey>(TableTransitionProvider.this);
+					return new IndexTransitionResult<DataObjectFactory,TableTransitionKey>(TableTransitionProvider.this);
 				}
 			});
 		}
     	
     }
     
-	public boolean allowTransition(AppContext c,TableTransitionTarget target,
+	public boolean allowTransition(AppContext c,DataObjectFactory target,
 			TableTransitionKey name) {
-		return name.allow(c.getService(SessionService.class),target);
+		if( name.allow(c.getService(SessionService.class),target)) {
+			return true;
+		}
+		return false;
 	}
 
-	public String getID(TableTransitionTarget target) {
+	public String getID(DataObjectFactory target) {
 		if( target == null){
 			return null;
 		}
-		return target.getTableTransitionID();
+		return target.getTag();
 	}
 
-	public <X extends ContentBuilder> X getSummaryContent(AppContext c,X cb,TableTransitionTarget target) {
-		SessionService operator = c.getService(SessionService.class);
-		getRegistry(target).getTableTransitionSummary(cb,operator );
-		return cb;
+	public <X extends ContentBuilder> X getSummaryContent(AppContext c,X cb,DataObjectFactory target) {
+		return getLogContent(cb, target, c.getService(SessionService.class));
 	}
 
-	protected TableTransitionRegistry getRegistry(TableTransitionTarget target) {
-		return target.getTableTransitionRegistry();
-	}
 
-	public TableTransitionTarget getTarget(String id) {
+	public DataObjectFactory getTarget(String id) {
 		if( id == null || id.length() == 0){
 			return null;
 		}
-		return conn.makeObjectWithDefault(TableTransitionTarget.class, null,id);
+		return getContext().makeObjectWithDefault(DataObjectFactory.class, null,id);
 	}
 
 	public String getTargetName() {
 		return TABLE_TRANSITION_TAG;
 	}
-
-	public Transition<TableTransitionTarget> getTransition(TableTransitionTarget target,TableTransitionKey name) {
-		if( name == INDEX){
-			return new IndexTransition();
-		}
-		if( name == UPLOAD && UPLOAD_XML_FEATURE.isEnabled(getContext())){
-			return new UploadTransition();
-		}
-		return getRegistry(target).getTableTransition(name);
-	}
-
-	public Set<TableTransitionKey> getTransitions(TableTransitionTarget target) {
-		return getRegistry(target).getTableTransitionKeys();
-	}
-
-	public TableTransitionKey lookupTransition(TableTransitionTarget target,String name) {
-		if( target == null){
-			if( INDEX.getName().equals(name)){
-				return INDEX;
-			}
-		}else{
-		for(TableTransitionKey key : getRegistry(target).getTableTransitionKeys()){
-			if( key.getName().equals(name)){
-				return key;
-			}
-		}
-		}
-		return null;
-	}
-
-	public AppContext getContext() {
-		return conn;
-	}
-	public boolean canView(TableTransitionTarget target, SessionService<?> sess) {
+	
+	public boolean canView(DataObjectFactory target, SessionService<?> sess) {
 		
 		return sess.hasRoleFromList(SessionService.ADMIN_ROLE,TABLE_INDEX_ROLE);
 	}
-	public <X extends ContentBuilder> X getLogContent(X hb,TableTransitionTarget target, SessionService<?> sess) {
-		hb.addHeading(2, "Table "+target.getTableTransitionID());
+	public <X extends ContentBuilder> X getLogContent(X hb,DataObjectFactory target, SessionService<?> sess) {
+		hb.addHeading(2, "Table "+target.getTag());
 		hb.addHeading(3,"Table Type:"+target.getClass().getSimpleName());
-		if( target instanceof DataObjectFactory){
-			DataObjectFactory fac = (DataObjectFactory) target;
-			Collection<Composite> comps = fac.getComposites();
-			if( ! comps.isEmpty()){
-				hb.addHeading(4, "Composites");
-				LinkedHashSet<String> names = new LinkedHashSet<String>();
-				for( Composite c : comps){
-					names.add(c.toString());
-				}
-				hb.addList(names);
+
+
+		Collection<Composite> comps = target.getComposites();
+		if( ! comps.isEmpty()){
+			hb.addHeading(4, "Composites");
+			LinkedHashSet<String> names = new LinkedHashSet<String>();
+			for( Composite c : comps){
+				names.add(c.toString());
 			}
+			hb.addList(names);
 		}
-		if( target instanceof TableContentProvider){
+		if( target instanceof TableContentProvider) {
 			((TableContentProvider)target).addSummaryContent(hb);
 		}
-		getRegistry(target).getTableTransitionSummary(hb,sess );
+		for(TableContentProvider prov : ((DataObjectFactory<?>)target).getComposites(TableContentProvider.class)) {
+			prov.addSummaryContent(hb);
+		}
+		Set<String> configs = getConfigProperties(target);
+		if( configs != null && ! configs.isEmpty()){
+			hb.addHeading(3, "Configuration parameters");
+			Table t = new Table();
+			for(String param : configs){
+				t.put("Value",param, getContext().getInitParameter(param, "Not-set"));
+			}
+			t.setKeyName("Parameter");
+			hb.addTable(getContext(), t);
+		}
 		return hb;
 	}
-	public <X extends ContentBuilder> X getTopContent(X hb,TableTransitionTarget target, SessionService<?> sess) {
+	
+
+	public <X extends ContentBuilder> X getTopContent(X hb,DataObjectFactory target, SessionService<?> sess) {
 		return hb;
 	}
 	public String getHelp(TableTransitionKey key) {
@@ -247,9 +359,46 @@ public class TableTransitionProvider implements ViewTransitionProvider<TableTran
 	}
 
 	public <R> R accept(
-			TransitionFactoryVisitor<R,TableTransitionTarget, TableTransitionKey> vis) {
+			TransitionFactoryVisitor<R,DataObjectFactory, TableTransitionKey> vis) {
 		return vis.visitTransitionProvider(this);
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#getTransitions(java.lang.Object)
+	 */
+	@Override
+	public Set<TableTransitionKey> getTransitions(DataObjectFactory target) {
+		return getTransitionMap(target).keySet();
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#getTransition(java.lang.Object, java.lang.Object)
+	 */
+	@Override
+	public Transition<DataObjectFactory> getTransition(DataObjectFactory target, TableTransitionKey key) {
+		return (Transition<DataObjectFactory>) getTransitionMap(target).get(key);
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#lookupTransition(java.lang.Object, java.lang.String)
+	 */
+	@Override
+	public TableTransitionKey lookupTransition(DataObjectFactory target, String name) {
+		for(TableTransitionKey key : getTransitions(target)) {
+			if( key.getName().equals(name)) {
+				return key;
+			}
+		}
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
+	 */
+	@Override
+	public AppContext getContext() {
+		return conn;
 	}
 	
 

@@ -72,7 +72,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.registry.SummaryContentProvider;
 		}
 
 		private final Class<? extends F> f;
-		private final String config_tag;
+		protected final String config_tag;
 		@Override
 		protected F getFactory(AppContext c) throws Exception{
 		

@@ -1103,6 +1103,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		res=null;
 		finder=null;
 		if( composites != null ){
+			for(Composite c : composites.values()) {
+				c.release();
+			}
 			composites.clear();
 		}
 		composites=null;
@@ -1815,6 +1818,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	protected final void setContext(AppContext ctx, String homeTable) {
 	   setContext(ctx, homeTable, AUTO_CREATE_TABLES_FEATURE.isEnabled(ctx));
 	}
+	protected void postSetContext() {
+		
+	}
 	protected final boolean setContext(AppContext ctx, String homeTable,boolean create) {
 		if (res != null  ){
 			getLogger().debug("Attempt to reset Repository");
@@ -1855,6 +1861,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 		}finally{
 			if( timer != null ){ timer.stopTimer("setContext:"+homeTable); timer.stopTimer("setContext");}
+			postSetContext();
 		}
 		return false;
 
@@ -1927,6 +1934,18 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			}
 		}
 		return spec;
+	}
+	
+	/** Get the default {@link TableSpecification} from a fully constructed factory.
+	 * 
+	 * This can only be called after auto-table generation.
+	 * @return
+	 */
+	public TableSpecification getTableSpecification() {
+		if( conn == null) {
+			throw new ConsistencyError("TableSepcification requested without context");
+		}
+		return getFinalTableSpecification(getContext(), getTag());
 	}
 	/** Get the default table specification if the table is to be created.
 	 * A null result means that a default specification is not available and the table will not be created.

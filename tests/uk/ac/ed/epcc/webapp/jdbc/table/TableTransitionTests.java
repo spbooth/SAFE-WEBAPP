@@ -17,10 +17,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.servlet.AbstractTransitionServletTest;
 import uk.ac.ed.epcc.webapp.servlet.ServletTest;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -32,14 +38,12 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 
-public class TableTransitionTests extends ServletTest {
+public class TableTransitionTests extends AbstractTransitionServletTest {
 
-	TransitionServlet servlet;
+	
+	TableTransitionProvider provider;
 	@Before
 	public void setTarget() throws DataException{
-		req.servlet_path=TransitionServlet.TRANSITION_SERVLET;
-		req.path_info=TableTransitionProvider.TABLE_TRANSITION_TAG+"/"+TableStructureTestFactory.DEFAULT_TABLE;
-		req.roles.add(SessionService.ADMIN_ROLE);
 		SessionService service = ctx.getService(SessionService.class);
 		AppUserFactory<?> fac = service.getLoginFactory();
 
@@ -49,21 +53,22 @@ public class TableTransitionTests extends ServletTest {
 		user.commit();
 		service.setCurrentPerson(user);
 		service.toggleRole(SessionService.ADMIN_ROLE);
-		servlet = new TransitionServlet();
+		
+		provider=new TableTransitionProvider(ctx);
 	}
 	
 	@Test
-	public void addStdField(){
+	public void addStdField() throws TransitionException, ServletException, IOException{
 		TableStructureTestFactory fac = new TableStructureTestFactory(ctx);
 		assertFalse(fac.hasField(TableStructureTestFactory.SECRET_IDENTITY));
 		
-		req.params.put(TransitionServlet.TRANSITION_KEY_ATTR, TableSpecificationTransitionSource.ADD_STD_FIELD);
-		req.params.put(TableSpecificationTransitionSource.FIELD_FORMFIELD, TableStructureTestFactory.SECRET_IDENTITY);
-		req.params.put("action", AddFieldTransition.ADD_ACTION);
-		req.params.put("transition_form", "true");
-		req.params.put("direct", "true");
-		servlet.doPost(req, res, ctx);
-		assertEquals("test/TransitionServlet/Table/TableTest", res.redirect);
+		setTransition(provider, TableTransitionProvider.ADD_STD_FIELD,fac);
+		addParam(AddStdFieldTransition.FIELD_FORMFIELD, TableStructureTestFactory.SECRET_IDENTITY);
+		addParam("action", AddFieldTransition.ADD_ACTION);
+		addParam("transition_form", "true");
+		addParam("direct", "true");
+		runTransition();
+		checkViewRedirect(provider, fac);
 		
 		fac = new TableStructureTestFactory(ctx);
 		assertTrue(fac.hasField(TableStructureTestFactory.SECRET_IDENTITY));
@@ -72,18 +77,18 @@ public class TableTransitionTests extends ServletTest {
 	}
 
 	@Test
-	public void addTextField(){
+	public void addTextField() throws ServletException, IOException, TransitionException{
 		TableStructureTestFactory fac = new TableStructureTestFactory(ctx);
 		assertFalse(fac.hasField("Wombat"));
 		
-		req.params.put(TransitionServlet.TRANSITION_KEY_ATTR, GeneralTransitionSource.ADD_TEXT_FIELD_KEY);
-		req.params.put(AddFieldTransition.FIELD, "Wombat");
-		req.params.put("action", AddFieldTransition.ADD_ACTION);
-		req.params.put("transition_form", "true");
-		req.params.put("direct", "true");
-		req.params.put("Size", "32");
-		servlet.doPost(req, res, ctx);
-		assertEquals("test/TransitionServlet/Table/TableTest", res.redirect);
+		setTransition(provider,TableTransitionProvider.ADD_TEXT_FIELD_KEY,fac);
+		addParam(AddFieldTransition.FIELD, "Wombat");
+		addParam("action", AddFieldTransition.ADD_ACTION);
+		addParam("transition_form", "true");
+		addParam("direct", "true");
+		addParam("Size", "32");
+		runTransition();
+		checkViewRedirect(provider, fac);
 		
 		fac = new TableStructureTestFactory(ctx);
 		assertTrue(fac.hasField("Wombat"));
@@ -91,18 +96,18 @@ public class TableTransitionTests extends ServletTest {
 		
 	}
 	@Test
-	public void addIntegerField(){
+	public void addIntegerField() throws TransitionException, ServletException, IOException{
 		TableStructureTestFactory fac = new TableStructureTestFactory(ctx);
 		assertFalse(fac.hasField("Wombat"));
 		
-		req.params.put(TransitionServlet.TRANSITION_KEY_ATTR, GeneralTransitionSource.ADD_INTEGER_FIELD_KEY);
-		req.params.put(AddFieldTransition.FIELD, "Wombat");
-		req.params.put("action", AddFieldTransition.ADD_ACTION);
-		req.params.put("transition_form", "true");
-		req.params.put("direct", "true");
-		//req.params.put("Size", "32");
-		servlet.doPost(req, res, ctx);
-		assertEquals("test/TransitionServlet/Table/TableTest", res.redirect);
+		setTransition(provider, TableTransitionProvider.ADD_INTEGER_FIELD_KEY,fac);
+		addParam(AddFieldTransition.FIELD, "Wombat");
+		addParam("action", AddFieldTransition.ADD_ACTION);
+		addParam("transition_form", "true");
+		addParam("direct", "true");
+		//addParam("Size", "32");
+		runTransition();
+		checkViewRedirect(provider, fac);
 		
 		fac = new TableStructureTestFactory(ctx);
 		assertTrue(fac.hasField("Wombat"));
@@ -110,18 +115,18 @@ public class TableTransitionTests extends ServletTest {
 		
 	}
 	@Test
-	public void addDoubleField(){
+	public void addDoubleField() throws TransitionException, ServletException, IOException{
 		TableStructureTestFactory fac = new TableStructureTestFactory(ctx);
 		assertFalse(fac.hasField("Wombat"));
 		
-		req.params.put(TransitionServlet.TRANSITION_KEY_ATTR, GeneralTransitionSource.ADD_DOUBLE_FIELD_KEY);
-		req.params.put(AddFieldTransition.FIELD, "Wombat");
-		req.params.put("action", AddFieldTransition.ADD_ACTION);
-		req.params.put("transition_form", "true");
-		req.params.put("direct", "true");
-		//req.params.put("Size", "32");
-		servlet.doPost(req, res, ctx);
-		assertEquals("test/TransitionServlet/Table/TableTest", res.redirect);
+		setTransition(provider, TableTransitionProvider.ADD_DOUBLE_FIELD_KEY,fac);
+		addParam(AddFieldTransition.FIELD, "Wombat");
+		addParam("action", AddFieldTransition.ADD_ACTION);
+		addParam("transition_form", "true");
+		addParam("direct", "true");
+		//addParam("Size", "32");
+		runTransition();
+		checkViewRedirect(provider, fac);
 		
 		fac = new TableStructureTestFactory(ctx);
 		assertTrue(fac.hasField("Wombat"));
@@ -129,18 +134,18 @@ public class TableTransitionTests extends ServletTest {
 		
 	}
 	@Test
-	public void addDateField(){
+	public void addDateField() throws TransitionException, ServletException, IOException{
 		TableStructureTestFactory fac = new TableStructureTestFactory(ctx);
 		assertFalse(fac.hasField("Wombat"));
 		
-		req.params.put(TransitionServlet.TRANSITION_KEY_ATTR, GeneralTransitionSource.ADD_DATE_FIELD_KEY);
-		req.params.put(AddFieldTransition.FIELD, "Wombat");
-		req.params.put("action", AddFieldTransition.ADD_ACTION);
-		req.params.put("transition_form", "true");
-		req.params.put("direct", "true");
-		//req.params.put("Size", "32");
-		servlet.doPost(req, res, ctx);
-		assertEquals("test/TransitionServlet/Table/TableTest", res.redirect);
+		setTransition(provider, TableTransitionProvider.ADD_DATE_FIELD_KEY,fac);
+		addParam(AddFieldTransition.FIELD, "Wombat");
+		addParam("action", AddFieldTransition.ADD_ACTION);
+		addParam("transition_form", "true");
+		addParam("direct", "true");
+		//addParam("Size", "32");
+		runTransition();
+		checkViewRedirect(provider, fac);
 		
 		fac = new TableStructureTestFactory(ctx);
 		assertTrue(fac.hasField("Wombat"));
@@ -148,18 +153,18 @@ public class TableTransitionTests extends ServletTest {
 		
 	}
 	@Test
-	public void addLongField(){
+	public void addLongField() throws ServletException, IOException, TransitionException{
 		TableStructureTestFactory fac = new TableStructureTestFactory(ctx);
 		assertFalse(fac.hasField("Wombat"));
 		
-		req.params.put(TransitionServlet.TRANSITION_KEY_ATTR, GeneralTransitionSource.ADD_LONG_FIELD_KEY);
-		req.params.put(AddFieldTransition.FIELD, "Wombat");
-		req.params.put("action", AddFieldTransition.ADD_ACTION);
-		req.params.put("transition_form", "true");
-		req.params.put("direct", "true");
-		//req.params.put("Size", "32");
-		servlet.doPost(req, res, ctx);
-		assertEquals("test/TransitionServlet/Table/TableTest", res.redirect);
+		setTransition(provider, TableTransitionProvider.ADD_LONG_FIELD_KEY,fac);
+		addParam(AddFieldTransition.FIELD, "Wombat");
+		addParam("action", AddFieldTransition.ADD_ACTION);
+		addParam("transition_form", "true");
+		addParam("direct", "true");
+		//addParam("Size", "32");
+		runTransition();
+		checkViewRedirect(provider, fac);
 		
 		fac = new TableStructureTestFactory(ctx);
 		assertTrue(fac.hasField("Wombat"));
@@ -167,18 +172,18 @@ public class TableTransitionTests extends ServletTest {
 		
 	}
 	@Test
-	public void addFloatField(){
+	public void addFloatField() throws ServletException, IOException, TransitionException{
 		TableStructureTestFactory fac = new TableStructureTestFactory(ctx);
 		assertFalse(fac.hasField("Wombat"));
 		
-		req.params.put(TransitionServlet.TRANSITION_KEY_ATTR, GeneralTransitionSource.ADD_FLOAT_FIELD_KEY);
-		req.params.put(AddFieldTransition.FIELD, "Wombat");
-		req.params.put("action", AddFieldTransition.ADD_ACTION);
-		req.params.put("transition_form", "true");
-		req.params.put("direct", "true");
-		//req.params.put("Size", "32");
-		servlet.doPost(req, res, ctx);
-		assertEquals("test/TransitionServlet/Table/TableTest", res.redirect);
+		setTransition(provider, TableTransitionProvider.ADD_FLOAT_FIELD_KEY,fac);
+		addParam(AddFieldTransition.FIELD, "Wombat");
+		addParam("action", AddFieldTransition.ADD_ACTION);
+		addParam("transition_form", "true");
+		addParam("direct", "true");
+		//addParam("Size", "32");
+		runTransition();
+		checkViewRedirect(provider, fac);
 		
 		fac = new TableStructureTestFactory(ctx);
 		assertTrue(fac.hasField("Wombat"));

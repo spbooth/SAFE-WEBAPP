@@ -44,12 +44,14 @@ import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableStructureListener;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.BasicType;
 import uk.ac.ed.epcc.webapp.model.data.CachedIndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.Owned;
 import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
@@ -62,7 +64,6 @@ import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.iterator.DecoratingIterator;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
-import uk.ac.ed.epcc.webapp.model.data.table.TableStructureDataObjectFactory;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 /**
@@ -88,7 +89,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 
 
-public class HistoryFactory<P extends DataObject,H extends HistoryFactory.HistoryRecord<P>> extends TableStructureDataObjectFactory<H> implements HistoryHandler<P> {
+public class HistoryFactory<P extends DataObject,H extends HistoryFactory.HistoryRecord<P>> extends DataObjectFactory<H> implements HistoryHandler<P>, TableStructureListener {
 	
 
 	public static final Feature HISTORY_CACHE_FEATURE = new Feature("history_cache",true,"should history factories cache the peer objects to save on lookups");
@@ -129,7 +130,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	 * @param <P> Type of peer object
 	 */
 
-	public static  class HistoryRecord<P extends DataObject> extends DataObject implements uk.ac.ed.epcc.webapp.model.history.History<P> {
+	public static  class HistoryRecord<P extends DataObject> extends DataObject implements uk.ac.ed.epcc.webapp.model.history.History<P>,Owned {
         protected HistoryFactory<P,?> history_factory;
 		public HistoryRecord(HistoryFactory<P,?> fac,Repository.Record res) {
 			super(res);
@@ -309,6 +310,14 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 			super.release();
 		}
 
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.Owned#getFactory()
+		 */
+		@Override
+		public HistoryFactory<P, ?> getFactory() {
+			return history_factory;
+		}
+
 		
 	}
     
@@ -434,9 +443,9 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
     
 	static protected long ENDTIME = java.lang.Long.MAX_VALUE;
 
-	protected static final String START_TIME_FIELD = "StartTime";
+	public static final String START_TIME_FIELD = "StartTime";
 
-	protected static final String END_TIME_FIELD = "EndTime";
+	public static final String END_TIME_FIELD = "EndTime";
 
 	
 	private static final class Status extends BasicType<Status.Value>{
@@ -491,7 +500,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	}
 	private DataObjectFactory<P> peer_factory=null;
 	@SuppressWarnings("unchecked")
-	protected DataObjectFactory<P> getPeerFactory(){
+	public DataObjectFactory<P> getPeerFactory(){
 		if( peer_factory == null){
 			setPeerFactory((DataObjectFactory<P>) getPeerReference().getProducer());
 		}
@@ -522,11 +531,19 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	 * @param table table to store data
 	 */
 	public HistoryFactory(DataObjectFactory<P> fac,String table) {
-		peer_factory=fac; // need to cache this NOW as getDefaultTableSpecification will retreive it in sub-classes.
+		this(fac);
 		AppContext c = fac.getContext();
 		
     	setContext(c, table);
 		
+	}
+	/** Constructor to allow sub-classes to set factory before calling 
+	 * {@link #setContext(AppContext, String)}
+	 * 
+	 * @param fac
+	 */
+	protected HistoryFactory(DataObjectFactory<P> fac) {
+		peer_factory=fac; // need to cache this NOW as getDefaultTableSpecification will retreive it in sub-classes.
 	}
 	@SuppressWarnings("unchecked")
 	protected void setPeerFactory(DataObjectFactory<P> fac) {
@@ -1049,7 +1066,6 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	}
 	@Override
 	public void resetStructure() {
-		super.resetStructure();
 		// We may be adding a HistoryStatus field 
 		// actually we won't trigger till the following transition but its still good 
 		// to do.

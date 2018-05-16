@@ -599,6 +599,9 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		super(c,table,left_fac,left_field,right_fac,right_field);
 
 	}
+	protected LinkManager() {
+		super();
+	}
 
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c,String table,

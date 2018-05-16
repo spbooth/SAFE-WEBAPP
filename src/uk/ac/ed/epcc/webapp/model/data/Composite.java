@@ -22,11 +22,9 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.jdbc.table.TransitionSource;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
-import uk.ac.ed.epcc.webapp.model.data.table.TableStructureDataObjectFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link Composite} adds behaviour to a {@link DataObjectFactory}
@@ -192,6 +190,12 @@ public abstract class Composite<BDO extends DataObject, X extends Composite> imp
 		
 	}
 	
+	/** perform extra clean-up when factory is released 
+	 * 
+	 */
+	protected void release() {
+		
+	}
 	/** used to list composites on table structure page.
 	 * 
 	 */

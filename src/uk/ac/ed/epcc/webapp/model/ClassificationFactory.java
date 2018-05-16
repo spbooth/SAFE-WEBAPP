@@ -16,7 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model;
 
-import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -26,7 +25,6 @@ import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
-import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
@@ -41,12 +39,9 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
-import uk.ac.ed.epcc.webapp.jdbc.table.AbstractTableRegistry;
-import uk.ac.ed.epcc.webapp.jdbc.table.GeneralTransitionSource;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecificationTransitionSource;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableTransitionRegistry;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
@@ -59,10 +54,8 @@ import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NameFinderInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedDataCache;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
-import uk.ac.ed.epcc.webapp.model.data.table.TableStructureDataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.history.HistoryFactory;
 import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
-import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** Factory class for Classification objects.
  * 
@@ -73,7 +66,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 
 
-public class ClassificationFactory<T extends Classification> extends TableStructureDataObjectFactory<T> implements Comparable<ClassificationFactory>, HistoryFieldContributor, NameFinder<T>,NameInputProvider{
+public class ClassificationFactory<T extends Classification> extends DataObjectFactory<T> implements Comparable<ClassificationFactory>, HistoryFieldContributor, NameFinder<T>,NameInputProvider{
 	
 	/** Maximum size of pull-down menu in update form.
 	 * 
@@ -82,17 +75,18 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 	private static final Pattern WHITESPACE = Pattern.compile("\\s");
 	
 	private HistoryFactory<T,HistoryFactory.HistoryRecord<T>> hist_fac=null;
-	private String homeTable;
 	
+	
+	protected ClassificationFactory() {
+		super();
+	}
     public ClassificationFactory(AppContext ctx, String homeTable){
     	setContext(ctx, homeTable);
-    	
-    	this.homeTable = homeTable;
-    	
     }
     
     public HistoryFactory<T,HistoryFactory.HistoryRecord<T>> getHistoryFactory() {
     	if( hist_fac == null) {
+    		String homeTable = getTag();
     		// create history factory if history table configured
         	String histTable = getContext().getInitParameter(homeTable + ".history_table");
         	if (histTable != null) {
@@ -113,26 +107,8 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 	return spec;	
     }
     
-	public class ClassificationTableRegistry extends AbstractTableRegistry{
-
-		public ClassificationTableRegistry(){
-			TableSpecification spec = getDefaultTableSpecification(getContext(), getTag());
-			if(spec != null ){
-				addTransitionSource(new TableSpecificationTransitionSource<ClassificationFactory>(res, spec));
-			}
-			addTransitionSource(new GeneralTransitionSource<ClassificationFactory<T>>(res));
-		}
-
-		
-		public void getTableTransitionSummary(ContentBuilder hb,
-				SessionService operator) {
-			hb.addText("Classification table");
-		}
-		
-	}
-	protected TableTransitionRegistry makeTableRegistry(){
-		return new ClassificationTableRegistry();
-	}
+	
+	
     @Override
     protected void postCreateTableSetup(AppContext c, String table){
     	String bootstrap = c.getInitParameter("classification.bootstrap."+table);
@@ -199,7 +175,9 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 	 * 
 	 */
 	protected void postMakeByName(T c, String name){
-		
+		for(ClassificationCreateContributor<T> ccc : getComposites(ClassificationCreateContributor.class)) {
+			ccc.postMakeByName(c, name);
+		}
 	}
 	/** Does the update allow name changes.
 	 * defaults to false. Override for tables that are not auto
@@ -511,7 +489,7 @@ public class ClassificationFactory<T extends Classification> extends TableStruct
 	@Override
 	public void addToHistorySpecification(TableSpecification spec) {
 		// add all the fields to the history specification, except the name since that shouldn't change
-		TableSpecification ts = getDefaultTableSpecification(getContext(), homeTable);
+		TableSpecification ts = getFinalTableSpecification(getContext(), getTag());
 		Set<String> fields = ts.getFieldNames();
 		for (String field : fields) {
 			if (!field.equals(Classification.NAME)) {

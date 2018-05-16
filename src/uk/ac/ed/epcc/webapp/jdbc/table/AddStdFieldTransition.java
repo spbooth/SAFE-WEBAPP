@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2017                            |
+//| Copyright - The University of Edinburgh 2018                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -13,31 +13,28 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
-import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.model.data.Repository;
 
-/** a {@link TransitionKey} for table transitions
- * @author spb
- * @param <T> type of target
- *
- */
-public abstract class TableTransitionKey extends TransitionKey<DataObjectFactory> {
-
-	public TableTransitionKey(Class<? super DataObjectFactory> t, String name, String help) {
-		super(t, name, help);
+public class AddStdFieldTransition<T extends DataObjectFactory> extends AddFieldTransition<T>{
+	static final String FIELD_FORMFIELD = "Field";
+	public AddStdFieldTransition() {
 	}
 
-	public TableTransitionKey(Class<? super DataObjectFactory> t, String name) {
-		super(t, name);
+	@Override
+	protected void addFormParams(Form f, T target, AppContext c) {
+		TableSpecification spec = target.getTableSpecification();
+		if( spec != null) {
+			Repository res = getRepository(target);
+			f.addInput(FIELD_FORMFIELD, "Field to add", new OptionalFieldInput<FieldType>(res,true,  spec.getStdFields()));
+		}
 	}
 
-	/** Access control to the transition.
-	 * This is used to widen the default permissions
-	 * 
-	 * @param serv
-	 * @param target
-	 * @return true if operation allowed
-	 */
-	public abstract boolean allow(SessionService<?> serv, DataObjectFactory target);
+	@Override
+	protected FieldType getFieldType(Form f) {
+		return (FieldType) f.getItem(FIELD_FORMFIELD);
+	}
+	
 }

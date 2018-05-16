@@ -21,10 +21,11 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
 
 
-public class DropTableTransition<T extends TableTransitionTarget> extends
+public class DropTableTransition<T extends DataObjectFactory> extends
 		AbstractDirectTransition<T> {
 	AppContext conn;
 	public DropTableTransition(AppContext conn){
@@ -35,7 +36,7 @@ public class DropTableTransition<T extends TableTransitionTarget> extends
 		DataBaseHandlerService serv = conn.getService(DataBaseHandlerService.class);
 		try{
 		if( serv != null ){
-			serv.deleteTable(target.getTableTransitionID());
+			serv.deleteTable(target.getTag());
 			return new TableListResult();
 		}
 		}catch(Exception e){

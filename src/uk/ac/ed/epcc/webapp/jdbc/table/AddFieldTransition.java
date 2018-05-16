@@ -27,42 +27,38 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NewFieldInput;
 
-public abstract class AddFieldTransition<T extends TableStructureTransitionTarget>
-		extends AbstractFormTransition<T> {
+public abstract class AddFieldTransition<T extends DataObjectFactory>
+		extends EditTableFormTransition<T> {
 	
 	/**
 	 * 
 	 */
 	static final String ADD_ACTION = "Add";
 	public static final String FIELD = "Field";
-	protected final Repository res;
 
-	public AddFieldTransition(Repository res){
-		this.res=res;
+
+	public AddFieldTransition(){
 	}
 	public final void buildForm(Form f, T target, AppContext c)
 			throws TransitionException {
-		f.addInput(FIELD, "New Field Name", new NewFieldInput(res));
-		addFormParams(f, c);
-		f.addAction(ADD_ACTION, new AddFieldAction<T>(target));
+		f.addInput(FIELD, "New Field Name", new NewFieldInput(getRepository(target)));
+		addFormParams(f,target, c);
+		f.addAction(ADD_ACTION, new AddFieldAction(target));
 
 	}
 
-	protected abstract void addFormParams(Form f, AppContext c);
+	protected abstract void addFormParams(Form f, T target, AppContext c);
 
 	protected abstract FieldType getFieldType(Form f);
 
 
 
-	public class AddFieldAction<T extends TableStructureTransitionTarget> extends FormAction {
+	public class AddFieldAction extends FormAction {
 
 		private final T target;
 		public AddFieldAction(T target) {
@@ -73,6 +69,7 @@ public abstract class AddFieldTransition<T extends TableStructureTransitionTarge
 		public FormResult action(Form f)
 				throws uk.ac.ed.epcc.webapp.forms.exceptions.ActionException {
 			try {
+				Repository res = getRepository(target);
 				SQLContext sql = res.getSQLContext();
 				StringBuilder query = new StringBuilder();
 				query.append("ALTER TABLE ");
@@ -100,8 +97,8 @@ public abstract class AddFieldTransition<T extends TableStructureTransitionTarge
     					
     				}
 				}
-				target.resetStructure();
-				Repository.reset(res.getContext(), res.getTag());
+				resetStructure(target);
+				
 			} catch (Exception e) {
 				throw new ActionException("Update failed",e);
 			}
