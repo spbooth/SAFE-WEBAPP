@@ -51,6 +51,7 @@ import uk.ac.ed.epcc.webapp.model.data.BasicType;
 import uk.ac.ed.epcc.webapp.model.data.CachedIndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.Owned;
 import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
@@ -129,7 +130,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	 * @param <P> Type of peer object
 	 */
 
-	public static  class HistoryRecord<P extends DataObject> extends DataObject implements uk.ac.ed.epcc.webapp.model.history.History<P> {
+	public static  class HistoryRecord<P extends DataObject> extends DataObject implements uk.ac.ed.epcc.webapp.model.history.History<P>,Owned {
         protected HistoryFactory<P,?> history_factory;
 		public HistoryRecord(HistoryFactory<P,?> fac,Repository.Record res) {
 			super(res);
@@ -307,6 +308,14 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		public void release(){
 			history_factory=null;
 			super.release();
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.Owned#getFactory()
+		 */
+		@Override
+		public HistoryFactory<P, ?> getFactory() {
+			return history_factory;
 		}
 
 		
