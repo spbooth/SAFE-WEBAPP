@@ -74,7 +74,12 @@ public interface TimeChartData<P extends PeriodSequencePlot> extends PeriodChart
 	 */
 	public abstract P addLineGraph(P plot, Color custom_colors[])throws Exception;
 	
-	public abstract void addWarningLevel(double value);
+	/** mark a threshold/warning level
+	 * 
+	 * @param value
+	 * @param col optional Color to mark threshold with
+	 */
+	public abstract void addWarningLevel(double value,Color col);
 	
 	public List<P> getPlots();
 	

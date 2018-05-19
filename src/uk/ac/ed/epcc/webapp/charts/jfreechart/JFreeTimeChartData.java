@@ -75,8 +75,11 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 
 
 
-	public void addWarningLevel(double value) {
-		((XYPlot)chart.getPlot()).addRangeMarker(new ValueMarker(value,Color.RED,new BasicStroke(2f)));
+	public void addWarningLevel(double value,Color col) {
+		if( col ==null) {
+			col=Color.RED;
+		}
+		((XYPlot)chart.getPlot()).addRangeMarker(new ValueMarker(value,col,new BasicStroke(2f)));
 		
 	}
 

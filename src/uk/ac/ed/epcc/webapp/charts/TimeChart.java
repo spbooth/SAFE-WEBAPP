@@ -23,6 +23,7 @@ import java.util.Date;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 //import uk.ac.ed.epcc.webapp.charts.jfreechart.JFreeChartData;
 import uk.ac.ed.epcc.webapp.time.CalendarFieldSplitPeriod;
 import uk.ac.ed.epcc.webapp.time.RegularSplitPeriod;
@@ -181,7 +182,16 @@ public class TimeChart<P extends PeriodSequencePlot> extends PeriodChart<P>{
 	
 	
 	public void addWarningLevel(double value){
-		((TimeChartData)getChartData()).addWarningLevel(value);
+		Color col = Color.RED;
+		String col_str = getContext().getInitParameter("timechart.warning_color");
+		if( col_str != null) {
+			try {
+				col = Color.decode(col_str);
+			}catch(Throwable t) {
+				getContext().getService(LoggerService.class).getLogger(getClass()).error("Error parsing color "+col_str, t);
+			}
+		}
+		((TimeChartData)getChartData()).addWarningLevel(value,col);
 	}
 	
 
