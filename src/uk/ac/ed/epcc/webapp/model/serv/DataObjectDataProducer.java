@@ -26,6 +26,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
@@ -52,7 +53,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @param <D>
  */
 public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> extends DataObjectFactory<D>
-		implements SettableServeDataProducer {
+		implements SettableServeDataProducer, AnonymisingFactory {
 	/** ID for anonymous access
 	 * 
 	 */
@@ -223,6 +224,16 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 		
 		MimeData data = new MimeData(res);
 		return data;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.AnonymisingFactory#anonymise()
+	 */
+	@Override
+	public void anonymise() throws DataFault {
+		FilterDelete<D> del = new FilterDelete<D>(res);
+		del.delete(null);
+		
 	}
 
 }

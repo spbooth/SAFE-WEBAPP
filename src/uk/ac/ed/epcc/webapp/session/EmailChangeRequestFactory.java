@@ -34,15 +34,17 @@ import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 
 
 
-public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequestFactory.EmailChangeRequest> {
+public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequestFactory.EmailChangeRequest> implements AnonymisingFactory{
 	/**
 	 * 
 	 */
@@ -171,4 +173,13 @@ public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequ
 			f.getField(EmailNameFinder.EMAIL).addValidator(new ParseFactoryValidator<AppUser>(factory, user));
 	    	f.addAction(REQUEST_ACTION, new RequestAction(user));
 	    }
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.AnonymisingFactory#anonymise()
+	 */
+	@Override
+	public void anonymise() throws DataFault {
+		FilterDelete del = new FilterDelete<>(res);
+		del.delete(null);
+		
+	}
 }
