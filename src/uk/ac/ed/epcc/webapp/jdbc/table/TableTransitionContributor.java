@@ -16,12 +16,11 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
 /**
  * @author spb
  *
  */
 public interface TableTransitionContributor {
-	public Map<TableTransitionKey,Transition<? extends DataObjectFactory>> getTableTransitions();
+	public Map<TableTransitionKey,Transition> getTableTransitions();
 }

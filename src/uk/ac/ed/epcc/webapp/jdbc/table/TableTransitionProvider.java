@@ -159,8 +159,8 @@ public class TableTransitionProvider  implements ViewTransitionProvider<TableTra
     	
     }
     
-    private Map<TableTransitionKey,Transition<? extends DataObjectFactory>> getTransitionMap(DataObjectFactory target){
-    	LinkedHashMap<TableTransitionKey, Transition<? extends DataObjectFactory>> map = new LinkedHashMap<>();
+    private Map<TableTransitionKey,Transition> getTransitionMap(DataObjectFactory target){
+    	LinkedHashMap<TableTransitionKey, Transition> map = new LinkedHashMap<>();
     	if( target == null ) {
     		map.put(INDEX, new IndexTransition());
     	}
