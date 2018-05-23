@@ -252,10 +252,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		protected abstract L makeLink(Number id) throws  Exception;
 
 		/**
-		 * Remove referenced data if appropriate and set the
-		 * link-id to zero. This marks the entry as deletable
-		 * without throwing off chunk based iterators.
-		 * 
+		 * Remove referenced data if appropriate and then remove this object.
 		 * @throws Exception
 		 */
 		public final void remove() throws Exception {

@@ -1,5 +1,5 @@
 <%
-	String privacy_policy=conn.getInitParameter("service.url.privacypolicy");
+	String privacy_policy=conn.getExpandedProperty("service.url.privacypolicy");
     if( privacy_policy != null && ! privacy_policy.isEmpty() ){ 
 %>
 <p>
