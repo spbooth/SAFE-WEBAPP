@@ -20,7 +20,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageProvider;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
