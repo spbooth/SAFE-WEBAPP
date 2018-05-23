@@ -57,6 +57,9 @@ public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequ
 		user_fac=fac;
 		setContext(fac.getContext(), "EmailChangeRequest");
 	}
+	public EmailChangeRequestFactory(AppContext conn) {
+		this(conn.getService(SessionService.class).getLoginFactory());
+	}
 	@Override
 	public TableSpecification getDefaultTableSpecification(AppContext ctx,String table){
 		TableSpecification spec = new TableSpecification();
