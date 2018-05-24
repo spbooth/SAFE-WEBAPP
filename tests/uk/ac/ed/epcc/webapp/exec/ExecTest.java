@@ -56,19 +56,7 @@ public class ExecTest extends WebappTestBase {
 	public void testFinish() throws Exception{
 		ctx.setService(new DefaultExecService(ctx));
 		ExecService serv = ctx.getService(ExecService.class);
-		// To be cross platform test with java 
-		URL location = Sleep.class.getResource(Sleep.class.getSimpleName()+".class");
-		System.out.println(location);
-		String path =location.getPath();
-		System.out.println(path);
-		int start=0;
-		if(path.startsWith("/") && ! File.separator.equals("/")){
-			// on windows you get /C:path that does not work as classpath
-			start++;
-		}
-		
-		path=path.substring(start, path.indexOf("uk"));
-		String txt = "java -classpath "+path+" "+Sleep.class.getCanonicalName()+" 1";
+		String txt = getText()+" 1";
 		System.out.println(txt);
 		ProcessProxy result = serv.exec(5000L, txt);
 		System.out.println("Output is "+result.getOutput());
@@ -86,18 +74,12 @@ public class ExecTest extends WebappTestBase {
 	public void testTimeout() throws Exception{
 		ctx.setService(new DefaultExecService(ctx));
 		ExecService serv = ctx.getService(ExecService.class);
-		// To be cross platform test with java 
-		URL location = Sleep.class.getResource(Sleep.class.getSimpleName()+".class");
-		String path =location.getPath();
-		int start=0;
-		if(path.startsWith("/") && ! File.separator.equals("/")){
-			// on windows you get /C:path that does not work as classpath
-			start++;
-		}
-		path=path.substring(start, path.indexOf("uk"));
-		String txt = "java -classpath "+path+" "+Sleep.class.getCanonicalName()+" 60";
+		
+		String txt = getText();
+		
+		String command = txt+" 60";
 		System.out.println(txt);
-		ProcessProxy result = serv.exec(1000L, txt);
+		ProcessProxy result = serv.exec(1000L, command);
 		System.out.println("Output is "+result.getOutput());
 		System.out.println("Error is "+result.getErr());
 		System.out.println(result.getExit());
@@ -106,18 +88,29 @@ public class ExecTest extends WebappTestBase {
 		
 		
 	}
-	
-	@Test 
-	public void testHandlerTimeout() throws Exception{
+
+	/**
+	 * @return
+	 */
+	private String getText() {
+		// To be cross platform test with java 
 		URL location = Sleep.class.getResource(Sleep.class.getSimpleName()+".class");
 		String path =location.getPath();
+		path=path.replaceAll("%20", " ");
 		int start=0;
 		if(path.startsWith("/") && ! File.separator.equals("/")){
 			// on windows you get /C:path that does not work as classpath
 			start++;
 		}
 		path=path.substring(start, path.indexOf("uk"));
-		String txt = "java -classpath "+path+" "+Sleep.class.getCanonicalName()+" 60";
+		String txt = "java -classpath \""+path+"\" "+Sleep.class.getCanonicalName();
+		return txt;
+	}
+	
+	@Test 
+	public void testHandlerTimeout() throws Exception{
+		
+		String txt = getText()+" 60";
 		System.out.println(txt);
 		Runtime rt = Runtime.getRuntime();
 		Process p = rt.exec(txt);
