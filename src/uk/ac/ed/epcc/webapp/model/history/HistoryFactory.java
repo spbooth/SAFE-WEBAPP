@@ -47,6 +47,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableStructureListener;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.TimePurgeFactory;
 import uk.ac.ed.epcc.webapp.model.data.BasicType;
 import uk.ac.ed.epcc.webapp.model.data.CachedIndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -89,7 +90,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 
 
-public class HistoryFactory<P extends DataObject,H extends HistoryFactory.HistoryRecord<P>> extends DataObjectFactory<H> implements HistoryHandler<P>, TableStructureListener {
+public class HistoryFactory<P extends DataObject,H extends HistoryFactory.HistoryRecord<P>> extends DataObjectFactory<H> implements HistoryHandler<P>, TableStructureListener,TimePurgeFactory {
 	
 
 	public static final Feature HISTORY_CACHE_FEATURE = new Feature("history_cache",true,"should history factories cache the peer objects to save on lookups");
@@ -1074,6 +1075,15 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		} catch (DataFault e) {
 			getLogger().error("Problem expiring records",e);
 		}
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.TimePurgeFactory#purgeOldData(java.util.Date)
+	 */
+	@Override
+	public void purgeOldData(Date epoch) throws Exception {
+		FilterDelete<H> del = new FilterDelete<>(res);
+		del.delete(new TimeFilter(END_TIME_FIELD, MatchCondition.LT, epoch));
+		
 	}
 
 }
