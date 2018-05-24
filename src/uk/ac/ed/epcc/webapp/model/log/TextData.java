@@ -16,7 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.log;
 
-import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -35,14 +34,8 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 public class TextData extends DataObject implements Removable {
 
-	public static final String DEFAULT_TABLE = "TextData";
-	private static final String TEXT = "Text";
-	public TextData(AppContext context, int i) throws DataException {
-		super(getRecord(context,DEFAULT_TABLE,i));
-	}
-	public TextData(AppContext context) {
-		super(getRecord(context,DEFAULT_TABLE));
-	}
+	static final String TEXT = "Text";
+	
 	public TextData(Repository.Record rec){
 		super(rec);
 	}

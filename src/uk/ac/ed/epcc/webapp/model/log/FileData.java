@@ -35,18 +35,11 @@ import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamDataWrapper;
 
 
 public class FileData extends DataObject implements Removable {
-    public static final String DEFAULT_TABLE = "FileData";
-	private static final String DATA = "Data";
+  
+	static final String DATA = "Data";
 	private static final String MIME_TYPE = "MimeType";
 	private static final String NAME = "Name";
 	
-    public FileData(AppContext conn, int id) throws DataException{
-    	super(getRecord(conn,DEFAULT_TABLE,id));
-    }
-	
-    public FileData(AppContext context) {
-		super(getRecord(context,DEFAULT_TABLE));
-	}
 
 	/**
 	 * @param res
@@ -60,12 +53,7 @@ public class FileData extends DataObject implements Removable {
     	record.setProperty(NAME,msd.getName());
     	record.setProperty(DATA, msd);
     }
-	public FileData copy() throws DataFault{
-		FileData dat = new FileData(getContext());
-		dat.setData(getData());
-		dat.commit();
-		return dat;
-	}
+	
     public MimeStreamData getData() throws DataFault{
     	return new MimeStreamDataWrapper(record.getStreamDataProperty(DATA),record.getStringProperty(MIME_TYPE),record.getStringProperty(NAME));
     }
