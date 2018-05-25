@@ -58,7 +58,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	private static final Preference LOCK_SINGLE_CHOICE_UNPUT_FEATURE = new Preference("html.lock_single_choice_inputs", true,"Single choice pull-downs shown as text fields");
 	private static final Preference ESCAPE_UNICODE_FEATURE = new Preference("html.input.escape_unicode",false,"Escape high code point characters in input values");
 	private static final Feature USE_DATALIST = new Feature("html5.use_datalist",true,"Use html5 datalist syntax, disable to test the fallback mode (as if browser does not userstand datalist)");
-	
+	private static final Feature LOCK_FORCED_LIST = new Feature("html.lost_input.lock_forces",false,"Supress mandatory pull-down inputs with a single choice");
 	AppContext conn;
 	private SimpleXMLBuilder hb;
 	private boolean use_post;
@@ -164,7 +164,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 		assert(input!=null);
 		boolean optional = input instanceof OptionalInput && ((OptionalInput)input).isOptional();
 		
-		if( ! optional && input.getCount() == 1) {
+		if( ! optional && LOCK_FORCED_LIST.isEnabled(conn) &&input.getCount() == 1) {
 			Iterator<T> iter = input.getItems();
 			T item = iter.next();
 			hb.clean(input.getText(item));

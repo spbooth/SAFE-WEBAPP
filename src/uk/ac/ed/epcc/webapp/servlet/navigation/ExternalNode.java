@@ -23,6 +23,12 @@ import uk.ac.ed.epcc.webapp.servlet.ServletService;
 
 public class ExternalNode extends Node {
 
+	@Override
+	public String getTargetAttr() {
+		// Open external links in new tab/window
+		return "_blank";
+	}
+
 	/**
 	 * 
 	 */

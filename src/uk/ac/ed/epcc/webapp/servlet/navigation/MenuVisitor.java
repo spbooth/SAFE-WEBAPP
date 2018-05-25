@@ -137,6 +137,10 @@ public class MenuVisitor implements Visitor{
 				if( key != 0 ){
 					builder.attr("accesskey",String.valueOf(key));
 				}
+				String target_attr = node.getTargetAttr();
+				if( target_attr != null ) {
+					builder.attr("target",target_attr);
+				}
 				String image = node.getImage();
 				if( image == null ){
 					builder.clean(node.getMenuText(conn));

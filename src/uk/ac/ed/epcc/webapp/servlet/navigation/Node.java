@@ -104,6 +104,9 @@ public abstract class Node extends NodeContainer implements Externalizable{
 
 		return target_url;
 	}
+	public String getTargetAttr() {
+		return null;
+	}
 
 	/**
 	 * @param conn
