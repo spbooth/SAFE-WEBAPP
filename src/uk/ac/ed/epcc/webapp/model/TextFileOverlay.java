@@ -486,7 +486,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 				dat.getContext().error(e,"Update failed");
 				throw new ActionException("Update failed");
 			}
-			return new MessageResult("object_updated",type_name);
+			return new MessageResult("object_updated",type_name,dat);
 		}
 		
 	}
@@ -511,7 +511,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 				dat.getContext().error(e,"Revert failed");
 				throw new ActionException("Revert failed");
 			}
-			return new MessageResult("object_updated",type_name);
+			return new MessageResult("object_updated",type_name,dat);
 		}
 		
 	}
@@ -592,7 +592,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		}
 
 		public FormResult getResult(String typeName, T dat, Form f) {
-			return new MessageResult("object_updated",typeName);
+			return new MessageResult("object_updated",typeName,dat);
 		}
 
 		/* (non-Javadoc)

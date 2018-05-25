@@ -16,7 +16,10 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data.forms;
 
+import uk.ac.ed.epcc.webapp.content.UIGenerator;
+import uk.ac.ed.epcc.webapp.content.UIProvider;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.Identified;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
@@ -88,7 +91,11 @@ public class Creator<BDO extends DataObject> extends DataObjectFormFactory<BDO> 
 	}
 	
 	public FormResult getResult(String type_name,BDO dat, Form f) {
-		MessageResult res = new MessageResult("object_created",type_name);
+		Object thing = type_name;
+		if( dat instanceof UIGenerator || dat instanceof UIProvider || dat instanceof Identified) {
+			thing = dat;
+		}
+		MessageResult res = new MessageResult("object_created",type_name,thing);
 		
 		return res;
 	}

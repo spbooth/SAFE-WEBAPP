@@ -101,7 +101,7 @@ public static class RoleAction<U extends AppUser> extends FormAction{
 				p.getContext().error(e,"Error modifying role");
 			}
 		}
-		return new MessageResult("object_updated",type_name);
+		return new MessageResult("object_updated",type_name,type_name);
 	}
 	
 }

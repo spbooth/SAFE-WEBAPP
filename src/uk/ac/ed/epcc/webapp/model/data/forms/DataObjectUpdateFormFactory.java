@@ -18,7 +18,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.content.UIGenerator;
+import uk.ac.ed.epcc.webapp.content.UIProvider;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.Identified;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -132,7 +135,11 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 	}
 
 	public FormResult getResult(String typeName, BDO dat, Form f) {
-		return new MessageResult("object_updated",typeName);
+		Object thing = typeName;
+		if( dat instanceof UIGenerator || dat instanceof UIProvider || dat instanceof Identified) {
+			thing = dat;
+		}
+		return new MessageResult("object_updated",typeName,thing);
 	}
 
 }

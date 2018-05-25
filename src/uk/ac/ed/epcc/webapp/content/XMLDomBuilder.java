@@ -37,6 +37,7 @@ public class XMLDomBuilder implements SimpleXMLBuilder {
     private final DocumentFragment frag;
     private Stack<Element> stack;
     private String ns=null;
+    private String prefix=null;
     private XMLDomBuilder parent=null;
     public XMLDomBuilder(DocumentFragment fragment){
     	frag=fragment;
@@ -44,6 +45,9 @@ public class XMLDomBuilder implements SimpleXMLBuilder {
     }
     public void setNameSpace(String ns){
     	this.ns=ns;
+    }
+    public void setPrefix(String prefix) {
+    	this.prefix=prefix;
     }
     public DocumentFragment getFragment(){
     	return frag;
@@ -91,7 +95,7 @@ public class XMLDomBuilder implements SimpleXMLBuilder {
 		Element e;
 		Document doc = frag.getOwnerDocument();
 		if( ns != null ){
-			e = doc.createElementNS(ns, tag);
+			e = doc.createElementNS(ns, isEmpty() ? tag : prefix+":"+tag);
 		}else{
 			e=doc.createElement(tag);
 		}
@@ -110,6 +114,12 @@ public class XMLDomBuilder implements SimpleXMLBuilder {
 			}
 		}
 		return this;
+	}
+	/**
+	 * @return
+	 */
+	private boolean isEmpty() {
+		return prefix == null || prefix.trim().isEmpty();
 	}
 	public SimpleXMLBuilder attr(String name, CharSequence s) {
 		Element e = stack.peek();
