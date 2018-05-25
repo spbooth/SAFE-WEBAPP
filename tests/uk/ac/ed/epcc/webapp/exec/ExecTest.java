@@ -96,14 +96,18 @@ public class ExecTest extends WebappTestBase {
 		// To be cross platform test with java 
 		URL location = Sleep.class.getResource(Sleep.class.getSimpleName()+".class");
 		String path =location.getPath();
-		path=path.replaceAll("%20", " ");
-		int start=0;
+		path=path.substring(0, path.indexOf("uk"));
+		
+		
 		if(path.startsWith("/") && ! File.separator.equals("/")){
 			// on windows you get /C:path that does not work as classpath
-			start++;
+			// and directory names may contain spaces
+			path=path.substring(1);
+			path=path.replaceAll("%20", " ");
+			path="\""+path+"\"";
 		}
-		path=path.substring(start, path.indexOf("uk"));
-		String txt = "java -classpath \""+path+"\" "+Sleep.class.getCanonicalName();
+		
+		String txt = "java -classpath "+path+" "+Sleep.class.getCanonicalName();
 		return txt;
 	}
 	
