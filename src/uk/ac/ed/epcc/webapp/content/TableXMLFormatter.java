@@ -48,7 +48,7 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 	 * @see uk.ac.ed.epcc.webapp.content.TableFormatPolicy#add(uk.ac.ed.epcc.webapp.content.Table)
 	 */
     public  void add(Table<C,R> t){
-    	if( t == null ){
+    	if( t == null || ! t.hasData()){
     		return;
     	}
     	hb.open("table",new String[][]{
