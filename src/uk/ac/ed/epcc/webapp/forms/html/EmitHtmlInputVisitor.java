@@ -163,8 +163,8 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	private  <X,T> void emitListHTML(SimpleXMLBuilder hb,boolean use_post, ListInput<X,T> input, String param) {
 		assert(input!=null);
 		boolean optional = input instanceof OptionalInput && ((OptionalInput)input).isOptional();
-		
-		if( ! optional && LOCK_FORCED_LIST.isEnabled(conn) &&input.getCount() == 1) {
+		boolean forced=! optional &&input.getCount() == 1;
+		if( forced && LOCK_FORCED_LIST.isEnabled(conn) ) {
 			Iterator<T> iter = input.getItems();
 			T item = iter.next();
 			hb.clean(input.getText(item));
@@ -227,7 +227,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			String tag = input.getTagByItem(current);
 			hb.open("option");
 			hb.attr("value", tag );
-			if (def != null && def.equals(tag)) {
+			if ((def != null && def.equals(tag)) || forced) {
 				hb.attr("selected",null);
 				seen_selected=true;
 			}

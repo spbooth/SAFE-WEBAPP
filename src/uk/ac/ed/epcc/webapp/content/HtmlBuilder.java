@@ -33,6 +33,7 @@ import uk.ac.ed.epcc.webapp.forms.html.AddButtonVisitor;
 import uk.ac.ed.epcc.webapp.forms.html.AddLinkVisitor;
 import uk.ac.ed.epcc.webapp.forms.html.EmitHtmlInputVisitor;
 import uk.ac.ed.epcc.webapp.forms.html.InputIdVisitor;
+import uk.ac.ed.epcc.webapp.forms.inputs.CanSubmitVisistor;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.PrefixInput;
@@ -479,6 +480,19 @@ private String form_id=null;
  * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addActionButtons(uk.ac.ed.epcc.webapp.forms.Form)
  */
 public void addActionButtons(Form f) {
+	boolean can_submit=true;
+	CanSubmitVisistor vis = new CanSubmitVisistor();
+	for( Iterator<String>it = f.getFieldIterator(); it.hasNext() ;) {
+		Input i = f.getInput(it.next());
+		try {
+			if( ! ((Boolean)i.accept(vis))) {
+				can_submit=false;
+			}
+		} catch (Exception e) {
+			getLogger(f.getContext()).error("Error checking submit",e);
+		}
+	}
+	
 	Iterator<String> it = f.getActionNames();
 	if( it.hasNext()){
 		open("fieldset");
@@ -497,6 +511,9 @@ public void addActionButtons(Form f) {
 			if( ! action.getMustValidate()){
 				attr("formnovalidate",null);
 			}
+			if( action.wantNewWindow()) {
+				attr("formtarget","_blank");
+			}
 			
 			String help = action.getHelp();
 			if( help != null){
@@ -512,7 +529,7 @@ public void addActionButtons(Form f) {
 				attr("name",name);
 			}
 			attr("value",name);
-			if( action instanceof DisabledAction){
+			if( action instanceof DisabledAction || ! can_submit){
 				attr("disabled",null);
 			}
 			if( content != null ){

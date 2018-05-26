@@ -36,6 +36,15 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 public abstract class FormAction{
 String confirm = null;  // 
 	private boolean must_validate=true;
+	private boolean new_window=false;
+
+	public boolean wantNewWindow() {
+		return new_window;
+	}
+
+	public void setNewWindow(boolean new_window) {
+		this.new_window = new_window;
+	}
 
 	/** Perform  the actual action based on the form parameters.
 	 * Throw a {@link TransitionException} to show an error message to the user.
