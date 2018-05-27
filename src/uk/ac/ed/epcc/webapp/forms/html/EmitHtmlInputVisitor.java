@@ -19,6 +19,7 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.inputs.AutoComplete;
@@ -60,14 +61,14 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	private static final Feature USE_DATALIST = new Feature("html5.use_datalist",true,"Use html5 datalist syntax, disable to test the fallback mode (as if browser does not userstand datalist)");
 	private static final Feature LOCK_FORCED_LIST = new Feature("html.lost_input.lock_forces",false,"Supress mandatory pull-down inputs with a single choice");
 	AppContext conn;
-	private SimpleXMLBuilder hb;
+	private ExtendedXMLBuilder hb;
 	private boolean use_post;
 	private boolean use_html5;
 	private boolean use_required=true;
 	private Map post_params;
 	private InputIdVisitor id_vis;
 	private Object radio_selector=null;
-	public EmitHtmlInputVisitor(AppContext conn,SimpleXMLBuilder hb, boolean use_post, Map post_params,String prefix){
+	public EmitHtmlInputVisitor(AppContext conn,ExtendedXMLBuilder hb, boolean use_post, Map post_params,String prefix){
 		this.conn=conn;
 		this.hb=hb;
 		this.use_post=use_post;
@@ -93,7 +94,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	public void setUseRequired(boolean use_required){
 		this.use_required=use_required;
 	}
-	private void  emitBinaryHTML(SimpleXMLBuilder hb, boolean use_post, BinaryInput input,
+	private void  emitBinaryHTML(ExtendedXMLBuilder hb, boolean use_post, BinaryInput input,
 			String param) {
 
 		String checked = null;
@@ -121,14 +122,14 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 		if( checked != null){
 		  hb.attr(checked,null);
 		}
-		hb.attr("class","input");
+		hb.addClass("input");
 		hb.close();
 
 	}
 	
 	
 
-	protected void emitFileHTML(SimpleXMLBuilder hb,boolean use_post, FileInput input,
+	protected void emitFileHTML(ExtendedXMLBuilder hb,boolean use_post, FileInput input,
 			String param) {
 		String value = null;
 		Object o = input.getValue();
@@ -157,10 +158,10 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 		if (use_post && value != null) {
 			hb.attr("value", value );
 		}
-		hb.attr("class","input");
+		hb.addClass("input");
 		hb.close();
 	}
-	private  <X,T> void emitListHTML(SimpleXMLBuilder hb,boolean use_post, ListInput<X,T> input, String param) {
+	private  <X,T> void emitListHTML(ExtendedXMLBuilder hb,boolean use_post, ListInput<X,T> input, String param) {
 		assert(input!=null);
 		boolean optional = input instanceof OptionalInput && ((OptionalInput)input).isOptional();
 		boolean forced=! optional &&input.getCount() == 1;
@@ -189,7 +190,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			conn.error(e,"Error getting id");
 		}
 		hb.attr("name",input.getKey());
-		hb.attr("class","input");
+		hb.addClass("input");
 		
 		if( use_html5 && use_required && ! optional){
 			hb.attr("required",null);
@@ -256,15 +257,15 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 		}else{
 			// no items !
 			hb.open("span");
-			hb.attr("class", "warn");
+			hb.addClass( "warn");
 			hb.clean("No choices available");
 			hb.close();
 		}
 	}
-	private  <X,T> void emitRadioButtonListHTML(SimpleXMLBuilder hb,boolean use_post, ListInput<X,T> input, String param) {
+	private  <X,T> void emitRadioButtonListHTML(ExtendedXMLBuilder hb,boolean use_post, ListInput<X,T> input, String param) {
 		hb.open("div");
 		
-		hb.attr("class","radiobox");
+		hb.addClass("radiobox");
 		
 		
 		for (Iterator<T> iter = input.getItems(); iter.hasNext();) {
@@ -317,7 +318,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 		}
 		hb.close();
 	}
-	private void emitPasswordHTML(SimpleXMLBuilder hb,boolean use_post, PasswordInput input,
+	private void emitPasswordHTML(ExtendedXMLBuilder hb,boolean use_post, PasswordInput input,
 			String param) {
 		String def = null;
 		if (use_post) {
@@ -337,7 +338,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	
 	}
 
-	private void emitTextHTML(SimpleXMLBuilder hb,boolean use_post, LengthInput input,
+	private void emitTextHTML(ExtendedXMLBuilder hb,boolean use_post, LengthInput input,
 			String param) {
 		String def = null;
 		if (use_post) {
@@ -401,7 +402,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	public <V,T extends Input> Object visitMultiInput(MultiInput<V,T> input) throws Exception {
 		if( input.hasLineBreaks()){
 			hb.open("table");
-			hb.attr("class","multi_input");
+			hb.addClass("multi_input");
 			for(String sub_key : input.getSubKeys()){
 				hb.open("tr");
 					if( input.hasSubLabels()){
@@ -422,7 +423,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			hb.close();
 		}else{
 			hb.open("span");
-			hb.attr("class","multi_input");
+			hb.addClass("multi_input");
 			for(String sub_key : input.getSubKeys()){
 				String lab = input.getSubLabel(sub_key);
 				if( lab != null ){
@@ -486,7 +487,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	 * @param default_value
 	
 	 */
-	private void emitTextParam(SimpleXMLBuilder result,Input input,String name, String id, int boxwid, int max_result_length,
+	private void emitTextParam(ExtendedXMLBuilder result,Input input,String name, String id, int boxwid, int max_result_length,
 			boolean force_single, boolean force_password,String default_value) {
 	
 		String format_hint=null;
@@ -508,7 +509,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			
 			if (wrapper != null) {
 				result.open("div");
-				result.attr("class", wrapper);
+				result.addClass( wrapper);
 			}
 			
 			result.open("input");
@@ -536,7 +537,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			if (default_value != null && default_value.length() > 0) {
 				result.attr("value",default_value);
 			}
-			result.attr("class","input");
+			result.addClass("input");
 			if (use_datalist) {
 				// add list attribute
 				result.attr("list", name + "_list");
@@ -612,7 +613,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			}
 			result.attr("cols",Integer.toString(size));
 			result.attr("name", name );
-			result.attr("class","input");
+			result.addClass("input");
 			if( id != null ){
 				result.attr("id", id);
 			}

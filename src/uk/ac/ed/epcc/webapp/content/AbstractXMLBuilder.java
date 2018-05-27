@@ -221,9 +221,16 @@ public abstract class AbstractXMLBuilder implements SimpleXMLBuilder {
 	}
 
 	public final SimpleXMLBuilder attr(String name, CharSequence s) {
+		if( ! isInOpen()) {
+			throw new ConsistencyError("Attribute "+name+" added after element content");
+		}
 		attributes.put(name, s);
 		return this;
 	}
+	protected CharSequence getAttribute(String name) {
+		return attributes.get(name);
+	}
+	
 	/** reset back to starting state
 	 * 
 	 */

@@ -87,6 +87,14 @@ public class CanSubmitVisistor implements InputVisitor<Boolean> {
 		if( input.getMaxResultLength() < 1) {
 			return false;
 		}
+		if( input instanceof RangedInput) {
+			RangedInput<?> r = (RangedInput<?>)input;
+			Number min = r.getMin();
+			Number max = r.getMax();
+			if( min != null && max !=null && min.doubleValue()>max.doubleValue()) {
+				return false;
+			}
+		}
 		return true;
 	}
 

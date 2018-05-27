@@ -61,6 +61,7 @@ public interface SimpleXMLBuilder {
 	 */
 	public abstract SimpleXMLBuilder attr(String name, CharSequence s);
 	
+	
 	/** close the last opened tag.
 	 * @return reference to self
 	 */

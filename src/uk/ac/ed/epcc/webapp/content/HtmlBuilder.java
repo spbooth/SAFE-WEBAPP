@@ -57,13 +57,14 @@ public class HtmlBuilder extends HtmlPrinter implements ContentBuilder {
   
 public static final Feature HTML_USE_LABEL_FEATURE = new Preference("html.use_label",true,"generate html labels in automatic forms");
 public static final Feature HTML_TABLE_SECTIONS_FEATURE = new Preference("html.table_sections",false,"generate thead/tbody in tables");
+public static final Feature CONFIRM_ATTR_FEATURE = new Feature("html.form.confirm_attributes",false,"Add known confirm tags as submit input attributes");
 Boolean use_table_section=null;
 
 protected static final class Text extends HtmlPrinter {
 	  Text(HtmlBuilder parent){
 		  super(parent);
 		  open("div");
-		  attr("class","para");
+		  addClass("para");
 	  }
 		@Override
 		public HtmlBuilder appendParent() throws UnsupportedOperationException {
@@ -115,7 +116,7 @@ protected static final class Text extends HtmlPrinter {
 	  Panel(String element,HtmlBuilder parent, String type){
 		  super(parent);
 		  this.element=element;
-		  attr.put("class", type);
+		  addAttr("class",type);
 		  this.type=type;
 	  }
 		@Override
@@ -261,7 +262,7 @@ public <C, R> void addColumn(AppContext conn, Table<C, R> t, C col) {
 
 public void addText(String text) {
 	open("div");
-	attr("class","para");
+	addClass("para");
 	clean(text);
 	close();
 }
@@ -296,15 +297,15 @@ public void addFormTable(AppContext conn,Iterable<Field> form) {
 	boolean even=true;
 	if( it.hasNext() ){
 		open("table");
-		attr("class", "form");
+		addClass( "form");
 		while (it.hasNext()) {
 			Field<?> f = it.next();
 		    try {
 		    	open("tr");
 		    	if( even ){
-		    		attr("class", "even");
+		    		addClass( "even");
 		    	}else{
-		    		attr("class","odd");
+		    		addClass("odd");
 		    	}
 		    	open("th");
 				addFormLabel(conn, f);
@@ -365,9 +366,12 @@ public <I> void addFormLabel(AppContext conn,Field<I> f) {
 		open("span");
 	}
 	if (optional) {
-		attr("class","optional");
+		addClass("optional");
 	}else{
-		attr("class","required");
+		addClass("required");
+	}
+	if( missing) {
+		addClass("missing");
 	}
 	Object details=f.getDetails();
 	if(details==null){
@@ -379,22 +383,20 @@ public <I> void addFormLabel(AppContext conn,Field<I> f) {
 	}
 	close(); // span or label
 
-	if (missing) {
-		open("b");
-		open("span");
-		attr("class", "warn");
-		clean("*");
-		close(); //span
-		close(); //b
-	}
+//	if (missing) {
+//		open("b");
+//		open("span");
+//		addClass( "warn");
+//		clean("*");
+//		close(); //span
+//		close(); //b
+//	}
 	if (error != null) {
 		nbs();
-		open("b");
 		open("span");
-		attr("class", "warn");
+		addClass( "field_error");
 		clean(error);
 		close(); //span
-		close(); //b
 	}
 	
 }
@@ -480,6 +482,7 @@ private String form_id=null;
  * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addActionButtons(uk.ac.ed.epcc.webapp.forms.Form)
  */
 public void addActionButtons(Form f) {
+	boolean confirm_attr = CONFIRM_ATTR_FEATURE.isEnabled(f.getContext());
 	boolean can_submit=true;
 	CanSubmitVisistor vis = new CanSubmitVisistor();
 	for( Iterator<String>it = f.getFieldIterator(); it.hasNext() ;) {
@@ -496,7 +499,7 @@ public void addActionButtons(Form f) {
 	Iterator<String> it = f.getActionNames();
 	if( it.hasNext()){
 		open("fieldset");
-		attr("class", "action_buttons");
+		addClass( "action_buttons");
 		while ( it.hasNext()) {
 			String name =  it.next();
 			FormAction action = f.getAction(name);
@@ -506,7 +509,7 @@ public void addActionButtons(Form f) {
 			}else{
 				open("input");
 			}
-			attr("class","input_button");
+			addClass("input_button");
 			attr("type","submit");
 			if( ! action.getMustValidate()){
 				attr("formnovalidate",null);
@@ -531,6 +534,17 @@ public void addActionButtons(Form f) {
 			attr("value",name);
 			if( action instanceof DisabledAction || ! can_submit){
 				attr("disabled",null);
+			}
+			if( confirm_attr) {
+				try{
+					String confirm = action.getConfirm(f);
+					if( confirm != null) {
+						// This is to allow script based confirm dialogs
+						attr("confirm",confirm);
+					}
+				}catch(Throwable t) {
+					getLogger(f.getContext()).error("Error checking for confirm string",t);
+				}
 			}
 			if( content != null ){
 				addObject(content);

@@ -38,7 +38,7 @@ public class PercentInput extends DoubleInput {
 	   setUnit("(Percentage)");
    }
    @Override
-public String formatRange(Number n) {
+public String formatRange(Double n) {
 	return Integer.toString((int)(n.doubleValue()*100.0));
 }
 @Override

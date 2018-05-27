@@ -360,4 +360,11 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 	public ContentBuilder getDetails(String summary_text) {
 		return getPanel();
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder#addClass(java.lang.CharSequence)
+	 */
+	@Override
+	public SimpleXMLBuilder addClass(CharSequence s) {
+		return this;
+	}
 }

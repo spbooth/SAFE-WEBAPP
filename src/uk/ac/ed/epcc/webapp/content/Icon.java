@@ -48,7 +48,7 @@ public class Icon implements UIGenerator {
 		ServletService service = conn.getService(ServletService.class);
 		if( service != null){
 			p.open("img");
-			p.attr("class","icon");
+			p.addClass("icon");
 			p.attr("alt", text);
 			p.attr("src",service.encodeURL(image));
 			p.close();

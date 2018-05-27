@@ -32,8 +32,8 @@ public interface BoundedInput<T> extends HTML5Input {
 	 */
 	public abstract T getMax();
 	
-	/** format step/range values compatible to the way they are  
-	 * presented. for example a percent imput may use 0.0 and 1.0 but present as 0, 100
+	/** format step/range values as used by the input into compatible to the way they are  
+	 * presented. for example a percent input may use 0.0 and 1.0 but present as 0, 100
 	 * used  to generate HTML5 ranges.
 	 * 
 	 * @param n

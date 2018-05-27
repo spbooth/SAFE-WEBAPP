@@ -24,7 +24,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 
 /** A {@link FormAction} that provides custom handling of a form that fails to validate.
  * 
- * This behaviour only applies in the web-context where form submission and validation are s.
+ * This behaviour only applies in the web-context where form submission and validation are seperate.
  * @author spb
  *
  */

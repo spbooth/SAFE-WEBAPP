@@ -51,7 +51,7 @@ public class HtmlPrinter extends XMLPrinter implements ExtendedXMLBuilder{
 	public final boolean longLines(int max, String s) {
 		boolean is_long=false;
 		open("p");
-		attr("class", "longlines");
+		addClass("longlines");
 		clean("\n");
 		for(String line : s.split("\n")){
 			String tmp = line.replace("\t", "        ");
@@ -83,6 +83,22 @@ public class HtmlPrinter extends XMLPrinter implements ExtendedXMLBuilder{
 		endOpen();
 		sb.append("<br/>\n");
 		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder#addClass(java.lang.CharSequence)
+	 */
+	@Override
+	public SimpleXMLBuilder addClass(CharSequence s) {
+		CharSequence prev = getAttribute("class");
+		if( prev == null) {
+			prev=s;
+		}else {
+			StringBuilder sb = new StringBuilder(prev);
+			sb.append(' ');
+			sb.append(s);
+			prev=sb.toString();
+		}
+		return attr("class", prev);
 	}
 
 }

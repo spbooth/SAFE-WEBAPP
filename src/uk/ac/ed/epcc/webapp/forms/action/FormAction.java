@@ -62,6 +62,7 @@ String confirm = null;  //
 	 * If not null it is the name of the confirm message in the confirm.properties
 	 * <p>
 	 * The form is passed to allow a sub-class to trigger confirm based on form parameters.
+	 * However in this case the implementation must handle an incomplete form.
 	 * 
 	 * @param f Form calling action.
 	 * 

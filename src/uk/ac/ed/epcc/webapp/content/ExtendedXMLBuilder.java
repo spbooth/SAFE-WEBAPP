@@ -35,4 +35,16 @@ public interface ExtendedXMLBuilder extends SimpleXMLBuilder{
 	 */
 	public abstract void br();
 	
+	/** Convenience method to add an additional class attribute using
+	 * the HTML convention that multiple classes are represented 
+	 * as one attribute with values separated by spaces.
+	 * 
+	 * It is only legal to call this after a
+	 * call to open and before close or clean.
+	 * 
+	 * @param s CharSequence attribute value or null for no value
+	 * @return reference to self
+	 */
+	public abstract SimpleXMLBuilder addClass(CharSequence s);
+	
 }

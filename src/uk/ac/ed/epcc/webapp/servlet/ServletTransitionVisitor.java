@@ -186,7 +186,7 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 				ValidatingFormTransition<T> t) throws TransitionException {
 			return doBaseFormTransition(t);
 		}
-		/** confirm a transition along lines of {@link SessionServlet} confirm method.
+		/** confirm a transition along lines of {@link WebappServlet} confirm method.
 		 * 
 		 * @param req
 		 * @param conn

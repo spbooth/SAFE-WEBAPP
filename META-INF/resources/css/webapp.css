@@ -261,7 +261,28 @@ table.form{
    
 }
 
-
+label.required, span.required {
+	font-weight: bold;
+}
+/* Add a black star to labels of required fields.
+ */
+label.required::after, span.required::after {
+	content: " \2605"
+}
+label.missing::after, span.missing::after {
+	color: #ff0000
+}
+/* Label for an optional form parameter
+ */
+.optional{
+	color: #555555;
+}
+/* error added to a form input label 
+ */
+.field_error{
+	font-weight: bold;
+	color: #ff0000;
+}
 table.form tr {
         width: 100%;
 }
@@ -462,9 +483,7 @@ text-align: center;
 .lightgrey{
 	background-color: #e7e7e7;
 }
-.optional{
-	color: #555555;
-}
+
 /* rules for the survey code */
 div.question_noanswer, div.question_answered{
  text-align: center;

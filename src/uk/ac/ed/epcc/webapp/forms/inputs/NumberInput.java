@@ -74,13 +74,13 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 		return min;
 	}
 
-	public Number getStep(){
+	public N getStep(){
 		if( step != null ){
 			return step;
 		}
 		if( nf != null ){
 			if( nf.isParseIntegerOnly()){
-				return 1;
+				return convert(1);
 			}
 		}
 		return null;
@@ -164,10 +164,10 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 		}
 		Number n = (Number) o;
 		if (min != null && n.doubleValue() < min.doubleValue()) {
-			throw new ValidateException("Too small minimum value="+formatRange(min));
+			throw new ValidateException("Too small minimum value="+getString(min));
 		}
 		if (max != null && n.doubleValue() > max.doubleValue()) {
-			throw new ValidateException("Too large maximum value="+formatRange(max));
+			throw new ValidateException("Too large maximum value="+getString(max));
 		}
 	}
 
@@ -175,20 +175,20 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 
 	@Override
 	public String getString(N val) {
+		if(val == null){
+			return null;
+		}
 		if( nf != null && val != null){
 			return nf.format(val);
 		}
 		return super.getString(val);
 	}
 
-	public String formatRange(Number n) {
-		if(n == null){
-			return null;
-		}
-		if( nf != null ){
-			return nf.format(n);
-		}
-		return n.toString();
+	public String formatRange(N n) {
+		// Normally getString is the correct conversion
+		//This handles scale factors
+		// only override explicitly if parse format contains extra markup.
+		return getString(n);
 	}
 
 	public String getType() {

@@ -82,7 +82,7 @@ public class LongInput extends NumberInput<Long> {
 	}
 
 	@Override
-	public Number getStep() {
+	public Long getStep() {
 		return 1L;
 	}
 }

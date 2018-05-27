@@ -82,7 +82,7 @@ public class IntegerInput extends NumberInput<Integer> {
 	}
 
 	@Override
-	public Number getStep() {
+	public Integer getStep() {
 		return 1;
 	}
 }

@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.forms.html;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.XMLGenerator;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
@@ -32,7 +33,7 @@ public class InputGenerator implements XMLGenerator{
 		this.conn=conn;
 	}
 	public SimpleXMLBuilder addContent(SimpleXMLBuilder builder) {
-		EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(conn,builder, use_post, post_params,null);
+		EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(conn,(ExtendedXMLBuilder)builder, use_post, post_params,null);
 		try {
 			i.accept(vis);
 		} catch (Exception e) {
