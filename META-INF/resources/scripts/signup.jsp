@@ -66,7 +66,7 @@ This is the <%=service_name%> <%=website_name%>.
 <%@ include file="/scripts/form_context.jsf" %>
 <%
 String default_charset = conn.getService(ServletService.class).defaultCharset();
-AppUserFactory person_fac =  session_service.getLoginFactory();
+AppUserFactory<?> person_fac =  session_service.getLoginFactory();
 HTMLCreationForm creator = new HTMLCreationForm("Signup",person_fac.getSignupFormCreator(RegisterServlet.getRealm(conn),conn.getService(ServletService.class).getWebName()));
 boolean multi = creator.useMultiPart();
 %>
@@ -74,11 +74,16 @@ boolean multi = creator.useMultiPart();
 <h2>Registration form</h2>
 <% if( person_fac.hasComposite(PasswordAuthComposite.class)){ %>
 <p class="highlight"> This form is to sign-up for a new <%=website_name%> account.
-If you already have an account or have forgotten your password go
-<a href="<%= response.encodeURL(web_path+"/login.jsp") %>">here</a>.
+If you already have an account then
+<a href="<%= response.encodeURL(web_path+"/login.jsp") %>">login</a>.
+<% PasswordAuthComposite password_auth = person_fac.getComposite(PasswordAuthComposite.class);
+if( password_auth != null && password_auth.canResetPassword(null)){
+%>
+If you have forgotten your password, then <a href="<%=response.encodeURL(web_path+"/reset_password.jsp") %>">recover your password</a>.
+<%} %>
 </p>
 <%} %>
-<p>Fields marked in <b>bold</b> are mandatory.</p>
+<p>Fields marked in <span class='required'>bold</span> are mandatory.</p>
 <%= person_fac.addUpdateNotes(new HtmlBuilder(),null) %>
 <%@ include file="/scripts/privacy_policy.jsf" %>
   <form method="post" 
