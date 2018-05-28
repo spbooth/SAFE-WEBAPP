@@ -21,14 +21,14 @@ details update.
 <%@ page import="uk.ac.ed.epcc.webapp.forms.*,uk.ac.ed.epcc.webapp.forms.html.*" %>
 <wb:formpage/>
 <%
-String page_title="Email Change Request";
+String page_title="Update Email";
 
 %>
 <%@ include file="/std_header.jsf" %>
 <%@ include file="/main__logged_in.jsf"%>
 
 <div class='block'>
-<h2>Email Change Request Form</h2>
+<h2><%=page_title %></h2>
 <p><wb:content message="change_email"/>
 <% 
 AppUserFactory login_fac = session_service.getLoginFactory();
@@ -49,7 +49,7 @@ if( login_fac.hasComposite(PasswordAuthComposite.class) && realm != null && real
 <form method="post" 
    action="<%= response.encodeURL(web_path+"/EmailChangeRequestServlet") %>">
   <input type="hidden" name="form_url" value="<%=HTMLForm.getFormURL(request)%>" />
-  <input type='hidden' name='Action' value='Request'/>
+  <input type='hidden' name='Action' value='Update'/>
   <%=f.getHtmlFieldTable(request) %>
   <%=f.getActionButtons() %>
   </form>
