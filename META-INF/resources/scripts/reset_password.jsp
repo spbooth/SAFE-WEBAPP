@@ -87,19 +87,15 @@ remember your password, you can use this form to send yourself a password recove
 <form method="post" action="<%= response.encodeURL(web_path+"/LoginServlet") %>">
    <table class="form">
 	<tr>
-		<td><b><%=fac.getNameLabel() %>:</b></td>
-		<td><input type="text" class="input" name="username" required/></td>
+		<td><label for="name" class="required"><%=fac.getNameLabel() %></label></td>
+		<td><input id="name" type="text" class="input" name="username" required/></td>
 	</tr>
-	<tr>
-		<td colspan="2">&nbsp;</td>
-	</tr>
-
-	<tr>
-		<td><b>Request a new <%=website_name %> password:</b></td>
-		<td><input type="submit" name="email_password" value="Send me an Email"
-			class="input_button" /></td>
-	</tr>
-  </table>
+	</table>
+	<fieldset class="action_buttons">
+	<input type="submit" name="email_password" value="Send password recovery email"
+			class="input_button" />
+	<a href="<%=response.encodeURL(web_path+"/login.jsp") %>">Cancel</a>
+	</fieldset>
 </form>
 </div>
 <% } %>
