@@ -499,7 +499,8 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			wrapper=((WrappedInput)input).getWrapperClass();
 		}
 		boolean old_escape = result.setEscapeUnicode(! force_password && ESCAPE_UNICODE_FEATURE.isEnabled(conn));
-		if (force_single || max_result_length <= 2 * boxwid) {
+		// max_result_length <= 0 is unlimited
+		if (force_single || ( max_result_length > 0 && max_result_length <= 2 * boxwid)) {
 			int size = max_result_length;
 			if (max_result_length > boxwid) {
 				size = boxwid;
@@ -600,10 +601,8 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			}
 		} else {
 			int rows = ((max_result_length + boxwid - 1) / boxwid);
-			int size = (max_result_length + rows - 1) / rows;
 			int max_text_rows = conn.getIntegerParameter(HTML_TEXTAREA_MAX_ROWS, 24);
-		
-			if (rows > max_text_rows) {
+			if (max_result_length <= 0 || rows > max_text_rows) {
 				rows = max_text_rows;
 			}
 			result.open("textarea");
@@ -611,7 +610,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			if( use_html5 ){
 				result.attr("wrap","soft");
 			}
-			result.attr("cols",Integer.toString(size));
+			result.attr("cols",Integer.toString(boxwid));
 			result.attr("name", name );
 			result.addClass("input");
 			if( id != null ){
