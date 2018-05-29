@@ -221,7 +221,7 @@ public abstract class AbstractXMLBuilder implements SimpleXMLBuilder {
 	}
 
 	protected void badAttribute(String name) {
-		throw new ConsistencyError("Attribute "+name+" added after element content");
+		//throw new ConsistencyError("Attribute "+name+" added after element content");
 	}
 	public final SimpleXMLBuilder attr(String name, CharSequence s) {
 		if( ! isInOpen()) {
