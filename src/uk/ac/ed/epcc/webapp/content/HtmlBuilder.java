@@ -81,7 +81,29 @@ protected static final class Text extends HtmlPrinter {
 			clean(text);
 		}
 		public ExtendedXMLBuilder getText() {
-			return new HtmlPrinter(this);
+			return new SpanText(this);
+		}
+	}
+protected static final class SpanText extends HtmlPrinter {
+	  SpanText(HtmlPrinter parent){
+		  super(parent);
+		  open("span");
+	  }
+		@Override
+		public HtmlBuilder appendParent() throws UnsupportedOperationException {
+			if( isInOpen() && sb.length()==0){
+				// this is an empty div which confuses some browsers
+				// supress box entirely
+				return (HtmlBuilder) getParent();
+			}
+			close();
+			return (HtmlBuilder) super.appendParent();
+		}
+		public void addText(String text) {
+			clean(text);
+		}
+		public ExtendedXMLBuilder getText() {
+			return new SpanText(this);
 		}
 	}
   protected static final class Heading extends HtmlBuilder {
@@ -106,7 +128,7 @@ protected static final class Text extends HtmlPrinter {
 			clean(text);
 		}
 		public ExtendedXMLBuilder getText() {
-			return new HtmlPrinter(this);
+			return new SpanText(this);
 		}
 	}
   public static final class Panel extends HtmlBuilder {

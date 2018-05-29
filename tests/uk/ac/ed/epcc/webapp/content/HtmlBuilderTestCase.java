@@ -302,4 +302,17 @@ public class HtmlBuilderTestCase extends WebappTestBase {
 		hb.addParent();
 		Assert.assertEquals("test text", parent.toString());
 	}
+	
+	@Test
+	public void testNest() {
+		HtmlBuilder parent = new HtmlBuilder();
+		ContentBuilder h2 = parent.getHeading(2);
+		ExtendedXMLBuilder h = h2.getText();
+		
+		h.addClass("warn");
+		h.clean("1234");
+		h.appendParent();
+		h2.addParent();
+		assertEquals("<h2><span class='warn'>1234</span></h2>", parent.toString().trim());
+	}
 }

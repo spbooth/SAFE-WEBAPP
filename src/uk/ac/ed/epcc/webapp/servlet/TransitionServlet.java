@@ -564,6 +564,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
          hb.close();
          }
          hb.open("input");
+          hb.addClass("input_button");
           hb.attr("type","submit");
           hb.attr("value", text);
           if( title != null && title.trim().length() > 0){

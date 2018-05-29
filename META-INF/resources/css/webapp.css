@@ -164,7 +164,7 @@ div.report h1, div.report h2, div.report h3, div.report h4{
 /* we use three levels of header as standard 
  * h1 or h2 is the top level header in a block
  * h3 is a secondary header or a header in a div.bar
- * h4 is a smaller header for dubdivisions.
+ * h4 is a smaller header for subdivisions.
 */
 
 h1, h2, h3, h4, h5, h6 {
@@ -172,10 +172,16 @@ h1, h2, h3, h4, h5, h6 {
 	color: black;
     text-align: left;
     line-height: normal;
-    margin: 0;
+    
     padding: 4px;
 }
 
+h1, h2{
+	margin: 8px 0px 0px 0px;
+}
+h3, h4, h5, h6 {
+	margin: 0;
+}
  /*
   * secondary header in a block
   */
@@ -251,6 +257,7 @@ form.button{
 	text-align: right;
 }
 .input_button {
+	margin: 3px 0px;
 	border-style: outset;
 }
 /* table for fine tuning the layout within a form
@@ -312,14 +319,16 @@ div.ifms_summary td.key {
 background-color: #e7e7e7;	
 text-align: left;
 }
-/* paragraph within a block
+/* paragraph within a block add margin at bottom so headers associate with following content
  */
-div.block p,  div.block ul, div.block table, div.block pre{
+div.block p,  div.block ul, div.block pre, div.block div.para, div.block table{
 text-align: left;
 
 }
+/* block content not including table
+ */
 div.block p,  div.block ul, div.block pre, div.block div.para{
-margin: 4px 0px;
+margin: 0px 0px 6px 0px;
 background-color: #e7e7e7;
 color: black;
 padding: 8px;
@@ -357,7 +366,7 @@ div.block table table.auto td, div.block table table.auto th{
 div.block > table.compact, table.compact {
 	    border: none;
 		border-spacing: 0;
-		margin: 3px 0px;	
+		margin: 0px 0px 6px 0px;	
 }
 
 
@@ -423,13 +432,11 @@ details div.description{
 div td, div table.auto td form , div.block td ul{
         background-color: #ffffff;
 }
-td.numeric, td[numeric] , td.notice_numeric, td.numeric input, td.notice_numeric input {
+td.numeric, td[numeric] ,  td.numeric input, {
 text-align: right;
 white-space: nowrap;
 }
-div td.notice_numeric{
-background-color: #ffcccc;
-}
+
 /* a table cell intended to hold a form buton */
 div td.button {
 	text-align: center;
