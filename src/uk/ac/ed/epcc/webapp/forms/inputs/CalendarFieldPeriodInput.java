@@ -16,6 +16,8 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import java.util.Calendar;
 import java.util.Date;
 
+import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.time.CalendarFieldSplitPeriod;
 
  
@@ -162,6 +164,14 @@ public class CalendarFieldPeriodInput extends MultiInput<CalendarFieldSplitPerio
 		splits.setValue(v.getNsplit());
 		return old;
 		
+	}
+	@Override
+	public void validate() throws FieldException {
+		super.validate();
+		int total_periods = count.getValue() * splits.getValue();
+		if( total_periods > RegularPeriodInput.PERIOD_INPUT_MAX_SPLITS) {
+			throw new ValidateException("Too many sub-periods: "+total_periods+">"+RegularPeriodInput.PERIOD_INPUT_MAX_SPLITS);
+		}
 	}
 
 	

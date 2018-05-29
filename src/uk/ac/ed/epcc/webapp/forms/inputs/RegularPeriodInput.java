@@ -24,6 +24,10 @@ import uk.ac.ed.epcc.webapp.time.RegularSplitPeriod;
 
 public class RegularPeriodInput extends MultiInput<RegularSplitPeriod, Input> {
 
+	/**
+	 * 
+	 */
+	public static final int PERIOD_INPUT_MAX_SPLITS = 500;
 	private final TimeStampMultiInput start;
 	private final TimeStampMultiInput end;
 	private final IntegerInput splits;
@@ -58,6 +62,8 @@ public class RegularPeriodInput extends MultiInput<RegularSplitPeriod, Input> {
 		splits.setBoxWidth(2);
 		splits.setMaxResultLength(3);
 		splits.setValue(4);
+		splits.setMin(0);
+		splits.setMax(PERIOD_INPUT_MAX_SPLITS);
 		start.setValue(cal.getTime());
 		addInput("start", "Start Date", start);
 		addInput("end", "End Date",end);
