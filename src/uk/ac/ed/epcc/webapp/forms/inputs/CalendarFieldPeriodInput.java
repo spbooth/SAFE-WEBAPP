@@ -94,6 +94,7 @@ public class CalendarFieldPeriodInput extends MultiInput<CalendarFieldSplitPerio
 		splits.setMin(1);
 		splits.setBoxWidth(2);
 		splits.setMaxResultLength(3);
+		splits.setMax(RegularPeriodInput.PERIOD_INPUT_MAX_SPLITS);
 		splits.setValue(1);
 		addInput("start", "From ", start);
 		
@@ -164,14 +165,6 @@ public class CalendarFieldPeriodInput extends MultiInput<CalendarFieldSplitPerio
 		splits.setValue(v.getNsplit());
 		return old;
 		
-	}
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		int total_periods = count.getValue() * splits.getValue();
-		if( total_periods > RegularPeriodInput.PERIOD_INPUT_MAX_SPLITS) {
-			throw new ValidateException("Too many sub-periods: "+total_periods+">"+RegularPeriodInput.PERIOD_INPUT_MAX_SPLITS);
-		}
 	}
 
 	
