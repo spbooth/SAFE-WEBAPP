@@ -220,9 +220,12 @@ public abstract class AbstractXMLBuilder implements SimpleXMLBuilder {
 		return this;
 	}
 
+	protected void badAttribute(String name) {
+		throw new ConsistencyError("Attribute "+name+" added after element content");
+	}
 	public final SimpleXMLBuilder attr(String name, CharSequence s) {
 		if( ! isInOpen()) {
-			throw new ConsistencyError("Attribute "+name+" added after element content");
+			badAttribute(name);
 		}
 		attributes.put(name, s);
 		return this;

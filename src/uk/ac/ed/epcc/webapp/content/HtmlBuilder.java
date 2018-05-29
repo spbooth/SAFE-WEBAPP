@@ -85,25 +85,32 @@ protected static final class Text extends HtmlPrinter {
 		}
 	}
 protected static final class SpanText extends HtmlPrinter {
+	  private boolean add_span=false;
 	  SpanText(HtmlPrinter parent){
 		  super(parent);
-		  open("span");
 	  }
 		@Override
-		public HtmlBuilder appendParent() throws UnsupportedOperationException {
-			if( isInOpen() && sb.length()==0){
-				// this is an empty div which confuses some browsers
-				// supress box entirely
-				return (HtmlBuilder) getParent();
+		public HtmlPrinter appendParent() throws UnsupportedOperationException {
+			if( add_span) {
+				close();
 			}
-			close();
-			return (HtmlBuilder) super.appendParent();
+			return  (HtmlPrinter) super.appendParent();
 		}
 		public void addText(String text) {
 			clean(text);
 		}
 		public ExtendedXMLBuilder getText() {
 			return new SpanText(this);
+		}
+		@Override
+		protected void badAttribute(String name) {
+			if( !hasContent()) {
+				// add a span element if adding an initial attribute
+				add_span=true;
+				open("span");
+				return;
+			}
+			super.badAttribute(name);
 		}
 	}
   protected static final class Heading extends HtmlBuilder {
