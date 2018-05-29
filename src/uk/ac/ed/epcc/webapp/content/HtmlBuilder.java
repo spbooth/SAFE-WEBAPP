@@ -377,8 +377,11 @@ public <I> void addFormLabel(AppContext conn,Field<I> f) {
 	if(details==null){
 		clean(f.getLabel());
 	}else{
-		ContentBuilder dt = getDetails(f.getLabel());
+		Panel dt = (Panel) getDetails(f.getLabel());
+		dt.open("div");
+		dt.addClass("description");
 		dt.addObject(details);
+		dt.close();
 		dt.addParent();
 	}
 	close(); // span or label
