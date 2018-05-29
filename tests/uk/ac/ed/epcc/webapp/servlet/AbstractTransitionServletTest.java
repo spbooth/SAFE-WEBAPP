@@ -203,6 +203,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	 */
 	public <K,T> void checkViewRedirect(ViewTransitionFactory<K, T> provider, T target) throws TransitionException{
 		checkRedirectToTransition(provider, null, target);
+		assertTrue("redirect to forbidden view",provider.canView(target, getContext().getService(SessionService.class)));
 	}
 
 	@Override
