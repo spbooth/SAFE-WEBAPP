@@ -130,9 +130,7 @@ This service is only available to pre-registered users.
 <%=conn.getExpandedProperty("login.link","")%>
 <% if("login".equals(request.getParameter("error"))) { %>
 <h3>Incorrect <%=fac.getNameLabel()%> or Password</h3>
-<p><b>please check your details and try again</b> <br />
-<small>If you have forgotten your password, enter your Email address and
-click <b>Email</b> and we will send you a new password for the <%=website_name %>.</small> <br />
+<p><b>please check your details and try again</b>
 </p>
 <% } %> <% if("session".equals(request.getParameter("error"))) { %>
 <h3>Session invalid or expired</h3>
@@ -141,6 +139,23 @@ click <b>Email</b> and we will send you a new password for the <%=website_name %
 <h3>Database error</h3>
 <p><b>please try again later</b></p>
 <% } %>
+<% 
+// Give urls for alternate external auth login. Normally just the one but
+// can use comma seperated list to support multiple types.
+String login_urls = conn.getInitParameter("service.web_login.url");
+if(  login_urls != null ){ 
+ String urls[] = login_urls.trim().split("\\s*,\\s*");
+ String labels[] = conn.getInitParameter("service.web_login.login-text","Alternate login").split("\\s*,\\s*");
+ for( int i = 0 ; i < urls.length ; i++){
+%>
+<form class="button" method="get" action="<%=web_path+urls[i] %>">
+<input class="input_button login" type="submit" value="<%=labels[i%labels.length] %>" />
+</form>
+<%
+ }
+%>or<%
+} 
+%>
 <form method="post" action="<%= response.encodeURL(web_path+"/LoginServlet") %>"><%
 	String prev_page = (String) request.getAttribute("page");
     if( prev_page == null ){
@@ -151,66 +166,39 @@ click <b>Email</b> and we will send you a new password for the <%=website_name %
    <input type="hidden" name="page" value="<%= prev_page %>" /> <% } %>
    <table class="form">
 	<tr>
-		<td><b><%=fac.getNameLabel() %>:</b></td>
+		<th><label class='required'><%=fac.getNameLabel() %>:</label></th>
 		<td><input type="text" class="input" name="username" required/></td>
-		<td>&nbsp;</td>
+		<td></td>
 	</tr>
 	<tr>
 
-		<td><b>Password:</b></td>
+		<th><label <%= use_reset_page ? "class='required'":""%>>Password</label></th>
 		<td><input type="password" class="input" name="password" <%= use_reset_page ? "required" :"" %>/></td>
-		<td><input class="input_button" type="submit" value="Login" /></td>
-	</tr>
-	<tr>
-		<td colspan="3">&nbsp;</td>
-	</tr>
+		<td>
+		    <input class="input_button login" type="submit" title="Login using password" value="Login" />
+		    <% if( password_auth.canResetPassword(null) && use_reset_page){ %>
+<a href="<%=response.encodeURL(web_path+"/reset_password.jsp") %>" title="Go to password recovery page">Forgot password?</a> 
+<%}%>
+</td>
+</tr>
 <% if( password_auth.canResetPassword(null) && ! use_reset_page){ %>
 	<tr>
 		<td colspan="2"><b>Request a new <%=website_name %> password:</b></td>
-		<td><input type="submit" name="email_password" value="Email"
-			class="input_button" /></td>
+		<td><input type="submit" name="email_password" title="Request a new password" value="Email"
+			class="input_button login" /></td>
 	</tr>
 <% } %>
-  </table>
+	</table>	
 </form>
-<% 
-// Give urls for alternate external auth login. Normally just the one but
-// can use comma seperated list to support multiple types.
-String login_urls = conn.getInitParameter("service.web_login.url");
-if(  login_urls != null ){ 
- String urls[] = login_urls.trim().split("\\s*,\\s*");
- String labels[] = conn.getInitParameter("service.web_login.login-text","Alternate login").split("\\s*,\\s*");
- for( int i = 0 ; i < urls.length ; i++){
-%>
-<form method="get" action="<%=web_path+urls[i] %>">
-<table class="form">
-<tr>
-<td><b><%=labels[i%labels.length] %></b></td>
-<td><input class="input_button" type="submit" value="Go" /></td>
-</tr>
-</table>
-</form>
-<%
- }
-} 
-%>
+
+<% if( RegisterServlet.ALLOW_SIGNUPS.isEnabled(conn)){ %>
+<a title='Go to registration/signup page' href='<%= response.encodeURL(web_path+"/signup.jsp") %>'>Create an account</a>
+<% } %>
 <p>
 <small><small>As part of its normal functioning when you log in the <%=website_name %> will install a temporary session cookie that will be removed when you log off or close your browser. If you do not wish this cookie 
 to be set, disable cookies in your browser settings.</small></small>
 </p>
-</div>
-<% if( password_auth.canResetPassword(null) && use_reset_page){ %>
-<div class = "block">
-<p>To recover a forgotten password for the <%=website_name %> click
-<a href="<%=response.encodeURL(web_path+"/reset_password.jsp") %>">this link</a>.</p>
-</div>
-<%} %>
-<% if( RegisterServlet.ALLOW_SIGNUPS.isEnabled(conn)){ %>
-<div class="block">
-<p>To create an account on the <%=website_name %> click <a
-	href='<%= response.encodeURL(web_path+"/signup.jsp") %>'><b>here</b></a>.
-</p>
-</div>
-<% } %>
+
+
 <% } %>
 <%@ include file="/login_footer.jsf"%>
