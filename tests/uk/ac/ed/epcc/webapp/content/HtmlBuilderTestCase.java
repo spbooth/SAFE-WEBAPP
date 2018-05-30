@@ -183,7 +183,7 @@ public class HtmlBuilderTestCase extends WebappTestBase {
 	public void testAddButton() {
 		HtmlBuilder hb = new HtmlBuilder();
 		hb.addButton(getContext(), "test button", new RedirectResult("http://test.url"));
-		Assert.assertEquals("<form action='http://test.url'><input type='submit' value='test button'/></form>", hb.toString());
+		Assert.assertEquals("<form action='http://test.url'><input class='input_button' type='submit' value='test button'/></form>", hb.toString());
 	}
 	
 	/**
