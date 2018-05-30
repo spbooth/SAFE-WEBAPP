@@ -545,6 +545,7 @@ public void addActionButtons(Form f) {
 			attr("type","submit");
 			if( ! action.getMustValidate()){
 				attr("formnovalidate",null);
+				can_submit=true;  // don't disable non validating
 			}
 			if( action.wantNewWindow()) {
 				attr("formtarget","_blank");
