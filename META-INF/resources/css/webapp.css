@@ -11,6 +11,13 @@ body {
 	margin: 0;
 }
 
+/** Allow a block heading to be the summary element 
+ */
+div.block details summary h2{
+	display: inline;
+	margin: 0;
+}
+
 /* all divs form a centered column */
 div.block, div.bar, div.textbar,div.text, div.graph {
 width: 46em;
