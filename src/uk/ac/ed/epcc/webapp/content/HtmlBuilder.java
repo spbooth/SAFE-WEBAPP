@@ -567,17 +567,7 @@ public void addActionButtons(Form f) {
 			if( action instanceof DisabledAction || ! can_submit){
 				attr("disabled",null);
 			}
-			if( confirm_attr) {
-				try{
-					String confirm = action.getConfirm(f);
-					if( confirm != null) {
-						// This is to allow script based confirm dialogs
-						attr("confirm",confirm);
-					}
-				}catch(Throwable t) {
-					getLogger(f.getContext()).error("Error checking for confirm string",t);
-				}
-			}
+			
 			if( content != null ){
 				addObject(content);
 			}

@@ -76,6 +76,7 @@ public class AddButtonVisitor implements WebFormResultVisitor {
 		hb.open("form");
 		hb.attr("action", encodeURL(res.getURL()));
 		  hb.open("input");
+		  	hb.attr("class", "input_button");
 		    hb.attr("type", "submit");
 		    hb.attr("value",text);
 	        if( title != null && title.trim().length() > 0){
@@ -92,6 +93,7 @@ public class AddButtonVisitor implements WebFormResultVisitor {
 		hb.open("form");
 		hb.attr("action", encodeURL(res.getURL()));
 		  hb.open("input");
+		  	hb.attr("class", "input_button");
 		    hb.attr("type", "submit");
 		    hb.attr("value",text);
 	        if( title != null && title.trim().length() > 0){
@@ -109,6 +111,7 @@ public class AddButtonVisitor implements WebFormResultVisitor {
 		hb.open("form");
 		hb.attr("action", encodeURL(ServeDataServlet.getURL(conn, res.getProducer(), res.getArgs())));
 		  hb.open("input");
+		    hb.attr("class", "input_button");
 		    hb.attr("type", "submit");
 		    hb.attr("value",text);
 		  hb.close();
