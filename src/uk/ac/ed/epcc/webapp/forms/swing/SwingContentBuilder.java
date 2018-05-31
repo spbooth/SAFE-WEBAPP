@@ -20,6 +20,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.NumberFormat;
 import java.util.Map;
 import java.util.Properties;
@@ -40,6 +41,7 @@ import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlPrinter;
+import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.content.UIProvider;
@@ -223,21 +225,127 @@ public class SwingContentBuilder  implements ContentBuilder{
 		}
 	}
 
-	public static class XMLPanel extends HtmlPrinter{
-		public XMLPanel(SwingContentBuilder parent) {
-			super();
-			this.parent = parent;
-		}
-
+	public static class XMLPanel implements ExtendedXMLBuilder{
+		// XML content built here then converted to stringand added to parent
+		private final ExtendedXMLBuilder nested;
 		private final SwingContentBuilder parent;
-
+		public XMLPanel(SwingContentBuilder parent,ExtendedXMLBuilder nested) {
+			this.parent = parent;
+			this.nested=nested;
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#clean(java.lang.CharSequence)
+		 */
 		@Override
-		public XMLPrinter appendParent() throws UnsupportedOperationException {
-			HtmlPanel comp = new HtmlPanel(toString());
-			parent.setStyle(comp);
-			parent.addComponent(comp);
+		public SimpleXMLBuilder clean(CharSequence s) {
+			nested.clean(s);
+			return this;
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#clean(char)
+		 */
+		@Override
+		public SimpleXMLBuilder clean(char c) {
+			nested.clean(c);
+			return this;
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#clean(java.lang.Number)
+		 */
+		@Override
+		public SimpleXMLBuilder clean(Number i) {
+			nested.clean(i);
+			return this;
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#open(java.lang.String)
+		 */
+		@Override
+		public SimpleXMLBuilder open(String tag) {
+			nested.open(tag);
+			return this;
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#open(java.lang.String, java.lang.String[][])
+		 */
+		@Override
+		public SimpleXMLBuilder open(String tag, String[][] attr) {
+			nested.open(tag, attr);
+			return this;
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#attr(java.lang.String, java.lang.CharSequence)
+		 */
+		@Override
+		public SimpleXMLBuilder attr(String name, CharSequence s) {
+			nested.attr(name, s);
+			return this;
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#close()
+		 */
+		@Override
+		public SimpleXMLBuilder close() {
+			nested.close();
+			return this;
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#getNested()
+		 */
+		@Override
+		public SimpleXMLBuilder getNested() throws UnsupportedOperationException {
+			return nested.getNested();
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#appendParent()
+		 */
+		@Override
+		public SimpleXMLBuilder appendParent() throws UnsupportedOperationException {
+			appendTo(parent);
 			return null;
 		}
+		protected void appendTo(SwingContentBuilder builder) {
+			builder.addText(nested.toString());
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#getParent()
+		 */
+		@Override
+		public SimpleXMLBuilder getParent() {
+			return null;
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#setEscapeUnicode(boolean)
+		 */
+		@Override
+		public boolean setEscapeUnicode(boolean escape_unicode) {
+			return nested.setEscapeUnicode(escape_unicode);
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder#nbs()
+		 */
+		@Override
+		public void nbs() {
+			nested.nbs();
+			
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder#br()
+		 */
+		@Override
+		public void br() {
+			nested.br();
+			
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder#addClass(java.lang.CharSequence)
+		 */
+		@Override
+		public SimpleXMLBuilder addClass(CharSequence s) {
+			nested.addClass(s);
+			return this;
+		}
+
 	}
     private <C,R> void addCell(Table<C,R> t, C key, R row_key,NumberFormat nf,SwingContentBuilder dest){
     	Object n = t.get(key,row_key);
@@ -350,11 +458,11 @@ public class SwingContentBuilder  implements ContentBuilder{
 	
 	public ExtendedXMLBuilder getText() {
 		log.debug("getText");
-		return new XMLPanel(this);
+		return new XMLPanel(this,new HtmlBuilder());
 	}
 	public ExtendedXMLBuilder getSpan() {
 		log.debug("getText");
-		return new XMLPanel(this);
+		return new XMLPanel(this,new HtmlBuilder());
 	}
 
 	public ContentBuilder getHeading(int level) {
@@ -532,6 +640,8 @@ public class SwingContentBuilder  implements ContentBuilder{
 			((UIProvider)target).getUIGenerator().addContent(this);
 		}else if( target instanceof UIGenerator){
 			((UIGenerator)target).addContent(this);
+		}else if(target instanceof XMLPanel) {
+			((XMLPanel)target).appendTo(this);
 		}else if( target instanceof Identified){
 			addText(((Identified)target).getIdentifier());
 		}else if( target  instanceof Iterable){
@@ -572,7 +682,8 @@ public class SwingContentBuilder  implements ContentBuilder{
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#getDetails(java.lang.String)
 	 */
 	@Override
-	public ContentBuilder getDetails(String summary_text) {
+	public ContentBuilder getDetails(Object summary_text) {
+		addObject(summary_text);
 		return getPanel();
 	}
 

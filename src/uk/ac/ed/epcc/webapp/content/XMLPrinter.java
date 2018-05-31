@@ -58,6 +58,10 @@ public class XMLPrinter extends AbstractXMLBuilder {
 	
 
 	public void append(XMLPrinter hb) {
+		if( hb.parent == this) {
+			hb.appendParent();
+			return;
+		}
 		if( ! hb.matched()){
 			throw new ConsistencyError("unclosed tag "+hb.getTags().peek());
 		}
@@ -95,16 +99,24 @@ public class XMLPrinter extends AbstractXMLBuilder {
 
 
 
-	public AbstractXMLBuilder appendParent() throws UnsupportedOperationException {
+	public final AbstractXMLBuilder appendParent() throws UnsupportedOperationException {
 		if( parent == null ){
 			throw new UnsupportedOperationException("No parent");
 		}
+		if( isInOpen() && sb.length()==0){
+			// this is an empty div which confuses some browsers
+			// supress box entirely
+			return getParent();
+		}
+		appendTo(parent);
+		return parent;
+	}
+	protected void appendTo(AbstractXMLBuilder printer) throws UnsupportedOperationException{
 		if( ! matched()){
 			throw new ConsistencyError("unclosed tag "+getTags().peek());
 		}
-		parent.endOpen();
-		parent.append(sb.toString());
-		return parent;
+		printer.endOpen();
+		printer.append(sb.toString());
 	}
 	@Override
 	protected void append(CharSequence s) {

@@ -60,107 +60,90 @@ public static final Feature HTML_TABLE_SECTIONS_FEATURE = new Preference("html.t
 public static final Feature CONFIRM_ATTR_FEATURE = new Feature("html.form.confirm_attributes",false,"Add known confirm tags as submit input attributes");
 Boolean use_table_section=null;
 
-protected static final class Text extends HtmlPrinter {
+protected static final class Text extends Panel {
 	  Text(HtmlBuilder parent){
-		  super(parent);
-		  open("div");
-		  addClass("para");
+		  super("div",parent,true,"para");
 	  }
-		@Override
-		public HtmlBuilder appendParent() throws UnsupportedOperationException {
-			if( isInOpen() && sb.length()==0){
-				// this is an empty div which confuses some browsers
-				// supress box entirely
-				return (HtmlBuilder) getParent();
-			}
-			close();
-			clean("\n");
-			return (HtmlBuilder) super.appendParent();
-		}
-		public void addText(String text) {
-			clean(text);
-		}
-		public ExtendedXMLBuilder getText() {
-			return new SpanText(this);
-		}
 	}
-protected static final class SpanText extends HtmlPrinter {
-	  private boolean add_span=false;
-	  SpanText(HtmlPrinter parent){
-		  super(parent);
+protected static final class SpanText extends Panel {
+	  SpanText(HtmlBuilder parent){
+		  super(null,parent,true,null);
 	  }
-		@Override
-		public HtmlPrinter appendParent() throws UnsupportedOperationException {
-			if( add_span) {
-				close();
-			}
-			return  (HtmlPrinter) super.appendParent();
-		}
-		public void addText(String text) {
-			clean(text);
-		}
-		public ExtendedXMLBuilder getText() {
-			return new SpanText(this);
-		}
-		@Override
-		protected void badAttribute(String name) {
-			if( !hasContent()) {
-				// add a span element if adding an initial attribute
-				add_span=true;
-				open("span");
-				return;
-			}
-			super.badAttribute(name);
-		}
 	}
-  protected static final class Heading extends HtmlBuilder {
-	  int level;
+  protected static final class Heading extends Panel {
+	  
 	  Heading(HtmlBuilder parent,int level){
-		  super(parent);
-		  open("h"+level);
-		  this.level=level;
+		  super("h"+level,parent,true,null);
 	  }
-		@Override
-		public HtmlBuilder appendParent() throws UnsupportedOperationException {
-			if( isInOpen() && sb.length()==0){
-				// this is an empty heading which mightconfuses some browsers
-				// supress box entirely
-				return (HtmlBuilder) getParent();
-			}
-			close();
-			clean("\n");
-			return (HtmlBuilder) super.appendParent();
-		}
-		public void addText(String text) {
-			clean(text);
-		}
-		public ExtendedXMLBuilder getText() {
-			return new SpanText(this);
-		}
 	}
-  public static final class Panel extends HtmlBuilder {
+  /** A nested {@link HtmlBuilder} representing an element.
+   * 
+   * @author Stephen Booth
+   *
+   */
+  public static class Panel extends HtmlBuilder {
 	  Map<String,String> attr = new LinkedHashMap<String, String>();
 	  String element;
 	  String type;
-	  Panel(String element,HtmlBuilder parent, String type){
+	  boolean inline;
+	  /**
+	   * 
+	   * @param element Name of element (an be null) 
+	   * @param parent   
+	   * @param inline   Should nested text be inline or block
+	   * @param type    class of element
+	   */
+	  Panel(String element,HtmlBuilder parent, boolean inline,String type){
 		  super(parent);
 		  this.element=element;
-		  addAttr("class",type);
+		  this.inline=inline;
+		  if(type != null) {
+			  addClass(type);
+		  }
 		  this.type=type;
 	  }
-		@Override
-		public HtmlBuilder appendParent() throws UnsupportedOperationException {
-			HtmlBuilder parent = (HtmlBuilder) getParent();
-			parent.open(element);
-			for(String key : attr.keySet()){
-				parent.attr(key,attr.get(key));
+	  public final void addText(String text) {
+		  if( inline) {
+			  // Text 
+			  clean(text);
+		  }else {
+			  super.addText(text);
+		  }
+		}
+		public final ExtendedXMLBuilder getText() {
+			if( inline) {
+				return new SpanText(this);
+			}else {
+				return super.getText();
 			}
-			parent.clean("\n");
-			super.appendParent();
-			parent.clean("\n");
-			parent.close();
-			parent.clean("\n");
-			return parent;
+		}
+		@Override
+		protected void appendTo(AbstractXMLBuilder builder) throws UnsupportedOperationException {
+			boolean add_newline=true;
+			if( (element == null || element.isEmpty()) && ! attr.isEmpty()) {
+				element="span";
+				add_newline=false;
+			}
+			boolean wrap = (element != null);
+			if( wrap ) {
+				builder.open(element.trim());
+				for(String key : attr.keySet()){
+					builder.attr(key,attr.get(key));
+				}
+				if( ! inline) {
+					builder.clean("\n");
+				}
+			}
+			super.appendTo(builder);
+			if( wrap) {
+				if( ! inline) {
+					builder.clean("\n");
+				}
+				builder.close();
+				if( add_newline) {
+					builder.clean("\n");
+				}
+			}
 		}
 		/** Add an attribute to the container itself.
 		 * 
@@ -168,7 +151,30 @@ protected static final class SpanText extends HtmlPrinter {
 		 * @param value
 		 */
 		public void addAttr(String key, String value){
-			attr.put(key, value);
+			attr.put(key.trim(), value.trim());
+		}
+		@Override
+		public String toString() {
+			XMLPrinter tmp = new XMLPrinter();
+			appendTo(tmp);
+			return tmp.toString().trim();
+		}
+		@Override
+		public SimpleXMLBuilder attr(String name, CharSequence s) {
+			if( ! isInOpen() && ! hasContent()) {
+				// this is a container attribute
+				addAttr(name, s.toString());
+				return this;
+			}
+			return super.attr(name, s);
+		}
+		@Override
+		protected CharSequence getAttribute(String name) {
+			if( ! isInOpen() && ! hasContent()) {
+				// this is a container attribute
+				return attr.get(name);
+			}
+			return super.getAttribute(name);
 		}
 	}
 public HtmlBuilder(){
@@ -261,22 +267,17 @@ public ContentBuilder getHeading(int level) {
 
 public ContentBuilder getPanel(String ... type)
 		throws UnsupportedOperationException {
-	StringBuilder classes = new StringBuilder();
+	Panel panel = new Panel("div",this,false,null);
 	for(String class_name : type){
-		if( class_name != null && class_name.trim().length() > 0){
-			if( classes.length() > 0){
-				classes.append(" ");
-			}
-			classes.append(class_name.trim());
-		}
+		panel.addClass(class_name);
 	}
-	return new Panel("div",this,classes.toString());
+	return panel;
 }
 
 public ContentBuilder getPanel(String type)
 		throws UnsupportedOperationException {
 	
-	return new Panel("div",this,type);
+	return new Panel("div",this,false,type);
 }
 public ContentBuilder addParent() throws UnsupportedOperationException {
 	return (ContentBuilder) appendParent();
@@ -627,6 +628,8 @@ public <X> void addObject(X target) {
 		((UIProvider)target).getUIGenerator().addContent(this);
 	}else if( target instanceof UIGenerator){
 		((UIGenerator)target).addContent(this);
+	}else if(target instanceof XMLPrinter) {
+		append((XMLPrinter)target);
 	}else if( target instanceof Identified){
 		clean(((Identified)target).getIdentifier());
 	}else if( target  instanceof Iterable){
@@ -672,11 +675,11 @@ protected final Logger getLogger(AppContext conn){
  * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#getDetails(java.lang.String)
  */
 @Override
-public ContentBuilder getDetails(String summary_text) {
-	Panel details = new Panel("details",this,"details");
-	if( summary_text != null && ! summary_text.isEmpty()){
+public ContentBuilder getDetails(Object summary_text) {
+	Panel details = new Panel("details",this,false,"details");
+	if( summary_text != null ){
 		details.open("summary");
-		details.clean(summary_text);
+		details.addObject(summary_text);
 		details.close();
 	}
 	return details;

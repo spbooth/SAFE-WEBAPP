@@ -314,5 +314,7 @@ public class HtmlBuilderTestCase extends WebappTestBase {
 		h.appendParent();
 		h2.addParent();
 		assertEquals("<h2><span class='warn'>1234</span></h2>", parent.toString().trim());
+		assertEquals("<h2><span class='warn'>1234</span></h2>", h2.toString().trim());
+		assertEquals("<span class='warn'>1234</span>",h.toString().trim());
 	}
 }
