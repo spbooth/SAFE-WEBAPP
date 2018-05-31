@@ -65,7 +65,13 @@ protected static final class Text extends Panel {
 		  super("div",parent,true,"para");
 	  }
 	}
-protected static final class SpanText extends Panel {
+   /** A {@link Panel} for in-line text.
+    * This should only introduce an additional span-element if you set attributes
+    * 
+    * @author Stephen Booth
+    *
+    */
+   protected static final class SpanText extends Panel {
 	  SpanText(HtmlBuilder parent){
 		  super(null,parent,true,null);
 	  }
@@ -257,7 +263,7 @@ public ExtendedXMLBuilder getText() {
 	return new Text(this);
 }
 public ExtendedXMLBuilder getSpan() {
-	return new HtmlPrinter(this);
+	return new SpanText(this);
 }
 
 public ContentBuilder getHeading(int level) {
