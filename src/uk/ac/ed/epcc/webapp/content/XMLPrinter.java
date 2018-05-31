@@ -66,7 +66,7 @@ public class XMLPrinter extends AbstractXMLBuilder {
 			throw new ConsistencyError("unclosed tag "+hb.getTags().peek());
 		}
 		endOpen();
-		sb.append(hb.sb);
+		sb.append(hb.toString());
 	}
 
 	
