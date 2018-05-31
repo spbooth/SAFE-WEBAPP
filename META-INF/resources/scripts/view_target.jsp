@@ -118,5 +118,5 @@ for(Object key : provider.getTransitions(target)){
 </div>
 </form>
 </div>
-
+<%= provider.getBottomContent(new HtmlBuilder(),target,session_service).toString() %>
 <%@ include file="/std_footer.jsf" %>

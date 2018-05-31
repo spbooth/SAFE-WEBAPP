@@ -48,6 +48,17 @@ public interface ViewTransitionFactory<K, T> extends TransitionFactory<K, T> {
     * @return boolean
     */
    public <X extends ContentBuilder> X getTopContent(X cb,T target, SessionService<?> sess);
+
+   /** Get the content to be displayed at the bottom of the target page.
+    * This content is at the top level of the page
+    * 
+    * @param cb
+    * @param target
+    * @param sess
+    * @return boolean
+    */
+   public <X extends ContentBuilder> X getBottomContent(X cb,T target, SessionService<?> sess);
+
    /** Get the content to be displayed on the view target page as part of the target pane.
     * 
     * @param cb

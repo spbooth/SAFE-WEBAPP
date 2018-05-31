@@ -348,6 +348,9 @@ public class TableTransitionProvider  implements ViewTransitionProvider<TableTra
 	public <X extends ContentBuilder> X getTopContent(X hb,DataObjectFactory target, SessionService<?> sess) {
 		return hb;
 	}
+	public <X extends ContentBuilder> X getBottomContent(X hb,DataObjectFactory target, SessionService<?> sess) {
+		return hb;
+	}
 	public String getHelp(TableTransitionKey key) {
 		return key.getHelp();
 	}
