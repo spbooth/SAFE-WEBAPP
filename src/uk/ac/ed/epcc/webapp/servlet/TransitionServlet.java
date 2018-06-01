@@ -42,6 +42,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.PathTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.TitleTransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
@@ -731,5 +732,44 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	}
 	public static <T,K> boolean hasViewRecorded(SessionService<?> sess, ViewTransitionFactory<K, T> tp){
 		return sess.getAttribute(VIEW_TRANSITION+tp.getTargetName()) != null;
+	}
+	public static <T,K> String getPageTitle(TransitionFactory<K, T> tp, K key, T target) {
+		if( tp instanceof TitleTransitionFactory){
+	    	TitleTransitionFactory ttp = (TitleTransitionFactory)tp;
+	    	return ttp.getTitle(key, target);
+	    }else{
+	    	String type=tp.getTargetName();
+	    	AppContext conn = tp.getContext();
+			String type_title = conn.getInitParameter("transition_title."+type,type);
+	    	String service_name = conn.getInitParameter("service.name", "");
+	    	String action = key.toString();
+	    	if( type==null) type="";
+			return service_name+" "+deCamel(action)+" "+type_title;
+	    }
+	}
+	public static <T,K> String getPageHeader(TransitionFactory<K, T> tp, K key, T target) {
+		if( tp instanceof TitleTransitionFactory){
+			TitleTransitionFactory ttp = (TitleTransitionFactory)tp;
+			return ttp.getHeading(key, target);
+		}else{
+			AppContext conn = tp.getContext();
+			String type=tp.getTargetName();
+			String action = key.toString();
+			String type_title = conn.getInitParameter("transition_title."+type,type);
+			return deCamel(action)+" "+type_title;
+		}
+	}
+	private static String deCamel(String name) {
+		boolean isLower=false;
+		StringBuilder sb = new StringBuilder();
+		for( int i=0 ; i< name.length(); i++) {
+			Character ch = name.charAt(i);
+			if( Character.isUpperCase(ch) && isLower) {
+				sb.append(" ");
+			}
+			isLower=Character.isLowerCase(ch);
+			sb.append(ch);
+		}
+		return sb.toString();
 	}
 }

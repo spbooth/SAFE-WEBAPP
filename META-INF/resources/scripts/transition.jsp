@@ -44,20 +44,9 @@ the form could just submit to self. This might break form error reporting though
     }
     Object target =   TransitionServlet.getTarget(conn,tp,request);
     String action = key.toString();
-    String page_title="Transition";
-    String page_heading="Transition";
-    if( tp instanceof TitleTransitionFactory){
-    	TitleTransitionFactory ttp = (TitleTransitionFactory)tp;
-    	page_title=ttp.getTitle(key, target);
-    	page_heading=ttp.getHeading(key, target);
-    }else{
-    	String type=tp.getTargetName();
-    	String type_title = conn.getInitParameter("transition_title."+type,type);
-    	if( type==null) type="";
-		page_title = service_name+" "+action+" "+type_title;
-		page_heading = action+" "+type_title;
-    }
-   
+    String page_title=TransitionServlet.getPageTitle(tp, key, target);
+    String page_heading=TransitionServlet.getPageHeader(tp, key, target);
+    
     // Add per tranistion css for script augmented transitions.
    
     if( tp instanceof ScriptTransitionFactory){
