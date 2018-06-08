@@ -146,10 +146,17 @@ String login_urls = conn.getInitParameter("service.web_login.url");
 if(  login_urls != null ){ 
  String urls[] = login_urls.trim().split("\\s*,\\s*");
  String labels[] = conn.getInitParameter("service.web_login.login-text","Alternate login").split("\\s*,\\s*");
+ String help[]= conn.getInitParameter("service.web_login.help-text","").split("\\s*,\\s*");
  for( int i = 0 ; i < urls.length ; i++){
 %>
 <form class="button" method="get" action="<%=web_path+urls[i] %>">
-<input class="input_button login" type="submit" value="<%=labels[i%labels.length] %>" />
+<input class="input_button login" type="submit" 
+<% String tt = help[i%help.length];
+if( tt != null && ! tt.isEmpty()){
+%> title="<%=tt%>"<%
+}
+%>
+value="<%=labels[i%labels.length] %>" />
 </form>
 <%
  }
