@@ -11,6 +11,13 @@ body {
 	margin: 0;
 }
 
+/** Allow a block heading to be the summary element 
+ */
+div.block details summary h2{
+	display: inline;
+	margin: 0;
+}
+
 /* all divs form a centered column */
 div.block, div.bar, div.textbar,div.text, div.graph {
 width: 46em;
@@ -63,7 +70,9 @@ div div.overflowblock{
 	overflow: scroll;
 	margin-left:6em;
 }
-
+.login{
+	font-weight: bold;
+}
 div.overflowblock table{
     display:block;
     white-space: nowrap;
@@ -162,7 +171,7 @@ div.report h1, div.report h2, div.report h3, div.report h4{
 /* we use three levels of header as standard 
  * h1 or h2 is the top level header in a block
  * h3 is a secondary header or a header in a div.bar
- * h4 is a smaller header for dubdivisions.
+ * h4 is a smaller header for subdivisions.
 */
 
 h1, h2, h3, h4, h5, h6 {
@@ -170,10 +179,16 @@ h1, h2, h3, h4, h5, h6 {
 	color: black;
     text-align: left;
     line-height: normal;
-    margin: 0;
+    
     padding: 4px;
 }
 
+h1, h2{
+	margin: 8px 0px 0px 0px;
+}
+h3, h4, h5, h6 {
+	margin: 0;
+}
  /*
   * secondary header in a block
   */
@@ -224,13 +239,13 @@ table.form th {
 */
 .action_buttons{
 text-align: right;
-border-width: 5px;
+border-width: 2px;
 margin-bottom: 10px;
 
 }
 fieldset.action_buttons{
 border: solid #e7e7e7;
-border-width: 3px;
+border-width: 2px;
 margin: 5px 0px;
 }
 /** Single button forms in an actionbutton block
@@ -248,13 +263,16 @@ form.button{
 	display: inline;
 	text-align: right;
 }
-
+.input_button {
+	margin: 3px 0px;
+	border-style: outset;
+}
 /* table for fine tuning the layout within a form
  * these have an explicit border 
  */
 table.form{
 	border: solid #e7e7e7;
-	border-width: 3px;
+	border-width: 2px;
     background-color: #cccccc;
     margin: 5px 0px;
     text-align: left;
@@ -308,14 +326,16 @@ div.ifms_summary td.key {
 background-color: #e7e7e7;	
 text-align: left;
 }
-/* paragraph within a block
+/* paragraph within a block add margin at bottom so headers associate with following content
  */
-div.block p,  div.block ul, div.block table, div.block pre{
+div.block p,  div.block ul, div.block pre, div.block div.para, div.block table{
 text-align: left;
 
 }
+/* block content not including table
+ */
 div.block p,  div.block ul, div.block pre, div.block div.para{
-margin: 4px 0px;
+margin: 0px 0px 6px 0px;
 background-color: #e7e7e7;
 color: black;
 padding: 8px;
@@ -353,7 +373,7 @@ div.block table table.auto td, div.block table table.auto th{
 div.block > table.compact, table.compact {
 	    border: none;
 		border-spacing: 0;
-		margin: 3px 0px;	
+		margin: 0px 0px 6px 0px;	
 }
 
 
@@ -409,17 +429,21 @@ div tr.notice td, div tr td.notice{
 div  *.highlight td, div table.auto *.highlight td form{
 	 background-color: #ffffcc;
 }
+details div.description{
+	 border-radius: 15px;
+	 padding: 5px;
+	 background-color: #ffffcc;
+	 font-size: small;
+}
 
 div td, div table.auto td form , div.block td ul{
         background-color: #ffffff;
 }
-td.numeric, td[numeric] , td.notice_numeric, td.numeric input, td.notice_numeric input {
+td.numeric, td[numeric] ,  td.numeric input, {
 text-align: right;
 white-space: nowrap;
 }
-div td.notice_numeric{
-background-color: #ffcccc;
-}
+
 /* a table cell intended to hold a form buton */
 div td.button {
 	text-align: center;
@@ -767,6 +791,7 @@ input[type=number][size="1"] {
 	width: 2em;
 }
 /*  added by javascript to show how full a textarea is.
+ * this puts a thin progress bar under the textarea
  */
 progress.textprogress {
 	width: 100%;

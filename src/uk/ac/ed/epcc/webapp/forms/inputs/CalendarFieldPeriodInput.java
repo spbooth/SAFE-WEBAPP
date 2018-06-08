@@ -16,6 +16,8 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import java.util.Calendar;
 import java.util.Date;
 
+import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.time.CalendarFieldSplitPeriod;
 
  
@@ -92,6 +94,7 @@ public class CalendarFieldPeriodInput extends MultiInput<CalendarFieldSplitPerio
 		splits.setMin(1);
 		splits.setBoxWidth(2);
 		splits.setMaxResultLength(3);
+		splits.setMax(RegularPeriodInput.PERIOD_INPUT_MAX_SPLITS);
 		splits.setValue(1);
 		addInput("start", "From ", start);
 		

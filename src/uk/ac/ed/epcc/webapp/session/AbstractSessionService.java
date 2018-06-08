@@ -49,6 +49,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
 import uk.ac.ed.epcc.webapp.model.data.NamedFilterWrapper;
 import uk.ac.ed.epcc.webapp.model.data.RemoteAccessRoleProvider;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -1216,7 +1217,10 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    		}
 	    		return arp.hasRelationFilter(sub,person);
 	    	}
-	  
+	    	NamedFilterProvider<T> nfp = getContext().makeObjectWithDefault(NamedFilterProvider.class, null, base);
+	    	if( nfp != null ) {
+	    		return nfp.getNamedFilter(sub);
+	    	}
 	    }else{
 	    	// Non qualified name
 	    	
@@ -1316,6 +1320,13 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    	if( arp != null ){
 	    		return arp.personInRelationFilter(this, sub, target);
 	    	}
+	    	NamedFilterProvider<T> nfp = getContext().makeObjectWithDefault(NamedFilterProvider.class, null, base);
+	    	if( nfp != null ) {
+	    		BaseFilter<T> fil = nfp.getNamedFilter(sub);
+	    		if( fil != null) {
+	    			return new GenericBinaryFilter<>(target_type, fac2.matches(fil, target));
+	    		}
+	    	}
 	    }else{
 	    	// direct roles can be un-qualified though not if we want multiple levels of qualification.
 	    	BaseFilter<? super A> result = makeDirectPersonInRelationshipRoleFilter(fac2, role,target);
@@ -1384,8 +1395,10 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	    }
 	    
 	    // Its not one of the directly implemented roles maybe its derived
-	    String defn = getContext().getInitParameter(USE_RELATIONSHIP_PREFIX+fac2.getTag()+"."+role);
+	    String name = USE_RELATIONSHIP_PREFIX+fac2.getTag()+"."+role;
+		String defn = getContext().getInitParameter(name);
 	    if( defn != null){
+	   
 	    	// don't pass def as it is the sub-defn that is not resolving
 	    	return makeRelationshipRoleFilter(fac2, defn,person,null);
 	    }

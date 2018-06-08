@@ -36,7 +36,10 @@ public abstract class AbstractViewTransitionFactory<T, K extends TransitionKey<T
 		return cb;
 	}
 
-	
+	public <X extends ContentBuilder> X getBottomContent(X cb, T target,
+			SessionService<?> sess) {
+		return cb;
+	}
 	public <X extends ContentBuilder> X getLogContent(X cb, T target,
 			SessionService<?> sess) {
 		return cb;

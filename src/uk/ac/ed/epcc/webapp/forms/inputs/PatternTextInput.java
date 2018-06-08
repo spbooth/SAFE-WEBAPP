@@ -58,9 +58,13 @@ public String getTag() {
 @Override
 public void validate() throws FieldException {
 	super.validate();
-		if( validate_pattern.matcher(getValue()).matches()) {
-			return;
-		}
-		throw new ValidateException("Input does not match required pattern "+pattern);
+	String v = getValue();
+	if( v == null || v.isEmpty()) {
+		return;
+	}
+	if( validate_pattern.matcher(v).matches()) {
+		return;
+	}
+	throw new ValidateException("Input does not match required pattern "+pattern);
 }
 }

@@ -54,7 +54,10 @@ public abstract class SimpleViewTransitionProvider<T extends Indexed,K extends T
 	public <X extends ContentBuilder> X getTopContent(X cb, T target, SessionService<?> sess) {
 		return cb;
 	}
-
+	@Override
+	public <X extends ContentBuilder> X getBottomContent(X cb, T target, SessionService<?> sess) {
+		return cb;
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#getLogContent(uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object, uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
@@ -78,5 +81,9 @@ public abstract class SimpleViewTransitionProvider<T extends Indexed,K extends T
 	public String getText(K key) {
 		return key.getName();
 	}
+
+
+
+	
 
 }

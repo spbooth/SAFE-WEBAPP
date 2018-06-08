@@ -127,7 +127,10 @@ public class TestTransitionProvider extends AbstractTransitionProvider<Number, T
 			SessionService<?> sess) {
 		return cb;
 	}
-
+	public <X extends ContentBuilder> X getBottomContent(X cb, Number target,
+			SessionService<?> sess) {
+		return cb;
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#getLogContent(uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object, uk.ac.ed.epcc.webapp.session.SessionService)
 	 */

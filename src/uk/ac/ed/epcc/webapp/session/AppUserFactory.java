@@ -43,6 +43,7 @@ import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
@@ -64,6 +65,8 @@ import uk.ac.ed.epcc.webapp.model.data.PatternArg;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory.DataObjectInput;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
+import uk.ac.ed.epcc.webapp.model.data.filter.IdAcceptFilter;
+import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
@@ -74,6 +77,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NameFinderInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedDataCache;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
+import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.RemoteAuthServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
@@ -90,9 +94,14 @@ import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
  */
 
 
-public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> implements RequiredPageProvider<AU>,NameFinder<AU> ,RegisterTrigger<AU>, SummaryContributer<AU>
+public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> implements 
+RequiredPageProvider<AU>,
+NameFinder<AU> ,
+RegisterTrigger<AU>, 
+SummaryContributer<AU>,
+AccessRoleProvider<AU, AU>
 {
-	
+	private static final String MY_SELF_RELATIONSHIP = "MySelf";
 	
 	//RegistrationDateComposite<AU> signup_date = new RegistrationDateComposite<AU>(this);
 	/**
@@ -837,5 +846,29 @@ public class AppUserFactory<AU extends AppUser> extends DataObjectFactory<AU> im
 	public void validateNameFormat(String name) throws ParseException {
 		//TODO consider checking if single realm
 		
+	}
+	@Override
+	public BaseFilter<AU> hasRelationFilter(String role, AU user) {
+		if( role.equals(MY_SELF_RELATIONSHIP)) {
+			return new DualFilter<AU>(new SQLIdFilter<>(getTarget(), res, user.getID()),
+					new IdAcceptFilter(getTarget(),user));
+		}
+		return null;
+	}
+	@Override
+	public BaseFilter<? super AU> personInRelationFilter(SessionService<AU> sess, String role,
+			AU target) {
+		if( role.equals(MY_SELF_RELATIONSHIP)) {
+			return new DualFilter<AU>(new SQLIdFilter<>(getTarget(), res, target.getID()),
+					new IdAcceptFilter(getTarget(),target));
+		}
+		return null;
+	}
+	@Override
+	public boolean providesRelationship(String role) {
+		if( role.equals(MY_SELF_RELATIONSHIP)) {
+			return true;
+		}
+		return false;
 	}
 }

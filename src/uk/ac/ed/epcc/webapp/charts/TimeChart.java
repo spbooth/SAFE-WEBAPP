@@ -23,6 +23,7 @@ import java.util.Date;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
+import uk.ac.ed.epcc.webapp.forms.inputs.RegularPeriodInput;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 //import uk.ac.ed.epcc.webapp.charts.jfreechart.JFreeChartData;
 import uk.ac.ed.epcc.webapp.time.CalendarFieldSplitPeriod;
@@ -292,6 +293,17 @@ public class TimeChart<P extends PeriodSequencePlot> extends PeriodChart<P>{
 		GraphService service = c.getService(GraphService.class);
 		assert(service !=null);
 		TimeChart t = service.getTimeChart();
+		int plot_points = p.getNsplit() * minor;
+		// default to always allow 2 minor and the max splits in the normal inputs
+		int max_plot_points = c.getIntegerParameter("timechart.max_plot_points", 2 * RegularPeriodInput.PERIOD_INPUT_MAX_SPLITS);
+		while(minor > 2 && plot_points > max_plot_points) {
+			// reduce number of minor points 
+			minor = minor / 2;
+		}
+		if( plot_points > max_plot_points) {
+			// Check to avoid chart code using too much memory
+			throw new InvalidArgument("Too many datapoints requested "+plot_points+">"+max_plot_points);
+		}
 	
 		TimeChartData chartData = t.getChartData();
 	

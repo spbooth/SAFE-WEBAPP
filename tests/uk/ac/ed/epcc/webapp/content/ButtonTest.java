@@ -38,7 +38,7 @@ public class ButtonTest extends WebappTestBase {
 		Button b = new Button(getContext(), "test button", new RedirectResult("http://test.url"));
 		SimpleXMLBuilder hb = new HtmlBuilder();
 		b.addContent(hb);
-		Assert.assertEquals("<form action='http://test.url'><input type='submit' value='test button'/></form>", hb.toString());
+		Assert.assertEquals("<form action='http://test.url'><input class='input_button' type='submit' value='test button'/></form>", hb.toString());
 		SimpleXMLBuilder p = new XMLPrinter();
 		b.addContent(p);
 		Assert.assertEquals("test button", p.toString());

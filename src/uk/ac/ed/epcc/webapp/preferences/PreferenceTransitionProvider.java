@@ -379,7 +379,10 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 	public <X extends ContentBuilder> X getTopContent(X cb, Feature target, SessionService<?> sess) {
 		return cb;
 	}
-
+	@Override
+	public <X extends ContentBuilder> X getBottomContent(X cb, Feature target, SessionService<?> sess) {
+		return cb;
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#getLogContent(uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object, uk.ac.ed.epcc.webapp.session.SessionService)
 	 */

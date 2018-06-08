@@ -91,12 +91,14 @@ public interface ContentBuilder {
 	
 	/** get an expanding/folding section if supported
 	 * 
-	 *  Otherwise this just maps to {@link #getPanel(String...)}
+	 *  Otherwise this just maps to 
+	 *  {@link #addObject(Object)} on the summary text followed by
+	 *  {@link #getPanel(String...)}
 	 * 
 	 * @param summary_text
 	 * @return
 	 */
-	public ContentBuilder getDetails(String summary_text);
+	public ContentBuilder getDetails(Object summary_text);
 	/** append a nested panel to its parent content.
 	 * @return parent ContentBuilder
 	 * 
@@ -104,7 +106,8 @@ public interface ContentBuilder {
 	 */
 	public ContentBuilder addParent() throws UnsupportedOperationException;
 	
-	/** Add an object depending on its type.
+	/** Add an object depending on its type. This should always map to {@link #addParent()}
+	 * on child objects.
 	 * 
 	 * @param target
 	 */

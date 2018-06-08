@@ -96,6 +96,9 @@ body{
 	background-color: #bf7a00;
 	color: black;
 }
+nav li.notify >  a:after {
+	content: " \1F514";
+}
 .nav li.notify >  a:hover , .nav li.notify > a:focus{
 	background-color: #ffa300;
 	color: #800000;

@@ -86,11 +86,11 @@ for(Object key : provider.getTransitions(target)){
 		String help=provider.getHelp(key);
 		if( help == null ){
 	 	  %>
-	 	  <button type='submit' name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>' value='<%=key.toString() %>'><%=valueString%></button>
+	 	  <button class='input_button' type='submit' name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>' value='<%=key.toString() %>'><%=valueString%></button>
 	 	  <% 
 		}else{
 			%>
-			<button type='submit' name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>' title='<%=help %>' value='<%=key.toString() %>' ><%=valueString%></button>
+			<button class='input_button' type='submit' name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>' title='<%=help %>' value='<%=key.toString() %>' ><%=valueString%></button>
 			<% 		
 		}
 	}else{
@@ -99,11 +99,11 @@ for(Object key : provider.getTransitions(target)){
 				String help=provider.getHelp(key);
 				if( help == null ){
 			 	  %>
-			 	  <button disabled name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>'  value='<%=key.toString() %>' ><%=valueString%></button>
+			 	  <button class='input_button' disabled name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>'  value='<%=key.toString() %>' ><%=valueString%></button>
 			 	  <% 
 				}else{
 					%>
-					<button disabled name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>' title='<%=help %> (disabled)'  value='<%=key.toString() %>' ><%=valueString%></button>
+					<button class='input_button' disabled name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>' title='<%=help %> (disabled)'  value='<%=key.toString() %>' ><%=valueString%></button>
 					<% 		
 				}
 			}
@@ -118,5 +118,5 @@ for(Object key : provider.getTransitions(target)){
 </div>
 </form>
 </div>
-
+<%= provider.getBottomContent(new HtmlBuilder(),target,session_service).toString() %>
 <%@ include file="/std_footer.jsf" %>

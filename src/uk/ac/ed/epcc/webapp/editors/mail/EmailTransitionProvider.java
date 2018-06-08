@@ -642,4 +642,13 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		return getContext().getService(LoggerService.class).getLogger(getClass());
 	}
 
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#getBottomContent(uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object, uk.ac.ed.epcc.webapp.session.SessionService)
+	 */
+	@Override
+	public <X extends ContentBuilder> X getBottomContent(X cb, MailTarget target, SessionService<?> sess) {
+		return cb;
+	}
+
 }

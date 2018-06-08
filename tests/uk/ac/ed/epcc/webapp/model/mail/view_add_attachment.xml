@@ -18,21 +18,21 @@
 <h2>Send Message</h2>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
 <input type="hidden" name="Transition" value="Send"/>
-<input type="submit" value="Send"/>
+<input class="input_button" type="submit" value="Send"/>
 </form>
 </div>
 <div class="bar">
 <h2>Abort Message</h2>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
 <input type="hidden" name="Transition" value="Abort"/>
-<input type="submit" value="Abort"/>
+<input class="input_button" type="submit" value="Abort"/>
 </form>
 </div>
 <div class="bar">
 <h2>Undo all edits</h2>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
 <input type="hidden" name="Transition" value="StartOver"/>
-<input type="submit" value="StartOver"/>
+<input class="input_button" type="submit" value="StartOver"/>
 </form>
 </div>
 </top>
@@ -43,29 +43,29 @@
 <h4>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/CC0">
 <input type="hidden" name="Transition" value="Delete"/>
-<input type="submit" value="Delete recipient"/>
+<input class="input_button" type="submit" value="Delete recipient"/>
 </form> CC: boris@example.xcom</h4>
 <h3>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
 <input type="hidden" name="Transition" value="AddRecipient"/>
-<input type="submit" value="Add"/>
+<input class="input_button" type="submit" value="Add"/>
 </form> New Recipient</h3>
 <h4>From: dummy@example.com</h4>
 <h4>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/Subject">
 <input type="hidden" name="Transition" value="EditSubject"/>
-<input type="submit" value="Edit Subject"/>
+<input class="input_button" type="submit" value="Edit Subject"/>
 </form> Subject: to change</h4>
 <div class="multipart">
 <div class="part">
 <pre>Now is the winter of our discontent</pre>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/0/T">
 <input type="hidden" name="Transition" value="Edit"/>
-<input type="submit" value="Edit"/>
+<input class="input_button" type="submit" value="Edit"/>
 </form>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/0">
 <input type="hidden" name="Transition" value="Delete"/>
-<input type="submit" value="Delete"/>
+<input class="input_button" type="submit" value="Delete"/>
 </form>
 </div>
 <div class="part">
@@ -74,25 +74,25 @@
 </div>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/1/T">
 <input type="hidden" name="Transition" value="Edit"/>
-<input type="submit" value="Edit"/>
+<input class="input_button" type="submit" value="Edit"/>
 </form>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/1">
 <input type="hidden" name="Transition" value="Delete"/>
-<input type="submit" value="Delete"/>
+<input class="input_button" type="submit" value="Delete"/>
 </form>
 </div>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
 <input type="hidden" name="Transition" value="Merge"/>
-<input type="submit" value="Merge Text"/>
+<input class="input_button" type="submit" value="Merge Text"/>
 </form>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
 <input type="hidden" name="Transition" value="Flatten"/>
-<input type="submit" value="Flatten Tree"/>
+<input class="input_button" type="submit" value="Flatten Tree"/>
 </form>
 </div>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
 <input type="hidden" name="Transition" value="AddAttachment"/>
-<input type="submit" value="Add Attachment"/>
+<input class="input_button" type="submit" value="Add Attachment"/>
 </form>
 </div>
 </log>
