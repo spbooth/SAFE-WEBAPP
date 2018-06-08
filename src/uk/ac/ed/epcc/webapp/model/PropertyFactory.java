@@ -43,7 +43,11 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  */
 
 public class PropertyFactory extends DataObjectFactory<Property> {
-    /* (non-Javadoc)
+    /**
+	 * 
+	 */
+	private static final int MAX_PROP_LENGTH = 4096;
+	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getSelectors()
 	 */
 	@Override
@@ -55,6 +59,9 @@ public class PropertyFactory extends DataObjectFactory<Property> {
 		selectors.put(Property.NAME, name_input);
 		// default input may forbid html but this should be allowed in props
 		TextInput prop_input = new TextInput();
+		prop_input.setBoxWidth(64);
+		prop_input.setMaxResultLength(MAX_PROP_LENGTH);
+		prop_input.setSingle(true);
 		selectors.put(Property.VALUE, prop_input);
 		return selectors;
 	}
