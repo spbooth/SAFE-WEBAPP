@@ -208,4 +208,5 @@ to be set, disable cookies in your browser settings.</small></small>
 
 
 <% } %>
+</div>
 <%@ include file="/login_footer.jsf"%>
