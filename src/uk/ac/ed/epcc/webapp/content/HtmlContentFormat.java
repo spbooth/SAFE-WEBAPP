@@ -20,7 +20,7 @@ import java.text.ParsePosition;
 /** A {@link Format} that adds the argument to a {@link HtmlBuilder}.
  * 
  * This allows {@link UIGenerator}s and {@link XMLGenerator}s to be added with markup
- * to a message
+ * to a message, it should also ensure that String values are properly escaped
  * 
  * @author spb
  *

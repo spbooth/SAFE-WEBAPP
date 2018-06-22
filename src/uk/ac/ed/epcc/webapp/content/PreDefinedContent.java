@@ -26,6 +26,7 @@ import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
  * a message bundle. This is to allow pre-defined content
  * to be added to a {@link ContentBuilder}. The message text is allowed to contain
  * raw HTML formatting
+ * @see HtmlContentFormat
  * @author spb
  *
  */
@@ -48,26 +49,35 @@ public class PreDefinedContent implements Contexed, XMLGenerator,UIGenerator {
 	public PreDefinedContent(AppContext conn,String message,Object ...args) {
 		this(conn,DEFAULT_BUNDLE,message,args);
 	}
-	/**
+	/** 
 	 * 
 	 */
 	public PreDefinedContent(AppContext conn,String bundle,String message, Object ... args) {
+		this(conn,conn.getService(MessageBundleService.class).getBundle(bundle == null ? DEFAULT_BUNDLE : bundle),message,args);
+	}
+	
+	/** Create {@link PreDefinedContent} from a specific message from a {@link ResourceBundle}
+	 * 
+	 * @param conn
+	 * @param mess
+	 * @param message
+	 * @param args
+	 */
+	public PreDefinedContent(AppContext conn,ResourceBundle mess,String message, Object ... args) {
 		this.conn=conn;
-		if(bundle==null) {
-			bundle=DEFAULT_BUNDLE;
+		String pattern = null;
+		if( mess != null) {
+			pattern = conn.expandText(mess.getString(message));
 		}
-		ResourceBundle mess = conn.getService(MessageBundleService.class).getBundle(bundle);
-		String pattern = conn.expandText(mess.getString(message));
 		if( pattern != null) {
 			fmt = new MessageFormat(pattern);
 			this.args=args;
 		}else {
 			fmt=null;
 			this.args=null;
-			conn.getService(LoggerService.class).getLogger(getClass()).error("missing content "+bundle+":"+message);
+			conn.getService(LoggerService.class).getLogger(getClass()).error("missing content "+(mess == null ? " no bundle ":mess.getBaseBundleName())+":"+message);
 		}
 	}
-
 	/** extension point to apply additional processing
 	 * 
 	 * @param value
@@ -88,7 +98,11 @@ public class PreDefinedContent implements Contexed, XMLGenerator,UIGenerator {
 				// apply HtmlFormat 
 				for(int i=0 ; i< args.length; i++) {
 					Object a = args[i];
-					if( !( a instanceof Number || a instanceof Date || a instanceof String)) {
+					// MessageFormat has direct support for number and date formats. These are safe to add to html
+					// Strings in particular should use HtmlContentFormat to force html escaping.
+					// raw html can be added by wrapping in a UIGenerator or XMLPrinter
+					// @see messages.jsf
+					if( !( a instanceof Number || a instanceof Date )) {
 						fmt2.setFormatByArgumentIndex(i, new HtmlContentFormat());
 					}
 				}
