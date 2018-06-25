@@ -49,7 +49,8 @@ you cannot change the password for this account.<br/><br/>
 </div>
 <%
 }else{
-if( comp.mustResetPassword(sess.getCurrentPerson()) ){
+	boolean must_change=comp.mustResetPassword(sess.getCurrentPerson());
+if( must_change ){
 %>
 <div class="block">
 <h2>Please change your <%=website_name %> password</h2>
@@ -68,7 +69,8 @@ Your <%=website_name %> password has expired and should be changed.
 <%
 String default_charset = conn.getService(ServletService.class).defaultCharset();
 HTMLForm f = new HTMLForm(conn);
-PasswordUpdateFormBuilder fac = new PasswordUpdateFormBuilder(comp, true);
+// Don't require old password for a forced change
+PasswordUpdateFormBuilder fac = new PasswordUpdateFormBuilder(comp, ! must_change);
 fac.buildForm(f,sess.getCurrentPerson(),conn);
 
 
