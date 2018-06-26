@@ -89,16 +89,19 @@ public class HtmlPrinter extends XMLPrinter implements ExtendedXMLBuilder{
 	 */
 	@Override
 	public SimpleXMLBuilder addClass(CharSequence s) {
-		CharSequence prev = getAttribute("class");
-		if( prev == null) {
-			prev=s;
-		}else {
-			StringBuilder sb = new StringBuilder(prev);
-			sb.append(' ');
-			sb.append(s);
-			prev=sb.toString();
+		if( s != null && s.length() > 0 ) {
+			CharSequence prev = getAttribute("class");
+			if( prev == null) {
+				prev=s;
+			}else {
+				StringBuilder sb = new StringBuilder(prev);
+				sb.append(' ');
+				sb.append(s);
+				prev=sb.toString();
+			}
+			return attr("class", prev);
 		}
-		return attr("class", prev);
+		return this;
 	}
 
 }

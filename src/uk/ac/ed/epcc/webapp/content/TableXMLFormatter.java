@@ -151,23 +151,40 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 				hb.close();
 				first_col = false;
 			}
+			int skip_col=0;
 			for (C key: t.getColumNames()) {
-				if (first_col) {
-					hb.open("td",new String[][]{
+				if( skip_col > 0) {
+					skip_col--;
+				}else {
+					if (first_col) {
+						hb.open("td",new String[][]{
 							{"class","first"},
 							{"count",Integer.toString(col++)}
-							});
-		
-					first_col = false;
-				} else {
-					hb.open("td",new String[][]{
+						});
+
+						first_col = false;
+					} else {
+						hb.open("td",new String[][]{
 							{"class","main"},
 							{"count",Integer.toString(col++)}
-							});
+						});
+					}
+					Object n = t.get(key, row_key);
+					if( n instanceof MultiColumn && hb instanceof HtmlPrinter) {
+						int cols = ((MultiColumn) n).getColumns();
+						if( cols > 1 ) {
+							hb.attr("colspan", Integer.toString(cols));
+							skip_col = cols-1;
+						}
+						String dc = ((MultiColumn) n).getDisplayClass();
+						if( dc != null ) {
+							((HtmlPrinter)hb).addClass(dc);
+						}
+					}
+					addCell(t,key,row_key, n);
+
+					hb.close();
 				}
-				addCell(t,key,row_key);
-				
-				hb.close();
 			}
 			hb.close();
 			hb.clean("\n");
@@ -198,7 +215,7 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
     			hb.close();
     		}
     		hb.open("td");
-    		addCell(t, key, row);
+    		addCell(t, key, row, t.get(key, row));
     		hb.close();
     		hb.close();
     		hb.clean("\n");
@@ -208,12 +225,12 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
     }
 
 	@SuppressWarnings("unchecked")
-	protected void addCell(Table<C, R> t, C key, R row_key) {
+	protected void addCell(Table<C, R> t, C key, R row_key, Object n) {
 		Map<String,String> my_attr = t.getAttributes(key,row_key);
 		for(String a : my_attr.keySet()){
 			hb.attr(a,my_attr.get(a));
 		}
-		Object n = t.get(key,row_key);
+		
 		Table.Formatter format = t.getColFormat(key);
 		if (format != null) {
 			n = format.convert(t,key,row_key,n);

@@ -39,22 +39,22 @@ public abstract class SimpleTransitionProvider<T extends Indexed,K extends Trans
     	this.fac=fac;
     	this.target_name=target_name;
     }
-    
-
+    public final IndexedProducer<? extends T> getProducer(){
+		return fac;
+	}
+	
+    @Override
     public final String getID(T target) {
 		return AbstractIndexedTransitionProvider.getIndexedID(getContext(),fac,target);
 	}
 
-	public final IndexedProducer<? extends T> getProducer(){
-		return fac;
-	}
 	
-
+    @Override
 	public final T getTarget(String id) {
 		return AbstractIndexedTransitionProvider.getIndexedTarget(getContext(),fac,id);
 	}
 
-	
+	@Override
 	public final String getTargetName(){
 		return target_name;
 	}
