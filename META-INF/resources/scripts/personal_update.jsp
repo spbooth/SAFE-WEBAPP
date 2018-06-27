@@ -46,7 +46,7 @@ Update personal details
 %>
 <div class="block">
 <h2>Update required</h2>
-<%=conn.getInitParameter("person_update_required.html", "") %>
+<webapp:message optional="true" message="person_update_required"/>
 </div>
 <%}%>
 <div class="block">
@@ -87,7 +87,7 @@ if( default_charset != null && ! default_charset.isEmpty()){
 	%>
     <%= result.toString() %>
     <div class="action_buttons">
-	<input class="input_button" type="submit" value=" Commit Update "/>
+	<input class="input_button" type="submit" value=" Update "/>
 	</div>
   </form>
 </div>

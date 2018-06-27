@@ -49,6 +49,9 @@
   <attribute><name>bundle</name>
   <rtexprvalue>true</rtexprvalue>
   </attribute>
+  <attribute><name>optional</name>
+  <rtexprvalue>true</rtexprvalue>
+  </attribute>
   <tag-class>uk.ac.ed.epcc.webapp.tags.WebappMessage</tag-class>
   </tag>
 </taglib>
