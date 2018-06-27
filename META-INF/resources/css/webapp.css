@@ -97,7 +97,11 @@ div.overflowblock .headcolhead {
 	border-top-width:3px; /*only relevant for first row*/
 	margin-top:-3px; /*compensate for top border*/
 }
-
+/** Acts as pre-formatted without changing the font
+ */
+p.preformatted{
+	white-space: pre;
+}
 div.overflowblock .headcol {
 	position:absolute;
 	margin-left: -6.5em;

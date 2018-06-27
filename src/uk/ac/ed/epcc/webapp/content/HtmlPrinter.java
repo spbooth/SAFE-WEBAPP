@@ -67,12 +67,13 @@ public class HtmlPrinter extends XMLPrinter implements ExtendedXMLBuilder{
 	}
 
 	public final boolean cleanFormatted(int max, String s) {
-		HtmlBuilder hb = new HtmlBuilder();
+		HtmlPrinter hb = new HtmlPrinter();
 		if( hb.longLines(max,s)){
 			append(hb);
 			return true;
 		}else{
-			open("pre");
+			open("p");
+			addClass("preformatted");
 			clean(s);
 			close();
 			return false;
