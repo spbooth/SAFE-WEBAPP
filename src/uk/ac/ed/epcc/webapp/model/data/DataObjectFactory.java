@@ -472,6 +472,12 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				return false;
 			}
 		}
+		public int getMaxIdentifier() {
+			return max_identifier;
+		}
+		public void setMaxIdentifier(int max_identifier) {
+			this.max_identifier = max_identifier;
+		}
 	}
 
 	public class SortingDataObjectInput extends DataObjectInput implements DataObjectItemParseInput<BDO>{
