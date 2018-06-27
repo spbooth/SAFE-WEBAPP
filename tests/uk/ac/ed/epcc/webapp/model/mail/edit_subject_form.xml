@@ -22,7 +22,7 @@
 <input class="input_button" type="submit" name="Update" value="Update"/>
 </fieldset>
 <div class="multipart">
-<pre/>
+<p class='preformatted'/>
 </div>
 </div>
 </Form>

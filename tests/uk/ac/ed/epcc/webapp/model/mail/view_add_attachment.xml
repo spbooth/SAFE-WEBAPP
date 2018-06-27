@@ -58,7 +58,7 @@
 </form> Subject: to change</h4>
 <div class="multipart">
 <div class="part">
-<pre>Now is the winter of our discontent</pre>
+<p class='preformatted'>Now is the winter of our discontent</p>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/0/T">
 <input type="hidden" name="Transition" value="Edit"/>
 <input class="input_button" type="submit" value="Edit"/>

@@ -102,7 +102,7 @@ public class HtmlBuilderTestCase extends WebappTestBase {
 	@Test
 	public void testCleanFormatted() {
 		String test          ="hello\nworld\n\nThis is a <test>";
-		String pre_result="<pre>hello\nworld\n\nThis is a &lt;test&gt;</pre>";
+		String pre_result="<p class='preformatted'>hello\nworld\n\nThis is a &lt;test&gt;</p>";
 		String break_result="<p class='longlines'>\nhello<br/>\nworld<br/>\n<br/>\nThis is a &lt;test&gt;<br/>\n</p>\n";
 		HtmlPrinter hb = new HtmlBuilder();
 		hb.cleanFormatted(100, test);
