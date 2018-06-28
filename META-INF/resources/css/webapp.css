@@ -100,7 +100,7 @@ div.overflowblock .headcolhead {
 /** Acts as pre-formatted without changing the font
  */
 p.preformatted{
-	overflow: scroll;
+	overflow: auto;
 	white-space: pre;
 	/* monospace font makes this exactly like pre but ... */
 	/* font-family:  monospace; */

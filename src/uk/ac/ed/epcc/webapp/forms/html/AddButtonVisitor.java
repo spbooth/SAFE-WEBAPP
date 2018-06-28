@@ -41,6 +41,7 @@ public class AddButtonVisitor implements WebFormResultVisitor {
     private final AppContext conn;
     private final String text;
     private final String title;
+    public boolean new_tab=false;
     public AddButtonVisitor(AppContext c, ExtendedXMLBuilder hb,String text){
     	this(c,hb,text,null);
     }
@@ -60,7 +61,32 @@ public class AddButtonVisitor implements WebFormResultVisitor {
   
 	public <T, K> void visitChainedTransitionResult(
 			ChainedTransitionResult<T, K> res) throws Exception {
-		TransitionServlet.addButton(conn, hb, res, text,title);
+			K operation = res.getTransition();
+				String url = TransitionServlet.getURL(conn, res.getProvider(), res.getTarget(), null);
+				hb.open("form");
+				hb.attr("method", "post");
+			    hb.attr("action",encodeURL(url));
+			    if( new_tab) {
+					hb.attr("formtarget","_blank");
+				}
+				 // pass operation as param by preference
+				 if(operation != null){
+				 hb.open("input"); 
+				    hb.attr("type","hidden"); 
+				    hb.attr("name", TransitionServlet.TRANSITION_KEY_ATTR); 
+				    hb.attr("value", operation.toString()); 
+				
+				 hb.close();
+				 }
+				 hb.open("input");
+				  hb.addClass("input_button");
+				  hb.attr("type","submit");
+				  hb.attr("value", text);
+				  if( title != null && title.trim().length() > 0){
+				  	hb.attr("title", title);
+				  }
+				 hb.close();
+				hb.close();
 	}
 
 	public <T, K> void visitConfirmTransitionResult(
@@ -75,6 +101,9 @@ public class AddButtonVisitor implements WebFormResultVisitor {
 		}
 		hb.open("form");
 		hb.attr("action", encodeURL(res.getURL()));
+		if( new_tab) {
+			hb.attr("formtarget","_blank");
+		}
 		  hb.open("input");
 		  	hb.attr("class", "input_button");
 		    hb.attr("type", "submit");
@@ -92,6 +121,9 @@ public class AddButtonVisitor implements WebFormResultVisitor {
 	public void visitRedirectResult(RedirectResult res) throws Exception {
 		hb.open("form");
 		hb.attr("action", encodeURL(res.getURL()));
+		if( new_tab) {
+			hb.attr("formtarget","_blank");
+		}
 		  hb.open("input");
 		  	hb.attr("class", "input_button");
 		    hb.attr("type", "submit");
@@ -110,6 +142,9 @@ public class AddButtonVisitor implements WebFormResultVisitor {
 	public void visitServeDataResult(ServeDataResult res) throws Exception{
 		hb.open("form");
 		hb.attr("action", encodeURL(ServeDataServlet.getURL(conn, res.getProducer(), res.getArgs())));
+		if( new_tab) {
+			hb.attr("formtarget","_blank");
+		}
 		  hb.open("input");
 		    hb.attr("class", "input_button");
 		    hb.attr("type", "submit");

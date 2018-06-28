@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.forms.FormValidator;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.inputs.PasswordInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
@@ -33,6 +34,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.ExtraFormTransition;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.servlet.LoginServlet;
 
 /** A class that build password update forms
  * @author spb
@@ -318,6 +320,17 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 				}
 			}catch(Throwable t){
 				getLogger().error("Error calling PasswordChangeListener", t);
+			}
+			SessionService<U> service = getContext().getService(SessionService.class);
+			if( ! service.haveCurrentUser()) {
+				// This must be a reset via an email link
+				service.setCurrentPerson(user);
+				if (comp.doWelcome(user)) {
+					getLogger().debug("Doing welcome page");
+					// Ok, got a first time visit from a new user - send
+					// them to the welcome page
+					return new RedirectResult(LoginServlet.getWelcomePage(getContext()));
+				}
 			}
 			return new MessageResult("password_changed");
 		}

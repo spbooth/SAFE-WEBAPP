@@ -40,6 +40,7 @@ public class AddLinkVisitor implements WebFormResultVisitor {
     private final AppContext conn;
     private final String text;
     private final String title;
+    public boolean new_tab=false;
     public AddLinkVisitor(AppContext c, ExtendedXMLBuilder hb,String text,String title){
     	conn=c;
     	this.hb=hb;
@@ -55,7 +56,7 @@ public class AddLinkVisitor implements WebFormResultVisitor {
     }
 	public <T, K> void visitChainedTransitionResult(
 			ChainedTransitionResult<T, K> res) throws Exception {
-		TransitionServlet.addLink(conn, hb, res, text,title);
+		TransitionServlet.addLink(conn,hb,res.getProvider(),res.getTransition(),res.getTarget(),text,title,new_tab);
 	}
 
 	public <T, K> void visitConfirmTransitionResult(
@@ -72,7 +73,11 @@ public class AddLinkVisitor implements WebFormResultVisitor {
 		if( title != null && ! title.isEmpty()){
 			hb.attr("title", title);
 		}
-		hb.attr("href", encodeURL(res.getURL()));
+		hb.attr("href", encodeURL(res.getURL()));	
+		if( new_tab) {
+			hb.attr("target","_blank");
+		}
+		
 		hb.clean(text);
 		hb.close();
 
@@ -86,6 +91,9 @@ public class AddLinkVisitor implements WebFormResultVisitor {
 			hb.attr("title", title);
 		}
 		hb.attr("href", encodeURL(res.getURL()));
+		if( new_tab) {
+			hb.attr("target","_blank");
+		}
 		hb.clean(text);
 		hb.close();
 	}

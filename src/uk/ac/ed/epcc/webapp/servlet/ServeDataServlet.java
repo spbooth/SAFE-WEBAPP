@@ -125,6 +125,7 @@ public class ServeDataServlet extends WebappServlet {
 		hb.open("a");
 		try {
 			hb.attr("href", conn.getService(ServletService.class).encodeURL(getURL(conn, producer, args)));
+			hb.attr("target","_blank"); // always in new tab for download
 		} catch (Exception e) {
 			conn.error(e,"Error making URL");
 		}

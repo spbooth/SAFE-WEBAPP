@@ -67,6 +67,14 @@ public class MessageComposerFormat {
 		xb.clean(composer.getTypeName());
 		xb.appendParent();
 		sb = sb.addParent();
+		if( composer instanceof MessageComposerExtraFormat) {
+			ContentBuilder top = sb.getPanel("top");
+			if( top instanceof HtmlBuilder) {
+				((HtmlBuilder)top).setNewTab(true);
+			}
+			((MessageComposerExtraFormat)composer).addTopContent(top);
+			top.addParent();
+		}
 		EditMessageVisitor v = new EditMessageVisitor(conn,sb,lk);
 		MessageWalker mw = new MessageWalker(conn);
 		MessageProvider messageProvider = composer.getMessageProvider();

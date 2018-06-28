@@ -88,18 +88,8 @@ public class PasswordChangeRequestServlet<A extends AppUser> extends WebappServl
 				
 				Map<String,Object> params = conn.getService(ServletService.class).getParams();
 				try {
-					FormResult result =  form.doAction(params); // this sets the password
+					FormResult result =  form.doAction(params); // this sets the password and logs-in
 					request.delete();
-					service.setCurrentPerson(user);
-					if (comp.doWelcome(user)) {
-						log.debug("Doing welcome page");
-						// Ok, got a first time visit from a new user - send
-						// them to the welcome page insras
-						res.sendRedirect(res.encodeRedirectURL(req
-								.getContextPath()
-								+ LoginServlet.getWelcomePage(conn)));
-						return;
-					}
 					handleFormResult(conn, req, res, result);
 				} catch (Exception e) {
 					getLogger(conn).error("Error processing form", e);

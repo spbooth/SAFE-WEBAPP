@@ -23,6 +23,7 @@ import javax.mail.internet.MimeMessage;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.email.inputs.EmailListInput;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
@@ -517,6 +518,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		try {
 			MessageHandler handler = target.getHandler();
 			if( handler instanceof MessageComposer){
+				
 				if( target.hashMatches()){
 					MessageComposerFormat mcf = new MessageComposerFormat(getContext(), (MessageComposer) handler, new TransitionLinker(getContext(), target));
 					mcf.getContent(cb);

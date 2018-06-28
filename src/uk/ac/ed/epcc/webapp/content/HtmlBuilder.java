@@ -60,6 +60,7 @@ public static final Feature HTML_TABLE_SECTIONS_FEATURE = new Preference("html.t
 public static final Feature CONFIRM_ATTR_FEATURE = new Feature("html.form.confirm_attributes",false,"Add known confirm tags as submit input attributes");
 Boolean use_table_section=null;
 
+private boolean new_tab=false; // Do  we want to open links/buttons in new tab/window
 protected static final class Text extends Panel {
 	  Text(HtmlBuilder parent){
 		  super("div",parent,true,"para");
@@ -207,6 +208,7 @@ public HtmlBuilder(){
 
 public void addButton(AppContext conn,String text, FormResult action) {
 	AddButtonVisitor vis = new AddButtonVisitor(conn, this, text);
+	vis.new_tab=new_tab;
 	try {
 		action.accept(vis);
 	} catch (Exception e) {
@@ -215,6 +217,7 @@ public void addButton(AppContext conn,String text, FormResult action) {
 }
 public void addButton(AppContext conn,String text, String hover,FormResult action) {
 	AddButtonVisitor vis = new AddButtonVisitor(conn, this, text,hover);
+	vis.new_tab=new_tab;
 	try {
 		action.accept(vis);
 	} catch (Exception e) {
@@ -230,6 +233,7 @@ public void addLink(AppContext conn,String text, String hover,FormResult action)
 		return;
 	}
 	AddLinkVisitor vis = new AddLinkVisitor(conn, this, text,hover);
+	vis.new_tab=new_tab;
 	try {
 		action.accept(vis);
 	} catch (Exception e) {
@@ -689,5 +693,15 @@ public ContentBuilder getDetails(Object summary_text) {
 		details.close();
 	}
 	return details;
+}
+
+
+public boolean useNewTab() {
+	return new_tab;
+}
+
+
+public void setNewTab(boolean new_tab) {
+	this.new_tab = new_tab;
 }
 }
