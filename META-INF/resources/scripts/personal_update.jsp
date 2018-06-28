@@ -46,7 +46,7 @@ Update personal details
 %>
 <div class="block">
 <h2>Update required</h2>
-<wb:message optional="true" message="person_update_required"/>
+<wb:content optional="true" message="person_update_required"/>
 </div>
 <%}%>
 <div class="block">
