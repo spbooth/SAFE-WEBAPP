@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import uk.ac.ed.epcc.webapp.email.MockTansport;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.html.PageHTMLForm;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
@@ -56,6 +57,7 @@ public class PasswordResetServletTest extends ServletTest {
 	@DataBaseFixtures("new_password_from_server.xml")
 	public void testPasswordChange() throws ConsistencyError, Exception{
 		takeBaseline();
+		MockTansport.clear();
 		req.path_info="1-2515j732jc4y1n13s315v34133x15";
 		doPost();
 		checkForward("/scripts/password_change_request.jsp");
@@ -74,8 +76,33 @@ public class PasswordResetServletTest extends ServletTest {
 		checkDiff("/cleanup.xsl", "servlet_password_reset.xml");
 		PasswordAuthComposite comp = (PasswordAuthComposite) sess.getLoginFactory().getComposite(PasswordAuthComposite.class);
 		assertTrue(comp.checkPassword(user, "BorisTheSpider"));
+		assertEquals(1, MockTansport.nSent());
+		assertEquals(ctx.expandText("${service.name} Password has been changed"),MockTansport.getMessage(0).getSubject());
 	}
 	
+	
+	@Test
+	@DataBaseFixtures("new_password_from_server.xml")
+	public void testPasswordCancel() throws ConsistencyError, Exception{
+		takeBaseline();
+		MockTansport.clear();
+		req.path_info="1-2515j732jc4y1n13s315v34133x15";
+		doPost();
+		checkForward("/scripts/password_change_request.jsp");
+		//addParam("form_url","/scripts/password_update.jsp");
+		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD1,"BorisTheSpider");
+		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD2,"BorisTheSpider");
+		addParam("submitted","true");
+		addParam("action",UserServlet.CHANGE_PASSWORD); 
+		setAction(PasswordUpdateFormBuilder.CANCEL_ACTION);
+		doPost();
+		checkMessage("password_change_cancel");
+		SessionService sess = ctx.getService(SessionService.class);
+		assertFalse(sess.haveCurrentUser());
+	
+		checkDiff("/cleanup.xsl", "servlet_password_cancel.xml");
+		PasswordAuthComposite comp = (PasswordAuthComposite) sess.getLoginFactory().getComposite(PasswordAuthComposite.class);
+	}
 	@Test
 	@DataBaseFixtures("new_password_from_server.xml")
 	public void testMisMatch() throws ConsistencyError, Exception{

@@ -19,6 +19,7 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.FormValidator;
@@ -43,6 +44,10 @@ import uk.ac.ed.epcc.webapp.servlet.LoginServlet;
  */
 public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormTransition<U> implements ExtraFormTransition<U>{
 	
+	/**
+	 * 
+	 */
+	public static final String CANCEL_ACTION = "Cancel";
 	/**
 	 * 
 	 */
@@ -71,6 +76,8 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 	 * 
 	 */
 	public static final Feature REQUIRE_OLD_PASSWORD= new Feature("password_change.require_old_password",false,"Do website password changes need the old password from a logged in user");
+
+	public static final Feature NOTIFY_PASSWORD_CHANGE= new Feature("password_change.notify_changes",true,"Send notifications when password reset");
 
 	/** create the form builder.
 	 * 
@@ -236,6 +243,8 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
     }
     
     public void buildForm(Form f,U user, AppContext conn){
+    	SessionService<U> sess = conn.getService(SessionService.class);
+    	boolean logged_in = sess != null && sess.haveCurrentUser();
     	if( check_old ){
     		f.addInput(PASSWORD_FIELD, "Current Password:", new PasswordInput());
     		f.getField(PASSWORD_FIELD).addValidator(new MatchValidator(user));
@@ -251,11 +260,50 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
     	}
     	f.addAction(CHANGE_ACTION, new UpdateAction(user));
     	if( comp.mustResetPassword(user)){
-    		f.addAction("Cancel", new CancelAction());
+    		f.addAction(CANCEL_ACTION, new CancelLogoutAction());
+    	}else if ( ! logged_in) {
+    		// must be reset link. Cancelling will leave pasword as is
+    		// but will servlet will strill remove the request object as well
+    		f.addAction(CANCEL_ACTION, new CancelAction());
     	}
     }
     
     public class CancelAction extends FormAction{
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#getHelp()
+		 */
+		@Override
+		public String getHelp() {
+			return "Cancel this password change.";
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#getText()
+		 */
+		@Override
+		public String getText() {
+			return CANCEL_ACTION;
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#action(uk.ac.ed.epcc.webapp.forms.Form)
+		 */
+		@Override
+		public FormResult action(Form f) throws ActionException {
+			return new MessageResult("password_change_cancel");
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#getMustValidate()
+		 */
+		@Override
+		public boolean getMustValidate() {
+			return false;
+		}
+    	
+    }
+    public class CancelLogoutAction extends FormAction{
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#getHelp()
@@ -323,13 +371,21 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 			}
 			SessionService<U> service = getContext().getService(SessionService.class);
 			if( ! service.haveCurrentUser()) {
-				// This must be a reset via an email link
+				// This must be a reset or initial password via an email link
 				service.setCurrentPerson(user);
 				if (comp.doWelcome(user)) {
 					getLogger().debug("Doing welcome page");
 					// Ok, got a first time visit from a new user - send
 					// them to the welcome page
 					return new RedirectResult(LoginServlet.getWelcomePage(getContext()));
+				}else {
+					try {
+						// Notify password reset
+						Emailer emailer = new Emailer(getContext());
+						emailer.passwordChanged(user);
+					}catch(Throwable t) {
+						getLogger().error("Error in email notification", t);
+					}
 				}
 			}
 			return new MessageResult("password_changed");

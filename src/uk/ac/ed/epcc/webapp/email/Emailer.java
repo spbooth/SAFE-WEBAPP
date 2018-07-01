@@ -244,8 +244,7 @@ public class Emailer {
 
 	}
 	/**
-	 * Generic welcome email giving a new signup his password. Some Webapps may
-	 * need to customise this.
+	 * Notify user their password has been changed.
 	 * 
 	 * 
 	 * @param person
@@ -253,6 +252,26 @@ public class Emailer {
 	 * @throws Exception 
 	 * 
 	 */
+	public void passwordChanged(AppUser person)
+			throws Exception {
+
+		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("password_changed.txt");
+		
+
+		String name = person.getName();
+		if( name == null || name.trim().length() == 0){
+			name = "User";
+		}
+		email_template.setProperty("person.name", name);
+		String email = person.getEmail();
+		if( email == null){
+			getLogger().error("Password change email destination not known "+person.getIdentifier());;
+			return;
+		}
+		email_template.setProperty("person.email", email);
+		doSend(templateMessage(person,email_template));
+
+	}
 	public void newSignup(AppUser person, String new_password)
 			throws Exception {
 
@@ -287,7 +306,6 @@ public class Emailer {
 		doSend(templateMessage(person,email_template));
 
 	}
-
 	public MimeMessage templateMessage(String sendto, Hashtable h,
 			TemplateFile email_template) throws IOException, MessagingException, InvalidArgument {
 		Logger log = getLogger();
