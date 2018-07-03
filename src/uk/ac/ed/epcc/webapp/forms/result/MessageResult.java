@@ -58,4 +58,33 @@ public void accept(FormResultVisitor vis) throws Exception {
 	vis.visitMessageResult(this);
 	
 }
+@Override
+public int hashCode() {
+	final int prime = 31;
+	int result = 1;
+	result = prime * result + ((args == null) ? 0 : args.hashCode());
+	result = prime * result + ((message == null) ? 0 : message.hashCode());
+	return result;
+}
+@Override
+public boolean equals(Object obj) {
+	if (this == obj)
+		return true;
+	if (obj == null)
+		return false;
+	if (getClass() != obj.getClass())
+		return false;
+	MessageResult other = (MessageResult) obj;
+	if (args == null) {
+		if (other.args != null)
+			return false;
+	} else if (!args.equals(other.args))
+		return false;
+	if (message == null) {
+		if (other.message != null)
+			return false;
+	} else if (!message.equals(other.message))
+		return false;
+	return true;
+}
 }

@@ -499,6 +499,8 @@ public class DefaultServletService implements ServletService{
 								// the registration page
 								return;
 							}
+							// If we want to support 2-factor with external login 
+							// we should do this via a required page.
 							sess.setCurrentPerson(person);
 						}	
 					}

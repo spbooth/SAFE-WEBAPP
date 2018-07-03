@@ -27,9 +27,7 @@ the form could just submit to self. This might break form error reporting though
 <%@ page import="uk.ac.ed.epcc.webapp.forms.exceptions.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.forms.inputs.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.content.*" %>
-<%@ include file="/session.jsf" %>
-<wb:formpage/>
-<wb:css url="service_desk.css"/>
+<%@ include file="/scripts/service_init.jsf" %>
 <%
     TransitionFactory tp = TransitionServlet.getProvider(conn,request);
     Object key =  request.getAttribute(TransitionServlet.TRANSITION_KEY_ATTR);
@@ -42,11 +40,18 @@ the form could just submit to self. This might break form error reporting though
 <%
        return;
     }
+    boolean allow_anonymous = tp instanceof AnonymousTransitionFactory;
+    if( ! allow_anonymous ){
+%>
+<%@ include file="/scripts/basic_session.jsf" %>
+<%@ include file="/scripts/required_pages.jsf" %>
+<%    	
+    }
     Object target =   TransitionServlet.getTarget(conn,tp,request);
     String action = key.toString();
     String page_title=TransitionServlet.getPageTitle(tp, key, target);
     String page_heading=TransitionServlet.getPageHeader(tp, key, target);
-    
+    SessionService session_service = conn.getService(SessionService.class);
     // Add per tranistion css for script augmented transitions.
    
     if( tp instanceof ScriptTransitionFactory){
@@ -56,6 +61,8 @@ the form could just submit to self. This might break form error reporting though
     }
     request.setAttribute(WebappHeadTag.FORM_PAGE_ATTR, Boolean.TRUE);
 %>
+<wb:formpage/>
+<wb:css url="service_desk.css"/>
 <%@ include file="/std_header.jsf" %>
 <%@ include file="/main__logged_in.jsf" %>
 <% if( tp instanceof NavigationProvider){

@@ -66,4 +66,33 @@ public class ForwardResult implements FormResult {
 		}
 		throw new UnsupportedResultException();
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((attr == null) ? 0 : attr.hashCode());
+		result = prime * result + ((url == null) ? 0 : url.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ForwardResult other = (ForwardResult) obj;
+		if (attr == null) {
+			if (other.attr != null)
+				return false;
+		} else if (!attr.equals(other.attr))
+			return false;
+		if (url == null) {
+			if (other.url != null)
+				return false;
+		} else if (!url.equals(other.url))
+			return false;
+		return true;
+	}
 }

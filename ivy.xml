@@ -85,7 +85,9 @@
 		<dependency org="junit" name="junit" rev="4.11">
     		<artifact name="junit" ext="jar"/>
 		</dependency>
-		
+		<dependency org="com.google.zxing" name="core" rev="3.3.3">
+  			<artifact name="core" type="jar" />
+		</dependency>
 	</dependencies>
 	
 </ivy-module>

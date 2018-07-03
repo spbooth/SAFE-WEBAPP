@@ -25,6 +25,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
@@ -33,6 +35,7 @@ import uk.ac.ed.epcc.webapp.session.Hash;
 import uk.ac.ed.epcc.webapp.session.RandomService;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.session.WebNameFinder;
+import uk.ac.ed.epcc.webapp.session.twofactor.TwoFactorHandler;
 
 /**
  * This servlet is to support authentication from the container. This servlet
@@ -203,9 +206,13 @@ public class RemoteAuthServlet extends WebappServlet {
 				}
 				if( allow_login ) {
 				// attempt a login
-					session_service.setCurrentPerson(person);
+					TwoFactorHandler handler = new TwoFactorHandler<>(session_service);
+					FormResult result = handler.doLogin(person, new RedirectResult(LoginServlet.getMainPage(conn)));
+					handleFormResult(conn, req, res, result);
+					return;
 				}else{
 					message(conn, req, res, "remote_auth_binding_only",web_name,person.getIdentifier());
+					return;
 				}
 			} else {
 				// Check for existing binding
@@ -231,10 +238,6 @@ public class RemoteAuthServlet extends WebappServlet {
 				}
 
 			}
-			// use re-direct rather than forward as this is a login
-			String redirect_url = res.encodeRedirectURL(req.getContextPath()
-					+ LoginServlet.getMainPage(conn));
-			res.sendRedirect(redirect_url);
 		} catch (Exception e) {
 			conn.error(e, "general error in RemoteAuthServlet");
 			if (e instanceof ServletException) {
@@ -297,7 +300,12 @@ public class RemoteAuthServlet extends WebappServlet {
     	Integer register_id = (Integer) sess.getAttribute(EXTAUTH_REGISTER_ID_ATTR);
     	if( register_id != null){
     		A user = sess.getLoginFactory().find(register_id);
-    		sess.setCurrentPerson(user);
+    		// Log the user in if no two factor required
+    		// otherwise we will still link the ID but not auto login.
+    		TwoFactorHandler<A> handler = new TwoFactorHandler<>(sess);
+    		if( ! handler.needAuth(user)) {
+    			sess.setCurrentPerson(user);
+    		}
 			return user;
     	}
     	return null;

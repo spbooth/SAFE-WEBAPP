@@ -29,6 +29,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider;
+import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
 /** A {@link TransitionProvider} for operations on {@link AppUser}s
@@ -37,6 +38,10 @@ import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
  */
 
 public class AppUserTransitionProvider extends AbstractViewTransitionProvider<AppUser, AppUserKey> {
+	/**
+	 * 
+	 */
+	private static final String PERSON_TRANSITION_TAG = "Person";
 	public static final String VIEW_PERSON_RELATIONSHIP = "ViewPerson";
 	public static final AppUserKey SU_KEY = new AppUserKey("SU","Become User","Switch to this user identity") {
 
@@ -72,7 +77,7 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 		super(c);
 		fac = c.getService(SessionService.class).getLoginFactory();
 		for(AppUserTransitionContributor cont : fac.getComposites(AppUserTransitionContributor.class)) {
-			for(Entry<AppUserKey, Transition<AppUser>> e : cont.getTransitions().entrySet()) {
+			for(Entry<AppUserKey, Transition<AppUser>> e : cont.getTransitions(this).entrySet()) {
 				addTransition( e.getKey(), e.getValue());
 			}
 		}
@@ -107,7 +112,7 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 	 */
 	@Override
 	public String getTargetName() {
-		return "Person";
+		return PERSON_TRANSITION_TAG;
 	}
 
 	/* (non-Javadoc)
@@ -172,4 +177,7 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 		return key.getText();
 	}
 
+	public static AppUserTransitionProvider getInstance(AppContext conn) {
+		return (AppUserTransitionProvider) TransitionServlet.getProviderFromName(conn, PERSON_TRANSITION_TAG);
+	}
 }

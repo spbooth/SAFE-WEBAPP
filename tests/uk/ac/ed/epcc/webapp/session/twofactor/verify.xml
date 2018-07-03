@@ -1,0 +1,21 @@
+<Diff><TableSpecification name='TwoFactorPerson'>
+<Email type='String' nullable='true' max='254'/>
+<Updated type='Long' nullable='true'/>
+<PasswordFails type='Integer' nullable='false'/>
+<PasswordStatus type='String' nullable='false' max='1'/>
+<Salt type='String' nullable='false' max='16'/>
+<Alg type='Integer' nullable='false'/>
+<Password type='String' nullable='false' max='32'/>
+<AuthCodeSecret type='String' nullable='true' max='32'/>
+<Email_index type='Index' unique='true'><Column name='Email'/></Email_index>
+</TableSpecification>
+<TwoFactorPerson id='1'>
+<Email>fred@example.com</Email>
+<PasswordFails>0</PasswordFails>
+<PasswordStatus>I</PasswordStatus>
+<Salt></Salt>
+<Alg>0</Alg>
+<Password>locked</Password>
+<AuthCodeSecret>UJ4SLJJPNPXVGIPLXDTQUGVKNI======</AuthCodeSecret>
+</TwoFactorPerson>
+</Diff>

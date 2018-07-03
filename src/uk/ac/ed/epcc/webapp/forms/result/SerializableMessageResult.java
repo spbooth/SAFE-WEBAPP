@@ -11,19 +11,30 @@
 //| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
-package uk.ac.ed.epcc.webapp.session;
+package uk.ac.ed.epcc.webapp.forms.result;
 
-import java.util.Map;
+import java.io.Serializable;
 
-import uk.ac.ed.epcc.webapp.forms.transition.Transition;
-
-/** Interface for {@link AppUserComposite}s that add additional transitions to the view details
- * transition.
- * @author spb
+/**
+ * @author Stephen Booth
  *
  */
-public interface AppUserTransitionContributor
-{
+public class SerializableMessageResult extends MessageResult implements SerializableFormResult {
 
-	Map<AppUserKey,Transition<AppUser>> getTransitions(AppUserTransitionProvider provider);
+	/**
+	 * @param mess
+	 * @param args
+	 */
+	public SerializableMessageResult(String mess, Serializable... args) {
+		super(mess, args);
+	}
+
+	/**
+	 * @param mess
+	 */
+	public SerializableMessageResult(String mess) {
+		super(mess);
+		// TODO Auto-generated constructor stub
+	}
+
 }

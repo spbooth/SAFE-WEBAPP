@@ -30,6 +30,9 @@ import javax.servlet.http.HttpServletResponse;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.email.Emailer;
+import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.SerializableFormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
@@ -39,6 +42,7 @@ import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
 import uk.ac.ed.epcc.webapp.session.ReRegisterComposite;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.session.twofactor.TwoFactorHandler;
 
 // import uk.ac.hpcx.HpcxMain;
 
@@ -199,38 +203,20 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 				}
 				
 				if (person != null) {
-					log.debug("Go for conn.login");
-					serv.setCurrentPerson(person);
-                    log.debug("done login");
-					if (password_auth.doWelcome(person)) {
-						log.debug("Doing welcome page");
-						// Ok, got a first time visit from a new user - send
-						// them to the welcome page
-						res.sendRedirect(res.encodeRedirectURL(req
-								.getContextPath()
-								+ getWelcomePage(conn)));
-						return;
-					}
-
 					// Go to the logged in page
 					// (we may have another page that should be accessed)
 					String other_page = req.getParameter("page");
-					if (other_page != null) {
-						// res.setContentType("text/html");
-						// PrintWriter out = res.getWriter();
-						// out.println("page = " + req.getServletPath());
-						String dest = res.encodeRedirectURL(req
-								.getContextPath()
-								+ other_page);
-						log.info("LoginServlet redirect to " + dest);
-
-						res.sendRedirect(dest);
-					} else {
-						log.debug("redirect to main");
-						res.sendRedirect(res.encodeRedirectURL(req
-								.getContextPath()
-								+ getMainPage(conn)));
+					FormResult next_page=null;
+					if (password_auth.doWelcome(person)) {
+						next_page = new RedirectResult(getWelcomePage(conn));
+					}else if( other_page != null) {
+						next_page = new RedirectResult(other_page);
+					}else {
+						next_page = new RedirectResult(getMainPage(conn));
 					}
+					TwoFactorHandler<T> handler = new TwoFactorHandler<>(serv);
+					next_page =  handler.doLogin(person, (SerializableFormResult) next_page);
+					handleFormResult(conn, req, res, next_page);
 					return;
 				}
 			}

@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
@@ -180,7 +181,7 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	
 	/** Store an object in the session. 
 	 * Objects stored in the session should not contain references to the 
-	 * AppContext as the AppCotnext might have a shorter lifetime.
+	 * AppContext as the {@link AppContext} might have a shorter lifetime.
 	 * t
 	 * 
 	 * @param key

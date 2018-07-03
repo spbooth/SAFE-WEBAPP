@@ -11,19 +11,9 @@
 //| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
-package uk.ac.ed.epcc.webapp.session;
-
-import java.util.Map;
-
-import uk.ac.ed.epcc.webapp.forms.transition.Transition;
-
-/** Interface for {@link AppUserComposite}s that add additional transitions to the view details
- * transition.
- * @author spb
+/** Two factor authentication
+ * 
+ * @author Stephen Booth
  *
  */
-public interface AppUserTransitionContributor
-{
-
-	Map<AppUserKey,Transition<AppUser>> getTransitions(AppUserTransitionProvider provider);
-}
+package uk.ac.ed.epcc.webapp.session.twofactor;

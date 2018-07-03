@@ -18,12 +18,14 @@ package uk.ac.ed.epcc.webapp.session;
 
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
+import uk.ac.ed.epcc.webapp.servlet.ServletFormResultVisitor;
 
 /** Object representing a page that a user is redirected to if certain conditions are met.
  * e.g. a password reset page.
  * 
  * You must ensure that any JSP referenced in this way does not include
- * the redirect checks itself.
+ * the redirect checks itself to avoid looping. Some {@link FormResult}s are
+ * added as request attributes by {@link ServletFormResultVisitor} andare checked to prevent loops.
  * 
  * {@link Composite}s in the {@link AppUserFactory} can add these if they implement {@link RequiredPageProvider}
  * 

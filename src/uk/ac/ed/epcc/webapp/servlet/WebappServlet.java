@@ -283,9 +283,14 @@ public abstract class WebappServlet extends HttpServlet {
     }
 
 public void handleFormResult(AppContext conn,HttpServletRequest req, HttpServletResponse res, FormResult result)throws Exception{
+		 if( result == null ) {
+			 return;
+		 }
 		 ServletFormResultVisitor vis = new ServletFormResultVisitor(conn, req, res);
 		 result.accept(vis);
-	}
+}
+
+
 
 
 	/**

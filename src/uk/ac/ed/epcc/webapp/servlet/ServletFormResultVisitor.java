@@ -48,6 +48,7 @@ public class ServletFormResultVisitor implements WebFormResultVisitor{
 	private AppContext conn;
 	private HttpServletRequest req; 
 	private HttpServletResponse res;
+	public static final String CHAIN_ATTRIBUTE = "ChainResult";
 	public ServletFormResultVisitor(AppContext conn,HttpServletRequest req, HttpServletResponse res){
 		this.conn=conn;
 		this.req=req;
@@ -67,6 +68,8 @@ public class ServletFormResultVisitor implements WebFormResultVisitor{
 		req.setAttribute(TransitionServlet.TRANSITION_KEY_ATTR, key);
 		
 		req.setAttribute(TransitionServlet.TARGET_ATTRIBUTE, target);
+		// let transition.jsp skip a recursive required page
+		req.setAttribute(ServletFormResultVisitor.CHAIN_ATTRIBUTE, ctr);
 		if( key == null ){
 			// assume view transition for a ViewTransitionProvider
 			// The TransitionServlet uses a chain with a null target to 
@@ -78,6 +81,7 @@ public class ServletFormResultVisitor implements WebFormResultVisitor{
 		return;
 	}
 	public void visitForwardResult(ForwardResult fr) throws ServletException, IOException {
+		req.setAttribute(CHAIN_ATTRIBUTE, fr);
 		   Map<String,Object> attr = fr.getAttr();
 		   if( attr != null ){
 			   for(String name : attr.keySet()){
@@ -137,6 +141,7 @@ public class ServletFormResultVisitor implements WebFormResultVisitor{
 	
 	public void visitCustomPage(CustomPageResult res) throws Exception {
 		req.setAttribute(CustomPage.CUSTOM_PAGE_TAG, res);
+		req.setAttribute(CHAIN_ATTRIBUTE, res);
 		conn.getService(ServletService.class).forward("/scripts/view_custom_page.jsp");
 		
 	}
