@@ -18,7 +18,6 @@ import java.util.List;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
-import uk.ac.ed.epcc.webapp.servlet.ServletService;
 /** A {@link Visitor} that generates the menu HTML as a set of buttons
  * 
  * @author spb

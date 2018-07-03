@@ -17,8 +17,12 @@ import java.util.HashSet;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.config.FilteredProperties;
+import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
+import uk.ac.ed.epcc.webapp.session.AppUserKey;
+import uk.ac.ed.epcc.webapp.session.AppUserTransitionProvider;
+import uk.ac.ed.epcc.webapp.session.CurrentUserKey;
 import uk.ac.ed.epcc.webapp.session.MenuContributor;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -60,6 +64,19 @@ public class SUNodeMaker extends AbstractNodeMaker  {
 		
 		for(MenuContributor<AU> mc : fac.getComposites(MenuContributor.class)){
 			addConfigNodes(parent, props, mc.additionalMenuItems(user));
+		}
+		// Add in the current-user transitions directly to the menu
+		AppUserTransitionProvider prov = AppUserTransitionProvider.getInstance(getContext());
+		for(AppUserKey key : prov.getTransitions(user)) {
+			if( key instanceof CurrentUserKey && ((CurrentUserKey)key).addMenu(user)) {
+				if( key.allow(user, service)) {
+					Node n = new ParentNode();
+					n.setMenuText(key.getText());
+					n.setHelpText(key.getHelp());
+					n.setTargetPath(TransitionServlet.getURL(getContext(), prov,(AppUser)user,key));
+					parent.addChild(n);
+				}
+			}
 		}
 	}
 

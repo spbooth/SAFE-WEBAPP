@@ -65,6 +65,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -72,6 +73,7 @@ import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.AppUserKey;
 import uk.ac.ed.epcc.webapp.session.AppUserTransitionContributor;
 import uk.ac.ed.epcc.webapp.session.AppUserTransitionProvider;
+import uk.ac.ed.epcc.webapp.session.CurrentUserKey;
 import uk.ac.ed.epcc.webapp.session.RequiredPage;
 import uk.ac.ed.epcc.webapp.session.RequiredPageProvider;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -171,7 +173,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
     }
 	public Key getSecret(A user) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeySpecException {
 		String secret = getRecord(user).getStringProperty(SECRET_FIELD);
-		if(secret == null | secret.length() == 0) {
+		if(secret == null || secret.length() == 0) {
 			return null;
 		}
 		return decodeKey(secret);
@@ -344,11 +346,13 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 			return new_key;
 		}
 		public class setKeyAction extends FormAction{
+			private final AppUserTransitionProvider prov;
 			/**
 			 * @param user
 			 */
-			public setKeyAction(A user) {
+			public setKeyAction(AppUserTransitionProvider prov,A user) {
 				super();
+				this.prov=prov;
 				this.user = user;
 			}
 			private final A user;
@@ -357,9 +361,15 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 			 */
 			@Override
 			public FormResult action(Form f) throws ActionException {
-				setSecret(user, (String)f.get(KEY));
+				
+				try {
+					setSecret(user, (String)f.get(KEY));
+					user.commit();
+				} catch (DataFault e) {
+					throw new ActionException("Error setting key", e);
+				}
 				getContext().getService(SessionService.class).removeAttribute(NEW_AUTH_KEY_ATTR);
-				return new MessageResult("totp_key_changed");
+				return prov.new ViewResult(user);
 			}
 			
 		}
@@ -386,7 +396,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 						
 					}
 				});
-				f.addAction("Set", new setKeyAction(target));
+				f.addAction("Set", new setKeyAction(prov,target));
 			} catch (Exception e) {
 				getLogger().error("Error building form", e);
 				throw new TransitionException("Internal error");
@@ -421,27 +431,34 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		}
 		
 	}
-	private static final AppUserKey SET_KEY = new AppUserKey("SetKey","Enable 2 factor","Enable two factor authentication for this account") {
+	private static final CurrentUserKey SET_KEY = new CurrentUserKey("SetKey","Set 2 factor token","Enable/change two factor authentication for this account") {
 		
 		@Override
-		public boolean allow(AppUser user, SessionService op) {
+		public boolean allowState(AppUser user, SessionService op) {
 			TotpCodeAuthComposite comp = (TotpCodeAuthComposite) op.getLoginFactory().getComposite(CodeAuthComposite.class);
 			if( comp == null ) {
 				return false;
 			}
-			return op.isCurrentPerson(user) ;
+			return comp.enabled();
 		}
 	};
-private static final AppUserKey CLEAR_KEY = new AppUserKey("ClearKey","Disable 2 factor","Disable two factor authentication for this account") {
+	private static final AppUserKey CLEAR_KEY = new CurrentUserKey("ClearKey","Disable 2 factor","Disable two factor authentication for this account ?") {
 		
 		@Override
-		public boolean allow(AppUser user, SessionService op) {
+		public boolean allowState(AppUser user, SessionService op) {
+			if( REQUIRED_TWO_FACTOR.isEnabled(op.getContext())) {
+				return false;
+			}
 			TotpCodeAuthComposite comp = (TotpCodeAuthComposite) op.getLoginFactory().getComposite(CodeAuthComposite.class);
 			if( comp == null || ! comp.hasKey(user)) {
 				return false;
 			}
-			return ( op.isCurrentPerson(user) && ! REQUIRED_TWO_FACTOR.isEnabled(op.getContext())) 
-					|| op.hasRole(SessionService.ADMIN_ROLE);
+			return true;
+		}
+
+		@Override
+		public boolean allow(AppUser user, SessionService op) {
+			return (op.hasRole(SessionService.ADMIN_ROLE) || op.isCurrentPerson(user)) && allowState(user, op);
 		}
 	};
 	public class ClearKeyTransition extends AbstractDirectTransition<A>{
@@ -516,6 +533,8 @@ private static final AppUserKey CLEAR_KEY = new AppUserKey("ClearKey","Disable 2
 	@Override
 	public void addAttributes(Map<String, Object> attributes, A target) {
 		if( enabled()) {
+			//TODO should we restict access to this attribute.
+			// admins may care but project managers should not.
 			attributes.put("2-factor authentication", hasKey(target));
 		}
 	

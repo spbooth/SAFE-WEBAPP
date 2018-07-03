@@ -17,7 +17,8 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
-/**
+/** An {@link ExactNode} where the menu text changes to the name of the current person
+ * if the session is a "SU" session from an admin account.
  * @author spb
  *
  */

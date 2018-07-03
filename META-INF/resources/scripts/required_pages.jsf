@@ -16,6 +16,7 @@
 <%@page import="uk.ac.ed.epcc.webapp.forms.result.FormResult" %>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.ServletFormResultVisitor" %>
 <%@page import="uk.ac.ed.epcc.webapp.session.RequiredPage" %>
+<%@page import="uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService" %>
 <% 
     //  fragment to check for required pages. include from session
     try{
