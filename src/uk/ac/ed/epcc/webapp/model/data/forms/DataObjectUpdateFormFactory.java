@@ -103,19 +103,29 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 				}
 				f.setContents(getDefaults());
 				f.addAction(UPDATE, new UpdateAction<BDO>(type_name,this, dat));
-				if (dat instanceof Retirable && ( ! (dat instanceof RestrictedRetirable)  || ((RestrictedRetirable)dat).allowRetire(operator))){
-					if(((Retirable) dat).canRetire()) {
-						f.addAction(RETIRE, new RetireAction(type_name, dat));
-					}else if( dat instanceof UnRetirable && ((UnRetirable)dat).canRestore()){
-						f.addAction(UN_RETIRE, new UnRetireAction(type_name, dat));
-					}
-				}
+				addRetireAction(type_name, f, dat, operator);
 				customiseUpdateForm(f, dat);
 				if( dat != null ){
 					//this should never be called with dat null except from a unit test
 				   f.setContents(dat.getMap());
 				}
 			}
+
+	/**
+	 * @param type_name
+	 * @param f
+	 * @param dat
+	 * @param operator
+	 */
+	protected void addRetireAction(String type_name, Form f, BDO dat, SessionService<?> operator) {
+		if (dat instanceof Retirable && ( ! (dat instanceof RestrictedRetirable)  || ((RestrictedRetirable)dat).allowRetire(operator))){
+			if(((Retirable) dat).canRetire()) {
+				f.addAction(RETIRE, new RetireAction(type_name, dat));
+			}else if( dat instanceof UnRetirable && ((UnRetirable)dat).canRestore()){
+				f.addAction(UN_RETIRE, new UnRetireAction(type_name, dat));
+			}
+		}
+	}
 
 	public void postUpdate(BDO o, Form f, Map<String,Object> origs)
 			throws DataException {

@@ -139,20 +139,29 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 			service.removeAttribute(NAVIGATION_MENU_ATTR);
 		}
 	}
+	
+	public FilteredProperties getProperties() {
+		ConfigService cfg = getContext().getService(ConfigService.class);
+		Properties prop = cfg.getServiceProperties();
+		FilteredProperties menu_prop = new FilteredProperties(prop, NAVIGATIONAL_PREFIX);
+		if( cfg==null){
+			return null;
+		}
+		return menu_prop;
+	}
 	/** Populate a {@link NodeContainer} with the appropriate navigational {@link Node}s for the current user.
 	 * @return {@link NodeContainer} for the navigation menu or null
 	 */
 	public NodeContainer makeMenu() {
-		ConfigService cfg = getContext().getService(ConfigService.class);
-		if( cfg==null){
+		FilteredProperties menu_prop = getProperties();
+		if( menu_prop == null) {
 			return null;
 		}
 		SessionService<?> sess = getContext().getService(SessionService.class);
 		if( sess == null || ! sess.haveCurrentUser()){
 			return null;
 		}
-		Properties prop = cfg.getServiceProperties();
-		FilteredProperties menu_prop = new FilteredProperties(prop, NAVIGATIONAL_PREFIX);
+		
 		String list = menu_prop.getProperty("list");
 		if( list == null ){
 			return null;
@@ -200,7 +209,7 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 			String path = conn.expandText(menu_prop.getProperty(name+".path"));
 			String help = conn.expandText(menu_prop.getProperty(name+".help"));
 			String type = conn.expandText(menu_prop.getProperty(name+".type","default_node_type"));
-			String child_list = conn.expandText(menu_prop.getProperty(name+".list"));
+			
 			String image = menu_prop.getProperty(name+".image");
 			String key = menu_prop.getProperty(name+".accesskey");
 			NodeMaker maker = getContext().makeObjectWithDefault(NodeMaker.class, ParentNodeMaker.class, type);
@@ -220,16 +229,7 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 				if( help != null && ! help.isEmpty()){
 					n.setHelpText(help);
 				}
-				// Add config nodes first
-				if( child_list != null && ! child_list.isEmpty()){
-					for(String child_name : child_list.trim().split("\\s*,\\s*")){
-						Node c = makeNode(seen,child_name, menu_prop);
-						if( c != null ){
-							n.addChild(c);
-						}
-					}
-				}
-				maker.addChildren(n, name, menu_prop);
+				addChildren(seen, name, menu_prop, maker, n);
 			}else{
 				// A null node may just be disabled by the maker look for a substitute node
 				String replacement = menu_prop.getProperty(name+".replacement");
@@ -242,6 +242,27 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 			conn.getService(LoggerService.class).getLogger(getClass()).error("Problem making menu "+name,t);
 			return null;
 		}
+	}
+
+	/**
+	 * @param seen
+	 * @param name
+	 * @param menu_prop
+	 * @param maker
+	 * @param n
+	 */
+	public void addChildren(Set<String> seen, String name, FilteredProperties menu_prop, NodeMaker maker, Node n) {
+		String child_list = conn.expandText(menu_prop.getProperty(name+".list"));
+		// Add config nodes first
+		if( child_list != null && ! child_list.isEmpty()){
+			for(String child_name : child_list.trim().split("\\s*,\\s*")){
+				Node c = makeNode(seen,child_name, menu_prop);
+				if( c != null ){
+					n.addChild(c);
+				}
+			}
+		}
+		maker.addChildren(n, name, menu_prop);
 	}
 
 	public void disableNavigation(HttpServletRequest request){

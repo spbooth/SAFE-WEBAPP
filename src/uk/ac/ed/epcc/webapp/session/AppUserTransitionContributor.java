@@ -17,8 +17,8 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 
-/** Interface for {@link AppUserComposite}s that add additional transitions to the view details
- * transition.
+/** Interface for {@link AppUserComposite}s that add additional transitions to the 
+ * AppUser transitions.
  * @author spb
  *
  */

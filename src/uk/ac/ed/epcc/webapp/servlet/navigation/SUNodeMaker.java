@@ -49,8 +49,11 @@ public class SUNodeMaker extends AbstractNodeMaker  {
 	@Override
 	public Node makeNode(String name, FilteredProperties props) {
 		SUNode n = new SUNode();
+		SessionService sess = getContext().getService(SessionService.class);
+		AppUserTransitionProvider tp = AppUserTransitionProvider.getInstance(getContext());
+		n.setTargetPath(TransitionServlet.getURL(getContext(), tp, sess.getCurrentPerson()));
 		addChildrenFromComposite(n,props);
-		String additions = props.getProperty(name+".head", "Details");
+		String additions = props.getProperty(name+".head");
 		if( additions != null && ! additions.trim().isEmpty()){
 			addConfigNodes(n, props, additions.split(","));
 		}

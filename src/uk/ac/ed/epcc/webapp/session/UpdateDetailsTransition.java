@@ -1,0 +1,110 @@
+//| Copyright - The University of Edinburgh 2018                            |
+//|                                                                         |
+//| Licensed under the Apache License, Version 2.0 (the "License");         |
+//| you may not use this file except in compliance with the License.        |
+//| You may obtain a copy of the License at                                 |
+//|                                                                         |
+//|    http://www.apache.org/licenses/LICENSE-2.0                           |
+//|                                                                         |
+//| Unless required by applicable law or agreed to in writing, software     |
+//| distributed under the License is distributed on an "AS IS" BASIS,       |
+//| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
+//| See the License for the specific language governing permissions and     |
+//| limitations under the License.                                          |
+package uk.ac.ed.epcc.webapp.session;
+
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.Map;
+import java.util.MissingResourceException;
+
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
+import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
+import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.model.data.forms.UpdateTransition;
+
+/**
+ * @author Stephen Booth
+ *
+ */
+public class UpdateDetailsTransition<A extends AppUser> extends UpdateTransition<A>
+implements ExtraContent<A>{
+
+	/**
+	 * @param name
+	 * @param fac
+	 */
+	protected UpdateDetailsTransition(AppUserFactory<A> fac) {
+		super("Details", fac);
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.ExtraContent#getExtraHtml(uk.ac.ed.epcc.webapp.content.ContentBuilder, uk.ac.ed.epcc.webapp.session.SessionService, java.lang.Object)
+	 */
+	@Override
+	public <X extends ContentBuilder> X getExtraHtml(X cb, SessionService<?> op, A target) {
+		if( target.needDetailsUpdate()) {
+			
+			try {
+				ContentBuilder div = cb.getPanel();
+				div.addHeading(2, "Update required");
+				PreDefinedContent content = new PreDefinedContent(getContext(), "person_update_required");
+				div.addObject(content);
+				div.addParent();
+			}catch(MissingResourceException e) {
+				// optional
+			}
+		}
+		Date last = target.getLastTimeDetailsUpdated();
+		if( last != null) {
+			DateFormat df = DateFormat.getDateInstance();
+			cb.addHeading(3, "Last updated: "+df.format(last));
+		}
+		AppContext c = op.getContext();
+		String privacy_policy=c.getInitParameter("service.url.privacypolicy");
+	    if( privacy_policy != null && ! privacy_policy.isEmpty() ){ 
+	    	ExtendedXMLBuilder text = cb.getText();
+	    	text.open("small");
+	    	text.clean(c.expandText("All information supplied is held and processed in accordance with the ${service.name} Personal Data and Privacy Policy.\n" + 
+	    			"You can find full details "));
+	    	text.open("a");
+	    		text.attr("href",privacy_policy);
+	    		text.attr("target", "_blank");
+	    		text.clean("here");
+	    	text.close();
+	    	text.clean(".");
+	    	text.close();
+	    	text.appendParent();
+	    }
+//		try {
+//		ContentBuilder div = cb.getPanel();
+//		div.addHeading(2, "This page is to allow you to update your contact details.");
+//		getAppUserFactory().addUpdateNotes(div, target);
+//		div.addParent();
+//		}catch(Throwable t) {
+//			getLogger().error("Error getting update notes", t);
+//		}
+		return cb;
+	}
+
+	public AppUserFactory<A> getAppUserFactory(){
+		return (AppUserFactory<A>) getFactory();
+	}
+
+	@Override
+	public void preCommit(A dat, Form f, Map<String, Object> orig) throws DataException {
+		dat.markDetailsUpdated();
+	}
+
+	@Override
+	protected void addRetireAction(String type_name, Form f, A dat, SessionService<?> operator) {
+		// Supressed we have transitions for this
+	}
+
+	
+
+}

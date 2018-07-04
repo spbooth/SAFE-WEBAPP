@@ -68,6 +68,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
+import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.AppUserKey;
@@ -369,6 +370,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 					throw new ActionException("Error setting key", e);
 				}
 				getContext().getService(SessionService.class).removeAttribute(NEW_AUTH_KEY_ATTR);
+				resetNavigation();
 				return prov.new ViewResult(user);
 			}
 			
@@ -478,6 +480,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 			try {
 			clearSecret(target);
 			target.commit();
+			resetNavigation();
 			return prov.new ViewResult(target);
 			}catch(Throwable t) {
 				getLogger().error("Error clearing secret", t);
@@ -540,6 +543,11 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	
 		
 	}
-	
+	private void resetNavigation() {
+		NavigationMenuService nms = getContext().getService(NavigationMenuService.class);
+		if( nms != null ){
+			nms.resetMenu();
+		}
+	}
 
 }

@@ -25,11 +25,13 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.TitleTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
+import uk.ac.ed.epcc.webapp.servlet.UserServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
 /** A {@link TransitionProvider} for operations on {@link AppUser}s
@@ -37,7 +39,7 @@ import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
  *
  */
 
-public class AppUserTransitionProvider extends AbstractViewTransitionProvider<AppUser, AppUserKey> {
+public class AppUserTransitionProvider extends AbstractViewTransitionProvider<AppUser, AppUserKey> implements TitleTransitionProvider<AppUserKey, AppUser> {
 	/**
 	 * 
 	 */
@@ -53,6 +55,7 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 			return false;
 		}
 	};
+	public static final CurrentUserKey UPDATE = new CurrentUserKey("Details", "Update personal details", "Update the information we hold about you");
 	
 	public static final class SUTransition extends AbstractDirectTransition<AppUser>{
 
@@ -80,6 +83,9 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 			for(Entry<AppUserKey, Transition<AppUser>> e : cont.getTransitions(this).entrySet()) {
 				addTransition( e.getKey(), e.getValue());
 			}
+		}
+		if( UserServlet.USER_SELF_UPDATE_FEATURE.isEnabled(c)) {
+			addTransition(UPDATE, new UpdateDetailsTransition(fac));
 		}
 		addTransition(SU_KEY, new SUTransition());
 	}
@@ -111,7 +117,7 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#getTargetName()
 	 */
 	@Override
-	public String getTargetName() {
+	public final String getTargetName() {
 		return PERSON_TRANSITION_TAG;
 	}
 
@@ -128,31 +134,6 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 	 */
 	@Override
 	public <X extends ContentBuilder> X getSummaryContent(AppContext c, X cb, AppUser target) {
-		cb.addHeading(2, "Person details");
-		Map<String,Object> attr = new LinkedHashMap<>();
-		((AppUserFactory)fac).addAttributes(attr, target);
-		Table t = new Table();
-		String col = "Value";
-		t.addMap(col, attr);
-		t.setKeyName("Property");
-		if( t.hasData()) {
-			cb.addColumn(getContext(), t, col);
-		}
-		String privacy_policy=c.getInitParameter("service.url.privacypolicy");
-	    if( privacy_policy != null && ! privacy_policy.isEmpty() ){ 
-	    	ExtendedXMLBuilder text = cb.getText();
-	    	text.open("small");
-	    	text.clean(c.expandText("All information supplied is held and processed in accordance with the ${service.name} Personal Data and Privacy Policy.\n" + 
-	    			"You can find full details "));
-	    	text.open("a");
-	    		text.attr("href",privacy_policy);
-	    		text.attr("target", "_blank");
-	    		text.clean("here");
-	    	text.close();
-	    	text.clean(".");
-	    	text.close();
-	    	text.appendParent();
-	    }
 		return cb;
 	}
 
@@ -179,5 +160,57 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 
 	public static AppUserTransitionProvider getInstance(AppContext conn) {
 		return (AppUserTransitionProvider) TransitionServlet.getProviderFromName(conn, PERSON_TRANSITION_TAG);
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.TitleTransitionFactory#getTitle(java.lang.Object, java.lang.Object)
+	 */
+	@Override
+	public String getTitle(AppUserKey key, AppUser target) {
+		if( key == null ) {
+			return target.getIdentifier();
+		}
+		return key.getText();
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.TitleTransitionFactory#getHeading(java.lang.Object, java.lang.Object)
+	 */
+	@Override
+	public String getHeading(AppUserKey key, AppUser target) {
+		return getTitle(key, target);
+	}
+
+	
+
+	@Override
+	public <X extends ContentBuilder> X getLogContent(X cb, AppUser target, SessionService<?> sess) {
+		cb.addHeading(2, target.getIdentifier());
+		AppContext c = sess.getContext();
+		Map<String,Object> attr = new LinkedHashMap<>();
+		((AppUserFactory)fac).addAttributes(attr, target);
+		Table t = new Table();
+		String col = "Value";
+		t.addMap(col, attr);
+		t.setKeyName("Property");
+		if( t.hasData()) {
+			cb.addColumn(getContext(), t, col);
+		}
+		String privacy_policy=c.getInitParameter("service.url.privacypolicy");
+	    if( privacy_policy != null && ! privacy_policy.isEmpty() ){ 
+	    	ExtendedXMLBuilder text = cb.getText();
+	    	text.open("small");
+	    	text.clean(c.expandText("All information supplied is held and processed in accordance with the ${service.name} Personal Data and Privacy Policy.\n" + 
+	    			"You can find full details "));
+	    	text.open("a");
+	    		text.attr("href",privacy_policy);
+	    		text.attr("target", "_blank");
+	    		text.clean("here");
+	    	text.close();
+	    	text.clean(".");
+	    	text.close();
+	    	text.appendParent();
+	    }
+		return cb;
 	}
 }

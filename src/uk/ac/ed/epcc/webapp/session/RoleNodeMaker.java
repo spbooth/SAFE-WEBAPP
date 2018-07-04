@@ -56,6 +56,7 @@ public class RoleNodeMaker extends AbstractNodeMaker {
 		// path and text set by properties
 		ParentNode node = new ParentNode();
 		node.setMenuText("Toggle roles");
+		node.setTargetPath("/toggle_roles.jsp");
 		return node;
 	}
 
@@ -69,6 +70,7 @@ public class RoleNodeMaker extends AbstractNodeMaker {
 			  String role= it.next();
 			  String role_name=role;
 			  PageNode node = new PageNode();
+			  node.setID("Role"+role);
 			  node.setTargetPath("/UserServlet/action=TOGGLE_PRIV/role="+role);
 			  if( session_service.hasRole(role_name)){
 				  node.setMenuText("-"+role_name);

@@ -90,6 +90,7 @@ public class LandingPageVisitor implements Visitor{
 						builder.open("img");
 						builder.attr("src", servlet_service.encodeURL(image));
 						builder.attr("alt", node.getMenuText(conn));
+						builder.attr("title", node.getMenuText(conn));
 						builder.close();
 					}
 					builder.close();
