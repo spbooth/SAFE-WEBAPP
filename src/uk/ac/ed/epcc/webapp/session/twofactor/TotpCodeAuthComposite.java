@@ -393,7 +393,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 						SecretKeySpec secret_key = new SecretKeySpec(codec.decode(enc),ALG);
 						Integer code = (Integer) f.get(CODE);
 						if( ! verify(secret_key, code)) {
-							throw new ValidateException("Code does not match");
+							throw new ValidateException(CODE,"Code does not match");
 						}
 						
 					}

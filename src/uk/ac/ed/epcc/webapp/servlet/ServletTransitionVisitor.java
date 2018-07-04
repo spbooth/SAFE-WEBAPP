@@ -106,8 +106,12 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 			
 				return  f.doAction(params);
 		    }catch( TransitionValidationException te){
-		    	// show these as general form errors re-displaying form.
-				HTMLForm.addGeneralError(te.getMessage(), req);
+		    	if( te.getField() != null ) {
+		    		HTMLForm.addFieldError(te.getField(), te.getMessage(), req);
+		    	}else {
+		    		// show these as general form errors re-displaying form.
+		    		HTMLForm.addGeneralError(te.getMessage(), req);
+		    	}
 				return new ErrorFormResult<T, K>(provider, target, tag, HTMLForm.getErrors(req), HTMLForm.getMissing(req));
 			}catch(TransitionException e){
 				// if it is a transition exception we have a message for the user
@@ -161,8 +165,12 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 				// convention here is that null return indicates an error.
 				return  f.doAction(params);
 		    }catch( TransitionValidationException te){
-		    	// show these as general form errors re-displaying form.
-				HTMLForm.addGeneralError(te.getMessage(), req);
+		    	if( te.getField() != null ) {
+		    		HTMLForm.addFieldError(te.getField(), te.getMessage(), req);
+		    	}else {
+		    		// show these as general form errors re-displaying form.
+		    		HTMLForm.addGeneralError(te.getMessage(), req);
+		    	}
 				return new ErrorFormResult<T, K>(provider, target, tag, HTMLForm.getErrors(req), HTMLForm.getMissing(req));
 			}catch(TransitionException e){
 				// if it is a transition exception we have a message for the user

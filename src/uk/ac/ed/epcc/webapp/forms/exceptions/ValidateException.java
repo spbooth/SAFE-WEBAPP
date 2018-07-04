@@ -31,6 +31,7 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 
 public class ValidateException extends FieldException {
 
+	private String field=null;
 	/**
 	 * 
 	 */
@@ -45,6 +46,10 @@ public class ValidateException extends FieldException {
 		super(message);
 
 	}
+	public ValidateException(String field, String message) {
+		super(message);
+		this.field=field;
+	}
 
 	public ValidateException(String message, Throwable cause) {
 		super(message, cause);
@@ -54,6 +59,20 @@ public class ValidateException extends FieldException {
 	public ValidateException(Throwable cause) {
 		super(cause);
 
+	}
+
+	/**
+	 * @return the field
+	 */
+	public String getField() {
+		return field;
+	}
+
+	/**
+	 * @param field the field to set
+	 */
+	public void setField(String field) {
+		this.field = field;
 	}
 
 }

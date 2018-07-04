@@ -29,11 +29,21 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 
 public class TransitionValidationException extends TransitionException {
 
+	private String field=null;
 	/** create the exception
 	 * @param message
 	 */
 	public TransitionValidationException(String message) {
 		super(message);
 	}
-
+	/** create the exception for a specific field.
+	 * @param message
+	 */
+	public TransitionValidationException(String field,String message) {
+		super(message);
+		this.field=field;
+	}
+	public String getField() {
+		return field;
+	}
 }

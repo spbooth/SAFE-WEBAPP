@@ -106,7 +106,7 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 				if( (move_start && d.before(bound.getEnd())) ||
 					((! move_start) && d.after(bound.getStart()))){
 			
-				throw new ValidateException("New date impacts on neighbour");
+				throw new ValidateException(DATE_FIELD,"New date impacts on neighbour");
 			
 				}
 			}

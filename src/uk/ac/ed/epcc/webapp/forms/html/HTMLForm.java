@@ -209,7 +209,10 @@ public class HTMLForm extends BaseHTMLForm {
 		Map<String,String> errors = getErrors(request);
 		errors.put(MapForm.GENERAL_ERROR, text);
 	}
-
+	public static void addFieldError(String field,String text, HttpServletRequest request) {
+		Map<String,String> errors = getErrors(request);
+		errors.put(field, text);
+	}
 	public static void clearErrors(HttpServletRequest request) {
 		request.removeAttribute(ERRORS_TAG);
 		request.removeAttribute(MISSING_FIELDS_TAG);

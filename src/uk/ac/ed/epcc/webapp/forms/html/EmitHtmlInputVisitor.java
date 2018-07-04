@@ -68,6 +68,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	private Map post_params;
 	private InputIdVisitor id_vis;
 	private Object radio_selector=null;
+	private boolean auto_focus=false;
 	public EmitHtmlInputVisitor(AppContext conn,ExtendedXMLBuilder hb, boolean use_post, Map post_params,String prefix){
 		this.conn=conn;
 		this.hb=hb;
@@ -516,6 +517,9 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			result.open("input");
 			if( id != null ){
 				result.attr("id", id);
+			}
+			if( use_html5 && auto_focus) {
+				result.attr("autofocus",null);
 			}
 			String type="text";
 			if( use_html5 && input instanceof HTML5Input){

@@ -144,7 +144,12 @@ public class MapForm extends BaseForm {
 			ok = false;
 			log.debug("form validator failed with exception",e);
 			if( errors != null ){
-			  errors.put(GENERAL_ERROR, e.getMessage());
+			  String field = e.getField();
+			  if( field == null ) {
+				  errors.put(GENERAL_ERROR, e.getMessage());
+			  }else{
+				  errors.put(field,e.getMessage());
+			  }
 			}
 		}
 		return ok;

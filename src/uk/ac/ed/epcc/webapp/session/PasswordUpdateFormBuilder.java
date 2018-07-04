@@ -131,6 +131,11 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
      *
      */
     private class ComplexityValidator implements FormValidator{
+    	
+    	private ValidateException decorate(ValidateException e) {
+    		e.setField(NEW_PASSWORD1);
+    		return e;
+    	}
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.FieldValidator#validate(java.lang.Object)
@@ -159,19 +164,19 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 		   }
 		   int min = minDiffChars();
 		   if( chars.size() < min){
-			   throw new ValidateException("Password must contain at least "+min+" different characters");
+			   throw decorate(new ValidateException("Password must contain at least "+min+" different characters"));
 		   }
 		   if( (data.length() - neighbours) < minPasswordLength()){
-			   throw new ValidateException("Password too simple, too many repeated or consecutive characters");
+			   throw decorate(new ValidateException("Password too simple, too many repeated or consecutive characters"));
 		   }
 			
 		   int mindigit = minDigits();
 		   if( numbers < mindigit){
-			   throw new ValidateException("Password must contain at least "+mindigit+" numerical digits");
+			   throw decorate(new ValidateException("Password must contain at least "+mindigit+" numerical digits"));
 		   }
 		   int minspecial = minNonAlphaNumeric();
 		   if( specials < minspecial){
-			   throw new ValidateException("Password must contain at least "+minspecial+" non alpha-numeric characters");
+			   throw decorate(new ValidateException("Password must contain at least "+minspecial+" non alpha-numeric characters"));
 		   }
 		}
     	
