@@ -123,9 +123,12 @@ div.overflowblock .headcol {
  */
 div.bar{
 text-align: left;
-background-color: #e7e7e7;
+/* background-color: #e7e7e7; */
 }
 
+div.bar, div.bar h1, div.bar h2, div.bar h3{
+	background-color: #cccccc;
+}
 /* simple single bar containing only text */
 div.textbar{
 background-color: #e7e7e7;
@@ -348,8 +351,10 @@ color: black;
 padding: 8px;
 display: block;
 }
-
-
+/* no margin inside table */
+div.block td p,  div.block  td ul, div.block  td pre, div.block  td div.para{
+margin: 0px 0px 0px 0px;
+}
 div.block ul{
 list-style: inside;
 }
@@ -408,13 +413,14 @@ div.bar form{
 /* heading within a bar
  */
 div.bar h1, div.bar h2, div.bar h3{
-font-weight: normal;
+/*font-weight: normal;*/
 display: inline;
 /*float: left;*/
 line-height: normal;
 margin: 2px;
-background-color: #e7e7e7;
 }
+
+
 
 
 
