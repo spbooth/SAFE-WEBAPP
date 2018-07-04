@@ -77,6 +77,7 @@ import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory.EmailChangeRequest;
 import uk.ac.ed.epcc.webapp.session.EmailParamContributor;
+import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeListener;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory.PasswordChangeRequest;
@@ -184,17 +185,20 @@ public class Emailer {
 	 * @param new_password
 	 * @throws Exception 
 	 */
-	public void newPassword(AppUser person, String new_password)
+	public void newPassword(AppUser person, PasswordAuthComposite comp)
 			throws Exception {
 
 		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("request_password.txt");
 
 		if( email_template == null ){
-			getLogger().debug(new_password);
-			return;
+			if( ! PASSWORD_RESET_SERVLET.isEnabled(ctx)) {
+				getLogger().debug(comp.randomisePassword(person));
+				person.commit();
+				return;
+			}
 		}
 		email_template.setProperty("person.name", person.getName());
-		email_template.setProperty("person.password", new_password);
+		
 		String email = person.getEmail();
 		if( email == null){
 			getLogger().error("New password for user with null email "+person.getIdentifier());;
@@ -209,7 +213,9 @@ public class Emailer {
 				email_template.setRegionEnabled("password_value.region", false);
 				email_template.setProperty("password_reset.tag", request.getTag());
 			}
-			
+		}else {
+			email_template.setProperty("person.password", comp.randomisePassword(person));
+			person.commit();
 		}
 		
 		doSend(templateMessage(person,email_template));

@@ -768,11 +768,8 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	public void newPassword(T user) throws Exception {
 		Handler h = getHandler(user);	
 		
-		// Make a new password
-		String new_password = randomisePassword(h);
-		h.commit();
 		Emailer m = new Emailer(getContext());
-		m.newPassword(user, new_password);
+		m.newPassword(user, this);
 	}
 
 	/* (non-Javadoc)
