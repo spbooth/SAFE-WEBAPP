@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><transition_page>
+<Title>Set 2 factor token</Title>
+<PageHeading>Set 2 factor token</PageHeading>
+<SummaryContent/>
+<ExtraContent>
+<div class="para">This is your new 2-factor authorisation key. You will need a smart-phone app such as google-authenticator to generate the verification codes.</div>
+<div class="para">
+<img class="qrcode" src="test/QRCode/code.png?text=otpauth%3A%2F%2Ftotp%2Ftest%3Afred%40example.com%3Fsecret%3DUJ4SLJJPNPXVGIPLXDTQUGVKNI" alt="otpauth://totp/test:fred@example.com?secret=UJ4SLJJPNPXVGIPLXDTQUGVKNI"/>
+</div>
+</ExtraContent>
+<Form>
+<table class="form">
+<tr class="even">
+<th>
+<label class="required">New key</label>
+</th>
+<td>UJ4SLJJPNPXVGIPLXDTQUGVKNI</td>
+</tr>
+<tr class="odd">
+<th>
+<label class="required">Verification code</label>
+</th>
+<td>
+<input type="number" size="6" maxlength="32" name="Code" class="input" min="0" max="999999" step="1" required="required"/>
+</td>
+</tr>
+</table>
+<fieldset class="action_buttons">
+<input class="input_button" type="submit" name="Set" value="Set"/>
+</fieldset>
+</Form>
+</transition_page>

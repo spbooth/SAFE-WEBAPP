@@ -173,6 +173,7 @@ public class TwoFactorAuthTests<A extends AppUser> extends AbstractTransitionSer
 		assertNotNull("No Person transition",prov);
 		sess.setAttribute(TotpCodeAuthComposite.SetToptTransition.NEW_AUTH_KEY_ATTR, "UJ4SLJJPNPXVGIPLXDTQUGVKNI");
 		setTransition(prov, TotpCodeAuthComposite.SET_KEY, user);
+		checkFormContent("/normalize.xsl", "key_set_form.xml");
 		addParam(TotpCodeAuthComposite.SetToptTransition.CODE, 278504);
 		runTransition();
 		checkViewRedirect(prov, user);
