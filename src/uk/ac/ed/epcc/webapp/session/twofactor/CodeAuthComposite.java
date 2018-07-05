@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserComposite;
@@ -45,12 +46,29 @@ public abstract class CodeAuthComposite<AU extends AppUser,T> extends AppUserCom
 	}
 
 	@Override
-	public FormResult requireAuth(AU user) {
-		if( needAuth(user)) {
+	public final FormResult requireAuth(AU user) {
+		if( user != null && needAuth(user)) {
 			// Need to ask for auth
+			if( needToken()) {
+				sendToken(user);
+			}
 			return new ChainedTransitionResult<AU, TransitionKey<AU>>(new CodeAuthTransitionProvider<AU>(getContext()), user, CodeAuthTransitionProvider.AUTHENTICATE);
 		}
 		return null;
+	}
+	/** Do we need to send tokens via a side channel
+	 * 
+	 * @return
+	 */
+	public boolean needToken() {
+		return false;
+	}
+	/** send side-channel tokens.
+	 * 
+	 * @param user
+	 */
+	protected void sendToken(AU user) {
+		
 	}
 	
 	protected abstract boolean enabled(AU user);
@@ -89,12 +107,16 @@ public abstract class CodeAuthComposite<AU extends AppUser,T> extends AppUserCom
 	 * @param ok
 	 */
 	public void authenticated(boolean ok) {
+		Logger logger = getLogger();
 		SessionService<AU> sess = getContext().getService(SessionService.class);
 		if( ok ) {
 			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
-			sess.setAttribute(CODE_COMPOSITE_LAST_AUTH_ATTR, getContext().getService(CurrentTimeService.class).getCurrentTime());
+			Date currentTime = getContext().getService(CurrentTimeService.class).getCurrentTime();
+			sess.setAttribute(CODE_COMPOSITE_LAST_AUTH_ATTR, currentTime);
+			logger.debug("Set last auth to "+currentTime);
 		}else {
 			sess.removeAttribute(CODE_COMPOSITE_LAST_AUTH_ATTR);
+			logger.debug("clear last auth");
 		}
 	}
 	@Override

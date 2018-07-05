@@ -136,75 +136,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		doPost();
 	}
 	
-	/** Check that the result is consistent with a chained transition.
-	 * This should always be a form tranition of some sort not a view transition.
-	 * 
-	 * this call also sets up the expected transition (using {@link #resetRequest()} {@link #setTransition(TransitionFactory, Object, Object)} so the test 
-	 * also call this next transition if desired.
-	 * 
-	 * @param provider
-	 * @param key
-	 * @param target
-	 * @throws TransitionException
-	 */
-	public <K,T> void checkTransitionForward(TransitionFactory<K, T> provider, K key, T target) throws TransitionException{
-		assertNotNull(provider);
-		assertNotNull(key);
-		Transition t = provider.getTransition(target, key);
-		assertNotNull(t);
-		assertTrue( t instanceof BaseFormTransition || t instanceof TargetLessTransition);
-		assertEquals(t instanceof TargetLessTransition, target == null);
-		checkAttributes(provider, key, target);
-		checkForward("/scripts/transition.jsp");
-
-		// Setup the transition for next operation
-		resetRequest();
-		setTransition(provider, key, target);
-		return;
-	}
-
-	public <K, T> void checkAttributes(TransitionFactory<K, T> provider, K key,
-			T target) {
-		assertNotNull(provider);
-		TransitionFactory transitionFactory = (TransitionFactory)req.getAttribute(TransitionServlet.TRANSITION_PROVIDER_ATTR);
-		assertNotNull(transitionFactory);
-		assertEquals(provider.getTargetName(), transitionFactory.getTargetName());
-		if( key == null ){
-			assertNull(req.getAttribute(TransitionServlet.TRANSITION_KEY_ATTR));
-		}else{
-			assertEquals(key, req.getAttribute(TransitionServlet.TRANSITION_KEY_ATTR));
-		}
-		if( target == null ){
-			assertNull(req.getAttribute(TransitionServlet.TARGET_ATTRIBUTE));
-		}else{
-			assertEquals(target, req.getAttribute(TransitionServlet.TARGET_ATTRIBUTE));
-		}
-	}
 	
-	/** check that the result is consistent with a forward to the view_target page. 
-	 * Normally this should not be needed in tests as most operations should be written 
-	 * to use a redirect to the canonical object URL to generate the view page.
-	 * You could call this after {@link #checkViewRedirect(ViewTransitionFactory, Object)}
-	 * to verify the servlet does the correct thing with a view url but this would be testing the servlet not
-	 * the transition class.
-	 * @param provider
-	 * @param target
-	 */
-	public <K,T> void checkViewForward(ViewTransitionFactory<K, T> provider, T target){
-		checkAttributes(provider, null, target);
-		checkForward("/scripts/view_target.jsp");
-	}
-	
-	/** This is the normal view result. These should always redirect to the canonical url to
-	 * generate a view page
-	 * @param provider
-	 * @param target
-	 * @throws TransitionException 
-	 */
-	public <K,T> void checkViewRedirect(ViewTransitionFactory<K, T> provider, T target) throws TransitionException{
-		checkRedirectToTransition(provider, null, target);
-		assertTrue("redirect to forbidden view",provider.canView(target, getContext().getService(SessionService.class)));
-	}
 
 	@Override
 	public <K, T> void checkRedirectToTransition(TransitionFactory<K, T> fac,
@@ -220,7 +152,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	/** check for a non-bookmarkable chained transition.
 	 * Note this should always be a form transition.
 	 * 
-	 * These are normally used where one form transition selects the target for another. If the first transition
+	 * These are normally used where one servlet of form transition selects the target for a. If the first transition
 	 * changes state then the transition should really have used a redirect.
 	 * 
 	 * @see ChainedTransitionResult#useURL()
@@ -231,13 +163,8 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	 */
 	public <K, T> void checkForwardToTransition(TransitionFactory<K, T> fac,
 			K key, T target) throws TransitionException {
-		if( target != null ){
-			assertEquals(target, req.getAttribute(TransitionServlet.TARGET_ATTRIBUTE));
-		}
-		assertNotNull(key);
-		assertEquals(key, req.getAttribute(TransitionServlet.TRANSITION_KEY_ATTR));
-		assertEquals(fac.getTargetName(), ((TransitionFactory)req.getAttribute(TransitionServlet.TRANSITION_PROVIDER_ATTR)).getTargetName());
-		checkForward("/scripts/transition.jsp");
+		super.checkForwardToTransition(fac,key,target);
+		// Setup the transition for next operation
 		resetRequest();
 		setTransition(fac, key, target);
 		return;

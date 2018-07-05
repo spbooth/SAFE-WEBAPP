@@ -1,0 +1,25 @@
+<Diff><TableSpecification name='Properties'>
+<Name type='String' nullable='false' max='255'/>
+<Value type='String' nullable='false' max='255'/>
+<name_key type='Index' unique='true'><Column name='Name'/></name_key>
+</TableSpecification>
+<Properties id='1'>
+<Name>reference.Wtmp.PersonID</Name>
+<Value>Person</Value>
+</Properties>
+<TableSpecification name='Wtmp'>
+<PersonID reference='Person'/>
+<StartTime type='Long' nullable='true'/>
+<EndTime type='Long' nullable='true'/>
+<Browser type='String' nullable='true' max='5592405'/>
+<Host type='String' nullable='true' max='128'/>
+<login_index type='Index' unique='false'><Column name='PersonID'/><Column name='EndTime'/></login_index>
+</TableSpecification>
+<Wtmp id='1'>
+<PersonID>1</PersonID>
+<StartTime>1478342100</StartTime>
+<EndTime>1478343900</EndTime>
+<Browser>junit</Browser>
+<Host>localhost</Host>
+</Wtmp>
+</Diff>

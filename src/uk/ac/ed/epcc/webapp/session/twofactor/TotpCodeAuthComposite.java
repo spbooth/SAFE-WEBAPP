@@ -18,10 +18,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.Key;
-import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
@@ -41,11 +39,12 @@ import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Form;
-import uk.ac.ed.epcc.webapp.forms.FormValidator;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FatalTransitionException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.ConstantInput;
@@ -53,7 +52,6 @@ import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
@@ -63,10 +61,9 @@ import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -91,6 +88,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<A,Integer> implements AppUserTransitionContributor, SummaryContributer<A>, RequiredPageProvider<A> {
 	public static final Feature REQUIRED_TWO_FACTOR= new Feature("two_factor.required",false,"Is two factor authentication required");
 	private static final String SECRET_FIELD="AuthCodeSecret";
+	public static final String REMOVE_KEY_ROLE="RemoveTwoFactor";
 	/**
 	 * @param fac
 	 */
@@ -241,7 +239,9 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		}
 	}
 	public boolean verify(Key key,Integer value) {
+		Logger logger = getLogger();
 		if( key == null) {
+			logger.debug("No key allow login");
 			return true;
 		}
 		CurrentTimeService serv = getContext().getService(CurrentTimeService.class);
@@ -253,14 +253,15 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		for(int i=-(window-1)/2 ; i<= window/2 ; ++i) {
 			try {
 				long code = getCode(key, counter+i);
-				//System.out.println("i="+i+" code="+code+" value="+value);
+				logger.debug("i="+i+" code="+code+" value="+value);
 				if( value.longValue() == code) {
 					return true;
 				}
 			} catch (Exception e) {
-				getLogger().error("Error checking code", e);
+				logger.error("Error checking code", e);
 			}
 		}
+		logger.debug("code does not match");
 		return false;
 	}
 	/** number of milliseconds per code value
@@ -303,6 +304,28 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		}
 		return new URI(sb.toString());
 	}
+	public class CodeValidator implements FieldValidator<Integer>{
+		/**
+		 * @param key
+		 */
+		public CodeValidator(Key key) {
+			super();
+			this.key = key;
+		}
+
+		private final Key key;
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.FieldValidator#validate(java.lang.Object)
+		 */
+		@Override
+		public void validate(Integer data) throws FieldException {
+			if( ! verify(key, data) ) {
+				throw new ValidateException("Incorrect");
+			}
+			
+		}
+	}
 	public class SetToptTransition extends AbstractFormTransition<A> implements ExtraContent<A>{
 		/**
 		 * @param prov
@@ -316,15 +339,15 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		/**
 		 * 
 		 */
-		private static final String NEW_AUTH_KEY_ATTR = "NewAuthKey";
+	    static final String NEW_AUTH_KEY_ATTR = "NewAuthKey";
 		/**
 		 * 
 		 */
-		private static final String CODE = "Code";
+		static final String CODE = "Code";
 		/**
 		 * 
 		 */
-		private static final String KEY = "Key";
+		static final String KEY = "Key";
 		private Key new_key=null;
 	
 		public Key getKey() throws NoSuchAlgorithmException {
@@ -381,23 +404,11 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		@Override
 		public void buildForm(Form f, A target, AppContext conn) throws TransitionException {
 			try {
-				String enc = getEncodedSecret(getKey());
+				Key key2 = getKey();
+				String enc = getEncodedSecret(key2);
 				f.addInput(KEY, "New key", new ConstantInput<>(enc,enc));
 				f.addInput(CODE, "Verification code", getInput());
-				f.addValidator(new FormValidator() {
-					
-					@Override
-					public void validate(Form f) throws ValidateException {
-						String enc = (String) f.get(KEY);
-						Base32 codec = new Base32();
-						SecretKeySpec secret_key = new SecretKeySpec(codec.decode(enc),ALG);
-						Integer code = (Integer) f.get(CODE);
-						if( ! verify(secret_key, code)) {
-							throw new ValidateException(CODE,"Code does not match");
-						}
-						
-					}
-				});
+				f.getField(CODE).addValidator(new CodeValidator(key2));
 				f.addAction("Set", new setKeyAction(prov,target));
 			} catch (Exception e) {
 				getLogger().error("Error building form", e);
@@ -433,7 +444,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		}
 		
 	}
-	private static final CurrentUserKey SET_KEY = new CurrentUserKey("SetKey","Set 2 factor token","Enable/change two factor authentication for this account") {
+	public static final CurrentUserKey SET_KEY = new CurrentUserKey("SetKey","Set 2 factor token","Enable/change two factor authentication for this account") {
 		
 		@Override
 		public boolean allowState(AppUser user, SessionService op) {
@@ -444,7 +455,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 			return comp.enabled();
 		}
 	};
-	private static final AppUserKey CLEAR_KEY = new CurrentUserKey("ClearKey","Disable 2 factor","Disable two factor authentication for this account ?") {
+	public static final AppUserKey CLEAR_KEY = new CurrentUserKey("ClearKey","Disable 2 factor","Disable two factor authentication for this account ?") {
 		
 		@Override
 		public boolean allowState(AppUser user, SessionService op) {
@@ -460,14 +471,14 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 
 		@Override
 		public boolean allow(AppUser user, SessionService op) {
-			return (op.hasRole(SessionService.ADMIN_ROLE) || op.isCurrentPerson(user)) && allowState(user, op);
+			return (op.hasRole(REMOVE_KEY_ROLE) || op.isCurrentPerson(user)) && allowState(user, op);
 		}
 	};
-	public class ClearKeyTransition extends AbstractDirectTransition<A>{
+	public class DirectClearKeyTransition extends AbstractDirectTransition<A>{
 		/**
 		 * @param prov
 		 */
-		public ClearKeyTransition(AppUserTransitionProvider prov) {
+		public DirectClearKeyTransition(AppUserTransitionProvider prov) {
 			super();
 			this.prov = prov;
 		}
@@ -498,7 +509,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		if( enabled()) {
 			
 			map.put(SET_KEY,(Transition<AppUser>) new SetToptTransition(prov));
-			map.put(CLEAR_KEY,new ConfirmTransition<AppUser>("Disable 2-factor authentication", (DirectTransition<AppUser>) new ClearKeyTransition(prov), prov.new ViewTransition()));
+			map.put(CLEAR_KEY,new AuthorisedConfirmTransition<AppUser,AppUser>("Disable 2-factor authentication", (DirectTransition<AppUser>) new DirectClearKeyTransition(prov), prov.new ViewTransition(),REMOVE_KEY_ROLE));
 		
 		}
 		return map;

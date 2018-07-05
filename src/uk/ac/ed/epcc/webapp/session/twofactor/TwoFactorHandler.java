@@ -15,6 +15,8 @@ package uk.ac.ed.epcc.webapp.session.twofactor;
 
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.SerializableFormResult;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
@@ -101,13 +103,25 @@ public class TwoFactorHandler<A extends AppUser> {
 	}
 
 
-	public FormResult completeTwoFactor(boolean success) {
+	public FormResult completeTwoFactor(boolean success,A expected) {
 		try {
+			Logger logger = getLogger();
+			Integer requested_id = (Integer)sess.getAttribute(AUTH_USER_ATTR);
+			if( requested_id == null || (expected != null && expected.getID() != requested_id.intValue())) {
+				logger.warn("Inconsistent request and result, possible security problem "+requested_id+" "+expected.getIdentifier());
+				return null;
+			}
+			logger.debug("success="+success);
 			// We could loop over the composites again
 			// to support more than 2 factors.  Keep thing simple for now
 			if( success) {
 				if(  ! sess.haveCurrentUser()) {
-					sess.setCurrentPerson((Integer)sess.getAttribute(AUTH_USER_ATTR));
+					// Use a full AppUser because there are various overrides
+					// in ServletSessionServlet that break if you try to login
+					// by just setting the personID
+					A user = sess.getLoginFactory().find(requested_id);
+					logger.debug("setting user to "+user.getIdentifier());
+					sess.setCurrentPerson(user);
 				}
 				FormResult result = (FormResult) sess.getAttribute(AUTH_RESULT_ATTR);
 				return result;
@@ -117,5 +131,12 @@ public class TwoFactorHandler<A extends AppUser> {
 			sess.removeAttribute(AUTH_USER_ATTR);
 		}
 		return null;
+	}
+
+	/**
+	 * @return
+	 */
+	public Logger getLogger() {
+		return sess.getContext().getService(LoggerService.class).getLogger(getClass());
 	}
 }

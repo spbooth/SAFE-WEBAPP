@@ -17,10 +17,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Key;
-import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Calendar;
@@ -33,8 +31,7 @@ import org.junit.Test;
 import uk.ac.ed.epcc.webapp.TestTimeService;
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 
@@ -42,11 +39,12 @@ import uk.ac.ed.epcc.webapp.session.AppUserFactory;
  * @author Stephen Booth
  *
  */
+@ConfigFixtures("twofactor.properties")
 public class TotpCompositeTest extends WebappTestBase {
 
 	@Test
 	public void testMakeKey() throws Exception {
-		AppUserFactory fac = ctx.makeContexedObject(AppUserFactory.class,"TwoFactorPerson");
+		AppUserFactory fac = ctx.makeContexedObject(AppUserFactory.class,"Person");
 		TotpCodeAuthComposite comp = (TotpCodeAuthComposite) fac.getComposite(CodeAuthComposite.class);
 		
 		assertNotNull(comp);
@@ -80,7 +78,7 @@ public class TotpCompositeTest extends WebappTestBase {
 		cal.clear();
 		cal.set(2018, Calendar.JULY, 2, 20, 22);
 		serv.setResult(cal.getTime());
-		AppUserFactory<?> fac = ctx.makeContexedObject(AppUserFactory.class,"TwoFactorPerson");
+		AppUserFactory<?> fac = ctx.makeContexedObject(AppUserFactory.class,"Person");
 		TotpCodeAuthComposite comp = (TotpCodeAuthComposite) fac.getComposite(CodeAuthComposite.class);
 		
 		takeBaseline();
@@ -102,7 +100,7 @@ public class TotpCompositeTest extends WebappTestBase {
 	
 	@Test
 	public void testgetCode() throws ConsistencyError, Exception {
-			AppUserFactory<?> fac = ctx.makeContexedObject(AppUserFactory.class,"TwoFactorPerson");
+			AppUserFactory<?> fac = ctx.makeContexedObject(AppUserFactory.class,"Person");
 		TotpCodeAuthComposite comp = (TotpCodeAuthComposite) fac.getComposite(CodeAuthComposite.class);
 		
 		takeBaseline();

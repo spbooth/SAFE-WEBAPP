@@ -12,10 +12,18 @@
 <Person id='1'>
 <Email>fred@example.com</Email>
 <PasswordFails>0</PasswordFails>
-<PasswordStatus>I</PasswordStatus>
-<Salt></Salt>
+<PasswordStatus>V</PasswordStatus>
+<Salt>yDHaacdiAlszgkel</Salt>
 <Alg>0</Alg>
-<Password>locked</Password>
+<Password>da2b4ab34816317a6204269a9223cc3d</Password>
 <AuthCodeSecret>UJ4SLJJPNPXVGIPLXDTQUGVKNI======</AuthCodeSecret>
 </Person>
+<TableSpecification name='role_table'>
+<PersonID type='Integer' nullable='false'/>
+<Role type='String' nullable='false' max='32'/>
+</TableSpecification>
+<role_table id='1'>
+<PersonID>1</PersonID>
+<Role>Admin</Role>
+</role_table>
 </Diff>

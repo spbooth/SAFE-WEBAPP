@@ -21,6 +21,8 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionValidationException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AnonymousTransitionFactory;
@@ -60,7 +62,7 @@ public class CodeAuthTransitionProvider<A extends AppUser> extends SimpleTransit
 		/**
 		 * 
 		 */
-		private static final String CODE_FIELD = "Code";
+		public static final String CODE_FIELD = "Code";
 
 		public class ProcessAction<T> extends FormAction{
 			/**
@@ -82,11 +84,13 @@ public class CodeAuthTransitionProvider<A extends AppUser> extends SimpleTransit
 			public FormResult action(Form f) throws ActionException {
 				boolean ok = comp.verify(target,(T) f.get(CODE_FIELD));
 				comp.authenticated(ok);
-				TwoFactorHandler<A> handler = new TwoFactorHandler<>(sess);
-				FormResult result = handler.completeTwoFactor(ok);
 				if( ! ok ) {
 					// result will be null
+					throw new TransitionValidationException(CODE_FIELD, "Incorrect");
 				}
+				TwoFactorHandler<A> handler = new TwoFactorHandler<>(sess);
+				FormResult result = handler.completeTwoFactor(ok,target);
+				
 				return result;
 			}
 			

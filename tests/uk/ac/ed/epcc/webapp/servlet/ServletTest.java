@@ -49,9 +49,14 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
+import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.CustomPage;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.transition.BaseFormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
+import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.jdbc.config.DataBaseConfigService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.debug.DebugLoggerService;
@@ -85,6 +90,7 @@ import uk.ac.ed.epcc.webapp.timer.DefaultTimerService;
  * single form-post to the servlet and a XML diff of the database state can be taken and
  * compared with an expected result.
  *  
+ * @see AbstractTransitionServletTest
  * @author spb
  *
  */
@@ -431,5 +437,78 @@ public abstract class ServletTest extends WebappTestBase{
     	ServletFormResultVisitor vis = new ServletFormResultVisitor(ErrorFilter.retrieveAppContext(req, res), req, res);
 		result.accept(vis);
     }
+	/** Check transition attributes.
+	 * 
+	 * We need this in servlet test as servlets may generate a chain result to a transitions
+	 * 
+	 * @param provider
+	 * @param key
+	 * @param target
+	 */
+    public <K, T> void checkAttributes(TransitionFactory<K, T> provider, K key,
+			T target) {
+		assertNotNull(provider);
+		TransitionFactory transitionFactory = (TransitionFactory)req.getAttribute(TransitionServlet.TRANSITION_PROVIDER_ATTR);
+		assertNotNull(transitionFactory);
+		assertEquals(provider.getTargetName(), transitionFactory.getTargetName());
+		if( key == null ){
+			assertNull(req.getAttribute(TransitionServlet.TRANSITION_KEY_ATTR));
+		}else{
+			assertEquals(key, req.getAttribute(TransitionServlet.TRANSITION_KEY_ATTR));
+		}
+		if( target == null ){
+			assertNull(req.getAttribute(TransitionServlet.TARGET_ATTRIBUTE));
+		}else{
+			assertEquals(target, req.getAttribute(TransitionServlet.TARGET_ATTRIBUTE));
+		}
+	}
+    
+    /** check for a non-bookmarkable chained transition.
+	 * Note this should always be a form transition.
+	 * 
+	 * These are normally used where one servlet of form transition selects the target for a. If the first transition
+	 * changes state then the transition should really have used a redirect.
+	 * 
+	 * @see ChainedTransitionResult#useURL()
+	 * @param fac
+	 * @param key
+	 * @param target
+	 * @throws TransitionException
+	 */
+	public <K, T> void checkForwardToTransition(TransitionFactory<K, T> fac,
+			K key, T target) throws TransitionException {
+		checkAttributes(fac, key, target);
+		Transition t = fac.getTransition(target, key);
+		assertNotNull(t);
+		assertTrue( t instanceof BaseFormTransition || t instanceof TargetLessTransition);
+		assertEquals(t instanceof TargetLessTransition, target == null);
+		
+		checkForward("/scripts/transition.jsp");
+
+	}
 	
+	/** check that the result is consistent with a forward to the view_target page. 
+	 * Normally this should not be needed in tests as most operations should be written 
+	 * to use a redirect to the canonical object URL to generate the view page.
+	 * You could call this after {@link #checkViewRedirect(ViewTransitionFactory, Object)}
+	 * to verify the servlet does the correct thing with a view url but this would be testing the servlet not
+	 * the transition class.
+	 * @param provider
+	 * @param target
+	 */
+	public <K,T> void checkViewForward(ViewTransitionFactory<K, T> provider, T target){
+		checkAttributes(provider, null, target);
+		checkForward("/scripts/view_target.jsp");
+	}
+	
+	/** This is the normal view result. These should always redirect to the canonical url to
+	 * generate a view page
+	 * @param provider
+	 * @param target
+	 * @throws TransitionException 
+	 */
+	public <K,T> void checkViewRedirect(ViewTransitionFactory<K, T> provider, T target) throws TransitionException{
+		checkRedirectToTransition(provider, null, target);
+		assertTrue("redirect to forbidden view",provider.canView(target, getContext().getService(SessionService.class)));
+	}
 }
