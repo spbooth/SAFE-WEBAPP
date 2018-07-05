@@ -20,10 +20,10 @@ div.block details summary h2{
 
 /* all divs form a centered column */
 div.block, div.bar, div.textbar,div.text, div.graph {
-width: 46em;
+width: 95%;
 }
 div.wideblock {
-width: 60em;
+width: 95%;
 }
 div.report {
 width: 95%;

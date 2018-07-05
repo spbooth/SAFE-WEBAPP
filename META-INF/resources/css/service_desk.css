@@ -1,9 +1,9 @@
 /* all divs form a centered column */
 div.block, div.bar, div.textbar,div.text, div.graph {
-width: 98%;
+width: 95%;
 }
 div div.bar{
-	width: 100%;
+	width: 95%;
 }
 div.dataTables_wrapper, div.scrollwrapper {
 	overflow: auto;
