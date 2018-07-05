@@ -47,6 +47,8 @@ public final class Field<I> {
 	 */
 	private String label;
 	
+	private String tooltip;
+	
 	/** Additional details/information
 	 * 
 	 */
@@ -212,6 +214,12 @@ public final class Field<I> {
 				}
 			}
 		}
+	}
+	public String getTooltip() {
+		return tooltip;
+	}
+	public void setTooltip(String tooltip) {
+		this.tooltip = tooltip;
 	}
 	
 

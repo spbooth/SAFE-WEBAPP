@@ -110,7 +110,26 @@ public class BaseForm implements Form {
 		fields.put(key, f);
 		return f;
 	}
-
+	/**
+	 * Add and input to the next slot in the form
+	 * 
+	 * @param key
+	 *            key to use to refer to field
+	 * @param label
+	 *            String to display to user
+	 * @param  help
+	 *            tooltip String
+	 * @param s
+	 *            Input to add
+	 * @return Field object created
+	 */
+	public <I> Field addInput(String key, String label, String help,Input<I> s) {
+		Field f = addInput(key, label, s);
+		if( f != null) {
+			f.setTooltip(help);
+		}
+		return f;
+	}
 	public void clear() {
 		fields.clear();
 		actions.clear();

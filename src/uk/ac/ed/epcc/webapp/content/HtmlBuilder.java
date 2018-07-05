@@ -413,6 +413,10 @@ public <I> void addFormLabel(AppContext conn,Field<I> f) {
 	if( missing) {
 		addClass("missing");
 	}
+	String tooltip = f.getTooltip();
+	if( tooltip != null && ! tooltip.isEmpty()) {
+		attr("title",tooltip);
+	}
 	Object details=f.getDetails();
 	if(details==null){
 		clean(f.getLabel());
