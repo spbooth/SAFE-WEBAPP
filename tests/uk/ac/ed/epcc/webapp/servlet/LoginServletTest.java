@@ -260,7 +260,7 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		checkDiff("/cleanup.xsl", "new_password_from_server.xml");
 		
 		user=fac.find(user.getID());
-		assertTrue(composite.mustResetPassword(user)); 
+		assertFalse(composite.mustResetPassword(user)); 
 	}
 
 	@Test
