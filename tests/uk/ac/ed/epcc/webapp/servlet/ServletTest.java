@@ -447,19 +447,19 @@ public abstract class ServletTest extends WebappTestBase{
 	 */
     public <K, T> void checkAttributes(TransitionFactory<K, T> provider, K key,
 			T target) {
-		assertNotNull(provider);
+		assertNotNull("null provider",provider);
 		TransitionFactory transitionFactory = (TransitionFactory)req.getAttribute(TransitionServlet.TRANSITION_PROVIDER_ATTR);
-		assertNotNull(transitionFactory);
+		assertNotNull("null factory",transitionFactory);
 		assertEquals(provider.getTargetName(), transitionFactory.getTargetName());
 		if( key == null ){
 			assertNull(req.getAttribute(TransitionServlet.TRANSITION_KEY_ATTR));
 		}else{
-			assertEquals(key, req.getAttribute(TransitionServlet.TRANSITION_KEY_ATTR));
+			assertEquals("key/attribute mis-match",key, req.getAttribute(TransitionServlet.TRANSITION_KEY_ATTR));
 		}
 		if( target == null ){
 			assertNull(req.getAttribute(TransitionServlet.TARGET_ATTRIBUTE));
 		}else{
-			assertEquals(target, req.getAttribute(TransitionServlet.TARGET_ATTRIBUTE));
+			assertEquals("target/attribute mis-match",target, req.getAttribute(TransitionServlet.TARGET_ATTRIBUTE));
 		}
 	}
     

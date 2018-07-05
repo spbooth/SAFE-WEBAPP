@@ -72,10 +72,10 @@ public class SUNodeMaker extends AbstractNodeMaker  {
 		AppUserTransitionProvider prov = AppUserTransitionProvider.getInstance(getContext());
 		for(AppUserKey key : prov.getTransitions(user)) {
 			if( key instanceof CurrentUserKey && ((CurrentUserKey)key).addMenu(user)) {
-				if( key.allow(user, service)) {
+				if( prov.allowTransition(getContext(), user, key)) {
 					Node n = new ParentNode();
-					n.setMenuText(key.getText());
-					n.setHelpText(key.getHelp());
+					n.setMenuText(prov.getText(key));
+					n.setHelpText(prov.getHelp(key));
 					n.setTargetPath(TransitionServlet.getURL(getContext(), prov,(AppUser)user,key));
 					parent.addChild(n);
 				}

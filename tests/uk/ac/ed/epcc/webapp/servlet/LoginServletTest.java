@@ -34,6 +34,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
+import uk.ac.ed.epcc.webapp.session.AppUserTransitionProvider;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
 import uk.ac.ed.epcc.webapp.session.RequiredPage;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -154,13 +155,14 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		doPost();
 		checkRedirect("/welcome.jsp");
 		assertTrue(sess.haveCurrentUser());
-		
+		resetRequest();
 		Set<RequiredPage<A>> pages = fac.getRequiredPages();
 		assertEquals(1,pages.size());
 		RequiredPage page = pages.iterator().next();
 		assertTrue(page.required(sess));
-		doFormResult(page.getPage());
-		checkRedirect("/password_update.jsp");
+		doFormResult(page.getPage(sess));
+		checkForwardToTransition(AppUserTransitionProvider.getInstance(ctx), PasswordAuthComposite.CHANGE_PASSWORD, sess.getCurrentPerson());
+		//checkRedirect("/password_update.jsp");
 	}
 	
 	

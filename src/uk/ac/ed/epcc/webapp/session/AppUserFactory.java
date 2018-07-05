@@ -38,6 +38,7 @@ import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdate;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input;
+import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
@@ -244,8 +245,8 @@ AccessRoleProvider<AU, AU>
 			return person.needDetailsUpdate();
 		}
 
-		public FormResult getPage() {
-			return new RedirectResult("/personal_update.jsp");
+		public FormResult getPage(SessionService<AU> user) {
+			return new ChainedTransitionResult(AppUserTransitionProvider.getInstance(user.getContext()), user.getCurrentPerson(), AppUserTransitionProvider.UPDATE);
 		}
 		
 	}

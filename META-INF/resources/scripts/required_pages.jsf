@@ -27,7 +27,7 @@
     			for(RequiredPage p : fac.getRequiredPages() ){
     				if( p.required(session_service) ){
     					ServletFormResultVisitor vis = new ServletFormResultVisitor(conn, request, response);
-    					FormResult form_result = p.getPage();
+    					FormResult form_result = p.getPage(session_service);
     					// we are displaying a required page.
     					request.setAttribute(NavigationMenuService.DISABLE_NAVIGATION_ATTR, Boolean.TRUE);
     					request.setAttribute("AmRequiredPage",Boolean.TRUE);

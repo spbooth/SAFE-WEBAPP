@@ -47,7 +47,7 @@ public abstract class AbstractViewTransitionFactory<T, K extends TransitionKey<T
 
 	
 	public String getHelp(K key) {
-		return key.getHelp();
+		return getContext().expandText(key.getHelp());
 	}
 	
 	public String getText(K key){

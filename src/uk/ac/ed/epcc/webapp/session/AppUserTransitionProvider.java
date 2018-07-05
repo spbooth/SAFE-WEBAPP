@@ -155,7 +155,7 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 	 */
 	@Override
 	public String getText(AppUserKey key) {
-		return key.getText();
+		return getContext().expandText(key.getText());
 	}
 
 	public static AppUserTransitionProvider getInstance(AppContext conn) {
@@ -170,7 +170,7 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 		if( key == null ) {
 			return target.getIdentifier();
 		}
-		return key.getText();
+		return getText(key);
 	}
 
 	/* (non-Javadoc)

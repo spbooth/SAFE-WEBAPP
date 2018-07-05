@@ -70,7 +70,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  *
  */
 
-public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthComposite<T> implements RequiredPageProvider<T> , AnonymisingComposite<T>{
+public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthComposite<T> implements  AnonymisingComposite<T>{
 	protected static class PasswordStatus extends BasicType<PasswordStatus.Value> {
 	    class Value extends BasicType.Value {
 			private Value(String tag, String name) {
@@ -346,19 +346,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			return sb.toString();
 		}
 		
-		 public class PasswordResetRequiredPage implements RequiredPage<T>{
-		    	public boolean required(SessionService<T> user){
-		    		T currentPerson = user.getCurrentPerson();
-		    		if( currentPerson == null ){
-		    			getLogger().error("No current person in PasswordResetRequired");
-		    			return false;
-		    		}
-					return getHandler(currentPerson).mustChangePassword();
-		    	}
-		    	public FormResult getPage(){
-		    		return new RedirectResult("/password_update.jsp");
-		    	}
-		    }
+		 
 		/** A handler class fro any database fields specific to the composite.
 		 * 
 		 * @author spb
@@ -733,13 +721,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 				return ((AppUserFactory)getFactory()).getStringFinderFilter(email,true);
 			}
 
-	@Override
-	public Set<RequiredPage<T>> getRequiredPages() {
-		LinkedHashSet<RequiredPage<T>> set = new LinkedHashSet<RequiredPage<T>>();
-		// This must be the FIRST page shown
-		set.add(new PasswordResetRequiredPage());
-		return set;
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.session.PasswordAuthComposite#canResetPassword(uk.ac.ed.epcc.webapp.session.AppUser)

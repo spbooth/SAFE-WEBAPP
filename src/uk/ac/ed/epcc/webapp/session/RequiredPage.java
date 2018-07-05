@@ -35,5 +35,5 @@ import uk.ac.ed.epcc.webapp.servlet.ServletFormResultVisitor;
  */
 public interface RequiredPage<U extends AppUser> {
     public boolean required(SessionService<U> user);
-    public FormResult getPage();
+    public FormResult getPage(SessionService<U> user);
 }
