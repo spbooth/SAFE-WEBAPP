@@ -16,10 +16,10 @@ package uk.ac.ed.epcc.webapp.session.twofactor;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static uk.ac.ed.epcc.webapp.session.twofactor.CodeAuthComposite.CODE;
 
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Date;
 
 import javax.servlet.ServletException;
 
@@ -60,7 +60,7 @@ public class TwoFactorAuthTests<A extends AppUser> extends AbstractTransitionSer
 		
 		CodeAuthTransitionProvider<A> catp = new CodeAuthTransitionProvider<>(ctx);
 		setTransition(catp, CodeAuthTransitionProvider.AUTHENTICATE, user);
-		addParam(CodeAuthTransitionProvider.AuthenticateTransition.CODE_FIELD, 278504);
+		addParam(CODE, 278504);
 		runTransition();
 		checkMessage("invalid_input");
 		assertFalse(ctx.getService(SessionService.class).haveCurrentUser());
@@ -81,7 +81,7 @@ public class TwoFactorAuthTests<A extends AppUser> extends AbstractTransitionSer
 		sess.setAttribute(TwoFactorHandler.AUTH_USER_ATTR, user.getID());
 		sess.setAttribute(TwoFactorHandler.AUTH_RESULT_ATTR, new RedirectResult(LoginServlet.getMainPage(ctx)));
 		setTransition(catp, CodeAuthTransitionProvider.AUTHENTICATE, user);
-		addParam(CodeAuthTransitionProvider.AuthenticateTransition.CODE_FIELD, 278504);
+		addParam(CODE, 278504);
 		runTransition();
 		assertTrue(ctx.getService(SessionService.class).haveCurrentUser());
 		checkRedirect(LoginServlet.getMainPage(ctx));
@@ -102,10 +102,10 @@ public class TwoFactorAuthTests<A extends AppUser> extends AbstractTransitionSer
 		sess.setAttribute(TwoFactorHandler.AUTH_USER_ATTR, user.getID());
 		sess.setAttribute(TwoFactorHandler.AUTH_RESULT_ATTR, new RedirectResult(LoginServlet.getMainPage(ctx)));
 		setTransition(catp, CodeAuthTransitionProvider.AUTHENTICATE, user);
-		addParam(CodeAuthTransitionProvider.AuthenticateTransition.CODE_FIELD, 123456);
+		addParam(CODE, 123456);
 		runTransition();
 		assertFalse(ctx.getService(SessionService.class).haveCurrentUser());
-		checkError(CodeAuthTransitionProvider.AuthenticateTransition.CODE_FIELD, "Incorrect");
+		checkError(CODE, "Incorrect");
 		
 		//checkRedirect(LoginServlet.getMainPage(ctx));
 	}
@@ -127,7 +127,7 @@ public class TwoFactorAuthTests<A extends AppUser> extends AbstractTransitionSer
 		AppUserTransitionProvider prov = AppUserTransitionProvider.getInstance(ctx);
 		assertNotNull("No Person transition",prov);
 		setTransition(prov, TotpCodeAuthComposite.CLEAR_KEY, user);
-		addParam(AuthorisedConfirmTransition.CODE,278504);
+		addParam(CODE,278504);
 		setConfirmTransition(true);
 		runTransition();
 		checkViewRedirect(prov, user);

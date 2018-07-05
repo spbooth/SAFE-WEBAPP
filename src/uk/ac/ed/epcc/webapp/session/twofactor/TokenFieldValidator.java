@@ -38,10 +38,10 @@ public class TokenFieldValidator<A extends AppUser, T> implements FieldValidator
 	@Override
 	public void validate(T data) throws FieldException {
 		boolean ok = comp.verify(user, data);
-		comp.authenticated(ok);
 		if( ! ok ) {
 			throw new ValidateException("Incorrect");
 		}
+		comp.authenticated();
 	}
 	private final CodeAuthComposite<A, T> comp;
 	private final A user;

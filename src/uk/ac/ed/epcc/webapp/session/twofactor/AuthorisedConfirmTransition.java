@@ -31,10 +31,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 public class AuthorisedConfirmTransition<A extends AppUser,T> extends ConfirmTransition<T> {
-	/**
-	 * 
-	 */
-	public static final String CODE = "Code";
+	
 	private final String sufficient_role;
 	/**
 	 * @param name
@@ -52,12 +49,11 @@ public class AuthorisedConfirmTransition<A extends AppUser,T> extends ConfirmTra
 			// check for additional auth
 			AppUserFactory<A> fac = sess.getLoginFactory();
 			A user = (A) sess.getCurrentPerson();
-			CodeAuthComposite comp = fac.getComposite(CodeAuthComposite.class);
+			FormAuthComposite comp = fac.getComposite(FormAuthComposite.class);
 			// supress any that need side-channel tokens as form is made 
 			// multiple times.
 			if( comp != null  && ! comp.needToken() && comp.needAuth(user)) {
-				f.addInput(CODE, "2fa Verification code", comp.getInput());
-				f.getField(CODE).addValidator(new TokenFieldValidator(comp, user));
+				comp.modifyForm(user, f);
 			}
 		}
 		super.buildForm(f, target, c);

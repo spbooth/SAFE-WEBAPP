@@ -49,7 +49,7 @@ public class TwoFactorLoginServletTests<A extends AppUser> extends LoginServletT
 		user.setEmail("fred@example.com");
 		composite.setPassword(user,"FredIsDead");
 		
-		TotpCodeAuthComposite<A> ta = (TotpCodeAuthComposite<A>) fac.getComposite(CodeAuthComposite.class);
+		TotpCodeAuthComposite<A> ta = (TotpCodeAuthComposite<A>) fac.getComposite(FormAuthComposite.class);
 		String external = "UJ4SLJJPNPXVGIPLXDTQUGVKNI";
 		ta.setSecret(user, external);
 		

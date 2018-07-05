@@ -191,7 +191,7 @@ public class DefaultServletService implements ServletService{
 	 * @throws IOException
 	 */
 	public void forward(String url) throws ServletException, IOException {
-		conn.getService(LoggerService.class).getLogger(getClass()).debug("forwarding to "+url);
+		conn.getService(LoggerService.class).getLogger(getClass()).debug("forwarding to "+url+" max_forward="+max_forward);
 		if( max_forward--  == 0 ){
 			error("too many calls to forward url="+url);
 			if( res instanceof HttpServletResponse){

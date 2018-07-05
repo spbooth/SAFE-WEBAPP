@@ -47,6 +47,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FatalTransitionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.inputs.ConstantInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
@@ -54,7 +55,6 @@ import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.DirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
@@ -76,7 +76,7 @@ import uk.ac.ed.epcc.webapp.session.RequiredPage;
 import uk.ac.ed.epcc.webapp.session.RequiredPageProvider;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
-/**  A {@link CodeAuthComposite} that implements time-based authentication codes compatible
+/**  A {@link FormAuthComposite} that implements time-based authentication codes compatible
  * with google authenticator
  * <ul>
  * <li>https://tools.ietf.org/html/rfc4226</li>
@@ -119,12 +119,9 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		return getRepository().hasField(SECRET_FIELD);
 	}
 
-	/**
+	/** Do we have a key for this user.
 	 * @param user
-	 * @return
-	 * @throws UnsupportedEncodingException
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeySpecException
+	 * @return boolean
 	 */
 	public boolean hasKey(A user){
 		try {
@@ -385,7 +382,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 			 */
 			@Override
 			public FormResult action(Form f) throws ActionException {
-				
+				boolean had_key = hasKey(user);
 				try {
 					setSecret(user, (String)f.get(KEY));
 					user.commit();
@@ -394,6 +391,10 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 				}
 				getContext().getService(SessionService.class).removeAttribute(NEW_AUTH_KEY_ATTR);
 				resetNavigation();
+				if( REQUIRED_TWO_FACTOR.isEnabled(getContext()) && ! had_key) {
+					// probably a mandatory page
+					return new RedirectResult("/main.jsp");
+				}
 				return prov.new ViewResult(user);
 			}
 			
@@ -448,7 +449,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		
 		@Override
 		public boolean allowState(AppUser user, SessionService op) {
-			TotpCodeAuthComposite comp = (TotpCodeAuthComposite) op.getLoginFactory().getComposite(CodeAuthComposite.class);
+			TotpCodeAuthComposite comp = (TotpCodeAuthComposite) op.getLoginFactory().getComposite(FormAuthComposite.class);
 			if( comp == null ) {
 				return false;
 			}
@@ -460,9 +461,11 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		@Override
 		public boolean allowState(AppUser user, SessionService op) {
 			if( REQUIRED_TWO_FACTOR.isEnabled(op.getContext())) {
-				return false;
+				// role access allows removal of required key.
+				// user will be forces to set on next login
+				return op.hasRole(REMOVE_KEY_ROLE);
 			}
-			TotpCodeAuthComposite comp = (TotpCodeAuthComposite) op.getLoginFactory().getComposite(CodeAuthComposite.class);
+			TotpCodeAuthComposite comp = (TotpCodeAuthComposite) op.getLoginFactory().getComposite(FormAuthComposite.class);
 			if( comp == null || ! comp.hasKey(user)) {
 				return false;
 			}

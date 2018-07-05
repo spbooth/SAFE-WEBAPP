@@ -21,8 +21,6 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionValidationException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AnonymousTransitionFactory;
@@ -39,7 +37,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 /** {@link TransitionProvider} to validate two factor authentication codes.
  * 
  * This could be combined with the normal {@link AppUserTransitionProvider} but as it works anonymously its safer
- * to keep the logic seperate.
+ * to keep the logic separate.
  * @author Stephen Booth
  *
  */
@@ -59,37 +57,29 @@ public class CodeAuthTransitionProvider<A extends AppUser> extends SimpleTransit
 	
 	public class AuthenticateTransition extends AbstractFormTransition<A> implements ExtraContent<A>{
 
-		/**
-		 * 
-		 */
-		public static final String CODE_FIELD = "Code";
-
-		public class ProcessAction<T> extends FormAction{
+		public class ProcessAction extends FormAction{
 			/**
 			 * @param comp
 			 */
-			public ProcessAction(SessionService<A> sess,CodeAuthComposite<A, T> comp, A target) {
+			public ProcessAction(SessionService<A> sess,FormAuthComposite<A> comp, A target) {
 				super();
 				this.sess=sess;
 				this.comp = comp;
 				this.target=target;
 			}
 			private final SessionService<A> sess;
-			private final CodeAuthComposite<A,T> comp;
+			private final FormAuthComposite<A> comp;
 			private final A target;
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#action(uk.ac.ed.epcc.webapp.forms.Form)
 			 */
 			@Override
 			public FormResult action(Form f) throws ActionException {
-				boolean ok = comp.verify(target,(T) f.get(CODE_FIELD));
-				comp.authenticated(ok);
-				if( ! ok ) {
-					// result will be null
-					throw new TransitionValidationException(CODE_FIELD, "Incorrect");
-				}
+				
+				comp.authenticated();
+				
 				TwoFactorHandler<A> handler = new TwoFactorHandler<>(sess);
-				FormResult result = handler.completeTwoFactor(ok,target);
+				FormResult result = handler.completeTwoFactor(true,target);
 				
 				return result;
 			}
@@ -102,12 +92,10 @@ public class CodeAuthTransitionProvider<A extends AppUser> extends SimpleTransit
 		@Override
 		public void buildForm(Form f, A target, AppContext conn) throws TransitionException {
 			SessionService<A> sess = conn.getService(SessionService.class);
-			CodeAuthComposite<A,?> comp = (CodeAuthComposite<A,?>) sess.getLoginFactory().getComposite(CodeAuthComposite.class);
+			FormAuthComposite<A> comp = (FormAuthComposite<A>) sess.getLoginFactory().getComposite(FormAuthComposite.class);
 			if( comp != null ) {
-				// We validate the code in the action because we want the option
-				// to rate-limit this operation to prevent brute forcing.
-				f.addInput(CODE_FIELD, "Verification code", comp.getInput());
-				f.addAction("Submit", new ProcessAction<>(sess, comp,target));
+				comp.modifyForm(target, f);
+				f.addAction("Submit", new ProcessAction(sess, comp,target));
 			}
 			
 		}
@@ -117,7 +105,7 @@ public class CodeAuthTransitionProvider<A extends AppUser> extends SimpleTransit
 		 */
 		@Override
 		public <X extends ContentBuilder> X getExtraHtml(X cb, SessionService<?> op, A target) {
-			CodeAuthComposite<A,?> comp = (CodeAuthComposite<A,?>) op.getLoginFactory().getComposite(CodeAuthComposite.class);
+			FormAuthComposite<A> comp = (FormAuthComposite<A>) op.getLoginFactory().getComposite(FormAuthComposite.class);
 			if( comp != null) {
 				comp.addExtra(cb);
 			}
@@ -135,7 +123,7 @@ public class CodeAuthTransitionProvider<A extends AppUser> extends SimpleTransit
 		if( sess == null || ! sess.haveCurrentUser() || sess.isCurrentPerson(target)) {
 			// allow if anonymous (we are doing a login) or the current user
 			// we are authenticating an operation.
-			CodeAuthComposite<A,?> comp = (CodeAuthComposite<A,?>) sess.getLoginFactory().getComposite(CodeAuthComposite.class);
+			FormAuthComposite<A> comp = (FormAuthComposite<A>) sess.getLoginFactory().getComposite(FormAuthComposite.class);
 			if( comp != null) {
 				
 				return true;

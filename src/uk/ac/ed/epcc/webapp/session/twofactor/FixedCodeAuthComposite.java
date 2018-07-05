@@ -18,7 +18,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 
-/** A debugging/testing {@link CodeAuthComposite} that uses a single fixed code
+/** A debugging/testing {@link FormAuthComposite} that uses a single fixed code
  * @author Stephen Booth
  *
  */

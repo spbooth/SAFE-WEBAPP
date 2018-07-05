@@ -28,7 +28,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * If two factor is enabled the person is remembered and the two-factor verification flow invoked instead.
  * 
  * If we use external-auth
- * enabled on any location we need to implement via a required-page instead
+ * enabled on any location we need to invoke via a required-page instead
  * @author Stephen Booth
  *
  */

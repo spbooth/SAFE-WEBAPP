@@ -45,7 +45,7 @@ public class TotpCompositeTest extends WebappTestBase {
 	@Test
 	public void testMakeKey() throws Exception {
 		AppUserFactory fac = ctx.makeContexedObject(AppUserFactory.class,"Person");
-		TotpCodeAuthComposite comp = (TotpCodeAuthComposite) fac.getComposite(CodeAuthComposite.class);
+		TotpCodeAuthComposite comp = (TotpCodeAuthComposite) fac.getComposite(FormAuthComposite.class);
 		
 		assertNotNull(comp);
 		
@@ -79,7 +79,7 @@ public class TotpCompositeTest extends WebappTestBase {
 		cal.set(2018, Calendar.JULY, 2, 20, 22);
 		serv.setResult(cal.getTime());
 		AppUserFactory<?> fac = ctx.makeContexedObject(AppUserFactory.class,"Person");
-		TotpCodeAuthComposite comp = (TotpCodeAuthComposite) fac.getComposite(CodeAuthComposite.class);
+		TotpCodeAuthComposite comp = (TotpCodeAuthComposite) fac.getComposite(FormAuthComposite.class);
 		
 		takeBaseline();
 		AppUser user = fac.makeFromString("fred@example.com");
@@ -101,7 +101,7 @@ public class TotpCompositeTest extends WebappTestBase {
 	@Test
 	public void testgetCode() throws ConsistencyError, Exception {
 			AppUserFactory<?> fac = ctx.makeContexedObject(AppUserFactory.class,"Person");
-		TotpCodeAuthComposite comp = (TotpCodeAuthComposite) fac.getComposite(CodeAuthComposite.class);
+		TotpCodeAuthComposite comp = (TotpCodeAuthComposite) fac.getComposite(FormAuthComposite.class);
 		
 		takeBaseline();
 		AppUser user = fac.makeFromString("fred@example.com");

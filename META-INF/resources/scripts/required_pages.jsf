@@ -20,31 +20,25 @@
 <% 
     //  fragment to check for required pages. include from session
     try{
-    Object skip=session.getAttribute("RequiredPages");
-    boolean checked_all=true;
-    // if known the FormResult used to invoke this page
-    FormResult chain = (FormResult)request.getAttribute(ServletFormResultVisitor.CHAIN_ATTRIBUTE);
-    if( session_service != null && skip==null && ! ((ServletSessionService) session_service).isSU() ){
-    	AppUserFactory<?> fac = session_service.getLoginFactory();
-    	for(RequiredPage p : fac.getRequiredPages() ){
-    		if( p.required(session_service) ){
-    			ServletFormResultVisitor vis = new ServletFormResultVisitor(conn, request, response);
-    			FormResult form_result = p.getPage();
-    			if( form_result.equals(chain)){
-    				// we are displaying a required page.
-    				checked_all=false;
-    				request.setAttribute(NavigationMenuService.DISABLE_NAVIGATION_ATTR, Boolean.TRUE);
-    			}else{
-    				form_result.accept(vis);
+        if( request.getAttribute("AmRequiredPage") == null){
+    		Object skip=session.getAttribute("RequiredPages");
+    		if( session_service != null && skip==null && ! ((ServletSessionService) session_service).isSU() ){
+    			AppUserFactory<?> fac = session_service.getLoginFactory();
+    			for(RequiredPage p : fac.getRequiredPages() ){
+    				if( p.required(session_service) ){
+    					ServletFormResultVisitor vis = new ServletFormResultVisitor(conn, request, response);
+    					FormResult form_result = p.getPage();
+    					// we are displaying a required page.
+    					request.setAttribute(NavigationMenuService.DISABLE_NAVIGATION_ATTR, Boolean.TRUE);
+    					request.setAttribute("AmRequiredPage",Boolean.TRUE);
+    					form_result.accept(vis);
+   		        		return;
+    				}
     			}
-   		       return;
+    			// all checks passed cache for session
+    			session.setAttribute("RequiredPages","done");
     		}
     	}
-    	if( checked_all){
-    		// all checks passed cache for session
-    		session.setAttribute("RequiredPages","done");
-    	}
-    }
     }catch(Throwable e){
     	conn.error(e,"Error processing required pages");
     }
