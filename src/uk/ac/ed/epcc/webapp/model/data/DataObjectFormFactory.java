@@ -91,7 +91,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	 * @throws DataFault
 	 */
 	public final void buildForm(Form f) throws DataFault {
-		buildForm(getContext(), factory.res,f,getSupress(),getOptional(),getSelectors(),getTranslations());
+		buildForm(getContext(), factory.res,f,getSupress(),getOptional(),getSelectors(),getTranslations(),getFieldHelp());
 		customiseForm(f);
 		f.setContents(getDefaults());
 	}
@@ -115,7 +115,31 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	 * @throws DataFault
 	 */
 	public static final void buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
-				Set<String> optional, Map<String,Object> selectors,Map<String,String> labels) throws DataFault {
+			Set<String> optional, Map<String,Object> selectors,Map<String,String> labels) throws DataFault {
+		buildForm(conn, res, f, supress_fields, optional, selectors, labels, null);
+	}
+	/**
+	 * Construct an edit Form for the associated DataObject based on database
+	 * meta-data
+	 * @param conn AppContext
+	 * @param res Repository to use as template
+	 * 
+	 * @param f
+	 *            Form to build
+	 * @param supress_fields
+	 *            Vector of fields to supress in the form
+	 * @param optional
+	 *            Vector marking fields as optional
+	 * @param selectors
+	 *            Map of selectors to use.
+	 * @param labels
+	 * 	          Map of field names to form labels
+	 * @param tooltips 
+	 * 			  Map of tooltip/help text for form labels
+	 * @throws DataFault
+	 */
+	public static final void buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
+				Set<String> optional, Map<String,Object> selectors,Map<String,String> labels,Map<String,String> tooltips) throws DataFault {
 		int maxwid = conn.getIntegerParameter("forms.max_text_input_width", 64);
 		Set<String> keys = res.getFields();
         String table = res.getTag();
@@ -203,7 +227,13 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 				}else{
 					lab = conn.getInitParameter("form.label."+table+"."+name,name);
 				}
-				f.addInput(name, lab, input);
+				String tooltip=null;
+				if( tooltips != null && tooltips.containsKey(name)) {
+					tooltip = tooltips.get(name);
+				}else {
+					tooltip = conn.getInitParameter("form.tooltip."+table+"."+name);
+				}
+				f.addInput(name, lab,tooltip, input);
 			}
 		}
 
@@ -420,6 +450,18 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 		}
 		return addTranslations(getContext(),translations,factory.res);
 	}
+	
+	protected  Map<String,String> getFieldHelp() {
+		Map<String, String> help = factory.getFieldHelp();
+		if( help == null){
+			help=new HashMap<String, String>();
+		}
+		for(TableStructureContributer c : factory.getTableStructureContributers()){
+			help=c.addFieldHelp(help);
+		}
+		return help;
+	}
+	
 	/**
 	 * Generate the set of optional fields to be used in form creation/update
 	 * default behaviour is to take the set defined by the factory

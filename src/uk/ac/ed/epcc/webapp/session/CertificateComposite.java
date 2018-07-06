@@ -132,4 +132,10 @@ public class CertificateComposite extends AppUserComposite<AppUser, CertificateC
 		}
 	}
 
+	@Override
+	public Map<String, String> addFieldHelp(Map<String, String> help) {
+		help.put(PERSONAL_CERTIFICATE, "This is the DN of your default X509 certificate for use with Globus or GridFTP");
+		return help;
+	}
+
 }

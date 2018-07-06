@@ -75,7 +75,20 @@ public interface Form extends Iterable<Field>, Contexed{
 	 */
 	public <I> Field addInput(String key, String label, Input<I> s); 
 
-	
+	/**
+	 * Add and input to the next slot in the form
+	 * 
+	 * @param key
+	 *            key to use to refer to field
+	 * @param label
+	 *            String to display to user
+	 * @param  help
+	 *            tooltip String
+	 * @param s
+	 *            Input to add
+	 * @return Field object created
+	 */
+	public <I> Field addInput(String key, String label, String help,Input<I> s);
 
 	/**
 	 * Check a form to see if it contains an input of a particular type.

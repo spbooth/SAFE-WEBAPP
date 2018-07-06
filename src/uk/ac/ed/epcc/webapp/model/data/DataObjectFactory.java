@@ -1636,6 +1636,16 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		return new HashMap<String, String>();
 	}
 
+	/**
+	 * return a class-default set of help-text for form fields.
+	 * 
+	 * 
+	 * @return Hashtable
+	 */
+	protected Map<String, String> getFieldHelp() {
+		// default to no translations override this method in sub-classes
+		return new HashMap<String, String>();
+	}
 	// name of table index
 	/**
 	 * Get the unique ID field name for the target object.
