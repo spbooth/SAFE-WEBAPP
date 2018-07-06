@@ -15,31 +15,35 @@ package uk.ac.ed.epcc.webapp.session;
 
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.Map;
 import java.util.MissingResourceException;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
-import uk.ac.ed.epcc.webapp.forms.Form;
-import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.model.data.forms.UpdateTransition;
+import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdateProducerTransition;
 
 /**
  * @author Stephen Booth
  *
  */
-public class UpdateDetailsTransition<A extends AppUser> extends UpdateTransition<A>
-implements ExtraContent<A>{
+public class UpdateDetailsTransition<A extends AppUser> extends StandAloneFormUpdateProducerTransition<A>
+{
+
+	private final AppUserTransitionProvider provider;
+	
 
 	/**
 	 * @param name
 	 * @param fac
 	 */
-	protected UpdateDetailsTransition(AppUserFactory<A> fac) {
+	protected UpdateDetailsTransition(AppUserTransitionProvider provider, AppUserFactory<A> fac) {
 		super("Details", fac);
+		this.provider=provider;
+	}
+	
+	public AppUserFactory<A> getAppUserFactory(){
+		return (AppUserFactory<A>) getFormUpdateProducer();
 	}
 
 	/* (non-Javadoc)
@@ -47,18 +51,20 @@ implements ExtraContent<A>{
 	 */
 	@Override
 	public <X extends ContentBuilder> X getExtraHtml(X cb, SessionService<?> op, A target) {
-		if( target.needDetailsUpdate()) {
+		AppUserFactory<A> fac = getAppUserFactory();
+		if( fac.needDetailsUpdate(target)) {
 			
 			try {
 				ContentBuilder div = cb.getPanel();
 				div.addHeading(2, "Update required");
-				PreDefinedContent content = new PreDefinedContent(getContext(), "person_update_required");
+				PreDefinedContent content = new PreDefinedContent(op.getContext(), "person_update_required");
 				div.addObject(content);
 				div.addParent();
 			}catch(MissingResourceException e) {
 				// optional
 			}
 		}
+		fac.addUpdateNotes(cb, target);
 		Date last = target.getLastTimeDetailsUpdated();
 		if( last != null) {
 			DateFormat df = DateFormat.getDateInstance();
@@ -80,29 +86,9 @@ implements ExtraContent<A>{
 	    	text.close();
 	    	text.appendParent();
 	    }
-//		try {
-//		ContentBuilder div = cb.getPanel();
-//		div.addHeading(2, "This page is to allow you to update your contact details.");
-//		getAppUserFactory().addUpdateNotes(div, target);
-//		div.addParent();
-//		}catch(Throwable t) {
-//			getLogger().error("Error getting update notes", t);
-//		}
+	    super.getExtraHtml(cb, op, target);
+
 		return cb;
-	}
-
-	public AppUserFactory<A> getAppUserFactory(){
-		return (AppUserFactory<A>) getFactory();
-	}
-
-	@Override
-	public void preCommit(A dat, Form f, Map<String, Object> orig) throws DataException {
-		dat.markDetailsUpdated();
-	}
-
-	@Override
-	protected void addRetireAction(String type_name, Form f, A dat, SessionService<?> operator) {
-		// Supressed we have transitions for this
 	}
 
 	

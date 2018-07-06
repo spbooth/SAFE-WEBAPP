@@ -182,52 +182,7 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 	public void markDetailsUpdated(){
 		record.setOptionalProperty(UPDATED_TIME, new Date());
 	}
-	/** do the persons details need updating.
-	 * This is only used by  {@link UpdatePersonRequiredPage} and the jsp pages that
-	 * update the personal details so if the corresponding feature is disabled it always return false.
-	 * @return boolean
-	 */
-	public boolean needDetailsUpdate(){
-		if( AppUserFactory.REQUIRE_PERSON_UPDATE_FEATURE.isEnabled(getContext())){
-			Form f = new BaseForm(getContext());
-			try {
-				// Check if the update form would show errors as well.
-				// bring this into the person method as this makes it easier
-				// to call from within a jsp
-				((AppUserFactory<AppUser>)factory).buildUpdateForm(f, this);
-				if( f.validate()){
-					return false;
-				}
-				return true;
-			} catch (Exception e) {
-				getContext().error(e,"Error checking for person update");
-			}
-
-			if( record.getRepository().hasField(UPDATED_TIME)){
-				Date last  = getLastTimeDetailsUpdated();
-				if( last == null ){
-					return true;
-				}
-				Calendar point = Calendar.getInstance();
-				point.add(Calendar.DAY_OF_YEAR, -1 * getContext().getIntegerParameter("person_details.refresh_days", 365));
-
-				Date target_time = point.getTime();
-				try{
-					String force = getContext().getInitParameter("force_details_update_time");
-					if( force != null){
-						Date d = DateFormat.getInstance().parse(force);
-						if( d.after(target_time)){
-							target_time=d;
-						}
-					}
-				}catch(Throwable t){
-					getContext().error(t,"Error checking force_time");
-				}
-				return last.before(target_time);
-			}
-		}
-		return false;
-	}
+	
 	
 
 

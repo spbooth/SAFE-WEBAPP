@@ -13,13 +13,22 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
+import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
 import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.email.inputs.EmailInput;
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.ExtraFormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -39,7 +48,7 @@ import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
  *
  */
 
-public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,EmailNameFinder<AU>> implements HistoryFieldContributor,SummaryContributer<AU>,MenuContributor<AU>,AnonymisingComposite<AU>{
+public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,EmailNameFinder<AU>> implements HistoryFieldContributor,SummaryContributer<AU>,AppUserTransitionContributor,AnonymisingComposite<AU>{
 
 	/** property to set the email input box width
 	 * 
@@ -186,16 +195,7 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 
 
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.session.MenuContributor#addMenuItems(uk.ac.ed.epcc.webapp.servlet.navigation.NodeContainer, uk.ac.ed.epcc.webapp.session.AppUser)
-	 */
-	@Override
-	public String[] additionalMenuItems( AU user) {
-		if( user == null || ! active()){
-			return new String[0];
-		}
-		return new String[]{"Email"};
-	}
+	
 
 
 
@@ -206,6 +206,52 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 	public void anonymise(AU target) {
 		setName(target, null);
 		
+	}
+
+	public static CurrentUserKey CHANGE_EMAIL = new CurrentUserKey("Email", "Update email", "Change the email address we use to contact you");
+
+
+	public class ChangeEmailTransition extends AbstractFormTransition<AU> implements ExtraFormTransition<AU>{
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.transition.ExtraContent#getExtraHtml(uk.ac.ed.epcc.webapp.content.ContentBuilder, uk.ac.ed.epcc.webapp.session.SessionService, java.lang.Object)
+		 */
+		@Override
+		public <X extends ContentBuilder> X getExtraHtml(X cb, SessionService<?> op, AU target) {
+			cb.addObject(new PreDefinedContent(op.getContext(), "change_email"));
+			if( userVisible()) {
+				AppUserFactory<AU> login_fac =  (AppUserFactory<AU>) op.getLoginFactory();
+				if( login_fac.hasComposite(PasswordAuthComposite.class)){
+					ExtendedXMLBuilder text = cb.getText();
+					text.open("em");
+					PreDefinedContent m = new PreDefinedContent(op.getContext(),"change_email_password");
+					m.addContent(text);
+					text.close();
+					text.appendParent();
+				}
+			}
+			return cb;
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.transition.BaseFormTransition#buildForm(uk.ac.ed.epcc.webapp.forms.Form, java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
+		 */
+		@Override
+		public void buildForm(Form f, AU target, AppContext conn) throws TransitionException {
+			SessionService session_service = conn.getService(SessionService.class);
+			EmailChangeRequestFactory fac = new EmailChangeRequestFactory(session_service.getLoginFactory());
+			fac.MakeRequestForm(target, f);
+		}
+		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.session.AppUserTransitionContributor#getTransitions(uk.ac.ed.epcc.webapp.session.AppUserTransitionProvider)
+	 */
+	@Override
+	public Map<AppUserKey, Transition<AppUser>> getTransitions(AppUserTransitionProvider provider) {
+		Map<AppUserKey, Transition<AppUser>> map = new LinkedHashMap<AppUserKey, Transition<AppUser>>();
+		map.put(CHANGE_EMAIL, (Transition<AppUser>) new ChangeEmailTransition());
+		return map;
 	}
 
 

@@ -162,8 +162,7 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		assertTrue(page.required(sess));
 		doFormResult(page.getPage(sess));
 		checkForwardToTransition(AppUserTransitionProvider.getInstance(ctx), PasswordAuthComposite.CHANGE_PASSWORD, sess.getCurrentPerson());
-		//checkRedirect("/password_update.jsp");
-	}
+}
 	
 	
 	

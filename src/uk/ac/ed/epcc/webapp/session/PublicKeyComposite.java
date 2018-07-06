@@ -129,7 +129,9 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 	public <CB extends ContentBuilder> CB addUpdateNotes(CB cb,AppUser person) {
 		if( usePublicKey() ){
 			if(isOptional()){
-			cb.addText("Login systems may have different levels of support for any ssh keys you register here. See the individual system documentation for more details.");
+			cb.addText("Any SSH key you register here will be included when new login accounts are requested. "
+					+ "However this does not automatically mean that it will be automatically enabled for that account."
+					+ " See the individual system documentation for details of their policy on SSH keys.");
 			}
 		}
 		return cb;

@@ -67,7 +67,9 @@ public  abstract class DataObjectFormFactory<BDO extends DataObject> implements 
 
 
 protected final DataObjectFactory<BDO> factory;
-   protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
+
+
+protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	   assert( fac != null );
 	   factory=fac;
    }

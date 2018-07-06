@@ -21,24 +21,28 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdateProducerTransition;
+import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdateTransition;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFormFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
-/** An Update Transition that extends DataObjectFormFactory directly rather than 
- * including a nested Updater. 
+/** An Update Transition that extends {@link DataObjectFormFactory} directly rather than 
+ * including a nested Updater. This allows the transition to be customised specifically.
+ * To implement a generic update that obeys the update customisation within the factory
+ * use {@link StandAloneFormUpdateTransition} or {@link StandAloneFormUpdateProducerTransition}.
  * 
  * @author spb
  *
- * @param <BDO>
+ * @param <BDO> type of target
  */
 public abstract class UpdateTransition<BDO extends DataObject> extends DataObjectUpdateFormFactory<BDO> implements FormTransition<BDO>, UpdateTemplate<BDO>{
 
-	public static final String UPDATE = " Update ";
 	private final String name;
 	protected UpdateTransition(String name,DataObjectFactory<BDO> fac) {
 		super(fac);

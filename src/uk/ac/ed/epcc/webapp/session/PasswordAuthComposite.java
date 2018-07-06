@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.email.Emailer;
@@ -45,7 +46,7 @@ import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite.PasswordResetRequiredP
  */
 
 public abstract class PasswordAuthComposite<T extends AppUser> extends AppUserComposite<T, PasswordAuthComposite<T>> implements AppUserTransitionContributor , NewSignupAction<T>,RequiredPageProvider<T> {
-	
+	public static final Feature USER_CHANGE_PASSWORD_FEATURE = new Feature("user.change.password",true,"users can change their password");
 	public class UpdatePasswordTransition extends AbstractFormTransition<T> implements ExtraFormTransition<T>{
 		private final PasswordUpdateFormBuilder<T> builder;
 		/**
@@ -213,7 +214,9 @@ public abstract class PasswordAuthComposite<T extends AppUser> extends AppUserCo
 	@Override
 	public Map<AppUserKey, Transition<AppUser>> getTransitions(AppUserTransitionProvider provider) {
 		Map<AppUserKey, Transition<AppUser>> map = new LinkedHashMap<AppUserKey, Transition<AppUser>>();
-		map.put(CHANGE_PASSWORD, (Transition<AppUser>) new UpdatePasswordTransition());
+		if(USER_CHANGE_PASSWORD_FEATURE.isEnabled(getContext())){
+			map.put(CHANGE_PASSWORD, (Transition<AppUser>) new UpdatePasswordTransition());
+		}
 		return map;
 	}
 	public class PasswordResetRequiredPage implements RequiredPage<T>{
@@ -232,8 +235,10 @@ public abstract class PasswordAuthComposite<T extends AppUser> extends AppUserCo
 	@Override
 	public Set<RequiredPage<T>> getRequiredPages() {
 		LinkedHashSet<RequiredPage<T>> set = new LinkedHashSet<RequiredPage<T>>();
-		// This must be the FIRST page shown
-		set.add(new PasswordResetRequiredPage());
+		if(USER_CHANGE_PASSWORD_FEATURE.isEnabled(getContext())) {
+			// This must be the FIRST page shown
+			set.add(new PasswordResetRequiredPage());
+		}
 		return set;
 	}
 }

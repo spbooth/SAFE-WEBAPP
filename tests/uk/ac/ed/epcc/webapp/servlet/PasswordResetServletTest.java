@@ -65,7 +65,7 @@ public class PasswordResetServletTest extends ServletTest {
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD1,"BorisTheSpider");
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD2,"BorisTheSpider");
 		addParam("submitted","true");
-		addParam("action",UserServlet.CHANGE_PASSWORD); 
+		
 		setAction(PasswordUpdateFormBuilder.CHANGE_ACTION);
 		doPost();
 		checkMessage("password_changed");
@@ -93,7 +93,6 @@ public class PasswordResetServletTest extends ServletTest {
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD1,"BorisTheSpider");
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD2,"BorisTheSpider");
 		addParam("submitted","true");
-		addParam("action",UserServlet.CHANGE_PASSWORD); 
 		setAction(PasswordUpdateFormBuilder.CANCEL_ACTION);
 		doPost();
 		checkMessage("password_change_cancel");
@@ -113,8 +112,7 @@ public class PasswordResetServletTest extends ServletTest {
 		//addParam("form_url","/scripts/password_update.jsp");
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD1,"BorisTheSpider");
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD2,"BorisTheRussian");
-		addParam("submitted","true");
-		addParam("action",UserServlet.CHANGE_PASSWORD); 
+		addParam("submitted","true"); 
 		doPost();
 		checkForward("/scripts/password_change_request.jsp");
 		PageHTMLForm form = (PageHTMLForm) req.getAttribute("Form");

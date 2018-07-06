@@ -19,7 +19,10 @@
  */
 package uk.ac.ed.epcc.webapp.session;
 
+import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -31,6 +34,7 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.forms.BaseForm;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
@@ -82,6 +86,7 @@ import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.RemoteAuthServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
+import uk.ac.ed.epcc.webapp.session.AppUserFactory.UpdatePersonRequiredPage;
 
 
 /** A Factory for creating {@link AppUser} objects that represent users of the system.
@@ -242,7 +247,7 @@ AccessRoleProvider<AU, AU>
 			}
 			AU person = user.getCurrentPerson();
 			
-			return person.needDetailsUpdate();
+			return needDetailsUpdate(person);
 		}
 
 		public FormResult getPage(SessionService<AU> user) {
@@ -315,26 +320,57 @@ AccessRoleProvider<AU, AU>
 	}
 
 
-	/**
-	 * create a Form for editing a person.
-	 * 
-	 * @param f
-	 *            Form to build
-	 * 
-	 * @param person
-	 *            Person to be updated
-	 * @throws Exception 
-	 * 
+	/** do the persons details need updating.
+	 * This is only used by  {@link UpdatePersonRequiredPage} and the jsp pages that
+	 * update the personal details so if the corresponding feature is disabled it always return false.
+	 * @return boolean
 	 */
-	public void buildUpdateForm(Form f, AU person) throws Exception {
-		
-		StandAloneFormUpdate<AU> u = (StandAloneFormUpdate<AU>) getFormUpdate(getContext());
-		
-		SessionService service = person.getContext().getService(SessionService.class);
-		u.buildUpdateForm("Person", f, person,service);
-		if( ! service.hasRole(SessionService.ADMIN_ROLE)){
-			f.removeField(ALLOW_EMAIL_FIELD);
+	public boolean needDetailsUpdate(AU user){
+		if( REQUIRE_PERSON_UPDATE_FEATURE.isEnabled(getContext())){
+			Form f = new BaseForm(getContext());
+			try {
+				// Check if the update form would show errors as well.
+				// bring this into the person method as this makes it easier
+				// to call from within a jsp
+				StandAloneFormUpdate<AU> u = (StandAloneFormUpdate<AU>) getFormUpdate(getContext());
+				
+				SessionService service = user.getContext().getService(SessionService.class);
+				u.buildUpdateForm("Person", f, user,service);
+				if( ! service.hasRole(SessionService.ADMIN_ROLE)){
+					f.removeField(ALLOW_EMAIL_FIELD);
+				}
+				if( f.validate()){
+					return false;
+				}
+				return true;
+			} catch (Exception e) {
+				getContext().error(e,"Error checking for person update");
+			}
+
+			if( res.hasField(AppUser.UPDATED_TIME)){
+				Date last  = user.getLastTimeDetailsUpdated();
+				if( last == null ){
+					return true;
+				}
+				Calendar point = Calendar.getInstance();
+				point.add(Calendar.DAY_OF_YEAR, -1 * getContext().getIntegerParameter("person_details.refresh_days", 365));
+
+				Date target_time = point.getTime();
+				try{
+					String force = getContext().getInitParameter("force_details_update_time");
+					if( force != null){
+						Date d = DateFormat.getInstance().parse(force);
+						if( d.after(target_time)){
+							target_time=d;
+						}
+					}
+				}catch(Throwable t){
+					getContext().error(t,"Error checking force_time");
+				}
+				return last.before(target_time);
+			}
 		}
+		return false;
 	}
 	/** add Notes to be included in a signup/update form.
 	 * This is included within the block element above the

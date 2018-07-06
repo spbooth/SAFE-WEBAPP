@@ -57,30 +57,7 @@ public class EmailChangeServletTest<A extends AppUser> extends ServletTest {
 		req.servlet_path="EmailChangeRequestServlet";
 	}
 	
-	@Test
-	public void testRequest() throws ConsistencyError, Exception{
-		MockTansport.clear();
-		takeBaseline();
 	
-		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
-		A user =  fac.makeBDO();
-		user.setEmail("fred@example.com");
-		user.commit();
-		SessionService<A> sess = ctx.getService(SessionService.class);
-		sess.setCurrentPerson(user);
-		addParam(EmailNameFinder.EMAIL, "bilbo@example.com");
-		addParam("Action","Request");
-		addParam("form_url", "/scripts/new_email.jsp");
-		setAction(EmailChangeRequestFactory.REQUEST_ACTION);
-		doPost();
-		checkMessage("email_change_request_made");
-		assertEquals(1,MockTansport.nSent());
-		Message message = MockTansport.getMessage(0);
-		assertEquals(ctx.expandText("${service.name} Email Change request Request"),message.getSubject());
-		assertEquals("bilbo@example.com",message.getAllRecipients()[0].toString());
-		checkDiff("/cleanup.xsl", "email_change.xml");
-	
-	}
 	
 	@Test
 	@DataBaseFixtures("email_change.xml")

@@ -11,12 +11,6 @@
 <%--| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. |--%>
 <%--| See the License for the specific language governing permissions and      |--%>
 <%--| limitations under the License.                                           |--%>
-<%-- 
-    password_update.jsp - Page used to change password.
-
-
-   
---%>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService"%>
 <%@ page	
    import="uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*, uk.ac.ed.epcc.webapp.session.*,uk.ac.ed.epcc.webapp.forms.html.*"

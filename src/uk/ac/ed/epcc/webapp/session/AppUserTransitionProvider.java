@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.Table;
@@ -31,7 +32,6 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
-import uk.ac.ed.epcc.webapp.servlet.UserServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
 /** A {@link TransitionProvider} for operations on {@link AppUser}s
@@ -40,6 +40,9 @@ import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
  */
 
 public class AppUserTransitionProvider extends AbstractViewTransitionProvider<AppUser, AppUserKey> implements TitleTransitionProvider<AppUserKey, AppUser> {
+	
+	public static final Feature USER_SELF_UPDATE_FEATURE = new Feature("user.self.update",true,"users can update their own details");
+	
 	/**
 	 * 
 	 */
@@ -84,8 +87,8 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 				addTransition( e.getKey(), e.getValue());
 			}
 		}
-		if( UserServlet.USER_SELF_UPDATE_FEATURE.isEnabled(c)) {
-			addTransition(UPDATE, new UpdateDetailsTransition(fac));
+		if( USER_SELF_UPDATE_FEATURE.isEnabled(c)) {
+			addTransition(UPDATE, new UpdateDetailsTransition(this,fac));
 		}
 		addTransition(SU_KEY, new SUTransition());
 	}

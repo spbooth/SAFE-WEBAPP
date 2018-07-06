@@ -17,9 +17,17 @@
 package uk.ac.ed.epcc.webapp.forms.factory;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.model.data.forms.UpdateTransition;
 
 
-
+/** A edit/update transition that wraps a {@link StandAloneFormUpdate}.
+ * 
+ * 
+ * @author Stephen Booth
+ * @see UpdateTransition
+ * @see StandAloneFormUpdateProducerTransition
+ * @param <T>
+ */
 public class StandAloneFormUpdateTransition<T> extends EditTransition<T> {
     private final StandAloneFormUpdate<T> update;
     public StandAloneFormUpdateTransition(String type_name,StandAloneFormUpdate<T> update){

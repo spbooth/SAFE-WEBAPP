@@ -19,7 +19,12 @@ package uk.ac.ed.epcc.webapp.forms.factory;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.registry.FormPolicy;
 import uk.ac.ed.epcc.webapp.session.SessionService;
-
+/** A factory class that can create {@link FormUpdate} objects for editing its targets
+ * 
+ * @author Stephen Booth
+ *
+ * @param <T>
+ */
 public interface FormUpdateProducer<T> {
 	/** produce a FormUpdate for the target type appropriate for
 	 * the requesting user
