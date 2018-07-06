@@ -23,7 +23,6 @@ import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.AppUserKey;
 import uk.ac.ed.epcc.webapp.session.AppUserTransitionProvider;
 import uk.ac.ed.epcc.webapp.session.CurrentUserKey;
-import uk.ac.ed.epcc.webapp.session.MenuContributor;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
@@ -52,7 +51,7 @@ public class SUNodeMaker extends AbstractNodeMaker  {
 		SessionService sess = getContext().getService(SessionService.class);
 		AppUserTransitionProvider tp = AppUserTransitionProvider.getInstance(getContext());
 		n.setTargetPath(TransitionServlet.getURL(getContext(), tp, sess.getCurrentPerson()));
-		addChildrenFromComposite(n,props);
+		addChildrenFromTransition(n,props);
 		String additions = props.getProperty(name+".head");
 		if( additions != null && ! additions.trim().isEmpty()){
 			addConfigNodes(n, props, additions.split(","));
@@ -60,14 +59,11 @@ public class SUNodeMaker extends AbstractNodeMaker  {
 		return n;
 	}
 	
-	private <AU extends AppUser> void addChildrenFromComposite(Node parent,FilteredProperties props){
+	private <AU extends AppUser> void addChildrenFromTransition(Node parent,FilteredProperties props){
 		SessionService<AU> service = getContext().getService(SessionService.class);
 		AppUserFactory<AU> fac = service.getLoginFactory();
 		AU user = service.getCurrentPerson();
 		
-		for(MenuContributor<AU> mc : fac.getComposites(MenuContributor.class)){
-			addConfigNodes(parent, props, mc.additionalMenuItems(user));
-		}
 		// Add in the current-user transitions directly to the menu
 		AppUserTransitionProvider prov = AppUserTransitionProvider.getInstance(getContext());
 		for(AppUserKey key : prov.getTransitions(user)) {
