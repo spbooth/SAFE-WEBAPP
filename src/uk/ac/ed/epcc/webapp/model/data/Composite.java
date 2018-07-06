@@ -116,8 +116,7 @@ public abstract class Composite<BDO extends DataObject, X extends Composite> imp
 	}
 	@Override
 	public Map<String, String> addFieldHelp(Map<String, String> help) {
-		// TODO Auto-generated method stub
-		return null;
+		return help;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.TableStructureContributer#addSelectors(java.util.Map)

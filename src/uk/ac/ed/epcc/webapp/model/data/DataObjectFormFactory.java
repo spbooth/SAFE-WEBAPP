@@ -457,7 +457,8 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 			help=new HashMap<String, String>();
 		}
 		for(TableStructureContributer c : factory.getTableStructureContributers()){
-			help=c.addFieldHelp(help);
+			Map mod = c.addFieldHelp(help);
+			assert(mod != null);
 		}
 		return help;
 	}
