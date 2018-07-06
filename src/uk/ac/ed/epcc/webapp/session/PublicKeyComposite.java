@@ -130,7 +130,7 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 		if( usePublicKey() ){
 			if(isOptional()){
 			cb.addText("Any SSH key you register here will be included when new login accounts are requested. "
-					+ "However this does not automatically mean that it will be automatically enabled for that account."
+					+ "However this does not automatically mean that it will be installed when the account is created."
 					+ " See the individual system documentation for details of their policy on SSH keys.");
 			}
 		}
