@@ -240,5 +240,16 @@ public interface Form extends Iterable<Field>, Contexed{
 	 */
 	public boolean validate(); 
 	
+	/** Set a form-id for this form.
+	 * In HTML this is used as a prefix for the input html-ids
+	 * 
+	 * @param id
+	 */
+	public void setFormID(String id);
+	/** get the form-ids
+	 * In HTML this is used as a prefix for the input html-ids
+	 * @return
+	 */
+	public String getFormID();
 	
 }

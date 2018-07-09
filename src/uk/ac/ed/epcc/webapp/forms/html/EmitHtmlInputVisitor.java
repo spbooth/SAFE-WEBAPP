@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.forms.html;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -66,17 +67,27 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	private boolean use_html5;
 	private boolean use_required=true;
 	private Map post_params;
+	private Map<String,String> data_attr;
 	private InputIdVisitor id_vis;
 	private Object radio_selector=null;
 	private boolean auto_focus=false;
-	public EmitHtmlInputVisitor(AppContext conn,ExtendedXMLBuilder hb, boolean use_post, Map post_params,String prefix){
+	public EmitHtmlInputVisitor(AppContext conn,ExtendedXMLBuilder hb, boolean use_post, Map post_params,String prefix,Map<String,String> data_attr){
 		this.conn=conn;
 		this.hb=hb;
 		this.use_post=use_post;
 		this.post_params=post_params;
 		this.id_vis = new InputIdVisitor(prefix);
+		this.data_attr=data_attr;
 		use_html5 = conn==null || USE_HTML5_FEATURE.isEnabled(conn);
 	}
+	private void addDataAttr(SimpleXMLBuilder hb) {
+		if( data_attr != null) {
+			for(Entry<String, String> e : data_attr.entrySet()) {
+				hb.attr("data-"+e.getKey().toLowerCase(), e.getValue());
+			}
+		}
+	}
+	
 	private void constantHTML(SimpleXMLBuilder hb,UnmodifiableInput input) {
 		String label = input.getLabel();
 		if( label.trim().contains("\n")){
@@ -123,6 +134,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 		if( checked != null){
 		  hb.attr(checked,null);
 		}
+		addDataAttr(hb);
 		hb.addClass("input");
 		hb.close();
 
@@ -312,7 +324,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 		hb.open("input");
 		hb.attr("type","radio");
 		hb.attr("name",input.getKey());
-		
+		addDataAttr(hb);
 		hb.attr("value", tag );
 		if (def != null && def.equals(tag)) {
 			hb.attr("checked",null);
@@ -542,6 +554,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			if (default_value != null && default_value.length() > 0) {
 				result.attr("value",default_value);
 			}
+			addDataAttr(result);
 			result.addClass("input");
 			if (use_datalist) {
 				// add list attribute

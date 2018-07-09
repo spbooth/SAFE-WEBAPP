@@ -33,7 +33,6 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.LockedInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -60,7 +59,8 @@ public class BaseForm implements Form {
 	private LinkedHashMap<String,FormAction> actions;
     
 	protected Set<FormValidator> validators = new HashSet<FormValidator>();
-	
+
+	private String form_id=null;
 
 	private AppContext conn;
 	protected Logger log;
@@ -329,7 +329,7 @@ public class BaseForm implements Form {
 	 * @return Field
 	 */
 	protected <I> Field<I> makeField(String key, String label, Input<I> sel) {
-		return  new Field<I>(key, label, sel);
+		return  new Field<I>(this,key, label, sel);
 	}
 
 	/**
@@ -400,6 +400,9 @@ public class BaseForm implements Form {
 	 * @return The previous FormValidator
 	 */
 	public final void addValidator(FormValidator v) {
+		if( v instanceof ModifyingFornValidator) {
+			((ModifyingFornValidator)v).register(this);
+		}
 		validators.add(v);
 	}
 
@@ -532,5 +535,22 @@ public class BaseForm implements Form {
 	public String toString() {
 		return "BaseForm [fields=" + fields + ", actions=" + actions
 				+ ", validators=" + validators + "]";
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.Form#setFormID(java.lang.String)
+	 */
+	@Override
+	public void setFormID(String id) {
+		form_id=id;
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.Form#getFormID()
+	 */
+	@Override
+	public String getFormID() {
+		return form_id;
 	}
 }

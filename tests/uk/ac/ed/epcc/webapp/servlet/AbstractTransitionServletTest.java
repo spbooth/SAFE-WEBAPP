@@ -245,6 +245,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 			 builder.close();
 		 }
 		 HTMLForm f = new HTMLForm(getContext());
+		 //f.setFormID("transition_");
 		 if( t instanceof BaseFormTransition ){
 		 	BaseFormTransition ft = (BaseFormTransition) t;
 		 	ft.buildForm(f,target,getContext());

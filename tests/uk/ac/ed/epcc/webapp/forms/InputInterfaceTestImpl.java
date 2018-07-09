@@ -57,7 +57,7 @@ public class InputInterfaceTestImpl<T,I extends Input<T>,X extends TestDataProvi
 		Input<T> input = target.getInput();
 		input.setKey("test");
 		HtmlBuilder hb = new HtmlBuilder();
-		EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(null,hb, false, new HashMap() ,null);
+		EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(null,hb, false, new HashMap() ,null,null);
 		input.accept(vis);
 	}
 	
@@ -70,7 +70,8 @@ public class InputInterfaceTestImpl<T,I extends Input<T>,X extends TestDataProvi
 		JFrame frame = new JFrame();
 		JFormDialog dialog = new JFormDialog(target.getContext(), frame);
 		SwingContentBuilder cb = dialog.getContentBuilder();
-		Field<T> f = new Field<T>("Test", "Test lable", target.getInput());
+		BaseForm form = new BaseForm(target.getContext());
+		Field<T> f = new Field<T>(form,"Test", "Test lable", target.getInput());
 		cb.addFormLabel(target.getContext(), f);
 		cb.addFormInput(target.getContext(), f, null);
 	}

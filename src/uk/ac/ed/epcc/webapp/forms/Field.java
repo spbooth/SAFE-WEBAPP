@@ -17,6 +17,8 @@
 package uk.ac.ed.epcc.webapp.forms;
 
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
@@ -68,11 +70,31 @@ public final class Field<I> {
 	public void setDetails(Object details) {
 		this.details = details;
 	}
+	private Map<String,String> data_attr=null;
+	
+	/** Add a custom attribute to the input
+	 * this is mapped to a <b>data-</b>key on the input
+	 * in html and can be used for custom JS validatipm
+	 * @param key
+	 * @param value
+	 */
+	public void setDataAttr(String key, String value) {
+		if(data_attr==null) {
+			data_attr=new LinkedHashMap<String, String>();
+		}
+		data_attr.put(key, value);
+	}
+	public Map<String,String> getAttributes(){
+		return data_attr;
+	}
 
 	private Input<I> sel;
+	
+	private final Form f;
 
-	public Field(String key, String label, Input<I> sel) {
+	public Field(Form form,String key, String label, Input<I> sel) {
 		super();
+		this.f=form;
 	//	this.key = key;
 		if (label != null) {
 			this.label = label;
@@ -221,6 +243,8 @@ public final class Field<I> {
 	public void setTooltip(String tooltip) {
 		this.tooltip = tooltip;
 	}
-	
+	public Form getForm() {
+		return f;
+	}
 
 }

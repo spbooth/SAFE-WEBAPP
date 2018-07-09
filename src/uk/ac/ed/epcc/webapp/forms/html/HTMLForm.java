@@ -112,7 +112,6 @@ public class HTMLForm extends BaseHTMLForm {
 	}
 	public String getHtmlFieldTableFromRequest(HttpServletRequest req,boolean use_required) {
 		HtmlBuilder hb = new HtmlBuilder();
-		hb.setFormID("form");
 		hb.setUseRequired(use_required);
 		return getHtmlFieldTable(hb, req).toString();
 	}

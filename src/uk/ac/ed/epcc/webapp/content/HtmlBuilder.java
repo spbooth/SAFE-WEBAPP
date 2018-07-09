@@ -194,7 +194,6 @@ public HtmlBuilder(){
 	super(htmlBuilder);
 	if( htmlBuilder != null ){
 		setUseRequired(htmlBuilder.use_required);
-		setFormID(htmlBuilder.form_id);
 		setActionName(htmlBuilder.action_name);
 		if( htmlBuilder.use_table_section != null ){
 			setTableSections(htmlBuilder.use_table_section);
@@ -393,7 +392,7 @@ public <I> void addFormLabel(AppContext conn,Field<I> f) {
 	&& ((OptionalInput) i).isOptional();
 	if( HTML_USE_LABEL_FEATURE.isEnabled(conn)){
 		open("label");
-		InputIdVisitor vis = new InputIdVisitor(form_id);
+		InputIdVisitor vis = new InputIdVisitor(f.getForm().getFormID());
 		try {
 			String id =  (String) i.accept(vis);
 			if( id != null){
@@ -479,7 +478,7 @@ public <I,T> void addFormInput(AppContext conn,Field<I> f,T item) {
 		clean(((PrefixInput)i).getPrefix());
 	}
 	try{
-		EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(conn,this, use_post, post_params,form_id);
+		EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(conn,this, use_post, post_params,f.getForm().getFormID(),f.getAttributes());
 		vis.setRadioTarget(item);
 		vis.setUseRequired(use_required);
 		i.accept(vis);
@@ -524,7 +523,7 @@ public void setPostParams(Map<String,Object> post_params) {
 }
 
 private String action_name=null;
-private String form_id=null;
+
 /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addActionButtons(uk.ac.ed.epcc.webapp.forms.Form)
  */
@@ -595,17 +594,6 @@ public void addActionButtons(Form f) {
 }
 
 
-/** Set an ID prefix so to make {@link Input}s from
- * different forms unique. Set a different id for each form.
- * 
- * Don't use period or colon as this makes the id's difficult to select
- * in javascript
- * 
- * @param id
- */
-public void setFormID(String id){
-	this.form_id=id;
-}
 
 public void setActionName(String action_name) {
 	this.action_name = action_name;

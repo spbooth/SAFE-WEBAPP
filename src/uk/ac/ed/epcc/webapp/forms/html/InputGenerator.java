@@ -33,7 +33,7 @@ public class InputGenerator implements XMLGenerator{
 		this.conn=conn;
 	}
 	public SimpleXMLBuilder addContent(SimpleXMLBuilder builder) {
-		EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(conn,(ExtendedXMLBuilder)builder, use_post, post_params,null);
+		EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(conn,(ExtendedXMLBuilder)builder, use_post, post_params,null,null);
 		try {
 			i.accept(vis);
 		} catch (Exception e) {

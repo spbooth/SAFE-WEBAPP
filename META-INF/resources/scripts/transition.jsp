@@ -74,6 +74,8 @@ the form could just submit to self. This might break form error reporting though
 <%
 Transition t = tp.getTransition(target,key);
 HTMLForm f = new HTMLForm(conn);
+//Don't use period to be jquery compatible
+f.setFormID("transition_");
 try{
 if( t instanceof BaseFormTransition ){
 	BaseFormTransition ft = (BaseFormTransition) t;
@@ -86,8 +88,6 @@ if( t instanceof BaseFormTransition ){
 String default_charset = conn.getService(ServletService.class).defaultCharset();
 boolean multi = f.containsInput(FileInput.class);
 HtmlBuilder form_content = new HtmlBuilder();
-// Don't use period to be jquery compatible
-form_content.setFormID("transition_");
 if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 	// force initial validation and use internal state
 	Collection<String> m = getMissing(request);
