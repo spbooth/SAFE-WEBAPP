@@ -17,10 +17,10 @@
 <table class="form">
 <tr class="even">
 <th>
-<label class="required">Attach file</label>
+<label for="transition_text" class="required">Attach file</label>
 </th>
 <td>
-<input type="file" name="text" class="input"/>
+<input id="transition_text" type="file" name="text" class="input"/>
 </td>
 </tr>
 </table>

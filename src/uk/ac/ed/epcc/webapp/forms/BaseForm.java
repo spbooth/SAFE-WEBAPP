@@ -60,7 +60,7 @@ public class BaseForm implements Form {
     
 	protected Set<FormValidator> validators = new HashSet<FormValidator>();
 
-	private String form_id=null;
+	private String form_id="form";
 
 	private AppContext conn;
 	protected Logger log;

@@ -17,10 +17,10 @@
 <table class="form">
 <tr class="even">
 <th>
-<label class="required">Recipient Email</label>
+<label for="transition_text" class="required">Recipient Email</label>
 </th>
 <td>
-<input type="email" size="32" maxlength="254" name="text" class="input" required="required" placeholder="name@example.com"/>
+<input id="transition_text" type="email" size="32" maxlength="254" name="text" class="input" required="required" placeholder="name@example.com"/>
 </td>
 </tr>
 </table>

@@ -18,10 +18,10 @@
 </tr>
 <tr class="odd">
 <th>
-<label class="required">Verification code</label>
+<label for="transition_Code" class="required">Verification code</label>
 </th>
 <td>
-<input type="number" size="6" maxlength="32" name="Code" class="input" min="0" max="999999" step="1" required="required"/>
+<input id="transition_Code" type="number" size="6" maxlength="32" name="Code" class="input" min="0" max="999999" step="1" required="required"/>
 </td>
 </tr>
 </table>

@@ -13,21 +13,22 @@
 <!--| limitations under the License.                                           |-->
 <transition_page>
 	<Form>
-		<table class='form'>
-			<tr class='even'>
+		<table class="form">
+			<tr class="even">
 				<th>
-					<label class='required'>form</label>
+					<label for="transition_Form" class="required">form</label>
 				</th>
 				<td>
-					<select name="Form" class="input" required="required">
+					<select id="transition_Form" name="Form" class="input"
+						required="required">
 						<option value="1" selected="selected">FirstForm</option>
 					</select>
 				</td>
 			</tr>
 		</table>
-		<fieldset class='action_buttons'>
-			<input class='input_button' type='submit' name='Response'
-				value='Response' />
+		<fieldset class="action_buttons">
+			<input class="input_button" type="submit" name="Response"
+				value="Response" />
 		</fieldset>
 	</Form>
 </transition_page>
