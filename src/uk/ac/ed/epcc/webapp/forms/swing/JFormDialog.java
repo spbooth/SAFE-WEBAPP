@@ -125,6 +125,7 @@ public class JFormDialog extends JDialog implements Contexed{
 	public FormResult showForm(Form f){
 		content.setComponentValues();
 		getContentPane().add(content.getComponent());
+		getContentPane().validate();
 		pack();
 		setVisible(true); //blocks until form completed.
 		return result;

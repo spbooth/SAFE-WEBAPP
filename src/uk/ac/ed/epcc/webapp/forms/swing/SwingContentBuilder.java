@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.forms.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -69,7 +70,7 @@ public class SwingContentBuilder  implements ContentBuilder{
     private String type=null;
     private String type_class=null;
     private Font font=null;
-    private int align=SwingConstants.LEFT;
+    private int align=SwingConstants.RIGHT;
     private Border border=BorderFactory.createEmptyBorder();
     private Color fg=null;
     private Color bg=null;
@@ -111,7 +112,11 @@ public class SwingContentBuilder  implements ContentBuilder{
 		// parse config parameters.
 		this.type=type;
 		//TODO handle multiple type classes
-		this.type_class=type_classes[0];
+		if( type_classes != null && type_classes.length > 0 ) {
+			this.type_class=type_classes[0];
+		}else {
+			this.type_class="default";
+		}
 		ConfigService cfg = parent.conn.getService(ConfigService.class);
 		Properties prop = cfg.getServiceProperties();
 		this.font=parseFont(prop.getProperty("style.font."+type+"."+type_class,prop.getProperty("style.font."+type)),parent.font);
@@ -195,6 +200,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 			content.setBorder(border);
 		}
 	}
+	
 	public void setFont(Font f){
 		font=f;
 	}
@@ -409,20 +415,24 @@ public class SwingContentBuilder  implements ContentBuilder{
 	public <C,R> void addTable(AppContext conn,NumberFormat nf,Table<C,R> t) {
 		log.debug("add table");
 		JPanel table=new JPanel(new GridBagLayout());
-		
+		setStyle(table);
 		addComponent(table);
 		GridBagConstraints c = new GridBagConstraints();
 		SwingContentBuilder inner=new SwingContentBuilder(conn, table, frame);
 		inner.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		
 		inner.add_param=c;
 		c.ipadx=4;
 		c.ipady=4;
 		c.fill=GridBagConstraints.BOTH;
 		c.insets=new Insets(1, 1, 1, 1);
+		c.weightx=0.9;
 		c.gridx=0;
 		c.gridy=0;
 		//first the headings
 		if(t.isPrintHeadings()){
+			Color old = inner.bg;
+			inner.bg=Color.LIGHT_GRAY;
 			if(t.printKeys()){
 				inner.addText(t.getKeyName());
 				c.gridx++;
@@ -436,6 +446,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 				c.gridx++;
 			}
 			c.gridy++;
+			inner.bg=old;
 		}
 		// then the body
 		for(R row : t.getRows()){
@@ -468,6 +479,8 @@ public class SwingContentBuilder  implements ContentBuilder{
 	public ContentBuilder getHeading(int level) {
 		log.debug("getHeading");
 		SwingContentBuilder builder = new SwingContentBuilder(this,"h"+level,"");
+		//builder.content.setBorder(BorderFactory.createLineBorder(Color.GREEN));
+		builder.content.setAlignmentX(Component.CENTER_ALIGNMENT);
 		return builder;
 	}
 	public ContentBuilder getPanel(String ... type)
@@ -475,6 +488,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 		log.debug("getPanel");
 		
 		SwingContentBuilder panel = new SwingContentBuilder(this,"div",type);
+		//panel.content.setBorder(BorderFactory.createLineBorder(Color.BLUE));
 		panel.content.setLayout(new BoxLayout(panel.content, BoxLayout.Y_AXIS));
 		return panel;
 	}
@@ -484,25 +498,36 @@ public class SwingContentBuilder  implements ContentBuilder{
 		if( parent == null){
 			throw new UnsupportedOperationException("No parent");
 		}
+		content.validate();
 		parent.addComponent(content);
 		return parent;
 	}
 	
 	public <C, R> void addColumn(AppContext conn, Table<C, R> t, C col) {
 		JPanel table=new JPanel(new GridBagLayout());
+		setStyle(table);
 		addComponent(table);
 		GridBagConstraints c = new GridBagConstraints();
 		SwingContentBuilder inner=new SwingContentBuilder(conn, table, frame);
+		inner.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		inner.add_param=c;
+		c.ipadx=4;
+		c.ipady=4;
+		c.fill=GridBagConstraints.BOTH;
+		c.insets=new Insets(1, 1, 1, 1);
 		c.gridx=0;
 		c.gridy=0;
+
 		
 		// then the body
 		for(R row : t.getRows()){
 			c.gridx=0;
 			if( t.printKeys()){
+				Color old = inner.bg;
+				inner.bg=Color.LIGHT_GRAY;
 				inner.addText(t.getKeyText(row).toString());
 				c.gridx++;
+				inner.bg=old;
 			}
 			
 			addCell(t,col,row,null,inner);
@@ -513,12 +538,14 @@ public class SwingContentBuilder  implements ContentBuilder{
 		addComponent(inner.getComponent());
 	}
 	public void addText(String text) {
-		log.debug("addText: "+text);
-		JLabel label = new JLabel("<html>"+text+"</html>");
-		label.setMaximumSize(new Dimension(400, 10000));
-		setStyle(label);
-		addComponent(label);
-		
+		if( text != null ) {
+			log.debug("addText: "+text);
+			JLabel label = new JLabel("<html>"+text+"</html>");
+			label.setOpaque(true);
+			label.setMaximumSize(new Dimension(800, 10000));
+			setStyle(label);
+			addComponent(label);
+		}
 	}
 	private void setStyle(JComponent comp) {
 		if( font != null){

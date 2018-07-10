@@ -29,6 +29,9 @@ import uk.ac.ed.epcc.webapp.forms.registry.FormFactoryProvider;
 import uk.ac.ed.epcc.webapp.forms.registry.FormFactoryProviderRegistry;
 import uk.ac.ed.epcc.webapp.forms.registry.FormFactoryProviderTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.registry.FormOperations;
+import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionFactory;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryFinder;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 public class AdminForms extends GraphicsCommand implements Command {
@@ -95,6 +98,34 @@ public class AdminForms extends GraphicsCommand implements Command {
 				}
 			}
 		}
+		JPanel transitions = new JPanel();
+		transitions.setLayout(new BoxLayout(transitions, BoxLayout.PAGE_AXIS));
+		
+		//JLabel section_title = new JLabel(registry.getTitle());
+		
+		////section_title.setBackground(Color.DARK_GRAY);
+		////section_title.setOpaque(true); // transparent by default
+		//section.add(section_title);
+		transitions.setBorder(BorderFactory.createTitledBorder("Transitions"));
+		transitions.setName("Transitions");
+		transitions.add(new JLabel("Index transtitions"));
+		TransitionFactoryFinder finder = new TransitionFactoryFinder(getContext());
+		for(String name : getContext().getInitParameter("form.transition.list","").split(",") ){
+			TransitionFactory fac = finder.getProviderFromName(name);
+			if( fac != null && fac instanceof IndexTransitionFactory) {
+				
+				Object index = ((IndexTransitionFactory)fac).getIndexTransition();
+				if( fac.allowTransition(getContext(), null, index)) {
+					JPanel type = new JPanel();
+					JButton button = new JButton(name);
+					type.add(button);
+					button.addActionListener( new TransitionActionListener(fac, index, null));
+					transitions.add(type);
+				}
+			}
+		}
+		main.add(transitions);
+		main.validate();
 		return main;
 	}
 

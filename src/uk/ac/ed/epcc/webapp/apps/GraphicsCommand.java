@@ -24,6 +24,7 @@ import javax.swing.JScrollPane;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.swing.SwingTransitionHandler;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -43,10 +44,10 @@ public abstract class GraphicsCommand implements Command{
 
 		public class TransitionActionListener<K,T> implements ActionListener{
 			
-			TransitionProvider<K,T> tp;
+			TransitionFactory<K,T> tp;
 			K key;
 			T target;
-			public TransitionActionListener(TransitionProvider<K,T> tp, K key, T target){
+			public TransitionActionListener(TransitionFactory<K,T> tp, K key, T target){
 				this.tp=tp;
 				this.key=key;
 				this.target=target;
