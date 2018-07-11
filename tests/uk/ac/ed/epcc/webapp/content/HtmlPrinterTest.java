@@ -49,6 +49,6 @@ public class HtmlPrinterTest {
 		Assert.assertEquals("<p class='longlines'>\nline1<br/>\nline2<br/>\n</p>\n", p.toString());
 		p.clear();
 		Assert.assertFalse(p.cleanFormatted(10, "line1\nline2"));
-		Assert.assertEquals("<p class='preformatted'>line1\nline2</p>", p.toString());
+		Assert.assertEquals("<pre class='loose'>line1\nline2</pre>", p.toString());
 	}
 }

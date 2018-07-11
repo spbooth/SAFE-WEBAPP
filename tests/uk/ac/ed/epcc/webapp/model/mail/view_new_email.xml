@@ -31,7 +31,7 @@
 </form> Subject: </h4>
 <div class="multipart">
 <div class="part">
-<p class='preformatted'/>
+<pre class='loose'/>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/0/T">
 <input type="hidden" name="Transition" value="Edit"/>
 <input class="input_button" type="submit" value="Edit"/>

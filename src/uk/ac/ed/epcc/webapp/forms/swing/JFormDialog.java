@@ -16,17 +16,24 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.swing;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -124,7 +131,11 @@ public class JFormDialog extends JDialog implements Contexed{
  */
 	public FormResult showForm(Form f){
 		content.setComponentValues();
-		getContentPane().add(content.getComponent());
+		JComponent comp = content.getComponent();
+		
+		JScrollPane scroll = new JScrollPane(comp);
+	
+		getContentPane().add(scroll);
 		getContentPane().validate();
 		pack();
 		setVisible(true); //blocks until form completed.
@@ -139,6 +150,7 @@ public class JFormDialog extends JDialog implements Contexed{
 		JPanel buttons = new JPanel();
 		buttons.setLayout(new BoxLayout(buttons, BoxLayout.LINE_AXIS));
 		buttons.add(Box.createHorizontalGlue());
+		buttons.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		for (Iterator it = form.getActionNames(); it.hasNext();) {
 			String action = (String) it.next();
 			JButton b = new JButton(action);
@@ -149,6 +161,7 @@ public class JFormDialog extends JDialog implements Contexed{
 			buttons.add(b);
 			b.addActionListener(new Action(form,action));
 		}
+		buttons.validate();
 		return buttons;
 	}
 	

@@ -271,7 +271,9 @@ public class SwingFormResultVisitor implements FormResultVisitor,Contexed {
 		}
 		builder.addActionButtons(base);
 		dialog.setTitle(page_title);
-		parent.validate();
+		if( parent != null ) {
+			parent.validate();
+		}
 		return dialog.showForm(base);
 	}
 	public void visitServeDataResult(

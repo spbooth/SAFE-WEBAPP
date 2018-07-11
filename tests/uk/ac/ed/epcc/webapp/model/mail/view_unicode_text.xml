@@ -56,7 +56,7 @@
 <input type="hidden" name="Transition" value="EditSubject"/>
 <input class="input_button" type="submit" value="Edit Subject"/>
 </form> Subject: to change</h4>
-<p class='preformatted'>Look a ö character</p>
+<pre class='loose'>Look a ö character</pre>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/T">
 <input type="hidden" name="Transition" value="Edit"/>
 <input class="input_button" type="submit" value="Edit"/>

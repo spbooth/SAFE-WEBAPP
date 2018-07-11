@@ -105,6 +105,12 @@ p.preformatted{
 	/* monospace font makes this exactly like pre but ... */
 	/* font-family:  monospace; */
 }
+
+pre.loose{
+	font-family: "MS Arial", "Helvetica", sans-serif;
+	overflow: auto;
+	white-space: pre;
+}
 div.overflowblock .headcol {
 	position:absolute;
 	margin-left: -6.5em;

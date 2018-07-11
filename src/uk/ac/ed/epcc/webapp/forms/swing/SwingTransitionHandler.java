@@ -18,6 +18,8 @@ import javax.swing.JFrame;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /** This class implements transitions using a series dialog windows
  * 
@@ -48,7 +50,8 @@ public class SwingTransitionHandler implements Contexed{
 				start=vis.getNextResult();
 			}
 		}catch(UnsupportedResultException e){
-
+			Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+			log.error("Unsupported result", e);
 		}
 		return start;
 	}

@@ -4,13 +4,13 @@
 <h4>Subject/[EditSubject]/Edit Subject Subject: Testing attachments</h4>
 <div class='multipart'>
 <div class='part'>
-<p class='preformatted'>
+<pre class='loose'>
 test message
 ======================================================================
 |epcc| Dr Stephen P Booth             Project Manager           |epcc|
 |epcc| s.booth@epcc.ed.ac.uk          Phone 0131 650 5746       |epcc|
 ======================================================================
-</p><div class='para'>0/T/[Edit]/Edit</div>
+</pre><div class='para'>0/T/[Edit]/Edit</div>
 <div class='para'>0/[Delete]/Delete</div>
 
 </div>

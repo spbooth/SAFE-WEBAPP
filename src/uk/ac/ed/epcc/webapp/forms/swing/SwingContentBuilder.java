@@ -17,11 +17,12 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.sql.SQLIntegrityConstraintViolationException;
+import java.security.Principal;
 import java.text.NumberFormat;
 import java.util.Map;
 import java.util.Properties;
@@ -33,6 +34,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
@@ -41,13 +43,10 @@ import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
-import uk.ac.ed.epcc.webapp.content.HtmlPrinter;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.content.UIProvider;
-import uk.ac.ed.epcc.webapp.content.XMLGenerator;
-import uk.ac.ed.epcc.webapp.content.XMLPrinter;
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.Identified;
@@ -70,7 +69,7 @@ public class SwingContentBuilder  implements ContentBuilder{
     private String type=null;
     private String type_class=null;
     private Font font=null;
-    private int align=SwingConstants.RIGHT;
+    private int align=SwingConstants.LEFT;
     private Border border=BorderFactory.createEmptyBorder();
     private Color fg=null;
     private Color bg=null;
@@ -82,8 +81,9 @@ public class SwingContentBuilder  implements ContentBuilder{
 	public SwingContentBuilder(AppContext conn, JFrame frame){
 		this(conn,new JPanel(),frame);
 		//TOP-level stacks vertically
-		content.setMaximumSize(new Dimension(450, 10000));
-		content.setLayout(new BoxLayout(content ,BoxLayout.Y_AXIS));
+		//content.setMaximumSize(new Dimension(800, 10000));
+		content.setLayout(new BoxLayout(content ,BoxLayout.PAGE_AXIS));
+		content.setAlignmentX(Component.CENTER_ALIGNMENT);
 		
 	}
 	/** Create a SwingContentBuilder for building FormContent in
@@ -95,7 +95,9 @@ public class SwingContentBuilder  implements ContentBuilder{
 		this(dialog.getContext(),new JPanel(),dialog.getFrame());
 		this.form_dialog=dialog;
 		this.listener = new SwingFormComponentListener(dialog.getContext());
-		content.setLayout(new BoxLayout(content ,BoxLayout.Y_AXIS));
+		//content.setMaximumSize(new Dimension(1024, 102400));
+		content.setLayout(new BoxLayout(content ,BoxLayout.PAGE_AXIS));
+		content.setAlignmentX(Component.CENTER_ALIGNMENT);
 	}
 	public SwingContentBuilder(AppContext conn, JComponent content,JFrame frame){
 		this.conn=conn;
@@ -235,9 +237,11 @@ public class SwingContentBuilder  implements ContentBuilder{
 		// XML content built here then converted to stringand added to parent
 		private final ExtendedXMLBuilder nested;
 		private final SwingContentBuilder parent;
-		public XMLPanel(SwingContentBuilder parent,ExtendedXMLBuilder nested) {
+		private final boolean in_line;
+		public XMLPanel(SwingContentBuilder parent,ExtendedXMLBuilder nested,boolean in_line) {
 			this.parent = parent;
 			this.nested=nested;
+			this.in_line=in_line;
 		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#clean(java.lang.CharSequence)
@@ -311,7 +315,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 			return null;
 		}
 		protected void appendTo(SwingContentBuilder builder) {
-			builder.addText(nested.toString());
+			builder.addHtml(nested.toString());
 		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#getParent()
@@ -364,24 +368,14 @@ public class SwingContentBuilder  implements ContentBuilder{
 			dest.addText("");
 			return;
 		}
-		if( n instanceof UIGenerator){
-			((UIGenerator)n).addContent(dest);
-			return;
-		}
-		if( n instanceof XMLGenerator){
-			ExtendedXMLBuilder text = dest.getText();
-			((XMLGenerator)n).addContent(text);
-			text.appendParent();
-			return;
-		}
-		if( n instanceof Table ){
-			dest.addTable(conn, (Table) n, nf,"inner");
-		}
-		if( n instanceof Number && n != null ){
+		
+		
+		if( n instanceof Number ){
 			dest.addText(nf.format((Number)n));
-		}else{
-			dest.addText(n.toString());
+			return;
 		}
+		dest.addObject(n);
+		
     }
 
 	public void addButton(AppContext c,String text, FormResult action) {
@@ -426,7 +420,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 		c.ipady=4;
 		c.fill=GridBagConstraints.BOTH;
 		c.insets=new Insets(1, 1, 1, 1);
-		c.weightx=0.9;
+		c.weightx=0;
 		c.gridx=0;
 		c.gridy=0;
 		//first the headings
@@ -453,7 +447,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 
 			c.gridx=0;
 			if( t.printKeys()){
-				inner.addText(t.getKeyText(row).toString());
+				inner.addObject(t.getKeyText(row));
 				c.gridx++;
 			}
 			for(C col : t.getCols()){
@@ -469,17 +463,18 @@ public class SwingContentBuilder  implements ContentBuilder{
 	
 	public ExtendedXMLBuilder getText() {
 		log.debug("getText");
-		return new XMLPanel(this,new HtmlBuilder());
+		return new XMLPanel(this,new HtmlBuilder(),false);
 	}
 	public ExtendedXMLBuilder getSpan() {
-		log.debug("getText");
-		return new XMLPanel(this,new HtmlBuilder());
+		log.debug("getSpan");
+		return new XMLPanel(this,new HtmlBuilder(),true);
 	}
 
 	public ContentBuilder getHeading(int level) {
 		log.debug("getHeading");
 		SwingContentBuilder builder = new SwingContentBuilder(this,"h"+level,"");
 		//builder.content.setBorder(BorderFactory.createLineBorder(Color.GREEN));
+		builder.content.setLayout(new FlowLayout(FlowLayout.LEADING));
 		builder.content.setAlignmentX(Component.CENTER_ALIGNMENT);
 		return builder;
 	}
@@ -489,7 +484,8 @@ public class SwingContentBuilder  implements ContentBuilder{
 		
 		SwingContentBuilder panel = new SwingContentBuilder(this,"div",type);
 		//panel.content.setBorder(BorderFactory.createLineBorder(Color.BLUE));
-		panel.content.setLayout(new BoxLayout(panel.content, BoxLayout.Y_AXIS));
+		panel.content.setLayout(new BoxLayout(panel.content, BoxLayout.PAGE_AXIS));
+		//panel.content.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		return panel;
 	}
 	
@@ -540,10 +536,28 @@ public class SwingContentBuilder  implements ContentBuilder{
 	public void addText(String text) {
 		if( text != null ) {
 			log.debug("addText: "+text);
+			text=text.trim();
+			
+			JLabel ta = new JLabel(text);
+			//ta.setLineWrap(true);
+			ta.setOpaque(true);
+			//ta.setMaximumSize(new Dimension(800, 800));
+			ta.setAlignmentX(Component.CENTER_ALIGNMENT);
+			//label.setMaximumSize(new Dimension(800, 10000));
+			setStyle(ta);
+			ta.setBorder(BorderFactory.createLineBorder(Color.GREEN));
+			addComponent(ta);
+		}
+	}
+	public void addHtml(String text) {
+		if( text != null ) {
+			log.debug("addHtml: "+text);
 			JLabel label = new JLabel("<html>"+text+"</html>");
 			label.setOpaque(true);
-			label.setMaximumSize(new Dimension(800, 10000));
+			label.setAlignmentX(Component.CENTER_ALIGNMENT);
+			label.setMaximumSize(new Dimension(800, 800));
 			setStyle(label);
+			label.setBorder(BorderFactory.createLineBorder(Color.ORANGE));
 			addComponent(label);
 		}
 	}
@@ -572,6 +586,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 		boolean result = hb.cleanFormatted(max, s);
 		HtmlPanel comp = new HtmlPanel(hb.toString());
 		setStyle(comp);
+		comp.setBorder(BorderFactory.createLineBorder(Color.RED));
 		addComponent(comp);
 		return result;
 	}
@@ -669,8 +684,13 @@ public class SwingContentBuilder  implements ContentBuilder{
 			((UIGenerator)target).addContent(this);
 		}else if(target instanceof XMLPanel) {
 			((XMLPanel)target).appendTo(this);
+		}else if( target instanceof SwingContentBuilder) {
+			SwingContentBuilder sw = (SwingContentBuilder)target;
+			content.add(sw.content);
 		}else if( target instanceof Identified){
 			addText(((Identified)target).getIdentifier());
+		}else if( target instanceof Principal) {
+			addText(((Principal)target).getName());
 		}else if( target  instanceof Iterable){
 			addList((Iterable)target);
 		}else{

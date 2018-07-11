@@ -72,8 +72,10 @@ public class HtmlPrinter extends XMLPrinter implements ExtendedXMLBuilder{
 			append(hb);
 			return true;
 		}else{
-			open("p");
-			addClass("preformatted");
+			//open("p");
+			//addClass("preformatted");
+			open("pre");
+			addClass("loose");
 			clean(s);
 			close();
 			return false;
