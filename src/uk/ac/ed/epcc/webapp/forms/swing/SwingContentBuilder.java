@@ -420,7 +420,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 		c.ipady=4;
 		c.fill=GridBagConstraints.BOTH;
 		c.insets=new Insets(1, 1, 1, 1);
-		c.weightx=0;
+		c.weightx=0.9;
 		c.gridx=0;
 		c.gridy=0;
 		//first the headings
@@ -545,7 +545,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 			ta.setAlignmentX(Component.CENTER_ALIGNMENT);
 			//label.setMaximumSize(new Dimension(800, 10000));
 			setStyle(ta);
-			ta.setBorder(BorderFactory.createLineBorder(Color.GREEN));
+			//ta.setBorder(BorderFactory.createLineBorder(Color.GREEN));
 			addComponent(ta);
 		}
 	}
@@ -557,7 +557,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 			label.setAlignmentX(Component.CENTER_ALIGNMENT);
 			label.setMaximumSize(new Dimension(800, 800));
 			setStyle(label);
-			label.setBorder(BorderFactory.createLineBorder(Color.ORANGE));
+			//label.setBorder(BorderFactory.createLineBorder(Color.ORANGE));
 			addComponent(label);
 		}
 	}
@@ -586,7 +586,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 		boolean result = hb.cleanFormatted(max, s);
 		HtmlPanel comp = new HtmlPanel(hb.toString());
 		setStyle(comp);
-		comp.setBorder(BorderFactory.createLineBorder(Color.RED));
+		//comp.setBorder(BorderFactory.createLineBorder(Color.RED));
 		addComponent(comp);
 		return result;
 	}

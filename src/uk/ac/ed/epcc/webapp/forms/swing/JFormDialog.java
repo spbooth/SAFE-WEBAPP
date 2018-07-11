@@ -17,16 +17,12 @@
 package uk.ac.ed.epcc.webapp.forms.swing;
 
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -148,8 +144,9 @@ public class JFormDialog extends JDialog implements Contexed{
 	 */
 	public JPanel getActionButtons(Form form){
 		JPanel buttons = new JPanel();
-		buttons.setLayout(new BoxLayout(buttons, BoxLayout.LINE_AXIS));
-		buttons.add(Box.createHorizontalGlue());
+		buttons.setLayout(new WrapLayout(FlowLayout.RIGHT));
+		//buttons.setLayout(new BoxLayout(buttons, BoxLayout.LINE_AXIS));
+		//buttons.add(Box.createHorizontalGlue());
 		buttons.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		for (Iterator it = form.getActionNames(); it.hasNext();) {
 			String action = (String) it.next();
