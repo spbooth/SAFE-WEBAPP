@@ -626,6 +626,9 @@ public <X> void addList(Map<String,String> attr,Iterable<X> list) {
  * @param target
  */
 public <X> void addObject(X target) {
+	if( target == null ) {
+		return;
+	}
 	if( target instanceof UIProvider){
 		((UIProvider)target).getUIGenerator().addContent(this);
 	}else if( target instanceof UIGenerator){
@@ -636,6 +639,8 @@ public <X> void addObject(X target) {
 		clean(((Identified)target).getIdentifier());
 	}else if( target  instanceof Iterable){
 		addList((Iterable)target);
+	}else if( target instanceof Object[]) {
+		addList((Object []) target);
 	}else{
 		clean(target.toString());
 	}

@@ -34,6 +34,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
@@ -410,7 +411,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 		log.debug("add table");
 		JPanel table=new JPanel(new GridBagLayout());
 		setStyle(table);
-		addComponent(table);
+		addComponent(new JScrollPane(table));
 		GridBagConstraints c = new GridBagConstraints();
 		SwingContentBuilder inner=new SwingContentBuilder(conn, table, frame);
 		inner.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -502,7 +503,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 	public <C, R> void addColumn(AppContext conn, Table<C, R> t, C col) {
 		JPanel table=new JPanel(new GridBagLayout());
 		setStyle(table);
-		addComponent(table);
+		addComponent(new JScrollPane(table));
 		GridBagConstraints c = new GridBagConstraints();
 		SwingContentBuilder inner=new SwingContentBuilder(conn, table, frame);
 		inner.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -693,6 +694,8 @@ public class SwingContentBuilder  implements ContentBuilder{
 			addText(((Principal)target).getName());
 		}else if( target  instanceof Iterable){
 			addList((Iterable)target);
+		}else if( target instanceof Object[]) {
+			addList((Object [])target);
 		}else{
 			addText(target.toString());
 		}
