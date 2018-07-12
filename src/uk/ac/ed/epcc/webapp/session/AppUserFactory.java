@@ -39,7 +39,6 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdate;
-import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
@@ -50,7 +49,6 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
-import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -67,13 +65,12 @@ import uk.ac.ed.epcc.webapp.model.data.DataCache;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.PatternArg;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory.DataObjectInput;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
-import uk.ac.ed.epcc.webapp.model.data.filter.IdAcceptFilter;
-import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
+import uk.ac.ed.epcc.webapp.model.data.filter.IdAcceptFilter;
+import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 import uk.ac.ed.epcc.webapp.model.data.forms.UpdateAction;
 import uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate;
@@ -86,7 +83,6 @@ import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.RemoteAuthServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
-import uk.ac.ed.epcc.webapp.session.AppUserFactory.UpdatePersonRequiredPage;
 
 
 /** A Factory for creating {@link AppUser} objects that represent users of the system.
@@ -128,34 +124,59 @@ AccessRoleProvider<AU, AU>
 	public static final String ALLOW_EMAIL_FIELD ="AllowEmail";
 	
     
-    public class RoleFilter implements SQLFilter<AU>,JoinFilter<AU>,PatternFilter<AU>{
+    public class RoleFilter implements SQLFilter<AU>,PatternFilter<AU>{
     	private final String role;
     	private final SQLContext ctx;
     	public RoleFilter(SQLContext ctx,String role){
     		this.ctx=ctx;
     		this.role=role;
     	}
-		public String getJoin() {
-			StringBuilder sb = new StringBuilder();
-			sb.append(" join ");
-			ctx.quote(sb, AbstractSessionService.ROLE_TABLE);
-			sb.append(" on ");
-			ctx.quoteQualified(sb, AbstractSessionService.ROLE_TABLE, AbstractSessionService.ROLE_FIELD);
-			sb.append(" = ");
-			res.addUniqueName(sb, true, false);
-			return sb.toString();
-		}
+		
 		public void accept(AU o) {
 			
 		}
 		public List<PatternArgument> getParameters(List<PatternArgument> list) {
-			list.add(new PatternArg(null,AbstractSessionService.ROLE_FIELD,role));
+			addRoleParameter(list, role);
 			return list;
 		}
+		/**
+		 * @param list
+		 * @param test_role
+		 */
+		public void addRoleParameter(List<PatternArgument> list, String test_role) {
+			list.add(new PatternArg(null,AbstractSessionService.ROLE_FIELD,test_role));
+			String use = getContext().getInitParameter(AbstractSessionService.USE_ROLE_PREFIX+test_role);
+			if( use != null) {
+				for(String r : use.split("\\s*,\\s*")) {
+					addRoleParameter(list, r);
+				}
+			}
+		}
 		public StringBuilder addPattern(StringBuilder sb,boolean qualify) {
+			sb.append(" EXISTS( SELECT 1 FROM ");
+			ctx.quote(sb, AbstractSessionService.ROLE_TABLE);
+			sb.append(" WHERE ");
+			ctx.quoteQualified(sb, AbstractSessionService.ROLE_TABLE, AbstractSessionService.ROLE_PERSON_ID);
+			sb.append(" = ");
+			res.addUniqueName(sb, true, false);
+			sb.append(" AND (");
+			addRolePattern(sb,role);
+			sb.append("))");
+			return sb;
+		}
+		/**
+		 * @param sbFROM
+		 */
+		public void addRolePattern(StringBuilder sb,String test_role) {
 			ctx.quoteQualified(sb, AbstractSessionService.ROLE_TABLE, AbstractSessionService.ROLE_FIELD);
 			sb.append("=?");
-			return sb;
+			String use = getContext().getInitParameter(AbstractSessionService.USE_ROLE_PREFIX+test_role);
+			if( use != null) {
+				for(String r : use.split("\\s*,\\s*")) {
+					sb.append(" OR ");
+					addRolePattern(sb, r);
+				}
+			}
 		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)

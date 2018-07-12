@@ -465,7 +465,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	/** map role name to a comma separated list of alternative roles to check.
 	 * 
 	 * Note the original name should always be checked explicitly first
-	 * with the alternatives only checked if 
+	 * with the alternatives only checked if that role is not found
 	 * 
 	 * @param name
 	 * @return 

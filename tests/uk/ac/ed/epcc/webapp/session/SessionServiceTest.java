@@ -15,13 +15,17 @@ package uk.ac.ed.epcc.webapp.session;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
+import uk.ac.ed.epcc.webapp.model.data.NamedFilterWrapper;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 /**
  * @author spb
@@ -61,7 +65,7 @@ public class SessionServiceTest extends WebappTestBase {
 	}
 	
 	@Test 
-	public void testSet() throws DataFault{
+	public void testSet() throws DataException{
 		AppUserFactory login = ctx.getService(SessionService.class).getLoginFactory();
 		AppUser fred = (AppUser) login.makeBDO();
 		fred.setEmail("fred@example.com");
@@ -72,8 +76,14 @@ public class SessionServiceTest extends WebappTestBase {
 		assertFalse(serv.hasRole("Boris"));
 		serv.setRole(fred, "Boris", true);
 		assertTrue(serv.hasRole("Boris"));
+		
+		NamedFilterWrapper wrapper = new NamedFilterWrapper<>(login);
+		BaseFilter fil = wrapper.getNamedFilter("RoleFilterProvider.Boris");
+		assertNotNull(fil);
+		assertTrue(login.exists(fil));
 		serv.setRole(fred, "Boris", false);
 		assertFalse(serv.hasRole("Boris"));
+		assertFalse(login.exists(fil));
 	}
 	@Test 
 	public void testToggle() throws DataFault{
