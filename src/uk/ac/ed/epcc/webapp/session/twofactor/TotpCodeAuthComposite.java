@@ -274,7 +274,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 
 	@Override
 	public TableSpecification modifyDefaultTableSpecification(TableSpecification spec, String table) {
-		spec.setField(SECRET_FIELD, new StringFieldType(true, null, 32));
+		spec.setOptionalField(SECRET_FIELD, new StringFieldType(true, null, 32));
 		return spec;
 	}
 
