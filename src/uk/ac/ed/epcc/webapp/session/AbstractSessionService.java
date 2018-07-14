@@ -19,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -133,7 +134,8 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	public static final Feature APPLY_DEFAULT_PERSON_RELATIONSHIP_FILTER = new Feature("relationships.apply_default_person_filter",true,"Apply the default person relationship filter when generating a filter on person");
 	public static final Feature APPLY_DEFAULT_TARGET_RELATIONSHIP_FILTER = new Feature("relationships.apply_default_target_filter",true,"Apply the default target relationship filter when generating a filter");
 	public static final Feature ALLOW_UNKNOWN_RELATIONSHIP_IN_OR_FEATURE = new Feature("relationship.allow_unknown_in_or",true,"Only skip the bad branches of a mis defined OR relationship");
-
+	public static final String ROLE_LIST_CONFIG = "role_list";
+	 
 	private Map<String,Boolean> toggle_map=null;
 	protected AppContext c;
     
@@ -607,6 +609,14 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	private void clearRoleMap(){
 		removeAttribute(role_map_tag);
 		role_map=null;
+	}
+	@Override
+	public Set<String> getStandardRoles(){
+		Set<String> result = new LinkedHashSet<String>();
+		for(String s :fac.getContext().getExpandedProperty(ROLE_LIST_CONFIG, SessionService.ADMIN_ROLE).split(",")){
+			result.add(s);
+		}
+		return result;
 	}
 	/** extension point for canLogin check.
 	 * superclasses may want to supress this check in SU mode to allow

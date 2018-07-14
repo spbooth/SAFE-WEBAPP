@@ -62,13 +62,7 @@ public class RoleFilterProvider<T extends AppUser> implements NamedFilterProvide
 	 */
 	@Override
 	public void addFilterNames(Set<String> names) {
-		String list = getContext().getExpandedProperty(RoleUpdate.ROLE_LIST_CONFIG);
-		if( list != null) {
-			for(String s : list.split("\\s*,\\s*")) {
-				names.add(s);
-			}
-		}
-		
+		names.addAll(getContext().getService(SessionService.class).getStandardRoles());
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()

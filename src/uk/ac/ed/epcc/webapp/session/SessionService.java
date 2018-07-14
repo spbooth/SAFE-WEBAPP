@@ -208,6 +208,13 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * 
 	 * @return TimeZone
 	 */
+	
+	/** Get the set of standard roles.
+	 * Used by add-role forms etc.
+	 * 
+	 * @return
+	 */
+	public Set<String> getStandardRoles();
 	public TimeZone getTimeZone();
 	/** Perform role-name mapping. This allows multiple
 	 * specific roles to be mapped to a single meta-role.

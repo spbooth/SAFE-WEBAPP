@@ -41,6 +41,11 @@ import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
 public class AppUserTransitionProvider extends AbstractViewTransitionProvider<AppUser, AppUserKey> implements TitleTransitionProvider<AppUserKey, AppUser> {
 	
+	/**
+	 * 
+	 */
+	private static final String SET_ROLES_ROLE = "SetRoles";
+
 	public static final Feature USER_SELF_UPDATE_FEATURE = new Feature("user.self.update",true,"users can update their own details");
 	
 	/**
@@ -58,6 +63,7 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 			return false;
 		}
 	};
+	public static final AppUserKey SET_ROLE_KEY = new RoleAppUserKey("Roles", "Set roles", "Set permission roles for this user", SET_ROLES_ROLE);
 	public static final CurrentUserKey UPDATE = new CurrentUserKey("Details", "Update personal details", "Update the information we hold about you");
 	
 	public static final class SUTransition extends AbstractDirectTransition<AppUser>{
@@ -90,6 +96,7 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 		if( USER_SELF_UPDATE_FEATURE.isEnabled(c)) {
 			addTransition(UPDATE, new UpdateDetailsTransition(this,fac));
 		}
+		addTransition(SET_ROLE_KEY, new SetRoleTransition<>());
 		addTransition(SU_KEY, new SUTransition());
 	}
 
