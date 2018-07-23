@@ -16,12 +16,7 @@ public class RoleAppUserKey extends AppUserKey {
 
 	@Override
 	public final boolean allow(AppUser user, SessionService op) {
-		try {
-			return user != null && allowState(user) && op.hasRelationship(op.getLoginFactory(), user, role);
-		} catch (UnknownRelationshipException e) {
-			getLogger(op.getContext()).error("Error checking permission "+role,e);
-			return false;
-		}
+			return user != null && allowState(user) && op.hasRole(role);
 	}
 
 	protected boolean allowState(AppUser user) {
