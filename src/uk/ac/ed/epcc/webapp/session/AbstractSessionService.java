@@ -613,7 +613,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	@Override
 	public Set<String> getStandardRoles(){
 		Set<String> result = new LinkedHashSet<String>();
-		for(String s :fac.getContext().getExpandedProperty(ROLE_LIST_CONFIG, SessionService.ADMIN_ROLE).split(",")){
+		for(String s :getContext().getExpandedProperty(ROLE_LIST_CONFIG, SessionService.ADMIN_ROLE).split(",")){
 			result.add(s);
 		}
 		return result;
