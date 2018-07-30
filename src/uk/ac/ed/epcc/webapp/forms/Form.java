@@ -252,4 +252,15 @@ public interface Form extends Iterable<Field>, Contexed{
 	 */
 	public String getFormID();
 	
+	/** set field for auto-focus
+	 * 
+	 * @param field
+	 */
+	public void setAutoFocus(String field);
+	
+	/** get field for auto-focus
+	 * 
+	 * @return
+	 */
+	public String getAutoFocus();
 }

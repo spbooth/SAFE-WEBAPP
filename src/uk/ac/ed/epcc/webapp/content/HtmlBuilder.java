@@ -481,6 +481,7 @@ public <I,T> void addFormInput(AppContext conn,Field<I> f,T item) {
 		EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(conn,this, use_post, post_params,f.getForm().getFormID(),f.getAttributes());
 		vis.setRadioTarget(item);
 		vis.setUseRequired(use_required);
+		vis.setAutoFocus(f.getKey().equals(f.getForm().getAutoFocus()));
 		i.accept(vis);
 	}catch(Exception e){
 		getLogger(conn).error("Error generating input",e);

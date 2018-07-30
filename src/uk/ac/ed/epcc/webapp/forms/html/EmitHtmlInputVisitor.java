@@ -106,6 +106,9 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	public void setUseRequired(boolean use_required){
 		this.use_required=use_required;
 	}
+	public void setAutoFocus(boolean auto_focus) {
+		this.auto_focus = auto_focus;
+	}
 	private void  emitBinaryHTML(ExtendedXMLBuilder hb, boolean use_post, BinaryInput input,
 			String param) {
 

@@ -61,6 +61,8 @@ public class BaseForm implements Form {
 	protected Set<FormValidator> validators = new HashSet<FormValidator>();
 
 	private String form_id="form";
+	
+	private String auto_focus=null;
 
 	private AppContext conn;
 	protected Logger log;
@@ -552,5 +554,22 @@ public class BaseForm implements Form {
 	@Override
 	public String getFormID() {
 		return form_id;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.Form#setAutoFocus(java.lang.String)
+	 */
+	@Override
+	public void setAutoFocus(String field) {
+		this.auto_focus=field;
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.Form#getAutoFocus()
+	 */
+	@Override
+	public String getAutoFocus() {
+		return auto_focus;
 	}
 }

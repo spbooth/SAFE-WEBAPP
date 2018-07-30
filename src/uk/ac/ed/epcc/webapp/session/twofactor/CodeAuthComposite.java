@@ -44,6 +44,7 @@ public abstract class CodeAuthComposite<AU extends AppUser,T> extends FormAuthCo
 	public void modifyForm(AU user,Form f) {
 		f.addInput(CODE, "2fa Verification code", getInput());
 		f.getField(CODE).addValidator(new TokenFieldValidator(this, user));
+		f.setAutoFocus(CODE);
 	}
 	
 	public abstract Input<T> getInput();

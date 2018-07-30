@@ -240,7 +240,7 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		public void buildForm(Form f, AU target, AppContext conn) throws TransitionException {
 			SessionService session_service = conn.getService(SessionService.class);
 			EmailChangeRequestFactory fac = new EmailChangeRequestFactory(session_service.getLoginFactory());
-			fac.MakeRequestForm(target, f);
+			fac.makeRequestForm(target, f);
 		}
 		
 	}

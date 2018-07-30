@@ -162,7 +162,7 @@ public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequ
 	}
 	
 	 @SuppressWarnings("unchecked")
-	public  void MakeRequestForm(AppUser user,Form f){
+	public  void makeRequestForm(AppUser user,Form f){
 	    	// use email field so we can use the normal field input
 		    // the factory class may have a special version
 	    	AppUserFactory factory = getAppUserFactory();
@@ -174,6 +174,7 @@ public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequ
 			// Must not change to existing email unless already taken by same user.
 			f.getField(EmailNameFinder.EMAIL).removeValidator(new ParseFactoryValidator<AppUser>(factory, null));
 			f.getField(EmailNameFinder.EMAIL).addValidator(new ParseFactoryValidator<AppUser>(factory, user));
+			
 	    	f.addAction(REQUEST_ACTION, new RequestAction(user));
 	    }
 	/* (non-Javadoc)
