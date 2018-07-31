@@ -43,6 +43,7 @@ public abstract class FormAuthComposite<AU extends AppUser> extends AppUserCompo
 	 */
 	protected FormAuthComposite(AppUserFactory<AU> fac) {
 		super(fac);
+		re_auth_minutes = getContext().getIntegerParameter(getConfigPrefix()+".re_auth_minutes", 30);
 	}
 
 	@Override
@@ -91,12 +92,12 @@ public abstract class FormAuthComposite<AU extends AppUser> extends AppUserCompo
 		}
 		SessionService<AU> sess = getContext().getService(SessionService.class);
 		Date last_auth = (Date) sess.getAttribute(FORM_COMPOSITE_LAST_AUTH_ATTR);
-		if( last_auth != null ) {
+		if( last_auth != null && re_auth_minutes > 0) {
 			// did we authenticate recently
 			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 			Calendar thresh = Calendar.getInstance();
 			thresh.setTime(time.getCurrentTime());
-			thresh.add(-re_auth_minutes, Calendar.MINUTE);
+			thresh.add(Calendar.MINUTE,-re_auth_minutes );
 			if( thresh.getTime().before(last_auth)) {
 				// no re-auth needed
 				return false;
@@ -124,4 +125,5 @@ public abstract class FormAuthComposite<AU extends AppUser> extends AppUserCompo
 		return FormAuthComposite.class;
 	}
 
+	protected abstract String getConfigPrefix();
 }

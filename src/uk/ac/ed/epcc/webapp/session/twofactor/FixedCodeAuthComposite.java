@@ -32,7 +32,7 @@ public class FixedCodeAuthComposite<A extends AppUser> extends CodeAuthComposite
 	}
 
 	private String getAuthCode() {
-		return getContext().getInitParameter("fixed_auth_code.code");
+		return getContext().getInitParameter(getConfigPrefix()+".code");
 	}
 	
 	/* (non-Javadoc)
@@ -63,6 +63,15 @@ public class FixedCodeAuthComposite<A extends AppUser> extends CodeAuthComposite
 			return false;
 		}
 		return getAuthCode().equals(value);
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.session.twofactor.FormAuthComposite#getConfigPrefix()
+	 */
+	@Override
+	protected String getConfigPrefix() {
+		// TODO Auto-generated method stub
+		return "fixed_auth_code";
 	}
 
 	

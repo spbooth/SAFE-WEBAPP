@@ -19,6 +19,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 
 import javax.servlet.ServletException;
@@ -177,6 +178,14 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	 */
 	public void checkError(String param, String error){
 		checkError("/scripts/transition.jsp", param,error);
+	}
+	
+	public void checkMissing(String ... params) {
+		checkForward("/scripts/transition.jsp");
+		Collection<String> missing = HTMLForm.getMissing(req);
+		for(String p : params) {
+			assertTrue("Param "+p+"should be missing",missing.contains(p));
+		}
 	}
 	
 	public void checkGeneralError(String error){

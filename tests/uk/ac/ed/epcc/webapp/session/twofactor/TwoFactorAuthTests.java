@@ -133,7 +133,87 @@ public class TwoFactorAuthTests<A extends AppUser> extends AbstractTransitionSer
 		checkViewRedirect(prov, user);
 		checkDiff("/cleanup.xsl", "key_cleared.xml");
 	}
+	@Test
+	public void testClearKeyNoCode() throws ConsistencyError, Exception {
+		TestTimeService serv = new TestTimeService();
+		ctx.setService(serv);
+		Calendar cal = Calendar.getInstance();
+		cal.clear();
+		cal.set(2018, Calendar.JULY, 2, 20, 22);
+		serv.setResult(cal.getTime());
+		SessionService sess = ctx.getService(SessionService.class);
+		AppUserFactory<A> fac = sess.getLoginFactory();
+		A user = fac.findByEmail("fred@example.com");
+		sess.setCurrentPerson(user);
+		takeBaseline();
+		
+		AppUserTransitionProvider prov = AppUserTransitionProvider.getInstance(ctx);
+		assertNotNull("No Person transition",prov);
+		setTransition(prov, TotpCodeAuthComposite.CLEAR_KEY, user);
+		setConfirmTransition(true);
+		runTransition();
+		checkMissing(CODE);
+		
+	}
 	
+	@Test
+	public void testClearKeyNoCodeRecentAuth() throws ConsistencyError, Exception {
+		TestTimeService serv = new TestTimeService();
+		ctx.setService(serv);
+		Calendar cal = Calendar.getInstance();
+		cal.clear();
+		cal.set(2018, Calendar.JULY, 2, 20, 20);
+		serv.setResult(cal.getTime());
+		SessionService sess = ctx.getService(SessionService.class);
+		AppUserFactory<A> fac = sess.getLoginFactory();
+		A user = fac.findByEmail("fred@example.com");
+		sess.setCurrentPerson(user);
+		FormAuthComposite comp = fac.getComposite(FormAuthComposite.class);
+		comp.authenticated();	
+		cal = Calendar.getInstance();
+		cal.clear();
+		cal.set(2018, Calendar.JULY, 2, 20, 22); // 2 min later
+		serv.setResult(cal.getTime());		
+		takeBaseline();
+		
+		AppUserTransitionProvider prov = AppUserTransitionProvider.getInstance(ctx);
+		assertNotNull("No Person transition",prov);
+		setTransition(prov, TotpCodeAuthComposite.CLEAR_KEY, user);
+		
+		setConfirmTransition(true);
+		runTransition();
+		checkViewRedirect(prov, user);
+		checkDiff("/cleanup.xsl", "key_cleared.xml");
+	}
+	
+	@Test
+	public void testClearKeyNoCodeNonRecentAuth() throws ConsistencyError, Exception {
+		TestTimeService serv = new TestTimeService();
+		ctx.setService(serv);
+		Calendar cal = Calendar.getInstance();
+		cal.clear();
+		cal.set(2018, Calendar.JULY, 2, 19, 00);
+		serv.setResult(cal.getTime());
+		SessionService sess = ctx.getService(SessionService.class);
+		AppUserFactory<A> fac = sess.getLoginFactory();
+		A user = fac.findByEmail("fred@example.com");
+		sess.setCurrentPerson(user);
+		FormAuthComposite comp = fac.getComposite(FormAuthComposite.class);
+		comp.authenticated();	
+		cal = Calendar.getInstance();
+		cal.clear();
+		cal.set(2018, Calendar.JULY, 2, 20, 22); // lhr 20 min later
+		serv.setResult(cal.getTime());		
+		takeBaseline();
+		
+		AppUserTransitionProvider prov = AppUserTransitionProvider.getInstance(ctx);
+		assertNotNull("No Person transition",prov);
+		setTransition(prov, TotpCodeAuthComposite.CLEAR_KEY, user);
+		
+		setConfirmTransition(true);
+		runTransition();
+		checkMissing(CODE);
+	}
 	@Test
 	public void testClearKeyWithRole() throws ConsistencyError, Exception {
 		

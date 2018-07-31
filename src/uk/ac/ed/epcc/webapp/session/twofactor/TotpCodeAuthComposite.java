@@ -563,4 +563,12 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.session.twofactor.FormAuthComposite#getConfigPrefix()
+	 */
+	@Override
+	protected String getConfigPrefix() {
+		return "totp_auth_code";
+	}
+
 }

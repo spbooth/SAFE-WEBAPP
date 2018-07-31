@@ -50,4 +50,6 @@ public abstract class CodeAuthComposite<AU extends AppUser,T> extends FormAuthCo
 	public abstract Input<T> getInput();
 
 	public abstract boolean verify(AU target, T value);
+	
+	
 }
