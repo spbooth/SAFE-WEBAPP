@@ -254,9 +254,37 @@ public class TwoFactorAuthTests<A extends AppUser> extends AbstractTransitionSer
 		sess.setAttribute(TotpCodeAuthComposite.SetToptTransition.NEW_AUTH_KEY_ATTR, "UJ4SLJJPNPXVGIPLXDTQUGVKNI");
 		setTransition(prov, TotpCodeAuthComposite.SET_KEY, user);
 		checkFormContent("/normalize.xsl", "key_set_form.xml");
-		addParam(TotpCodeAuthComposite.SetToptTransition.CODE, 278504);
+		addParam(TotpCodeAuthComposite.SetToptTransition.NEW_CODE, 278504);
 		runTransition();
 		checkViewRedirect(prov, user);
 		checkDiff("/cleanup.xsl", "key_set.xml");
+	}
+	
+	
+	@Test
+	@DataBaseFixtures({"key_cleared.xml","key_set.xml"})
+	public void changeKey() throws DataException, Exception {
+		TestTimeService serv = new TestTimeService();
+		ctx.setService(serv);
+		Calendar cal = Calendar.getInstance();
+		cal.clear();
+		cal.set(2018, Calendar.JULY, 2, 20, 22);
+		serv.setResult(cal.getTime());
+		SessionService sess = ctx.getService(SessionService.class);
+		AppUserFactory<A> fac = sess.getLoginFactory();
+		A user = fac.findByEmail("fred@example.com");
+		sess.setCurrentPerson(user);
+		takeBaseline();
+		
+		AppUserTransitionProvider prov = AppUserTransitionProvider.getInstance(ctx);
+		assertNotNull("No Person transition",prov);
+		sess.setAttribute(TotpCodeAuthComposite.SetToptTransition.NEW_AUTH_KEY_ATTR, "BZSQEG4RK7RLWFW6XFS7AUGOLM");
+		setTransition(prov, TotpCodeAuthComposite.SET_KEY, user);
+		checkFormContent("/normalize.xsl", "key_change_form.xml");
+		addParam(CodeAuthComposite.CODE, 278504);
+		addParam(TotpCodeAuthComposite.SetToptTransition.NEW_CODE, 176952);
+		runTransition();
+		checkViewRedirect(prov, user);
+		checkDiff("/cleanup.xsl", "key_changed.xml");
 	}
 }

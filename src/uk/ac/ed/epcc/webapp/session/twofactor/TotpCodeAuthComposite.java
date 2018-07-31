@@ -87,6 +87,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<A,Integer> implements AppUserTransitionContributor, SummaryContributer<A>, RequiredPageProvider<A> {
 	public static final Feature REQUIRED_TWO_FACTOR= new Feature("two_factor.required",false,"Is two factor authentication required");
+	public static final Feature VERIFY_OLD_CODE=new Feature("two_factor.verify_previous_code",true,"Verify current code on key change");
 	private static final String SECRET_FIELD="AuthCodeSecret";
 	public static final String REMOVE_KEY_ROLE="RemoveTwoFactor";
 	/**
@@ -340,7 +341,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		/**
 		 * 
 		 */
-		static final String CODE = "Code";
+		static final String NEW_CODE = "NewCode";
 		/**
 		 * 
 		 */
@@ -405,11 +406,14 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		@Override
 		public void buildForm(Form f, A target, AppContext conn) throws TransitionException {
 			try {
+				if( VERIFY_OLD_CODE.isEnabled(conn) && needAuth(target)) {
+					modifyForm(target, f);
+				}
 				Key key2 = getKey();
 				String enc = getEncodedSecret(key2);
 				f.addInput(KEY, "New key", new ConstantInput<>(enc,enc));
-				f.addInput(CODE, "Verification code", getInput());
-				f.getField(CODE).addValidator(new CodeValidator(key2));
+				f.addInput(NEW_CODE, "Verification code (New key)", getInput());
+				f.getField(NEW_CODE).addValidator(new CodeValidator(key2));
 				f.addAction("Set", new setKeyAction(prov,target));
 			} catch (Exception e) {
 				getLogger().error("Error building form", e);

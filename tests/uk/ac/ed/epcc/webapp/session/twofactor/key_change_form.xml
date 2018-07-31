@@ -5,18 +5,26 @@
 <ExtraContent>
 <div class="para">This is your new 2-factor authorisation key. You will need a smart-phone app such as google-authenticator to generate the verification codes.</div>
 <div class="para">
-<img class="qrcode" src="test/QRCode/code.png?text=otpauth%3A%2F%2Ftotp%2Ftest%3Afred%40example.com%3Fsecret%3DUJ4SLJJPNPXVGIPLXDTQUGVKNI" alt="otpauth://totp/test:fred@example.com?secret=UJ4SLJJPNPXVGIPLXDTQUGVKNI"/>
+<img class="qrcode" src="test/QRCode/code.png?text=otpauth%3A%2F%2Ftotp%2Ftest%3Afred%40example.com%3Fsecret%3DBZSQEG4RK7RLWFW6XFS7AUGOLM" alt="otpauth://totp/test:fred@example.com?secret=BZSQEG4RK7RLWFW6XFS7AUGOLM"/>
 </div>
 </ExtraContent>
 <Form>
 <table class="form">
 <tr class="even">
 <th>
-<label class="required">New key</label>
+<label for="transition_Code" class="required">2fa Verification code</label>
 </th>
-<td>UJ4SLJJPNPXVGIPLXDTQUGVKNI</td>
+<td>
+<input id="transition_Code" autofocus="autofocus" type="number" size="6" maxlength="32" name="Code" class="input" min="0" max="999999" step="1" required="required"/>
+</td>
 </tr>
 <tr class="odd">
+<th>
+<label class="required">New key</label>
+</th>
+<td>BZSQEG4RK7RLWFW6XFS7AUGOLM</td>
+</tr>
+<tr class="even">
 <th>
 <label for="transition_NewCode" class="required">Verification code (New key)</label>
 </th>
