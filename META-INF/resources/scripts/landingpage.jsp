@@ -28,7 +28,7 @@
 %>
 <%@ include file="/std_header.jsf"%>
 
-<% if( NavigationMenuService.NAVIGATION_MENU_FEATURE.isEnabled(conn)){
+<% if( node_name != null && NavigationMenuService.NAVIGATION_MENU_FEATURE.isEnabled(conn)){
 	NavigationMenuService serv = conn.getService(NavigationMenuService.class);
 	NodeContainer menu = serv.getMenu();
 	HtmlBuilder builder = new HtmlBuilder();

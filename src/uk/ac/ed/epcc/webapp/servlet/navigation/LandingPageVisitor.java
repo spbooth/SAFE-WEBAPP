@@ -59,7 +59,7 @@ public class LandingPageVisitor implements Visitor{
 	 */
 	@Override
 	public void visitNode(Node node) {
-		boolean target_node = target_name.equals(node.getID());
+		boolean target_node = target_name != null && target_name.equals(node.getID());
 		if( target_node){
 			active=true;
 			builder.open("div");
