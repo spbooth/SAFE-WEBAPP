@@ -21,7 +21,9 @@ import static org.junit.Assert.*;
 import java.util.Calendar;
 import java.util.Set;
 
+import javax.activation.MailcapCommandMap;
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.swing.DebugGraphics;
 
 import org.junit.Test;
@@ -90,7 +92,8 @@ public abstract class AbstractPasswordAuthAppUserFactoryTestCase<F extends AppUs
 	}
 	
 	@Test
-	public void testPasswordFails() throws DataException{
+	public void testPasswordFails() throws DataException, MessagingException{
+		MockTansport.clear();
 		F fac = getFactory();
 		DatabasePasswordComposite comp = (DatabasePasswordComposite) fac.getComposite(PasswordAuthComposite.class);
 		assertNotNull(comp);
@@ -102,24 +105,38 @@ public abstract class AbstractPasswordAuthAppUserFactoryTestCase<F extends AppUs
 		assertNull(comp.findByLoginNamePassword(email, "hilary", true));
 		user =  fac.findByEmail(email); // fails update db only
 		h = comp.getHandler(user);
-		
 		assertFalse(h.passwordFailsExceeded());
+		assertEquals(0, MockTansport.nSent());
+		
+		
 		assertNull(comp.findByLoginNamePassword(email, "hilary", true));
 		user =  fac.findByEmail(email); // fails update db only
 		h = comp.getHandler(user);
-		
 		assertFalse(h.passwordFailsExceeded());
+		assertEquals(0, MockTansport.nSent());
+		
 		assertNull(comp.findByLoginNamePassword(email, "hilary", true));
 		user =  fac.findByEmail(email); // fails update db only
 		h = comp.getHandler(user);
-		
 		assertFalse(h.passwordFailsExceeded());
+		assertEquals(0, MockTansport.nSent());
+		
 		assertNull(comp.findByLoginNamePassword(email, "hilary", true));
 		user =  fac.findByEmail(email); // fails update db only
 		h = comp.getHandler(user);
-		
 		assertTrue(h.passwordFailsExceeded());
+		assertEquals(1, MockTansport.nSent());
+		Message m = MockTansport.getMessage(0);
+		assertEquals(ctx.expandText("${service.name} Password has been locked"), m.getSubject());
+		
 		assertNull(comp.findByLoginNamePassword(email, "boris", true));
+		
+		assertNull(comp.findByLoginNamePassword(email, "hilary", true));
+		user =  fac.findByEmail(email); // fails update db only
+		h = comp.getHandler(user);
+		assertTrue(h.passwordFailsExceeded());
+		assertEquals(1, MockTansport.nSent()); // no additional mails on more fails
+		
 		h.resetPasswordFails();
 		assertFalse(h.passwordFailsExceeded());
 		assertNotNull(comp.findByLoginNamePassword(email, "boris", true));

@@ -19,7 +19,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +28,6 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.email.Emailer;
-import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
-import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -59,7 +56,6 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterAdd;
-import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 
 
@@ -86,6 +82,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	protected static final Feature SALT_FIRST_FEATURE = new Feature("salt_first", false, "Salt comes first in password hash");
 	public static final Feature NON_RANDOM_PASSWORD = new Feature("password.non-random",false,"Force randomly chosen passwords to be a series of x's (for bootstapping without email access)");
 	public static final Feature LOG_RANDOM_PASSWORD = new Feature("password.log-random",false,"Log randomly generated passwords (for bootstrapping without email access)");
+	public static final Feature NOTIFY_PASSWORD_LOCK = new Feature("password.notify-lock",true,"Notify be email if maximum password attempts are exceeded");
 	/** config parameter name for maximum age of password.
 	 * 
 	 */
@@ -346,8 +343,13 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			return sb.toString();
 		}
 		
-		 
-		/** A handler class fro any database fields specific to the composite.
+		/** get the fail threshold at which account is locked
+		 * @return
+		 */
+		private int getFailThreshold() {
+			return getContext().getIntegerParameter("max_password_fails",0);
+		} 
+		/** A handler class for any database fields specific to the composite.
 		 * 
 		 * @author spb
 		 *
@@ -485,7 +487,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 				}
 				
 				public boolean passwordFailsExceeded(){
-					int fails= record.getIntProperty(DatabasePasswordComposite.PASSWORD_FAILS, 0);
+					int fails= getFailCount();
 					if( fails == 0 ){
 						return false;
 					}
@@ -493,12 +495,19 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 						// report as error
 						getLogger().error("Large number of password fails for "+user.getIdentifier()+" "+fails);
 					}
-					int target = getContext().getIntegerParameter("max_password_fails",0);
+					int target = getFailThreshold();
 					if( target > 0 && fails > target){
 						
 						return true;
 					}
 					return false;
+				}
+				
+				/** get number of times password attempts have failed
+				 * @return
+				 */
+				private int getFailCount() {
+					return record.getIntProperty(DatabasePasswordComposite.PASSWORD_FAILS, 0);
 				}
 			    public void resetPasswordFails(){
 			    	try{
@@ -686,10 +695,25 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 					if( check_fail_count && getRepository().hasField(DatabasePasswordComposite.PASSWORD_FAILS)){
 						try {
 							
+							// atomic update via SQL
 							FilterAdd<T> adder = new FilterAdd<T>(getRepository());
-							
 							adder.update(getRepository().<Integer,T>getNumberExpression(getFactory().getTarget(),Integer.class, DatabasePasswordComposite.PASSWORD_FAILS), Integer.valueOf(1), nameFilter);
-							
+							u = getFactory().find(nameFilter,true);
+							if( u != null ) {
+								int fails = getHandler(u).getFailCount();
+								int thresh = getFailThreshold();
+								if( thresh > 0 && fails == thresh+1 && NOTIFY_PASSWORD_LOCK.isEnabled(getContext())) {
+									// This is the failure that crossed the threshold
+									// count as at limit and we just incremented it.
+
+									try {
+										Emailer m = new Emailer(getContext());
+										m.passwordFailsExceeded(u);
+									} catch (Exception e) {
+										getLogger().error("Failed to notify of password lock", e);
+									}
+								}
+							}
 						} catch (DataFault e) {
 							getLogger().error("Error updating password fails",e);
 						}
@@ -707,6 +731,8 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 						log.warn("user " + email + " exceeded max failed passwords");
 						return null;
 					}
+					// successful login resets the fail count
+					// provided the count has not been exceeded
 					handler.resetPasswordFails();
 				}
 				log.debug("password success for "+email);
