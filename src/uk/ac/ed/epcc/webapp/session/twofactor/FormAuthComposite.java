@@ -80,7 +80,11 @@ public abstract class FormAuthComposite<AU extends AppUser> extends AppUserCompo
 	 * @param f
 	 */
 	public abstract  void modifyForm(AU user,Form f);
-	
+	/** Add extra content when being shown a modified auth form.
+	 * 
+	 * @param cb
+	 * @return
+	 */
 	public ContentBuilder addExtra(ContentBuilder cb) {
 		return cb;
 	}

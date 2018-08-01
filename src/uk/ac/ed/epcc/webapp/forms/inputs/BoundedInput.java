@@ -13,11 +13,16 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-/**
+/** Interface for {@link Input} which come from a range.
+ * 
+ * Normally the {@link Input#convert(Object)} method should
+ * be able to parse string values for setting min/max values.
+ * 
  * @author spb
+ * @param <T> type of input
  *
  */
-public interface BoundedInput<T> extends HTML5Input {
+public interface BoundedInput<T> extends HTML5Input, Input<T> {
 	/** Minimum valid  value.
 	 * null value implies no minimum.
 	 * 

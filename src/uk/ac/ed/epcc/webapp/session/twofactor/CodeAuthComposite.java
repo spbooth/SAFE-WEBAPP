@@ -27,6 +27,10 @@ public abstract class CodeAuthComposite<AU extends AppUser,T> extends FormAuthCo
 	/**
 	 * 
 	 */
+	protected static final String VERIFICATION_CODE_LABEL = "2fa Verification code";
+	/** form field for autentication code in augmented forms.
+	 * 
+	 */
 	public static final String CODE = "Code";
 	
 
@@ -42,7 +46,7 @@ public abstract class CodeAuthComposite<AU extends AppUser,T> extends FormAuthCo
 	 */
 	@Override
 	public void modifyForm(AU user,Form f) {
-		f.addInput(CODE, "2fa Verification code", getInput());
+		f.addInput(CODE, VERIFICATION_CODE_LABEL, getInput());
 		f.getField(CODE).addValidator(new TokenFieldValidator(this, user));
 		f.setAutoFocus(CODE);
 	}
