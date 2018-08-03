@@ -51,6 +51,7 @@ the form could just submit to self. This might break form error reporting though
     String action = key.toString();
     String page_title=TransitionServlet.getPageTitle(tp, key, target);
     String page_heading=TransitionServlet.getPageHeader(tp, key, target);
+    String crsf = TransitionServlet.getCrsfToken(conn, request);
     SessionService session_service = conn.getService(SessionService.class);
     // Add per tranistion css for script augmented transitions.
    
@@ -138,6 +139,9 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 <% } %>
 action="<%= response.encodeURL(web_path+TransitionServlet.getURL(conn,tp,target))%>" role="main">
 <input type='hidden' name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>' value='<%=action %>'/>
+<% if( crsf != null ){ %>
+<input type='hidden' name='<%=TransitionServlet.TRANSITION_CSRF_ATTR %>' value='<%=crsf %>'/>
+<%} %>
 <input type='hidden' name='transition_form' value='true'/>
 <input type='hidden' name='form_url' value='/scripts/transition.jsp'/>
 <% 

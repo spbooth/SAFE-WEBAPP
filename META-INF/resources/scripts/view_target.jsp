@@ -49,6 +49,7 @@ the form could just submit to self.
 <jsp:forward page="/messages.jsp?message_type=access_denied" />
 <%    	
     }
+    String crsf = TransitionServlet.getCrsfToken(conn, request);
     if( tp instanceof ScriptTransitionFactory){
     	ScriptTransitionFactory st = (ScriptTransitionFactory)tp;
     	WebappHeadTag.addCss(conn, request, st.getAdditionalCSS(null));
@@ -74,6 +75,9 @@ try{
 <div class="block" role="main">
 <%= provider.getLogContent(new HtmlBuilder(),target,session_service).toString() %>
 <form id="form" action="<%=response.encodeURL(web_path +TransitionServlet.getURL(conn,provider,target)+"#form") %>" method="post">
+<% if( crsf != null ){ %>
+<input type='hidden' name='<%=TransitionServlet.TRANSITION_CSRF_ATTR %>' value='<%=crsf %>'/>
+<%} %>
 <div class="action_buttons">
 <%
 for(Object key : provider.getTransitions(target)){

@@ -24,18 +24,34 @@ import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
-/**
+/** A {@link TransitionProvider} for testing
+ * 
+ * this just operates on integers
+ * 
  * @author spb
  *
  */
 
 public class TestTransitionProvider extends AbstractTransitionProvider<Number, TransitionKey<Number>> implements ViewTransitionProvider<TransitionKey<Number>, Number>{
 
+	/**
+	 * 
+	 */
+	public static final String VALUE = "Value";
+	/**
+	 * 
+	 */
+	public static final TransitionKey<Number> FORM_ADD_KEY = new TransitionKey<Number>(Number.class, "FormAdd");
+	/**
+	 * 
+	 */
+	public static final TransitionKey<Number> ADD_KEY = new TransitionKey<Number>(Number.class, "Add");
 	/**
 	 * 
 	 */
@@ -51,7 +67,7 @@ public class TestTransitionProvider extends AbstractTransitionProvider<Number, T
 		 */
 		@Override
 		public FormResult action(Form f) throws ActionException{
-			return new ChainedTransitionResult(TestTransitionProvider.this, target.intValue()+(Integer)f.get("Value"), null);
+			return new ChainedTransitionResult(TestTransitionProvider.this, target.intValue()+(Integer)f.get(VALUE), null);
 		}
     	
     }
@@ -60,16 +76,16 @@ public class TestTransitionProvider extends AbstractTransitionProvider<Number, T
 	 */
 	public TestTransitionProvider(AppContext c) {
 		super(c);
-		addTransition(new TransitionKey<Number>(Number.class, "Add"), new AbstractDirectTransition<Number>() {
+		addTransition(ADD_KEY, new AbstractDirectTransition<Number>() {
 			public FormResult doTransition(Number target, AppContext c)
 					throws TransitionException {
 				return new ChainedTransitionResult<Number, TransitionKey<Number>>(TestTransitionProvider.this, target.intValue()+1, null);
 			}
 		});
-		addTransition(new TransitionKey<Number>(Number.class, "FormAdd"), new AbstractFormTransition<Number>() {
+		addTransition(FORM_ADD_KEY, new AbstractFormTransition<Number>() {
 			public void buildForm(Form f, Number target, AppContext conn)
 					throws TransitionException {
-				f.addInput("Value", "Value", new IntegerInput());
+				f.addInput(VALUE, VALUE, new IntegerInput());
 				f.addAction("Add", new AddAction(target));
 			}
 			

@@ -112,6 +112,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	public static final String TRANSITION_SERVLET = "/TransitionServlet";
 	public static final String TRANSITION_PROVIDER_ATTR = "TransitionProvider";
 	public static final String TRANSITION_KEY_ATTR = "Transition";
+	public static final String TRANSITION_CSRF_ATTR ="TransitionCRSF";
 	public static final String TARGET_ATTRIBUTE = "Target";
 	@SuppressWarnings("unchecked")
 	@Override
@@ -165,6 +166,12 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 				}
 			}
 		}
+		String crsf = getCRSFToken(conn,tp, key, target);
+		if( crsf != null ) {
+			req.setAttribute(TRANSITION_CSRF_ATTR, crsf);
+		}else {
+			req.removeAttribute(TRANSITION_CSRF_ATTR);
+		}
 		boolean allow_get=false; // allow get method
 		log.debug("transition="+key);
 		if( key == null){
@@ -209,11 +216,22 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			if( o == null){
 				log.debug("No shortcut result");
 				if( ! (allow_get || req.getMethod().equalsIgnoreCase("POST"))) {
-					// Its dubious to allow modification from a get operation
 					getLogger(conn).error("Modify not from POST");
 					if( MODIFY_ON_POST_ONLY.isEnabled(conn)) {
 						res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			        	return;
+					}
+				}
+				// crsf check
+				if( crsf != null && ! allow_get) {
+					// potential modifying with a set token
+					String submitted_crsf = (String) params.get(TRANSITION_CSRF_ATTR);
+					if( submitted_crsf == null || ! crsf.equals(submitted_crsf)) {
+						//Failed
+						log.warn("CRSF token mis-match "+submitted_crsf+"!="+crsf);
+						sess.logOut();
+						message(conn, req, res, "crsf_check_failed");
+						return;
 					}
 				}
 				long start=0L,aquired=0L;
@@ -502,7 +520,9 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	protected void setTarget(HttpServletRequest req,T q){
 		req.setAttribute(TARGET_ATTRIBUTE, q);
 	}
-	
+	public static String getCrsfToken(AppContext conn, HttpServletRequest req) {
+		return (String) req.getAttribute(TRANSITION_CSRF_ATTR);
+	}
 	
 	public static class GetIDVisitor<T,K> implements TransitionFactoryVisitor<String, T, K>{
 		public GetIDVisitor(T target) {
@@ -774,5 +794,21 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			sb.append(ch);
 		}
 		return sb.toString();
+	}
+	/** generate a CRSF token to be included in form posts.
+	 * 
+	 * Returning a null value disables the check.
+	 * 
+	 * @param fac
+	 * @param key
+	 * @param target
+	 * @return token or null
+	 */
+	protected String getCRSFToken(AppContext conn,TransitionFactory<K,T> fac, K key, T target) {
+		CrsfTokenService serv = conn.getService(CrsfTokenService.class);
+		if( serv != null ) {
+			return serv.getCrsfToken(fac, target);
+		}
+		return null;
 	}
 }

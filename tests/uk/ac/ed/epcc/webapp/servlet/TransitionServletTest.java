@@ -125,7 +125,10 @@ public class TransitionServletTest extends ServletTest {
 		req.params.put(TransitionServlet.TRANSITION_KEY_ATTR, "Add");
 		SessionService service = ctx.getService(SessionService.class);
 		AppUserFactory<?> fac = service.getLoginFactory();
-
+		CrsfTokenService ts = ctx.getService(CrsfTokenService.class);
+		if( ts != null && ts instanceof DefaultCrsfTokenService) {
+			req.params.put(TransitionServlet.TRANSITION_CSRF_ATTR, "12345TestAdd6");
+		}
 		AppUser user = fac.makeBDO();
 		String email = ctx.getInitParameter("test.email");
 		user.setEmail(email);
@@ -191,6 +194,10 @@ public class TransitionServletTest extends ServletTest {
 		SessionService service = ctx.getService(SessionService.class);
 		AppUserFactory<?> fac = service.getLoginFactory();
 
+		CrsfTokenService ts = ctx.getService(CrsfTokenService.class);
+		if( ts != null && ts instanceof DefaultCrsfTokenService) {
+			req.params.put(TransitionServlet.TRANSITION_CSRF_ATTR, "12345TestFormAdd6");
+		}
 		AppUser user = fac.makeBDO();
 		String email = ctx.getInitParameter("test.email");
 		user.setEmail(email);

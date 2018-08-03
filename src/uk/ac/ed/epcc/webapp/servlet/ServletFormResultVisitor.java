@@ -68,6 +68,16 @@ public class ServletFormResultVisitor implements WebFormResultVisitor{
 		req.setAttribute(TransitionServlet.TRANSITION_KEY_ATTR, key);
 		
 		req.setAttribute(TransitionServlet.TARGET_ATTRIBUTE, target);
+		// Add in any crsf token
+		CrsfTokenService serv = conn.getService(CrsfTokenService.class);
+		if( serv != null) {
+			String token = serv.getCrsfToken(provider, target);
+			if( token != null ) {
+				req.setAttribute(TransitionServlet.TRANSITION_CSRF_ATTR, token);
+			}else {
+				req.removeAttribute(TransitionServlet.TRANSITION_CSRF_ATTR);
+			}
+		}
 		// let transition.jsp skip a recursive required page
 		req.setAttribute(ServletFormResultVisitor.CHAIN_ATTRIBUTE, ctr);
 		if( key == null ){

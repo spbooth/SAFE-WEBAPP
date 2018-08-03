@@ -15,7 +15,6 @@ package uk.ac.ed.epcc.webapp.servlet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -50,9 +49,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * {@link TransitionServlet}. Many different operations use {@link Transition}s
  * this can be used to build high level tests of them.
  * 
- * @author spb
- * @param <K> 
- * @param <T> 
+ * @author spb 
  *
  */
 
@@ -86,6 +83,9 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	 * @throws TransitionException 
 	 */
 	public <K,T> void setTransition(TransitionFactory<K, T> provider, K key, T target) throws TransitionException{
+		setTransition(provider, key, target,true);
+	}
+	public <K,T> void setTransition(TransitionFactory<K, T> provider, K key, T target, boolean from_form) throws TransitionException{
 		resetRequest();
 		req.servlet_path="TransitionServlet";
 		StringBuilder path = new StringBuilder();
@@ -105,8 +105,12 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 				}
 			}
 		}
-		
 		req.path_info=path.toString();
+		if( from_form) {
+		String csrf = ((TransitionServlet)servlet).getCRSFToken(ctx, provider, key, target);
+		if( csrf != null) {
+			req.params.put(TransitionServlet.TRANSITION_CSRF_ATTR, csrf);
+		}
 		if( key != null ){
 			req.params.put(TransitionServlet.TRANSITION_KEY_ATTR, key.toString());
 			Transition<T> transition = provider.getTransition(target, key);
@@ -124,6 +128,12 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 					f.addStringMap(req.params);
 				}
 				
+			}
+		}
+		}else {
+			// setup for post before from is shown
+			if( key != null ){
+				req.params.put(TransitionServlet.TRANSITION_KEY_ATTR, key.toString());
 			}
 		}
 	}

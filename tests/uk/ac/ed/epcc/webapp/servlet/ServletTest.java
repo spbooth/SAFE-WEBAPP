@@ -336,7 +336,10 @@ public abstract class ServletTest extends WebappTestBase{
 		req.params.put(name, value);
 		req.method="POST";
 	}
-	
+	public void clearParam(String name) {
+		req.removeAttribute(DefaultServletService.PARAMS_KEY_NAME);
+		req.params.remove(name);
+	}
 	public void addParam(String name, int value){
 		req.removeAttribute(DefaultServletService.PARAMS_KEY_NAME);
 		req.params.put(name,Integer.toString(value));
