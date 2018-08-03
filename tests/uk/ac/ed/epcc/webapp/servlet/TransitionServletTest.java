@@ -27,10 +27,10 @@ import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 /** Tests of the TransitionServlet itself (not transitions)
  * @author spb
- *
+ * @see BasicTransitionServletTest
  */
 
-public class TransitionServletTest extends ServletTest {
+public final class TransitionServletTest extends ServletTest {
 	
 	@Test
 	public void testNoUser() throws ServletException, IOException{
@@ -126,8 +126,8 @@ public class TransitionServletTest extends ServletTest {
 		SessionService service = ctx.getService(SessionService.class);
 		AppUserFactory<?> fac = service.getLoginFactory();
 		CrsfTokenService ts = ctx.getService(CrsfTokenService.class);
-		if( ts != null && ts instanceof DefaultCrsfTokenService) {
-			req.params.put(TransitionServlet.TRANSITION_CSRF_ATTR, "12345TestAdd6");
+		if( ts != null && ts instanceof TestCrsfService) {
+			req.params.put(TransitionServlet.TRANSITION_CSRF_ATTR, "12345Test6");
 		}
 		AppUser user = fac.makeBDO();
 		String email = ctx.getInitParameter("test.email");
@@ -195,8 +195,8 @@ public class TransitionServletTest extends ServletTest {
 		AppUserFactory<?> fac = service.getLoginFactory();
 
 		CrsfTokenService ts = ctx.getService(CrsfTokenService.class);
-		if( ts != null && ts instanceof DefaultCrsfTokenService) {
-			req.params.put(TransitionServlet.TRANSITION_CSRF_ATTR, "12345TestFormAdd6");
+		if( ts != null && ts instanceof TestCrsfService) {
+			req.params.put(TransitionServlet.TRANSITION_CSRF_ATTR, "12345Test6");
 		}
 		AppUser user = fac.makeBDO();
 		String email = ctx.getInitParameter("test.email");

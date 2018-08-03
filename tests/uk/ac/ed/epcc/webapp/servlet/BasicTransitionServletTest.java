@@ -92,6 +92,29 @@ public final class BasicTransitionServletTest extends AbstractTransitionServletT
 		runTransition();
 		checkViewForward(provider, 7);	// Its a forward becasue the provider uses chain not a viewresult
 	}
+	
+	@Test
+	public void testConfirmTransition() throws ServletException, IOException, DataException, TransitionException{
+		setupUser();
+		TestTransitionProvider provider = new TestTransitionProvider(ctx);
+		setTransition(provider, TestTransitionProvider.CONFIRM_ADD_KEY, 6);
+		setConfirmTransition(true);
+		runTransition();
+		
+		checkViewForward(provider, 7);	// Its a forward becasue the provider uses chain not a viewresult
+	}
+	
+	@Test
+	public void testConfirmTransitionBadCsrf() throws ServletException, IOException, DataException, TransitionException{
+		setupUser();
+		TestTransitionProvider provider = new TestTransitionProvider(ctx);
+		setTransition(provider, TestTransitionProvider.CONFIRM_ADD_KEY, 6);
+		addParam(TransitionServlet.TRANSITION_CSRF_ATTR, "frog");
+		setConfirmTransition(true);
+		runTransition();
+		checkMessage("crsf_check_failed");
+		assertFalse(ctx.getService(SessionService.class).haveCurrentUser());
+	}
 	@Test
 	public void testDenyDirectTransition() throws ServletException, IOException, DataException, TransitionException{
 		setupUser();

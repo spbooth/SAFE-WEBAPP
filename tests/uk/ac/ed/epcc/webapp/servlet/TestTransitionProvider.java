@@ -22,8 +22,10 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractTransitionProvider;
@@ -52,6 +54,8 @@ public class TestTransitionProvider extends AbstractTransitionProvider<Number, T
 	 * 
 	 */
 	public static final TransitionKey<Number> ADD_KEY = new TransitionKey<Number>(Number.class, "Add");
+	
+	public static final TransitionKey<Number> CONFIRM_ADD_KEY = new TransitionKey<Number>(Number.class, "ConfirmAdd");
 	/**
 	 * 
 	 */
@@ -90,6 +94,20 @@ public class TestTransitionProvider extends AbstractTransitionProvider<Number, T
 			}
 			
 		});
+		addTransition(CONFIRM_ADD_KEY, new ConfirmTransition<>("Are you sure?",
+				new AbstractDirectTransition<Number>() {
+					public FormResult doTransition(Number target, AppContext c)
+					throws TransitionException {
+							return new ChainedTransitionResult<Number, TransitionKey<Number>>(TestTransitionProvider.this, target.intValue()+1, null);
+					}
+				}, 
+				new AbstractDirectTransition<Number>() {
+					public FormResult doTransition(Number target, AppContext c)
+					throws TransitionException {
+						return new ViewTransitionResult<Number, TransitionKey<Number>>(TestTransitionProvider.this, target.intValue());
+					}
+				}	
+			));
 	}
 
 	/* (non-Javadoc)

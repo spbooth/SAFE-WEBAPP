@@ -575,6 +575,19 @@ public  class TransitionServlet<K,T> extends WebappServlet {
          } else {
         	hb.attr("action",url); 
          }
+         // Only really need this for direct transitions
+         CrsfTokenService crsf_serv = c.getService(CrsfTokenService.class);
+ 		 if( crsf_serv != null ) {
+ 			 String crsf = crsf_serv.getCrsfToken(tp, target);
+ 			 if( crsf != null ) {
+ 				hb.open("input"); 
+ 	            hb.attr("type","hidden"); 
+ 	            hb.attr("name", TRANSITION_CSRF_ATTR); 
+ 	            hb.attr("value", crsf); 
+ 	 
+ 	         hb.close();
+ 			 }
+ 		 }
          // pass operation as param by preference
          if(operation != null){
          hb.open("input"); 
