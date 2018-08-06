@@ -144,6 +144,9 @@ public  class TransitionServlet<K,T> extends WebappServlet {
         	sessionError(conn,sess,req, res);
         	return;
         }
+        if( ! checkOrigin(conn,req, res)) {
+        	return;
+        }
         T target = getTarget(conn,tp,path) ;
         // A null target is allowed with some transitions e.g. select/create
         // so null targets need to be checked for later.
@@ -166,6 +169,8 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 				}
 			}
 		}
+		// expected crsf toke is set here for use by 
+		// transition and view pages
 		String crsf = getCRSFToken(conn,tp, key, target);
 		if( crsf != null ) {
 			req.setAttribute(TRANSITION_CSRF_ATTR, crsf);
@@ -222,7 +227,8 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			        	return;
 					}
 				}
-				// crsf check
+				// crsf check. If get is allowed it is explicitly non-modifying and
+				// potentially book-markable.
 				if( crsf != null && ! allow_get) {
 					// potential modifying with a set token
 					String submitted_crsf = (String) params.get(TRANSITION_CSRF_ATTR);
@@ -823,5 +829,19 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			return serv.getCrsfToken(fac, target);
 		}
 		return null;
+	}
+	/** check headers for csrf etc.
+	 * 
+	 * @param req
+	 * @param res
+	 * @return true to continue processing
+	 */
+	public boolean checkOrigin(AppContext conn,HttpServletRequest req, HttpServletResponse res) {
+//		String origin = req.getHeader("Origin");
+//		Logger logger = getLogger(conn);
+//		logger.debug("origin is "+origin);
+//		String referer = req.getHeader("Referer");
+//		logger.debug("referer is "+referer);
+		return true;
 	}
 }

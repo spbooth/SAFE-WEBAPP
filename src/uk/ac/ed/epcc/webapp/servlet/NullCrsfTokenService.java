@@ -13,28 +13,20 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet;
 
-import java.security.MessageDigest;
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
-import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
-import uk.ac.ed.epcc.webapp.servlet.TransitionServlet.GetIDVisitor;
-import uk.ac.ed.epcc.webapp.session.Hash;
-import uk.ac.ed.epcc.webapp.session.RandomService;
-import uk.ac.ed.epcc.webapp.session.SessionService;
 
-/**
+/** A {@link CrsfTokenService} that disables the check.
  * @author Stephen Booth
  *
  */
-@PreRequisiteService({SessionService.class,RandomService.class})
-public class DefaultCrsfTokenService implements CrsfTokenService,Contexed {
+public class NullCrsfTokenService implements CrsfTokenService,Contexed {
 	private static final String CRSF_TAG_ATTR="CrsfTag";
 	/**
 	 * @param conn
 	 */
-	public DefaultCrsfTokenService(AppContext conn) {
+	public NullCrsfTokenService(AppContext conn) {
 		super();
 		this.conn = conn;
 	}
@@ -64,32 +56,7 @@ public class DefaultCrsfTokenService implements CrsfTokenService,Contexed {
 	 */
 	@Override
 	public <K, T, P extends TransitionFactory<K, T>> String getCrsfToken(P provider, T target) {
-		SessionService sess = getContext().getService(SessionService.class);
-		if( sess == null) {
-			return null;
-		}
-		String tag = (String) sess.getAttribute(CRSF_TAG_ATTR);
-		if( tag == null) {
-			RandomService rnd = getContext().getService(RandomService.class);
-			tag = rnd.randomString(getContext().getIntegerParameter("crsf.taglen", 64));
-			sess.setAttribute(CRSF_TAG_ATTR, tag);
-		}
-		Hash h = getContext().getEnumParameter(Hash.class, "crsf.hash", Hash.SHA256);
-		MessageDigest md;
-		try {
-			md = h.getDigest();
-			
-			md.update(provider.getTargetName().getBytes());
-			if( target != null) {
-				GetIDVisitor<T, K> vis = new GetIDVisitor<T, K>(target);
-				md.update(provider.accept(vis).getBytes());
-			}
-			md.update(tag.getBytes());
-			return Hash.getHex(md.digest());
-		} catch (Throwable e) {
-			getContext().error(e, "Error making crsf value");
-			return null;
-		}
+		return null;
 		
 	}
 
