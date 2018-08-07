@@ -36,6 +36,7 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.forms.BaseForm;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdate;
@@ -740,7 +741,7 @@ AccessRoleProvider<AU, AU>
 		private static final String REGISTER_ACTION = " Register ";
 
 		@Override
-		public void preCommit(T dat, Form f) throws DataException {
+		public void preCommit(T dat, Form f) throws DataException, ActionException {
 			super.preCommit(dat, f);
 			if( realm != null && realm.trim().length() > 0  && webname != null && webname.trim().length() > 0){
 				dat.setRealmName(realm,webname);
@@ -851,7 +852,11 @@ AccessRoleProvider<AU, AU>
 		@Override
 		public final void preCommit(T dat, Form f, Map<String, Object> orig) throws DataException {
 			// forward to  creation version
-			preCommit(dat, f);	
+			try {
+				preCommit(dat, f);
+			} catch (ActionException e) {
+				getLogger().error("Unexpected ActionException", e);
+			}	
 		}
 
 		

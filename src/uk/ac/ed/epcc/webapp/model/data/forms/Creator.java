@@ -20,6 +20,7 @@ import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.content.UIProvider;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.Identified;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
@@ -76,7 +77,7 @@ public class Creator<BDO extends DataObject> extends DataObjectFormFactory<BDO> 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.CreateTemplate#preCommit(BDO, uk.ac.ed.epcc.webapp.model.data.forms.Form)
 	 */
-	public  void preCommit(BDO dat, Form f) throws DataException {
+	public  void preCommit(BDO dat, Form f) throws DataException, ActionException {
 		for(CreateCustomizer comp : getFactory().getComposites(CreateCustomizer.class)){
 			comp.preCommit(dat, f);
 		}

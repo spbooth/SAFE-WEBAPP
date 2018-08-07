@@ -76,6 +76,8 @@ public final class CreateAction<BDO extends DataObject> extends FormAction {
 			o.commit();
 			log.debug("postCreate");
 			postCreate(o,f);
+		}catch(ActionException ae) {
+			throw ae; // allow preCommit to throw action exception directly
 		} catch (Exception e) {
 			log.error("exception in CreateAction.action",e);
 			throw new ActionException("Create failed", e);
@@ -83,7 +85,7 @@ public final class CreateAction<BDO extends DataObject> extends FormAction {
 		return creator.getResult(type_name,o, f);
 		
 	}
-	public final void preCommit(BDO dat, Form f) throws DataException {
+	public final void preCommit(BDO dat, Form f) throws DataException, ActionException {
 		creator.preCommit(dat, f);
 	}
 	public void postCreate(BDO dat, Form f) throws Exception {

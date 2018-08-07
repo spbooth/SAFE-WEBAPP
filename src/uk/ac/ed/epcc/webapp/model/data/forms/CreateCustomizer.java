@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.model.data.forms;
 
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -45,8 +46,9 @@ public interface CreateCustomizer <BDO extends DataObject>{
 	 * @param dat Object being created
 	 * @param f {@link Form} providing parameters
 	 * @throws DataException 
+	 * @throws ActionException 
 	 */
-	public abstract void preCommit(BDO dat, Form f) throws DataException;
+	public abstract void preCommit(BDO dat, Form f) throws DataException, ActionException;
 
 	/** Take any action after object commit.
 	 * 

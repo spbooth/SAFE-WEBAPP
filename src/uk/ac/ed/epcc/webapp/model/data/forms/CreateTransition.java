@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.model.data.forms;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
@@ -73,7 +74,7 @@ public abstract  class CreateTransition<BDO extends DataObject> extends DataObje
 		
 	}
 
-	public void preCommit(BDO dat, Form f) throws DataException {
+	public void preCommit(BDO dat, Form f) throws DataException, ActionException {
 		for(CreateCustomizer comp : getFactory().getComposites(CreateCustomizer.class)){
 			comp.preCommit(dat, f);
 		}
