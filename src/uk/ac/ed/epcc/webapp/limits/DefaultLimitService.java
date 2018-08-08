@@ -30,7 +30,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 public class DefaultLimitService extends LimitService {
 
 	private final Runtime rt;
-	private final long inital_free_memory;
+	private final long inital_available_memory;
 	private final long max_memory;
 	private final CurrentTimeService current_time;
 	private final Date start;
@@ -44,7 +44,7 @@ public class DefaultLimitService extends LimitService {
 	public DefaultLimitService(AppContext conn) {
 		super(conn);
 		rt=Runtime.getRuntime();
-		inital_free_memory=rt.freeMemory();
+		inital_available_memory=rt.maxMemory()-rt.totalMemory()+rt.freeMemory();
 		max_memory=rt.maxMemory();
 		current_time=conn.getService(CurrentTimeService.class);
 		start=current_time.getCurrentTime();
@@ -71,17 +71,17 @@ public class DefaultLimitService extends LimitService {
 			}
 			throw new LimitException("The request is taking too long");
 		}
-		long free_mem = rt.freeMemory();
-		double fraction_used = ((double)(inital_free_memory-free_mem))/(double)inital_free_memory;
+		long free_mem = rt.maxMemory()-rt.totalMemory()+rt.freeMemory();
+		double fraction_used = ((double)(inital_available_memory-free_mem))/(double)inital_available_memory;
 		
 		if( fraction_used >max_mem_fraction) {
 			if( log != null) {
-				log.warn("Resource check fail: start="+start+" now="+now+" memory "+inital_free_memory+"->"+free_mem+" "+fraction_used);
+				log.warn("Resource check fail: start="+start+" now="+now+" memory "+inital_available_memory+"->"+free_mem+" "+fraction_used);
 			}
 			throw new LimitException("Memory use is too high");
 		}
 		if( log != null ) {
-			log.debug("Resource check: start="+start+" now="+now+" memory "+inital_free_memory+"->"+free_mem+" "+fraction_used);
+			log.debug("Resource check: start="+start+" now="+now+" memory "+inital_available_memory+"->"+free_mem+" "+fraction_used);
 		}
 	}
 
