@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.charts.strategy.QueryMapper;
 import uk.ac.ed.epcc.webapp.charts.strategy.SetRangeMapper;
 import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.limits.LimitService;
 //import uk.ac.ed.epcc.webapp.time.Period;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
@@ -35,16 +36,24 @@ import uk.ac.ed.epcc.webapp.time.TimePeriod;
  *
  */
 public abstract class PeriodChart<P extends PeriodPlot> extends Chart {
+	private int adds=0;
+	private int limit_check=0;
+	private LimitService limit=null;
 	
+	private void setLimit(AppContext c) {
+		limit_check=c.getIntegerParameter("period_chart.limit_check_every", 500);
+		limit=c.getService(LimitService.class);
+	}
 	protected PeriodChart(AppContext c) {
 		super(c);
-		
+		setLimit(c);
 	}
 
 	
 	
 	protected PeriodChart(AppContext c,TimePeriod p) {
 		super(c);
+		setLimit(c);
 	}
 	
 	/**
@@ -60,6 +69,10 @@ public abstract class PeriodChart<P extends PeriodPlot> extends Chart {
 	protected final <D> void addData(P ds, SetRangeMapper<D> t, D object)
 			throws uk.ac.ed.epcc.webapp.charts.InvalidTransformException{
 		ds.addData(t, object);
+		adds++;
+		if( limit != null && limit_check> 0 && adds%limit_check==0) {
+			limit.checkLimit();
+		}
 	}
 
 	/** Populate chart using a QueryMapper and a factory 
