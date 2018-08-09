@@ -27,7 +27,7 @@ public abstract class CodeAuthComposite<AU extends AppUser,T> extends FormAuthCo
 	/**
 	 * 
 	 */
-	protected static final String VERIFICATION_CODE_LABEL = "2fa Verification code";
+	protected static final String VERIFICATION_CODE_LABEL = "Verification code from Authenticator App";
 	/** form field for autentication code in augmented forms.
 	 * 
 	 */

@@ -427,8 +427,10 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		 */
 		@Override
 		public <X extends ContentBuilder> X getExtraHtml(X cb, SessionService<?> op, A target) {
-			cb.addText("This is your new 2-factor authorisation key. You will need a smart-phone app such as google-authenticator to generate the verification codes.");
-			
+			cb.addText("This is your new 2-factor authorisation key. You will need a smart-phone app such as Google Authenticator or Microsoft Authenticator to generate the verification codes.");
+			if( VERIFY_OLD_CODE.isEnabled(getContext()) && needAuth(target)) {
+				cb.addText("You are changing an existing key and will have to input the codes for both the current and the new key.");
+			}
 			try {
 				ServletService serv = getContext().getService(ServletService.class);
 				if( serv != null) {
