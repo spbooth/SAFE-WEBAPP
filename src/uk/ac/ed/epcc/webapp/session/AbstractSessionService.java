@@ -38,7 +38,9 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FilterConverter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.NegatingFilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
@@ -1115,6 +1117,8 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * <li> The tag of a {@link AccessRoleProvider}</li>
 	 * </ul>
 	 * 
+	 * A role prefixed by <b>!</b> negates the filter
+	 * 
 	 * @param fac2   target factory
 	 * @param role   relationship string
 	 * @param person person to query (null for current person)
@@ -1166,7 +1170,18 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			return and;
 		}
 		// should be a single filter now.
-		if( role.contains(RELATIONSHIP_DEREF)){
+		if( role.startsWith("!")) {
+			BaseFilter<? super T> fil = makeRelationshipRoleFilter(fac2, role.substring(1), person, def);
+			NegatingFilterVisitor<T> nv = new NegatingFilterVisitor<>(fac2);
+			try {
+				return fil.acceptVisitor(nv);
+			}catch(UnknownRelationshipException e) {
+				throw e;
+			} catch (Exception e) {
+				error(e, "Error negating filter");
+				throw new UnknownRelationshipException(role);
+			}
+		}else if( role.contains(RELATIONSHIP_DEREF)){
 		    	// This is a remote relationship
 		    	// Note this will also catch remote NamedRoles
 				// Match this first as the remote relationship
@@ -1289,7 +1304,18 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			return and;
 		}
 		// should be a single filter now.
-		if( role.contains(RELATIONSHIP_DEREF)){
+		if( role.startsWith("!")) {
+			BaseFilter<? super A> fil = makePersonInRelationshipRoleFilter(fac2, role.substring(1), target);
+			NegatingFilterVisitor<A> nv = new NegatingFilterVisitor<>(login_fac);
+			try {
+				return fil.acceptVisitor(nv);
+			}catch( UnknownRelationshipException e) {
+				throw e;
+			} catch (Exception e) {
+				error(e,"Error negating filter");
+				throw new UnknownRelationshipException(role);
+			}
+		}else if( role.contains(RELATIONSHIP_DEREF)){
 	    	// This is a remote relationship
 	    	// Note this will also catch remote NamedRoles
 	    	int pos = role.indexOf(RELATIONSHIP_DEREF);
