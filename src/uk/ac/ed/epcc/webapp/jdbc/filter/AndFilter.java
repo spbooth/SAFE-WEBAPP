@@ -33,7 +33,7 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 
 
 public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<T>, AcceptFilter<T>{
-    private LinkedList<AcceptFilter<? super T>> accepts= new LinkedList<AcceptFilter<? super T>>();
+    protected LinkedList<AcceptFilter<? super T>> accepts= new LinkedList<AcceptFilter<? super T>>();
     public AndFilter(Class<? super T> target){
     	super(target);
     }
@@ -195,5 +195,11 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 			sb.append(accepts.toString());
 		}
 		super.listContents(sb);
+	}
+	@Override
+	public Set<BaseFilter> getSet() {
+		Set<BaseFilter> set = super.getSet();
+		set.addAll(accepts);
+		return set;
 	}
 }

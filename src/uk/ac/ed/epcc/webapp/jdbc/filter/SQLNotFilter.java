@@ -22,15 +22,15 @@ import java.util.List;
  *
  */
 
-public class SQLNotFilter<Q> implements SQLFilter<Q>,PatternFilter<Q>{
+public class SQLNotFilter<Q,F extends PatternFilter<Q>&SQLFilter<Q>> implements SQLFilter<Q>,PatternFilter<Q>{
 	//TODO convert this to use the {@link SQLFilterVisitor}
-	private final PatternFilter<Q> nested;
+	private final F nested;
 	
-	public SQLNotFilter(SQLFilter<Q> fil){
-		this.nested=(PatternFilter<Q>) fil;
+	protected  SQLNotFilter(F fil){
+		this.nested= fil;
 	}
 	
-	public PatternFilter<Q> getNested(){
+	public F getNested(){
 		return nested;
 	}
 

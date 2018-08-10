@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,6 +34,7 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
  *
  */
 public abstract class BaseCombineFilter<T> extends FilterSet<T> implements PatternFilter<T>, JoinFilter<T> , OrderFilter<T>, BinaryFilter<T>{
+	    // Note some filters may appear in both 
 		protected LinkedHashSet<PatternFilter> filters;
 	    protected LinkedHashSet<OrderClause> order=null;
 	    private boolean force_value;
@@ -398,5 +400,12 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			}
 			sb.append(" force=");
 			sb.append(force_value);
+		}
+
+		@Override
+		public Set<BaseFilter> getSet() {
+			Set<BaseFilter> sets = new HashSet<>();
+			sets.addAll(filters);
+			return sets;
 		}
 }

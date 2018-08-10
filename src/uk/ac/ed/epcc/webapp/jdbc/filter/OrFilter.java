@@ -13,7 +13,9 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 
@@ -355,5 +357,17 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		sb.append(Boolean.toString(force_value));
 		sb.append(")");
 		return sb.toString();
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterSet#getSet()
+	 */
+	@Override
+	public Set<BaseFilter> getSet() {
+		Set<BaseFilter> result = new HashSet<>();
+		result.addAll(sql_filters.getSet());
+		result.addAll(pure_accept_filters);
+		result.addAll(mixed_filters);
+		result.addAll(dual_filters);
+		return result;
 	}
 }

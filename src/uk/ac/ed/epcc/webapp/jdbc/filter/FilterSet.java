@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
+import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 
 /** Abstract class for a set of Filters 
@@ -106,4 +108,9 @@ public abstract class FilterSet<T> {
 	 */
 	public abstract boolean isEmpty();
 
+	/** get a {@link Set} of selection filters represented by this {@link FilterSet}
+	 * order only filters may not be represented
+	 * @return
+	 */
+	public abstract Set<BaseFilter> getSet();
 }

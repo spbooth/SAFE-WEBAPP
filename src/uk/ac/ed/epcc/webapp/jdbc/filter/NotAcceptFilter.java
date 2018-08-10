@@ -27,15 +27,16 @@ public class NotAcceptFilter<T extends DataObject> extends AbstractAcceptFilter<
 	 * @param fac
 	 * @param fil
 	 */
-	public NotAcceptFilter(DataObjectFactory<T> fac, BaseFilter<T> fil) {
+	public NotAcceptFilter(DataObjectFactory<T> fac, BaseFilter<? super T> fil) {
 		super(fac.getTarget());
 		this.fac = fac;
 		this.fil = fil;
 	}
 
 
+
 	private final DataObjectFactory<T> fac;
-	private final BaseFilter<T> fil;
+	private final BaseFilter<? super T> fil;
 	
 
 	/* (non-Javadoc)
