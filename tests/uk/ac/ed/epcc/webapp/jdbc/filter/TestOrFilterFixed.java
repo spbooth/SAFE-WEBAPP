@@ -13,48 +13,36 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.WebappTestBase;
+import uk.ac.ed.epcc.webapp.model.Dummy1;
+import uk.ac.ed.epcc.webapp.model.DummyReferenceFactory;
 
-/** A Negating filter that works with any base filter.
- * Should really use the {@link NegatingFilterVisitor} instead
+import static org.junit.Assert.*;
+
+import org.junit.Before;
+import org.junit.Test;
+/**
  * @author spb
- * @see NegatingFilterVisitor
+ *
  */
-public class NotAcceptFilter<T extends DataObject> extends AbstractAcceptFilter<T> implements NegatingFilter<BaseFilter<? super T>> {
-
-	/**
-	 * @param target
-	 * @param fac
-	 * @param fil
-	 */
-	public NotAcceptFilter(DataObjectFactory<T> fac, BaseFilter<? super T> fil) {
-		super(fac.getTarget());
-		this.fac = fac;
-		this.fil = fil;
-	}
-
-
-
-	private final DataObjectFactory<T> fac;
-	private final BaseFilter<? super T> fil;
+public class TestOrFilterFixed extends WebappTestBase {
 	
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
-	 */
-	@Override
-	public boolean accept(T o) {
-		return ! fac.matches(fil, o);
+	@Test
+	public void testAddFixed() throws NoSQLFilterException{
+		Dummy1.Factory fac = new Dummy1.Factory(getContext());
+		OrFilter<Dummy1> fil = new OrFilter<Dummy1>(Dummy1.class, fac);
+		
+		assertFalse(fil.getBooleanResult());
+		fil.addFilter(new FalseFilter<Dummy1>(Dummy1.class));
+		assertFalse(fil.getBooleanResult());
+		fil.addFilter(new GenericBinaryFilter<>(Dummy1.class, true));
+		assertTrue(fil.getBooleanResult());
+		assertFalse(fil.nonSQL());
+		assertEquals(fil.getSQLFilter(), new GenericBinaryFilter<>(Dummy1.class, true));
+		
 	}
-
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.NegatingFilter#getNested()
-	 */
-	@Override
-	public BaseFilter<? super T> getNested() {
-		return fil;
-	}
-
+	
+	
+	
 }

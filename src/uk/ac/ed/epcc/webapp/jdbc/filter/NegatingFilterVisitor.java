@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
@@ -38,6 +40,9 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 */
 	@Override
 	public BaseFilter<? super T> visitPatternFilter(PatternFilter<? super T> fil) throws Exception {
+		if( fil instanceof NegatingFilter) {
+			return ((NegatingFilter) fil).getNested();
+		}
 		return new SQLNotFilter(fil);
 	}
 
@@ -54,6 +59,13 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 */
 	@Override
 	public BaseFilter<? super T> visitAndFilter(AndFilter<? super T> fil) throws Exception {
+		if( ! fil.hasAcceptFilters()) {
+			try {
+				return FilterConverter.convert(fil).acceptVisitor(this);
+			}catch(Throwable t) {
+				getLogger().error("Unexpected error: SQL convert failed", t);
+			}
+		}
 		OrFilter<T> result = new OrFilter<>(fac.getTarget(), fac);
 		for(BaseFilter f : fil.getSet()) {
 			result.add((BaseFilter<? super T>) f.acceptVisitor(this), false);
@@ -86,7 +98,7 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 *
 	 * @param <X>
 	 */
-    private static final class PureNegatingAcceptFilter<X> implements AcceptFilter<X>{
+    private static final class PureNegatingAcceptFilter<X> implements AcceptFilter<X>,NegatingFilter<AcceptFilter<X>>{
     	/**
 		 * @param nested
 		 */
@@ -122,6 +134,44 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 		public <Y> Y acceptVisitor(FilterVisitor<Y, ? extends X> vis) throws Exception {
 			return vis.visitAcceptFilter(this);
 		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((nested == null) ? 0 : nested.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			PureNegatingAcceptFilter other = (PureNegatingAcceptFilter) obj;
+			if (nested == null) {
+				if (other.nested != null)
+					return false;
+			} else if (!nested.equals(other.nested))
+				return false;
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			return "PureNegatingAcceptFilter(" + nested + ")";
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.NegatingFilter#getNested()
+		 */
+		@Override
+		public AcceptFilter<X> getNested() {
+			return nested;
+		}
     	
     }
 	/* (non-Javadoc)
@@ -129,6 +179,9 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 */
 	@Override
 	public BaseFilter<? super T> visitAcceptFilter(AcceptFilter<? super T> fil) throws Exception {
+		if( fil instanceof NegatingFilter) {
+			return ((NegatingFilter) fil).getNested();
+		}
 		// Can be treated as a pure fulter due to visitor contract
 		return new PureNegatingAcceptFilter<>(fil);
 	}
@@ -138,6 +191,9 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 */
 	@Override
 	public BaseFilter<? super T> visitJoinFilter(JoinFilter<? super T> fil) throws Exception {
+		if( fil instanceof NegatingFilter) {
+			return ((NegatingFilter) fil).getNested();
+		}
 		return new NotJoinFilter(fil);
 	}
 
@@ -166,4 +222,11 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 		return new DualFilter((SQLFilter)fil.getSQLFilter().acceptVisitor(this), (AcceptFilter)fil.getAcceptFilter().acceptVisitor(this));
 	}
 
+	private Logger log;
+	public Logger getLogger() {
+		if( log == null) {
+			log=fac.getContext().getService(LoggerService.class).getLogger(getClass());
+		}
+		return log;
+	}
 }

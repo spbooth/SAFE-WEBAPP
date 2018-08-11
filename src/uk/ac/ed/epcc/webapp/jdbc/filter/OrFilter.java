@@ -79,15 +79,8 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		 */
 		@Override
 		public Boolean visitAndFilter(AndFilter<? super T> fil) throws Exception {
-			if( fil.isEmpty()){
-				// nothing to do here
-				return null;
-			}
-			if( fil.useBinary(true)){
-				// Trap this explicitly The Andfilter will only add as binary if there are no
-				// joins or order clauses. These are irrelevant in an OR combination
-				return visitBinaryFilter(fil);
-			}
+			// The AndFilter will invoke the visitBinaryFilter 
+			// if its forced
 			
 			// An ANDFilter could be in any of the 3 categories.
 			AcceptFilter<? super T> accept = fil.getAcceptFilter(null);
@@ -129,6 +122,8 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		 */
 		@Override
 		public Boolean visitJoinFilter(JoinFilter<? super T> fil) throws Exception {
+			sql_filters.addPatternFilter(fil);
+			sql_filters.addJoin(fil.getJoin());
 			return null;
 		}
 
@@ -279,12 +274,14 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((dual_filters == null) ? 0 : dual_filters.hashCode());
-		result = prime * result + (force_value ? 1231 : 1237);
-		result = prime * result + ((matcher == null) ? 0 : matcher.hashCode());
-		result = prime * result + ((mixed_filters == null) ? 0 : mixed_filters.hashCode());
-		result = prime * result + ((pure_accept_filters == null) ? 0 : pure_accept_filters.hashCode());
-		result = prime * result + ((sql_filters == null) ? 0 : sql_filters.hashCode());
+		if( ! force_value ) {
+			// all forced true or filters are equivalent
+			result = prime * result + ((dual_filters == null) ? 0 : dual_filters.hashCode());
+			result = prime * result + ((matcher == null) ? 0 : matcher.hashCode());
+			result = prime * result + ((mixed_filters == null) ? 0 : mixed_filters.hashCode());
+			result = prime * result + ((pure_accept_filters == null) ? 0 : pure_accept_filters.hashCode());
+			result = prime * result + ((sql_filters == null) ? 0 : sql_filters.hashCode());
+		}
 		return result;
 	}
 	@Override
@@ -296,13 +293,18 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		if (getClass() != obj.getClass())
 			return false;
 		OrFilter other = (OrFilter) obj;
+		if( force_value && other.force_value) {
+			// both forced to true can ignore filters
+			return true;
+		}
+		if (force_value != other.force_value)
+			return false;
 		if (dual_filters == null) {
 			if (other.dual_filters != null)
 				return false;
 		} else if (!dual_filters.equals(other.dual_filters))
 			return false;
-		if (force_value != other.force_value)
-			return false;
+		
 		if (matcher == null) {
 			if (other.matcher != null)
 				return false;
@@ -369,5 +371,9 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		result.addAll(mixed_filters);
 		result.addAll(dual_filters);
 		return result;
+	}
+	
+	public FilterMatcher<T> getMatcher(){
+		return matcher;
 	}
 }

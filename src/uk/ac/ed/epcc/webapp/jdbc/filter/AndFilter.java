@@ -121,7 +121,7 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 	 * possible.
 	 * 
 	 * Passing a valid {@link FilterMatcher} will always return a valid filter 
-	 * Passing null will return null if the
+	 * Passing null will return null if SQL queries are needed for the conversion
 	 * 
 	 * @param matcher An optional {@link FilterMatcher}
 	 * 
@@ -158,7 +158,9 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((accepts == null) ? 0 : accepts.hashCode());
+		if( ! isForced()) {
+			result = prime * result + ((accepts == null) ? 0 : accepts.hashCode());
+		}
 		return result;
 	}
 	@Override
@@ -170,11 +172,13 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 		if (getClass() != obj.getClass())
 			return false;
 		AndFilter other = (AndFilter) obj;
-		if (accepts == null) {
-			if (other.accepts != null)
+		if( ! isForced()) {
+			if (accepts == null) {
+				if (other.accepts != null)
+					return false;
+			} else if (!accepts.equals(other.accepts))
 				return false;
-		} else if (!accepts.equals(other.accepts))
-			return false;
+		}
 		return true;
 	}
 	/* (non-Javadoc)

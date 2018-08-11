@@ -136,6 +136,39 @@ public class Dummy1 extends DataObject implements Removable {
 			public boolean accept(Dummy1 d) {
 				return n.intValue() == d.getNumber();
 			}
+			@Override
+			public int hashCode() {
+				final int prime = 31;
+				int result = 1;
+				result = prime * result + getOuterType().hashCode();
+				result = prime * result + ((n == null) ? 0 : n.hashCode());
+				return result;
+			}
+			@Override
+			public boolean equals(Object obj) {
+				if (this == obj)
+					return true;
+				if (obj == null)
+					return false;
+				if (getClass() != obj.getClass())
+					return false;
+				NumberAcceptFilter other = (NumberAcceptFilter) obj;
+				if (!getOuterType().equals(other.getOuterType()))
+					return false;
+				if (n == null) {
+					if (other.n != null)
+						return false;
+				} else if (!n.equals(other.n))
+					return false;
+				return true;
+			}
+			private Factory getOuterType() {
+				return Factory.this;
+			}
+			@Override
+			public String toString() {
+				return "NumberAcceptFilter(" + n + ")";
+			}
           }
          public class StringFilter extends SQLValueFilter<Dummy1>{
          	public StringFilter(String s){
