@@ -234,7 +234,8 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 					String submitted_crsf = (String) params.get(TRANSITION_CSRF_ATTR);
 					if( submitted_crsf == null || ! crsf.equals(submitted_crsf)) {
 						//Failed
-						log.warn("CRSF token mis-match "+submitted_crsf+"!="+crsf);
+						// TODO reduce to warn once debugged.
+						log.error("CRSF token mis-match "+submitted_crsf+"!="+crsf);
 						sess.logOut();
 						message(conn, req, res, "crsf_check_failed");
 						return;
@@ -572,6 +573,9 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		return addButton(c, hb, tp, operation, target, text,null);
 	}
 	public static <A,B, X extends ExtendedXMLBuilder> X addButton(AppContext c,X hb, TransitionFactory<A,B> tp, A operation, B target,String text,String title ){
+		return addButton(c, hb, tp, operation, target, text, title,false);
+	}
+	public static <A,B, X extends ExtendedXMLBuilder> X addButton(AppContext c,X hb, TransitionFactory<A,B> tp, A operation, B target,String text,String title, boolean new_tab ){
 		String url = getURL(c, tp, target, null);
 		hb.open("form");
         hb.attr("method", "post");
@@ -581,6 +585,9 @@ public  class TransitionServlet<K,T> extends WebappServlet {
          } else {
         	hb.attr("action",url); 
          }
+         if( new_tab) {
+				hb.attr("formtarget","_blank");
+		 }
          // Only really need this for direct transitions
          CrsfTokenService crsf_serv = c.getService(CrsfTokenService.class);
  		 if( crsf_serv != null ) {

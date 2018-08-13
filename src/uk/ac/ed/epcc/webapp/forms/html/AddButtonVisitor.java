@@ -61,32 +61,8 @@ public class AddButtonVisitor implements WebFormResultVisitor {
   
 	public <T, K> void visitChainedTransitionResult(
 			ChainedTransitionResult<T, K> res) throws Exception {
-			K operation = res.getTransition();
-				String url = TransitionServlet.getURL(conn, res.getProvider(), res.getTarget(), null);
-				hb.open("form");
-				hb.attr("method", "post");
-			    hb.attr("action",encodeURL(url));
-			    if( new_tab) {
-					hb.attr("formtarget","_blank");
-				}
-				 // pass operation as param by preference
-				 if(operation != null){
-				 hb.open("input"); 
-				    hb.attr("type","hidden"); 
-				    hb.attr("name", TransitionServlet.TRANSITION_KEY_ATTR); 
-				    hb.attr("value", operation.toString()); 
-				
-				 hb.close();
-				 }
-				 hb.open("input");
-				  hb.addClass("input_button");
-				  hb.attr("type","submit");
-				  hb.attr("value", text);
-				  if( title != null && title.trim().length() > 0){
-				  	hb.attr("title", title);
-				  }
-				 hb.close();
-				hb.close();
+		//Defer to TransitionServlet method
+		TransitionServlet.addButton(conn, hb, res.getProvider(),res.getTransition(),res.getTarget(), text,title,new_tab);
 	}
 
 	public <T, K> void visitConfirmTransitionResult(
@@ -97,7 +73,7 @@ public class AddButtonVisitor implements WebFormResultVisitor {
 
 	public void visitForwardResult(ForwardResult res) throws Exception {
 		if( res.getAttr() != null ){
-			throw new UnsupportedResultException("Cannot  with forward attributes");
+			throw new UnsupportedResultException("Cannot  create button with forward attributes");
 		}
 		hb.open("form");
 		hb.attr("action", encodeURL(res.getURL()));
