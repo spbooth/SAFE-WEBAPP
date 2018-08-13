@@ -588,27 +588,33 @@ public  class TransitionServlet<K,T> extends WebappServlet {
          if( new_tab) {
 				hb.attr("formtarget","_blank");
 		 }
-         // Only really need this for direct transitions
-         CrsfTokenService crsf_serv = c.getService(CrsfTokenService.class);
- 		 if( crsf_serv != null ) {
- 			 String crsf = crsf_serv.getCrsfToken(tp, target);
- 			 if( crsf != null ) {
- 				hb.open("input"); 
- 	            hb.attr("type","hidden"); 
- 	            hb.attr("name", TRANSITION_CSRF_ATTR); 
- 	            hb.attr("value", crsf); 
- 	 
- 	         hb.close();
- 			 }
- 		 }
          // pass operation as param by preference
          if(operation != null){
-         hb.open("input"); 
-            hb.attr("type","hidden"); 
-            hb.attr("name", TRANSITION_KEY_ATTR); 
-            hb.attr("value", operation.toString()); 
- 
-         hb.close();
+
+        	 // Only really need this for direct transitions
+        	 CrsfTokenService crsf_serv = c.getService(CrsfTokenService.class);
+        	 if( crsf_serv != null ) {
+        		 boolean add_token=true;
+        		 if( operation instanceof ViewTransitionKey && ((ViewTransitionKey<B>)operation).isNonModifying(target)) {
+        			 add_token=false;
+        		 }
+        		 if( add_token) {
+        			 String crsf = crsf_serv.getCrsfToken(tp, target);
+        			 if( crsf != null ) {
+        				 hb.open("input"); 
+        				 hb.attr("type","hidden"); 
+        				 hb.attr("name", TRANSITION_CSRF_ATTR); 
+        				 hb.attr("value", crsf); 
+
+        				 hb.close();
+        			 }
+        		 }
+        	 }
+        	 hb.open("input"); 
+        	   hb.attr("type","hidden"); 
+        	   hb.attr("name", TRANSITION_KEY_ATTR); 
+        	   hb.attr("value", operation.toString()); 
+        	 hb.close();
          }
          hb.open("input");
           hb.addClass("input_button");
