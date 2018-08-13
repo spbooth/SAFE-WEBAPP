@@ -84,8 +84,11 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 			
 			// An ANDFilter could be in any of the 3 categories.
 			AcceptFilter<? super T> accept = fil.getAcceptFilter(null);
-			if( accept != null ){  // This is a pure accept filter as matcher was null
-				pure_accept_filters.add(accept);
+			if( accept != null ){  
+				// This is a pure accept filter as matcher was null
+				// this will usually add to the pure_accept_filters but use the visitor
+				// as it might also be  BinaryAcceptFilter
+				addFilter(accept);
 				return null;
 			}
 			if( ! fil.hasAcceptFilters()){
