@@ -20,33 +20,39 @@
 <h4>To: fred@example.com</h4>
 <h3>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
+<input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0"/>
 <input type="hidden" name="Transition" value="AddRecipient"/>
 <input class="input_button" type="submit" value="Add"/>
 </form> New Recipient</h3>
 <h4>From: dummy@example.com</h4>
 <h4>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/Subject">
+<input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0/Subject"/>
 <input type="hidden" name="Transition" value="EditSubject"/>
 <input class="input_button" type="submit" value="Edit Subject"/>
 </form> Subject: </h4>
 <div class="multipart">
 <div class="part">
-<pre class='loose'/>
+<pre class="loose"/>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/0/T">
+<input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0/0/T"/>
 <input type="hidden" name="Transition" value="Edit"/>
 <input class="input_button" type="submit" value="Edit"/>
 </form>
 </div>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
+<input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0"/>
 <input type="hidden" name="Transition" value="Merge"/>
 <input class="input_button" type="submit" value="Merge Text"/>
 </form>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
+<input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0"/>
 <input type="hidden" name="Transition" value="Flatten"/>
 <input class="input_button" type="submit" value="Flatten Tree"/>
 </form>
 </div>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
+<input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0"/>
 <input type="hidden" name="Transition" value="AddAttachment"/>
 <input class="input_button" type="submit" value="Add Attachment"/>
 </form>

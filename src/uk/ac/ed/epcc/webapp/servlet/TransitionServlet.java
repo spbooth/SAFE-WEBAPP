@@ -234,8 +234,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 					String submitted_crsf = (String) params.get(TRANSITION_CSRF_ATTR);
 					if( submitted_crsf == null || ! crsf.equals(submitted_crsf)) {
 						//Failed
-						// TODO reduce to warn once debugged.
-						log.error("CRSF token mis-match "+submitted_crsf+"!="+crsf);
+						log.warn("CRSF token mis-match "+submitted_crsf+"!="+crsf);
 						sess.logOut();
 						message(conn, req, res, "crsf_check_failed");
 						return;
