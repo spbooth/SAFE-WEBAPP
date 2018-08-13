@@ -323,7 +323,7 @@ public class MessageWalker {
 	}
 @SuppressWarnings("unchecked")
 private final void visitMessageHeaders(MimeMessage m,Visitor v) throws WalkerException {
-		
+		if( v.visitHeaders()) {
 		try{
 			Address to[] = m.getRecipients(RecipientType.TO);
 			if( to != null ){
@@ -400,7 +400,7 @@ private final void visitMessageHeaders(MimeMessage m,Visitor v) throws WalkerExc
 		}catch( MessagingException e ){
 			v.doMessageError(this,e);
 		}
-		
+		}
 	}
 /** Exception thrown to abort processing in the MessageWalker
  * 

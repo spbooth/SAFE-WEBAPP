@@ -201,4 +201,9 @@ public	void endMessage(MimePart parent, MimeMessage m, MessageWalker messageWalk
      */
 	public void doRecipients(MessageWalker walker)throws MessageWalker.WalkerException;
 
+	/** Does the visitor want to walker to vidist the message headers
+	 * 
+	 * @return boolean
+	 */
+	public boolean visitHeaders();
 }

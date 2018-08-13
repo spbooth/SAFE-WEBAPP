@@ -130,6 +130,11 @@ public class MimeStreamDataVisitor extends AbstractVisitor{
 		return false;
 
 	}
+	@Override
+	public boolean visitHeaders() {
+		// Don't look at any of these
+		return false;
+	}
 
 
 }

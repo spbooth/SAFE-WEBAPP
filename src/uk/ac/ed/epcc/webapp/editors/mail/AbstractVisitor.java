@@ -211,4 +211,12 @@ public void doBCC(Address address, int i, int length,
 	protected final Logger getLogger(){
 		return conn.getService(LoggerService.class).getLogger(getClass());
 	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.editors.mail.Visitor#visitHeaders()
+	 */
+	@Override
+	public boolean visitHeaders() {
+		return true;
+	}
 }
