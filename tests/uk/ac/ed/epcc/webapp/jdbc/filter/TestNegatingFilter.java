@@ -34,13 +34,14 @@ import org.junit.Before;
 public class TestNegatingFilter extends WebappTestBase {
 	Dummy1.Factory fac;
 	DummyReferenceFactory ref;
-	NegatingFilterVisitor vis;
-	
+	NegatingFilterVisitor<Dummy1> vis;
+	NegatingFilterVisitor<DummyReference> ref_vis;
 	@Before
 	public void setup() {
 		fac = new Dummy1.Factory(getContext());
 		vis = new NegatingFilterVisitor<>(fac);
 		ref=new DummyReferenceFactory(ctx);
+		ref_vis = new NegatingFilterVisitor<>(ref);
 	}
 	
 	@Test
@@ -173,7 +174,7 @@ public class TestNegatingFilter extends WebappTestBase {
 		
 		assertEquals(0,fac.getCount(no_filter));
 		
-		BaseFilter<Dummy1> not_no = no_filter.acceptVisitor(vis);
+		BaseFilter<Dummy1> not_no = (BaseFilter<Dummy1>) no_filter.acceptVisitor(vis);
 		assertEquals(2,fac.getCount(not_no));
 	}
 	
@@ -200,7 +201,7 @@ public class TestNegatingFilter extends WebappTestBase {
 		
 		assertEquals(0,fac.getCount(no_filter));
 		
-		BaseFilter<Dummy1> not_no = no_filter.acceptVisitor(vis);
+		BaseFilter<Dummy1> not_no = (BaseFilter<Dummy1>) no_filter.acceptVisitor(vis);
 		assertEquals(2,fac.getCount(not_no));
 	}
 	
@@ -227,7 +228,7 @@ public class TestNegatingFilter extends WebappTestBase {
 		
 		assertEquals(0,fac.getCount(no_filter));
 		
-		BaseFilter<Dummy1> not_no = no_filter.acceptVisitor(vis);
+		BaseFilter<Dummy1> not_no = (BaseFilter<Dummy1>) no_filter.acceptVisitor(vis);
 		assertEquals(2,fac.getCount(not_no));
 	}
 	
@@ -310,7 +311,7 @@ public class TestNegatingFilter extends WebappTestBase {
 		DummyReference fred2 = ref.find(fred_filter);
 		assertEquals("RefFred", fred2.getName());
 		
-		DummyReference bill2 = ref.find((BaseFilter<DummyReference>)fred_filter.acceptVisitor(vis));
+		DummyReference bill2 = ref.find((BaseFilter<DummyReference>)fred_filter.acceptVisitor(ref_vis));
 		assertEquals("RefBill",bill2.getName());
 		
 	}

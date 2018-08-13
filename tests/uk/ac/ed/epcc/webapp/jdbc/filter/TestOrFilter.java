@@ -253,6 +253,7 @@ public class TestOrFilter extends WebappTestBase {
 		assertTrue(fac.matches(fil, fred));
 		assertFalse(fac.matches(fil, bill));
 		assertFalse(fac.matches(fil, simon));
+		checkStd(fil, "OrFilter(SQLOrFilter( filters=[SQLValueFilter(Name= fred)] force=false),AndFilter( accepts=[NumberAcceptFilter(20)] filters=[SQLValueFilter(Name= bill)] force=true) force=false)");
 	}
 	
 	@Test
@@ -269,6 +270,7 @@ public class TestOrFilter extends WebappTestBase {
 		assertTrue(fac.matches(fil, fred));
 		assertFalse(fac.matches(fil, bill));
 		assertFalse(fac.matches(fil, simon));
+		checkStd(fil, "OrFilter(SQLOrFilter( filters=[SQLValueFilter(Name= fred)] force=false) force=false)");
 	}
 	
 	@Test
@@ -285,5 +287,6 @@ public class TestOrFilter extends WebappTestBase {
 		assertTrue(fac.matches(fil, fred));
 		assertTrue(fac.matches(fil, bill));
 		assertFalse(fac.matches(fil, simon));
+		checkStd(fil, "OrFilter(SQLOrFilter( filters=[SQLValueFilter(Name= fred), SQLValueFilter(Name= bill)] force=false),NumberAcceptFilter(2) force=false)");
 	}
 }
