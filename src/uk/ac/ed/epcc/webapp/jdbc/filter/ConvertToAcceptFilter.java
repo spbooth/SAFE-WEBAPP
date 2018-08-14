@@ -17,6 +17,7 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
  * using a {@link FilterMatcher}. 
  * 
  * Use with caution as this might not be the best implementation of a composite filter
+ * @see ConvertPureAcceptFilterVisitor
  * @author spb
  *
  */

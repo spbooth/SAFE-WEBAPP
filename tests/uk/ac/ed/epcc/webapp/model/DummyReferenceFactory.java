@@ -19,6 +19,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
@@ -63,7 +64,10 @@ public class DummyReferenceFactory extends DataObjectFactory<DummyReference> {
 	public SQLFilter<Dummy1> getReferencedFilter(String name){
 		return new DestFilter<Dummy1>(new SQLValueFilter<DummyReference>(getTarget(),res,DummyReference.STRING_FIELD,name), DummyReference.REF_FIELD, new Dummy1.Factory(getContext()));
 	}
-
+	public BaseFilter<DummyReference> getRemoteFilter(BaseFilter<Dummy1> fil){
+		Dummy1.Factory fac = new Dummy1.Factory(getContext());
+		return getRemoteFilter(fac, DummyReference.REF_FIELD, fil);
+	}
 	public BaseFilter<DummyReference> getRemoteNameFilter(String name){
 		Dummy1.Factory fac = new Dummy1.Factory(getContext());
 		return getRemoteFilter(fac, DummyReference.REF_FIELD, fac.getStringFilter(name));
@@ -79,6 +83,10 @@ public class DummyReferenceFactory extends DataObjectFactory<DummyReference> {
 	public BaseFilter<DummyReference> getRemoteNumberAndFilter(Number n){
 		Dummy1.Factory fac = new Dummy1.Factory(getContext());
 		return getRemoteFilter(fac, DummyReference.REF_FIELD,new AndFilter(fac.getTarget(), fac.getNumberAcceptFilter(n), fac.getNumberFilter(n)));
+	}
+	public BaseFilter<DummyReference> getRemoteNumberSQLAndFilter(Number n){
+		Dummy1.Factory fac = new Dummy1.Factory(getContext());
+		return getRemoteFilter(fac, DummyReference.REF_FIELD,new SQLAndFilter(fac.getTarget(), fac.getNumberFilter(n), fac.getNumberFilter(n)));
 	}
 	public BaseFilter<DummyReference> getRemoteNumberDualFilter(Number n){
 		Dummy1.Factory fac = new Dummy1.Factory(getContext());

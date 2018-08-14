@@ -124,7 +124,7 @@ public class NamedFilterWrapper<T extends DataObject> implements NamedFilterProv
 		}finally {
 			missing.remove(name);
 		}
-		getLogger().warn("Bad named filter for "+fac.getTag()+" "+name);
+		//getLogger().warn("Bad named filter for "+fac.getTag()+" "+name);
 		return null;
 	};
 

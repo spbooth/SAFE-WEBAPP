@@ -65,7 +65,13 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 	}
 	@Override
 	protected final void addAccept(AcceptFilter<? super T> filter) throws ConsistencyError {
-		accepts.add(filter);
+		if( filter instanceof AndFilter) {
+			// add component parts to reduce nesting
+			AndFilter<? super T> and = (AndFilter<? super T>) filter;
+			accepts.addAll(and.accepts);
+		}else {
+			accepts.add(filter);
+		}
 	}
 
 	

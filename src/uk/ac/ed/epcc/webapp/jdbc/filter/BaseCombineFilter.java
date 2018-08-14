@@ -100,8 +100,21 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 					fil.getSQLFilter().acceptVisitor(this);
 					return null;
 				}
-				visitAcceptFilter(fil);
-				visitPatternFilter(fil);
+				if(getFilterCombiner() == FilterCombination.AND) {
+					// These methods will loop over the inner filters to remove
+					// nesting if appropriate (ie combine mechanism is right).
+					visitAcceptFilter(fil);
+					visitPatternFilter(fil);
+				}else {
+					if( fil.hasAcceptFilters() && 
+							fil.hasPatternFilters()) {
+						throw new ConsistencyError("Cannot combine accept/pattern in OR combination");
+					}
+					// Either one or both of these is empty 
+					// so we can add separately
+					visitAcceptFilter(fil);
+					visitPatternFilter(fil);
+				}
 				handleOrderClause(fil);
 				Set<String> joins = fil.getJoins();
 				if( joins != null ){
@@ -293,7 +306,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 		/** get the boolean value of the filter if defined.
 		 * If the filter itself does not accept the {@link BinaryFilter} visitor method then
 		 * the returned value does not represent the full filter condition.
-		 * 
+		 * it is valid when the filter is empty or when forced.
 		 */
 		@Override
 		public boolean getBooleanResult() {
