@@ -45,7 +45,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
  * @param <X>
  */
 
-public class ListInputInterfaceTestImpl<T,D,I extends Input<T> , X extends TestDataProvider<T,I> >  implements ListInputInterfaceTest<T,D,I,X>{
+public class ListInputInterfaceTestImpl<T,D,I extends Input<T>&ListInput<T,D> , X extends TestDataProvider<T,I> >  implements ListInputInterfaceTest<T,D,I,X>{
 
 	private X target;
 	public ListInputInterfaceTestImpl(X target) {

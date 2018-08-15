@@ -34,7 +34,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
  * @param <X>
  */
 
-public interface ListInputInterfaceTest<T,D,I extends Input<T> , X extends TestDataProvider<T,I> >  {
+public interface ListInputInterfaceTest<T,D,I extends Input<T>&ListInput<T,D> , X extends TestDataProvider<T,I> >  {
 
 	@Test
 	public void testGetItembyValue() throws Exception ;

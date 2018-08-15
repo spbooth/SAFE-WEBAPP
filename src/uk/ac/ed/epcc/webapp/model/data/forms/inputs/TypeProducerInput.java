@@ -83,6 +83,9 @@ public class TypeProducerInput<T> extends TextInput implements PreSelectInput<St
 	}
 
 	public String getText(T item) {
+		if( item == null) {
+			return null;
+		}
 		return item.toString();
 	}
 
