@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.forms;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -34,9 +35,19 @@ public class BinaryInputInterfaceTestImpl<T,I extends BinaryInput<T>,X extends T
 		assertNotNull(i.getChecked());
 		
 		i.setChecked(true);
+		T checked_value = i.getValue();
 		assertTrue(i.isChecked());
 		i.setChecked(false);
+		T unchecked_value = i.getValue();
 		assertFalse(i.isChecked());
+		
+		assertNotEquals(checked_value, unchecked_value);
+		i.setValue(checked_value);
+		assertTrue(i.isChecked());
+		
+		i.setValue(unchecked_value);
+		assertFalse(i.isChecked());
+		
 	}
 
 }

@@ -64,6 +64,39 @@ public class IntegerInputTest extends NumberInputTestCase<Integer,IntegerInput> 
 		return res;
 	}
 	
-	
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getLowBound()
+	 */
+	@Override
+	public Integer getLowBound() {
+		return 10;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getHighBound()
+	 */
+	@Override
+	public Integer getHighBound() {
+		return 20;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getHighData()
+	 */
+	@Override
+	public Set<Integer> getHighData() {
+		Set<Integer> high = new HashSet<>();
+		high.add(25);
+		high.add(30);
+		return high;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getLowData()
+	 */
+	@Override
+	public Set<Integer> getLowData() {
+		Set<Integer> high = new HashSet<>();
+		high.add(1);
+		high.add(4);
+		return high;
+	}
 
 }

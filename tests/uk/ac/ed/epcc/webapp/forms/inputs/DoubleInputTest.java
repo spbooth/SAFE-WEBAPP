@@ -65,4 +65,38 @@ public class DoubleInputTest extends NumberInputTestCase<Double,DoubleInput> {
 		res.add("0");
 		return res;
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getLowBound()
+	 */
+	@Override
+	public Double getLowBound() {
+		return 10.0;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getHighBound()
+	 */
+	@Override
+	public Double getHighBound() {
+		return 20.0;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getHighData()
+	 */
+	@Override
+	public Set<Double> getHighData() {
+		Set<Double> high = new HashSet<>();
+		high.add(25.0);
+		high.add(30.0);
+		return high;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getLowData()
+	 */
+	@Override
+	public Set<Double> getLowData() {
+		Set<Double> high = new HashSet<>();
+		high.add(-6.0);
+		high.add(4.0);
+		return high;
+	}
 }

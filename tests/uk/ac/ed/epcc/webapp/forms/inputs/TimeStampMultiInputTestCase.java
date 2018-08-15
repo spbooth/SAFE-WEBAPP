@@ -37,10 +37,15 @@ import uk.ac.ed.epcc.webapp.forms.TestParseDataProvider;
  */
 
 public class TimeStampMultiInputTestCase extends MultiInputTestBase<Date, Input<Integer>, TimeStampMultiInput> implements TestParseDataProvider<Date, TimeStampMultiInput>,
-ParseInputInterfaceTest<Date, TimeStampMultiInput, TimeStampMultiInputTestCase>{
+ParseInputInterfaceTest<Date, TimeStampMultiInput, TimeStampMultiInputTestCase>,
+BoundedInputDataProvider<Date, TimeStampMultiInput>,
+BoundedInputInterfaceTest<Date, TimeStampMultiInput, TimeStampMultiInputTestCase>{
 
 	
 	public ParseInputInterfaceTest<Date, TimeStampMultiInput, TimeStampMultiInputTestCase> parse_input_test = new ParseInputInterfaceTestImpl<Date, TimeStampMultiInput, TimeStampMultiInputTestCase>(this);
+	
+	public BoundedInputInterfaceTestImpl<Date, TimeStampMultiInput, TimeStampMultiInputTestCase> bounded_tests = new BoundedInputInterfaceTestImpl<Date, TimeStampMultiInput, TimeStampMultiInputTestCase>(this);
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getGoodData()
 	 */
@@ -187,5 +192,87 @@ ParseInputInterfaceTest<Date, TimeStampMultiInput, TimeStampMultiInputTestCase>{
 		parse_input_test.testBadParse();
 		
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputInterfaceTest#testMin()
+	 */
+	@Override
+	@Test
+	public void testMin() throws Exception {
+		bounded_tests.testMin();
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputInterfaceTest#testMax()
+	 */
+	@Override
+	@Test
+	public void testMax() throws Exception {
+		bounded_tests.testMax();
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputInterfaceTest#testBoth()
+	 */
+	@Override
+	@Test
+	public void testBoth() throws Exception {
+		bounded_tests.testBoth();
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputInterfaceTest#testAll()
+	 */
+	@Override
+	@Test
+	public void testAll() throws Exception {
+		bounded_tests.testAll();
+		
+	}
+
+	@Override
+	public Date getLowBound() {
+		
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.MILLISECOND, 0);
+		c.add(Calendar.HOUR_OF_DAY, -1);
+		return c.getTime();
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getHighBound()
+	 */
+	@Override
+	public Date getHighBound() {
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.MILLISECOND, 0);
+		c.add(Calendar.HOUR_OF_DAY, 1);
+		return c.getTime();
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getHighData()
+	 */
+	@Override
+	public Set<Date> getHighData() {
+		Set<Date> set = new HashSet<>();
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.MILLISECOND, 0);
+		c.add(Calendar.HOUR_OF_DAY, 8);
+		set.add(c.getTime());
+		return set;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getLowData()
+	 */
+	@Override
+	public Set<Date> getLowData() {
+		Set<Date> set = new HashSet<>();
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.MILLISECOND, 0);
+		c.add(Calendar.HOUR_OF_DAY, -8);
+		set.add(c.getTime());
+		return set;
+	}
 }

@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,8 +26,9 @@ import org.junit.Test;
 import uk.ac.ed.epcc.webapp.forms.ParseAbstractInputTestCase;
 import uk.ac.ed.epcc.webapp.forms.TestParseDataProvider;
 import uk.ac.ed.epcc.webapp.forms.inputs.TimeStampInput;
-public class TimeStampInputTest extends ParseAbstractInputTestCase<Date,TimeStampInput>  implements TestParseDataProvider<Date,TimeStampInput>{
+public class TimeStampInputTest extends ParseAbstractInputTestCase<Date,TimeStampInput>  implements TestParseDataProvider<Date,TimeStampInput>,BoundedInputDataProvider<Date, TimeStampInput>,BoundedInputInterfaceTest<Date, TimeStampInput, TimeStampInputTest>{
 
+	public final BoundedInputInterfaceTest<Date, TimeStampInput, TimeStampInputTest> bounded_tests = new BoundedInputInterfaceTestImpl<Date, TimeStampInput, TimeStampInputTest>(this);
 	@Test
 	public void dummy(){
 		
@@ -67,5 +69,83 @@ public class TimeStampInputTest extends ParseAbstractInputTestCase<Date,TimeStam
 		res.add("2006-12-12 08");
 		res.add("2006-12-12");
 		return res;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputInterfaceTest#testMin()
+	 */
+	@Override
+	@Test
+	public void testMin() throws Exception {
+		bounded_tests.testMin();
+		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputInterfaceTest#testMax()
+	 */
+	@Override
+	@Test
+	public void testMax() throws Exception {
+		bounded_tests.testMax();
+		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputInterfaceTest#testBoth()
+	 */
+	@Override
+	@Test
+	public void testBoth() throws Exception {
+		bounded_tests.testBoth();
+		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputInterfaceTest#testAll()
+	 */
+	@Override
+	@Test
+	public void testAll() throws Exception {
+		bounded_tests.testAll();
+		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getLowBound()
+	 */
+	@Override
+	public Date getLowBound() {
+		
+		Calendar c = Calendar.getInstance();
+		c.clear();
+		c.set(2000, Calendar.FEBRUARY, 14);
+		return c.getTime();
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getHighBound()
+	 */
+	@Override
+	public Date getHighBound() {
+		Calendar c = Calendar.getInstance();
+		c.clear();
+		c.set(2500, Calendar.FEBRUARY, 14);
+		return c.getTime();
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getHighData()
+	 */
+	@Override
+	public Set<Date> getHighData() {
+		Set<Date> set = new HashSet<>();
+		Calendar c = Calendar.getInstance();
+		c.clear();
+		c.set(2500, Calendar.OCTOBER, 10);
+		set.add(c.getTime());
+		return set;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getLowData()
+	 */
+	@Override
+	public Set<Date> getLowData() {
+		Set<Date> set = new HashSet<>();
+		set.add(new Date(9000L));
+		return set;
 	}
 }

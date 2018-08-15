@@ -16,16 +16,16 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.forms.ParseAbstractInputTestCase;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.forms.inputs.NumberInput;
-import static org.junit.Assert.*;
 
-public abstract class NumberInputTestCase<N extends Number,I extends NumberInput<N>> extends ParseAbstractInputTestCase<N,I> {
+public abstract class NumberInputTestCase<N extends Number,I extends NumberInput<N>> extends ParseAbstractInputTestCase<N,I> implements BoundedInputInterfaceTest<N, I, NumberInputTestCase<N,I>>,BoundedInputDataProvider<N, I> {
 
-	
+	BoundedInputInterfaceTestImpl<N,I, NumberInputTestCase<N,I>> bounded_tests = new BoundedInputInterfaceTestImpl<N,I, NumberInputTestCase<N,I>>(this);
 	@Test
 	public void testUnit() throws Exception{
 		NumberInput ni = getInput();
@@ -63,5 +63,37 @@ public abstract class NumberInputTestCase<N extends Number,I extends NumberInput
 			assertEquals(num, ni.convert(num.toString()));
 			assertEquals(num, ni.convert(Double.parseDouble(num.toString())));
 		}
+	}
+
+
+	@Override
+	@Test
+	public void testMin() throws Exception {
+		bounded_tests.testMin();
+		
+	}
+
+
+	@Override
+	@Test
+	public void testMax() throws Exception {
+		bounded_tests.testMax();
+		
+	}
+
+
+	@Override
+	@Test
+	public void testBoth() throws Exception {
+		bounded_tests.testBoth();
+		
+	}
+
+
+	@Override
+	@Test
+	public void testAll() throws Exception {
+		bounded_tests.testAll();
+		
 	}
 }

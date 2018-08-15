@@ -51,8 +51,7 @@ public class PercentInputTestCase extends NumberInputTestCase<Double, PercentInp
 
 	public Set<Double> getGoodData() throws Exception {
 		Set<Double> good = new HashSet<Double>();
-		good.add(0.0);
-		good.add(1.0);
+		good.add(0.5);
 		good.add(0.75);
 		return good;
 	}
@@ -77,4 +76,38 @@ public class PercentInputTestCase extends NumberInputTestCase<Double, PercentInp
 		assertEquals("1",input.formatRange(input.getStep()));
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getLowBound()
+	 */
+	@Override
+	public Double getLowBound() {
+		return 0.25;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getHighBound()
+	 */
+	@Override
+	public Double getHighBound() {
+		return 0.8;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getHighData()
+	 */
+	@Override
+	public Set<Double> getHighData() {
+		Set<Double> high = new HashSet<>();
+		high.add(0.85);
+		high.add(1.0);
+		return high;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getLowData()
+	 */
+	@Override
+	public Set<Double> getLowData() {
+		Set<Double> high = new HashSet<>();
+		high.add(0.0);
+		high.add(0.1);
+		return high;
+	}
 }

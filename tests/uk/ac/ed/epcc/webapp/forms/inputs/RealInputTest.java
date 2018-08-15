@@ -67,4 +67,39 @@ public class RealInputTest extends NumberInputTestCase<Float,RealInput> {
 		res.add("0");
 		return res;
 	}
+	
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getLowBound()
+	 */
+	@Override
+	public Float getLowBound() {
+		return 10.0F;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getHighBound()
+	 */
+	@Override
+	public Float getHighBound() {
+		return 20.0F;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getHighData()
+	 */
+	@Override
+	public Set<Float> getHighData() {
+		Set<Float> high = new HashSet<>();
+		high.add(25.0F);
+		high.add(30.0F);
+		return high;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getLowData()
+	 */
+	@Override
+	public Set<Float> getLowData() {
+		Set<Float> high = new HashSet<>();
+		high.add(0.0F);
+		high.add(4.0F);
+		return high;
+	}
 }

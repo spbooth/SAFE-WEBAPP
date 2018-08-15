@@ -29,9 +29,6 @@ public class LongInputTest extends NumberInputTestCase<Long,LongInput> {
 	}
 	public Set<Long> getBadData() {
 		Set<Long> bad = new HashSet<Long>();
-		bad.add(-1L);
-		bad.add(2L);
-		bad.add(500L);
 		return bad;
 	}
 
@@ -44,8 +41,6 @@ public class LongInputTest extends NumberInputTestCase<Long,LongInput> {
 
 	public LongInput getInput() {
 		LongInput i = new LongInput();
-		i.setMin(10L);
-		i.setMax(100L);
 		return i;
 	}
 	
@@ -54,7 +49,6 @@ public class LongInputTest extends NumberInputTestCase<Long,LongInput> {
 		res.add("fred");
 		res.add("14.5.6");
 		res.add("82wombat");
-		res.add("2");
 		return res;
 
 	}
@@ -68,6 +62,39 @@ public class LongInputTest extends NumberInputTestCase<Long,LongInput> {
 		return res;
 	}
 	
-	
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getLowBound()
+	 */
+	@Override
+	public Long getLowBound() {
+		return 10L;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getHighBound()
+	 */
+	@Override
+	public Long getHighBound() {
+		return 20L;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getHighData()
+	 */
+	@Override
+	public Set<Long> getHighData() {
+		Set<Long> high = new HashSet<>();
+		high.add(25L);
+		high.add(30L);
+		return high;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getLowData()
+	 */
+	@Override
+	public Set<Long> getLowData() {
+		Set<Long> high = new HashSet<>();
+		high.add(-6L);
+		high.add(4L);
+		return high;
+	}
 
 }

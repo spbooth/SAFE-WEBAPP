@@ -48,31 +48,37 @@ public class TypeConverterSQLValue<H,T,D> implements  SQLValue<T>, FilterProvide
 	private final TypeConverter<T,D> converter;
 	private final SQLValue<D> inner;
 	
-	public Class<? super T> getTarget() {
+	protected SQLValue<D> getInner(){
+		return inner;
+	}
+	protected TypeConverter<T, D> getConverter(){
+		return converter;
+	}
+	public final Class<? super T> getTarget() {
 		return converter.getTarget();
 	}
 	
-	public int add(StringBuilder sb, boolean qualify) {
+	public final int add(StringBuilder sb, boolean qualify) {
 		
 		return inner.add(sb, qualify);
 	}
-	public List<PatternArgument> getParameters(List<PatternArgument> list) {
+	public final List<PatternArgument> getParameters(List<PatternArgument> list) {
 		return inner.getParameters(list);
 	}
-	public T makeObject(ResultSet rs, int pos) throws DataException {
+	public final T makeObject(ResultSet rs, int pos) throws DataException {
 		return converter.find(inner.makeObject(rs, pos));
 	}
-	public SQLFilter getRequiredFilter() {
+	public final SQLFilter getRequiredFilter() {
 		return inner.getRequiredFilter();
 	}
-	public String toString(){
+	public final String toString(){
 		return converter.toString()+"("+inner.toString()+")";
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilter(uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition, java.lang.Object)
 	 */
-	public SQLFilter<H> getFilter(MatchCondition match, T val)
+	public final SQLFilter<H> getFilter(MatchCondition match, T val)
 			throws CannotFilterException, NoSQLFilterException {
 		if( match != null ){
 			throw new CannotFilterException("Cannot perform relative match via TypeConverter");
@@ -89,7 +95,7 @@ public class TypeConverterSQLValue<H,T,D> implements  SQLValue<T>, FilterProvide
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getNullFilter(boolean)
 	 */
-	public SQLFilter<H> getNullFilter(boolean is_null)
+	public final SQLFilter<H> getNullFilter(boolean is_null)
 			throws CannotFilterException, NoSQLFilterException {
 		if( inner instanceof FilterProvider){
 			return ((FilterProvider<H, D>)inner).getNullFilter(is_null);
@@ -100,7 +106,7 @@ public class TypeConverterSQLValue<H,T,D> implements  SQLValue<T>, FilterProvide
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getOrderFilter(boolean)
 	 */
-	public SQLFilter<H> getOrderFilter(boolean descending)
+	public final SQLFilter<H> getOrderFilter(boolean descending)
 			throws CannotFilterException, NoSQLFilterException {
 		throw new CannotFilterException("Cannot generate order using TypeConverter");
 	}
@@ -108,7 +114,7 @@ public class TypeConverterSQLValue<H,T,D> implements  SQLValue<T>, FilterProvide
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilterType()
 	 */
-	public Class<? super H> getFilterType() {
+	public final Class<? super H> getFilterType() {
 		return target;
 	}
 
