@@ -102,7 +102,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	 * {@link ViewTransitionKey} and reports the transition as safe.
 	 * 
 	 */
-	public static final Feature MODIFY_ON_POST_ONLY= new Feature("transition.modify_on_post_only",false,"Only allow modification via post operations");
+	public static final Feature MODIFY_ON_POST_ONLY= new Feature("transition.modify_on_post_only",true,"Only allow modification via post operations");
 	/**
 	 * 
 	 */
