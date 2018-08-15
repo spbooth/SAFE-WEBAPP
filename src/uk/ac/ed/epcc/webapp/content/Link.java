@@ -27,11 +27,16 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 public class Link implements XMLGenerator,UIGenerator,Contexed {
 
 	private final String text;
+	private final String help;
 	private final FormResult result;
 	private final AppContext conn;
 	public Link(AppContext conn,String text,FormResult result){
+		this(conn,text,null,result);
+	}
+	public Link(AppContext conn,String text,String help,FormResult result){
 		this.conn=conn;
 		this.text=text;
+		this.help=help;
 		this.result=result;
 	}
 	public SimpleXMLBuilder addContent(SimpleXMLBuilder builder) {
@@ -62,7 +67,7 @@ public class Link implements XMLGenerator,UIGenerator,Contexed {
 		return text.hashCode();
 	}
 	public ContentBuilder addContent(ContentBuilder builder) {
-		builder.addLink(conn, text, result);
+		builder.addLink(conn, text, help,result);
 		return builder;
 	}
 }

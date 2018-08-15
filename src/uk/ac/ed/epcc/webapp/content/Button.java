@@ -27,11 +27,16 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 public class Button implements XMLGenerator,UIGenerator,Contexed {
 
 	private final String text;
+	private final String help;
 	private final FormResult result;
 	private final AppContext conn;
 	public Button(AppContext conn,String text,FormResult result){
+		this(conn,text,null,result);
+	}
+	public Button(AppContext conn,String text,String help,FormResult result){
 		this.conn=conn;
 		this.text=text;
+		this.help=help;
 		this.result=result;
 	}
 	public SimpleXMLBuilder addContent(SimpleXMLBuilder builder) {
@@ -50,7 +55,7 @@ public class Button implements XMLGenerator,UIGenerator,Contexed {
 		return text;
 	}
 	public ContentBuilder addContent(ContentBuilder builder) {
-		builder.addButton(conn, text, result);
+		builder.addButton(conn, text, help,result);
 		return builder;
 	}
 }
