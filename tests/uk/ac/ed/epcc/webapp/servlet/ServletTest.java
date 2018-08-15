@@ -46,9 +46,11 @@ import uk.ac.ed.epcc.webapp.config.OverrideConfigService;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlContentFormat;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.SetParamVisitor;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.CustomPage;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
@@ -335,6 +337,21 @@ public abstract class ServletTest extends WebappTestBase{
 		req.removeAttribute(DefaultServletService.PARAMS_KEY_NAME);
 		req.params.put(name, value);
 		req.method="POST";
+	}
+	/** Add the form parameters corresponding to an Input.
+	 * The Input key value must be set to the base parameter name
+	 * 
+	 * Useful for setting multi-input parameters
+	 * 
+	 * @param i {@link Input}
+	 * @throws Exception 
+	 */
+	public void addParam(Input i) throws Exception {
+		SetParamVisitor vis = new SetParamVisitor(req.params);
+		req.removeAttribute(DefaultServletService.PARAMS_KEY_NAME);
+		i.accept(vis);
+		req.method="POST";
+
 	}
 	public void clearParam(String name) {
 		req.removeAttribute(DefaultServletService.PARAMS_KEY_NAME);

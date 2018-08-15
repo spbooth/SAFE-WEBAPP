@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.logging.debug;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -33,6 +34,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 public class DebugLoggerService implements Contexed, LoggerService {
     private final AppContext conn;
     private LoggerService nested;
+    private static final Feature FATAL_FEATURE = new Feature("debug.errors_are_fatal",true,"DebugLogger throws fatal errors");
     public DebugLoggerService(AppContext conn){
     	this.conn=conn;
     	nested=conn.getService(LoggerService.class);
@@ -46,7 +48,10 @@ public class DebugLoggerService implements Contexed, LoggerService {
 		if( nested != null ){
 			l = nested.getLogger(name);
 		}
-		return new DebugLogger(l);
+		if( FATAL_FEATURE.isEnabled(getContext())) {
+			return new DebugLogger(l);
+		}
+		return l;
 	}
 
 
@@ -55,7 +60,10 @@ public class DebugLoggerService implements Contexed, LoggerService {
 		if( nested != null ){
 			l = nested.getLogger(c);
 		}
-		return new DebugLogger(l);
+		if( FATAL_FEATURE.isEnabled(getContext())) {
+			return new DebugLogger(l);
+		}
+		return l;
 	}
 
 	

@@ -436,33 +436,12 @@ public class MapForm extends BaseForm {
 	
 	
 	private void setValues(Map<String,Object> result ,Input i){
-		if(i instanceof ParseMapInput){
-			ParseMapInput c = (ParseMapInput) i;
-			Map<String,Object> map = c.getMap();
-			for (Iterator<String> it = map.keySet().iterator(); it.hasNext();) {
-				String key = it.next();
-				String value = map.get(key).toString();
-				result.put(key, value);
-			}
-		}else if (i instanceof MultiInput) {
-			MultiInput c = (MultiInput) i;
-			for (Iterator it = c.getInputs(); it.hasNext();) {
-				Input t = (Input) it.next();
-				addValue(result, t);
-			}
-		} else {
-			addValue(result, i);
+		SetParamVisitor vis = new SetParamVisitor(result);
+		try {
+			i.accept(vis);
+		} catch (Exception e) {
+			log.error("Error setting map", e);
 		}
-	}
-	
-	private void addValue(Map<String,Object> map, Input i){
-		if( i.getValue() == null ){
-			return;
-		}
-		if( i instanceof ParseInput){
-			map.put(i.getKey(), ((ParseInput)i).getString());
-		}else{
-			map.put(i.getKey(), i.getValue().toString());
-		}
+		
 	}
 }
