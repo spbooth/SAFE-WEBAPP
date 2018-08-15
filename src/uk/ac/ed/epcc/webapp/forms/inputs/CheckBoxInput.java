@@ -75,6 +75,7 @@ public class CheckBoxInput implements ParseInput<String>,  BinaryInput<String> {
 	 */
 	public void setChecked(boolean value) {
 		is_checked=value;
+		this.value=getValue(value);
 	}
 
 	public String setValue(String o) throws TypeError{
