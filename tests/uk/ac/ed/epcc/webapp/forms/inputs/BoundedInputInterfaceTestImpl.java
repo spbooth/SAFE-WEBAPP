@@ -13,7 +13,9 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
@@ -43,7 +45,14 @@ public class BoundedInputInterfaceTestImpl<T,I extends BoundedInput<T>,X extends
 	
     public void testMin() throws Exception {
 		I input = target.getInput();
-		input.setMin(target.getLowBound());
+		T old = input.getMin();
+		T prev = input.setMin(target.getLowBound());
+		if( old == null ) {
+			assertNull(prev);
+		}else {
+			assertEquals(old, prev);
+		}
+		assertEquals(target.getLowBound(),input.getMin());
 		Set<T> good = new HashSet<>();
 		good.addAll(target.getGoodData());
 		good.addAll(target.getHighData());
@@ -65,7 +74,14 @@ public class BoundedInputInterfaceTestImpl<T,I extends BoundedInput<T>,X extends
 	
     public void testMax() throws Exception {
 		I input = target.getInput();
-		input.setMax(target.getHighBound());
+		T old = input.getMax();
+		T prev = input.setMax(target.getHighBound());
+		if( old == null ) {
+			assertNull(prev);
+		}else {
+			assertEquals(old, prev);
+		}
+		assertEquals(target.getHighBound(),input.getMax());
 		Set<T> good = new HashSet<>();
 		good.addAll(target.getGoodData());
 		good.addAll(target.getLowData());

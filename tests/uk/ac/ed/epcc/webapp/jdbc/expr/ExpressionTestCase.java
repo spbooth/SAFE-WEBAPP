@@ -446,4 +446,30 @@ public class ExpressionTestCase extends WebappTestBase {
 		res = fac.evaluate(obj, new CompareSQLValue<>(ctx,(SQLExpression<Date>)fac.getDateA(), null,(SQLExpression<Date>) fac.getDateB()));
 		assertTrue(res);
 	}
+	
+	@Test
+	public void testLocateValue() throws DataException {
+		ExpressionTest sub = fac.makeFromString("bang");
+		ExpressionTest a = fac.makeFromString("123bang");
+		ExpressionTest b = fac.makeFromString("123456bang");
+		
+		SQLValue<Integer> val = fac.getLocateValue("bang", 2);
+		
+		assertEquals(4,(int)fac.evaluate(a, val));
+		assertEquals(7,(int)fac.evaluate(b, val));
+		assertEquals(0,(int)fac.evaluate(sub, val));
+	}
+	
+	@Test
+	public void testLocateExpression() throws DataException {
+		ExpressionTest sub = fac.makeFromString("bang");
+		ExpressionTest a = fac.makeFromString("123bang");
+		ExpressionTest b = fac.makeFromString("123456bang");
+		
+		SQLValue<Integer> val = fac.getLocateExpression("bang", 2);
+		
+		assertEquals(4,(int)fac.evaluate(a, val));
+		assertEquals(7,(int)fac.evaluate(b, val));
+		assertEquals(0,(int)fac.evaluate(sub, val));
+	}
 }
