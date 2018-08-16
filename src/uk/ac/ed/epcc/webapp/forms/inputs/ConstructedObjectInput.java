@@ -171,6 +171,9 @@ public class ConstructedObjectInput<T> implements ListInput<String,T>{
 	 */
 	@Override
 	public boolean isValid(T item) {
+		if( item == null) {
+			return false;
+		}
 		if( clazz.isAssignableFrom(item.getClass())){
 			if( item instanceof Tagged){
 				return reg.containsKey(((Tagged)item).getTag());

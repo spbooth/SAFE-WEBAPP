@@ -466,6 +466,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 */
 		@Override
 		public boolean isValid(BDO item) {
+			if(item == null) {
+				return false;
+			}
 			try {
 				return exists(getValidateFilter(item.getID()));
 			} catch (DataException e) {

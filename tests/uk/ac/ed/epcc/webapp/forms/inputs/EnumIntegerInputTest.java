@@ -119,5 +119,14 @@ ListInputInterfaceTest<Integer, TestEnum, EnumIntegerInput<TestEnum>, TestDataPr
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.ListInputInterfaceTest#testIsValid()
+	 */
+	@Override
+	@Test
+	public final void testIsValid() throws Exception {
+		list_test.testIsValid();	
+	}
+
 
 }

@@ -94,7 +94,7 @@ ListInputInterfaceTest<String, TestType.TestValue, BasicTypeInput<TestType.TestV
 	 */
 	@Override
 	@Test
-	public void testGetItembyValue() throws Exception {
+	public final void testGetItembyValue() throws Exception {
 		list_tests.testGetItembyValue();
 		
 	}
@@ -104,7 +104,7 @@ ListInputInterfaceTest<String, TestType.TestValue, BasicTypeInput<TestType.TestV
 	 */
 	@Override
 	@Test
-	public void testGetItems() throws Exception {
+	public final void testGetItems() throws Exception {
 		list_tests.testGetItems();
 		
 	}
@@ -114,7 +114,7 @@ ListInputInterfaceTest<String, TestType.TestValue, BasicTypeInput<TestType.TestV
 	 */
 	@Override
 	@Test
-	public void testGetTagByItem() throws Exception {
+	public final void testGetTagByItem() throws Exception {
 		list_tests.testGetTagByItem();
 		
 	}
@@ -124,7 +124,7 @@ ListInputInterfaceTest<String, TestType.TestValue, BasicTypeInput<TestType.TestV
 	 */
 	@Override
 	@Test
-	public void testGetTagByValue() throws Exception {
+	public final void testGetTagByValue() throws Exception {
 		list_tests.testGetTagByValue();
 		
 	}
@@ -134,8 +134,18 @@ ListInputInterfaceTest<String, TestType.TestValue, BasicTypeInput<TestType.TestV
 	 */
 	@Override
 	@Test
-	public void testGetText() throws Exception {
+	public final void testGetText() throws Exception {
 		list_tests.testGetText();
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.ListInputInterfaceTest#testIsValid()
+	 */
+	@Override
+	@Test
+	public final void testIsValid() throws Exception {
+		list_tests.testIsValid();
 		
 	}
 

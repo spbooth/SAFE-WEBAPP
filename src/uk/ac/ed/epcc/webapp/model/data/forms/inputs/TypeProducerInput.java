@@ -161,8 +161,18 @@ public class TypeProducerInput<T> extends TextInput implements PreSelectInput<St
 	 */
 	@Override
 	public boolean isValid(T item) {
+		if( item == null ) {
+			return false;
+		}
 		if( item_set != null ){
 			return item_set.contains(item);
+		}else {
+			for(Iterator<T> it = t.getValues(); it.hasNext();) {
+				T v = it.next();
+				if( item.equals(v)) {
+					return true;
+				}
+			}
 		}
 		return false;
 	}

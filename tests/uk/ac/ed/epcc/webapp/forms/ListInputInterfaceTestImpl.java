@@ -31,6 +31,7 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.forms.inputs.AlternateInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 
 /** An  InterfaceTest for {@link ListInput}.
  * As factory classes override their default input to
@@ -66,18 +67,18 @@ public class ListInputInterfaceTestImpl<T,D,I extends Input<T>&ListInput<T,D> , 
 	 * @return
 	 * @throws Exception
 	 */
-	public ListInput<T, D> getInput() throws Exception {
+	public I getInput() throws Exception {
 		I input = target.getInput();
 		
 		if( input instanceof ListInput){
-			return (ListInput<T, D>) input;
+			return (I) input;
 		}
 		if( input instanceof AlternateInput){
 			AlternateInput comp = (AlternateInput) input;
 			for(Iterator<Input> it=comp.getInputs(); it.hasNext();){
 				Input i = it.next();
 				if( i instanceof ListInput){
-					return (ListInput<T, D>) i;
+					return (I) i;
 				}
 			}
 		}
@@ -169,6 +170,22 @@ public class ListInputInterfaceTestImpl<T,D,I extends Input<T>&ListInput<T,D> , 
 		}
 		
 		assertNull(input.getText(null));
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.ListInputInterfaceTest#testIsValid()
+	 */
+	@Override
+	public void testIsValid() throws Exception {
+		I input = getInput();
+		
+		assertFalse(input.isValid(null));
+		
+		for(Iterator<D>it= input.getItems(); it.hasNext();) {
+			D item = it.next();
+			assertTrue("Item not valid! "+item.toString(),input.isValid(item));
+		}
 		
 	}
 	

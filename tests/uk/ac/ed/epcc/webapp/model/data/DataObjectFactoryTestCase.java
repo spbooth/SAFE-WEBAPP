@@ -416,4 +416,13 @@ ListInputInterfaceTest
 		
 	}
 
+
+
+	@Override
+	@Test
+	public final void testIsValid() throws Exception {
+		list_test.testIsValid();
+		
+	}
+
 }

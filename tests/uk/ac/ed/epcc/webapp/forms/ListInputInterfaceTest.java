@@ -48,4 +48,6 @@ public interface ListInputInterfaceTest<T,D,I extends Input<T>&ListInput<T,D> , 
 	@Test
 	public void testGetText() throws Exception ;
 	
+	@Test
+	public void testIsValid() throws Exception;
 }

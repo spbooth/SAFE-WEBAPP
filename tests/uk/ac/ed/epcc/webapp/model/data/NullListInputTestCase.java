@@ -180,4 +180,12 @@ ListInputInterfaceTest<Integer, Object,ListInput<Integer,Object>, NullListInputT
 		list_test.testGetText();
 		
 	}
+
+
+	@Override
+	@Test
+	public final void testIsValid() throws Exception {
+		list_test.testIsValid();
+		
+	}
 }

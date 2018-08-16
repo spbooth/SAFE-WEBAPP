@@ -75,7 +75,7 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 	@SuppressWarnings("unchecked")
 	public String getTagByItem(Object item) {
 		if( item == null ){
-			return "";
+			return null;
 		}
 		if( item == NULLTAG){
 			return ""+NULL_VALUE;
@@ -85,7 +85,7 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 
 	public String getTagByValue(Integer value) {
 		if( value == null ){
-			return "";
+			return null;
 		}
 		return value.toString();
 	}
@@ -209,7 +209,10 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 	 */
 	@Override
 	public boolean isValid(Object item) {
-		if( item == null || item.equals(NULLTAG)){
+		if( item == null) {
+			return false;
+		}
+		if(  item.equals(NULLTAG)){
 			return true;
 		}
 		return internal.isValid((T) item);
