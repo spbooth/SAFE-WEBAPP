@@ -179,7 +179,7 @@ public class ListInputInterfaceTestImpl<T,D,I extends Input<T>&ListInput<T,D> , 
 	@Override
 	public void testIsValid() throws Exception {
 		I input = getInput();
-		
+		if( input == null) return;
 		assertFalse(input.isValid(null));
 		
 		for(Iterator<D>it= input.getItems(); it.hasNext();) {
