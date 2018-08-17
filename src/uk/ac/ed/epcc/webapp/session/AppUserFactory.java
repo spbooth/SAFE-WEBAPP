@@ -618,7 +618,7 @@ AccessRoleProvider<AU, AU>
 	/** Get a name where the String sort order matches the 
 	 * presentation order. If we change this we need to keep getIdentifier roughly consistent.
 	 * 
-	 * 
+	 * Returns null or an empty string for the default sort order.
 	 * @param user
 	 * @return String
 	 */
@@ -633,10 +633,7 @@ AccessRoleProvider<AU, AU>
 				inserted=true;
 			}
 		}
-		if( inserted ) {
-			return name.toString();
-		}
-		return user.getName();
+		return name.toString();
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#makeFromString(java.lang.String)
