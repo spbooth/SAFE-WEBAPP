@@ -14,9 +14,12 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.mail.Message;
 import javax.servlet.ServletException;
@@ -27,9 +30,12 @@ import uk.ac.ed.epcc.webapp.email.MockTansport;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.MapForm;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.AbstractTransitionServletTest;
+import uk.ac.ed.epcc.webapp.session.AppUserFactory.UpdatePersonRequiredPage;
 
 /**
  * @author Stephen Booth
@@ -158,5 +164,61 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 		assertEquals("bilbo@example.com",message.getAllRecipients()[0].toString());
 		checkDiff("/cleanup.xsl", "../servlet/email_change.xml");
 	
+	}
+	
+	@Test
+	public void testRequirePasswordChange() throws Exception {
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.randomisePassword(user);
+		user.commit();
+		assertTrue(composite.mustResetPassword(user));
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setCurrentPerson(user);
+		assertTrue(sess.haveCurrentUser());
+		Set<RequiredPage<A>> requiredPages = fac.getRequiredPages();
+		assertEquals(1,requiredPages.size());
+		RequiredPage<A> page = requiredPages.iterator().next();
+		assertTrue(page.getClass().getCanonicalName(),page instanceof PasswordAuthComposite.PasswordResetRequiredPage);
+		assertTrue(page.required(sess));
+		FormResult result = page.getPage(sess);
+		setTransition((ChainedTransitionResult) result);
+		checkFormContent(null, "password_change_form.xml");
+	}
+	@Test
+	@ConfigFixtures("require_update.properties")
+	public void testUpdateDetails() throws Exception {
+		MockTansport.clear();
+		takeBaseline();
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user, "ThisIsaPassword");
+		user.commit();
+		assertFalse(composite.mustResetPassword(user));
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setCurrentPerson(user);
+		assertTrue(sess.haveCurrentUser());
+		Set<RequiredPage<A>> requiredPages = fac.getRequiredPages();
+		assertEquals(2,requiredPages.size());
+		Iterator<RequiredPage<A>> it = requiredPages.iterator();
+		RequiredPage<A> page = it.next();
+		//assertTrue(page.getClass().getCanonicalName(),page instanceof PasswordAuthComposite.PasswordResetRequiredPage);
+		//assertFalse(page.required(sess));
+		//page = it.next();
+		assertTrue(page.getClass().getCanonicalName(),page instanceof UpdatePersonRequiredPage);
+		assertTrue(page.required(sess));
+		FormResult result = page.getPage(sess);
+		setTransition((ChainedTransitionResult) result);
+		// This is actually an empty form as no user settable details configured
+		checkFormContent(null, "details_form.xml");
+		addParam(RealNameComposite.FIRSTNAME,"Albert");
+		addParam(RealNameComposite.LASTNAME,"Spangler");
+		runTransition();
+		checkMessage("object_updated");
+		checkDiff("/cleanup.xsl", "details.xml");
 	}
 }

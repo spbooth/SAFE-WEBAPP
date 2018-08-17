@@ -35,6 +35,7 @@ import uk.ac.ed.epcc.webapp.model.data.FieldSQLExpression;
 import uk.ac.ed.epcc.webapp.model.data.FieldValue;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
+import uk.ac.ed.epcc.webapp.model.data.StringFieldExpression;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
 
@@ -216,6 +217,11 @@ public class ExpressionTestFactory extends ClassificationFactory<ExpressionTestF
 	
 	public SQLExpression<Integer> getLocateExpression(String sub,int pos){
 		return new LocateSQLExpression(new ConstExpression(String.class, sub), res.getStringExpression(getTarget(), Classification.NAME), new ConstExpression(Integer.class, pos));
+	}
+	
+	public StringFieldExpression getNameSQLAccessor(){
+		return res.getStringExpression(getTarget(), Classification.NAME);
+		
 	}
 	
 	public SQLValue<Integer> getLocateValue(String sub,int pos){

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><transition_page>
+<Title>Update personal details</Title>
+<PageHeading>Update personal details</PageHeading>
+<SummaryContent/>
+<ExtraContent>
+<div>
+<h2>Update required</h2>
+<p>It is important that we keep the details we hold on you up to date. We need up to date contact details in the event that we ever need to contact you. Other information is needed to perform demographic analysis of the use of our systems.</p>
+<p>We would therefore be grateful if you could check the following details that we currently hold and update any that need changing.</p>
+</div>
+</ExtraContent>
+<Form>
+<table class="form">
+<tr class="even">
+<th>
+<label class="required">Email</label>
+</th>
+<td>fred@example.com</td>
+</tr>
+<tr class="odd">
+<th>
+<label for="transition_Title" class="optional">Title (Mr,Mrs,Dr etc.)</label>
+</th>
+<td>
+<input id="transition_Title" type="text" size="32" maxlength="32" name="Title" class="input"/>
+</td>
+</tr>
+<tr class="even">
+<th>
+<label for="transition_Firstname" class="optional">First Name</label>
+</th>
+<td>
+<input id="transition_Firstname" type="text" size="32" maxlength="32" name="Firstname" class="input"/>
+</td>
+</tr>
+<tr class="odd">
+<th>
+<label for="transition_Initials" class="optional">Initials</label>
+</th>
+<td>
+<input id="transition_Initials" type="text" size="3" maxlength="3" name="Initials" class="input"/>
+</td>
+</tr>
+<tr class="even">
+<th>
+<label for="transition_Lastname" class="optional">Last Name</label>
+</th>
+<td>
+<input id="transition_Lastname" type="text" size="32" maxlength="32" name="Lastname" class="input"/>
+</td>
+</tr>
+</table>
+<fieldset class="action_buttons">
+<input class="input_button" type="submit" name="Update" value="Update"/>
+</fieldset>
+</Form>
+</transition_page>

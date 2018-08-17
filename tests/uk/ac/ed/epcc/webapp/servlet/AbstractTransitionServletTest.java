@@ -85,6 +85,9 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	public <K,T> void setTransition(TransitionFactory<K, T> provider, K key, T target) throws TransitionException{
 		setTransition(provider, key, target,true);
 	}
+	public <K,T> void setTransition(ChainedTransitionResult<T, K> result) throws TransitionException {
+		setTransition(result.getProvider(),result.getTransition(),result.getTarget());
+	}
 	public <K,T> void setTransition(TransitionFactory<K, T> provider, K key, T target, boolean from_form) throws TransitionException{
 		resetRequest();
 		req.servlet_path="TransitionServlet";

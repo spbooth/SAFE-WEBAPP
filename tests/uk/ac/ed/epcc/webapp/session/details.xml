@@ -1,0 +1,36 @@
+<Diff><TableSpecification name='Person'>
+<Email type='String' nullable='true' max='254'/>
+<Updated type='Long' nullable='true'/>
+<PasswordFails type='Integer' nullable='false'/>
+<PasswordStatus type='String' nullable='false' max='1'/>
+<Salt type='String' nullable='false' max='16'/>
+<Alg type='Integer' nullable='false'/>
+<Password type='String' nullable='false' max='32'/>
+<WebName type='String' nullable='true' max='128'/>
+<SignupDate type='Long' nullable='true'/>
+<Title type='String' nullable='true' max='32'/>
+<Firstname type='String' nullable='true' max='32'/>
+<Initials type='String' nullable='true' max='3'/>
+<Lastname type='String' nullable='true' max='32'/>
+<Email_index type='Index' unique='true'><Column name='Email'/></Email_index>
+<WebName_index type='Index' unique='true'><Column name='WebName'/></WebName_index>
+</TableSpecification>
+<Person id='1'>
+<Email>fred@example.com</Email>
+<PasswordFails>0</PasswordFails>
+<PasswordStatus>V</PasswordStatus>
+<Salt>nnIG6s766z3waQDz</Salt>
+<Alg>0</Alg>
+<Password>f6800f1e70917631b204b2ab7abcf76c</Password>
+<Firstname>Albert</Firstname>
+<Lastname>Spangler</Lastname>
+</Person>
+<TableSpecification name='role_table'>
+<PersonID type='Integer' nullable='false'/>
+<Role type='String' nullable='false' max='32'/>
+</TableSpecification>
+<role_table id='1'>
+<PersonID>1</PersonID>
+<Role>Admin</Role>
+</role_table>
+</Diff>

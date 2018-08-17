@@ -13,7 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.swing;
 
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import uk.ac.ed.epcc.webapp.AppContext;

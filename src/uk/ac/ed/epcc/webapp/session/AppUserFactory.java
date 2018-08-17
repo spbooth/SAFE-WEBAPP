@@ -361,10 +361,9 @@ AccessRoleProvider<AU, AU>
 				if( ! service.hasRole(SessionService.ADMIN_ROLE)){
 					f.removeField(ALLOW_EMAIL_FIELD);
 				}
-				if( f.validate()){
-					return false;
+				if( ! f.validate()){
+					return true;
 				}
-				return true;
 			} catch (Exception e) {
 				getContext().error(e,"Error checking for person update");
 			}
@@ -624,6 +623,19 @@ AccessRoleProvider<AU, AU>
 	 * @return String
 	 */
 	public String getSortName(AU user){
+		StringBuilder name = new StringBuilder();
+		boolean inserted = false;
+		for(SortNameContributor<AU> sn : getComposites(SortNameContributor.class)){
+			if( inserted){
+				name.append(" ");
+			}
+			if( sn.addSortName(user, name)){
+				inserted=true;
+			}
+		}
+		if( inserted ) {
+			return name.toString();
+		}
 		return user.getName();
 	}
 	/* (non-Javadoc)
