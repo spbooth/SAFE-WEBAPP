@@ -88,7 +88,8 @@ public class RelationshipTest extends WebappTestBase {
 		Assert.assertFalse(fac.matches(service.getRelationshipRoleFilter(fac, MANAGER), t));
 		assertFalse(service.hasRelationship(fac, t,MANAGER));
 		
-	
+		Assert.assertTrue(fac.matches(service.getRelationshipRoleFilter(fac, "!"+MANAGER), t));
+		assertTrue(service.hasRelationship(fac, t,"!"+MANAGER));
 	}
 	@Test
 	public void testGlobalSet() throws DataException, UnknownRelationshipException{
@@ -123,6 +124,9 @@ public class RelationshipTest extends WebappTestBase {
 		AppUser fred = login.findByEmail("fred@example.com");
 		Assert.assertNotNull(fred);
 		
+		AppUser bill = login.findByEmail("bill@example.com");
+		Assert.assertNotNull(bill);
+		
 		SessionService<AppUser> serv = service;
 		serv.setCurrentPerson(fred);
 		
@@ -151,6 +155,10 @@ public class RelationshipTest extends WebappTestBase {
 		assertNotNull(manager);
 		assertTrue(fred.equals(manager));
 		assertNull(login.find(service.getPersonInRelationshipRoleFilter(fac, DOUBLE_MANAGER, t),true));
+		
+		AppUser not_manager = (AppUser) login.find(service.getPersonInRelationshipRoleFilter(fac, "!"+MANAGER, t),true);
+		assertNotNull(not_manager);
+		assertTrue(bill.equals(not_manager));
 		
 		// fred 
 		Dummy3.Factory fac = new Dummy3.Factory(ctx);

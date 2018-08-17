@@ -49,7 +49,6 @@ public class UserServlet<T extends AppUser> extends SessionServlet {
 	
 	
 	protected static final String RESET_NAVIGATION_MENU ="RESET_NAVIGATION_MENU";
-	public static final Feature USER_SELF_UPDATE_FEATURE = new Feature("user.self.update",true,"users can update their own details");
 	
 	@Override
 	@SuppressWarnings("unchecked")
