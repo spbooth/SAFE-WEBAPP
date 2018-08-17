@@ -712,6 +712,8 @@ AccessRoleProvider<AU, AU>
 		for( NewSignupAction<AU> action : getComposites(NewSignupAction.class)) {
 			action.newSignup(user);
 		}
+		// Will force update on first login otherwise 
+		user.markDetailsUpdated();
 	}
 	
 	/** Get a {@link FormCreator} to use when users sign-up

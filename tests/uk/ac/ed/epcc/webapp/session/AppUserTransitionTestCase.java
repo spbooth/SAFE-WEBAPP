@@ -32,9 +32,11 @@ import uk.ac.ed.epcc.webapp.forms.MapForm;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.AbstractTransitionServletTest;
+import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory.UpdatePersonRequiredPage;
 
 /**
@@ -220,5 +222,61 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 		runTransition();
 		checkMessage("object_updated");
 		checkDiff("/cleanup.xsl", "details.xml");
+	}
+	
+	@Test
+	public void testSUTransition() throws DataFault, DataException, ConsistencyError, IOException, TransitionException, ServletException {
+		MockTansport.clear();
+		takeBaseline();
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+	
+		user.setEmail("fred@example.com");
+		user.commit();
+		
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setRole(user,ServletSessionService.BECOME_USER_ROLE, true);
+		sess.setCurrentPerson(user);
+		assertTrue(sess.haveCurrentUser());
+		
+		A target = fac.makeBDO();
+		target.setEmail("bill@example.com");
+		target.commit();
+		
+		AppUserTransitionProvider provider = AppUserTransitionProvider.getInstance(ctx);
+		setTransition(provider, AppUserTransitionProvider.SU_KEY, target);
+		runTransition();
+		checkRedirect("/main.jsp");
+		sess = ctx.getService(SessionService.class);
+		assertEquals("bill@example.com",sess.getCurrentPerson().getEmail());
+		assertTrue(((ServletSessionService)sess).isSU());
+	}
+	
+	@Test
+	public void testSetRoleTransition() throws ConsistencyError, Exception {
+		MockTansport.clear();
+		takeBaseline();
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+	
+		user.setEmail("fred@example.com");
+		user.commit();
+		
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setRole(user,AppUserTransitionProvider.SET_ROLES_ROLE, true);
+		sess.setCurrentPerson(user);
+		assertTrue(sess.haveCurrentUser());
+		
+		A target = fac.makeBDO();
+		target.setEmail("bill@example.com");
+		target.commit();
+		
+		AppUserTransitionProvider provider = AppUserTransitionProvider.getInstance(ctx);
+		setTransition(provider, AppUserTransitionProvider.SET_ROLE_KEY, target);
+		checkFormContent(null, "set_roles_form.xml");
+		addParam("Pig", "Y");
+		runTransition();
+		checkMessage("object_updated");
+		checkDiff("/cleanup.xsl", "roles.xml");
 	}
 }

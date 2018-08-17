@@ -44,7 +44,7 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 	/**
 	 * 
 	 */
-	private static final String SET_ROLES_ROLE = "SetRoles";
+	public static final String SET_ROLES_ROLE = "SetRoles";
 
 	public static final Feature USER_SELF_UPDATE_FEATURE = new Feature("user.self.update",true,"users can update their own details");
 	
