@@ -20,10 +20,12 @@ import static org.junit.Assert.assertTrue;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
@@ -61,6 +63,7 @@ import uk.ac.ed.epcc.webapp.model.data.Dumper;
 import uk.ac.ed.epcc.webapp.model.data.UnDumper;
 import uk.ac.ed.epcc.webapp.model.data.XMLDataUtils;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 /** A base class for Junit4 tests that require an {@link AppContext}
@@ -304,7 +307,12 @@ public abstract class WebappTestBase implements ContextHolder{
 		writer.println(string);
 		writer.close();
 	}
-	
+protected void writeFile(String file_name, byte data[]) throws IOException {
+		
+	OutputStream stream = new FileOutputStream(new File(file_name));
+	stream.write(data);
+	stream.close();
+	}
 	public String getResourceAsString(String name) throws IOException{
 		InputStream stream = getClass().getResourceAsStream(getContext().expandText(name));
 		StringBuffer fileData = new StringBuffer(1000);
@@ -318,6 +326,12 @@ public abstract class WebappTestBase implements ContextHolder{
 		}
 		reader.close();
 		return fileData.toString();
+	}
+	public byte[] getResourceAsBytes(String name) throws IOException, DataFault{
+		InputStream stream = getClass().getResourceAsStream(getContext().expandText(name));
+		ByteArrayStreamData data = new ByteArrayStreamData();
+		data.read(stream);
+		return data.getBytes();
 	}
 	
 	/** Check the contents of some test generated XML contenet

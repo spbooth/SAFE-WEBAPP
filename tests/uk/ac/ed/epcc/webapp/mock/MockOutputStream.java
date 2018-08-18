@@ -45,6 +45,9 @@ public class MockOutputStream extends ServletOutputStream {
 		return inner.toString();
 	}
 
+	public byte[] getData() {
+		return inner.toByteArray();
+	}
 	/* (non-Javadoc)
 	 * @see javax.servlet.ServletOutputStream#isReady()
 	 */
