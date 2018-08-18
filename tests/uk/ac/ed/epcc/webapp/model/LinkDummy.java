@@ -21,6 +21,7 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.BasicType;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -83,6 +84,9 @@ public class LinkDummy extends LinkManager<LinkDummy.DummyLink,Dummy1,Dummy2> {
 	}
 	public Set getDummy1(Dummy2 arg) throws DataException{
 		return getLeftSet(arg,status.getFilter(this,ACTIVE));
+	}
+	public SQLFilter<DummyLink> getLinkedFilter(){
+		return status.getFilter(this, ACTIVE);
 	}
 	public void nuke() throws DataFault{
 		for(Iterator it = getAllIterator(); it.hasNext();){

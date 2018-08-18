@@ -93,5 +93,10 @@ public class Dummy2 extends DataObject {
 			spec.setField(NUMBER, new DoubleFieldType(true, 0.0));
 			return spec;
 		}
+
+		public StringFilter getStringFilter(String name) {
+			return new StringFilter(name);
+		}
+
     }
 }

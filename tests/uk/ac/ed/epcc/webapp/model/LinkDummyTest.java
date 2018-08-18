@@ -29,7 +29,9 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.LinkDummy.DummyLink;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 
 public class LinkDummyTest extends WebappTestBase {
@@ -134,4 +136,129 @@ public class LinkDummyTest extends WebappTestBase {
 		}
 		
 	}
+	
+	@Test
+	public void testFilters() throws Exception {
+		LinkDummy linker = LinkDummy.getInstance(ctx);
+	    Dummy1.Factory d1_fac = new Dummy1.Factory(ctx);
+	    Dummy2.Factory d2_fac = new Dummy2.Factory(ctx);
+		
+		Dummy1 d1 = new Dummy1(ctx);
+		d1.setName("fred");
+		d1.setNumber(5);
+		d1.commit();
+		Dummy2 d2 = new Dummy2(ctx);
+		d2.setName("boris");
+		d2.setNumber(8);
+		d2.commit();
+		
+		Dummy2 d3 = new Dummy2(ctx);
+		d3.setName("enoch");
+		d3.setNumber(6);
+		d3.commit();
+		assertFalse(linker.isLinked(d1,d2));
+		linker.addLink(d1,d2);
+		
+		LinkDummy.DummyLink link = linker.find(linker.getLeftJoinFilter(d1_fac.getStringFilter("fred")));
+		
+		assertEquals("boris",link.getDummy2().getName());
+		
+		link = linker.find(linker.getLeftRemoteFilter(d1_fac.getStringFilter("fred")));
+		
+		assertEquals("boris",link.getDummy2().getName());
+		
+		link = linker.find(linker.getRightJoinFilter(d2_fac.getStringFilter("boris")));
+		
+		assertEquals("fred",link.getDummy1().getName());
+		
+		link = linker.find(linker.getRightRemoteFilter(d2_fac.getStringFilter("boris")));
+		
+		assertEquals("fred",link.getDummy1().getName());
+		
+		Dummy1 fred = d1_fac.find(linker.getLeftFilter(linker.getLinkedFilter()));
+		assertEquals("fred",fred.getName());
+		
+		Dummy2 boris = d2_fac.find(linker.getRightFilter(linker.getLinkedFilter()));
+		assertEquals("boris",boris.getName());
+		
+	}
+
+	
+	
+	@Test
+	public void testLinkCount() throws Exception {
+		LinkDummy linker = LinkDummy.getInstance(ctx);
+	    Dummy1.Factory d1_fac = new Dummy1.Factory(ctx);
+	    Dummy2.Factory d2_fac = new Dummy2.Factory(ctx);
+		
+		Dummy1 d1 = new Dummy1(ctx);
+		d1.setName("fred");
+		d1.setNumber(5);
+		d1.commit();
+		Dummy2 d2 = new Dummy2(ctx);
+		d2.setName("boris");
+		d2.setNumber(8);
+		d2.commit();
+		
+		Dummy2 d3 = new Dummy2(ctx);
+		d3.setName("enoch");
+		d3.setNumber(6);
+		d3.commit();
+		assertFalse(linker.isLinked(d1,d2));
+		linker.addLink(d1,d2);
+		
+		assertEquals(0,linker.getLinkCount(null, d3, null));
+		assertEquals(1,linker.getLinkCount(d1, null, null));
+		assertEquals(1,linker.getLinkCount(d1, d2, null));
+		assertEquals(0,linker.getLinkCount(d1, d3, null));
+		
+		assertEquals(0,linker.getLinkCount(null, d3, linker.getLinkedFilter()));
+		assertEquals(1,linker.getLinkCount(d1, null, linker.getLinkedFilter()));
+		assertEquals(1,linker.getLinkCount(d1, d2, linker.getLinkedFilter()));
+		assertEquals(0,linker.getLinkCount(d1, d3, linker.getLinkedFilter()));
+	}
+	
+	@Test
+	public void testLinkIterator() throws Exception {
+		LinkDummy linker = LinkDummy.getInstance(ctx);
+	    Dummy1.Factory d1_fac = new Dummy1.Factory(ctx);
+	    Dummy2.Factory d2_fac = new Dummy2.Factory(ctx);
+		
+		Dummy1 d1 = new Dummy1(ctx);
+		d1.setName("fred");
+		d1.setNumber(5);
+		d1.commit();
+		Dummy2 d2 = new Dummy2(ctx);
+		d2.setName("boris");
+		d2.setNumber(8);
+		d2.commit();
+		
+		Dummy2 d3 = new Dummy2(ctx);
+		d3.setName("enoch");
+		d3.setNumber(6);
+		d3.commit();
+		assertFalse(linker.isLinked(d1,d2));
+		linker.addLink(d1,d2);
+		
+		Iterator<DummyLink> it = linker.getLinkIterator(d1, null, null, true);
+		assertTrue(it.hasNext());
+		DummyLink link = it.next();
+		assertEquals("fred",link.getDummy1().getName());
+		
+		
+		it = linker.getLinkIterator(d1, null, null, false);
+		assertTrue(it.hasNext());
+		link = it.next();
+		assertEquals("fred",link.getDummy1().getName());
+		
+		it = linker.getLinkIterator(d1, d2, linker.getLinkedFilter(), false);
+		assertTrue(it.hasNext());
+		link = it.next();
+		assertEquals("fred",link.getDummy1().getName());
+		
+		it = linker.getLinkIterator(d1, d3, null, false);
+		assertFalse(it.hasNext());
+		
+	}
+	
 }
