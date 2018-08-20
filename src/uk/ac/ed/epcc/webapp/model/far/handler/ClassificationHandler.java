@@ -63,7 +63,7 @@ public class ClassificationHandler implements QuestionFormHandler<String>, Conte
 	@Override
 	public Input<String> parseConfiguration(Form f) {
 		NameInputProvider fac = (NameInputProvider) f.getItem(TABLE_FIELD);
-		Input<String> input = fac.getNameInput();
+		Input<String> input = (Input<String>) fac.getNameInput();
 		if( input instanceof OptionalInput){
 			return input;
 		}

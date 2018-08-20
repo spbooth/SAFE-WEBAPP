@@ -66,7 +66,7 @@ import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
  */
 
 
-public class ClassificationFactory<T extends Classification> extends DataObjectFactory<T> implements Comparable<ClassificationFactory>, HistoryFieldContributor, NameFinder<T>,NameInputProvider{
+public class ClassificationFactory<T extends Classification> extends DataObjectFactory<T> implements Comparable<ClassificationFactory>, HistoryFieldContributor, NameFinder<T>,NameInputProvider<T>{
 	
 	/** Maximum size of pull-down menu in update form.
 	 * 
@@ -191,6 +191,61 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	
 	protected boolean allowSpacesInName(){
 		return getContext().getBooleanParameter(getConfigTag()+".allow_space_in_name", false);
+	}
+	/**
+	 * @author Stephen Booth
+	 *
+	 */
+	public final class ClassificationCodeListInput extends CodeListInput<T> {
+		/**
+		 * @param fil
+		 */
+		public ClassificationCodeListInput(BaseFilter<T> fil) {
+			super();
+			this.fil = fil;
+		}
+
+		private final BaseFilter<T> fil;
+		public T getItembyValue(String value) {
+			return findFromString(value);
+		}
+
+		public Iterator<T> getItems() {
+			try {
+				return new FilterIterator(fil);
+			} catch (DataFault e) {
+				getContext().error(e,"Error getting item iterator");
+				return null;
+			}
+		}
+
+		public int getCount(){
+			try{
+				return (int) ClassificationFactory.this.getCount(fil);
+			}catch(Exception e){
+				getContext().error(e,"Error getting select count");
+				return 0;
+			}
+		}
+
+		public String getTagByItem(T item) {
+			if( item == null ){
+				return null;
+			}
+			return item.getName();
+		}
+
+		public String getText(T item) {
+			if( item == null){
+				return "No item";
+			}
+			return item.getName();
+		}
+
+		@Override
+		public boolean isValid(T item) {
+			return matches(fil,item);
+		}
 	}
 	/** An {@link DataObjectItemInput} that uses the {@link ParseFactory#findFromString(String)} method to locate
 	 * 
@@ -376,57 +431,11 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	 * 
 	 * @return
 	 */
-	public final Input<String> getNameInput(){
-		return new CodeListInput<T>(){
-
-			public T getItembyValue(String value) {
-				return findFromString(value);
-			}
-
-			public Iterator<T> getItems() {
-				try {
-					return new FilterIterator(getFinalSelectFilter());
-				} catch (DataFault e) {
-					getContext().error(e,"Error getting item iterator");
-					return null;
-				}
-			}
-			public int getCount(){
-				try{
-					return (int) ClassificationFactory.this.getCount(getFinalSelectFilter());
-				}catch(Exception e){
-					getContext().error(e,"Error getting select count");
-					return 0;
-				}
-			}
-
-			public String getTagByItem(T item) {
-				if( item == null ){
-					return null;
-				}
-				return item.getName();
-			}
-
-			public String getText(T item) {
-				if( item == null){
-					return "No item";
-				}
-				return item.getName();
-			}
-
-			@Override
-			public boolean isValid(T item) {
-				
-				try {
-					return exists(new AndFilter<T>(getTarget(), getFinalSelectFilter(),getFilter(item)));
-				} catch (DataException e) {
-					return false;
-				}
-			}
-
-			
-			
-		};
+	public final CodeListInput<T> getNameInput(){
+		return new ClassificationCodeListInput(getFinalSelectFilter());
+	}
+	public final CodeListInput<T> getNameInput(BaseFilter<T> fil){
+		return new ClassificationCodeListInput(fil);
 	}
 	@Override
 	protected Map<String, String> getTranslations() {

@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2016                            |
+//| Copyright - The University of Edinburgh 2018                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -13,14 +13,12 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-
-/**
- * @author spb
+/** Inteface for {@link ItemInput}s where the value is
+ * the canonical name of the item
+ * @author Stephen Booth
+ * @see NameInputProvider
  *
  */
-public interface NameInputProvider<X> {
-	public NameInput<X> getNameInput();
-	
-	public NameInput<X> getNameInput(BaseFilter<X> fil);
+public interface NameInput<T> extends Input<String>, ItemInput<T> {
+
 }

@@ -26,7 +26,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
  *
  * @param <O> type of item
  */
-public abstract class CodeListInput<O> implements ListInput<String,O> {
+public abstract class CodeListInput<O> implements ListInput<String,O>, NameInput<O> {
 
 	private O item=null;
 	private String key=null;
