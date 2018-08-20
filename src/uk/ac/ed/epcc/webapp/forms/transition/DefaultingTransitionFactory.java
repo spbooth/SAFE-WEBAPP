@@ -18,12 +18,12 @@ import uk.ac.ed.epcc.webapp.servlet.ViewTransitionKey;
 /** TransitionProvider that can generate a default transition for a target
  * if no other transition is specified.
  * 
-  * This is incompatible with {@link ViewTransitionFactory} if both interfaces are implemented the
- * view operation will take precedence.
+  * Like {@link ViewTransitionFactory} this defines the operation if no transition is specified for a target. If both interfaces are implemented the
+ * default transition is taken if one is returned but a view transition is considered if {@link #getDefaultTransition(Object)} returns null.
  * 
  * <p> 
  * An default transition should usually not modify state. Consider having the key
- * implement {@link ViewTransitionKey}
+ * implement {@link ViewTransitionKey} if this is not the case.
  * @author spb
  *
  * @param <K>
@@ -34,8 +34,8 @@ public interface DefaultingTransitionFactory<K, T> extends
 
 	/** Get the key for the default transition.
 	 * 
-	 * This method can return null if a sub-class wants to suppress the default transition or if
-	 * there is no valid default for the target.
+	 * This method can return null if a sub-class wants to suppress the default transition, if
+	 * there is no valid default for the target or if a view transition is to be used.
 	 * @param target 
 	 * @return transition key
 	 */

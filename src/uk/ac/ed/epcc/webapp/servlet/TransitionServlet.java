@@ -178,7 +178,16 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			req.removeAttribute(TRANSITION_CSRF_ATTR);
 		}
 		boolean allow_get=false; // allow get method
-		log.debug("transition="+key);
+		if( key == null && target == null && tp instanceof IndexTransitionFactory){
+			// IndexTransitionProvider can generate an index
+			key = ((IndexTransitionFactory<K, T>)tp).getIndexTransition();
+			allow_get=(key != null); // non modifying usually
+		}
+		if( key == null && target != null && tp instanceof DefaultingTransitionFactory){
+			// if we have a target maybe there is a default transition for it.
+			key = ((DefaultingTransitionFactory<K, T>)tp).getDefaultTransition(target);
+			allow_get = (key != null); // non modifying usually
+		}
 		if( key == null){
 			if( target != null && tp instanceof ViewTransitionFactory){
 				log.debug("Redirecting to View page");
@@ -191,24 +200,17 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 					message(conn, req, res, "access_denied");
 				}
 				return;
-			}
-			// IndexTransitionProvider can generate an index
-			if( target == null && tp instanceof IndexTransitionFactory){
-				key = ((IndexTransitionFactory<K, T>)tp).getIndexTransition();
-				allow_get=true; // non modifying usually
-			}else if( target != null && tp instanceof DefaultingTransitionFactory){
-				key = ((DefaultingTransitionFactory<K, T>)tp).getDefaultTransition(target);
-				allow_get = true; // non modifying usually
-			}
-			if( key == null ){
+			}else{
 				log.debug("No transition");
 				message(conn, req, res, "invalid_input");
 				return;
 			}
-			
-		}else if( key instanceof ViewTransitionKey) {
+		}
+		// must have a key here.
+		if( key instanceof ViewTransitionKey) {
 			allow_get = ((ViewTransitionKey<T>)key).isNonModifying(target);
 		}
+		log.debug("transition="+key);
 	    // this is the access control
 		if( ! tp.allowTransition(conn,target,key)){
 			message(conn, req, res, "access_denied");
