@@ -344,21 +344,26 @@ text-align: left;
 }
 /* paragraph within a block add margin at bottom so headers associate with following content
  */
-div.block p,  div.block ul, div.block pre, div.block div.para, div.block table{
+div.block p,  div.block ul, div.block ol, div.block pre, div.block div.para, div.block table{
 text-align: left;
 
 }
 /* block content not including table
  */
-div.block p,  div.block ul, div.block pre, div.block div.para{
+div.block p,  div.block ul,  div.block pre, div.block div.para{
 margin: 0px 0px 6px 0px;
 background-color: #e7e7e7;
 color: black;
 padding: 8px;
 display: block;
 }
+div.block ol {
+	margin: 0px 0px 6px 0px;
+background-color: white;
+color: black;
+}
 /* no margin inside table */
-div.block td p,  div.block  td ul, div.block  td pre, div.block  td div.para{
+div.block td p,  div.block  td ul, div.block td ol, div.block  td pre, div.block  td div.para{
 margin: 0px 0px 0px 0px;
 }
 div.block ul{
@@ -455,7 +460,7 @@ details div.description{
 	 font-size: small;
 }
 
-div td, div table.auto td form , div.block td ul{
+div td, div table.auto td form , div.block td ul, div.block td ol{
         background-color: #ffffff;
 }
 td.numeric, td[numeric] ,  td.numeric input, {

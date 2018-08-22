@@ -121,6 +121,14 @@ public interface ContentBuilder {
 	 */
 	public abstract <X> void addList(Iterable<X> list);
 	
+	/** add a numbered list of objects to the content.
+	 * Any {@link UIGenerator}s will generate their content otherwise 
+	 * a suitable text representation will be used.
+	 * 
+	 * @param list
+	 */
+	public abstract <X> void addNumberedList(int start,Iterable<X> list);
+	
 	/** add a bullet list of objects to the content.
 	 * Any {@link UIGenerator}s will generate their content otherwise 
 	 * a suitable text representation will be used.

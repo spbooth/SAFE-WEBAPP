@@ -621,6 +621,17 @@ public <X> void addList(Map<String,String> attr,Iterable<X> list) {
 	close();
 	clean("\n");
 }
+public <X> void addNumberedList(int start,Iterable<X> list) {
+	open("ol");
+	attr("start",Integer.toString(start));
+	for(X target : list){
+		open("li");
+		addObject(target);
+		close();
+	}
+	close();
+	clean("\n");
+}
 
 
 /**

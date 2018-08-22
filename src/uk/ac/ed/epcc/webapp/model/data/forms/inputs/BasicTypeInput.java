@@ -17,13 +17,14 @@
 package uk.ac.ed.epcc.webapp.model.data.forms.inputs;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.forms.inputs.NameInput;
 import uk.ac.ed.epcc.webapp.model.data.BasicType;
 
 
 
 
 
-public class BasicTypeInput<T extends BasicType.Value> extends TypeProducerInput<T>  {
+public class BasicTypeInput<T extends BasicType.Value> extends TypeProducerInput<T>  implements NameInput<T>{
 
 	public BasicTypeInput(BasicType<T> t) {
 		super(t); 

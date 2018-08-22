@@ -119,7 +119,18 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 		}
 		
 	}
-
+	@Override
+	public <X> void addNumberedList(int start,Iterable<X> list) {
+		sb.append("\n");
+		int i=start;
+		for(X item : list){
+			sb.append(Integer.toString(i++));
+			sb.append(": ");
+			addObject(item);
+			sb.append("\n");
+		}
+		
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addList(java.lang.Object[])
 	 */

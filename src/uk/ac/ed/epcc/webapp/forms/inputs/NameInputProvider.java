@@ -14,12 +14,14 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.model.NameFinder;
+import uk.ac.ed.epcc.webapp.model.data.DataObject;
 
 /**
  * @author spb
  *
  */
-public interface NameInputProvider<X> {
+public interface NameInputProvider<X extends DataObject> extends NameFinder<X> {
 	public NameInput<X> getNameInput();
 	
 	public NameInput<X> getNameInput(BaseFilter<X> fil);

@@ -736,5 +736,13 @@ public class SwingContentBuilder  implements ContentBuilder{
 		addObject(summary_text);
 		return getPanel();
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addNumberedList(int, java.lang.Iterable)
+	 */
+	@Override
+	public <X> void addNumberedList(int start, Iterable<X> list) {
+		addList(list);
+		
+	}
 
 }
