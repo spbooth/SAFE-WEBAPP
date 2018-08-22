@@ -162,7 +162,7 @@ public class RealNameComposite<AU extends AppUser> extends AppUserComposite<AU, 
 				
 				res = first1.compareToIgnoreCase(first2);
 			}
-			return 0;
+			return res;
 		}
 		
 	}
