@@ -426,9 +426,9 @@ AccessRoleProvider<AU, AU>
 			return map.values().iterator().next();
 		}
 		AppUserNameFinder finder = map.get(realm);
-		if( finder != null ){
-			getLogger().debug("realm "+realm+" -> "+finder.getClass().getCanonicalName());
-		}
+//		if( finder != null ){
+//			getLogger().debug("realm "+realm+" -> "+finder.getClass().getCanonicalName());
+//		}
 		return finder;
 	}
 	

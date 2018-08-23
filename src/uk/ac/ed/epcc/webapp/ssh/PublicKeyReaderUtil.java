@@ -118,9 +118,12 @@ public final class PublicKeyReaderUtil
         final String base64;
 
         if (c == 's')  {
-        	_key = _key.replaceAll("\\s*\n\\s*", ""); // remove spurious newlines from cut-paste        
+        	_key = _key.replaceAll("\\s*[\n\r]\\s*", ""); // remove spurious newline/carridge-return and associates space from cut-paste        
             base64 = PublicKeyReaderUtil.extractOpenSSHBase64(_key);
         } else if (c == '-')  {
+        	if( _key.contains("PRIVATE KEY")) {
+        		throw new PublicKeyParseException(PublicKeyParseException.ErrorCode.UNEXPECTED_PRIVATE_KEY); 
+        	}
             base64 = PublicKeyReaderUtil.extractSecSHBase64(_key);
         } else {
             throw new PublicKeyParseException(
@@ -601,8 +604,10 @@ public final class PublicKeyReaderUtil
             /**
              * @see PublicKeyReaderUtil.SSH2DataBuffer#readByteArray()
              */
-            CORRUPT_BYTE_ARRAY_ON_READ("Corrupt byte array on read");
+            CORRUPT_BYTE_ARRAY_ON_READ("Corrupt byte array on read"),
 
+        	
+        	UNEXPECTED_PRIVATE_KEY("Private key where public key expected");
             /**
              * English message of the error code.
              */
