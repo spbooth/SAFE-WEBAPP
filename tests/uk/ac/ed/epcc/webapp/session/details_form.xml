@@ -27,10 +27,10 @@
 </tr>
 <tr class="even">
 <th>
-<label for="transition_Firstname" class="optional">First Name</label>
+<label for="transition_Firstname" class="required">First Name</label>
 </th>
 <td>
-<input id="transition_Firstname" type="text" size="32" maxlength="32" name="Firstname" class="input"/>
+<input id="transition_Firstname" type="text" size="32" maxlength="32" name="Firstname" class="input" required="required"/>
 </td>
 </tr>
 <tr class="odd">
@@ -43,10 +43,37 @@
 </tr>
 <tr class="even">
 <th>
-<label for="transition_Lastname" class="optional">Last Name</label>
+<label for="transition_Lastname" class="required">Last Name</label>
 </th>
 <td>
-<input id="transition_Lastname" type="text" size="32" maxlength="32" name="Lastname" class="input"/>
+<input id="transition_Lastname" type="text" size="32" maxlength="32" name="Lastname" class="input" required="required"/>
+</td>
+</tr>
+<tr class="odd">
+<th>
+<label for="transition_PublicKey.Text" class="required">SSH Public key</label>
+</th>
+<td>
+<table class="multi_input">
+<tr>
+<td>
+<input id="transition_PublicKey.Text" type="text" size="48" maxlength="4096" name="PublicKey.Text" class="input"/>
+</td>
+</tr>
+<tr>
+<td>
+<input id="transition_PublicKey.File" type="file" name="PublicKey.File" class="input"/>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr class="even">
+<th>
+<label for="transition_PersonalCertificate" class="optional" title="This is the DN of your default X509 certificate for use with Globus or GridFTP">PersonalCertificate</label>
+</th>
+<td>
+<input id="transition_PersonalCertificate" type="text" size="64" maxlength="256" name="PersonalCertificate" class="input"/>
 </td>
 </tr>
 </table>

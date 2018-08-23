@@ -945,4 +945,8 @@ AccessRoleProvider<AU, AU>
 		}
 		return false;
 	}
+	@Override
+	protected Set<String> getOptional() {
+		return new HashSet<>();
+	}
 }

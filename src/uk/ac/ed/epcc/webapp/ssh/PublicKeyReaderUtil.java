@@ -118,7 +118,7 @@ public final class PublicKeyReaderUtil
         final String base64;
 
         if (c == 's')  {
-        	_key = _key.replaceAll("\\s*[\n\r]\\s*", ""); // remove spurious newline/carridge-return and associates space from cut-paste        
+        	//_key = _key.replaceAll("\\s*[\n\r]\\s*", ""); // remove spurious newline/carridge-return and associates space from cut-paste        
             base64 = PublicKeyReaderUtil.extractOpenSSHBase64(_key);
         } else if (c == '-')  {
         	if( _key.contains("PRIVATE KEY")) {
@@ -209,7 +209,16 @@ public final class PublicKeyReaderUtil
         try {
             final StringTokenizer st = new StringTokenizer(_key);
             st.nextToken();
-            base64 = st.nextToken();
+            StringBuilder sb =new StringBuilder();
+            sb.append(st.nextToken());
+            while( st.hasMoreTokens()) {
+            	sb.append(st.nextToken());
+            }
+            base64 = sb.toString();
+            if( base64.isEmpty()) {
+            	throw new PublicKeyParseException(
+                        PublicKeyParseException.ErrorCode.CORRUPT_OPENSSH_PUBLIC_KEY_STRING);
+            }
         } catch (final NoSuchElementException e) {
             throw new PublicKeyParseException(
                     PublicKeyParseException.ErrorCode.CORRUPT_OPENSSH_PUBLIC_KEY_STRING);

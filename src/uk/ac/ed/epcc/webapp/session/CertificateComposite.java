@@ -73,7 +73,7 @@ public class CertificateComposite extends AppUserComposite<AppUser, CertificateC
 
 	private static final Feature OPTIONAL_CERTIFICATE_FEATURE = new Feature("optional.person-certificate",true,"Are personal certificates optional");
 	private static final Feature NOTIFY_CERTIFICATE_CHANGE_FEATURE = new Feature("person.notify-certificate-change",false,"Generate notify ticket if user changes certificate DN");
-	private static final String PERSONAL_CERTIFICATE = "PersonalCertificate";
+	public static final String PERSONAL_CERTIFICATE = "PersonalCertificate";
 
 	public CertificateComposite(AppUserFactory fac) {
 		super(fac);

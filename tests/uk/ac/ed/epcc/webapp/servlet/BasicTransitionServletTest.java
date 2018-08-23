@@ -174,4 +174,22 @@ public final class BasicTransitionServletTest extends AbstractTransitionServletT
 		runTransition();
 		checkMessage("access_denied");
 	}
+	
+	@Test
+	public void testTargetLessDirect() throws DataFault, DataException, TransitionException, ServletException, IOException {
+		setupUser();
+		TestTransitionProvider provider = new TestTransitionProvider(ctx);
+		setTransition(provider, TestTransitionProvider.THREE_KEY, null);
+		runTransition();
+		checkViewRedirect(provider, 3);
+	}
+	
+	@Test
+	public void testChainedDirect() throws DataFault, DataException, TransitionException, ServletException, IOException {
+		setupUser();
+		TestTransitionProvider provider = new TestTransitionProvider(ctx);
+		setTransition(provider, TestTransitionProvider.DUAL_ADD_KEY, 1);
+		runTransition();
+		checkViewForward(provider, 3);
+	}
 }

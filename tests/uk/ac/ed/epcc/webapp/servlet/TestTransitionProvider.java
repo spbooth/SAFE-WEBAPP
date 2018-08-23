@@ -23,12 +23,15 @@ import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
+import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTargetlessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.AbstractTargetLessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractTransitionProvider;
+import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -40,7 +43,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 
-public class TestTransitionProvider extends AbstractTransitionProvider<Number, TransitionKey<Number>> implements ViewTransitionProvider<TransitionKey<Number>, Number>{
+public class TestTransitionProvider extends AbstractViewTransitionProvider<Number, TransitionKey<Number>> implements ViewTransitionProvider<TransitionKey<Number>, Number>{
 
 	/**
 	 * 
@@ -55,7 +58,13 @@ public class TestTransitionProvider extends AbstractTransitionProvider<Number, T
 	 */
 	public static final TransitionKey<Number> ADD_KEY = new TransitionKey<Number>(Number.class, "Add");
 	
+	public static final TransitionKey<Number> DUAL_ADD_KEY = new TransitionKey<Number>(Number.class, "DualAdd");
+
 	public static final TransitionKey<Number> CONFIRM_ADD_KEY = new TransitionKey<Number>(Number.class, "ConfirmAdd");
+	
+	public static final TransitionKey<Number> THREE_KEY = new TransitionKey<Number>(Number.class,"Three");
+	
+	public static final TransitionKey<Number> SET_KEY = new TransitionKey<Number>(Number.class,"Set");
 	/**
 	 * 
 	 */
@@ -75,15 +84,41 @@ public class TestTransitionProvider extends AbstractTransitionProvider<Number, T
 		}
     	
     }
+    private class SetAction extends FormAction{
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#action(uk.ac.ed.epcc.webapp.forms.Form)
+		 */
+		@Override
+		public FormResult action(Form f) throws ActionException {
+			
+			return new ViewResult((Number)f.get(VALUE));
+		}
+    	
+    }
 	/**
 	 * @param c
 	 */
 	public TestTransitionProvider(AppContext c) {
 		super(c);
+		addTransition(THREE_KEY,new AbstractDirectTargetlessTransition<Number>() {
+
+			@Override
+			public FormResult doTransition(AppContext c) throws TransitionException {
+				
+				return new ViewResult(Integer.valueOf(3));
+			}
+		});
 		addTransition(ADD_KEY, new AbstractDirectTransition<Number>() {
 			public FormResult doTransition(Number target, AppContext c)
 					throws TransitionException {
 				return new ChainedTransitionResult<Number, TransitionKey<Number>>(TestTransitionProvider.this, target.intValue()+1, null);
+			}
+		});
+		addTransition(DUAL_ADD_KEY, new AbstractDirectTransition<Number>() {
+			public FormResult doTransition(Number target, AppContext c)
+					throws TransitionException {
+				return new ChainedTransitionResult<Number, TransitionKey<Number>>(TestTransitionProvider.this, target.intValue()+1, ADD_KEY);
 			}
 		});
 		addTransition(FORM_ADD_KEY, new AbstractFormTransition<Number>() {
@@ -108,6 +143,14 @@ public class TestTransitionProvider extends AbstractTransitionProvider<Number, T
 					}
 				}	
 			));
+		addTransition(SET_KEY, new AbstractTargetLessTransition<Number>() {
+
+			@Override
+			public void buildForm(Form f, AppContext c) throws TransitionException {
+				f.addInput(VALUE, VALUE, new IntegerInput());
+				f.addAction("Set", new SetAction());
+			}
+		});
 	}
 
 	/* (non-Javadoc)
@@ -136,6 +179,9 @@ public class TestTransitionProvider extends AbstractTransitionProvider<Number, T
 	 */
 	public boolean allowTransition(AppContext c, Number target,
 			TransitionKey<Number> key) {
+		if(target == null) {
+			return key == THREE_KEY || key == SET_KEY;
+		}
 		return target.intValue() < MAX_ALLOWED ;
 	}
 

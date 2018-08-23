@@ -219,6 +219,12 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 		checkFormContent(null, "details_form.xml");
 		addParam(RealNameComposite.FIRSTNAME,"Albert");
 		addParam(RealNameComposite.LASTNAME,"Spangler");
+		addParam(CertificateComposite.PERSONAL_CERTIFICATE,"/c=UK/o=eScience/ou=Edinburgh/l=NeSC/cn=stephen booth");
+		addParam(PublicKeyComposite.PUBLIC_KEY,"ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQBRQkTnsRzUM9mLrgEMFk78CLdOxtepxPp1JQSfRc3/A1cy\n"+
+				"D8NV/gxINRNhMIVkIofUexxtLfAfmNRf666SSei/w2kPX9ndOJ32y2OUUKkijJvEdeMEuFido9Kifc79\n"+
+				"p0q1KcOhAdRNmmE+LriqsbhJJVQz0OeOKw7wPN9KNYfTevZleQAJBRKr99rBgyRrtrXBhnjYu3yb8E/l\n"+
+				"f4g8MiBuLGcezzi310RwKMFnamr6MTbA3KBvgvFrPmsjVyedn1IyMdgQ0x8OZMQbr6hesvnR8HuKYfFt\n"+
+				"m4Vjx7bS+Dyqn+PlPrWH/fjs1957fe57gtZ9eM2S0lsv5cagcWghPAZP rsa-key-20110308");
 		runTransition();
 		checkMessage("object_updated");
 		checkDiff("/cleanup.xsl", "details.xml");
