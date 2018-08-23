@@ -31,6 +31,7 @@ import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.HourTransform;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FatalTransitionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.html.DirectOperationResultVisitor;
 import uk.ac.ed.epcc.webapp.forms.result.BackResult;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
@@ -398,8 +399,17 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	protected FormResult processTransition(AppContext conn,
 			HttpServletRequest req, Map<String, Object> params,
 			TransitionFactory<K, T> tp, K key, T target, Transition<T> t)
-			throws TransitionException {
-		  return t.getResult(new ServletTransitionVisitor<K, T>(conn, req, key, tp, target, params));
+					throws Exception {
+		FormResult result = t.getResult(new ServletTransitionVisitor<K, T>(conn, req, key, tp, target, params));
+		if( result != null) {
+			// execute any direct transitions we can.
+			// This avoids getting a submit-only form when direct transitions chain
+			// and places a chain of direct transitions into a single transaction
+			DirectOperationResultVisitor vis = new DirectOperationResultVisitor(conn);
+			result.accept(vis);
+			return vis.getFinalResult();
+		}
+		return null;
 	}
 	/** Extension point to get the session including any custom login code based on the parameters.
 	 * This allows sub-classes to that parse the parameters for login credentials
