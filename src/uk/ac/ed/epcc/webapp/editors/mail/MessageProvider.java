@@ -36,19 +36,35 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  */
 public interface MessageProvider {
 
+	/** set the {@link MimeMessage} to store
+	 * 
+	 * @param m
+	 */
 	public abstract void setMessage(MimeMessage m);
 
+	/** get the {@link MimeMessage}
+	 * 
+	 * @return
+	 * @throws DataFault
+	 * @throws MessagingException
+	 */
 	public abstract MimeMessage getMessage() throws DataFault,
 			MessagingException;
 
+	/** get a hash for the message
+	 * 
+	 * @return
+	 */
 	public abstract int getMessageHash();
 	public abstract String getSubject();
 
 	public abstract String getRecipients();
 
 	public abstract String getSender();
-	public abstract boolean editRecipients();
-	public abstract boolean bccOnly();
-	public abstract boolean allowNewAttachments();
+	/** persist message to database
+	 * 
+	 * @return true if changed
+	 * @throws DataFault
+	 */
     public boolean commit() throws DataFault;
 }

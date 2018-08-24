@@ -117,19 +117,5 @@ public class MessageData extends MessageDataObject implements MessageProvider , 
 		return dat;
 	}
 
-	public boolean editRecipients() {
-		return false;
-	}
-
-	public boolean allowNewAttachments() {
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#bccOnly()
-	 */
-	@Override
-	public boolean bccOnly() {
-		return false;
-	}
+	
 }

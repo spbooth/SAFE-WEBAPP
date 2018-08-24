@@ -33,13 +33,19 @@ import uk.ac.ed.epcc.webapp.editors.mail.MessageWalker.WalkerException;
 
 
 public class EditMessageVisitor extends ContentMessageVisitor {
-	
+	private boolean see_bcc=true;
 	private boolean edit_recipients=false;
 	private boolean allow_new_attachments=false;
 	
 
 	public void editRecipients(boolean val){
 		edit_recipients=val;
+	}
+	public void seeBcc(boolean val) {
+		see_bcc=val;
+	}
+	public boolean showBcc() {
+		return edit_recipients || see_bcc;
 	}
 	public void allowNewAttachments(boolean val){
 		allow_new_attachments=val;
@@ -171,7 +177,7 @@ public class EditMessageVisitor extends ContentMessageVisitor {
 		}
 	 @Override
 		public void doBCC(Address recipients, int i, int len,MessageWalker w) throws WalkerException {
-			
+			if( showBcc()) {
 			if( ! w.isSubMessage() && edit_recipients){
 				sb=sb.getHeading(4);
 				addButton(w,EditAction.Delete, "Delete recipient");
@@ -183,14 +189,17 @@ public class EditMessageVisitor extends ContentMessageVisitor {
 			}else{
 				super.doBCC(recipients, i, len,w);
 			}
+			}
 		}
 	 @Override
 		public void doBCC(Address[] cc, MessageWalker w)
 				throws WalkerException {
-		 if( ! w.isSubMessage() && ! edit_recipients){
-			 formatList("BCC", cc);
-		 }else{
-			super.doBCC(cc, w);
+		 if( showBcc()) {
+			 if( ! w.isSubMessage() && ! edit_recipients){
+				 formatList("BCC", cc);
+			 }else{
+				 super.doBCC(cc, w);
+			 }
 		 }
 		}
 		@Override

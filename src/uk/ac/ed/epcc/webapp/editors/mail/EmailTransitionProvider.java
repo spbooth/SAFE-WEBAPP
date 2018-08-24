@@ -246,18 +246,19 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		 */
 		public void buildForm(Form f, MailTarget target, AppContext conn)
 				throws TransitionException {
+			MessageComposer composer =null;
 			MessageProvider messageProvider = null;
-			
 			try {
-				messageProvider= target.getHandler().getMessageProvider();
+				composer = (MessageComposer) target.getHandler();
+				messageProvider= composer.getMessageProvider();
 			} catch (Exception e) {
 				getLogger().error("Error getting messageProvider", e);
 			}
-			if( messageProvider != null &&  ! messageProvider.editRecipients() ) {
+			if( messageProvider != null &&  ! composer.editRecipients() ) {
 				throw new TransitionException("Editing recipients not allowed");
 			}
 			f.addInput(DATA_FORM_FIELD, "Recipient Email", ((MessageComposer)target.getHandler()).getEmailInput());
-			if( messageProvider == null || ! messageProvider.bccOnly()) {
+			if( messageProvider == null || ! composer.bccOnly()) {
 				f.addAction(EditAction.AddCC.toString(), new EditFormAction(target, EditAction.AddCC));
 				f.addAction(EditAction.AddTo.toString(), new EditFormAction(target, EditAction.AddTo));
 			}

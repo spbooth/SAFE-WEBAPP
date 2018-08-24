@@ -155,14 +155,17 @@ public	void endMessage(MimePart parent, MimeMessage m, MessageWalker messageWalk
     * @throws MessageWalker.WalkerException
     */
 	void doCC(Address address, int i, int length, MessageWalker messageWalker)throws MessageWalker.WalkerException;
-	/** process the BCC fields
+	/** process all the BCC addresses
+	 * This is called first then {@link #doBCC(Address, int, int, MessageWalker)}
+	 * is called for each address.
 	 * 
 	 * @param cc
 	 * @param messageWalker
 	 * @throws MessageWalker.WalkerException
 	 */
 	void doBCC(Address[] cc, MessageWalker messageWalker)throws MessageWalker.WalkerException;
-   /** process a single BCC field
+   /** process a single BCC field.
+    * These are called in turn after the call to {@link #doBCC(Address[], MessageWalker)}
     * 
     * @param address
     * @param i

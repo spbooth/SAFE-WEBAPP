@@ -78,5 +78,8 @@ public interface MessageComposer extends MessageHandler{
 	 * @return Input<String>
 	 */
 	public Input<String> getEmailInput();
-   
+	public abstract boolean editRecipients();
+	public abstract boolean showBcc();
+	public abstract boolean bccOnly();
+	public abstract boolean allowNewAttachments();
 }

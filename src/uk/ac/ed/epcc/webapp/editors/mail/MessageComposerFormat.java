@@ -78,8 +78,9 @@ public class MessageComposerFormat {
 		EditMessageVisitor v = new EditMessageVisitor(conn,sb,lk);
 		MessageWalker mw = new MessageWalker(conn);
 		MessageProvider messageProvider = composer.getMessageProvider();
-		v.editRecipients(messageProvider.editRecipients());
-		v.allowNewAttachments(messageProvider.allowNewAttachments());
+		v.editRecipients(composer.editRecipients());
+		v.seeBcc(composer.showBcc());
+		v.allowNewAttachments(composer.allowNewAttachments());
 		mw.visitMessage(messageProvider.getMessage(),v);
 		}catch(Exception e){
 			getLogger().error("Error getting Edit HTML",e);

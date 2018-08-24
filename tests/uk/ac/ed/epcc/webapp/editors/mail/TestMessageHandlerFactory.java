@@ -143,37 +143,17 @@ public class TestMessageHandlerFactory implements MessageHandlerFactory{
 			}
 			return "Unknown";
 		}
-		
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#editRecipients()
-		 */
-		public boolean editRecipients() {
-			return true;
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#allowNewAttachments()
-		 */
-		public boolean allowNewAttachments() {
-			return true;
-		}
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#commit()
 		 */
+		@Override
 		public boolean commit() throws DataFault {
 			// TODO Auto-generated method stub
 			return false;
 		}
+		
 
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#bccOnly()
-		 */
-		@Override
-		public boolean bccOnly() {
-			return false;
-		}
 		
 	}
 	private class TestComposer implements MessageComposer{
@@ -304,6 +284,36 @@ public class TestMessageHandlerFactory implements MessageHandlerFactory{
 		@Override
 		public Input<String> getEmailInput() {
 			return new EmailInput();
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#editRecipients()
+		 */
+		public boolean editRecipients() {
+			return true;
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#allowNewAttachments()
+		 */
+		public boolean allowNewAttachments() {
+			return true;
+		}
+
+		
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#bccOnly()
+		 */
+		@Override
+		public boolean bccOnly() {
+			return false;
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageComposer#showBcc()
+		 */
+		@Override
+		public boolean showBcc() {
+			return true;
 		}
 		
 	}

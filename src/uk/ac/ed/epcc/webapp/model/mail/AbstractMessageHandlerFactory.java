@@ -102,30 +102,7 @@ public abstract class AbstractMessageHandlerFactory<H extends AbstractMessageHan
 		
 
 
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#editRecipients()
-		 */
-		@Override
-		public boolean editRecipients() {
-			return true;
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#bccOnly()
-		 */
-		@Override
-		public boolean bccOnly() {
-			return false;
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#allowNewAttachments()
-		 */
-		@Override
-		public boolean allowNewAttachments() {
-			return true;
-		}
-
+		
 		/**
 		 * @param val
 		 */
@@ -276,7 +253,38 @@ public abstract class AbstractMessageHandlerFactory<H extends AbstractMessageHan
 		public Input<String> getEmailInput() {
 			return new EmailInput();
 		}
-		
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#editRecipients()
+		 */
+		@Override
+		public boolean editRecipients() {
+			return true;
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#bccOnly()
+		 */
+		@Override
+		public boolean bccOnly() {
+			return false;
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#allowNewAttachments()
+		 */
+		@Override
+		public boolean allowNewAttachments() {
+			return true;
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageComposer#showBcc()
+		 */
+		@Override
+		public boolean showBcc() {
+			return true;
+		}
+
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageHandlerFactory#getHandler(int, uk.ac.ed.epcc.webapp.session.SessionService)
