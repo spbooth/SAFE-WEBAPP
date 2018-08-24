@@ -192,16 +192,21 @@ public class EditMessageVisitor extends ContentMessageVisitor {
 			}
 		}
 	 @Override
-		public void doBCC(Address[] cc, MessageWalker w)
-				throws WalkerException {
-		 if( showBcc()) {
-			 if( ! w.isSubMessage() && ! edit_recipients){
+	 public void doBCC(Address[] cc, MessageWalker w)
+			 throws WalkerException {
+
+		 if( ! w.isSubMessage() && ! edit_recipients){
+			 if( showBcc()) {
 				 formatList("BCC", cc);
-			 }else{
-				 super.doBCC(cc, w);
+			 }else {
+				 // Just show the count
+				 doHeader("BCC", ""+cc.length+" recipients");
 			 }
+		 }else{
+			 super.doBCC(cc, w);
 		 }
-		}
+
+	 }
 		@Override
 		public void doCC(Address[] cc, MessageWalker w)
 				throws WalkerException {
