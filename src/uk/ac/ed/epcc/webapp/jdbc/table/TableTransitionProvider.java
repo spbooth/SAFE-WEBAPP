@@ -29,9 +29,8 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
-
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.Table;
@@ -70,7 +69,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 
 
-public class TableTransitionProvider  implements ViewTransitionProvider<TableTransitionKey,DataObjectFactory>, IndexTransitionProvider<TableTransitionKey, DataObjectFactory>,Contexed{
+public class TableTransitionProvider  extends AbstractContexed implements ViewTransitionProvider<TableTransitionKey,DataObjectFactory>, IndexTransitionProvider<TableTransitionKey, DataObjectFactory>{
 	
 	public static final Feature UPLOAD_XML_FEATURE = new Feature("table_transition.upload_xml",false,"Allow XML tables to be uploaded via a transition");
     /**
@@ -153,10 +152,8 @@ public class TableTransitionProvider  implements ViewTransitionProvider<TableTra
 	static final TableTransitionKey ADD_STD_FIELD = new TableStructureAdminOperationKey("Add Std field","Add missing fields from the default table specification for this class");
 	static final TableTransitionKey DROP_OPTIONAL_FIELD =new TableStructureAdminOperationKey("Drop optional field","Drop optional existing field");
 
-	private final AppContext conn;
     public TableTransitionProvider(AppContext conn){
-    	this.conn=conn;
-    	
+    	super(conn);
     }
     
     private Map<TableTransitionKey,Transition> getTransitionMap(DataObjectFactory target){
@@ -395,15 +392,4 @@ public class TableTransitionProvider  implements ViewTransitionProvider<TableTra
 		}
 		return null;
 	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public AppContext getContext() {
-		return conn;
-	}
-	
-
-	
 }

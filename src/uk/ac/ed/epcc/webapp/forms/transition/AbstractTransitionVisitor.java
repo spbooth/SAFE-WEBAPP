@@ -13,21 +13,19 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.transition;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
-public abstract class AbstractTransitionVisitor<K,T> implements TransitionVisitor<T>, Contexed {
-	protected final AppContext conn;
+public abstract class AbstractTransitionVisitor<K,T> extends AbstractContexed implements TransitionVisitor<T> {
+	
 	protected final K tag;
 	protected final TransitionFactory<K, T> provider;
 	protected final T target;
 	public AbstractTransitionVisitor(AppContext conn, K tag,
 			TransitionFactory<K, T> tp, T target) {
-		this.conn=conn;
+		super(conn);
 		this.tag=tag;
 		this.provider=tp;
 		this.target=target;
@@ -41,10 +39,5 @@ public abstract class AbstractTransitionVisitor<K,T> implements TransitionVisito
 	public FormResult doDirectTargetlessTransition(DirectTargetlessTransition<T> t) throws TransitionException {
 		return t.doTransition(conn);
 	}
-	public AppContext getContext() {
-		return conn;
-	}
-	protected Logger getLogger(){
-		return conn.getService(LoggerService.class).getLogger(getClass());
-	}
+	
 }

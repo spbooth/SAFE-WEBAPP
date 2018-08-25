@@ -26,13 +26,12 @@ import java.util.LinkedHashSet;
  * @author spb
  *
  */
-public class CleanupService implements AppContextService<CleanupService> , Contexed{
+public class CleanupService extends AbstractContexed implements AppContextService<CleanupService>{
 
-	private final AppContext conn;
 	private final LinkedHashSet<Runnable> actions;
 	
 	public CleanupService(AppContext conn){
-		this.conn = conn;
+		super(conn);
 		this.actions=new LinkedHashSet<Runnable>();
 	}
 	/** Add a {@link Runnable} to the set of actions performed on cleanup.
@@ -89,12 +88,6 @@ public class CleanupService implements AppContextService<CleanupService> , Conte
 	public final Class<? super CleanupService> getType() {
 		return CleanupService.class;
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public AppContext getContext() {
-		return conn;
-	}
+	
 
 }

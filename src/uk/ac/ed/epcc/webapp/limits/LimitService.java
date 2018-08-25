@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.limits;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Contexed;
@@ -24,19 +25,10 @@ import uk.ac.ed.epcc.webapp.Contexed;
  * @author Stephen Booth
  *
  */
-public abstract class LimitService implements AppContextService<LimitService>, Contexed {
-
-	private final AppContext conn;
+public abstract class LimitService extends AbstractContexed implements AppContextService<LimitService> {
 	
 	public LimitService(AppContext conn) {
-		this.conn=conn;
-	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public final AppContext getContext() {
-		return conn;
+		super(conn);
 	}
 
 	/** Estimate the resources used by this request and throw a {@link LimitException}

@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.model.serv;
 import java.util.Calendar;
 import java.util.Date;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener;
@@ -27,13 +28,11 @@ import uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener;
  *
  */
 
-public class DataProducerHeartbeatListener implements Contexed, HeartbeatListener {
+public class DataProducerHeartbeatListener extends AbstractContexed implements HeartbeatListener {
 
 	public DataProducerHeartbeatListener(AppContext conn) {
-		super();
-		this.conn = conn;
+		super(conn);
 	}
-	private final AppContext conn;
 	private Date next_run=null;
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener#run()
@@ -55,12 +54,4 @@ public class DataProducerHeartbeatListener implements Contexed, HeartbeatListene
 		}
 		return next_run;
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public AppContext getContext() {
-		return conn;
-	}
-
 }

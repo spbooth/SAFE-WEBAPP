@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.log;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
@@ -24,12 +25,12 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
  */
 
 
-public class LogTransitionProviderFactory implements
+public class LogTransitionProviderFactory extends AbstractContexed implements
 		TransitionFactoryCreator<LogTransitionProvider>, Contexed{
 
-	private final AppContext conn;
+	
 	public LogTransitionProviderFactory(AppContext c){
-		conn=c;
+		super(c);
 	}
 	public LogTransitionProvider getTransitionProvider(String tag) {
 		LogOwner<?> owner = conn.makeObject(LogOwner.class, tag);
@@ -37,9 +38,6 @@ public class LogTransitionProviderFactory implements
 			return owner.getLogFactory().getTransitionProvider();
 		}
 		return null;
-	}
-	public AppContext getContext() {
-		return conn;
 	}
 
 }

@@ -15,8 +15,8 @@ package uk.ac.ed.epcc.webapp.apps;
 
 import java.util.LinkedList;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.session.RandomService;
 
 /** A {@link Command} that generates a random password
@@ -24,22 +24,14 @@ import uk.ac.ed.epcc.webapp.session.RandomService;
  * @author spb
  *
  */
-public class GetRandomPassword implements Command, Contexed {
+public class GetRandomPassword extends AbstractContexed implements Command {
 
-	private final AppContext conn;
+	
 	/**
 	 * 
 	 */
 	public GetRandomPassword(AppContext conn) {
-		this.conn=conn;
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public AppContext getContext() {
-		return conn;
+		super(conn);
 	}
 
 	/* (non-Javadoc)

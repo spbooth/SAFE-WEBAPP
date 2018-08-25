@@ -26,12 +26,10 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimePart;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageWalker.WalkerException;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 /** Implementation of the Visitor interface with default implementations of methods to
  * make it easier to produce classes that implement the interface correctly.
  * 
@@ -42,7 +40,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  */
 
 
-public class AbstractVisitor implements Visitor, Contexed {
+public class AbstractVisitor extends AbstractContexed implements Visitor {
 
 	/**
 	 * 
@@ -53,14 +51,12 @@ public class AbstractVisitor implements Visitor, Contexed {
 	 * @param conn
 	 */
 	public AbstractVisitor(AppContext conn) {
-		super();
-		this.conn = conn;
+		super(conn);
 	}
 
 	private static final int MAX_TEXT_LINE = 80;
 	public static final Feature EMAIL_WRAP_FEATURE = new Feature("email.edit.wrap", false, "Automatically apply wrapping when editing email text");
 	
-	private final AppContext conn;
 	
 	public void doCC(Address[] cc, MessageWalker messageWalker)
 			throws WalkerException {
@@ -200,17 +196,6 @@ public void doBCC(Address address, int i, int length,
 			 return text;
 		 }
 	    }
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public final AppContext getContext() {
-		return conn;
-	}
-	protected final Logger getLogger(){
-		return conn.getService(LoggerService.class).getLogger(getClass());
-	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.editors.mail.Visitor#visitHeaders()

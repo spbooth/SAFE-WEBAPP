@@ -33,6 +33,8 @@ import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
 
 
 public class FileInput extends AbstractInput<StreamData> {
+	// pattern for accepted mime types
+	private String accept=null;
     long max_upload=0;
     /** Set the maximum upload size for this input.
      * 
@@ -60,8 +62,12 @@ public class FileInput extends AbstractInput<StreamData> {
 			}
 			if (o instanceof StreamData ) {
 				StreamData sd = (StreamData)o;
-				if( max_upload > 0 && sd.getLength() > max_upload){
+				long length = sd.getLength();
+				if( max_upload > 0 && length > max_upload){
 					throw new ValidateException("Upload size greater than allowed maximum "+max_upload);
+				}
+				if( length == 0 && ! isOptional()) {
+					throw new ValidateException("Zero length file");
 				}
 				return;
 			}
@@ -71,6 +77,18 @@ public class FileInput extends AbstractInput<StreamData> {
 	}
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitFileInput(this);
+	}
+	/**
+	 * @return the accept
+	 */
+	public String getAccept() {
+		return accept;
+	}
+	/**
+	 * @param accept the accept to set
+	 */
+	public void setAccept(String accept) {
+		this.accept = accept;
 	}
 
 }

@@ -174,6 +174,10 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 		if (use_post && value != null) {
 			hb.attr("value", value );
 		}
+		String accept = input.getAccept();
+		if( accept != null && accept.length() > 0) {
+			hb.attr("accept", accept);
+		}
 		hb.addClass("input");
 		hb.close();
 	}

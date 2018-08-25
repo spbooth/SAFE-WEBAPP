@@ -9,6 +9,7 @@ import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.Identified;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
 
 /** A {@link ContentBuilder} that generates plain text.
  * @author spb
@@ -378,5 +379,14 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 	@Override
 	public SimpleXMLBuilder addClass(CharSequence s) {
 		return this;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addImage(uk.ac.ed.epcc.webapp.AppContext, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer, uk.ac.ed.epcc.webapp.forms.result.ServeDataResult)
+	 */
+	@Override
+	public void addImage(AppContext conn, String alt, String hover, Integer width, Integer height,
+			ServeDataResult image) {
+		clean(alt);
+		
 	}
 }

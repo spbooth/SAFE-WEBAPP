@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.jdbc.expr;
 import java.sql.ResultSet;
 import java.util.List;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
@@ -26,8 +27,8 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 
 
 
-public class ReductionMapper<R> implements ResultMapper<R> , Contexed{
-	private final AppContext conn;
+public class ReductionMapper<R> extends AbstractContexed implements ResultMapper<R> {
+
 	private final Reduction op;
 	private final Class<R> target;
 	private final SQLExpression<? extends R> exp;
@@ -35,7 +36,7 @@ public class ReductionMapper<R> implements ResultMapper<R> , Contexed{
 	private boolean qualify=false;
 
 	public ReductionMapper(AppContext c,Class<R> target, Reduction op,R def,SQLExpression<? extends R> exp) {
-		this.conn=c;
+		super(c);
 		this.target=target;
 		this.op=op;
 		this.exp=exp;
@@ -89,7 +90,4 @@ public class ReductionMapper<R> implements ResultMapper<R> , Contexed{
 		return list;
 	}
 
-	public AppContext getContext() {
-		return conn;
-	}
 }

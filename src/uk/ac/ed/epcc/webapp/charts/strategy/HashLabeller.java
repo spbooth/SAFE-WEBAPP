@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.forms.Identified;
@@ -37,9 +38,8 @@ import uk.ac.ed.epcc.webapp.forms.Identified;
  * @param <T> type of object being mapped
  * @param <K> type of key object generated
  */
-public abstract class HashLabeller<T,K> implements Labelled,Contexed {
+public abstract class HashLabeller<T,K> extends AbstractContexed implements Labelled {
 
-    AppContext conn;
 	Map<K,Number> map;
 
 	Map<Object,Number> label_to_set;
@@ -50,7 +50,7 @@ public abstract class HashLabeller<T,K> implements Labelled,Contexed {
 
 	@SuppressWarnings("unchecked")
 	public HashLabeller(AppContext c) {
-		conn=c;
+		super(c);
 		map = new HashMap<K,Number>();
 		label_to_set = new TreeMap<Object,Number>(new Comparator() {
 
@@ -73,9 +73,6 @@ public abstract class HashLabeller<T,K> implements Labelled,Contexed {
 		labels = new Vector<String>();
 	}
 
-	public AppContext getContext(){
-		return conn;
-	}
 	/**
 	 * Create the Key object from the object being plotted. All objects with
 	 * the same key map to the same plot, different keys may map to the same

@@ -25,7 +25,6 @@ import java.net.URL;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
-import uk.ac.ed.epcc.webapp.Version;
 /** DefaultResourceService
  * USe ClassLoader resource location with fall-back to file-system
  * 

@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.inputs.RadioButtonInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
 
 /** Interface used to add content to a user interface.
  * These operations are intended to be sufficiently generic 
@@ -175,7 +176,16 @@ public interface ContentBuilder {
 	 * @param action FormResult to navigate to.
 	 */
 	public abstract void addLink(AppContext conn,String text, String hover,FormResult action);
-	
+	/** Add an image served by a {@link ServeDataResult}
+	 * 
+	 * @param conn
+	 * @param alt
+	 * @param hover
+	 * @param width (optional)
+	 * @param height (optional)
+	 * @param image
+	 */
+	public abstract void addImage(AppContext conn,String alt,String hover,Integer width, Integer height, ServeDataResult image);
 	/** Add a table to the content.
 	 * 
 	 * Table content that implements {@link UIGenerator} should be added via {@link UIGenerator#addContent(ContentBuilder)}

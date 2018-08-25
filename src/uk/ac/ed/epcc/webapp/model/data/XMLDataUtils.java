@@ -34,6 +34,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
@@ -55,23 +56,19 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  *
  */
 
-public class XMLDataUtils implements Contexed{
+public class XMLDataUtils extends AbstractContexed{
 	/**
 	 * 
 	 */
 	private static final Feature DROP_TABLES_FEATURE = new Feature("test.drop-tables", false,"drop all tables before test not just fixtures");
 	private static final Feature MINIMAL_DIFF_FEATURE = new Feature("test.minimal-diff", false,"Only show changed fields in a diff");
-	private final AppContext conn;
 	private XMLReader reader=null;
 	private SAXParserFactory spf = SAXParserFactory.newInstance();
 	/**
 	 * 
 	 */
 	public XMLDataUtils(AppContext conn) {
-		this.conn=conn;
-	}
-	public AppContext getContext() {
-		return conn;
+		super(conn);
 	}
 	/** Read a set of fixture files.
 	 * 

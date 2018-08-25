@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2017                            |
+//| Copyright - The University of Edinburgh 2018                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -11,34 +11,17 @@
 //| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
-package uk.ac.ed.epcc.webapp.email;
+package uk.ac.ed.epcc.webapp.model.data;
 
-import javax.mail.internet.MimeMessage;
+import java.util.Map;
 
-import uk.ac.ed.epcc.webapp.AbstractContexed;
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 
-/** A class that modifies email messages before they are sent.
- * 
- * The default behaviour leaves the message un-modified but this class can be
- * extended to implement mail signing.
- * @author spb
+/** Interface for {@link Composite}s that need pre-commit access on update
+ * @author Stephen Booth
  *
  */
-public class SignMailVisitor extends AbstractContexed {
-
-	
-	/**
-	 * 
-	 */
-	public SignMailVisitor(AppContext conn) {
-		super(conn);
-	}
-
-	
-	public MimeMessage update(MimeMessage m){
-		return m;
-	}
-
+public interface UpdateContributor<BDO extends DataObject> {
+	public void preCommit(BDO dat, Form f, Map<String, Object> orig) throws DataException;
 }

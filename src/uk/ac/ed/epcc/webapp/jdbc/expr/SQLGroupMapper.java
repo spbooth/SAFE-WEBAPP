@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -36,9 +37,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  * @see GroupingSQLValue
  * @param <O> Type being produced
  */
-public abstract class SQLGroupMapper<O> implements ResultMapper<O>, Contexed {
-	
-	    private final AppContext c;
+public abstract class SQLGroupMapper<O> extends AbstractContexed implements ResultMapper<O> {
 	// This is the list of key fields that need to be output in the GROUP BY clasue
 	    private List<SQLValue> key_list;
 	    private List<SQLValue> target_list; // either Fields  or strings that must be concatenated to make
@@ -60,7 +59,7 @@ public abstract class SQLGroupMapper<O> implements ResultMapper<O>, Contexed {
 	     * 
 	     */
 	    public SQLGroupMapper(AppContext c){
-	    	this.c=c;
+	    	super(c);
 	    	key_list = new LinkedList<SQLValue>(); 
 	    	target_list=new LinkedList<SQLValue>();
 	    }
@@ -107,7 +106,7 @@ public abstract class SQLGroupMapper<O> implements ResultMapper<O>, Contexed {
 	    	if( field == null ){
 	    		return;
 	    	}
-	    	addClause(FuncExpression.apply(c,SQLFunc.SUM,Number.class,field),name);
+	    	addClause(FuncExpression.apply(getContext(),SQLFunc.SUM,Number.class,field),name);
 	    }
 	    
 	    /** Add a column average to the table output
@@ -132,7 +131,7 @@ public abstract class SQLGroupMapper<O> implements ResultMapper<O>, Contexed {
 	    	if( field == null ){
 	    		return;
 	    	}
-	    	addClause(FuncExpression.apply(c,SQLFunc.MIN,Number.class,field),name);
+	    	addClause(FuncExpression.apply(getContext(),SQLFunc.MIN,Number.class,field),name);
 	    }
 	    /** Add a column min date to table output
 	     * 
@@ -143,7 +142,7 @@ public abstract class SQLGroupMapper<O> implements ResultMapper<O>, Contexed {
 	    	if( field == null ){
 	    		return;
 	    	}
-	    	addClause(FuncExpression.apply(c,SQLFunc.MIN,Date.class,field),name);
+	    	addClause(FuncExpression.apply(getContext(),SQLFunc.MIN,Date.class,field),name);
 	    }
 	    /** Add a column max to the table output
 	     * 
@@ -154,7 +153,7 @@ public abstract class SQLGroupMapper<O> implements ResultMapper<O>, Contexed {
 	    	if( field == null ){
 	    		return;
 	    	}
-	    	addClause(FuncExpression.apply(c,SQLFunc.MAX,Number.class,field),name);
+	    	addClause(FuncExpression.apply(getContext(),SQLFunc.MAX,Number.class,field),name);
 	    }
 	    /** Add a column max date to the table output
 	     * 
@@ -165,10 +164,10 @@ public abstract class SQLGroupMapper<O> implements ResultMapper<O>, Contexed {
 	    	if( field == null ){
 	    		return;
 	    	}
-	    	addClause(FuncExpression.apply(c,SQLFunc.MAX,Date.class,field),name);
+	    	addClause(FuncExpression.apply(getContext(),SQLFunc.MAX,Date.class,field),name);
 	    }
 	    public final void addCount(String name){
-	    	addClause(FuncExpression.apply(c,SQLFunc.COUNT,Number.class,null),name);
+	    	addClause(FuncExpression.apply(getContext(),SQLFunc.COUNT,Number.class,null),name);
 	    }
 	    /** Add a column counting distinct values
 	     * 
@@ -263,11 +262,5 @@ public abstract class SQLGroupMapper<O> implements ResultMapper<O>, Contexed {
 				}
 			}
 			return fil;
-		}
-		public final AppContext getContext(){
-			return c;
-		}
-		protected final Logger getLogger(){
-			return c.getService(LoggerService.class).getLogger(getClass());
 		}
 }

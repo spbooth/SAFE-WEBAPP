@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.model.relationship;
 
 
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
@@ -41,15 +42,14 @@ import uk.ac.ed.epcc.webapp.model.data.forms.inputs.TableInput;
  */
 
 
-public class RelationshipTableCreator implements FormCreator,Contexed{
+public class RelationshipTableCreator extends AbstractContexed implements FormCreator{
 
 
 	private static final String TYPE = "Type";
 	private static final String TABLE = "Table";
 	private static final String PEER = "Peer";
-	private AppContext conn;
 	public RelationshipTableCreator(AppContext c){
-		this.conn=c;
+		super(c);
 	}
 	public void buildCreationForm(String type_name,Form f) throws Exception {
 		f.addInput(TABLE, "Name of table to create", new NewTableInput(conn));
@@ -58,9 +58,6 @@ public class RelationshipTableCreator implements FormCreator,Contexed{
 		f.addAction("Create", new CreateAction());
 	}
 
-	public AppContext getContext() {
-		return conn;
-	}
 	public class CreateAction extends FormAction{
 
 	

@@ -18,6 +18,7 @@ import java.sql.PreparedStatement;
 
 import org.apache.commons.codec.digest.Crypt;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
@@ -33,7 +34,7 @@ import uk.ac.ed.epcc.webapp.session.WebNameFinder;
  * @author spb
  *
  */
-public class RadiusPasswordChangeListener implements PasswordChangeListener, Contexed {
+public class RadiusPasswordChangeListener extends AbstractContexed implements PasswordChangeListener {
 
 	/** Name of the SQL context used to update radius
 	 * 
@@ -44,24 +45,15 @@ public class RadiusPasswordChangeListener implements PasswordChangeListener, Con
 	 */
 	public static final String RADIUS_USER_ROLE = "RadiusUser";
 	private static final char[][] salt_chars = { { 'a', 'z' }, { 'A', 'Z' }, { '0', '9' }, {'.'},{'/'}};
-	private final AppContext conn;
 	private final String realm; // realm to use as username
 	private final String name_suffix;
 	/**
 	 * 
 	 */
 	public RadiusPasswordChangeListener(AppContext conn) {
-		this.conn=conn;
+		super(conn);
 		realm=conn.getInitParameter("radius.realmname",WebNameFinder.WEB_NAME);
 		name_suffix=conn.getInitParameter("radius.name_suffix");
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public AppContext getContext() {
-		return conn;
 	}
 
 	/* (non-Javadoc)

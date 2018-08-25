@@ -22,6 +22,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Contexed;
@@ -40,15 +41,14 @@ import uk.ac.ed.epcc.webapp.resource.ResourceService;
  *
  */
 @PreRequisiteService({ConfigService.class ,ResourceService.class})
-public class SSLService implements Contexed, ConfigServiceListener, AppContextService<SSLService> {
+public class SSLService extends AbstractContexed implements Contexed, ConfigServiceListener, AppContextService<SSLService> {
 
 	public static final Feature INSTALL_DEFAULT_FEATURE = new Feature("sslservice.install_default_context", true, "When the SSL service makes its default SSLContext this is also installed as the general default");
 	public static final String DEFAULT = "default";
 	private static SSLContext default_context=null;
 	private ConfigService config_serv;
-	private AppContext conn;
 	public SSLService(AppContext conn){
-		this.conn=conn;
+		super(conn);
 		config_serv = conn.getService(ConfigService.class);
 		config_serv.addListener(this);
 	}
@@ -168,7 +168,4 @@ public class SSLService implements Contexed, ConfigServiceListener, AppContextSe
         TrustManager[] tms=tmFact.getTrustManagers();
         return tms;
     }
-public AppContext getContext() {
-	return conn;
-}
 }

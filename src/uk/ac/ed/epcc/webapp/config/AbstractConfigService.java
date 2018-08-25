@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.config;
 import java.io.InputStream;
 import java.util.Properties;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
@@ -33,17 +34,15 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  */
 
 @PreRequisiteService({ResourceService.class})
-public abstract class AbstractConfigService implements Contexed, ConfigService{
+public abstract class AbstractConfigService extends AbstractContexed implements ConfigService{
 
 	private static final String SPLIT_REGEX = "\\s*,\\s*";
 	private static final String ADD_PROPERTIES = "add_properties";
 	private static final String CONFIG_LOADED = "config.loaded.";
-	private AppContext conn;
 	
 
 	public AbstractConfigService(AppContext conn) {
-		assert(conn!=null);
-		this.conn=conn;
+		super(conn);
 	}
 	
 
@@ -154,14 +153,6 @@ public abstract class AbstractConfigService implements Contexed, ConfigService{
 			return processAdditions(result, serv);
 		}
 	}
-
-	public final AppContext getContext() {
-		return conn;
-	}
-
-
-
-	
 
 	public final Class<ConfigService> getType() {
 		return ConfigService.class;

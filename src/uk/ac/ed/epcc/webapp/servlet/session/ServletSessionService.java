@@ -277,7 +277,7 @@ public void setCurrentPerson(A person) {
 			}
 		}
 	} catch (DataException e) {
-		c.error(e,"Error setting wtmp");
+		getContext().error(e,"Error setting wtmp");
 		removeAttribute(WTMP_EXPIRY_DATE);
 		removeAttribute(WTMP_ID);
 	}

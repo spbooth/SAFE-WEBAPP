@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.servlet;
 
 import java.security.MessageDigest;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
@@ -29,17 +30,14 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 @PreRequisiteService({SessionService.class,RandomService.class})
-public class DefaultCrsfTokenService implements CrsfTokenService,Contexed {
+public class DefaultCrsfTokenService extends AbstractContexed implements CrsfTokenService {
 	private static final String CRSF_TAG_ATTR="CrsfTag";
 	/**
 	 * @param conn
 	 */
 	public DefaultCrsfTokenService(AppContext conn) {
-		super();
-		this.conn = conn;
+		super(conn);
 	}
-
-	private final AppContext conn;
 	
 
 	/* (non-Javadoc)
@@ -93,13 +91,6 @@ public class DefaultCrsfTokenService implements CrsfTokenService,Contexed {
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public AppContext getContext() {
-		return conn;
-	}
 
 
 }

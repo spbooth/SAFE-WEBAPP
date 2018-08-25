@@ -17,8 +17,8 @@ import java.text.MessageFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 
@@ -30,9 +30,8 @@ import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
  * @author spb
  *
  */
-public class PreDefinedContent implements Contexed, XMLGenerator,UIGenerator {
+public class PreDefinedContent extends AbstractContexed implements  XMLGenerator,UIGenerator {
 
-	private final AppContext conn;
 	private final MessageFormat fmt;
 	private final Object args[];
 	/**
@@ -64,7 +63,7 @@ public class PreDefinedContent implements Contexed, XMLGenerator,UIGenerator {
 	 * @param args
 	 */
 	public PreDefinedContent(AppContext conn,ResourceBundle mess,String message, Object ... args) {
-		this.conn=conn;
+		super(conn);
 		String pattern = null;
 		if( mess != null) {
 			pattern = conn.expandText(mess.getString(message));
@@ -113,14 +112,7 @@ public class PreDefinedContent implements Contexed, XMLGenerator,UIGenerator {
 		}
 		return builder;
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public AppContext getContext() {
-		return conn;
-	}
-
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.UIGenerator#addContent(uk.ac.ed.epcc.webapp.content.ContentBuilder)
 	 */

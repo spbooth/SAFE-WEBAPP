@@ -22,21 +22,18 @@ package uk.ac.ed.epcc.webapp.editors.mail;
 import java.util.LinkedList;
 import java.util.List;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 
 
-public class Linker implements MessageEditLinker, Contexed{
+public class Linker extends AbstractContexed implements MessageEditLinker{
 
 	private final MessageHandler composer;
-	private final AppContext conn;
 	
 	public Linker(AppContext conn,  MessageHandler h){
-		this.conn=conn;
+		super(conn);
 		this.composer=h;
 	}
 	public void addButton(ContentBuilder cb, EditAction action, List<String> path,
@@ -70,12 +67,4 @@ public class Linker implements MessageEditLinker, Contexed{
 		return composer.getMessageProvider();
 	}
 
-
-	public AppContext getContext() {
-		return conn;
-	}
-	protected Logger getLogger(){
-		return conn.getService(LoggerService.class).getLogger(getClass());
-	}
-	
 }

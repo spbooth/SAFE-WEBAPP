@@ -21,23 +21,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-
-
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.config.FilteredProperties;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.servlet.navigation.Node;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NodeMaker;
 import uk.ac.ed.epcc.webapp.servlet.navigation.ParentNode;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 /** Factory class for a set of FormFactoryProviders
  * 
@@ -45,18 +41,11 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  * @param <T>
  */
-public abstract class FormFactoryProviderRegistry<T extends FormFactoryProvider> implements Contexed ,UIGenerator,TransitionFactoryCreator<TransitionProvider>, NodeMaker{
+public abstract class FormFactoryProviderRegistry<T extends FormFactoryProvider> extends AbstractContexed implements UIGenerator,TransitionFactoryCreator<TransitionProvider>, NodeMaker{
 	public static final char TAG_SEPERATOR = ':';
-	private AppContext conn;
-	public FormFactoryProviderRegistry(AppContext conn){
-		this.conn=conn;
-	}
 	
-	public AppContext getContext(){
-		return conn;
-	}
-	protected final Logger getLogger(){
-		return conn.getService(LoggerService.class).getLogger(getClass());
+	public FormFactoryProviderRegistry(AppContext conn){
+		super(conn);
 	}
 	
 	@SuppressWarnings("unchecked")

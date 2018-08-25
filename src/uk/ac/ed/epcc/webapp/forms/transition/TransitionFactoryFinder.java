@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.transition;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 
@@ -21,25 +22,18 @@ import uk.ac.ed.epcc.webapp.Contexed;
  * @author spb
  *
  */
-public class TransitionFactoryFinder implements Contexed {
+public class TransitionFactoryFinder extends AbstractContexed {
 
-	private final AppContext conn;
 	public static final String TRANSITION_PROVIDER_PREFIX = "TransitionProvider";
 	
 	/**
 	 * 
 	 */
 	public TransitionFactoryFinder(AppContext conn) {
-		this.conn=conn;
+		super(conn);
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public AppContext getContext() {
-		return conn;
-	}
+	
 	/** method to retrieve the TransitionProvider from a string tag
 	 * If the tag contains a colon this is taken as a separator between two fields.
 	 * The first field is used to construct a {@link TransitionFactoryCreator} using {@link AppContext#makeObject(Class, String)}

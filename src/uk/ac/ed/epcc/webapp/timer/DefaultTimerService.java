@@ -21,8 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
@@ -36,15 +36,14 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  */
 @PreRequisiteService({LoggerService.class})
 
-public class DefaultTimerService implements Contexed,TimerService{
+public class DefaultTimerService extends AbstractContexed implements TimerService{
 	private static final String TIMER_TOTAL = "Total";
 	private static final Feature GLOBAL_TIMERS = new Feature("global_timers",false,"Are timers global/static rather than per session");
 	 private static Map<String,Timer> global_timers=null;
 	 private Map<String,Timer> timers=null;
-	 private AppContext conn;
 	 private String prefix="";
 	 public DefaultTimerService(AppContext conn){
-		 this.conn=conn;
+		 super(conn);
 		 if( GLOBAL_TIMERS.isEnabled(conn)){
 			 if( global_timers != null){
 				 timers=global_timers;
@@ -152,9 +151,6 @@ public class DefaultTimerService implements Contexed,TimerService{
 				throw new ConsistencyError("Non existant timer stopped "+name);
 			}
 			t.stop();
-		}
-		public AppContext getContext() {
-			return conn;
 		}
 		public Class<TimerService> getType() {
 			return TimerService.class;

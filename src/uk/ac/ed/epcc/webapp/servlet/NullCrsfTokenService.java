@@ -13,25 +13,22 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 
 /** A {@link CrsfTokenService} that disables the check.
  * @author Stephen Booth
  *
  */
-public class NullCrsfTokenService implements CrsfTokenService,Contexed {
+public class NullCrsfTokenService extends AbstractContexed implements CrsfTokenService {
 	private static final String CRSF_TAG_ATTR="CrsfTag";
 	/**
 	 * @param conn
 	 */
 	public NullCrsfTokenService(AppContext conn) {
-		super();
-		this.conn = conn;
+		super(conn);
 	}
-
-	private final AppContext conn;
 	
 
 	/* (non-Javadoc)
@@ -59,14 +56,5 @@ public class NullCrsfTokenService implements CrsfTokenService,Contexed {
 		return null;
 		
 	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public AppContext getContext() {
-		return conn;
-	}
-
 
 }

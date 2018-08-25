@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.editors.mail;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
@@ -24,14 +25,13 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  *
  */
 
-public class EmailTransitionFactoryCreator implements TransitionFactoryCreator<EmailTransitionProvider>,Contexed {
+public class EmailTransitionFactoryCreator extends AbstractContexed implements TransitionFactoryCreator<EmailTransitionProvider>{
 	/**
 	 * 
 	 */
 	public static final String MESSAGE_PROVIDER_FACTORY_TAG_PREFIX = "MessageProviderFactory";
-	private final AppContext conn;
 	public EmailTransitionFactoryCreator(AppContext conn){
-		this.conn=conn;
+		super(conn);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator#getTransitionProvider(java.lang.String)
@@ -54,11 +54,6 @@ public class EmailTransitionFactoryCreator implements TransitionFactoryCreator<E
 		}
 		return new EmailTransitionProvider(fac);
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	public AppContext getContext() {
-		return conn;
-	}
+	
 
 }

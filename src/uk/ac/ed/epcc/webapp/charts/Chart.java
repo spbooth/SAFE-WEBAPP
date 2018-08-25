@@ -22,8 +22,8 @@ package uk.ac.ed.epcc.webapp.charts;
 
 import java.util.Arrays;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 
 /** Chart is a base class for chart generation.
  * Its essentially a facade class around underlying implementation classes (that implement the {@link ChartData} interface) to allow the underlying chart 
@@ -43,15 +43,12 @@ import uk.ac.ed.epcc.webapp.Contexed;
  * @author spb
  * 
  */
-public abstract class Chart<P extends Plot> implements Contexed{
-	AppContext conn;
+public abstract class Chart<P extends Plot> extends AbstractContexed {
 	private String legendName=null; // used to suply the keyname when converting a chart to a table.
 	protected Chart(AppContext conn){
-		this.conn=conn;
+		super(conn);
 	}
-	public AppContext getContext(){
-		return conn;
-	}
+	
 	/**
 	 * Default maximum number of sets in output of sortSets. zero implies no
 	 * restriction

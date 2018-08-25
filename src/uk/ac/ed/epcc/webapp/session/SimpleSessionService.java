@@ -34,16 +34,16 @@ public class SimpleSessionService<A extends AppUser> extends AbstractSessionServ
 	}
 
 	public final void setAttribute(String key, Object value) {
-		c.setAttribute(key, value);
+		getContext().setAttribute(key, value);
 	}
 
 	public final void removeAttribute(String key) {
-		c.removeAttribute(key);
+		getContext().removeAttribute(key);
 		
 	}
 
 	public final Object getAttribute(String key) {
-		return c.getAttribute(key);
+		return getContext().getAttribute(key);
 	}
 
 	

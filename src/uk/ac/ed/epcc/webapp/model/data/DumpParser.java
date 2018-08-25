@@ -15,17 +15,15 @@ package uk.ac.ed.epcc.webapp.model.data;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -40,8 +38,6 @@ import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.IdMode;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
@@ -62,7 +58,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  * @author spb
  *
  */
-public abstract class DumpParser implements  ContentHandler, Contexed{
+public abstract class DumpParser extends AbstractContexed implements  ContentHandler{
 	private static enum State{
 		Top,
 		Skip,
@@ -70,8 +66,6 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 		Schema,
 		SchemaIndex
 	};
-	private final AppContext conn;
-	private final Logger log;
 	private State state;
 	private int depth;
 	private Repository.Record current=null;
@@ -90,16 +84,12 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 		this(conn,false);
 	}
 	public DumpParser(AppContext conn, boolean map_ids){
-		this.conn=conn;
-		this.log=conn.getService(LoggerService.class).getLogger(getClass());
+		super(conn);
 		if( map_ids){
 			id_map=new HashMap<String, Map<Integer,Integer>>();
 		}else{
 			id_map=null;
 		}
-	}
-	public AppContext getContext(){
-		return conn;
 	}
 	
 	public void characters(char[] dat, int start, int length) throws SAXException {
@@ -275,7 +265,7 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 					res=null;
 					current=null;
 					field=null;
-					log.error("Error making factory",t);
+					getLogger().error("Error making factory",t);
 				}
 			}else if( name.equals(Dumper.TABLE_SPECIFICATION)){
 				depth=1; // start counting
@@ -305,7 +295,7 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 				try {
 					index = spec.new Index(name, unique);
 				} catch (InvalidArgument e) {
-					log.error("Error making index", e);
+					getLogger().error("Error making index", e);
 				}
 			}else{
 				boolean nullable= Boolean.parseBoolean(arg3.getValue(Dumper.NULLABLE_ATTR));
@@ -336,7 +326,7 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 				}else if( type.equals(Dumper.BLOB_TYPE)){
 					spec.setField(name, new BlobType());
 				}else{
-					log.error("Bad specification type "+type);
+					getLogger().error("Bad specification type "+type);
 				}
 			}
 		}else if( state == State.SchemaIndex && index != null && name.equals(Dumper.COLUMN)){
@@ -345,7 +335,7 @@ public abstract class DumpParser implements  ContentHandler, Contexed{
 				index.addField(col_name);
 				
 			} catch (InvalidArgument e) {
-				log.error("Error adding column", e);
+				getLogger().error("Error adding column", e);
 			}
 		}
 		// ignore container elements of fields where repository 

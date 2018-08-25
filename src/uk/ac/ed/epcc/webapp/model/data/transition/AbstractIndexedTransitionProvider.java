@@ -16,14 +16,13 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data.transition;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.ParseFactory;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
@@ -36,7 +35,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
  * @param <T> target type
  * @param <K> 
  */
-public abstract class AbstractIndexedTransitionProvider<T extends Indexed,K>  implements TransitionProvider<K, T>, Contexed {
+public abstract class AbstractIndexedTransitionProvider<T extends Indexed,K>  extends AbstractContexed implements TransitionProvider<K, T> {
 
 	
 
@@ -44,12 +43,11 @@ public abstract class AbstractIndexedTransitionProvider<T extends Indexed,K>  im
     
     private final IndexedProducer<? extends T> fac;
     private final String target_name;
-    private final AppContext conn;
     
     
 
 	public AbstractIndexedTransitionProvider(AppContext c,IndexedProducer<? extends T> fac,String target_name){
-		this.conn=c;
+		super(c);
 		this.fac=fac;
 		this.target_name=target_name;
 	}
@@ -114,12 +112,7 @@ public abstract class AbstractIndexedTransitionProvider<T extends Indexed,K>  im
 		return target_name;
 	}
 
-	public final AppContext getContext(){
-		return conn;
-	}
-	public final Logger getLogger() {
-		return getContext().getService(LoggerService.class).getLogger(getClass());
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#accept(uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor)
 	 */

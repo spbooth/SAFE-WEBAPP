@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.content;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
@@ -24,17 +25,16 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
  */
 
 
-public class Link implements XMLGenerator,UIGenerator,Contexed {
+public class Link extends AbstractContexed implements XMLGenerator,UIGenerator {
 
 	private final String text;
 	private final String help;
 	private final FormResult result;
-	private final AppContext conn;
 	public Link(AppContext conn,String text,FormResult result){
 		this(conn,text,null,result);
 	}
 	public Link(AppContext conn,String text,String help,FormResult result){
-		this.conn=conn;
+		super(conn);
 		this.text=text;
 		this.help=help;
 		this.result=result;
@@ -47,10 +47,7 @@ public class Link implements XMLGenerator,UIGenerator,Contexed {
 		}
 		return builder;
 	}
-	public AppContext getContext() {
-		return conn;
-	}
-
+	
 	public String toString(){
 		// makes text tables work sensibly
 		return text;

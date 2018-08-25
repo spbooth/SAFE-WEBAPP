@@ -15,23 +15,22 @@ package uk.ac.ed.epcc.webapp.exec;
 
 import java.io.IOException;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 
 /**
  * @author spb
  *
  */
 
-public class DefaultExecService implements ExecService,Contexed {
+public class DefaultExecService extends AbstractContexed implements ExecService {
 
-	private final AppContext conn;
 	/**
 	 * @param conn 
 	 * 
 	 */
 	public DefaultExecService(AppContext conn) {
-		this.conn=conn;
+		super(conn);
 	}
 
 	/* (non-Javadoc)
@@ -65,12 +64,6 @@ public class DefaultExecService implements ExecService,Contexed {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	public AppContext getContext() {
-		return conn;
-	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.exec.ExecService#exec(long, java.lang.String)

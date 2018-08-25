@@ -27,6 +27,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.UpdateContributor;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 
 /** default {@link FormUpdate} for DataObjects
@@ -77,7 +78,9 @@ public class Updater<BDO extends DataObject> extends DataObjectUpdateFormFactory
 	 */
 	@Override
 	public void preCommit(BDO dat, Form f, Map<String, Object> orig) throws DataException {
-		
+		for(UpdateContributor<BDO> comp : getFactory().getComposites(UpdateContributor.class)) {
+			comp.preCommit(dat, f, orig);
+		}
 		
 	}
 	

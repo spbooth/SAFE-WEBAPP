@@ -18,6 +18,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Contexed;
@@ -30,14 +31,13 @@ import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
  * @author spb
  *
  */
-public class HttpService implements Contexed, AppContextService<HttpService> {
+public class HttpService extends AbstractContexed implements AppContextService<HttpService> {
 
-	private final AppContext conn;
 	/**
 	 * 
 	 */
 	public HttpService(AppContext conn) {
-		this.conn=conn;
+		super(conn);
 	}
 
 	/* (non-Javadoc)
@@ -103,13 +103,5 @@ public class HttpService implements Contexed, AppContextService<HttpService> {
 		return HttpService.class;
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public AppContext getContext() {
 	
-		return conn;
-	}
-
 }

@@ -26,8 +26,8 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
@@ -38,7 +38,6 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterConverter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.NegatingFilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
@@ -100,7 +99,7 @@ import uk.ac.ed.epcc.webapp.model.relationship.RelationshipProvider;
  * @param <A>
  */
 @PreRequisiteService(ConfigService.class)
-public abstract class AbstractSessionService<A extends AppUser> implements Contexed, SessionService<A>{
+public abstract class AbstractSessionService<A extends AppUser> extends AbstractContexed implements SessionService<A>{
 	/**
 	 * 
 	 */
@@ -139,8 +138,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	public static final String ROLE_LIST_CONFIG = "role_list";
 	 
 	private Map<String,Boolean> toggle_map=null;
-	protected AppContext c;
-    
+	
 	private A person=null;
     private AppUserFactory<A> fac=null;
     /** Map of roles that this user can assume.
@@ -222,8 +220,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	// map of roles to filters.
 	private Map<String,BaseFilter> roles = new HashMap<String, BaseFilter>();
 	public AbstractSessionService(AppContext c) {
-		this.c=c;
-		
+		super(c);
 	}
 
 	/** clear all cached relationships
@@ -254,6 +251,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			return fac;
 		}
 		try{
+			AppContext c = getContext();
 			Logger log =c.getService(LoggerService.class).getLogger(getClass());
 			String table=getLoginTable();
 			log.debug("login-table="+table);
@@ -261,7 +259,7 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 			if( table == null ){
 				// If the login factory has a hardwired table then we specify the class
 				// name as follows
-				log.debug("looking for login-factory should be "+c.getInitParameter("class.login-factory","unset"));
+				log.debug("looking for login-factory should be "+getContext().getInitParameter("class.login-factory","unset"));
 				clazz = c.getPropertyClass(getDefaultFactoryClass(), null,"login-factory");
 			}else{
 				// look up the class for this table. We ignore any login-factory
@@ -297,14 +295,11 @@ public abstract class AbstractSessionService<A extends AppUser> implements Conte
 	 * @return
 	 */
 	protected String getLoginTable() {
-		return c.getInitParameter("login-table");
+		return getContext().getInitParameter("login-table");
 	}
 
 	protected Class<? extends AppUserFactory> getDefaultFactoryClass(){
 		return AppUserFactory.class;
-	}
-	public AppContext getContext() {
-		return c;
 	}
 	/** get the current State of a role toggle or null if not a toggle role
 	 * 

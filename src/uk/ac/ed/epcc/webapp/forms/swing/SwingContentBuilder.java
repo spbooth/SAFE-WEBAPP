@@ -22,13 +22,16 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.image.BufferedImage;
 import java.security.Principal;
 import java.text.NumberFormat;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -53,8 +56,12 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.Identified;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
+import uk.ac.ed.epcc.webapp.jdbc.filter.GetListFilterVisitor;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 /** builds a swing version of content.
  * 
  * @author spb
@@ -743,6 +750,29 @@ public class SwingContentBuilder  implements ContentBuilder{
 	public <X> void addNumberedList(int start, Iterable<X> list) {
 		addList(list);
 		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addImage(uk.ac.ed.epcc.webapp.AppContext, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer, uk.ac.ed.epcc.webapp.forms.result.ServeDataResult)
+	 */
+	@Override
+	public void addImage(AppContext conn, String alt, String hover, Integer width, Integer height,
+			ServeDataResult image) {
+		try {
+		SessionService sess = conn.getService(SessionService.class);
+		MimeStreamData data = image.getProducer().getData(sess, image.getArgs());
+		BufferedImage bi = ImageIO.read(data.getInputStream());
+				
+		JLabel label = new JLabel(new ImageIcon(bi));
+		addComponent(label);
+		}catch(Throwable t) {
+			getLogger().error("Error making image",t);
+		}
+	}
+	/**
+	 * @return
+	 */
+	public Logger getLogger() {
+		return this.conn.getService(LoggerService.class).getLogger(getClass());
 	}
 
 }

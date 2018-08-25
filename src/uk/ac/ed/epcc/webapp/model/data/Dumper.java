@@ -25,24 +25,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-
-
-
-
-
-
-
-
-
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.FieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.IndexInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
@@ -62,7 +52,7 @@ import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
  * @author spb
  *
  */
-public class Dumper implements Contexed{
+public class Dumper extends AbstractContexed{
 
 	/**
 	 * 
@@ -89,14 +79,11 @@ public class Dumper implements Contexed{
 	public static final String ID = "id";
 	public static final String TABLE_SPECIFICATION = "TableSpecification";
 	public Dumper(AppContext conn,SimpleXMLBuilder builder) {
-		super();
-		this.conn = conn;
+		super(conn);
 		this.builder=builder;
 		seen = new HashMap<String, Set<Integer>>();
 		specifications = new HashMap<>();
 	}
-
-	private final AppContext conn;
     private final SimpleXMLBuilder builder;
     /** records that have already been processed so should
      * not be dumped if referenced again.
@@ -109,9 +96,6 @@ public class Dumper implements Contexed{
     private boolean dump_null_values=false;
     private boolean verbose_diff=true;
     
-	public AppContext getContext() {
-		return conn;
-	}
 	public void dump(DataObject obj) throws DataFault, IOException{
 		dump(obj.record);
 	}

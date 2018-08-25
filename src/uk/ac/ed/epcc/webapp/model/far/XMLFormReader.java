@@ -24,6 +24,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 
@@ -33,25 +34,18 @@ import uk.ac.ed.epcc.webapp.Contexed;
  * @param <F> 
  *
  */
-public class XMLFormReader<O extends PartOwner,F extends PartOwnerFactory<O>> implements Contexed {
+public class XMLFormReader<O extends PartOwner,F extends PartOwnerFactory<O>> extends AbstractContexed {
 
-	private final AppContext conn;
+	
 	private SAXParserFactory spf = SAXParserFactory.newInstance();
 	/**
 	 * @param conn 
 	 * 
 	 */
 	public XMLFormReader(AppContext conn) {
-		this.conn=conn;
+		super(conn);
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public AppContext getContext() {
-		return conn;
-	}
 	
 	public void read(F fac, O owner, String data) throws ParserConfigurationException, SAXException, IOException{
 		SAXParser parser = spf.newSAXParser();

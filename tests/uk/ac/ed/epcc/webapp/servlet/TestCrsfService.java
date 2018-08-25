@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
@@ -25,16 +26,14 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 @PreRequisiteService({SessionService.class})
-public class TestCrsfService implements CrsfTokenService,Contexed {
+public class TestCrsfService extends AbstractContexed implements CrsfTokenService {
 	/**
 	 * @param conn
 	 */
 	public TestCrsfService(AppContext conn) {
-		super();
-		this.conn = conn;
+		super(conn);
 	}
 
-	private final AppContext conn;
 	private String tag="12345";
 
 	/* (non-Javadoc)
@@ -67,14 +66,6 @@ public class TestCrsfService implements CrsfTokenService,Contexed {
 			sb.append(provider.accept(vis));
 		}
 		return sb.toString();
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public AppContext getContext() {
-		return conn;
 	}
 
 	public String getTag() {

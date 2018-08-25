@@ -16,9 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 
@@ -31,12 +31,11 @@ import uk.ac.ed.epcc.webapp.config.ConfigService;
  */
 
 @PreRequisiteService(ConfigService.class)
-public class MessageBundleService implements Contexed, AppContextService<MessageBundleService> {
+public class MessageBundleService extends AbstractContexed implements AppContextService<MessageBundleService> {
 	private static ListControl control = new ListControl();
-	private AppContext context;
 	private Map<String,ResourceBundle> bundle_map=new HashMap<String, ResourceBundle>();
 	public MessageBundleService(AppContext c){
-		context=c;
+		super(c);
 	}
 	public ResourceBundle getBundle(){
 		return getBundle("messages");
@@ -50,7 +49,7 @@ public class MessageBundleService implements Contexed, AppContextService<Message
 		return bundle;
 	}
 	protected ResourceBundle makeBundle(String tag){
-		ConfigService config = context.getService(ConfigService.class);
+		ConfigService config = getContext().getService(ConfigService.class);
 		String bundles= config.getServiceProperties().getProperty(tag+".bundle.list", tag);
 		return ResourceBundle.getBundle(bundles, control);
 
@@ -68,14 +67,5 @@ public class MessageBundleService implements Contexed, AppContextService<Message
 	public Class<? super MessageBundleService> getType() {
 		return MessageBundleService.class;
 	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	public AppContext getContext() {
-		return context;
-	}
-
-	
 
 }

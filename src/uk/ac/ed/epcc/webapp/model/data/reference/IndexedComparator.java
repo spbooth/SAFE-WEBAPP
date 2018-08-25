@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.model.data.reference;
 
 import java.util.Comparator;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Indexed;
@@ -30,11 +31,10 @@ import uk.ac.ed.epcc.webapp.forms.Identified;
  */
 
 
-public class IndexedComparator<I extends Indexed> implements Comparator<IndexedReference<I>> , Contexed{
+public class IndexedComparator<I extends Indexed> extends AbstractContexed implements Comparator<IndexedReference<I>> {
 
-	private final AppContext conn;
 	public IndexedComparator(AppContext conn){
-		this.conn=conn;
+		super(conn);
 	}
 	
 	public int compare(IndexedReference<I> i0, IndexedReference<I> i1) {
@@ -60,15 +60,5 @@ public class IndexedComparator<I extends Indexed> implements Comparator<IndexedR
 		// Default to sorting by string representation
 		return obj0.toString().compareTo(obj1.toString());
 	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	public AppContext getContext() {
-		
-		return conn;
-	}
-
-	
 
 }

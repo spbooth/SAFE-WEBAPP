@@ -13,8 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far.handler;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.inputs.ConstructedObjectInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
@@ -29,18 +29,16 @@ import uk.ac.ed.epcc.webapp.model.far.response.StringDataManager;
  * @author spb
  *
  */
-public class ClassificationHandler implements QuestionFormHandler<String>, Contexed {
+public class ClassificationHandler extends AbstractContexed implements QuestionFormHandler<String> {
 
 	/**
 	 * 
 	 */
 	private static final String TABLE_FIELD = "table";
 	public ClassificationHandler(AppContext conn) {
-		super();
-		this.conn = conn;
+		super(conn);
 	}
 
-	private final AppContext conn;
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
@@ -87,14 +85,6 @@ public class ClassificationHandler implements QuestionFormHandler<String>, Conte
 	@Override
 	public boolean hasConfig() {
 		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public AppContext getContext() {
-		return conn;
 	}
 
 }

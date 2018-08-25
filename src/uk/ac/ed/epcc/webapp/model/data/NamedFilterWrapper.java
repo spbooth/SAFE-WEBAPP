@@ -18,11 +18,8 @@ package uk.ac.ed.epcc.webapp.model.data;
 import java.util.HashSet;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
@@ -41,21 +38,20 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
  * @param <T> target type of filters
  *
  */
-public class NamedFilterWrapper<T extends DataObject> implements NamedFilterProvider<T>,Contexed {
+public class NamedFilterWrapper<T extends DataObject> extends AbstractContexed implements NamedFilterProvider<T> {
 
 	/**
 	 * 
 	 */
 	private static final String NAME_PREFIX = "name:";
-	private final AppContext conn;
 	private final DataObjectFactory<T> fac;
 	private final Set<String> missing=new HashSet<>();
 	/**
 	 * 
 	 */
 	public NamedFilterWrapper(DataObjectFactory<T> fac) {
+		super(fac.getContext());
 		this.fac=fac;
-		this.conn=fac.getContext();
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider#getNamedFilter(java.lang.String)
@@ -151,15 +147,5 @@ public class NamedFilterWrapper<T extends DataObject> implements NamedFilterProv
 			nfp.addFilterNames(names);
 		}
 		
-	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public AppContext getContext() {
-		return conn;
-	}
-	public Logger getLogger() {
-		return conn.getService(LoggerService.class).getLogger(getClass());
 	}
 }

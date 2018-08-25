@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.config.OverrideConfigService;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
@@ -43,7 +43,7 @@ import uk.ac.ed.epcc.webapp.session.SimpleSessionService;
  * @author spb
  *
  */
-public class CommandLauncher implements Contexed{
+public class CommandLauncher extends AbstractContexed{
 	private static final Options options = new Options();
 	  private static final Option OPT_HELP = new Option(options, 'h', "help",
 		"Print usage information and exit");
@@ -61,18 +61,12 @@ public class CommandLauncher implements Contexed{
 	  private static final Option OPT_ROLE = new Option(options,'R',true,"Run with role").setMultipleArgs();
 	  private static final Option OPT_USER = new Option(options,'U',true,"Run with user");
 
-	  private AppContext conn;
 	  private PrintStream out = System.out;
 	  private PrintStream err = System.out;
 	  public CommandLauncher(AppContext conn){
-		  setContext(conn);
+		  super(conn);
 	  }
-	  public void setContext(AppContext conn){
-		  this.conn=conn;
-	  }
-	  public AppContext getContext(){
-		  return conn;
-	  }
+	  
 	  public static void main(String[] args){
 		  AppContext conn = new AppContext();
 		  conn.setService( new CommandLineLoggerService());

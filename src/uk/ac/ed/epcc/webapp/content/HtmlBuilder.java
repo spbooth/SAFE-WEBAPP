@@ -39,9 +39,11 @@ import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.PrefixInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TagInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
+import uk.ac.ed.epcc.webapp.servlet.ServeDataServlet;
 
 
 /** A {@link HtmlPrinter} that also implements {@link ContentBuilder} 
@@ -239,6 +241,35 @@ public void addLink(AppContext conn,String text, String hover,FormResult action)
 		getLogger(conn).error("Error adding Link",e);
 	}
 }
+@Override
+public void addImage(AppContext conn, String alt, String hover,Integer width, Integer height, ServeDataResult image) {
+	if( image == null) {
+		return;
+	}
+	try {
+		String url = ServeDataServlet.getURL(conn, image.getProducer(), image.getArgs());
+		open("img");
+		if( alt != null) {
+			attr("alt", alt);
+		}
+		if( hover != null ) {
+			attr("title",hover);
+		}
+		if( width != null && width.intValue() > 0) {
+			attr("width",width.toString());
+		}
+		if( height != null && height.intValue() > 0) {
+			attr("height",height.toString());
+		}
+
+		attr("src",url);
+		close();
+	}catch(Throwable t) {
+		getLogger(conn).error("Error adding image",t);
+	}
+}
+
+
 public <C,R> void addTable(AppContext conn,Table<C,R> t,String style) {
 	addTable(conn,t,null,style);
 }

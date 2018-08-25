@@ -20,6 +20,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -38,9 +39,9 @@ import uk.ac.ed.epcc.webapp.model.far.handler.PartConfigFactory.Config;
  * @author spb
  *
  */
-public class XMLFormParser implements Contexed, ContentHandler {
+public class XMLFormParser extends AbstractContexed implements ContentHandler {
 	
-	private final AppContext conn;
+	
 	private final StringBuilder text=new StringBuilder();
 	private PartOwner owner; // The PartOwner we are adding content to.
     private PartOwnerFactory manager; // The manager for the current level 
@@ -49,7 +50,7 @@ public class XMLFormParser implements Contexed, ContentHandler {
 	 * 
 	 */
 	public XMLFormParser(AppContext conn, PartOwnerFactory fac,PartOwner owner) {
-		this.conn=conn;
+		super(conn);
 		this.manager=fac;
 		this.owner=owner;
 	}
@@ -244,12 +245,5 @@ public class XMLFormParser implements Contexed, ContentHandler {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public AppContext getContext() {
-		return conn;
-	}
 
 }

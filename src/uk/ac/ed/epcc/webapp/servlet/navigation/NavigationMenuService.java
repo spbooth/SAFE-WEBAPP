@@ -20,9 +20,9 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
@@ -60,7 +60,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 
 @PreRequisiteService({SessionService.class,ConfigService.class})
-public class NavigationMenuService extends Object implements Contexed, AppContextService<NavigationMenuService>{
+public class NavigationMenuService extends AbstractContexed implements  AppContextService<NavigationMenuService>{
 
 	/**
 	 * 
@@ -74,12 +74,11 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 	public static final Feature NAVIGATION_MENU_FEATURE = new Preference("navigation_menu", false, "Support for navigation menu code");
 	public static final Feature NAVIGATION_MENU_JS_FEATURE = new Preference("navigation_menu.script", false, "Add javascript for keyboard access to navigaition menu sub-menus");
 
-	private final AppContext conn;
 	/**
 	 * 
 	 */
 	public NavigationMenuService(AppContext conn) {
-		this.conn=conn;
+		super(conn);
 	}
 
 	/* (non-Javadoc)
@@ -97,14 +96,6 @@ public class NavigationMenuService extends Object implements Contexed, AppContex
 	@Override
 	public Class<? super NavigationMenuService> getType() {
 		return NavigationMenuService.class;
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
-	 */
-	@Override
-	public AppContext getContext() {
-		return conn;
 	}
 	
 	public NodeContainer getMenu(){

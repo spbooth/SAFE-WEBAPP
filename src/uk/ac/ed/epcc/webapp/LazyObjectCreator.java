@@ -23,19 +23,18 @@ package uk.ac.ed.epcc.webapp;
  *
  * @param <A>
  */
-public class LazyObjectCreator<A> implements Contexed {
-  private final AppContext conn;
+public class LazyObjectCreator<A> extends AbstractContexed {
   private final Class<? super A> clazz;
   private final String tag;
   private  A inner=null;
   public LazyObjectCreator(AppContext c, Class<? super A> clazz, String tag){
-	  this.conn=c;
+	  super(c);
 	  this.clazz=clazz;
 	  this.tag=tag;
   }
   @SuppressWarnings("unchecked")
 public LazyObjectCreator(AppContext c,A result){
-	  this.conn=c;
+	  super(c);
 	  if( result instanceof Tagged){
 		  this.tag = ((Tagged)result).getTag();
 	  }else{
@@ -58,9 +57,6 @@ public A getInner(){
   public String getInnerTag(){
 	  return tag;
   }
-public AppContext getContext() {
-	return conn;
-}
 @Override
 public int hashCode() {
 	
