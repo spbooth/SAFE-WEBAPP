@@ -13,12 +13,22 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.transition;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
-
+import uk.ac.ed.epcc.webapp.TestDataHelper;
+import uk.ac.ed.epcc.webapp.apps.CheckClassProperties;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
+import uk.ac.ed.epcc.webapp.model.data.XMLDataUtils;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 /**
  * @author spb
@@ -55,8 +65,14 @@ public class ViewTransitionFactoryInterfaceTestImpl<T,K,X extends ViewTransition
 		ViewTransitionFactory<K, T> fac = provider.getTransitionFactory();
 		for(T target : provider.getTargets()){
 			HtmlBuilder builder = new HtmlBuilder();
+			builder.open("top");
 			fac.getTopContent(builder, target, provider.getAllowedUser(target));
-			builder.toString();
+			builder.close();
+			String top = builder.toString();
+			String expected_name = provider.getTopContentExpected(target);
+			if( expected_name != null) {
+				checkContent(null, expected_name, top);
+			}
 		}
 	}
 	
@@ -64,8 +80,14 @@ public class ViewTransitionFactoryInterfaceTestImpl<T,K,X extends ViewTransition
 		ViewTransitionFactory<K, T> fac = provider.getTransitionFactory();
 		for(T target : provider.getTargets()){
 			HtmlBuilder builder = new HtmlBuilder();
+			builder.open("log");
 			fac.getLogContent(builder, target, provider.getAllowedUser(target));
-			builder.toString();
+			builder.close();
+			String log = builder.toString();
+			String expected_name = provider.getLogContentExpected(target);
+			if( expected_name != null) {
+				checkContent(null, expected_name, log);
+			}
 		}
 	}
 	
@@ -78,5 +100,30 @@ public class ViewTransitionFactoryInterfaceTestImpl<T,K,X extends ViewTransition
 				fac.getHelp(key);
 			}
 		}
+	}
+	
+	public void checkContent(String normalize_transform, String expected_xml, String content)
+			throws TransformerFactoryConfigurationError, TransformerConfigurationException, TransformerException {
+		TransformerFactory tfac = TransformerFactory.newInstance();
+		 Transformer tt;
+		 if( normalize_transform == null ){
+			 normalize_transform="/normalize.xsl";
+		 }
+			 Source source = XMLDataUtils.readResourceAsSource(provider.getClass(), normalize_transform);
+			 assertNotNull(expected_xml,source);
+			 tt = tfac.newTransformer(source);
+		 
+		 assertNotNull(tt);
+		 
+		String result = XMLDataUtils.transform(tt, content);
+		
+		 String expected = XMLDataUtils.transform(tt,provider.getClass(), expected_xml);
+		 
+		 String differ = TestDataHelper.diff(expected, result);
+		 boolean same = differ.trim().length()==0;
+		 if( ! same ){
+			 System.out.println(result);
+		 }
+		assertEquals("Unexpected result:"+expected_xml+"\n"+differ,expected,result);
 	}
 }

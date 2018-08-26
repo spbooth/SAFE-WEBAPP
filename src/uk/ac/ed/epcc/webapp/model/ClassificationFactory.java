@@ -256,14 +256,6 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	public class NameItemInput extends ParseAbstractInput<Integer> implements DataObjectItemParseInput<T>{
 
 		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#getItem()
-		 */
-		@Override
-		public T getItem() {
-			return getDataObject();
-		}
-
-		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#setItem(java.lang.Object)
 		 */
 		@Override
@@ -295,7 +287,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		 * @see uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput#getDataObject()
 		 */
 		@Override
-		public T getDataObject() {
+		public T getItem() {
 			return find(getValue());
 		}	
 	}

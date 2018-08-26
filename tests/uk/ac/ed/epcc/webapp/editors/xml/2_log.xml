@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><log>
+<table class="column">
+<tr>
+<th>Path</th>
+<td>/TestXML/Test1.xml</td>
+</tr>
+<tr>
+<th>Node Type</th>
+<td>Element</td>
+</tr>
+</table>
+<div class="element">
+<h3>
+<a href="/TransitionServlet/XML/TestXML/Test1.xml">&lt;Domument</a>&gt;</h3>
+<div class="elementcontent">
+<a href="/TransitionServlet/XML/TestXML/Test1.xml/T0"/>
+<div class="element">
+<h3>
+<a href="/TransitionServlet/XML/TestXML/Test1.xml/E0">&lt;Data</a>&gt;</h3>
+<div class="elementcontent">
+<a href="/TransitionServlet/XML/TestXML/Test1.xml/E0/T0">1</a>
+</div>
+<h3>&lt;/Data&gt;</h3>
+</div>
+<a href="/TransitionServlet/XML/TestXML/Test1.xml/T1"/>
+<div class="element">
+<h3>
+<a href="/TransitionServlet/XML/TestXML/Test1.xml/E1">&lt;Data</a>&gt;</h3>
+<div class="elementcontent">
+<a href="/TransitionServlet/XML/TestXML/Test1.xml/E1/T0">2</a>
+</div>
+<h3>&lt;/Data&gt;</h3>
+</div>
+<a href="/TransitionServlet/XML/TestXML/Test1.xml/T2"/>
+</div>
+<h3>&lt;/Domument&gt;</h3>
+</div>
+</log>

@@ -39,4 +39,18 @@ public interface ViewTransitionFactoryDataProvider<K,T> extends
 	 * @throws Exception 
 	 */
 	public SessionService<?> getForbiddenUser(T target) throws Exception;
+	
+	/** Get a file name of the expected top content
+	 * return null to suppress check
+	 * @param target
+	 * @return  String
+	 */
+	public String getTopContentExpected(T target);
+	
+	/** Get a file name of the expected log content
+	 * return  null to suppress check
+	 * @param target
+	 * @return  String
+	 */
+	public String getLogContentExpected(T target);
 }

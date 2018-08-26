@@ -135,11 +135,6 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 			}
 		}
 	}
-	@Override
-	public T getDataObject() {
-		return getItem();
-	}
-	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AbstractInput#getString(java.lang.Object)
 	 */

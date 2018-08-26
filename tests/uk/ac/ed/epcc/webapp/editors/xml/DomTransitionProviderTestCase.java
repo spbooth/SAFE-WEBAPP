@@ -204,5 +204,21 @@ ViewTransitionFactoryInterfaceTest<XMLTarget, XMLKey, DomTransitionProviderTestC
 		path_test.testVisitor();
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactoryDataProvider#getTopContentExpected(java.lang.Object)
+	 */
+	@Override
+	public String getTopContentExpected(XMLTarget target) {
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactoryDataProvider#getLogContentExpected(java.lang.Object)
+	 */
+	@Override
+	public String getLogContentExpected(XMLTarget target) {
+		return target.getTargetPath().size()+"_log.xml";
+	}
+
 	
 }

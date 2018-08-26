@@ -86,6 +86,16 @@ public class RepositoryTest extends WebappTestBase {
 		res = Repository.getInstance(ctx,"Test");
 	}
 
+	@Test
+	public void testHasIndex() {
+		assertTrue(res.hasIndex("name_index"));
+		assertFalse(res.hasIndex("boris"));
+	}
+	@Test
+	public void testIsUniqueName() {
+		assertTrue(res.isUniqueIdName("TestID"));
+		assertFalse(res.isUniqueIdName("Boris"));
+	}
 	/*
 	 * Test method for 'uk.ac.ed.epcc.webapp.model.data.Repository.getUniqueIdName()'
 	 */
@@ -529,6 +539,26 @@ public class RepositoryTest extends WebappTestBase {
 		assertEquals(2, m.size());
 	}
 	@Test
+	public void testSetMap() throws DataFault {
+		Record r = res.new Record();
+		r.put("Name", "fred");
+		r.put("Number", 12);
+		r.commit();
+		int r_id = r.getID();
+		Map m = r.getValues();
+		m.put("Bogus", "data");
+		
+		Record r2 = res.new Record();
+		r2.set(m);
+		assertEquals("fred",r2.getProperty("Name"));
+		assertEquals(12,r2.getNumberProperty("Number"));
+		assertNull(r2.getProperty("Bogus"));
+		
+		int dup = r2.findDuplicate();
+		
+		assertEquals(r_id,dup);
+	}
+	@Test
 	public void testEquals(){
 		Record r = res.new Record();
 		r.put("Name", "fred");
@@ -599,12 +629,27 @@ public class RepositoryTest extends WebappTestBase {
 		assertEquals(Date.class, f.getTarget());
 		
 	}
-	
+	@Test 
+	public void testBooleanFieldExpression(){
+		FieldValue f = res.getBooleanExpression(DataObject.class,"Boolean");
+		assertNotNull(f);
+		assertEquals(Boolean.class, f.getTarget());
+		
+	}
 	@Test 
 	public void testReferenceValue() throws Exception{
 		IndexedFieldValue f = res.getReferenceExpression(DataObject.class,"PersonID");
 		assertNotNull(f);
 		assertEquals(IndexedReference.class, f.getTarget());
 		assertEquals("Person", f.getFactory().getTag());
+	}
+	
+	@Test
+	public void testConvert() {
+		assertNull(res.convert((Class)null, null));
+		assertNull(res.convert(Date.class, null));
+		assertEquals(new Date(15000L), res.convert(Date.class, 15));
+		assertEquals(Boolean.TRUE, res.convert(Boolean.class, "Y"));
+		assertEquals(12L,res.convert(Number.class, new Date(12000L)));
 	}
 }

@@ -213,6 +213,22 @@ ViewTransitionFactoryInterfaceTest<MailTarget, EditAction, EmailTransitionProvid
 		path_test.testVisitor();
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactoryDataProvider#getTopContentExpected(java.lang.Object)
+	 */
+	@Override
+	public String getTopContentExpected(MailTarget target) {
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactoryDataProvider#getLogContentExpected(java.lang.Object)
+	 */
+	@Override
+	public String getLogContentExpected(MailTarget target) {
+		return target.getHandler().getID()+"_log.xml";
+	}
+
 	
 	
 

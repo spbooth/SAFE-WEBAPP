@@ -240,16 +240,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			setMin(1);
 		}
 
-		/**
-         * get the DataObject corresponding to this inputs Value
-         * 
-         * @return DataObject
-         */
-        public BDO getDataObject() {
-            return getItem();
-        }
-
-        public BDO getItem() {
+		public BDO getItem() {
             Number num = getValue();
             if (num == null) {
                 // must be optional

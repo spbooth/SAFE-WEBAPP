@@ -2427,9 +2427,7 @@ public final class Repository implements AppContextCleanup{
 		return db_tag;
 	}
 
-	int getType(String key) {
-		return getInfo(key).type;
-	}
+	
 
 	/**
 	 * get the field name of the primary key
@@ -2452,6 +2450,9 @@ public final class Repository implements AppContextCleanup{
 	 * @return boolean
 	 */
 	public boolean isUniqueIdName(String name){
+		if (id_name == null) {
+			setMetaData();
+		}
 		return id_name.equals(name);
 	}
 	protected String getUniqueIdName(boolean qualify) {

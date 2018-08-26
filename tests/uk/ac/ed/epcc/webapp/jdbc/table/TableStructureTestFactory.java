@@ -45,7 +45,12 @@ public class TableStructureTestFactory extends DataObjectFactory<TableStructureT
 		protected TableStructureTestObject(Record r) {
 			super(r);
 		}
-	
+		public void setName(String name) {
+			record.setProperty(NAME, name);
+		}
+		public void setSecretIdentity(String val) {
+			record.setOptionalProperty(SECRET_IDENTITY, val);
+		}
 	}
 	
 	/**

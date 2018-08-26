@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableStructureTestFactory.TableStructureTestObject;
 import uk.ac.ed.epcc.webapp.servlet.AbstractTransitionServletTest;
 import uk.ac.ed.epcc.webapp.servlet.ServletTest;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
@@ -189,5 +190,44 @@ public class TableTransitionTests extends AbstractTransitionServletTest {
 		assertTrue(fac.hasField("Wombat"));
 		
 		
+	}
+	
+	@Test
+	public void testIndex() throws Exception {
+		setTransition(provider,null,null);
+		runTransition();
+		checkForwardToTransition(provider,TableTransitionProvider.INDEX, null);
+		checkFormContent(null, "table_form.xml");
+		
+	}
+	
+	@Test
+	public void testViewTable() throws Exception {
+		
+		TableStructureTestFactory target = new TableStructureTestFactory(getContext());
+		setTransition(provider,null,target);
+		checkViewContent(null, "view.xml");
+		
+		
+		//runTransition();
+		//checkForwardToTransition(provider,TableTransitionProvider.INDEX, null);
+		//checkFormContent(null, "table_form.xml");
+		
+	}
+	
+	@Test
+	public void testAddOptionalField() throws Exception {
+		takeBaseline();
+		TableStructureTestFactory target = new TableStructureTestFactory(getContext());
+		setTransition(provider,TableTransitionProvider.ADD_STD_FIELD,target);
+		TableStructureTestObject obj = target.makeBDO();
+		obj.setName("florance");
+		obj.setSecretIdentity("dougal");
+		obj.commit();
+		checkFormContent(null, "add_form.xml");
+		addParam("Field","SecretIdentity");
+		runTransition();
+		checkRedirectToTransition(provider,null, target);
+		checkDiff("/cleanup.xsl", "added.xml");
 	}
 }

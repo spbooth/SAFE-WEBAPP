@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?><view_page>
+<Title>View Table</Title>
+<top/>
+<log>
+<h2>Table TableTest</h2>
+<h3>Table Type:TableStructureTestFactory</h3>
+</log>
+<buttons>
+<active value="DropTable"/>
+<active value="AddForeignKeys"/>
+<active value="DropField"/>
+<active value="DropIndex"/>
+<active value="DropForeignKey"/>
+<active value="AddReferenceField"/>
+<active value="AddDateField"/>
+<active value="AddTextField"/>
+<active value="AddIntegerField"/>
+<active value="AddLongField"/>
+<active value="AddFloatField"/>
+<active value="AddDoubleField"/>
+<active value="Add Std field" help="Add missing fields from the default table specification for this class"/>
+<active value="Add Std index" help="Add missing index from the default table specification for this class"/>
+<active value="Drop optional field" help="Drop optional existing field"/>
+</buttons>
+</view_page>

@@ -65,7 +65,7 @@ ViewTransitionFactoryInterfaceTest<DataObjectFactory, TableTransitionKey, TableT
 	public Set<DataObjectFactory> getTargets() {
 		HashSet<DataObjectFactory> result = new HashSet<DataObjectFactory>();
 		AppContext conn = getContext();
-		Map<String,Class> classmap = conn.getClassMap(DataObjectFactory.class);
+		Map<String,Class> classmap = conn.getClassMap(TableStructureTestFactory.class);
 		for(String key : classmap.keySet()){
 			result.add((DataObjectFactory) conn.makeObject(classmap.get(key), key));
 		}
@@ -229,6 +229,22 @@ ViewTransitionFactoryInterfaceTest<DataObjectFactory, TableTransitionKey, TableT
 	public final void testVisitor() {
 		transition_provider_test.testVisitor();
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactoryDataProvider#getTopContentExpected(java.lang.Object)
+	 */
+	@Override
+	public String getTopContentExpected(DataObjectFactory target) {
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactoryDataProvider#getLogContentExpected(java.lang.Object)
+	 */
+	@Override
+	public String getLogContentExpected(DataObjectFactory target) {
+		return target.getConfigTag()+"_log.xml";
 	}
 
 }
