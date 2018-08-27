@@ -43,7 +43,7 @@ public class ServeDataServlet extends WebappServlet {
 	/**
 	 * 
 	 */
-	static final String DATA_PATH = "/Data/";
+	public static final String DATA_PATH = "/Data/";
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse res,
 		AppContext conn)  {
@@ -97,7 +97,18 @@ public class ServeDataServlet extends WebappServlet {
 		}
 		}catch(Throwable t){
 			getLogger(conn).error("Error caught in ServeDataServlet",t);
+			if( ! res.isCommitted()){
+				try {
+					res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				} catch (IOException e) {
+				}
+			}
+			
+
+			
+			return;		
 		}
+		
 	}
 	
 	public static  String getURL(AppContext conn,ServeDataProducer producer,List<String> args) throws Exception{

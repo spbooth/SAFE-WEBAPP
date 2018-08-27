@@ -284,8 +284,11 @@ public class MockRequest implements HttpServletRequest {
 		if( o instanceof String){
 			return new String[] { (String) o};
 		}
-		Vector<String> v = (Vector<String>)o;
-		return v.toArray(new String[0]);
+		if( o instanceof Vector) {
+			Vector<String> v = (Vector<String>)o;
+			return v.toArray(new String[0]);
+		}
+		return new String[0];
 	}
 
 	public String getProtocol() {

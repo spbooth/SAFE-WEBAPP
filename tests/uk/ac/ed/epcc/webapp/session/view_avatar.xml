@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><view_page>
+<Title>sw@example.com</Title>
+<top/>
+<log>
+<h2>sw@example.com</h2>
+<table class="column">
+<tr>
+<th>Name</th>
+<td>sw@example.com</td>
+</tr>
+<tr>
+<th>Email</th>
+<td>sw@example.com</td>
+</tr>
+<tr>
+<th>Picture</th>
+<td>
+<img alt="sw@example.com" title="sw@example.com" width="100" height="100" src="test/Data/Avatar/1/avatar.png"/>
+</td>
+</tr>
+</table>
+</log>
+<buttons>
+<active value="Email" help="Change the email address we use to contact you"/>
+<active value="RemoveAvatar" help="Clear the avatar image"/>
+<active value="AddAvatar" help="Upload your picture"/>
+<active value="Details" help="Update the information we hold about you"/>
+</buttons>
+</view_page>

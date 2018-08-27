@@ -19,6 +19,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Map;
@@ -64,12 +66,15 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.debug.DebugLoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintLoggerService;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
+import uk.ac.ed.epcc.webapp.mock.MockPart;
 import uk.ac.ed.epcc.webapp.mock.MockRequest;
 import uk.ac.ed.epcc.webapp.mock.MockResponse;
 import uk.ac.ed.epcc.webapp.mock.MockServletContext;
 import uk.ac.ed.epcc.webapp.mock.MockSession;
 import uk.ac.ed.epcc.webapp.model.ClassificationFactory;
 import uk.ac.ed.epcc.webapp.model.data.XMLDataUtils;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AbstractSessionService;
@@ -361,11 +366,16 @@ public abstract class ServletTest extends WebappTestBase{
 		req.removeAttribute(DefaultServletService.PARAMS_KEY_NAME);
 		req.params.put(name,Integer.toString(value));
 	}
-	public void addParam(String name, MimeStreamData value) {
-		req.removeAttribute(DefaultServletService.PARAMS_KEY_NAME);
-		req.params.put(name, value);
-	}
+	
 
+	public void addUploadParam(String name, String mime_type, String resource_name) throws DataFault, IOException {
+		String file_name = getContext().expandText(resource_name);
+		MockPart part = new MockPart(name);
+		part.setFileName(file_name);
+		part.data.setMimeType(mime_type);
+		part.data.read(getClass().getResourceAsStream(file_name));
+		req.addPart(part);
+	}
 	/** Add a {@link Indexed} object as a form parameter using the
 	 * default encoding (the object id).
 	 * 

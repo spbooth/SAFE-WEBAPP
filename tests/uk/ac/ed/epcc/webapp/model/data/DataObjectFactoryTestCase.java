@@ -153,6 +153,7 @@ ListInputInterfaceTest
 	   for(O o: set){
 		   assertTrue(it2.hasNext());
 		   assertTrue(f.isMine(o));
+		   assertEquals(f,DataObject.getFactory(o));
 		   O o2 = it2.next();
 		   assertEquals(o2, o);
 		   o2.release();

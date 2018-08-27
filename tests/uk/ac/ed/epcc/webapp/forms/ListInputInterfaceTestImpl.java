@@ -26,12 +26,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-
-
 import uk.ac.ed.epcc.webapp.forms.inputs.AlternateInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 
 /** An  InterfaceTest for {@link ListInput}.
  * As factory classes override their default input to

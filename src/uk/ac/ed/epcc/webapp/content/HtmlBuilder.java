@@ -44,6 +44,7 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.ServeDataServlet;
+import uk.ac.ed.epcc.webapp.servlet.ServletService;
 
 
 /** A {@link HtmlPrinter} that also implements {@link ContentBuilder} 
@@ -247,7 +248,7 @@ public void addImage(AppContext conn, String alt, String hover,Integer width, In
 		return;
 	}
 	try {
-		String url = ServeDataServlet.getURL(conn, image.getProducer(), image.getArgs());
+		String url = conn.getService(ServletService.class).encodeURL(ServeDataServlet.getURL(conn, image.getProducer(), image.getArgs()));
 		open("img");
 		if( alt != null) {
 			attr("alt", alt);
