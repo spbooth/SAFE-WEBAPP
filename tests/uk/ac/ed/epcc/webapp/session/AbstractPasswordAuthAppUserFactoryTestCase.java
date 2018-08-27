@@ -50,6 +50,9 @@ public abstract class AbstractPasswordAuthAppUserFactoryTestCase<F extends AppUs
 			h.setPassword("boris");
 			user.commit();String old = h.getCryptPassword();
 			System.out.println(" old is "+old);
+			assertNull(comp.findByLoginNamePassword(user.getEmail(), "andrew"));
+			assertNull(comp.findByLoginNamePassword(user.getEmail(), ""));
+			assertNull(comp.findByLoginNamePassword(user.getEmail(), null));
 			U copy = (U) comp.findByLoginNamePassword(user.getEmail(), "boris");
 			Handler hc = comp.getHandler(copy);
 			assertNotNull(copy);

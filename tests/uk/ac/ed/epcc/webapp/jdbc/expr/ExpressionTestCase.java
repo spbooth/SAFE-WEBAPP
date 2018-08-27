@@ -147,8 +147,10 @@ public class ExpressionTestCase extends WebappTestBase {
 		// always double from sql		
 		assertEquals(12.0, res);
 		
-		res = fac.evaluate(obj, new BinarySQLValue(ctx, fac.getDoubleA(), Operator.ADD, new ConstExpression<Double,ExpressionTest>(Double.class, 5.0)));	
+		BinarySQLValue expr = new BinarySQLValue(ctx, fac.getDoubleA(), Operator.ADD, new ConstExpression<Double,ExpressionTest>(Double.class, 5.0));
+		res = fac.evaluate(obj, expr);	
 		assertEquals(12.0, res);
+		assertEquals("( FieldExpression(ExpressionTest.DoubleA->java.lang.Double) ADD Const(5.0))",expr.toString());
 		
 	}
 	

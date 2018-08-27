@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,6 +24,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.CaseExpression.Clause;
 import uk.ac.ed.epcc.webapp.jdbc.expr.NumberTableFactory.NumberTable;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 /**
@@ -163,12 +165,17 @@ public class NumberTableTest extends WebappTestBase {
 		// 8 80 80 3      210    9
 		// 9 90 -1000     300    9
 
-		Double val2 = fac.getSum(SQLExpressionNullFilter.getFilter(fac.getTarget(), fac.getNumber3Expr(), false),expr);
+		SQLFilter<NumberTable> fil1 = SQLExpressionNullFilter.getFilter(fac.getTarget(), fac.getNumber3Expr(), false);
+		Double val2 = fac.getSum(fil1,expr);
 		assertEquals("Select value", 9.0, val2.doubleValue(),0.001);
+		assertEquals("SQLExpressionNullFilter(FieldExpression(NumberTable.Number3->java.lang.Double)==null)",fil1.toString());
 		
-		Double val = fac.getSum(SQLExpressionNullFilter.getFilter(fac.getTarget(), fac.getNumber3Expr(), true),expr);
+		SQLFilter<NumberTable> fil2 = SQLExpressionNullFilter.getFilter(fac.getTarget(), fac.getNumber3Expr(), true);
+		Double val = fac.getSum(fil2,expr);
 		assertEquals("Select value", 300.0, val.doubleValue(),0.001);
+		assertEquals("SQLExpressionNullFilter(FieldExpression(NumberTable.Number3->java.lang.Double)==null)",fil2.toString());
 		
+		assertFalse(fil1.equals(fil2));
 		
 	}
 }

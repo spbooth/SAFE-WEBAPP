@@ -126,9 +126,10 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 				for(Hash h : Hash.values()){
 					if( h.equals(default_hash) || h.isEnabled(conn)){
 						SQLAndFilter<T> clause = new SQLAndFilter<T>(getFactory().getTarget());
-						of.addFilter(clause);
+						
 						clause.addFilter(new SQLValueFilter<T>(getFactory().getTarget(),getRepository(), DatabasePasswordComposite.ALG, h.ordinal()));
 						clause.addFilter(new SQLHashFilter(getContext(),h, password));
+						of.addFilter(clause);
 					}
 				}
 				return of;
