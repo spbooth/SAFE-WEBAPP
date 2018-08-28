@@ -468,7 +468,7 @@ public abstract class DataObject implements ContextIndexed, Identified{
 			return ((Owned)obj).getFactory();
 		}
 		try {
-			return obj.getContext().makeContexedObject(DataObjectFactory.class, obj.getFactoryTag());
+			return obj.getContext().makeObject(DataObjectFactory.class, obj.getFactoryTag());
 		} catch (Exception e) {
 			return null;
 		}

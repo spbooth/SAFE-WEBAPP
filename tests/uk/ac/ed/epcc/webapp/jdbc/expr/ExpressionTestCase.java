@@ -364,16 +364,22 @@ public class ExpressionTestCase extends WebappTestBase {
 		obj.setIntB(5);
 		obj.commit();
 		
-		Boolean res = fac.evaluate(obj, new CompareSQLExpression<>(fac.getIntA(), MatchCondition.GT, fac.getIntB()));
+		CompareSQLExpression<Integer> expr = new CompareSQLExpression<>(fac.getIntA(), MatchCondition.GT, fac.getIntB());
+		assertEquals("(FieldExpression(ExpressionTest.IntA->java.lang.Integer)GTFieldExpression(ExpressionTest.IntB->java.lang.Integer))",expr.toString());
+		Boolean res = fac.evaluate(obj, expr);
 		assertTrue(res);
-		res = fac.evaluate(obj, new CompareSQLExpression<>(fac.getIntA(), null, fac.getIntB()));
+		CompareSQLExpression<Integer> expr2 = new CompareSQLExpression<>(fac.getIntA(), null, fac.getIntB());
+		assertEquals("(FieldExpression(ExpressionTest.IntA->java.lang.Integer)==FieldExpression(ExpressionTest.IntB->java.lang.Integer))",expr2.toString());
+		res = fac.evaluate(obj, expr2);
 		assertFalse(res);
-		res = fac.evaluate(obj, new CompareSQLExpression<>(fac.getIntA(), MatchCondition.LT, fac.getIntB()));
+		CompareSQLExpression<Integer> expr3 = new CompareSQLExpression<>(fac.getIntA(), MatchCondition.LT, fac.getIntB());
+		assertEquals("(FieldExpression(ExpressionTest.IntA->java.lang.Integer)LTFieldExpression(ExpressionTest.IntB->java.lang.Integer))",expr3.toString());
+		res = fac.evaluate(obj, expr3);
 		assertFalse(res);
 		
 		obj.setIntB(7);
 		obj.commit();
-		res = fac.evaluate(obj, new CompareSQLExpression<>(fac.getIntA(), null, fac.getIntB()));
+		res = fac.evaluate(obj, expr2);
 		assertTrue(res);
 	}
 	@Test 
