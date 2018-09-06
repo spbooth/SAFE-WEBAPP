@@ -20,7 +20,7 @@ import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
  *
  */
 
-public abstract class AppUserKey extends TransitionKey<AppUser> {
+public abstract class AppUserKey<AU extends AppUser> extends TransitionKey<AU> {
 	private final String button_text;
 	/**
 	 * @param name
@@ -44,7 +44,7 @@ public abstract class AppUserKey extends TransitionKey<AppUser> {
 		button_text=null;
 	}
 	
-	public abstract boolean allow(AppUser user,SessionService op);
+	public abstract boolean allow(AU user,SessionService op);
 
 	/** get the button text to use
 	 * 

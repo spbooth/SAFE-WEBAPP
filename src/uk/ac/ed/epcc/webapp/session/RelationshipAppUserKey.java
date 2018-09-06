@@ -1,6 +1,6 @@
 package uk.ac.ed.epcc.webapp.session;
 
-public class RelationshipAppUserKey extends AppUserKey {
+public class RelationshipAppUserKey<AU extends AppUser> extends AppUserKey<AU> {
 
 	
 	private final String role;
@@ -15,7 +15,7 @@ public class RelationshipAppUserKey extends AppUserKey {
 	
 
 	@Override
-	public final boolean allow(AppUser user, SessionService op) {
+	public final boolean allow(AU user, SessionService op) {
 		try {
 			return user != null && allowState(user) && op.hasRelationship(op.getLoginFactory(), user, role);
 		} catch (UnknownRelationshipException e) {
@@ -24,7 +24,7 @@ public class RelationshipAppUserKey extends AppUserKey {
 		}
 	}
 
-	protected boolean allowState(AppUser user) {
+	protected boolean allowState(AU user) {
 		return true;
 	}
 }

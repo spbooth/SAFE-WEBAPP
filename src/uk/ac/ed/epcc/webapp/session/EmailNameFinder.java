@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
@@ -55,6 +56,7 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 	 */
 	public static final String EMAIL_MAXWIDTH_PROP = "email.maxwidth";
 	public static final String EMAIL = "Email";
+	public static final Feature CHANGE_EMAIL_FEATURE = new Feature("email.change_transition",true,"Users can change their email address");
 	
 	@Override
 	public TableSpecification modifyDefaultTableSpecification(
@@ -250,7 +252,9 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 	@Override
 	public Map<AppUserKey, Transition<AppUser>> getTransitions(AppUserTransitionProvider provider) {
 		Map<AppUserKey, Transition<AppUser>> map = new LinkedHashMap<AppUserKey, Transition<AppUser>>();
-		map.put(CHANGE_EMAIL, (Transition<AppUser>) new ChangeEmailTransition());
+		if(CHANGE_EMAIL_FEATURE.isEnabled(getContext())) {
+			map.put(CHANGE_EMAIL, (Transition<AppUser>) new ChangeEmailTransition());
+		}
 		return map;
 	}
 

@@ -31,7 +31,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  * The type of the filter is specified separately as this might be a composite object made from a join
  * 
  * @author spb
- *
+ * @see SQLIdFilter
  * @param <T> type of filter
  */
 

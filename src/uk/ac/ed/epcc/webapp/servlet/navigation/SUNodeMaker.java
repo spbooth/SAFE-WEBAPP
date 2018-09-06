@@ -65,14 +65,14 @@ public class SUNodeMaker extends AbstractNodeMaker  {
 		AU user = service.getCurrentPerson();
 		
 		// Add in the current-user transitions directly to the menu
-		AppUserTransitionProvider prov = AppUserTransitionProvider.getInstance(getContext());
-		for(AppUserKey key : prov.getTransitions(user)) {
+		AppUserTransitionProvider<AU> prov = AppUserTransitionProvider.getInstance(getContext());
+		for(AppUserKey<AU> key : prov.getTransitions(user)) {
 			if( key instanceof CurrentUserKey && ((CurrentUserKey)key).addMenu(user)) {
 				if( prov.allowTransition(getContext(), user, key)) {
 					Node n = new ParentNode();
 					n.setMenuText(prov.getText(key));
 					n.setHelpText(prov.getHelp(key));
-					n.setTargetPath(TransitionServlet.getURL(getContext(), prov,(AppUser)user,key));
+					n.setTargetPath(TransitionServlet.getURL(getContext(), prov,user,key));
 					parent.addChild(n);
 				}
 			}

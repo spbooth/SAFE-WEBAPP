@@ -13,7 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
-/** An {@link AppUserKey} for operations that (primarily) on the current user.
+/** An {@link AppUserKey} for operations that (primarily) act on the current user.
  * 
  * These will be added automatically as navigation menu items.
  * 
@@ -52,7 +52,7 @@ public class CurrentUserKey extends AppUserKey {
 	 */
 	@Override
 	public boolean allow(AppUser user, SessionService op) {
-		return op.isCurrentPerson(user) && allowState(user, op);
+		return op != null && user != null && op.isCurrentPerson(user) && allowState(user, op);
 	}
 
 	public boolean allowState(AppUser user, SessionService op) {

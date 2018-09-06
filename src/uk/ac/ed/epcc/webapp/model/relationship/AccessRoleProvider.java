@@ -44,7 +44,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 public interface AccessRoleProvider<U extends AppUser,T extends DataObject> {
-	/** Get a {@link BaseFilter} corresponding to target objects where the current user has
+	/** Get a {@link BaseFilter} corresponding to target objects where the given user has
 	 * the specified relation.
 	 * If the method returns null then the role is not recognised by the provider. 
 	 * A non-null result means the role is recognised but does not imply

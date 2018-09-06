@@ -29,16 +29,17 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 /** An {@link AppUserTransitionProvider} where the view transition can act
  * as the landing-page for the {@link SUNodeMaker} menu.
  * @author Stephen Booth
+ * @param <AU> type of AppUser
  *
  */
-public class LandingPageAppUserTransitionProvider extends AppUserTransitionProvider {
+public class LandingPageAppUserTransitionProvider<AU extends AppUser> extends AppUserTransitionProvider<AU> {
 
 	/** An {@link AppUserKey} for menu items  imported as transitions
 	 * 
 	 * @author Stephen Booth
 	 *
 	 */
-	public static class ImportKey extends AppUserKey{
+	public static class ImportKey<AU extends AppUser> extends AppUserKey<AU>{
 
 		/**
 		 * @param name
@@ -74,7 +75,7 @@ public class LandingPageAppUserTransitionProvider extends AppUserTransitionProvi
 		
 	}
 	
-	public static class MenuTransition extends AbstractDirectTransition<AppUser>{
+	public static class MenuTransition<AU extends AppUser> extends AbstractDirectTransition<AU>{
 		/**
 		 * @param url
 		 */
@@ -89,7 +90,7 @@ public class LandingPageAppUserTransitionProvider extends AppUserTransitionProvi
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
 		 */
 		@Override
-		public FormResult doTransition(AppUser target, AppContext c) throws TransitionException {
+		public FormResult doTransition(AU target, AppContext c) throws TransitionException {
 			return new RedirectResult(url);
 		}
 	}
@@ -114,7 +115,7 @@ public class LandingPageAppUserTransitionProvider extends AppUserTransitionProvi
 			String targetPath = n.getTargetPath(getContext());
 			if( n.isEmpty() && targetPath != null && ! n.useLandingPage(getContext())) {
 				try {
-				addTransition(new ImportKey(n.getID(), n.getMenuText(getContext()),n.getHelpText()), new MenuTransition(targetPath));
+				addTransition(new ImportKey<AU>(n.getID(), n.getMenuText(getContext()),n.getHelpText()), new MenuTransition(targetPath));
 				}catch(Throwable t) {
 					getLogger().error("Error adding transition "+n.getID(), t);
 				}
@@ -144,7 +145,7 @@ public class LandingPageAppUserTransitionProvider extends AppUserTransitionProvi
 	
 
 	@Override
-	public <X extends ContentBuilder> X getTopContent(X cb, AppUser target, SessionService<?> sess) {
+	public <X extends ContentBuilder> X getTopContent(X cb, AU target, SessionService<?> sess) {
 		SUNodeMaker maker = new SUNodeMaker(getContext());
 		Node top = new ParentNode();
 		top.setID("Person");

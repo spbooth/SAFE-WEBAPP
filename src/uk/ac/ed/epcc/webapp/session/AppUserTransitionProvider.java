@@ -39,7 +39,7 @@ import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
  *
  */
 
-public class AppUserTransitionProvider extends AbstractViewTransitionProvider<AppUser, AppUserKey> implements TitleTransitionProvider<AppUserKey, AppUser> {
+public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewTransitionProvider<AU, AppUserKey<AU>> implements TitleTransitionProvider<AppUserKey<AU>, AU> {
 	
 	/**
 	 * 
@@ -57,7 +57,7 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 
 		@Override
 		public boolean allow(AppUser user, SessionService op) {
-			if( op instanceof ServletSessionService) {
+			if( op != null && op instanceof ServletSessionService) {
 				return user != null && ((ServletSessionService)op).canSU(user);
 			}
 			return false;
@@ -66,13 +66,13 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 	public static final AppUserKey SET_ROLE_KEY = new RoleAppUserKey("Roles", "Set roles", "Set permission roles for this user", SET_ROLES_ROLE);
 	public static final CurrentUserKey UPDATE = new CurrentUserKey("Details", "Update personal details", "Update the information we hold about you");
 	
-	public static final class SUTransition extends AbstractDirectTransition<AppUser>{
+	public static final class SUTransition<AU extends AppUser> extends AbstractDirectTransition<AU>{
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
 		 */
 		@Override
-		public FormResult doTransition(AppUser target, AppContext c) throws TransitionException {
+		public FormResult doTransition(AU target, AppContext c) throws TransitionException {
 			SessionService sess = c.getService(SessionService.class);
 			if( sess instanceof ServletSessionService) {
 				((ServletSessionService)sess).su(target);
@@ -81,22 +81,22 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 		}
 		
 	}
-	private final AppUserFactory<?> fac;
+	private final AppUserFactory<AU> fac;
 	/**
 	 * @param c
 	 */
 	public AppUserTransitionProvider(AppContext c) {
 		super(c);
 		fac = c.getService(SessionService.class).getLoginFactory();
-		for(AppUserTransitionContributor cont : fac.getComposites(AppUserTransitionContributor.class)) {
-			for(Entry<AppUserKey, Transition<AppUser>> e : cont.getTransitions(this).entrySet()) {
+		for(AppUserTransitionContributor<AU> cont : fac.getComposites(AppUserTransitionContributor.class)) {
+			for(Entry<AppUserKey<AU>, Transition<AU>> e : cont.getTransitions(this).entrySet()) {
 				addTransition( e.getKey(), e.getValue());
 			}
 		}
 		if( USER_SELF_UPDATE_FEATURE.isEnabled(c)) {
 			addTransition(UPDATE, new UpdateDetailsTransition(this,fac));
 		}
-		addTransition(SET_ROLE_KEY, new SetRoleTransition<>());
+		addTransition(SET_ROLE_KEY, new SetRoleTransition<AU>());
 		addTransition(SU_KEY, new SUTransition());
 	}
 
@@ -104,7 +104,7 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider#getTarget(java.lang.String)
 	 */
 	@Override
-	public AppUser getTarget(String id) {
+	public AU getTarget(String id) {
 		try {
 			return fac.find(Integer.parseInt(id));
 		} catch (NumberFormatException e) {
@@ -135,7 +135,7 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#allowTransition(uk.ac.ed.epcc.webapp.AppContext, java.lang.Object, java.lang.Object)
 	 */
 	@Override
-	public boolean allowTransition(AppContext c, AppUser target, AppUserKey key) {
+	public boolean allowTransition(AppContext c, AU target, AppUserKey<AU> key) {
 		return key.allow(target, c.getService(SessionService.class));
 	}
 
@@ -143,7 +143,7 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#getSummaryContent(uk.ac.ed.epcc.webapp.AppContext, uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object)
 	 */
 	@Override
-	public <X extends ContentBuilder> X getSummaryContent(AppContext c, X cb, AppUser target) {
+	public <X extends ContentBuilder> X getSummaryContent(AppContext c, X cb, AU target) {
 		return cb;
 	}
 
@@ -151,7 +151,7 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#canView(java.lang.Object, uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
 	@Override
-	public boolean canView(AppUser target, SessionService<?> sess) {
+	public boolean canView(AU target, SessionService<?> sess) {
 		try {
 			return ((SessionService)sess).isCurrentPerson(target) || ((SessionService)sess).hasRelationship((AppUserFactory)sess.getLoginFactory(), target, VIEW_PERSON_RELATIONSHIP);
 		} catch (UnknownRelationshipException e) {
@@ -194,7 +194,7 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 	
 
 	@Override
-	public <X extends ContentBuilder> X getLogContent(X cb, AppUser target, SessionService<?> sess) {
+	public <X extends ContentBuilder> X getLogContent(X cb, AU target, SessionService<?> sess) {
 		cb.addHeading(2, target.getIdentifier());
 		AppContext c = sess.getContext();
 		Map<String,Object> attr = new LinkedHashMap<>();
@@ -222,5 +222,8 @@ public class AppUserTransitionProvider extends AbstractViewTransitionProvider<Ap
 	    	text.appendParent();
 	    }
 		return cb;
+	}
+	public AppUserFactory<AU> getAppUserFactory(){
+		return fac;
 	}
 }

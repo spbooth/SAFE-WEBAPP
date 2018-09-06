@@ -25,6 +25,8 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 /** Filter to select/exclude an entry by Id.
  * 
  * @author spb
+ * @see SelfReferenceFilter
+ * @see IdAcceptFilter
  *
  * @param <T>
  */

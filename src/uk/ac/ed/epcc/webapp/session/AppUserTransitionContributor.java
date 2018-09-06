@@ -20,10 +20,11 @@ import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 /** Interface for {@link AppUserComposite}s that add additional transitions to the 
  * AppUser transitions.
  * @author spb
+ * @param <AU> type of AppUser
  *
  */
-public interface AppUserTransitionContributor
+public interface AppUserTransitionContributor<AU extends AppUser>
 {
 
-	Map<AppUserKey,Transition<AppUser>> getTransitions(AppUserTransitionProvider provider);
+	Map<AppUserKey<AU>,Transition<AU>> getTransitions(AppUserTransitionProvider<AU> provider);
 }
