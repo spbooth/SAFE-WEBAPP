@@ -47,9 +47,10 @@ public class AvatarTestCase extends AbstractTransitionServletTest {
 		takeBaseline();
 		SessionService  sess = setupPerson("sw@example.com");
 		target = sess.getCurrentPerson();
-		setTransition(provider,AvatarComposite.ADD_AVATAR,target);
+		setTransition(provider,AvatarComposite.SET_AVATAR,target);
 		
 		addUploadParam(AvatarComposite.AVATAR,"image/png","avatar.png");
+		setAction(AvatarComposite.AddAvatarTransition.ATTACH_ACTION);
 		runTransition();
 		checkViewRedirect(provider, target);
 		checkDiff("/normalize.xsl", "avatar.xml");
@@ -62,8 +63,8 @@ public class AvatarTestCase extends AbstractTransitionServletTest {
 		takeBaseline();
 		SessionService  sess = setupPerson("sw@example.com");
 		target = sess.getCurrentPerson();
-		setTransition(provider,AvatarComposite.REMOVE_AVATAR,target);
-		
+		setTransition(provider,AvatarComposite.SET_AVATAR,target);
+		setAction(AvatarComposite.AddAvatarTransition.REMOVE_ACTION);
 		runTransition();
 		checkViewRedirect(provider, target);
 		checkDiff("/normalize.xsl", "remove_avatar.xml");

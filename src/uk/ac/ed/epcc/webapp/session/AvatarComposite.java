@@ -52,40 +52,72 @@ public class AvatarComposite<AU extends AppUser> extends AppUserComposite<AU, Av
 	public static final String AVATAR="Avatar";
 	//public static final String AVATAR_MIME="AvatarType";
 	public static final String VIEW_AVATAR_RELATIONSHIP="ViewAvatar";
-	public static final CurrentUserKey REMOVE_AVATAR = new CurrentUserKey("RemoveAvatar","Remove avatar","Clear the avatar image") {
-
-		@Override
-		public boolean allowState(AppUser user, SessionService op) {
-			AppUserFactory<?> fac = op.getLoginFactory();
-			AvatarComposite comp = fac.getComposite(AvatarComposite.class);
-			return comp != null && comp.hasAvatar(op, user);
-		}
-		
-		
-	};
-	public class RemoveAvatarTransition extends AbstractDirectTransition<AppUser>{
-
-		/**
-		 * @param provider
-		 */
-		public RemoveAvatarTransition(AppUserTransitionProvider provider) {
-			super();
-			this.provider = provider;
-		}
-		private final AppUserTransitionProvider provider;
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
-		 */
-		@Override
-		public FormResult doTransition(AppUser target, AppContext c) throws TransitionException {
-			removeAvatar((AU)target);
-			return provider.new ViewResult(target);
-		}
-		
-	}
-	public static CurrentUserKey ADD_AVATAR = new CurrentUserKey("AddAvatar", "Add Avatar", "Upload your picture");
+//	public static final CurrentUserKey REMOVE_AVATAR = new CurrentUserKey("RemoveAvatar","Remove avatar","Clear the avatar image") {
+//
+//		@Override
+//		public boolean allowState(AppUser user, SessionService op) {
+//			AppUserFactory<?> fac = op.getLoginFactory();
+//			AvatarComposite comp = fac.getComposite(AvatarComposite.class);
+//			return comp != null && comp.hasAvatar(op, user);
+//		}
+//		
+//		
+//	};
+//	public class RemoveAvatarTransition extends AbstractDirectTransition<AppUser>{
+//
+//		/**
+//		 * @param provider
+//		 */
+//		public RemoveAvatarTransition(AppUserTransitionProvider provider) {
+//			super();
+//			this.provider = provider;
+//		}
+//		private final AppUserTransitionProvider provider;
+//		/* (non-Javadoc)
+//		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
+//		 */
+//		@Override
+//		public FormResult doTransition(AppUser target, AppContext c) throws TransitionException {
+//			removeAvatar((AU)target);
+//			return provider.new ViewResult(target);
+//		}
+//		
+//	}
+	public static CurrentUserKey SET_AVATAR = new CurrentUserKey("SetAvatar", "Change Avatar", "Upload or delete your picture");
 	
 	public class AddAvatarTransition extends AbstractFormTransition<AppUser>{
+		/**
+		 * 
+		 */
+		public static final String REMOVE_ACTION = "Remove";
+		/**
+		 * 
+		 */
+		public static final String ATTACH_ACTION = "Attach";
+		public class RemoveAvatarAction extends FormAction{
+			@Override
+			public String getHelp() {
+				return "Remove the current image";
+			}
+			/**
+			 * @param target
+			 */
+			public RemoveAvatarAction(AU target) {
+				super();
+				this.target = target;
+				setMustValidate(false);
+			}
+			private final AU target;
+			/* (non-Javadoc)
+			 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#action(uk.ac.ed.epcc.webapp.forms.Form)
+			 */
+			@Override
+			public FormResult action(Form f) throws ActionException {
+				removeAvatar(target);
+				return provider.new ViewResult(target);
+			}
+			
+		}
 		public class AddAvatarAction extends FormAction{
 			/**
 			 * @param target
@@ -126,7 +158,10 @@ public class AvatarComposite<AU extends AppUser> extends AppUserComposite<AU, Av
 			ImageInput input = new ImageInput();
 			input.setOptional(false);
 			f.addInput(AVATAR, "Avatar image", input);
-			f.addAction("Attach", new AddAvatarAction(target));
+			f.addAction(ATTACH_ACTION, new AddAvatarAction(target));
+			if( hasAvatar(null, (AU)target)) {
+				f.addAction(REMOVE_ACTION, new RemoveAvatarAction((AU)target));
+			}
 		}
 		
 	}
@@ -227,8 +262,8 @@ public class AvatarComposite<AU extends AppUser> extends AppUserComposite<AU, Av
 	public Map<AppUserKey, Transition<AppUser>> getTransitions(AppUserTransitionProvider provider) {
 		Map<AppUserKey, Transition<AppUser>> map = new LinkedHashMap<>();
 		if( getRepository().hasField(AVATAR)) {
-			map.put(REMOVE_AVATAR, new RemoveAvatarTransition(provider));
-			map.put(ADD_AVATAR, new AddAvatarTransition(provider));
+			//map.put(REMOVE_AVATAR, new RemoveAvatarTransition(provider));
+			map.put(SET_AVATAR, new AddAvatarTransition(provider));
 		}
 		return map;
 	}

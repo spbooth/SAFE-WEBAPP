@@ -22,8 +22,7 @@
 </log>
 <buttons>
 <active value="Email" help="Change the email address we use to contact you"/>
-<active value="RemoveAvatar" help="Clear the avatar image"/>
-<active value="AddAvatar" help="Upload your picture"/>
+<active value="SetAvatar" help="Upload or delete your picture"/>
 <active value="Details" help="Update the information we hold about you"/>
 </buttons>
 </view_page>
