@@ -29,7 +29,7 @@ import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.DefaultServletService;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 
-/** Visitor that generates a MimeStreamData object for the targetted message part
+/** Visitor that generates a {@link MimeStreamData} object for the targetted message part
  * 
  * @author spb
  *

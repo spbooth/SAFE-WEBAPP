@@ -67,7 +67,7 @@ public class ContentMessageVisitor extends AbstractVisitor {
 	  this.sb=buff;
 	  this.linker=linker;
   }
-	/** Output a link to the current part this item to a string buffer
+	/** Output a link to the current part this item to the {@link ContentBuilder}
 	 * @param args path for current part
 	 * 
 	 * @param file filename to use in link
