@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.editors.mail;
 
+import java.text.DateFormat;
 import java.util.Set;
 
 import javax.mail.MessagingException;
@@ -21,6 +22,7 @@ import javax.mail.internet.MimePart;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageWalker.WalkerException;
 
 /** A {@link ContentMessageVisitor} that only shows each message once.
@@ -51,7 +53,11 @@ public class ShortContentMessageVisitor extends ContentMessageVisitor {
 			if( id != null ) {
 				if( message_ids.contains(id)) {
 					sb=sb.getPanel("link","seen_message");
-					addLink(messageWalker.getPath(), id, ">"+m.getSubject());
+					if( sb instanceof HtmlBuilder) {
+						((HtmlBuilder)sb).setNewTab(true);
+					}
+					DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+					addLink(messageWalker.getPath(), id, "["+df.format(m.getSentDate())+"] "+m.getSubject());
 					sb=sb.addParent();
 					return false; // truncate recursion
 				}

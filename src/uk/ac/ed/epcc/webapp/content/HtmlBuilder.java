@@ -742,7 +742,9 @@ public boolean useNewTab() {
 }
 
 
-public void setNewTab(boolean new_tab) {
+public boolean setNewTab(boolean new_tab) {
+	boolean old = this.new_tab;
 	this.new_tab = new_tab;
+	return old;
 }
 }
