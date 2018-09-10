@@ -299,6 +299,7 @@ public class TimeChart<P extends PeriodSequencePlot> extends PeriodChart<P>{
 		while(minor > 2 && plot_points > max_plot_points) {
 			// reduce number of minor points 
 			minor = minor / 2;
+			plot_points = p.getNsplit() * minor;
 		}
 		if( plot_points > max_plot_points) {
 			// Check to avoid chart code using too much memory
