@@ -181,8 +181,8 @@ public interface ContentBuilder {
 	 * @param conn
 	 * @param alt
 	 * @param hover
-	 * @param width (optional)
-	 * @param height (optional)
+	 * @param width (optional, ignored if <= 0) 
+	 * @param height (optional, ignored if <= 0)
 	 * @param image
 	 */
 	public abstract void addImage(AppContext conn,String alt,String hover,Integer width, Integer height, ServeDataResult image);

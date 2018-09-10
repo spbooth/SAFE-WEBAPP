@@ -18,6 +18,7 @@ import java.util.List;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 /** A {@link Visitor} that generates the menu HTML
  * 
@@ -35,7 +36,7 @@ public class MenuVisitor implements Visitor{
 	private static final String MENU_ID_PREFIX = "menu_";
 	private final AppContext conn;
 	private final HtmlBuilder builder;
-	public static final Feature MULTI_LEVEL_MENU_FEATURE=new Feature("navigation.multi_level_menu",false,"Should navigation menus support multiple levels");
+	public static final Preference MULTI_LEVEL_MENU_FEATURE=new Preference("navigation.multi_level_menu",false,"Should navigation menus support multiple levels");
 	public MenuVisitor(AppContext conn,HtmlBuilder builder){
 		this.conn=conn;
 		this.builder=builder;

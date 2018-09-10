@@ -22,7 +22,6 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.Image;
 import uk.ac.ed.epcc.webapp.forms.Form;
@@ -32,11 +31,9 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.inputs.ImageInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
-import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.jdbc.table.BlobType;
-import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
@@ -52,6 +49,7 @@ public class AvatarComposite<AU extends AppUser> extends AppUserComposite<AU, Av
 	public static final String AVATAR="Avatar";
 	//public static final String AVATAR_MIME="AvatarType";
 	public static final String VIEW_AVATAR_RELATIONSHIP="ViewAvatar";
+	public static final String SET_AVATAR_RELATIONSHIP="SetAvatar";
 //	public static final CurrentUserKey REMOVE_AVATAR = new CurrentUserKey("RemoveAvatar","Remove avatar","Clear the avatar image") {
 //
 //		@Override
@@ -83,7 +81,7 @@ public class AvatarComposite<AU extends AppUser> extends AppUserComposite<AU, Av
 //		}
 //		
 //	}
-	public static CurrentUserKey SET_AVATAR = new CurrentUserKey("SetAvatar", "Change Avatar", "Upload or delete your picture");
+	public static CurrentUserKey SET_AVATAR = new CurrentUserKey("SetAvatar", "Change Avatar", "Upload or delete your picture",SET_AVATAR_RELATIONSHIP);
 	
 	public class AddAvatarTransition extends AbstractFormTransition<AppUser>{
 		/**
@@ -241,8 +239,9 @@ public class AvatarComposite<AU extends AppUser> extends AppUserComposite<AU, Av
 		LinkedList<String> path = new LinkedList<>();
 		path.add(Integer.toString(user.getID()));
 		
+		
 		return new Image(getContext(),new ServeDataResult(new AvatarServeDataProducer<>(getContext()), path),
-				user.getIdentifier(),user.getIdentifier(),100,100);
+				user.getIdentifier(),user.getIdentifier(),-1,100);
 	}
 
 	public void removeAvatar(AU user) {

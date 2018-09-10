@@ -1498,7 +1498,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		// but at the moment do 
 		// fac.exists(this.getRelationshipRoleFilter(fac,role)
 		// explicitly
-		if( target == null) {
+		if( target == null || role == null) {
 			return false;
 		}
 		// For the moment we only cache relationships within a request

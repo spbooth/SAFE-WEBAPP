@@ -15,6 +15,8 @@ package uk.ac.ed.epcc.webapp.session;
 
 /** An {@link AppUserKey} for operations that (primarily) act on the current user.
  * 
+ * Optionally an additional role may be specified that
+ * 
  * These will be added automatically as navigation menu items.
  * 
  * @author Stephen Booth
@@ -22,13 +24,18 @@ package uk.ac.ed.epcc.webapp.session;
  */
 public class CurrentUserKey extends AppUserKey {
 
+	private final String additional_role;
 	/**
 	 * @param name
 	 * @param text
 	 * @param help
 	 */
 	public CurrentUserKey(String name, String text, String help) {
+		this(name, text, help,null);
+	}
+	public CurrentUserKey(String name, String text, String help,String additional_role) {
 		super(name, text, help);
+		this.additional_role=additional_role;
 	}
 
 	/**
@@ -36,7 +43,7 @@ public class CurrentUserKey extends AppUserKey {
 	 * @param help
 	 */
 	public CurrentUserKey(String name, String help) {
-		super(name, help);
+		this(name, null,help,null);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -44,7 +51,7 @@ public class CurrentUserKey extends AppUserKey {
 	 * @param name
 	 */
 	public CurrentUserKey(String name) {
-		super(name);
+		this(name,null);
 	}
 
 	/* (non-Javadoc)
@@ -52,7 +59,7 @@ public class CurrentUserKey extends AppUserKey {
 	 */
 	@Override
 	public boolean allow(AppUser user, SessionService op) {
-		return op != null && user != null && op.isCurrentPerson(user) && allowState(user, op);
+		return op != null && user != null && (op.isCurrentPerson(user) || (additional_role != null && op.hasRelationship(op.getLoginFactory(), user, additional_role,false)))&& allowState(user, op);
 	}
 
 	public boolean allowState(AppUser user, SessionService op) {
