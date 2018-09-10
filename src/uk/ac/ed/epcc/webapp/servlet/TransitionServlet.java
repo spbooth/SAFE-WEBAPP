@@ -587,6 +587,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		return addButton(c, hb, tp, operation, target, text, title,false);
 	}
 	public static <A,B, X extends ExtendedXMLBuilder> X addButton(AppContext c,X hb, TransitionFactory<A,B> tp, A operation, B target,String text,String title, boolean new_tab ){
+		if( tp.allowTransition(c, target, operation)) {
 		String url = getURL(c, tp, target, null);
 		hb.open("form");
         hb.attr("method", "post");
@@ -636,6 +637,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
           }
          hb.close();
         hb.close();
+		}
 		return hb;
 	}
 	public static <A,B, X extends ExtendedXMLBuilder> X addButton(AppContext c,X hb, ChainedTransitionResult<B, A> next,String text ){
