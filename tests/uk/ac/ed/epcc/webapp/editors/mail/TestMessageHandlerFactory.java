@@ -247,7 +247,7 @@ public class TestMessageHandlerFactory implements MessageHandlerFactory{
 		 */
 		public boolean canEdit(List<String> path, SessionService<?> operator) {
 			// TODO Auto-generated method stub
-			return false;
+			return true;
 		}
 		@Override
 		public int hashCode() {

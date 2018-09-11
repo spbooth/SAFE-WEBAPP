@@ -13,7 +13,32 @@
 <!--| See the License for the specific language governing permissions and      |-->
 <!--| limitations under the License.                                           |-->
 <Title>View Email:TestMessage</Title>
-<top/>
+<top>
+<div class="bar">
+<h2>Send Message</h2>
+<form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
+<input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0"/>
+<input type="hidden" name="Transition" value="Send"/>
+<input class="input_button" type="submit" value="Send"/>
+</form>
+</div>
+<div class="bar">
+<h2>Abort Message</h2>
+<form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
+<input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0"/>
+<input type="hidden" name="Transition" value="Abort"/>
+<input class="input_button" type="submit" value="Abort"/>
+</form>
+</div>
+<div class="bar">
+<h2>Undo all edits</h2>
+<form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
+<input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0"/>
+<input type="hidden" name="Transition" value="StartOver"/>
+<input class="input_button" type="submit" value="StartOver"/>
+</form>
+</div>
+</top>
 <log>
 <h3> Build TestMessage</h3>
 <div class="message">
@@ -58,5 +83,9 @@
 </form>
 </div>
 </log>
-<buttons/>
+<buttons>
+<active value="Send" help="Send Message"/>
+<active value="Abort" help="Abort Message"/>
+<active value="StartOver" help="Undo all edits"/>
+</buttons>
 </view_page>

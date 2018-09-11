@@ -20,12 +20,16 @@ import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.transition.PathTransitionProviderInterfaceTest;
 import uk.ac.ed.epcc.webapp.forms.transition.PathTransitionProviderInterfaceTestImpl;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactoryDataProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactoryInterfaceTest;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactoryInterfaceTestImpl;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.session.AbstractSessionService;
+import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.session.SimpleSessionService;
 
@@ -69,8 +73,14 @@ ViewTransitionFactoryInterfaceTest<MailTarget, EditAction, EmailTransitionProvid
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactoryDataProvider#getAllowedUser(java.lang.Object)
 	 */
-	public SessionService<?> getAllowedUser(MailTarget target) {
-		return new SimpleSessionService(ctx);
+	public SessionService<?> getAllowedUser(MailTarget target) throws DataFault, ParseException {
+		
+		SimpleSessionService sess = new SimpleSessionService(ctx);
+		ctx.setService(sess);
+		AppUserFactory<?> fac = sess.getLoginFactory();
+		AbstractSessionService.setupRoleTable(ctx);
+		sess.setCurrentPerson(fac.makeFromString("fred@example.com"));
+		return sess;
 	}
 
 	/* (non-Javadoc)

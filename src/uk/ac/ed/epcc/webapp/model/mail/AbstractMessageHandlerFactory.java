@@ -83,9 +83,9 @@ public abstract class AbstractMessageHandlerFactory<H extends AbstractMessageHan
 		}
 	}
 	private static final Status status = new Status();
-	private static final Status.Value COMPOSE = status.new Value("C","Compose");
-	private static final Status.Value SENT = status.new Value("S","Sent");
-	private static final Status.Value ABANDONED = status.new Value("A","Abandoned");
+	protected static final Status.Value COMPOSE = status.new Value("C","Compose");
+	protected static final Status.Value SENT = status.new Value("S","Sent");
+	protected static final Status.Value ABANDONED = status.new Value("A","Abandoned");
 	
 	public static abstract class Provider extends MessageDataObject implements MessageProvider{
 

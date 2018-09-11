@@ -57,6 +57,7 @@ public class TestingMessageHandlerFactory<H extends TestingMessageHandlerFactory
 		H obj = makeBDO();
 		SessionService service = getContext().getService(SessionService.class);
 		obj.setOwner(service);
+		obj.setStatus(COMPOSE);
 		obj.commit();
 		Composer comp = new Composer(obj);
 		comp.repopulate(service);
@@ -115,4 +116,5 @@ public class TestingMessageHandlerFactory<H extends TestingMessageHandlerFactory
 		
 		return h.isOwner(user);
 	}
+
 }

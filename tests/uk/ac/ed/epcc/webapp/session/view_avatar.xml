@@ -15,7 +15,7 @@
 <tr>
 <th>Picture</th>
 <td>
-<img alt="sw@example.com" title="sw@example.com" width="100" height="100" src="test/Data/Avatar/1/avatar.png"/>
+<img alt="sw@example.com" title="sw@example.com" height="100" src="test/Data/Avatar/1/avatar.png"/>
 </td>
 </tr>
 </table>

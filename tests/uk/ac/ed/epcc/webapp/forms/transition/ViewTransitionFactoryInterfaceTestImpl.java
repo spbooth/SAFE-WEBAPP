@@ -81,7 +81,8 @@ public class ViewTransitionFactoryInterfaceTestImpl<T,K,X extends ViewTransition
 		for(T target : provider.getTargets()){
 			HtmlBuilder builder = new HtmlBuilder();
 			builder.open("log");
-			fac.getLogContent(builder, target, provider.getAllowedUser(target));
+			SessionService<?> user = provider.getAllowedUser(target);
+			fac.getLogContent(builder, target, user);
 			builder.close();
 			String log = builder.toString();
 			String expected_name = provider.getLogContentExpected(target);
