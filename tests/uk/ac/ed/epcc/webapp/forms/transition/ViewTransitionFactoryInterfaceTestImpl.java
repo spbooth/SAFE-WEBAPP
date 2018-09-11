@@ -52,9 +52,13 @@ public class ViewTransitionFactoryInterfaceTestImpl<T,K,X extends ViewTransition
 		ViewTransitionFactory<K, T> fac = provider.getTransitionFactory();
 		for(T target : provider.getTargets()){
 			assertTrue(fac.canView(target, provider.getAllowedUser(target)));
+			// This is not strictly necessary but for robustness allowTransition
+			// should be compatible with canView and not throw exceptions
+			assertTrue(fac.allowTransition(provider.getContext(), target, null));
 			SessionService<?> forbiddenUser = provider.getForbiddenUser(target);
 			if( forbiddenUser != null ){
 				assertFalse(fac.canView(target, forbiddenUser));
+				assertFalse(fac.allowTransition(provider.getContext(), target, null));
 			}
 		}
 	}

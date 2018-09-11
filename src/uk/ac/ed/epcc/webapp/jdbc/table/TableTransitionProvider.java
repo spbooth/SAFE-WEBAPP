@@ -275,7 +275,12 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
     
 	public boolean allowTransition(AppContext c,DataObjectFactory target,
 			TableTransitionKey name) {
-		if( name.allow(c.getService(SessionService.class),target)) {
+		SessionService sess = c.getService(SessionService.class);
+		if( name == null) {
+			return canView(target, sess);
+		}
+		
+		if( name.allow(sess,target)) {
 			return true;
 		}
 		return false;
