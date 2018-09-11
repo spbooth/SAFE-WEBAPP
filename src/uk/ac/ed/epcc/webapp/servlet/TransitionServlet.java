@@ -587,7 +587,19 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		return addButton(c, hb, tp, operation, target, text, title,false);
 	}
 	public static <A,B, X extends ExtendedXMLBuilder> X addButton(AppContext c,X hb, TransitionFactory<A,B> tp, A operation, B target,String text,String title, boolean new_tab ){
-		if( tp.allowTransition(c, target, operation)) {
+		if( operation == null ) {
+			// maybe view, for the moment assume a default transition will be passed explicitly
+			if( tp instanceof ViewTransitionFactory) {
+				if( ! ((ViewTransitionFactory<A, B>)tp).canView(target, c.getService(SessionService.class))){
+					return hb;
+				}
+			}else {
+				return hb;
+			}
+		}else if( ! tp.allowTransition(c, target, operation)) {
+			// not allowed
+			return hb;
+		}
 		String url = getURL(c, tp, target, null);
 		hb.open("form");
         hb.attr("method", "post");
@@ -637,7 +649,6 @@ public  class TransitionServlet<K,T> extends WebappServlet {
           }
          hb.close();
         hb.close();
-		}
 		return hb;
 	}
 	public static <A,B, X extends ExtendedXMLBuilder> X addButton(AppContext c,X hb, ChainedTransitionResult<B, A> next,String text ){
