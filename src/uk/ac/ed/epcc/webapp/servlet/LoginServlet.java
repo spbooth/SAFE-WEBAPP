@@ -124,6 +124,12 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 			}
 			AppUserFactory<T> person_fac = serv.getLoginFactory();
 			PasswordAuthComposite<T> password_auth = person_fac.getComposite(PasswordAuthComposite.class);
+
+			if(  password_auth == null) {
+				message(conn,req,res,"disabled_feature_error");
+				return;
+			}
+			
 			// User wants a new password sent to them
 
 			if (req.getParameter("email_password") != null ){
