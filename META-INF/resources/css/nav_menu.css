@@ -107,6 +107,10 @@ nav li.notify >  a:after {
 	content:   url("link.png");
   	margin-left: 15px;
   }
+  
+.nav li.parent > a:after{
+	content: " \25B6";
+}
 /*******************************************
    Style menu for larger screens
 
@@ -192,13 +196,13 @@ nav li.notify >  a:after {
    * are included static in the parent menu
    * so their size is included in the parent menu scrolling works
    * If made absolute (and dynamic)  the parent menu would have to use overflow: visible
-   */ 
+   * 
   .nav ul li ul ul{
     position: initial;
     display: initial;
     width: inherit;
   }
-  
+  */
   /* sub-menus add vertical scroll above a certain length
    */
   .nav > ul > li > ul {
@@ -206,17 +210,18 @@ nav li.notify >  a:after {
     overflow-y: auto;
     overflow-x: visible;
   }
-  /*  alternate rules for dynamic sub-menu
+  /*  alternate rules for dynamic sub-menu */
   .nav ul li ul ul{
     position: absolute;
     z-index: 12;
     left: 100px;
+    box-shadow: 2px 4px #888888;
   }
   .nav > ul > li > ul {
   	overflow-x: visible;
   	overflow-y: visible;
   }
-  */
+  
   /* sub-menu items need to auto-calculate height
    * so the sub-menu can do overflow properly
    */

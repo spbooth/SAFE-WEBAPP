@@ -84,7 +84,7 @@ public class NodeContainer implements Externalizable {
 			addChild((Node)in.readObject());
 		}
 	}
-	
+	/** Does the node contain children */
 	public boolean isEmpty(){
 		return children.isEmpty();
 	}

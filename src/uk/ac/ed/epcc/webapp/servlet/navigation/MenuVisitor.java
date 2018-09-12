@@ -16,7 +16,6 @@ package uk.ac.ed.epcc.webapp.servlet.navigation;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
@@ -36,7 +35,8 @@ public class MenuVisitor implements Visitor{
 	private static final String MENU_ID_PREFIX = "menu_";
 	private final AppContext conn;
 	private final HtmlBuilder builder;
-	public static final Preference MULTI_LEVEL_MENU_FEATURE=new Preference("navigation.multi_level_menu",false,"Should navigation menus support multiple levels");
+	private int depth=0;  // depth (if not done by recursion)
+	public static final Preference MULTI_LEVEL_MENU_FEATURE=new Preference("navigation.multi_level_menu",true,"Should navigation menus support multiple levels");
 	public MenuVisitor(AppContext conn,HtmlBuilder builder){
 		this.conn=conn;
 		this.builder=builder;
@@ -54,7 +54,6 @@ public class MenuVisitor implements Visitor{
 			// merge lower levels to work round IE11 bug
 			
 			builder.open("ul");
-			
 			if( top){
 				//builder.attr("role", "menubar");
 			    builder.attr("id","navbar");
@@ -93,7 +92,9 @@ public class MenuVisitor implements Visitor{
 	}
 	
 	public void visitNode(Node node,boolean recurse) {
+		
 		boolean top = ! (node.getParent() instanceof Node);
+		depth++;
 		builder.open("li");
 		//builder.attr("role","menuitem");
 		//if( top ){
@@ -113,14 +114,13 @@ public class MenuVisitor implements Visitor{
 		
 		String display_class = node.getDisplayClass(conn);
 		if( display_class != null ){
-			if( class_string.isEmpty()){
-				class_string = display_class;
-			}else{
-				class_string = class_string +" "+ display_class;
-			}
+			builder.addClass(display_class);
 		}
 		if( ! class_string.isEmpty()){
-			builder.attr("class",class_string);
+			builder.addClass(class_string);
+		}
+		if( depth > 1 && ! node.isEmpty()) {
+			builder.addClass("parent");
 		}
 		String help = node.getHelpText();
 		if( help != null && ! help.isEmpty()){
@@ -130,6 +130,7 @@ public class MenuVisitor implements Visitor{
 		if( id != null){
 			builder.attr("id",MENU_ID_PREFIX+id);
 		}
+		
 		if( targetPath != null ){
 			
 			builder.open("a");
@@ -162,6 +163,7 @@ public class MenuVisitor implements Visitor{
 		if( recurse &&  ! node.isEmpty()){
 			visitContainer(node);
 		}
+		depth--;
 		builder.close(); // close node
 	}
 	/** adds a node and all its children without nesting 
