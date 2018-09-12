@@ -80,14 +80,14 @@ public class TypeConverterSQLValue<H,T,D> implements  SQLValue<T>, FilterProvide
 	 */
 	public final SQLFilter<H> getFilter(MatchCondition match, T val)
 			throws CannotFilterException, NoSQLFilterException {
-		if( match != null ){
+		if( match != null && match != MatchCondition.NE){
 			throw new CannotFilterException("Cannot perform relative match via TypeConverter");
 		}
 		D equiv = converter.getIndex(val);
 		if( inner instanceof FilterProvider){
-			return ((FilterProvider<H, D>)inner).getFilter(null, equiv);
+			return ((FilterProvider<H, D>)inner).getFilter(match, equiv);
 		}else if( inner instanceof SQLExpression){
-			return SQLExpressionFilter.getFilter(target,(SQLExpression<D>)inner, equiv);
+			return SQLExpressionFilter.getFilter(target,(SQLExpression<D>)inner,match, equiv);
 		}
 		throw new CannotFilterException();
 	}
