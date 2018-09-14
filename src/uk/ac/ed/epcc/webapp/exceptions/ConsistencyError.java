@@ -24,7 +24,7 @@ package uk.ac.ed.epcc.webapp.exceptions;
  */
 
 
-public class ConsistencyError extends Error {
+public class ConsistencyError extends RuntimeException {
 	/**
 	 * 
 	 */

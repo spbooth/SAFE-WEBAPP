@@ -50,14 +50,14 @@ public class CheckClassProperties implements Command {
 						String fqn = class_name;
 						try{
 							Class clazz = Class.forName(fqn);
-						}catch(Throwable e1){
+						}catch(Exception e1){
 							System.out.println("classdef:"+name.substring(AppContext.CLASSDEF_PROP_PREFIX.length())+" Not found \n\t"+fqn);
 						}
 					}else if( name.startsWith(AppContext.CLASS_PREFIX)){
 						Object o=null;
 						try{
 						o = conn.getClassFromName(Object.class, null, class_name);
-						}catch(Throwable t){
+						}catch(Exception t){
 							
 						}
 						if( o == null ){

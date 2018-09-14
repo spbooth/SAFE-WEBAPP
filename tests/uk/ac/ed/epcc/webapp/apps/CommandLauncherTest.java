@@ -13,16 +13,15 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.apps;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
-import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -85,8 +84,8 @@ public class CommandLauncherTest extends WebappTestBase {
 			launcher.run(new String[]{"TestCommand","-T"});
 			System.out.println("Returned");
 			ok = false;
-		}catch(Throwable e){
-			System.out.println("Got excpetion");
+		}catch(Exception e){
+			System.out.println("Got exception");
 		}
 		assertTrue(ok);
 	}

@@ -169,7 +169,7 @@ public class Emailer {
 			if( pattern_text != null){
 				dont_send_pattern = Pattern.compile(pattern_text);
 			}
-		}catch(Throwable t){
+		}catch(Exception t){
 			getLogger().error("Error making dont_send_pattern", t);
 		}
 	}
@@ -224,7 +224,7 @@ public class Emailer {
 			if( listener != null ){
 				listener.passwordInvalid(person);
 			}
-		}catch(Throwable t){
+		}catch(Exception t){
 			getLogger().error("Error calling PasswordChangeListener", t);
 		}
 	}
@@ -705,7 +705,7 @@ public class Emailer {
 					if( additional != null ){
 						set.add(new InternetAddress(additional));
 					}
-				}catch(Throwable t){
+				}catch(Exception t){
 					getLogger().error("Error in alsoto hack", t);
 				}
 			}
@@ -1046,7 +1046,7 @@ public class Emailer {
 		String subject = null;
 		try{
 			subject = getSubject(null, errorEmail);
-		}catch(Throwable t){
+		}catch(Exception t){
 			// can cope with this
 		}
 		errorEmail(conn, subject,errorEmail.toString());

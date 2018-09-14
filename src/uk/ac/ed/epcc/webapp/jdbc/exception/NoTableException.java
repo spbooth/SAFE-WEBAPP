@@ -11,16 +11,14 @@
 //| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
-package uk.ac.ed.epcc.webapp.model.data.Exceptions;
-
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+package uk.ac.ed.epcc.webapp.jdbc.exception;
 
 /** Exception thrown when the specified table does not exist yet
  * 
  * @author spb
  *
  */
-public class NoTableException extends DataException {
+public class NoTableException extends DataError {
 
 	public NoTableException(String str) {
 		super(str);

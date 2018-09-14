@@ -140,7 +140,7 @@ public class TableSpecification {
 				}else{
 					setField(name, new ReferenceFieldType(type));
 				}
-			}catch(Throwable t) {
+			}catch(Exception t) {
 				conn.getService(LoggerService.class).getLogger(getClass()).error("Error parsing table specification parameter "+name+"="+type,t);
 			}
 		}

@@ -17,10 +17,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataError;
 
 /** A {@link SQLExpression} that interprets a numeric {@link SQLExpression} to
  * as a double. This does not alter the SQL expression just the type it is interpretted as.

@@ -639,7 +639,7 @@ public final class AppContext {
 		try{
 			enum_name=enum_name.trim();
 			return (E) Enum.valueOf(clazz, enum_name);
-		}catch(Throwable t){
+		}catch(Exception t){
 			error(t,"Error getting EnumParameter "+clazz.getCanonicalName()+" "+enum_name);
 			return fallback;
 		}
@@ -1044,7 +1044,7 @@ public final class AppContext {
 				}
 			}
 			return result;
-		}catch(Throwable e){
+		}catch(Exception e){
 			error(e,"Error making class "+target.getCanonicalName());
 			return null;
 		}finally{
@@ -1149,7 +1149,7 @@ public final class AppContext {
 				result.put(tag, cand);
 			}
 			}
-			}catch(Throwable t){
+			}catch(Exception t){
 				LoggerService serv = getService(LoggerService.class);
 				if( serv != null){
 					// make this a non fatal error in tests

@@ -136,7 +136,7 @@ public class DataBaseConfigService implements ConfigService {
     		
     			
     		
-    		}catch(Throwable e){
+    		}catch(Exception e){
     			// setup has failed
     			// try to report and carry on. 
     			// However this will leave incomplete data in any upper caches.

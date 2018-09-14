@@ -17,10 +17,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataError;
 
 /** SQLExpression that counts distinct values of an expression. 
  * @author spb

@@ -14,16 +14,16 @@
 /*******************************************************************************
  * Copyright (c) - The University of Edinburgh 2010
  *******************************************************************************/
-package uk.ac.ed.epcc.webapp.model.data.Exceptions;
+package uk.ac.ed.epcc.webapp.jdbc.exception;
 /** A Data error similar to a DataException but this is taken to be
- * a non recoverable error.
+ * a normally non recoverable error (hence an uncaught exception)
  * 
  * @author spb
  *
  */
 
 
-public class DataError extends Error {
+public class DataError extends RuntimeException {
 
 	
 	public DataError(String message) {

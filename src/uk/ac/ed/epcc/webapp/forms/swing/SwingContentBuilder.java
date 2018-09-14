@@ -764,7 +764,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 				
 		JLabel label = new JLabel(new ImageIcon(bi));
 		addComponent(label);
-		}catch(Throwable t) {
+		}catch(Exception t) {
 			getLogger().error("Error making image",t);
 		}
 	}

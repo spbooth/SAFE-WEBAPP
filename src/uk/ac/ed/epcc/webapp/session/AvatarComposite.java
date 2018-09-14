@@ -248,7 +248,7 @@ public class AvatarComposite<AU extends AppUser> extends AppUserComposite<AU, Av
 		try {
 			getRecord(user).setProperty(AVATAR, null);
 			user.commit();
-		}catch(Throwable t) {
+		}catch(Exception t) {
 			getLogger().error("Error removing avatar", t);
 		}
 	}

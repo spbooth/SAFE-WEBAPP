@@ -26,6 +26,7 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
  */
 public class DebugLogger implements Logger {
     private final Logger nested;
+    
   
     public DebugLogger(Logger l){
     	this.nested=l;

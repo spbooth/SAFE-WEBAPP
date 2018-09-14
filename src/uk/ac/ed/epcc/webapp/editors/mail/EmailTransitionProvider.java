@@ -626,7 +626,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		}
 		try{
 			return EditAction.valueOf(name);
-		}catch(Throwable t){
+		}catch(Exception t){
 			return null;
 		}
 	}

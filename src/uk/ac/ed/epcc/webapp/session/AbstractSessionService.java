@@ -937,7 +937,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			// Does a target object exist which matches the named filter and
 			// the designated relationship
 			return fac.exists(fil);
-		}catch(Throwable t) {
+		}catch(Exception t) {
 			error(t,"Error checking relationship based role");
 			return false;
 		}

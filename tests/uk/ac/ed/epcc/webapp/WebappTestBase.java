@@ -111,14 +111,14 @@ public abstract class WebappTestBase implements ContextHolder{
 					for(DataObject o: fac.all()){
 						d.dump(o);
 					}
-				}catch(Throwable t){
+				}catch(Exception t){
 					log.warn("Error in dump of "+tab, t);
 				}
 			}
 			builder.close();
 			builder.appendParent();
 			//w.close();
-		}catch(Throwable t){
+		}catch(Exception t){
 			ctx.error(t,"Error dumping fixtures");
 		}
 
@@ -149,7 +149,7 @@ public abstract class WebappTestBase implements ContextHolder{
 			builder.close();
 			builder.appendParent();
 			//w.close();
-		}catch(Throwable t){
+		}catch(Exception t){
 			ctx.error(t,"Error dumping fixtures");
 		}
 

@@ -179,7 +179,7 @@ protected A lookupPerson() {
 						}
 					}
 				}
-			}catch(Throwable e){
+			}catch(Exception e){
 				getContext().error(e, "Error updating Wtmp");
 				removeAttribute(WTMP_EXPIRY_DATE);
 				removeAttribute(WTMP_ID);
@@ -240,7 +240,7 @@ public void logOut(){
 			}
 			setCookie(false, "");
 		}
-	}catch(Throwable t){
+	}catch(Exception t){
 		getContext().error(t, "Error closing Wtmp");
 	}
 	if( ss instanceof DefaultServletService){
@@ -313,7 +313,7 @@ public void setCrossCookie(WtmpManager man, Wtmp w)  {
 				}
 			}
 		}
-	}catch(Throwable t){
+	}catch(Exception t){
 		getContext().error(t,"Error setting cross app cookie");
 	}
 }
@@ -394,7 +394,7 @@ protected Integer getPersonID() {
 							}
 						}
 					}
-				}catch(Throwable t){
+				}catch(Exception t){
 					getContext().error(t,"Error reading cross app cookie");
 				}
 			}
@@ -403,7 +403,7 @@ protected Integer getPersonID() {
 		// This breaks the sign-up code as the newly created user is remembered as being
 		// non-valid best to slow down unregistered users.
 		clearCurrentPerson();
-	}catch(Throwable t){
+	}catch(Exception t){
 		getContext().error(t, "Error populating session");
 	}
 	return 0;

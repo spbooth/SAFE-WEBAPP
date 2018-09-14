@@ -98,7 +98,7 @@ public class EmailLoggerService implements Contexed, LoggerService {
 			java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
 			props.put("host.name",localMachine.getHostName());
 			
-		}catch(Throwable t){
+		}catch(Exception t){
 			//if( nested != null ){
 			//nested.getLogger(getClass()).error("Cannot get hostname",t);
 			//}
@@ -112,7 +112,7 @@ public class EmailLoggerService implements Contexed, LoggerService {
 			if( serv != null){
 				props.put("database.host", serv.getSQLContext().getConnectionHost());
 			}
-		}catch(Throwable t){
+		}catch(Exception t){
 			if( nested != null ){
 				nested.getLogger(getClass()).error("Cannot get database hostname");
 			}
@@ -143,7 +143,7 @@ public class EmailLoggerService implements Contexed, LoggerService {
 				Hashtable props = getProps();
 				props.put("report_level", level.toString());
 				Emailer.errorEmail(getContext(), e, props, text);
-			}catch(Throwable t){
+			}catch(Exception t){
 				if( nested != null ){
 					Logger l = nested.getLogger(getClass());
 					if( l != null ){

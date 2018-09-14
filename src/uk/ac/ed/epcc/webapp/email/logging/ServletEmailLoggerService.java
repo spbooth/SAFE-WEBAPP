@@ -118,7 +118,7 @@ public class ServletEmailLoggerService extends EmailLoggerService {
 				props.put("timers", sb.toString());
 			}
 		}
-		}catch(Throwable t){
+		}catch(Exception t){
 			
 		}
 		return props;

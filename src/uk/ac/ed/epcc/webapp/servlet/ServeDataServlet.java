@@ -95,7 +95,7 @@ public class ServeDataServlet extends WebappServlet {
 			return;
 
 		}
-		}catch(Throwable t){
+		}catch(Exception t){
 			getLogger(conn).error("Error caught in ServeDataServlet",t);
 			if( ! res.isCommitted()){
 				try {

@@ -62,7 +62,7 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 		if( ! fil.hasAcceptFilters()) {
 			try {
 				return FilterConverter.convert(fil).acceptVisitor(this);
-			}catch(Throwable t) {
+			}catch(Exception t) {
 				getLogger().error("Unexpected error: SQL convert failed", t);
 			}
 		}

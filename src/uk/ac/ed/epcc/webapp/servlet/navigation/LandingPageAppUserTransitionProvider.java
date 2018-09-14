@@ -116,7 +116,7 @@ public class LandingPageAppUserTransitionProvider<AU extends AppUser> extends Ap
 			if( n.isEmpty() && targetPath != null && ! n.useLandingPage(getContext())) {
 				try {
 				addTransition(new ImportKey<AU>(n.getID(), n.getMenuText(getContext()),n.getHelpText()), new MenuTransition(targetPath));
-				}catch(Throwable t) {
+				}catch(Exception t) {
 					getLogger().error("Error adding transition "+n.getID(), t);
 				}
 			}

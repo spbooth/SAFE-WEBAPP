@@ -155,7 +155,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 							map.put(id, new_id);
 						}
 					}
-				}catch(Throwable t){
+				}catch(Exception t){
 					conn.error(t,"Error commiting record");
 				}finally{
 					res=null;
@@ -167,7 +167,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 			if( depth == 1){
 				try{
 					processSpecification(table_name, spec);
-				}catch(Throwable t){
+				}catch(Exception t){
 					conn.error(t,"Error creating table");
 				}finally{
 					table_name=null;
@@ -260,7 +260,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 						}
 					}
 					field=null;
-				}catch(Throwable t){
+				}catch(Exception t){
 					id=null;
 					res=null;
 					current=null;

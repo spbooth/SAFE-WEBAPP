@@ -115,7 +115,7 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 					}else{
 						log.error("No HearBeatListener constructed for tag "+l);
 					}
-				}catch(Throwable t){
+				}catch(Exception t){
 					ok=false;
 					log.error("Error in hearbeatlistener "+l,t);
 				}finally{
@@ -153,7 +153,7 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 				ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
 				service.scheduleWithFixedDelay(runner, repeat, repeat, TimeUnit.MINUTES);
 			}
-		}catch(Throwable t){
+		}catch(Exception t){
 			config.getServletContext().log("Error checking for heartbeat-thread", t);
 		}
 	}

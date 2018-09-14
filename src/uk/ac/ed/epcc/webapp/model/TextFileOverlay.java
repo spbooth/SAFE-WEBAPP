@@ -455,7 +455,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 				diffdata.setMimeType("text/plain");
 				diffdata.setName("diffdata.txt");
 				return new ServeDataResult(producer, producer.setData(diffdata));
-			}catch(Throwable t) {
+			}catch(Exception t) {
 				throw new ActionException("internal_error", t);
 			}
 		}

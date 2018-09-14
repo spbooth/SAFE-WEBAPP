@@ -119,7 +119,7 @@ public class ErrorFilter implements Filter {
 				// Make sure Cleanup runs first
 				serv.cleanup();
 				conn.close();
-			}catch(Throwable t){
+			}catch(Exception t){
 				log.error("Error closing AppContext", t);
 			}
 			
@@ -191,12 +191,12 @@ public class ErrorFilter implements Filter {
 			// Note that Servlet2.4 spec says exceptions thrown from a filter
 			// are not handled by error-page but error codes are
 			res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} catch( Throwable t){
+		} catch(Throwable t){ // YES this should be throwable as we want some logging if we can
 			
-			// generic throwable catch
+			// generic throwable catch  We do want o
 			try {
 				getCustomLogger(req, res).error("caught Error in filter",t);
-			}catch(Throwable t2) {
+			}catch(Exception t2) {
 				// Things are really bad
 				System.err.println("Unloggable error in filter");
 				t.printStackTrace(); // should go to catalina.out
@@ -242,7 +242,7 @@ public class ErrorFilter implements Filter {
 							cleanup.action();
 						}
 						conn.close();
-					}catch(Throwable t){
+					}catch(Exception t){
 						getLocalLogger(req,res).error("Error closing AppContext",t);
 					}
 				}

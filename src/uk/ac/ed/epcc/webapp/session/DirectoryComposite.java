@@ -88,7 +88,7 @@ public class DirectoryComposite<AU extends AppUser> extends AppUserComposite<AU,
 		    	 }
 		    	 return data;
 		     }
-		}catch(Throwable t){
+		}catch(Exception t){
 			getLogger().error("Error doing directory lookup",t);
 			
 		}

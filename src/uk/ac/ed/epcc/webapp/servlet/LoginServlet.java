@@ -166,7 +166,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 						}
 						
 						password_auth.newPassword(user);
-					}catch(Throwable t){
+					}catch(Exception t){
 						getLogger(conn).error("Error getting registered user or sending new password",t);
 						message(conn,req,res,"internal_error");
 					}

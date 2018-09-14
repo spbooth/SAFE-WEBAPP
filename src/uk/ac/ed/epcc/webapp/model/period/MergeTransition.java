@@ -55,7 +55,7 @@ public class MergeTransition<T extends TimePeriod,K> extends AbstractDirectTrans
 		}else{
 			return new ViewTransitionResult<T, K>(tp, fac.merge(peer,target)); 
 		}
-		}catch(Throwable t){
+		}catch(Exception t){
 			tp.getContext().error(t,"Error in merge");
 			throw new TransitionException("Internal error");
 		}

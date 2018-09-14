@@ -19,12 +19,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GetListFilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MakeSelectVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataError;
 
 /** Combines SQLExpressions as a CASE statement.
  * A CASE expression consists of a series of expressions with corresponding {@link SQLFilter}s for which records they apply to

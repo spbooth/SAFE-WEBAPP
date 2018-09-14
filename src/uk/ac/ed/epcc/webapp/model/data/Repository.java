@@ -26,6 +26,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.SQLSyntaxErrorException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -53,10 +54,11 @@ import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.exception.NoTableException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataError;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
@@ -1937,7 +1939,7 @@ public final class Repository implements AppContextCleanup{
 				backup = getInstance(getContext(), backup_name);
 			}
 			return backup;
-		}catch(Throwable t){
+		}catch(Exception t){
 			throw new DataFault("Error creating backup repository",t);
 		}
 	}
@@ -2844,6 +2846,9 @@ public final class Repository implements AppContextCleanup{
 			setMetaData(rs);
 			stmt.close();
 			setReferences(ctx,c);
+		}catch( SQLSyntaxErrorException se) {
+			// This occurs when table does not exist
+			throw new NoTableException(getTable(), se);
 		} catch (Exception e) {
 			//ctx.error(e, "Error creating MetaData for " + getTag());
 			throw new DataError("Error in setMetaData for "+getTag(),e);
@@ -3132,7 +3137,7 @@ public final class Repository implements AppContextCleanup{
 			res.addUniqueName(sb, false, quote);
 			sb.append(")");
 			return sb.toString();
-		}catch(Throwable t){
+		}catch(Exception t){
 			// by default just skip foreign key
 			// probably a missing table
 			return null;

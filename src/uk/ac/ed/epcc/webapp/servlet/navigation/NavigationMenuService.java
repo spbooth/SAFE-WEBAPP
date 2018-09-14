@@ -106,7 +106,7 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 		NodeContainer menu = null;
 		try{
 			menu = (NodeContainer) service.getAttribute(NAVIGATION_MENU_ATTR);
-		}catch(Throwable t){
+		}catch(Exception t){
 			// Any de-serialisation problem will probably jus destory the session
 			// but just to be fail-safe trap all throwables.
 		}
@@ -229,7 +229,7 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 				}
 			}
 			return n;
-		}catch(Throwable t){
+		}catch(Exception t){
 			conn.getService(LoggerService.class).getLogger(getClass()).error("Problem making menu "+name,t);
 			return null;
 		}

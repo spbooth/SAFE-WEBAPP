@@ -129,7 +129,7 @@ public class DatabaseUpgrader extends Object implements Command {
 				System.out.println(info.getName(true)+" not index?");
 			}
 		}
-		}catch(Throwable t){
+		}catch(Exception t){
 			System.err.println("Error processing table");
 			t.printStackTrace(System.err);
 		}
@@ -156,7 +156,7 @@ public class DatabaseUpgrader extends Object implements Command {
 				
 			}
 
-		}catch(Throwable t){
+		}catch(Exception t){
 			t.printStackTrace(System.err);
 			CommandLauncher.die(t);
 		}

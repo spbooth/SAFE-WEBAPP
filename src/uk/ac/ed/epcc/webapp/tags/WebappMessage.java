@@ -64,7 +64,7 @@ public class WebappMessage extends TagSupport implements Tag {
 	public void setOptional(String optional) {
 		try {
 			this.optional=Boolean.parseBoolean(optional);
-		}catch(Throwable t) {
+		}catch(Exception t) {
 			this.optional=false;
 		}
 	}

@@ -319,7 +319,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 						log.info("transition exception", e);
 						message(conn, req, res, "transition_error",  key, e.getMessage());
 						return;
-					}catch(Throwable tr){
+					}catch(Exception tr){
 						if (use_transactions){
 							// assume this is bad and roll-back
 							serv.rollbackTransaction();
@@ -345,7 +345,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 								long secs = (now-start)/1000L;
 								log.warn("Blocked transition "+secs+" seconds ("+HourTransform.toHrsMinSec(secs)+") provider="+tp.getTargetName()+" target="+getLogTag(tp,target)+" key="+key);
 							}
-						}catch(Throwable tr){
+						}catch(Exception tr){
 							log.error("Problem reporting transition timimgs",tr);
 						}
 					}
@@ -371,7 +371,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		// handle the FormResult
 		// current target should be set as attribute by default
 		handleFormResult(conn,req,res,o);
-		}catch(Throwable tr){
+		}catch(Exception tr){
 			getLogger(conn).error("Exception caught in TransitionServlet",tr);
 			try {
 				message(conn, req, res, "internal_error");

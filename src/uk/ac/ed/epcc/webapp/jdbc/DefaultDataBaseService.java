@@ -30,9 +30,10 @@ import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.FilteredProperties;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataError;
+import uk.ac.ed.epcc.webapp.jdbc.exception.TransactionError;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataError;
 /** Default implementation of the {@link DatabaseService}
  * 
  * This gets connection parameters from the {@link ConfigService} but this is only queried
@@ -308,7 +309,7 @@ public class DefaultDataBaseService implements DatabaseService {
 			} catch (SQLException e) {
 				error(e,"Error committing transaction");
 				// Make this fatal don't want to try continuing if this happens
-				throw new DataError("Error committing transaction", e);
+				throw new TransactionError("Error committing transaction", e);
 			}
 
 		}
@@ -332,7 +333,7 @@ public class DefaultDataBaseService implements DatabaseService {
 				in_transaction=false;
 			} catch (SQLException e) {
 				error(e,"Error ending transaction");
-				throw new DataError("Error ending transaction", e);
+				throw new TransactionError("Error ending transaction", e);
 			}
 		}
 

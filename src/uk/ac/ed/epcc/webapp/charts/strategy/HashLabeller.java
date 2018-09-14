@@ -59,7 +59,7 @@ public abstract class HashLabeller<T,K> extends AbstractContexed implements Labe
 				if( o1 instanceof Comparable){
 					try{
 						return ((Comparable)o1).compareTo(o2);
-					}catch(Throwable t){
+					}catch(Exception t){
 
 					}
 				}

@@ -58,7 +58,7 @@ public abstract class AbstractList<T extends DataObject,L extends Targetted> ext
 				}else{
 					add(a);
 				}
-				}catch(Throwable t){
+				}catch(Exception t){
 					getLogger().error("Error making listener list for action="+action,t);
 				}
 			}

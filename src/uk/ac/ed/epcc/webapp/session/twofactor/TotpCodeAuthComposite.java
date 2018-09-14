@@ -502,7 +502,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 			target.commit();
 			resetNavigation();
 			return prov.new ViewResult(target);
-			}catch(Throwable t) {
+			}catch(Exception t) {
 				getLogger().error("Error clearing secret", t);
 				throw new FatalTransitionException("Internal error");
 			}

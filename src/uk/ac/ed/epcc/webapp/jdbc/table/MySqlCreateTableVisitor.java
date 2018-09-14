@@ -176,7 +176,7 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 				// This is to endure the referenced table is auto-created before the
 				// current one (in case we have a foreign key)
 				conn.makeContexedObject(DataObjectFactory.class, tag);
-			}catch(Throwable t){
+			}catch(Exception t){
 				conn.getService(LoggerService.class).getLogger(getClass()).error("Problem making referenced facory for "+tag);
 			}
 			// Note this will only work if the table has already been created.

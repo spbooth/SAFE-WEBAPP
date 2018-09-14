@@ -65,7 +65,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.registry.SummaryContentProvider;
 			if( fac instanceof SummaryContentProvider) {
 				cb = ((SummaryContentProvider<T>)fac).getSummaryContent(c, cb, target);
 			}
-			}catch(Throwable t) {
+			}catch(Exception t) {
 				c.getService(LoggerService.class).getLogger(getClass()).error("Error makings SummaryContent", t);
 			}
 			return cb;

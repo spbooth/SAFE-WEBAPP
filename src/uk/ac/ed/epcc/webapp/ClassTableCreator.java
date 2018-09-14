@@ -58,7 +58,7 @@ public class ClassTableCreator {
 						}
 					}
 				}
-			}catch(Throwable tr){
+			}catch(Exception tr){
 				conn.error(tr,"Error making documentation table for "+s);
 			}
 		}

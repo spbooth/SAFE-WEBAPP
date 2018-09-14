@@ -52,6 +52,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.PreSelectInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.exception.NoTableException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
@@ -1682,9 +1683,10 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     		}
     		Set<String> fields = res.getFields();
     	   return fields != null && fields.size() > 0;
-    	}catch(Throwable e){
-    		// auto create goes through here so tests fail if we report error
-    		//getContext().error(e,"Error in getFields");
+    	}catch(NoTableException nt) {
+    		return false;
+    	}catch(Exception e){
+    		getLogger().error("Error in getFields", e);
     		return false;
     	}
     }

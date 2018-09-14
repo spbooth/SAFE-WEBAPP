@@ -17,7 +17,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.exception;
 
 /**
- * superclass of the Data exceptions thrown by DataObject
+ * superclass of the Data checked exceptions thrown by DataObject
  * 
  * @author spb
  * 

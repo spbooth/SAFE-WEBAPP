@@ -265,7 +265,7 @@ public void addImage(AppContext conn, String alt, String hover,Integer width, In
 
 		attr("src",url);
 		close();
-	}catch(Throwable t) {
+	}catch(Exception t) {
 		getLogger(conn).error("Error adding image",t);
 	}
 }

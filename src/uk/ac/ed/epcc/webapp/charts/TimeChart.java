@@ -188,7 +188,7 @@ public class TimeChart<P extends PeriodSequencePlot> extends PeriodChart<P>{
 		if( col_str != null) {
 			try {
 				col = Color.decode(col_str);
-			}catch(Throwable t) {
+			}catch(Exception t) {
 				getContext().getService(LoggerService.class).getLogger(getClass()).error("Error parsing color "+col_str, t);
 			}
 		}

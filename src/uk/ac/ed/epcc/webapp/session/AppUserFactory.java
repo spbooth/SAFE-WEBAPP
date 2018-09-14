@@ -318,7 +318,7 @@ AccessRoleProvider<AU, AU>
 						SimpleSessionService.addRoleByID(ctx, 1, role);
 					}
 				}
-			}catch(Throwable t){
+			}catch(Exception t){
 				ctx.error(t,"Error adding Admin to first user");
 			}
 		}
@@ -385,7 +385,7 @@ AccessRoleProvider<AU, AU>
 							target_time=d;
 						}
 					}
-				}catch(Throwable t){
+				}catch(Exception t){
 					getContext().error(t,"Error checking force_time");
 				}
 				return last.before(target_time);

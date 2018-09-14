@@ -371,7 +371,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 				if( listener != null ){
 					listener.setPassword(user, new_password);
 				}
-			}catch(Throwable t){
+			}catch(Exception t){
 				getLogger().error("Error calling PasswordChangeListener", t);
 			}
 			SessionService<U> service = getContext().getService(SessionService.class);
@@ -388,7 +388,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 						// Notify password reset
 						Emailer emailer = new Emailer(getContext());
 						emailer.passwordChanged(user);
-					}catch(Throwable t) {
+					}catch(Exception t) {
 						getLogger().error("Error in email notification", t);
 					}
 				}

@@ -109,7 +109,7 @@ public class CommandLauncher extends AbstractContexed{
 		}else{
 			try{
 				comm.run(data);
-			}catch(Throwable e){
+			}catch(Exception e){
 				if( System.getProperty("testing") == null ){
 					e.printStackTrace();
 					System.exit(1);
