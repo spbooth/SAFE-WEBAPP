@@ -85,9 +85,11 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
      * @throws DataException
      */
 	public Set<String> getTables() throws DataException{
+		DatabaseService service = conn.getService(DatabaseService.class);
     	try{
     	Set<String> result = new HashSet<String>();
-    	Connection c = conn.getService(DatabaseService.class).getSQLContext().getConnection();
+    	
+		Connection c = service.getSQLContext().getConnection();
     	DatabaseMetaData md = c.getMetaData();
     	ResultSet rs = md.getTables(null, null, null, null);
     	if( rs.first()){
@@ -99,7 +101,8 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     	
     	return result;
     	}catch(SQLException e){
-    		throw new DataFault("Error getting table names",e);
+    		service.handleError("Error getting table names",e);
+    		return null; // acutally unreachable
     	}
     }
   
@@ -207,11 +210,13 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 	}
 	public void updateTable(Repository res, TableSpecification orig) throws DataFault{
     	TableSpecification s = new TableSpecification(orig);
+    	DatabaseService service = conn.getService(DatabaseService.class);
     	try{
     		
         	
     		Logger log = conn.getService(LoggerService.class).getLogger(getClass());
-    		SQLContext c = conn.getService(DatabaseService.class).getSQLContext();
+    		
+			SQLContext c = service.getSQLContext();
 			
 			 LinkedList<Object> args = new LinkedList<Object>();	
 			 
@@ -226,8 +231,10 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     		stmt.executeUpdate();
     		stmt.close();
     		Repository.reset(getContext(), res.getTag());
+    	}catch(SQLException se) {
+    		service.handleError("Cannot update table "+res.getTable(), se);
     	}catch(Exception e){
-    		throw new DataFault("Cannot create table "+res.getTable(),e);
+    		throw new DataFault("Cannot update table "+res.getTable(),e);
     	}
     }
 	/** produce the SQL to create a table.
@@ -263,11 +270,13 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 	}
 
     public void deleteTable(String name) throws Exception{
+    	DatabaseService service = conn.getService(DatabaseService.class);
     	try{
     		if( Repository.READ_ONLY_FEATURE.isEnabled(getContext())){
     			return;
     		}
-    	SQLContext c = conn.getService(DatabaseService.class).getSQLContext();
+    	
+		SQLContext c = service.getSQLContext();
 		Statement stmt = c.getConnection().createStatement();
 		StringBuilder sb = new StringBuilder();
 		sb.append("DROP TABLE ");
@@ -276,15 +285,17 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 		stmt.executeUpdate(sb.toString());
 		stmt.close();
     	}catch(SQLException e){
-    		throw new DataFault("Cannot remove table "+name,e);
+    		service.handleError("Cannot remove table "+name,e);
     	}
     }
 
     public void clearDatabase() throws Exception{
     	if( CLEAR_DATABASE.isEnabled(getContext())){
+    		DatabaseService service = conn.getService(DatabaseService.class);
     		try{
 
-    			SQLContext c = conn.getService(DatabaseService.class).getSQLContext();
+    			
+				SQLContext c = service.getSQLContext();
     			Connection connection = c.getConnection();
     			String db_name = connection.getCatalog();
     			Statement stmt = connection.createStatement();
@@ -295,7 +306,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     			stmt.close();
     			connection.setCatalog(db_name);
     		}catch(SQLException e){
-    			throw new DataFault("Cannot clear database",e);
+    			service.handleError("Cannot clear database",e);
     		}
     	}
     }

@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -49,7 +50,7 @@ public class CompareSQLValue<C extends Comparable> implements SQLValue<Boolean> 
 	}
   
     
-    public Boolean makeObject(ResultSet rs, int pos) throws DataException{
+    public Boolean makeObject(ResultSet rs, int pos) throws DataException, SQLException{
     		C obja = a.makeObject(rs, pos);
 			C objb = b.makeObject(rs, pos+offset);
 			if(op == null) {

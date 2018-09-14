@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -88,7 +89,7 @@ public class ArrayFuncValue<F,T> implements SQLValue<T> {
 		return sb.toString();
 	}
 	@SuppressWarnings("unchecked")
-	public T makeObject(ResultSet rs, int pos) throws DataException {
+	public T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		T result = null;
 		int i=0;
 		for(SQLValue<? extends T> x : e){

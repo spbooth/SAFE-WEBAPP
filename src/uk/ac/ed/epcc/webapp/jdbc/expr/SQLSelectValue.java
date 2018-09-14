@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -85,7 +86,7 @@ public class SQLSelectValue<T> implements SQLValue<T> {
 		return list;
 	}
 	
-	public T makeObject(ResultSet rs, int pos) throws DataException {
+	public T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		for(int i=0;i<accessors.length;i++){
 			T tmp = accessors[i].makeObject(rs, pos+offsets[i]);
 			if( tmp != null ){

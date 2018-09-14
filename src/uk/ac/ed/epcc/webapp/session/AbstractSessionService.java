@@ -831,9 +831,10 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 
 
 	public static  void removeRoleByID(AppContext context, int id, String role) throws DataFault {
-		
-	   try {
-		   SQLContext ctx=context.getService(DatabaseService.class).getSQLContext();
+		DatabaseService service = context.getService(DatabaseService.class);
+		try {
+		  
+		   SQLContext ctx=service.getSQLContext();
 			StringBuilder role_query=new StringBuilder();
 			role_query.append("DELETE FROM ");
 			ctx.quote(role_query, ROLE_TABLE).append(" WHERE ");
@@ -856,15 +857,17 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 				}
 			}
 		} catch (SQLException e) {
-			throw new DataFault("SQLException ", e);
+			service.handleError("SQLException ", e);
 		}
 	}
 
 
 
 	public static void addRoleByID(AppContext c, int id, String role) throws DataFault {
+		DatabaseService service = c.getService(DatabaseService.class);
 		try {
-			SQLContext ctx=c.getService(DatabaseService.class).getSQLContext();
+			
+			SQLContext ctx=service.getSQLContext();
 			StringBuilder role_query=new StringBuilder();
 			role_query.append( "INSERT INTO ");
 			ctx.quote(role_query,ROLE_TABLE).append(" (");
@@ -887,7 +890,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 				}
 			}
 		} catch (SQLException e) {
-			throw new DataFault("SQLException ", e);
+			service.handleError("SQLException ", e);
 		}
 	}
 

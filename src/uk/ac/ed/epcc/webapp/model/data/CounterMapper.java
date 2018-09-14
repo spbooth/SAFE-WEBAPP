@@ -28,16 +28,13 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  *
  */
 public class CounterMapper implements ResultMapper<Long>{
-	public Long makeObject(ResultSet rs) throws DataFault {
-		try {
+	public Long makeObject(ResultSet rs) throws SQLException {
+		
 			if( rs.first()){
 			    return rs.getLong(1);
 			}else{
 				return null;
 			}
-		} catch (SQLException e) {
-			throw new DataFault("No count data",e);
-		}
 	}
 
 	public String getTarget() {

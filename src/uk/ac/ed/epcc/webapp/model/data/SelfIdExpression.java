@@ -21,7 +21,6 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 /** A {@link SQLExpression} for the unique id field.
  * 
@@ -61,12 +60,8 @@ public class SelfIdExpression implements SQLExpression<Integer> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#makeObject(java.sql.ResultSet, int)
 	 */
 	@Override
-	public Integer makeObject(ResultSet rs, int pos) throws DataException {
-		try {
+	public Integer makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 			return Integer.valueOf(rs.getInt(pos));
-		} catch (SQLException e) {
-			throw new DataFault("Error getting id", e);
-		}
 	}
 
 	/* (non-Javadoc)

@@ -87,12 +87,12 @@ public abstract class GeneralMapMapper<K,R> extends SQLGroupMapper<Map<K,R>>  im
 	 * @return
 	 * @throws DataFault
 	 */
-	protected abstract K makeKey(ResultSet rs) throws DataException;
+	protected abstract K makeKey(ResultSet rs) throws DataException, SQLException;
 	/** make the result object from the ResultSet
 	 * 
 	 * @param rs
 	 * @return
 	 * @throws DataFault
 	 */
-	protected abstract R makeResult(ResultSet rs) throws DataException;
+	protected abstract R makeResult(ResultSet rs) throws DataException, SQLException;
 }

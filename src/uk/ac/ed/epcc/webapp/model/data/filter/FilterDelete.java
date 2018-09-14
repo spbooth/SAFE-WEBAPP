@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
+import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterSelect;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
@@ -54,8 +55,10 @@ public class FilterDelete<T extends DataObject> extends FilterSelect<T>{
     		sql.append(" WHERE ");
     		makeWhere(my_filter, sql, false);
     	}
+    	SQLContext sqlContext = res.getSQLContext();
     	try{
-    		PreparedStatement stmt = res.getSQLContext().getConnection().prepareStatement(
+    		
+			PreparedStatement stmt = sqlContext.getConnection().prepareStatement(
     				sql.toString());
     		List<PatternArgument> list = new LinkedList<PatternArgument>();
 			list=getFilterArguments(my_filter, list);
@@ -65,7 +68,8 @@ public class FilterDelete<T extends DataObject> extends FilterSelect<T>{
     		}
     		return stmt.executeUpdate();
     	}catch(SQLException e){
-    		throw new DataFault("Error on delete",e);
+    		sqlContext.getService().handleError("Error on delete",e);
+    		return 0; // actually unreachable
     	}
     }
 

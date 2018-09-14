@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.model.data.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -56,7 +57,7 @@ public List<PatternArgument> getParameters(List<PatternArgument> list) {
 }
 
 
-public Duration makeObject(ResultSet rs, int pos) throws DataException {
+public Duration makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 	
 	return new Duration(start.makeObject(rs, pos), end.makeObject(rs, pos+offset));
 }

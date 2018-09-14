@@ -28,7 +28,6 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.PrimaryOrderFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SelfReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
@@ -71,14 +70,10 @@ public abstract class AbstractSelfSQLValue<T extends DataObject,R> implements SQ
 	}
 	
 	public final IndexedReference<T> makeObject(ResultSet rs, int pos)
-			throws DataException {
-		try {
+			throws DataException, SQLException {
 			int id=rs.getInt(pos);
 			IndexedReference<T> res =  makeReference(id);
 			return res;
-		} catch (SQLException e) {
-			  throw new DataFault("Error making IndexedReferencefield result",e);
-		}
 	}
 	public final IndexedReference<T> makeReference(int id) {
 		return fac.makeReference(id);

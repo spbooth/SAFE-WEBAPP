@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class MillisecondSQLValue implements SQLValue<Long>{
 	}
 	
 
-	public Long makeObject(ResultSet rs, int pos) throws DataException {
+	public Long makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		return Long.valueOf(a.makeObject(rs, pos).getTime());
 	}
 

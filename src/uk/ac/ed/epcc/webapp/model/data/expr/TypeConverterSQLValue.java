@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.model.data.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -65,7 +66,7 @@ public class TypeConverterSQLValue<H,T,D> implements  SQLValue<T>, FilterProvide
 	public final List<PatternArgument> getParameters(List<PatternArgument> list) {
 		return inner.getParameters(list);
 	}
-	public final T makeObject(ResultSet rs, int pos) throws DataException {
+	public final T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		return converter.find(inner.makeObject(rs, pos));
 	}
 	public final SQLFilter getRequiredFilter() {

@@ -17,12 +17,15 @@
 package uk.ac.ed.epcc.webapp.jdbc;
 
 import java.sql.SQLException;
+import java.sql.SQLTransientException;
 import java.util.Properties;
 
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 
 /** A service that supplies the DataBase Connection
@@ -64,13 +67,22 @@ public SQLContext getSQLContext(String tag) throws SQLException;
 
 /** Are we already in a transaction
  * 
- * @return
+ * @return boolean
  */
 
 public boolean inTransaction();
 
+/** returns the number of times {@link #commitTransaction()} has been called
+ * since the transaction started. 
+ * If this returns 0 then a roll-back will return to the state at {@link #startTransaction()} if greater than zero
+ * there have been intermediate commits. 
+ * 
+ * @return int
+ */
+public int transactionStage();
+
 /** Start a database transaction 
- * Transactions cannot be nested to use {@link #inTransaction()} if possible doubt.
+ * Transactions cannot be nested so use {@link #inTransaction()} if possible doubt.
  */
 public void startTransaction();
 
@@ -90,4 +102,14 @@ public void commitTransaction();
  * 
  */
 public void stopTransaction();
+
+/** Handle an unexpected database exception.
+ * 
+ * Most of the time this will just re-throw the exception wrapped in a {@link DataFault} however
+ * this also allow special handing of certain classes of error such as {@link SQLTransientException}s
+ * 
+ * @param e
+ * @throws DataException
+ */
+public void handleError(String message,SQLException e)throws DataFault;
 }

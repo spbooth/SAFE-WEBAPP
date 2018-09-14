@@ -20,7 +20,6 @@ import java.util.List;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 /** SQLExpression to generate the length of String {@link SQLExpression}.
  * 
@@ -43,13 +42,8 @@ public class LengthExpression  implements SQLExpression<Integer> {
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
 		return a.getParameters(list);
 	}
-	public Integer makeObject(ResultSet rs, int pos) throws DataException {
-		try {
+	public Integer makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 			return rs.getInt(pos);
-		} catch (SQLException e) {
-			throw new DataFault("Error adding length to database field",e);
-		}
-
 	}
 	@Override
 	public String toString(){

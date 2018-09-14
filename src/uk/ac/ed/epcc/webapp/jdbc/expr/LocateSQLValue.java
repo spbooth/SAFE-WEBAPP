@@ -21,7 +21,6 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 /** Create locate expression in SQL.
  * @author spb
@@ -71,8 +70,7 @@ public class LocateSQLValue implements SQLValue<Integer>{
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#makeObject(java.sql.ResultSet, int)
 	 */
 	@Override
-	public Integer makeObject(ResultSet rs, int loc) throws DataException {
-		try {
+	public Integer makeObject(ResultSet rs, int loc) throws DataException, SQLException {
 			String substr_val = rs.getString(loc);
 			String str_val = rs.getString(loc+1);
 			Integer pos_val = rs.getInt(loc+2);
@@ -85,11 +83,6 @@ public class LocateSQLValue implements SQLValue<Integer>{
 				loc_val += 1;
 			}
 			return loc_val;
-		} catch (SQLException e) {
-			throw new DataFault("Error finding '" + substr
-					+ "' in string '" + str
-					+ "' starting at position " + pos + ".",e);
-		}
 	}
 	
 	

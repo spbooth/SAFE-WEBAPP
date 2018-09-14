@@ -52,9 +52,9 @@ public class JNDIDatabaseService extends DefaultDataBaseService {
 					Connection conn =  ds.getConnection();
 					String type = prop.getProperty("db_type","").trim();
 					if( type.contains(POSTGRESQL_TYPE) ){
-						return new PostgresqlSQLContext(getContext(),conn);
+						return new PostgresqlSQLContext(getContext(),this,conn);
 					}
-					return new MysqlSQLContext(getContext(),conn);
+					return new MysqlSQLContext(getContext(),this,conn);
 				} catch (Throwable e) {
 					getContext().error(e, "error attaching to connection pool " + lookup);
 				}

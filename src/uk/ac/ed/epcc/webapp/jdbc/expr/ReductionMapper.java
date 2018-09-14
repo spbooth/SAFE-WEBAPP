@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
@@ -67,7 +68,7 @@ public class ReductionMapper<R> extends AbstractContexed implements ResultMapper
 		return def;
 	}
 
-	public R makeObject(ResultSet rs) throws DataException {
+	public R makeObject(ResultSet rs) throws DataException, SQLException {
 		return exp.makeObject(rs, 1);
 	}
 

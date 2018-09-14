@@ -71,14 +71,8 @@ public class LocateSQLExpression implements SQLExpression<Integer>{
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#makeObject(java.sql.ResultSet, int)
 	 */
 	@Override
-	public Integer makeObject(ResultSet rs, int loc) throws DataException {
-		try {
+	public Integer makeObject(ResultSet rs, int loc) throws DataException, SQLException {
 			return rs.getInt(loc);
-		} catch (SQLException e) {
-			throw new DataFault("Error finding '" + substr
-					+ "' in string '" + str
-					+ "' starting at position " + pos + ".",e);
-		}
 	}
 	
 	

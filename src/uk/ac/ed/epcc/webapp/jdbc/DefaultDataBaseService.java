@@ -31,9 +31,11 @@ import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.FilteredProperties;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataError;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.TransactionError;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 /** Default implementation of the {@link DatabaseService}
  * 
  * This gets connection parameters from the {@link ConfigService} but this is only queried
@@ -67,6 +69,7 @@ public class DefaultDataBaseService implements DatabaseService {
     
     private int old_isolation_level;
     private boolean in_transaction = false;
+    private int stage_count=0;
 	
     public DefaultDataBaseService(AppContext ctx){
     	this.ctx=ctx;
@@ -209,10 +212,10 @@ public class DefaultDataBaseService implements DatabaseService {
 		}
 		conn.setAutoCommit(true); // just in case
 		if( type.contains(POSTGRESQL_TYPE) || driver_name.contains(POSTGRESQL_TYPE)){
-			return new PostgresqlSQLContext(ctx,conn);
+			return new PostgresqlSQLContext(ctx,this,conn);
 		}
 		
-		return new MysqlSQLContext(ctx,conn);
+		return new MysqlSQLContext(ctx,this,conn);
 		
 
 	}
@@ -270,6 +273,7 @@ public class DefaultDataBaseService implements DatabaseService {
 				}
 				connection.setAutoCommit(false);
 				in_transaction=true;
+				stage_count=0;
 			} catch (SQLException e) {
 				error(e,"Error starting transaction");
 			}
@@ -306,6 +310,7 @@ public class DefaultDataBaseService implements DatabaseService {
 		if( in_transaction && TRANSACTIONS_FEATURE.isEnabled(getContext())){
 			try {
 				getSQLContext().getConnection().commit();
+				stage_count++;
 			} catch (SQLException e) {
 				error(e,"Error committing transaction");
 				// Make this fatal don't want to try continuing if this happens
@@ -331,6 +336,7 @@ public class DefaultDataBaseService implements DatabaseService {
 					connection.setTransactionIsolation(old_isolation_level);
 				}
 				in_transaction=false;
+				stage_count=0;
 			} catch (SQLException e) {
 				error(e,"Error ending transaction");
 				throw new TransactionError("Error ending transaction", e);
@@ -364,5 +370,18 @@ public class DefaultDataBaseService implements DatabaseService {
 				log.error(errors,t);
 			}
 		}
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.DatabaseService#transactionStage()
+	 */
+	@Override
+	public int transactionStage() {
+		return stage_count;
+	}
+	
+	@Override
+	public void handleError(String message,SQLException e) throws DataFault {
+		throw new DataFault(message, e);
+		
 	}
 }

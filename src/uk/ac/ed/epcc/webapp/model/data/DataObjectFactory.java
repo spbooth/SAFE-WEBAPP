@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.model.data;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
@@ -585,16 +586,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     	public ReferencedAdapter(IndexedTypeProducer<I,? extends IndexedProducer<I>> ref){
     		this(ref.getField(),ref.getProducer());
     	}
-		public I makeObject(ResultSet rs) throws DataFault {
-				   try {
+		public I makeObject(ResultSet rs) throws SQLException, DataException{
 					int ref = rs.getInt(1);
 					if( ref < 1 ){
 						return null;
 					}
 					return  producer.find(ref);
-				} catch (Exception e) {
-					throw new DataFault("Error in ReferencedAdapter.makeObject",e);
-				}
+				
 		}
 
 		public String getTarget() {

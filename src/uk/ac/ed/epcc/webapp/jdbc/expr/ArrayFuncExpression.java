@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -89,7 +90,7 @@ public class ArrayFuncExpression<F,T> implements SQLExpression<T> {
 		return sb.toString();
 	}
 	@SuppressWarnings("unchecked")
-	public T makeObject(ResultSet rs, int pos) throws DataException {
+	public T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		return e[0].makeObject(rs,pos);
 	}
 	public Class<? super T> getTarget() {

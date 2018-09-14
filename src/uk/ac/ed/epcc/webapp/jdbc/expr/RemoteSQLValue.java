@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,7 +102,7 @@ public abstract class RemoteSQLValue<H extends DataObject,R extends DataObject, 
 		return c.getService(LoggerService.class).getLogger(getClass());
 	}
 	
-	public final T makeObject(ResultSet rs, int pos) throws DataException {
+	public final T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		//Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
 		IndexedReference<R> ref = a.makeObject(rs, pos);
 		T res = getRemoteValueFromReference(ref);

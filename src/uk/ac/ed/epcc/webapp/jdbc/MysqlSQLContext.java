@@ -36,10 +36,12 @@ import uk.ac.ed.epcc.webapp.session.Hash;
 public class MysqlSQLContext implements SQLContext {
 	private final AppContext ctx;
 	private final Connection conn;
+	private final DatabaseService serv;
 
-	public MysqlSQLContext(AppContext ctx,Connection conn) {
+	public MysqlSQLContext(AppContext ctx,DatabaseService serv,Connection conn) {
 		this.ctx=ctx;
 		this.conn=conn;
+		this.serv=serv;
 		assert(conn != null);
 	}
 
@@ -124,5 +126,16 @@ public class MysqlSQLContext implements SQLContext {
 		}
 		return name;
 	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.SQLContext#getService()
+	 */
+	@Override
+	public DatabaseService getService() {
+		return serv;
+	}
+
+	
+	
 
 }

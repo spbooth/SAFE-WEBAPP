@@ -44,13 +44,9 @@ public class StringConvertSQLExpression<T>  implements SQLExpression<String> {
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
 		return a.getParameters(list);
 	}
-	public String makeObject(ResultSet rs, int pos) throws DataException {
-		try {
-			return rs.getString(pos);
-		} catch (SQLException e) {
-			throw new DataFault("Error reading value as string",e);
-		}
+	public String makeObject(ResultSet rs, int pos) throws SQLException {
 
+		return rs.getString(pos);
 	}
 	@Override
 	public String toString(){

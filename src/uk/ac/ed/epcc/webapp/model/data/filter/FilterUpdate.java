@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
+import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ConstPatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterSelect;
@@ -62,8 +63,10 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    		sql.append(" WHERE ");
 	    		makeWhere(my_filter, sql, false);
 	    	}
+	    	SQLContext sqlContext = res.getSQLContext();
 	    	try{
-	    		PreparedStatement stmt = res.getContext().getService(DatabaseService.class).getSQLContext(res.getDBTag()).getConnection().prepareStatement(
+	    		
+				PreparedStatement stmt = sqlContext.getConnection().prepareStatement(
 	    				sql.toString());
 	    		List<PatternArgument> list = new LinkedList<PatternArgument>();
 				list.add(new ConstPatternArgument<R>(target.getTarget(), value));
@@ -75,7 +78,8 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    		}
 	    		return stmt.executeUpdate();
 	    	}catch(SQLException e){
-	    		throw new DataFault("Error on update",e);
+	    		sqlContext.getService().handleError("Error on update",e);
+	    		return 0; // acutally unreachable
 	    	}
 	    }
 	    @SuppressWarnings("unchecked")
@@ -92,8 +96,10 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    		sql.append(" WHERE ");
 	    		makeWhere(my_filter, sql, false);
 	    	}
+	    	SQLContext sqlContext = res.getSQLContext();
 	    	try{
-	    		PreparedStatement stmt = res.getContext().getService(DatabaseService.class).getSQLContext(res.getDBTag()).getConnection().prepareStatement(
+	    		
+				PreparedStatement stmt = sqlContext.getConnection().prepareStatement(
 	    				sql.toString());
 	    		List<PatternArgument> list = new LinkedList<PatternArgument>();
 	    		list = value.getParameters(list);
@@ -107,7 +113,8 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    		}
 	    		return stmt.executeUpdate();
 	    	}catch(SQLException e){
-	    		throw new DataFault("Error on update",e);
+	    		sqlContext.getService().handleError("Error on update",e);
+	    		return 0; // actually unreachable
 	    	}
 	    }
 }

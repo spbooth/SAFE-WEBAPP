@@ -14,14 +14,18 @@
 package uk.ac.ed.epcc.webapp.jdbc;
 
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.SQLTransientException;
 import java.util.Date;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.DateSQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.filter.CannotUseSQLException;
 import uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.Hash;
 /** This encodes the differences between different databases and
  * dialects of SQL.
@@ -91,6 +95,10 @@ public interface SQLContext extends Contexed{
 	 */
 	public void close() throws Exception;
 	
-
+	/** get the {@link DatabaseService}
+	 * 
+	 * @return
+	 */
+	public DatabaseService getService();
 	
 }

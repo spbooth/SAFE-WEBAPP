@@ -25,7 +25,6 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 
 /** A SQLAccessor for a field with a {@link TypeProducer}
@@ -61,13 +60,8 @@ public class TypeProducerFieldValue<T extends DataObject,O,D> implements FieldVa
 	}
 	
 	public O makeObject(ResultSet rs, int pos)
-			throws DataException {
-		try {
+			throws DataException, SQLException {
 			return producer.find((D) rs.getObject(pos));
-		
-		} catch (SQLException e) {
-			  throw new DataFault("Error making IndexedReferencefield result",e);
-		}
 	}
 	
 	

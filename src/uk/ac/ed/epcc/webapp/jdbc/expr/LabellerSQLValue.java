@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -61,7 +62,7 @@ public class LabellerSQLValue<T,R> implements SQLValue<R> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#makeObject(java.sql.ResultSet, int)
 	 */
-	public R makeObject(ResultSet rs, int pos) throws DataException {
+	public R makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		return labeller.getLabel(conn, nested.makeObject(rs, pos));
 	}
 	/* (non-Javadoc)

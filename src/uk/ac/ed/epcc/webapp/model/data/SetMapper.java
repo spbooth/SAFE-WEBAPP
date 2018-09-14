@@ -73,19 +73,17 @@ public class SetMapper<O> implements ResultMapper<Set<O>> {
 		
 	}
 
-	public Set<O> makeObject(ResultSet rs) throws DataException {
+	public Set<O> makeObject(ResultSet rs) throws DataException, SQLException {
 		Set<O> set = new HashSet<O>();
-		try {
-			do {
-				set.add(target.makeObject(rs, 1));
-				
-			} while (rs.next());
-			
-		} catch (SQLException ex) {
-			throw new DataFault("Error making object",ex);
-		}		
+
+		do {
+			set.add(target.makeObject(rs, 1));
+
+		} while (rs.next());
+
+
 		return set;
-		
+
 	}
 
 	

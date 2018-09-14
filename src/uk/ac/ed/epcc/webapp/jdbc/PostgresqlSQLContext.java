@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.DateDerefSQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.DateSQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.DerefSQLExpression;
@@ -28,15 +29,18 @@ import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.filter.CannotUseSQLException;
 import uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.table.PostgresqlCreateTableVisitor;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.Hash;
 
 public class PostgresqlSQLContext implements SQLContext {
 	private final AppContext ctx;
 	private final Connection conn;
+	private final DatabaseService serv;
 
-	public PostgresqlSQLContext(AppContext ctx,Connection conn) {
+	public PostgresqlSQLContext(AppContext ctx,DatabaseService serv,Connection conn) {
 		this.ctx=ctx;
 		this.conn=conn;
+		this.serv=serv;
 	}
 
 	public Connection getConnection() {
@@ -108,4 +112,12 @@ public class PostgresqlSQLContext implements SQLContext {
 		return "Unknown";
 	}
 
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.SQLContext#getService()
+	 */
+	@Override
+	public DatabaseService getService() {
+		return serv;
+	}
+	
 }

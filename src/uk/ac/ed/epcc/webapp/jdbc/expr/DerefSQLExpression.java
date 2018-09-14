@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class DerefSQLExpression<H extends DataObject,R extends DataObject,T> imp
 		return remote_expression.getParameters(list);
 	}
 	
-	public T makeObject(ResultSet rs, int pos) throws DataException {
+	public T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		return remote_expression.makeObject(rs, pos);
 	}
 

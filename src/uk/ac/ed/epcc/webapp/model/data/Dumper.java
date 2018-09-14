@@ -277,8 +277,10 @@ public class Dumper extends AbstractContexed{
 		query.append(" ORDER BY ");
 		res.addUniqueName(query, false, true);
 		AppContext conn = getContext();
+		DatabaseService service = conn.getService(DatabaseService.class);
 		try{
-		PreparedStatement stmt = conn.getService(DatabaseService.class).getSQLContext().getConnection().prepareStatement(
+		
+		PreparedStatement stmt = service.getSQLContext().getConnection().prepareStatement(
 				query.toString(), ResultSet.TYPE_FORWARD_ONLY,
 				ResultSet.CONCUR_READ_ONLY);
 		ResultSet rs = stmt.executeQuery();
@@ -289,7 +291,7 @@ public class Dumper extends AbstractContexed{
 			dump(record);
 		}
 		}catch(SQLException e){
-			throw new DataFault("Bad query", e);
+			service.handleError("Bad query", e);
 		}
 	}
 	public void dumpSchema(Repository res){

@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -53,7 +54,7 @@ public class MapMapper<K,R> extends GeneralMapMapper<K,R>{
 	}
 	@Override
 	@SuppressWarnings("unchecked")
-	protected K makeKey(ResultSet rs) throws DataException{
+	protected K makeKey(ResultSet rs) throws DataException, SQLException{
 	
 		K key = (K) getTargetObject(0, rs);
 		if( key == null ){
@@ -65,7 +66,7 @@ public class MapMapper<K,R> extends GeneralMapMapper<K,R>{
 	}
 	@Override
 	@SuppressWarnings("unchecked")
-	protected R makeResult(ResultSet rs) throws DataException{
+	protected R makeResult(ResultSet rs) throws DataException, SQLException{
 		R val  = (R) getTargetObject(1, rs);
 		return val;
 	}

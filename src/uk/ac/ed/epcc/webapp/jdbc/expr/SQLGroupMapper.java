@@ -17,20 +17,18 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultMapper;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 /** A  base class for ResultMappers that use SQL Group-By queries 
  * there are methods to add various select clauses to the target string.
  * @author spb
@@ -66,7 +64,7 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 	    
 	    
 	    
-	    protected Object getTargetObject(int index, ResultSet rs) throws DataException{
+	    protected Object getTargetObject(int index, ResultSet rs) throws DataException, SQLException{
 	    	return target_list.get(index).makeObject(rs, start_pos[index]);
 	    }
 	    

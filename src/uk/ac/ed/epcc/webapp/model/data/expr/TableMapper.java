@@ -18,12 +18,13 @@ package uk.ac.ed.epcc.webapp.model.data.expr;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLGroupMapper;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 /** Creates a Table from a SQL GROUP BY query with a single key.
  * The key expression is used to GROUP the SQL results and a Mapper is used to convert the
  * expression into the table key. 
@@ -50,13 +51,13 @@ public class TableMapper extends SQLGroupMapper<Table> {
     	addKey(key, key_name);
     }
   
-	public Table makeObject(ResultSet rs) throws DataFault {
+	public Table makeObject(ResultSet rs) throws DataException, SQLException {
 		Table t = new Table();
 		// is we have a name for the key set it for the table
 		if( key_name != null ){
 			t.setKeyName(key_name);
 		}
-		try {
+		
 			ResultSetMetaData meta_data = rs.getMetaData();
 			int md_columns = meta_data.getColumnCount();
 			if( rs.isAfterLast()){
@@ -86,9 +87,7 @@ public class TableMapper extends SQLGroupMapper<Table> {
 				}
 
 			}while( rs.next());
-		} catch (Exception e) {
-			throw new DataFault("Error making Table in TableMapper",e);
-		}
+		
 		
 		return t;
 	}

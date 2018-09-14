@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class DateSQLValue implements SQLValue<Date>{
 	}
 	
 
-	public Date makeObject(ResultSet rs, int pos) throws DataException {
+	public Date makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		return new Date(a.makeObject(rs, pos).longValue());
 	}
 

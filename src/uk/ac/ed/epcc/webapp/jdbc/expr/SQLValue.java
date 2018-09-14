@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.Targetted;
@@ -62,8 +63,9 @@ public interface SQLValue<T> extends Targetted<T>{
 	 * @param pos
 	 * @return produced object
 	 * @throws DataException 
+	 * @throws SQLException 
 	 */
-	public T makeObject(ResultSet rs, int pos) throws DataException;
+	public T makeObject(ResultSet rs, int pos) throws DataException,SQLException;
 	
 	/** Get an SQLFilter required to be added to the filter set.
 	 * This is usually to implement a join.

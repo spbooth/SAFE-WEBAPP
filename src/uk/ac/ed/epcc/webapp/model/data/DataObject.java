@@ -186,12 +186,9 @@ public abstract class DataObject implements ContextIndexed, Identified{
 	 * @throws DataFault
 	 */
 	public boolean delete() throws DataFault {
-		try {
-			record.delete();
-			record=null;
-		} catch (ConsistencyError e) {
-			throw new DataFault("Error in delete", e);
-		}
+
+		record.delete();
+		record=null;
 		return true;
 	}
 
@@ -232,7 +229,13 @@ public abstract class DataObject implements ContextIndexed, Identified{
 	}
    
 	protected final SQLContext getSQLContext() throws SQLException {
-		return getContext().getService(DatabaseService.class).getSQLContext(record.getRepository().getDBTag());
+		return getDatabaseService().getSQLContext(record.getRepository().getDBTag());
+	}
+	/**
+	 * @return
+	 */
+	protected final DatabaseService getDatabaseService() {
+		return getContext().getService(DatabaseService.class);
 	}
 
 	/**

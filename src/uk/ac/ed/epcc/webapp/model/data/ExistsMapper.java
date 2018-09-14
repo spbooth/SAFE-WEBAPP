@@ -35,12 +35,10 @@ public class ExistsMapper implements ResultMapper<Boolean>{
 	}
 
 	
-	public Boolean makeObject(ResultSet rs) throws DataFault {
-		try {
-			return rs.getBoolean(1);
-		} catch (SQLException e) {
-			throw new DataFault("Error in EXISTS",e);
-		}
+	public Boolean makeObject(ResultSet rs) throws SQLException {
+
+		return rs.getBoolean(1);
+
 	}
 
 	

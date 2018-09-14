@@ -69,13 +69,8 @@ public List<PatternArgument> getParameters(List<PatternArgument> list) {
 }
 
 
-public Duration makeObject(ResultSet rs, int pos) throws DataException {
-	
-	try {
+public Duration makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		return new Duration(rs.getLong(pos),1L);
-	} catch (SQLException e) {
-		throw new DataFault("Error making duration expression",e);
-	}
 }
 @SuppressWarnings("unchecked")
 public SQLFilter getRequiredFilter() {

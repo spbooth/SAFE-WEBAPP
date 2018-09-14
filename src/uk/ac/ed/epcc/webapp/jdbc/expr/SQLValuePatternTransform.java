@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +84,7 @@ public class SQLValuePatternTransform implements SQLValue<String> {
 	}
 
 
-	public String makeObject(ResultSet rs, int pos) throws DataException {
+	public String makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		String s = base.makeObject(rs, pos);
 		for(Pattern p :map.keySet()){
 			if( p.matcher(s).matches() ){

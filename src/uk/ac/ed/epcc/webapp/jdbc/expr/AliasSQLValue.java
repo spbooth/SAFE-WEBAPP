@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
@@ -70,7 +71,7 @@ public final class AliasSQLValue<T> implements GroupingSQLValue<T> {
 		}
 		return 1;
 	}
-	public T makeObject(ResultSet rs, int pos) throws DataException {
+	public T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		return exp.makeObject(rs, pos);
 	}
 

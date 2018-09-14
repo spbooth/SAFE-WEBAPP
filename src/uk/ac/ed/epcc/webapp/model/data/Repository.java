@@ -640,6 +640,8 @@ public final class Repository implements AppContextCleanup{
 				// reset dirty flags.
 				clean();
 
+			}catch(DataFault df) {
+				throw df;
 			} catch (Exception e) {
 				throw new DataFault("Error in commit", e);
 			}
@@ -766,7 +768,7 @@ public final class Repository implements AppContextCleanup{
 				
 
 			} catch (SQLException e) {
-				throw new DataFault("SQL Exception", e);
+				sql.getService().handleError("SQL Exception", e);
 
 			}
 		}
@@ -1587,7 +1589,8 @@ public final class Repository implements AppContextCleanup{
 
 			} catch (SQLException e) {
 				// report the problem SQL to aid debugging
-				throw new DataFault("SQL Exception " + buff.toString(), e);
+				sql.getService().handleError("SQL Exception " + buff.toString(), e);
+				return false; // actually unreachable
 			}finally{
 				if( time != null ){
 					time.stopTimer(getTag()+"-update");
@@ -1701,7 +1704,8 @@ public final class Repository implements AppContextCleanup{
 
 			} catch (SQLException e) {
 				// report the problem SQL to aid debugging
-				throw new DataFault("SQL Exception " + buff.toString(), e);
+				sql.getService().handleError("SQL Exception " + buff.toString(), e);
+				return 0; // actually unreachable
 			}
 		}
 
@@ -2278,7 +2282,8 @@ public final class Repository implements AppContextCleanup{
 			return rs;
 		}catch(SQLException e){
 			
-			throw new DataFault("Exception in findRecord",e);
+			sql.getService().handleError("Exception in findRecord",e);
+			return null; // actually unreachable
 		}finally{
 			if( timer != null){
 				timer.stopTimer(getTag()+"-find");
@@ -2713,7 +2718,8 @@ public final class Repository implements AppContextCleanup{
 					return 0;
 				}
 			} catch (SQLException e) {
-				throw new DataFault("Insert exception " + query.toString(), e);
+				sql.getService().handleError("Insert exception " + query.toString(), e);
+				return 0; // actually unreachable
 			}
 	}
 	
@@ -2812,7 +2818,8 @@ public final class Repository implements AppContextCleanup{
 
 		} catch (SQLException e) {
 			r.clear();
-			throw new DataFault("Exception in setContents", e);
+			getSQLContext().getService().handleError("Exception in setContents", e);
+			return;
 		}
 		// store this object in the cache if appropriate
 		if( use_cache  && use_id){

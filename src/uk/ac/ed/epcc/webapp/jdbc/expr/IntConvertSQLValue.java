@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -43,7 +44,7 @@ public class IntConvertSQLValue<T>  implements SQLValue<Integer> {
 		return a.getParameters(list);
 	}
 	
-	public Integer makeObject(ResultSet rs, int pos) throws DataException {
+	public Integer makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		T temp = a.makeObject(rs, pos);
 		if( temp != null ){
 	    	if( temp instanceof Number ){

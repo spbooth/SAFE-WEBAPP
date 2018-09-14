@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -48,7 +49,7 @@ public interface ResultMapper<O> {
 	 * @return domain object
 	 * @throws DataFault
 	 */
-  public O makeObject(ResultSet rs) throws DataException;
+  public O makeObject(ResultSet rs) throws DataException, SQLException;
  /** Create a default Object to be returned if no SQL results are generated. 
   * If there is no obvious default result then return null. Where there is an obvious result
   * (like a sum=0 or an empty Map) this is less error prone than trying to trap null at the 

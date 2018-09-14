@@ -31,7 +31,6 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FieldOrderFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.Joiner;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
@@ -80,8 +79,7 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 	}
 	
 	public IndexedReference<I> makeObject(ResultSet rs, int pos)
-			throws DataException {
-		try {
+			throws DataException, SQLException {
 			int id=rs.getInt(pos);
 			IndexedReference<I> res =  makeReference(id);
 			// For the moment return a reference to zero to denote null
@@ -89,9 +87,6 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 //				return null;
 //			}
 			return res;
-		} catch (SQLException e) {
-			  throw new DataFault("Error making IndexedReferencefield result",e);
-		}
 	}
 	public IndexedReference<I> makeReference(int id) {
 		return producer.makeReference(id);

@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -181,8 +182,9 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 	 * @param rs
 	 * @return DataObject or null
 	 * @throws DataException
+	 * @throws SQLException 
 	 */
-	public final O makeEntry(ResultSet rs) throws DataException  {
+	public final O makeEntry(ResultSet rs) throws DataException, SQLException  {
 		return mapper.makeObject(rs);
 	}
 	public final O makeDefault(){

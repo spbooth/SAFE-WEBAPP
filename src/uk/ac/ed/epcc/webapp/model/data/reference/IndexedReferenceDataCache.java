@@ -38,11 +38,7 @@ public class IndexedReferenceDataCache<I extends Indexed> extends DataCache<Inde
     }
 	@Override
 	protected I find(IndexedReference<? extends I> key) throws DataException {
-		try {
-			return key.getIndexed(c);
-		} catch (Exception e) {
-			throw new DataFault("Error making target from IndexedReference",e);
-		}
+		return key.getIndexed(c);
 	}
 
 }

@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -65,7 +66,7 @@ implements IndexedSQLValue<H,T>{
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#makeObject(java.sql.ResultSet, int)
 	 */
 	@Override
-	public IndexedReference<T> makeObject(ResultSet rs, int pos) throws DataException {
+	public IndexedReference<T> makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		return branch.makeObject(rs, pos);
 	}
 

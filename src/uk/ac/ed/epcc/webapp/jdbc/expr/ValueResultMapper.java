@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -52,7 +53,7 @@ public class ValueResultMapper<O> implements ResultMapper<O> {
 		return null;
 	}
 
-	public O makeObject(ResultSet rs) throws DataException {
+	public O makeObject(ResultSet rs) throws DataException, SQLException {
 		O res =  expr.makeObject(rs, 1);
 		return res;
 	}

@@ -98,7 +98,7 @@ public class FuncExpression<T> implements SQLExpression<T> {
 		return sb.toString();
 	}
 	@SuppressWarnings("unchecked")
-	public T makeObject(ResultSet rs, int pos) throws DataException {
+	public T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		if( e != null ){
 			return e.makeObject(rs,pos);
 		}else{
