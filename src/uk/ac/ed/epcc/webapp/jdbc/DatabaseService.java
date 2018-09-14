@@ -73,9 +73,12 @@ public SQLContext getSQLContext(String tag) throws SQLException;
 public boolean inTransaction();
 
 /** returns the number of times {@link #commitTransaction()} has been called
- * since the transaction started. 
+ * since the last transaction start. 
  * If this returns 0 then a roll-back will return to the state at {@link #startTransaction()} if greater than zero
  * there have been intermediate commits. 
+ * 
+ * To aid in testing the value is not reset to zero until the next call to {@link #startTransaction()}
+ * 
  * 
  * @return int
  */

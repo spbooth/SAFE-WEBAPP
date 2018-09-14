@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.jdbc;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLTransientException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -32,6 +33,7 @@ import uk.ac.ed.epcc.webapp.config.FilteredProperties;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.exception.ForceRollBack;
 import uk.ac.ed.epcc.webapp.jdbc.exception.TransactionError;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -57,6 +59,7 @@ public class DefaultDataBaseService implements DatabaseService {
 	public static final Feature TRANSACTIONS_FEATURE = new Feature("database_transactions",true,"Database transactions are supported");
 	public static final Feature TRANSACTIONS_SERIALIZE_FEATURE = new Feature("database_transactions.serialized",true,"Database transactions use serialized isolation (locks)");
 
+	public static final Feature TRANSACTIONS_ROLLBACK_TRANSIENT_ERRORS = new Feature("database_transactions.rollback_transient",true,"Transient sql errors generate a ForceRollBack error");
 	protected static final String POSTGRESQL_TYPE = "postgres";
 	private static final String MYSQL_TYPE = "mysql";
 	private AppContext ctx;
@@ -66,13 +69,14 @@ public class DefaultDataBaseService implements DatabaseService {
 	// Have we already attempted to set the default connection
 	// we remember this so that we we don't keep attempting on fail
     private boolean connection_set=false;
-    
+    private final boolean force_rollback;
     private int old_isolation_level;
     private boolean in_transaction = false;
     private int stage_count=0;
 	
     public DefaultDataBaseService(AppContext ctx){
     	this.ctx=ctx;
+    	force_rollback= TRANSACTIONS_ROLLBACK_TRANSIENT_ERRORS.isEnabled(ctx);
     }
     public final SQLContext getSQLContext() throws SQLException {
     	return getSQLContext(null);
@@ -336,7 +340,6 @@ public class DefaultDataBaseService implements DatabaseService {
 					connection.setTransactionIsolation(old_isolation_level);
 				}
 				in_transaction=false;
-				stage_count=0;
 			} catch (SQLException e) {
 				error(e,"Error ending transaction");
 				throw new TransactionError("Error ending transaction", e);
@@ -381,6 +384,11 @@ public class DefaultDataBaseService implements DatabaseService {
 	
 	@Override
 	public void handleError(String message,SQLException e) throws DataFault {
+		if( force_rollback && e instanceof SQLTransientException) {
+			if( inTransaction() && transactionStage() == 0) {
+				throw new ForceRollBack(message, e);
+			}
+		}
 		throw new DataFault(message, e);
 		
 	}

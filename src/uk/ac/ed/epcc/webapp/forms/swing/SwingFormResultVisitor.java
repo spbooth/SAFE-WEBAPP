@@ -43,6 +43,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
+import uk.ac.ed.epcc.webapp.jdbc.exception.ForceRollBack;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
@@ -130,7 +131,7 @@ public class SwingFormResultVisitor implements FormResultVisitor,Contexed {
 						}
 					}
 					throw e;
-				}catch(Exception e){
+				}catch(Exception|ForceRollBack e){
 					if (use_transactions){
 						// assume this is bad and roll-back
 						db_serv.rollbackTransaction();

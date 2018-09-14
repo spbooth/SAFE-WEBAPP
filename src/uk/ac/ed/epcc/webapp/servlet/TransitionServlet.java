@@ -54,6 +54,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
 import uk.ac.ed.epcc.webapp.forms.transition.ValidatingFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
+import uk.ac.ed.epcc.webapp.jdbc.exception.ForceRollBack;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -319,7 +320,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 						log.info("transition exception", e);
 						message(conn, req, res, "transition_error",  key, e.getMessage());
 						return;
-					}catch(Exception tr){
+					}catch(Exception|ForceRollBack tr){
 						if (use_transactions){
 							// assume this is bad and roll-back
 							serv.rollbackTransaction();
