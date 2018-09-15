@@ -25,6 +25,7 @@ import javax.servlet.ServletException;
 
 import org.junit.Before;
 
+import uk.ac.ed.epcc.webapp.CleanupService;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.forms.MapForm;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
@@ -147,7 +148,18 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	 * @throws IOException
 	 */
 	public void runTransition() throws ServletException, IOException{
+		runTransition(false);
+	}
+	
+	public void runTransition(boolean run_cleanup) throws ServletException, IOException{
 		doPost();
+		if( run_cleanup) {
+			// Also the cleanup phase
+			CleanupService serv = ctx.getService(CleanupService.class);
+			if( serv != null) {
+				serv.action();
+			}
+		}
 	}
 	
 	

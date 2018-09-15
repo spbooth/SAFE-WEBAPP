@@ -188,7 +188,7 @@ public abstract class AbstractMessageHandlerFactory<H extends AbstractMessageHan
 			MimeMessage m = getMessageProvider().getMessage();
 			m.saveChanges();
 			Emailer es = new Emailer(getContext());
-			es.doSend(m);
+			es.doSendNow(m);
 			provider.setStatus(SENT);
 			provider.commit();
 			return new MessageResult("message_sent");

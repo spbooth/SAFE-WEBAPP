@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CleanupService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.HourTransform;
@@ -314,6 +315,11 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 							if (use_transactions){
 								serv.rollbackTransaction();
 								log.warn("Rolling back transaction in TransitionServlet");
+								CleanupService clean = conn.getService(CleanupService.class);
+								if( clean != null ) {
+									// remove queued actions
+									clean.reset();
+								}
 							}
 						}
 						// These are typically user errors
@@ -325,6 +331,11 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 							// assume this is bad and roll-back
 							serv.rollbackTransaction();
 							log.warn("Rolling back transaction in TransitionServlet");
+							CleanupService clean = conn.getService(CleanupService.class);
+							if( clean != null ) {
+								// remove queued actions
+								clean.reset();
+							}
 						}
 						throw tr;
 					}finally{
