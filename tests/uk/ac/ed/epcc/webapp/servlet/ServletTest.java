@@ -396,9 +396,11 @@ public abstract class ServletTest extends WebappTestBase{
 	
 	protected final void doPost() throws ServletException, IOException{
 		servlet.doPost(req, res);
+		deferredEmails();
+
 	}
-	
-/** Lookup a user by email and install them as the current person in the session.
+
+	/** Lookup a user by email and install them as the current person in the session.
 	 * @param email
 	 * @return
 	 * @throws DataException

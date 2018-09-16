@@ -103,6 +103,7 @@ public class EmailerTest extends WebappTestBase {
 		File f = new File("test_templates/test_email.txt");
 		TemplateFile tf = TemplateFile.getTemplateFile(f.getAbsolutePath()); // Load the page template
 		mailer.doSend(mailer.templateMessage("user@example.com", null, tf));
+		deferredEmails();
 		assertTrue(MockTansport.nSent()==1);
 		assertEquals("user@example.com", MockTansport.getAddress(0)[0].toString());
 		assertEquals("A test Email",MockTansport.getMessage(0).getSubject());
@@ -116,7 +117,7 @@ public class EmailerTest extends WebappTestBase {
 		File f = new File("test_templates/test_email.txt");
 		TemplateFile tf = TemplateFile.getTemplateFile(f.getAbsolutePath()); // Load the page template
 
-		mailer.doSend(mailer.templateMessage("user@example.com", null, tf));
+		mailer.doSendNow(mailer.templateMessage("user@example.com", null, tf));
 		
 	}
 }

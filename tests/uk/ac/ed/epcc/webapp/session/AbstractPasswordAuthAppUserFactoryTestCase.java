@@ -128,6 +128,7 @@ public abstract class AbstractPasswordAuthAppUserFactoryTestCase<F extends AppUs
 		user =  fac.findByEmail(email); // fails update db only
 		h = comp.getHandler(user);
 		assertTrue(h.passwordFailsExceeded());
+		deferredEmails();
 		assertEquals(1, MockTansport.nSent());
 		Message m = MockTansport.getMessage(0);
 		assertEquals(ctx.expandText("${service.name} Password has been locked"), m.getSubject());
@@ -187,6 +188,7 @@ public abstract class AbstractPasswordAuthAppUserFactoryTestCase<F extends AppUs
 		U user =  fac.findByEmail(email);
 		Handler h = comp.getHandler(user);
 		comp.newPassword(user);
+		deferredEmails();
 		assertEquals(1,MockTansport.nSent());
 		Message message = MockTansport.getMessage(0);
 		assertEquals(email, message.getAllRecipients()[0].toString());

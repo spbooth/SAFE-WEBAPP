@@ -27,6 +27,7 @@ import org.junit.Before;
 
 import uk.ac.ed.epcc.webapp.CleanupService;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
+import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.forms.MapForm;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
@@ -44,6 +45,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
+import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 /** A Customised version {@link ServletTest} for testing the
@@ -143,23 +145,28 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	}
 	
 	/** invoke the servlet with the current state of the request object
-	 * 
+	 * checks 
 	 * @throws ServletException
 	 * @throws IOException
 	 */
 	public void runTransition() throws ServletException, IOException{
-		runTransition(false);
+		runTransition(0);
 	}
-	
-	public void runTransition(boolean run_cleanup) throws ServletException, IOException{
+	/**
+	 * 
+	 * @param expected_stages number of expected additional transaction stages
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	public void runTransition(int expected_stages) throws ServletException, IOException{
 		doPost();
-		if( run_cleanup) {
-			// Also the cleanup phase
-			CleanupService serv = ctx.getService(CleanupService.class);
-			if( serv != null) {
-				serv.action();
+		if( expected_stages >= 0 ) {
+			DatabaseService db = ctx.getService(DatabaseService.class);
+			if( db != null ) {
+				assertEquals("Number of transaction stages in transition",expected_stages, db.transactionStage());
 			}
 		}
+		
 	}
 	
 	

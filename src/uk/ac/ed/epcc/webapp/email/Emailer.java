@@ -141,7 +141,7 @@ public class Emailer {
 	public static final String EMAIL_BYPASS_FORCE_ADDRESS = "email.bypass_force.address";
 	public static final Feature EMAILS_FEATURE = new Feature("emails",true,"emails enabled");
 	public static final Feature PASSWORD_RESET_SERVLET = new Feature("password_reset.servlet",false,"Send reset url in reset email");
-	public static final Feature EMAIL_DEFERRED_SEND = new Feature("email.deferred_send",false,"Use cleanup service to defer send till end of transaction");
+	public static final Feature EMAIL_DEFERRED_SEND = new Feature("email.deferred_send",true,"Use cleanup service to defer send till end of transaction");
     public static final Feature HTML_ALTERNATIVE = new Feature("email.html_alternative",true,"Look for a tempalte region conatining html alternative content");
 	private static final String MAIL_SMTP_HOST = "mail.smtp.host";
 
@@ -413,14 +413,16 @@ public class Emailer {
 		}
 		return false;
 	}
-	public class SendAction implements Runnable{
+	public static class SendAction implements Runnable{
 		/**
 		 * @param m
 		 */
-		public SendAction(MimeMessage m) {
+		public SendAction(Emailer es,MimeMessage m) {
 			super();
+			this.es=es;
 			this.m = m;
 		}
+		private final Emailer es;
 		private final MimeMessage m;
 		/* (non-Javadoc)
 		 * @see java.lang.Runnable#run()
@@ -428,13 +430,19 @@ public class Emailer {
 		@Override
 		public void run() {
 			try {
-				send(m);
+				postSend(es.send(m));
 			} catch (Exception e) {
-				getLogger().error("Error sending message", e);
+				es.getLogger().error("Error sending message", e);
 			}
 			
 		}
-		
+		/** Extension point to allow sub-classes to observe the sent email
+		 * 
+		 * @param m
+		 */
+		public void postSend(MimeMessage m) {
+			
+		}
 	}
 	/** Send the message
 	 * This might use the {@link CleanupService} to send at the end of
@@ -446,7 +454,7 @@ public class Emailer {
 		if( EMAIL_DEFERRED_SEND.isEnabled(getContext())) {
 		   CleanupService cleanup = getContext().getService(CleanupService.class);
 		   if( cleanup != null) {
-			   cleanup.add(new SendAction(m));
+			   cleanup.add(new SendAction(this,m));
 			   return;
 		   }
 		}
@@ -894,10 +902,10 @@ public class Emailer {
 	 * @throws MessagingException
 	 * @throws InvalidArgument 
 	 */
-	public MimeMessage templateEmail(String[] notify_emails,
+	public void templateEmail(String[] notify_emails,
 			TemplateFile email_template) throws UnsupportedEncodingException,
 			MessagingException, InvalidArgument {
-		return doSendNow(templateMessage(notify_emails,email_template));
+		doSend(templateMessage(notify_emails,email_template));
 	}
 	/**
 	 * make an email from a template file to multiple recipients

@@ -49,6 +49,7 @@ import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.XMLPrinter;
 import uk.ac.ed.epcc.webapp.content.XMLWriter;
+import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.email.MockTansport;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -369,5 +370,15 @@ protected void writeFile(String file_name, byte data[]) throws IOException {
 	@Before
 	public void clearEmails() {
 		MockTansport.clear();
+	}
+	/**
+	 * 
+	 */
+	public void deferredEmails() {
+		// Run any deferred email sends
+		CleanupService serv = ctx.getService(CleanupService.class);
+		if( serv != null) {
+			serv.action(Emailer.SendAction.class);
+		}
 	}
 }

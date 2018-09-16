@@ -21,6 +21,7 @@ import java.sql.SQLTransientException;
 import java.util.Properties;
 
 import uk.ac.ed.epcc.webapp.AppContextService;
+import uk.ac.ed.epcc.webapp.CleanupService;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
@@ -97,6 +98,10 @@ public void rollbackTransaction();
 /** flush changes since start of last commit.
  * Unlike the commit method of a Connection this is a NOP if
  * not in a transaction.
+ * 
+ * Call before an operation that modifies external state as these won't roll-back. However probably better to
+ * defer the external state change using the {@link CleanupService} unless the transaction phases all
+ * make sense in their own right.
  * 
  */
 public void commitTransaction();

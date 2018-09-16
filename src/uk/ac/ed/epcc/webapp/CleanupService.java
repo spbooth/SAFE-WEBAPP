@@ -63,12 +63,18 @@ public class CleanupService extends AbstractContexed implements AppContextServic
 	/** action to be performed.
 	 * 
 	 */
-	public synchronized  void action(){
+	
+	public   void action(){
+		action(null);
+	}
+	public synchronized  void action(Class template){
 
 		for(Iterator<Runnable> it = actions.iterator() ; it.hasNext(); ){
 			Runnable r = it.next();
-			r.run();
-			it.remove();
+			if( template == null || template.isAssignableFrom(r.getClass())) {
+				r.run();
+				it.remove();
+			}
 		}
 	}
 
