@@ -3264,7 +3264,7 @@ public final class Repository implements AppContextCleanup{
 				find_statement.close();
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			ctx.error(e, "Error closing find_Statement");
 		}
 		find_statement=null;
 	}
