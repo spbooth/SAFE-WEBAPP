@@ -58,7 +58,7 @@ public abstract class FieldExpression<T,X extends DataObject> implements FieldSQ
 		return 1;
 	}
 
-	public T makeObject(ResultSet rs, int pos) throws DataException {
+	public T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		T result = Repository.makeTargetObject(target, rs, pos);
 		if( result != null && LOG_FETCH.isEnabled(repository.getContext())){
 			repository.getContext().getService(LoggerService.class).getLogger(getClass()).debug(

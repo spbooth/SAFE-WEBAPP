@@ -110,8 +110,9 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	 * 
 	 * @param password
 	 * @return
+	 * @throws DataFault 
 	 */
-	protected BaseFilter<T> getPasswordFilter(String password){
+	protected BaseFilter<T> getPasswordFilter(String password) throws DataFault{
 		Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
 		if( DatabasePasswordComposite.JAVA_HASH.isEnabled(getContext())){
 			log.debug("Using java hash");
@@ -224,8 +225,8 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
         
 		private final Hash hash;
         private final String password;
-        private final SQLExpression<String> check_value;
-        public SQLHashFilter(AppContext conn,Hash hash,String password) throws CannotUseSQLException{
+        private SQLExpression<String> check_value;
+        public SQLHashFilter(AppContext conn,Hash hash,String password) throws DataFault, CannotUseSQLException{
         	this.hash=hash;
         	this.password=password;
         	SQLExpression<String> c = new ConstExpression<String, String>(String.class, password,false);
@@ -236,11 +237,13 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 					c = new ConcatSQLExpression(c,getRepository().getStringExpression(getTarget(),DatabasePasswordComposite.SALT));
 				}
         	}
+        	DatabaseService db_service = conn.getService(DatabaseService.class);
         	try {
-				SQLContext ctx = conn.getService(DatabaseService.class).getSQLContext();
+				
+				SQLContext ctx = db_service.getSQLContext();
 				check_value=ctx.hashFunction(hash,c);
 			} catch (SQLException e) {
-				throw new CannotUseSQLException("Error getting context",e);
+				db_service.handleError("Error getting context",e);
 			}
         	
         }
@@ -410,9 +413,10 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 							throw new DataFault("bad hash algorithm", e);
 						}
 					}else{
+						SQLContext sqlContext = getRepository().getSQLContext();
 						try {
 							
-							SQLContext sqlContext = getRepository().getSQLContext();
+							
 							// setProperty("Password", new_password);
 							// Update the database directly using the Password field
 							StringBuilder sb = new StringBuilder();
@@ -475,7 +479,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 								throw new DataFault("bad hash algorithm", e2);
 							}
 						} catch ( SQLException e2) {
-							throw new DataFault("Error setting password",e2);
+							sqlContext.getService().handleError("Error setting password",e2);
 						}
 					}
 					setPasswordStatus(DatabasePasswordComposite.VALID);

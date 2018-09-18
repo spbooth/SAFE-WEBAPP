@@ -84,12 +84,8 @@ public class CompareSQLExpression<C extends Comparable> implements SQLExpression
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#makeObject(java.sql.ResultSet, int)
 	 */
 	@Override
-	public Boolean makeObject(ResultSet rs, int pos) throws DataException {
-		try {
-			return rs.getBoolean(pos);
-		} catch (SQLException e) {
-			throw new DataException("Error making expression",e);
-		}
+	public Boolean makeObject(ResultSet rs, int pos) throws DataException, SQLException {
+		return rs.getBoolean(pos);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#getRequiredFilter()

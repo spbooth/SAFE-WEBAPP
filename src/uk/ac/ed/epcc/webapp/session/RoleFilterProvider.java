@@ -47,11 +47,12 @@ public class RoleFilterProvider<T extends AppUser> implements NamedFilterProvide
 	 */
 	@Override
 	public BaseFilter<T> getNamedFilter(String name) {
-
+		DatabaseService db_service = getContext().getService(DatabaseService.class);
 		try {
-			return fac.new RoleFilter(getContext().getService(DatabaseService.class).getSQLContext(), name);
+			
+			return fac.new RoleFilter(db_service.getSQLContext(), name);
 		} catch (SQLException e) {
-			getContext().getService(LoggerService.class).getLogger(getClass()).error("Error making role filter",e);
+			db_service.logError("Error making role filter",e);
 		}
 
 		return null;

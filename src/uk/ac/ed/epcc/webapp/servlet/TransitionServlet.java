@@ -59,6 +59,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.ForceRollBack;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 
@@ -320,6 +321,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 									// remove queued actions
 									clean.reset();
 								}
+								
 							}
 						}
 						// These are typically user errors
@@ -337,7 +339,12 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 								clean.reset();
 							}
 						}
-						throw tr;
+						if( tr instanceof ForceRollBack) {
+							message(conn, req, res, "force_rollback",  key, tr.getMessage());
+							return;
+						}else {
+							throw tr;
+						}
 					}finally{
 						if (use_transactions){
 							// restore original mode (usually auto-commit)

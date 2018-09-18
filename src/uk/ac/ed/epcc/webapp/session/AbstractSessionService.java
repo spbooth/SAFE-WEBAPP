@@ -783,7 +783,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 				}
 			}
 		} catch (SQLException e) {
-			conn.getService(LoggerService.class).getLogger(AbstractSessionService.class).error("Error checking AppUser role",e);
+			conn.getService(DatabaseService.class).logError("Error checking AppUser role",e);
 			// maybe table missing
 			// this is null if table exists
 			setupRoleTable(conn);

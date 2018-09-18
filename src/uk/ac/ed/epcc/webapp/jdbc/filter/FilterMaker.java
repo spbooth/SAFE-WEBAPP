@@ -68,12 +68,14 @@ public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
 		}
 		PreparedStatement stmt=null;
 		ResultSet rs=null;
+		DatabaseService db_service = conn.getService(DatabaseService.class);
 		try {
 			
 			// We are only using the REsultSet to initialise the Record and
 			// are not concurrent anyway so give
 			// the DB the best chance of optimising the query
-			stmt = conn.getService(DatabaseService.class).getSQLContext(getDBTag()).getConnection().prepareStatement(
+			
+			stmt = db_service.getSQLContext(getDBTag()).getConnection().prepareStatement(
 					q, ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			List<PatternArgument> list = new LinkedList<PatternArgument>();
@@ -107,21 +109,22 @@ public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
 			stmt=null;
 			return result;
 		} catch (SQLException e) {
-			throw new DataException("DataFault in FilterFinder " + query, e);
+			db_service.handleError("DataFault in FilterFinder " + query, e);
+			return null;
 		}finally{
 			try {
 				if( rs != null && ! rs.isClosed()) {
 					rs.close();
 				}
 			}catch(SQLException e) {
-				e.printStackTrace(); // 
+				db_service.logError("Error closing result set", e);
 			}
 			try {
 				if( stmt != null && ! stmt.isClosed()) {
 					stmt.close();
 				}
 			} catch (SQLException e) {
-				e.printStackTrace();
+				db_service.logError("Error closing statement", e);
 			}
 			
 			if( timer != null ){

@@ -223,11 +223,13 @@ public abstract class MessageDataObject extends DataObject implements
 	}
 	
 	public static void anonymise(AppContext c, String table) throws DataFault{
+		DatabaseService db_service = c.getService(DatabaseService.class);
 		try{
 			if( Repository.READ_ONLY_FEATURE.isEnabled(c)){
 				return;
 			}
-			SQLContext conn = c.getService(DatabaseService.class).getSQLContext();
+			
+			SQLContext conn = db_service.getSQLContext();
 			if (conn == null) {
 				throw new DataFault("No connection");
 			}
@@ -243,7 +245,7 @@ public abstract class MessageDataObject extends DataObject implements
 			int results = stmt.executeUpdate(sb.toString());
 			stmt.close();
 			}catch(SQLException e){
-				throw new DataFault("Error in delete", e);
+				db_service.handleError("Error in delete", e);
 			}
 	}
 }

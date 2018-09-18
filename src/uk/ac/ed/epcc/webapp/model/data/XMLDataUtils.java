@@ -36,7 +36,6 @@ import org.xml.sax.XMLReader;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
@@ -124,7 +123,41 @@ public class XMLDataUtils extends AbstractContexed{
 		XMLReader r = reader;
 		return r;
 	}
-	
+	/** Just create tables from the fixtures
+	 * 
+	 * @param clazz
+	 * @param fixtures
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws DataFault
+	 */
+	public void readTables(Class clazz, String ... fixtures) throws ParserConfigurationException, SAXException, IOException, DataFault{
+		AppContext c = getContext();
+		SAXParser parser = spf.newSAXParser();
+		// we can make a new reader per call as there is no state to preserve
+		XMLReader r = parser.getXMLReader();
+		r.setContentHandler(new TableUnDumper(getContext()));
+		
+		TimerService serv = c.getService(TimerService.class);
+		for( int i=0 ; i< fixtures.length ; i++){
+			String fixture_name = c.expandText(fixtures[i]);
+			//System.out.println("Loading "+fixture_name);
+			if( serv != null ){
+				serv.startTimer(fixtures[i]);
+			}
+			
+			InputStream stm = clazz.getResourceAsStream(fixture_name);
+			if( stm != null ){
+				r.parse(new InputSource(stm));
+			}else{
+				throw new DataFault("Resource not found "+fixture_name);
+			}
+			if( serv != null ){
+				serv.stopTimer(fixtures[i]);
+			}
+		}
+	}
 	public void getDiff(SimpleXMLBuilder output,InputSource baseline) throws DataException, Exception{
 		Dumper dumper = new Dumper(getContext(), output);
 		dumper.setVerboseDiff(! MINIMAL_DIFF_FEATURE.isEnabled(getContext()));
@@ -165,6 +198,23 @@ public class XMLDataUtils extends AbstractContexed{
 			}
 		}
 	}
+	
+	public void dumpAllSchema(Dumper dumper) throws DataException, DataFault,
+	ConsistencyError, IOException {
+		DataBaseHandlerService handler = getContext().getService(DataBaseHandlerService.class);
+		if( handler != null){
+			// we want the order to be the same on all OS including windows that 
+			// converts table names to lower case.
+			TreeMap<String,String> map = new TreeMap<String,String>();
+			for(String name : handler.getTables()){
+				map.put(name.toLowerCase(Locale.ENGLISH), name);
+			}
+			for( String key : map.keySet()){
+				Repository res = Repository.getInstance(getContext(), Repository.TableToTag(getContext(), map.get(key)));
+				dumper.dumpSchema(res);
+			}
+		}
+}
 	/** read a resource as a String
 	 * 
 	 * @param clazz

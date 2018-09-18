@@ -87,7 +87,7 @@ public class DurationFieldValue<X extends DataObject> implements    SQLAccessor<
 		return expression.getParameters(list);
 	}
 	
-	public Duration makeObject(ResultSet rs, int pos) throws DataException {
+	public Duration makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		Number number = expression.makeObject(rs, pos);
 		if( number == null){
 			return null;

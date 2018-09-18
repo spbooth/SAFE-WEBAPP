@@ -56,12 +56,8 @@ public class CastLongSQLExpression<N extends Number> implements SQLExpression<Lo
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#makeObject(java.sql.ResultSet, int)
 	 */
-	public Long makeObject(ResultSet rs, int pos) throws DataException {
-		try {
-			return rs.getLong(pos);
-		} catch (SQLException e) {
-			throw new DataError(e);
-		}
+	public Long makeObject(ResultSet rs, int pos) throws DataException, SQLException {
+		return rs.getLong(pos);
 	}
 
 	/* (non-Javadoc)

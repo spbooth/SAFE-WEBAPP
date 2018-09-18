@@ -55,6 +55,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 public class DataBaseHandlerService implements Contexed, AppContextService<DataBaseHandlerService>{
 	public static final Feature CLEAR_DATABASE = new Feature("clear_database", false, "Is the clear database feature enabled");
+	public static final Feature COMMIT_ON_CREATE = new Feature("database.commit_on_create_table", false, "Add explicit commit on table modify (will be effective commit anyway)");
     private AppContext conn;
     public DataBaseHandlerService(AppContext c){
     	conn=c;
@@ -113,11 +114,11 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     	s.setFromParameters(conn,prefix, conn.getInitParameters(prefix));
     	Logger log = conn.getService(LoggerService.class).getLogger(getClass());
     	String text="unknown";
+    	DatabaseService db_service = conn.getService(DatabaseService.class);
     	try{
     		
-        	
-    	
-    		SQLContext c = conn.getService(DatabaseService.class).getSQLContext();
+    		
+			SQLContext c = db_service.getSQLContext();
 			if( c == null){
 				return;
 			}
@@ -146,8 +147,10 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     				}
     			}
     		}
+    	}catch(SQLException e) {
+    		db_service.handleError("Failed to create table using "+text,e);
     	}catch(Exception e){
-    		log.error("Failed to create table using "+text,e);
+    		log.error("Error creating table",e);
     		throw new DataFault("Cannot create table "+name,e);
     	}
     }
@@ -213,7 +216,12 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     	DatabaseService service = conn.getService(DatabaseService.class);
     	try{
     		
-        	
+    		if( COMMIT_ON_CREATE.isEnabled(conn)) {
+    			// table creation implicitly commits the transaction anyway
+        		// this lets the db_server know a commit has taken place so the transaction count
+        		// is correct.
+    			service.commitTransaction(); 
+    		}
     		Logger log = conn.getService(LoggerService.class).getLogger(getClass());
     		
 			SQLContext c = service.getSQLContext();

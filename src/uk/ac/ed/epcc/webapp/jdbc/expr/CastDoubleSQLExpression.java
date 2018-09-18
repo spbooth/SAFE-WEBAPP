@@ -56,12 +56,8 @@ public class CastDoubleSQLExpression<N extends Number> implements SQLExpression<
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#makeObject(java.sql.ResultSet, int)
 	 */
-	public Double makeObject(ResultSet rs, int pos) throws DataException {
-		try {
-			return rs.getDouble(pos);
-		} catch (SQLException e) {
-			throw new DataError(e);
-		}
+	public Double makeObject(ResultSet rs, int pos) throws DataException, SQLException {
+		return rs.getDouble(pos);
 	}
 
 	/* (non-Javadoc)

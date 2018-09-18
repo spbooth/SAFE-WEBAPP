@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -51,7 +52,7 @@ public final class ConstExpression<T,R> implements SQLExpression<T>, SQLAccessor
 			return list;
 		}
 		
-		public T makeObject(ResultSet rs, int pos) throws DataException  {
+		public T makeObject(ResultSet rs, int pos) throws DataException, SQLException  {
 			
 			// Note that this function also processes function results like sum(1)
 			// so it has to process the result set not just return the constant.

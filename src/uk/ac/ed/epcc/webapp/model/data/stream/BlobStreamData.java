@@ -23,6 +23,7 @@ import java.sql.Blob;
 import java.sql.SQLException;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 
@@ -51,7 +52,7 @@ public class BlobStreamData implements StreamData {
 		try {
 			return blob.getBinaryStream();
 		} catch (SQLException e) {
-			c.error(e,"Failed to get stream from blob");
+			c.getService(DatabaseService.class).logError("Failed to get stream from blob", e);
 			return null;
 		}
 	}
@@ -60,7 +61,7 @@ public class BlobStreamData implements StreamData {
 		try {
 			return blob.setBinaryStream(0);
 		} catch (SQLException e) {
-			c.error(e,"Failed to get stream from blob");
+			c.getService(DatabaseService.class).logError("Failed to get stream from blob", e);
 			return null;
 		}
 	}

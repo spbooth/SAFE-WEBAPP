@@ -71,12 +71,10 @@ public class SQLAverageValue implements SQLValue<AverageValue>{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#makeObject(java.sql.ResultSet, int)
 	 */
-	public AverageValue makeObject(ResultSet rs, int pos) throws DataException {
-		try {
-			return new AverageValue(value.makeObject(rs, pos).doubleValue(), rs.getLong(pos+1));
-		} catch (SQLException e) {
-			throw new DataException("Error getting count", e);
-		}
+	public AverageValue makeObject(ResultSet rs, int pos) throws DataException, SQLException {
+		
+		return new AverageValue(value.makeObject(rs, pos).doubleValue(), rs.getLong(pos+1));
+
 	}
 
 	/* (non-Javadoc)

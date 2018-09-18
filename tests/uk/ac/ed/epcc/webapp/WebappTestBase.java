@@ -302,6 +302,24 @@ public abstract class WebappTestBase implements ContextHolder{
 		
 		writeFile(file_name, string);
 	}
+	/** Save a diff file as part of test development.
+	 * Make sure so read the contents and check it looks correct before committing.
+	 * 
+	 * @param file_name
+	 * @throws Exception 
+	 * @throws DataException 
+	 */
+	public void saveSchema(String file_name) throws DataException, Exception{
+		XMLPrinter schema = new XMLPrinter();	
+		
+		schema.open("Tables");
+	 
+		utils.dumpAllSchema(new Dumper(getContext(), schema));
+		schema.close();
+		String string = schema.toString();
+		
+		writeFile(file_name, string);
+	}
 	protected void writeFile(String file_name, String string) throws FileNotFoundException {
 		
 		PrintWriter writer = new PrintWriter(new File(file_name));

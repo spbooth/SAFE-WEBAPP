@@ -37,6 +37,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.ForceRollBack;
 import uk.ac.ed.epcc.webapp.jdbc.exception.TransactionError;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 /** Default implementation of the {@link DatabaseService}
  * 
@@ -303,7 +304,8 @@ public class DefaultDataBaseService implements DatabaseService {
 			} catch (SQLException e) {
 				error(e,"Error rolling back transaction");
 			}
-
+			// caches may hold data from transaction
+			Repository.flushCaches(getContext());
 		}
 	}
 	/* (non-Javadoc)
@@ -390,6 +392,16 @@ public class DefaultDataBaseService implements DatabaseService {
 			}
 		}
 		throw new DataFault(message, e);
+		
+	}
+	@Override
+	public void logError(String message,SQLException e) {
+		if( force_rollback && e instanceof SQLTransientException) {
+			if( inTransaction() && transactionStage() == 0) {
+				throw new ForceRollBack(message, e);
+			}
+		}
+		error(e,message);
 		
 	}
 }

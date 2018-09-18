@@ -237,12 +237,8 @@ public final class BinaryExpression implements SQLExpression<Number> {
 	}
   
     
-    public Number makeObject(ResultSet rs, int pos) throws DataException{
-    	try {
-			return rs.getDouble(pos);
-		} catch (SQLException e) {
-			throw new DataException("Error making expression",e);
-		}
+    public Number makeObject(ResultSet rs, int pos) throws DataException, SQLException{
+		return rs.getDouble(pos);
     }
 
 	public Class<Number> getTarget() {

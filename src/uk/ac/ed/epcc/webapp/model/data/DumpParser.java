@@ -208,6 +208,14 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 	 * @return boolean
 	 */
 	public abstract boolean skipSpecification(String table);
+	/** Should we skip the following Record.
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public boolean skipRecord(String name,String id) {
+		return false;
+	}
 	public void endPrefixMapping(String arg0) throws SAXException {
 	}
 	public void ignorableWhitespace(char[] arg0, int arg1, int arg2)
@@ -236,36 +244,40 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 		if( state == State.Top){
 			String id_str  = arg3.getValue(Dumper.ID);
 			if( id_str != null ){
-				state=State.Record;
 				depth=1; // start counting
-				try{
-					// new record
-					id = Integer.parseInt(id_str);
-					res=Repository.getInstance(conn, name);
-					current = res.new Record();
-					if( getPreserveIds()){
-						// Edit existing record or use parsed id in insert.
-						current.setID(id, getIdMode());
-					}else{
-						// If we already have a map for this parse_id assume this is an update for an existing record
-						if( id_map != null ){
-							Map<Integer,Integer> map = id_map.get(res.getTag());
-							if( map != null ){
-								Integer new_id = map.get(id);
-								if( new_id != null ){
-									// load existing values from database.
-									current.setID(new_id.intValue(), getIdMode());
+				if( skipRecord(name,id_str)) {
+					state=State.Skip;
+				}else {
+					state=State.Record;
+					try{
+						// new record
+						id = Integer.parseInt(id_str);
+						res=Repository.getInstance(conn, name);
+						current = res.new Record();
+						if( getPreserveIds()){
+							// Edit existing record or use parsed id in insert.
+							current.setID(id, getIdMode());
+						}else{
+							// If we already have a map for this parse_id assume this is an update for an existing record
+							if( id_map != null ){
+								Map<Integer,Integer> map = id_map.get(res.getTag());
+								if( map != null ){
+									Integer new_id = map.get(id);
+									if( new_id != null ){
+										// load existing values from database.
+										current.setID(new_id.intValue(), getIdMode());
+									}
 								}
 							}
 						}
+						field=null;
+					}catch(Exception t){
+						id=null;
+						res=null;
+						current=null;
+						field=null;
+						getLogger().error("Error making record",t);
 					}
-					field=null;
-				}catch(Exception t){
-					id=null;
-					res=null;
-					current=null;
-					field=null;
-					getLogger().error("Error making factory",t);
 				}
 			}else if( name.equals(Dumper.TABLE_SPECIFICATION)){
 				depth=1; // start counting

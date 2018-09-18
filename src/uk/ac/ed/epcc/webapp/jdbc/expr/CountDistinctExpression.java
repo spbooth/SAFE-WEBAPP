@@ -47,12 +47,8 @@ public class CountDistinctExpression<T> implements SQLExpression<Integer> {
 		return expr.getParameters(list);
 	}
 
-	public Integer makeObject(ResultSet rs, int pos) throws DataException {
-		try {
-			return rs.getInt(pos);
-		} catch (SQLException e) {
-			throw new DataError(e);
-		}
+	public Integer makeObject(ResultSet rs, int pos) throws DataException, SQLException {
+		return rs.getInt(pos);
 	}
 
 	public SQLFilter getRequiredFilter() {

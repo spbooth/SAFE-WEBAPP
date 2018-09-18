@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><Diff>
+<TableSpecification name="Test">
+<Beatles type="String" nullable="false" max="6"/>
+<Mandatory type="String" nullable="false" max="32"/>
+<Name type="String" nullable="true" max="32"/>
+<Number type="Double" nullable="true"/>
+<Ruttles type="Integer" nullable="false"/>
+<Time type="Long" nullable="true"/>
+<UnsignedInt type="Long" nullable="true"/>
+</TableSpecification>
+<Test id="2">
+<Beatles>Paul</Beatles>
+<Mandatory>Junk</Mandatory>
+<Name>Boris</Name>
+<Number>0.0</Number>
+<Ruttles>2</Ruttles>
+<UnsignedInt>0</UnsignedInt>
+</Test>
+</Diff>

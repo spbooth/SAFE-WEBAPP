@@ -60,12 +60,8 @@ public class RoundSQLExpression<N extends Number> implements SQLExpression<Integ
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#makeObject(java.sql.ResultSet, int)
 	 */
-	public Integer makeObject(ResultSet rs, int pos) throws DataException {
-		try {
-			return rs.getInt(pos);
-		} catch (SQLException e) {
-			throw new DataError(e);
-		}
+	public Integer makeObject(ResultSet rs, int pos) throws DataException, SQLException {
+		return rs.getInt(pos);
 	}
 
 	/* (non-Javadoc)

@@ -44,6 +44,7 @@ import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -691,7 +692,7 @@ public final class Repository implements AppContextCleanup{
         			stmt.executeUpdate();
         			return;
         		}catch(SQLException e){
-        			throw new DataFault("Error in backup "+sb.toString(),e);
+        			sql.getService().handleError("Error in backup "+sb.toString(),e);
         		}
         	}
         	Record b = store.new Record();
@@ -1476,11 +1477,10 @@ public final class Repository implements AppContextCleanup{
 		 * @param key
 		 *            Field to output
 		 * @throws SQLException
-		 * @throws DataFault
 		 */
 		protected final void setValue(StringBuilder buff, PreparedStatement stmt,
-				int pos, String key) throws DataFault {
-			try {
+				int pos, String key) throws SQLException {
+			
 				Object value = get(key);
 
 				buff.append(' ');
@@ -1498,9 +1498,7 @@ public final class Repository implements AppContextCleanup{
 					buff.append(String.valueOf(value));
 					setObject(stmt, pos, key, value);
 				}
-			} catch (SQLException e) {
-				throw new DataFault("Error adding object to stmt", e);
-			}
+			
 		}
 
 		/**
@@ -2249,7 +2247,7 @@ public final class Repository implements AppContextCleanup{
 	 * @param id record-id to find. 
 	 * @param required Do we need a result
 	 * @return ResultSet
-	 * @throws SQLException
+	 * @throws DataException
 	 */
 	synchronized private ResultSet findRecord(int id,boolean required) throws DataException{
 		AppContext conn=getContext();
@@ -2317,6 +2315,22 @@ public final class Repository implements AppContextCleanup{
 	    // there is a potential race condition here as the reference may be cleared 
 		// by the gc between the previous line and the next. 
 		return cache_ref.get();
+		}
+	}
+	
+	public final void flushCache() {
+		if( use_cache) {
+			synchronized (this) {
+
+
+				if( cache_ref != null) {
+					Map<Integer,Record> map = cache_ref.get();
+					if( map != null) {
+						map.clear();
+					}
+				}
+				cache_ref=null;
+			}
 		}
 	}
 	/**
@@ -2863,9 +2877,11 @@ public final class Repository implements AppContextCleanup{
 		}
 	}
 	synchronized private void setIndexes(){
+		DatabaseService db_serv = getContext().getService(DatabaseService.class);
 		try{
 			Map<String,IndexInfo> result = new LinkedHashMap<String, Repository.IndexInfo>();
-			Connection c = getContext().getService(DatabaseService.class).getSQLContext().getConnection();
+			
+			Connection c = db_serv.getSQLContext().getConnection();
 			DatabaseMetaData md = c.getMetaData();
 			ResultSet rs = md.getIndexInfo(null, null, table_name, false, true);
 			while( rs.next()){
@@ -2886,6 +2902,7 @@ public final class Repository implements AppContextCleanup{
 
 			indexes=result;
 		}catch(SQLException e){
+			db_serv.logError("Error getting index names", e);
 			throw new DataError("Error getting index names",e);
 		}
 	}
@@ -3054,11 +3071,11 @@ public final class Repository implements AppContextCleanup{
 	 * @param rs
 	 * @param pos
 	 * @return T
-	 * @throws DataFault
+	 * @throws SQLException 
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T makeTargetObject(Class<T> target, ResultSet rs, int pos) throws DataFault{
-		try {
+	public static <T> T makeTargetObject(Class<T> target, ResultSet rs, int pos) throws SQLException{
+		
 			T result;
 			if( target == Date.class){
 				Timestamp timeStamp = rs.getTimestamp(pos);
@@ -3089,9 +3106,6 @@ public final class Repository implements AppContextCleanup{
 			assert(result == null || target.isAssignableFrom(result.getClass()));
 			
 			return result;
-		} catch (SQLException e) {
-		    throw new DataFault("Error making field result",e);
-		}
 	}
 	/**
 	 * compare two objects by their String Number or Date value Other kinds of
@@ -3182,6 +3196,15 @@ public final class Repository implements AppContextCleanup{
 		return r;
 	}
 	
+	public static void flushCaches(AppContext c) {
+		for( Entry e : c.getAttributes().entrySet()) {
+			if( e.getKey() instanceof Tag) {
+				Repository res = (Repository) e.getValue();
+				res.flushCache();
+			}
+		}
+	}
+	
    /** Clear the cached repository
 	 * 
 	 * @param c
@@ -3264,7 +3287,7 @@ public final class Repository implements AppContextCleanup{
 				find_statement.close();
 			}
 		} catch (SQLException e) {
-			ctx.error(e, "Error closing find_Statement");
+			ctx.getService(DatabaseService.class).logError("Error closing find_Statement",e);
 		}
 		find_statement=null;
 	}

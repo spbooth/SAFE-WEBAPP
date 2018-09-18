@@ -44,11 +44,13 @@ public class FuncExpression<T> implements SQLExpression<T> {
 		if(c != null &&  e instanceof DateSQLExpression){
 			// move date convert outside function
 			DateSQLExpression dse = (DateSQLExpression) e;
+			DatabaseService db_serv = c.getService(DatabaseService.class);
 			try{
-				SQLContext sqc = c.getService(DatabaseService.class).getSQLContext();
+				
+				SQLContext sqc = db_serv.getSQLContext();
 				return (SQLExpression<T>) sqc.convertToDate(new FuncExpression<Number>(f, Number.class, dse.getSeconds()), 1000L);
 			}catch(SQLException ee){
-				c.getService(LoggerService.class).getLogger(FuncExpression.class).error("Error getting SQLContext",ee);
+				db_serv.logError("Error getting SQLContext",ee);
 			}
 		}
 		return new FuncExpression<T>(f, target, e);
@@ -103,11 +105,7 @@ public class FuncExpression<T> implements SQLExpression<T> {
 			return e.makeObject(rs,pos);
 		}else{
 			// count has null expression
-			try {
-				return (T) rs.getObject(pos);
-			} catch (SQLException e1) {
-				throw new DataException("Error making FuncExpression via default", e1);
-			}
+			return (T) rs.getObject(pos);
 		}
 	}
 	public Class<? super T> getTarget() {

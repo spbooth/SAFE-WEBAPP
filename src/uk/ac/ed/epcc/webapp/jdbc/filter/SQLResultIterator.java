@@ -222,7 +222,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 					getContext().error(e, "DataFault in ResultIterator");
 					next=null;
 				} catch (SQLException e) {
-					getContext().error(e, "SQLException in ResultIterator");
+					getContext().getService(DatabaseService.class).logError("SQLException in ResultIterator",e);
 					next=null;
 				}
 				if( next == null ){
@@ -239,12 +239,13 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 		 * 
 		 */
 		public void close() {
+			DatabaseService db_serv = getContext().getService(DatabaseService.class);
 			try {
 				if( rs != null && ! rs.isClosed()) {
 					rs.close();
 				}
 			} catch (SQLException e) {
-				getContext().error(e,"Error closing ResultSet");
+				db_serv.logError("Error closing ResultSet",e);
 			}
 			rs=null;
 			if( stmt == null){
@@ -255,7 +256,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 					stmt.close();
 				}
 			} catch (SQLException e) {
-				getContext().error(e,"Error closing statement");
+				db_serv.logError("Error closing statement",e);
 			}
 			stmt = null;
 			
@@ -351,13 +352,15 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 			if (useChunking() || maxreturn > 0) {
 				query.append(" LIMIT ?,?");
 			}
+			DatabaseService db_serv = getContext().getService(DatabaseService.class);
 			try {
 				tag=query.toString();
 				//System.out.println("Query is "+query);
 				// We are only using the REsultSet to initialise the Record and
 				// are not concurrent anyway so give
 				// the DB the best chance of optimising the query
-				stmt = getContext().getService(DatabaseService.class).getSQLContext(getDBTag()).getConnection().prepareStatement(
+				
+				stmt = db_serv.getSQLContext(getDBTag()).getConnection().prepareStatement(
 						query.toString(), ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				List<PatternArgument> list = new LinkedList<PatternArgument>();
@@ -381,7 +384,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 				next=iterate();
 
 			} catch (SQLException e) {
-				throw new DataException("DataFault in FilterIterator " + query, e);
+				db_serv.handleError("DataFault in FilterIterator " + query, e);
 			}
 
 		}

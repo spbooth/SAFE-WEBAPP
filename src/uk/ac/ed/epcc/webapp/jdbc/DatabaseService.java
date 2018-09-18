@@ -120,4 +120,11 @@ public void stopTransaction();
  * @throws DataException
  */
 public void handleError(String message,SQLException e)throws DataFault;
+
+/** handle an {@link SQLException} directly. Normally this will just log the error however
+ * this also allow special handing of certain classes of error such as {@link SQLTransientException}s
+ * @param message
+ * @param e
+ */
+public void logError(String message,SQLException e);
 }

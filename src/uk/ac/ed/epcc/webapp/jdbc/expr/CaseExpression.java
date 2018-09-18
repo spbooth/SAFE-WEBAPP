@@ -163,12 +163,10 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#makeObject(java.sql.ResultSet, int)
 	 */
-	public R makeObject(ResultSet rs, int pos) throws DataException {
-		try {
-			return (R)  rs.getObject(pos);
-		} catch (SQLException e) {
-			throw new DataError(e);
-		}
+	public R makeObject(ResultSet rs, int pos) throws DataException, SQLException {
+
+		return (R)  rs.getObject(pos);
+
 	}
 
 	/* (non-Javadoc)

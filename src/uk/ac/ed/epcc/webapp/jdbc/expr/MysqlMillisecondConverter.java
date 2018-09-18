@@ -60,12 +60,8 @@ public MysqlMillisecondConverter(SQLExpression<Date> e){
 	   exp=e;
 }
 
-public Long makeObject(ResultSet rs, int pos) throws DataException {
-	try {
-		return rs.getLong(pos);
-	} catch (SQLException e) {
-		throw new DataException("Failed to make long from date", e);
-	}
+public Long makeObject(ResultSet rs, int pos) throws DataException, SQLException {
+	return rs.getLong(pos);
 }
 public int add(StringBuilder sb, boolean qualify) {
 	sb.append("(1000*UNIX_TIMESTAMP(");

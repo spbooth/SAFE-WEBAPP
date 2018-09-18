@@ -126,11 +126,14 @@ public class FormComposeTest<D extends DynamicForm> extends AbstractTransitionSe
 		PageManager page_manager = manager.getChildManager();
 		Page page = page_manager.findByParentAndName(form, "FirstPage");
 		assertNotNull(page);
+		
+		SectionManager section_manager = (SectionManager) page_manager.getChildManager();
+		section_manager.getConfigFactory(); // create config table too
 		takeBaseline();
 		setTransition(provider, PartPathTransitionProvider.CREATE, page);
 		addParam(PartManager.NAME_FIELD, "FirstSection");
 		runTransition();
-		SectionManager section_manager = (SectionManager) page_manager.getChildManager();
+		
 		Section section = section_manager.findByParentAndName(page, "FirstSection");
 		checkViewRedirect(provider, section);
 		checkDiff("/cleanup.xsl", "add_section.xml");

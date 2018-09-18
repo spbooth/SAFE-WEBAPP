@@ -28,7 +28,12 @@ public class DebugLogger implements Logger {
     private final Logger nested;
     
   
-    public DebugLogger(Logger l){
+    public Logger getNested() {
+		return nested;
+	}
+
+
+	public DebugLogger(Logger l){
     	this.nested=l;
     }
   

@@ -55,7 +55,7 @@ public class JNDIDatabaseService extends DefaultDataBaseService {
 						return new PostgresqlSQLContext(getContext(),this,conn);
 					}
 					return new MysqlSQLContext(getContext(),this,conn);
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					getContext().error(e, "error attaching to connection pool " + lookup);
 				}
 			}

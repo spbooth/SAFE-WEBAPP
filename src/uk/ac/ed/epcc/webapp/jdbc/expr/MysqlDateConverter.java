@@ -79,18 +79,15 @@ public class MysqlDateConverter implements DateSQLExpression{
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
 		return val.getParameters(list);
 	}
-	public Date makeObject(ResultSet rs, int pos) throws DataException {
+	public Date makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		Timestamp timestamp;
-		try {
-			Timestamp t = rs.getTimestamp(pos);
-			if( t == null ){
-				return null;
-			}
-			return new Date(t.getTime());
-		} catch (SQLException e) {
-			throw new DataException("Fault getting timestamp",e);
+
+		Timestamp t = rs.getTimestamp(pos);
+		if( t == null ){
+			return null;
 		}
-		
+		return new Date(t.getTime());
+
 	}
 	public SQLFilter getRequiredFilter() {
 		return val.getRequiredFilter();

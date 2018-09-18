@@ -41,7 +41,7 @@ public abstract class GeneralMapMapper<K,R> extends SQLGroupMapper<Map<K,R>>  im
 	}
 
 	
-	public Map<K,R> makeObject(ResultSet rs) throws DataException {
+	public Map<K,R> makeObject(ResultSet rs) throws DataException, SQLException {
 
 
 		Map<K,R> m = new HashMap<K,R>();
@@ -58,8 +58,6 @@ public abstract class GeneralMapMapper<K,R> extends SQLGroupMapper<Map<K,R>>  im
 				}
 
 			}while(rs.next());
-		}catch(SQLException e){
-			throw new DataException("Error populating map",e);
 		} catch (CombineException e) {
 			throw new DataException("Illegal combine operation for "+getClass().getName(),e);
 		}

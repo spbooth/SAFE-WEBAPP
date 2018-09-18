@@ -80,12 +80,8 @@ public class ConcatSQLExpression implements SQLExpression<String>{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#makeObject(java.sql.ResultSet, int)
 	 */
-	public String makeObject(ResultSet rs, int pos) throws DataException {
-		try {
-			return rs.getString(pos);
-		} catch (SQLException e) {
-			throw new DataException("Failed to make string from concat expr", e);
-		}
+	public String makeObject(ResultSet rs, int pos) throws DataException, SQLException {
+		return rs.getString(pos);
 	}
 
 	/* (non-Javadoc)

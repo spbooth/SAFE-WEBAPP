@@ -219,7 +219,7 @@ public class CommandLauncher extends AbstractContexed{
         		}
         		
         	} catch (SQLException e) {
-        		log.error("Error making Database connection",e);
+        		db_serv.logError("Error making Database connection",e);
         	}
         	
         }

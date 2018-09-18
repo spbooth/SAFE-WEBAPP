@@ -11,10 +11,7 @@
 <!--| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. |-->
 <!--| See the License for the specific language governing permissions and      |-->
 <!--| limitations under the License.                                           |-->
-<Diff><Properties id='4'>
-<Name>reference.TestFormsPageSectionConfig.PartID</Name>
-<Value>TestFormsPageSection</Value>
-</Properties>
+<Diff>
 <TableSpecification name='TestFormsPageSection'>
 <Owner reference='TestFormsPage'/>
 <SortOrder type='Integer' nullable='false'/>
