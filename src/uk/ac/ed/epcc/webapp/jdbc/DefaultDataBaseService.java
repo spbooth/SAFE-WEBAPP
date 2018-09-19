@@ -31,8 +31,6 @@ import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.FilteredProperties;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataError;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.ForceRollBack;
 import uk.ac.ed.epcc.webapp.jdbc.exception.TransactionError;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -74,10 +72,12 @@ public class DefaultDataBaseService implements DatabaseService {
     private int old_isolation_level;
     private boolean in_transaction = false;
     private int stage_count=0;
+    private final int desired_isolation_level;
 	
     public DefaultDataBaseService(AppContext ctx){
     	this.ctx=ctx;
     	force_rollback= TRANSACTIONS_ROLLBACK_TRANSIENT_ERRORS.isEnabled(ctx);
+    	desired_isolation_level=parseLevel(ctx.getInitParameter("transaction.isolation_level"));
     }
     public final SQLContext getSQLContext() throws SQLException {
     	return getSQLContext(null);
@@ -288,8 +288,7 @@ public class DefaultDataBaseService implements DatabaseService {
 	 * @return
 	 */
 	public int getTargetIsolationLevel() {
-		//return Connection.TRANSACTION_READ_COMMITTED;
-		return Connection.TRANSACTION_SERIALIZABLE;
+		return desired_isolation_level;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.DatabaseService#rollbackTransaction()
@@ -403,5 +402,18 @@ public class DefaultDataBaseService implements DatabaseService {
 		}
 		error(e,message);
 		
+	}
+	
+	public static int parseLevel(String name) {
+		
+		if( name != null) {
+			switch(name) {
+			case "READ_UNCOMMITTED" : return Connection.TRANSACTION_READ_UNCOMMITTED;
+			case "READ_COMITTED" : return Connection.TRANSACTION_READ_COMMITTED;
+			case "REPEATABLE_READ" : return Connection.TRANSACTION_REPEATABLE_READ;
+			case "SERIALIZABLE": return Connection.TRANSACTION_SERIALIZABLE;
+			}
+		}
+		return Connection.TRANSACTION_SERIALIZABLE;
 	}
 }
