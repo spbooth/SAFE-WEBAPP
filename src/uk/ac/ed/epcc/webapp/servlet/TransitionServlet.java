@@ -173,7 +173,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 				}
 			}
 		}
-		// expected crsf toke is set here for use by 
+		// expected crsf token is set here for use by 
 		// transition and view pages
 		String crsf = getCRSFToken(conn,tp, key, target);
 		if( crsf != null ) {
@@ -181,16 +181,16 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		}else {
 			req.removeAttribute(TRANSITION_CSRF_ATTR);
 		}
-		boolean allow_get=false; // allow get method
+		boolean non_modifying=false; // allow get method
 		if( key == null && target == null && tp instanceof IndexTransitionFactory){
 			// IndexTransitionProvider can generate an index
 			key = ((IndexTransitionFactory<K, T>)tp).getIndexTransition();
-			allow_get=(key != null); // non modifying usually
+			non_modifying=(key != null); // non modifying usually
 		}
 		if( key == null && target != null && tp instanceof DefaultingTransitionFactory){
 			// if we have a target maybe there is a default transition for it.
 			key = ((DefaultingTransitionFactory<K, T>)tp).getDefaultTransition(target);
-			allow_get = (key != null); // non modifying usually
+			non_modifying = (key != null); // non modifying usually
 		}
 		if( key == null){
 			if( target != null && tp instanceof ViewTransitionFactory){
@@ -212,7 +212,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		}
 		// must have a key here.
 		if( key instanceof ViewTransitionKey) {
-			allow_get = ((ViewTransitionKey<T>)key).isNonModifying(target);
+			non_modifying = ((ViewTransitionKey<T>)key).isNonModifying(target);
 		}
 		log.debug("transition="+key);
 	    // this is the access control
@@ -226,7 +226,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			o = t.getResult(getShortcutVisitor(conn, params, tp, target, key));
 			if( o == null){
 				log.debug("No shortcut result");
-				if( ! (allow_get || req.getMethod().equalsIgnoreCase("POST"))) {
+				if( ! (non_modifying || req.getMethod().equalsIgnoreCase("POST"))) {
 					getLogger(conn).error("Modify not from POST");
 					if( MODIFY_ON_POST_ONLY.isEnabled(conn)) {
 						res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
@@ -235,7 +235,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 				}
 				// crsf check. If get is allowed it is explicitly non-modifying and
 				// potentially book-markable.
-				if( crsf != null && ! allow_get) {
+				if( crsf != null && ! non_modifying) {
 					// potential modifying with a set token
 					String submitted_crsf = (String) params.get(TRANSITION_CSRF_ATTR);
 					if( submitted_crsf == null || ! crsf.equals(submitted_crsf)) {
@@ -270,7 +270,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 					// Transitions should take place in a transaction
 					// This helps keeps them atomic even on distributed infrastructure.
 					DatabaseService serv = conn.getService(DatabaseService.class);
-					boolean use_transactions = serv != null && TRANSITION_TRANSACTIONS.isEnabled(conn);
+					boolean use_transactions = serv != null && TRANSITION_TRANSACTIONS.isEnabled(conn) && ! non_modifying;
 					if (use_transactions){
 						if(timer_service != null){
 							timer_service.startTimer(DATABASE_TRANSACTION_TIMER);
