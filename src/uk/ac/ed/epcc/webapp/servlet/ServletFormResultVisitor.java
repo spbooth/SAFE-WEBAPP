@@ -137,14 +137,26 @@ public class ServletFormResultVisitor implements WebFormResultVisitor{
 		}
 		req.setAttribute(TransitionServlet.TRANSITION_PROVIDER_ATTR, res.provider);
 		req.setAttribute(TransitionServlet.TRANSITION_KEY_ATTR, null);
+		Object target = null;
 		if( res.provider instanceof TransitionProvider){
-			req.setAttribute(TransitionServlet.TARGET_ATTRIBUTE, ((TransitionProvider)res.provider).getTarget((String)target_id));
+			target=((TransitionProvider)res.provider).getTarget((String)target_id);
+			req.setAttribute(TransitionServlet.TARGET_ATTRIBUTE, target);
 		}else if( res.provider instanceof PathTransitionProvider){
-			req.setAttribute(TransitionServlet.TARGET_ATTRIBUTE, ((PathTransitionProvider)res.provider).getTarget((LinkedList)target_id));
+			target=((PathTransitionProvider)res.provider).getTarget((LinkedList)target_id);
+			req.setAttribute(TransitionServlet.TARGET_ATTRIBUTE,target );
 		}else{
 			// unsupported type of factory
 			res.fallback.accept(this);
 			return;
+		}
+		CrsfTokenService serv = conn.getService(CrsfTokenService.class);
+		if( serv != null) {
+			String token = serv.getCrsfToken(res.provider, target);
+			if( token != null ) {
+				req.setAttribute(TransitionServlet.TRANSITION_CSRF_ATTR, token);
+			}else {
+				req.removeAttribute(TransitionServlet.TRANSITION_CSRF_ATTR);
+			}
 		}
 		conn.getService(ServletService.class).forward("/scripts/view_target.jsp");
 	}

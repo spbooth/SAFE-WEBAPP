@@ -177,6 +177,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		// transition and view pages
 		String crsf = getCRSFToken(conn,tp, key, target);
 		if( crsf != null ) {
+			log.debug("CRSF is "+crsf);
 			req.setAttribute(TRANSITION_CSRF_ATTR, crsf);
 		}else {
 			req.removeAttribute(TRANSITION_CSRF_ATTR);
