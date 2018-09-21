@@ -63,6 +63,11 @@ public class MenuVisitor implements Visitor{
 					builder.attr("id",MENU_ID_PREFIX+id);
 				}
 			}else{
+				if( container.isEmpty() || ! recurse ) {
+					// this is a single level of menu add automatic scrollbar
+					// these rules don't work for multi-level menus
+					builder.addClass("scroll");
+				}
 				//builder.attr("role","menu");
 				//builder.attr("aria-hidden","true");
 				String id = container.getID();
@@ -120,7 +125,10 @@ public class MenuVisitor implements Visitor{
 			builder.addClass(class_string);
 		}
 		if( depth > 1 && ! node.isEmpty()) {
-			builder.addClass("parent");
+			if( recurse ) {
+				// dynamic sub-menu
+				builder.addClass("parent");
+			}
 		}
 		String help = node.getHelpText();
 		if( help != null && ! help.isEmpty()){
