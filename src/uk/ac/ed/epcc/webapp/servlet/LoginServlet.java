@@ -59,18 +59,21 @@ import uk.ac.ed.epcc.webapp.session.twofactor.TwoFactorHandler;
 @WebServlet(name="LoginServlet", urlPatterns="/LoginServlet/*")
 public class LoginServlet<T extends AppUser> extends WebappServlet {
 	
-	/**
+	/** config parameter for the logout url.
 	 * 
 	 */
 	private static final String LOGOUT_URL_PARAM = "logout.url";
-	/**
+	/** config parameter for the main page url
 	 * 
 	 */
 	private static final String MAIN_PAGE_PARAM = "main.page";
-	/**
+	/** config parameter for the login page url
 	 * 
 	 */
 	private static final String LOGIN_PAGE_PARAM = "login.page";
+	
+	
+	private static final String INITIAL_PAGE_ATTR = "initial_page";
 	/**
 	 * 
 	 */
@@ -79,6 +82,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 	
 	public static final Feature REPORT_ACCOUNT_NOT_FOUND = new Feature("login.report_account_not_found",true,"Users are explicitly informed if resetting an account hat is not found");
 	public static final Feature RESET_PASSWORD_PAGE = new Feature("login.reset_password_page",false,"Use a separate reset password page");
+	public static final Feature COOKIE_TEST = new Feature("login.cookie_test_redirect",true,"Use double redirect on login to check for cookie support and avoid url rewriting");
 	/**
 	 * 
 	 */
@@ -120,8 +124,15 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 			}
 			SessionService sess = conn.getService(SessionService.class);
 			if( sess != null && sess.haveCurrentUser()) {
+				// look for a cookie test
+				SerializableFormResult next_page = (SerializableFormResult) sess.getAttribute(INITIAL_PAGE_ATTR);
+				if( next_page != null ) {
+					sess.removeAttribute(INITIAL_PAGE_ATTR);
+				}else {
+					next_page = new RedirectResult(getMainPage(conn));
+				}
 				// already logged in
-				handleFormResult(conn, req, res, new RedirectResult(getMainPage(conn)));
+				handleFormResult(conn, req, res, next_page);
 				return;
 			}
 			if( DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn)){
@@ -228,7 +239,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 					}
 					TwoFactorHandler<T> handler = new TwoFactorHandler<>(serv);
 					next_page =  handler.doLogin(person, (SerializableFormResult) next_page);
-					handleFormResult(conn, req, res, next_page);
+					doLoginResult(conn, req, res, next_page);
 					return;
 				}
 			}
@@ -247,6 +258,29 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 				+ getLoginPage(conn)+"?error=login"));
 	}
 
+	/** go to intial page on login.
+	 * optionally this performs a double redirect through the LoginServlet
+	 * to test if cookies are supported and suppress url rewriting for the initial page
+	 * 
+	 * @param conn
+	 * @param req
+	 * @param res
+	 * @param result
+	 * @throws Exception
+	 */
+	public static void doLoginResult(AppContext conn,HttpServletRequest req, HttpServletResponse res, FormResult result) throws Exception {
+		if( COOKIE_TEST.isEnabled(conn) && result instanceof SerializableFormResult) {
+			SessionService sess = conn.getService(SessionService.class);
+			sess.setAttribute(INITIAL_PAGE_ATTR, result);
+			res.sendRedirect(res.encodeRedirectURL(req.getContextPath()+"/LoginServlet"));
+			return;
+		}
+		if( result == null ) {
+			 return;
+		 }
+		 ServletFormResultVisitor vis = new ServletFormResultVisitor(conn, req, res);
+		 result.accept(vis);
+	}
 	public static String getWelcomePage(AppContext conn) {
 		return conn.getInitParameter("welcome.page","/welcome.jsp");
 	}
