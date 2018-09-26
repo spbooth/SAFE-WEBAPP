@@ -61,7 +61,6 @@ public class PasswordResetServletTest extends ServletTest {
 		req.path_info="1-2515j732jc4y1n13s315v34133x15";
 		doPost();
 		checkForward("/scripts/password_change_request.jsp");
-		//addParam("form_url","/scripts/password_update.jsp");
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD1,"BorisTheSpider");
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD2,"BorisTheSpider");
 		addParam("submitted","true");
@@ -89,7 +88,6 @@ public class PasswordResetServletTest extends ServletTest {
 		req.path_info="1-2515j732jc4y1n13s315v34133x15";
 		doPost();
 		checkForward("/scripts/password_change_request.jsp");
-		//addParam("form_url","/scripts/password_update.jsp");
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD1,"BorisTheSpider");
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD2,"BorisTheSpider");
 		addParam("submitted","true");
@@ -109,7 +107,6 @@ public class PasswordResetServletTest extends ServletTest {
 		req.path_info="1-2515j732jc4y1n13s315v34133x15";
 		doPost();
 		checkForward("/scripts/password_change_request.jsp");
-		//addParam("form_url","/scripts/password_update.jsp");
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD1,"BorisTheSpider");
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD2,"BorisTheRussian");
 		addParam("submitted","true"); 

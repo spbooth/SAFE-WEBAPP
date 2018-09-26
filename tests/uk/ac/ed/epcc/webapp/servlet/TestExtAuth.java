@@ -59,7 +59,7 @@ public class TestExtAuth extends ServletTest {
 		takeBaseline();
 		req.remote_user="fred";
 		doPost();
-		checkRedirect("/login.jsp?error=session&page=TestSessionServlet/");
+		checkRequestAuth("TestSessionServlet/");
 		checkUnchanged();
 	}
 	

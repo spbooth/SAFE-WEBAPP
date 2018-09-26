@@ -110,9 +110,8 @@ This service is only available to pre-registered users.
 <div class="block">
 <%@ include file="/scripts/form_context.jsf" %>
   <h2>Your Details:</h2>
-  <form method="post" action="<%= response.encodeURL(web_path+"/RegisterServlet") %>">
+  <form method="post" action="<%= web_path %>/RegisterServlet">
    <input type="hidden" name="action" value="REGISTER">
-   <input type="hidden" name="form_url" value="<%=HTMLForm.getFormURL(request)%>">
       <table class="form">
         <%= person_form.getHtmlForm(request) %>
       </table>
@@ -163,14 +162,14 @@ value="<%=labels[i%labels.length] %>" />
 %>or<%
 } 
 %>
-<form method="post" action="<%= response.encodeURL(web_path+"/LoginServlet") %>"><%
-	String prev_page = (String) request.getAttribute("page");
-    if( prev_page == null ){
-		prev_page = request.getParameter("page");
-    }
-	if("session".equals(request.getParameter("error")) && (prev_page!=null)) {
-	%>
-   <input type="hidden" name="page" value="<%= prev_page %>" /> <% } %>
+<form method="post" action="<%=web_path%>/LoginServlet"><%
+	String prev_page = (String) request.getAttribute(DefaultServletService.PAGE_ATTR);
+	if(prev_page!=null) {
+		HtmlBuilder hb = new HtmlBuilder(); // make sure escaping correct for untrusted content
+		hb.open("input",new String[][]{{"type","hidden"},{"name","page"},{"value",prev_page}});
+		hb.close();
+	%><%=hb.toString() %>
+   <% } %>
    <table class="form">
 	<tr>
 		<th><label class='required'><%=fac.getNameLabel() %>:</label></th>
@@ -184,7 +183,7 @@ value="<%=labels[i%labels.length] %>" />
 		<td>
 		    <input class="input_button login" type="submit" title="Login using password" value="Login" />
 		    <% if( password_auth.canResetPassword(null) && use_reset_page){ %>
-<a href="<%=response.encodeURL(web_path+"/reset_password.jsp") %>" title="Go to password recovery page">Forgot password?</a> 
+<a href="<%=web_path%>/reset_password.jsp" title="Go to password recovery page">Forgot password?</a> 
 <%}%>
 </td>
 </tr>
@@ -199,7 +198,7 @@ value="<%=labels[i%labels.length] %>" />
 </form>
 
 <% if( RegisterServlet.ALLOW_SIGNUPS.isEnabled(conn)){ %>
-<a title='Go to registration/signup page' href='<%= response.encodeURL(web_path+"/signup.jsp") %>'>Create an account</a>
+<a title='Go to registration/signup page' href='<%= web_path%>/signup.jsp'>Create an account</a>
 <% } %>
 <p>
 <small><small>As part of its normal functioning when you log in the <%=website_name %> will install a temporary session cookie that will be removed when you log off or close your browser. If you do not wish this cookie 

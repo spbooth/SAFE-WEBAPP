@@ -60,7 +60,7 @@ public class TestAutoCreate extends ServletTest {
 		req.remote_user="fred";
 		doPost();
 		// This should create a record but still redirect to register
-		checkRedirect("/login.jsp?error=session&page=TestSessionServlet/");
+		checkRequestAuth("TestSessionServlet/");
 		checkDiff("/cleanup.xsl", "noregister.xml");
 	}
 	

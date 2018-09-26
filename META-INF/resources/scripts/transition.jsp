@@ -143,7 +143,6 @@ action="<%= response.encodeURL(web_path+TransitionServlet.getURL(conn,tp,target)
 <input type='hidden' name='<%=TransitionServlet.TRANSITION_CSRF_ATTR %>' value='<%=crsf %>'/>
 <%} %>
 <input type='hidden' name='transition_form' value='true'/>
-<input type='hidden' name='form_url' value='/scripts/transition.jsp'/>
 <% 
 if( t instanceof CustomFormContent ){
 	((CustomFormContent)t).addFormContent(form_content, session_service, f, target);

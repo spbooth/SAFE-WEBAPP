@@ -118,6 +118,12 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 				doLogout(conn, req, res);
 				return;
 			}
+			SessionService sess = conn.getService(SessionService.class);
+			if( sess != null && sess.haveCurrentUser()) {
+				// already logged in
+				handleFormResult(conn, req, res, new RedirectResult(getMainPage(conn)));
+				return;
+			}
 			if( DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn)){
 				message(conn,req,res,"disabled_feature_error");
 				return;

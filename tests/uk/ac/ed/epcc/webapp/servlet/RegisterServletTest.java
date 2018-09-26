@@ -48,7 +48,6 @@ public class RegisterServletTest extends AbstractRegisterServletTest {
 	public void testRegister() throws Exception{
 		MockTansport.clear();
 		takeBaseline();
-		addParam("form_url", "/scripts/signup.jsp");
 		addParam(EmailNameFinder.EMAIL, "thing@example.com");
 		doPost();
 		checkMessage("signup_ok_password");
@@ -63,7 +62,6 @@ public class RegisterServletTest extends AbstractRegisterServletTest {
 		req.remote_user="fred";
 		MockTansport.clear();
 		takeBaseline();
-		addParam("form_url", "/scripts/signup.jsp");
 		addParam(EmailNameFinder.EMAIL, "thing@example.com");
 		doPost();
 		checkMessage("signup_ok");
@@ -79,7 +77,6 @@ public class RegisterServletTest extends AbstractRegisterServletTest {
 		req.remote_user=null;
 		MockTansport.clear();
 		takeBaseline();
-		addParam("form_url", "/scripts/signup.jsp");
 		addParam(EmailNameFinder.EMAIL, "thing@example.com");
 		doPost();
 		checkMessage("access_denied");
@@ -101,7 +98,6 @@ public class RegisterServletTest extends AbstractRegisterServletTest {
 		assertNull(fred.getEmail());
 		assertTrue(login.mustRegister(fred));
 		takeBaseline();
-		addParam("form_url", "/scripts/signup.jsp");
 		addParam(EmailNameFinder.EMAIL, "thing@example.com");
 		doPost();
 		checkMessage("signup_ok");

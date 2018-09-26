@@ -45,7 +45,12 @@
     		<artifact name="javax.mail" ext="jar"/>
 		</dependency>
 	
-		
+		<dependency org="org.webjars" name="jquery" rev="3.3.1-1" />
+		<dependency org="org.webjars" name="datatables" rev="1.10.19" />
+		<dependency org="org.webjars" name="jquery-ui" rev="1.12.1" />
+		<dependency org="org.webjars" name="datatables-colreorder" rev="1.2.0" />
+		<dependency org="org.webjars" name="datatables-colvis" rev="1.1.1" />
+		<dependency org="org.webjars" name="datatables-fixedcolumns" rev="3.2.2" />
 		<!-- This is mostly for the Base64 encoder which is standard in Java1.8
 		   however also used for the Crypt function 
 		 -->

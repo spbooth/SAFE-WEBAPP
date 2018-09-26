@@ -135,7 +135,11 @@ public class WebappHeadTag extends TagSupport implements Tag {
 		if( file.startsWith("//")){
 			out.print(file);
 		}else{
-			out.print(response.encodeURL(template_path+"/css/"+file));
+			if( ! file.startsWith("/webjars/")) {
+				file="/css/"+file;
+			}
+			// no session-id needed
+			out.print(template_path+file);
 		}
 		out.println("\" rel=\"stylesheet\" type=\"text/css\">");
 	}
@@ -148,7 +152,8 @@ public class WebappHeadTag extends TagSupport implements Tag {
 			out.print("\" ");
 		}
 		out.print("href=\"");
-		out.print(response.encodeURL(template_path+"/"+file));
+		// no session id needed
+		out.print(template_path+"/"+file);
 		out.println("\" >");
 	}
 	protected void doScript(Set<String> scripts, JspWriter out, HttpServletRequest request, HttpServletResponse response, String location) throws IOException {
@@ -165,7 +170,8 @@ public class WebappHeadTag extends TagSupport implements Tag {
 				out.print(location);
 			}else {
 				// local script file
-				out.print(response.encodeURL(request.getContextPath()+location));		
+				// no sessionid needed
+				out.print(request.getContextPath()+location);		
 			}
 			out.println("\"></script>");
 		}else{

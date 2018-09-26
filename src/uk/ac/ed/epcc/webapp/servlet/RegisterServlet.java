@@ -75,7 +75,7 @@ public class RegisterServlet extends WebappServlet {
 			message(conn,req,res,"disabled_feature_error");
 			return;
 		}
-		
+		HTMLForm.setFormUrl(req, "/signup.jsp");
 		
 		String realm=getRealm(conn);
 		FormCreator signupFormCreator =fac.getSignupFormCreator(realm,webName);

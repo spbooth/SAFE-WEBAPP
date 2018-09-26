@@ -33,6 +33,7 @@ import uk.ac.ed.epcc.webapp.content.HourTransform;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FatalTransitionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.DirectOperationResultVisitor;
+import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
 import uk.ac.ed.epcc.webapp.forms.result.BackResult;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
@@ -127,6 +128,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		ServletService servlet_service = conn.getService(ServletService.class);
 		TimerService timer_service = conn.getService(TimerService.class);
 	
+		HTMLForm.setFormUrl(req, "/scripts/transition.jsp");
 		Map<String,Object> params = servlet_service.getParams();
 		LinkedList<String> path = servlet_service.getArgs();
 		Logger log = conn.getService(LoggerService.class).getLogger(getClass());

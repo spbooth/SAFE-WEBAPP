@@ -269,6 +269,10 @@ public abstract class ServletTest extends WebappTestBase{
 		assertEquals("Wrong redirect", url, res.forward);
 	}
 	
+	public void checkRequestAuth(String page) {
+		assertEquals(page, req.getAttribute(DefaultServletService.PAGE_ATTR));
+		checkForward(LoginServlet.getLoginPage(ctx));
+	}
 	
 	public void checkError(String expected_url,String param, String error){
 		checkForward(expected_url);

@@ -66,8 +66,6 @@ public class TableTransitionTests extends AbstractTransitionServletTest {
 		setTransition(provider, TableTransitionProvider.ADD_STD_FIELD,fac);
 		addParam(AddStdFieldTransition.FIELD_FORMFIELD, TableStructureTestFactory.SECRET_IDENTITY);
 		addParam("action", AddFieldTransition.ADD_ACTION);
-		addParam("transition_form", "true");
-		addParam("direct", "true");
 		runTransition();
 		checkViewRedirect(provider, fac);
 		
@@ -85,8 +83,6 @@ public class TableTransitionTests extends AbstractTransitionServletTest {
 		setTransition(provider,TableTransitionProvider.ADD_TEXT_FIELD_KEY,fac);
 		addParam(AddFieldTransition.FIELD, "Wombat");
 		addParam("action", AddFieldTransition.ADD_ACTION);
-		addParam("transition_form", "true");
-		addParam("direct", "true");
 		addParam("Size", "32");
 		runTransition();
 		checkViewRedirect(provider, fac);
@@ -104,8 +100,6 @@ public class TableTransitionTests extends AbstractTransitionServletTest {
 		setTransition(provider, TableTransitionProvider.ADD_INTEGER_FIELD_KEY,fac);
 		addParam(AddFieldTransition.FIELD, "Wombat");
 		addParam("action", AddFieldTransition.ADD_ACTION);
-		addParam("transition_form", "true");
-		addParam("direct", "true");
 		//addParam("Size", "32");
 		runTransition();
 		checkViewRedirect(provider, fac);
@@ -123,8 +117,6 @@ public class TableTransitionTests extends AbstractTransitionServletTest {
 		setTransition(provider, TableTransitionProvider.ADD_DOUBLE_FIELD_KEY,fac);
 		addParam(AddFieldTransition.FIELD, "Wombat");
 		addParam("action", AddFieldTransition.ADD_ACTION);
-		addParam("transition_form", "true");
-		addParam("direct", "true");
 		//addParam("Size", "32");
 		runTransition();
 		checkViewRedirect(provider, fac);
@@ -142,8 +134,6 @@ public class TableTransitionTests extends AbstractTransitionServletTest {
 		setTransition(provider, TableTransitionProvider.ADD_DATE_FIELD_KEY,fac);
 		addParam(AddFieldTransition.FIELD, "Wombat");
 		addParam("action", AddFieldTransition.ADD_ACTION);
-		addParam("transition_form", "true");
-		addParam("direct", "true");
 		//addParam("Size", "32");
 		runTransition();
 		checkViewRedirect(provider, fac);
@@ -161,8 +151,6 @@ public class TableTransitionTests extends AbstractTransitionServletTest {
 		setTransition(provider, TableTransitionProvider.ADD_LONG_FIELD_KEY,fac);
 		addParam(AddFieldTransition.FIELD, "Wombat");
 		addParam("action", AddFieldTransition.ADD_ACTION);
-		addParam("transition_form", "true");
-		addParam("direct", "true");
 		//addParam("Size", "32");
 		runTransition();
 		checkViewRedirect(provider, fac);
@@ -180,8 +168,6 @@ public class TableTransitionTests extends AbstractTransitionServletTest {
 		setTransition(provider, TableTransitionProvider.ADD_FLOAT_FIELD_KEY,fac);
 		addParam(AddFieldTransition.FIELD, "Wombat");
 		addParam("action", AddFieldTransition.ADD_ACTION);
-		addParam("transition_form", "true");
-		addParam("direct", "true");
 		//addParam("Size", "32");
 		runTransition();
 		checkViewRedirect(provider, fac);

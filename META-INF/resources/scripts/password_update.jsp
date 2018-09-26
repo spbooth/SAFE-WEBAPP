@@ -86,7 +86,6 @@ accept-charset="<%=default_charset %>"
 <% } %>
  >
 	<input type="hidden" name="action" value="CHANGE_PASSWORD"/>
-	<input type='hidden' name='form_url' value='/scripts/password_update.jsp'/>
     <%= f.getHtmlFieldTable(request) %>
     <%= f.getActionButtons() %>
 	</div>

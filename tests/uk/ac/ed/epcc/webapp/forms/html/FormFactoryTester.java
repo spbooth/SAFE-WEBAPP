@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.factory.FormFactory;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdate;
+import uk.ac.ed.epcc.webapp.forms.factory.UpdateForm;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 public class FormFactoryTester {
@@ -46,7 +47,7 @@ public void testCreate(FormCreator f){
 @SuppressWarnings("unchecked")
 public <T> void testUpdate(FormUpdate<T> f) throws Exception{
 	  HTMLForm form = new HTMLForm(ctx);
-	  HTMLUpdateForm<T> u = new HTMLUpdateForm<T>("test",f);
+	  UpdateForm<T> u = new UpdateForm<T>("test",f);
 	  u.buildSelectForm(form);
 	  form.clear();
 	  if( u instanceof StandAloneFormUpdate){

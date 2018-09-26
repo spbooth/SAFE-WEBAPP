@@ -73,6 +73,10 @@ public class DefaultServletService implements ServletService{
 	/**
 	 * 
 	 */
+	public static final String PAGE_ATTR = "page";
+	/**
+	 * 
+	 */
 	private static final String LOGOUT_REMOVE_COOKIE_PREFIX = "logout.remove_cookie.";
 	public static final String BASIC_AUTH_REALM_PARAM="basic_auth.realm";
 	public static final Feature NEED_CERTIFICATE_FEATURE = new Feature("need-certificate", true,"try additional mechanisms to retrieve certificate DN as web-name");
@@ -177,10 +181,12 @@ public class DefaultServletService implements ServletService{
 	 */
 	public String encodeURL(String url){
 		if( res != null && res instanceof HttpServletResponse ){
-			return ((HttpServletResponse)res).encodeURL(web_path+url);
-		}else{
-			return web_path+url;
+			if( getSession(false) != null ) {
+				// make sure we don't trigger session creation
+				return ((HttpServletResponse)res).encodeURL(web_path+url);
+			}
 		}
+		return web_path+url;
 	}
 	/**
 	 * Forward request to a different page.
@@ -456,7 +462,8 @@ public class DefaultServletService implements ServletService{
 		}else{
 			// standard login page supports both custom password login and self-register for external-auth
 			String login_page=LoginServlet.getLoginPage(conn);
-			redirect(login_page+"?error=session&page="+encodePage());
+			req.setAttribute(PAGE_ATTR, encodePage());
+			forward(login_page);
 		}
 	}
 
@@ -567,6 +574,7 @@ public class DefaultServletService implements ServletService{
 					for( Cookie c : cookies){
 						if( c.getName().equalsIgnoreCase("JSESSIONID") || getContext().getBooleanParameter(LOGOUT_REMOVE_COOKIE_PREFIX+c.getName(), false)){
 							Cookie c2 = (Cookie) c.clone();
+							c2.setHttpOnly(true); // for owasp scan
 							c2.setMaxAge(0); // This should request a delete
 							if( c2.getPath() == null ){
 								String contextPath = request.getContextPath();

@@ -94,7 +94,7 @@ remember your password, you can use this form to send yourself a password recove
 	<fieldset class="action_buttons">
 	<input type="submit" name="email_password" value="Send password recovery email"
 			class="input_button" />
-	<a href="<%=response.encodeURL(web_path+"/login.jsp") %>">Cancel</a>
+	<a href="<%=web_path%>/login.jsp">Cancel</a>
 	</fieldset>
 </form>
 </div>

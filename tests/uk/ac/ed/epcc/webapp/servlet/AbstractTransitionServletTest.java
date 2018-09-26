@@ -123,7 +123,6 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 			if(transition != null &&  (transition instanceof BaseFormTransition || transition instanceof TargetLessTransition)){
 				req.params.put("Transition", key.toString());
 				req.params.put("transition_form", "true");
-				req.params.put("form_url", "/scripts/transition.jsp");
 				MapForm f = new MapForm(getContext());
 				if( transition instanceof BaseFormTransition){
 					BaseFormTransition ft = (BaseFormTransition)transition;

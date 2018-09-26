@@ -40,7 +40,7 @@ public final class TransitionServletTest extends ServletTest {
 		TransitionServlet servlet = new TransitionServlet();
 		
 		servlet.doPost(req,res,ctx);
-		assertEquals("test/login.jsp?error=session&page=TransitionServlet/Test/12", res.redirect);
+		checkRequestAuth("TransitionServlet/Test/12");
 	}
 	@Test
 	public void testNull() throws ServletException, IOException, DataException{
@@ -190,7 +190,7 @@ public final class TransitionServletTest extends ServletTest {
 		req.params.put("transition_form", "true");
 		req.params.put("Value","2");
 		req.params.put("Add","Add");
-		req.params.put("form_url","/scripts/transition.jsp");
+		req.params.put("form_loc","transition");
 		SessionService service = ctx.getService(SessionService.class);
 		AppUserFactory<?> fac = service.getLoginFactory();
 

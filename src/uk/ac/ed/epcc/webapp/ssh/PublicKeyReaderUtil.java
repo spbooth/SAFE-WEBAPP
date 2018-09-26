@@ -361,7 +361,7 @@ public final class PublicKeyReaderUtil
     {
         final BigInteger e = _buffer.readMPint();
         final BigInteger n = _buffer.readMPint();
-
+        //assert(_buffer.remaining()==0);
         try {
             final KeyFactory rsaKeyFact = KeyFactory.getInstance("RSA");
             final RSAPublicKeySpec rsaPubSpec = new RSAPublicKeySpec(n, e);
@@ -382,7 +382,7 @@ public final class PublicKeyReaderUtil
      *
      * @see <a href="http://tools.ietf.org/html/rfc4253#section-6.6">RFC 4253 Section 6.6</a>
      */
-    private static class SSH2DataBuffer
+    static class SSH2DataBuffer
     {
         /**
          * SSH2 data.
@@ -443,7 +443,7 @@ public final class PublicKeyReaderUtil
          *
          * @return 32 bit integer value
          */
-        private int readUInt32()
+        public int readUInt32()
         {
             final int byte1 = 0xff & this.data[this.pos++];
             final int byte2 = 0xff & this.data[this.pos++];
@@ -451,7 +451,25 @@ public final class PublicKeyReaderUtil
             final int byte4 = 0xff & this.data[this.pos++];
             return ((byte1 << 24) + (byte2 << 16) + (byte3 << 8) + (byte4 << 0));
         }
-
+        /**
+         * Reads from the {@link #data} starting with {@link #pos} the next
+         * eight bytes and prepares a long.
+         *
+         * @return 64 bit long value
+         */
+        public long readUInt64()
+        {
+            final long byte1 = 0xff & this.data[this.pos++];
+            final long byte2 = 0xff & this.data[this.pos++];
+            final long byte3 = 0xff & this.data[this.pos++];
+            final long byte4 = 0xff & this.data[this.pos++];
+            final long byte5 = 0xff & this.data[this.pos++];
+            final long byte6 = 0xff & this.data[this.pos++];
+            final long byte7 = 0xff & this.data[this.pos++];
+            final long byte8 = 0xff & this.data[this.pos++];
+            return ((byte1 << 56) + (byte2 << 48) + (byte3 << 40) + (byte5 << 32) +
+            		(byte5 << 24) + (byte6 << 16) + (byte7 << 8 ) + (byte8 << 0 ));
+        }
         /**
          * Reads from the {@link #data} starting with {@link #pos} a byte
          * array. The byte array is defined as:
@@ -467,7 +485,7 @@ public final class PublicKeyReaderUtil
          * @see #readUInt32()
          * @see PublicKeyParseException.ErrorCode#CORRUPT_BYTE_ARRAY_ON_READ
          */
-        private byte[] readByteArray()
+        public byte[] readByteArray()
             throws PublicKeyParseException
         {
             final int len = this.readUInt32();
@@ -480,20 +498,46 @@ public final class PublicKeyReaderUtil
             this.pos += len;
             return str;
         }
+        /** reads a nested buffer.
+         * 
+         * @return
+         * @throws PublicKeyParseException
+         */
+        public SSH2DataBuffer readBuffer() throws PublicKeyParseException {
+        	return new SSH2DataBuffer(readByteArray());
+        }
+        
+        public int remaining() {
+        	return data.length - pos;
+        }
+        
+        public int pos() {
+        	return pos;
+        }
     }
 
-    private static class SSH2ByteBuffer extends ByteArrayOutputStream{
+    static class SSH2ByteBuffer extends ByteArrayOutputStream{
     	public void writeMPint(BigInteger i) throws IOException{
     		writeByteArray(i.toByteArray());
     	}
     	public void writeString(String s) throws IOException{
     		writeByteArray(s.getBytes());
     	}
-    	private void writeUint32(int i){
+    	public void writeUint32(int i){
     		write( ( i >> 24 ) & 0xff );
     		write( ( i >> 16 ) & 0xff );
     		write( ( i >> 8 ) & 0xff );
     		write(  i  & 0xff );
+    	}
+    	public void writeUint64(long i){
+    		write( (int) (( i >> 56 ) & 0xff ));
+    		write( (int) (( i >> 48 ) & 0xff ));
+    		write( (int) (( i >> 40 ) & 0xff ));
+    		write( (int) (( i >> 32 ) & 0xff ));
+    		write( (int) (( i >> 24 ) & 0xff ));
+    		write( (int) (( i >> 16 ) & 0xff ));
+    		write( (int) (( i >> 8 ) & 0xff ));
+    		write( (int) (i  & 0xff) );
     	}
     	private void writeByteArray(byte data[]) throws IOException{
     		writeUint32(data.length);

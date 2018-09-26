@@ -330,6 +330,7 @@ private void setCookie(boolean add,String value) {
 		return;
 	}
 	Cookie ck = new Cookie(name, value);
+	ck.setHttpOnly(true);
 	//ck.setSecure(true);
 	if( add){
 		ck.setMaxAge(-1);

@@ -75,11 +75,11 @@ boolean multi = creator.useMultiPart();
 <% if( person_fac.hasComposite(PasswordAuthComposite.class)){ %>
 <p class="highlight"> This form is to sign-up for a new <%=website_name%> account.
 If you already have an account then
-<a href="<%= response.encodeURL(web_path+"/login.jsp") %>">login</a>.
+<a href="<%=web_path%>/login.jsp">login</a>.
 <% PasswordAuthComposite password_auth = person_fac.getComposite(PasswordAuthComposite.class);
 if( password_auth != null && password_auth.canResetPassword(null)){
 %>
-If you have forgotten your password, then <a href="<%=response.encodeURL(web_path+"/reset_password.jsp") %>">recover your password</a>.
+If you have forgotten your password, then <a href="<%=web_path%>/reset_password.jsp">recover your password</a>.
 <%} %>
 </p>
 <%} %>
@@ -95,8 +95,7 @@ if( default_charset != null && ! default_charset.isEmpty()){
 %> accept-charset="<%=default_charset %>"
 <% } %>
   autocomplete="on"
-  action="<%= response.encodeURL(web_path+"/SignupServlet") %>">
-<input type="hidden" name="form_url" value="<%=HTMLForm.getFormURL(request)%>">
+  action="<%= web_path %>/SignupServlet">
 <%= creator.getHtmlForm(request) %>
   </form>
 </div>

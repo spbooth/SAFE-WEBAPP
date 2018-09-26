@@ -40,7 +40,7 @@ public final class BasicTransitionServletTest extends AbstractTransitionServletT
 		TestTransitionProvider provider = new TestTransitionProvider(ctx);
 		setTransition(provider, null, 12);
 		runTransition();
-		checkRedirect("/login.jsp?error=session&page=TransitionServlet/Test/12");
+		checkRequestAuth("TransitionServlet/Test/12");
 	}
 	/**
 	 * @throws DataFault

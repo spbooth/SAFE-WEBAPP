@@ -46,7 +46,7 @@ import uk.ac.ed.epcc.webapp.servlet.ServletService;
 
 
 public class HTMLForm extends BaseHTMLForm {
-	private static final String FORM_URL = "form_url";
+	private static final String FORM_URL_ATTR = "form_url";
 
 	private static final String MISSING_FIELDS_TAG = "MissingFields";
 
@@ -183,13 +183,11 @@ public class HTMLForm extends BaseHTMLForm {
 		AppContext c = getContext();
 		Map<String,Object> params;
 		params = c.getService(ServletService.class).getParams();
-		if( params.get(FORM_URL) == null && params.get("direct") == null){
+		if( req.getAttribute(FORM_URL_ATTR) == null ){
 			// we won't be able to return to forms to show errors
 			// not a problem if parse succeeds but report it so it can be fixed
 			// create an Exception to generate a stack trace
-			// The parameter direct can be used to supress this check where we
-			// are bypassing a form stage (e.g pre selecting the object in an update form
-			c.error(new Exception("No form_url in parameters"),  "No form_url in parameters");
+			getLogger().error("No form_url in request",new Exception("No form_url in request"));
 		}
 		boolean ok = parsePost(getErrors(req), params,false);
 		if (!ok) {
@@ -234,18 +232,29 @@ public class HTMLForm extends BaseHTMLForm {
 	public static void doFormError(AppContext ctx,
 			HttpServletRequest req, HttpServletResponse res) {
 
-		String form_url = (String) ctx.getService(ServletService.class).getParams().get(FORM_URL);
-		if (form_url == null) {
-			// lets get the stacktrace from where this occured
-			throw new ConsistencyError("Return URL of form not specified");
-
-		}
 		try {
+			String form_url = (String) req.getAttribute(FORM_URL_ATTR);
+			if( form_url == null ) {
+				// lets get the stacktrace from where this occured
+				throw new ConsistencyError("Return URL of form not specified");
+			}
 			ctx.getService(ServletService.class).forward(form_url);
 		} catch (Exception e) {
 			ctx.error(e, "Exception dispatching form error");
 
 		}
+	}
+	/** Record the form url that should be forwarded to if the
+	 * form contains errors.
+	 * 
+	 * This should be set by the servlet (which presumably knows where its form lives)
+	 * early on in the processing so it can be retreived by the lower level error handling
+	 * 
+	 * @param req  {@link HttpServletRequest} request
+	 * @param url  URL of form script
+	 */
+	public static void setFormUrl(HttpServletRequest req, String url) {
+		req.setAttribute(FORM_URL_ATTR, url);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -263,21 +272,6 @@ public class HTMLForm extends BaseHTMLForm {
 		return errors;
 	}
 
-	/**
-	 * Get the url to use for error reporting. If it already exists in the
-	 * parameters then use that (we have already returned errors). Otherwise
-	 * assume this is the first show of the form and take it from the request.
-	 * 
-	 * @param req
-	 * @return String
-	 */
-	public static String getFormURL(HttpServletRequest req) {
-		String result = req.getParameter(FORM_URL);
-		if (result == null) {
-			result = req.getServletPath();
-		}
-		return result;
-	}
 
 	public static String getGeneralError(HttpServletRequest request) {
 		Map<String,String> errors = getErrors(request);
