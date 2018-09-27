@@ -36,4 +36,13 @@ public class MockRandomService extends RandomService {
 	protected int randomInt(int total_chars) {
 		return (i++) % total_chars;
 	}
+	@Override
+	public byte[] randomBytes(int length) {
+		byte[] result = new byte[length];
+		for(int i=0 ; i<length ; i++) {
+			result[i]=(byte) (i%255);
+		}
+		return result;
+		
+	}
 }

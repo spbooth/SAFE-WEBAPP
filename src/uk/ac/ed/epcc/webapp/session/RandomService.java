@@ -119,4 +119,10 @@ public class RandomService implements AppContextService<RandomService> {
 		char[][] chars = { { 'a', 'z' }, { 'A', 'Z' }, { '0', '9' }, };
 		return randomString(chars, length);
 	}
+	
+	public byte[] randomBytes(int length) {
+		byte data[] = new byte[length];
+		random.nextBytes(data);
+		return data;
+	}
 }

@@ -539,6 +539,13 @@ public final class PublicKeyReaderUtil
     		write( (int) (( i >> 8 ) & 0xff ));
     		write( (int) (i  & 0xff) );
     	}
+    	public void writeBuffer(SSH2ByteBuffer buffer) throws IOException {
+    		if( buffer ==null) {
+    			writeByteArray(new byte[0]);
+    		}else {
+    			writeByteArray(buffer.toByteArray());
+    		}
+    	}
     	private void writeByteArray(byte data[]) throws IOException{
     		writeUint32(data.length);
     		write(data);

@@ -68,7 +68,7 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		addParam("username", "fred@example.com");
 		addParam("password", "FredIsDead");
 		doPost();
-		checkRedirect("/main.jsp");
+		loginRedirects();
 		SessionService<A> sess = ctx.getService(SessionService.class);
 		assertTrue(sess.haveCurrentUser());
 		
@@ -94,7 +94,7 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		addParam("username", "fred@example.com");
 		addParam("password", "FredIsDead");
 		doPost();
-		checkRedirect("/main.jsp");
+		loginRedirects();
 		SessionService<A> sess = ctx.getService(SessionService.class);
 		assertTrue(sess.haveCurrentUser());
 		
@@ -103,6 +103,22 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		RequiredPage page = pages.iterator().next();
 		assertFalse(page.required(sess));
 		checkDiff("/cleanup.xsl", "login_wtmp.xml");
+	}
+
+	/**
+	 * @throws IOException 
+	 * @throws ServletException 
+	 * 
+	 */
+	public void loginRedirects() throws ServletException, IOException {
+		loginRedirects("/main.jsp");
+	}
+	public void loginRedirects(String expected) throws ServletException, IOException {
+		if( LoginServlet.COOKIE_TEST.isEnabled(ctx)) {
+			checkRedirect("/LoginServlet");
+			doPost();
+		}
+		checkRedirect(expected);
 	}
 	
 	@ConfigFixtures({"wtmp.properties","crosscookie.properties"})
@@ -130,7 +146,7 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		addParam("username", "fred@example.com");
 		addParam("password", "FredIsDead");
 		doPost();
-		checkRedirect("/main.jsp");
+		loginRedirects();
 		SessionService<A> sess = ctx.getService(SessionService.class);
 		assertTrue(sess.haveCurrentUser());
 		
@@ -153,7 +169,7 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		addParam("username","fred@example.com");
 		addParam("password",first);
 		doPost();
-		checkRedirect("/welcome.jsp");
+		loginRedirects("/welcome.jsp");
 		assertTrue(sess.haveCurrentUser());
 		resetRequest();
 		Set<RequiredPage<A>> pages = fac.getRequiredPages();
