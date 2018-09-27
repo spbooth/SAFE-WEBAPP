@@ -23,6 +23,9 @@ public class MockRandomService extends RandomService {
 
 	
 	private int i=0;
+	
+	private int pos=0;
+	private byte byte_data[]=null;
 	/**
 	 * 
 	 */
@@ -40,9 +43,18 @@ public class MockRandomService extends RandomService {
 	public byte[] randomBytes(int length) {
 		byte[] result = new byte[length];
 		for(int i=0 ; i<length ; i++) {
-			result[i]=(byte) (i%255);
+			if( byte_data != null && pos < byte_data.length) {
+				result[i] = byte_data[pos++];
+			}else {
+				result[i]=(byte) (i%255);
+			}
 		}
 		return result;
 		
+	}
+	
+	public void setByteData(byte values[]) {
+		pos=0;
+		byte_data=values;
 	}
 }

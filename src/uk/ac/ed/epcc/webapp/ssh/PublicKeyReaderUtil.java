@@ -546,7 +546,7 @@ public final class PublicKeyReaderUtil
     			writeByteArray(buffer.toByteArray());
     		}
     	}
-    	private void writeByteArray(byte data[]) throws IOException{
+    	public void writeByteArray(byte data[]) throws IOException{
     		writeUint32(data.length);
     		write(data);
     	}
