@@ -82,14 +82,14 @@ public final class PublicKeyReaderUtil
      *
      * @see #load(String)
      */
-    private static final String SSH2_DSA_KEY = "ssh-dss";
+    public static final String SSH2_DSA_KEY = "ssh-dss";
 
     /**
      * Key name of the type of public key for RSA algorithm.
      *
      * @see #load(String)
      */
-    private static final String SSH2_RSA_KEY = "ssh-rsa";
+    public static final String SSH2_RSA_KEY = "ssh-rsa";
 
     /**
      * Default constructor is private so that the public key read utility class
@@ -159,27 +159,64 @@ public final class PublicKeyReaderUtil
     		sb.append(SSH2_RSA_KEY);
     		sb.append(" ");
     		SSH2ByteBuffer buf = new SSH2ByteBuffer();
-    		buf.writeString(SSH2_RSA_KEY);
-    		buf.writeMPint(pub.getPublicExponent());
-    		buf.writeMPint(pub.getModulus());
+    		packRSAkey(pub, buf);
     		sb.append(Base64.encodeBase64String(buf.toByteArray()));
     	}else if( alg.equalsIgnoreCase("DSA")){
     		DSAPublicKey pub = (DSAPublicKey) key;
     		sb.append(SSH2_DSA_KEY);
     		sb.append(" ");
     		SSH2ByteBuffer buf = new SSH2ByteBuffer();
-    		buf.writeString(SSH2_DSA_KEY);
-    		DSAParams params = pub.getParams();
-    		buf.writeMPint(params.getP());
-    		buf.writeMPint(params.getQ());
-    		buf.writeMPint(params.getG());
-    		buf.writeMPint(pub.getY());
+    		
+    		packDSAkey(pub, buf);
     		sb.append(Base64.encodeBase64String(buf.toByteArray()));
     	}else{
     		throw new PublicKeyParseException(ErrorCode.UNKNOWN_PUBLIC_KEY_FILE_FORMAT);
     	}
     	return sb.toString();
     }
+
+	/**
+	 * @param pub
+	 * @param buf
+	 * @throws IOException
+	 */
+	public static void packDSAkey(DSAPublicKey pub, SSH2ByteBuffer buf) throws IOException {
+		buf.writeString(SSH2_DSA_KEY);
+		packDSAKeyParams(pub, buf);
+	}
+
+	/**
+	 * @param pub
+	 * @param buf
+	 * @throws IOException
+	 */
+	public static void packDSAKeyParams(DSAPublicKey pub, SSH2ByteBuffer buf) throws IOException {
+		DSAParams params = pub.getParams();
+		buf.writeMPint(params.getP());
+		buf.writeMPint(params.getQ());
+		buf.writeMPint(params.getG());
+		buf.writeMPint(pub.getY());
+	}
+
+	/**
+	 * @param pub
+	 * @param buf
+	 * @throws IOException
+	 */
+	public static void packRSAkey(RSAPublicKey pub, SSH2ByteBuffer buf) throws IOException {
+		buf.writeString(SSH2_RSA_KEY);
+		packRSAKeyParams(pub, buf);
+	}
+
+	/**
+	 * @param pub
+	 * @param buf
+	 * @throws IOException
+	 */
+	public static void packRSAKeyParams(RSAPublicKey pub, SSH2ByteBuffer buf) throws IOException {
+		buf.writeMPint(pub.getPublicExponent());
+		buf.writeMPint(pub.getModulus());
+	}
 
     public static String normalise(String key) throws PublicKeyParseException, IOException{
     	if( key == null || key.trim().length() == 0){

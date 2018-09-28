@@ -18,6 +18,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
 import java.security.PublicKey;
 import java.security.Signature;
+import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
 import java.util.Map.Entry;
@@ -32,7 +33,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.session.RandomService;
 import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.SSH2ByteBuffer;
 
-/**
+/** Class to generate OpenSSH 
  * @author Stephen Booth
  *
  */
@@ -89,14 +90,22 @@ public class KeySigner extends AbstractContexed {
 		
 		SSH2ByteBuffer data = new SSH2ByteBuffer();
 		String key_alg = key.getAlgorithm();
-		if( key_alg.equals("RSA")) {
+		switch( key_alg) {
+		case "RSA":
 			type="ssh-rsa-cert-v01@openssh.com";
 			data.writeString(type);
 			writeNonce(data);
 			RSAPublicKey rsa = (RSAPublicKey) key;
-			data.writeMPint(rsa.getPublicExponent());
-			data.writeMPint(rsa.getModulus());
-		}else {
+			PublicKeyReaderUtil.packRSAKeyParams(rsa, data);
+			break;
+		case "DSA":
+			type="ssh-dss-cert-v01@openssh.com";
+			data.writeString(type);
+			writeNonce(data);
+			DSAPublicKey dsa = (DSAPublicKey) key;
+			PublicKeyReaderUtil.packDSAKeyParams(dsa, data);
+			break;
+		default:
 			throw new InvalidAlgorithmParameterException("Unsupported algorith "+key_alg);
 		}
 		data.writeUint64(serial);
@@ -118,24 +127,34 @@ public class KeySigner extends AbstractContexed {
 		data.writeByteArray(new byte[0]); // reserved
 		PublicKey ca_public = ca.getPublic();
 		String ca_alg = ca_public.getAlgorithm();
-		if( ca_alg.equals("RSA")) {
+		SSH2ByteBuffer ca_buff = new SSH2ByteBuffer();
+		SSH2ByteBuffer sig_part = new SSH2ByteBuffer();
+		
+		switch(ca_alg) {
+		case "RSA":
 			RSAPublicKey ca_pub_rsa=(RSAPublicKey) ca_public;
-			SSH2ByteBuffer ca_buff = new SSH2ByteBuffer();
-			ca_buff.writeString("ssh-rsa");
-			ca_buff.writeMPint(ca_pub_rsa.getPublicExponent());
-			ca_buff.writeMPint(ca_pub_rsa.getModulus());
-			data.writeBuffer(ca_buff);
+			PublicKeyReaderUtil.packRSAkey(ca_pub_rsa, ca_buff);
 			
-			Signature sig = Signature.getInstance("SHA1withRSA");
-			sig.initSign(ca.getPrivate());
-			sig.update(data.toByteArray());
-			SSH2ByteBuffer sig_part = new SSH2ByteBuffer();
-			sig_part.writeString("ssh-rsa");
-			sig_part.writeByteArray(sig.sign());
-			data.writeBuffer(sig_part);
-		}else {
+			sig_part.writeString(PublicKeyReaderUtil.SSH2_RSA_KEY);
+		    break;
+		case "DSA":
+			DSAPublicKey ca_pub_dsa=(DSAPublicKey) ca_public;
+			PublicKeyReaderUtil.packDSAkey(ca_pub_dsa, ca_buff);
+			
+			sig_part.writeString(PublicKeyReaderUtil.SSH2_DSA_KEY);
+		    break;
+		default:
 			throw new InvalidAlgorithmParameterException("Unsupported algorith "+ca_alg);
 		}
+		Signature sig = Signature.getInstance("SHA1withRSA");
+		data.writeBuffer(ca_buff);
+		
+		sig.initSign(ca.getPrivate());
+		sig.update(data.toByteArray());
+		
+		sig_part.writeByteArray(sig.sign());
+		data.writeBuffer(sig_part);
+		
 		StringBuilder sb = new StringBuilder();
 		sb.append(type);
 		sb.append(" ");
