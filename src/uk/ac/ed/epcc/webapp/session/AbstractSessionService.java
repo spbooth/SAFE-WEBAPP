@@ -419,7 +419,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 */
 	private final boolean hasRole(Set<String> skip,String name){
 		if( skip == null){
-			skip = new HashSet();
+			skip = new HashSet<>();
 		}
 		skip.add(name);
 		// role name aliasing
@@ -467,7 +467,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 * with the alternatives only checked if that role is not found
 	 * 
 	 * @param name
-	 * @return 
+	 * @return role to use
 	 */
 	public String mapRoleName(String name) {
 		return getContext().getInitParameter(USE_ROLE_PREFIX+name, name);
@@ -508,7 +508,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 * No name mapping is applied.
 	 * 
 	 * @param role
-	 * @return
+	 * @return  true if role set/permitted
 	 */
 	public final boolean canHaveRole(String role){
 		// final so that sub-classes see the role cache.
@@ -532,17 +532,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		
 	}
 	
-	/** updates the cached result
-	 * 
-	 * @param role
-	 * @param value
-	 */
-	private void cacheRole(String role, boolean value){
-		if (role_map == null) {
-			role_map = setupRoleMap();
-		}
-		role_map.put(role, Boolean.valueOf(value));
-	}
+	
 
 	/** perform a non-cached role-check. 
 	 * This is called every time a role is checked. If it returns true the role is allowed
@@ -920,17 +910,17 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	}
 
 
-	private boolean checkRelationshipRole(A user,String tag, String relationship, String name_filter) {
+	private <X extends DataObject> boolean checkRelationshipRole(A user,String tag, String relationship, String name_filter) {
 		try {
-			DataObjectFactory fac = getContext().makeObject(DataObjectFactory.class, tag);
+			DataObjectFactory<X> fac = getContext().makeObject(DataObjectFactory.class, tag);
 			if( fac == null) {
 				error("tag "+tag+" failed to resolve to DataObjectFactory");
 				return false;
 			}
-			AndFilter fil = new AndFilter(fac.getTarget());
+			AndFilter<X> fil = new AndFilter<X>(fac.getTarget());
 			fil.addFilter(getTargetInRelationshipRoleFilter(fac, relationship, user));
 			if( name_filter != null ) {
-				BaseFilter nf = makeNamedFilter(fac, name_filter);
+				BaseFilter<? super X> nf = makeNamedFilter(fac, name_filter);
 				if( nf == null ) {
 					error("Name filter "+name_filter+" failed to resolve on "+tag);
 					return false;
