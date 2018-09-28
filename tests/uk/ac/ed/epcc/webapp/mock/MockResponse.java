@@ -148,9 +148,12 @@ public class MockResponse implements HttpServletResponse {
 		return stream;
 	}
 
+	PrintWriter writer = null;
 	public PrintWriter getWriter() throws IOException {
-		
-		return new PrintWriter(stream);
+		if( writer == null) {
+			writer = new PrintWriter(stream);
+		}
+		return writer;
 	}
 
 	public boolean isCommitted() {

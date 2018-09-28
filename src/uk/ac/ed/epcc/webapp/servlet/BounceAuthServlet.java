@@ -88,7 +88,8 @@ public class BounceAuthServlet extends SessionServlet {
 		Hash h = conn.getEnumParameter(Hash.class, "remote_auth_servlet.hash", Hash.SHA512);
 		String check_token = h.getHash(name+token+auth_secret);
 		String return_url = remote_url+"?check_token="+check_token+"&auth_name="+name;
-		res.sendRedirect(res.encodeRedirectURL(return_url));
+		// Don't encode the URL as it is a known cross-site redirect
+		res.sendRedirect(return_url);
 		
 	}
 

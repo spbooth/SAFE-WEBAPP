@@ -147,19 +147,15 @@ public class StaticServlet extends SessionServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse res,
 			AppContext conn, SessionService person) throws Exception {
-		Logger log = conn.getService(LoggerService.class).getLogger(conn.getClass());
-		String param_basedir=conn.getInitParameter("static.basedir");
+		Logger log = getLogger(conn);
+		String param_basedir=conn.getExpandedProperty("static.basedir");
 		if( param_basedir == null ){
-			getLogger(conn).error("static.basedir not set in StaticServlet");
+			getLogger(conn).warn("static.basedir not set in StaticServlet");
 			message(conn, req, res, "invalid_argument");
 			return;
 		}
 		StringBuilder basedir = new StringBuilder(param_basedir);
         log.debug("In StaticServlet");
-		if (basedir == null || basedir.length() == 0) {
-			getLogger(conn).error("No basedir specified in Staticservlet");
-			return;
-		}
 		log.debug("basedir="+basedir);
 		// strip trailing slashes
 		while (basedir.charAt(basedir.length() - 1) == '/') {
@@ -170,7 +166,7 @@ public class StaticServlet extends SessionServlet {
 			spath = "/";
 		}
 		log.debug("spath is " + spath);
-		// avoid the ability to backtrack out of the
+		// avoid the ability to backtrack out of the directory
 		if (spath.indexOf("..") >= 0) {
 			access_denied(conn, req, res);
 			return;
@@ -261,7 +257,8 @@ public class StaticServlet extends SessionServlet {
 	protected static void Footer(HttpServletRequest req, HttpServletResponse res)
 			throws IOException {
 		PrintWriter out = res.getWriter();
-		out.println("<hr></body>");
+		out.println("<hr></body></html>");
+		out.close();
 	}
 
 	protected static void Header(HttpServletRequest req,
@@ -269,7 +266,7 @@ public class StaticServlet extends SessionServlet {
 		res.setContentType("text/html");
 		PrintWriter out = res.getWriter();
 		out.println("<html lang='en'><head><title>" + title
-				+ "</title></head><body>");
+				+ "</title></head><body></html>");
 		out.println("<h2 align='center'>" + title + "</h2><hr>");
 	}
 

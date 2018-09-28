@@ -46,6 +46,7 @@ public class ExternalNode extends Node {
 
 	@Override
 	public String getTargetURL(ServletService service)  {
+		// don't do url re-writting on external links
 		return getTargetPath(service.getContext());
 	}
 

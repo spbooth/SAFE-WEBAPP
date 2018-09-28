@@ -153,8 +153,8 @@ public class RemoteAuthServlet extends WebappServlet {
 						session_service.setAttribute(REMOTE_AUTH_TOKEN_ATTR, token);
 						// redirect to remote what about non cookie sessions.
 						String redirect_url =auth_url+"?token="+token;
-						// Use method on Response as this is not an internal url.
-						res.sendRedirect(res.encodeRedirectURL(redirect_url));
+						// Don't encode the url as its a known external url
+						res.sendRedirect(redirect_url);
 						return;
 					}
 					

@@ -244,9 +244,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 				}
 			}
 		} catch (Exception e) {
-			if( conn != null ){
-				conn.error(e,"Error in LoginServlet");
-			}
+			log.error("Exception in LoginServlet", e);
 			throw new ServletException(e);
 		}
 
