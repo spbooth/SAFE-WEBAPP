@@ -90,13 +90,13 @@ public class StaticServletTest extends ServletTest {
 		setupTestDir();
 		doPost();
 		assertEquals(HttpServletResponse.SC_OK,res.error);
-		assertEquals("<html lang='en'><head><title>Listing of test/StaticServlet/</title></head><body></html>\r\n" + 
-				"<h2 align='center'>Listing of test/StaticServlet/</h2><hr>\r\n" + 
-				"<ul>\r\n" + 
-				"<LI> <a href=\"test/StaticServlet/hello.txt\">hello.txt</a></LI>\r\n" + 
-				"</ul>\r\n" + 
-				"<hr></body></html>\r\n" + 
-				"",res.getOutputStream().toString());
+		assertEquals("<html lang='en'><head><title>Listing of test/StaticServlet/</title></head><body></html>\n" + 
+				"<h2 align='center'>Listing of test/StaticServlet/</h2><hr>\n" + 
+				"<ul>\n" + 
+				"<LI> <a href=\"test/StaticServlet/hello.txt\">hello.txt</a></LI>\n" + 
+				"</ul>\n" + 
+				"<hr></body></html>\n" + 
+				"",res.getOutputStream().toString().replaceAll("\r", ""));
 		File f = basedir.toFile();
 		f.delete();
 	}

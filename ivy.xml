@@ -41,7 +41,7 @@
 	</info>
 	
 	<dependencies>
-		 <dependency org="com.sun.mail" name="javax.mail" rev="1.6.0">
+		 <dependency org="com.sun.mail" name="javax.mail" rev="1.6.2">
     		<artifact name="javax.mail" ext="jar"/>
 		</dependency>
 	
@@ -68,7 +68,7 @@
 		
 		
 		
-		<dependency org="org.jfree" name="jfreechart" rev="1.0.19">
+		<dependency org="org.jfree" name="jfreechart" rev="1.5.0">
     		<artifact name="jfreechart" ext="jar"/>
 		</dependency>
 		
@@ -76,7 +76,7 @@
     		<artifact name="jcommon" ext="jar"/>
 		</dependency>
 		
-		<dependency org="mysql" name="mysql-connector-java" rev="5.1.42">
+		<dependency org="mysql" name="mysql-connector-java" rev="8.0.12">
     		<artifact name="mysql-connector-java" ext="jar"/>
 		</dependency>
 		<!-- Note log4j adds an old javamail jar-file so add later in load -->

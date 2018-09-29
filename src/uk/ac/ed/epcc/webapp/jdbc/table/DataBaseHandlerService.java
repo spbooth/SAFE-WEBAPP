@@ -92,7 +92,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     	
 		Connection c = service.getSQLContext().getConnection();
     	DatabaseMetaData md = c.getMetaData();
-    	ResultSet rs = md.getTables(null, null, null, null);
+    	ResultSet rs = md.getTables(null, null, null, new String[] {"TABLE"});
     	if( rs.first()){
     	  do{
     		String name = rs.getString("TABLE_NAME");

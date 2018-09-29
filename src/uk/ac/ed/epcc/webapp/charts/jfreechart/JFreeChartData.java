@@ -25,7 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 
 import uk.ac.ed.epcc.webapp.charts.ChartData;
@@ -56,12 +56,12 @@ public abstract class JFreeChartData<P extends Plot> implements ChartData<P> {
 
 
 	public void createPNG(OutputStream res) throws IOException {
-		ChartUtilities.writeChartAsPNG(res,
+		ChartUtils.writeChartAsPNG(res,
 				getCustomisedJFreeChart(), DEFAULT_X_SIZE, DEFAULT_Y_SIZE);
 	}
 
 	public void createPNG(File pngfile) throws IOException {
-		ChartUtilities.saveChartAsPNG(pngfile,
+		ChartUtils.saveChartAsPNG(pngfile,
 				getCustomisedJFreeChart(), DEFAULT_X_SIZE, DEFAULT_Y_SIZE);
 	}
 	public void createPNG(String pngfile) throws IOException {

@@ -21,16 +21,13 @@ import java.util.LinkedList;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.labels.PieSectionLabelGenerator;
 import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.title.LegendTitle;
+import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.data.general.DefaultPieDataset;
-import org.jfree.ui.RectangleEdge;
-import org.jfree.util.SortOrder;
 
 import uk.ac.ed.epcc.webapp.charts.GenericSetPlot;
-import uk.ac.ed.epcc.webapp.charts.PieChartData;
 import uk.ac.ed.epcc.webapp.charts.PieTimeChartData;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 

@@ -41,8 +41,10 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.renderer.xy.XYStepAreaRenderer;
 import org.jfree.chart.renderer.xy.XYStepRenderer;
 import org.jfree.chart.title.LegendTitle;
-import org.jfree.ui.RectangleEdge;
-import org.jfree.util.SortOrder;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.util.SortOrder;
+
+
 
 import uk.ac.ed.epcc.webapp.charts.TimeChartData;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
@@ -99,14 +101,14 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 				//XYAreaRenderer renderer = new XYAreaRenderer(XYAreaRenderer.AREA);
 				XYStepAreaRenderer renderer = new XYStepAreaRenderer(XYStepAreaRenderer.AREA);
 
-				renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator());
+				renderer.setDefaultToolTipGenerator(new StandardXYToolTipGenerator());
 				renderer.setStepPoint(0.5); // change step half way between points, dataset set points in middle
 				((XYPlot)chart.getPlot()).setRenderer(myplot.getDatasetId(), renderer, false);
 			}else{
 				XYAreaRenderer renderer = new XYAreaRenderer(XYAreaRenderer.AREA);
 				//XYStepAreaRenderer renderer = new XYStepAreaRenderer(XYStepAreaRenderer.AREA);
 				
-				renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator());
+				renderer.setDefaultToolTipGenerator(new StandardXYToolTipGenerator());
 				
 				((XYPlot)chart.getPlot()).setRenderer(myplot.getDatasetId(), renderer, false);
 			}
@@ -120,7 +122,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 			
 			
 
-			renderer.setBaseToolTipGenerator(new StandardXYToolTipGenerator());
+			renderer.setDefaultToolTipGenerator(new StandardXYToolTipGenerator());
 			((XYPlot)chart.getPlot()).setRenderer(myplot.getDatasetId(), renderer, false);
 		}
 
