@@ -359,6 +359,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 		 */
 		@Override
 		public FormResult action(Form f) throws ActionException {
+			boolean doWelcome = comp.doWelcome(user); // setPassword will reset this
 			String new_password = (String) f.get(NEW_PASSWORD1);
 			try {
 				comp.setPassword(user, new_password);
@@ -378,7 +379,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 			if( ! service.haveCurrentUser()) {
 				// This must be a reset or initial password via an email link
 				service.setCurrentPerson(user);
-				if (comp.doWelcome(user)) {
+				if (doWelcome) {
 					getLogger().debug("Doing welcome page");
 					// Ok, got a first time visit from a new user - send
 					// them to the welcome page
