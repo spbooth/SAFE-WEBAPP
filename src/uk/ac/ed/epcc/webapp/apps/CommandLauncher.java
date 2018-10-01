@@ -109,6 +109,7 @@ public class CommandLauncher extends AbstractContexed{
 		}else{
 			try{
 				comm.run(data);
+				context.close(); // may have actions in the cleanup service
 			}catch(Exception e){
 				if( System.getProperty("testing") == null ){
 					e.printStackTrace();

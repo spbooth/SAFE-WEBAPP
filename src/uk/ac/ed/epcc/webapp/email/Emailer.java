@@ -451,7 +451,7 @@ public class Emailer {
 	 * @throws MessagingException
 	 */
 	public void doSend(MimeMessage m) throws MessagingException{
-		if( EMAIL_DEFERRED_SEND.isEnabled(getContext())) {
+		if( EMAIL_DEFERRED_SEND.isEnabled(getContext()) && getContext().getService(DatabaseService.class).inTransaction()) {
 		   CleanupService cleanup = getContext().getService(CleanupService.class);
 		   if( cleanup != null) {
 			   cleanup.add(new SendAction(this,m));
