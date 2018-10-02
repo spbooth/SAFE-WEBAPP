@@ -43,11 +43,13 @@ public class ServletResourceService extends DefaultResourceService {
 	public URL getResource(String name) {
 		//Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
 		try{
-		URL result = ctx.getResource(mapName(name));
-		if( result != null){
-			//log.debug("Servlet GetResource("+name+") returns "+result);
-			return result;
-		}
+			if( ctx != null) {
+				URL result = ctx.getResource(mapName(name));
+				if( result != null){
+					//log.debug("Servlet GetResource("+name+") returns "+result);
+					return result;
+				}
+			}
 		}catch(Exception e){
 			getContext().error(e,"Error in ServletContext.getResource");
 		}
@@ -64,11 +66,17 @@ public class ServletResourceService extends DefaultResourceService {
 
 	@Override
 	public InputStream getResourceAsStream(String name) throws FileNotFoundException {
-		//Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
-		InputStream result = ctx.getResourceAsStream(mapName(name));
-		//log.debug("servlet getResourceAsStream("+name+") returns "+result);
-		if( result != null ){
-			return result;
+		try {
+			if( ctx != null ) {
+				//Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
+				InputStream result = ctx.getResourceAsStream(mapName(name));
+				//log.debug("servlet getResourceAsStream("+name+") returns "+result);
+				if( result != null ){
+					return result;
+				}
+			}
+		}catch(Exception e){
+			getContext().error(e,"Error in ServletContext.getResource");
 		}
 		//log.debug("revert to super.getResourceAsStream");
 		return super.getResourceAsStream(name);
