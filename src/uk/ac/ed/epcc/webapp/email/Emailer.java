@@ -996,8 +996,9 @@ public class Emailer {
 		try {
 			
 			if (!doReport(conn)) {
-				if( log != null )
-				log.error("error email supressed " + text);
+				if( log != null ) {
+					log.error("error email supressed " + text);
+				}
 				return;
 			}
 			String emailTo = conn
@@ -1050,6 +1051,8 @@ public class Emailer {
 			// ERROR.. uh log it?
 			if( log != null) {
 				log.error("Failed to send error email " + me);
+			}else {
+				me.printStackTrace(System.err);
 			}
 		}
 
