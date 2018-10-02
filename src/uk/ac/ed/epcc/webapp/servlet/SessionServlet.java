@@ -54,7 +54,7 @@ public abstract class SessionServlet extends WebappServlet {
 		} catch (ServletException e) {
 			// higher levels can handle this
 			throw e;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			// we could throw an enclosing ServletException here but we have all
 			// the context we need here and
 			// best to handle as soon as we can in case ErrorFilter not
@@ -80,7 +80,7 @@ public abstract class SessionServlet extends WebappServlet {
 		} catch (ServletException e) {
 			// higher levels can handle this
 			throw e;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			// we could throw an enclosing ServletException here but we have all
 			// the context we need here and
 			// best to handle as soon as we can in case ErrorFilter not

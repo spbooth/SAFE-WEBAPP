@@ -55,7 +55,7 @@ public class WebappContextListener implements ServletContextListener {
 		        }
 		    }
 		}
-		catch (Throwable e) {
+		catch (Exception e) {
 		    System.out.println("Unable to clean up JDBC driver: " + e.getMessage());
 		}
 		CachedConfigService.invalidate();

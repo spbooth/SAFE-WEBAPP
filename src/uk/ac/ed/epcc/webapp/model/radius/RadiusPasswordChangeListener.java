@@ -101,7 +101,7 @@ public class RadiusPasswordChangeListener extends AbstractContexed implements Pa
 				rows = set.executeUpdate();
 			}
 			
-		} catch (Throwable  e) {
+		} catch (Exception  e) {
 			conn.getService(LoggerService.class).getLogger(getClass()).error("Error in password update", e);
 		}
 	}

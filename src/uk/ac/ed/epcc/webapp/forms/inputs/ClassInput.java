@@ -61,7 +61,7 @@ public class ClassInput<T> implements ListInput<String,Class<? extends T>>{
 						reg.put(tag, cand);
 					}
 				}
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				// just skip
 				c.getService(LoggerService.class).getLogger(getClass()).error("Class "+params.get(name)+" from parameter "+name+" not found",e);
 			}

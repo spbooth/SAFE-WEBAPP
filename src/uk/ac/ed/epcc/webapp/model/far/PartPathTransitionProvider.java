@@ -494,7 +494,7 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 		DynamicForm root;
 		try {
 			root = (DynamicForm) form_manager.find(Integer.parseInt(path.pop()));
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			return null;
 		}
 		if( root == null){

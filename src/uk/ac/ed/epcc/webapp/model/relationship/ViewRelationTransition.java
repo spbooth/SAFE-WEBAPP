@@ -91,7 +91,7 @@ public class ViewRelationTransition<X extends DataObject> extends AbstractFormTr
 			SessionService sess = conn.getService(SessionService.class);
 			try {
 				cb.addList(sess.getLoginFactory().getResult(sess.getPersonInRelationshipRoleFilter(fac, relationship, target)));
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				cb.addText("Internal error occured");
 				conn.getService(LoggerService.class).getLogger(getClass()).error("Error making list",e);
 			}

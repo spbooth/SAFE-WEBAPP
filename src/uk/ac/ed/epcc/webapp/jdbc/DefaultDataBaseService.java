@@ -183,7 +183,7 @@ public class DefaultDataBaseService implements DatabaseService {
 			if(driver_name!=null && ! driver_name.isEmpty()){
 				Class.forName(driver_name);
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			error(e,"Could not load database driver: "+driver_name);
 		}
 		String name = props.getProperty("db_name"+suffix,"").trim();

@@ -109,7 +109,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 				try {
 					return (AppUser) serv.getLoginFactory().find(
 							record.getNumberProperty(PERSON_ID));
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					return null;
 				}
 			}

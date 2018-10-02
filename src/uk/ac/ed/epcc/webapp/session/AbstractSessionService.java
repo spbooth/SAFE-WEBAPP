@@ -634,7 +634,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 				clearCurrentPerson();
 				return null;
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			clearCurrentPerson();  // clear first as error will try to report person
 			error(e,"Error finding person by id "+personID);
 			return null;

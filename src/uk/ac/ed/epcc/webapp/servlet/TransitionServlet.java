@@ -730,7 +730,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 							return null;
 						}
 					});
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					c.getService(LoggerService.class).getLogger(TransitionServlet.class).error("Link to modifying transition "+url,e);
 				}
 				

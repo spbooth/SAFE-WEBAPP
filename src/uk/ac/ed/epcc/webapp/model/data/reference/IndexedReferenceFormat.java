@@ -49,7 +49,7 @@ public class IndexedReferenceFormat implements Transform{
 						return ((Identified) i).getIdentifier();
 					}
 					return i.toString();
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					return "Unknown";
 				}
 	    }

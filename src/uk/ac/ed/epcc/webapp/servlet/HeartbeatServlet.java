@@ -178,7 +178,7 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 				AppContext conn = ErrorFilter.makeContext(config.getServletContext(), null, null);
 				runHeartbeat(conn, null);
 				conn.close();
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				config.getServletContext().log("Error in Runner", e);
 			}
 

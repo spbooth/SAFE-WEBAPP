@@ -177,6 +177,7 @@ public class DataBaseConfigService implements ConfigService {
 				db_props = new Properties(nested.getServiceProperties());
 				AppContext conn = getContext();
 				try {
+					try {
 					Connection connection = sql.getConnection();
 					if( connection == null){
 						conn.error("No database connection");
@@ -200,7 +201,10 @@ public class DataBaseConfigService implements ConfigService {
 						res.close();
 						select.close();
 					}
-				} catch (Throwable e) {
+					}catch(SQLException se) {
+						sql.getService().handleError("Error getting properties", se);
+					}
+				} catch (Exception e) {
 					conn.error(e,"Error reading property table");
 					db_props= null; // DB props are required, this may be a transient error so try again later.
 					ctx.getService(ConfigService.class).clearServiceProperties();

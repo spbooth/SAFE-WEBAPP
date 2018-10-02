@@ -82,7 +82,7 @@ public abstract class ClassType<T extends ClassType.ClassValue<D>, D extends Dat
 				}else{
 				    return c.getConstructor(new Class[] { Repository.Record.class} );
 				}
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				String sig = ""+c.getCanonicalName()+"(";
 				if( fac != null ){
 					sig += fac.getClass().getCanonicalName()+",";
