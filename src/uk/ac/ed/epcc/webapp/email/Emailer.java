@@ -991,11 +991,12 @@ public class Emailer {
 	 * @param conn
 	 * @param text
 	 */
-	public static void errorEmail(AppContext conn, String subject,String text) {
-		Logger log = conn.getService(LoggerService.class).getLogger(conn.getClass());
+	public static void errorEmail(AppContext conn, Logger log,String subject,String text) {
+		
 		try {
 			
 			if (!doReport(conn)) {
+				if( log != null )
 				log.error("error email supressed " + text);
 				return;
 			}
@@ -1011,7 +1012,9 @@ public class Emailer {
 			}else{
 				emailSubject=subject;
 			}
-            log.debug("sending "+emailSubject);
+			if( log != null) {
+				log.debug("sending "+emailSubject);
+			}
 			Session session = getSession(conn);
 
 			// create the Multipart
@@ -1040,11 +1043,14 @@ public class Emailer {
 			if(EMAILS_FEATURE.isEnabled(conn)){
 				Transport.send(m);
 			}
-            log.debug("Sent error email");
+			if( log != null) {
+				log.debug("Sent error email");
+			}
 		} catch (Exception me) {
 			// ERROR.. uh log it?
-			log.error("Failed to send error email " + me);
-
+			if( log != null) {
+				log.error("Failed to send error email " + me);
+			}
 		}
 
 	}
@@ -1059,7 +1065,7 @@ public class Emailer {
 	 * @param additional_info
 	 * @throws Exception 
 	 */
-	public static void errorEmail(AppContext conn, Throwable e,
+	public static void errorEmail(AppContext conn, Logger log,Throwable e,
 			Map props, String additional_info) throws Exception {
 		if( conn.getInitParameter(ERROR_EMAIL_NOTIFY_ADDRESS) == null ){
 			// abort early if no notify address set.
@@ -1122,7 +1128,7 @@ public class Emailer {
 		}catch(Exception t){
 			// can cope with this
 		}
-		errorEmail(conn, subject,errorEmail.toString());
+		errorEmail(conn,log, subject,errorEmail.toString());
        
 	}
 

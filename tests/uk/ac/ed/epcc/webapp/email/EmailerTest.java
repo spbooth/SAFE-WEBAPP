@@ -78,7 +78,7 @@ public class EmailerTest extends WebappTestBase {
 	
 	@Test
 	public void testErrorMail() throws IOException, MessagingException{
-		Emailer.errorEmail(ctx, null,"Some error text");
+		Emailer.errorEmail(ctx,log, null,"Some error text");
 		assertEquals("One message sent",1,MockTansport.nSent());
 		assertEquals("error@example.org", MockTansport.getAddress(0)[0].toString());
 		assertEquals("from@example.org", MockTansport.getMessage(0).getFrom()[0].toString());
@@ -86,7 +86,7 @@ public class EmailerTest extends WebappTestBase {
 	
 	@Test
 	public void testErrorMailWithThrowable() throws Exception{
-		Emailer.errorEmail(ctx, new Exception("HairyHamster",new Exception("Penguins")),new HashMap(),"A test error");
+		Emailer.errorEmail(ctx, log,new Exception("HairyHamster",new Exception("Penguins")),new HashMap(),"A test error");
 		
 		assertEquals("One message sent",1,MockTansport.nSent());
 		assertEquals("error@example.org", MockTansport.getAddress(0)[0].toString());

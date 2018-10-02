@@ -37,6 +37,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 public class EmailLoggerService implements Contexed, LoggerService {
     private final AppContext conn;
     private LoggerService nested;
+    private Logger self_logger;
     private boolean in_error=false;
     public EmailLoggerService(AppContext conn){
     	this.conn=conn;
@@ -48,6 +49,7 @@ public class EmailLoggerService implements Contexed, LoggerService {
     	while( nested != null && nested instanceof EmailLoggerService){
     		nested = ((EmailLoggerService)nested).nested;
     	}
+    	self_logger = nested.getLogger(getClass());
     }
 	
 	public Logger getLogger(String name) {
@@ -142,13 +144,10 @@ public class EmailLoggerService implements Contexed, LoggerService {
 				in_error=true;
 				Hashtable props = getProps();
 				props.put("report_level", level.toString());
-				Emailer.errorEmail(getContext(), e, props, text);
+				Emailer.errorEmail(getContext(),self_logger, e, props, text);
 			}catch(Exception t){
-				if( nested != null ){
-					Logger l = nested.getLogger(getClass());
-					if( l != null ){
-						l.error("Error reporting error by email",t);
-					}
+				if( self_logger != null ){
+					self_logger.error("Error reporting error by email",t);
 				}
 				
 			}finally{
