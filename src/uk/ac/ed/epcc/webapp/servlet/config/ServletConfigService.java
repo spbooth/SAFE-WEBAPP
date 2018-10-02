@@ -49,12 +49,13 @@ public class ServletConfigService implements ConfigService {
 	public Properties getServiceProperties() {
 		
 			Properties props= new Properties( nested_service.getServiceProperties());
-			Enumeration e = ctx.getInitParameterNames();
-			while (e.hasMoreElements()) {
-				String name= (String) e.nextElement();
-				props.setProperty(name, ctx.getInitParameter(name));
+			if( ctx != null) {
+				Enumeration e = ctx.getInitParameterNames();
+				while (e.hasMoreElements()) {
+					String name= (String) e.nextElement();
+					props.setProperty(name, ctx.getInitParameter(name));
+				}
 			}
-		
 		return props;
 	}
 
