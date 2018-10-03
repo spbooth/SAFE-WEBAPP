@@ -17,7 +17,9 @@
 package uk.ac.ed.epcc.webapp.email.logging;
 
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Properties;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -37,7 +39,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 public class EmailLoggerService implements Contexed, LoggerService {
     private final AppContext conn;
     private LoggerService nested;
-    private Logger self_logger;
+    private Logger self_logger=null;
     private boolean in_error=false;
     public EmailLoggerService(AppContext conn){
     	this.conn=conn;
@@ -49,7 +51,9 @@ public class EmailLoggerService implements Contexed, LoggerService {
     	while( nested != null && nested instanceof EmailLoggerService){
     		nested = ((EmailLoggerService)nested).nested;
     	}
-    	self_logger = nested.getLogger(getClass());
+    	if( nested != null ) {
+    		self_logger = nested.getLogger(getClass());
+    	}
     }
 	
 	public Logger getLogger(String name) {
@@ -142,7 +146,16 @@ public class EmailLoggerService implements Contexed, LoggerService {
 		if( ! in_error ){
 			try{
 				in_error=true;
-				Hashtable props = getProps();
+				Map props;
+				try {
+					props = getProps();
+				}catch(Exception x) {
+					props = new HashMap<>();
+					props.put("prop_generation_error",x.getMessage());
+					if( self_logger != null) {
+						self_logger.error("Error making props", x);
+					}
+				}
 				props.put("report_level", level.toString());
 				Emailer.errorEmail(getContext(),self_logger, e, props, text);
 			}catch(Exception t){

@@ -963,17 +963,21 @@ public class Emailer {
 	 * 
 	 * @return boolean true if email shuld be sent
 	 */
-	synchronized private static boolean doReport(AppContext conn) {
-		Logger logger = conn.getService(LoggerService.class).getLogger(conn.getClass());
+	synchronized private static boolean doReport(Logger logger,AppContext conn) {
+		
 		
 		if( ! EMAILS_FEATURE.isEnabled(conn)){
-			logger.debug("Feature "+EMAILS_FEATURE+" is off");
+			if( logger != null) {
+				logger.debug("Feature "+EMAILS_FEATURE+" is off");
+			}
 			return false;
 		}
 		long now = System.currentTimeMillis() / 1000;
-		logger.debug(
+		if( logger != null ) {
+			logger.debug(
 				"doReport " + (now - last_send) + " s since last count="
 						+ send_count);
+		}
 		if (now > (last_send + MAX_REPORT_FREQUENCY)) {
 			last_send = now;
 			send_count = 0;
@@ -995,7 +999,7 @@ public class Emailer {
 		
 		try {
 			
-			if (!doReport(conn)) {
+			if (!doReport(log,conn)) {
 				if( log != null ) {
 					log.error("error email supressed " + text);
 				}
@@ -1038,7 +1042,7 @@ public class Emailer {
 			m.setRecipients(Message.RecipientType.TO, ia);
 			m.setFrom(new InternetAddress(emailFrom));
 			m.setSubject(emailSubject);
-			m.addHeader("X-Saf-service", conn.getInitParameter("service.name"));
+			m.addHeader("X-Saf-service", conn.getInitParameter("service.name","Webapp"));
 			m.addHeader("X-Safe-notify", "Error");
 			m.setContent(mp);
 			if(EMAILS_FEATURE.isEnabled(conn)){
@@ -1060,9 +1064,11 @@ public class Emailer {
 
 	/**
 	 * Send an error email
-	 * This is called within {@link EmailLogger} so logging should not be used here to
-	 * prevent recursion
+	 * This is called within {@link EmailLogger} so logging should always go through the
+	 * provided logger.  We need to be careful to recover from errors if we can so that we
+	 * can still send some email even if some things are failing
 	 * @param conn
+	 * @param log   Logger (optional)
 	 * @param props
 	 * @param e
 	 * @param additional_info
@@ -1070,39 +1076,15 @@ public class Emailer {
 	 */
 	public static void errorEmail(AppContext conn, Logger log,Throwable e,
 			Map props, String additional_info) throws Exception {
-		if( conn.getInitParameter(ERROR_EMAIL_NOTIFY_ADDRESS) == null ){
+		if( conn == null || conn.getInitParameter(ERROR_EMAIL_NOTIFY_ADDRESS) == null ){
 			// abort early if no notify address set.
 			return;
 		}
-		TemplateFile errorEmail;
-		
-		errorEmail = new TemplateFinder(conn).getTemplateFile("error_email.txt");
-		
-
-		
-		// Show current date and time
-		DateFormat df = DateFormat.getDateTimeInstance();
-		errorEmail.setProperty("date", df.format(new java.util.Date()));
-		if (props != null) {
-			errorEmail.setProperties(props);
-		}
-		if (e != null) {
-			String message = e.getMessage();
-			
-			if(message != null ){
-				String subject_message = message;
-
-				if( subject_message.contains("\n")){
-					subject_message = subject_message.substring(0, subject_message.indexOf('\n'));
-				}
-				if( subject_message.length() > 64){
-					subject_message = subject_message.substring(0, 64);
-				}
-				errorEmail.setProperty("subject_message", subject_message);
-				errorEmail.setProperty("exception_message", message);
-			}
-			// Show stack trace
-			StringWriter stackTraceWriter = new StringWriter();
+		String subject="An Error occurred";
+		String body="";
+		// Show stack trace
+		StringWriter stackTraceWriter = new StringWriter();
+		if( e != null ) {
 			PrintWriter printWriter = new PrintWriter(stackTraceWriter,true);
 			e.printStackTrace(printWriter);
 			Throwable rc = e.getCause();
@@ -1113,26 +1095,69 @@ public class Emailer {
 			}
 			printWriter.flush();
 			printWriter.close();
-			errorEmail.setProperty("exception_stack_trace", stackTraceWriter.toString());
-		}else{
-			if( additional_info != null && additional_info.length() < 64){
-				errorEmail.setProperty("subject_message", additional_info);
+		}
+		try {
+			TemplateFile errorEmail;
+			errorEmail = new TemplateFinder(conn).getTemplateFile("error_email.txt");
+
+
+
+			// Show current date and time
+			DateFormat df = DateFormat.getDateTimeInstance();
+			errorEmail.setProperty("date", df.format(new java.util.Date()));
+			if (props != null) {
+				errorEmail.setProperties(props);
+			}
+			if (e != null) {
+				String message = e.getMessage();
+
+				if(message != null ){
+					String subject_message = message;
+
+					if( subject_message.contains("\n")){
+						subject_message = subject_message.substring(0, subject_message.indexOf('\n'));
+					}
+					if( subject_message.length() > 64){
+						subject_message = subject_message.substring(0, 64);
+					}
+					errorEmail.setProperty("subject_message", subject_message);
+					errorEmail.setProperty("exception_message", message);
+				}
+
+				errorEmail.setProperty("exception_stack_trace", stackTraceWriter.toString());
+			}else{
+				if( additional_info != null && additional_info.length() < 64){
+					errorEmail.setProperty("subject_message", additional_info);
+				}
+			}
+
+			if (additional_info != null) {
+				errorEmail.setProperty("additional_info", additional_info);
+				errorEmail.setRegionEnabled("additional_info_region", true);
+			}
+
+
+			try{
+				subject = getSubject(log, errorEmail);
+			}catch(Exception t){
+				// can cope with this
+			}
+			body=errorEmail.toString();
+
+		}catch(Exception x) {
+			// Try again without template
+			if( additional_info != null) {
+				body += additional_info;
+				body += "\n";
+			}
+			if( e != null ) {
+				body += stackTraceWriter.toString();
+			}
+			if( log != null ) {
+				log.error("error in email formatting", x);
 			}
 		}
-
-		if (additional_info != null) {
-			errorEmail.setProperty("additional_info", additional_info);
-			errorEmail.setRegionEnabled("additional_info_region", true);
-		}
-		
-		String subject = null;
-		try{
-			subject = getSubject(null, errorEmail);
-		}catch(Exception t){
-			// can cope with this
-		}
-		errorEmail(conn,log, subject,errorEmail.toString());
-       
+		errorEmail(conn,log, subject,body);
 	}
 
 	/**
@@ -1145,8 +1170,10 @@ public class Emailer {
 		Logger log = conn.getService(LoggerService.class).getLogger(conn.getClass());
 		try {
 
-			if (!doReport(conn)) {
-				conn.getService(LoggerService.class).getLogger(conn.getClass()).info("info email supressed " + text);
+			if (!doReport(log,conn)) {
+				if( log != null ) {
+					log.info("info email supressed " + text);
+				}
 				return;
 			}
 			String emailTo = conn.getInitParameter("info.email_notify_address");
@@ -1191,7 +1218,11 @@ public class Emailer {
 
 		} catch (Exception me) {
 			// ERROR.. uh log it?
-			log.error("Failed to send Info email " + me);
+			if( log != null) {
+				log.error("Failed to send Info email " + me);
+			}else {
+				me.printStackTrace(System.err);
+			}
 
 		}
 
