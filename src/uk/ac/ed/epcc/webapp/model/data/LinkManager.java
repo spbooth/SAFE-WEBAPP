@@ -246,10 +246,10 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			Class<? super T> target = LinkManager.this.getTarget();
 			SQLAndFilter<T> fil = new SQLAndFilter<T>(target);
 			if( join_left ){
-				fil.addFilter(new JoinerFilter<L,T>(target, getLeftField(), res, getLeftFactory().res, true));
+				fil.addFilter(new JoinerFilter<L,T>(target, getLeftField(), res, getLeftFactory().res));
 			}
 			if( join_right ){
-				fil.addFilter(new JoinerFilter<R,T>(target, getRightField(), res, getRightFactory().res, true));
+				fil.addFilter(new JoinerFilter<R,T>(target, getRightField(), res, getRightFactory().res));
 			}
 			return fil;
 		}

@@ -1389,7 +1389,8 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		return getInput(getFinalSelectFilter(),restrictDefaultInput());
 	}
 	
-	/** Create an {@link Input} from a filter
+	/** Create an {@link Input} from a filter.
+	 * This will restrict valid results as well as offered choices.
 	 * 
 	 * @param fil
 	 * @return {@link DataObjectItemInput}

@@ -54,22 +54,21 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 	private final String join_field;
 	private final Repository res;
 	private final Repository remote_res;
-	private final boolean target_references;
+	
 	/**
 	 * 
 	 * @param target type of filter target
 	 * @param join_field String reference field
 	 * @param res        Repository of target
 	 * @param remote_res Repository of remote
-	 * @param target_references boolean true if target points to remote. false if remote points to target
 	 */
-	public JoinerFilter(Class<? super BDO> target, String join_field, Repository res, Repository remote_res, boolean target_references){
+	public JoinerFilter(Class<? super BDO> target, String join_field, Repository res, Repository remote_res){
 		this.target=target;
 		this.join_field=join_field;
 		this.res=res;
 		this.remote_res=remote_res;
-		this.target_references=target_references;
-		assert(target_references ? res.hasField(join_field) : remote_res.hasField(join_field));
+		
+		assert(res.hasField(join_field));
 	}
 		
 		
@@ -93,17 +92,12 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 		public StringBuilder addPattern(StringBuilder join, boolean qualify) {
 			// this is the clause that matches the tables.
 			join.append("(");
-			if( target_references){
+		
 	     		FieldInfo info = res.getInfo(join_field);
 				info.addName(join, true, true);
 	         	join.append(" = ");
 	         	remote_res.addUniqueName(join, true, true);
-	     	}else{
-	     		FieldInfo info = remote_res.getInfo(join_field);
-				info.addName(join, true, true);
-	         	join.append(" = ");
-	         	res.addUniqueName(join, true, true);
-	     	}
+	     	
 			join.append(")");
 			return join;
 		}
@@ -118,7 +112,7 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 			result = prime * result
 					+ ((remote_res == null) ? 0 : remote_res.hashCode());
 			result = prime * result + ((res == null) ? 0 : res.hashCode());
-			result = prime * result + (target_references ? 1231 : 1237);
+			
 			return result;
 		}
 
@@ -146,8 +140,6 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 				if (other.res != null)
 					return false;
 			} else if (!res.equals(other.res))
-				return false;
-			if (target_references != other.target_references)
 				return false;
 			return true;
 		}
@@ -183,15 +175,11 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 			StringBuilder sb = new StringBuilder();
 			sb.append(getClass().getSimpleName());
 			sb.append("(");
-			if( target_references) {
+			
 				res.getInfo(join_field).addName(sb, true, false);
 				sb.append("=");
 				remote_res.addUniqueName(sb, true, false);
-			}else {
-				remote_res.getInfo(join_field).addName(sb, true, false);
-				sb.append("=");
-				res.addUniqueName(sb, true, false);
-			}
+			
 			return sb.toString();
 		}
 }

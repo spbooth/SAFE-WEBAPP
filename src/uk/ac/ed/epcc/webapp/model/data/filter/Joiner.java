@@ -54,7 +54,7 @@ public class Joiner<T extends DataObject, BDO extends DataObject> extends SQLAnd
 				// result set.
 				addFilter(new BackJoinFilter<T, BDO>(target,join_field, res, remote_res, fil));
 			}else{
-				addFilter(new JoinerFilter(target,join_field, res, remote_res, target_references));
+				addFilter(new JoinerFilter(target,join_field, res, remote_res));
 				// note we are  using a non-generic type here to force a foreign type of filter to be
 				// included in the clause.
 				SQLFilter f = fil;
