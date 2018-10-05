@@ -30,7 +30,7 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
  * @param <T> type of object selected
  *
  */
-public interface JoinFilter<T> extends PatternFilter<T> {
+public interface JoinFilter<T> extends BaseFilter<T> {
 	
    /** Join clause to add to query
     * 

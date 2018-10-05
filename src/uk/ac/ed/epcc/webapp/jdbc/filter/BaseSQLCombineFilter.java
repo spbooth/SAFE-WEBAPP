@@ -35,7 +35,6 @@ public abstract class BaseSQLCombineFilter<T> extends BaseCombineFilter<T> imple
 	 */
 	protected BaseSQLCombineFilter(Class<? super T> target) {
 		super(target);
-		// TODO Auto-generated constructor stub
 	}
 
 	

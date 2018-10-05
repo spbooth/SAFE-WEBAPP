@@ -92,7 +92,7 @@ public class TestOrFilter extends WebappTestBase {
 		assertTrue(ref.matches(fil, fred_ref));
 		assertTrue(ref.matches(fil, bill_ref));
 		assertFalse(ref.matches(fil, simon_ref));
-		checkStd(fil, "OrFilter(SQLOrFilter( filters=[RemoteFilter( filters=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`, SQLValueFilter(Name= fred)] force=true), RemoteFilter( filters=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`, SQLValueFilter(Number= 2)] force=true)] force=false) force=false)");
+		checkStd(fil, "OrFilter(SQLOrFilter( filters=[SQLValueFilter(Name= fred), SQLValueFilter(Number= 2)] join=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`)] force=false) force=false)");
 	}
 	@Test
 	public void testAccept() throws DataException {
@@ -180,7 +180,7 @@ public class TestOrFilter extends WebappTestBase {
 		assertTrue(ref.matches(fil, fred_ref));
 		assertTrue(ref.matches(fil, bill_ref));
 		assertFalse(ref.matches(fil, simon_ref));
-		checkStd(fil, "OrFilter(SQLOrFilter( filters=[RemoteFilter( filters=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`, SQLValueFilter(Name= fred)] force=true), RemoteFilter( filters=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`, SQLValueFilter(Number= 2)] force=true)] force=false) force=false)");
+		checkStd(fil, "OrFilter(SQLOrFilter( filters=[SQLValueFilter(Name= fred), SQLValueFilter(Number= 2)] join=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`)] force=false) force=false)");
 	}
 	
 	@Test
@@ -193,7 +193,7 @@ public class TestOrFilter extends WebappTestBase {
 		assertTrue(ref.matches(fil, fred_ref));
 		assertTrue(ref.matches(fil, bill_ref));
 		assertFalse(ref.matches(fil, simon_ref));
-		checkStd(fil, "OrFilter(SQLOrFilter( filters=[RemoteFilter( filters=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`, SQLValueFilter(Name= fred)] force=true)] force=false),AndFilter( accepts=[RemoteAcceptFilter(remote=Test, field=Reference, fil=AndFilter( accepts=[NumberAcceptFilter(2)] filters=[SQLValueFilter(Number= 2)] force=true))] filters=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`, SQLValueFilter(Number= 2)] force=true) force=false)");
+		checkStd(fil, "OrFilter(SQLOrFilter( filters=[SQLValueFilter(Name= fred)] join=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`)] force=false),AndFilter( accepts=[RemoteAcceptFilter(remote=Test, field=Reference, fil=AndFilter( accepts=[NumberAcceptFilter(2)] filters=[SQLValueFilter(Number= 2)] force=true))] filters=[SQLValueFilter(Number= 2)] join=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`)] force=true) force=false)");
 	}
 	@Test
 	public void testMixed() throws DataException {
@@ -225,7 +225,7 @@ public class TestOrFilter extends WebappTestBase {
 		assertTrue(ref.matches(fil, fred_ref));
 		assertTrue(ref.matches(fil, bill_ref));
 		assertFalse(ref.matches(fil, simon_ref));
-		checkStd(fil, "OrFilter(SQLOrFilter( filters=[RemoteFilter( filters=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`, SQLValueFilter(Name= fred)] force=true)] force=false),AndFilter( accepts=[RemoteAcceptFilter(remote=Test, field=Reference, fil=AndFilter( accepts=[NumberAcceptFilter(2)] filters=[SQLValueFilter(Name= bill)] force=true))] filters=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`, SQLValueFilter(Name= bill)] force=true) force=false)");
+		checkStd(fil, "OrFilter(SQLOrFilter( filters=[SQLValueFilter(Name= fred)] join=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`)] force=false),AndFilter( accepts=[RemoteAcceptFilter(remote=Test, field=Reference, fil=AndFilter( accepts=[NumberAcceptFilter(2)] filters=[SQLValueFilter(Name= bill)] force=true))] filters=[SQLValueFilter(Name= bill)] join=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`)] force=true) force=false)");
 	}
 	@Test
 	public void testEmptyAnd() throws DataException {

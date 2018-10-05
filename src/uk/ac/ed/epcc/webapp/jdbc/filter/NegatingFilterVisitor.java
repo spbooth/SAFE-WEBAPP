@@ -51,7 +51,17 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 */
 	@Override
 	public BaseFilter<? super T> visitSQLCombineFilter(BaseSQLCombineFilter<? super T> fil) throws Exception {
-		return visitJoinFilter(fil);
+		FilterCombination c = fil.getFilterCombiner();
+		BaseCombineFilter<T> neg;
+		if( c == FilterCombination.AND) {
+			neg = new SQLOrFilter<>(fil.getTarget());
+		}else {
+			neg = new SQLAndFilter<>(fil.getTarget());
+		}
+		for( BaseFilter<T> f : fil.getSet()) {
+			neg.add(f.acceptVisitor(this), false);
+		}
+		return neg;
 	}
 
 	/* (non-Javadoc)
@@ -191,10 +201,7 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 */
 	@Override
 	public BaseFilter<? super T> visitJoinFilter(JoinFilter<? super T> fil) throws Exception {
-		if( fil instanceof NegatingFilter) {
-			return ((NegatingFilter) fil).getNested();
-		}
-		return new NotJoinFilter(fil);
+		return (BaseFilter<? super T>) fil;
 	}
 
 	/* (non-Javadoc)

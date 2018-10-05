@@ -26,7 +26,6 @@ import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ConstPatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterSelect;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.FieldValue;

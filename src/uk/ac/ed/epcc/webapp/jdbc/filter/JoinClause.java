@@ -13,24 +13,13 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
-/** A class to negate a {@link SQLFilter} with a join clause
+import uk.ac.ed.epcc.webapp.model.data.DataObject;
+
+/** An object representing a link between two tables.
+ * 
  * @author Stephen Booth
  *
  */
-public class NotJoinFilter<Q,F extends JoinFilter<Q>&SQLFilter<Q>> extends SQLNotFilter<Q,F> implements JoinFilter<Q>{
-
-	/**
-	 * @param fil
-	 */
-	protected NotJoinFilter(F fil) {
-		super(fil);
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter#getJoin()
-	 */
-	@Override
-	public String getJoin() {
-		return getNested().getJoin();
-	}
+public interface JoinClause<T extends DataObject, R extends DataObject> {
+	
 }

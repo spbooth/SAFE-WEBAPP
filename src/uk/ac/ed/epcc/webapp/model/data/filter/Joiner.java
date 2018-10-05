@@ -32,7 +32,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  */
 
 
-public class Joiner<T extends DataObject, BDO extends DataObject> extends SQLAndFilter<BDO> implements JoinFilter<BDO> {
+public class Joiner<T extends DataObject, BDO extends DataObject> extends SQLAndFilter<BDO>  {
 		public Joiner(Class<? super BDO> target,SQLFilter<? super T> fil, String join_field, Repository res, Repository remote_res){
 			this(target,fil,join_field,res,remote_res,true);
 		}

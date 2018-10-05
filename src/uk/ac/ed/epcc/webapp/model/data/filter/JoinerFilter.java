@@ -81,27 +81,17 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 			join.append(" left join ");
 			remote_res.addSource(join, true);
 			join.append(" on ");
-			addPattern(join, true);
+			join.append("(");
+			
+     		FieldInfo info = res.getInfo(join_field);
+			info.addName(join, true, true);
+         	join.append(" = ");
+         	remote_res.addUniqueName(join, true, true);
+     	
+         	join.append(")");
 			return join.toString();
 		}
-		
-		public List<PatternArgument> getParameters(List<PatternArgument> list) {
-			return list;
-		}
-		
-		public StringBuilder addPattern(StringBuilder join, boolean qualify) {
-			// this is the clause that matches the tables.
-			join.append("(");
-		
-	     		FieldInfo info = res.getInfo(join_field);
-				info.addName(join, true, true);
-	         	join.append(" = ");
-	         	remote_res.addUniqueName(join, true, true);
-	     	
-			join.append(")");
-			return join;
-		}
-
+	
 
 		@Override
 		public int hashCode() {
@@ -179,7 +169,7 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 				res.getInfo(join_field).addName(sb, true, false);
 				sb.append("=");
 				remote_res.addUniqueName(sb, true, false);
-			
+			sb.append(")");
 			return sb.toString();
 		}
 }

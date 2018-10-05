@@ -64,18 +64,6 @@ public final class ConstJoinerFilter<T extends DataObject, BDO extends DataObjec
 			join.append(" ");
 			return join.toString();
 		}
-		
-		public List<PatternArgument> getParameters(List<PatternArgument> list) {
-			return list;
-		}
-		
-		public StringBuilder addPattern(StringBuilder join, boolean qualify) {
-			return join;
-		}
-
-
-		
-
 
 		
 		public void accept(BDO o) {

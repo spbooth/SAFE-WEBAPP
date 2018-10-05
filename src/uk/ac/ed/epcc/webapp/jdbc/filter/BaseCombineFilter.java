@@ -81,9 +81,9 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			public final Boolean visitSQLCombineFilter(BaseSQLCombineFilter<? super X> fil) {
 				visitPatternFilter(fil);
 				handleOrderClause(fil);
-				Set<String> joins = fil.getJoins();
+				Set<JoinFilter> joins = fil.getJoins();
 				if( joins != null ){
-					for(String join : joins){
+					for(JoinFilter join : joins){
 						addJoin(join);
 					}
 				}
@@ -116,9 +116,9 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 					visitPatternFilter(fil);
 				}
 				handleOrderClause(fil);
-				Set<String> joins = fil.getJoins();
+				Set<JoinFilter> joins = fil.getJoins();
 				if( joins != null ){
-					for(String join : joins){
+					for(JoinFilter join : joins){
 						addJoin(join);
 					}
 				}
@@ -141,8 +141,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitJoinFilter(uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter)
 			 */
 			public final Boolean visitJoinFilter(JoinFilter<? super X> fil) {
-				addPatternFilter(fil);
-				addJoin(fil.getJoin());
+				addJoin(fil);
 				return null;
 			}
 
@@ -226,23 +225,22 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 
 		protected abstract void addAccept(AcceptFilter<? super T> filter) throws ConsistencyError;
 		
-		Set<String> join=null;
+		Set<JoinFilter> join=null;
 		
-		protected final void addJoin(String add) throws ConsistencyError {
+		protected final void addJoin(JoinFilter add) throws ConsistencyError {
 			     // we use a Set to remove  duplicate joins
 			     // this will only work where the join strings are identical
 			     // but this at least covers the case of multiple dereference
 			     // expressions generated automatically
-				if( add != null && add.trim().length() > 0){
+				if( add != null ){
 					if( join == null ){
-						join = new LinkedHashSet<String>(); // order of joins is significant
+						join = new LinkedHashSet<JoinFilter>(); // order of joins is significant
 					}
-					// trim is important as getJoin might add spaces in nested
-					join.add(add.trim());
+					join.add(add);
 				}
 		}
 
-		protected final Set<String> getJoins(){
+		protected final Set<JoinFilter> getJoins(){
 			return join;
 		}
 		
@@ -251,11 +249,11 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 				return null;
 			}
 			StringBuilder sb = new StringBuilder();
-			for( String s : join){
+			for( JoinFilter s : join){
 				if( sb.length() > 0){
 					sb.append(' ');	
 				}
-				sb.append(s);
+				sb.append(s.getJoin());
 			}
 			return sb.toString();
 		}
@@ -411,6 +409,10 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 				sb.append(" filters=");
 				sb.append(filters.toString());
 			}
+			if( join != null && ! join.isEmpty()) {
+				sb.append(" join=");
+				sb.append(join.toString());
+			}
 			if( order != null && ! order.isEmpty()) {
 				sb.append(" order=");
 				sb.append(order.toString());
@@ -423,6 +425,9 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 		public Set<BaseFilter> getSet() {
 			Set<BaseFilter> sets = new HashSet<>();
 			sets.addAll(filters);
+			if( join != null) {
+				sets.addAll(join);
+			}
 			return sets;
 		}
 }

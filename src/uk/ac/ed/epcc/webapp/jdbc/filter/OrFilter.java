@@ -125,8 +125,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		 */
 		@Override
 		public Boolean visitJoinFilter(JoinFilter<? super T> fil) throws Exception {
-			sql_filters.addPatternFilter(fil);
-			sql_filters.addJoin(fil.getJoin());
+			sql_filters.addJoin(fil);
 			return null;
 		}
 

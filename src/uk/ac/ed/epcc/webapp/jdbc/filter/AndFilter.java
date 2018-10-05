@@ -114,9 +114,9 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 				res.addPatternFilter(pat);
 			}
 		}
-		Set<String> joins = getJoins();
+		Set<JoinFilter> joins = getJoins();
 		if( joins != null ){
-			for(String join  : joins){
+			for(JoinFilter join  : joins){
 				res.addJoin(join);
 			}
 		}
