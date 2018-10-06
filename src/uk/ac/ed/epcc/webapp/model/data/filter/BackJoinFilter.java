@@ -20,6 +20,7 @@ import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterSelect;
 import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.MultiTableFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -51,12 +52,12 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  */
 
 
-public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> extends FilterSelect<T> implements SQLFilter<BDO>, PatternFilter<BDO> {
+public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> extends FilterSelect<T> implements SQLFilter<BDO>, PatternFilter<BDO>, MultiTableFilter {
 	private final Class<? super BDO> target;
-	private final String join_field;
-	private final Repository res;
-	private final Repository remote_res;
+	// Note this is a filter on the remote that points back to the target
+	private final JoinerFilter<BDO, T> link;
 	private final SQLFilter<? super T> fil;
+	private final Repository remote_res;
 	/**
 	 * 
 	 * @param join_field String reference field
@@ -66,8 +67,7 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 	 */
 	public BackJoinFilter( Class<? super BDO> target,String join_field, Repository res, Repository remote_res, SQLFilter<? super T> fil){
 		this.target=target;
-		this.join_field=join_field;
-		this.res=res;
+		this.link = new JoinerFilter<BDO,T>((Class<? super T>) (fil != null ? fil.getTarget(): DataObject.class), join_field, remote_res, res);
 		this.remote_res=remote_res;
 		this.fil=fil;
 	}
@@ -89,18 +89,16 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 			if( fil != null && fil instanceof JoinFilter){
 				final String join = ((JoinFilter)fil).getJoin();
 				if( join != null ){
+					sb.append(" ");
 					sb.append(join);
 				}
 			}
 			sb.append(" WHERE ");
-	     	remote_res.getInfo(join_field).addName(sb, true, true);
-	        sb.append(" = ");
-	        res.addUniqueName(sb, true, true);
+	     	link.addLinkClause(sb);
 	        if( fil != null ){
 	        	sb.append(" AND ");
 	        	makeWhere(fil, sb, true);
 	        }
-	        
 			sb.append(")");
 			return sb;
 		}
@@ -139,14 +137,24 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 			StringBuilder sb = new StringBuilder();
 			sb.append(getClass().getSimpleName());
 			sb.append("(");
-			remote_res.getInfo(join_field).addName(sb, true, false);
-			sb.append("=");
-			res.addUniqueName(sb, true, false);
+			sb.append(link.toString());
 			if( fil != null ) {
 				sb.append(" remote_filter=");
 				sb.append(fil.toString());
 			}
 			sb.append(")");
 			return sb.toString();
+		}
+
+
+
+
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.MultiTableFilter#qualifyTables()
+		 */
+		@Override
+		public boolean qualifyTables() {
+			return true;
 		}
 }

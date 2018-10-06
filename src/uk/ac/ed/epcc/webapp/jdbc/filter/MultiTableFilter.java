@@ -13,13 +13,15 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-
-/** An object representing a link between two tables.
- * 
+/** Interface for filters that reference multiple tables
  * @author Stephen Booth
  *
  */
-public interface JoinClause<T extends DataObject, R extends DataObject> {
-	
+public interface MultiTableFilter {
+
+	/** Should field names be qualified
+	 * 
+	 * @return
+	 */
+	public boolean qualifyTables();
 }

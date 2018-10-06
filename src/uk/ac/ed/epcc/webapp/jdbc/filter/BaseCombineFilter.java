@@ -430,4 +430,9 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			}
 			return sets;
 		}
+
+		@Override
+		public boolean qualifyTables() {
+			return join != null && ! join.isEmpty();
+		}
 }

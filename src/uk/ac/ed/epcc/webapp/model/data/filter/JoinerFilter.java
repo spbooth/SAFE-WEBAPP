@@ -63,7 +63,7 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 	 * @param remote_res Repository of remote
 	 */
 	public JoinerFilter(Class<? super BDO> target, String join_field, Repository res, Repository remote_res){
-		this.target=target;
+		this.target= target;
 		this.join_field=join_field;
 		this.res=res;
 		this.remote_res=remote_res;
@@ -81,6 +81,18 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 			join.append(" left join ");
 			remote_res.addSource(join, true);
 			join.append(" on ");
+			addLinkClause(join);
+			return join.toString();
+		}
+
+
+
+
+
+		/**
+		 * @param join
+		 */
+		public void addLinkClause(StringBuilder join) {
 			join.append("(");
 			
      		FieldInfo info = res.getInfo(join_field);
@@ -89,7 +101,6 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
          	remote_res.addUniqueName(join, true, true);
      	
          	join.append(")");
-			return join.toString();
 		}
 	
 
@@ -171,5 +182,14 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 				remote_res.addUniqueName(sb, true, false);
 			sb.append(")");
 			return sb.toString();
+		}
+
+
+
+
+
+		@Override
+		public boolean qualifyTables() {
+			return true;
 		}
 }

@@ -91,4 +91,13 @@ public final class ConstJoinerFilter<T extends DataObject, BDO extends DataObjec
 		public Class<? super BDO> getTarget() {
 			return target;
 		}
+
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.MultiTableFilter#qualifyTables()
+		 */
+		@Override
+		public boolean qualifyTables() {
+			return true;
+		}
 }

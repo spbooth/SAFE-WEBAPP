@@ -125,7 +125,7 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 	 * 
 	 * Sub-classes can override to force this to true;
 	 * 
-	 * @return
+	 * @return boolean true if fields should be qualified
 	 */
 	public boolean getQualify() {
 		return qualify;
@@ -134,6 +134,8 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 		String join="";
 		boolean use_join=false;
 		BaseFilter<? super T> filter = getFilter();
+		// Note this is a check on the JoinFilter interface not visitor behaviour
+		// the combine filters also implement the interface and can provide a join clause
 		if( filter instanceof JoinFilter ){
 			join = ((JoinFilter) filter).getJoin();
 			if( join != null && join.trim().length()>0){
@@ -141,7 +143,7 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 			}
 		}
 		
-		if( use_join || getQualify()){
+		if( use_join || getQualify() || ( filter instanceof MultiTableFilter &&((MultiTableFilter)filter).qualifyTables())){
 			mapper.setQualify(true);
 			qualify=true;
 		}
