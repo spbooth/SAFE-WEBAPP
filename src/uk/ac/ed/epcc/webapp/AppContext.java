@@ -44,6 +44,8 @@ import uk.ac.ed.epcc.webapp.jdbc.DefaultDataBaseService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintLoggerService;
+import uk.ac.ed.epcc.webapp.model.data.Composable;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.resource.DefaultResourceService;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 
@@ -930,16 +932,29 @@ public final class AppContext {
 	 * @return instance
 	 */
 	public final <T> T makeObject(Class<T> clazz, String tag){
-		if( clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())){
+		if( clazz.isInterface() ) {
+			// can't use as default so use null
+			T result =  makeObjectWithDefault(clazz, null, tag);
+			if( result == null && Composable.class.isAssignableFrom(clazz)) {
+				// look for a composite
+				DataObjectFactory<?> fac = makeObjectWithDefault(DataObjectFactory.class, null, tag);
+				if( fac != null ) {
+					//Interface cannot be the same as registration class because it can't extends Composite
+					// search for appropriate composite and return the first one found.
+					for(T x : fac.getComposites(clazz)) {
+						result = x;
+						break;
+					}
+				}
+			}
+			return result;
+		}else if( Modifier.isAbstract(clazz.getModifiers())){
 			// can't use as default so use null
 			return makeObjectWithDefault(clazz, null, tag);
 		}
 		return makeObjectWithDefault(clazz, clazz, tag);
 	}
-	@Deprecated
-	public <T> T getFactory(Class<T> clazz, String tag){
-		return makeObject(clazz,tag);
-	}
+	
 	
 	
 	/** Construct an object identified by a string tag.

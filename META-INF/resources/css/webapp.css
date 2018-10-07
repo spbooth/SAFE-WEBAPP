@@ -22,6 +22,9 @@ div.block details summary h2{
 div.block, div.bar, div.textbar,div.text, div.graph {
 width: 95%;
 }
+div.bar{
+height: 25px;
+}
 div.wideblock {
 width: 95%;
 }
