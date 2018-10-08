@@ -36,7 +36,7 @@ public class PatternArg implements PatternArgument{
 		this.field = field;
 		this.arg = arg;
 		this.res=res;
-		assert(res==null||res.hasField(field));
+		assert(res==null||field==null||res.hasField(field));
 	}
 	public void addArg(PreparedStatement stmt,int pos) throws SQLException{
 		if(res == null){
