@@ -16,6 +16,10 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
+import java.util.Set;
+
+import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.model.data.filter.LinkClause;
 
 /** Interface for filters that add an explicit join clause. 
  * The intention here is to filter entries from the primary tables based on the data it
@@ -32,9 +36,15 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
  */
 public interface JoinFilter<T> extends BaseFilter<T>, MultiTableFilter {
 	
-   /** Join clause to add to query
-    * 
-    * @return String
+/** add join clause to add to query. Each {@link Repository} should only be joined to once. 
+ * A table may be joined to multiple times if via a {@link Repository} with an alias.
+ * If the {@link Repository} being joined to is already present the <b>join_clause</b> is left unchanged but the
+ * {@link LinkClause} is added to the <b>additions</b> list.
+ * 
+ * 
+ * @param tables Set of {@link Repository}s in join (updated)
+ * @param join_clause Query join clause (modified)
+ * @param additions  Additional {@link LinkClause}s to add to select
     */
-   public String getJoin();
+   public void addJoin(Set<Repository> tables, StringBuilder join_clause, Set<LinkClause> additions);
 }

@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.model.data.filter.LinkClause;
 /** Base class for Filters than combines multiple SQL filters. 
  * 
  * Only the SQL parts of the filters are considered by this class.
@@ -244,19 +246,15 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			return join;
 		}
 		
-		public final String getJoin(){
-			if( join == null ){
-				return null;
+		
+		@Override
+		public void addJoin(Set<Repository> tables, StringBuilder join_clause, Set<LinkClause> additions) {
+			for( JoinFilter j : join) {
+				j.addJoin(tables, join_clause, additions);
 			}
-			StringBuilder sb = new StringBuilder();
-			for( JoinFilter s : join){
-				if( sb.length() > 0){
-					sb.append(' ');	
-				}
-				sb.append(s.getJoin());
-			}
-			return sb.toString();
+			
 		}
+
 		public final  List<PatternArgument> getParameters(List<PatternArgument> res) {
 			if( isForced()){
 				return res;

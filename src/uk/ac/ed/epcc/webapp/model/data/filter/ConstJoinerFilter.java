@@ -16,11 +16,10 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data.filter;
 
-import java.util.List;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
@@ -35,7 +34,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  */
 
 
-public final class ConstJoinerFilter<T extends DataObject, BDO extends DataObject> implements SQLFilter<BDO>, JoinFilter<BDO> {
+public final class ConstJoinerFilter<T extends DataObject, BDO extends DataObject> implements SQLFilter<BDO>, JoinFilter<BDO> , LinkClause{
 	public ConstJoinerFilter(Class<? super BDO> target, int id, Repository remote_res) {
 		super();
 		this.target = target;
@@ -53,17 +52,7 @@ public final class ConstJoinerFilter<T extends DataObject, BDO extends DataObjec
 		
 		
 		
-		public String getJoin() {
-			StringBuilder join=new StringBuilder();
-			join.append(" join ");
-			remote_res.addSource(join, true);
-			join.append(" on ");
-			remote_res.addUniqueName(join, true, true);
-			join.append("=");
-			join.append(Integer.toString(id));
-			join.append(" ");
-			return join.toString();
-		}
+		
 
 		
 		public void accept(BDO o) {
@@ -99,5 +88,39 @@ public final class ConstJoinerFilter<T extends DataObject, BDO extends DataObjec
 		@Override
 		public boolean qualifyTables() {
 			return true;
+		}
+
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter#addJoin(java.util.Set, java.lang.StringBuilder, java.util.Set)
+		 */
+		@Override
+		public void addJoin(Set<Repository> tables, StringBuilder join, Set<LinkClause> additions) {
+			if( tables.contains(remote_res)) {
+				additions.add(this);
+			}else {
+				join.append(" join ");
+				remote_res.addSource(join, true);
+				join.append(" on ");
+				
+				join.append(" ");
+				addLinkClause(join);
+			}
+			
+		}
+
+
+
+
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.filter.LinkClause#addLinkClause(java.lang.StringBuilder)
+		 */
+		@Override
+		public void addLinkClause(StringBuilder join) {
+			remote_res.addUniqueName(join, true, true);
+			join.append("=");
+			join.append(Integer.toString(id));
+			
 		}
 }

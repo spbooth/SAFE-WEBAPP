@@ -18,7 +18,9 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
@@ -27,6 +29,8 @@ import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.model.data.filter.LinkClause;
 /** common base for classes that generate results via SQL.
  * It uses a filter class to specify what records are to be retrieved and a 
  * ResultMapper to convert this data into a domain object.
@@ -69,6 +73,7 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 	protected abstract String getDBTag();
 	
 	protected abstract void addSource(StringBuilder sb);
+	protected abstract Set<Repository> getSourceTables();
 	protected final Logger getLogger(){
 		return getContext().getService(LoggerService.class).getLogger(getClass());
 	}
@@ -131,18 +136,18 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 		return qualify;
 	}
 	protected final void makeSelect(StringBuilder query) {
-		String join="";
+		StringBuilder join = new StringBuilder();
 		boolean use_join=false;
 		BaseFilter<? super T> filter = getFilter();
+		Set<LinkClause> additions = new HashSet<>();
+		
+		Set<Repository> tables = getSourceTables();
 		// Note this is a check on the JoinFilter interface not visitor behaviour
 		// the combine filters also implement the interface and can provide a join clause
 		if( filter instanceof JoinFilter ){
-			join = ((JoinFilter) filter).getJoin();
-			if( join != null && join.trim().length()>0){
-				use_join=true;
-			}
+			((JoinFilter) filter).addJoin(tables, join, additions);
 		}
-		
+		use_join = tables.size() > 1;
 		if( use_join || getQualify() || ( filter instanceof MultiTableFilter &&((MultiTableFilter)filter).qualifyTables())){
 			mapper.setQualify(true);
 			qualify=true;
@@ -156,6 +161,12 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 			  query.append(join);
 		}
 		query.append(" WHERE ");
+		if( ! additions.isEmpty()) {
+			for(LinkClause l : additions) {
+				l.addLinkClause(query);
+				query.append(" AND ");
+			}
+		}
 		makeWhere(my_filter,query,getQualify());
 	}
 

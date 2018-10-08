@@ -16,12 +16,11 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data.filter;
 
-import java.util.List;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseCombineFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
@@ -49,7 +48,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
  */
 
 
-public final class JoinerFilter<T extends DataObject, BDO extends DataObject> implements SQLFilter<BDO>, JoinFilter<BDO> {
+public final class JoinerFilter<T extends DataObject, BDO extends DataObject> implements SQLFilter<BDO>, JoinFilter<BDO>, LinkClause {
 	private final Class<? super BDO> target;
 	private final String join_field;
 	private final Repository res;
@@ -75,23 +74,16 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 		
 		
 		
-		public String getJoin() {
-			StringBuilder join=new StringBuilder();
-			// see comments for reason for left join
-			join.append(" left join ");
-			remote_res.addSource(join, true);
-			join.append(" on ");
-			addLinkClause(join);
-			return join.toString();
-		}
+		
 
 
 
 
 
-		/**
-		 * @param join
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.filter.LinkClause#addLinkClause(java.lang.StringBuilder)
 		 */
+		@Override
 		public void addLinkClause(StringBuilder join) {
 			join.append("(");
 			
@@ -191,5 +183,26 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 		@Override
 		public boolean qualifyTables() {
 			return true;
+		}
+
+
+
+
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter#addJoin(java.util.Set, java.lang.StringBuilder, java.util.Set)
+		 */
+		@Override
+		public void addJoin(Set<Repository> tables, StringBuilder join_clause, Set<LinkClause> additions) {
+			if( tables.contains(remote_res)) {
+				additions.add(this);
+			}else {
+				// see comments for reason for left join
+				join_clause.append(" left join ");
+				remote_res.addSource(join_clause, true);
+				join_clause.append(" on ");
+				addLinkClause(join_clause);
+			}
+			
 		}
 }
