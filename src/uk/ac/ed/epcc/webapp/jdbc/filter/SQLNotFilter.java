@@ -14,6 +14,9 @@
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
 import java.util.List;
+import java.util.Set;
+
+import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 /** Invert the sense of a {@link SQLFilter}
@@ -57,9 +60,9 @@ public class SQLNotFilter<Q,F extends PatternFilter<Q>&SQLFilter<Q>> implements 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter#addPattern(java.lang.StringBuilder, boolean)
 	 */
-	public StringBuilder addPattern(StringBuilder sb, boolean qualify) {
+	public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb, boolean qualify) {
 		sb.append("NOT(");
-		nested.addPattern(sb, qualify);
+		nested.addPattern(tables,sb, qualify);
 		sb.append(")");
 		return sb;
 	}

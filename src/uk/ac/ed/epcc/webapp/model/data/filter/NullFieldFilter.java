@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.model.data.filter;
 
 import java.util.List;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
@@ -43,7 +44,7 @@ public class NullFieldFilter<T> implements PatternFilter<T>, SQLFilter<T>{
     	this.match_null=match_null;
     	this.res = res;
     }
-	public StringBuilder  addPattern(StringBuilder target,boolean qualify) {
+	public StringBuilder  addPattern(Set<Repository> tables,StringBuilder target,boolean qualify) {
 		if( res != null ){
 			res.getInfo(field).addName(target, qualify, true);
 		}else{

@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.model.data.filter;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,8 +53,10 @@ public class FilterDelete<T extends DataObject> extends FilterSelect<T>{
     	res.addTable(sql, true);
     	
     	if( my_filter != null ){
+    		HashSet<Repository> tables = new HashSet<>();
+	    	tables.add(res);
     		sql.append(" WHERE ");
-    		makeWhere(my_filter, sql, false);
+    		makeWhere(tables,my_filter, sql, false);
     	}
     	SQLContext sqlContext = res.getSQLContext();
     	try{

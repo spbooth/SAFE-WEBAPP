@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.util.List;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
@@ -25,6 +26,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 /** A {@link SQLFilter} that compares two {@link SQLExpression}s.
@@ -111,7 +113,7 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
 		return list;
 	}
 
-	public StringBuilder addPattern(StringBuilder sb,boolean qualify) {
+	public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify) {
 		//sb.append("(");
 		expr1.add(sb,qualify);
 		if( match != null){

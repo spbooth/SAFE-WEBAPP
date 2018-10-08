@@ -17,9 +17,11 @@
 package uk.ac.ed.epcc.webapp.model.data.filter;
 
 import java.util.List;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterSelect;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
+import uk.ac.ed.epcc.webapp.jdbc.filter.MultiTableFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -38,7 +40,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  */
 
 
-public class OrphanFilter<T extends DataObject, BDO extends DataObject> extends FilterSelect<T> implements SQLFilter<BDO>, PatternFilter<BDO> {
+public class OrphanFilter<T extends DataObject, BDO extends DataObject> extends FilterSelect<T> implements SQLFilter<BDO>, PatternFilter<BDO>,MultiTableFilter {
 	private final Class<? super BDO> target;
 	private final String join_field;
 	private final Repository res;
@@ -64,11 +66,12 @@ public class OrphanFilter<T extends DataObject, BDO extends DataObject> extends 
 			return list;
 		}
 		
-		public final StringBuilder addPattern(StringBuilder sb, boolean qualify) {
+		public final StringBuilder addPattern(Set<Repository> tables,StringBuilder sb, boolean qualify) {
+			assert( ! tables.contains(remote_res));
 			// this is the clause that matches the tables.
 			sb.append("NOT EXISTS( SELECT 1 FROM ");
-			remote_res.addSource(sb, true);
 			
+			remote_res.addSource(sb, true);
 			sb.append(" WHERE ");
 	     	res.getInfo(join_field).addName(sb, true, true);
 	        sb.append(" = ");
@@ -108,4 +111,19 @@ public class OrphanFilter<T extends DataObject, BDO extends DataObject> extends 
 		public final Class<? super BDO> getTarget() {
 			return target;
 		}
+
+
+
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.MultiTableFilter#qualifyTables()
+		 */
+		@Override
+		public boolean qualifyTables() {
+
+			return true;
+		}
+
+
+
 }

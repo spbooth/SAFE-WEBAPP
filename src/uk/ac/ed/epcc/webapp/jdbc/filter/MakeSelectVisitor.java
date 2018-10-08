@@ -13,6 +13,10 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
+import java.util.Set;
+
+import uk.ac.ed.epcc.webapp.model.data.Repository;
+
 /** A {@link FilterVisitor} that makes the select clause for a filter
  * 
  * @author spb
@@ -20,23 +24,26 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
  * @param <T> type of filter
  */
 public class MakeSelectVisitor<T> implements FilterVisitor<StringBuilder, T>{
-	public MakeSelectVisitor(StringBuilder sb,boolean qualify,boolean require_sql) {
+	public MakeSelectVisitor(Set<Repository> tables,StringBuilder sb,boolean qualify,boolean require_sql) {
 		super();
+		this.tables=tables;
 		this.sb = sb;
 		this.qualify=qualify;
 		this.require_sql=require_sql;
 	}
 
 	private final StringBuilder sb;
+	private final Set<Repository> tables;
 	private final boolean qualify;
 	private final boolean require_sql;
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
 	 */
 	@Override
 	public StringBuilder visitPatternFilter(PatternFilter<? super T> fil) throws Exception {
-		return fil.addPattern(sb, qualify);
+		return fil.addPattern(tables,sb, qualify);
 	}
 
 	/* (non-Javadoc)

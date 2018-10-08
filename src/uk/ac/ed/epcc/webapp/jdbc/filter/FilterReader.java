@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -139,7 +140,7 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 		StringBuilder join = new StringBuilder();
 		boolean use_join=false;
 		BaseFilter<? super T> filter = getFilter();
-		Set<LinkClause> additions = new HashSet<>();
+		Set<LinkClause> additions = new LinkedHashSet<>();
 		
 		Set<Repository> tables = getSourceTables();
 		// Note this is a check on the JoinFilter interface not visitor behaviour
@@ -167,7 +168,7 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 				query.append(" AND ");
 			}
 		}
-		makeWhere(my_filter,query,getQualify());
+		makeWhere(tables,my_filter,query,getQualify());
 	}
 
 	

@@ -66,6 +66,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataCache;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.PatternArg;
+import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -153,7 +154,7 @@ AccessRoleProvider<AU, AU>
 				}
 			}
 		}
-		public StringBuilder addPattern(StringBuilder sb,boolean qualify) {
+		public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify) {
 			sb.append(" EXISTS( SELECT 1 FROM ");
 			ctx.quote(sb, AbstractSessionService.ROLE_TABLE);
 			sb.append(" WHERE ");

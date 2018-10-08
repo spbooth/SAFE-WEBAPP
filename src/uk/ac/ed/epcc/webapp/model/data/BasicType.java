@@ -88,7 +88,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		 * 
 		 * @see uk.ac.hpcx.model.data.BasicDataObject.Filter#condition()
 		 */
-		public StringBuilder addPattern(StringBuilder sb, boolean qualify) {
+		public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb, boolean qualify) {
 			if (res == null ) {
 				sb.append(type.getField());
 				sb.append("= ? ");
@@ -152,7 +152,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
         	this.res=res;
         	this.type=type;
         }
-		public StringBuilder addPattern(StringBuilder sb,boolean qualify) {
+		public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify) {
 			boolean seen=false;
 			sb.append(" ( ");
 			for(int i=0; i< set.size(); i++){

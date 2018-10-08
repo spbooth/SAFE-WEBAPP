@@ -17,11 +17,13 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.util.List;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 
 
@@ -61,7 +63,7 @@ public class SQLExpressionNullFilter<T,V> implements SQLFilter<T>, PatternFilter
 		return list;
 	}
 
-	public StringBuilder addPattern(StringBuilder sb,boolean qualify) {
+	public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify) {
 		//sb.append("(");
 		expr.add(sb,qualify);
 		if( is_null ){

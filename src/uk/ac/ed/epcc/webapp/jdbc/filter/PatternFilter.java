@@ -18,6 +18,9 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
 
 import java.sql.PreparedStatement;
 import java.util.List;
+import java.util.Set;
+
+import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 
@@ -40,13 +43,18 @@ public interface PatternFilter<T> extends BaseSQLFilter<T> {
 
 	/**
 	 * get a Parameterised selection SQL clause
+	 * 
+	 * The <b>tables</b> parameter is only needed by nested sub-queries (e.g. EXISTS) so they can
+	 * supress unwanted joins back the the outer query.
+	 * 
+	 * @param tables Set of {@link Repository}s in the SQL 
 	 * @param sb StringBuilder to modify
 	 * @param qualify request field names to be qualified with table name.
 	 * @see PreparedStatement
 	
 	 * @return modified StringBuilder
 	 */
-	public StringBuilder addPattern(StringBuilder sb,boolean qualify);
+	public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify);
 	
 	
 }

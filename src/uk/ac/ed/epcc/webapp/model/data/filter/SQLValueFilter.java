@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.model.data.filter;
 
 import java.util.List;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
@@ -70,7 +71,7 @@ public class SQLValueFilter<T> implements SQLFilter<T>, PatternFilter<T> {
 		return list;
 	}
 
-	public final StringBuilder addPattern(StringBuilder result,boolean qualify) {
+	public final StringBuilder addPattern(Set<Repository> tables,StringBuilder result,boolean qualify) {
 		if( peer == null ){
 			result.append("true"); // default to true
 			return result;

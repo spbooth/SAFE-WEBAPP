@@ -120,7 +120,9 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
 	 */
 	public int add(StringBuilder sb, boolean qualify) {
 		sb.append("CASE ");
-		MakeSelectVisitor<X> vis = new MakeSelectVisitor<X>(sb, qualify,true);
+		// We only support simple expression filters here so ok to pass
+		// null for the tables parameter
+		MakeSelectVisitor<X> vis = new MakeSelectVisitor<X>(null,sb, qualify,true);
 		for( Clause<X,R> c: options){
 			sb.append("WHEN ");
 			try {

@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.model.data.filter;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
@@ -91,7 +92,7 @@ public class SelfReferenceFilter<T> implements SQLFilter<T> , PatternFilter<T>{
 		return list;
 	}
 
-	public StringBuilder addPattern(StringBuilder sb,boolean qualify) {
+	public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify) {
 		res.addUniqueName(sb, qualify, true);
 		if( exclude ){
 			sb.append(" != ?");

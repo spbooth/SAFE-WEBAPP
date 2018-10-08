@@ -202,6 +202,7 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 				remote_res.addSource(join_clause, true);
 				join_clause.append(" on ");
 				addLinkClause(join_clause);
+				tables.add(remote_res);
 			}
 			
 		}

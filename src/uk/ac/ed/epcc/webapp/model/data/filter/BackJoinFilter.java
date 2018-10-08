@@ -16,7 +16,10 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data.filter;
 
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterSelect;
 import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
@@ -82,22 +85,27 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 			return getFilterArguments(fil, list);
 		}
 		
-		public StringBuilder addPattern(StringBuilder sb, boolean qualify) {
+		public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb, boolean qualify) {
+			Set<Repository> inner_tables = new HashSet<>(tables);
 			// this is the clause that matches the tables.
 			sb.append("EXISTS( SELECT 1 FROM ");
 			remote_res.addSource(sb, true);
+			inner_tables.add(remote_res);
+			
+			Set<LinkClause> additions = new LinkedHashSet<>();
+			additions.add(link);
 			if( fil != null && fil instanceof JoinFilter){
-				final String join = ((JoinFilter)fil).getJoin();
-				if( join != null ){
-					sb.append(" ");
-					sb.append(join);
-				}
+				((JoinFilter)fil).addJoin(inner_tables, sb, additions);
 			}
 			sb.append(" WHERE ");
-	     	link.addLinkClause(sb);
+			for(LinkClause l : additions) {
+				link.addLinkClause(sb);
+				sb.append(" AND ");
+			}
 	        if( fil != null ){
-	        	sb.append(" AND ");
-	        	makeWhere(fil, sb, true);
+	        	makeWhere(inner_tables,fil, sb, true);
+	        }else {
+	        	sb.append("true");
 	        }
 			sb.append(")");
 			return sb;

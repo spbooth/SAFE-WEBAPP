@@ -20,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
@@ -28,6 +29,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.model.data.FieldValue;
+import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 /** A {@link SQLFilter} that compares a {@link SQLExpression} to a constant value.
@@ -118,7 +120,7 @@ public class SQLExpressionFilter<T,V> implements SQLFilter<T>, PatternFilter<T> 
 		return list;
 	}
 
-	public StringBuilder addPattern(StringBuilder sb,boolean qualify) {
+	public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify) {
 		sb.append("(");
 		expr.add(sb,qualify);
 		if( match != null){

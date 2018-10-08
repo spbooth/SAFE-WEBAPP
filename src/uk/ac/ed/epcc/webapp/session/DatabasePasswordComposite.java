@@ -254,7 +254,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		
 		
 		
-		public StringBuilder addPattern(StringBuilder sb,boolean qualify) {
+		public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify) {
 			getRepository().getInfo(DatabasePasswordComposite.PASSWORD).addName(sb, qualify, false);
 			sb.append("=");
 			check_value.add(sb, qualify);

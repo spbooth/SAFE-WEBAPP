@@ -50,7 +50,7 @@ public class PatternArg implements PatternArgument{
 		return can_log;
 	}
 	public void setLog(boolean log){
-		can_log=false;
+		can_log=log;
 	}
 	/** get a field name with the same type as this argument
 	 * or null for default conversion.

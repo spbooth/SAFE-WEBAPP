@@ -249,10 +249,11 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 		
 		@Override
 		public void addJoin(Set<Repository> tables, StringBuilder join_clause, Set<LinkClause> additions) {
-			for( JoinFilter j : join) {
-				j.addJoin(tables, join_clause, additions);
+			if( join != null ) {
+				for( JoinFilter j : join) {
+					j.addJoin(tables, join_clause, additions);
+				}
 			}
-			
 		}
 
 		public final  List<PatternArgument> getParameters(List<PatternArgument> res) {
@@ -271,7 +272,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			}
 			return new LinkedList<OrderClause>(order);
 		}
-		public final StringBuilder addPattern(StringBuilder sb,boolean qualify) {
+		public final StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify) {
 			if( isForced()){
 				sb.append(" ");
 				sb.append(Boolean.toString(force_value));
@@ -289,7 +290,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 					seen = true;
 				}
 				sb.append(" ( ");
-				f.addPattern(sb, qualify);
+				f.addPattern(tables,sb, qualify);
 			}
 			if( seen ){
 			  sb.append(" ) ");

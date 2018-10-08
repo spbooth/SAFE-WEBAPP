@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.model.data.filter;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -60,8 +61,10 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    	sql.append("=?");
 	    	
 	    	if( my_filter != null ){
+	    		HashSet<Repository> tables = new HashSet<>();
+		    	tables.add(res);
 	    		sql.append(" WHERE ");
-	    		makeWhere(my_filter, sql, false);
+	    		makeWhere(tables,my_filter, sql, false);
 	    	}
 	    	SQLContext sqlContext = res.getSQLContext();
 	    	try{
@@ -93,8 +96,10 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    	value.add(sql, false);
 	    	
 	    	if( my_filter != null ){
+	    		HashSet<Repository> tables = new HashSet<>();
+		    	tables.add(res);
 	    		sql.append(" WHERE ");
-	    		makeWhere(my_filter, sql, false);
+	    		makeWhere(tables,my_filter, sql, false);
 	    	}
 	    	SQLContext sqlContext = res.getSQLContext();
 	    	try{

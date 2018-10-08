@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.model.data.filter;
 
 import java.util.List;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.ConstPatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
@@ -65,7 +66,7 @@ public class SQLIdFilter<T extends DataObject> implements SQLFilter<T>, PatternF
 	}
 
 	
-	public StringBuilder addPattern(StringBuilder sb, boolean qualify) {
+	public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb, boolean qualify) {
 		res.addUniqueName(sb, qualify, true);
 		if( exclude) {
 			sb.append("!=?");

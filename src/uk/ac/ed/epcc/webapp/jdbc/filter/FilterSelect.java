@@ -21,8 +21,10 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 
@@ -56,12 +58,12 @@ public class FilterSelect<T> {
    * @param qualify
 	 * @throws Exception 
    */
-  protected void makeWhere(BaseFilter<? super T> my_filter,StringBuilder query,boolean qualify){
+  protected void makeWhere(Set<Repository> tables,BaseFilter<? super T> my_filter,StringBuilder query,boolean qualify){
 	  if( my_filter == null){
 		  query.append(" true ");
 		  return;
 	  }
-	  MakeSelectVisitor<T> vis = new MakeSelectVisitor<T>(query, qualify, false);
+	  MakeSelectVisitor<T> vis = new MakeSelectVisitor<T>(tables,query, qualify, false);
 	  try {
 		  my_filter.acceptVisitor(vis);
 	  } catch (Exception e) {
