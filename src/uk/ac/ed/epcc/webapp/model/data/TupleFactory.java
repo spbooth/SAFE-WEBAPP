@@ -15,10 +15,12 @@ package uk.ac.ed.epcc.webapp.model.data;
 
 import java.sql.ResultSet;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -87,6 +89,13 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 			fac.res.addSource(sb, true);
 			seen=true;
 		}
+	}
+	public final Set<Repository> getSourceTables(){
+		HashSet<Repository> set = new HashSet<>();
+		for ( AF fac : factories.values()){
+			set.add(fac.res);
+		}
+		return set;
 	}
 	public String getDBTag() {
 		return factories.values().iterator().next().res.getDBTag();
@@ -370,6 +379,13 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 		public boolean getQualify() {
 			return true;
 		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterReader#getSourceTables()
+		 */
+		@Override
+		protected Set<Repository> getSourceTables() {
+			return TupleFactory.this.getSourceTables();
+		}
     	
     }
     protected class FilterSet extends AbstractFilterResult<T> implements Iterable<T>, FilterResult<T>{
@@ -442,6 +458,10 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 		@Override
 		protected final String getDBTag() {
 			return TupleFactory.this.getDBTag();
+		}
+		@Override
+		protected final Set<Repository> getSourceTables() {
+			return TupleFactory.this.getSourceTables();
 		}
 
 		/* (non-Javadoc)

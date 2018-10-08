@@ -13,11 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
-import java.util.Map;
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterFinder;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DoubleFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -94,35 +91,16 @@ public class NumberTableFactory extends DataObjectFactory<NumberTableFactory.Num
 	public Class<? super NumberTable> getTarget() {
 		return NumberTable.class;
 	}
-	public class ReductionFinder extends FilterFinder<NumberTable, Double>{
+	public class ReductionFinder extends AbstractFinder<Double>{
 
 		/**
 		 * @param c
 		 * @param target
 		 */
 		public ReductionFinder( SQLExpression<Double> exp) {
-			super(NumberTableFactory.this.getContext(), NumberTableFactory.this.getTarget());
+			super();
 			setMapper(new ReductionMapper<Double>(getContext(), Double.class, Reduction.SUM, 0.0, exp));
 		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterReader#getDBTag()
-		 */
-		@Override
-		protected String getDBTag() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterReader#addSource(java.lang.StringBuilder)
-		 */
-		@Override
-		protected void addSource(StringBuilder sb) {
-			res.addSource(sb, true);
-			
-		}
-		
 	}
 	public Double getSum(SQLFilter<NumberTable> fil,SQLExpression<Double> expr) throws DataException {
 		ReductionFinder finder = new ReductionFinder(expr);

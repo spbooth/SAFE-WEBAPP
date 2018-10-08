@@ -41,9 +41,9 @@ public interface PatternFilter<T> extends BaseSQLFilter<T> {
 	/**
 	 * get a Parameterised selection SQL clause
 	 * @param sb StringBuilder to modify
-	 * 
-	 * @see PreparedStatement
 	 * @param qualify request field names to be qualified with table name.
+	 * @see PreparedStatement
+	
 	 * @return modified StringBuilder
 	 */
 	public StringBuilder addPattern(StringBuilder sb,boolean qualify);

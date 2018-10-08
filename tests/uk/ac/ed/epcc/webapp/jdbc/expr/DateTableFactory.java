@@ -14,7 +14,9 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -102,37 +104,26 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 		return res;
 	}
 
-	public class SumMapFinder extends FilterFinder<DateTable, Map<Integer,Number>>{
+	public class SumMapFinder extends AbstractFinder<Map<Integer,Number>>{
 
 		/**
 		 * @param c
 		 */
 		public SumMapFinder(AppContext c) {
-			super(c,DateTableFactory.this.getTarget());
+			super();
 			SumMapMapper<Integer> smm = new SumMapMapper<Integer>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", res.getNumberExpression(getTarget(),Long.class, DateTableFactory.MILLIS), "millis");
 			setMapper(smm);
 		}
-
-		@Override
-		protected void addSource(StringBuilder sb) {
-			res.addSource(sb, true);
-			
-		}
-
-		@Override
-		protected String getDBTag() {
-			return res.getDBTag();
-		}
 		
 	}
-	public class BinarySumMapFinder extends FilterFinder<DateTable, Map<Number,Number>>{
+	public class BinarySumMapFinder extends AbstractFinder<Map<Number,Number>>{
 
 		/**
 		 * @param c
 		 * @param op 
 		 */
 		public BinarySumMapFinder(AppContext c, Operator op) {
-			super(c,DateTableFactory.this.getTarget());
+			super();
 			SumMapMapper<Number> smm = new SumMapMapper<Number>(c,
 					new BinarySQLValue(c,
 							res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS),
@@ -145,112 +136,54 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 							res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.YEAR))
 					, "composite");
 			setMapper(smm);
-		}
-
-		@Override
-		protected void addSource(StringBuilder sb) {
-			res.addSource(sb, true);
-			
-		}
-
-		@Override
-		protected String getDBTag() {
-			return res.getDBTag();
-		}
-		
+		}		
 	}
-	public class ConstSumMapFinder extends FilterFinder<DateTable, Map<Integer,Number>>{
+	public class ConstSumMapFinder extends AbstractFinder< Map<Integer,Number>>{
 
 		/**
 		 * @param c
 		 */
 		public ConstSumMapFinder(AppContext c) {
-			super(c,DateTableFactory.this.getTarget());
+			super();
 			SumMapMapper<Integer> smm = new SumMapMapper<Integer>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", 
 					new ConstExpression<Integer, Integer>(Integer.class, 8), "sumconst");
 			setMapper(smm);
 		}
-
-		@Override
-		protected void addSource(StringBuilder sb) {
-			res.addSource(sb, true);
-			
-		}
-
-		@Override
-		protected String getDBTag() {
-			return res.getDBTag();
-		}
-		
 	}
-	public class MinMapFinder extends FilterFinder<DateTable, Map<Integer,Number>>{
+	public class MinMapFinder extends AbstractFinder<Map<Integer,Number>>{
 
 		/**
 		 * @param c
 		 */
 		public MinMapFinder(AppContext c) {
-			super(c,DateTableFactory.this.getTarget());
+			super();
 			MinimumMapMapper<Integer> smm = new MinimumMapMapper<Integer>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", res.getNumberExpression(getTarget(),Long.class, DateTableFactory.MILLIS), "millis");
 			setMapper(smm);
 		}
-
-		@Override
-		protected void addSource(StringBuilder sb) {
-			res.addSource(sb, true);
-			
-		}
-
-		@Override
-		protected String getDBTag() {
-			return res.getDBTag();
-		}
 		
 	}
-	public class MaxMapFinder extends FilterFinder<DateTable, Map<Integer,Number>>{
+	public class MaxMapFinder extends AbstractFinder< Map<Integer,Number>>{
 
 		/**
 		 * @param c
 		 */
 		public MaxMapFinder(AppContext c) {
-			super(c,DateTableFactory.this.getTarget());
+			super();
 			MaximumMapMapper<Integer> mmm = new MaximumMapMapper<Integer>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", res.getNumberExpression(getTarget(),Long.class, DateTableFactory.MILLIS), "millis");
 			setMapper(mmm);
 		}
-
-		@Override
-		protected void addSource(StringBuilder sb) {
-			res.addSource(sb, true);
-			
-		}
-
-		@Override
-		protected String getDBTag() {
-			return res.getDBTag();
-		}
 		
 	}
-	public class AvgMapFinder extends FilterFinder<DateTable, Map<Integer,Number>>{
+	public class AvgMapFinder extends AbstractFinder<Map<Integer,Number>>{
 
 		/**
 		 * @param c
 		 */
 		public AvgMapFinder(AppContext c) {
-			super(c,DateTableFactory.this.getTarget());
+			super();
 			AverageMapMapper<Integer> amm = new AverageMapMapper<Integer>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", res.getNumberExpression(getTarget(),Double.class, DateTableFactory.MILLIS), "avgmillis");
 			setMapper(amm);
-		}
-
-		@Override
-		protected void addSource(StringBuilder sb) {
-			res.addSource(sb, true);
-			
-		}
-
-		@Override
-		protected String getDBTag() {
-			return res.getDBTag();
-		}
-		
+		}		
 	}
 	public Map<Integer,Number> getSumMap(SQLFilter<DateTable> fil) throws DataException{
 		SumMapFinder finder = new SumMapFinder(getContext());

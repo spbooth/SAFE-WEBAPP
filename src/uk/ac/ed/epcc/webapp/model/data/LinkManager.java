@@ -18,9 +18,11 @@ package uk.ac.ed.epcc.webapp.model.data;
 
 import java.sql.ResultSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
@@ -295,8 +297,16 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 				throw new DataFault("Error in setup",e);
 			}
 		}
-		public void addSource(StringBuilder source) {
+		public final void addSource(StringBuilder source) {
+			// Note the join tables are added as filters
 			res.addSource(source, true);	
+		}
+		@Override
+		protected final Set<Repository> getSourceTables() {
+			// note the join tables are added as filters
+			HashSet<Repository> set = new HashSet<>();
+			set.add(res);
+			return set;
 		}
 		@Override
 		protected String getDBTag() {

@@ -631,22 +631,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return list;
 		}
     }
-    public class FilterExists extends FilterFinder<BDO,Boolean>{
+    public class FilterExists extends AbstractFinder<Boolean>{
 		public FilterExists() {
-			super(DataObjectFactory.this.getContext(),DataObjectFactory.this.getTarget());
+			super();
 			setMapper(new ExistsMapper());
 		}
-
-		@Override
-		protected void addSource(StringBuilder sb) {
-			res.addSource(sb, true);
-		}
-
-		@Override
-		protected String getDBTag() {
-			return res.getDBTag();
-		}
-    	
     }
     protected abstract class AbstractFinder<X> extends FilterFinder<BDO, X>{
 		public AbstractFinder(boolean allow_null) {
@@ -660,6 +649,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		protected final void addSource(StringBuilder sb) {
 			res.addSource(sb, true);
 			
+		}
+
+		@Override
+		protected final Set<Repository> getSourceTables() {
+			HashSet<Repository> set = new HashSet<>();
+			set.add(res);
+			return set;
 		}
 
 		@Override
@@ -740,13 +736,20 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	    }
 
 		@Override
-		protected void addSource(StringBuilder sb) {
+		protected final void addSource(StringBuilder sb) {
 			res.addSource(sb, true);
 			
 		}
 
 		@Override
-		protected String getDBTag() {
+		protected final Set<Repository> getSourceTables() {
+			HashSet<Repository> set = new HashSet<>();
+			set.add(res);
+			return set;
+		}
+
+		@Override
+		protected final String getDBTag() {
 			return res.getDBTag();
 		}
 	   
@@ -777,13 +780,18 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	    }
 
 		@Override
-		protected void addSource(StringBuilder sb) {
+		protected final void addSource(StringBuilder sb) {
 			res.addSource(sb, true);
 			
 		}
-
 		@Override
-		protected String getDBTag() {
+		protected final Set<Repository> getSourceTables() {
+			HashSet<Repository> set = new HashSet<>();
+			set.add(res);
+			return set;
+		}
+		@Override
+		protected final String getDBTag() {
 			return res.getDBTag();
 		}
 	}
