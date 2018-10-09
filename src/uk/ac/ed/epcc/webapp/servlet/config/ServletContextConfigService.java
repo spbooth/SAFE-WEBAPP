@@ -50,10 +50,16 @@ public class ServletContextConfigService implements ConfigService {
 		
 			Properties props= new Properties( nested_service.getServiceProperties());
 			if( ctx != null){
-				Enumeration e = ctx.getInitParameterNames();
-				while (e.hasMoreElements()) {
-					String name= (String) e.nextElement();
-					props.setProperty(name, ctx.getInitParameter(name));
+				try {
+					Enumeration e = ctx.getInitParameterNames();
+					while (e.hasMoreElements()) {
+						String name= (String) e.nextElement();
+						props.setProperty(name, ctx.getInitParameter(name));
+					}
+				}catch(Exception e) {
+					// This is most likely to happen during close
+					// so use fall-back error reporting strategy
+					e.printStackTrace(System.err);
 				}
 			}
 		return props;
