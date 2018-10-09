@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.servlet;
 import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -77,7 +78,9 @@ public class ServeDataServlet extends WebappServlet {
 				}
 				res.setContentLength((int) msd.getLength());
 				res.setContentType(msd.getContentType());
-				msd.write(res.getOutputStream());
+				ServletOutputStream out = res.getOutputStream();
+				msd.write(out);
+				out.close();
 				return;
 			
 		}catch(IOException e){

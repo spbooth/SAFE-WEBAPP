@@ -72,6 +72,7 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 		}else{
 			out.println("FAIL");
 		}
+		out.close();
 		return;
 	}
 	public synchronized static Date getLastCall(){
