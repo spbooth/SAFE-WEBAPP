@@ -455,7 +455,7 @@ public abstract class DataObject implements ContextIndexed, Identified{
 		return ((input == null) || (input.length() == 0));
 	}
 	/** A static method to locate the {@link DataObjectFactory} used to create a {@link DataObject}
-	 * This will necessary when behaviour added as {@link Composite}s is required but
+	 * This will be necessary when behaviour added as {@link Composite}s is required but
 	 * only the {@link DataObject} is available.
 	 * 
 	 * 
@@ -463,7 +463,7 @@ public abstract class DataObject implements ContextIndexed, Identified{
 	 * @param obj
 	 * @return
 	 */
-	public static <D extends DataObject> DataObjectFactory<D> getFactory( D obj){
+	public static <D extends DataObject> DataObjectFactory<D> getOwningFactory( D obj){
 		if( obj == null ) {
 			return null;
 		}
