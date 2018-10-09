@@ -118,9 +118,15 @@ public class ErrorFilter implements Filter {
 				}
 				// Make sure Cleanup runs first
 				serv.cleanup();
-				conn.close();
+				
 			}catch(Exception t){
-				log.error("Error closing AppContext", t);
+				log.error("Error running cleanup from Closer", t);
+			}finally{
+				try {
+					conn.close();
+				}catch(Exception x){
+					log.error("Error closing AppContext from Closer",x);
+				}
 			}
 			
 		}
