@@ -13,26 +13,19 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Hashtable;
 
+import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import uk.ac.ed.epcc.webapp.AppContext;
-import java.io.IOException;
-import java.util.Hashtable;
-
-import javax.imageio.ImageIO;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Hashtable;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -40,6 +33,8 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+
+import uk.ac.ed.epcc.webapp.AppContext;
 /**
  * @author Stephen Booth
  *
@@ -57,7 +52,9 @@ public class QRServlet extends WebappServlet {
 		String text=req.getParameter("text");
 		res.setContentType("image/png");
 		try {
-			createQRImage(res.getOutputStream(), text, 300, "png");
+			ServletOutputStream out = res.getOutputStream();
+			createQRImage(out, text, 300, "png");
+			out.close();
 		} catch (WriterException e) {
 			throw new ServletException(e);
 		}
