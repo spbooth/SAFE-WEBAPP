@@ -564,32 +564,37 @@ public final class AppContext {
 		return expandText(new HashMap<String,String>(), text_to_expand);
 	}
 	private String expandText(Map<String,String> values,String text_to_expand) {
-		if( text_to_expand == null || text_to_expand.length() == 0){
-			return text_to_expand;
-		}
-		StringBuffer result = new StringBuffer();
-		Matcher m = expand_pattern.matcher(text_to_expand);
-		while(m.find()){
-			String default_text ="";
-			String subname = m.group(1);
-			if( subname.contains(":")){
-				int pos = subname.indexOf(':');
-				default_text = subname.substring(pos+1);
-				subname=subname.substring(0, pos);
+		try {
+			if( text_to_expand == null || text_to_expand.length() == 0){
+				return text_to_expand;
 			}
-			String text = values.get(subname);
-			if( text == null){
-				text=getInitParameter(subname,default_text);
-				values.put(subname, ""); // recursive go to empty string
-				values.put(subname, text=expandText(values,text));
+			StringBuffer result = new StringBuffer();
+			Matcher m = expand_pattern.matcher(text_to_expand);
+			while(m.find()){
+				String default_text ="";
+				String subname = m.group(1);
+				if( subname.contains(":")){
+					int pos = subname.indexOf(':');
+					default_text = subname.substring(pos+1);
+					subname=subname.substring(0, pos);
+				}
+				String text = values.get(subname);
+				if( text == null){
+					text=getInitParameter(subname,default_text);
+					values.put(subname, ""); // recursive go to empty string
+					values.put(subname, text=expandText(values,text));
+				}
+				// supress unintended back subs
+				text = text.replace("\\", "\\\\");
+				text = text.replace("$", "\\$");
+				m.appendReplacement(result, text);
 			}
-			// supress unintended back subs
-			 text = text.replace("\\", "\\\\");
-			text = text.replace("$", "\\$");
-			m.appendReplacement(result, text);
+			m.appendTail(result);
+			return result.toString();
+		}catch(Exception e) {
+			error(e, "Error expanding text");
+			return null;
 		}
-		m.appendTail(result);
-		return result.toString();
 	}
 	/** Query a property with generic and specialised forms.
 	 * First look for a property called <b>name.tag</b> If this does not exist 
