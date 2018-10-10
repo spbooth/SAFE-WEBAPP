@@ -600,8 +600,12 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	@Override
 	public Set<String> getStandardRoles(){
 		Set<String> result = new LinkedHashSet<String>();
-		for(String s :getContext().getExpandedProperty(ROLE_LIST_CONFIG, SessionService.ADMIN_ROLE).split(",")){
-			result.add(s);
+		try {
+			for(String s :getContext().getExpandedProperty(ROLE_LIST_CONFIG, SessionService.ADMIN_ROLE).split(",")){
+				result.add(s);
+			}
+		}catch(Exception e) {
+			error(e, "Error getting role list");
 		}
 		return result;
 	}
