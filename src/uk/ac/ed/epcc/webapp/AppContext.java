@@ -549,7 +549,11 @@ public final class AppContext {
 		String text_to_expand = getInitParameter(name,def);
 		Map<String,String> values = new HashMap<String,String>();
 		values.put(name, "");
-		return expandText(values,text_to_expand);
+		String expandText = expandText(values,text_to_expand);
+		if( expandText == null) {
+			return null; // something went wrong
+		}
+		return expandText;
 	}
 
 	/** perform config parameter expansion on a text fragment.
