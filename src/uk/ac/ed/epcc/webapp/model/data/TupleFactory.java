@@ -444,11 +444,11 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
     }
     protected abstract class AbstractFinder<X> extends FilterFinder<T, X>{
 		public AbstractFinder(boolean allow_null) {
-			super(TupleFactory.this.getContext(),Tuple.class,allow_null);
+			super(TupleFactory.this.getContext(),TupleFactory.this.getTarget(),allow_null);
 		}
 		
 		public AbstractFinder() {
-			super(TupleFactory.this.getContext(),Tuple.class);
+			super(TupleFactory.this.getContext(),TupleFactory.this.getTarget());
 		}
 		@Override
 		protected final void addSource(StringBuilder sb) {
