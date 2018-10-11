@@ -25,7 +25,10 @@ import javax.servlet.WriteListener;
  */
 
 public class MockOutputStream extends ServletOutputStream {
+	
+
 	ByteArrayOutputStream inner = new ByteArrayOutputStream();
+	boolean is_closed=false;
 	/**
 	 * 
 	 */
@@ -38,6 +41,9 @@ public class MockOutputStream extends ServletOutputStream {
 	 */
 	@Override
 	public void write(int b) throws IOException {
+		if( is_closed) {
+			throw new IOException("stream is closed");
+		}
 		inner.write(b);
 	}
 
@@ -55,12 +61,20 @@ public class MockOutputStream extends ServletOutputStream {
 	public boolean isReady() {
 		return true;
 	}
-
+	@Override
+	public void close() throws IOException {
+		super.close();
+		is_closed=true;
+	}
 	/* (non-Javadoc)
 	 * @see javax.servlet.ServletOutputStream#setWriteListener(javax.servlet.WriteListener)
 	 */
 	
 	public void setWriteListener(WriteListener arg0) {
 		
+	}
+	
+	public boolean isClosed() {
+		return is_closed;
 	}
 }

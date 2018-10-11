@@ -61,6 +61,7 @@ public class ServeDataServletTest extends ServletTest {
 		doPost();
 		
 		assertEquals("text/plain",res.getContentType());
+		assertTrue(res.stream.isClosed());
 		assertTrue(res.getOutputStream().toString().startsWith("hello world")); // windows CR LR ignore newline etc.
 		
 	}

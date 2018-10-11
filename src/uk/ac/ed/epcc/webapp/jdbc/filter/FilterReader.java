@@ -157,7 +157,7 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 		query.append(mapper.getTarget());
 		query.append(" FROM ");
 		addSource(query);
-		if( use_join ){ 
+		if( join.length() > 0 ){ 
 			  query.append(" ");
 			  query.append(join);
 		}

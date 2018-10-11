@@ -16,10 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.mock;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Locale;
 
@@ -33,7 +31,7 @@ public class MockResponse implements HttpServletResponse {
 
 	public int error=HttpServletResponse.SC_OK;
 	public String error_str=null;
-	MockOutputStream stream = new MockOutputStream();
+	public MockOutputStream stream = new MockOutputStream();
 	public String content_type="text/html";
 	int content_length=0;
 	

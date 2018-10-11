@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.servlet;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -90,6 +91,7 @@ public class StaticServletTest extends ServletTest {
 		setupTestDir();
 		doPost();
 		assertEquals(HttpServletResponse.SC_OK,res.error);
+		assertTrue(res.stream.isClosed());
 		assertEquals("<html lang='en'><head><title>Listing of test/StaticServlet/</title></head><body></html>\n" + 
 				"<h2 align='center'>Listing of test/StaticServlet/</h2><hr>\n" + 
 				"<ul>\n" + 
@@ -107,6 +109,7 @@ public class StaticServletTest extends ServletTest {
 		req.path_info="/hello.txt";
 		doPost();
 		assertEquals(HttpServletResponse.SC_OK,res.error);
+		assertTrue(res.stream.isClosed());
 		assertEquals("hello world",res.getOutputStream().toString().trim());
 		File f = basedir.toFile();
 		f.delete();

@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
@@ -55,6 +56,7 @@ public class ServeAvatarTest extends ServletTest{
 		req.path_info="Avatar/"+target.getID()+"/avatar.png";
 		doPost();
 		assertEquals("image/png", res.content_type);
+		assertTrue(res.stream.isClosed());
 		MockOutputStream stream = (MockOutputStream) res.getOutputStream();
 		//writeFile("avatar2.png",stream.getData());
 		byte[] data = stream.getData();

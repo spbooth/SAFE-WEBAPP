@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.servlet;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -49,6 +50,7 @@ public class QRServletTest extends ServletTest {
 		addParam("text", "https://en.wikipedia.org/wiki/QR_code");
 		doPost();
 		assertEquals("image/png",res.getContentType());
+		assertTrue(res.stream.isClosed());
 		byte content[] = ((MockOutputStream)res.getOutputStream()).getData();
 		BufferedImage image = ImageIO.read(new ByteArrayInputStream(content));
 		assertEquals(300,image.getHeight());
