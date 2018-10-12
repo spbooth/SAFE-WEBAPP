@@ -78,6 +78,7 @@ public class DBFixtureRule implements TestRule {
 		AppContext conn = ctx.getContext();
 		if( conn != null){
 			conn.clearAttributes();
+			conn.clearObjectCache();
 			conn.getService(ConfigService.class).clearServiceProperties();
 		}
 		if( global_fixtures != null && global_fixtures.length > 0){

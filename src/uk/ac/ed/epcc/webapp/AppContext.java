@@ -159,39 +159,13 @@ public final class AppContext {
 	public static final String CLASS_PREFIX = "class.";
 	// a hastable for caching objects in the AppContext
 	private Map<Object,Object> attributes = null;
+	private Map<String,Object> object_cache = null;
     private LinkedHashMap<Class,AppContextService> services = null;
     // services known not to resolve
     private Set<Class> missing_services =null;
     private boolean disable_service_creation=false;
  
-    /** class to key caching of objects.
-     * 
-     * @author spb
-     *
-     * @param <T>
-     */
-    private static final class FactoryKey<T>{
-    	private final Class<T> target;
-    	private final Class<? extends T> def;
-    	private final String tag;
-    	public FactoryKey(Class<T> target, Class<? extends T> def, String tag){
-    		this.target=target;
-    		this.def=def;
-    		this.tag=(tag==null?"null":tag);
-    	}
-		@Override
-		public boolean equals(Object peer) {
-			if( peer instanceof FactoryKey ){
-				FactoryKey f = (FactoryKey)peer;
-				return f.target==target && f.def==def && f.tag.equals(tag);
-			}
-			return false;
-		}
-		@Override
-		public int hashCode() {
-			return tag.hashCode();
-		}
-    }
+    
     public AppContext(){
     	// Set default values for the mandatory services
     	setService(new DefaultResourceService(this));
@@ -226,6 +200,15 @@ public final class AppContext {
 			}
 			attributes.clear();
 			attributes = null;
+		}
+		if( object_cache != null) {
+			for( Object o : object_cache.values()) {
+				if( o instanceof AppContextCleanup) {
+					((AppContextCleanup)o).cleanup();
+				}
+			}
+			object_cache.clear();
+			object_cache = null;
 		}
 		if( services != null ){
 			Set<Class> keySet = services.keySet();
@@ -1023,14 +1006,18 @@ public final class AppContext {
 		}else{
 			timer_name="makeObjectWithDefault."+clazz.getCanonicalName();
 		}
-		FactoryKey<T> key=null;
 		T result=null;
-		// FactoryKey won't work if tag null
-		if(tag != null && ContextCached.class.isAssignableFrom(clazz)&&CONTEXT_CACHE_FEATURE.isEnabled(this)){
-			key = new FactoryKey<T>(clazz, default_class, tag);
-			T res = (T) getAttribute(key);
-			if( res != null ){
-				return res;
+		
+		boolean use_cache = tag != null  && ContextCached.class.isAssignableFrom(clazz)&&CONTEXT_CACHE_FEATURE.isEnabled(this);
+		if(use_cache && object_cache != null){
+			Object o = object_cache.get(tag);
+			if( o != null) {
+				if( clazz.isAssignableFrom(o.getClass())) {
+					return (T) o;
+				}else {
+					error("Unexpected class "+o.getClass().getCanonicalName()+" not assignable to "+clazz.getCanonicalName()+" tag:"+tag);
+					object_cache.remove(tag);
+				}
 			}
 		}
 		Class<? extends T> target = getPropertyClass(clazz,default_class,tag);
@@ -1055,8 +1042,11 @@ public final class AppContext {
 					result =  target.newInstance();
 				}
 			}
-			if( key != null && result != null ){
-				setAttribute(key, result);
+			if( use_cache ){
+				if( object_cache == null) {
+					object_cache = new HashMap<>();
+				}
+				object_cache.put(tag, result);
 			}
 			if( result instanceof Tagged){
 				if( TAG_CHECK_FEATURE.isEnabled(this) && ! name.equals(((Tagged)result).getTag())){
@@ -1317,7 +1307,17 @@ public final class AppContext {
 		}
 		attributes=null;
 	}
+	public final void clearObjectCache(){
+		if( object_cache != null ){
+			object_cache.clear();
+		}
+		object_cache=null;
+	}
 
-
+	public final void removeCached(String tag) {
+		if( object_cache != null) {
+			object_cache.remove(tag);
+		}
+	}
 	
 }
