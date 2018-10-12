@@ -28,9 +28,11 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
@@ -159,7 +161,7 @@ public final class AppContext {
 	public static final String CLASS_PREFIX = "class.";
 	// a hastable for caching objects in the AppContext
 	private Map<Object,Object> attributes = null;
-	private Map<String,Object> object_cache = null;
+
     private LinkedHashMap<Class,AppContextService> services = null;
     // services known not to resolve
     private Set<Class> missing_services =null;
@@ -193,22 +195,16 @@ public final class AppContext {
 		disable_service_creation=true;
 		
 		if (attributes != null) {
-			for( Object o : attributes.values()) {
+			for( Iterator<Entry<Object, Object>> it =attributes.entrySet().iterator();it.hasNext();) {
+				Map.Entry e = it.next();
+				Object o = e.getValue();
 				if( o instanceof AppContextCleanup) {
 					((AppContextCleanup)o).cleanup();
 				}
+				it.remove();
 			}
 			attributes.clear();
 			attributes = null;
-		}
-		if( object_cache != null) {
-			for( Object o : object_cache.values()) {
-				if( o instanceof AppContextCleanup) {
-					((AppContextCleanup)o).cleanup();
-				}
-			}
-			object_cache.clear();
-			object_cache = null;
 		}
 		if( services != null ){
 			Set<Class> keySet = services.keySet();
@@ -967,6 +963,58 @@ public final class AppContext {
 	public final <T> T makeObjectWithDefault(Class<T> clazz, Class<? extends T> default_class, String tag){
 		return makeObjectWithDefault(clazz, default_class,null, tag);
 	}
+	/** Special class to key objects created by {@link AppContext#makeObjectWithDefault(Class, Class, String, String)}
+	 * stored as attributes.
+	 * It is a private class to prevent these being accessed other than via the {@link AppContext} methods.
+	 * We only key on the path and tag as this is sufficient to identify the class.
+	 * 
+	 * @author Stephen Booth
+	 *
+	 */
+	private static final class ObjectCacheKey{
+		
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((path == null) ? 0 : path.hashCode());
+			result = prime * result + ((tag == null) ? 0 : tag.hashCode());
+			return result;
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ObjectCacheKey other = (ObjectCacheKey) obj;
+			if (path == null) {
+				if (other.path != null)
+					return false;
+			} else if (!path.equals(other.path))
+				return false;
+			if (tag == null) {
+				if (other.tag != null)
+					return false;
+			} else if (!tag.equals(other.tag))
+				return false;
+			return true;
+		}
+		/**
+		 * @param path
+		 * @param tag
+		 */
+		public ObjectCacheKey(String path, String tag) {
+			super();
+			this.path = path;
+			this.tag = tag;
+		}
+		private final String path;
+		private final String tag;
+	}
 	/** Construct an object identified by a string tag and an optional qualifier string.
 	 * <p>
 	 * The qualifier string if for cases where it is convenient to use the same tag string
@@ -1007,16 +1055,16 @@ public final class AppContext {
 			timer_name="makeObjectWithDefault."+clazz.getCanonicalName();
 		}
 		T result=null;
-		
-		boolean use_cache = tag != null  && ContextCached.class.isAssignableFrom(clazz)&&CONTEXT_CACHE_FEATURE.isEnabled(this);
-		if(use_cache && object_cache != null){
-			Object o = object_cache.get(tag);
+		ObjectCacheKey key = null;
+		if( tag != null  && ContextCached.class.isAssignableFrom(clazz)&&CONTEXT_CACHE_FEATURE.isEnabled(this)) {
+			key = new ObjectCacheKey(path, tag);
+			Object o = getAttribute(key);
 			if( o != null) {
 				if( clazz.isAssignableFrom(o.getClass())) {
 					return (T) o;
 				}else {
 					error("Unexpected class "+o.getClass().getCanonicalName()+" not assignable to "+clazz.getCanonicalName()+" tag:"+tag);
-					object_cache.remove(tag);
+					removeAttribute(key);
 				}
 			}
 		}
@@ -1042,11 +1090,8 @@ public final class AppContext {
 					result =  target.newInstance();
 				}
 			}
-			if( use_cache ){
-				if( object_cache == null) {
-					object_cache = new HashMap<>();
-				}
-				object_cache.put(tag, result);
+			if( key != null ){
+				setAttribute(key, result);
 			}
 			if( result instanceof Tagged){
 				if( TAG_CHECK_FEATURE.isEnabled(this) && ! name.equals(((Tagged)result).getTag())){
@@ -1307,17 +1352,10 @@ public final class AppContext {
 		}
 		attributes=null;
 	}
-	public final void clearObjectCache(){
-		if( object_cache != null ){
-			object_cache.clear();
-		}
-		object_cache=null;
-	}
+	
 
-	public final void removeCached(String tag) {
-		if( object_cache != null) {
-			object_cache.remove(tag);
-		}
+	public final void removeCached(String path,String tag) {
+		removeAttribute(new ObjectCacheKey(path, tag));
 	}
 	
 }

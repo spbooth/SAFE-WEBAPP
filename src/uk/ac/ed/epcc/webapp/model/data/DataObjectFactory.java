@@ -1107,7 +1107,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 */
 	public void release(){
 		// make sure we are not cached before destroying state
-		getContext().removeCached(getTag());
+		getContext().removeCached(null,getTag());
 		res=null;
 		finder=null;
 		if( composites != null ){
