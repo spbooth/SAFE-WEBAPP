@@ -95,15 +95,17 @@ public class ErrorFilter implements Filter {
 		 * @param conn
 		 * @param log
 		 */
-		public Closer(AppContext conn, CleanupService serv, Logger log) {
+		public Closer(AppContext conn, CleanupService serv, Logger log, long max_wait) {
 			super();
 			this.conn = conn;
 			this.serv = serv;
 			this.log = log;
+			this.max_wait=max_wait;
 		}
 		private final AppContext conn;
 		private final CleanupService serv;
 		private final Logger log;
+		private final long max_wait;
 		/* (non-Javadoc)
 		 * @see java.lang.Runnable#run()
 		 */
@@ -117,8 +119,16 @@ public class ErrorFilter implements Filter {
 					conn.setService(new EmailLoggerService(conn));
 				}
 				// Make sure Cleanup runs first
+				long start_cleanup = System.currentTimeMillis();
 				serv.cleanup();
-				
+				long stop_cleanup = System.currentTimeMillis();
+				long elapsed = stop_cleanup - start_cleanup;
+				if( elapsed > max_wait) { 
+					long milli = elapsed % 1000L;
+					long seconds = (elapsed / 1000L)%60;
+					long min = elapsed / 60000L;
+					log.error("Long running cleanup "+String.format("%d:%02d.%03d", min,seconds,milli));
+				}
 			}catch(Exception t){
 				log.error("Error running cleanup from Closer", t);
 			}finally{
@@ -243,19 +253,34 @@ public class ErrorFilter implements Filter {
 				// non interactive jobs always wait as they may be processing a lot of data in
 				// a loop and we don't want to exhaust the connection pool
 				
+				Logger log = getLocalLogger(req,res);
 				if( interactive && CLEANUP_THREAD_FEATURE.isEnabled(conn) && cleanup != null && cleanup.hasActions()){
 					conn.clearService(CleanupService.class);
 					// cleanup in thread
-					Thread t = new Thread(new Closer(conn, cleanup, getLocalLogger(req,res)));
+					Thread t = new Thread(new Closer(conn, cleanup, log,max_wait));
 					t.start();
 				}else{
 					try{
 						if( cleanup != null && cleanup.hasActions()){
+							long start_cleanup = System.currentTimeMillis();
 							cleanup.action();
+							long stop_cleanup = System.currentTimeMillis();
+							elapsed = stop_cleanup - start_cleanup;
+							if( elapsed > max_wait) { 
+								long milli = elapsed % 1000L;
+								long seconds = (elapsed / 1000L)%60;
+								long min = elapsed / 60000L;
+								log.error("Long running cleanup "+String.format("%d:%02d.%03d", min,seconds,milli));
+							}
 						}
-						conn.close();
-					}catch(Exception t){
-						getLocalLogger(req,res).error("Error closing AppContext",t);
+					}catch(Exception e) {
+						log.error("Error in closer ",e);
+					}finally{
+						try {
+							conn.close();
+						}catch(Exception t){
+							log.error("Error closing AppContext",t);
+						}
 					}
 				}
 				conn = null;
