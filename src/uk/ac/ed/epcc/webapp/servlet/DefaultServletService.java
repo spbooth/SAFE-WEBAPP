@@ -460,6 +460,10 @@ public class DefaultServletService implements ServletService{
 				return;
 			}
 		}
+		if( isComitted()) {
+			// Can't do anything
+			return;
+		}
 		if( getWebName() == null  
 				&& (! EXTERNAL_AUTH_VIA_lOGIN_FEATURE.isEnabled(conn)) &&
 			( composite == null || EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(getContext()))){

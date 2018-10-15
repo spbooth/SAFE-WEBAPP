@@ -22,7 +22,7 @@
     try{
         if( request.getAttribute("AmRequiredPage") == null){
     		Object skip=session.getAttribute("RequiredPages");
-    		if( session_service != null && skip==null && ! ((ServletSessionService) session_service).isSU() ){
+    		if( session_service != null && session_service.haveCurrentUser() && skip==null && ! ((ServletSessionService) session_service).isSU() ){
     			AppUserFactory<?> fac = session_service.getLoginFactory();
     			for(RequiredPage p : fac.getRequiredPages() ){
     				if( p.required(session_service) ){
@@ -39,7 +39,7 @@
     			session.setAttribute("RequiredPages","done");
     		}
     	}
-    }catch(Throwable e){
+    }catch(Exception e){
     	conn.error(e,"Error processing required pages");
     }
 %>

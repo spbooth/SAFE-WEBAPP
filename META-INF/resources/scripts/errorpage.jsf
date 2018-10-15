@@ -37,7 +37,7 @@ if( error_code != null ){
 	default:
 	}
 }
-}catch(Throwable t){
+}catch(Exception t){
 	// really try to make sure no exception occurs in the page
 }
 %>

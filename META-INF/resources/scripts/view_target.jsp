@@ -114,7 +114,7 @@ for(Object key : provider.getTransitions(target)){
 		}
 	}
 }
-}catch(Throwable e){
+}catch(Exception e){
 	conn.error(e,"Error building view target form");
 	//throw e;
 }
