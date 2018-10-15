@@ -112,12 +112,7 @@ public class ErrorFilter implements Filter {
 		@Override
 		public void run() {
 			try{
-				if( EMAIL_LOGGING_FEATURE.isEnabled(conn)) {
-					// we no longer have the request so use normal logger service
-					// this will automatically pick up the nested logger if the
-					// current logger is a [Servlet]EmailLoggerservice 
-					conn.setService(new EmailLoggerService(conn));
-				}
+				
 				// Make sure Cleanup runs first
 				long start_cleanup = System.currentTimeMillis();
 				serv.cleanup();
@@ -134,6 +129,7 @@ public class ErrorFilter implements Filter {
 			}finally{
 				try {
 					conn.close();
+					log.debug("appcontext closed");
 				}catch(Exception x){
 					log.error("Error closing AppContext from Closer",x);
 				}
@@ -253,13 +249,22 @@ public class ErrorFilter implements Filter {
 				// non interactive jobs always wait as they may be processing a lot of data in
 				// a loop and we don't want to exhaust the connection pool
 				
-				Logger log = getLocalLogger(req,res);
+				
 				if( interactive && CLEANUP_THREAD_FEATURE.isEnabled(conn) && cleanup != null && cleanup.hasActions()){
+					if( EMAIL_LOGGING_FEATURE.isEnabled(conn)) {
+						// we no longer have the request so use normal logger service
+						// this will automatically pick up the nested logger if the
+						// current logger is a [Servlet]EmailLoggerservice 
+						conn.setService(new EmailLoggerService(conn));
+					}
 					conn.clearService(CleanupService.class);
+					conn.clearService(ServletService.class);
+					Logger log = getCustomLogger(req,res);
 					// cleanup in thread
 					Thread t = new Thread(new Closer(conn, cleanup, log,max_wait));
 					t.start();
 				}else{
+					Logger log = getCustomLogger(req,res);
 					try{
 						if( cleanup != null && cleanup.hasActions()){
 							long start_cleanup = System.currentTimeMillis();

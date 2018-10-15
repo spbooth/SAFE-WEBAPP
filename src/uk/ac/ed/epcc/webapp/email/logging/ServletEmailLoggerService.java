@@ -119,7 +119,7 @@ public class ServletEmailLoggerService extends EmailLoggerService {
 			}
 		}
 		}catch(Exception t){
-			
+			getSelfLogger().error("Error getting servlet props", t);
 		}
 		return props;
 	}

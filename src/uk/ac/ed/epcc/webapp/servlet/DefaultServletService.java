@@ -147,6 +147,9 @@ public class DefaultServletService implements ServletService{
 	 * @return String
 	 */
 	String encodePage(HttpServletRequest req) {
+		if( req == null) {
+			return "";
+		}
 		String res, tmp;
 
 		
@@ -253,12 +256,14 @@ public class DefaultServletService implements ServletService{
 	@SuppressWarnings("unchecked")
 	public Map<String,Object> getParams() {
 		Map<String,Object> h = null;
-		// look for cached value
-		h = (Map<String,Object>) req.getAttribute(PARAMS_KEY_NAME);
-		if (h == null) {
-			h = makeParams((HttpServletRequest) req);
+		if( req != null ) {
+			// look for cached value
+			h = (Map<String,Object>) req.getAttribute(PARAMS_KEY_NAME);
+			if (h == null) {
+				h = makeParams((HttpServletRequest) req);
 
-			req.setAttribute(PARAMS_KEY_NAME, h);
+				req.setAttribute(PARAMS_KEY_NAME, h);
+			}
 		}
 		return h;
 		// Caching causes problems when adding params on a page forward
@@ -274,7 +279,7 @@ public class DefaultServletService implements ServletService{
 	 */
     public LinkedList<String> getArgs(){
     	LinkedList<String> h = new LinkedList<String>();
-    	if( req instanceof HttpServletRequest){
+    	if( req != null && req instanceof HttpServletRequest){
     	String path = ((HttpServletRequest)req).getPathInfo();
 		if (path != null) {
 			StringTokenizer st = new StringTokenizer(path, "/", false);
@@ -299,6 +304,7 @@ public class DefaultServletService implements ServletService{
 	 */
 	public String getWebName() {
 		String name=null;
+		if( req != null) {
 		// If the web.xml defines a certificate based security-constraint then the
 		// certificate info will be available from getUserPrincipal
 		Principal p = null;
@@ -329,6 +335,7 @@ public class DefaultServletService implements ServletService{
 		if (name != null) {
 			return name.trim();
 		}
+		}
 		return null;
 	}
 
@@ -346,7 +353,7 @@ public class DefaultServletService implements ServletService{
 	public Map<String,Object> makeParams(HttpServletRequest req)  {
 		Hashtable<String,Object> h = new Hashtable<String,Object>();
 		
-
+		
 		String path = req.getPathInfo();
 		if (path != null) {
 			StringTokenizer st = new StringTokenizer(path, "/", false);

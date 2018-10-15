@@ -168,6 +168,9 @@ public class EmailLoggerService implements Contexed, LoggerService {
 			}
 		}
 	}
+	protected Logger getSelfLogger() {
+		return self_logger;
+	}
 
 	public Class<? super LoggerService> getType() {
 		return LoggerService.class;
