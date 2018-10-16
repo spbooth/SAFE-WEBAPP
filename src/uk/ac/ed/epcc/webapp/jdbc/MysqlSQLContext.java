@@ -38,6 +38,7 @@ public class MysqlSQLContext implements SQLContext {
 	private final Connection conn;
 	private final DatabaseService serv;
 
+	private boolean closed=false;
 	public MysqlSQLContext(AppContext ctx,DatabaseService serv,Connection conn) {
 		this.ctx=ctx;
 		this.conn=conn;
@@ -46,6 +47,7 @@ public class MysqlSQLContext implements SQLContext {
 	}
 
 	public Connection getConnection() {
+		if(closed) return null;
 		return conn;
 	}
 
@@ -87,6 +89,7 @@ public class MysqlSQLContext implements SQLContext {
 	public void close() throws SQLException {
 		if(conn != null){
 			conn.close();
+			closed=true;
 		}
 
 	}

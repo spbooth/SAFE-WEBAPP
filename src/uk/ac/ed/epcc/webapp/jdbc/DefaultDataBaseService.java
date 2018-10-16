@@ -238,6 +238,7 @@ public class DefaultDataBaseService implements DatabaseService {
 							// Make sure we don't leave a pooled connection in transaction mode.
 							connection.setAutoCommit(true);
 						}
+						// This closes the nested connection
 						c.close();
 					} catch (Exception e) {
 						error(e,"Error closing database connection");

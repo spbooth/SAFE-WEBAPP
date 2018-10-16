@@ -284,6 +284,7 @@ public class ErrorFilter implements Filter {
 					}finally{
 						try {
 							conn.close();
+							log.debug("appcontext closed from main thread");
 						}catch(Exception t){
 							log.error("Error closing AppContext",t);
 						}
