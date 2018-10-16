@@ -2113,8 +2113,10 @@ public final class Repository implements AppContextCleanup{
 	}
 
 	protected synchronized void clearFields(){
-		fields.clear();
-		fields=null;
+		if( fields != null) {
+			fields.clear();
+			fields=null;
+		}
 	}
 	/** perform any conversions to Date supported by this Repository.
 	 * This is public so external code that queries directly can use them.
