@@ -135,4 +135,11 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * @return
 	 */
 	public boolean isComitted();
+	
+	/** Add additional information about the request to the properties of a debugging
+	 * error report email.
+	 * 
+	 * @param props
+	 */
+	public void addErrorProps(Map props);
 }

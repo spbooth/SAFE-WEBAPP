@@ -38,7 +38,6 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CleanupService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.config.OverrideConfigService;
-import uk.ac.ed.epcc.webapp.email.logging.EmailLoggerService;
 import uk.ac.ed.epcc.webapp.email.logging.ServletEmailLoggerService;
 import uk.ac.ed.epcc.webapp.jdbc.JNDIDatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.config.DataBaseConfigService;
@@ -93,7 +92,9 @@ public class ErrorFilter implements Filter {
 	public static class Closer implements Runnable{
 		/**
 		 * @param conn
+		 * @param serv 
 		 * @param log
+		 * @param max_wait 
 		 */
 		public Closer(AppContext conn, CleanupService serv, Logger log, long max_wait) {
 			super();
@@ -185,9 +186,11 @@ public class ErrorFilter implements Filter {
 		try {
 			
 			chain.doFilter(req, res);
-		} catch(java.net.SocketException se){
+		} catch(java.io.IOException se){
 			// usually just the browser has gone away just log this
-			getCustomLogger(req, res).warn("Socket exception "+se.getMessage());
+			// use a local logger to avoid creating an AppContext unecessarily especially
+			// if this is just static content where the socket has closed.
+			getLocalLogger(req, res).warn("IO exception "+se.getMessage());
 	    }catch (ServletException e) {
 	    	
 			Throwable root = e.getRootCause();
@@ -221,7 +224,9 @@ public class ErrorFilter implements Filter {
 			}
 			// Note that Servlet2.4 spec says exceptions thrown from a filter
 			// are not handled by error-page but error codes are
-			res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			if( ! res.isCommitted()) {
+				res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			}
 		}finally{
 			AppContext conn = (AppContext) req.getAttribute(APP_CONTEXT_ATTR);
 			if (conn != null && toplevel) {
@@ -251,13 +256,9 @@ public class ErrorFilter implements Filter {
 				
 				
 				if( interactive && CLEANUP_THREAD_FEATURE.isEnabled(conn) && cleanup != null && cleanup.hasActions()){
-					if( EMAIL_LOGGING_FEATURE.isEnabled(conn)) {
-						// we no longer have the request so use normal logger service
-						// this will automatically pick up the nested logger if the
-						// current logger is a [Servlet]EmailLoggerservice 
-						conn.setService(new EmailLoggerService(conn));
-					}
 					conn.clearService(CleanupService.class);
+					// request no longer valid so make sure its not available
+					// the ServletEmailLoggerService should cope is no service returned
 					conn.clearService(ServletService.class);
 					Logger log = getCustomLogger(req,res);
 					// cleanup in thread
@@ -364,6 +365,8 @@ public class ErrorFilter implements Filter {
 
 	/** Get a logger object that does not require the use of an AppContext
 	 * Needed for logging problems with creating the AppContext.
+	 * @param req 
+	 * @param res 
 	 * 
 	 * @return Logger
 	 */
@@ -378,7 +381,7 @@ public class ErrorFilter implements Filter {
 	public static Logger getCustomLogger(HttpServletRequest req,HttpServletResponse res ){
 		AppContext conn=null;
 		try {
-			conn = retrieveAppContext(req,res);
+			conn = retrieveAppContext(req,res,false);
 		} catch (ServletException e) {
 			// already want a logger
 			Logger log = getLocalLogger(req, res);
@@ -405,16 +408,20 @@ public class ErrorFilter implements Filter {
 	 */
 	public static AppContext retrieveAppContext(
 			HttpServletRequest req, HttpServletResponse res) throws ServletException {
-		AppContext conn = (AppContext) req
-				.getAttribute(APP_CONTEXT_ATTR);
+		return retrieveAppContext(req, res, true);
+	}
+	public static AppContext retrieveAppContext(
+				HttpServletRequest req, HttpServletResponse res,boolean create) throws ServletException {	
+		AppContext conn = (AppContext) req.getAttribute(APP_CONTEXT_ATTR);
 		// IF there is already an AppContext in the request then this is a recursive filter call so skip
-		if( req.getAttribute(APP_CONTEXT_ATTR) == null ){
+		if( req.getAttribute(APP_CONTEXT_ATTR) == null && create){
 			try {
 
 				conn = makeContext((ServletContext) req.getAttribute(SERVLET_CONTEXT_ATTR),req,res);
+				req.setAttribute(APP_CONTEXT_ATTR, conn);
 				if( EMAIL_LOGGING_FEATURE.isEnabled(conn)) {
 					// report error logs by email with page info need to replace this within closer
-					conn.setService( new ServletEmailLoggerService(conn,req));
+					conn.setService( new ServletEmailLoggerService(conn));
 				}
 				if( TIMER_FEATURE.isEnabled(conn)){
 					DefaultTimerService timer_service = new DefaultTimerService(conn);
@@ -431,7 +438,8 @@ public class ErrorFilter implements Filter {
 					String host=(String) sess.getAttribute(LAST_ADDR_ATTR);
 					if( host != null ){
 						if( ! host.equals(req.getRemoteAddr())){ // host address has changed in a session
-							getCustomLogger(req, res).error("Possible session stealing remote address has changed "+host+" != "+req.getRemoteAddr());
+							// we have an AppContext so don't recurse to getCustomLogger
+							conn.getService(LoggerService.class).getLogger(ErrorFilter.class).error("Possible session stealing remote address has changed "+host+" != "+req.getRemoteAddr());
 							if(  conn.getBooleanParameter("session.ipcheck", true)){
 								conn.getService(SessionService.class).clearCurrentPerson();
 							}
@@ -441,7 +449,7 @@ public class ErrorFilter implements Filter {
 					}
 				}
 
-				req.setAttribute(APP_CONTEXT_ATTR, conn);
+				
 
 			} catch (Throwable e1) {
 				throw new ServletException("Exception making AppContext", e1);

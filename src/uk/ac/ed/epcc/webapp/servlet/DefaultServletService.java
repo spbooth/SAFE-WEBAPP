@@ -22,6 +22,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,6 +38,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.codec.binary.Base64;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -652,5 +654,85 @@ public class DefaultServletService implements ServletService{
 	@Override
 	public boolean isComitted() {
 		return res.isCommitted();
+	}
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.servlet.ServletService#addErrorProps(java.util.Map)
+	 */
+	@Override
+	public void addErrorProps(Map props) {
+		HttpServletRequest req = getRequest();
+		if (req != null ) {
+			
+			String url = null;
+			StringBuffer buf =  req.getRequestURL();
+			if( buf != null ){
+				url = buf.toString();
+			}
+			if( url != null && url.contains("password")){
+				url="redacted";
+			}
+			if( url != null ){
+				props.put("request_url", url);
+			}
+			
+			// Get the user-agent info
+			Vector<String> headers = new Vector<String>();
+			for (Enumeration enumeration = req.getHeaderNames(); enumeration
+			.hasMoreElements();) {
+				String header = (String) enumeration.nextElement();
+				if( ! header.contains("cookie") && ! header.contains("authorization")){
+					// don't log security sensative info
+					headers.add("    " + header + " = '" + req.getHeader(header)
+							+ "'\n");
+				}
+			}
+			props.put("headers", headers);
+
+			StringBuilder service_list = new StringBuilder();
+			for(AppContextService s : getContext().getServices()){
+				service_list.append("   ");
+				service_list.append(s.getType().getSimpleName());
+				service_list.append(": ");
+				service_list.append(s.getClass().getCanonicalName());
+				service_list.append("\n");
+			}
+			props.put("services", service_list.toString());
+			// Show IP Address of current remote client
+			String ip_address = null;
+
+			ip_address = req.getRemoteAddr();
+
+			if (ip_address != null) {
+				props.put("ip_address", ip_address);
+			}
+
+			// And show all parameters
+			StringBuilder psb = new StringBuilder();
+
+			for (Enumeration param_names = req.getParameterNames(); param_names
+			.hasMoreElements();) {
+				String name = (String) param_names.nextElement();
+				if( ! name.equalsIgnoreCase("password")){
+					psb.append("  ");
+					psb.append(name); 
+
+					String val = req.getParameter(name);
+					if( val.length() < 512){
+						psb.append(" = ");
+						psb.append(val);
+					}else{
+						psb.append(" - long parameter");
+					}
+					psb.append("\n");
+				}
+			}
+
+			if (psb.length() > 0) {
+				props.put("parameters", psb.toString());
+			}
+		}
+		
 	}
 }
