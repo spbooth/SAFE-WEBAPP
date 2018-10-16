@@ -122,6 +122,7 @@ public class MysqlSQLContext implements SQLContext {
 				if( rs.next()){
 					name = rs.getString(1);
 				}
+				rs.close();
 				stmt.close();
 			}
 		}catch(SQLException e){

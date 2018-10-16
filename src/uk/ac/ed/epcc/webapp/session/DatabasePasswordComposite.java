@@ -414,6 +414,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 						}
 					}else{
 						SQLContext sqlContext = getRepository().getSQLContext();
+						PreparedStatement stmt=null;
 						try {
 							
 							
@@ -447,7 +448,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 							sb.append("=?");
 
 							
-							PreparedStatement stmt = sqlContext.getConnection().prepareStatement(
+							stmt = sqlContext.getConnection().prepareStatement(
 									sb.toString());
 							int pos=1;
 							if( use_salt ){
@@ -471,6 +472,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 							// getLogger().debug("Update = " + query);
 							stmt.executeUpdate();
 							stmt.close();
+							stmt=null;
 						} catch (CannotUseSQLException e) {
 							getLogger().error("Error setting password by sql",e);
 							try {
@@ -480,6 +482,14 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 							}
 						} catch ( SQLException e2) {
 							sqlContext.getService().handleError("Error setting password",e2);
+						}finally {
+							try {
+								if( stmt != null && ! stmt.isClosed()) {
+									stmt.close();
+								}
+							}catch(SQLException e) {
+
+							}
 						}
 					}
 					setPasswordStatus(DatabasePasswordComposite.VALID);

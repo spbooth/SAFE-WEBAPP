@@ -270,6 +270,7 @@ public class DataBaseConfigService implements ConfigService {
 				PreparedStatement del = sql.getConnection().prepareStatement(query.toString());
 				del.setString(1, name);
 				del.executeUpdate();
+				del.close();
 				if( db_props != null ){
 					db_props.remove(name);
 				}
@@ -286,6 +287,7 @@ public class DataBaseConfigService implements ConfigService {
 					insert.setString(1, name);
 					insert.setString(2, value);
 					insert.executeUpdate();
+					insert.close();
 					if( db_props != null ){
 						db_props.setProperty(name,value);
 					}

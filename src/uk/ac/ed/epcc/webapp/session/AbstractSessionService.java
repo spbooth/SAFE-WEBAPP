@@ -772,7 +772,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 					return true;
 				}
 			} finally {
-				if( stmt != null ){
+				if( stmt != null && ! stmt.isClosed() ){
 				   stmt.close();
 				}
 			}
@@ -846,7 +846,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 					log.debug(role_query+" id="+id+" role="+role);
 				}
 			} finally {
-				if( stmt != null){
+				if( stmt != null && ! stmt.isClosed()){
 				  stmt.close();
 				}
 			}
@@ -879,7 +879,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 					log.debug(role_query+" id="+id+" role="+role);
 				}
 			} finally {
-				if( stmt != null ){
+				if( stmt != null  && ! stmt.isClosed()){
 				  stmt.close();
 				}
 			}

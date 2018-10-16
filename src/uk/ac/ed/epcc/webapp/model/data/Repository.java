@@ -2856,24 +2856,40 @@ public final class Repository implements AppContextCleanup{
 	 */
 	synchronized private void setMetaData() {
 		if( fields == null){
-		try {
-			Connection c = sql.getConnection();
-			Statement stmt = c.createStatement();
-			StringBuilder sb = new StringBuilder();
-			sb.append("SELECT * FROM ");
-			addTable(sb, true);
-			sb.append(" WHERE 1=0");
-			ResultSet rs = stmt.executeQuery(sb.toString());
-			setMetaData(rs);
-			stmt.close();
-			setReferences(ctx,c);
-		}catch( SQLSyntaxErrorException se) {
-			// This occurs when table does not exist
-			throw new NoTableException(getTable(), se);
-		} catch (Exception e) {
-			//ctx.error(e, "Error creating MetaData for " + getTag());
-			throw new DataError("Error in setMetaData for "+getTag(),e);
-		}
+			Statement stmt=null;
+			ResultSet rs=null;
+			try {
+				Connection c = sql.getConnection();
+				stmt = c.createStatement();
+				StringBuilder sb = new StringBuilder();
+				sb.append("SELECT * FROM ");
+				addTable(sb, true);
+				sb.append(" WHERE 1=0");
+				rs = stmt.executeQuery(sb.toString());
+				setMetaData(rs);
+				rs.close();
+				rs=null;
+				stmt.close();
+				stmt=null;
+				setReferences(ctx,c);
+			}catch( SQLSyntaxErrorException se) {
+				// This occurs when table does not exist
+				throw new NoTableException(getTable(), se);
+			} catch (Exception e) {
+				//ctx.error(e, "Error creating MetaData for " + getTag());
+				throw new DataError("Error in setMetaData for "+getTag(),e);
+			}finally {
+				try {
+					if( rs != null && ! rs.isClosed()) {
+						rs.close();
+					}
+					if( stmt != null && ! stmt.isClosed()) {
+						stmt.close();
+					}
+				}catch(Exception t) {
+					
+				}
+			}
 		}
 	}
 	synchronized private void setIndexes(){
@@ -2899,7 +2915,7 @@ public final class Repository implements AppContextCleanup{
 				}
 				
 			}
-
+			rs.close();
 			indexes=result;
 		}catch(SQLException e){
 			db_serv.logError("Error getting index names", e);
@@ -3282,6 +3298,12 @@ public final class Repository implements AppContextCleanup{
 	 */
 	@Override
 	public void cleanup() {
+		flushCache();
+		clearFields();
+		if( indexes != null) {
+			indexes.clear();
+			indexes=null;
+		}
 	    try {
 			if(find_statement != null && ! find_statement.isClosed()) {
 				find_statement.close();
