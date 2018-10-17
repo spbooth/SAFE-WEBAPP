@@ -182,7 +182,6 @@ public class DataBaseConfigService implements ConfigService {
 					if( connection == null){
 						conn.error("No database connection");
 					}else{
-						Statement select = connection.createStatement();
 						StringBuilder query = new StringBuilder();
 						query.append("SELECT ");
 						sql.quote(query,"Name");
@@ -190,16 +189,17 @@ public class DataBaseConfigService implements ConfigService {
 						sql.quote(query,"Value");
 						query.append(" FROM ");
 						sql.quote(query,prop_table);
-						ResultSet res = select.executeQuery(query.toString());
-						while( res.next()){
-							String value = res.getString(2);
-							if(value != null && value.trim().length() > 0){
-								db_props.setProperty(res.getString(1), value);
-								changed=true;
+						try(Statement select = connection.createStatement();
+								ResultSet res = select.executeQuery(query.toString())
+								){
+							while( res.next()){
+								String value = res.getString(2);
+								if(value != null && value.trim().length() > 0){
+									db_props.setProperty(res.getString(1), value);
+									changed=true;
+								}
 							}
 						}
-						res.close();
-						select.close();
 					}
 					}catch(SQLException se) {
 						sql.getService().handleError("Error getting properties", se);
@@ -267,10 +267,10 @@ public class DataBaseConfigService implements ConfigService {
 				query.append(" WHERE ");
 				sql.quote(query,"Name");
 				query.append("=?");
-				PreparedStatement del = sql.getConnection().prepareStatement(query.toString());
-				del.setString(1, name);
-				del.executeUpdate();
-				del.close();
+				try(PreparedStatement del = sql.getConnection().prepareStatement(query.toString())){
+					del.setString(1, name);
+					del.executeUpdate();
+				}
 				if( db_props != null ){
 					db_props.remove(name);
 				}
@@ -283,11 +283,11 @@ public class DataBaseConfigService implements ConfigService {
 					insert_query.append(",");
 					sql.quote(insert_query, VALUE);
 					insert_query.append(") VALUES (?,?)");
-					PreparedStatement insert = sql.getConnection().prepareStatement(insert_query.toString());
-					insert.setString(1, name);
-					insert.setString(2, value);
-					insert.executeUpdate();
-					insert.close();
+					try(PreparedStatement insert = sql.getConnection().prepareStatement(insert_query.toString())){
+						insert.setString(1, name);
+						insert.setString(2, value);
+						insert.executeUpdate();
+					}
 					if( db_props != null ){
 						db_props.setProperty(name,value);
 					}

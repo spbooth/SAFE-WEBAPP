@@ -76,13 +76,13 @@ public class AddStdIndexTransition<T extends DataObjectFactory> extends EditTabl
 				type.accept(sql.getCreateVisitor(query, args));
 				Logger log = res.getContext().getService(LoggerService.class).getLogger(getClass());
 				log.debug("Query is "+query.toString());
-				java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString());
-				int pos=1;
-				for(Object o: args){
-					stmt.setObject(pos++, o);
+				try(java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString())){
+					int pos=1;
+					for(Object o: args){
+						stmt.setObject(pos++, o);
+					}
+					stmt.execute();
 				}
-				stmt.execute();
-				stmt.close();
 				
 				resetStructure(target);
 			} catch (Exception e) {

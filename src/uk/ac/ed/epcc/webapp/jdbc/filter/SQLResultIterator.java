@@ -49,7 +49,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * @param <O> Type of object produced.
  * 
  */
-public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implements java.util.Iterator<O> {
+public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implements java.util.Iterator<O>, AutoCloseable {
 	static final int DEFAULT_CHUNKSIZE = 1024;
 		
     static final Feature CHUNKING_FEATURE= new Feature("chunking",true,"retrieve SQL data in chunks using limit clause");

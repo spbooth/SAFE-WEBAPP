@@ -145,17 +145,18 @@ public class DatabaseUpgrader extends Object implements Command {
 
 			SQLContext sqlContext = db.getSQLContext();
 			Connection c = sqlContext.getConnection();
-			Statement stmt = c.createStatement();
-			ResultSet rs = stmt.executeQuery("SHOW TABLES");
-			Statement s2 = c.createStatement();
-			while( rs.next()){
-				String name = rs.getString(1);
-		
-					System.out.println(name);
-					process(c,s2,name);
-				
-			}
+			try(Statement stmt = c.createStatement()){
+				ResultSet rs = stmt.executeQuery("SHOW TABLES");
+				try(Statement s2 = c.createStatement()){
+					while( rs.next()){
+						String name = rs.getString(1);
 
+						System.out.println(name);
+						process(c,s2,name);
+
+					}
+				}
+			}
 		}catch(Exception t){
 			t.printStackTrace(System.err);
 			CommandLauncher.die(t);

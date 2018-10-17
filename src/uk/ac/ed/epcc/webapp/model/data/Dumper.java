@@ -278,18 +278,15 @@ public class Dumper extends AbstractContexed{
 		res.addUniqueName(query, false, true);
 		AppContext conn = getContext();
 		DatabaseService service = conn.getService(DatabaseService.class);
-		try{
-		
-		PreparedStatement stmt = service.getSQLContext().getConnection().prepareStatement(
+		try(PreparedStatement stmt = service.getSQLContext().getConnection().prepareStatement(
 				query.toString(), ResultSet.TYPE_FORWARD_ONLY,
 				ResultSet.CONCUR_READ_ONLY);
-		ResultSet rs = stmt.executeQuery();
-		
-		while(rs.next()){
-			Record record = res.new Record();
-			record.setContents(rs);
-			dump(record);
-		}
+				ResultSet rs = stmt.executeQuery()){
+			while(rs.next()){
+				Record record = res.new Record();
+				record.setContents(rs);
+				dump(record);
+			}
 		}catch(SQLException e){
 			service.handleError("Bad query", e);
 		}

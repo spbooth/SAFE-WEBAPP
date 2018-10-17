@@ -89,6 +89,7 @@ public class MysqlSQLContext implements SQLContext {
 	public void close() throws SQLException {
 		if(conn != null){
 			conn.close();
+			assert(conn.isClosed());
 			closed=true;
 		}
 
@@ -117,13 +118,12 @@ public class MysqlSQLContext implements SQLContext {
 		String name="unknown";
 		try{
 			if( ! conn.isReadOnly()){
-				PreparedStatement stmt = conn.prepareStatement("select @@hostname");
-				ResultSet rs = stmt.executeQuery();
-				if( rs.next()){
-					name = rs.getString(1);
+				try(PreparedStatement stmt = conn.prepareStatement("select @@hostname");
+						ResultSet rs = stmt.executeQuery()){
+					if( rs.next()){
+						name = rs.getString(1);
+					}
 				}
-				rs.close();
-				stmt.close();
 			}
 		}catch(SQLException e){
 			// report unknown

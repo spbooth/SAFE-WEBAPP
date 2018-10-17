@@ -687,9 +687,10 @@ public final class Repository implements AppContextCleanup{
         			sb.append(" WHERE ");
         			getRepository().addUniqueName(sb, true, true);
         			sb.append("=?");
-        			PreparedStatement stmt = sql.getConnection().prepareStatement(sb.toString());
-        			stmt.setInt(1, getID());
-        			stmt.executeUpdate();
+        			try(PreparedStatement stmt = sql.getConnection().prepareStatement(sb.toString())){
+        				stmt.setInt(1, getID());
+        				stmt.executeUpdate();
+        			}
         			return;
         		}catch(SQLException e){
         			sql.getService().handleError("Error in backup "+sb.toString(),e);
@@ -751,22 +752,21 @@ public final class Repository implements AppContextCleanup{
 				addUniqueName(sb, false, true);
 				sb.append("=");
 				sb.append(getID());
-				Statement stmt = conn.createStatement();
-				String query = sb.toString();
-				int results = stmt.executeUpdate(query);
-				if( DatabaseService.LOG_UPDATE.isEnabled(getContext())){
-					LoggerService serv = getContext().getService(LoggerService.class);
-					if( serv != null ){
-						serv.getLogger(getClass()).debug("delete query is "+query);
+				try(Statement stmt = conn.createStatement();){
+					String query = sb.toString();
+					int results = stmt.executeUpdate(query);
+					if( DatabaseService.LOG_UPDATE.isEnabled(getContext())){
+						LoggerService serv = getContext().getService(LoggerService.class);
+						if( serv != null ){
+							serv.getLogger(getClass()).debug("delete query is "+query);
+						}
+					}
+					// Destroy the connection to reduce strangeness of mis-use
+					boolean ok = (results == 1);
+					if (ok) {
+						clear();
 					}
 				}
-				stmt.close();
-				// Destroy the connection to reduce strangeness of mis-use
-				boolean ok = (results == 1);
-				if (ok) {
-					clear();
-				}
-				
 
 			} catch (SQLException e) {
 				sql.getService().handleError("SQL Exception", e);
@@ -1548,38 +1548,38 @@ public final class Repository implements AppContextCleanup{
 				buff.append(getID());
 				boolean updated=false;
 				if (update) {
-					PreparedStatement stmt = sql.getConnection()
-							.prepareStatement(buff.toString());
-					int pos = 1;
-					for (String key : fields) {
-						if (isDirty(key)) {
-							setValue(buff, stmt, pos, key);
-							pos++;
+					try(PreparedStatement stmt = sql.getConnection()
+							.prepareStatement(buff.toString())){
+						int pos = 1;
+						for (String key : fields) {
+							if (isDirty(key)) {
+								setValue(buff, stmt, pos, key);
+								pos++;
+							}
 						}
-					}
-					if( DatabaseService.LOG_UPDATE.isEnabled(getContext())){
-						LoggerService serv = getContext().getService(LoggerService.class);
-						if( serv != null ){
-							serv.getLogger(getClass()).debug("update query is "+buff.toString());
+						if( DatabaseService.LOG_UPDATE.isEnabled(getContext())){
+							LoggerService serv = getContext().getService(LoggerService.class);
+							if( serv != null ){
+								serv.getLogger(getClass()).debug("update query is "+buff.toString());
+							}
 						}
-					}
-					//ctx.getService(LoggerService.class).getLogger(getClass()).debug("update :"+buff+" pos="+pos+" count="+pattern_count+" fieldcount="+fields.size()+" dirty"+dirty.size());
-					assert(pos == pattern_count);
-			
-					int rows_changed = stmt.executeUpdate();
-					stmt.close();
-					
-					if (rows_changed > 1 || rows_changed < 0) {
-						throw new ConsistencyError(
-								"incorrect number of rows changes "+rows_changed+" "+buff.toString());
-					}else if( rows_changed == 0){
-						LoggerService serv = getContext().getService(LoggerService.class);
-						if( serv != null ){
-							// Same update may have happened between read and commit. 
-							serv.getLogger(getClass()).warn("No update when one was expected "+buff.toString());
+						//ctx.getService(LoggerService.class).getLogger(getClass()).debug("update :"+buff+" pos="+pos+" count="+pattern_count+" fieldcount="+fields.size()+" dirty"+dirty.size());
+						assert(pos == pattern_count);
+
+						int rows_changed = stmt.executeUpdate();
+
+						if (rows_changed > 1 || rows_changed < 0) {
+							throw new ConsistencyError(
+									"incorrect number of rows changes "+rows_changed+" "+buff.toString());
+						}else if( rows_changed == 0){
+							LoggerService serv = getContext().getService(LoggerService.class);
+							if( serv != null ){
+								// Same update may have happened between read and commit. 
+								serv.getLogger(getClass()).warn("No update when one was expected "+buff.toString());
+							}
+						}else{
+							updated = true;
 						}
-					}else{
-						updated = true;
 					}
 				}
 				
@@ -1672,8 +1672,8 @@ public final class Repository implements AppContextCleanup{
 					}
 				}
 				
-					PreparedStatement stmt = sql.getConnection()
-							.prepareStatement(buff.toString());
+				try(PreparedStatement stmt = sql.getConnection()
+						.prepareStatement(buff.toString())){
 					int pos = 1;
 					for (String key : fields) {
 						if( isDirty(key) && containsKey(key)){
@@ -1692,13 +1692,14 @@ public final class Repository implements AppContextCleanup{
 						System.out.println("pos "+pos+" count "+pattern_count);
 					}
 					assert(pos == pattern_count);
-					ResultSet rs = stmt.executeQuery();
-					if( rs.first()){
-						return rs.getInt(1);
-					}else{
-						return 0;
+					try(ResultSet rs = stmt.executeQuery()){
+						if( rs.first()){
+							return rs.getInt(1);
+						}else{
+							return 0;
+						}
 					}
-					
+				}
 
 			} catch (SQLException e) {
 				// report the problem SQL to aid debugging
@@ -1914,14 +1915,15 @@ public final class Repository implements AppContextCleanup{
 	
 	public void createBackupTable(String name) throws SQLException{
 		Connection c = sql.getConnection();
-		Statement stmt = c.createStatement();
+		
 		StringBuilder sb = new StringBuilder();
 		sb.append("CREATE TABLE IF NOT EXISTS ");
 		sql.quote(sb, name);
 		sb.append(" LIKE ");
 		addTable(sb, true);
-		stmt.executeUpdate(sb.toString());
-		stmt.close();
+		try(Statement stmt = c.createStatement()){
+			stmt.executeUpdate(sb.toString());
+		}
 	}
 	private Repository backup=null;
 	/** create a backup table structured like this one if backups are enabled.
@@ -2688,9 +2690,8 @@ public final class Repository implements AppContextCleanup{
 				throw new DataFault("Insert with no values");
 			}
 			
-			try {
-				PreparedStatement stmt = sql.getConnection().prepareStatement(
-						query.toString(), Statement.RETURN_GENERATED_KEYS);
+			try(PreparedStatement stmt = sql.getConnection().prepareStatement(
+					query.toString(), Statement.RETURN_GENERATED_KEYS)) {
 				int pos = 1;
 				if( r.id > 0 ){
 					stmt.setInt(pos, r.id);
@@ -2721,14 +2722,13 @@ public final class Repository implements AppContextCleanup{
 					return r.id;
 				}
 				if( use_id ){
-					ResultSet rs = stmt.getGeneratedKeys();
-					if (rs.next()) {
-						id = rs.getInt(1);
-					} else {
-						throw new DataFault("cannot retrieve auto_key");
+					try(ResultSet rs = stmt.getGeneratedKeys()){
+						if (rs.next()) {
+							id = rs.getInt(1);
+						} else {
+							throw new DataFault("cannot retrieve auto_key");
+						}
 					}
-					rs.close();
-					stmt.close();
 					return id;
 				}else{
 					return 0;
@@ -2858,21 +2858,13 @@ public final class Repository implements AppContextCleanup{
 	 */
 	synchronized private void setMetaData() {
 		if( fields == null){
-			Statement stmt=null;
-			ResultSet rs=null;
-			try {
-				Connection c = sql.getConnection();
-				stmt = c.createStatement();
-				StringBuilder sb = new StringBuilder();
-				sb.append("SELECT * FROM ");
-				addTable(sb, true);
-				sb.append(" WHERE 1=0");
-				rs = stmt.executeQuery(sb.toString());
+			StringBuilder sb = new StringBuilder();
+			sb.append("SELECT * FROM ");
+			addTable(sb, true);
+			sb.append(" WHERE 1=0");
+			Connection c = sql.getConnection();
+			try(Statement stmt=c.createStatement(); ResultSet rs = stmt.executeQuery(sb.toString())) {
 				setMetaData(rs);
-				rs.close();
-				rs=null;
-				stmt.close();
-				stmt=null;
 				setReferences(ctx,c);
 			}catch( SQLSyntaxErrorException se) {
 				// This occurs when table does not exist
@@ -2880,17 +2872,6 @@ public final class Repository implements AppContextCleanup{
 			} catch (Exception e) {
 				//ctx.error(e, "Error creating MetaData for " + getTag());
 				throw new DataError("Error in setMetaData for "+getTag(),e);
-			}finally {
-				try {
-					if( rs != null && ! rs.isClosed()) {
-						rs.close();
-					}
-					if( stmt != null && ! stmt.isClosed()) {
-						stmt.close();
-					}
-				}catch(Exception t) {
-					
-				}
 			}
 		}
 	}

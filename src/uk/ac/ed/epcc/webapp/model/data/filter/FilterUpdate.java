@@ -67,11 +67,9 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    		makeWhere(tables,my_filter, sql, false);
 	    	}
 	    	SQLContext sqlContext = res.getSQLContext();
-	    	PreparedStatement stmt=null;
-	    	try{
-	    		
-				stmt = sqlContext.getConnection().prepareStatement(
-	    				sql.toString());
+	    	
+	    	try(PreparedStatement stmt=sqlContext.getConnection().prepareStatement(
+    				sql.toString())){
 	    		List<PatternArgument> list = new LinkedList<PatternArgument>();
 				list.add(new ConstPatternArgument<R>(target.getTarget(), value));
 	    		
@@ -84,14 +82,6 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    	}catch(SQLException e){
 	    		sqlContext.getService().handleError("Error on update",e);
 	    		return 0; // acutally unreachable
-	    	}finally {
-	    		try {
-	    			if( stmt != null && ! stmt.isClosed()) {
-	    				stmt.close();
-	    			}
-	    		}catch(SQLException e) {
-
-	    		}
 	    	}
 	    }
 	    @SuppressWarnings("unchecked")
@@ -111,11 +101,8 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    		makeWhere(tables,my_filter, sql, false);
 	    	}
 	    	SQLContext sqlContext = res.getSQLContext();
-	    	PreparedStatement stmt=null;
-	    	try{
-	    		
-				 stmt = sqlContext.getConnection().prepareStatement(
-	    				sql.toString());
+	    	try(PreparedStatement stmt=sqlContext.getConnection().prepareStatement(
+    				sql.toString())){
 	    		List<PatternArgument> list = new LinkedList<PatternArgument>();
 	    		list = value.getParameters(list);
 	    		
@@ -130,14 +117,6 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    	}catch(SQLException e){
 	    		sqlContext.getService().handleError("Error on update",e);
 	    		return 0; // actually unreachable
-	    	}finally {
-	    		try {
-	    			if( stmt != null && ! stmt.isClosed()) {
-	    				stmt.close();
-	    			}
-	    		}catch(SQLException e) {
-
-	    		}
 	    	}
 	    }
 }

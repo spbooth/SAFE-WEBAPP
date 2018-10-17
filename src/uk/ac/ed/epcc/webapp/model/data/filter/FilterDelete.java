@@ -25,7 +25,6 @@ import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterSelect;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -59,11 +58,10 @@ public class FilterDelete<T extends DataObject> extends FilterSelect<T>{
     		makeWhere(tables,my_filter, sql, false);
     	}
     	SQLContext sqlContext = res.getSQLContext();
-    	PreparedStatement stmt=null;
-    	try{
+    	
+    	try(PreparedStatement stmt=sqlContext.getConnection().prepareStatement(
+				sql.toString())){
     		
-			stmt = sqlContext.getConnection().prepareStatement(
-    				sql.toString());
     		List<PatternArgument> list = new LinkedList<PatternArgument>();
 			list=getFilterArguments(my_filter, list);
     		setParams(1, sql, stmt, list);
@@ -74,14 +72,6 @@ public class FilterDelete<T extends DataObject> extends FilterSelect<T>{
     	}catch(SQLException e){
     		sqlContext.getService().handleError("Error on delete",e);
     		return 0; // actually unreachable
-    	}finally {
-    		try {
-    			if( stmt != null && ! stmt.isClosed()) {
-    				stmt.close();
-    			}
-    		}catch(SQLException e) {
-
-    		}
     	}
     }
 

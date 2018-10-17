@@ -459,7 +459,7 @@ public class RepositoryTest extends WebappTestBase {
 		r.put("Number", new Integer(12));
 		r.put("Boolean",false);
 		assertTrue(r.commit());
-		 Statement s = res.getSQLContext().getConnection().createStatement();
+		Statement s = res.getSQLContext().getConnection().createStatement();
 		 ResultSet rs = s.executeQuery("select * from "+res.getTag()+" where "+res.getUniqueIdName()+"="+r.getID());
 		 Record p = res.new Record();
 		 assertTrue(rs.next());

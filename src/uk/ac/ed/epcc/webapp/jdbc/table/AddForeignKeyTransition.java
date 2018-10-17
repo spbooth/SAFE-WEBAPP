@@ -75,10 +75,10 @@ public class AddForeignKeyTransition<T extends DataObjectFactory> extends EditTa
 			if( seen ){
 
 				c.getService(LoggerService.class).getLogger(getClass()).debug(query);
-				java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString());
+				try(java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString())){
 
-				stmt.execute();
-				stmt.close();
+					stmt.execute();
+				}
 				resetStructure(target);
 			}
 		} catch (Exception e) {

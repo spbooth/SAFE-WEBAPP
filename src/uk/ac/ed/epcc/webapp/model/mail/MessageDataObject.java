@@ -240,10 +240,10 @@ public abstract class MessageDataObject extends DataObject implements
 			sb.append(" SET ");
 			conn.quote(sb, MESSAGE);
 			sb.append("=null");
-			
-			Statement stmt = conn.getConnection().createStatement();
-			int results = stmt.executeUpdate(sb.toString());
-			stmt.close();
+
+			try(Statement stmt = conn.getConnection().createStatement()){
+				int results = stmt.executeUpdate(sb.toString());
+			}
 			}catch(SQLException e){
 				db_service.handleError("Error in delete", e);
 			}

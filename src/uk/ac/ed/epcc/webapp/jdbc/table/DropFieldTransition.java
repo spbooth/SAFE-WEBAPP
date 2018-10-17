@@ -71,10 +71,10 @@ public class DropFieldTransition<T extends DataObjectFactory> extends EditTableF
 				input.getItem().addName(query, false, true);
 				query.append(" ");
 				
-				java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString());
-				
-				stmt.execute();
-				stmt.close();
+				try(java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString())){
+
+					stmt.execute();
+				}
 				resetStructure(target);
 			} catch (Exception e) {
 				throw new ActionException("Update failed",e);

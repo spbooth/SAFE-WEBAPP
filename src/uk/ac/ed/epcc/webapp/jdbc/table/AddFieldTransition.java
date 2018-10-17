@@ -81,13 +81,13 @@ public abstract class AddFieldTransition<T extends DataObjectFactory>
 				List<Object> args = new LinkedList<Object>();
 				FieldType fieldType = getFieldType(f);
 				fieldType.accept(sql.getCreateVisitor(query, args));
-				java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString());
-				int pos=1;
-				for(Object o: args){
-					stmt.setObject(pos++, o);
+				try(java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString())){
+					int pos=1;
+					for(Object o: args){
+						stmt.setObject(pos++, o);
+					}
+					stmt.execute();
 				}
-				stmt.execute();
-				stmt.close();
 				if( fieldType instanceof ReferenceFieldType){
 					ReferenceFieldType ref = (ReferenceFieldType) fieldType;
 					ConfigService serv = res.getContext().getService(ConfigService.class);

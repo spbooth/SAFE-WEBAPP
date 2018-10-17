@@ -66,18 +66,18 @@ public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
 		if( timer != null ){
 			timer.startTimer("FilterMaker: "+q);
 		}
-		PreparedStatement stmt=null;
-		ResultSet rs=null;
+		
+		
 		DatabaseService db_service = conn.getService(DatabaseService.class);
-		try {
+		try(PreparedStatement stmt= db_service.getSQLContext(getDBTag()).getConnection().prepareStatement(
+				q, ResultSet.TYPE_FORWARD_ONLY,
+				ResultSet.CONCUR_READ_ONLY)) {
 			
 			// We are only using the REsultSet to initialise the Record and
 			// are not concurrent anyway so give
 			// the DB the best chance of optimising the query
 			
-			stmt = db_service.getSQLContext(getDBTag()).getConnection().prepareStatement(
-					q, ResultSet.TYPE_FORWARD_ONLY,
-					ResultSet.CONCUR_READ_ONLY);
+			
 			List<PatternArgument> list = new LinkedList<PatternArgument>();
 			list=getTargetParameters(list);
 			list=getFilterArguments(f, list);
@@ -86,47 +86,31 @@ public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
 			if( DatabaseService.LOG_QUERY_FEATURE.isEnabled(conn)){
 				getLogger().debug("Query is "+query);
 			}
-			rs = stmt.executeQuery();
-			O result = null;
-			if( rs.next()){ // need to position the REsultSet before making object
-				result = makeEntry(rs);
-				if( result ==null ){
+			try( ResultSet rs = stmt.executeQuery()){
+				O result = null;
+				if( rs.next()){ // need to position the REsultSet before making object
+					result = makeEntry(rs);
+					if( result ==null ){
+						result = makeDefault();
+					}
+					if( rs.next() ){
+						if( DataObjectFactory.REJECT_MULTIPLE_RESULT_FEATURE.isEnabled(conn)){
+
+							throw new MultipleResultException("Found multiple results expecting 1 :"+query.toString());
+						}else{
+							// just log
+							conn.getService(LoggerService.class).getLogger(getClass()).error("Multiple result expecting 1"+query.toString(),new Exception());
+						}
+					}
+				}else{
 					result = makeDefault();
 				}
-				if( rs.next() ){
-					if( DataObjectFactory.REJECT_MULTIPLE_RESULT_FEATURE.isEnabled(conn)){
-				
-						throw new MultipleResultException("Found multiple results expecting 1 :"+query.toString());
-					}else{
-						// just log
-						conn.getService(LoggerService.class).getLogger(getClass()).error("Multiple result expecting 1"+query.toString(),new Exception());
-					}
-				}
-			}else{
-				result = makeDefault();
+				return result;
 			}
-			stmt.close();
-			stmt=null;
-			return result;
 		} catch (SQLException e) {
 			db_service.handleError("DataFault in FilterFinder " + query, e);
 			return null;
 		}finally{
-			try {
-				if( rs != null && ! rs.isClosed()) {
-					rs.close();
-				}
-			}catch(SQLException e) {
-				db_service.logError("Error closing result set", e);
-			}
-			try {
-				if( stmt != null && ! stmt.isClosed()) {
-					stmt.close();
-				}
-			} catch (SQLException e) {
-				db_service.logError("Error closing statement", e);
-			}
-			
 			if( timer != null ){
 				timer.stopTimer("FilterMaker: "+q);
 			}

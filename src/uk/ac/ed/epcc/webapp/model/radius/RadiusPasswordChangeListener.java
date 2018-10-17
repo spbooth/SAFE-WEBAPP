@@ -87,20 +87,21 @@ public class RadiusPasswordChangeListener extends AbstractContexed implements Pa
 			DatabaseService serv = conn.getService(DatabaseService.class);
 			SQLContext sql = serv.getSQLContext(RADIUS_SQL_CONTEXT);
 			Connection c = sql.getConnection();
-			PreparedStatement set = c.prepareStatement("UPDATE radcheck SET value=? WHERE username=? and attribute=?");
-			set.setString(1, entry);
-			set.setString(2, name);
-			set.setString(3, "Crypt-Password");
-			int rows = set.executeUpdate();
-			if( rows == 0 && create){
-				set = c.prepareStatement("INSERT INTO radcheck (username,attribute,op,value) VALUES (?,?,?,?)");
-				set.setString(1, name);
-				set.setString(2, "Crypt-Password");
-				set.setString(3, ":=");
-				set.setString(4, entry);
-				rows = set.executeUpdate();
+			try(PreparedStatement set = c.prepareStatement("UPDATE radcheck SET value=? WHERE username=? and attribute=?")){
+				set.setString(1, entry);
+				set.setString(2, name);
+				set.setString(3, "Crypt-Password");
+				int rows = set.executeUpdate();
+				if( rows == 0 && create){
+					try(PreparedStatement set2 = c.prepareStatement("INSERT INTO radcheck (username,attribute,op,value) VALUES (?,?,?,?)")){
+						set2.setString(1, name);
+						set2.setString(2, "Crypt-Password");
+						set2.setString(3, ":=");
+						set2.setString(4, entry);
+						rows = set2.executeUpdate();
+					}
+				}
 			}
-			
 		} catch (Exception  e) {
 			conn.getService(LoggerService.class).getLogger(getClass()).error("Error in password update", e);
 		}

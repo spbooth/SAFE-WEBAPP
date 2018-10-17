@@ -67,15 +67,16 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     public boolean tableExists(String name){
     	try {
 			SQLContext sql = conn.getService(DatabaseService.class).getSQLContext();
-			Statement stmt = sql.getConnection().createStatement();
+			
 			StringBuilder sb = new StringBuilder();
 			sb.append("SELECT * FROM ");
 			sql.quote(sb, name);
 			sb.append(" WHERE 1=0");
-			ResultSet rs = stmt.executeQuery(sb.toString());
-			rs.getMetaData();
-			stmt.close();
-		    return true;
+			try(Statement stmt = sql.getConnection().createStatement();
+					ResultSet rs = stmt.executeQuery(sb.toString())){
+				rs.getMetaData();
+			}
+			return true;
 		} catch (Exception e) {
 			return false;
 		}
@@ -92,14 +93,14 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     	
 		Connection c = service.getSQLContext().getConnection();
     	DatabaseMetaData md = c.getMetaData();
-    	ResultSet rs = md.getTables(null, null, null, new String[] {"TABLE"});
-    	if( rs.first()){
-    	  do{
-    		String name = rs.getString("TABLE_NAME");
-    		result.add(name);
-    	  }while(rs.next());
+    	try(ResultSet rs = md.getTables(null, null, null, new String[] {"TABLE"})){
+    		if( rs.first()){
+    			do{
+    				String name = rs.getString("TABLE_NAME");
+    				result.add(name);
+    			}while(rs.next());
+    		}
     	}
-    	
     	return result;
     	}catch(SQLException e){
     		service.handleError("Error getting table names",e);
@@ -126,14 +127,14 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 			 
 			text = createTableText(name, s, c, args);
     		// This is overly noisy in junit tests
-    		//log.debug("Creating table using "+text);
-    		PreparedStatement stmt = c.getConnection().prepareStatement(text);
-    		for( int i=0; i< args.size(); i++){
-    			Object x = args.get(i);
-				stmt.setObject(i+1, x);
-    		}
-    		stmt.executeUpdate();
-    		stmt.close();
+			//log.debug("Creating table using "+text);
+			try(PreparedStatement stmt = c.getConnection().prepareStatement(text)){
+				for( int i=0; i< args.size(); i++){
+					Object x = args.get(i);
+					stmt.setObject(i+1, x);
+				}
+				stmt.executeUpdate();
+			}
     		//TODO have SQLContext do this as some may use foreign keys
     		ConfigService serv = conn.getService(ConfigService.class);
     		for(String field_name : s.getFieldNames()){
@@ -231,13 +232,13 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 			 	String text = alterTableText(res, s, c, args);
     		// This is overly noisy in junit tests
     		//log.debug("Creating table using "+text);
-    		PreparedStatement stmt = c.getConnection().prepareStatement(text);
-    		for( int i=0; i< args.size(); i++){
-    			Object x = args.get(i);
-				stmt.setObject(i+1, x);
-    		}
-    		stmt.executeUpdate();
-    		stmt.close();
+			 	try(PreparedStatement stmt = c.getConnection().prepareStatement(text)){
+			 		for( int i=0; i< args.size(); i++){
+			 			Object x = args.get(i);
+			 			stmt.setObject(i+1, x);
+			 		}
+			 		stmt.executeUpdate();
+			 	}
     		Repository.reset(getContext(), res.getTag());
     	}catch(SQLException se) {
     		service.handleError("Cannot update table "+res.getTable(), se);
@@ -285,13 +286,13 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     		}
     	
 		SQLContext c = service.getSQLContext();
-		Statement stmt = c.getConnection().createStatement();
+		
 		StringBuilder sb = new StringBuilder();
 		sb.append("DROP TABLE ");
 		c.quote(sb, name);
-		
-		stmt.executeUpdate(sb.toString());
-		stmt.close();
+		try(Statement stmt = c.getConnection().createStatement()){
+			stmt.executeUpdate(sb.toString());
+		}
     	}catch(SQLException e){
     		service.handleError("Cannot remove table "+name,e);
     	}
@@ -306,12 +307,11 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 				SQLContext c = service.getSQLContext();
     			Connection connection = c.getConnection();
     			String db_name = connection.getCatalog();
-    			Statement stmt = connection.createStatement();
-    			StringBuilder sb = new StringBuilder();
-    			stmt.executeUpdate("DROP DATABASE "+db_name);
-    			stmt.executeUpdate("CREATE DATABASE "+db_name+" CHARACTER SET utf8 COLLATE utf8_general_ci");
-
-    			stmt.close();
+    			try(Statement stmt = connection.createStatement()){
+    				StringBuilder sb = new StringBuilder();
+    				stmt.executeUpdate("DROP DATABASE "+db_name);
+    				stmt.executeUpdate("CREATE DATABASE "+db_name+" CHARACTER SET utf8 COLLATE utf8_general_ci");
+    			}
     			connection.setCatalog(db_name);
     		}catch(SQLException e){
     			service.handleError("Cannot clear database",e);

@@ -762,20 +762,15 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			role_query.append("=?   AND ");
 			ctx.quote(role_query,ROLE_FIELD);
 			role_query.append("=? ");
-			PreparedStatement stmt = null;
-			try {
-				stmt = ctx.getConnection().prepareStatement(role_query.toString());
+			try(PreparedStatement stmt =ctx.getConnection().prepareStatement(role_query.toString())) {
 				stmt.setInt(1, id);
 				stmt.setString(2, role);
-				ResultSet rs = stmt.executeQuery();
-				if (rs.next()) {
-					return true;
+				try(ResultSet rs = stmt.executeQuery()){
+					if (rs.next()) {
+						return true;
+					}
 				}
-			} finally {
-				if( stmt != null && ! stmt.isClosed() ){
-				   stmt.close();
-				}
-			}
+			} 
 		} catch (SQLException e) {
 			conn.getService(DatabaseService.class).logError("Error checking AppUser role",e);
 			// maybe table missing
@@ -835,9 +830,8 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			ctx.quote(role_query,ROLE_PERSON_ID).append("=? AND ");
 			ctx.quote(role_query,ROLE_FIELD).append("=?");
 					
-			PreparedStatement stmt = null;
-			try {
-				stmt = ctx.getConnection().prepareStatement(role_query.toString());
+		
+			try(PreparedStatement stmt =ctx.getConnection().prepareStatement(role_query.toString())) {
 				stmt.setInt(1, id);
 				stmt.setString(2, role);
 				stmt.executeUpdate();
@@ -845,11 +839,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 					Logger log = context.getService(LoggerService.class).getLogger(context.getClass());
 					log.debug(role_query+" id="+id+" role="+role);
 				}
-			} finally {
-				if( stmt != null && ! stmt.isClosed()){
-				  stmt.close();
-				}
-			}
+			} 
 		} catch (SQLException e) {
 			service.handleError("SQLException ", e);
 		}
@@ -868,9 +858,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			ctx.quote(role_query, ROLE_PERSON_ID).append(",");
 			ctx.quote(role_query, ROLE_FIELD).append(") VALUES(?,?)");;
 					
-			PreparedStatement stmt = null;
-			try {
-				stmt = ctx.getConnection().prepareStatement(role_query.toString());
+			try(PreparedStatement stmt= ctx.getConnection().prepareStatement(role_query.toString())) {
 				stmt.setInt(1, id);
 				stmt.setString(2, role);
 				stmt.executeUpdate();
@@ -878,11 +866,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 					Logger log = c.getService(LoggerService.class).getLogger(c.getClass());
 					log.debug(role_query+" id="+id+" role="+role);
 				}
-			} finally {
-				if( stmt != null  && ! stmt.isClosed()){
-				  stmt.close();
-				}
-			}
+			} 
 		} catch (SQLException e) {
 			service.handleError("SQLException ", e);
 		}
