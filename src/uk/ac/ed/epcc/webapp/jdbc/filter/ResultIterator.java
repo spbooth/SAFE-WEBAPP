@@ -21,6 +21,7 @@ import java.sql.SQLException;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.model.data.CloseableIterator;
 
 /** Iterator over filter results.
  * 
@@ -43,7 +44,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
  * @param <O> Type of object produced.
  * 
  */
-public abstract class ResultIterator<O> extends SQLResultIterator<O,O> implements java.util.Iterator<O> {
+public abstract class ResultIterator<O> extends SQLResultIterator<O,O> implements CloseableIterator<O> {
 		
 
 		private AcceptFilter<? super O> f = null;

@@ -154,4 +154,16 @@ public abstract class DatabaseServiceWrapper implements DatabaseService {
 		nested.logError(message, e);
 	}
 
+	@Override
+	public void addClosable(AutoCloseable c) {
+		nested.addClosable(c);
+		
+	}
+
+	@Override
+	public void removeClosable(AutoCloseable c) {
+		nested.removeClosable(c);
+		
+	}
+
 }

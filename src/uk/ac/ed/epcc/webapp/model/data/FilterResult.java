@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -48,5 +49,8 @@ public interface FilterResult<D>  extends Iterable<D>{
 	 * @return modified {@link Collection}
 	 */
 	public abstract <X extends Collection<D>> X toCollection(X res);
+
+	@Override
+	CloseableIterator<D> iterator();
 
 }

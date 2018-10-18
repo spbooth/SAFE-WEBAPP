@@ -15,6 +15,8 @@ package uk.ac.ed.epcc.webapp.model.data.iterator;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import uk.ac.ed.epcc.webapp.model.data.CloseableIterator;
 /** Wrapper to select a sub-set from the results of an iterator
  * 
  * @author spb
@@ -23,7 +25,7 @@ import java.util.NoSuchElementException;
  */
 
 
-public class SkipIterator<E> implements Iterator<E> {
+public class SkipIterator<E> implements CloseableIterator<E> {
 
 	private final Iterator<E> inner;
 	private int count;
@@ -49,6 +51,16 @@ public class SkipIterator<E> implements Iterator<E> {
 
 	public void remove() {
 		inner.remove();
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.AutoCloseable#close()
+	 */
+	@Override
+	public void close() throws Exception {
+		if( inner instanceof AutoCloseable) {
+			((AutoCloseable)inner).close();
+		}
+		
 	}
 
 }

@@ -19,7 +19,6 @@ package uk.ac.ed.epcc.webapp.model.data;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -519,15 +518,15 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		private final L left;
 		private final R right;
 		private final BaseFilter<? super T> fil;
-		private Iterator<T> iter;
+		private CloseableIterator<T> iter;
 
 		/* (non-Javadoc)
 		 * @see java.lang.Iterable#iterator()
 		 */
-		public Iterator<T> iterator() {
+		public CloseableIterator<T> iterator() {
 			try {
 				if( iter != null ){
-					Iterator<T> result=iter;
+					CloseableIterator<T> result=iter;
 					iter=null;
 					return result;
 				}
@@ -669,10 +668,10 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @throws DataFault
 	 */
 	
-	private Iterator<T> getLinkIterator(L l, R r, BaseFilter<? super T> f) throws DataFault{
+	private CloseableIterator<T> getLinkIterator(L l, R r, BaseFilter<? super T> f) throws DataFault{
 		return getLinkIterator(l, r, f, USE_JOIN.isEnabled(getContext()));
 	}
-	public Iterator<T> getLinkIterator(L l, R r, BaseFilter<? super T> f, boolean use_join)
+	public CloseableIterator<T> getLinkIterator(L l, R r, BaseFilter<? super T> f, boolean use_join)
 			throws DataFault {
 		if (use_join) {
 			return this.new JoinLinkFilterIterator(new LinkFilter(l, r, f));

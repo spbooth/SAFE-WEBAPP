@@ -208,4 +208,9 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 	public final Class<? super T> getTarget(){
 		return target;
 	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+" [my_filter=" + my_filter + ", mapper=" + mapper + "]";
+	}
 }

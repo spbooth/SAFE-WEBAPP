@@ -73,7 +73,7 @@ public class DefaultDataBaseService implements DatabaseService {
     private boolean in_transaction = false;
     private int stage_count=0;
     private final int desired_isolation_level;
-	
+	private Set<AutoCloseable> closes=null;
     public DefaultDataBaseService(AppContext ctx){
     	this.ctx=ctx;
     	force_rollback= TRANSACTIONS_ROLLBACK_TRANSIENT_ERRORS.isEnabled(ctx);
@@ -229,6 +229,7 @@ public class DefaultDataBaseService implements DatabaseService {
 	}
 
 	public synchronized void cleanup() {
+		closeRetainedClosables();
 		if( map != null){
 		for(SQLContext c : map.values()){
 				if( c != null ){
@@ -248,6 +249,32 @@ public class DefaultDataBaseService implements DatabaseService {
 		map.clear();
 		}
 		connection_set=false;
+	}
+	/**
+	 * 
+	 */
+	public void closeRetainedClosables() {
+		if( closes != null) {
+			if( ! closes.isEmpty()) {
+				LoggerService serv = getContext().getService(LoggerService.class);
+				if( serv != null) {
+					Logger log = serv.getLogger(getClass());
+					if( log != null ) {
+						log.warn("Unclosed retained closables "+closes);
+					}
+				}
+			}
+			// set will be modified during loop so copy
+			for(AutoCloseable c : closes.toArray(new AutoCloseable[closes.size()])) {
+				try {
+					c.close();
+				} catch (Exception e) {
+					error(e,"Error closing cached autoClosable");
+				}
+			}
+			closes.clear();
+			closes=null;
+		}
 	}
 
 	public Class<DatabaseService> getType() {
@@ -347,7 +374,7 @@ public class DefaultDataBaseService implements DatabaseService {
 				throw new TransactionError("Error ending transaction", e);
 			}
 		}
-
+		
 	}
 	/**
 	 * Report an application error.
@@ -376,6 +403,7 @@ public class DefaultDataBaseService implements DatabaseService {
 			}
 		}
 	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.DatabaseService#transactionStage()
 	 */
@@ -416,5 +444,26 @@ public class DefaultDataBaseService implements DatabaseService {
 			}
 		}
 		return Connection.TRANSACTION_SERIALIZABLE;
+	}
+	
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.CloseRegistry#addClosable(java.lang.AutoCloseable)
+	 */
+	@Override
+	public void addClosable(AutoCloseable c) {
+		if( closes == null) {
+			closes = new HashSet<>();
+		}
+		closes.add(c);
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.CloseRegistry#removeClosable(java.lang.AutoCloseable)
+	 */
+	@Override
+	public void removeClosable(AutoCloseable c) {
+		if( closes != null ) {
+			closes.remove(c);
+		}
+		
 	}
 }

@@ -567,6 +567,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				List<PatternArgument> list) {
 			return list;
 		}
+		public String toString() {
+			return "FilterAdapter [ factory="+DataObjectFactory.this.getClass().getSimpleName()+" tag="+DataObjectFactory.this.getTag()+"]";
+		}
     }
     /** ResultMapper that generates the set of objects referenced from
      * the targets selected by the filter
@@ -820,7 +823,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
         // create the first iterator in the constructor
         // to give it a chance to throw any exceptions.
         
-        private Iterator<BDO> iter=null;
+        private CloseableIterator<BDO> iter=null;
         int start;
         int max;
         public FilterSet(BaseFilter<? super BDO> f) throws DataFault{
@@ -843,9 +846,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.data.FilterResult#iterator()
 		 */
-		public Iterator<BDO> iterator() {
+		public CloseableIterator<BDO> iterator() {
 			if( iter != null){
-				Iterator<BDO> temp = iter;
+				CloseableIterator<BDO> temp = iter;
 				iter=null;
 				return temp;
 			}
@@ -856,7 +859,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				return null;
 			}
 		}
-		protected Iterator<BDO> makeIterator() throws DataFault {
+		protected CloseableIterator<BDO> makeIterator() throws DataFault {
 			if( start < 0 ){
 				return new FilterIterator(f);
 			}else{
@@ -1240,24 +1243,25 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     		}
     		return finder.find(sql_fil,allow_null);
     	}catch(NoSQLFilterException e){
-    		Iterator<BDO> it = new FilterIterator(f);
-    		if( it.hasNext()){
-    			BDO result = it.next();
-    			if( it.hasNext() ){
-					if( DataObjectFactory.REJECT_MULTIPLE_RESULT_FEATURE.isEnabled(getContext())){
-				
-						throw new MultipleResultException("Found multiple "+getTag()+" records expecting 1");
-					}else{
-						// just log
-						getContext().getService(LoggerService.class).getLogger(getClass()).error("Multiple "+getTag()+" records expecting 1",new Exception());
-					}
-				}
-    			return result;
-    		}else{
-    			if( allow_null ){
-    				return null;
+    		try(FilterIterator it = new FilterIterator(f)){
+    			if( it.hasNext()){
+    				BDO result = it.next();
+    				if( it.hasNext() ){
+    					if( DataObjectFactory.REJECT_MULTIPLE_RESULT_FEATURE.isEnabled(getContext())){
+
+    						throw new MultipleResultException("Found multiple "+getTag()+" records expecting 1");
+    					}else{
+    						// just log
+    						getContext().getService(LoggerService.class).getLogger(getClass()).error("Multiple "+getTag()+" records expecting 1",new Exception());
+    					}
+    				}
+    				return result;
+    			}else{
+    				if( allow_null ){
+    					return null;
+    				}
+    				throw new DataNotFoundException("No result from filter");
     			}
-    			throw new DataNotFoundException("No result from filter");
     		}
     	}
     	
@@ -1292,8 +1296,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}catch(NoSQLFilterException e){
 			// do things the hard way
 		
-			Iterator<BDO> it = new FilterIterator(s);
-			return it.hasNext();
+			try(FilterIterator it = new FilterIterator(s)){
+				return it.hasNext();
+			}
 		}
 	}
 	// Note this is used to implement FilterMatcher so

@@ -55,7 +55,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
     static final Feature CHUNKING_FEATURE= new Feature("chunking",true,"retrieve SQL data in chunks using limit clause");
 		private PreparedStatement stmt;
 		private ResultSet rs;
-
+		
 		private int chunkstart;
 
 		private int maxreturn;
@@ -236,16 +236,20 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 		}
 
 		/** close the underlying statement etc. to free resources
+		 * @throws SQLException 
 		 * 
 		 */
-		public void close() {
+		public void close()  {
+			// Note this can be call when close called from DatabaseService cleanup itself
 			DatabaseService db_serv = getContext().getService(DatabaseService.class);
 			try {
 				if( rs != null && ! rs.isClosed()) {
 					rs.close();
 				}
 			} catch (SQLException e) {
-				db_serv.logError("Error closing ResultSet",e);
+				if( db_serv != null) {
+					db_serv.logError("Error closing ResultSet",e);
+				}
 			}
 			rs=null;
 			if( stmt == null){
@@ -259,7 +263,9 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 				db_serv.logError("Error closing statement",e);
 			}
 			stmt = null;
-			
+			if( db_serv != null) {
+				db_serv.removeClosable(this);
+			}
 		}
 
 		public final void remove() {
@@ -353,6 +359,8 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 				query.append(" LIMIT ?,?");
 			}
 			DatabaseService db_serv = getContext().getService(DatabaseService.class);
+			db_serv.addClosable(this);
+			
 			try {
 				tag=query.toString();
 				//System.out.println("Query is "+query);

@@ -18,13 +18,18 @@ package uk.ac.ed.epcc.webapp.model.data.iterator;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-/** Abstract class for combining a sequence of iterators
+
+import uk.ac.ed.epcc.webapp.model.data.CloseableIterator;
+/** Abstract class for combining a sequence of iterators.
  * 
+ * If the nested iterators implement {@link AutoCloseable} we assume only the current iterator
+ * needs closing
+ * @see CloseableIterator
  * @author spb
  *
  * @param <T>
  */
-public abstract class AbstractMultiIterator<T> implements Iterator<T> {
+public abstract class AbstractMultiIterator<T> implements CloseableIterator<T> {
     private Iterator<T> inner=null;
 
     /** return the next Iterator in the sequence or null if no more iterators
@@ -63,6 +68,14 @@ public abstract class AbstractMultiIterator<T> implements Iterator<T> {
 	public void remove() {
 		throw new UnsupportedOperationException(
 		"MultiIterator does not support remove");
+	}
+
+	@Override
+	public void close() throws Exception {
+		if( inner instanceof AutoCloseable) {
+			((AutoCloseable)inner).close();
+		}
+		
 	}
 
 }

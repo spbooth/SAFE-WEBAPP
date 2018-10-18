@@ -24,6 +24,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
+import uk.ac.ed.epcc.webapp.model.data.CloseableIterator;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+
 /**
  * Wrapper that iterates over multiple iterators in turn.
  * 
@@ -33,7 +36,7 @@ import java.util.Vector;
  */
 
 
-public class NestedIterator<T> implements Iterator<T> {
+public class NestedIterator<T> implements CloseableIterator<T> {
 	Vector<Iterator<? extends T>> list;
 
 	int count = 0;
@@ -92,6 +95,32 @@ public class NestedIterator<T> implements Iterator<T> {
 		throw new UnsupportedOperationException(
 				"NestedIterator does not support remove");
 
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.AutoCloseable#close()
+	 */
+	@Override
+	public void close() throws Exception {
+		DataFault f=null;
+		for(Iterator it : list) {
+			if( it instanceof AutoCloseable) {
+				try {
+					((AutoCloseable)it).close();
+				}catch(Exception e) {
+					if( f == null ) {
+						f = new DataFault("Close exception", e);
+					}else {
+						f.addSuppressed(e);
+					}
+				}
+			}
+		}
+		list.clear();
+		list=null;
+		if( f != null ) {
+			throw f;
+		}
 	}
 
 

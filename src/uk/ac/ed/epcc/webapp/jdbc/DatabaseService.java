@@ -34,7 +34,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  * @author spb
  *
  */
-public interface DatabaseService extends Contexed , AppContextService<DatabaseService>{
+public interface DatabaseService extends Contexed , AppContextService<DatabaseService>, CloseRegistry{
   public static final Feature LOG_QUERY_FEATURE = new Feature("log_query",false,"log all SQL queries");
 public static final Feature USE_SQL_DISTICT_FEATURE = new Feature("use_sql_distict",false,"add distinct clause when selecting objects from table. Should not need this unless filters are malformed");
 public static final Feature LOG_INSERT_FEATURE = new Feature("log_insert",false,"loag all SQL inserts");

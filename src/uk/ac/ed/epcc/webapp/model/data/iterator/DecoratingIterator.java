@@ -23,6 +23,8 @@ package uk.ac.ed.epcc.webapp.model.data.iterator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import uk.ac.ed.epcc.webapp.model.data.CloseableIterator;
+
 /**
  * DecoratingIterator Base class for a Decorator applied to an Iterator. Create
  * subclasses that overide the next and/or accept method to modify the returned
@@ -33,7 +35,7 @@ import java.util.NoSuchElementException;
  * @param <S> a superclass of incoming iterator
  * 
  */
-public abstract class DecoratingIterator<R,S> implements Iterator<R> {
+public abstract class DecoratingIterator<R,S> implements CloseableIterator<R> {
 	private Iterator<? extends S> it;
 
 	private S n = null;
@@ -105,6 +107,14 @@ public abstract class DecoratingIterator<R,S> implements Iterator<R> {
 		throw new UnsupportedOperationException(
 				"DecoratedIterator does not support remove");
 
+	}
+
+	@Override
+	public void close() throws Exception {
+		if( it instanceof AutoCloseable) {
+			((AutoCloseable)it).close();
+		}
+		
 	}
 
 }
