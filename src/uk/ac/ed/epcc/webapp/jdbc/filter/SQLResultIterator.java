@@ -28,6 +28,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.model.data.CloseableIterator;
 import uk.ac.ed.epcc.webapp.model.data.Removable;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 /** Iterator over filter results based on the SQL parts of a filter
@@ -37,7 +38,10 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
 	 * use. It is up to the calling method not to retain too many references to
 	 * the generated objects.
 	 * <p>
-	 * 
+	 * This is an {@link CloseableIterator} as it wraps jdbc {@link AutoCloseable}s. It should close automatically
+	 * when the iterator is exhausted. It also registers itself with the {@link DatabaseService} to be closed 
+	 * on {@link AppContext} cleanup if not explicitly closed before then.
+	 * <p>
 	 * Note that where the filter implements more than one of the supported
 	 * filter interfaces AcceptFilter, ConditionFilter, PatternFilter The
 	 * iterator will return the intersection of the sets selected by each
@@ -49,7 +53,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * @param <O> Type of object produced.
  * 
  */
-public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implements java.util.Iterator<O>, AutoCloseable {
+public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implements CloseableIterator<O> {
 	static final int DEFAULT_CHUNKSIZE = 1024;
 		
     static final Feature CHUNKING_FEATURE= new Feature("chunking",true,"retrieve SQL data in chunks using limit clause");

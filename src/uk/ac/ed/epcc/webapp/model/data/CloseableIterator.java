@@ -19,6 +19,18 @@ import uk.ac.ed.epcc.webapp.model.data.iterator.AbstractMultiIterator;
 
 /** A combination of {@link AutoCloseable} and {@link Iterator}
  * 
+ * This allows an iterator that encapsulates a chunking SQL operation. Suggested loop sytax is to
+ * use a try-with-resources statement containing a while loop.
+ * <pre>
+ * try(CloseableIterator it = .... ){
+ *   while(it.hasNext()){
+ *   
+ *   
+ *   }
+ * }
+ * </pre>
+ * 
+ * 
  * The contract of this interface is that the the {@link #close()} should be invokable
  * multiple times without additional error.
  * If the {@link Iterator} is run to completion than the object should automatically close. An additional
