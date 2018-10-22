@@ -13,11 +13,12 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms;
 
-/**
+/** a {@link FormValidator} that applies additional changes to the {@link Form} itself
+ * for example adding a 2FA token input
  * @author Stephen Booth
  *
  */
-public interface ModifyingFornValidator extends FormValidator {
+public interface ModifyingFormValidator extends FormValidator {
 	/** called when the validator is registered
 	 * 
 	 * @param f

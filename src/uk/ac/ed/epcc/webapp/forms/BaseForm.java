@@ -402,8 +402,8 @@ public class BaseForm implements Form {
 	 * @return The previous FormValidator
 	 */
 	public final void addValidator(FormValidator v) {
-		if( v instanceof ModifyingFornValidator) {
-			((ModifyingFornValidator)v).register(this);
+		if( v instanceof ModifyingFormValidator) {
+			((ModifyingFormValidator)v).register(this);
 		}
 		validators.add(v);
 	}
