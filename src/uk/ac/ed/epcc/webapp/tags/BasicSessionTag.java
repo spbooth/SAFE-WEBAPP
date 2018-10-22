@@ -13,7 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.tags;
 
-import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.Tag;
@@ -41,8 +42,10 @@ public class BasicSessionTag extends TagSupport implements Tag {
 	public int doEndTag() throws JspException {
 		try{
 		PageContext page = pageContext;
-		ServletRequest request = page.getRequest();
-		AppContext conn = ErrorFilter.makeContext(page.getServletContext(), request, page.getResponse());
+		HttpServletRequest request = (HttpServletRequest) page.getRequest();
+		HttpServletResponse response = (HttpServletResponse) page.getResponse();
+		AppContext conn = ErrorFilter.retrieveAppContext(request, response);
+				
 	    if( conn == null ){
 	    	// have to do this explicitly as normal method needs AppContesx
 	    	request.setAttribute(WebappServlet.MESSAGE_TYPE_ATTR, "internal_error");

@@ -142,9 +142,10 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
+		AppContext conn=null;
 		try{
 
-			AppContext conn = ErrorFilter.makeContext(config.getServletContext(), null, null);
+			conn= ErrorFilter.makeContext(config.getServletContext(), null, null);
 			boolean run_thread = conn.getBooleanParameter("HeartbeatServlet.run_thread",false);
 			long repeat = conn.getLongParameter("HeartbeatServlet.repeat", 5);
 
@@ -156,6 +157,10 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 			}
 		}catch(Exception t){
 			config.getServletContext().log("Error checking for heartbeat-thread", t);
+		}finally {
+			if( conn != null ) {
+				conn.close();
+			}
 		}
 	}
 	public Runner runner=null;
@@ -174,13 +179,16 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 		 */
 		@Override
 		public void run() {
-			
+			AppContext conn=null;
 			try {
-				AppContext conn = ErrorFilter.makeContext(config.getServletContext(), null, null);
+				conn = ErrorFilter.makeContext(config.getServletContext(), null, null);
 				runHeartbeat(conn, null);
-				conn.close();
 			} catch (Exception e) {
 				config.getServletContext().log("Error in Runner", e);
+			}finally {
+				if( conn != null ) {
+					conn.close();
+				}
 			}
 
 		}

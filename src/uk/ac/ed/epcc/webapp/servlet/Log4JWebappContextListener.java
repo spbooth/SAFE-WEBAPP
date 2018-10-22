@@ -58,15 +58,20 @@ public class Log4JWebappContextListener extends WebappContextListener {
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
+		AppContext conn=null;
 		try{
-		AppContext conn = ErrorFilter.makeContext(arg0.getServletContext(), null, null);
+		conn = ErrorFilter.makeContext(arg0.getServletContext(), null, null);
 	
 		LoggerService serv = conn.getService(LoggerService.class);
 		use_log4j = serv.getClass() == Log4JLoggerService.class;
 		serv.getLogger(getClass()).debug("Context started");
-		conn.close();
+		
 		}catch(Exception t){
 			arg0.getServletContext().log("Error starting Log4JWebappContextListener",t);
+		}finally {
+			if( conn != null) {
+				conn.close();
+			}
 		}
 	}
 
