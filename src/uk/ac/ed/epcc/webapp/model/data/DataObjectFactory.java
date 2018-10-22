@@ -824,6 +824,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
         // to give it a chance to throw any exceptions.
         
         private CloseableIterator<BDO> iter=null;
+        private CloseableIterator<BDO> prev=null;
         int start;
         int max;
         public FilterSet(BaseFilter<? super BDO> f) throws DataFault{
@@ -848,9 +849,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 */
 		public CloseableIterator<BDO> iterator() {
 			if( iter != null){
-				CloseableIterator<BDO> temp = iter;
+				prev = iter;
 				iter=null;
-				return temp;
+				return prev;
 			}
 			try{
 				return makeIterator();
@@ -878,7 +879,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 					getLogger().error("Error closing iterator", e);
 				}
 			}
-			
+			if( prev != null) {
+				try {
+					prev.close();
+				} catch (Exception e) {
+					getLogger().error("Error closing previous iterator", e);
+				}
+			}
 		}
       
 	}

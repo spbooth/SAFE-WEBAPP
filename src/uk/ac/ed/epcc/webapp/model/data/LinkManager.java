@@ -519,16 +519,16 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		private final R right;
 		private final BaseFilter<? super T> fil;
 		private CloseableIterator<T> iter;
-
+		private CloseableIterator<T> prev;
 		/* (non-Javadoc)
 		 * @see java.lang.Iterable#iterator()
 		 */
 		public CloseableIterator<T> iterator() {
 			try {
 				if( iter != null ){
-					CloseableIterator<T> result=iter;
+					prev=iter;
 					iter=null;
-					return result;
+					return prev;
 				}
 				return getLinkIterator(left,right, fil);
 			} catch (DataFault e) {
@@ -549,7 +549,13 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 					getLogger().error("Error closing iterator", e);
 				}
 			}
-			
+			if( prev != null ) {
+				try {
+					prev.close();
+				} catch (Exception e) {
+					getLogger().error("Error closing previous iterator", e);
+				}
+			}
 		}
 	}
 

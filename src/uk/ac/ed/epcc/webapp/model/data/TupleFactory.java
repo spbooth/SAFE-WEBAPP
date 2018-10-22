@@ -394,6 +394,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
         // to give it a chance to throw any exceptions.
         
         private CloseableIterator<T> iter=null;
+        private CloseableIterator<T> prev=null;
         int start;
         int max;
         public FilterSet(BaseFilter<T> f) throws DataFault{
@@ -416,9 +417,9 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 		 */
 		public CloseableIterator<T> iterator() {
 			if( iter != null){
-				CloseableIterator<T> temp = iter;
+				prev = iter;
 				iter=null;
-				return temp;
+				return prev;
 			}
 			try{
 				return makeIterator();
@@ -446,7 +447,13 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 					getLogger().error("Error closing iterator", e);
 				}
 			}
-			
+			if( prev != null ) {
+				try {
+					prev.close();
+				} catch (Exception e) {
+					getLogger().error("Error closing iterator", e);
+				}
+			}
 		}
       
 	}
