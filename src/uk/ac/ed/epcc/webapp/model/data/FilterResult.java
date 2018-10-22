@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @param <D> Type of object produced
  */
-public interface FilterResult<D>  extends Iterable<D>{
+public interface FilterResult<D>  extends Iterable<D>, AutoCloseable{
 
 	/** Generate a {@link List} representing the contents of the {@link FilterResult}
 	 * 
@@ -53,4 +53,5 @@ public interface FilterResult<D>  extends Iterable<D>{
 	@Override
 	CloseableIterator<D> iterator();
 
+	public abstract void close();
 }

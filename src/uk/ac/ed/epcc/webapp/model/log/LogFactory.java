@@ -49,6 +49,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.ClassType;
+import uk.ac.ed.epcc.webapp.model.data.CloseableIterator;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
@@ -597,12 +598,18 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 * @throws DataFault 
 	 */
 	public final void purge(O q) throws DataFault{
-		for (Iterator<T> it = getLog(q); it.hasNext();) {
-			T i = it.next();
-			it.remove();
-			
+		try(CloseableIterator<T> it = getLog(q)){
+			while(it.hasNext()) {
+
+				T i = it.next();
+				it.remove();
+			}
+		}catch(DataFault e) {
+			throw e;
+		} catch (Exception e) {
+			throw new DataFault("Error in close", e);
 		}
-		
+
 	}
 	/** purge all orphan entries.
 	 * Only works if the {@link LogOwner} is a {@link DataObjectFactory}.
@@ -616,7 +623,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		}
 	}
 	
-	public Iterator<T> getLog(O q) throws DataFault {
+	public CloseableIterator<T> getLog(O q) throws DataFault {
 		return new FilterIterator(new ReferenceFilter<T, O>(this, OWNER_ID, q));
 	}
 

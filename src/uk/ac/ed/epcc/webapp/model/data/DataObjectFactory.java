@@ -866,6 +866,20 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				return new FilterIterator((SQLFilter<BDO>)f, start,max);
 			}
 		}
+		/* (non-Javadoc)
+		 * @see java.lang.AutoCloseable#close()
+		 */
+		@Override
+		public void close(){
+			if( iter != null) {
+				try {
+					iter.close();
+				} catch (Exception e) {
+					getLogger().error("Error closing iterator", e);
+				}
+			}
+			
+		}
       
 	}
 	/** Filter that selects based on a condition on a referenced object.

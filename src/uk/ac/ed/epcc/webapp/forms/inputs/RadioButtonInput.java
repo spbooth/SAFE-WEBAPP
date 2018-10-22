@@ -41,6 +41,13 @@ public class RadioButtonInput<V, T> implements ListInput<V, T>, ParseInput<V> {
 		if( it != null && it.hasNext()){
 			setItem(it.next());
 		}
+		if( it instanceof AutoCloseable) {
+			try {
+				// 
+				((AutoCloseable)it).close();
+			} catch (Exception e) {
+			}
+		}
 	}
 	/** Construct a RadioButtonInput with a specified default (can be null).
 	 * 

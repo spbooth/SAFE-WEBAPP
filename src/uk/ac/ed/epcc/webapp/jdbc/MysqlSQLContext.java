@@ -88,9 +88,10 @@ public class MysqlSQLContext implements SQLContext {
 
 	public void close() throws SQLException {
 		if(conn != null){
+			closed=true;
 			conn.close();
 			assert(conn.isClosed());
-			closed=true;
+			
 		}
 
 	}

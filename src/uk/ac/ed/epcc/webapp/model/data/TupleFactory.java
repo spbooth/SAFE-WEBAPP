@@ -434,6 +434,20 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 				return new TupleIterator(f, start,max);
 			}
 		}
+		/* (non-Javadoc)
+		 * @see java.lang.AutoCloseable#close()
+		 */
+		@Override
+		public void close()  {
+			if( iter != null ) {
+				try {
+					iter.close();
+				} catch (Exception e) {
+					getLogger().error("Error closing iterator", e);
+				}
+			}
+			
+		}
       
 	}
     public FilterResult<T> makeResult(BaseFilter<T> f) throws DataFault{

@@ -68,6 +68,7 @@ public class DefaultDataBaseService implements DatabaseService {
 	// Have we already attempted to set the default connection
 	// we remember this so that we we don't keep attempting on fail
     private boolean connection_set=false;
+    private boolean closed=false;
     private final boolean force_rollback;
     private int old_isolation_level;
     private boolean in_transaction = false;
@@ -86,12 +87,15 @@ public class DefaultDataBaseService implements DatabaseService {
 		return getSQLContext(tag,ctx.getService(ConfigService.class).getServiceProperties());
 	}
 	/**
-	 * returns a database connection for the application based on a set of Config Proeprtis
+	 * returns a database connection for the application based on a set of Config Propertis
 	 * 
 	 * @return A {@link SQLContext}
 	 * @throws SQLException
 	 */
 	public synchronized  SQLContext getSQLContext(String tag,Properties props) throws SQLException {
+		if( closed ) {
+			throw new SQLException("DatabaseService already closed");
+		}
 		String key = tag;
 		if( key == null ){
 			key="default";
@@ -229,6 +233,7 @@ public class DefaultDataBaseService implements DatabaseService {
 	}
 
 	public synchronized void cleanup() {
+		closed=true;
 		closeRetainedClosables();
 		if( map != null){
 		for(SQLContext c : map.values()){

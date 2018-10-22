@@ -536,6 +536,21 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 				return null;
 			}
 		}
+
+		/* (non-Javadoc)
+		 * @see java.lang.AutoCloseable#close()
+		 */
+		@Override
+		public void close() {
+			if( iter != null ) {
+				try {
+					iter.close();
+				} catch (Exception e) {
+					getLogger().error("Error closing iterator", e);
+				}
+			}
+			
+		}
 	}
 
 
