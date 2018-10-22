@@ -39,7 +39,9 @@ import uk.ac.ed.epcc.webapp.CleanupService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.config.OverrideConfigService;
 import uk.ac.ed.epcc.webapp.email.logging.ServletEmailLoggerService;
+import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.JNDIDatabaseService;
+import uk.ac.ed.epcc.webapp.jdbc.WrappedDatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.config.DataBaseConfigService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -79,6 +81,7 @@ public class ErrorFilter implements Filter {
 	private static final Feature CONTEXT_CONFIG_FEATURE = new Feature("context.configuration",false,"Allow additional properties files based on the application Context");
 	private static final Feature CLEANUP_THREAD_FEATURE = new Feature("appcontext.cleanup_thread",true,"Close the AppContext in a thread if CleanupServices are defined");
 	private static final Feature EMAIL_LOGGING_FEATURE = new Feature("logging.send_email",true,"Send error reports by email");
+	public static final Feature CONNECTION_STATUS_FEATURE = new Feature("database.connection_status",false,"Track active database connections");
 	public static final Feature TIMER_FEATURE = new Feature("Timer",false,"gather timing information for performance analyis");
 	
 	private static final String LAST_ADDR_ATTR = "LastAddr";
@@ -321,10 +324,22 @@ public class ErrorFilter implements Filter {
 		conn.setService(new ServletContextConfigService(ctx,conn));
 		// Look for a connection pool. The pool name or database params may be in the 
 		// servlet config parameters so we need the ServletConfig first.
-		conn.setService( new JNDIDatabaseService(conn));
+		DatabaseService db_service = new JNDIDatabaseService(conn);
+		if( CONNECTION_STATUS_FEATURE.isEnabled(conn) && request instanceof HttpServletRequest) {
+			HttpServletRequest hs = (HttpServletRequest) request;
+			String id = hs.getServletPath();
+			String path = hs.getPathInfo();
+			if( path != null) {
+				id = id+"/"+hs.getPathInfo();
+			}
+			db_service = new WrappedDatabaseService(db_service,id);
+		}
+		conn.setService( db_service);
 		// Now add support for DataBase overrides. This needs the db connection
 		// so requires the db service.
 		conn.setService(new DataBaseConfigService(conn));
+		
+		
 		
 		// cache the parameters between requests.
 		// We want to be able to configure the use of the cache but it completely removes the whole point of 
