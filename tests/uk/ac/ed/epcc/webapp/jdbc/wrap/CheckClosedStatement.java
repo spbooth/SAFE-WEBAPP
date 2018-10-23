@@ -11,20 +11,30 @@
 //| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
-package uk.ac.ed.epcc.webapp.jdbc;
+package uk.ac.ed.epcc.webapp.jdbc.wrap;
 
-/** Registry of {@link AutoCloseable} objects.
- * 
- * The {@link AutoCloseable} objects can add themselves to the registry (so a close can be triggered later)
- * and should remove themselves when actually closed.
- * 
+import java.sql.SQLException;
+import java.sql.Statement;
+
+/**
  * @author Stephen Booth
  *
  */
-public interface CloseRegistry {
-	public void addClosable(AutoCloseable c);
-	
-	public void removeClosable(AutoCloseable c);
-	
-	public void closeRetainedClosables();
+public class CheckClosedStatement extends StatementWrapper<CheckCloseConnectionWrapper, Statement> {
+
+	/**
+	 * @param conn
+	 * @param nested
+	 */
+	public CheckClosedStatement(CheckCloseConnectionWrapper conn, Statement nested) {
+		super(conn, nested);
+		conn.statements_open++;
+	}
+
+	@Override
+	public void close() throws SQLException {
+		conn.statements_close++;
+		super.close();
+	}
+
 }

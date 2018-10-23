@@ -167,50 +167,53 @@ ListInputInterfaceTest
    }
    
    @Test
-   public void testLimitFilter() throws DataFault{
+   public void testLimitFilter() throws Exception{
 	   DataObjectFactory<O> f = getFactory();
 	   if( f.isValid()){
-	   int count=0;
-	   for(Iterator<O> it = f.getAllIterator(); it.hasNext() && count < 50 ;){
-		   O o =  it.next();
-		   assertTrue(f.isMine(o));
-		   count++;
-		   o.release();
+		   int count=0;
+		   try(CloseableIterator<O> it = f.getAllIterator()){
+			   while(it.hasNext() && count < 50 ){
+				   O o =  it.next();
+				   assertTrue(f.isMine(o));
+				   count++;
+				   o.release();
+			   }
+		   }
+		   int lcount=0;
+		   for(Iterator<O> it = f.new FilterIterator(null,0,5);it.hasNext();){
+			   O o =  it.next();
+			   assertTrue(f.isMine(o));
+			   lcount++;
+			   o.release();
+		   }
+		   if( count > 5){
+			   assertEquals(5,lcount);
+		   }else{
+			   assertEquals(lcount, count);
+		   }
+		   int lpos=0;
+		   try(CloseableIterator<O> it = f.getAllIterator()){
+			   while(it.hasNext() && lpos < 100 ){
+				   lcount=0;
+				   for(Iterator<O> it2 = f.new FilterIterator(null,lpos,7);it2.hasNext();){
+					   assertTrue(it.hasNext());
+					   O o =  it.next();
+					   O o2 =  it2.next();
+					   assertTrue(f.isMine(o));
+					   assertTrue(f.isMine(o2));
+					   assertTrue(o.equals(o2));
+					   lcount++;
+					   lpos++;
+					   o.release();
+					   o2.release();
+				   }
+				   if( it.hasNext()){
+					   assertEquals(7, lcount);
+				   }
+			   }
+		   }
 	   }
 
-	   int lcount=0;
-	   for(Iterator<O> it = f.new FilterIterator(null,0,5);it.hasNext();){
-		   O o =  it.next();
-		   assertTrue(f.isMine(o));
-		   lcount++;
-		   o.release();
-	   }
-	   if( count > 5){
-		   assertEquals(5,lcount);
-	   }else{
-		   assertEquals(lcount, count);
-	   }
-	   int lpos=0;
-	   for(Iterator<O> it = f.getAllIterator();it.hasNext() && lpos < 100 ;){
-		   lcount=0;
-		   for(Iterator<O> it2 = f.new FilterIterator(null,lpos,7);it2.hasNext();){
-			   assertTrue(it.hasNext());
-			   O o =  it.next();
-			   O o2 =  it2.next();
-			   assertTrue(f.isMine(o));
-			   assertTrue(f.isMine(o2));
-			   assertTrue(o.equals(o2));
-			   lcount++;
-			   lpos++;
-			   o.release();
-			   o2.release();
-		   }
-		   if( it.hasNext()){
-			   assertEquals(7, lcount);
-		   }
-	   }
-	   }
-	   
    }
    
    @SuppressWarnings("unchecked")

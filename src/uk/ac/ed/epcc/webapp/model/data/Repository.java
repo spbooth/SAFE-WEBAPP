@@ -2882,7 +2882,7 @@ public final class Repository implements AppContextCleanup{
 			
 			Connection c = db_serv.getSQLContext().getConnection();
 			DatabaseMetaData md = c.getMetaData();
-			ResultSet rs = md.getIndexInfo(null, null, table_name, false, true);
+			try(ResultSet rs = md.getIndexInfo(null, null, table_name, false, true)){
 			while( rs.next()){
 				String name = rs.getString("INDEX_NAME");
 				if( ! name.equals("PRIMARY")){
@@ -2898,7 +2898,7 @@ public final class Repository implements AppContextCleanup{
 				}
 				
 			}
-			rs.close();
+			}
 			indexes=result;
 		}catch(SQLException e){
 			db_serv.logError("Error getting index names", e);

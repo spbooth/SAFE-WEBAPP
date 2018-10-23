@@ -231,5 +231,13 @@ public class WrappedDatabaseService implements DatabaseService {
 	public void logError(String message, SQLException e) {
 		inner.logError(message, e);
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.CloseRegistry#closeRetainedClosables()
+	 */
+	@Override
+	public void closeRetainedClosables() {
+		inner.closeRetainedClosables();
+		
+	}
 
 }

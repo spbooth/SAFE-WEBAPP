@@ -166,4 +166,10 @@ public abstract class DatabaseServiceWrapper implements DatabaseService {
 		
 	}
 
+	@Override
+	public void closeRetainedClosables() {
+		nested.closeRetainedClosables();
+		
+	}
+
 }

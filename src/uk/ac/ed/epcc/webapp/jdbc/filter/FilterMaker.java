@@ -95,7 +95,7 @@ public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
 					}
 					if( rs.next() ){
 						if( DataObjectFactory.REJECT_MULTIPLE_RESULT_FEATURE.isEnabled(conn)){
-
+							
 							throw new MultipleResultException("Found multiple results expecting 1 :"+query.toString());
 						}else{
 							// just log

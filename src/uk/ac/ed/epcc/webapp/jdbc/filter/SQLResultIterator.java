@@ -244,8 +244,15 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 		 * 
 		 */
 		public void close()  {
-			// Note this can be call when close called from DatabaseService cleanup itself
+			if( stmt == null){
+				return; // already closed
+			}
+			// Note this can be called when close called from DatabaseService cleanup itself
+			// after service is de-registered
 			DatabaseService db_serv = getContext().getService(DatabaseService.class);
+			if( db_serv != null) {
+				db_serv.removeClosable(this);
+			}
 			try {
 				if( rs != null && ! rs.isClosed()) {
 					rs.close();
@@ -256,20 +263,18 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 				}
 			}
 			rs=null;
-			if( stmt == null){
-				return;
-			}
+			
 			try {
 				if( ! stmt.isClosed()) {
 					stmt.close();
 				}
 			} catch (SQLException e) {
-				db_serv.logError("Error closing statement",e);
+				if( db_serv != null) {
+					db_serv.logError("Error closing statement",e);
+				}
 			}
 			stmt = null;
-			if( db_serv != null) {
-				db_serv.removeClosable(this);
-			}
+			
 		}
 
 		public final void remove() {

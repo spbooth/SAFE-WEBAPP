@@ -1362,7 +1362,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return Iterator
 	 * @throws DataFault
 	 */
-	public Iterator<BDO> getAllIterator() throws DataFault {
+	public final CloseableIterator<BDO> getAllIterator() throws DataFault {
 		return new FilterIterator(null);
 	}
 	/** Get an Iterable over all contents of a table
@@ -1370,7 +1370,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return Iterable
 	 * @throws DataFault 
 	 */
-	public FilterResult<BDO> all() throws DataFault{
+	public final FilterResult<BDO> all() throws DataFault{
 		return new FilterSet(null);
 	}
 

@@ -481,6 +481,7 @@ public class RepositoryTest extends WebappTestBase {
 		        assertEquals(r.get(key),p.get(key));
 		 }
 		 rs.close();
+		 s.close();
 	}
 	
 	@Test
