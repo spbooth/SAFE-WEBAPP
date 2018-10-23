@@ -23,6 +23,8 @@ Note make sure that this page does not actually output any whitepace
 otherwise the redirect will fail
 
 --%>
+<%@page isErrorPage="true" %>
+<%@page session="false" %>
 <%@ page	
    import="uk.ac.ed.epcc.webapp.*"
 %>

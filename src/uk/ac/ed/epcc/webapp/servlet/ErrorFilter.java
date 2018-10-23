@@ -424,7 +424,9 @@ public class ErrorFilter implements Filter {
 	 */
 	public static AppContext retrieveAppContext(
 			HttpServletRequest req, HttpServletResponse res) throws ServletException {
-		return retrieveAppContext(req, res, true);
+		// only create if we are within the filter
+		// use the attribute added by the filter to signify this.
+		return retrieveAppContext(req, res, req.getAttribute(SERVLET_CONTEXT_ATTR)!=null);
 	}
 	public static AppContext retrieveAppContext(
 				HttpServletRequest req, HttpServletResponse res,boolean create) throws ServletException {	
