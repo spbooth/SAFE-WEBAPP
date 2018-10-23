@@ -31,7 +31,7 @@ import uk.ac.ed.epcc.webapp.model.data.CloseableIterator;
  * object.
  * 
  * @author spb
- * @param <R> REsult typeof iterator
+ * @param <R> Result typeof iterator
  * @param <S> a superclass of incoming iterator
  * 
  */

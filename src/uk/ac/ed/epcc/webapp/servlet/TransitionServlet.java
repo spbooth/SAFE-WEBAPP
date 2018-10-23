@@ -343,6 +343,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 							}
 						}
 						if( tr instanceof ForceRollBack) {
+							serv.closeRetainedClosables();
 							message(conn, req, res, "force_rollback",  key, tr.getMessage());
 							return;
 						}else {

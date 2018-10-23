@@ -1327,11 +1327,14 @@ public final class Repository implements AppContextCleanup{
 		}
 		
 		private void populate(int id2, boolean require_existing) throws DataException{
-			ResultSet set = findRecord(id2, require_existing);
-			if(set != null){
-				setContents(set);
-			}else{
-				id=id2; // remember id we want to use.
+			try(ResultSet set = findRecord(id2, require_existing)){
+				if(set != null){
+					setContents(set);
+				}else{
+					id=id2; // remember id we want to use.
+				}
+			} catch (SQLException e) {
+				getContext().getService(DatabaseService.class).handleError("Error closing result set", e);
 			}
 		}
 		/** Store data in record 
@@ -2279,6 +2282,7 @@ public final class Repository implements AppContextCleanup{
 				if( ! required){
 					return null;
 				}
+				rs.close();
 				throw new DataNotFoundException("No record with specified ID "+getTag()+":"+getUniqueIdName()+"="+id);
 			}
 			return rs;

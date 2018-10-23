@@ -96,8 +96,9 @@ public class CheckCloseDatabaseService extends DatabaseServiceWrapper {
 
 	@Override
 	public void cleanup() {
-		// comment out to check there are nodeferredcloses
-		//closeRetainedClosables(); // These would be closed ok in practice
+		// comment out to check there are no deferred closes
+		// uncomment to log which statements still open
+		closeRetainedClosables(); // These would be closed ok in practice
 		for(CheckClosedSQLContext x : map.values()) {
 			x.checkClosed();
 		}

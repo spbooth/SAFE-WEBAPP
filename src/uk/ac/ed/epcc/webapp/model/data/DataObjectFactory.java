@@ -1301,10 +1301,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}catch(NoSQLFilterException e){
 			// do things the hard way
 			long count=0;
-			Iterator<BDO> it = new FilterIterator(s);
-			while(it.hasNext()){
-				count++;
-				it.next();
+			try(CloseableIterator<BDO> it = new FilterIterator(s)){
+				while(it.hasNext()){
+					count++;
+					it.next();
+				}
+			} catch (Exception e1) {
+				throw new DataException("Error in close", e);
 			}
 			return count;
 		}
