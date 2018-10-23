@@ -25,11 +25,16 @@ otherwise the redirect will fail
 --%>
 <%@page isErrorPage="true" %>
 <%@page session="false" %>
-<%@ page	
-   import="uk.ac.ed.epcc.webapp.*"
-%>
 <%@ include file="/service_init.jsf"%>
+<%try{ %>
 <% String page_title = "Errorpage"; %>
 <%@ include file="/std_header.jsf"%>
 <%@ include file="/scripts/errorpage.jsf" %>
 <%@ include file="/std_footer.jsf"%>
+<%}finally{
+	// Errorpage is called outside the filter
+	if( conn != null){
+		conn.close();
+	}
+}
+%>

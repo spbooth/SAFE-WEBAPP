@@ -250,7 +250,7 @@ public class ErrorFilter implements Filter {
 				}
 				// remove the cached AppContext as this request object may be passed to
 				// the error-page and we are about to invalidate it
-				req.setAttribute(APP_CONTEXT_ATTR, null);
+				req.removeAttribute(APP_CONTEXT_ATTR);
 				
 				CleanupService cleanup = conn.getService(CleanupService.class);
 				// Run cleanup in a seperate thread IF interactive and cleanup actions
@@ -424,18 +424,18 @@ public class ErrorFilter implements Filter {
 	 */
 	public static AppContext retrieveAppContext(
 			HttpServletRequest req, HttpServletResponse res) throws ServletException {
-		// only create if we are within the filter
-		// use the attribute added by the filter to signify this.
-		return retrieveAppContext(req, res, req.getAttribute(SERVLET_CONTEXT_ATTR)!=null);
+		return retrieveAppContext(req, res, true);
 	}
 	public static AppContext retrieveAppContext(
 				HttpServletRequest req, HttpServletResponse res,boolean create) throws ServletException {	
 		AppContext conn = (AppContext) req.getAttribute(APP_CONTEXT_ATTR);
+		ServletContext servlet_ctx = (ServletContext) req.getAttribute(SERVLET_CONTEXT_ATTR);
 		// IF there is already an AppContext in the request then this is a recursive filter call so skip
-		if( req.getAttribute(APP_CONTEXT_ATTR) == null && create){
+		if( conn == null && servlet_ctx != null && create){
 			try {
 
-				conn = makeContext((ServletContext) req.getAttribute(SERVLET_CONTEXT_ATTR),req,res);
+				
+				conn = makeContext(servlet_ctx,req,res);
 				req.setAttribute(APP_CONTEXT_ATTR, conn);
 				if( EMAIL_LOGGING_FEATURE.isEnabled(conn)) {
 					// report error logs by email with page info need to replace this within closer

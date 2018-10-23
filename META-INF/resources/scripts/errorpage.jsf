@@ -45,7 +45,7 @@ if( error_code != null ){
 <h2>An error has occurred</h2>
 <% if( error_exception != null ){
 
-if( show != null && show.equals("yes")){
+if( error_exception != null && show != null && show.equals("yes")){
 	StringWriter sw = new StringWriter();
 	error_exception.printStackTrace(new PrintWriter(sw));
 	HtmlBuilder hb = new HtmlBuilder();
