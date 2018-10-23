@@ -59,6 +59,9 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 	}
 
 	protected String normalise(String old) throws PublicKeyParseException, IOException {
+		if( old == null ) {
+			return null;
+		}
 		return format(load(old));
 	}
 	protected abstract X load(String value) throws PublicKeyParseException;
