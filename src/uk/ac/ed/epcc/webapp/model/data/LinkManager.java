@@ -46,6 +46,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.filter.JoinerFilter;
@@ -556,6 +557,14 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 					getLogger().error("Error closing previous iterator", e);
 				}
 			}
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.AbstractFilterResult#getLogger()
+		 */
+		@Override
+		protected Logger getLogger() {
+			return LinkManager.this.getLogger();
 		}
 	}
 

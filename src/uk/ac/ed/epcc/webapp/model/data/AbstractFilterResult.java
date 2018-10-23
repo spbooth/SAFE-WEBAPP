@@ -18,6 +18,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import uk.ac.ed.epcc.webapp.logging.Logger;
+
+
 /**
  * @author spb
  * @param <D> 
@@ -46,4 +49,15 @@ public abstract class AbstractFilterResult<D> implements FilterResult<D> {
 	        	}
 	        	return res;
 	        }
+			@Override
+			public boolean isEmpty() {
+				try(CloseableIterator<D> it = iterator()){
+					return ! it.hasNext();
+				} catch (Exception e) {
+					getLogger().error("Error closing iterator", e);
+					return true;
+				}
+			}
+			
+			protected abstract Logger getLogger();
 }

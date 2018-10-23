@@ -52,6 +52,12 @@ public interface FilterResult<D>  extends Iterable<D>, AutoCloseable{
 
 	@Override
 	CloseableIterator<D> iterator();
+	
+	/** Is the result-set empty
+	 * 
+	 * @return
+	 */
+	public boolean isEmpty();
 
 	public abstract void close();
 }

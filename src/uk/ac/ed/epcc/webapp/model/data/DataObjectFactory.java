@@ -887,6 +887,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				}
 			}
 		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.AbstractFilterResult#getLogger()
+		 */
+		@Override
+		protected Logger getLogger() {
+			return DataObjectFactory.this.getLogger();
+		}
       
 	}
 	/** Filter that selects based on a condition on a referenced object.
