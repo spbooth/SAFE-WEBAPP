@@ -43,7 +43,6 @@ import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.DefaultConfigService;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DefaultDataBaseService;
-import uk.ac.ed.epcc.webapp.jdbc.wrap.CheckCloseDatabaseService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintLoggerService;
@@ -177,7 +176,7 @@ public final class AppContext {
     	clearService(TimerService.class);
     	if( DATABASE_FEATURE.isEnabled(this)){
     		// we can supress database setup with a config parameter
-    		setService(new CheckCloseDatabaseService(new DefaultDataBaseService(this)));
+    		setService(new DefaultDataBaseService(this));
     	}
     	
     }

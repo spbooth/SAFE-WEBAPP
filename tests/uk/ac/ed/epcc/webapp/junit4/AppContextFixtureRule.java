@@ -25,7 +25,9 @@ import uk.ac.ed.epcc.webapp.CleanupService;
 import uk.ac.ed.epcc.webapp.ContextHolder;
 import uk.ac.ed.epcc.webapp.config.DefaultConfigService;
 import uk.ac.ed.epcc.webapp.config.OverrideConfigService;
+import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.config.DataBaseConfigService;
+import uk.ac.ed.epcc.webapp.jdbc.wrap.CheckCloseDatabaseService;
 import uk.ac.ed.epcc.webapp.logging.debug.DebugLoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintLoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -113,6 +115,7 @@ public class AppContextFixtureRule extends ExternalResource{
 			}
 		}
 		ctx = new AppContext();
+		ctx.setService(new CheckCloseDatabaseService(ctx.getService(DatabaseService.class)));
 		ctx.setService(new PrintLoggerService());
 		ctx.setService(new DebugLoggerService(ctx));
 		ctx.setService( new SimpleSessionService(ctx));
