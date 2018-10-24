@@ -22,6 +22,8 @@ errorpage.jsp - Page used to trap and process servlet exceptions and errors
 Note make sure that this page does not actually output any whitepace 
 otherwise the redirect will fail
 
+This version creates an AppContext to allow config in the header/footer.
+This needs to be explicilty closed as the errorpage runs outside the ErrorFilter
 --%>
 <%@page isErrorPage="true" %>
 <%@page session="false" %>
