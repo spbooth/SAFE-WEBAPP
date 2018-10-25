@@ -26,6 +26,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
+import uk.ac.ed.epcc.webapp.config.FilteredProperties;
 import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -125,6 +126,8 @@ public class EmailLoggerService implements Contexed, LoggerService {
 		}
 		ConfigService cfg = conn.getService(ConfigService.class);
 		if( cfg != null ){
+			
+			
 			//l.debug("have config service");
 			Properties p = cfg.getServiceProperties();
 			Enumeration e = p.propertyNames();
@@ -136,6 +139,12 @@ public class EmailLoggerService implements Contexed, LoggerService {
 					props.put(key.toString(), value);
 				}
 			}
+			
+			// software versions
+			FilteredProperties version = new FilteredProperties(p, "version");
+			Map v = new HashMap<>();
+			version.putAll(v);
+			props.put("versions", v);
 		}else{
 			//l.debug("no config service");
 		}
