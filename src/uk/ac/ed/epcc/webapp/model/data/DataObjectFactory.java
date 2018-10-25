@@ -91,6 +91,7 @@ import uk.ac.ed.epcc.webapp.model.ParseFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.UncaughtDataFault;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 import uk.ac.ed.epcc.webapp.model.data.filter.Joiner;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
@@ -820,11 +821,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 */
 	protected class FilterSet extends AbstractFilterResult<BDO> implements Iterable<BDO>, FilterResult<BDO>{
 		private BaseFilter<? super BDO> f;
-        // create the first iterator in the constructor
-        // to give it a chance to throw any exceptions.
+       
         
-        private CloseableIterator<BDO> iter=null;
-        private CloseableIterator<BDO> prev=null;
+       
         int start;
         int max;
         public FilterSet(BaseFilter<? super BDO> f) throws DataFault{
@@ -836,30 +835,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			}
         	start=-1;
         	max=-1;
-        	iter = makeIterator();
         }
         public FilterSet(SQLFilter<? super BDO> f, int start, int max) throws DataFault{
         	this.f=f;
         	this.start=start;
         	this.max=max;
-        	iter = makeIterator();
         }
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.model.data.FilterResult#iterator()
-		 */
-		public CloseableIterator<BDO> iterator() {
-			if( iter != null){
-				prev = iter;
-				iter=null;
-				return prev;
-			}
-			try{
-				return makeIterator();
-			}catch(DataFault e){
-				DataObjectFactory.this.getLogger().error("Error making iterator for FilterSet",e);
-				return null;
-			}
-		}
+		
 		protected CloseableIterator<BDO> makeIterator() throws DataFault {
 			if( start < 0 ){
 				return new FilterIterator(f);
@@ -867,26 +849,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				return new FilterIterator((SQLFilter<BDO>)f, start,max);
 			}
 		}
-		/* (non-Javadoc)
-		 * @see java.lang.AutoCloseable#close()
-		 */
-		@Override
-		public void close(){
-			if( iter != null) {
-				try {
-					iter.close();
-				} catch (Exception e) {
-					getLogger().error("Error closing iterator", e);
-				}
-			}
-			if( prev != null) {
-				try {
-					prev.close();
-				} catch (Exception e) {
-					getLogger().error("Error closing previous iterator", e);
-				}
-			}
-		}
+		
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.data.AbstractFilterResult#getLogger()
 		 */
@@ -894,6 +857,16 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		protected Logger getLogger() {
 			return DataObjectFactory.this.getLogger();
 		}
+		@Override
+		public boolean isEmpty() throws  DataFault{
+			try {
+				return !exists(f);
+			}catch(DataFault df) {
+				throw df;
+			} catch (DataException e) {
+				throw new DataFault("Error in isEmpty",e);
+			}
+		}		
       
 	}
 	/** Filter that selects based on a condition on a referenced object.
@@ -1319,9 +1292,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return count;
 		}
 	}
-	public final boolean exists(BaseFilter<BDO> s) throws DataException{
+	public final boolean exists(BaseFilter<? super BDO> s) throws DataException{
 		try{
-			SQLFilter<BDO> sql_fil = FilterConverter.convert(s);
+			SQLFilter<? super BDO> sql_fil = FilterConverter.convert(s);
 			FilterExists counter = new FilterExists();
 			return ((Boolean)counter.find(sql_fil)).booleanValue();
 		}catch(NoSQLFilterException e){

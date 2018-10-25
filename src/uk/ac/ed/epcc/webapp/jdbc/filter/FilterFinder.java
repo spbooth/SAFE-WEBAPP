@@ -37,10 +37,10 @@ public abstract  class FilterFinder<T,O> extends FilterMaker<T,O> {
 	   super(c,target);
    }
    
-   public O find(SQLFilter<T> f) throws  DataException{
+   public O find(SQLFilter<? super T> f) throws  DataException{
 	   return find(f,allow_null);
    }
-   public O find(SQLFilter<T> f, boolean allow_null) throws  DataException{
+   public O find(SQLFilter<? super T> f, boolean allow_null) throws  DataException{
 	   setFilter((BaseFilter<T>)f);
 	   O res = make();
 	   if( res == null && ! allow_null){

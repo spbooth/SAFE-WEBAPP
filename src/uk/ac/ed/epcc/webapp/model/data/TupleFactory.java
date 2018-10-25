@@ -391,11 +391,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
     }
     protected class FilterSet extends AbstractFilterResult<T> implements Iterable<T>, FilterResult<T>{
 		private BaseFilter<T> f;
-        // create the first iterator in the constructor
-        // to give it a chance to throw any exceptions.
         
-        private CloseableIterator<T> iter=null;
-        private CloseableIterator<T> prev=null;
         int start;
         int max;
         public FilterSet(BaseFilter<T> f) throws DataFault{
@@ -405,55 +401,18 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 			
         	start=-1;
         	max=-1;
-        	iter = makeIterator();
         }
         public FilterSet(SQLFilter f, int start, int max) throws DataFault{
         	this.f=f;
         	this.start=start;
         	this.max=max;
-        	iter = makeIterator();
         }
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.model.data.FilterResult#iterator()
-		 */
-		public CloseableIterator<T> iterator() {
-			if( iter != null){
-				prev = iter;
-				iter=null;
-				return prev;
-			}
-			try{
-				return makeIterator();
-			}catch(DataFault e){
-				TupleFactory.this.getLogger().error("Error making iterator for FilterSet",e);
-				return null;
-			}
-		}
+		
 		protected CloseableIterator<T> makeIterator() throws DataFault {
 			if( start < 0 ){
 				return new TupleIterator(f);
 			}else{
 				return new TupleIterator(f, start,max);
-			}
-		}
-		/* (non-Javadoc)
-		 * @see java.lang.AutoCloseable#close()
-		 */
-		@Override
-		public void close()  {
-			if( iter != null ) {
-				try {
-					iter.close();
-				} catch (Exception e) {
-					getLogger().error("Error closing iterator", e);
-				}
-			}
-			if( prev != null ) {
-				try {
-					prev.close();
-				} catch (Exception e) {
-					getLogger().error("Error closing iterator", e);
-				}
 			}
 		}
 		/* (non-Javadoc)

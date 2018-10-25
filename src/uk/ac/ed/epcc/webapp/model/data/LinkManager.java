@@ -513,51 +513,13 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			this.left=left;
 			this.right = right;
 			this.fil = fil;
-			iter=getLinkIterator(left,right, fil);
 		}
 
 		private final L left;
 		private final R right;
 		private final BaseFilter<? super T> fil;
-		private CloseableIterator<T> iter;
-		private CloseableIterator<T> prev;
-		/* (non-Javadoc)
-		 * @see java.lang.Iterable#iterator()
-		 */
-		public CloseableIterator<T> iterator() {
-			try {
-				if( iter != null ){
-					prev=iter;
-					iter=null;
-					return prev;
-				}
-				return getLinkIterator(left,right, fil);
-			} catch (DataFault e) {
-				LinkManager.this.getLogger().error("Error making iterator for LinkResult", e);
-				return null;
-			}
-		}
-
-		/* (non-Javadoc)
-		 * @see java.lang.AutoCloseable#close()
-		 */
-		@Override
-		public void close() {
-			if( iter != null ) {
-				try {
-					iter.close();
-				} catch (Exception e) {
-					getLogger().error("Error closing iterator", e);
-				}
-			}
-			if( prev != null ) {
-				try {
-					prev.close();
-				} catch (Exception e) {
-					getLogger().error("Error closing previous iterator", e);
-				}
-			}
-		}
+		
+		
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.data.AbstractFilterResult#getLogger()
@@ -566,6 +528,24 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		protected Logger getLogger() {
 			return LinkManager.this.getLogger();
 		}
+		@Override
+		public boolean isEmpty() throws  DataFault{
+			try {
+				return !exists(fil);
+			}catch(DataFault df) {
+				throw df;
+			} catch (DataException e) {
+				throw new DataFault("Error in isEmpty",e);
+			}
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.AbstractFilterResult#makeIterator()
+		 */
+		@Override
+		protected CloseableIterator<T> makeIterator() throws DataFault {
+			// TODO Auto-generated method stub
+			return getLinkIterator(left, right, fil);
+		}		
 	}
 
 

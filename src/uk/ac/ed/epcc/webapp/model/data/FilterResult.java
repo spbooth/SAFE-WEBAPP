@@ -17,8 +17,9 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
+
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 
 /** Interface for containers that hold Filter results
@@ -56,8 +57,9 @@ public interface FilterResult<D>  extends Iterable<D>, AutoCloseable{
 	/** Is the result-set empty
 	 * 
 	 * @return
+	 * @throws DataFault 
 	 */
-	public boolean isEmpty();
+	public boolean isEmpty() throws DataFault;
 
 	public abstract void close();
 }

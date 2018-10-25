@@ -19,6 +19,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.UncaughtDataFault;
 
 
 /**
@@ -28,7 +30,38 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
  */
 
 public abstract class AbstractFilterResult<D> implements FilterResult<D> {
+	private CloseableIterator<D> iter=null;
 	
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.data.FilterResult#iterator()
+	 */
+	public final CloseableIterator<D> iterator() {
+		
+		try{
+			if( iter != null){
+				iter.close();
+			}
+			return iter=makeIterator();
+		}catch(Exception e){
+			getLogger().error("Error making iterator for FilterSet",e);
+			throw new UncaughtDataFault("Error making iterator", e);
+		}
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.AutoCloseable#close()
+	 */
+	@Override
+	public final void close(){
+		if( iter != null) {
+			try {
+				iter.close();
+				iter=null;
+			} catch (Exception e) {
+				getLogger().error("Error closing iterator", e);
+			}
+		}
+	}
+	protected abstract CloseableIterator<D> makeIterator() throws DataFault;
 	  /* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.model.data.FilterResult#toCollection()
 			 */
@@ -50,12 +83,11 @@ public abstract class AbstractFilterResult<D> implements FilterResult<D> {
 	        	return res;
 	        }
 			@Override
-			public boolean isEmpty() {
+			public boolean isEmpty() throws DataFault {
 				try(CloseableIterator<D> it = iterator()){
 					return ! it.hasNext();
 				} catch (Exception e) {
-					getLogger().error("Error closing iterator", e);
-					return true;
+					throw new DataFault("Error in isEmpty",e);
 				}
 			}
 			
