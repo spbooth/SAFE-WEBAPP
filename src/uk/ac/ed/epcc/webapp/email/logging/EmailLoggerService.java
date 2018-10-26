@@ -143,7 +143,10 @@ public class EmailLoggerService implements Contexed, LoggerService {
 			// software versions
 			FilteredProperties version = new FilteredProperties(p, "version");
 			Map v = new HashMap<>();
-			version.putAll(v);
+			for(Enumeration ve= version.propertyNames(); ve.hasMoreElements() ;) {
+				Object key = ve.nextElement();
+				v.put(key, version.getProperty(key.toString()));
+			}
 			props.put("versions", v);
 		}else{
 			//l.debug("no config service");
