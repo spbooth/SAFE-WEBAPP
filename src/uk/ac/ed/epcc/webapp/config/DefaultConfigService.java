@@ -24,6 +24,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 
 public class DefaultConfigService extends AbstractConfigService implements ConfigService, Contexed{
+	public static final String BUILD_PATH_PROP_NAME = "build.path";
 	/**
 	 * 
 	 */
@@ -69,7 +70,8 @@ public class DefaultConfigService extends AbstractConfigService implements Confi
 				service_props = loadFile(service_props,service_props.getProperty(DEFAULT_PATH_PROP_NAME,"default-config.properties"),false);
 				service_props = loadFile(service_props,service_props.getProperty(CONFIG_PATH_PROP_NAME,"service-config.properties"),true);
 				service_props = loadFile(service_props,service_props.getProperty(DEPLOY_PATH_PROP_NAME,"deploy-config.properties"),false);
-			
+				service_props = loadFile(service_props,service_props.getProperty(BUILD_PATH_PROP_NAME,"build-config.properties"),false);
+				
 				
 			}
 			return service_props;

@@ -18,15 +18,9 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import uk.ac.ed.epcc.webapp.WebappTestBase;
-import uk.ac.ed.epcc.webapp.forms.AbstractInputTestCase;
-import uk.ac.ed.epcc.webapp.forms.InputInterfaceTest;
-import uk.ac.ed.epcc.webapp.forms.InputInterfaceTestImpl;
 import uk.ac.ed.epcc.webapp.forms.ListInputInterfaceTest;
 import uk.ac.ed.epcc.webapp.forms.ListInputInterfaceTestImpl;
 import uk.ac.ed.epcc.webapp.forms.ParseAbstractInputTestCase;
-import uk.ac.ed.epcc.webapp.forms.TestDataProvider;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
 import uk.ac.ed.epcc.webapp.model.data.TestType.TestValue;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.BasicTypeInput;
 
