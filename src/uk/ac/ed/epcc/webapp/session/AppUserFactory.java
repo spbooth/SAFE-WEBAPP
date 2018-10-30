@@ -339,7 +339,7 @@ AccessRoleProvider<AU, AU>
 	
 	@Override
 	public Class<AU> getTarget(){
-		return (Class<AU>) AppUser.class;
+		return (Class) AppUser.class;
 	}
 
 

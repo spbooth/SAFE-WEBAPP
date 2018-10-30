@@ -296,7 +296,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		return part_tag;
 	}
 	public Class<P> getTarget(){
-		return (Class<P>) Part.class;
+		return (Class) Part.class;
 	}
 
 	

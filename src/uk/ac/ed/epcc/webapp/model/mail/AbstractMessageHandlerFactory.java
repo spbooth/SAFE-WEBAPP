@@ -323,7 +323,7 @@ public abstract class AbstractMessageHandlerFactory<H extends AbstractMessageHan
 
 	@Override
 	public Class<H> getTarget() {
-		return (Class<H>) Provider.class;
+		return (Class) Provider.class;
 	}
 
 	@Override

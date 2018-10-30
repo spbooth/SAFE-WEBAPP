@@ -746,7 +746,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	}
 	@Override
 	public Class<H> getTarget(){
-		return (Class<H>) HistoryRecord.class;
+		return (Class) HistoryRecord.class;
 	}
 
 	/**

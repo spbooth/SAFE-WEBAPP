@@ -1183,7 +1183,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * 
 	 */
     public Class<BDO> getTarget(){
-    	return (Class<BDO>) DataObject.class;
+    	return (Class) DataObject.class;
     }
 	/**
 	 * get a single Object via its unique id as a number. If the number is null

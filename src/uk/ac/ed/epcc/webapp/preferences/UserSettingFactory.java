@@ -136,7 +136,7 @@ public class UserSettingFactory<S extends UserSettingFactory.UserSetting> extend
 
 	@Override
 	public Class<S> getTarget() {
-		return (Class<S>) UserSetting.class;
+		return (Class) UserSetting.class;
 	}
 
 	@Override

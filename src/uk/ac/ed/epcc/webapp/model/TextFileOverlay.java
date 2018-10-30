@@ -723,7 +723,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 
 	@Override
 	public Class<T> getTarget() {
-		return (Class<T>) TextFile.class;
+		return (Class) TextFile.class;
 	}
 
 	/* (non-Javadoc)

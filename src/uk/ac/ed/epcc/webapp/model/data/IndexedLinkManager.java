@@ -782,6 +782,6 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 
 	@Override
 	public Class<T> getTarget(){
-		return (Class<T>) Link.class;
+		return (Class) Link.class;
 	}
 }

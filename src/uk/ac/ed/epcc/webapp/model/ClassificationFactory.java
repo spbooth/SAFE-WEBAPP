@@ -127,7 +127,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	}
 	@Override
 	public Class<T> getTarget() {
-		return (Class<T>) Classification.class;
+		return (Class) Classification.class;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#findByName(java.lang.String)

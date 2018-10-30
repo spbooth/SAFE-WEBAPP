@@ -51,7 +51,7 @@ public class TextDataFactory<T extends TextData> extends DataObjectFactory<T> im
 	}
 	@Override
 	public Class<T> getTarget() {
-		return (Class<T>) TextData.class;
+		return (Class) TextData.class;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.AnonymisingFactory#anonymise()

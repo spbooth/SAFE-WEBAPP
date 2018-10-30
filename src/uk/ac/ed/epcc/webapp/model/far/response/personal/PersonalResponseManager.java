@@ -184,7 +184,7 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 
 	@Override
 	public Class<R> getTarget() {
-		return (Class<R>) PersonalResponse.class;
+		return (Class) PersonalResponse.class;
 	}
 
 	/* (non-Javadoc)

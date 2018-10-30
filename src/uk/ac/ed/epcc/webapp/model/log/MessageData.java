@@ -76,7 +76,7 @@ public class MessageData extends MessageDataObject implements MessageProvider , 
 		 */
 		@Override
 		public Class<M> getTarget() {
-			return (Class<M>) MessageData.class;
+			return (Class) MessageData.class;
 		}
 		
 	}

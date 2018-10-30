@@ -288,7 +288,7 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 	}
 	@Override
 	public Class<M> getTarget() {
-		return (Class<M>) MultiLink.class;
+		return (Class) MultiLink.class;
 	}
 	
 
