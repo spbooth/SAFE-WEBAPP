@@ -714,7 +714,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 
 	@Override
 	public Class<T> getTarget(){
-		return (Class<T>) Link.class;
+		return (Class) Link.class;
 	}
 	/** Get a filter for the left peer from a filter on the link
 	 * 

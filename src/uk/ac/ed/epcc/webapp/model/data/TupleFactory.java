@@ -493,7 +493,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 	 */
 	@Override
 	public Class<T> getTarget() {
-		return (Class<T>) Tuple.class;
+		return (Class) Tuple.class;
 	}
 
 	/** get the component factories of the tuples

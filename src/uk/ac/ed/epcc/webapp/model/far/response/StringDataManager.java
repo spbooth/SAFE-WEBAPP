@@ -98,7 +98,7 @@ extends ResponseDataManager<M, R, F> {
 
 	@Override
 	public Class<M> getTarget() {
-		return (Class<M>) StringData.class;
+		return (Class) StringData.class;
 	}
 
 	@Override

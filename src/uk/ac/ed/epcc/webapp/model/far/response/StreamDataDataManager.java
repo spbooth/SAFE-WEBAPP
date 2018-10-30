@@ -145,7 +145,7 @@ extends ResponseDataManager<M, R, F> {
 
 	@Override
 	public Class<M> getTarget() {
-		return (Class<M>) StreamDataRecord.class;
+		return (Class) StreamDataRecord.class;
 	}
 
 	@Override

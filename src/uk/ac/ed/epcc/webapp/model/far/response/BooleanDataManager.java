@@ -88,7 +88,7 @@ extends ResponseDataManager<M, R, F> {
 
 	@Override
 	public Class<M> getTarget() {
-		return (Class<M>) BooleanData.class;
+		return (Class) BooleanData.class;
 	}
 
 	@Override
