@@ -78,7 +78,7 @@ public class TypeProducerFieldValue<T extends DataObject,O,D> implements FieldVa
 		stmt.setObject(pos,producer.getIndex(value));
 		
 	}
-	public Class<? super O> getTarget() {
+	public Class<O> getTarget() {
 		return producer.getTarget();
 	}
 	

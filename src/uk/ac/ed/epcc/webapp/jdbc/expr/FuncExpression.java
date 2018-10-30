@@ -108,7 +108,7 @@ public class FuncExpression<T> implements SQLExpression<T> {
 			return (T) rs.getObject(pos);
 		}
 	}
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		return target_class;
 	}
 	public SQLFilter getRequiredFilter() {

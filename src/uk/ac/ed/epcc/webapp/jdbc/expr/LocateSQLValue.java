@@ -62,7 +62,7 @@ public class LocateSQLValue implements SQLValue<Integer>{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
-	public Class<? super Integer> getTarget() {
+	public Class<Integer> getTarget() {
 		return Integer.class;
 	}
 	

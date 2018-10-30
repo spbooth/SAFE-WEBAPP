@@ -45,7 +45,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  */
 
 
-public abstract class AbstractSelfSQLValue<T extends DataObject,R> implements SQLAccessor<IndexedReference<T>,R>,FilterProvider<R, IndexedReference<T>>,IndexedSQLValue<R, T> {
+public abstract class AbstractSelfSQLValue<T extends DataObject,R> implements SQLAccessor<IndexedReference,R>,FilterProvider<R, IndexedReference>,IndexedSQLValue<R, T> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue#getIDExpression()
 	 */
@@ -88,20 +88,21 @@ public abstract class AbstractSelfSQLValue<T extends DataObject,R> implements SQ
 		return "SelfId";
 	}
 	
-	
+	@Override
 	public final SQLFilter getRequiredFilter() {
 		return null;
 	}
-	
+	@Override
 	public final boolean canSet() {
 		return false;
 	}
 
-	public final void setValue(R r, IndexedReference<T> value) {
+	@Override
+	public final void setValue(R r, IndexedReference value) {
 		throw new ConsistencyError("Cannot set self reference");
 	}
-
-	public final SQLFilter<R> getFilter(MatchCondition match, IndexedReference<T> val)
+	@Override
+	public final SQLFilter<R> getFilter(MatchCondition match, IndexedReference val)
 			throws CannotFilterException {
 		if( match == null ){
 			return new SelfReferenceFilter<R>(getFilterType(),fac.res,val);
@@ -110,11 +111,12 @@ public abstract class AbstractSelfSQLValue<T extends DataObject,R> implements SQ
 		}
 		throw new CannotFilterException("Relative MatchCondition requested for IndexedReference");
 	}
-
+	@Override
 	public final SQLFilter<R> getNullFilter(boolean is_null)
 			throws CannotFilterException {
 		return new GenericBinaryFilter<>(getFilterType(), ! is_null);
 	}
+	@Override
 	public final SQLFilter<R> getOrderFilter(boolean descending)
 			throws CannotFilterException {
 		return new PrimaryOrderFilter<R>(getFilterType(),fac.res, descending);

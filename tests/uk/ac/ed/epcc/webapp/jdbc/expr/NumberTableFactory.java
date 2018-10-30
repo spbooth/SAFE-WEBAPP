@@ -88,7 +88,7 @@ public class NumberTableFactory extends DataObjectFactory<NumberTableFactory.Num
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getTarget()
 	 */
 	@Override
-	public Class<? super NumberTable> getTarget() {
+	public Class<NumberTable> getTarget() {
 		return NumberTable.class;
 	}
 	public class ReductionFinder extends AbstractFinder<Double>{

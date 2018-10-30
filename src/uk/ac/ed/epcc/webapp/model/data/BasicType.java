@@ -74,8 +74,8 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
     	private final T target;
 		private final Repository res;
         private final BasicType<T> type;
-        private final Class<? super I> owner;
-		private SQLTypeFilter(Class<? super I> owner,BasicType<T> type, Repository res, T v) {
+        private final Class<I> owner;
+		private SQLTypeFilter(Class<I> owner,BasicType<T> type, Repository res, T v) {
 			this.owner=owner;
 			this.type=type;
 			this.res=res;
@@ -114,7 +114,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 		 */
-		public <X> X acceptVisitor(FilterVisitor<X, ? extends I> vis) throws Exception {
+		public <X> X acceptVisitor(FilterVisitor<X,I> vis) throws Exception {
 			return vis.visitPatternFilter(this);
 		}
 
@@ -130,7 +130,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#getType()
 		 */
-		public Class<? super I> getTarget() {
+		public Class<I> getTarget() {
 			return owner;
 		}
 		
@@ -142,11 +142,11 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 
 	
 	public static class TypeSetSQLFilter<T extends BasicType.Value,I> implements PatternFilter<I>, SQLFilter<I>{
-		private final Class<? super I> owner; 
+		private final Class<I> owner; 
 		private final Set<T> set;
         private final Repository res;
         private final BasicType<T> type;
-        public TypeSetSQLFilter(Class<? super I> owner, BasicType<T> type,Repository res, Set<T> set){
+        public TypeSetSQLFilter(Class<I> owner, BasicType<T> type,Repository res, Set<T> set){
         	this.owner=owner;
         	this.set=set;
         	this.res=res;
@@ -183,7 +183,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 		 */
-		public <X> X acceptVisitor(FilterVisitor<X, ? extends I> vis) throws Exception {
+		public <X> X acceptVisitor(FilterVisitor<X, I> vis) throws Exception {
 			return vis.visitPatternFilter(this);
 		}
 		/* (non-Javadoc)
@@ -195,7 +195,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#getType()
 		 */
-		public Class<? super I> getTarget() {
+		public Class<I> getTarget() {
 			return owner;
 		}
 		public String toString() {
@@ -493,9 +493,9 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		return set;
 	}
 
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		
-		return Value.class;
+		return (Class<T>) Value.class;
 	}
 	public String toString(){
 		return getClass().getSimpleName()+"."+field;

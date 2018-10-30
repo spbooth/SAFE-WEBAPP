@@ -49,8 +49,8 @@ public class AbstractAction<R> implements ActionListener<R>{
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public final Class<? super R> getTarget() {
-		return clazz;
+	public final Class<R> getTarget() {
+		return (Class<R>) clazz;
 	}
 
 }

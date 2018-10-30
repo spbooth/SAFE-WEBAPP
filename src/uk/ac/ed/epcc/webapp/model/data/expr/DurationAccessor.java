@@ -33,7 +33,7 @@ public Duration getValue(R r) {
 
 	return new Duration(start.getValue(r),end.getValue(r));
 }
-public Class<? super Duration> getTarget() {
+public Class<Duration> getTarget() {
 	return Duration.class;
 }
 @Override

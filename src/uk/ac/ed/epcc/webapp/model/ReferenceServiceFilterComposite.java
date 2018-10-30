@@ -78,7 +78,7 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	 * @return {@link SQLFilter}
 	 */
 	public SQLFilter<BDO> getCurrentServiceFilter(){
-		Class<? super BDO> target = getFactory().getTarget();
+		Class<BDO> target = getFactory().getTarget();
 		int[] currentIDs = getCurrentIDs();
 		if(currentIDs != null && currentIDs.length > 0){
 			// Match any id in current view list or null.
@@ -98,7 +98,7 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	 * @return {@link SQLFilter}
 	 */
 	public SQLFilter<BDO> getOtherServiceFilter(){
-		Class<? super BDO> target = getFactory().getTarget();
+		Class<BDO> target = getFactory().getTarget();
 		int[] currentIDs = getCurrentIDs();
 		if(currentIDs != null && currentIDs.length > 0){
 			SQLAndFilter<BDO> fil = new SQLAndFilter<>(target);

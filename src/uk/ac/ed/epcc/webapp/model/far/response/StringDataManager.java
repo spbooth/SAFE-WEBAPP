@@ -38,7 +38,8 @@ import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
  *
  */
 
-public class StringDataManager<R extends Response<F>,F extends DynamicForm> extends ResponseDataManager<StringDataManager<R,F>.StringData, R, F> {
+public class StringDataManager<R extends Response<F>,F extends DynamicForm, M extends StringDataManager<R,F,M>.StringData> 
+extends ResponseDataManager<M, R, F> {
 
 	private static final String DATA_FIELD="Data";
  	/**
@@ -96,8 +97,8 @@ public class StringDataManager<R extends Response<F>,F extends DynamicForm> exte
 	}
 
 	@Override
-	public Class<? super StringDataManager<R, F>.StringData> getTarget() {
-		return StringData.class;
+	public Class<M> getTarget() {
+		return (Class<M>) StringData.class;
 	}
 
 	@Override

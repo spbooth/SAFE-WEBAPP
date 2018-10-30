@@ -295,8 +295,8 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 	public final String getPartTag(){
 		return part_tag;
 	}
-	public Class<? super P> getTarget(){
-		return Part.class;
+	public Class<P> getTarget(){
+		return (Class<P>) Part.class;
 	}
 
 	
@@ -411,7 +411,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 		 */
 		@Override
-		public <X> X acceptVisitor(FilterVisitor<X, ? extends P> vis)
+		public <X> X acceptVisitor(FilterVisitor<X, P> vis)
 				throws Exception {
 			return vis.visitOrderFilter(this);
 		}
@@ -420,7 +420,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
 		@Override
-		public Class<? super P> getTarget() {
+		public Class<P> getTarget() {
 			return PartManager.this.getTarget();
 		}
 

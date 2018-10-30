@@ -36,14 +36,14 @@ import uk.ac.ed.epcc.webapp.model.data.forms.SQLMatcher;
 public class SQLFormFilter<T extends DataObject> extends SQLAndFilter<T>{
 
 	public SQLFormFilter(Form f) {
-		this(DataObject.class,null,f,null);
+		this((Class<T>) DataObject.class,null,f,null);
 
 	}
     public SQLFormFilter(Form f, Map<String,SQLMatcher<T>> m){
-    	this(DataObject.class,null,f,m);
+    	this((Class<T>) DataObject.class,null,f,m);
     }
     @SuppressWarnings("unchecked")
-	public SQLFormFilter(Class<? super T> target,Repository res,Form f, Map<String,SQLMatcher<T>> matchers){ 
+	public SQLFormFilter(Class<T> target,Repository res,Form f, Map<String,SQLMatcher<T>> matchers){ 
     	super(target);
     	for(Iterator<String> it=f.getFieldIterator(); it.hasNext();){
 			String field = it.next();

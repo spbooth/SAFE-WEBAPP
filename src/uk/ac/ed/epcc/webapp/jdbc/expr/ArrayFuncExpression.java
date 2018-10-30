@@ -30,8 +30,8 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 /**
  * 
  * @author spb
- *
- * @param <T>
+ * @param <F> filter type
+ * @param <T> type of expression
  */
 public class ArrayFuncExpression<F,T> implements SQLExpression<T> {
 	
@@ -89,13 +89,14 @@ public class ArrayFuncExpression<F,T> implements SQLExpression<T> {
 		sb.append(")");
 		return sb.toString();
 	}
-	@SuppressWarnings("unchecked")
+	
 	public T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		return e[0].makeObject(rs,pos);
 	}
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		return target_class;
 	}
+	@SuppressWarnings("unchecked")
 	public SQLFilter<F> getRequiredFilter() {
 		SQLAndFilter<F> result = null;
 		for(SQLExpression<? extends T> x: e){

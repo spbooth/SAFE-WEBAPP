@@ -21,14 +21,14 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
  * @author spb
  * @see NegatingFilterVisitor
  */
-public class NotAcceptFilter<T extends DataObject> extends AbstractAcceptFilter<T> implements NegatingFilter<BaseFilter<? super T>> {
+public class NotAcceptFilter<T extends DataObject> extends AbstractAcceptFilter<T> implements NegatingFilter<BaseFilter<T>> {
 
 	/**
 	 * @param target
 	 * @param fac
 	 * @param fil
 	 */
-	public NotAcceptFilter(DataObjectFactory<T> fac, BaseFilter<? super T> fil) {
+	public NotAcceptFilter(DataObjectFactory<T> fac, BaseFilter<T> fil) {
 		super(fac.getTarget());
 		this.fac = fac;
 		this.fil = fil;
@@ -37,7 +37,7 @@ public class NotAcceptFilter<T extends DataObject> extends AbstractAcceptFilter<
 
 
 	private final DataObjectFactory<T> fac;
-	private final BaseFilter<? super T> fil;
+	private final BaseFilter<T> fil;
 	
 
 	/* (non-Javadoc)
@@ -53,7 +53,7 @@ public class NotAcceptFilter<T extends DataObject> extends AbstractAcceptFilter<
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.NegatingFilter#getNested()
 	 */
 	@Override
-	public BaseFilter<? super T> getNested() {
+	public BaseFilter<T> getNested() {
 		return fil;
 	}
 

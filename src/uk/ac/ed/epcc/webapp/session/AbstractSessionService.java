@@ -995,12 +995,12 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	
 	
 	@Override
-	public final <T extends DataObject> BaseFilter<? super T> getRelationshipRoleFilter(DataObjectFactory<T> fac,
+	public final <T extends DataObject> BaseFilter<T> getRelationshipRoleFilter(DataObjectFactory<T> fac,
 			String role) throws UnknownRelationshipException {
 		// We may be storing roles from different types so prefix all tags with the type.
 		// prefix is never seen outsite this cache.
 		String store_tag=fac.getTag()+"."+role;
-		BaseFilter<? super T> result = roles.get(store_tag);
+		BaseFilter<T> result = roles.get(store_tag);
 		if( result == null ){
 			result = makeRelationshipRoleFilter(fac,role,null,null);
 			roles.put(store_tag, result);
@@ -1008,10 +1008,10 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		return result;
 	}
 	@Override
-	public final <T extends DataObject> BaseFilter<? super T> getRelationshipRoleFilter(DataObjectFactory<T> fac,
+	public final <T extends DataObject> BaseFilter<T> getRelationshipRoleFilter(DataObjectFactory<T> fac,
 			String role,BaseFilter<T> fallback) {
 		
-		BaseFilter<? super T> result;
+		BaseFilter<T> result;
 		try {
 			result = makeRelationshipRoleFilter(fac,role,null,fallback);
 			// narrow the selection
@@ -1024,13 +1024,13 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		return result;
 	}
 	@Override
-	public final <T extends DataObject> BaseFilter<? super A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac,
+	public final <T extends DataObject> BaseFilter<A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac,
 			String role, T target) throws UnknownRelationshipException {
 		// We may be storing roles from different types so prefix all tags with the type.
 		// prefix is never seen outside this cache.
 		// This filter is also parameterised by the target
 		String store_tag="PersonFilter."+fac.getTag()+(target == null ? "" : "."+target.getID())+"."+role;
-		BaseFilter<? super A> result = roles.get(store_tag);
+		BaseFilter<A> result = roles.get(store_tag);
 		if( result == null ){
 			
 			result = makePersonInRelationshipRoleFilter(fac, role,target);
@@ -1046,13 +1046,13 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		return result;
 	}
 	@Override
-	public <T extends DataObject> BaseFilter<? super T> getTargetInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,
+	public <T extends DataObject> BaseFilter<T> getTargetInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,
 			A person) throws UnknownRelationshipException {
 		if( person == null){
 			return getRelationshipRoleFilter(fac, role);
 		}
 		String store_tag="TargetFilter."+fac.getTag()+"."+person.getID()+"."+role;
-		BaseFilter<? super T> result = roles.get(store_tag);
+		BaseFilter<T> result = roles.get(store_tag);
 		if( result == null ){
 			result = makeRelationshipRoleFilter(fac,role,person,null);
 			if(APPLY_DEFAULT_TARGET_RELATIONSHIP_FILTER.isEnabled(getContext())){
@@ -1060,7 +1060,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 				//
 				// TODO This breaks everything for some reasons
 				//
-				SQLFilter<? super T> fil = fac.getDefaultRelationshipFilter();
+				SQLFilter<T> fil = fac.getDefaultRelationshipFilter();
 				if( fil != null ){
 					result = new AndFilter<T>(fac.getTarget(),result,fil);
 				}
@@ -1102,7 +1102,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 * @return
 	 * @throws UnknownRelationshipException 
 	 */
-	protected <T extends DataObject> BaseFilter<? super T> makeRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,A person,BaseFilter<T> def) throws UnknownRelationshipException {
+	protected <T extends DataObject> BaseFilter<T> makeRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,A person,BaseFilter<T> def) throws UnknownRelationshipException {
 		String search_tag = fac2.getTag()+":"+role;
 		if( searching_roles.contains(search_tag)){
 			// recursive creation
@@ -1147,7 +1147,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		}
 		// should be a single filter now.
 		if( role.startsWith("!")) {
-			BaseFilter<? super T> fil = makeRelationshipRoleFilter(fac2, role.substring(1), person, def);
+			BaseFilter<T> fil = makeRelationshipRoleFilter(fac2, role.substring(1), person, def);
 			NegatingFilterVisitor<T> nv = new NegatingFilterVisitor<>(fac2);
 			try {
 				return fil.acceptVisitor(nv);
@@ -1200,7 +1200,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	    		// This is a reference a factory/composite role from within a redefined
 	    		// definition. direct roles can be qualified if we want qualified names cannot
 	    		// be overridden. 
-	    		BaseFilter<? super T> result = makeDirectRelationshipRoleFilter(fac2, sub,person,null);
+	    		BaseFilter<T> result = makeDirectRelationshipRoleFilter(fac2, sub,person,null);
 	    		if( result != null ){
 	    			return result;
 	    		}
@@ -1226,7 +1226,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	    	// Non qualified name
 	    	
 	    	// direct roles can be un-qualified though not if we want multiple levels of qualification.
-	    	BaseFilter<? super T> result = makeDirectRelationshipRoleFilter(fac2, role,person,null);
+	    	BaseFilter<T> result = makeDirectRelationshipRoleFilter(fac2, role,person,null);
 			if( result != null ){
 				return result;
 			}
@@ -1245,9 +1245,9 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			searching_roles.remove(search_tag);
 		}
 	}
-	protected <T extends DataObject> BaseFilter<? super A> makePersonInRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,T target) throws UnknownRelationshipException {
+	protected <T extends DataObject> BaseFilter<A> makePersonInRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,T target) throws UnknownRelationshipException {
 		AppUserFactory<A> login_fac = getLoginFactory();
-		Class<? super A> target_type = login_fac.getTarget();
+		Class<A> target_type = login_fac.getTarget();
 		String search_tag = fac2.getTag()+":"+role;
 		if( searching_roles.contains(search_tag)){
 			// recursive creation
@@ -1281,7 +1281,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		}
 		// should be a single filter now.
 		if( role.startsWith("!")) {
-			BaseFilter<? super A> fil = makePersonInRelationshipRoleFilter(fac2, role.substring(1), target);
+			BaseFilter<A> fil = makePersonInRelationshipRoleFilter(fac2, role.substring(1), target);
 			NegatingFilterVisitor<A> nv = new NegatingFilterVisitor<>(login_fac);
 			try {
 				return fil.acceptVisitor(nv);
@@ -1298,7 +1298,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	    	String link_field = role.substring(0, pos);
 	    	String remote_role = role.substring(pos+RELATIONSHIP_DEREF.length());
 	    	RemoteAccessRoleProvider<A, T, ?> rarp = new RemoteAccessRoleProvider<>(this, fac2, link_field);
-	    	BaseFilter<? super A> fil = rarp.personInRelationFilter(this, remote_role, target);
+	    	BaseFilter<A> fil = rarp.personInRelationFilter(this, remote_role, target);
 	    	if( fil == null ){
 	    		throw new UnknownRelationshipException(role);
 	    	}
@@ -1321,7 +1321,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	    		// This is to reference a factory/composite role from within a redefined
 	    		// definition. direct roles can be qualified if we want qualified names cannot
 	    		// be overridden. 
-	    		BaseFilter<? super A> result = makeDirectPersonInRelationshipRoleFilter(fac2, sub,target);
+	    		BaseFilter<A> result = makeDirectPersonInRelationshipRoleFilter(fac2, sub,target);
 	    		if( result != null ){
 	    			return result;
 	    		}
@@ -1341,7 +1341,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	    	}
 	    }else{
 	    	// direct roles can be un-qualified though not if we want multiple levels of qualification.
-	    	BaseFilter<? super A> result = makeDirectPersonInRelationshipRoleFilter(fac2, role,target);
+	    	BaseFilter<A> result = makeDirectPersonInRelationshipRoleFilter(fac2, role,target);
 			if( result != null ){
 				return result;
 			}
@@ -1363,12 +1363,12 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 * @param role
 	 * @throws UnknownRelationshipException 
 	 */
-	protected <T extends DataObject> BaseFilter<? super T> makeDirectRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,A person,BaseFilter<T> def) throws UnknownRelationshipException {
+	protected <T extends DataObject> BaseFilter<T> makeDirectRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,A person,BaseFilter<T> def) throws UnknownRelationshipException {
 		if( role == null || role.trim().isEmpty()) {
 			throw new UnknownRelationshipException("empty role requested");
 		}
 		// look for directly implemented relations first
-		BaseFilter<? super T> result=null;
+		BaseFilter<T> result=null;
 		
 	    if( person != null || haveCurrentUser()){
 
@@ -1427,12 +1427,12 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	/** look for a named filter from the factory or composites.
 	 * 
 	 */
-	protected <T extends DataObject> BaseFilter<? super T> makeNamedFilter(DataObjectFactory<T> fac2, String name){
+	protected <T extends DataObject> BaseFilter<T> makeNamedFilter(DataObjectFactory<T> fac2, String name){
 		NamedFilterWrapper<T> wrapper = new NamedFilterWrapper<>(fac2);
 		return wrapper.getNamedFilter(name);
 	}
-	protected <T extends DataObject> BaseFilter<? super A> makeDirectPersonInRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,T target) throws UnknownRelationshipException {
-		BaseFilter<? super A> result=null;
+	protected <T extends DataObject> BaseFilter<A> makeDirectPersonInRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,T target) throws UnknownRelationshipException {
+		BaseFilter<A> result=null;
 	    if( fac2 instanceof AccessRoleProvider){  // first check factory itself.
 	    	result = ((AccessRoleProvider<A,T>)fac2).personInRelationFilter(this, role, target);
 	    	if( result != null){
@@ -1455,7 +1455,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	    }
 	    
 	 // Maybe its a named filter this will translate to a binary filter on the app-user
-	    BaseFilter<? super T> fil = makeNamedFilter(fac2, role);
+	    BaseFilter<T> fil = makeNamedFilter(fac2, role);
 	    if( fil != null){
 	    	boolean matches=false;
 	    	if( target == null ){
@@ -1467,7 +1467,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	    	}else{
 	    		matches= fac2.matches(fil, target);
 	    	}
-	    	return new GenericBinaryFilter<>(AppUser.class, matches);
+	    	return new GenericBinaryFilter<A>((Class<A>) AppUser.class, matches);
 	    }
 	    // unrecognised role
 	    throw new UnknownRelationshipException(role);

@@ -67,7 +67,7 @@ public class IntConvertSQLValue<T>  implements SQLValue<Integer> {
 	public SQLFilter getRequiredFilter() {
 		return a.getRequiredFilter();
 	}
-	public Class<? super Integer> getTarget() {
+	public Class<Integer> getTarget() {
 		return Integer.class;
 	}
 }

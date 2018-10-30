@@ -20,6 +20,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.FieldExpression;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
+import uk.ac.ed.epcc.webapp.model.data.StreamDataFieldExpression;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterUpdate;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
@@ -53,8 +54,8 @@ public class FileDataFactory<T extends FileData> extends DataObjectFactory<T> im
 		return FileData.getDefaultTableSpecification();
 	}
 	@Override
-	public Class<? super T> getTarget() {
-		return FileData.class;
+	public Class<T> getTarget() {
+		return (Class<T>) FileData.class;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.AnonymisingFactory#anonymise()
@@ -64,23 +65,7 @@ public class FileDataFactory<T extends FileData> extends DataObjectFactory<T> im
 		FilterUpdate<T> update = new FilterUpdate<>(res);
 		StreamData data = new ByteArrayStreamData();
 		// wipe all text data
-		update.update(new FieldExpression<StreamData, T>(getTarget(), res, StreamData.class, FileData.DATA) {
-
-			@Override
-			protected StreamData getValue(Record r) {
-				try {
-					return r.getStreamDataProperty(getFieldName());
-				} catch (DataFault e) {
-					return null;
-				}
-			}
-
-			@Override
-			protected void setValue(Record r, StreamData value) {
-				r.setProperty(getFieldName(), value);
-				
-			}
-		}, data, null);
+		update.update(new StreamDataFieldExpression(getTarget(),res,FileData.DATA), data, null);
 		
 	}
 

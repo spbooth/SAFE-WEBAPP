@@ -245,7 +245,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			}
 			// Use JoinerFilters so that if additional joins are added explicitly
 			// The join clauses will be identical and not duplicated.
-			Class<? super T> target = LinkManager.this.getTarget();
+			Class<T> target = LinkManager.this.getTarget();
 			SQLAndFilter<T> fil = new SQLAndFilter<T>(target);
 			if( join_left ){
 				fil.addFilter(new JoinerFilter<L,T>(target, getLeftField(), res, getLeftFactory().res));
@@ -502,7 +502,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 *
 	 */
 	public class LinkResult extends AbstractFilterResult<T> implements FilterResult<T>{
-		public LinkResult(L left, R right, BaseFilter<? super T> fil) throws DataFault {
+		public LinkResult(L left, R right, BaseFilter<T> fil) throws DataFault {
 			super();
 			if( left != null && ! isLeft(left)){
 				throw new ClassCastException("Invalid object passed as left peer");
@@ -517,7 +517,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 
 		private final L left;
 		private final R right;
-		private final BaseFilter<? super T> fil;
+		private final BaseFilter<T> fil;
 		
 		
 
@@ -678,10 +678,10 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @throws DataFault
 	 */
 	
-	private CloseableIterator<T> getLinkIterator(L l, R r, BaseFilter<? super T> f) throws DataFault{
+	private CloseableIterator<T> getLinkIterator(L l, R r, BaseFilter<T> f) throws DataFault{
 		return getLinkIterator(l, r, f, USE_JOIN.isEnabled(getContext()));
 	}
-	public CloseableIterator<T> getLinkIterator(L l, R r, BaseFilter<? super T> f, boolean use_join)
+	public CloseableIterator<T> getLinkIterator(L l, R r, BaseFilter<T> f, boolean use_join)
 			throws DataFault {
 		if (use_join) {
 			return this.new JoinLinkFilterIterator(new LinkFilter(l, r, f));
@@ -689,10 +689,10 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		// This will still set the known links as LinkFilter is a ResultVisitor
 		return new FilterIterator(new LinkFilter(l, r, f));
 	}
-	public long getLinkCount(L l, R r,BaseFilter<? super T> f) throws DataException{
+	public long getLinkCount(L l, R r,BaseFilter<T> f) throws DataException{
 		return getCount(new LinkFilter(l, r, f));
 	}
-	public T find(L l, R r,BaseFilter<? super T> f) throws DataException{
+	public T find(L l, R r,BaseFilter<T> f) throws DataException{
 		return find(new LinkFilter(l, r, f));
 	}
 	public DataObjectFactory<R> getRightFactory(){
@@ -708,13 +708,13 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @throws DataFault
 	 */
 	@Override
-	public FilterResult<T> getFilterResult(L left, R right, BaseFilter<? super T> fil) throws DataFault{
+	public FilterResult<T> getFilterResult(L left, R right, BaseFilter<T> fil) throws DataFault{
 		return new LinkResult(left, right, fil);
 	}
 
 	@Override
-	public Class<? super T> getTarget(){
-		return Link.class;
+	public Class<T> getTarget(){
+		return (Class<T>) Link.class;
 	}
 	/** Get a filter for the left peer from a filter on the link
 	 * 
@@ -737,7 +737,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @param fil SQLFilter on left peer
 	 * @return SQLFilter on self
 	 */
-	public SQLFilter<T> getLeftJoinFilter(SQLFilter<? super L> fil){
+	public SQLFilter<T> getLeftJoinFilter(SQLFilter<L> fil){
 		return new RemoteFilter<L>(getLeftFactory(), getLeftField(), fil);
 	}
 	/** get a {@link BaseFilter} for the link from a {@link BaseFilter} on the left peer
@@ -745,7 +745,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @param fil {@link BaseFilter} on left peer
 	 * @return {@link BaseFilter} on self
 	 */
-	public BaseFilter<T> getLeftRemoteFilter(BaseFilter<? super L> fil){
+	public BaseFilter<T> getLeftRemoteFilter(BaseFilter<L> fil){
 		return getRemoteFilter(getLeftFactory(), getLeftField(), fil);
 	}
 	
@@ -773,7 +773,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @param fil {@link SQLFilter} on right peer
 	 * @return {@link SQLFilter} on self
 	 */
-	public SQLFilter<T> getRightJoinFilter(SQLFilter<? super R> fil){
+	public SQLFilter<T> getRightJoinFilter(SQLFilter<R> fil){
 		return new RemoteFilter<R>(getRightFactory(), getRightField(), fil);
 	}
 	/** get a {@link BaseFilter} for the link from a {@link BaseFilter} on the right peer.
@@ -781,7 +781,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @param fil {@link BaseFilter} in right peer
 	 * @return {@link BaseFilter} on self
 	 */
-	public BaseFilter<T> getRightRemoteFilter(BaseFilter<? super R> fil){
+	public BaseFilter<T> getRightRemoteFilter(BaseFilter<R> fil){
 		return getRemoteFilter(getRightFactory(), getRightField(), fil);
 	}
 

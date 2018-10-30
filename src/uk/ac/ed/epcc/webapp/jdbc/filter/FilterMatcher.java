@@ -22,5 +22,5 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
  *
  */
 public interface FilterMatcher<T> {
-	public boolean matches(BaseFilter<? super T> fil, T o);
+	public boolean matches(BaseFilter<T> fil, T o);
 }

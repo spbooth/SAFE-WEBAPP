@@ -300,7 +300,7 @@ public class ExpressionTestCase extends WebappTestBase {
 				new ArrayFuncExpression<>(fac.getTarget(), ArrayFunc.GREATEST, Number.class, fac.getIntA(),fac.getIntB()));
 		assertEquals(7, res);
 		res = fac.evaluate(obj, 
-				new ArrayFuncExpression<>(fac.getTarget(), ArrayFunc.LEAST, Number.class, fac.getIntA(),fac.getIntB()));
+				new ArrayFuncExpression<>(fac.getTarget(), ArrayFunc.LEAST,    Number.class, fac.getIntA(),fac.getIntB()));
 		assertEquals(5, res);
 	}
 	@Test
@@ -312,7 +312,7 @@ public class ExpressionTestCase extends WebappTestBase {
 				new ArrayFuncValue<>(fac.getTarget(), ArrayFunc.GREATEST, Number.class, fac.getIntA(),fac.getIntB()));
 		assertEquals(7, res);
 		res = fac.evaluate(obj, 
-				new ArrayFuncValue<>(fac.getTarget(), ArrayFunc.LEAST, Number.class, fac.getIntA(),fac.getIntB()));
+				new ArrayFuncValue<>(fac.getTarget(), ArrayFunc.LEAST, Number.class,    fac.getIntA(),fac.getIntB()));
 		assertEquals(5, res);
 	}
 	
@@ -331,10 +331,10 @@ public class ExpressionTestCase extends WebappTestBase {
 		obj.setDateB(later);
 		obj.commit();
 		Date res = (Date)fac.evaluate(obj, 
-				new ArrayFuncExpression<>(fac.getTarget(), ArrayFunc.GREATEST, Date.class,new SQLExpression[] { (SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()}));
+				new ArrayFuncExpression<>(fac.getTarget(), ArrayFunc.GREATEST, Date.class, (SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()));
 		assertEquals(later, res);
 		res = (Date)fac.evaluate(obj, 
-				new ArrayFuncExpression<>(fac.getTarget(), ArrayFunc.LEAST, Date.class,new SQLExpression[] { (SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()}));
+				new ArrayFuncExpression<>(fac.getTarget(), ArrayFunc.LEAST, Date.class,(SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()));
 		assertEquals(least, res);
 	}
 	@Test
@@ -352,10 +352,10 @@ public class ExpressionTestCase extends WebappTestBase {
 		obj.setDateB(later);
 		obj.commit();
 		Date res = (Date)fac.evaluate(obj, 
-				new ArrayFuncValue<>(fac.getTarget(), ArrayFunc.GREATEST, Date.class,new SQLExpression[] { (SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()}));
+				new ArrayFuncValue<>(fac.getTarget(), ArrayFunc.GREATEST, Date.class, (SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()));
 		assertEquals(later, res);
 		res = (Date)fac.evaluate(obj, 
-				new ArrayFuncValue<>(fac.getTarget(), ArrayFunc.LEAST, Date.class,new SQLExpression[] { (SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()}));
+				new ArrayFuncValue<>(fac.getTarget(), ArrayFunc.LEAST, Date.class,(SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()));
 		assertEquals(least, res);
 	}
 	@Test 

@@ -47,7 +47,7 @@ public class DurationSQLExpression  implements SQLExpression<Duration> {
 	  this(start.getMillis(),end.getMillis());
   }
 
-public Class<? super Duration> getTarget() {
+public Class<Duration> getTarget() {
 	return Duration.class;
 }
 @Override

@@ -26,7 +26,6 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.Castor.Factory;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Removable;
@@ -108,7 +107,7 @@ public class Pollux extends DataObject implements Removable {
 		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getTarget()
 		 */
 		@Override
-		public Class<? super Pollux> getTarget() {
+		public Class<Pollux> getTarget() {
 			return Pollux.class;
 		}
 		public BaseFilter<Pollux> getFilterFromPeer(BaseFilter<Castor>  fil){

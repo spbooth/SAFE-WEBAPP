@@ -29,18 +29,22 @@ import uk.ac.ed.epcc.webapp.model.data.filter.LinkClause;
  * 
  * Only the SQL parts of the filters are considered by this class.
  * 
- * This class assumes it is ok to supress multiple copies of equal filters.
+ * This class assumes it is ok to suppress multiple copies of equal filters.
+ * Super-class filters are always valid for selecting sub-classes so can be added to a combining filter.
  * 
  * @author spb
  * @param <T> Type of target 
  *
  */
 public abstract class BaseCombineFilter<T> extends FilterSet<T> implements PatternFilter<T>, JoinFilter<T> , OrderFilter<T>, BinaryFilter<T>{
+	    // We don't apply type parameters to the constituent filters as we want to be able to
+	    // add super-type filters and remote filters
+	
 	    // Note some filters may appear in both 
 		protected LinkedHashSet<PatternFilter> filters;
 	    protected LinkedHashSet<OrderClause> order=null;
 	    private boolean force_value;
-	    public BaseCombineFilter(Class<? super T> target){
+	    public BaseCombineFilter(Class<T> target){
 	    	super(target);
 	    	filters = new LinkedHashSet<PatternFilter>();
 	    	force_value=getFilterCombiner().getDefault();
@@ -56,7 +60,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
 			 */
-			public final Boolean visitPatternFilter(PatternFilter<? super X> fil) {
+			public final Boolean visitPatternFilter(PatternFilter<X> fil) {
 				if( fil instanceof BaseCombineFilter &&
 						(((BaseCombineFilter)fil).getFilterCombiner() == getFilterCombiner() || ((BaseCombineFilter)fil).filters.size()==1)
 				){
@@ -66,7 +70,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 		    		// directly to avoid redundant braces and possible duplication
 					// of clauses.
 		    		BaseCombineFilter<X> comb = (BaseCombineFilter<X>) fil;
-		    		for(PatternFilter<? super X> nest : comb.filters){
+		    		for(PatternFilter nest : comb.filters){
 		    			// call same method recursively in case the contents are also a BaseCombineFilter
 		    			visitPatternFilter(nest);
 		    		}
@@ -80,7 +84,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitSQLCombineFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter)
 			 */
-			public final Boolean visitSQLCombineFilter(BaseSQLCombineFilter<? super X> fil) {
+			public final Boolean visitSQLCombineFilter(BaseSQLCombineFilter<X> fil) {
 				visitPatternFilter(fil);
 				handleOrderClause(fil);
 				Set<JoinFilter> joins = fil.getJoins();
@@ -95,7 +99,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAndFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter)
 			 */
-			public final Boolean visitAndFilter(AndFilter<? super X> fil) throws Exception{
+			public final Boolean visitAndFilter(AndFilter<X> fil) throws Exception{
 				if( ! fil.hasAcceptFilters()){
 					// we can convert to SQL best to do this as it
 					// allows filter to be added to other SQL filters
@@ -130,10 +134,10 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
 			 */
-			public final Boolean visitOrderFilter(SQLOrderFilter<? super X> fil) {
+			public final Boolean visitOrderFilter(SQLOrderFilter<X> fil) {
 			    return handleOrderClause(fil);
 			}
-			private final Boolean handleOrderClause(OrderFilter<? super X> fil) {
+			private final Boolean handleOrderClause(OrderFilter<X> fil) {
 			    addOrder(fil.OrderBy());
 				return null;
 			}
@@ -142,7 +146,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitJoinFilter(uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter)
 			 */
-			public final Boolean visitJoinFilter(JoinFilter<? super X> fil) {
+			public final Boolean visitJoinFilter(JoinFilter<X> fil) {
 				addJoin(fil);
 				return null;
 			}
@@ -151,7 +155,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFiler(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
 			 */
 			@Override
-			public final Boolean visitOrFilter(OrFilter<? super X> fil) throws Exception {
+			public final Boolean visitOrFilter(OrFilter<X> fil) throws Exception {
 				if( fil.nonSQL()){
 					visitAcceptFilter(fil);
 				}else{
@@ -166,7 +170,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
 			 */
 			@Override
-			public final Boolean visitBinaryFilter(BinaryFilter<? super X> fil) throws Exception {
+			public final Boolean visitBinaryFilter(BinaryFilter<X> fil) throws Exception {
 				if( fil.getBooleanResult() != getFilterCombiner().getDefault()){
 					force_value=fil.getBooleanResult();
 				}
@@ -177,7 +181,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
 			 */
 			@Override
-			public final Boolean visitDualFilter(DualFilter<? super X> fil) throws Exception {
+			public final Boolean visitDualFilter(DualFilter<X> fil) throws Exception {
 				return fil.getSQLFilter().acceptVisitor(this);
 			}
 
@@ -185,12 +189,12 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter)
 			 */
 			@Override
-			public final Boolean visitBinaryAcceptFilter(BinaryAcceptFilter<? super X> fil) throws Exception {
+			public final Boolean visitBinaryAcceptFilter(BinaryAcceptFilter<X> fil) throws Exception {
 				return visitBinaryFilter(fil);
 			}
 	    	
 	    }
-	    class AddFilterVisitor extends AbstractAddFilterVisitor<T>{
+	    class AddFilterVisitor extends AbstractAddFilterVisitor{
 
 			
 
@@ -199,7 +203,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter)
 			 */
-			public Boolean visitAcceptFilter(AcceptFilter<? super T> fil) {
+			public Boolean visitAcceptFilter(AcceptFilter fil) {
 				addAccept(fil);
 				return null;
 			}

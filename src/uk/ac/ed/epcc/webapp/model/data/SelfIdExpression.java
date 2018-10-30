@@ -76,7 +76,7 @@ public class SelfIdExpression implements SQLExpression<Integer> {
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<? super Integer> getTarget() {
+	public Class<Integer> getTarget() {
 		return Integer.class;
 	}
 

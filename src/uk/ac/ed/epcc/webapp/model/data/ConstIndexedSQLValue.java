@@ -45,9 +45,9 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  * @param <T> Type of owning/home table.
  * @param <I> Type of remote table
  */
-public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> implements IndexedSQLValue<T, I> , GroupingSQLValue<IndexedReference<I>>{
+public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> implements IndexedSQLValue<T, I> , GroupingSQLValue<IndexedReference>{
 
-	public ConstIndexedSQLValue(AppContext conn, Class<? super T> clazz, IndexedReference<I> val) {
+	public ConstIndexedSQLValue(AppContext conn, Class<T> clazz, IndexedReference<I> val) {
 		super();
 		this.conn = conn;
 		this.clazz = clazz;
@@ -56,7 +56,7 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	}
 
 	private final AppContext conn;
-	private final Class<? super T> clazz;
+	private final Class<T> clazz;
 	private final IndexedReference<I> val;
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#add(java.lang.StringBuilder, boolean)
@@ -97,7 +97,7 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<? super IndexedReference<I>> getTarget() {
+	public Class<IndexedReference> getTarget() {
 		return IndexedReference.class;
 	}
 
@@ -105,7 +105,7 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilter(uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition, java.lang.Object)
 	 */
 	@Override
-	public SQLFilter<T> getFilter(MatchCondition match, IndexedReference<I> val)
+	public SQLFilter<T> getFilter(MatchCondition match, IndexedReference val)
 			throws CannotFilterException, NoSQLFilterException {
 		return new GenericBinaryFilter<>(clazz, this.val.equals(val));
 	}
@@ -132,7 +132,7 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilterType()
 	 */
 	@Override
-	public Class<? super T> getFilterType() {
+	public Class<T> getFilterType() {
 		return clazz;
 	}
 

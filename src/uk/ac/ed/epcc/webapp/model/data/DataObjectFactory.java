@@ -706,7 +706,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	    	setMapper(new FilterAdapter());
 	    }
 		
-	    public FilterIterator(BaseFilter<? super BDO> fil) throws DataFault{
+	    public FilterIterator(BaseFilter<BDO> fil) throws DataFault{
 	    	this();
 	    	try {
 				setup(fil,0,-1);
@@ -820,13 +820,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 *
 	 */
 	protected class FilterSet extends AbstractFilterResult<BDO> implements Iterable<BDO>, FilterResult<BDO>{
-		private BaseFilter<? super BDO> f;
+		private BaseFilter<BDO> f;
        
         
        
         int start;
         int max;
-        public FilterSet(BaseFilter<? super BDO> f) throws DataFault{
+        public FilterSet(BaseFilter<BDO> f) throws DataFault{
         	
         	try {
 				this.f = FilterConverter.convert(f);
@@ -836,7 +836,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
         	start=-1;
         	max=-1;
         }
-        public FilterSet(SQLFilter<? super BDO> f, int start, int max) throws DataFault{
+        public FilterSet(SQLFilter<BDO> f, int start, int max) throws DataFault{
         	this.f=f;
         	this.start=start;
         	this.max=max;
@@ -890,7 +890,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 * @param join_field  field referencing remote oject
 		 * @param fil  {@link SQLFilter} on remote object
 		 */
-		public RemoteFilter(DataObjectFactory<T> join_fac, String join_field, SQLFilter<? super T> fil){
+		public RemoteFilter(DataObjectFactory<T> join_fac, String join_field, SQLFilter<T> fil){
         	super(DataObjectFactory.this.getTarget(),fil,join_field,res,join_fac.res);
         }
 	}
@@ -913,7 +913,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 * @param join_field field pointing to remote object
 		 * @param join_fac {@link DataObjectFactory} for remote object.
 		 */
-		public DestFilter(SQLFilter<? super BDO> fil, String join_field, DataObjectFactory<T> join_fac){
+		public DestFilter(SQLFilter<BDO> fil, String join_field, DataObjectFactory<T> join_fac){
         	super(join_fac.getTarget(),fil,join_field,join_fac.res,res,false);
         }
 	}
@@ -924,10 +924,10 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param <T>
 	 */
 	public class DestAcceptFilter<T extends DataObject> extends AbstractAcceptFilter<T>{
-		private final BaseFilter<? super BDO> fil;
+		private final BaseFilter<BDO> fil;
 		private final String join_field;
 		private final DataObjectFactory<T> join_fac;
-		public DestAcceptFilter(BaseFilter<? super BDO> fil, String join_field, DataObjectFactory<T> join_fac){
+		public DestAcceptFilter(BaseFilter<BDO> fil, String join_field, DataObjectFactory<T> join_fac){
 			super(join_fac.getTarget());
 			this.fil=fil;
 			this.join_field=join_field;
@@ -981,7 +981,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
         private final String field;
         private final MatchCondition cond;
         private final Date point;
-		public TimeAcceptFilter(Class<? super T> target,String field, MatchCondition cond, Date point){
+		public TimeAcceptFilter(Class<T> target,String field, MatchCondition cond, Date point){
 			super(target);
         	this.field=field;
         	this.cond=cond;
@@ -1182,8 +1182,8 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * checks should still pass if the super-type method is retained. 
 	 * 
 	 */
-    public Class<? super BDO> getTarget(){
-    	return DataObject.class;
+    public Class<BDO> getTarget(){
+    	return (Class<BDO>) DataObject.class;
     }
 	/**
 	 * get a single Object via its unique id as a number. If the number is null
@@ -1292,9 +1292,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return count;
 		}
 	}
-	public final boolean exists(BaseFilter<? super BDO> s) throws DataException{
+	public final boolean exists(BaseFilter<BDO> s) throws DataException{
 		try{
-			SQLFilter<? super BDO> sql_fil = FilterConverter.convert(s);
+			SQLFilter<BDO> sql_fil = FilterConverter.convert(s);
 			FilterExists counter = new FilterExists();
 			return ((Boolean)counter.find(sql_fil)).booleanValue();
 		}catch(NoSQLFilterException e){
@@ -1308,7 +1308,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	// Note this is used to implement FilterMatcher so
 	// we can't pass ourselves as the matcher arg
 	private final ConvertPureAcceptFilterVisitor<BDO> accept_converter = new ConvertPureAcceptFilterVisitor<BDO>(null);
-	public final boolean matches(BaseFilter<? super BDO> fil, BDO o) {
+	public final boolean matches(BaseFilter<BDO> fil, BDO o) {
 		if( fil == null || o == null){
 			return false;
 		}
@@ -1455,7 +1455,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return {@link FilterResult}
 	 * @throws DataFault
 	 */
-	public final FilterResult<BDO> getResult(BaseFilter<? super BDO> fil) throws DataFault{
+	public final FilterResult<BDO> getResult(BaseFilter<BDO> fil) throws DataFault{
 		return new FilterSet(fil);
 	}
 	
@@ -1467,7 +1467,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return {@link FilterResult}
 	 * @throws DataFault
 	 */
-	public final FilterResult<BDO> getResult(SQLFilter<? super BDO> fil,int start, int max) throws DataFault{
+	public final FilterResult<BDO> getResult(SQLFilter<BDO> fil,int start, int max) throws DataFault{
 		return new FilterSet(fil,start,max);
 	}
 	/** return the default pre-select behaviour for inputs generated by this class.
@@ -1501,12 +1501,12 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 					return DataObjectFactory.this.getOrder();
 				}
 
-				public <X> X acceptVisitor(FilterVisitor<X, ? extends BDO> vis)
+				public <X> X acceptVisitor(FilterVisitor<X, BDO> vis)
 						throws Exception {
 					return vis.visitOrderFilter(this);
 				}
 
-				public Class<? super BDO> getTarget() {
+				public Class<BDO> getTarget() {
 					return DataObjectFactory.this.getTarget();
 				}
 
@@ -2111,9 +2111,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param fil
 	 * @return
 	 */
-	protected <T extends DataObject> BaseFilter<T> convertToDestinationFilter(DataObjectFactory<T> remote_fac, String link_field,BaseFilter<? super BDO> fil){
+	protected <T extends DataObject> BaseFilter<T> convertToDestinationFilter(DataObjectFactory<T> remote_fac, String link_field,BaseFilter<BDO> fil){
 		try{
-			SQLFilter<? super BDO> sqlfilter = FilterConverter.convert(fil);
+			SQLFilter<BDO> sqlfilter = FilterConverter.convert(fil);
 			return new DestFilter<T>(sqlfilter, link_field,remote_fac);
 		}catch(NoSQLFilterException e){
 			return new DestAcceptFilter<T>(fil, link_field, remote_fac);
@@ -2141,9 +2141,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 * @param fil
 		 * @return
 		 */
-		public BaseFilter<BDO> visitBaseFilter(BaseFilter<? super R> fil){
+		public BaseFilter<BDO> visitBaseFilter(BaseFilter<R> fil){
 			try{
-				SQLFilter<? super R> sqlfilter = FilterConverter.convert(fil);
+				SQLFilter<R> sqlfilter = FilterConverter.convert(fil);
 				return new RemoteFilter<R>(remote_fac,field,sqlfilter);
 			}catch(NoSQLFilterException e){
 				return new RemoteAcceptFilter<BDO, R>(getTarget(), remote_fac, field, fil);
@@ -2156,7 +2156,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
 		 */
 		@Override
-		public BaseFilter<BDO> visitPatternFilter(PatternFilter<? super R> fil) throws Exception {
+		public BaseFilter<BDO> visitPatternFilter(PatternFilter<R> fil) throws Exception {
 			return visitSQLFilter((SQLFilter<R>) fil);
 		}
 
@@ -2164,7 +2164,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitSQLCombineFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter)
 		 */
 		@Override
-		public BaseFilter<BDO> visitSQLCombineFilter(BaseSQLCombineFilter<? super R> fil) throws Exception {
+		public BaseFilter<BDO> visitSQLCombineFilter(BaseSQLCombineFilter<R> fil) throws Exception {
 			return visitSQLFilter((SQLFilter<R>) fil);
 		}
 
@@ -2172,10 +2172,10 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAndFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter)
 		 */
 		@Override
-		public BaseFilter<BDO> visitAndFilter(AndFilter<? super R> fil) throws Exception {
+		public BaseFilter<BDO> visitAndFilter(AndFilter<R> fil) throws Exception {
 			try{
 				if( ! fil.hasAcceptFilters()){
-					SQLFilter<? super R> sqlfilter = FilterConverter.convert(fil);
+					SQLFilter<R> sqlfilter = FilterConverter.convert(fil);
 					return new RemoteFilter<R>(remote_fac,field,sqlfilter);
 				}
 			}catch(NoSQLFilterException e){
@@ -2192,7 +2192,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
 		 */
 		@Override
-		public BaseFilter<BDO> visitOrFilter(OrFilter<? super R> fil) throws Exception {
+		public BaseFilter<BDO> visitOrFilter(OrFilter<R> fil) throws Exception {
 			return visitBaseFilter(fil);
 		}
 
@@ -2200,7 +2200,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
 		 */
 		@Override
-		public BaseFilter<BDO> visitOrderFilter(SQLOrderFilter<? super R> fil) throws Exception {
+		public BaseFilter<BDO> visitOrderFilter(SQLOrderFilter<R> fil) throws Exception {
 			return visitSQLFilter((SQLFilter<R>) fil);
 		}
 
@@ -2208,7 +2208,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter)
 		 */
 		@Override
-		public BaseFilter<BDO> visitAcceptFilter(AcceptFilter<? super R> fil) throws Exception {
+		public BaseFilter<BDO> visitAcceptFilter(AcceptFilter<R> fil) throws Exception {
 	
 			return new RemoteAcceptFilter<BDO,R>(getTarget(), remote_fac, field, fil);
 		}
@@ -2217,7 +2217,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitJoinFilter(uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter)
 		 */
 		@Override
-		public BaseFilter<BDO> visitJoinFilter(JoinFilter<? super R> fil) throws Exception {
+		public BaseFilter<BDO> visitJoinFilter(JoinFilter<R> fil) throws Exception {
 			return visitSQLFilter((SQLFilter<R>) fil);
 		}
 
@@ -2225,7 +2225,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
 		 */
 		@Override
-		public BaseFilter<BDO> visitBinaryFilter(BinaryFilter<? super R> fil) throws Exception {
+		public BaseFilter<BDO> visitBinaryFilter(BinaryFilter<R> fil) throws Exception {
 			// A remote binary filter can become a local binary filter
 			return new GenericBinaryFilter<BDO>(getTarget(), fil.getBooleanResult());
 		}
@@ -2234,14 +2234,14 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
 		 */
 		@Override
-		public BaseFilter<BDO> visitDualFilter(DualFilter<? super R> fil) throws Exception {
+		public BaseFilter<BDO> visitDualFilter(DualFilter<R> fil) throws Exception {
 			return visitBaseFilter(fil);
 		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter)
 		 */
 		@Override
-		public BaseFilter<BDO> visitBinaryAcceptFilter(BinaryAcceptFilter<? super R> fil) throws Exception {
+		public BaseFilter<BDO> visitBinaryAcceptFilter(BinaryAcceptFilter<R> fil) throws Exception {
 			return visitBinaryFilter(fil);
 		}
 		
@@ -2254,7 +2254,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param fil
 	 * @return
 	 */
-	public <R extends DataObject> BaseFilter<BDO> getRemoteFilter(DataObjectFactory<R> remote_fac, String link_field,BaseFilter<? super R> fil){
+	public <R extends DataObject> BaseFilter<BDO> getRemoteFilter(DataObjectFactory<R> remote_fac, String link_field,BaseFilter<R> fil){
 		try {
 			return fil.acceptVisitor(new MakeRemoteFilterVisitor<R>(remote_fac, link_field));
 		} catch (Exception e1) {

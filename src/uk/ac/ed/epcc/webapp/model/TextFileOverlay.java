@@ -722,8 +722,8 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 	}
 
 	@Override
-	public Class<? super T> getTarget() {
-		return TextFile.class;
+	public Class<T> getTarget() {
+		return (Class<T>) TextFile.class;
 	}
 
 	/* (non-Javadoc)

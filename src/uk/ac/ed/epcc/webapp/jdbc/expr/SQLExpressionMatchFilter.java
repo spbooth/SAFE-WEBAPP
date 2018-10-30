@@ -40,14 +40,14 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  * @param <V> type of expression
  */
 public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilter<T> {
-	private final Class<? super T> target;
+	private final Class<T> target;
     private final SQLExpression<? extends V> expr1;
     private final SQLExpression<? extends V> expr2;
   
     private final MatchCondition match;
     
     @SuppressWarnings("unchecked")
-	public static <T,V>  SQLFilter<T> getFilter(Class<? super T> target,SQLExpression<? extends V> expr1,SQLExpression<? extends V> expr2){
+	public static <T,V>  SQLFilter<T> getFilter(Class<T> target,SQLExpression<? extends V> expr1,SQLExpression<? extends V> expr2){
     	if( expr1 instanceof ConstExpression &&  expr1 instanceof ConstExpression){
     		ConstExpression<V,T> const1 = (ConstExpression<V,T>) expr1;
     		ConstExpression<V,T> const2 = (ConstExpression<V,T>) expr2;
@@ -68,7 +68,7 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
 
     }
     @SuppressWarnings("unchecked")
-	public static <T,V>  SQLFilter<T> getFilter(Class<? super T> target,SQLExpression<? extends V> expr1,MatchCondition m,SQLExpression<? extends V> expr2){
+	public static <T,V>  SQLFilter<T> getFilter(Class<T> target,SQLExpression<? extends V> expr1,MatchCondition m,SQLExpression<? extends V> expr2){
     	if( expr1 instanceof ConstExpression &&  expr1 instanceof ConstExpression){
     		ConstExpression<V,T> const1 = (ConstExpression<V,T>) expr1;
     		ConstExpression<V,T> const2 = (ConstExpression<V,T>) expr2;
@@ -93,13 +93,13 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
     	return new SQLAndFilter<T>(target,fil,req1,req2);
 
     }
-	private SQLExpressionMatchFilter(Class<? super T> target,SQLExpression<? extends V> expr1,SQLExpression<? extends V> expr2){
+	private SQLExpressionMatchFilter(Class<T> target,SQLExpression<? extends V> expr1,SQLExpression<? extends V> expr2){
 		this.target=target;
     	this.expr1=expr1;
     	this.expr2=expr2;
     	this.match=null;
     }
-	private SQLExpressionMatchFilter(Class<? super T> target,SQLExpression<? extends V> expr1,MatchCondition match,SQLExpression<? extends V> expr2){
+	private SQLExpressionMatchFilter(Class<T> target,SQLExpression<? extends V> expr1,MatchCondition match,SQLExpression<? extends V> expr2){
 		this.target=target;
     	this.expr1=expr1;
     	this.match=match;
@@ -162,7 +162,7 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
-	public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 		return vis.visitPatternFilter(this);
 	}
 	/* (non-Javadoc)
@@ -175,7 +175,7 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		return target;
 	}
 	public String toString() {

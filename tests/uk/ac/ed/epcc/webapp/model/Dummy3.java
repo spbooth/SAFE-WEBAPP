@@ -232,5 +232,9 @@ public class Dummy3 extends DataObject {
 				}
 			};
 		}
+		@Override
+		public Class<Dummy3> getTarget() {
+			return Dummy3.class;
+		}
     }
 }

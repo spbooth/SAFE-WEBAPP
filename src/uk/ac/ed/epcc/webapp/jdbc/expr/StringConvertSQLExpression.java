@@ -59,7 +59,7 @@ public class StringConvertSQLExpression<T>  implements SQLExpression<String> {
 	public SQLFilter getRequiredFilter() {
 		return a.getRequiredFilter();
 	}
-	public Class<? super String> getTarget() {
+	public Class<String> getTarget() {
 		return String.class;
 	}
 }

@@ -39,7 +39,7 @@ public class RemoteAcceptFilter<T extends DataObject, R extends DataObject> exte
 	 * @param field field to join on
 	 * @param fil {@link AcceptFilter} to apply
 	 */
-	public RemoteAcceptFilter(Class<? super T> target,DataObjectFactory<R> remote,String field, BaseFilter<? super R> fil) {
+	public RemoteAcceptFilter(Class<T> target,DataObjectFactory<R> remote,String field, BaseFilter<R> fil) {
 		super(target);
 		this.remote=remote;
 		this.field=field;
@@ -47,7 +47,7 @@ public class RemoteAcceptFilter<T extends DataObject, R extends DataObject> exte
 	}
 	private final DataObjectFactory<R> remote;
 	private final String field;
-	private final BaseFilter<? super R> fil;
+	private final BaseFilter<R> fil;
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
 	 */

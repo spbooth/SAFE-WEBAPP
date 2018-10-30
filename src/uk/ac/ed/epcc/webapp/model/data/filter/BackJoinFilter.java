@@ -56,10 +56,10 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> extends FilterSelect<T> implements SQLFilter<BDO>, PatternFilter<BDO>, MultiTableFilter {
-	private final Class<? super BDO> target;
+	private final Class<BDO> target;
 	// Note this is a filter on the remote that points back to the target
 	private final JoinerFilter<BDO, T> link;
-	private final SQLFilter<? super T> fil;
+	private final SQLFilter<T> fil;
 	private final Repository remote_res;
 	/**
 	 * 
@@ -68,9 +68,9 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 	 * @param remote_res Repository of remote
 	 * @param fil 
 	 */
-	public BackJoinFilter( Class<? super BDO> target,String join_field, Repository res, Repository remote_res, SQLFilter<? super T> fil){
+	public BackJoinFilter( Class<BDO> target,String join_field, Repository res, Repository remote_res, SQLFilter<T> fil){
 		this.target=target;
-		this.link = new JoinerFilter<BDO,T>((Class<? super T>) (fil != null ? fil.getTarget(): DataObject.class), join_field, remote_res, res);
+		this.link = new JoinerFilter<BDO,T>((Class<T>) (fil != null ? fil.getTarget(): DataObject.class), join_field, remote_res, res);
 		this.remote_res=remote_res;
 		this.fil=fil;
 	}
@@ -126,7 +126,7 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 		 */
-		public <X> X acceptVisitor(FilterVisitor<X, ? extends BDO> vis)
+		public <X> X acceptVisitor(FilterVisitor<X, BDO> vis)
 				throws Exception {
 			return vis.visitPatternFilter(this);
 		}
@@ -138,7 +138,7 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
-		public Class<? super BDO> getTarget() {
+		public Class<BDO> getTarget() {
 			return target;
 		}
 		public String toString() {

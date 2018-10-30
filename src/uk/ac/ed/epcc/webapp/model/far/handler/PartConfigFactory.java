@@ -44,7 +44,7 @@ import uk.ac.ed.epcc.webapp.model.far.PartManager.Part;
  *
  */
 
-public class PartConfigFactory<O extends PartOwner,P extends Part<O>> extends DataObjectFactory<PartConfigFactory.Config<P>> {
+public class PartConfigFactory<O extends PartOwner,P extends Part<O>> extends DataObjectFactory<PartConfigFactory.Config> {
 
 	/**
 	 * 
@@ -99,7 +99,7 @@ public class PartConfigFactory<O extends PartOwner,P extends Part<O>> extends Da
 	}
 	public Config makeEntry(P owner, String name) throws DataException{
 		Config<P> result;
-		SQLAndFilter<Config<P>> fil = getNamePartFilter(owner, name);
+		SQLAndFilter<Config> fil = getNamePartFilter(owner, name);
 		result = find(fil,true);
 		if( result == null ){
 			result = makeBDO();
@@ -113,15 +113,15 @@ public class PartConfigFactory<O extends PartOwner,P extends Part<O>> extends Da
 	 * @param name
 	 * @return
 	 */
-	private SQLAndFilter<Config<P>> getNamePartFilter(P owner, String name) {
-		return new SQLAndFilter<Config<P>>(getTarget(), getPartFilter(owner),getNameFilter(name));
+	private SQLAndFilter<Config> getNamePartFilter(P owner, String name) {
+		return new SQLAndFilter<Config>(getTarget(), getPartFilter(owner),getNameFilter(name));
 	}
 	/**
 	 * @param name
 	 * @return
 	 */
-	private SQLValueFilter<Config<P>> getNameFilter(String name) {
-		return new SQLValueFilter<Config<P>>(getTarget(), res, NAME_FIELD, name);
+	private SQLValueFilter<Config> getNameFilter(String name) {
+		return new SQLValueFilter<Config>(getTarget(), res, NAME_FIELD, name);
 	}
 
 	public void setValues(P owner,Map<String,Object> values) throws DataException{
@@ -131,7 +131,7 @@ public class PartConfigFactory<O extends PartOwner,P extends Part<O>> extends Da
 			entry.commit();
 		}
 		// now check for deletes.
-		FilterDelete<Config<P>> delete = new FilterDelete<Config<P>>(res);
+		FilterDelete<Config> delete = new FilterDelete<Config>(res);
 		Map<String,Object> old_values = getValues(owner);
 		for(String name : old_values.keySet()){
 			if( ! values.containsKey(name)){
@@ -143,12 +143,12 @@ public class PartConfigFactory<O extends PartOwner,P extends Part<O>> extends Da
 	 * @param owner
 	 * @return
 	 */
-	private ReferenceFilter<Config<P>, P> getPartFilter(P owner) {
-		return new ReferenceFilter<Config<P>, P>(this, PART_ID_FIELD, owner);
+	private ReferenceFilter<Config, P> getPartFilter(P owner) {
+		return new ReferenceFilter<Config, P>(this, PART_ID_FIELD, owner);
 	}
 	
 	public void clearAll(P owner) throws DataFault{
-		FilterDelete<Config<P>> delete = new FilterDelete<Config<P>>(res);
+		FilterDelete<Config> delete = new FilterDelete<Config>(res);
 		delete.delete(getPartFilter(owner));
 	}
 	
@@ -162,7 +162,7 @@ public class PartConfigFactory<O extends PartOwner,P extends Part<O>> extends Da
 
 
 	@Override
-	public Class<? super Config> getTarget() {
+	public Class<Config> getTarget() {
 		return Config.class;
 	}
 

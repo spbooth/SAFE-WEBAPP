@@ -38,7 +38,7 @@ public class FilterConverter<T> implements FilterVisitor<SQLFilter<T>, T> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
 	 */
-	public SQLFilter<T> visitPatternFilter(PatternFilter<? super T> fil) throws NoSQLFilterException {
+	public SQLFilter<T> visitPatternFilter(PatternFilter<T> fil) throws NoSQLFilterException {
 		if( fil instanceof SQLFilter){
 			return (SQLFilter<T>) fil;
 		}
@@ -49,35 +49,35 @@ public class FilterConverter<T> implements FilterVisitor<SQLFilter<T>, T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitSQLCombineFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter)
 	 */
 	public SQLFilter<T> visitSQLCombineFilter(
-			BaseSQLCombineFilter<? super T> fil) throws NoSQLFilterException {
-		return (SQLFilter<T>) fil;
+			BaseSQLCombineFilter<T> fil) throws NoSQLFilterException {
+		return  fil;
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAndFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter)
 	 */
-	public SQLFilter<T> visitAndFilter(AndFilter<? super T> fil) throws NoSQLFilterException {
-		return (SQLFilter<T>) fil.getSQLFilter();
+	public SQLFilter<T> visitAndFilter(AndFilter<T> fil) throws NoSQLFilterException {
+		return fil.getSQLFilter();
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
 	 */
-	public SQLFilter<T> visitOrderFilter(SQLOrderFilter<? super T> fil) throws NoSQLFilterException {
-		return (SQLFilter<T>) fil;
+	public SQLFilter<T> visitOrderFilter(SQLOrderFilter<T> fil) throws NoSQLFilterException {
+		return fil;
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter)
 	 */
-	public SQLFilter<T> visitAcceptFilter(AcceptFilter<? super T> fil) throws NoSQLFilterException {
+	public SQLFilter<T> visitAcceptFilter(AcceptFilter<T> fil) throws NoSQLFilterException {
 		throw new NoSQLFilterException("Cannot convert AcceptFilter to SQL");
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitJoinFilter(uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter)
 	 */
-	public SQLFilter<T> visitJoinFilter(JoinFilter<? super T> fil) throws NoSQLFilterException {
+	public SQLFilter<T> visitJoinFilter(JoinFilter<T> fil) throws NoSQLFilterException {
 		if( fil instanceof SQLFilter){
 			return (SQLFilter<T>) fil;
 		}
@@ -88,34 +88,34 @@ public class FilterConverter<T> implements FilterVisitor<SQLFilter<T>, T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFiler(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
 	 */
 	@Override
-	public SQLFilter<T> visitOrFilter(OrFilter<? super T> fil) throws NoSQLFilterException {
-		return (SQLFilter<T>) fil.getSQLFilter();
+	public SQLFilter<T> visitOrFilter(OrFilter<T> fil) throws NoSQLFilterException {
+		return fil.getSQLFilter();
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
 	 */
 	@Override
-	public SQLFilter<T> visitBinaryFilter(BinaryFilter<? super T> fil)  {
+	public SQLFilter<T> visitBinaryFilter(BinaryFilter<T> fil)  {
 		if( fil instanceof SQLFilter){
 			return (SQLFilter<T>) fil;
 		}
-		return new GenericBinaryFilter<T>(fil.getTarget(), fil.getBooleanResult());
+		return new GenericBinaryFilter<T>((Class<T>) fil.getTarget(), fil.getBooleanResult());
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
 	 */
 	@Override
-	public SQLFilter<T> visitDualFilter(DualFilter<? super T> fil)  {
-		return (SQLFilter<T>) fil.getSQLFilter();
+	public SQLFilter<T> visitDualFilter(DualFilter<T> fil)  {
+		return fil.getSQLFilter();
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter)
 	 */
 	@Override
-	public SQLFilter<T> visitBinaryAcceptFilter(BinaryAcceptFilter<? super T> fil) throws Exception {
+	public SQLFilter<T> visitBinaryAcceptFilter(BinaryAcceptFilter<T> fil) throws Exception {
 		return visitBinaryFilter(fil);
 	}
 }

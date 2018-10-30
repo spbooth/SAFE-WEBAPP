@@ -14,13 +14,10 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterFinder;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.DoubleFieldType;
@@ -72,7 +69,7 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 	}
 
 	@Override
-	public Class<? super DateTable> getTarget() {
+	public Class<DateTable> getTarget() {
 		return DateTable.class;
 	}
 

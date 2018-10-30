@@ -28,7 +28,7 @@ public class IntConvertAccessor<T,R> implements Accessor<Integer,R> {
 		a=acc;
 	}
 
-	public Class<? super Integer> getTarget() {
+	public Class<Integer> getTarget() {
 		return Integer.class;
 	}
 

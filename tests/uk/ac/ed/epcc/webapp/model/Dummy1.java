@@ -239,7 +239,7 @@ public class Dummy1 extends DataObject implements Removable {
 		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getTarget()
 		 */
 		@Override
-		public Class<? super Dummy1> getTarget() {
+		public Class<Dummy1> getTarget() {
 			return Dummy1.class;
 		}
 		public NumberFilter getNumberFilter(Number n) {

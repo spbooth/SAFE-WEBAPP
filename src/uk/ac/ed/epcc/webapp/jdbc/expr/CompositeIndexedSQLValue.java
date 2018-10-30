@@ -82,7 +82,7 @@ implements IndexedSQLValue<H,T>{
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<? super IndexedReference<T>> getTarget() {
+	public Class<IndexedReference> getTarget() {
 		return branch.getTarget();
 	}
 
@@ -90,7 +90,7 @@ implements IndexedSQLValue<H,T>{
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilter(uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition, java.lang.Object)
 	 */
 	@Override
-	public SQLFilter<H> getFilter(MatchCondition match, IndexedReference<T> val)
+	public SQLFilter<H> getFilter(MatchCondition match, IndexedReference val)
 			throws CannotFilterException, NoSQLFilterException {
 		return base.getSQLFilter(branch.getFilter(match, val));
 	}
@@ -115,7 +115,7 @@ implements IndexedSQLValue<H,T>{
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilterType()
 	 */
 	@Override
-	public Class<? super H> getFilterType() {
+	public Class<H> getFilterType() {
 		return base.getFilterType();
 	}
 

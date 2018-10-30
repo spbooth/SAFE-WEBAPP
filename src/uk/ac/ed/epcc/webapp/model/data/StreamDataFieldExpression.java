@@ -14,55 +14,33 @@
 /*******************************************************************************
  * Copyright (c) - The University of Edinburgh 2010
  *******************************************************************************/
-package uk.ac.ed.epcc.webapp.jdbc.expr;
+package uk.ac.ed.epcc.webapp.model.data;
+
+import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.UncaughtDataFault;
+import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
 
 
 
-
-/** A {@link Accessor} that converts the result of a nested {@link Accessor} to a string.
- * 
- * @author spb
- *
- * @param <T>
- * @param <R>
- */
-public class StringConvertAccessor<T,R> implements Accessor<String,R> {
-
-	protected Accessor<T,R> a;
-
-	public StringConvertAccessor(Accessor<T,R> acc) {
-		a=acc;
+public class StreamDataFieldExpression<X extends DataObject> extends FieldExpression<StreamData,X> {
+	
+	public StreamDataFieldExpression(Class<X> filter_type,Repository repository,String field) {
+		super(filter_type,repository, StreamData.class, field);
 	}
 
-	public Class<String> getTarget() {
-		return String.class;
+	protected void setValue(Record r, StreamData value) {
+		r.setProperty(name, value);
 	}
 
-	public String getValue(R r) {
-	    T temp = a.getValue(r);
-	    if( temp != null ){
-	    	return temp.toString();
-	    }
-		return null;
-	}
-	public boolean canSet() {
-		
-		return false;
-	}
-	public void setValue(R r, String value) {
-		throw new UnsupportedOperationException("Set not supported");
-		
-	}
-    @Override
-	public String toString(){
-    	StringBuilder sb = new StringBuilder();
-    	sb.append("String(");
-    	if (a instanceof SQLExpression) {
-			((SQLValue) a).add(sb, true);
-		} else {
-			sb.append(a.toString());
+	protected StreamData getValue(Record r) {
+		try {
+			return r.getStreamDataProperty(name);
+		} catch (DataFault e) {
+			throw new UncaughtDataFault(e);
 		}
-    	sb.append(")");
-    	return sb.toString();
-    }
+	}
+
+
+
 }

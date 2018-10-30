@@ -33,7 +33,7 @@ public class MillisecondSQLValue implements SQLValue<Long>{
 		this.a=a;
 	}
 	
-	public Class<? super Long> getTarget() {
+	public Class<Long> getTarget() {
 		return Long.class;
 	}
 	@Override

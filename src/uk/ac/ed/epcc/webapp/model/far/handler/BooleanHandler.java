@@ -41,7 +41,7 @@ public class BooleanHandler implements QuestionFormHandler<Boolean> {
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<? super Boolean> getTarget() {
+	public Class<Boolean> getTarget() {
 		return Boolean.class;
 	}
 

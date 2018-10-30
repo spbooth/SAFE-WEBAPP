@@ -224,8 +224,8 @@ public class XMLOverlay<X extends XMLOverlay.XMLFile> extends TextFileOverlay<X>
 	}
 
 	@Override
-	public Class<? super X> getTarget(){
-		return XMLFile.class;
+	public Class<X> getTarget(){
+		return (Class<X>) XMLFile.class;
 	}
 
 	public boolean canView(SessionService<?> sess) {

@@ -33,7 +33,7 @@ public abstract class AbstractTextHandler implements QuestionFormHandler<String>
 	}
 
 	@Override
-	public Class<? super String> getTarget() {
+	public Class<String> getTarget() {
 		return String.class;
 	}
 

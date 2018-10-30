@@ -20,7 +20,6 @@ import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.IndexedLinkManager;
 
@@ -37,7 +36,7 @@ import uk.ac.ed.epcc.webapp.model.data.IndexedLinkManager;
  */
 
 
-public class LinkHistoryAcceptFilter<L extends Indexed, R extends Indexed, T extends IndexedLinkManager.Link<L,R>> extends AbstractAcceptFilter<History<T>> implements AcceptFilter<History<T>>{
+public class LinkHistoryAcceptFilter<L extends Indexed, R extends Indexed, T extends IndexedLinkManager.Link<L,R>,H extends History<T>> extends AbstractAcceptFilter<H> implements AcceptFilter<H>{
 	/**
 	 * 
 	 */
@@ -49,8 +48,8 @@ public class LinkHistoryAcceptFilter<L extends Indexed, R extends Indexed, T ext
 	boolean has_left_field;
 	boolean has_right_field;
 	Map<Integer,Boolean> cache;
-	public LinkHistoryAcceptFilter(LinkHistoryHandler<L, R, T> linkHistoryHandler, L left, R right){
-		super(History.class);
+	public LinkHistoryAcceptFilter(Class<H> target,LinkHistoryHandler<L, R, T> linkHistoryHandler, L left, R right){
+		super(target);
 		this.linkHistoryHandler = linkHistoryHandler;
 		this.left=left;
 		this.right=right;
@@ -60,7 +59,7 @@ public class LinkHistoryAcceptFilter<L extends Indexed, R extends Indexed, T ext
 		has_left_field = this.linkHistoryHandler.canLeftJoin();
 		has_right_field = this.linkHistoryHandler.canRightJoin();
 	}
-	public boolean accept(History<T> h) {
+	public boolean accept(H h) {
 		if( left != null ){
 			if( has_left_field ){
 				if( ! h.matchIntegerProperty(left_field, left.getID())){

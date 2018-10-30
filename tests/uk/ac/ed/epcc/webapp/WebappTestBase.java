@@ -255,7 +255,7 @@ public abstract class WebappTestBase implements ContextHolder{
 		String expected = XMLDataUtils.transform(t,getClass(), expected_xml);
 		
 		String result = XMLDataUtils.transform(t, diff.toString());
-		
+		//System.out.println(result);
 		String differ = TestDataHelper.diff(expected, result);
 		boolean same = differ.trim().length()==0;
 		if( ! same){

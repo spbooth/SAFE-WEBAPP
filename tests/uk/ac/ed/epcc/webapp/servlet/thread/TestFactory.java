@@ -49,7 +49,7 @@ public class TestFactory extends DataObjectFactory<TestFactory.TestData> {
 		return new TestData(res);
 	}
 	
-	public Class<? super TestData> getTarget(){
+	public Class<TestData> getTarget(){
 		return TestData.class;
 	}
 

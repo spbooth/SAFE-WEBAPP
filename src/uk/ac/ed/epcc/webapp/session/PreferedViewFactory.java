@@ -71,7 +71,7 @@ public class PreferedViewFactory extends ClassificationFactory<PreferedView> {
 	 * @see uk.ac.ed.epcc.webapp.model.ClassificationFactory#getTarget()
 	 */
 	@Override
-	public Class<? super PreferedView> getTarget() {
+	public Class<PreferedView> getTarget() {
 		return PreferedView.class;
 	}
 	

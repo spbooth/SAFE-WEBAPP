@@ -35,7 +35,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 public final class ConstJoinerFilter<T extends DataObject, BDO extends DataObject> implements SQLFilter<BDO>, JoinFilter<BDO> , LinkClause{
-	public ConstJoinerFilter(Class<? super BDO> target, int id, Repository remote_res) {
+	public ConstJoinerFilter(Class<BDO> target, int id, Repository remote_res) {
 		super();
 		this.target = target;
 		this.id=id;
@@ -46,7 +46,7 @@ public final class ConstJoinerFilter<T extends DataObject, BDO extends DataObjec
 
 
 
-	private final Class<? super BDO> target;
+	private final Class<BDO> target;
 	private final int id;
 	private final Repository remote_res;
 		
@@ -65,7 +65,7 @@ public final class ConstJoinerFilter<T extends DataObject, BDO extends DataObjec
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 		 */
-		public <X> X acceptVisitor(FilterVisitor<X, ? extends BDO> vis)
+		public <X> X acceptVisitor(FilterVisitor<X, BDO> vis)
 				throws Exception {
 			return vis.visitJoinFilter(this);
 		}
@@ -77,8 +77,8 @@ public final class ConstJoinerFilter<T extends DataObject, BDO extends DataObjec
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
-		public Class<? super BDO> getTarget() {
-			return target;
+		public Class<BDO> getTarget() {
+			return  target;
 		}
 
 

@@ -29,10 +29,10 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
 public class SQLOrFilter<T> extends BaseSQLCombineFilter<T> {
 	
 	
-	public SQLOrFilter(Class<? super T> target) {
+	public SQLOrFilter(Class<T> target) {
 		super(target);
 	}
-	public SQLOrFilter(Class<? super T> target,SQLFilter<? super T> ...filters ){
+	public SQLOrFilter(Class<T> target,SQLFilter<? super T> ...filters ){
 		super(target);
 		for(SQLFilter<? super T> f : filters){
 			addFilter(f);

@@ -41,22 +41,22 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 
 
 public class SQLValueFilter<T> implements SQLFilter<T>, PatternFilter<T> {
-	 private final Class<? super T> target;
+	 private final Class<T> target;
 	 private final Object peer;
      private final String field;
      private final Repository parent;
      private final String match;
      
-     public SQLValueFilter(Class<? super T> target,Repository res,String field,Object peer){
+     public SQLValueFilter(Class<T> target,Repository res,String field,Object peer){
         this(target,res,field,peer,false);
      }
-     public SQLValueFilter(Class<? super T> target,Repository res,String field,Object peer, boolean negate ){
+     public SQLValueFilter(Class<T> target,Repository res,String field,Object peer, boolean negate ){
     	this(target,res,field,negate ? "!=" : "= ",peer);
      }
-     public SQLValueFilter(Class<? super T> target,Repository res, String field,MatchCondition cond, Object peer){
+     public SQLValueFilter(Class<T> target,Repository res, String field,MatchCondition cond, Object peer){
     	 this(target,res,field,cond.match(),peer);
      }
-     private SQLValueFilter(Class<? super T> target,Repository res,String field,String match,Object peer){
+     private SQLValueFilter(Class<T> target,Repository res,String field,String match,Object peer){
     	 this.target=target;
     	 parent=res;
     	 this.field=field;
@@ -149,13 +149,13 @@ public class SQLValueFilter<T> implements SQLFilter<T>, PatternFilter<T> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
-	public final <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+	public final <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
 		return vis.visitPatternFilter(this);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
-	public final Class<? super T> getTarget() {
+	public final Class<T> getTarget() {
 		return target;
 	}
 	/** Make sure sub-classes don't try to imlement OrderFilter as well

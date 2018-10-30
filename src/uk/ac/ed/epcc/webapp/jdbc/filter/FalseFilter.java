@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
 
 /** A filter than never slects any records.
  * @author spb
+ * @param <T> type of filter
  *
  */
 public class FalseFilter<T> extends GenericBinaryFilter<T>{
@@ -23,7 +24,7 @@ public class FalseFilter<T> extends GenericBinaryFilter<T>{
 	 * @param target
 	 * 
 	 */
-	public FalseFilter(Class<? super T> target) {
+	public FalseFilter(Class<T> target) {
 		super(target, false);
 	}
 

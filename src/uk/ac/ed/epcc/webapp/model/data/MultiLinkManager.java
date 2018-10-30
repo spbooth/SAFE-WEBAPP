@@ -16,17 +16,18 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
-
-import java.util.*;
 
 /**
  * MultiLinkManager is a superclass for handling Linkage objects that link
@@ -286,8 +287,8 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		return res;
 	}
 	@Override
-	public Class<? super M> getTarget() {
-		return MultiLink.class;
+	public Class<M> getTarget() {
+		return (Class<M>) MultiLink.class;
 	}
 	
 

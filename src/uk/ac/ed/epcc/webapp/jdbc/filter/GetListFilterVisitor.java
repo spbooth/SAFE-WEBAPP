@@ -37,7 +37,7 @@ public class GetListFilterVisitor<T> implements FilterVisitor<List<PatternArgume
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
 	 */
 	@Override
-	public List<PatternArgument> visitPatternFilter(PatternFilter<? super T> fil) throws Exception {
+	public List<PatternArgument> visitPatternFilter(PatternFilter<T> fil) throws Exception {
 		return fil.getParameters(list);
 	}
 
@@ -45,7 +45,7 @@ public class GetListFilterVisitor<T> implements FilterVisitor<List<PatternArgume
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitSQLCombineFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter)
 	 */
 	@Override
-	public List<PatternArgument> visitSQLCombineFilter(BaseSQLCombineFilter<? super T> fil) throws Exception {
+	public List<PatternArgument> visitSQLCombineFilter(BaseSQLCombineFilter<T> fil) throws Exception {
 		return visitPatternFilter(fil);
 	}
 
@@ -53,7 +53,7 @@ public class GetListFilterVisitor<T> implements FilterVisitor<List<PatternArgume
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAndFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter)
 	 */
 	@Override
-	public List<PatternArgument> visitAndFilter(AndFilter<? super T> fil) throws Exception {
+	public List<PatternArgument> visitAndFilter(AndFilter<T> fil) throws Exception {
 		return visitPatternFilter(fil);
 	}
 
@@ -61,7 +61,7 @@ public class GetListFilterVisitor<T> implements FilterVisitor<List<PatternArgume
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
 	 */
 	@Override
-	public List<PatternArgument> visitOrFilter(OrFilter<? super T> fil) throws Exception {
+	public List<PatternArgument> visitOrFilter(OrFilter<T> fil) throws Exception {
 		if( fil.nonSQL() ){
 			return visitAcceptFilter(fil);
 		}
@@ -72,7 +72,7 @@ public class GetListFilterVisitor<T> implements FilterVisitor<List<PatternArgume
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
 	 */
 	@Override
-	public List<PatternArgument> visitOrderFilter(SQLOrderFilter<? super T> fil) throws Exception {
+	public List<PatternArgument> visitOrderFilter(SQLOrderFilter<T> fil) throws Exception {
 		return list;
 	}
 
@@ -80,7 +80,7 @@ public class GetListFilterVisitor<T> implements FilterVisitor<List<PatternArgume
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter)
 	 */
 	@Override
-	public List<PatternArgument> visitAcceptFilter(AcceptFilter<? super T> fil) throws Exception {
+	public List<PatternArgument> visitAcceptFilter(AcceptFilter<T> fil) throws Exception {
 		if( require_sql){
 			throw new NoSQLFilterException();
 		}
@@ -91,7 +91,7 @@ public class GetListFilterVisitor<T> implements FilterVisitor<List<PatternArgume
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitJoinFilter(uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter)
 	 */
 	@Override
-	public List<PatternArgument> visitJoinFilter(JoinFilter<? super T> fil) throws Exception {
+	public List<PatternArgument> visitJoinFilter(JoinFilter<T> fil) throws Exception {
 		return list;
 	}
 
@@ -99,7 +99,7 @@ public class GetListFilterVisitor<T> implements FilterVisitor<List<PatternArgume
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
 	 */
 	@Override
-	public List<PatternArgument> visitBinaryFilter(BinaryFilter<? super T> fil) throws Exception {
+	public List<PatternArgument> visitBinaryFilter(BinaryFilter<T> fil) throws Exception {
 		return list;
 	}
 	
@@ -109,7 +109,7 @@ public class GetListFilterVisitor<T> implements FilterVisitor<List<PatternArgume
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
 	 */
 	@Override
-	public List<PatternArgument> visitDualFilter(DualFilter<? super T> fil) throws Exception {
+	public List<PatternArgument> visitDualFilter(DualFilter<T> fil) throws Exception {
 		return fil.getSQLFilter().acceptVisitor(this);
 	}
 
@@ -117,7 +117,7 @@ public class GetListFilterVisitor<T> implements FilterVisitor<List<PatternArgume
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter)
 	 */
 	@Override
-	public List<PatternArgument> visitBinaryAcceptFilter(BinaryAcceptFilter<? super T> fil) throws Exception {
+	public List<PatternArgument> visitBinaryAcceptFilter(BinaryAcceptFilter<T> fil) throws Exception {
 		return visitBinaryFilter(fil);
 	}
 

@@ -83,7 +83,7 @@ public class PostgresqlDateConverter implements DateSQLExpression{
 	public SQLFilter getRequiredFilter() {
 		return val.getRequiredFilter();
 	}
-	public Class<? super Date> getTarget() {
+	public Class<Date> getTarget() {
 		return Date.class;
 	}
 	@Override

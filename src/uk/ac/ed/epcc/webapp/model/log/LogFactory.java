@@ -674,8 +674,8 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	}
 
 	@Override
-	public Class<? super T> getTarget() {
-		return Entry.class;
+	public Class<T> getTarget() {
+		return (Class<T>) Entry.class;
 	}
 	/**
 	 * @param v

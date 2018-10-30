@@ -32,7 +32,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 public class Joiner<T extends DataObject, BDO extends DataObject> extends SQLAndFilter<BDO>  {
-		public Joiner(Class<? super BDO> target,SQLFilter<? super T> fil, String join_field, Repository res, Repository remote_res){
+		public Joiner(Class<BDO> target,SQLFilter<T> fil, String join_field, Repository res, Repository remote_res){
 			this(target,fil,join_field,res,remote_res,true);
 		}
 		/**
@@ -45,7 +45,7 @@ public class Joiner<T extends DataObject, BDO extends DataObject> extends SQLAnd
 		 * @param target_references boolean true if target points to remote. false if remote points to target
 		 */
 		@SuppressWarnings("unchecked")
-		public Joiner(Class<? super BDO> target,SQLFilter<? super T> fil, String join_field, Repository res, Repository remote_res,
+		public Joiner(Class<BDO> target,SQLFilter<T> fil, String join_field, Repository res, Repository remote_res,
 			boolean target_references	){
 			super(target);
 			if( ! target_references){
@@ -67,7 +67,7 @@ public class Joiner<T extends DataObject, BDO extends DataObject> extends SQLAnd
 		 * @param remote_res
 		 * @param ref
 		 */
-		public Joiner(Class<? super BDO> target, SQLFilter<? super T> fil, Repository remote_res,int ref){
+		public Joiner(Class<BDO> target, SQLFilter<? super T> fil, Repository remote_res,int ref){
 			super(target);
 			addFilter(new ConstJoinerFilter<T,BDO>(target, ref, remote_res));
 			SQLFilter f = fil;

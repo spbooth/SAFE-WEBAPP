@@ -111,18 +111,18 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 	public class TupleAndFilter extends AndFilter<T>{
 	
 		public TupleAndFilter(BaseFilter<? super T>... fil) {
-			super(TupleFactory.this.getTarget(), fil);
+			super((Class<T>) TupleFactory.this.getTarget(), fil);
 		}
 
 		/**
 		 * @param target
 		 */
 		public TupleAndFilter() {
-			super(TupleFactory.this.getTarget());
+			super((Class<T>) TupleFactory.this.getTarget());
 
 		}
 		
-		public class AddMemberVisitor extends AbstractAddFilterVisitor<A>{
+		public class AddMemberVisitor extends AbstractAddFilterVisitor{
 			
 
 			public AddMemberVisitor(String tag) {
@@ -138,7 +138,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter)
 			 */
 			@Override
-			public Boolean visitAcceptFilter(AcceptFilter<? super A> fil) throws Exception {
+			public Boolean visitAcceptFilter(AcceptFilter fil) throws Exception {
 				addAccept(new AcceptFilterConverter(tag, fil));
 				return null;
 			}
@@ -336,7 +336,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 		 * @param target
 		 * @throws DataFault 
 		 */
-		public TupleIterator(BaseFilter<? super T> fil, int start, int max) throws DataFault {
+		public TupleIterator(BaseFilter<T> fil, int start, int max) throws DataFault {
 			this();
 			try {
 				setup(fil, start, max);
@@ -492,8 +492,8 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<? super T> getTarget() {
-		return Tuple.class;
+	public Class<T> getTarget() {
+		return (Class<T>) Tuple.class;
 	}
 
 	/** get the component factories of the tuples

@@ -60,7 +60,7 @@ public class StateRelationshipComposite<U extends AppUser,BDO extends DataObject
 		 * @param target
 		 */
 		protected Filter() {
-			super(DataObject.class);
+			super((Class<BDO>) DataObject.class);
 		}
 
 		/* (non-Javadoc)
@@ -76,7 +76,7 @@ public class StateRelationshipComposite<U extends AppUser,BDO extends DataObject
 
 		private final BDO target;
 		public PersonFilter(BDO target){
-			super(AppUser.class);
+			super((Class<U>) AppUser.class);
 			this.target=target;
 		}
 		

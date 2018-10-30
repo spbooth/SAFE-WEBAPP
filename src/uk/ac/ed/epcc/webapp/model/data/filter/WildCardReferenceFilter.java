@@ -28,7 +28,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  */
 public class WildCardReferenceFilter<T extends DataObject,P extends Indexed> extends SQLOrFilter<T> {
 
-	public WildCardReferenceFilter(Class<? super T> target,Repository res, String field, P peer){
+	public WildCardReferenceFilter(Class<T> target,Repository res, String field, P peer){
 		super(target);
 		addFilter(new NullFieldFilter<T>(target,res, field, true));
 		if( peer != null){

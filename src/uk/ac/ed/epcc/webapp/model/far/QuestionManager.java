@@ -154,7 +154,7 @@ public class QuestionManager extends HandlerPartManager<SectionManager.Section,Q
 		return QuestionFormHandler.class;
 	}
 	@Override
-	public Class<? super Question> getTarget() {
+	public Class<Question> getTarget() {
 		return Question.class;
 	}
 	/* (non-Javadoc)

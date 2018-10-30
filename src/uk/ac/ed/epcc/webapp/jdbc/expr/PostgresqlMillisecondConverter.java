@@ -55,7 +55,7 @@ public List<PatternArgument> getParameters(List<PatternArgument> list) {
 }
 
 
-public Class<? super Number> getTarget() {
+public Class<Number> getTarget() {
 	return Number.class;
 }
 public SQLFilter getRequiredFilter() {

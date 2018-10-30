@@ -41,7 +41,7 @@ public class TimestampDateFieldExpression<T extends DataObject> extends FieldExp
     private final long res;
     private final NumberFieldExpression<Integer, T> num_field;
     private final DateSQLExpression date_expr;
-	protected TimestampDateFieldExpression(Class<? super T> target,Repository rep,String field) {
+	protected TimestampDateFieldExpression(Class<T> target,Repository rep,String field) {
 		super(target,rep, Date.class,field);
 		this.res=rep.getResolution();
 		num_field=rep.getNumberExpression(target,Integer.class, field);

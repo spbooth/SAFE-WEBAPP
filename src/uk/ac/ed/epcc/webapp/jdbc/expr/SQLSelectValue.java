@@ -34,17 +34,17 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  * @param <T>
  */
 public class SQLSelectValue<T> implements SQLValue<T> {
-    private final Class<? super T> target;
+    private final Class<T> target;
     private final SQLValue<T> accessors[];
     private final int offsets[];
     
-    public SQLSelectValue(Class<? super T> target, SQLValue<T> accessors[]){
+    public SQLSelectValue(Class<T> target, SQLValue<T> accessors[]){
     	this.target=target;
     	this.accessors=accessors;
     	offsets=new int[accessors.length];
     }
 	
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		return target;
 	}
 

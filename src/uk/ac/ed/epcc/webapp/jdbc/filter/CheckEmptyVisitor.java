@@ -24,7 +24,7 @@ public class CheckEmptyVisitor<T> implements FilterVisitor<Boolean, T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
 	 */
 	@Override
-	public Boolean visitPatternFilter(PatternFilter<? super T> fil)  {
+	public Boolean visitPatternFilter(PatternFilter<T> fil)  {
 		return false;
 	}
 
@@ -32,7 +32,7 @@ public class CheckEmptyVisitor<T> implements FilterVisitor<Boolean, T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitSQLCombineFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter)
 	 */
 	@Override
-	public Boolean visitSQLCombineFilter(BaseSQLCombineFilter<? super T> fil)  {
+	public Boolean visitSQLCombineFilter(BaseSQLCombineFilter<T> fil)  {
 		return false;
 	}
 
@@ -40,7 +40,7 @@ public class CheckEmptyVisitor<T> implements FilterVisitor<Boolean, T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAndFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter)
 	 */
 	@Override
-	public Boolean visitAndFilter(AndFilter<? super T> fil)  {
+	public Boolean visitAndFilter(AndFilter<T> fil)  {
 		return false;
 	}
 
@@ -48,7 +48,7 @@ public class CheckEmptyVisitor<T> implements FilterVisitor<Boolean, T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
 	 */
 	@Override
-	public Boolean visitOrFilter(OrFilter<? super T> fil) {
+	public Boolean visitOrFilter(OrFilter<T> fil) {
 		return false;
 	}
 
@@ -56,7 +56,7 @@ public class CheckEmptyVisitor<T> implements FilterVisitor<Boolean, T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
 	 */
 	@Override
-	public Boolean visitOrderFilter(SQLOrderFilter<? super T> fil)  {
+	public Boolean visitOrderFilter(SQLOrderFilter<T> fil)  {
 		return false;
 	}
 
@@ -64,7 +64,7 @@ public class CheckEmptyVisitor<T> implements FilterVisitor<Boolean, T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter)
 	 */
 	@Override
-	public Boolean visitAcceptFilter(AcceptFilter<? super T> fil)  {
+	public Boolean visitAcceptFilter(AcceptFilter<T> fil)  {
 		return false;
 	}
 
@@ -72,7 +72,7 @@ public class CheckEmptyVisitor<T> implements FilterVisitor<Boolean, T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitJoinFilter(uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter)
 	 */
 	@Override
-	public Boolean visitJoinFilter(JoinFilter<? super T> fil) {
+	public Boolean visitJoinFilter(JoinFilter<T> fil) {
 		return false;
 	}
 
@@ -80,7 +80,7 @@ public class CheckEmptyVisitor<T> implements FilterVisitor<Boolean, T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
 	 */
 	@Override
-	public Boolean visitBinaryFilter(BinaryFilter<? super T> fil)  {
+	public Boolean visitBinaryFilter(BinaryFilter<T> fil)  {
 		return ! fil.getBooleanResult();
 	}
 
@@ -88,7 +88,7 @@ public class CheckEmptyVisitor<T> implements FilterVisitor<Boolean, T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
 	 */
 	@Override
-	public Boolean visitDualFilter(DualFilter<? super T> fil) throws Exception {
+	public Boolean visitDualFilter(DualFilter<T> fil) throws Exception {
 		return fil.getSQLFilter().acceptVisitor(this);
 	}
 
@@ -96,7 +96,7 @@ public class CheckEmptyVisitor<T> implements FilterVisitor<Boolean, T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter)
 	 */
 	@Override
-	public Boolean visitBinaryAcceptFilter(BinaryAcceptFilter<? super T> fil) throws Exception {
+	public Boolean visitBinaryAcceptFilter(BinaryAcceptFilter<T> fil) throws Exception {
 		return visitBinaryFilter(fil);
 	}
 

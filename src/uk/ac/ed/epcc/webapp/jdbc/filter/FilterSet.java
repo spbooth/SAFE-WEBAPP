@@ -19,20 +19,22 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 
 /** Abstract class for a set of Filters 
  * 
- * This class performs type checking.
+ * This class performs type checking but the implementation assumes that 
+ * filters for super-types are also valid.
  * @author spb
  *
- * @param <T>
+ * @param <T> type of filter
  */
 public abstract class FilterSet<T> {
 
 
-	protected Class<? super T> target;
+	protected Class<T> target;
 
 	/**
+	 * @param target type of filter
 	 * 
 	 */
-	public FilterSet(Class<? super T> target) {
+	public FilterSet(Class<T> target) {
 		super();
 		this.target=target;
 	}
@@ -49,7 +51,7 @@ public abstract class FilterSet<T> {
 		}
 		if( check_types){
 			if( target == null ){
-				target=fil.getTarget();
+				target=(Class<T>) fil.getTarget();
 			}else{
 				// Its OK to add a super-type filter to a more specific filter but
 				// not the other way round.
@@ -59,8 +61,6 @@ public abstract class FilterSet<T> {
 						// adding more restricive target
 						target=target2;
 					}else{
-						//TODO check this always but run as assertion for a bit.
-						//assert(false);
 						throw new ConsistencyError("Incompatible filter types "+target2.getCanonicalName()+","+target.getCanonicalName());
 					}
 				}
@@ -74,7 +74,7 @@ public abstract class FilterSet<T> {
 		return this;
 	}
 	
-	public final Class<? super T> getTarget(){
+	public final Class<T> getTarget(){
 		return target;
 	}
 

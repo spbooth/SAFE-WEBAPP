@@ -65,7 +65,7 @@ public class StringConvertSQLValue<T>  implements SQLValue<String> {
 	public SQLFilter getRequiredFilter() {
 		return a.getRequiredFilter();
 	}
-	public Class<? super String> getTarget() {
+	public Class<String> getTarget() {
 		return String.class;
 	}
 }

@@ -37,7 +37,7 @@ public class DateSQLValue implements SQLValue<Date>{
 		this.a=a;
 	}
 	
-	public Class<? super Date> getTarget() {
+	public Class<Date> getTarget() {
 		return Date.class;
 	}
 	@Override

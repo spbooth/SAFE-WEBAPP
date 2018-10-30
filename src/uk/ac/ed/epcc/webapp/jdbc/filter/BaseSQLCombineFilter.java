@@ -33,7 +33,7 @@ public abstract class BaseSQLCombineFilter<T> extends BaseCombineFilter<T> imple
 	/**
 	 * @param target
 	 */
-	protected BaseSQLCombineFilter(Class<? super T> target) {
+	protected BaseSQLCombineFilter(Class<T> target) {
 		super(target);
 	}
 
@@ -51,7 +51,7 @@ public abstract class BaseSQLCombineFilter<T> extends BaseCombineFilter<T> imple
 	public final void accept(T o) {
 
 	}
-	public final <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+	public final <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
 		if( useBinary(false)){
 			return vis.visitBinaryFilter(this);
 		}

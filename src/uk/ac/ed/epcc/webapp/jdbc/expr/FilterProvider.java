@@ -74,5 +74,5 @@ public interface FilterProvider<T, D> extends Targetted<D> {
    * 
    * @return Class
    */
-  public Class<? super T> getFilterType();
+  public Class<T> getFilterType();
 }

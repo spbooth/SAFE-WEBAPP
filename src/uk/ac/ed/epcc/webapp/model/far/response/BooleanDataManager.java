@@ -33,7 +33,8 @@ import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
  *
  */
 
-public class BooleanDataManager<R extends Response<F>,F extends DynamicForm> extends ResponseDataManager<BooleanDataManager<R,F>.BooleanData, R, F> {
+public class BooleanDataManager<R extends Response<F>,F extends DynamicForm,M extends BooleanDataManager<R,F,M>.BooleanData> 
+extends ResponseDataManager<M, R, F> {
 
 	private static final String DATA_FIELD="Data";
  	/**
@@ -86,8 +87,8 @@ public class BooleanDataManager<R extends Response<F>,F extends DynamicForm> ext
 	}
 
 	@Override
-	public Class<? super BooleanDataManager<R, F>.BooleanData> getTarget() {
-		return BooleanData.class;
+	public Class<M> getTarget() {
+		return (Class<M>) BooleanData.class;
 	}
 
 	@Override

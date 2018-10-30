@@ -20,24 +20,24 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
  */
 public abstract class AbstractAcceptFilter<T> implements AcceptFilter<T> {
 	
-	private final Class<? super T> target;
+	private final Class<T> target;
 
    /**
 	 * 
 	 */
-	protected AbstractAcceptFilter(Class<? super T> target) {
+	protected AbstractAcceptFilter(Class<T> target) {
 		this.target=target;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
 	@Override
-	public final <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+	public final <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 		return vis.visitAcceptFilter(this);
 	}
 
 	@Override
-	public final Class<? super T> getTarget(){
+	public final Class<T> getTarget(){
 		return target;
 	}
 }

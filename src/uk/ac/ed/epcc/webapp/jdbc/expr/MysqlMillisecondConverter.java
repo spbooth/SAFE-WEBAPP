@@ -82,7 +82,7 @@ public String toString() {
 	return sb.toString();
  }
 
-public Class<? super Number> getTarget() {
+public Class<Number> getTarget() {
 	return Number.class;
 }
 public SQLFilter getRequiredFilter() {

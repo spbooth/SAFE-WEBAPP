@@ -110,7 +110,7 @@ public class CompareSQLExpression<C extends Comparable> implements SQLExpression
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<? super Boolean> getTarget() {
+	public Class<Boolean> getTarget() {
 		return Boolean.class;
 	}
 

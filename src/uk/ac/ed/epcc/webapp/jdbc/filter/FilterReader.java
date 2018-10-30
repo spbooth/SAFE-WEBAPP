@@ -18,7 +18,6 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,14 +43,14 @@ import uk.ac.ed.epcc.webapp.model.data.filter.LinkClause;
  */
 public abstract class FilterReader<T,O> extends FilterSelect<T> implements Contexed, Targetted<T>{
 	private final AppContext ctx;
-	private final Class<? super T> target;
+	private final Class<T> target;
 	private BaseFilter<? super T> my_filter;
 
 	private ResultMapper<O> mapper;
 	
 	
 	private boolean qualify=false;
-	public FilterReader(AppContext c,Class<? super T> target){
+	public FilterReader(AppContext c,Class<T> target){
 		ctx=c;
 		this.target=target;
 	}
@@ -94,12 +93,12 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 			}else{
 				// both non null
 				if( my_filter instanceof SQLFilter ){
-					SQLAndFilter<T> res = new SQLAndFilter<T>(my_filter.getTarget());
+					SQLAndFilter<T> res = new SQLAndFilter<T>(target);
 					res.addFilter(mapper_filter);
-					res.addFilter((SQLFilter<T>)my_filter);
+					res.addFilter((SQLFilter<? super T>) my_filter);
 					return res;
 				}else{
-					AndFilter<T> res = new AndFilter<T>(my_filter.getTarget());
+					AndFilter<T> res = new AndFilter<T>(target);
 					res.addFilter(mapper_filter);
 					res.addFilter(my_filter);
 					return res;
@@ -205,7 +204,7 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 		return mapper.makeDefault();
 	}
 	
-	public final Class<? super T> getTarget(){
+	public final Class<T> getTarget(){
 		return target;
 	}
 

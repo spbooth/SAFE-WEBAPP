@@ -23,7 +23,8 @@ import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
  *
  */
 
-public class OptionDataManager<R extends Response<F>,F extends DynamicForm> extends ResponseDataManager<OptionDataManager<R,F>.OptionData, R, F> {
+public class OptionDataManager<R extends Response<F>,F extends DynamicForm, M extends OptionDataManager<R,F,M>.OptionData> 
+extends ResponseDataManager<M, R, F> {
 
 	private static final String DATA_FIELD="Data";
  	/**
@@ -79,8 +80,8 @@ public class OptionDataManager<R extends Response<F>,F extends DynamicForm> exte
 	}
 
 	@Override
-	public Class<? super OptionDataManager<R, F>.OptionData> getTarget() {
-		return OptionData.class;
+	public Class<M> getTarget() {
+		return (Class<M>) OptionData.class;
 	}
 
 	@Override

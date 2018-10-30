@@ -104,7 +104,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 		}
 		
 		
-        protected SQLResultIterator(AppContext c, Class<? super T> target){
+        protected SQLResultIterator(AppContext c, Class<T> target){
             super(c,target);
             use_chunking = CHUNKING_FEATURE.isEnabled(getContext());
 			chunk = getContext().getIntegerParameter("chunksize", DEFAULT_CHUNKSIZE);
@@ -310,7 +310,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 		 * @param max
 		 * @throws DataException 
 		 */
-		protected void setup(BaseFilter<? super T> f, int start, int max) throws DataException {
+		protected void setup(BaseFilter<T> f, int start, int max) throws DataException {
 			
 			if( isEmpty(f)){
 				return;

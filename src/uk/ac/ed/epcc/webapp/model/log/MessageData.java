@@ -75,8 +75,8 @@ public class MessageData extends MessageDataObject implements MessageProvider , 
 		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getTarget()
 		 */
 		@Override
-		public Class<? super M> getTarget() {
-			return MessageData.class;
+		public Class<M> getTarget() {
+			return (Class<M>) MessageData.class;
 		}
 		
 	}

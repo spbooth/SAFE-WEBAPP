@@ -39,7 +39,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 public class SelfReferenceFilter<T> implements SQLFilter<T> , PatternFilter<T>{
 
-	private final Class<? super T> target;
+	private final Class<T> target;
 	private final IndexedReference ref;
 	private final Repository res;
 	private final boolean exclude;
@@ -49,7 +49,7 @@ public class SelfReferenceFilter<T> implements SQLFilter<T> , PatternFilter<T>{
 	 * @param res  {@link Repository}
 	 * @param ref {@link IndexedReference}
 	 */
-	public SelfReferenceFilter(Class<? super T> target,Repository res, IndexedReference ref){
+	public SelfReferenceFilter(Class<T> target,Repository res, IndexedReference ref){
 		this(target,res,false,ref);
 	}
 	/** 
@@ -59,7 +59,7 @@ public class SelfReferenceFilter<T> implements SQLFilter<T> , PatternFilter<T>{
 	 * @param exclude if true, matches everything but reference
 	 * @param ref {@link IndexedReference}
 	 */
-	public SelfReferenceFilter(Class<? super T> target,Repository res, boolean exclude ,IndexedReference ref){
+	public SelfReferenceFilter(Class<T> target,Repository res, boolean exclude ,IndexedReference ref){
 		this.target=target;
 		this.res=res;
 		this.exclude=exclude;
@@ -105,14 +105,14 @@ public class SelfReferenceFilter<T> implements SQLFilter<T> , PatternFilter<T>{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
-	public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+	public <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
 		return vis.visitPatternFilter(this);
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		return target;
 	}
 	

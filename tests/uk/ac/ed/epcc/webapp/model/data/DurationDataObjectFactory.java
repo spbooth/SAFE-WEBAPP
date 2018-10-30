@@ -16,7 +16,6 @@ package uk.ac.ed.epcc.webapp.model.data;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.table.NumberFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.DurationDataObjectFactory.DurationObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
@@ -37,7 +36,7 @@ public class DurationDataObjectFactory extends DataObjectFactory<DurationDataObj
 	private static final String DURATION = "Duration";
 
 @Override
-	public Class<? super DurationObject> getTarget() {
+	public Class<DurationObject> getTarget() {
 		return DurationObject.class;
 	}
 

@@ -57,7 +57,7 @@ public class EmailListHandler implements QuestionFormHandler<String> {
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<? super String> getTarget() {
+	public Class<String> getTarget() {
 		return String.class;
 	}
 

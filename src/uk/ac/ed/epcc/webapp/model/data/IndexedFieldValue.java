@@ -30,7 +30,6 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
-import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.filter.FieldOrderFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.Joiner;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
@@ -49,11 +48,11 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
  */
 
 
-public class IndexedFieldValue<T extends DataObject,I extends DataObject> implements FieldValue<IndexedReference<I>,T>,IndexedSQLValue<T,I> ,Selector{
-	private final Class<? super T> target;
+public class IndexedFieldValue<T extends DataObject,I extends DataObject> implements FieldValue<IndexedReference,T>,IndexedSQLValue<T,I> ,Selector{
+	private final Class<T> target;
 	private final Repository repository;
 	private final IndexedTypeProducer<I,? extends DataObjectFactory<I>> producer;
-	public IndexedFieldValue(Class<? super T> target,Repository repository, IndexedTypeProducer<I,? extends DataObjectFactory<I>> producer) {
+	public IndexedFieldValue(Class<T> target,Repository repository, IndexedTypeProducer<I,? extends DataObjectFactory<I>> producer) {
 		this.target=target;
 		this.repository=repository;
 		this.producer=producer;
@@ -92,7 +91,7 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 		return producer.makeReference(id);
 	}
 	
-	public void setValue(T r, IndexedReference<I> value) {
+	public void setValue(T r, IndexedReference value) {
 		if( value == null ){
 			r.record.setProperty(producer.getField(), 0);
 		}else{
@@ -101,7 +100,7 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 		
 	}
 	public void setObject(PreparedStatement stmt, int pos,
-			IndexedReference<I> value) throws SQLException {
+			IndexedReference value) throws SQLException {
 		stmt.setInt(pos,value.getID());
 		
 	}
@@ -122,7 +121,7 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 		return info.getName(true)+(info.isIndexed()?"(Index)":"")+"->"+table;
 	}
 	public SQLFilter<T> getFilter(MatchCondition match,
-			IndexedReference<I> val) {
+			IndexedReference val) {
 		if(match == null ){
 			return new SQLValueFilter<T>(target,repository,producer.getField(),val.getID());
 		}
@@ -182,7 +181,7 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilterType()
 	 */
-	public Class<? super T> getFilterType() {
+	public Class<T> getFilterType() {
 		return target;
 	}
 
@@ -191,20 +190,8 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 	 */
 	@Override
 	public SQLExpression<Integer> getIDExpression() {
+		return repository.getNumberExpression(getFilterType(), Integer.class, getFieldName());
 		
-		return new FieldExpression<Integer, T>(getFilterType(), repository, Integer.class, getFieldName()) {
-
-			@Override
-			protected Integer getValue(Record r) {
-				return r.getIntProperty(getFieldName());
-			}
-
-			@Override
-			protected void setValue(Record r, Integer value) {
-				r.setProperty(getFieldName(), value.intValue());
-				
-			}
-		};
 	}
 
 }

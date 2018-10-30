@@ -145,6 +145,7 @@ public class RelationshipTest extends WebappTestBase {
 		Assert.assertTrue("Manager role",service.hasRole(fac.getTag()+"%"+MANAGER+"@CalledTest1")); // alt named filter
 		Assert.assertTrue("Manager role",service.hasRole(fac.getTag()+"%"+MANAGER)); // no name filter
 		Assert.assertFalse("Double manager role",service.hasRole(fac.getTag()+"%"+DOUBLE_MANAGER+"@name:"+t.getName()));
+
 		
 		// caching call
 		assertTrue(service.hasRelationship(fac, t, MANAGER));

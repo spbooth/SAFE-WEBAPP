@@ -60,13 +60,13 @@ public class GenericBinaryFilter<T> implements SQLFilter<T>, BinaryFilter<T>{
 	}
 
 
-	protected final Class<? super T> target;
+	protected final Class<T> target;
 	protected boolean value;
 
 	/**
 	 * 
 	 */
-	public GenericBinaryFilter(Class<? super T> target,boolean value) {
+	public GenericBinaryFilter(Class<T> target,boolean value) {
 		super();
 		this.target=target;
 		this.value=value;
@@ -82,7 +82,7 @@ public class GenericBinaryFilter<T> implements SQLFilter<T>, BinaryFilter<T>{
 	}
 	
 	
-	public final Class<? super T> getTarget() {
+	public final Class<T> getTarget() {
 		return target;
 	}
 
@@ -90,7 +90,7 @@ public class GenericBinaryFilter<T> implements SQLFilter<T>, BinaryFilter<T>{
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
 	@Override
-	public final <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+	public final <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 		// Default is to act as a binary filter
 		return vis.visitBinaryFilter(this);
 	}

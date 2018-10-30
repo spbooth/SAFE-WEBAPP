@@ -40,7 +40,7 @@ public class SQLAverageValue implements SQLValue<AverageValue>{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
-	public Class<? super AverageValue> getTarget() {
+	public Class<AverageValue> getTarget() {
 		return AverageValue.class;
 	}
 

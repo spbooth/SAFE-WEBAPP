@@ -38,7 +38,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 	/**
 	 * @param target
 	 */
-	public OrFilter(Class<? super T> target, FilterMatcher<T> matcher) {
+	public OrFilter(Class<T> target, FilterMatcher<T> matcher) {
 		super(target);
 		this.matcher=matcher;
 		sql_filters=new SQLOrFilter<T>(target);
@@ -60,7 +60,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
 		 */
 		@Override
-		public Boolean visitPatternFilter(PatternFilter<? super T> fil) throws Exception {
+		public Boolean visitPatternFilter(PatternFilter<T> fil) throws Exception {
 			sql_filters.addPatternFilter(fil);;
 			return null;
 		}
@@ -69,7 +69,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitSQLCombineFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter)
 		 */
 		@Override
-		public Boolean visitSQLCombineFilter(BaseSQLCombineFilter<? super T> fil) throws Exception {
+		public Boolean visitSQLCombineFilter(BaseSQLCombineFilter<T> fil) throws Exception {
 			sql_filters.addFilter(fil);
 			return null;
 		}
@@ -78,7 +78,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAndFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter)
 		 */
 		@Override
-		public Boolean visitAndFilter(AndFilter<? super T> fil) throws Exception {
+		public Boolean visitAndFilter(AndFilter<T> fil) throws Exception {
 			// The AndFilter will invoke the visitBinaryFilter 
 			// if its forced
 			
@@ -104,7 +104,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
 		 */
 		@Override
-		public Boolean visitOrderFilter(SQLOrderFilter<? super T> fil) throws Exception {
+		public Boolean visitOrderFilter(SQLOrderFilter<T> fil) throws Exception {
 			return null;
 		}
 
@@ -112,9 +112,9 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter)
 		 */
 		@Override
-		public Boolean visitAcceptFilter(AcceptFilter<? super T> fil) throws Exception {
+		public Boolean visitAcceptFilter(AcceptFilter<T> fil) throws Exception {
 			if( fil instanceof BinaryAcceptFilter){
-				return visitBinaryFilter((BinaryFilter<? super T>) fil);
+				return visitBinaryFilter((BinaryFilter<T>) fil);
 			}
 			pure_accept_filters.add(fil);
 			return null;
@@ -124,7 +124,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitJoinFilter(uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter)
 		 */
 		@Override
-		public Boolean visitJoinFilter(JoinFilter<? super T> fil) throws Exception {
+		public Boolean visitJoinFilter(JoinFilter<T> fil) throws Exception {
 			sql_filters.addJoin(fil);
 			return null;
 		}
@@ -133,7 +133,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFiler(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
 		 */
 		@Override
-		public Boolean visitOrFilter(OrFilter<? super T> fil) throws Exception {
+		public Boolean visitOrFilter(OrFilter<T> fil) throws Exception {
 			sql_filters.addFilter(fil.sql_filters);
 			pure_accept_filters.addAll(fil.pure_accept_filters);
 			mixed_filters.addAll(fil.mixed_filters);
@@ -146,7 +146,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
 		 */
 		@Override
-		public Boolean visitBinaryFilter(BinaryFilter<? super T> fil) throws Exception {
+		public Boolean visitBinaryFilter(BinaryFilter<T> fil) throws Exception {
 			if( fil.getBooleanResult()){
 				force_value=true;
 			}
@@ -157,7 +157,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
 		 */
 		@Override
-		public Boolean visitDualFilter(DualFilter<? super T> fil) throws Exception {
+		public Boolean visitDualFilter(DualFilter<T> fil) throws Exception {
 			dual_filters.add(fil);
 			return null;
 		}
@@ -166,7 +166,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter)
 		 */
 		@Override
-		public Boolean visitBinaryAcceptFilter(BinaryAcceptFilter<? super T> fil) throws Exception {
+		public Boolean visitBinaryAcceptFilter(BinaryAcceptFilter<T> fil) throws Exception {
 			return visitBinaryFilter(fil);
 		}
 		
@@ -175,7 +175,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
 	@Override
-	public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 		if( force_value){
 			return vis.visitBinaryFilter(this);
 		}
@@ -227,7 +227,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 	 * @throws DataException 
 	 */
 	private boolean filterMatches(BaseFilter<? super T> fil, T o) {
-		return matcher.matches(fil, o);
+		return matcher.matches((BaseFilter<T>) fil, o);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterSet#getAddVisitor()

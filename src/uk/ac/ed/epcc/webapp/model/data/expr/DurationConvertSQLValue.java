@@ -71,7 +71,7 @@ public class DurationConvertSQLValue<T extends Number>  implements SQLValue<Dura
 	public SQLFilter getRequiredFilter() {
 		return a.getRequiredFilter();
 	}
-	public Class<? super Duration> getTarget() {
+	public Class<Duration> getTarget() {
 		return Duration.class;
 	}
 }

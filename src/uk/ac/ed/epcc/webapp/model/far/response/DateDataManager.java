@@ -26,7 +26,8 @@ import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
  * @param <F> {@link DynamicForm} type
  *
  */
-public class DateDataManager<R extends Response<F>,F extends DynamicForm> extends ResponseDataManager<DateDataManager<R,F>.DateData, R, F> {
+public class DateDataManager<R extends Response<F>,F extends DynamicForm,M extends DateDataManager<R,F,M>.DateData> 
+extends ResponseDataManager<M, R, F> {
 
 	private static final String DATA_FIELD="Data";
  	/**
@@ -83,8 +84,8 @@ public class DateDataManager<R extends Response<F>,F extends DynamicForm> extend
 	}
 
 	@Override
-	public Class<? super DateDataManager<R, F>.DateData> getTarget() {
-		return DateData.class;
+	public Class<M> getTarget() {
+		return (Class<M>) DateData.class;
 	}
 
 	@Override

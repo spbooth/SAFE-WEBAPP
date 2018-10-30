@@ -22,7 +22,8 @@ import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
  * @param <F> {@link DynamicForm} type
  *
  */
-public class IntegerDataManager<R extends Response<F>,F extends DynamicForm> extends ResponseDataManager<IntegerDataManager<R,F>.IntegerData, R, F> {
+public class IntegerDataManager<R extends Response<F>,F extends DynamicForm,M extends IntegerDataManager<R,F,M>.IntegerData> 
+extends ResponseDataManager<M, R, F> {
 
 	private static final String DATA_FIELD="Data";
  	/**
@@ -78,8 +79,8 @@ public class IntegerDataManager<R extends Response<F>,F extends DynamicForm> ext
 	}
 
 	@Override
-	public Class<? super IntegerDataManager<R, F>.IntegerData> getTarget() {
-		return IntegerData.class;
+	public Class<M> getTarget() {
+		return (Class<M>) IntegerData.class;
 	}
 
 	@Override

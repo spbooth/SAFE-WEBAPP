@@ -24,7 +24,7 @@ public class IdAcceptFilter<T> extends AbstractAcceptFilter<T> {
 	/**
 	 * @param target
 	 */
-	public IdAcceptFilter(Class<? super T> target,T obj) {
+	public IdAcceptFilter(Class<T> target,T obj) {
 		super(target);
 		this.obj=obj;
 	}

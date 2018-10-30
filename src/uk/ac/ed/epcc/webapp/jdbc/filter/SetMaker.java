@@ -24,7 +24,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 
 public abstract class SetMaker<F, O> extends FilterFinder<F, Set<O>> {
 
-	public SetMaker(AppContext c,Class<? super F> target) {
+	public SetMaker(AppContext c,Class<F> target) {
 		super(c, target,true);
 	}
 

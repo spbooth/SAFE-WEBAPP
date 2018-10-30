@@ -33,12 +33,13 @@ import uk.ac.ed.epcc.webapp.Targetted;
  * visitor pattern.
  * <p>
  * All filters are parameterised by the type of object they select for and implements {@link Targetted} 
- * so that this can be checked at run-time.
+ * so that this can be checked at run-time. In most cases a filter for a super-type will also be valid but the types of filters should
+ * normally be made as specific as possible, usually following the target type of the corresponding factory. 
  * 
  * @author spb
  * @param <T> target type.
  */
 public interface BaseFilter<T> extends Targetted<T>{
-	public <X> X acceptVisitor(FilterVisitor<X,? extends T> vis) throws Exception;
+	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception;
 
 }

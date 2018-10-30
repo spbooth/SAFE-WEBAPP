@@ -31,11 +31,11 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrderFilter;
  * @param <T>
  */
 public class SQLExpressionOrderFilter<I,T> implements SQLOrderFilter<T> {
-	private final Class<? super T> target;
+	private final Class<T> target;
 	private final boolean descending;
 	private final SQLExpression<I> expr;
 	@SuppressWarnings("unchecked")
-	public static <I,T> SQLFilter<T> getFilter(Class<? super T> target,boolean descending,SQLExpression<I> expr) {
+	public static <I,T> SQLFilter<T> getFilter(Class<T> target,boolean descending,SQLExpression<I> expr) {
 		SQLExpressionOrderFilter<I, T> fil = new SQLExpressionOrderFilter<>(target, descending, expr);
 		SQLFilter<T> req = expr.getRequiredFilter();
     	if( req == null){
@@ -44,7 +44,7 @@ public class SQLExpressionOrderFilter<I,T> implements SQLOrderFilter<T> {
     	return new SQLAndFilter<T>(target,fil,req);
 
 	}
-	private SQLExpressionOrderFilter(Class<? super T> target,boolean descending,SQLExpression<I> expr) {
+	private SQLExpressionOrderFilter(Class<T> target,boolean descending,SQLExpression<I> expr) {
 		this.target=target;
 		this.descending=descending;
 		this.expr=expr;
@@ -61,14 +61,14 @@ public class SQLExpressionOrderFilter<I,T> implements SQLOrderFilter<T> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
-	public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+	public <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
 		return vis.visitOrderFilter(this);
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		return target;
 	}
 

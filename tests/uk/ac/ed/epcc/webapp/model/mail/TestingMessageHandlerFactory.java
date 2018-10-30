@@ -105,8 +105,8 @@ public class TestingMessageHandlerFactory<H extends TestingMessageHandlerFactory
 	}
 
 	@Override
-	public Class<? super H> getTarget() {
-		return ExampleMessage.class;
+	public Class<H> getTarget() {
+		return (Class<H>) ExampleMessage.class;
 	}
 
 	@Override

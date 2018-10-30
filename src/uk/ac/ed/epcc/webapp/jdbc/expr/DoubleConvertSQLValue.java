@@ -67,7 +67,7 @@ public class DoubleConvertSQLValue<T>  implements SQLValue<Double> {
 	public SQLFilter getRequiredFilter() {
 		return a.getRequiredFilter();
 	}
-	public Class<? super Double> getTarget() {
+	public Class<Double> getTarget() {
 		return Double.class;
 	}
 }

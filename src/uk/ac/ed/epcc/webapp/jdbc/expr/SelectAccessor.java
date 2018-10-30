@@ -21,15 +21,15 @@ package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 
 public class SelectAccessor<T,R> implements Accessor<T,R> {
-    private final Class<? super T> target;
+    private final Class<T> target;
     private final Accessor<T,R> accessors[];
     
-    public SelectAccessor(Class<? super T> target, Accessor<T,R> accessors[]){
+    public SelectAccessor(Class<T> target, Accessor<T,R> accessors[]){
     	this.target=target;
     	this.accessors=accessors;
     }
 	
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		return target;
 	}
 

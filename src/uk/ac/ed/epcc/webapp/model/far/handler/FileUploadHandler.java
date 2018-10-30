@@ -51,7 +51,7 @@ public class FileUploadHandler implements QuestionFormHandler<StreamData> {
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<? super StreamData> getTarget() {
+	public Class<StreamData> getTarget() {
 		return StreamData.class;
 	}
 

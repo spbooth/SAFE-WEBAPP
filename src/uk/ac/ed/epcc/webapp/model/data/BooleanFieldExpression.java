@@ -22,7 +22,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 
 public class BooleanFieldExpression<X extends DataObject> extends FieldExpression<Boolean,X> {
 	
-	protected BooleanFieldExpression(Class<? super X> filter_type,Repository repository,String field) {
+	protected BooleanFieldExpression(Class<X> filter_type,Repository repository,String field) {
 		super(filter_type,repository, Boolean.class, field);
 	}
 

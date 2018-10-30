@@ -183,14 +183,14 @@ AccessRoleProvider<AU, AU>
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 		 */
-		public <X> X acceptVisitor(FilterVisitor<X, ? extends AU> vis)
+		public <X> X acceptVisitor(FilterVisitor<X, AU> vis)
 				throws Exception {
 			return vis.visitPatternFilter(this);
 		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
-		public Class<? super AU> getTarget() {
+		public Class<AU> getTarget() {
 			return AppUserFactory.this.getTarget();
 		}
 		public String toString() {
@@ -338,8 +338,8 @@ AccessRoleProvider<AU, AU>
 	}
 	
 	@Override
-	public Class<? super AU> getTarget(){
-		return AppUser.class;
+	public Class<AU> getTarget(){
+		return (Class<AU>) AppUser.class;
 	}
 
 
@@ -931,7 +931,7 @@ AccessRoleProvider<AU, AU>
 		return null;
 	}
 	@Override
-	public BaseFilter<? super AU> personInRelationFilter(SessionService<AU> sess, String role,
+	public BaseFilter<AU> personInRelationFilter(SessionService<AU> sess, String role,
 			AU target) {
 		if( role.equals(MY_SELF_RELATIONSHIP)) {
 			return new DualFilter<AU>(new SQLIdFilter<>(getTarget(), res, target.getID()),

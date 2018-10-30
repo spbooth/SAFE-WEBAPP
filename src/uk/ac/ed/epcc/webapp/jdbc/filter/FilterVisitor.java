@@ -37,7 +37,7 @@ public interface FilterVisitor<X,T> {
 	 * @return
 	 * @throws Exception
 	 */
-	public X visitPatternFilter(PatternFilter<? super T> fil) throws Exception;
+	public X visitPatternFilter(PatternFilter<T> fil) throws Exception;
 	/** process a {@link BaseSQLCombineFilter} this combines all of the sub-classes except
 	 * {@link AccceptFilter} and can be either AND or OR combinations. This only combines filters that also
 	 * implement {@link SQLFilter}.
@@ -46,14 +46,14 @@ public interface FilterVisitor<X,T> {
 	 * @return
 	 * @throws Exception
 	 */
-	public X visitSQLCombineFilter(BaseSQLCombineFilter<? super T> fil) throws Exception;
+	public X visitSQLCombineFilter(BaseSQLCombineFilter<T> fil) throws Exception;
 	/** process a {@link AndFilter} or its sub-types. this can combine any of the filter sub-types.
 	 * 
 	 * @param fil
 	 * @return
 	 * @throws Exception
 	 */
-	public X visitAndFilter(AndFilter<? super T> fil) throws Exception;
+	public X visitAndFilter(AndFilter<T> fil) throws Exception;
 	
 	/** process a {@link OrFilter} or its sub-types. this can combine any of the filter sub-types.
 	 * 
@@ -61,7 +61,7 @@ public interface FilterVisitor<X,T> {
 	 * @return
 	 * @throws Exception
 	 */
-	public X visitOrFilter(OrFilter<? super T> fil) throws Exception;
+	public X visitOrFilter(OrFilter<T> fil) throws Exception;
 	/** process a pure {@link OrderFilter}. Objects that accept via this method.
 	 * should also implement {@link SQLFilter}
 	 * 
@@ -69,14 +69,14 @@ public interface FilterVisitor<X,T> {
 	 * @return
 	 * @throws Exception
 	 */
-	public X visitOrderFilter(SQLOrderFilter<? super T> fil) throws Exception;
+	public X visitOrderFilter(SQLOrderFilter<T> fil) throws Exception;
 	/** process a pure {@link AcceptFilter}
 	 * 
 	 * @param fil
 	 * @return
 	 * @throws Exception
 	 */
-	public X visitAcceptFilter(AcceptFilter<? super T> fil) throws Exception;
+	public X visitAcceptFilter(AcceptFilter<T> fil) throws Exception;
 	/** process a {@link JoinFilter}. Objects that accept via this method
 	 * should also implement {@link SQLFilter} and should not implement any other of the
 	 * filter sub-types except {@link PatternFilter} which {@link JoinFilter} extends.
@@ -85,7 +85,7 @@ public interface FilterVisitor<X,T> {
 	 * @return
 	 * @throws Exception
 	 */
-	public X visitJoinFilter(JoinFilter<? super T> fil) throws Exception;
+	public X visitJoinFilter(JoinFilter<T> fil) throws Exception;
 	
 	/** process a {@link BinaryFilter} Objects that accept this method should generate a
 	 * <em>true</em> or a <em>false</em> selection value. They can also implement {@link SQLFilter}.
@@ -94,7 +94,7 @@ public interface FilterVisitor<X,T> {
 	 * @return
 	 * @throws Exception
 	 */
-	public X visitBinaryFilter(BinaryFilter<? super T> fil) throws Exception;
+	public X visitBinaryFilter(BinaryFilter<T> fil) throws Exception;
 	
 	/** process a {@link BinaryAcceptFilter} Objects that accept this method
 	 *  can either act as a {@link BinaryFilter} or an {@link AcceptFilter}
@@ -103,12 +103,12 @@ public interface FilterVisitor<X,T> {
 	 * @return
 	 * @throws Exception
 	 */
-	public X visitBinaryAcceptFilter(BinaryAcceptFilter<? super T> fil) throws Exception;
+	public X visitBinaryAcceptFilter(BinaryAcceptFilter<T> fil) throws Exception;
 	/** process a {@link DualFilter}.
 	 * 
 	 * @param fil
 	 * @return
 	 * @throws Exception
 	 */
-	public X visitDualFilter(DualFilter<? super T> fil) throws Exception;
+	public X visitDualFilter(DualFilter<T> fil) throws Exception;
 }

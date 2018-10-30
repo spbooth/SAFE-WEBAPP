@@ -30,11 +30,11 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
 
 public class SQLAndFilter<T> extends BaseSQLCombineFilter<T>  {
 
-	public SQLAndFilter(Class<? super T>target){
+	public SQLAndFilter(Class<T>target){
 		super(target);
 	}
 	
-	public SQLAndFilter(Class<? super T>target,SQLFilter<? super T> ...filters ){
+	public SQLAndFilter(Class<T>target,SQLFilter<? super T> ...filters ){
 		super(target);
 		for(SQLFilter<? super T> f : filters){
 			addFilter(f);

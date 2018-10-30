@@ -745,8 +745,8 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		return new HistoryRecord<P>(this,res);
 	}
 	@Override
-	public Class<? super H> getTarget(){
-		return HistoryRecord.class;
+	public Class<H> getTarget(){
+		return (Class<H>) HistoryRecord.class;
 	}
 
 	/**

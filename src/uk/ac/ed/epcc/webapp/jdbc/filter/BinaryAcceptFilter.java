@@ -28,12 +28,12 @@ public class BinaryAcceptFilter<T> implements AcceptFilter<T>, BinaryFilter<T> {
 
 	
 
-	public BinaryAcceptFilter(BinaryFilter<? super T> nested) {
+	public BinaryAcceptFilter(BinaryFilter<T> nested) {
 		super();
 		this.nested = nested;
 	}
 
-	private final BinaryFilter<? super T> nested;
+	private final BinaryFilter<T> nested;
 	
 
 
@@ -42,7 +42,7 @@ public class BinaryAcceptFilter<T> implements AcceptFilter<T>, BinaryFilter<T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
 	@Override
-	public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 		return vis.visitBinaryAcceptFilter(this);
 	}
 
@@ -54,7 +54,7 @@ public class BinaryAcceptFilter<T> implements AcceptFilter<T>, BinaryFilter<T> {
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		// TODO Auto-generated method stub
 		return nested.getTarget();
 	}

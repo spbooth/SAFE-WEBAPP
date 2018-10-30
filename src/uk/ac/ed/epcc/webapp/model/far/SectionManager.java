@@ -142,7 +142,7 @@ public class SectionManager extends HandlerPartManager<PageManager.Page,uk.ac.ed
 		return new Section(res);
 	}
 	@Override
-	public Class<? super Section> getTarget() {
+	public Class<Section> getTarget() {
 		return Section.class;
 	}
 	/* (non-Javadoc)

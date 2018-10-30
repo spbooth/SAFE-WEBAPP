@@ -33,11 +33,11 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 public class FieldOrderFilter<T> implements SQLOrderFilter<T>{
 
-	private final Class<? super T> target;
+	private final Class<T> target;
 	private final Repository res;
 	private final String name;
 	private final boolean descending;
-	public FieldOrderFilter(Class<? super T> target,Repository res,String name,boolean descending){
+	public FieldOrderFilter(Class<T> target,Repository res,String name,boolean descending){
 		this.target=target;
 		this.res=res;
 		this.name=name;
@@ -56,13 +56,13 @@ public class FieldOrderFilter<T> implements SQLOrderFilter<T>{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
-	public final <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+	public final <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 		return vis.visitOrderFilter(this);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		return target;
 	}
 

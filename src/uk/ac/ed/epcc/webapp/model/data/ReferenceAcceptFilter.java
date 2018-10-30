@@ -31,7 +31,7 @@ public final class ReferenceAcceptFilter<R extends Indexed,T extends DataObject>
          * @param field field referencing the peer
          * @param peer DataObject null for all records
          */
-        public ReferenceAcceptFilter(Class<? super T> target,String field, R peer){
+        public ReferenceAcceptFilter(Class<T> target,String field, R peer){
         	super(target);
         	this.field =field;
         	this.peer=peer;

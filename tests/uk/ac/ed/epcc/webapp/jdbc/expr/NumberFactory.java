@@ -50,7 +50,7 @@ public class NumberFactory extends DataObjectFactory<NumberFactory.NumberObject>
 		return new NumberObject(res);
 	}
 	
-	public Class<? super NumberObject>getTarget(){
+	public Class<NumberObject>getTarget(){
 		return NumberObject.class;
 	}
 	

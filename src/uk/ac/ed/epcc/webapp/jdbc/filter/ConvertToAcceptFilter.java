@@ -19,29 +19,30 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
  * Use with caution as this might not be the best implementation of a composite filter
  * @see ConvertPureAcceptFilterVisitor
  * @author spb
+ * @param <T> type of filter
  *
  */
 public class ConvertToAcceptFilter<T> implements AcceptFilter<T> {
 
-	public ConvertToAcceptFilter(BaseFilter<? super T> inner, FilterMatcher<T> matcher) {
+	public ConvertToAcceptFilter(BaseFilter<T> inner, FilterMatcher<T> matcher) {
 		super();
 		this.inner = inner;
 		this.matcher = matcher;
 	}
-	private final BaseFilter<? super T> inner;
+	private final BaseFilter<T> inner;
 	private final FilterMatcher<T> matcher;
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
 	@Override
-	public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 		return vis.visitAcceptFilter(this);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		return inner.getTarget();
 	}
 	/* (non-Javadoc)

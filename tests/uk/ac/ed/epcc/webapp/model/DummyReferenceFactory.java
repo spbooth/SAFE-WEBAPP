@@ -38,7 +38,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
 public class DummyReferenceFactory extends DataObjectFactory<DummyReference> {
 
 	@Override
-	public Class<? super DummyReference> getTarget() {
+	public Class<DummyReference> getTarget() {
 		return DummyReference.class;
 	}
 

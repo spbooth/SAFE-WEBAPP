@@ -24,7 +24,7 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
  * @see ConvertToAcceptFilter
  *
  */
-public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFilter<? super T>, T> {
+public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFilter<T>, T> {
 
 	/**
 	 * 
@@ -55,7 +55,7 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
 	 */
 	@Override
-	public AcceptFilter<T> visitPatternFilter(PatternFilter<? super T> fil) throws Exception {
+	public AcceptFilter<T> visitPatternFilter(PatternFilter<T> fil) throws Exception {
 		if( matcher != null ){
 			return new ConvertToAcceptFilter<T>(fil, matcher);
 		}
@@ -67,7 +67,7 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitSQLCombineFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter)
 	 */
 	@Override
-	public AcceptFilter<T> visitSQLCombineFilter(BaseSQLCombineFilter<? super T> fil) throws Exception {
+	public AcceptFilter<T> visitSQLCombineFilter(BaseSQLCombineFilter<T> fil) throws Exception {
 		if( matcher != null ){
 			return new ConvertToAcceptFilter<T>(fil, matcher);
 		}
@@ -80,8 +80,8 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAndFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter)
 	 */
 	@Override
-	public AcceptFilter<T> visitAndFilter(AndFilter<? super T> fil) throws Exception {
-		AcceptFilter<T> res = ((AndFilter)fil).getAcceptFilter( matcher);
+	public AcceptFilter<T> visitAndFilter(AndFilter<T> fil) throws Exception {
+		AcceptFilter<T> res = fil.getAcceptFilter( matcher);
 		if( res == null ){
 			doThrow();
 		}
@@ -92,7 +92,7 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
 	 */
 	@Override
-	public AcceptFilter<? super T> visitOrderFilter(SQLOrderFilter<? super T> fil) throws Exception {
+	public AcceptFilter<T> visitOrderFilter(SQLOrderFilter<T> fil) throws Exception {
 		doThrow();
 		return null;
 	}
@@ -101,7 +101,7 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter)
 	 */
 	@Override
-	public AcceptFilter<? super T> visitAcceptFilter(AcceptFilter<? super T> fil) throws Exception {
+	public AcceptFilter<T> visitAcceptFilter(AcceptFilter<T> fil) throws Exception {
 		return fil;
 	}
 
@@ -109,7 +109,7 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitJoinFilter(uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter)
 	 */
 	@Override
-	public AcceptFilter<? super T> visitJoinFilter(JoinFilter<? super T> fil) throws Exception {
+	public AcceptFilter<T> visitJoinFilter(JoinFilter<T> fil) throws Exception {
 		doThrow();
 		return null;
 	}
@@ -118,7 +118,7 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFiler(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
 	 */
 	@Override
-	public AcceptFilter<? super T> visitOrFilter(OrFilter<? super T> fil) throws Exception {
+	public AcceptFilter<T> visitOrFilter(OrFilter<T> fil) throws Exception {
 		// A OrFilter is an AcceptFilter even though it uses SQL to do this
 		return fil;
 	}
@@ -128,7 +128,7 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
 	 */
 	@Override
-	public AcceptFilter<? super T> visitBinaryFilter(BinaryFilter<? super T> fil) throws Exception {
+	public AcceptFilter<T> visitBinaryFilter(BinaryFilter<T> fil) throws Exception {
 		//return new ConstAcceptFilter<T>(fil.getTarget(), fil.getBooleanResult());
 		return new BinaryAcceptFilter<T>(fil);
 	}
@@ -137,7 +137,7 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
 	 */
 	@Override
-	public AcceptFilter<? super T> visitDualFilter(DualFilter<? super T> fil) throws Exception {
+	public AcceptFilter<T> visitDualFilter(DualFilter<T> fil) throws Exception {
 		return fil.getAcceptFilter();
 	}
 
@@ -145,7 +145,7 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter)
 	 */
 	@Override
-	public AcceptFilter<? super T> visitBinaryAcceptFilter(BinaryAcceptFilter<? super T> fil) throws Exception {
+	public AcceptFilter<T> visitBinaryAcceptFilter(BinaryAcceptFilter<T> fil) throws Exception {
 		return fil;
 	}
 

@@ -81,7 +81,7 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 	 * @see uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider#personInRelationFilter(uk.ac.ed.epcc.webapp.session.SessionService, java.lang.String, uk.ac.ed.epcc.webapp.model.data.DataObject)
 	 */
 	@Override
-	public BaseFilter<? super U> personInRelationFilter(SessionService<U> sess, String role, T target) {
+	public BaseFilter<U> personInRelationFilter(SessionService<U> sess, String role, T target) {
 		if( role == null || role.isEmpty()){
 			return null;
 		}
@@ -94,7 +94,7 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 		}
 		R remote = remote_fac.find(target.record.getNumberProperty(link_field));
 		if( remote == null){
-			return new FalseFilter<>(AppUser.class);
+			return new FalseFilter<U>((Class<U>) AppUser.class);
 		}
 		try {
 			return sess.getPersonInRelationshipRoleFilter(remote_fac, role, remote);

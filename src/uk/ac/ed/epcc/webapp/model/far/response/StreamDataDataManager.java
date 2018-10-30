@@ -45,7 +45,8 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 
-public class StreamDataDataManager<R extends Response<F>,F extends DynamicForm> extends ResponseDataManager<StreamDataDataManager<R,F>.StreamDataRecord, R, F> {
+public class StreamDataDataManager<R extends Response<F>,F extends DynamicForm,M extends StreamDataDataManager<R,F,M>.StreamDataRecord> 
+extends ResponseDataManager<M, R, F> {
 
 	private static final String DATA_FIELD="Data";
 	private static final String MIME_FIELD="Mime";
@@ -143,8 +144,8 @@ public class StreamDataDataManager<R extends Response<F>,F extends DynamicForm> 
 	}
 
 	@Override
-	public Class<? super StreamDataDataManager<R, F>.StreamDataRecord> getTarget() {
-		return StreamDataRecord.class;
+	public Class<M> getTarget() {
+		return (Class<M>) StreamDataRecord.class;
 	}
 
 	@Override

@@ -89,7 +89,7 @@ public class PageManager extends PartManager<DynamicFormManager.DynamicForm,Page
 		return new Page(res);
 	}
 	@Override
-	public Class<? super Page> getTarget() {
+	public Class<Page> getTarget() {
 		return Page.class;
 	}
 

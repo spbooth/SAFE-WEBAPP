@@ -34,10 +34,10 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 
 public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<T>, AcceptFilter<T>{
     protected LinkedList<AcceptFilter<? super T>> accepts= new LinkedList<AcceptFilter<? super T>>();
-    public AndFilter(Class<? super T> target){
+    public AndFilter(Class<T> target){
     	super(target);
     }
-    public AndFilter(Class<? super T> target,BaseFilter<? super T> ... fil){
+    public AndFilter(Class<T> target,BaseFilter<? super T> ... fil){
     	super(target);
     	for(BaseFilter<? super T> f: fil){
     		add(f,true);
@@ -76,7 +76,7 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 
 	
 	
-	public final <X> X acceptVisitor(FilterVisitor<X,? extends T> vis) throws Exception {
+	public final <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 		if( useBinary(false)){
 			// If forced we don't need to worry about the accept filters
 			return vis.visitBinaryFilter(this);

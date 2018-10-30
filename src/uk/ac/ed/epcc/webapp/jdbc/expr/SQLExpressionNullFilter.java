@@ -37,12 +37,12 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
  * @param <V>
  */
 public class SQLExpressionNullFilter<T,V> implements SQLFilter<T>, PatternFilter<T> {
-	private final Class<? super T> target;
+	private final Class<T> target;
     private final SQLExpression<V> expr;
     private final boolean is_null;
     
     @SuppressWarnings("unchecked")
-	public static <T,V> SQLFilter<T> getFilter(Class<? super T> target,SQLExpression<V> expr,boolean is_null){
+	public static <T,V> SQLFilter<T> getFilter(Class<T> target,SQLExpression<V> expr,boolean is_null){
     	SQLExpressionNullFilter<T, V> fil = new SQLExpressionNullFilter<>(target, expr, is_null);
     	SQLFilter<T> req = expr.getRequiredFilter();
     	if( req == null){
@@ -51,7 +51,7 @@ public class SQLExpressionNullFilter<T,V> implements SQLFilter<T>, PatternFilter
     	return new SQLAndFilter<T>(target,fil,req);
 
     }
-	private SQLExpressionNullFilter(Class<? super T> target,SQLExpression<V> expr,boolean is_null){
+	private SQLExpressionNullFilter(Class<T> target,SQLExpression<V> expr,boolean is_null){
 		this.target=target;
     	this.expr=expr;
     	this.is_null=is_null;
@@ -108,7 +108,7 @@ public class SQLExpressionNullFilter<T,V> implements SQLFilter<T>, PatternFilter
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
-	public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 		return vis.visitPatternFilter(this);
 	}
 
@@ -124,7 +124,7 @@ public class SQLExpressionNullFilter<T,V> implements SQLFilter<T>, PatternFilter
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		return target;
 	}
 	public String toString() {

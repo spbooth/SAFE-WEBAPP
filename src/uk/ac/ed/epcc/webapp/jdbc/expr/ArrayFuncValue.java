@@ -98,7 +98,7 @@ public class ArrayFuncValue<F,T> implements SQLValue<T> {
 		}
 		return result;
 	}
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		return target_class;
 	}
 	public SQLFilter<F> getRequiredFilter() {

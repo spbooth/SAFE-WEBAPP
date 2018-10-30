@@ -49,7 +49,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 
 
 public final class JoinerFilter<T extends DataObject, BDO extends DataObject> implements SQLFilter<BDO>, JoinFilter<BDO>, LinkClause {
-	private final Class<? super BDO> target;
+	private final Class<BDO> target;
 	private final String join_field;
 	private final Repository res;
 	private final Repository remote_res;
@@ -61,7 +61,7 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 	 * @param res        Repository of target
 	 * @param remote_res Repository of remote
 	 */
-	public JoinerFilter(Class<? super BDO> target, String join_field, Repository res, Repository remote_res){
+	public JoinerFilter(Class<BDO> target, String join_field, Repository res, Repository remote_res){
 		this.target= target;
 		this.join_field=join_field;
 		this.res=res;
@@ -149,7 +149,7 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 		 */
-		public <X> X acceptVisitor(FilterVisitor<X, ? extends BDO> vis)
+		public <X> X acceptVisitor(FilterVisitor<X, BDO> vis)
 				throws Exception {
 			return vis.visitJoinFilter(this);
 		}
@@ -161,7 +161,7 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
-		public Class<? super BDO> getTarget() {
+		public Class<BDO> getTarget() {
 			return target;
 		}
 		public String toString() {

@@ -33,7 +33,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
  * @param <X>
  */
 public class DateFieldExpression<X extends DataObject> extends FieldExpression<Date,X> {
-	protected DateFieldExpression(Class<? super X> filter_type,Repository res,String field) {
+	protected DateFieldExpression(Class<X> filter_type,Repository res,String field) {
 		super(filter_type,res, Date.class,field);
 	}
 	protected Date getValue(Record r) {

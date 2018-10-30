@@ -22,12 +22,12 @@ import java.util.LinkedHashSet;
  *
  */
 public class AndAcceptFilter<T> extends LinkedHashSet<AcceptFilter<? super T>> implements AcceptFilter<T> {
-	private final Class<? super T> target;
+	private final Class<T> target;
 	/**
 	 * 
 	 * @param target
 	 */
-	public AndAcceptFilter(Class<? super T> target){
+	public AndAcceptFilter(Class<T> target){
 		super();
 		this.target=target;
 	}
@@ -35,7 +35,7 @@ public class AndAcceptFilter<T> extends LinkedHashSet<AcceptFilter<? super T>> i
 	 * @param target 
 	 * @param c
 	 */
-	public AndAcceptFilter(Class<? super T> target,Collection<? extends AcceptFilter<? super T>> c) {
+	public AndAcceptFilter(Class<T> target,Collection<? extends AcceptFilter<? super T>> c) {
 		super(c);
 		this.target=target;
 	}
@@ -44,7 +44,7 @@ public class AndAcceptFilter<T> extends LinkedHashSet<AcceptFilter<? super T>> i
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
 	@Override
-	public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 		return vis.visitAcceptFilter(this);
 	}
 
@@ -52,7 +52,7 @@ public class AndAcceptFilter<T> extends LinkedHashSet<AcceptFilter<? super T>> i
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		return target;
 	}
 

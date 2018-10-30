@@ -34,11 +34,11 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 public class SQLIdFilter<T extends DataObject> implements SQLFilter<T>, PatternFilter<T>{
 
 	
-	public SQLIdFilter(Class<? super T> target,Repository res, int id) {
+	public SQLIdFilter(Class<T> target,Repository res, int id) {
 		this( target,res,id,false);
 	}
 		
-	public SQLIdFilter(Class<? super T> target,Repository res, int id,boolean exclude) {
+	public SQLIdFilter(Class<T> target,Repository res, int id,boolean exclude) {
 		super();
 		this.target=target;
 		this.res = res;
@@ -46,7 +46,7 @@ public class SQLIdFilter<T extends DataObject> implements SQLFilter<T>, PatternF
 		this.exclude=exclude;
 	}
 
-	private final Class<? super T> target;
+	private final Class<T> target;
 	private final Repository res;
 	private final int id;
 	private final boolean exclude;
@@ -80,7 +80,7 @@ public class SQLIdFilter<T extends DataObject> implements SQLFilter<T>, PatternF
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
-	public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 		return vis.visitPatternFilter(this);
 	}
 
@@ -88,7 +88,7 @@ public class SQLIdFilter<T extends DataObject> implements SQLFilter<T>, PatternF
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		return target;
 	}
 	

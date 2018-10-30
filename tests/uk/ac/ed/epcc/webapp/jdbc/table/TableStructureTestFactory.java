@@ -71,7 +71,7 @@ public class TableStructureTestFactory extends DataObjectFactory<TableStructureT
 
 
 	@Override
-	public Class<? super TableStructureTestObject> getTarget() {
+	public Class<TableStructureTestObject> getTarget() {
 		return TableStructureTestObject.class;
 	}
 

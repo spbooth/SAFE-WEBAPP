@@ -46,7 +46,7 @@ public class GlobalRoleFilter<T> implements BinaryFilter<T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
 	@Override
-	public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+	public <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
 		return vis.visitBinaryFilter(this);
 	}
 
@@ -54,8 +54,8 @@ public class GlobalRoleFilter<T> implements BinaryFilter<T> {
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<? super T> getTarget() {
-		return (Class<? super T>) DataObject.class;
+	public Class<T> getTarget() {
+		return (Class<T>) DataObject.class;
 	}
 
 	/* (non-Javadoc)

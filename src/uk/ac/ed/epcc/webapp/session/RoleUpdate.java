@@ -72,7 +72,7 @@ public  class RoleUpdate<U extends AppUser> implements Contexed, StandAloneFormU
 public U find(int id) throws DataException {
 	return fac.find(id);
 }
-public Class<? super U> getTarget() {
+public Class<U> getTarget() {
 	return fac.getTarget();
 }
 public IndexedReference<U> makeReference(U obj) {

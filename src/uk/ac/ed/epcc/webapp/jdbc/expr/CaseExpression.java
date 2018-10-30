@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GetListFilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MakeSelectVisitor;
@@ -181,7 +180,7 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
-	public Class<? super R> getTarget() {
+	public Class<R> getTarget() {
 		return target;
 	}
 	@Override

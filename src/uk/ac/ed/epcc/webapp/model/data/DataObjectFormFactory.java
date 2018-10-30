@@ -525,7 +525,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	 * @see uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer#getTarget()
 	 */
 	@Override
-	public final Class<? super BDO> getTarget() {
+	public final Class<BDO> getTarget() {
 		return factory.getTarget();
 	}
 	/* (non-Javadoc)

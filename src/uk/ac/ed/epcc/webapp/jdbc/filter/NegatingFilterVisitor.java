@@ -22,9 +22,10 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
  * 
  * Ordering information is not preserved.
  * @author Stephen Booth
+ * @param <T> type of filter
  *
  */
-public class NegatingFilterVisitor<T extends DataObject> implements FilterVisitor<BaseFilter<? super T>, T> {
+public class NegatingFilterVisitor<T extends DataObject> implements FilterVisitor<BaseFilter<T>, T> {
 
 	/**
 	 * @param fac
@@ -39,7 +40,7 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
 	 */
 	@Override
-	public BaseFilter<? super T> visitPatternFilter(PatternFilter<? super T> fil) throws Exception {
+	public BaseFilter<T> visitPatternFilter(PatternFilter<T> fil) throws Exception {
 		if( fil instanceof NegatingFilter) {
 			return ((NegatingFilter) fil).getNested();
 		}
@@ -50,13 +51,13 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitSQLCombineFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter)
 	 */
 	@Override
-	public BaseFilter<? super T> visitSQLCombineFilter(BaseSQLCombineFilter<? super T> fil) throws Exception {
+	public BaseFilter<T> visitSQLCombineFilter(BaseSQLCombineFilter<T> fil) throws Exception {
 		FilterCombination c = fil.getFilterCombiner();
 		BaseCombineFilter<T> neg;
 		if( c == FilterCombination.AND) {
-			neg = new SQLOrFilter<>(fil.getTarget());
+			neg = new SQLOrFilter<T>((Class<T>) fil.getTarget());
 		}else {
-			neg = new SQLAndFilter<>(fil.getTarget());
+			neg = new SQLAndFilter<T>((Class<T>) fil.getTarget());
 		}
 		for( BaseFilter<T> f : fil.getSet()) {
 			neg.add(f.acceptVisitor(this), false);
@@ -68,7 +69,7 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAndFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter)
 	 */
 	@Override
-	public BaseFilter<? super T> visitAndFilter(AndFilter<? super T> fil) throws Exception {
+	public BaseFilter<T> visitAndFilter(AndFilter<T> fil) throws Exception {
 		if( ! fil.hasAcceptFilters()) {
 			try {
 				return FilterConverter.convert(fil).acceptVisitor(this);
@@ -87,8 +88,8 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
 	 */
 	@Override
-	public BaseFilter<? super T> visitOrFilter(OrFilter<? super T> fil) throws Exception {
-		AndFilter<? super T> result = new AndFilter<>(fil.getTarget());
+	public BaseFilter<T> visitOrFilter(OrFilter<T> fil) throws Exception {
+		AndFilter<T> result = new AndFilter<T>((Class<T>) fil.getTarget());
 		for(BaseFilter f : fil.getSet()) {
 			result.add( (BaseFilter) f.acceptVisitor(this), false);
 		}
@@ -99,7 +100,7 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrderFilter)
 	 */
 	@Override
-	public BaseFilter<? super T> visitOrderFilter(SQLOrderFilter<? super T> fil) throws Exception {
+	public BaseFilter<T> visitOrderFilter(SQLOrderFilter<T> fil) throws Exception {
 		return fil;
 	}
 	/** A negating filter for pure accept filters.
@@ -125,7 +126,7 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
 		@Override
-		public Class<? super X> getTarget() {
+		public Class<X> getTarget() {
 			return nested.getTarget();
 		}
 
@@ -141,7 +142,7 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 		 */
 		@Override
-		public <Y> Y acceptVisitor(FilterVisitor<Y, ? extends X> vis) throws Exception {
+		public <Y> Y acceptVisitor(FilterVisitor<Y, X> vis) throws Exception {
 			return vis.visitAcceptFilter(this);
 		}
 
@@ -188,7 +189,7 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter)
 	 */
 	@Override
-	public BaseFilter<? super T> visitAcceptFilter(AcceptFilter<? super T> fil) throws Exception {
+	public BaseFilter<T> visitAcceptFilter(AcceptFilter<T> fil) throws Exception {
 		if( fil instanceof NegatingFilter) {
 			return ((NegatingFilter) fil).getNested();
 		}
@@ -200,23 +201,23 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitJoinFilter(uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter)
 	 */
 	@Override
-	public BaseFilter<? super T> visitJoinFilter(JoinFilter<? super T> fil) throws Exception {
-		return (BaseFilter<? super T>) fil;
+	public BaseFilter<T> visitJoinFilter(JoinFilter<T> fil) throws Exception {
+		return (BaseFilter<T>) fil;
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
 	 */
 	@Override
-	public BaseFilter<? super T> visitBinaryFilter(BinaryFilter<? super T> fil) throws Exception {
-		return new GenericBinaryFilter<>(fil.getTarget(), ! fil.getBooleanResult());
+	public BaseFilter<T> visitBinaryFilter(BinaryFilter<T> fil) throws Exception {
+		return new GenericBinaryFilter<T>(fac.getTarget(), ! fil.getBooleanResult());
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter)
 	 */
 	@Override
-	public BaseFilter<? super T> visitBinaryAcceptFilter(BinaryAcceptFilter<? super T> fil) throws Exception {
+	public BaseFilter<T> visitBinaryAcceptFilter(BinaryAcceptFilter<T> fil) throws Exception {
 		return visitBinaryFilter(fil);
 	}
 
@@ -224,7 +225,7 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
 	 */
 	@Override
-	public BaseFilter<? super T> visitDualFilter(DualFilter<? super T> fil) throws Exception {
+	public BaseFilter<T> visitDualFilter(DualFilter<T> fil) throws Exception {
 		
 		return new DualFilter((SQLFilter)fil.getSQLFilter().acceptVisitor(this), (AcceptFilter)fil.getAcceptFilter().acceptVisitor(this));
 	}

@@ -50,8 +50,8 @@ public class TextDataFactory<T extends TextData> extends DataObjectFactory<T> im
 		return TextData.getTableSpecification();
 	}
 	@Override
-	public Class<? super T> getTarget() {
-		return TextData.class;
+	public Class<T> getTarget() {
+		return (Class<T>) TextData.class;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.AnonymisingFactory#anonymise()

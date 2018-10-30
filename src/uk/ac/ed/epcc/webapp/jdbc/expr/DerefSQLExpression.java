@@ -67,7 +67,7 @@ public class DerefSQLExpression<H extends DataObject,R extends DataObject,T> imp
 		
 	}
 
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		return remote_expression.getTarget();
 	}
 	@Override

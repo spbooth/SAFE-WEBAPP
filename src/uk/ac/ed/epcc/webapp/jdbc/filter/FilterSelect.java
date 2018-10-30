@@ -33,7 +33,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  * 
  * @author spb
  *
- * @param <T>
+ * @param <T> type of object being filtered.
  */
 public class FilterSelect<T> {
 	/** is the filter known to match no records without running any sql.
@@ -41,12 +41,12 @@ public class FilterSelect<T> {
 	 * @param my_filter
 	 * @return
 	 */
-	protected boolean isEmpty(BaseFilter<? super T> my_filter){
+	protected  boolean isEmpty(BaseFilter<? super T> my_filter){
 		if( my_filter == null){
 			return false;
 		}
 		try {
-			return my_filter.acceptVisitor(new CheckEmptyVisitor<T>());
+			return my_filter.acceptVisitor(new CheckEmptyVisitor<>());
 		} catch (Exception e) {
 			return false;
 		}
@@ -63,9 +63,8 @@ public class FilterSelect<T> {
 		  query.append(" true ");
 		  return;
 	  }
-	  MakeSelectVisitor<T> vis = new MakeSelectVisitor<T>(tables,query, qualify, false);
 	  try {
-		  my_filter.acceptVisitor(vis);
+		  my_filter.acceptVisitor(new MakeSelectVisitor<>(tables,query, qualify, false));
 	  } catch (Exception e) {
 		  // should not get an exception with require_sql=false
 		  throw new ConsistencyError("Unexpected exception",e);
@@ -76,9 +75,8 @@ public class FilterSelect<T> {
 	  if( my_filter == null ){
 		  return list;
 	  }
-	  GetListFilterVisitor<T> vis = new GetListFilterVisitor<T>(list, false);
 	  try {
-		return my_filter.acceptVisitor(vis);
+		return my_filter.acceptVisitor(new GetListFilterVisitor<>(list, false));
 	} catch (Exception e) {
 		// should not get an exception with require_sql=false
 		throw new ConsistencyError("Unexpected exception",e);

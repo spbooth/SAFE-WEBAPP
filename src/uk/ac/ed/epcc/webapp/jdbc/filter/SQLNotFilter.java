@@ -21,7 +21,8 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 /** Invert the sense of a {@link SQLFilter}
  * @author spb
- * @param <Q>  type of filter
+ * @param <Q>  target type of this filter
+ * @param <F>  full type of nested filter
  *
  */
 
@@ -40,7 +41,7 @@ public class SQLNotFilter<Q,F extends PatternFilter<Q>&SQLFilter<Q>> implements 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilterVisitor)
 	 */
-	public <X> X acceptVisitor(FilterVisitor<X,? extends Q> vis) throws Exception {
+	public <X> X acceptVisitor(FilterVisitor<X,Q> vis) throws Exception {
 		return vis.visitPatternFilter(this);
 	}
 
@@ -70,7 +71,7 @@ public class SQLNotFilter<Q,F extends PatternFilter<Q>&SQLFilter<Q>> implements 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
-	public Class<? super Q> getTarget() {
+	public Class<Q> getTarget() {
 		return nested.getTarget();
 	}
 	public String toString() {

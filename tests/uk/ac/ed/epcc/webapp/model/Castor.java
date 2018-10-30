@@ -107,7 +107,7 @@ public class Castor extends DataObject implements Removable {
 		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getTarget()
 		 */
 		@Override
-		public Class<? super Castor> getTarget() {
+		public Class<Castor> getTarget() {
 			return Castor.class;
 		}
 		public BaseFilter<Castor> getFilterFromPeer(BaseFilter<Pollux>  fil){

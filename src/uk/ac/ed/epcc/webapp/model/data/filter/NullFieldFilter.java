@@ -34,11 +34,11 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 public class NullFieldFilter<T> implements PatternFilter<T>, SQLFilter<T>{
-	private final Class<? super T> target;
+	private final Class<T> target;
     private final boolean match_null;
     private final String field;
     private final Repository res;
-    public NullFieldFilter(Class<? super T> target,Repository res,String field, boolean match_null){
+    public NullFieldFilter(Class<T> target,Repository res,String field, boolean match_null){
     	this.target=target;
     	this.field=field;
     	this.match_null=match_null;
@@ -103,13 +103,13 @@ public class NullFieldFilter<T> implements PatternFilter<T>, SQLFilter<T>{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
-	public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+	public <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
 		return vis.visitPatternFilter(this);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		return target;
 	}
 	public String toString() {

@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
 /** A composite of an {@link AcceptFilter} and a {@link SQLFilter}.
  * Both filters <em>MUST</em> implement the same selection rule. Depending on the context one or other of the filters will actually be used.
  * @author spb
+ * @param <T> type of filter
  *
  */
 public final class DualFilter<T> implements BaseFilter<T> {
@@ -31,7 +32,7 @@ private final SQLFilter<T> sql;
  * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
  */
 @Override
-public Class<? super T> getTarget() {
+public Class<T> getTarget() {
 	return sql.getTarget();
 }
 
@@ -46,7 +47,7 @@ public AcceptFilter<T> getAcceptFilter(){
  * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
  */
 @Override
-public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 	return vis.visitDualFilter(this);
 }
 

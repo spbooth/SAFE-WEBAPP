@@ -52,7 +52,7 @@ public abstract class ResultIterator<O> extends SQLResultIterator<O,O> implement
 	
 		
 		
-        protected ResultIterator(AppContext c,Class<? super O> target){
+        protected ResultIterator(AppContext c,Class<O> target){
             super(c,target);
         }
 		
@@ -114,7 +114,7 @@ public abstract class ResultIterator<O> extends SQLResultIterator<O,O> implement
 		 * @throws DataFault
 		 */
 		@Override
-		protected void setup(BaseFilter<? super O> f, int start, int max) throws DataException {
+		protected void setup(BaseFilter<O> f, int start, int max) throws DataException {
 			// must come before super.setup as setup calls iterate
 			if (f instanceof AcceptFilter) {
 				this.f = (AcceptFilter<? super O>) f;

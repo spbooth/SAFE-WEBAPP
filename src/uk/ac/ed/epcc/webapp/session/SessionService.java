@@ -231,7 +231,7 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @param role 
 	 * @return {@link BaseFilter}
 	 */
-	public <T extends DataObject> BaseFilter<? super T> getRelationshipRoleFilter(DataObjectFactory<T> fac, String role) throws UnknownRelationshipException;
+	public <T extends DataObject> BaseFilter<T> getRelationshipRoleFilter(DataObjectFactory<T> fac, String role) throws UnknownRelationshipException;
 	
 	/** get a {@link BaseFilter} representing the set of target objects that the current user has
 	 * a particular relationship-role with.
@@ -244,7 +244,7 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @param fallback {@link BaseFilter} to use by default.
 	 * @return {@link BaseFilter}
 	 */
-	public <T extends DataObject> BaseFilter<? super T> getRelationshipRoleFilter(DataObjectFactory<T> fac, String role,BaseFilter<T> fallback);
+	public <T extends DataObject> BaseFilter<T> getRelationshipRoleFilter(DataObjectFactory<T> fac, String role,BaseFilter<T> fallback);
 
 	/** get a {@link BaseFilter} representing the set of {@link AppUser}s that are in a particular
 	 * relationship-role with a target object.
@@ -255,7 +255,7 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @param target
 	 * @return {@link BaseFilter}
 	 */
-	public <T extends DataObject> BaseFilter<? super A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,T target) throws UnknownRelationshipException;
+	public <T extends DataObject> BaseFilter<A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,T target) throws UnknownRelationshipException;
 	
 	/** get a {@link BaseFilter} representing the set of targets that a specified {@link AppUser} is in a particular
 	 * relationship-role with.
@@ -264,7 +264,7 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @param person
 	 * @return {@link BaseFilter}
 	 */
-	public <T extends DataObject> BaseFilter<? super T> getTargetInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,A person) throws UnknownRelationshipException;
+	public <T extends DataObject> BaseFilter<T> getTargetInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,A person) throws UnknownRelationshipException;
 	/** Method to check relationships on a specified target object.
 	 * 
 	 * Note that {@link #getRelationshipRoleFilter(DataObjectFactory, String)} is sufficient for this

@@ -82,7 +82,7 @@ public class CachedIndexedProducer<T extends Indexed>  implements IndexedProduce
         ref=null;
         return;
     }
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		return maker.getTarget();
 	}
 	public IndexedReference<T> makeReference(T obj) {

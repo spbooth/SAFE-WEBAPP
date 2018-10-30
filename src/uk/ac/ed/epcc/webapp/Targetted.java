@@ -12,7 +12,13 @@
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp;
-/** Object with a target type that can be queried at run-time
+/** Object with a target type that can be queried at run-time.
+ * 
+ * The primary purpose of this interface is to make a generic type explicit in code, for example a factory class can be queried
+ * for the type of object it creates of a filter can be queried for the types if filters. One use case is for run-time type checking.
+ * This also allows interactions between
+ * {@link Targetted} types so the target class returned by the factory can be used to construct compatible filters.
+ * 
  * 
  * @author spb
  *
@@ -20,11 +26,9 @@ package uk.ac.ed.epcc.webapp;
  */
 public interface Targetted<T> {
 	 /** Get the type of the returned object as far as it is known.
-	   * This method is used for run-time type checking
-	   * The result objects will always be assignable to the type returned by
-	   * this method.
 	   * 
+	   * Normally this should be the erasure type corresponding to T.
 	   * @return Class object for return type
 	   */
-	  public Class<? super T> getTarget();
+	  public Class<T> getTarget();
 }

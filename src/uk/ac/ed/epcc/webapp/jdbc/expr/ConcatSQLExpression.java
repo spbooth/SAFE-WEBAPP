@@ -44,7 +44,7 @@ public class ConcatSQLExpression implements SQLExpression<String>{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
-	public Class<? super String> getTarget() {
+	public Class<String> getTarget() {
 		return String.class;
 	}
 

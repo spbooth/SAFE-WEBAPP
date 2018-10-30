@@ -82,7 +82,7 @@ public final class AliasSQLValue<T> implements GroupingSQLValue<T> {
 		}
 		return exp.toString()+" AS "+alias;
 	}
-	public Class<? super T> getTarget() {
+	public Class<T> getTarget() {
 		return exp.getTarget();
 	}
 	public SQLFilter getRequiredFilter() {

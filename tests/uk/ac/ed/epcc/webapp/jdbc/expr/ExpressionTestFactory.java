@@ -30,7 +30,6 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.Classification;
 import uk.ac.ed.epcc.webapp.model.ClassificationFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.FieldExpression;
 import uk.ac.ed.epcc.webapp.model.data.FieldSQLExpression;
 import uk.ac.ed.epcc.webapp.model.data.FieldValue;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
@@ -155,7 +154,7 @@ public class ExpressionTestFactory extends ClassificationFactory<ExpressionTestF
 	 * @see uk.ac.ed.epcc.webapp.model.ClassificationFactory#getTarget()
 	 */
 	@Override
-	public Class<? super ExpressionTest> getTarget() {
+	public Class<ExpressionTest> getTarget() {
 		return ExpressionTest.class;
 	}
 	public class ExpressionFinder<X> extends AbstractFinder<X>{
@@ -170,8 +169,8 @@ public class ExpressionTestFactory extends ClassificationFactory<ExpressionTestF
 	 * @return
 	 * @throws DataException 
 	 */
-	public <X> X evaluate(ExpressionTest target, SQLValue<X> expr) throws DataException {
-		ExpressionFinder<X> finder = new ExpressionFinder<>(expr);
+	public <Y> Y evaluate(ExpressionTest target, SQLValue<Y> expr) throws DataException {
+		ExpressionFinder<Y> finder = new ExpressionFinder<>(expr);
 		return finder.find(new SQLIdFilter<>(getTarget(), res, target.getID()) , true);
 
 	}
@@ -188,7 +187,7 @@ public class ExpressionTestFactory extends ClassificationFactory<ExpressionTestF
 	public FieldSQLExpression<Double, ExpressionTest> getDoubleA(){
 		return res.getNumberExpression(getTarget(), Double.class, DOUBLE_A);
 	}
-	public FieldSQLExpression<Double, ExpressionTest> getDoubleB(){
+	public FieldSQLExpression<Double,ExpressionTest> getDoubleB(){
 		return res.getNumberExpression(getTarget(), Double.class, DOUBLE_B);
 	}
 	public FieldValue<Date, ExpressionTest> getDateA(){

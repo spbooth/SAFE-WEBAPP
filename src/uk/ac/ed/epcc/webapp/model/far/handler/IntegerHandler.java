@@ -23,7 +23,7 @@ public class IntegerHandler implements QuestionFormHandler<Integer> {
 	private static final String DEFAULT_VALUE = "default";
 
 	@Override
-	public Class<? super Integer> getTarget() {
+	public Class<Integer> getTarget() {
 		return Integer.class;
 	}
 

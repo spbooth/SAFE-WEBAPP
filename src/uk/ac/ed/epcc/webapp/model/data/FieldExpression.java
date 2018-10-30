@@ -44,8 +44,8 @@ public abstract class FieldExpression<T,X extends DataObject> implements FieldSQ
 	protected final Repository repository;
 	protected  final String name;
 	protected final Class<T> target;
-	protected final Class<? super X> filter_type;
-	protected FieldExpression(Class<? super X> filter_type,Repository repository, Class<T> target,String name){
+	protected final Class<X> filter_type;
+	protected FieldExpression(Class<X> filter_type,Repository repository, Class<T> target,String name){
 		this.repository = repository;
 		this.target=target;
 		this.name=name;
@@ -68,7 +68,7 @@ public abstract class FieldExpression<T,X extends DataObject> implements FieldSQ
 		return result;
 	}
 	
-	public final Class<? super T> getTarget() {
+	public final Class<T> getTarget() {
 		return target;
 	}
 	/* (non-Javadoc)
@@ -109,7 +109,7 @@ public abstract class FieldExpression<T,X extends DataObject> implements FieldSQ
 	public final void setValue(X r, T value) {
 		setValue(r.record,value);
 	}
-	public final Class<? super X> getFilterType(){
+	public final Class<X> getFilterType(){
 		return filter_type;
 	}
 	@Override

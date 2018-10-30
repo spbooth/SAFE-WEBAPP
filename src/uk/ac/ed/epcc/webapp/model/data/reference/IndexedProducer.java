@@ -38,7 +38,7 @@ public interface IndexedProducer<A extends Indexed> extends TypeConverter<A, Num
 	 * 
 	 * @return Class object for target
 	 */
-	public Class<? super A> getTarget();
+	public Class<A> getTarget();
 	
 	/** Make a IndexedReference from a target object
 	 * 

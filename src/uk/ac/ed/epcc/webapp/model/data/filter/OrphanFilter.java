@@ -41,7 +41,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 public class OrphanFilter<T extends DataObject, BDO extends DataObject> extends FilterSelect<T> implements SQLFilter<BDO>, PatternFilter<BDO>,MultiTableFilter {
-	private final Class<? super BDO> target;
+	private final Class<BDO> target;
 	private final String join_field;
 	private final Repository res;
 	private final Repository remote_res;
@@ -52,7 +52,7 @@ public class OrphanFilter<T extends DataObject, BDO extends DataObject> extends 
 	 * @param res        Repository of target
 	 * @param remote_res Repository of remote
 	 */
-	public OrphanFilter( Class<? super BDO> target,String join_field, Repository res, Repository remote_res){
+	public OrphanFilter( Class<BDO> target,String join_field, Repository res, Repository remote_res){
 		this.target=target;
 		this.join_field=join_field;
 		this.res=res;
@@ -96,7 +96,7 @@ public class OrphanFilter<T extends DataObject, BDO extends DataObject> extends 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 		 */
-		public final <X> X acceptVisitor(FilterVisitor<X, ? extends BDO> vis)
+		public final <X> X acceptVisitor(FilterVisitor<X, BDO> vis)
 				throws Exception {
 			return vis.visitPatternFilter(this);
 		}
@@ -108,7 +108,7 @@ public class OrphanFilter<T extends DataObject, BDO extends DataObject> extends 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
-		public final Class<? super BDO> getTarget() {
+		public final Class<BDO> getTarget() {
 			return target;
 		}
 

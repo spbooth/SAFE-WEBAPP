@@ -17,7 +17,7 @@ import uk.ac.ed.epcc.webapp.model.far.response.ResponseDataManager;
 public class DateHandler implements QuestionFormHandler<Date> {
 
 	@Override
-	public Class<? super Date> getTarget() {
+	public Class<Date> getTarget() {
 		return Date.class;
 	}
 

@@ -39,8 +39,8 @@ import uk.ac.ed.epcc.webapp.model.data.convert.TypeConverter;
 
 
 public class TypeConverterSQLValue<H,T,D> implements  SQLValue<T>, FilterProvider<H,T>{
-	private final Class<? super H> target;
-	public TypeConverterSQLValue(Class<? super H> target,TypeConverter<T, D> converter, SQLValue<D> inner) {
+	private final Class<H> target;
+	public TypeConverterSQLValue(Class<H> target,TypeConverter<T, D> converter, SQLValue<D> inner) {
 		super();
 		this.target=target;
 		this.converter = converter;
@@ -55,7 +55,7 @@ public class TypeConverterSQLValue<H,T,D> implements  SQLValue<T>, FilterProvide
 	protected TypeConverter<T, D> getConverter(){
 		return converter;
 	}
-	public final Class<? super T> getTarget() {
+	public final Class<T> getTarget() {
 		return converter.getTarget();
 	}
 	
@@ -115,7 +115,7 @@ public class TypeConverterSQLValue<H,T,D> implements  SQLValue<T>, FilterProvide
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilterType()
 	 */
-	public final Class<? super H> getFilterType() {
+	public final Class<H> getFilterType() {
 		return target;
 	}
 

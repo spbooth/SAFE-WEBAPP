@@ -344,7 +344,7 @@ public final class Repository implements AppContextCleanup{
          * So always use {@link #getTypeProducer()}
          * in preference to constructing via this tag.
          * 
-         * @return
+         * @return constructor tag 
          */
         public String getReferencedTable(){
         	if( references != null ){
@@ -1010,7 +1010,6 @@ public final class Repository implements AppContextCleanup{
 		 * @param name
 		 *            Property to get
 		 * @return String value
-		 * @throws  
 		 */
 		public final String getStringProperty(String name)  {
 			Object o = getProperty(name);
@@ -1992,7 +1991,7 @@ public final class Repository implements AppContextCleanup{
 	 * 
 	 * @param sb
 	 * @param quote
-	 * @return
+	 * @return modified {@link StringBuilder}
 	 */
 	public StringBuilder addAlias(StringBuilder sb, boolean quote) {
 		if( quote ){
@@ -2010,7 +2009,7 @@ public final class Repository implements AppContextCleanup{
 	 * 
 	 * @param sb
 	 * @param quote
-	 * @return
+	 * @return modified {@link StringBuilder}
 	 */
 	public StringBuilder addSource(StringBuilder sb, boolean quote) {
 		addTable(sb, quote);
@@ -2528,7 +2527,7 @@ public final class Repository implements AppContextCleanup{
 	 * @param key field name
 	 * @return {@link NumberFieldExpression}
 	 */
-	public <T extends Number,X extends DataObject> NumberFieldExpression<T,X> getNumberExpression(Class<? super X> filter_type,Class<T> target,String key){
+	public <T extends Number,X extends DataObject> NumberFieldExpression<T,X> getNumberExpression(Class<X> filter_type,Class<T> target,String key){
 		FieldInfo info = getInfo(key);
 		if( info == null || ! info.isNumeric()){
 			throw new ConsistencyError("Invalid numeric field "+getTag()+"."+key);
@@ -2541,13 +2540,13 @@ public final class Repository implements AppContextCleanup{
 	 * @param key field name
 	 * @return {@link BooleanFieldExpression}
 	 */
-	public <X extends DataObject> BooleanFieldExpression<X> getBooleanExpression(Class<? super X> filter_type,String key){
+	public <X extends DataObject> BooleanFieldExpression<X> getBooleanExpression(Class<X> filter_type,String key){
 	
 		FieldInfo info = getInfo(key);
 		if( info == null || ! info.isBoolean()){
 			throw new ConsistencyError("Invalid boolean field "+getTag()+"."+key);
 		}
-		return new BooleanFieldExpression(filter_type,this,key);
+		return new BooleanFieldExpression<X>(filter_type,this,key);
 	}
 	/** get a {@link StringFieldExpression} for a field
 	 * 
@@ -2555,7 +2554,7 @@ public final class Repository implements AppContextCleanup{
 	 * @param key field name
 	 * @return {@link StringFieldExpression}
 	 */
-	public <X extends DataObject> StringFieldExpression<X> getStringExpression(Class<? super X> filter_type,String key) {
+	public <X extends DataObject> StringFieldExpression<X> getStringExpression(Class<X> filter_type,String key) {
 		
 		FieldInfo info = getInfo(key);
 
@@ -2574,7 +2573,7 @@ public final class Repository implements AppContextCleanup{
 	 * @param key field name
 	 * @return {@link FieldValue}
 	 */
-	public <X extends DataObject> FieldValue<Date,X> getDateExpression(Class<? super X> target,String key) {
+	public <X extends DataObject> FieldValue<Date,X> getDateExpression(Class<X> target,String key) {
 		
 		FieldInfo info = getInfo(key);
 		if( info == null ){
@@ -2584,15 +2583,11 @@ public final class Repository implements AppContextCleanup{
 		   return new DateFieldExpression<X>(target,this,key);
 		}
 		if( info.isNumeric()){
-			   return getTimeStampDateFieldExpression(target,key);
+			   return new TimestampDateFieldExpression<X>(target,this, key);
 		}
 		throw new ConsistencyError("Invalid date field");
 	}
-	protected<X extends DataObject> FieldValue<Date,X> getTimeStampDateFieldExpression(
-			Class<? super X> target,
-			String key){
-		return new TimestampDateFieldExpression<X>(target,this, key);
-	}
+	
 	
 	
 	/** Get a {@link IndexedFieldValue} for a reference field
@@ -2602,7 +2597,7 @@ public final class Repository implements AppContextCleanup{
 	 * @return IndexedFieldValue
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends DataObject> IndexedFieldValue getReferenceExpression(Class<? super T> self,String key){
+	public <T extends DataObject> IndexedFieldValue getReferenceExpression(Class<T> self,String key){
 		
 		FieldInfo info = getInfo(key);
 		if( info == null || ! info.isNumeric() || ! info.isReference()){
@@ -2614,8 +2609,8 @@ public final class Repository implements AppContextCleanup{
 		}
 		throw new ConsistencyError("Invalid reference field "+getTag()+"."+key);
 	}
-	public TypeProducerFieldValue getTypeProducerExpression(TypeProducer prod){
-		return new TypeProducerFieldValue(this, prod);
+	public <T extends DataObject,O,D> TypeProducerFieldValue<T,O,D> getTypeProducerExpression(TypeProducer<O,D> prod){
+		return new TypeProducerFieldValue<T,O,D>(this, prod);
 	}
 	/** Get a {@link IndexedFieldValue} for a field
 	 * The field does not have to be tagged as a reference field
@@ -2625,7 +2620,7 @@ public final class Repository implements AppContextCleanup{
 	 * @return IndexedFieldValue
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends DataObject,I extends DataObject> IndexedFieldValue<T,I> getReferenceExpression(Class<? super T> self,String key,IndexedProducer<I> prod){
+	public <T extends DataObject,I extends DataObject> IndexedFieldValue<T,I> getReferenceExpression(Class<T> self,String key,IndexedProducer<I> prod){
 		
 		FieldInfo info = getInfo(key);
 		if( info == null || ! info.isNumeric() ){
@@ -2772,6 +2767,7 @@ public final class Repository implements AppContextCleanup{
 	 * populate an object from a ResultSet
 	 * 
 	 * It seems to work if we always qualify the field names but its slower
+	 * @param r 
 	 * 
 	 * @param rs
 	 *            ResultSet
@@ -2779,6 +2775,7 @@ public final class Repository implements AppContextCleanup{
 	 *            boolean qualify the field names with the table name as
 	 *            ResultSet is from a join
 	 * @throws DataFault
+	 * @throws DataNotFoundException 
 	 * 
 	 * @throws ConsistencyError
 	 */
@@ -3147,6 +3144,7 @@ public final class Repository implements AppContextCleanup{
 	 * 
 	 * @param c    AppContext
 	 * @param tag  String
+	 * @param quote 
 	 * @return descriptor or null
 	 */
 	public static String getForeignKeyDescriptor(AppContext c,String tag, boolean quote){

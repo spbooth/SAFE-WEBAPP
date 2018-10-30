@@ -67,7 +67,7 @@ public class LongConvertSQLValue<T>  implements SQLValue<Long> {
 	public SQLFilter getRequiredFilter() {
 		return a.getRequiredFilter();
 	}
-	public Class<? super Long> getTarget() {
+	public Class<Long> getTarget() {
 		return Long.class;
 	}
 }

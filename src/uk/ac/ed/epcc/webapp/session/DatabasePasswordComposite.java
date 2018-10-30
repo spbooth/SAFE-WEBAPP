@@ -203,14 +203,14 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 		 */
-		public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+		public <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
 			return vis.visitAcceptFilter(this);
 		}
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
-		public Class<? super T> getTarget() {
+		public Class<T> getTarget() {
 			return getFactory().getTarget();
 		}
 
@@ -301,13 +301,13 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 		 */
-		public <X> X acceptVisitor(FilterVisitor<X, ? extends T> vis) throws Exception {
+		public <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
 			return vis.visitPatternFilter(this);
 		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
-		public Class<? super T> getTarget() {
+		public Class<T> getTarget() {
 			return getFactory().getTarget();
 		}
     	

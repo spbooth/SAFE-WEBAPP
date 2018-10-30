@@ -49,7 +49,7 @@ public class SelfSQLValue<T extends DataObject> extends AbstractSelfSQLValue<T, 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilterType()
 	 */
-	public Class<? super T> getFilterType() {
+	public Class<T> getFilterType() {
 		return getFactory().getTarget();
 	}
 

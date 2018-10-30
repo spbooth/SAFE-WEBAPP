@@ -29,7 +29,7 @@ public class MillisecondAccessor<R> implements Accessor<Long,R>{
 	public Long getValue(R r) {
 		return Long.valueOf(a.getValue(r).getTime());
 	}
-	public Class<? super Long> getTarget() {
+	public Class<Long> getTarget() {
 		return Long.class;
 	}
 	@Override

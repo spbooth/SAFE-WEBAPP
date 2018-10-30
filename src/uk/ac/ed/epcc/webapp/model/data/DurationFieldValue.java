@@ -62,7 +62,7 @@ public class DurationFieldValue<X extends DataObject> implements    SQLAccessor<
 		this.resolution=resolution;
 	}
 	
-	public Class<? super Duration> getTarget() {
+	public Class<Duration> getTarget() {
 		return Duration.class;
 		
 	}
@@ -145,7 +145,7 @@ public class DurationFieldValue<X extends DataObject> implements    SQLAccessor<
 		return SQLExpressionOrderFilter.getFilter(expression.getFilterType(),descending, expression);
 	}
 
-	public Class<? super X> getFilterType() {
+	public Class<X> getFilterType() {
 		return expression.getFilterType();
 	}
 

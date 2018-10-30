@@ -26,7 +26,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.FilterMaker;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 
 public abstract class TableMaker<O> extends FilterMaker<O,Table>{
-	public TableMaker(AppContext c,Class<? super O> target) {
+	public TableMaker(AppContext c,Class<O> target) {
 		super(c,target);
 	}
     protected void formatTable(Table t){

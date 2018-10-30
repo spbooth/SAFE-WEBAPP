@@ -62,7 +62,7 @@ public class DurationSecondConvertSQLValue  implements SQLValue<Number> {
 	public SQLFilter getRequiredFilter() {
 		return a.getRequiredFilter();
 	}
-	public Class<? super Number> getTarget() {
+	public Class<Number> getTarget() {
 		return Number.class;
 	}
 }

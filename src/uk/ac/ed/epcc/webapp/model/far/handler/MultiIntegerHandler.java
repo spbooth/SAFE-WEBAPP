@@ -87,7 +87,7 @@ public class MultiIntegerHandler implements QuestionFormHandler<MultiInput> {
 	
 	
 	@Override
-	public Class<? super MultiInput> getTarget() {
+	public Class<MultiInput> getTarget() {
 		return MultiInput.class;
 	}
 

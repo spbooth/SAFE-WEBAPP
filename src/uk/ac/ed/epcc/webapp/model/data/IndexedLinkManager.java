@@ -286,7 +286,14 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 				}
 			}
 		}
-
+		protected final void changeLeft(L left) {
+			record.setProperty(manager.left_field, left.getID());
+			setCachedLeft(left);
+		}
+		protected final void changeRight(R right) {
+			record.setProperty(manager.right_field, right.getID());
+			setCachedRight(right);
+		}
 		/**
 		 * extension point for Link subclasses this method is called when new
 		 * records are created to initialise subclass fields to sensible default
@@ -335,8 +342,8 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		 * @param f
 		 *            extension Filter
 		 */
-		public LinkFilter(L l, R r, BaseFilter<? super T> f) {
-			super(IndexedLinkManager.this.getTarget());
+		public LinkFilter(L l, R r, BaseFilter<T> f) {
+			super((Class<T>) IndexedLinkManager.this.getTarget());
 			left_target = l;
 			right_target = r;
 			if (l != null && !isLeft(l)) {
@@ -396,7 +403,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		 *            extension Filter
 		 */
 		public SQLLinkFilter(L l, R r, SQLFilter<? super T> f) {
-			super(IndexedLinkManager.this.getTarget());
+			super((Class<T>) IndexedLinkManager.this.getTarget());
 			left_target = l;
 			right_target = r;
 			if (l != null && !isLeft(l)) {
@@ -552,7 +559,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 * @return Set of Left objects
 	 * @throws DataException 
 	 */
-	public Set<L> getLeftSet( R r ,BaseFilter<? super T> f) throws DataException{
+	public Set<L> getLeftSet( R r ,BaseFilter<T> f) throws DataException{
 		Set<L> res= new LinkedHashSet<L>();
 		for(T link : getFilterResult(null, r, f)){
 			res.add(link.getLeft());
@@ -617,7 +624,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 * @throws DataFault 
 	 * @throws DataFault
 	 */
-	public FilterResult<T> getFilterResult(L l, R r, BaseFilter<? super T> fil) throws DataFault{
+	public FilterResult<T> getFilterResult(L l, R r, BaseFilter<T> fil) throws DataFault{
 		return new FilterSet(new LinkFilter(l, r, fil));
 	}
 	
@@ -640,7 +647,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 * @return Set of Right objects
 	 * @throws DataException 
 	 */
-	public Set<R> getRightSet(L l ,BaseFilter<? super T> f) throws DataException{
+	public Set<R> getRightSet(L l ,BaseFilter<T> f) throws DataException{
 		Set<R> res= new LinkedHashSet<R>();
 		for(T link : getFilterResult(l, null, f)){
 			res.add(link.getRight());
@@ -774,7 +781,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	}
 
 	@Override
-	public Class<? super T> getTarget(){
-		return Link.class;
+	public Class<T> getTarget(){
+		return (Class<T>) Link.class;
 	}
 }

@@ -29,18 +29,18 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
  */
 public abstract  class FilterFinder<T,O> extends FilterMaker<T,O> {
 	boolean allow_null=false;
-   public FilterFinder(AppContext c,Class<? super T> target,boolean allow_null){
+   public FilterFinder(AppContext c,Class<T> target,boolean allow_null){
 	   super(c,target);
 	   this.allow_null = allow_null;
    }
-   public FilterFinder(AppContext c,Class<? super T> target){
+   public FilterFinder(AppContext c,Class<T> target){
 	   super(c,target);
    }
    
-   public O find(SQLFilter<? super T> f) throws  DataException{
+   public O find(SQLFilter<T> f) throws  DataException{
 	   return find(f,allow_null);
    }
-   public O find(SQLFilter<? super T> f, boolean allow_null) throws  DataException{
+   public O find(SQLFilter<T> f, boolean allow_null) throws  DataException{
 	   setFilter((BaseFilter<T>)f);
 	   O res = make();
 	   if( res == null && ! allow_null){

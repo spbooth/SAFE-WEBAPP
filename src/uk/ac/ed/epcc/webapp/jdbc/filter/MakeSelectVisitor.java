@@ -42,7 +42,7 @@ public class MakeSelectVisitor<T> implements FilterVisitor<StringBuilder, T>{
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
 	 */
 	@Override
-	public StringBuilder visitPatternFilter(PatternFilter<? super T> fil) throws Exception {
+	public StringBuilder visitPatternFilter(PatternFilter<T> fil) throws Exception {
 		return fil.addPattern(tables,sb, qualify);
 	}
 
@@ -50,7 +50,7 @@ public class MakeSelectVisitor<T> implements FilterVisitor<StringBuilder, T>{
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitSQLCombineFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter)
 	 */
 	@Override
-	public StringBuilder visitSQLCombineFilter(BaseSQLCombineFilter<? super T> fil) throws Exception {
+	public StringBuilder visitSQLCombineFilter(BaseSQLCombineFilter<T> fil) throws Exception {
 		return visitPatternFilter(fil);
 	}
 
@@ -58,7 +58,7 @@ public class MakeSelectVisitor<T> implements FilterVisitor<StringBuilder, T>{
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAndFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter)
 	 */
 	@Override
-	public StringBuilder visitAndFilter(AndFilter<? super T> fil) throws Exception {
+	public StringBuilder visitAndFilter(AndFilter<T> fil) throws Exception {
 		return visitPatternFilter(fil);
 	}
 
@@ -66,7 +66,7 @@ public class MakeSelectVisitor<T> implements FilterVisitor<StringBuilder, T>{
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter)
 	 */
 	@Override
-	public StringBuilder visitOrFilter(OrFilter<? super T> fil) throws Exception {
+	public StringBuilder visitOrFilter(OrFilter<T> fil) throws Exception {
 		if( fil.nonSQL() ){
 			return visitAcceptFilter(fil);
 		}
@@ -77,7 +77,7 @@ public class MakeSelectVisitor<T> implements FilterVisitor<StringBuilder, T>{
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
 	 */
 	@Override
-	public StringBuilder visitOrderFilter(SQLOrderFilter<? super T> fil) throws Exception {
+	public StringBuilder visitOrderFilter(SQLOrderFilter<T> fil) throws Exception {
 		return doTrue();
 	}
 
@@ -85,7 +85,7 @@ public class MakeSelectVisitor<T> implements FilterVisitor<StringBuilder, T>{
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter)
 	 */
 	@Override
-	public StringBuilder visitAcceptFilter(AcceptFilter<? super T> fil) throws Exception {
+	public StringBuilder visitAcceptFilter(AcceptFilter<T> fil) throws Exception {
 		if( require_sql){
 			throw new NoSQLFilterException();
 		}
@@ -96,7 +96,7 @@ public class MakeSelectVisitor<T> implements FilterVisitor<StringBuilder, T>{
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitJoinFilter(uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter)
 	 */
 	@Override
-	public StringBuilder visitJoinFilter(JoinFilter<? super T> fil) throws Exception {
+	public StringBuilder visitJoinFilter(JoinFilter<T> fil) throws Exception {
 		return doTrue();
 	}
 
@@ -104,7 +104,7 @@ public class MakeSelectVisitor<T> implements FilterVisitor<StringBuilder, T>{
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter)
 	 */
 	@Override
-	public StringBuilder visitBinaryFilter(BinaryFilter<? super T> fil) throws Exception {
+	public StringBuilder visitBinaryFilter(BinaryFilter<T> fil) throws Exception {
 		sb.append(" ");
 		sb.append(Boolean.toString(fil.getBooleanResult()));
 		sb.append(" ");
@@ -120,7 +120,7 @@ public class MakeSelectVisitor<T> implements FilterVisitor<StringBuilder, T>{
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitDualFilter(uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter)
 	 */
 	@Override
-	public StringBuilder visitDualFilter(DualFilter<? super T> fil) throws Exception {
+	public StringBuilder visitDualFilter(DualFilter<T> fil) throws Exception {
 		
 		return fil.getSQLFilter().acceptVisitor(this);
 	}
@@ -129,7 +129,7 @@ public class MakeSelectVisitor<T> implements FilterVisitor<StringBuilder, T>{
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitBinaryAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BinaryAcceptFilter)
 	 */
 	@Override
-	public StringBuilder visitBinaryAcceptFilter(BinaryAcceptFilter<? super T> fil) throws Exception {
+	public StringBuilder visitBinaryAcceptFilter(BinaryAcceptFilter<T> fil) throws Exception {
 		return visitBinaryFilter(fil);
 	}
 }

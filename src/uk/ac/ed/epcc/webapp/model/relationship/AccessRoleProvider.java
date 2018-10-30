@@ -73,7 +73,7 @@ public interface AccessRoleProvider<U extends AppUser,T extends DataObject> {
 	 * it should return null;
 	 * @return {@link BaseFilter} or null
 	 */
-    public BaseFilter<? super U> personInRelationFilter(SessionService<U> sess, String role, T target);
+    public BaseFilter<U> personInRelationFilter(SessionService<U> sess, String role, T target);
     
     /** Does this class provide the named relationship.
      * 

@@ -45,7 +45,7 @@ public class FilterPathParser<T extends DataObject> {
 	 * @param matchers Map of {@link SQLMatcher}s
 	 * @param target target class of filter.
 	 */
-	public FilterPathParser(Repository res, Form f, Map<String,SQLMatcher<T>> matchers, Class<? super T> target) {
+	public FilterPathParser(Repository res, Form f, Map<String,SQLMatcher<T>> matchers, Class<T> target) {
 		super();
 		this.res = res;
 		this.f=f;
@@ -54,7 +54,7 @@ public class FilterPathParser<T extends DataObject> {
 	}
 	private Repository res;
 	private Map<String,SQLMatcher<T>> matchers;
-	private Class<? super T> target;
+	private Class<T> target;
 	private Form f;
 	
 	

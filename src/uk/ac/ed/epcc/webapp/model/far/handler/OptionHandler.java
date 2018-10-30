@@ -18,7 +18,7 @@ public class OptionHandler implements QuestionFormHandler<String> {
 	private static final String OPTIONS = "Options";
 	
 	@Override
-	public Class<? super String> getTarget() {
+	public Class<String> getTarget() {
 		return String.class;
 	}
 

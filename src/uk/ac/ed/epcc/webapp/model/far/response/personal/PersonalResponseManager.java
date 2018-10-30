@@ -25,7 +25,6 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
@@ -184,8 +183,8 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 	}
 
 	@Override
-	public Class<? super R> getTarget() {
-		return PersonalResponse.class;
+	public Class<R> getTarget() {
+		return (Class<R>) PersonalResponse.class;
 	}
 
 	/* (non-Javadoc)

@@ -79,7 +79,7 @@ public class SQLValuePatternTransform implements SQLValue<String> {
 	}
 	
 
-	public Class<? super String> getTarget() {
+	public Class<String> getTarget() {
 		return String.class;
 	}
 

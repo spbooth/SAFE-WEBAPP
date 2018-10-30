@@ -44,7 +44,7 @@ public class LabellerSQLValue<T,R> implements SQLValue<R> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
-	public Class<? super R> getTarget() {
+	public Class<R> getTarget() {
 		return labeller.getTarget();
 	}
 	/* (non-Javadoc)

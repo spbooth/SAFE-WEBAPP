@@ -38,7 +38,7 @@ public class DurationSQLValue implements SQLValue<Duration> {
 	  this.end=end;
   }
 
-public Class<? super Duration> getTarget() {
+public Class<Duration> getTarget() {
 	return Duration.class;
 }
 @Override
