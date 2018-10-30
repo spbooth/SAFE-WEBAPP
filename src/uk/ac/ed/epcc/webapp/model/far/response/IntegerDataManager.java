@@ -80,7 +80,7 @@ extends ResponseDataManager<M, R, F> {
 
 	@Override
 	public Class<M> getTarget() {
-		return (Class<M>) IntegerData.class;
+		return (Class) IntegerData.class;
 	}
 
 	@Override

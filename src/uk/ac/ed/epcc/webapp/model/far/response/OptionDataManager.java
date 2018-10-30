@@ -81,7 +81,7 @@ extends ResponseDataManager<M, R, F> {
 
 	@Override
 	public Class<M> getTarget() {
-		return (Class<M>) OptionData.class;
+		return (Class) OptionData.class;
 	}
 
 	@Override
