@@ -29,7 +29,7 @@ public interface AcceptFilter<T> extends BaseFilter<T> {
 	 * does this object match the filter
 	 * 
 	 * @param o
-	 *            Object to ecaluate
+	 *            Object to evaluate
 	 * @return boolean
 	 */
 	public boolean accept(T o);
