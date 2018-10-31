@@ -42,13 +42,14 @@ ViewTransitionFactoryInterfaceTest<XMLTarget, XMLKey, DomTransitionProviderTestC
 	
 
 	
-	public PathTransitionProviderInterfaceTest<XMLTarget, XMLKey, DomTransitionProviderTestCase> path_test = new PathTransitionProviderInterfaceTestImpl<XMLTarget, XMLKey, DomTransitionProviderTestCase>(this);
+	public PathTransitionProviderInterfaceTest<XMLTarget, XMLKey, DomTransitionProviderTestCase> path_test = new PathTransitionProviderInterfaceTestImpl<>(this);
 
 	
-	public ViewTransitionFactoryInterfaceTest<XMLTarget, XMLKey, DomTransitionProviderTestCase> view_test = new ViewTransitionFactoryInterfaceTestImpl<XMLTarget, XMLKey, DomTransitionProviderTestCase>(this);
+	public ViewTransitionFactoryInterfaceTest<XMLTarget, XMLKey, DomTransitionProviderTestCase> view_test = new ViewTransitionFactoryInterfaceTestImpl<>(this);
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryDataProvider#getTransitionFactory()
 	 */
+	@Override
 	public ViewTransitionFactory<XMLKey, XMLTarget> getTransitionFactory() {
 		return new DomTransitionProvider(ctx);
 	}
@@ -56,10 +57,11 @@ ViewTransitionFactoryInterfaceTest<XMLTarget, XMLKey, DomTransitionProviderTestC
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryDataProvider#getTargets()
 	 */
+	@Override
 	public Set<XMLTarget> getTargets() {
-		Set<XMLTarget> result = new HashSet<XMLTarget>();
+		Set<XMLTarget> result = new HashSet<>();
 		TestXMLTargetFactory fac = new TestXMLTargetFactory(getContext(), "TestXML");
-		LinkedList<String> path = new LinkedList<String>();
+		LinkedList<String> path = new LinkedList<>();
 		path.add("TestXML");
 		path.add("Test1.xml");
 		result.add(fac.find(path));
@@ -71,6 +73,7 @@ ViewTransitionFactoryInterfaceTest<XMLTarget, XMLKey, DomTransitionProviderTestC
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactoryDataProvider#getAllowedUser(java.lang.Object)
 	 */
+	@Override
 	public SessionService<?> getAllowedUser(XMLTarget target) {
 		return new SimpleSessionService(ctx);
 	}
@@ -78,6 +81,7 @@ ViewTransitionFactoryInterfaceTest<XMLTarget, XMLKey, DomTransitionProviderTestC
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactoryDataProvider#getForbiddenUser(java.lang.Object)
 	 */
+	@Override
 	public SessionService<?> getForbiddenUser(XMLTarget target) {
 		return null;
 	}

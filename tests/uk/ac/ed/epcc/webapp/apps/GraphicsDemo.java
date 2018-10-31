@@ -50,7 +50,7 @@ public class GraphicsDemo extends GraphicsCommand {
 	 */
 	public static void main(String[] args) {
 		AppContext conn = new AppContext();
-		LinkedList<String> data = new LinkedList<String>();
+		LinkedList<String> data = new LinkedList<>();
 		CommandLauncher.setupContext(args, data, conn);
 		GraphicsDemo test = new GraphicsDemo(conn);
 		test.run(data);

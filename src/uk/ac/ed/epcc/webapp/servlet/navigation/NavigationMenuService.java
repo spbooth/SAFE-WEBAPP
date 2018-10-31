@@ -133,11 +133,12 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 	
 	public FilteredProperties getProperties() {
 		ConfigService cfg = getContext().getService(ConfigService.class);
-		Properties prop = cfg.getServiceProperties();
-		FilteredProperties menu_prop = new FilteredProperties(prop, NAVIGATIONAL_PREFIX);
 		if( cfg==null){
 			return null;
 		}
+		Properties prop = cfg.getServiceProperties();
+		FilteredProperties menu_prop = new FilteredProperties(prop, NAVIGATIONAL_PREFIX);
+		
 		return menu_prop;
 	}
 	/** Populate a {@link NodeContainer} with the appropriate navigational {@link Node}s for the current user.
@@ -158,7 +159,7 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 			return null;
 		}
 		NodeContainer menu = new NodeContainer();
-		Set<String> seen = new HashSet<String>();
+		Set<String> seen = new HashSet<>();
 		for(String name : list.trim().split("\\s*,\\s*")){
 			Node n = makeNode(seen,name, menu_prop);
 			if( n != null ){

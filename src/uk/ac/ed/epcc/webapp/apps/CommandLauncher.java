@@ -79,7 +79,7 @@ public class CommandLauncher extends AbstractContexed{
 	
 	public  void run(String[] args) {
 		AppContext context = getContext();
-		LinkedList<String> data=new LinkedList<String>();
+		LinkedList<String> data=new LinkedList<>();
 		Options.Instance opts = setupContext(args, data, context);
 		String command = data.poll();
 		// HELP option
@@ -128,7 +128,7 @@ public class CommandLauncher extends AbstractContexed{
 	 * @throws Exception 
 	 */
 	public void run(Class<? extends Command> comm, String args[]) {
-		LinkedList<String> data = new LinkedList<String>();
+		LinkedList<String> data = new LinkedList<>();
 		AppContext conn = getContext();
 		setupContext(args,data,conn);
 		Command c;

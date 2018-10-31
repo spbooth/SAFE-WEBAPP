@@ -33,7 +33,7 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 
 
 public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<T>, AcceptFilter<T>{
-    protected LinkedList<AcceptFilter<? super T>> accepts= new LinkedList<AcceptFilter<? super T>>();
+    protected LinkedList<AcceptFilter<? super T>> accepts= new LinkedList<>();
     public AndFilter(Class<T> target){
     	super(target);
     }
@@ -55,6 +55,7 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
      * If an extending class wants to add additional accept clauses
      * they can add an inner class AcceptFiler in the constructor.
      */
+	@Override
 	public final boolean  accept(T o) {
 		for(AcceptFilter<? super T> acc: accepts){
 			if( ! acc.accept(o)){
@@ -76,6 +77,7 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 
 	
 	
+	@Override
 	public final <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 		if( useBinary(false)){
 			// If forced we don't need to worry about the accept filters
@@ -106,9 +108,9 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 	 * @return {@link SQLFilter}
 	 */
 	public SQLFilter<T> getNarrowingFilter()  {
-		SQLAndFilter<T> res = new SQLAndFilter<T>(getTarget());
+		SQLAndFilter<T> res = new SQLAndFilter<>(getTarget());
 		if( isForced()){
-			res.addFilter(new GenericBinaryFilter<T>(target, getBooleanResult()));
+			res.addFilter(new GenericBinaryFilter<>(target, getBooleanResult()));
 		}else{
 			for(PatternFilter<? super T> pat : filters){
 				res.addPatternFilter(pat);
@@ -135,7 +137,7 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 	 */
 	public AcceptFilter<T> getAcceptFilter(FilterMatcher<T> matcher){
 		if( isForced()){
-			return new BinaryAcceptFilter<T>(this);
+			return new BinaryAcceptFilter<>(this);
 		}
 		if( hasPatternFilters() ){
 			if( matcher != null ){
@@ -148,7 +150,7 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 			// a AndAcceptFilter will inhibit optimisation later
 			return (AcceptFilter<T>) accepts.getFirst();
 		}
-		return new AndAcceptFilter<T>(getTarget(), accepts);
+		return new AndAcceptFilter<>(getTarget(), accepts);
 	}
 	public final AndFilter<T> addFilter(BaseFilter<? super T> fil){
 		return (AndFilter<T>) super.add(fil,true);

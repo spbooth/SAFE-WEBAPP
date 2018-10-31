@@ -50,6 +50,7 @@ public class DefaultConfigService extends AbstractConfigService implements Confi
 	 * In this second case values in deploy-properties take precidence
 	 * 
 	 */
+	@Override
 	public synchronized Properties getServiceProperties() {
 			// Only load them once:
 			if (service_props == null ) {
@@ -79,15 +80,17 @@ public class DefaultConfigService extends AbstractConfigService implements Confi
 	}
 	
 
+	@Override
 	public void addListener(ConfigServiceListener listener) {
 		if( listeners == null ){
-			listeners=new HashSet<ConfigServiceListener>();
+			listeners=new HashSet<>();
 		}
 		listeners.add(listener);
 		
 	}
 
 	
+	@Override
 	public void clearServiceProperties() {
 		service_props=null;
 		if( listeners != null ){
@@ -97,12 +100,14 @@ public class DefaultConfigService extends AbstractConfigService implements Confi
 		}
 	}
 
+	@Override
 	public void setProperty(String name, String value)
 			throws UnsupportedOperationException {
 		throw new UnsupportedOperationException("Set property not supported");
 		
 	}
 
+	@Override
 	public void cleanup() {
 		if( service_props != null ){
 			service_props.clear();

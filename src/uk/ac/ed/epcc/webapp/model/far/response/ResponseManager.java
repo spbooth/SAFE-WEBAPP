@@ -275,7 +275,7 @@ public abstract class ResponseManager<R extends ResponseManager.Response<F>,F ex
 	 * @return
 	 */
 	public SQLFilter<R> getFormFilter(F form){
-		return new ReferenceFilter<R, F>(this, FORM_ID, form);
+		return new ReferenceFilter<>(this, FORM_ID, form);
 	}
 	
 	/** get a {@link ServeDataResult} (for a download link) from a {@link ResponseData}
@@ -285,7 +285,7 @@ public abstract class ResponseManager<R extends ResponseManager.Response<F>,F ex
 	 * @throws DataException
 	 */
 	public <T> ServeDataResult getServeResult(ResponseData<T, R,F> wrapper) throws DataException{
-		LinkedList<String> args = new LinkedList<String>();
+		LinkedList<String> args = new LinkedList<>();
 		R response = wrapper.getResponse();
 		try {
 			if( wrapper.getServeData() == null || ! isMine(response)){
@@ -310,7 +310,7 @@ public abstract class ResponseManager<R extends ResponseManager.Response<F>,F ex
 		if( path instanceof LinkedList){
 			list=(LinkedList<String>) path;
 		}else{
-			list=new LinkedList<String>(path);
+			list=new LinkedList<>(path);
 		}
 		
 		R response = find(Integer.parseInt(list.pop()));

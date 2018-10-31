@@ -59,10 +59,10 @@ ListInputInterfaceTest
 
 	
 	
-	public InputInterfaceTest<Integer, DataObjectItemInput<O>, DataObjectFactoryTestCase<D, O>> input_test = new InputInterfaceTestImpl<Integer, DataObjectItemInput<O>, DataObjectFactoryTestCase<D,O>>(this);
+	public InputInterfaceTest<Integer, DataObjectItemInput<O>, DataObjectFactoryTestCase<D, O>> input_test = new InputInterfaceTestImpl<>(this);
 	
 
-	public OptionalInputInterfaceTest<Integer, DataObjectItemInput<O>, DataObjectFactoryTestCase<D, O>> optional_input_test = new OptionalInputInterfaceTestImpl<Integer, DataObjectItemInput<O>, DataObjectFactoryTestCase<D,O>>(this);
+	public OptionalInputInterfaceTest<Integer, DataObjectItemInput<O>, DataObjectFactoryTestCase<D, O>> optional_input_test = new OptionalInputInterfaceTestImpl<>(this);
 	
 
 	public ListInputInterfaceTest list_test = new ListInputInterfaceTestImpl(this);
@@ -124,7 +124,7 @@ ListInputInterfaceTest
 	   long expect = f.getCount(null);
 	   
 	   
-	   assertEquals(f.exists(new SQLAndFilter<O>(f.getTarget())), expect>0);
+	   assertEquals(f.exists(new SQLAndFilter<>(f.getTarget())), expect>0);
 	   
 	   if( expect > 100000){
 		   System.out.println("Count to large to test");
@@ -280,22 +280,24 @@ ListInputInterfaceTest
 	   }
    }
    }
-   public Set<Integer> getBadData() throws Exception{
-		Set<Integer> bad = new HashSet<Integer>();
+   @Override
+public Set<Integer> getBadData() throws Exception{
+		Set<Integer> bad = new HashSet<>();
 		bad.add(-12);
 		bad.add(-14);
 		return bad;
 	}
 
+	@Override
 	public Set<Integer> getGoodData()  throws Exception{
-		Set<Integer> good = new HashSet<Integer>();
+		Set<Integer> good = new HashSet<>();
 	       DataObjectFactory<O> fac = getFactory();
 	       SQLFilter<O> fil;
 	       try{
 	    	   fil = FilterConverter.convert(fac.getSelectFilter());
 	       }catch(NoSQLFilterException e){
 	    	   // All records
-	    	   fil = new SQLAndFilter<O>(getFactory().getTarget());
+	    	   fil = new SQLAndFilter<>(getFactory().getTarget());
 	       }
 			for(O item : fac.new FilterSet(fil,0,100)){
 				good.add(item.getID());
@@ -303,6 +305,7 @@ ListInputInterfaceTest
 		return good;
 	}
 
+	@Override
 	public DataObjectItemInput<O> getInput() {
 		return getFactory().getInput();
 	}

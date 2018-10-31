@@ -31,7 +31,7 @@ import uk.ac.ed.epcc.webapp.time.Period;
 
 public class JFreeSetPlot extends GenericSetPlot implements PieDataset {
 	DatasetGroup group;
-	HashSet<DatasetChangeListener> listeners = new HashSet<DatasetChangeListener>();
+	HashSet<DatasetChangeListener> listeners = new HashSet<>();
 	/**
 	 * @param i
 	 */
@@ -42,6 +42,7 @@ public class JFreeSetPlot extends GenericSetPlot implements PieDataset {
 	/* (non-Javadoc)
 	 * @see org.jfree.data.KeyedValues#getIndex(java.lang.Comparable)
 	 */
+	@Override
 	public int getIndex(Comparable arg0) {
 		if( labels != null ){
 			for(int i=0 ;i< labels.length;i++){
@@ -57,6 +58,7 @@ public class JFreeSetPlot extends GenericSetPlot implements PieDataset {
 	/* (non-Javadoc)
 	 * @see org.jfree.data.KeyedValues#getKey(int)
 	 */
+	@Override
 	public Comparable getKey(int arg0) {
 		if( labels != null ){
 			return labels[arg0];
@@ -67,8 +69,9 @@ public class JFreeSetPlot extends GenericSetPlot implements PieDataset {
 	/* (non-Javadoc)
 	 * @see org.jfree.data.KeyedValues#getKeys()
 	 */
+	@Override
 	public List getKeys() {
-		LinkedList<String> list = new LinkedList<String>();
+		LinkedList<String> list = new LinkedList<>();
 		if( labels != null){
 			for(String s : labels){
 				list.add(s);
@@ -84,6 +87,7 @@ public class JFreeSetPlot extends GenericSetPlot implements PieDataset {
 	/* (non-Javadoc)
 	 * @see org.jfree.data.KeyedValues#getValue(java.lang.Comparable)
 	 */
+	@Override
 	public Number getValue(Comparable arg0) {
 		return get(getIndex(arg0));
 	}
@@ -91,6 +95,7 @@ public class JFreeSetPlot extends GenericSetPlot implements PieDataset {
 	/* (non-Javadoc)
 	 * @see org.jfree.data.Values#getItemCount()
 	 */
+	@Override
 	public int getItemCount() {
 		return getNumSets();
 	}
@@ -98,6 +103,7 @@ public class JFreeSetPlot extends GenericSetPlot implements PieDataset {
 	/* (non-Javadoc)
 	 * @see org.jfree.data.Values#getValue(int)
 	 */
+	@Override
 	public Number getValue(int arg0) {
 		return get(arg0);
 	}
@@ -105,6 +111,7 @@ public class JFreeSetPlot extends GenericSetPlot implements PieDataset {
 	/* (non-Javadoc)
 	 * @see org.jfree.data.general.Dataset#addChangeListener(org.jfree.data.general.DatasetChangeListener)
 	 */
+	@Override
 	public void addChangeListener(DatasetChangeListener arg0) {
 		listeners.add(arg0);
 		
@@ -113,6 +120,7 @@ public class JFreeSetPlot extends GenericSetPlot implements PieDataset {
 	/* (non-Javadoc)
 	 * @see org.jfree.data.general.Dataset#getGroup()
 	 */
+	@Override
 	public DatasetGroup getGroup() {
 		return group;
 	}
@@ -120,6 +128,7 @@ public class JFreeSetPlot extends GenericSetPlot implements PieDataset {
 	/* (non-Javadoc)
 	 * @see org.jfree.data.general.Dataset#removeChangeListener(org.jfree.data.general.DatasetChangeListener)
 	 */
+	@Override
 	public void removeChangeListener(DatasetChangeListener arg0) {
 		listeners.remove(arg0);
 	}
@@ -127,6 +136,7 @@ public class JFreeSetPlot extends GenericSetPlot implements PieDataset {
 	/* (non-Javadoc)
 	 * @see org.jfree.data.general.Dataset#setGroup(org.jfree.data.general.DatasetGroup)
 	 */
+	@Override
 	public void setGroup(DatasetGroup arg0) {
 		this.group=arg0;
 		

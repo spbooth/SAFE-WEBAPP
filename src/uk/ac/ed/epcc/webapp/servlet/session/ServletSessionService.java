@@ -448,7 +448,7 @@ public boolean canSU(A new_person) {
 public PersonRelationship<A> getPersonRelationship(){
 	String sudo_table= getContext().getInitParameter(PERSON_RELATIONSHIP_TABLE);
 	if( sudo_table != null ){
-		return new PersonRelationship<A>(getContext(), sudo_table);
+		return new PersonRelationship<>(getContext(), sudo_table);
 	}
 	return null;
 }

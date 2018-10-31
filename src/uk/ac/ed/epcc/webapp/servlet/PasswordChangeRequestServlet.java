@@ -56,7 +56,7 @@ public class PasswordChangeRequestServlet<A extends AppUser> extends WebappServl
 		@SuppressWarnings("unchecked")
 		SessionService<A> service = conn.getService(SessionService.class);
 		ServletService serv = conn.getService(ServletService.class);
-		PasswordChangeRequestFactory<A> fac = new PasswordChangeRequestFactory<A>(service.getLoginFactory());
+		PasswordChangeRequestFactory<A> fac = new PasswordChangeRequestFactory<>(service.getLoginFactory());
 		Logger log = conn.getService(LoggerService.class).getLogger(getClass());
 		
 			log.debug("path is "+req.getPathInfo());
@@ -74,7 +74,7 @@ public class PasswordChangeRequestServlet<A extends AppUser> extends WebappServl
 				@SuppressWarnings("unchecked")
 				PasswordAuthComposite<A> comp = (PasswordAuthComposite<A>) service.getLoginFactory().getComposite(PasswordAuthComposite.class);
 				A user = request.getUser();
-				PasswordUpdateFormBuilder<A> builder = new PasswordUpdateFormBuilder<A>(comp, false);
+				PasswordUpdateFormBuilder<A> builder = new PasswordUpdateFormBuilder<>(comp, false);
 				PageHTMLForm form = new PageHTMLForm(conn);
 				builder.buildForm(form, user, conn);
 				

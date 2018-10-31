@@ -25,7 +25,6 @@ import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
-import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
@@ -35,7 +34,6 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite.PasswordResetRequiredPage;
 
 /** An abstract {@link Composite} that implements password authentication.
  * If a {@link AppUserFactory} contains a composite of this type then it supports password authentication
@@ -213,7 +211,7 @@ public abstract class PasswordAuthComposite<T extends AppUser> extends AppUserCo
 	};
 	@Override
 	public Map<AppUserKey, Transition<AppUser>> getTransitions(AppUserTransitionProvider provider) {
-		Map<AppUserKey, Transition<AppUser>> map = new LinkedHashMap<AppUserKey, Transition<AppUser>>();
+		Map<AppUserKey, Transition<AppUser>> map = new LinkedHashMap<>();
 		if(USER_CHANGE_PASSWORD_FEATURE.isEnabled(getContext())){
 			map.put(CHANGE_PASSWORD, (Transition<AppUser>) new UpdatePasswordTransition());
 		}
@@ -229,12 +227,12 @@ public abstract class PasswordAuthComposite<T extends AppUser> extends AppUserCo
 			return mustResetPassword(currentPerson);
     	}
     	public FormResult getPage(SessionService<T> user){
-    		return new ChainedTransitionResult<T, AppUserKey>((TransitionFactory<AppUserKey, T>) AppUserTransitionProvider.getInstance(user.getContext()), user.getCurrentPerson(), CHANGE_PASSWORD);
+    		return new ChainedTransitionResult<>((TransitionFactory<AppUserKey, T>) AppUserTransitionProvider.getInstance(user.getContext()), user.getCurrentPerson(), CHANGE_PASSWORD);
     	}
     }
 	@Override
 	public Set<RequiredPage<T>> getRequiredPages() {
-		LinkedHashSet<RequiredPage<T>> set = new LinkedHashSet<RequiredPage<T>>();
+		LinkedHashSet<RequiredPage<T>> set = new LinkedHashSet<>();
 		if(USER_CHANGE_PASSWORD_FEATURE.isEnabled(getContext())) {
 			// This must be the FIRST page shown
 			set.add(new PasswordResetRequiredPage());

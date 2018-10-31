@@ -35,12 +35,13 @@ public class DatePatternMatcher<T> implements SQLMatcher<T>{
     	return match_before;
     }
 	
+	@Override
 	public SQLFilter<T> getSQLFilter(Class<T> clazz,Repository res, String target, Object form_value) {
 		Date d = (Date) form_value;
 		if( matchBefore()){
-			return new SQLValueFilter<T>(clazz,res,target,MatchCondition.LT,d);
+			return new SQLValueFilter<>(clazz,res,target,MatchCondition.LT,d);
 		}else{
-			return new SQLValueFilter<T>(clazz,res,target,MatchCondition.GE,d);
+			return new SQLValueFilter<>(clazz,res,target,MatchCondition.GE,d);
 		}
 		
 	}

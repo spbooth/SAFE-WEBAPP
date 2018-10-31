@@ -597,7 +597,7 @@ public class Option implements Serializable {
 		/**
 		 * The values this option takes
 		 */
-		private List<String> values = new ArrayList<String>();
+		private List<String> values = new ArrayList<>();
 
 		/**
 		 * Adds a value to this option instance. If the option's value separator is

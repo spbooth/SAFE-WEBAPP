@@ -32,7 +32,7 @@ public class CleanupService extends AbstractContexed implements AppContextServic
 	
 	public CleanupService(AppContext conn){
 		super(conn);
-		this.actions=new LinkedHashSet<Runnable>();
+		this.actions=new LinkedHashSet<>();
 	}
 	/** Add a {@link Runnable} to the set of actions performed on cleanup.
 	 * The runnable object should implement {@link #hashCode()} and {@link #equals(Object)} so identical 

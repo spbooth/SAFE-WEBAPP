@@ -47,7 +47,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 public class HeirarchyFormRegistry extends FormFactoryProviderRegistry {
 	private final String tag;
-	private  Map<String,FormFactoryProvider> map = new HashMap<String,FormFactoryProvider>();
+	private  Map<String,FormFactoryProvider> map = new HashMap<>();
 	@SuppressWarnings("unchecked")
 	public HeirarchyFormRegistry(AppContext conn, String tag){
 		super(conn);

@@ -31,32 +31,36 @@ public class IntegerSetInput extends IntegerInput implements ListInput<Integer,I
     private final LinkedHashSet<Integer> values;
     
     public IntegerSetInput(int list[]){
-    	this.values=new LinkedHashSet<Integer>();
+    	this.values=new LinkedHashSet<>();
     	for(int i : list){
     		values.add(i);
     	}
     }
     public IntegerSetInput(Integer list[]){
-    	this.values=new LinkedHashSet<Integer>();
+    	this.values=new LinkedHashSet<>();
     	for(Integer i : list){
     		values.add(i);
     	}
     }
     public IntegerSetInput(Set<Integer> values){
-    	this.values=new LinkedHashSet<Integer>(values);
+    	this.values=new LinkedHashSet<>(values);
     }
+	@Override
 	public Integer getItem() {
 		return getValue();
 	}
 
+	@Override
 	public void setItem(Integer item) {
 		setValue(item);
 	}
 
+	@Override
 	public Integer getItembyValue(Integer value) {
 		return value;
 	}
 
+	@Override
 	public Iterator<Integer> getItems() {
 		Number min = getMin();
 		Number max = getMax();
@@ -73,18 +77,22 @@ public class IntegerSetInput extends IntegerInput implements ListInput<Integer,I
 		}
 		return values.iterator();
 	}
+	@Override
 	public int getCount(){
 		return values.size();
 	}
 
+	@Override
 	public String getTagByItem(Integer item) {
 		return item.toString();
 	}
 
+	@Override
 	public String getTagByValue(Integer value) {
 		return value.toString();
 	}
 
+	@Override
 	public String getText(Integer item) {
 		// use getString so we can control presented text using the NumberFormat
 		return getString(item);

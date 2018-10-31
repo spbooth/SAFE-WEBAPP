@@ -13,7 +13,6 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionProvider;
-import uk.ac.ed.epcc.webapp.model.data.transition.SimpleTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.transition.SimpleViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 import uk.ac.ed.epcc.webapp.servlet.thread.TestFactory.TestData;
@@ -25,7 +24,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 public class AddDataTransitionProvider extends SimpleViewTransitionProvider<TestFactory.TestData, TransitionKey<TestFactory.TestData>> implements ViewTransitionProvider<TransitionKey<TestFactory.TestData>, TestData> {
 
-	public static final TransitionKey<TestData> ADD = new TransitionKey<TestFactory.TestData>(TestData.class, "ADD");
+	public static final TransitionKey<TestData> ADD = new TransitionKey<>(TestData.class, "ADD");
 
 	
 	public class AddTransition extends AbstractFormTransition<TestData>{
@@ -77,7 +76,7 @@ public class AddDataTransitionProvider extends SimpleViewTransitionProvider<Test
 				} catch (Exception e) {
 					throw new ActionException("Wait interrupted", e);
 				}
-				return new ViewTransitionResult<TestData, TransitionKey<TestData>>(AddDataTransitionProvider.this, target);
+				return new ViewTransitionResult<>(AddDataTransitionProvider.this, target);
 			}
 		}
 		/* (non-Javadoc)

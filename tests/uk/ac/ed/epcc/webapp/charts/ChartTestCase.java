@@ -60,6 +60,7 @@ public abstract class ChartTestCase extends WebappTestBase {
   }
 	public static class DayTransform implements LabelledSetRangeMapper<Calendar>{
 
+		@Override
 		public int getSet(Calendar c) {
 			return c.get(Calendar.DAY_OF_WEEK);
 		}
@@ -72,6 +73,7 @@ public abstract class ChartTestCase extends WebappTestBase {
 			return point.after(c.getTime());
 		}
 
+		@Override
 		public float getOverlapp(Calendar c, Date start, Date end) {
 			Calendar e = (Calendar) c.clone();
 			e.add(Calendar.DAY_OF_YEAR, 1);
@@ -90,14 +92,16 @@ public abstract class ChartTestCase extends WebappTestBase {
 			return (float)(f-s)/(float)(value);
 		}
 
+		@Override
 		public boolean overlapps(Calendar c, Date start, Date end) {
 			Calendar e = (Calendar) c.clone();
 			e.add(Calendar.DAY_OF_YEAR, 1);
 			return e.getTime().after(start) && c.getTime().before(end);
 		}
 
+		@Override
 		public Vector<String> getLabels() {
-			Vector<String> v = new Vector<String>();
+			Vector<String> v = new Vector<>();
 			v.add("Noday");
 			v.add("Sunday");
 			v.add("Monday");
@@ -109,6 +113,7 @@ public abstract class ChartTestCase extends WebappTestBase {
 			return v;
 		}
 
+		@Override
 		public int nSets() {
 			return 8;
 		}

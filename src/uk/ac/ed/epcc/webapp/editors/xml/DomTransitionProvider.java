@@ -94,6 +94,7 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 
 	public static class DownLoadTransition extends AbstractDirectTransition<XMLTarget>{
 
+		@Override
 		public FormResult doTransition(XMLTarget target, AppContext c)
 				throws TransitionException {
 			try{
@@ -117,6 +118,7 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 		
 	}
 	public static class DeleteTransition extends AbstractDirectTransition<XMLTarget>{
+		@Override
 		public FormResult doTransition(XMLTarget target, AppContext c)
 				throws TransitionException {
 			Node n = target.getTargetNode();
@@ -146,6 +148,7 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 	}
     
 	public static class ParentTransition extends AbstractDirectTransition<XMLTarget>{
+		@Override
 		public FormResult doTransition(XMLTarget target, AppContext c)
 				throws TransitionException {
 			LinkedList<String> path=target.getTargetPath();
@@ -182,6 +185,7 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 		
 	}
 	public static class EditTransition extends AbstractFormTransition<XMLTarget>{
+		@Override
 		public void buildForm(Form f, XMLTarget target, AppContext conn)
 				throws TransitionException {
 			Node n = target.getTargetNode();
@@ -236,6 +240,7 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 		
 	}
 	public static class EditNodeTransition extends AbstractFormTransition<XMLTarget>{
+		@Override
 		public void buildForm(Form f, XMLTarget target, AppContext conn)
 				throws TransitionException {
 			
@@ -299,11 +304,13 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 	}
 
 	
+	@Override
 	public String getTargetName() {
 		return "XML";
 	}
 
 	
+	@Override
 	public boolean allowTransition(AppContext c, XMLTarget target, XMLKey key) {
 		final SessionService sess = c.getService(SessionService.class);
 		if( target == null || ! target.canView(sess)){
@@ -316,9 +323,10 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 		return key.allow(target, sess);
 	}
 
+	@Override
 	public <X extends ContentBuilder> X getSummaryContent(AppContext c, X cb,
 			XMLTarget target) {
-		Table<String,String> props=new Table<String,String>();
+		Table<String,String> props=new Table<>();
 		StringBuilder sb = new StringBuilder();
 		for(String s : target.getTargetPath()){
 			sb.append("/");
@@ -355,6 +363,7 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 	}
 
 	
+	@Override
 	public boolean canView(XMLTarget target, SessionService<?> sess) {
 		if( target != null ){
 			return target.canView(sess);
@@ -363,6 +372,7 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 	}
 
 	
+	@Override
 	public XMLTarget getTarget(LinkedList<String> id) {
 		AppContext conn = getContext();
 		return  makeXMLTarget(id, conn);
@@ -397,6 +407,7 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 	}
 
 	
+	@Override
 	public LinkedList<String> getID(XMLTarget target) {
 		return target.getTargetPath();
 	}
@@ -410,7 +421,7 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 		if( info != null ){
 			TypeInfo ti = info.getTypeInfo(target_path);
 			if( ti != null){
-				Table<String,String> t = new Table<String,String>();
+				Table<String,String> t = new Table<>();
 				t.put("Value", "Schema NameSpace", ti.getTypeNamespace());
 				t.put("Value", "Schema Type", ti.getTypeName());
 				t.setKeyName("Properties");

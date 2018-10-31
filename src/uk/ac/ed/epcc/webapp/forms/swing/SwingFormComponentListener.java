@@ -51,7 +51,7 @@ public class SwingFormComponentListener implements ComponentListener {
    
 	public SwingFormComponentListener(AppContext c) {
 		conn=c;
-		field_map=new LinkedHashMap<String, SwingField>();
+		field_map=new LinkedHashMap<>();
 		log = conn.getService(LoggerService.class).getLogger(getClass());
 	}
 
@@ -62,25 +62,29 @@ public class SwingFormComponentListener implements ComponentListener {
 		if( result != null ){
 			return result;
 		}
-		result = new SwingField<I>(conn, f);
+		result = new SwingField<>(conn, f);
 		field_map.put(key, result);
 		return result;
 	}
+	@Override
 	public void componentHidden(ComponentEvent e) {
 
 		log.debug("hidden " + e.paramString());
 	}
 
+	@Override
 	public void componentMoved(ComponentEvent e) {
 		// TODO Auto-generated method stub
 
 	}
 
+	@Override
 	public void componentResized(ComponentEvent e) {
 		log.debug("resize " + e.paramString());
 
 	}
 
+	@Override
 	public void componentShown(ComponentEvent e) {
 
 		log.debug("shown " + e.paramString());

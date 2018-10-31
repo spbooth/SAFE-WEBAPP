@@ -27,25 +27,29 @@ public class LongInputTest extends NumberInputTestCase<Long,LongInput> {
 	public void dummy(){
 		
 	}
+	@Override
 	public Set<Long> getBadData() {
-		Set<Long> bad = new HashSet<Long>();
+		Set<Long> bad = new HashSet<>();
 		return bad;
 	}
 
+	@Override
 	public Set<Long> getGoodData() {
-		Set<Long> good = new HashSet<Long>();
+		Set<Long> good = new HashSet<>();
 		good.add(12L);
 		good.add(14L);
 		return good;
 	}
 
+	@Override
 	public LongInput getInput() {
 		LongInput i = new LongInput();
 		return i;
 	}
 	
+	@Override
 	public Set<String> getBadParseData() {
-        HashSet<String> res = new HashSet<String>();
+        HashSet<String> res = new HashSet<>();
 		res.add("fred");
 		res.add("14.5.6");
 		res.add("82wombat");
@@ -54,8 +58,9 @@ public class LongInputTest extends NumberInputTestCase<Long,LongInput> {
 	}
 
 
+	@Override
 	public Set<String> getGoodParseData() {
-		HashSet<String> res = new HashSet<String>();
+		HashSet<String> res = new HashSet<>();
 		res.add("12");
 		res.add("15");
 		res.add("70");

@@ -542,7 +542,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 
 				@Override
 				public FormResult getPage(SessionService<A> sess) {
-					return new ChainedTransitionResult<A, AppUserKey>((TransitionFactory<AppUserKey, A>) AppUserTransitionProvider.getInstance(getContext()), sess.getCurrentPerson(), SET_KEY);
+					return new ChainedTransitionResult<>((TransitionFactory<AppUserKey, A>) AppUserTransitionProvider.getInstance(getContext()), sess.getCurrentPerson(), SET_KEY);
 				}
 			});
 		}

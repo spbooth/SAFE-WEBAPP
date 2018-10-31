@@ -85,6 +85,7 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 			return isSubmitter(sess);
 		}
 		
+		@Override
 		public String getDescriptor() {
 			return "";
 		}
@@ -155,7 +156,7 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 	 */
 	public R getResponse(D form) throws DataException{
 		SessionService<?> sess = getContext().getService(SessionService.class);
-		SQLAndFilter<R> fil = new SQLAndFilter<R>(getTarget());
+		SQLAndFilter<R> fil = new SQLAndFilter<>(getTarget());
 		fil.addFilter(getFormFilter(form));
 		fil.addFilter(getMyResponsesFilter(sess));
 		R result = find(fil,true);
@@ -169,7 +170,7 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 	}
 
 	public ReferenceFilter<R, AppUser> getMyResponsesFilter(SessionService<?> sess) {
-		return new ReferenceFilter<R, AppUser>(this, SUBMITTER_ID, (AppUser) sess.getCurrentPerson());
+		return new ReferenceFilter<>(this, SUBMITTER_ID, (AppUser) sess.getCurrentPerson());
 	}
 
 	

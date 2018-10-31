@@ -59,6 +59,7 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 		
 	}
 	
+	@Override
 	public IndexedReference<I> getValue(T r) {
 		// again if not set we use a zero id value
 		return producer.makeReference(r.record.getIntProperty(producer.getField(), 0));
@@ -69,14 +70,17 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 	public IndexedTypeProducer<I,? extends DataObjectFactory<I>> getProducer(){
 		return producer;
 	}
+	@Override
 	public int add(StringBuilder sb, boolean qualify) {
 		repository.getInfo(producer.getField()).addName(sb, qualify, true);
 		return 1;
 	}
+	@Override
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
 		return list;
 	}
 	
+	@Override
 	public IndexedReference<I> makeObject(ResultSet rs, int pos)
 			throws DataException, SQLException {
 			int id=rs.getInt(pos);
@@ -91,6 +95,7 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 		return producer.makeReference(id);
 	}
 	
+	@Override
 	public void setValue(T r, IndexedReference value) {
 		if( value == null ){
 			r.record.setProperty(producer.getField(), 0);
@@ -99,11 +104,13 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 		}
 		
 	}
+	@Override
 	public void setObject(PreparedStatement stmt, int pos,
 			IndexedReference value) throws SQLException {
 		stmt.setInt(pos,value.getID());
 		
 	}
+	@Override
 	public Class<IndexedReference> getTarget() {
 		return IndexedReference.class;
 	}
@@ -120,18 +127,21 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 		FieldInfo info = this.repository.getInfo(field);
 		return info.getName(true)+(info.isIndexed()?"(Index)":"")+"->"+table;
 	}
+	@Override
 	public SQLFilter<T> getFilter(MatchCondition match,
 			IndexedReference val) {
 		if(match == null ){
-			return new SQLValueFilter<T>(target,repository,producer.getField(),val.getID());
+			return new SQLValueFilter<>(target,repository,producer.getField(),val.getID());
 		}
-		return new SQLValueFilter<T>(target,repository,producer.getField(),match,val.getID());
+		return new SQLValueFilter<>(target,repository,producer.getField(),match,val.getID());
 	}
+	@Override
 	public SQLFilter<T> getNullFilter(boolean is_null){
-		return new NullFieldFilter<T>(target,repository, producer.getField(), is_null);
+		return new NullFieldFilter<>(target,repository, producer.getField(), is_null);
 	}
+	@Override
 	public SQLFilter<T> getOrderFilter(boolean descending){
-		return new FieldOrderFilter<T>(target,repository, producer.getField(), descending);
+		return new FieldOrderFilter<>(target,repository, producer.getField(), descending);
 	}
 	/** Create a filter for the home table out of a a filter on the target object
 	 * 
@@ -139,25 +149,29 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 	 * @return SQLFilter<T>
 	 * @throws CannotFilterException
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public SQLFilter<T> getSQLFilter(SQLFilter<I> fil) throws CannotFilterException{
 		try{
 			IndexedProducer<I> ip = producer.getProducer();
 			if( ip instanceof DataObjectFactory){
 				DataObjectFactory fac = (DataObjectFactory) ip;
-				return new Joiner<I,T>(getFilterType(),fil,producer.getField(),repository,fac.res);
+				return new Joiner<>(getFilterType(),fil,producer.getField(),repository,fac.res);
 			}
 			throw new CannotFilterException("Not referencing a DataObjectFactory");
 		}catch(Exception e){
 			throw new CannotFilterException(e);
 		}
 	}
+	@Override
 	public String getFieldName() {
 		return producer.getField();
 	}
+	@Override
 	public SQLFilter getRequiredFilter() {
 		return null;
 	}
+	@Override
 	public Input getInput() {
 		try {
 			IndexedProducer<I> ip = producer.getProducer();
@@ -170,10 +184,12 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 		return null;
 	}
 
+	@Override
 	public DataObjectFactory<I> getFactory() throws Exception {
 		return (DataObjectFactory<I>) producer.getProducer();
 	}
 
+	@Override
 	public boolean canSet() {
 		return true;
 	}
@@ -181,6 +197,7 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilterType()
 	 */
+	@Override
 	public Class<T> getFilterType() {
 		return target;
 	}

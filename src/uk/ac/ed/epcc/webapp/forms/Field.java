@@ -80,7 +80,7 @@ public final class Field<I> {
 	 */
 	public void setDataAttr(String key, String value) {
 		if(data_attr==null) {
-			data_attr=new LinkedHashMap<String, String>();
+			data_attr=new LinkedHashMap<>();
 		}
 		data_attr.put(key, value);
 	}
@@ -110,7 +110,7 @@ public final class Field<I> {
 	 */
     public void lock(){
     	if( sel != null && ! (sel instanceof LockedInput)){
-    		sel = new LockedInput<I>(sel);
+    		sel = new LockedInput<>(sel);
     	}
     }
 	/**
@@ -189,7 +189,7 @@ public final class Field<I> {
 	 */
 	public void addValidator(FieldValidator<I> v) {
 		if( validators == null){
-			validators=new HashSet<FieldValidator<I>>();
+			validators=new HashSet<>();
 		}
 		validators.add(v);
 	}

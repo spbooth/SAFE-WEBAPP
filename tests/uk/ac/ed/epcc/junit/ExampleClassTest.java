@@ -29,7 +29,7 @@ import uk.ac.ed.epcc.webapp.junit4.DBFixtureRule;
 
 public class ExampleClassTest implements ContextHolder,ExampleInterfaceTest<ExampleInterface>{
 	
-	public ExampleInterfaceTestImpl<ExampleClassTest> example_interface = new ExampleInterfaceTestImpl<ExampleClassTest>(this);
+	public ExampleInterfaceTestImpl<ExampleClassTest> example_interface = new ExampleInterfaceTestImpl<>(this);
 	private  AppContext c;
 	
 	// Need appcontext first
@@ -38,6 +38,7 @@ public class ExampleClassTest implements ContextHolder,ExampleInterfaceTest<Exam
 		
 	
 	
+	@Override
 	public  ExampleClass getTarget(){
 		return new ExampleClass();
 	}
@@ -49,10 +50,12 @@ public class ExampleClassTest implements ContextHolder,ExampleInterfaceTest<Exam
 		
 	}
 	
+	@Override
 	public void setContext(AppContext c){
 		this.c=c;
 	}
 	
+	@Override
 	public AppContext getContext() {
 		return c;
 	}

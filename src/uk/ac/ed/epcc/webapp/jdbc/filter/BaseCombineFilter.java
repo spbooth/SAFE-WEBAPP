@@ -46,7 +46,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 	    private boolean force_value;
 	    public BaseCombineFilter(Class<T> target){
 	    	super(target);
-	    	filters = new LinkedHashSet<PatternFilter>();
+	    	filters = new LinkedHashSet<>();
 	    	force_value=getFilterCombiner().getDefault();
 	    }
 	    /** A {@link FilterVisitor} that encodes the rules for adding a filter.
@@ -60,6 +60,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
 			 */
+			@Override
 			public final Boolean visitPatternFilter(PatternFilter<X> fil) {
 				if( fil instanceof BaseCombineFilter &&
 						(((BaseCombineFilter)fil).getFilterCombiner() == getFilterCombiner() || ((BaseCombineFilter)fil).filters.size()==1)
@@ -84,6 +85,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitSQLCombineFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter)
 			 */
+			@Override
 			public final Boolean visitSQLCombineFilter(BaseSQLCombineFilter<X> fil) {
 				visitPatternFilter(fil);
 				handleOrderClause(fil);
@@ -99,6 +101,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAndFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter)
 			 */
+			@Override
 			public final Boolean visitAndFilter(AndFilter<X> fil) throws Exception{
 				if( ! fil.hasAcceptFilters()){
 					// we can convert to SQL best to do this as it
@@ -134,6 +137,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
 			 */
+			@Override
 			public final Boolean visitOrderFilter(SQLOrderFilter<X> fil) {
 			    return handleOrderClause(fil);
 			}
@@ -146,6 +150,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitJoinFilter(uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter)
 			 */
+			@Override
 			public final Boolean visitJoinFilter(JoinFilter<X> fil) {
 				addJoin(fil);
 				return null;
@@ -203,6 +208,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter)
 			 */
+			@Override
 			public Boolean visitAcceptFilter(AcceptFilter fil) {
 				addAccept(fil);
 				return null;
@@ -219,7 +225,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 				return;
 			}
 			if( order == null ){
-				order = new LinkedHashSet<OrderClause>();
+				order = new LinkedHashSet<>();
 			}
 			order.addAll(new_order);
 			
@@ -240,7 +246,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			     // expressions generated automatically
 				if( add != null ){
 					if( join == null ){
-						join = new LinkedHashSet<JoinFilter>(); // order of joins is significant
+						join = new LinkedHashSet<>(); // order of joins is significant
 					}
 					join.add(add);
 				}
@@ -260,6 +266,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			}
 		}
 
+		@Override
 		public final  List<PatternArgument> getParameters(List<PatternArgument> res) {
 			if( isForced()){
 				return res;
@@ -270,12 +277,14 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			return res;
 		}
 	   
+		@Override
 		public final List<OrderClause>   OrderBy(){
 			if( order == null){
 				return null;
 			}
-			return new LinkedList<OrderClause>(order);
+			return new LinkedList<>(order);
 		}
+		@Override
 		public final StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify) {
 			if( isForced()){
 				sb.append(" ");
@@ -348,6 +357,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			return (isEmpty() || isForced())  && (ignore_order_or_join || (order==null && join==null));
 		}
 
+		@Override
 		public boolean isEmpty(){
 			return filters.isEmpty();
 		}
@@ -394,6 +404,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 				return false;
 			return true;
 		}
+		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
 			sb.append(getClass().getSimpleName());

@@ -52,7 +52,7 @@ public class ClassificationHandler extends AbstractContexed implements QuestionF
 	 */
 	@Override
 	public void buildConfigForm(Form f) {
-		f.addInput(TABLE_FIELD, "Classifier", new ConstructedObjectInput<NameInputProvider>(conn, NameInputProvider.class));
+		f.addInput(TABLE_FIELD, "Classifier", new ConstructedObjectInput<>(conn, NameInputProvider.class));
 	}
 
 	/* (non-Javadoc)

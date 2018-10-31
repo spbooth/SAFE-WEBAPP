@@ -28,7 +28,7 @@ public class MockServletConfig implements ServletConfig {
 
 	private final String name;
 	private final ServletContext context;
-	private Hashtable<String,String> params = new Hashtable<String, String>();
+	private Hashtable<String,String> params = new Hashtable<>();
 	/**
 	 * 
 	 */
@@ -40,6 +40,7 @@ public class MockServletConfig implements ServletConfig {
 	/* (non-Javadoc)
 	 * @see javax.servlet.ServletConfig#getInitParameter(java.lang.String)
 	 */
+	@Override
 	public String getInitParameter(String arg0) {
 		return params.get(arg0);
 	}
@@ -50,6 +51,7 @@ public class MockServletConfig implements ServletConfig {
 	/* (non-Javadoc)
 	 * @see javax.servlet.ServletConfig#getInitParameterNames()
 	 */
+	@Override
 	public Enumeration getInitParameterNames() {
 		return params.keys();
 	}
@@ -57,6 +59,7 @@ public class MockServletConfig implements ServletConfig {
 	/* (non-Javadoc)
 	 * @see javax.servlet.ServletConfig#getServletContext()
 	 */
+	@Override
 	public ServletContext getServletContext() {
 		return context;
 	}
@@ -64,6 +67,7 @@ public class MockServletConfig implements ServletConfig {
 	/* (non-Javadoc)
 	 * @see javax.servlet.ServletConfig#getServletName()
 	 */
+	@Override
 	public String getServletName() {
 		return name;
 	}

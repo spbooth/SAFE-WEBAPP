@@ -62,7 +62,7 @@ public class DummyReferenceFactory extends DataObjectFactory<DummyReference> {
 	 * @return
 	 */
 	public SQLFilter<Dummy1> getReferencedFilter(String name){
-		return new DestFilter<Dummy1>(new SQLValueFilter<DummyReference>(getTarget(),res,DummyReference.STRING_FIELD,name), DummyReference.REF_FIELD, new Dummy1.Factory(getContext()));
+		return new DestFilter<>(new SQLValueFilter<>(getTarget(),res,DummyReference.STRING_FIELD,name), DummyReference.REF_FIELD, new Dummy1.Factory(getContext()));
 	}
 	public BaseFilter<DummyReference> getRemoteFilter(BaseFilter<Dummy1> fil){
 		Dummy1.Factory fac = new Dummy1.Factory(getContext());
@@ -93,8 +93,8 @@ public class DummyReferenceFactory extends DataObjectFactory<DummyReference> {
 		return getRemoteFilter(fac, DummyReference.REF_FIELD,new DualFilter(fac.getNumberFilter(n), fac.getNumberAcceptFilter(n)));
 	}
 	public Set<Dummy1> geReferencedDummy(String name) throws DataFault{
-		IndexedTypeProducer<Dummy1, Dummy1.Factory>prod = new IndexedTypeProducer<Dummy1, Dummy1.Factory>(getContext(), DummyReference.REF_FIELD, new Dummy1.Factory(getContext()));
-		return getReferenced(prod, new SQLValueFilter<DummyReference>(getTarget(), res, DummyReference.STRING_FIELD, name));
+		IndexedTypeProducer<Dummy1, Dummy1.Factory>prod = new IndexedTypeProducer<>(getContext(), DummyReference.REF_FIELD, new Dummy1.Factory(getContext()));
+		return getReferenced(prod, new SQLValueFilter<>(getTarget(), res, DummyReference.STRING_FIELD, name));
 	}
 	
 	/**

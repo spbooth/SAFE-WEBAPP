@@ -164,30 +164,30 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
     	if( UPLOAD_XML_FEATURE.isEnabled(conn)) {
     		map.put(UPLOAD, new UploadTransition());
     	}
-    	map.put(DROP_TABLE_KEY,new ConfirmTransition<DataObjectFactory>(
+    	map.put(DROP_TABLE_KEY,new ConfirmTransition<>(
 			     "Delete this table ? (all data will be lost)", 
-			     new DropTableTransition<DataObjectFactory>(conn), 
+			     new DropTableTransition<>(conn), 
 			     new ForwardTransition<DataObjectFactory>(new MessageResult("aborted"))) );
-		map.put(ADD_FOREIGN_KEYS_KEY,new ConfirmTransition<DataObjectFactory>(
+		map.put(ADD_FOREIGN_KEYS_KEY,new ConfirmTransition<>(
 			     "Add Foreign Key definitions?", 
-			     new AddForeignKeyTransition<DataObjectFactory>(), 
+			     new AddForeignKeyTransition<>(), 
 			     new ForwardTransition<DataObjectFactory>(new MessageResult("aborted"))) );
 	
-		map.put(DROP_FIELD_KEY, new DropFieldTransition<DataObjectFactory>());
-		map.put(DROP_INDEX_KEY, new DropIndexTransition<DataObjectFactory>());
-		map.put(DROP_FOREIGN_KEY_KEY, new DropForeignKeyTransition<DataObjectFactory>());
-		map.put(ADD_REFERENCE_FIELD_KEY, new AddReferenceTransition<DataObjectFactory>());
-		map.put(ADD_DATE_FIELD_KEY, new AddDateFieldTransition<DataObjectFactory>());
-		map.put(ADD_TEXT_FIELD_KEY, new AddTextFieldTransition<DataObjectFactory>());
-		map.put(ADD_INTEGER_FIELD_KEY, new AddIntegerFieldTransition<DataObjectFactory>());
-		map.put(ADD_LONG_FIELD_KEY, new AddLongFieldTransition<DataObjectFactory>());
-		map.put(ADD_FLOAT_FIELD_KEY, new AddFloatFieldTransition<DataObjectFactory>());
-		map.put(ADD_DOUBLE_FIELD_KEY, new AddDoubleFieldTransition<DataObjectFactory>());
+		map.put(DROP_FIELD_KEY, new DropFieldTransition<>());
+		map.put(DROP_INDEX_KEY, new DropIndexTransition<>());
+		map.put(DROP_FOREIGN_KEY_KEY, new DropForeignKeyTransition<>());
+		map.put(ADD_REFERENCE_FIELD_KEY, new AddReferenceTransition<>());
+		map.put(ADD_DATE_FIELD_KEY, new AddDateFieldTransition<>());
+		map.put(ADD_TEXT_FIELD_KEY, new AddTextFieldTransition<>());
+		map.put(ADD_INTEGER_FIELD_KEY, new AddIntegerFieldTransition<>());
+		map.put(ADD_LONG_FIELD_KEY, new AddLongFieldTransition<>());
+		map.put(ADD_FLOAT_FIELD_KEY, new AddFloatFieldTransition<>());
+		map.put(ADD_DOUBLE_FIELD_KEY, new AddDoubleFieldTransition<>());
 		if( target == null) {
 			return map;
 		}
 		if( target.getTableSpecification() != null ) {
-			map.put(ADD_STD_FIELD, new AddStdFieldTransition<DataObjectFactory>());
+			map.put(ADD_STD_FIELD, new AddStdFieldTransition<>());
 			map.put(ADD_STD_INDEX, new AddStdIndexTransition<>());
 			map.put(DROP_OPTIONAL_FIELD, new DropOptionalFieldTransition<>());
 		}
@@ -219,8 +219,9 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 		return params;
 	}
     public class IndexTransition extends AbstractTargetLessTransition<DataObjectFactory>{
+		@Override
 		public void buildForm(Form f, AppContext c) throws TransitionException {
-			f.addInput("table", TABLE_TRANSITION_TAG, new TableInput<DataObjectFactory>(c, DataObjectFactory.class));
+			f.addInput("table", TABLE_TRANSITION_TAG, new TableInput<>(c, DataObjectFactory.class));
 			f.addAction("View", new FormAction() {
 				
 				@Override
@@ -266,13 +267,14 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 					} catch (Exception e) {
 						throw new ActionException("Error readind dump", e);
 					}
-					return new IndexTransitionResult<DataObjectFactory,TableTransitionKey>(TableTransitionProvider.this);
+					return new IndexTransitionResult<>(TableTransitionProvider.this);
 				}
 			});
 		}
     	
     }
     
+	@Override
 	public boolean allowTransition(AppContext c,DataObjectFactory target,
 			TableTransitionKey name) {
 		SessionService sess = c.getService(SessionService.class);
@@ -286,6 +288,7 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 		return false;
 	}
 
+	@Override
 	public String getID(DataObjectFactory target) {
 		if( target == null){
 			return null;
@@ -293,11 +296,13 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 		return target.getTag();
 	}
 
+	@Override
 	public <X extends ContentBuilder> X getSummaryContent(AppContext c,X cb,DataObjectFactory target) {
 		return getLogContent(cb, target, c.getService(SessionService.class));
 	}
 
 
+	@Override
 	public DataObjectFactory getTarget(String id) {
 		if( id == null || id.length() == 0){
 			return null;
@@ -305,14 +310,17 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 		return getContext().makeObjectWithDefault(DataObjectFactory.class, null,id);
 	}
 
+	@Override
 	public String getTargetName() {
 		return TABLE_TRANSITION_TAG;
 	}
 	
+	@Override
 	public boolean canView(DataObjectFactory target, SessionService<?> sess) {
 		
 		return sess.hasRoleFromList(SessionService.ADMIN_ROLE,TABLE_INDEX_ROLE);
 	}
+	@Override
 	public <X extends ContentBuilder> X getLogContent(X hb,DataObjectFactory target, SessionService<?> sess) {
 		hb.addHeading(2, "Table "+target.getTag());
 		hb.addHeading(3,"Table Type:"+target.getClass().getSimpleName());
@@ -321,7 +329,7 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 		Collection<Composite> comps = target.getComposites();
 		if( ! comps.isEmpty()){
 			hb.addHeading(4, "Composites");
-			LinkedHashSet<String> names = new LinkedHashSet<String>();
+			LinkedHashSet<String> names = new LinkedHashSet<>();
 			for( Composite c : comps){
 				names.add(c.toString());
 			}
@@ -347,22 +355,28 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 	}
 	
 
+	@Override
 	public <X extends ContentBuilder> X getTopContent(X hb,DataObjectFactory target, SessionService<?> sess) {
 		return hb;
 	}
+	@Override
 	public <X extends ContentBuilder> X getBottomContent(X hb,DataObjectFactory target, SessionService<?> sess) {
 		return hb;
 	}
+	@Override
 	public String getHelp(TableTransitionKey key) {
 		return key.getHelp();
 	}
+	@Override
 	public String getText(TableTransitionKey key) {
 		return key.toString();
 	}
+	@Override
 	public TableTransitionKey getIndexTransition() {
 		return INDEX;
 	}
 
+	@Override
 	public <R> R accept(
 			TransitionFactoryVisitor<R,DataObjectFactory, TableTransitionKey> vis) {
 		return vis.visitTransitionProvider(this);

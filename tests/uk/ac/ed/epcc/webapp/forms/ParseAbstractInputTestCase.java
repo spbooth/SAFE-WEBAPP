@@ -33,7 +33,7 @@ public abstract class ParseAbstractInputTestCase<T,I extends ParseAbstractInput<
 ParseInputInterfaceTest<T, I, ParseAbstractInputTestCase<T, I>>{
 
 	
-	public ParseInputInterfaceTest<T, I, ParseAbstractInputTestCase<T, I>> parse_input_test = new ParseInputInterfaceTestImpl<T, I, ParseAbstractInputTestCase<T,I>>(this);
+	public ParseInputInterfaceTest<T, I, ParseAbstractInputTestCase<T, I>> parse_input_test = new ParseInputInterfaceTestImpl<>(this);
 	
 	public boolean allowNull(){
 		return true;

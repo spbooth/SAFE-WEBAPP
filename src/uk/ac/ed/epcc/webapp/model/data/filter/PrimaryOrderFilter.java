@@ -41,25 +41,29 @@ public class PrimaryOrderFilter<T> implements SQLOrderFilter<T> {
 		this.res=res;
 		this.descending=descending;
 	}
+	@Override
 	public List<OrderClause> OrderBy() {
-		LinkedList<OrderClause> order = new LinkedList<OrderClause>();
+		LinkedList<OrderClause> order = new LinkedList<>();
 		order.add(res.getOrder(null, descending));
 		return order;
 	}
 	
 	
+	@Override
 	public void accept(T o) {
 		
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
+	@Override
 	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 		return vis.visitOrderFilter(this);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
+	@Override
 	public Class<T> getTarget() {
 		return target;
 	}

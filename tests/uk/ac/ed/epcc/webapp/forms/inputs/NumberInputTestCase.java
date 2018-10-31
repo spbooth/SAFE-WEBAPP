@@ -25,7 +25,7 @@ import uk.ac.ed.epcc.webapp.forms.ParseAbstractInputTestCase;
 
 public abstract class NumberInputTestCase<N extends Number,I extends NumberInput<N>> extends ParseAbstractInputTestCase<N,I> implements BoundedInputInterfaceTest<N, I, NumberInputTestCase<N,I>>,BoundedInputDataProvider<N, I> {
 
-	BoundedInputInterfaceTestImpl<N,I, NumberInputTestCase<N,I>> bounded_tests = new BoundedInputInterfaceTestImpl<N,I, NumberInputTestCase<N,I>>(this);
+	BoundedInputInterfaceTestImpl<N,I, NumberInputTestCase<N,I>> bounded_tests = new BoundedInputInterfaceTestImpl<>(this);
 	@Test
 	public void testUnit() throws Exception{
 		NumberInput ni = getInput();

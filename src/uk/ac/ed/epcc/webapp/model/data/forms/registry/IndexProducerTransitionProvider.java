@@ -51,17 +51,17 @@ public class IndexProducerTransitionProvider<T extends Indexed> extends SimpleTr
 		this.policy=policy;
 		
 		if( fac instanceof FormCreatorProducer){
-			create = new TransitionKey<T>(fac.getTarget(), "Create");
+			create = new TransitionKey<>(fac.getTarget(), "Create");
 			addTransition(create, new FormCreatorProducerTransition<T>(target_name,(FormCreatorProducer) fac));
 		}else{
 			create=null;
 		}
 		
 		if( fac instanceof FormUpdateProducer){
-			edit = new TransitionKey<T>(fac.getTarget(), "Edit");
-			update = new TransitionKey<T>(fac.getTarget(), "Update");
-			addTransition(update, new FormUpdateProducerTransition<TransitionKey<T>, T>(target_name, (FormUpdateProducer<T>) fac, this, edit));
-			addTransition(edit, new StandAloneFormUpdateProducerTransition<T>(target_name,(FormUpdateProducer<T>) fac));
+			edit = new TransitionKey<>(fac.getTarget(), "Edit");
+			update = new TransitionKey<>(fac.getTarget(), "Update");
+			addTransition(update, new FormUpdateProducerTransition<>(target_name, (FormUpdateProducer<T>) fac, this, edit));
+			addTransition(edit, new StandAloneFormUpdateProducerTransition<>(target_name,(FormUpdateProducer<T>) fac));
 		}else{
 			edit=null;
 			update=null;

@@ -43,15 +43,16 @@ PathTransitionProviderInterfaceTest<MailTarget, EditAction, EmailTransitionProvi
 ViewTransitionFactoryInterfaceTest<MailTarget, EditAction, EmailTransitionProviderTestCase>
 {
 
-	public PathTransitionProviderInterfaceTest<MailTarget, EditAction, EmailTransitionProviderTestCase> path_test = new PathTransitionProviderInterfaceTestImpl<MailTarget, EditAction, EmailTransitionProviderTestCase>(this);
+	public PathTransitionProviderInterfaceTest<MailTarget, EditAction, EmailTransitionProviderTestCase> path_test = new PathTransitionProviderInterfaceTestImpl<>(this);
  
 
-	public ViewTransitionFactoryInterfaceTest<MailTarget, EditAction, EmailTransitionProviderTestCase> view_test = new ViewTransitionFactoryInterfaceTestImpl<MailTarget, EditAction, EmailTransitionProviderTestCase>(this);
+	public ViewTransitionFactoryInterfaceTest<MailTarget, EditAction, EmailTransitionProviderTestCase> view_test = new ViewTransitionFactoryInterfaceTestImpl<>(this);
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryDataProvider#getTargets()
 	 */
+	@Override
 	public Set<MailTarget> getTargets() {
-		HashSet<MailTarget> targets = new HashSet<MailTarget>();
+		HashSet<MailTarget> targets = new HashSet<>();
 		for(int i=0;i<getFac().names.length;i++){
 			MessageHandler hand = getFac().getHandler(i, null);
 			try {
@@ -66,6 +67,7 @@ ViewTransitionFactoryInterfaceTest<MailTarget, EditAction, EmailTransitionProvid
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactoryDataProvider#getTransitionFactory()
 	 */
+	@Override
 	public ViewTransitionFactory<EditAction, MailTarget> getTransitionFactory() {
 		return new EmailTransitionProvider(getFac());
 	}
@@ -73,6 +75,7 @@ ViewTransitionFactoryInterfaceTest<MailTarget, EditAction, EmailTransitionProvid
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactoryDataProvider#getAllowedUser(java.lang.Object)
 	 */
+	@Override
 	public SessionService<?> getAllowedUser(MailTarget target) throws DataFault, ParseException {
 		
 		SimpleSessionService sess = new SimpleSessionService(ctx);
@@ -86,6 +89,7 @@ ViewTransitionFactoryInterfaceTest<MailTarget, EditAction, EmailTransitionProvid
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactoryDataProvider#getForbiddenUser(java.lang.Object)
 	 */
+	@Override
 	public SessionService<?> getForbiddenUser(MailTarget target) {
 		// TODO Auto-generated method stub
 		return null;

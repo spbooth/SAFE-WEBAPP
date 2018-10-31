@@ -44,7 +44,7 @@ public class MessageResult implements FormResult {
    }
    public void addArg(Object a){
 	   if( args == null ){
-		   args=new LinkedList<Object>();
+		   args=new LinkedList<>();
 	   }
 	   args.add(a);
    }
@@ -54,6 +54,7 @@ public class MessageResult implements FormResult {
 	   }
 	   return args.toArray(new Object[args.size()]);
    }
+@Override
 public void accept(FormResultVisitor vis) throws Exception {
 	vis.visitMessageResult(this);
 	

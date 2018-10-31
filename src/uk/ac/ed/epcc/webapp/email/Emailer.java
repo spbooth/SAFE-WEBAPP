@@ -509,7 +509,7 @@ public class Emailer {
 				Address old[] = recipients.clone();
 				if( old != null && old.length > 0){
 					// allow emails to designated testers.
-					Set<String> allow = new HashSet<String>();
+					Set<String> allow = new HashSet<>();
 					for(String addr : conn.getInitParameter(EMAIL_BYPASS_FORCE_ADDRESS,"").split("\\s*,\\s*")){
 						allow.add(addr);
 					}
@@ -761,7 +761,7 @@ public class Emailer {
 		}
 		String force_email = conn.getInitParameter(EMAIL_FORCE_ADDRESS);
 		log.debug("Force email is "+force_email);
-		Set<InternetAddress> set = new LinkedHashSet<InternetAddress>();
+		Set<InternetAddress> set = new LinkedHashSet<>();
 		if (force_email == null) {
 			for (int i = 0; i < notify_emails.length; i++) {
 				log.debug("Add recipient "+notify_emails[i]);
@@ -786,7 +786,7 @@ public class Emailer {
 			
 			set.add(new InternetAddress(force_email));
 			text_recip=force_email;
-			Set<String> allowed = new HashSet<String>();
+			Set<String> allowed = new HashSet<>();
 			for(String allow : conn.getInitParameter(EMAIL_BYPASS_FORCE_ADDRESS, "").split("\\s*,\\s*")){
 				allowed.add(allow);
 			}
@@ -1229,7 +1229,7 @@ public class Emailer {
 	}
     public static String[] splitEmailList(String list){
     	StringTokenizer st = new StringTokenizer(list,",",false);
-    	LinkedHashSet<String> set = new LinkedHashSet<String>();
+    	LinkedHashSet<String> set = new LinkedHashSet<>();
     	while(st.hasMoreTokens()){
              String s = st.nextToken();
              if(checkAddress(s)){
@@ -1239,7 +1239,7 @@ public class Emailer {
     	return set.toArray(new String[set.size()]);
     }
     public static Set<InternetAddress> parseEmailList(String list) throws AddressException{
-    	LinkedHashSet<InternetAddress> result = new LinkedHashSet<InternetAddress>();
+    	LinkedHashSet<InternetAddress> result = new LinkedHashSet<>();
     	for(String s : list.split("\\s*,\\s*")){
     		
 				result.add(new InternetAddress(s));

@@ -20,7 +20,6 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.model.ClassificationFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.TableInput;
 
 
@@ -33,7 +32,7 @@ public class AddClassificationReferenceTransition<T extends DataObjectFactory> e
 	
 	@Override
 	protected void addFormParams(Form f, T target, AppContext c) {
-		f.addInput(TABLE, "Classification Table to reference", new TableInput<ClassificationFactory>(c,ClassificationFactory.class ));
+		f.addInput(TABLE, "Classification Table to reference", new TableInput<>(c,ClassificationFactory.class ));
 	}
 	@Override
 	protected FieldType getFieldType(Form f) {

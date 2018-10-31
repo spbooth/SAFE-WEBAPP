@@ -59,7 +59,7 @@ public class SerialisableSoftReference<T>  implements Externalizable{
 		if( data == null ){
 			ref=null;
 		}else{
-			ref = new SoftReference<T>(data);
+			ref = new SoftReference<>(data);
 		}
 	}
 	

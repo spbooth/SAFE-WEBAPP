@@ -39,7 +39,7 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
     Map<Integer,E> lookup;
     public EnumIntegerInput(EnumSet<E> set){
     	this.set = set;
-    	lookup = new HashMap<Integer,E>();
+    	lookup = new HashMap<>();
     	for(E s: set){
     		lookup.put(s.ordinal(), s);
     	}
@@ -47,6 +47,7 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
     public EnumIntegerInput(Class<E> clazz){
     	this(EnumSet.allOf(clazz));
     }
+	@Override
 	public E getItembyValue(Integer value) {
 		if( value == null ){
 			return null;
@@ -54,13 +55,16 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
 		return lookup.get(value);
 	}
 
+	@Override
 	public Iterator<E> getItems() {
 		return set.iterator();
 	}
 
+	@Override
 	public int getCount(){
 		return set.size();
 	}
+	@Override
 	public String getTagByItem(E item) {
 		if( item == null){
 			return null;
@@ -68,10 +72,12 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
 		return Integer.toString(item.ordinal());
 	}
 
+	@Override
 	public String getTagByValue(Integer value) {
 		return getTagByItem(getItembyValue(value));
 	}
 
+	@Override
 	public String getText(E item) {
 		if( item == null ){
 			return null;
@@ -79,6 +85,7 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
 		return item.toString();
 	}
 
+	@Override
 	public E getItem() {
 		Integer val = getValue();
 		if( val == null ){
@@ -88,6 +95,7 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
 	}
 
 	
+	@Override
 	public void setItem(E v) {
 		if( v == null ){
 			setValue(null);

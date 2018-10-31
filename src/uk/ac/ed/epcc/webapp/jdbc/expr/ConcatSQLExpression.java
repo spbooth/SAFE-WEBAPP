@@ -22,14 +22,14 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 
-/** Combine multiple {@link SQLExpression} by concatination in SQL.
+/** Combine multiple {@link SQLExpression} by concatenation in SQL.
  * @author spb
  *
  */
 
 public class ConcatSQLExpression implements SQLExpression<String>{
 
-	private LinkedList<SQLExpression<String>> values=new LinkedList<SQLExpression<String>>();
+	private LinkedList<SQLExpression<String>> values=new LinkedList<>();
 	public ConcatSQLExpression(){
 		
 	}
@@ -44,6 +44,7 @@ public class ConcatSQLExpression implements SQLExpression<String>{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
+	@Override
 	public Class<String> getTarget() {
 		return String.class;
 	}
@@ -51,6 +52,7 @@ public class ConcatSQLExpression implements SQLExpression<String>{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#add(java.lang.StringBuilder, boolean)
 	 */
+	@Override
 	public int add(StringBuilder sb, boolean qualify) {
 		
 		boolean seen=false;
@@ -70,6 +72,7 @@ public class ConcatSQLExpression implements SQLExpression<String>{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#getParameters(java.util.List)
 	 */
+	@Override
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
 		for(SQLValue<String> v: values){
 			list = v.getParameters(list);
@@ -80,6 +83,7 @@ public class ConcatSQLExpression implements SQLExpression<String>{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#makeObject(java.sql.ResultSet, int)
 	 */
+	@Override
 	public String makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		return rs.getString(pos);
 	}
@@ -87,6 +91,7 @@ public class ConcatSQLExpression implements SQLExpression<String>{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#getRequiredFilter()
 	 */
+	@Override
 	public SQLFilter getRequiredFilter() {
 		return null;
 	}

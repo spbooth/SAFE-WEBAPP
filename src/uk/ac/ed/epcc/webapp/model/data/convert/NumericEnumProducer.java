@@ -79,6 +79,6 @@ public class NumericEnumProducer<E extends Enum<E>> implements TypeProducer<E,In
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#getInput()
 	 */
 	public Input<Integer> getInput() {
-		return new EnumIntegerInput<E>(clazz);
+		return new EnumIntegerInput<>(clazz);
 	}
 }

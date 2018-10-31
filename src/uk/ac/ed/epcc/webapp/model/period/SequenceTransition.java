@@ -33,18 +33,20 @@ public class SequenceTransition<T extends TimePeriod,K> extends AbstractDirectTr
 		this.move_up=move_up;
 	}
 	
+	@Override
 	public FormResult doTransition(T target, AppContext c)
 			throws TransitionException {
 		T result = getNext(target);
 		if( result == null ){
 			return new MessageResult("no_next_rate");
 		}
-		return new ViewTransitionResult<T, K>(tp, result);
+		return new ViewTransitionResult<>(tp, result);
 	}
 	protected T getNext(T target) {
 		return fac.getNextInSequence(target, move_up);
 	}
 	
+	@Override
 	public boolean allow(SessionService<?> serv, T target) {
 		return getNext(target) != null;
 	}

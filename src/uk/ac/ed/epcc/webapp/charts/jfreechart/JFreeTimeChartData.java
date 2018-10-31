@@ -65,7 +65,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 	SplitTimePeriod period;
 	int nsplits;
 	int ndatasets=0;
-	LinkedList<TimeChartDataSet> plots = new LinkedList<TimeChartDataSet>();
+	LinkedList<TimeChartDataSet> plots = new LinkedList<>();
 	boolean use_bar=false;
 	private boolean use_step=false;
 	private boolean is_cumulative=false;
@@ -77,6 +77,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 
 
 
+	@Override
 	public void addWarningLevel(double value,Color col) {
 		if( col ==null) {
 			col=Color.RED;
@@ -85,6 +86,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 		
 	}
 
+	@Override
 	public TimeChartDataSet makeDataSet(int i) throws InvalidArgument {
 		return new TimeChartDataSet(this,i, period, nsplits);
 	}
@@ -92,6 +94,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 	
 
 	
+	@Override
 	public TimeChartDataSet addAreaGraph(TimeChartDataSet plot) throws InvalidArgument {
 		TimeChartDataSet myplot = addTimeSeries(plot);
 
@@ -226,6 +229,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 		return dataset;
 	}
 
+	@Override
 	public TimeChartDataSet addAreaGraph(TimeChartDataSet plot,
 			Color[] custom_colours) throws InvalidArgument {
 		TimeChartDataSet ds = addAreaGraph(plot);
@@ -253,6 +257,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 		}
 	}
 
+	@Override
 	public TimeChartDataSet addLineGraph(TimeChartDataSet plot) throws InvalidArgument {
 		TimeChartDataSet myplot = addTimeSeries(plot);
 		if( use_bar || getItems() < STEP_THRESHOLD || use_step){
@@ -267,6 +272,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 		return myplot;
 	}
 
+	@Override
 	public TimeChartDataSet addLineGraph(TimeChartDataSet plot,
 			Color[] custom_colors) throws InvalidArgument {
 	
@@ -279,6 +285,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.charts.TimeChartData#setPeriod(uk.ac.ed.epcc.webapp.time.SplitTimePeriod, int)
 	 */
+	@Override
 	public void setPeriod(SplitTimePeriod period, int nsplit) {
 		this.period=period;
 		if( nsplit <= 1){
@@ -298,6 +305,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.charts.PeriodChartData#getPeriod()
 	 */
+	@Override
 	public TimePeriod getPeriod() {
 		return period;
 	}
@@ -313,6 +321,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.charts.TimeChartData#getPlots()
 	 */
+	@Override
 	public List<TimeChartDataSet> getPlots() {
 		return plots;
 	}

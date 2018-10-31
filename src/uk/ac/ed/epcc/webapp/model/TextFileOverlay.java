@@ -326,17 +326,19 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			}
 			return getGroup()+":"+getName()+tag;
 		}
+		@Override
 		public boolean canRetire() {
 			return true;
 		}
+		@Override
 		public void retire() throws Exception {
 			delete();	
 		}
 	}
 	public TextFile find(String group,String name) throws DataFault{
-		SQLAndFilter<T> get = new SQLAndFilter<T>(getTarget());
-		get.addFilter(new SQLValueFilter<T>(getTarget(),res,GROUP,group));
-		get.addFilter(new SQLValueFilter<T>(getTarget(),res,NAME,name));
+		SQLAndFilter<T> get = new SQLAndFilter<>(getTarget());
+		get.addFilter(new SQLValueFilter<>(getTarget(),res,GROUP,group));
+		get.addFilter(new SQLValueFilter<>(getTarget(),res,NAME,name));
 		T tf;
 		try {
 			tf = find(get,true);
@@ -397,7 +399,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 
 				String originalArray[] = splitNormalised(tf.getResourceString());
 				String newArray[] = splitNormalised(tf.getText());
-				Diff<String> diff = new Diff<String>(originalArray,newArray);
+				Diff<String> diff = new Diff<>(originalArray,newArray);
 				StringBuilder result = new StringBuilder();
 				for (Object object :diff.diff()) {
 					Difference difference = (Difference)object;
@@ -517,6 +519,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 	}
 	public class TextFileUpdator implements StandAloneFormUpdate<T>, UpdateTemplate<T>{
 
+		@Override
 		public void buildSelectForm(Form f, String label, T dat) {
 			Input<Integer> i = getInput();
             if( ! isValid()){
@@ -528,6 +531,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			}
 		}
 
+		@Override
 		@SuppressWarnings("unchecked")
 		public void buildUpdateForm(String type_name,Form f, T dat,SessionService<?> operator) throws DataException {
 			boolean show_diff=false;
@@ -574,23 +578,27 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 				f.addAction("Revert",new TextFileRevertAction(type_name,dat));
 				f.addAction("Diff", new TextFileDiffAction(dat));
 			}
-			f.addAction("Delete",new RetireAction<T>(type_name,dat));
+			f.addAction("Delete",new RetireAction<>(type_name,dat));
 		}
 
+		@Override
 		@SuppressWarnings("unchecked")
 		public T getSelected(Form f) {
 			ItemInput<T> input = (ItemInput<T>) f.getInput(getUniqueIdName());
 			return input.getItem();
 		}
 
+		@Override
 		public AppContext getContext() {
 			return TextFileOverlay.this.getContext();
 		}
 
+		@Override
 		public void postUpdate(T o, Form f,Map<String,Object> orig) throws DataException {
 			
 		}
 
+		@Override
 		public FormResult getResult(String typeName, T dat, Form f) {
 			return new MessageResult("object_updated",typeName,dat);
 		}
@@ -638,7 +646,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		return s;
 	}
 	public FilterResult<T> allbyGroup(String groupName) throws DataFault {		
-		return new FilterSet(new SQLValueFilter<T>(getTarget(),res,TextFileOverlay.GROUP ,groupName.trim()));
+		return new FilterSet(new SQLValueFilter<>(getTarget(),res,TextFileOverlay.GROUP ,groupName.trim()));
 		
 	}
 	/** Check we are only creating a new entry and one where no
@@ -649,6 +657,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 	 */
 	public class ExistsValidator implements FormValidator{
 
+		@Override
 		public void validate(Form f)
 				throws ValidateException {
 			try {
@@ -705,7 +714,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 	 */
 	@Override
 	protected Map<String, Object> getSelectors() {
-		Map<String,Object> sel = new HashMap<String,Object>();
+		Map<String,Object> sel = new HashMap<>();
 		TextInput text = new TextInput();
 		text.setOptional(false);
 		text.setMaxResultLength(1<<24);

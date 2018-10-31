@@ -42,10 +42,10 @@ ListInputInterfaceTest<Integer, Object,ListInput<Integer,Object>, NullListInputT
 {
 	
 	
-	public InputInterfaceTest<Integer, ListInput<Integer,Object>, NullListInputTestCase<BDO>> input_test = new InputInterfaceTestImpl<Integer, ListInput<Integer,Object>, NullListInputTestCase<BDO>>(this);
+	public InputInterfaceTest<Integer, ListInput<Integer,Object>, NullListInputTestCase<BDO>> input_test = new InputInterfaceTestImpl<>(this);
 	
 	
-	public ListInputInterfaceTest<Integer, Object,ListInput<Integer,Object>, NullListInputTestCase<BDO>> list_test = new ListInputInterfaceTestImpl<Integer, Object,ListInput<Integer,Object>, NullListInputTestCase<BDO>>(this);
+	public ListInputInterfaceTest<Integer, Object,ListInput<Integer,Object>, NullListInputTestCase<BDO>> list_test = new ListInputInterfaceTestImpl<>(this);
 	
 	
 	DataObjectFactory<BDO> fac=null;
@@ -59,7 +59,7 @@ ListInputInterfaceTest<Integer, Object,ListInput<Integer,Object>, NullListInputT
 		   return fac;
 	   }
 	public Set<Integer> getBadData() throws Exception{
-		Set<Integer> bad = new HashSet<Integer>();
+		Set<Integer> bad = new HashSet<>();
 		bad.add(-12);
 		bad.add(-14);
 		bad.remove(NullListInput.NULL_VALUE);
@@ -68,7 +68,7 @@ ListInputInterfaceTest<Integer, Object,ListInput<Integer,Object>, NullListInputT
 	
 	
 	public Set<Integer> getGoodData()  throws Exception{
-		Set<Integer> good = new HashSet<Integer>();
+		Set<Integer> good = new HashSet<>();
 		   good.add(NullListInput.NULL_VALUE);
 	       DataObjectFactory<BDO> fac = getFactory();
 			for(BDO item : fac.new FilterSet(fac.getSelectFilter())){
@@ -82,7 +82,7 @@ ListInputInterfaceTest<Integer, Object,ListInput<Integer,Object>, NullListInputT
 
 	@SuppressWarnings("unchecked")
 	public final ListInput<Integer,Object> getInput() {
-		return new NullListInput<BDO>((ListInput<Integer, BDO>) getFactory().getInput());
+		return new NullListInput<>((ListInput<Integer, BDO>) getFactory().getInput());
 	}
 
 	

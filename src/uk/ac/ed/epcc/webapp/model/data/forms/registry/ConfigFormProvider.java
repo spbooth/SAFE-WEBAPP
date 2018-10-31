@@ -49,7 +49,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 public class ConfigFormProvider extends FormFactoryProviderRegistry {
 	private final String tag;
-	private  Map<String,FormFactoryProvider> map = new HashMap<String,FormFactoryProvider>();
+	private  Map<String,FormFactoryProvider> map = new HashMap<>();
 	private Logger log;
 	@SuppressWarnings("unchecked")
 	public ConfigFormProvider(AppContext conn, String tag){

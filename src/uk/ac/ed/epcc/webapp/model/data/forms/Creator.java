@@ -48,6 +48,7 @@ public class Creator<BDO extends DataObject> extends DataObjectFormFactory<BDO> 
 		super(dataObjectFactory);
 		
 	}
+	@Override
 	public void buildCreationForm(String type_name,Form f) throws Exception {
 		buildForm(f);
 		setAction(type_name,f);
@@ -59,7 +60,7 @@ public class Creator<BDO extends DataObject> extends DataObjectFormFactory<BDO> 
 		}
 	}
     public void setAction(String type_name,Form f) {
-    	f.addAction(" Create ", new CreateAction<BDO>(type_name,this));
+    	f.addAction(" Create ", new CreateAction<>(type_name,this));
     }
 	
 	/**
@@ -71,12 +72,14 @@ public class Creator<BDO extends DataObject> extends DataObjectFormFactory<BDO> 
 	 *            Form to be modified
 	 * @throws Exception 
 	 */
+	@Override
 	public void customiseCreationForm(Form f) throws Exception {
 
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.CreateTemplate#preCommit(BDO, uk.ac.ed.epcc.webapp.model.data.forms.Form)
 	 */
+	@Override
 	public  void preCommit(BDO dat, Form f) throws DataException, ActionException {
 		for(CreateCustomizer comp : getFactory().getComposites(CreateCustomizer.class)){
 			comp.preCommit(dat, f);
@@ -85,12 +88,14 @@ public class Creator<BDO extends DataObject> extends DataObjectFormFactory<BDO> 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.CreateTemplate#postCreate(BDO, uk.ac.ed.epcc.webapp.model.data.forms.Form)
 	 */
+	@Override
 	public void postCreate(BDO dat, Form f) throws Exception {
 		for(CreateCustomizer comp : getFactory().getComposites(CreateCustomizer.class)){
 			comp.postCreate(dat, f);
 		}
 	}
 	
+	@Override
 	public FormResult getResult(String type_name,BDO dat, Form f) {
 		Object thing = type_name;
 		if( dat instanceof UIGenerator || dat instanceof UIProvider || dat instanceof Identified) {
@@ -100,6 +105,7 @@ public class Creator<BDO extends DataObject> extends DataObjectFormFactory<BDO> 
 		
 		return res;
 	}
+	@Override
 	public String getConfirm(Form f) {
 		return null;
 	}

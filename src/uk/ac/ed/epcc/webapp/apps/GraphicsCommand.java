@@ -53,11 +53,12 @@ public abstract class GraphicsCommand implements Command{
 				this.target=target;
 			}
 			
+			@Override
 			public void actionPerformed(ActionEvent e) {
 			
 				SwingTransitionHandler handler = new SwingTransitionHandler(frame, conn);
 				try {
-					handler.process(new ChainedTransitionResult<T, K>(tp, target, key));
+					handler.process(new ChainedTransitionResult<>(tp, target, key));
 				} catch (Exception e1) {
 					log.error("Error performing transition",e1);
 				}
@@ -65,6 +66,7 @@ public abstract class GraphicsCommand implements Command{
 			
 		}
 		
+		@Override
 		public void run(LinkedList<String> args) {
 			
 			SessionService session_service=conn.getService(SessionService.class);
@@ -86,14 +88,17 @@ public abstract class GraphicsCommand implements Command{
 		public String getTitle() {
 			return "Admin forms";
 		}
+		@Override
 		public AppContext getContext() {
 			return conn;
 		}
 		protected abstract JComponent getMainPanel(JFrame frame, SessionService session_service);
 		
-	 	public String description() {
+	 	@Override
+		public String description() {
 			return "A graphics command";
 		}
+		@Override
 		public String help() {
 			return "No help";
 		}

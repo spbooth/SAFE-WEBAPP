@@ -32,9 +32,9 @@ OptionalInputInterfaceTest<String, OptionalListInputWrapper<String,TestEnum>, Te
 {
 
 	public ListInputInterfaceTest<String, TestEnum, OptionalListInputWrapper<String,TestEnum>,TestDataProvider<String,OptionalListInputWrapper<String,TestEnum>>> list_test =
-			new ListInputInterfaceTestImpl<String, TestEnum, OptionalListInputWrapper<String,TestEnum>, TestDataProvider<String,OptionalListInputWrapper<String,TestEnum>>>(this);
+			new ListInputInterfaceTestImpl<>(this);
 	
-	public OptionalInputInterfaceTest<String, OptionalListInputWrapper<String,TestEnum>, TestDataProvider<String,OptionalListInputWrapper<String,TestEnum>>> optional_tests = new OptionalInputInterfaceTestImpl<String, OptionalListInputWrapper<String,TestEnum>, TestDataProvider<String,OptionalListInputWrapper<String,TestEnum>>>(this);
+	public OptionalInputInterfaceTest<String, OptionalListInputWrapper<String,TestEnum>, TestDataProvider<String,OptionalListInputWrapper<String,TestEnum>>> optional_tests = new OptionalInputInterfaceTestImpl<>(this);
 	
 	public OptionalListInputWrapperTest() {
 		
@@ -48,24 +48,27 @@ OptionalInputInterfaceTest<String, OptionalListInputWrapper<String,TestEnum>, Te
 		return getBadData();
 	}
 
+	@Override
 	public Set<String> getGoodData()  {
-		HashSet<String> res = new HashSet<String>();
+		HashSet<String> res = new HashSet<>();
 		res.add(TestEnum.CAT.name());
 		res.add(TestEnum.DOG.name());
 		res.add(TestEnum.HAMSTER.name());
 		return res;
 	}
 
+	@Override
 	public Set<String> getBadData()  {
-		HashSet<String> res = new HashSet<String>();
+		HashSet<String> res = new HashSet<>();
 		res.add("Lion");
 		res.add("Tiger");
 		res.add("Bear");
 		return res;
 	}
 
+	@Override
 	public OptionalListInputWrapper<String,TestEnum> getInput() throws Exception {
-		return new OptionalListInputWrapper<>(new EnumInput<TestEnum>(TestEnum.class));
+		return new OptionalListInputWrapper<>(new EnumInput<>(TestEnum.class));
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.ListInputInterfaceTest#testGetItembyValue()

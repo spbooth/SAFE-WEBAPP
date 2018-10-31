@@ -54,14 +54,14 @@ public class TableTest {
 	@Test
 	public void testTableCopy() {
 		// creates a new table
-		Table<Integer, Double> origTable = new Table<Integer, Double>();
+		Table<Integer, Double> origTable = new Table<>();
 		Integer[] col_keys = {0, 1};
 		Double[] row_keys = {0.0, -0.1};
 		String[] values = {"testValue1", "testValue2"};
 		origTable.put(col_keys[0], row_keys[0], values[0]);
 		origTable.put(col_keys[1], row_keys[1], values[1]);
 		// copies the table using the copy constructor
-		Table<Integer, Double> copiedTable = new Table<Integer, Double>(origTable);
+		Table<Integer, Double> copiedTable = new Table<>(origTable);
 		// asserts that the copied table has the same keys and values
 		assertEquals("Wrong number of rows.", 2, copiedTable.nRows());
 		assertEquals("Wrong number of columns.", 2, copiedTable.nCols());
@@ -76,10 +76,10 @@ public class TableTest {
 	public void testAddTable() {
 		// creates two new tables
 		// table1
-		Table<String, Integer> table1 = new Table<String, Integer>();
+		Table<String, Integer> table1 = new Table<>();
 		table1.put("Col1", 1, "value1");
 		// table2
-		Table<String, Integer> table2 = new Table<String, Integer>(table1);
+		Table<String, Integer> table2 = new Table<>(table1);
 		// adds table2 to table1
 		table1.add(table2);
 		// asserts table1 structure
@@ -108,7 +108,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testAddAttribute() {
-		Table<Integer, Integer> t = new Table<Integer, Integer>();
+		Table<Integer, Integer> t = new Table<>();
 		t.addAttribute(0, 1, "test_name", "test_value");
 		assertEquals("Wrong single cell attribute.", "test_value", t.getAttributes(0, 1).get("test_name"));
 	}
@@ -118,7 +118,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testAddColAttribute() {
-		Table<String, Integer> t = new Table<String, Integer>();
+		Table<String, Integer> t = new Table<>();
 		t.put("col1", 1, "value1");
 		t.put("col1", 2, "value2");
 		t.addColAttribute("col1", "test_attr_name", "test_attr_value");
@@ -131,8 +131,8 @@ public class TableTest {
 	 */
 	@Test
 	public void testAddMap() {
-		Table<String, Integer> t = new Table<String, Integer>();
-		Map<Integer, Object> m = new HashMap<Integer, Object>();
+		Table<String, Integer> t = new Table<>();
+		Map<Integer, Object> m = new HashMap<>();
 		m.put(1, "value1");
 		m.put(2,  2);
 		t.addMap("col1", m);
@@ -148,7 +148,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testAddPercentCol() {
-		Table<String, Integer> t = new Table<String, Integer>();
+		Table<String, Integer> t = new Table<>();
 		t.put("col1", 1, 20);
 		t.put("col1", 2, 40);
 		t.put("col1", 3, 40);
@@ -165,7 +165,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testAddTotalToCol() {
-		Table<String, Integer> t = new Table<String, Integer>();
+		Table<String, Integer> t = new Table<>();
 		t.put("col1", 1, 20);
 		t.put("col1", 2, 40);
 		t.put("col1", 3, 40);
@@ -183,7 +183,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testColOperation() {
-		Table<String, Integer> t = new Table<String, Integer>();
+		Table<String, Integer> t = new Table<>();
 		t.put("col1", 1, 20);
 		t.put("col1", 2, 30);
 		t.put("col2", 1, 0);
@@ -205,7 +205,7 @@ public class TableTest {
 		assertEquals("Wrong colOperation DIV.", Double.POSITIVE_INFINITY, t.get("colDIV", 1));
 		assertEquals("Wrong colOperation DIV.", -1.0, t.get("colDIV", 2));
 		// test not numbers
-		Table<String, String> t2 = new Table<String, String>();
+		Table<String, String> t2 = new Table<>();
 		t2.put("col1", "row1", "value");
 		t2.put("col2", "row1", "value");
 		t2.colOperation("result_col", Operator.ADD, "col1", "col2");
@@ -217,7 +217,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testRowOperation() {
-		Table<Integer, String> t = new Table<Integer, String>();
+		Table<Integer, String> t = new Table<>();
 		t.put(1, "row1", 5);
 		t.put(2, "row1", 50);
 		t.put(1, "row2", 2);
@@ -239,7 +239,7 @@ public class TableTest {
 		assertEquals("Wrong rowOperation DIV.", 2.5, t.get(1, "rowDIV"));
 		assertEquals("Wrong rowOperation DIV.", 2.5, t.get(2, "rowDIV"));
 		// test not numbers
-		Table<String, String> t2 = new Table<String, String>();
+		Table<String, String> t2 = new Table<>();
 		t2.put("col1", "row1", "value");
 		t2.put("col1", "row2", "value");
 		t2.rowOperation("result_row", Operator.SUB, "row1", "row2");
@@ -251,7 +251,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testContainsCol() {
-		Table<String, Integer> t = new Table<String, Integer>();
+		Table<String, Integer> t = new Table<>();
 		t.getCol("testCol");
 		assertTrue("Wrong value of containsCol.", t.containsCol("testCol"));
 	}
@@ -261,7 +261,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testRemoveCol() {
-		Table<String, Integer> t = new Table<String, Integer>();
+		Table<String, Integer> t = new Table<>();
 		t.getCol("col1");
 		t.getCol("col2");
 		t.removeCol("col1");
@@ -273,7 +273,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testSortCols() {
-		Table<String, Integer> t = new Table<String, Integer>();
+		Table<String, Integer> t = new Table<>();
 		t.getCol("z");
 		t.getCol("N");
 		t.getCol("a");
@@ -288,7 +288,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testSumCol() {
-		Table<String, Integer> t = new Table<String, Integer>();
+		Table<String, Integer> t = new Table<>();
 		t.put("col1", 1, 100);
 		t.put("col1", 2, "abc");
 		t.put("col1", 3, 200);
@@ -300,7 +300,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testWarning() {
-		Table<String, Integer> t = new Table<String, Integer>();
+		Table<String, Integer> t = new Table<>();
 		t.put("col1", 1, 100);
 		t.put("col1", 2, -100);
 		t.put("col1", 3, 100);
@@ -313,7 +313,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testHighlight() {
-		Table<String, Integer> t = new Table<String, Integer>();
+		Table<String, Integer> t = new Table<>();
 		t.put("col1", 1, 100);
 		t.put("col1", 2, -100);
 		t.put("col1", 3, 100);
@@ -332,7 +332,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testIncrement() {
-		Table<String, Integer> t = new Table<String, Integer>();
+		Table<String, Integer> t = new Table<>();
 		t.put("col1", 1, 100);
 		t.increment("col1", 1, 10);
 		assertEquals("Wrong increment.", 110, t.get("col1",  1));
@@ -343,7 +343,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testSetColAfter() {
-		Table<String, Integer> t = new Table<String, Integer>();
+		Table<String, Integer> t = new Table<>();
 		t.getCol("col1");
 		t.getCol("col2");
 		t.getCol("col3");
@@ -360,7 +360,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testTransformCol() {
-		Table<String, Object> t = new Table<String, Object>();
+		Table<String, Object> t = new Table<>();
 		// tests the Default transform
 		t.put("col1", 1, null);
 		t.transformCol("col1", new DefaultTransform(333));
@@ -375,7 +375,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testTransformKeys() {
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", null, 0);
 		t.put("col1", "row2", 0);
 		t.transformKeys("col2", new DefaultTransform("row1"));
@@ -388,7 +388,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testSetRow() {
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", "row1", 100);
 		t.put("col1", "row2", 200);
 		t.setRow("row2", 0);
@@ -401,7 +401,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testSetRowAfter() {
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", "row1", 100);
 		t.put("col1", "row2", 200);
 		t.setRowAfter("row1", "row2");
@@ -414,7 +414,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testSetRowLast() {
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", "row1", 100);
 		t.put("col1", "row2", 200);
 		t.setRowLast("row1");
@@ -427,7 +427,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testRowToString() {
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", "row1", 100);
 		t.put("col2", "row1", 200);
 		t.rowToString("row1");
@@ -439,7 +439,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testSetCol() {
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", "row1", 100);
 		t.put("col2", "row1", 200);
 		t.setCol("col1", 1);
@@ -452,7 +452,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testSetColLast() {
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", "row1", 100);
 		t.put("col2", "row1", 200);
 		t.setColLast("col1");
@@ -465,7 +465,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testSetColName() {
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.getCol("col1");
 		t.setColName("col1", "col1_name");
 		assertEquals("Wrong column name.", "col1_name", t.getCol("col1").getName());
@@ -476,8 +476,8 @@ public class TableTest {
 	 */
 	@Test
 	public void testSetColumns() {
-		Table<String, String> t = new Table<String, String>();
-		LinkedList<String> columns = new LinkedList<String>();
+		Table<String, String> t = new Table<>();
+		LinkedList<String> columns = new LinkedList<>();
 		columns.add("col1");
 		t.setColumns(columns);
 		assertEquals("Wrong column name.", "col1", t.getColumNames().get(0));
@@ -491,7 +491,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testHasRow() {
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", "row1", 100);
 		assertTrue("Missing row.", t.hasRow("row1"));
 		t.removeRow("row1");
@@ -503,10 +503,10 @@ public class TableTest {
 	 */
 	@Test
 	public void testSetKeyTransform() {
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", "row1", 100);
 		t.put("col1", "row2", 200);
-		Hashtable<String,String> keyToKeyTextMap = new Hashtable<String,String>();
+		Hashtable<String,String> keyToKeyTextMap = new Hashtable<>();
 		keyToKeyTextMap.put("row1", "row1_label");
 		keyToKeyTextMap.put("row2", "row2_label");
 		t.setKeyTransform(new MapTransform(keyToKeyTextMap));
@@ -519,10 +519,10 @@ public class TableTest {
 	 */
 	@Test
 	public void testGetString() {
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", "row1", 100);
 		t.put("col1", "row2", 200);
-		Hashtable<String,String> keyToKeyTextMap = new Hashtable<String,String>();
+		Hashtable<String,String> keyToKeyTextMap = new Hashtable<>();
 		keyToKeyTextMap.put("row1", "row1_label");
 		keyToKeyTextMap.put("row2", "row2_label");
 		t.setKeyTransform(new MapTransform(keyToKeyTextMap));
@@ -532,7 +532,7 @@ public class TableTest {
 	
 	@Test
 	public void testAddCategoryTotalToCol() {
-		Table<String,Object> t = new Table<String,Object>();
+		Table<String,Object> t = new Table<>();
 		t.put("Cat", 1, "A");
 		t.put("Val",1 ,2.0);
 		t.put("Cat", 2, "A");
@@ -541,7 +541,7 @@ public class TableTest {
 		t.put("Val",3 ,4.0);
 		t.put("Cat", 4, "B");
 		t.put("Val",4 ,5.0);
-		Hashtable<String,String> sel = new Hashtable<String,String>();
+		Hashtable<String,String> sel = new Hashtable<>();
 		sel.put("A","SumA");
 		sel.put("B","SumB");
 		t.addCategoryTotalToCol("Val", "Cat", sel);
@@ -551,7 +551,7 @@ public class TableTest {
 
 	@Test
 	public void testhasData(){
-		Table<String,String> t = new Table<String,String>();
+		Table<String,String> t = new Table<>();
 		assertFalse(t.hasData());
 		t.put("Value","A",3.0);
 		Number n = t.getNumber("Value", "A");
@@ -562,7 +562,7 @@ public class TableTest {
 	@Test
 	public void testGetHashTable() throws InvalidArgument{
 		
-		Table<String,Integer> t = new Table<String,Integer>();
+		Table<String,Integer> t = new Table<>();
 		
 		for( int i=0;i<10;i++){
 			t.put("lab",i,"value-"+i);
@@ -590,7 +590,7 @@ public class TableTest {
 	
 	@Test
 	public void testSortRows(){
-		Table<String,String> t = new Table<String,String>();
+		Table<String,String> t = new Table<>();
 		t.put("Data","C", Long.valueOf(1000L));
 		t.put("Data","D", Long.valueOf(1000L));
 		t.put("Data","A", Double.valueOf(10.0));
@@ -609,7 +609,7 @@ public class TableTest {
 	
 	@Test
 	public void testSortRowsWithComparator(){
-		Table<String,String> t = new Table<String,String>();
+		Table<String,String> t = new Table<>();
 		t.put("Data","C", Long.valueOf(1000L));
 		t.put("Data","D", Long.valueOf(1000L));
 		t.put("Data","A", Double.valueOf(10.0));
@@ -631,7 +631,7 @@ public class TableTest {
 	
 	@Test
 	public void testMixedSort(){
-		Table<String,String> t = new Table<String,String>();
+		Table<String,String> t = new Table<>();
 		t.put("Data","A", Double.valueOf(10.0));
 		t.put("Data","B", Integer.valueOf(1));
 		t.put("Data","C", Long.valueOf(1000L));
@@ -663,7 +663,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testSetCategoryRow() {
-		Table<String, Object> t = new Table<String, Object>();
+		Table<String, Object> t = new Table<>();
 		t.put("Cat", 1, "A");
 		t.put("Val", 1, 2.0);
 		t.put("Cat", 2, "A");
@@ -672,11 +672,11 @@ public class TableTest {
 		t.put("Val", 3, 4.0);
 		t.put("Cat", 4, "B");
 		t.put("Val", 4, 5.0);
-		Hashtable<String,String> sel = new Hashtable<String,String>();
+		Hashtable<String,String> sel = new Hashtable<>();
 		sel.put("A", "CatA");
 		sel.put("B", "CatB");
 		Transform cat_to_key = new MapTransform(sel);
-		Hashtable<String,String> sel2 = new Hashtable<String,String>();
+		Hashtable<String,String> sel2 = new Hashtable<>();
 		sel2.put("A", "CatA extra text");
 		sel2.put("B", "CatB extra text");		
 		Transform cat_to_val = new MapTransform(sel2);
@@ -690,7 +690,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testPrintKeys() {
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", "row1", 100);
 		t.setKeyName("keys_column");
 		String s = t.toString();
@@ -708,7 +708,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testSetFormat() {
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", "row1", 0.123);
 		NumberFormatTransform f = new NumberFormatTransform(NumberFormat.getIntegerInstance(), "N/A");
 		t.setFormat(f);
@@ -745,7 +745,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testPrintWidth() {
-		Table<String, Object> t = new Table<String, Object>();
+		Table<String, Object> t = new Table<>();
 		t.put("col1", "row1", 0.123);
 		t.put("col1", "row2", "A");
 		Table<String, Object>.Col col1 = t.getCol("col1");
@@ -768,7 +768,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testAddCategoryTotalToCol2() {
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("ValueCol", "row1", 100);
 		t.put("CategoryCol", "row1", "POSITIVE");
 		t.put("ValueCol", "row2", -200);
@@ -785,7 +785,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testAddPercentCol2() {
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", "row1", 60);
 		t.put("col1", "row2", 40);
 		t.addPercentCol("col1", "col1percent", NumberFormat.getPercentInstance());
@@ -800,7 +800,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testTransform() {
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", "row1", 10);
 		t.put("col1", "row2", 20);
 		NumberFormat currencyInstance = NumberFormat.getCurrencyInstance(Locale.UK);
@@ -814,7 +814,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testSetColFormat() {
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", "row1", 10);
 		t.put("col1", "row2", 20);
 		NumberFormat currencyInstance = NumberFormat.getCurrencyInstance(Locale.UK);
@@ -828,7 +828,7 @@ public class TableTest {
 	 */
 	@Test
 	public void testAdd() {
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", "row1", 10);
 		t.put("col1", "row2", null);
 		t.getCol("col1").add("row2", 20);
@@ -839,7 +839,7 @@ public class TableTest {
 	@Test
 	public void testToString(){
 		
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", "row1", "Something");
 		t.put("col1", "row2", "Short");
 		t.put("col2", "row1", "x");

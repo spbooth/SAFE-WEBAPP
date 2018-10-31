@@ -86,20 +86,23 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 	public DumpParser(AppContext conn, boolean map_ids){
 		super(conn);
 		if( map_ids){
-			id_map=new HashMap<String, Map<Integer,Integer>>();
+			id_map=new HashMap<>();
 		}else{
 			id_map=null;
 		}
 	}
 	
+	@Override
 	public void characters(char[] dat, int start, int length) throws SAXException {
 		for(int i=0;i<length;i++){
 			sb.append(dat[i+start]);
 		}
 	}
+	@Override
 	public void endDocument() throws SAXException {
 		
 	}
+	@Override
 	public void endElement(String arg0, String arg1, String arg2)
 			throws SAXException {
 		if( state == State.Record){
@@ -149,7 +152,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 						if( new_id != 0 && id_map != null){
 							Map<Integer,Integer> map = id_map.get(res.getTag());
 							if( map == null ){
-								map = new HashMap<Integer, Integer>();
+								map = new HashMap<>();
 								id_map.put(res.getTag(), map);
 							}
 							map.put(id, new_id);
@@ -216,26 +219,33 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 	public boolean skipRecord(String name,String id) {
 		return false;
 	}
+	@Override
 	public void endPrefixMapping(String arg0) throws SAXException {
 	}
+	@Override
 	public void ignorableWhitespace(char[] arg0, int arg1, int arg2)
 			throws SAXException {
 		
 	}
+	@Override
 	public void processingInstruction(String arg0, String arg1)
 			throws SAXException {
 		
 	}
+	@Override
 	public void setDocumentLocator(Locator arg0) {
 		
 	}
+	@Override
 	public void skippedEntity(String arg0) throws SAXException {
 		
 	}
+	@Override
 	public void startDocument() throws SAXException {
 		state=State.Top;
 		depth=0;
 	}
+	@Override
 	public void startElement(String arg0, String arg1, String name,
 			Attributes arg3) throws SAXException {
 		if( depth > 0){
@@ -359,6 +369,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 	protected IdMode getIdMode() {
 		return IdMode.UseExistingIfPresent;
 	}
+	@Override
 	public void startPrefixMapping(String arg0, String arg1)
 			throws SAXException {
 		

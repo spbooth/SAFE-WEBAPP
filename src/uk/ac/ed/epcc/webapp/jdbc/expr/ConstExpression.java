@@ -43,15 +43,18 @@ public final class ConstExpression<T,R> implements SQLExpression<T>, SQLAccessor
 	    	this.target=target;
 	    	this.log=log;
 	    }
+		@Override
 		public int add(StringBuilder sb, boolean qualify) {
 			sb.append("?");
 			return 1;
 		}
+		@Override
 		public List<PatternArgument> getParameters(List<PatternArgument> list) {
-			list.add(new ConstPatternArgument<T>(target, n,log));
+			list.add(new ConstPatternArgument<>(target, n,log));
 			return list;
 		}
 		
+		@Override
 		public T makeObject(ResultSet rs, int pos) throws DataException, SQLException  {
 			
 			// Note that this function also processes function results like sum(1)
@@ -59,6 +62,7 @@ public final class ConstExpression<T,R> implements SQLExpression<T>, SQLAccessor
 			return Repository.makeTargetObject(target, rs, pos);
 			
 		}
+		@Override
 		public Class<T> getTarget() {
 			return target;
 		}
@@ -66,9 +70,11 @@ public final class ConstExpression<T,R> implements SQLExpression<T>, SQLAccessor
 		public String toString() {
 			return "Const("+n.toString()+")";
 		}
+		@Override
 		public SQLFilter getRequiredFilter() {
 			return null;
 		}
+		@Override
 		public T getValue(R r) {
 			return n;
 		}
@@ -76,10 +82,12 @@ public final class ConstExpression<T,R> implements SQLExpression<T>, SQLAccessor
 		public T getValue(){
 			return n;
 		}
+		@Override
 		public boolean canSet() {
 			
 			return false;
 		}
+		@Override
 		public void setValue(R r, T value) {
 			throw new UnsupportedOperationException("Set not supported");
 			
@@ -112,6 +120,7 @@ public final class ConstExpression<T,R> implements SQLExpression<T>, SQLAccessor
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue#addGroup(java.lang.StringBuilder, boolean)
 		 */
+		@Override
 		public int addGroup(StringBuilder sb, boolean qualify) {
 			// constant does not affect group-by
 			return 0;
@@ -119,6 +128,7 @@ public final class ConstExpression<T,R> implements SQLExpression<T>, SQLAccessor
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue#getGroupParameters(java.util.List)
 		 */
+		@Override
 		public List<PatternArgument> getGroupParameters(
 				List<PatternArgument> list) {
 			return list;

@@ -21,7 +21,6 @@ import java.util.Vector;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.forms.Identified;
 
 
@@ -51,7 +50,7 @@ public abstract class HashLabeller<T,K> extends AbstractContexed implements Labe
 	@SuppressWarnings("unchecked")
 	public HashLabeller(AppContext c) {
 		super(c);
-		map = new HashMap<K,Number>();
+		map = new HashMap<>();
 		label_to_set = new TreeMap<Object,Number>(new Comparator() {
 
 			@Override
@@ -70,7 +69,7 @@ public abstract class HashLabeller<T,K> extends AbstractContexed implements Labe
 				return o1.toString().compareTo(o2.toString());
 			}
 		});
-		labels = new Vector<String>();
+		labels = new Vector<>();
 	}
 
 	/**
@@ -102,6 +101,7 @@ public abstract class HashLabeller<T,K> extends AbstractContexed implements Labe
 	 * 
 	 * @see uk.ac.hpcx.report.TimeChart.LabeledTransform#getLabels()
 	 */
+	@Override
 	public final Vector<String> getLabels() {
 
 		return labels;
@@ -165,6 +165,7 @@ public abstract class HashLabeller<T,K> extends AbstractContexed implements Labe
 	 * 
 	 * @see uk.ac.hpcx.report.TimeChart.LabeledTransform#nSets()
 	 */
+	@Override
 	public final int nSets() {
 
 		return labels.size();

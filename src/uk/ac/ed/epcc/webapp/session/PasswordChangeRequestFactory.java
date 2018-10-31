@@ -94,8 +94,8 @@ public class PasswordChangeRequestFactory<A extends AppUser> extends DataObjectF
 		assert(user != null);
 		
 		// delete any existing requests
-		FilterDelete<PasswordChangeRequest> del = new FilterDelete<PasswordChangeRequest>(res);
-		del.delete(new SQLValueFilter<PasswordChangeRequest>(getTarget(), res, USER_ID, user.getID()));
+		FilterDelete<PasswordChangeRequest> del = new FilterDelete<>(res);
+		del.delete(new SQLValueFilter<>(getTarget(), res, USER_ID, user.getID()));
 		
 		PasswordAuthComposite<A> comp = user_fac.getComposite(PasswordAuthComposite.class);
 		if( comp == null ){
@@ -113,7 +113,7 @@ public class PasswordChangeRequestFactory<A extends AppUser> extends DataObjectF
 		return req;
 	}
 	public PasswordChangeRequest findByTag(String tag) throws DataException{
-		PasswordChangeRequest request = find(new SQLValueFilter<PasswordChangeRequestFactory<A>.PasswordChangeRequest>(getTarget(),res,TAG,tag),true );
+		PasswordChangeRequest request = find(new SQLValueFilter<>(getTarget(),res,TAG,tag),true );
 		if( request == null ){
 			return null;
 		}

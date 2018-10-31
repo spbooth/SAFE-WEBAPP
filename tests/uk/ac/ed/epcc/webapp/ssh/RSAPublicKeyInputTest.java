@@ -31,13 +31,15 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 public class RSAPublicKeyInputTest extends ParseAbstractInputTestCase<String,RsaPublicKeyInput>{
 
 	
+	@Override
 	public RsaPublicKeyInput getInput() {
 		return new RsaPublicKeyInput();
 	}
 
 	
+	@Override
 	public Set<String> getBadParseData() {
-		Set<String> bad_parse = new HashSet<String>();
+		Set<String> bad_parse = new HashSet<>();
 		bad_parse.add("I am a hamster");
 		bad_parse.add("ssh-dss AAAAB3NzaC1kc3MAAACBAMot/qdk4G5WgLUTodzXa8YdvzmvsQsEHRMhgfRtq2DGDXn6QYuO"+
 				"I4ORiXHXLhyaY4Igtc3bj3QFPNNy/tDzFt+ejhknPlgGZtn1W9ye4/b//EBiyUFT/y7ETYP2tvfAhVJn"+
@@ -53,8 +55,9 @@ public class RSAPublicKeyInputTest extends ParseAbstractInputTestCase<String,Rsa
 	}
 
 	
+	@Override
 	public Set<String> getGoodParseData() {
-		Set<String> good = new HashSet<String>();
+		Set<String> good = new HashSet<>();
 		// with and without newline breaks
 		good.add("ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQBRQkTnsRzUM9mLrgEMFk78CLdOxtepxPp1JQSfRc3/A1cy"+
 "D8NV/gxINRNhMIVkIofUexxtLfAfmNRf666SSei/w2kPX9ndOJ32y2OUUKkijJvEdeMEuFido9Kifc79"+
@@ -81,13 +84,15 @@ good.add("ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDXA9/mz912d721UhE0bP5othL0sqWrG6
 	}
 
 	
+	@Override
 	public Set<String> getBadData() {
 		return getBadParseData();
 	}
 
 	
+	@Override
 	public Set<String> getGoodData() {
-		Set<String> good = new HashSet<String>();
+		Set<String> good = new HashSet<>();
 		// only without newline breaks
 		good.add("ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQBRQkTnsRzUM9mLrgEMFk78CLdOxtepxPp1JQSfRc3/A1cy"+
 "D8NV/gxINRNhMIVkIofUexxtLfAfmNRf666SSei/w2kPX9ndOJ32y2OUUKkijJvEdeMEuFido9Kifc79"+

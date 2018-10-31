@@ -32,7 +32,7 @@ public abstract class SetMaker<F, O> extends FilterFinder<F, Set<O>> {
 		setFilter(f);
 		Set<O> set = make();
 		if (set == null) {
-			set = new HashSet<O>();
+			set = new HashSet<>();
 		}
 		return set;
 		

@@ -38,8 +38,8 @@ public abstract class AbstractTransitionFactory<T , K extends TransitionKey<T>> 
 	public AbstractTransitionFactory(AppContext c) {
 		super();
 		this.conn=c;
-    	key_map = new LinkedHashMap<String,K>();
-    	transition_map= new LinkedHashMap<K,Transition<T>>();
+    	key_map = new LinkedHashMap<>();
+    	transition_map= new LinkedHashMap<>();
 	}
 	
 	protected Logger getLogger(){
@@ -56,17 +56,20 @@ public abstract class AbstractTransitionFactory<T , K extends TransitionKey<T>> 
     	key_map.put(key.getName(),key);
     	transition_map.put(key, t);
     }
-    public final K lookupTransition(T target, String name) {
+    @Override
+	public final K lookupTransition(T target, String name) {
 		return key_map.get(name);
 	}
-    public final Transition<T> getTransition(T target, K name) {
+    @Override
+	public final Transition<T> getTransition(T target, K name) {
 		return getTransition(name);
 	}
     public final Transition<T> getTransition(K name) {
 		return transition_map.get(name);
 	}
+	@Override
 	public final Set<K> getTransitions(T target) {
-		LinkedHashSet<K> result = new LinkedHashSet<K>();
+		LinkedHashSet<K> result = new LinkedHashSet<>();
 		for( K key : transition_map.keySet()){
 			Transition<T> t = transition_map.get(key);
 			if( target == null ){
@@ -82,6 +85,7 @@ public abstract class AbstractTransitionFactory<T , K extends TransitionKey<T>> 
 		return result;
 	}
 
+	@Override
 	public final AppContext getContext() {
 		return conn;
 	}	

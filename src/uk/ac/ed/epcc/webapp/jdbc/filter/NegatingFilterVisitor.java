@@ -55,9 +55,9 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 		FilterCombination c = fil.getFilterCombiner();
 		BaseCombineFilter<T> neg;
 		if( c == FilterCombination.AND) {
-			neg = new SQLOrFilter<T>((Class<T>) fil.getTarget());
+			neg = new SQLOrFilter<>((Class<T>) fil.getTarget());
 		}else {
-			neg = new SQLAndFilter<T>((Class<T>) fil.getTarget());
+			neg = new SQLAndFilter<>((Class<T>) fil.getTarget());
 		}
 		for( BaseFilter<T> f : fil.getSet()) {
 			neg.add(f.acceptVisitor(this), false);
@@ -89,7 +89,7 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 */
 	@Override
 	public BaseFilter<T> visitOrFilter(OrFilter<T> fil) throws Exception {
-		AndFilter<T> result = new AndFilter<T>((Class<T>) fil.getTarget());
+		AndFilter<T> result = new AndFilter<>((Class<T>) fil.getTarget());
 		for(BaseFilter f : fil.getSet()) {
 			result.add( (BaseFilter) f.acceptVisitor(this), false);
 		}
@@ -210,7 +210,7 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 */
 	@Override
 	public BaseFilter<T> visitBinaryFilter(BinaryFilter<T> fil) throws Exception {
-		return new GenericBinaryFilter<T>(fac.getTarget(), ! fil.getBooleanResult());
+		return new GenericBinaryFilter<>(fac.getTarget(), ! fil.getBooleanResult());
 	}
 
 	/* (non-Javadoc)

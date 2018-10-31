@@ -62,7 +62,7 @@ public class SQLExpressionFilter<T,V> implements SQLFilter<T>, PatternFilter<T> 
     	if( req == null){
     		return fil;
     	}
-    	return new SQLAndFilter<T>(target,fil,req);
+    	return new SQLAndFilter<>(target,fil,req);
     }
     @SuppressWarnings("unchecked")
 	public static <T,V> SQLFilter<T> getFilter(Class<T> target,SQLExpression<V> expr,V value){
@@ -71,7 +71,7 @@ public class SQLExpressionFilter<T,V> implements SQLFilter<T>, PatternFilter<T> 
     	if( req == null){
     		return fil;
     	}
-    	return new SQLAndFilter<T>(target,fil,req);
+    	return new SQLAndFilter<>(target,fil,req);
     }
     private SQLExpressionFilter(Class<T> target,SQLExpression<V> expr,V value){
 		this.target=target;
@@ -86,11 +86,13 @@ public class SQLExpressionFilter<T,V> implements SQLFilter<T>, PatternFilter<T> 
     	this.value=value;
     }
 
+	@Override
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
 		list=expr.getParameters(list);
 		list.add(new PatternArgument(){
 
 		
+			@Override
 			@SuppressWarnings("unchecked")
 			public void addArg(PreparedStatement stmt, int pos)
 					throws SQLException {
@@ -101,14 +103,17 @@ public class SQLExpressionFilter<T,V> implements SQLFilter<T>, PatternFilter<T> 
 				}
 			}
 
+			@Override
 			public boolean canLog() {
 				return true;
 			}
 
+			@Override
 			public Object getArg() {
 				return value;
 			}
 
+			@Override
 			public String getField() {
 				if( expr instanceof FieldValue){
 					return ((FieldValue)expr).getFieldName();
@@ -120,6 +125,7 @@ public class SQLExpressionFilter<T,V> implements SQLFilter<T>, PatternFilter<T> 
 		return list;
 	}
 
+	@Override
 	public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify) {
 		sb.append("(");
 		expr.add(sb,qualify);
@@ -167,12 +173,14 @@ public class SQLExpressionFilter<T,V> implements SQLFilter<T>, PatternFilter<T> 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
+	@Override
 	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 		return vis.visitPatternFilter(this);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter#accept(java.lang.Object)
 	 */
+	@Override
 	public void accept(T o) {
 		
 		
@@ -180,10 +188,12 @@ public class SQLExpressionFilter<T,V> implements SQLFilter<T>, PatternFilter<T> 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
+	@Override
 	public Class<T> getTarget() {
 		return target;
 	}
 	
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("SQLExpressionFilter(");

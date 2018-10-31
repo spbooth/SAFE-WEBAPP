@@ -40,14 +40,15 @@ public class UnmodifiableInputInterfaceTestImpl<T,I extends Input<T>,X extends T
 		this.target=target;
 	}
 
+	@Override
 	@Test
 	public void testWebParse() throws Exception{
 		I input = target.getInput();
 		
 		HTMLForm f = new HTMLForm(target.getContext());
 		f.addInput("input", "input", input);
-		Map<String,Object> params = new HashMap<String,Object>();
-		Map<String,String> errors = new HashMap<String, String>();
+		Map<String,Object> params = new HashMap<>();
+		Map<String,String> errors = new HashMap<>();
 		params.put("input", "BadValue");
 		for(T data : target.getGoodData()){
 			input.setValue(data);

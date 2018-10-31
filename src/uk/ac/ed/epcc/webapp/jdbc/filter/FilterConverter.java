@@ -25,7 +25,7 @@ public class FilterConverter<T> implements FilterVisitor<SQLFilter<T>, T> {
 		if( fil instanceof SQLFilter || fil == null){
 			return (SQLFilter<X>) fil;
 		}
-		FilterConverter<X> conv = new FilterConverter<X>();
+		FilterConverter<X> conv = new FilterConverter<>();
 		try {
 			return fil.acceptVisitor(conv);
 		}catch( NoSQLFilterException nsql){
@@ -38,6 +38,7 @@ public class FilterConverter<T> implements FilterVisitor<SQLFilter<T>, T> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
 	 */
+	@Override
 	public SQLFilter<T> visitPatternFilter(PatternFilter<T> fil) throws NoSQLFilterException {
 		if( fil instanceof SQLFilter){
 			return (SQLFilter<T>) fil;
@@ -48,6 +49,7 @@ public class FilterConverter<T> implements FilterVisitor<SQLFilter<T>, T> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitSQLCombineFilter(uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter)
 	 */
+	@Override
 	public SQLFilter<T> visitSQLCombineFilter(
 			BaseSQLCombineFilter<T> fil) throws NoSQLFilterException {
 		return  fil;
@@ -56,6 +58,7 @@ public class FilterConverter<T> implements FilterVisitor<SQLFilter<T>, T> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAndFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter)
 	 */
+	@Override
 	public SQLFilter<T> visitAndFilter(AndFilter<T> fil) throws NoSQLFilterException {
 		return fil.getSQLFilter();
 	}
@@ -63,6 +66,7 @@ public class FilterConverter<T> implements FilterVisitor<SQLFilter<T>, T> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitOrderFilter(uk.ac.ed.epcc.webapp.jdbc.filter.OrderFilter)
 	 */
+	@Override
 	public SQLFilter<T> visitOrderFilter(SQLOrderFilter<T> fil) throws NoSQLFilterException {
 		return fil;
 	}
@@ -70,6 +74,7 @@ public class FilterConverter<T> implements FilterVisitor<SQLFilter<T>, T> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter)
 	 */
+	@Override
 	public SQLFilter<T> visitAcceptFilter(AcceptFilter<T> fil) throws NoSQLFilterException {
 		throw new NoSQLFilterException("Cannot convert AcceptFilter to SQL");
 	}
@@ -77,6 +82,7 @@ public class FilterConverter<T> implements FilterVisitor<SQLFilter<T>, T> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitJoinFilter(uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter)
 	 */
+	@Override
 	public SQLFilter<T> visitJoinFilter(JoinFilter<T> fil) throws NoSQLFilterException {
 		if( fil instanceof SQLFilter){
 			return (SQLFilter<T>) fil;
@@ -100,7 +106,7 @@ public class FilterConverter<T> implements FilterVisitor<SQLFilter<T>, T> {
 		if( fil instanceof SQLFilter){
 			return (SQLFilter<T>) fil;
 		}
-		return new GenericBinaryFilter<T>((Class<T>) fil.getTarget(), fil.getBooleanResult());
+		return new GenericBinaryFilter<>((Class<T>) fil.getTarget(), fil.getBooleanResult());
 	}
 
 	/* (non-Javadoc)

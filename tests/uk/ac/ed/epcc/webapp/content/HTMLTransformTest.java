@@ -31,7 +31,7 @@ public class HTMLTransformTest {
 	 */
 	@Test
 	public void testConvert1() {
-		HTMLTransform<String, String> t = new HTMLTransform<String, String>();
+		HTMLTransform<String, String> t = new HTMLTransform<>();
 		Assert.assertEquals(3.14, t.convert(3.14));
 	}
 	
@@ -40,7 +40,7 @@ public class HTMLTransformTest {
 	 */
 	@Test
 	public void testConvert2() {
-		HTMLTransform<String, String> t = new HTMLTransform<String, String>();
+		HTMLTransform<String, String> t = new HTMLTransform<>();
 		Assert.assertEquals(12, t.convert(null, null, null, 12));
 		HtmlSpaceGenerator g = (HtmlSpaceGenerator) t.convert(null, null, null, "test text");
 		HtmlPrinter builder = new HtmlPrinter();

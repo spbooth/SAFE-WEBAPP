@@ -47,7 +47,7 @@ public void testCreate(FormCreator f){
 @SuppressWarnings("unchecked")
 public <T> void testUpdate(FormUpdate<T> f) throws Exception{
 	  HTMLForm form = new HTMLForm(ctx);
-	  UpdateForm<T> u = new UpdateForm<T>("test",f);
+	  UpdateForm<T> u = new UpdateForm<>("test",f);
 	  u.buildSelectForm(form);
 	  form.clear();
 	  if( u instanceof StandAloneFormUpdate){

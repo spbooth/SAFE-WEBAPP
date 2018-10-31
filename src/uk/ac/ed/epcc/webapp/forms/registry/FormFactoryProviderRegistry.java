@@ -48,6 +48,7 @@ public abstract class FormFactoryProviderRegistry<T extends FormFactoryProvider>
 		super(conn);
 	}
 	
+	@Override
 	@SuppressWarnings("unchecked")
 	public TransitionProvider getTransitionProvider(String name){
 		T provider = getMap().get(name);
@@ -59,7 +60,7 @@ public abstract class FormFactoryProviderRegistry<T extends FormFactoryProvider>
 	
 	
 	public TransitionProvider<FormOperations,T> getTransitionProvider(FormFactoryProvider<T> provider){
-	    return new FormFactoryProviderTransitionProvider<T>(conn, getTag(provider), provider);
+	    return new FormFactoryProviderTransitionProvider<>(conn, getTag(provider), provider);
 		
 	}
 	
@@ -94,7 +95,7 @@ public Iterator<T> getTypes(){
  * @return Iterator<T>
  */
 public  Iterator<T> getUpdaters(SessionService p){
-	Set<T> l = new TreeSet<T>();
+	Set<T> l = new TreeSet<>();
 	for(Iterator<T> it=getTypes();it.hasNext();){
 		T f = it.next();
 		if( f.canUpdate(p)){
@@ -109,7 +110,7 @@ public  Iterator<T> getUpdaters(SessionService p){
  * @return Iterator<FormType>
  */
 public  Iterator<T> getCreators(SessionService p){
-	Set<T> l = new TreeSet<T>();
+	Set<T> l = new TreeSet<>();
 	for(Iterator<T> it=getTypes();it.hasNext();){
 		T f = it.next();
 		if( f.canCreate(p)){
@@ -156,6 +157,7 @@ public static String getType(String tag){
 	return tag.substring(sep+1);
 }
 
+@Override
 public ContentBuilder addContent(ContentBuilder builder) {
 	ContentBuilder content = builder.getPanel("block");
 	content.addHeading(2, getTitle()+" Create/Edit actions");

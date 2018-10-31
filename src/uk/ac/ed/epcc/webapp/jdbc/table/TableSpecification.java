@@ -47,21 +47,21 @@ public class TableSpecification {
 	private final Pattern field_pattern = Pattern.compile("[A-Za-z][A-Za-z0-9_]*");
 	public TableSpecification(String key){
 		this.primary_key=key;
-		all_fields=new LinkedHashMap<String, FieldType>();
-		required_field_names=new HashSet<String>();
+		all_fields=new LinkedHashMap<>();
+		required_field_names=new HashSet<>();
 		
-		indexes=new LinkedHashSet<IndexType>();
+		indexes=new LinkedHashSet<>();
 	}
 	public TableSpecification(){
 		this("PrimaryRecordID");
 	}
 	public TableSpecification(TableSpecification spec){
 		this.primary_key=spec.primary_key;
-		all_fields=new LinkedHashMap<String, FieldType>();
-		required_field_names=new HashSet<String>();
+		all_fields=new LinkedHashMap<>();
+		required_field_names=new HashSet<>();
 		all_fields.putAll(spec.all_fields);
 		required_field_names.addAll(spec.required_field_names);
-		indexes=new LinkedHashSet<IndexType>();
+		indexes=new LinkedHashSet<>();
 		for(IndexType i: spec.indexes){
 			i.copy(this);
 		}
@@ -151,7 +151,7 @@ public class TableSpecification {
 	public Set<String> getFieldNames(){
 		// ordered set in the canonical order
 		// we want promoted fields to still retain their original order
-		LinkedHashSet<String> result = new LinkedHashSet<String>();
+		LinkedHashSet<String> result = new LinkedHashSet<>();
 		for(String name : all_fields.keySet()){
 			if( required_field_names.contains(name)){
 				result.add(name);
@@ -162,7 +162,7 @@ public class TableSpecification {
 	public Set<String> getOptionalFieldNames(){
 		// ordered set in the canonical order
 		// we want promoted fields to still retain their original order
-		LinkedHashSet<String> result = new LinkedHashSet<String>();
+		LinkedHashSet<String> result = new LinkedHashSet<>();
 		for(String name : all_fields.keySet()){
 			if( ! required_field_names.contains(name)){
 				result.add(name);
@@ -192,7 +192,7 @@ public class TableSpecification {
 	
 	public abstract class IndexType {
 		private final String name;
-		private LinkedHashSet<String> index_fields = new LinkedHashSet<String>();
+		private LinkedHashSet<String> index_fields = new LinkedHashSet<>();
 		public IndexType(String name, String ...strings) throws InvalidArgument{
 			this.name=name;
 			for(String s : strings){

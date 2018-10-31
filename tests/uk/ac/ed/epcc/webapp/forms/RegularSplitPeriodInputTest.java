@@ -25,21 +25,24 @@ import uk.ac.ed.epcc.webapp.time.RegularSplitPeriod;
 
 public class RegularSplitPeriodInputTest extends MultiInputTestBase<RegularSplitPeriod,Input,RegularPeriodInput> {
 
+	@Override
 	@SuppressWarnings("deprecation")
 	public Set<RegularSplitPeriod> getGoodData() throws Exception {
-		HashSet<RegularSplitPeriod> result = new HashSet<RegularSplitPeriod>();
+		HashSet<RegularSplitPeriod> result = new HashSet<>();
 		
 		result.add(new RegularSplitPeriod(new Date(105,11,12),new Date(105,11,15),4));
 		
 		return result;
 	}
 
+	@Override
 	public Set<RegularSplitPeriod> getBadData() throws Exception {
-		HashSet<RegularSplitPeriod> result = new HashSet<RegularSplitPeriod>();
+		HashSet<RegularSplitPeriod> result = new HashSet<>();
 		
 		return result;
 	}
 
+	@Override
 	public RegularPeriodInput getInput() throws Exception {
 		return new RegularPeriodInput();
 	}

@@ -59,7 +59,7 @@ public class FilterPathParser<T extends DataObject> {
 	
 	
 	public SQLFilter<T> parseFilter(LinkedList<String> path) throws ParseException{
-		return parseFilter(new SQLAndFilter<T>(target),path);
+		return parseFilter(new SQLAndFilter<>(target),path);
 	}
 	/** parse the path generating a {@link SQLFilter}
 	 * 
@@ -77,9 +77,9 @@ public class FilterPathParser<T extends DataObject> {
 			if( p.equals(")")){
 				return base;
 			}else if( p.equals("AND(")){
-				base.addFilter(parseFilter(new SQLAndFilter<T>(target), path));
+				base.addFilter(parseFilter(new SQLAndFilter<>(target), path));
 			}else if( p.equals("OR(")){
-				base.addFilter(parseFilter(new SQLOrFilter<T>(target), path));
+				base.addFilter(parseFilter(new SQLOrFilter<>(target), path));
 			}else if( index > 0  && index < (p.length()-1)){
 				String name=p.substring(0, index);
 				String value=p.substring(index+1);
@@ -97,7 +97,7 @@ public class FilterPathParser<T extends DataObject> {
 					SQLMatcher<T> m = matchers.get(name);
 					base.addFilter(m.getSQLFilter(target, res, name, obj));
 				}else if( res.hasField(name)){
-					base.addFilter(new SQLValueFilter<T>(target, res, name, obj));
+					base.addFilter(new SQLValueFilter<>(target, res, name, obj));
 				}else{
 					throw new ParseException("Invalid field "+name);
 				}

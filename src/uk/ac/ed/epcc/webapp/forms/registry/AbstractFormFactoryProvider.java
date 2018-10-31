@@ -150,7 +150,7 @@ public abstract class AbstractFormFactoryProvider<F extends Contexed, T> impleme
 	 * 
 	 * @param c AppContest
 	 * @return FormUpdate or null
-	 * @throws DataFault
+	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
 	public FormUpdate<T> getFormUpdate(AppContext c) throws Exception{

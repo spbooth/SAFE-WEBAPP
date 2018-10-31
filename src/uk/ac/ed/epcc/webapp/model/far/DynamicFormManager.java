@@ -345,8 +345,8 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 	@Override
 	protected Map<String, Object> getSelectors() {
 		Map<String, Object> selectors = super.getSelectors();
-		ClassInput<CompleteVisitor> input =  new ClassInput<CompleteVisitor>(getContext(), CompleteVisitor.class);
-		OptionalListInputWrapper<String, Class<? extends CompleteVisitor>> optional_input = new OptionalListInputWrapper<String,Class<? extends CompleteVisitor>>(input,"use default");
+		ClassInput<CompleteVisitor> input =  new ClassInput<>(getContext(), CompleteVisitor.class);
+		OptionalListInputWrapper<String, Class<? extends CompleteVisitor>> optional_input = new OptionalListInputWrapper<>(input,"use default");
 		optional_input.setOptional(true);
 		selectors.put(VALIDATING_VISITOR_FIELD, optional_input);
 		
@@ -380,7 +380,7 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 		if( path instanceof LinkedList){
 			list=(LinkedList<String>) path;
 		}else{
-			list=new LinkedList<String>(path);
+			list=new LinkedList<>(path);
 		}
 		
 		F form = find(Integer.parseInt(list.pop()));
@@ -394,7 +394,7 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 		}
 		
 		XMLPrinter printer = new XMLPrinter();
-		XMLVisitor<XMLPrinter> vis = new XMLVisitor<XMLPrinter>(getContext(), printer);
+		XMLVisitor<XMLPrinter> vis = new XMLVisitor<>(getContext(), printer);
 		String name;
 		
 		if( list.isEmpty() ){

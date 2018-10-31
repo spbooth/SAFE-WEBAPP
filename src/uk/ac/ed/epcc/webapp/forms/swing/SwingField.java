@@ -93,6 +93,7 @@ public class SwingField<I>  {
 			input = i;
 		}
 
+		@Override
 		public void itemStateChanged(ItemEvent e) {
 			clearError();
 			if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -114,6 +115,7 @@ public class SwingField<I>  {
 			input = i;
 		}
 
+		@Override
 		public void itemStateChanged(ItemEvent e) {
 			clearError();
 			if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -137,6 +139,7 @@ public class SwingField<I>  {
 			input = i;
 		}
 
+		@Override
 		@SuppressWarnings("unchecked")
 		public void itemStateChanged(ItemEvent e) {
 			if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -170,10 +173,12 @@ public class SwingField<I>  {
 			input = i;
 		}
 
+		@Override
 		public void focusGained(FocusEvent e) {
 			
 		}
 
+		@Override
 		public void focusLost(FocusEvent ev) {
 			JTextComponent c = (JTextComponent) ev.getSource();
 			String text = c.getText();
@@ -203,6 +208,7 @@ public class SwingField<I>  {
 			input = i;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			textChanged(input, e);
@@ -233,6 +239,7 @@ public class SwingField<I>  {
 			
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			if("open_file".equals(arg0.getActionCommand())){
 				JFileChooser chooser = SwingFormComponentListener.getChooser(conn);
@@ -255,7 +262,7 @@ public class SwingField<I>  {
 
 	protected SwingField(AppContext conn,Field<I> field) {
 		this.field=field;
-		components = new Hashtable<Input,JComponent>();
+		components = new Hashtable<>();
 		this.conn=conn;
 		//this.log = conn.getService(LoggerService.class).getLogger(getClass());
 	}
@@ -267,6 +274,7 @@ public class SwingField<I>  {
 	}
 	public class MakeComponentVisitor implements InputVisitor<JComponent>{
 		
+		@Override
 		public JComponent visitBinaryInput(BinaryInput checkBoxInput)
 				throws Exception {
 			JCheckBox cb = new JCheckBox();
@@ -275,6 +283,7 @@ public class SwingField<I>  {
 			return cb;
 		}
 
+		@Override
 		public <V,T extends Input> JComponent visitMultiInput(MultiInput<V,T> multiInput)
 				throws Exception {
 			JPanel p = new JPanel();
@@ -292,6 +301,7 @@ public class SwingField<I>  {
 			return p;
 		}
 
+		@Override
 		@SuppressWarnings("unchecked")
 		public JComponent visitListInput(ListInput listInput) throws Exception {
 			JComboBox box = new JComboBox();
@@ -314,11 +324,12 @@ public class SwingField<I>  {
 			box.addItemListener(new ListItemListener<Object,Object>(listInput));
 			return box;
 		}
+		@Override
 		public JComponent visitRadioButtonInput(ListInput listInput) throws Exception {
 			
 			ButtonGroup   group = new ButtonGroup();
 			
-			button_map = new HashMap<Object, JRadioButtonMenuItem>();
+			button_map = new HashMap<>();
 				JMenu menu = new JMenu();
 
 				if( listInput instanceof OptionalListInput){
@@ -339,6 +350,7 @@ public class SwingField<I>  {
 			
 		}
 
+		@Override
 		public JComponent visitLengthInput(LengthInput input) throws Exception {
 			String def = null;
 			Object o = input.getValue();
@@ -384,11 +396,13 @@ public class SwingField<I>  {
 			return j;
 		}
 
+		@Override
 		public JComponent visitUnmodifyableInput(UnmodifiableInput input)
 				throws Exception {
 			return new JLabel(input.getLabel());
 		}
 
+		@Override
 		public JComponent visitFileInput(FileInput input) throws Exception {
 			JButton button = new JButton("Select File");
 			button.setActionCommand("open_file");
@@ -396,6 +410,7 @@ public class SwingField<I>  {
 			return button;
 		}
 
+		@Override
 		public JComponent visitPasswordInput(PasswordInput input)
 				throws Exception {
 			JPasswordField p = new JPasswordField();
@@ -485,6 +500,7 @@ public class SwingField<I>  {
 	 */
 	public class SetComponentVisitor implements InputVisitor<Object>{
 
+		@Override
 		public Object visitBinaryInput(BinaryInput checkBoxInput)
 				throws Exception {
 			JCheckBox box = (JCheckBox) components.get(checkBoxInput);
@@ -492,6 +508,7 @@ public class SwingField<I>  {
 			return null;
 		}
 
+		@Override
 		public Object visitMultiInput(MultiInput input) throws Exception {
 			for (Iterator it = input.getInputs(); it.hasNext();) {
 				Input<?> i = (Input) it.next();
@@ -500,6 +517,7 @@ public class SwingField<I>  {
 			return null;
 		}
 
+		@Override
 		public <V,T>Object visitListInput(ListInput<V,T> input) throws Exception {
 			V value = input.getValue();
 			Object item;
@@ -517,6 +535,7 @@ public class SwingField<I>  {
 			
 			return null;
 		}
+		@Override
 		public <V,T>Object visitRadioButtonInput(ListInput<V,T> input) throws Exception {
 			V value = input.getValue();
 			Object item;
@@ -541,6 +560,7 @@ public class SwingField<I>  {
 			
 			return null;
 		}
+		@Override
 		public Object visitLengthInput(LengthInput input) throws Exception {
 			String value=input.getString();
 			if (value == null) {
@@ -550,6 +570,7 @@ public class SwingField<I>  {
 			return null;
 		}
 
+		@Override
 		public Object visitUnmodifyableInput(UnmodifiableInput input)
 				throws Exception {
 			JLabel lab = (JLabel) components.get(input);
@@ -557,11 +578,13 @@ public class SwingField<I>  {
 			return null;
 		}
 
+		@Override
 		public Object visitFileInput(FileInput input) throws Exception {
 			
 			return null;
 		}
 
+		@Override
 		public Object visitPasswordInput(PasswordInput input) throws Exception {
 			JPasswordField jpf = (JPasswordField) components.get(input);
 			jpf.setText(input.getString());

@@ -31,23 +31,26 @@ ListInputInterfaceTest<String, Class<? extends DataObjectFactory>, ClassInput<Da
 {
 	
 
-	public ListInputInterfaceTest<String, Class<? extends DataObjectFactory>, ClassInput<DataObjectFactory>, ClassInputTest> list_test = new ListInputInterfaceTestImpl<String, Class<? extends DataObjectFactory>, ClassInput<DataObjectFactory>, ClassInputTest>(this);
+	public ListInputInterfaceTest<String, Class<? extends DataObjectFactory>, ClassInput<DataObjectFactory>, ClassInputTest> list_test = new ListInputInterfaceTestImpl<>(this);
 
+	@Override
 	public Set<String> getGoodData() throws Exception {
-		Set<String> result = new HashSet<String>();
+		Set<String> result = new HashSet<>();
 		result.add("AppUserFactory");
 		return result;
 	}
 
+	@Override
 	public Set<String> getBadData() throws Exception {
-		Set<String> result = new HashSet<String>();
+		Set<String> result = new HashSet<>();
 		result.add("Fred");
 		result.add("Date");
 		return result;
 	}
 
+	@Override
 	public ClassInput<DataObjectFactory> getInput() throws Exception {
-		return new ClassInput<DataObjectFactory>(ctx, DataObjectFactory.class);
+		return new ClassInput<>(ctx, DataObjectFactory.class);
 	}
 	
 	@Test

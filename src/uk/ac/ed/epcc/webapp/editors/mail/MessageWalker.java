@@ -108,7 +108,7 @@ public class MessageWalker {
 	static int MAXLENGTH=100;
 	public MessageWalker(AppContext conn){
 		this.conn=conn;
-		args=new LinkedList<String>();
+		args=new LinkedList<>();
 		target=null;
 		//log= conn.getLogger(getClass());
 	}
@@ -125,7 +125,7 @@ public class MessageWalker {
 		if( message_level > 0){
 			throw new WalkerException("Cannot set target mid-walk");
 		}
-		this.target = new LinkedList<String>();
+		this.target = new LinkedList<>();
 		if( src_target != null ){
 			for( String path : src_target){
 				if( path.equals(EXTRA_TAG_X)){
@@ -148,10 +148,10 @@ public class MessageWalker {
 		return current_message;
 	}
 	public List<String> getPath(){
-		return  new LinkedList<String>(args);
+		return  new LinkedList<>(args);
 	}
 	public void setTarget(List<String> target){
-		this.target = new LinkedList<String>(target);
+		this.target = new LinkedList<>(target);
 	}
 	/** Are we in a nested message
 	 * 
@@ -468,7 +468,7 @@ protected  boolean showAsLink(MimePart parent, String string) {
  * @return combined path
  */
 public static LinkedList<String> addPath(LinkedList<String> path, String ...extra){
-	LinkedList<String> result = new LinkedList<String>();
+	LinkedList<String> result = new LinkedList<>();
 	if( path != null){
 		result.addAll(path);
 	}

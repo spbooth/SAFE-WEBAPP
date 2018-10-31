@@ -29,10 +29,10 @@ OptionalInputInterfaceTest<T, I, AbstractInputTestCase<T, I>>
 {
 	
 
-	public InputInterfaceTest<T, I, AbstractInputTestCase<T, I>> input_test = new InputInterfaceTestImpl<T, I, AbstractInputTestCase<T,I>>(this);
+	public InputInterfaceTest<T, I, AbstractInputTestCase<T, I>> input_test = new InputInterfaceTestImpl<>(this);
 	
 
-	public OptionalInputInterfaceTest<T, I, AbstractInputTestCase<T, I>> optional_input_test = new OptionalInputInterfaceTestImpl<T, I, AbstractInputTestCase<T,I>>(this);
+	public OptionalInputInterfaceTest<T, I, AbstractInputTestCase<T, I>> optional_input_test = new OptionalInputInterfaceTestImpl<>(this);
 
 
 	@Override

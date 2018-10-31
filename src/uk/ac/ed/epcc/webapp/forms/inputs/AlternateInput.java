@@ -81,6 +81,7 @@ public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> implements Op
 	}
 
 	
+	@Override
 	public T convert(Object v) throws TypeError{
 		TypeError e=null;
 		// normally take this form the first input
@@ -117,6 +118,7 @@ public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> implements Op
 		super.addInput(sub_key, label,i);
 	}
 	
+	@Override
 	public void validate() throws FieldException {
 		for(Iterator<Input<T>> it = getInputs();it.hasNext();){
 			Input<? extends T> i = it.next();
@@ -142,16 +144,19 @@ public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> implements Op
 		}
 	}
 
+	@Override
 	public boolean isOptional() {
 	  return optional;
 	}
 
+	@Override
 	public void setOptional(boolean opt) {
 		optional=opt;
 	}
 
+	@Override
 	public Map<String, Object> getMap() {
-		Map<String,Object> m = new HashMap<String,Object>();
+		Map<String,Object> m = new HashMap<>();
 		for(Iterator<Input<T>> it = getInputs(); it.hasNext();){
 			Input<T> i = it.next();
 			if( i instanceof ParseMapInput){
@@ -171,6 +176,7 @@ public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> implements Op
 		return m;
 	}
 
+	@Override
 	public boolean parse(Map<String, Object> v) throws ParseException {
 		String default_value = (String) v.get(getKey()); // value corresponding to this input
 		boolean result = false;

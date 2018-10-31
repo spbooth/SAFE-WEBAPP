@@ -99,7 +99,7 @@ public class NumberTableFactory extends DataObjectFactory<NumberTableFactory.Num
 		 */
 		public ReductionFinder( SQLExpression<Double> exp) {
 			super();
-			setMapper(new ReductionMapper<Double>(getContext(), Double.class, Reduction.SUM, 0.0, exp));
+			setMapper(new ReductionMapper<>(getContext(), Double.class, Reduction.SUM, 0.0, exp));
 		}
 	}
 	public Double getSum(SQLFilter<NumberTable> fil,SQLExpression<Double> expr) throws DataException {

@@ -23,8 +23,6 @@ import javax.mail.internet.MimeMessage;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
-import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
-import uk.ac.ed.epcc.webapp.email.inputs.EmailListInput;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
@@ -80,6 +78,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageLinker#getMessageProvider()
 		 */
+		@Override
 		public MessageProvider getMessageProvider() throws Exception {
 			return target.getHandler().getMessageProvider();
 		}
@@ -87,19 +86,21 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageLinker#addLink(uk.ac.ed.epcc.webapp.content.ContentBuilder, java.util.List, java.lang.String, java.lang.String)
 		 */
+		@Override
 		public void addLink(ContentBuilder builder, List<String> args,
 				String file, String text) {
 			MailTarget dest = new MailTarget(target.getHandler(), target.getMessageHash(), args);
-			builder.addLink(conn, text, new ChainedTransitionResult<MailTarget, EditAction>(EmailTransitionProvider.this, dest, EditAction.Serve));
+			builder.addLink(conn, text, new ChainedTransitionResult<>(EmailTransitionProvider.this, dest, EditAction.Serve));
 		}
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageEditLinker#addButton(uk.ac.ed.epcc.webapp.content.ContentBuilder, uk.ac.ed.epcc.webapp.editors.mail.EditAction, java.util.List, java.lang.String)
 		 */
+		@Override
 		public void addButton(ContentBuilder sb, EditAction action,
 				List<String> path, String text) {
 			MailTarget dest = new MailTarget(target.getHandler(), target.getMessageHash(), path);
-			sb.addButton(conn, text, new ChainedTransitionResult<MailTarget, EditAction>(EmailTransitionProvider.this, dest, action));
+			sb.addButton(conn, text, new ChainedTransitionResult<>(EmailTransitionProvider.this, dest, action));
 
 			
 		}
@@ -113,6 +114,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 	}
 	public abstract class FormContentMailTransition extends FormMailTransition implements CustomFormContent<MailTarget>{
 
+		@Override
 		public <X extends ContentBuilder> X addFormContent(X cb,
 				SessionService<?> op, Form f, MailTarget target) {
 			AppContext conn = op.getContext();
@@ -133,6 +135,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
 		 */
+		@Override
 		public FormResult doTransition(MailTarget target, AppContext c)
 				throws TransitionException {
 			try {
@@ -149,6 +152,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
 		 */
+		@Override
 		public FormResult doTransition(MailTarget target, AppContext c)
 				throws TransitionException {
 			try {
@@ -165,13 +169,14 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
 		 */
+		@Override
 		public FormResult doTransition(MailTarget target, AppContext c)
 				throws TransitionException {
 			try {
 				MessageComposer comp = (MessageComposer)target.getHandler();
 				comp.repopulate(c.getService(SessionService.class));
 				target = new MailTarget(comp, comp.getMessageProvider().getMessageHash(), null);
-				return new ViewTransitionResult<MailTarget, EditAction>(EmailTransitionProvider.this, target);
+				return new ViewTransitionResult<>(EmailTransitionProvider.this, target);
 			} catch (Exception e) {
 				getLogger().error("Error reverting message",e);
 				throw new TransitionException("StartOver failed");
@@ -233,7 +238,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 				if( auto_send ){
 					return ((MessageComposer)dest.getHandler()).send(c.getService(SessionService.class));
 				}
-				return new ViewTransitionResult<MailTarget, EditAction>(EmailTransitionProvider.this, dest);
+				return new ViewTransitionResult<>(EmailTransitionProvider.this, dest);
 			}catch(Exception e){
 				throw new ActionException("Invalid input", e);
 			}
@@ -244,6 +249,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.FormTransition#buildForm(uk.ac.ed.epcc.webapp.forms.Form, java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
 		 */
+		@Override
 		public void buildForm(Form f, MailTarget target, AppContext conn)
 				throws TransitionException {
 			MessageComposer composer =null;
@@ -278,6 +284,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
 		 */
+		@Override
 		public FormResult doTransition(MailTarget target, AppContext c)
 				throws TransitionException {
 			try{
@@ -298,7 +305,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 						target = new MailTarget(target.getHandler(), target.getMessageHash(), null);
 					}
 				}
-				return new ViewTransitionResult<MailTarget, EditAction>(EmailTransitionProvider.this, target);
+				return new ViewTransitionResult<>(EmailTransitionProvider.this, target);
 			}catch(Exception e){
 				getLogger().error("Error in direct edit",e);
 				throw new TransitionException("Internal error");
@@ -310,6 +317,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.FormTransition#buildForm(uk.ac.ed.epcc.webapp.forms.Form, java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
 		 */
+		@Override
 		public void buildForm(Form f, MailTarget target, AppContext conn)
 				throws TransitionException {
 			f.addInput(DATA_FORM_FIELD, "Attach file", new FileInput());
@@ -331,6 +339,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.FormTransition#buildForm(uk.ac.ed.epcc.webapp.forms.Form, java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
 		 */
+		@Override
 		public void buildForm(Form f, MailTarget target, AppContext conn)
 				throws TransitionException {
 			TextInput input = new TextInput();
@@ -347,6 +356,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.FormTransition#buildForm(uk.ac.ed.epcc.webapp.forms.Form, java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
 		 */
+		@Override
 		public void buildForm(Form f, MailTarget target, AppContext conn)
 				throws TransitionException {
 			TextInput input = new TextInput();
@@ -368,9 +378,10 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
 		 */
+		@Override
 		public FormResult doTransition(MailTarget target, AppContext c)
 				throws TransitionException {
-			return new ViewTransitionResult<MailTarget, EditAction>(EmailTransitionProvider.this,target);
+			return new ViewTransitionResult<>(EmailTransitionProvider.this,target);
 		}
 		
 	}
@@ -379,6 +390,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.Transition#getResult(uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor)
 		 */
+		@Override
 		public FormResult getResult(TransitionVisitor<MailTarget> vis)
 				throws TransitionException {
 			MessageCreator creator = (MessageCreator) messageFactory;
@@ -392,6 +404,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition#buildForm(uk.ac.ed.epcc.webapp.forms.Form, uk.ac.ed.epcc.webapp.AppContext)
 		 */
+		@Override
 		public void buildForm(Form f, AppContext c) throws TransitionException {
 			MessageCreator creator = (MessageCreator) messageFactory;
 			SessionService<?> operator = c.getService(SessionService.class);
@@ -401,6 +414,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
 		 */
+		@Override
 		public FormResult doTransition( AppContext c)
 				throws TransitionException {
 			MessageCreator creator = (MessageCreator) messageFactory;
@@ -420,6 +434,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 	}
 
 	
+	@Override
 	public boolean canView(MailTarget target, SessionService<?> sess) {
 		if( target == null){
 			return false;
@@ -430,17 +445,20 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 	}
 
 	
+	@Override
 	public String getTargetName() {
 		return "Email"+TransitionFactoryCreator.TYPE_SEPERATOR+messageFactory.getTag();
 	}
 
 
 	
+	@Override
 	public <X extends ContentBuilder> X getSummaryContent(AppContext c, X cb,
 			MailTarget target) {
 		return cb;
 	}
 	
+	@Override
 	public MailTarget getTarget(LinkedList<String> path) {
 		
 		if( path.size() < 2 ){
@@ -465,8 +483,9 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 	}
 
 	
+	@Override
 	public LinkedList<String> getID(MailTarget target) {
-		LinkedList<String> result = new LinkedList<String>();
+		LinkedList<String> result = new LinkedList<>();
 		MessageHandler handler = target.getHandler();
 		result.add(Integer.toString(handler.getID()));
 		result.add(Integer.toString(target.getMessageHash()));
@@ -475,6 +494,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 	}
 
 	
+	@Override
 	public boolean allowTransition(AppContext c, MailTarget target, EditAction key) {
 		SessionService<?> operator = c.getService(SessionService.class);
 		if( operator == null || ! operator.haveCurrentUser()){
@@ -498,6 +518,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 	}
 
 	
+	@Override
 	public <X extends ContentBuilder> X getTopContent(X cb, MailTarget target,
 			SessionService<?> sess) {
 		// Add additional send buttons to the top content of the view page if composer
@@ -506,7 +527,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 			for(EditAction action : getTransitions(target)){
 				ContentBuilder div = cb.getPanel("bar");
 				div.addHeading(2,action.getHelp());
-				div.addButton(getContext(), action.toString(), new ChainedTransitionResult<MailTarget, EditAction>(EmailTransitionProvider.this, target, action));
+				div.addButton(getContext(), action.toString(), new ChainedTransitionResult<>(EmailTransitionProvider.this, target, action));
 				div.addParent();
 			}
 		}
@@ -514,6 +535,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 	}
 
 	
+	@Override
 	public <X extends ContentBuilder> X getLogContent(X cb, MailTarget target,
 			SessionService<?> sess) {
 		try {
@@ -542,13 +564,16 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 	}
 
 	
+	@Override
 	public String getHelp(EditAction key) {
 		return key.getHelp();
 	}
+	@Override
 	public String getText(EditAction key){
 		return key.toString();
 	}
 	
+	@Override
 	public Set<EditAction> getTransitions(MailTarget target) {
 		if( target != null ){
 			try {
@@ -566,6 +591,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
 		 */
+		@Override
 		public FormResult doTransition(MailTarget target, AppContext c)
 				throws TransitionException {
 			try{
@@ -589,6 +615,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		
 	}
 	
+	@Override
 	public Transition<MailTarget> getTransition(MailTarget target, EditAction key) {
 		try{
 			if( target != null){
@@ -620,6 +647,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 	}
 
 	
+	@Override
 	public EditAction lookupTransition(MailTarget target, String name) {
 		if( name == null ){
 			return null;
@@ -632,11 +660,13 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 	}
 
 	
+	@Override
 	public AppContext getContext() {
 		return c;
 	}
 
 
+	@Override
 	public <R> R accept(TransitionFactoryVisitor<R,MailTarget, EditAction> vis) {
 		return vis.visitPathTransitionProvider(this);
 	}

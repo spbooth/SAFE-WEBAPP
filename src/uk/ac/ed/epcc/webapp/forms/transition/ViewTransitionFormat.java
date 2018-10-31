@@ -38,6 +38,7 @@ public class ViewTransitionFormat<K,T> implements Transform{
     	this.use_link=use_link;
     	this.label_fmt=label_fmt;
     }
+	@Override
 	public Object convert(Object old) {
 		if( old != null ){
 			Object trial=old;
@@ -54,7 +55,7 @@ public class ViewTransitionFormat<K,T> implements Transform{
 			@SuppressWarnings("unchecked")
 			T target = (T) trial;
 			if( provider.canView(target, provider.getContext().getService(SessionService.class))){
-				ViewTransitionResult<T, K> result = new ViewTransitionResult<T, K>(provider, target);
+				ViewTransitionResult<T, K> result = new ViewTransitionResult<>(provider, target);
 				// get the text from the original object. 
 				// we assume the nested transform matches the class being passed
 				if( use_link ){

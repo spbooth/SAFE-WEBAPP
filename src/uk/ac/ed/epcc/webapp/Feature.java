@@ -48,7 +48,7 @@ public class Feature implements Comparable<Feature>{
 	 */
 	public static Set<Feature> getKnownFeatures(){
 		synchronized (known_features) {
-			return new HashSet<Feature>(known_features);
+			return new HashSet<>(known_features);
 		}
 		
 	}

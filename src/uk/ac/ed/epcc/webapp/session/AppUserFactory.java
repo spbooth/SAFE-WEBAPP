@@ -225,7 +225,7 @@ AccessRoleProvider<AU, AU>
 	protected Map<String,Object> getSelectors() {
 		Map<String,Object> selectors = super.getSelectors();
 		if (selectors == null) {
-			selectors = new HashMap<String,Object>();
+			selectors = new HashMap<>();
 		}
 		
 		return selectors;
@@ -238,7 +238,7 @@ AccessRoleProvider<AU, AU>
 	 */
 	@Override
 	protected Set<String> getSupress() {
-		Set<String> supress = new HashSet<String>();
+		Set<String> supress = new HashSet<>();
 
 		
 		
@@ -250,7 +250,7 @@ AccessRoleProvider<AU, AU>
 	 */
     @Override
 	public Set<RequiredPage<AU>> getRequiredPages(){
-    	Set<RequiredPage<AU>> requiredPages= new LinkedHashSet<RequiredPage<AU>>();
+    	Set<RequiredPage<AU>> requiredPages= new LinkedHashSet<>();
     	if( REQUIRE_PERSON_UPDATE_FEATURE.isEnabled(getContext())){
 			requiredPages.add(new UpdatePersonRequiredPage());
 		}
@@ -438,7 +438,7 @@ AccessRoleProvider<AU, AU>
 		if( realms == null){
 			// Generate lazily only want to do this AFTER factory is constructed
 			// as order of construction is complicated
-			realms = new LinkedHashMap<String, AppUserNameFinder>();
+			realms = new LinkedHashMap<>();
 			for( AppUserNameFinder finder : getComposites(AppUserNameFinder.class)){
 				if( finder.active()){
 					realms.put(finder.getRealm(), finder);
@@ -572,7 +572,7 @@ AccessRoleProvider<AU, AU>
 	}
 	
 	public final DataObjectItemInput<AU> getNameInput(BaseFilter<AU> fil,boolean create,boolean restrict){
-		return new AppUserNameInput<AU>(this, create, restrict, fil);
+		return new AppUserNameInput<>(this, create, restrict, fil);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.ParseFactory#getCanonicalName(java.lang.Object)
@@ -605,7 +605,7 @@ AccessRoleProvider<AU, AU>
 		return getStringFinderFilter(name, false);
 	}
 	public   SQLFilter<AU> getStringFinderFilter(String name,boolean require_user_supplied){
-		SQLOrFilter<AU> fil = new SQLOrFilter<AU>(getTarget());
+		SQLOrFilter<AU> fil = new SQLOrFilter<>(getTarget());
 		for(  AppUserNameFinder<AU,?> finder : getRealms()){
 			if( finder.userVisible() || ! require_user_supplied){
 				fil.addFilter(finder.getStringFinderFilter(getTarget(), name));
@@ -677,7 +677,7 @@ AccessRoleProvider<AU, AU>
 			@SuppressWarnings("unchecked")
 			@Override
 			protected IndexedReference<AU> getReference(AU dat) {
-				return new IndexedReference<AU>(dat.getID(),(Class<? extends IndexedProducer<AU>>) AppUserFactory.this.getClass(),getTag());
+				return new IndexedReference<>(dat.getID(),(Class<? extends IndexedProducer<AU>>) AppUserFactory.this.getClass(),getTag());
 			}
 
 			@Override
@@ -727,7 +727,7 @@ AccessRoleProvider<AU, AU>
 	 * @return
 	 */
 	public final FormCreator getSignupFormCreator(String realm,String webname) {
-				return new SignupFormCreator<AU>(this,realm,webname);
+				return new SignupFormCreator<>(this,realm,webname);
 		
 	}
 	/** Form for first time visitors to self register
@@ -781,11 +781,11 @@ AccessRoleProvider<AU, AU>
 			if( webname != null && ! webname.isEmpty()){
 				T existing = getAppUserFactory().getRealmFinder(realm).findFromString(webname);
 				if( existing != null ){
-					f.addAction(REGISTER_ACTION, new UpdateAction<T>("Person", this, existing));
+					f.addAction(REGISTER_ACTION, new UpdateAction<>("Person", this, existing));
 					return;
 				}
 			}
-			f.addAction(REGISTER_ACTION, new CreateAction<T>(type_name,this));
+			f.addAction(REGISTER_ACTION, new CreateAction<>(type_name,this));
 		}
 		String realm;
 		String webname;

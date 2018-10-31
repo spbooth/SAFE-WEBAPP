@@ -68,7 +68,7 @@ public void parse(String v) throws ParseException {
 	}
 }
 private static Set<Integer> getSet(int max){
-	LinkedHashSet<Integer> result = new LinkedHashSet<Integer>(field_list.length);
+	LinkedHashSet<Integer> result = new LinkedHashSet<>(field_list.length);
 	for(Integer i : field_list){
 		if( i <= max ){
 			result.add(i);

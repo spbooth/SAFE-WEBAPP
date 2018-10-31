@@ -31,6 +31,7 @@ public class IndexTransitionFactoryInterfaceTestImpl<T,K,X extends TransitionFac
 	}
 	
 	
+	@Override
 	public void testIndexTransition() throws TransitionException{
 		IndexTransitionFactory<K, T> fac = (IndexTransitionFactory<K, T>) provider.getTransitionFactory();
 		
@@ -38,7 +39,7 @@ public class IndexTransitionFactoryInterfaceTestImpl<T,K,X extends TransitionFac
 		if( key != null ){
 			assertEquals(key, fac.lookupTransition(null, key.toString()));
 			Transition t = fac.getTransition(null, key);
-			TestTransitionVisitor<T> vis = new TestTransitionVisitor<T>(provider.getContext(), null);
+			TestTransitionVisitor<T> vis = new TestTransitionVisitor<>(provider.getContext(), null);
 			t.getResult(vis);
 			
 		}

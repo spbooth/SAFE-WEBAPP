@@ -352,7 +352,7 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 			 */
 			@Override
 			public FormResult action(Form f) throws ActionException {
-				Map<String,Object> map = new LinkedHashMap<String, Object>();
+				Map<String,Object> map = new LinkedHashMap<>();
 				for(Iterator<String> it = f.getFieldIterator() ; it.hasNext();){
 					String field = it.next();
 					Object val = f.get(field);
@@ -453,7 +453,7 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 		addTransition(DOWNLOAD, new DownloadTransition());
 		addTransition(UPLOAD, new AddXMLTransition());
 		addTransition(PARENT, new GotoParentTransition());
-		addTransition(DELETE, new ConfirmTransition<T>("Do you wish to delete this element and all its children?", new DeleteChildTransition(), new ViewTransition()));
+		addTransition(DELETE, new ConfirmTransition<>("Do you wish to delete this element and all its children?", new DeleteChildTransition(), new ViewTransition()));
 		addTransition(MOVE_DOWN, new SwapSiblingTransition(true));
 		addTransition(NEXT, new GotoSiblingTransition(true));
 		
@@ -490,7 +490,7 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 	 */
 	@Override
 	public T getTarget(LinkedList<String> id) {
-		LinkedList<String> path = new LinkedList<String>(id);
+		LinkedList<String> path = new LinkedList<>(id);
 		DynamicForm root;
 		try {
 			root = (DynamicForm) form_manager.find(Integer.parseInt(path.pop()));
@@ -510,7 +510,7 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 	 */
 	@Override
 	public LinkedList<String> getID(T target) {
-		LinkedList<String> id = new LinkedList<String>();
+		LinkedList<String> id = new LinkedList<>();
 		return getID(id,target);
 	}
 

@@ -56,7 +56,7 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 		return pvf;
 	}
 	private IndexedTypeProducer<PreferedView, PreferedViewFactory> getProducer(){
-		return new IndexedTypeProducer<PreferedView, PreferedViewFactory>(getContext(), PREFERRED_VIEW, getViewFactory());
+		return new IndexedTypeProducer<>(getContext(), PREFERRED_VIEW, getViewFactory());
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#getType()

@@ -45,7 +45,7 @@ public class PasswordAuthAppUserTestCase extends
 	 */
 	@Override
 	public AppUserFactory<AppUser> getFactory() {
-		return new AppUserFactory<AppUser>(getContext(),"TestPasswordAuthAppUser");
+		return new AppUserFactory<>(getContext(),"TestPasswordAuthAppUser");
 	}
 
 	@Test

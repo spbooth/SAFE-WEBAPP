@@ -62,7 +62,7 @@ public class MailTarget {
 		this.handler = handler;
 		this.hash = hash;
 		if( path == null){
-			this.path=new LinkedList<String>();
+			this.path=new LinkedList<>();
 		}else{
 			this.path = path;
 		}

@@ -245,7 +245,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 		anonymise(null);
 	}
 	public void anonymiseAppUser(AppUser person) throws DataFault {
-		anonymise(new ReferenceFilter<Wtmp, AppUser>(this, PERSON_ID, person));
+		anonymise(new ReferenceFilter<>(this, PERSON_ID, person));
 	}
 	public void anonymise(SQLFilter<Wtmp> fil) throws DataFault {
 		FilterUpdate<Wtmp> update = new FilterUpdate<>(res);
@@ -268,7 +268,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	}
 	public Date lastLogin(AppUser person) throws DataException {
 		LoginFinder finder = new LoginFinder();
-		return finder.find(new ReferenceFilter<WtmpManager.Wtmp, AppUser>(WtmpManager.this, PERSON_ID, person),true);
+		return finder.find(new ReferenceFilter<>(WtmpManager.this, PERSON_ID, person),true);
 	}
 	/** Get a filter for {@link AppUser}s who have logged in since
 	 * a target date.

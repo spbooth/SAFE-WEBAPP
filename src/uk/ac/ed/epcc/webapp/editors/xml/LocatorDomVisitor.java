@@ -31,12 +31,13 @@ public class LocatorDomVisitor implements DomVisitor {
 	private Node target=null;
 	
 	public LocatorDomVisitor(LinkedList<String> path){
-		this.target_path=new LinkedList<String>(path);
+		this.target_path=new LinkedList<>(path);
 	}
 	public Node getNode(){
 		return target;
 	}
 	
+	@Override
 	public boolean beginStartElement(Element e, LinkedList<String> path) {
 		if( target_path == null ){
 			return false;
@@ -60,6 +61,7 @@ public class LocatorDomVisitor implements DomVisitor {
 	}
 
 	
+	@Override
 	public boolean useAttributes(Element e, LinkedList<String> path) {
 		if( target_path == null || target_path.size() == 0 ){
 			return false;
@@ -71,17 +73,20 @@ public class LocatorDomVisitor implements DomVisitor {
 	}
 
 	
+	@Override
 	public void endStartElement(Element e, LinkedList<String> path) {
 
 	}
 
 	
+	@Override
 	public void endElement(Element e, LinkedList<String> path) {
 		// been down this path don't select anything else.
 		target_path=null;
 	}
 
 	
+	@Override
 	public void textNode(Text n, LinkedList<String> path) {
 		if(target_path != null &&  target_path.size() == 1 && target_path.getFirst().equals(path.getLast()) ){
 			target=n;
@@ -89,6 +94,7 @@ public class LocatorDomVisitor implements DomVisitor {
 		}
 	}
 	
+	@Override
 	public void commentNode(Comment n, LinkedList<String> path) {
 		if(target_path != null &&  target_path.size() == 1 && target_path.getFirst().equals(path.getLast()) ){
 			target=n;
@@ -96,6 +102,7 @@ public class LocatorDomVisitor implements DomVisitor {
 		}
 	}
 	
+	@Override
 	public void visitAttr(Attr a, LinkedList<String> path) {
 		if(target_path != null &&  target_path.size() == 1 && target_path.getFirst().equals(path.getLast()) ){
 			target=a;

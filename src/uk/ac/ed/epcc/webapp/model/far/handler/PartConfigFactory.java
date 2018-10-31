@@ -91,7 +91,7 @@ public class PartConfigFactory<O extends PartOwner,P extends Part<O>> extends Da
 	}
 	
 	public Map<String,Object> getValues(P owner) throws DataFault{
-		Map<String,Object> result = new HashMap<String, Object>();
+		Map<String,Object> result = new HashMap<>();
 		for( Config<P> c : new FilterSet(getPartFilter(owner))){
 			result.put(c.getName(), c.getValue());
 		}
@@ -114,14 +114,14 @@ public class PartConfigFactory<O extends PartOwner,P extends Part<O>> extends Da
 	 * @return
 	 */
 	private SQLAndFilter<Config> getNamePartFilter(P owner, String name) {
-		return new SQLAndFilter<Config>(getTarget(), getPartFilter(owner),getNameFilter(name));
+		return new SQLAndFilter<>(getTarget(), getPartFilter(owner),getNameFilter(name));
 	}
 	/**
 	 * @param name
 	 * @return
 	 */
 	private SQLValueFilter<Config> getNameFilter(String name) {
-		return new SQLValueFilter<Config>(getTarget(), res, NAME_FIELD, name);
+		return new SQLValueFilter<>(getTarget(), res, NAME_FIELD, name);
 	}
 
 	public void setValues(P owner,Map<String,Object> values) throws DataException{
@@ -131,7 +131,7 @@ public class PartConfigFactory<O extends PartOwner,P extends Part<O>> extends Da
 			entry.commit();
 		}
 		// now check for deletes.
-		FilterDelete<Config> delete = new FilterDelete<Config>(res);
+		FilterDelete<Config> delete = new FilterDelete<>(res);
 		Map<String,Object> old_values = getValues(owner);
 		for(String name : old_values.keySet()){
 			if( ! values.containsKey(name)){
@@ -144,11 +144,11 @@ public class PartConfigFactory<O extends PartOwner,P extends Part<O>> extends Da
 	 * @return
 	 */
 	private ReferenceFilter<Config, P> getPartFilter(P owner) {
-		return new ReferenceFilter<Config, P>(this, PART_ID_FIELD, owner);
+		return new ReferenceFilter<>(this, PART_ID_FIELD, owner);
 	}
 	
 	public void clearAll(P owner) throws DataFault{
-		FilterDelete<Config> delete = new FilterDelete<Config>(res);
+		FilterDelete<Config> delete = new FilterDelete<>(res);
 		delete.delete(getPartFilter(owner));
 	}
 	

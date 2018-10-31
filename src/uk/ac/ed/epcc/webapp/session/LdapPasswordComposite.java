@@ -251,7 +251,7 @@ public class LdapPasswordComposite<T extends AppUser> extends PasswordAuthCompos
 	 * @throws NamingException
 	 */
 	protected DirContext getContext(String name, String password) throws InvalidNameException, NamingException {
-		Hashtable<String,String> env = new Hashtable<String,String>();
+		Hashtable<String,String> env = new Hashtable<>();
 		
 		
 		env.put(Context.INITIAL_CONTEXT_FACTORY, factory);

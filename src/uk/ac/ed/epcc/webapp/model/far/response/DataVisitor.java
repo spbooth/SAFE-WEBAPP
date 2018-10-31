@@ -93,7 +93,7 @@ public class DataVisitor<D extends DynamicForm,R extends Response<D>> implements
 		PartManager<O,?> manager = my_manager.getChildManager();
 		if( manager != null ){
 			try{
-				Map<String,Object> result = new LinkedHashMap<String,Object>();
+				Map<String,Object> result = new LinkedHashMap<>();
 				for(Part child : manager.getParts(owner)){
 					Object dat = child.visit(this);
 					if( dat != null ){

@@ -44,7 +44,7 @@ public class AddStdIndexTransition<T extends DataObjectFactory> extends EditTabl
 			return;
 		}
 		Repository res = getRepository(target);
-		Map<String,IndexType> indexes = new LinkedHashMap<String, TableSpecification.IndexType>();
+		Map<String,IndexType> indexes = new LinkedHashMap<>();
 		for(Iterator<IndexType> it = spec.getIndexes(); it.hasNext();){
 			IndexType type = it.next();
 			indexes.put(type.getName(), type);
@@ -71,7 +71,7 @@ public class AddStdIndexTransition<T extends DataObjectFactory> extends EditTabl
 				query.append(" ADD ");
 				String name = (String) f.get(INDEX_FORMFIELD);
 				IndexType type = (IndexType) f.getItem(INDEX_FORMFIELD);
-				List<Object> args = new LinkedList<Object>();
+				List<Object> args = new LinkedList<>();
 				
 				type.accept(sql.getCreateVisitor(query, args));
 				Logger log = res.getContext().getService(LoggerService.class).getLogger(getClass());

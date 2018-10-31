@@ -183,7 +183,7 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 	 */
 	@Override
 	public <C, R> void addTable(AppContext conn, NumberFormat nf,Table<C, R> t) {
-		TextTableFormatter< C, R> fmt = new TextTableFormatter<C, R>(nf,t);
+		TextTableFormatter< C, R> fmt = new TextTableFormatter<>(nf,t);
 		fmt.add(sb);
 	}
 	@Override

@@ -41,7 +41,7 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
     public EnumInput(EnumSet<E> set){
     	super(true);
     	this.set = set;
-    	lookup = new HashMap<String,E>();
+    	lookup = new HashMap<>();
     	for(E s: set){
     		lookup.put(s.name(), s);
     	}
@@ -49,6 +49,7 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
     public EnumInput(Class<E> clazz){
     	this(EnumSet.allOf(clazz));
     }
+	@Override
 	public E getItembyValue(String value) {
 		if( value == null ){
 			return null;
@@ -56,14 +57,17 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
 		return lookup.get(value);
 	}
 
+	@Override
 	public Iterator<E> getItems() {
 		return set.iterator();
 	}
 	
+	@Override
 	public int getCount(){
 		return set.size();
 	}
 
+	@Override
 	public String getTagByItem(E item) {
 		if( item == null){
 			return null;
@@ -71,10 +75,12 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
 		return item.name();
 	}
 
+	@Override
 	public String getTagByValue(String value) {
 		return getTagByItem(getItembyValue(value));
 	}
 
+	@Override
 	public String getText(E item) {
 		if( item == null ){
 			return null;
@@ -82,6 +88,7 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
 		return item.toString();
 	}
 
+	@Override
 	public E getItem() {
 		String val = getValue();
 		if( val == null ){
@@ -91,6 +98,7 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
 	}
 
 	
+	@Override
 	public void setItem(E v) {
 		if( v == null ){
 			setValue(null);
@@ -124,24 +132,28 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.PreSelectInput#allowPreSelect()
 	 */
+	@Override
 	public boolean allowPreSelect() {
 		return allow_preselect;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.PreSelectInput#setPreSelect(boolean)
 	 */
+	@Override
 	public void setPreSelect(boolean value) {
 		allow_preselect=value;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput#getUnselectedText()
 	 */
+	@Override
 	public String getUnselectedText() {
 		return unslected_text;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput#setUnselectedText(java.lang.String)
 	 */
+	@Override
 	public void setUnselectedText(String text) {
 		unslected_text=text;
 		

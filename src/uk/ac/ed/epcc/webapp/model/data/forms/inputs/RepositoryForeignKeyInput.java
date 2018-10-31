@@ -38,7 +38,7 @@ public class RepositoryForeignKeyInput implements ListInput<String,Repository.Fi
     private final Repository res;
     private FieldInfo item=null;
     private String key=null;
-    private Map<String,FieldInfo> data=new LinkedHashMap<String, FieldInfo>();
+    private Map<String,FieldInfo> data=new LinkedHashMap<>();
     public RepositoryForeignKeyInput(Repository res){
     	for(FieldInfo info : res.getInfo()){
     		if( info.isIndexed()){
@@ -50,17 +50,21 @@ public class RepositoryForeignKeyInput implements ListInput<String,Repository.Fi
     	}
     	this.res=res;
     }
+	@Override
 	public FieldInfo getItembyValue(String value) {
 		return data.get(value);
 	}
 
+	@Override
 	public Iterator<FieldInfo> getItems() {
 		return data.values().iterator();
 	}
+	@Override
 	public int getCount(){
 		return data.size();
 	}
 
+	@Override
 	public String getTagByItem(FieldInfo item) {
 		if( item == null ){
 			return null;
@@ -68,10 +72,12 @@ public class RepositoryForeignKeyInput implements ListInput<String,Repository.Fi
 		return item.getForeignKeyName();
 	}
 
+	@Override
 	public String getTagByValue(String value) {
 		return value;
 	}
 
+	@Override
 	public String getText(FieldInfo item) {
 		if( item == null ){
 			return null;
@@ -79,6 +85,7 @@ public class RepositoryForeignKeyInput implements ListInput<String,Repository.Fi
 		return item.getForeignKeyName()+" "+item.getName(false);
 	}
 
+	@Override
 	public String convert(Object v) throws TypeError {
 		if( v instanceof String){
 			return (String)v;
@@ -86,45 +93,55 @@ public class RepositoryForeignKeyInput implements ListInput<String,Repository.Fi
 		throw new TypeError();
 	}
 
+	@Override
 	public String getKey() {
 		return key;
 	}
 
+	@Override
 	public String getPrettyString(String value) {
 		return value;
 	}
 
+	@Override
 	public String getString(String value) {
 		return value;
 	}
 
+	@Override
 	public String getValue() {
 		return getTagByItem(item);
 	}
 
+	@Override
 	public void setKey(String key) {
 		this.key=key;
 	}
 
+	@Override
 	public String setValue(String v) throws TypeError {
 		String old = getValue();
 		item=getItembyValue(v);
 		return old;
 	}
 
+	@Override
 	public void validate() throws FieldException {
 		if( item == null ){
 			throw new MissingFieldException();
 		}
 	}
 
+	@Override
 	public FieldInfo getItem() {
 		return item;
 	}
 
+	@Override
 	public void setItem(FieldInfo item) {
 		this.item=item;
 	}
+	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitListInput(this);
 	}

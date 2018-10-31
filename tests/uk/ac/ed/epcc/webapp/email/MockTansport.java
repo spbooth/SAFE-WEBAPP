@@ -33,8 +33,8 @@ import javax.mail.URLName;
 
 public class MockTansport extends Transport {
 
-	private static Vector<Message> messages=new Vector<Message>();
-	private static Vector<Address[]> addresses=new Vector<Address[]>();
+	private static Vector<Message> messages=new Vector<>();
+	private static Vector<Address[]> addresses=new Vector<>();
 	
 	public static void clear(){
 		messages.clear();

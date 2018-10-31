@@ -78,7 +78,7 @@ public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
 			// the DB the best chance of optimising the query
 			
 			
-			List<PatternArgument> list = new LinkedList<PatternArgument>();
+			List<PatternArgument> list = new LinkedList<>();
 			list=getTargetParameters(list);
 			list=getFilterArguments(f, list);
 			list=getModifyParameters(list);

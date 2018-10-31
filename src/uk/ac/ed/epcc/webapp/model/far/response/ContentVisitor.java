@@ -80,7 +80,7 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 		block.addHeading(2, p.getSpacedName());
 		SectionManager manager = (SectionManager)((PageManager) p.getFactory()).getChildManager();
 		for( Section s : manager.getParts(p)){
-			Map<String,String> errors = new LinkedHashMap<String,String>();
+			Map<String,String> errors = new LinkedHashMap<>();
 			complete_viz.setErrors(errors);
 			boolean section_complete = (Boolean)s.visit(complete_viz);
 			boolean section_has_questions = (Boolean)s.visit(has_question_viz);
@@ -105,7 +105,7 @@ public class ContentVisitor<X extends ContentBuilder> implements PartVisitor<X>,
 			warnings.addParent();
 		}
 		QuestionManager manager = (QuestionManager)((SectionManager) s.getFactory()).getChildManager();
-		t = new Table<String, Question>();
+		t = new Table<>();
 		for( Question q : manager.getParts(s)){
 			visitQuestion(t, q);
 		}

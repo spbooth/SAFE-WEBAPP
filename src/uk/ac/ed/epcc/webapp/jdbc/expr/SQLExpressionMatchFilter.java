@@ -51,7 +51,7 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
     	if( expr1 instanceof ConstExpression &&  expr1 instanceof ConstExpression){
     		ConstExpression<V,T> const1 = (ConstExpression<V,T>) expr1;
     		ConstExpression<V,T> const2 = (ConstExpression<V,T>) expr2;
-    		return new GenericBinaryFilter<T>(target,const1.getValue().equals(const2.getValue()));
+    		return new GenericBinaryFilter<>(target,const1.getValue().equals(const2.getValue()));
     	}
     	if( expr1 instanceof DateSQLExpression && expr2 instanceof DateSQLExpression){
     		// compare underlying value
@@ -64,7 +64,7 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
     	if( req1 == null && req2 == null){
     		return fil;
     	}
-    	return new SQLAndFilter<T>(target,fil,req1,req2);
+    	return new SQLAndFilter<>(target,fil,req1,req2);
 
     }
     @SuppressWarnings("unchecked")
@@ -72,7 +72,7 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
     	if( expr1 instanceof ConstExpression &&  expr1 instanceof ConstExpression){
     		ConstExpression<V,T> const1 = (ConstExpression<V,T>) expr1;
     		ConstExpression<V,T> const2 = (ConstExpression<V,T>) expr2;
-    		return new GenericBinaryFilter<T>(target,m.compare(const1.getValue(), const2.getValue()));
+    		return new GenericBinaryFilter<>(target,m.compare(const1.getValue(), const2.getValue()));
     	}
     	if( expr1 instanceof DateSQLExpression && expr2 instanceof DateSQLExpression){
     		// compare underlying value
@@ -90,7 +90,7 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
     	if( req1 == null && req2 == null){
     		return fil;
     	}
-    	return new SQLAndFilter<T>(target,fil,req1,req2);
+    	return new SQLAndFilter<>(target,fil,req1,req2);
 
     }
 	private SQLExpressionMatchFilter(Class<T> target,SQLExpression<? extends V> expr1,SQLExpression<? extends V> expr2){
@@ -106,6 +106,7 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
     	this.expr2=expr2;
     }
 
+	@Override
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
 		list=expr1.getParameters(list);
 		list=expr2.getParameters(list);
@@ -113,6 +114,7 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
 		return list;
 	}
 
+	@Override
 	public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify) {
 		//sb.append("(");
 		expr1.add(sb,qualify);
@@ -162,12 +164,14 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
+	@Override
 	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 		return vis.visitPatternFilter(this);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter#accept(java.lang.Object)
 	 */
+	@Override
 	public void accept(T o) {
 		
 		
@@ -175,9 +179,11 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
+	@Override
 	public Class<T> getTarget() {
 		return target;
 	}
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("SQLExpressionMatchFilter(");

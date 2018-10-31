@@ -86,7 +86,7 @@ public class CalendarFieldPeriodInput extends MultiInput<CalendarFieldSplitPerio
 			count=bare;
 		}else{
 			bare.setValue(fixed_blocks);
-			count = new LockedInput<Integer>(bare);
+			count = new LockedInput<>(bare);
 		}
 		field = new CalendarFieldInput(finest_field);
 		field.setValue(finest_field > Calendar.MONTH? Calendar.MONTH : finest_field);
@@ -132,6 +132,7 @@ public class CalendarFieldPeriodInput extends MultiInput<CalendarFieldSplitPerio
 	public int getBlockCount(){
 		return count.getValue();
 	}
+	@Override
 	public CalendarFieldSplitPeriod convert(Object v) throws TypeError {
 		if( v == null ){
 			return null;

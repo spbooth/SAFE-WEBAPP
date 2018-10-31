@@ -133,12 +133,12 @@ public abstract class HandlerPartManager<O extends PartOwner, X extends FormHand
 	}
 	@Override
 	protected PartConfigFactory<O, H> makeConfigFactory() {
-		return new PartConfigFactory<O, H>(this);
+		return new PartConfigFactory<>(this);
 	}
 	@Override
 	protected Map<String, Object> getSelectors() {
 		Map<String, Object> selectors = super.getSelectors();
-		ListInput i = new ClassInput<X>(getContext(), getHandlerClass());
+		ListInput i = new ClassInput<>(getContext(), getHandlerClass());
 		if( ! requireHandler()){
 			i = new OptionalListInputWrapper(i);
 		}

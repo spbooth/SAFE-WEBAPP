@@ -32,8 +32,9 @@ public final class ServeDataResult implements FormResult {
 
 	public ServeDataResult(ServeDataProducer producer, List<String> args){
 		this.producer=producer;
-		this.args = new LinkedList<String>(args);
+		this.args = new LinkedList<>(args);
 	}
+	@Override
 	public void accept(FormResultVisitor vis) throws Exception {
 		vis.visitServeDataResult(this);
 	}
@@ -45,6 +46,6 @@ public final class ServeDataResult implements FormResult {
 		if( args == null){
 			return null;
 		}
-		return new LinkedList<String>(args);
+		return new LinkedList<>(args);
 	}
 }

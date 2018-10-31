@@ -47,14 +47,15 @@ ViewTransitionFactoryInterfaceTest<DataObjectFactory, TableTransitionKey, TableT
 
 {
 	
-	public TransitionProviderInterfaceTest<DataObjectFactory, TableTransitionKey, TableTransitionProviderTest> transition_provider_test = new TransitionProviderInterfaceTestImpl<DataObjectFactory, TableTransitionKey, TableTransitionProviderTest>(this);
+	public TransitionProviderInterfaceTest<DataObjectFactory, TableTransitionKey, TableTransitionProviderTest> transition_provider_test = new TransitionProviderInterfaceTestImpl<>(this);
    
-	public IndexTransitionFactoryInterfaceTest<DataObjectFactory, TableTransitionKey, TableTransitionProviderTest> index_factory_test = new IndexTransitionFactoryInterfaceTestImpl<DataObjectFactory, TableTransitionKey, TableTransitionProviderTest>(this);
+	public IndexTransitionFactoryInterfaceTest<DataObjectFactory, TableTransitionKey, TableTransitionProviderTest> index_factory_test = new IndexTransitionFactoryInterfaceTestImpl<>(this);
     
-    public ViewTransitionFactoryInterfaceTest<DataObjectFactory, TableTransitionKey, TableTransitionProviderTest> view_factory_test = new ViewTransitionFactoryInterfaceTestImpl<DataObjectFactory, TableTransitionKey, TableTransitionProviderTest>(this);
+    public ViewTransitionFactoryInterfaceTest<DataObjectFactory, TableTransitionKey, TableTransitionProviderTest> view_factory_test = new ViewTransitionFactoryInterfaceTestImpl<>(this);
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryDataProvider#getTransitionFactory()
 	 */
+	@Override
 	public ViewTransitionFactory<TableTransitionKey, DataObjectFactory> getTransitionFactory() {
 		return new TableTransitionProvider(ctx);
 	}
@@ -62,8 +63,9 @@ ViewTransitionFactoryInterfaceTest<DataObjectFactory, TableTransitionKey, TableT
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryDataProvider#getTargets()
 	 */
+	@Override
 	public Set<DataObjectFactory> getTargets() {
-		HashSet<DataObjectFactory> result = new HashSet<DataObjectFactory>();
+		HashSet<DataObjectFactory> result = new HashSet<>();
 		AppContext conn = getContext();
 		Map<String,Class> classmap = conn.getClassMap(TableStructureTestFactory.class);
 		for(String key : classmap.keySet()){
@@ -80,6 +82,7 @@ ViewTransitionFactoryInterfaceTest<DataObjectFactory, TableTransitionKey, TableT
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactoryDataProvider#getAllowedUser(java.lang.Object)
 	 */
+	@Override
 	public SessionService<?> getAllowedUser(DataObjectFactory target) {
 		SessionService sess = new SimpleSessionService(getContext());
 		sess.setTempRole(SessionService.ADMIN_ROLE);
@@ -90,6 +93,7 @@ ViewTransitionFactoryInterfaceTest<DataObjectFactory, TableTransitionKey, TableT
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactoryDataProvider#getForbiddenUser(java.lang.Object)
 	 */
+	@Override
 	public SessionService<?> getForbiddenUser(DataObjectFactory target) {
 		return null;
 	}

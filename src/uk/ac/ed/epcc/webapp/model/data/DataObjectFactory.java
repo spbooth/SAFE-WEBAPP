@@ -91,7 +91,6 @@ import uk.ac.ed.epcc.webapp.model.ParseFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.UncaughtDataFault;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 import uk.ac.ed.epcc.webapp.model.data.filter.Joiner;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
@@ -372,7 +371,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				return new FilterIterator(fil);
 			} catch (DataFault e) {
 				getContext().error(e, "Error making select Iterator");
-				return new EmptyIterator<BDO>();
+				return new EmptyIterator<>();
 			}
 		}
   
@@ -441,8 +440,8 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 * @return
 		 */
 		private AndFilter<BDO> getValidateFilter(Number num) {
-			return new AndFilter<BDO>(getTarget(), fil, 
-					new SQLIdFilter<BDO>(getTarget(), res, num.intValue()));
+			return new AndFilter<>(getTarget(), fil, 
+					new SQLIdFilter<>(getTarget(), res, num.intValue()));
 		}
 		@Override
 		public <R> R accept(InputVisitor<R> vis) throws Exception {
@@ -507,7 +506,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			if( comp == null ){
 			  return super.getItems();
 			}else{
-				return new SortingIterator<BDO>(super.getItems(),comp);
+				return new SortingIterator<>(super.getItems(),comp);
 			}
 		}
 		
@@ -770,12 +769,12 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		
 	    public ReferenceIterator(IndexedTypeProducer<I,? extends IndexedProducer<I>> ref,SQLFilter<BDO> fil) throws DataFault{
 	    	super(DataObjectFactory.this.getContext(),DataObjectFactory.this.getTarget());
-	    	setMapper(new ReferencedAdapter<I>(ref));
+	    	setMapper(new ReferencedAdapter<>(ref));
 	    	// Don't return null
-	    	SQLAndFilter<BDO> ref_fil = new SQLAndFilter<BDO>(DataObjectFactory.this.getTarget());
+	    	SQLAndFilter<BDO> ref_fil = new SQLAndFilter<>(DataObjectFactory.this.getTarget());
 	    	ref_fil.addFilter(fil);
-	    	ref_fil.addFilter(new NullFieldFilter<BDO>(getTarget(),res, ref.getField(), false));
-	    	ref_fil.addFilter(new SQLValueFilter<BDO>(getTarget(),res,ref.getField(), MatchCondition.GT, 0));
+	    	ref_fil.addFilter(new NullFieldFilter<>(getTarget(),res, ref.getField(), false));
+	    	ref_fil.addFilter(new SQLValueFilter<>(getTarget(),res,ref.getField(), MatchCondition.GT, 0));
 	    	try {
 				setup(fil,0,-1);
 			} catch (DataException e) {
@@ -941,7 +940,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		public boolean accept(T o) {
 			AndFilter<BDO> and = new AndFilter(getTarget());
 			and.addFilter(fil);
-			and.addFilter(new ReferenceFilter<BDO, T>(DataObjectFactory.this, join_field, o));
+			and.addFilter(new ReferenceFilter<>(DataObjectFactory.this, join_field, o));
 			try {
 				return exists(and);
 			} catch (DataException e) {
@@ -1015,7 +1014,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      * factory.
      */
     protected DataObjectFactory(){
-    	composites = new LinkedHashMap<Class,Composite<BDO,?>>();
+    	composites = new LinkedHashMap<>();
     }
 
     /** register a {@link Composite} with this factory. 
@@ -1053,7 +1052,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      * @return {@link Collection}
      */
     public Collection<TableStructureContributer<BDO>> getTableStructureContributers(){
-    	return new LinkedList<TableStructureContributer<BDO>>(getComposites());
+    	return new LinkedList<>(getComposites());
     }
     /** get all {@link Composite}s for this factory.
      * @return {@link Collection}
@@ -1096,7 +1095,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return
 	 */
 	public <Y> Collection<Y> getComposites(Class<Y> template){
-		LinkedList<Y> result = new LinkedList<Y>();
+		LinkedList<Y> result = new LinkedList<>();
 		for( Composite<BDO,?> c : composites.values()){
 			if( template.isAssignableFrom(c.getClass()) ){
 				result.add((Y) c);
@@ -1124,10 +1123,10 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	}
 	
     public FormCreator getFormCreator(AppContext c){
-    	return new Creator<BDO>(this);
+    	return new Creator<>(this);
     }
     public FormUpdate<BDO> getFormUpdate(AppContext c){
-    	return new Updater<BDO>(this);
+    	return new Updater<>(this);
     }
 
 	public boolean canUpdate(SessionService c) {
@@ -1307,14 +1306,14 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	}
 	// Note this is used to implement FilterMatcher so
 	// we can't pass ourselves as the matcher arg
-	private final ConvertPureAcceptFilterVisitor<BDO> accept_converter = new ConvertPureAcceptFilterVisitor<BDO>(null);
-	public final boolean matches(BaseFilter<BDO> fil, BDO o) {
+	private final ConvertPureAcceptFilterVisitor<BDO> accept_converter = new ConvertPureAcceptFilterVisitor<>(null);
+	public final boolean matches(BaseFilter<? super BDO> fil, BDO o) {
 		if( fil == null || o == null){
 			return false;
 		}
 		try {
 			// Use AcceptFilter by preference.
-			AcceptFilter<? super BDO> accept = fil.acceptVisitor(accept_converter);
+			AcceptFilter<BDO> accept = (AcceptFilter<BDO>) ((BaseFilter)fil).acceptVisitor(accept_converter);
 			if( accept != null){
 				return accept.accept(o);
 			}
@@ -1323,7 +1322,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 		// Have to do a SQL query
 		@SuppressWarnings("unchecked")
-		AndFilter<BDO> and = new AndFilter<BDO>(getTarget(), fil, getFilter(o) );
+		AndFilter<BDO> and = new AndFilter<>(getTarget(), fil, getFilter(o) );
 		try {
 			return exists(and);
 		} catch (DataException e) {
@@ -1332,8 +1331,8 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 	}
 	protected <I extends Indexed> Set<I> getReferenced(IndexedTypeProducer<I,? extends IndexedProducer<I>> producer, SQLFilter<BDO> fil) throws DataFault{
-		HashSet<I>res = new HashSet<I>();
-		for(Iterator<I> it = new ReferenceIterator<I>(producer,fil); it.hasNext();){
+		HashSet<I>res = new HashSet<>();
+		for(Iterator<I> it = new ReferenceIterator<>(producer,fil); it.hasNext();){
 			res.add(it.next());
 		}
 		return res;
@@ -1370,7 +1369,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return hashtable of default properties
 	 */
 	protected Map<String, Object> getDefaults() {
-		HashMap<String, Object> defaults = new HashMap<String,Object>();
+		HashMap<String, Object> defaults = new HashMap<>();
 		for(TableStructureContributer<BDO> t : getTableStructureContributers()){
 			t.addDefaults(defaults);
 		}
@@ -1540,7 +1539,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	}
 
 	protected final Set<String> getNullable() {
-		Set<String> nullable = new HashSet<String>();
+		Set<String> nullable = new HashSet<>();
 		for (Iterator it = res.getFields().iterator(); it.hasNext();) {
 			String name = (String) it.next();
 			Repository.FieldInfo info = res.getInfo(name);
@@ -1587,7 +1586,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 */
 	protected Map<String,Object> getSelectors() {
 
-		return new HashMap<String, Object>();
+		return new HashMap<>();
 	}
 	/**
 	 * generate the class specific set of suppressed fields to be used in form creation/update
@@ -1597,7 +1596,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return Vector
 	 */
 	protected Set<String> getSupress() {
-		return new HashSet<String>();
+		return new HashSet<>();
 	}
 	
 	/** Generate the default text identifier of the client object.
@@ -1646,7 +1645,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 */
 	protected Map<String, String> getTranslations() {
 		// default to no translations override this method in sub-classes
-		return new HashMap<String, String>();
+		return new HashMap<>();
 	}
 
 	/**
@@ -1657,7 +1656,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 */
 	protected Map<String, String> getFieldHelp() {
 		// default to no translations override this method in sub-classes
-		return new HashMap<String, String>();
+		return new HashMap<>();
 	}
 	// name of table index
 	/**
@@ -1780,7 +1779,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 @SuppressWarnings("unchecked")
     public IndexedReference<BDO> makeReference(int id){
     	Class<? extends IndexedProducer<BDO>> c = (Class<? extends IndexedProducer<BDO>>) getClass();
-    	IndexedReference<BDO> ref = new IndexedReference<BDO>(id,c,getTag());
+    	IndexedReference<BDO> ref = new IndexedReference<>(id,c,getTag());
 		return ref;
     }
     public boolean isMyReference(IndexedReference ref){
@@ -1833,7 +1832,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	}
 
 	protected List<OrderClause> getOrder(){
-		return new LinkedList<OrderClause>();
+		return new LinkedList<>();
 	}
 
 
@@ -2065,7 +2064,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     	if( ! isMine(target)){
     		throw new ConsistencyError("unexpected target "+target.getFactoryTag());
     	}
-    	return new SQLIdFilter<BDO>(getTarget(), res, target.getID(),exclude);
+    	return new SQLIdFilter<>(getTarget(), res, target.getID(),exclude);
     }
 
 
@@ -2114,9 +2113,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	protected <T extends DataObject> BaseFilter<T> convertToDestinationFilter(DataObjectFactory<T> remote_fac, String link_field,BaseFilter<BDO> fil){
 		try{
 			SQLFilter<BDO> sqlfilter = FilterConverter.convert(fil);
-			return new DestFilter<T>(sqlfilter, link_field,remote_fac);
+			return new DestFilter<>(sqlfilter, link_field,remote_fac);
 		}catch(NoSQLFilterException e){
-			return new DestAcceptFilter<T>(fil, link_field, remote_fac);
+			return new DestAcceptFilter<>(fil, link_field, remote_fac);
 		}
 		
 	}
@@ -2144,9 +2143,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		public BaseFilter<BDO> visitBaseFilter(BaseFilter<R> fil){
 			try{
 				SQLFilter<R> sqlfilter = FilterConverter.convert(fil);
-				return new RemoteFilter<R>(remote_fac,field,sqlfilter);
+				return new RemoteFilter<>(remote_fac,field,sqlfilter);
 			}catch(NoSQLFilterException e){
-				return new RemoteAcceptFilter<BDO, R>(getTarget(), remote_fac, field, fil);
+				return new RemoteAcceptFilter<>(getTarget(), remote_fac, field, fil);
 			}
 		}
 		public RemoteFilter<R> visitSQLFilter(SQLFilter<R> fil){
@@ -2176,13 +2175,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			try{
 				if( ! fil.hasAcceptFilters()){
 					SQLFilter<R> sqlfilter = FilterConverter.convert(fil);
-					return new RemoteFilter<R>(remote_fac,field,sqlfilter);
+					return new RemoteFilter<>(remote_fac,field,sqlfilter);
 				}
 			}catch(NoSQLFilterException e){
 			}
-			BaseFilter<BDO> result =new RemoteAcceptFilter<BDO, R>(getTarget(), remote_fac, field, fil);
+			BaseFilter<BDO> result =new RemoteAcceptFilter<>(getTarget(), remote_fac, field, fil);
 			if( fil.hasPatternFilters() ){
-				result = new AndFilter<BDO>(getTarget(),result, new RemoteFilter<R>(remote_fac,field,fil.getNarrowingFilter()));
+				result = new AndFilter<>(getTarget(),result, new RemoteFilter<>(remote_fac,field,fil.getNarrowingFilter()));
 			}
 			return result;
 
@@ -2210,7 +2209,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		@Override
 		public BaseFilter<BDO> visitAcceptFilter(AcceptFilter<R> fil) throws Exception {
 	
-			return new RemoteAcceptFilter<BDO,R>(getTarget(), remote_fac, field, fil);
+			return new RemoteAcceptFilter<>(getTarget(), remote_fac, field, fil);
 		}
 
 		/* (non-Javadoc)
@@ -2227,7 +2226,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		@Override
 		public BaseFilter<BDO> visitBinaryFilter(BinaryFilter<R> fil) throws Exception {
 			// A remote binary filter can become a local binary filter
-			return new GenericBinaryFilter<BDO>(getTarget(), fil.getBooleanResult());
+			return new GenericBinaryFilter<>(getTarget(), fil.getBooleanResult());
 		}
 
 		/* (non-Javadoc)
@@ -2256,7 +2255,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 */
 	public <R extends DataObject> BaseFilter<BDO> getRemoteFilter(DataObjectFactory<R> remote_fac, String link_field,BaseFilter<R> fil){
 		try {
-			return fil.acceptVisitor(new MakeRemoteFilterVisitor<R>(remote_fac, link_field));
+			return fil.acceptVisitor(new MakeRemoteFilterVisitor<>(remote_fac, link_field));
 		} catch (Exception e1) {
 			getLogger().error("Impossible error", e1);
 			return null;

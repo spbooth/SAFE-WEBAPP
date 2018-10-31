@@ -205,7 +205,7 @@ public class HtmlBuilderTestCase extends WebappTestBase {
 	@Test
 	public void testAddTable() {
 		HtmlBuilder hb = new HtmlBuilder();
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", "row1", 100);
 		hb.addTable(getContext(), t);
 		Assert.assertEquals(
@@ -238,7 +238,7 @@ public class HtmlBuilderTestCase extends WebappTestBase {
 	@Test
 	public void testAddColumn() {
 		HtmlBuilder hb = new HtmlBuilder();
-		Table<String, String> t = new Table<String, String>();
+		Table<String, String> t = new Table<>();
 		t.put("col1", "row1", 100);
 		t.put("col1", "row2", 200);
 		hb.addColumn(getContext(), t, "col1");

@@ -53,7 +53,7 @@ public class SortingIteratorTest {
 	
 	@Test
 	public void testReverse() {
-		LinkedList<Number> list = new LinkedList<Number>();
+		LinkedList<Number> list = new LinkedList<>();
 		
 		list.add(1.0);
 		list.add(13.0);
@@ -61,7 +61,7 @@ public class SortingIteratorTest {
 		list.add(2.0);
 		list.add(3.0);
 		
-		SortingIterator it = new SortingIterator<Number>(list.iterator(), new Comparator<Number>(){
+		SortingIterator it = new SortingIterator<>(list.iterator(), new Comparator<Number>(){
 
 			public int compare(Number o1, Number o2) {
 				return (int) (o2.doubleValue() - o1.doubleValue());

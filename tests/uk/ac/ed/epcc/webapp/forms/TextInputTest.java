@@ -29,6 +29,7 @@ public class TextInputTest<I extends TextInput> extends ParseAbstractInputTestCa
 		
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public I getInput() {
 		I i = (I) new TextInput(allowNull());
@@ -43,24 +44,28 @@ public class TextInputTest<I extends TextInput> extends ParseAbstractInputTestCa
 	public boolean forbidSpace(){
 		return false;
 	}
+	@Override
 	public Set<String> getBadData() {
-		return new HashSet<String>();
+		return new HashSet<>();
 	}
 
 	
+	@Override
 	public Set<String> getGoodData() {
-		HashSet<String> good = new HashSet<String>();
+		HashSet<String> good = new HashSet<>();
 		good.add("Here is some text" );
 		return good;
 	}
 	
 
 
+	@Override
 	public Set<String> getBadParseData() {
 		return null;
 	}
 
 
+	@Override
 	public Set<String> getGoodParseData() {
 		return null;
 	}

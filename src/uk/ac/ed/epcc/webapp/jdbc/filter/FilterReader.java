@@ -93,12 +93,12 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 			}else{
 				// both non null
 				if( my_filter instanceof SQLFilter ){
-					SQLAndFilter<T> res = new SQLAndFilter<T>(target);
+					SQLAndFilter<T> res = new SQLAndFilter<>(target);
 					res.addFilter(mapper_filter);
 					res.addFilter((SQLFilter<? super T>) my_filter);
 					return res;
 				}else{
-					AndFilter<T> res = new AndFilter<T>(target);
+					AndFilter<T> res = new AndFilter<>(target);
 					res.addFilter(mapper_filter);
 					res.addFilter(my_filter);
 					return res;

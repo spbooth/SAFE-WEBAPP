@@ -104,7 +104,7 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
 	public CaseExpression(Class<R> target,SQLExpression<? extends R> default_expression, Clause<X,R> ... clauses ) {
 		this.target=target;
 		this.default_expr=default_expression;
-		this.options=new LinkedList<CaseExpression.Clause<X,R>>();
+		this.options=new LinkedList<>();
 		for(Clause<X,R> c : clauses ){
 			options.add(c);
 		}
@@ -112,16 +112,17 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
 	public CaseExpression(Class<R> target,SQLExpression<? extends R> default_expression, LinkedList<Clause<X,R>> clauses  ) {
 		this.target=target;
 		this.default_expr=default_expression;
-		this.options=new LinkedList<CaseExpression.Clause<X,R>>(clauses);
+		this.options=new LinkedList<>(clauses);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#add(java.lang.StringBuilder, boolean)
 	 */
+	@Override
 	public int add(StringBuilder sb, boolean qualify) {
 		sb.append("CASE ");
 		// We only support simple expression filters here so ok to pass
 		// null for the tables parameter
-		MakeSelectVisitor<X> vis = new MakeSelectVisitor<X>(null,sb, qualify,true);
+		MakeSelectVisitor<X> vis = new MakeSelectVisitor<>(null,sb, qualify,true);
 		for( Clause<X,R> c: options){
 			sb.append("WHEN ");
 			try {
@@ -144,9 +145,10 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#getParameters(java.util.List)
 	 */
+	@Override
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
 		for( Clause<X,R> c: options){
-			GetListFilterVisitor<X> vis = new GetListFilterVisitor<X>(list,true);
+			GetListFilterVisitor<X> vis = new GetListFilterVisitor<>(list,true);
 			try{
 				list = c.filter.acceptVisitor(vis);
 			} catch (Exception e) {
@@ -164,6 +166,7 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#makeObject(java.sql.ResultSet, int)
 	 */
+	@Override
 	public R makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 
 		return (R)  rs.getObject(pos);
@@ -173,6 +176,7 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#getRequiredFilter()
 	 */
+	@Override
 	public SQLFilter getRequiredFilter() {
 		return null;
 	}
@@ -180,6 +184,7 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
+	@Override
 	public Class<R> getTarget() {
 		return target;
 	}

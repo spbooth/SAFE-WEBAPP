@@ -36,6 +36,7 @@ public class Linker extends AbstractContexed implements MessageEditLinker{
 		super(conn);
 		this.composer=h;
 	}
+	@Override
 	public void addButton(ContentBuilder cb, EditAction action, List<String> path,
 			String text) {
 		try {
@@ -48,11 +49,12 @@ public class Linker extends AbstractContexed implements MessageEditLinker{
 	
 	
 
+	@Override
 	public void addLink(ContentBuilder builder, List<String> args,
 			String file, String text) {
 		
 		if( file != null ){
-			args = new LinkedList<String>(args);
+			args = new LinkedList<>(args);
 			args.add(file);
 		}
 		try {
@@ -63,6 +65,7 @@ public class Linker extends AbstractContexed implements MessageEditLinker{
 
 	}
 
+	@Override
 	public MessageProvider getMessageProvider() throws Exception {
 		return composer.getMessageProvider();
 	}

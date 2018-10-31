@@ -126,9 +126,11 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 		@Override
 		protected void setup() throws DataFault, DataException {
 		}
+		@Override
 		public boolean hasRole(String role){
 			return record.getBooleanProperty(role, false);
 		}
+		@Override
 		public void setRole(String role, boolean value){
 			record.setProperty(role, value);
 		}
@@ -136,8 +138,8 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
     }
 
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
-		return new Link<A,B>(this,res);
+	protected Link<A,B> makeBDO(Record res) throws DataFault {
+		return new Link<>(this,res);
 	}
 
 
@@ -146,11 +148,12 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 	 * @return
 	 * @throws UnknownRelationshipException 
 	 */
+	@Override
 	protected SQLFilter<Link<A, B>> getFilterFromRole(String role) throws UnknownRelationshipException {
 		if( ! res.hasField(role)){
 			throw new UnknownRelationshipException(role);
 		}
-		return new SQLValueFilter<Link<A,B>>(getTarget(),res,role,Boolean.TRUE);
+		return new SQLValueFilter<>(getTarget(),res,role,Boolean.TRUE);
 	}
 		
 	
@@ -180,8 +183,9 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.safe.accounting.db.RelationshipProvider#getRoles()
 	 */
+	@Override
 	public Set<String> getRelationships(){
-		Set<String> result = new HashSet<String>();
+		Set<String> result = new HashSet<>();
 		for( String s: res.getFields()){
 			if( res.getInfo(s).isBoolean()){
 				result.add(s);

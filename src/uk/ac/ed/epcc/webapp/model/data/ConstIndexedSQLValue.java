@@ -72,7 +72,7 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	 */
 	@Override
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
-		list.add(new ConstPatternArgument<Integer>(Integer.class, Integer.valueOf(val.getID())));
+		list.add(new ConstPatternArgument<>(Integer.class, Integer.valueOf(val.getID())));
 		return list;
 	}
 
@@ -143,7 +143,7 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	public SQLFilter<T> getSQLFilter(SQLFilter<I> fil) throws CannotFilterException {
 		try{
 			DataObjectFactory<I> fac = getFactory();
-			return new Joiner<I,T>(clazz, fil, fac.res, val.getID());
+			return new Joiner<>(clazz, fil, fac.res, val.getID());
 		}catch(Exception e){
 			throw new CannotFilterException(e);
 		}
@@ -197,6 +197,7 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue#addGroup(java.lang.StringBuilder, boolean)
 	 */
+	@Override
 	public int addGroup(StringBuilder sb, boolean qualify) {
 		// constant does not affect group-by
 		return 0;
@@ -204,10 +205,12 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue#getGroupParameters(java.util.List)
 	 */
+	@Override
 	public List<PatternArgument> getGroupParameters(
 			List<PatternArgument> list) {
 		return list;
 	}
+	@Override
 	public String toString(){
 		return "CONST("+val.toString()+")";
 	}

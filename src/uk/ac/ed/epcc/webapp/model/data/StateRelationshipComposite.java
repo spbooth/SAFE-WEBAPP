@@ -137,7 +137,7 @@ public class StateRelationshipComposite<U extends AppUser,BDO extends DataObject
 		if( target== null){
 			return null;
 		}
-		return new PersonFilter<U>(target);
+		return new PersonFilter<>(target);
 	}
 
 	/* (non-Javadoc)

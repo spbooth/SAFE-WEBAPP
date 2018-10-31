@@ -62,7 +62,7 @@ public class FilterDelete<T extends DataObject> extends FilterSelect<T>{
     	try(PreparedStatement stmt=sqlContext.getConnection().prepareStatement(
 				sql.toString())){
     		
-    		List<PatternArgument> list = new LinkedList<PatternArgument>();
+    		List<PatternArgument> list = new LinkedList<>();
 			list=getFilterArguments(my_filter, list);
     		setParams(1, sql, stmt, list);
     		if( DatabaseService.LOG_QUERY_FEATURE.isEnabled(res.getContext())){

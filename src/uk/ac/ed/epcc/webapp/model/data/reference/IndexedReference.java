@@ -165,7 +165,7 @@ public static <I extends Indexed> IndexedReference<I> parseIndexedReference(AppC
 		if( tag.trim().length() == 0){
 			tag=null;
 		}
-		return new IndexedReference<I>(id, clazz,tag);
+		return new IndexedReference<>(id, clazz,tag);
 	}
 	return null;
 }

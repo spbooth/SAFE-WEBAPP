@@ -52,19 +52,19 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 	/**
 	 * 
 	 */
-	public static final TransitionKey<Number> FORM_ADD_KEY = new TransitionKey<Number>(Number.class, "FormAdd");
+	public static final TransitionKey<Number> FORM_ADD_KEY = new TransitionKey<>(Number.class, "FormAdd");
 	/**
 	 * 
 	 */
-	public static final TransitionKey<Number> ADD_KEY = new TransitionKey<Number>(Number.class, "Add");
+	public static final TransitionKey<Number> ADD_KEY = new TransitionKey<>(Number.class, "Add");
 	
-	public static final TransitionKey<Number> DUAL_ADD_KEY = new TransitionKey<Number>(Number.class, "DualAdd");
+	public static final TransitionKey<Number> DUAL_ADD_KEY = new TransitionKey<>(Number.class, "DualAdd");
 
-	public static final TransitionKey<Number> CONFIRM_ADD_KEY = new TransitionKey<Number>(Number.class, "ConfirmAdd");
+	public static final TransitionKey<Number> CONFIRM_ADD_KEY = new TransitionKey<>(Number.class, "ConfirmAdd");
 	
-	public static final TransitionKey<Number> THREE_KEY = new TransitionKey<Number>(Number.class,"Three");
+	public static final TransitionKey<Number> THREE_KEY = new TransitionKey<>(Number.class,"Three");
 	
-	public static final TransitionKey<Number> SET_KEY = new TransitionKey<Number>(Number.class,"Set");
+	public static final TransitionKey<Number> SET_KEY = new TransitionKey<>(Number.class,"Set");
 	/**
 	 * 
 	 */
@@ -110,18 +110,21 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 			}
 		});
 		addTransition(ADD_KEY, new AbstractDirectTransition<Number>() {
+			@Override
 			public FormResult doTransition(Number target, AppContext c)
 					throws TransitionException {
-				return new ChainedTransitionResult<Number, TransitionKey<Number>>(TestTransitionProvider.this, target.intValue()+1, null);
+				return new ChainedTransitionResult<>(TestTransitionProvider.this, target.intValue()+1, null);
 			}
 		});
 		addTransition(DUAL_ADD_KEY, new AbstractDirectTransition<Number>() {
+			@Override
 			public FormResult doTransition(Number target, AppContext c)
 					throws TransitionException {
-				return new ChainedTransitionResult<Number, TransitionKey<Number>>(TestTransitionProvider.this, target.intValue()+1, ADD_KEY);
+				return new ChainedTransitionResult<>(TestTransitionProvider.this, target.intValue()+1, ADD_KEY);
 			}
 		});
 		addTransition(FORM_ADD_KEY, new AbstractFormTransition<Number>() {
+			@Override
 			public void buildForm(Form f, Number target, AppContext conn)
 					throws TransitionException {
 				f.addInput(VALUE, VALUE, new IntegerInput());
@@ -131,15 +134,17 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 		});
 		addTransition(CONFIRM_ADD_KEY, new ConfirmTransition<>("Are you sure?",
 				new AbstractDirectTransition<Number>() {
+					@Override
 					public FormResult doTransition(Number target, AppContext c)
 					throws TransitionException {
-							return new ChainedTransitionResult<Number, TransitionKey<Number>>(TestTransitionProvider.this, target.intValue()+1, null);
+							return new ChainedTransitionResult<>(TestTransitionProvider.this, target.intValue()+1, null);
 					}
 				}, 
 				new AbstractDirectTransition<Number>() {
+					@Override
 					public FormResult doTransition(Number target, AppContext c)
 					throws TransitionException {
-						return new ViewTransitionResult<Number, TransitionKey<Number>>(TestTransitionProvider.this, target.intValue());
+						return new ViewTransitionResult<>(TestTransitionProvider.this, target.intValue());
 					}
 				}	
 			));
@@ -156,6 +161,7 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider#getTarget(java.lang.String)
 	 */
+	@Override
 	public Number getTarget(String id) {
 		return Integer.parseInt(id);
 	}
@@ -163,6 +169,7 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider#getID(java.lang.Object)
 	 */
+	@Override
 	public String getID(Number target) {
 		return target.toString();
 	}
@@ -170,6 +177,7 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#getTargetName()
 	 */
+	@Override
 	public String getTargetName() {
 		return "Test";
 	}
@@ -177,6 +185,7 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#allowTransition(uk.ac.ed.epcc.webapp.AppContext, java.lang.Object, java.lang.Object)
 	 */
+	@Override
 	public boolean allowTransition(AppContext c, Number target,
 			TransitionKey<Number> key) {
 		if(target == null) {
@@ -188,6 +197,7 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#getSummaryContent(uk.ac.ed.epcc.webapp.AppContext, uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object)
 	 */
+	@Override
 	public <X extends ContentBuilder> X getSummaryContent(AppContext c, X cb,
 			Number target) {
 		return cb;
@@ -196,6 +206,7 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#canView(java.lang.Object, uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
+	@Override
 	public boolean canView(Number target, SessionService<?> sess) {
 		return target.intValue() < MAX_ALLOWED;
 	}
@@ -203,10 +214,12 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#getTopContent(uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object, uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
+	@Override
 	public <X extends ContentBuilder> X getTopContent(X cb, Number target,
 			SessionService<?> sess) {
 		return cb;
 	}
+	@Override
 	public <X extends ContentBuilder> X getBottomContent(X cb, Number target,
 			SessionService<?> sess) {
 		return cb;
@@ -214,6 +227,7 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#getLogContent(uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object, uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
+	@Override
 	public <X extends ContentBuilder> X getLogContent(X cb, Number target,
 			SessionService<?> sess) {
 		return cb;
@@ -222,9 +236,11 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#getHelp(java.lang.Object)
 	 */
+	@Override
 	public String getHelp(TransitionKey<Number> key) {
 		return null;
 	}
+	@Override
 	public String getText(TransitionKey<Number> key){
 		return key.toString();
 	}

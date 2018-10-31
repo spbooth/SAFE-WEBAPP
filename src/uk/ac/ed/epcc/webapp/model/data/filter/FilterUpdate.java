@@ -48,8 +48,7 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    	res=r;
 	    }
 		
-	    @SuppressWarnings("unchecked")
-		public <R> int update(FieldSQLExpression<R,T> target, R value,SQLFilter<T> my_filter) throws DataFault{
+	    public <R> int update(FieldSQLExpression<R,T> target, R value,SQLFilter<T> my_filter) throws DataFault{
 	    	if( isEmpty(my_filter)){
 	    		return 0;
 	    	}
@@ -70,8 +69,8 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    	
 	    	try(PreparedStatement stmt=sqlContext.getConnection().prepareStatement(
     				sql.toString())){
-	    		List<PatternArgument> list = new LinkedList<PatternArgument>();
-				list.add(new ConstPatternArgument<R>(target.getTarget(), value));
+	    		List<PatternArgument> list = new LinkedList<>();
+				list.add(new ConstPatternArgument<>(target.getTarget(), value));
 	    		
 				list = getFilterArguments(my_filter, list);
 	    		setParams(1, sql, stmt, list);
@@ -103,7 +102,7 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    	SQLContext sqlContext = res.getSQLContext();
 	    	try(PreparedStatement stmt=sqlContext.getConnection().prepareStatement(
     				sql.toString())){
-	    		List<PatternArgument> list = new LinkedList<PatternArgument>();
+	    		List<PatternArgument> list = new LinkedList<>();
 	    		list = value.getParameters(list);
 	    		
 	    		if (my_filter != null && my_filter instanceof PatternFilter) {

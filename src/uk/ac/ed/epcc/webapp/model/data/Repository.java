@@ -212,7 +212,7 @@ public final class Repository implements AppContextCleanup{
 		public IndexInfo(String name, boolean unique){
 			this.name=name;
 			this.unique=unique;
-			cols = new ArrayList<String>();
+			cols = new ArrayList<>();
 		}
 		public String getName(){
 			return name;
@@ -712,7 +712,7 @@ public final class Repository implements AppContextCleanup{
          * @return Map
          */
         public Map<String,Object> getValues(){
-        	Map<String,Object> res = new HashMap<String,Object>();
+        	Map<String,Object> res = new HashMap<>();
         	for(String key : getFields()){
         		if( ! key.equals(getUniqueIdName())){
         			Object value = get(key);
@@ -1231,7 +1231,7 @@ public final class Repository implements AppContextCleanup{
 				if( ! val ){
 					return;
 				}
-				dirty = new HashSet<String>();
+				dirty = new HashSet<>();
 			}
 			if( val ){
 				dirty.add(key);
@@ -1791,6 +1791,7 @@ public final class Repository implements AppContextCleanup{
 			this.desc=desc;
 			this.info=info;
 		}
+		@Override
 		public StringBuilder addClause(StringBuilder sb, boolean qualify){
 			if( info != null ){
 				info.addName(sb, qualify, true);
@@ -1806,6 +1807,7 @@ public final class Repository implements AppContextCleanup{
 			return Repository.this;
 		}
 		
+		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
 			sb.append("Order(");
@@ -2317,7 +2319,7 @@ public final class Repository implements AppContextCleanup{
 		}
 		synchronized(this){
 		if( cache_ref == null || cache_ref.get() == null){
-			cache_ref = new SoftReference<Map<Integer,Record>>(new HashMap<Integer,Record>());
+			cache_ref = new SoftReference<>(new HashMap<Integer,Record>());
 		}
 	    // there is a potential race condition here as the reference may be cleared 
 		// by the gc between the previous line and the next. 
@@ -2365,7 +2367,7 @@ public final class Repository implements AppContextCleanup{
 			return null;
 		}
 		// preserve order
-		return new LinkedHashSet<String>(indexes.keySet());
+		return new LinkedHashSet<>(indexes.keySet());
 	}
 	public IndexInfo getIndexInfo(String name){
 		if( indexes == null ){
@@ -2532,7 +2534,7 @@ public final class Repository implements AppContextCleanup{
 		if( info == null || ! info.isNumeric()){
 			throw new ConsistencyError("Invalid numeric field "+getTag()+"."+key);
 		}
-		return new NumberFieldExpression<T,X>(filter_type,target,this,key);
+		return new NumberFieldExpression<>(filter_type,target,this,key);
 	}
 	/** get a {@link BooleanFieldExpression} for a field
 	 * 
@@ -2546,7 +2548,7 @@ public final class Repository implements AppContextCleanup{
 		if( info == null || ! info.isBoolean()){
 			throw new ConsistencyError("Invalid boolean field "+getTag()+"."+key);
 		}
-		return new BooleanFieldExpression<X>(filter_type,this,key);
+		return new BooleanFieldExpression<>(filter_type,this,key);
 	}
 	/** get a {@link StringFieldExpression} for a field
 	 * 
@@ -2562,7 +2564,7 @@ public final class Repository implements AppContextCleanup{
 			// note all types can be treated as strings
 			throw new ConsistencyError("Invalid string field "+getTag()+"."+key);
 		}
-		return new StringFieldExpression<X>(filter_type,this,key);
+		return new StringFieldExpression<>(filter_type,this,key);
 		
 	}
 	/** get a {@link Date} valued {@link FieldValue} for a field.
@@ -2580,10 +2582,10 @@ public final class Repository implements AppContextCleanup{
 			throw new ConsistencyError("Invalid date field");
 		}
 		if( info.isDate()){
-		   return new DateFieldExpression<X>(target,this,key);
+		   return new DateFieldExpression<>(target,this,key);
 		}
 		if( info.isNumeric()){
-			   return new TimestampDateFieldExpression<X>(target,this, key);
+			   return new TimestampDateFieldExpression<>(target,this, key);
 		}
 		throw new ConsistencyError("Invalid date field");
 	}
@@ -2610,7 +2612,7 @@ public final class Repository implements AppContextCleanup{
 		throw new ConsistencyError("Invalid reference field "+getTag()+"."+key);
 	}
 	public <T extends DataObject,O,D> TypeProducerFieldValue<T,O,D> getTypeProducerExpression(TypeProducer<O,D> prod){
-		return new TypeProducerFieldValue<T,O,D>(this, prod);
+		return new TypeProducerFieldValue<>(this, prod);
 	}
 	/** Get a {@link IndexedFieldValue} for a field
 	 * The field does not have to be tagged as a reference field
@@ -2879,7 +2881,7 @@ public final class Repository implements AppContextCleanup{
 	synchronized private void setIndexes(){
 		DatabaseService db_serv = getContext().getService(DatabaseService.class);
 		try{
-			Map<String,IndexInfo> result = new LinkedHashMap<String, Repository.IndexInfo>();
+			Map<String,IndexInfo> result = new LinkedHashMap<>();
 			
 			Connection c = db_serv.getSQLContext().getConnection();
 			DatabaseMetaData md = c.getMetaData();
@@ -2959,7 +2961,7 @@ public final class Repository implements AppContextCleanup{
 	private void setMetaData(ResultSet rs) throws SQLException,
 			ConsistencyError {
 		assert(fields == null);
-		fields = new LinkedHashMap<String,FieldInfo>();
+		fields = new LinkedHashMap<>();
 		ResultSetMetaData meta_data = rs.getMetaData();
 		int md_columns = meta_data.getColumnCount();
 		boolean seen_key = false;
@@ -3274,6 +3276,7 @@ public final class Repository implements AppContextCleanup{
 			return false;
 		return true;
 	}
+	@Override
 	public String toString(){
 		return "Repository-"+alias_name+"["+table_name+"]";
 	}

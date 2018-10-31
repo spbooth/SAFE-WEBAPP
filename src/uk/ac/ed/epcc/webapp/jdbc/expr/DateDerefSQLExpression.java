@@ -46,7 +46,7 @@ public class DateDerefSQLExpression<H extends DataObject,R extends DataObject> e
 	 */
 	public static <H extends DataObject,R extends DataObject> DateDerefSQLExpression<H, R> convertToDate(SQLContext sql, DerefSQLExpression<H, R, ? extends Number> expr,long res){
 		
-		return new DateDerefSQLExpression<H,R>(expr.a, sql.convertToDate(expr.remote_expression, res),expr.required_filter);
+		return new DateDerefSQLExpression<>(expr.a, sql.convertToDate(expr.remote_expression, res),expr.required_filter);
 		
 	}
 	/* (non-Javadoc)

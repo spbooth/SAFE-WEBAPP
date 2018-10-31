@@ -41,7 +41,7 @@ public class SQLExpressionOrderFilter<I,T> implements SQLOrderFilter<T> {
     	if( req == null){
     		return fil;
     	}
-    	return new SQLAndFilter<T>(target,fil,req);
+    	return new SQLAndFilter<>(target,fil,req);
 
 	}
 	private SQLExpressionOrderFilter(Class<T> target,boolean descending,SQLExpression<I> expr) {
@@ -50,17 +50,20 @@ public class SQLExpressionOrderFilter<I,T> implements SQLOrderFilter<T> {
 		this.expr=expr;
 	}
 	
+	@Override
 	public List<OrderClause> OrderBy() {
-		LinkedList<OrderClause> result = new LinkedList<OrderClause>();
-		result.add(new SQLExpressionOrderClause<I>(descending,expr));
+		LinkedList<OrderClause> result = new LinkedList<>();
+		result.add(new SQLExpressionOrderClause<>(descending,expr));
 		return result;
 	}
+	@Override
 	public void accept(T o) {
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
+	@Override
 	public <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
 		return vis.visitOrderFilter(this);
 	}
@@ -68,6 +71,7 @@ public class SQLExpressionOrderFilter<I,T> implements SQLOrderFilter<T> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
+	@Override
 	public Class<T> getTarget() {
 		return target;
 	}

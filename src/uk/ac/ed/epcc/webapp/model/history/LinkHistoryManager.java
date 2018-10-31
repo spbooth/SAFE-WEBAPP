@@ -59,6 +59,7 @@ public  class LinkHistoryManager<L extends Indexed, R extends Indexed, T extends
 		getLinkManager().modifyHistoryTable(spec);
 		return spec;
 	}
+	@Override
 	@SuppressWarnings("unchecked")
 	public IndexedLinkManager<T,L,R> getLinkManager(){
 		return (IndexedLinkManager<T, L, R>) getPeerFactory();
@@ -66,17 +67,18 @@ public  class LinkHistoryManager<L extends Indexed, R extends Indexed, T extends
     /* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.history.LinkHistoryHandler#getHistoryFilter(L, R, java.util.Date, java.util.Date)
 	 */
-    public SQLFilter<H> getHistoryFilter(L left, R right,Date start,Date end) throws DataException{
+    @Override
+	public SQLFilter<H> getHistoryFilter(L left, R right,Date start,Date end) throws DataException{
 		T peer=null;
 		if( left != null && right != null ){
 			peer = getLinkManager().getLink(left, right);
 			if( peer == null ){
 				// no result
-				return new FalseFilter<H>(getTarget());
+				return new FalseFilter<>(getTarget());
 			}
 		}
 	    HistoryFilter fil = new HistoryFilter(peer,start,end);
-	    fil.addFilter(new LinkHistorySQLFilter<L, R, T,H,LinkHistoryManager<L, R, T,H>>(this, left,right));
+	    fil.addFilter(new LinkHistorySQLFilter<>(this, left,right));
 	   
 	   return fil;
 	}
@@ -84,14 +86,16 @@ public  class LinkHistoryManager<L extends Indexed, R extends Indexed, T extends
     /* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.history.LinkHistoryHandler#canLeftJoin()
 	 */
-    public boolean canLeftJoin(){
+    @Override
+	public boolean canLeftJoin(){
     	return res.hasField(getLinkManager().getLeftField());
     }
 
     /* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.history.LinkHistoryHandler#canRightJoin()
 	 */
-    public boolean canRightJoin(){
+    @Override
+	public boolean canRightJoin(){
     	return res.hasField(getLinkManager().getRightField());
     }
 }

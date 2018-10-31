@@ -254,7 +254,7 @@ public abstract class DataObject implements ContextIndexed, Identified{
 	 * @return Hashtable
 	 */
 	public final Map<String,Object> getMap() {
-		Map<String,Object> h = new HashMap<String,Object>();
+		Map<String,Object> h = new HashMap<>();
 		if (record != null) {
 			// use explicit code as putAll has had problems with null entries in
 			// the past.
@@ -423,7 +423,7 @@ public abstract class DataObject implements ContextIndexed, Identified{
 			}
 			return table;
 		} else {
-			Map<String,Object> newtable = new HashMap<String,Object>();
+			Map<String,Object> newtable = new HashMap<>();
 			for (int i = 0; i < values.length; i++) {
 				newtable.put((String)values[i][0], values[i][1]);
 			}

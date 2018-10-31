@@ -44,7 +44,8 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 	    private int start_pos[]; // start positions of targets in resultset
 	    protected boolean qualify=false;
 	    protected boolean use_alias=false;
-	    public boolean setQualify(boolean qualify) {
+	    @Override
+		public boolean setQualify(boolean qualify) {
 			boolean old = this.qualify;
 			this.qualify = qualify;
 			return old;
@@ -58,8 +59,8 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 	     */
 	    public SQLGroupMapper(AppContext c){
 	    	super(c);
-	    	key_list = new LinkedList<SQLValue>(); 
-	    	target_list=new LinkedList<SQLValue>();
+	    	key_list = new LinkedList<>(); 
+	    	target_list=new LinkedList<>();
 	    }
 	    
 	    
@@ -88,7 +89,7 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 	    public  <T> SQLValue<T> addClause(SQLValue<T> orig, String name){
 	    	SQLValue<T> expr=orig;
 	    	if(use_alias &&  name != null && orig instanceof SQLExpression ){
-	    		expr=new AliasSQLValue<T>((SQLExpression<T>)orig,name);
+	    		expr=new AliasSQLValue<>((SQLExpression<T>)orig,name);
 	    	}
 	    	target_list.add(expr);
 	    	return expr;
@@ -173,8 +174,9 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 	     * @param name
 	     */
 	    public final <T> void addCount(SQLExpression<T> expr,String name){
-	    	addClause(new CountDistinctExpression<T>(expr), name);
+	    	addClause(new CountDistinctExpression<>(expr), name);
 	    }
+		@Override
 		public String getTarget() {
 			start_pos = new int[target_list.size()];
 			int pos=1,i=0;
@@ -190,12 +192,14 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 			}
 			return sb.toString();
 		}
+		@Override
 		public List<PatternArgument> getTargetParameters(List<PatternArgument> list) {
 			for(SQLValue<?> o : target_list){
 				list = o.getParameters(list);
 			}
 			return list;
 		}
+		@Override
 		public List<PatternArgument> getModifyParameters(List<PatternArgument> list) {
 			for(SQLValue<?> o : key_list){
 				if( o instanceof GroupingSQLValue){
@@ -231,6 +235,7 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 			}
 			return seen;
 		}
+		@Override
 		public final String getModify() {
 			
 			StringBuilder modify = new StringBuilder();
@@ -247,6 +252,7 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 			
 			return ! key_list.isEmpty();
 		}
+		@Override
 		@SuppressWarnings("unchecked")
 		public SQLFilter getRequiredFilter() {
 			SQLAndFilter fil=null;

@@ -35,9 +35,9 @@ OptionalInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestC
 {
 
 	
-	public ParseMapInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestCase> parse_map_test = new ParseMapInputInterfaceTestImpl<Integer, AlternateInput<Integer>, AlternateInputTestCase>(this);
+	public ParseMapInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestCase> parse_map_test = new ParseMapInputInterfaceTestImpl<>(this);
 	
-	public OptionalInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestCase> optional_test = new OptionalInputInterfaceTestImpl<Integer, AlternateInput<Integer>, AlternateInputTestCase>(this);
+	public OptionalInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestCase> optional_test = new OptionalInputInterfaceTestImpl<>(this);
 	/**
 	 * 
 	 */
@@ -48,8 +48,9 @@ OptionalInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestC
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getGoodData()
 	 */
+	@Override
 	public Set<Integer> getGoodData() throws Exception {
-		HashSet<Integer> result = new HashSet<Integer>();
+		HashSet<Integer> result = new HashSet<>();
 		for(int i = 1; i< 10; i++){
 			result.add(i);
 		}
@@ -59,8 +60,9 @@ OptionalInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestC
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getBadData()
 	 */
+	@Override
 	public Set<Integer> getBadData() throws Exception {
-		HashSet<Integer> result = new HashSet<Integer>();
+		HashSet<Integer> result = new HashSet<>();
 		result.add(-1);
 		return result;
 	}
@@ -68,8 +70,9 @@ OptionalInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestC
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getInput()
 	 */
+	@Override
 	public AlternateInput<Integer> getInput() throws Exception {
-		AlternateInput<Integer> result = new AlternateInput<Integer>();
+		AlternateInput<Integer> result = new AlternateInput<>();
 		
 		
 		result.addInput("PullDown", new IntegerSetInput(new int[]{3,5,7}));

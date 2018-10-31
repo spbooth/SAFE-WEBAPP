@@ -41,8 +41,8 @@ public abstract class MultiInput<V,I extends Input> implements Input<V> {
 	private String key = "default";
 	private boolean line_breaks=false;
 	public MultiInput(){
-		m = new LinkedHashMap<String,I>();
-		labels = new HashMap<String,String>();
+		m = new LinkedHashMap<>();
+		labels = new HashMap<>();
 	}
 	public final void addInput(String sub_key, I i) {
 		addInput(sub_key,null,i);
@@ -87,10 +87,12 @@ public abstract class MultiInput<V,I extends Input> implements Input<V> {
 	 * 
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#getKey()
 	 */
+	@Override
 	public final String getKey() {
 		return key;
 	}
 
+	@Override
 	public abstract V getValue();
 	public final void removeInput(String sub_key) {
 		m.remove(sub_key);
@@ -99,14 +101,16 @@ public abstract class MultiInput<V,I extends Input> implements Input<V> {
 	public final String getString(){
 		return getString(getValue());
 	}
-	  public String getString(V val){
+	  @Override
+	public String getString(V val){
 	    	if( val == null ){
 	    		return null;
 	    	}
 	    	return val.toString();
 	    }
 	    
-	    public String getPrettyString(V val){
+	    @Override
+		public String getPrettyString(V val){
 	    	if( val == null ){
 	    		return "no value";
 	    	}
@@ -117,6 +121,7 @@ public abstract class MultiInput<V,I extends Input> implements Input<V> {
 	 * 
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#setKey(java.lang.Object)
 	 */
+	@Override
 	public final void setKey(String key) {
 		this.key = key;
 		/*
@@ -129,10 +134,13 @@ public abstract class MultiInput<V,I extends Input> implements Input<V> {
 			i.setKey(key + "." + sub_key);
 		}
 	}
+	@Override
 	public abstract V setValue(V v) throws TypeError;
+	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitMultiInput(this);
 	}
+	@Override
 	public void validate() throws FieldException {
 		// default behaviour is to validate each sub input
 		// sub-classes can override.

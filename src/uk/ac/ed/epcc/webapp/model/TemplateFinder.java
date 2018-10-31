@@ -47,7 +47,7 @@ public class TemplateFinder {
 	private final AppContext conn;
 	private final String group;
 	private final TextFileOverlay ov;
-	Map<String,String> cache = new HashMap<String, String>();
+	Map<String,String> cache = new HashMap<>();
 	private final Pattern expand_pattern = Pattern.compile("%%include\\s+([\\w.]+)%%");
 	public TemplateFinder(AppContext conn, String group){
 		this.conn=conn;

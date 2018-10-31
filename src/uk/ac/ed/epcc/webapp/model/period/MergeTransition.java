@@ -34,6 +34,7 @@ public class MergeTransition<T extends TimePeriod,K> extends AbstractDirectTrans
 		this.fac=fac;
 		move_up=go_up;
 	}
+	@Override
 	public boolean allow(SessionService<?> serv, T target) {
 		T peer = fac.getNextInSequence(target, move_up);
 		if( peer == null){
@@ -46,14 +47,15 @@ public class MergeTransition<T extends TimePeriod,K> extends AbstractDirectTrans
 		}
 	}
 	
+	@Override
 	public FormResult doTransition(T target, AppContext c)
 			throws TransitionException {
 		try{
 		T peer = fac.getNextInSequence(target, move_up);
 		if( move_up){
-			return new ViewTransitionResult<T, K>(tp, fac.merge(target, peer)); 
+			return new ViewTransitionResult<>(tp, fac.merge(target, peer)); 
 		}else{
-			return new ViewTransitionResult<T, K>(tp, fac.merge(peer,target)); 
+			return new ViewTransitionResult<>(tp, fac.merge(peer,target)); 
 		}
 		}catch(Exception t){
 			tp.getContext().error(t,"Error in merge");

@@ -70,7 +70,7 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 	 */
 	public BackJoinFilter( Class<BDO> target,String join_field, Repository res, Repository remote_res, SQLFilter<T> fil){
 		this.target=target;
-		this.link = new JoinerFilter<BDO,T>((Class<T>) (fil != null ? fil.getTarget(): DataObject.class), join_field, remote_res, res);
+		this.link = new JoinerFilter<>((Class<T>) (fil != null ? fil.getTarget(): DataObject.class), join_field, remote_res, res);
 		this.remote_res=remote_res;
 		this.fil=fil;
 	}
@@ -79,12 +79,14 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 		
 		
 		
+		@Override
 		@SuppressWarnings("unchecked")
 		
 		public List<PatternArgument> getParameters(List<PatternArgument> list) {
 			return getFilterArguments(fil, list);
 		}
 		
+		@Override
 		public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb, boolean qualify) {
 			Set<Repository> inner_tables = new HashSet<>(tables);
 			// this is the clause that matches the tables.
@@ -116,6 +118,7 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 
 
 		
+		@Override
 		public void accept(BDO o) {
 		}
 
@@ -126,6 +129,7 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 		 */
+		@Override
 		public <X> X acceptVisitor(FilterVisitor<X, BDO> vis)
 				throws Exception {
 			return vis.visitPatternFilter(this);
@@ -138,9 +142,11 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
+		@Override
 		public Class<BDO> getTarget() {
 			return target;
 		}
+		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
 			sb.append(getClass().getSimpleName());

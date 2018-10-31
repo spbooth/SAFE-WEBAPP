@@ -40,10 +40,10 @@ UnmodifiableInputInterfaceTest<Number, ConstantInput<Number>, ConstantInputTestC
 {
 
 	
-	public InputInterfaceTest<Number, ConstantInput<Number>, ConstantInputTestCase> input_test = new InputInterfaceTestImpl<Number, ConstantInput<Number>, ConstantInputTestCase>(this);
+	public InputInterfaceTest<Number, ConstantInput<Number>, ConstantInputTestCase> input_test = new InputInterfaceTestImpl<>(this);
 	
 	
-	public UnmodifiableInputInterfaceTest<Number, ConstantInput<Number>, ConstantInputTestCase> unmodifiable_test = new UnmodifiableInputInterfaceTestImpl<Number, ConstantInput<Number>, ConstantInputTestCase>(this);
+	public UnmodifiableInputInterfaceTest<Number, ConstantInput<Number>, ConstantInputTestCase> unmodifiable_test = new UnmodifiableInputInterfaceTestImpl<>(this);
 	
 	/**
 	 * 
@@ -53,8 +53,9 @@ UnmodifiableInputInterfaceTest<Number, ConstantInput<Number>, ConstantInputTestC
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getGoodData()
 	 */
+	@Override
 	public Set<Number> getGoodData() throws Exception {
-		Set<Number> result = new HashSet<Number>();
+		Set<Number> result = new HashSet<>();
 		result.add(12);
 		result.add(16.0);
 		return result;
@@ -63,8 +64,9 @@ UnmodifiableInputInterfaceTest<Number, ConstantInput<Number>, ConstantInputTestC
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getBadData()
 	 */
+	@Override
 	public Set<Number> getBadData() throws Exception {
-		Set<Number> result = new HashSet<Number>();
+		Set<Number> result = new HashSet<>();
 		//result.add(15);
 		return result;
 	}
@@ -72,8 +74,9 @@ UnmodifiableInputInterfaceTest<Number, ConstantInput<Number>, ConstantInputTestC
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getInput()
 	 */
+	@Override
 	public ConstantInput<Number> getInput() throws Exception {
-		ConstantInput<Number> input = new ConstantInput<Number>("Boris",12);
+		ConstantInput<Number> input = new ConstantInput<>("Boris",12);
 		return input;
 	}
 

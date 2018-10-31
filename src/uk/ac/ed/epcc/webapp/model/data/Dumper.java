@@ -81,7 +81,7 @@ public class Dumper extends AbstractContexed{
 	public Dumper(AppContext conn,SimpleXMLBuilder builder) {
 		super(conn);
 		this.builder=builder;
-		seen = new HashMap<String, Set<Integer>>();
+		seen = new HashMap<>();
 		specifications = new HashMap<>();
 	}
     private final SimpleXMLBuilder builder;
@@ -119,7 +119,7 @@ public class Dumper extends AbstractContexed{
 			if( res != null ){ 
 				dumpSchema(res);
 			}
-			dumped = new HashSet<Integer>();
+			dumped = new HashSet<>();
 			seen.put(key, dumped);
 		}
 		if( id <= 0 || dumped.contains(id)){

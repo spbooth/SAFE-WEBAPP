@@ -45,12 +45,14 @@ public class InputInterfaceTestImpl<T,I extends Input<T>,X extends TestDataProvi
 		this.target=target;
 	}
 
+	@Override
 	@Test
 	public void testGetKey() throws Exception {
 		I i = target.getInput();
 		i.setKey("fred");
 		assertEquals("fred", i.getKey());
 	}
+	@Override
 	@Test
 	public void testMakeHtml() throws Exception{
 		// check for exceptions makeing html
@@ -61,6 +63,7 @@ public class InputInterfaceTestImpl<T,I extends Input<T>,X extends TestDataProvi
 		input.accept(vis);
 	}
 	
+	@Override
 	@Test
 	public void testMakeSwing() throws Exception{
 		if( target.getContext().getBooleanParameter("java.awt.headless",false)){
@@ -71,11 +74,12 @@ public class InputInterfaceTestImpl<T,I extends Input<T>,X extends TestDataProvi
 		JFormDialog dialog = new JFormDialog(target.getContext(), frame);
 		SwingContentBuilder cb = dialog.getContentBuilder();
 		BaseForm form = new BaseForm(target.getContext());
-		Field<T> f = new Field<T>(form,"Test", "Test lable", target.getInput());
+		Field<T> f = new Field<>(form,"Test", "Test lable", target.getInput());
 		cb.addFormLabel(target.getContext(), f);
 		cb.addFormInput(target.getContext(), f, null);
 	}
 	
+	@Override
 	@Test
     public void testGood() throws TypeError, Exception{
     	
@@ -85,6 +89,7 @@ public class InputInterfaceTestImpl<T,I extends Input<T>,X extends TestDataProvi
     		checkValid(dat,true, in);
     	}
     }
+	@Override
 	@Test
     public void testBad() throws Exception{
     	I in=target.getInput();
@@ -110,7 +115,8 @@ public class InputInterfaceTestImpl<T,I extends Input<T>,X extends TestDataProvi
 	
    }
     
-    @Test
+    @Override
+	@Test
     public void testGetString() throws Exception{
     	I in=target.getInput();
     	for( T dat : target.getGoodData()){

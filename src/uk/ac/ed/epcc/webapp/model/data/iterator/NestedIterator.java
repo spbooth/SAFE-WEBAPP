@@ -45,7 +45,7 @@ public class NestedIterator<T> implements CloseableIterator<T> {
 	 * 
 	 */
 	public NestedIterator() {
-		list = new Vector<Iterator<? extends T>>();
+		list = new Vector<>();
 		count = 0;
 	}
 
@@ -58,6 +58,7 @@ public class NestedIterator<T> implements CloseableIterator<T> {
 	 * 
 	 * @see java.util.Iterator#hasNext()
 	 */
+	@Override
 	public boolean hasNext() {
 		for (;;) {
 			if (count >= list.size()) {
@@ -76,6 +77,7 @@ public class NestedIterator<T> implements CloseableIterator<T> {
 	 * 
 	 * @see java.util.Iterator#next()
 	 */
+	@Override
 	public T next() {
 		if (hasNext()) {
 			return list.get(count).next();
@@ -89,6 +91,7 @@ public class NestedIterator<T> implements CloseableIterator<T> {
 	 * 
 	 * @see java.util.Iterator#remove()
 	 */
+	@Override
 	public void remove() {
 		// tricky to do right as may have switched underlying iterator since
 		// last call

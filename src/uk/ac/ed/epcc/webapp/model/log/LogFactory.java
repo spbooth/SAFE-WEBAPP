@@ -256,6 +256,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		 * Remove referenced data if appropriate and then remove this object.
 		 * @throws Exception
 		 */
+		@Override
 		public final void remove() throws Exception {
 			try{
 				L data = getLink();
@@ -375,12 +376,12 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	public class ItemDateFilter extends DateFilter {
 		public ItemDateFilter(O q, ItemType.ItemValue<T> v, Date s, Date e) {
 			super(s,e);
-			addFilter(new ReferenceFilter<T, O>(LogFactory.this, OWNER_ID, q));
+			addFilter(new ReferenceFilter<>(LogFactory.this, OWNER_ID, q));
 			addFilter(getItemFilter(v));
 		}
 		public ItemDateFilter(O q, Set<ItemType.ItemValue<T>> set, Date s, Date e) {
 			super(s,e);
-			addFilter(new ReferenceFilter<T, O>(LogFactory.this, OWNER_ID, q));
+			addFilter(new ReferenceFilter<>(LogFactory.this, OWNER_ID, q));
 			addFilter(getItemType().getFilter(LogFactory.this, set));
 		}
 	}
@@ -431,7 +432,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 			super(s,e);
 			addFilter(getItemType().getFilter(LogFactory.this, item));
 			if (target != null) {
-				addFilter(new ReferenceFilter<T, L>(LogFactory.this, LINK_ID,
+				addFilter(new ReferenceFilter<>(LogFactory.this, LINK_ID,
 						target));
 			}
 		}
@@ -452,7 +453,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
     protected final ItemType<T> use_type;
 	public LogFactory(LogOwner<O> fac, String table,AppUserFactory<?> uf) {
 		AppContext ctx = fac.getContext();
-		use_type=new ItemType<T>(getStaticItemType());
+		use_type=new ItemType<>(getStaticItemType());
 		if( DataObjectFactory.AUTO_CREATE_TABLES_FEATURE.isEnabled(ctx)){
     		if( setContextWithMake(ctx, table,getDefaultTableSpecification(ctx,fac,uf,table))){
     			// table created
@@ -500,7 +501,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		
 	}
 	protected Map<String,TableSpecification> getPrereqTables(){
-		return new HashMap<String, TableSpecification>();
+		return new HashMap<>();
 	}
 	protected TableSpecification getDefaultTableSpecification(AppContext c,LogOwner<O> fac,AppUserFactory<?>uf,String homeTable){
 		TableSpecification spec = new TableSpecification("LogID");
@@ -526,10 +527,10 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 */
 	public T find(O q, ItemType.ItemValue v, int link, boolean allow_null)
 			throws DataException {
-		SQLAndFilter<T> fil = new SQLAndFilter<T>(getTarget());
-		fil.addFilter(new ReferenceFilter<T, O>(this, OWNER_ID, q));
+		SQLAndFilter<T> fil = new SQLAndFilter<>(getTarget());
+		fil.addFilter(new ReferenceFilter<>(this, OWNER_ID, q));
 		fil.addFilter(getItemType().getFilter(this, v));
-		fil.addFilter(new SQLValueFilter<T>(getTarget(),res, LINK_ID, link));
+		fil.addFilter(new SQLValueFilter<>(getTarget(),res, LINK_ID, link));
 		return find(fil,allow_null);
 		
 	}
@@ -556,9 +557,9 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 */
 	private SQLAndFilter<T> getItemFilter(ItemType.ItemValue v, int link) {
 		SQLAndFilter<T> fil;
-		fil = new SQLAndFilter<T>(getTarget());
+		fil = new SQLAndFilter<>(getTarget());
 		fil.addFilter(getItemType().getFilter(this, v));
-		fil.addFilter(new SQLValueFilter<T>(getTarget(),res, LINK_ID, link));
+		fil.addFilter(new SQLValueFilter<>(getTarget(),res, LINK_ID, link));
 		return fil;
 	}
 	/** get all owners that reference a particular owner from their log.
@@ -569,7 +570,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 * @throws DataException
 	 */
 	public Set<O> getOwners(ItemType.ItemValue v, int link) throws DataException {
-		HashSet<O> owners = new HashSet<O>();
+		HashSet<O> owners = new HashSet<>();
 		for( T item : new FilterSet(getItemFilter(v, link))){
 			owners.add((O) item.getOwner());
 		}
@@ -589,6 +590,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 * @return
 	 */
 	protected abstract ItemType<T> getStaticItemType();
+	@Override
 	protected final DataObject makeBDO(Record res) throws DataFault {
 		return getItemType().makeBDO(this, res);
 	}
@@ -624,7 +626,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	}
 	
 	public CloseableIterator<T> getLog(O q) throws DataFault {
-		return new FilterIterator(new ReferenceFilter<T, O>(this, OWNER_ID, q));
+		return new FilterIterator(new ReferenceFilter<>(this, OWNER_ID, q));
 	}
 
 	protected final LogOwner<O> getOwnerFactory() {
@@ -640,6 +642,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	}
 	public class EditItemTransition extends AbstractFormTransition<Entry>{
 
+		@Override
 		public void buildForm(Form f, Entry target, AppContext conn)
 				throws TransitionException {
 			
@@ -657,12 +660,14 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 			addTransition(EDIT_ITEM, new EditItemTransition());
 		}
 
+		@Override
 		public boolean allowTransition(AppContext c, Entry target,
 				TransitionKey<Entry> key) {
 			SessionService serv = c.getService(SessionService.class);
 			return target.canRead(serv) && target.permit(serv,key);
 		}
 
+		@Override
 		public <X extends ContentBuilder> X getSummaryContent(AppContext c, X cb,Entry target) {
 			return cb;
 		}

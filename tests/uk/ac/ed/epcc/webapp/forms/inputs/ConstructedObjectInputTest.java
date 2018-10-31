@@ -37,16 +37,17 @@ ListInputInterfaceTest<String, Beatle, ConstructedObjectInput<Beatle>, TestDataP
 {
 
 	
-	public InputInterfaceTest<String, ConstructedObjectInput<Beatle>, ConstructedObjectInputTest> input_test = new InputInterfaceTestImpl<String, ConstructedObjectInput<Beatle>, ConstructedObjectInputTest>(this);
+	public InputInterfaceTest<String, ConstructedObjectInput<Beatle>, ConstructedObjectInputTest> input_test = new InputInterfaceTestImpl<>(this);
 
 	
 
-	public ListInputInterfaceTest<String, Beatle, ConstructedObjectInput<Beatle>, TestDataProvider<String,ConstructedObjectInput<Beatle>>> list_test = new ListInputInterfaceTestImpl<String, Beatle, ConstructedObjectInput<Beatle>, TestDataProvider<String,ConstructedObjectInput<Beatle>>>(this);
+	public ListInputInterfaceTest<String, Beatle, ConstructedObjectInput<Beatle>, TestDataProvider<String,ConstructedObjectInput<Beatle>>> list_test = new ListInputInterfaceTestImpl<>(this);
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getGoodData()
 	 */
+	@Override
 	public Set<String> getGoodData() throws Exception {
-		Set<String> good = new HashSet<String>();
+		Set<String> good = new HashSet<>();
 		good.add("John");
 		good.add("Paul");
 		good.add("Ringo");
@@ -57,8 +58,9 @@ ListInputInterfaceTest<String, Beatle, ConstructedObjectInput<Beatle>, TestDataP
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getBadData()
 	 */
+	@Override
 	public Set<String> getBadData() throws Exception {
-		Set<String> bad = new HashSet<String>();
+		Set<String> bad = new HashSet<>();
 		bad.add("Mick");
 		bad.add("Vlad");
 		return bad;
@@ -71,8 +73,9 @@ ListInputInterfaceTest<String, Beatle, ConstructedObjectInput<Beatle>, TestDataP
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getInput()
 	 */
+	@Override
 	public ConstructedObjectInput<Beatle> getInput() throws Exception {
-		return new ConstructedObjectInput<Beatle>(ctx, Beatle.class);
+		return new ConstructedObjectInput<>(ctx, Beatle.class);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.InputInterfaceTest#testGetKey()

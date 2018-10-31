@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class NodeContainer implements Externalizable {
 
-	protected LinkedList<Node> children = new LinkedList<Node>();
+	protected LinkedList<Node> children = new LinkedList<>();
     private Date creation_date;
 	private String id;
 	/**

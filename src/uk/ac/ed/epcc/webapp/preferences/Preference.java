@@ -54,7 +54,7 @@ public class Preference extends Feature {
 		Boolean b = (Boolean) conn.getAttribute(this);
 		if (b == null) {
 			if( canUserSet(conn)){
-				UserSettingFactory<UserSetting> fac = new UserSettingFactory<UserSetting>(conn);
+				UserSettingFactory<UserSetting> fac = new UserSettingFactory<>(conn);
 				b = new Boolean(fac.getPreference(this));
 			}else{
 				b = new Boolean(defaultSetting(conn));
@@ -72,19 +72,19 @@ public class Preference extends Feature {
 	}
 	
 	public boolean hasPreference(AppContext conn){
-		UserSettingFactory<UserSetting> fac = new UserSettingFactory<UserSetting>(conn);
+		UserSettingFactory<UserSetting> fac = new UserSettingFactory<>(conn);
 		return fac.hasPreference(this);
 	}
 	
 	
 	public void clearPreference(AppContext conn) throws DataFault{
-		UserSettingFactory<UserSetting> fac = new UserSettingFactory<UserSetting>(conn);
+		UserSettingFactory<UserSetting> fac = new UserSettingFactory<>(conn);
 		fac.clearPreference(this);
 		conn.removeAttribute(this);
 		
 	}
 	public void setPreference(AppContext conn, boolean value){
-		UserSettingFactory<UserSetting> fac = new UserSettingFactory<UserSetting>(conn);
+		UserSettingFactory<UserSetting> fac = new UserSettingFactory<>(conn);
 		fac.setPreference(this, value);
 		conn.removeAttribute(this);
 	}

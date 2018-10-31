@@ -145,9 +145,11 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		public void setSortOrder(int order){
 			record.setProperty(ORDER_FIELD, order);
 		}
+		@Override
 		public final DynamicForm getForm(){
 			return getOwner().getForm();
 		}
+		@Override
 		public String getName(){
 			return getRawName();
 		}
@@ -189,6 +191,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 			return builder;
 		}
 		
+		@Override
 		public ViewResult getViewResult() {
 			return manager.form_manager.getPartPathProvider().new ViewResult(this);
 		}
@@ -211,7 +214,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		 * @return
 		 */
 		public Map<String,Object> getInfo(){
-			return new LinkedHashMap<String, Object>();
+			return new LinkedHashMap<>();
 		}
 		
 		/** visit a {@link PartVisitor}
@@ -295,6 +298,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 	public final String getPartTag(){
 		return part_tag;
 	}
+	@Override
 	public Class<P> getTarget(){
 		return (Class) Part.class;
 	}
@@ -342,18 +346,18 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 	 * @return
 	 */
 	private ReferenceFilter<P, O> getOwnerFilter(O owner) {
-		return new ReferenceFilter<P, O>(this, OWNER_FIELD, owner);
+		return new ReferenceFilter<>(this, OWNER_FIELD, owner);
 	}
 	
 	public P findByParentAndName(O owner,String name) throws DataException{
-		SQLAndFilter<P> fil = new SQLAndFilter<P>(getTarget());
+		SQLAndFilter<P> fil = new SQLAndFilter<>(getTarget());
 		fil.addFilter(getOwnerFilter(owner));
-		fil.addFilter(new SQLValueFilter<P>(getTarget(), res, NAME_FIELD, name));
+		fil.addFilter(new SQLValueFilter<>(getTarget(), res, NAME_FIELD, name));
 		return find(fil,true);
 	}
 	private class MaxFinder extends AbstractFinder<Number>{
 		private MaxFinder(){
-			setMapper(new ValueResultMapper<Number>(FuncExpression.apply(getContext(),SQLFunc.MAX,Number.class,res.getNumberExpression(getTarget(), Number.class, ORDER_FIELD))));
+			setMapper(new ValueResultMapper<>(FuncExpression.apply(getContext(),SQLFunc.MAX,Number.class,res.getNumberExpression(getTarget(), Number.class, ORDER_FIELD))));
 		}
 	}
 	private int getNextPosition(O owner) throws DataException{
@@ -403,7 +407,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		 * 
 		 */
 		public PartOrderFilter(boolean down) {
-			order = new LinkedList<OrderClause>();
+			order = new LinkedList<>();
 			order.add(res.getOrder(ORDER_FIELD, down));
 			order.add(res.getOrder(null, down));
 		}
@@ -448,10 +452,10 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 	 * @throws DataFault
 	 */
 	public P getSibling(P current, boolean up) throws DataFault{
-		SQLAndFilter<P> fil = new SQLAndFilter<P>(getTarget());
-		fil.addFilter(new SQLValueFilter<P>(getTarget(), res, OWNER_FIELD, current.getOwnerID()));
-		fil.addFilter(new SQLValueFilter<P>(getTarget(), res, ORDER_FIELD, up ? MatchCondition.GE : MatchCondition.LE, current.getSortOrder()));
-		fil.addFilter(new SelfReferenceFilter<P>(getTarget(), res, true, makeReference(current)));
+		SQLAndFilter<P> fil = new SQLAndFilter<>(getTarget());
+		fil.addFilter(new SQLValueFilter<>(getTarget(), res, OWNER_FIELD, current.getOwnerID()));
+		fil.addFilter(new SQLValueFilter<>(getTarget(), res, ORDER_FIELD, up ? MatchCondition.GE : MatchCondition.LE, current.getSortOrder()));
+		fil.addFilter(new SelfReferenceFilter<>(getTarget(), res, true, makeReference(current)));
 		fil.addFilter(new PartOrderFilter(! up));
 		FilterIterator it = new FilterIterator(fil, 0, 1);
 		if( it.hasNext()){
@@ -560,7 +564,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 			deleteContent(part);
 		}
 		// Now delete the parts themselves.
-		FilterDelete<P> del = new FilterDelete<P>(res);
+		FilterDelete<P> del = new FilterDelete<>(res);
 		del.delete(getOwnerFilter(owner));
 	}
 	/** delete a {@link Part}
@@ -585,6 +589,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		}
 	}
 	private PartManager child_manager=null;
+	@Override
 	public abstract String getChildTypeName();
 	protected abstract PartManager makeChildManager();
 	@Override

@@ -102,10 +102,10 @@ public class DomWalker implements ContentHandler, ErrorHandler, InfoProvider{
 					
 						TypeInfoProvider type_provider = ((ValidatorHandler)inner).getTypeInfoProvider();
 						if( types == null ){
-							types = new HashMap<LinkedList<String>, TypeInfo>();
+							types = new HashMap<>();
 						}
 						TypeInfo info = type_provider.getElementTypeInfo();
-						types.put(new LinkedList<String>(path), info);
+						types.put(new LinkedList<>(path), info);
 				}
 				
 			});
@@ -194,13 +194,14 @@ public class DomWalker implements ContentHandler, ErrorHandler, InfoProvider{
 	}
 	public void setPath(LinkedList<String> sax_path) {
 		this.path = sax_path;
-		this.counter_stack=new LinkedList<DomWalker.Counter>();
+		this.counter_stack=new LinkedList<>();
 		errors=null;
 	}
 
 
 	private LinkedList<String> path;
 	
+	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException{
 		counter_stack.removeLast();
 		if( ! counter_stack.isEmpty()){
@@ -211,6 +212,7 @@ public class DomWalker implements ContentHandler, ErrorHandler, InfoProvider{
 		}
 	}
 	
+	@Override
 	public void startElement(String uri, String localName, String qName,
 			Attributes atts) throws SAXException {
 		if( ! counter_stack.isEmpty()){
@@ -231,12 +233,12 @@ public class DomWalker implements ContentHandler, ErrorHandler, InfoProvider{
 	
 	private void doError(Throwable t){
 		if( errors == null ){
-			errors = new HashMap<LinkedList<String>, Set<String>>();
+			errors = new HashMap<>();
 		}
 		Set<String> msg = errors.get(path);
 		if( msg == null ){
-			msg = new LinkedHashSet<String>();
-			errors.put(new LinkedList<String>(path),msg);
+			msg = new LinkedHashSet<>();
+			errors.put(new LinkedList<>(path),msg);
 		}
 		msg.add(t.toString());
 	}
@@ -245,7 +247,7 @@ public class DomWalker implements ContentHandler, ErrorHandler, InfoProvider{
 			return;
 		}
 		if( this.errors == null){
-			this.errors=new LinkedHashMap<LinkedList<String>, Set<String>>(errors);
+			this.errors=new LinkedHashMap<>(errors);
 		}else{
 			this.errors.putAll(errors);
 		}
@@ -254,6 +256,7 @@ public class DomWalker implements ContentHandler, ErrorHandler, InfoProvider{
 	 * @see uk.ac.ed.epcc.webapp.model.xml.InfoProvider#getErrors()
 	 */
 	
+	@Override
 	public Map<LinkedList<String>, Set<String>> getErrors() {
 		return errors;
 	}
@@ -261,23 +264,28 @@ public class DomWalker implements ContentHandler, ErrorHandler, InfoProvider{
 	 * @see uk.ac.ed.epcc.webapp.model.xml.InfoProvider#getTypes()
 	 */
 	
+	@Override
 	public Map<LinkedList<String> ,TypeInfo> getTypes(){
 		return types;
 	}
 	
+	@Override
 	public void error(SAXParseException e) throws SAXException {
 		doError(e);
 	}
 	
+	@Override
 	public void warning(SAXParseException e) throws SAXException {
 		doError(e);
 	}
 	
+	@Override
 	public void fatalError(SAXParseException exception) throws SAXException {
 		throw exception;
 		
 	}
 	
+	@Override
 	public void characters(char[] ch, int start, int length)
 			throws SAXException {
 		if( inner != null ){
@@ -285,6 +293,7 @@ public class DomWalker implements ContentHandler, ErrorHandler, InfoProvider{
 		}
 	}
 	
+	@Override
 	public void endDocument() throws SAXException {
 		if( inner != null){
 			inner.endDocument();
@@ -292,6 +301,7 @@ public class DomWalker implements ContentHandler, ErrorHandler, InfoProvider{
 		
 	}
 	
+	@Override
 	public void endPrefixMapping(String prefix) throws SAXException {
 		if( inner != null){
 			inner.endPrefixMapping(prefix);
@@ -299,6 +309,7 @@ public class DomWalker implements ContentHandler, ErrorHandler, InfoProvider{
 		
 	}
 	
+	@Override
 	public void ignorableWhitespace(char[] ch, int start, int length)
 			throws SAXException {
 		if( inner != null ){
@@ -307,6 +318,7 @@ public class DomWalker implements ContentHandler, ErrorHandler, InfoProvider{
 		
 	}
 	
+	@Override
 	public void processingInstruction(String target, String data)
 			throws SAXException {
 		if( inner != null ){
@@ -315,24 +327,28 @@ public class DomWalker implements ContentHandler, ErrorHandler, InfoProvider{
 		
 	}
 	
+	@Override
 	public void setDocumentLocator(Locator locator) {
 		if( inner != null ){
 			inner.setDocumentLocator(locator);
 		}
 	}
 	
+	@Override
 	public void skippedEntity(String name) throws SAXException {
 		if( inner != null ){
 			inner.skippedEntity(name);
 		}
 	}
 	
+	@Override
 	public void startDocument() throws SAXException {
 		if( inner != null){
 			inner.startDocument();
 		}
 	}
 	
+	@Override
 	public void startPrefixMapping(String prefix, String uri)
 			throws SAXException {
 		if( inner != null ){
@@ -340,6 +356,7 @@ public class DomWalker implements ContentHandler, ErrorHandler, InfoProvider{
 		}
 	}
 	
+	@Override
 	public Set<String> getError(LinkedList<String> path) {
 		if( errors != null ){
 			return errors.get(path);
@@ -347,6 +364,7 @@ public class DomWalker implements ContentHandler, ErrorHandler, InfoProvider{
 		return null;
 	}
 	
+	@Override
 	public TypeInfo getTypeInfo(LinkedList<String> path) {
 		if( types != null){
 			return types.get(path);

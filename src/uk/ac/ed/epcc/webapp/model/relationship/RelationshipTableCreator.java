@@ -51,10 +51,11 @@ public class RelationshipTableCreator extends AbstractContexed implements FormCr
 	public RelationshipTableCreator(AppContext c){
 		super(c);
 	}
+	@Override
 	public void buildCreationForm(String type_name,Form f) throws Exception {
 		f.addInput(TABLE, "Name of table to create", new NewTableInput(conn));
-		f.addInput(TYPE,"Table type",new ClassInput<RelationshipProvider>(conn, RelationshipProvider.class));
-		f.addInput(PEER,"Table Relationship applies to", new TableInput<NameFinder>(conn, NameFinder.class));
+		f.addInput(TYPE,"Table type",new ClassInput<>(conn, RelationshipProvider.class));
+		f.addInput(PEER,"Table Relationship applies to", new TableInput<>(conn, NameFinder.class));
 		f.addAction("Create", new CreateAction());
 	}
 
@@ -67,7 +68,7 @@ public class RelationshipTableCreator extends AbstractContexed implements FormCr
 				String table_name=(String) f.get(TABLE);
 				String type_tag = (String) f.get(TYPE);
 				String peer_table =(String) f.get(PEER);
-				f.addInput(PEER, "Peer relashionship applies to", new TableInput<NameFinder>(getContext(), NameFinder.class));
+				f.addInput(PEER, "Peer relashionship applies to", new TableInput<>(getContext(), NameFinder.class));
 				
 				ConfigService serv = conn.getService(ConfigService.class);
 				serv.setProperty("class."+table_name, type_tag);

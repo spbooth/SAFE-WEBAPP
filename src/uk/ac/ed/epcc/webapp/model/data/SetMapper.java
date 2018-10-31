@@ -27,7 +27,6 @@ import uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultMapper;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 
 
@@ -53,6 +52,7 @@ public class SetMapper<O> implements ResultMapper<Set<O>> {
     	
     }
     
+	@Override
 	public String getTarget() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("DISTINCT ");
@@ -61,6 +61,7 @@ public class SetMapper<O> implements ResultMapper<Set<O>> {
 		
 	}
 	
+	@Override
 	public boolean setQualify(boolean qualify) {
 		boolean old = this.qualify;
 		this.qualify = qualify;
@@ -68,13 +69,15 @@ public class SetMapper<O> implements ResultMapper<Set<O>> {
 		
 	}
 
+	@Override
 	public Set<O> makeDefault() {
-		return new HashSet<O>();
+		return new HashSet<>();
 		
 	}
 
+	@Override
 	public Set<O> makeObject(ResultSet rs) throws DataException, SQLException {
-		Set<O> set = new HashSet<O>();
+		Set<O> set = new HashSet<>();
 
 		do {
 			set.add(target.makeObject(rs, 1));
@@ -88,13 +91,16 @@ public class SetMapper<O> implements ResultMapper<Set<O>> {
 
 	
 
+	@Override
 	public SQLFilter getRequiredFilter() {
 		return target.getRequiredFilter();
 	}
 
+	@Override
 	public List<PatternArgument> getTargetParameters(List<PatternArgument> list) {
 		return target.getParameters(list);
 	}
+	@Override
 	public String getModify() {
 		//TODO is it always valid to order by an arbitrary SQLValue
 		//StringBuilder sb = new StringBuilder();
@@ -102,6 +108,7 @@ public class SetMapper<O> implements ResultMapper<Set<O>> {
 		//target.add(sb, qualify);
 		return null;
 	}
+	@Override
 	public List<PatternArgument> getModifyParameters(List<PatternArgument> list) {
 		//target.getParameters(list);
 		return list;

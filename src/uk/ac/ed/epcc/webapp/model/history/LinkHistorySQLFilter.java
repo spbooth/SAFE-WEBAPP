@@ -63,21 +63,21 @@ public class LinkHistorySQLFilter<L extends Indexed, R extends Indexed,
 		boolean has_right_field = linkHistoryManager.canRightJoin();
 		if( left != null ){
 			if(has_left_field){
-				addFilter(new ReferenceFilter<H,L>(this.linkHistoryManager,left_field,left));
+				addFilter(new ReferenceFilter<>(this.linkHistoryManager,left_field,left));
 			}else{
 				// join with parent
-				addFilter(((DataObjectFactory<H>)linkHistoryManager).new RemoteFilter<T>(linkHistoryManager.getLinkManager(),
+				addFilter(((DataObjectFactory<H>)linkHistoryManager).new RemoteFilter<>(linkHistoryManager.getLinkManager(),
 						linkHistoryManager.getPeerName(),
-						new ReferenceFilter<T,L>(linkHistoryManager.getLinkManager(), left_field,left)));
+						new ReferenceFilter<>(linkHistoryManager.getLinkManager(), left_field,left)));
 			}
 		}else if( right != null){
 			if(has_right_field && right != null){
-				addFilter(new ReferenceFilter<H,R>(this.linkHistoryManager,right_field,right));
+				addFilter(new ReferenceFilter<>(this.linkHistoryManager,right_field,right));
 			}else{
 				// join with parent 
-				addFilter(((DataObjectFactory<H>)linkHistoryManager).new RemoteFilter<T>(linkHistoryManager.getLinkManager(),
+				addFilter(((DataObjectFactory<H>)linkHistoryManager).new RemoteFilter<>(linkHistoryManager.getLinkManager(),
 						linkHistoryManager.getPeerName(),
-						new ReferenceFilter<T,R>(linkHistoryManager.getLinkManager(), right_field,right)));
+						new ReferenceFilter<>(linkHistoryManager.getLinkManager(), right_field,right)));
 			}
 		}
 

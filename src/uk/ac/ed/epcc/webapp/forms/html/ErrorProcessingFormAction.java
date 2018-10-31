@@ -41,6 +41,6 @@ public abstract class ErrorProcessingFormAction<X,K> extends FormAction{
  * @return {@link FormResult}
  */
 	public FormResult processError(AppContext conn,Form f, TransitionFactory<K,X> provider,X target,K key,Collection<String> missing, Map<String,String> errors){
-		return new ErrorFormResult<X, K>(provider, target, key, errors, missing);
+		return new ErrorFormResult<>(provider, target, key, errors, missing);
 	}
 }

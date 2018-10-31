@@ -32,8 +32,8 @@ public abstract class AbstractXMLBuilder implements SimpleXMLBuilder {
     private boolean escape_unicode =true;
     private boolean valid_xml=false;
 	public AbstractXMLBuilder() {
-		tags = new Stack<String>();
-		attributes = new LinkedHashMap<String, CharSequence>();
+		tags = new Stack<>();
+		attributes = new LinkedHashMap<>();
 	}
 
 	

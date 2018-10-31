@@ -81,7 +81,7 @@ ListInputInterfaceTest<String, TestType.TestValue, BasicTypeInput<TestType.TestV
 		return getBadData();
 	}
 	
-	public final ListInputInterfaceTest<String, TestType.TestValue,BasicTypeInput<TestType.TestValue> , BasicTypeInputTest> list_tests = new ListInputInterfaceTestImpl<String, TestType.TestValue, BasicTypeInput<TestValue>, BasicTypeInputTest>(this);
+	public final ListInputInterfaceTest<String, TestType.TestValue,BasicTypeInput<TestType.TestValue> , BasicTypeInputTest> list_tests = new ListInputInterfaceTestImpl<>(this);
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.ListInputInterfaceTest#testGetItembyValue()

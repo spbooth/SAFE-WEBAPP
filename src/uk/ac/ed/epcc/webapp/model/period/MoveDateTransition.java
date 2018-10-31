@@ -65,7 +65,7 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 				tp.getContext().error(e,"Internal error");
 				throw new ActionException("Internal error");
 			}
-			return new ViewTransitionResult<T, K>(tp, target);
+			return new ViewTransitionResult<>(tp, target);
 		}
 		@Override
 		public String getConfirm(Form f) {
@@ -93,6 +93,7 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 		}
 
 		
+		@Override
 		public void validate(Form f) throws ValidateException {
 			
 			Boolean move = (Boolean) f.get(MoveDateTransition.MOVE_SPLIT_FIELD);
@@ -123,6 +124,7 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 		this.fac=fac;
 		this.move_start=move_start;
 	}
+	@Override
 	public void buildForm(Form f, T target, AppContext conn)
 			throws TransitionException {
 		Date def;

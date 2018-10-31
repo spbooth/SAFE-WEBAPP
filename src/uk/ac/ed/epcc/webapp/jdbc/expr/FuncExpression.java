@@ -48,12 +48,12 @@ public class FuncExpression<T> implements SQLExpression<T> {
 			try{
 				
 				SQLContext sqc = db_serv.getSQLContext();
-				return (SQLExpression<T>) sqc.convertToDate(new FuncExpression<Number>(f, Number.class, dse.getSeconds()), 1000L);
+				return (SQLExpression<T>) sqc.convertToDate(new FuncExpression<>(f, Number.class, dse.getSeconds()), 1000L);
 			}catch(SQLException ee){
 				db_serv.logError("Error getting SQLContext",ee);
 			}
 		}
-		return new FuncExpression<T>(f, target, e);
+		return new FuncExpression<>(f, target, e);
 	}
     private final SQLFunc func;
     private final SQLExpression<? extends T> e;
@@ -65,6 +65,7 @@ public class FuncExpression<T> implements SQLExpression<T> {
     	this.target_class=target;
     	this.e=e;
     }
+	@Override
 	public int add(StringBuilder sb, boolean qualify) {
 		int res=1;
 
@@ -80,6 +81,7 @@ public class FuncExpression<T> implements SQLExpression<T> {
 		assert(res == 1);
 		return res;
 	}
+	@Override
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
 		if( e == null ){
 			return list;
@@ -99,6 +101,7 @@ public class FuncExpression<T> implements SQLExpression<T> {
 		sb.append(")");
 		return sb.toString();
 	}
+	@Override
 	@SuppressWarnings("unchecked")
 	public T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		if( e != null ){
@@ -108,9 +111,11 @@ public class FuncExpression<T> implements SQLExpression<T> {
 			return (T) rs.getObject(pos);
 		}
 	}
+	@Override
 	public Class<T> getTarget() {
 		return target_class;
 	}
+	@Override
 	public SQLFilter getRequiredFilter() {
 		if( e == null ){
 			return null;

@@ -188,7 +188,7 @@ public class XMLDataUtils extends AbstractContexed{
 		if( handler != null){
 			// we want the order to be the same on all OS including windows that 
 			// converts table names to lower case.
-			TreeMap<String,String> map = new TreeMap<String,String>();
+			TreeMap<String,String> map = new TreeMap<>();
 			for(String name : handler.getTables()){
 				map.put(name.toLowerCase(Locale.ENGLISH), name);
 			}
@@ -205,7 +205,7 @@ public class XMLDataUtils extends AbstractContexed{
 		if( handler != null){
 			// we want the order to be the same on all OS including windows that 
 			// converts table names to lower case.
-			TreeMap<String,String> map = new TreeMap<String,String>();
+			TreeMap<String,String> map = new TreeMap<>();
 			for(String name : handler.getTables()){
 				map.put(name.toLowerCase(Locale.ENGLISH), name);
 			}

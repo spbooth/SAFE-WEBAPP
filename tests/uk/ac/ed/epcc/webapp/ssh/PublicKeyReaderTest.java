@@ -36,7 +36,7 @@ public class PublicKeyReaderTest {
 @Test
 public void testRoundTrip() throws PublicKeyParseException, IOException{
 	
-	Set<String> good = new HashSet<String>();
+	Set<String> good = new HashSet<>();
 	// with and without newline breaks
 	good.add("ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQBRQkTnsRzUM9mLrgEMFk78CLdOxtepxPp1JQSfRc3/A1cy"+
 "D8NV/gxINRNhMIVkIofUexxtLfAfmNRf666SSei/w2kPX9ndOJ32y2OUUKkijJvEdeMEuFido9Kifc79"+

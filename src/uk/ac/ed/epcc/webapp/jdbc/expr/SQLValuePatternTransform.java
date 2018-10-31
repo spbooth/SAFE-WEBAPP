@@ -44,7 +44,7 @@ public class SQLValuePatternTransform implements SQLValue<String> {
     public SQLValuePatternTransform(AppContext conn, String tag, SQLValue<String> base){
     	this.conn=conn;
     	this.base=base;
-    	map = new HashMap<Pattern,String>();
+    	map = new HashMap<>();
     	Logger log = conn.getService(LoggerService.class).getLogger(getClass());
     	String prefix = "SQLValuePatternTransform."+tag+".";
 		Map<String,String> conf = conn.getInitParameters(prefix);
@@ -70,20 +70,24 @@ public class SQLValuePatternTransform implements SQLValue<String> {
 	}
 
 
+	@Override
 	public int add(StringBuilder sb, boolean qualify) {
 		base.add(sb, qualify);
 		return 1;
 	}
+	@Override
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
 		return base.getParameters(list);
 	}
 	
 
+	@Override
 	public Class<String> getTarget() {
 		return String.class;
 	}
 
 
+	@Override
 	public String makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		String s = base.makeObject(rs, pos);
 		for(Pattern p :map.keySet()){
@@ -97,6 +101,7 @@ public class SQLValuePatternTransform implements SQLValue<String> {
 
 
 
+	@Override
 	public SQLFilter getRequiredFilter() {
 		return null;
 	}

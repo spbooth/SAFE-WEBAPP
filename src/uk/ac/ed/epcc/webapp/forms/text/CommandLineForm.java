@@ -36,7 +36,7 @@ public class CommandLineForm extends MapForm {
 
 	
 	public String showTable(Collection<String> missing_fields, Map<String,String> errors){
-		Table<String,String> t = new Table<String,String>();
+		Table<String,String> t = new Table<>();
 		for(Field f : this){
 			String key = f.getKey();
 			t.put("label", key, f.getLabel());
@@ -67,8 +67,8 @@ public class CommandLineForm extends MapForm {
 	}
 	public boolean parseParams(Map<String,Object> params){
 	
-		Map<String, String> errors= new HashMap<String,String>();
-		Set<String> missing_fields=new HashSet<String>();
+		Map<String, String> errors= new HashMap<>();
+		Set<String> missing_fields=new HashSet<>();
 		boolean ok = parsePost(errors, params,true);
 		if( ok ){
 			ok = validate(missing_fields, errors);

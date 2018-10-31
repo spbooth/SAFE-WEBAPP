@@ -47,6 +47,7 @@ public class TypeProducerInput<T> extends TextInput implements PreSelectInput<St
     public EnumeratingTypeConverter<T,String> getProducer(){
     	return t;
     }
+	@Override
 	public T getItembyValue(String value) {
 
 		try {
@@ -56,6 +57,7 @@ public class TypeProducerInput<T> extends TextInput implements PreSelectInput<St
 		}
 	}
 
+	@Override
 	public Iterator<T> getItems() {
 		if(item_set != null ){
 			return item_set.iterator();
@@ -63,25 +65,29 @@ public class TypeProducerInput<T> extends TextInput implements PreSelectInput<St
 		return t.getValues();
 	}
 	
+	@Override
 	public int getCount(){
 		if( item_set != null ){
 			return item_set.size();
 		}
-		Set<T> set = new HashSet<T>();
+		Set<T> set = new HashSet<>();
 		t.getValues(set);
 		return set.size();
 	}
 
+	@Override
 	public String getTagByItem(T item) {
 
 		return t.getIndex(item);
 		
 	}
 
+	@Override
 	public String getTagByValue(String value) {
 		return value;
 	}
 
+	@Override
 	public String getText(T item) {
 		if( item == null) {
 			return null;
@@ -89,6 +95,7 @@ public class TypeProducerInput<T> extends TextInput implements PreSelectInput<St
 		return item.toString();
 	}
 
+	@Override
 	public T getItem() {
 		String value =  getValue();
 		if (value == null) {
@@ -97,6 +104,7 @@ public class TypeProducerInput<T> extends TextInput implements PreSelectInput<St
 		return getItembyValue(value);
 	}
 
+	@Override
 	public void setItem(T item) {
 		setValue(getTagByItem(item));
 	}
@@ -133,12 +141,14 @@ public class TypeProducerInput<T> extends TextInput implements PreSelectInput<St
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput#getUnselectedText()
 	 */
+	@Override
 	public String getUnselectedText() {
 		return unselected_text;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput#setUnselectedText(java.lang.String)
 	 */
+	@Override
 	public void setUnselectedText(String text) {
 		unselected_text=text;
 		
@@ -146,12 +156,14 @@ public class TypeProducerInput<T> extends TextInput implements PreSelectInput<St
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.PreSelectInput#allowPreSelect()
 	 */
+	@Override
 	public boolean allowPreSelect() {
 		return pre_select;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.PreSelectInput#setPreSelect(boolean)
 	 */
+	@Override
 	public void setPreSelect(boolean value) {
 		pre_select=value;
 		

@@ -37,15 +37,18 @@ public class JFreePieChartData extends JFreeChartData<GenericSetPlot> implements
 
 //	public static final Feature JFREE_3D_PIE = new Feature("jfreechat.3dpiechart", false,"Use 3D effecct on piecharts");
 	GenericSetPlot ds;
-	LinkedList<Color> colours=new LinkedList<Color>();
+	LinkedList<Color> colours=new LinkedList<>();
 	private TimePeriod period=null;
+	@Override
 	public TimePeriod getPeriod() {
 		return period;
 	}
 
+	@Override
 	public void setPeriod(TimePeriod period) {
 		this.period = period;
 	}
+	@Override
 	public GenericSetPlot addPieChart(int nset) {
 		ds= new GenericSetPlot(period,nset);
 		return ds;
@@ -104,10 +107,12 @@ public class JFreePieChartData extends JFreeChartData<GenericSetPlot> implements
 		return pieDataset;
 	}
 
+	@Override
 	public GenericSetPlot makeDataSet(int i) {
 		return new GenericSetPlot(period,i);
 	}
 
+	@Override
 	public GenericSetPlot addPieChart(int nset, Color[] custom_colours) {
 		if( custom_colours != null){
 			for(Color c : custom_colours){

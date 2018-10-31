@@ -591,7 +591,7 @@ public class RepositoryTest extends WebappTestBase {
 	@Test
 	public void testPutAll(){
 		Record r = res.new Record();
-		Map<String,String> m = new HashMap<String,String>();
+		Map<String,String> m = new HashMap<>();
 		
 		m.put("Noris","fred");
 		try{

@@ -43,25 +43,29 @@ public class FieldOrderFilter<T> implements SQLOrderFilter<T>{
 		this.name=name;
 		this.descending=descending;
 	}
+	@Override
 	public final List<OrderClause> OrderBy() {
-		LinkedList<OrderClause> order = new LinkedList<OrderClause>();
+		LinkedList<OrderClause> order = new LinkedList<>();
 		order.add(res.getOrder(name, descending));
 		return order;
 	}
 	
 	
+	@Override
 	public void accept(T o) {
 		
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
+	@Override
 	public final <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 		return vis.visitOrderFilter(this);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
+	@Override
 	public Class<T> getTarget() {
 		return target;
 	}

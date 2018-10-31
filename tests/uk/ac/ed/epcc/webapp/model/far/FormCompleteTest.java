@@ -59,7 +59,7 @@ public class FormCompleteTest<D extends DynamicForm,R extends PersonalResponseMa
 		DynamicFormManager<D> form_manager = new DynamicFormManager(getContext(), "TestForms");
 		D form = form_manager.findFromString("FirstForm");
 		
-		PersonalResponseManager<R, D> response_manager = new PersonalResponseManager<R,D>(getContext(),"TestResponse" );
+		PersonalResponseManager<R, D> response_manager = new PersonalResponseManager<>(getContext(),"TestResponse" );
 		PersonalResponseTransitionProvider provider = response_manager.getPersonalResponseTransitionProvider();
 		
 		takeBaseline();
@@ -82,7 +82,7 @@ public class FormCompleteTest<D extends DynamicForm,R extends PersonalResponseMa
 		DynamicFormManager<D> form_manager = new DynamicFormManager(getContext(), "TestForms");
 		D form = form_manager.findFromString("FirstForm");
 		
-		PersonalResponseManager<R, D> response_manager = new PersonalResponseManager<R,D>(getContext(),"TestResponse" );
+		PersonalResponseManager<R, D> response_manager = new PersonalResponseManager<>(getContext(),"TestResponse" );
 		
 		R response = response_manager.getResponse(form);
 		assertNotNull(response);
@@ -133,7 +133,7 @@ public class FormCompleteTest<D extends DynamicForm,R extends PersonalResponseMa
 			DynamicFormManager<D> form_manager = new DynamicFormManager(getContext(), "TestForms");
 			D form = form_manager.findFromString("FirstForm");
 			
-			PersonalResponseManager<R, D> response_manager = new PersonalResponseManager<R,D>(getContext(),"TestResponse" );
+			PersonalResponseManager<R, D> response_manager = new PersonalResponseManager<>(getContext(),"TestResponse" );
 			
 			R response = response_manager.getResponse(form);
 			assertNotNull(response);
@@ -182,7 +182,7 @@ public class FormCompleteTest<D extends DynamicForm,R extends PersonalResponseMa
 			checkDiff("/cleanup.xsl", "answer_all_questions.xml");
 			
 			
-			CompleteVisitor<D, R> vis = new CompleteVisitor<D, R>(response);
+			CompleteVisitor<D, R> vis = new CompleteVisitor<>(response);
 			assertTrue("form should be complete",first_section.visit(vis));
 		}
 		

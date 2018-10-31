@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.table.BlobType;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
@@ -77,6 +76,7 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 		
 	}
 
+	@Override
 	public TableSpecification getDefaultTableSpecification(AppContext c, String tag){
 		TableSpecification spec = new TableSpecification("ServeDataID");
 		spec.setField(MIME_TYPE, new StringFieldType(true, null, 127));
@@ -89,9 +89,9 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 
 	public void clean(){
 		if( res.hasField(EXPIRES_FIELD)){
-			FilterDelete<D> del = new FilterDelete<D>(res);
+			FilterDelete<D> del = new FilterDelete<>(res);
 			try {
-				del.delete(new SQLValueFilter<D>(getTarget(),res, EXPIRES_FIELD,MatchCondition.LT, new Date()));
+				del.delete(new SQLValueFilter<>(getTarget(),res, EXPIRES_FIELD,MatchCondition.LT, new Date()));
 			} catch (DataFault e) {
 				getContext().error(e,"Error deleting old data");
 			}
@@ -183,6 +183,7 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 		d.touch();
 		return d;
 	}
+	@Override
 	public MimeStreamData getData(SessionService user, List<String> path)
 			throws Exception {
 		MimeData d = getMimeData(user, path);
@@ -192,6 +193,7 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 		return d.getData();
 	}
 
+	@Override
 	public String getDownloadName(SessionService user, List<String> path) throws Exception{
 		MimeData d = getMimeData(user, path);
 		if( d == null ){
@@ -202,12 +204,13 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 	
 
 	
+	@Override
 	public List<String> setData(MimeStreamData data) {
 		try {
 			MimeData obj = makeBDO();
 			obj.setData(data);
 			obj.commit();
-			LinkedList<String> result = new LinkedList<String>();
+			LinkedList<String> result = new LinkedList<>();
 			result.addFirst(Integer.toString(obj.getID()));
 			return result;
 		} catch (DataFault e) {
@@ -231,7 +234,7 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 	 */
 	@Override
 	public void anonymise() throws DataFault {
-		FilterDelete<D> del = new FilterDelete<D>(res);
+		FilterDelete<D> del = new FilterDelete<>(res);
 		del.delete(null);
 		
 	}

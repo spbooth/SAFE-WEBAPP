@@ -49,7 +49,7 @@ public class ClassInput<T> implements ListInput<String,Class<? extends T>>{
 	public ClassInput(AppContext c,Class<T> target,boolean allow_non_instantiable, String p){
     	this.c=c;
     	prefix=p+".";
-    	reg = new HashMap<String,Class<? extends T>>();
+    	reg = new HashMap<>();
     	
     	Map<String,String> params = c.getInitParameters(prefix);
     	for(String name : params.keySet()){

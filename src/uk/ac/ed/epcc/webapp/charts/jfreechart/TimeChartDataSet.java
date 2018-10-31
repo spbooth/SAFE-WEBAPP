@@ -84,6 +84,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.general.SeriesDataset#getSeriesCount()
 	 */
+	@Override
 	public int getSeriesCount() {
 		return getNumSets();
 	}
@@ -91,6 +92,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.general.SeriesDataset#getSeriesKey(int)
 	 */
+	@Override
 	public Comparable getSeriesKey(int arg0) {
 		if( lab != null ){
 			return lab[arg0];
@@ -101,6 +103,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.general.SeriesDataset#indexOf(java.lang.Comparable)
 	 */
+	@Override
 	public int indexOf(Comparable arg0) {
 		if( lab != null){
 			int i=0;
@@ -122,9 +125,10 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.general.Dataset#addChangeListener(org.jfree.data.general.DatasetChangeListener)
 	 */
+	@Override
 	public void addChangeListener(DatasetChangeListener arg0) {
 		if( listeners == null){
-			listeners=new HashSet<DatasetChangeListener>();
+			listeners=new HashSet<>();
 		}
 		listeners.add(arg0);
 	}
@@ -132,6 +136,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.general.Dataset#getGroup()
 	 */
+	@Override
 	public DatasetGroup getGroup() {
 		return group;
 	}
@@ -139,6 +144,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.general.Dataset#removeChangeListener(org.jfree.data.general.DatasetChangeListener)
 	 */
+	@Override
 	public void removeChangeListener(DatasetChangeListener arg0) {
 		if(listeners != null){
 			listeners.add(arg0);
@@ -148,6 +154,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.general.Dataset#setGroup(org.jfree.data.general.DatasetGroup)
 	 */
+	@Override
 	public void setGroup(DatasetGroup arg0) {
 		this.group=arg0;
 	}
@@ -155,6 +162,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.xy.XYDataset#getDomainOrder()
 	 */
+	@Override
 	public DomainOrder getDomainOrder() {
 		return DomainOrder.ASCENDING;
 	}
@@ -162,6 +170,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.xy.XYDataset#getItemCount(int)
 	 */
+	@Override
 	public int getItemCount(int arg0) {
 		if( arg0 < 0 || arg0 >= getNumSets()){
 			throw new IllegalArgumentException("Series out of range ");
@@ -174,6 +183,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.xy.XYDataset#getX(int, int)
 	 */
+	@Override
 	public Number getX(int set, int item) {
 		return times[item];
 	}
@@ -181,6 +191,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.xy.XYDataset#getXValue(int, int)
 	 */
+	@Override
 	public double getXValue(int set, int item) {
 		return times[item];
 	}
@@ -188,6 +199,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.xy.XYDataset#getY(int, int)
 	 */
+	@Override
 	public Number getY(int set, int item) {
 		return get(set,item/getNumItems(),item%getNumItems());
 	}
@@ -195,6 +207,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.xy.XYDataset#getYValue(int, int)
 	 */
+	@Override
 	public double getYValue(int set, int item) {
 		return get(set,item/getNumItems(),item%getNumItems());
 	}
@@ -203,6 +216,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	
 
 
+	@Override
 	protected void notifyChange() {
 		if( listeners != null){
 			for(DatasetChangeListener l : listeners){
@@ -225,6 +239,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.xy.IntervalXYDataset#getEndX(int, int)
 	 */
+	@Override
 	public Number getEndX(int arg0, int arg1){
 		return ends[arg1];
 	}
@@ -233,6 +248,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.xy.IntervalXYDataset#getEndXValue(int, int)
 	 */
+	@Override
 	public double getEndXValue(int arg0, int arg1) {
 		return ends[arg1];
 	}
@@ -241,6 +257,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.xy.IntervalXYDataset#getEndY(int, int)
 	 */
+	@Override
 	public Number getEndY(int arg0, int arg1) {
 		return getYValue(arg0, arg1);
 	}
@@ -249,6 +266,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.xy.IntervalXYDataset#getEndYValue(int, int)
 	 */
+	@Override
 	public double getEndYValue(int arg0, int arg1) {
 		return getYValue(arg0, arg1);
 	}
@@ -257,6 +275,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.xy.IntervalXYDataset#getStartX(int, int)
 	 */
+	@Override
 	public Number getStartX(int arg0, int arg1) {
 		return starts[arg1];
 	}
@@ -265,6 +284,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.xy.IntervalXYDataset#getStartXValue(int, int)
 	 */
+	@Override
 	public double getStartXValue(int arg0, int arg1) {
 		return starts[arg1];
 	}
@@ -273,6 +293,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.xy.IntervalXYDataset#getStartY(int, int)
 	 */
+	@Override
 	public Number getStartY(int arg0, int arg1) {
 		return getYValue(arg0, arg1);
 	}
@@ -281,6 +302,7 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	/* (non-Javadoc)
 	 * @see org.jfree.data.xy.IntervalXYDataset#getStartYValue(int, int)
 	 */
+	@Override
 	public double getStartYValue(int arg0, int arg1) {
 		return getYValue(arg0, arg1);
 	}

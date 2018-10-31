@@ -79,7 +79,7 @@ public class RoleFilterProvider<T extends AppUser> implements NamedFilterProvide
 	public Input<String> getInput() {
 		Set<String> roles = new LinkedHashSet<>();
 		addFilterNames(roles);
-		SetInput<String> input = new SetInput<String>(roles);
+		SetInput<String> input = new SetInput<>(roles);
 		return input;
 	}
 

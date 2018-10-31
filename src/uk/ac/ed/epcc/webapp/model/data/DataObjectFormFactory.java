@@ -73,7 +73,8 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	   assert( fac != null );
 	   factory=fac;
    }
-   public final AppContext getContext(){
+   @Override
+public final AppContext getContext(){
 	   return factory.getContext();
    }
    public final DataObjectFactory<BDO> getFactory() {
@@ -278,7 +279,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	 */
 	public static Set<String> getOptional(Repository res){
 		Set<String> keys = res.getFields();
-        Set<String> result = new HashSet<String>();
+        Set<String> result = new HashSet<>();
 		for (Iterator<String> it = keys.iterator(); it.hasNext();) {
 			String name =  it.next();
 			Repository.FieldInfo info = res.getInfo(name);
@@ -296,7 +297,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	 */
 	public static Map<String,Object> addSelectors(AppContext conn,Map<String,Object> sel,Repository res){
 		if( sel == null ){
-			sel = new HashMap<String,Object>();
+			sel = new HashMap<>();
 		}
 		for(String field : res.getFields()){
 			Repository.FieldInfo info = res.getInfo(field);
@@ -359,7 +360,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	 */
 	public static Map<String,String> addTranslations(AppContext conn,Map<String,String> trans,Repository res){
 		if( trans == null ){
-			trans = new HashMap<String,String>();
+			trans = new HashMap<>();
 		}
 		for(String field : res.getFields()){
 			if( ! trans.containsKey(field)){
@@ -403,7 +404,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	protected  Map<String,Object> getSelectors() {
 		Map<String,Object>sel = factory.getSelectors();
 		if( sel == null ){
-			sel = new HashMap<String, Object>();
+			sel = new HashMap<>();
 		}
 		for(TableStructureContributer c : factory.getTableStructureContributers()){
 			sel = c.addSelectors(sel);
@@ -418,7 +419,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	protected  Set<String> getSupress() {
 		Set<String> supress = factory.getSupress();
 		if( supress == null ){
-			supress=new HashSet<String>();
+			supress=new HashSet<>();
 		}
 		for(TableStructureContributer c : factory.getTableStructureContributers()){
 			supress = c.addSuppress(supress);
@@ -426,7 +427,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 		return supress;
 	}
 	protected Set<String> getFields(){
-		LinkedHashSet<String> result = new LinkedHashSet<String>();
+		LinkedHashSet<String> result = new LinkedHashSet<>();
 		Set<String> supress = getSupress();
 		for(String field : factory.res.getFields()){
 			if( supress == null || ! supress.contains(field)){
@@ -443,7 +444,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	protected  Map<String,String> getTranslations() {
 		Map<String, String> translations = factory.getTranslations();
 		if( translations == null){
-			translations=new HashMap<String, String>();
+			translations=new HashMap<>();
 		}
 		for(TableStructureContributer c : factory.getTableStructureContributers()){
 			translations=c.addTranslations(translations);
@@ -454,7 +455,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	protected  Map<String,String> getFieldHelp() {
 		Map<String, String> help = factory.getFieldHelp();
 		if( help == null){
-			help=new HashMap<String, String>();
+			help=new HashMap<>();
 		}
 		for(TableStructureContributer c : factory.getTableStructureContributers()){
 			Map mod = c.addFieldHelp(help);
@@ -506,7 +507,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	public  Map<String, Object> getDefaults() {
 		Map<String, Object> defaults = factory.getDefaults();
 		if( defaults == null){
-			defaults=new HashMap<String, Object>();
+			defaults=new HashMap<>();
 		}
 		for(TableStructureContributer c: factory.getTableStructureContributers()){
 			defaults=c.addDefaults(defaults);

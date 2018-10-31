@@ -28,14 +28,16 @@ public class RealInputTest extends NumberInputTestCase<Float,RealInput> {
 	public void dummy(){
 		
 	}
+	@Override
 	public Set<Float> getGoodData() {
-		HashSet<Float> good = new HashSet<Float>();
+		HashSet<Float> good = new HashSet<>();
 		good.add(12.0f);
 		good.add(14.0f);
 		return good;
 	}
 
 
+	@Override
 	public RealInput getInput() {
 		RealInput realInput = new RealInput();
 		realInput.setMin(0.0f);
@@ -43,14 +45,16 @@ public class RealInputTest extends NumberInputTestCase<Float,RealInput> {
 	}
 
 
+	@Override
 	public Set<Float> getBadData() {
-		return new HashSet<Float>();
+		return new HashSet<>();
 	}
 	
 
 
+	@Override
 	public Set<String> getBadParseData() {
-        HashSet<String> res = new HashSet<String>();
+        HashSet<String> res = new HashSet<>();
 		res.add("fred");
 		res.add("14.5.6");
 		res.add("82wombat");
@@ -60,8 +64,9 @@ public class RealInputTest extends NumberInputTestCase<Float,RealInput> {
 	}
 
 
+	@Override
 	public Set<String> getGoodParseData() {
-		HashSet<String> res = new HashSet<String>();
+		HashSet<String> res = new HashSet<>();
 		res.add("12.8");
 		res.add("0.0");
 		res.add("0");

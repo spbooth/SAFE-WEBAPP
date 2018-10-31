@@ -157,6 +157,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 
 		
 
+		@Override
 		public final boolean hasNext() {
 			if( next == null ){
 				close();
@@ -216,6 +217,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 		
 
 	
+		@Override
 		public final O next() {
 			O result = next;
 
@@ -243,6 +245,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 		 * @throws SQLException 
 		 * 
 		 */
+		@Override
 		public void close()  {
 			if( stmt == null){
 				return; // already closed
@@ -277,6 +280,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 			
 		}
 
+		@Override
 		public final void remove() {
 			if( prev != null && prev instanceof Removable){
 				try {
@@ -380,7 +384,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 				stmt = db_serv.getSQLContext(getDBTag()).getConnection().prepareStatement(
 						query.toString(), ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
-				List<PatternArgument> list = new LinkedList<PatternArgument>();
+				List<PatternArgument> list = new LinkedList<>();
 				list=getTargetParameters(list);
 				list=getFilterArguments(f, list);
 				list=getModifyParameters(list);

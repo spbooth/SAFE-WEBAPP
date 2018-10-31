@@ -48,7 +48,7 @@ public class SQLExpressionNullFilter<T,V> implements SQLFilter<T>, PatternFilter
     	if( req == null){
     		return fil;
     	}
-    	return new SQLAndFilter<T>(target,fil,req);
+    	return new SQLAndFilter<>(target,fil,req);
 
     }
 	private SQLExpressionNullFilter(Class<T> target,SQLExpression<V> expr,boolean is_null){
@@ -58,11 +58,13 @@ public class SQLExpressionNullFilter<T,V> implements SQLFilter<T>, PatternFilter
     }
 	
 	
+	@Override
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
 		list=expr.getParameters(list);
 		return list;
 	}
 
+	@Override
 	public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify) {
 		//sb.append("(");
 		expr.add(sb,qualify);
@@ -108,6 +110,7 @@ public class SQLExpressionNullFilter<T,V> implements SQLFilter<T>, PatternFilter
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
+	@Override
 	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 		return vis.visitPatternFilter(this);
 	}
@@ -116,6 +119,7 @@ public class SQLExpressionNullFilter<T,V> implements SQLFilter<T>, PatternFilter
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter#accept(java.lang.Object)
 	 */
+	@Override
 	public void accept(T o) {
 		
 	}
@@ -124,9 +128,11 @@ public class SQLExpressionNullFilter<T,V> implements SQLFilter<T>, PatternFilter
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
+	@Override
 	public Class<T> getTarget() {
 		return target;
 	}
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("SQLExpressionNullFilter(");

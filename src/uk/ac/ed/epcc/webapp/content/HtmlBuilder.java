@@ -92,7 +92,7 @@ protected static final class Text extends Panel {
    *
    */
   public static class Panel extends HtmlBuilder {
-	  Map<String,String> attr = new LinkedHashMap<String, String>();
+	  Map<String,String> attr = new LinkedHashMap<>();
 	  String element;
 	  String type;
 	  boolean inline;
@@ -112,7 +112,8 @@ protected static final class Text extends Panel {
 		  }
 		  this.type=type;
 	  }
-	  public final void addText(String text) {
+	  @Override
+	public final void addText(String text) {
 		  if( inline) {
 			  // Text 
 			  clean(text);
@@ -120,6 +121,7 @@ protected static final class Text extends Panel {
 			  super.addText(text);
 		  }
 		}
+		@Override
 		public final ExtendedXMLBuilder getText() {
 			if( inline) {
 				return new SpanText(this);
@@ -208,6 +210,7 @@ public HtmlBuilder(){
 }
 
 
+@Override
 public void addButton(AppContext conn,String text, FormResult action) {
 	AddButtonVisitor vis = new AddButtonVisitor(conn, this, text);
 	vis.new_tab=new_tab;
@@ -217,6 +220,7 @@ public void addButton(AppContext conn,String text, FormResult action) {
 		getLogger(conn).error("Error adding Button",e);
 	}
 }
+@Override
 public void addButton(AppContext conn,String text, String hover,FormResult action) {
 	AddButtonVisitor vis = new AddButtonVisitor(conn, this, text,hover);
 	vis.new_tab=new_tab;
@@ -226,9 +230,11 @@ public void addButton(AppContext conn,String text, String hover,FormResult actio
 		getLogger(conn).error("Error adding Button",e);
 	}
 }
+@Override
 public void addLink(AppContext conn,String text, FormResult action) {
 	addLink(conn,text,null,action);
 }
+@Override
 public void addLink(AppContext conn,String text, String hover,FormResult action) {
 	if( action == null){
 		clean(text);
@@ -271,11 +277,13 @@ public void addImage(AppContext conn, String alt, String hover,Integer width, In
 }
 
 
+@Override
 public <C,R> void addTable(AppContext conn,Table<C,R> t,String style) {
 	addTable(conn,t,null,style);
 }
+@Override
 public <C,R> void addTable(AppContext conn,Table<C,R> t,NumberFormat nf,String style) {
-	TableXMLFormatter<C,R> fmt = new TableXMLFormatter<C,R>(this, nf,style);
+	TableXMLFormatter<C,R> fmt = new TableXMLFormatter<>(this, nf,style);
 	if( use_table_section != null){
 		// If set explicitly this takes preference.
 		fmt.setTableSections(use_table_section);
@@ -294,18 +302,22 @@ public void paragraph(String text) {
 }
 
 
+@Override
 public ExtendedXMLBuilder getText() {
 	return new Text(this);
 }
+@Override
 public ExtendedXMLBuilder getSpan() {
 	return new SpanText(this);
 }
 
+@Override
 public ContentBuilder getHeading(int level) {
 	return new Heading(this,level);
 }
 
 
+@Override
 public ContentBuilder getPanel(String ... type)
 		throws UnsupportedOperationException {
 	Panel panel = new Panel("div",this,false,null);
@@ -320,17 +332,20 @@ public ContentBuilder getPanel(String type)
 	
 	return new Panel("div",this,false,type);
 }
+@Override
 public ContentBuilder addParent() throws UnsupportedOperationException {
 	return (ContentBuilder) appendParent();
 }
 
 
+@Override
 public <C, R> void addColumn(AppContext conn, Table<C, R> t, C col) {
-	TableXMLFormatter<C,R> fmt = new TableXMLFormatter<C,R>(this, null,"auto");
+	TableXMLFormatter<C,R> fmt = new TableXMLFormatter<>(this, null,"auto");
 	fmt.addColumn(t,col);
 }
 
 
+@Override
 public void addText(String text) {
 	open("div");
 	addClass("para");
@@ -339,6 +354,7 @@ public void addText(String text) {
 }
 
 
+@Override
 public void addHeading(int level, String text) {
 	open("h"+level);
 	clean(text);
@@ -347,9 +363,11 @@ public void addHeading(int level, String text) {
 }
 
 
+@Override
 public <C, R> void addTable(AppContext conn, Table<C, R> t) {
 	addTable(conn,null,t);
 }
+@Override
 public <C, R> void addTable(AppContext conn, NumberFormat nf,Table<C, R> t) {
 	addTable(conn, t, nf, "auto");
 	
@@ -363,6 +381,7 @@ private Map<String,Object> post_params=null;
 /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormTable(java.lang.Iterable)
  */
+@Override
 public void addFormTable(AppContext conn,Iterable<Field> form) {
 	Iterator<Field> it = form.iterator();
 	boolean even=true;
@@ -415,6 +434,7 @@ private String getError(String field){
 /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormLabel(uk.ac.ed.epcc.webapp.forms.Field)
  */
+@Override
 public <I> void addFormLabel(AppContext conn,Field<I> f) {
 	String key = f.getKey();
 	boolean missing = isMissing(key);
@@ -492,6 +512,7 @@ public boolean setUseRequired(boolean use_required){
 /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormInput(uk.ac.ed.epcc.webapp.forms.Field)
  */
+@Override
 public <I,T> void addFormInput(AppContext conn,Field<I> f,T item) {
 	String key =  f.getKey();
 	String error = null;
@@ -560,6 +581,7 @@ private String action_name=null;
 /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addActionButtons(uk.ac.ed.epcc.webapp.forms.Form)
  */
+@Override
 public void addActionButtons(Form f) {
 	boolean confirm_attr = CONFIRM_ATTR_FEATURE.isEnabled(f.getContext());
 	boolean can_submit=true;
@@ -639,9 +661,11 @@ public void setTableSections(boolean value){
 /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addList(java.util.Collection)
  */
+@Override
 public <X> void addList(Iterable<X> list) {
 	addList(null,list);
 }
+@Override
 public <X> void addList(Map<String,String> attr,Iterable<X> list) {
 	open("ul");
 	attr(attr);
@@ -653,6 +677,7 @@ public <X> void addList(Map<String,String> attr,Iterable<X> list) {
 	close();
 	clean("\n");
 }
+@Override
 public <X> void addNumberedList(int start,Iterable<X> list) {
 	open("ol");
 	attr("start",Integer.toString(start));
@@ -669,6 +694,7 @@ public <X> void addNumberedList(int start,Iterable<X> list) {
 /**
  * @param target
  */
+@Override
 public <X> void addObject(X target) {
 	if( target == null ) {
 		return;
@@ -689,6 +715,7 @@ public <X> void addObject(X target) {
 		clean(target.toString());
 	}
 }
+@Override
 public <X> void addList(X[] list) {
 	open("ul");
 	for(X target : list){

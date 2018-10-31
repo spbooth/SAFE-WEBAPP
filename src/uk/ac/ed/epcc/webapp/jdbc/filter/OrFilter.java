@@ -41,10 +41,10 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 	public OrFilter(Class<T> target, FilterMatcher<T> matcher) {
 		super(target);
 		this.matcher=matcher;
-		sql_filters=new SQLOrFilter<T>(target);
-		pure_accept_filters = new LinkedHashSet<AcceptFilter<? super T>>();
-		mixed_filters = new LinkedHashSet<BaseFilter<? super T>>();
-		dual_filters = new LinkedHashSet<DualFilter<? super T>>();
+		sql_filters=new SQLOrFilter<>(target);
+		pure_accept_filters = new LinkedHashSet<>();
+		mixed_filters = new LinkedHashSet<>();
+		dual_filters = new LinkedHashSet<>();
 	}
 
 	
@@ -242,15 +242,15 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 	 */
 	public SQLFilter<T> getSQLFilter() throws NoSQLFilterException{
 		if( force_value){
-			return new GenericBinaryFilter<T>(target, true);
+			return new GenericBinaryFilter<>(target, true);
 		}
 		if( isEmpty()){
-			return new GenericBinaryFilter<T>(target, false);
+			return new GenericBinaryFilter<>(target, false);
 		}
 		if( nonSQL()){
 			throw new NoSQLFilterException("OrFilter contains non SQL filter");
 		}
-		SQLOrFilter<T> or = new SQLOrFilter<T>(target,sql_filters);
+		SQLOrFilter<T> or = new SQLOrFilter<>(target,sql_filters);
 		for(DualFilter<? super T> fil : dual_filters){
 			or.addFilter(fil.getSQLFilter());
 		}

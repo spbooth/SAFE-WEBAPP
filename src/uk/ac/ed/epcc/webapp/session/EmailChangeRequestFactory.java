@@ -104,7 +104,7 @@ public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequ
 		return req;
 	}
 	public EmailChangeRequest findByTag(String tag) throws DataException{
-		return find(new SQLValueFilter<EmailChangeRequest>(getTarget(),res,TAG,tag),true );
+		return find(new SQLValueFilter<>(getTarget(),res,TAG,tag),true );
 	}
 	@Override
 	protected DataObject makeBDO(Record res) throws DataFault {

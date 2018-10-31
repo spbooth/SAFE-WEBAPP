@@ -60,7 +60,6 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.ForceRollBack;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 
@@ -202,7 +201,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 				if( vtp.canView(target, sess)){
 					// Note we use ChainedTransitionResult not a ViewTransitionResult as the latter
 					// would redirect back to this servlet and e
-					handleFormResult(conn, req, res, new ChainedTransitionResult<T, K>(vtp, target,null));
+					handleFormResult(conn, req, res, new ChainedTransitionResult<>(vtp, target,null));
 				}else{
 					message(conn, req, res, "access_denied");
 				}
@@ -405,7 +404,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	}
 	protected TransitionVisitor<T> getShortcutVisitor(AppContext conn, Map<String, Object> params,
 			TransitionFactory<K, T> tp, T target, K key) {
-		return new ShortcutServletTransitionVisitor<K, T>(conn, key, tp, target, params);
+		return new ShortcutServletTransitionVisitor<>(conn, key, tp, target, params);
 	}
 	/** Extension point for missing authorisation
 	 * @param conn
@@ -423,7 +422,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			HttpServletRequest req, Map<String, Object> params,
 			TransitionFactory<K, T> tp, K key, T target, Transition<T> t)
 					throws Exception {
-		FormResult result = t.getResult(new ServletTransitionVisitor<K, T>(conn, req, key, tp, target, params));
+		FormResult result = t.getResult(new ServletTransitionVisitor<>(conn, req, key, tp, target, params));
 		if( result != null) {
 			// execute any direct transitions we can.
 			// This avoids getting a submit-only form when direct transitions chain
@@ -506,7 +505,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
  	public static class GetTargetVisitor<T,K> implements TransitionFactoryVisitor<T,T, K>{
  		public GetTargetVisitor(LinkedList<String> path) {
 			super();
-			this.path = new LinkedList<String>(path); // non destructive as we may need to re-aquire target within lock
+			this.path = new LinkedList<>(path); // non destructive as we may need to re-aquire target within lock
 		}
 
 		private final LinkedList<String> path;
@@ -539,7 +538,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		if( path == null || path.size() == 0){
 			return null;
 		}
-		GetTargetVisitor<T,K> vis = new GetTargetVisitor<T,K>(path);
+		GetTargetVisitor<T,K> vis = new GetTargetVisitor<>(path);
 		return provider.accept(vis);
 	}
 	/** Static method for jsp pages to use to retieve the target in a way compatible with the
@@ -792,7 +791,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		url.append("/");
 		
 		if( target != null ){
-			GetIDVisitor< B,A> vis = new GetIDVisitor<B,A>(target);
+			GetIDVisitor< B,A> vis = new GetIDVisitor<>(target);
 			url.append(tp.accept(vis));
 		}
 		if( operation != null ){

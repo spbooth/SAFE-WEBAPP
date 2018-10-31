@@ -70,9 +70,9 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 	public BaseFilter<BDO> getNamedFilter(String name) {
 		if( names.contains(name) ) {
 			if( getRepository().hasField(name)) {
-				return new SQLValueFilter<BDO>(getFactory().getTarget(), getRepository(), name, Boolean.TRUE);
+				return new SQLValueFilter<>(getFactory().getTarget(), getRepository(), name, Boolean.TRUE);
 			}else {
-				return new FalseFilter<BDO>(getFactory().getTarget());
+				return new FalseFilter<>(getFactory().getTarget());
 			}
 		}
 		return null;

@@ -40,6 +40,7 @@ public class EnumProducer<E extends Enum<E>> implements TypeProducer<E,String>,E
     	this.field=field;
     	this.clazz=clazz;
     }
+	@Override
 	public E find(String o) {
 		if( o == null){
 			return null;
@@ -51,9 +52,11 @@ public class EnumProducer<E extends Enum<E>> implements TypeProducer<E,String>,E
 		}
 	}
 
+	@Override
 	public String getField() {
 		return field;
 	}
+	@Override
 	public FieldType<String> getFieldType(E def){
 		int len=1;
 		for( E e : EnumSet.allOf(clazz)){
@@ -65,25 +68,31 @@ public class EnumProducer<E extends Enum<E>> implements TypeProducer<E,String>,E
 		return new StringFieldType(def==null,def==null ? null : def.name(), len);
 	}
 
+	@Override
 	public String getIndex(E value) {
 		return value.name();
 	}
+	@Override
 	public Iterator<E> getValues() {
 		return EnumSet.allOf(clazz).iterator();
 	}
+	@Override
 	public <X extends Set<E>> X getValues(X set) {
 		set.addAll(EnumSet.allOf(clazz));
 		return set;
 	}
+	@Override
 	public Class<E> getTarget() {
 		return clazz;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#getInput()
 	 */
+	@Override
 	public Input<String> getInput() {
-		return new EnumInput<E>(clazz);
+		return new EnumInput<>(clazz);
 	}
+	@Override
 	public String toString(){
 		return "EnumProducer:"+clazz.getSimpleName();
 	}

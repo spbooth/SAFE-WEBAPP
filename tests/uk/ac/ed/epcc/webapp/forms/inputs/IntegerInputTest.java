@@ -27,27 +27,31 @@ public class IntegerInputTest extends NumberInputTestCase<Integer,IntegerInput> 
 	public void dummy(){
 		
 	}
+	@Override
 	public Set<Integer> getBadData() {
-		Set<Integer> bad = new HashSet<Integer>();
+		Set<Integer> bad = new HashSet<>();
 		bad.add(-1);
 		return bad;
 	}
 
+	@Override
 	public Set<Integer> getGoodData() {
-		Set<Integer> good = new HashSet<Integer>();
+		Set<Integer> good = new HashSet<>();
 		good.add(12);
 		good.add(14);
 		return good;
 	}
 
+	@Override
 	public IntegerInput getInput() {
 		IntegerInput i = new IntegerInput();
 		i.setMin(0);
 		return i;
 	}
 	
+	@Override
 	public Set<String> getBadParseData() {
-        HashSet<String> res = new HashSet<String>();
+        HashSet<String> res = new HashSet<>();
 		res.add("fred");
 		res.add("14.5.6");
 		res.add("82wombat");
@@ -56,8 +60,9 @@ public class IntegerInputTest extends NumberInputTestCase<Integer,IntegerInput> 
 	}
 
 
+	@Override
 	public Set<String> getGoodParseData() {
-		HashSet<String> res = new HashSet<String>();
+		HashSet<String> res = new HashSet<>();
 		res.add("12");
 		res.add("1");
 		res.add("0");

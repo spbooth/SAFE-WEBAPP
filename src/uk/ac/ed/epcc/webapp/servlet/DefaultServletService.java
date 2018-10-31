@@ -280,7 +280,7 @@ public class DefaultServletService implements ServletService{
 	 * @return LinkedList<String> arguments in order.
 	 */
     public LinkedList<String> getArgs(){
-    	LinkedList<String> h = new LinkedList<String>();
+    	LinkedList<String> h = new LinkedList<>();
     	if( req != null && req instanceof HttpServletRequest){
     	String path = ((HttpServletRequest)req).getPathInfo();
 		if (path != null) {
@@ -353,7 +353,7 @@ public class DefaultServletService implements ServletService{
 	 * @return Map of request parameters
 	 */
 	public Map<String,Object> makeParams(HttpServletRequest req)  {
-		Hashtable<String,Object> h = new Hashtable<String,Object>();
+		Hashtable<String,Object> h = new Hashtable<>();
 		
 		
 		String path = req.getPathInfo();
@@ -678,7 +678,7 @@ public class DefaultServletService implements ServletService{
 			}
 			
 			// Get the user-agent info
-			Vector<String> headers = new Vector<String>();
+			Vector<String> headers = new Vector<>();
 			for (Enumeration enumeration = req.getHeaderNames(); enumeration
 			.hasMoreElements();) {
 				String header = (String) enumeration.nextElement();

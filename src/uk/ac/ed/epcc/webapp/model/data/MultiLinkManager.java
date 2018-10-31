@@ -84,7 +84,7 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		 */
 		protected void setPeer(String key, DataObject o) {
 			if (peers == null) {
-				peers = new HashMap<String,DataObject>();
+				peers = new HashMap<>();
 			}
 			DataObjectFactory fac = (DataObjectFactory) man.factories.get(key);
 			if (!fac.isMine(o)) {
@@ -121,7 +121,7 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		private Map<String,DataObject> map;
 
 		public Template() {
-			map = new HashMap<String,DataObject>();
+			map = new HashMap<>();
 		}
 
 		/**
@@ -158,10 +158,10 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		 * @return SQLFilter
 		 */
 		public SQLFilter<M> getFilter(){
-			SQLAndFilter<M> fil = new SQLAndFilter<M>(getTarget());
+			SQLAndFilter<M> fil = new SQLAndFilter<>(getTarget());
 			for(String key : map.keySet()){
 				DataObject d = map.get(key);
-				fil.addFilter(new ReferenceFilter<M,DataObject>(MultiLinkManager.this,key,d));
+				fil.addFilter(new ReferenceFilter<>(MultiLinkManager.this,key,d));
 			}
 			return fil;
 		}
@@ -203,8 +203,8 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
    	 	
      		setContext(ctx, homeTable);
      	
-		factories = new HashMap<String,DataObjectFactory>();
-		table_to_key = new HashMap<String,String>();
+		factories = new HashMap<>();
+		table_to_key = new HashMap<>();
 	}
 	@Override
 	public TableSpecification getDefaultTableSpecification(AppContext ctx,

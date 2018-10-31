@@ -80,7 +80,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		 */
 		@Override
 		public ContentBuilder addContent(ContentBuilder builder) {
-			builder.addLink(conn, target.getName(), new ViewTransitionResult<Feature, PreferenceAction>(PreferenceTransitionProvider.this, target));
+			builder.addLink(conn, target.getName(), new ViewTransitionResult<>(PreferenceTransitionProvider.this, target));
 			return builder;
 		}
 
@@ -99,14 +99,14 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		 */
 		@Override
 		public FormResult doTransition(Feature target, AppContext c) throws TransitionException {
-			UserSettingFactory<UserSetting> fac = new UserSettingFactory<UserSetting>(c);
+			UserSettingFactory<UserSetting> fac = new UserSettingFactory<>(c);
 			try {
 				((Preference)target).clearPreference(c);
 			} catch (DataFault e) {
 				c.getService(LoggerService.class).getLogger(getClass()).error("Error clearing preference",e);
 				throw new TransitionException("Internal error");
 			}
-			return new ViewTransitionResult<Feature, PreferenceAction>(PreferenceTransitionProvider.this, target);
+			return new ViewTransitionResult<>(PreferenceTransitionProvider.this, target);
 		}
 		
 	}
@@ -164,7 +164,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 			public FormResult action(Form f) throws ActionException {
 				Boolean b = (Boolean) f.getItem(VALUE);
 				pref.setPreference(getContext(), b);
-				return new IndexTransitionResult<Feature, PreferenceAction>(PreferenceTransitionProvider.this);
+				return new IndexTransitionResult<>(PreferenceTransitionProvider.this);
 			}
 		}
 		/* (non-Javadoc)
@@ -204,7 +204,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 				Boolean b = (Boolean) f.getItem(VALUE);
 				ConfigService serv = getContext().getService(ConfigService.class);
 				serv.setProperty("service.feature."+feature.getName(), Boolean.toString(b));
-				return new IndexTransitionResult<Feature, PreferenceAction>(PreferenceTransitionProvider.this);
+				return new IndexTransitionResult<>(PreferenceTransitionProvider.this);
 			}
 		}
 		/* (non-Javadoc)

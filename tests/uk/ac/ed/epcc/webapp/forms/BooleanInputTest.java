@@ -36,16 +36,17 @@ ParseInputInterfaceTest<Boolean, BooleanInput, BooleanInputTest>
 {
 
 	
-	public InputInterfaceTest<Boolean, BooleanInput, BooleanInputTest> input_test = new InputInterfaceTestImpl<Boolean, BooleanInput, BooleanInputTest>(this);
+	public InputInterfaceTest<Boolean, BooleanInput, BooleanInputTest> input_test = new InputInterfaceTestImpl<>(this);
 	
 	
-	public BinaryInputInterfaceTest<Boolean, BooleanInput, BooleanInputTest> binary_test = new BinaryInputInterfaceTestImpl<Boolean, BooleanInput, BooleanInputTest>(this);
+	public BinaryInputInterfaceTest<Boolean, BooleanInput, BooleanInputTest> binary_test = new BinaryInputInterfaceTestImpl<>(this);
 	
 	
-	public ParseInputInterfaceTest<Boolean, BooleanInput, BooleanInputTest> parse_test = new ParseInputInterfaceTestImpl<Boolean, BooleanInput, BooleanInputTest>(this);
+	public ParseInputInterfaceTest<Boolean, BooleanInput, BooleanInputTest> parse_test = new ParseInputInterfaceTestImpl<>(this);
 	
+	@Override
 	public Set<Boolean> getGoodData() throws Exception {
-		HashSet<Boolean> good = new HashSet<Boolean>();
+		HashSet<Boolean> good = new HashSet<>();
 		good.add( Boolean.TRUE );
 		good.add( Boolean.FALSE );
 		return good;
@@ -82,31 +83,36 @@ ParseInputInterfaceTest<Boolean, BooleanInput, BooleanInputTest>
 		assertEquals(input.getValue(), Boolean.FALSE);
 		assertEquals(input.getString(), "false");
 	}
+	@Override
 	public Set<Boolean> getBadData() throws Exception {
-		HashSet<Boolean> bad = new HashSet<Boolean>();
+		HashSet<Boolean> bad = new HashSet<>();
 		return bad;
 	}
 
+	@Override
 	public BooleanInput getInput() {
 
 		return new BooleanInput();
 	}
 
+	@Override
 	public Set<String> getGoodParseData() {
-		HashSet<String> good = new HashSet<String>();
+		HashSet<String> good = new HashSet<>();
 		good.add( "true" );
 		good.add( "false" );
 		return good;
 	}
 
+	@Override
 	public Set<String> getBadParseData() {
-		HashSet<String> bad = new HashSet<String>();
+		HashSet<String> bad = new HashSet<>();
 		return bad;
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestParseDataProvider#allowNull()
 	 */
+	@Override
 	public boolean allowNull() {
 		return false;
 	}

@@ -28,7 +28,7 @@ public class IntegerRangeInput extends IntegerSetInput {
 	  super(makeSet(min, count));
   }
   private static Set<Integer> makeSet(int min, int count){
-	  LinkedHashSet<Integer> result=new LinkedHashSet<Integer>();
+	  LinkedHashSet<Integer> result=new LinkedHashSet<>();
 	  for(int i=0;i<count;i++){
 		  result.add(min+i);
 	  }

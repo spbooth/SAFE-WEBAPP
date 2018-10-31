@@ -36,9 +36,9 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
 
 public class SetInput<T> extends ParseAbstractInput<String> implements ListInput<String, T> {
-    private Map<String,T> data = new LinkedHashMap<String,T>();
-    private Map<T,String> labels = new LinkedHashMap<T,String>();
-    private Map<T,String> tags = new LinkedHashMap<T,String>();
+    private Map<String,T> data = new LinkedHashMap<>();
+    private Map<T,String> labels = new LinkedHashMap<>();
+    private Map<T,String> tags = new LinkedHashMap<>();
     private boolean case_insensative=false;
     public SetInput(){
     	
@@ -89,14 +89,17 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
     	}
     	addChoice(key, label, item);
     }
+	@Override
 	public T getItembyValue(String value) {
 		return data.get(mapTag(value));
 	}
 
+	@Override
 	public Iterator<T> getItems() {
 		return data.values().iterator();
 	}
 
+	@Override
 	public int getCount(){
 		return data.size();
 	}
@@ -110,25 +113,31 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
 		// This assumes toString is consistent with equals.
 		return item.toString();
 	}
+	@Override
 	public String getTagByItem(T item) {
 		return tags.get(item);
 	}
 
+	@Override
 	public String getTagByValue(String value) {
 		return mapTag(value);
 	}
 
+	@Override
 	public String getText(T item) {
 		return labels.get(item);
 	}
 
+	@Override
 	public T getItem() {
 		return getItembyValue(getValue());
 	}
 
+	@Override
 	public void setItem(T item) {
 		setValue(getTagByItem(item));
 	}
+	@Override
 	public void parse(String v) throws ParseException {
 		if (v == null) {
 			setValue(null);

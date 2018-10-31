@@ -95,7 +95,7 @@ public class Table<C, R> {
 			} else {
 				setName(key.toString());
 			}
-			data = new HashMap<R, Object>();
+			data = new HashMap<>();
 			cols.put(key, this);
 			if ((keyName == null || !keyName.equals(key))
 					&& !col_keys.contains(key)) {
@@ -105,7 +105,7 @@ public class Table<C, R> {
 
 		private Col(C myname, Map<R, Object> h) {
 			this(myname);
-			data = new HashMap<R, Object>(h);
+			data = new HashMap<>(h);
 		}
 
 		public Object add(R key, Number value) {
@@ -178,11 +178,11 @@ public class Table<C, R> {
 		 */
 		public void addAttribute(R key, String name, String value) {
 			if (element_attr == null) {
-				element_attr = new HashMap<R, Map<String, String>>();
+				element_attr = new HashMap<>();
 			}
 			Map<String, String> my_attr = element_attr.get(key);
 			if (my_attr == null) {
-				my_attr = new HashMap<String, String>();
+				my_attr = new HashMap<>();
 				element_attr.put(key, my_attr);
 			}
 			my_attr.put(name, value);
@@ -196,7 +196,7 @@ public class Table<C, R> {
 		 */
 		public void addAttribute(String name, String value) {
 			if (attr == null) {
-				attr = new HashMap<String, String>();
+				attr = new HashMap<>();
 			}
 			attr.put(name, value);
 		}
@@ -240,7 +240,7 @@ public class Table<C, R> {
 		 * @return Map
 		 */
 		public Map<String, String> getAttributes(R key) {
-			Map<String, String> result = new HashMap<String, String>();
+			Map<String, String> result = new HashMap<>();
 			if (attr != null) {
 				result.putAll(attr);
 			}
@@ -254,7 +254,7 @@ public class Table<C, R> {
 		}
 
 		protected Map<R, Object> getData() {
-			return new HashMap<R, Object>(data);
+			return new HashMap<>(data);
 		}
 
 		public Table.Formatter<C, R> getFormat() {
@@ -487,6 +487,7 @@ public class Table<C, R> {
 		private final NumberFormat nf;
 		private final Number data;
 		
+		@Override
 		public SimpleXMLBuilder addContent(SimpleXMLBuilder builder) {
 			builder.attr("numeric", "true");
 			if( data == null){
@@ -566,6 +567,7 @@ public class Table<C, R> {
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
 
+		@Override
 		@SuppressWarnings("unchecked")
 		public int compare(Object o1, Object o2) {
 			for (int i = 0; i < keys.length; i++) {
@@ -634,6 +636,7 @@ public class Table<C, R> {
 		}
 
 	
+		@Override
 		public Object convert(Table<C, R> tab, C col, R row, Object raw) {
 			if( t == null){
 				return raw;
@@ -663,9 +666,9 @@ public class Table<C, R> {
 	private boolean printHeadings = true;
 	private String id;
 	public Table() {
-		cols = new HashMap<C, Col>();
-		row_keys = new LinkedList<R>();
-		col_keys = new LinkedList<C>();
+		cols = new HashMap<>();
+		row_keys = new LinkedList<>();
+		col_keys = new LinkedList<>();
 
 	}
 
@@ -677,16 +680,16 @@ public class Table<C, R> {
 	@SuppressWarnings("unchecked")
 	public Table(Table<C, R> t) {
 		cols = (HashMap<C, Col>) t.cols.clone();
-		row_keys = new LinkedList<R>(t.row_keys);
-		col_keys = new LinkedList<C>(t.col_keys);
+		row_keys = new LinkedList<>(t.row_keys);
+		col_keys = new LinkedList<>(t.col_keys);
 		if (t.keyName != null) {
 			keyName = t.keyName;
 		}
 		if (t.warnings != null) {
-			warnings = new HashSet<R>(t.warnings);
+			warnings = new HashSet<>(t.warnings);
 		}
 		if (t.highlight != null) {
-			highlight = new HashSet<R>(t.highlight);
+			highlight = new HashSet<>(t.highlight);
 		}
 
 	}
@@ -839,8 +842,8 @@ public class Table<C, R> {
 		if (cat_Col == null || sum_col == null) {
 			return;
 		}
-		HashMap<R, R> last = new HashMap<R, R>();
-		HashMap<R, Number> sums = new HashMap<R, Number>();
+		HashMap<R, R> last = new HashMap<>();
+		HashMap<R, Number> sums = new HashMap<>();
 		// we insert category sum after last element of the category
 		// so create a row order to define the list.
 		Col category = cols.get(cat_Col);
@@ -929,6 +932,7 @@ public class Table<C, R> {
 	public void addCategoryTotalToCol(C sum_col, C cat_Col) {
 		addCategoryTotals(sum_col, cat_Col, new Transform() {
 
+			@Override
 			public Object convert(Object old) {
 
 				return old.toString() + " Total";
@@ -1176,7 +1180,7 @@ public class Table<C, R> {
 
 	@Deprecated
 	public Collection<C> cols() {
-		return new Vector<C>(col_keys);
+		return new Vector<>(col_keys);
 	}
 
 	/**
@@ -1246,7 +1250,7 @@ public class Table<C, R> {
 	private Hashtable<String, Number> getColNumbersAsHashtable(Col key_col,
 			Col col) {
 
-		Hashtable<String, Number> h = new Hashtable<String, Number>();
+		Hashtable<String, Number> h = new Hashtable<>();
 
 		for (R row_key : getRows()) {
 
@@ -1279,7 +1283,7 @@ public class Table<C, R> {
 	 * @return List of col keys
 	 */
 	public List<C> getCols() {
-		return (List<C>) new LinkedList<C>(col_keys);
+		return (List<C>) new LinkedList<>(col_keys);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1361,7 +1365,7 @@ public class Table<C, R> {
 	 * @return list of row keys
 	 */
 	public List<R> getRows() {
-		return (List<R>) new LinkedList<R>(row_keys);
+		return (List<R>) new LinkedList<>(row_keys);
 	}
 
 	/**
@@ -1519,7 +1523,7 @@ public class Table<C, R> {
 
 	@Deprecated
 	public Collection<R> rows() {
-		return new Vector<R>(row_keys);
+		return new Vector<>(row_keys);
 	}
 
 	/**
@@ -1600,7 +1604,7 @@ public class Table<C, R> {
 	}
 
 	public void setColumns(List<C> v) {
-		col_keys = new LinkedList<C>(v);
+		col_keys = new LinkedList<>(v);
 	}
 
 	/**
@@ -1627,7 +1631,7 @@ public class Table<C, R> {
 	 */
 	public void setHighlight(R row_key, boolean value) {
 		if (highlight == null && value) {
-			highlight = new HashSet<R>();
+			highlight = new HashSet<>();
 		}
 		if (value) {
 			highlight.add(row_key);
@@ -1711,7 +1715,7 @@ public class Table<C, R> {
 	 */
 	public void setWarning(R row_key, boolean value) {
 		if (warnings == null && value) {
-			warnings = new HashSet<R>();
+			warnings = new HashSet<>();
 		}
 		if (value) {
 			warnings.add(row_key);
@@ -1753,7 +1757,7 @@ public class Table<C, R> {
 	 *            boolean should order be reversed
 	 */
 	public void sortRows(C keys[], boolean reverse) {
-		sortRows(new Table.Sorter<C>(keys, this, reverse));
+		sortRows(new Table.Sorter<>(keys, this, reverse));
 	}
 
 	/**
@@ -1781,7 +1785,7 @@ public class Table<C, R> {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		TextTableFormatter< C, R> fmt = new TextTableFormatter<C, R>(null,this);
+		TextTableFormatter< C, R> fmt = new TextTableFormatter<>(null,this);
 		fmt.add(sb);
 		return sb.toString();
 	}

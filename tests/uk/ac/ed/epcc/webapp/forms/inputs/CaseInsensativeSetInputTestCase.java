@@ -31,12 +31,13 @@ import uk.ac.ed.epcc.webapp.forms.ParseAbstractInputTestCase;
 public class CaseInsensativeSetInputTestCase extends ParseAbstractInputTestCase<String, SetInput<Number>> implements
 ListInputInterfaceTest<String, Number, SetInput<Number>, CaseInsensativeSetInputTestCase> {
 
-	public ListInputInterfaceTest<String, Number, SetInput<Number>, CaseInsensativeSetInputTestCase> list_test = new ListInputInterfaceTestImpl<String, Number, SetInput<Number>, CaseInsensativeSetInputTestCase>(this);
+	public ListInputInterfaceTest<String, Number, SetInput<Number>, CaseInsensativeSetInputTestCase> list_test = new ListInputInterfaceTestImpl<>(this);
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestParseDataProvider#getGoodParseData()
 	 */
+	@Override
 	public Set<String> getGoodParseData() {
-		Set<String> good = new HashSet<String>();
+		Set<String> good = new HashSet<>();
 		good.add("One");
 		good.add("Three");
 		good.add("Five");
@@ -49,8 +50,9 @@ ListInputInterfaceTest<String, Number, SetInput<Number>, CaseInsensativeSetInput
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestParseDataProvider#getBadParseData()
 	 */
+	@Override
 	public Set<String> getBadParseData() {
-		Set<String> bad = new HashSet<String>();
+		Set<String> bad = new HashSet<>();
 		bad.add("Two");
 		bad.add("Four");
 		bad.add("Eight");
@@ -60,8 +62,9 @@ ListInputInterfaceTest<String, Number, SetInput<Number>, CaseInsensativeSetInput
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getGoodData()
 	 */
+	@Override
 	public Set<String> getGoodData() throws Exception {
-		Set<String> good = new HashSet<String>();
+		Set<String> good = new HashSet<>();
 		good.add("one");
 		good.add("three");
 		good.add("five");
@@ -74,6 +77,7 @@ ListInputInterfaceTest<String, Number, SetInput<Number>, CaseInsensativeSetInput
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getBadData()
 	 */
+	@Override
 	public Set<String> getBadData() throws Exception {
 		return getBadParseData();
 	}
@@ -81,8 +85,9 @@ ListInputInterfaceTest<String, Number, SetInput<Number>, CaseInsensativeSetInput
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getInput()
 	 */
+	@Override
 	public SetInput<Number> getInput() throws Exception {
-		SetInput<Number> input = new SetInput<Number>();
+		SetInput<Number> input = new SetInput<>();
 		input.setCaseInsensative(true);
 		input.addChoice("One", 1);
 		input.addChoice("Three",3);

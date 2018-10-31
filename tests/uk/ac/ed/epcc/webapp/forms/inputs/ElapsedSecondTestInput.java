@@ -22,36 +22,41 @@ import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 
 public class ElapsedSecondTestInput extends ParseAbstractInputTestCase<Number,ElapsedSecondInput> {
 
+	@Override
 	public Set<String> getGoodParseData() {
-		HashSet<String> res = new HashSet<String>();
+		HashSet<String> res = new HashSet<>();
 		res.add("5");
 		res.add("5:06");
 		res.add("6:00:00");
 		return res;
 	}
 
+	@Override
 	public Set<String> getBadParseData() {
-		HashSet<String> res = new HashSet<String>();
+		HashSet<String> res = new HashSet<>();
 		res.add("-17");
 		res.add("10:00:00:00");
 		res.add("wombat");
 		return res;
 	}
 
+	@Override
 	public Set<Number> getGoodData() throws Exception {
-		HashSet<Number> res = new HashSet<Number>();
+		HashSet<Number> res = new HashSet<>();
 		res.add(5L);
 		res.add(60L);
 		res.add(8000L);
 		return res;
 	}
 
+	@Override
 	public Set<Number> getBadData() throws Exception {
-		HashSet<Number> res = new HashSet<Number>();
+		HashSet<Number> res = new HashSet<>();
 		res.add(-3);
 		return res;
 	}
 
+	@Override
 	public ElapsedSecondInput getInput() throws Exception {
 		return new ElapsedSecondInput();
 	}

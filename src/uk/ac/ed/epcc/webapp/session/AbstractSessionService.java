@@ -218,7 +218,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	}
 	private Map<RelationshipTag,Boolean> relationship_map=null;
 	// map of roles to filters.
-	private Map<String,BaseFilter> roles = new HashMap<String, BaseFilter>();
+	private Map<String,BaseFilter> roles = new HashMap<>();
 	public AbstractSessionService(AppContext c) {
 		super(c);
 	}
@@ -245,6 +245,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	}
 	
 	
+	@Override
 	@SuppressWarnings("unchecked")
 	public AppUserFactory<A> getLoginFactory() {
 		if( fac != null ){
@@ -306,6 +307,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 * @param role
 	 * @return Boolean or null
 	 */
+	@Override
 	public final Boolean getToggle(String role){
 		if( ! apply_toggle ) {
 			return null;
@@ -324,6 +326,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 * @param name String role to set
 	 * @param value boolean value to set
 	 */
+	@Override
 	public void setToggle(String name, boolean value) {
 		flushRelationships();
 		if( toggle_map == null ){
@@ -341,6 +344,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 * @param name String role to toggle
 	 * @return Boolean or null
 	 */
+	@Override
 	public Boolean toggleRole(String name){
 		if( toggle_map == null ){
 			setupToggleMap();
@@ -364,7 +368,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 * @return Map<String,Boolean>
 	 */
 	public Map<String,Boolean> makeToggleMap(){
-		HashMap<String,Boolean> map = new HashMap<String,Boolean>();
+		HashMap<String,Boolean> map = new HashMap<>();
 
 		
 		String additions = getContext().getInitParameter("toggle_roles",SessionService.ADMIN_ROLE);
@@ -381,7 +385,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		if( toggle_map == null ){
 			setupToggleMap();
 		}
-		return new HashMap<String,Boolean>(toggle_map);
+		return new HashMap<>(toggle_map);
 	}
 
 
@@ -406,6 +410,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 * @return true if person has role.
 	 * 
 	 */
+	@Override
 	public final boolean hasRole(String name){
 		return hasRole(null,name);
 	}
@@ -469,11 +474,13 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 * @param name
 	 * @return role to use
 	 */
+	@Override
 	public String mapRoleName(String name) {
 		return getContext().getInitParameter(USE_ROLE_PREFIX+name, name);
 	}
 	
 	
+	@Override
 	public boolean hasRoleFromList(String ...roles){
 		if( roles == null ){
 			return false;
@@ -489,12 +496,13 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 * 
 	 * @return Set<String>
 	 */
+	@Override
 	public Set<String> getToggleRoles(){
 		if( toggle_map == null ){
 			setupToggleMap();
 		}
 		// have predictable order
-		Set<String> set = new TreeSet<String>();
+		Set<String> set = new TreeSet<>();
 		if( toggle_map != null ){
 		for(String s : toggle_map.keySet()){
 			if( canHaveRole(s)){
@@ -553,7 +561,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		if( result != null ){
 			return result;
 		}
-		result = new HashMap<String,Boolean>();
+		result = new HashMap<>();
 		setAttribute(role_map_tag, result);
 		return result;
 	}
@@ -574,6 +582,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 * does not have the role but it allows toggle state to be retained acSross a SU.
 	 * 
 	 */
+	@Override
 	public void clearCurrentPerson() {
 		flushRelationships();
 		clearRoleMap();
@@ -581,10 +590,12 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		removeAttribute(person_tag);
 	}
 	
+	@Override
 	public void logOut(){
 		clearCurrentPerson();
 	}
 
+	@Override
 	public final  A getCurrentPerson() {
 		if( person == null && haveCurrentUser()){
 			person = lookupPerson();
@@ -599,7 +610,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	}
 	@Override
 	public Set<String> getStandardRoles(){
-		Set<String> result = new LinkedHashSet<String>();
+		Set<String> result = new LinkedHashSet<>();
 		try {
 			for(String s :getContext().getExpandedProperty(ROLE_LIST_CONFIG, SessionService.ADMIN_ROLE).split(",")){
 				result.add(s);
@@ -652,6 +663,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		return person;
 	}
 
+	@Override
 	public final boolean haveCurrentUser() {
 		if( person != null ){
 			return true;
@@ -671,6 +683,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	}
 	
 
+	@Override
 	public void setCurrentPerson(A new_person) {
 		if( new_person == null){
 			clearCurrentPerson();
@@ -687,12 +700,14 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		}
 	}
 
+	@Override
 	public boolean isCurrentPerson(A person){
 		if( person == null || ! haveCurrentUser()){
 			return false;
 		}
 		return getPersonID() == person.getID();
 	}
+	@Override
 	public void setCurrentPerson(int id) {
 		if( id <= 0 ){
 			clearCurrentPerson();
@@ -708,6 +723,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		}
 	}
 
+	@Override
 	public void setCurrentRoleToggle(Map<String, Boolean> toggleMap) {
 		toggle_map=toggleMap;	
 	}
@@ -715,6 +731,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 * 
 	 * @param role
 	 */
+	@Override
 	public void setTempRole(String role){
 		if( role_map == null){
 			role_map = setupRoleMap();
@@ -723,6 +740,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		flushRelationships();
 	}
 
+	@Override
 	public String getName() {
 		A user = getCurrentPerson();
 		if( user != null ){
@@ -731,6 +749,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		return null;
 	}
 
+	@Override
 	public void cleanup() {
 		if( person != null){
 			person.release();
@@ -873,6 +892,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	}
 
 
+	@Override
 	public void setRole(A user, String role, boolean value)
 			throws UnsupportedOperationException {
 		boolean current = canHaveRole(user,role);
@@ -905,7 +925,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 				error("tag "+tag+" failed to resolve to DataObjectFactory");
 				return false;
 			}
-			AndFilter<X> fil = new AndFilter<X>(fac.getTarget());
+			AndFilter<X> fil = new AndFilter<>(fac.getTarget());
 			fil.addFilter(getTargetInRelationshipRoleFilter(fac, relationship, user));
 			if( name_filter != null ) {
 				BaseFilter<? super X> nf = makeNamedFilter(fac, name_filter);
@@ -923,6 +943,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			return false;
 		}
 	}
+	@Override
 	public boolean canHaveRole(A user, String role) {
 		if( user == null || role == null){
 			return false;
@@ -975,6 +996,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 
 
 
+	@Override
 	public Class<SessionService> getType() {
 		return SessionService.class;
 	}
@@ -984,9 +1006,11 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 * 
 	 * @return Locale
 	 */
+	@Override
 	public Locale getLocale() {
 		return Locale.UK;
 	}
+	@Override
 	public TimeZone getTimeZone(){
 		return TimeZone.getDefault();
 	}
@@ -1015,7 +1039,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		try {
 			result = makeRelationshipRoleFilter(fac,role,null,fallback);
 			// narrow the selection
-			result = new AndFilter<T>(fac.getTarget(),result,fallback);
+			result = new AndFilter<>(fac.getTarget(),result,fallback);
 		} catch (UnknownRelationshipException e) {
 			// should never be thrown with a default specified.
 			return fallback;
@@ -1036,9 +1060,9 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			result = makePersonInRelationshipRoleFilter(fac, role,target);
 			if(APPLY_DEFAULT_PERSON_RELATIONSHIP_FILTER.isEnabled(getContext())){
 				// Add in the default relationship filte on person
-				SQLFilter<? super A> fil = getLoginFactory().getDefaultRelationshipFilter();
+				SQLFilter<A> fil = getLoginFactory().getDefaultRelationshipFilter();
 				if( fil != null ){
-					result = new AndFilter<A>(getLoginFactory().getTarget(),result,fil);
+					result = new AndFilter<>(getLoginFactory().getTarget(),result,fil);
 				}
 			}
 			roles.put(store_tag, result);
@@ -1062,7 +1086,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 				//
 				SQLFilter<T> fil = fac.getDefaultRelationshipFilter();
 				if( fil != null ){
-					result = new AndFilter<T>(fac.getTarget(),result,fil);
+					result = new AndFilter<>(fac.getTarget(),result,fil);
 				}
 			}
 			roles.put(store_tag, result);
@@ -1070,7 +1094,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		return result;
 	}
 
-	private Set<String> searching_roles = new HashSet<String>();
+	private Set<String> searching_roles = new HashSet<>();
 	/** actually construct the filter.
 	 * 
 	 * A role can be mapped to a different implementation by setting:
@@ -1115,7 +1139,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			}
 		if( role.contains(OR_RELATIONSHIP_COMBINER)){
 			// OR combination of filters
-			OrFilter<T> or = new OrFilter<T>(fac2.getTarget(), fac2);
+			OrFilter<T> or = new OrFilter<>(fac2.getTarget(), fac2);
 			for( String  s  : role.split(",")){
 				try{
 					if( person == null){
@@ -1135,7 +1159,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		}
 		if( role.contains(AND_RELATIONSHIP_COMBINER)){
 			// AND combination of filters
-			AndFilter<T> and = new AndFilter<T>(fac2.getTarget());
+			AndFilter<T> and = new AndFilter<>(fac2.getTarget());
 			for( String  s  : role.split("\\+")){
 				if( person == null ){
 					and.addFilter(getRelationshipRoleFilter(fac2, s));
@@ -1180,20 +1204,20 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	    		if( person == null){
 	    			// Only the global role filter can allow relationship without a current person
 	    			// as roles may be asserted from the container.
-	    			return new GlobalRoleFilter<T>(this, sub);
+	    			return new GlobalRoleFilter<>(this, sub);
 	    		}else{
 	    			
-	    			return new GenericBinaryFilter<T>(fac2.getTarget(),canHaveRole(person, role));
+	    			return new GenericBinaryFilter<>(fac2.getTarget(),canHaveRole(person, role));
 	    		}
 	    	}
 	    	if( base.equals(BOOLEAN_RELATIONSHIP_BASE)){
 	    		
-	    		return new GenericBinaryFilter<T>(fac2.getTarget(),Boolean.valueOf(sub));
+	    		return new GenericBinaryFilter<>(fac2.getTarget(),Boolean.valueOf(sub));
 	    		
 	    	}
 	    	if( person == null && ! haveCurrentUser()){
 	    		// No users specified
-	    		return new GenericBinaryFilter<T>(fac2.getTarget(),false);
+	    		return new GenericBinaryFilter<>(fac2.getTarget(),false);
 	    	}
 	    	
 	    	if( base.equals(fac2.getTag())){
@@ -1257,7 +1281,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		try{
 		if( role.contains(OR_RELATIONSHIP_COMBINER)){
 			// OR combination of filters
-			OrFilter<A> or = new OrFilter<A>(target_type, login_fac);
+			OrFilter<A> or = new OrFilter<>(target_type, login_fac);
 			for( String  s  : role.split(",")){
 				try{
 					or.addFilter(getPersonInRelationshipRoleFilter(fac2, s,target));
@@ -1273,7 +1297,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		}
 		if( role.contains(AND_RELATIONSHIP_COMBINER)){
 			// OR combination of filters
-			AndFilter<A> and = new AndFilter<A>(target_type);
+			AndFilter<A> and = new AndFilter<>(target_type);
 			for( String  s  : role.split("\\+")){
 				and.addFilter(getPersonInRelationshipRoleFilter(fac2, s,target));
 			}
@@ -1310,11 +1334,11 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	    	String sub = role.substring(pos+1);
 	    	if( base.equals(GLOBAL_ROLE_RELATIONSHIP_BASE)){
 	    		// roles don't enumerate
-	    		return new GenericBinaryFilter<A>(target_type,false);
+	    		return new GenericBinaryFilter<>(target_type,false);
 	    	}
 	    	if( base.equals(BOOLEAN_RELATIONSHIP_BASE)){
 	    		
-	    		return new GenericBinaryFilter<A>(target_type,Boolean.valueOf(sub));
+	    		return new GenericBinaryFilter<>(target_type,Boolean.valueOf(sub));
 	    		
 	    	}
 	    	if( base.equals(fac2.getTag())){
@@ -1467,7 +1491,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	    	}else{
 	    		matches= fac2.matches(fil, target);
 	    	}
-	    	return new GenericBinaryFilter<A>((Class<A>) AppUser.class, matches);
+	    	return new GenericBinaryFilter<>((Class<A>) AppUser.class, matches);
 	    }
 	    // unrecognised role
 	    throw new UnknownRelationshipException(role);
@@ -1485,7 +1509,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		// For the moment we only cache relationships within a request
 		// to avoid stale values as a users state changes
 		if( relationship_map == null && CACHE_RELATIONSHIP_FEATURE.isEnabled(getContext())){
-			relationship_map = new HashMap<RelationshipTag,Boolean>();
+			relationship_map = new HashMap<>();
 		}
 		RelationshipTag tag = new RelationshipTag(fac.getTag(), target.getID(), role);
 		if( relationship_map != null && relationship_map.containsKey(tag)){

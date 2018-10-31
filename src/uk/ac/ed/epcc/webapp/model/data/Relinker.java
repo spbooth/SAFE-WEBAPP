@@ -19,7 +19,6 @@ import java.util.Properties;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterUpdate;
@@ -76,7 +75,7 @@ public class Relinker{
 						continue;
 					}
 					FieldExpression<Number,DataObject>expr = src_rep.getNumberExpression(DataObject.class, Number.class, field);
-					update.update(expr, dest.getID(), new SQLValueFilter<DataObject>(DataObject.class, src_rep, field, src.getID()));
+					update.update(expr, dest.getID(), new SQLValueFilter<>(DataObject.class, src_rep, field, src.getID()));
 				}
 			}
 		}

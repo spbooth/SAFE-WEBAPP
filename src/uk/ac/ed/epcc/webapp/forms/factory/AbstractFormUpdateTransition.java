@@ -73,7 +73,7 @@ public abstract class AbstractFormUpdateTransition<K, X> extends AbstractTargetL
 				// TransitionException reported to user
 				return new MessageResult("no_select_target");
 			}
-			return new ChainedTransitionResult<X, K>(tp, target, next);
+			return new ChainedTransitionResult<>(tp, target, next);
 		}
 	}
 

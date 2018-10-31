@@ -66,6 +66,7 @@ public class ConstructedObjectInput<T> implements ListInput<String,T>{
     	
     	
     }
+	@Override
 	public T getItembyValue(String value) {
 		if( value == null ){
 			return null;
@@ -73,17 +74,20 @@ public class ConstructedObjectInput<T> implements ListInput<String,T>{
 		return c.makeObject(clazz, value); 
 	}
 
+	@Override
 	public Iterator<T> getItems() {
-		Set<T> set = new LinkedHashSet<T>();
+		Set<T> set = new LinkedHashSet<>();
 		for(String tag : reg.keySet()){
 			set.add(c.makeObject(clazz, tag));
 		}
 		return set.iterator();
 	}
 
+	@Override
 	public int getCount(){
 		return reg.size();
 	}
+	@Override
 	public String getTagByItem(T item) {
 		if( item == null){
 			return null;
@@ -96,15 +100,18 @@ public class ConstructedObjectInput<T> implements ListInput<String,T>{
 		return null;
 	}
 
+	@Override
 	public String getTagByValue(String value) {
 		return value;
 	}
 
+	@Override
 	public String getText(T item) {
 		String tag = getTagByItem(item);
 		return tag;
 	}
 
+	@Override
 	public String convert(Object v) throws TypeError {
 		if( v instanceof String ){
 			return (String) v;
@@ -112,33 +119,40 @@ public class ConstructedObjectInput<T> implements ListInput<String,T>{
 		return null;
 	}
 
+	@Override
 	public String getKey() {
 		return key;
 	}
 
+	@Override
 	public String getPrettyString(String value) {
 		return value;
 	}
 
+	@Override
 	public String getString(String value) {
 		return value;
 	}
 
+	@Override
 	public String getValue() {
 		return name;
 	}
 
+	@Override
 	public void setKey(String key) {
 		
 		this.key=key;
 	}
 
+	@Override
 	public String setValue(String v) throws TypeError {
 		String old=name;
 		name=v;
 		return old;
 	}
 
+	@Override
 	public void validate() throws FieldException {
 		if( name != null && reg.containsKey(name)){
 			return;
@@ -150,6 +164,7 @@ public class ConstructedObjectInput<T> implements ListInput<String,T>{
 			throw new ValidateException("Invalid selection "+name);
 	}
 
+	@Override
 	public T getItem() {
 		String value = getValue();
 		if( value == null) {
@@ -158,10 +173,12 @@ public class ConstructedObjectInput<T> implements ListInput<String,T>{
 		return c.makeObject(clazz, value);
 	}
 
+	@Override
 	public void setItem(T item) {
 		name=getTagByItem(item);
 		
 	}
+	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitListInput(this);
 	}

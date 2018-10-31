@@ -56,7 +56,7 @@ public class DirectOperationResultVisitor implements WebFormResultVisitor {
 			K key = res.getTransition();
 			if( key != null ) {
 				Transition<T> t = fac.getTransition(target, key);
-				FormResult next = t.getResult(new DirectOperationTransitionVisitor<T>(conn, target));
+				FormResult next = t.getResult(new DirectOperationTransitionVisitor<>(conn, target));
 				if( next != null ) {
 					next.accept(this);
 					// recursive call will have set result

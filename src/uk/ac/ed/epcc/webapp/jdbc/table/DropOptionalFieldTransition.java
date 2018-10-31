@@ -35,7 +35,7 @@ public class DropOptionalFieldTransition<T extends DataObjectFactory> extends Dr
 	@Override
 	public <I extends Input<String> & ItemInput<FieldInfo>> I getFieldInput(T target) {
 		TableSpecification spec = target.getTableSpecification();
-		Map<String,FieldInfo> map = new LinkedHashMap<String, Repository.FieldInfo>();
+		Map<String,FieldInfo> map = new LinkedHashMap<>();
 		Set<String> optionalFieldNames = spec.getOptionalFieldNames();
 		Set<String> fieldNames = spec.getFieldNames();
 		Repository res = getRepository(target);
@@ -45,7 +45,7 @@ public class DropOptionalFieldTransition<T extends DataObjectFactory> extends Dr
 				map.put(name, res.getInfo(name));
 			}
 		}
-		return (I) new OptionalFieldInput<FieldInfo>(res, false, map);
+		return (I) new OptionalFieldInput<>(res, false, map);
 	}
 
 	

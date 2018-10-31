@@ -31,16 +31,18 @@ public class PercentInputTestCase extends NumberInputTestCase<Double, PercentInp
 		return null;
 	}
 
+	@Override
 	public Set<String> getGoodParseData() {
-		Set<String> good=new HashSet<String>();
+		Set<String> good=new HashSet<>();
 		good.add("0%");
 		good.add("100%");
 		good.add("55%");
 		return good;
 	}
 
+	@Override
 	public Set<String> getBadParseData() {
-		Set<String> bad = new HashSet<String>();
+		Set<String> bad = new HashSet<>();
 		bad.add("boris");
 		bad.add("110");
 		bad.add("-7");
@@ -49,20 +51,23 @@ public class PercentInputTestCase extends NumberInputTestCase<Double, PercentInp
 		return bad;
 	}
 
+	@Override
 	public Set<Double> getGoodData() throws Exception {
-		Set<Double> good = new HashSet<Double>();
+		Set<Double> good = new HashSet<>();
 		good.add(0.5);
 		good.add(0.75);
 		return good;
 	}
 
+	@Override
 	public Set<Double> getBadData() throws Exception {
-		Set<Double> bad = new HashSet<Double>();
+		Set<Double> bad = new HashSet<>();
 		bad.add(-0.3);
 		bad.add(7.0);
 		return bad;
 	}
 
+	@Override
 	public PercentInput getInput() throws Exception {
 		
 		return new PercentInput();

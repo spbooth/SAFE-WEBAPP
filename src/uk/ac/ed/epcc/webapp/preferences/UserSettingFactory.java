@@ -102,9 +102,9 @@ public class UserSettingFactory<S extends UserSettingFactory.UserSetting> extend
 		if( serv == null || ! serv.haveCurrentUser() || ! PER_USER_SETTINGS_FEATURE.isEnabled(getContext())){
 			return null;
 		}
-		SQLAndFilter<S> fil = new SQLAndFilter<S>(getTarget());
-		fil.addFilter(new SQLValueFilter<S>(getTarget(),res, SETTING_FIELD, pref.getName()));
-		fil.addFilter(new SQLValueFilter<S>(getTarget(),res, PERSON_FIELD, serv.getCurrentPerson().getID()));
+		SQLAndFilter<S> fil = new SQLAndFilter<>(getTarget());
+		fil.addFilter(new SQLValueFilter<>(getTarget(),res, SETTING_FIELD, pref.getName()));
+		fil.addFilter(new SQLValueFilter<>(getTarget(),res, PERSON_FIELD, serv.getCurrentPerson().getID()));
 		try {
 			S result = find(fil,true);
 			if( result == null ){

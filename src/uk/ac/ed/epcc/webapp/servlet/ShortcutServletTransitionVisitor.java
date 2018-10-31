@@ -59,12 +59,13 @@ public class ShortcutServletTransitionVisitor<K,T> extends AbstractTransitionVis
 				// have to go the the transition page to
 				// show the form
 				// but its easier if all main forms post to here first
-				return new ChainedTransitionResult<T,K>(provider,target,tag);
+				return new ChainedTransitionResult<>(provider,target,tag);
 			}
 			return null;
 		    
 		}
 		
+		@Override
 		public FormResult doTargetLessTransition(TargetLessTransition<T> ft) throws TransitionException{
 			String transition_form = (String) params.get("transition_form");
 			
@@ -72,7 +73,7 @@ public class ShortcutServletTransitionVisitor<K,T> extends AbstractTransitionVis
 				// have to go the the transition page to
 				// show the form
 				// but its easier if all main forms post to here first
-				return new ChainedTransitionResult<T,K>(provider,null,tag);
+				return new ChainedTransitionResult<>(provider,null,tag);
 			}
 			return null;
 			
@@ -81,6 +82,7 @@ public class ShortcutServletTransitionVisitor<K,T> extends AbstractTransitionVis
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor#doFormTransition(uk.ac.ed.epcc.webapp.forms.transition.FormTransition)
 		 */
+		@Override
 		public FormResult doFormTransition(FormTransition<T> t)
 				throws TransitionException {
 			return doBaseFormTransition(t);
@@ -88,6 +90,7 @@ public class ShortcutServletTransitionVisitor<K,T> extends AbstractTransitionVis
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor#doValidatingFormTransition(uk.ac.ed.epcc.webapp.forms.transition.ValidatingFormTransition)
 		 */
+		@Override
 		public FormResult doValidatingFormTransition(
 				ValidatingFormTransition<T> t) throws TransitionException {
 			return doBaseFormTransition(t);

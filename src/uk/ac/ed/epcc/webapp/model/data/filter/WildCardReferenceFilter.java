@@ -30,9 +30,9 @@ public class WildCardReferenceFilter<T extends DataObject,P extends Indexed> ext
 
 	public WildCardReferenceFilter(Class<T> target,Repository res, String field, P peer){
 		super(target);
-		addFilter(new NullFieldFilter<T>(target,res, field, true));
+		addFilter(new NullFieldFilter<>(target,res, field, true));
 		if( peer != null){
-			addFilter(new SQLValueFilter<T>(target,res, field, peer.getID()));
+			addFilter(new SQLValueFilter<>(target,res, field, peer.getID()));
 		}
 	}
 }

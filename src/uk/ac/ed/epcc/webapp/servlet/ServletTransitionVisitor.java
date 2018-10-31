@@ -61,7 +61,7 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 				// have to go the the transition page to
 				// show the form
 				// but its easier if all main forms post to here first
-				return new ChainedTransitionResult<T,K>(provider,target,tag);
+				return new ChainedTransitionResult<>(provider,target,tag);
 			}
 //			 actually process the results of a transition
 			HTMLForm f = new HTMLForm(conn);
@@ -90,7 +90,7 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 		    		if( action instanceof ErrorProcessingFormAction){
 		    			return ((ErrorProcessingFormAction<T, K>)action).processError(getContext(), f, provider, target, tag, HTMLForm.getMissing(req), HTMLForm.getErrors(req));
 		    		}
-		    		return new ErrorFormResult<T, K>(provider, target, tag, HTMLForm.getErrors(req), HTMLForm.getMissing(req));
+		    		return new ErrorFormResult<>(provider, target, tag, HTMLForm.getErrors(req), HTMLForm.getMissing(req));
 		    		
 		    	}
 
@@ -112,7 +112,7 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 		    		// show these as general form errors re-displaying form.
 		    		HTMLForm.addGeneralError(te.getMessage(), req);
 		    	}
-				return new ErrorFormResult<T, K>(provider, target, tag, HTMLForm.getErrors(req), HTMLForm.getMissing(req));
+				return new ErrorFormResult<>(provider, target, tag, HTMLForm.getErrors(req), HTMLForm.getMissing(req));
 			}catch(TransitionException e){
 				// if it is a transition exception we have a message for the user
 				throw e;
@@ -121,6 +121,7 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 				throw new TransitionException("Operation failed");
 			}
 		}
+		@Override
 		@SuppressWarnings("unchecked")
 		public FormResult doTargetLessTransition(TargetLessTransition<T> ft) throws TransitionException{
 			String transition_form = (String) params.get("transition_form");
@@ -129,7 +130,7 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 				// have to go the the transition page to
 				// show the form
 				// but its easier if all main forms post to here first
-				return new ChainedTransitionResult<T,K>(provider,null,tag);
+				return new ChainedTransitionResult<>(provider,null,tag);
 			}
 //			 actually process the results of a transition
 			HTMLForm f = new HTMLForm(conn);
@@ -151,7 +152,7 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 				}
 	    	}
 			if (! f.parsePost(req)){
-				return new ErrorFormResult<T, K>(provider, target, tag, HTMLForm.getErrors(req), HTMLForm.getMissing(req)); 
+				return new ErrorFormResult<>(provider, target, tag, HTMLForm.getErrors(req), HTMLForm.getMissing(req)); 
 			}
 			
 				String confirm_action = f.mustConfirm(params);
@@ -171,7 +172,7 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 		    		// show these as general form errors re-displaying form.
 		    		HTMLForm.addGeneralError(te.getMessage(), req);
 		    	}
-				return new ErrorFormResult<T, K>(provider, target, tag, HTMLForm.getErrors(req), HTMLForm.getMissing(req));
+				return new ErrorFormResult<>(provider, target, tag, HTMLForm.getErrors(req), HTMLForm.getMissing(req));
 			}catch(TransitionException e){
 				// if it is a transition exception we have a message for the user
 				throw e;	
@@ -183,6 +184,7 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor#doFormTransition(uk.ac.ed.epcc.webapp.forms.transition.FormTransition)
 		 */
+		@Override
 		public FormResult doFormTransition(FormTransition<T> t)
 				throws TransitionException {
 			return doBaseFormTransition(t);
@@ -190,6 +192,7 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor#doValidatingFormTransition(uk.ac.ed.epcc.webapp.forms.transition.ValidatingFormTransition)
 		 */
+		@Override
 		public FormResult doValidatingFormTransition(
 				ValidatingFormTransition<T> t) throws TransitionException {
 			return doBaseFormTransition(t);
@@ -218,6 +221,6 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 	    		return null;
 	    	}
 			// need to show page
-			return new ConfirmTransitionResult<T, K>(tp,target,operation,type,args);
+			return new ConfirmTransitionResult<>(tp,target,operation,type,args);
 		}
  	}

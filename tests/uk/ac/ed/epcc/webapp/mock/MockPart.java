@@ -31,7 +31,7 @@ import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 public class MockPart  implements Part {
 
 	public String name;
-	private Map<String,String> headers = new HashMap<String, String>();
+	private Map<String,String> headers = new HashMap<>();
 	public ByteArrayMimeStreamData data = new ByteArrayMimeStreamData();
 	
 	public MockPart(String name){

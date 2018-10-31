@@ -65,7 +65,7 @@ public class RelationshipTest extends WebappTestBase {
 		
 		
 		
-		Relationship<AppUser, Dummy3> rel = new Relationship<AppUser, Dummy3>(ctx, "TestRelationship");
+		Relationship<AppUser, Dummy3> rel = new Relationship<>(ctx, "TestRelationship");
 		rel.setRole(fred, t, "shark", true);		
 		
 	}

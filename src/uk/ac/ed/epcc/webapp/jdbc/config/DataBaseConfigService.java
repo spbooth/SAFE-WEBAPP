@@ -22,7 +22,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Set;
 
@@ -31,14 +30,11 @@ import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.config.CachedConfigService;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.ConfigServiceListener;
-import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
-import uk.ac.ed.epcc.webapp.model.Property;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
 
@@ -149,6 +145,7 @@ public class DataBaseConfigService implements ConfigService {
     	}
     }
    
+	@Override
 	public void clearServiceProperties() {
 		if( forward ){
 			// This is our own clean call from setup
@@ -162,6 +159,7 @@ public class DataBaseConfigService implements ConfigService {
 		notifyListeners();
 	}
 
+	@Override
 	public Properties getServiceProperties() {
 		if( forward ){
 			// We are going to return incomplete results
@@ -221,9 +219,11 @@ public class DataBaseConfigService implements ConfigService {
 		return new Properties(db_props);
 	}
 
+	@Override
 	public AppContext getContext() {
 		return ctx;
 	}
+	@Override
 	public void setProperty(String name, String value)
 			throws UnsupportedOperationException {
 		if( forward ){
@@ -305,18 +305,21 @@ public class DataBaseConfigService implements ConfigService {
 			}
 		}
 	}
+	@Override
 	public void cleanup() {
 		nested.cleanup();
 	}
+	@Override
 	public void addListener(ConfigServiceListener listener) {
 		
 		if( listeners == null ){
-			listeners=new HashSet<ConfigServiceListener>();
+			listeners=new HashSet<>();
 		}
 		listeners.add(listener);
 	}
 	
 	
+	@Override
 	public Class<ConfigService> getType() {
 		return ConfigService.class;
 	}

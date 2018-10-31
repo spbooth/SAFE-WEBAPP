@@ -62,8 +62,8 @@ public class PageHTMLForm extends BaseHTMLForm {
     }
 	public PageHTMLForm(AppContext c,String submitted) {
 		super(c);
-		missing = new HashSet<String>();
-		errors = new HashMap<String,String>();
+		missing = new HashSet<>();
+		errors = new HashMap<>();
 		this.submitted=submitted;
 	}
 	/** Parse the post parameters needs to be called before the 

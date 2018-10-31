@@ -50,13 +50,14 @@ public class DefaultTimerService extends AbstractContexed implements TimerServic
 			 }
 		 }
 		 if( timers == null){
-			 timers = new HashMap<String,Timer>();
+			 timers = new HashMap<>();
 		 }
  		startTimer(TIMER_TOTAL);
 	 }
 	    
 	    private int n_timers=0;
 	    private static final int MAX_TIMERS=10000;
+		@Override
 		public void cleanup() {
 			//TODO this will not work if LoggerService cleans up before TimerService
 			if( timers != null ){
@@ -72,6 +73,7 @@ public class DefaultTimerService extends AbstractContexed implements TimerServic
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.TimerService#timerStats()
 		 */
+		@Override
 		public void timerStats(Class clazz) {
 			if( timers != null ){
 				
@@ -80,7 +82,7 @@ public class DefaultTimerService extends AbstractContexed implements TimerServic
 				if( service != null){
 					Logger log=service.getLogger(clazz);
 					if(log != null){
-					Set<Timer> stats = new TreeSet<Timer>(timers.values());
+					Set<Timer> stats = new TreeSet<>(timers.values());
 					for(Timer t: stats){
 						if( t.getTime() > target){
 							log.info(prefix+t.getStats());
@@ -91,13 +93,14 @@ public class DefaultTimerService extends AbstractContexed implements TimerServic
 				
 			}
 		}
+		@Override
 		public void timerStats(StringBuilder sb) {
 			if( timers != null ){
 				
 				long target = (long) (0.005 * timers.get(TIMER_TOTAL).getTime());
 				LoggerService service = conn.getService(LoggerService.class);
 				if( service != null){
-					Set<Timer> stats = new TreeSet<Timer>(timers.values());
+					Set<Timer> stats = new TreeSet<>(timers.values());
 					for(Timer t: stats){
 						if( t.getTime() > target){
 							sb.append(prefix+t.getStats());
@@ -119,6 +122,7 @@ public class DefaultTimerService extends AbstractContexed implements TimerServic
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.TimerService#startTimer(java.lang.String)
 		 */
+		@Override
 		public final void startTimer(String name){
 			if( timers == null ){
 				return;
@@ -139,6 +143,7 @@ public class DefaultTimerService extends AbstractContexed implements TimerServic
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.TimerService#stopTimer(java.lang.String)
 		 */
+		@Override
 		public final void stopTimer(String name){
 			if( timers == null ){
 				return;
@@ -152,6 +157,7 @@ public class DefaultTimerService extends AbstractContexed implements TimerServic
 			}
 			t.stop();
 		}
+		@Override
 		public Class<TimerService> getType() {
 			return TimerService.class;
 		}

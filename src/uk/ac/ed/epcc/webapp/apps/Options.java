@@ -48,12 +48,12 @@ public class Options {
 	 * All options stored by their id. This map will have set of values (ie no two
 	 * options in the values set will be the same
 	 */
-	private Map<String, Option> optionsById = new HashMap<String, Option>();
+	private Map<String, Option> optionsById = new HashMap<>();
 	/**
 	 * All options stored by their name. Since options can have more than one
 	 * name, the values set may contain the same option more than once.
 	 */
-	private Map<String, Option> optionsByName = new HashMap<String, Option>();
+	private Map<String, Option> optionsByName = new HashMap<>();
 
 	/**
 	 * Adds an option to this object
@@ -248,7 +248,7 @@ public class Options {
 		 * 
 		 */
 		private Instance() {
-			this.options = new HashMap<Option, Option.Instance>();
+			this.options = new HashMap<>();
 		}
 
 		/**
@@ -389,7 +389,7 @@ public class Options {
 		 */
 		public LinkedList<String> parse(String[] arguments)
 				throws IllegalArgumentException {
-			LinkedList<String> argQueue = new LinkedList<String>();
+			LinkedList<String> argQueue = new LinkedList<>();
 			// add all arguments to the queue
 			for (String arg : arguments){
 				argQueue.add(arg);
@@ -398,7 +398,7 @@ public class Options {
 			
 		}
 		public LinkedList<String> parse(LinkedList<String> argQueue){
-			LinkedList<String> nonOptionArgs = new LinkedList<String>();
+			LinkedList<String> nonOptionArgs = new LinkedList<>();
 
 			
 			

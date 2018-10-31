@@ -35,6 +35,7 @@ public class TransitionProviderInterfaceTestImpl<T,K,X extends TransitionFactory
 	}
 
 	
+	@Override
 	public void testGetID() throws Exception{
 			TransitionProvider<K, T> fac = (TransitionProvider<K, T>) provider.getTransitionFactory();
 			for(T target : provider.getTargets()){
@@ -43,8 +44,9 @@ public class TransitionProviderInterfaceTestImpl<T,K,X extends TransitionFactory
 	}
 	
 	
+	@Override
 	public void testVisitor(){
-		TestTransitionFactoryVisitor<Object, T, K> vis = new TestTransitionFactoryVisitor<Object, T, K>(true);
+		TestTransitionFactoryVisitor<Object, T, K> vis = new TestTransitionFactoryVisitor<>(true);
 		provider.getTransitionFactory().accept(vis);
 	}
 }

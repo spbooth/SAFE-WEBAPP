@@ -33,7 +33,7 @@ public class DummyReference extends DataObject {
 	 */
 	public DummyReference(Record r) {
 		super(r);
-		 prod = new IndexedTypeProducer<Dummy1, Dummy1.Factory>(getContext(), REF_FIELD, new Dummy1.Factory(getContext()));
+		 prod = new IndexedTypeProducer<>(getContext(), REF_FIELD, new Dummy1.Factory(getContext()));
 	}
 	
 	public String getName(){

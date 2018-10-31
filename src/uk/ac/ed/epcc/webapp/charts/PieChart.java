@@ -77,7 +77,7 @@ public class PieChart extends Chart {
 	    */
 	   public SingleValueSetPlot getData(Map<String, Number> data) {
 		  SingleValueSetPlot pc = addPieChart(data.size());
-		  List<String> aul = new ArrayList<String>(data.keySet()); Collections.sort(aul);
+		  List<String> aul = new ArrayList<>(data.keySet()); Collections.sort(aul);
 			String[] cats = new String[aul.size()];
 			String key = null;
 			// Loop over the list to build up totals etc:

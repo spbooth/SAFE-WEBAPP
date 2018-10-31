@@ -28,24 +28,27 @@ import uk.ac.ed.epcc.webapp.forms.TestParseDataProvider;
 import uk.ac.ed.epcc.webapp.forms.inputs.TimeStampInput;
 public class TimeStampInputTest extends ParseAbstractInputTestCase<Date,TimeStampInput>  implements TestParseDataProvider<Date,TimeStampInput>,BoundedInputDataProvider<Date, TimeStampInput>,BoundedInputInterfaceTest<Date, TimeStampInput, TimeStampInputTest>{
 
-	public final BoundedInputInterfaceTest<Date, TimeStampInput, TimeStampInputTest> bounded_tests = new BoundedInputInterfaceTestImpl<Date, TimeStampInput, TimeStampInputTest>(this);
+	public final BoundedInputInterfaceTest<Date, TimeStampInput, TimeStampInputTest> bounded_tests = new BoundedInputInterfaceTestImpl<>(this);
 	@Test
 	public void dummy(){
 		
 	}
+	@Override
 	public TimeStampInput getInput() {
 	
 		return  new TimeStampInput(1000L);
 	}
 
 	
+	@Override
 	public Set<Date> getBadData() {
-		return new HashSet<Date>();
+		return new HashSet<>();
 	}
 
 	
+	@Override
 	public Set<Date> getGoodData() {
-		HashSet<Date> good = new HashSet<Date>();
+		HashSet<Date> good = new HashSet<>();
 		Date r = new Date();
 		r.setTime((r.getTime()/1000)*1000);
 		good.add(r);
@@ -54,16 +57,18 @@ public class TimeStampInputTest extends ParseAbstractInputTestCase<Date,TimeStam
 
 	
 
+	@Override
 	public Set<String> getBadParseData() {
-		Set<String> res = new HashSet<String>();
+		Set<String> res = new HashSet<>();
 		res.add("12-12-2008 08:00:00");
 		res.add("boris the spider");
 		return res;
 	}
 
 
+	@Override
 	public Set<String> getGoodParseData() {
-		Set<String> res = new HashSet<String>();
+		Set<String> res = new HashSet<>();
 		res.add("2006-12-12 08:00:00");
 		res.add("2006-12-12 08:00");
 		res.add("2006-12-12 08");

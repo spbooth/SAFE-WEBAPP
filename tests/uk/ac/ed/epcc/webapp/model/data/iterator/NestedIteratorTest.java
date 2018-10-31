@@ -28,11 +28,11 @@ public class NestedIteratorTest {
 
 	@Test
 	public void test() {
-		NestedIterator<Number> it = new NestedIterator<Number>();
-		LinkedHashSet<Number> set1= new LinkedHashSet<Number>();
+		NestedIterator<Number> it = new NestedIterator<>();
+		LinkedHashSet<Number> set1= new LinkedHashSet<>();
 		set1.add(1.0);
 		set1.add(2.0);
-		LinkedHashSet<Number> set2= new LinkedHashSet<Number>();
+		LinkedHashSet<Number> set2= new LinkedHashSet<>();
 		set2.add(3.0);
 		set2.add(4.0);
 		

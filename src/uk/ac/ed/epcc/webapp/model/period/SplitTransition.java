@@ -56,9 +56,9 @@ public class SplitTransition<T extends TimePeriod,K> extends AbstractFormTransit
 					throw new TransitionException("Split failed");
 				}
 				if( nav_first){
-					return new ViewTransitionResult<T, K>(tp, target);
+					return new ViewTransitionResult<>(tp, target);
 				}else{
-					return new ViewTransitionResult<T, K>(tp, later);
+					return new ViewTransitionResult<>(tp, later);
 				}
 			} catch (Exception e) {
 				throw new ActionException("Internal error in split", e);
@@ -92,6 +92,7 @@ public class SplitTransition<T extends TimePeriod,K> extends AbstractFormTransit
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.FormValidator#validate(uk.ac.ed.epcc.webapp.forms.Form)
 		 */
+		@Override
 		public void validate(Form f) throws ValidateException {
 			Date split = (Date) f.get("Date");
 			fac.canSplit(target, split);
@@ -108,6 +109,7 @@ public class SplitTransition<T extends TimePeriod,K> extends AbstractFormTransit
 	private final SplitManager<T> fac;
 	private final ViewTransitionFactory<K, T> tp;
 	
+	@Override
 	public void buildForm(Form f, T target, AppContext conn)
 			throws TransitionException {
 		Date start=target.getStart();

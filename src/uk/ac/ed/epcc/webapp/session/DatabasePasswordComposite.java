@@ -122,13 +122,13 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			Hash default_hash = Hash.getDefault(getContext());
 			if( getRepository().hasField(DatabasePasswordComposite.ALG)){
 				log.debug("Has alg field");
-				SQLOrFilter<T> of = new SQLOrFilter<T>(getFactory().getTarget());
+				SQLOrFilter<T> of = new SQLOrFilter<>(getFactory().getTarget());
 				AppContext conn = getContext();
 				for(Hash h : Hash.values()){
 					if( h.equals(default_hash) || h.isEnabled(conn)){
-						SQLAndFilter<T> clause = new SQLAndFilter<T>(getFactory().getTarget());
+						SQLAndFilter<T> clause = new SQLAndFilter<>(getFactory().getTarget());
 						
-						clause.addFilter(new SQLValueFilter<T>(getFactory().getTarget(),getRepository(), DatabasePasswordComposite.ALG, h.ordinal()));
+						clause.addFilter(new SQLValueFilter<>(getFactory().getTarget(),getRepository(), DatabasePasswordComposite.ALG, h.ordinal()));
 						clause.addFilter(new SQLHashFilter(getContext(),h, password));
 						of.addFilter(clause);
 					}
@@ -163,6 +163,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
 		 */
+		@Override
 		public boolean accept(T o) {
 			Handler handler = getHandler(o);
 			Hash h = handler.getAlgorithm();
@@ -203,6 +204,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 		 */
+		@Override
 		public <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
 			return vis.visitAcceptFilter(this);
 		}
@@ -210,6 +212,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
+		@Override
 		public Class<T> getTarget() {
 			return getFactory().getTarget();
 		}
@@ -247,6 +250,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			}
         	
         }
+		@Override
 		public List<PatternArgument> getParameters(List<PatternArgument> list) {
 			return check_value.getParameters(list);
 		}
@@ -254,12 +258,14 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		
 		
 		
+		@Override
 		public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify) {
 			getRepository().getInfo(DatabasePasswordComposite.PASSWORD).addName(sb, qualify, false);
 			sb.append("=");
 			check_value.add(sb, qualify);
 			return sb;
 		}
+		@Override
 		public void accept(T o) {
 			
 		}
@@ -301,12 +307,14 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 		 */
+		@Override
 		public <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
 			return vis.visitPatternFilter(this);
 		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
+		@Override
 		public Class<T> getTarget() {
 			return getFactory().getTarget();
 		}
@@ -663,13 +671,14 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	 * @return true if password matches.
 	 * 
 	 */
+	@Override
 	public boolean checkPassword(T u, String password) {
 		if( u == null) {
 			return false;
 		}
 		// route all password checks through the same code
 		try {
-			AndFilter<T> fil = new AndFilter<T>(getFactory().getTarget());
+			AndFilter<T> fil = new AndFilter<>(getFactory().getTarget());
 			fil.addFilter(getFactory().getFilter(u));
 			fil.addFilter(getPasswordFilter(password));
 			T temp = getFactory().find(fil,true);
@@ -682,15 +691,17 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			return false;
 		}
 	}
+	@Override
 	public final T findByLoginNamePassword(String email, String password)
 			throws DataException {
 				return findByLoginNamePassword(email, password, true);
 				
 			}
+			@Override
 			public T findByLoginNamePassword(String email, String password,boolean check_fail_count)
 					throws DataException {
 				Logger log=getLogger();
-				AndFilter<T> fil = new AndFilter<T>(getFactory().getTarget());
+				AndFilter<T> fil = new AndFilter<>(getFactory().getTarget());
 				SQLFilter<T> nameFilter = getLoginFilter(email);
 				fil.addFilter(nameFilter);
 				fil.addFilter(getPasswordFilter(password));
@@ -702,7 +713,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 						try {
 							
 							// atomic update via SQL
-							FilterAdd<T> adder = new FilterAdd<T>(getRepository());
+							FilterAdd<T> adder = new FilterAdd<>(getRepository());
 							adder.update(getRepository().<Integer,T>getNumberExpression(getFactory().getTarget(),Integer.class, DatabasePasswordComposite.PASSWORD_FAILS), Integer.valueOf(1), nameFilter);
 							u = getFactory().find(nameFilter,true);
 							if( u != null ) {

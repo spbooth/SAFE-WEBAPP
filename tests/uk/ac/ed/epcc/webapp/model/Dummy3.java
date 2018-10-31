@@ -109,7 +109,7 @@ public class Dummy3 extends DataObject {
 	
 		
 		public FilterResult<Dummy3> getWithFilter() throws DataFault{
-			AndFilter<Dummy3>fil = new AndFilter<Dummy3>(getTarget());
+			AndFilter<Dummy3>fil = new AndFilter<>(getTarget());
 			return new FilterSet(fil);
 			
 		}
@@ -137,7 +137,7 @@ public class Dummy3 extends DataObject {
 		@Override
 		public BaseFilter<Dummy3> hasRelationFilter( String role,AppUser user) {
 			if( role.equals(SELF)){
-				return new SQLValueFilter<Dummy3>(getTarget(), res, PERSON_ID, user.getID());
+				return new SQLValueFilter<>(getTarget(), res, PERSON_ID, user.getID());
 			}
 			return null;
 		}

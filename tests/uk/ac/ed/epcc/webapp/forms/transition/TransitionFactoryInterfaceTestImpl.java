@@ -45,6 +45,7 @@ public abstract class TransitionFactoryInterfaceTestImpl<T,K,X extends Transitio
 	}
 	
 	
+	@Override
 	public void testGetTransitions() throws Exception{
 		TransitionFactory<K, T> fac = provider.getTransitionFactory();
 		for(T target : provider.getTargets()){
@@ -54,6 +55,7 @@ public abstract class TransitionFactoryInterfaceTestImpl<T,K,X extends Transitio
 		}
 	}
 	
+	@Override
 	public void testGetTransition() throws Exception{
 		TransitionFactory<K, T> fac = provider.getTransitionFactory();
 		for(T target : provider.getTargets()){
@@ -62,12 +64,13 @@ public abstract class TransitionFactoryInterfaceTestImpl<T,K,X extends Transitio
 				Transition t = fac.getTransition(target, key);
 				assertNotNull(t);
 				if( fac.allowTransition(provider.getContext(), target, key)){
-					t.getResult(new TestTransitionVisitor<T>(provider.getContext(),target));
+					t.getResult(new TestTransitionVisitor<>(provider.getContext(),target));
 				}
 			}
 		}
 	}
 
+	@Override
 	public void testLookupTransition() throws Exception{
 		TransitionFactory<K, T> fac = provider.getTransitionFactory();
 		for(T target : provider.getTargets()){
@@ -80,6 +83,7 @@ public abstract class TransitionFactoryInterfaceTestImpl<T,K,X extends Transitio
 	}
 	
 	
+	@Override
 	public void testAllowTransition() throws Exception{
 		TransitionFactory<K, T> fac = provider.getTransitionFactory();
 		for(T target : provider.getTargets()){
@@ -91,6 +95,7 @@ public abstract class TransitionFactoryInterfaceTestImpl<T,K,X extends Transitio
 		}
 	}
 	
+	@Override
 	public void testGetTargetName(){
 		TransitionFactory<K, T> fac = provider.getTransitionFactory();
 		AppContext  c = provider.getContext();
@@ -98,6 +103,7 @@ public abstract class TransitionFactoryInterfaceTestImpl<T,K,X extends Transitio
 	}
 	
 	
+	@Override
 	public void testGetSummaryContentHTML() throws Exception{
 		TransitionFactory<K, T> fac = provider.getTransitionFactory();
 		for(T target : provider.getTargets()){
@@ -110,6 +116,7 @@ public abstract class TransitionFactoryInterfaceTestImpl<T,K,X extends Transitio
 	
 	
 	
+	@Override
 	public void testFormCreation() throws Exception{
 		TransitionFactory<K, T> fac = provider.getTransitionFactory();
 		for(T target : provider.getTargets()){

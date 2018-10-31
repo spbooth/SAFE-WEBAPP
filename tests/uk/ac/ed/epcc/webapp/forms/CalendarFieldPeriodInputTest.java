@@ -26,9 +26,10 @@ import uk.ac.ed.epcc.webapp.time.CalendarFieldSplitPeriod;
 
 public class CalendarFieldPeriodInputTest extends MultiInputTestBase<CalendarFieldSplitPeriod,Input,CalendarFieldPeriodInput> {
 
+	@Override
 	@SuppressWarnings("deprecation")
 	public Set<CalendarFieldSplitPeriod> getGoodData() throws Exception {
-		HashSet<CalendarFieldSplitPeriod> result = new HashSet<CalendarFieldSplitPeriod>();
+		HashSet<CalendarFieldSplitPeriod> result = new HashSet<>();
 		
 		Calendar c = Calendar.getInstance();
 		c.setTime(new Date(105,11,12));
@@ -37,12 +38,14 @@ public class CalendarFieldPeriodInputTest extends MultiInputTestBase<CalendarFie
 		return result;
 	}
 
+	@Override
 	public Set<CalendarFieldSplitPeriod> getBadData() throws Exception {
-		HashSet<CalendarFieldSplitPeriod> result = new HashSet<CalendarFieldSplitPeriod>();
+		HashSet<CalendarFieldSplitPeriod> result = new HashSet<>();
 		
 		return result;
 	}
 
+	@Override
 	public CalendarFieldPeriodInput getInput() throws Exception {
 		
 		return new CalendarFieldPeriodInput();

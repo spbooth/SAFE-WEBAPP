@@ -52,7 +52,7 @@ public class ResponseTarget<D extends DynamicForm, R extends Response<D>> {
 		if( p == null || ! (p instanceof Part)){
 			return null;
 		}
-		return new ResponseTarget<D, R>(response, (Part)p);
+		return new ResponseTarget<>(response, (Part)p);
 	}
 	
 	public ResponseTarget<D,R> getSibling(boolean up) throws DataFault{
@@ -60,7 +60,7 @@ public class ResponseTarget<D extends DynamicForm, R extends Response<D>> {
 		if( p == null ){
 			return null;
 		}
-		return new ResponseTarget<D,R>(response, p);
+		return new ResponseTarget<>(response, p);
 	}
 	@Override
 	public int hashCode() {

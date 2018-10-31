@@ -66,7 +66,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
 		MessageHandler hand = fac.getHandler(1,user);
-		LinkedList<String> path = new LinkedList<String>();
+		LinkedList<String> path = new LinkedList<>();
 		path.add("Subject");
 		MailTarget target = new MailTarget(hand,0,path);
 		takeBaseline();
@@ -91,7 +91,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
 		MessageHandler hand = fac.getHandler(1,user);
-		LinkedList<String> path = new LinkedList<String>();
+		LinkedList<String> path = new LinkedList<>();
 		MailTarget target = new MailTarget(hand,0,path);
 		takeBaseline();
 		setTransition(prov,EditAction.AddRecipient,target);
@@ -112,7 +112,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
 		MessageHandler hand = fac.getHandler(1,user);
-		LinkedList<String> path = new LinkedList<String>();
+		LinkedList<String> path = new LinkedList<>();
 		MailTarget target = new MailTarget(hand,0,path);
 		takeBaseline();
 		setTransition(prov,EditAction.AddAttachment,target);
@@ -138,7 +138,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
 		MessageHandler hand = fac.getHandler(1,user);
-		LinkedList<String> path = new LinkedList<String>();
+		LinkedList<String> path = new LinkedList<>();
 		//path.add("0");
 		path.add("T");
 		MailTarget target = new MailTarget(hand,0,path);
@@ -160,7 +160,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
 		MessageHandler hand = fac.getHandler(1,user);
-		LinkedList<String> path = new LinkedList<String>();
+		LinkedList<String> path = new LinkedList<>();
 		//path.add("0");
 		path.add("T");
 		MailTarget target = new MailTarget(hand,0,path);

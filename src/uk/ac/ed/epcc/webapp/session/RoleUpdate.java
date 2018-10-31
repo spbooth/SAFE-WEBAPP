@@ -43,50 +43,61 @@ public  class RoleUpdate<U extends AppUser> implements Contexed, StandAloneFormU
     	serv=conn.getService(SessionService.class);
     	fac =serv.getLoginFactory();
     }
+	@Override
 	public void buildSelectForm(Form f, String label, U dat) {
 		f.addInput(PERSON, "Role owner", fac.getInput());
 	}
 
 	
 	
+	@Override
 	public void buildUpdateForm(String type_name,Form f, U dat,SessionService<?> operator) throws DataFault {
 		for(String role : serv.getStandardRoles()){
 			CheckBoxInput i = new CheckBoxInput("Y","N");
 			i.setChecked(dat!=null && serv.canHaveRole(dat, role));
 			f.addInput(role, role, i);
 		}
-		f.addAction("Update", new RoleAction<U>(type_name,dat));
+		f.addAction("Update", new RoleAction<>(type_name,dat));
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public U getSelected(Form f) {
 		ItemInput<U> i = (ItemInput<U>) f.getInput(PERSON);
 		return i.getItem();
 	}
 
+	@Override
 	public AppContext getContext() {
 		return fac.getContext();
 	}
 	
 
+@Override
 public U find(int id) throws DataException {
 	return fac.find(id);
 }
+@Override
 public Class<U> getTarget() {
 	return fac.getTarget();
 }
+@Override
 public IndexedReference<U> makeReference(U obj) {
 	return fac.makeReference(obj);
 }
+@Override
 public IndexedReference<U> makeReference(int id) {
 	return fac.makeReference(id);
 }
+@Override
 public boolean isMyReference(IndexedReference ref) {
 	return fac.isMyReference(ref);
 }
+@Override
 public U find(Number o) {
 	return fac.find(o);
 }
+@Override
 public Integer getIndex(U value) {
 	return fac.getIndex(value);
 }

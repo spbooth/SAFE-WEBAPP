@@ -94,7 +94,7 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 		}
 		R remote = remote_fac.find(target.record.getNumberProperty(link_field));
 		if( remote == null){
-			return new FalseFilter<U>((Class<U>) AppUser.class);
+			return new FalseFilter<>((Class<U>) AppUser.class);
 		}
 		try {
 			return sess.getPersonInRelationshipRoleFilter(remote_fac, role, remote);

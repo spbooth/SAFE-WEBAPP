@@ -47,7 +47,7 @@ public class HeadGenerator  implements XMLGenerator{
 	 * hashCode and equals such that redundant entries are not duplicates
 	 * 
 	 */
-	private LinkedHashSet<XMLGenerator> generators = new LinkedHashSet<XMLGenerator>();
+	private LinkedHashSet<XMLGenerator> generators = new LinkedHashSet<>();
 	
 	public static HeadGenerator getHeadGenerator(ServletRequest request){
 		HeadGenerator gen = (HeadGenerator) request.getAttribute(HEAD_GENERATOR_ATTR);

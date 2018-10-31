@@ -55,17 +55,20 @@ public class SQLIdFilter<T extends DataObject> implements SQLFilter<T>, PatternF
 	
 
 	
+	@Override
 	public void accept(T o) {
 		
 	}
 
 	
+	@Override
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
-		list.add(new ConstPatternArgument<Integer>(Integer.class, id));
+		list.add(new ConstPatternArgument<>(Integer.class, id));
 		return list;
 	}
 
 	
+	@Override
 	public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb, boolean qualify) {
 		res.addUniqueName(sb, qualify, true);
 		if( exclude) {
@@ -80,6 +83,7 @@ public class SQLIdFilter<T extends DataObject> implements SQLFilter<T>, PatternF
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
+	@Override
 	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
 		return vis.visitPatternFilter(this);
 	}
@@ -88,10 +92,12 @@ public class SQLIdFilter<T extends DataObject> implements SQLFilter<T>, PatternF
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
+	@Override
 	public Class<T> getTarget() {
 		return target;
 	}
 	
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("SQLIdFilter(id=");

@@ -45,7 +45,7 @@ public class XMLFormParser extends AbstractContexed implements ContentHandler {
 	private final StringBuilder text=new StringBuilder();
 	private PartOwner owner; // The PartOwner we are adding content to.
     private PartOwnerFactory manager; // The manager for the current level 
-    LinkedList<String> current_type = new LinkedList<String>();
+    LinkedList<String> current_type = new LinkedList<>();
 	/**
 	 * 
 	 */

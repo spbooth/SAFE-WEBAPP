@@ -28,19 +28,19 @@ public abstract class AbstractXMLTarget implements XMLTarget {
 	private LinkedList<String> path;
 	
 	public AbstractXMLTarget(LinkedList<String> path){
-		this.path=new LinkedList<String>(path);
+		this.path=new LinkedList<>(path);
 		
 	}
 
 	
 	
 	public final LinkedList<String> getTargetPath() {
-		return new LinkedList<String>(path);
+		return new LinkedList<>(path);
 	}
 
 	protected abstract LinkedList<String> extractPrefix(LinkedList<String> node_path);
 	public final Node getTargetNode() {
-		LinkedList<String> node_path=new LinkedList<String>(path);
+		LinkedList<String> node_path=new LinkedList<>(path);
 		LinkedList<String> prefix_path = extractPrefix(node_path);
 		LocatorDomVisitor v = new LocatorDomVisitor(node_path);
 		DomWalker walker = new DomWalker();

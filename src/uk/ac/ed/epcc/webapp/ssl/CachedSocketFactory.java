@@ -27,7 +27,7 @@ import javax.net.SocketFactory;
  *
  */
 public class CachedSocketFactory extends SocketFactory {
-	static ThreadLocal<SocketFactory> local = new ThreadLocal<SocketFactory>();
+	static ThreadLocal<SocketFactory> local = new ThreadLocal<>();
 
 	  public static SocketFactory getDefault()
 	  {

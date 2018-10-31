@@ -88,10 +88,10 @@ public final class BinaryExpression implements SQLExpression<Number> {
 		
 		if( a.equals(b)){
 			if( op == Operator.SUB){
-				return new ConstExpression<Number, Object>(Number.class, 0);
+				return new ConstExpression<>(Number.class, 0);
 			}
 			if( op == Operator.DIV){
-				return new ConstExpression<Number, Object>(Number.class, 1.0);
+				return new ConstExpression<>(Number.class, 1.0);
 			}
 		}
 		// b is a constant
@@ -227,6 +227,7 @@ public final class BinaryExpression implements SQLExpression<Number> {
     	this.op=op;
     }
    
+	@Override
 	public int add(StringBuilder sb, boolean qualify) {
 		sb.append("(");
 		a.add(sb, qualify);
@@ -237,10 +238,12 @@ public final class BinaryExpression implements SQLExpression<Number> {
 	}
   
     
-    public Number makeObject(ResultSet rs, int pos) throws DataException, SQLException{
+    @Override
+	public Number makeObject(ResultSet rs, int pos) throws DataException, SQLException{
 		return rs.getDouble(pos);
     }
 
+	@Override
 	public Class<Number> getTarget() {
 		return Number.class;
 	}
@@ -255,6 +258,7 @@ public final class BinaryExpression implements SQLExpression<Number> {
 		return sb.toString();
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public SQLFilter getRequiredFilter() {
 		SQLFilter a_fil = a.getRequiredFilter();
@@ -272,6 +276,7 @@ public final class BinaryExpression implements SQLExpression<Number> {
 		}
 	}
 
+	@Override
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
 		list = a.getParameters(list);
 		return b.getParameters(list);

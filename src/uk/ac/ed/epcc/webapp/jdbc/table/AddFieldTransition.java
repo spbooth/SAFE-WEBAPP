@@ -44,6 +44,7 @@ public abstract class AddFieldTransition<T extends DataObjectFactory>
 
 	public AddFieldTransition(){
 	}
+	@Override
 	public final void buildForm(Form f, T target, AppContext c)
 			throws TransitionException {
 		f.addInput(FIELD, "New Field Name", new NewFieldInput(getRepository(target)));
@@ -78,7 +79,7 @@ public abstract class AddFieldTransition<T extends DataObjectFactory>
 				String name = (String) f.get(FIELD);
 				sql.quote(query,name);
 				query.append(" ");
-				List<Object> args = new LinkedList<Object>();
+				List<Object> args = new LinkedList<>();
 				FieldType fieldType = getFieldType(f);
 				fieldType.accept(sql.getCreateVisitor(query, args));
 				try(java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString())){

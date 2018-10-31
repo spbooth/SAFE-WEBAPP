@@ -76,6 +76,7 @@ public class SwingFormResultVisitor implements FormResultVisitor,Contexed {
     public FormResult getNextResult(){
     	return next_result;
     }
+	@Override
 	public <T, K> void visitChainedTransitionResult(
 			ChainedTransitionResult<T, K> res) throws Exception {
 		TransitionFactory<K, T> tp = res.getProvider();
@@ -121,7 +122,7 @@ public class SwingFormResultVisitor implements FormResultVisitor,Contexed {
 					// that operations are valid are protected by a lock.
 					t = tp.getTransition(target,key);
 					if( t != null ){
-						next_result = t.getResult(new SwingTransitionVisitor<K,T>(conn, key, tp, target,parent));
+						next_result = t.getResult(new SwingTransitionVisitor<>(conn, key, tp, target,parent));
 					}
 				}catch(TransitionException e){
 					if( e instanceof FatalTransitionException){
@@ -157,6 +158,7 @@ public class SwingFormResultVisitor implements FormResultVisitor,Contexed {
 		
 	}
 
+	@Override
 	public <T, K> void visitConfirmTransitionResult(
 			ConfirmTransitionResult<T, K> res) throws Exception {
 		
@@ -203,6 +205,7 @@ public class SwingFormResultVisitor implements FormResultVisitor,Contexed {
 
 	
 
+	@Override
 	public void visitMessageResult(MessageResult res) throws Exception {
 		next_result=null;
 		
@@ -243,6 +246,7 @@ public class SwingFormResultVisitor implements FormResultVisitor,Contexed {
 		  
 		  JOptionPane.showMessageDialog(parent, body,message_title,JOptionPane.INFORMATION_MESSAGE);
 	}
+	@Override
 	public AppContext getContext() {
 		return conn;
 	}
@@ -267,7 +271,7 @@ public class SwingFormResultVisitor implements FormResultVisitor,Contexed {
 		BaseForm base = new BaseForm(conn);
 		for(K key : provider.getTransitions(target)){
 			if( provider.allowTransition(conn,target,key) ){
-				base.addAction(key.toString(), new NestAction<K,T>(provider,key,target));
+				base.addAction(key.toString(), new NestAction<>(provider,key,target));
 			}
 		}
 		builder.addActionButtons(base);
@@ -277,6 +281,7 @@ public class SwingFormResultVisitor implements FormResultVisitor,Contexed {
 		}
 		return dialog.showForm(base);
 	}
+	@Override
 	public void visitServeDataResult(
 			ServeDataResult res) throws Exception {
 		JFileChooser chooser = SwingFormComponentListener.getChooser(conn);
@@ -301,11 +306,13 @@ public class SwingFormResultVisitor implements FormResultVisitor,Contexed {
 		}
 		
 	}
+	@Override
 	public void visitBackResult(BackResult res) throws Exception {
 		//Do nothing navigation 
 		
 	}
 
+	@Override
 	public void visitCustomPage(CustomPageResult res) throws Exception {
 		throw new UnsupportedResultException();
 	}

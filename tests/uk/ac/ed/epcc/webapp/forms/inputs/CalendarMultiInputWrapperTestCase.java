@@ -40,12 +40,13 @@ public class CalendarMultiInputWrapperTestCase extends MultiInputTestBase<Date, 
 ParseInputInterfaceTest<Date, CalendarMultiInputWrapper, CalendarMultiInputWrapperTestCase>{
 
 	
-	public ParseInputInterfaceTest<Date, CalendarMultiInputWrapper, CalendarMultiInputWrapperTestCase> parse_input_test = new ParseInputInterfaceTestImpl<Date, CalendarMultiInputWrapper, CalendarMultiInputWrapperTestCase>(this);
+	public ParseInputInterfaceTest<Date, CalendarMultiInputWrapper, CalendarMultiInputWrapperTestCase> parse_input_test = new ParseInputInterfaceTestImpl<>(this);
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getGoodData()
 	 */
+	@Override
 	public Set<Date> getGoodData() throws Exception {
-		Set<Date> result = new HashSet<Date>();
+		Set<Date> result = new HashSet<>();
 		Calendar c = getCalendar(); // parse loses these
 		result.add(c.getTime());
 		c.add(Calendar.DAY_OF_YEAR,1);
@@ -58,8 +59,9 @@ ParseInputInterfaceTest<Date, CalendarMultiInputWrapper, CalendarMultiInputWrapp
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getBadData()
 	 */
+	@Override
 	public Set<Date> getBadData() throws Exception {
-		Set<Date> result = new HashSet<Date>();
+		Set<Date> result = new HashSet<>();
 		Calendar c = getCalendar();
 		c.add(Calendar.YEAR,2);
 		result.add(c.getTime());
@@ -71,6 +73,7 @@ ParseInputInterfaceTest<Date, CalendarMultiInputWrapper, CalendarMultiInputWrapp
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getInput()
 	 */
+	@Override
 	public CalendarMultiInputWrapper getInput() throws Exception {
 		DateInput nested = new DateInput();
 		Calendar c = Calendar.getInstance();
@@ -86,8 +89,9 @@ ParseInputInterfaceTest<Date, CalendarMultiInputWrapper, CalendarMultiInputWrapp
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestParseDataProvider#getGoodParseData()
 	 */
+	@Override
 	public Set<String> getGoodParseData() {
-		Set<String> result = new HashSet<String>();
+		Set<String> result = new HashSet<>();
 		//result.add("Now-0d");
 		//result.add("Now+3d");
 		DateFormat df = getDateFormat();
@@ -104,8 +108,9 @@ ParseInputInterfaceTest<Date, CalendarMultiInputWrapper, CalendarMultiInputWrapp
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestParseDataProvider#getBadParseData()
 	 */
+	@Override
 	public Set<String> getBadParseData() {
-		Set<String> result = new HashSet<String>();
+		Set<String> result = new HashSet<>();
 		//result.add("Now-6y");
 		//result.add("Now+6y");
 		DateFormat df = getDateFormat();
@@ -168,6 +173,7 @@ ParseInputInterfaceTest<Date, CalendarMultiInputWrapper, CalendarMultiInputWrapp
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestParseDataProvider#allowNull()
 	 */
+	@Override
 	public boolean allowNull() {
 		return true;
 	}

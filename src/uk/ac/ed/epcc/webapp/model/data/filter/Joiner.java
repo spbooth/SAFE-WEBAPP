@@ -51,7 +51,7 @@ public class Joiner<T extends DataObject, BDO extends DataObject> extends SQLAnd
 			if( ! target_references){
 				// use an EXISTS clause to select so as not to expand 
 				// result set.
-				addFilter(new BackJoinFilter<T, BDO>(target,join_field, res, remote_res, fil));
+				addFilter(new BackJoinFilter<>(target,join_field, res, remote_res, fil));
 			}else{
 				addFilter(new JoinerFilter(target,join_field, res, remote_res));
 				// note we are  using a non-generic type here to force a foreign type of filter to be

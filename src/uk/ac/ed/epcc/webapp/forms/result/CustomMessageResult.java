@@ -50,7 +50,7 @@ public class CustomMessageResult extends CustomPageResult  {
 	   }
 	   public void addArg(String a){
 		   if( args == null ){
-			   args=new LinkedList<String>();
+			   args=new LinkedList<>();
 		   }
 		   args.add(a);
 	   }

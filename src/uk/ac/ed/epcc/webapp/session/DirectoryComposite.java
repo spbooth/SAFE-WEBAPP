@@ -104,7 +104,7 @@ public class DirectoryComposite<AU extends AppUser> extends AppUserComposite<AU,
 		if( dircontext != null){
 			return dircontext;
 		}
-		Hashtable<String,String> env = new Hashtable<String,String>();
+		Hashtable<String,String> env = new Hashtable<>();
 		
 		
 		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");

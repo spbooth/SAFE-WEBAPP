@@ -15,18 +15,15 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
 
 
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.Dummy1;
 import uk.ac.ed.epcc.webapp.model.DummyReference;
 import uk.ac.ed.epcc.webapp.model.DummyReferenceFactory;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-
-import static org.junit.Assert.*;
-
-import org.junit.Before;
 /**
  * @author Stephen Booth
  *
@@ -140,7 +137,7 @@ public class TestNegatingFilter extends WebappTestBase {
 		bill.setNumber(2);
 		bill.commit();
 		
-		BaseFilter<Dummy1> fred_filter = new DualFilter<Dummy1>(fac.new NumberFilter(1), fac.new NumberAcceptFilter(1));
+		BaseFilter<Dummy1> fred_filter = new DualFilter<>(fac.new NumberFilter(1), fac.new NumberAcceptFilter(1));
 		
 		Dummy1 fred2 = fac.find(fred_filter);
 		assertEquals("fred", fred2.getName());
@@ -243,7 +240,7 @@ public class TestNegatingFilter extends WebappTestBase {
 		bill.setNumber(2);
 		bill.commit();
 		
-		OrFilter<Dummy1> fred_filter = new OrFilter<Dummy1>(fac.getTarget(),fac);
+		OrFilter<Dummy1> fred_filter = new OrFilter<>(fac.getTarget(),fac);
 		
 		fred_filter.addFilter(fac.new StringFilter("fred"));
 		fred_filter.addFilter(fac.new NumberFilter(1));
@@ -267,7 +264,7 @@ public class TestNegatingFilter extends WebappTestBase {
 		bill.setNumber(2);
 		bill.commit();
 		
-		OrFilter<Dummy1> fred_filter = new OrFilter<Dummy1>(fac.getTarget(),fac);
+		OrFilter<Dummy1> fred_filter = new OrFilter<>(fac.getTarget(),fac);
 		
 		fred_filter.addFilter(fac.new StringFilter("fred"));
 		fred_filter.addFilter(fac.new NumberFilter(1));
@@ -302,7 +299,7 @@ public class TestNegatingFilter extends WebappTestBase {
 		bill_ref.setName("RefBill");
 		bill_ref.commit();
 		
-		SQLOrFilter<DummyReference> fred_filter = new SQLOrFilter<DummyReference>(ref.getTarget());
+		SQLOrFilter<DummyReference> fred_filter = new SQLOrFilter<>(ref.getTarget());
 	
 		fred_filter.addFilter((SQLFilter<? super DummyReference>) ref.getRemoteNameFilter("fred"));
 		fred_filter.addFilter((SQLFilter<? super DummyReference>) ref.getRemoteNumberFilter(1));

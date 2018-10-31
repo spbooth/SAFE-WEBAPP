@@ -45,11 +45,11 @@ public abstract class DataCache<K,V> {
 	}
 	public DataCache(Map<K,V> initial_data) {
 		if( initial_data == null ){
-			cache = new HashMap<K, V>();
+			cache = new HashMap<>();
 		}else{
-			cache = new HashMap<K,V>(initial_data);
+			cache = new HashMap<>(initial_data);
 		}
-		bad_keys = new HashSet<K>();
+		bad_keys = new HashSet<>();
 	}
 
 	/**
@@ -100,7 +100,7 @@ public abstract class DataCache<K,V> {
 		return bad_keys.size();
 	}
 	public Set<K> badKeys(){
-		return new HashSet<K>(bad_keys);
+		return new HashSet<>(bad_keys);
 	}
 	public void clear(){
 		cache.clear();

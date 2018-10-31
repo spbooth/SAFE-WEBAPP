@@ -29,9 +29,10 @@ import uk.ac.ed.epcc.webapp.time.RegularSplitPeriod;
 
 public class SimplePeriodInputTest extends MultiInputTestBase<Period,TimeStampMultiInput,SimplePeriodInput> {
 
+	@Override
 	@SuppressWarnings("deprecation")
 	public Set<Period> getGoodData() throws Exception {
-		HashSet<Period> result = new HashSet<Period>();
+		HashSet<Period> result = new HashSet<>();
 		result.add(new Period(new Date(105,11,12),new Date(105,11,15)));
 		result.add(new RegularSplitPeriod(new Date(105,11,12),new Date(105,11,15),4));
 		Calendar c = Calendar.getInstance();
@@ -40,12 +41,14 @@ public class SimplePeriodInputTest extends MultiInputTestBase<Period,TimeStampMu
 		return result;
 	}
 
+	@Override
 	public Set<Period> getBadData() throws Exception {
-		HashSet<Period> result = new HashSet<Period>();
+		HashSet<Period> result = new HashSet<>();
 		
 		return result;
 	}
 
+	@Override
 	public SimplePeriodInput getInput() throws Exception {
 		return new SimplePeriodInput();
 	}

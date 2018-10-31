@@ -171,7 +171,7 @@ public class TemplateFile {
 		int end = -1;
 
 		// elements contains properties and regions
-		Vector<Object> elements = new Vector<Object>();
+		Vector<Object> elements = new Vector<>();
 
 		Region() {
 		}
@@ -279,9 +279,9 @@ public class TemplateFile {
 		// Store a copy of the contents without the tokens
 		StringBuilder buffer = new StringBuilder();
 
-		Hashtable<String,Object> elements_hashtable = new Hashtable<String,Object>();
+		Hashtable<String,Object> elements_hashtable = new Hashtable<>();
 
-		Vector<Object> element_values = new Vector<Object>();
+		Vector<Object> element_values = new Vector<>();
 		// Now scan for valid properties and regions and record them
 		int position = 0; // position in current unparsed contents
 		{
@@ -295,7 +295,7 @@ public class TemplateFile {
 
 			top_region.enabled_index = element_values.size() - 1;
 
-			Stack<Region> stack = new Stack<Region>();
+			Stack<Region> stack = new Stack<>();
 			stack.push(top_region);
 
 			while (true) { // Is ok, we can break out on the percent searches
@@ -988,6 +988,7 @@ public class TemplateFile {
 		return template;
 	}
     public static class DefaultPropertyPolicy implements PropertyPolicy{
+	@Override
 	public void writePropertyValue(Writer out, String name,Object value)
 			throws IOException {
 		// Ignore null values

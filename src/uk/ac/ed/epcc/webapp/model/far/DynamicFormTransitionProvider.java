@@ -223,7 +223,7 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 				cb.addHeading(2, manager.getTag() + " List");
 				
 				cb.addHeading(3, "New");
-				LinkedList<Linker> new_list = new LinkedList<Linker>();
+				LinkedList<Linker> new_list = new LinkedList<>();
 				for(T f : manager.getNew()){
 					new_list.add(new Linker(f));
 				}
@@ -234,7 +234,7 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 				}
 				
 				cb.addHeading(3, "Active");
-				LinkedList<Linker> active_list = new LinkedList<Linker>();
+				LinkedList<Linker> active_list = new LinkedList<>();
 				for(T f : manager.getActive()){
 					active_list.add(new Linker(f));
 				}
@@ -245,7 +245,7 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 				}
 				
 				cb.addHeading(3, "Retired");
-				LinkedList<Linker> retired_list = new LinkedList<Linker>();
+				LinkedList<Linker> retired_list = new LinkedList<>();
 				for(T f : manager.getRetired()){
 					retired_list.add(new Linker(f));
 				}
@@ -370,7 +370,7 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 		 */
 		@Override
 		public FormResult doTransition(T target, AppContext c) throws TransitionException {
-			LinkedList<String> args = new LinkedList<String>();
+			LinkedList<String> args = new LinkedList<>();
 			args.add(Integer.toString(target.getID()));
 			return new ServeDataResult(manager, args);
 		}

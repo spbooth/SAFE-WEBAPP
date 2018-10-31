@@ -96,6 +96,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 			}
 		}
 
+		@Override
 		public boolean showButton(ResponseTarget<D,R> target, SessionService<?> sess) {
 			try {
 				R rsp = target.getResponse();
@@ -224,11 +225,11 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 						response.setData(q, f.get(q.getName()));
 					}
 					Section next_sec = factory.getSibling(s, true);
-					UnAnsweredVisitor<D, R> no_answer_vis = new UnAnsweredVisitor<D, R>(response);
+					UnAnsweredVisitor<D, R> no_answer_vis = new UnAnsweredVisitor<>(response);
 					if( next_sec != null ){
 						if( (Boolean)next_sec.visit(no_answer_vis)){
 							// edit next section if its not been answered
-						    return new ChainedResult(new ResponseTarget<D, R>(response, next_sec),EDIT);
+						    return new ChainedResult(new ResponseTarget<>(response, next_sec),EDIT);
 						}else{
 							return new ViewResult(target.getParent());
 						}
@@ -240,10 +241,10 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 						Section first = factory.getFirst(next_page);
 						if( first != null ){
 							if( (Boolean)first.visit(no_answer_vis)){
-								return new ChainedResult(new ResponseTarget<D, R>(response, first), EDIT);
+								return new ChainedResult(new ResponseTarget<>(response, first), EDIT);
 							}
 						}
-						return new ViewResult(new ResponseTarget<D, R>(response, next_page));
+						return new ViewResult(new ResponseTarget<>(response, next_page));
 					}
 					return new ViewResult(target.getParent());
 				}catch(Exception e){
@@ -327,7 +328,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 				// can't do this if browser won't submit 
 				((HtmlBuilder)cb).setUseRequired(false);
 			}
-			SectionEditVisitor<X> vis = new SectionEditVisitor<X>(cb, op, response, f, s);
+			SectionEditVisitor<X> vis = new SectionEditVisitor<>(cb, op, response, f, s);
 			vis.visitPage(p);
 			return cb;
 		}
@@ -442,7 +443,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 		try {
 			R response = manager.find(Integer.parseInt(id.pop()));
 			Part part = getTarget(response.getForm(), form_manager.getChildManager(), id);
-			return new ResponseTarget<D, R>(response, part);
+			return new ResponseTarget<>(response, part);
 		} catch (Exception e) {
 			getLogger().error("Error getting target",e);
 		}
@@ -455,7 +456,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 	 */
 	@Override
 	public LinkedList<String> getID(ResponseTarget<D, R> target) {
-		LinkedList<String> result = new LinkedList<String>();
+		LinkedList<String> result = new LinkedList<>();
 		getID(result,target.getPart());
 		result.pop();  // pop form-id we will replace with response.
 		result.push(Integer.toString(target.getResponse().getID()));
@@ -470,7 +471,7 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 		Part p = target.getPart();
 		cb.addHeading(2, target.getResponse().getDescriptor());
 		
-		EditSectionVisitor<X> vis = new EditSectionVisitor<X>(cb, sess,p instanceof Page ? this: null,target.getResponse());
+		EditSectionVisitor<X> vis = new EditSectionVisitor<>(cb, sess,p instanceof Page ? this: null,target.getResponse());
 		target.getPart().visit(vis);		
 		return cb;
 	}

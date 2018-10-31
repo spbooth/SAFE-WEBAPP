@@ -61,14 +61,17 @@ public abstract class AbstractSelfSQLValue<T extends DataObject,R> implements SQ
 	}
 	
 	
+	@Override
 	public final int add(StringBuilder sb, boolean qualify) {
 		fac.res.addUniqueName(sb, qualify, true);
 		return 1;
 	}
+	@Override
 	public final List<PatternArgument> getParameters(List<PatternArgument> list) {
 		return list;
 	}
 	
+	@Override
 	public final IndexedReference<T> makeObject(ResultSet rs, int pos)
 			throws DataException, SQLException {
 			int id=rs.getInt(pos);
@@ -80,6 +83,7 @@ public abstract class AbstractSelfSQLValue<T extends DataObject,R> implements SQ
 	}
 	
 	
+	@Override
 	public final Class<IndexedReference> getTarget() {
 		return IndexedReference.class;
 	}
@@ -105,9 +109,9 @@ public abstract class AbstractSelfSQLValue<T extends DataObject,R> implements SQ
 	public final SQLFilter<R> getFilter(MatchCondition match, IndexedReference val)
 			throws CannotFilterException {
 		if( match == null ){
-			return new SelfReferenceFilter<R>(getFilterType(),fac.res,val);
+			return new SelfReferenceFilter<>(getFilterType(),fac.res,val);
 		}else if( match == MatchCondition.NE){
-			return new SelfReferenceFilter<R>(getFilterType(),fac.res,true,val);
+			return new SelfReferenceFilter<>(getFilterType(),fac.res,true,val);
 		}
 		throw new CannotFilterException("Relative MatchCondition requested for IndexedReference");
 	}
@@ -119,7 +123,7 @@ public abstract class AbstractSelfSQLValue<T extends DataObject,R> implements SQ
 	@Override
 	public final SQLFilter<R> getOrderFilter(boolean descending)
 			throws CannotFilterException {
-		return new PrimaryOrderFilter<R>(getFilterType(),fac.res, descending);
+		return new PrimaryOrderFilter<>(getFilterType(),fac.res, descending);
 	}
 
 

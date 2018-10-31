@@ -34,38 +34,43 @@ public class EnumInputTest extends ParseAbstractInputTestCase<String,EnumInput<T
 ListInputInterfaceTest<String, TestEnum, EnumInput<TestEnum>, TestDataProvider<String,EnumInput<TestEnum>>>
 {
 
-	public ListInputInterfaceTest<String, TestEnum, EnumInput<TestEnum>, TestDataProvider<String,EnumInput<TestEnum>>> list_test = new ListInputInterfaceTestImpl<String, TestEnum, EnumInput<TestEnum>, TestDataProvider<String,EnumInput<TestEnum>>>(this);
+	public ListInputInterfaceTest<String, TestEnum, EnumInput<TestEnum>, TestDataProvider<String,EnumInput<TestEnum>>> list_test = new ListInputInterfaceTestImpl<>(this);
 	
 	public EnumInputTest() {
 		
 	}
 
+	@Override
 	public Set<String> getGoodParseData() {
 		return getGoodData();
 	}
 
+	@Override
 	public Set<String> getBadParseData() {
 		return getBadData();
 	}
 
+	@Override
 	public Set<String> getGoodData()  {
-		HashSet<String> res = new HashSet<String>();
+		HashSet<String> res = new HashSet<>();
 		res.add(TestEnum.CAT.name());
 		res.add(TestEnum.DOG.name());
 		res.add(TestEnum.HAMSTER.name());
 		return res;
 	}
 
+	@Override
 	public Set<String> getBadData()  {
-		HashSet<String> res = new HashSet<String>();
+		HashSet<String> res = new HashSet<>();
 		res.add("Lion");
 		res.add("Tiger");
 		res.add("Bear");
 		return res;
 	}
 
+	@Override
 	public EnumInput<TestEnum> getInput() throws Exception {
-		return new EnumInput<TestEnum>(TestEnum.class);
+		return new EnumInput<>(TestEnum.class);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.ListInputInterfaceTest#testGetItembyValue()

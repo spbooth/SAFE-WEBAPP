@@ -49,7 +49,7 @@ public class LdapAuthAppUserTestCase extends
 	 */
 	@Override
 	public AppUserFactory<AppUser> getFactory() {
-		return new AppUserFactory<AppUser>(getContext(),"ldapperson");
+		return new AppUserFactory<>(getContext(),"ldapperson");
 	}
 	@Test
 	public void testFindByEmailPassword() throws DataException{

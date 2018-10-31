@@ -79,7 +79,7 @@ public class DefaultCrsfTokenService extends AbstractContexed implements CrsfTok
 			
 			md.update(provider.getTargetName().getBytes());
 			if( target != null) {
-				GetIDVisitor<T, K> vis = new GetIDVisitor<T, K>(target);
+				GetIDVisitor<T, K> vis = new GetIDVisitor<>(target);
 				md.update(provider.accept(vis).getBytes());
 			}
 			md.update(tag.getBytes());

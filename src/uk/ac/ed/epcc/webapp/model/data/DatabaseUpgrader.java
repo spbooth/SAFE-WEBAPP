@@ -51,7 +51,7 @@ public class DatabaseUpgrader extends Object implements Command {
 	public AppContext getContext() {
 		return conn;
 	}
-	Set<String> seen = new HashSet<String>();
+	Set<String> seen = new HashSet<>();
 	
 	private void process(Connection c,Statement stmt,String name) throws SQLException{
 		if( seen.contains(name) || conn.getBooleanParameter(name+".no_innodb", false)){

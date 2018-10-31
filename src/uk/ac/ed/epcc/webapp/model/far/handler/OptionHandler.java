@@ -34,14 +34,14 @@ public class OptionHandler implements QuestionFormHandler<String> {
 	@Override
 	public RadioButtonInput<String, String> parseConfiguration(Form f) {
 		String options = (String) f.get(OPTIONS);
-		SetInput<String> option_list = new SetInput<String>();
+		SetInput<String> option_list = new SetInput<>();
 		
 		String option_array[] = options.split(",");
 		for(String option : option_array){
 		    option_list.addChoice(option, option);
 		}
 		
-		return new RadioButtonInput<String, String>(option_list);
+		return new RadioButtonInput<>(option_list);
 	}
 
 	@Override

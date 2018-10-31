@@ -32,7 +32,7 @@ public class ClassTableCreator {
 		this.conn=c;
 	}
 	public <T> Table getList(Class<T> template,String path){
-		Table<String,String> t = new Table<String,String>();
+		Table<String,String> t = new Table<>();
 		String prefix = AppContext.CLASS_PREFIX;
 		if( path != null && path.length() > 0){
 			prefix=prefix+path+".";

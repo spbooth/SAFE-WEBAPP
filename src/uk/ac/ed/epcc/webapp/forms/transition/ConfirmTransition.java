@@ -51,19 +51,22 @@ public class ConfirmTransition<T> implements ExtraFormTransition<T>{
 		this.yes_transition=yes;
 		this.no_transition=no;
 	}
+	@Override
 	public void buildForm(Form f, T target, AppContext c)
 			throws TransitionException {
-		f.addAction(YES, new ChainAction<T>(target,c,yes_transition));
-		f.addAction(NO, new ChainAction<T>(target,c,no_transition));
+		f.addAction(YES, new ChainAction<>(target,c,yes_transition));
+		f.addAction(NO, new ChainAction<>(target,c,no_transition));
 		
 		
 	}
+	@Override
 	public <X extends ContentBuilder> X getExtraHtml(X cb,SessionService<?> op, T target) {
 		ExtendedXMLBuilder text = cb.getText();
 		text.clean(name);
 		text.appendParent();
 		return cb;
 	}
+	@Override
 	public FormResult getResult(TransitionVisitor<T> vis) throws TransitionException {
 		return vis.doFormTransition(this);
 	}

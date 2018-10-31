@@ -159,7 +159,7 @@ public class ExpressionTestFactory extends ClassificationFactory<ExpressionTestF
 	}
 	public class ExpressionFinder<X> extends AbstractFinder<X>{
 		public ExpressionFinder(SQLValue<X> val){
-			setMapper(new ValueResultMapper<X>(val));
+			setMapper(new ValueResultMapper<>(val));
 		}
 	}
 	/** Evaluate a {@link SQLValue} on a target object

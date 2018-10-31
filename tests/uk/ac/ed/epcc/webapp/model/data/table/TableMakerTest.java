@@ -48,7 +48,7 @@ public class TableMakerTest extends WebappTestBase {
 		TableSpecification s = new TableSpecification();
 		
 		SQLContext sql = ctx.getService(DatabaseService.class).getSQLContext();
-		LinkedList<Object> args = new LinkedList<Object>();
+		LinkedList<Object> args = new LinkedList<>();
 		String result = sql.getContext().getService(DataBaseHandlerService.class).createTableText("Fred", s, sql, args);
 		System.out.println(result);
 		assertTrue(result.startsWith("CREATE TABLE `Fred` ( `PrimaryRecordID` INT(11) NOT NULL auto_increment,\n"+
@@ -62,7 +62,7 @@ public class TableMakerTest extends WebappTestBase {
 		s.setField("f", new FloatFieldType(false,12.0F));
 		s.setField("d", new DoubleFieldType(true,12.0));
 		SQLContext sql = ctx.getService(DatabaseService.class).getSQLContext();
-		LinkedList<Object> args = new LinkedList<Object>();
+		LinkedList<Object> args = new LinkedList<>();
 		String result = sql.getContext().getService(DataBaseHandlerService.class).createTableText("Test", s, sql, args);
 		System.out.println(result);
 		assertTrue(result.startsWith("CREATE TABLE `Test` ( `PrimaryRecordID` INT(11) NOT NULL auto_increment,\n"+
@@ -78,7 +78,7 @@ public class TableMakerTest extends WebappTestBase {
 		s.setField("small", new StringFieldType(true,"boris",8));
 		s.setField("large", new StringFieldType(false,null,512));
 		SQLContext sql = ctx.getService(DatabaseService.class).getSQLContext();
-		List<Object> args = new LinkedList<Object>();
+		List<Object> args = new LinkedList<>();
 		String result = sql.getContext().getService(DataBaseHandlerService.class).createTableText("Test", s, sql, args);
 		System.out.println(result);
 		assertEquals("CREATE TABLE `Test` ( `PrimaryRecordID` INT(11) NOT NULL auto_increment,\n"+
@@ -92,7 +92,7 @@ public class TableMakerTest extends WebappTestBase {
 		TableSpecification s = new TableSpecification();
 		s.setField("t", new DateFieldType(true,null));
 		SQLContext sql = ctx.getService(DatabaseService.class).getSQLContext();
-		List<Object> args = new LinkedList<Object>();
+		List<Object> args = new LinkedList<>();
 		String result = sql.getContext().getService(DataBaseHandlerService.class).createTableText("Test", s, sql, args);
 		System.out.println(result);
 		assertTrue(result.startsWith("CREATE TABLE `Test` ( `PrimaryRecordID` INT(11) NOT NULL auto_increment,\n"+
@@ -109,7 +109,7 @@ public class TableMakerTest extends WebappTestBase {
 		s.new Index("float_key",false,"f","d");
 		s.new Index("int_key",true,"i");
 		SQLContext sql = ctx.getService(DatabaseService.class).getSQLContext();
-		List<Object> args = new LinkedList<Object>();
+		List<Object> args = new LinkedList<>();
 		String result = sql.getContext().getService(DataBaseHandlerService.class).createTableText("Test", s, sql, args);
 		System.out.println(result);
 		assertTrue(result.startsWith("CREATE TABLE `Test` ( `PrimaryRecordID` INT(11) NOT NULL auto_increment,\n"+

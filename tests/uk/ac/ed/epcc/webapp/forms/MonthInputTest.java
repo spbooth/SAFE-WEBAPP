@@ -29,32 +29,37 @@ public class MonthInputTest<I extends MonthInput> extends ParseAbstractInputTest
 	public void dummy(){
 		
 	}
+	@Override
 	public Set<String> getBadParseData() {
-		HashSet<String> set=new HashSet<String>();
+		HashSet<String> set=new HashSet<>();
 		set.add("womble");
 		set.add("01-01-2008");
 		return set;
 	}
 
+	@Override
 	public Set<String> getGoodParseData() {
-		HashSet<String> set=new HashSet<String>();
+		HashSet<String> set=new HashSet<>();
 		set.add("1965-12");
 		set.add("2008-09");
 		return set;
 	}
 
+	@Override
 	public Set<Date> getBadData() throws Exception {
-		HashSet<Date> set = new HashSet<Date>();
+		HashSet<Date> set = new HashSet<>();
 		return set;
 	}
 
+	@Override
 	@SuppressWarnings("deprecation")
 	public Set<Date> getGoodData() throws Exception {
-		HashSet<Date> set = new HashSet<Date>();
+		HashSet<Date> set = new HashSet<>();
 		set.add(new Date(2008,10,01));
 		return set;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public I getInput() {
 		return (I) new MonthInput();

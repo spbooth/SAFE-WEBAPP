@@ -141,6 +141,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.history.History#contains(java.util.Date)
 		 */
+		@Override
 		public final boolean contains(java.util.Date val) {
 			if ((!val.before(getStartTimeAsDate()))  && val.before(getEndTimeAsDate())) {
 				return true;
@@ -151,6 +152,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.history.History#getAsPeer()
 		 */
+		@Override
 		public final P getAsPeer() throws DataException {
 			P peer = getPeer();
 			peer.setContents(getMap());
@@ -161,6 +163,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.history.History#getEndTimeAsDate()
 		 */
+		@Override
 		public final java.util.Date getEndTimeAsDate() {
 			return record.getDateProperty(END_TIME_FIELD);
 		}
@@ -170,6 +173,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.history.History#getNew()
 		 */
+		@Override
 		public P getNew() throws DataFault {
 			P peer = history_factory.getPeerFactory().makeBDO();
 			peer.setContents(getMap());
@@ -206,6 +210,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.history.History#getPeer()
 		 */
+		@Override
 		public final P getPeer() throws DataException {
 			return history_factory.getPeerProducer().find(getPeerID());
 		}
@@ -213,6 +218,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.history.History#getPeerID()
 		 */
+		@Override
 		public final int getPeerID() {
 			return record.getIntProperty(history_factory.getPeerName(), 0);
 		}
@@ -220,6 +226,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.history.History#getStartTimeAsDate()
 		 */
+		@Override
 		public final java.util.Date getStartTimeAsDate() {
 			return record.getDateProperty(START_TIME_FIELD);
 		}
@@ -236,12 +243,14 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 			// generic implementation
 			return !record.equals(peer.getMap());
 		}
-        public boolean matchIntegerProperty(String key, int val){
+        @Override
+		public boolean matchIntegerProperty(String key, int val){
         	return val == record.getIntProperty(key, 0);
         }
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.history.History#overlapps(java.util.Date, java.util.Date)
 		 */
+		@Override
 		public final boolean overlapps(Date start, Date end) {
 		
 			return (getStartTimeAsDate().before(end) && getEndTimeAsDate().after(start));
@@ -288,6 +297,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.history.History#terminate()
 		 */
+		@Override
 		public final void terminate() {
 
 			setEndTime(new Date());
@@ -344,7 +354,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 			this(start,end);
 			if (peer != null) {
 				if (isPeerType(peer)) {
-					addFilter(new ReferenceFilter<H,P>(HistoryFactory.this,getPeerName(),peer));
+					addFilter(new ReferenceFilter<>(HistoryFactory.this,getPeerName(),peer));
 				} else {
 					throw new IllegalArgumentException(
 							"Wrong peer type passed to History.Filter");
@@ -359,7 +369,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		 */
 		public HistoryFilter(SQLFilter<P> peer_filter, Date start, Date end) {
 			this(start,end);
-			addFilter(new RemoteFilter<P>(getPeerFactory(),getPeerName(),peer_filter));
+			addFilter(new RemoteFilter<>(getPeerFactory(),getPeerName(),peer_filter));
 		}
 		/** Select all history objects in a date range.
 		 * Start may be null to indicate a wild-card.
@@ -407,12 +417,14 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 			return h.getEndTimeAsDate().before(point);
 		}
 
+		@Override
 		public float getOverlapp(H h, Date start, Date end) {
 		
 			return (float) h.getOverlapp(plot_field, start, end);
 
 		}
 
+		@Override
 		public boolean overlapps(H h, Date start, Date end) {
 			return h.overlapps(start, end);
 		}
@@ -513,7 +525,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
     	if( peer_producer == null ){
     		DataObjectFactory<P> fac = getPeerFactory();
     		if( HISTORY_CACHE_FEATURE.isEnabled(getContext())){
-    		    peer_producer = new CachedIndexedProducer<P>(fac);
+    		    peer_producer = new CachedIndexedProducer<>(fac);
     	    }else{
     	    	peer_producer = fac;
     	    }
@@ -644,6 +656,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	 */
 
 	
+	@Override
 	public final H find(P peer, Date time)
 			throws uk.ac.ed.epcc.webapp.jdbc.exception.DataException,
 			IllegalArgumentException {
@@ -660,12 +673,12 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		if( timer != null ){
 			timer.startTimer(getTag()+"findPeer");
 		}
-		SQLAndFilter<H> fil =new  SQLAndFilter<H>(getTarget());
-		fil.addFilter(new ReferenceFilter<H,P>(this, getPeerName(),peer));
+		SQLAndFilter<H> fil =new  SQLAndFilter<>(getTarget());
+		fil.addFilter(new ReferenceFilter<>(this, getPeerName(),peer));
 		fil.addFilter(new TimeFilter(START_TIME_FIELD,MatchCondition.LE,time));
-		SQLOrFilter<H> end_fil = new SQLOrFilter<H>(getTarget());
+		SQLOrFilter<H> end_fil = new SQLOrFilter<>(getTarget());
 		end_fil.addFilter(new TimeFilter(END_TIME_FIELD,MatchCondition.GT,time));
-		end_fil.addFilter(new NullFieldFilter<H>(getTarget(), res, END_TIME_FIELD, true));
+		end_fil.addFilter(new NullFieldFilter<>(getTarget(), res, END_TIME_FIELD, true));
 		fil.addFilter(end_fil);
 		if( want_tail && res.hasField(status.getField())){
 			fil.addFilter(status.getFilter(this, TAIL));
@@ -692,6 +705,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.history.HistoryHandler#getIterator(P, java.util.Date, java.util.Date)
 	 */
+	@Override
 	public Iterator<H> getIterator(P peer, Date start, Date end)
 			throws DataFault {
 		return new FilterIterator(new HistoryFilter(peer, start, end));
@@ -699,6 +713,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.history.HistoryHandler#getIterator(uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter, java.util.Date, java.util.Date)
 	 */
+	@Override
 	public Iterator<H> getIterator(SQLFilter<P> peer, Date start, Date end)
 	throws DataFault {
 		return new FilterIterator(new HistoryFilter(peer, start, end));
@@ -707,6 +722,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.history.HistoryHandler#getIterator(java.util.Date, java.util.Date)
 	 */
+	@Override
 	public Iterator<H> getIterator(Date start, Date end) throws DataFault {
 		return new FilterIterator(new HistoryFilter( start, end));
 	}
@@ -717,6 +733,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	 * 
 	 * @return String containing field name
 	 */
+	@Override
 	public String getPeerName() {
 		return "PeerID";
 	}
@@ -726,6 +743,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.history.HistoryHandler#isPeerType(uk.ac.ed.epcc.webapp.model.data.DataObject)
 	 */
+	@Override
 	public final boolean isPeerType(DataObject peer) {
 		return getPeerFactory().isMine(peer);
 	}
@@ -742,7 +760,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		 * behaviour
 		 * 
 		 */
-		return new HistoryRecord<P>(this,res);
+		return new HistoryRecord<>(this,res);
 	}
 	@Override
 	public Class<H> getTarget(){
@@ -788,11 +806,12 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.history.HistoryHandler#purge(P)
 	 */
+	@Override
 	public void purge(P o) throws DataFault {
 		if (!isPeerType(o)) {
 			throw new ConsistencyError("Object does not match peer type");
 		}
-		FilterDelete<H> del = new FilterDelete<H>(res);
+		FilterDelete<H> del = new FilterDelete<>(res);
 		del.delete(new HistoryFilter(o, null, null));
 	}
 	
@@ -807,19 +826,20 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		if( ! res.hasField(status.getField())){
 			return;
 		}
-		SQLAndFilter<H> fil = new SQLAndFilter<H>(getTarget());
+		SQLAndFilter<H> fil = new SQLAndFilter<>(getTarget());
 		if( peer != null){
-			fil.addFilter(new ReferenceFilter<H,P>(HistoryFactory.this,getPeerName(),peer));
+			fil.addFilter(new ReferenceFilter<>(HistoryFactory.this,getPeerName(),peer));
 		}
 		fil.addFilter(status.getFilter(this, TAIL));
 		fil.addFilter(new TimeFilter(END_TIME_FIELD,MatchCondition.LT,time) );
-		FilterUpdate<H> update = new FilterUpdate<H>(res);
+		FilterUpdate<H> update = new FilterUpdate<>(res);
 		update.update(res.getStringExpression(getTarget(), status.getField()), EXPIRED.getTag(), fil);
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.history.HistoryHandler#terminate(P)
 	 */
+	@Override
 	public final synchronized void terminate(P peer)
 			throws IllegalArgumentException, DataException {
 
@@ -850,6 +870,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.history.HistoryHandler#update(P)
 	 */
+	@Override
 	public final synchronized HistoryRecord<P> update(P peer)
 			throws IllegalArgumentException, ConsistencyError, DataException {
 
@@ -1005,12 +1026,12 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 			prev.commit();
 		}
 		if( deletes > 0 ){
-			SQLAndFilter<H> delete_fil = new SQLAndFilter<H>(getTarget());
-			delete_fil.addFilter(new ReferenceFilter<H,P>(HistoryFactory.this,getPeerName(),peer));
+			SQLAndFilter<H> delete_fil = new SQLAndFilter<>(getTarget());
+			delete_fil.addFilter(new ReferenceFilter<>(HistoryFactory.this,getPeerName(),peer));
 			delete_fil.addFilter(SQLExpressionMatchFilter.getFilter(getTarget(), 
 					(SQLExpression<Date>)res.getDateExpression(getTarget(), START_TIME_FIELD),
 					(SQLExpression<Date>)res.getDateExpression(getTarget(), END_TIME_FIELD)));
-			FilterDelete<H> reaper = new FilterDelete<H>(res);
+			FilterDelete<H> reaper = new FilterDelete<>(res);
 			int actual = reaper.delete(delete_fil);
 			log.debug("Actual deletes="+actual+" expected="+deletes);
 		}

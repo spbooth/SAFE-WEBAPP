@@ -48,23 +48,27 @@ public class TestXMLTargetFactory implements XMLTargetFactory {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
 	 */
+	@Override
 	public AppContext getContext() {
 		return c;
 	}
 	protected final Logger getLogger(){
 		return c.getService(LoggerService.class).getLogger(getClass());
 	}
+	@Override
 	public Schema getSchema() {
 		return null;
 	}
 
 	
+	@Override
 	public DomVisitor getValidatingVisitor() {
 		return null;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.editors.xml.XMLTargetFactory#find(java.util.LinkedList)
 	 */
+	@Override
 	public XMLTarget find(LinkedList<String> location) {
 		return new TestXMLTarget(location);
 	}
@@ -84,6 +88,7 @@ public class TestXMLTargetFactory implements XMLTargetFactory {
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.editors.xml.XMLTarget#getXMLTargetFactory()
 		 */
+		@Override
 		public XMLTargetFactory getXMLTargetFactory() {
 			return TestXMLTargetFactory.this;
 		}
@@ -91,6 +96,7 @@ public class TestXMLTargetFactory implements XMLTargetFactory {
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.editors.xml.XMLTarget#getDocument()
 		 */
+		@Override
 		public Document getDocument() {
 			if( doc == null){
 				try{
@@ -117,8 +123,9 @@ public class TestXMLTargetFactory implements XMLTargetFactory {
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.editors.xml.XMLTarget#getRootTarget()
 		 */
+		@Override
 		public XMLTarget getRootTarget() {
-			LinkedList<String> root_path = new LinkedList<String>();
+			LinkedList<String> root_path = new LinkedList<>();
 			LinkedList<String> path = getTargetPath();
 			root_path.add(path.get(0));
 			root_path.add(path.get(1));
@@ -128,6 +135,7 @@ public class TestXMLTargetFactory implements XMLTargetFactory {
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.editors.xml.XMLTarget#canView(uk.ac.ed.epcc.webapp.session.SessionService)
 		 */
+		@Override
 		public boolean canView(SessionService<?> sess) {
 			return true;
 		}
@@ -135,6 +143,7 @@ public class TestXMLTargetFactory implements XMLTargetFactory {
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.editors.xml.XMLTarget#commit()
 		 */
+		@Override
 		public void commit() throws Exception {
 			
 			
@@ -143,6 +152,7 @@ public class TestXMLTargetFactory implements XMLTargetFactory {
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
 		 */
+		@Override
 		public AppContext getContext() {
 			return TestXMLTargetFactory.this.getContext();
 		}
@@ -152,7 +162,7 @@ public class TestXMLTargetFactory implements XMLTargetFactory {
 		 */
 		@Override
 		protected LinkedList<String> extractPrefix(LinkedList<String> node_path) {
-			LinkedList<String> prefix_path = new LinkedList<String>();
+			LinkedList<String> prefix_path = new LinkedList<>();
 			prefix_path.add(node_path.removeFirst()); // factory tag
 			prefix_path.add(node_path.getFirst()); // file id
 			return prefix_path;

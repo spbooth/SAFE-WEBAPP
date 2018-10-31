@@ -24,7 +24,6 @@ import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.forms.inputs.DayMultiInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
 
 
 
@@ -35,8 +34,9 @@ ParseInputInterfaceTest<Date, DayMultiInput, DayMultiInputTest>
 
 
  
-	public ParseInputInterfaceTest<Date, DayMultiInput, DayMultiInputTest> parse_input_test = new ParseInputInterfaceTestImpl<Date, DayMultiInput, DayMultiInputTest>(this);
+	public ParseInputInterfaceTest<Date, DayMultiInput, DayMultiInputTest> parse_input_test = new ParseInputInterfaceTestImpl<>(this);
 	
+	@Override
 	public DayMultiInput getInput() throws Exception {
 		return  new DayMultiInput();
 	}
@@ -44,25 +44,29 @@ ParseInputInterfaceTest<Date, DayMultiInput, DayMultiInputTest>
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.DateInputTest#getGoodParseData()
 	 */
+	@Override
 	public Set<String> getGoodParseData() {
 		
-		Set<String> res = new HashSet<String>();
+		Set<String> res = new HashSet<>();
 		res.add("Now+0d");
 		res.add("Now-1y");
 		res.add("\nNow-1m\n");
 		res.add("2010-12-12");
 		return res;
 	}
+	@Override
 	public Set<Date> getGoodData() throws Exception {
-		Set<Date> res = new HashSet<Date>();
+		Set<Date> res = new HashSet<>();
 		return res;
 	}
+	@Override
 	public Set<Date> getBadData() throws Exception {
-		Set<Date> res = new HashSet<Date>();
+		Set<Date> res = new HashSet<>();
 		return res;
 	}
+	@Override
 	public Set<String> getBadParseData() {
-		Set<String> res = new HashSet<String>();
+		Set<String> res = new HashSet<>();
 		res.add("womble");
 		return res;
 	}
@@ -70,6 +74,7 @@ ParseInputInterfaceTest<Date, DayMultiInput, DayMultiInputTest>
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestParseDataProvider#allowNull()
 	 */
+	@Override
 	public boolean allowNull() {
 		return true;
 	}

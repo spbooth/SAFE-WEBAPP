@@ -42,15 +42,16 @@ BoundedInputDataProvider<Date, TimeStampMultiInput>,
 BoundedInputInterfaceTest<Date, TimeStampMultiInput, TimeStampMultiInputTestCase>{
 
 	
-	public ParseInputInterfaceTest<Date, TimeStampMultiInput, TimeStampMultiInputTestCase> parse_input_test = new ParseInputInterfaceTestImpl<Date, TimeStampMultiInput, TimeStampMultiInputTestCase>(this);
+	public ParseInputInterfaceTest<Date, TimeStampMultiInput, TimeStampMultiInputTestCase> parse_input_test = new ParseInputInterfaceTestImpl<>(this);
 	
-	public BoundedInputInterfaceTestImpl<Date, TimeStampMultiInput, TimeStampMultiInputTestCase> bounded_tests = new BoundedInputInterfaceTestImpl<Date, TimeStampMultiInput, TimeStampMultiInputTestCase>(this);
+	public BoundedInputInterfaceTestImpl<Date, TimeStampMultiInput, TimeStampMultiInputTestCase> bounded_tests = new BoundedInputInterfaceTestImpl<>(this);
 	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getGoodData()
 	 */
+	@Override
 	public Set<Date> getGoodData() throws Exception {
-		Set<Date> result = new HashSet<Date>();
+		Set<Date> result = new HashSet<>();
 		Calendar c = Calendar.getInstance();
 		c.set(Calendar.MILLISECOND,0); // parse loses these
 		result.add(c.getTime());
@@ -64,8 +65,9 @@ BoundedInputInterfaceTest<Date, TimeStampMultiInput, TimeStampMultiInputTestCase
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getBadData()
 	 */
+	@Override
 	public Set<Date> getBadData() throws Exception {
-		Set<Date> result = new HashSet<Date>();
+		Set<Date> result = new HashSet<>();
 		Calendar c = Calendar.getInstance();
 		c.set(Calendar.MILLISECOND,0); // parse loses these
 		c.add(Calendar.YEAR,2);
@@ -78,6 +80,7 @@ BoundedInputInterfaceTest<Date, TimeStampMultiInput, TimeStampMultiInputTestCase
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getInput()
 	 */
+	@Override
 	public TimeStampMultiInput getInput() throws Exception {
 		TimeStampMultiInput input = new TimeStampMultiInput();
 		Calendar c = Calendar.getInstance();
@@ -91,8 +94,9 @@ BoundedInputInterfaceTest<Date, TimeStampMultiInput, TimeStampMultiInputTestCase
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestParseDataProvider#getGoodParseData()
 	 */
+	@Override
 	public Set<String> getGoodParseData() {
-		Set<String> result = new HashSet<String>();
+		Set<String> result = new HashSet<>();
 		result.add("Now-0d");
 		result.add("Now+3d");
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -109,8 +113,9 @@ BoundedInputInterfaceTest<Date, TimeStampMultiInput, TimeStampMultiInputTestCase
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestParseDataProvider#getBadParseData()
 	 */
+	@Override
 	public Set<String> getBadParseData() {
-		Set<String> result = new HashSet<String>();
+		Set<String> result = new HashSet<>();
 		result.add("Now-6y");
 		result.add("Now+6y");
 		DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
@@ -156,6 +161,7 @@ BoundedInputInterfaceTest<Date, TimeStampMultiInput, TimeStampMultiInputTestCase
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.TestParseDataProvider#allowNull()
 	 */
+	@Override
 	public boolean allowNull() {
 		return true;
 	}

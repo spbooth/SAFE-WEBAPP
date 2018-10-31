@@ -45,7 +45,7 @@ public class TupleFactoryTest<A extends DataObject,AF extends DataObjectFactory<
 	public void setUp() throws DataFault {
 		fac1 = new Dummy1.Factory(ctx);
 		fac2 = new Dummy2.Factory(ctx);
-		fac = new TupleFactory<A,AF,T>(ctx, (AF)fac1,(AF)fac2);
+		fac = new TupleFactory<>(ctx, (AF)fac1,(AF)fac2);
 		
 		Dummy1 d1a = new Dummy1(ctx);
 		d1a.setName("Name1");

@@ -42,7 +42,7 @@ public class DNInputTest extends ParseAbstractInputTestCase<String,DNInput> {
 	 * @see uk.ac.ed.epcc.webapp.forms.TestParseDataProvider#getGoodParseData()
 	 */
 	public Set<String> getGoodParseData() {
-		Set<String> gp = new HashSet<String>();
+		Set<String> gp = new HashSet<>();
 		for(String s : getGoodData()){
 			gp.add(s);
 			gp.add("\""+s+"\""); // allow quoted input
@@ -63,7 +63,7 @@ public class DNInputTest extends ParseAbstractInputTestCase<String,DNInput> {
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getGoodData()
 	 */
 	public Set<String> getGoodData()  {
-		Set<String> good = new HashSet<String>();
+		Set<String> good = new HashSet<>();
 		good.add("/c=UK/o=eScience/ou=Edinburgh/l=NeSC/cn=stephen booth");
 		good.add("/C=UK/O=eScience/OU=Edinburgh/L=NeSC/CN=stephen \\,booth"); // escaped commas
 		good.add("/DC=uk/DC=ac/DC=ceda/O=STFC RAL/CN=https://ceda.ac.uk/openid/Stephen.Pascoe");
@@ -74,7 +74,7 @@ public class DNInputTest extends ParseAbstractInputTestCase<String,DNInput> {
 	 * @see uk.ac.ed.epcc.webapp.forms.TestDataProvider#getBadData()
 	 */
 	public Set<String> getBadData() {
-		Set<String> bad = new HashSet<String>();
+		Set<String> bad = new HashSet<>();
 		bad.add("  ");
 		bad.add("wombles");
 		bad.add("/C=UK/O=eScience/OU=Edinburgh/L=NeSC/CN=stephen ,booth"); // un-escaped commas)
@@ -92,7 +92,7 @@ public class DNInputTest extends ParseAbstractInputTestCase<String,DNInput> {
 	@Test
 	public void testGlobusName() throws InvalidNameException{
 			String name = "/C=UK/O=eScience/OU=Edinburgh/L=NeSC/CN=stephen booth";
-			List<Rdn> list = new LinkedList<Rdn>();
+			List<Rdn> list = new LinkedList<>();
 			for(String s : name.substring(1).split("/")){
 				list.add(new Rdn(s));
 			}

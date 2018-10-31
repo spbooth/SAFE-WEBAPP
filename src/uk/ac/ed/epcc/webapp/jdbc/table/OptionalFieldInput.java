@@ -38,7 +38,7 @@ public class OptionalFieldInput<I> extends ParseAbstractInput<String> implements
 
 	Map<String,I> fields;
 	public OptionalFieldInput(Repository res, boolean missing, Map<String,I> options){
-		fields = new HashMap<String, I>();
+		fields = new HashMap<>();
 		for(String name : options.keySet()){
 			if( missing == ! res.hasField(name)){
 				fields.put(name, options.get(name));
@@ -50,17 +50,20 @@ public class OptionalFieldInput<I> extends ParseAbstractInput<String> implements
 		return vis.visitListInput(this);
 	}
 	
+	@Override
 	public I getItem() {
 		
 		return fields.get(getValue());
 	}
 
+	@Override
 	public void setItem(I item) {
 		setValue(getTagByItem(item));
 		
 	}
 
 	
+	@Override
 	public void parse(String v) throws ParseException {
 		if( fields.containsKey(v)){
 			setValue(v);
@@ -70,19 +73,23 @@ public class OptionalFieldInput<I> extends ParseAbstractInput<String> implements
 	}
 
 	
+	@Override
 	public I getItembyValue(String value) {
 		return fields.get(value);
 	}
 
 	
+	@Override
 	public Iterator<I> getItems() {
 		return fields.values().iterator();
 	}
 
+	@Override
 	public int getCount(){
 		return fields.size();
 	}
 	
+	@Override
 	public String getTagByItem(I item) {
 		for(String name : fields.keySet()){
 			if( fields.get(name).equals(item)){
@@ -93,11 +100,13 @@ public class OptionalFieldInput<I> extends ParseAbstractInput<String> implements
 	}
 
 	
+	@Override
 	public String getTagByValue(String value) {
 		return value;
 	}
 
 	
+	@Override
 	public String getText(I item) {
 		return getTagByItem(item);
 	}

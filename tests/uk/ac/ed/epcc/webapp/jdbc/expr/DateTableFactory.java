@@ -108,7 +108,7 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 		 */
 		public SumMapFinder(AppContext c) {
 			super();
-			SumMapMapper<Integer> smm = new SumMapMapper<Integer>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", res.getNumberExpression(getTarget(),Long.class, DateTableFactory.MILLIS), "millis");
+			SumMapMapper<Integer> smm = new SumMapMapper<>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", res.getNumberExpression(getTarget(),Long.class, DateTableFactory.MILLIS), "millis");
 			setMapper(smm);
 		}
 		
@@ -121,7 +121,7 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 		 */
 		public BinarySumMapFinder(AppContext c, Operator op) {
 			super();
-			SumMapMapper<Number> smm = new SumMapMapper<Number>(c,
+			SumMapMapper<Number> smm = new SumMapMapper<>(c,
 					new BinarySQLValue(c,
 							res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS),
 							Operator.MUL,
@@ -142,7 +142,7 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 		 */
 		public ConstSumMapFinder(AppContext c) {
 			super();
-			SumMapMapper<Integer> smm = new SumMapMapper<Integer>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", 
+			SumMapMapper<Integer> smm = new SumMapMapper<>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", 
 					new ConstExpression<Integer, Integer>(Integer.class, 8), "sumconst");
 			setMapper(smm);
 		}
@@ -154,7 +154,7 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 		 */
 		public MinMapFinder(AppContext c) {
 			super();
-			MinimumMapMapper<Integer> smm = new MinimumMapMapper<Integer>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", res.getNumberExpression(getTarget(),Long.class, DateTableFactory.MILLIS), "millis");
+			MinimumMapMapper<Integer> smm = new MinimumMapMapper<>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", res.getNumberExpression(getTarget(),Long.class, DateTableFactory.MILLIS), "millis");
 			setMapper(smm);
 		}
 		
@@ -166,7 +166,7 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 		 */
 		public MaxMapFinder(AppContext c) {
 			super();
-			MaximumMapMapper<Integer> mmm = new MaximumMapMapper<Integer>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", res.getNumberExpression(getTarget(),Long.class, DateTableFactory.MILLIS), "millis");
+			MaximumMapMapper<Integer> mmm = new MaximumMapMapper<>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", res.getNumberExpression(getTarget(),Long.class, DateTableFactory.MILLIS), "millis");
 			setMapper(mmm);
 		}
 		
@@ -178,7 +178,7 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 		 */
 		public AvgMapFinder(AppContext c) {
 			super();
-			AverageMapMapper<Integer> amm = new AverageMapMapper<Integer>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", res.getNumberExpression(getTarget(),Double.class, DateTableFactory.MILLIS), "avgmillis");
+			AverageMapMapper<Integer> amm = new AverageMapMapper<>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", res.getNumberExpression(getTarget(),Double.class, DateTableFactory.MILLIS), "avgmillis");
 			setMapper(amm);
 		}		
 	}

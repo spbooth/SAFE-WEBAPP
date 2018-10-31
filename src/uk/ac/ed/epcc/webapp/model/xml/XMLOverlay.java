@@ -110,6 +110,7 @@ public class XMLOverlay<X extends XMLOverlay.XMLFile> extends TextFileOverlay<X>
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.ExtraContent#getExtraHtml(uk.ac.ed.epcc.webapp.content.ContentBuilder, uk.ac.ed.epcc.webapp.session.SessionService, java.lang.Object)
 		 */
+		@Override
 		public <C extends ContentBuilder> C getExtraHtml(C cb,
 				SessionService<?> op, X target) {
 			AppContext conn = getContext();
@@ -171,6 +172,7 @@ public class XMLOverlay<X extends XMLOverlay.XMLFile> extends TextFileOverlay<X>
 	 * 
 	 * @return Schema
 	 */
+	@Override
 	public Schema getSchema(){
 		return null;
 	}
@@ -193,7 +195,7 @@ public class XMLOverlay<X extends XMLOverlay.XMLFile> extends TextFileOverlay<X>
 			return (Document) res.getNode();
 		}
 		public LinkedList<String> getRootPath(){
-			LinkedList<String> path = new LinkedList<String>();
+			LinkedList<String> path = new LinkedList<>();
 			path.add(getFactoryTag());
 			path.add(Integer.toString(getID()));
 			return path;
@@ -251,10 +253,12 @@ public class XMLOverlay<X extends XMLOverlay.XMLFile> extends TextFileOverlay<X>
 			}
 			return file;
 		}
+		@Override
 		public AppContext getContext() {
 			return XMLOverlay.this.getContext();
 		}
 
+		@Override
 		public Document getDocument() {
 			if( doc == null){
 				try {
@@ -268,10 +272,12 @@ public class XMLOverlay<X extends XMLOverlay.XMLFile> extends TextFileOverlay<X>
 		}
 
 		
+		@Override
 		public final boolean canView(SessionService<?> sess) {
 			return XMLOverlay.this.canView(sess);
 		}
 
+		@Override
 		public void commit() throws Exception {
 			if( doc != null ){
 				XMLFile f = getXMLFile();
@@ -280,12 +286,14 @@ public class XMLOverlay<X extends XMLOverlay.XMLFile> extends TextFileOverlay<X>
 			}
 		}
 		
+		@Override
 		public XMLTargetFactory getXMLTargetFactory() {
 			return XMLOverlay.this;
 		}
 		
+		@Override
 		public XMLTarget getRootTarget() {
-			LinkedList<String> root_path =new LinkedList<String>();
+			LinkedList<String> root_path =new LinkedList<>();
 			LinkedList<String> path = getTargetPath();
 			root_path.add(0, path.get(0));
 			root_path.add(1,path.get(1));
@@ -296,13 +304,14 @@ public class XMLOverlay<X extends XMLOverlay.XMLFile> extends TextFileOverlay<X>
 		 */
 		@Override
 		protected LinkedList<String> extractPrefix(LinkedList<String> node_path) {
-			LinkedList<String> prefix_path = new LinkedList<String>();
+			LinkedList<String> prefix_path = new LinkedList<>();
 			prefix_path.add(node_path.removeFirst()); // factory tag
 			prefix_path.add(node_path.getFirst()); // file id
 			return prefix_path;
 		}
 		
 	}
+	@Override
 	public XMLTarget find(LinkedList<String> location) {
 		return new TemplateTarget(location);
 	}
@@ -324,6 +333,7 @@ public class XMLOverlay<X extends XMLOverlay.XMLFile> extends TextFileOverlay<X>
 	}
 
 	
+	@Override
 	public DomVisitor getValidatingVisitor() {
 		return null;
 	}

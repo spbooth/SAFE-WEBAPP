@@ -63,7 +63,7 @@ public class WebappHeadTag extends TagSupport implements Tag {
 		Set<String> request_script = (Set<String>) request.getAttribute(REQUEST_SCRIPT_ATTR);
 		JspWriter out = page.getOut();
         HttpServletResponse response = (HttpServletResponse)pageContext.getResponse();
-        Set<String> scripts = new HashSet<String>(); // don't emit the same script twice 
+        Set<String> scripts = new HashSet<>(); // don't emit the same script twice 
         try{
         	AppContext conn = ErrorFilter.retrieveAppContext(request,response);
         	if( conn != null ){
@@ -205,7 +205,7 @@ public class WebappHeadTag extends TagSupport implements Tag {
 	public static void addScript(AppContext conn,HttpServletRequest request, String script){
 		Set<String> scripts = (Set<String>) request.getAttribute(REQUEST_SCRIPT_ATTR);
 		if( scripts == null ){
-			scripts=new LinkedHashSet<String>();
+			scripts=new LinkedHashSet<>();
 			request.setAttribute(REQUEST_SCRIPT_ATTR, scripts);
 		}
 		scripts.add(conn.expandText(script));
@@ -221,7 +221,7 @@ public class WebappHeadTag extends TagSupport implements Tag {
 	public static void addCss(AppContext conn,HttpServletRequest request, String css){
 		Set<String> stylesheets = (Set<String>) request.getAttribute(REQUEST_CSS_ATTR);
 		if( stylesheets == null ){
-			stylesheets=new LinkedHashSet<String>();
+			stylesheets=new LinkedHashSet<>();
 			request.setAttribute(REQUEST_CSS_ATTR, stylesheets);
 		}
 		stylesheets.add(conn.expandText(css));

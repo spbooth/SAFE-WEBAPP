@@ -41,6 +41,7 @@ public class CachedIndexedProducer<T extends Indexed>  implements IndexedProduce
     public CachedIndexedProducer(IndexedProducer<T> m){
     	maker = m;
     }
+	@Override
 	public T find(int id) throws DataException {
 		Map<Integer,T> cache=getCache();
 		T result;
@@ -63,7 +64,7 @@ public class CachedIndexedProducer<T extends Indexed>  implements IndexedProduce
 	 */
 	private final Map<Integer,T> getCache(){
 		if( ref == null || ref.get() == null ){
-			ref = new SoftReference<Map<Integer,T>>(new HashMap<Integer,T>());
+			ref = new SoftReference<>(new HashMap<Integer,T>());
 		}
 		return ref.get();
 	}
@@ -82,21 +83,27 @@ public class CachedIndexedProducer<T extends Indexed>  implements IndexedProduce
         ref=null;
         return;
     }
+	@Override
 	public Class<T> getTarget() {
 		return maker.getTarget();
 	}
+	@Override
 	public IndexedReference<T> makeReference(T obj) {
 		return maker.makeReference(obj);
 	}
+	@Override
 	public IndexedReference<T> makeReference(int id) {
 		return maker.makeReference(id);
 	}
+	@Override
 	public boolean isMyReference(IndexedReference ref) {
 		return maker.isMyReference(ref);
 	}
+	@Override
 	public T find(Number o) {
 		return maker.find(o);
 	}
+	@Override
 	public Number getIndex(T value) {
 		return maker.getIndex(value);
 	}

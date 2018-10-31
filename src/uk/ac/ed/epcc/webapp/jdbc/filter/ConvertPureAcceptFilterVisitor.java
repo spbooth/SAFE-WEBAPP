@@ -57,7 +57,7 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	@Override
 	public AcceptFilter<T> visitPatternFilter(PatternFilter<T> fil) throws Exception {
 		if( matcher != null ){
-			return new ConvertToAcceptFilter<T>(fil, matcher);
+			return new ConvertToAcceptFilter<>(fil, matcher);
 		}
 		doThrow();
 		return null;
@@ -69,7 +69,7 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	@Override
 	public AcceptFilter<T> visitSQLCombineFilter(BaseSQLCombineFilter<T> fil) throws Exception {
 		if( matcher != null ){
-			return new ConvertToAcceptFilter<T>(fil, matcher);
+			return new ConvertToAcceptFilter<>(fil, matcher);
 		}
 		// Might be able to do something if all contents are DualFilters
 		doThrow();
@@ -130,7 +130,7 @@ public class ConvertPureAcceptFilterVisitor<T> implements FilterVisitor<AcceptFi
 	@Override
 	public AcceptFilter<T> visitBinaryFilter(BinaryFilter<T> fil) throws Exception {
 		//return new ConstAcceptFilter<T>(fil.getTarget(), fil.getBooleanResult());
-		return new BinaryAcceptFilter<T>(fil);
+		return new BinaryAcceptFilter<>(fil);
 	}
 
 	/* (non-Javadoc)

@@ -89,7 +89,7 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	 */
 	@Override
 	public SQLFilter getStringFinderFilter(Class target, String name) {
-		return new SQLValueFilter<AU>(getFactory().getTarget(), getRepository(), getField(), normalizeName(name));
+		return new SQLValueFilter<>(getFactory().getTarget(), getRepository(), getField(), normalizeName(name));
 	}
 
 	
@@ -143,8 +143,8 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	public void customiseUpdateForm(Form f, AU target, SessionService operator) {
 		Field ff = f.getField(getField());
 		if( ff != null ){
-			ff.removeValidator(new ParseFactoryValidator<AU>(this, null));
-			ff.addValidator(new ParseFactoryValidator<AU>(this, target));
+			ff.removeValidator(new ParseFactoryValidator<>(this, null));
+			ff.addValidator(new ParseFactoryValidator<>(this, target));
 			if( ! operator.hasRole(SessionService.ADMIN_ROLE)){
 				// only admin can edit in update
 				ff.lock();
@@ -156,7 +156,7 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	public void customiseForm(Form f) {
 		Field ff = f.getField(getField());
 		if( ff != null ){
-			ff.addValidator(new ParseFactoryValidator<AU>(this, null));
+			ff.addValidator(new ParseFactoryValidator<>(this, null));
 		}
 	}
 

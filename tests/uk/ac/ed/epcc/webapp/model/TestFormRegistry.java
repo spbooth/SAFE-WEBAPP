@@ -36,7 +36,7 @@ public class TestFormRegistry extends FormRegistry {
 	public TestFormRegistry(AppContext conn) {
 		super(conn);
 	}
-	private static Map<String,FormEntry> map = new HashMap<String,FormEntry>();
+	private static Map<String,FormEntry> map = new HashMap<>();
 
 	public static final String TAG="TestForm";
 	@Override
@@ -62,10 +62,12 @@ public class TestFormRegistry extends FormRegistry {
 
 		private final boolean create;
 		private final boolean update;
+		@Override
 		public boolean canUpdate(SessionService p) {
 			return update;
 		}
 
+		@Override
 		public boolean canCreate(SessionService p) {
 			return create;
 		}
@@ -96,8 +98,8 @@ public class TestFormRegistry extends FormRegistry {
 		}
     	
     }
-    public static TestFormType<Dummy1> DUMMY1_TYPE = new TestFormType<Dummy1>("Dummy1", Dummy1.Factory.class,new TestPolicy(true,true));
-    public static TestFormType<Dummy2> DUMMY2_TYPE = new TestFormType<Dummy2>("Dummy2", Dummy2.Factory.class,new TestPolicy(true,true));
+    public static TestFormType<Dummy1> DUMMY1_TYPE = new TestFormType<>("Dummy1", Dummy1.Factory.class,new TestPolicy(true,true));
+    public static TestFormType<Dummy2> DUMMY2_TYPE = new TestFormType<>("Dummy2", Dummy2.Factory.class,new TestPolicy(true,true));
     public static FormType ROLE_TYPE = new FormType("User roles", RoleUpdate.class, new TestPolicy(false, true));
     
 }

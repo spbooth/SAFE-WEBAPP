@@ -71,8 +71,8 @@ public class DNInput extends ParseAbstractInput<String> implements ItemInput<Lda
 		if( name==null || !name.startsWith("/")){
 			throw new ParseException("No leading /");
 		}
-		List<Rdn> list = new LinkedList<Rdn>();
-		LinkedList<String> chunks= new LinkedList<String>();
+		List<Rdn> list = new LinkedList<>();
+		LinkedList<String> chunks= new LinkedList<>();
     	// Rdns may contain / but must contain an = 
 		for(String s : name.substring(1).split("/")){
 			if( s.contains("=") ){
@@ -104,7 +104,7 @@ public class DNInput extends ParseAbstractInput<String> implements ItemInput<Lda
 		}
 	}
 	public static LdapName reverse(LdapName name){
-		List<Rdn> rdns = new LinkedList<Rdn>(name.getRdns());
+		List<Rdn> rdns = new LinkedList<>(name.getRdns());
 		java.util.Collections.reverse(rdns);
 		return new LdapName(rdns);
 	}

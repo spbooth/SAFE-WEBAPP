@@ -47,9 +47,11 @@ public class TimestampDateFieldExpression<T extends DataObject> extends FieldExp
 		num_field=rep.getNumberExpression(target,Integer.class, field);
 		date_expr = rep.getSQLContext().convertToDate(num_field, res);
 	}
+	@Override
 	public Date getValue(Record r) {
 		return r.getDateProperty(name);
 	}
+	@Override
 	public void setValue(Record r, Date value) {
 		r.setProperty(name, value);
 	}
@@ -58,30 +60,35 @@ public class TimestampDateFieldExpression<T extends DataObject> extends FieldExp
 		return date_expr.add(sb, qualify);
 	}
 	
+	@Override
 	public SQLExpression<? extends Number> getMillis() {
 		return date_expr.getMillis();
 	}
+	@Override
 	public SQLExpression<? extends Number> getSeconds() {
 		return date_expr.getSeconds();
 
 	}
 
+	@Override
 	public  SQLFilter<T> getFilter(MatchCondition match, Date val) {
 		//Repository will convert this to the correct number.
 		if( match == null ){
 			// null implies equality test
-			return new SQLValueFilter<T>(filter_type,repository,name,val);
+			return new SQLValueFilter<>(filter_type,repository,name,val);
 		}
 		// This to avoid unecessary conversions in the filter
-		return new SQLValueFilter<T>(filter_type,repository,name,match,val);
+		return new SQLValueFilter<>(filter_type,repository,name,match,val);
 	}
+	@Override
 	public SQLFilter<T> getNullFilter(boolean is_null)
 			throws CannotFilterException {
-		return new NullFieldFilter<T>(filter_type,repository, name,is_null);
+		return new NullFieldFilter<>(filter_type,repository, name,is_null);
 	}
+	@Override
 	public SQLFilter<T> getOrderFilter(boolean descending)
 			throws CannotFilterException {
-		return new FieldOrderFilter<T>(filter_type,repository, name, descending);
+		return new FieldOrderFilter<>(filter_type,repository, name, descending);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.DateSQLExpression#preferSeconds()

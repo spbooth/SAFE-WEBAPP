@@ -132,7 +132,8 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
         protected IndexedLinkManager getIndexedLinkManager(){
         	return manager;
         }
-        public DataObjectFactory getFactory() {
+        @Override
+		public DataObjectFactory getFactory() {
         	return getIndexedLinkManager();
         }
 		/*
@@ -354,20 +355,23 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 			}
 			addFilter(f);
 			if( l != null ){
-			  addFilter(new ReferenceFilter<T,L>(IndexedLinkManager.this,left_field,l));
+			  addFilter(new ReferenceFilter<>(IndexedLinkManager.this,left_field,l));
 			}
 			if( r != null ){
-				  addFilter(new ReferenceFilter<T,R>(IndexedLinkManager.this,right_field,r));
+				  addFilter(new ReferenceFilter<>(IndexedLinkManager.this,right_field,r));
 			}
 		}
 
+		@Override
 		public L getLeftTarget(){
 			return left_target;
 		}
+		@Override
 		public R getRightTarget(){
 			return right_target;
 		}
-        public void visit(T l) {
+        @Override
+		public void visit(T l) {
 				// Set cache values where we can. This happened in the LinkMapper if
 				// we are using LinkFilterIterator but we have to do it here if we are using
 				// a standard LinkFilter
@@ -414,20 +418,23 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 			}
 			addFilter(f);
 			if( l != null ){
-				addFilter(new ReferenceFilter<T,L>(IndexedLinkManager.this,left_field,l));
+				addFilter(new ReferenceFilter<>(IndexedLinkManager.this,left_field,l));
 			}
 			if( r != null ){
-				addFilter(new ReferenceFilter<T,R>(IndexedLinkManager.this,right_field,r));
+				addFilter(new ReferenceFilter<>(IndexedLinkManager.this,right_field,r));
 			}
 		}
 
+		@Override
 		public L getLeftTarget(){
 			return left_target;
 		}
+		@Override
 		public R getRightTarget(){
 			return right_target;
 		}
-        public void visit(T l) {
+        @Override
+		public void visit(T l) {
 				// Set cache values where we can. This happened in the LinkMapper if
 				// we are using LinkFilterIterator but we have to do it here if we are using
 				// a standard LinkFilter
@@ -479,11 +486,12 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		}else{
 			setContext(c, table,false);
 		}
-		res.addTypeProducer(new IndexedTypeProducer<L,IndexedProducer<L>>(c,left_field, left_fac));
-		res.addTypeProducer(new IndexedTypeProducer<R,IndexedProducer<R>>(c,right_field, right_fac));
+		res.addTypeProducer(new IndexedTypeProducer<>(c,left_field, left_fac));
+		res.addTypeProducer(new IndexedTypeProducer<>(c,right_field, right_fac));
 	}
 
 	// make final to stop people overriding the wrong method.
+	@Override
 	public final TableSpecification getDefaultTableSpecification(AppContext c,String table){
 		return super.getDefaultTableSpecification(c, table);
 	}
@@ -520,6 +528,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		}
 		return spec;
 	}
+	@Override
 	public final TableSpecification getTableSpecification() {
 		return getFinalTableSpecification(getContext(), getTag(), getLeftProducer(), getLeftField(), getRightProducer(), getRightField());
 	}
@@ -549,7 +558,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
     	return left_field;
     }
     public SQLFilter<T> getLeftFilter(L l){
-    	return new ReferenceFilter<T,L>(this,left_field,l);
+    	return new ReferenceFilter<>(this,left_field,l);
     }
 	
 	/** Get a Set of Left  objects
@@ -560,7 +569,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 * @throws DataException 
 	 */
 	public Set<L> getLeftSet( R r ,BaseFilter<T> f) throws DataException{
-		Set<L> res= new LinkedHashSet<L>();
+		Set<L> res= new LinkedHashSet<>();
 		for(T link : getFilterResult(null, r, f)){
 			res.add(link.getLeft());
 		}
@@ -590,9 +599,9 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		   timer.startTimer(tag);
 		}
 		try {
-			SQLAndFilter<T> fil = new SQLAndFilter<T>(getTarget());
-			fil.addFilter(new ReferenceFilter<T, L>(this, left_field, left_end));
-			fil.addFilter(new ReferenceFilter<T, R>(this, right_field, right_end));
+			SQLAndFilter<T> fil = new SQLAndFilter<>(getTarget());
+			fil.addFilter(new ReferenceFilter<>(this, left_field, left_end));
+			fil.addFilter(new ReferenceFilter<>(this, right_field, right_end));
 			T l = find(fil,true);
 			
 			if( l != null ){
@@ -636,7 +645,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
     	return right_field;
     }
     public SQLFilter<T> getRightFilter(R r){
-    	return new ReferenceFilter<T,R>(this,right_field,r);
+    	return new ReferenceFilter<>(this,right_field,r);
     }
     
 	
@@ -648,7 +657,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 * @throws DataException 
 	 */
 	public Set<R> getRightSet(L l ,BaseFilter<T> f) throws DataException{
-		Set<R> res= new LinkedHashSet<R>();
+		Set<R> res= new LinkedHashSet<>();
 		for(T link : getFilterResult(l, null, f)){
 			res.add(link.getRight());
 		}
@@ -747,7 +756,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 			// supress link fields as set by the update
 			// don't do this in the factory as we may want 
 			// a create form
-			Set<String> supress = new HashSet<String>();
+			Set<String> supress = new HashSet<>();
 			Set<String> xtra = super.getSupress();
 			if( xtra != null){
 				supress.addAll(xtra);

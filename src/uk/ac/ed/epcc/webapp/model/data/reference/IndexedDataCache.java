@@ -32,7 +32,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataCache;
  * @param <D> target type
  */
 public abstract class IndexedDataCache<K,D extends Indexed> extends DataCache<K,D> {
-    private Map<IndexedReference<? extends D>,D> index_map = new HashMap<IndexedReference<? extends D>,D>();
+    private Map<IndexedReference<? extends D>,D> index_map = new HashMap<>();
     private AppContext c;
     public IndexedDataCache(AppContext c){
     	this.c=c;

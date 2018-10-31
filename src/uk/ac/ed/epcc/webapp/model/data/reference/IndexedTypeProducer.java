@@ -62,6 +62,7 @@ public class IndexedTypeProducer<T extends Indexed,F extends IndexedProducer<T>>
 		this.field=field;
 	}
 	
+	@Override
 	public String getField() {
 		return field;
 	}
@@ -77,12 +78,14 @@ public class IndexedTypeProducer<T extends Indexed,F extends IndexedProducer<T>>
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer#getFieldType(java.lang.Object)
 	 */
+	@Override
 	public FieldType<Integer> getFieldType(T def) {
-		return new NumberFieldType<Integer>(Integer.class, def == null,def == null ? null : def.getID());
+		return new NumberFieldType<>(Integer.class, def == null,def == null ? null : def.getID());
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#getInput()
 	 */
+	@Override
 	public Input<Integer> getInput() {
 		IndexedProducer<T> producer = getProducer();
 		if( producer instanceof Selector){

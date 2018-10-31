@@ -196,14 +196,14 @@ public class Dummy1 extends DataObject implements Removable {
     	}
 		@Override
 		protected List<OrderClause> getOrder() {
-			List<OrderClause> result = new LinkedList<OrderClause>();
+			List<OrderClause> result = new LinkedList<>();
 			result.add(res.getOrder(NUMBER, false));
 			return result;
 		}
 		
 		public FilterResult<Dummy1> getReverse() throws DataFault{
-			AndFilter<Dummy1>fil = new AndFilter<Dummy1>(getTarget());
-			fil.addFilter(new FieldOrderFilter<Dummy1>(Factory.this.getTarget(),res, NUMBER, true));
+			AndFilter<Dummy1>fil = new AndFilter<>(getTarget());
+			fil.addFilter(new FieldOrderFilter<>(Factory.this.getTarget(),res, NUMBER, true));
 			return new FilterSet(fil);
 			
 		}
@@ -211,7 +211,7 @@ public class Dummy1 extends DataObject implements Removable {
 			return res.getStringExpression(getTarget(), NAME);
 		}
 		public FilterResult<Dummy1> getWithFilter() throws DataFault{
-			AndFilter<Dummy1>fil = new AndFilter<Dummy1>(getTarget());
+			AndFilter<Dummy1>fil = new AndFilter<>(getTarget());
 			return new FilterSet(fil);
 			
 		}

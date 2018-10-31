@@ -63,10 +63,10 @@ public class SQLFormFilter<T extends DataObject> extends SQLAndFilter<T>{
 			if( o != null ){
 				if( m == null ){
 					if( res.hasField(field)){
-						addFilter(new SQLValueFilter<T>(target,res,field,o));
+						addFilter(new SQLValueFilter<>(target,res,field,o));
 					}else{
 						if( res.isUniqueIdName(field)){
-							addFilter(new SQLIdFilter<T>(target,res, (Integer)o));
+							addFilter(new SQLIdFilter<>(target,res, (Integer)o));
 						}else{
 							throw new ConsistencyError("Unrecognised field "+field);
 						}

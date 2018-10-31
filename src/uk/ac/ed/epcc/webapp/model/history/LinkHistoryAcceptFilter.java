@@ -53,12 +53,13 @@ public class LinkHistoryAcceptFilter<L extends Indexed, R extends Indexed, T ext
 		this.linkHistoryHandler = linkHistoryHandler;
 		this.left=left;
 		this.right=right;
-		cache = new HashMap<Integer,Boolean>();
+		cache = new HashMap<>();
 		left_field=linkHistoryHandler.getLinkManager().getLeftField();
 		right_field=linkHistoryHandler.getLinkManager().getRightField();
 		has_left_field = this.linkHistoryHandler.canLeftJoin();
 		has_right_field = this.linkHistoryHandler.canRightJoin();
 	}
+	@Override
 	public boolean accept(H h) {
 		if( left != null ){
 			if( has_left_field ){

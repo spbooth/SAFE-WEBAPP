@@ -63,8 +63,8 @@ public class DefaultDataBaseService implements DatabaseService {
 	private static final String MYSQL_TYPE = "mysql";
 	private AppContext ctx;
 	// The database connection:
-	private Map<String,SQLContext> map = new HashMap<String, SQLContext>();
-	private Set<String> bad_tags = new HashSet<String>();
+	private Map<String,SQLContext> map = new HashMap<>();
+	private Set<String> bad_tags = new HashSet<>();
 	// Have we already attempted to set the default connection
 	// we remember this so that we we don't keep attempting on fail
     private boolean connection_set=false;
@@ -80,9 +80,11 @@ public class DefaultDataBaseService implements DatabaseService {
     	force_rollback= TRANSACTIONS_ROLLBACK_TRANSIENT_ERRORS.isEnabled(ctx);
     	desired_isolation_level=parseLevel(ctx.getInitParameter("transaction.isolation_level"));
     }
-    public final SQLContext getSQLContext() throws SQLException {
+    @Override
+	public final SQLContext getSQLContext() throws SQLException {
     	return getSQLContext(null);
     }
+	@Override
 	public final SQLContext getSQLContext(String tag) throws SQLException {
 		return getSQLContext(tag,ctx.getService(ConfigService.class).getServiceProperties());
 	}
@@ -92,6 +94,7 @@ public class DefaultDataBaseService implements DatabaseService {
 	 * @return A {@link SQLContext}
 	 * @throws SQLException
 	 */
+	@Override
 	public synchronized  SQLContext getSQLContext(String tag,Properties props) throws SQLException {
 		if( closed ) {
 			throw new SQLException("DatabaseService already closed");
@@ -228,10 +231,12 @@ public class DefaultDataBaseService implements DatabaseService {
 		
 
 	}
+	@Override
 	public AppContext getContext() {
 		return ctx;
 	}
 
+	@Override
 	public synchronized void cleanup() {
 		closed=true;
 		closeRetainedClosables();
@@ -258,6 +263,7 @@ public class DefaultDataBaseService implements DatabaseService {
 	/**
 	 * 
 	 */
+	@Override
 	public void closeRetainedClosables() {
 		if( closes != null) {
 			if( ! closes.isEmpty()) {
@@ -282,6 +288,7 @@ public class DefaultDataBaseService implements DatabaseService {
 		}
 	}
 
+	@Override
 	public Class<DatabaseService> getType() {
 		return DatabaseService.class;
 	}

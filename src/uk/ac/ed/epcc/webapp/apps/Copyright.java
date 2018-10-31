@@ -96,9 +96,9 @@ public class Copyright {
 	 */
 
 	// Keyed by file extension
-	public static final Map<String, Bounds> copyrightBounds = new HashMap<String, Bounds>();
-	public static final Map<String,Pattern> boundPatterns = new HashMap<String, Pattern>();
-	public static final Map<String,String> copyrightText = new HashMap<String, String>();
+	public static final Map<String, Bounds> copyrightBounds = new HashMap<>();
+	public static final Map<String,Pattern> boundPatterns = new HashMap<>();
+	public static final Map<String,String> copyrightText = new HashMap<>();
 	public static final String NEW_LINE = System.getProperty("line.separator");
 	static {
 		copyrightBounds.put("java", new Bounds("//| ","|"));
@@ -200,8 +200,8 @@ public class Copyright {
 		int total = 0;
 		int skipped = 0;
 
-		Map<String, MutInt> modFiles = new HashMap<String, MutInt>();
-		Map<String, MutInt> numFiles = new HashMap<String, MutInt>();
+		Map<String, MutInt> modFiles = new HashMap<>();
+		Map<String, MutInt> numFiles = new HashMap<>();
 		for (String type : copyrightBounds.keySet()) {
 			modFiles.put(type, new MutInt());
 			numFiles.put(type, new MutInt());
@@ -397,7 +397,7 @@ public class Copyright {
 		}
 
 		// go through all children
-		Collection<File> files = new ArrayList<File>();
+		Collection<File> files = new ArrayList<>();
 		for (File child : root.listFiles()) {
 			if (child.isFile()) {
 				if (child.isHidden() == false) {

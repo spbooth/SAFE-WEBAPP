@@ -62,7 +62,7 @@ public class TestCrsfService extends AbstractContexed implements CrsfTokenServic
 		sb.append(tag);
 		sb.append(provider.getTargetName());
 		if( target != null) {
-			GetIDVisitor<T, K> vis = new GetIDVisitor<T, K>(target);
+			GetIDVisitor<T, K> vis = new GetIDVisitor<>(target);
 			sb.append(provider.accept(vis));
 		}
 		return sb.toString();

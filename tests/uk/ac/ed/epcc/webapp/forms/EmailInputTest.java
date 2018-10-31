@@ -31,14 +31,14 @@ public class EmailInputTest extends TextInputTest<EmailInput> {
 	}
 	@Override
 	public Set<String> getGoodData() {
-		HashSet<String> good = new HashSet<String>();
+		HashSet<String> good = new HashSet<>();
 		good.add( "spb@example.com" );
 		return good;
 	}
 	
 	@Override
 	public Set<String> getBadData() {
-		HashSet<String> bad = new HashSet<String>();
+		HashSet<String> bad = new HashSet<>();
 		bad.add( "");
 		bad.add( "Some random text");
 		bad.add("<Stephen Booth> spb@example.com" );

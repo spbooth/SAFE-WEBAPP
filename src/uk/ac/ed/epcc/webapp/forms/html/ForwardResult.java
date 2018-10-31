@@ -47,7 +47,7 @@ public class ForwardResult implements FormResult {
 	 */
 	public ForwardResult(String url,Map<String,Object> attr){
 		this.url=url;
-		this.attr=new HashMap<String, Object>();
+		this.attr=new HashMap<>();
 		this.attr.putAll(attr);
 	}
 	public String getURL(){
@@ -59,6 +59,7 @@ public class ForwardResult implements FormResult {
 		}
 		return (Map<String, Object>) attr.clone();
 	}
+	@Override
 	public void accept(FormResultVisitor vis) throws Exception {
 		if( vis instanceof WebFormResultVisitor){
 			((WebFormResultVisitor)vis).visitForwardResult(this);

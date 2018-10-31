@@ -88,6 +88,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		 * 
 		 * @see uk.ac.hpcx.model.data.BasicDataObject.Filter#condition()
 		 */
+		@Override
 		public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb, boolean qualify) {
 			if (res == null ) {
 				sb.append(type.getField());
@@ -105,6 +106,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 
 
 		
+		@Override
 		public List<PatternArgument> getParameters(List<PatternArgument> list) {
 			list.add(new PatternArg(res,type.getField(),target.getTag()));
 			return list;
@@ -114,6 +116,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 		 */
+		@Override
 		public <X> X acceptVisitor(FilterVisitor<X,I> vis) throws Exception {
 			return vis.visitPatternFilter(this);
 		}
@@ -122,6 +125,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter#accept(java.lang.Object)
 		 */
+		@Override
 		public void accept(I o) {
 			
 		}
@@ -130,10 +134,12 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#getType()
 		 */
+		@Override
 		public Class<I> getTarget() {
 			return owner;
 		}
 		
+		@Override
 		public String toString() {
 			return "SQLTypeFilter("+type.getField()+"="+target.getName()+")";
 		}
@@ -152,6 +158,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
         	this.res=res;
         	this.type=type;
         }
+		@Override
 		public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify) {
 			boolean seen=false;
 			sb.append(" ( ");
@@ -174,6 +181,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 
 		
 	
+		@Override
 		public List<PatternArgument> getParameters(List<PatternArgument> list) {
 			for( T val : set){
 				list.add(new PatternArg(res,type.getField(),val.getTag()));
@@ -183,21 +191,25 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 		 */
+		@Override
 		public <X> X acceptVisitor(FilterVisitor<X, I> vis) throws Exception {
 			return vis.visitPatternFilter(this);
 		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter#accept(java.lang.Object)
 		 */
+		@Override
 		public void accept(I o) {
 			
 		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#getType()
 		 */
+		@Override
 		public Class<I> getTarget() {
 			return owner;
 		}
+		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
 			sb.append("TypeSetSQLFilter(");
@@ -326,7 +338,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	 */
 	protected BasicType(String field) {
 		super();
-		values = new LinkedHashMap<String,T>();
+		values = new LinkedHashMap<>();
 		this.field = field;
 	}
 
@@ -380,10 +392,12 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	 * @param o
 	 * @return Value or null if invalid
 	 */
+	@Override
 	public final T find(String o) {
 		return  values.get(o);
 	}
 
+	@Override
 	public final FieldType<String> getFieldType(T def){
 		int len=1;
 		for( String tag : values.keySet()){
@@ -398,6 +412,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	 * 
 	 * @return String
 	 */
+	@Override
 	public final String getField() {
 		return field;
 	}
@@ -406,28 +421,31 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	
 
 	public final LinkedHashSet<T> getValues(T... val) {
-		LinkedHashSet<T> values = new LinkedHashSet<T>();
+		LinkedHashSet<T> values = new LinkedHashSet<>();
 		for(T i : val){
 			values.add(i);
 		}
 		return values;
 	}
 	
+	@Override
 	public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac, T val) {
 		if( val == null ){
 			return null;
 		}
-		return new SQLTypeFilter<T,I>(fac.getTarget(),this,fac.res, val);
+		return new SQLTypeFilter<>(fac.getTarget(),this,fac.res, val);
 	}
 	
 
 	
+	@Override
 	public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac,Set<T> val) {
-		return new TypeSetSQLFilter<T,I>(fac.getTarget(),this,fac.res, val);
+		return new TypeSetSQLFilter<>(fac.getTarget(),this,fac.res, val);
 	}
 	
+	@Override
 	public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac,T ... val) {
-		return new TypeSetSQLFilter<T,I>(fac.getTarget(),this,fac.res,getValues(val) );
+		return new TypeSetSQLFilter<>(fac.getTarget(),this,fac.res,getValues(val) );
 	}
 	/**
 	 * @param val
@@ -447,6 +465,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	 * @param val
 	 * @return SQLFilter
 	 */
+	@Override
 	public <I extends DataObject> SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,T val){
 		Set<T> s = getValues(new HashSet<T>());
 		s.remove(val);
@@ -459,44 +478,52 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	 * @param val
 	 * @return SQLFilter
 	 */
+	@Override
 	public <I extends DataObject> SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,T ... val){
 		return getFilter(fac,getExcludeValues(val));
 	}
 	
 
+	@Override
 	public <I extends DataObject>SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,Set<T> val){
 		Set<T> s = getValues(new HashSet<T>());
 		s.removeAll(val);
 		return getFilter(fac,s);
 	}
 	
+	@Override
 	public BasicTypeInput<T> getInput() {
-		BasicTypeInput<T> input = new BasicTypeInput<T>(this);
+		BasicTypeInput<T> input = new BasicTypeInput<>(this);
 		input.setOptional(true);
 		return input;
 	}
 
-    public final String getIndex(T value){
+    @Override
+	public final String getIndex(T value){
     	if( ! values.containsValue(value)){
     		return null;
     	}
     	return value.getTag();
     }
+	@Override
 	public Iterator<T> getValues() {
 		return values.values().iterator();
 	}
 	public final Set<T> getValueSet(){
 		return getValues(new LinkedHashSet<T>());
 	}
+	@Override
 	public final <X extends Set<T>> X getValues(X set){
 		set.addAll(values.values());
 		return set;
 	}
 
+	@Override
 	public Class<T> getTarget() {
 		
 		return (Class<T>) Value.class;
 	}
+	@Override
 	public String toString(){
 		return getClass().getSimpleName()+"."+field;
 	}

@@ -31,9 +31,9 @@ public class RadioButtonInputTest extends WebappTestBase implements TestDataProv
 ListInputInterfaceTest<String, TestEnum, RadioButtonInput<String,TestEnum>, TestDataProvider<String,RadioButtonInput<String,TestEnum>>>,
 InputInterfaceTest<String, RadioButtonInput<String,TestEnum>, RadioButtonInputTest>{
 
-	public ListInputInterfaceTest<String, TestEnum, RadioButtonInput<String,TestEnum>, TestDataProvider<String,RadioButtonInput<String,TestEnum>>> list_test = new ListInputInterfaceTestImpl<String, TestEnum, RadioButtonInput<String,TestEnum>, TestDataProvider<String,RadioButtonInput<String,TestEnum>>>(this);
+	public ListInputInterfaceTest<String, TestEnum, RadioButtonInput<String,TestEnum>, TestDataProvider<String,RadioButtonInput<String,TestEnum>>> list_test = new ListInputInterfaceTestImpl<>(this);
 	
-	public InputInterfaceTest<String, RadioButtonInput<String,TestEnum>, RadioButtonInputTest> input_test = new InputInterfaceTestImpl<String, RadioButtonInput<String,TestEnum>, RadioButtonInputTest>(this);
+	public InputInterfaceTest<String, RadioButtonInput<String,TestEnum>, RadioButtonInputTest> input_test = new InputInterfaceTestImpl<>(this);
 
 
 	public RadioButtonInputTest() {
@@ -47,7 +47,7 @@ InputInterfaceTest<String, RadioButtonInput<String,TestEnum>, RadioButtonInputTe
 
 
 	public Set<String> getGoodData()  {
-		HashSet<String> res = new HashSet<String>();
+		HashSet<String> res = new HashSet<>();
 		res.add(TestEnum.CAT.name());
 		res.add(TestEnum.DOG.name());
 		res.add(TestEnum.HAMSTER.name());
@@ -55,7 +55,7 @@ InputInterfaceTest<String, RadioButtonInput<String,TestEnum>, RadioButtonInputTe
 	}
 
 	public Set<String> getBadData()  {
-		HashSet<String> res = new HashSet<String>();
+		HashSet<String> res = new HashSet<>();
 		res.add("Lion");
 		res.add("Tiger");
 		res.add("Bear");
@@ -63,7 +63,7 @@ InputInterfaceTest<String, RadioButtonInput<String,TestEnum>, RadioButtonInputTe
 	}
 
 	public RadioButtonInput<String,TestEnum> getInput() throws Exception {
-		return new RadioButtonInput<String,TestEnum>(new EnumInput<TestEnum>(TestEnum.class));
+		return new RadioButtonInput<>(new EnumInput<>(TestEnum.class));
 	}
 
 	@Override

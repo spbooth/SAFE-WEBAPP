@@ -36,15 +36,17 @@ public abstract class GeneralMapMapper<K,R> extends SQLGroupMapper<Map<K,R>>  im
 	public GeneralMapMapper(AppContext c){
 		super(c);
 	}
+	@Override
 	public Map<K,R> makeDefault() {
-		return new HashMap<K,R>();
+		return new HashMap<>();
 	}
 
 	
+	@Override
 	public Map<K,R> makeObject(ResultSet rs) throws DataException, SQLException {
 
 
-		Map<K,R> m = new HashMap<K,R>();
+		Map<K,R> m = new HashMap<>();
 		//Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
 		try{
 			do{

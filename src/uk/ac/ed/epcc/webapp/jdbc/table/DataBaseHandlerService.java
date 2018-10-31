@@ -89,7 +89,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 	public Set<String> getTables() throws DataException{
 		DatabaseService service = conn.getService(DatabaseService.class);
     	try{
-    	Set<String> result = new HashSet<String>();
+    	Set<String> result = new HashSet<>();
     	
 		Connection c = service.getSQLContext().getConnection();
     	DatabaseMetaData md = c.getMetaData();
@@ -123,7 +123,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 			if( c == null){
 				return;
 			}
-			LinkedList<Object> args = new LinkedList<Object>();	
+			LinkedList<Object> args = new LinkedList<>();	
 			 
 			text = createTableText(name, s, c, args);
     		// This is overly noisy in junit tests
@@ -227,7 +227,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     		
 			SQLContext c = service.getSQLContext();
 			
-			 LinkedList<Object> args = new LinkedList<Object>();	
+			 LinkedList<Object> args = new LinkedList<>();	
 			 
 			 	String text = alterTableText(res, s, c, args);
     		// This is overly noisy in junit tests

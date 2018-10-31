@@ -595,7 +595,7 @@ public class MockDirContext  implements DirContext {
 	@Override
 	public NamingEnumeration<SearchResult> search(Name name, String filter,
 			SearchControls cons) throws NamingException {
-		HashSet<SearchResult> res = new HashSet<SearchResult>();
+		HashSet<SearchResult> res = new HashSet<>();
 		
 		String target_name = "uid=testuser,ou=users,dc=fortissimo-openstack,dc=localnet";
 		if( principal.equals(target_name) && password.equals("testpassword")){

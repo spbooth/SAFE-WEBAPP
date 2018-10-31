@@ -50,6 +50,7 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
     public NullListInput(ListInput<Integer,T> input){
     	internal = input;
     }
+	@Override
 	public Object getItembyValue(Integer value) {
 		if( value == null ){
 			return null;
@@ -60,18 +61,21 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		return internal.getItembyValue(value);
 	}
 
+	@Override
 	public Iterator<Object> getItems() {
-		LinkedList<Object> list = new LinkedList<Object>();
+		LinkedList<Object> list = new LinkedList<>();
 		list.add(NULLTAG);
 		for(Iterator<T> it = internal.getItems(); it.hasNext();){
 			list.add(it.next());
 		}
 		return list.iterator();
 	}
+	@Override
 	public int getCount(){
 		return internal.getCount();
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public String getTagByItem(Object item) {
 		if( item == null ){
@@ -83,6 +87,7 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		return internal.getTagByItem((T)item);
 	}
 
+	@Override
 	public String getTagByValue(Integer value) {
 		if( value == null ){
 			return null;
@@ -90,6 +95,7 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		return value.toString();
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public String getText(Object item) {
 		if( item==NULLTAG){
@@ -97,12 +103,14 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		}
 		return internal.getText((T)item);
 	}
+	@Override
 	public String getPrettyString(Integer value) {
 		if( value.intValue() == NULL_VALUE){
 			return NULLTAG;
 		}
 		return internal.getPrettyString(value);
 	}
+	@Override
 	public Object getItem() {
 		Integer value = internal.getValue();
 		if( value == null ){
@@ -114,6 +122,7 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		return internal.getItembyValue(value);
 	}
 
+	@Override
 	public void setItem(Object item) {
 		if( item == null ){
 			setValue(null);
@@ -125,9 +134,11 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		}
 		setValue(((Indexed)item).getID());
 	}
+	@Override
 	public Integer setValue(Integer v) throws TypeError {
 			return internal.setValue(v);		
 	}
+	@Override
 	public  SQLFilter getSQLFilter(Class clazz,Repository res, String target,
 			Object form_value) {
 		if( form_value == null ){
@@ -139,12 +150,15 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		}
 	    return new 	SQLValueFilter(clazz,res,target,i);
 	}
+	@Override
 	public Integer convert(Object v) throws TypeError {
 		return internal.convert(v);
 	}
+	@Override
 	public String getKey() {
 		return internal.getKey();
 	}
+	@Override
 	public String getString(Integer value) {
 		if( value == null ){
 			return "";
@@ -154,20 +168,24 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		}
 		return internal.getString(value);
 	}
+	@Override
 	public Integer getValue() {
 		Integer i = internal.getValue();
 	    return i;
 	}
+	@Override
 	public void setKey(String key) {
 		internal.setKey(key);
 		
 	}
+	@Override
 	public void validate() throws FieldException {
 		if( internal.getValue() == null || internal.getValue() == NULL_VALUE){
 			return;
 		}
 		internal.validate();
 	}
+	@Override
 	public String getString() {
 	    if( internal.getValue() == NULL_VALUE){
 	    	return NULLTAG;
@@ -181,6 +199,7 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 	    	return internal.getValue().toString();
 	    }
 	}
+	@Override
 	public void parse(String v) throws ParseException {
 		if( v == NULLTAG){
 			internal.setValue(NULL_VALUE);
@@ -195,12 +214,15 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		}
 		
 	}
+	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitListInput(this);
 	}
+	@Override
 	public boolean isOptional() {
 		return optional;
 	}
+	@Override
 	public void setOptional(boolean opt) {
 		optional=opt;
 	}

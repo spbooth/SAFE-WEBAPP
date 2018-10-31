@@ -83,8 +83,8 @@ public class HTMLForm extends BaseHTMLForm {
 	 * @return HtmlPrinter form fragment
 	 */
 	public <X extends HtmlBuilder> X getHtmlFieldTable(X result){
-		Collection<String> missing = new HashSet<String>();
-		Map<String,String> errors = new HashMap<String,String>();
+		Collection<String> missing = new HashSet<>();
+		Map<String,String> errors = new HashMap<>();
 		validate(missing, errors);
 		result.setMissingFields(missing);
 		result.setErrors(errors);
@@ -137,7 +137,7 @@ public class HTMLForm extends BaseHTMLForm {
 		if( serv != null){
 			params = serv.getParams();
 		}else{
-			params = new HashMap<String,Object>();
+			params = new HashMap<>();
 		}
 		return getHtmlFieldTable(result,missing_fields, errors, params);
 	}
@@ -264,7 +264,7 @@ public class HTMLForm extends BaseHTMLForm {
 			errors = (Map<String,String>) request.getAttribute(ERRORS_TAG);
 		}
 		if (errors == null) {
-			errors = new HashMap<String,String>();
+			errors = new HashMap<>();
 			if( request != null ){
 			request.setAttribute(ERRORS_TAG, errors);
 			}
@@ -285,7 +285,7 @@ public class HTMLForm extends BaseHTMLForm {
 			missing_fields = (Collection) request.getAttribute(MISSING_FIELDS_TAG);
 		}
 		if (missing_fields == null) {
-			missing_fields = new HashSet<String>();
+			missing_fields = new HashSet<>();
 			if( request != null){
 			  request.setAttribute(MISSING_FIELDS_TAG, missing_fields);
 			}

@@ -33,7 +33,7 @@ import uk.ac.ed.epcc.webapp.config.ConfigService;
 @PreRequisiteService(ConfigService.class)
 public class MessageBundleService extends AbstractContexed implements AppContextService<MessageBundleService> {
 	private static ListControl control = new ListControl();
-	private Map<String,ResourceBundle> bundle_map=new HashMap<String, ResourceBundle>();
+	private Map<String,ResourceBundle> bundle_map=new HashMap<>();
 	public MessageBundleService(AppContext c){
 		super(c);
 	}
@@ -57,6 +57,7 @@ public class MessageBundleService extends AbstractContexed implements AppContext
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.AppContextService#cleanup()
 	 */
+	@Override
 	public void cleanup() {
 		
 	}
@@ -64,6 +65,7 @@ public class MessageBundleService extends AbstractContexed implements AppContext
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.AppContextService#getType()
 	 */
+	@Override
 	public Class<? super MessageBundleService> getType() {
 		return MessageBundleService.class;
 	}

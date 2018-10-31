@@ -77,7 +77,7 @@ public class CrossCookieComposite extends Composite<WtmpManager.Wtmp,CrossCookie
 		int pos = fulldata.indexOf("-");
 		// Important to check length to not match blank data wtmp.
 		if( pos < 1 || (fulldata.length()-(pos+1)) != DATA_LEN || ! res.hasField(COOKIE_DATA_FIELD)){
-			return new FalseFilter<WtmpManager.Wtmp>(target);
+			return new FalseFilter<>(target);
 		}
 		AndFilter fil = new AndFilter<>(target);
 		Integer id = Integer.parseInt(fulldata.substring(0, pos));

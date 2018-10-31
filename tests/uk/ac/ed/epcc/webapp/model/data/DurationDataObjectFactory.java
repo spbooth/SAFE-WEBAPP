@@ -49,7 +49,7 @@ public class DurationDataObjectFactory extends DataObjectFactory<DurationDataObj
 	protected TableSpecification getDefaultTableSpecification(AppContext c,
 			String table) {
 		TableSpecification spec = new TableSpecification("DurationID");
-		spec.setField(DURATION, new NumberFieldType<Duration>(Duration.class, true, null));
+		spec.setField(DURATION, new NumberFieldType<>(Duration.class, true, null));
 		return spec;
 	}
 

@@ -69,14 +69,14 @@ public class NumberTableTest extends WebappTestBase {
 	@Test
 	public void testCaseExpr() throws DataException {
 		NumberTableFactory fac = new NumberTableFactory(getContext());
-		Clause<NumberTable, Double> clause1 = new CaseExpression.Clause<NumberTable,Double>(
+		Clause<NumberTable, Double> clause1 = new CaseExpression.Clause<>(
 				SQLExpressionMatchFilter.getFilter(fac.getTarget(),fac.getNumber1Expr(),MatchCondition.LT,fac.getNumber2Expr()),
 				fac.getNumber2Expr());
-		Clause<NumberTable, Double> clause2 = new CaseExpression.Clause<NumberTable,Double>(
+		Clause<NumberTable, Double> clause2 = new CaseExpression.Clause<>(
 				SQLExpressionMatchFilter.getFilter(fac.getTarget(),fac.getNumber1Expr(),MatchCondition.GT,fac.getNumber2Expr()),
 				fac.getNumber1Expr());
 		CaseExpression< NumberTable,Double> expr = 
-				new CaseExpression< NumberTable,Double>(Double.class, 
+				new CaseExpression<>(Double.class, 
 						fac.getNumber3Expr(), 
 						clause1,
 						clause2
@@ -103,14 +103,14 @@ public class NumberTableTest extends WebappTestBase {
 	@Test
 	public void testCaseExprFilter() throws DataException {
 		NumberTableFactory fac = new NumberTableFactory(getContext());
-		Clause<NumberTable, Double> clause1 = new CaseExpression.Clause<NumberTable,Double>(
+		Clause<NumberTable, Double> clause1 = new CaseExpression.Clause<>(
 				SQLExpressionMatchFilter.getFilter(fac.getTarget(),fac.getNumber1Expr(),MatchCondition.LT,fac.getNumber2Expr()),
 				fac.getNumber2Expr());
-		Clause<NumberTable, Double> clause2 = new CaseExpression.Clause<NumberTable,Double>(
+		Clause<NumberTable, Double> clause2 = new CaseExpression.Clause<>(
 				SQLExpressionMatchFilter.getFilter(fac.getTarget(),fac.getNumber1Expr(),MatchCondition.GT,fac.getNumber2Expr()),
 				fac.getNumber1Expr());
 		CaseExpression< NumberTable,Double> expr = 
-				new CaseExpression< NumberTable,Double>(Double.class, 
+				new CaseExpression<>(Double.class, 
 						fac.getNumber3Expr(), 
 						clause1,
 						clause2
@@ -138,14 +138,14 @@ public class NumberTableTest extends WebappTestBase {
 	@Test
 	public void testCaseExprNullFilter() throws DataException {
 		NumberTableFactory fac = new NumberTableFactory(getContext());
-		Clause<NumberTable, Double> clause1 = new CaseExpression.Clause<NumberTable,Double>(
+		Clause<NumberTable, Double> clause1 = new CaseExpression.Clause<>(
 				SQLExpressionMatchFilter.getFilter(fac.getTarget(),fac.getNumber1Expr(),MatchCondition.LT,fac.getNumber2Expr()),
 				fac.getNumber2Expr());
-		Clause<NumberTable, Double> clause2 = new CaseExpression.Clause<NumberTable,Double>(
+		Clause<NumberTable, Double> clause2 = new CaseExpression.Clause<>(
 				SQLExpressionMatchFilter.getFilter(fac.getTarget(),fac.getNumber1Expr(),MatchCondition.GT,fac.getNumber2Expr()),
 				fac.getNumber1Expr());
 		CaseExpression< NumberTable,Double> expr = 
-				new CaseExpression< NumberTable,Double>(Double.class, 
+				new CaseExpression<>(Double.class, 
 						fac.getNumber3Expr(), 
 						clause1,
 						clause2

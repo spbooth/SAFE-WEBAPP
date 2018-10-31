@@ -18,7 +18,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -126,14 +125,14 @@ public class SessionDataProducer implements SettableServeDataProducer {
 			Object attribute = stream.toByteArray();
 			if( SOFT_REFERENCE_FEATURE.isEnabled(conn)){
 				int max_len = conn.getIntegerParameter("SessionDataProducer.max_serialise",0);
-				SerialisableSoftReference<byte[]> ref = new SerialisableSoftReference<byte[]>((byte[])attribute);
+				SerialisableSoftReference<byte[]> ref = new SerialisableSoftReference<>((byte[])attribute);
 				if( max_len > 0 && data.getLength() > max_len){
 					ref.setForceNullOnSerialise(true);
 				}
 				attribute = ref;
 			}
 			session_service.setAttribute(getTag()+_DATA+next, attribute);
-			LinkedList<String> res = new LinkedList<String>();
+			LinkedList<String> res = new LinkedList<>();
 			res.addFirst(Integer.toString(next));
 			return res;
 		} catch (Exception e) {

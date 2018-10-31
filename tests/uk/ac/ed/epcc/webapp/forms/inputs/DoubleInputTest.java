@@ -29,27 +29,31 @@ public class DoubleInputTest extends NumberInputTestCase<Double,DoubleInput> {
 	public void dummy(){
 		
 	}
+	@Override
 	public Set<Double> getGoodData() {
-		HashSet<Double> good = new HashSet<Double>();
+		HashSet<Double> good = new HashSet<>();
 		good.add(12.0);
 		good.add(14.0);
 		return good;
 	}
 
 
+	@Override
 	public DoubleInput getInput() {
 		return new DoubleInput();
 	}
 
 
+	@Override
 	public Set<Double> getBadData() {
-		return new HashSet<Double>();
+		return new HashSet<>();
 	}
 	
 
 
+	@Override
 	public Set<String> getBadParseData() {
-        HashSet<String> res = new HashSet<String>();
+        HashSet<String> res = new HashSet<>();
 		res.add("fred");
 		res.add("14.5.6");
 		res.add("82wombat");
@@ -58,8 +62,9 @@ public class DoubleInputTest extends NumberInputTestCase<Double,DoubleInput> {
 	}
 
 
+	@Override
 	public Set<String> getGoodParseData() {
-		HashSet<String> res = new HashSet<String>();
+		HashSet<String> res = new HashSet<>();
 		res.add("12.8");
 		res.add("0.0");
 		res.add("0");

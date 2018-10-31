@@ -50,6 +50,7 @@ public class ListInputInterfaceTestImpl<T,D,I extends Input<T>&ListInput<T,D> , 
 		this.target=target;
 	}
 	
+	@Override
 	public void testGetItembyValue() throws Exception {
 		ListInput<T, D> input = getInput();
 		if( input == null) return;
@@ -82,8 +83,9 @@ public class ListInputInterfaceTestImpl<T,D,I extends Input<T>&ListInput<T,D> , 
 		return null;
 	}
 	
+	@Override
 	public void testGetItems() throws Exception {
-		Set<D> s = new HashSet<D>();
+		Set<D> s = new HashSet<>();
 		ListInput<T, D> input = getInput();
 		if( input == null) return;
 		for(Iterator<D> it = input.getItems(); it.hasNext();){
@@ -118,6 +120,7 @@ public class ListInputInterfaceTestImpl<T,D,I extends Input<T>&ListInput<T,D> , 
 		
 	}
 
+	@Override
 	public void testGetTagByItem() throws Exception {
 		ListInput<T, D> input = getInput();
 		if( input == null) return;
@@ -133,10 +136,11 @@ public class ListInputInterfaceTestImpl<T,D,I extends Input<T>&ListInput<T,D> , 
 		
 	}
 	
+	@Override
 	public void testGetTagByValue() throws Exception {
 		ListInput<T, D> input = getInput();
 		if( input == null) return;
-		Set<String> s = new HashSet<String>();
+		Set<String> s = new HashSet<>();
 		for(Iterator<D> it = input.getItems(); it.hasNext();){
 			D item = it.next();
 			assertNotNull(item);
@@ -152,10 +156,11 @@ public class ListInputInterfaceTestImpl<T,D,I extends Input<T>&ListInput<T,D> , 
 		
 	}
 	
+	@Override
 	public void testGetText() throws Exception {
 		ListInput<T, D> input = getInput();
 		if( input == null) return;
-		Set<String> s = new HashSet<String>();
+		Set<String> s = new HashSet<>();
 		for(Iterator<D> it = input.getItems(); it.hasNext();){
 			D item = it.next();
 			assertNotNull(item);

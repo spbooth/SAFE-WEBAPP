@@ -28,7 +28,7 @@ public abstract class MultiInputTestBase<T,V extends Input,I extends MultiInput<
 InputInterfaceTest<T, I, MultiInputTestBase<T, V, I>>{
 
 	
-	public InputInterfaceTest<T, I, MultiInputTestBase<T, V, I>> input_test = new InputInterfaceTestImpl<T, I, MultiInputTestBase<T,V,I>>(this);
+	public InputInterfaceTest<T, I, MultiInputTestBase<T, V, I>> input_test = new InputInterfaceTestImpl<>(this);
 	@Test
 	public void dummy(){
 		

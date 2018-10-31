@@ -52,7 +52,7 @@ public abstract class RemoteSQLValue<H extends DataObject,R extends DataObject, 
 		this.c=c;
 		this.a=a;
 		if( CACHE_REMOTE_ACCESSOR_FEATURE.isEnabled(c)){
-			cache = new HashMap<IndexedReference<R>,T>();
+			cache = new HashMap<>();
 		}
 	}
 	
@@ -102,6 +102,7 @@ public abstract class RemoteSQLValue<H extends DataObject,R extends DataObject, 
 		return c.getService(LoggerService.class).getLogger(getClass());
 	}
 	
+	@Override
 	public final T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		//Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
 		IndexedReference<R> ref = a.makeObject(rs, pos);
@@ -109,14 +110,17 @@ public abstract class RemoteSQLValue<H extends DataObject,R extends DataObject, 
 		//log.debug("RemoteAccessor on "+ref.toString()+" generates "+res+" class "+res.getClass());
 		return res;
 	}
+	@Override
 	public int add(StringBuilder sb, boolean qualify) {
 		return a.add(sb,qualify);
 		
 	}
+	@Override
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
 		return a.getParameters(list);
 	}
 	
+	@Override
 	public SQLFilter getRequiredFilter() {
 
 		return a.getRequiredFilter();

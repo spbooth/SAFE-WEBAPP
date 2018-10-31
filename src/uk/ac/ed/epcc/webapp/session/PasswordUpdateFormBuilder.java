@@ -143,7 +143,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 		@Override
 		public void validate(Form f) throws ValidateException {
 		   String data = (String) f.get(NEW_PASSWORD1);
-		   Set<Character> chars = new HashSet<Character>();
+		   Set<Character> chars = new HashSet<>();
 		   int neighbours=0;
 		   int specials=0;
 		   int numbers=0;

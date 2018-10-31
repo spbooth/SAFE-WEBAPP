@@ -58,7 +58,7 @@ public class BaseForm implements Form {
 
 	private LinkedHashMap<String,FormAction> actions;
     
-	protected Set<FormValidator> validators = new HashSet<FormValidator>();
+	protected Set<FormValidator> validators = new HashSet<>();
 
 	private String form_id="form";
 	
@@ -69,8 +69,8 @@ public class BaseForm implements Form {
 
 	
 	public BaseForm(AppContext c) {
-		fields = new LinkedHashMap<String,Field>();
-		actions = new LinkedHashMap<String,FormAction>();
+		fields = new LinkedHashMap<>();
+		actions = new LinkedHashMap<>();
 		
 		conn = c;
 		log = c.getService(LoggerService.class).getLogger(getClass());
@@ -84,6 +84,7 @@ public class BaseForm implements Form {
 	 * @param action
 	 *            FormAction
 	 */
+	@Override
 	public void addAction(String name, FormAction action) {
 		name=name.trim(); 
 		actions.put(name, action);
@@ -100,6 +101,7 @@ public class BaseForm implements Form {
 	 *            Input to add
 	 * @return Field object created
 	 */
+	@Override
 	public <I> Field addInput(String key, String label, Input<I> s) {
 		if( s == null ){
 			return null;
@@ -125,6 +127,7 @@ public class BaseForm implements Form {
 	 *            Input to add
 	 * @return Field object created
 	 */
+	@Override
 	public <I> Field addInput(String key, String label, String help,Input<I> s) {
 		Field f = addInput(key, label, s);
 		if( f != null) {
@@ -145,6 +148,7 @@ public class BaseForm implements Form {
 	 *            Class for the Input type to be testes
 	 * @return bioolean true if input exists
 	 */
+	@Override
 	public boolean containsInput(Class<? extends Input> c) {
 		for (Iterator it = fields.values().iterator(); it.hasNext();) {
 			Field<?> f = (Field) it.next();
@@ -165,6 +169,7 @@ public class BaseForm implements Form {
 	 * @throws FieldException
 	 * @throws ActionException
 	 */
+	@Override
 	public FormResult doAction(String name) throws FieldException, ActionException {
 		FormAction action = getAction(name);
 		if (action == null) {
@@ -175,6 +180,7 @@ public class BaseForm implements Form {
 		}
 		return action.action(this);
 	}
+	@Override
 	public FormAction getAction(String name){
 		if( name == null ){
 			return null;
@@ -187,6 +193,7 @@ public class BaseForm implements Form {
 	 * @param key
 	 * @return value
 	 */
+	@Override
 	public Object get(String key) {
 		Field f = getField(key);
 		if (f == null) {
@@ -195,6 +202,7 @@ public class BaseForm implements Form {
 		return f.getValue();
 	}
 
+	@Override
 	public Object getItem(String key){
 		Input sel = getInput(key);
 		if( sel == null ){
@@ -208,6 +216,7 @@ public class BaseForm implements Form {
 		}
 		return sel.getValue();
 	}
+	@Override
 	public Iterator<String> getActionNames() {
 		return actions.keySet().iterator();
 	}
@@ -228,6 +237,7 @@ public class BaseForm implements Form {
 	public int fieldCount(){
 		return fields.size();
 	}
+	@Override
 	public void setConfirm(String name, String conf){
 		FormAction action = actions.get(name);
 		if( action != null){
@@ -240,8 +250,9 @@ public class BaseForm implements Form {
 	 * 
 	 * @return Map
 	 */
+	@Override
 	public Map<String,Object> getContents() {
-		Map<String,Object> m = new HashMap<String,Object>();
+		Map<String,Object> m = new HashMap<>();
 		update(m);
 		return m;
 	}
@@ -251,6 +262,7 @@ public class BaseForm implements Form {
 	 * 
 	 * @return AppContext
 	 */
+	@Override
 	public AppContext getContext() {
 		return conn;
 	}
@@ -261,6 +273,7 @@ public class BaseForm implements Form {
 	 * @param key
 	 * @return Field
 	 */
+	@Override
 	public Field getField(String key) {
 		return  fields.get(key);
 	}
@@ -270,6 +283,7 @@ public class BaseForm implements Form {
 	 * 
 	 * @return Iterator
 	 */
+	@Override
 	public Iterator<String> getFieldIterator() {
 		return fields.keySet().iterator();
 	}
@@ -283,6 +297,7 @@ public class BaseForm implements Form {
 	 * @param key
 	 * @return the Input or null if Input does not exist
 	 */
+	@Override
 	public Input getInput(String key) {
 		Field f = getField(key);
 		if (f == null) {
@@ -297,7 +312,8 @@ public class BaseForm implements Form {
      * 
      * @return TAble
      */
-    @SuppressWarnings("unchecked")
+    @Override
+	@SuppressWarnings("unchecked")
 	public Table<String,String> getTable(){
     	Table t = new Table();
     	for (Iterator<String> it = getFieldIterator(); it.hasNext();) {
@@ -317,8 +333,9 @@ public class BaseForm implements Form {
 	 * 
 	 * @return the FormValidator
 	 */
+	@Override
 	public final  Set<FormValidator> getValidators() {
-		return new HashSet<FormValidator>(validators);
+		return new HashSet<>(validators);
 	}
 
 	/**
@@ -331,7 +348,7 @@ public class BaseForm implements Form {
 	 * @return Field
 	 */
 	protected <I> Field<I> makeField(String key, String label, Input<I> sel) {
-		return  new Field<I>(this,key, label, sel);
+		return  new Field<>(this,key, label, sel);
 	}
 
 	/**
@@ -356,6 +373,7 @@ public class BaseForm implements Form {
 	 * @param value
 	 * @return previous value
 	 */
+	@Override
 	public Object put(String key, Object value) {
 		Field<?> f = getField(key);
 		if (f == null) {
@@ -370,6 +388,7 @@ public class BaseForm implements Form {
 	 * 
 	 * @param key
 	 */
+	@Override
 	public void removeField(Object key) {
 		fields.remove(key);
 	}
@@ -381,6 +400,7 @@ public class BaseForm implements Form {
 	 * @param m
 	 *            Map of values
 	 */
+	@Override
 	public void setContents(Map<String,Object> m) {
 		// only insert valid keys
 		for (Iterator<String> it = getFieldIterator(); it.hasNext();) {
@@ -401,6 +421,7 @@ public class BaseForm implements Form {
 	 *            The FormValidator to set.
 	 * @return The previous FormValidator
 	 */
+	@Override
 	public final void addValidator(FormValidator v) {
 		if( v instanceof ModifyingFormValidator) {
 			((ModifyingFormValidator)v).register(this);
@@ -408,6 +429,7 @@ public class BaseForm implements Form {
 		validators.add(v);
 	}
 
+	@Override
 	public final void removeValidator(FormValidator v) {
 		validators.remove(v);
 	}
@@ -418,6 +440,7 @@ public class BaseForm implements Form {
 	 * @param m
 	 *            Map to update
 	 */
+	@Override
 	public void update(Map<String,Object> m) {
 		for (Iterator<String> it = getFieldIterator(); it.hasNext();) {
 			String key = it.next();
@@ -434,7 +457,8 @@ public class BaseForm implements Form {
 	 * @param m Map to compare to
 	 * @return String summary or null
 	 */
-    @SuppressWarnings("unchecked")
+    @Override
+	@SuppressWarnings("unchecked")
 	public String diff(Map<String,Object> m){
     	StringBuilder sb = new StringBuilder();
     	for(Iterator<String> it = getFieldIterator(); it.hasNext();){
@@ -493,6 +517,7 @@ public class BaseForm implements Form {
 	 * @return boolean true if valid
 	 * @throws ValidateException
 	 */
+	@Override
 	public final boolean validate()  {
 		//int missing = 0;
 				//int errors = 0;
@@ -529,6 +554,7 @@ public class BaseForm implements Form {
 	/* (non-Javadoc)
 	 * @see java.lang.Iterable#iterator()
 	 */
+	@Override
 	public Iterator<Field> iterator() {
 		return fields.values().iterator();
 	}

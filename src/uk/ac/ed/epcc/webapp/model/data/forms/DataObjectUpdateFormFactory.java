@@ -93,7 +93,6 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public final void buildUpdateForm(String type_name, Form f, BDO dat, SessionService<?> operator)
 			throws DataFault {
 			    buildForm(f);
@@ -102,7 +101,7 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 					contrib.customiseUpdateForm(f, dat, operator);
 				}
 				f.setContents(getDefaults());
-				f.addAction(UPDATE, new UpdateAction<BDO>(type_name,this, dat));
+				f.addAction(UPDATE, new UpdateAction<>(type_name,this, dat));
 				addRetireAction(type_name, f, dat, operator);
 				customiseUpdateForm(f, dat);
 				if( dat != null ){
@@ -127,6 +126,7 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 		}
 	}
 
+	@Override
 	public void postUpdate(BDO o, Form f, Map<String,Object> origs)
 			throws DataException {
 		compositesPostUpdate(o, f, origs);
@@ -144,6 +144,7 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 		}
 	}
 
+	@Override
 	public FormResult getResult(String typeName, BDO dat, Form f) {
 		Object thing = typeName;
 		if( dat instanceof UIGenerator || dat instanceof UIProvider || dat instanceof Identified) {

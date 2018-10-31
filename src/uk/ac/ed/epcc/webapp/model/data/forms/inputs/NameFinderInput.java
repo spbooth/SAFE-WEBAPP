@@ -88,7 +88,7 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	}
 	@Override
 	public Set<T> getSuggestions() {
-		LinkedHashSet<T> result = new LinkedHashSet<T>();
+		LinkedHashSet<T> result = new LinkedHashSet<>();
 		if( autocomplete != null){
 			try {
 				this.factory.getResult(autocomplete).toCollection(result);

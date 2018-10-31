@@ -44,7 +44,7 @@ public class NestAction<K,T> extends FormAction {
 	@Override
 	public ChainedTransitionResult action(Form f) throws ActionException {
 
-		return new ChainedTransitionResult<T, K>(provider, target, key);
+		return new ChainedTransitionResult<>(provider, target, key);
 	}
 
 	@Override

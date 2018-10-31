@@ -180,12 +180,14 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
         boolean qualify=true;
         final boolean join_left;
         final boolean join_right;
-        public boolean setQualify(boolean qualify) {
+        @Override
+		public boolean setQualify(boolean qualify) {
 			boolean old = this.qualify;
 			this.qualify = qualify;
 			return old;
 		}
-        public T makeObject(ResultSet rs) throws DataException {
+        @Override
+		public T makeObject(ResultSet rs) throws DataException {
         	LinkManager<T,L,R> lm = LinkManager.this;
         	T link = lm.makeObject(rs,true);
 
@@ -213,6 +215,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
         	return link;
 		}
     	
+		@Override
 		public String getTarget() {
 			StringBuilder target = new StringBuilder();
 			res.addAlias(target, true);
@@ -232,13 +235,16 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			}
 			return target.toString();
 		}
+		@Override
 		public String getModify() {
 			// force a defined order as we may be chunking
 			return OrderBy(true);
 		}
+		@Override
 		public T makeDefault() {
 			return null;
 		}
+		@Override
 		public SQLFilter getRequiredFilter() {
 			if( ! (join_left || join_right)){
 				return null;
@@ -246,7 +252,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			// Use JoinerFilters so that if additional joins are added explicitly
 			// The join clauses will be identical and not duplicated.
 			Class<T> target = LinkManager.this.getTarget();
-			SQLAndFilter<T> fil = new SQLAndFilter<T>(target);
+			SQLAndFilter<T> fil = new SQLAndFilter<>(target);
 			if( join_left ){
 				fil.addFilter(new JoinerFilter<L,T>(target, getLeftField(), res, getLeftFactory().res));
 			}
@@ -255,10 +261,12 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			}
 			return fil;
 		}
+		@Override
 		public List<PatternArgument> getTargetParameters(
 				List<PatternArgument> list) {
 			return list;
 		}
+		@Override
 		public List<PatternArgument> getModifyParameters(
 				List<PatternArgument> list) {
 			return list;
@@ -297,6 +305,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 				throw new DataFault("Error in setup",e);
 			}
 		}
+		@Override
 		public final void addSource(StringBuilder source) {
 			// Note the join tables are added as filters
 			res.addSource(source, true);	
@@ -349,7 +358,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 				addInput("left",  left_input);
 			} else {
 				// override the input
-				addInput("left",  new ConstantInput<Integer>(left.getIdentifier(),left.getID()));
+				addInput("left",  new ConstantInput<>(left.getIdentifier(),left.getID()));
 			}
 		}
 
@@ -365,10 +374,11 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 				addInput("right",  right_input);
 			} else {
 				// override the input
-				addInput("right",  new ConstantInput<Integer>(right.getIdentifier(),right.getID()));
+				addInput("right",  new ConstantInput<>(right.getIdentifier(),right.getID()));
 			}
 		}
 
+		@Override
 		public T getItem() {
 			Number num = getValue();
 			if (num == null) {
@@ -421,6 +431,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 
 		}
 
+		@Override
 		public void setItem(T l) {
 
 		
@@ -456,7 +467,8 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			}
 			throw new TypeError("Unknown type pased to LinkInput");
 		}
-        public Integer convert(Object v){
+        @Override
+		public Integer convert(Object v){
         	if( v == null || v instanceof Integer){
         		return (Integer) v;
         	}
@@ -730,7 +742,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @return SQLFilter on left peer
 	 */
 	public SQLFilter<L> getLeftFilter(SQLFilter<T> fil){
-		return new DestFilter<L>(fil, getLeftField(), getLeftFactory());
+		return new DestFilter<>(fil, getLeftField(), getLeftFactory());
 	}
 	/** Get a {@link SQLFilter} for the link from a {@link SQLFilter} on the left peer
 	 * 
@@ -738,7 +750,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @return SQLFilter on self
 	 */
 	public SQLFilter<T> getLeftJoinFilter(SQLFilter<L> fil){
-		return new RemoteFilter<L>(getLeftFactory(), getLeftField(), fil);
+		return new RemoteFilter<>(getLeftFactory(), getLeftField(), fil);
 	}
 	/** get a {@link BaseFilter} for the link from a {@link BaseFilter} on the left peer
 	 * 
@@ -766,7 +778,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @return SQLFilter on left peer
 	 */
 	public SQLFilter<R> getRightFilter(SQLFilter<T> fil){
-		return new DestFilter<R>(fil, getRightField(), getRightFactory());
+		return new DestFilter<>(fil, getRightField(), getRightFactory());
 	}
 	/** Get a {@link SQLFilter} for the link from a {@link SQLFilter} on the right peer
 	 * 
@@ -774,7 +786,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @return {@link SQLFilter} on self
 	 */
 	public SQLFilter<T> getRightJoinFilter(SQLFilter<R> fil){
-		return new RemoteFilter<R>(getRightFactory(), getRightField(), fil);
+		return new RemoteFilter<>(getRightFactory(), getRightField(), fil);
 	}
 	/** get a {@link BaseFilter} for the link from a {@link BaseFilter} on the right peer.
 	 * 
@@ -818,15 +830,17 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 
 	@Override
 	protected Map<String, Object> getSelectors() {
-		HashMap<String, Object> result = new HashMap<String, Object>();
+		HashMap<String, Object> result = new HashMap<>();
 		result.put(getLeftField(),new Selector() {
 
+			@Override
 			public Input getInput() {
 				return getLeftInput();
 			}
 		});
 		result.put(getRightField(),new Selector() {
 
+			@Override
 			public Input getInput() {
 				return getRightInput();
 			}

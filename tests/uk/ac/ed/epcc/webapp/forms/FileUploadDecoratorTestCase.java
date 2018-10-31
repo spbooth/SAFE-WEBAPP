@@ -36,8 +36,8 @@ TestParseDataProvider<String, FileUploadDecorator>,
 ParseInputInterfaceTest<String, FileUploadDecorator, FileUploadDecoratorTestCase>,
 ParseMapInputInterfaceTest<String, FileUploadDecorator, FileUploadDecoratorTestCase>{
 
-	ParseInputInterfaceTestImpl<String, FileUploadDecorator, FileUploadDecoratorTestCase> parse_impl = new ParseInputInterfaceTestImpl<String, FileUploadDecorator, FileUploadDecoratorTestCase>(this);
-	ParseMapInputInterfaceTestImpl<String, FileUploadDecorator, FileUploadDecoratorTestCase> map_imp = new ParseMapInputInterfaceTestImpl<String, FileUploadDecorator, FileUploadDecoratorTestCase>(this);
+	ParseInputInterfaceTestImpl<String, FileUploadDecorator, FileUploadDecoratorTestCase> parse_impl = new ParseInputInterfaceTestImpl<>(this);
+	ParseMapInputInterfaceTestImpl<String, FileUploadDecorator, FileUploadDecoratorTestCase> map_imp = new ParseMapInputInterfaceTestImpl<>(this);
 	/**
 	 * 
 	 */

@@ -39,7 +39,7 @@ public interface FilterVisitor<X,T> {
 	 */
 	public X visitPatternFilter(PatternFilter<T> fil) throws Exception;
 	/** process a {@link BaseSQLCombineFilter} this combines all of the sub-classes except
-	 * {@link AccceptFilter} and can be either AND or OR combinations. This only combines filters that also
+	 * {@link AcceptFilter} and can be either AND or OR combinations. This only combines filters that also
 	 * implement {@link SQLFilter}.
 	 * 
 	 * @param fil

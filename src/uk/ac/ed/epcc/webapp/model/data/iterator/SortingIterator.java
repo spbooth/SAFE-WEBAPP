@@ -37,21 +37,24 @@ public class SortingIterator<T> implements Iterator<T> {
 	Iterator<T> internal;
 
 	public SortingIterator(Iterator<T> i, Comparator<? super T> c) {
-		set = new TreeSet<T>(c);
+		set = new TreeSet<>(c);
 		while (i.hasNext()) {
 			set.add(i.next());
 		}
 		internal = set.iterator();
 	}
 
+	@Override
 	public boolean hasNext() {
 		return internal.hasNext();
 	}
 
+	@Override
 	public T next() {
 		return internal.next();
 	}
 
+	@Override
 	public void remove() {
 		throw new UnsupportedOperationException(
 				"SortingIterator does not support remove");

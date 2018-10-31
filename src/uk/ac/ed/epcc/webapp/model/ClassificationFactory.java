@@ -132,6 +132,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#findByName(java.lang.String)
 	 */
+	@Override
 	public T findFromString(String name){
 		if( name == null ){
 			return null;
@@ -147,13 +148,15 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	 * @param name
 	 * @return
 	 */
+	@Override
 	public SQLValueFilter<T> getStringFinderFilter(String name) {
-		return new SQLValueFilter<T>(getTarget(),res,Classification.NAME,name);
+		return new SQLValueFilter<>(getTarget(),res,Classification.NAME,name);
 	}
 	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#makeByName(java.lang.String)
 	 */
+	@Override
 	public T makeFromString(String name) throws DataFault{
 		if( name == null || name.isEmpty()){
 			return null;
@@ -204,10 +207,12 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		}
 
 		private final BaseFilter<T> fil;
+		@Override
 		public T getItembyValue(String value) {
 			return findFromString(value);
 		}
 
+		@Override
 		public Iterator<T> getItems() {
 			try {
 				return new FilterIterator(fil);
@@ -217,6 +222,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			}
 		}
 
+		@Override
 		public int getCount(){
 			try{
 				return (int) ClassificationFactory.this.getCount(fil);
@@ -226,6 +232,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			}
 		}
 
+		@Override
 		public String getTagByItem(T item) {
 			if( item == null ){
 				return null;
@@ -233,6 +240,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			return item.getName();
 		}
 
+		@Override
 		public String getText(T item) {
 			if( item == null){
 				return "No item";
@@ -303,7 +311,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			Map<String,Object> result = super.getSelectors();
 			// done here as only the create form can check that the name does not exist
 			// the update form has to rely on the sql update generating an error.
-			UnusedNameInput<T> input = new UnusedNameInput<T>(ClassificationFactory.this);
+			UnusedNameInput<T> input = new UnusedNameInput<>(ClassificationFactory.this);
 			input.setMaxResultLength(res.getInfo(Classification.NAME).getMax());
 			input.setNoSpaces(! allowSpacesInName());
 			result.put(Classification.NAME, input);
@@ -328,6 +336,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#getDataCache()
 	 */
+	@Override
 	public IndexedDataCache<String,T> getDataCache(){
 		return new IndexedDataCache<String, T>(getContext()){
 
@@ -339,13 +348,14 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			@SuppressWarnings("unchecked")
 			@Override
 			protected IndexedReference<T> getReference(T dat) {
-				return new IndexedReference<T>(dat.getID(),(Class<? extends IndexedProducer<T>>) ClassificationFactory.this.getClass(),getTag());
+				return new IndexedReference<>(dat.getID(),(Class<? extends IndexedProducer<T>>) ClassificationFactory.this.getClass(),getTag());
 			}
 
 			
 			
 		};
 	}
+	@Override
 	public int compareTo(ClassificationFactory o) {
 		return getTag().compareTo(o.getTag());
 	}
@@ -376,7 +386,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			// don't allow edits to the name
 			super.customiseUpdateForm(f, o);
 			if( allow_name_change){
-				UnusedNameInput<C> input = new UnusedNameInput<C>(getClassificationFactory(),o);
+				UnusedNameInput<C> input = new UnusedNameInput<>(getClassificationFactory(),o);
 				input.setNoSpaces(! getClassificationFactory().allowSpacesInName());
 				f.getField(Classification.NAME).setInput(input);
 			}else{
@@ -396,7 +406,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 					if( cf.useAutoCompleteInput(cf.getFinalSelectFilter())) {
 						return cf.getInput();
 					}
-					DataObjectAlternateInput<C, DataObjectItemParseInput<C>> input = new DataObjectAlternateInput<C, DataObjectItemParseInput<C>>();
+					DataObjectAlternateInput<C, DataObjectItemParseInput<C>> input = new DataObjectAlternateInput<>();
 					input.addInput("Menu", "Select ", super.getSelectInput());
 					input.addInput("Name", " or specify name ", cf.new NameItemInput());
 					return input;
@@ -414,16 +424,18 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	}
 	@Override
 	public FormUpdate<T> getFormUpdate(AppContext c) {
-		return new ClassificationUpdater<T>(this);
+		return new ClassificationUpdater<>(this);
 	}
 	
 	/** Get a String valued pull-down input for the classifiers
 	 * 
 	 * @return
 	 */
+	@Override
 	public final CodeListInput<T> getNameInput(){
 		return new ClassificationCodeListInput(getFinalSelectFilter());
 	}
+	@Override
 	public final CodeListInput<T> getNameInput(BaseFilter<T> fil){
 		return new ClassificationCodeListInput(fil);
 	}
@@ -431,7 +443,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	protected Map<String, String> getTranslations() {
 		Map<String,String> trans = super.getTranslations();
 		if( trans == null ){
-			trans =	new HashMap<String, String>();
+			trans =	new HashMap<>();
 		}
 		trans.put(Classification.SORT_ORDER, "Sort weighting");
 		return trans;
@@ -444,7 +456,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		return object.getName();
 	}
 	public final DataObjectItemInput<T> getAutocompleteInput(BaseFilter<T> fil,boolean create,boolean restrict){
-		NameFinderInput<T, ClassificationFactory<T>> input = new NameFinderInput<T,ClassificationFactory<T>>(this, create, restrict, fil);
+		NameFinderInput<T, ClassificationFactory<T>> input = new NameFinderInput<>(this, create, restrict, fil);
 		return input;
 	}
 	/* (non-Javadoc)

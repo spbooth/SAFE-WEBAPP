@@ -112,7 +112,7 @@ public abstract class AbstractRelationship<A extends AppUser,B extends DataObjec
 		return getLeftFilter(getTargetRoleFilter(target, role));
 	}
     public final BaseFilter<A> getUserFilter(BaseFilter<B> fil,String role) throws UnknownRelationshipException{
-    	AndFilter<L> and = new AndFilter<L>(getTarget());
+    	AndFilter<L> and = new AndFilter<>(getTarget());
     	and.addFilter(getFilterFromRole(role));
     	and.addFilter(getRightRemoteFilter(fil));
     	return getLeftFilter(and);
@@ -121,6 +121,7 @@ public abstract class AbstractRelationship<A extends AppUser,B extends DataObjec
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.safe.accounting.db.RelationshipProvider#getInput(java.lang.String, uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public final DataObjectItemInput<B> getInput(String role, SessionService user) {
 		return getRightFactory().getInput(hasRelationFilter(role,(A)user.getCurrentPerson()));
@@ -168,6 +169,7 @@ public abstract class AbstractRelationship<A extends AppUser,B extends DataObjec
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.safe.accounting.db.RelationshipProvider#hasRole(int, java.lang.String)
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public final boolean hasRole(SessionService sess,B target,String role){
 		return hasRole((A) sess.getCurrentPerson(),target ,role);
@@ -183,6 +185,7 @@ public abstract class AbstractRelationship<A extends AppUser,B extends DataObjec
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.safe.accounting.db.RelationshipProvider#hasRole(java.lang.String, uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public final boolean hasRole(String role, SessionService user) {
 		A u = (A) user.getCurrentPerson();
@@ -196,11 +199,13 @@ public abstract class AbstractRelationship<A extends AppUser,B extends DataObjec
 			return false;
 		}
 	}
+	@Override
 	public final boolean canCreate(SessionService c){
 		// link objects are created from the update form
 		return false;
 	}
 
+	@Override
 	public final DataObjectFactory<B> getTargetFactory() {
 		return getRightFactory();
 	}

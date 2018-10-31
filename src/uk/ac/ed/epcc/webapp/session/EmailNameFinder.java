@@ -121,14 +121,14 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 	@Override
 	public SQLFilter<AU> getStringFinderFilter(Class<? super AU> target,
 			String name) {
-		return new SQLValueFilter<AU>(getFactory().getTarget(), getRepository(), EMAIL, name);
+		return new SQLValueFilter<>(getFactory().getTarget(), getRepository(), EMAIL, name);
 	}
 
 
 
 	@Override
 	public void customiseForm(Form f) {
-		f.getField(EMAIL).addValidator(new ParseFactoryValidator<AU>(this, null));
+		f.getField(EMAIL).addValidator(new ParseFactoryValidator<>(this, null));
 	}
 
 
@@ -138,8 +138,8 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		
 		Field field = f.getField(EMAIL);
 		// Current target is allowed have to replace the default validator
-		field.removeValidator(new ParseFactoryValidator<AU>(this, null));
-		field.addValidator(new ParseFactoryValidator<AU>(this, target));
+		field.removeValidator(new ParseFactoryValidator<>(this, null));
+		field.addValidator(new ParseFactoryValidator<>(this, target));
 		if( target.getEmail() != null && ! operator.hasRole(SessionService.ADMIN_ROLE)){
 			// only admin can edit in update However allow if email is unset
 			// This could happen if a external auth person is auto created outside of
@@ -251,7 +251,7 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 	 */
 	@Override
 	public Map<AppUserKey, Transition<AppUser>> getTransitions(AppUserTransitionProvider provider) {
-		Map<AppUserKey, Transition<AppUser>> map = new LinkedHashMap<AppUserKey, Transition<AppUser>>();
+		Map<AppUserKey, Transition<AppUser>> map = new LinkedHashMap<>();
 		if(CHANGE_EMAIL_FEATURE.isEnabled(getContext())) {
 			map.put(CHANGE_EMAIL, (Transition<AppUser>) new ChangeEmailTransition());
 		}

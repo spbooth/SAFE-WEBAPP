@@ -54,7 +54,7 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 	private StringBuilder str = new StringBuilder();
 	Number n;
 	int depth=0; // depth levels
-	List<Integer> count = new LinkedList<Integer>();
+	List<Integer> count = new LinkedList<>();
 	
 	
 	public JsonBuilder(){
@@ -64,6 +64,7 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#getNested()
 	 */
+	@Override
 	public SimpleXMLBuilder getNested() throws UnsupportedOperationException {
 		throw new UnsupportedOperationException();
 	}
@@ -71,6 +72,7 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#appendParent()
 	 */
+	@Override
 	public SimpleXMLBuilder appendParent() throws UnsupportedOperationException {
 		throw new UnsupportedOperationException();
 	}
@@ -78,6 +80,7 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#getParent()
 	 */
+	@Override
 	public SimpleXMLBuilder getParent() {
 		return null;
 	}
@@ -95,6 +98,7 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#clean(java.lang.CharSequence)
 	 */
+	@Override
 	public SimpleXMLBuilder clean(CharSequence s) {
 		str.append(s);
 		return this;
@@ -103,6 +107,7 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#clean(char)
 	 */
+	@Override
 	public SimpleXMLBuilder clean(char c) {
 		str.append(c);
 		return this;
@@ -115,6 +120,7 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#clean(java.lang.Number)
 	 */
+	@Override
 	public SimpleXMLBuilder clean(Number i) {
 		if( hasContent() ){
 			// append text
@@ -147,6 +153,7 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#open(java.lang.String)
 	 */
+	@Override
 	public SimpleXMLBuilder open(String tag) {
 		int pos = count.get(depth);
 		if( pos == 0 ){
@@ -169,6 +176,7 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#open(java.lang.String, java.lang.String[][])
 	 */
+	@Override
 	public SimpleXMLBuilder open(String tag, String[][] a) {
 		open(tag);
 		for(int i=0; i< a.length ; i++){
@@ -180,6 +188,7 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#attr(java.lang.String, java.lang.CharSequence)
 	 */
+	@Override
 	public SimpleXMLBuilder attr(String name, CharSequence s) {
 		open("@"+name);
 		clean(s);
@@ -190,6 +199,7 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#close()
 	 */
+	@Override
 	public SimpleXMLBuilder close() {
 		//TODO complete
 		// if we have children
@@ -223,12 +233,14 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 		return this;
 	}
 
+	@Override
 	public String toString(){
 		return content.toString()+"\n"+CLOSE_OBJECT;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#setEscapeUnicode(boolean)
 	 */
+	@Override
 	public boolean setEscapeUnicode(boolean escape_unicode) {
 		// Not an option in JSON
 		return false;

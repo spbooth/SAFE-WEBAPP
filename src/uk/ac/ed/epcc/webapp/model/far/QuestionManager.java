@@ -175,7 +175,7 @@ public class QuestionManager extends HandlerPartManager<SectionManager.Section,Q
 	}
 	@Override
 	protected PartConfigFactory<Section, Question> makeConfigFactory() {
-		return new PartConfigFactory<SectionManager.Section, QuestionManager.Question>(this);
+		return new PartConfigFactory<>(this);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.far.PartManager#getChildTypeName()

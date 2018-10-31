@@ -41,7 +41,7 @@ public class XMLDomBuilder implements SimpleXMLBuilder {
     private XMLDomBuilder parent=null;
     public XMLDomBuilder(DocumentFragment fragment){
     	frag=fragment;
-    	stack = new Stack<Element>();
+    	stack = new Stack<>();
     }
     public void setNameSpace(String ns){
     	this.ns=ns;

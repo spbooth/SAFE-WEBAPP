@@ -296,9 +296,9 @@ public final class AppContext {
     }
     public Map<Object,Object> getAttributes(){
     	if( attributes == null ){
-    		return new HashMap<Object, Object>();
+    		return new HashMap<>();
     	}
-    	return new HashMap<Object, Object>(attributes);
+    	return new HashMap<>(attributes);
     }
     @SuppressWarnings("unchecked")
     /** get a Service requested by the Interface class of the service.
@@ -318,7 +318,7 @@ public final class AppContext {
     		return null;
     	}
     	if( missing_services == null ){
-    		missing_services=new HashSet<Class>();
+    		missing_services=new HashSet<>();
     	}
     	missing_services.add(clazz); // setService will undo this if found.
     	if( disable_service_creation ){
@@ -355,7 +355,7 @@ public final class AppContext {
      * @return Collection
      */
     public final Collection<AppContextService> getServices(){
-    	return new LinkedList<AppContextService>(services.values());
+    	return new LinkedList<>(services.values());
     }
 
     /** Internal method to make services. This does not obey the disable_Service_creation
@@ -402,7 +402,7 @@ public final class AppContext {
 				}
 				if( services == null || ! services.containsKey(req)){
 					if( missing_services == null ){
-						missing_services= new HashSet<Class>();
+						missing_services= new HashSet<>();
 					}
 					missing_services.add(req);
 					try{
@@ -430,7 +430,7 @@ public final class AppContext {
     	}
     	Class<? extends AppContextService> clazz = service.getType();
     	if(services == null){
-    		services=new LinkedHashMap<Class,AppContextService>();
+    		services=new LinkedHashMap<>();
     	}
     	try {
     		// even if we have already constructed the service we 
@@ -520,13 +520,13 @@ public final class AppContext {
      */
 	public final String getExpandedProperty(String name){
 		String text_to_expand = getInitParameter(name);
-		Map<String,String> values = new HashMap<String,String>();
+		Map<String,String> values = new HashMap<>();
 		values.put(name, "");
 		return expandText(values,text_to_expand);
 	}
 	public final String getExpandedProperty(String name,String def){
 		String text_to_expand = getInitParameter(name,def);
-		Map<String,String> values = new HashMap<String,String>();
+		Map<String,String> values = new HashMap<>();
 		values.put(name, "");
 		return expandText(values,text_to_expand);
 	}
@@ -642,12 +642,12 @@ public final class AppContext {
 		// Load the properties file if this has not already been done:
 		ConfigService service = getService(ConfigService.class);
 		if( service == null ){
-			return new Hashtable<String,String>();
+			return new Hashtable<>();
 		}
 		Properties service_props = service.getServiceProperties();
 	
 		// Map the service properties into a hashtable
-		Hashtable<String,String> h = new Hashtable<String,String>();
+		Hashtable<String,String> h = new Hashtable<>();
 		Enumeration e = service_props.propertyNames(); 
 		while (e.hasMoreElements()) {
 			String name = (String) e.nextElement();
@@ -1190,7 +1190,7 @@ public final class AppContext {
 	 */
 	public <T> Map<String,Class> getClassMap(Class<T> template){
 	
-		Map<String,Class> result = new TreeMap<String,Class>();
+		Map<String,Class> result = new TreeMap<>();
 		Map<String,String> tagmap = getInitParameters(CLASS_PREFIX);
 		for(String s : tagmap.keySet()){
 			
@@ -1341,7 +1341,7 @@ public final class AppContext {
 	 */
 	public final void setAttribute(Object key, Object value) {
 		if (attributes == null) {
-			attributes = new HashMap<Object,Object>();
+			attributes = new HashMap<>();
 		}
 		attributes.put(key, value);
 	}

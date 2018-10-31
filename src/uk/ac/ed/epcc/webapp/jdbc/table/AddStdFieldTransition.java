@@ -28,7 +28,7 @@ public class AddStdFieldTransition<T extends DataObjectFactory> extends AddField
 		TableSpecification spec = target.getTableSpecification();
 		if( spec != null) {
 			Repository res = getRepository(target);
-			f.addInput(FIELD_FORMFIELD, "Field to add", new OptionalFieldInput<FieldType>(res,true,  spec.getStdFields()));
+			f.addInput(FIELD_FORMFIELD, "Field to add", new OptionalFieldInput<>(res,true,  spec.getStdFields()));
 		}
 	}
 
