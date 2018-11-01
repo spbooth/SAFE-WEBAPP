@@ -1,0 +1,4 @@
+java:
+  stage: test
+  script:
+    - ant coverage
