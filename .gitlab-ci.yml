@@ -1,4 +1,6 @@
+image: unit-tests
+
 java:
   stage: test
   script:
-    - ant coverage
+    - $ANT_HOME/bin/ant junit 
