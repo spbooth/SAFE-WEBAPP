@@ -9,6 +9,6 @@ java:
     - ant
   artifacts:
     paths:
-      - webapp.jar
-      - webapp-test.jar
+      - lib/safe/webapp.jar
+      - tests/lib/webapp-test.jar
     expire_in: 1 week
