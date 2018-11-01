@@ -1,4 +1,5 @@
 java:
   stage: test
   script:
+    - export ANT_HOME=/opt/apache-ant-1.9.11/
     - ant junit 
