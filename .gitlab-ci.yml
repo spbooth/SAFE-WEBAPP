@@ -3,4 +3,5 @@ image: unit-tests
 java:
   stage: test
   script:
+    - export ANT_OPTS="-Xmx512m"
     - $ANT_HOME/bin/ant -Dtomcat.home=$CATALINA_HOME junit 
