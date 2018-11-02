@@ -28,4 +28,11 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
  */
 public interface DirectTargetlessTransition<X> extends Transition<X>{
 	public FormResult doTransition(AppContext c) throws TransitionException;
+	
+	@Override
+	default public FormResult getResult(TransitionVisitor<X> vis)
+			throws TransitionException {
+		return vis.doDirectTargetlessTransition(this);
+	}
+
 }

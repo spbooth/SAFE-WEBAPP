@@ -51,9 +51,12 @@ public abstract class SimpleTransitionProvider<T extends Indexed,K extends Trans
 	
     @Override
 	public final T getTarget(String id) {
-		return AbstractIndexedTransitionProvider.getIndexedTarget(getContext(),fac,id);
+		return AbstractIndexedTransitionProvider.getIndexedTarget(getContext(),fac,normaliseID(id));
 	}
 
+    public String normaliseID(String id) {
+    	return id;
+    }
 	@Override
 	public final String getTargetName(){
 		return target_name;

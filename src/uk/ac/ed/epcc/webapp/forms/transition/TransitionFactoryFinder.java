@@ -15,7 +15,6 @@ package uk.ac.ed.epcc.webapp.forms.transition;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 
 /** class that encodes the rules for locating a {@link TransitionFactory} from its 
  * {@link TransitionFactory#getTargetName()} tag,

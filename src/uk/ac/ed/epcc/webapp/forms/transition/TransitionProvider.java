@@ -44,4 +44,8 @@ public interface TransitionProvider<K,T> extends TransitionFactory<K, T>{
 	 */
 	public String getID(T target);
 	
+	@Override
+	default public <R> R accept(TransitionFactoryVisitor<R,T,K> vis) {
+		return vis.visitTransitionProvider(this);
+	}
 }

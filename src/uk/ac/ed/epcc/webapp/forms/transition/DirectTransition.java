@@ -27,4 +27,10 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
  */
 public interface DirectTransition<X> extends Transition<X>{
 	public FormResult doTransition(X target,AppContext c) throws TransitionException;
+	
+	@Override
+	default public FormResult getResult(TransitionVisitor<X> vis)
+			throws TransitionException {
+		return vis.doDirectTransition(this);
+	}
 }

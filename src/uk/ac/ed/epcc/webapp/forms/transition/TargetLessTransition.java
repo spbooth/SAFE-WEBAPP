@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.forms.transition;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 
 /** A transition that generates a Form to supply all input.
  * There is no implied target.
@@ -40,4 +41,10 @@ public interface TargetLessTransition<X> extends Transition<X> {
 	 * @throws TransitionException
 	 */
 	public void buildForm(Form f, AppContext c) throws TransitionException;
+	
+	@Override
+	default public FormResult getResult(TransitionVisitor<X> vis)
+			throws TransitionException {
+		return vis.doTargetLessTransition(this);
+	}
 }

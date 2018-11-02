@@ -16,6 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.transition;
 
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 
 /** A transition that requires a form to specify arguments
  * 
@@ -24,5 +26,9 @@ package uk.ac.ed.epcc.webapp.forms.transition;
  *
  */
 public  interface FormTransition<X> extends BaseFormTransition<X>{
-	
+	@Override
+	default public FormResult getResult(TransitionVisitor<X> vis)
+			throws TransitionException {
+		return vis.doFormTransition(this);
+	}
 }

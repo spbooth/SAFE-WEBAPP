@@ -48,4 +48,9 @@ public interface PathTransitionProvider<K,T> extends TransitionFactory<K, T>{
 	 */
 	public LinkedList<String> getID(T target);
 	
+	@Override
+	default public <R> R accept(TransitionFactoryVisitor<R, T, K> vis) {
+		return vis.visitPathTransitionProvider(this);
+	}
+	
 }

@@ -27,6 +27,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 public abstract class AbstractDirectTargetlessTransition<X> implements
 		DirectTargetlessTransition<X> {
 
+	@Override
 	public final FormResult getResult(TransitionVisitor<X> vis)
 			throws TransitionException {
 		return vis.doDirectTargetlessTransition(this);
