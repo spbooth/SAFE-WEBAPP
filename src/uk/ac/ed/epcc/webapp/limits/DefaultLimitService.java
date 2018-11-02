@@ -50,7 +50,7 @@ public class DefaultLimitService extends LimitService {
 		start=current_time.getCurrentTime();
 		max_millis=conn.getLongParameter("resource_limit.max_millis", 120000L); // 2 min
 		max_time= new Date(start.getTime()+max_millis);
-		max_mem_fraction=conn.getDoubleParam("resource_limit.max_memory_fraction", 0.5);
+		max_mem_fraction=conn.getDoubleParam("resource_limit.max_memory_fraction", 0.9);
 		LoggerService ls = conn.getService(LoggerService.class);
 		if( ls != null) {
 			log=ls.getLogger(getClass());

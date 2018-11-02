@@ -28,7 +28,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * <p>
  * The default selector will also be narrowed to the current view unless the parameter
  * <b>ServiceFilterComposite.<i>config-tag</i>.auto_narrow</b> is set to false. In which case the owning factory should have
- * an explicit relationship for setting the selector which can reference the named filters. Narrowing the seelctors to the current view is a sensible
+ * an explicit relationship for setting the selector which can reference the named filters. Narrowing the selectors to the current view is a sensible
  * default though we may want to put in exceptions for some users.
  * 
  * @author spb
