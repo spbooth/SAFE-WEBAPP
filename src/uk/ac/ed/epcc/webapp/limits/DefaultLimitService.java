@@ -31,7 +31,6 @@ public class DefaultLimitService extends LimitService {
 
 	private final Runtime rt;
 	private final long inital_available_memory;
-	private final long max_memory;
 	private final CurrentTimeService current_time;
 	private final Date start;
 	private final Date max_time;
@@ -45,7 +44,6 @@ public class DefaultLimitService extends LimitService {
 		super(conn);
 		rt=Runtime.getRuntime();
 		inital_available_memory=rt.maxMemory()-rt.totalMemory()+rt.freeMemory();
-		max_memory=rt.maxMemory();
 		current_time=conn.getService(CurrentTimeService.class);
 		start=current_time.getCurrentTime();
 		max_millis=conn.getLongParameter("resource_limit.max_millis", 120000L); // 2 min
