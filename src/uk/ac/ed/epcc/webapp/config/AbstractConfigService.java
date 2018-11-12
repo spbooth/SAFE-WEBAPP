@@ -57,11 +57,10 @@ public abstract class AbstractConfigService extends AbstractContexed implements 
 		for(String config_path : config_list.split(SPLIT_REGEX)){
 			
 			//log.debug("stream is "+service_props_stream);
-			try {
-				InputStream service_props_stream = serv.getResourceAsStream(config_path);
+			try(InputStream service_props_stream = serv.getResourceAsStream(config_path)) {
+			
 				if (service_props_stream != null) {
 					props.load(service_props_stream);
-					service_props_stream.close();
 					// mark this resource as loaded
 					props.setProperty(CONFIG_LOADED+config_path, "true");
 				} else {
@@ -113,12 +112,10 @@ public abstract class AbstractConfigService extends AbstractContexed implements 
 			if( name.startsWith(ADD_PROPERTIES)){
 				for(String file : props.getProperty(name).split(SPLIT_REGEX)){
 					if( null ==  props.getProperty(CONFIG_LOADED+file)){
-						try{
-							InputStream service_props_stream = serv.getResourceAsStream(file);
+						try(InputStream service_props_stream = serv.getResourceAsStream(file)){
 							if (service_props_stream != null) {
 								seen=true;
 								result.load(service_props_stream);
-								service_props_stream.close();
 								// mark this resource as loaded
 								result.setProperty(CONFIG_LOADED+file, "true");
 
