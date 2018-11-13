@@ -96,6 +96,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.Joiner;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
+import uk.ac.ed.epcc.webapp.model.data.filter.SelfReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.Updater;
@@ -242,6 +243,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			setMin(1);
 		}
 
+		@Override
 		public BDO getItem() {
             Number num = getValue();
             if (num == null) {
@@ -255,7 +257,8 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
             }
         }
 
-        public void setItem(BDO o) {
+        @Override
+		public void setItem(BDO o) {
             if (o == null) {
                 setValue(null);
             } else {
@@ -329,6 +332,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			allow_pre_select = DataObjectFactory.this.allowPreSelect();
 		}
 
+		@Override
 		public BDO getItembyValue(Integer id) {
 			if (id == null || id.intValue() <= 0) {
 				// could be optional
@@ -357,6 +361,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return res;
 		}
       
+		@Override
 		public int getCount(){
 			try {
 				return (int) DataObjectFactory.this.getCount(fil);
@@ -366,6 +371,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			}
 			
 		}
+		@Override
 		public Iterator<BDO> getItems() {
 			try {
 				return new FilterIterator(fil);
@@ -375,14 +381,17 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			}
 		}
   
+		@Override
 		public String getTagByItem(BDO item) {
 			return "" + item.getID();
 		}
 
+		@Override
 		public String getTagByValue(Integer id) {
 			return id.toString();
 		}
 
+		@Override
 		public String getText(BDO obj) {
 			if( obj == null ){
 				return null;
@@ -447,9 +456,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		public <R> R accept(InputVisitor<R> vis) throws Exception {
 			return vis.visitListInput(this);
 		}
+		@Override
 		public boolean allowPreSelect() {
 			return allow_pre_select;
 		}
+		@Override
 		public void setPreSelect(boolean value) {
 			allow_pre_select=value;
 			
@@ -491,6 +502,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			super(f);
 			comp = new Comparator<BDO>(){
 
+				@Override
 				public int compare(BDO o1, BDO o2) {
 					return o1.getIdentifier().compareTo(o2.getIdentifier());
 				}
@@ -522,10 +534,12 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     	public FilterAdapter(){
     	}
     	boolean qualify = false;
+		@Override
 		public BDO makeObject(ResultSet rs) throws DataException {
 				   return  DataObjectFactory.this.makeObject(rs,qualify);
 		}
 
+		@Override
 		public String getTarget() {
 			if( qualify ){ 
 				final StringBuilder sb = new StringBuilder();
@@ -541,32 +555,39 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			}
 		}
 
+		@Override
 		public String getModify() {
 			return null;
 		}
 
+		@Override
 		public BDO makeDefault() {
 			return null;
 		}
+		@Override
 		public boolean setQualify(boolean qualify) {
 			boolean old = this.qualify;
 			this.qualify = qualify;
 			return old;
 		}
 
+		@Override
 		public SQLFilter getRequiredFilter() {
 			return null;
 		}
 
+		@Override
 		public List<PatternArgument> getTargetParameters(
 				List<PatternArgument> list) {
 			return list;
 		}
 
+		@Override
 		public List<PatternArgument> getModifyParameters(
 				List<PatternArgument> list) {
 			return list;
 		}
+		@Override
 		public String toString() {
 			return "FilterAdapter [ factory="+DataObjectFactory.this.getClass().getSimpleName()+" tag="+DataObjectFactory.this.getTag()+"]";
 		}
@@ -589,6 +610,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     	public ReferencedAdapter(IndexedTypeProducer<I,? extends IndexedProducer<I>> ref){
     		this(ref.getField(),ref.getProducer());
     	}
+		@Override
 		public I makeObject(ResultSet rs) throws SQLException, DataException{
 					int ref = rs.getInt(1);
 					if( ref < 1 ){
@@ -598,6 +620,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				
 		}
 
+		@Override
 		public String getTarget() {
 			StringBuilder sb = new StringBuilder();
 			sb.append("DISTINCT(");
@@ -607,14 +630,17 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 
 
+		@Override
 		public I makeDefault() {
 			return null;
 		}
+		@Override
 		public boolean setQualify(boolean qualify) {
 			boolean old = this.qualify;
 			this.qualify = qualify;
 			return old;
 		}
+		@Override
 		public String getModify() {
 			// Use a defined order
 			StringBuilder sb = new StringBuilder();
@@ -622,13 +648,16 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			res.getInfo(field).addName(sb, qualify, true);
 			return sb.toString();
 		}
+		@Override
 		public SQLFilter getRequiredFilter() {
 			return null;
 		}
+		@Override
 		public List<PatternArgument> getTargetParameters(
 				List<PatternArgument> list) {
 			return list;
 		}
+		@Override
 		public List<PatternArgument> getModifyParameters(
 				List<PatternArgument> list) {
 			return list;
@@ -841,6 +870,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
         	this.max=max;
         }
 		
+		@Override
 		protected CloseableIterator<BDO> makeIterator() throws DataFault {
 			if( start < 0 ){
 				return new FilterIterator(f);
@@ -986,6 +1016,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
         	this.cond=cond;
         	this.point=point;
         }
+		@Override
 		public boolean accept(T d) {
 			Date t = d.record.getDateProperty(field);
 			switch(cond){
@@ -1122,18 +1153,30 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		composites=null;
 	}
 	
-    public FormCreator getFormCreator(AppContext c){
+    @Override
+	public FormCreator getFormCreator(AppContext c){
     	return new Creator<>(this);
     }
-    public FormUpdate<BDO> getFormUpdate(AppContext c){
+    @Override
+	public FormUpdate<BDO> getFormUpdate(AppContext c){
     	return new Updater<>(this);
     }
+    /** Make a filter from an integer reference
+     * @see SelfReferenceFilter
+     * @param id
+     * @return
+     */
+    public SQLFilter<BDO> getFindFilter(int id){
+    	return new SelfReferenceFilter<>(getTarget(), res, makeReference(id));
+    }
 
+	@Override
 	public boolean canUpdate(SessionService c) {
 		return true;
 	}
 
 
+	@Override
 	public boolean canCreate(SessionService c) {
 		return true;
 	}
@@ -1162,6 +1205,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @throws uk.ac.ed.epcc.webapp.jdbc.exception.DataException
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public  BDO find(int id)
 			throws uk.ac.ed.epcc.webapp.jdbc.exception.DataException {
@@ -1181,7 +1225,8 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * checks should still pass if the super-type method is retained. 
 	 * 
 	 */
-    public Class<BDO> getTarget(){
+    @Override
+	public Class<BDO> getTarget(){
     	return (Class) DataObject.class;
     }
 	/**
@@ -1195,6 +1240,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	public final BDO find(Integer id) {
 		return find((Number) id);
 	}
+	@Override
 	public final BDO find(Number id) {
 		if (id == null || id.intValue()==0) {
 			return null;
@@ -1209,6 +1255,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return null;
 		}
 	}
+	@Override
 	public Integer getIndex(BDO value) {
 		if( value == null ) {
 			return null;
@@ -1307,6 +1354,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	// Note this is used to implement FilterMatcher so
 	// we can't pass ourselves as the matcher arg
 	private final ConvertPureAcceptFilterVisitor<BDO> accept_converter = new ConvertPureAcceptFilterVisitor<>(null);
+	@Override
 	public final boolean matches(BaseFilter<? super BDO> fil, BDO o) {
 		if( fil == null || o == null){
 			return false;
@@ -1358,6 +1406,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 
 	
 
+	@Override
 	final public AppContext getContext() {
 		return conn;
 	}
@@ -1403,6 +1452,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * but <em>not</em> to restrict the parse values (default value of {@link #restrictDefaultInput()} so existing values that don't
 	 * match the select filter are still valid.
 	 */
+	@Override
 	public DataObjectItemInput<BDO> getInput() {
 		return getInput(getFinalSelectFilter(),restrictDefaultInput());
 	}
@@ -1496,15 +1546,18 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     		return new SQLOrderFilter<BDO>() {
 
 			
+				@Override
 				public List<OrderClause> OrderBy() {
 					return DataObjectFactory.this.getOrder();
 				}
 
+				@Override
 				public <X> X acceptVisitor(FilterVisitor<X, BDO> vis)
 						throws Exception {
 					return vis.visitOrderFilter(this);
 				}
 
+				@Override
 				public Class<BDO> getTarget() {
 					return DataObjectFactory.this.getTarget();
 				}
@@ -1608,6 +1661,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param obj
 	 * @return
 	 */
+	@Override
 	public String getID(BDO obj){
 		return Integer.toString(obj.getID());
 	}
@@ -1621,6 +1675,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 *  
 	 * @return String
 	 */
+	@Override
 	public final String getTag(){
 		if( res == null) {
 			return tag;
@@ -1683,6 +1738,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		return getTag().equals(o.getFactoryTag());
 	}
 
+	@Override
 	public final boolean isMine(Object ob) {
 		if (ob instanceof DataObject) {
 			return isMine((DataObject) ob);
@@ -1767,6 +1823,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		return o;
 	}
    
+	@Override
 	public IndexedReference<BDO> makeReference(BDO obj){
 		if( obj == null ){
 			return makeReference(0); // Null refs are allowed
@@ -1776,13 +1833,15 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
     	return makeReference(obj.getID());
     }
-	 @SuppressWarnings("unchecked")
+	 @Override
+	@SuppressWarnings("unchecked")
     public IndexedReference<BDO> makeReference(int id){
     	Class<? extends IndexedProducer<BDO>> c = (Class<? extends IndexedProducer<BDO>>) getClass();
     	IndexedReference<BDO> ref = new IndexedReference<>(id,c,getTag());
 		return ref;
     }
-    public boolean isMyReference(IndexedReference ref){
+    @Override
+	public boolean isMyReference(IndexedReference ref){
     	if( ref == null || ref.isNull()){
     		return false;
     	}
