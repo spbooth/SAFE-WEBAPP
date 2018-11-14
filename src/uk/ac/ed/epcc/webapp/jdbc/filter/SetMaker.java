@@ -21,7 +21,13 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-
+/**
+ * 
+ * @author Stephen Booth
+ *
+ * @param <F> type of filter
+ * @param <O> result type
+ */
 public abstract class SetMaker<F, O> extends FilterFinder<F, Set<O>> {
 
 	public SetMaker(AppContext c,Class<F> target) {
