@@ -19,7 +19,9 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
 /** A {@link SplitManager} where the {@link TimePeriod}s are arranged in
- * non-overlapping sequences.
+ * ordered sequences. By default these are non-overlapping sequences in time order.
+ * Optionally overlapps can be enabled on a sequence by sequence bases in which case the sequence order
+ * is roughly time ordered.
  * 
  * @author spb
  *
@@ -27,6 +29,14 @@ import uk.ac.ed.epcc.webapp.time.TimePeriod;
  */
 public interface SequenceManager<T extends TimePeriod> extends SplitManager<T>{
 
+	/** Does the record come from a sequence that disallows overlapping records
+	 * 
+	 * @param target
+	 * @return
+	 */
+	public default boolean noOverlapps(T target) {
+		return true;
+	}
 	/** Test to see if two periods can be merged.
 	 * Usually this means test if they are neighbouring periods from the same sequence.
 	 * @param first
@@ -43,13 +53,27 @@ public interface SequenceManager<T extends TimePeriod> extends SplitManager<T>{
 	 * @throws Exception
 	 */
 	public abstract T merge(T first, T second) throws Exception;
-	/** Get the next entry in the sequence
+	/** Get the next entry in the sequence.
 	 * 
 	 * @param current starting period
 	 * @param move_up direction of move
 	 * @return period or null
 	 */
 	public T getNextInSequence(T current, boolean move_up);
+	
+	
+	
+	/** Get the element from the sequence most likely to be merged with the
+	 * current record
+	 * 
+	 * @param current
+	 * @param move_up
+	 * @return Merge candidate
+	 */
+	default public T getMergeCandidate(T current, boolean move_up) {
+		// This is correct (but not necessarily most efficient) for non-overlapping sequences 
+		return getNextInSequence(current, move_up);
+	}
 	/** Additional validation checks
 	 * 
 	 * @param current

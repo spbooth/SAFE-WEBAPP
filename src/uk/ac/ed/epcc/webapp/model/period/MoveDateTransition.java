@@ -129,10 +129,13 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 			throws TransitionException {
 		Date def;
 		String label;
+		boolean move_split=false;
 		Date min_date=null;
 		Date max_date=null;
-		T next_seq = fac.getNextInSequence(target, !move_start);
-		boolean move_split=false;
+		T next_seq = null;
+		if( fac.noOverlapps(target)) {
+			next_seq = fac.getNextInSequence(target, !move_start);
+		}
 		if( move_start ){
 			def = target.getStart();
 			label="Start Date";
@@ -156,6 +159,7 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 				}
 			}
 		}
+		
 		BoundedDateInput input = fac.getDateInput();
 		input.setValue(def);
 		input.setMin(min_date);
