@@ -232,6 +232,26 @@ public class HtmlBuilderTestCase extends WebappTestBase {
 				"</table>\n",
 				hb.toString());
 	}
+	
+	@Test
+	public void testDeDupTableFormat() {
+		HtmlBuilder hb = new HtmlBuilder();
+		Table t = new Table();
+		t.put("col1", "row1", "A");
+		t.put("col2", "row1", "B");
+		t.put("col1", "row2", "A");
+		t.put("col2", "row2", "C");
+		DeDupTableXMLFormatter fmt = new DeDupTableXMLFormatter<>(hb, null);
+		fmt.add(t);
+		
+		Assert.assertEquals(
+				"<table class='auto' rows='2' cols='2'>\n" + 
+				"<tr count='0'><th class='first' count='0'>col1</th><th class='main' count='1'>col2</th></tr>\n" + 
+				"<tr count='1'><td class='first' count='0' rowspan='2'>A</td><td class='main' count='1'>B</td></tr>\n" + 
+				"<tr count='2'>		<td class='main' count='1'>C</td></tr>\n" + 
+				"</table>\n",
+				hb.toString());
+	}
 	/**
 	 * Tests the method {@link HtmlBuilder#addColumn(AppContext, Table, Object)}.
 	 */

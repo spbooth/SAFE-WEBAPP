@@ -131,16 +131,16 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 			hb.open("tbody");
 			hb.clean("\n");
 		}
+		
 		for (R row_key: t.getRows()) {
 			hb.open("tr", new String[][]{
-					{"count",Integer.toString(nrow++)}
+					{"count",Integer.toString(nrow)}
 					});
 			if (t.getWarning(row_key)) {
 				hb.attr("class","notice");
 			}else if (t.getHighlight(row_key)) {
 				hb.attr("class","highlight");	
 			}
-			boolean first_col = true;
 			int col=0;
 			if (t.printKeys()) {
 				hb.open(t.isPrintHeadings()?"td":"th", new String[][]{
@@ -149,50 +149,64 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 						});
 				addContent(t.getKeyText(row_key));
 				hb.close();
-				first_col = false;
 			}
 			int skip_col=0;
 			for (C key: t.getColumNames()) {
 				if( skip_col > 0) {
 					skip_col--;
+					col++;
 				}else {
-					if (first_col) {
-						hb.open("td",new String[][]{
-							{"class","first"},
-							{"count",Integer.toString(col++)}
-						});
-
-						first_col = false;
-					} else {
-						hb.open("td",new String[][]{
-							{"class","main"},
-							{"count",Integer.toString(col++)}
-						});
-					}
 					Object n = t.get(key, row_key);
+					String dc=null;
+					int cols=0;
+					
 					if( n instanceof MultiColumn && hb instanceof HtmlPrinter) {
-						int cols = ((MultiColumn) n).getColumns();
+						cols = ((MultiColumn) n).getColumns();
 						if( cols > 1 ) {
-							hb.attr("colspan", Integer.toString(cols));
+							
 							skip_col = cols-1;
 						}
-						String dc = ((MultiColumn) n).getDisplayClass();
-						if( dc != null ) {
-							((HtmlPrinter)hb).addClass(dc);
-						}
+						dc = ((MultiColumn) n).getDisplayClass();
+						
 					}
-					addCell(t,key,row_key, n);
-
-					hb.close();
+					addTd(t, row_key, nrow-1,col, key, n, dc, cols,1);
+					col++;
 				}
 			}
 			hb.close();
 			hb.clean("\n");
+			nrow++;
 		}
 		if( table_sections){
 			hb.close();
 			hb.clean("\n");
 		}
+	}
+	/**
+	 * @param t  Table
+	 * @param row_key  
+	 * @param col   
+	 * @param key
+	 * @param n
+	 * @param dc
+	 * @param cols
+	 */
+	protected void addTd(Table<C, R> t, R row_key, int row,int col, C key, Object n, String dc, int cols,int rows) {
+		hb.open("td",new String[][]{
+			{"class",col==0?"first":"main"},
+			{"count",Integer.toString(col)}
+		});
+		if( dc != null && hb instanceof HtmlPrinter) {
+			((HtmlPrinter)hb).addClass(dc);
+		}
+		if( cols >1) {
+			hb.attr("colspan", Integer.toString(cols));
+		}
+		if( rows > 1) {
+			hb.attr("rowspan", Integer.toString(rows));
+		}
+		addCell(t,key,row_key, n);
+		hb.close();
 	}
     
     /* (non-Javadoc)
