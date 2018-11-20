@@ -11,11 +11,11 @@
 <%--| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. |--%>
 <%--| See the License for the specific language governing permissions and      |--%>
 <%--| limitations under the License.                                           |--%>
-<!-- 
+<%-- 
 The core of a standard errorpage this is included by errorpage.jsp wrapped in application specific markup.
 This fragment does not require an AppContext. If an AppContext is generated to mark up the calling page
 then it should be explicilty closed as the errorpage does not run within the ErrorFilter
- -->
+ --%>
 <%@page isErrorPage="true" %>
 <%@page session="false" %>
 <%@page import="uk.ac.ed.epcc.webapp.content.HtmlBuilder"%>

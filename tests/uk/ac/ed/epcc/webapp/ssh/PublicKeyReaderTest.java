@@ -14,10 +14,13 @@
 package uk.ac.ed.epcc.webapp.ssh;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.security.PublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.junit.Test;
@@ -36,7 +39,7 @@ public class PublicKeyReaderTest {
 @Test
 public void testRoundTrip() throws PublicKeyParseException, IOException{
 	
-	Set<String> good = new HashSet<>();
+	Set<String> good = new LinkedHashSet<>();
 	// with and without newline breaks
 	good.add("ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQBRQkTnsRzUM9mLrgEMFk78CLdOxtepxPp1JQSfRc3/A1cy"+
 "D8NV/gxINRNhMIVkIofUexxtLfAfmNRf666SSei/w2kPX9ndOJ32y2OUUKkijJvEdeMEuFido9Kifc79"+
@@ -85,13 +88,34 @@ good.add("ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQBRQkTnsRzUM9mLrgEMFk78CLdOxtepxPp1JQ
 			" 5NwU1nApiGe/yRWr9qSGrQEJCUlGBX0BPwpyv4unwzU6KVWlhL5IvgQU6BocQfCw+xX74k1MlWDMTO8t"+
 			" nwnUbI9GgLJ74uNaT12mrlOptO+36yy4tvNLTiJn2KfzI1D+0FadNboYzI3H mcdn20@chpc-iztac");
 	
+	good.add("---- BEGIN SSH2 PUBLIC KEY ----\n"+
+			"Comment: \"comment goes here\"\n"+
+			"AAAAB3NzaC1yc2EAAAABJQAAAQEAlLhFLr/4LGC3cM1xgRZVxfQ7JgoSvnVXly0K\n"+
+			"7MNufZbUSUkKtVnBXAOIjtOYe7EPndyT/SAq1s9RGZ63qsaVc/05diLrgL0E0gW+\n"+
+			"9VptTmiUh7OSsXkoKQn1RiACfH7sbKi6H373bmB5/TyXNZ5C5KVmdXxO+laT8IdW\n"+
+			"7JdD/gwrBra9M9vAMfcxNYVCBcPQRhJ7vOeDZ+e30qapH4R/mfEyKorYxrvQerJW\n"+
+			"OeLKjOH4rSnAAOLcEqPmJhkLL8k6nQAAK3P/E1PeOaB2xD7NNPqfIsjhAJLZ+2wV\n"+
+			"3eUZATx9vnmVF0YafOjvzcoK2GqUrhNAvi7k0f+ihh8twkfthj==\n"+
+			"---- END SSH2 PUBLIC KEY ----");
+	good.add("ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAlLhFLr/4LGC3cM1xgRZVxfQ7JgoSvnVXly0K7MNufZbUSUkKtVnBXAOIjtOYe7EPndyT/SAq1s9RGZ63qsaVc/05diLrgL0E0gW+9VptTmiUh7OSsXkoKQn1RiACfH7sbKi6H373bmB5/TyXNZ5C5KVmdXxO+laT8IdW7JdD/gwrBra9M9vAMfcxNYVCBcPQRhJ7vOeDZ+e30qapH4R/mfEyKorYxrvQerJWOeLKjOH4rSnAAOLcEqPmJhkLL8k6nQAAK3P/E1PeOaB2xD7NNPqfIsjhAJLZ+2wV3eUZATx9vnmVF0YafOjvzcoK2GqUrhNAvi7k0f+ihh8twkfthg==");
+	good.add("ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAlLhFLr/4LGC3cM1xgRZVxfQ7JgoSvnVXly0K7MNufZbUSUkKtVnBXAOIjtOYe7EPndyT/SAq1s9RGZ63qsaVc/05diLrgL0E0gW+9VptTmiUh7OSsXkoKQn1RiACfH7sbKi6H373bmB5/TyXNZ5C5KVmdXxO+laT8IdW7JdD/gwrBra9M9vAMfcxNYVCBcPQRhJ7vOeDZ+e30qapH4R/mfEyKorYxrvQerJWOeLKjOH4rSnAAOLcEqPmJhkLL8k6nQAAK3P/E1PeOaB2xD7NNPqfIsjhAJLZ+2wV3eUZATx9vnmVF0YafOjvzcoK2GqUrhNAvi7k0f+ihh8twkfthj==");
 for( String key_str : good){
 	
 
 	PublicKey key= PublicKeyReaderUtil.load(key_str);
     String normalised = PublicKeyReaderUtil.format(key);
     PublicKey key2 = PublicKeyReaderUtil.load(normalised);
+    System.out.println(key_str+"\n|\n|\nV\n"+normalised);
+    assertTrue(key.equals(key2));
     assertEquals(key,key2);
+    if( key instanceof RSAPublicKey) {
+    	RSAPublicKey rsa_key = (RSAPublicKey) key;
+    	RSAPublicKey rsa_key2 = (RSAPublicKey) key2;
+    	assertEquals(rsa_key.getModulus(), rsa_key2.getModulus());
+    	assertEquals(rsa_key.getPublicExponent(),rsa_key2.getPublicExponent());
+    	System.out.println(rsa_key.getModulus());
+    	System.out.println(rsa_key.getPublicExponent());
+    }
 }
 	
 	

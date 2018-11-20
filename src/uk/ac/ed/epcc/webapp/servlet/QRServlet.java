@@ -35,7 +35,8 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-/**
+/** Servlet to generate a QRCode
+ * This is not authenticated as it is used as 
  * @author Stephen Booth
  *
  */
@@ -50,6 +51,10 @@ public class QRServlet extends WebappServlet {
 			throws ServletException, IOException {
 		
 		String text=req.getParameter("text");
+		if( text == null || text.isEmpty()) {
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid argument");
+			return;
+		}
 		res.setContentType("image/png");
 		try {
 			ServletOutputStream out = res.getOutputStream();
