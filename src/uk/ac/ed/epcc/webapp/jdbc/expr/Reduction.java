@@ -41,7 +41,7 @@ public enum Reduction {
   MAX(Operator.MAX),
   INDEX(Operator.MERGE),
   SELECT(Operator.MERGE),
-  DISTINCT(Operator.MERGE);
+  DISTINCT(Operator.ADD);
   
   private final Operator op;
   private Reduction(Operator o){

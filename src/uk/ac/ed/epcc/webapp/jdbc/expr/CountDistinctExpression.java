@@ -28,12 +28,12 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  */
 
 public class CountDistinctExpression<T> implements SQLExpression<Integer> {
-	public CountDistinctExpression(SQLExpression<T> expr) {
+	public CountDistinctExpression(SQLValue<T> expr) {
 		super();
 		this.expr = expr;
 	}
 
-	private SQLExpression<T> expr;
+	private SQLValue<T> expr;
 
 	public int add(StringBuilder sb, boolean qualify) {
 		sb.append("COUNT(DISTINCT ");

@@ -168,12 +168,15 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 	    public final void addCount(String name){
 	    	addClause(FuncExpression.apply(getContext(),SQLFunc.COUNT,Number.class,null),name);
 	    }
-	    /** Add a column counting distinct values
+	    /** Add a column counting distinct values. 
+	     * 
+	     * We allow SQLValues so we can count references but we are counting the underlying values 
+	     * the count will be too high if multiple values are mapped to the same result
 	     * 
 	     * @param expr
 	     * @param name
 	     */
-	    public final <T> void addCount(SQLExpression<T> expr,String name){
+	    public final <T> void addCount(SQLValue<T> expr,String name){
 	    	addClause(new CountDistinctExpression<>(expr), name);
 	    }
 		@Override
