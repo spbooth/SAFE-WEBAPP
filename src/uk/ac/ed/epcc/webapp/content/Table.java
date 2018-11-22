@@ -1727,7 +1727,7 @@ public class Table<C, R> {
 	}
 
 	/**
-	 * Sort rows according to a specified comparator
+	 * Sort columns according to a specified comparator
 	 * 
 	 * @param c
 	 */
