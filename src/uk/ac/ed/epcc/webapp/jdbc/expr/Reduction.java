@@ -28,19 +28,42 @@ import uk.ac.ed.epcc.webapp.content.Operator;
  * AVG is a mean value except when doing overlap mapping when it becomes a time average
  * </p>
  * <p>
- * SELECT just selects a value without adding to the SQL GROUP BY. The expression is assumed to be
- * derivable from the INDEXs or the same for all records.
+ * 
  * </p>
  * @author spb
  *
  */
 public enum Reduction {
+  /** values are summed
+   * 
+   */
   SUM(Operator.ADD),
+  /** values are averaged
+   * 
+   */
   AVG(Operator.AVG),
+  /** minimum value taken
+   * 
+   */
   MIN(Operator.MIN),
+  /** maximum value taken.
+   * 
+   */
   MAX(Operator.MAX),
+  /** The INDEX reduction is equivalent to the SQL GROUP BY CLAUSE, when combined with other
+ * Reductions it requests that multiple results should be returned, with reductions only happening
+ * across sets of records where the INDEX property is the same.
+   * 
+   */
   INDEX(Operator.MERGE),
+  /** SELECT just selects a value without adding to the SQL GROUP BY. The expression is assumed to be
+ * derivable from the INDEXs or the same for all records. 
+   * 
+   */
   SELECT(Operator.MERGE),
+  /** Count distinct values. This always generates a number whatever is being reduced
+   * 
+   */
   DISTINCT(Operator.ADD);
   
   private final Operator op;
