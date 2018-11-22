@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 import javax.mail.MessagingException;
@@ -119,5 +120,12 @@ public class EmailerTest extends WebappTestBase {
 
 		mailer.doSendNow(mailer.templateMessage("user@example.com", null, tf));
 		
+	}
+	
+	@Test
+	public void testGroupAddress() throws AddressException, UnsupportedEncodingException {
+		
+		InternetAddress from = new InternetAddress("project-managers:;");
+		System.out.println(from.toString());
 	}
 }
