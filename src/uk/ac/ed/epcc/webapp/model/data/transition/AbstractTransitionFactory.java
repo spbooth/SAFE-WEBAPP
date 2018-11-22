@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
@@ -39,7 +40,14 @@ public abstract class AbstractTransitionFactory<T , K extends TransitionKey<T>> 
 		super();
 		this.conn=c;
     	key_map = new LinkedHashMap<>();
-    	transition_map= new LinkedHashMap<>();
+    	if( sortByKey()) {
+    		transition_map = new TreeMap<>();
+    	}else {
+    		transition_map= new LinkedHashMap<>();
+    	}
+	}
+	protected boolean sortByKey() {
+		return false;
 	}
 	
 	protected Logger getLogger(){
@@ -53,6 +61,7 @@ public abstract class AbstractTransitionFactory<T , K extends TransitionKey<T>> 
      * @param t
      */
     public final void addTransition(K key, Transition<T> t){
+    	getLogger().debug("adding transition "+key.toString());
     	key_map.put(key.getName(),key);
     	transition_map.put(key, t);
     }
