@@ -45,7 +45,7 @@ public abstract class AbstractList<T extends DataObject,L extends Targetted> ext
 		super();
 		this.conn=factory.getContext();
 		this.target=factory.getTarget();
-		String list = conn.getInitParameter(factory.getConfigTag()+"."+list_name,"");
+		String list = conn.getExpandedProperty(factory.getConfigTag()+"."+list_name,"");
 		for(String action : list.split("\\s*,\\s*")){
 			if( ! action.isEmpty()){
 				try{

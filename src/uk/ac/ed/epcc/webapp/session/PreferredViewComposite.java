@@ -49,7 +49,7 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 	}
 	
 	PreferedViewFactory pvf= null;
-	private PreferedViewFactory getViewFactory() {
+	public PreferedViewFactory getViewFactory() {
 		if( pvf == null) {
 			pvf=getContext().makeObject(PreferedViewFactory.class, PREFERRED_VIEW);
 		}
