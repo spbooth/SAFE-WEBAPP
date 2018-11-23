@@ -41,6 +41,7 @@ public enum EditAction implements ViewTransitionKey<MailTarget>{
 	AddCC,
 	AddTo,
 	AddBcc,
+	AddReplyTo,
 	Serve{
 
 		/* (non-Javadoc)

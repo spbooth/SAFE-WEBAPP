@@ -9,6 +9,7 @@
 <input class="input_button" type="submit" value="Add"/>
 </form> New Recipient</h3>
 <h4>From: "J.Random" &lt;punter3@epcc.ed.ac.uk&gt;</h4>
+<h4>ReplyTo: s.booth@epcc.ed.ac.uk</h4>
 <h4>
 <form method="post" action="/TransitionServlet/Email:TestMail/1/870875925/Subject">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMail1/870875925/Subject"/>

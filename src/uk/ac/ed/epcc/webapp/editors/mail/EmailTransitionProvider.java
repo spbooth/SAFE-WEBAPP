@@ -272,7 +272,30 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		}
 		
 	}
-	
+	public class AddReplyToTransition extends FormMailTransition{
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.transition.FormTransition#buildForm(uk.ac.ed.epcc.webapp.forms.Form, java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
+		 */
+		@Override
+		public void buildForm(Form f, MailTarget target, AppContext conn)
+				throws TransitionException {
+			MessageComposer composer =null;
+			MessageProvider messageProvider = null;
+			try {
+				composer = (MessageComposer) target.getHandler();
+				messageProvider= composer.getMessageProvider();
+			} catch (Exception e) {
+				getLogger().error("Error getting messageProvider", e);
+			}
+			if( messageProvider != null &&  ! composer.editReplyTo() ) {
+				throw new TransitionException("Editing reply-to not allowed");
+			}
+			f.addInput(DATA_FORM_FIELD, "Reply Email", ((MessageComposer)target.getHandler()).getEmailInput());
+			f.addAction(EditAction.AddReplyTo.toString(), new EditFormAction(target, EditAction.AddReplyTo));
+		}
+		
+	}
 	public class DirectOperationTransition extends DirectMailTransition{
 		public DirectOperationTransition(EditAction action) {
 			super();
@@ -625,6 +648,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 					case Abort: return new AbortTransition();
 					case StartOver: return new StartOverTransition();
 					case AddRecipient: return new AddRecipientTransition();
+					case AddReplyTo: return new AddReplyToTransition();
 					case AddAttachment: return new AddAttachmentTransition(); 
 					case Edit: return new EditTextTransition();
 					case EditSubject: return new EditSubjectTransition();

@@ -198,6 +198,10 @@ public class ContentMessageVisitor extends AbstractVisitor {
 	}
 	
 	@Override
+	public void doReplyTo(Address address, int i, int length, MessageWalker messageWalker) throws WalkerException {
+		doHeader("ReplyTo",address.toString());
+	}
+	@Override
 	public void doSubject(String subject,MessageWalker w) {
 		formatList("Subject",new String[] {subject});
 	}

@@ -82,4 +82,7 @@ public interface MessageComposer extends MessageHandler{
 	public abstract boolean showBcc();
 	public abstract boolean bccOnly();
 	public abstract boolean allowNewAttachments();
+	default public boolean editReplyTo() {
+		return false;
+	}
 }

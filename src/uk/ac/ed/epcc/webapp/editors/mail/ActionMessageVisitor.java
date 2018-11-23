@@ -17,6 +17,8 @@
 package uk.ac.ed.epcc.webapp.editors.mail;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.mail.Address;
 import javax.mail.MessagingException;
@@ -112,8 +114,55 @@ public class ActionMessageVisitor extends AbstractVisitor {
 			   modified=true;
 		}
 	 
-	 
-
+	 protected void addReplyTo(AppContext c,MimeMessage m,
+			 String address
+			 ) throws WalkerException{
+		 try{
+			 Set<Address> reply = new HashSet<>();
+			 Address current[] = m.getReplyTo();
+			 if( current != null ) {
+				 for(Address a : current) {
+					 reply.add(a);
+				 }
+			 }
+			 // works with single values or comma seperated list
+			 for(InternetAddress a : Emailer.parseEmailList(address)){
+				 reply.add( a);
+			 }
+			 if( reply.isEmpty()) {
+				 m.setReplyTo(null);
+			 }else {
+				 m.setReplyTo(reply.toArray(new Address[reply.size()]));
+			 }
+          modified=true;
+		
+		 }catch(Exception e){
+			 // need to tell operator there is a problem
+			 // as input was specified
+			 throw new WalkerException(e);
+		 }
+	 } 
+	 protected void deleteReplyTo(MimeMessage m, int id) throws MessagingException {
+            
+		       Address old[] = m.getReplyTo();
+		       if( old == null || old.length == 0) {
+		    	   return;
+		       }
+		       if( old.length == 1) {
+		    	   m.setReplyTo(null);
+		    	   modified=true;
+		    	   return;
+		       }
+			   Address new_reply[] = new Address[old.length-1];
+			   for(int i=0;i<id;i++){
+				   new_reply[i] = old[i];
+			   }
+			   for(int i=id+1;i<old.length;i++){
+				   new_reply[i-1] = old[i];
+			   }
+			   m.setReplyTo(new_reply);
+			   modified=true;
+		}
 	@Override
 	public void doIOError(MessageWalker w, IOException e)
 			throws WalkerException {
@@ -164,6 +213,32 @@ public class ActionMessageVisitor extends AbstractVisitor {
 		}
 		if( request == EditAction.AddBcc){
 			addRecipient(walker.getContext(), walker.getCurrentMessage(), javax.mail.Message.RecipientType.BCC, (String)data);
+		}
+	}
+	@Override
+	public void doSenders(MessageWalker walker) throws WalkerException {
+		if( request == EditAction.AddReplyTo){
+			addReplyTo(walker.getContext(), walker.getCurrentMessage(),  (String)data);
+		}
+		
+	}
+
+	@Override
+	public void doReplyTo(Address[] cc, MessageWalker messageWalker) throws WalkerException {
+		// TODO Auto-generated method stub
+		super.doReplyTo(cc, messageWalker);
+	}
+
+
+	@Override
+	public void doReplyTo(Address address, int i, int length, MessageWalker messageWalker) throws WalkerException {
+		if( request == EditAction.Delete){
+			try {
+				deleteReplyTo(messageWalker.getCurrentMessage(), i);
+                modified=true;
+			} catch (MessagingException e) {
+				getLogger().error("Error deleting recipient",e);
+			}
 		}
 	}
 

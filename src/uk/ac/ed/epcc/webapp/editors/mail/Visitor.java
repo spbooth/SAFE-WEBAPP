@@ -174,6 +174,30 @@ public	void endMessage(MimePart parent, MimeMessage m, MessageWalker messageWalk
     * @throws MessageWalker.WalkerException
     */
 	void doBCC(Address address, int i, int length, MessageWalker messageWalker)throws MessageWalker.WalkerException;
+	
+	/** process all the ReplyTo addresses
+	 * This is called first then {@link #doReplyTo(Address, int, int, MessageWalker)}
+	 * is called for each address.
+	 * 
+	 * @param cc
+	 * @param messageWalker
+	 * @throws MessageWalker.WalkerException
+	 */
+	default void doReplyTo(Address[] cc, MessageWalker messageWalker)throws MessageWalker.WalkerException{
+		
+	}
+   /** process a single ReplyTo field.
+    * These are called in turn after the call to {@link #doReplyTo(Address[], MessageWalker)}
+    * 
+    * @param address
+    * @param i
+    * @param length
+    * @param messageWalker
+    * @throws MessageWalker.WalkerException
+    */
+	default void doReplyTo(Address address, int i, int length, MessageWalker messageWalker)throws MessageWalker.WalkerException{
+		
+	}
 
 	
 	/** process the subject fields
@@ -204,6 +228,14 @@ public	void endMessage(MimePart parent, MimeMessage m, MessageWalker messageWalk
      */
 	public void doRecipients(MessageWalker walker)throws MessageWalker.WalkerException;
 
+	 /** called immediatly after sender fields are processed
+     * 
+     * @param walker
+     * @throws MessageWalker.WalkerException 
+     */
+	default public void doSenders(MessageWalker walker)throws MessageWalker.WalkerException{
+		
+	}
 	/** Does the visitor want to walker to vidist the message headers
 	 * 
 	 * @return boolean

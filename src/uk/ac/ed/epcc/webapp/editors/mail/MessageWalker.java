@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.editors.mail;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -82,6 +83,11 @@ public class MessageWalker {
 	 * 
 	 */
 	private static final String TO_TAG_PREFIX = "TO";
+	
+	/** Path tag prefix for ReplyTo
+	 * 
+	 */
+	private static final String REPLY_TAG_PREFIX = "REPLY";
 	/** Path tag prefix for a Stream item
 	 * 
 	 */
@@ -382,6 +388,25 @@ private final void visitMessageHeaders(MimeMessage m,Visitor v) throws WalkerExc
 		}catch( MessagingException e ){
 			v.doMessageError(this,e);
 		}
+		try{
+			Address reply[] = m.getReplyTo();
+			Address from[] = m.getFrom();
+			// the getReplyTo method defaults to getFrom if none set.
+			if( reply != null && ! Arrays.equals(reply, from)){
+				v.doReplyTo(reply,this);
+
+
+				for(int i=0; i< reply.length;i++){
+					if( push(REPLY_TAG_PREFIX+i)){
+						v.doReplyTo(reply[i],i,reply.length,this);
+						pop();
+					}
+				}
+			}
+		}catch( MessagingException e ){
+			v.doMessageError(this,e);
+		}
+		v.doSenders(this);
 		try{
 			if( push(SUBJECT_TAG)){
 				String subject = m.getSubject();

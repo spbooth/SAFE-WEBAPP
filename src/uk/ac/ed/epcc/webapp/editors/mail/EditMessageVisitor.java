@@ -35,11 +35,15 @@ import uk.ac.ed.epcc.webapp.editors.mail.MessageWalker.WalkerException;
 public class EditMessageVisitor extends ContentMessageVisitor {
 	private boolean see_bcc=true;
 	private boolean edit_recipients=false;
+	private boolean edit_reply_to=false;
 	private boolean allow_new_attachments=false;
 	
 
 	public void editRecipients(boolean val){
 		edit_recipients=val;
+	}
+	public void editReplyTo(boolean val) {
+		edit_reply_to=val;
 	}
 	public void seeBcc(boolean val) {
 		see_bcc=val;
@@ -157,27 +161,36 @@ public class EditMessageVisitor extends ContentMessageVisitor {
 		}
 		sb=sb.addParent();
 	}
-	
-	
-	 @Override
-		public void doCC(Address recipients, int i, int len,MessageWalker w) throws WalkerException {
-			
-			if( ! w.isSubMessage() && edit_recipients){
-				sb = sb.getHeading(4);
-				
-				  addButton(w,EditAction.Delete, "Delete recipient");
-				  ExtendedXMLBuilder text = sb.getText();
-				text.clean(" CC: ");
-				text.clean(recipients.toString());
-				text.appendParent();
-			   sb=sb.addParent();
-			}else{
-				super.doCC(recipients, i, len,w);
-			}
+
+
+	@Override
+	public void doCC(Address recipients, int i, int len,MessageWalker w) throws WalkerException {
+
+		if( ! w.isSubMessage() && edit_recipients){
+			sb = sb.getHeading(4);
+
+			addButton(w,EditAction.Delete, "Delete recipient");
+			ExtendedXMLBuilder text = sb.getText();
+			text.clean(" CC: ");
+			text.clean(recipients.toString());
+			text.appendParent();
+			sb=sb.addParent();
+		}else{
+			super.doCC(recipients, i, len,w);
 		}
-	 @Override
-		public void doBCC(Address recipients, int i, int len,MessageWalker w) throws WalkerException {
-			if( showBcc()) {
+	}
+	@Override
+	public void doCC(Address[] cc, MessageWalker w)
+			throws WalkerException {
+		if( ! w.isSubMessage() && ! edit_recipients){
+			formatList("CC", cc);
+		}else{
+			super.doCC(cc, w);
+		}
+	}
+	@Override
+	public void doBCC(Address recipients, int i, int len,MessageWalker w) throws WalkerException {
+		if( showBcc()) {
 			if( ! w.isSubMessage() && edit_recipients){
 				sb=sb.getHeading(4);
 				addButton(w,EditAction.Delete, "Delete recipient");
@@ -189,33 +202,48 @@ public class EditMessageVisitor extends ContentMessageVisitor {
 			}else{
 				super.doBCC(recipients, i, len,w);
 			}
+		}
+	}
+	@Override
+	public void doBCC(Address[] cc, MessageWalker w)
+			throws WalkerException {
+
+		if( ! w.isSubMessage() && ! edit_recipients){
+			if( showBcc()) {
+				formatList("BCC", cc);
+			}else {
+				// Just show the count
+				doHeader("BCC", ""+cc.length+" recipients");
 			}
+		}else{
+			super.doBCC(cc, w);
 		}
-	 @Override
-	 public void doBCC(Address[] cc, MessageWalker w)
-			 throws WalkerException {
 
-		 if( ! w.isSubMessage() && ! edit_recipients){
-			 if( showBcc()) {
-				 formatList("BCC", cc);
-			 }else {
-				 // Just show the count
-				 doHeader("BCC", ""+cc.length+" recipients");
-			 }
-		 }else{
-			 super.doBCC(cc, w);
-		 }
-
-	 }
-		@Override
-		public void doCC(Address[] cc, MessageWalker w)
-				throws WalkerException {
-			 if( ! w.isSubMessage() && ! edit_recipients){
-				 formatList("CC", cc);
-			 }else{
-				super.doCC(cc, w);
-			 }
+	}
+	@Override
+	public void doReplyTo(Address recipients, int i, int len,MessageWalker w) throws WalkerException {
+			if( ! w.isSubMessage() && edit_reply_to){
+				// Only show if editing as these are show as a list in 
+				// the other doReplyTo method otherwise
+				sb=sb.getHeading(4);
+				addButton(w,EditAction.Delete, "Remove");
+				ExtendedXMLBuilder text = sb.getText();
+				text.clean( "ReplyTo: ");
+				text.clean(recipients.toString());
+				text.appendParent();
+				sb=sb.addParent();
+			}
+	}
+	@Override
+	public void doReplyTo(Address[] cc, MessageWalker w)
+			throws WalkerException {
+		if( ! w.isSubMessage() && ! edit_reply_to){
+			formatList("ReplyTo", cc);
+		}else{
+			super.doReplyTo(cc, w);
 		}
+
+	}
 	@Override
 	public void doTo(Address recipients, int i, int len,MessageWalker w) throws WalkerException {
 		
@@ -244,6 +272,16 @@ public class EditMessageVisitor extends ContentMessageVisitor {
 			addButton(w,EditAction.AddRecipient,"Add");
 			
 			sb.addText(" New Recipient");
+			sb=sb.addParent();
+		}
+	}
+	@Override
+	public void doSenders(MessageWalker w)throws MessageWalker.WalkerException{
+		if( ! w.isSubMessage() && edit_reply_to){
+			sb=sb.getHeading(3);
+			addButton(w,EditAction.AddReplyTo,"Add");
+			
+			sb.addText(" Reply-To");
 			sb=sb.addParent();
 		}
 	}

@@ -79,6 +79,7 @@ public class MessageComposerFormat {
 		MessageWalker mw = new MessageWalker(conn);
 		MessageProvider messageProvider = composer.getMessageProvider();
 		v.editRecipients(composer.editRecipients());
+		v.editReplyTo(composer.editReplyTo());
 		v.seeBcc(composer.showBcc());
 		v.allowNewAttachments(composer.allowNewAttachments());
 		mw.visitMessage(messageProvider.getMessage(),v);
