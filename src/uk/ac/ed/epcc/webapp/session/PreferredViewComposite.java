@@ -146,8 +146,11 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 	@Override
 	public void newSignup(AU user) throws Exception {
 		PreferedView dv = getDefaultView();
-		setPreferredView(user, dv);
-		
+		PreferedView old =getPreferredView(user);
+		if( old == null) {
+		  // don't remove view already set 
+		  setPreferredView(user, dv);
+		}
 	}
 
 	/* (non-Javadoc)
