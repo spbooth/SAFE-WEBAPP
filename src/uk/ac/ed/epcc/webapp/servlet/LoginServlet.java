@@ -26,6 +26,7 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
@@ -73,7 +74,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 	private static final String LOGIN_PAGE_PARAM = "login.page";
 	
 	
-	private static final String INITIAL_PAGE_ATTR = "initial_page";
+	public static final String INITIAL_PAGE_ATTR = "initial_page";
 	/**
 	 * 
 	 */
@@ -110,6 +111,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 		String logout = req.getParameter("logout");
 		String username = req.getParameter("username");
 		String password = req.getParameter("password");
+		String authtype = req.getParameter("authtype");
 		Logger log = getLogger(conn);
 		SessionService<T> serv = conn.getService(SessionService.class);
 		if( serv == null ){
@@ -137,6 +139,29 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 			}
 			if( DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn)){
 				message(conn,req,res,"disabled_feature_error");
+				return;
+			}
+			if( authtype != null ) {
+				try {
+					Integer i = Integer.parseInt(authtype);
+					String login_urls = conn.getInitParameter("service.web_login.url");
+					if(  login_urls != null ){ 
+						String urls[] = login_urls.trim().split("\\s*,\\s*");
+						if( i < 0 || i > urls.length) {
+							message(conn,req,res,"invalid_argument");
+							return;
+						}
+						// ok to make a session at this point
+						String other_page = req.getParameter("page");
+						if( other_page != null) {
+							sess.setAttribute(INITIAL_PAGE_ATTR, new RedirectResult(other_page));
+						}
+						
+						handleFormResult(conn, req, res, new RedirectResult(urls[i]));
+					}
+				}catch(Exception e) {
+					getLogger(conn).error("Error parsing alternate login", e);
+				}
 				return;
 			}
 			AppUserFactory<T> person_fac = serv.getLoginFactory();

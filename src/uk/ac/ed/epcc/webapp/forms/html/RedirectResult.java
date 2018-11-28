@@ -64,4 +64,9 @@ public boolean equals(Object obj) {
 		return false;
 	return true;
 }
+@Override
+public String toString() {
+	return "RedirectResult [url=" + url + "]";
+}
+
 }

@@ -207,7 +207,12 @@ public class RemoteAuthServlet extends WebappServlet {
 				if( allow_login ) {
 				// attempt a login
 					TwoFactorHandler handler = new TwoFactorHandler<>(session_service);
-					FormResult result = handler.doLogin(person, new RedirectResult(LoginServlet.getMainPage(conn)));
+					RedirectResult next_page = (RedirectResult) session_service.getAttribute(LoginServlet.INITIAL_PAGE_ATTR);
+					session_service.removeAttribute(LoginServlet.INITIAL_PAGE_ATTR);
+					if( next_page == null) {
+						next_page = new RedirectResult(LoginServlet.getMainPage(conn));
+					}
+					FormResult result = handler.doLogin(person, next_page);
 					handleFormResult(conn, req, res, result);
 					return;
 				}else{

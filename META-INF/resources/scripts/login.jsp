@@ -139,6 +139,8 @@ This service is only available to pre-registered users.
 <p><b>please try again later</b></p>
 <% } %>
 <% 
+
+String prev_page = (String) request.getAttribute(DefaultServletService.PAGE_ATTR);
 // Give urls for alternate external auth login. Normally just the one but
 // can use comma seperated list to support multiple types.
 String login_urls = conn.getInitParameter("service.web_login.url");
@@ -147,23 +149,43 @@ if(  login_urls != null ){
  String labels[] = conn.getInitParameter("service.web_login.login-text","Alternate login").split("\\s*,\\s*");
  String help[]= conn.getInitParameter("service.web_login.help-text","").split("\\s*,\\s*");
  for( int i = 0 ; i < urls.length ; i++){
+	 HtmlBuilder a = new HtmlBuilder();
+	 a.open("form");
+	 a.addClass("button");
+	 a.attr("method","post");
+	 a.attr("action",web_path+"/LoginServlet");
+	 a.open("input");
+	 a.attr("type","hidden");
+	 a.attr("name","authtype");
+	 a.attr("value",Integer.toString(i));
+	 a.close();
+	 if( prev_page != null ){
+		 a.open("input");
+		 a.attr("type","hidden");
+		 a.attr("name","page");
+		 a.attr("value",prev_page);
+		 a.close();
+	 }
+	 a.open("input");
+	 a.addClass("input_button");
+	 a.addClass("login");
+	 a.attr("type","submit");
+	 String tt = help[i%help.length];
+	 if( tt != null && ! tt.isEmpty()){
+		a.attr("title",tt);
+	 }
+	 a.attr("value",labels[i%labels.length]);
+	 a.close();
+	 a.close(); // form
 %>
-<form class="button" method="get" action="<%=web_path+urls[i] %>">
-<input class="input_button login" type="submit" 
-<% String tt = help[i%help.length];
-if( tt != null && ! tt.isEmpty()){
-%> title="<%=tt%>"<%
-}
-%>
-value="<%=labels[i%labels.length] %>" />
-</form>
+<%=a.toString() %>
 <%
  }
 %>or<%
 } 
 %>
 <form method="post" action="<%=web_path%>/LoginServlet"><%
-	String prev_page = (String) request.getAttribute(DefaultServletService.PAGE_ATTR);
+	
 	if(prev_page!=null) {
 		HtmlBuilder hb = new HtmlBuilder(); // make sure escaping correct for untrusted content
 		hb.open("input",new String[][]{{"type","hidden"},{"name","page"},{"value",prev_page}});
