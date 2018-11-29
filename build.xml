@@ -242,4 +242,11 @@
 		</javadoc>
 	</target>
 
+	<target name="makepom">
+		<ivy:makepom ivyfile="${basedir}/ivy.xml" pomfile="${basedir}/module.pom" conf="default,runtime">
+		   <mapping conf="default" scope="compile"/>
+		   <mapping conf="runtime" scope="runtime"/>
+		   <dependency group="com.acme" artifact="acme-logging" version="1.0" optional="true"/>
+		</ivy:makepom>
+	</target>
 </project>

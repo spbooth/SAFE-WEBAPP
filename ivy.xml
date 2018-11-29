@@ -51,8 +51,7 @@
 		<dependency org="org.webjars" name="datatables-colreorder" rev="1.2.0" />
 		<dependency org="org.webjars" name="datatables-colvis" rev="1.1.1" />
 		<dependency org="org.webjars" name="datatables-fixedcolumns" rev="3.2.2" />
-		<!-- This is mostly for the Base64 encoder which is standard in Java1.8
-		   however also used for the Crypt function 
+		<!-- This is for the Base32 & Base64 encoder (Base64 is available from Java8 with a slightly different syntax)
 		 -->
 		<dependency org="commons-codec" name="commons-codec" rev="1.10">
     		<artifact name="commons-codec" ext="jar"/>

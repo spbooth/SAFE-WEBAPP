@@ -22,6 +22,7 @@ package uk.ac.ed.epcc.webapp.content;
 
 import java.text.NumberFormat;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +35,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import uk.ac.ed.epcc.webapp.EmptyIterable;
 import uk.ac.ed.epcc.webapp.NumberOp;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 
@@ -650,6 +652,11 @@ public class Table<C, R> {
 	}
 
 	private HashMap<C, Col> cols;
+	
+	/** Optional grouping of columns for formatting operations
+	 * 
+	 */
+	private Map<C,Set<C>> column_groups = null;
 
 	// printed with this as the col header
 
@@ -836,21 +843,43 @@ public class Table<C, R> {
 	 * @param label_col
 	 * @param highlight 
 	 */
-	@SuppressWarnings("unchecked")
 	public void addCategoryTotals(C sum_col, C cat_Col, Transform cat_to_key,
 			C label_col, Boolean highlight) {
 		if (cat_Col == null || sum_col == null) {
 			return;
 		}
-		HashMap<R, R> last = new HashMap<>();
-		HashMap<R, Number> sums = new HashMap<>();
+		
 		// we insert category sum after last element of the category
 		// so create a row order to define the list.
 		Col category = cols.get(cat_Col);
 		Col values = cols.get(sum_col);
-		if (category == null || values == null || sum_col == null) {
+		if (category == null ||  sum_col == null) {
 			return;
 		}
+		if( values != null ) {
+			addCategoryTotals(sum_col, cat_to_key, label_col, highlight, category, values);
+		}else{
+			for(C g : getColumnGroup(sum_col) ) {
+				values = cols.get(g);
+				if( values != null) {
+					addCategoryTotals(g, cat_to_key, label_col, highlight, category, values);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param sum_col
+	 * @param cat_to_key
+	 * @param label_col
+	 * @param highlight
+	 * @param category
+	 * @param values
+	 */
+	public void addCategoryTotals(C sum_col, Transform cat_to_key, C label_col, Boolean highlight, Col category,
+			Col values) {
+		HashMap<R, R> last = new HashMap<>();
+		HashMap<R, Number> sums = new HashMap<>();
 		values.addAttribute("numeric", "true");
 		for (R key : getRows()) {
 			// If we have already generated this row-key as a summation line key
@@ -890,7 +919,9 @@ public class Table<C, R> {
 			if (label_col != null) {
 				put(label_col, sumkey, sumkey);
 			}
-			if (highlight != null) {
+		}
+		if (highlight != null) {
+			for (R sumkey : last.keySet()) {
 				setHighlight(sumkey, highlight.booleanValue());
 			}
 		}
@@ -965,7 +996,16 @@ public class Table<C, R> {
 	 */
 	public void addColAttribute(C col, String name, String value) {
 		Col c = getCol(col);
-		c.addAttribute(name, value);
+		if( c != null ) {
+			c.addAttribute(name, value);
+		}else {
+			for(C g : getColumnGroup(col)) {
+				c = getCol(g);
+				if( c != null ) {
+					c.addAttribute(name, value);
+				}
+			}
+		}
 	}
 
 	
@@ -1115,6 +1155,13 @@ public class Table<C, R> {
 		Col c = cols.get(col_name);
 		if (c != null) {
 			return c.addTotal(key);
+		}else {
+			for(C g : getColumnGroup(col_name)) {
+				c = cols.get(g);
+				if (c != null) {
+					c.addTotal(key);
+				}
+			}
 		}
 		return null;
 	}
@@ -1575,6 +1622,13 @@ public class Table<C, R> {
 		Table.Formatter<C, R> res = null;
 		if (c != null) {
 			res = c.setFormat(t);
+		}else {
+			for(C g : getColumnGroup(col_name)) {
+				c = getCol(g);
+				if( c != null) {
+					c.setFormat(t);
+				}
+			}
 		}
 		return res;
 	}
@@ -1799,6 +1853,13 @@ public class Table<C, R> {
 		Col c = getCol(col_name);
 		if (c != null) {
 			c.transform(row_keys, t);
+		}else {
+			for( C g : getColumnGroup(col_name)) {
+				c = getCol(g);
+				if (c != null) {
+					c.transform(row_keys, t);
+				}
+			}
 		}
 	}
 
@@ -1861,5 +1922,32 @@ public class Table<C, R> {
 			}
 			remove.clear();
 		}
+	}
+	public void addToGroup(C group, C col) throws InvalidArgument {
+		if( cols.containsKey(group) ) {
+			throw new InvalidArgument("Bad group "+group.toString());
+		}
+		if( column_groups == null) {
+			column_groups= new HashMap<>();
+		}
+		Set<C> g = column_groups.get(group);
+		if( g == null ) {
+			g = new HashSet<>();
+			column_groups.put(group, g);
+		}
+		if( column_groups.containsKey(col)) {
+			throw new InvalidArgument("Cannot add group to group");
+		}
+		g.add(col);
+	}
+	public Iterable<C> getColumnGroup(C name){
+		if( column_groups == null) {
+			return new EmptyIterable<>();
+		}
+		Set<C> group = column_groups.get(name);
+		if( group == null ) {
+			return new EmptyIterable<>();
+		}
+		return Collections.unmodifiableSet(group);
 	}
 }
