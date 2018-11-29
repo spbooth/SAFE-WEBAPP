@@ -61,7 +61,7 @@ public abstract class AbstractTransitionFactory<T , K extends TransitionKey<T>> 
      * @param t
      */
     public final void addTransition(K key, Transition<T> t){
-    	getLogger().debug("adding transition "+key.toString());
+    	//getLogger().debug("adding transition "+key.toString());
     	key_map.put(key.getName(),key);
     	transition_map.put(key, t);
     }

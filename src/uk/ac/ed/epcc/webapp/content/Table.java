@@ -995,7 +995,7 @@ public class Table<C, R> {
 	 * @param value
 	 */
 	public void addColAttribute(C col, String name, String value) {
-		Col c = getCol(col);
+		Col c = cols.get(col);
 		if( c != null ) {
 			c.addAttribute(name, value);
 		}else {
@@ -1618,7 +1618,7 @@ public class Table<C, R> {
 
 	public Table.Formatter<C, R> setColFormat(C col_name,
 			Table.Formatter<C, R> t) {
-		Col c = getCol(col_name);
+		Col c = cols.get(col_name);
 		Table.Formatter<C, R> res = null;
 		if (c != null) {
 			res = c.setFormat(t);
@@ -1850,7 +1850,7 @@ public class Table<C, R> {
 	 * @param t
 	 */
 	public void transformCol(C col_name, Transform t) {
-		Col c = getCol(col_name);
+		Col c = cols.get(col_name);
 		if (c != null) {
 			c.transform(row_keys, t);
 		}else {
