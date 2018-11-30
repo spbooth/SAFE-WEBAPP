@@ -1623,12 +1623,19 @@ public class Table<C, R> {
 		if (c != null) {
 			res = c.setFormat(t);
 		}else {
-			for(C g : getColumnGroup(col_name)) {
-				c = getCol(g);
-				if( c != null) {
-					c.setFormat(t);
+			if( hasColumnGroup(col_name)) {
+				for(C g : getColumnGroup(col_name)) {
+					c = getCol(g);
+					if( c != null) {
+						c.setFormat(t);
+					}
 				}
+			}else {
+				// make col
+				c = getCol(col_name);
+				c.setFormat(t);
 			}
+
 		}
 		return res;
 	}
@@ -1949,5 +1956,8 @@ public class Table<C, R> {
 			return new EmptyIterable<>();
 		}
 		return Collections.unmodifiableSet(group);
+	}
+	public boolean hasColumnGroup(C name) {
+		return column_groups != null && column_groups.containsKey(name);
 	}
 }
