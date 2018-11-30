@@ -849,8 +849,8 @@ public class Table<C, R> {
 			return;
 		}
 		
-		// we insert category sum after last element of the category
-		// so create a row order to define the list.
+		// Unlike most formatting operations we don't add catagory totals unless the
+		// column already exists
 		Col category = cols.get(cat_Col);
 		Col values = cols.get(sum_col);
 		if (category == null ||  sum_col == null) {
@@ -876,8 +876,10 @@ public class Table<C, R> {
 	 * @param category
 	 * @param values
 	 */
-	public void addCategoryTotals(C sum_col, Transform cat_to_key, C label_col, Boolean highlight, Col category,
+	private void addCategoryTotals(C sum_col, Transform cat_to_key, C label_col, Boolean highlight, Col category,
 			Col values) {
+		// we insert category sum after last element of the category
+		// so create a row order to define the list.
 		HashMap<R, R> last = new HashMap<>();
 		HashMap<R, Number> sums = new HashMap<>();
 		values.addAttribute("numeric", "true");
@@ -995,16 +997,14 @@ public class Table<C, R> {
 	 * @param value
 	 */
 	public void addColAttribute(C col, String name, String value) {
-		Col c = cols.get(col);
-		if( c != null ) {
-			c.addAttribute(name, value);
-		}else {
+		if( hasColumnGroup(col)) {
 			for(C g : getColumnGroup(col)) {
-				c = getCol(g);
-				if( c != null ) {
-					c.addAttribute(name, value);
-				}
+				Col c = getCol(g);
+				c.addAttribute(name, value);
 			}
+		}else {
+			Col c = getCol(col);
+			c.addAttribute(name, value);
 		}
 	}
 
@@ -1152,18 +1152,16 @@ public class Table<C, R> {
 	 * @return total calculated or null if no column.
 	 */
 	public Double addTotalToCol(C col_name, R key) {
-		Col c = cols.get(col_name);
-		if (c != null) {
-			return c.addTotal(key);
-		}else {
+		if( hasColumnGroup(col_name)) {
 			for(C g : getColumnGroup(col_name)) {
-				c = cols.get(g);
-				if (c != null) {
-					c.addTotal(key);
-				}
+				Col c = getCol(g);
+				c.addTotal(key);
 			}
+			return null;
+		}else {
+			Col c = getCol(col_name);
+			return c.addTotal(key);
 		}
-		return null;
 	}
 
 	/**
@@ -1618,26 +1616,18 @@ public class Table<C, R> {
 
 	public Table.Formatter<C, R> setColFormat(C col_name,
 			Table.Formatter<C, R> t) {
-		Col c = cols.get(col_name);
-		Table.Formatter<C, R> res = null;
-		if (c != null) {
-			res = c.setFormat(t);
-		}else {
-			if( hasColumnGroup(col_name)) {
-				for(C g : getColumnGroup(col_name)) {
-					c = getCol(g);
-					if( c != null) {
-						c.setFormat(t);
-					}
-				}
-			}else {
-				// make col
-				c = getCol(col_name);
+
+		if( hasColumnGroup(col_name)) {
+			for(C g : getColumnGroup(col_name)) {
+				Col c = getCol(g);
 				c.setFormat(t);
 			}
-
+			return null;
+		}else {
+			// make col
+			Col c = getCol(col_name);
+			return c.setFormat(t);
 		}
-		return res;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1857,16 +1847,14 @@ public class Table<C, R> {
 	 * @param t
 	 */
 	public void transformCol(C col_name, Transform t) {
-		Col c = cols.get(col_name);
-		if (c != null) {
-			c.transform(row_keys, t);
-		}else {
+		if( hasColumnGroup(col_name)) {
 			for( C g : getColumnGroup(col_name)) {
-				c = getCol(g);
-				if (c != null) {
-					c.transform(row_keys, t);
-				}
+				Col c = getCol(g);
+				c.transform(row_keys, t);
 			}
+		}else {
+			Col c = getCol(col_name);
+			c.transform(row_keys, t);
 		}
 	}
 
