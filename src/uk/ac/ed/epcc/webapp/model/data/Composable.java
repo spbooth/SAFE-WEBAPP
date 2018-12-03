@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 
 /** A marker for a stand alone interface that can be
  * implemented directly or via a composite.
@@ -24,4 +25,24 @@ import uk.ac.ed.epcc.webapp.AppContext;
  */
 public interface Composable {
 
+	/** Convert an object to a {@link Composable}.
+	 * The object either has to implement the interface or be a {@link DataObjectFactory} in which cast
+	 * the target is used to look up a {@link Composite}
+	 * 
+	 * @param target
+	 * @param o
+	 * @return
+	 * @throws InvalidArgument
+	 */
+	public static <X extends Composable> X getComposable(Class<X> target, Class<? extends X> key, Object o) throws InvalidArgument {
+		if( o == null) {
+			return null;
+		}
+		if( target.isAssignableFrom(o.getClass())) {
+			return (X) o;
+		}else if( o instanceof DataObjectFactory) {
+			return (X) ((DataObjectFactory)o).getComposite(key);
+		}
+		throw new InvalidArgument(o.getClass().getCanonicalName()+" cannot generate a "+target.getCanonicalName());
+	}
 }

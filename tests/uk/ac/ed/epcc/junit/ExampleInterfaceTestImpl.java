@@ -16,29 +16,22 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.junit;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import org.junit.Ignore;
 
 @Ignore
-public class ExampleInterfaceTestImpl<X extends TargetProvider<ExampleInterface>>  {
+public class ExampleInterfaceTestImpl<X extends TargetProvider<ExampleInterface>> implements ExampleInterfaceTest<ExampleInterface> {
 
-	private X target_provider;
+	private final X target_provider;
 	public ExampleInterfaceTestImpl(X target ) {
 		this.target_provider=target;
 	}
 	
-	public void testDoAdd() {
-		TargetProvider<ExampleInterface> t = target_provider;
-		ExampleInterface i = t.getTarget();
-		
-		assertEquals(5, i.doAdd(1, 4));
-	}
+	
 
 	public void testDoThrow() throws Exception{
-		TargetProvider<ExampleInterface> t = target_provider;
-		ExampleInterface i = t.getTarget();
+		ExampleInterface i = getTarget();
 		i.doThrow(false);
 		try{
 			i.doThrow(true);
@@ -47,5 +40,15 @@ public class ExampleInterfaceTestImpl<X extends TargetProvider<ExampleInterface>
 			//  ok expect this
 		}
 		
+	}
+
+	
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.junit.TargetProvider#getTarget()
+	 */
+	@Override
+	public ExampleInterface getTarget() {
+		return target_provider.getTarget();
 	}
 }

@@ -16,6 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.junit;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
 
@@ -26,15 +28,28 @@ import org.junit.Test;
  * composite implementation class that holds the logic.
  * To keep things within the normal junit idiom we need to fill out forwarding methods.
  * 
+ * Unfortunately junit (at least when run from eclipse) does not pick up tests purely as default methods though they
+ * can be used in implementation class. This is supposed to work in junit5 where interface tests can be implemented as interfaces
+ * 
  * @author spb
  *
  * @param <X>
  */
 public interface ExampleInterfaceTest<X extends ExampleInterface> extends TargetProvider<X>{
 
-	
+	/** This is an example of an interface test written as a default method.
+	 * In Junit4 we still need to forward the actual test method onto the implementation 
+	 * class to have the test run and a default method just ensures that forgetting to do this
+	 * is a silent error. 
+	 * 
+	 */
 	@Test
-	public void testDoAdd() ;
+	default public void testDoAdd(){
+		
+		ExampleInterface i = getTarget();
+		
+		assertEquals(5, i.doAdd(1, 4));
+	}
 	@Test
 	public void testDoThrow() throws Exception;
 }

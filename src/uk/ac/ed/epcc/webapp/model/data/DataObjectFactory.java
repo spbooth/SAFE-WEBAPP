@@ -1097,13 +1097,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      * @return {@link Composite}
      */
 	@SuppressWarnings("unchecked")
-	public <X extends Composite> X getComposite(Class<X> clazz){
+	public <X extends Composite> X getComposite(Class<? super X> clazz){
 		X found = (X) composites.get(clazz);
 		assert( found == null || checkComposite(clazz));
 		return found;
 	}
 	
-	public <X extends Composite> boolean checkComposite(Class<X> clazz) {
+	public <X extends Composite> boolean checkComposite(Class<? super X> clazz) {
 		if( clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) {
 			return true; // can't check
 		}
