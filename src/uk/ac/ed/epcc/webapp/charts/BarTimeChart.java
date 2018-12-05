@@ -19,8 +19,6 @@ package uk.ac.ed.epcc.webapp.charts;
 import java.util.Calendar;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Feature;
-import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.time.Period;
 
 /**

@@ -74,10 +74,14 @@
 		<dependency org="org.jfree" name="jcommon" rev="1.0.24">
     		<artifact name="jcommon" ext="jar"/>
 		</dependency>
-		
+		<!--
 		<dependency org="mysql" name="mysql-connector-java" rev="8.0.12">
     		<artifact name="mysql-connector-java" ext="jar"/>
 		</dependency>
+		-->
+		<dependency org="org.mariadb.jdbc" name="mariadb-java-client" rev="2.3.0">
+           <artifact name="mariadb-java-client" ext="jar"/>
+        </dependency>
 		<!-- Note log4j adds an old javamail jar-file so add later in load -->
 		<dependency org="log4j" name="log4j" rev="1.2.17" transitive="false">
     		<artifact name="log4j" ext="jar"/>
