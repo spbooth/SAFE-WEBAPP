@@ -323,7 +323,13 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 				boolean nullable= Boolean.parseBoolean(arg3.getValue(Dumper.NULLABLE_ATTR));
 				
 				if( type.equals(Dumper.STRING_TYPE)){
-					int max = Integer.parseInt(arg3.getValue(Dumper.MAX_ATTR));
+					int max;
+					String val = arg3.getValue(Dumper.MAX_ATTR);
+					if( val.equalsIgnoreCase("long")) {
+						max=8 * 1024 *1024;  // cleanup xsl maps long values to this as actual numeric value for mediumtext etc is implementation dep.
+					}else {
+						max= Integer.parseInt(val);
+					}
 					spec.setField(name, new StringFieldType(nullable, nullable? null : def != null ? def : "", max));
 				}else if( type.equals(Dumper.BOOLEAN_TYPE)){
 					spec.setField(name, new BooleanFieldType(nullable,def != null ? Boolean.valueOf(def) : false));
