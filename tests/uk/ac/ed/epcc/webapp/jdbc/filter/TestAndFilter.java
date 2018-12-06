@@ -155,6 +155,23 @@ public class TestAndFilter extends WebappTestBase {
 		assertFalse(fac.matches(fil, simon));
 		checkStd(fil, "AndFilter( accepts=[NumberAcceptFilter(1)] force=true)");
 	}
+	
+	@Test 
+	public void testAccept4() throws DataException {
+		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTarget());
+		fil.addFilter(fac.getStringAcceptFilter("fred"));
+		fil.addFilter(fac.getNumberAcceptFilter(1));
+		assertTrue(fil.hasAcceptFilters());
+		assertFalse(fil.hasPatternFilters());
+		assertFalse(fil.isEmpty());
+		assertFalse(fil.isForced());
+		//assertNull(fil.getAcceptFilter(null));
+		assertEquals(1, fac.getCount(fil));
+		assertTrue(fac.matches(fil, fred));
+		assertFalse(fac.matches(fil, bill));
+		assertFalse(fac.matches(fil, simon));
+		checkStd(fil, "AndFilter( accepts=[StringAcceptFilter(fred), NumberAcceptFilter(1)] force=true)");
+	}
 	@Test 
 	public void testDual() throws DataException {
 		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTarget());

@@ -127,6 +127,53 @@ public class Dummy1 extends DataObject implements Removable {
          		super(Factory.this.getTarget(),res,NUMBER,n);
          	}
          }
+		 public class StringAcceptFilter extends AbstractAcceptFilter<Dummy1>{
+			 String s;
+			 public StringAcceptFilter(String s) {
+				 super(Factory.this.getTarget());
+				 this.s=s;
+			 }
+			/* (non-Javadoc)
+			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
+			 */
+			@Override
+			public boolean accept(Dummy1 o) {
+				return s.equals(o.getName());
+			}
+			@Override
+			public int hashCode() {
+				final int prime = 31;
+				int result = 1;
+				result = prime * result + getOuterType().hashCode();
+				result = prime * result + ((s == null) ? 0 : s.hashCode());
+				return result;
+			}
+			@Override
+			public boolean equals(Object obj) {
+				if (this == obj)
+					return true;
+				if (obj == null)
+					return false;
+				if (getClass() != obj.getClass())
+					return false;
+				StringAcceptFilter other = (StringAcceptFilter) obj;
+				if (!getOuterType().equals(other.getOuterType()))
+					return false;
+				if (s == null) {
+					if (other.s != null)
+						return false;
+				} else if (!s.equals(other.s))
+					return false;
+				return true;
+			}
+			private Factory getOuterType() {
+				return Factory.this;
+			}
+			@Override
+			public String toString() {
+				return "StringAcceptFilter(" + s + ")";
+			}
+		 }
     	 public class NumberAcceptFilter extends AbstractAcceptFilter<Dummy1>{
     		 Number n;
           	public NumberAcceptFilter(Number n){
@@ -250,6 +297,9 @@ public class Dummy1 extends DataObject implements Removable {
 		}
 		public StringFilter getStringFilter(String name) {
 			return new StringFilter(name);
+		}
+		public StringAcceptFilter getStringAcceptFilter(String s) {
+			return new StringAcceptFilter(s);
 		}
 		
     }

@@ -23,9 +23,8 @@ import uk.ac.ed.epcc.webapp.model.Castor;
 import uk.ac.ed.epcc.webapp.model.Dummy1;
 import uk.ac.ed.epcc.webapp.model.Dummy2;
 import uk.ac.ed.epcc.webapp.model.LinkDummy;
-import uk.ac.ed.epcc.webapp.model.Pollux;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.LinkDummy.DummyLink;
+import uk.ac.ed.epcc.webapp.model.Pollux;
 
 /**
  * @author Stephen Booth
