@@ -16,8 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.charts;
 
-import javax.xml.ws.WebServiceProvider;
-
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 

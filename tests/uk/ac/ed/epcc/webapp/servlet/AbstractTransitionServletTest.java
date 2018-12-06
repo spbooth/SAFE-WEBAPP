@@ -257,12 +257,13 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		 }
 		 assertNotNull(key);
 		 if( factory instanceof TitleTransitionFactory){
-			 TitleTransitionFactory ttf = (TitleTransitionFactory) factory;
+			 // could do this for all transitions but
+			 // would need to update results for all non Title factories
 			builder.open("Title");
-				builder.clean(ttf.getTitle(key, target));
+				builder.clean(TransitionServlet.getPageTitle(factory, key, target));
 			builder.close();
 			builder.open("PageHeading");
-				builder.clean(ttf.getHeading(key, target));
+				builder.clean(TransitionServlet.getPageHeader(factory, key, target));
 			builder.close();
 		 }
 		 if( factory instanceof NavigationProvider){

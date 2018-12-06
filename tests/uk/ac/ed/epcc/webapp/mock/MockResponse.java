@@ -19,7 +19,10 @@ package uk.ac.ed.epcc.webapp.mock;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -34,30 +37,29 @@ public class MockResponse implements HttpServletResponse {
 	public MockOutputStream stream = new MockOutputStream();
 	public String content_type="text/html";
 	int content_length=0;
-	
+	Map<String,String> headers=new HashMap<>();
 	public void addCookie(Cookie arg0) {
 	
 
 	}
 
 	public void addDateHeader(String arg0, long arg1) {
-		
-
+		Date d = new Date(arg1);
+		addHeader(arg0, d.toString());
 	}
 
 	public void addHeader(String arg0, String arg1) {
-		
+		headers.put(arg0, arg1);
 
 	}
 
 	public void addIntHeader(String arg0, int arg1) {
-		
+		addHeader(arg0, Integer.toString(arg1));
 
 	}
 
 	public boolean containsHeader(String arg0) {
-		
-		return false;
+		return headers.containsKey(arg0);
 	}
 
 	public String encodeRedirectURL(String arg0) {
@@ -94,16 +96,17 @@ public class MockResponse implements HttpServletResponse {
 	}
 
 	public void setDateHeader(String arg0, long arg1) {
-		
+		Date d = new Date(arg1);
+		setHeader(arg0, d.toString());
 	}
 
 	public void setHeader(String arg0, String arg1) {
-		
+		headers.put(arg0, arg1);
 
 	}
 
 	public void setIntHeader(String arg0, int arg1) {
-		
+		headers.put(arg0, Integer.toString(arg1));
 
 	}
 
