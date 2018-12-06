@@ -19,12 +19,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.ContextCached;
 import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 /** Abstract superclass for building {@link TransitionFactory}s.
  * 
  * @author spb
@@ -32,13 +32,13 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  * @param <T>
  * @param <K>
  */
-public abstract class AbstractTransitionFactory<T , K extends TransitionKey<T>> implements TransitionFactory<K,T>{
+
+public abstract class AbstractTransitionFactory<T , K extends TransitionKey<T>> extends AbstractContexed implements ContextCached, TransitionFactory<K,T>{
 	private final Map<String,K> key_map;
 	private final Map<K,Transition<T>> transition_map;
-    private final AppContext conn;
 	public AbstractTransitionFactory(AppContext c) {
-		super();
-		this.conn=c;
+		super(c);
+		
     	key_map = new LinkedHashMap<>();
     	if( sortByKey()) {
     		transition_map = new TreeMap<>();
@@ -50,9 +50,6 @@ public abstract class AbstractTransitionFactory<T , K extends TransitionKey<T>> 
 		return false;
 	}
 	
-	protected Logger getLogger(){
-		return conn.getService(LoggerService.class).getLogger(getClass());
-	}
 	/** Register a new transition with the provider. 
      * This is intended to be called from the constructor of the sub-class
      * so that all transitions are registered by the time the constructor returns.
@@ -94,8 +91,4 @@ public abstract class AbstractTransitionFactory<T , K extends TransitionKey<T>> 
 		return result;
 	}
 
-	@Override
-	public final AppContext getContext() {
-		return conn;
-	}	
 }
