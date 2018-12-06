@@ -62,11 +62,11 @@ public class AndAcceptFilter<T> extends LinkedHashSet<AcceptFilter<? super T>> i
 	@Override
 	public boolean accept(T o) {
 		for(AcceptFilter<? super T> fil : this){
-			if( fil.accept(o)){
-				return true;
+			if( ! fil.accept(o)){
+				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 	@Override
 	public int hashCode() {
