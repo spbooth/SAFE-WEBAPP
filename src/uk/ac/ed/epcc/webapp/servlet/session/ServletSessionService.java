@@ -269,8 +269,10 @@ public void setCurrentPerson(A person) {
 				Wtmp w = man.find(id);
 				w.logout();
 			}
+			
 			if( request != null){
-				Wtmp w = man.create(person, request);
+				AppUser real = getSuperPerson();
+				Wtmp w = man.create(person, real,request);
 				setCrossCookie(man, w);
 				setAttribute(WTMP_ID, w.getID());
 				setAttribute(WTMP_EXPIRY_DATE, w.getEndTime());

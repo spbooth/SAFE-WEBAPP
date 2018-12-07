@@ -31,6 +31,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
+import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -64,6 +65,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	private static final String HOST = "Host";
 
 	private static final String PERSON_ID = "PersonID";
+	private static final String SUPER_PERSON_ID = "SuperPersonID";
 	public class DateFilter extends SQLAndFilter<Wtmp> {
 
 		public DateFilter(Date point) {
@@ -112,6 +114,19 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 			}
 			return null;
 		}
+		public AppUser getSuperPerson()  {
+			SessionService serv = getContext().getService(SessionService.class);
+			Number id = record.getNumberProperty(SUPER_PERSON_ID);
+			if( serv != null && id != null ){
+
+
+				return (AppUser) serv.getLoginFactory().find(
+						id);
+
+			}
+			return null;
+		}
+
 
 		public Date getStartTime() {
 			return record.getDateProperty(START_TIME);
@@ -132,7 +147,12 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 		public void setPerson(AppUser p) {
 			record.setProperty(PERSON_ID, p.getID());
 		}
-
+		public void setSuperPerson(AppUser p) {
+			if( p == null) {
+				return;
+			}
+			record.setOptionalProperty(SUPER_PERSON_ID, p.getID());
+		}
 		public void setStartTime(Date d) {
 			record.setProperty(START_TIME, d);
 		}
@@ -176,6 +196,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
    			String homeTable) {
 		  TableSpecification spec = new TableSpecification();
 		  spec.setField(PERSON_ID, new ReferenceFieldType(false, ctx.getService(SessionService.class).getLoginFactory().getTag()));
+		  spec.setOptionalField(SUPER_PERSON_ID, new IntegerFieldType());
 		  spec.setField(START_TIME, new DateFieldType(true, null));
 		  spec.setField(END_TIME, new DateFieldType(true, null));
 		  spec.setField(BROWSER, new StringFieldType(true, null, 512));
@@ -198,10 +219,11 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 		return new Wtmp(res);
 	}
 
-	public Wtmp create(AppUser p, HttpServletRequest req) throws DataFault{
+	public Wtmp create(AppUser p, AppUser real,HttpServletRequest req) throws DataFault{
 		Wtmp w =  makeBDO();
 
 		w.setPerson(p);
+		w.setSuperPerson(real);
 		w.setHost(req.getRemoteHost());
 		w.setBrowser(req.getHeader("user-agent"));
 		Date s = new Date();
@@ -213,7 +235,6 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	}
 	
 
-
 	public String getHTMLHeader() {
 		return "<tr><th>Person</th><th>Host</th><th>Browser</th><th>Start</th><th>End</th></tr>\n";
 	}
@@ -222,6 +243,12 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 		StringBuilder buff = new StringBuilder();
 		buff.append("<tr><td><small>");
 		buff.append(w.getPerson().getIdentifier());
+		AppUser real = w.getSuperPerson();
+		if( real != null) {
+			buff.append(" [");
+			buff.append(real.getIdentifier());
+			buff.append("]");
+		}
 		buff.append("</small></td><td><small>");
 		buff.append(w.getHost());
 		buff.append("</small></td><td><small>");

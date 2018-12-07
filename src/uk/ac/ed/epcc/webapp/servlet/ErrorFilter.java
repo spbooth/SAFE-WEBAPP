@@ -45,7 +45,7 @@ import uk.ac.ed.epcc.webapp.jdbc.WrappedDatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.config.DataBaseConfigService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.logging.log4j.Log4JLoggerService;
+import uk.ac.ed.epcc.webapp.logging.print.PrintLoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintWrapper;
 import uk.ac.ed.epcc.webapp.servlet.config.ServletContextConfigService;
 import uk.ac.ed.epcc.webapp.servlet.logging.ServletWrapper;
@@ -353,7 +353,7 @@ public class ErrorFilter implements Filter {
 
 
 		// This is going to use the config service so apply after the cache is in place
-		conn.setService(conn.makeObjectWithDefault(LoggerService.class, Log4JLoggerService.class, "logger.service"));
+		conn.setService(conn.makeObjectWithDefault(LoggerService.class, PrintLoggerService.class, "logger.service"));
 		if( request != null && response != null ){
 			// null request/response means this is a dummy context generated for
 			// a context listener

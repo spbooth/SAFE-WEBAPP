@@ -654,7 +654,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			error(e,"Error finding person by id "+personID);
 			return null;
 		}
-		if( person != null && ! person.canLogin()){
+		if( person != null && ! canLogin(person)){
 			
 			// login now forbidden
 			clearCurrentPerson();

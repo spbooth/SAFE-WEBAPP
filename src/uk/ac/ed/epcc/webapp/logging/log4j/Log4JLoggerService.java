@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.logging.log4j;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.PropertyConfigurator;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -74,6 +75,10 @@ public class Log4JLoggerService implements LoggerService, Contexed , ConfigServi
 	}
 	public AppContext getContext() {
 		return conn;
+	}
+	@Override
+	public void shutdownLogging() {
+		LogManager.shutdown();
 	}
 
 	

@@ -19,14 +19,11 @@ package uk.ac.ed.epcc.webapp.servlet;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.logging.log4j.Log4JLoggerService;
 
-/** ContextListener that ensures Log4J is is correctly configured on application start 
+/** ContextListener that ensures the {@link LoggerService} is is correctly configured on 
+ * application start 
  * and shutdown on application finish.
  * 
  * failing to shutdown or delaying initialisation seems to cause classloader 
@@ -38,19 +35,24 @@ import uk.ac.ed.epcc.webapp.logging.log4j.Log4JLoggerService;
 
 @WebListener()
 public class Log4JWebappContextListener extends WebappContextListener {
-    boolean use_log4j=false;
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
-		Logger log = Logger.getLogger(getClass());
-		log.debug("super shutdown");
-		super.contextDestroyed(arg0);
-		/** The logging scheme may have a similar problem
-		 * 
-		 */
-		if( use_log4j){
-			log.debug("Shutting down logging");
-		    LogManager.shutdown();
+		AppContext conn=null;
+		try{
+			conn = ErrorFilter.makeContext(arg0.getServletContext(), null, null);
+
+			LoggerService serv = conn.getService(LoggerService.class);
+			serv.shutdownLogging();
+
+
+		}catch(Exception t){
+			arg0.getServletContext().log("Error starting logging WebappContextListener",t);
+		}finally {
+			if( conn != null) {
+				conn.close();
+			}
 		}
+		super.contextDestroyed(arg0);
 	}
 
 	/* (non-Javadoc)
@@ -60,14 +62,14 @@ public class Log4JWebappContextListener extends WebappContextListener {
 	public void contextInitialized(ServletContextEvent arg0) {
 		AppContext conn=null;
 		try{
-		conn = ErrorFilter.makeContext(arg0.getServletContext(), null, null);
-	
-		LoggerService serv = conn.getService(LoggerService.class);
-		use_log4j = serv.getClass() == Log4JLoggerService.class;
-		serv.getLogger(getClass()).debug("Context started");
-		
+			conn = ErrorFilter.makeContext(arg0.getServletContext(), null, null);
+
+			LoggerService serv = conn.getService(LoggerService.class);
+			serv.initialiseLogging();
+
+
 		}catch(Exception t){
-			arg0.getServletContext().log("Error starting Log4JWebappContextListener",t);
+			arg0.getServletContext().log("Error starting logging WebappContextListener",t);
 		}finally {
 			if( conn != null) {
 				conn.close();

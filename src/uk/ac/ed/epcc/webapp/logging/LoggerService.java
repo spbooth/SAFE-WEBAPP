@@ -37,4 +37,17 @@ import uk.ac.ed.epcc.webapp.AppContextService;
 public interface LoggerService extends AppContextService<LoggerService>{
    public Logger getLogger(String name);
    public Logger getLogger(Class c);
+   
+   /** Initialise the logging system. Called once per application
+    * 
+    */
+   public default void initialiseLogging() {
+	   
+   }
+   /** shutdown the logging system called once per application
+    * 
+    */
+   public default void shutdownLogging() {
+	   
+   }
 }

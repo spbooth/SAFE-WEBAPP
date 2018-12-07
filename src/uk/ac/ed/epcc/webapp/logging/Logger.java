@@ -16,6 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.logging;
 
+import java.util.function.Supplier;
+
 /**
  * This is the Logger interface used by the Webapp classes. Its essentially a
  * wrapper around the subset of the log4J interface that we use but by wrapping
@@ -28,23 +30,64 @@ package uk.ac.ed.epcc.webapp.logging;
  * 
  */
 public interface Logger {
+	
 	public void debug(Object message);
-
+	
+	public default void debug(Supplier<String> message) {
+		debug(message.get());
+	}
+	
 	public void debug(Object message, Throwable t);
-
+	
+	public default void debug(Supplier<String> message, Throwable t) {
+		debug(message.get(),t);
+	}
+	
 	public void error(Object message);
+	
+	public default void error(Supplier<String> message) {
+		error(message.get());
+	}
 
 	public void error(Object message, Throwable t);
+	
+	public default void error(Supplier<String> message, Throwable t) {
+		error(message.get(),t);
+	}
 
 	public void fatal(Object message);
+	
+	public default void fatal(Supplier<String> message) {
+		fatal(message.get());
+	}
 
 	public void fatal(Object message, Throwable t);
+	
+	public default void fatal(Supplier<String> message, Throwable t) {
+		fatal(message.get(),t);
+	}
 
 	public void info(Object message);
+	
+	public default void info(Supplier<String> message) {
+		info(message.get());
+	}
 
 	public void info(Object message, Throwable t);
+	
+	public default void info(Supplier<String> message, Throwable t) {
+		info(message.get(),t);
+	}
 
 	public void warn(Object message);
+	
+	public default void warn(Supplier<String> message) {
+		warn(message.get());
+	}
 
 	public void warn(Object message, Throwable t);
+	
+	public default void warn(Supplier<String> message, Throwable t) {
+		warn(message.get(),t);
+	}
 }
