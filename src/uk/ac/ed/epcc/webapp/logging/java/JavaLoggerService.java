@@ -13,19 +13,16 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.logging.java;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.logging.LogManager;
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
-import uk.ac.ed.epcc.webapp.config.ConfigService;
-import uk.ac.ed.epcc.webapp.config.FilteredProperties;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
-/**
+/** A {@link LoggerService} that maps onto the standard java logging api.
+ * 
+ * Note that when running under tomcat this api is provided by a tomcat specific
+ * implementation to allow per-application configuration so consult the tomcat documentation for
+ * configuration instructions.
  * @author spb
  *
  */
@@ -71,8 +68,8 @@ public class JavaLoggerService implements Contexed, LoggerService {
 		return new JavaLoggerWrapper(c.getCanonicalName(), null, java.util.logging.Logger.getLogger(c.getCanonicalName()));
 	}
 
-//	@Override
-//	public void initialiseLogging() {
+	@Override
+	public void initialiseLogging() {
 //		ConfigService config = conn.getService(ConfigService.class);
 //		if( config != null ) {
 //			FilteredProperties props = new FilteredProperties(config.getServiceProperties(), "logconfig");
@@ -87,7 +84,7 @@ public class JavaLoggerService implements Contexed, LoggerService {
 //				}
 //			}
 //		}
-//	}
+	}
 //
 //	@Override
 //	public void shutdownLogging() {
