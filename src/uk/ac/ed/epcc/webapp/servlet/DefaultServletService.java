@@ -734,4 +734,18 @@ public class DefaultServletService implements ServletService{
 		}
 		
 	}
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.servlet.ServletService#noCache()
+	 */
+	@Override
+	public void noCache() {
+		if( res instanceof HttpServletResponse){
+			HttpServletResponse h = (HttpServletResponse) res;
+			h.setHeader("Cache-Control", "no-store");
+			h.addHeader("Pragma", "no-cache");
+		}
+		
+	}
 }

@@ -64,6 +64,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.servlet.QRServlet;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -434,15 +435,17 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 			try {
 				ServletService serv = getContext().getService(ServletService.class);
 				if( serv != null) {
-				ExtendedXMLBuilder xml = cb.getText();
-				//xml.addClass("qrcode");
-				xml.open("img");
-				xml.addClass("qrcode");
-				URI uri=getURI(target, getKey());
-				xml.attr("src",serv.encodeURL("/QRCode/code.png?text="+URLEncoder.encode(uri.toString(),"UTF-8")));
-				xml.attr("alt",uri.toString());
-				xml.close();
-				xml.appendParent();
+					serv.noCache();
+					ExtendedXMLBuilder xml = cb.getText();
+					//xml.addClass("qrcode");
+					xml.open("img");
+					xml.addClass("qrcode");
+					URI uri=getURI(target, getKey());
+					xml.attr("src",serv.encodeURL(QRServlet.getImageURL(getContext(), "code.png", uri.toString())));
+					// no alt as we want to avoid the value being cached
+					//xml.attr("alt",uri.toString());
+					xml.close();
+					xml.appendParent();
 				}
 			}catch(Exception e) {
 				getLogger().error("Error making image", e);

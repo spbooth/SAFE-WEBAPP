@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -47,8 +48,10 @@ public class QRServletTest extends ServletTest {
 	@Test
 	public void testMakeCode() throws ServletException, IOException, DataFault {
 		req.path_info="hello_world.png";
-		addParam("text", "https://en.wikipedia.org/wiki/QR_code");
+		req.getSession().setAttribute("QRCODE0", "https://en.wikipedia.org/wiki/QR_code");
+		addParam("img","0" );
 		doPost();
+		assertEquals(HttpServletResponse.SC_OK,res.error);
 		assertEquals("image/png",res.getContentType());
 		assertTrue(res.stream.isClosed());
 		byte content[] = ((MockOutputStream)res.getOutputStream()).getData();

@@ -142,4 +142,9 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * @param props
 	 */
 	public void addErrorProps(Map props);
+	
+	/** Identify the current request as conaining sensative data that should not be cached.
+	 * 
+	 */
+	public void noCache();
 }

@@ -18,6 +18,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Hashtable;
 
 import javax.imageio.ImageIO;
@@ -35,13 +36,23 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 /** Servlet to generate a QRCode
- * This is not authenticated as it is used as 
+ * This is not authenticated but may use the HttpSession 
  * @author Stephen Booth
  *
  */
 @WebServlet(name="QRServlet", urlPatterns={"/QRCode/*"})
 public class QRServlet extends WebappServlet {
+
+	/**
+	 * 
+	 */
+	private static final String QRCODE_ATTR_PREFIX = "QRCODE";
+	/**
+	 * 
+	 */
+	private static final String COUNTER_ATTR = "QrcodeCounter";
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.servlet.WebappServlet#doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, uk.ac.ed.epcc.webapp.AppContext)
@@ -49,8 +60,20 @@ public class QRServlet extends WebappServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse res, AppContext conn)
 			throws ServletException, IOException {
+		ServletService serv = conn.getService(ServletService.class);
+		serv.noCache();
 		
-		String text=req.getParameter("text");
+		int pos=0;
+		String img = req.getParameter("img");
+		if( img == null || img.isEmpty()) {
+			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid argument");
+			return;
+		}
+		
+		pos = Integer.parseInt(img);
+		
+		SessionService sess = conn.getService(SessionService.class);
+		String text=(String) sess.getAttribute(QRCODE_ATTR_PREFIX+Integer.toString(pos));
 		if( text == null || text.isEmpty()) {
 			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid argument");
 			return;
@@ -92,4 +115,15 @@ public class QRServlet extends WebappServlet {
 		ImageIO.write(image, fileType, stream);
 	}
 
+	public static String getImageURL(AppContext conn, String image_name, String text) throws UnsupportedEncodingException {
+		SessionService sess = conn.getService(SessionService.class);
+		Integer counter = (Integer) sess.getAttribute(COUNTER_ATTR);
+		if( counter == null ) {
+			counter = Integer.valueOf(0);
+		}
+		sess.setAttribute(COUNTER_ATTR, Integer.valueOf(counter.intValue()+1));
+		int pos=counter.intValue()%50; // max 50 images
+		sess.setAttribute(QRCODE_ATTR_PREFIX+pos, text);
+		return "/QRCode/"+image_name+"?img="+Integer.toString(pos);
+	}
 }

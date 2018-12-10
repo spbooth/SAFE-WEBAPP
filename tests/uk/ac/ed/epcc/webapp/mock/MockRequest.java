@@ -172,7 +172,7 @@ public class MockRequest implements HttpServletRequest {
 	@Override
 	public HttpSession getSession() {
 		
-		return session;
+		return getSession(true);
 	}
 
 	@Override
