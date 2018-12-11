@@ -22,5 +22,6 @@ public class Confirmations {
 	public static final String TIME_BOUNDS_CONFIRM = "time_bounds";
 	public static final String PAST_EDIT_CONFIRM = "past_edit";
 	public static final String CLIP_RECORDS_CONFIRM = "will_clip";
+	public static final String CLIP_WILL_DELETE_RECORDS_CONFIRM = "will_clip_and_delete";
 
 }
