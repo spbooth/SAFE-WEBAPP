@@ -92,6 +92,9 @@ public class ConstructedObjectInput<T> implements ListInput<String,T>{
 		if( item == null){
 			return null;
 		}
+		if( item instanceof Tagged) {
+			return ((Tagged)item).getTag();
+		}
 		for(String key : reg.keySet()){
 			if( item.getClass() == reg.get(key)){
 				return key;

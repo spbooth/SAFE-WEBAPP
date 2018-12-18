@@ -22,6 +22,7 @@
 package uk.ac.ed.epcc.webapp;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -31,6 +32,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -47,6 +49,7 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintLoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Composable;
+import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.resource.DefaultResourceService;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
@@ -1182,9 +1185,27 @@ public final class AppContext {
 		}
 		return target;
 	}
-	/** Generate a map of tags to classes assignable to a target type
+	public List<Class> getClassList(Class template,String name){
+		LinkedList<Class> result = new LinkedList<>();
+		String list = getExpandedProperty(name);
+		if( list == null || list.isEmpty()) {
+			return result;
+		}
+		for(String tag: list.split("\\s*,\\s*")) {
+			Class c = getPropertyClass(template,null, tag);
+			if( c == null) {
+				c = getClassDef(template, tag);
+			}
+			if( c != null ) {
+				result.add(c);
+			}
+		}
+		return result;
+	}
+	/** Generate a map of tags to classes assignable to (or containing
+	 * an assignable {@link Composable} {@link Composite} of) a target type
 	 * This will only find classes registered with the config service.
-	 * @param <T>
+	 * @param <T> type being looked for.
 	 * @param template Class of target.
 	 * @return Map of tag to class
 	 */
@@ -1193,17 +1214,21 @@ public final class AppContext {
 		Map<String,Class> result = new TreeMap<>();
 		Map<String,String> tagmap = getInitParameters(CLASS_PREFIX);
 		for(String s : tagmap.keySet()){
-			
+			assert(s.startsWith(CLASS_PREFIX));
 			try{
-			String tag = s.substring(CLASS_PREFIX.length());
-			// Only single string tags
-			if( ! tag.contains(".")){
-			Class<? extends T> cand = getClassDef(template, tagmap.get(s));
-			if( cand != null && (template == null||template.isAssignableFrom(cand) )){
-				
-				result.put(tag, cand);
-			}
-			}
+				String tag = s.substring(CLASS_PREFIX.length());
+				// Only single string tags
+				if( ! tag.contains(".")){
+					// no template here as we are looking up the FQN and
+					// can't check for composites
+					Class<? extends T> cand = getClassDef(null, tagmap.get(s));
+
+					if( checkTemplate(template, cand,tag)){
+
+						result.put(tag, cand);
+					}
+
+				}
 			}catch(Exception t){
 				LoggerService serv = getService(LoggerService.class);
 				if( serv != null){
@@ -1214,6 +1239,43 @@ public final class AppContext {
 			}
 		}
 		return result;
+	}
+		/** rules to check if a candidate class matches a template
+		 * 
+		 * A null template always matches. a null candidate always fails.
+		 * if tag is non null and the template implements {@link Composable} then
+		 * composites are checked for a match as well
+		 * 
+		 * @param template      can be null
+		 * @param candidate
+		 * @return
+		 */
+	private boolean checkTemplate(Class template, Class candidate,String tag) {
+		if( candidate == null) {
+			return false;
+		}
+		if( template == null) {
+			return true;
+		}
+		if( template.isAssignableFrom(candidate) ) {
+			return true;
+		}else {
+			if( tag != null && Composable.class.isAssignableFrom(template) && DataObjectFactory.class.isAssignableFrom(candidate)) {
+				// have to check composites.
+				for(Class c : getClassList(Composite.class, tag+DataObjectFactory.COMPOSITES_SUFFIX)) {
+					if( template.isAssignableFrom(c)) {
+						return true;
+					}
+				}
+				// now static composites, only works if available as an accessible field of the right type.
+				for(Field f : candidate.getFields()) {
+					if( template.isAssignableFrom(f.getType()) && Composite.class.isAssignableFrom(f.getType())) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 	/** resolve a class-name into a class.
 	 * This will attempt expand classdef definitions if the name is in the default package. 
@@ -1231,23 +1293,25 @@ public final class AppContext {
 	 * 
 	 * @param <T>
 	 * @param template
-	 * @param default_class
-	 * @param class_name  Either a fully qualified class name or a classdef tag.
+	 * @param default_class result to use if no definition
+	 * @param tag  Either a fully qualified class name or a classdef tag.
 	 * @return target class or null
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> Class<? extends T> getClassFromName(Class<T> template, Class<? extends T> default_class,String tag){
+	
 		String class_name=null;
 		Class<? extends T> target=default_class; // default to the target
-		if( tag != null && tag.contains(".")){
-			// tag might be a bare class name use as default
-			class_name=tag;
-		}
-		
-		if( tag != null ){
-			// try looking up a classdef
-			tag=tag.trim();
-			class_name=getInitParameter(CLASSDEF_PROP_PREFIX+tag, class_name);
+		if( tag != null) {
+			if( tag.contains(".")){
+				// tag might be a bare class name use as default
+				class_name=tag;
+				//tag = null;  // supress Composable check
+			}else {
+				// try looking up a classdef
+				tag=tag.trim();
+				class_name=getInitParameter(CLASSDEF_PROP_PREFIX+tag);
+			}
 		}
 		//log.debug("class name for "+tag+" is "+class_name);
 		if( class_name != null ){
@@ -1260,23 +1324,20 @@ public final class AppContext {
 					error(e,"Class "+class_name+" not found");
 				}
 				if(t != null ){
-					
-					if(template == null ){
-						target = t ; // No constraints so OK.
+					// don't check for composites here as we want a
+					// class assignable to the template not one that is just cast-able
+					if( checkTemplate(template, t,null)){
+						target=t; // Also OK meets constraints
 					}else{
-						if( template.isAssignableFrom(t)){
-							target=t; // Also OK meets constraints
-						}else{
-							if( default_class == null ){
-								// assume we are just querying the definitions and
-								// can handle a null result.
-								return null;
-							}
-							// This is bad class defined but does not conform to target
-							// the existence of a default_class implies we are going to try
-							// constructing the class returned 
-							throw new ClassCastException(template.getCanonicalName()+" not assignable from "+t.getCanonicalName()+" resolved from "+tag);
+						if( default_class == null ){
+							// assume we are just querying the definitions and
+							// can handle a null result.
+							return null;
 						}
+						// This is bad class defined but does not conform to target
+						// the existence of a default_class implies we are going to try
+						// constructing the class returned 
+						throw new ClassCastException(template.getCanonicalName()+" not assignable from "+t.getCanonicalName()+" resolved from "+tag);
 					}
 				}
 			}
@@ -1289,26 +1350,7 @@ public final class AppContext {
 	}
 	
 	
-	@Deprecated
-	public boolean isFeatureOn(String f) {
-		return isFeatureOn(f, false);
-	}
-	@Deprecated
-	public boolean isFeatureOn(String f,boolean def) {
-		return new Feature(f,def,null).isEnabled(this);
-	}
-	/**
-	 * Checks if optional features specified by the {@link Feature} object are enabled on
-	 * this service.
-	 * 
-	 * @param f
-	 *            The key of the feature we are checking for.
-	 * @return true if service.feature.<em>feature-name</em> is equal on/true, false otherwise.
-	 */
-	@Deprecated
-	public boolean isFeatureOn(Feature f){
-		return f.isEnabled(this);
-	}
+	
 	
    
 	

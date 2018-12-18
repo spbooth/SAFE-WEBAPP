@@ -39,6 +39,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.FilterResult;
 import uk.ac.ed.epcc.webapp.model.data.Removable;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.model.data.TestComposable;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.convert.EnumProducer;
 import uk.ac.ed.epcc.webapp.model.data.convert.NumericEnumProducer;
@@ -117,7 +118,7 @@ public class Dummy1 extends DataObject implements Removable {
 	}
 	
 	
-    public static class Factory extends DataObjectFactory<Dummy1> {
+    public static class Factory extends DataObjectFactory<Dummy1> implements TestComposable{
     	 /**
 		 * 
 		 */
