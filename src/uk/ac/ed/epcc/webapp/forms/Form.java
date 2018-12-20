@@ -212,8 +212,11 @@ public interface Form extends Iterable<Field>, Contexed{
 	public void removeValidator(FormValidator v);
 	
 	/** Get the set of {@link FormValidator}s installed in the form.
+	 * This is a copy of the internal set and is not modifiable, though
+	 * its members can be removed from the active set by passing them
+	 * to {@link #removeValidator(FormValidator)}
 	 * 
-	 * @return FormValidator
+	 * @return Set<FormValidator>
 	 */
 	public Set<FormValidator> getValidators();
 	/**

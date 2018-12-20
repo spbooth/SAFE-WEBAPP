@@ -273,12 +273,19 @@ public abstract class ServletTest extends WebappTestBase{
 		assertEquals(page, req.getAttribute(DefaultServletService.PAGE_ATTR));
 		checkForward(LoginServlet.getLoginPage(ctx));
 	}
-	
+	/** Assert form error reported with a specific error reported on one of the parameters
+	 * 
+	 * @param expected_url  form-url redirected to.
+	 * @param param parameter with error (null to skip check)
+	 * @param error expected error text.
+	 */
 	public void checkError(String expected_url,String param, String error){
 		checkForward(expected_url);
 		Map<String,String> errors = HTMLForm.getErrors(req);
 		//assertTrue(errors.containsKey(param));
-		assertEquals(error, errors.get(param));
+		if( param != null) {
+			assertEquals(error, errors.get(param));
+		}
 	}
 	/** Check that the specified confirm message has been requested
 	 * then reset the response and modify the request with the specified confirmation

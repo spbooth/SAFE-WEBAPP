@@ -202,15 +202,20 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		return;
 	}
 	
-	/** verify that the transition resulted in a form error.
+	/** verify that the transition resulted in a form error on a specific parameter.
 	 * 
-	 * @param param
+	 * 
+	 * @param param 
 	 * @param error
 	 */
 	public void checkError(String param, String error){
 		checkError("/scripts/transition.jsp", param,error);
 	}
-	
+	/** Check that transition resulted in a form error with the specified parameters
+	 * missing 
+	 * 
+	 * @param params
+	 */
 	public void checkMissing(String ... params) {
 		checkForward("/scripts/transition.jsp");
 		Collection<String> missing = HTMLForm.getMissing(req);
