@@ -442,7 +442,7 @@ public boolean canSU(A new_person) {
 	// We re looking for a specific person Check for a sudo table
 	PersonRelationship<A> pr = getPersonRelationship();
 	if( pr != null ){
-		return pr.hasRole(this,new_person, PersonRelationship.SUDO_ROLE);
+		return pr.hasRole(this.getCurrentPerson(),new_person, PersonRelationship.SUDO_ROLE);
 	}
 	return false;
 }

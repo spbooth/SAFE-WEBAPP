@@ -26,7 +26,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.LinkManager;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.model.data.forms.RoleSelector;
+
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -49,7 +49,7 @@ import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
 
 public abstract class AbstractRelationship<A extends AppUser,B extends DataObject, L extends AbstractRelationship.Link<A, B>> extends 
          LinkManager<L,A,B> implements 
-         RelationshipProvider<A, B>, RoleSelector<B>{
+         RelationshipProvider<A, B>{
     
 	
 	
@@ -118,14 +118,7 @@ public abstract class AbstractRelationship<A extends AppUser,B extends DataObjec
     	return getLeftFilter(and);
     }
 	
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.safe.accounting.db.RelationshipProvider#getInput(java.lang.String, uk.ac.ed.epcc.webapp.session.SessionService)
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public final DataObjectItemInput<B> getInput(String role, SessionService user) {
-		return getRightFactory().getInput(hasRelationFilter(role,(A)user.getCurrentPerson()));
-	}
+	
 	
 
 	
@@ -166,14 +159,7 @@ public abstract class AbstractRelationship<A extends AppUser,B extends DataObjec
 			getLogger().error("Error making role",e);
 		}
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.safe.accounting.db.RelationshipProvider#hasRole(int, java.lang.String)
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public final boolean hasRole(SessionService sess,B target,String role){
-		return hasRole((A) sess.getCurrentPerson(),target ,role);
-	}
+	
 	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.IndexedLinkManager#selectLink(uk.ac.ed.epcc.webapp.model.data.Indexed, uk.ac.ed.epcc.webapp.model.data.Indexed)
@@ -182,23 +168,7 @@ public abstract class AbstractRelationship<A extends AppUser,B extends DataObjec
 	protected final L selectLink(A leftEnd, B rightEnd) throws Exception {
 		return makeLink(leftEnd, rightEnd);
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.safe.accounting.db.RelationshipProvider#hasRole(java.lang.String, uk.ac.ed.epcc.webapp.session.SessionService)
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public final boolean hasRole(String role, SessionService user) {
-		A u = (A) user.getCurrentPerson();
-		if( u == null){
-			return false;
-		}
-		try {
-			return exists(getUserRoleFilter(u, role));
-		} catch (Exception e) {
-			getLogger().error("Error checking match",e);
-			return false;
-		}
-	}
+	
 	@Override
 	public final boolean canCreate(SessionService c){
 		// link objects are created from the update form
