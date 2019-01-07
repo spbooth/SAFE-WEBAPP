@@ -35,7 +35,10 @@ import uk.ac.ed.epcc.webapp.servlet.navigation.Node;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NodeMaker;
 import uk.ac.ed.epcc.webapp.servlet.navigation.ParentNode;
 import uk.ac.ed.epcc.webapp.session.SessionService;
-/** Factory class for a set of FormFactoryProviders
+/** Factory class for a set of FormFactoryProviders.
+ * 
+ * This implements {@link UIGenerator} to emit a set of edit/update buttons
+ * and {@link NodeMaker} to expose the same operations as a navigation menu.
  * 
  * @author spb
  *

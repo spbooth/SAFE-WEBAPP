@@ -1,2 +1,3 @@
 # Specifies the mock implementations that would be returned by Session
 protocol=smtp; type=transport; class=uk.ac.ed.epcc.webapp.email.MockTansport; vendor=Smail, Inc.;
+protocol=test; type=store; class=uk.ac.ed.epcc.webapp.email.MockStore; vendor=Test, code;

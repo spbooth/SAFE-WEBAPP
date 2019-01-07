@@ -28,18 +28,6 @@ public abstract class AbstractListener<R> extends AbstractAction<R> implements L
 		super(clazz);
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.lifecycle.LifeCycleListener#prepare(java.lang.Object)
-	 */
-	public void prepare(R target) throws Exception {
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.lifecycle.LifeCycleListener#abort(java.lang.Object)
-	 */
-	public void abort(R target) {
-		
-	}
+	
 
 }

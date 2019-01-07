@@ -57,7 +57,7 @@ public interface LifeCycleListener<R> extends ActionListener<R> {
 	 * @param target
 	 * @throws Exception 
 	 */
-	public void prepare(R target) throws Exception;
+	public default void prepare(R target) throws Exception{};
 	
 	/**  A prepared event has been aborted. This allows the {@link LifeCycleListener} try to clean-up any changes it made in
 	 * the {@link #prepare(Object)} call. For example by returning to the original state or cancelling the
@@ -65,5 +65,5 @@ public interface LifeCycleListener<R> extends ActionListener<R> {
 	 * 
 	 * @param target
 	 */
-	public void abort(R target);
+	public default void abort(R target) {};
 }

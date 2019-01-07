@@ -37,13 +37,7 @@ public class AbstractAction<R> implements ActionListener<R>{
 		return getClass().getSimpleName();
 	}
 
-	public boolean allow(R target, boolean throw_reason) throws LifeCycleException {
-		return true;
-	}
-
-	public void action(R target) {
-		
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()

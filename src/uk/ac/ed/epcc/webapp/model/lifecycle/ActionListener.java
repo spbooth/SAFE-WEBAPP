@@ -38,14 +38,16 @@ public interface ActionListener<R> extends Targetted<R> {
 	 * @return boolean true if operation allowed
 	 * @throws LifeCycleException
 	 */
-	public abstract boolean allow(R target, boolean throw_reason)
-			throws LifeCycleException;
+	public default boolean allow(R target, boolean throw_reason)
+			throws LifeCycleException{
+		return true;
+	}
 
 	/** Called after the event has taken place (and any external actions have completed) to allow the {@link LifeCycleListener} to 
 	 * make/finalise corresponding changes to its own objects.
 	 * 
 	 * @param target
 	 */
-	public abstract void action(R target);
+	public default void action(R target) {}
 
 }
