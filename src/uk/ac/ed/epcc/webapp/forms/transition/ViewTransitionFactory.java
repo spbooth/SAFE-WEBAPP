@@ -74,7 +74,7 @@ public interface ViewTransitionFactory<K, T> extends TransitionFactory<K, T> {
     */
    public String getHelp(K key);
    
-   /** get custom button content. should default to the sting representation of the key
+   /** get custom button content. should default to the string representation of the key
     * 
     * @param key
     * @return String

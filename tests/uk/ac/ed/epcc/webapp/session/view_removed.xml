@@ -15,8 +15,8 @@
 </table>
 </log>
 <buttons>
-<active value="Email" help="Change the email address we use to contact you"/>
-<active value="SetAvatar" help="Upload or delete your picture"/>
-<active value="Details" help="Update the information we hold about you"/>
+<active value="Email" help="Change the email address we use to contact you">Update email</active>
+<active value="SetAvatar" help="Upload or delete your picture">Change Avatar</active>
+<active value="Details" help="Update the information we hold about you">Update personal details</active>
 </buttons>
 </view_page>

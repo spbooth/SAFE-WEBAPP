@@ -386,6 +386,11 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		builder.close();
 		builder.open("buttons");
 		for(Object key : provider.getTransitions(target)){
+			String text = provider.getText(key);
+			// for backwards compatability supress if same as value
+			if( text.equals(key.toString())) {
+				text=null;
+			}
 			if( provider.allowTransition(getContext(),target,key) ){
 				builder.open("active");
 				  builder.attr("value", key.toString());
@@ -393,6 +398,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 				  if( help != null ){
 					builder.attr("help",help);
 				  }
+				builder.clean(text);
 				builder.close();
 			}else{
 				if( provider instanceof ShowDisabledTransitions){
@@ -403,13 +409,23 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 					  if( help != null ){
 						builder.attr("help",help+" (disabled)");
 					  }
+					  builder.clean(text);
 					builder.close();
 					}
 				}
 			}
 		}
 		builder.close();
-		
+		// for test backwards compat only add if content exists
+		HtmlBuilder bottom = (HtmlBuilder) builder.getNested();
+		bottom.open("bottom");
+		  HtmlBuilder inner = (HtmlBuilder) bottom.getNested();
+		  provider.getBottomContent(inner,target,session_service);
+		  if( inner.hasContent()) {
+			  inner.appendParent();
+			  bottom.close();
+			  bottom.appendParent();
+		  }
 		builder.close();
 		 
 		 
