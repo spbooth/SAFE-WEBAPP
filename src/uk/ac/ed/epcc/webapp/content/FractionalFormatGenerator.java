@@ -19,6 +19,7 @@ import java.text.NumberFormat;
  * 
  * 
  * @see Table.NumberFormatGenerator
+ * @see FractionalFormatTransform
  * @author spb
  *
  */
@@ -39,8 +40,7 @@ public class FractionalFormatGenerator implements XMLGenerator{
 	public SimpleXMLBuilder addContent(SimpleXMLBuilder builder) {
 		builder.attr("numeric", "true");
 		if( data == null){
-			builder.attr("null","true");
-			builder.attr("class","frac_0");
+			builder.attr("class","frac_null");
 			builder.clean(nf.format(0.0));
 		}else{
 			int frac = (int)(10.0 * data.doubleValue());

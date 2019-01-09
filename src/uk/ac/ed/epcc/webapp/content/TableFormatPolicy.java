@@ -13,7 +13,12 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.content;
 
-/**
+import java.text.NumberFormat;
+
+/** Policy object to map a {@link Table} to a {@link SimpleXMLBuilder}
+ * 
+ * assumes a standard constructor signature with arguments
+ * ( {@link SimpleXMLBuilder}, {@link NumberFormat} )
  * @author spb
  *
  * @param <C>
