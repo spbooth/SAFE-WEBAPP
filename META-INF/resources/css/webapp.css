@@ -466,7 +466,7 @@ details div.description{
 div td, div table.auto td form , div.block td ul, div.block td ol{
         background-color: #ffffff;
 }
-td.numeric, td[numeric] ,  td.numeric input, {
+td.numeric, td[numeric] ,  td.numeric input {
 text-align: right;
 white-space: nowrap;
 }
@@ -643,36 +643,58 @@ li.frac_10{
 
 div.report td.frac_0 {
   	background-color: #ed1818;
+  	text-align: right;
+	white-space: nowrap;
 }
 div.report td.frac_1 {
   	background-color: #ed4218;
+  	text-align: right;
+	white-space: nowrap;  	
 }
 div.report td.frac_2 {
 	background-color: #ed6d18;
+  	text-align: right;
+	white-space: nowrap;	
 }
 div.report td.frac_3{
 	background-color: #ed9818;
+  	text-align: right;
+	white-space: nowrap;	
 }
 div.report td.frac_4{
 	background-color: #edc218;
+  	text-align: right;
+	white-space: nowrap;
 }
 div.report td.frac_5{
 	background-color: #eded18;
+  	text-align: right;
+	white-space: nowrap;
 }
 div.report td.frac_6{
 	background-color: #c2ed18;
+  	text-align: right;
+	white-space: nowrap;
 }
 div.report td.frac_7{
 	background-color: #98ed18;
+  	text-align: right;
+	white-space: nowrap;
 }
 div.report td.frac_8{
 	background-color: #6ded18;
+  	text-align: right;
+	white-space: nowrap;
 }
 div.report td.frac_9{
 	background-color: #42ed18;
+  	text-align: right;
+	white-space: nowrap;
 }
 div.report td.frac_10{
 	background-color: #18ed18;
+  	text-align: right;
+	white-space: nowrap;
 }
 
 
