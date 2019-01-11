@@ -59,6 +59,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.NoTableException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
@@ -1112,9 +1113,13 @@ public final class Repository implements AppContextCleanup{
 			// Length check for optional
 			if( optional && value instanceof String ){
 				FieldInfo info = getInfo(key);
-				if( info.isString() && info.getMax() < ((String)value).length()){
-					// Skip optional strings that are too long
-					return get(key);
+				if( info.isString() ) {
+					int max = info.getMax();
+					if( max > 0 && ((String)value).length() > max) {
+						// Skip optional strings that are known to be too long for the database
+						// however an unlimited field may return a max of zero
+						return get(key);
+					}
 				}
 			}
 			if( ! isDirty()){
@@ -3035,11 +3040,12 @@ public final class Repository implements AppContextCleanup{
 	final void setObject(PreparedStatement stmt, int pos, String key,
 			Object value) throws SQLException {
 		FieldInfo f = getInfo(key);
+		//Logger log = ctx.getService(LoggerService.class).getLogger(getClass());
 		if (f != null) {
-			//ctx.getLogger().debug("setObject "+pos+","+value+","+f.getType());
+			//log.debug("setObject "+pos+","+value+","+f.getType());
 			stmt.setObject(pos, value, f.getType());
 		} else {
-			//ctx.getLogger().debug("setObject "+pos+","+value);
+			//log.debug("setObject "+pos+","+value);
 			stmt.setObject(pos, value);
 		}
 	}
