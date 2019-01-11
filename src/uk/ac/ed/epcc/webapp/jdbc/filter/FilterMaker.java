@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,6 +26,7 @@ import java.util.List;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
+import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
@@ -69,44 +71,48 @@ public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
 		
 		
 		DatabaseService db_service = conn.getService(DatabaseService.class);
-		try(PreparedStatement stmt= db_service.getSQLContext(getDBTag()).getConnection().prepareStatement(
-				q, ResultSet.TYPE_FORWARD_ONLY,
-				ResultSet.CONCUR_READ_ONLY)) {
-			
-			// We are only using the REsultSet to initialise the Record and
-			// are not concurrent anyway so give
-			// the DB the best chance of optimising the query
-			
-			
-			List<PatternArgument> list = new LinkedList<>();
-			list=getTargetParameters(list);
-			list=getFilterArguments(f, list);
-			list=getModifyParameters(list);
-			setParams(1,query, stmt, list);
-			if( DatabaseService.LOG_QUERY_FEATURE.isEnabled(conn)){
-				getLogger().debug("Query is "+query);
-			}
-			try( ResultSet rs = stmt.executeQuery()){
-				O result = null;
-				if( rs.next()){ // need to position the REsultSet before making object
-					result = makeEntry(rs);
-					if( result ==null ){
+		try {
+			SQLContext sqlContext = db_service.getSQLContext(getDBTag());
+			Connection connection = sqlContext.getConnection();
+			try(PreparedStatement stmt= connection.prepareStatement(
+					q, ResultSet.TYPE_FORWARD_ONLY,
+					ResultSet.CONCUR_READ_ONLY)) {
+
+				// We are only using the REsultSet to initialise the Record and
+				// are not concurrent anyway so give
+				// the DB the best chance of optimising the query
+
+
+				List<PatternArgument> list = new LinkedList<>();
+				list=getTargetParameters(list);
+				list=getFilterArguments(f, list);
+				list=getModifyParameters(list);
+				setParams(1,query, stmt, list);
+				if( DatabaseService.LOG_QUERY_FEATURE.isEnabled(conn)){
+					getLogger().debug("Query is "+query);
+				}
+				try( ResultSet rs = stmt.executeQuery()){
+					O result = null;
+					if( rs.next()){ // need to position the REsultSet before making object
+						result = makeEntry(rs);
+						if( result ==null ){
+							result = makeDefault();
+						}
+						if( rs.next() ){
+							if( DataObjectFactory.REJECT_MULTIPLE_RESULT_FEATURE.isEnabled(conn)){
+
+								throw new MultipleResultException("Found multiple results expecting 1 :"+query.toString());
+							}else{
+								// just log
+								conn.getService(LoggerService.class).getLogger(getClass()).error("Multiple result expecting 1"+query.toString(),new Exception());
+							}
+						}
+					}else{
 						result = makeDefault();
 					}
-					if( rs.next() ){
-						if( DataObjectFactory.REJECT_MULTIPLE_RESULT_FEATURE.isEnabled(conn)){
-							
-							throw new MultipleResultException("Found multiple results expecting 1 :"+query.toString());
-						}else{
-							// just log
-							conn.getService(LoggerService.class).getLogger(getClass()).error("Multiple result expecting 1"+query.toString(),new Exception());
-						}
-					}
-				}else{
-					result = makeDefault();
+					return result;
 				}
-				return result;
-			}
+			} 
 		} catch (SQLException e) {
 			db_service.handleError("DataFault in FilterFinder " + query, e);
 			return null;

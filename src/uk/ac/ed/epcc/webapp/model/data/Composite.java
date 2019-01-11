@@ -159,7 +159,10 @@ public abstract class Composite<BDO extends DataObject, X extends Composite> imp
 		if( fac.isMine(data)){
 			return data.record;
 		}
-		throw new ConsistencyError("Wrong Object type passed");
+		if( data == null) {
+			throw new ConsistencyError("Null passed to getRecord");
+		}
+		throw new ConsistencyError("Wrong Object type passed to getRecord "+data.getIdentifier()+" expecting "+fac.getTarget().getSimpleName());
 	}
 	/** method to allow sub-classes to retrieve the {@link Repository}.
 	 * 

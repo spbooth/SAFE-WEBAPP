@@ -17,6 +17,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import static org.junit.Assert.assertEquals;
 /**
  * @author Stephen Booth
@@ -24,6 +28,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class CheckCloseConnectionWrapper extends ConnectionWrapper {
 
+	Set<PreparedStatement> prepared_statements = new HashSet<>();
 	int statements_open=0;
 	int p_statements_open=0;
 	int statements_close=0;
@@ -44,6 +49,11 @@ public class CheckCloseConnectionWrapper extends ConnectionWrapper {
 	 */
 	public void checkClosed() {
 		assertEquals("statements still open",statements_open,statements_close);
+		int still_open = p_statements_open-p_statements_close;
+		if( still_open > 0 && still_open < 10) {
+			// show statments if less than 10 of them
+			assertEquals("prepared-statements still open "+prepared_statements,p_statements_open,p_statements_close);
+		}
 		assertEquals("prepared-statements still open",p_statements_open,p_statements_close);
 	}
 	@Override

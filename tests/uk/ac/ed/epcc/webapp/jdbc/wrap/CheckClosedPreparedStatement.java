@@ -29,12 +29,21 @@ public class CheckClosedPreparedStatement extends PreparedStatementWrapper<Check
 	public CheckClosedPreparedStatement(CheckCloseConnectionWrapper conn, PreparedStatement nested) {
 		super(conn, nested);
 		conn.p_statements_open++;
+		conn.prepared_statements.add(this);
 	}
 
 	@Override
 	public void close() throws SQLException {
+		conn.prepared_statements.remove(this);
 		conn.p_statements_close++;
 		super.close();
 	}
 
+	public String toString() {
+		try {
+			return getNested().toString();
+		} catch (Exception e) {
+			return super.toString();
+		}
+	}
 }

@@ -102,7 +102,10 @@ public class RollbackInsertionWrapper extends ConnectionWrapper {
 		if( serv.inTransaction()) {
 			count++;
 			if(count == target) {
-				throw new SQLTransactionRollbackException("Inserted fault");
+				
+				SQLTransactionRollbackException e = new SQLTransactionRollbackException("Inserted fault");
+				e.printStackTrace(); // make sure we can find where we inserted
+				throw e;
 			}
 		}
 	}

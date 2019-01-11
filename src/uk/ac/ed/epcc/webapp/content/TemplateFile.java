@@ -732,7 +732,17 @@ public class TemplateFile {
 	public void setProperty(String property_name, int value) {
 		setProperty(property_name, Integer.toString(value));
 	}
-
+	/**
+	 * Sets the value of a property to an integer.
+	 * 
+	 * @param property_name
+	 *            Name of the property to be set
+	 * @param value
+	 *            New <code>integer</code> value for the property
+	 */
+	public void setProperty(String property_name, long value) {
+		setProperty(property_name, Long.toString(value));
+	}
 	/**
 	 * Sets the value of a property
 	 * 

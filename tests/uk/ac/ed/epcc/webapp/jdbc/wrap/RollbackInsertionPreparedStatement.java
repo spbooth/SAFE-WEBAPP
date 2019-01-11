@@ -38,4 +38,11 @@ public class RollbackInsertionPreparedStatement extends PreparedStatementWrapper
 		return super.getNested();
 	}
 
+	@Override
+	public void close() throws SQLException {
+		// Dont want to insert an fault in the actual
+		// close statement itself
+		super.getNested().close();
+	}
+
 }
