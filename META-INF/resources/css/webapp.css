@@ -456,6 +456,12 @@ div tr.notice td, div tr td.notice{
 div  *.highlight td, div table.auto *.highlight td form{
 	 background-color: #ffffcc;
 }
+/* hover highlighting to indicate the active row in a form
+*/
+form  tr.highlight:hover td {
+	 background-color: #ffeecc;
+}
+
 details div.description{
 	 border-radius: 15px;
 	 padding: 5px;
