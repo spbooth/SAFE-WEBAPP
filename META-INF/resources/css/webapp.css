@@ -328,6 +328,10 @@ table.form td {
         background-color: #cccccc;
 }
 
+form table.form tr:hover td {
+	 background-color: #dddddd;
+}
+
 /* auto generated table from Table class */
 table.auto {
 	width: 100%;
@@ -458,7 +462,7 @@ div  *.highlight td, div table.auto *.highlight td form{
 }
 /* hover highlighting to indicate the active row in a form
 */
-form  tr.highlight:hover td {
+form table.form tr.highlight:hover td {
 	 background-color: #ffeecc;
 }
 
@@ -485,6 +489,9 @@ div td.button {
 div th {
         color: black;
         background-color: #e7e7e7;
+}
+form table.form tr:hover th{
+	background-color: #f3f3f3;
 }
 th.button-col, td.button-col {
 	width: 5%;
