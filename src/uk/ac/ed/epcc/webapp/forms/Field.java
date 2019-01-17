@@ -95,6 +95,12 @@ public final class Field<I> {
     		sel = new LockedInput<>(sel);
     	}
     }
+    public boolean isLocked() {
+    	if( sel != null && sel instanceof LockedInput) {
+    		return true;
+    	}
+    	return false;
+    }
 	/**
 	 * Does this field use a particular type of input
 	 * 

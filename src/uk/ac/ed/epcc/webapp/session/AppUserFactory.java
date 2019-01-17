@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -363,6 +364,12 @@ AccessRoleProvider<AU, AU>
 				u.buildUpdateForm("Person", f, user,service);
 				if( ! service.hasRole(SessionService.ADMIN_ROLE)){
 					f.removeField(ALLOW_EMAIL_FIELD);
+				}
+				for( Iterator<String> it = f.getFieldIterator(); it.hasNext();) {
+					String field = it.next();
+					if( f.getField(field).isLocked()) {
+						it.remove();
+					}
 				}
 				if( ! f.validate()){
 					return true;
