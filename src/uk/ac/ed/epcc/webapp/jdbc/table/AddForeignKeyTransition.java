@@ -18,7 +18,6 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
@@ -31,7 +30,6 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
  */
 
 public class AddForeignKeyTransition<T extends DataObjectFactory> extends EditTableDirectTransition<T>{
-	
 	/**
 	 * 
 	 */
@@ -60,21 +58,27 @@ public class AddForeignKeyTransition<T extends DataObjectFactory> extends EditTa
 							query.append(", ");
 						}
 						seen=true;
-						query.append("ADD FOREIGN KEY ");
+						query.append(" ADD FOREIGN KEY ");
 						// This adds a name that can be used to 
 						// delete index note foreign key will need to be dropped first
-						sql.quote(query, field+"_ref_key");
+						//
+						// We want a globally unique name so depend on table
+						// as well as field
+						sql.quote(query, target.getTag()+"_"+field+"_ref_key");
 						query.append(" (");
 						info.addName(query, false, true);
 						query.append(") REFERENCES ");
 						query.append(desc);
 						query.append(" ON UPDATE CASCADE");
+						if(MySqlCreateTableVisitor.FOREIGN_KEY_DELETE_CASCASE_FEATURE.isEnabled(c)) {
+							query.append(" ON DELETE CASCADE");
+						}
 					}
 				}
 			}
 			if( seen ){
 
-				c.getService(LoggerService.class).getLogger(getClass()).debug(query);
+				c.getService(LoggerService.class).getLogger(getClass()).info(query);
 				try(java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString())){
 
 					stmt.execute();
@@ -82,7 +86,7 @@ public class AddForeignKeyTransition<T extends DataObjectFactory> extends EditTa
 				resetStructure(target);
 			}
 		} catch (Exception e) {
-			c.error(e,"Error adding foreign keys");
+			c.getService(LoggerService.class).getLogger(getClass()).error("Error adding foreign keys",e);
 			throw new TransitionException("Update failed");
 		}
 		return new ViewTableResult(target);

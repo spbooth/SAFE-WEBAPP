@@ -34,6 +34,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	public static final Feature FOREIGN_KEY_FEATURE=new Feature("foreign-key",false,"Generate foreign keys");
+	public static final Feature FOREIGN_KEY_DELETE_CASCASE_FEATURE = new Feature("foreign-key.delete_cascase",true,"Default to DELETE CASCASE on foreign keys");
     public static final Feature FORCE_MYISAM_ON_FULLTEXT_FEATURE=new Feature("mysql.force_myisam_on_fulltext",false,"Always use MyISAM if table contains fulltext index");
 	private final MysqlSQLContext ctx;
 	private final StringBuilder sb;
@@ -173,7 +174,7 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 			String tag = referenceField.getRemoteTable();
 			try{
 				// Try to make referenced factory.
-				// This is to endure the referenced table is auto-created before the
+				// This is to ensure the referenced table is auto-created before the
 				// current one (in case we have a foreign key)
 				conn.makeContexedObject(DataObjectFactory.class, tag);
 			}catch(Exception t){
@@ -184,12 +185,15 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 			if( desc != null ){
 				sb.append(",\n");
 				sb.append("FOREIGN KEY ");
-				ctx.quote(sb, name+"_ref_key");
+				ctx.quote(sb, tag+"_"+name+"_ref_key");
 				sb.append(" ( ");
 				ctx.quote(sb, name);
 				sb.append(" ) REFERENCES ");
 				sb.append(desc);
 				sb.append(" ON UPDATE CASCADE");
+				if(FOREIGN_KEY_DELETE_CASCASE_FEATURE.isEnabled(conn)) {
+					sb.append(" ON DELETE CASCADE");
+				}
 			}
 		}
 	}
