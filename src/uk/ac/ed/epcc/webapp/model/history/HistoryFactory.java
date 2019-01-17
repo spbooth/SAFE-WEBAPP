@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -61,6 +62,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterUpdate;
+import uk.ac.ed.epcc.webapp.model.data.filter.FilterWipe;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.iterator.DecoratingIterator;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
@@ -1107,4 +1109,14 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		
 	}
 
+	/** wipe data from entire sequence of a record
+	 * 
+	 * @param peer
+	 * @param fields
+	 * @throws DataFault 
+	 */
+	public int wipe(P peer, Set<String> fields) throws DataFault {
+		FilterWipe<H> wipe = new FilterWipe<>(res);
+		return wipe.update(fields, new ReferenceFilter<>(HistoryFactory.this,getPeerName(),peer));
+	}
 }

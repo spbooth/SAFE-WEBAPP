@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
+import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 
 /** Default Web-name {@link AppUserNameFinder}.
@@ -40,6 +42,11 @@ public class WebNameFinder<AU extends AppUser> extends FieldNameFinder<AU,WebNam
 	@Override
 	public void anonymise(AU target) {
 		getRecord(target).setProperty(WEB_NAME, "WebName"+target.getID());
+	}
+
+	@Override
+	public void addEraseFields(Set<String> fields) {
+		fields.add(WEB_NAME);
 	}
 
 	

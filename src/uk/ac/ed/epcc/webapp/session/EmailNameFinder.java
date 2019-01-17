@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.session;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
@@ -256,6 +257,13 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 			map.put(CHANGE_EMAIL, (Transition<AppUser>) new ChangeEmailTransition());
 		}
 		return map;
+	}
+
+
+
+	@Override
+	public void addEraseFields(Set<String> fields) {
+		fields.add(EMAIL);
 	}
 
 

@@ -19,7 +19,7 @@ import java.util.Date;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
-/** A wrapepr to convert a {@link AbstractDateInput} into a {@link MultiInput}.
+/** A wrapper to convert a {@link AbstractDateInput} into a {@link MultiInput}.
  * @author spb
  *
  */

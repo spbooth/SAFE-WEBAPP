@@ -36,4 +36,7 @@ public interface InputVisitor<R> {
 	R visitUnmodifyableInput(UnmodifiableInput input) throws Exception;
 	R visitFileInput(FileInput input) throws Exception;
 	R visitPasswordInput(PasswordInput input) throws Exception;
+	default R visitTimestampInput(TimeStampInput t) throws Exception {
+		return visitLengthInput(t);
+	}
 }

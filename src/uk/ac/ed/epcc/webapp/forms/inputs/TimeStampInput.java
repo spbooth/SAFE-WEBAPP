@@ -44,4 +44,9 @@ public class TimeStampInput extends AbstractDateInput implements HTML5Input{
 	public String getType(){
 		return "datetime-local";
 	}
+
+	@Override
+	public <R> R accept(InputVisitor<R> vis) throws Exception {
+		return vis.visitTimestampInput(this);
+	}
 }

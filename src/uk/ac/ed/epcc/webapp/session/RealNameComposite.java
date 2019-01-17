@@ -207,5 +207,13 @@ public class RealNameComposite<AU extends AppUser> extends AppUserComposite<AU, 
 		modifyDefaultTableSpecification(spec, null);
 		
 	}
+
+	@Override
+	public void addEraseFields(Set<String> fields) {
+		fields.add(TITLE);
+		fields.add(FIRSTNAME);
+		fields.add(INITIALS);
+		fields.add(LASTNAME);
+	}
 	
 }

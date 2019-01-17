@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model;
 
+import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 
@@ -27,4 +29,13 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
  */
 public interface AnonymisingComposite<BDO extends DataObject> {
 	public void anonymise(BDO target);
+	/** Add to the set of fields that contain PII data
+	 * 
+	 * This can be used to generate an anonymising rule for history tables
+	 * 
+	 * @param fields
+	 */
+	default public void addEraseFields(Set<String> fields) {
+		
+	}
 }
