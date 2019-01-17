@@ -468,17 +468,9 @@ public <I> void addFormLabel(AppContext conn,Field<I> f) {
 	if( tooltip != null && ! tooltip.isEmpty()) {
 		attr("title",tooltip);
 	}
-	Object details=f.getDetails();
-	if(details==null){
-		clean(f.getLabel());
-	}else{
-		Panel dt = (Panel) getDetails(f.getLabel());
-		dt.open("div");
-		dt.addClass("description");
-		dt.addObject(details);
-		dt.close();
-		dt.addParent();
-	}
+	
+	clean(f.getLabel());
+	
 	close(); // span or label
 
 //	if (missing) {

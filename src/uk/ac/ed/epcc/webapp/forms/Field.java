@@ -51,25 +51,7 @@ public final class Field<I> {
 	
 	private String tooltip;
 	
-	/** Additional details/information
-	 * 
-	 */
-	private Object details;
-
-//	private String key;
-
-	/**
-	 * @return the details
-	 */
-	public Object getDetails() {
-		return details;
-	}
-	/**
-	 * @param details the details to set
-	 */
-	public void setDetails(Object details) {
-		this.details = details;
-	}
+	
 	private Map<String,String> data_attr=null;
 	
 	/** Add a custom attribute to the input
