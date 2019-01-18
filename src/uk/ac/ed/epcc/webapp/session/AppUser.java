@@ -20,19 +20,20 @@
  */
 package uk.ac.ed.epcc.webapp.session;
 
-import java.text.DateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
-import uk.ac.ed.epcc.webapp.forms.BaseForm;
-import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Owned;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.history.PersonHistoryFactory;
+import uk.ac.ed.epcc.webapp.model.lifecycle.ActionList;
+import uk.ac.ed.epcc.webapp.model.lifecycle.LifeCycleException;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
-import uk.ac.ed.epcc.webapp.session.AppUserFactory.UpdatePersonRequiredPage;
+
 
 /**
  * AppUser Generic Object representing a user of the Web application potentially sub-classed
@@ -47,6 +48,8 @@ import uk.ac.ed.epcc.webapp.session.AppUserFactory.UpdatePersonRequiredPage;
 public class AppUser extends DataObject implements java.security.Principal, Owned{
 
 	public static final String UPDATED_TIME="Updated";
+
+	public static final Feature PERSON_HISTORY_FEATURE = new Feature("person.history",true,"Keep history table of person state");
 	
 	private AppUserFactory<?> factory;
 
@@ -250,4 +253,22 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 	public void notifyChange(String extra) {
 		
 	}
+
+
+	public void historyUpdate() {
+		AppContext conn = getContext();
+		if (PERSON_HISTORY_FEATURE.isEnabled(conn)) {
+			try {
+				PersonHistoryFactory fac = new PersonHistoryFactory(factory);
+			
+				fac.update(this);
+			} catch (Exception e) {
+				conn.error(e, "Error updating PersonHistory");
+				return;
+			}
+		}
+	}
+	
+	
+	
 }

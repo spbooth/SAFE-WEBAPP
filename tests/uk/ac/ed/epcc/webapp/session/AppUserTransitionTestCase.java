@@ -34,7 +34,9 @@ import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
+import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionFactory.ViewResult;
 import uk.ac.ed.epcc.webapp.servlet.AbstractTransitionServletTest;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory.UpdatePersonRequiredPage;
@@ -226,10 +228,45 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 				"f4g8MiBuLGcezzi310RwKMFnamr6MTbA3KBvgvFrPmsjVyedn1IyMdgQ0x8OZMQbr6hesvnR8HuKYfFt\n"+
 				"m4Vjx7bS+Dyqn+PlPrWH/fjs1957fe57gtZ9eM2S0lsv5cagcWghPAZP rsa-key-20110308");
 		runTransition();
-		checkMessage("object_updated");
+		AppUserTransitionProvider<A> provider = AppUserTransitionProvider.getInstance(getContext());
+		if( provider != null) {
+			checkViewRedirect(provider, user);
+		}else{
+			checkMessage("object_updated");
+		}
 		checkDiff("/cleanup.xsl", "details.xml");
 	}
 	
+	@Test
+	@DataBaseFixtures("details.xml")
+	@ConfigFixtures("require_update.properties")
+	public void testEraseTransition() throws Exception {
+		MockTansport.clear();
+		takeBaseline();
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+	
+		user.setEmail("bill@example.com");
+		user.commit();
+		
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		
+	
+		sess.setCurrentPerson(user);
+		sess.setTempRole("TestErase");
+		assertTrue(sess.haveCurrentUser());
+		
+		AppUser target = fac.findByEmail("fred@example.com");
+		AppUserTransitionProvider provider = AppUserTransitionProvider.getInstance(ctx);
+		setTransition(provider,AppUserTransitionProvider.ERASE,target);
+		setConfirmTransition(true);
+		runTransition();
+		
+		checkViewRedirect(provider, target);
+		checkDiff("/cleanup.xsl", "erased.xml");
+		checkViewContent(null, "view_erased.xml");
+		
+	}
 	@Test
 	public void testSUTransition() throws DataFault, DataException, ConsistencyError, IOException, TransitionException, ServletException {
 		MockTansport.clear();

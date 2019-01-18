@@ -22,10 +22,12 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.forms.exceptions.FatalTransitionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.TitleTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
@@ -33,6 +35,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
+
 
 /** A {@link TransitionProvider} for operations on {@link AppUser}s
  * @author spb
@@ -81,6 +84,31 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 		
 	}
+	public static final AppUserKey ERASE = new RelationshipAppUserKey("Anonymise", "Remove personally identifiable information", "ErasePerson") {
+
+		/* (non-Javadoc)
+		 * @see uk.ac.hpcx.model.person.RoleAppUserKey#allowState(uk.ac.ed.epcc.webapp.session.AppUser)
+		 */
+		@Override
+		protected boolean allowState(AppUser user) {
+			return user.getFactory().canErase(user);
+		}
+		
+	};
+	public final class EraseTransition extends AbstractDirectTransition<AU>{
+
+		@Override
+		public FormResult doTransition(AU target, AppContext c) throws TransitionException {
+			try {
+				fac.erasePersonalData(target);
+			} catch (Exception e) {
+				getLogger().error("Error erasing personal data", e);
+				throw new FatalTransitionException("Error erasing personal data");
+			}
+			return new ViewResult(target);
+		}
+		
+	}
 	private final AppUserFactory<AU> fac;
 	/**
 	 * @param c
@@ -98,6 +126,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 		addTransition(SET_ROLE_KEY, new SetRoleTransition<AU>());
 		addTransition(SU_KEY, new SUTransition());
+		addTransition(ERASE, new ConfirmTransition<>("Are you sure you want to anonymise this person record", new EraseTransition(), new ViewTransition()));
 	}
 
 	/* (non-Javadoc)

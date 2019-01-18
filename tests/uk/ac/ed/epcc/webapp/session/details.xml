@@ -12,23 +12,45 @@
 <Firstname type='String' nullable='true' max='32'/>
 <Initials type='String' nullable='true' max='3'/>
 <Lastname type='String' nullable='true' max='32'/>
+<PublicKey type='String' nullable='true' max='16777215'/>
+<PersonalCertificate type='String' nullable='true' max='200'/>
 <Email_index type='Index' unique='true'><Column name='Email'/></Email_index>
 <WebName_index type='Index' unique='true'><Column name='WebName'/></WebName_index>
-<PersonalCertificate type="String" nullable="true" max="200"/>
-<PublicKey type="String" nullable="true" max="5592405"/>
 </TableSpecification>
 <Person id='1'>
 <Email>fred@example.com</Email>
+<Updated>1547809678</Updated>
 <PasswordFails>0</PasswordFails>
 <PasswordStatus>V</PasswordStatus>
-<Salt>nnIG6s766z3waQDz</Salt>
+<Salt>PFL1kQ5ZBOmBc4gs</Salt>
 <Alg>0</Alg>
-<Password>f6800f1e70917631b204b2ab7abcf76c</Password>
+<Password>40a83e182d4f80f46096ea2445bfe6f8</Password>
 <Firstname>Albert</Firstname>
 <Lastname>Spangler</Lastname>
-<PersonalCertificate>/c=UK/o=eScience/ou=Edinburgh/l=NeSC/cn=stephen booth</PersonalCertificate>
 <PublicKey>ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQBRQkTnsRzUM9mLrgEMFk78CLdOxtepxPp1JQSfRc3/A1cyD8NV/gxINRNhMIVkIofUexxtLfAfmNRf666SSei/w2kPX9ndOJ32y2OUUKkijJvEdeMEuFido9Kifc79p0q1KcOhAdRNmmE+LriqsbhJJVQz0OeOKw7wPN9KNYfTevZleQAJBRKr99rBgyRrtrXBhnjYu3yb8E/lf4g8MiBuLGcezzi310RwKMFnamr6MTbA3KBvgvFrPmsjVyedn1IyMdgQ0x8OZMQbr6hesvnR8HuKYfFtm4Vjx7bS+Dyqn+PlPrWH/fjs1957fe57gtZ9eM2S0lsv5cagcWghPAZP</PublicKey>
+<PersonalCertificate>/c=UK/o=eScience/ou=Edinburgh/l=NeSC/cn=stephen booth</PersonalCertificate>
 </Person>
+<TableSpecification name='PersonHistory'>
+<PeerID reference='Person'/>
+<StartTime type='Long' nullable='true'/>
+<EndTime type='Long' nullable='true'/>
+<Email type='String' nullable='true' max='254'/>
+<WebName type='String' nullable='true' max='128'/>
+<Title type='String' nullable='true' max='32'/>
+<Firstname type='String' nullable='true' max='32'/>
+<Initials type='String' nullable='true' max='3'/>
+<Lastname type='String' nullable='true' max='32'/>
+<PeerIndex type='Index' unique='false'><Column name='PeerID'/><Column name='EndTime'/><Column name='StartTime'/></PeerIndex>
+<SearchIndex type='Index' unique='false'><Column name='EndTime'/><Column name='StartTime'/></SearchIndex>
+</TableSpecification>
+<PersonHistory id='1'>
+<PeerID>1</PeerID>
+<StartTime>1547809678</StartTime>
+<EndTime>9223372036854775</EndTime>
+<Email>fred@example.com</Email>
+<Firstname>Albert</Firstname>
+<Lastname>Spangler</Lastname>
+</PersonHistory>
 <TableSpecification name='role_table'>
 <PersonID type='Integer' nullable='false'/>
 <Role type='String' nullable='false' max='32'/>

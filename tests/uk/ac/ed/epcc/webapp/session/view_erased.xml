@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?><view_page>
+<Title/>
+<top/>
+<log>
+<h2/>
+<table class="column">
+<tr>
+<th>Name</th>
+<td>Anonymous-1</td>
+</tr>
+</table>
+</log>
+<buttons>
+<active value="Anonymise" help="Remove personally identifiable information"/>
+</buttons>
+</view_page>

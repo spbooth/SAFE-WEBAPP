@@ -58,7 +58,7 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 	public static final String EMAIL_MAXWIDTH_PROP = "email.maxwidth";
 	public static final String EMAIL = "Email";
 	public static final Feature CHANGE_EMAIL_FEATURE = new Feature("email.change_transition",true,"Users can change their email address");
-	
+	public static final Feature ANON_TO_DUMMY_FEATURE = new Feature("email.anon_to_dummy",false,"Anonymisation generated dummy email address");
 	@Override
 	public TableSpecification modifyDefaultTableSpecification(
 			TableSpecification spec, String table) {
@@ -207,8 +207,11 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 	 */
 	@Override
 	public void anonymise(AU target) {
+		if(ANON_TO_DUMMY_FEATURE.isEnabled(getContext())) {
+			setName(target, "Person"+target.getID()+"@example.com");
+			return;
+		}
 		setName(target, null);
-		
 	}
 
 	public static CurrentUserKey CHANGE_EMAIL = new CurrentUserKey("Email", "Update email", "Change the email address we use to contact you");

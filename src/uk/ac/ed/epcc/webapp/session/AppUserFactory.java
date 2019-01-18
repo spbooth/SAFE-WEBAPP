@@ -19,6 +19,8 @@
  */
 package uk.ac.ed.epcc.webapp.session;
 
+import static uk.ac.ed.epcc.webapp.session.EmailNameFinder.EMAIL;
+
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Collection;
@@ -35,11 +37,13 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.BaseForm;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
+import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdate;
 import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input;
@@ -61,6 +65,10 @@ import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.PlaceHolderFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
+import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
@@ -75,6 +83,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.filter.IdAcceptFilter;
+import uk.ac.ed.epcc.webapp.model.data.filter.PrimaryOrderFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 import uk.ac.ed.epcc.webapp.model.data.forms.UpdateAction;
@@ -84,11 +93,13 @@ import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NameFinderInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedDataCache;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
+import uk.ac.ed.epcc.webapp.model.history.PersonHistoryFactory;
+import uk.ac.ed.epcc.webapp.model.lifecycle.ActionList;
+import uk.ac.ed.epcc.webapp.model.lifecycle.LifeCycleException;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.RemoteAuthServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
-
 
 /** A Factory for creating {@link AppUser} objects that represent users of the system.
  * 
@@ -106,7 +117,8 @@ RequiredPageProvider<AU>,
 NameFinder<AU> ,
 RegisterTrigger<AU>, 
 SummaryContributer<AU>,
-AccessRoleProvider<AU, AU>
+AccessRoleProvider<AU, AU>,
+AnonymisingFactory
 {
 	private static final String MY_SELF_RELATIONSHIP = "MySelf";
 	
@@ -964,5 +976,84 @@ AccessRoleProvider<AU, AU>
 		AndFilter<AU> result = new AndFilter<>(getTarget(),super.getSelectFilter());
 		result.addFilter(getContext().getService(SessionService.class).getRelationshipRoleFilter(this, AppUserTransitionProvider.VIEW_PERSON_RELATIONSHIP,new GenericBinaryFilter<>(getTarget(), true)));
 		return result;
+	}
+	@Override
+	public FormUpdate<AU> getFormUpdate(AppContext c) {
+		return new AppUserUpdater<AU>(this);
+	}
+	/** Anonymise the database.
+	 * 
+	 *  All passwords are made invalid except for the person anonymising the database where the
+	 *  password is reset to <b>Password</B>
+	 * 
+	 * @throws DataFault
+	 */
+	@Override
+	public void anonymise() throws DataFault {
+		if( ! AppUserFactory.ANONYMISE_DATABASE_FEATURE.isEnabled(getContext())){
+			throw new ConsistencyError("Call to disabled feature");
+		}
+		Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
+		SessionService sess =  getContext().getService(SessionService.class);
+		AppUser currentPerson = sess == null ? null : sess.getCurrentPerson();
+		for(AU p : new FilterSet(new PrimaryOrderFilter<>(getTarget(),res, false))){
+			
+			
+			if(currentPerson == null || ! currentPerson.equals(p)){
+				log.debug("Anonymise "+p.getIdentifier()+" "+p.getID());
+				for(AnonymisingComposite anon : getComposites(AnonymisingComposite.class)){
+					anon.anonymise(p);
+				}
+			}else{
+				// for debugging current user just has password reset
+				PasswordAuthComposite<AU> comp = getComposite(PasswordAuthComposite.class);
+				if( comp != null) {
+					comp.setPassword(p,"Password");
+				}
+			}
+			p.commit();
+		}
+		
+	}
+	private ActionList<AU> getEraseListeners(){
+		return new ActionList<>(this, "EraseActions");
+	}
+	
+	public boolean canErase(AU person) {
+		try {
+			return getEraseListeners().allow(person, false);
+		} catch (LifeCycleException e) {
+			getLogger().error("Error in canErase",e);
+			return false;
+		}
+	}
+	/** Erase the personal data for the specified user
+	 * 
+	 * @param p
+	 * @throws DataFault 
+	 */
+	public void erasePersonalData(AU p) throws DataFault {
+		Set<String> fields = new HashSet<>();
+		for(AnonymisingComposite anon : getComposites(AnonymisingComposite.class)){
+			anon.anonymise(p);
+			anon.addEraseFields(fields);
+		}
+		getEraseListeners().action(p);
+		p.commit();
+		AppContext conn = getContext();
+		if (AppUser.PERSON_HISTORY_FEATURE.isEnabled(conn)) {
+			try {
+				PersonHistoryFactory<AU> fac = new PersonHistoryFactory<>(this);
+				fac.wipe(p, fields);
+				fac.update(p);
+			} catch (Exception e) {
+				conn.error(e, "Error updating PersonHistory");
+				return;
+			}
+		}
+		
+	}
+	public SQLFilter<AU> getEraseCandidates(){
+		return new GenericBinaryFilter<>(getTarget(), true);
 	}
 }
