@@ -20,9 +20,20 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 
 public class ReferenceFieldType extends IntegerFieldType {
    private final String remote_table;
+   /** Constructor for the default nullable reference
+    * 
+    * @param remote
+    */
    public ReferenceFieldType(String remote){
 	   this(true,remote);
    }
+   /** Constructor that allows the reference to be defined
+    * as non-null. When adding foreign keys to these our convention
+    * is to cascase delete operations.
+    * 
+    * @param allow_null
+    * @param remote
+    */
    public ReferenceFieldType(boolean allow_null,String remote){
 	   super(allow_null,null);
 	   remote_table=remote;
