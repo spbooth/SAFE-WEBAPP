@@ -34,7 +34,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	public static final Feature FOREIGN_KEY_FEATURE=new Feature("foreign-key",false,"Generate foreign keys");
-	public static final Feature FOREIGN_KEY_DELETE_CASCASE_FEATURE = new Feature("foreign-key.delete_cascase",true,"Default to DELETE CASCASE on foreign keys");
+	public static final Feature FOREIGN_KEY_DELETE_CASCASE_FEATURE = new Feature("foreign-key.delete_cascase",true,"Default to DELETE CASCASE on foreign keys for references that do not allow null");
     public static final Feature FORCE_MYISAM_ON_FULLTEXT_FEATURE=new Feature("mysql.force_myisam_on_fulltext",false,"Always use MyISAM if table contains fulltext index");
 	private final MysqlSQLContext ctx;
 	private final StringBuilder sb;
@@ -192,7 +192,9 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 				sb.append(desc);
 				sb.append(" ON UPDATE CASCADE");
 				if(FOREIGN_KEY_DELETE_CASCASE_FEATURE.isEnabled(conn)) {
-					sb.append(" ON DELETE CASCADE");
+					if( ! referenceField.canBeNull()) {
+						sb.append(" ON DELETE CASCADE");
+					}
 				}
 			}
 		}

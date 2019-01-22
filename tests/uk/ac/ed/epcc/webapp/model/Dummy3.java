@@ -120,7 +120,7 @@ public class Dummy3 extends DataObject {
 			spec.setField(NAME, new StringFieldType(true, "", 32));
 			
 			spec.setField(MANDATORY, new StringFieldType(false, "Junk", 32));
-		    spec.setField(PERSON_ID, new ReferenceFieldType(true, c.getService(SessionService.class).getLoginFactory().getTag()));
+		    spec.setField(PERSON_ID, new ReferenceFieldType( c.getService(SessionService.class).getLoginFactory().getTag()));
 			
 			return spec;
 		}

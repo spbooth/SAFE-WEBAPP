@@ -21,12 +21,15 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.IndexTableContributor;
 import uk.ac.ed.epcc.webapp.model.data.CreateComposite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 
 /** Add a field to record the date the record was created.
  * @author spb
@@ -59,7 +62,9 @@ public class SignupDateComposite<BDO extends DataObject> extends CreateComposite
 		return supress;
 	}
 
-
+	public SQLFilter<BDO> getFilter(MatchCondition m, Date point){
+		return new SQLValueFilter<>(getFactory().getTarget(), getRepository(), SIGNUP_DATE, m,point);
+	}
 
 	@Override
 	public TableSpecification modifyDefaultTableSpecification(TableSpecification spec, String table) {

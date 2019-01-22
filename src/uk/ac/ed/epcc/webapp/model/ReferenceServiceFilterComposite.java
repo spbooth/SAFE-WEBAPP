@@ -56,7 +56,7 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	 */
 	@Override
 	public TableSpecification modifyDefaultTableSpecification(TableSpecification spec, String table) {
-		spec.setOptionalField(SERVICE_ID_FIELD, new ReferenceFieldType(true, SERVICE_CLASSIFIER));
+		spec.setOptionalField(SERVICE_ID_FIELD, new ReferenceFieldType(SERVICE_CLASSIFIER));
 		
 		return spec;
 	}

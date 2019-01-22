@@ -65,7 +65,7 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 				
 			}
 			if(target == null) {
-				throw new ParseException("Not found");
+				throw new ParseException("["+v+"] Not found");
 			}
 			setItem(target);
 		}catch(ParseException p) {

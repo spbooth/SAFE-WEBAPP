@@ -71,7 +71,9 @@ public class AddForeignKeyTransition<T extends DataObjectFactory> extends EditTa
 						query.append(desc);
 						query.append(" ON UPDATE CASCADE");
 						if(MySqlCreateTableVisitor.FOREIGN_KEY_DELETE_CASCASE_FEATURE.isEnabled(c)) {
-							query.append(" ON DELETE CASCADE");
+							if( ! info.getNullable()) {
+								query.append(" ON DELETE CASCADE");
+							}
 						}
 					}
 				}
