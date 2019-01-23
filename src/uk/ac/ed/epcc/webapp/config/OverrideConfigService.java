@@ -97,6 +97,10 @@ public class OverrideConfigService extends AbstractConfigService {
 	
 	public void setProperty(String name, String value)
 			throws UnsupportedOperationException {
+		String old_value = getServiceProperties().getProperty(name);
+		if( old_value != null && old_value.equals(value)){
+			return;
+		}
 		parent.setProperty(name, value);	
 	}
 
