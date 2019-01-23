@@ -581,7 +581,11 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	public TableSpecification getDefaultTableSpecification(AppContext c,String homeTable){
 		boolean tail_status = HISTORY_STATUS_FEATURE.isEnabled(c);
 		TableSpecification spec = new TableSpecification("HistoryID");
-		spec.setField(getPeerName(), new IntegerFieldType());
+		if( peer_factory != null ) {
+			spec.setField(getPeerName(), peer_factory.getReferenceFieldType(false));
+		}else {
+			spec.setField(getPeerName(), new IntegerFieldType(false,null));
+		}
 		spec.setField(START_TIME_FIELD, new DateFieldType(true, null));
 		spec.setField(END_TIME_FIELD, new DateFieldType(true,null));
 		if( tail_status){
