@@ -26,6 +26,7 @@ import uk.ac.ed.epcc.webapp.forms.html.ErrorFormResult;
 import uk.ac.ed.epcc.webapp.forms.html.ForwardResult;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
+import uk.ac.ed.epcc.webapp.forms.html.RedisplayResult;
 import uk.ac.ed.epcc.webapp.forms.html.WebFormResultVisitor;
 import uk.ac.ed.epcc.webapp.forms.result.BackResult;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
@@ -173,6 +174,12 @@ public class ServletFormResultVisitor implements WebFormResultVisitor{
 	public void visitErrorFormResult(ErrorFormResult result) throws Exception {
 		// Assumes errors have already been set in response
 		req.setAttribute(TransitionServlet.TRANSITION_KEY_ATTR, result.getKey());
+		HTMLForm.doFormError(conn, req, res);
+	}
+	@Override
+	public void visitRedisplayResult(RedisplayResult result) throws Exception {
+		// same logic as error should be enough 
+		// form should not pre-validate unless there are errors recorded
 		HTMLForm.doFormError(conn, req, res);
 	}
 	public Logger getLogger(){

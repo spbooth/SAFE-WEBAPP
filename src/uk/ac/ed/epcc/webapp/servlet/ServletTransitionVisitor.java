@@ -70,19 +70,15 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 		    try{
 		    	FormAction shortcut = f.getShortcutAction(params);
 		    	if( shortcut != null ){
-		    		FormResult result=null;
 		    		String confirm_action = shortcut.getConfirm(f);
 		    		if( confirm_action != null ){
-						result = confirmTransition(req, conn, provider, tag, target,confirm_action,shortcut.getConfirmArgs(f));
+		    			FormResult result = confirmTransition(req, conn, provider, tag, target,confirm_action,shortcut.getConfirmArgs(f));
 						if( result != null ){
 							return result;
 						}
 						
 					}
-		    		result = shortcut.action(f);
-					if( result != null ){
-						return result;
-					}
+		    		return shortcut.action(f);
 		    	}
 		    	if (! f.parsePost(req)){
 		    		// Not all ok
@@ -145,11 +141,8 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 					if( result != null ){
 						return result;
 					}
-					result = shortcut.action(f);
-					if( result != null ){
-						return result;
-					}
-				}
+	    		}
+	    		return shortcut.action(f);
 	    	}
 			if (! f.parsePost(req)){
 				return new ErrorFormResult<>(provider, target, tag, HTMLForm.getErrors(req), HTMLForm.getMissing(req)); 

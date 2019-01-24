@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?><transition_page>
+<Form>
+<table class="form">
+<tr class="even">
+<th>
+<label for="transition_Hundreds" class="required">Hundreds</label>
+</th>
+<td>
+<input id="transition_Hundreds" type="number" size="32" maxlength="32" name="Hundreds" class="input" min="0" max="1000" step="100" required="required"/>
+</td>
+</tr>
+</table>
+<fieldset class="action_buttons">
+<input class="input_button" type="submit" name="Next" value="Next"/>
+</fieldset>
+</Form>
+</transition_page>

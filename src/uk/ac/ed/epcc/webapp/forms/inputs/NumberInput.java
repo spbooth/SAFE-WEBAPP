@@ -74,6 +74,7 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 		return min;
 	}
 
+	@Override
 	public N getStep(){
 		if( step != null ){
 			return step;

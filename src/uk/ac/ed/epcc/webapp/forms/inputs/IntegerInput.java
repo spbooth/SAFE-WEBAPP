@@ -26,6 +26,7 @@ public class IntegerInput extends NumberInput<Integer> {
 
 	public IntegerInput() {
 		super();
+		setStep(1);
 	}
 
 	/*
@@ -81,8 +82,4 @@ public class IntegerInput extends NumberInput<Integer> {
 		throw new TypeError("Invalid type "+v.getClass().getCanonicalName()+" passed to IntegerInput");
 	}
 
-	@Override
-	public Integer getStep() {
-		return 1;
-	}
 }

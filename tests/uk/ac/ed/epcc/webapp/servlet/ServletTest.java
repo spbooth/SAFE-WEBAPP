@@ -47,6 +47,8 @@ import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.OverrideConfigService;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlContentFormat;
+import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
+import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.SetParamVisitor;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
@@ -321,19 +323,11 @@ public abstract class ServletTest extends WebappTestBase{
 		String message_type = (String) req.getAttribute("message_type");
 		Object args[] = (Object[]) req.getAttribute("args");
 		if(args == null) args = new Object[0];
+		
 		ResourceBundle mess = getContext().getService(MessageBundleService.class).getBundle();
-		MessageFormat fmt = new MessageFormat(getContext().expandText(mess.getString(message_type + ".text")));
-		if( args != null ) {
-			// apply HtmlFormat 
-			for(int i=0 ; i< args.length; i++) {
-				Object a = args[i];
-				if( !( a instanceof Number || a instanceof java.util.Date || a instanceof String)) {
-					fmt.setFormatByArgumentIndex(i, new HtmlContentFormat());
-				}
-			}
-		}
-		StringBuffer buffer = new StringBuffer();
-		fmt.format(args, buffer, null);
+		PreDefinedContent text = new PreDefinedContent(ctx,mess,message_type + ".text",args);
+		HtmlBuilder buffer = new HtmlBuilder();
+		text.addContent((SimpleXMLBuilder)buffer);
 		assertEquals(expected, buffer.toString());
 	}
 	

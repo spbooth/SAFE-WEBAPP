@@ -13,6 +13,16 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.html;
 
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.FormResultVisitor;
+
+
+/** Exception thrown when the {@link FormResultVisitor} is not the
+ * correct sub-type to support a {@link FormResult}
+ * 
+ * @author Stephen Booth
+ *
+ */
 public class UnsupportedResultException extends Exception {
 
 	public UnsupportedResultException() {

@@ -15,9 +15,12 @@ package uk.ac.ed.epcc.webapp.content;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ResourceBundle;
+
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
+import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 
 /**
  * @author Stephen Booth
@@ -53,6 +56,19 @@ public class PreDefinedContentTest extends WebappTestBase {
 		PreDefinedContent content = new PreDefinedContent(ctx, "testcontent", "numeric.content", 7.2, 0.82);
 		
 		String expected = "This is a 7 integer, This is a 82% percentage";
+		assertEquals(expected, content.toString());
+		
+		HtmlBuilder hb = new HtmlBuilder();
+		hb.addObject(content);
+		assertEquals(expected, hb.toString());
+	}
+	
+	@Test
+	public void testCreateMessage() {
+		ResourceBundle mess = getContext().getService(MessageBundleService.class).getBundle();
+		PreDefinedContent content = new PreDefinedContent(ctx,mess,"object_created.text",new Object[] {"Object", "Hello" });
+		
+		String expected = "Hello created";
 		assertEquals(expected, content.toString());
 		
 		HtmlBuilder hb = new HtmlBuilder();
