@@ -374,14 +374,9 @@ AnonymisingFactory
 				
 				SessionService service = user.getContext().getService(SessionService.class);
 				u.buildUpdateForm("Person", f, user,service);
+				f.removeField(EmailNameFinder.EMAIL); // This should be locked and un-editable
 				if( ! service.hasRole(SessionService.ADMIN_ROLE)){
 					f.removeField(ALLOW_EMAIL_FIELD);
-				}
-				for( Iterator<String> it = f.getFieldIterator(); it.hasNext();) {
-					String field = it.next();
-					if( f.getField(field).isLocked()) {
-						it.remove();
-					}
 				}
 				if( ! f.validate()){
 					return true;
