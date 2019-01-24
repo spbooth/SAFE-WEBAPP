@@ -17,8 +17,8 @@
 </tr>
 </table>
 <fieldset class="action_buttons">
-<input class="input_button" type="submit" formnovalidate="formnovalidate" title="Delete saved state and return the form to its initial stage" name="Reset" value="Reset"/>
 <input class="input_button" type="submit" name="Next" value="Next"/>
+<input class="input_button" type="submit" formnovalidate="formnovalidate" title="Delete saved state and return the form to its initial stage" name="Reset" value="Reset"/>
 </fieldset>
 </Form>
 </transition_page>

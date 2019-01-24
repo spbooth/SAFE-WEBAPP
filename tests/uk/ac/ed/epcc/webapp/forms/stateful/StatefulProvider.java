@@ -20,10 +20,13 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
+import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractTargetLessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AnonymousTransitionFactory;
+import uk.ac.ed.epcc.webapp.forms.transition.DefaultingTransitionFactory;
+import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionFactory;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 
@@ -31,7 +34,7 @@ import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
  * @author Stephen Booth
  *
  */
-public class StatefulProvider extends AbstractTransitionProvider<Number,TransitionKey<Number>> implements AnonymousTransitionFactory<TransitionKey<Number>, Number>{
+public class StatefulProvider extends AbstractTransitionProvider<Number,TransitionKey<Number>> implements AnonymousTransitionFactory<TransitionKey<Number>, Number>, IndexTransitionFactory<TransitionKey<Number>, Number>{
 
 	
 	/**
@@ -50,7 +53,7 @@ public class StatefulProvider extends AbstractTransitionProvider<Number,Transiti
 	 * 
 	 */
 	public static final String HUNDREDS = "Hundreds";
-	public static class MultiStageCreate extends AbstractTargetLessTransition<Number>{
+	public class MultiStageCreate extends AbstractTargetLessTransition<Number>{
 
 	
 
@@ -59,7 +62,7 @@ public class StatefulProvider extends AbstractTransitionProvider<Number,Transiti
 		 */
 		@Override
 		public void buildForm(Form f, AppContext c) throws TransitionException {
-			FormState state = new FormState(c,"NumberTest");
+			FormState state = new FormState(c,"NumberTest",new ChainedTransitionResult<Number, TransitionKey<Number>>(StatefulProvider.this, null, CREATE_KEY));
 			IntegerInput hundreds = new IntegerInput();
 			hundreds.setMin(0);
 			hundreds.setMax(1000);
@@ -148,6 +151,16 @@ public class StatefulProvider extends AbstractTransitionProvider<Number,Transiti
 	public <X extends ContentBuilder> X getSummaryContent(AppContext c, X cb, Number target) {
 		return cb;
 	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionFactory#getIndexTransition()
+	 */
+	@Override
+	public TransitionKey<Number> getIndexTransition() {
+		return CREATE_KEY;
+	}
+
+	
 
 	
 }

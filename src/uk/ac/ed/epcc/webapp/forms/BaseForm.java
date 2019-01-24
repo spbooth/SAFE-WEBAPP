@@ -23,6 +23,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jasper.util.FastRemovalDequeue.Entry;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
@@ -88,6 +90,11 @@ public class BaseForm implements Form {
 	public void addAction(String name, FormAction action) {
 		name=name.trim(); 
 		actions.put(name, action);
+	}
+
+	@Override
+	public void removeAction(String name) {
+		actions.remove(name);
 	}
 
 	/**
@@ -225,11 +232,19 @@ public class BaseForm implements Form {
 	 * @return String
 	 */
 	public String getSingleActionName(){
-		Set<String> names = actions.keySet();
-		if( names.size() == 1){
-			return names.iterator().next();
+		// If there is only 1 validating action use that.
+		String name=null;
+		for( Iterator<Map.Entry<String,FormAction>> it = actions.entrySet().iterator(); it.hasNext();) {
+			Map.Entry<String,FormAction> e = it.next();
+			if( e.getValue().getMustValidate()) {
+				if(name != null) {
+					return null; // more than one possible action
+				}else {
+					name=e.getKey();
+				}
+			}
 		}
-		return null;
+		return name;
 	}
 	public boolean hasActions(){
 		return ! actions.isEmpty();

@@ -139,8 +139,4 @@ public class DirectOperationResultVisitor implements WebFormResultVisitor {
 		final_result=res;
 
 	}
-	@Override
-	public void visitRedisplayResult(RedisplayResult res) throws Exception {
-		final_result=res;
-	}
 }

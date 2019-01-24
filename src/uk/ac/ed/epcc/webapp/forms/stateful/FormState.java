@@ -26,7 +26,6 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
-import uk.ac.ed.epcc.webapp.forms.html.RedisplayResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -43,6 +42,42 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 public class FormState extends AbstractContexed {
 	/**
+	 * @author Stephen Booth
+	 *
+	 */
+	public final class ResetAction extends FormAction {
+		@Override
+		public String getHelp() {
+			return "Delete saved state and return the form to its initial stage";
+		}
+
+		@Override
+		public boolean getMustValidate() {
+			return false;
+		}
+
+		@Override
+		public FormResult action(Form f) throws ActionException {
+			clear();
+			return self;
+		}
+	}
+	/**
+	 * @author Stephen Booth
+	 *
+	 */
+	public final class NextAction extends FormAction {
+		@Override
+		public FormResult action(Form f) throws ActionException {
+			Map data = makeCached();
+			for(Iterator<String> it=f.getFieldIterator();it.hasNext();) {
+				String field = it.next();
+				data.put(field, f.get(field));
+			}
+			return self;
+		}
+	}
+	/**
 	 * 
 	 */
 	public static final String NEXT_ACTION = "Next";
@@ -52,12 +87,14 @@ public class FormState extends AbstractContexed {
 	public static final String RESET_ACTION = "Reset";
 	private final String name;
 	private final SessionService sess;
+	private final FormResult self;
 	/**
 	 * @param conn
 	 */
-	public FormState(AppContext conn, String name) {
+	public FormState(AppContext conn, String name,FormResult self) {
 		super(conn);
 		this.name=name;
+		this.self=self;
 		sess=conn.getService(SessionService.class);
 	}
 
@@ -115,40 +152,17 @@ public class FormState extends AbstractContexed {
 					clear();
 					throw new TransitionException("Internal error please re-try");
 				}
-				f.addAction(RESET_ACTION, new FormAction() {
-
-					@Override
-					public String getHelp() {
-						return "Delete saved state and return the form to its initial stage";
-					}
-
-
-					@Override
-					public boolean getMustValidate() {
-						return false;
-					}
-
-					@Override
-					public FormResult action(Form f) throws ActionException {
-						clear();
-						return new RedisplayResult();
-					}
-				});
+				f.addAction(RESET_ACTION, new ResetAction());
 				return true;
 			}
 		}
-		f.addAction(NEXT_ACTION, new FormAction() {
-
-			@Override
-			public FormResult action(Form f) throws ActionException {
-				Map data = makeCached();
-				for(Iterator<String> it=f.getFieldIterator();it.hasNext();) {
-					String field = it.next();
-					data.put(field, f.get(field));
-				}
-				return new RedisplayResult();
-			}
-		});
+		f.addAction(NEXT_ACTION, new NextAction());
+		if( data != null ) {
+			// this will have been added by last poll but
+			// we want it the last action
+			f.removeAction(RESET_ACTION);
+			f.addAction(RESET_ACTION, new ResetAction());
+		}
 		return false;
 	}
 	

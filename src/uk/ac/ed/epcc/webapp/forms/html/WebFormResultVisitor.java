@@ -24,7 +24,4 @@ public interface WebFormResultVisitor extends FormResultVisitor {
 	public void visitForwardResult(ForwardResult res) throws Exception;
 	public void visitRedirectResult(RedirectResult res) throws Exception;
 	public void visitErrorFormResult(ErrorFormResult res)throws Exception;
-	default public void visitRedisplayResult(RedisplayResult res) throws Exception{
-		throw new UnsupportedResultException("Redisplay result not supported");
-	}
 }
