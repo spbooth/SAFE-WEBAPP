@@ -748,4 +748,23 @@ public class DefaultServletService implements ServletService{
 		}
 		
 	}
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.servlet.ServletService#setRequestAttribute(java.lang.String, java.lang.Object)
+	 */
+	@Override
+	public void setRequestAttribute(String name, Object value) {
+		getRequest().setAttribute(name, value);
+		
+	}
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.servlet.ServletService#getRequestAttribute(java.lang.String)
+	 */
+	@Override
+	public Object getRequestAttribute(String name) {
+		return getRequest().getAttribute(name);
+	}
 }

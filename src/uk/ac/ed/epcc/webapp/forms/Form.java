@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 
@@ -248,6 +249,22 @@ public interface Form extends Iterable<Field>, Contexed{
 	 * @return boolean true if valid
 	 */
 	public boolean validate(); 
+	/** Attempt to show/validate  the current state of the form as part of a multi-phase 
+	 * form.
+	 * 
+	 * This is called during form construction when values from inputs are needed to construct the rest of the form.
+	 * If the method returns true then form construction can continue. If false then the method will have modified the
+	 * form to add actions to progress the multi-stage completion (by recursing to the self result) and the form should be displayed as-is.
+	 * 
+	 * <p>
+	 * If multi-stage submission is not supported the method will just return true.
+	 * @param self {@link FormResult} for this operation
+	 * @return boolean   true if form build should continue
+	 * @throws TransitionException
+	 */
+	default public boolean poll(FormResult self) throws TransitionException{
+		return true;
+	}
 	
 	/** Set a form-id for this form.
 	 * In HTML this is used as a prefix for the input html-ids

@@ -33,6 +33,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.LengthInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.LockedInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.MultipleInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
@@ -65,6 +66,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	private boolean use_post;
 	private boolean use_html5;
 	private boolean use_required=true;
+	private boolean locked_as_hidden=false;
 	private Map post_params;
 	private Map<String,String> data_attr;
 	private InputIdVisitor id_vis;
@@ -107,6 +109,12 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	}
 	public void setAutoFocus(boolean auto_focus) {
 		this.auto_focus = auto_focus;
+	}
+	public boolean getLockedAsHidden() {
+		return locked_as_hidden;
+	}
+	public void setLockedAsHidden(boolean locked_as_hidden) {
+		this.locked_as_hidden = locked_as_hidden;
 	}
 	private void  emitBinaryHTML(ExtendedXMLBuilder hb, boolean use_post, BinaryInput input,
 			String param) {
@@ -473,6 +481,13 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 		return null;
 	}
 
+	public Object visitLockedInput(LockedInput input) {
+		constantHTML(hb,input);
+		if( locked_as_hidden) {
+			BaseHTMLForm.emitHiddenParam(hb, input.getNested());
+		}
+		return null;
+	}
 	public Object visitFileInput(FileInput input) throws Exception {
 		emitFileHTML(hb, use_post, input, getParam(input));
 		return null;

@@ -74,7 +74,7 @@ public class LockedInput<V> implements UnmodifiableInput ,  Input<V>{
 	}
 
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitUnmodifyableInput(this);
+		return vis.visitLockedInput(this);
 	}
 
 }

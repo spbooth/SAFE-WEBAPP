@@ -501,6 +501,17 @@ public boolean setUseRequired(boolean use_required){
 	this.use_required=use_required;
 	return old_value;
 }
+
+/** Should locked inputs have their vvalues posed as hidden parameters
+ * 
+ */
+private boolean locked_as_hidden=false;
+public boolean setLockedAsHidden(boolean value) {
+	boolean old = locked_as_hidden;
+	this.locked_as_hidden=value;
+	return old;
+}
+
 /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormInput(uk.ac.ed.epcc.webapp.forms.Field)
  */
@@ -527,6 +538,7 @@ public <I,T> void addFormInput(AppContext conn,Field<I> f,T item) {
 		vis.setRadioTarget(item);
 		vis.setUseRequired(use_required);
 		vis.setAutoFocus(f.getKey().equals(f.getForm().getAutoFocus()));
+		vis.setLockedAsHidden(locked_as_hidden);
 		i.accept(vis);
 	}catch(Exception e){
 		getLogger(conn).error("Error generating input",e);

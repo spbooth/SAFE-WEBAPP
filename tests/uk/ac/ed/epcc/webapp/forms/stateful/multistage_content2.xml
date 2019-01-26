@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?><transition_page>
+<Form>
+<table class="form">
+<tr class="even">
+<th>
+<label class="required">Hundreds</label>
+</th>
+<td>700</td>
+</tr>
+<tr class="odd">
+<th>
+<label for="transition_Tens" class="required">Tens</label>
+</th>
+<td>
+<input id="transition_Tens" type="number" size="32" maxlength="32" name="Tens" class="input" min="700" max="790" step="10" required="required"/>
+</td>
+</tr>
+</table>
+<fieldset class="action_buttons">
+<input class="input_button" type="submit" name="Next" value="Next"/>
+</fieldset>
+</Form>
+</transition_page>

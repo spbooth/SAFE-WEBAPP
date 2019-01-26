@@ -112,9 +112,11 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 <%@ include file="/scripts/form_context.jsf" %>
 <div class="block">
 <h2><%=new HtmlBuilder().clean(page_heading).toString() %></h2>
-<A name="summary"></A><%--Browsers don't like single tag anchors--%>
+
 <% if(target != null ){ %>
+<div id="summary">
 <%= tp.getSummaryContent(conn,new HtmlBuilder(),target).toString() %>
+</div>
 <% } %>
 <%
 	if( t instanceof ExtraContent ){
@@ -130,7 +132,6 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
     	}
 	}
 %>
-
 <form id="form" method="post" 
 <% if( multi ){ %>
    enctype="multipart/form-data"
@@ -144,11 +145,12 @@ action="<%= response.encodeURL(web_path+TransitionServlet.getURL(conn,tp,target)
 <%} %>
 <input type='hidden' name='transition_form' value='true'/>
 <% 
+form_content.setLockedAsHidden(f.getTargetStage()>0);
 if( t instanceof CustomFormContent ){
 	((CustomFormContent)t).addFormContent(form_content, session_service, f, target);
 }else{
 	form_content.addFormTable(conn, f);
-	form_content.addActionButtons(f);
+	f.getActionButtons(form_content);
 }
 
 %>

@@ -25,11 +25,9 @@ import javax.servlet.ServletException;
 
 import org.junit.Before;
 
-import uk.ac.ed.epcc.webapp.CleanupService;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
-import uk.ac.ed.epcc.webapp.email.Emailer;
-import uk.ac.ed.epcc.webapp.forms.MapForm;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.html.BaseHTMLForm;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.transition.BaseFormTransition;
@@ -123,15 +121,20 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 			if(transition != null &&  (transition instanceof BaseFormTransition || transition instanceof TargetLessTransition)){
 				req.params.put("Transition", key.toString());
 				req.params.put("transition_form", "true");
-				MapForm f = new MapForm(getContext());
+				HTMLForm f = new HTMLForm(getContext());
+				
 				if( transition instanceof BaseFormTransition){
 					BaseFormTransition ft = (BaseFormTransition)transition;
 					ft.buildForm(f, target, getContext());
-					f.addStringMap(req.params);
+					
 				}else if( transition instanceof TargetLessTransition){
 					((TargetLessTransition)transition).buildForm(f, getContext());
-					f.addStringMap(req.params);
+					
 				}
+				if( f.getTargetStage() > 0 ) {
+					req.params.put(BaseHTMLForm.FORM_STAGE_INPUT, Integer.toString(f.getTargetStage()));
+				}
+				f.addStringMap(req.params);
 				
 			}
 		}

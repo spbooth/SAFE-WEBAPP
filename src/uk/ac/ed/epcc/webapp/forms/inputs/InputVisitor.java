@@ -39,4 +39,7 @@ public interface InputVisitor<R> {
 	default R visitTimestampInput(TimeStampInput t) throws Exception {
 		return visitLengthInput(t);
 	}
+	default R visitLockedInput(LockedInput l)throws Exception{
+		return visitUnmodifyableInput(l);
+	}
 }

@@ -17,26 +17,102 @@
 package uk.ac.ed.epcc.webapp.forms.html;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlPrinter;
 import uk.ac.ed.epcc.webapp.forms.Field;
+import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.MapForm;
+import uk.ac.ed.epcc.webapp.forms.action.FormAction;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseMapInput;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.servlet.ServletService;
 /** Common Base class for different types of HTML Form
  * 
  * @author spb
  *
  */
 public abstract class BaseHTMLForm extends MapForm {
+	private static final String FORM_STATE_ATTR = "form_state";
+	public static final String FORM_STAGE_INPUT = "form_stage";
+	
 	public BaseHTMLForm(AppContext c) {
 		super(c);
+	}
+	
+	protected int target_stage=0; // stage being evaluates
+	protected int stage=0;// form stage we are considering
+	
+	public int getTargetStage() {
+		return target_stage;
+	}
+	@Override
+	public boolean poll(FormResult self) throws TransitionException{
+		boolean result=false;
+		AppContext c = getContext();
+		
+		
+		final ServletService service = c.getService(ServletService.class);
+		Map<String,Object>	params = (Map<String, Object>) service.getRequestAttribute(FORM_STATE_ATTR);
+		if( params == null) {
+			params = service.getParams(); // use post params if not caches
+		}
+		
+		String stage_string=(String) params.get(FORM_STAGE_INPUT);
+		if( stage_string != null ) {
+			// from post is from a multi stage form
+			target_stage = Integer.parseInt(stage_string);
+		}
+		
+		if( stage < target_stage ) {
+
+			// current form state should parse and validate from params
+			if( parsePost(null, params, false) && validate()) {
+				// lock all these fields going forward
+				for(Iterator<String> it=getFieldIterator();it.hasNext();) {
+					String field = it.next();
+					Field ff = getField(field);
+					ff.lock();
+				}
+			}else {
+				getLogger().error("re-validate failed in poll "+stage+":"+target_stage, new Exception());
+				throw new TransitionException("Internal error please retry");
+			}
+			stage++;
+			result=true;  // keep building
+		}
+		
+		if( ! result ) {
+			// Form creation has been terminated early 
+			// so add a next action
+			addAction("Next", new FormAction() {
+				
+				@Override
+				public FormResult action(Form f) throws ActionException {
+					assert( f == BaseHTMLForm.this);
+					// Need to cache form state for later in same request
+					// we are relying on the form redisplay being generated from
+					// a forward not a redirect
+					Map<String,Object> values = new HashMap<>();
+					values.put(FORM_STAGE_INPUT, Integer.toString(target_stage+1));
+					addStringMap(values);
+					service.setRequestAttribute(FORM_STATE_ATTR, values);
+					return self;
+				}
+			});
+		}
+		
+		return result;
 	}
 	/**
 	 * emit the action buttons (if any) registered for this form.
@@ -47,6 +123,10 @@ public abstract class BaseHTMLForm extends MapForm {
 		return getActionButtons(new HtmlBuilder()).toString();
 	}
 	public HtmlBuilder getActionButtons(HtmlBuilder result){
+		if( target_stage > 0 ) {
+			// record which stage we are at
+			BaseHTMLForm.emitHiddenParam(result, FORM_STAGE_INPUT, Integer.toString(target_stage));
+		}
 		result.setActionName(action_name);
 		result.addActionButtons(this);
 		return result;
@@ -90,6 +170,7 @@ public abstract class BaseHTMLForm extends MapForm {
 	
 	protected < X extends HtmlBuilder> X getHtmlFieldTable(X result,Collection<String> missing_fields, Map<String,String> errors,
 				Map<String,Object> post_params) {
+		result.setLockedAsHidden(stage>0);
 		result.setErrors(errors);
 		result.setMissingFields(missing_fields);
 		result.setPostParams(post_params);
@@ -100,7 +181,7 @@ public abstract class BaseHTMLForm extends MapForm {
 	
 	
 	
-	private void emitHiddenParam(HtmlPrinter hb,Input i) {
+	public static void emitHiddenParam(ExtendedXMLBuilder hb,Input i) {
 		String value;
 		if (i instanceof ParseInput) {
 			ParseInput p = (ParseInput) i;
@@ -110,7 +191,7 @@ public abstract class BaseHTMLForm extends MapForm {
 		}
 		emitHiddenParam(hb,i.getKey(), value);
 	}
-	private void emitHiddenParam(HtmlPrinter hb,String key, String value){
+	public static void emitHiddenParam(ExtendedXMLBuilder hb,String key, String value){
 		hb.open("input");
 		hb.attr("type","hidden");
 		hb.attr("name",key);
@@ -118,7 +199,7 @@ public abstract class BaseHTMLForm extends MapForm {
 		hb.close();
 
 	}
-	private void getHiddenParam(HtmlPrinter hb,Input i){
+	public static void getHiddenParam(ExtendedXMLBuilder hb,Input i){
 		if(i instanceof ParseMapInput){
 			ParseMapInput c = (ParseMapInput) i;
 			Map<String,Object> map = c.getMap();

@@ -170,7 +170,7 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 				// if it is a transition exception we have a message for the user
 				throw e;	
 			}catch(Exception e){
-				conn.error(e,"Error performing TargetLessTransition");
+				getLogger().error("Error performing TargetLessTransition",e);
 				throw new TransitionException("Operation failed");
 			}
 		}

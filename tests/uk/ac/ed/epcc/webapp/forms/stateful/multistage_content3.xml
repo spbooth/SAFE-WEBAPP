@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><transition_page>
+<Form>
+<table class="form">
+<tr class="even">
+<th>
+<label class="required">Hundreds</label>
+</th>
+<td>700</td>
+</tr>
+<tr class="odd">
+<th>
+<label class="required">Tens</label>
+</th>
+<td>730</td>
+</tr>
+<tr class="even">
+<th>
+<label for="transition_Units" class="required">Units</label>
+</th>
+<td>
+<input id="transition_Units" type="number" size="32" maxlength="32" name="Units" class="input" min="730" max="739" step="1" required="required"/>
+</td>
+</tr>
+</table>
+<fieldset class="action_buttons">
+<input class="input_button" type="submit" name="Create" value="Create"/>
+</fieldset>
+</Form>
+</transition_page>

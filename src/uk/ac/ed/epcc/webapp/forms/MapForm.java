@@ -52,10 +52,8 @@ public class MapForm extends BaseForm {
 
 	public static final String GENERAL_ERROR = "general";
 	protected String action_name = null;
-	private Logger log;
 	public MapForm(AppContext c) {
 		super(c);
-		log = c.getService(LoggerService.class).getLogger(getClass());
 	}
 	
 	/**
