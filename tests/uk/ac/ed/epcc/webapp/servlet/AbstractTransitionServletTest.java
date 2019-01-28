@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 
@@ -190,6 +191,10 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	 * These are normally used where one servlet of form transition selects the target for a. If the first transition
 	 * changes state then the transition should really have used a redirect.
 	 * 
+	 * This sets up a new request so effectively moves the test state from showing the form to
+	 * posting the next operation. For multi-stage forms the form state is copied from the cached values
+	 * in the request to the post params.
+	 * 
 	 * @see ChainedTransitionResult#useURL()
 	 * @param fac
 	 * @param key
@@ -200,8 +205,15 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 			K key, T target) throws TransitionException {
 		super.checkForwardToTransition(fac,key,target);
 		// Setup the transition for next operation
+		// we don't call resetRequest as
+		Map<String,Object> multi_stage = (Map<String, Object>) req.getAttribute(BaseHTMLForm.FORM_STATE_ATTR);
 		resetRequest();
 		setTransition(fac, key, target);
+		if( multi_stage != null) {
+			// copy over the current form state 
+			req.params.putAll(multi_stage);
+			req.attr.remove("Params");
+		}
 		return;
 	}
 	
@@ -288,11 +300,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		 }
 		 Transition t = factory.getTransition(target,key);
 		 assertNotNull("Transition not null",t);
-		 if( t instanceof ExtraContent ){
-			 builder.open("ExtraContent");
-			 	((ExtraContent)t).getExtraHtml(builder, getContext().getService(SessionService.class), target);
-			 builder.close();
-		 }
+		 
 		 HTMLForm f = new HTMLForm(getContext());
 		 f.setFormID("transition_");
 		 if( t instanceof BaseFormTransition ){
@@ -301,6 +309,11 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		 }else if( t instanceof TargetLessTransition ){
 		 	TargetLessTransition tlt = (TargetLessTransition) t;
 		 	((TargetLessTransition)t).buildForm(f,getContext());
+		 }
+		 if( t instanceof ExtraContent ){
+			 builder.open("ExtraContent");
+			 	((ExtraContent)t).getExtraHtml(builder, getContext().getService(SessionService.class), target,f);
+			 builder.close();
 		 }
 		 builder.open("Form");
 		 if( t instanceof CustomFormContent ){
@@ -329,6 +342,8 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	 * normalisation XLST transform to remove time dependent 
 	 * output and compared with a file of expected output.
 	 * 
+	 * This works in the context of the current request so if called after running
+	 * a stage of a multi-stage transition it will use the request cached form state.
 	 * 
 	 * @param normalise_transform
 	 * @param expected

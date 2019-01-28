@@ -120,7 +120,7 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 <% } %>
 <%
 	if( t instanceof ExtraContent ){
-		HtmlBuilder extra=(HtmlBuilder)((ExtraContent) t).getExtraHtml(new HtmlBuilder(),session_service,target);
+		HtmlBuilder extra=(HtmlBuilder)((ExtraContent) t).getExtraHtml(new HtmlBuilder(),session_service,target,f);
 		if( extra != null){
 %>
 <div id="extra">

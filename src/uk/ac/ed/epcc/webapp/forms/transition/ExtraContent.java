@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.forms.transition;
 
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** Interface for {@link FormTransition} or {@link TargetLessTransition}s 
@@ -29,5 +30,26 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 
 public interface ExtraContent<O> {	 
+	/** Add the extra content to be shown with the transition
+	 * 
+	 * @param cb
+	 * @param op
+	 * @param target
+	 * @return
+	 */
 	public <X extends ContentBuilder> X getExtraHtml(X cb,SessionService<?> op, O target);
+	
+	/** A multi-stage form may need to customise content based on form state and can override this method.
+	 *  It defaults to the same as {@link #getExtraHtml(ContentBuilder, SessionService, Object)}
+	 * 
+	 * 
+	 * @param cb
+	 * @param op
+	 * @param target
+	 * @param f
+	 * @return
+	 */
+	default public <X extends ContentBuilder> X getExtraHtml(X cb,SessionService<?> op, O target, Form f) {
+		return getExtraHtml(cb,op,target);
+	}
 }

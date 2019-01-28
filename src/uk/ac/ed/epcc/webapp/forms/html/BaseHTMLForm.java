@@ -43,7 +43,7 @@ import uk.ac.ed.epcc.webapp.servlet.ServletService;
  *
  */
 public abstract class BaseHTMLForm extends MapForm {
-	private static final String FORM_STATE_ATTR = "form_state";
+	public static final String FORM_STATE_ATTR = "form_state";
 	public static final String FORM_STAGE_INPUT = "form_stage";
 	
 	public BaseHTMLForm(AppContext c) {

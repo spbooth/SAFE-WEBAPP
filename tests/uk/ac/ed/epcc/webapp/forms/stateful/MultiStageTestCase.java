@@ -52,6 +52,28 @@ public class MultiStageTestCase extends AbstractTransitionServletTest {
 	}
 	
 	@Test
+	public void testCreate2() throws Exception {
+		MultiStageProvider provider = new MultiStageProvider(ctx);
+		
+		setTransition(provider, MultiStageProvider.CREATE_KEY, null);
+		checkFormContent(null, "multistage_content1.xml");
+		addParam(MultiStageProvider.HUNDREDS,700);
+		runTransition();
+		checkFormContent(null, "multistage_content2.xml");
+		checkForwardToTransition(provider, MultiStageProvider.CREATE_KEY, null);
+		checkFormContent(null, "multistage_content2.xml");
+		addParam(MultiStageProvider.TENS,730);
+		runTransition();
+		checkFormContent(null, "multistage_content3.xml");
+		addParam(MultiStageProvider.UNITS,736);
+		runTransition();
+		checkMessageText("736 created");
+		// action should have cleared state
+		setTransition(provider, MultiStageProvider.CREATE_KEY, null);
+		checkFormContent(null, "multistage_content1.xml");
+	}
+	
+	@Test
 	public void testPhaseError() throws Exception {
 		MultiStageProvider provider = new MultiStageProvider(ctx);
 		
