@@ -336,7 +336,9 @@ public class MapForm extends BaseForm {
 	public void setActionName(String name) {
 		action_name=name;
 	}
-
+    public String getActionName() {
+    	return action_name;
+    }
 	public String locateAction(Map<String,Object> params) throws ActionException{
 		for (Iterator<String> it = getActionNames(); it.hasNext();) {
 			String name = it.next();

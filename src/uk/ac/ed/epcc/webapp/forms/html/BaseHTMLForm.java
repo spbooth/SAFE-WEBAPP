@@ -53,6 +53,7 @@ public abstract class BaseHTMLForm extends MapForm {
 	protected int target_stage=0; // stage being evaluates
 	protected int stage=0;// form stage we are considering
 	
+	@Override
 	public int getTargetStage() {
 		return target_stage;
 	}

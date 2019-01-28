@@ -144,13 +144,17 @@ action="<%= response.encodeURL(web_path+TransitionServlet.getURL(conn,tp,target)
 <input type='hidden' name='<%=TransitionServlet.TRANSITION_CSRF_ATTR %>' value='<%=crsf %>'/>
 <%} %>
 <input type='hidden' name='transition_form' value='true'/>
+<% if(f.getTargetStage() > 0 ){ %>
+<input type='hidden' name='<%=BaseHTMLForm.FORM_STAGE_INPUT %>' value='<%=f.getTargetStage()%>'/>
+<%} %>
 <% 
 form_content.setLockedAsHidden(f.getTargetStage()>0);
 if( t instanceof CustomFormContent ){
 	((CustomFormContent)t).addFormContent(form_content, session_service, f, target);
 }else{
+	form_content.setActionName(f.getActionName());
 	form_content.addFormTable(conn, f);
-	f.getActionButtons(form_content);
+	form_content.addActionButtons(f);
 }
 
 %>
