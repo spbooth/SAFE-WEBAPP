@@ -16,15 +16,22 @@ package uk.ac.ed.epcc.webapp.model.mail;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.LinkedList;
 
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
 import org.junit.Test;
+
+import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.MimeBodyPart;
 
 import uk.ac.ed.epcc.webapp.editors.mail.EditAction;
 import uk.ac.ed.epcc.webapp.editors.mail.EmailTransitionProvider;
 import uk.ac.ed.epcc.webapp.editors.mail.MailTarget;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageHandler;
+import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
 import uk.ac.ed.epcc.webapp.mock.MockPart;
@@ -131,6 +138,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		checkDiff("/cleanup.xsl","add_attachment.xml");
 	}
 	
+	
 	@Test
 	@DataBaseFixtures({"new_compose.xml","subject_edit.xml","add_recipient.xml"})
 	public void editText() throws Exception{
@@ -173,5 +181,97 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		checkViewRedirect(prov,target);
 		target = (MailTarget) checkViewContent("/normalize.xsl","view_unicode_text.xml");
 		checkDiff("/cleanup.xsl","edit_text.xml");
+	}
+	@Test
+	@DataBaseFixtures({"new_compose.xml","subject_edit.xml","add_recipient.xml","edit_text.xml"})
+	public void addEmailAttachment() throws Exception{
+		SessionService user  = setupPerson();
+		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
+		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
+		MessageHandler hand = fac.getHandler(1,user);
+		LinkedList<String> path = new LinkedList<>();
+		MailTarget target = new MailTarget(hand,0,path);
+		takeBaseline();
+		setTransition(prov,EditAction.AddAttachment,target);
+		checkFormContent("/normalize.xsl","add_attachment_form.xml");
+		MockPart part = new MockPart("text");
+		part.setFileName("hello.msg");
+		part.data.setMimeType("message/rfc822");
+		
+		Emailer mailer = new Emailer(ctx);
+		MimeMessage m = mailer.makeBlankEmail(ctx, new String[] {"fred@example.com" }, new InternetAddress("bill@example.com"), "A test email");
+		m.setContent("<h1>A header</h1>\nAnd a <a href='http://www.example.com'>link</a>\n", "text/html");
+		m.saveChanges();
+		OutputStream outputStream = part.data.getOutputStream();
+		m.writeTo(outputStream);
+		outputStream.close();
+		//w.println("hello world");
+	
+		req.addPart(part);
+		runTransition();
+		target = new MailTarget(fac.getHandler(1,user));
+		checkViewRedirect(prov,target);
+		target = (MailTarget) checkViewContent("/normalize.xsl","view_add_email_attachment.xml");
+		checkDiff("/cleanup.xsl","add_email_attachment.xml");
+	}
+	
+	@Test
+	@DataBaseFixtures({"new_compose.xml","subject_edit.xml","add_recipient.xml","edit_text.xml","add_email_attachment.xml"})
+	public void testQuote() throws Exception{
+		SessionService user  = setupPerson();
+		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
+		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
+		MessageHandler hand = fac.getHandler(1,user);
+		LinkedList<String> path = new LinkedList<>();
+		path.add("1");
+		
+		MailTarget target = new MailTarget(hand,0,path);
+		takeBaseline();
+		setTransition(prov,EditAction.Quote,target);
+		runTransition();
+		target = new MailTarget(fac.getHandler(1,user));
+		checkViewRedirect(prov,target);
+		target = (MailTarget) checkViewContent("/normalize.xsl","view_quote.xml");
+		checkDiff("/cleanup.xsl","quote.xml");
+	}
+	
+	@Test
+	@DataBaseFixtures({"new_compose.xml","subject_edit.xml","add_recipient.xml","edit_text.xml","add_email_attachment.xml"})
+	public void testMerge() throws Exception{
+		SessionService user  = setupPerson();
+		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
+		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
+		MessageHandler hand = fac.getHandler(1,user);
+		LinkedList<String> path = new LinkedList<>();
+		
+		
+		MailTarget target = new MailTarget(hand,0,path);
+		takeBaseline();
+		setTransition(prov,EditAction.Merge,target);
+		runTransition();
+		target = new MailTarget(fac.getHandler(1,user));
+		checkViewRedirect(prov,target);
+		target = (MailTarget) checkViewContent("/normalize.xsl","view_merge.xml");
+		checkDiff("/cleanup.xsl","merge.xml");
+	}
+	
+	@Test
+	@DataBaseFixtures({"new_compose.xml","subject_edit.xml","add_recipient.xml","edit_text.xml","add_email_attachment.xml"})
+	public void testFlatten() throws Exception{
+		SessionService user  = setupPerson();
+		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
+		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
+		MessageHandler hand = fac.getHandler(1,user);
+		LinkedList<String> path = new LinkedList<>();
+		
+		
+		MailTarget target = new MailTarget(hand,0,path);
+		takeBaseline();
+		setTransition(prov,EditAction.Flatten,target);
+		runTransition();
+		target = new MailTarget(fac.getHandler(1,user));
+		checkViewRedirect(prov,target);
+		target = (MailTarget) checkViewContent("/normalize.xsl","view_flatten.xml");
+		checkDiff("/cleanup.xsl","flatten.xml");
 	}
 }
