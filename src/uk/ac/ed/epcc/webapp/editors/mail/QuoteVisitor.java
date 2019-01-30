@@ -16,6 +16,9 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.editors.mail;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimePart;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 
 /** Class to convert a Message into a quoted text string 
@@ -45,6 +48,20 @@ public class QuoteVisitor extends PrefixVisitor<TextMailBuilder> {
 	@Override
 	protected TextMailBuilder getMailBuilder() {
 		return sb;
+	}
+
+	@Override
+	public void visit(MimePart parent, String string, MessageWalker w) {
+		// We want plain text here
+		try {
+			if( parent.isMimeType("text/html")) {
+				// strip html
+				string = HtmlStripper.strip(string);
+			}
+		} catch (MessagingException e) {
+			getLogger().error("Error checking content type", e);
+		}
+		super.visit(parent, string, w);
 	}
 
 

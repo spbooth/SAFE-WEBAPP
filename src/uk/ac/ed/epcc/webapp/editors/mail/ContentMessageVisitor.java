@@ -18,7 +18,6 @@ package uk.ac.ed.epcc.webapp.editors.mail;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,21 +27,10 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimePart;
-import javax.xml.transform.ErrorListener;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXResult;
-import javax.xml.transform.stream.StreamSource;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
-import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
-import uk.ac.ed.epcc.webapp.content.XMLBuilderSaxHandler;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageWalker.WalkerException;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
@@ -54,11 +42,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 
 public class ContentMessageVisitor extends AbstractVisitor {
-	/**
-	 * 
-	 */
-	public static final String EMAIL_FORMAT_WRAP_THRESHOLD_CFG = "email.format.wrap_threshold";
-	public static final Feature CLEAN_WITH_STYLESHEET_FEATURE = new Feature("clean_html_stylesheet", false, "Use a stylesheet to clean html");
+	
 	  static final int MAX_INLINE_LENGTH = 262144;
 	protected ContentBuilder sb;
 	  protected  MessageLinker linker;
@@ -89,58 +73,15 @@ public class ContentMessageVisitor extends AbstractVisitor {
 		}
 		try {
 			if( parent.isMimeType("text/html")){
-				if( CLEAN_WITH_STYLESHEET_FEATURE.isEnabled(w.getContext())){
-					try{
-						// attempt to clean html vi xlst
-						TransformerFactory tfac = TransformerFactory.newInstance();
-						Transformer trans =tfac.newTransformer(new StreamSource(getClass().getResourceAsStream("HtmlCleaner.xsl")));
-						trans.setErrorListener(new ErrorListener() {
-
-							public void warning(TransformerException exception)
-									throws TransformerException {
-								// ignore warnings
-
-							}
-
-							public void fatalError(TransformerException exception)
-									throws TransformerException {
-								throw exception;
-
-							}
-
-							public void error(TransformerException exception)
-									throws TransformerException {
-								// ignore non fatal errors
-
-							}
-						});
-						Source src = new StreamSource(new StringReader(string));
-						SimpleXMLBuilder child =sb.getText();
-						XMLBuilderSaxHandler handler = new XMLBuilderSaxHandler(child);
-						Result res = new SAXResult(handler);
-						trans.transform(src, res);
-						child.appendParent();
-						return;
-					}catch(TransformerException e){
-						// transform failed.
-						getLogger().error("Error formatting html",e);
-					}
-				}
-				// try quick and dirty html strip
-				string = string.replaceAll("<[bB][rR]/?>", "\n");
-				string = string.replaceAll("<[^>]*>", "");
-				string = string.replace("&amp;", "&");
-				string = string.replace("&nbsp;", " ");
-				string = string.replace("&lt;", "<");
-				string = string.replace("&gt;", ">");
-				string = string.replace("&quot;", "\"");
-				string = string.replace("&\\#\\d+;", "");
+				HtmlStripper stripper = new HtmlStripper(sb,w.getContext());
+				stripper.clean(string);
+				return;
 			}
 		} catch (Exception e) {
 			getLogger().error("Error checking for html",e);
 
-		}
-		sb.cleanFormatted(getContext().getIntegerParameter(EMAIL_FORMAT_WRAP_THRESHOLD_CFG,MessageWalker.MAXLENGTH), string);
+		}	
+		sb.cleanFormatted(getContext().getIntegerParameter(HtmlStripper.EMAIL_FORMAT_WRAP_THRESHOLD_CFG,MessageWalker.MAXLENGTH), string);
 		
 	}
 
