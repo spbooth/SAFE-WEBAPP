@@ -49,7 +49,7 @@ public class LogListener extends AbstractContexed implements RemoteAuthListener 
 		for(String name : serv.getAttributeNames()) {
 			log.debug(name+":="+serv.getRequestAttribute(name));
 		}
-		for(String name : new String[] {"affiliation","persistent-id"}) {
+		for(String name : new String[] {"affiliation","persistent-id","entitlement","epnn"}) {
 			log.debug(name+":="+serv.getRequestAttribute(name));
 		}
 		Map props = new HashMap();
