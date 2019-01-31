@@ -14,6 +14,8 @@
 package uk.ac.ed.epcc.webapp.servlet;
 
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -46,6 +48,11 @@ public class LogListener extends AbstractContexed implements RemoteAuthListener 
 		log.debug("remote authentication to "+tag+" "+user.getIdentifier());
 		for(String name : serv.getAttributeNames()) {
 			log.debug(name+":="+serv.getRequestAttribute(name));
+		}
+		Map props = new HashMap();
+		serv.addErrorProps(props);
+		for(Object name : props.keySet()) {
+			log.debug(name.toString()+":="+props.get(name));
 		}
 	}
 
