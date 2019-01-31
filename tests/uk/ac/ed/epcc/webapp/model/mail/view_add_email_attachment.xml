@@ -69,7 +69,7 @@
 <h4>From: bill@example.com</h4>
 <h4>Subject: A test email</h4>
 <pre class="loose">A header
-And a link
+And a [http://www.example.com] link
 </pre>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/1/T">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0/1/T"/>

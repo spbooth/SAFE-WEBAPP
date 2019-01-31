@@ -14,6 +14,8 @@
 package uk.ac.ed.epcc.webapp.editors.mail;
 
 import java.io.StringReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Result;
@@ -94,11 +96,14 @@ public class HtmlStripper extends AbstractContexed {
 		sb.cleanFormatted(getContext().getIntegerParameter(EMAIL_FORMAT_WRAP_THRESHOLD_CFG,MessageWalker.MAXLENGTH), string);
 	}
 
+	private static final Pattern UNICODE_PATT = Pattern.compile("&\\#(\\d+);");
+	private static final Pattern LINK_HEAD_PATT = Pattern.compile("<a\\s+href\\s*=\\s*'(.*?)'\\s*>");
 	/** A quick and diry regexp based removal of html.
 	 * @param string
 	 * @return
 	 */
 	public static String strip(String string) {
+		string = getLinks(string);
 		string = string.replaceAll("<[bB][rR]/?>", "\n");
 		string = string.replaceAll("<[^>]*>", "");
 		string = string.replace("&amp;", "&");
@@ -106,7 +111,35 @@ public class HtmlStripper extends AbstractContexed {
 		string = string.replace("&lt;", "<");
 		string = string.replace("&gt;", ">");
 		string = string.replace("&quot;", "\"");
-		string = string.replace("&\\#\\d+;", "");
+		
+		// expand encoded chars into the text 
+		string = expandUnicode(string);
+		return string;
+	}
+
+	/** replace expanded unicode with raw 
+	 * @param string
+	 * @return
+	 */
+	public static String expandUnicode(String string) {
+		StringBuffer sb = new StringBuffer();
+		Matcher m = UNICODE_PATT.matcher(string);
+		while( m.find() ) {
+			int codepoint = Integer.parseInt(m.group(1));
+			m.appendReplacement(sb, String.valueOf(Character.toChars(codepoint)));
+		}
+		m.appendTail(sb);
+		string = sb.toString();
+		return string;
+	}
+	public static String getLinks(String string) {
+		StringBuffer sb = new StringBuffer();
+		Matcher m = LINK_HEAD_PATT.matcher(string);
+		while( m.find() ) {
+			m.appendReplacement(sb, "[$1] ");
+		}
+		m.appendTail(sb);
+		string = sb.toString();
 		return string;
 	}
 }

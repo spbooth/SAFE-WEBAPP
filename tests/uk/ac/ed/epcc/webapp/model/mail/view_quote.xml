@@ -68,7 +68,7 @@
 &gt; From: bill@example.com
 &gt; Subject: A test email
 &gt; A header
-&gt; And a link
+&gt; And a [http://www.example.com] link
 </pre>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/1/T">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0/1/T"/>
