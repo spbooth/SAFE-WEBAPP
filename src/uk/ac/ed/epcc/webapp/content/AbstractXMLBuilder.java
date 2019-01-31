@@ -31,6 +31,7 @@ public abstract class AbstractXMLBuilder implements SimpleXMLBuilder {
     private final Map<String,CharSequence> attributes;
     private boolean escape_unicode =true;
     private boolean valid_xml=false;
+    private char high_surrogate=0;
 	public AbstractXMLBuilder() {
 		tags = new Stack<>();
 		attributes = new LinkedHashMap<>();
@@ -112,6 +113,8 @@ public abstract class AbstractXMLBuilder implements SimpleXMLBuilder {
 	
 
 	protected final void doClean(char c) {
+		char prev=high_surrogate;
+		high_surrogate=0;
 		// We use number values for quotes as these are defined in all versions of
 		// html. &apos; and &quot; are valid XML and HTML4
   		switch(c){
@@ -127,10 +130,20 @@ public abstract class AbstractXMLBuilder implements SimpleXMLBuilder {
 		  break;
   		default: 
   			if( c > 127 && escape_unicode){
-  				char data[] = { c};
-  				append("&#");
-  				append(Integer.toString(Character.codePointAt(data, 0)));
-  				append(";");
+  				if( Character.isHighSurrogate(c)) {
+  					high_surrogate=c;
+  				}else if( prev != 0 && Character.isLowSurrogate(c)) {
+  					// we have a pair
+  					// always escape chars outside 
+  					append("&#");
+  	  				append(Integer.toString(Character.toCodePoint(prev, c)));
+  	  				append(";");
+  				}else {
+  					char data[] = { c};
+  					append("&#");
+  					append(Integer.toString(Character.codePointAt(data, 0)));
+  					append(";");
+  				}
   			}else{
   				append(c);
   			}

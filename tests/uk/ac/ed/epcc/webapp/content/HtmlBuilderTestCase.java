@@ -162,6 +162,22 @@ public class HtmlBuilderTestCase extends WebappTestBase {
 		assertEquals("&#34;", hb.toString());
 	}
 	
+	@Test
+	public void testCleanUnicode() {
+		HtmlBuilder hb = new HtmlBuilder();
+		hb.setEscapeUnicode(true);
+		hb.clean("\u21A9 \u2660 \u2603");
+		assertEquals("&#8617; &#9824; &#9731;", hb.toString());
+	}
+	
+	@Test
+	public void testCleanUnicode2() {
+		HtmlBuilder hb = new HtmlBuilder();
+		hb.setEscapeUnicode(true);
+		hb.clean(String.valueOf(Character.toChars(0x1F4A9))); // poo emoji
+		assertEquals(0x1F4A9,128169);
+		assertEquals("&#128169;", hb.toString());
+	}
 	/**
 	 * Tests the method {@link XMLPrinter#clear()}.
 	 */
