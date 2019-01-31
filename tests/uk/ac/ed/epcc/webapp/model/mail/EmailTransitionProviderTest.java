@@ -25,8 +25,6 @@ import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
 
-import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.MimeBodyPart;
-
 import uk.ac.ed.epcc.webapp.editors.mail.EditAction;
 import uk.ac.ed.epcc.webapp.editors.mail.EmailTransitionProvider;
 import uk.ac.ed.epcc.webapp.editors.mail.MailTarget;
