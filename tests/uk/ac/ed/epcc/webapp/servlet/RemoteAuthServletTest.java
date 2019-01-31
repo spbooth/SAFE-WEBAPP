@@ -22,6 +22,7 @@ import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.email.MockTansport;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
 import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -119,6 +120,7 @@ public class RemoteAuthServletTest<A extends AppUser> extends ServletTest {
 	
 	@Test
 	@DataBaseFixtures("remote_set.xml")
+	@ConfigFixtures("listener.properties")
 	public void testLogin() throws ConsistencyError, Exception{
 		
 		req.remote_user="fred";

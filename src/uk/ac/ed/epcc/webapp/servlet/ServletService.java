@@ -148,6 +148,7 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 */
 	public void noCache();
 	
+	public Iterable<String> getAttributeNames();
 	/** Store an object in the current request
 	 * 
 	 * @param name

@@ -206,6 +206,10 @@ public class RemoteAuthServlet extends WebappServlet {
 				}
 				if( allow_login ) {
 					parser.verified(person); // record sucessful authentication
+					RemoteAuthListener l = conn.makeObject(RemoteAuthListener.class, "remote_auth_listener."+remote_auth_realm);
+					if( l != null ) {
+						l.authenticated(person);
+					}
 				// attempt a login
 					TwoFactorHandler handler = new TwoFactorHandler<>(session_service);
 					RedirectResult next_page = (RedirectResult) session_service.getAttribute(LoginServlet.INITIAL_PAGE_ATTR);

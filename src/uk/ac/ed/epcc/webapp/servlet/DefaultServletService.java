@@ -18,9 +18,11 @@ import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -766,5 +768,18 @@ public class DefaultServletService implements ServletService{
 	@Override
 	public Object getRequestAttribute(String name) {
 		return getRequest().getAttribute(name);
+	}
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.servlet.ServletService#getAttributeNames()
+	 */
+	@Override
+	public Iterable<String> getAttributeNames() {
+		Set<String> names = new HashSet<>();
+		for(Enumeration<String> e=getRequest().getAttributeNames(); e.hasMoreElements(); ) {
+			names.add(e.nextElement());
+		}
+		return names;
 	}
 }
