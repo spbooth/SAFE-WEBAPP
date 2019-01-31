@@ -46,6 +46,7 @@ import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
 import java.util.Hashtable;
+import java.util.Iterator;
 
 public class MockRequest implements HttpServletRequest {
     public Hashtable<String,Object> params=new Hashtable<>();
@@ -231,10 +232,37 @@ public class MockRequest implements HttpServletRequest {
 		return attr.get(arg0);
 	}
 
+	private static class EnumerationWrapper<E> implements Enumeration<E>{
+		/**
+		 * @param it
+		 */
+		public EnumerationWrapper(Iterator<E> it) {
+			super();
+			this.it = it;
+		}
+
+		private final Iterator<E> it;
+
+		/* (non-Javadoc)
+		 * @see java.util.Enumeration#hasMoreElements()
+		 */
+		@Override
+		public boolean hasMoreElements() {
+			return it.hasNext();
+		}
+
+		/* (non-Javadoc)
+		 * @see java.util.Enumeration#nextElement()
+		 */
+		@Override
+		public E nextElement() {
+			return it.next();
+		}
+	}
 	@Override
 	public Enumeration getAttributeNames() {
 		
-		return null;
+		return new EnumerationWrapper<String>(attr.keySet().iterator());
 	}
 
 	@Override

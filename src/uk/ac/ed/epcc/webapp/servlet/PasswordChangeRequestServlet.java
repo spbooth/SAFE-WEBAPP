@@ -30,6 +30,8 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
+import uk.ac.ed.epcc.webapp.session.AppUserNameFinder;
+import uk.ac.ed.epcc.webapp.session.EmailNameFinder;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory.PasswordChangeRequest;
@@ -90,6 +92,10 @@ public class PasswordChangeRequestServlet<A extends AppUser> extends WebappServl
 				try {
 					FormResult result =  form.doAction(params); // this sets the password and logs-in
 					request.delete();
+					AppUserNameFinder finder = user.getFactory().getRealmFinder(EmailNameFinder.EMAIL);
+					if( finder != null ) {
+						finder.verified(user); // email address verified by reset link
+					}
 					handleFormResult(conn, req, res, result);
 				} catch (Exception e) {
 					getLogger(conn).error("Error processing form", e);

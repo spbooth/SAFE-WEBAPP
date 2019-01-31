@@ -84,7 +84,9 @@ public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequ
 		}
 		public void complete() throws DataException{
 			AppUser user = (AppUser) user_fac.find(record.getIntProperty(USER_ID));
-			user.setEmail(record.getStringProperty(NEW_EMAIL));
+			AppUserNameFinder finder = user_fac.getRealmFinder(EmailNameFinder.EMAIL);
+			finder.setName(user, record.getStringProperty(NEW_EMAIL));
+			finder.verified(user); // email address verified
 			user.commit();
 			delete();
 		}
