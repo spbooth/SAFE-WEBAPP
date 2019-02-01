@@ -120,7 +120,6 @@ public class RemoteAuthServletTest<A extends AppUser> extends ServletTest {
 	
 	@Test
 	@DataBaseFixtures("remote_set.xml")
-	@ConfigFixtures("listener.properties")
 	public void testLogin() throws ConsistencyError, Exception{
 		
 		req.remote_user="fred";

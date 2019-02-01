@@ -51,6 +51,7 @@ import uk.ac.ed.epcc.webapp.session.AppUserNameFinder;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.session.WebNameFinder;
+import uk.ac.ed.epcc.webapp.session.twofactor.TwoFactorHandler;
 /** A default implementation for {@link ServletService} for a HTTP servlet application.
  * 
  * This class implements the following strategy for extracting a user from a HTTP request
@@ -493,6 +494,11 @@ public class DefaultServletService implements ServletService{
 			}
 			AppContext conn = getContext();
 			String name = getWebName();
+			// This is for on-the-fly remote authentication at any url
+			// don't do this if the authentication flow is expensive
+			// use RemoteAuthServlet (with similar code to this)
+			// for a single auth point. Also allows multiple mechanisms in the
+			// same application
 			if( name != null && (DefaultServletService.ALLOW_EXTERNAL_AUTH_FEATURE.isEnabled(conn) || DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn))){
 				// If there is a web-name we don't consider password login
 				AppUserFactory<A> factory = sess.getLoginFactory();
@@ -514,7 +520,11 @@ public class DefaultServletService implements ServletService{
 					}
 					if( person != null ){
 						if( person.canLogin()){
-
+							finder.verified(person); // record sucessful authentication
+							for(RemoteAuthListener l : ((AppUserFactory<?>)person.getFactory()).getComposites(RemoteAuthListener.class)){
+								l.authenticated(remote_auth_realm,person);
+							}
+							person.commit();
 							if( factory.mustRegister(person)){
 								// don't populate session this will trigger redirect to
 								// the registration page

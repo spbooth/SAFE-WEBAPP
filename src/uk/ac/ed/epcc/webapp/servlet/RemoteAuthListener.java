@@ -13,9 +13,10 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet;
 
+import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 
-/** Interface for plug-in classes which observe 
+/** Interface for {@link Composite}s which observe 
  * external authentications.
  * 
  * These are usually to capture AAAI attributes that
@@ -23,8 +24,12 @@ import uk.ac.ed.epcc.webapp.session.AppUser;
  * @author Stephen Booth
  *
  */
-public interface RemoteAuthListener {
-	
-	public void authenticated(AppUser user);
+public interface RemoteAuthListener<AU extends AppUser> {
+	/** observe remote auth authentication
+	 * 
+	 * @param realm The realm user authenticated against
+	 * @param user  The {@link AppUser} who authenticated
+	 */
+	public void authenticated(String realm,AU user);
 
 }
