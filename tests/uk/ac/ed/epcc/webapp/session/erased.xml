@@ -1,12 +1,10 @@
 <Diff><Person id='1'>
 <Email null='true'/><Salt></Salt>
 <Password>Locked</Password>
-<WebName>WebName1</WebName>
 <Firstname null='true'/><Lastname null='true'/><PublicKey></PublicKey>
 <PersonalCertificate></PersonalCertificate>
 </Person>
 <PersonHistory id='1'>
-<EndTime>1547821876</EndTime>
 <Email null='true'/><Firstname null='true'/><Lastname null='true'/></PersonHistory>
 <Person id='2'>
 <Email>bill@example.com</Email>
@@ -16,10 +14,4 @@
 <Alg>0</Alg>
 <Password>locked</Password>
 </Person>
-<PersonHistory id='2'>
-<PeerID>1</PeerID>
-<StartTime>1547821876</StartTime>
-<EndTime>9223372036854775</EndTime>
-<WebName>WebName1</WebName>
-</PersonHistory>
 </Diff>
