@@ -21,6 +21,9 @@ import java.util.List;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.junit.Test;
 
@@ -60,7 +63,35 @@ public class TestFormatHtml extends WebappTestBase{
 		String expected = readFileAsString("expected_mime");
 		assertEquals(expected, builder.toString());
 	}
-	
+	@Test
+	public void testFormat2() throws MessagingException, WalkerException, IOException, TransformerConfigurationException, TransformerFactoryConfigurationError, TransformerException{
+		Session session = Session.getInstance(getContext().getProperties(),
+				null);
+		MimeMessage m = new MimeMessage(session, getClass().getResourceAsStream("testing.msg"));
+		HtmlBuilder builder = new HtmlBuilder();
+		ContentMessageVisitor vis = new ContentMessageVisitor(getContext(),builder, new MessageLinker() {
+			
+			public MessageProvider getMessageProvider() throws Exception {
+				return null;
+			}
+			
+			public void addLink(ContentBuilder builder, List<String> args, String file,
+					String text) {
+				ExtendedXMLBuilder p = builder.getText();
+				for(String s : args){
+					p.clean(s);
+					p.clean("/");
+				}
+				p.clean(text);
+				p.appendParent();
+				
+			}
+		});
+		MessageWalker walker = new MessageWalker(getContext());
+		walker.visitMessage(m, vis);
+		checkContent(null, "expected_msg", builder.toString());
+		
+	}
 	@Test
 	public void testEdit() throws MessagingException, WalkerException, IOException{
 		Session session = Session.getInstance(getContext().getProperties(),
