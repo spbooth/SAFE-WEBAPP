@@ -71,7 +71,7 @@ public class UpdateDetailsTransition<A extends AppUser> extends StandAloneFormUp
 			cb.addHeading(3, "Last updated: "+df.format(last));
 		}
 		AppContext c = op.getContext();
-		String privacy_policy=c.getInitParameter("service.url.privacypolicy");
+		String privacy_policy=c.getExpandedProperty("service.url.privacypolicy");
 	    if( privacy_policy != null && ! privacy_policy.isEmpty() ){ 
 	    	ExtendedXMLBuilder text = cb.getText();
 	    	text.open("small");

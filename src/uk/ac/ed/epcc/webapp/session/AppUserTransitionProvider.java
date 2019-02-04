@@ -235,7 +235,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		if( t.hasData()) {
 			cb.addColumn(getContext(), t, col);
 		}
-		String privacy_policy=c.getInitParameter("service.url.privacypolicy");
+		String privacy_policy=c.getExpandedProperty("service.url.privacypolicy");
 	    if( privacy_policy != null && ! privacy_policy.isEmpty() ){ 
 	    	ExtendedXMLBuilder text = cb.getText();
 	    	text.open("small");
