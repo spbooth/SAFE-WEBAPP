@@ -269,6 +269,20 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 		}
 	}
 	
+	public void historyTerminate() {
+		AppContext conn = getContext();
+		if (PERSON_HISTORY_FEATURE.isEnabled(conn)) {
+			try {
+				PersonHistoryFactory fac = new PersonHistoryFactory(factory);
+			
+				fac.terminate(this);
+			} catch (Exception e) {
+				conn.error(e, "Error terminating PersonHistory");
+				return;
+			}
+		}
+	}
+	
 	
 	
 }
