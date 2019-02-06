@@ -238,8 +238,12 @@ public class Emailer {
 	 */
 	public void newEmailRequest(AppUser person, EmailChangeRequest req)
 	throws Exception {
-
-		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("new_email.txt");
+        boolean verify_only = person.getEmail().equalsIgnoreCase(req.getEmail());
+		String name = "new_email.txt";
+		if( verify_only ) {
+			name = "verify_email.txt";
+		}
+		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile(name);
 
 		email_template.setProperty("person.name", person.getName());
 		email_template.setProperty("person.email", person.getEmail());

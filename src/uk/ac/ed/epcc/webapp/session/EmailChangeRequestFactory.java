@@ -49,6 +49,7 @@ public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequ
 	 * 
 	 */
 	public static final String REQUEST_ACTION = "Request";
+	public static final String VERIFY_ACTION = "Verify";
 	static final String NEW_EMAIL="NewEmail";
 	static final String TAG="Tag";
 	static final String USER_ID="UserID";
@@ -83,12 +84,19 @@ public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequ
 			
 		}
 		public void complete() throws DataException{
-			AppUser user = (AppUser) user_fac.find(record.getIntProperty(USER_ID));
+			AppUser user = getAppUser();
 			AppUserNameFinder finder = user_fac.getRealmFinder(EmailNameFinder.EMAIL);
 			finder.setName(user, record.getStringProperty(NEW_EMAIL));
 			finder.verified(user); // email address verified
 			user.commit();
 			delete();
+		}
+		/**get user change is for
+		 * @return AppUser
+		 * @throws DataException
+		 */
+		public AppUser getAppUser() throws DataException {
+			return (AppUser) user_fac.find(record.getIntProperty(USER_ID));
 		}
 		public String getEmail() {
 			return record.getStringProperty(NEW_EMAIL);
@@ -160,11 +168,40 @@ public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequ
 				throw new ActionException("Internal Error");
 			}
 		}
+		@Override
+		public String getHelp() {
+			return "Request email be updated to a new address";
+		}
+		
+	}
+	public class VerifyAction extends FormAction{
+        private AppUser user;
+        public VerifyAction(AppUser user){
+        	this.user=user;
+        	setMustValidate(false);
+        }
+		@Override
+		public FormResult action(Form f) throws ActionException {
+			try {
+				
+				EmailChangeRequest req = createRequest(user,user.getEmail());
+				Emailer em= new Emailer(getContext());
+				em.newEmailRequest(user, req);
+				return new MessageResult("email_verify_request_made");
+			} catch (Exception e) {
+				getContext().error(e,"Error making EmailChangeRequest");
+				throw new ActionException("Internal Error");
+			}
+		}
+		@Override
+		public String getHelp() {
+			return "Re-validate your current email address without changing it";
+		}
 		
 	}
 	
 	 @SuppressWarnings("unchecked")
-	public  void makeRequestForm(AppUser user,Form f){
+	public  void makeRequestForm(AppUser user,Form f, boolean include_verify){
 	    	// use email field so we can use the normal field input
 		    // the factory class may have a special version
 	    	AppUserFactory factory = getAppUserFactory();
@@ -178,6 +215,9 @@ public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequ
 			f.getField(EmailNameFinder.EMAIL).addValidator(new ParseFactoryValidator<AppUser>(factory, user));
 			
 	    	f.addAction(REQUEST_ACTION, new RequestAction(user));
+	    	if( include_verify) {
+	    		f.addAction(VERIFY_ACTION, new VerifyAction(user));
+	    	}
 	    }
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.AnonymisingFactory#anonymise()

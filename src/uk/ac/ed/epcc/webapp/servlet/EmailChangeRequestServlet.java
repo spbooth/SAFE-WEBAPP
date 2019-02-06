@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory;
 import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory.EmailChangeRequest;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -37,13 +38,12 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 
 @WebServlet(name="EmailChangeRequestServlet",urlPatterns="/EmailChangeRequestServlet/*")
-public class EmailChangeRequestServlet extends WebappServlet {
+public class EmailChangeRequestServlet extends SessionServlet {
 
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse res,
-			AppContext conn) throws ServletException, IOException {
+	public void doPost(HttpServletRequest req, HttpServletResponse res,
+			AppContext conn,SessionService service) throws ServletException, IOException {
 		try{
-		SessionService service = conn.getService(SessionService.class);
 		EmailChangeRequestFactory fac = new EmailChangeRequestFactory(service.getLoginFactory());
 		Logger log = conn.getService(LoggerService.class).getLogger(getClass());
 			log.debug("path is "+req.getPathInfo());
@@ -62,14 +62,18 @@ public class EmailChangeRequestServlet extends WebappServlet {
 			}
 			EmailChangeRequest request = fac.findByTag(tag);
 			if( request != null ){
-				String email=request.getEmail();
-				request.complete();
-				message(conn, req, res, "email_change_request_successful",email);
-				return;
-			}else{
-				message(conn, req, res, "email_change_request_denied");
-				return;
+				AppUser target_user = request.getAppUser();
+				if( service.isCurrentPerson(target_user)) { // could make this a relationship
+					String email=request.getEmail();
+					request.complete();
+					message(conn, req, res, "email_change_request_successful",email);
+					return;
+				}else {
+					getLogger(conn).warn("Email change request for "+target_user.getName()+" complet attempted by "+service.getName());
+				}
 			}
+			message(conn, req, res, "email_change_request_denied");
+			return;
 		}catch(Exception e){
 			conn.error(e,"Error in EmailChangeRequest form");
 			message(conn,req,res,"invalid_input");

@@ -20,5 +20,10 @@ package uk.ac.ed.epcc.webapp.content;
  *
  */
 public interface XMLGenerator {
+	/** Add the target object to a {@link SimpleXMLBuilder}
+	 * 
+	 * @param builder {@link SimpleXMLBuilder}
+	 * @return
+	 */
 	public SimpleXMLBuilder addContent(SimpleXMLBuilder builder);
 }

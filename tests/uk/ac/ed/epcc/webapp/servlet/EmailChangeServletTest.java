@@ -76,4 +76,52 @@ public class EmailChangeServletTest<A extends AppUser> extends ServletTest {
 		checkDiff("/cleanup.xsl", "email_change_complete.xml");
 	
 	}
+	
+	@Test
+	@DataBaseFixtures("email_change.xml")
+	public void testCompleteWrongTag() throws ConsistencyError, Exception{
+		MockTansport.clear();
+		takeBaseline();
+	
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.findByEmail("fred@example.com");
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setCurrentPerson(user);
+		req.path_info="1-2u5t433z3f3i2o28114j6g133e503XXX";
+		doPost();
+		checkMessage("email_change_request_denied");
+		
+	
+	}
+	@Test
+	@DataBaseFixtures("email_change.xml")
+	public void testCompleteNoUser() throws ConsistencyError, Exception{
+		MockTansport.clear();
+		takeBaseline();
+	
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.findByEmail("fred@example.com");
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		
+		req.path_info="1-2u5t433z3f3i2o28114j6g133e503y6y";
+		doPost();
+		checkForward("/login.jsp");
+	
+	}
+	@Test
+	@DataBaseFixtures("email_change.xml")
+	public void testCompleteWrongUser() throws ConsistencyError, Exception{
+		MockTansport.clear();
+		takeBaseline();
+	
+		//AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+	
+		SessionService<A> sess = setupPerson("bill@example.com");
+		
+		req.path_info="1-2u5t433z3f3i2o28114j6g133e503y6y";
+		doPost();
+		checkMessage("email_change_request_denied");
+		
+	
+	}
 }
