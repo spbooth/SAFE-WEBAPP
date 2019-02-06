@@ -26,7 +26,6 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
@@ -81,9 +80,10 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 	private static final long serialVersionUID = 1L;
 
 	
-	public static final Feature REPORT_ACCOUNT_NOT_FOUND = new Feature("login.report_account_not_found",true,"Users are explicitly informed if resetting an account hat is not found");
+	public static final Feature REPORT_ACCOUNT_NOT_FOUND = new Feature("login.report_account_not_found",true,"Users are explicitly informed if resetting an account that is not found");
 	public static final Feature RESET_PASSWORD_PAGE = new Feature("login.reset_password_page",false,"Use a separate reset password page");
 	public static final Feature COOKIE_TEST = new Feature("login.cookie_test_redirect",true,"Use double redirect on login to check for cookie support and avoid url rewriting");
+	public static final Feature BUILT_IN_LOGIN = new Feature("login.built_in",true,"Use built-in login page and servlet. If false login.page parameter may be external url");
 	/**
 	 * 
 	 */
@@ -108,6 +108,10 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse res,
 			AppContext conn) throws ServletException,
 			java.io.IOException {
+		if( ! BUILT_IN_LOGIN.isEnabled(conn)) {
+			message(conn, req, res, "disabled_feature_error");
+			return;
+		}
 		String logout = req.getParameter("logout");
 		String username = req.getParameter("username");
 		String password = req.getParameter("password");

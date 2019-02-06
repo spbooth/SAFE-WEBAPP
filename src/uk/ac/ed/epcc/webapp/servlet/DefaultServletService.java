@@ -51,7 +51,6 @@ import uk.ac.ed.epcc.webapp.session.AppUserNameFinder;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.session.WebNameFinder;
-import uk.ac.ed.epcc.webapp.session.twofactor.TwoFactorHandler;
 /** A default implementation for {@link ServletService} for a HTTP servlet application.
  * 
  * This class implements the following strategy for extracting a user from a HTTP request
@@ -106,7 +105,7 @@ public class DefaultServletService implements ServletService{
 	 */
 	public static final Feature EXTERNAL_AUTH_ONLY_FEATURE = new Feature("external_auth",false,"Default authorisation is using external container level authorisation on all URLs");
 
-	public static final Feature EXTERNAL_AUTH_VIA_lOGIN_FEATURE = new Feature("external_auth.use_login",false,"Mandatory external auth with only login.jsp protected externally");
+	public static final Feature EXTERNAL_AUTH_VIA_LOGIN_FEATURE = new Feature("external_auth.use_login",false,"Mandatory external auth with only login.jsp protected externally");
 
 	public DefaultServletService(AppContext conn,ServletContext ctx, ServletRequest req,
 			ServletResponse res) {
@@ -468,17 +467,26 @@ public class DefaultServletService implements ServletService{
 			// Can't do anything
 			return;
 		}
+		boolean external_via_login = EXTERNAL_AUTH_VIA_LOGIN_FEATURE.isEnabled(conn);
 		if( getWebName() == null  
-				&& (! EXTERNAL_AUTH_VIA_lOGIN_FEATURE.isEnabled(conn)) &&
+				&& (! external_via_login) &&
 			( composite == null || EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(getContext()))){
 			// We require external auth so must have web-name
 			warn("No webname when required");
 			message( "access_denied", (Object[])null);
 		}else{
 			// standard login page supports both custom password login and self-register for external-auth
+			// If built_in login is off we might change the login page to an external auth servlet url.
 			String login_page=LoginServlet.getLoginPage(conn);
-			req.setAttribute(PAGE_ATTR, encodePage());
-			forward(login_page);
+			if( external_via_login || ! LoginServlet.BUILT_IN_LOGIN.isEnabled(getContext())) {
+				// Need to remember page and redirect to login
+				sess.setAttribute(LoginServlet.INITIAL_PAGE_ATTR, encodePage());
+				redirect(login_page);
+			}else {
+				
+				req.setAttribute(PAGE_ATTR, encodePage());
+				forward(login_page);
+			}
 		}
 	}
 
