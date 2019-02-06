@@ -44,36 +44,50 @@ public class EmailChangeRequestServlet extends SessionServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse res,
 			AppContext conn,SessionService service) throws ServletException, IOException {
 		try{
-		EmailChangeRequestFactory fac = new EmailChangeRequestFactory(service.getLoginFactory());
-		Logger log = conn.getService(LoggerService.class).getLogger(getClass());
-			log.debug("path is "+req.getPathInfo());
-			// should be request link
-			String tag = req.getPathInfo();
-			if( tag == null || tag.isEmpty()) {
-				message(conn, req, res, "invalid_input");
-				return;
-			}
-			if( tag.startsWith("/", 0)){
-				tag= tag.substring(1);
-			}
-			int i = tag.indexOf("/");
-			if( i > 0){
-				tag = tag.substring(0, i);
-			}
-			EmailChangeRequest request = fac.findByTag(tag);
-			if( request != null ){
-				AppUser target_user = request.getAppUser();
-				if( service.isCurrentPerson(target_user)) { // could make this a relationship
-					String email=request.getEmail();
-					request.complete();
-					message(conn, req, res, "email_change_request_successful",email);
+			EmailChangeRequestFactory fac = new EmailChangeRequestFactory(service.getLoginFactory());
+			Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+			try {
+				log.debug("path is "+req.getPathInfo());
+				// should be request link
+				String tag = req.getPathInfo();
+				if( tag == null || tag.isEmpty()) {
+					message(conn, req, res, "invalid_input");
 					return;
-				}else {
-					getLogger(conn).warn("Email change request for "+target_user.getName()+" complet attempted by "+service.getName());
 				}
+				if( tag.startsWith("/", 0)){
+					tag= tag.substring(1);
+				}
+				int i = tag.indexOf("/");
+				if( i > 0){
+					tag = tag.substring(0, i);
+				}
+				EmailChangeRequest request = fac.findByTag(tag);
+				if( request != null ){
+					if( request.expired()) {
+						message(conn,req,res,"request_expired");
+						request.delete();
+						return;
+					}
+					AppUser target_user = request.getAppUser();
+					if( service.isCurrentPerson(target_user)) { // could make this a relationship
+						String old = target_user.getEmail();
+						String email=request.getEmail();
+						request.complete();
+						if( old.equalsIgnoreCase(email)) {
+							message(conn, req, res, "email_verification_request_successful",email);
+						}else {
+							message(conn, req, res, "email_change_request_successful",email);
+						}
+						return;
+					}else {
+						getLogger(conn).warn("Email change request for "+target_user.getName()+" complet attempted by "+service.getName());
+					}
+				}
+				message(conn, req, res, "email_change_request_denied");
+				return;
+			}finally {
+				fac.purge();
 			}
-			message(conn, req, res, "email_change_request_denied");
-			return;
 		}catch(Exception e){
 			conn.error(e,"Error in EmailChangeRequest form");
 			message(conn,req,res,"invalid_input");
@@ -81,6 +95,6 @@ public class EmailChangeRequestServlet extends SessionServlet {
 		}
 	}
 
-	
-   
+
+
 }

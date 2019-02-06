@@ -17,12 +17,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Calendar;
 
 import javax.mail.Message;
 import javax.servlet.ServletException;
 
 import org.junit.Test;
 
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
+import uk.ac.ed.epcc.webapp.TestTimeService;
 import uk.ac.ed.epcc.webapp.email.MockTansport;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -45,6 +48,10 @@ public class EmailChangeServletTest<A extends AppUser> extends ServletTest {
 	/**
 	 * 
 	 */
+	private static final String CORRECT_TAG = "1-24332e2a6l386z5m2jh6j3t379v6";
+	/**
+	 * 
+	 */
 	public EmailChangeServletTest() {
 	}
 	@Override
@@ -55,6 +62,11 @@ public class EmailChangeServletTest<A extends AppUser> extends ServletTest {
 		MockServletConfig config = new MockServletConfig(serv_ctx, "EmailChangeRequestServlet");
 		servlet.init(config);
 		req.servlet_path="EmailChangeRequestServlet";
+		TestTimeService t = new TestTimeService();
+		Calendar c = Calendar.getInstance();
+		c.set(2019, Calendar.FEBRUARY, 6);
+		t.setResult(c.getTime());
+		ctx.setService(t);
 	}
 	
 	
@@ -69,7 +81,7 @@ public class EmailChangeServletTest<A extends AppUser> extends ServletTest {
 		A user =  fac.findByEmail("fred@example.com");
 		SessionService<A> sess = ctx.getService(SessionService.class);
 		sess.setCurrentPerson(user);
-		req.path_info="1-2u5t433z3f3i2o28114j6g133e503y6y";
+		req.path_info=CORRECT_TAG;
 		doPost();
 		checkMessage("email_change_request_successful");
 		assertEquals("bilbo@example.com",fac.find(user.getID()).getEmail());
@@ -77,6 +89,26 @@ public class EmailChangeServletTest<A extends AppUser> extends ServletTest {
 	
 	}
 	
+	@Test
+	@DataBaseFixtures("email_change.xml")
+	public void testExpired() throws ConsistencyError, Exception{
+		MockTansport.clear();
+		takeBaseline();
+		TestTimeService t = (TestTimeService) ctx.getService(CurrentTimeService.class);
+		Calendar c = Calendar.getInstance();
+		c.set(2019, Calendar.JULY, 6);
+		t.setResult(c.getTime());
+		
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.findByEmail("fred@example.com");
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setCurrentPerson(user);
+		req.path_info=CORRECT_TAG;
+		doPost();
+		checkMessage("request_expired");
+		
+	
+	}
 	@Test
 	@DataBaseFixtures("email_change.xml")
 	public void testCompleteWrongTag() throws ConsistencyError, Exception{
@@ -103,7 +135,7 @@ public class EmailChangeServletTest<A extends AppUser> extends ServletTest {
 		A user =  fac.findByEmail("fred@example.com");
 		SessionService<A> sess = ctx.getService(SessionService.class);
 		
-		req.path_info="1-2u5t433z3f3i2o28114j6g133e503y6y";
+		req.path_info=CORRECT_TAG;
 		doPost();
 		checkForward("/login.jsp");
 	
@@ -118,7 +150,7 @@ public class EmailChangeServletTest<A extends AppUser> extends ServletTest {
 	
 		SessionService<A> sess = setupPerson("bill@example.com");
 		
-		req.path_info="1-2u5t433z3f3i2o28114j6g133e503y6y";
+		req.path_info=CORRECT_TAG;
 		doPost();
 		checkMessage("email_change_request_denied");
 		

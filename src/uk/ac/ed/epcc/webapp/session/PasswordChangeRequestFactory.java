@@ -18,9 +18,15 @@ package uk.ac.ed.epcc.webapp.session;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
+import java.util.Date;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
+import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -31,6 +37,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
+import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 /** Holds an one use id-string associated with a user for resetting the login password.
  * 
@@ -49,6 +56,7 @@ public class PasswordChangeRequestFactory<A extends AppUser> extends DataObjectF
 	static final String USER_ID="UserID";
 	static final String CHECK="Check";
 	private final AppUserFactory<A> user_fac;
+	static final String EXPIRES="Expires";
 	public PasswordChangeRequestFactory(AppUserFactory<A> fac){
 		user_fac=fac;
 		setContext(fac.getContext(), "PasswordChangeRequest");
@@ -59,6 +67,7 @@ public class PasswordChangeRequestFactory<A extends AppUser> extends DataObjectF
 		spec.setField(USER_ID, new IntegerFieldType());
 		spec.setField(CHECK, new StringFieldType(false, "", MAX_CHECK));
 		spec.setField(TAG, new StringFieldType(false, "", 256));
+		spec.setField(EXPIRES, new DateFieldType(true, null));
 		return spec;
 	}
 	
@@ -75,6 +84,11 @@ public class PasswordChangeRequestFactory<A extends AppUser> extends DataObjectF
 				check = check.substring(0, MAX_CHECK);
 			}
 			record.setProperty(CHECK, check);
+			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+			Calendar c = Calendar.getInstance();
+			c.setTime(time.getCurrentTime());
+			c.add(Calendar.DAY_OF_YEAR, getContext().getIntegerParameter("password_change.max_valid_days", 10));
+			record.setOptionalProperty(EXPIRES, c.getTime());
 			commit();
 			
 		}
@@ -88,6 +102,16 @@ public class PasswordChangeRequestFactory<A extends AppUser> extends DataObjectF
 		
 		public String getCheck(){
 			return record.getStringProperty(CHECK);
+		}
+		public boolean expired() {
+			if ( record.getRepository().hasField(EXPIRES)) {
+				Date d = record.getDateProperty(EXPIRES);
+				if( d != null) {
+					CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+					return d.before(time.getCurrentTime());
+				}
+			}
+			return false;
 		}
 	}
 	public PasswordChangeRequest createRequest(A user) throws DataFault{
@@ -169,5 +193,15 @@ public class PasswordChangeRequestFactory<A extends AppUser> extends DataObjectF
 		return user_fac;
 	}
 	
-
+	public void purge() throws DataFault {
+		if( res.hasField(EXPIRES)) {
+			FilterDelete<PasswordChangeRequest> del = new FilterDelete<>(res);
+			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+			Date d = time.getCurrentTime();
+			SQLOrFilter<PasswordChangeRequest> fil = new SQLOrFilter<>(getTarget());
+			fil.addFilter(new SQLValueFilter<>(getTarget(), res, EXPIRES,MatchCondition.LT, d));
+			fil.addFilter(new NullFieldFilter<>(getTarget(), res, EXPIRES, true));
+			del.delete(fil);
+		}
+	}
 }

@@ -17,8 +17,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Calendar;
+
+import javax.swing.DebugGraphics;
+
 import org.junit.Test;
 
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
+import uk.ac.ed.epcc.webapp.TestTimeService;
 import uk.ac.ed.epcc.webapp.email.MockTansport;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.html.PageHTMLForm;
@@ -40,6 +46,11 @@ public class PasswordResetServletTest extends ServletTest {
 	/**
 	 * 
 	 */
+	private static final String CORRECT_TAG = "1-49191c4u425rw2f3k103a52231x2g10";
+
+	/**
+	 * 
+	 */
 	public PasswordResetServletTest() {
 		// TODO Auto-generated constructor stub
 	}
@@ -51,6 +62,11 @@ public class PasswordResetServletTest extends ServletTest {
 		MockServletConfig config = new MockServletConfig(serv_ctx, "PasswordChangeRequestServlet");
 		servlet.init(config);
 		req.servlet_path="PasswordChangeRequesetServlet";
+		TestTimeService t = new TestTimeService();
+		Calendar c = Calendar.getInstance();
+		c.set(2019, Calendar.FEBRUARY, 6);
+		t.setResult(c.getTime());
+		ctx.setService(t);
 	}
 	
 	@Test
@@ -58,7 +74,7 @@ public class PasswordResetServletTest extends ServletTest {
 	public void testPasswordChange() throws ConsistencyError, Exception{
 		takeBaseline();
 		MockTansport.clear();
-		req.path_info="1-2515j732jc4y1n13s315v34133x15";
+		req.path_info=CORRECT_TAG;
 		doPost();
 		checkForward("/scripts/password_change_request.jsp");
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD1,"BorisTheSpider");
@@ -78,14 +94,27 @@ public class PasswordResetServletTest extends ServletTest {
 		assertEquals(1, MockTansport.nSent());
 		assertEquals(ctx.expandText("${service.name} Password has been changed"),MockTansport.getMessage(0).getSubject());
 	}
-	
+	@Test
+	@DataBaseFixtures("new_password_from_server.xml")
+	public void testExpired() throws ConsistencyError, Exception{
+		takeBaseline();
+		MockTansport.clear();
+		TestTimeService t = (TestTimeService) ctx.getService(CurrentTimeService.class);
+		Calendar c = Calendar.getInstance();
+		c.set(2019, Calendar.JULY, 6);
+		t.setResult(c.getTime());
+		req.path_info=CORRECT_TAG;
+		doPost();
+		
+		checkMessage("request_expired");
+	}
 	
 	@Test
 	@DataBaseFixtures("new_password_from_server.xml")
 	public void testPasswordCancel() throws ConsistencyError, Exception{
 		takeBaseline();
 		MockTansport.clear();
-		req.path_info="1-2515j732jc4y1n13s315v34133x15";
+		req.path_info=CORRECT_TAG;
 		doPost();
 		checkForward("/scripts/password_change_request.jsp");
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD1,"BorisTheSpider");
@@ -104,7 +133,7 @@ public class PasswordResetServletTest extends ServletTest {
 	@DataBaseFixtures("new_password_from_server.xml")
 	public void testMisMatch() throws ConsistencyError, Exception{
 		takeBaseline();
-		req.path_info="1-2515j732jc4y1n13s315v34133x15";
+		req.path_info=CORRECT_TAG;
 		doPost();
 		checkForward("/scripts/password_change_request.jsp");
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD1,"BorisTheSpider");

@@ -304,7 +304,7 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		 */
 		@Override
 		public FormResult getPage(SessionService<AU> user) {
-			return new ChainedTransitionResult(AppUserTransitionProvider.getInstance(getContext()),user,CHANGE_EMAIL);
+			return new ChainedTransitionResult(AppUserTransitionProvider.getInstance(getContext()),user.getCurrentPerson(),CHANGE_EMAIL);
 		}
 		
 	}

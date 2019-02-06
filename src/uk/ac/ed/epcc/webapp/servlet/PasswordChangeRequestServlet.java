@@ -55,62 +55,70 @@ public class PasswordChangeRequestServlet<A extends AppUser> extends WebappServl
 	protected void doPost(HttpServletRequest req, HttpServletResponse res,
 			AppContext conn) throws ServletException, IOException {
 		try{
-		@SuppressWarnings("unchecked")
-		SessionService<A> service = conn.getService(SessionService.class);
-		ServletService serv = conn.getService(ServletService.class);
-		PasswordChangeRequestFactory<A> fac = new PasswordChangeRequestFactory<>(service.getLoginFactory());
-		Logger log = conn.getService(LoggerService.class).getLogger(getClass());
-		
-			log.debug("path is "+req.getPathInfo());
-			// should be request link
-			String tag = req.getPathInfo();
-			if( tag.startsWith("/", 0)){
-				tag= tag.substring(1);
-			}
-			int i = tag.indexOf("/");
-			if( i > 0){
-				tag = tag.substring(0, i);
-			}
-			PasswordChangeRequestFactory<A>.PasswordChangeRequest request = fac.findByTag(tag);
-			if( request != null ){
-				@SuppressWarnings("unchecked")
-				PasswordAuthComposite<A> comp = (PasswordAuthComposite<A>) service.getLoginFactory().getComposite(PasswordAuthComposite.class);
-				A user = request.getUser();
-				PasswordUpdateFormBuilder<A> builder = new PasswordUpdateFormBuilder<>(comp, false);
-				PageHTMLForm form = new PageHTMLForm(conn);
-				builder.buildForm(form, user, conn);
-				
-				if ( ! form.hasSubmitted(req) || ! form.parsePost(req)){
-					req.setAttribute("Form", form);
-					req.setAttribute("policy", builder.getPasswordPolicy());
-					serv.forward("/scripts/password_change_request.jsp");
-					return;
+			@SuppressWarnings("unchecked")
+			SessionService<A> service = conn.getService(SessionService.class);
+			ServletService serv = conn.getService(ServletService.class);
+			PasswordChangeRequestFactory<A> fac = new PasswordChangeRequestFactory<>(service.getLoginFactory());
+			Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+			try {
+				log.debug("path is "+req.getPathInfo());
+				// should be request link
+				String tag = req.getPathInfo();
+				if( tag.startsWith("/", 0)){
+					tag= tag.substring(1);
 				}
-				
-				
-				Map<String,Object> params = conn.getService(ServletService.class).getParams();
-				try {
-					FormResult result =  form.doAction(params); // this sets the password and logs-in
-					request.delete();
-					AppUserNameFinder finder = user.getFactory().getRealmFinder(EmailNameFinder.EMAIL);
-					if( finder != null ) {
-						finder.verified(user); // email address verified by reset link
+				int i = tag.indexOf("/");
+				if( i > 0){
+					tag = tag.substring(0, i);
+				}
+				PasswordChangeRequestFactory<A>.PasswordChangeRequest request = fac.findByTag(tag);
+				if( request != null ){
+					if( request.expired()) {
+						message(conn,req,res,"request_expired");
+						request.delete();
+						return;
 					}
-					handleFormResult(conn, req, res, result);
-				} catch (Exception e) {
-					getLogger(conn).error("Error processing form", e);
-					message(conn, req, res, "internal_error");
+					@SuppressWarnings("unchecked")
+					PasswordAuthComposite<A> comp = (PasswordAuthComposite<A>) service.getLoginFactory().getComposite(PasswordAuthComposite.class);
+					A user = request.getUser();
+					PasswordUpdateFormBuilder<A> builder = new PasswordUpdateFormBuilder<>(comp, false);
+					PageHTMLForm form = new PageHTMLForm(conn);
+					builder.buildForm(form, user, conn);
+
+					if ( ! form.hasSubmitted(req) || ! form.parsePost(req)){
+						req.setAttribute("Form", form);
+						req.setAttribute("policy", builder.getPasswordPolicy());
+						serv.forward("/scripts/password_change_request.jsp");
+						return;
+					}
+
+
+					Map<String,Object> params = conn.getService(ServletService.class).getParams();
+					try {
+						FormResult result =  form.doAction(params); // this sets the password and logs-in
+						request.delete();
+						AppUserNameFinder finder = user.getFactory().getRealmFinder(EmailNameFinder.EMAIL);
+						if( finder != null ) {
+							finder.verified(user); // email address verified by reset link
+						}
+						handleFormResult(conn, req, res, result);
+					} catch (Exception e) {
+						getLogger(conn).error("Error processing form", e);
+						message(conn, req, res, "internal_error");
+					}
+					return;
+
 				}
+				message(conn, req, res, "password_change_request_denied");
 				return;
-				
+			}finally {
+				fac.purge();
 			}
-			message(conn, req, res, "password_change_request_denied");
-			return;
 		}catch(Exception e){
 			conn.error(e,"Error in EmailChangeRequest form");
 			message(conn,req,res,"invalid_input");
 			return;
 		}
 	}
-	
+
 }

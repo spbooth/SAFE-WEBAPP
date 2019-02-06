@@ -23,6 +23,12 @@
     <xsl:template match="Inserted">
 	<xsl:element name="Inserted">1234567890</xsl:element>
 	</xsl:template>
+	<xsl:template match="EmailChangeRequest/Expires">
+	<xsl:element name="Expires">1234567890</xsl:element>
+	</xsl:template>
+	<xsl:template match="PasswordChangeRequest/Expires">
+	<xsl:element name="Expires">1234567890</xsl:element>
+	</xsl:template>
 	<xsl:template match="person/Updated">
 	<xsl:element name="Updated">1234567890</xsl:element>
 	</xsl:template>
