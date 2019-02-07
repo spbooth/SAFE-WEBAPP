@@ -16,28 +16,17 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.session;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
-import java.util.Date;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
-import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
-import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 /** Holds an one use id-string associated with a user for resetting the login password.
  * 
@@ -47,31 +36,29 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  * @author spb
  *
  */
-public class PasswordChangeRequestFactory<A extends AppUser> extends DataObjectFactory<PasswordChangeRequestFactory<A>.PasswordChangeRequest> {
+public class PasswordChangeRequestFactory<A extends AppUser> extends AbstractRequestFactory<A,PasswordChangeRequestFactory<A>.PasswordChangeRequest> {
 	/**
 	 * 
 	 */
 	private static final int MAX_CHECK = 512;
-	static final String TAG="Tag";
-	static final String USER_ID="UserID";
+	
 	static final String CHECK="Check";
-	private final AppUserFactory<A> user_fac;
-	static final String EXPIRES="Expires";
+	
 	public PasswordChangeRequestFactory(AppUserFactory<A> fac){
-		user_fac=fac;
+		super(fac);
 		setContext(fac.getContext(), "PasswordChangeRequest");
 	}
 	@Override
 	public TableSpecification getDefaultTableSpecification(AppContext ctx,String table){
-		TableSpecification spec = new TableSpecification();
-		spec.setField(USER_ID, new IntegerFieldType());
+		TableSpecification spec = super.getDefaultTableSpecification(ctx, table);
+		
 		spec.setField(CHECK, new StringFieldType(false, "", MAX_CHECK));
-		spec.setField(TAG, new StringFieldType(false, "", 256));
-		spec.setField(EXPIRES, new DateFieldType(true, null));
+		
+		
 		return spec;
 	}
 	
-	public final class PasswordChangeRequest extends DataObject{
+	public final class PasswordChangeRequest extends AbstractRequestFactory.AbstractRequest{
 
 		protected PasswordChangeRequest(Record r) {
 			super(r);
@@ -93,26 +80,12 @@ public class PasswordChangeRequestFactory<A extends AppUser> extends DataObjectF
 			
 		}
 	
-		public String getTag(){
-			return record.getStringProperty(TAG);
-		}
-		public A getUser(){
-			return user_fac.find(record.getNumberProperty(USER_ID));
-		}
 		
 		public String getCheck(){
 			return record.getStringProperty(CHECK);
 		}
-		public boolean expired() {
-			if ( record.getRepository().hasField(EXPIRES)) {
-				Date d = record.getDateProperty(EXPIRES);
-				if( d != null) {
-					CurrentTimeService time = getContext().getService(CurrentTimeService.class);
-					return d.before(time.getCurrentTime());
-				}
-			}
-			return false;
-		}
+
+		
 	}
 	public PasswordChangeRequest createRequest(A user) throws DataFault{
 		assert(user != null);
@@ -141,7 +114,7 @@ public class PasswordChangeRequestFactory<A extends AppUser> extends DataObjectF
 		if( request == null ){
 			return null;
 		}
-		A user = request.getUser();
+		A user = (A) request.getUser();
 		PasswordAuthComposite<A> comp = user_fac.getComposite(PasswordAuthComposite.class);
 		if( comp == null ){
 			return null;
@@ -163,45 +136,5 @@ public class PasswordChangeRequestFactory<A extends AppUser> extends DataObjectF
 	protected DataObject makeBDO(Record res) throws DataFault {
 		return new PasswordChangeRequest(res);
 	}
-	public String makeTag(int id,String seed) {
-		Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
-		StringBuilder input = new StringBuilder();
-		input.append(seed);
-		RandomService serv = getContext().getService(RandomService.class);
-		input.append(serv.randomString(64));
-		
-		log.debug("Input is "+input.toString());
-		try {
-			// obfuscate the tag
-			MessageDigest digest = MessageDigest.getInstance("MD5");
-			digest.update(input.toString().getBytes());
-			StringBuilder output= new StringBuilder();
-			output.append(id); // make sure different users can't have a tag clash.
-			output.append("-");
-			byte tag[]=digest.digest();
-			for(int i=0;i<tag.length;i++){
-				output.append(Integer.toString(tag[i]-Byte.MIN_VALUE, 36));
-			}
-			log.debug("output is"+output.toString());
-			return output.toString();
-		} catch (NoSuchAlgorithmException e) {
-			getContext().error(e,"Error making digest");
-			return input.toString();
-		}
-	}
-	public AppUserFactory<A> getAppUserFactory() {
-		return user_fac;
-	}
 	
-	public void purge() throws DataFault {
-		if( res.hasField(EXPIRES)) {
-			FilterDelete<PasswordChangeRequest> del = new FilterDelete<>(res);
-			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
-			Date d = time.getCurrentTime();
-			SQLOrFilter<PasswordChangeRequest> fil = new SQLOrFilter<>(getTarget());
-			fil.addFilter(new SQLValueFilter<>(getTarget(), res, EXPIRES,MatchCondition.LT, d));
-			fil.addFilter(new NullFieldFilter<>(getTarget(), res, EXPIRES, true));
-			del.delete(fil);
-		}
-	}
 }

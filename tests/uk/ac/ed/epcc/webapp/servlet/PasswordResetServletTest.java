@@ -19,8 +19,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Calendar;
 
-import javax.swing.DebugGraphics;
-
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
@@ -33,6 +31,7 @@ import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
 import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
+import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordUpdateFormBuilder;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -68,12 +67,33 @@ public class PasswordResetServletTest extends ServletTest {
 		t.setResult(c.getTime());
 		ctx.setService(t);
 	}
+	@Test
+	@DataBaseFixtures("new_password_from_server.xml")
+	public void testNoPurge() throws Exception {
+		takeBaseline();
+		PasswordChangeRequestFactory fac = new PasswordChangeRequestFactory<>(ctx.getService(SessionService.class).getLoginFactory());
+		fac.purge();
+		checkUnchanged();
+	}
 	
+	@Test
+	@DataBaseFixtures("new_password_from_server.xml")
+	public void testPurge() throws Exception {
+		takeBaseline();
+		TestTimeService t = (TestTimeService) ctx.getService(CurrentTimeService.class);
+		Calendar c = Calendar.getInstance();
+		c.set(2019, Calendar.JULY, 6);
+		t.setResult(c.getTime());
+		PasswordChangeRequestFactory fac = new PasswordChangeRequestFactory<>(ctx.getService(SessionService.class).getLoginFactory());
+		fac.purge();
+		checkDiff("/cleanup.xsl", "purged.xml");
+	}
 	@Test
 	@DataBaseFixtures("new_password_from_server.xml")
 	public void testPasswordChange() throws ConsistencyError, Exception{
 		takeBaseline();
 		MockTansport.clear();
+		
 		req.path_info=CORRECT_TAG;
 		doPost();
 		checkForward("/scripts/password_change_request.jsp");

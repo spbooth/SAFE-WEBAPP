@@ -16,10 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.session;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
-import java.util.Date;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
@@ -32,38 +29,30 @@ import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
-import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
-import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 
 
 
-public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequestFactory.EmailChangeRequest> implements AnonymisingFactory{
+public class EmailChangeRequestFactory<A extends AppUser> extends AbstractRequestFactory<A,EmailChangeRequestFactory<A>.EmailChangeRequest> implements AnonymisingFactory{
 	/**
 	 * 
 	 */
 	public static final String REQUEST_ACTION = "Request";
 	public static final String VERIFY_ACTION = "Verify";
 	static final String NEW_EMAIL="NewEmail";
-	static final String TAG="Tag";
-	static final String USER_ID="UserID";
-	static final String EXPIRES="Expires";
-	private final AppUserFactory user_fac;
+	
+	
+	
 	public EmailChangeRequestFactory(AppUserFactory fac){
-		user_fac=fac;
+		super(fac);
 		setContext(fac.getContext(), "EmailChangeRequest");
 	}
 	public EmailChangeRequestFactory(AppContext conn) {
@@ -79,7 +68,7 @@ public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequ
 		return spec;
 	}
 	
-	public final class EmailChangeRequest extends DataObject{
+	public final class EmailChangeRequest extends uk.ac.ed.epcc.webapp.session.AbstractRequestFactory.AbstractRequest{
 
 		protected EmailChangeRequest(Record r) {
 			super(r);
@@ -98,35 +87,16 @@ public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequ
 			
 		}
 		public void complete() throws DataException{
-			AppUser user = getAppUser();
+			AppUser user = getUser();
 			AppUserNameFinder finder = user_fac.getRealmFinder(EmailNameFinder.EMAIL);
 			finder.setName(user, record.getStringProperty(NEW_EMAIL));
 			finder.verified(user); // email address verified
 			user.commit();
 			delete();
 		}
-		/**get user change is for
-		 * @return AppUser
-		 * @throws DataException
-		 */
-		public AppUser getAppUser() throws DataException {
-			return (AppUser) user_fac.find(record.getIntProperty(USER_ID));
-		}
+		
 		public String getEmail() {
 			return record.getStringProperty(NEW_EMAIL);
-		}
-		public String getTag(){
-			return record.getStringProperty(TAG);
-		}
-		public boolean expired() {
-			if ( record.getRepository().hasField(EXPIRES)) {
-				Date d = record.getDateProperty(EXPIRES);
-				if( d != null) {
-					CurrentTimeService time = getContext().getService(CurrentTimeService.class);
-					return d.before(time.getCurrentTime());
-				}
-			}
-			return false;
 		}
 	}
 	public EmailChangeRequest createRequest(AppUser user, String email) throws DataFault{
@@ -136,42 +106,13 @@ public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequ
 		req.commit();
 		return req;
 	}
-	public EmailChangeRequest findByTag(String tag) throws DataException{
-		return find(new SQLValueFilter<>(getTarget(),res,TAG,tag),true );
-	}
+	
 	@Override
 	protected DataObject makeBDO(Record res) throws DataFault {
 		return new EmailChangeRequest(res);
 	}
-	public String makeTag(int id,String seed) {
-		Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
-		StringBuilder input = new StringBuilder();
-		input.append(seed);
-		RandomService serv = getContext().getService(RandomService.class);
-		input.append(serv.randomString(64));
-		
-		log.debug("Input is "+input.toString());
-		try {
-			// obfuscate the tag
-			MessageDigest digest = MessageDigest.getInstance("MD5");
-			digest.update(input.toString().getBytes());
-			StringBuilder output= new StringBuilder();
-			output.append(id); // make sure different users can't have a tag clash.
-			output.append("-");
-			byte tag[]=digest.digest();
-			for(int i=0;i<tag.length;i++){
-				output.append(Integer.toString(tag[i]-Byte.MIN_VALUE, 36));
-			}
-			log.debug("output is"+output.toString());
-			return output.toString();
-		} catch (NoSuchAlgorithmException e) {
-			getContext().error(e,"Error making digest");
-			return input.toString();
-		}
-	}
-	public AppUserFactory getAppUserFactory() {
-		return user_fac;
-	}
+	
+
 	
 	public class RequestAction extends FormAction{
         private AppUser user;
@@ -252,15 +193,5 @@ public class EmailChangeRequestFactory extends DataObjectFactory<EmailChangeRequ
 		
 	}
 	
-	public void purge() throws DataFault {
-		if( res.hasField(EXPIRES)) {
-			FilterDelete<EmailChangeRequest> del = new FilterDelete<>(res);
-			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
-			Date d = time.getCurrentTime();
-			SQLOrFilter<EmailChangeRequest> fil = new SQLOrFilter<>(getTarget());
-			fil.addFilter(new SQLValueFilter<>(getTarget(), res, EXPIRES,MatchCondition.LT, d));
-			fil.addFilter(new NullFieldFilter<>(getTarget(), res, EXPIRES, true));
-			del.delete(fil);
-		}
-	}
+	
 }

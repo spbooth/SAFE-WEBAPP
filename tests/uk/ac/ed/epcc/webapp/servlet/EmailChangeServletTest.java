@@ -37,6 +37,7 @@ import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory;
 import uk.ac.ed.epcc.webapp.session.EmailNameFinder;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
+import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
@@ -69,7 +70,27 @@ public class EmailChangeServletTest<A extends AppUser> extends ServletTest {
 		ctx.setService(t);
 	}
 	
+	@Test
+	@DataBaseFixtures("email_change.xml")
+	public void testNoPurge() throws Exception {
+		takeBaseline();
+		EmailChangeRequestFactory fac = new EmailChangeRequestFactory(ctx.getService(SessionService.class).getLoginFactory());
+		fac.purge();
+		checkUnchanged();
+	}
 	
+	@Test
+	@DataBaseFixtures("email_change.xml")
+	public void testPurge() throws Exception {
+		takeBaseline();
+		TestTimeService t = (TestTimeService) ctx.getService(CurrentTimeService.class);
+		Calendar c = Calendar.getInstance();
+		c.set(2019, Calendar.JULY, 6);
+		t.setResult(c.getTime());
+		EmailChangeRequestFactory fac = new EmailChangeRequestFactory(ctx.getService(SessionService.class).getLoginFactory());
+		fac.purge();
+		checkDiff("/cleanup.xsl", "email_purged.xml");
+	}
 	
 	@Test
 	@DataBaseFixtures("email_change.xml")

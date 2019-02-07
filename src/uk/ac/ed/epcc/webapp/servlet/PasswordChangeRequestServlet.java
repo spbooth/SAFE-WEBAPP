@@ -80,7 +80,7 @@ public class PasswordChangeRequestServlet<A extends AppUser> extends WebappServl
 					}
 					@SuppressWarnings("unchecked")
 					PasswordAuthComposite<A> comp = (PasswordAuthComposite<A>) service.getLoginFactory().getComposite(PasswordAuthComposite.class);
-					A user = request.getUser();
+					A user = (A) request.getUser();
 					PasswordUpdateFormBuilder<A> builder = new PasswordUpdateFormBuilder<>(comp, false);
 					PageHTMLForm form = new PageHTMLForm(conn);
 					builder.buildForm(form, user, conn);

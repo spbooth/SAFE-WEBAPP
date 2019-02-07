@@ -44,7 +44,7 @@ public class EmailChangeRequestServlet extends SessionServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse res,
 			AppContext conn,SessionService service) throws ServletException, IOException {
 		try{
-			EmailChangeRequestFactory fac = new EmailChangeRequestFactory(service.getLoginFactory());
+			EmailChangeRequestFactory<?> fac = new EmailChangeRequestFactory(service.getLoginFactory());
 			Logger log = conn.getService(LoggerService.class).getLogger(getClass());
 			try {
 				log.debug("path is "+req.getPathInfo());
@@ -68,7 +68,7 @@ public class EmailChangeRequestServlet extends SessionServlet {
 						request.delete();
 						return;
 					}
-					AppUser target_user = request.getAppUser();
+					AppUser target_user = request.getUser();
 					if( service.isCurrentPerson(target_user)) { // could make this a relationship
 						String old = target_user.getEmail();
 						String email=request.getEmail();
