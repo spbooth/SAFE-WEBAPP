@@ -68,10 +68,10 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractReques
 		return spec;
 	}
 	
-	public final class EmailChangeRequest extends uk.ac.ed.epcc.webapp.session.AbstractRequestFactory.AbstractRequest{
+	public final class EmailChangeRequest extends uk.ac.ed.epcc.webapp.session.AbstractRequestFactory.AbstractRequest<A>{
 
 		protected EmailChangeRequest(Record r) {
-			super(r);
+			super(getAppUserFactory(),r);
 		}
 		public EmailChangeRequest(AppUser user, String new_email) throws DataFault{
 			this(res.new Record());

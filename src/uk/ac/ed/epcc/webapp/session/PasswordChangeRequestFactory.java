@@ -58,10 +58,10 @@ public class PasswordChangeRequestFactory<A extends AppUser> extends AbstractReq
 		return spec;
 	}
 	
-	public final class PasswordChangeRequest extends AbstractRequestFactory.AbstractRequest{
+	public final class PasswordChangeRequest extends AbstractRequestFactory.AbstractRequest<A>{
 
 		protected PasswordChangeRequest(Record r) {
-			super(r);
+			super(getAppUserFactory(),r);
 		}
 		public PasswordChangeRequest(AppUser user,String check) throws DataFault{
 			this(res.new Record());

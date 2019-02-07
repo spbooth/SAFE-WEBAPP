@@ -41,7 +41,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  *
  * @param <A>
  */
-public abstract class AbstractRequestFactory<A extends AppUser,R extends AbstractRequestFactory<A,?>.AbstractRequest>
+public abstract class AbstractRequestFactory<A extends AppUser,R extends AbstractRequestFactory.AbstractRequest>
 		extends DataObjectFactory<R> {
 
 	/**
@@ -57,16 +57,17 @@ public abstract class AbstractRequestFactory<A extends AppUser,R extends Abstrac
 	static final String TAG="Tag";
 	protected final AppUserFactory<A> user_fac;
 	
-	public class AbstractRequest extends DataObject{
-		
+	public static class AbstractRequest<A extends AppUser> extends DataObject{
+		protected final AppUserFactory<A> user_fac;
 		/**
 		 * @param r
 		 */
-		protected AbstractRequest(Record r) {
+		protected AbstractRequest(AppUserFactory<A> user_fac,Record r) {
 			super(r);
+			this.user_fac=user_fac;
 		}
 		public final A getUser(){
-			return user_fac.find(record.getNumberProperty(USER_ID));
+			return getUserFactory().find(record.getNumberProperty(USER_ID));
 		}
 		public final AppUserFactory<A> getUserFactory(){
 			return user_fac;
