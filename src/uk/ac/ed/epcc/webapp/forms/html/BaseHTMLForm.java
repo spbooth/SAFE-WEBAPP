@@ -50,12 +50,18 @@ public abstract class BaseHTMLForm extends MapForm {
 		super(c);
 	}
 	
-	protected int target_stage=0; // stage being evaluates
-	protected int stage=0;// form stage we are considering
 	
+	protected int stage=0;// form stage we are considering
+	boolean last_poll=true;
+	
+	protected int target_stage=0; // stage being evaluates
 	@Override
 	public int getTargetStage() {
 		return target_stage;
+	}
+	@Override
+	public void setTargetStage(int stage) {
+		this.target_stage=stage;
 	}
 	@Override
 	public boolean poll(FormResult self) throws TransitionException{
@@ -78,7 +84,7 @@ public abstract class BaseHTMLForm extends MapForm {
 		if( stage < target_stage ) {
 
 			// current form state should parse and validate from params
-			if( parsePost(null, params, false) && validate()) {
+			if( parsePost(null, params, true) && validate()) {
 				// lock all these fields going forward
 				for(Iterator<String> it=getFieldIterator();it.hasNext();) {
 					String field = it.next();
@@ -112,8 +118,12 @@ public abstract class BaseHTMLForm extends MapForm {
 				}
 			});
 		}
-		
+		last_poll=result;
 		return result;
+	}
+	@Override
+	public boolean isComplete() {
+		return last_poll;
 	}
 	/**
 	 * emit the action buttons (if any) registered for this form.

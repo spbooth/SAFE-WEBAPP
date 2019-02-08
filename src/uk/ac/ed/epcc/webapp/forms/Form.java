@@ -265,12 +265,26 @@ public interface Form extends Iterable<Field>, Contexed{
 	default public boolean poll(FormResult self) throws TransitionException{
 		return true;
 	}
-	/** which stage of a multi-stage form is being shown/read.
+	/** returns the last value returned by {@link #poll(FormResult)}
+	 * 
+	 * @return
+	 */
+	default public boolean isComplete() {
+		return true;
+	}
+	/** get which stage of a multi-stage form is being shown/read.
 	 * 
 	 * @return
 	 */
 	default public int getTargetStage() {
 		return 0;
+	}
+	/** set which stage of a multi-stage form is being shown/read
+	 * 
+	 * @param stage
+	 */
+	default public void setTargetStage(int stage) {
+		
 	}
 	/** Set a form-id for this form.
 	 * In HTML this is used as a prefix for the input html-ids
