@@ -296,6 +296,10 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 		 */
 		@Override
 		public FormResult action(Form f) throws ActionException {
+			SessionService sess = getContext().getService(SessionService.class);
+			if( sess == null || ! sess.haveCurrentUser()) {
+				return new RedirectResult(LoginServlet.getLoginPage(getContext()));
+			}
 			return new MessageResult("password_change_cancel");
 		}
 

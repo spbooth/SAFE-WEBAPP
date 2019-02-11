@@ -138,16 +138,16 @@ public class PasswordResetServletTest extends ServletTest {
 		doPost();
 		checkForward("/scripts/password_change_request.jsp");
 		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD1,"BorisTheSpider");
-		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD2,"BorisTheSpider");
+		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD2,"X");
 		addParam("submitted","true");
 		setAction(PasswordUpdateFormBuilder.CANCEL_ACTION);
 		doPost();
-		checkMessage("password_change_cancel");
+		checkRedirect("/login.jsp");
+		//checkMessage("password_change_cancel");
 		SessionService sess = ctx.getService(SessionService.class);
 		assertFalse(sess.haveCurrentUser());
-	
-		checkDiff("/cleanup.xsl", "servlet_password_cancel.xml");
-		PasswordAuthComposite comp = (PasswordAuthComposite) sess.getLoginFactory().getComposite(PasswordAuthComposite.class);
+		checkUnchanged();
+		
 	}
 	@Test
 	@DataBaseFixtures("new_password_from_server.xml")

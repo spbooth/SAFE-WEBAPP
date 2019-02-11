@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.html.PageHTMLForm;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -85,16 +86,24 @@ public class PasswordChangeRequestServlet<A extends AppUser> extends WebappServl
 					PageHTMLForm form = new PageHTMLForm(conn);
 					builder.buildForm(form, user, conn);
 
-					if ( ! form.hasSubmitted(req) || ! form.parsePost(req)){
-						req.setAttribute("Form", form);
-						req.setAttribute("policy", builder.getPasswordPolicy());
-						serv.forward("/scripts/password_change_request.jsp");
+					if ( ! form.hasSubmitted(req) ){
+						showForm(req, serv, builder, form);
 						return;
 					}
-
-
+					
 					Map<String,Object> params = conn.getService(ServletService.class).getParams();
 					try {
+						FormAction shortcut = form.getShortcutAction(params);
+				    	if( shortcut != null ){
+				    		// non validating action
+				    		handleFormResult(conn, req, res, shortcut.action(form));
+				    		return;
+				    	}
+				    	if( ! form.parsePost(req)) {
+				    		showForm(req, serv, builder, form);
+							return;
+				    	}
+						
 						FormResult result =  form.doAction(params); // this sets the password and logs-in
 						request.delete();
 						AppUserNameFinder finder = user.getFactory().getRealmFinder(EmailNameFinder.EMAIL);
@@ -119,6 +128,21 @@ public class PasswordChangeRequestServlet<A extends AppUser> extends WebappServl
 			message(conn,req,res,"invalid_input");
 			return;
 		}
+	}
+
+	/**
+	 * @param req
+	 * @param serv
+	 * @param builder
+	 * @param form
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	private void showForm(HttpServletRequest req, ServletService serv, PasswordUpdateFormBuilder<A> builder,
+			PageHTMLForm form) throws ServletException, IOException {
+		req.setAttribute("Form", form);
+		req.setAttribute("policy", builder.getPasswordPolicy());
+		serv.forward("/scripts/password_change_request.jsp");
 	}
 
 }
