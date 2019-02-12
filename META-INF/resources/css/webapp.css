@@ -465,7 +465,11 @@ div  *.highlight td, div table.auto *.highlight td form{
 form table.form tr.highlight:hover td {
 	 background-color: #ffeecc;
 }
-
+/* some transitions dont set form class
+ */ 
+form table tr.highlight:hover td {
+	 background-color: #ffeecc;
+}
 details div.description{
 	 border-radius: 15px;
 	 padding: 5px;
