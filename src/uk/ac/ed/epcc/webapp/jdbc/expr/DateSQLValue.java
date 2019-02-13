@@ -31,7 +31,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  * @author spb
  *
  */
-public class DateSQLValue implements SQLValue<Date>{
+public class DateSQLValue implements NestedSQLValue<Date,Number>{
 	private final SQLValue<Number> a;
 	public DateSQLValue(SQLValue<Number> a){
 		this.a=a;
@@ -57,7 +57,11 @@ public class DateSQLValue implements SQLValue<Date>{
 		return new Date(a.makeObject(rs, pos).longValue());
 	}
 
-	public SQLFilter getRequiredFilter() {
-		return null;
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.NestedSQLValue#getNested()
+	 */
+	@Override
+	public SQLValue<Number> getNested() {
+		return a;
 	}
 }

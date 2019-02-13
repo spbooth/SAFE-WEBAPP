@@ -32,7 +32,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  */
 
 
-public class IntConvertSQLValue<T>  implements SQLValue<Integer> {
+public class IntConvertSQLValue<T>  implements NestedSQLValue<Integer,T> {
 	private SQLValue<T> a;
     public IntConvertSQLValue(SQLValue<T> a){
     	this.a = a;
@@ -48,6 +48,9 @@ public class IntConvertSQLValue<T>  implements SQLValue<Integer> {
 		T temp = a.makeObject(rs, pos);
 		if( temp != null ){
 	    	if( temp instanceof Number ){
+	    		if( temp instanceof Double || temp instanceof Float ) {
+	    			return Integer.valueOf((int) Math.round(((Number) temp).doubleValue()));
+	    		}
 	    		return Integer.valueOf(((Number)temp).intValue());
 	    	}
 	    	if( temp instanceof String){
@@ -64,10 +67,15 @@ public class IntConvertSQLValue<T>  implements SQLValue<Integer> {
     	sb.append(")");
     	return sb.toString();
     }
-	public SQLFilter getRequiredFilter() {
-		return a.getRequiredFilter();
-	}
+	
 	public Class<Integer> getTarget() {
 		return Integer.class;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.NestedSQLValue#getNested()
+	 */
+	@Override
+	public SQLValue<T> getNested() {
+		return a;
 	}
 }

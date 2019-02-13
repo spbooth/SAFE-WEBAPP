@@ -20,6 +20,7 @@ import java.util.List;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider;
+import uk.ac.ed.epcc.webapp.jdbc.expr.NestedSQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpressionFilter;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue;
@@ -38,7 +39,7 @@ import uk.ac.ed.epcc.webapp.model.data.convert.TypeConverter;
  */
 
 
-public class TypeConverterSQLValue<H,T,D> implements  SQLValue<T>, FilterProvider<H,T>{
+public class TypeConverterSQLValue<H,T,D> implements  NestedSQLValue<T,D>, FilterProvider<H,T>{
 	private final Class<H> target;
 	public TypeConverterSQLValue(Class<H> target,TypeConverter<T, D> converter, SQLValue<D> inner) {
 		super();
@@ -49,7 +50,7 @@ public class TypeConverterSQLValue<H,T,D> implements  SQLValue<T>, FilterProvide
 	private final TypeConverter<T,D> converter;
 	private final SQLValue<D> inner;
 	
-	protected SQLValue<D> getInner(){
+	public SQLValue<D> getNested(){
 		return inner;
 	}
 	protected TypeConverter<T, D> getConverter(){
@@ -69,9 +70,7 @@ public class TypeConverterSQLValue<H,T,D> implements  SQLValue<T>, FilterProvide
 	public final T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		return converter.find(inner.makeObject(rs, pos));
 	}
-	public final SQLFilter getRequiredFilter() {
-		return inner.getRequiredFilter();
-	}
+	
 	public final String toString(){
 		return converter.toString()+"("+inner.toString()+")";
 	}

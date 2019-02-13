@@ -27,7 +27,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 
 
 
-public class MillisecondSQLValue implements SQLValue<Long>{
+public class MillisecondSQLValue implements NestedSQLValue<Long,Date>{
 	private final SQLValue<Date> a;
 	public MillisecondSQLValue(SQLValue<Date> a){
 		this.a=a;
@@ -53,7 +53,13 @@ public class MillisecondSQLValue implements SQLValue<Long>{
 		return Long.valueOf(a.makeObject(rs, pos).getTime());
 	}
 
-	public SQLFilter getRequiredFilter() {
-		return null;
+	
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.NestedSQLValue#getNested()
+	 */
+	@Override
+	public SQLValue<Date> getNested() {
+		return a;
 	}
 }

@@ -37,7 +37,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  */
 
 
-public class SQLValuePatternTransform implements SQLValue<String> {
+public class SQLValuePatternTransform implements NestedSQLValue<String,String> {
 	private AppContext conn;
 	SQLValue<String> base;
     Map<Pattern,String> map;
@@ -98,11 +98,11 @@ public class SQLValuePatternTransform implements SQLValue<String> {
 		return s;
 	}
 
-
-
-
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.NestedSQLValue#getNested()
+	 */
 	@Override
-	public SQLFilter getRequiredFilter() {
-		return null;
+	public SQLValue<String> getNested() {
+		return base;
 	}
 }

@@ -32,7 +32,7 @@ import uk.ac.ed.epcc.webapp.model.data.Duration;
  */
 
 
-public class DurationSecondConvertSQLValue  implements SQLValue<Number> {
+public class DurationSecondConvertSQLValue  implements NestedSQLValue<Number,Duration> {
 	private SQLValue<Duration> a;
     public DurationSecondConvertSQLValue(SQLValue<Duration> a){
     	this.a = a;
@@ -59,10 +59,14 @@ public class DurationSecondConvertSQLValue  implements SQLValue<Number> {
     	sb.append(")");
     	return sb.toString();
     }
-	public SQLFilter getRequiredFilter() {
-		return a.getRequiredFilter();
-	}
 	public Class<Number> getTarget() {
 		return Number.class;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.NestedSQLValue#getNested()
+	 */
+	@Override
+	public SQLValue<Duration> getNested() {
+		return a;
 	}
 }

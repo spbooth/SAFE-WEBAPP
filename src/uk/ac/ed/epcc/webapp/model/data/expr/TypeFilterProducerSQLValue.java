@@ -38,20 +38,20 @@ public class TypeFilterProducerSQLValue<T,D,X extends DataObject> extends TypeCo
 	public TypeProducer<T, D> getConverter(){
 		return (TypeProducer<T, D>) super.getConverter();
 	}
-	public SQLAccessor<D,X> getInner(){
-		return (SQLAccessor<D, X>) super.getInner();
+	public SQLAccessor<D,X> getNested(){
+		return (SQLAccessor<D, X>) super.getNested();
 	}
 	public T getValue(X r) {
 
-		return getConverter().find(getInner().getValue(r));
+		return getConverter().find(getNested().getValue(r));
 	}
 	
 	public void setValue(X r, T value) {
-		getInner().setValue(r, getConverter().getIndex(value));
+		getNested().setValue(r, getConverter().getIndex(value));
 
 	}
 	public boolean canSet() {
-		return getInner().canSet();
+		return getNested().canSet();
 	}
 	
 }

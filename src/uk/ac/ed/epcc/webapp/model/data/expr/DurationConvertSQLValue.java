@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.expr.NestedSQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -34,7 +35,7 @@ import uk.ac.ed.epcc.webapp.model.data.Duration;
  */
 
 
-public class DurationConvertSQLValue<T extends Number>  implements SQLValue<Duration> {
+public class DurationConvertSQLValue<T extends Number>  implements NestedSQLValue<Duration,T> {
 	private final SQLValue<T> a;
 	private final long resolution;
     public DurationConvertSQLValue(SQLValue<T> a,long resolution){
@@ -68,10 +69,15 @@ public class DurationConvertSQLValue<T extends Number>  implements SQLValue<Dura
     	sb.append(")");
     	return sb.toString();
     }
-	public SQLFilter getRequiredFilter() {
-		return a.getRequiredFilter();
-	}
+	
 	public Class<Duration> getTarget() {
 		return Duration.class;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.NestedSQLValue#getNested()
+	 */
+	@Override
+	public SQLValue<T> getNested() {
+		return a;
 	}
 }

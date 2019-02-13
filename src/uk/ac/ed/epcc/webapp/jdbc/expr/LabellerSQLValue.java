@@ -30,7 +30,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  *
  */
 
-public class LabellerSQLValue<T,R> implements SQLValue<R> {
+public class LabellerSQLValue<T,R> implements NestedSQLValue<R,T> {
 
 	public LabellerSQLValue(AppContext c,Labeller<T,R> labeller, SQLValue<T> nested) {
 		super();
@@ -74,6 +74,13 @@ public class LabellerSQLValue<T,R> implements SQLValue<R> {
 	@Override
 	public String toString() {
 		return labeller.getClass().getSimpleName()+"("+nested.toString()+")";
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.NestedSQLValue#getNested()
+	 */
+	@Override
+	public SQLValue<T> getNested() {
+		return nested;
 	}
 
 }

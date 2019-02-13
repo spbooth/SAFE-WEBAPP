@@ -32,7 +32,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  */
 
 
-public class DoubleConvertSQLValue<T>  implements SQLValue<Double> {
+public class DoubleConvertSQLValue<T>  implements NestedSQLValue<Double,T> {
 	private SQLValue<T> a;
     public DoubleConvertSQLValue(SQLValue<T> a){
     	this.a = a;
@@ -64,10 +64,15 @@ public class DoubleConvertSQLValue<T>  implements SQLValue<Double> {
     	sb.append(")");
     	return sb.toString();
     }
-	public SQLFilter getRequiredFilter() {
-		return a.getRequiredFilter();
-	}
+	
 	public Class<Double> getTarget() {
 		return Double.class;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.NestedSQLValue#getNested()
+	 */
+	@Override
+	public SQLValue<T> getNested() {
+		return a;
 	}
 }
