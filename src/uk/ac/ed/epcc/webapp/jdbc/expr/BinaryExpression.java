@@ -31,7 +31,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 /** A binary numerical {@link SQLExpression}
  * 
  * There is a factory method for generating these that can implement simple simplifications.
- * 
+ * The {@link #equals(Object)} method is written to reflect commutative {@link Operator}s.
  * @author spb
  *
  */
@@ -221,7 +221,7 @@ public final class BinaryExpression implements SQLExpression<Number> {
      * @param b
      */
     BinaryExpression(SQLExpression<?> a, Operator op,SQLExpression<?> b) {
-     
+    	assert(a!=null && b!=null && op !=null);
     	this.a=a;
     	this.b=b;
     	this.op=op;
@@ -286,9 +286,8 @@ public final class BinaryExpression implements SQLExpression<Number> {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((a == null) ? 0 : a.hashCode());
-		result = prime * result + ((b == null) ? 0 : b.hashCode());
-		result = prime * result + ((op == null) ? 0 : op.hashCode());
+		result = prime * result + (a.hashCode()+b.hashCode()); // support commutative
+		result = prime * result + op.hashCode();
 		return result;
 	}
 
@@ -301,19 +300,15 @@ public final class BinaryExpression implements SQLExpression<Number> {
 		if (getClass() != obj.getClass())
 			return false;
 		BinaryExpression other = (BinaryExpression) obj;
-		if (a == null) {
-			if (other.a != null)
-				return false;
-		} else if (!a.equals(other.a))
-			return false;
-		if (b == null) {
-			if (other.b != null)
-				return false;
-		} else if (!b.equals(other.b))
-			return false;
 		if (op != other.op)
 			return false;
-		return true;
+		if( a.equals(other.a) && b.equals(other.b)) {
+			return true;
+		}
+		if( op.commutes()) {
+			return a.equals(other.b) && b.equals(other.a);
+		}
+		return false;
 	}
 
 	public SQLExpression<?> getA() {

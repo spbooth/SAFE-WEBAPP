@@ -334,4 +334,29 @@ public class BinaryPropExpressionTest extends WebappTestBase {
 				BinaryExpression.create(ctx,four, Operator.MUL, exp2));
 		assertEquals(expected, actual);
 	}
+	@Test
+	public void testCommutativeEquals() {
+		NumberFactory fac = new NumberFactory(ctx);
+		SQLExpression exp = fac.getExpr();
+		SQLExpression exp2 = fac.getExpr2();
+		SQLExpression a = BinaryExpression.create(ctx, exp, Operator.MUL, exp2);
+		SQLExpression b = BinaryExpression.create(ctx, exp2, Operator.MUL, exp);
+		assertTrue("Comutative equals",a.equals(b));
+		assertTrue("Comutative equals rev",b.equals(a));
+		assertTrue("Comutative equals self",a.equals(a));
+		assertEquals("hash", a.hashCode(),b.hashCode());
+	}
+	
+	@Test
+	public void testNonCommutativeEquals() {
+		NumberFactory fac = new NumberFactory(ctx);
+		SQLExpression exp = fac.getExpr();
+		SQLExpression exp2 = fac.getExpr2();
+		SQLExpression a = BinaryExpression.create(ctx, exp, Operator.DIV, exp2);
+		SQLExpression b = BinaryExpression.create(ctx, exp2, Operator.DIV, exp);
+		assertFalse("Comutative equals",a.equals(b));
+		assertFalse("Comutative equals rev",b.equals(a));
+		assertTrue("Comutative equals self",a.equals(a));
+	
+	}
 }
