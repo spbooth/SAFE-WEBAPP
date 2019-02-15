@@ -172,6 +172,9 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 	 */
 	@Override
 	public void addData(Plot plot) {
+		if( plot == null) {
+			return;
+		}
 		if( !( plot instanceof GenericSplitSetPlot)) {
 			throw new ConsistencyError("Unexpected plot type "+plot.getClass().getCanonicalName()+" expecting GenericSplitSetPlot");
 		}
