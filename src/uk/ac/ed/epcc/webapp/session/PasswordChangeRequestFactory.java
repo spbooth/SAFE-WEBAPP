@@ -43,7 +43,9 @@ public class PasswordChangeRequestFactory<A extends AppUser> extends AbstractReq
 	private static final int MAX_CHECK = 512;
 	
 	static final String CHECK="Check";
-	
+	public PasswordChangeRequestFactory(AppContext conn) {
+		this(conn.getService(SessionService.class).getLoginFactory());
+	}
 	public PasswordChangeRequestFactory(AppUserFactory<A> fac){
 		super(fac);
 		setContext(fac.getContext(), "PasswordChangeRequest");
