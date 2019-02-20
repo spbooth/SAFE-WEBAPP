@@ -38,9 +38,9 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  *
  * @param <T>
  */
-public class FuncExpression<T> implements SQLExpression<T> {
+public class FuncExpression<T,D> implements SQLExpression<T> {
 	
-	public static <T> SQLExpression<T> apply(AppContext c,SQLFunc f, Class<T> target, SQLExpression<? extends T> e){
+	public static <T,D> SQLExpression<T> apply(AppContext c,SQLFunc f, Class<T> target, SQLExpression<D> e){
 		if(c != null &&  e instanceof DateSQLExpression){
 			// move date convert outside function
 			DateSQLExpression dse = (DateSQLExpression) e;
@@ -56,9 +56,9 @@ public class FuncExpression<T> implements SQLExpression<T> {
 		return new FuncExpression<>(f, target, e);
 	}
     private final SQLFunc func;
-    private final SQLExpression<? extends T> e;
+    private final SQLExpression<D> e;
     private final Class<T> target_class;
-    private FuncExpression(SQLFunc f, Class<T> target, SQLExpression<? extends T> e){
+    private FuncExpression(SQLFunc f, Class<T> target, SQLExpression<D> e){
     	assert(f!=null);
     	// expression may be null 
     	func=f;
@@ -69,8 +69,12 @@ public class FuncExpression<T> implements SQLExpression<T> {
 	public int add(StringBuilder sb, boolean qualify) {
 		int res=1;
 
-		sb.append(func.name());
-		sb.append("(");
+		if( func.equals(SQLFunc.DISTINCT)) {
+			sb.append("COUNT( DISTINCT ");
+		}else {
+			sb.append(func.name());
+			sb.append("(");
+		}
 		if( e == null){
 			sb.append("1");
 		}else{
@@ -104,12 +108,11 @@ public class FuncExpression<T> implements SQLExpression<T> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
-		if( e != null ){
-			return e.makeObject(rs,pos);
-		}else{
-			// count has null expression
-			return (T) rs.getObject(pos);
+		// count has null expression
+		if(e !=null &&  target_class.isAssignableFrom(e.getTarget())) {
+			return (T) e.makeObject(rs, pos);
 		}
+		return (T) rs.getObject(pos);
 	}
 	@Override
 	public Class<T> getTarget() {

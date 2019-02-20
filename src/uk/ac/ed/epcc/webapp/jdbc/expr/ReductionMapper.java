@@ -28,15 +28,15 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 
 
 
-public class ReductionMapper<R> extends AbstractContexed implements ResultMapper<R> {
+public class ReductionMapper<R,D> extends AbstractContexed implements ResultMapper<R> {
 
 	private final Reduction op;
 	private final Class<R> target;
-	private final SQLExpression<? extends R> exp;
+	private final SQLExpression<D> exp;
 	private final R def;
 	private boolean qualify=false;
 
-	public ReductionMapper(AppContext c,Class<R> target, Reduction op,R def,SQLExpression<? extends R> exp) {
+	public ReductionMapper(AppContext c,Class<R> target, Reduction op,R def,SQLExpression<D> exp) {
 		super(c);
 		this.target=target;
 		this.op=op;
@@ -56,9 +56,10 @@ public class ReductionMapper<R> extends AbstractContexed implements ResultMapper
 		case MIN:  expr = FuncExpression.apply(conn,SQLFunc.MIN,target,exp);break;
 		case MAX:  expr = FuncExpression.apply(conn,SQLFunc.MAX,target,exp);break;
 		case AVG:  expr = FuncExpression.apply(conn,SQLFunc.AVG,target,exp);break;
+		case DISTINCT: expr = FuncExpression.apply(conn, SQLFunc.DISTINCT, target, exp); break;
 		}
 		if( expr == null ){
-			throw new ConsistencyError("reduction did not generate exrpression");
+			throw new ConsistencyError("reduction did not generate expression");
 		}
 		expr.add(sb, qualify);
 		return sb.toString();
@@ -69,7 +70,10 @@ public class ReductionMapper<R> extends AbstractContexed implements ResultMapper
 	}
 
 	public R makeObject(ResultSet rs) throws DataException, SQLException {
-		return exp.makeObject(rs, 1);
+		if( target.isAssignableFrom(exp.getTarget())) {
+			return (R) exp.makeObject(rs, 1);
+		}
+		return (R) rs.getObject(1);
 	}
 
 	public boolean setQualify(boolean qualify) {

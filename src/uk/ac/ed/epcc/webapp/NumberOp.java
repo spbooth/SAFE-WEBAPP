@@ -47,9 +47,7 @@ public class NumberOp {
 	private static boolean useDuration(Number n){
 		return n instanceof Duration;
 	}
-	private static boolean useAverageValue(Number n){
-		return n instanceof AverageValue;
-	}
+	
 	public static AverageValue average(Number a, Number b){
 		double sum=0.0;
 		long count=0L;
