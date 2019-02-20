@@ -48,12 +48,19 @@ public class Joiner<T extends DataObject, BDO extends DataObject> extends SQLAnd
 		public Joiner(Class<BDO> target,SQLFilter<T> fil, String join_field, Repository res, Repository remote_res,
 			boolean target_references	){
 			super(target);
-			if( ! target_references){
+			if( (! target_references) && (! remote_res.getInfo(join_field).isUnique())){
 				// use an EXISTS clause to select so as not to expand 
 				// result set.
 				addFilter(new BackJoinFilter<>(target,join_field, res, remote_res, fil));
 			}else{
-				addFilter(new JoinerFilter(target,join_field, res, remote_res));
+				
+				if( target_references) {
+					addFilter(new JoinerFilter(target,join_field, res, remote_res));
+				}else {
+					// unique references can also use a simple join. A unique reference
+					// could be implemented in either direction equivalently
+					addFilter(new JoinerFilter(target,join_field, remote_res, res));
+				}
 				// note we are  using a non-generic type here to force a foreign type of filter to be
 				// included in the clause.
 				SQLFilter f = fil;

@@ -194,15 +194,28 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 		 */
 		@Override
 		public void addJoin(Set<Repository> tables, StringBuilder join_clause, Set<LinkClause> additions) {
-			if( tables.contains(remote_res)) {
+			if( tables.contains(remote_res) && tables.contains(res)) {
 				additions.add(this);
 			}else {
-				// see comments for reason for left join
-				join_clause.append(" left join ");
-				remote_res.addSource(join_clause, true);
-				join_clause.append(" on ");
-				addLinkClause(join_clause);
-				tables.add(remote_res);
+				assert( tables.contains(res) || tables.contains(remote_res));
+				if( ! tables.contains(remote_res)) {
+					// see comments for reason for left join
+					join_clause.append(" left join ");
+					remote_res.addSource(join_clause, true);
+					join_clause.append(" on ");
+					addLinkClause(join_clause);
+					tables.add(remote_res);
+				}
+				if( ! tables.contains(res)) {
+					// This allows us to use a simple join when using a unique remote reference
+					assert(res.getInfo(join_field).isUnique());
+					// see comments for reason for left join
+					join_clause.append(" left join ");
+					res.addSource(join_clause, true);
+					join_clause.append(" on ");
+					addLinkClause(join_clause);
+					tables.add(res);
+				}
 			}
 			
 		}

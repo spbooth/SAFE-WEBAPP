@@ -163,6 +163,11 @@ public final class Repository implements AppContextCleanup{
 	/**
 	 * 
 	 */
+	private static final String UNIQUE_PREFIX = "unique.";
+
+	/**
+	 * 
+	 */
 	protected static final String CONFIG_TAG_PREFIX = "config.";
 
 	/** modes supported by {@link Record#setID}
@@ -250,6 +255,11 @@ public final class Repository implements AppContextCleanup{
 		 * 
 		 */
 		private String references=null;
+		/** Is there a 1-1 mapping between records in the source and
+		 * destination table
+		 * 
+		 */
+		private boolean unique=false;
 		/** Is there a foreign key for this reference
 		 * 
 		 */
@@ -381,13 +391,22 @@ public final class Repository implements AppContextCleanup{
         public boolean isIndexed(){
         	return indexed;
         }
+        /** Is this a unique reference where there is a 1-1 mapping
+         * between records in the source and destination table. 
+         * 
+         * @return
+         */
+        public boolean isUnique() {
+        	return unique;
+        }
         public String getForeignKeyName(){
         	return key_name;
         }
-        private void setReference(boolean indexed,String fk,String table){
+        private void setReference(boolean indexed,String fk,String table,boolean unique){
         	this.indexed=indexed;
         	this.key_name=fk;
         	references=table;
+        	this.unique=unique;
         }
         private void setTypeProducer(TypeProducer producer){
         	if(producer.getField().equals(name)){
@@ -2935,23 +2954,25 @@ public final class Repository implements AppContextCleanup{
 			if( seq == 1 ){
 				FieldInfo info = fields.get(field);
 				if(info.isNumeric()){
-					String name = REFERENCE_PREFIX+param_name+"."+info.getName(false);
+					String suffix = param_name+"."+info.getName(false);
+					String name = REFERENCE_PREFIX+suffix;
 					table=ctx.getInitParameter(name,table); // use param in preference because of windows case mangle
 					String tag = TableToTag(ctx, table);
 					//log.debug("field "+field+" references "+table);
-					info.setReference(true,key_name,tag);
+					info.setReference(true,key_name,tag,ctx.getBooleanParameter(UNIQUE_PREFIX+suffix, false));
 				}
 			}
 		}while(rs.next());
 		}
 		// now try explicit references set from properties
 		for(FieldInfo i  : fields.values()){
-			if( i.getReferencedTable() == null ){
+			if( i.isNumeric() && i.getReferencedTable() == null ){
 				//use param name for table rename
-				String tag = REFERENCE_PREFIX+param_name+"."+i.getName(false);
+				String suffix = param_name+"."+i.getName(false);
+				String tag = REFERENCE_PREFIX+suffix;
 				String table=ctx.getInitParameter(tag);
 				//log.debug("tag "+tag+" resolves to "+table);
-				i.setReference(false,null,table);
+				i.setReference(false,null,table,ctx.getBooleanParameter(UNIQUE_PREFIX+suffix, false));
 			}
 		}
 	}
