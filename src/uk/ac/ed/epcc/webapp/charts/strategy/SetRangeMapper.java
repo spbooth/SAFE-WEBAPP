@@ -19,7 +19,7 @@ package uk.ac.ed.epcc.webapp.charts.strategy;
 
 
 /**
- * This interface extends RangeMapper but adds the capability of specifying
+ * This interface extends {@link RangeMapper} but adds the capability of specifying
  * which dataset/plot the object contributes to.
  * @param <T> type of object being mapped
  */

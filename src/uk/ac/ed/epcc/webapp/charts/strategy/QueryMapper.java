@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.Map;
 
 /** Formatting object that gather the data for an arbitrary date range from 
- * a target object. Where RangeMapper is applied to individual data items
+ * a target object. Where {@link RangeMapper} is applied to individual data items
  * QueryMapper is applied to factory classes that can perform more high level
  * queries.
  * 

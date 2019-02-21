@@ -82,6 +82,9 @@ public class NumberOp {
 		if (b == null) {
 			return a;
 		}
+		if( a instanceof DistinctCount && b instanceof DistinctCount) {
+			return DistinctCount.add((DistinctCount)a,(DistinctCount) b);
+		}
 		if( useDuration(a) || useDuration(b)){
 			// use scale of 1 as this will be the unit returned by a Duration.longValue
 			return new Duration(a.longValue()+b.longValue(),1L);
