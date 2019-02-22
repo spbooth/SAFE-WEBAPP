@@ -466,6 +466,9 @@ AnonymisingFactory
 	public Collection<AppUserNameFinder> getRealms() {
 		return getRealmMap().values();
 	}
+	public boolean supportsRealm(String realm) {
+		return getRealmMap().containsKey(realm);
+	}
 
 
 	/* (non-Javadoc)
