@@ -1,5 +1,6 @@
 package uk.ac.ed.epcc.webapp.session;
 
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -72,18 +73,25 @@ public class DirectoryComposite<AU extends AppUser> extends AppUserComposite<AU,
 		    	 SearchResult sr = (SearchResult) results.next();
 		    	 Attributes attrs = sr.getAttributes();
 		    	 NamingEnumeration<? extends Attribute> it = attrs.getAll();
+		    	 Map tmp = new HashMap();
 		    	 while( it.hasMore()){
 		    		 Attribute at = it.next();
 		    		 String id = at.getID();
 		    		 if( at.size() == 1){
-		    			 data.put(id, at.get());
+		    			 tmp.put(id, at.get());
 		    		 }else{
 		    			 Set set = new LinkedHashSet<>();
 		    			 for(int i=0; i< at.size(); i++){
 
 		    				 set.add(at.get(i));
 		    			 }
-		    			 data.put(id, set);
+		    			 tmp.put(id, set);
+		    		 }
+		    	 }
+		    	 // Use ordering from config param
+		    	 for(String key : attributes.split(",")) {
+		    		 if( tmp.containsKey(key)) {
+		    			 data.put(key, tmp.get(key));
 		    		 }
 		    	 }
 		    	 return data;
