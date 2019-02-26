@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.editors.mail;
 
 import java.io.IOException;
 import javax.mail.MessagingException;
+import javax.mail.Part;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
@@ -104,6 +105,21 @@ public class FlattenVisitor extends PrefixVisitor<MultipartMailBuilder> {
 	@Override
 	protected MultipartMailBuilder getMailBuilder() {
 		return mb;
+	}
+	@Override
+	public void visit(MimePart parent, String string, MessageWalker w) {
+		try {
+			if( parent.isMimeType("text/html")) {
+				MimeBodyPart part = new MimeBodyPart();
+				part.setContent(string, parent.getContentType());
+				part.setDisposition(Part.INLINE);
+				mb.addBodyPart(part);
+				return;
+			}
+		} catch (MessagingException e) {
+			getLogger().error("Error checking content type", e);
+		}
+		super.visit(parent, string, w);
 	}
 	
 

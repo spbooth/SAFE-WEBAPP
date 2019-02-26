@@ -57,13 +57,31 @@
 &gt; To: fred@example.com
 &gt; From: bill@example.com
 &gt; Subject: A test email
-&gt; &lt;h1&gt;A header&lt;/h1&gt;
-&gt; And a &lt;a href='http://www.example.com'&gt;link&lt;/a&gt;
 </pre>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/0/T">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0/0/T"/>
 <input type="hidden" name="Transition" value="Edit"/>
 <input class="input_button" type="submit" value="Edit"/>
+</form>
+<form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/0">
+<input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0/0"/>
+<input type="hidden" name="Transition" value="Delete"/>
+<input class="input_button" type="submit" value="Delete"/>
+</form>
+</div>
+<div class="part">
+<pre class="loose">A header
+And a [http://www.example.com] link
+</pre>
+<form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/1/T">
+<input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0/1/T"/>
+<input type="hidden" name="Transition" value="Edit"/>
+<input class="input_button" type="submit" value="Edit"/>
+</form>
+<form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/1">
+<input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0/1"/>
+<input type="hidden" name="Transition" value="Delete"/>
+<input class="input_button" type="submit" value="Delete"/>
 </form>
 </div>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
