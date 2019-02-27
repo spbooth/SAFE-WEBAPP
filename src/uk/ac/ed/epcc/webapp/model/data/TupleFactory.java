@@ -471,6 +471,17 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 		}
     	
     }
+    public class FilterExists extends AbstractFinder{
+
+		public FilterExists() {
+			super();
+			ExistsMapper m = new ExistsMapper();
+			m.setQualify(true);
+			setQualify(true);
+			setMapper(m);
+		}
+    	
+    }
     public final long getCount(BaseFilter<T> s) throws DataException{
     	try{
 			SQLFilter<T> sql_fil = FilterConverter.convert(s);
@@ -479,15 +490,35 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 		}catch(NoSQLFilterException e){
 			// do things the hard way
 			long count=0;
-			Iterator<T> it = new TupleIterator(s);
-			while(it.hasNext()){
-				count++;
-				it.next();
+			try(CloseableIterator<T> it = new TupleIterator(s)){
+				while(it.hasNext()){
+					count++;
+					it.next();
+				}
+			} catch (Exception e1) {
+				throw new DataException("error closing iterator",e1);
 			}
 			return count;
 		}
     }
-
+    public final boolean exists(BaseFilter<T> s) throws DataException{
+    	try{
+			SQLFilter<T> sql_fil = FilterConverter.convert(s);
+			FilterExists exists = new FilterExists();
+			return  (boolean) exists.find(sql_fil);
+		}catch(NoSQLFilterException e){
+			// do things the hard way
+			long count=0;
+			try(CloseableIterator<T> it = new TupleIterator(s)){
+				if( it.hasNext()) {
+					return true;
+				}
+			} catch (Exception e1) {
+				throw new DataException("error closing iterator",e1);
+			}
+			return false;
+		}
+    }
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
