@@ -291,7 +291,7 @@ public final class AppContext {
 	 * @param key
 	 * @return boolean
 	 */
-    protected boolean hasAttribute(Object key){
+    public boolean hasAttribute(Object key){
     	if( attributes == null ){
     		return false;
     	}

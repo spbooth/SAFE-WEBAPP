@@ -21,7 +21,9 @@
 package uk.ac.ed.epcc.webapp;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
@@ -128,4 +130,18 @@ public class AppContextTest {
 		assertEquals(value,"found it!");
 
     }
+	
+	@Test
+	public void testAttributes() {
+		AppContext c = new AppContext();
+		assertFalse(c.hasAttribute("Thing"));
+		assertFalse(c.hasAttribute("Null"));
+		c.setAttribute("Thing", "Goober");
+		c.setAttribute("Null", null);
+		assertTrue(c.hasAttribute("Thing"));
+		assertTrue(c.hasAttribute("Null"));
+		assertEquals("Goober", c.getAttribute("Thing"));
+		assertNull(c.getAttribute("Null"));
+		
+	}
 }
