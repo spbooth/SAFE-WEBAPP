@@ -33,7 +33,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  *
  * @param <T>
  */
-public class SQLSelectValue<T> implements SQLValue<T> {
+public class SQLSelectValue<T> implements GroupingSQLValue<T> {
     private final Class<T> target;
     private final SQLValue<T> accessors[];
     private final int offsets[];
@@ -115,6 +115,49 @@ public class SQLSelectValue<T> implements SQLValue<T> {
 			}
 		}
 		return required;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue#addGroup(java.lang.StringBuilder, boolean)
+	 */
+	@Override
+	public int addGroup(StringBuilder sb, boolean qualify) {
+		int count=0;
+		boolean seen=false;
+		for(SQLValue<T> v : accessors) {
+			if( v instanceof GroupingSQLValue) {
+				StringBuilder tmp = new StringBuilder();
+				if( count > 0) {
+					tmp.append(" , ");
+				}
+				int added = ((GroupingSQLValue<T>)v).addGroup(tmp, qualify);
+				if( added > 0 ) {
+					count += added;
+					sb.append(tmp);
+				}
+			}else {
+				if( count > 0 ) {
+					sb.append(" , ");
+				}
+				count += v.add(sb, qualify);
+			}
+		}
+		return count;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue#getGroupParameters(java.util.List)
+	 */
+	@Override
+	public List<PatternArgument> getGroupParameters(List<PatternArgument> list) {
+		for(SQLValue<T> v : accessors) {
+			if( v instanceof GroupingSQLValue) {
+				list = ((GroupingSQLValue<T>)v).getGroupParameters(list);
+			}else {
+				list = v.getParameters(list);
+			}
+		}
+		return list;
 	}
 
 }
