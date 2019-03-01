@@ -231,14 +231,14 @@ public class StaticServlet extends SessionServlet {
 		String type = mimeType(conn, suffix(target));
 		res.setContentType(type);
 		res.setContentLength((int) length);
-		OutputStream out = res.getOutputStream();
-		InputStream in = new FileInputStream(f);
-		int val;
-		while ((val = in.read()) != -1) {
-			out.write(val);
+		try(OutputStream out = res.getOutputStream();
+				InputStream in = new FileInputStream(f)){
+			int val;
+			while ((val = in.read()) != -1) {
+				out.write(val);
+			}
 		}
-		in.close();
-		out.close();
+		
 	}
 
 	/**

@@ -79,9 +79,9 @@ public class AvatarServeDataProducer<AU extends AppUser> implements ServeDataPro
 				ByteArrayMimeStreamData msd = new ByteArrayMimeStreamData();
 				msd.setMimeType("image/png");
 				msd.setName("avatar.png");
-				OutputStream s = msd.getOutputStream();
-				ImageIO.write(image, "png", s);
-				s.close();
+				try(OutputStream s = msd.getOutputStream()){
+					ImageIO.write(image, "png", s);
+				}
 				return msd;
 			}
 		}

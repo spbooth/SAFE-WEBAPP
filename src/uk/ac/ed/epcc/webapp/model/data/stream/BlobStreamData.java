@@ -90,12 +90,12 @@ public class BlobStreamData implements StreamData {
 	 * @throws IOException
 	 */
 	public void append(OutputStream out) throws IOException {
-		InputStream in = getInputStream();
-		int i;
+		try(InputStream in = getInputStream()){
+			int i;
 
-		while ((i = in.read()) != -1) {
-			out.write(i);
+			while ((i = in.read()) != -1) {
+				out.write(i);
+			}
 		}
-		in.close();
 	}
 }

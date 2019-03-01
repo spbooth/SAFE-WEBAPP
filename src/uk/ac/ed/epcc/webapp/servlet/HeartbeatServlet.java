@@ -65,14 +65,14 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 		
 		boolean ok=true;
 		res.setContentType("text/plain");
-		ServletOutputStream out = res.getOutputStream();
-		ok = runHeartbeat(conn, out);
-		if( ok ){
-			out.println("OK");
-		}else{
-			out.println("FAIL");
+		try(ServletOutputStream out = res.getOutputStream()){
+			ok = runHeartbeat(conn, out);
+			if( ok ){
+				out.println("OK");
+			}else{
+				out.println("FAIL");
+			}
 		}
-		out.close();
 		return;
 	}
 	public synchronized static Date getLastCall(){

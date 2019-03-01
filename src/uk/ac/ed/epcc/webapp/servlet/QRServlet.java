@@ -79,10 +79,8 @@ public class QRServlet extends WebappServlet {
 			return;
 		}
 		res.setContentType("image/png");
-		try {
-			ServletOutputStream out = res.getOutputStream();
+		try(ServletOutputStream out = res.getOutputStream()) {
 			createQRImage(out, text, 300, "png");
-			out.close();
 		} catch (WriterException e) {
 			throw new ServletException(e);
 		}

@@ -186,15 +186,15 @@ public abstract class WebappTestBase implements ContextHolder{
 		if( stream == null ){
 			return null;
 		}
-		Reader reader = new InputStreamReader(stream);
-		char[] buf = new char[1024];
-		int numRead = 0;
-		while ((numRead = reader.read(buf)) != -1) {
-			String readData = String.valueOf(buf, 0, numRead);
-			fileData.append(readData);
-			buf = new char[1024];
+		try(Reader reader = new InputStreamReader(stream)){
+			char[] buf = new char[1024];
+			int numRead = 0;
+			while ((numRead = reader.read(buf)) != -1) {
+				String readData = String.valueOf(buf, 0, numRead);
+				fileData.append(readData);
+				buf = new char[1024];
+			}
 		}
-		reader.close();
 		return fileData.toString();
 		
 	}
@@ -335,15 +335,15 @@ protected void writeFile(String file_name, byte data[]) throws IOException {
 	public String getResourceAsString(String name) throws IOException{
 		InputStream stream = getClass().getResourceAsStream(getContext().expandText(name));
 		StringBuffer fileData = new StringBuffer(1000);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-		char[] buf = new char[1024];
-		int numRead = 0;
-		while ((numRead = reader.read(buf)) != -1) {
-			String readData = String.valueOf(buf, 0, numRead);
-			fileData.append(readData);
-			buf = new char[1024];
+		try(BufferedReader reader = new BufferedReader(new InputStreamReader(stream))){
+			char[] buf = new char[1024];
+			int numRead = 0;
+			while ((numRead = reader.read(buf)) != -1) {
+				String readData = String.valueOf(buf, 0, numRead);
+				fileData.append(readData);
+				buf = new char[1024];
+			}
 		}
-		reader.close();
 		return fileData.toString();
 	}
 	public byte[] getResourceAsBytes(String name) throws IOException, DataFault{

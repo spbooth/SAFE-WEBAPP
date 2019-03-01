@@ -78,9 +78,9 @@ public class ServeDataServlet extends WebappServlet {
 				}
 				res.setContentLength((int) msd.getLength());
 				res.setContentType(msd.getContentType());
-				ServletOutputStream out = res.getOutputStream();
-				msd.write(out);
-				out.close();
+				try(ServletOutputStream out = res.getOutputStream()){
+					msd.write(out);
+				}
 				return;
 			
 		}catch(IOException e){
