@@ -47,7 +47,8 @@ public class BinarySQLValue implements GroupingSQLValue<Number> {
     	this.op=op;
     }
    
-	public int add(StringBuilder sb, boolean qualify) {
+   
+	public final int add(StringBuilder sb, boolean qualify) {
 		
 		offset =a.add(sb, qualify);
 		sb.append(" , ");
@@ -56,7 +57,7 @@ public class BinarySQLValue implements GroupingSQLValue<Number> {
 	}
   
     
-    public Number makeObject(ResultSet rs, int pos) throws DataException, SQLException{
+    public final Number makeObject(ResultSet rs, int pos) throws DataException, SQLException{
     		Number obja = a.makeObject(rs, pos);
 			Number objb = b.makeObject(rs, pos+offset);
 //			Logger log = conn.getService(LoggerService.class).getLogger(getClass());
@@ -67,11 +68,11 @@ public class BinarySQLValue implements GroupingSQLValue<Number> {
 			return op.operate(obja, objb);
     }
 
-	public Class<Number> getTarget() {
+	public final Class<Number> getTarget() {
 		return Number.class;
 	}
 	@Override
-	public String toString(){
+	public final String toString(){
 		StringBuilder sb = new StringBuilder();
 		sb.append("( ");
 		sb.append(a.toString());
@@ -85,7 +86,7 @@ public class BinarySQLValue implements GroupingSQLValue<Number> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public SQLFilter getRequiredFilter() {
+	public final SQLFilter getRequiredFilter() {
 		SQLFilter a_fil = a.getRequiredFilter();
 		SQLFilter b_fil = b.getRequiredFilter();
 		if( a_fil == null ){
@@ -101,59 +102,76 @@ public class BinarySQLValue implements GroupingSQLValue<Number> {
 		}
 	}
 
-	public List<PatternArgument> getParameters(List<PatternArgument> list) {
+	public final List<PatternArgument> getParameters(List<PatternArgument> list) {
 		list = a.getParameters(list);
 		return b.getParameters(list);
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue#addGroup(java.lang.StringBuilder, boolean)
+
+	/**
+	 * @return the a
 	 */
+	protected SQLValue<? extends Number> getA() {
+		return a;
+	}
+
+
+	/**
+	 * @return the b
+	 */
+	protected SQLValue<? extends Number> getB() {
+		return b;
+	}
+	@Override
 	public int addGroup(StringBuilder sb, boolean qualify) {
+		
 		// use embedded groupings if needed
-		int count=0;
-		if( a instanceof GroupingSQLValue){
-			count = ((GroupingSQLValue)a).addGroup(sb, qualify);
+		int count = ((GroupingSQLValue)a).addGroup(sb, qualify);
+
+
+
+		if( count == 0 ){
+			count += ((GroupingSQLValue)b).addGroup(sb, qualify);
 		}else{
-			count = a.add(sb, qualify);
+			StringBuilder sb2 = new StringBuilder();
+			int more = ((GroupingSQLValue)b).addGroup(sb2, qualify);
+			if( more > 0 ){
+				// need non-null from both clauses to add additional
+				// seperator
+				sb.append(" , ");
+				sb.append(sb2);
+			}
 		}
 		
-		if( b instanceof GroupingSQLValue){
-			if( count == 0 ){
-				count += ((GroupingSQLValue)b).addGroup(sb, qualify);
-			}else{
-				StringBuilder sb2 = new StringBuilder();
-				int more = ((GroupingSQLValue)b).addGroup(sb, qualify);
-				if( more > 0 ){
-					// need non-null from both clauses to add additional
-					// seperator
-					sb.append(" , ");
-					sb.append(sb2);
-				}
-			}
-		}else{
-			if( count > 0 ){
-				sb.append(" , ");
-			}
-			count += b.add(sb, qualify);
-		}
 		return count;
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue#getGroupParameters(java.util.List)
 	 */
+	@Override
 	public List<PatternArgument> getGroupParameters(List<PatternArgument> list) {
-		if( a instanceof GroupingSQLValue){
-			list = ((GroupingSQLValue)a).getGroupParameters(list);
-		}else{
-			list = a.getParameters(list);
-		}
-		if( b instanceof GroupingSQLValue){
-			list = ((GroupingSQLValue)b).getGroupParameters(list);
-		}else{
-			list = b.getParameters(list);
-		}
+		GroupingSQLValue a = (GroupingSQLValue) getA();
+		GroupingSQLValue b = (GroupingSQLValue) getB();
+
+		list = a.getGroupParameters(list);
+
+
+		list = b.getGroupParameters(list);
+
 		return list;
 	}
+
+
+	@Override
+	public boolean checkContentsCanGroup() {
+		if( ! (a instanceof GroupingSQLValue)) {
+			return false;
+		}
+		if( ! (b instanceof GroupingSQLValue)) {
+			return false;
+		}
+		return true;
+	}
+	
 }

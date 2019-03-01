@@ -38,6 +38,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  * @param <T> type produced
  * @see SQLExpression 
  * @see GroupingSQLValue
+ * @see NestedSQLValue
  * 
  */
 public interface SQLValue<T> extends Targetted<T>{
@@ -70,7 +71,9 @@ public interface SQLValue<T> extends Targetted<T>{
 	/** Get an SQLFilter required to be added to the filter set.
 	 * This is usually to implement a join.
 	 * 
-	 * @return null of SQLFilter
+	 * @return null or SQLFilter
 	 */
-	public SQLFilter getRequiredFilter();
+	default public SQLFilter getRequiredFilter() {
+		return null;
+	}
 }

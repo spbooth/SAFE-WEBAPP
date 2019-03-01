@@ -33,8 +33,8 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 
 public class MapMapper<K,R> extends GeneralMapMapper<K,R>{
 	private Class<? super K> key_type;
-	public MapMapper(AppContext c,SQLValue<K> key,
-			String key_name) {
+	public MapMapper(AppContext c,GroupingSQLValue<K> key,
+			String key_name) throws InvalidKeyException {
 		super(c);
 		addKey(key,key_name);
 		key_type = key.getTarget();
@@ -47,8 +47,9 @@ public class MapMapper<K,R> extends GeneralMapMapper<K,R>{
 	 * @param key_name
 	 * @param dat
 	 * @param dat_name
+	 * @throws InvalidKeyException 
 	 */
-	public MapMapper(AppContext c, SQLValue<K> key, String key_name, SQLValue<R> dat, String dat_name){
+	public MapMapper(AppContext c, GroupingSQLValue<K> key, String key_name, SQLValue<R> dat, String dat_name) throws InvalidKeyException{
 		this(c,key,key_name);
 		addClause(dat, dat_name);
 	}

@@ -42,7 +42,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  * @param <T> target type of {@link SQLValue}
  *
  */
-public abstract class RemoteSQLValue<H extends DataObject,R extends DataObject, T>  implements SQLValue<T>{
+public abstract class RemoteSQLValue<H extends DataObject,R extends DataObject, T>  implements GroupingSQLValue<T>{
 	public static final Feature CACHE_REMOTE_ACCESSOR_FEATURE = new Feature("cache.remote-accessor",true,"cache expression results when implementing remore expression as a SQLValue");
 	private final IndexedSQLValue<H, R> a;
 	private final AppContext c;

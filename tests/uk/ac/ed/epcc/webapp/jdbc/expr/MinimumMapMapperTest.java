@@ -32,7 +32,7 @@ public class MinimumMapMapperTest extends DateTableTest {
 	
 	
 	@Test
-	public void testMinMillis() throws DataException{
+	public void testMinMillis() throws DataException, InvalidKeyException{
 		DateTableFactory fac = new DateTableFactory(getContext());
 		
 		Map<Integer,Number> result = fac.getMinMap(null);

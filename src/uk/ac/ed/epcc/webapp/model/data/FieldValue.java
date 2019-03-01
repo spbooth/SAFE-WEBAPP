@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.model.data;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLAccessor;
 
 /** SQLAccessor that represents a field in the DataBase
@@ -25,7 +26,7 @@ import uk.ac.ed.epcc.webapp.jdbc.expr.SQLAccessor;
  * @param <T> type of field data
  * @param <X> type of owning DataObject
  */
-public interface FieldValue<T,X> extends  SQLAccessor<T,X>{
+public interface FieldValue<T,X> extends  SQLAccessor<T,X>, GroupingSQLValue<T>{
 	/** Get the corresponding field name. This should not be used to create SQL fragments but
 	 * can be used to identify Repository field names
 	 * 

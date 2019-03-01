@@ -27,7 +27,8 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 
 
 
-/**
+/** A {@link SQLValue} that selects one of a set of values under control of
+ * an {@link ArrayFunc} (e.g. greatest/least).
  * 
  * @author spb
  *

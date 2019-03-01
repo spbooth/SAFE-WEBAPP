@@ -32,7 +32,7 @@ public class BinarySumMapMapperTest extends DateTableTest {
 	
 	
 	@Test
-	public void testSumMillis() throws DataException{
+	public void testSumMillis() throws DataException, InvalidKeyException{
 		DateTableFactory fac = new DateTableFactory(getContext());
 		
 		for (Operator op : Operator.values()) {

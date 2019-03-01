@@ -17,13 +17,16 @@ import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 
-/** A variant of {@link SQLValue} which can produce an alternative
- * SQL fragment for group-by clauses. This allows complex transformations
- * that do not change the grouping result to be optimised.
+/** A variant of {@link SQLValue} which is legal to use for group-by clauses.
+ * This allows the class to generate an alternative
+ * SQL fragment. This allows complex transformations
+ * that do not change the grouping result to be optimised. Not all {@link SQLValue}s can be used
+ * to implement a group-by so this interface needs to be implemented explicitly though there is a default
+ * implementation that works for most simple cases.
  * 
  * If the SQL representation of the {@link SQLValue} is a literal constant it
  * is required to implement this to suppress the group-by clause as literal constants 
- * are illegal in group-by clauses
+ * are illegal in group-by clauses but won't actually change the grouping.
  * 
  * 
  * @author spb
@@ -41,12 +44,24 @@ public interface GroupingSQLValue<T> extends SQLValue<T> {
 	 * @param sb
 	 * @param qualify
 	 * @return actual number of fields added
+	 * @throws CannotGroupException 
 	 */
-	public int addGroup(StringBuilder sb,boolean qualify);
+	default public int addGroup(StringBuilder sb,boolean qualify) {
+		return add(sb, qualify);
+	}
 	/** Get the parameters for a group-by clause.
 	 * 
 	 * @param list
 	 * @return modified list
 	 */
-	public List<PatternArgument> getGroupParameters(List<PatternArgument> list);
+	default public List<PatternArgument> getGroupParameters(List<PatternArgument> list){
+		return getParameters(list);
+	}
+	/** return false if this instance is not able to perform grouping.
+	 * 
+	 * @return
+	 */
+	default public boolean checkContentsCanGroup() {
+		return true;
+	}
 }

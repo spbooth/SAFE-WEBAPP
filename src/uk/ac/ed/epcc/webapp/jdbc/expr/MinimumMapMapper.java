@@ -30,7 +30,7 @@ import uk.ac.ed.epcc.webapp.NumberOp;
 
 public class MinimumMapMapper<K> extends MapMapper<K, Number> {
 
-	public MinimumMapMapper(AppContext c, SQLValue<K> key, String key_name,SQLExpression<? extends Number> val, String value_name) {
+	public MinimumMapMapper(AppContext c, GroupingSQLValue<K> key, String key_name,SQLExpression<? extends Number> val, String value_name) throws InvalidKeyException {
 		super(c, key, key_name);
 		addMin(val, value_name);
 	}

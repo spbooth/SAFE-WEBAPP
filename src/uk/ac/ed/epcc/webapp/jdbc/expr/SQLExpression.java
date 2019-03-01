@@ -33,7 +33,7 @@ package uk.ac.ed.epcc.webapp.jdbc.expr;
  
  *
  */
-public interface SQLExpression<T> extends SQLValue<T>{
+public interface SQLExpression<T> extends GroupingSQLValue<T>{
 	public int hashCode();
 	public boolean equals(Object o);
 }

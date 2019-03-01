@@ -30,7 +30,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 public class AverageMapMapperTest extends DateTableTest {
 
 	@Test
-	public void testAvgMillis() throws DataException{
+	public void testAvgMillis() throws DataException, InvalidKeyException{
 		DateTableFactory fac = new DateTableFactory(getContext());
 		
 		Map<Integer,Number> result = fac.getAvgMap(null);

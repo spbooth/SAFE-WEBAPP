@@ -23,6 +23,8 @@ import java.sql.SQLException;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue;
+import uk.ac.ed.epcc.webapp.jdbc.expr.InvalidKeyException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLGroupMapper;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue;
 /** Creates a Table from a SQL GROUP BY query with a single key.
@@ -42,8 +44,9 @@ public class TableMapper extends SQLGroupMapper<Table> {
      * @param m   Mapper to convert key expression into table key
      * @param key field/expression  to use for key
      * @param key_name  name of key expression (can be null if key is a field name)
+     * @throws InvalidKeyException 
      */
-    public TableMapper(AppContext conn,Mapper m,SQLValue key, String key_name){
+    public TableMapper(AppContext conn,Mapper m,GroupingSQLValue key, String key_name) throws InvalidKeyException{
         super(conn);
         setUseAlias(true);
     	this.m = m;

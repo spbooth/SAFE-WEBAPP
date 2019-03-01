@@ -105,8 +105,9 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 
 		/**
 		 * @param c
+		 * @throws InvalidKeyException 
 		 */
-		public SumMapFinder(AppContext c) {
+		public SumMapFinder(AppContext c) throws InvalidKeyException {
 			super();
 			SumMapMapper<Integer> smm = new SumMapMapper<>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", res.getNumberExpression(getTarget(),Long.class, DateTableFactory.MILLIS), "millis");
 			setMapper(smm);
@@ -118,8 +119,9 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 		/**
 		 * @param c
 		 * @param op 
+		 * @throws InvalidKeyException 
 		 */
-		public BinarySumMapFinder(AppContext c, Operator op) {
+		public BinarySumMapFinder(AppContext c, Operator op) throws InvalidKeyException {
 			super();
 			SumMapMapper<Number> smm = new SumMapMapper<>(c,
 					new BinarySQLValue(c,
@@ -139,8 +141,9 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 
 		/**
 		 * @param c
+		 * @throws InvalidKeyException 
 		 */
-		public ConstSumMapFinder(AppContext c) {
+		public ConstSumMapFinder(AppContext c) throws InvalidKeyException {
 			super();
 			SumMapMapper<Integer> smm = new SumMapMapper<>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", 
 					new ConstExpression<Integer, Integer>(Integer.class, 8), "sumconst");
@@ -151,8 +154,9 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 
 		/**
 		 * @param c
+		 * @throws InvalidKeyException 
 		 */
-		public MinMapFinder(AppContext c) {
+		public MinMapFinder(AppContext c) throws InvalidKeyException {
 			super();
 			MinimumMapMapper<Integer> smm = new MinimumMapMapper<>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", res.getNumberExpression(getTarget(),Long.class, DateTableFactory.MILLIS), "millis");
 			setMapper(smm);
@@ -163,8 +167,9 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 
 		/**
 		 * @param c
+		 * @throws InvalidKeyException 
 		 */
-		public MaxMapFinder(AppContext c) {
+		public MaxMapFinder(AppContext c) throws InvalidKeyException {
 			super();
 			MaximumMapMapper<Integer> mmm = new MaximumMapMapper<>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", res.getNumberExpression(getTarget(),Long.class, DateTableFactory.MILLIS), "millis");
 			setMapper(mmm);
@@ -175,34 +180,35 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 
 		/**
 		 * @param c
+		 * @throws InvalidKeyException 
 		 */
-		public AvgMapFinder(AppContext c) {
+		public AvgMapFinder(AppContext c) throws InvalidKeyException {
 			super();
 			AverageMapMapper<Integer> amm = new AverageMapMapper<>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", res.getNumberExpression(getTarget(),Double.class, DateTableFactory.MILLIS), "avgmillis");
 			setMapper(amm);
 		}		
 	}
-	public Map<Integer,Number> getSumMap(SQLFilter<DateTable> fil) throws DataException{
+	public Map<Integer,Number> getSumMap(SQLFilter<DateTable> fil) throws DataException, InvalidKeyException{
 		SumMapFinder finder = new SumMapFinder(getContext());
 		return finder.find(fil);
 	}
-	public Map<Number,Number> getBinarySumMap(SQLFilter<DateTable> fil, Operator op) throws DataException{
+	public Map<Number,Number> getBinarySumMap(SQLFilter<DateTable> fil, Operator op) throws DataException, InvalidKeyException{
 		BinarySumMapFinder finder = new BinarySumMapFinder(getContext(), op);
 		return finder.find(fil);
 	}
-	public Map<Integer,Number> getConstSumMap(SQLFilter<DateTable> fil) throws DataException{
+	public Map<Integer,Number> getConstSumMap(SQLFilter<DateTable> fil) throws DataException, InvalidKeyException{
 		ConstSumMapFinder finder = new ConstSumMapFinder(getContext());
 		return finder.find(fil);
 	}
-	public Map<Integer,Number> getMinMap(SQLFilter<DateTable> fil) throws DataException{
+	public Map<Integer,Number> getMinMap(SQLFilter<DateTable> fil) throws DataException, InvalidKeyException{
 		MinMapFinder finder = new MinMapFinder(getContext());
 		return finder.find(fil);
 	}
-	public Map<Integer,Number> getMaxMap(SQLFilter<DateTable> fil) throws DataException{
+	public Map<Integer,Number> getMaxMap(SQLFilter<DateTable> fil) throws DataException, InvalidKeyException{
 		MaxMapFinder finder = new MaxMapFinder(getContext());
 		return finder.find(fil);
 	}
-	public Map<Integer,Number> getAvgMap(SQLFilter<DateTable> fil) throws DataException{
+	public Map<Integer,Number> getAvgMap(SQLFilter<DateTable> fil) throws DataException, InvalidKeyException{
 		AvgMapFinder finder = new AvgMapFinder(getContext());
 		return finder.find(fil);
 	}

@@ -37,7 +37,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  */
 public abstract class SQLGroupMapper<O> extends AbstractContexed implements ResultMapper<O> {
 	// This is the list of key fields that need to be output in the GROUP BY clasue
-	    private List<SQLValue> key_list;
+	    private List<GroupingSQLValue> key_list;
 	    private List<SQLValue> target_list; // either Fields  or strings that must be concatenated to make
 	                                                     // target clause this also includes the key fields
 	   
@@ -75,9 +75,13 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 	     * are not legal in group-by clauses so {@link GroupingSQLValue} must be implemented when the SQL representation is a constant.
 	     * @param exp
 	     * @param name 
+	     * @throws InvalidKeyException 
 	     */
-	    public  void addKey(SQLValue<?> exp, String name){
-	    	    key_list.add(addClause(exp,name));
+	    public  void addKey(GroupingSQLValue<?> exp, String name) throws InvalidKeyException{
+	    		if( ! exp.checkContentsCanGroup()) {
+	    			throw new InvalidKeyException("Key does not support Group By");
+	    		}
+	    	    key_list.add((GroupingSQLValue) addClause(exp,name));
 	    }
 	    /** Add a column to the table output
 	     * @param <T> java type produced
@@ -204,37 +208,29 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 		}
 		@Override
 		public List<PatternArgument> getModifyParameters(List<PatternArgument> list) {
-			for(SQLValue<?> o : key_list){
-				if( o instanceof GroupingSQLValue){
-					list = ((GroupingSQLValue<?>)o).getGroupParameters(list);
-				}else{
-					list = o.getParameters(list);
-				}
+			for(GroupingSQLValue<?> o : key_list){
+				list = o.getGroupParameters(list);
 			}
 			return list;
 		}
 		/** add group by clauses corresponding to key list
 		 * @return true is any added.
+		 * @throws CannotGroupException 
 		 */
-		protected boolean addKeyList(StringBuilder sb) {
+		protected boolean addKeyList(StringBuilder sb)  {
 			boolean seen=false;
 			StringBuilder tmp = new StringBuilder();
-			for(SQLValue<?> o : key_list){
+			for(GroupingSQLValue<?> o : key_list){
 				tmp.setLength(0);
 				if(seen){
 					tmp.append(",");
 				}
-				if( o instanceof GroupingSQLValue){
-				  if( ((GroupingSQLValue)o).addGroup(tmp, qualify) > 0 ){
-					  sb.append(tmp);
-					  seen=true;
-				  }
-				}else{
-				   o.add(tmp,qualify);
-				   sb.append(tmp);
-				   seen=true;
+
+				if( o.addGroup(tmp, qualify) > 0 ){
+					sb.append(tmp);
+					seen=true;
 				}
-				
+
 			}
 			return seen;
 		}

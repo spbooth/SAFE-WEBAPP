@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -36,7 +37,7 @@ import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
  */
 
 
-public class TypeProducerFieldValue<T extends DataObject,O,D> implements FieldValue<O,T>,SQLValue<O> {
+public class TypeProducerFieldValue<T extends DataObject,O,D> implements FieldValue<O,T>,GroupingSQLValue<O> {
 	private final Repository repository;
 	private final TypeProducer<O,D> producer;
 	public TypeProducerFieldValue(Repository repository, TypeProducer<O,D> producer) {

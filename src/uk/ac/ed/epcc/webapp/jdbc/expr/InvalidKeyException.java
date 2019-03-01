@@ -13,47 +13,53 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
-import java.util.List;
-
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-
-/** A {@link SQLValue} that wraps a different one
- * 
- * It includes default methods to handle any nested {@link GroupingSQLValue}.
+/**
  * @author Stephen Booth
- * @param <T> type of {@link SQLValue}
- * @param <N> type of nested {@link SQLValue}
  *
  */
-public interface NestedSQLValue<T,N> extends SQLValue<T>, GroupingSQLValue<T> {
+public class InvalidKeyException extends Exception {
 
-	@Override
-	default SQLFilter getRequiredFilter() {
-		return getNested().getRequiredFilter();
+	/**
+	 * 
+	 */
+	public InvalidKeyException() {
+		// TODO Auto-generated constructor stub
 	}
 
-	@Override
-	default int addGroup(StringBuilder sb, boolean qualify)  {
-		GroupingSQLValue<N> n = (GroupingSQLValue<N>) getNested();
-
-		return n.addGroup(sb, qualify);
-
+	/**
+	 * @param message
+	 */
+	public InvalidKeyException(String message) {
+		super(message);
+		// TODO Auto-generated constructor stub
 	}
 
-	@Override
-	default List<PatternArgument> getGroupParameters(List<PatternArgument> list) {
-		SQLValue<N> n = getNested();
-		if( n instanceof GroupingSQLValue) {
-			return ((GroupingSQLValue)n).getGroupParameters(list);
-		}
-		return getParameters(list);
+	/**
+	 * @param cause
+	 */
+	public InvalidKeyException(Throwable cause) {
+		super(cause);
+		// TODO Auto-generated constructor stub
 	}
 
-	public SQLValue<N> getNested();
-
-	@Override
-	default boolean checkContentsCanGroup() {
-		return getNested() instanceof GroupingSQLValue;
+	/**
+	 * @param message
+	 * @param cause
+	 */
+	public InvalidKeyException(String message, Throwable cause) {
+		super(message, cause);
+		// TODO Auto-generated constructor stub
 	}
+
+	/**
+	 * @param message
+	 * @param cause
+	 * @param enableSuppression
+	 * @param writableStackTrace
+	 */
+	public InvalidKeyException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
+		// TODO Auto-generated constructor stub
+	}
+
 }

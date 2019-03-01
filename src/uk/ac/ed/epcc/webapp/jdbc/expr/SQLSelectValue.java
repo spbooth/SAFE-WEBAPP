@@ -20,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
@@ -136,10 +137,7 @@ public class SQLSelectValue<T> implements GroupingSQLValue<T> {
 					sb.append(tmp);
 				}
 			}else {
-				if( count > 0 ) {
-					sb.append(" , ");
-				}
-				count += v.add(sb, qualify);
+				throw new ConsistencyError(v.toString()+" not a GroupingSQLValue");
 			}
 		}
 		return count;
@@ -158,6 +156,16 @@ public class SQLSelectValue<T> implements GroupingSQLValue<T> {
 			}
 		}
 		return list;
+	}
+
+	@Override
+	public boolean checkContentsCanGroup() {
+		for(SQLValue<T> v : accessors) {
+			if( ! (v instanceof GroupingSQLValue)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

@@ -32,7 +32,7 @@ public class MaximumMapMapperTest extends DateTableTest {
 	
 	
 	@Test
-	public void testMaxMillis() throws DataException{
+	public void testMaxMillis() throws DataException, InvalidKeyException{
 		DateTableFactory fac = new DateTableFactory(getContext());
 		
 		Map<Integer, Number> result = fac.getMaxMap(null);

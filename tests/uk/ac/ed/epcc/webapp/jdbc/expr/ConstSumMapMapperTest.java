@@ -32,7 +32,7 @@ public class ConstSumMapMapperTest extends DateTableTest {
 	
 	
 	@Test
-	public void testSumConst() throws DataException{
+	public void testSumConst() throws DataException, InvalidKeyException{
 		DateTableFactory fac = new DateTableFactory(getContext());
 		
 		Map<Integer,Number> result = fac.getConstSumMap(null);

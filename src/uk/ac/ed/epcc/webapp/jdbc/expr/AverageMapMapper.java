@@ -30,7 +30,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 
 public class AverageMapMapper<K> extends MapMapper<K, Number> {
 
-	public AverageMapMapper(AppContext c, SQLValue<K> key, String key_name,SQLExpression<? extends Number> val, String value_name) {
+	public AverageMapMapper(AppContext c, GroupingSQLValue<K> key, String key_name,SQLExpression<? extends Number> val, String value_name) throws InvalidKeyException {
 		super(c, key, key_name);
 		addAverage(val, value_name);
 	}
