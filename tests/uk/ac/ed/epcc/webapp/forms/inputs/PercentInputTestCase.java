@@ -18,10 +18,9 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.Test;
 
-
-
-
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.inputs.PercentInput;
 
 public class PercentInputTestCase extends NumberInputTestCase<Double, PercentInput> {
@@ -37,6 +36,7 @@ public class PercentInputTestCase extends NumberInputTestCase<Double, PercentInp
 		good.add("0%");
 		good.add("100%");
 		good.add("55%");
+		good.add("12.6%");
 		return good;
 	}
 
@@ -56,6 +56,7 @@ public class PercentInputTestCase extends NumberInputTestCase<Double, PercentInp
 		Set<Double> good = new HashSet<>();
 		good.add(0.5);
 		good.add(0.75);
+		good.add(0.752);
 		return good;
 	}
 
@@ -114,5 +115,24 @@ public class PercentInputTestCase extends NumberInputTestCase<Double, PercentInp
 		high.add(0.0);
 		high.add(0.1);
 		return high;
+	}
+	
+	@Test
+	public void testParseFractions() throws ParseException {
+		PercentInput i = new PercentInput();
+		
+		i.parse("12.6%");
+		assertEquals(0.126, i.getValue(), 0.0001);
+		
+		
+	}
+	@Test
+	public void testParseNoFractions() throws ParseException {
+		PercentInput i = new PercentInput(true);
+		
+		i.parse("12.6%");
+		assertEquals(0.12, i.getValue(), 0.0001);
+		
+		
 	}
 }

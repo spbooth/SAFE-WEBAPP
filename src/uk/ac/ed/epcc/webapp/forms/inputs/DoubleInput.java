@@ -67,7 +67,7 @@ public class DoubleInput extends NumberInput<Double> {
 		try {
 			Double i;
 			if (nf != null) {
-				i = nf.parse(v.trim()).doubleValue();
+				i = normalise(nf.parse(v.trim()).doubleValue());
 			} else {
 				i = new Double(Double.parseDouble(v.trim()));
 			}
@@ -78,6 +78,14 @@ public class DoubleInput extends NumberInput<Double> {
 			throw new ParseException("Invalid input format");
 		}
 
+	}
+	/** Extension point to normalise a value after a parse
+	 * 
+	 * @param val
+	 * @return
+	 */
+	protected Double normalise(Double val) {
+		return val;
 	}
 	
 }

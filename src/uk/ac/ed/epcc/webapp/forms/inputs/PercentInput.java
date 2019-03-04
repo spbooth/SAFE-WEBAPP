@@ -27,9 +27,20 @@ import java.text.NumberFormat;
 
 
 public class PercentInput extends DoubleInput {
-   public PercentInput(){
+   public PercentInput() {
+	   this(false);
+   }
+   private final boolean integer_only;
+   public PercentInput(boolean integer_only){
 	   super();
-	   setNumberFormat(NumberFormat.getPercentInstance());
+	   this.integer_only=integer_only;
+	   NumberFormat perc = NumberFormat.getPercentInstance();
+	   if( ! integer_only) {
+		   // Allow up to 3 fractional digits in format/reparse
+		   perc.setMinimumFractionDigits(0);
+		   perc.setMaximumFractionDigits(3);
+	   }
+	   setNumberFormat(perc);
 	   setStep(0.01);
 	   setMin(0.0);
 	   setMax(1.0);
@@ -45,5 +56,13 @@ public String formatRange(Double n) {
 public String getType() {
 	// percentages don't validate in most browsers.
 	return null;
+}
+@Override
+protected Double normalise(Double val) {
+	if( val == null || ! integer_only) {
+		return val;
+	}
+	int perc = (int) (val.doubleValue()*100.0);
+	return new Double((double)perc/100.0);
 }
 }
