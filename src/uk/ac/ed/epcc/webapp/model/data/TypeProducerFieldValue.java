@@ -22,8 +22,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider;
 import uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue;
-import uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
@@ -31,9 +31,13 @@ import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 /** A SQLAccessor for a field with a {@link TypeProducer}
  * This accessor returns the produced object.
  * 
+ * Unlike most {@link FieldValue}s it is neither a {@link FieldSQLExpression} not
+ * a {@link FilterProvider} but it can generate filters via {@link FieldValueFilter}.
+ * 
  * @author spb
  * @param <T> type of owning object
  * @param <O> type of produced object
+ * @see FieldValueFilter
  */
 
 

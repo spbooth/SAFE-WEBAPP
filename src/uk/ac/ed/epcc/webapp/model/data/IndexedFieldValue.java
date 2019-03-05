@@ -133,6 +133,7 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 		if(match == null ){
 			return new SQLValueFilter<>(target,repository,producer.getField(),val.getID());
 		}
+		// This is slightly meaningless but there might be some call for it.
 		return new SQLValueFilter<>(target,repository,producer.getField(),match,val.getID());
 	}
 	@Override
