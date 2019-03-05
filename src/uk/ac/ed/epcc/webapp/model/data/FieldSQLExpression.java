@@ -15,7 +15,7 @@ package uk.ac.ed.epcc.webapp.model.data;
 
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 
-/**
+/** A {@link FieldValue} that is also a {@link SQLExpression}
  * @author spb
  * @param <T> type of field data
  * @param <X> type of owning DataObject

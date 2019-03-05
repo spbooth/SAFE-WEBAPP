@@ -38,7 +38,9 @@ public interface PatternArgument {
 	 * @return Field name
 	 */
 	public String getField();
-	/** Get raw object
+	/** Get raw object 
+	 * 
+	 * For debugging messages
 	 * 
 	 * @return Raw object.
 	 */
@@ -47,5 +49,7 @@ public interface PatternArgument {
 	 * This is for marking info like passwords that should never be logged.
 	 * @return boolean
 	 */
-	public boolean canLog();
+	default public boolean canLog() {
+		return true;
+	}
 }
