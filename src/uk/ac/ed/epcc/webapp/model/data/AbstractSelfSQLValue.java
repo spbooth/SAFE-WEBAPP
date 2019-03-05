@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider;
+import uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLAccessor;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
@@ -45,7 +46,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  */
 
 
-public abstract class AbstractSelfSQLValue<T extends DataObject,R> implements SQLAccessor<IndexedReference,R>,FilterProvider<R, IndexedReference>,IndexedSQLValue<R, T> {
+public abstract class AbstractSelfSQLValue<T extends DataObject,R> implements SQLAccessor<IndexedReference,R>,FilterProvider<R, IndexedReference>,IndexedSQLValue<R, T>,GroupingSQLValue<IndexedReference> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue#getIDExpression()
 	 */

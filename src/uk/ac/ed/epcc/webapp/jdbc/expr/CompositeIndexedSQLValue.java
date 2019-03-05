@@ -34,7 +34,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  *
  */
 public class CompositeIndexedSQLValue<H extends DataObject,I extends DataObject, T extends DataObject> 
-implements IndexedSQLValue<H,T>{
+implements IndexedSQLValue<H,T>, GroupingSQLValue<IndexedReference>{
 	public CompositeIndexedSQLValue(IndexedSQLValue<H, I> base, IndexedSQLValue<I, T> branch) throws CannotFilterException {
 		super();
 		this.base = base;

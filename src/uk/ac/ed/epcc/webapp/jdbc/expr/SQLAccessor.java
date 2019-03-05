@@ -29,6 +29,6 @@ import uk.ac.ed.epcc.webapp.model.data.FieldValue;
  * @param <T> type of result value
  * @param <R> target object
  */
-public interface SQLAccessor<T,R> extends Accessor<T,R>, SQLValue<T> {
+public interface SQLAccessor<T,R> extends Accessor<T,R>, GroupingSQLValue<T> {
 
 }
