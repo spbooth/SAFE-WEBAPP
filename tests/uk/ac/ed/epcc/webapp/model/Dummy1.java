@@ -36,14 +36,18 @@ import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.FieldValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.FilterResult;
 import uk.ac.ed.epcc.webapp.model.data.Removable;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.TestComposable;
+import uk.ac.ed.epcc.webapp.model.data.TypeProducerFieldValue;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.convert.EnumProducer;
 import uk.ac.ed.epcc.webapp.model.data.convert.NumericEnumProducer;
 import uk.ac.ed.epcc.webapp.model.data.filter.FieldOrderFilter;
+import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
+import uk.ac.ed.epcc.webapp.model.data.filter.FilterUpdate;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 /** class instantiating the standard test table.
  * 
@@ -223,6 +227,11 @@ public class Dummy1 extends DataObject implements Removable {
          		super(Factory.this.getTarget(),res,NAME,s);
          	}
          }
+         public class BeatleFilter extends FieldValueFilter<Beatle, Dummy1>{
+        	 public BeatleFilter(Beatle beat) {
+        		 super(Factory.this.getTarget(),res.getTypeProducerExpression(beatles),beat);
+        	 }
+         }
 		public Factory(AppContext c) {
 			setContext(c,DEFAULT_TABLE);
 		}
@@ -237,10 +246,8 @@ public class Dummy1 extends DataObject implements Removable {
 			return new Dummy1(res);
 		}
     	public void nuke() throws DataFault{
-    		for(Iterator it = getAllIterator(); it.hasNext();){
-    			DataObject o = (DataObject) it.next();
-    			o.delete();
-    		}
+    		FilterDelete del = new FilterDelete<>(res);
+    		del.delete(null);
     	}
 		@Override
 		protected List<OrderClause> getOrder() {
@@ -257,6 +264,13 @@ public class Dummy1 extends DataObject implements Removable {
 		}
 		public SQLExpression<String> getNameExpression(){
 			return res.getStringExpression(getTarget(), NAME);
+		}
+		public SQLExpression<Number> getNumberExpression(){
+			return res.getNumberExpression(getTarget(), Number.class, NUMBER);
+		}
+		
+		public TypeProducerFieldValue<Dummy1, Beatle, String> getBeatleFieldValue(){
+			return res.getTypeProducerExpression(beatles);
 		}
 		public FilterResult<Dummy1> getWithFilter() throws DataFault{
 			AndFilter<Dummy1>fil = new AndFilter<>(getTarget());
@@ -302,7 +316,12 @@ public class Dummy1 extends DataObject implements Removable {
 		public StringAcceptFilter getStringAcceptFilter(String s) {
 			return new StringAcceptFilter(s);
 		}
-		
+		public BeatleFilter getBeatleFilter(Beatle beat) {
+			return new BeatleFilter(beat);
+		}
+		public FilterUpdate<Dummy1> getUpdate(){
+			return new FilterUpdate<>(res);
+		}
     }
 
 

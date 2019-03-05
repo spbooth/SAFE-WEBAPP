@@ -37,6 +37,7 @@ import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
  * @author spb
  * @param <T> type of owning object
  * @param <O> type of produced object
+ * @param <D> type of underlying data
  * @see FieldValueFilter
  */
 

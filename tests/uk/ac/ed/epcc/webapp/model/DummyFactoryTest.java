@@ -28,7 +28,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.expr.BinaryExpression;
+import uk.ac.ed.epcc.webapp.jdbc.expr.ConstExpression;
+import uk.ac.ed.epcc.webapp.jdbc.expr.Operator;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
@@ -37,9 +41,11 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.Dummy1.Beatle;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactoryTestCase;
+import uk.ac.ed.epcc.webapp.model.data.FieldSQLExpression;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
+import uk.ac.ed.epcc.webapp.model.data.filter.FilterUpdate;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 public class DummyFactoryTest extends DataObjectFactoryTestCase {
@@ -351,6 +357,44 @@ public class DummyFactoryTest extends DataObjectFactoryTestCase {
 		assertFalse(fac.exists(null));
 		
 		checkDiff("/cleanup.xsl", "backup.xml");
+	}
+	@Test
+	public void testTypeProducerFilter() throws DataException {
+		Dummy1.Factory fac = (Dummy1.Factory) getFactory();
+		for(Beatle b : Dummy1.Beatle.values()) {
+			Dummy1 d = fac.makeBDO();
+			d.setBeatle(b);
+			d.commit();
+		}
+		
+		assertEquals((long) Dummy1.Beatle.values().length, fac.getCount(null));
+		
+		Dummy1 ringo = fac.find(fac.getBeatleFilter(Beatle.Ringo));
+		assertEquals(Beatle.Ringo, ringo.getBeatle());
+	}
+	@Test
+	public void testUpdate() throws DataException {
+		Dummy1.Factory fac = (Dummy1.Factory) getFactory();
+		int i=0;
+		for(Beatle b : Dummy1.Beatle.values()) {
+			if( b != Beatle.John) {
+				Dummy1 d = fac.makeBDO();
+				d.setBeatle(b);
+				d.setNumber(i++);
+				d.setName(b.toString());
+				d.commit();
+			}
+		}
+		FilterUpdate update = fac.getUpdate();
+		
+		update.updateExpression((FieldSQLExpression) fac.getNumberExpression(), BinaryExpression.create(ctx,fac.getNumberExpression(),Operator.MUL, new ConstExpression(Number.class, 7)), null);
+		update.update(fac.getBeatleFieldValue(), Beatle.John, fac.getBeatleFilter(Beatle.Ringo));
+		
+		Dummy1 d = fac.find(fac.getBeatleFilter(Beatle.John));
+		
+		assertEquals(7,d.getNumber());
+		
+		
 	}
 	
 }
