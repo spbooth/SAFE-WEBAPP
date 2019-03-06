@@ -72,6 +72,10 @@ public class DistinctCount<D> extends Number {
 		v.add(obj);
 		return new DistinctCount<>(v);
 	}
+	
+	public static <D> DistinctCount zero() {
+		return new DistinctCount<>(new HashSet<>(0));
+	}
 
 	public static <D> DistinctCount<D> add(DistinctCount<D> a, DistinctCount<D> b){
 		if( a == null) {
