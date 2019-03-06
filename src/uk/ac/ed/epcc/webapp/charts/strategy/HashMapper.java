@@ -72,7 +72,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 		 * @see uk.ac.ed.epcc.webapp.charts.Chart.RangeMapper#getOverlapp(java.lang.Object,
 		 *      java.util.Date, java.util.Date)
 		 */
-		public float getOverlapp(T o, Date start, Date end) {
+		public float getOverlapp(T o, Date start, Date end) throws Exception {
 
 			return rm.getOverlapp(o, start, end);
 		}

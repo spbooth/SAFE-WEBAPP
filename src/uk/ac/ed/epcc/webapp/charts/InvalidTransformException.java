@@ -13,12 +13,45 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.charts;
 
-/**
+/**  Exception thrown when a problem occurs mapping data to a plot
 	 * @author spb
 	 * 
 	 */
 
 	public class InvalidTransformException extends Exception {
+
+		/**
+	 * 
+	 */
+	public InvalidTransformException() {
+		super();
+	}
+
+	/**
+	 * @param message
+	 * @param cause
+	 * @param enableSuppression
+	 * @param writableStackTrace
+	 */
+	public InvalidTransformException(String message, Throwable cause, boolean enableSuppression,
+			boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
+	}
+
+	/**
+	 * @param message
+	 * @param cause
+	 */
+	public InvalidTransformException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	/**
+	 * @param cause
+	 */
+	public InvalidTransformException(Throwable cause) {
+		super(cause);
+	}
 
 		/**
 		 * 

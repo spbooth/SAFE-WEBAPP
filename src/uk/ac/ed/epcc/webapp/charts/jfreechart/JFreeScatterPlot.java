@@ -21,7 +21,6 @@ import uk.ac.ed.epcc.webapp.charts.InvalidTransformException;
 import uk.ac.ed.epcc.webapp.charts.Plot;
 import uk.ac.ed.epcc.webapp.charts.ScatterPeriodPlot;
 import uk.ac.ed.epcc.webapp.charts.strategy.RangeMapper;
-import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.time.RegularSplitPeriod;
 import uk.ac.ed.epcc.webapp.time.SplitTimePeriod;
@@ -54,21 +53,25 @@ public class JFreeScatterPlot implements ScatterPeriodPlot {
 	 */
 	public <D> void addData(RangeMapper<D> x, RangeMapper<D> y, D object)
 			throws InvalidTransformException {
-		for(TimePeriod p : period.getSubPeriods()){
-			System.out.println("Outer period "+p.toString());
-			RegularSplitPeriod p2 = new RegularSplitPeriod(p.getStart(), p.getEnd(), nsplit);
-			for(TimePeriod q : p2.getSubPeriods()){
-				Date start = q.getStart();
-				Date end = q.getEnd();
-				System.out.println("inner period "+q);
-				if( x.overlapps(object, start, end) && y.overlapps(object, start, end)){
-					float fx = x.getOverlapp(object, start, end);
-					float fy = y.getOverlapp(object, start, end);
-					series.add(fx, fy);
+		try {
+			for(TimePeriod p : period.getSubPeriods()){
+				System.out.println("Outer period "+p.toString());
+				RegularSplitPeriod p2 = new RegularSplitPeriod(p.getStart(), p.getEnd(), nsplit);
+				for(TimePeriod q : p2.getSubPeriods()){
+					Date start = q.getStart();
+					Date end = q.getEnd();
+					System.out.println("inner period "+q);
+					if( x.overlapps(object, start, end) && y.overlapps(object, start, end)){
+						float fx = x.getOverlapp(object, start, end);
+						float fy = y.getOverlapp(object, start, end);
+						series.add(fx, fy);
+					}
 				}
 			}
+		}catch(Exception e) {
+			throw new InvalidTransformException(e);
 		}
-		
+
 	}
 	
 	public void setLabel(String key){
@@ -78,7 +81,7 @@ public class JFreeScatterPlot implements ScatterPeriodPlot {
 	 * @see uk.ac.ed.epcc.webapp.charts.Plot#scale(float)
 	 */
 	public void scale(float scale) {
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
 		
 	}
 	/* (non-Javadoc)

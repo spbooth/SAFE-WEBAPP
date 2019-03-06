@@ -27,9 +27,10 @@ public interface PeriodPlot extends SetPlot {
 	 * @param t
 	 * @param object
 	 * @throws uk.ac.ed.epcc.webapp.charts.InvalidTransformException
+	 * @throws Exception 
 	 */
 	public <D> void addData(SetRangeMapper<D> t, D object)
-			throws uk.ac.ed.epcc.webapp.charts.InvalidTransformException;
+			throws Exception;
 
 	/** Populate plot using a {@link QueryMapper} and a factory 
 	 * 

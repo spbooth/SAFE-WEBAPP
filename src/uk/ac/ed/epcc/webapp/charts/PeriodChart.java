@@ -67,7 +67,7 @@ public abstract class PeriodChart<P extends PeriodPlot> extends Chart {
 	 * @throws uk.ac.ed.epcc.webapp.charts.InvalidTransformException
 	 */
 	protected final <D> void addData(P ds, SetRangeMapper<D> t, D object)
-			throws uk.ac.ed.epcc.webapp.charts.InvalidTransformException{
+			throws Exception{
 		ds.addData(t, object);
 		adds++;
 		if( limit != null && limit_check> 0 && adds%limit_check==0) {
@@ -97,10 +97,10 @@ public abstract class PeriodChart<P extends PeriodPlot> extends Chart {
 	 * 
 	 * @param t
 	 * @param i
-	 * @throws InvalidTransformException
+	 * @throws Exception 
 	 */
 	public final <D> void addDataIterator(P ds,SetRangeMapper<D> t, Iterator<D> i)
-			throws InvalidTransformException {
+			throws Exception {
 		// Note we can't call this method addData or there may be an ambiguity against
 		// this single addData because the type erases to Object  
 		while (i.hasNext()) {
@@ -115,10 +115,10 @@ public abstract class PeriodChart<P extends PeriodPlot> extends Chart {
 	 * 
 	 * @param t
 	 * @param o
-	 * @throws InvalidTransformException
+	 * @throws Exception 
 	 */
 	public final <D> void addDataArray(P ds, SetRangeMapper<D> t, D[] o)
-			throws InvalidTransformException {
+			throws Exception {
 		for (int i = 0; i < o.length; i++) {
 			addData(ds, t, o[i]);
 		}

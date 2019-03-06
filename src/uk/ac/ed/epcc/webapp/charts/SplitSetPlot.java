@@ -242,9 +242,10 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 	 * @param ds
 	 * @param t
 	 * @param o
+	 * @throws Exception 
 	 */
 	public <D> void   addData(SetRangeMapper<D> t, D o)
-			throws InvalidTransformException {
+			throws Exception {
 		int set = t.getSet(o);
 		int nMajor=getNumCats();
 		int nMinor=getNumItems();

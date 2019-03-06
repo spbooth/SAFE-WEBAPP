@@ -40,7 +40,7 @@ public abstract class AbstractPeriodSetPlot extends AbstractSingleValueSetPlot i
 	}
 
 
-	public <D> void addData(SetRangeMapper<D> t, D r) {
+	public <D> void addData(SetRangeMapper<D> t, D r) throws Exception {
 		TimePeriod p = getPeriod();
 		Date start = p.getStart();
 		Date end = p.getEnd();

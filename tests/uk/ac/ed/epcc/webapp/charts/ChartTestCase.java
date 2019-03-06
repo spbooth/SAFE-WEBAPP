@@ -20,7 +20,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
 
-import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.charts.strategy.LabelledSetRangeMapper;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
@@ -39,9 +38,9 @@ public abstract class ChartTestCase extends WebappTestBase {
      * 
      * @param c
      * @param p 
-     * @throws InvalidTransformException 
+	 * @throws Exception 
      */
-	public <P extends PeriodPlot> void loadData(PeriodChart<P> c, P p) throws InvalidTransformException{
+	public <P extends PeriodPlot> void loadData(PeriodChart<P> c, P p) throws Exception{
 	  Date s = c.getStartDate();
 	  Date e = c.getEndDate();
 	  

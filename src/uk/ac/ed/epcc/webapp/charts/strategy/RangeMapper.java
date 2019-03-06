@@ -38,7 +38,7 @@ public interface RangeMapper<T> extends PlotStrategy{
 	 *            period end as Date
 	 * @return value of overlapp.
 	 */
-	public float getOverlapp(T o, Date start, Date end);
+	public float getOverlapp(T o, Date start, Date end) throws Exception;
 
 	/**
 	 * does this object overlap with the specified time period.
