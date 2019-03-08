@@ -17,8 +17,10 @@
 package uk.ac.ed.epcc.webapp.charts;
 
 import java.util.Calendar;
+import java.util.Map.Entry;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.time.Period;
 
 /**
@@ -36,23 +38,23 @@ import uk.ac.ed.epcc.webapp.time.Period;
  * 
  */
 
-public final class BarTimeChart<P extends PeriodSetPlot> extends SetPeriodChart<P> {
-	private P plot=null;
+public final class BarTimeChart<S extends PeriodSetPlot> extends PeriodChart<S> {
+	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see uk.ac.hpcx.report.QuantByCategory#getData(uk.ac.hpcx.AppContext)
 	 */
-	protected BarTimeChart(AppContext c,Period p) {
-		super(c,p);
+	protected BarTimeChart(AppContext c) {
+		super(c);
 	}
 
 	
 
 	@SuppressWarnings("unchecked")
-	public P addBarChart(int nset) {
-		BarTimeChartData<P> chart = (BarTimeChartData) getChartData();
-		return plot=chart.addBarChart(nset);
+	public S getBarChartSeries(String series,int nset) {
+		BarTimeChartData<S> chart = (BarTimeChartData) getChartData();
+		return chart.getBarChartSeries(series, nset);
 	}
 
 
@@ -65,12 +67,26 @@ public final class BarTimeChart<P extends PeriodSetPlot> extends SetPeriodChart<
 		return getInstance(c, new Period(s.getTime(),e.getTime()));
 	}
 
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.charts.PeriodChart#getTable()
+	 */
 	@Override
-	public P getPlot() {
-		return plot;
+	public Table getTable() {
+		Table t = new Table();
+		BarTimeChartData<S> data = (BarTimeChartData<S>) getChartData();
+		for(Entry<String, S> e : data.getSeries().entrySet()) {
+			S ds = e.getValue();
+			String quant = e.getKey();
+			if( ds != null ){
+				t.add(ds.getTable(quant));
+				if( ds.hasLegends()){
+					t.setKeyName(getLegendName());
+				}
+			}
+		}
+		return t;
 	}
-	@Override
-    public void setPlot(P ds) {
-    	this.plot=ds;
-    }
+
 }

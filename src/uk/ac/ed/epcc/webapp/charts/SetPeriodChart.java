@@ -30,10 +30,10 @@ import uk.ac.ed.epcc.webapp.time.Period;
  *
  * @param <P>
  */
-public abstract class SetPeriodChart<P extends PeriodSetPlot> extends PeriodChart<P> {
+public abstract class SetPeriodChart<P extends PeriodPlot> extends PeriodChart<P> {
 
-	protected SetPeriodChart(AppContext c, Period p) {
-		super(c, p);
+	protected SetPeriodChart(AppContext c) {
+		super(c);
 	}
 
 	

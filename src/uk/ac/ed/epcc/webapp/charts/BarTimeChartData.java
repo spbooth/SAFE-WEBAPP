@@ -16,9 +16,17 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.charts;
 
+import java.util.Map;
+
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
-public interface BarTimeChartData<P extends PeriodSetPlot> extends PeriodChartData<P> {
+public interface BarTimeChartData<S extends PeriodSetPlot> extends PeriodChartData<S> {
 	public void setPeriod(TimePeriod period);
-	public abstract P addBarChart(int nset);
+	public abstract S getBarChartSeries(String series,int nset);
+	
+	public boolean isStacked();
+	
+	public void setStacked(boolean value);
+	
+	public Map<String,S> getSeries();
 }

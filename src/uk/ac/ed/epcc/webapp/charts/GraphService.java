@@ -48,7 +48,7 @@ public abstract class GraphService extends AbstractContexed implements AppContex
 	 */
 	protected abstract ChartData getPieChartData();
 	public final PieTimeChart getPieTimeChart(Period p) {
-		PieTimeChart ptc = new PieTimeChart(conn,p);
+		PieTimeChart ptc = new PieTimeChart(conn);
 		PieTimeChartData chart = getPieTimeChartData();
 		
 		chart.setPeriod(p);
@@ -77,7 +77,7 @@ public abstract class GraphService extends AbstractContexed implements AppContex
 	protected abstract  ScatterPeriodChartData getScatterPeriodChartData() ;
 
 	public final BarTimeChart getBarTimeChart( Period p) throws Exception {
-		BarTimeChart ptc = new BarTimeChart(conn,p);
+		BarTimeChart ptc = new BarTimeChart(conn);
 		BarTimeChartData chartData=getBarTimeChartData();
 		
 		chartData.setPeriod(p);

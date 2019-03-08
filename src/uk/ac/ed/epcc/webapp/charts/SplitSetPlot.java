@@ -48,7 +48,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 
 	public abstract int getNumItems();
 
-	public abstract float get(int set, int cat, int item);;
+	public abstract float get(int set, int cat, int item);
 
 	public abstract void set(int nset, int cat, int item, float value);
 

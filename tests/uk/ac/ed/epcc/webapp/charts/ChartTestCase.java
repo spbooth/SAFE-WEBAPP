@@ -41,6 +41,9 @@ public abstract class ChartTestCase extends WebappTestBase {
 	 * @throws Exception 
      */
 	public <P extends PeriodPlot> void loadData(PeriodChart<P> c, P p) throws Exception{
+		loadData(c, p, 1.0F);
+	}
+	public <P extends PeriodPlot> void loadData(PeriodChart<P> c, P p,float scale) throws Exception{	
 	  Date s = c.getStartDate();
 	  Date e = c.getEndDate();
 	  
@@ -48,7 +51,7 @@ public abstract class ChartTestCase extends WebappTestBase {
 	  Calendar end = Calendar.getInstance();
 	  d.setTime(s);
 	  end.setTime(e);
-	  LabelledSetRangeMapper<Calendar> f = new DayTransform();
+	  LabelledSetRangeMapper<Calendar> f = new DayTransform(scale);
 	  while( d.before(end)){
 		  c.addData(p, f, d);
 		  d.add(Calendar.DAY_OF_YEAR, 1);
@@ -58,7 +61,15 @@ public abstract class ChartTestCase extends WebappTestBase {
 	  
   }
 	public static class DayTransform implements LabelledSetRangeMapper<Calendar>{
+		/**
+		 * @param scale
+		 */
+		public DayTransform(float scale) {
+			super();
+			this.scale = scale;
+		}
 
+		private final float scale;
 		@Override
 		public int getSet(Calendar c) {
 			return c.get(Calendar.DAY_OF_WEEK);
@@ -88,7 +99,7 @@ public abstract class ChartTestCase extends WebappTestBase {
 			if( s >= f){
 			   return 0;
 			}
-			return (float)(f-s)/(float)(value);
+			return scale * (float)(f-s)/(float)(value);
 		}
 
 		@Override

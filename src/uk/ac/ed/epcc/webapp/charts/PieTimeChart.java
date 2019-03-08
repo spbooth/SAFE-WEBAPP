@@ -50,8 +50,8 @@ public final class PieTimeChart<P extends PeriodSetPlot> extends SetPeriodChart<
 	 * 
 	 * @see uk.ac.hpcx.report.QuantByCategory#getData(uk.ac.hpcx.AppContext)
 	 */
-	protected PieTimeChart(AppContext c,Period p) {
-		super(c,p);
+	protected PieTimeChart(AppContext c) {
+		super(c);
 	}
 
 	@SuppressWarnings("unchecked")
