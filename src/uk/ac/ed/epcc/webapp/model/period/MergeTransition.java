@@ -26,7 +26,7 @@ import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
 public class MergeTransition<T extends TimePeriod,K> extends AbstractDirectTransition<T> implements GatedTransition<T>{
 
-	private final boolean move_up;
+	protected final boolean move_up;
 	private final ViewTransitionFactory<K, T> tp;
 	private final SequenceManager<T> fac;
 	public MergeTransition(ViewTransitionFactory<K, T> tp, SequenceManager<T> fac,boolean go_up){

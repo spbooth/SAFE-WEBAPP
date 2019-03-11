@@ -114,7 +114,7 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 		}
     	
     }
-	private final boolean move_start;
+	protected final boolean move_start;
 	private final ViewTransitionFactory<K, T> tp;
 	private final SequenceManager<T> fac;
 	private static final String MOVE_SPLIT_FIELD = "MoveSplit";
