@@ -237,4 +237,15 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 		}
 		return log;
 	}
+	/** static helper method to negate filters
+	 * 
+	 * @param fac {@link DataObjectFactory}
+	 * @param input original {@link BaseFilter}
+	 * @return negated {@link BaseFilter}
+	 * @throws Exception
+	 */
+	public static <X extends DataObject> BaseFilter<X> negate(DataObjectFactory<X> fac, BaseFilter<X> input) throws Exception{
+		NegatingFilterVisitor<X> vis = new NegatingFilterVisitor<>(fac);
+		return input.acceptVisitor(vis);
+	}
 }

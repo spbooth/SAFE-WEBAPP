@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.model.lifecycle;
 
 import java.util.LinkedList;
 
+import uk.ac.ed.epcc.webapp.model.AbstractConstructedTargetList;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
@@ -33,7 +34,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
  * @param <T> 
  *
  */
-public class ListenerList<T extends DataObject> extends AbstractList<T,LifeCycleListener<T>> implements LifeCycleListener<T>{
+public class ListenerList<T extends DataObject> extends AbstractConstructedTargetList<T,LifeCycleListener<T>> implements LifeCycleListener<T>{
 
 	
 	public ListenerList(DataObjectFactory<T> factory,String list_name){

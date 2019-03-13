@@ -11,7 +11,7 @@
 //| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
-package uk.ac.ed.epcc.webapp.model.lifecycle;
+package uk.ac.ed.epcc.webapp.model;
 
 import java.util.LinkedList;
 
@@ -26,7 +26,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 /** A {@link LinkedList} of {@link Targetted} objects that is populated
  * from configuration parameters.
  * 
- * The aim is to remove unecessary code dependencies 
+ * The aim is to remove unnecessary code dependencies.
  * 
  * 
  * This looks in the parameter <b><em>tag</em>.<em>list-name</em></b> where
@@ -34,14 +34,17 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
  * This value is interpreted as a comma separated list of class tags and used to create the
  * listeners. The target classes for the listeners and the factory are checked for type conflicts.
  * 
+ * 
  * @author spb
+ * @param <T> type of data object
+ * @param <L> type of constructed object
  *
  */
-public abstract class AbstractList<T extends DataObject,L extends Targetted> extends LinkedList<L> implements Contexed,Targetted<T>{
+public abstract class AbstractConstructedTargetList<T extends DataObject,L extends Targetted> extends LinkedList<L> implements Contexed,Targetted<T>{
 
 	private final AppContext conn;
 	private final Class<T> target;
-	public AbstractList(DataObjectFactory<T> factory,String list_name){
+	public AbstractConstructedTargetList(DataObjectFactory<T> factory,String list_name){
 		super();
 		this.conn=factory.getContext();
 		this.target=factory.getTarget();
@@ -54,12 +57,12 @@ public abstract class AbstractList<T extends DataObject,L extends Targetted> ext
 				if( a == null){
 					getLogger().error(action+" failed to resolve to "+getTemplate().getCanonicalName());
 				}else if( ! a.getTarget().isAssignableFrom(factory.getTarget())){
-					getLogger().error("Incompatible targets for listener "+a.getTarget().getCanonicalName()+" "+factory.getTarget().getCanonicalName());;
+					getLogger().error("Incompatible targets for list member "+a.getTarget().getCanonicalName()+" "+factory.getTarget().getCanonicalName());;
 				}else{
 					add(a);
 				}
 				}catch(Exception t){
-					getLogger().error("Error making listener list for action="+action,t);
+					getLogger().error("Error making list for action="+action,t);
 				}
 			}
 		}
