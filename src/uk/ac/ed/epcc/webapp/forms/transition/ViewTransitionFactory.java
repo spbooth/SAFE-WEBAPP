@@ -47,7 +47,9 @@ public interface ViewTransitionFactory<K, T> extends TransitionFactory<K, T> {
     * @param sess
     * @return boolean
     */
-   public <X extends ContentBuilder> X getTopContent(X cb,T target, SessionService<?> sess);
+   default public <X extends ContentBuilder> X getTopContent(X cb,T target, SessionService<?> sess) {
+	   return cb;
+   }
 
    /** Get the content to be displayed at the bottom of the target page.
     * This content is at the top level of the page
@@ -57,7 +59,9 @@ public interface ViewTransitionFactory<K, T> extends TransitionFactory<K, T> {
     * @param sess
     * @return boolean
     */
-   public <X extends ContentBuilder> X getBottomContent(X cb,T target, SessionService<?> sess);
+   default public <X extends ContentBuilder> X getBottomContent(X cb,T target, SessionService<?> sess) {
+	   return cb;
+   }
 
    /** Get the content to be displayed on the view target page as part of the target pane.
     * 
@@ -72,12 +76,16 @@ public interface ViewTransitionFactory<K, T> extends TransitionFactory<K, T> {
     * @param key
     * @return String or null
     */
-   public String getHelp(K key);
+   default public String getHelp(K key) {
+	   return null;
+   }
    
    /** get custom button content. should default to the string representation of the key
     * 
     * @param key
     * @return String
     */
-   public String getText(K key);
+   default public String getText(K key) {
+	   return key.toString();
+   }
 }

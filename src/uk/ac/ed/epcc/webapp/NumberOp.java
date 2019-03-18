@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp;
 
+import uk.ac.ed.epcc.webapp.exceptions.UnsupportedOperation;
 import uk.ac.ed.epcc.webapp.model.data.Duration;
 
 
@@ -84,6 +85,9 @@ public class NumberOp {
 		}
 		if( a instanceof DistinctCount && b instanceof DistinctCount) {
 			return DistinctCount.add((DistinctCount)a,(DistinctCount) b);
+		}
+		if( a instanceof DistinctCount || b instanceof DistinctCount) {
+			throw new UnsupportedOperation("Cannot add DistinctCount to other numbers");
 		}
 		if( useDuration(a) || useDuration(b)){
 			// use scale of 1 as this will be the unit returned by a Duration.longValue

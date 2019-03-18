@@ -273,6 +273,11 @@ margin: 5px 0px;
 	display: inline;
 }
 
+/** button in a list
+*/
+li form{
+	display: inline;
+}
 
 div.block td form, div.wideblock td form{
 	background-color: inherit;
