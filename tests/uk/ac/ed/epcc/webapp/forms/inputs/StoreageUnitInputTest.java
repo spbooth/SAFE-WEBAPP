@@ -102,5 +102,9 @@ public class StoreageUnitInputTest extends NumberInputTestCase<Long,StorageUnitI
 		high.add(4L);
 		return high;
 	}
+	@Override
+	protected String getExpectedType() {
+		return null;
+	}
 
 }

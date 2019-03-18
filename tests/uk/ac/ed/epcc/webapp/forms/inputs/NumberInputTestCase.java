@@ -40,6 +40,13 @@ public abstract class NumberInputTestCase<N extends Number,I extends NumberInput
 	}
 
 
+	/** get the html5 type expected.
+	 * 
+	 * If you override the getType method on the input the test needs to override
+	 * this to match
+	 * 
+	 * @return
+	 */
 	protected String getExpectedType() {
 		return "number";
 	}
