@@ -99,4 +99,17 @@ public interface SimpleXMLBuilder {
 	 * @return previous setting.
 	 */
 	public boolean setEscapeUnicode(boolean escape_unicode);
+	
+	/** Add an object depending on its type. This should always map to {@link #addParent()}
+	 * on child objects.
+	 * 
+	 * @param target
+	 */
+	public default <X> void addObject(X target) {
+		if( target instanceof XMLGenerator) {
+			((XMLGenerator)target).addContent(this);
+		}else {
+			clean(target.toString());
+		}
+	}
 }
