@@ -32,7 +32,11 @@ public class DoubleInput extends NumberInput<Double> {
 			return  new Double(((Number)v).doubleValue());
 		}
 		if( v instanceof String){
-			return  new Double((String)v);
+			try {
+				return  parseValue((String) v);
+			} catch (ParseException e) {
+				throw new TypeError(e);
+			}
 		}
 		throw new TypeError(v.getClass());
 	}
@@ -55,14 +59,12 @@ public class DoubleInput extends NumberInput<Double> {
 		return nf.format(val.doubleValue());
 	}
 
-	public void parse(String v) throws ParseException {
+	public Double parseValue(String v) throws ParseException {
 		if (v == null) {
-			setValue(null);
-			return;
+			return null;
 		}
 		if (v.trim().length() == 0) {
-			setValue(null);
-			return;
+			return null;
 		}
 		try {
 			Double i;
@@ -71,7 +73,7 @@ public class DoubleInput extends NumberInput<Double> {
 			} else {
 				i = new Double(Double.parseDouble(v.trim()));
 			}
-			setValue( i);
+			return i;
 		} catch (NumberFormatException e) {
 			throw new ParseException("Invalid number format");
 		} catch (java.text.ParseException e) {

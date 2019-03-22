@@ -111,7 +111,6 @@ public class MultiIntegerHandler implements QuestionFormHandler<MultiInput> {
 		String label_array[] = labels.split(",");
 		for(String label : label_array){
 			IntegerInput input = (IntegerInput) int_handler.parseConfiguration(f);
-			input.setLabel(label);
 			multi_input.addInput(label, input);
 		}
 		

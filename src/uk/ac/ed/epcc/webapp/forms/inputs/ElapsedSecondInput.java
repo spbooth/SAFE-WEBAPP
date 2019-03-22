@@ -39,10 +39,9 @@ public class ElapsedSecondInput extends ParseAbstractInput<Number> implements Fo
 		setSingle(true);
 	}
 
-	public void parse(String v) throws ParseException {
+	public Long parseValue(String v) throws ParseException {
 		if( v == null || v.trim().length()== 0){
-			setValue(null);
-			return;
+			return null;
 		}
 		long result=0L;
 		try{
@@ -61,7 +60,7 @@ public class ElapsedSecondInput extends ParseAbstractInput<Number> implements Fo
 		}catch(Exception e){
 			throw new ParseException("Invalid format");
 		}
-		setValue(new Long(result));
+		return new Long(result);
 	}
 
 	/* (non-Javadoc)

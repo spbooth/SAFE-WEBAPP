@@ -13,71 +13,70 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.UnitFormat;
+import uk.ac.ed.epcc.webapp.Units;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
-/**
+/** An {@link Input} for storage size in specified {@link Units}.
+ * The returned value (and the bounds etc.) are always in bytes but the text representation 
+ * (and numeric values passed to {@link #convert(Object)} are in the specified unit.
  * @author Stephen Booth
  *
  */
-public class StorageUnitInput extends NumberInput<Long> {
+public class StorageUnitNumberInput extends NumberInput<Long> {
 
+	private final Units unit;
 	/**
 	 * 
 	 */
-	public StorageUnitInput() {
-		setMin(1L);
-		setNumberFormat(new UnitFormat());
+	public StorageUnitNumberInput(Units unit) {
+		this.unit=unit;
+		setUnit(unit.toString());
+		setStep(unit.bytes);
+		
 	}
-
-	
-
-	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ParseInput#parse(java.lang.String)
 	 */
 	@Override
-	public void parse(String v) throws ParseException {
-		if( v == null || v.isEmpty()) {
-			setValue(null);
-		}else {
-			try {
-				setValue((Long) nf.parse(v));
-			} catch (Exception e) {
-				throw new ParseException(e);
-			}
+	public Long parseValue(String v) throws ParseException {
+		if( v == null || v.trim().isEmpty()) {
+			return null;
 		}
-
+		try {
+			Long l = Long.parseLong(v);
+			 return (unit.bytes * l.longValue());
+		}catch(Exception e) {
+			throw new ParseException(e);
+		}
 	}
-
-
-
-
+	@Override
+	public String getString(Long val) {
+		return Long.toString(val.longValue()/unit.bytes);
+	}
 	@Override
 	public Long convert(Object v) throws TypeError {
 		if( v == null ) {
 			return null;
 		}
-		if( v instanceof String) {
+		if( v instanceof Number) {
+			return ((Number)v).longValue();
+		}
+		if( v instanceof String ) {
 			try {
-				return (Long) nf.parse((String)v);
-			} catch (java.text.ParseException e) {
+				return parseValue((String) v);
+			} catch (ParseException e) {
 				throw new TypeError(e);
 			}
 		}
-		if( v instanceof Number ) {
-			return Long.valueOf(((Number)v).longValue());
-		}
-		throw new TypeError("Type "+v.getClass().getCanonicalName()+" not convertable to Long");
+		throw new TypeError(v.getClass());
 	}
-
-
-
-
 	@Override
-	public String getType() {
-		// can't be a html5 number input with custom format browser may not show
-		return null;
+	public String getPrettyString(Long val) {
+		if( val == null) {
+			return super.getPrettyString(val);
+		}
+		return getString(val)+" "+unit.toString();
 	}
+	
 
 }

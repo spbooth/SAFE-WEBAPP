@@ -43,14 +43,12 @@ public class LongInput extends NumberInput<Long> {
 		return nf.format(l.longValue());
 	}
 
-	public void parse(String v) throws ParseException {
+	public Long parseValue(String v) throws ParseException {
 		if (v == null) {
-			setValue(null);
-			return;
+			return null;
 		}
 		if (v.trim().length() == 0) {
-			setValue(null);
-			return;
+			return null;
 		}
 		try {
 			Long i;
@@ -59,7 +57,7 @@ public class LongInput extends NumberInput<Long> {
 			} else {
 				i = new Long(Long.parseLong(v.trim()));
 			}
-			setValue(i);
+			return i;
 		} catch (NumberFormatException e) {
 			throw new ParseException("Invalid integer format");
 		} catch (java.text.ParseException e) {
@@ -68,7 +66,7 @@ public class LongInput extends NumberInput<Long> {
 
 	}
 	@Override
-	public Long convert(Object v) throws TypeError {
+	public final Long convert(Object v) throws TypeError {
 		if( v == null || v instanceof Long){
 			return (Long) v;
 		}
@@ -76,7 +74,11 @@ public class LongInput extends NumberInput<Long> {
 			return new Long(((Number)v).longValue());
 		}
 		if( v instanceof String){
-			return new Long((String)v);
+			try {
+				return parseValue((String) v);
+			} catch (ParseException e) {
+				throw new TypeError(e);
+			}
 		}
 		throw new TypeError("Invalid type passed to LongInput");
 	}

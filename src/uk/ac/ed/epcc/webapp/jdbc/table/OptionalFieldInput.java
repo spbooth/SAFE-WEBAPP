@@ -64,10 +64,9 @@ public class OptionalFieldInput<I> extends ParseAbstractInput<String> implements
 
 	
 	@Override
-	public void parse(String v) throws ParseException {
+	public String parseValue(String v) throws ParseException {
 		if( fields.containsKey(v)){
-			setValue(v);
-			return;
+			return v;
 		}
 		throw new ParseException("Illegal value "+v);
 	}

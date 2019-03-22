@@ -67,8 +67,9 @@ public abstract class NumberInputTestCase<N extends Number,I extends NumberInput
 		
 		for(N num : getGoodData()){
 			assertEquals(num, ni.convert(num));
-			assertEquals(num, ni.convert(num.toString()));
-			assertEquals(num, ni.convert(Double.parseDouble(num.toString())));
+			assertEquals(num, ni.convert(ni.getString(num)));
+			// won't work for inputs with a parse scale
+			//assertEquals(num, ni.convert(Double.parseDouble(num.toString())));
 		}
 	}
 

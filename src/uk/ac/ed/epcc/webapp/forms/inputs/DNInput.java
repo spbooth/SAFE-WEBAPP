@@ -153,22 +153,21 @@ public class DNInput extends ParseAbstractInput<String> implements ItemInput<Lda
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ParseInput#parse(java.lang.String)
 	 */
-	public void parse(String v) throws ParseException {
+	public String parseValue(String v) throws ParseException {
 		if( v == null ){
-			setValue(null);
-			return;
+			
+			return null;
 		}
 		v=convert(v);
 		if( v == null || v.trim().length() == 0){
-			setValue(null);
-			return;
+			return null;
 		}
 		if( v.startsWith("/")){
 			LdapName name= parseGlobusName(v);
-			setValue(makeGlobusName(name));
+			return makeGlobusName(name);
 		}else{
 			LdapName name = parseLDAPName(v);
-			setValue(makeGlobusName(name));
+			return makeGlobusName(name);
 		}
 	}
 

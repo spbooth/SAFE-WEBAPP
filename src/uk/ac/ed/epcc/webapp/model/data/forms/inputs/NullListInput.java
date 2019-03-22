@@ -200,17 +200,17 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 	    }
 	}
 	@Override
-	public void parse(String v) throws ParseException {
+	public Integer parseValue(String v) throws ParseException {
 		if( v == NULLTAG){
-			internal.setValue(NULL_VALUE);
+			return NULL_VALUE;
 		}
 		if( v == null || v == ""){
-			internal.setValue(null);
+			return null;
 		}
 		if( internal instanceof ParseInput){
-			((ParseInput)internal).parse(v);
+			return ((ParseInput<Integer>)internal).parseValue(v);
 		}else{
-			internal.setValue(Integer.valueOf(v));
+			return Integer.valueOf(v);
 		}
 		
 	}

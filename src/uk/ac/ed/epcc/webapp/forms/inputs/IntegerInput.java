@@ -44,14 +44,12 @@ public class IntegerInput extends NumberInput<Integer> {
 		return nf.format(i.intValue());
 	}
 
-	public void parse(String v) throws ParseException {
+	public Integer parseValue(String v) throws ParseException {
 		if (v == null) {
-			setValue(null);
-			return;
+			return null;
 		}
 		if (v.trim().length() == 0) {
-			setValue(null);
-			return;
+			return null;
 		}
 		try {
 			Integer i;
@@ -60,7 +58,7 @@ public class IntegerInput extends NumberInput<Integer> {
 			} else {
 				i = new Integer(Integer.parseInt(v.trim()));
 			}
-			setValue(i);
+			return i;
 		} catch (NumberFormatException e) {
 			throw new ParseException("Invalid integer format");
 		} catch (java.text.ParseException e) {

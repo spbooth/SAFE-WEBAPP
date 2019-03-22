@@ -49,11 +49,10 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	private boolean create;
 	private final boolean restrict;
 	private final BaseFilter<T> autocomplete;
-	@Override
-	public void parse(String v) throws ParseException {
+	
+	public T parseItem(String v) throws ParseException {
 		if( v == null || v.trim().isEmpty()) {
-			setItem(null);
-			return;
+			return null;
 		}
 		factory.validateNameFormat(v);
 		try{
@@ -67,12 +66,24 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 			if(target == null) {
 				throw new ParseException("["+v+"] Not found");
 			}
-			setItem(target);
+			return target;
 		}catch(ParseException p) {
 			throw p;
 		}catch(Exception e){
 			throw new ParseException(e);
 		}
+	}
+	@Override
+	public void parse(String v) throws ParseException {
+		setItem(parseItem(v));
+	}
+	@Override
+	public Integer parseValue(String v) throws ParseException {
+		T item = parseItem(v);
+		if( item == null) {
+			return null;
+		}
+		return item.getID();
 	}
 	@Override
 	public T getItem() {

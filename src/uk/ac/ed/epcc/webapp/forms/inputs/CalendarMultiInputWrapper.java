@@ -47,17 +47,8 @@ public class CalendarMultiInputWrapper extends AbstractCalendarMultiInput {
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ParseInput#parse(java.lang.String)
 	 */
 	@Override
-	public void parse(String v) throws ParseException {
-		input.parse(v);
-		Date val = input.getValue();
-		if( val == null ){
-			setNull();
-		}else{
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(val);
-			setInputsFromCalendar(cal);
-		}
-
+	public Date parseValue(String v) throws ParseException {
+		return input.parseValue(v);
 	}
 
 	/* (non-Javadoc)

@@ -47,15 +47,13 @@ public class MonthInput extends ParseAbstractInput<Date> implements FormatHintIn
 	
 
 	
-	public void parse(String v) throws ParseException {
+	public Date parseValue(String v) throws ParseException {
 		if (v == null) {
-			setValue(null);
-			return;
+			return null;
 		}
 		v = v.trim();
 		if (v.length() == 0) {
-			setValue(null);
-			return;
+			return null;
 		}
 		Date d=null;
 
@@ -78,7 +76,7 @@ public class MonthInput extends ParseAbstractInput<Date> implements FormatHintIn
 				throw new ParseException("Bad date format ["+v+"]");
 			}
 		}
-		setValue(d);
+		return d;
 	}
 
 	/**

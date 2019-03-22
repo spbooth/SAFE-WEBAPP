@@ -288,7 +288,20 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			}
 			setItem(findFromString(v));
 		}
-
+        @Override
+		public Integer parseValue(String v) throws ParseException {
+        	if( v == null || v.trim().length()==0){
+				return null;
+			}
+			if( ! allowSpacesInName() && WHITESPACE.matcher(v).matches()){
+				throw new ParseException("No whitespace allowed");
+			}
+			T item = findFromString(v);
+			if( item != null) {
+				return item.getID();
+			}
+			return null;
+        }
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput#getDataObject()
 		 */

@@ -41,12 +41,12 @@ public class TextInput extends ParseAbstractInput<String> {
 		this.allow_null = allow_null;
 	}
 
-	public final void parse(String v) throws ParseException {
+	public String parseValue(String v) throws ParseException {
 		if (v == null || v.length() == 0) {
 			if (allow_null) {
-				setValue(null);
+				return null;
 			} else {
-				setValue("");
+				return "";
 			}
 		} else {
 			if( force_single ){
@@ -55,7 +55,7 @@ public class TextInput extends ParseAbstractInput<String> {
 			if( getTrim()){
 				v = v.trim();
 			}
-			setValue(v);
+			return v;
 		}
 	}
 

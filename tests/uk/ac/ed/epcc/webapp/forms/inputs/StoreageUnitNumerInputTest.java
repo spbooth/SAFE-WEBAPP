@@ -20,7 +20,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
-public class StoreageUnitInputTest extends NumberInputTestCase<Long,StorageUnitInput> {
+
+import uk.ac.ed.epcc.webapp.Units;
+public class StoreageUnitNumerInputTest extends NumberInputTestCase<Long,StorageUnitNumberInput> {
 	@Test
 	public void dummy(){
 		
@@ -34,16 +36,21 @@ public class StoreageUnitInputTest extends NumberInputTestCase<Long,StorageUnitI
 	@Override
 	public Set<Long> getGoodData() {
 		Set<Long> good = new HashSet<>();
-		good.add(12L);
-		good.add(14L);
-		good.add(12L*1024L);
+		good.add(12L*getUnits().bytes);
+		good.add(14L*getUnits().bytes);
 		return good;
 	}
 
 	@Override
-	public StorageUnitInput getInput() {
-		StorageUnitInput i = new StorageUnitInput();
+	public StorageUnitNumberInput getInput() {
+		StorageUnitNumberInput i = new StorageUnitNumberInput(getUnits());
 		return i;
+	}
+	/**
+	 * @return
+	 */
+	public Units getUnits() {
+		return Units.GiB;
 	}
 	
 	@Override
@@ -63,8 +70,6 @@ public class StoreageUnitInputTest extends NumberInputTestCase<Long,StorageUnitI
 		res.add("12");
 		res.add("15");
 		res.add("70");
-		res.add("100KiB");
-		res.add("10M");
 		return res;
 	}
 	
@@ -73,14 +78,14 @@ public class StoreageUnitInputTest extends NumberInputTestCase<Long,StorageUnitI
 	 */
 	@Override
 	public Long getLowBound() {
-		return 10L;
+		return 10L*getUnits().bytes;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getHighBound()
 	 */
 	@Override
 	public Long getHighBound() {
-		return 20L * 1024L * 1024L;
+		return 20L*getUnits().bytes;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInputDataProvider#getHighData()
@@ -88,8 +93,8 @@ public class StoreageUnitInputTest extends NumberInputTestCase<Long,StorageUnitI
 	@Override
 	public Set<Long> getHighData() {
 		Set<Long> high = new HashSet<>();
-		high.add(25L* 1024L * 1024L);
-		high.add(30L* 1024L * 1024L);
+		high.add(25L*getUnits().bytes);
+		high.add(30L*getUnits().bytes);
 		return high;
 	}
 	/* (non-Javadoc)
@@ -98,13 +103,9 @@ public class StoreageUnitInputTest extends NumberInputTestCase<Long,StorageUnitI
 	@Override
 	public Set<Long> getLowData() {
 		Set<Long> high = new HashSet<>();
-		
-		high.add(4L);
+		high.add(-6L*getUnits().bytes);
+		high.add(4L*getUnits().bytes);
 		return high;
-	}
-	@Override
-	protected String getExpectedType() {
-		return null;
 	}
 
 }

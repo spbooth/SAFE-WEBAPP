@@ -125,8 +125,8 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ParseInput#parse(java.lang.String)
 	 */
 	@Override
-	public void parse(String v) throws ParseException {
-		master.parse(v);
+	public String parseValue(String v) throws ParseException {
+		return master.parseValue(v);
 	}
 
 	/* (non-Javadoc)

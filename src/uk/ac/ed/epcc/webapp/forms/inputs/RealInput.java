@@ -40,14 +40,12 @@ public class RealInput extends NumberInput<Float> {
 		return nf.format(f.floatValue());
 	}
 
-	public void parse(String v) throws ParseException {
+	public Float parseValue(String v) throws ParseException {
 		if (v == null) {
-			setValue(null);
-			return;
+			return null;
 		}
 		if (v.trim().length() == 0) {
-			setValue(null);
-			return;
+			return null;
 		}
 		try {
 			Float i;
@@ -56,7 +54,7 @@ public class RealInput extends NumberInput<Float> {
 			} else {
 				i = new Float(Float.parseFloat(v.trim()));
 			}
-			setValue(i);
+			return i;
 		} catch (NumberFormatException e) {
 			throw new ParseException("Invalid real format");
 		} catch (java.text.ParseException e) {

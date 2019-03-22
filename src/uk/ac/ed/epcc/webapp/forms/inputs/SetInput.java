@@ -138,19 +138,16 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
 		setValue(getTagByItem(item));
 	}
 	@Override
-	public void parse(String v) throws ParseException {
+	public String parseValue(String v) throws ParseException {
 		if (v == null) {
-			setValue(null);
-			return;
+			return null;
 		}
 		if (v.trim().length() == 0) {
-			setValue(null);
-			return;
+			return null;
 		}
 		v=mapTag(v);
 		if( data.containsKey(v)){
-			setValue(v);
-			return;
+			return v;
 		}
 		throw new ParseException("Illegal value "+v);
 		

@@ -141,29 +141,19 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements P
 		setBounds();
 		return old;
 	}
-	public void parse(String v) throws ParseException {
+	public Date parseValue(String v) throws ParseException {
 		if (v == null) {
-			setValue(null);
-			return;
+			return null;
 		}
 		v = v.trim();
 		if (v.length() == 0) {
-			setValue(null);
-			return;
+			return null;
 		}
-		Date d=null;
 		try {
-			d=df.parse(v);
+			return df.parse(v);
 		} catch (Exception e){
 			throw new ParseException(e);
 		}
-		setValue(d);
-		try {
-			validate();
-		} catch (FieldException e) {
-			throw new ParseException("parsed values not in range");
-		}
-		
 	}
 	@Override
 	public String getString(Date val) {

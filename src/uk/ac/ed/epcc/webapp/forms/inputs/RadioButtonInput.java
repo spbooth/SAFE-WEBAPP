@@ -139,13 +139,12 @@ public class RadioButtonInput<V, T> implements ListInput<V, T>, ParseInput<V> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ParseInput#parse(java.lang.String)
 	 */
-	public void parse(String v) throws ParseException {
+	public V parseValue(String v) throws ParseException {
 		// Use nested parse if we can
 		if( nested instanceof ParseInput){
-			((ParseInput<V>)nested).parse(v);
-			return;
+			return ((ParseInput<V>)nested).parseValue(v);
 		}
-		nested.setValue(nested.convert(v));
+		return nested.convert(v);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)

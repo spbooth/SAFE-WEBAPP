@@ -53,10 +53,9 @@ public class DurationInput extends ParseAbstractInput<Duration> implements Forma
 		this.resolution=resolution;
 	}
 
-	public void parse(String v) throws ParseException {
+	public Duration parseValue(String v) throws ParseException {
 		if( v == null || v.trim().length()== 0){
-			setValue(null);
-			return;
+			return null;
 		}
 		long result=0L;
 		try{
@@ -75,7 +74,7 @@ public class DurationInput extends ParseAbstractInput<Duration> implements Forma
 		}catch(Exception e){
 			throw new ParseException("Invalid format");
 		}
-		setValue(new Duration(result));
+		return new Duration(result);
 	}
 
 	/* (non-Javadoc)

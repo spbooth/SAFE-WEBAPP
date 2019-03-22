@@ -76,25 +76,16 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 
 	public abstract String[] getFormats();
 		
-	public void parse(String v) throws ParseException {
-		if (v == null) {
-			setValue(null);
-			return;
-		}
-		v = v.trim();
-		if (v.length() == 0) {
-			setValue(null);
-			return;
-		}
-		Date d = parseValue(v);
-		setValue(d);
-	}
 	/**
 	 * @param v
 	 * @return
 	 * @throws ParseException
 	 */
+	@Override
 	public Date parseValue(String v) throws ParseException {
+		if( v == null || v.isEmpty()) {
+			return null;
+		}
 		Date d=null;
 		for(int i=0 ; i< df.length ; i++){
 			try {

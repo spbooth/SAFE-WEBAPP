@@ -30,12 +30,12 @@ public class BooleanInput implements ParseInput<Boolean> ,BinaryInput<Boolean>{
 		return value.toString();
 	}
 
-	public void parse(String v) throws ParseException {
+	public Boolean parseValue(String v) throws ParseException {
 		if( v==null || v.trim().length() == 0){
 			// unchecked boxes are false
-			value = Boolean.FALSE;
+			return Boolean.FALSE;
 		}else{
-			value = Boolean.valueOf(v);
+			return Boolean.valueOf(v);
 		}
 	}
 

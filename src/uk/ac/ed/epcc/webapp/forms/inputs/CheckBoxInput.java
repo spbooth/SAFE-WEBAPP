@@ -65,9 +65,9 @@ public class CheckBoxInput implements ParseInput<String>,  BinaryInput<String> {
 			return false;
 		}
     }
-	public void parse(String v) throws ParseException {
+	public String parseValue(String v) throws ParseException {
 		is_checked = checkString(v);
-		setValue(getValue(is_checked));
+		return getValue(is_checked);
 	}
 
 	/* (non-Javadoc)

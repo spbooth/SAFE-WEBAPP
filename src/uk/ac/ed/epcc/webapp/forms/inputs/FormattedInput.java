@@ -34,9 +34,9 @@ public class FormattedInput<N> extends ParseAbstractInput<N> {
     }
     
 	@SuppressWarnings("unchecked")
-	public void parse(String v) throws ParseException {
+	public N parseValue(String v) throws ParseException {
 		try{
-		setValue((N) format.parseObject(v));
+		   return (N) format.parseObject(v);
 		}catch(java.text.ParseException e){
 			throw new ParseException(e);
 		}
