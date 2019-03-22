@@ -42,7 +42,7 @@ import java.util.regex.Pattern;
 
 
 public class RelativeDateFormat extends SimpleDateFormat{
-    private static final Pattern p = Pattern.compile("Now([+-])(\\d+)([dwmy])");
+    private static final Pattern p = Pattern.compile("\\s*Now([+-])(\\d+)([dwmy])\\s*");
     public RelativeDateFormat(String format){
     	super(format);
     	setLenient(false);
