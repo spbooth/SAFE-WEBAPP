@@ -92,6 +92,7 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 	@Override
 	public SimpleXMLBuilder addContent(SimpleXMLBuilder builder) {
 		if( builder instanceof XMLPrinter) {
+			XMLPrinter printer = (XMLPrinter) builder;
 			MessageFormat fmt2 = (MessageFormat) fmt.clone();
 			if( args != null && builder instanceof HtmlBuilder) {
 				// apply HtmlFormat 
@@ -108,7 +109,8 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 			}
 			StringBuffer buffer = new StringBuffer();
 			fmt2.format(args, buffer, null);
-			((XMLPrinter)builder).append(buffer);
+			printer.endOpen();
+			printer.append(buffer);
 		}
 		return builder;
 	}

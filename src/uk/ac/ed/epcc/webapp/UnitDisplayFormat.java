@@ -14,58 +14,51 @@
 package uk.ac.ed.epcc.webapp;
 
 import java.text.FieldPosition;
-import java.text.Format;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.EnumSet;
 
-/** A {@link NumberFormat} for {@link Units} intended for setting/editing quota values.
- * The largest unit that exactly divides the value is used
+/** A NumberFormat for storage units for displaying arbitrary values
+ * 
+ * The largest unit that is less than the value is used by default.
  * @author Stephen Booth
  *
  */
-public class UnitFormat extends NumberFormat {
-
+public class UnitDisplayFormat extends NumberFormat {
+	private final NumberFormat inner;
 	/**
 	 * 
 	 */
-	public UnitFormat() {
+	public UnitDisplayFormat() {
+		inner = NumberFormat.getInstance();
+		inner.setMaximumFractionDigits(2);
 	}
-
-	/* (non-Javadoc)
-	 * @see java.text.NumberFormat#format(double, java.lang.StringBuffer, java.text.FieldPosition)
-	 */
 	@Override
-	public StringBuffer format(double arg0, StringBuffer arg1, FieldPosition arg2) {
-		Double d = Double.valueOf(arg0);  // jsut convert to long and format
-		return format(d.longValue(),arg1,arg2);
+	public StringBuffer format(long arg0, StringBuffer arg1, FieldPosition arg2) {
+		return format((double)arg0,arg1,arg2);
 	}
+	
 
 	/* (non-Javadoc)
 	 * @see java.text.NumberFormat#format(long, java.lang.StringBuffer, java.text.FieldPosition)
 	 */
 	@Override
-	public StringBuffer format(long arg0, StringBuffer arg1, FieldPosition arg2) {
+	public StringBuffer format(double arg0, StringBuffer arg1, FieldPosition arg2) {
 		Units u=Units.B;
 		if( arg0 > 0L) {
 			for(Units c : EnumSet.allOf(Units.class)) {
-				if( arg0 >= c.bytes && ((arg0 % c.bytes) == 0L)) {
+				if( arg0 >= c.bytes ) {
 					u=c;
 				}
 			}
 		}
-		long val = arg0/u.bytes;
-		String num = Long.toString(val);
-		int start =arg1.length();
-		arg1.append(num);
+		double val = ((double)arg0)/((double)u.bytes);
+		inner.format(val, arg1, arg2);
+		
 		if( u.bytes > 1L) {
 			arg1.append(u.toString());
-		}
-		int end = arg1.length();
-		if( arg2 != null ) {
-			arg2.setBeginIndex(start);
-			arg2.setEndIndex(end);
+			arg2.setEndIndex(arg2.getEndIndex()+u.toString().length());
 		}
 		return arg1;
 	}
@@ -75,19 +68,17 @@ public class UnitFormat extends NumberFormat {
 	 */
 	@Override
 	public Number parse(String arg0, ParsePosition arg1) {
-		int len = arg0.length();
-		int start = arg1.getIndex();
-		int end=start;
-		while( end < len && Character.isDigit(arg0.charAt(end))) {
-			end++;
-		}
-		if( end == start) {
-			arg1.setErrorIndex(start);
+		
+		Number base = inner.parse(arg0, arg1);
+		if( base == null) {
 			return null;
 		}
-		long value = Long.parseLong(arg0.substring(start, end));
-		arg1.setIndex(end);
+		int end = arg1.getIndex();
 		String remainder = arg0.substring(end);
+		if( remainder.isEmpty()) {
+			// must be bytes
+			return Double.valueOf(base.doubleValue());
+		}
 		Units u = null;
 		for(Units c : EnumSet.allOf(Units.class)) {
 			if( remainder.startsWith(c.toString())) {
@@ -97,29 +88,42 @@ public class UnitFormat extends NumberFormat {
 			}
 		}
 		if( u != null ) {
-			value *= u.bytes;
+			return Double.valueOf(base.doubleValue()*u.bytes);
 		}
-		return Long.valueOf(value);
+		arg1.setErrorIndex(end);
+		return null;
 	}
 
-	@Override
-	public boolean isGroupingUsed() {
-		return false;
-	}
+	
 
 	@Override
-	public boolean isParseIntegerOnly() {
-		return true;
-	}
-
-	@Override
-	public Long parse(String arg0) throws ParseException {
+	public Number parse(String arg0) throws ParseException {
 		ParsePosition p = new ParsePosition(0);
-		Long o = (Long) parse(arg0,p);
+		Number o =  parse(arg0,p);
 		if( p.getIndex() != arg0.length()) {
 			throw new ParseException("Unparsed suffix",p.getIndex());
 		}
 		return o;
+	}
+
+	@Override
+	public int getMaximumFractionDigits() {
+		return inner.getMaximumFractionDigits();
+	}
+
+	@Override
+	public int getMinimumFractionDigits() {
+		return inner.getMinimumFractionDigits();
+	}
+
+	@Override
+	public void setMaximumFractionDigits(int newValue) {
+		inner.setMaximumFractionDigits(newValue);
+	}
+
+	@Override
+	public void setMinimumFractionDigits(int newValue) {
+		inner.setMinimumFractionDigits(newValue);
 	}
 
 	
