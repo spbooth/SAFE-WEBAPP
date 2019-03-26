@@ -19,7 +19,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
@@ -43,6 +45,10 @@ public class NamedFilterWrapper<T extends DataObject> extends AbstractContexed i
 	/**
 	 * 
 	 */
+	private static final String FILTER_DEREF = "->";
+	/**
+	 * 
+	 */
 	private static final String NAME_PREFIX = "name:";
 	private final DataObjectFactory<T> fac;
 	private final Set<String> missing=new HashSet<>();
@@ -58,7 +64,24 @@ public class NamedFilterWrapper<T extends DataObject> extends AbstractContexed i
 	 */
 	@Override
 	public BaseFilter<T> getNamedFilter(String name) {
-		int pos = name.indexOf("->");
+		// We need to handle AND/OR combinations here for code that uses explicitly name-filter
+		// when called from the SessionService relationship code the AND/OR combinations should
+		// be parsed at that level
+		if( name.contains(",")) {
+			OrFilter<T> or = new OrFilter<>(fac.getTarget(), fac);
+			for(String sub : name.split(",")) {
+				or.addFilter(getNamedFilter(sub));
+			}
+			return or;
+		}
+		if( name.contains("+")) {
+			AndFilter<T> and = new AndFilter<>(fac.getTarget());
+			for(String sub : name.split("\\+")) {
+				and.addFilter(getNamedFilter(sub));
+			}
+			return and;
+		}
+		int pos = name.indexOf(FILTER_DEREF);
 		if( pos > 0 ){
 			String remote=name.substring(0, pos);
 			String remote_name = name.substring(pos+2);
@@ -87,7 +110,7 @@ public class NamedFilterWrapper<T extends DataObject> extends AbstractContexed i
 			if( prov != null) {
 				return prov.getNamedFilter(provider_name);
 			}else {
-				getLogger().warn("Bad explicit NamedFilterProvider "+provider);
+				getLogger().error("Bad explicit NamedFilterProvider "+provider);
 			}
 			return null;
 		}

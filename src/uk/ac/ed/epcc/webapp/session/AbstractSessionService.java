@@ -1140,7 +1140,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		if( role.contains(OR_RELATIONSHIP_COMBINER)){
 			// OR combination of filters
 			OrFilter<T> or = new OrFilter<>(fac2.getTarget(), fac2);
-			for( String  s  : role.split(",")){
+			for( String  s  : role.split(OR_RELATIONSHIP_COMBINER)){
 				try{
 					if( person == null){
 						or.addFilter(getRelationshipRoleFilter(fac2, s));
