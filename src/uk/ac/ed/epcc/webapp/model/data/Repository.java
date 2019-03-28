@@ -43,8 +43,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -59,7 +59,6 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.NoTableException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
-import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
@@ -90,6 +89,9 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * If a handler class is registered for the remote table this is used to create a {@link TypeProducer} for the field.
  * Alternatively a reference can be registered explicitly with the Repository by registering a {@link TypeProducer} for the field.
  * This will reduce overhead where an instance of the remote handler class is already available.   
+ * <p>
+ * A boolean property of the form <b>truncate.</b><em>repository-tag</em><b>.</b><em>DBfield</em> can be used to request
+ * that field values be truncated to the database field length when being stored. 
  * <p>
  * At the moment the integer identifier is implemented by requiring each
  * tables to have a primary key consisting of a mysql
@@ -160,6 +162,11 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  */
 
 public final class Repository implements AppContextCleanup{
+	/**
+	 * 
+	 */
+	private static final String TRUNCATE_PREFIX = "truncate.";
+
 	/**
 	 * 
 	 */
@@ -268,6 +275,10 @@ public final class Repository implements AppContextCleanup{
 		 * 
 		 */
 		private String key_name=null;
+		/** Should values be truncated to the field length
+		 * 
+		 */
+		private boolean truncate=false;
 		/** TypeProducer for the table this field references (if known)
 		 * 
 		 */
@@ -503,6 +514,22 @@ public final class Repository implements AppContextCleanup{
         		r.setProperty(name,data);
         	}
         }
+        // Optionally truncate the value before storage
+        Object truncate(Object input) {
+        	if( input != null && isString() && input instanceof String) {
+        		String val = (String) input;
+        		if( val.length() > max) {
+        			return val.substring(0,max);
+        		}
+        	}
+        	return input;
+        }
+		public boolean isTruncate() {
+			return truncate;
+		}
+		public void setTruncate(boolean truncate) {
+			this.truncate = truncate;
+		}
 	}
     /** Record encapsulates a Database record.
 	 * It is essentially a Map container where database field names are used as
@@ -2961,6 +2988,11 @@ public final class Repository implements AppContextCleanup{
 					//log.debug("field "+field+" references "+table);
 					info.setReference(true,key_name,tag,ctx.getBooleanParameter(UNIQUE_PREFIX+suffix, false));
 				}
+				if( info.isString()) {
+					String suffix = param_name+"."+info.getName(false);
+					String name = TRUNCATE_PREFIX+suffix;
+					info.setTruncate(ctx.getBooleanParameter(name, false));
+				}
 			}
 		}while(rs.next());
 		}
@@ -3064,7 +3096,7 @@ public final class Repository implements AppContextCleanup{
 		//Logger log = ctx.getService(LoggerService.class).getLogger(getClass());
 		if (f != null) {
 			//log.debug("setObject "+pos+","+value+","+f.getType());
-			stmt.setObject(pos, value, f.getType());
+			stmt.setObject(pos, f.truncate(value), f.getType());
 		} else {
 			//log.debug("setObject "+pos+","+value);
 			stmt.setObject(pos, value);
