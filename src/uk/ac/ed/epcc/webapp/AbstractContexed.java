@@ -50,5 +50,10 @@ public abstract class AbstractContexed implements Contexed {
 		}
 		return log;
 	}
-
+	/** clear the cached logger in case we modify the log service
+	 * 
+	 */
+    public void resetLogger() {
+    	log=null;
+    }
 }
