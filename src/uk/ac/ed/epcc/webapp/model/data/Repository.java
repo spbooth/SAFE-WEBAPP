@@ -516,9 +516,9 @@ public final class Repository implements AppContextCleanup{
         }
         // Optionally truncate the value before storage
         Object truncate(Object input) {
-        	if( input != null && isString() && input instanceof String) {
+        	if( truncate && input != null && isString() && input instanceof String) {
         		String val = (String) input;
-        		if( val.length() > max) {
+        		if( max > 0 && val.length() > max) {
         			return val.substring(0,max);
         		}
         	}
