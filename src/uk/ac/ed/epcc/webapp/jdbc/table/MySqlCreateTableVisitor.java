@@ -57,12 +57,22 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 		//Repository can use DATE fields as well but an int fields covers all bases.
 		
 		//sb.append("TIMESTAMP");
-		sb.append("BIGINT(20)");
-		doNull(dateFieldType);
-		Date d = dateFieldType.getDefault();
-		if( d != null ){
-			sb.append(" DEFAULT ?");
-			args.add(dateFieldType.getDefault().getTime()/1000);
+		if( dateFieldType.isTruncate()) {
+			sb.append("DATE");
+			doNull(dateFieldType);
+			Date d = dateFieldType.getDefault();
+			if( d != null ){
+				sb.append(" DEFAULT ?");
+				args.add(new java.sql.Date(dateFieldType.getDefault().getTime()));
+			}
+		}else {
+			sb.append("BIGINT(20)");
+			doNull(dateFieldType);
+			Date d = dateFieldType.getDefault();
+			if( d != null ){
+				sb.append(" DEFAULT ?");
+				args.add(dateFieldType.getDefault().getTime()/1000);
+			}
 		}
 		
 	}

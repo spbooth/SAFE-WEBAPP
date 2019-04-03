@@ -40,6 +40,8 @@ import org.junit.Test;
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.forms.inputs.DateInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.BlobType;
 import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
@@ -74,6 +76,7 @@ public class RepositoryTest extends WebappTestBase {
 		spec.setField("Longtext", new StringFieldType(true, null, 1000000000));
 		spec.setField("Number", new IntegerFieldType(true, 0));
 		spec.setField("Date", new DateFieldType(true, null));
+		spec.setField("TruncatedDate", new DateFieldType(true, null,true));
 		spec.setField("UnsignedInt", new LongFieldType(true, null));
 		spec.setField("PersonID",new ReferenceFieldType("Person"));
 		spec.setField("Boolean", new BooleanFieldType(false, true));
@@ -158,11 +161,13 @@ public class RepositoryTest extends WebappTestBase {
 	@Test
 	public void testGetFields() {
 		Set fields = res.getFields();
-		assertEquals(fields.size(),7);
+		assertEquals(fields.size(),9);
 		Iterator it = fields.iterator();
 		assertEquals(it.next(),"Name");
+		assertEquals(it.next(),"Longtext");
 		assertEquals(it.next(),"Number");
 		assertEquals(it.next(),"Date");
+		assertEquals(it.next(),"TruncatedDate");
 		assertEquals(it.next(),"UnsignedInt");
 		assertEquals(it.next(),"PersonID");
 		assertEquals(it.next(),"Boolean");
@@ -421,6 +426,42 @@ public class RepositoryTest extends WebappTestBase {
 		r.delete();
 	}
 	
+	
+	
+	@Test
+	public void testDateField2() throws ConsistencyError, DataException, ParseException{
+		DateInput input = new DateInput();
+		Date d = input.parseValue("2019-05-01");
+		
+		Record r = res.new Record();
+		r.put("Name","fred");
+		r.put("Number", new Integer(12));
+		r.put("TruncatedDate", d);
+		// date is default null this should be ok
+		assertTrue(r.isDirty());
+		assertTrue(r.commit());
+		// now check second commit does not change 
+		assertFalse(r.isDirty());
+		assertFalse(r.commit());
+		int id = r.getID();
+		Record p = res.new Record();
+		p.setID(id);
+		assertEquals("fred",p.get("Name"));
+		Number n = (Number) p.get("Number");
+		Date d2 = (Date) p.getDateProperty("TruncatedDate");
+		
+		assertEquals(12,n.intValue());
+		System.out.println(d.toString());
+		
+		System.out.println(d2.toString());
+      System.out.println(d.getClass().toString());
+		
+		System.out.println(d2.getClass().toString());
+		// check a save edit cycle keeps things unchanged
+		assertEquals("2019-05-01", input.getString(d2));
+		assertEquals(d.getTime(), d2.getTime());
+		
+	}
 	@Test
 	public void testBooleanField() throws DataException{
 		Record r = res.new Record();

@@ -41,13 +41,22 @@ public class PostgresqlCreateTableVisitor implements FieldTypeVisitor {
 		// use timestamp field by default
 		// this makes the field read as time field for the forms code, though
 		// user may have wanted date not timestamp.
-		
-		sb.append("TIMESTAMP");
-		doNull(dateFieldType);
-		Date d = dateFieldType.getDefault();
-		if( d != null ){
-			sb.append(" DEFAULT ?");
-			args.add(d);
+		if( dateFieldType.isTruncate()) {
+			sb.append("DATE");
+			doNull(dateFieldType);
+			Date d = dateFieldType.getDefault();
+			if( d != null ){
+				sb.append(" DEFAULT ?");
+				args.add(new java.sql.Date(dateFieldType.getDefault().getTime()));
+			}
+		}else {
+			sb.append("TIMESTAMP");
+			doNull(dateFieldType);
+			Date d = dateFieldType.getDefault();
+			if( d != null ){
+				sb.append(" DEFAULT ?");
+				args.add(d);
+			}
 		}
 		
 	}

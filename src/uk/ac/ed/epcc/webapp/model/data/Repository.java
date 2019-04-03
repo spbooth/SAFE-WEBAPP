@@ -524,6 +524,10 @@ public final class Repository implements AppContextCleanup{
         			return val.substring(0,max);
         		}
         	}
+        	if( getType() == Types.DATE && input instanceof Date) {
+        		Date d = (Date) input;
+        		return new java.sql.Date(d.getTime()); // 
+        	}
         	return input;
         }
 		public boolean isTruncate() {

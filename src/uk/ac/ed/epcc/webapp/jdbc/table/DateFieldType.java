@@ -26,14 +26,23 @@ import java.util.Date;
  */
 public class DateFieldType extends FieldType<Date> {
 
+	private final boolean truncate;
 	public DateFieldType( boolean can_null,
 			Date default_val) {
+		this(can_null,default_val,false);
+	}
+	public DateFieldType( boolean can_null,
+				Date default_val,boolean truncate) {
 		super(Date.class, can_null, default_val);
+		this.truncate=truncate;
 	}
 
 	@Override
 	public void accept(FieldTypeVisitor vis) {
 		vis.visitDateFieldType(this);
+	}
+	public boolean isTruncate() {
+		return truncate;
 	}
 
 }
