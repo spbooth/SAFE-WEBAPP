@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -49,6 +50,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.LongFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.IdMode;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
@@ -326,6 +328,37 @@ public class RepositoryTest extends WebappTestBase {
 		p.delete();
 		r.delete();
 		
+	}
+	
+	@Test
+	public void testLongString() {
+		Record r = res.new Record();
+		r.put("Name", "HEnryHooverDemontfordWombleKingHooplyFrooom");
+		try {
+			r.commit();
+			fail("Expecting exception");
+		}catch(DataFault e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	@ConfigFixtures("truncate.properties")
+	public void testTruncateLongString() throws DataException {
+		assertTrue(res.getInfo("Name").isTruncate());
+		Record r = res.new Record();
+		String value = "HEnryHooverDemontfordWombleKingHooplyFrooom";
+		r.put("Name", value);
+	
+		r.commit();
+	
+		
+		int id = r.getID();
+		Record r2 = res.new Record();
+		r2.setID(id);
+		Object trun = r2.getProperty("Name");
+		System.out.println(trun);
+		assertEquals(value.substring(0, 32), trun);
 	}
 	
 	@SuppressWarnings("deprecation")

@@ -2988,11 +2988,7 @@ public final class Repository implements AppContextCleanup{
 					//log.debug("field "+field+" references "+table);
 					info.setReference(true,key_name,tag,ctx.getBooleanParameter(UNIQUE_PREFIX+suffix, false));
 				}
-				if( info.isString()) {
-					String suffix = param_name+"."+info.getName(false);
-					String name = TRUNCATE_PREFIX+suffix;
-					info.setTruncate(ctx.getBooleanParameter(name, false));
-				}
+				
 			}
 		}while(rs.next());
 		}
@@ -3005,6 +3001,11 @@ public final class Repository implements AppContextCleanup{
 				String table=ctx.getInitParameter(tag);
 				//log.debug("tag "+tag+" resolves to "+table);
 				i.setReference(false,null,table,ctx.getBooleanParameter(UNIQUE_PREFIX+suffix, false));
+			}
+			if( i.isString()) {
+				String suffix = param_name+"."+i.getName(false);
+				String name = TRUNCATE_PREFIX+suffix;
+				i.setTruncate(ctx.getBooleanParameter(name, false));
 			}
 		}
 	}
