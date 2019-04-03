@@ -518,6 +518,8 @@ public final class Repository implements AppContextCleanup{
         Object truncate(Object input) {
         	if( truncate && input != null && isString() && input instanceof String) {
         		String val = (String) input;
+        		// Though the code won't use these itself a longtext field
+        		// returns max-length 0 in mariadb (max length needs 32-bit unsigned)
         		if( max > 0 && val.length() > max) {
         			return val.substring(0,max);
         		}

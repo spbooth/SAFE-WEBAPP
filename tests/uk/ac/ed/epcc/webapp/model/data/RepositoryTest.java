@@ -71,6 +71,7 @@ public class RepositoryTest extends WebappTestBase {
 	public void setUp() throws DataFault {
 		TableSpecification spec = new TableSpecification("TestID");
 		spec.setField("Name", new StringFieldType(true, "", 32));
+		spec.setField("Longtext", new StringFieldType(true, null, 1000000000));
 		spec.setField("Number", new IntegerFieldType(true, 0));
 		spec.setField("Date", new DateFieldType(true, null));
 		spec.setField("UnsignedInt", new LongFieldType(true, null));
@@ -328,6 +329,19 @@ public class RepositoryTest extends WebappTestBase {
 		p.delete();
 		r.delete();
 		
+	}
+	@Test 
+	public void testLongField() throws ConsistencyError, DataException {
+		Record r = res.new Record();
+		
+		r.put("Longtext","fred");
+		r.commit();
+		
+		Record p = res.new Record();
+		p.setID(r.getID());
+		assertEquals("fred",p.get("Longtext"));
+		p.delete();
+		r.delete();
 	}
 	
 	@Test
