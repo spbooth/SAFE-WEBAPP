@@ -19,9 +19,9 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
-/** An ErrorInput is an unmodifiale input that never validates.
+/** An ErrorInput is an unmodifiable input that never validates.
  * It can used to indicate that no valid selections are possible for the user
- * or that an error occuted while generating the form.
+ * or that an error occurred while generating the form.
  * 
  * @author spb
  * @param <T> type of input

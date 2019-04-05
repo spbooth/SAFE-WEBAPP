@@ -80,12 +80,12 @@ public class ViewPeriod implements TimePeriod {
 		//System.out.println("<"+id+">");
 		String tags[] = id.split(SEPERATOR);
 		Calendar c = Calendar.getInstance();
-		c.setTimeInMillis(Long.parseLong(tags[1]));
+		c.setTimeInMillis(Long.parseLong(tags[0]));
 		return new ViewPeriod(
 		c,
+		Integer.parseInt(tags[1]),
 		Integer.parseInt(tags[2]),
-		Integer.parseInt(tags[3]),
-		Integer.parseInt(tags[4]));
+		Integer.parseInt(tags[3]));
 	}
 	public String toString(){
 		return start.getTimeInMillis()+SEPERATOR+field+SEPERATOR+block+SEPERATOR+num_periods;
@@ -103,15 +103,9 @@ public class ViewPeriod implements TimePeriod {
 		}
 		return false;
 	}
-	public final ViewPeriod[] getSubPeriods(){
-		ViewPeriod result[] = new ViewPeriod[num_periods];
-		Calendar c = (Calendar) start.clone();
-		for(int i=0 ;i < num_periods ; i++){
-			result[i] = create( c, field, block, 1);
-			c.add(field,block);
-		}
-		return result;
-	}
+	
+	
+
 	public static Number getCalendarMonths(TimePeriod period){
 		int full_months=0;
 		double fraction=0.0;

@@ -13,7 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-/**
+/** an On/Off pulldown
  * @author spb
  *
  */
