@@ -40,20 +40,4 @@ public abstract class CompositeInput<V> extends MultiInput<V,Input> implements I
 	}
 
 
-
-	
-
-
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#validate()
-	 */
-	public void validate() throws FieldException {
-		for (Iterator it = getInputs(); it.hasNext();) {
-			Input s = (Input) it.next();
-			s.validate();
-		}
-	}
 }

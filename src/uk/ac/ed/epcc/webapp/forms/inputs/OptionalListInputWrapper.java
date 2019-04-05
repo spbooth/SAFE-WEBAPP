@@ -73,6 +73,9 @@ public class OptionalListInputWrapper<V,T> implements OptionalListInput<V, T> {
 			if( ((String) v).trim().length()==0){
 				return null;
 			}
+			if( unselected.equals(v)) {
+				return null;
+			}
 		}
 		return inner.convert(v);
 	}

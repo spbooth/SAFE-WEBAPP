@@ -427,6 +427,11 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 
 	@SuppressWarnings("unchecked")
 	public <V,T extends Input> Object visitMultiInput(MultiInput<V,T> input) throws Exception {
+		boolean saved = optional;
+		try {
+			// if we don't require all sub-inputs they must be shown as optional
+			optional = optional || !input.requireAll();
+		
 		if( input.hasLineBreaks()){
 			hb.open("table");
 			hb.addClass("multi_input");
@@ -460,6 +465,9 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 				i.accept(this);
 			}
 			hb.close();
+		}
+		}finally {
+			optional=saved;
 		}
 		return null;
 	}

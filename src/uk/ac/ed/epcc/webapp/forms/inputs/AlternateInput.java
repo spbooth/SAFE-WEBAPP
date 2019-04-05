@@ -107,30 +107,15 @@ public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> {
 	public void addInput(String sub_key, String label,Input<T> i) {
 
 
-		if( i instanceof ListInput){
-			// convert to optional
-			i = new OptionalListInputWrapper((ListInput)i);
-		}
+		
 
 		super.addInput(sub_key, label,i);
 	}
 	
 	@Override
-	public void validate() throws FieldException {
-		for(Iterator<Input<T>> it = getInputs();it.hasNext();){
-			Input<? extends T> i = it.next();
-			// Note unless the sub-inputs are optional we get a
-			// missing field exception here
-			T value = i.getValue();
-			if( value != null) {
-			    i.validate();
-				// only one input needs to be valid
-				break;
-			}
-		}
-	
+	public boolean requireAll() {
+		return false;
 	}
-
 
 
 	

@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.LockedInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
@@ -215,6 +216,12 @@ public final class Field<I> {
 	 * @throws FieldException
 	 */
 	public void validate() throws FieldException {
+		if( sel.isEmpty()) {
+			if( optional) {
+				return;
+			}
+			throw new MissingFieldException();
+		}
 		sel.validate();
 		if (validators != null) {
 			I dat = getValue();

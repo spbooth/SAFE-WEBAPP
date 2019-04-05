@@ -74,9 +74,8 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 	@Override
 	public String getValue() {
 		// Take first value.
-		String val = master.getValue();
-		if( val != null && val.trim().length() > 0){
-			return val;
+		if( ! master.isEmpty()) {
+			return master.getValue();
 		}
 		return convert(file.getValue());
 	}
@@ -92,13 +91,15 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 	}
 
 	@Override
+	public boolean requireAll() {
+		return false;
+	}
+
+	@Override
 	public void validate() throws FieldException {
-		String value = master.getValue();
-		if( value == null || value.trim().length()==0 ){
-			// promote to master
-			setValue(getValue());
+		if( master.isEmpty() && ! file.isEmpty()) {
+			master.setValue(convert(file.getValue()));
 		}
-		
 		master.validate();
 	}
 

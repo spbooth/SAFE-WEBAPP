@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 
 /** A multi input consists of a combination of sub inputs
  * Optionally each input can have an associated text label
@@ -140,13 +141,46 @@ public abstract class MultiInput<V,I extends Input> implements Input<V> {
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitMultiInput(this);
 	}
+	/** Are all inputs required
+	 * 
+	 * @return
+	 */
+	public boolean requireAll() {
+		return true;
+	}
+	
 	@Override
 	public void validate() throws FieldException {
 		// default behaviour is to validate each sub input
 		// sub-classes can override.
 		for(I i : m.values()){
-			i.validate();
+			if( i.isEmpty()) {
+				if( requireAll()) {
+					throw new MissingFieldException(i.getKey()+" missing");
+				}
+			}else {
+				i.validate();
+			}
 		}
+	}
+	@Override
+	public boolean isEmpty() {
+		if( requireAll()) {
+			for( I input : m.values()) {
+				if( input.isEmpty()) {
+					return true;
+				}
+			}
+			return false;
+		}else {
+			for( I input : m.values()) {
+				if( ! input.isEmpty()) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
 	}
 	public boolean hasLineBreaks() {
 		return line_breaks;
