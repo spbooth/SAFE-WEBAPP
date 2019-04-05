@@ -96,7 +96,6 @@ public class MultiIntegerHandler implements QuestionFormHandler<MultiInput> {
 		int_handler.buildConfigForm(f);
 		
 		TextInput labels = new TextInput();
-		labels.setOptional(false);
 		labels.setSingle(false);
 		labels.setMaxResultLength(256);
 		f.addInput(LABELS, "Labels", labels);

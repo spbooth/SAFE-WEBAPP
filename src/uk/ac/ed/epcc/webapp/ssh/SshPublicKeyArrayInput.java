@@ -35,6 +35,8 @@ import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
  */
 public class SshPublicKeyArrayInput extends ParseAbstractInput<String> implements ItemInput<PublicKey[]> {
 
+	
+
 	public SshPublicKeyArrayInput(){
 		super();
 		setBoxWidth(48);
@@ -97,9 +99,6 @@ public class SshPublicKeyArrayInput extends ParseAbstractInput<String> implement
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ParseInput#parse(java.lang.String)
 	 */
 	public String parseValue(String v) throws ParseException {
-		if( isOptional() && (v == null || v.trim().length() == 0) ){
-			return null;
-		}
 		try{
 			PublicKey[] keys = load(v);
 			return format(keys);
@@ -108,7 +107,11 @@ public class SshPublicKeyArrayInput extends ParseAbstractInput<String> implement
 		}
 		
 	}
-	
+	@Override
+	public boolean isEmpty() {
+		String v = getValue();
+		return v == null || v.trim().isEmpty();
+	}
 	public static PublicKey[] load(String value) throws PublicKeyParseException {
 		if( value == null || value.isEmpty()) {
 			return null;

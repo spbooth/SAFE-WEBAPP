@@ -40,14 +40,9 @@ public class UnusedNameInput<F extends DataObject> extends NoHtmlInput{
     	super();
     	this.fac=fac;
     	setSingle(true);
-    	setOptional(false);
     	setNoSpaces(true);
     }
-	@Override
-	public boolean isOptional() {
-		//Make sure that even if DB field is optional this input never is.
-		return false;
-	}
+	
 	@Override
 	public void validate() throws FieldException {
 		super.validate();

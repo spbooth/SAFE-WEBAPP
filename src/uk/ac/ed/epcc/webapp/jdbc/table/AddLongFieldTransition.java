@@ -35,8 +35,8 @@ public class AddLongFieldTransition<T extends DataObjectFactory> extends AddFiel
 	@Override
 	protected void addFormParams(Form f,T target, AppContext c) {
 		LongInput input = new LongInput();
-		input.setOptional(true);
 		f.addInput(DEFAULT,"Default value", input);
+		f.getField(DEFAULT).setOptional(true);
 	}
 
 	@Override

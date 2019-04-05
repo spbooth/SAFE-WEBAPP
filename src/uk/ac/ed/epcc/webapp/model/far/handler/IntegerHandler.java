@@ -30,27 +30,27 @@ public class IntegerHandler implements QuestionFormHandler<Integer> {
 	@Override
 	public void buildConfigForm(Form f) {
 		IntegerInput min_input = new IntegerInput();
-		min_input.setOptional(true);
 		f.addInput(MINIMUM, "Minimum legal value", min_input);
+		f.getField(MINIMUM).setOptional(true);
 		
 		IntegerInput max_input = new IntegerInput();
-		max_input.setOptional(true);
 		f.addInput(MAXIMUM, "Maximum legal value", max_input);
+		f.getField(MAXIMUM).setOptional(true);
 		
 		IntegerInput step_input = new IntegerInput();
 		step_input.setMin(1);
-		step_input.setOptional(true);
 		f.addInput(STEP, "Step size", step_input);
+		f.getField(STEP).setOptional(true);
 		
 		TextInput unit_input = new TextInput();
-		unit_input.setOptional(true);
 		unit_input.setSingle(true);
 		unit_input.setMaxResultLength(16);
 		f.addInput(UNIT, "Unit", unit_input);
+		f.getField(UNIT).setOptional(true);
 		
 		IntegerInput def_input = new IntegerInput();
-		def_input.setOptional(true);
 		f.addInput(DEFAULT_VALUE, "Default value", def_input);
+		f.getField(DEFAULT_VALUE).setOptional(true);
 		
 		f.addValidator(new FormValidator() {
 			

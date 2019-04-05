@@ -67,7 +67,7 @@ public class MultiStageProvider extends AbstractTransitionProvider<Number,Transi
 			hundreds.setMin(0);
 			hundreds.setMax(1000);
 			hundreds.setStep(100);
-			hundreds.setOptional(false);
+			
 			f.addInput(HUNDREDS, HUNDREDS, hundreds);
 			if( f.poll(self)) {
 				Integer h = (Integer) f.get(HUNDREDS);
@@ -75,7 +75,6 @@ public class MultiStageProvider extends AbstractTransitionProvider<Number,Transi
 				tens.setMin(h.intValue());
 				tens.setMax(h.intValue()+90);
 				tens.setStep(10);
-				tens.setOptional(false);
 				f.addInput(TENS, TENS, tens);
 				if( f.poll(self)) {
 					Integer t = (Integer) f.get(TENS);
@@ -83,7 +82,6 @@ public class MultiStageProvider extends AbstractTransitionProvider<Number,Transi
 					units.setMin(t.intValue());
 					units.setMax(t.intValue()+9);
 					units.setStep(1);
-					units.setOptional(false);
 					f.addInput(UNITS, UNITS, units);
 					f.addAction("Create", new FormAction() {
 						

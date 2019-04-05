@@ -121,10 +121,6 @@ public class TypeProducerInput<T> extends TextInput implements PreSelectInput<St
 	public void validate() throws FieldException {
 		super.validate();
 			String value = getValue();
-			if( value == null && isOptional()){
-				// null is valid
-				return;
-			}
 			try {
 				if( t.find(value) == null){
 					// not one of the valid types

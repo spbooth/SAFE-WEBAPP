@@ -93,8 +93,8 @@ public class AddDataTransitionProvider extends SimpleViewTransitionProvider<Test
 			wait.setValue(0);
 			f.addInput(WAIT_INPUT, "time to wait",wait);
 			TextInput text = new TextInput();
-			text.setOptional(true);
 			f.addInput(COMMENT_INPUT, "Comment to add in link", text);
+			f.getField(COMMENT_INPUT).setOptional(true);
 			f.addAction("Add", new AddAction(target));
 			
 		}

@@ -28,18 +28,16 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
  * @param <V> Param of object we generate
  * 
  */
-public abstract class AbstractInput<V> implements Input<V>, OptionalInput {
+public abstract class AbstractInput<V> implements Input<V> {
 	String key;
 
 	V value;
 
-	boolean optional;
+
 
 	public AbstractInput() {
 		super();
 		value = null;
-		optional = false;
-
 	}
 
 	/*
@@ -91,15 +89,7 @@ public abstract class AbstractInput<V> implements Input<V>, OptionalInput {
 		return value;
 	}
 
-	/**
-	 * Is it an error not to specify this Input
-	 * 
-	 * @return boolean true if optional
-	 * 
-	 */
-	public  boolean isOptional() {
-		return optional;
-	}
+	
 
 	/*
 	 * (non-Javadoc)
@@ -110,15 +100,7 @@ public abstract class AbstractInput<V> implements Input<V>, OptionalInput {
 		this.key = key;
 	}
 
-	/**
-	 * Mark this input as optional or not
-	 * 
-	 * @param opt
-	 *            boolean
-	 */
-	public  void setOptional(boolean opt) {
-		optional = opt;
-	}
+	
 
 	/*
 	 * (non-Javadoc)
@@ -145,9 +127,7 @@ public abstract class AbstractInput<V> implements Input<V>, OptionalInput {
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#validate()
 	 */
 	public void validate() throws FieldException {
-		if (value == null && !optional) {
-			throw new MissingFieldException(getKey() + " missing");
-		}
+	
 	}
 
 }

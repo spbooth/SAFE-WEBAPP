@@ -30,6 +30,5 @@ public class RangeDateInput extends DateInput {
     	if( end.before(start)){
     		throw new ConsistencyError("Date range reversed");
     	}
-    	setOptional(false);
     }
 }

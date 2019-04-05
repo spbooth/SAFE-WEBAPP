@@ -27,7 +27,6 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.ErrorProcessingFormAction;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
@@ -297,11 +296,9 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 				QuestionManager man = (QuestionManager) s.getFactory().getChildManager();
 				for( Question q : man.getParts(s)){
 					Input input = q.getInput();
-					if( input instanceof OptionalInput){
-						((OptionalInput)input).setOptional(q.isOptional());
-					}
 					input.setValue(response.getData(q));
 					f.addInput(q.getName(), q.getQuestionText(), input);
+					f.getField(q.getName()).setOptional(q.isOptional());
 				}
 				FormValidator val = s.getValidator(response);
 				if( val != null ){

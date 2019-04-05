@@ -35,8 +35,8 @@ public class AddDoubleFieldTransition<T extends DataObjectFactory> extends AddFi
 	@Override
 	protected void addFormParams(Form f, T target, AppContext c) {
 		DoubleInput input = new DoubleInput();
-		input.setOptional(true);
 		f.addInput(DEFAULT,"Default value", input);
+		f.getField(DEFAULT).setOptional(true);
 	}
 
 	@Override

@@ -110,4 +110,7 @@ public interface Input<V> {
 	
 	public abstract <R> R accept(InputVisitor<R> vis) throws Exception;
 
+	default public  boolean isEmpty() {
+		return getValue() == null;
+	}
 }

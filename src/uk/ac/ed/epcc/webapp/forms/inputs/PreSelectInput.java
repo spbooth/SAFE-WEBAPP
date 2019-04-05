@@ -22,7 +22,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
  * @param <T> type of Item object
  *
  */
-public interface PreSelectInput<V,T> extends ListInput<V, T>, OptionalInput {
+public interface PreSelectInput<V,T> extends ListInput<V, T> {
 
 	public boolean allowPreSelect();
 	

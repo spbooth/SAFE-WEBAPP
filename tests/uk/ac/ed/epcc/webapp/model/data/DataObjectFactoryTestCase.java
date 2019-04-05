@@ -34,8 +34,7 @@ import uk.ac.ed.epcc.webapp.forms.InputInterfaceTest;
 import uk.ac.ed.epcc.webapp.forms.InputInterfaceTestImpl;
 import uk.ac.ed.epcc.webapp.forms.ListInputInterfaceTest;
 import uk.ac.ed.epcc.webapp.forms.ListInputInterfaceTestImpl;
-import uk.ac.ed.epcc.webapp.forms.OptionalInputInterfaceTest;
-import uk.ac.ed.epcc.webapp.forms.OptionalInputInterfaceTestImpl;
+
 import uk.ac.ed.epcc.webapp.forms.TestDataProvider;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
@@ -53,7 +52,6 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 public abstract class DataObjectFactoryTestCase<D extends DataObjectFactory<O>, O extends DataObject> extends WebappTestBase implements TestDataProvider<Integer,DataObjectItemInput<O>>,
 InputInterfaceTest<Integer, DataObjectItemInput<O>, DataObjectFactoryTestCase<D, O>>,
-OptionalInputInterfaceTest<Integer, DataObjectItemInput<O>, DataObjectFactoryTestCase<D, O>>,
 ListInputInterfaceTest
 {
 
@@ -61,8 +59,6 @@ ListInputInterfaceTest
 	
 	public InputInterfaceTest<Integer, DataObjectItemInput<O>, DataObjectFactoryTestCase<D, O>> input_test = new InputInterfaceTestImpl<>(this);
 	
-
-	public OptionalInputInterfaceTest<Integer, DataObjectItemInput<O>, DataObjectFactoryTestCase<D, O>> optional_input_test = new OptionalInputInterfaceTestImpl<>(this);
 	
 
 	public ListInputInterfaceTest list_test = new ListInputInterfaceTestImpl(this);
@@ -323,11 +319,7 @@ public Set<Integer> getBadData() throws Exception{
 		}
 	}
 	
-	@Override
-	@Test
-	public final void testIsOptional() throws Exception {
-		optional_input_test.testIsOptional();
-	}
+	
 
 
 	@Override

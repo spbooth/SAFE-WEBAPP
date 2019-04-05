@@ -23,14 +23,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.jasper.util.FastRemovalDequeue.Entry;
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
@@ -540,15 +537,16 @@ public class BaseForm implements Form {
 				for (Iterator<String> it = getFieldIterator(); it.hasNext();) {
 					String key = it.next();
 					Field f = getField(key);
-					try {
-						f.validate();
-					} catch (MissingFieldException e) {
-						
-						ok = false;
-					} catch (FieldException e) {
-						
-						ok = false;
-						//errors++;
+					if( f.getInput().isEmpty() ) {
+						ok =  f.isOptional();
+					}else {
+						try {
+							f.validate();
+						} catch (FieldException e) {
+
+							ok = false;
+							//errors++;
+						}
 					}
 				}
 				if (!ok) {

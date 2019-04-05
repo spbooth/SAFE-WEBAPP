@@ -26,21 +26,17 @@ import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
  *
  */
 
-public class FileUploadDecorator extends ParseMultiInput<String,Input> implements OptionalInput, ParseInput<String>{
+public class FileUploadDecorator extends ParseMultiInput<String,Input> implements  ParseInput<String>{
 	
 
 	private ParseAbstractInput<String> master;
 	private FileInput file;
-	private boolean optional=false;
+	
 	public FileUploadDecorator(ParseAbstractInput<String> input){
 		master=input;
 		addInput("Text", input);
 		file = new FileInput();
-		optional=input.isOptional();
-		// Need to be optional when generating html as this
-		// may be validated in browser
-		master.setOptional(true);
-		file.setOptional(true);
+	
 		if( input instanceof LengthInput){
 			file.setMaxUpload(((LengthInput)input).getMaxResultLength());
 		}
@@ -102,24 +98,11 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 			// promote to master
 			setValue(getValue());
 		}
-		master.setOptional(optional);
+		
 		master.validate();
-		master.setOptional(true);
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput#isOptional()
-	 */
-	public boolean isOptional() {
-		return optional;
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput#setOptional(boolean)
-	 */
-	public void setOptional(boolean opt) {
-		optional=opt;
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ParseInput#parse(java.lang.String)

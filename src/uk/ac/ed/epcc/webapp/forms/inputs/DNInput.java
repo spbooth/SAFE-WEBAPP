@@ -37,6 +37,8 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  */
 public class DNInput extends ParseAbstractInput<String> implements ItemInput<LdapName>{
 
+
+
 	private static final Pattern strip_pattern= Pattern.compile("\"(.*)\"");
 	//private static final Pattern valid_pattern = Pattern.compile("(/\\w+=[^/=]+)+");
 	public DNInput() {
@@ -44,7 +46,6 @@ public class DNInput extends ParseAbstractInput<String> implements ItemInput<Lda
 		setMaxResultLength(256);
 		setBoxWidth(64);
 		setSingle(true);
-		setOptional(false);
 	}
 
 	@Override
@@ -53,9 +54,6 @@ public class DNInput extends ParseAbstractInput<String> implements ItemInput<Lda
 		String val = getValue();
 		if( val == null || value.trim().length()==0){
 			// have to check optional again as superclass accepts spaces
-			if( !optional) {
-				throw new MissingFieldException(getKey() + " empty");
-			}
 			return;
 		}
 		if( DNInput.validateGlobusDN(val)){
@@ -189,4 +187,9 @@ public class DNInput extends ParseAbstractInput<String> implements ItemInput<Lda
 		setValue(makeGlobusName(item));
 	}
 
+	@Override
+	public boolean isEmpty() {
+		String value = getValue();
+		return value == null || value.trim().isEmpty();
+	}
    }

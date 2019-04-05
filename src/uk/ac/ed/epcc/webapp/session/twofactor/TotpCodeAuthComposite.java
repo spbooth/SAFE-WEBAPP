@@ -218,7 +218,6 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	@Override
 	public Input<Integer> getInput() {
 		IntegerInput input = new IntegerInput();
-		input.setOptional(false);
 		input.setMin(0);
 		input.setMax(999999);
 		input.setBoxWidth(6);

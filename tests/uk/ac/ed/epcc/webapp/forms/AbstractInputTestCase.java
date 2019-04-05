@@ -24,23 +24,16 @@ import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
 
 
 public abstract class AbstractInputTestCase<T,I extends AbstractInput<T>> extends WebappTestBase implements TestDataProvider<T,I> ,
-InputInterfaceTest<T, I, AbstractInputTestCase<T, I>>,
-OptionalInputInterfaceTest<T, I, AbstractInputTestCase<T, I>>
+InputInterfaceTest<T, I, AbstractInputTestCase<T, I>>
 {
 	
 
 	public InputInterfaceTest<T, I, AbstractInputTestCase<T, I>> input_test = new InputInterfaceTestImpl<>(this);
 	
 
-	public OptionalInputInterfaceTest<T, I, AbstractInputTestCase<T, I>> optional_input_test = new OptionalInputInterfaceTestImpl<>(this);
 
 
-	@Override
-	@Test
-	public final void testIsOptional() throws Exception {
-		optional_input_test.testIsOptional();
-	}
-
+	
 
 	@Override
 	@Test

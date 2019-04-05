@@ -54,11 +54,7 @@ public class CanSubmitVisistor implements InputVisitor<Boolean> {
 	 */
 	@Override
 	public <V, T> Boolean visitListInput(ListInput<V, T> listInput) throws Exception {
-		if( listInput instanceof OptionalInput) {
-			if(((OptionalInput)listInput).isOptional()) {
-				return true;
-			}
-		}
+		
 		if( listInput.getCount() < 1 ) {
 			// no valid options
 			return false;
@@ -79,11 +75,6 @@ public class CanSubmitVisistor implements InputVisitor<Boolean> {
 	 */
 	@Override
 	public Boolean visitLengthInput(LengthInput input) throws Exception {
-		if( input instanceof OptionalInput) {
-			if(((OptionalInput)input).isOptional()) {
-				return true;
-			}
-		}
 		if( input.getMaxResultLength() < 1) {
 			return false;
 		}

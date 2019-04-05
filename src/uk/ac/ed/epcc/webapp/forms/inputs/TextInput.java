@@ -76,12 +76,7 @@ public class TextInput extends ParseAbstractInput<String> {
 			if (s != null && s.length() > getMaxResultLength() && getMaxResultLength() > 0) {
 				throw new ValidateException("Input too long");
 			}
-			if (s == null || s.trim().length() == 0) {
-				// empty string counts as missing
-				if (!isOptional()) {
-					throw new MissingFieldException(getKey() + " missing");
-				}
-			}
+			
 			
 			if( s != null && no_spaces && WHITESPACE.matcher(s).find()){
 				throw new ValidateException("Input must not contain whitespace");
@@ -112,6 +107,11 @@ public class TextInput extends ParseAbstractInput<String> {
 		if( no_spaces) {
 			setTrim(true);
 		}
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return super.isEmpty() || getValue().length() == 0;
 	}
 
 }

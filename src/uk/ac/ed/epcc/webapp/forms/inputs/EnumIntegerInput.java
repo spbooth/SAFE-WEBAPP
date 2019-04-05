@@ -127,9 +127,6 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
 	public void validate() throws FieldException {
 		super.validate();
 		Integer val = getValue();
-		if( isOptional() && val == null ){
-			return;
-		}
 		if( ! lookup.containsKey(val)){
 			throw new ValidateException("Not one of the valid choices");
 		}

@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -347,10 +348,16 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 		Map<String, Object> selectors = super.getSelectors();
 		ClassInput<CompleteVisitor> input =  new ClassInput<>(getContext(), CompleteVisitor.class);
 		OptionalListInputWrapper<String, Class<? extends CompleteVisitor>> optional_input = new OptionalListInputWrapper<>(input,"use default");
-		optional_input.setOptional(true);
 		selectors.put(VALIDATING_VISITOR_FIELD, optional_input);
 		
 		return selectors;
+	}
+
+	@Override
+	protected Set<String> getOptional() {
+		Set<String> optional = new HashSet<>();
+		optional.add(VALIDATING_VISITOR_FIELD);
+		return optional;
 	}
 
 	/**

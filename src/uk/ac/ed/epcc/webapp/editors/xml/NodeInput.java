@@ -49,7 +49,6 @@ public class NodeInput extends TextInput implements ItemInput<Node>{
 	private Schema schema;
 	public NodeInput(AppContext conn,Document doc,TransformerFactory fac,Schema schema) throws TransformerConfigurationException {
 		super();
-		setOptional(false);
 		setSingle(false);
 		setMaxResultLength(1<<24);
 		this.conn=conn;

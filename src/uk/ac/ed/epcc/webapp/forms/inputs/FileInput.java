@@ -66,9 +66,7 @@ public class FileInput extends AbstractInput<StreamData> {
 				if( max_upload > 0 && length > max_upload){
 					throw new ValidateException("Upload size greater than allowed maximum "+max_upload);
 				}
-				if( length == 0 && ! isOptional()) {
-					throw new ValidateException("Zero length file");
-				}
+			
 				return;
 			}
 			
@@ -89,6 +87,11 @@ public class FileInput extends AbstractInput<StreamData> {
 	 */
 	public void setAccept(String accept) {
 		this.accept = accept;
+	}
+	@Override
+	public boolean isEmpty() {
+		StreamData value = getValue();
+		return ( value == null || value.getLength() == 0L);
 	}
 
 }

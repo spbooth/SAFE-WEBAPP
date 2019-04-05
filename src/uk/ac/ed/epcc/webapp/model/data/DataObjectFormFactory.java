@@ -37,7 +37,6 @@ import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.LongInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.NoHtmlInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.RealInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TimeStampInput;
@@ -208,10 +207,6 @@ public final AppContext getContext(){
 						throw new DataFault("Unsupported sql.Type: " + sql_type);
 					}
 				}
-				if (input instanceof OptionalInput) {
-					OptionalInput ab = (OptionalInput) input;
-					ab.setOptional(is_optional);
-				}
 				if( input instanceof TextInput){
 					// If MaxResultLength out of range then
 					// set from the DB.
@@ -235,6 +230,7 @@ public final AppContext getContext(){
 					tooltip = conn.getInitParameter("form.tooltip."+table+"."+name);
 				}
 				f.addInput(name, lab,tooltip, input);
+				f.getField(name).setOptional(is_optional);
 			}
 		}
 

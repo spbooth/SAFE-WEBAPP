@@ -42,12 +42,11 @@ public class AddTextFieldTransition<T extends DataObjectFactory> extends AddFiel
 		IntegerInput length = new IntegerInput();
 		BooleanInput null_input = new BooleanInput();
 		length.setMin(1);
-		length.setOptional(false);
 		TextInput def = new TextInput(true);
-		def.setOptional(true);
 		f.addInput(SIZE,"Max length", length);
 		f.addInput(ALLOW_NULL, "Allow null", null_input);
 		f.addInput(DEFAULT,"Default value",def);
+		f.getField(DEFAULT).setOptional(true);
 		
 	}
 

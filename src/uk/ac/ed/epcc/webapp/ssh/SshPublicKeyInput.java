@@ -90,10 +90,10 @@ public class SshPublicKeyInput extends ParseAbstractInput<String> implements Ite
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ParseInput#parse(java.lang.String)
 	 */
 	public String parseValue(String v) throws ParseException {
-		if( isOptional() && (v == null || v.trim().length() == 0) ){
-			return null;
-		}
 		try{
+			if( v == null || v.isEmpty()) {
+				return null;
+			}
 			PublicKey key = PublicKeyReaderUtil.load(v);
 			return PublicKeyReaderUtil.format(key);
 		}catch(Exception e){
@@ -135,5 +135,11 @@ public class SshPublicKeyInput extends ParseAbstractInput<String> implements Ite
 
 		}
 		return super.convert(v);
+	}
+
+	@Override
+	public boolean isEmpty() {
+		String value = getValue();
+		return value == null || value.trim().isEmpty();
 	}
 }

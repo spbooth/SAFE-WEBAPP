@@ -50,7 +50,6 @@ public class FixedCodeAuthComposite<A extends AppUser> extends CodeAuthComposite
 	public Input<String> getInput() {
 		TextInput input = new TextInput();
 		input.setSingle(true);
-		input.setOptional(false);
 		return input;
 	}
 

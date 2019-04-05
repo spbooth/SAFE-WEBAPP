@@ -494,7 +494,6 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	@Override
 	public BasicTypeInput<T> getInput() {
 		BasicTypeInput<T> input = new BasicTypeInput<>(this);
-		input.setOptional(true);
 		return input;
 	}
 

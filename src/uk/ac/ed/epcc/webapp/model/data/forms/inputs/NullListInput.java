@@ -24,7 +24,6 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -42,11 +41,11 @@ import uk.ac.ed.epcc.webapp.model.data.forms.SQLMatcher;
  */
 
 
-public class NullListInput<T extends Indexed>   implements ListInput<Integer,Object>,ParseInput<Integer>, SQLMatcher,OptionalInput{
+public class NullListInput<T extends Indexed>   implements ListInput<Integer,Object>,ParseInput<Integer>, SQLMatcher{
     private ListInput<Integer,T> internal;
     public static final String NULLTAG="NULL-VALUE";
     public static final int NULL_VALUE=-1;
-    private boolean optional=true;
+   
     public NullListInput(ListInput<Integer,T> input){
     	internal = input;
     }
@@ -218,14 +217,7 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitListInput(this);
 	}
-	@Override
-	public boolean isOptional() {
-		return optional;
-	}
-	@Override
-	public void setOptional(boolean opt) {
-		optional=opt;
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
 	 */

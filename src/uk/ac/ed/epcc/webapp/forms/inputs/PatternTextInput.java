@@ -33,7 +33,6 @@ public class PatternTextInput extends TextInput implements TagInput, PatternInpu
    private String tag=null;
    public PatternTextInput(String pattern){
 	   super(false);
-	   setOptional(false);
 	   this.pattern=pattern;
 	   validate_pattern = Pattern.compile(pattern);
    }

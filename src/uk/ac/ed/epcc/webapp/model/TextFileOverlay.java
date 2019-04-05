@@ -24,8 +24,10 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.incava.util.diff.Diff;
 import org.incava.util.diff.Difference;
@@ -716,19 +718,18 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 	protected Map<String, Object> getSelectors() {
 		Map<String,Object> sel = new HashMap<>();
 		TextInput text = new TextInput();
-		text.setOptional(false);
 		text.setMaxResultLength(1<<24);
 		sel.put(TEXT,text);
 		TextInput name = new TextInput();
-		name.setOptional(false);
 		name.setSingle(true);
 		sel.put(NAME, name);
 		TextInput group = new TextInput();
-		group.setOptional(false);
 		group.setSingle(true);
 		sel.put(GROUP, group);
 		return sel;
 	}
+
+	
 
 	@Override
 	public Class<T> getTarget() {

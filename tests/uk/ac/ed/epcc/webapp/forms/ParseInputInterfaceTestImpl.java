@@ -24,7 +24,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
+
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseInput;
 
 
@@ -39,9 +39,7 @@ public  class ParseInputInterfaceTestImpl<T,I extends ParseInput<T>,X extends Te
 	@Test
 	public void parseNull() throws Exception{
 		I i = target.getInput();
-		if( i instanceof OptionalInput ){
-			((OptionalInput)i).setOptional(true);
-		}
+		
 				
 				
 		if( target.allowNull()){
@@ -94,8 +92,15 @@ public  class ParseInputInterfaceTestImpl<T,I extends ParseInput<T>,X extends Te
 public  void checkValid(String text,boolean expect, I i) throws FieldException  {
 		
 		try{
-			i.validate();
-			assertTrue("passed validate with expected fail "+text,expect);
+			// inputs that report empty are only checked for optional
+			// validate is not called
+			if( ! i.isEmpty()) {
+				i.validate();
+				assertTrue("passed validate with expected fail "+text,expect);
+			}else {
+				assertFalse("Empty inputs should be expected to fail ",expect);
+			}
+			
 		}catch(FieldException e){
 			assertFalse("Exception thrown with "+text,expect);
 		}

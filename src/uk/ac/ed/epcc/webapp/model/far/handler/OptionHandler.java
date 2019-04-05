@@ -12,7 +12,6 @@ import uk.ac.ed.epcc.webapp.model.far.response.StringDataManager;
  * @author michaelbareford
  *
  */
-@uk.ac.ed.epcc.webapp.Version("$Revision:$")
 public class OptionHandler implements QuestionFormHandler<String> {
 
 	private static final String OPTIONS = "Options";
@@ -25,7 +24,6 @@ public class OptionHandler implements QuestionFormHandler<String> {
 	@Override
 	public void buildConfigForm(Form f) {
 		TextInput options = new TextInput();
-		options.setOptional(false);
 		options.setSingle(false);
 		options.setMaxResultLength(256);
 		f.addInput(OPTIONS, "Options", options);

@@ -119,7 +119,6 @@ public class ViewRelationTransition<X extends DataObject> extends AbstractFormTr
 	@Override
 	public void buildForm(Form f, X target, AppContext conn) throws TransitionException {
 		SetInput<String> r = new SetInput<>(getRelationships());
-		r.setOptional(false);
 		f.addInput(RELATIONSHIP_FIELD,"Relationship", r);
 		f.addAction("View", new ShowAction(target));
 		

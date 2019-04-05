@@ -69,13 +69,13 @@ public class EmailListHandler implements QuestionFormHandler<String> {
 		
 		f.addInput(SINGLE_CONF, "Force single line", new BooleanInput());
 		IntegerInput max_input = new IntegerInput();
-		max_input.setOptional(true);
 		max_input.setMin(1);
 		f.addInput(MAX_RESULT_CONF, "Maximum result length", max_input);
+		f.getField(MAX_RESULT_CONF).setOptional(true);
 		IntegerInput max_box = new IntegerInput();
-		max_box.setOptional(true);
 		max_box.setMin(1);
 		f.addInput(BOX_LENGTH_CONF, "Box length", max_box);
+		f.getField(BOX_LENGTH_CONF).setOptional(true);
 		
 	}
 

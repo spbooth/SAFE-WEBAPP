@@ -191,7 +191,6 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 			Node n = target.getTargetNode();
 			String value = n.getNodeValue();
 			final TextInput input = new TextInput();
-			input.setOptional(false);
 			if( value != null && value.length() > 8){
 				input.setBoxWidth(value.length());
 			}

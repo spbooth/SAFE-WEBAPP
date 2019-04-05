@@ -482,13 +482,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			super.validate();
 			Number left = left_input.getValue();
 			Number right = right_input.getValue();
-			if (left == null || right == null) {
-				// ok if optional
-				if (isOptional()) {
-					return;
-				}
-				throw new MissingFieldException();
-			}
+			
 			try {
 				l = selectLink(getLeftFactory().find(left), getRightFactory().find(right));
 			} catch (Exception e) {
@@ -498,6 +492,16 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			if (l == null) {
 				throw new ValidateException("Selected item does not exist");
 			}
+		}
+
+		@Override
+		public boolean isEmpty() {
+			Number left = left_input.getValue();
+			Number right = right_input.getValue();
+			if (left == null || right == null) {
+				return true;
+			}
+			return super.isEmpty();
 		}
 
 		public T getDataObject() {

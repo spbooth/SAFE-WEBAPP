@@ -35,8 +35,8 @@ public class AddDateFieldTransition<T extends DataObjectFactory> extends AddFiel
 	@Override
 	protected void addFormParams(Form f, T target, AppContext c) {
 		DateInput input = new DateInput();
-		input.setOptional(true);
 		f.addInput(DEFAULT,"Default Date", input);
+		f.getField(DEFAULT).setOptional(true);
 	}
 
 	@Override

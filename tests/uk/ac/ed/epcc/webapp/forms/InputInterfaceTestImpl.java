@@ -59,7 +59,7 @@ public class InputInterfaceTestImpl<T,I extends Input<T>,X extends TestDataProvi
 		Input<T> input = target.getInput();
 		input.setKey("test");
 		HtmlBuilder hb = new HtmlBuilder();
-		EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(null,hb, false, new HashMap() ,null,null);
+		EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(null,false,hb, false, new HashMap() ,null,null);
 		input.accept(vis);
 	}
 	
@@ -107,8 +107,12 @@ public class InputInterfaceTestImpl<T,I extends Input<T>,X extends TestDataProvi
 		
 	
 		try{
-			i.validate();
-			assertTrue("Exception validate passed for ["+value+"]",expect);
+			if( ! i.isEmpty()) {
+				i.validate();
+				assertTrue("Exception validate passed for ["+value+"]",expect);
+			}else {
+				assertFalse("Inputs should only report empty when fail expected",expect);
+			}
 		}catch(FieldException e){
 			assertFalse("Exception thrown for value "+value+" "+e.getMessage(), expect);
 		}

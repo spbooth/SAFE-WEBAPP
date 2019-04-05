@@ -27,14 +27,13 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
  */
 
 
-public class ConstantInput<V> implements UnmodifiableInput, Input<V>,  OptionalInput {
+public class ConstantInput<V> implements UnmodifiableInput, Input<V> {
 	private String label;
 
 	private String key;
 
 	private V value = null;
 
-	private  boolean optional = false;
 
 	public ConstantInput(String label){
 		this(label,null);
@@ -71,15 +70,7 @@ public class ConstantInput<V> implements UnmodifiableInput, Input<V>,  OptionalI
 		return value;
 	}
 
-	/**
-	 * Is it an error not to specify this Input
-	 * 
-	 * @return boolean true if optional
-	 * 
-	 */
-	public boolean isOptional() {
-		return optional;
-	}
+	
 
 	
 
@@ -92,15 +83,7 @@ public class ConstantInput<V> implements UnmodifiableInput, Input<V>,  OptionalI
 		label = s;
 	}
 
-	/**
-	 * Mark this input as optional or not
-	 * 
-	 * @param opt
-	 *            boolean
-	 */
-	public void setOptional(boolean opt) {
-		optional = opt;
-	}
+	
 
 	@SuppressWarnings("unchecked")
 	public V setValue(Object v) throws TypeError{
@@ -115,11 +98,7 @@ public class ConstantInput<V> implements UnmodifiableInput, Input<V>,  OptionalI
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.AbstractInput#validate(boolean)
 	 */
 	public void validate() throws FieldException {
-		boolean ok = value != null || optional;
-		if (ok) {
-			return;
-		}
-		throw new MissingFieldException(getKey() + " missing");
+		
 	}
 
 	@SuppressWarnings("unchecked")

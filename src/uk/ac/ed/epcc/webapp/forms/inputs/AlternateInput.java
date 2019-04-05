@@ -22,7 +22,6 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
 /** An alternateInput is a MultiInput consisting of
@@ -40,8 +39,8 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
  */
 
 
-public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> implements OptionalInput{
-    private boolean optional=false;
+public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> {
+
 	public AlternateInput() {
 		super();
 	}
@@ -106,15 +105,13 @@ public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> implements Op
 	 */
 	@Override
 	public void addInput(String sub_key, String label,Input<T> i) {
-	
-		if( i  instanceof OptionalInput){
-			((OptionalInput) i).setOptional(true);
-		}else{
-			if( i instanceof ListInput){
-				// convert to optional
-				i = new OptionalListInputWrapper((ListInput)i);
-			}
+
+
+		if( i instanceof ListInput){
+			// convert to optional
+			i = new OptionalListInputWrapper((ListInput)i);
 		}
+
 		super.addInput(sub_key, label,i);
 	}
 	
@@ -124,35 +121,19 @@ public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> implements Op
 			Input<? extends T> i = it.next();
 			// Note unless the sub-inputs are optional we get a
 			// missing field exception here
-			try{
+			T value = i.getValue();
+			if( value != null) {
 			    i.validate();
 				// only one input needs to be valid
 				break;
-			
-			}catch(MissingFieldException e){
-				// treat inputs as optional even if not
 			}
 		}
 	
-		if(  ! isOptional()){
-		
-			// need to check one of the inputs has a non null value
-			if( getValue() == null ){
-				
-				throw new MissingFieldException();
-			}
-		}
 	}
 
-	@Override
-	public boolean isOptional() {
-	  return optional;
-	}
 
-	@Override
-	public void setOptional(boolean opt) {
-		optional=opt;
-	}
+
+	
 
 	@Override
 	public Map<String, Object> getMap() {

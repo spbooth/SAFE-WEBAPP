@@ -21,20 +21,16 @@ import org.junit.Test;
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.forms.ListInputInterfaceTest;
 import uk.ac.ed.epcc.webapp.forms.ListInputInterfaceTestImpl;
-import uk.ac.ed.epcc.webapp.forms.OptionalInputInterfaceTest;
-import uk.ac.ed.epcc.webapp.forms.OptionalInputInterfaceTestImpl;
+
 import uk.ac.ed.epcc.webapp.forms.TestDataProvider;
 import uk.ac.ed.epcc.webapp.forms.TestEnum;
 
 public class OptionalListInputWrapperTest extends WebappTestBase implements TestDataProvider<String,OptionalListInputWrapper<String,TestEnum>>,
-ListInputInterfaceTest<String, TestEnum, OptionalListInputWrapper<String,TestEnum>, TestDataProvider<String,OptionalListInputWrapper<String,TestEnum>>>,
-OptionalInputInterfaceTest<String, OptionalListInputWrapper<String,TestEnum>, TestDataProvider<String,OptionalListInputWrapper<String,TestEnum>>>
+ListInputInterfaceTest<String, TestEnum, OptionalListInputWrapper<String,TestEnum>, TestDataProvider<String,OptionalListInputWrapper<String,TestEnum>>>
 {
 
 	public ListInputInterfaceTest<String, TestEnum, OptionalListInputWrapper<String,TestEnum>,TestDataProvider<String,OptionalListInputWrapper<String,TestEnum>>> list_test =
 			new ListInputInterfaceTestImpl<>(this);
-	
-	public OptionalInputInterfaceTest<String, OptionalListInputWrapper<String,TestEnum>, TestDataProvider<String,OptionalListInputWrapper<String,TestEnum>>> optional_tests = new OptionalInputInterfaceTestImpl<>(this);
 	
 	public OptionalListInputWrapperTest() {
 		
@@ -129,15 +125,5 @@ OptionalInputInterfaceTest<String, OptionalListInputWrapper<String,TestEnum>, Te
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.OptionalInputInterfaceTest#testIsOptional()
-	 */
-	@Override
-	@Test
-	public void testIsOptional() throws Exception {
-		optional_tests.testIsOptional();
-	}
-
-	
 
 }

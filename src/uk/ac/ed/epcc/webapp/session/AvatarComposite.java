@@ -154,7 +154,6 @@ public class AvatarComposite<AU extends AppUser> extends AppUserComposite<AU, Av
 		@Override
 		public void buildForm(Form f, AppUser target, AppContext conn) throws TransitionException {
 			ImageInput input = new ImageInput();
-			input.setOptional(false);
 			f.addInput(AVATAR, "Avatar image", input);
 			f.addAction(ATTACH_ACTION, new AddAvatarAction(target));
 			if( hasAvatar(null, (AU)target)) {

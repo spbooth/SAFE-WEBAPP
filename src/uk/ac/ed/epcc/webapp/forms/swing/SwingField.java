@@ -58,7 +58,6 @@ import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.LengthInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseMultiInput;
@@ -305,7 +304,7 @@ public class SwingField<I>  {
 		@SuppressWarnings("unchecked")
 		public JComponent visitListInput(ListInput listInput) throws Exception {
 			JComboBox box = new JComboBox();
-			if( listInput instanceof OptionalInput && ((OptionalInput)listInput).isOptional()){
+			if( field.isOptional()){
 				String unselected = LIST_INPUT_UNSELECTED;
 				if( listInput instanceof OptionalListInput){
 					unselected =((OptionalListInput)listInput).getUnselectedText();
@@ -479,7 +478,7 @@ public class SwingField<I>  {
 		lab = new JLabel(field.getLabel());
 		form.add(lab);
 		Input<I> input = field.getInput();
-		if( input instanceof OptionalInput &&((OptionalInput)input).isOptional()){
+		if( field.isOptional()){
 			lab.setForeground(Color.GRAY);
 		}
 		JComponent field_component = getComponent(input,null);
@@ -525,7 +524,7 @@ public class SwingField<I>  {
 				item = input.getItembyValue(value);
 				((JComboBox)components.get(input)).setSelectedItem(item);
 			} else {
-				if( input instanceof OptionalInput && ((OptionalInput)input).isOptional()){
+				if( field.isOptional()){
 					item = LIST_INPUT_UNSELECTED;
 					((JComboBox)components.get(input)).setSelectedItem(item);
 				}else{

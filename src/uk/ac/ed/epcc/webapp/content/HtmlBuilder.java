@@ -35,7 +35,6 @@ import uk.ac.ed.epcc.webapp.forms.html.EmitHtmlInputVisitor;
 import uk.ac.ed.epcc.webapp.forms.html.InputIdVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.CanSubmitVisistor;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.PrefixInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TagInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
@@ -440,8 +439,7 @@ public <I> void addFormLabel(AppContext conn,Field<I> f) {
 	boolean missing = isMissing(key);
 	String error = getError(key);
 	Input<I> i = f.getInput();
-	boolean optional = i instanceof OptionalInput
-	&& ((OptionalInput) i).isOptional();
+	boolean optional = f.isOptional();
 	if( HTML_USE_LABEL_FEATURE.isEnabled(conn)){
 		open("label");
 		InputIdVisitor vis = new InputIdVisitor(f.getForm().getFormID());
@@ -519,6 +517,7 @@ public boolean setLockedAsHidden(boolean value) {
 public <I,T> void addFormInput(AppContext conn,Field<I> f,T item) {
 	String key =  f.getKey();
 	String error = null;
+	boolean optional = f.isOptional();
 	// If we have errors to report then we are showing the post_params.
 	// if we want to force errors to be shown from the Form state (say
 	// updating an old object with
@@ -534,7 +533,7 @@ public <I,T> void addFormInput(AppContext conn,Field<I> f,T item) {
 		clean(((PrefixInput)i).getPrefix());
 	}
 	try{
-		EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(conn,this, use_post, post_params,f.getForm().getFormID(),f.getAttributes());
+		EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(conn,optional,this, use_post, post_params,f.getForm().getFormID(),f.getAttributes());
 		vis.setRadioTarget(item);
 		vis.setUseRequired(use_required);
 		vis.setAutoFocus(f.getKey().equals(f.getForm().getAutoFocus()));

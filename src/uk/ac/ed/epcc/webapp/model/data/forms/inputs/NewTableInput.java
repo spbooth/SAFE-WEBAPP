@@ -32,7 +32,6 @@ public class NewTableInput extends TextInput {
 	private AppContext c;
 	public NewTableInput(AppContext c){
 		this.c=c;
-		setOptional(false);
 		setSingle(true);
 	}
 	/* (non-Javadoc)

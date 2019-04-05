@@ -34,8 +34,8 @@ public class AddFloatFieldTransition<T extends DataObjectFactory> extends AddFie
 	@Override
 	protected void addFormParams(Form f, T target,AppContext c) {
 		RealInput input = new RealInput();
-		input.setOptional(true);
 		f.addInput(DEFAULT,"Default value", input);
+		f.getField(DEFAULT).setOptional(true);
 	}
 
 	@Override

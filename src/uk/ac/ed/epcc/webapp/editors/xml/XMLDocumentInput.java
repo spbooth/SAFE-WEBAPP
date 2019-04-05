@@ -47,7 +47,6 @@ public class XMLDocumentInput extends TextInput implements ItemInput<Document>{
 	private Schema schema;
 	public XMLDocumentInput(AppContext conn,TransformerFactory fac,Schema schema) throws TransformerConfigurationException {
 		super();
-		setOptional(false);
 		setSingle(false);
 		setMaxResultLength(1<<24);
 		this.conn=conn;

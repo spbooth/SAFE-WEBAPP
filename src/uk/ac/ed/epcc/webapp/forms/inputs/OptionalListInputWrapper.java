@@ -27,29 +27,14 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 public class OptionalListInputWrapper<V,T> implements OptionalListInput<V, T> {
 	private ListInput<V,T> inner;
 	private String unselected="Not Selected";
-	private boolean is_optional=true;
 	public OptionalListInputWrapper(ListInput<V,T> inner){
 		this.inner=inner;
-		if( inner instanceof OptionalInput){
-			((OptionalInput)inner).setOptional(true);
-		}
 	}
 	public OptionalListInputWrapper(ListInput<V,T> inner,String text){
 		this(inner);
 		unselected=text;
 	}
-	public boolean isOptional() {
-		if( inner instanceof OptionalInput){
-			return ((OptionalInput)inner).isOptional();
-		}
-		return is_optional;
-	}
-	public void setOptional(boolean opt) {
-		if( inner instanceof OptionalInput){
-			((OptionalInput)inner).setOptional(opt);
-		}
-		is_optional=opt;
-	}
+	
 	public T getItembyValue(V value) {
 		return inner.getItembyValue(value);
 	}
@@ -98,9 +83,6 @@ public class OptionalListInputWrapper<V,T> implements OptionalListInput<V, T> {
 		return inner.getPrettyString(value);
 	}
 	public void validate() throws FieldException {
-		if( isOptional() && inner.getValue() == null){
-			return;
-		}
 		inner.validate();		
 	}
 	public <R> R accept(InputVisitor<R> vis) throws Exception {

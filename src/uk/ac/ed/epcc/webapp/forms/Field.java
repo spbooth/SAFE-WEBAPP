@@ -50,7 +50,7 @@ public final class Field<I> {
 	private String label;
 	
 	private String tooltip;
-	
+	private boolean optional=false;
 	
 	private Map<String,String> data_attr=null;
 	
@@ -233,6 +233,12 @@ public final class Field<I> {
 	}
 	public Form getForm() {
 		return f;
+	}
+	public boolean isOptional() {
+		return optional;
+	}
+	public void setOptional(boolean optional) {
+		this.optional = optional;
 	}
 
 }

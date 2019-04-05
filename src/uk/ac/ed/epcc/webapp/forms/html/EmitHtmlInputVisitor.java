@@ -36,7 +36,6 @@ import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.LockedInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.MultipleInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseMultiInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.PasswordInput;
@@ -67,13 +66,15 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	private boolean use_html5;
 	private boolean use_required=true;
 	private boolean locked_as_hidden=false;
+	private boolean optional=false;
 	private Map post_params;
 	private Map<String,String> data_attr;
 	private InputIdVisitor id_vis;
 	private Object radio_selector=null;
 	private boolean auto_focus=false;
-	public EmitHtmlInputVisitor(AppContext conn,ExtendedXMLBuilder hb, boolean use_post, Map post_params,String prefix,Map<String,String> data_attr){
+	public EmitHtmlInputVisitor(AppContext conn,boolean optional,ExtendedXMLBuilder hb, boolean use_post, Map post_params,String prefix,Map<String,String> data_attr){
 		this.conn=conn;
+		this.optional=optional;
 		this.hb=hb;
 		this.use_post=use_post;
 		this.post_params=post_params;
@@ -190,7 +191,6 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	}
 	private  <X,T> void emitListHTML(ExtendedXMLBuilder hb,boolean use_post, ListInput<X,T> input, String param) {
 		assert(input!=null);
-		boolean optional = input instanceof OptionalInput && ((OptionalInput)input).isOptional();
 		boolean forced=! optional &&input.getCount() == 1;
 		if( forced && LOCK_FORCED_LIST.isEnabled(conn) ) {
 			Iterator<T> iter = input.getItems();
@@ -612,7 +612,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 					}
 				}
 				if( use_html5 && use_required && (use_datalist || ! autocomplete)){
-					if( ! (input instanceof OptionalInput) || ! ((OptionalInput) input).isOptional()){
+					if( ! optional){
 						//Note we have to set
 						// formnovalidate for non validating submit elements.
 						result.attr("required",null);
@@ -659,7 +659,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 				result.attr("maxlength",Integer.toString(max_result_length));
 			}
 			if( use_html5 && use_required ){
-				if( ! (input instanceof OptionalInput) || ! ((OptionalInput) input).isOptional()){
+				if( ! optional){
 					//Note we have to set
 					// formnovalidate for non validating submit elements.
 					result.attr("required",null);

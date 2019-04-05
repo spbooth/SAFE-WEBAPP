@@ -20,7 +20,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.ConstructedObjectInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.NameInputProvider;
-import uk.ac.ed.epcc.webapp.forms.inputs.OptionalInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInputWrapper;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseDataManager;
 import uk.ac.ed.epcc.webapp.model.far.response.StringDataManager;
@@ -62,7 +62,7 @@ public class ClassificationHandler extends AbstractContexed implements QuestionF
 	public Input<String> parseConfiguration(Form f) {
 		NameInputProvider fac = (NameInputProvider) f.getItem(TABLE_FIELD);
 		Input<String> input = (Input<String>) fac.getNameInput();
-		if( input instanceof OptionalInput){
+		if( input instanceof OptionalListInput){
 			return input;
 		}
 		if( input instanceof ListInput){

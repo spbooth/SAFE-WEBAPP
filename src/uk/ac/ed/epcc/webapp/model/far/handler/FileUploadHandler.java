@@ -62,9 +62,9 @@ public class FileUploadHandler implements QuestionFormHandler<StreamData> {
 	public void buildConfigForm(Form f) {
 		
 		IntegerInput input = new IntegerInput();
-		input.setOptional(true);
 		input.setMin(0);
 		f.addInput(MAX_UPLOAD, "Maximum upload size",input);
+		f.getField(MAX_UPLOAD).setOptional(true);
 		
 	}
 

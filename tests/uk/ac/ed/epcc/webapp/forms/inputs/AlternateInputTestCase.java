@@ -17,8 +17,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.forms.MultiInputTestBase;
-import uk.ac.ed.epcc.webapp.forms.OptionalInputInterfaceTest;
-import uk.ac.ed.epcc.webapp.forms.OptionalInputInterfaceTestImpl;
 import uk.ac.ed.epcc.webapp.forms.ParseMapInputInterfaceTest;
 import uk.ac.ed.epcc.webapp.forms.ParseMapInputInterfaceTestImpl;
 
@@ -29,16 +27,14 @@ import uk.ac.ed.epcc.webapp.forms.ParseMapInputInterfaceTestImpl;
  */
 
 public class AlternateInputTestCase extends MultiInputTestBase<Integer,Input<Integer>,AlternateInput<Integer>> implements
-ParseMapInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestCase>,
-OptionalInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestCase>
+ParseMapInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestCase>
 
 {
 
 	
 	public ParseMapInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestCase> parse_map_test = new ParseMapInputInterfaceTestImpl<>(this);
 	
-	public OptionalInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestCase> optional_test = new OptionalInputInterfaceTestImpl<>(this);
-	/**
+		/**
 	 * 
 	 */
 	public AlternateInputTestCase() {
@@ -82,13 +78,7 @@ OptionalInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestC
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.OptionalInputInterfaceTest#testIsOptional()
-	 */
-	@Override
-	public void testIsOptional() throws Exception {
-		optional_test.testIsOptional();	
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.ParseMapInputInterfaceTest#testGoodDataParses()
