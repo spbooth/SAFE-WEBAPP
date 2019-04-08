@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
@@ -375,28 +376,32 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 			this.parent=parent;
 			this.existing=existing;
 			setMaxResultLength(MAX_NAME_LENGTH);
-		}
-		@Override
-		public void validate() throws FieldException {
-			super.validate();
-			if( existing != null && existing.equals(getValue())){
-				return;
-			}
-			if( ! name_pattern.matcher(getValue()).matches()){
-				throw new ValidateException("Invalid characters");
-			}
-			if( getValue().trim().length() < MIN_NAME_LENGTH){
-				throw new ValidateException("Name too short must be at least "+MIN_NAME_LENGTH);
-			}
-			try {
-				P match = findByParentAndName(parent, getValue());
-				if( match != null  ){
-					throw new ValidateException("Name already in use");
+			addValidator(new FieldValidator<String>() {
+				
+				@Override
+				public void validate(String data) throws FieldException {
+					if( existing != null && existing.equals(getValue())){
+						return;
+					}
+					if( ! name_pattern.matcher(data).matches()){
+						throw new ValidateException("Invalid characters");
+					}
+					if( data.trim().length() < MIN_NAME_LENGTH){
+						throw new ValidateException("Name too short must be at least "+MIN_NAME_LENGTH);
+					}
+					try {
+						P match = findByParentAndName(parent, data);
+						if( match != null  ){
+							throw new ValidateException("Name already in use");
+						}
+					} catch (DataException e) {
+						throw new ValidateException("Internal error", e);
+					}
+					
 				}
-			} catch (DataException e) {
-				throw new ValidateException("Internal error", e);
-			}
+			});
 		}
+	
 		
 	}
 	private class PartOrderFilter implements SQLOrderFilter<P>{

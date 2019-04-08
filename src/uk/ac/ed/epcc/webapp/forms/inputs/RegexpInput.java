@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
@@ -35,23 +36,20 @@ public class RegexpInput extends TextInput implements TagInput{
 	 */
 	public RegexpInput() {
 		super(true);
-	}
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see uk.ac.ed.epcc.webapp.model.data.forms.TextInput#validate(boolean)
-	 */
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		String s = getValue();
-		if (s != null) {
-			try {
-				Pattern.compile(s);
-			} catch (PatternSyntaxException e) {
-				throw new ParseException("Invalid regular expression");
+		addValidator(new FieldValidator<String>() {
+			
+			@Override
+			public void validate(String s) throws FieldException {
+				if (s != null) {
+					try {
+						Pattern.compile(s);
+					} catch (PatternSyntaxException e) {
+						throw new ParseException("Invalid regular expression");
+					}
+				}
+				
 			}
-		}
+		});
 	}
 
 	public String getTag() {

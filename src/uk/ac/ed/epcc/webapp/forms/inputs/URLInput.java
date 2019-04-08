@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
@@ -26,24 +27,29 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
 public class URLInput extends TextInput implements HTML5Input{
 	
+	/**
+	 * @author Stephen Booth
+	 *
+	 */
+	public final class URLValidator implements FieldValidator<String> {
+		@Override
+		public void validate(String value) throws FieldException {
+			try {
+				URL url = new URL(value);
+			} catch (MalformedURLException e) {
+				throw new ValidateException("Bad URL", e);
+			}
+			
+		}
+	}
+
 	public URLInput(){
 		super();
 		setSingle(true);
 		setTrim(true);
+		addValidator(new URLValidator());
 	}
 
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		if( value == null || value.isEmpty()){
-			return; // super handles optional
-		}
-		try {
-			URL url = new URL(value);
-		} catch (MalformedURLException e) {
-			throw new ValidateException("Bad URL", e);
-		}
-	}
 
 	/**
 	 * @param allow_null
@@ -52,6 +58,7 @@ public class URLInput extends TextInput implements HTML5Input{
 		super(allow_null);
 		setSingle(true);
 		setTrim(true);
+		addValidator(new URLValidator());
 	}
 
 	/* (non-Javadoc)

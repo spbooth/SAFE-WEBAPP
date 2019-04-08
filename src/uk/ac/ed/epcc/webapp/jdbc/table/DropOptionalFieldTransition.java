@@ -33,7 +33,7 @@ public class DropOptionalFieldTransition<T extends DataObjectFactory> extends Dr
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.DropFieldTransition#getFieldInput()
 	 */
 	@Override
-	public <I extends Input<String> & ItemInput<FieldInfo>> I getFieldInput(T target) {
+	public <I extends ItemInput<String,FieldInfo>> I getFieldInput(T target) {
 		TableSpecification spec = target.getTableSpecification();
 		Map<String,FieldInfo> map = new LinkedHashMap<>();
 		Set<String> optionalFieldNames = spec.getOptionalFieldNames();

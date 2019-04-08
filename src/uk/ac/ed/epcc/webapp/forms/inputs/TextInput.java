@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.util.regex.Pattern;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
@@ -39,6 +40,25 @@ public class TextInput extends ParseAbstractInput<String> {
 	public TextInput(boolean allow_null) {
 		super();
 		this.allow_null = allow_null;
+		addValidator(new FieldValidator<String>() {
+			
+			@Override
+			public void validate(String v) throws FieldException {
+				if (v != null && !(v instanceof String)) {
+					throw new ValidateException("Invalid input type in TextInput "+v.getClass().getCanonicalName());
+				}
+				String s = (String) v;
+				if (s != null && s.length() > getMaxResultLength() && getMaxResultLength() > 0) {
+					throw new ValidateException("Input too long");
+				}
+				
+				
+				if( s != null && no_spaces && WHITESPACE.matcher(s).find()){
+					throw new ValidateException("Input must not contain whitespace");
+				}
+				
+			}
+		});
 	}
 
 	public String parseValue(String v) throws ParseException {
@@ -57,31 +77,6 @@ public class TextInput extends ParseAbstractInput<String> {
 			}
 			return v;
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see uk.ac.ed.epcc.webapp.model.data.forms.AbstractInput#validate()
-	 */
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		
-			Object v = getValue();
-			if (v != null && !(v instanceof String)) {
-				throw new ValidateException("Invalid input type in TextInput "+v.getClass().getCanonicalName());
-			}
-			String s = (String) v;
-			if (s != null && s.length() > getMaxResultLength() && getMaxResultLength() > 0) {
-				throw new ValidateException("Input too long");
-			}
-			
-			
-			if( s != null && no_spaces && WHITESPACE.matcher(s).find()){
-				throw new ValidateException("Input must not contain whitespace");
-			}
-		
 	}
 
 	public boolean getTrim() {

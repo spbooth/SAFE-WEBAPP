@@ -32,6 +32,7 @@ import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
@@ -41,7 +42,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
  * @author spb
  *
  */
-public class NodeInput extends TextInput implements ItemInput<Node>{
+public class NodeInput extends TextInput implements ItemInput<String,Node>{
 
 	private Transformer transformer;
 	private AppContext conn;
@@ -57,15 +58,37 @@ public class NodeInput extends TextInput implements ItemInput<Node>{
 		transformer=fac.newTransformer();
 		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		addValidator(new FieldValidator<String>() {
+			
+			@Override
+			public void validate(String data) throws FieldException {
+				DocumentFragment frag = doc.createDocumentFragment();
+				DOMResult result = new DOMResult(frag);
+				StreamSource source = new StreamSource(new StringReader(data));
+				try {
+					transformer.transform(source, result);
+					// can't schema validate a fragment reliably 
+					
+//					if( schema != null ){
+//						Validator v = schema.newValidator();
+//						source = new StreamSource(new StringReader(getValue()));
+//						v.validate(source);
+//					}
+				} catch (Exception e1) {
+					throw new ValidateException(e1.getMessage());
+				}
+				
+			}
+		});
 	}
 
 
 
 	
-	public Node getItem() {
+	public Node getItembyValue(String value) {
 		DocumentFragment frag = doc.createDocumentFragment();
 		DOMResult result = new DOMResult(frag);
-		StreamSource source = new StreamSource(new StringReader(getValue()));
+		StreamSource source = new StreamSource(new StringReader(value));
 		try {
 			transformer.transform(source, result);
 			return frag;
@@ -84,29 +107,6 @@ public class NodeInput extends TextInput implements ItemInput<Node>{
 		}catch(Exception e){
 			conn.error(e,"error setting Node as item");
 		}
-	}
-
-
-
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		DocumentFragment frag = doc.createDocumentFragment();
-		DOMResult result = new DOMResult(frag);
-		StreamSource source = new StreamSource(new StringReader(getValue()));
-		try {
-			transformer.transform(source, result);
-			// can't schema validate a fragment reliably 
-			
-//			if( schema != null ){
-//				Validator v = schema.newValidator();
-//				source = new StreamSource(new StringReader(getValue()));
-//				v.validate(source);
-//			}
-		} catch (Exception e1) {
-			throw new ValidateException(e1.getMessage());
-		}
-		
 	}
 
 }

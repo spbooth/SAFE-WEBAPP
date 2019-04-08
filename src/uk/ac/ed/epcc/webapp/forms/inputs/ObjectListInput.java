@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
@@ -24,30 +25,52 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  *
  */
 public class ObjectListInput extends TextInput {
-	private final Class<?> target;
-	private final AppContext conn;
+	/**
+	 * @author Stephen Booth
+	 *
+	 */
+	public final class ObjectListValidator implements FieldValidator<String> {
+		/**
+		 * 
+		 */
+		private final AppContext conn;
+		/**
+		 * 
+		 */
+		private final Class<?> target;
+
+		/**
+		 * @param conn
+		 * @param target
+		 */
+		public ObjectListValidator(AppContext conn, Class<?> target) {
+			this.conn = conn;
+			this.target = target;
+		}
+
+		@Override
+		public void validate(String list) throws FieldException {
+			if( list != null && list.trim().length() > 0){
+				for(String n : list.split("\\s*,\\s*")){
+					if( conn.makeObjectWithDefault(target,null, n)==null){
+						throw new ValidateException("tag "+n+" not a "+target.getCanonicalName());
+					}
+				}
+			}
+			
+		}
+	}
+
+	
 	public ObjectListInput(AppContext conn,Class<?> target) {
 		this(conn,target,false);
 	}
 
 	public ObjectListInput(AppContext conn,Class<?> target,boolean allow_null) {
 		super(allow_null);
-		this.conn=conn;
-		this.target=target;
 		setSingle(true);
+		addValidator(new ObjectListValidator(conn, target));
 	}
 
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		String list = getValue();
-		if( list != null && list.trim().length() > 0){
-			for(String n : list.split("\\s*,\\s*")){
-				if( conn.makeObjectWithDefault(target,null, n)==null){
-					throw new ValidateException("tag "+n+" not a "+target.getCanonicalName());
-				}
-			}
-		}
-	}
 
 }

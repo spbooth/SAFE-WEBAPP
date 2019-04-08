@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.util.regex.Pattern;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
@@ -23,13 +24,12 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  *
  */
 public class NoHtmlInput extends TextInput {
-	boolean allowHtml=false;
-	public static final Pattern HTML_PATTERN = Pattern.compile(">|<");
+	
 	/**
 	 * 
 	 */
 	public NoHtmlInput() {
-		
+		addValidator(new NoHtmlValidator());
 	}
 
 	/**
@@ -37,18 +37,21 @@ public class NoHtmlInput extends TextInput {
 	 */
 	public NoHtmlInput(boolean allow_null) {
 		super(allow_null);
+		addValidator(new NoHtmlValidator());
 	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.TextInput#validate()
-	 */
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		String value = getValue();
+	boolean allowHtml=false;
+	public static final Pattern HTML_PATTERN = Pattern.compile(">|<");
+	public class NoHtmlValidator implements FieldValidator<String>{
 		
-		if( value != null && (! allowHtml) &&  HTML_PATTERN.matcher(value).find()){
-			throw new ValidateException("The Characters > and < are not allowed");
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.FieldValidator#validate(java.lang.Object)
+		 */
+		@Override
+		public void validate(String value) throws FieldException {
+			if( value != null && (! allowHtml) &&  HTML_PATTERN.matcher(value).find()){
+				throw new ValidateException("The Characters > and < are not allowed");
+			}
+			
 		}
 		
 	}

@@ -25,7 +25,7 @@ import java.util.Set;
  * @author James
  *
  */
-public abstract class AutocompleteTextInput<T> extends TextInput implements ItemInput<T>, AutoComplete<T,String> {
+public abstract class AutocompleteTextInput<T> extends TextInput implements ItemInput<String,T>, AutoComplete<T,String> {
 	public AutocompleteTextInput(boolean allow_null) {
 		super(allow_null);
 	}

@@ -27,6 +27,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.CheckBoxInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
@@ -63,7 +64,7 @@ public  class RoleUpdate<U extends AppUser> implements Contexed, StandAloneFormU
 	@Override
 	@SuppressWarnings("unchecked")
 	public U getSelected(Form f) {
-		ItemInput<U> i = (ItemInput<U>) f.getInput(PERSON);
+		DataObjectItemInput<U> i = (DataObjectItemInput<U>) f.getInput(PERSON);
 		return i.getItem();
 	}
 

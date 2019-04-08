@@ -21,7 +21,7 @@ import java.util.Set;
  * @param <T> item type
  * @param <V> input type
  */
-public interface AutoComplete<T,V> extends ItemInput<T>, ParseInput<V> {
+public interface AutoComplete<T,V> extends ItemInput<V,T>, ParseInput<V> {
 
 	/** Get the set of Items corresponding to a suggested values
 	 * 

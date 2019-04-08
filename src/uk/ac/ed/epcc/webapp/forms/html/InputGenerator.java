@@ -27,6 +27,9 @@ public class InputGenerator implements XMLGenerator{
 	private final Input i;
 	private final AppContext conn;
 	private final boolean optional;
+	public InputGenerator(AppContext conn,Input i, boolean use_post,Map post_params){
+		this(conn,i,use_post,post_params,false);
+	}
 	public InputGenerator(AppContext conn,Input i, boolean use_post,Map post_params,boolean optional){
 		this.i=i;
 		this.use_post=use_post;

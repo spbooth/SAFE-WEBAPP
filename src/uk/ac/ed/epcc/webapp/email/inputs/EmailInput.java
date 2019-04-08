@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.email.inputs;
 
 import uk.ac.ed.epcc.webapp.email.Emailer;
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
@@ -42,25 +43,22 @@ public class EmailInput extends TextInput implements HTML5Input , FormatHintInpu
 		setBoxWidth(32); // 64 is too long for EmailChangeRequest page
 		setMaxResultLength(MAX_EMAIL_LENGTH);
 		setSingle(true);
+		addValidator(new FieldValidator<String>() {
+			
+			@Override
+			public void validate(String email) throws FieldException {
+				if( email == null || email.trim().length()==0){
+					// must be optional
+					return;
+				}
+				if (!Emailer.checkAddress(getString())) {
+					throw new ValidateException("Invalid email address");
+				}
+				
+			}
+		});
 	}
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see uk.ac.ed.epcc.webapp.model.data.forms.TextInput#validate(boolean)
-	 */
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		
-		String email = getString();
-		if( email == null || email.trim().length()==0){
-			// must be optional
-			return;
-		}
-		if (!Emailer.checkAddress(getString())) {
-			throw new ValidateException("Invalid email address");
-		}
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input#getType()
 	 */

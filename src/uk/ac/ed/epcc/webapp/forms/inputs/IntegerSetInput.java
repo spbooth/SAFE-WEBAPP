@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
@@ -28,22 +29,50 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
 
 public class IntegerSetInput extends IntegerInput implements ListInput<Integer,Integer> {
-    private final LinkedHashSet<Integer> values;
+    /**
+	 * @author Stephen Booth
+	 *
+	 */
+	public final class IntegerSetValidator implements FieldValidator<Integer> {
+		/**
+		 * 
+		 */
+		private final Set<Integer> values;
+
+		/**
+		 * @param values
+		 */
+		public IntegerSetValidator(Set<Integer> values) {
+			this.values = values;
+		}
+
+		@Override
+		public void validate(Integer value) throws FieldException {
+			if( value != null && ! values.contains(value)){
+				throw new ValidateException("Value not in permitted set");
+			}
+			
+		}
+	}
+	private final LinkedHashSet<Integer> values;
     
     public IntegerSetInput(int list[]){
     	this.values=new LinkedHashSet<>();
     	for(int i : list){
     		values.add(i);
     	}
+    	addValidator(new IntegerSetValidator(values));
     }
     public IntegerSetInput(Integer list[]){
     	this.values=new LinkedHashSet<>();
     	for(Integer i : list){
     		values.add(i);
     	}
+    	addValidator(new IntegerSetValidator(values));
     }
     public IntegerSetInput(Set<Integer> values){
     	this.values=new LinkedHashSet<>(values);
+    	addValidator(new IntegerSetValidator(values));
     }
 	@Override
 	public Integer getItem() {
@@ -97,14 +126,7 @@ public class IntegerSetInput extends IntegerInput implements ListInput<Integer,I
 		// use getString so we can control presented text using the NumberFormat
 		return getString(item);
 	}
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		Integer value = getValue();
-		if( value != null && ! values.contains(value)){
-			throw new ValidateException("Value not in permitted set");
-		}
-	}
+	
 	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitListInput(this);

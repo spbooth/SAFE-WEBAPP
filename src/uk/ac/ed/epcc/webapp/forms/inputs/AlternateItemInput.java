@@ -27,11 +27,11 @@ import java.util.Iterator;
  * @param <T> Input type
  * @param <I> Item type
  */
-public class AlternateItemInput<T,I> extends AlternateInput<T> implements ItemInput<I> {
+public class AlternateItemInput<T,I> extends AlternateInput<T> implements ItemInput<T,I> {
 
 	public I getItem() {
 		for(Iterator<Input<T>> it = getInputs();it.hasNext();){
-			ItemInput<I> i =  (ItemInput<I>) it.next();
+			ItemInput<T,I> i =  (ItemInput<T,I>) it.next();
 			I val = i.getItem();
 			if( val != null ){
 				return val;
@@ -44,7 +44,7 @@ public class AlternateItemInput<T,I> extends AlternateInput<T> implements ItemIn
 		
 			boolean set=false;
 			for(Iterator<Input<T>> it = getInputs();it.hasNext();){
-				ItemInput<I> i =  (ItemInput<I>) it.next();
+				ItemInput<T,I> i =  (ItemInput<T,I>) it.next();
 				if( ! set ){
 				   i.setItem(item);
 				   set = true;
@@ -55,6 +55,21 @@ public class AlternateItemInput<T,I> extends AlternateInput<T> implements ItemIn
 			}
 			
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#getItembyValue(java.lang.Object)
+	 */
+	@Override
+	public I getItembyValue(T value) {
+		if( value == null) {
+			return null;
+		}
+		for(Iterator<Input<T>> it = getInputs();it.hasNext();){
+			ItemInput<T,I> i =  (ItemInput<T,I>) it.next();
+			return i.getItembyValue(value);
+		}
+		return null;
 	}
 
 

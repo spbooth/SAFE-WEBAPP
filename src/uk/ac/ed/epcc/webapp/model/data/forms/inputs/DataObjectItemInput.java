@@ -26,6 +26,6 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
  *
  * @param <I> type of DataObject
  */
-public interface DataObjectItemInput<I extends DataObject> extends Input<Integer>, ItemInput<I>{
+public interface DataObjectItemInput<I extends DataObject> extends Input<Integer>, ItemInput<Integer,I>{
 
 }

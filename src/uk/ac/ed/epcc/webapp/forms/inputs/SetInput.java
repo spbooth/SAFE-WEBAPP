@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.Indexed;
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Identified;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
@@ -41,10 +42,20 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
     private Map<T,String> tags = new LinkedHashMap<>();
     private boolean case_insensative=false;
     public SetInput(){
-    	
+    	addValidator(new FieldValidator<String>() {
+			
+			@Override
+			public void validate(String value) throws FieldException {
+				if( value != null && ! data.containsKey(value)){
+					throw new ValidateException("Illegal choice "+value);
+				}
+				
+			}
+		});
     }
     
     public SetInput(Collection<T> items){
+    	this();
     	for(T item : items){
     		addChoice(item);
     	}
@@ -156,15 +167,6 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
 	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitListInput(this);
-	}
-
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		String value = getValue();
-		if( value != null && ! data.containsKey(value)){
-			throw new ValidateException("Illegal choice "+value);
-		}
 	}
 
 	/* (non-Javadoc)

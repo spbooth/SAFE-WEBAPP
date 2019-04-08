@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.model.ParseFactory;
@@ -41,19 +42,20 @@ public class UnusedNameInput<F extends DataObject> extends NoHtmlInput{
     	this.fac=fac;
     	setSingle(true);
     	setNoSpaces(true);
+    	addValidator(new FieldValidator<String>() {
+			
+			@Override
+			public void validate(String name) throws FieldException {
+				F dup = fac.findFromString(name);
+				if( dup != null ){
+					if( existing == null || ! existing.equals(dup)){
+						throw new ValidateException("Name "+name+" already in use");
+					}
+				}
+				
+			}
+		});
     }
 	
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		
-		String name = getValue();
-		F dup = fac.findFromString(name);
-		if( dup != null ){
-			if( existing == null || ! existing.equals(dup)){
-				throw new ValidateException("Name "+name+" already in use");
-			}
-		}
-	}
 	
 }

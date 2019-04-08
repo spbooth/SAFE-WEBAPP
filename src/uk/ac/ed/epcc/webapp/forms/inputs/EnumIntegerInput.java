@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
@@ -43,6 +44,16 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
     	for(E s: set){
     		lookup.put(s.ordinal(), s);
     	}
+    	addValidator(new FieldValidator<Integer>() {
+			
+			@Override
+			public void validate(Integer val) throws FieldException {
+				if( ! lookup.containsKey(val)){
+					throw new ValidateException("Not one of the valid choices");
+				}
+				
+			}
+		});
     }
     public EnumIntegerInput(Class<E> clazz){
     	this(EnumSet.allOf(clazz));
@@ -123,14 +134,6 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
 		return super.convert(v);
 	}
 	
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		Integer val = getValue();
-		if( ! lookup.containsKey(val)){
-			throw new ValidateException("Not one of the valid choices");
-		}
-	}
 	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitListInput(this);

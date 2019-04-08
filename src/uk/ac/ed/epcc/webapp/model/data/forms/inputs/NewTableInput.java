@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.model.data.forms.inputs;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
@@ -29,22 +30,38 @@ import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 
 
 public class NewTableInput extends TextInput {
-	private AppContext c;
-	public NewTableInput(AppContext c){
-		this.c=c;
-		setSingle(true);
-	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.data.forms.TextInput#validate(boolean)
+	/**
+	 * @author Stephen Booth
+	 *
 	 */
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		DataBaseHandlerService serv = c.getService(DataBaseHandlerService.class);
-		if( serv != null ){
-			if( serv.tableExists(getValue())){
-				throw new ValidateException("Table "+getValue()+" already exists");
+	public final class NewTableNameValidator implements FieldValidator<String> {
+		/**
+		 * 
+		 */
+		private final AppContext c;
+
+		/**
+		 * @param c
+		 */
+		public NewTableNameValidator(AppContext c) {
+			this.c = c;
+		}
+
+		@Override
+		public void validate(String data) throws FieldException {
+			DataBaseHandlerService serv = c.getService(DataBaseHandlerService.class);
+			if( serv != null ){
+				if( serv.tableExists(data)){
+					throw new ValidateException("Table "+getValue()+" already exists");
+				}
 			}
+			
 		}
 	}
+	public NewTableInput(AppContext c){
+		setSingle(true);
+		setNoSpaces(true);
+		addValidator(new NewTableNameValidator(c));
+	}
+	
 }

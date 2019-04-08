@@ -19,6 +19,6 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
  * @see NameInputProvider
  *
  */
-public interface NameInput<T> extends Input<String>, ItemInput<T> {
+public interface NameInput<T> extends ItemInput<String,T> {
 
 }

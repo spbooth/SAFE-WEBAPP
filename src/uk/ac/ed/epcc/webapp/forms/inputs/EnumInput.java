@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
@@ -45,6 +46,16 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
     	for(E s: set){
     		lookup.put(s.name(), s);
     	}
+    	addValidator(new FieldValidator<String>() {
+			
+			@Override
+			public void validate(String data) throws FieldException {
+				if( data != null && ! lookup.containsKey(data)){
+					throw new ValidateException("Value not permitted");
+				}
+				
+			}
+		});
     }
     public EnumInput(Class<E> clazz){
     	this(EnumSet.allOf(clazz));
@@ -158,14 +169,7 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
 		unslected_text=text;
 		
 	}
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		String value = getValue();
-		if( value != null && ! lookup.containsKey(value)){
-			throw new ValidateException("Value not permitted");
-		}
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
 	 */

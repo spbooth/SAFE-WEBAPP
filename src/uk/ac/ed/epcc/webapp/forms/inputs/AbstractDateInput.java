@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
@@ -68,6 +69,19 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 		}
 		setBoxWidth(length);
 		setMaxResultLength(length);
+		addValidator(new FieldValidator<Date>() {
+			
+			@Override
+			public void validate(Date value) throws FieldException {
+				if( min != null && value.before(min)){
+					throw new ValidateException("Value must be after "+getString(min));
+				}
+				if( max != null && value.after(max)){
+					throw new ValidateException("Value must be before "+getString(max));
+				}
+				
+			}
+		});
 	}
 	protected DateFormat getDateFormat(String format) {
 		return new SimpleDateFormat(format);
@@ -182,22 +196,6 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 	@Override
 	public String formatRange(Date n) {
 		return getString(n);
-	}
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		Date value = getValue();
-		if( value == null ){
-			return;
-		}
-		if( min != null && value.before(min)){
-			throw new ValidateException("Value must be after "+getString(min));
-		}
-		if( max != null && value.after(max)){
-			throw new ValidateException("Value must be before "+getString(max));
-		}
-	}
-
-	
+	}	
 
 }

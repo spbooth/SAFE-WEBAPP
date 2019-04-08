@@ -16,6 +16,10 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 
@@ -28,18 +32,27 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
  * @param <V> Param of object we generate
  * 
  */
-public abstract class AbstractInput<V> implements Input<V> {
+public abstract class AbstractInput<V> implements Input<V>{
 	String key;
 
 	V value;
 
+	private Set<FieldValidator<V>> validators;
 
 
 	public AbstractInput() {
 		super();
 		value = null;
+		validators=new LinkedHashSet<>();
+	}
+	
+	public void addValidator(FieldValidator<V> val) {
+		validators.add(val);
 	}
 
+	public void removeValidator(FieldValidator<V> val) {
+		validators.remove(val);
+	}
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -126,8 +139,16 @@ public abstract class AbstractInput<V> implements Input<V> {
 	 * 
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#validate()
 	 */
-	public void validate() throws FieldException {
-	
+	public final void validate() throws FieldException {
+		V value = getValue();
+		if( value == null ) {
+			return;
+		}
+		for(FieldValidator<V> val : validators) {
+			val.validate(value);
+		}
 	}
+	
+	
 
 }

@@ -590,13 +590,17 @@ public void addActionButtons(Form f) {
 	boolean can_submit=true;
 	CanSubmitVisistor vis = new CanSubmitVisistor();
 	for( Iterator<String>it = f.getFieldIterator(); it.hasNext() ;) {
-		Input i = f.getInput(it.next());
-		try {
-			if( ! ((Boolean)i.accept(vis))) {
-				can_submit=false;
+		Field field = f.getField(it.next());
+		if( ! field.isOptional()) {
+			// optional fields won't stop submission
+			Input i = field.getInput();
+			try {
+				if( ! ((Boolean)i.accept(vis))) {
+					can_submit=false;
+				}
+			} catch (Exception e) {
+				getLogger(f.getContext()).error("Error checking submit",e);
 			}
-		} catch (Exception e) {
-			getLogger(f.getContext()).error("Error checking submit",e);
 		}
 	}
 	

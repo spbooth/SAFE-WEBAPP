@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -30,7 +31,7 @@ import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
  * @author Stephen Booth
  *
  */
-public class ImageInput extends FileInput implements ItemInput<BufferedImage> {
+public class ImageInput extends FileInput implements ItemInput<StreamData,BufferedImage> {
 
 	/**
 	 * 
@@ -38,45 +39,42 @@ public class ImageInput extends FileInput implements ItemInput<BufferedImage> {
 	public ImageInput() {
 		super();
 		setAccept("image/*");
+		addValidator(new FieldValidator<StreamData>() {
+			
+			@Override
+			public void validate(StreamData data) throws FieldException {
+				try {
+					BufferedImage image = getBufferedImage(data);
+					if( image == null) {
+						throw new ValidateException("Bad image");
+					}
+					if(max_x >0 && image.getWidth()>max_x) {
+						throw new ValidateException("Image too wide max="+max_x);
+					}
+					if(max_y >0 && image.getHeight()>max_y) {
+						throw new ValidateException("Image too high max="+max_y);
+					}
+				} catch (IOException e) {
+					throw new ValidateException(e);
+				}
+				
+			}
+		});
 	}
 
 	private int max_x=0;
 	private int max_y=0;
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		StreamData data = getValue();
-		if( data == null) {
-			return; // must be optional
-		}
-		try {
-			BufferedImage image = getBufferedImage();
-			if( image == null) {
-				throw new ValidateException("Bad image");
-			}
-			if(max_x >0 && image.getWidth()>max_x) {
-				throw new ValidateException("Image too wide max="+max_x);
-			}
-			if(max_y >0 && image.getHeight()>max_y) {
-				throw new ValidateException("Image too high max="+max_y);
-			}
-		} catch (IOException e) {
-			throw new ValidateException(e);
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#getItem()
-	 */
 	
-	public BufferedImage getBufferedImage() throws IOException {
-		StreamData data = getValue();
-		if( data == null) {
-			return null;
-		}
-		
+
+	
+
+	/**
+	 * @param data
+	 * @return
+	 * @throws IOException
+	 */
+	public BufferedImage getBufferedImage(StreamData data) throws IOException {
 		return ImageIO.read(data.getInputStream());
-		
 	}
 
 	/* (non-Javadoc)
@@ -95,9 +93,9 @@ public class ImageInput extends FileInput implements ItemInput<BufferedImage> {
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#getItem()
 	 */
 	@Override
-	public BufferedImage getItem() {
+	public BufferedImage getItembyValue(StreamData data) {
 		try {
-			return getBufferedImage();
+			return getBufferedImage(data);
 		} catch (IOException e) {
 			return null;
 		}

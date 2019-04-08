@@ -20,6 +20,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
@@ -33,7 +34,7 @@ import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
  * @author spb
  *
  */
-public class SshPublicKeyArrayInput extends ParseAbstractInput<String> implements ItemInput<PublicKey[]> {
+public class SshPublicKeyArrayInput extends ParseAbstractInput<String> implements ItemInput<String,PublicKey[]> {
 
 	
 
@@ -42,15 +43,31 @@ public class SshPublicKeyArrayInput extends ParseAbstractInput<String> implement
 		setBoxWidth(48);
 		setSingle(true);
 		setMaxResultLength(4096);
+		addValidator(new FieldValidator<String>() {
+			
+			@Override
+			public void validate(String value) throws FieldException {
+				PublicKey[] keys;
+				if( value != null && value.trim().length() > 0){
+					try{
+						keys = load(value);
+					}catch(Exception e){
+						throw new ValidateException("Bad PublicKey:"+e.getMessage(), e);
+					}
+					validateKeys(keys);
+				}
+				
+			}
+		});
 	}
 	int minBits=2048;
 	public void setMinBits(int bits){
 		minBits=bits;
 	}
 
-	public PublicKey[] getItem() {
+	public PublicKey[] getItembyValue(String value) {
 		try {
-			return load(getValue().trim());
+			return load(value.trim());
 		} catch (PublicKeyParseException e) {
 			return null;
 		}
@@ -66,20 +83,7 @@ public class SshPublicKeyArrayInput extends ParseAbstractInput<String> implement
 		
 	}
 
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		String value = getValue();
-		PublicKey[] keys;
-		if( value != null && value.trim().length() > 0){
-			try{
-				keys = load(value);
-			}catch(Exception e){
-				throw new ValidateException("Bad PublicKey:"+e.getMessage(), e);
-			}
-			validateKeys(keys);
-		}
-	}
+	
 	protected void validateKeys(PublicKey keys[])throws ValidateException{
 		for( PublicKey key : keys) {
 			validateKey(key);

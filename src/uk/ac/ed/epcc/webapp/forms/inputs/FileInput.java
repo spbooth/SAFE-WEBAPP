@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
@@ -33,6 +34,23 @@ import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
 
 
 public class FileInput extends AbstractInput<StreamData> {
+	/**
+	 * 
+	 */
+	public FileInput() {
+		super();
+		addValidator(new FieldValidator<StreamData>() {
+			
+			@Override
+			public void validate(StreamData sd) throws FieldException {
+				long length = sd.getLength();
+				if( max_upload > 0 && length > max_upload){
+					throw new ValidateException("Upload size greater than allowed maximum "+max_upload);
+				}
+				
+			}
+		});
+	}
 	// pattern for accepted mime types
 	private String accept=null;
     long max_upload=0;
@@ -46,33 +64,7 @@ public class FileInput extends AbstractInput<StreamData> {
     	max_upload=val;
     	return old;
     }
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see uk.ac.ed.epcc.webapp.model.data.forms.AbstractInput#validate(boolean)
-	 */
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		
-			Object o = getValue();
-			if( o == null ){
-				// must be optional
-				return;
-			}
-			if (o instanceof StreamData ) {
-				StreamData sd = (StreamData)o;
-				long length = sd.getLength();
-				if( max_upload > 0 && length > max_upload){
-					throw new ValidateException("Upload size greater than allowed maximum "+max_upload);
-				}
-			
-				return;
-			}
-			
-			throw new ConsistencyError("Bad Type for FileInput, not multipart form?");
-
-	}
+	
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitFileInput(this);
 	}

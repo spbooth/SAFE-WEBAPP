@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.model.data.forms.inputs;
 
 import java.util.StringTokenizer;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
@@ -51,6 +52,16 @@ public class DurationInput extends ParseAbstractInput<Duration> implements Forma
 		setMaxResultLength(16);
 		setSingle(true);
 		this.resolution=resolution;
+		addValidator(new FieldValidator<Duration>() {
+			
+			@Override
+			public void validate(Duration val) throws FieldException {
+				if( val != null && val.getSeconds() < 0L){
+					throw new ValidateException("-ve duration");
+				}
+				
+			}
+		});
 	}
 
 	public Duration parseValue(String v) throws ParseException {
@@ -96,16 +107,6 @@ public class DurationInput extends ParseAbstractInput<Duration> implements Forma
 	public String getFormatHint() {
 		return "HH:MM:SS";
 	}
-
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		Duration val = getValue();
-		if( val != null && val.getSeconds() < 0L){
-			throw new ValidateException("-ve duration");
-		}
-	}
-
 	@Override
 	public Duration convert(Object v) throws TypeError {
 		if( v == null ){

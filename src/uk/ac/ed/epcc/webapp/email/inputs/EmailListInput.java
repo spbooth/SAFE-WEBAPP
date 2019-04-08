@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.email.inputs;
 
 import uk.ac.ed.epcc.webapp.email.Emailer;
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
@@ -36,6 +37,7 @@ public class EmailListInput extends TextInput implements MultipleInput, FormatHi
 	public EmailListInput() {
 		super();
 		setSingle(true); // can't be a textarea and an html5 email input
+		addValidator(new EmailListValidator());
 	}
 
 	/**
@@ -44,25 +46,28 @@ public class EmailListInput extends TextInput implements MultipleInput, FormatHi
 	public EmailListInput(boolean allow_null) {
 		super(allow_null);
 		setSingle(true); // can't be a textarea and an html5 email input
+		addValidator(new EmailListValidator());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see uk.ac.ed.epcc.webapp.model.data.forms.TextInput#validate(boolean)
-	 */
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		String email = getString();
-		if( email == null || email.trim().length()==0){
-			// must be optional
-			return;
+	public class EmailListValidator implements FieldValidator<String> {
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.FieldValidator#validate(java.lang.Object)
+		 */
+		@Override
+		public void validate(String email) throws FieldException {
+			if( email == null || email.trim().length()==0){
+				// must be optional
+				return;
+			}
+			if (!Emailer.checkAddressList(getString())) {
+				throw new ValidateException("Expecting comma seperated email addresses");
+			}
+			
 		}
-		if (!Emailer.checkAddressList(getString())) {
-			throw new ValidateException("Expecting comma seperated email addresses");
-		}
+		
 	}
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input#getType()
@@ -88,4 +93,5 @@ public class EmailListInput extends TextInput implements MultipleInput, FormatHi
 		
 		return "name@example.com, name2@example.com";
 	}
+
 }

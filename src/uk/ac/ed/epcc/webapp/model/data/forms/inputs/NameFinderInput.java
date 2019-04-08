@@ -4,6 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
@@ -45,6 +46,22 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 		this.create = create;
 		this.restrict=restrict;
 		this.autocomplete = autocomplete;
+		addValidator(new FieldValidator<Integer>() {
+			
+			@Override
+			public void validate(Integer data) throws FieldException {
+				T item = getItembyValue(data);
+				if( item == null) {
+					throw new ValidateException("Value does not correspond to item");
+				}
+				if( restrict){
+					
+					if( ! factory.matches(autocomplete, item)){
+						throw new ValidateException("Input does not match required filter");
+					}
+				}
+			}
+		});
 	}
 	private boolean create;
 	private final boolean restrict;
@@ -86,8 +103,8 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 		return item.getID();
 	}
 	@Override
-	public T getItem() {
-		return factory.find(getValue());
+	public T getItembyValue(Integer value) {
+		return factory.find(value);
 	}
 	@Override
 	public void setItem(T item) {
@@ -125,27 +142,7 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	public String getSuggestionText(T item) {
 		return getValue(item)+": "+item.getIdentifier();
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AbstractInput#validate()
-	 */
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		if( getValue() == null) {
-			// optional input
-			return;
-		}
-		T item = getItem();
-		if( item == null) {
-			throw new ValidateException("Value does not correspond to item");
-		}
-		if( restrict){
-			
-			if( ! this.factory.matches(autocomplete, item)){
-				throw new ValidateException("Input does not match required filter");
-			}
-		}
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AbstractInput#getString(java.lang.Object)
 	 */

@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.util.regex.Pattern;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 /** an input that validates text against a pattern
@@ -28,13 +29,45 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
 
 public class PatternTextInput extends TextInput implements TagInput, PatternInput{
-   private final Pattern validate_pattern;
+   /**
+	 * @author Stephen Booth
+	 *
+	 */
+	public final class PatternFieldValidator implements FieldValidator<String> {
+		private final Pattern validate_pattern;
+		/**
+		 * 
+		 */
+		private final String pattern;
+
+		/**
+		 * @param pattern
+		 */
+		public PatternFieldValidator(String pattern) {
+			this.pattern = pattern;
+			validate_pattern = Pattern.compile(pattern);
+		}
+
+		@Override
+		public void validate(String v) throws FieldException {
+			if( v == null || v.isEmpty()) {
+				return;
+			}
+			if( validate_pattern.matcher(v).matches()) {
+				return;
+			}
+			throw new ValidateException("Input does not match required pattern "+pattern);
+			
+		}
+	}
+
    private final String pattern;
    private String tag=null;
    public PatternTextInput(String pattern){
 	   super(false);
 	   this.pattern=pattern;
-	   validate_pattern = Pattern.compile(pattern);
+	   
+	   addValidator(new PatternFieldValidator(pattern));
    }
 
 
@@ -54,16 +87,5 @@ public String getTag() {
 	return "Regexp: "+pattern;
 }
 
-@Override
-public void validate() throws FieldException {
-	super.validate();
-	String v = getValue();
-	if( v == null || v.isEmpty()) {
-		return;
-	}
-	if( validate_pattern.matcher(v).matches()) {
-		return;
-	}
-	throw new ValidateException("Input does not match required pattern "+pattern);
-}
+
 }

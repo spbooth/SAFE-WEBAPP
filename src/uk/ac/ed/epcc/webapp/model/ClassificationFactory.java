@@ -306,8 +306,8 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		 * @see uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput#getDataObject()
 		 */
 		@Override
-		public T getItem() {
-			return find(getValue());
+		public T getItembyValue(Integer val) {
+			return find(val);
 		}	
 	}
 	public  class ClassificationCreator extends Creator<T>{

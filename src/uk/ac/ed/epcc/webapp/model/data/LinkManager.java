@@ -379,8 +379,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		}
 
 		@Override
-		public T getItem() {
-			Number num = getValue();
+		public T getItembyValue(Integer num) {
 			if (num == null) {
 				// must be optional
 				return null;

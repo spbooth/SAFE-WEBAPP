@@ -17,6 +17,7 @@ import java.security.PublicKey;
 import java.security.interfaces.RSAKey;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
@@ -31,22 +32,38 @@ import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
  * @author spb
  *
  */
-public class SshPublicKeyInput extends ParseAbstractInput<String> implements ItemInput<PublicKey> {
+public class SshPublicKeyInput extends ParseAbstractInput<String> implements ItemInput<String,PublicKey> {
 
 	public SshPublicKeyInput(){
 		super();
 		setBoxWidth(48);
 		setSingle(true);
 		setMaxResultLength(4096);
+		addValidator(new FieldValidator<String>() {
+			
+			@Override
+			public void validate(String value) throws FieldException {
+				PublicKey key;
+				if( value != null && value.trim().length() > 0){
+					try{
+						key = PublicKeyReaderUtil.load(value);
+					}catch(Exception e){
+						throw new ValidateException("Bad PublicKey:"+e.getMessage(), e);
+					}
+					validateKey(key);
+				}
+				
+			}
+		});
 	}
 	int minBits=2048;
 	public void setMinBits(int bits){
 		minBits=bits;
 	}
 
-	public PublicKey getItem() {
+	public PublicKey getItembyValue(String value) {
 		try {
-			return PublicKeyReaderUtil.load(getValue().trim());
+			return PublicKeyReaderUtil.load(value.trim());
 		} catch (PublicKeyParseException e) {
 			return null;
 		}
@@ -62,20 +79,6 @@ public class SshPublicKeyInput extends ParseAbstractInput<String> implements Ite
 		
 	}
 
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		String value = getValue();
-		PublicKey key;
-		if( value != null && value.trim().length() > 0){
-			try{
-				key = PublicKeyReaderUtil.load(value);
-			}catch(Exception e){
-				throw new ValidateException("Bad PublicKey:"+e.getMessage(), e);
-			}
-			validateKey(key);
-		}
-	}
 	protected void validateKey(PublicKey key)throws ValidateException{
 		if( key.getAlgorithm().equalsIgnoreCase("RSA")){
 

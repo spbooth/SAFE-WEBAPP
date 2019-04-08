@@ -48,7 +48,7 @@ public class DropFieldTransition<T extends DataObjectFactory> extends EditTableF
 		f.addInput(FIELD_INPUT, "Field to drop", getFieldInput(target));
 		f.addAction("Drop", new DropAction(target));
 	}
-	public <I extends Input<String> & ItemInput<FieldInfo>> I getFieldInput(T target) {
+	public <I extends ItemInput<String,FieldInfo>> I getFieldInput(T target) {
 		return (I) new RepositoryFieldInput(getRepository(target));
 	}
 	public class DropAction extends FormAction{
@@ -60,7 +60,7 @@ public class DropFieldTransition<T extends DataObjectFactory> extends EditTableF
 		}
 		@Override
 		public FormResult action(Form f) throws ActionException {
-			ItemInput<FieldInfo> input = (ItemInput<FieldInfo>) f.getInput(FIELD_INPUT);
+			ItemInput<String,FieldInfo> input = (ItemInput<String,FieldInfo>) f.getInput(FIELD_INPUT);
 			try {
 				Repository res = getRepository(target);
 				SQLContext sql = res.getSQLContext();

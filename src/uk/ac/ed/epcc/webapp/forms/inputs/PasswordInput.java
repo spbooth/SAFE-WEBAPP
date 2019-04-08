@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
@@ -29,14 +30,6 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
 
 public class PasswordInput extends TextInput {
-	
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		if( minimum_length > 0 && getValue().length() < minimum_length){
-			throw new ValidateException("Password is too short must be at least "+minimum_length+" characters");
-		}
-	}
 
 	private int minimum_length=0;
 
@@ -46,6 +39,16 @@ public class PasswordInput extends TextInput {
 	public PasswordInput() {
 		super();
 		setBoxWidth(32);
+		addValidator(new FieldValidator<String>() {
+			
+			@Override
+			public void validate(String data) throws FieldException {
+				if( minimum_length > 0 && data.length() < minimum_length){
+					throw new ValidateException("Password is too short must be at least "+minimum_length+" characters");
+				}
+				
+			}
+		});
 	}
 
 

@@ -523,8 +523,10 @@ public class BaseForm implements Form {
     	}
     	return null;
     }
-	/**
-	 * validate a form
+	/** validate a form
+	 * 
+	 * This does not attempt to report details of any problem and
+	 * will return as soon as <b>any</b> validation condition fails.
 	 * 
 	 * @return boolean true if valid
 	 * @throws ValidateException
@@ -533,25 +535,23 @@ public class BaseForm implements Form {
 	public final boolean validate()  {
 		//int missing = 0;
 				//int errors = 0;
-				boolean ok = true;
+				
 				for (Iterator<String> it = getFieldIterator(); it.hasNext();) {
 					String key = it.next();
 					Field f = getField(key);
-					if( f.getInput().isEmpty() ) {
-						ok =  f.isOptional();
+					if( f.getInput().isEmpty() && ! f.isOptional()) {
+						return false;
 					}else {
 						try {
 							f.validate();
 						} catch (FieldException e) {
 
-							ok = false;
+							return false;
 							//errors++;
 						}
 					}
 				}
-				if (!ok) {
-					return false;
-				}
+				
 				for(FormValidator v : validators){
 					try{
 						v.validate(this);

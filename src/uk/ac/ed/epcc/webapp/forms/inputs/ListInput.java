@@ -39,16 +39,9 @@ import java.util.Iterator;
  * @param <T> type of Item object
  * 
  */
-public abstract interface ListInput<V,T> extends Input<V>, ItemInput<T> {
+public abstract interface ListInput<V,T> extends  ItemInput<V,T> {
 
-	/**
-	 * get the domain object from the Input value if defined
-	 * 
-	 * @param value
-	 *            input Value
-	 * @return Object the domain object or null
-	 */
-	public abstract T getItembyValue(V value);
+	
 
 	/**
 	 * get a list of domain objects that are being selected

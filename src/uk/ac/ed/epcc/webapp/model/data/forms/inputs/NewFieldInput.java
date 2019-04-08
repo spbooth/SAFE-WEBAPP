@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data.forms.inputs;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
@@ -28,23 +29,39 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 public class NewFieldInput extends TextInput {
-	private Repository res;
+	/**
+	 * @author Stephen Booth
+	 *
+	 */
+	public final class NewFieldValidator implements FieldValidator<String> {
+		/**
+		 * 
+		 */
+		private final Repository res;
+
+		/**
+		 * @param res
+		 */
+		public NewFieldValidator(Repository res) {
+			this.res = res;
+		}
+
+		@Override
+		public void validate(String data) throws FieldException {
+			if( res.getInfo(data) != null ){
+				throw new ValidateException("Name already in use");
+			}
+			
+		}
+	}
+	
 	public NewFieldInput(Repository res) {
 		super(false);
-		this.res=res;
 		setBoxWidth(32);
 		setMaxResultLength(32);
 		setSingle(true);
+		addValidator(new NewFieldValidator(res));
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.data.forms.TextInput#validate(boolean)
-	 */
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		if( res.getInfo(getValue()) != null ){
-			throw new ValidateException("Name already in use");
-		}
-	}
+	
 
 }

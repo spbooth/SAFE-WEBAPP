@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
@@ -42,6 +43,21 @@ public class TypeProducerInput<T> extends TextInput implements PreSelectInput<St
     public TypeProducerInput(EnumeratingTypeConverter<T,String> prod){
     	super(true);// allow null values in case we are optional
     	t=prod;
+    	addValidator(new FieldValidator<String>() {
+			
+			@Override
+			public void validate(String value) throws FieldException {
+				try {
+					if( t.find(value) == null){
+						// not one of the valid types
+						throw new ValidateException("Invalid input");
+					}
+				} catch (Exception e) {
+					throw new ValidateException("Bad value");
+				}
+				
+			}
+		});
     }
     
     public EnumeratingTypeConverter<T,String> getProducer(){
@@ -112,24 +128,7 @@ public class TypeProducerInput<T> extends TextInput implements PreSelectInput<St
 	public String getPrettyString(String val) {
 		return getText(getItembyValue(val));
 	}
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see uk.ac.ed.epcc.webapp.model.data.forms.TextInput#validate(boolean)
-	 */
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-			String value = getValue();
-			try {
-				if( t.find(value) == null){
-					// not one of the valid types
-					throw new ValidateException("Invalid input");
-				}
-			} catch (Exception e) {
-				throw new ValidateException("Bad value");
-			}
-	}
+	
 	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitListInput(this);

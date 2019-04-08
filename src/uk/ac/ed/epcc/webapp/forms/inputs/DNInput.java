@@ -24,6 +24,7 @@ import javax.naming.InvalidNameException;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
@@ -35,7 +36,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  * two forms.  
  * 
  */
-public class DNInput extends ParseAbstractInput<String> implements ItemInput<LdapName>{
+public class DNInput extends ParseAbstractInput<String> implements ItemInput<String,LdapName>{
 
 
 
@@ -46,21 +47,22 @@ public class DNInput extends ParseAbstractInput<String> implements ItemInput<Lda
 		setMaxResultLength(256);
 		setBoxWidth(64);
 		setSingle(true);
-	}
+		addValidator(new FieldValidator<String>() {
+			
+			@Override
+			public void validate(String val) throws FieldException {
+				if( val == null || value.trim().length()==0){
+					// have to check optional again as superclass accepts spaces
+					return;
+				}
+				if( DNInput.validateGlobusDN(val)){
+					return;
+				}
 
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		String val = getValue();
-		if( val == null || value.trim().length()==0){
-			// have to check optional again as superclass accepts spaces
-			return;
-		}
-		if( DNInput.validateGlobusDN(val)){
-			return;
-		}
-		
-			throw new ValidateException("Invalid format  DN");
+				throw new ValidateException("Invalid format  DN");
+
+			}
+		});
 	}
 
 	
@@ -172,9 +174,9 @@ public class DNInput extends ParseAbstractInput<String> implements ItemInput<Lda
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#getItem()
 	 */
-	public LdapName getItem() {
+	public LdapName getItembyValue(String value) {
 		try {
-			return parseGlobusName(getValue());
+			return parseGlobusName(value);
 		} catch (ParseException e) {
 			return null;
 		}

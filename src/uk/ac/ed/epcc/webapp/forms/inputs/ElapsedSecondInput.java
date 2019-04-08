@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.util.StringTokenizer;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
@@ -37,6 +38,16 @@ public class ElapsedSecondInput extends ParseAbstractInput<Number> implements Fo
 		setBoxWidth(10);
 		setMaxResultLength(16);
 		setSingle(true);
+		addValidator(new FieldValidator<Number>() {
+			
+			@Override
+			public void validate(Number val) throws FieldException {
+				if( val != null && val.intValue() < 0){
+					throw new ValidateException("-ve duration");
+				}
+				
+			}
+		});
 	}
 
 	public Long parseValue(String v) throws ParseException {
@@ -81,15 +92,6 @@ public class ElapsedSecondInput extends ParseAbstractInput<Number> implements Fo
 
 	public String getFormatHint() {
 		return "HH:MM:SS";
-	}
-
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		Number val = getValue();
-		if( val != null && val.intValue() < 0){
-			throw new ValidateException("-ve duration");
-		}
 	}
 
 }

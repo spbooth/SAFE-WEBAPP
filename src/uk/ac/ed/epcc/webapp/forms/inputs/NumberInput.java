@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.text.NumberFormat;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
@@ -47,6 +48,23 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 		setSingle(true);
 		setMaxResultLength(32);
 		setBoxWidth(32);
+		addValidator(new FieldValidator<N>() {
+
+			@Override
+			public void validate(N data) throws FieldException {
+				if (!(data instanceof Number)) {
+					throw new ValidateException("Invalid input");
+				}
+				Number n = (Number) data;
+				if (min != null && n.doubleValue() < min.doubleValue()) {
+					throw new ValidateException("Too small minimum value="+getString(min));
+				}
+				if (max != null && n.doubleValue() > max.doubleValue()) {
+					throw new ValidateException("Too large maximum value="+getString(max));
+				}
+				
+			}
+		});
 	}
 
 	
@@ -128,32 +146,6 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 		unit = u;
 		return old;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see uk.ac.ed.epcc.webapp.model.data.forms.AbstractInput#validate(boolean)
-	 */
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		Object o = getValue();
-		if (o == null) {
-			// super class checks for optional input
-			return;
-		}
-		if (!(o instanceof Number)) {
-			throw new ValidateException("Invalid input");
-		}
-		Number n = (Number) o;
-		if (min != null && n.doubleValue() < min.doubleValue()) {
-			throw new ValidateException("Too small minimum value="+getString(min));
-		}
-		if (max != null && n.doubleValue() > max.doubleValue()) {
-			throw new ValidateException("Too large maximum value="+getString(max));
-		}
-	}
-
 
 
 	@Override

@@ -66,6 +66,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 import uk.ac.ed.epcc.webapp.model.data.forms.RetireAction;
 import uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate;
+import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.serv.ServeDataProducer;
 import uk.ac.ed.epcc.webapp.model.serv.SettableServeDataProducer;
@@ -586,7 +587,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		@Override
 		@SuppressWarnings("unchecked")
 		public T getSelected(Form f) {
-			ItemInput<T> input = (ItemInput<T>) f.getInput(getUniqueIdName());
+			DataObjectItemInput<T> input = (DataObjectItemInput<T>) f.getInput(getUniqueIdName());
 			return input.getItem();
 		}
 

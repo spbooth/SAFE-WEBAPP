@@ -15,6 +15,7 @@
  * Copyright (c) - The University of Edinburgh 2010
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
@@ -30,20 +31,27 @@ import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
 
 public class MimeFileInput extends FileInput {
 
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		
-		StreamData sd = getValue();
-		if( sd instanceof MimeStreamData){
-			MimeStreamData msd = (MimeStreamData)sd;
-		if( msd != null ){
-			String type = msd.getContentType();
-			if( type == null || type.toLowerCase().contains("html")){
-				throw new ValidateException("Unsupported mime type");
+	/**
+	 * 
+	 */
+	public MimeFileInput() {
+		super();
+		addValidator(new FieldValidator<StreamData>() {
+			
+			@Override
+			public void validate(StreamData sd) throws FieldException {
+				if( sd instanceof MimeStreamData){
+					MimeStreamData msd = (MimeStreamData)sd;
+				if( msd != null ){
+					String type = msd.getContentType();
+					if( type == null || type.toLowerCase().contains("html")){
+						throw new ValidateException("Unsupported mime type");
+					}
+				}
+				}
+				
 			}
-		}
-		}
+		});
 	}
 
 }

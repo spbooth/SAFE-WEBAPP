@@ -23,13 +23,24 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
  * @param <T> type of item object
  * 
  */
-public interface ItemInput<T>{
+public interface ItemInput<V,T> extends Input<V>{
+	
+	/**
+	 * get the domain object from the Input value if defined
+	 * 
+	 * @param value
+	 *            input Value
+	 * @return Object the domain object or null
+	 */
+	public abstract T getItembyValue(V value);
 	/**
 	 * get the domain Object associated with the current value
 	 * 
 	 * @return Object
 	 */
-	public abstract T getItem();
+	default public  T getItem() {
+		return getItembyValue(getValue());
+	}
 
 	/**
 	 * Set the value of the input using an item
