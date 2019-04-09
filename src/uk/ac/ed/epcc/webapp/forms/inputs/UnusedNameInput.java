@@ -41,7 +41,6 @@ public class UnusedNameInput<F extends DataObject> extends NoHtmlInput{
     	super();
     	this.fac=fac;
     	setSingle(true);
-    	setNoSpaces(true);
     	addValidator(new FieldValidator<String>() {
 			
 			@Override

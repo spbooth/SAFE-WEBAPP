@@ -53,11 +53,10 @@ public class ConfigTransition<T extends DataObjectFactory> extends AbstractFormT
 	@Override
 	public void buildForm(Form f, T target, AppContext conn) throws TransitionException {
 		for(String param : params){
-			TextInput input = new TextInput(true);
+			TextInput input = new TextInput();
 			input.setSingle(true);
 			input.setValue(conn.getInitParameter(param));
-			f.addInput(param, param, input);
-			f.getField(param).setOptional(true);
+			f.addInput(param, param, input).setOptional(true);
 		}
 		f.addAction("Update", new UpdateConfig(target));
 	}

@@ -21,7 +21,6 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 
 /**
  * Superclass for general non-composite Inputs
@@ -46,11 +45,11 @@ public abstract class AbstractInput<V> implements Input<V>{
 		validators=new LinkedHashSet<>();
 	}
 	
-	public void addValidator(FieldValidator<V> val) {
+	public final void addValidator(FieldValidator<V> val) {
 		validators.add(val);
 	}
 
-	public void removeValidator(FieldValidator<V> val) {
+	public final void removeValidator(FieldValidator<V> val) {
 		validators.remove(val);
 	}
 	/*
@@ -58,7 +57,7 @@ public abstract class AbstractInput<V> implements Input<V>{
 	 * 
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#getKey()
 	 */
-	public String getKey() {
+	public final String getKey() {
 		return key;
 	}
 
@@ -98,7 +97,7 @@ public abstract class AbstractInput<V> implements Input<V>{
 	 * 
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#getValue()
 	 */
-	public V getValue() {
+	public final V getValue() {
 		return value;
 	}
 
@@ -109,7 +108,7 @@ public abstract class AbstractInput<V> implements Input<V>{
 	 * 
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#setKey(java.lang.Object)
 	 */
-	public void setKey(String key) {
+	public final void setKey(String key) {
 		this.key = key;
 	}
 

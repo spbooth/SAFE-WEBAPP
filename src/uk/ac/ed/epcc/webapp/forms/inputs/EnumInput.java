@@ -40,7 +40,7 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
     private String unslected_text=null;
     private boolean allow_preselect=true;
     public EnumInput(EnumSet<E> set){
-    	super(true);
+    	super();
     	this.set = set;
     	lookup = new HashMap<>();
     	for(E s: set){

@@ -70,8 +70,11 @@ public class NoHtmInputTest<I extends NoHtmlInput> extends TextInputTest<I> {
 	 */
 	@Override
 	public I getInput() {
-		I i = (I) new NoHtmlInput(allowNull());
-		i.setNoSpaces(forbidSpace());
+		I i = (I) new NoHtmlInput();
+		if(forbidSpace()) {
+			i.setTrim(true);
+			i.addValidator(new NoSpaceFieldValidator());
+		}
 		i.setTrim(requireTrim());
 		return i;
 	}

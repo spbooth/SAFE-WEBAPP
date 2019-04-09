@@ -32,6 +32,7 @@ import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.inputs.CodeListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.NameInputProvider;
 import uk.ac.ed.epcc.webapp.forms.inputs.NoHtmlInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.NoSpaceFieldValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnusedNameInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -326,7 +327,10 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			// the update form has to rely on the sql update generating an error.
 			UnusedNameInput<T> input = new UnusedNameInput<>(ClassificationFactory.this);
 			input.setMaxResultLength(res.getInfo(Classification.NAME).getMax());
-			input.setNoSpaces(! allowSpacesInName());
+			if(! allowSpacesInName()) {
+				input.setTrim(true);
+				input.addValidator(new NoSpaceFieldValidator());
+			}
 			result.put(Classification.NAME, input);
 			
 			// Description is likely to be displayed to user so inhibit html by default
@@ -400,7 +404,10 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			super.customiseUpdateForm(f, o);
 			if( allow_name_change){
 				UnusedNameInput<C> input = new UnusedNameInput<>(getClassificationFactory(),o);
-				input.setNoSpaces(! getClassificationFactory().allowSpacesInName());
+				if(! getClassificationFactory().allowSpacesInName()) {
+					input.setTrim(true);
+					input.addValidator(new NoSpaceFieldValidator());
+				}
 				f.getField(Classification.NAME).setInput(input);
 			}else{
 				f.getField(Classification.NAME).lock();

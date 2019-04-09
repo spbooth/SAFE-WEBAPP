@@ -40,14 +40,6 @@ public class EmailListInput extends TextInput implements MultipleInput, FormatHi
 		addValidator(new EmailListValidator());
 	}
 
-	/**
-	 * @param allow_null
-	 */
-	public EmailListInput(boolean allow_null) {
-		super(allow_null);
-		setSingle(true); // can't be a textarea and an html5 email input
-		addValidator(new EmailListValidator());
-	}
 
 	public class EmailListValidator implements FieldValidator<String> {
 

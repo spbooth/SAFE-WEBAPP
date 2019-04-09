@@ -51,16 +51,6 @@ public class URLInput extends TextInput implements HTML5Input{
 	}
 
 
-	/**
-	 * @param allow_null
-	 */
-	public URLInput(boolean allow_null) {
-		super(allow_null);
-		setSingle(true);
-		setTrim(true);
-		addValidator(new URLValidator());
-	}
-
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input#getType()
 	 */

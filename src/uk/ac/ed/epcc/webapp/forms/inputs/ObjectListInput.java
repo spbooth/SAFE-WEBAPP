@@ -63,11 +63,7 @@ public class ObjectListInput extends TextInput {
 
 	
 	public ObjectListInput(AppContext conn,Class<?> target) {
-		this(conn,target,false);
-	}
-
-	public ObjectListInput(AppContext conn,Class<?> target,boolean allow_null) {
-		super(allow_null);
+		super();
 		setSingle(true);
 		addValidator(new ObjectListValidator(conn, target));
 	}

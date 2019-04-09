@@ -23,6 +23,7 @@ import java.util.Properties;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
+import uk.ac.ed.epcc.webapp.forms.inputs.NoSpaceFieldValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
@@ -55,7 +56,8 @@ public class PropertyFactory extends DataObjectFactory<Property> {
 		Map<String, Object> selectors = super.getSelectors();
 		TextInput name_input = new TextInput();
 		name_input.setSingle(true);
-		name_input.setNoSpaces(true);
+		name_input.setTrim(true);
+		name_input.addValidator(new NoSpaceFieldValidator());
 		selectors.put(Property.NAME, name_input);
 		// default input may forbid html but this should be allowed in props
 		TextInput prop_input = new TextInput();

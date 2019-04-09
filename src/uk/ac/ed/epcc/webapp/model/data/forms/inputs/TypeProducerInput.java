@@ -41,7 +41,7 @@ public class TypeProducerInput<T> extends TextInput implements PreSelectInput<St
     	item_set=set;
     }
     public TypeProducerInput(EnumeratingTypeConverter<T,String> prod){
-    	super(true);// allow null values in case we are optional
+    	super();// allow null values in case we are optional
     	t=prod;
     	addValidator(new FieldValidator<String>() {
 			

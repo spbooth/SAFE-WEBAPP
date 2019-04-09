@@ -30,6 +30,7 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileUploadDecorator;
+import uk.ac.ed.epcc.webapp.forms.inputs.NoSpaceFieldValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnusedNameInput;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
@@ -189,7 +190,10 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 		@Override
 		protected Map<String, Object> getSelectors() {
 			Map<String, Object> selectors = super.getSelectors();
-			selectors.put(DynamicFormManager.NAME_FIELD,new UnusedNameInput((DynamicFormManager) getFactory()));
+			UnusedNameInput input = new UnusedNameInput((DynamicFormManager) getFactory());
+			input.setTrim(true);
+			input.addValidator(new NoSpaceFieldValidator());
+			selectors.put(DynamicFormManager.NAME_FIELD,input);
 			return selectors;
 		}
 		
@@ -297,7 +301,10 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 		 */
 		@Override
 		public void buildForm(Form f, T target, AppContext conn) throws TransitionException {
-			f.addInput(DynamicFormManager.NAME_FIELD, "New Form Name", new UnusedNameInput(manager));
+			UnusedNameInput input = new UnusedNameInput(manager);
+			input.setTrim(true);
+			input.addValidator(new NoSpaceFieldValidator());
+			f.addInput(DynamicFormManager.NAME_FIELD, "New Form Name", input);
 			f.addAction("Clone", new DuplicateAction(target));
 			
 		}

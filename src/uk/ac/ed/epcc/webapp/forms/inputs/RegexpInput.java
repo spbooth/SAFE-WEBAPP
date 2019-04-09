@@ -35,7 +35,7 @@ public class RegexpInput extends TextInput implements TagInput{
 	 * 
 	 */
 	public RegexpInput() {
-		super(true);
+		super();
 		addValidator(new FieldValidator<String>() {
 			
 			@Override

@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2017                            |
+//| Copyright - The University of Edinburgh 2019                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -13,20 +13,35 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-/** A {@link TextInput} that protects against uploaded Html
- * @author spb
+import java.util.regex.Pattern;
+
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
+import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+
+/**
+ * @author Stephen Booth
  *
  */
-public class NoHtmlInput extends TextInput {
-	
+public class NoSpaceFieldValidator implements FieldValidator<String> {
+	private static final Pattern WHITESPACE = Pattern.compile("\\s");
 	/**
 	 * 
 	 */
-	public NoHtmlInput() {
-		addValidator(new NoHtmlValidator());
+	public NoSpaceFieldValidator() {
+		// TODO Auto-generated constructor stub
 	}
 
-	
-	
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.FieldValidator#validate(java.lang.Object)
+	 */
+	@Override
+	public void validate(String s) throws FieldException {
+
+		if( s != null  && WHITESPACE.matcher(s).find()){
+			throw new ValidateException("Input must not contain whitespace");
+		}
+
+	}
 
 }

@@ -181,9 +181,9 @@ public final AppContext getContext(){
 					case Types.LONGVARCHAR:
 						TextInput ti;
 						if( DEFAULT_FORBID_HTML.isEnabled(conn)){
-							ti = new NoHtmlInput(info.getNullable());
+							ti = new NoHtmlInput();
 						}else{
-							ti= new TextInput(info.getNullable());
+							ti= new TextInput();
 						}
 						ti.setMaxResultLength(info.getMax());
 						ti.setBoxWidth(maxwid);

@@ -23,12 +23,8 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
 
 
-public class BooleanInput implements ParseInput<Boolean> ,BinaryInput<Boolean>{
-    private Boolean value=Boolean.FALSE;
-    private String key;
-	public String getString() {
-		return value.toString();
-	}
+public class BooleanInput extends AbstractInput<Boolean> implements ParseInput<Boolean> ,BinaryInput<Boolean>{
+    
 
 	public Boolean parseValue(String v) throws ParseException {
 		if( v==null || v.trim().length() == 0){
@@ -49,9 +45,7 @@ public class BooleanInput implements ParseInput<Boolean> ,BinaryInput<Boolean>{
 		return Boolean.FALSE;
 	}
 
-	public String getKey() {
-		return key;
-	}
+	
 
 	public String getPrettyString(Boolean value) {
 		return value.toString();
@@ -61,33 +55,13 @@ public class BooleanInput implements ParseInput<Boolean> ,BinaryInput<Boolean>{
 		return value.toString();
 	}
 
-	public Boolean getValue() {
-		return value;
-	}
-
-	public void setKey(String key) {
-		this.key=key;
-	}
-
-	public Boolean setValue(Boolean v) throws TypeError {
-		if( v == null ){
-			v = Boolean.FALSE;
-		}
-		Boolean old = value;
-		value=v;
-		return old;
-	}
-
-	public void validate() throws FieldException {
-		return;
-	}
 
 	public final <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitBinaryInput(this);
 	}
 
 	public boolean isChecked() {
-		return value;
+		return getValue();
 	}
 
 	public void setChecked(boolean value) {

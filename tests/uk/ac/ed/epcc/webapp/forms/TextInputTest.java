@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import uk.ac.ed.epcc.webapp.forms.inputs.NoSpaceFieldValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 
 public class TextInputTest<I extends TextInput> extends ParseAbstractInputTestCase<String,I> {
@@ -32,8 +33,11 @@ public class TextInputTest<I extends TextInput> extends ParseAbstractInputTestCa
 	@Override
 	@SuppressWarnings("unchecked")
 	public I getInput() {
-		I i = (I) new TextInput(allowNull());
-		i.setNoSpaces(forbidSpace());
+		I i = (I) new TextInput();
+		if(forbidSpace()) {
+			i.setTrim(true);
+			i.addValidator(new NoSpaceFieldValidator());
+		}
 		i.setTrim(requireTrim());
 		return i;
 	}

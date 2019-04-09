@@ -29,17 +29,11 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
 public class TextInput extends ParseAbstractInput<String> {
 
-	private static final Pattern WHITESPACE = Pattern.compile("\\s");
-	private boolean allow_null;
+	
+	
 	private boolean trim=true;
-	private boolean no_spaces=false;
 	public TextInput() {
-		this(false);
-	}
-
-	public TextInput(boolean allow_null) {
 		super();
-		this.allow_null = allow_null;
 		addValidator(new FieldValidator<String>() {
 			
 			@Override
@@ -53,9 +47,6 @@ public class TextInput extends ParseAbstractInput<String> {
 				}
 				
 				
-				if( s != null && no_spaces && WHITESPACE.matcher(s).find()){
-					throw new ValidateException("Input must not contain whitespace");
-				}
 				
 			}
 		});
@@ -63,11 +54,7 @@ public class TextInput extends ParseAbstractInput<String> {
 
 	public String parseValue(String v) throws ParseException {
 		if (v == null || v.length() == 0) {
-			if (allow_null) {
-				return null;
-			} else {
-				return "";
-			}
+			return null;
 		} else {
 			if( force_single ){
 				v = v.replace("\n", "");
@@ -87,22 +74,6 @@ public class TextInput extends ParseAbstractInput<String> {
 		this.trim = trim;
 	}
 
-	/**
-	 * @return the no_spaces
-	 */
-	public boolean isNoSpaces() {
-		return no_spaces;
-	}
-
-	/**
-	 * @param no_spaces the no_spaces to set
-	 */
-	public void setNoSpaces(boolean no_spaces) {
-		this.no_spaces = no_spaces;
-		if( no_spaces) {
-			setTrim(true);
-		}
-	}
 
 	@Override
 	public boolean isEmpty() {

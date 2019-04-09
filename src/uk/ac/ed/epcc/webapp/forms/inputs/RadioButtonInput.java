@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.util.Iterator;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 /** Wrapper class to convert a ListInput to be displayed as a
@@ -152,6 +153,21 @@ public class RadioButtonInput<V, T> implements ListInput<V, T>, ParseInput<V> {
 	@Override
 	public boolean isValid(T item) {
 		return nested.isValid(item);
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#addValidator(uk.ac.ed.epcc.webapp.forms.FieldValidator)
+	 */
+	@Override
+	public void addValidator(FieldValidator<V> val) {
+		nested.addValidator(val);
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#removeValidator(uk.ac.ed.epcc.webapp.forms.FieldValidator)
+	 */
+	@Override
+	public void removeValidator(FieldValidator<V> val) {
+		nested.removeValidator(val);
+		
 	}
 
 }

@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 
 /**
@@ -113,4 +114,14 @@ public interface Input<V> {
 	default public  boolean isEmpty() {
 		return getValue() == null;
 	}
+	/** Add a {@link FieldValidator} to this input
+	 * 
+	 * @param val
+	 */
+	public void addValidator(FieldValidator<V> val) ;
+	/** Remove a {@link FieldValidator} from this input
+	 * 
+	 * @param val
+	 */
+	public void removeValidator(FieldValidator<V> val);
 }
