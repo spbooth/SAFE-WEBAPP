@@ -37,6 +37,7 @@ import uk.ac.ed.epcc.webapp.ContextCached;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.Tagged;
+import uk.ac.ed.epcc.webapp.content.Labeller;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Form;
@@ -322,6 +323,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		private int max_identifier=DataObject.MAX_IDENTIFIER;
         boolean restrict_parse=true;  // does filter apply to parse as well as offered choice
         boolean allow_pre_select=true;
+        private Labeller<? super BDO, String> labeller=null;
 		public AbstractDataObjectInput(BaseFilter<BDO> f) {
 			this(f,true);
 		}
@@ -425,6 +427,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			if( obj == null ){
 				return null;
 			}
+			if( labeller != null ) {
+				return labeller.getLabel(getContext(), obj);
+			}
 			String result = obj.getIdentifier(max_identifier);
 			
 			if ( result != null && result.length() > max_identifier) {
@@ -493,6 +498,12 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 		public void setMaxIdentifier(int max_identifier) {
 			this.max_identifier = max_identifier;
+		}
+		public Labeller<? super BDO, String> getLabeller() {
+			return labeller;
+		}
+		public void setLabeller(Labeller<? super BDO, String> labeller) {
+			this.labeller = labeller;
 		}
 	}
     /** A form Input used to select objects produced by the owning factory using the record id

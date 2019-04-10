@@ -15,8 +15,15 @@ package uk.ac.ed.epcc.webapp.content;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Field;
+import uk.ac.ed.epcc.webapp.forms.Form;
 
-
+/** A {@link UIGenerator} used to add a {@link Form} label to a table.
+ * 
+ * @author Stephen Booth
+ *
+ * @param <I> type of {@link Field}
+ * @see Control
+ */
 public class Label<I> implements UIGenerator{
 	public Label(AppContext conn,Field<I> field) {
 		this.conn=conn;

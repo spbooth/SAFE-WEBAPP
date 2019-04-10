@@ -15,8 +15,16 @@ package uk.ac.ed.epcc.webapp.content;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Field;
+import uk.ac.ed.epcc.webapp.forms.Form;
 
-
+/** A {@link UIGenerator} used to add a {@link Form} control/input
+ * to a table.
+ * 
+ * @author Stephen Booth
+ *
+ * @param <I> type of {@link Field}
+ * @see Label
+ */
 public class Control<I> implements UIGenerator{
 	public Control(AppContext conn,Field<I> field) {
 		this(conn,field,null);

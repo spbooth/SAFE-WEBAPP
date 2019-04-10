@@ -333,7 +333,7 @@ table.form td {
         background-color: #cccccc;
 }
 
-form table.form tr:hover td {
+form table tr:hover td {
 	 background-color: #dddddd;
 }
 
