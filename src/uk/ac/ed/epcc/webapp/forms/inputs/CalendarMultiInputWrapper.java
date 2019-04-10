@@ -157,8 +157,8 @@ public class CalendarMultiInputWrapper extends AbstractCalendarMultiInput {
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.MultiInput#validate()
 	 */
 	@Override
-	public void validate() throws FieldException {
-		super.validate();
+	public void validateInner() throws FieldException {
+		super.validateInner();
 		input.validate();
 	}
 	

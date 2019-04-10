@@ -17,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
@@ -96,7 +97,7 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 	}
 
 	@Override
-	public void validate() throws FieldException {
+	public void validateInner() throws FieldException {
 		if( master.isEmpty() && ! file.isEmpty()) {
 			master.setValue(convert(file.getValue()));
 		}
@@ -151,4 +152,5 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 		}
 		return is_leaf;
 	}
+
 }

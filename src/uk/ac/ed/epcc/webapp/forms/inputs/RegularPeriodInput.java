@@ -107,8 +107,8 @@ public class RegularPeriodInput extends MultiInput<RegularSplitPeriod, Input> {
 		splits.setValue(n);
 	}
 	@Override
-	public void validate() throws FieldException {
-		super.validate();
+	public void validateInner() throws FieldException {
+		super.validateInner();
 		if( start.getValue().after(end.getValue())){
 			throw new ValidateException("start after end");
 		}

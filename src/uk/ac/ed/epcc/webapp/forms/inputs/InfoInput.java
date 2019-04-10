@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 
 /** Represents an UnmodifiableInput that takes no part in the
@@ -70,6 +71,20 @@ public class InfoInput implements Input<String>, UnmodifiableInput{
 	}
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitUnmodifyableInput(this);
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#addValidator(uk.ac.ed.epcc.webapp.forms.FieldValidator)
+	 */
+	@Override
+	public void addValidator(FieldValidator<String> val) {
+		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#removeValidator(uk.ac.ed.epcc.webapp.forms.FieldValidator)
+	 */
+	@Override
+	public void removeValidator(FieldValidator<String> val) {
+		
 	}
 
 }

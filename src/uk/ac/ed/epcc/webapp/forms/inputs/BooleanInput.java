@@ -16,7 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
 
@@ -61,7 +60,11 @@ public class BooleanInput extends AbstractInput<Boolean> implements ParseInput<B
 	}
 
 	public boolean isChecked() {
-		return getValue();
+		Boolean v = getValue();
+		if( v == null) {
+			return false;
+		}
+		return v;
 	}
 
 	public void setChecked(boolean value) {

@@ -23,8 +23,8 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Tagged;
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
 /** Input to select a objects dynamically constructed from the configuration service 
@@ -38,10 +38,8 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  */
 
 
-public class ConstructedObjectInput<T> implements ListInput<String,T>{
+public class ConstructedObjectInput<T> extends AbstractInput<String> implements ListInput<String,T>{
     private final AppContext c;
-    private String name;
-    private String key;
     private Class<T> clazz;
     private Map<String,Class> reg;
     
@@ -63,7 +61,16 @@ public class ConstructedObjectInput<T> implements ListInput<String,T>{
     	this.c=c;
     	clazz=target;
     	reg = map;
-    	
+    	addValidator(new FieldValidator<String>() {
+			
+			@Override
+			public void validate(String data) throws FieldException {
+				if( ! map.containsKey(data)) {
+					throw new ValidateException("Tag "+data+" does not resolve to target class");
+				}
+				
+			}
+		});
     	
     }
 	@Override
@@ -122,50 +129,11 @@ public class ConstructedObjectInput<T> implements ListInput<String,T>{
 		return null;
 	}
 
-	@Override
-	public String getKey() {
-		return key;
-	}
+	
 
-	@Override
-	public String getPrettyString(String value) {
-		return value;
-	}
 
-	@Override
-	public String getString(String value) {
-		return value;
-	}
+	
 
-	@Override
-	public String getValue() {
-		return name;
-	}
-
-	@Override
-	public void setKey(String key) {
-		
-		this.key=key;
-	}
-
-	@Override
-	public String setValue(String v) throws TypeError {
-		String old=name;
-		name=v;
-		return old;
-	}
-
-	@Override
-	public void validate() throws FieldException {
-		if( name != null && reg.containsKey(name)){
-			return;
-		}
-		
-			if( name == null ){
-				throw new MissingFieldException();
-			}
-			throw new ValidateException("Invalid selection "+name);
-	}
 
 	@Override
 	public T getItem() {
@@ -178,7 +146,7 @@ public class ConstructedObjectInput<T> implements ListInput<String,T>{
 
 	@Override
 	public void setItem(T item) {
-		name=getTagByItem(item);
+		setValue(getTagByItem(item));
 		
 	}
 	@Override

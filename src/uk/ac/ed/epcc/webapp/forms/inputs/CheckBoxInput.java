@@ -16,7 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
 /** A checkbox input. 
@@ -29,19 +28,18 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
  */
 
 
-public class CheckBoxInput implements ParseInput<String>,  BinaryInput<String> {
+public class CheckBoxInput extends AbstractInput<String> implements ParseInput<String>,  BinaryInput<String> {
 
 	private final String checked_value;
 	private final String unchecked_value;
-	private String key;
-	boolean is_checked;
-	String value;
+	
+	
+
 
 	public CheckBoxInput(String checked, String unchecked) {
 		this.checked_value = checked;
 		this.unchecked_value = unchecked;
-		is_checked=false;
-		value = unchecked;
+		setValue(unchecked);
 	}
 
 	public String getChecked() {
@@ -56,7 +54,7 @@ public class CheckBoxInput implements ParseInput<String>,  BinaryInput<String> {
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.BinaryInput#isChecked()
 	 */
 	public boolean isChecked() {
-		return is_checked;
+		return checkString(getValue());
 	}
     private boolean checkString(String v){
     	if (v != null && v.trim().equalsIgnoreCase(checked_value)) {
@@ -66,36 +64,17 @@ public class CheckBoxInput implements ParseInput<String>,  BinaryInput<String> {
 		}
     }
 	public String parseValue(String v) throws ParseException {
-		is_checked = checkString(v);
-		return getValue(is_checked);
+		return getValue(checkString(v));
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.BinaryInput#setChecked(boolean)
 	 */
 	public void setChecked(boolean value) {
-		is_checked=value;
-		this.value=getValue(value);
+		setValue(getValue(value));
 	}
 
-	public String setValue(String o) throws TypeError{
-		if( o == null ){
-			// null means unchecked
-			String old = getValue();
-			is_checked=false;
-			value = getUnChecked();
-			return old;
-		}
-		if(o instanceof String){
-			String v = o;
-			// no input implies unchecked
-			String old = getValue();
-			is_checked=checkString(v);
-			value=v;
-			return old;
-		}
-		throw new TypeError("Unsupported object in setValue");
-	}
+	
 
 	public String convert(Object o) throws TypeError{
 		if( o == null ){
@@ -110,18 +89,8 @@ public class CheckBoxInput implements ParseInput<String>,  BinaryInput<String> {
 		}
 		throw new TypeError(o.getClass());
 	}
-	public void validate() throws FieldException {
-		return;
-	}
 
-	public String getString() {
-		return getValue(is_checked);
-	}
-
-	public String getKey() {
-		return key;
-	}
-
+	
 	public String getPrettyString(String value) {
 		return getString(value);
 	}
@@ -136,15 +105,6 @@ public class CheckBoxInput implements ParseInput<String>,  BinaryInput<String> {
 		}else{
 			return unchecked_value;
 		}
-	}
-   
-	public void setKey(String key) {
-	    this.key=key;	
-	}
-
-	public String getValue() {
-		// getValue returns the ACTUAL value as set by the setValue call
-		return value;
 	}
 
 	public <R> R accept(InputVisitor<R> vis) throws Exception {

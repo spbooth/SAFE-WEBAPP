@@ -17,6 +17,7 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
@@ -78,7 +79,25 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements P
     		date_format.append(time_format);
     	}
     	df = new RelativeDateFormat(date_format.toString());
-    	
+    	addValidator(new FieldValidator<Date>() {
+			
+			@Override
+			public void validate(Date val) throws FieldException {
+				if( min_date != null && min_date.after(val)){
+					if( (min_date.getTime() - val.getTime()) < 1000L  ) {
+						// This is a boundary case min and value will format the same
+						// even though min is technically after value
+						throw new ValidateException("Must be after "+df.format(min_date));
+					}
+					throw new ValidateException("Before "+df.format(min_date));
+				}
+				if( max_date != null && max_date.before(val)){
+					// boundary ok as will format as day before
+					throw new ValidateException("After "+df.format(max_date));
+				}
+				
+			}
+		});
     }
 	public Date convert(Object v) throws TypeError {
 		if( v == null ){
@@ -159,23 +178,7 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements P
 	public String getString(Date val) {
 		return df.format(val);
 	}
-	@Override
-	public void validate() throws FieldException {
-		super.validate();
-		Date val = getValue();
-		if( min_date != null && min_date.after(val)){
-			if( (min_date.getTime() - val.getTime()) < 1000L  ) {
-				// This is a boundary case min and value will format the same
-				// even though min is technically after value
-				throw new ValidateException("Must be after "+df.format(min_date));
-			}
-			throw new ValidateException("Before "+df.format(min_date));
-		}
-		if( max_date != null && max_date.before(val)){
-			// boundary ok as will format as day before
-			throw new ValidateException("After "+df.format(max_date));
-		}
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput#getMin()
 	 */

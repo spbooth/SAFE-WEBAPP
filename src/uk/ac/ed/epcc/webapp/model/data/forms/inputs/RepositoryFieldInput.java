@@ -20,6 +20,7 @@ import java.util.Iterator;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
+import uk.ac.ed.epcc.webapp.forms.inputs.BaseInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
@@ -32,10 +33,9 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
  */
 
 
-public class RepositoryFieldInput implements ListInput<String,Repository.FieldInfo>{
+public class RepositoryFieldInput extends BaseInput<String> implements ListInput<String,Repository.FieldInfo>{
     private final Repository res;
     private FieldInfo item=null;
-    private String key=null;
     public RepositoryFieldInput(Repository res){
     	this.res=res;
     }
@@ -75,25 +75,15 @@ public class RepositoryFieldInput implements ListInput<String,Repository.FieldIn
 		throw new TypeError();
 	}
 
-	public String getKey() {
-		return key;
-	}
+	
 
-	public String getPrettyString(String value) {
-		return value;
-	}
-
-	public String getString(String value) {
-		return value;
-	}
+	
 
 	public String getValue() {
 		return getTagByItem(item);
 	}
 
-	public void setKey(String key) {
-		this.key=key;
-	}
+	
 
 	public String setValue(String v) throws TypeError {
 		String old = getValue();
@@ -101,11 +91,7 @@ public class RepositoryFieldInput implements ListInput<String,Repository.FieldIn
 		return old;
 	}
 
-	public void validate() throws FieldException {
-		if( item == null ){
-			throw new MissingFieldException();
-		}
-	}
+	
 
 	public FieldInfo getItem() {
 		return item;
@@ -124,5 +110,9 @@ public class RepositoryFieldInput implements ListInput<String,Repository.FieldIn
 	public boolean isValid(FieldInfo item) {
 		return res.hasField(item);
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#validate()
+	 */
+	
 
 }

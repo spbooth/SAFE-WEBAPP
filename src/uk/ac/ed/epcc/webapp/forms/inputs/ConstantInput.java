@@ -16,9 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
-
 /** a read-only input that cannot be modified. For convenience in update forms it can cache an
  * object value but this should never actually be edited by the input instead the text label should be 
  * displayed. This input only validates against optional input
@@ -27,24 +24,15 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
  */
 
 
-public class ConstantInput<V> implements UnmodifiableInput, Input<V> {
+public class ConstantInput<V> extends AbstractInput<V> implements UnmodifiableInput, Input<V> {
 	private String label;
-
-	private String key;
-
-	private V value = null;
-
 
 	public ConstantInput(String label){
 		this(label,null);
 	}
 	public ConstantInput(String label,V value) {
 		this.label = label;
-		this.value = value;
-	}
-
-	public String getKey() {
-		return key;
+		setValue(value);
 	}
 
 	public String getLabel() {
@@ -63,47 +51,10 @@ public class ConstantInput<V> implements UnmodifiableInput, Input<V> {
 	    	}
 	    	return getString(val);
 	    }
-    public final String getString(){
-    	return getString(value);
-    }
-	public V getValue() {
-		return value;
-	}
-
-	
-
-	
-
-	public void setKey(String key) {
-		this.key = key;
-
-	}
+ 
 
 	public void setLabel(String s) {
 		label = s;
-	}
-
-	
-
-	@SuppressWarnings("unchecked")
-	public V setValue(Object v) throws TypeError{
-		V old = value;
-		value = (V) v;
-		return old;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see uk.ac.ed.epcc.webapp.model.data.forms.AbstractInput#validate(boolean)
-	 */
-	public void validate() throws FieldException {
-		
-	}
-
-	@SuppressWarnings("unchecked")
-	public V convert(Object v) throws TypeError {
-		return(V) v;
 	}
 
 	

@@ -524,7 +524,17 @@ public final class Repository implements AppContextCleanup{
         			return val.substring(0,max);
         		}
         	}
-        	
+        	if( input == null && ! getNullable()) {
+        		if( isString()) {
+        			//map null to empty string for non nullable fields
+        			//this is to cope with legacy database fields 
+        			// originally forms code did this as an option in the input
+        			// but functionally it was still an empty input
+        			//ongoing optional string fields should support null
+        			
+        			return "";
+        		}
+        	}
         	return input;
         }
 		public boolean isTruncate() {

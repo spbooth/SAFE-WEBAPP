@@ -111,6 +111,13 @@ public interface Input<V> {
 	
 	public abstract <R> R accept(InputVisitor<R> vis) throws Exception;
 
+	/**Is the input empty.
+	 * 
+	 * empty inputs are reported as errors for non-optional fields.
+	 * Additional validation is not performed if the input is empty.
+	 * 
+	 * @return
+	 */
 	default public  boolean isEmpty() {
 		return getValue() == null;
 	}

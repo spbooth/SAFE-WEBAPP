@@ -17,7 +17,6 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
@@ -31,67 +30,15 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
  * @param <V> Param of object we generate
  * 
  */
-public abstract class AbstractInput<V> implements Input<V>{
-	String key;
-
+public abstract class AbstractInput<V> extends BaseInput<V> {
 	V value;
-
-	private Set<FieldValidator<V>> validators;
-
 
 	public AbstractInput() {
 		super();
 		value = null;
-		validators=new LinkedHashSet<>();
 	}
 	
-	public final void addValidator(FieldValidator<V> val) {
-		validators.add(val);
-	}
-
-	public final void removeValidator(FieldValidator<V> val) {
-		validators.remove(val);
-	}
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#getKey()
-	 */
-	public final String getKey() {
-		return key;
-	}
-
-	/**
-	 * get a String representation of the value in a form that is compatible
-	 * with the way the input is parsed.
-	 * This provides a default implementation of a method requires by ParseInput
-	 * @return String or null if no value
-	 */
-	public final String getString() {
-	    if( value == null ){
-	    	return null;
-	    }
-		return getString(value);
-	}
-	/** get a String representation of an Object that is compatible with the way
-	 * the input is parsed
-	 * 
-	 * @param val
-	 * @return String or null if val is null
-	 */
-    public String getString(V val){
-    	if( val == null ){
-    		return null;
-    	}
-    	return val.toString();
-    }
-    
-    public String getPrettyString(V val){
-    	if( val == null ){
-    		return "no value";
-    	}
-    	return getString(val);
-    }
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -99,17 +46,6 @@ public abstract class AbstractInput<V> implements Input<V>{
 	 */
 	public final V getValue() {
 		return value;
-	}
-
-	
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#setKey(java.lang.Object)
-	 */
-	public final void setKey(String key) {
-		this.key = key;
 	}
 
 	
@@ -126,28 +62,8 @@ public abstract class AbstractInput<V> implements Input<V>{
 		return old;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public V convert(Object v) throws TypeError{
-		return (V) v;
+	@Override
+	public final void setKey(String key) {
+		super.setKey(key);
 	}
-	
-	
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#validate()
-	 */
-	public final void validate() throws FieldException {
-		V value = getValue();
-		if( value == null ) {
-			return;
-		}
-		for(FieldValidator<V> val : validators) {
-			val.validate(value);
-		}
-	}
-	
-	
-
 }

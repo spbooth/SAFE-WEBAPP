@@ -27,52 +27,18 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
  */
 
 
-public class LockedInput<V> implements UnmodifiableInput ,  Input<V>{
-    Input<V> wrapped;
+public class LockedInput<V> extends WrappingInput<V> implements UnmodifiableInput ,  Input<V>{
+  
     public LockedInput(Input<V> wrapped_input){
-    	wrapped=wrapped_input;
+    	super(wrapped_input);
     }
-    public Input<V> getNested(){
-    	return wrapped;
-    }
+   
 	public String getLabel() {
-		return wrapped.getPrettyString(wrapped.getValue());
+		return getNested().getPrettyString(getNested().getValue());
 	}
 
-	public V convert(Object v) throws TypeError {
-		return wrapped.convert(v);
-	}
 
-	public String getKey() {
-		return wrapped.getKey();
-	}
-
-	public String getPrettyString(V value) {
-		return wrapped.getPrettyString(value);
-	}
-
-	public String getString(V value) {
-		return wrapped.getString(value);
-	}
-
-	public V getValue() {
-		return wrapped.getValue();
-	}
-
-	public void setKey(String key) {
-		wrapped.setKey(key);
-	}
-
-	public V setValue(V v) throws TypeError {
-		// We need to be able to set values to populate the current 
-		// state in update forms.
-		return wrapped.setValue(v);
-	}
-
-	public void validate() throws FieldException {
-		wrapped.validate();
-	}
-
+	
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitLockedInput(this);
 	}

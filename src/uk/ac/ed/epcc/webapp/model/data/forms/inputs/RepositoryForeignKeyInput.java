@@ -22,6 +22,7 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
+import uk.ac.ed.epcc.webapp.forms.inputs.BaseInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
@@ -34,10 +35,9 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
  */
 
 
-public class RepositoryForeignKeyInput implements ListInput<String,Repository.FieldInfo>{
+public class RepositoryForeignKeyInput extends BaseInput<String> implements ListInput<String,Repository.FieldInfo>{
     private final Repository res;
     private FieldInfo item=null;
-    private String key=null;
     private Map<String,FieldInfo> data=new LinkedHashMap<>();
     public RepositoryForeignKeyInput(Repository res){
     	for(FieldInfo info : res.getInfo()){
@@ -93,10 +93,7 @@ public class RepositoryForeignKeyInput implements ListInput<String,Repository.Fi
 		throw new TypeError();
 	}
 
-	@Override
-	public String getKey() {
-		return key;
-	}
+	
 
 	@Override
 	public String getPrettyString(String value) {
@@ -110,13 +107,12 @@ public class RepositoryForeignKeyInput implements ListInput<String,Repository.Fi
 
 	@Override
 	public String getValue() {
+		if( item == null ) {
+			return null;
+		}
 		return getTagByItem(item);
 	}
 
-	@Override
-	public void setKey(String key) {
-		this.key=key;
-	}
 
 	@Override
 	public String setValue(String v) throws TypeError {
@@ -125,12 +121,6 @@ public class RepositoryForeignKeyInput implements ListInput<String,Repository.Fi
 		return old;
 	}
 
-	@Override
-	public void validate() throws FieldException {
-		if( item == null ){
-			throw new MissingFieldException();
-		}
-	}
 
 	@Override
 	public FieldInfo getItem() {

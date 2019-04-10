@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
@@ -31,6 +32,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
 public class ErrorInput<T> implements UnmodifiableInput, Input<T> {
 
+	
 	private final String text;
 	private String key;
 	public ErrorInput(String text){
@@ -60,11 +62,30 @@ public class ErrorInput<T> implements UnmodifiableInput, Input<T> {
 	public T setValue(T v) throws TypeError {
 		return null;
 	}
+	@Override
+	public boolean isEmpty() {
+		// force validation
+		return false;
+	}
 	public void validate() throws FieldException {
 		throw new ValidateException("No legal value possible");
 	}
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitUnmodifyableInput(this);
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#addValidator(uk.ac.ed.epcc.webapp.forms.FieldValidator)
+	 */
+	@Override
+	public void addValidator(FieldValidator<T> val) {
+		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#removeValidator(uk.ac.ed.epcc.webapp.forms.FieldValidator)
+	 */
+	@Override
+	public void removeValidator(FieldValidator<T> val) {
+		
 	}
 
 	

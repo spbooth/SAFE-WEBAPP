@@ -73,9 +73,9 @@ public class SimplePeriodInput extends MultiInput<Period, TimeStampMultiInput> {
 	}
 
 	@Override
-	public void validate() throws FieldException {
+	public void validateInner() throws FieldException {
 		
-		super.validate();
+		super.validateInner();
 		if( start.getValue().after(end.getValue())){
 			throw new ValidateException("start after end");
 		}

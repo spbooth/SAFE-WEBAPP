@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
@@ -38,11 +39,10 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  */
 
 
-public class ClassInput<T> implements ListInput<String,Class<? extends T>>{
+public class ClassInput<T> extends AbstractInput<String> implements ListInput<String,Class<? extends T>>{
     private final AppContext c;
     private final String prefix;
-    private String name;
-    private String key;
+    
     private Map<String,Class<? extends T>> reg;
     
     @SuppressWarnings("unchecked")
@@ -66,6 +66,15 @@ public class ClassInput<T> implements ListInput<String,Class<? extends T>>{
 				c.getService(LoggerService.class).getLogger(getClass()).error("Class "+params.get(name)+" from parameter "+name+" not found",e);
 			}
     	}
+    	addValidator(new FieldValidator<String>() {
+			
+			@Override
+			public void validate(String data) throws FieldException {
+				if( ! reg.containsKey(data)) {
+					throw new ValidateException("Invalid selection "+data);
+				}
+			}
+		});
     }
     public ClassInput(AppContext c, Class<T> target){
     	this(c,target,false,"classdef");
@@ -110,50 +119,19 @@ public class ClassInput<T> implements ListInput<String,Class<? extends T>>{
 		return null;
 	}
 
-	public String getKey() {
-		return key;
-	}
+	
 
-	public String getPrettyString(String value) {
-		return value;
-	}
+	
 
-	public String getString(String value) {
-		return value;
-	}
 
-	public String getValue() {
-		return name;
-	}
-
-	public void setKey(String key) {
-		
-		this.key=key;
-	}
-
-	public String setValue(String v) throws TypeError {
-		String old=name;
-		name=v;
-		return old;
-	}
-
-	public void validate() throws FieldException {
-		if( name != null && reg.containsKey(name)){
-			return;
-		}
-		
-			if( name == null ){
-				throw new MissingFieldException();
-			}
-			throw new ValidateException("Invalid selection "+name);
-	}
+	
 
 	public Class<? extends T> getItem() {
-		return reg.get(name);
+		return reg.get(getValue());
 	}
 
 	public void setItem(Class<? extends T> item) {
-		name=getTagByItem(item);
+		setValue(getTagByItem(item));
 		
 	}
 	public <R> R accept(InputVisitor<R> vis) throws Exception {

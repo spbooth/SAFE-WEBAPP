@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 
@@ -34,12 +35,12 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
  * @param <I> Type of sub inputs
  *
  */
-public abstract class MultiInput<V,I extends Input> implements Input<V> {
+public abstract class MultiInput<V,I extends Input> extends BaseInput<V> implements Input<V> {
 	// map between sub-keys and inputs.
 	private Map<String,I> m;
 	// map between sub-keys and labels
     private Map<String,String> labels;
-	private String key = "default";
+	
 	private boolean line_breaks=false;
 	public MultiInput(){
 		m = new LinkedHashMap<>();
@@ -83,15 +84,7 @@ public abstract class MultiInput<V,I extends Input> implements Input<V> {
     public final String getSubLabel(String sub_key){
     	return labels.get(sub_key);
     }
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#getKey()
-	 */
-	@Override
-	public final String getKey() {
-		return key;
-	}
+	
 
 	@Override
 	public abstract V getValue();
@@ -99,10 +92,8 @@ public abstract class MultiInput<V,I extends Input> implements Input<V> {
 		m.remove(sub_key);
 		labels.remove(sub_key);
 	}
-	public final String getString(){
-		return getString(getValue());
-	}
-	  @Override
+	
+	@Override
 	public String getString(V val){
 	    	if( val == null ){
 	    		return null;
@@ -124,7 +115,7 @@ public abstract class MultiInput<V,I extends Input> implements Input<V> {
 	 */
 	@Override
 	public final void setKey(String key) {
-		this.key = key;
+		super.setKey(key);
 		/*
 		 * Also change the key mappings for any sub
 		 * 
@@ -150,7 +141,7 @@ public abstract class MultiInput<V,I extends Input> implements Input<V> {
 	}
 	
 	@Override
-	public void validate() throws FieldException {
+	public void validateInner() throws FieldException {
 		// default behaviour is to validate each sub input
 		// sub-classes can override.
 		for(I i : m.values()){

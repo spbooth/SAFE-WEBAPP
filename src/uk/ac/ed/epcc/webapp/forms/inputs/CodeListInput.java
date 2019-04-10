@@ -26,10 +26,10 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
  *
  * @param <O> type of item
  */
-public abstract class CodeListInput<O> implements ListInput<String,O>, NameInput<O> {
+public abstract class CodeListInput<O> extends BaseInput<String> implements ListInput<String,O>, NameInput<O> {
 
 	private O item=null;
-	private String key=null;
+	
 	
 
 	
@@ -45,10 +45,7 @@ public abstract class CodeListInput<O> implements ListInput<String,O>, NameInput
 		return v.toString();
 	}
 
-	public String getKey() {
-		return key;
-	}
-
+	
 	public String getPrettyString(String value) {
 		O tmp = getItembyValue(value);
 		if( tmp != null ){
@@ -62,11 +59,10 @@ public abstract class CodeListInput<O> implements ListInput<String,O>, NameInput
 	}
 
 	public String getValue() {
+		if( item == null) {
+			return null;
+		}
 		return getTagByItem(item);
-	}
-
-	public void setKey(String key) {
-		this.key=key;
 	}
 
 	public String setValue(String v) throws TypeError {
@@ -75,11 +71,7 @@ public abstract class CodeListInput<O> implements ListInput<String,O>, NameInput
 		return previous;
 	}
 
-	public void validate() throws FieldException {
-	    if( item == null ){
-	    	throw new MissingFieldException(getKey()+" missing");
-	    }
-	}
+
 
 	public O getItem() {
 		return item;

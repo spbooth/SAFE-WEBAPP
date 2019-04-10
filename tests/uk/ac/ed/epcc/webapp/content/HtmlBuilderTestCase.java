@@ -369,4 +369,11 @@ public class HtmlBuilderTestCase extends WebappTestBase {
 		assertEquals("<h2><span class='warn'>1234</span></h2>", h2.toString().trim());
 		assertEquals("<span class='warn'>1234</span>",h.toString().trim());
 	}
+	
+	
+	public void testXSScase() {
+		HtmlBuilder hb = new HtmlBuilder();
+		hb.open("X");
+		hb.attr("page","/helpdesk/my_queries.jsp%22%3E%3Cscript%3Ealert(150)%3C/script%3E");
+	}
 }

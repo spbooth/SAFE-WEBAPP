@@ -22,8 +22,10 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
+import uk.ac.ed.epcc.webapp.forms.inputs.AbstractInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.StringListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
 
 /** Input to select a database table
@@ -34,17 +36,14 @@ import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
  */
 
 
-public class TableInput<T> implements ListInput<String, String> {
+public class TableInput<T> extends StringListInput implements ListInput<String, String> {
 	private final AppContext conn;
 	private final Class<T> target;
-	private String key, table=null;
 	public TableInput(AppContext c, Class<T> target){
 		conn=c;
 		this.target=target;
 	}
-	public String getItembyValue(String value) {
-		return value;
-	}
+	
 
 	public Iterator<String> getItems() {
 		return getMap().keySet().iterator();
@@ -53,13 +52,7 @@ public class TableInput<T> implements ListInput<String, String> {
 	public int getCount(){
 		return getMap().size();
 	}
-	public String getTagByItem(String item) {
-		return item;
-	}
-
-	public String getTagByValue(String value) {
-		return value;
-	}
+	
 
 	public String getText(String item) {
 		if( item == null ){
@@ -72,56 +65,12 @@ public class TableInput<T> implements ListInput<String, String> {
 		return item+": "+clazz.getSimpleName();
 	}
 
-	public String convert(Object v) throws TypeError {
-		if( v == null ){
-			return null;
-		}
-		return v.toString();
-	}
+	
 
-	public String getKey() {
-		return key;
-	}
+	
 
-	public String getPrettyString(String value) {
-		return value;
-	}
+	
 
-	public String getString(String value) {
-		return value;
-	}
-
-	public String getValue() {
-		return table;
-	}
-
-	public void setKey(String key) {
-		this.key=key;
-		
-	}
-
-	public String setValue(String v) throws TypeError {
-		String old=table;
-		table=v;
-		return old;
-	}
-
-	public void validate() throws FieldException {
-		if( table == null){
-			throw new MissingFieldException();
-		}
-	}
-
-	public String getItem() {
-		return table;
-	}
-
-	public void setItem(String item) {
-		table=item;
-	}
-	public <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitListInput(this);
-	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
 	 */

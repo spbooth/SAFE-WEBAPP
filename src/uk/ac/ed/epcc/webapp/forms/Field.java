@@ -39,11 +39,11 @@ import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
 public final class Field<I> {
 	@Override
 	public String toString() {
-		return "Field [validators=" + validators + ", label=" + label + ", value="+(sel.getValue()==null?"null":sel.getPrettyString(sel.getValue()))+", sel="
+		return "Field [label=" + label + ", value="+(sel.getValue()==null?"null":sel.getPrettyString(sel.getValue()))+", sel="
 				+ sel + "]";
 	}
 
-	Set<FieldValidator<I>> validators = null;
+	
 
 	/** text label of this field presented to the user.
 	 * 
@@ -177,16 +177,11 @@ public final class Field<I> {
 	 * @return the previous validator
 	 */
 	public void addValidator(FieldValidator<I> v) {
-		if( validators == null){
-			validators=new HashSet<>();
-		}
-		validators.add(v);
+		sel.addValidator(v);
 	}
 	
 	public void removeValidator(FieldValidator<I> v){
-		if( validators != null){
-			validators.remove(v);
-		}
+		sel.removeValidator(v);
 	}
 
 	/**
@@ -223,14 +218,7 @@ public final class Field<I> {
 			throw new MissingFieldException();
 		}
 		sel.validate();
-		if (validators != null) {
-			I dat = getValue();
-			if (dat != null) {
-				for( FieldValidator<I> validator : validators){
-					validator.validate(dat);
-				}
-			}
-		}
+		
 	}
 	public String getTooltip() {
 		return tooltip;

@@ -20,8 +20,10 @@ import java.util.Iterator;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
+import uk.ac.ed.epcc.webapp.forms.inputs.AbstractInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.StringListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 /** Input to select one of the fields of a Repository
@@ -31,16 +33,13 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  */
 
 
-public class RepositoryIndexInput implements ListInput<String,String>{
+public class RepositoryIndexInput extends StringListInput implements ListInput<String,String>{
     private final Repository res;
-    private String key=null;
-    private String value;
+
     public RepositoryIndexInput(Repository res){
     	this.res=res;
     }
-	public String getItembyValue(String value) {
-		return value;
-	}
+	
 
 	public Iterator<String> getItems() {
 		return res.getIndexNames().iterator();
@@ -49,14 +48,8 @@ public class RepositoryIndexInput implements ListInput<String,String>{
 		return res.getInfo().size();
 	}
 
-	public String getTagByItem(String item) {
-		return item;
-	}
-
-	public String getTagByValue(String value) {
-		return value;
-	}
-
+	
+	
 	public String getText(String item) {
 		if( item == null ){
 			return "None";
@@ -64,55 +57,6 @@ public class RepositoryIndexInput implements ListInput<String,String>{
 		return item;
 	}
 
-	public String convert(Object v) throws TypeError {
-		if( v instanceof String){
-			return (String)v;
-		}
-		throw new TypeError();
-	}
-
-	public String getKey() {
-		return key;
-	}
-
-	public String getPrettyString(String value) {
-		return value;
-	}
-
-	public String getString(String value) {
-		return value;
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public void setKey(String key) {
-		this.key=key;
-	}
-
-	public String setValue(String v) throws TypeError {
-		String old = getValue();
-		value=v;
-		return old;
-	}
-
-	public void validate() throws FieldException {
-		if( value == null ){
-			throw new MissingFieldException();
-		}
-	}
-
-	public String getItem() {
-		return value;
-	}
-
-	public void setItem(String item) {
-		this.value=item;
-	}
-	public <R> R accept(InputVisitor<R> vis) throws Exception {
-		return vis.visitListInput(this);
-	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
 	 */

@@ -477,8 +477,8 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
         	throw new TypeError("Unknown type pased to LinkInput");
         }
 		@Override
-		public void validate() throws FieldException {
-			super.validate();
+		public void validateInner() throws FieldException {
+			super.validateInner();
 			Number left = left_input.getValue();
 			Number right = right_input.getValue();
 			

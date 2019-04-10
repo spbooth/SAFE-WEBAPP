@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import uk.ac.ed.epcc.webapp.Indexed;
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
@@ -230,6 +231,22 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 			return true;
 		}
 		return internal.isValid((T) item);
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#addValidator(uk.ac.ed.epcc.webapp.forms.FieldValidator)
+	 */
+	@Override
+	public void addValidator(FieldValidator<Integer> val) {
+		internal.addValidator(val);
+		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#removeValidator(uk.ac.ed.epcc.webapp.forms.FieldValidator)
+	 */
+	@Override
+	public void removeValidator(FieldValidator<Integer> val) {
+		internal.removeValidator(val);
+		
 	}
 	
 	
