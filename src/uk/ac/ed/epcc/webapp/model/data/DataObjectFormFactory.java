@@ -271,23 +271,7 @@ public final AppContext getContext(){
 		}
 		return input;
 	}
-	/** Calculate a set of optional fields based on field nullability.
-	 * 
-	 * @param res
-	 * @return Set of field names
-	 */
-	public static Set<String> getOptional(Repository res){
-		Set<String> keys = res.getFields();
-        Set<String> result = new HashSet<>();
-		for (Iterator<String> it = keys.iterator(); it.hasNext();) {
-			String name =  it.next();
-			Repository.FieldInfo info = res.getInfo(name);
-			if( info.getNullable() ){
-				result.add(name);
-			}
-		}
-		return result;
-	}
+	
 	/** Add a set of selectors based on the tables referenced by field keys
 	 * @param conn 
 	 * @param sel 
@@ -483,7 +467,7 @@ public final AppContext getContext(){
 			// If a sub-class overrides this method to return null
 			// the buildForm method will also check for nullable fields directly
 			//
-			optional=getOptional(factory.res);
+			optional=factory.getNullable();
 		}
 		optional = addOptionalFromComposites(optional);
 		return optional;

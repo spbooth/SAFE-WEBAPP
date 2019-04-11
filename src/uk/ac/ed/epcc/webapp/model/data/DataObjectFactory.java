@@ -1649,10 +1649,19 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return null;
 		}
     }
+    /** get the default {@link Logger}
+     * 
+     * @return {@link Logger}
+     */
 	protected Logger getLogger() {
 		return getContext().getService(LoggerService.class).getLogger(getClass());
 	}
 
+	/** get the set of fields that can be null in the database.
+	 * 
+	 * 
+	 * @return Set<String>
+	 */
 	protected final Set<String> getNullable() {
 		Set<String> nullable = new HashSet<>();
 		for (Iterator it = res.getFields().iterator(); it.hasNext();) {
@@ -1672,8 +1681,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * start with {@link #getNullable()} and remove any fields that should be forced to be mandatory.
 	 * Alternatively you can start with an empty set (defaulting to all fields mandatory) and add exceptions
 	 * 
+	 * Note that for legacy reasons a non-nullable String field <b>CAN</b> be made optional (the {@link Repository}
+	 * will map null values to the empty string) 
 	 * @return Vector
 	 * @see #getNullable()
+	 * @See {@link DataObjectFormFactory}
 	 */
 	protected Set<String> getOptional() {
 		return null;
@@ -1701,6 +1713,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * This method provides a class specific set of defaults but the specific form classes can
 	 * override this.
 	 * @return Map
+	 * @see DataObjectFormFactory
 	 */
 	protected Map<String,Object> getSelectors() {
 
@@ -1711,7 +1724,8 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * The individual forms can override these so you usually use this method to define fields that should
 	 * be suppressed in <em>all</em> forms.
 	 * 
-	 * @return Vector
+	 * @return Set<String>
+	 * @see DataObjectFormFactory
 	 */
 	protected Set<String> getSupress() {
 		return new HashSet<>();
@@ -1761,7 +1775,8 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * return a default set of translation between field names and text labels.
 	 * This method provides a class specific set of defaults. The individual Form classes can still override this.
 	 * 
-	 * @return Hashtable
+	 * @return Map<String,String>
+	 * @see DataObjectFormFactory
 	 */
 	protected Map<String, String> getTranslations() {
 		// default to no translations override this method in sub-classes
