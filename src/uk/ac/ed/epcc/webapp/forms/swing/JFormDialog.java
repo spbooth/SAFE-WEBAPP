@@ -21,6 +21,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -142,14 +143,13 @@ public class JFormDialog extends JDialog implements Contexed{
 	 * @param form
 	 * @return JPanel
 	 */
-	public JPanel getActionButtons(Form form){
+	public JPanel getActionButtons(Form form,Set<String> actions){
 		JPanel buttons = new JPanel();
 		buttons.setLayout(new WrapLayout(FlowLayout.RIGHT));
 		//buttons.setLayout(new BoxLayout(buttons, BoxLayout.LINE_AXIS));
 		//buttons.add(Box.createHorizontalGlue());
 		buttons.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		for (Iterator it = form.getActionNames(); it.hasNext();) {
-			String action = (String) it.next();
+		for (String action : actions) {
 			JButton b = new JButton(action);
 			String help = form.getAction(action).getHelp();
 			if( help != null && help.trim().length() > 0){

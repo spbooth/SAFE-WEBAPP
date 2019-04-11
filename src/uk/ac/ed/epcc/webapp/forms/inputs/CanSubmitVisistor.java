@@ -13,6 +13,13 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import java.util.Iterator;
+
+import uk.ac.ed.epcc.webapp.forms.Field;
+import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
+
 /** An {@link InputVisitor} that detects any input that  is impossible to validate
  * @author Stephen Booth
  *
@@ -113,5 +120,23 @@ public class CanSubmitVisistor implements InputVisitor<Boolean> {
 	public Boolean visitPasswordInput(PasswordInput input) throws Exception {
 		return true;
 	}
-
+    public static boolean canSubmit(Form f) {
+    	boolean can_submit=true;
+    	CanSubmitVisistor vis = new CanSubmitVisistor();
+    	for( Iterator<String>it = f.getFieldIterator(); it.hasNext() ;) {
+    		Field field = f.getField(it.next());
+    		if( ! field.isOptional()) {
+    			// optional fields won't stop submission
+    			Input i = field.getInput();
+    			try {
+    				if( ! ((Boolean)i.accept(vis))) {
+    					can_submit=false;
+    				}
+    			} catch (Exception e) {
+    				f.getContext().getService(LoggerService.class).getLogger(CanSubmitVisistor.class).error("Error checking submit",e);
+    			}
+    		}
+    	}
+    	return can_submit;
+    }
 }

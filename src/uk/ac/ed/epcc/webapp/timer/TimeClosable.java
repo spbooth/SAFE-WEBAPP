@@ -15,6 +15,8 @@ package uk.ac.ed.epcc.webapp.timer;
 
 import java.io.IOException;
 
+import uk.ac.ed.epcc.webapp.AppContext;
+
 /** A {@link AutoCloseable} wrapper to allows timers to be closed automatically.
  * 
  * Its written to handle a null {@link TimerService}
@@ -34,6 +36,17 @@ public class TimeClosable implements AutoCloseable{
 		if( service != null ) {
 			service.startTimer(name);
 		}
+	}
+	/** Create with the default {@link TimerService}
+	 * 
+	 * If no {@link TimerService} is enabled the {@link TimeClosable}
+	 * will have no effect.
+	 * 
+	 * @param conn
+	 * @param name
+	 */
+	public TimeClosable(AppContext conn,String name) {
+		this(conn.getService(TimerService.class),name);
 	}
 
 	private final TimerService service;
@@ -56,7 +69,7 @@ public class TimeClosable implements AutoCloseable{
 	 * @see java.io.Closeable#close()
 	 */
 	@Override
-	public void close() throws IOException {
+	public void close()  {
 		if( service != null ) {
 			service.stopTimer(name);
 		}

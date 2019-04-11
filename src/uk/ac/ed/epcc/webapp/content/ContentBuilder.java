@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.content;
 
 import java.text.NumberFormat;
 import java.util.Map;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Field;
@@ -256,5 +257,14 @@ public interface ContentBuilder {
 	 * 
 	 * @param f
 	 */
-	public void addActionButtons(Form f);
+	default public void addActionButtons(Form f) {
+		addActionButtons(f,null, f.getActionNames());
+	}
+	/** A a set of action buttons to the content
+	 * 
+	 * @param f  {@link Form}
+	 * @param legend optional legend for the button set
+	 * @param names {@link Set} of action names
+	 */
+	public void addActionButtons(Form f,String legend,Set<String> names);
 }

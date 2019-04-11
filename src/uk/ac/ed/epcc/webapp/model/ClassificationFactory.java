@@ -41,6 +41,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFormFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
@@ -467,6 +468,13 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		}
 		trans.put(Classification.SORT_ORDER, "Sort weighting");
 		return trans;
+	}
+	
+	@Override
+	protected Set<String> getOptional() {
+		Set<String> optional = getNullable();
+		optional.remove(Classification.NAME);
+		return optional;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.ParseFactory#getName(java.lang.Object)

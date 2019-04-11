@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
@@ -59,7 +60,6 @@ public class HtmlBuilder extends HtmlPrinter implements ContentBuilder {
   
 public static final Feature HTML_USE_LABEL_FEATURE = new Preference("html.use_label",true,"generate html labels in automatic forms");
 public static final Feature HTML_TABLE_SECTIONS_FEATURE = new Preference("html.table_sections",false,"generate thead/tbody in tables");
-public static final Feature CONFIRM_ATTR_FEATURE = new Feature("html.form.confirm_attributes",false,"Add known confirm tags as submit input attributes");
 Boolean use_table_section=null;
 
 private boolean new_tab=false; // Do  we want to open links/buttons in new tab/window
@@ -585,33 +585,21 @@ private String action_name=null;
  * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addActionButtons(uk.ac.ed.epcc.webapp.forms.Form)
  */
 @Override
-public void addActionButtons(Form f) {
-	boolean confirm_attr = CONFIRM_ATTR_FEATURE.isEnabled(f.getContext());
-	boolean can_submit=true;
-	CanSubmitVisistor vis = new CanSubmitVisistor();
-	for( Iterator<String>it = f.getFieldIterator(); it.hasNext() ;) {
-		Field field = f.getField(it.next());
-		if( ! field.isOptional()) {
-			// optional fields won't stop submission
-			Input i = field.getInput();
-			try {
-				if( ! ((Boolean)i.accept(vis))) {
-					can_submit=false;
-				}
-			} catch (Exception e) {
-				getLogger(f.getContext()).error("Error checking submit",e);
-			}
-		}
-	}
-	
-	Iterator<String> it = f.getActionNames();
-	if( it.hasNext()){
+public void addActionButtons(Form f,String legend,Set<String> actions) {
+	boolean can_submit=CanSubmitVisistor.canSubmit(f);
+
+	if( ! actions.isEmpty()){
 		open("fieldset");
 		addClass( "action_buttons");
-		while ( it.hasNext()) {
-			String name =  it.next();
+		if( legend != null && ! legend.isEmpty()) {
+			open("legend");
+			clean(legend);
+			close();
+		}
+		for( String name : actions) {
 			FormAction action = f.getAction(name);
 			Object content = action.getText();
+			
 			if( content != null ){
 				open("button");
 			}else{
@@ -619,9 +607,9 @@ public void addActionButtons(Form f) {
 			}
 			addClass("input_button");
 			attr("type","submit");
-			if( ! action.getMustValidate()){
+			boolean must_validate = action.getMustValidate();
+			if( ! must_validate){
 				attr("formnovalidate",null);
-				can_submit=true;  // don't disable non validating
 			}
 			if( action.wantNewWindow()) {
 				attr("formtarget","_blank");
@@ -641,8 +629,11 @@ public void addActionButtons(Form f) {
 				attr("name",name);
 			}
 			attr("value",name);
-			if( action instanceof DisabledAction || ! can_submit){
-				attr("disabled",null);
+			if( must_validate) {
+				// non validsating actions always enabled
+				if( action instanceof DisabledAction || ! can_submit){
+					attr("disabled",null);
+				}
 			}
 			
 			if( content != null ){

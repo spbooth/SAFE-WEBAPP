@@ -157,8 +157,7 @@ public class HTMLForm extends BaseHTMLForm {
 	 */
 	public String mustConfirm(Map params) throws ActionException {
 
-		for (Iterator<String> it = getActionNames(); it.hasNext();) {
-			String name =  it.next();
+		for (String name : getActionNames()) {
 			if (params.get(name) != null) {
 				return mustConfirm(name);
 			}

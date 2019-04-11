@@ -340,8 +340,7 @@ public class MapForm extends BaseForm {
     	return action_name;
     }
 	public String locateAction(Map<String,Object> params) throws ActionException{
-		for (Iterator<String> it = getActionNames(); it.hasNext();) {
-			String name = it.next();
+		for (String name : getActionNames()) {
 			if( action_name != null ){
 				String val = (String) params.get(action_name);
 				if( val != null && val.trim().equals(name.trim())){
@@ -404,8 +403,7 @@ public class MapForm extends BaseForm {
 	public FormAction getShortcutAction(Map<String,Object> params) throws FieldException,
 			ActionException {
 				//Logger log = getContext().getLogger();
-				for (Iterator<String> it = getActionNames(); it.hasNext();) {
-					String name = it.next();
+				for (String name : getActionNames()) {
 					//log.debug("looking for action <" + name + "> " + params.size());
 					if (params.get(name) != null || params.get(name.trim()) != null) {
 						FormAction a = getAction(name);

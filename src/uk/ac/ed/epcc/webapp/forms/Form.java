@@ -131,11 +131,11 @@ public interface Form extends Iterable<Field>, Contexed{
 	 * @return item
 	 */
 	public Object getItem(String key);
-	/** Get an {@link Iterator} over the names of the installed Actions.
+	/** Get an {@link Set} of the names of the installed Actions.
 	 * 
 	 * @return Iterator
 	 */
-	public Iterator<String> getActionNames(); 
+	public Set<String> getActionNames(); 
 	
 	
 	public void setConfirm(String name, String conf);

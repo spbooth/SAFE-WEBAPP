@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.sql.ResultSet;
@@ -110,6 +111,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 /**
@@ -1404,10 +1406,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return ((Boolean)counter.find(sql_fil)).booleanValue();
 		}catch(NoSQLFilterException e){
 			// do things the hard way
-		
+
 			try(FilterIterator it = new FilterIterator(s)){
 				return it.hasNext();
 			}
+
 		}
 	}
 	// Note this is used to implement FilterMatcher so
@@ -1665,9 +1668,12 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * generate the set of optional fields to be used to provide class specific defaults
 	 *  in form creation/update.
 	 * If null is returned the default behaviour is to take fields that can be null in the database but
-	 * most classes will override with an explicit list of optional fields
+	 * classes can override with an explicit list of optional fields. In which case it may be a good idea to
+	 * start with {@link #getNullable()} and remove any fields that should be forced to be mandatory.
+	 * Alternatively you can start with an empty set (defaulting to all fields mandatory) and add exceptions
 	 * 
 	 * @return Vector
+	 * @see #getNullable()
 	 */
 	protected Set<String> getOptional() {
 		return null;

@@ -3,6 +3,7 @@ package uk.ac.ed.epcc.webapp.content;
 
 import java.text.NumberFormat;
 import java.util.Map;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Field;
@@ -251,7 +252,7 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addActionButtons(uk.ac.ed.epcc.webapp.forms.Form)
 	 */
 	@Override
-	public void addActionButtons(Form f) {
+	public void addActionButtons(Form f,String legend,Set<String> actions) {
 		// TODO Auto-generated method stub
 		
 	}

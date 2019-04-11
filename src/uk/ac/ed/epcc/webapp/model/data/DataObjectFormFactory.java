@@ -151,7 +151,8 @@ public final AppContext getContext(){
 				int sql_type = info.getType();
 				boolean is_optional;
 				if (optional != null) {
-					is_optional = optional.contains(name);
+					// Don't set optional unless the DB allows this
+					is_optional = optional.contains(name) && info.getNullable();
 				} else {
 					// default to follow nullability of field.
 					is_optional = info.getNullable();

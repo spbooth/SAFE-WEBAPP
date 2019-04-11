@@ -55,7 +55,7 @@ public   class TestTransitionVisitor<T> implements TransitionVisitor<T>{
 		assertNotNull(target);
 		Form f = new HTMLForm(c);
 		t.buildForm(f, target, c);
-		assertTrue("Must be at least one action",f.getActionNames().hasNext());
+		assertTrue("Must be at least one action",! f.getActionNames().isEmpty());
 		return null;
 	}
 
@@ -64,7 +64,7 @@ public   class TestTransitionVisitor<T> implements TransitionVisitor<T>{
 		assertNotNull(target);
 		Form f = new HTMLForm(c);
 		t.buildForm(f, target, c);
-		assertTrue("Must be at least one action",f.getActionNames().hasNext());
+		assertTrue("Must be at least one action",! f.getActionNames().isEmpty());
 		return null;
 	}
 	/* (non-Javadoc)

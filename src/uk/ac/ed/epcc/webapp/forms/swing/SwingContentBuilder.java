@@ -27,6 +27,7 @@ import java.security.Principal;
 import java.text.NumberFormat;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -649,9 +650,9 @@ public class SwingContentBuilder  implements ContentBuilder{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addActionButtons(uk.ac.ed.epcc.webapp.forms.Form)
 	 */
-	public void addActionButtons(Form f) {
+	public void addActionButtons(Form f,String legend,Set<String> actions) {
 		if( form_dialog != null ){
-			content.add(form_dialog.getActionButtons(f),BorderLayout.EAST);
+			content.add(form_dialog.getActionButtons(f,actions),BorderLayout.EAST);
 		}
 	}
 	/**

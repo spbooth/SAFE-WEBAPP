@@ -221,8 +221,8 @@ public class BaseForm implements Form {
 		return sel.getValue();
 	}
 	@Override
-	public Iterator<String> getActionNames() {
-		return actions.keySet().iterator();
+	public Set<String> getActionNames() {
+		return actions.keySet();
 	}
 	/** get the default action name.
 	 * 
