@@ -152,7 +152,9 @@ public final AppContext getContext(){
 				boolean is_optional;
 				if (optional != null) {
 					// Don't set optional unless the DB allows this
-					is_optional = optional.contains(name) && info.getNullable();
+					// for legacy reasons a non nullable string field will map to
+					// the empty string if marked optional
+					is_optional = optional.contains(name) && (info.isString() || info.getNullable());
 				} else {
 					// default to follow nullability of field.
 					is_optional = info.getNullable();
