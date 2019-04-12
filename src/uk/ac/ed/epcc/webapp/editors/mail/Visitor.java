@@ -236,7 +236,7 @@ public	void endMessage(MimePart parent, MimeMessage m, MessageWalker messageWalk
 	default public void doSenders(MessageWalker walker)throws MessageWalker.WalkerException{
 		
 	}
-	/** Does the visitor want to walker to vidist the message headers
+	/** Does the visitor want to walker to visit the message headers
 	 * 
 	 * @return boolean
 	 */

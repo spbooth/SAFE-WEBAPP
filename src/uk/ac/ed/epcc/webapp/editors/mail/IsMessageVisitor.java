@@ -26,6 +26,8 @@ import uk.ac.ed.epcc.webapp.editors.mail.MessageWalker.WalkerException;
 
 public class IsMessageVisitor extends AbstractVisitor {
 
+	
+
 	private boolean is_message=false;
 	/**
 	 * @param conn
@@ -54,5 +56,11 @@ public class IsMessageVisitor extends AbstractVisitor {
 			return false;
 		}
 		return true;
+	}
+	
+	@Override
+	public boolean visitHeaders() {
+		// Not interested in the headers
+		return false;
 	}
 }

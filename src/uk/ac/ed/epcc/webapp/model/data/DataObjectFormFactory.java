@@ -161,6 +161,7 @@ public final AppContext getContext(){
 				}
 				// override can set a non-nullable field to optional
 				// this allows default values set post-create.
+				// The other alternative is to change the field to optional in form customisation
 				is_optional = conn.getBooleanParameter("form.optional."+table+"."+name, is_optional);
 				Input<?> input = getInput(conn,selectors,table,name);
 				if( input == null ){

@@ -37,6 +37,7 @@ import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
 
 public class DeDupVisitor extends AbstractVisitor {
 
+	
 	/** Objects already included in the mail message so can be skipped
 	 * 
 	 */
@@ -151,5 +152,9 @@ public class DeDupVisitor extends AbstractVisitor {
 			throw new WalkerException(e);
 		}
 		return true;
+	}
+	@Override
+	public boolean visitHeaders() {
+		return false;
 	}
 }
