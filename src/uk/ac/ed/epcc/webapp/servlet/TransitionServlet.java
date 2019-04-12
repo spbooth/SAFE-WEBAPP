@@ -30,6 +30,7 @@ import uk.ac.ed.epcc.webapp.CleanupService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.HourTransform;
+import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FatalTransitionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.DirectOperationResultVisitor;
@@ -691,6 +692,12 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	 * @return modified HtmlBuilder
 	 */
 	public static <A,B, X extends  ExtendedXMLBuilder> X addLink(AppContext c,X hb, TransitionFactory<A,B> tp, A operation, B target,String text, String hover,boolean new_tab ){
+		// do some explicit null checks, had some non-reproducable null pointer exceptions once
+		if( tp == null) {
+			c.getService(LoggerService.class).getLogger(TransitionServlet.class).error("Bad arguement for addLink",new InvalidArgument("No transition provider"));
+			hb.clean(text);
+			return hb;
+		}
 	    // as the servlet uses getParams we can pass the parameters in the servlet path
 		String url = getURL(c, tp, target, operation);
 		// Check that MODIFY_ON_POST check will pass
@@ -700,7 +707,11 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 				// generate an error if we display the link don't wait
 				// for user to click on it.
 				try {
-					tp.getTransition(target, operation).getResult(new TransitionVisitor<B>() {
+					Transition<B> transition = tp.getTransition(target, operation);
+					if( transition == null ) {
+						throw new InvalidArgument("Null transition returned for "+tp.getTargetName()+" "+operation);
+					}
+					transition.getResult(new TransitionVisitor<B>() {
 
 						@Override
 						public FormResult doDirectTransition(DirectTransition<B> t) throws TransitionException {
@@ -732,6 +743,9 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 					});
 				} catch (Exception e) {
 					c.getService(LoggerService.class).getLogger(TransitionServlet.class).error("Link to modifying transition "+url,e);
+					// just show link text and return.
+					hb.clean(text);
+					return hb;
 				}
 				
 			}
