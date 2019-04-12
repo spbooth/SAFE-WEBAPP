@@ -257,11 +257,18 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	}
 	/** An {@link DataObjectItemInput} that uses the {@link ParseFactory#findFromString(String)} method to locate
 	 * 
-	 * Note this is not constrained by the select filter so can be used to locate retired obects.
+	 * Note this is not constrained by the select filter so can be used to locate retired objects.
 	 * @author spb
 	 *
 	 */
 	public class NameItemInput extends ParseAbstractInput<Integer> implements DataObjectItemParseInput<T>{
+
+		/**
+		 * 
+		 */
+		public NameItemInput() {
+			super();
+		}
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#setItem(java.lang.Object)
@@ -285,18 +292,12 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 				setValue(null);
 				return;
 			}
-			if( ! allowSpacesInName() && WHITESPACE.matcher(v).matches()){
-				throw new ParseException("No whitespace allowed");
-			}
 			setItem(findFromString(v));
 		}
         @Override
 		public Integer parseValue(String v) throws ParseException {
         	if( v == null || v.trim().length()==0){
 				return null;
-			}
-			if( ! allowSpacesInName() && WHITESPACE.matcher(v).matches()){
-				throw new ParseException("No whitespace allowed");
 			}
 			T item = findFromString(v);
 			if( item != null) {
@@ -328,10 +329,8 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			// the update form has to rely on the sql update generating an error.
 			UnusedNameInput<T> input = new UnusedNameInput<>(ClassificationFactory.this);
 			input.setMaxResultLength(res.getInfo(Classification.NAME).getMax());
-			if(! allowSpacesInName()) {
-				input.setTrim(true);
-				input.addValidator(new NoSpaceFieldValidator());
-			}
+			input.setTrim(true);
+			
 			result.put(Classification.NAME, input);
 			
 			// Description is likely to be displayed to user so inhibit html by default
@@ -405,10 +404,6 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			super.customiseUpdateForm(f, o);
 			if( allow_name_change){
 				UnusedNameInput<C> input = new UnusedNameInput<>(getClassificationFactory(),o);
-				if(! getClassificationFactory().allowSpacesInName()) {
-					input.setTrim(true);
-					input.addValidator(new NoSpaceFieldValidator());
-				}
 				f.getField(Classification.NAME).setInput(input);
 			}else{
 				f.getField(Classification.NAME).lock();
@@ -422,9 +417,10 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		public DataObjectItemInput<C> getSelectInput() {
 			try{
 				ClassificationFactory<C> cf = getClassificationFactory();
-				if( cf.getCount(cf.getSelectFilter()) < CLASSIFICATION_MAX_MENU){
+				BaseFilter<C> finalSelectFilter = cf.getFinalSelectFilter();
+				if( cf.getCount(finalSelectFilter) < getContext().getIntegerParameter(cf.getConfigTag()+".max_autocomplete", CLASSIFICATION_MAX_MENU)){
 
-					if( cf.useAutoCompleteInput(cf.getFinalSelectFilter())) {
+					if( cf.useAutoCompleteInput(finalSelectFilter)) {
 						return cf.getInput();
 					}
 					DataObjectAlternateInput<C, DataObjectItemParseInput<C>> input = new DataObjectAlternateInput<>();
@@ -448,6 +444,14 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		return new ClassificationUpdater<>(this);
 	}
 	
+	@Override
+	public void customiseForm(Form f) {
+		super.customiseForm(f);
+		if( ! allowSpacesInName()) {
+			f.getField(Classification.NAME).addValidator(new NoSpaceFieldValidator());
+		}
+		
+	}
 	/** Get a String valued pull-down input for the classifiers
 	 * 
 	 * @return
