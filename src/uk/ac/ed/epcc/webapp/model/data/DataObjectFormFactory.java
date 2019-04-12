@@ -159,6 +159,8 @@ public final AppContext getContext(){
 					// default to follow nullability of field.
 					is_optional = info.getNullable();
 				}
+				// override can set a non-nullable field to optional
+				// this allows default values set post-create.
 				is_optional = conn.getBooleanParameter("form.optional."+table+"."+name, is_optional);
 				Input<?> input = getInput(conn,selectors,table,name);
 				if( input == null ){
@@ -232,8 +234,7 @@ public final AppContext getContext(){
 				}else {
 					tooltip = conn.getInitParameter("form.tooltip."+table+"."+name);
 				}
-				f.addInput(name, lab,tooltip, input);
-				f.getField(name).setOptional(is_optional);
+				f.addInput(name, lab,tooltip, input).setOptional(is_optional);
 			}
 		}
 

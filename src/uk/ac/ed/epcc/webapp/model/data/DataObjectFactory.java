@@ -1664,8 +1664,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 */
 	protected final Set<String> getNullable() {
 		Set<String> nullable = new HashSet<>();
-		for (Iterator it = res.getFields().iterator(); it.hasNext();) {
-			String name = (String) it.next();
+		for (String name : res.getFields()) {
 			Repository.FieldInfo info = res.getInfo(name);
 			if (info.getNullable()) {
 				nullable.add(name);
