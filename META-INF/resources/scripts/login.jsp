@@ -140,7 +140,7 @@ This service is only available to pre-registered users.
 <% } %>
 <% 
 
-String prev_page = (String) request.getAttribute(DefaultServletService.PAGE_ATTR);
+
 // Give urls for alternate external auth login. Normally just the one but
 // can use comma seperated list to support multiple types.
 String login_urls = conn.getInitParameter("service.web_login.url");
@@ -159,13 +159,7 @@ if(  login_urls != null ){
 	 a.attr("name","authtype");
 	 a.attr("value",Integer.toString(i));
 	 a.close();
-	 if( prev_page != null ){
-		 a.open("input");
-		 a.attr("type","hidden");
-		 a.attr("name","page");
-		 a.attr("value",prev_page);
-		 a.close();
-	 }
+	
 	 a.open("input");
 	 a.addClass("input_button");
 	 a.addClass("login");
@@ -184,14 +178,7 @@ if(  login_urls != null ){
 %>or<%
 } 
 %>
-<form method="post" action="<%=web_path%>/LoginServlet"><%
-	
-	if(prev_page!=null) {
-		HtmlBuilder hb = new HtmlBuilder(); // make sure escaping correct for untrusted content
-		hb.open("input",new String[][]{{"type","hidden"},{"name","page"},{"value",prev_page}});
-		hb.close();
-	%><%=hb.toString() %>
-   <% } %>
+<form method="post" action="<%=web_path%>/LoginServlet">
    <table class="form">
 	<tr>
 		<th><label class='required'><%=fac.getNameLabel() %>:</label></th>

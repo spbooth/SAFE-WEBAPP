@@ -29,6 +29,7 @@ import java.util.ResourceBundle;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -54,6 +55,7 @@ import uk.ac.ed.epcc.webapp.forms.SetParamVisitor;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
+import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.CustomPage;
@@ -272,7 +274,11 @@ public abstract class ServletTest extends WebappTestBase{
 	}
 	
 	public void checkRequestAuth(String page) {
-		assertEquals(page, req.getAttribute(DefaultServletService.PAGE_ATTR));
+		HttpSession session = req.getSession(false);
+		assertNotNull(session);
+		RedirectResult result = (RedirectResult) session.getAttribute(LoginServlet.INITIAL_PAGE_ATTR);
+		assertNotNull(result);
+		assertEquals(page, result.getURL());
 		checkForward(LoginServlet.getLoginPage(ctx));
 	}
 	/** Assert form error reported with a specific error reported on one of the parameters

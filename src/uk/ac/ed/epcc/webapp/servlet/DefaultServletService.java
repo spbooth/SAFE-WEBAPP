@@ -42,6 +42,7 @@ import org.apache.commons.codec.binary.Base64;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -74,10 +75,7 @@ import uk.ac.ed.epcc.webapp.session.WebNameFinder;
  *
  */
 public class DefaultServletService implements ServletService{
-	/**
-	 * 
-	 */
-	public static final String PAGE_ATTR = "page";
+	
 	/**
 	 * 
 	 */
@@ -478,13 +476,15 @@ public class DefaultServletService implements ServletService{
 			// standard login page supports both custom password login and self-register for external-auth
 			// If built_in login is off we might change the login page to an external auth servlet url.
 			String login_page=LoginServlet.getLoginPage(conn);
+			// Need to remember page and redirect to login
+			String page = encodePage();
+			if( page !=null&& ! page.isEmpty()) {
+				sess.setAttribute(LoginServlet.INITIAL_PAGE_ATTR, new RedirectResult(page));
+			}
 			if( external_via_login || ! LoginServlet.BUILT_IN_LOGIN.isEnabled(getContext())) {
-				// Need to remember page and redirect to login
-				sess.setAttribute(LoginServlet.INITIAL_PAGE_ATTR, encodePage());
+				
 				redirect(login_page);
 			}else {
-				
-				req.setAttribute(PAGE_ATTR, encodePage());
 				forward(login_page);
 			}
 		}
@@ -606,11 +606,14 @@ public class DefaultServletService implements ServletService{
 					for( Cookie c : cookies){
 						if( c.getName().equalsIgnoreCase("JSESSIONID") || getContext().getBooleanParameter(LOGOUT_REMOVE_COOKIE_PREFIX+c.getName(), false)){
 							Cookie c2 = (Cookie) c.clone();
-							c2.setHttpOnly(true); // for owasp scan
+							//c2.setHttpOnly(true); // for owasp scan
 							c2.setMaxAge(0); // This should request a delete
 							if( c2.getPath() == null ){
 								String contextPath = request.getContextPath();
-								c2.setPath(contextPath+"/"); // browser did not include path. This will only work if path matched exactly
+								if( contextPath == null || contextPath.isEmpty()) {
+									contextPath="/";
+								}
+								c2.setPath(contextPath); // browser did not include path. This will only work if path matched exactly
 							}
 							c2.setValue("");
 							((HttpServletResponse)res).addCookie(c2);

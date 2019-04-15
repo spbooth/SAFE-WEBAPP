@@ -130,7 +130,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 			}
 			SessionService sess = conn.getService(SessionService.class);
 			if( sess != null && sess.haveCurrentUser()) {
-				// look for a cookie test
+				// look for a cookie test or remembered page
 				SerializableFormResult next_page = (SerializableFormResult) sess.getAttribute(INITIAL_PAGE_ATTR);
 				if( next_page != null ) {
 					sess.removeAttribute(INITIAL_PAGE_ATTR);
@@ -156,15 +156,11 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 							return;
 						}
 						// ok to make a session at this point
-						String other_page = req.getParameter("page");
-						if( other_page != null) {
-							sess.setAttribute(INITIAL_PAGE_ATTR, new RedirectResult(other_page));
-						}
-						
 						handleFormResult(conn, req, res, new RedirectResult(urls[i]));
 					}
 				}catch(Exception e) {
 					getLogger(conn).error("Error parsing alternate login", e);
+					message(conn, req, res, "invalid_argument");
 				}
 				return;
 			}
@@ -230,9 +226,6 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 							+ username);
 				}
 				//Same text for success or fail
-				req.setAttribute("page_name", "the Login Page");
-				req.setAttribute("page_url", getLoginPage(conn)+"?username="
-						+ encodeCGI(username));
 				message(conn, req, res, "new_password_emailed", username , Emailer.PASSWORD_RESET_SERVLET.isEnabled(conn)? "password reset link" :"new password");
 				return;
 			}
@@ -257,12 +250,13 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 				if (person != null) {
 					// Go to the logged in page
 					// (we may have another page that should be accessed)
-					String other_page = req.getParameter("page");
+					RedirectResult other_page = (RedirectResult) sess.getAttribute(INITIAL_PAGE_ATTR);
 					FormResult next_page=null;
 					if (password_auth.doWelcome(person)) {
 						next_page = new RedirectResult(getWelcomePage(conn));
 					}else if( other_page != null) {
-						next_page = new RedirectResult(other_page);
+						// if we already have a remembered page use it
+						next_page = other_page;
 					}else {
 						next_page = new RedirectResult(getMainPage(conn));
 					}
