@@ -2079,7 +2079,7 @@ public final class Repository implements AppContextCleanup{
 	 */
 	public StringBuilder addSource(StringBuilder sb, boolean quote) {
 		addTable(sb, quote);
-		if( ! table_name.equals(alias_name)) {
+		if( usesAlias()) {
 			sb.append(" AS ");
 			addAlias(sb, quote);
 		}
@@ -3137,6 +3137,13 @@ public final class Repository implements AppContextCleanup{
 	
 	public boolean usesCache(){
 		return use_cache;
+	}
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean usesAlias() {
+		return ! table_name.equals(alias_name);
 	}
 	/** Static method to result a field from a result set 
 	 * with a specified target class
