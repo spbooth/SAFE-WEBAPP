@@ -209,12 +209,15 @@ public abstract class ServletTest extends WebappTestBase{
 	 */
 	protected void resetRequest() {
 		MockSession session=null;
+		String remote_user = null;
 		if( req != null){
 			session=req.session;
+			remote_user=req.remote_user;
 		}
 		res = new MockResponse();
 		req= new MockRequest(TEST_APP_NAME);
 		req.session=session;
+		req.remote_user=remote_user;
 	
 		
 		ctx.setService(new Servlet3MultiPartServletService(ctx, serv_ctx, req, res));
