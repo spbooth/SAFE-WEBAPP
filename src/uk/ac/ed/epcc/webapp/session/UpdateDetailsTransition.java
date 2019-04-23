@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.MissingResourceException;
 
@@ -67,7 +68,7 @@ public class UpdateDetailsTransition<A extends AppUser> extends StandAloneFormUp
 		fac.addUpdateNotes(cb, target);
 		Date last = target.getLastTimeDetailsUpdated();
 		if( last != null) {
-			DateFormat df = DateFormat.getDateInstance();
+			DateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
 			cb.addHeading(3, "Last updated: "+df.format(last));
 		}
 		AppContext c = op.getContext();
