@@ -86,6 +86,8 @@
 		<dependency org="log4j" name="log4j" rev="1.2.17" transitive="false">
     		<artifact name="log4j" ext="jar"/>
 		</dependency>
+	
+		
 		<dependency org="org.incava" name="java-diff" rev="1.1">
     		<artifact name="java-diff" ext="jar"/>
 		</dependency>
