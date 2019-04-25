@@ -95,11 +95,6 @@
 			</fileset>
 		</copy>
 		
-		<copy todir="${build.home}/META-INF" verbose="true" overwrite="true">
-			<fileset dir="${basedir}/META-INF">
-				<filename name="**/*.*" />
-			</fileset>
-		</copy>
 	</target>
 	<target name="compile-test" depends="compile" description="Compile Tests">
 		<mkdir dir="${test.home}" />

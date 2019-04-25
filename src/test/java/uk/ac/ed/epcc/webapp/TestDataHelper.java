@@ -27,8 +27,8 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Properties;
 
-import org.incava.util.diff.Diff;
-import org.incava.util.diff.Difference;
+import org.incava.diff.Diff;
+import org.incava.diff.Difference;
 
 /**
  * The TestDataHelper is a utility class for testing 
