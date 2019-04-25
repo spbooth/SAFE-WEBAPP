@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 
 import junit.framework.Assert;
+import uk.ac.ed.epcc.webapp.WebappTestBase;
 
 import org.junit.Test;
 
@@ -27,7 +28,7 @@ import org.junit.Test;
  *
  */
 
-public class TemplateFileTest {
+public class TemplateFileTest extends WebappTestBase{
 
 	/**
 	 * Unit test of the class {@link TemplateFile}.
@@ -35,8 +36,7 @@ public class TemplateFileTest {
 	@Test
 	public void testTemplateFile() {
 		try {
-			File f = new File("test_templates/test_template.txt");
-			TemplateFile tf = TemplateFile.getTemplateFile(f.getAbsolutePath()); // Load the page template
+			TemplateFile tf = TemplateFile.getFromString(getResourceAsString("/test_templates/test_template.txt")); // Load the page template
 			tf.setProperty("test_text1", "abc"); // Apply the property
 			tf.setRegionEnabled("additional_info_region", true);
 			tf.setProperty("additional_info", "zzz"); // Apply the property

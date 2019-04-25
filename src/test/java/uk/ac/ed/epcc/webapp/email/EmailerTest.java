@@ -39,6 +39,7 @@ import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.content.TemplateFile;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
+import uk.ac.ed.epcc.webapp.resource.ResourceService;
 
 /** Mock based tests of {@link Emailer}.
  * 
@@ -101,8 +102,8 @@ public class EmailerTest extends WebappTestBase {
 	@Test
 	public void testTemplateEmail() throws IOException, MessagingException, InvalidArgument{
 		Emailer mailer = new Emailer(ctx);
-		File f = new File("test_templates/test_email.txt");
-		TemplateFile tf = TemplateFile.getTemplateFile(f.getAbsolutePath()); // Load the page template
+	
+		TemplateFile tf = TemplateFile.getFromString(getResourceAsString("/test_templates/test_email.txt")); // Load the page template
 		mailer.doSend(mailer.templateMessage("user@example.com", null, tf));
 		deferredEmails();
 		assertTrue(MockTansport.nSent()==1);
@@ -115,8 +116,8 @@ public class EmailerTest extends WebappTestBase {
 	@ConfigFixtures("blacklist.properties")
 	public void testBlacklist() throws IOException, MessagingException, InvalidArgument{
 		Emailer mailer = new Emailer(ctx);
-		File f = new File("test_templates/test_email.txt");
-		TemplateFile tf = TemplateFile.getTemplateFile(f.getAbsolutePath()); // Load the page template
+	
+		TemplateFile tf = TemplateFile.getFromString(getResourceAsString("/test_templates/test_email.txt")); // Load the page template
 
 		mailer.doSendNow(mailer.templateMessage("user@example.com", null, tf));
 		

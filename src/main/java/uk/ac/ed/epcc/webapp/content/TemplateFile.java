@@ -896,51 +896,7 @@ public class TemplateFile {
 		return new TemplateFile(template_string);
 	}
 
-	/**
-	 * Returns a parsed <code>TemplateFile</code> based on the filename
-	 * provided
-	 * 
-	 * @param filename The name of the desired <code>TemplateFile</code>
-	 * @return An empty <code>TemplateFile</code> (only default values filled
-	 *          in)
-	 * @throws IOException
-	 */
-	public static synchronized TemplateFile getTemplateFile(String filename)
-			throws IOException {
-
-//		// Have we already got this one?
-//		for (int i = 0; i < template_files.size(); i++) {
-//			TemplateFile template_file = template_files
-//					.elementAt(i);
-//
-//			if (filename.equals(template_file.getFilename())) {
-//
-//				File current_file = new File(filename);
-//				// See if the file has been changed
-//				if (template_file.file_last_modified < current_file
-//						.lastModified()) {
-//					// Is has been changed.. reload it and replace the previous
-//					// one
-//					TemplateFile new_template_file = loadFromFile(filename);
-//					template_files.setElementAt(new_template_file, i);
-//
-//					// Return a copy of it (don't want it modified)
-//					return new TemplateFile(new_template_file);
-//				} else {
-//					// Ok, got an existing one, return a fresh copy
-//					return new TemplateFile(template_file);
-//				}
-//			}
-//		}
-
-		// Otherwise need to make a new TemplateFile and store it
-		TemplateFile template_file = loadFromFile(filename);
-//		template_files.addElement(template_file);
-//
-//		// Return a copy of it (don't want it modified)
-//		return new TemplateFile(template_file);
-		return template_file;
-	}
+	
 
 	/*
 	 * Useful methods for parsing
@@ -966,37 +922,7 @@ public class TemplateFile {
 		return true;
 	}
 
-	protected static TemplateFile loadFromFile(String filename)
-			throws IOException {
-		// Get the file details
-		File file = new File(filename);
-		long file_last_modified = file.lastModified();
-
-		// Read the file contents
-		String file_contents;
-		{
-			StringBuilder file_buffer = new StringBuilder();
-			FileReader f = new FileReader(file);
-
-			char buffer[] = new char[4096];
-			int chars_read = f.read(buffer, 0, 4096);
-			while (chars_read != -1) { // while not EOF
-				file_buffer.append(buffer, 0, chars_read);
-
-				chars_read = f.read(buffer, 0, 4096);
-			}
-			f.close();
-			file_contents = file_buffer.toString();
-		}
-
-		TemplateFile template = new TemplateFile(file_contents);
-
-		// Set file info
-		template.filename = filename;
-		template.file_last_modified = file_last_modified;
-
-		return template;
-	}
+	
     public static class DefaultPropertyPolicy implements PropertyPolicy{
 	@Override
 	public void writePropertyValue(Writer out, String name,Object value)
