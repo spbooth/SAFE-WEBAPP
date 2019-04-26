@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.incava.util.diff.Diff;
-import org.incava.util.diff.Difference;
+import org.incava.diff.Diff;
+import org.incava.diff.Difference;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
@@ -404,8 +404,8 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 				String newArray[] = splitNormalised(tf.getText());
 				Diff<String> diff = new Diff<>(originalArray,newArray);
 				StringBuilder result = new StringBuilder();
-				for (Object object :diff.diff()) {
-					Difference difference = (Difference)object;
+				for (Difference difference :diff.execute()) {
+					
 
 					int as = difference.getAddedStart();
 					int ae = difference.getAddedEnd();
