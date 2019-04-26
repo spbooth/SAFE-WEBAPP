@@ -20,8 +20,8 @@
 	<property name="doc.dir" value="${basedir}/docs/javadoc" />
 	<property name="tomcat.home" value="/opt/tomcat/default" />
 	<property name="umldoc.home" value="/home/sbooth/yworks-uml-doclet-3.0_02-jdk1.5" />
-	<property name="webapp.lib" value="lib/safe"/>
-	<property name="webapp.testlib" value="tests/lib"/>
+	<property name="webapp.lib" value="${basedir}/lib"/>
+	<property name="webapp.testlib" value="${basedir}/testlib"/>
 	<property name="ext-lib.dir" value="${basedir}/ext-lib"/>
 
 	<property name="compile.debug" value="true" />
