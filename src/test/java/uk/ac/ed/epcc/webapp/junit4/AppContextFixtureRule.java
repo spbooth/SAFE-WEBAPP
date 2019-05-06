@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.junit4;
 
 import java.io.InputStream;
+import java.util.Enumeration;
 import java.util.Properties;
 
 import org.junit.rules.ExternalResource;
@@ -95,7 +96,10 @@ public class AppContextFixtureRule extends ExternalResource{
 				}
 			}
 			
-			
+			for(Enumeration e=overrides.elements(); e.hasMoreElements(); ) {
+				String name = (String) e.nextElement(); 
+				System.out.println("Prop "+name+"="+overrides.getProperty(name));
+			}
 		}else {
 			throw new DataFault("test.properties not found");
 		}
