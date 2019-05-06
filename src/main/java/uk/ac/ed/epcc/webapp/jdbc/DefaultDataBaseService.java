@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.jdbc;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLTransientException;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -208,7 +209,12 @@ public class DefaultDataBaseService implements DatabaseService {
 		//System.out.println("ACTUAL "+name+" "+user+" "+pass+" "+type);
 		Connection conn;
 		if( name.length() == 0){
+			for(Enumeration e = props.keys(); e.hasMoreElements();) {
+				String prop= (String) e.nextElement();
+				System.out.println("SQL prop "+prop+"="+props.getProperty(prop));
+			}
 			error("No DB connection name suffix="+suffix);
+			
 			return null;
 		}
 		conn = java.sql.DriverManager.getConnection(name,db_props);
