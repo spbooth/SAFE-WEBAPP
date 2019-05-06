@@ -196,6 +196,7 @@ public class RemoteAuthServlet extends WebappServlet {
 			if( parser == null) {
 				getLogger(conn).error("No realm finder found for "+remote_auth_realm);
 				message(conn,req,res,"internal_error","No realm finder found");
+				return;
 			}
 			if (person == null) {
 				person = parser.findFromString(web_name);
