@@ -90,11 +90,14 @@ public class AppContextFixtureRule extends ExternalResource{
 			for(String prop : new String[]{DefaultConfigService.CONFIG_PATH_PROP_NAME,DefaultConfigService.DEFAULT_PATH_PROP_NAME,DefaultConfigService.DEPLOY_PATH_PROP_NAME,"testing"}){
 				String value = overrides.getProperty(prop);
 				if( value != null ){
+					System.out.println("property override "+prop+"->"+value);
 					sys_properties.setProperty(prop,value);
 				}
 			}
 			
 			
+		}else {
+			throw new DataFault("test.properties not found");
 		}
 		for(String fix : global_fixtures){
 			InputStream stream = holder.getClass().getResourceAsStream(fix);
