@@ -96,7 +96,7 @@ public class AppContextFixtureRule extends ExternalResource{
 				}
 			}
 			
-			for(Enumeration e=overrides.elements(); e.hasMoreElements(); ) {
+			for(Enumeration e=overrides.keys(); e.hasMoreElements(); ) {
 				String name = (String) e.nextElement(); 
 				System.out.println("Prop "+name+"="+overrides.getProperty(name));
 			}
