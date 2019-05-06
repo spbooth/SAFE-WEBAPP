@@ -208,7 +208,7 @@ public class DefaultDataBaseService implements DatabaseService {
 		//System.out.println("ACTUAL "+name+" "+user+" "+pass+" "+type);
 		Connection conn;
 		if( name.length() == 0){
-			error("No DB connection name");
+			error("No DB connection name suffix="+suffix);
 			return null;
 		}
 		conn = java.sql.DriverManager.getConnection(name,db_props);
