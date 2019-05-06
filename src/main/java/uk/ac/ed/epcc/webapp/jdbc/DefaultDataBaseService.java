@@ -214,7 +214,7 @@ public class DefaultDataBaseService implements DatabaseService {
 				System.out.println("SQL prop "+prop+"="+props.getProperty(prop));
 			}
 			if( props.isEmpty()) {
-				System.out.println("SQL props are empty");
+				throw new ConsistencyError("SQL props are empty");
 			}
 			error("No DB connection name suffix="+suffix);
 			
