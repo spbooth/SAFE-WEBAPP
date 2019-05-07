@@ -122,9 +122,9 @@ public class AppContextFixtureRule extends ExternalResource{
 			}
 		}
 		ctx = new AppContext();
-		ctx.setService(new CheckCloseDatabaseService(ctx.getService(DatabaseService.class)));
+		
 		ctx.setService(new PrintLoggerService());
-		ctx.setService(new DebugLoggerService(ctx));
+		
 		ctx.setService( new SimpleSessionService(ctx));
 		// make sure database service sees the loaded props
 		ctx.setService( new OverrideConfigService(overrides,ctx));
@@ -132,6 +132,10 @@ public class AppContextFixtureRule extends ExternalResource{
 		//props only in test.properties will be visible from the service props but
 		// we also want to override any values in the normal config
 		ctx.setService( new OverrideConfigService(overrides,ctx));
+		
+		// get config service configured first before wrapping database and logger
+		ctx.setService(new CheckCloseDatabaseService(ctx.getService(DatabaseService.class)));
+		ctx.setService(new DebugLoggerService(ctx));
 		if( ErrorFilter.TIMER_FEATURE.isEnabled(ctx)) {
 			ctx.setService(new DefaultTimerService(ctx));
 		}

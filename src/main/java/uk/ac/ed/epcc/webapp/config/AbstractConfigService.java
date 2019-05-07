@@ -90,14 +90,18 @@ public abstract class AbstractConfigService extends AbstractContexed implements 
 	 *            Text of error.
 	 */
 	
-	final void error(String errors) {
-		LoggerService serv = getContext().getService(LoggerService.class);
-		if( serv != null ){
-			Logger log = serv.getLogger(getClass());
+	final void error(String errors){
+		// Logger may fail to initialise when there is a problem with the config service
+		try{
+			Logger log = getLogger();
 			if( log != null ){
 				log.error(errors);
+				return;
 			}
+		}catch(Exception e) {
+			
 		}
+		System.err.println(errors);
 	}
 
 

@@ -46,7 +46,10 @@ public abstract class AbstractContexed implements Contexed {
 	
 	public final Logger getLogger() {
 		if( log == null) {
-		  log =  getContext().getService(LoggerService.class).getLogger(getClass());
+		  LoggerService service = getContext().getService(LoggerService.class);
+		  if( service != null) {
+			  log =  service.getLogger(getClass());
+		  }
 		}
 		return log;
 	}

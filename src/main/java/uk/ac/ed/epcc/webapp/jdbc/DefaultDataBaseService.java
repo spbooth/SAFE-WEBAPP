@@ -209,13 +209,7 @@ public class DefaultDataBaseService implements DatabaseService {
 		//System.out.println("ACTUAL "+name+" "+user+" "+pass+" "+type);
 		Connection conn;
 		if( name.length() == 0){
-			for(Enumeration e = props.keys(); e.hasMoreElements();) {
-				String prop= (String) e.nextElement();
-				System.out.println("SQL prop "+prop+"="+props.getProperty(prop));
-			}
-			if( props.isEmpty()) {
-				throw new ConsistencyError("SQL props are empty");
-			}
+			
 			error("No DB connection name suffix="+suffix);
 			
 			return null;
