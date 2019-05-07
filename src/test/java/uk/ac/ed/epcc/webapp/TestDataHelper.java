@@ -197,12 +197,13 @@ public class TestDataHelper {
 		if (redirectedStdOut == null) {
 			String redirectionFileName = ".redirected-of-stdout.txt";	
 			String tmpDirName = System.getProperty("java.io.tmpdir");
+			String userName = System.getProperty("user.name");
 			if (tmpDirName != null) {
 				File tmpDir = new File(tmpDirName);
 				if (tmpDir.exists() && tmpDir.isDirectory() && 
 						tmpDir.canWrite()) {
 					redirectionFileName = tmpDir.getAbsolutePath() + 
-						File.separator + redirectionFileName;
+						File.separator + userName+redirectionFileName;
 					
 				}		
 			}
