@@ -36,6 +36,7 @@ import uk.ac.ed.epcc.webapp.resource.ResourceService;
 public class OverrideConfigService extends AbstractConfigService {
 	private final ConfigService parent;
 	private final Properties overrides;
+	private boolean setup=false;
 
 	/**
 	 * Constructs a new <code>OverrideConfigService</code> that will return
@@ -52,6 +53,7 @@ public class OverrideConfigService extends AbstractConfigService {
 		super(c);
 		this.parent = c.getService(ConfigService.class);
 		this.overrides = processAdditions(overrides,c.getService(ResourceService.class));
+		setup=true;
 	}
 
 	/** Constructs {@link OverrideConfigService} where the override properties are loaded
@@ -65,6 +67,7 @@ public class OverrideConfigService extends AbstractConfigService {
 		super(c);
 		this.parent = c.getService(ConfigService.class);
 		this.overrides =loadFile(parent, config_list, false);
+		setup=true;
 	}
 	/*
 	 * (non-Javadoc)
@@ -81,13 +84,18 @@ public class OverrideConfigService extends AbstractConfigService {
 	 * @see uk.ac.ed.epcc.webapp.ConfigService#getServiceProperties()
 	 */
 	public Properties getServiceProperties() {
+		if( ! setup ) {
+			return this.parent.getServiceProperties();
+		}
 		Properties result = new Properties(this.parent.getServiceProperties());
 		//Add ALL properties from override tree
+
 		for(Enumeration e = overrides.propertyNames(); e.hasMoreElements();){
 			String key = e.nextElement().toString();
 			String val = overrides.getProperty(key);
 			result.setProperty(key, val);
-		}
+			}
+		
 		return result;
 	}
 	public Properties getOverrides(){

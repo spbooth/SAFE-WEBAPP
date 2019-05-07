@@ -126,6 +126,8 @@ public class AppContextFixtureRule extends ExternalResource{
 		ctx.setService(new PrintLoggerService());
 		ctx.setService(new DebugLoggerService(ctx));
 		ctx.setService( new SimpleSessionService(ctx));
+		// make sure database service sees the loaded props
+		ctx.setService( new OverrideConfigService(overrides,ctx));
 		ctx.setService(new DataBaseConfigService(ctx));
 		//props only in test.properties will be visible from the service props but
 		// we also want to override any values in the normal config
