@@ -15,8 +15,129 @@
 <web-fragment id="WebFragment_ID" version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd">
  <name>WEBAPP</name> 
  
+ 
+<filter>
+  <filter-name>Fault-filter</filter-name>
+  <filter-class>uk.ac.ed.epcc.webapp.servlet.ErrorFilter</filter-class>
+</filter>
+<filter-mapping>
+  <filter-name>Fault-filter</filter-name>
+  <url-pattern>/*</url-pattern>
+</filter-mapping>
+<listener>
+ <listener-class>uk.ac.ed.epcc.webapp.servlet.Log4JWebappContextListener</listener-class>
+ </listener>
+ <listener>
+ <listener-class>uk.ac.ed.epcc.webapp.servlet.FileUploadWebappContextListener</listener-class>
+ </listener>
+ 
+ <servlet>
+ <description>Allows password login</description>
+  <servlet-name>LoginServlet</servlet-name>
+ 
+  <servlet-class>uk.ac.ed.epcc.webapp.servlet.LoginServlet</servlet-class>
+</servlet>
+<servlet>
+<description>Allows users to perform transitions</description>
+  <servlet-name>TransitionServlet</servlet-name>
+  
+  <servlet-class>uk.ac.ed.epcc.webapp.servlet.TransitionServlet</servlet-class>
+</servlet>
+<servlet>
+ <description>general object creation and update</description>
+  <servlet-name>ObjectServlet</servlet-name>
+ 
+  <servlet-class>uk.ac.ed.epcc.webapp.servlet.ObjectServlet</servlet-class>
+</servlet>
+<servlet>
+<description>reqeust changes of email for user</description>
+  <servlet-name>EmailChangeRequestServlet</servlet-name>
+  
+  <servlet-class>uk.ac.ed.epcc.webapp.servlet.EmailChangeRequestServlet</servlet-class>
+</servlet>
+<servlet>
+ <description>ServeData servlet</description>
+  <servlet-name>DataServlet</servlet-name>
+ 
+  <servlet-class>uk.ac.ed.epcc.webapp.servlet.ServeDataServlet</servlet-class>
+</servlet>
+<servlet>
+ <description>User operations</description>
+  <servlet-name>UserServlet</servlet-name>
+
+  <servlet-class>uk.ac.ed.epcc.webapp.servlet.UserServlet</servlet-class>	
+</servlet>
+<servlet>
+<description>Allows alternate access method authenticated from a web-server module</description>
+ <servlet-name>RemoteAuthServlet</servlet-name>
+  
+  <servlet-class>uk.ac.ed.epcc.webapp.servlet.RemoteAuthServlet</servlet-class>
+ </servlet>
+ <servlet>
+ <description>Heart-beat for time triggered operations</description>
+  <servlet-name>HeartbeatServlet</servlet-name>
+ 
+  <servlet-class>uk.ac.ed.epcc.webapp.servlet.HeartbeatServlet</servlet-class>
+</servlet>
+<servlet>
+  <description>Servlet for serving manages held in the session</description>
+  <servlet-name>ImageServlet</servlet-name>
+  <servlet-class>uk.ac.ed.epcc.webapp.servlet.ImageServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+<servlet-name>HeartbeatServlet</servlet-name>
+<url-pattern>/HeartbeatServlet/*</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+<servlet-name>LoginServlet</servlet-name>
+<url-pattern>/LoginServlet</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+<servlet-name>TransitionServlet</servlet-name>
+<url-pattern>/TransitionServlet/*</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+<servlet-name>ObjectServlet</servlet-name>
+<url-pattern>/ObjectServlet</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+<servlet-name>EmailChangeRequestServlet</servlet-name>
+<url-pattern>/EmailChangeRequestServlet/*</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+<servlet-name>DataServlet</servlet-name>
+<url-pattern>/Data/*</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+<servlet-name>UserServlet</servlet-name>
+<url-pattern>/UserServlet/*</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+<servlet-name>ImageServlet</servlet-name>
+<url-pattern>/ImageServlet/*</url-pattern>
+</servlet-mapping> 
     <error-page>
   	<exception-type>java.lang.Exception</exception-type>
+  	<location>/errorpage.jsp</location>
+  </error-page>
+  <error-page>
+    <error-code>500</error-code>
+  	<location>/errorpage.jsp</location>
+  </error-page>
+   <error-page>
+    <error-code>400</error-code>
+  	<location>/errorpage.jsp</location>
+  </error-page>
+  <error-page>
+    <error-code>404</error-code>
+  	<location>/errorpage.jsp</location>
+  </error-page>
+    <error-page>
+    <error-code>403</error-code>
+  	<location>/errorpage.jsp</location>
+  </error-page>
+   <error-page>
+    <error-code>401</error-code>
   	<location>/errorpage.jsp</location>
   </error-page>
  </web-fragment>
