@@ -142,7 +142,11 @@ public abstract class AbstractConfigService extends AbstractContexed implements 
 								result.setProperty(CONFIG_LOADED+file, "true");
 
 							}else{
-								error("failed to find included properties file "+file);
+								if( prefix == null ) {
+									// silent skip if nested. These are ususally auto-generated
+									// build version files
+									error("failed to find included properties file "+file);
+								}
 							}
 						}catch(Exception e){
 							error("Exception while loading service properties file: "
