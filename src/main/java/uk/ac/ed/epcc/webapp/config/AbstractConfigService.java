@@ -14,20 +14,23 @@
 package uk.ac.ed.epcc.webapp.config;
 
 import java.io.InputStream;
+import java.util.Enumeration;
 import java.util.Properties;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
-import uk.ac.ed.epcc.webapp.Version;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.resource.ResourceService;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 /** Base {@link ConfigService} that supports the recursive loading of properties from
  * a {@link ResourceService}
+ * <p>
+ * Additional property files can be included by adding a property of the form
+ * <b>add_properties.<i>name</i>=<i>resource-list<\i></b>.
+ * A property of the form <b>nest_properties.<i>name</i>=<i>resource-list<\i></b> will cause the 
+ * included properties to be prefixed by <i>name</i>.
  * 
  * @author spb
  *
@@ -37,7 +40,8 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
 public abstract class AbstractConfigService extends AbstractContexed implements ConfigService{
 
 	private static final String SPLIT_REGEX = "\\s*,\\s*";
-	private static final String ADD_PROPERTIES = "add_properties";
+	private static final String ADD_PROPERTIES = "add_properties.";
+	private static final String NEST_PROPERTIES = "nest_properties.";
 	private static final String CONFIG_LOADED = "config.loaded.";
 	
 
@@ -113,13 +117,27 @@ public abstract class AbstractConfigService extends AbstractContexed implements 
 		Properties result=new Properties(props);
 		for(Object key : props.keySet() ){
 			String name = key.toString();
-			if( name.startsWith(ADD_PROPERTIES)){
+			if( name.startsWith(ADD_PROPERTIES) || name.startsWith(NEST_PROPERTIES)){
+				String prefix = null;
+				if( name.startsWith(NEST_PROPERTIES)) {
+					prefix = name.substring(NEST_PROPERTIES.length())+".";
+				}
 				for(String file : props.getProperty(name).split(SPLIT_REGEX)){
+				
 					if( null ==  props.getProperty(CONFIG_LOADED+file)){
 						try(InputStream service_props_stream = serv.getResourceAsStream(file)){
 							if (service_props_stream != null) {
 								seen=true;
-								result.load(service_props_stream);
+								if( prefix == null ) {
+									result.load(service_props_stream);
+								}else {
+									Properties tmp = new Properties();
+									tmp.load(service_props_stream);
+									for(Enumeration  e= tmp.keys(); e.hasMoreElements();) {
+										String tk = (String) e.nextElement();
+										result.setProperty(prefix+tk, tmp.getProperty(tk));
+									}
+								}
 								// mark this resource as loaded
 								result.setProperty(CONFIG_LOADED+file, "true");
 
