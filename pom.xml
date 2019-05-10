@@ -61,7 +61,7 @@
 				<version>1.4</version>
 				<executions>
 					<execution>
-						<phase>validate</phase>
+						<phase>generate-resources</phase>
 						<goals>
 							<goal>create-metadata</goal>
 						</goals>
