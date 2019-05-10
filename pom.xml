@@ -75,7 +75,6 @@
 					 <attach>true</attach>
 					 <addOutputDirectoryToResources>true</addOutputDirectoryToResources>
 					 <outputName>webapp_build.properties</outputName>
-					 <revisionPropertyName>webapp.version</revisionPropertyName>
 					<doCheck>true</doCheck>
 					<doUpdate>true</doUpdate>
 				</configuration>
