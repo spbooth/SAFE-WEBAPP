@@ -6,7 +6,11 @@
 	<groupId>epcc.ed.ac.uk</groupId>
 	<artifactId>webapp</artifactId>
 	<version>1.0-SNAPSHOT</version>
-
+	<name>webapp framework</name>
+	<scm>
+	<connection>https://git.ecdf.ed.ac.uk/sbooth/WEBAPP-JAR.git</connection>
+	<developerConnection>git@git.ecdf.ed.ac.uk:sbooth/WEBAPP-JAR.git</developerConnection>
+	</scm>
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
