@@ -135,9 +135,11 @@ public class FilteredProperties extends Properties {
 
 		// +1 to remove the extra '.'
 		final int baseLen = base.length() + 1;
+		final String prefix = base+".";
 
 		Enumeration propEnum = properties.propertyNames();
 
+		
 		if (mode == null || mode.trim().length()==0) {
 			/*
 			 * No mode. Just add all properties with keys starting with the specified
@@ -147,7 +149,7 @@ public class FilteredProperties extends Properties {
 			while (propEnum.hasMoreElements()) {
 				String key = propEnum.nextElement().toString();
 
-				if (key.startsWith(base)) {
+				if (key.startsWith(prefix)) {
 					String filteredKey = key.substring(baseLen);
 					this.setProperty(filteredKey, properties.getProperty(key));
 				}
@@ -158,16 +160,17 @@ public class FilteredProperties extends Properties {
 			 * properties take precedence.
 			 */
 
-			final String baseAndMode = base + "." + mode;
+			final String baseAndMode = prefix + mode;
 			final int baseAndModeLen = baseAndMode.length() + 1;
-
+			final String baeAndModePrefix = baseAndMode+".";
 			while (propEnum.hasMoreElements()) {
 				String key = propEnum.nextElement().toString();
 
-				if (key.startsWith(base)) {
+				if (key.startsWith(prefix)) {
 					String filteredKey;
 
-					if (key.startsWith(baseAndMode)) {
+					
+					if (key.startsWith(baeAndModePrefix)) {
 						// moded property
 						filteredKey = key.substring(baseAndModeLen);
 					} else {

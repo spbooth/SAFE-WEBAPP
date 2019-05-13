@@ -31,7 +31,7 @@ Properties props = conn.getService(ConfigService.class).getServiceProperties();
 FilteredProperties version = new FilteredProperties(props, EmailLoggerService.VERSION_PROP_PREFIX);
 		
 for(String name : version.names()){
-	String ver = props.getProperty(name);
+	String ver = version.getProperty(name);
 	if( ver != null ){
 %><li><%=name %>: <%=ver %></li><% 
 	}
