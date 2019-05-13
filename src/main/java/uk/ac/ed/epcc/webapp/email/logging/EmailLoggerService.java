@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
@@ -146,7 +147,7 @@ public class EmailLoggerService implements Contexed, LoggerService {
 			
 			// software versions
 			FilteredProperties version = new FilteredProperties(p, VERSION_PROP_PREFIX);
-			Map v = new HashMap<>();
+			Map v = new TreeMap<>(); //sorted
 			for(Enumeration ve= version.propertyNames(); ve.hasMoreElements() ;) {
 				Object key = ve.nextElement();
 				v.put(key, version.getProperty(key.toString()));

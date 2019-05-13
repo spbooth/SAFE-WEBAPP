@@ -23,19 +23,25 @@ Display version information held in properties
     String page_title = service_name+" "+website_name+" Versions";
 %>
 <%@ include file="/std_header.jsf"%>
+<div class="block">
 <h2>module versions</h2>
 <ul>
 <%
 // show same set as reported in email
 Properties props = conn.getService(ConfigService.class).getServiceProperties();
 FilteredProperties version = new FilteredProperties(props, EmailLoggerService.VERSION_PROP_PREFIX);
-		
+Map<String,String> m = new TreeMap<>();		
+
 for(String name : version.names()){
 	String ver = version.getProperty(name);
-	if( ver != null ){
-%><li><%=name %>: <%=ver %></li><% 
+	if( ver != null && ! ver.isEmpty() ){
+		m.put(name,ver);
 	}
+}
+for(String name : m.keySet()){
+%><li><%=name %>: <%=m.get(name) %></li><% 
 }
 %>
 </ul>
+</div>
 <%@ include file="/std_footer.jsf"%>
