@@ -47,7 +47,9 @@ public class DefaultConfigService extends AbstractConfigService implements Confi
 	 * Service Context Attributes - loadAttributes if the config.path property is
 	 * defined then load from that file. otherwise use the ClassLoader to load a
 	 * files from the System classpath called service-config.properties and deploy-config.properties
-	 * In this second case values in deploy-properties take precidence
+	 * In this second case values in deploy-properties take precedence.
+	 * 
+	 * Look for a build-config.properies file containing info from the build system
 	 * 
 	 */
 	@Override

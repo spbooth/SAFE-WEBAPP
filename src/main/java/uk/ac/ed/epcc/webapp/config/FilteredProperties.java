@@ -242,6 +242,17 @@ public class FilteredProperties extends Properties {
 		else
 			return origKey;
 	}
+	
+	public Iterable<String> names() {
+		return new Iterable<String>() {
+
+			@Override
+			public Iterator iterator() {
+				return nameIterator();
+			}
+			
+		};
+	}
 
 	/**
 	 * Convenience property name iterator method. <code>Iterator</code> objects

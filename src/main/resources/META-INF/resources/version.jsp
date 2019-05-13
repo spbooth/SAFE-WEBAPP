@@ -15,6 +15,7 @@
 Display version information held in properties
 
 --%>
+<%@page import="uk.ac.ed.epcc.webapp.email.logging.EmailLoggerService"%>
 <%@ page
 	import="uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*, java.util.* "%>
 <%@ include file="/service_init.jsf"%>
@@ -25,10 +26,12 @@ Display version information held in properties
 <h2>module versions</h2>
 <ul>
 <%
+// show same set as reported in email
 Properties props = conn.getService(ConfigService.class).getServiceProperties();
-String list = props.getProperty("version.tags","");
-for(String name : list.split("\\s*,\\s*")){
-	String ver = props.getProperty(name+".revision");
+FilteredProperties version = new FilteredProperties(props, EmailLoggerService.VERSION_PROP_PREFIX);
+		
+for(String name : version.names()){
+	String ver = props.getProperty(name);
 	if( ver != null ){
 %><li><%=name %>: <%=ver %></li><% 
 	}

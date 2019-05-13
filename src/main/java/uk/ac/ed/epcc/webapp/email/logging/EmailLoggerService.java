@@ -38,7 +38,11 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 public class EmailLoggerService implements Contexed, LoggerService {
-    private final AppContext conn;
+    /**
+	 * 
+	 */
+	public static final String VERSION_PROP_PREFIX = "version";
+	private final AppContext conn;
     private LoggerService nested;
     private Logger self_logger=null;
     private boolean in_error=false;
@@ -141,7 +145,7 @@ public class EmailLoggerService implements Contexed, LoggerService {
 			}
 			
 			// software versions
-			FilteredProperties version = new FilteredProperties(p, "version");
+			FilteredProperties version = new FilteredProperties(p, VERSION_PROP_PREFIX);
 			Map v = new HashMap<>();
 			for(Enumeration ve= version.propertyNames(); ve.hasMoreElements() ;) {
 				Object key = ve.nextElement();
