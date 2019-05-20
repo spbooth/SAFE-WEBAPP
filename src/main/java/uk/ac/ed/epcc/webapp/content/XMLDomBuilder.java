@@ -137,10 +137,11 @@ public class XMLDomBuilder implements SimpleXMLBuilder {
 			throw new UnsupportedOperationException("No parent");
 		}
 		if( parent.stack.isEmpty()) {
-			throw new UnsupportedOperationException("No open element");
+			parent.frag.appendChild(getFragment());
+		}else {
+			Element e = parent.stack.peek();
+			e.appendChild(getFragment());
 		}
-		Element e = parent.stack.peek();
-		e.appendChild(getFragment());
 		return parent;
 	}
 	public SimpleXMLBuilder getParent() {
