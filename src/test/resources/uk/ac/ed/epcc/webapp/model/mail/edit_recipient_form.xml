@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><transition_page>
+<!--| Copyright - The University of Edinburgh 2015                             |-->
+<!--|                                                                          |-->
+<!--| Licensed under the Apache License, Version 2.0 (the "License");          |-->
+<!--| you may not use this file except in compliance with the License.         |-->
+<!--| You may obtain a copy of the License at                                  |-->
+<!--|                                                                          |-->
+<!--|    http://www.apache.org/licenses/LICENSE-2.0                            |-->
+<!--|                                                                          |-->
+<!--| Unless required by applicable law or agreed to in writing, software      |-->
+<!--| distributed under the License is distributed on an "AS IS" BASIS,        |-->
+<!--| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. |-->
+<!--| See the License for the specific language governing permissions and      |-->
+<!--| limitations under the License.                                           |-->
+<SummaryContent/>
+<Form>
+<table class="form">
+<tr class="even">
+<th>
+<label for="transition_text" class="required">Recipient Email</label>
+</th>
+<td>
+<input id="transition_text" type="email" size="32" maxlength="254" name="text" class="input" required="required" placeholder="name@example.com"/>
+</td>
+</tr>
+</table>
+<fieldset class="action_buttons">
+<input class="input_button" type="submit" name="AddCC" value="AddCC"/>
+<input class="input_button" type="submit" name="AddTo" value="AddTo"/>
+<input class="input_button" type="submit" name="AddBcc" value="AddBcc"/>
+</fieldset>
+</Form>
+</transition_page>

@@ -1,0 +1,17 @@
+<Diff><Person id='1'>
+<Email null='true'/><Salt></Salt>
+<Password>Locked</Password>
+<Firstname null='true'/><Lastname null='true'/><PublicKey></PublicKey>
+<PersonalCertificate></PersonalCertificate>
+</Person>
+<PersonHistory id='1'>
+<Email null='true'/><Firstname null='true'/><Lastname null='true'/></PersonHistory>
+<Person id='2'>
+<Email>bill@example.com</Email>
+<PasswordFails>0</PasswordFails>
+<PasswordStatus>I</PasswordStatus>
+<Salt></Salt>
+<Alg>0</Alg>
+<Password>locked</Password>
+</Person>
+</Diff>

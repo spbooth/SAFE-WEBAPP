@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><Diff>
+<TableSpecification name="TableTest">
+<Name type="String" nullable="true" max="48"/>
+<SecretIdentity type="String" nullable="true" max="48"/>
+</TableSpecification>
+<TableTest id="1">
+<Name>florance</Name>
+<SecretIdentity>SuperLightningBabe</SecretIdentity>
+</TableTest>
+</Diff>

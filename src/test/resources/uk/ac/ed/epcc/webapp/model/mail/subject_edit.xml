@@ -1,0 +1,18 @@
+<!--| Copyright - The University of Edinburgh 2015                             |-->
+<!--|                                                                          |-->
+<!--| Licensed under the Apache License, Version 2.0 (the "License");          |-->
+<!--| you may not use this file except in compliance with the License.         |-->
+<!--| You may obtain a copy of the License at                                  |-->
+<!--|                                                                          |-->
+<!--|    http://www.apache.org/licenses/LICENSE-2.0                            |-->
+<!--|                                                                          |-->
+<!--| Unless required by applicable law or agreed to in writing, software      |-->
+<!--| distributed under the License is distributed on an "AS IS" BASIS,        |-->
+<!--| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. |-->
+<!--| See the License for the specific language governing permissions and      |-->
+<!--| limitations under the License.                                           |-->
+<Diff>
+<TestMessage id='1'>
+<Message>RGF0ZTogU2F0LCA0IEp1bCAyMDE1IDE4OjExOjMzICswMTAwIChCU1QpDQpGcm9tOiBkdW1teUBleGFtcGxlLmNvbQ0KU2VuZGVyOiBudWxsDQpUbzogZnJlZEBleGFtcGxlLmNvbQ0KTWVzc2FnZS1JRDogPDIwMzg1ODEzMjIuMS4xNDM2MDMwMjcxMzYwLkphdmFNYWlsLnNwYkBFNzQ0MHNwYj4NClN1YmplY3Q6IHRvIGNoYW5nZQ0KTUlNRS1WZXJzaW9uOiAxLjANCkNvbnRlbnQtVHlwZTogdGV4dC9wbGFpbjsgY2hhcnNldD11cy1hc2NpaQ0KWC1IZWxwZGVzazogU2FmDQpYLVNhZi1zZXJ2aWNlOiB0ZXN0DQpDb250ZW50LVRyYW5zZmVyLUVuY29kaW5nOiA3Yml0DQoNCg==</Message>
+</TestMessage>
+</Diff>

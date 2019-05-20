@@ -1,0 +1,6 @@
+<Diff>
+<EmailChangeRequest id='1' deleted='true'/>
+<Person id='1'>
+<Email>bilbo@example.com</Email>
+</Person>
+</Diff>

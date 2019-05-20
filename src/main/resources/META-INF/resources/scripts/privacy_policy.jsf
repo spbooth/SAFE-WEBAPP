@@ -1,0 +1,9 @@
+<%
+	String privacy_policy=conn.getExpandedProperty("service.url.privacypolicy");
+    if( privacy_policy != null && ! privacy_policy.isEmpty() ){ 
+%>
+<p>
+<small>All information supplied is held and processed in accordance with our Personal Data and Privacy Policy.
+	  You can find full details <a href="<%= privacy_policy%>" target="_blank"><b>here</b></a>.</small>
+</p>
+<% } %>

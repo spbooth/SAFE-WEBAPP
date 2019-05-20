@@ -1,0 +1,40 @@
+<div class='message'>
+<h4>To: saf@epcc.ed.ac.uk</h4>
+<h4>From: &#34;J.Random&#34; &lt;punter3@epcc.ed.ac.uk&gt;</h4>
+<h4>ReplyTo: s.booth@epcc.ed.ac.uk</h4>
+<h4>Subject/[EditSubject]/Edit Subject Subject: Testing attachments</h4>
+<div class='multipart'>
+<div class='part'>
+<pre class='loose'>
+test message
+======================================================================
+|epcc| Dr Stephen P Booth             Project Manager           |epcc|
+|epcc| s.booth@epcc.ed.ac.uk          Phone 0131 650 5746       |epcc|
+======================================================================
+</pre><div class='para'>0/T/[Edit]/Edit</div>
+<div class='para'>0/[Delete]/Delete</div>
+
+</div>
+<div class='part'>
+<div class='link'>
+<div class='para'>1/T/.bashrc: </div>
+
+</div>
+<div class='para'>1/T/[Edit]/Edit</div>
+<div class='para'>1/[Delete]/Delete</div>
+
+</div>
+<div class='part'>
+<div class='link'>
+<div class='para'>2/S/vtc-linux.tar.gz: </div>
+
+</div>
+<div class='para'>2/[Delete]/Delete</div>
+
+</div>
+<div class='para'>[Merge]/Merge Text</div>
+<div class='para'>[Flatten]/Flatten Tree</div>
+
+</div>
+
+</div>

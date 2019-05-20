@@ -1,0 +1,13 @@
+<Diff><Person id='1'>
+<WebName null='true'/>
+</Person>
+<Person id='2'>
+<Email>fred2@example.com</Email>
+<WebName>fred</WebName>
+<PasswordFails>0</PasswordFails>
+<PasswordStatus>V</PasswordStatus>
+<Salt>fMzdeKhUrmQcJLOK</Salt>
+<Alg>0</Alg>
+<Password>b0b8b2b7d5c5d6fd2756772e4f4cd4ea</Password>
+</Person>
+</Diff>

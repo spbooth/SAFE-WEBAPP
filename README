@@ -6,4 +6,5 @@ for:
 * SAFE
 * and a number of internal tools and projects.
 
-Dependencies are mostly managed via ivy.
+Converted to maven project
+Though ant build with Dependencies managed via ivy should still work.

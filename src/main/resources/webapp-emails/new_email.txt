@@ -1,0 +1,19 @@
+%%begin{Subject}%%
+%%service.name%% Email Change request Request
+%%end{Subject}%%
+Dear %%person.name%%,
+
+You have requested an update to the email address held by the 
+%%service.name%% %%service.website-name%% (%%service.saf.url%%).
+
+Old Email: %%person.email%%
+New Email: %%request.email%%
+
+To complete this request you must visit the following URL.
+
+%%service.saf.url%%/EmailChangeRequestServlet/%%request.tag%%
+
+Regards
+
+  The %%service.name%% Team
+

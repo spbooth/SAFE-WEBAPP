@@ -18,23 +18,26 @@
 	<property name="work.home" value="${basedir}/work" />
 	<property name="report.dir" value="${basedir}/report" />
 	<property name="doc.dir" value="${basedir}/docs/javadoc" />
-	<property name="tomcat.home" value="/home/sbooth/tomcat/apache-tomcat-7.0.27" />
+	<property name="tomcat.home" value="/opt/tomcat/default" />
 	<property name="umldoc.home" value="/home/sbooth/yworks-uml-doclet-3.0_02-jdk1.5" />
-	<property name="webapp.lib" value="lib/safe"/>
-	<property name="webapp.testlib" value="tests/lib"/>
+	<property name="webapp.lib" value="${basedir}/lib"/>
+	<property name="webapp.testlib" value="${basedir}/testlib"/>
 	<property name="ext-lib.dir" value="${basedir}/ext-lib"/>
 
 	<property name="compile.debug" value="true" />
 	<property name="compile.deprecation" value="false" />
 	<property name="compile.optimize" value="true" />
-	<property name="compile.target" value="1.7" />
-	<property name="compile.source" value="1.7" />
+	<property name="compile.target" value="1.8" />
+	<property name="compile.source" value="1.8" />
 	<property name="ant.headless" value="true" />
 	<property name="db_name" value="" />
 	<property name="db_username" value="" />
 	<property name="db_password" value="" />
 	<property name="coverage.dir" value="${basedir}/coverage" />
-	<property name="src.dir" value="${basedir}/src/"/>
+	<property name="src.dir" value="${basedir}/src/main/java"/>
+	<property name="test.dir" value="${basedir}/src/test/java"/>
+	<property name="src.resources" value="${basedir}/src/main/resources"/>
+	<property name="test.resources" value="${basedir}/src/test/resources"/>
 	<property name="class.dir" value="${build.home}/"/>
 
 	<!-- ==== All Target ==== -->
@@ -69,10 +72,8 @@
 		<path refid="lib.classpath" />
 		<pathelement location="${build.home}" />
 		<pathelement location="${test.home}" />
-		<!-- to find the test.properties -->
-		<pathelement location="${basedir}/tests" />
-		<!-- pick up the Mock email settings -->
-		<pathelement location="${basedir}/test_settings" />
+		<!-- to find the test.properties and mock email-->
+		<pathelement location="${test.resources}" />
 	</path>
 
 
@@ -85,30 +86,26 @@
 
 	<target name="compile" depends="ivy-resolve" description="Compile Java">
 		<mkdir dir="${build.home}" />
-		<javac srcdir="${basedir}/src" destdir="${build.home}" debug="${compile.debug}" source="${compile.source}" target="${compile.target}" deprecation="${compile.deprecation}" optimize="${compile.optimize}">
+		<javac srcdir="${src.dir}" destdir="${build.home}" debug="${compile.debug}" source="${compile.source}" target="${compile.target}" deprecation="${compile.deprecation}" optimize="${compile.optimize}">
 			<classpath refid="compile.classpath" />
 		</javac>
 		<copy todir="${build.home}" verbose="true" overwrite="true">
-			<fileset dir="${basedir}/src">
-				<filename name="**/*.properties" />
-			</fileset>
-		</copy>
-		<copy todir="${build.home}" verbose="true" overwrite="true" >
-					<fileset dir="${basedir}/resources">
-						<filename name="**/*.*" />
-					</fileset>
-		</copy>
-		<copy todir="${build.home}/META-INF" verbose="true" overwrite="true">
-			<fileset dir="${basedir}/META-INF">
+			<fileset dir="${src.resources}/">
 				<filename name="**/*.*" />
 			</fileset>
 		</copy>
+		
 	</target>
 	<target name="compile-test" depends="compile" description="Compile Tests">
 		<mkdir dir="${test.home}" />
-		<javac srcdir="${basedir}/tests" destdir="${test.home}" debug="${compile.debug}" source="${compile.source}" target="${compile.target}" deprecation="${compile.deprecation}" optimize="${compile.optimize}">
+		<javac srcdir="${basedir}/src/test/java" destdir="${test.home}" debug="${compile.debug}" source="${compile.source}" target="${compile.target}" deprecation="${compile.deprecation}" optimize="${compile.optimize}">
 			<classpath refid="test.classpath" />
 		</javac>
+		<copy todir="${test.home}" verbose="true" overwrite="true">
+					<fileset dir="${test.resources}/">
+						<filename name="**/*.*" />
+					</fileset>
+				</copy>
 	</target>
 
 	<target name="build-jar" depends="compile" description="Create a JAR file from the current build.">
@@ -119,7 +116,6 @@
 		<delete file="${webapp.testlib}/webapp-test.jar" />
 		<jar destfile="${webapp.testlib}/webapp-test.jar">
 			<fileset dir="${test.home}" />
-			<fileset dir="${basedir}/test_settings"/>
 		</jar>
 	</target>
 
@@ -242,4 +238,11 @@
 		</javadoc>
 	</target>
 
+	<target name="makepom">
+		<ivy:makepom ivyfile="${basedir}/ivy.xml" pomfile="${basedir}/module.pom" conf="default,runtime">
+		   <mapping conf="default" scope="compile"/>
+		   <mapping conf="runtime" scope="runtime"/>
+		   <dependency group="com.acme" artifact="acme-logging" version="1.0" optional="true"/>
+		</ivy:makepom>
+	</target>
 </project>

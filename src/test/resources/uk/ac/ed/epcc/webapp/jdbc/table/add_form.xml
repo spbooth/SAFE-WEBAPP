@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?><transition_page>
+<SummaryContent>
+<h2>Table TableTest</h2>
+<h3>Table Type:TableStructureTestFactory</h3>
+</SummaryContent>
+<Form>
+<table class="form">
+<tr class="even">
+<th>
+<label for="transition_Field" class="required">Field to add</label>
+</th>
+<td>
+<select id="transition_Field" name="Field" class="input" required="required">
+<option value="SecretIdentity" selected="selected">SecretIdentity</option>
+</select>
+</td>
+</tr>
+</table>
+<fieldset class="action_buttons">
+<input class="input_button" type="submit" name="Add" value="Add"/>
+</fieldset>
+</Form>
+</transition_page>
