@@ -52,9 +52,11 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 	private static final String OPEN_OBJECT = "{\n";
 	private StringBuilder content=new StringBuilder();
 	private StringBuilder str = new StringBuilder();
+	private String raw=null;
 	Number n;
 	int depth=0; // depth levels
 	List<Integer> count = new LinkedList<>();
+	private boolean is_open=false;
 	private JsonBuilder parent=null;
 	
 	public JsonBuilder(){
@@ -83,7 +85,14 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 		if( parent == null ) {
 			throw new UnsupportedOperationException();
 		}
-		parent.content.append(content.toString());
+		if( parent.is_open) {
+			parent.raw=toString();
+		}else {
+			parent.content.append(content.toString());
+			parent.is_open=is_open;
+		}
+		
+		
 		return parent;
 	}
 
@@ -124,7 +133,7 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 	}
 
 	private boolean hasContent(){
-		return str.length() > 0 || n != null;
+		return str.length() > 0 || n != null || raw != null;
 	}
 	
 	/* (non-Javadoc)
@@ -149,15 +158,23 @@ public class JsonBuilder   implements SimpleXMLBuilder{
  * 
  */
 	private void doContent(){
+		if( ! is_open ) {
+			return;
+		}
+		
 		if( str.length() > 0 ){
 			addString(str.toString());
 		}else if( n != null){
 			content.append(n.toString());
+		}else if( raw != null) {
+			content.append(raw);
 		}else{
 			content.append("null");
 		}
 		str.setLength(0);
 		n=null;
+		raw=null;
+		is_open=false;
 		assert(! hasContent());
 	}
 	/* (non-Javadoc)
@@ -170,6 +187,7 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 		content.append(": ");
 		depth++;
 		count.add(0);
+		is_open=true;
 		return this;
 	}
 
@@ -230,6 +248,7 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 				}
 				addString("#content");
 				content.append(": ");
+				is_open=true;
 				doContent();
 			}
 			content.append('\n');

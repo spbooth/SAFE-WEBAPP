@@ -137,5 +137,41 @@ public class JsonBuilderTest {
 		System.out.println(expected);
 		assertEquals(expected, j.toString());
 	}
-	
+	@Test
+	public void testNestedBuilder2(){
+		JsonBuilder j = new JsonBuilder();
+		j.open("hello");
+		  j.clean("world");
+		j.close();
+		
+		j.open("flowers");
+		  SimpleXMLBuilder k = j.getNested();
+		  k.open("daisy");
+		    k.open("colour");
+		      k.clean("white");
+		    k.close();
+		    k.open("count");
+		      k.clean(1000);
+		    k.close();
+		  k.close();
+		  
+		  k.open("rose");
+		    k.open("colour");
+		      k.clean("red");
+		    k.close();
+		    k.open("count");
+		      k.clean(1);
+		    k.close();
+		  k.close();
+		
+		  k.appendParent();
+		j.close();
+		j.open("number");
+		j.clean(12);
+		j.close();
+		System.out.println(j.toString());
+		String expected = "{\n\"hello\": \"world\",\n\"flowers\": {\n \"daisy\": {\n  \"colour\": \"white\",\n  \"count\": 1000\n },\n \"rose\": {\n  \"colour\": \"red\",\n  \"count\": 1\n }\n},\n\"number\": 12\n}";
+		System.out.println(expected);
+		assertEquals(expected, j.toString());
+	}
 }
