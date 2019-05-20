@@ -29,7 +29,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
  */
 
 public class JsonBuilder   implements SimpleXMLBuilder{
-	
+
 	/** static factory method to allow implementations to be replaced.
 	 * 
 	 * @param conn
@@ -55,18 +55,24 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 	Number n;
 	int depth=0; // depth levels
 	List<Integer> count = new LinkedList<>();
-	
+	private JsonBuilder parent=null;
 	
 	public JsonBuilder(){
 		count.add(0);
 		
+	}
+	
+	protected JsonBuilder(JsonBuilder parent) {
+		this.parent=parent;
+		this.depth=parent.depth;
+		this.count = new LinkedList<Integer>(parent.count);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder#getNested()
 	 */
 	@Override
 	public SimpleXMLBuilder getNested() throws UnsupportedOperationException {
-		throw new UnsupportedOperationException();
+		return new JsonBuilder(this);
 	}
 
 	/* (non-Javadoc)
@@ -74,7 +80,11 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 	 */
 	@Override
 	public SimpleXMLBuilder appendParent() throws UnsupportedOperationException {
-		throw new UnsupportedOperationException();
+		if( parent == null ) {
+			throw new UnsupportedOperationException();
+		}
+		parent.content.append(content.toString());
+		return parent;
 	}
 
 	/* (non-Javadoc)
@@ -82,7 +92,7 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 	 */
 	@Override
 	public SimpleXMLBuilder getParent() {
-		return null;
+		return parent;
 	}
 
 	private void addString(String s){
@@ -155,6 +165,16 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 	 */
 	@Override
 	public SimpleXMLBuilder open(String tag) {
+		prefix();
+		addString(tag);
+		content.append(": ");
+		depth++;
+		count.add(0);
+		return this;
+	}
+
+	protected void prefix() {
+	
 		int pos = count.get(depth);
 		if( pos == 0 ){
 			content.append(OPEN_OBJECT);
@@ -166,11 +186,6 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 		for(int i=0;i<depth;i++){
 			content.append(' ');
 		}
-		addString(tag);
-		content.append(": ");
-		depth++;
-		count.add(0);
-		return this;
 	}
 
 	/* (non-Javadoc)
