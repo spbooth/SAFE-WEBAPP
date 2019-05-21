@@ -41,7 +41,7 @@ public class WebNameFinder<AU extends AppUser> extends FieldNameFinder<AU,WebNam
 	 */
 	@Override
 	public void anonymise(AU target) {
-		getRecord(target).setProperty(WEB_NAME, null);
+		getRecord(target).setOptionalProperty(WEB_NAME, null);
 	}
 
 	@Override

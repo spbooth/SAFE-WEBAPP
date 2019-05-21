@@ -79,7 +79,7 @@ public class AppContextFixtureRule extends ExternalResource{
 				if( name.startsWith("db_") ){
 					Object value = sys_properties.get(name);
 					if( overrides.containsKey(name) && value != null && value.toString().trim().length() > 0){
-						System.out.println("property override "+name+"->"+value);
+						//System.out.println("property override "+name+"->"+value);
 						overrides.put(name, value);
 					}
 				}
@@ -91,7 +91,7 @@ public class AppContextFixtureRule extends ExternalResource{
 			for(String prop : new String[]{DefaultConfigService.CONFIG_PATH_PROP_NAME,DefaultConfigService.DEFAULT_PATH_PROP_NAME,DefaultConfigService.DEPLOY_PATH_PROP_NAME,"testing"}){
 				String value = overrides.getProperty(prop);
 				if( value != null ){
-					System.out.println("property override "+prop+"->"+value);
+					//System.out.println("property override "+prop+"->"+value);
 					sys_properties.setProperty(prop,value);
 				}
 			}

@@ -21,8 +21,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
-import uk.ac.ed.epcc.webapp.Version;
-
 /** Class to walk a DOM Tree and map content to a SimpleXMLBuilder
  * 
  * @author spb

@@ -172,9 +172,12 @@ public final class AppContext {
  
     
     public AppContext(){
+    	this(null);
+    }
+    public AppContext(Properties props) {
     	// Set default values for the mandatory services
     	setService(new DefaultResourceService(this));
-    	setService(new DefaultConfigService(this));
+    	setService(new DefaultConfigService(this,props));
     	setService(new PrintLoggerService());
     	clearService(TimerService.class);
     	if( DATABASE_FEATURE.isEnabled(this)){

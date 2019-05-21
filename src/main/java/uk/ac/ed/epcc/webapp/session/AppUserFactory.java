@@ -224,7 +224,11 @@ AnonymisingFactory
 		if( finder == null ){
 			return null;
 		}
+		try {
 		return find(finder.getStringFinderFilter(getTarget(), email),allow_null);
+		}catch(DataNotFoundException e) {
+			throw new DataNotFoundException("No AppUser found with email "+email,e);
+		}
 	}
 	
 
@@ -991,24 +995,28 @@ AnonymisingFactory
 		Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
 		SessionService sess =  getContext().getService(SessionService.class);
 		AppUser currentPerson = sess == null ? null : sess.getCurrentPerson();
-		for(AU p : new FilterSet(new PrimaryOrderFilter<>(getTarget(),res, false))){
-			
-			
-			if(currentPerson == null || ! currentPerson.equals(p)){
-				log.debug("Anonymise "+p.getIdentifier()+" "+p.getID());
-				for(AnonymisingComposite anon : getComposites(AnonymisingComposite.class)){
-					anon.anonymise(p);
+		try(FilterSet set = new FilterSet(new PrimaryOrderFilter<>(getTarget(),res, false))){
+			for(AU p : set){
+
+
+				if(currentPerson == null || ! currentPerson.equals(p)){
+					log.debug("Anonymise "+p.getIdentifier()+" "+p.getID());
+					for(AnonymisingComposite anon : getComposites(AnonymisingComposite.class)){
+						anon.anonymise(p);
+					}
+				}else{
+					// for debugging current user just has password reset
+					PasswordAuthComposite<AU> comp = getComposite(PasswordAuthComposite.class);
+					if( comp != null) {
+						comp.setPassword(p,"Password");
+					}
 				}
-			}else{
-				// for debugging current user just has password reset
-				PasswordAuthComposite<AU> comp = getComposite(PasswordAuthComposite.class);
-				if( comp != null) {
-					comp.setPassword(p,"Password");
-				}
+				p.commit();
 			}
-			p.commit();
+		}catch(Exception e) {
+			log.error("Error anonymising person",e);
 		}
-		
+
 	}
 	private ActionList<AU> getEraseListeners(){
 		return new ActionList<>(this, "EraseActions");
