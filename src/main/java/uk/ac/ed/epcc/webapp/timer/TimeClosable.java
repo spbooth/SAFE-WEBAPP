@@ -13,8 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.timer;
 
-import java.io.IOException;
-
 import uk.ac.ed.epcc.webapp.AppContext;
 
 /** A {@link AutoCloseable} wrapper to allows timers to be closed automatically.

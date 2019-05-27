@@ -58,6 +58,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.model.relationship.GlobalRoleFilter;
 import uk.ac.ed.epcc.webapp.model.relationship.RelationshipProvider;
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 /** Abstract base implementation of {@link SessionService}
  * <p>
  * A config parameter of the form <b>use_role.<i>role-name</i></b> defines a role-name mapping
@@ -1515,11 +1516,14 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		if( relationship_map != null && relationship_map.containsKey(tag)){
 			return relationship_map.get(tag).booleanValue();
 		}
-		boolean result = fac.matches(getRelationshipRoleFilter(fac, role), target);
-		if( relationship_map != null ){
-			relationship_map.put(tag, result);
+		try(TimeClosable t = new TimeClosable(getContext(),"hasRelationship."+tag.toString()) ){
+			boolean result = fac.matches(getRelationshipRoleFilter(fac, role), target);
+			if( relationship_map != null ){
+				relationship_map.put(tag, result);
+			}
+
+			return result;
 		}
-		return result;
 	}
 	@Override
 	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target, String role, boolean fallback) {
