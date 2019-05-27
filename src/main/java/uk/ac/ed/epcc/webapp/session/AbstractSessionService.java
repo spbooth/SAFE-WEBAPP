@@ -1042,6 +1042,11 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			// narrow the selection
 			result = new AndFilter<>(fac.getTarget(),result,fallback);
 		} catch (UnknownRelationshipException e) {
+			Throwable t = e.getCause();
+			if( t != null ) {
+				// Problem in a nested definition
+				getLogger().error("Error in nested relationship defn of "+role+" on "+fac.getTag(), t);
+			}
 			// should never be thrown with a default specified.
 			return fallback;
 		}

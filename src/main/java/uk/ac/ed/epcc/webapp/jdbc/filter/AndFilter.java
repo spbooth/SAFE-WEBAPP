@@ -16,7 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
@@ -33,7 +33,7 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 
 
 public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<T>, AcceptFilter<T>{
-    protected LinkedList<AcceptFilter<? super T>> accepts= new LinkedList<>();
+    protected LinkedHashSet<AcceptFilter<? super T>> accepts= new LinkedHashSet<>();
     public AndFilter(Class<T> target){
     	super(target);
     }
@@ -148,7 +148,7 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 		if( accepts.size() == 1){
 			// first filter will do wrapping a single filter in
 			// a AndAcceptFilter will inhibit optimisation later
-			return (AcceptFilter<T>) accepts.getFirst();
+			return (AcceptFilter<T>) accepts.iterator().next();
 		}
 		return new AndAcceptFilter<>(getTarget(), accepts);
 	}
