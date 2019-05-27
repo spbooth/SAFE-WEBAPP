@@ -734,11 +734,20 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 */
 	@Override
 	public void setTempRole(String role){
+		cacheRole(role);
+		flushRelationships();
+	}
+
+	/** like {@link #setTempRole(String)} but does not call {@link #flushRelationships()}
+	 * internal use only
+	 * 
+	 * @param role
+	 */
+	protected void cacheRole(String role) {
 		if( role_map == null){
 			role_map = setupRoleMap();
 		}
 		role_map.put(role, Boolean.TRUE);
-		flushRelationships();
 	}
 
 	@Override
@@ -1100,7 +1109,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		return result;
 	}
 
-	private Set<String> searching_roles = new HashSet<>();
+	private Set<String> searching_roles = new LinkedHashSet<>();
 	/** actually construct the filter.
 	 * 
 	 * A role can be mapped to a different implementation by setting:
@@ -1136,135 +1145,135 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		String search_tag = fac2.getTag()+":"+role;
 		if( searching_roles.contains(search_tag)){
 			// recursive creation
-			throw new UnknownRelationshipException("recursive definition of "+search_tag);
+			throw new UnknownRelationshipException("recursive definition of "+search_tag+" via "+searching_roles.toString());
 		}
 		searching_roles.add(search_tag);
 		try{
 			if( role == null || role.trim().isEmpty()) {
 				throw new UnknownRelationshipException("empty role requested");
 			}
-		if( role.contains(OR_RELATIONSHIP_COMBINER)){
-			// OR combination of filters
-			OrFilter<T> or = new OrFilter<>(fac2.getTarget(), fac2);
-			for( String  s  : role.split(OR_RELATIONSHIP_COMBINER)){
-				try{
+			if( role.contains(OR_RELATIONSHIP_COMBINER)){
+				// OR combination of filters
+				OrFilter<T> or = new OrFilter<>(fac2.getTarget(), fac2);
+				for( String  s  : role.split(OR_RELATIONSHIP_COMBINER)){
+					try{
+						if( person == null){
+							or.addFilter(getRelationshipRoleFilter(fac2, s));
+						}else{
+							or.addFilter(getTargetInRelationshipRoleFilter(fac2, s, person));
+						}
+					}catch(UnknownRelationshipException e){
+						if(ALLOW_UNKNOWN_RELATIONSHIP_IN_OR_FEATURE.isEnabled(getContext())){
+							error(e, "Bad relationship in OR branch");
+						}else{
+							throw e;
+						}
+					}
+				}
+				return or;
+			}
+			if( role.contains(AND_RELATIONSHIP_COMBINER)){
+				// AND combination of filters
+				AndFilter<T> and = new AndFilter<>(fac2.getTarget());
+				for( String  s  : role.split("\\+")){
+					if( person == null ){
+						and.addFilter(getRelationshipRoleFilter(fac2, s));
+					}else{
+						and.addFilter(getTargetInRelationshipRoleFilter(fac2, s, person));
+					}
+				}
+				return and;
+			}
+			// should be a single filter now.
+			if( role.startsWith("!")) {
+				BaseFilter<T> fil = makeRelationshipRoleFilter(fac2, role.substring(1), person, def);
+				NegatingFilterVisitor<T> nv = new NegatingFilterVisitor<>(fac2);
+				try {
+					return fil.acceptVisitor(nv);
+				}catch(UnknownRelationshipException e) {
+					throw e;
+				} catch (Exception e) {
+					error(e, "Error negating filter");
+					throw new UnknownRelationshipException(role);
+				}
+			}else if( role.contains(RELATIONSHIP_DEREF)){
+				// This is a remote relationship
+				// Note this will also catch remote NamedRoles
+				// Match this first as the remote relationship
+				// might be qualified but the field name never is
+				int pos = role.indexOf(RELATIONSHIP_DEREF);
+				String link_field = role.substring(0, pos);
+				String remote_role = role.substring(pos+RELATIONSHIP_DEREF.length());
+				RemoteAccessRoleProvider<A, T, ?> rarp = new RemoteAccessRoleProvider<>(this, fac2, link_field);
+				BaseFilter<T> fil = rarp.hasRelationFilter(remote_role, person);
+				if( fil == null ){
+					throw new UnknownRelationshipException(role);
+				}
+				return fil;
+			}else if( role.contains(".")){
+				// qualified role
+				int pos = role.indexOf('.');
+				String base =role.substring(0, pos);
+				String sub = role.substring(pos+1);
+				if( base.equals(GLOBAL_ROLE_RELATIONSHIP_BASE)){
 					if( person == null){
-						or.addFilter(getRelationshipRoleFilter(fac2, s));
+						// Only the global role filter can allow relationship without a current person
+						// as roles may be asserted from the container.
+						return new GlobalRoleFilter<>(this, sub);
 					}else{
-						or.addFilter(getTargetInRelationshipRoleFilter(fac2, s, person));
-					}
-				}catch(UnknownRelationshipException e){
-					if(ALLOW_UNKNOWN_RELATIONSHIP_IN_OR_FEATURE.isEnabled(getContext())){
-						error(e, "Bad relationship in OR branch");
-					}else{
-						throw e;
+
+						return new GenericBinaryFilter<>(fac2.getTarget(),canHaveRole(person, role));
 					}
 				}
-			}
-			return or;
-		}
-		if( role.contains(AND_RELATIONSHIP_COMBINER)){
-			// AND combination of filters
-			AndFilter<T> and = new AndFilter<>(fac2.getTarget());
-			for( String  s  : role.split("\\+")){
-				if( person == null ){
-					and.addFilter(getRelationshipRoleFilter(fac2, s));
-				}else{
-					and.addFilter(getTargetInRelationshipRoleFilter(fac2, s, person));
+				if( base.equals(BOOLEAN_RELATIONSHIP_BASE)){
+
+					return new GenericBinaryFilter<>(fac2.getTarget(),Boolean.valueOf(sub));
+
+				}
+				if( person == null && ! haveCurrentUser()){
+					// No users specified
+					return new GenericBinaryFilter<>(fac2.getTarget(),false);
+				}
+
+				if( base.equals(fac2.getTag())){
+					// This is a reference a factory/composite role from within a redefined
+					// definition. direct roles can be qualified if we want qualified names cannot
+					// be overridden. 
+					BaseFilter<T> result = makeDirectRelationshipRoleFilter(fac2, sub,person,null);
+					if( result != null ){
+						return result;
+					}
+					// unrecognised direct role alias maybe
+					if( person == null){
+						return getRelationshipRoleFilter(fac2, sub);
+					}else{
+						return getTargetInRelationshipRoleFilter(fac2, sub, person);
+					}
+				}
+				AccessRoleProvider<A,T> arp = getContext().makeObjectWithDefault(AccessRoleProvider.class,null,base);
+				if( arp != null ){
+					if( person == null){
+						person=getCurrentPerson();
+					}
+					return arp.hasRelationFilter(sub,person);
+				}
+				NamedFilterProvider<T> nfp = getContext().makeObjectWithDefault(NamedFilterProvider.class, null, base);
+				if( nfp != null ) {
+					return nfp.getNamedFilter(sub);
+				}
+			}else{
+				// Non qualified name
+
+				// direct roles can be un-qualified though not if we want multiple levels of qualification.
+				BaseFilter<T> result = makeDirectRelationshipRoleFilter(fac2, role,person,null);
+				if( result != null ){
+					return result;
 				}
 			}
-			return and;
-		}
-		// should be a single filter now.
-		if( role.startsWith("!")) {
-			BaseFilter<T> fil = makeRelationshipRoleFilter(fac2, role.substring(1), person, def);
-			NegatingFilterVisitor<T> nv = new NegatingFilterVisitor<>(fac2);
-			try {
-				return fil.acceptVisitor(nv);
-			}catch(UnknownRelationshipException e) {
-				throw e;
-			} catch (Exception e) {
-				error(e, "Error negating filter");
+			if( def == null){
 				throw new UnknownRelationshipException(role);
 			}
-		}else if( role.contains(RELATIONSHIP_DEREF)){
-		    	// This is a remote relationship
-		    	// Note this will also catch remote NamedRoles
-				// Match this first as the remote relationship
-			    // might be qualified but the field name never is
-		    	int pos = role.indexOf(RELATIONSHIP_DEREF);
-		    	String link_field = role.substring(0, pos);
-		    	String remote_role = role.substring(pos+RELATIONSHIP_DEREF.length());
-		    	RemoteAccessRoleProvider<A, T, ?> rarp = new RemoteAccessRoleProvider<>(this, fac2, link_field);
-		    	BaseFilter<T> fil = rarp.hasRelationFilter(remote_role, person);
-		    	if( fil == null ){
-		    		throw new UnknownRelationshipException(role);
-		    	}
-				return fil;
-		}else if( role.contains(".")){
-	    	// qualified role
-	    	int pos = role.indexOf('.');
-	    	String base =role.substring(0, pos);
-	    	String sub = role.substring(pos+1);
-	    	if( base.equals(GLOBAL_ROLE_RELATIONSHIP_BASE)){
-	    		if( person == null){
-	    			// Only the global role filter can allow relationship without a current person
-	    			// as roles may be asserted from the container.
-	    			return new GlobalRoleFilter<>(this, sub);
-	    		}else{
-	    			
-	    			return new GenericBinaryFilter<>(fac2.getTarget(),canHaveRole(person, role));
-	    		}
-	    	}
-	    	if( base.equals(BOOLEAN_RELATIONSHIP_BASE)){
-	    		
-	    		return new GenericBinaryFilter<>(fac2.getTarget(),Boolean.valueOf(sub));
-	    		
-	    	}
-	    	if( person == null && ! haveCurrentUser()){
-	    		// No users specified
-	    		return new GenericBinaryFilter<>(fac2.getTarget(),false);
-	    	}
-	    	
-	    	if( base.equals(fac2.getTag())){
-	    		// This is a reference a factory/composite role from within a redefined
-	    		// definition. direct roles can be qualified if we want qualified names cannot
-	    		// be overridden. 
-	    		BaseFilter<T> result = makeDirectRelationshipRoleFilter(fac2, sub,person,null);
-	    		if( result != null ){
-	    			return result;
-	    		}
-	    		// unrecognised direct role alias maybe
-	    		if( person == null){
-	    			return getRelationshipRoleFilter(fac2, sub);
-	    		}else{
-	    			return getTargetInRelationshipRoleFilter(fac2, sub, person);
-	    		}
-	    	}
-	    	AccessRoleProvider<A,T> arp = getContext().makeObjectWithDefault(AccessRoleProvider.class,null,base);
-	    	if( arp != null ){
-	    		if( person == null){
-	    			person=getCurrentPerson();
-	    		}
-	    		return arp.hasRelationFilter(sub,person);
-	    	}
-	    	NamedFilterProvider<T> nfp = getContext().makeObjectWithDefault(NamedFilterProvider.class, null, base);
-	    	if( nfp != null ) {
-	    		return nfp.getNamedFilter(sub);
-	    	}
-	    }else{
-	    	// Non qualified name
-	    	
-	    	// direct roles can be un-qualified though not if we want multiple levels of qualification.
-	    	BaseFilter<T> result = makeDirectRelationshipRoleFilter(fac2, role,person,null);
-			if( result != null ){
-				return result;
-			}
-	    }
-		if( def == null){
-			throw new UnknownRelationshipException(role);
-		}
-		return def;
+			return def;
 		}catch(UnknownRelationshipException ur){
 			if( ur.getMessage().equals(role)){
 				throw ur;
