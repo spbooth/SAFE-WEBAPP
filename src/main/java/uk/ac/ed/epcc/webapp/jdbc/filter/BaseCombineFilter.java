@@ -75,7 +75,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 		    			// call same method recursively in case the contents are also a BaseCombineFilter
 		    			visitPatternFilter(nest);
 		    		}
-		    	}else{
+				}else{
 		    		// just add the nested filter
 		    		addPatternFilter(fil);
 		    	}
@@ -161,7 +161,12 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			 */
 			@Override
 			public final Boolean visitOrFilter(OrFilter<X> fil) throws Exception {
-				if( fil.nonSQL()){
+				if( fil.size() == 1) {
+					// ok to add the single filter as only one branch in the OR
+					for(BaseFilter<X> f : fil.getSet()) {
+						f.acceptVisitor(this);
+					}
+				}else if( fil.nonSQL()){
 					visitAcceptFilter(fil);
 				}else{
 					// Add in as SQL by preference
@@ -444,7 +449,13 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			}
 			return sets;
 		}
-
+		public int size() {
+			int count = filters.size();
+			if( join != null) {
+				count += join.size();
+			}
+			return count;
+		}
 		@Override
 		public boolean qualifyTables() {
 			return join != null && ! join.isEmpty();

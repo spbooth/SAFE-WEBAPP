@@ -214,4 +214,9 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 		set.addAll(accepts);
 		return set;
 	}
+	
+	@Override
+	public int size() {
+		return super.size() + accepts.size();
+	}
 }

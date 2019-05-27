@@ -107,6 +107,12 @@ public abstract class FilterSet<T> {
 	 * @return
 	 */
 	public abstract boolean isEmpty();
+	
+	/** return the number of filters that will be returned by the {@link #getSet()} method
+	 * 
+	 * @return
+	 */
+	public abstract int size();
 
 	/** get a {@link Set} of selection filters represented by this {@link FilterSet}
 	 * order only filters may not be represented
