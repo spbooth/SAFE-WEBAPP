@@ -119,7 +119,7 @@ public class MapForm extends BaseForm {
 					}
 					ok = false;
 				} catch (FieldException e) {
-					log.debug("exception " + key,e);
+					log.debug("FieldException " + key,e);
 					if (errors != null) {
 						// error message for user
 						errors.put(key, e.getMessage());
