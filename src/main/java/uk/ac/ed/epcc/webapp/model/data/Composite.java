@@ -114,6 +114,7 @@ public abstract class Composite<BDO extends DataObject, X extends Composite> imp
 	public Map<String, String> addTranslations(Map<String,String> translations) {
 		return translations;
 	}
+	
 	@Override
 	public Map<String, String> addFieldHelp(Map<String, String> help) {
 		return help;
