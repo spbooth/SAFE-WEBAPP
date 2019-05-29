@@ -977,7 +977,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	public class RemoteFilter<T extends DataObject> extends Joiner<T,BDO> implements SQLFilter<BDO>{
 		/** Make filter from remote filter 
 		 * @param join_fac {@link DataObjectFactory} for remote object
-		 * @param join_field  field referencing remote oject
+		 * @param join_field  field referencing remote object
 		 * @param fil  {@link SQLFilter} on remote object
 		 */
 		public RemoteFilter(DataObjectFactory<T> join_fac, String join_field, SQLFilter<T> fil){
