@@ -79,7 +79,7 @@ public class TestSQLOrFilter extends WebappTestBase {
 		assertTrue(fac.matches(fil, fred));
 		assertTrue(fac.matches(fil, bill));
 		assertFalse(fac.matches(fil, simon));
-		checkStd(fil, "SQLOrFilter( filters=[SQLValueFilter(Name= fred), SQLValueFilter(Number= 2)] force=false)");
+		checkStd(fil, "SQLOrFilter( filters=[SQLValueFilter(Test.Name= fred), SQLValueFilter(Test.Number= 2)] force=false)");
 	}
 	
 	@Test
@@ -92,7 +92,7 @@ public class TestSQLOrFilter extends WebappTestBase {
 		assertTrue(ref.matches(fil, fred_ref));
 		assertTrue(ref.matches(fil, bill_ref));
 		assertFalse(ref.matches(fil, simon_ref));
-		checkStd(fil, "SQLOrFilter( filters=[SQLValueFilter(Name= fred), SQLValueFilter(Number= 2)] join=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`)] force=false)");
+		checkStd(fil, "SQLOrFilter( filters=[SQLValueFilter(Test.Name= fred), SQLValueFilter(Test.Number= 2)] join=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`)] force=false)");
 	}
 	
 	
@@ -109,7 +109,7 @@ public class TestSQLOrFilter extends WebappTestBase {
 		assertTrue(fac.matches(fil, fred));
 		assertTrue(fac.matches(fil, bill));
 		assertFalse(fac.matches(fil, simon));
-		checkStd(fil, "SQLOrFilter( filters=[SQLValueFilter(Name= fred), SQLValueFilter(Number= 2)] force=false)");
+		checkStd(fil, "SQLOrFilter( filters=[SQLValueFilter(Test.Name= fred), SQLValueFilter(Test.Number= 2)] force=false)");
 	}
 	@Test
 	public void testFixedTrue() throws DataException {
@@ -122,7 +122,7 @@ public class TestSQLOrFilter extends WebappTestBase {
 		assertTrue(fac.matches(fil, fred));
 		assertTrue(fac.matches(fil, bill));
 		assertTrue(fac.matches(fil, simon));
-		checkStd(fil, "SQLOrFilter( filters=[SQLValueFilter(Name= fred), SQLValueFilter(Number= 2)] force=true)");
+		checkStd(fil, "SQLOrFilter( filters=[SQLValueFilter(Test.Name= fred), SQLValueFilter(Test.Number= 2)] force=true)");
 	}
 	
 	
@@ -138,7 +138,7 @@ public class TestSQLOrFilter extends WebappTestBase {
 		assertTrue(ref.matches(fil, fred_ref));
 		assertTrue(ref.matches(fil, bill_ref));
 		assertFalse(ref.matches(fil, simon_ref));
-		checkStd(fil, "SQLOrFilter( filters=[SQLValueFilter(Name= fred), SQLValueFilter(Number= 2)] join=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`)] force=false)");
+		checkStd(fil, "SQLOrFilter( filters=[SQLValueFilter(Test.Name= fred), SQLValueFilter(Test.Number= 2)] join=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`)] force=false)");
 	}
 	@Test
 	public void testAnd() throws DataException {
@@ -153,7 +153,7 @@ public class TestSQLOrFilter extends WebappTestBase {
 		assertTrue(fac.matches(fil, fred));
 		assertTrue(fac.matches(fil, bill));
 		assertFalse(fac.matches(fil, simon));
-		checkStd(fil, "SQLOrFilter( filters=[SQLValueFilter(Name= fred), SQLAndFilter( filters=[SQLValueFilter(Name= bill), SQLValueFilter(Number= 2)] force=true)] force=false)");
+		checkStd(fil, "SQLOrFilter( filters=[SQLValueFilter(Test.Name= fred), SQLAndFilter( filters=[SQLValueFilter(Test.Name= bill), SQLValueFilter(Test.Number= 2)] force=true)] force=false)");
 	}
 	
 	@Test
@@ -169,7 +169,7 @@ public class TestSQLOrFilter extends WebappTestBase {
 		assertTrue(fac.matches(fil, bill));
 		assertTrue(fac.matches(fil, simon));
 		
-		checkStd(fil, "SQLOrFilter( filters=[SQLValueFilter(Name= fred)] force=true)");
+		checkStd(fil, "SQLOrFilter( filters=[SQLValueFilter(Test.Name= fred)] force=true)");
 	}
 	
 	private <X> void checkStd(SQLOrFilter<X> fil, String expected) {
@@ -203,7 +203,7 @@ public class TestSQLOrFilter extends WebappTestBase {
 		assertTrue(fac.matches(fil, fred));
 		assertTrue(fac.matches(fil, bill));
 		assertFalse(fac.matches(fil, simon));
-		checkStd(fil, "SQLOrFilter( filters=[SQLValueFilter(Name= fred), SQLValueFilter(Name= bill), SQLValueFilter(Number= 2)] force=false)");
+		checkStd(fil, "SQLOrFilter( filters=[SQLValueFilter(Test.Name= fred), SQLValueFilter(Test.Name= bill), SQLValueFilter(Test.Number= 2)] force=false)");
 	}
 	@Test
 	public void testEmptyOr() throws DataException {
