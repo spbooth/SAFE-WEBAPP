@@ -60,7 +60,7 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 	// Note this is a filter on the remote that points back to the target
 	private final JoinerFilter<BDO, T> link;
 	private final SQLFilter<T> fil;
-	private final Repository remote_res;
+	
 	/**
 	 * 
 	 * @param join_field String reference field
@@ -71,14 +71,31 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 	public BackJoinFilter( Class<BDO> target,String join_field, Repository res, Repository remote_res, SQLFilter<T> fil){
 		this.target=target;
 		this.link = new JoinerFilter<>((Class<T>) (fil != null ? fil.getTarget(): DataObject.class), join_field, remote_res, res);
-		this.remote_res=remote_res;
 		this.fil=fil;
 	}
 		
+	
 		
 		
 		
 		
+	/**
+	 * @param target
+	 * @param link
+	 * @param fil
+	 */
+	public BackJoinFilter(Class<BDO> target, JoinerFilter<BDO, T> link, SQLFilter<T> fil) {
+		super();
+		this.target = target;
+		this.link = link;
+		this.fil = fil;
+	}
+
+
+
+
+
+
 		@Override
 		@SuppressWarnings("unchecked")
 		
@@ -91,8 +108,8 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 			Set<Repository> inner_tables = new HashSet<>(tables);
 			// this is the clause that matches the tables.
 			sb.append("EXISTS( SELECT 1 FROM ");
-			remote_res.addSource(sb, true);
-			inner_tables.add(remote_res);
+			link.getTargetRes().addSource(sb, true);
+			inner_tables.add(link.getTargetRes());
 			
 			Set<LinkClause> additions = new LinkedHashSet<>();
 			additions.add(link);
@@ -105,7 +122,9 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 				sb.append(" AND ");
 			}
 	        if( fil != null ){
+	        	sb.append("("); // might be an OR combinations
 	        	makeWhere(inner_tables,fil, sb, true);
+	        	sb.append(")");
 	        }else {
 	        	sb.append("true");
 	        }
@@ -182,7 +201,6 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 			int result = 1;
 			result = prime * result + ((fil == null) ? 0 : fil.hashCode());
 			result = prime * result + ((link == null) ? 0 : link.hashCode());
-			result = prime * result + ((remote_res == null) ? 0 : remote_res.hashCode());
 			result = prime * result + ((target == null) ? 0 : target.hashCode());
 			return result;
 		}
@@ -210,16 +228,27 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 					return false;
 			} else if (!link.equals(other.link))
 				return false;
-			if (remote_res == null) {
-				if (other.remote_res != null)
-					return false;
-			} else if (!remote_res.equals(other.remote_res))
-				return false;
 			if (target == null) {
 				if (other.target != null)
 					return false;
 			} else if (!target.equals(other.target))
 				return false;
 			return true;
+		}
+
+
+
+
+
+		public JoinerFilter<BDO, T> getLink() {
+			return link;
+		}
+
+
+
+
+
+		public SQLFilter<T> getFil() {
+			return fil;
 		}
 }

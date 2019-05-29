@@ -186,7 +186,12 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 		}
 
 
-
+        Repository getTargetRes() {
+        	return res;
+        }
+        Repository getRemoteRes() {
+        	return remote_res;
+        }
 
 
 		/* (non-Javadoc)

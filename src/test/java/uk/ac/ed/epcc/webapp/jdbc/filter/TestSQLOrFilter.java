@@ -95,6 +95,21 @@ public class TestSQLOrFilter extends WebappTestBase {
 		checkStd(fil, "SQLOrFilter( filters=[SQLValueFilter(Test.Name= fred), SQLValueFilter(Test.Number= 2)] join=[JoinerFilter(DummyReference.Reference=Test.`TestRecordID`)] force=false)");
 	}
 	
+	@Test
+	public void testBackJoin() throws DataException{
+		SQLOrFilter<Dummy1> or = new SQLOrFilter<Dummy1>(fac.getTarget());
+		
+		or.addFilter((SQLFilter<? super Dummy1>) ref.getDestFilter("RefFred"));
+		or.addFilter((SQLFilter<? super Dummy1>) ref.getDestFilter("RefBill"));
+		or.addFilter((SQLFilter<? super Dummy1>) ref.getDestFilter("Wombat"));
+		assertEquals(2, fac.getCount(or));
+		assertTrue(fac.matches(or, fred));
+		assertTrue(fac.matches(or, bill));
+		assertFalse(fac.matches(or, simon));
+		//checkStd(or, "SQLOrFilter( filters=[BackJoinFilter(JoinerFilter(DummyReference.Reference=Test.`TestRecordID`) remote_filter=SQLValueFilter(DummyReference.Name= RefFred)), BackJoinFilter(JoinerFilter(DummyReference.Reference=Test.`TestRecordID`) remote_filter=SQLValueFilter(DummyReference.Name= RefBill)), BackJoinFilter(JoinerFilter(DummyReference.Reference=Test.`TestRecordID`) remote_filter=SQLValueFilter(DummyReference.Name= Wombat))] force=false)");
+		checkStd(or, "SQLOrFilter( filters=[BackJoinFilter(JoinerFilter(DummyReference.Reference=Test.`TestRecordID`) remote_filter=SQLOrFilter( filters=[SQLValueFilter(DummyReference.Name= RefFred), SQLValueFilter(DummyReference.Name= RefBill), SQLValueFilter(DummyReference.Name= Wombat)] force=false))] force=false back_joins={JoinerFilter(DummyReference.Reference=Test.`TestRecordID`)=SQLOrFilter( filters=[SQLValueFilter(DummyReference.Name= RefFred), SQLValueFilter(DummyReference.Name= RefBill), SQLValueFilter(DummyReference.Name= Wombat)] force=false)})");
+
+	}
 	
 	
 	@Test
@@ -176,7 +191,7 @@ public class TestSQLOrFilter extends WebappTestBase {
 		assertEquals(expected, fil.toString());
 		SQLOrFilter<X> dup = new SQLOrFilter<>(fil.getTarget());
 		dup.addFilter(fil);
-	
+		assertEquals(expected,dup.toString());
 		assertEquals(fil.hashCode(), dup.hashCode());
 		assertTrue(dup.equals(fil) && fil.equals(dup));
 		

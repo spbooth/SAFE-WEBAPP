@@ -20,6 +20,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.model.data.filter.BackJoinFilter;
 /** Combining filter that selects the intersection of multiple filters.
  * 
  * This is a {@link PatternFilter}, {@link BinaryFilter} and an {@link AcceptFilter} though it has its own
@@ -218,5 +219,13 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 	@Override
 	public int size() {
 		return super.size() + accepts.size();
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseCombineFilter#addBackJoinFilter(uk.ac.ed.epcc.webapp.model.data.filter.BackJoinFilter)
+	 */
+	@Override
+	protected void addBackJoinFilter(BackJoinFilter filter) {
+		addPatternFilter(filter);
+		
 	}
 }

@@ -96,7 +96,10 @@ public class DummyReferenceFactory extends DataObjectFactory<DummyReference> {
 		IndexedTypeProducer<Dummy1, Dummy1.Factory>prod = new IndexedTypeProducer<>(getContext(), DummyReference.REF_FIELD, new Dummy1.Factory(getContext()));
 		return getReferenced(prod, new SQLValueFilter<>(getTarget(), res, DummyReference.STRING_FIELD, name));
 	}
-	
+	public BaseFilter<Dummy1> getDestFilter(String local_name){
+		Dummy1.Factory fac = new Dummy1.Factory(getContext());
+		return convertToDestinationFilter(fac, DummyReference.REF_FIELD, new SQLValueFilter<DummyReference>(getTarget(), res, DummyReference.STRING_FIELD, local_name));
+	}
 	/**
 	 * 
 	 */
