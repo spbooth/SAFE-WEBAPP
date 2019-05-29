@@ -115,6 +115,44 @@ public class SelfReferenceFilter<T> implements SQLFilter<T> , PatternFilter<T>{
 	public Class<T> getTarget() {
 		return target;
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (exclude ? 1231 : 1237);
+		result = prime * result + ((ref == null) ? 0 : ref.hashCode());
+		result = prime * result + ((res == null) ? 0 : res.hashCode());
+		result = prime * result + ((target == null) ? 0 : target.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SelfReferenceFilter other = (SelfReferenceFilter) obj;
+		if (exclude != other.exclude)
+			return false;
+		if (ref == null) {
+			if (other.ref != null)
+				return false;
+		} else if (!ref.equals(other.ref))
+			return false;
+		if (res == null) {
+			if (other.res != null)
+				return false;
+		} else if (!res.equals(other.res))
+			return false;
+		if (target == null) {
+			if (other.target != null)
+				return false;
+		} else if (!target.equals(other.target))
+			return false;
+		return true;
+	}
 	
 	
 }

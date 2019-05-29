@@ -41,5 +41,6 @@ import uk.ac.ed.epcc.webapp.Targetted;
  */
 public interface BaseFilter<T> extends Targetted<T>{
 	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception;
-
+	public int hashCode();
+	public boolean equals(Object obj) ;
 }

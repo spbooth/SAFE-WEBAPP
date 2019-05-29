@@ -20,26 +20,21 @@
  */
 package uk.ac.ed.epcc.webapp.model.data;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.FieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
-import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.convert.EnumProducer;
 import uk.ac.ed.epcc.webapp.model.data.convert.EnumeratingTypeConverter;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeFilterProducer;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
+import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.BasicTypeInput;
 
 /**
@@ -70,166 +65,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 
    
 	
-	public static class SQLTypeFilter<T extends BasicType.Value,I> implements PatternFilter<I>, SQLFilter<I>{
-    	private final T target;
-		private final Repository res;
-        private final BasicType<T> type;
-        private final Class<I> owner;
-		private SQLTypeFilter(Class<I> owner,BasicType<T> type, Repository res, T v) {
-			this.owner=owner;
-			this.type=type;
-			this.res=res;
-			target = v;
-		}
-
-		
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see uk.ac.hpcx.model.data.BasicDataObject.Filter#condition()
-		 */
-		@Override
-		public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb, boolean qualify) {
-			if (res == null ) {
-				sb.append(type.getField());
-				sb.append("= ? ");
-			} else {
-				FieldInfo info = res.getInfo(type.getField());
-				if( info == null ){
-					throw new ConsistencyError("No field "+type.getField());
-				}
-				info.addName(sb, qualify, true);
-				sb.append("= ?");
-			}
-			return sb;
-		}
-
-
-		
-		@Override
-		public List<PatternArgument> getParameters(List<PatternArgument> list) {
-			list.add(new PatternArg(res,type.getField(),target.getTag()));
-			return list;
-		}
-
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-		 */
-		@Override
-		public <X> X acceptVisitor(FilterVisitor<X,I> vis) throws Exception {
-			return vis.visitPatternFilter(this);
-		}
-
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter#accept(java.lang.Object)
-		 */
-		@Override
-		public void accept(I o) {
-			
-		}
-
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#getType()
-		 */
-		@Override
-		public Class<I> getTarget() {
-			return owner;
-		}
-		
-		@Override
-		public String toString() {
-			return "SQLTypeFilter("+type.getField()+"="+target.getName()+")";
-		}
-		
-    }
-
 	
-	public static class TypeSetSQLFilter<T extends BasicType.Value,I> implements PatternFilter<I>, SQLFilter<I>{
-		private final Class<I> owner; 
-		private final Set<T> set;
-        private final Repository res;
-        private final BasicType<T> type;
-        public TypeSetSQLFilter(Class<I> owner, BasicType<T> type,Repository res, Set<T> set){
-        	this.owner=owner;
-        	this.set=set;
-        	this.res=res;
-        	this.type=type;
-        }
-		@Override
-		public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify) {
-			boolean seen=false;
-			sb.append(" ( ");
-			for(int i=0; i< set.size(); i++){
-			   if(! seen ){
-				   seen=true;
-			   }else{
-				   sb.append(" OR ");
-			   }
-			   if( res == null ){
-				   sb.append( type.getField()); 
-			   }else{
-				   res.getInfo(type.getField()).addName(sb, qualify, true);
-			   } 
-			   sb.append("=? " );
-			}
-			sb.append(" ) ");
-			return sb;
-		}
-
-		
-	
-		@Override
-		public List<PatternArgument> getParameters(List<PatternArgument> list) {
-			for( T val : set){
-				list.add(new PatternArg(res,type.getField(),val.getTag()));
-			}
-			return list;
-		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-		 */
-		@Override
-		public <X> X acceptVisitor(FilterVisitor<X, I> vis) throws Exception {
-			return vis.visitPatternFilter(this);
-		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter#accept(java.lang.Object)
-		 */
-		@Override
-		public void accept(I o) {
-			
-		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#getType()
-		 */
-		@Override
-		public Class<I> getTarget() {
-			return owner;
-		}
-		@Override
-		public String toString() {
-			StringBuilder sb = new StringBuilder();
-			sb.append("TypeSetSQLFilter(");
-			boolean seen=false;
-			for(T val : set){
-				   if(! seen ){
-					   seen=true;
-				   }else{
-					   sb.append(" OR ");
-				   }
-				   sb.append( type.getField()); 
-				   sb.append("=" );
-				   sb.append(val.getName());
-				}
-			sb.append(")");
-			return sb.toString();
-		}
-		
-		
-	}
 	
 	/**
 	 * Value inner class representing a possible value of the enclosing
@@ -429,24 +265,26 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	}
 	
 	@Override
-	public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac, T val) {
+	public final <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac, T val) {
 		if( val == null ){
 			return null;
 		}
-		return new SQLTypeFilter<>(fac.getTarget(),this,fac.res, val);
+		return new SQLValueFilter<I>(fac.getTarget(), fac.res, getField(), val.getTag());
 	}
 	
-
-	
+	/** Get a filter excluding a value
+	 * @param <I> type of filter
+	 * @param fac Factory we are selecting for
+	 * 
+	 * @param val
+	 * @return SQLFilter
+	 */
 	@Override
-	public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac,Set<T> val) {
-		return new TypeSetSQLFilter<>(fac.getTarget(),this,fac.res, val);
+	public final <I extends DataObject> SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,T val){
+		return new SQLValueFilter<I>(fac.getTarget(), fac.res, getField(), val.getTag(),true);
 	}
 	
-	@Override
-	public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac,T ... val) {
-		return new TypeSetSQLFilter<>(fac.getTarget(),this,fac.res,getValues(val) );
-	}
+	
 	/**
 	 * @param val
 	 * @return
@@ -458,38 +296,8 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		}
 		return s;
 	}
-	/** Get a filter excluding a value
-	 * @param <I> type of filter
-	 * @param fac Factory we are selecting for
-	 * 
-	 * @param val
-	 * @return SQLFilter
-	 */
-	@Override
-	public <I extends DataObject> SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,T val){
-		Set<T> s = getValues(new HashSet<T>());
-		s.remove(val);
-		return getFilter(fac,s);
-	}
-	/** Get a filter excluding multiple value
-	 * @param <I> type of filter
-	 * @param fac Factory we are selecting for
-	 * 
-	 * @param val
-	 * @return SQLFilter
-	 */
-	@Override
-	public <I extends DataObject> SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,T ... val){
-		return getFilter(fac,getExcludeValues(val));
-	}
 	
-
-	@Override
-	public <I extends DataObject>SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,Set<T> val){
-		Set<T> s = getValues(new HashSet<T>());
-		s.removeAll(val);
-		return getFilter(fac,s);
-	}
+	
 	
 	@Override
 	public BasicTypeInput<T> getInput() {

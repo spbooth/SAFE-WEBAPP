@@ -126,4 +126,53 @@ public class OrphanFilter<T extends DataObject, BDO extends DataObject> extends 
 
 
 
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((join_field == null) ? 0 : join_field.hashCode());
+			result = prime * result + ((remote_res == null) ? 0 : remote_res.hashCode());
+			result = prime * result + ((res == null) ? 0 : res.hashCode());
+			result = prime * result + ((target == null) ? 0 : target.hashCode());
+			return result;
+		}
+
+
+
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			OrphanFilter other = (OrphanFilter) obj;
+			if (join_field == null) {
+				if (other.join_field != null)
+					return false;
+			} else if (!join_field.equals(other.join_field))
+				return false;
+			if (remote_res == null) {
+				if (other.remote_res != null)
+					return false;
+			} else if (!remote_res.equals(other.remote_res))
+				return false;
+			if (res == null) {
+				if (other.res != null)
+					return false;
+			} else if (!res.equals(other.res))
+				return false;
+			if (target == null) {
+				if (other.target != null)
+					return false;
+			} else if (!target.equals(other.target))
+				return false;
+			return true;
+		}
+
+
+
 }

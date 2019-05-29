@@ -75,5 +75,37 @@ public class SQLExpressionOrderFilter<I,T> implements SQLOrderFilter<T> {
 	public Class<T> getTarget() {
 		return target;
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (descending ? 1231 : 1237);
+		result = prime * result + ((expr == null) ? 0 : expr.hashCode());
+		result = prime * result + ((target == null) ? 0 : target.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SQLExpressionOrderFilter other = (SQLExpressionOrderFilter) obj;
+		if (descending != other.descending)
+			return false;
+		if (expr == null) {
+			if (other.expr != null)
+				return false;
+		} else if (!expr.equals(other.expr))
+			return false;
+		if (target == null) {
+			if (other.target != null)
+				return false;
+		} else if (!target.equals(other.target))
+			return false;
+		return true;
+	}
 
 }

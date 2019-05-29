@@ -1407,7 +1407,8 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}catch(NoSQLFilterException e){
 			// do things the hard way
 
-			try(FilterIterator it = new FilterIterator(s)){
+			try(TimeClosable t = new TimeClosable(getContext(), "exists-iterator."+getTag());
+					FilterIterator  it = new FilterIterator(s)){
 				return it.hasNext();
 			}
 
@@ -2251,6 +2252,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	protected <T extends DataObject> BaseFilter<T> convertToDestinationFilter(DataObjectFactory<T> remote_fac, String link_field,BaseFilter<BDO> fil){
 		try{
 			SQLFilter<BDO> sqlfilter = FilterConverter.convert(fil);
+			if( sqlfilter == null ) {
+				return null;
+			}
 			return new DestFilter<>(sqlfilter, link_field,remote_fac);
 		}catch(NoSQLFilterException e){
 			return new DestAcceptFilter<>(fil, link_field, remote_fac);
@@ -2392,6 +2396,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return
 	 */
 	public <R extends DataObject> BaseFilter<BDO> getRemoteFilter(DataObjectFactory<R> remote_fac, String link_field,BaseFilter<R> fil){
+		if( fil == null ){
+			return null;
+		}
 		try {
 			return fil.acceptVisitor(new MakeRemoteFilterVisitor<>(remote_fac, link_field));
 		} catch (Exception e1) {

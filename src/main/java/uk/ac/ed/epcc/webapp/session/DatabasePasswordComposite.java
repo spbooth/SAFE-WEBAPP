@@ -217,6 +217,38 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			return getFactory().getTarget();
 		}
 
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getEnclosingInstance().hashCode();
+			result = prime * result + ((password == null) ? 0 : password.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			AcceptHashFilter other = (AcceptHashFilter) obj;
+			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
+				return false;
+			if (password == null) {
+				if (other.password != null)
+					return false;
+			} else if (!password.equals(other.password))
+				return false;
+			return true;
+		}
+
+		private DatabasePasswordComposite getEnclosingInstance() {
+			return DatabasePasswordComposite.this;
+		}
+
 		
 	}
 	/** Filter to select from a hashed (possibly salted) string.

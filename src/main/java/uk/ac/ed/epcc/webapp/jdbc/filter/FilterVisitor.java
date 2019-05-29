@@ -13,6 +13,9 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
+import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.model.data.filter.BackJoinFilter;
+
 /** A visitor for {@link BaseFilter}. 
  * 
  * We use the visitor pattern as this makes the dependencies 
@@ -111,4 +114,8 @@ public interface FilterVisitor<X,T> {
 	 * @throws Exception
 	 */
 	public X visitDualFilter(DualFilter<T> fil) throws Exception;
+	
+	public default  X visitBackJoinFilter(BackJoinFilter fil  )throws Exception{
+		return visitPatternFilter((PatternFilter<T>) fil);
+	}
 }

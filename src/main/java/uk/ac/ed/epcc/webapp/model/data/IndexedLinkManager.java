@@ -783,7 +783,10 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	}
 	protected void updateHistory(T val){
 		try {
-			getHistoryHandler().update(val);
+			HistoryHandler<T> h = getHistoryHandler();
+			if( h != null ) {
+				h.update(val);
+			}
 		} catch (Exception e) {
 		    getContext().error(e,"Error updating history");
 		}

@@ -132,7 +132,7 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 		@Override
 		public <X> X acceptVisitor(FilterVisitor<X, BDO> vis)
 				throws Exception {
-			return vis.visitPatternFilter(this);
+			return vis.visitBackJoinFilter(this);
 		}
 
 
@@ -169,6 +169,57 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 		 */
 		@Override
 		public boolean qualifyTables() {
+			return true;
+		}
+
+
+
+
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((fil == null) ? 0 : fil.hashCode());
+			result = prime * result + ((link == null) ? 0 : link.hashCode());
+			result = prime * result + ((remote_res == null) ? 0 : remote_res.hashCode());
+			result = prime * result + ((target == null) ? 0 : target.hashCode());
+			return result;
+		}
+
+
+
+
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			BackJoinFilter other = (BackJoinFilter) obj;
+			if (fil == null) {
+				if (other.fil != null)
+					return false;
+			} else if (!fil.equals(other.fil))
+				return false;
+			if (link == null) {
+				if (other.link != null)
+					return false;
+			} else if (!link.equals(other.link))
+				return false;
+			if (remote_res == null) {
+				if (other.remote_res != null)
+					return false;
+			} else if (!remote_res.equals(other.remote_res))
+				return false;
+			if (target == null) {
+				if (other.target != null)
+					return false;
+			} else if (!target.equals(other.target))
+				return false;
 			return true;
 		}
 }
