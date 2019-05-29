@@ -109,7 +109,7 @@ public class TestAndFilter extends WebappTestBase {
 		assertTrue(fac.matches(fil, fred));
 		assertFalse(fac.matches(fil, bill));
 		assertFalse(fac.matches(fil, simon));
-		checkStd(fil, "AndFilter( filters=[SQLValueFilter(Name= fred), SQLValueFilter(Number= 1)] force=true)");
+		checkStd(fil, "AndFilter( filters=[SQLValueFilter(Test.Name= fred), SQLValueFilter(Test.Number= 1)] force=true)");
 	}
 	@Test 
 	public void testAccept() throws DataException {
@@ -125,7 +125,7 @@ public class TestAndFilter extends WebappTestBase {
 		assertTrue(fac.matches(fil, fred));
 		assertFalse(fac.matches(fil, bill));
 		assertFalse(fac.matches(fil, simon));
-		checkStd(fil, "AndFilter( accepts=[NumberAcceptFilter(1)] filters=[SQLValueFilter(Name= fred)] force=true)");
+		checkStd(fil, "AndFilter( accepts=[NumberAcceptFilter(1)] filters=[SQLValueFilter(Test.Name= fred)] force=true)");
 	}
 	@Test 
 	public void testAccept2() throws DataException {
@@ -138,7 +138,7 @@ public class TestAndFilter extends WebappTestBase {
 		assertFalse(fac.matches(fil, fred));
 		assertFalse(fac.matches(fil, bill));
 		assertFalse(fac.matches(fil, simon));
-		checkStd(fil, "AndFilter( accepts=[NumberAcceptFilter(2)] filters=[SQLValueFilter(Name= fred)] force=true)");
+		checkStd(fil, "AndFilter( accepts=[NumberAcceptFilter(2)] filters=[SQLValueFilter(Test.Name= fred)] force=true)");
 	}
 	@Test 
 	public void testAccept3() throws DataException {
@@ -183,6 +183,6 @@ public class TestAndFilter extends WebappTestBase {
 		assertTrue(fac.matches(fil, fred));
 		assertFalse(fac.matches(fil, bill));
 		assertFalse(fac.matches(fil, simon));
-		checkStd(fil, "AndFilter( filters=[SQLValueFilter(Name= fred), SQLValueFilter(Number= 1)] force=true)");
+		checkStd(fil, "AndFilter( filters=[SQLValueFilter(Test.Name= fred), SQLValueFilter(Test.Number= 1)] force=true)");
 	}
 }
