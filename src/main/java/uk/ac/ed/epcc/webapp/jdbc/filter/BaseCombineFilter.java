@@ -63,24 +63,10 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			 */
 			@Override
 			public final Boolean visitPatternFilter(PatternFilter<X> fil) throws Exception {
-				if( fil instanceof BaseCombineFilter &&
-						(((BaseCombineFilter)fil).getFilterCombiner() == getFilterCombiner() || ((BaseCombineFilter)fil).filters.size()==1)
-				){
-					// This is a filter of the same combination type so merge
-					// pattern filters
-					// also merge if there is only one inner filter as the type of combination is irrelevant then
-		    		// directly to avoid redundant braces and possible duplication
-					// of clauses.
-		    		BaseCombineFilter<X> comb = (BaseCombineFilter<X>) fil;
-		    		for(PatternFilter nest : comb.filters){
-		    			// call same method recursively in case the contents are also a BaseCombineFilter
-		    			//visitPatternFilter(nest);
-		    			nest.acceptVisitor(this);
-		    		}
-				}else{
-		    		// just add the nested filter
-		    		addPatternFilter(fil);
-		    	}
+
+				// just add the nested filter
+				addPatternFilter(fil);
+
 				return null;
 			}
 
@@ -89,7 +75,21 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			 */
 			@Override
 			public final Boolean visitSQLCombineFilter(BaseSQLCombineFilter<X> fil) throws Exception {
-				visitPatternFilter(fil);
+				if( fil.getCombiner() == getCombiner() || fil.size() == 1) {
+					// add components directly no need to bracket
+					for(BaseFilter<X> f : fil.getSet()) {
+						f.acceptVisitor(this);
+					}
+				}else {
+					// need bracketing
+					visitPatternFilter(fil);
+				}
+				handleBaseCombineFilter(fil);
+				return null;
+			}
+
+			private void handleBaseCombineFilter(BaseCombineFilter<X> fil) {
+				// add any order or join clauses not seen above
 				handleOrderClause(fil);
 				Set<JoinFilter> joins = fil.getJoins();
 				if( joins != null ){
@@ -97,7 +97,6 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 						addJoin(join);
 					}
 				}
-				return null;
 			}
 
 			/* (non-Javadoc)
@@ -115,8 +114,11 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 					// These methods will loop over the inner filters to remove
 					// nesting if appropriate (ie combine mechanism is right).
 					visitAcceptFilter(fil);
-					visitPatternFilter(fil);
+					for(PatternFilter p : fil.getPatternFilters()) {
+						p.acceptVisitor(this);
+					}
 				}else {
+					// This filter is adding in OR combination
 					if( fil.hasAcceptFilters() && 
 							fil.hasPatternFilters()) {
 						throw new ConsistencyError("Cannot combine accept/pattern in OR combination");
@@ -126,13 +128,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 					visitAcceptFilter(fil);
 					visitPatternFilter(fil);
 				}
-				handleOrderClause(fil);
-				Set<JoinFilter> joins = fil.getJoins();
-				if( joins != null ){
-					for(JoinFilter join : joins){
-						addJoin(join);
-					}
-				}
+				handleBaseCombineFilter(fil);
 				return null;
 			}
 
@@ -207,7 +203,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 
 			@Override
 			public Boolean visitBackJoinFilter(BackJoinFilter fil) throws Exception {
-				BaseCombineFilter.this.addBackJoinFilter(fil);
+				addBackJoinFilter(fil);
 				return null;
 			}
 	    	
@@ -292,8 +288,12 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			return res;
 		}
 
+		/** returns a <b>modifiable</b> copy of the final set of {@link PatternFilter}s
+		 * 
+		 * @return
+		 */
 		protected LinkedHashSet<PatternFilter> getPatternFilters() {
-			return filters;
+			return new LinkedHashSet<PatternFilter>(filters);
 		}
 	   
 		@Override
@@ -456,7 +456,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 
 		@Override
 		public Set<BaseFilter> getSet() {
-			Set<BaseFilter> sets = new HashSet<>();
+			Set<BaseFilter> sets = new LinkedHashSet<>();
 			sets.addAll(getPatternFilters());
 			if( join != null) {
 				sets.addAll(join);
