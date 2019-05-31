@@ -1555,16 +1555,14 @@ public final class Repository implements AppContextCleanup{
 				buff.append(key);
 				buff.append('=');
 				if (value instanceof StreamData) {
-					StreamData s = (StreamData) value;
-					stmt.setBinaryStream(pos, s.getInputStream(), (int) s
-							.getLength());
+					// setObject also understands StreamData
 					buff.append("file");
 				} else {
 					// needs to work with null values
 					buff.append(String.valueOf(value));
-					setObject(stmt, pos, key, value);
+					
 				}
-			
+				setObject(stmt, pos, key, value);
 		}
 
 		/**
@@ -3106,6 +3104,12 @@ public final class Repository implements AppContextCleanup{
 	 */
 	final void setObject(PreparedStatement stmt, int pos, String key,
 			Object value) throws SQLException {
+		if (value instanceof StreamData) {
+			StreamData s = (StreamData) value;
+			stmt.setBinaryStream(pos, s.getInputStream(), (int) s
+					.getLength());
+			return;
+		}
 		FieldInfo f = getInfo(key);
 		//Logger log = ctx.getService(LoggerService.class).getLogger(getClass());
 		if (f != null) {
