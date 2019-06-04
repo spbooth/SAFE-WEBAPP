@@ -21,6 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.model.data.filter.BackJoinFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.JoinerFilter;
 
@@ -34,6 +35,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.JoinerFilter;
 
 
 public class SQLOrFilter<T> extends BaseSQLCombineFilter<T> {
+	public static final Feature MERGE_BACK_JOIN = new Feature("filter.sqlorfilter.merge_back_join", true, "Merge multiple back join filters in OR combination");
 	// For OR combinations we can merge back joins into a single exists clause
 	// only works for OR as it makes no difference if branches are satisfied in the same
 	// object or not only one branch needs to evaluate to true.
@@ -57,13 +59,18 @@ public class SQLOrFilter<T> extends BaseSQLCombineFilter<T> {
 	}
 	@Override
 	protected void addBackJoinFilter(BackJoinFilter filter) {
-		JoinerFilter link = filter.getLink();
-		SQLOrFilter group = back_joins.get(link);
-		if( group == null ) {
-			group=new SQLOrFilter<T>(link.getTarget());
-			back_joins.put(link, group);
+		if( MERGE_BACK_JOIN.isEnabled(filter.getContext())) {
+			JoinerFilter link = filter.getLink();
+			SQLOrFilter group = back_joins.get(link);
+			if( group == null ) {
+				group=new SQLOrFilter<T>(link.getTarget());
+				back_joins.put(link, group);
+			}
+			group.addFilter(filter.getFil());
+		}else{
+			// Fallback to just treating as a pattern filter
+			addPatternFilter(filter);
 		}
-		group.addFilter(filter.getFil());
 	}
 	@Override
 	protected void listContents(StringBuilder sb) {

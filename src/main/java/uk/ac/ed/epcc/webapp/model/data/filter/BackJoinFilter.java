@@ -21,6 +21,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterSelect;
 import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MultiTableFilter;
@@ -55,7 +57,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  */
 
 
-public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> extends FilterSelect<T> implements SQLFilter<BDO>, PatternFilter<BDO>, MultiTableFilter {
+public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> extends FilterSelect<T> implements SQLFilter<BDO>, PatternFilter<BDO>, MultiTableFilter,Contexed {
 	private final Class<BDO> target;
 	// Note this is a filter on the remote that points back to the target
 	private final JoinerFilter<BDO, T> link;
@@ -250,5 +252,18 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 
 		public SQLFilter<T> getFil() {
 			return fil;
+		}
+
+
+
+
+
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
+		 */
+		@Override
+		public AppContext getContext() {
+			return link.getContext();
 		}
 }

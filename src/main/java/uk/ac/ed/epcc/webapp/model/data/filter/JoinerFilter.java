@@ -18,6 +18,8 @@ package uk.ac.ed.epcc.webapp.model.data.filter;
 
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseCombineFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
@@ -48,7 +50,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
  */
 
 
-public final class JoinerFilter<T extends DataObject, BDO extends DataObject> implements SQLFilter<BDO>, JoinFilter<BDO>, LinkClause {
+public final class JoinerFilter<T extends DataObject, BDO extends DataObject> implements SQLFilter<BDO>, JoinFilter<BDO>, LinkClause,Contexed {
 	private final Class<BDO> target;
 	private final String join_field;
 	private final Repository res;
@@ -223,5 +225,23 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 				}
 			}
 			
+		}
+
+
+
+
+
+
+
+
+
+
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
+		 */
+		@Override
+		public AppContext getContext() {
+			return res.getContext();
 		}
 }
