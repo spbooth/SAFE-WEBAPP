@@ -217,8 +217,8 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 	}
 	
 	@Override
-	public int size() {
-		return super.size() + accepts.size();
+	public int getNumBranches() {
+		return super.getNumBranches() + accepts.size();
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseCombineFilter#addBackJoinFilter(uk.ac.ed.epcc.webapp.model.data.filter.BackJoinFilter)

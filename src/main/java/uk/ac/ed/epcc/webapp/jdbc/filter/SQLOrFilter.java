@@ -97,8 +97,8 @@ public class SQLOrFilter<T> extends BaseSQLCombineFilter<T> {
 	}
 	
 	@Override
-	public int size() {
-		return super.size()+back_joins.size();
+	public int getNumBranches() {
+		return super.getNumBranches()+back_joins.size();
 	}
 	@Override
 	public boolean isEmpty() {

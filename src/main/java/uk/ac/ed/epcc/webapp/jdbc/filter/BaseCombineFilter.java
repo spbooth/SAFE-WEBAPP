@@ -75,15 +75,23 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			 */
 			@Override
 			public final Boolean visitSQLCombineFilter(BaseSQLCombineFilter<X> fil) throws Exception {
-				if( fil.getCombiner() == getCombiner() || fil.size() == 1) {
+				// First handle the selection branches
+				// must NOT process join here as we need to preserve
+				// the order in the explicit join set.
+				if( fil.getCombiner() == getCombiner() || fil.getNumBranches() == 1) {
 					// add components directly no need to bracket
-					for(BaseFilter<X> f : fil.getSet()) {
-						f.acceptVisitor(this);
+					for(PatternFilter<X> f : fil.getPatternFilters()) {
+						if( f instanceof BackJoinFilter) {
+							addBackJoinFilter((BackJoinFilter) f);
+						}else {
+							addPatternFilter(f);
+						}
 					}
 				}else {
 					// need bracketing
 					visitPatternFilter(fil);
 				}
+				// handle joins and order
 				handleBaseCombineFilter(fil);
 				return null;
 			}
@@ -202,7 +210,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			}
 
 			@Override
-			public Boolean visitBackJoinFilter(BackJoinFilter fil) throws Exception {
+			public final Boolean visitBackJoinFilter(BackJoinFilter fil) throws Exception {
 				addBackJoinFilter(fil);
 				return null;
 			}
@@ -240,7 +248,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			
 		}
 	    
-		protected void addPatternFilter(PatternFilter filter) {
+		protected final void addPatternFilter(PatternFilter filter) {
 			filters.add(filter);
 		}
 
@@ -248,7 +256,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 		
 		protected abstract void addBackJoinFilter(BackJoinFilter filter);
 		
-		Set<JoinFilter> join=null;
+		LinkedHashSet<JoinFilter> join=null;
 		
 		protected final void addJoin(JoinFilter add) throws ConsistencyError {
 			     // we use a Set to remove  duplicate joins
@@ -463,11 +471,15 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			}
 			return sets;
 		}
-		public int size() {
-			int count = filters.size();
+		public final int size() {
+			int count = getNumBranches();
 			if( join != null) {
+				count += join.size();
 			}
 			return count;
+		}
+		public int getNumBranches() {
+			return filters.size();
 		}
 		@Override
 		public boolean qualifyTables() {
