@@ -16,7 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,7 +55,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 	     * @author spb
 	     *
 	     */
-	    protected abstract class AbstractAddFilterVisitor<X> implements FilterVisitor<Boolean,X>{
+	    protected class AddFilterVisitor<X> implements FilterVisitor<Boolean,X>{
 
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
@@ -75,24 +74,24 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			 */
 			@Override
 			public final Boolean visitSQLCombineFilter(BaseSQLCombineFilter<X> fil) throws Exception {
+				// handle joins and order
+				// Do this first to ensure we get the joins in the correct order
+				handleBaseCombineFilter(fil);
 				// First handle the selection branches
 				// must NOT process join here as we need to preserve
 				// the order in the explicit join set.
 				if( fil.getCombiner() == getCombiner() || fil.getNumBranches() == 1) {
 					// add components directly no need to bracket
 					for(PatternFilter<X> f : fil.getPatternFilters()) {
-						if( f instanceof BackJoinFilter) {
-							addBackJoinFilter((BackJoinFilter) f);
-						}else {
-							addPatternFilter(f);
-						}
+						// This will re-add the joins etc
+						// but they should already be in place in the correct order.
+						f.acceptVisitor(this);
 					}
 				}else {
 					// need bracketing
 					visitPatternFilter(fil);
 				}
-				// handle joins and order
-				handleBaseCombineFilter(fil);
+				
 				return null;
 			}
 
@@ -118,11 +117,16 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 					fil.getSQLFilter().acceptVisitor(this);
 					return null;
 				}
+				// Do this first to ensure the joins are added in the correct order
+				handleBaseCombineFilter(fil);
 				if(getFilterCombiner() == FilterCombination.AND) {
 					// These methods will loop over the inner filters to remove
 					// nesting if appropriate (ie combine mechanism is right).
 					visitAcceptFilter(fil);
 					for(PatternFilter p : fil.getPatternFilters()) {
+						// This will duplicate adding the joins but they should already be in place
+						// use visitor in preference so we can  customise the add.
+						// by sub-type.
 						p.acceptVisitor(this);
 					}
 				}else {
@@ -136,7 +140,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 					visitAcceptFilter(fil);
 					visitPatternFilter(fil);
 				}
-				handleBaseCombineFilter(fil);
+				
 				return null;
 			}
 
@@ -214,24 +218,17 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 				addBackJoinFilter(fil);
 				return null;
 			}
-	    	
-	    }
-	    class AddFilterVisitor extends AbstractAddFilterVisitor{
-
-			
-
-			
-
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitAcceptFilter(uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter)
 			 */
 			@Override
-			public Boolean visitAcceptFilter(AcceptFilter fil) {
+			public Boolean visitAcceptFilter(AcceptFilter fil) throws Exception {
 				addAccept(fil);
 				return null;
 			}
 	    	
 	    }
+	  
 	    @Override
 		protected FilterVisitor getAddVisitor() {
 			return new AddFilterVisitor();
