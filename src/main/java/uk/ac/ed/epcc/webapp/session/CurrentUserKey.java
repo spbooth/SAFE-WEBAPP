@@ -24,7 +24,7 @@ package uk.ac.ed.epcc.webapp.session;
  */
 public class CurrentUserKey extends AppUserKey {
 
-	private final String additional_role;
+	private final String additional_relationship;
 	/**
 	 * @param name
 	 * @param text
@@ -33,9 +33,9 @@ public class CurrentUserKey extends AppUserKey {
 	public CurrentUserKey(String name, String text, String help) {
 		this(name, text, help,null);
 	}
-	public CurrentUserKey(String name, String text, String help,String additional_role) {
+	public CurrentUserKey(String name, String text, String help,String additional_relationship) {
 		super(name, text, help);
-		this.additional_role=additional_role;
+		this.additional_relationship=additional_relationship;
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class CurrentUserKey extends AppUserKey {
 	 */
 	@Override
 	public boolean allow(AppUser user, SessionService op) {
-		return op != null && user != null && (op.isCurrentPerson(user) || (additional_role != null && op.hasRelationship(op.getLoginFactory(), user, additional_role,false)))&& allowState(user, op);
+		return op != null && user != null && (op.isCurrentPerson(user) || (additional_relationship != null && op.hasRelationship(op.getLoginFactory(), user, additional_relationship,false)))&& allowState(user, op);
 	}
 
 	public boolean allowState(AppUser user, SessionService op) {

@@ -44,7 +44,12 @@ import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
 public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewTransitionProvider<AU, AppUserKey<AU>> implements TitleTransitionProvider<AppUserKey<AU>, AU> {
 	
-	/**
+	/** Relationship that allows a different user to edit this persons details
+	 * 
+	 */
+	public static final String EDIT_DETAILS_ROLE = "EditDetails";
+
+	/** Relationship that allows somebody to edit this persons roles
 	 * 
 	 */
 	public static final String SET_ROLES_ROLE = "SetRoles";
@@ -67,7 +72,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 	};
 	public static final AppUserKey SET_ROLE_KEY = new RoleAppUserKey("Roles", "Set roles", "Set permission roles for this user", SET_ROLES_ROLE);
-	public static final CurrentUserKey UPDATE = new CurrentUserKey("Details", "Update personal details", "Update the information we hold about you");
+	public static final CurrentUserKey UPDATE = new CurrentUserKey("Details", "Update personal details", "Update the information we hold about you",EDIT_DETAILS_ROLE);
 	
 	public static final class SUTransition<AU extends AppUser> extends AbstractDirectTransition<AU>{
 

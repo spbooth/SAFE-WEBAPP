@@ -282,7 +282,7 @@ public class AvatarComposite<AU extends AppUser> extends AppUserComposite<AU, Av
 	 */
 	@Override
 	public void anonymise(AU target) {
-		// TODO Auto-generated method stub
+		removeAvatar(target);
 		
 	}
 
