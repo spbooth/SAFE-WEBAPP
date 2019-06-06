@@ -25,6 +25,8 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
@@ -127,7 +129,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @param <R> Right end type
 	 * 
 	 */
-	public abstract static class Link<L extends DataObject, R extends DataObject> extends IndexedLinkManager.Link<L,R> {
+	public abstract static class Link<L extends DataObject, R extends DataObject> extends IndexedLinkManager.Link<L,R>  implements UIGenerator{
 		
 		protected Link(LinkManager<?,L,R> man,Repository.Record res) {
 			super(man,res);
@@ -160,9 +162,20 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 				return super.getIdentifier();
 			}
 		}
+		@Override
+		public ContentBuilder addContent(ContentBuilder builder) {
+			try {
 
-		
-		
+
+				builder.addObject(getLeft());
+				builder.addObject("-");
+				builder.addObject(getRight());
+			}catch(Exception e){
+				getLogger().error("Error adding content", e);
+				builder.addObject(getIdentifier());
+			}
+			return builder;
+		}		
        
 	}
 
