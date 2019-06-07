@@ -14,6 +14,8 @@
 package uk.ac.ed.epcc.webapp;
 /** A Number that represents an average value.
  * 
+ * This is NOT immutable
+ * 
  * @author spb
  *
  */

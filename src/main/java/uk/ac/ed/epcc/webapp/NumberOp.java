@@ -75,7 +75,17 @@ public class NumberOp {
 		}
 		return new AverageValue(sum, count);
 	}
-	
+	public static Number median(Number a, Number b) {
+		if( a instanceof MedianValue) {
+			((MedianValue)a).add(b);
+			return a;
+		}
+		if( b instanceof MedianValue) {
+			((MedianValue)b).add(a);
+			return b;
+		}
+		return new MedianValue(a,b);
+	}
 	public static Number add(Number a, Number b) {
 		if (a == null) {
 			return b;

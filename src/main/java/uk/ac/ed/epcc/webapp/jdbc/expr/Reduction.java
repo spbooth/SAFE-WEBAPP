@@ -42,6 +42,10 @@ public enum Reduction {
    * 
    */
   AVG(Operator.AVG),
+  /** median value of values is calcualted
+   * 
+   */
+  MEDIAN(Operator.MEDIAN),
   /** minimum value taken
    * 
    */
