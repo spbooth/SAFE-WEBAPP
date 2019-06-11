@@ -66,6 +66,7 @@ public class Log4JWebappContextListener extends WebappContextListener {
 
 			LoggerService serv = conn.getService(LoggerService.class);
 			serv.initialiseLogging();
+			serv.getLogger(getClass()).info("Logging initialised");
 
 
 		}catch(Exception t){
