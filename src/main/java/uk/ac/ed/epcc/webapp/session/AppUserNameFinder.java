@@ -32,8 +32,8 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
  * to have it query an external directory and lazily create database records. 
  * 
  * @author spb
- * @param <AU> 
- * @param <X> 
+ * @param <AU> type of {@link AppUser}
+ * @param <X> registration type
  *
  */
 

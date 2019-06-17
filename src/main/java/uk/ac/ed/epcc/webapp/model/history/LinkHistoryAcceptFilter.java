@@ -20,6 +20,7 @@ import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.IndexedLinkManager;
 
@@ -79,7 +80,7 @@ public class LinkHistoryAcceptFilter<L extends Indexed, R extends Indexed, T ext
 					T l = h.getPeer();
 					ok = l.isLeftPeer(left);
 				} catch (DataException e) {
-					this.linkHistoryHandler.getContext().getService(LoggerService.class).getLogger(getClass()).error("error getting peer in LinkHistoryFilter",e);
+					getLogger().error("error getting peer in LinkHistoryFilter",e);
 					ok=false;;
 				}
 				cache.put(key, new Boolean(ok));
@@ -102,7 +103,7 @@ public class LinkHistoryAcceptFilter<L extends Indexed, R extends Indexed, T ext
 					T l = h.getPeer();
 					ok = l.isRightPeer(right);
 				} catch (DataException e) {
-					this.linkHistoryHandler.getContext().error(e,"error getting peer in LinkHistoryFilter");
+					getLogger().error("error getting peer in LinkHistoryFilter",e);
 					ok=false;;
 				}
 				cache.put(key, new Boolean(ok));
@@ -111,6 +112,9 @@ public class LinkHistoryAcceptFilter<L extends Indexed, R extends Indexed, T ext
 			}
 		}
 		return true;
+	}
+	public Logger getLogger() {
+		return this.linkHistoryHandler.getContext().getService(LoggerService.class).getLogger(getClass());
 	}
 	
 	

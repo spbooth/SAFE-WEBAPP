@@ -93,7 +93,7 @@ public class RegisterServlet extends WebappServlet {
 				handleFormResult(conn, req, res, result);
 				return;
 			} catch (Exception e) {
-				conn.error(e, "Error registering new user ");
+				getLogger(conn).error( "Error registering new user ",e);
 			}
 		}
 		message(conn, req, res, "invalid_input");

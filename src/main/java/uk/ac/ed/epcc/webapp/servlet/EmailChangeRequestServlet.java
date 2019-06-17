@@ -89,7 +89,7 @@ public class EmailChangeRequestServlet extends SessionServlet {
 				fac.purge();
 			}
 		}catch(Exception e){
-			conn.error(e,"Error in EmailChangeRequest form");
+			getLogger(conn).error("Error in EmailChangeRequest form",e);
 			message(conn,req,res,"invalid_input");
 			return;
 		}

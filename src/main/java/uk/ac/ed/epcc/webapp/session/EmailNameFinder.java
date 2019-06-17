@@ -138,7 +138,10 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 
 	@Override
 	public void customiseForm(Form f) {
-		f.getField(EMAIL).addValidator(new ParseFactoryValidator<>(this, null));
+		Field field = f.getField(EMAIL);
+		if( field !=null) {
+			field.addValidator(new ParseFactoryValidator<>(this, null));
+		}
 	}
 
 

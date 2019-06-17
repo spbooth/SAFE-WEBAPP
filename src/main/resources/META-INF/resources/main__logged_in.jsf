@@ -13,5 +13,5 @@
 <%--| limitations under the License.                                           |--%>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService"%>
 <%if( ! NavigationMenuService.NAVIGATION_MENU_FEATURE.isEnabled(conn)){ %>
-<jsp:include page="main__logged_in.jsp"/>
+<jsp:include page="/main__logged_in.jsp"/>
 <%}%>

@@ -12,3 +12,7 @@
 <%--| See the License for the specific language governing permissions and      |--%>
 <%--| limitations under the License.                                           |--%>
 <%-- Copyright - The University of Edinburgh 2015 --%>
+<%-- This JSP in included at the start of every logged in page unless the 
+     navigation menu is enabled
+--%>
+<%@include file="/basic_session.jsf" %>

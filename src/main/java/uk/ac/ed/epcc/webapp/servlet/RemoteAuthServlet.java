@@ -251,7 +251,7 @@ public class RemoteAuthServlet extends WebappServlet {
 
 			}
 		} catch (Exception e) {
-			conn.error(e, "general error in RemoteAuthServlet");
+			getLogger(conn).error("general error in RemoteAuthServlet",e);
 			if (e instanceof ServletException) {
 				throw (ServletException) e;
 			}

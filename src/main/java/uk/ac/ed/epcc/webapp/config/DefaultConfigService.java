@@ -22,7 +22,13 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
-
+/** The default {@link ConfigService}
+ * 
+ * This starts
+ * 
+ * @author Stephen Booth
+ *
+ */
 public class DefaultConfigService extends AbstractConfigService implements ConfigService, Contexed{
 	public static final String BUILD_PATH_PROP_NAME = "build.path";
 	/**

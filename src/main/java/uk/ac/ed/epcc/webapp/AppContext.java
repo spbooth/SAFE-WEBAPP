@@ -44,6 +44,7 @@ import java.util.regex.Pattern;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.DefaultConfigService;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.DefaultDataBaseService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -52,6 +53,7 @@ import uk.ac.ed.epcc.webapp.model.data.Composable;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.resource.DefaultResourceService;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 /**
@@ -73,13 +75,45 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * Each page request will have an independent
  * <code>AppContext</code> and short term state can be cached within in using the <code>setAttribute</code>
  * method. This data can be retrieved using the <code>getAttribute</code> method. 
+ * 
+ *  <p>
+ * The AppContext also acts as a composite policy object allowing different behaviours 
+ * to be selected depending on the environment. 
+
+ * This allows a policy object specific to a particular type of functionality (e.g. logging) to be retrieved using the {@link #getService(Class)} method (the class object for
+ * the required interface/superclass is used as the key). e.g.
+ * <pre>
+ * LoggerService lfac = conn.getService(LoggerService.class);
+ * Logger log = lfac.getLogger(getClass())
+ * log.debug("Debug message");
+ * </pre> 
+ * <p> 
+ * Services all implement {@link AppContextService} and can be pre-set using the {@link #setService(AppContextService)} method or they can be constructed dynamically by a call to {@link #makeObject(Class, String)}
+ * The FQCN of the class used to request the service is used as the identifying tag when lookup up the implementation class. If the located class is annotated with the {@link PreRequisiteService} annotation
+ * then the AppContext will attempt to ensure the referenced services are in place before calling the constructor of the requested service.
+ * All services are cached as attributes so the same instance will be returned by subsequent  calls to 
+ * {@link #getService(Class)}. Frequently {@link AppContextService}s will be chained together with the currently installed implementation of a service holding a reference to the implementation it replaced and possibly
+ * forwarding some requests to that nested version. 
+ * <p>
+ * Key {@link AppContextService}s include:
+ * <ul>
+ * <li> {@link LoggerService} - application logging policy </li>
+ * <li> {@link ConfigService} - configuration property policy </li>
+ * <li> {@link SessionService} - user session and persistence <li>
+ * <li> {@link DatabaseService} - database connection service </li>
+ * </ul>
+ * 
+ * Note that there may be legacy methods in AppContext for functionality that was once part of the class proper but has been moved 
+ * into a separate service.
+ * <p> 
+ *  The AppContext class is final so all specialisations need to be implemented via {@link AppContextService}s.
  * <p>
  * The AppContext encodes the conventions for constructing objects by reflection.
  * A typical use might be:
 <pre>
 TargetType t = conn.makeObject(TargetType.class,"tag-name");
 </pre>
- *  This uses the <code>getPropertyClass</code> method that looks for a class name in 
+ *  This uses the {@link #getPropertyClass(Class, String)} method that looks for a class name in 
  *  a configuration property of the form
  *  <b>class.<i>tag-name</i></b> This may either be a full class-name or the name of a 
  *  <em>classdef</em> parameter e.g. 
@@ -95,27 +129,6 @@ TargetType t = conn.makeObject(TargetType.class,"tag-name");
  *  by different tag-names. Factory classes that correspond to different database tables often follow this pattern, using the table name as the tag.
  *  If a class implements the {@link Tagged} interface the value returned by the {@link Tagged#getTag()} method should be the same
  *  as the tag used to construct the object.
- *  <p>
- * The AppContext also acts as a composite policy object allowing different behaviours 
- * to be selected depending on the environment. In general this should be done using the <code>getService</code> method.
- * This allows a policy object specific to a particular type of functionality (e.g. logging) to be retrieved (the class object for
- * the required interface/superclass is used as the key). e.g.
- * <pre>
- * LoggerService lfac = conn.getService(LoggerService.class);
- * Logger log = lfac.getLogger(getClass())
- * log.debug("Debug message");
- * </pre>  
- * Services all implement {@link AppContextService} and can be pre-set using the {@link #setService(AppContextService)} method or they can be constructed dynamically.
- * <p>
- * The FQCN of the class used to request the service is used as the identifying tag when lookup up the implementation class.
- * All services are cached as attributes so the same instance will be returned by subsequent  calls to 
- * {@link #getService(Class)}. Frequently {@link AppContextService}s will be chained together with the currently installed implementation of a service holding a reference to the implementation it replaced and possibly
- * forwarding some requests to that nested version. 
- * 
- * Note that there may be legacy methods in AppContext for functionality that was once part of the class proper but has been moved 
- * into a separate service.
- * <p> 
- *  The AppContext class is final so all specialisations need to be implemented via {@link AppContextService}s.
  * <p>
  * 
  * 
@@ -144,7 +157,8 @@ TargetType t = conn.makeObject(TargetType.class,"tag-name");
   }
  </pre> 
  * </code>
- * These are forwarded onto an underlying {@link LoggerService} so it is better to use a {@link Logger} specific to 
+ * These are forwarded onto an underlying {@link LoggerService} if one is available but converts the error to a fatal error otherwise.
+ * Normally it is better to use a {@link Logger} specific to 
  * the class where the exception is caught unless reporting error from within a {@link AppContextService}.
  * We will probably remove or reduce the visibility of the AppContext methods in the near future.
  * <p>

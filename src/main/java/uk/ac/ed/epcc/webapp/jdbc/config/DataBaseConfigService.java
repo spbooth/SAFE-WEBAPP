@@ -38,7 +38,12 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
 
-/** ConfigService that adds additional properties from a database table.
+/** {@link ConfigService} that adds additional properties from a database table.
+ * 
+ * This is a wrapper that decorates a previously installed {@link ConfigService}.
+ * The name of the table to store the properties is taken from a property <b>database.properties</b>
+ * from the nested service. If this property is not found then this service will just foward to the nested service.
+ * 
  * 
  * There is a nasty potential circular dependency where the {@link DatabaseService} needed to
  * query the database table may need the {@link ConfigService} and may end up calling back to this class.
@@ -54,7 +59,11 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
 public class DataBaseConfigService implements ConfigService {
 
-    public static final String VALUE = "Value";
+    /**
+	 * 
+	 */
+	private static final String DATABASE_PROPERTIES_TABLE_PROP = "database.properties";
+	public static final String VALUE = "Value";
 	public static final String NAME = "Name";
 	private SQLContext sql=null;
 	private AppContext ctx;
@@ -102,7 +111,7 @@ public class DataBaseConfigService implements ConfigService {
 
     			if(this.sql != null ){
     			
-    				prop_table = props.getProperty("database.properties");
+    				prop_table = props.getProperty(DATABASE_PROPERTIES_TABLE_PROP);
     				// query the existing props bundle to avoid re-calling
     				boolean auto_create = DataObjectFactory.AUTO_CREATE_TABLES_FEATURE.isEnabled(props);
     				
@@ -128,6 +137,8 @@ public class DataBaseConfigService implements ConfigService {
     		    			}
     		    		}
     		    	}
+    			}else {
+    				ctx.error("NO SQL Context when setting up DatabaseConfigService");
     			}
     		
     			
