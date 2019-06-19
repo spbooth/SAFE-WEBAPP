@@ -30,7 +30,7 @@ Display version information held in properties
 // show same set as reported in email
 Properties props = conn.getService(ConfigService.class).getServiceProperties();
 FilteredProperties version = new FilteredProperties(props, EmailLoggerService.VERSION_PROP_PREFIX);
-Map<String,String> m = new TreeMap<>();		
+Map<String,String> m = new TreeMap<String,String>();		
 
 for(String name : version.names()){
 	String ver = version.getProperty(name);
