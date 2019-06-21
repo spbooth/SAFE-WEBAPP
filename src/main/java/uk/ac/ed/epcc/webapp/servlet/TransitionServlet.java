@@ -124,6 +124,10 @@ public  class TransitionServlet<K,T> extends WebappServlet {
  	public void doPost(HttpServletRequest req, HttpServletResponse res,
 			AppContext conn) {
 		try{
+			if( ! enabled(conn)) {
+				res.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
+				return;
+			}
 		// first find the transition provider
 		ServletService servlet_service = conn.getService(ServletService.class);
 		TimerService timer_service = conn.getService(TimerService.class);
@@ -915,6 +919,14 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 //		logger.debug("origin is "+origin);
 //		String referer = req.getHeader("Referer");
 //		logger.debug("referer is "+referer);
+		return true;
+	}
+	
+	/** Extension point to allow sub-classes to enable/disable the servlet
+	 * 
+	 * @return
+	 */
+	protected boolean enabled(AppContext conn) {
 		return true;
 	}
 }
