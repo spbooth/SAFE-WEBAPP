@@ -52,12 +52,13 @@ public class ListControl extends ResourceBundle.Control{
 			for(String name : baseName.split(",")){
 				String bundleName = toBundleName(name, locale);
 				String resourceName = toResourceName(bundleName, "properties");
+				// Need a single level property file as containsKey does not resolve nested props
 				InputStream stream = loader.getResourceAsStream(resourceName);
 				if( stream != null){
 					if( props == null){
 						props=new Properties();
-					}else{
-						props = new Properties(props);
+//					}else{
+//						props = new Properties(props);
 					}
 					props.load(stream);
 				}

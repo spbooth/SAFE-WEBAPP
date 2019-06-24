@@ -188,7 +188,7 @@ public abstract class WebappServlet extends HttpServlet {
 			HttpServletResponse res, String message_type)
 			throws ServletException, IOException {
 		// make sure that this call does not recurse
-		messageWithArgs(context, req, res, message_type, null);
+		sendMessageWithArgs(context, req, res, message_type, null);
 	}
 	
 	/**
@@ -216,7 +216,12 @@ public abstract class WebappServlet extends HttpServlet {
 	public  void message(AppContext context, HttpServletRequest req,
 			HttpServletResponse res, String message_type, Object... args)
 			throws ServletException, IOException {
-		messageWithArgs(context,req,res,message_type,args);
+		sendMessageWithArgs(context,req,res,message_type,args);
+	}
+	protected void sendMessageWithArgs(AppContext context,HttpServletRequest req,
+			HttpServletResponse res, String message_type, Object args[])
+			throws ServletException, IOException {
+		messageWithArgs(context, req, res, message_type, args);
 	}
 	
 	public static void messageWithArgs(AppContext context, HttpServletRequest req,
@@ -234,8 +239,11 @@ public abstract class WebappServlet extends HttpServlet {
 			context.error(e, "Bad message " + message_type);
 		}
 		req.setAttribute(MESSAGE_TYPE_ATTR, message_type);
-		req.setAttribute(ARGS, args);
-
+		if( args != null ) {
+			req.setAttribute(ARGS, args);
+		}else {
+			req.removeAttribute(ARGS);
+		}
 		// Forward to message page with appropriate arguments
 		context.getService(ServletService.class).forward(MESSAGES_JSP_URL);
 	}
