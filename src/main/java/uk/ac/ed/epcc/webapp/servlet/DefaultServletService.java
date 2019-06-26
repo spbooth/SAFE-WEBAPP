@@ -105,6 +105,7 @@ public class DefaultServletService implements ServletService{
 
 	public static final Feature EXTERNAL_AUTH_VIA_LOGIN_FEATURE = new Feature("external_auth.use_login",false,"Mandatory external auth with only login.jsp protected externally");
 
+	public static final Feature REDIRECT_TO_LOGIN_FEATURE = new Feature("login_page.always_redirect",false,"Always use redirect to go to login page");
 	public DefaultServletService(AppContext conn,ServletContext ctx, ServletRequest req,
 			ServletResponse res) {
 		super();
@@ -481,7 +482,7 @@ public class DefaultServletService implements ServletService{
 			if( page !=null&& ! page.isEmpty()) {
 				sess.setAttribute(LoginServlet.INITIAL_PAGE_ATTR, new RedirectResult(page));
 			}
-			if( external_via_login || ! LoginServlet.BUILT_IN_LOGIN.isEnabled(getContext())) {
+			if( external_via_login || REDIRECT_TO_LOGIN_FEATURE.isEnabled(getContext()) || ! LoginServlet.BUILT_IN_LOGIN.isEnabled(getContext())) {
 				
 				redirect(login_page);
 			}else {
