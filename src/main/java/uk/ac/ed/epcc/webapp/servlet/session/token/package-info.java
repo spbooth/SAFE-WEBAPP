@@ -11,7 +11,10 @@
 //| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
-/** Support for token based authentication
+/** Support for token based authentication.
+ * 
+ * This package just defines the interfaces needed to integrate with the general authentication flow.
+ * 
  * @author Stephen Booth
  *
  */

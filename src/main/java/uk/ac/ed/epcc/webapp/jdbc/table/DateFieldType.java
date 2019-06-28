@@ -27,10 +27,22 @@ import java.util.Date;
 public class DateFieldType extends FieldType<Date> {
 
 	private final boolean truncate;
+	
+	/** Timestamp
+	 * 
+	 * @param can_null
+	 * @param default_val
+	 */
 	public DateFieldType( boolean can_null,
 			Date default_val) {
 		this(can_null,default_val,false);
 	}
+	/** Generic Date or timestamp
+	 * 
+	 * @param can_null    can field be null
+	 * @param default_val default field value
+	 * @param truncate  truncate to date not timestamp
+	 */
 	public DateFieldType( boolean can_null,
 				Date default_val,boolean truncate) {
 		super(Date.class, can_null, default_val);
