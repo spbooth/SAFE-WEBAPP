@@ -13,31 +13,20 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet.session.token;
 
-import javax.servlet.http.HttpServletResponse;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-/** Standard Bearer token error codes
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+@Documented
+@Retention(RUNTIME)
+@Target(TYPE)
+/** Annotation on a class (e.g. a {@link Transition}) restricting bearer access to the specified scopes.
  * @author Stephen Booth
  *
  */
-public enum ErrorCodes {
-	invalid_request {
-		@Override
-		public int getCode() {
-			return HttpServletResponse.SC_BAD_REQUEST;
-		}
-	},
-	invalid_token {
-		@Override
-		public int getCode() {
-			return HttpServletResponse.SC_UNAUTHORIZED;
-		}
-	},
-	insufficient_scope {
-		@Override
-		public int getCode() {
-			return HttpServletResponse.SC_FORBIDDEN;
-		}
-	};
-	
-	public abstract int getCode();
+public @interface Scopes {
+  public String[] scopes();
 }

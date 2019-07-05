@@ -91,8 +91,7 @@ public class DefaultServletService implements ServletService{
 	public static final String PARAMS_KEY_NAME = "Params";
 	public static final String ARG_TERRMINATOR = "-";
 	
-	Pattern auth_patt = Pattern.compile("\\s*Basic\\s+(\\S*)");
-	Pattern token_patt = Pattern.compile("\\s*Bearer\\s+([\\w~/\\.\\+\\-]+=*)");
+	Pattern auth_patt =  Pattern.compile("\\s*(\\w+)\\s+([\\w~/\\.\\+\\-]+=*)");
 	protected final AppContext conn;
 	private final ServletContext ctx;
     private final ServletRequest req; // cached request may be null
@@ -456,21 +455,26 @@ public class DefaultServletService implements ServletService{
 	 * @see uk.ac.ed.epcc.webapp.servlet.ServletService#requestAuthorization()
 	 */
 	public <A extends AppUser> void requestAuthentication(SessionService<A> sess) throws IOException, ServletException {
+		if( isComitted()) {
+			// Can't do anything
+			return;
+		}
 		AppUserFactory<A> factory = sess.getLoginFactory();
 		BearerTokenService bearer = getContext().getService(BearerTokenService.class);
 		int code = HttpServletResponse.SC_UNAUTHORIZED;
 		if( bearer != null ) {
-			String token_realm = bearer.getRealm();
-			if( token_realm != null  && bearer.request() && res instanceof HttpServletResponse) {
+			
+			if(  bearer.request() && res instanceof HttpServletResponse) {
 				StringBuilder header =new StringBuilder();
 				header.append("Bearer");
-				if( ! token_realm.isEmpty()) {
+				String token_realm = bearer.getRealm();
+				if( token_realm != null &&  ! token_realm.isEmpty()) {
 					header.append(" realm=\"");
 					header.append(token_realm);
 					header.append("\"");
 				}
 			
-				String scopes[] = bearer.permittedScopes();
+				String scopes[] = bearer.requestedScopes();
 				if( scopes != null && scopes.length > 0) {
 					header.append(", scope=\"");
 					header.append(String.join(" ", scopes));
@@ -493,7 +497,7 @@ public class DefaultServletService implements ServletService{
 		@SuppressWarnings("unchecked")
 		PasswordAuthComposite<A> composite = (PasswordAuthComposite<A>) factory.getComposite(PasswordAuthComposite.class);
 		if( composite != null ){
-			// Should we attempt basic auth
+			// Should we request basic auth
 			String realm = conn.getInitParameter(BASIC_AUTH_REALM_PARAM);
 			if( realm != null && realm.trim().length() > 0 && res instanceof HttpServletResponse){
 				((HttpServletResponse)res).setHeader("WWW-Authenticate", "Basic realm=\""+realm+"\"");
@@ -501,10 +505,7 @@ public class DefaultServletService implements ServletService{
 				return;
 			}
 		}
-		if( isComitted()) {
-			// Can't do anything
-			return;
-		}
+		
 		boolean external_via_login = EXTERNAL_AUTH_VIA_LOGIN_FEATURE.isEnabled(conn);
 		if( getWebName() == null  
 				&& (! external_via_login) &&
@@ -586,57 +587,48 @@ public class DefaultServletService implements ServletService{
 
 				}
 			}else if (DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn) ){
-			}else{
-				HttpServletRequest request = getRequest();
-				if(request != null && ! DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn) ) {
-					
-					BearerTokenService bearer = getContext().getService(BearerTokenService.class);
-					if( bearer != null ) {
-						String token_realm = bearer.getRealm();
-						if( token_realm != null ) {
-							String auth = request.getHeader("Authorization");
-							if( auth != null ) {
-								Matcher m = token_patt.matcher(auth);
-								if( m.matches()) {
-									String token = m.group(1);
-									bearer.processToken(sess, token);
-									return;
-								}
+				// name must be null
+				return;
+			}
+			HttpServletRequest request = getRequest();
+			if(request != null && ! DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn) ) {
+				// only consider authorisation headers if no webname found
+				// Note we pick up the top level config service so that per-servlet parameters
+				// are available
+				String auth = request.getHeader("Authorization");
+				if( auth != null ) {
+					Matcher m = auth_patt.matcher(auth);
+					if( m.matches()) {
+						String type = m.group(1);
+						String cred = m.group(2);
+						if( type.equals("Bearer")) {
+							BearerTokenService bearer = getContext().getService(BearerTokenService.class);
+							if( bearer != null ) {
+								// Let the bearer token service do everything
+								// this is to allow it to implement anonymous role only sessions
+								bearer.processToken(sess, cred);
+								return;
 							}
-						}
-					}
-					// only consider basic-auth if no webname found
-					// Note we pick up the top level config service so that per-servlet parameters
-					// are available
-					String realm = conn.getInitParameter(BASIC_AUTH_REALM_PARAM);
-					
-					if( realm != null && realm.trim().length() > 0 ) {
+						}else if( type.equals("Basic")) {
+							AppUserFactory<A> factory = sess.getLoginFactory();
+							@SuppressWarnings("unchecked")
+							PasswordAuthComposite<A> comp = factory.getComposite(PasswordAuthComposite.class);
+							String userpass= decode(cred);
+							int pos = userpass.indexOf(":");
+							if( pos > 0 ){
+								String user = userpass.substring(0, pos);
+								String pass = userpass.substring(pos+1);
+								try {
 
-						String auth = request.getHeader("Authorization");
-						AppUserFactory<A> factory = sess.getLoginFactory();
-						@SuppressWarnings("unchecked")
-						PasswordAuthComposite<A> comp = factory.getComposite(PasswordAuthComposite.class);
-						if( auth != null && comp != null ){
-							Matcher m = auth_patt.matcher(auth);
-							if( m.matches()){
-								String base64 = m.group(1);
-								String userpass= decode(base64);
-								int pos = userpass.indexOf(":");
-								if( pos > 0 ){
-									String user = userpass.substring(0, pos);
-									String pass = userpass.substring(pos+1);
-									try {
-
-										A person = (A) comp.findByLoginNamePassword(user, pass);
-										if( person != null && person.canLogin()){
-											sess.setCurrentPerson(person);
-										}else {
-											//TODO handle bad authentication
-											// could remember error in response and return forbidden in requestAuthentication
-										}
-									} catch (DataException e) {
-										error(e,"Error looking up person");
+									A person = (A) comp.findByLoginNamePassword(user, pass);
+									if( person != null && person.canLogin()){
+										sess.setCurrentPerson(person);
+									}else {
+										//TODO handle bad authentication
+										// could remember error in response and return forbidden in requestAuthentication
 									}
+								} catch (DataException e) {
+									error(e,"Error looking up person");
 								}
 							}
 						}
