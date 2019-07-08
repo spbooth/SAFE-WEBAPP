@@ -46,6 +46,7 @@ import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
+import uk.ac.ed.epcc.webapp.servlet.session.token.Scopes;
 
 /** A {@link AppUserNameFinder} to handle users canonical Email
  * 
@@ -56,7 +57,7 @@ import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
  * @param <AU> type of AppUser
  *
  */
-
+@Scopes(scopes={"email"})
 public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,EmailNameFinder<AU>> implements HistoryFieldContributor,SummaryContributer<AU>,AppUserTransitionContributor,AnonymisingComposite<AU>,RequiredPageProvider<AU>{
 
 	/** property to set the email input box width

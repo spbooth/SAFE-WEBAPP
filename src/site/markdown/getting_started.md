@@ -75,7 +75,7 @@ db_password=demo
 db_driver=org.mariadb.jdbc.Driver
 ```
 
-In production it might be better to pass these in from the servlet container as a JNDI datasource. You have to create the database and set up the access credentials in advance but the code will be able to auto-create its database tables if you tell it to.
+In production it might be better to pass these in from the servlet container as a JNDI datasource. You have to create the database and set up the access credentials in advance but the code will be able to auto-create its database tables if you tell it to (and the credential has the necessary access permissions to create tables).
 
 ```
 service.feature.auto_create.tables=on

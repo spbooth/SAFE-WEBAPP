@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet.session.token;
 
+import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
@@ -63,7 +65,7 @@ public interface BearerTokenService extends AppContextService<BearerTokenService
 	 * 
 	 * @return String array of scopes
 	 */
-	public String[] requestedScopes();
+	public Set<String> requestedScopes();
 	
 	/** restrict authentication to tokens that have one of the specified scopes.
 	 * 
@@ -120,4 +122,18 @@ public interface BearerTokenService extends AppContextService<BearerTokenService
 	 * @return
 	 */
 	public boolean hasScope(String scope);
+	
+	/** Does the token have one of the scope from a list
+	 * 
+	 * @param scopes
+	 * @return
+	 */
+	public default boolean hasScope(String scopes[]) {
+		for(String s : scopes) {
+			if(hasScope(s)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

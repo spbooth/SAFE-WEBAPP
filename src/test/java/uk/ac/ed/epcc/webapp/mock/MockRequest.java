@@ -136,7 +136,18 @@ public class MockRequest implements HttpServletRequest {
 
 	@Override
 	public String getQueryString() {
-		
+		if( method.equalsIgnoreCase("GET")) {
+			StringBuilder sb = new StringBuilder();
+			for(Map.Entry<String,Object> e : params.entrySet()) {
+				if(sb.length()>0) {
+					sb.append("&");
+				}
+				sb.append(e.getKey());
+				sb.append("=");
+				sb.append(e.getValue().toString());
+			}
+			return sb.toString();
+		}
 		return null;
 	}
 

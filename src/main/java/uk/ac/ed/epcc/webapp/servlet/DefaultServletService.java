@@ -474,8 +474,8 @@ public class DefaultServletService implements ServletService{
 					header.append("\"");
 				}
 			
-				String scopes[] = bearer.requestedScopes();
-				if( scopes != null && scopes.length > 0) {
+				Set<String> scopes = bearer.requestedScopes();
+				if( scopes != null && ! scopes.isEmpty()) {
 					header.append(", scope=\"");
 					header.append(String.join(" ", scopes));
 					header.append("\"");
