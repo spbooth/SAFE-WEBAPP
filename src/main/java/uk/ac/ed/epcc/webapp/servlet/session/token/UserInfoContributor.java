@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2017                            |
+//| Copyright - The University of Edinburgh 2019                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -11,26 +11,15 @@
 //| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
-package uk.ac.ed.epcc.webapp.model;
+package uk.ac.ed.epcc.webapp.servlet.session.token;
 
-import java.util.Map;
-
-import uk.ac.ed.epcc.webapp.model.data.Composite;
+import uk.ac.ed.epcc.webapp.model.DataContributor;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
-/** Interface for providing machine readable MetaData
- * 
- * This is usually implemented by a {@link DataObjectFactory} or {@link Composite}
- * and is intended to build a {@link Map} of attributes that provide meta-data information about
- * the target object.
- * These will usually be added to a XML or JSON document describing the target
- * 
- * The keys should be valid element/key names.
- * 
- * @see SummaryContributer
- * @author spb
+/** A {@link DataContributor} that adds data to the Oauth user info endpoint
+ * @author Stephen Booth
  *
  */
-public interface MetaDataContributer<T extends DataObject> extends DataContributor<T> {
+public interface UserInfoContributor<T extends DataObject> extends DataContributor<T> {
+
 }
