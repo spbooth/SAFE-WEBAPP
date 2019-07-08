@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.table.BlobType;
@@ -28,6 +29,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
@@ -106,7 +108,14 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 
 		public void setData(MimeStreamData data){
 			record.setProperty(NAME, data.getName());
-			record.setProperty(MIME_TYPE, data.getContentType());
+			// Sometimes get charset/name arguments in the content-type.
+			// sacrifice these if they push us over the allowed field length
+			String contentType = data.getContentType();
+			FieldInfo info = record.getRepository().getInfo(MIME_TYPE);
+			while( contentType.contains(";") && contentType.length() > info.getMax()) {
+				contentType = contentType.substring(0, contentType.lastIndexOf(';'));
+			}
+			record.setProperty(MIME_TYPE, contentType);
 			record.setProperty(DATA, data);
 			AppContext conn = getContext();
 			int live_months = conn.getIntegerParameter("serv_data.lifetime.months", 1);
