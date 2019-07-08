@@ -57,7 +57,7 @@ import uk.ac.ed.epcc.webapp.servlet.session.token.Scopes;
  * @param <AU> type of AppUser
  *
  */
-@Scopes(scopes={"email"})
+@Scopes(scopes={"email","impersonate"})
 public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,EmailNameFinder<AU>> implements HistoryFieldContributor,SummaryContributer<AU>,AppUserTransitionContributor,AnonymisingComposite<AU>,RequiredPageProvider<AU>{
 
 	/** property to set the email input box width
