@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.session;
 
+import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -127,6 +128,16 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public void clearCurrentPerson();
 	
+	/** If there is a current user return the time they authenticated
+	 * This should only record a user-present authentication not API access via a token
+	 * @return
+	 */
+	public Date getAuthenticationTime();
+	/** Set the authentication time
+	 * 
+	 * @param d
+	 */
+	public void setAuthenticationTime(Date d);
 	/** Clear current person and any saved state
 	 * 
 	 */

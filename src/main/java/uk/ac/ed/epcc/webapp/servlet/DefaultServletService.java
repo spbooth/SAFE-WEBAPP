@@ -41,6 +41,7 @@ import org.apache.commons.codec.binary.Base64;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -582,6 +583,11 @@ public class DefaultServletService implements ServletService{
 							// If we want to support 2-factor with external login 
 							// we should do this via a required page.
 							sess.setCurrentPerson(person);
+							
+							CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+							if( time != null) {
+								sess.setAuthenticationTime(time.getCurrentTime());
+							}
 						}	
 					}
 

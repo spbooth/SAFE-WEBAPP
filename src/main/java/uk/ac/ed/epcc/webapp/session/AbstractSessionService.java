@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -154,6 +155,8 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	private static final String person_tag = "SESSION_PersonID";
 	private static final String toggle_map_tag = "SESSION_toggle_map";
 	private static final String role_map_tag = "SESSION_role_map";
+	
+	private static final String auth_time_tag = "SESSION_auth_time";
 	private boolean apply_toggle=true;
 	/** A keying object representing a relationship.
 	 * 
@@ -722,6 +725,15 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 				setAttribute(person_tag,id);
 			}	
 		}
+	}
+
+	@Override
+	public Date getAuthenticationTime() {
+		return (Date) getAttribute(auth_time_tag);
+	}
+	
+	public void setAuthenticationTime(Date d) {
+		setAttribute(auth_time_tag, d);
 	}
 
 	@Override
