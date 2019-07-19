@@ -321,9 +321,10 @@ public void handleFormResult(AppContext conn,HttpServletRequest req, HttpServlet
 				output.append('+');
 				continue;
 			}
+			// including "." otherwise keycloak state parameter corrupted with restapp openid
 			if (((ch >= 'a') && (ch <= 'z')) || ((ch >= 'A') && (ch <= 'Z'))
 					|| ((ch >= '0') && (ch <= '9')) || (ch == '_')
-					|| (ch == '-')) {
+					|| (ch == '-') || (ch == '.')) {
 				output.append(ch);
 			} else {
 				output.append('%');

@@ -38,7 +38,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 @PreRequisiteService(ServletService.class)
-public interface BearerTokenService extends AppContextService<BearerTokenService> {
+public interface BearerTokenService extends AppContextService<BearerTokenService>, ScopeQuery {
 
 	/** Enable/Disable bearer token authentication for this request.
 	 * the service will probably have a configurable default but this allows bearer tokens to be enabled/disabled
@@ -114,26 +114,5 @@ public interface BearerTokenService extends AppContextService<BearerTokenService
 	 */
 	public String getToken();
 	
-	/** Does the authenticated token have the specified scope.
-	 * 
-	 * This is for fine tuing access control where the url permits multiple scopes.
-	 * 
-	 * @param scope
-	 * @return
-	 */
-	public boolean hasScope(String scope);
 	
-	/** Does the token have one of the scope from a list
-	 * 
-	 * @param scopes
-	 * @return
-	 */
-	public default boolean hasScope(String scopes[]) {
-		for(String s : scopes) {
-			if(hasScope(s)) {
-				return true;
-			}
-		}
-		return false;
-	}
 }
