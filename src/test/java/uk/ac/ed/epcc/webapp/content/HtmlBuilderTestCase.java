@@ -232,6 +232,24 @@ public class HtmlBuilderTestCase extends WebappTestBase {
 				hb.toString());
 	}
 	
+	
+	@Test
+	public void testAddTableWithColName() {
+		HtmlBuilder hb = new HtmlBuilder();
+		Table<String, String> t = new Table<>();
+		t.put("col1", "row1", 100);
+		t.put("col2", "row1", 100);
+		
+		t.setColName("col1", "Igor");
+		t.setColName("col2", "Newt");
+		hb.addTable(getContext(), t);
+		Assert.assertEquals(
+				"<table class='auto' rows='1' cols='2'>\n" +
+				"<tr count='0'><th class='first' count='0'>Igor</th><th class='main' count='1'>Newt</th></tr>\n" +
+				"<tr count='1'><td class='first' count='0' numeric='true'>100</td><td class='main' count='1' numeric='true'>100</td></tr>\n" +
+				"</table>\n",
+				hb.toString());
+	}
 	@Test
 	public void testAddTableWithMulticolumn() {
 		HtmlBuilder hb = new HtmlBuilder();
