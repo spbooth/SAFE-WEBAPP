@@ -142,6 +142,7 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 	 */
 	static final TableTransitionKey ADD_DOUBLE_FIELD_KEY = new TableDeveloperKey("AddDoubleField");
 
+	static final TableTransitionKey ADD_BOOLEAN_FIELD_KEY = new TableDeveloperKey("AddBooleanField");
 	/**
 	 * 
 	 */
@@ -183,6 +184,7 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 		map.put(ADD_LONG_FIELD_KEY, new AddLongFieldTransition<>());
 		map.put(ADD_FLOAT_FIELD_KEY, new AddFloatFieldTransition<>());
 		map.put(ADD_DOUBLE_FIELD_KEY, new AddDoubleFieldTransition<>());
+		map.put(ADD_BOOLEAN_FIELD_KEY,new AddBooleanFieldTransition<>());
 		if( target == null) {
 			return map;
 		}
