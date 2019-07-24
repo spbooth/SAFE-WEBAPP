@@ -32,6 +32,7 @@ import uk.ac.ed.epcc.webapp.jdbc.wrap.CheckCloseDatabaseService;
 import uk.ac.ed.epcc.webapp.logging.debug.DebugLoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintLoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.datastore.DataStoreResourceService;
 import uk.ac.ed.epcc.webapp.servlet.ErrorFilter;
 import uk.ac.ed.epcc.webapp.session.SimpleSessionService;
 import uk.ac.ed.epcc.webapp.timer.DefaultTimerService;
@@ -132,7 +133,7 @@ public class AppContextFixtureRule extends ExternalResource{
 		//props only in test.properties will be visible from the service props but
 		// we also want to override any values in the normal config
 		ctx.setService( new OverrideConfigService(overrides,ctx));
-		
+		ctx.setService(new DataStoreResourceService(ctx));
 		// get config service configured first before wrapping database and logger
 		ctx.setService(new CheckCloseDatabaseService(ctx.getService(DatabaseService.class)));
 		ctx.setService(new DebugLoggerService(ctx));

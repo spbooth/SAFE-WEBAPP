@@ -47,6 +47,7 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintLoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintWrapper;
+import uk.ac.ed.epcc.webapp.model.datastore.DataStoreResourceService;
 import uk.ac.ed.epcc.webapp.servlet.config.ServletContextConfigService;
 import uk.ac.ed.epcc.webapp.servlet.logging.ServletWrapper;
 import uk.ac.ed.epcc.webapp.servlet.resource.ServletResourceService;
@@ -83,6 +84,7 @@ public class ErrorFilter implements Filter {
 	private static final Feature EMAIL_LOGGING_FEATURE = new Feature("logging.send_email",true,"Send error reports by email");
 	public static final Feature CONNECTION_STATUS_FEATURE = new Feature("database.connection_status",false,"Track active database connections");
 	public static final Feature TIMER_FEATURE = new Feature("Timer",false,"gather timing information for performance analyis");
+	public static final Feature DATASTORE_RESOURCE_FEATURE = new Feature("resource_service.use_datastore",true,"Use datastore table to hold resources");
 	
 	private static final String LAST_ADDR_ATTR = "LastAddr";
 	public static final String APP_CONTEXT_ATTR = "AppContext";
@@ -315,6 +317,7 @@ public class ErrorFilter implements Filter {
 		// This includes the default services like DeaultDatabaseService
 		AppContext  conn = new AppContext();
 		
+		
 		// allow use of ServletContext for resource location
 		conn.setService(new ServletResourceService(conn,ctx));
 		// Add in servlet config parameters. These are application global 
@@ -339,8 +342,9 @@ public class ErrorFilter implements Filter {
 		// so requires the db service.
 		conn.setService(new DataBaseConfigService(conn));
 		
-		
-		
+		if( DATASTORE_RESOURCE_FEATURE.isEnabled(conn)) {
+			conn.setService(new DataStoreResourceService(conn));
+		}
 		// cache the parameters between requests.
 		// We want to be able to configure the use of the cache but it completely removes the whole point of 
 		// the cache if we query the nested services for a config parameter before installing the cache service

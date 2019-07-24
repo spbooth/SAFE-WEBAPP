@@ -16,7 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
