@@ -76,13 +76,16 @@ public class DataStoreResourceService extends AbstractContexed implements Resour
 	 */
 	@Override
 	public InputStream getResourceAsStream(String name) throws Exception {
-		DataStore store = new DataStore(getContext());
+		
 		if( name.startsWith(DATASTORE_PREFIX)) {
-			Data d = store.findFromString(name.substring(DATASTORE_PREFIX.length()));
-			if( d != null ) {
-				return d.getData().getInputStream();
-			}else {
-				throw null;
+			DataStore store = new DataStore(getContext());
+			if( store.isValid()) {
+				Data d = store.findFromString(name.substring(DATASTORE_PREFIX.length()));
+				if( d != null ) {
+					return d.getData().getInputStream();
+				}else {
+					return null;
+				}
 			}
 		}
 		return nested.getResourceAsStream(name);
