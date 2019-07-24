@@ -18,6 +18,7 @@
 <active value="AddLongField"/>
 <active value="AddFloatField"/>
 <active value="AddDoubleField"/>
+<active value="AddBooleanField"/>
 <active value="Add Std field" help="Add missing fields from the default table specification for this class"/>
 <active value="Add Std index" help="Add missing index from the default table specification for this class"/>
 <active value="Drop optional field" help="Drop optional existing field"/>
