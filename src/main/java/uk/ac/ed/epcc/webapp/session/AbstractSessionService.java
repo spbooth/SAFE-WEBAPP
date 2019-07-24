@@ -36,6 +36,7 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.exception.ForceRollBack;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
@@ -683,6 +684,10 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 */
 	protected Integer getPersonID(){
 		Integer id = (Integer)getAttribute(person_tag);
+		if( id == null && person != null ) {
+			// attribute caching disabled
+			return person.getID();
+		}
 		return id;
 	}
 	

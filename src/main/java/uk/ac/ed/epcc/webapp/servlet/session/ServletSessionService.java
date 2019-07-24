@@ -76,6 +76,10 @@ public class ServletSessionService<A extends AppUser> extends AbstractSessionSer
 	
 	// Flag to supress re-populate if we logged out
 	private boolean force_no_person=false;
+	// Flag to supress read/write to http session
+	// This is to force per request authentication in an api call and to prevent
+	// a restricted permission api call from creating a session
+	private boolean use_session=true;
 	private ServletService ss;
 	private HttpServletRequest request;
   public ServletSessionService(AppContext c){
@@ -111,7 +115,7 @@ protected boolean shortcutTestRole(String role) {
 public void setAttribute(String key, Object value) {
     //need a session if we are storing anything
 	HttpSession sess = null;
-	if( ss instanceof DefaultServletService){
+	if( use_session && ss instanceof DefaultServletService){
 		DefaultServletService dss = (DefaultServletService)ss;
 		// can't create session if comitted response
 		sess = dss.getSession(! dss.isComitted());
@@ -131,7 +135,7 @@ public void setAttribute(String key, Object value) {
 public void removeAttribute(String key) {
 	
 	HttpSession sess = null;
-	if( ss instanceof DefaultServletService){
+	if( use_session && ss instanceof DefaultServletService){
 		sess = ((DefaultServletService)ss).getSession();
 	}
 	if( sess != null ){
@@ -143,7 +147,7 @@ public void removeAttribute(String key) {
 public Object getAttribute(String key) {
 	
 	HttpSession sess = null;
-	if( ss instanceof DefaultServletService){
+	if( use_session && ss instanceof DefaultServletService){
 		sess = ((DefaultServletService)ss).getSession();
 	}
 	if( sess != null ){
@@ -195,6 +199,9 @@ public void clearCurrentPerson() {
 	
 	super.clearCurrentPerson();
 	force_no_person=true;
+	if( ! use_session) {
+		return;
+	}
 	try{
 		WtmpManager man = getWtmpManager();
 		if( man != null ){
@@ -458,6 +465,10 @@ public PersonRelationship<A> getPersonRelationship(){
 public boolean isSU(){
 	Object super_person = getAttribute(SUPER_PERSON_ID_ATTR);
 	return super_person != null;
+}
+
+public void setUseSession(boolean use) {
+	use_session=use;
 }
 
 @Override

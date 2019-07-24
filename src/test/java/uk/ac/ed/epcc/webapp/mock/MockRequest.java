@@ -315,7 +315,7 @@ public class MockRequest implements HttpServletRequest {
 	@Override
 	public int getLocalPort() {
 		
-		return 0;
+		return 443;
 	}
 
 	@Override
@@ -373,7 +373,7 @@ public class MockRequest implements HttpServletRequest {
 	@Override
 	public String getProtocol() {
 		
-		return null;
+		return "https";
 	}
 
 	@Override
