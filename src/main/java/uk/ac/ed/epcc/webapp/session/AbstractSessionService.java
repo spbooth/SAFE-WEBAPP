@@ -1147,6 +1147,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 * <li> <em>factory-tag</em> un-modified role from factory or {@link Composite}.</li>
 	 * <li> The tag of a {@link RelationshipProvider} for the target.</li>
 	 * <li> The tag of a {@link AccessRoleProvider}</li>
+	 * <li> The tag of a {@link NamedFilterProvider} for the target.</li>
 	 * </ul>
 	 * 
 	 * A role prefixed by <b>!</b> negates the filter

@@ -33,6 +33,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider;
+import uk.ac.ed.epcc.webapp.servlet.LoginServlet;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
@@ -85,7 +86,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 			if( sess instanceof ServletSessionService) {
 				((ServletSessionService)sess).su(target);
 			}
-			return new RedirectResult("/main.jsp");
+			return new RedirectResult(LoginServlet.getMainPage(c));
 		}
 		
 	}

@@ -63,6 +63,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.transition.SimpleTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
+import uk.ac.ed.epcc.webapp.servlet.LoginServlet;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -350,7 +351,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 			try {
 				target.commit();
 			} catch (DataFault e1) {
-				throw new ActionException("Error performaing update", e1);
+				throw new ActionException("Error performing update", e1);
 			}
 			Object owner;
 			try {
@@ -362,7 +363,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 			// redirect back to parent query page
 			   return ((Viewable) owner).getViewTransition();
 			}else{
-				return new RedirectResult("/main.jsp");
+				return new RedirectResult(LoginServlet.getMainPage(target.getContext()));
 			}
 		}
 

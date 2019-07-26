@@ -16,7 +16,7 @@ package uk.ac.ed.epcc.webapp.model.data.forms.registry;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 
-/**
+/** Interface for factories that add additional summary content to the standard edit forms
  * @author spb
  *
  */

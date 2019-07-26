@@ -25,10 +25,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
  * This is usually implemented by a {@link DataObjectFactory} or {@link Composite}
  * and is intended to build a {@link Map} of attributes that provide summary information about
  * the target object.
- * These will usually be added to a {@link Table} so the data should be of a
- * type that can be displayed by {@link Table}s
  * 
- * The keys should be display text.
  * 
  * @see MetaDataContributer
  * @author spb
@@ -37,6 +34,11 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 public interface SummaryContributer<T extends DataObject> {
 
 	/** Add to the set of attributes.
+	 * 
+	 * These will usually be added to a {@link Table} so the data should be of a
+	 * type that can be displayed by {@link Table}s
+	 * 
+	 * The keys should be display text.
 	 * 
 	 * @param attributes
 	 * @param target
