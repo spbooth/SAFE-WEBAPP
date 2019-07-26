@@ -266,33 +266,35 @@ public A getSuperPerson(){
 public void setCurrentPerson(A person) {
 	
 	setCurrentPersonNoWtmp(person);
-	try {
-		WtmpManager man = getWtmpManager();
-		if( man != null ){
+	if( use_session) {
+		try {
+			WtmpManager man = getWtmpManager();
+			if( man != null ){
 
 
-			Integer id = (Integer) getAttribute(WTMP_ID);
-			if( id != null ){
-				Wtmp w = man.find(id);
-				w.logout();
+				Integer id = (Integer) getAttribute(WTMP_ID);
+				if( id != null ){
+					Wtmp w = man.find(id);
+					w.logout();
+				}
+
+				if( request != null){
+					AppUser real = getSuperPerson();
+					Wtmp w = man.create(person, real,request);
+					setCrossCookie(man, w);
+					setAttribute(WTMP_ID, w.getID());
+					setAttribute(WTMP_EXPIRY_DATE, w.getEndTime());
+				}
 			}
-			
-			if( request != null){
-				AppUser real = getSuperPerson();
-				Wtmp w = man.create(person, real,request);
-				setCrossCookie(man, w);
-				setAttribute(WTMP_ID, w.getID());
-				setAttribute(WTMP_EXPIRY_DATE, w.getEndTime());
-			}
+		} catch (DataException e) {
+			getContext().error(e,"Error setting wtmp");
+			removeAttribute(WTMP_EXPIRY_DATE);
+			removeAttribute(WTMP_ID);
 		}
-	} catch (DataException e) {
-		getContext().error(e,"Error setting wtmp");
-		removeAttribute(WTMP_EXPIRY_DATE);
-		removeAttribute(WTMP_ID);
+		// Store name as an attribute.We don't use this
+		// but it helps to identify users from the tomcat manager app.
+		setAttribute(NAME_ATTR, person.getName());
 	}
-	// Store name as an attribute.We don't use this
-	// but it helps to identify users from the tomcat manager app.
-	setAttribute(NAME_ATTR, person.getName());
 }
 
 /**
