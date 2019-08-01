@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.html.ErrorFormResult;
+import uk.ac.ed.epcc.webapp.forms.html.ExternalRedirectResult;
 import uk.ac.ed.epcc.webapp.forms.html.ForwardResult;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
@@ -109,7 +110,10 @@ public class ServletFormResultVisitor implements WebFormResultVisitor{
 		conn.getService(ServletService.class).redirect(red.getURL());
 		
 	}
-	
+	public void visitExternalRedirectResult(ExternalRedirectResult red) throws IOException {
+		conn.getService(ServletService.class).redirect(red.getRedirect());
+		
+	}
 	public <T, K> void visitConfirmTransitionResult(
 			ConfirmTransitionResult<T, K> res) throws Exception {
 		req.setAttribute(WebappServlet.CONFIRM_POST_URL, req.getContextPath()+TransitionServlet.getURL(conn, res.getProvider(),res.getTarget(),res.getTransition()));

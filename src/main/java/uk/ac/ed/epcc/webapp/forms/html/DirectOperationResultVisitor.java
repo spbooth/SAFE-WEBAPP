@@ -130,7 +130,11 @@ public class DirectOperationResultVisitor implements WebFormResultVisitor {
 		final_result=res;
 
 	}
+	@Override
+	public void visitExternalRedirectResult(ExternalRedirectResult res) throws Exception {
+		final_result=res;
 
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.html.WebFormResultVisitor#visitErrorFormResult(uk.ac.ed.epcc.webapp.forms.html.ErrorFormResult)
 	 */

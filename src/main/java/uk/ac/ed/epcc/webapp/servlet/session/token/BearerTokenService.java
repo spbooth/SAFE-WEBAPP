@@ -114,5 +114,9 @@ public interface BearerTokenService extends AppContextService<BearerTokenService
 	 */
 	public String getToken();
 	
+	public default boolean hasToken() {
+		return getToken() != null;
+	}
+	
 	
 }

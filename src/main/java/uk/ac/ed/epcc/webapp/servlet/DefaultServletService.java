@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.servlet;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
@@ -235,6 +236,12 @@ public class DefaultServletService implements ServletService{
     	}
     }
    
+    public void redirect(URI url) throws IOException {
+    	conn.getService(LoggerService.class).getLogger(getClass()).debug("redirect to "+url);
+    	if( req instanceof HttpServletRequest && res instanceof HttpServletResponse){
+    		((HttpServletResponse)res).sendRedirect(url.toASCIIString());
+    	}
+    }
 
     public void message(String message, Object ... args) throws IOException, ServletException {
     	if( req instanceof HttpServletRequest && res instanceof HttpServletResponse){

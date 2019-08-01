@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.servlet;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -74,6 +75,13 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 */
     public void redirect(String url) throws IOException ;
    
+    /** Redirect to an external URI
+     * 
+     * This is intended for external URLs so session is never encoded
+     * 
+     * @param uri
+     */
+    public void redirect(URI uri) throws IOException;
 	
 	/**
 	 * Extract a Map of the request parameters from the request. This is made a
