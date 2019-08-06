@@ -5,7 +5,7 @@
 <PasswordStatus type='String' nullable='false' max='1'/>
 <Salt type='String' nullable='false' max='16'/>
 <Alg type='Integer' nullable='false'/>
-<Password type='String' nullable='false' max='32'/>
+<Password type='String' nullable='false' max='64'/>
 <WebName type='String' nullable='true' max='128'/>
 <SignupDate type='Long' nullable='true'/>
 <Email_index type='Index' unique='true'><Column name='Email'/></Email_index>
@@ -16,7 +16,7 @@
 <PasswordFails>0</PasswordFails>
 <PasswordStatus>V</PasswordStatus>
 <Salt>abcdefghijklmnop</Salt>
-<Alg>0</Alg>
+<Alg>2</Alg>
 <Password>f37588aa6f7cca950347968cbcdc32c8</Password>
 </Person>
 <TableSpecification name='Properties'>

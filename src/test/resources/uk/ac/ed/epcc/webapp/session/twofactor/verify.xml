@@ -5,7 +5,7 @@
 <PasswordStatus type='String' nullable='false' max='1'/>
 <Salt type='String' nullable='false' max='16'/>
 <Alg type='Integer' nullable='false'/>
-<Password type='String' nullable='false' max='32'/>
+<Password type='String' nullable='false' max='64'/>
 <AuthCodeSecret type='String' nullable='true' max='32'/>
 <Email_index type='Index' unique='true'><Column name='Email'/></Email_index>
 </TableSpecification>
@@ -14,7 +14,7 @@
 <PasswordFails>0</PasswordFails>
 <PasswordStatus>I</PasswordStatus>
 <Salt></Salt>
-<Alg>0</Alg>
+<Alg>2</Alg>
 <Password>locked</Password>
 <AuthCodeSecret>UJ4SLJJPNPXVGIPLXDTQUGVKNI======</AuthCodeSecret>
 </Person>

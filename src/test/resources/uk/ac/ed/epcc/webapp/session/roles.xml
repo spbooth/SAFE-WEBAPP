@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><Diff>
 <Person id="1">
-<Alg>0</Alg>
+<Alg>2</Alg>
 <Email>fred@example.com</Email>
 <Password>FakePassword</Password>
 <PasswordFails>0</PasswordFails>
@@ -8,7 +8,7 @@
 <Salt>FakeSalt</Salt>
 </Person>
 <Person id="2">
-<Alg>0</Alg>
+<Alg>2</Alg>
 <Email>bill@example.com</Email>
 <Password>FakePassword</Password>
 <PasswordFails>0</PasswordFails>
@@ -33,7 +33,7 @@
 <Email_index type="Index" unique="true">
 <Column name="Email"/>
 </Email_index>
-<Password type="String" nullable="false" max="32"/>
+<Password type="String" nullable="false" max="64"/>
 <PasswordFails type="Integer" nullable="false"/>
 <PasswordStatus type="String" nullable="false" max="1"/>
 <Salt type="String" nullable="false" max="16"/>

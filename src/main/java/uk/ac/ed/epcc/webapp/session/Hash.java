@@ -30,10 +30,7 @@ public enum Hash{
 	
 	MD5{
 
-		@Override
-		public boolean enableByDefault() {
-			return true;
-		}
+		
 	
 	},
 	SHA1{
@@ -43,6 +40,10 @@ public enum Hash{
 		}
 	},
 	SHA256{
+		@Override
+		public boolean enableByDefault() {
+			return true;
+		}
 		public String toString(){
 			return "SHA-256";
 		}
@@ -104,6 +105,6 @@ public enum Hash{
 	}
 	
 	public static Hash getDefault(AppContext c){
-		return c.getEnumParameter(Hash.class, "password.hash",MD5);
+		return c.getEnumParameter(Hash.class, "password.hash",SHA256);
 	}
 }
