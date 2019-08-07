@@ -136,7 +136,16 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * 
 	 */
 	public <A extends AppUser> void requestAuthentication(SessionService<A> sess) throws IOException, ServletException;
-	
+	/** Go to the login page to request a login.
+	 * 
+	 * @param <A>
+	 * @param sess {@link SessionService}
+	 * @param page  page to return to
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	public <A extends AppUser> void requestLogin(SessionService<A> sess, String page)
+			throws IOException, ServletException;
 	/** Return the default charset we want to use.
 	 * 
 	 * @return

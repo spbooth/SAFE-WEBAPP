@@ -522,20 +522,27 @@ public class DefaultServletService implements ServletService{
 			warn("No webname when required");
 			message( "access_denied", (Object[])null);
 		}else{
-			// standard login page supports both custom password login and self-register for external-auth
-			// If built_in login is off we might change the login page to an external auth servlet url.
-			String login_page=LoginServlet.getLoginPage(conn);
-			// Need to remember page and redirect to login
 			String page = encodePage();
-			if( page !=null&& ! page.isEmpty()) {
-				sess.setAttribute(LoginServlet.INITIAL_PAGE_ATTR, new RedirectResult(page));
-			}
-			if( external_via_login || REDIRECT_TO_LOGIN_FEATURE.isEnabled(getContext()) || ! LoginServlet.BUILT_IN_LOGIN.isEnabled(getContext())) {
-				
-				redirect(login_page);
-			}else {
-				forward(login_page);
-			}
+			requestLogin(sess, page);
+		}
+	}
+
+
+	public <A extends AppUser> void requestLogin(SessionService<A> sess, String page)
+			throws IOException, ServletException {
+		// standard login page supports both custom password login and self-register for external-auth
+		// If built_in login is off we might change the login page to an external auth servlet url.
+		String login_page=LoginServlet.getLoginPage(getContext());
+		// Need to remember page and redirect to login
+		
+		if( page !=null&& ! page.isEmpty()) {
+			sess.setAttribute(LoginServlet.INITIAL_PAGE_ATTR, new RedirectResult(page));
+		}
+		if( EXTERNAL_AUTH_VIA_LOGIN_FEATURE.isEnabled(getContext()) || REDIRECT_TO_LOGIN_FEATURE.isEnabled(getContext()) || ! LoginServlet.BUILT_IN_LOGIN.isEnabled(getContext())) {
+			
+			redirect(login_page);
+		}else {
+			forward(login_page);
 		}
 	}
 
