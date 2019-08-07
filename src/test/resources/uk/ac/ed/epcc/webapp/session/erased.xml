@@ -1,5 +1,6 @@
 <Diff><Person id='1'>
 <Email null='true'/><Salt></Salt>
+<Alg>5</Alg>
 <Password>Locked</Password>
 <Firstname null='true'/><Lastname null='true'/><PublicKey></PublicKey>
 <PersonalCertificate></PersonalCertificate>

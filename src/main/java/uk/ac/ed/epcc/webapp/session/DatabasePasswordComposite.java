@@ -168,7 +168,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		public boolean accept(T o) {
 			Handler handler = getHandler(o);
 			Hash h = handler.getAlgorithm();
-			if( h == null){
+			if( h == null || h.equals(Hash.LOCKED)){
 				getLogger().error("No hash algorithm for"+o.getIdentifier());
 				return false;
 			}
@@ -428,10 +428,13 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 				 * 
 				 * 
 				 */
-				public void setPassword(String new_password) throws DataFault {
+			 public void setPassword(String new_password) throws DataFault {
+				 setPassword(Hash.getDefault(getContext()), new_password);
+			 }
+				public void setPassword(Hash h,String new_password) throws DataFault {
 					String salt="";
 					AppContext conn = getContext();
-					Hash h = Hash.getDefault(conn);
+				
 					if( h == null ){
 						throw new DataFault("bad hash algorithm");
 					}
@@ -439,7 +442,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 					boolean use_salt = res.hasField(DatabasePasswordComposite.SALT);
 
 					if( use_salt ){
-						RandomService serv = getContext().getService(RandomService.class);
+						RandomService serv = conn.getService(RandomService.class);
 						salt=serv.randomString(res.getInfo(DatabasePasswordComposite.SALT).getMax());
 						if( DatabasePasswordComposite.SALT_FIRST_FEATURE.isEnabled(conn)){
 							new_password=salt+new_password;
@@ -624,8 +627,8 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 					if (v == DatabasePasswordComposite.INVALID || v == DatabasePasswordComposite.FIRST) {
 						return true;
 					}
-					if( CHANGE_OLD_HASH.isEnabled(getContext()) && ! getAlgorithm().isEnabled(getContext())) {
-						return false;
+					if( CHANGE_OLD_HASH.isEnabled(getContext()) && getAlgorithm().isDeprecated(getContext())) {
+						return true;
 					}
 					Date last_changed = getPasswordChanged();
 					if( last_changed != null ){
@@ -816,9 +819,15 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.session.PasswordAuthComposite#setPassword(uk.ac.ed.epcc.webapp.session.AppUser, java.lang.String)
 	 */
+	
 	@Override
 	public void setPassword(T user, String password) throws DataFault {
 		getHandler(user).setPassword(password);
+		
+	}
+	
+	public void setPassword(Hash h,T user, String password) throws DataFault {
+		getHandler(user).setPassword(h,password);
 		
 	}
 
@@ -893,7 +902,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	 */
 	@Override
 	public void lockPassword(T user) {
-		getHandler(user).setCryptPassword(Hash.getDefault(getContext()),"", "Locked");
+		getHandler(user).setCryptPassword(Hash.LOCKED,"", "Locked");
 	}
 
 	@Override

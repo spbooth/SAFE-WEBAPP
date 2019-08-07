@@ -27,6 +27,8 @@ import org.junit.Test;
 import uk.ac.ed.epcc.webapp.TestTimeService;
 import uk.ac.ed.epcc.webapp.email.MockTansport;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
@@ -37,6 +39,7 @@ import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.AppUserTransitionProvider;
 import uk.ac.ed.epcc.webapp.session.DatabasePasswordComposite;
+import uk.ac.ed.epcc.webapp.session.Hash;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
 import uk.ac.ed.epcc.webapp.session.RequiredPage;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -78,6 +81,36 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		assertEquals(1,pages.size());
 		RequiredPage page = pages.iterator().next();
 		assertFalse(page.required(sess));
+		
+	}
+	
+	@Test
+	public void testLoginOldAlg() throws DataFault, ServletException, IOException{
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		if( ! (composite instanceof DatabasePasswordComposite)) {
+			return;
+		}
+		user.setEmail("fred@example.com");
+		((DatabasePasswordComposite)composite).setPassword(Hash.MD5,user,"FredIsDead");
+		user.commit();
+		
+		
+		addParam("username", "fred@example.com");
+		addParam("password", "FredIsDead");
+		doPost();
+		loginRedirects();
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		assertTrue(sess.haveCurrentUser());
+		
+		Set<RequiredPage<A>> pages = fac.getRequiredPages();
+		assertEquals(1,pages.size());
+		RequiredPage page = pages.iterator().next();
+		assertTrue(page.required(sess));
+		FormResult res = page.getPage(sess);
+		assertTrue( res instanceof ChainedTransitionResult);
+		assertEquals(PasswordAuthComposite.CHANGE_PASSWORD,((ChainedTransitionResult)res).getTransition());
 		
 	}
 	
