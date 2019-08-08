@@ -45,6 +45,8 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
+import uk.ac.ed.epcc.webapp.servlet.WebappServlet;
+
 import java.util.Hashtable;
 import java.util.Iterator;
 
@@ -144,7 +146,7 @@ public class MockRequest implements HttpServletRequest {
 				}
 				sb.append(e.getKey());
 				sb.append("=");
-				sb.append(e.getValue().toString());
+				sb.append(WebappServlet.encodeCGI(e.getValue().toString()));
 			}
 			return sb.toString();
 		}
