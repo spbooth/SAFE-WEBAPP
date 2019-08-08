@@ -589,6 +589,7 @@ public class DefaultServletService implements ServletService{
 								l.authenticated(remote_auth_realm,person);
 							}
 							person.commit();
+							person.historyUpdate();
 							if( factory.mustRegister(person)){
 								// don't populate session this will trigger redirect to
 								// the registration page

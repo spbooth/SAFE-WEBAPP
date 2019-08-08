@@ -212,6 +212,7 @@ public class RemoteAuthServlet extends WebappServlet {
 						l.authenticated(remote_auth_realm,person);
 					}
 					person.commit();
+					person.historyUpdate();
 				// attempt a login
 					TwoFactorHandler handler = new TwoFactorHandler<>(session_service);
 					RedirectResult next_page = (RedirectResult) session_service.getAttribute(LoginServlet.INITIAL_PAGE_ATTR);
