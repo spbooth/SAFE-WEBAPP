@@ -8,6 +8,7 @@
 <td>
 <select id="transition_table" name="table" class="input" required="required">
 <option value="Person">Person: AppUserFactory</option>
+<option value="PersonHistory">PersonHistory: PersonHistoryFactory</option>
 <option value="TableTest">TableTest: TableStructureTestFactory</option>
 <option value="Test">Test: Factory</option>
 <option value="Test2">Test2: Factory</option>
