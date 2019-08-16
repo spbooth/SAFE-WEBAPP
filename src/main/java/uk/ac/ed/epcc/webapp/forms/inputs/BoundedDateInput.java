@@ -29,7 +29,7 @@ public interface BoundedDateInput extends ParseInput<Date>, BoundedInput<Date> {
 	
 	public static BoundedDateInput getInstance(AppContext conn,long resolution,int finest_field) {
 		if( USE_DATE_INPUT.isEnabled(conn) && finest_field == Calendar.DAY_OF_MONTH) {
-			return new DateInput();
+			return new RelativeDateInput();
 		}
 		return new TimeStampMultiInput(resolution, finest_field);
 	}
