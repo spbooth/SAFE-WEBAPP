@@ -16,8 +16,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import java.util.Calendar;
 import java.util.Date;
 
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.time.CalendarFieldSplitPeriod;
 
  
@@ -45,26 +44,29 @@ import uk.ac.ed.epcc.webapp.time.CalendarFieldSplitPeriod;
 
 public class CalendarFieldPeriodInput extends MultiInput<CalendarFieldSplitPeriod, Input> {
 
-	private final TimeStampMultiInput start;
+	private final BoundedDateInput start;
 	private final Input<Integer> count;
 	private final CalendarFieldInput field;
 	private final IntegerInput splits;
-	public CalendarFieldPeriodInput(){
-		this(Calendar.SECOND);
+	public static CalendarFieldPeriodInput getInstance(AppContext conn){
+		return getInstance(conn,Calendar.SECOND);
 	}
-	public CalendarFieldPeriodInput(Date now){
-		this(now,Calendar.SECOND);
+	public static CalendarFieldPeriodInput getInstance(AppContext conn,Date now){
+		return getInstance(conn,now,Calendar.SECOND);
 	}
-	public CalendarFieldPeriodInput(int finest_field){
-		this(finest_field,0);
+	public static CalendarFieldPeriodInput getInstance(AppContext conn,int finest_field){
+		return getInstance(conn,finest_field,0);
 	}
-	public CalendarFieldPeriodInput(Date now,int finest_field){
-		this(now,finest_field,0);
+	public static CalendarFieldPeriodInput getInstance(AppContext conn,Date now,int finest_field){
+		return getInstance(conn,now,finest_field,0);
 	}
-	public CalendarFieldPeriodInput(int finest_field, int fixed_blocks){
-		this(null,finest_field,fixed_blocks);
+	public static CalendarFieldPeriodInput getInstance(AppContext conn,int finest_field, int fixed_blocks){
+		return getInstance(conn,null,finest_field,fixed_blocks);
 	}
-	public CalendarFieldPeriodInput(Date now,int finest_field, int fixed_blocks){
+	public static CalendarFieldPeriodInput getInstance(AppContext conn,Date now,int finest_field, int fixed_blocks) {
+		return new CalendarFieldPeriodInput(BoundedDateInput.getInstance(conn, finest_field),now, finest_field, fixed_blocks);
+	}
+	private CalendarFieldPeriodInput(BoundedDateInput date_input,Date now,int finest_field, int fixed_blocks){
 		Calendar cal = Calendar.getInstance();
 		if( now != null) {
 			cal.setTime(now);
@@ -75,7 +77,7 @@ public class CalendarFieldPeriodInput extends MultiInput<CalendarFieldSplitPerio
 		cal.set(Calendar.HOUR_OF_DAY, 0);
 		cal.set(Calendar.DAY_OF_MONTH, 1);
 		cal.add(Calendar.MONTH, -1);
-		start = new TimeStampMultiInput(1000L,finest_field);
+		start = date_input;
 		start.setValue(cal.getTime());
 		IntegerInput bare = new IntegerInput();
 		bare.setMin(1);

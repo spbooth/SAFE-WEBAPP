@@ -19,11 +19,12 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import java.util.Date;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
 
 
 
 public class RangeDateInput extends DateInput {
-    
+
     public RangeDateInput(Date start,Date end){
     	setMin(start);
     	setMax(end);
