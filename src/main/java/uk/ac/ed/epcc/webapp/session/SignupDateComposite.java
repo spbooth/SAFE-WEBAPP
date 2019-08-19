@@ -111,5 +111,10 @@ public class SignupDateComposite<BDO extends DataObject> extends CreateComposite
 		}
 	}
 
-	
+	public SQLFilter<BDO> signupBeforeFilter(Date d){
+		if( getRepository().hasField(SIGNUP_DATE)) {
+			return new SQLValueFilter<BDO>(getFactory().getTarget(), getRepository(), SIGNUP_DATE,MatchCondition.LT, d);
+		}
+		return null;
+	}
 }
