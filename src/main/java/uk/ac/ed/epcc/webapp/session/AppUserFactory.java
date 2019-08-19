@@ -1081,6 +1081,7 @@ AnonymisingFactory
 				PersonHistoryFactory<AU> fac = new PersonHistoryFactory<>(this);
 				fac.wipe(p, fields);
 				fac.update(p);
+				fac.terminate(p);
 			} catch (Exception e) {
 				conn.error(e, "Error updating PersonHistory");
 				return;
@@ -1088,7 +1089,5 @@ AnonymisingFactory
 		}
 		
 	}
-	public SQLFilter<AU> getEraseCandidates(){
-		return new GenericBinaryFilter<>(getTarget(), true);
-	}
+	
 }
