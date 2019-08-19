@@ -6,6 +6,7 @@
 <PersonalCertificate></PersonalCertificate>
 </Person>
 <PersonHistory id='1'>
+<EndTime>1234567890</EndTime>
 <Email null='true'/><Firstname null='true'/><Lastname null='true'/></PersonHistory>
 <Person id='2'>
 <Email>bill@example.com</Email>
