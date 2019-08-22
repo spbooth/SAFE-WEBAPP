@@ -17,7 +17,6 @@ import java.util.Iterator;
 
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
-import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /** An {@link InputVisitor} that detects any input that  is impossible to validate
@@ -82,9 +81,10 @@ public class CanSubmitVisistor implements InputVisitor<Boolean> {
 	 */
 	@Override
 	public Boolean visitLengthInput(LengthInput input) throws Exception {
-		if( input.getMaxResultLength() < 1) {
-			return false;
-		}
+		// A max length of zero or less implies no limit
+//		if( input.getMaxResultLength() < 1) {
+//			return false;
+//		}
 		if( input instanceof RangedInput) {
 			RangedInput<?> r = (RangedInput<?>)input;
 			Number min = r.getMin();

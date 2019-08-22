@@ -26,6 +26,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 public interface LengthInput<T> extends ParseInput<T>{
 	/**
 	 * Get the input length for this Parameter as a text box.
+	 * A value of zero or less implies no limit
 	 * 
 	 * @return int input length
 	 */
@@ -41,6 +42,8 @@ public interface LengthInput<T> extends ParseInput<T>{
 	/**
 	 * set the input length for this parameter as a text box.
 	 * This is the maximum allowed length of the result string.
+	 * A value of zero or less implies no limit
+	 * 
 	 * 
 	 * @param l
 	 *            int input_length
