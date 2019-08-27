@@ -215,6 +215,8 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 		//page = it.next();
 		assertTrue(page.getClass().getCanonicalName(),page instanceof UpdatePersonRequiredPage);
 		assertTrue(page.required(sess));
+		String return_page = "/noddy.jsp";
+		sess.setAttribute(RequiredPage.REQUIRED_PAGE_RETURN_ATTR, return_page);
 		FormResult result = page.getPage(sess);
 		setTransition((ChainedTransitionResult) result);
 		// This is actually an empty form as no user settable details configured
@@ -228,11 +230,15 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 				"f4g8MiBuLGcezzi310RwKMFnamr6MTbA3KBvgvFrPmsjVyedn1IyMdgQ0x8OZMQbr6hesvnR8HuKYfFt\n"+
 				"m4Vjx7bS+Dyqn+PlPrWH/fjs1957fe57gtZ9eM2S0lsv5cagcWghPAZP rsa-key-20110308");
 		runTransition();
-		AppUserTransitionProvider<A> provider = AppUserTransitionProvider.getInstance(getContext());
-		if( provider != null) {
-			checkViewRedirect(provider, user);
-		}else{
-			checkMessage("object_updated");
+		if( return_page != null ) {
+			checkRedirect(return_page);
+		}else {
+			AppUserTransitionProvider<A> provider = AppUserTransitionProvider.getInstance(getContext());
+			if( provider != null) {
+				checkViewRedirect(provider, user);
+			}else{
+				checkMessage("object_updated");
+			}
 		}
 		checkDiff("/cleanup.xsl", "details.xml");
 	}

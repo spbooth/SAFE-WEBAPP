@@ -15,13 +15,14 @@
 <%@page import="uk.ac.ed.epcc.webapp.servlet.session.*" %>
 <%@page import="uk.ac.ed.epcc.webapp.forms.result.FormResult" %>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.ServletFormResultVisitor" %>
+<%@page import="uk.ac.ed.epcc.webapp.servlet.ServletService" %>
 <%@page import="uk.ac.ed.epcc.webapp.session.RequiredPage" %>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService" %>
 <% 
     //  fragment to check for required pages. include from session
     try{
-        if( request.getAttribute("AmRequiredPage") == null){
-    		Object skip=session.getAttribute("RequiredPages");
+        if( request.getAttribute(RequiredPage.AM_REQUIRED_PAGE_ATTR) == null){
+    		Object skip=session.getAttribute(RequiredPage.REQUIRED_PAGES_ATTR);
     		if( session_service != null && session_service.haveCurrentUser() && skip==null && ! ((ServletSessionService) session_service).isSU() ){
     			AppUserFactory<?> fac = session_service.getLoginFactory();
     			for(RequiredPage p : fac.getRequiredPages() ){
@@ -29,14 +30,15 @@
     					ServletFormResultVisitor vis = new ServletFormResultVisitor(conn, request, response);
     					FormResult form_result = p.getPage(session_service);
     					// we are displaying a required page.
+    					session_service.setAttribute(RequiredPage.REQUIRED_PAGE_RETURN_ATTR, conn.getService(ServletService.class).encodePage());
     					request.setAttribute(NavigationMenuService.DISABLE_NAVIGATION_ATTR, Boolean.TRUE);
-    					request.setAttribute("AmRequiredPage",Boolean.TRUE);
+    					request.setAttribute(RequiredPage.AM_REQUIRED_PAGE_ATTR,Boolean.TRUE);
     					form_result.accept(vis);
    		        		return;
     				}
     			}
     			// all checks passed cache for session
-    			session.setAttribute("RequiredPages","done");
+    			session.setAttribute(RequiredPage.REQUIRED_PAGES_ATTR,"done");
     		}
     	}
     }catch(Exception e){

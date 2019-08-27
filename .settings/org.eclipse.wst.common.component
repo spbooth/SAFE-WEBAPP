@@ -2,7 +2,6 @@
     <wb-module deploy-name="WEBAPP-JAR">
         <wb-resource deploy-path="/" source-path="/src/main/java"/>
         <wb-resource deploy-path="/" source-path="/src/main/resources" tag="defaultRootSource"/>
-        <wb-resource deploy-path="/META-INF" source-path="/src/main/resources/META-INF"/>
         <wb-resource deploy-path="/" source-path="/src/main/resources/META-INF/resources"/>
     </wb-module>
 </project-modules>

@@ -175,6 +175,8 @@ public class DefaultServletService implements ServletService{
 		return res;
 
 	}
+    
+	private String page = null;
 	/** request page when ServletAppContext was created. 
 	 * This uses a cached request object because the request URL will be
 	 * re-written if the request is forwarded to a different servlet/jsp.
@@ -182,8 +184,12 @@ public class DefaultServletService implements ServletService{
 	 * @return String URL
 	 */
     public String encodePage(){
+    	if( page != null ) {
+    		return page;
+    	}
     	if( req != null && req instanceof HttpServletRequest){
-    		return encodePage((HttpServletRequest) req);
+    		page = encodePage((HttpServletRequest) req);
+    		return page;
     	}
     	return "";
     }

@@ -398,6 +398,13 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 					}
 				}
 			}
+			// This  might be a required page update
+			SessionService sess = getContext().getService(SessionService.class);
+			String return_url = (String) sess.getAttribute(RequiredPage.REQUIRED_PAGE_RETURN_ATTR);
+			if( return_url != null && ! return_url.isEmpty()) {
+				sess.removeAttribute(RequiredPage.REQUIRED_PAGE_RETURN_ATTR);
+				return new RedirectResult(return_url);
+			}
 			return new MessageResult("password_changed");
 		}
     	
