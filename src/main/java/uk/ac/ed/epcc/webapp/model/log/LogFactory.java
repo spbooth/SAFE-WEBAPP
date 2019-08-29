@@ -297,11 +297,11 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		}
 
 		/**
-		 * set the ID of the date entry in the data table.
+		 * set the ID of the link item entry in the data table.
 		 * 
 		 * @param id
 		 */
-		private final void setLinkID(int id) {
+		protected final void setLinkID(int id) {
 			record.setProperty(LINK_ID, id);
 		}
 
