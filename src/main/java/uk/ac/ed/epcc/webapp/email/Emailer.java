@@ -58,6 +58,7 @@ import javax.mail.internet.MimeMultipart;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CleanupService;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
@@ -548,7 +549,8 @@ public class Emailer {
 			}
 
 			// make sure send date is right as many mail clients sort by sent date.
-			m.setSentDate(new Date());
+			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+			m.setSentDate(time.getCurrentTime());
 			m.saveChanges();
 			SignMailVisitor vis = getContext().makeObjectWithDefault(SignMailVisitor.class, null, MAIL_SIGNER);
 			if( vis != null ){
@@ -824,7 +826,8 @@ public class Emailer {
 		m.addHeader("X-Helpdesk", "Saf");
 		m.addHeader("X-Saf-service", conn.getInitParameter("service.name"));
 		log.debug("made message to "+text_recip+" Subject:"+subject);
-		m.setSentDate(new Date()); // default can override
+		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+		m.setSentDate(time.getCurrentTime()); // default can override
 		return m;
 	}
 
@@ -1108,7 +1111,8 @@ public class Emailer {
 
 			// Show current date and time
 			DateFormat df = DateFormat.getDateTimeInstance();
-			errorEmail.setProperty("date", df.format(new java.util.Date()));
+			CurrentTimeService time = conn.getService(CurrentTimeService.class);
+			errorEmail.setProperty("date", df.format(time.getCurrentTime()));
 			if (props != null) {
 				errorEmail.setProperties(props);
 			}

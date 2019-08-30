@@ -68,6 +68,7 @@ public class Dumper extends AbstractContexed{
 	public static final String STRING_TYPE = "String";
 	public static final String BLOB_TYPE ="Blob";
 	public static final String INDEX_TYPE="Index";
+	public static final String FULLTEXT_INDEX_TYPE="FullTextIndex";
 	public static final String REFERENCE_ATTR = "reference";
 	public static final String DEFAULT_ATTR ="default"; // This can't be generated easily but this is the attribute the parser understands
 	public static final String TYPE_ATTR = "type";

@@ -38,6 +38,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.IdMode;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
@@ -76,7 +77,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 	private StringBuilder sb = new StringBuilder();
 	private String table_name;
 	private TableSpecification spec;
-	private Index index;
+	private IndexType index;
 	private boolean preserve_ids=true;
 	private final Map<String,Map<Integer,Integer>> id_map;
 	//DataBaseHandlerService serv;
@@ -315,7 +316,11 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 				boolean unique = arg3.getValue(Dumper.UNIQUE_ATTR).equalsIgnoreCase("true");
 				state = State.SchemaIndex;
 				try {
-					index = spec.new Index(name, unique);
+					if(getContext().getBooleanParameter("dump."+table_name+"."+name+".fulltext", false)) {
+						index = spec.new FullTextIndex(name);
+					}else {
+						index = spec.new Index(name, unique);
+					}
 				} catch (InvalidArgument e) {
 					getLogger().error("Error making index", e);
 				}
