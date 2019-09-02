@@ -20,6 +20,7 @@ import java.util.List;
 
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.table.BlobType;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
@@ -93,7 +94,8 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 		if( res.hasField(EXPIRES_FIELD)){
 			FilterDelete<D> del = new FilterDelete<>(res);
 			try {
-				del.delete(new SQLValueFilter<>(getTarget(),res, EXPIRES_FIELD,MatchCondition.LT, new Date()));
+				CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+				del.delete(new SQLValueFilter<>(getTarget(),res, EXPIRES_FIELD,MatchCondition.LT, time.getCurrentTime()));
 			} catch (DataFault e) {
 				getContext().error(e,"Error deleting old data");
 			}

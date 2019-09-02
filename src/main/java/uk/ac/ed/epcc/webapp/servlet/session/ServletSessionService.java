@@ -174,7 +174,8 @@ protected A lookupPerson() {
 			try{
 				WtmpManager man = getWtmpManager();
 				if( man != null ){
-					Date now = new Date();
+					CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+					Date now = time.getCurrentTime();
 					if( d.before(now)){
 						Integer id = (Integer) getAttribute(WTMP_ID);
 						if( id != null ){

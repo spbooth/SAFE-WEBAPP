@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
@@ -86,7 +87,8 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 		TimerService serv = conn.getService(TimerService.class);
 		if( serv != null ) serv.startTimer("Heartbeatlistener");
 		try{
-			last_call=new Date();
+			CurrentTimeService time = conn.getService(CurrentTimeService.class);
+			last_call=time.getCurrentTime();
 
 			String listeners = conn.getExpandedProperty("heartbeat.listeners");
 

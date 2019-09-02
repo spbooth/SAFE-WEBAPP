@@ -163,7 +163,8 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 		 * @throws DataFault
 		 */
 		public boolean update() throws DataFault {
-			Date n = new Date();
+			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+			Date n = time.getCurrentTime();
 			if (n.after(getEndTime())) {
 				setEndTime(new Date(n.getTime() + Window));
 				return commit();
@@ -209,7 +210,8 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 		  return spec;
 	  }
 	public Iterator getCurrent() throws DataFault {
-		return new FilterIterator(new DateFilter(new Date()));
+		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+		return new FilterIterator(new DateFilter(time.getCurrentTime()));
 	}
 
 	
@@ -226,7 +228,8 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 		w.setSuperPerson(real);
 		w.setHost(req.getRemoteHost());
 		w.setBrowser(req.getHeader("user-agent"));
-		Date s = new Date();
+		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+		Date s = time.getCurrentTime();
 		Date e = new Date(s.getTime() + Window);
 		w.setStartTime(s);
 		w.setEndTime(e);
