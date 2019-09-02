@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
@@ -85,7 +86,8 @@ public class SignupDateComposite<BDO extends DataObject> extends CreateComposite
 	 * @param dat
 	 */
 	public void markSignup(BDO dat) {
-		getRecord(dat).setOptionalProperty(SIGNUP_DATE, new Date());
+		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+		getRecord(dat).setOptionalProperty(SIGNUP_DATE, time.getCurrentTime());
 	}
 	/** clear the signup record.
 	 * 

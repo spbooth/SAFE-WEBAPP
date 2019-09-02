@@ -23,6 +23,7 @@ package uk.ac.ed.epcc.webapp.session;
 import java.util.Date;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -30,8 +31,6 @@ import uk.ac.ed.epcc.webapp.model.data.Owned;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.history.PersonHistoryFactory;
-import uk.ac.ed.epcc.webapp.model.lifecycle.ActionList;
-import uk.ac.ed.epcc.webapp.model.lifecycle.LifeCycleException;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
 
@@ -183,7 +182,8 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 		return record.getDateProperty(UPDATED_TIME);
 	}
 	public void markDetailsUpdated(){
-		record.setOptionalProperty(UPDATED_TIME, new Date());
+		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+		record.setOptionalProperty(UPDATED_TIME, time.getCurrentTime());
 	}
 	
 	

@@ -301,8 +301,8 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		 */
 		@Override
 		public final void terminate() {
-
-			setEndTime(new Date());
+			
+			setEndTime(now(getContext()));
 			setStatus(EXPIRED);
 		}
 
@@ -1098,7 +1098,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		// actually we won't trigger till the following transition but its still good 
 		// to do.
 		try {
-			expireSequence(null, new Date());
+			expireSequence(null, now(getContext()));
 		} catch (DataFault e) {
 			getLogger().error("Problem expiring records",e);
 		}
