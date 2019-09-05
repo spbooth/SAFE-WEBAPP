@@ -316,7 +316,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	private <T, X> void emitRadioButtonHTML(SimpleXMLBuilder hb,boolean use_post,
 			ListInput<X, T> input, String param, T current) {
 		String def = null;
-		if (use_post) {
+		if (use_post && param != null && ! param.isEmpty()) {
 			def = param;
 		} else {
 			X default_value = input.getValue();

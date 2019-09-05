@@ -51,7 +51,7 @@ public class HTMLForm extends BaseHTMLForm {
 	private static final String MISSING_FIELDS_TAG = "MissingFields";
 
 	private static final String ERRORS_TAG = "Errors";
-
+	private boolean need_form_url=true;
    
 
 	public HTMLForm(AppContext c) {
@@ -172,6 +172,9 @@ public class HTMLForm extends BaseHTMLForm {
 	}
 	
 
+	public void setNeedFormURL(boolean val) {
+		need_form_url=val;
+	}
 
 
 
@@ -188,7 +191,7 @@ public class HTMLForm extends BaseHTMLForm {
 		AppContext c = getContext();
 		Map<String,Object> params;
 		params = c.getService(ServletService.class).getParams();
-		if( req.getAttribute(FORM_URL_ATTR) == null ){
+		if( need_form_url && req.getAttribute(FORM_URL_ATTR) == null ){
 			// we won't be able to return to forms to show errors
 			// not a problem if parse succeeds but report it so it can be fixed
 			// create an Exception to generate a stack trace
