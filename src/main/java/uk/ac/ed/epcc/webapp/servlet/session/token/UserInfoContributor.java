@@ -13,13 +13,30 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet.session.token;
 
+import java.util.Map;
+
 import uk.ac.ed.epcc.webapp.model.DataContributor;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.session.AppUser;
 
 /** A {@link DataContributor} that adds data to the Oauth user info endpoint
+ * 
+ * 
+ * Add a {@link Scopes} annotation to set global access control. Fine grained control can be added by overriding 
+ * {@link #addMetaData(ScopeQuery, Map, AppUser)}
  * @author Stephen Booth
  *
  */
-public interface UserInfoContributor<T extends DataObject> extends DataContributor<T> {
+public interface UserInfoContributor<T extends AppUser> extends DataContributor<T> {
 
+	/** add metadata with fine grained access control
+	 * 
+	 * @param scopes   {@link ScopeQuery} representing the access permissions of the request.
+	 * @param attributes
+	 * @param target
+	 */
+	public default void addMetaData(ScopeQuery scopes, Map<String, Object> attributes, T target) {
+		// Default behaviour is to only do global access control
+		addMetaData(attributes, target);
+	}
+	
 }

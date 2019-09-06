@@ -17,7 +17,7 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 
-/**
+/** Base interface for composites that add attribute data about a domain object
  * @author Stephen Booth
  *
  * @param <T>
