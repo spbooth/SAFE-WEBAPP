@@ -42,6 +42,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdate;
+import uk.ac.ed.epcc.webapp.forms.inputs.CanSubmitVisistor;
 import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
@@ -407,15 +408,20 @@ AnonymisingFactory
 				
 				SessionService service = user.getContext().getService(SessionService.class);
 				u.buildUpdateForm("Person", f, user,service);
-				f.removeField(EmailNameFinder.EMAIL); // This should be locked and un-editable
 				if( ! service.hasRole(SessionService.ADMIN_ROLE)){
 					f.removeField(ALLOW_EMAIL_FIELD);
+				}
+				if( ! CanSubmitVisistor.canSubmit(f)) {
+					// As a safety check don't force a form that can't
+					// be submitted
+					getLogger().warn("User details form cannot be submitted for "+user.getIdentifier());
+					return false;
 				}
 				if( ! f.validate()){
 					return true;
 				}
 			} catch (Exception e) {
-				getContext().error(e,"Error checking for person update");
+				getLogger().error("Error checking for person update",e);
 			}
 
 			if( res.hasField(AppUser.UPDATED_TIME)){

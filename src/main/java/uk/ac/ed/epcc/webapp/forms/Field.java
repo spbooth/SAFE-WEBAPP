@@ -26,6 +26,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.LockedInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.UnmodifiableInput;
 
 /**
  * Field represents a single field in the form consisting of a label and and Input.
@@ -97,7 +98,7 @@ public final class Field<I> {
     	}
     }
     public boolean isLocked() {
-    	if( sel != null && sel instanceof LockedInput) {
+    	if( sel != null && sel instanceof UnmodifiableInput) {
     		return true;
     	}
     	return false;
