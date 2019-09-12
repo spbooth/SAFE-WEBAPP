@@ -16,8 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-
 /** An UnmodifiableInput that wraps an existing input showing the value of the wrapped input 
  * as Unmodifiable text in the form. 
  * 
