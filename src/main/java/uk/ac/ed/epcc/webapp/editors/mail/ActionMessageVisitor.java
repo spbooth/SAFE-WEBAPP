@@ -398,7 +398,7 @@ public class ActionMessageVisitor extends AbstractVisitor {
 			// preserve the previous type.
 			String type = parent.getContentType();
 			String string = wrapForEdit(new_text);
-			if( type.equals("text/plain")){
+			if( type.contains("text/plain")){
 				if( Emailer.needsEncoding(string)){
 					parent.setText(string, Emailer.DEFAULT_ENCODING);
 				}else{

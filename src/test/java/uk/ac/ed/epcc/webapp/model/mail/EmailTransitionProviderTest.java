@@ -179,6 +179,30 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		checkViewRedirect(prov,target);
 		target = (MailTarget) checkViewContent("/normalize.xsl","view_unicode_text.xml");
 		checkDiff("/cleanup.xsl","edit_text.xml");
+		target.getHandler().getMessageProvider().getMessage().writeTo(System.out);
+	}
+	
+	@Test
+	@DataBaseFixtures({"new_compose.xml","subject_edit.xml","add_recipient.xml"})
+	public void editMisBrokenText() throws Exception{
+		SessionService user  = setupPerson();
+		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
+		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
+		MessageHandler hand = fac.getHandler(1,user);
+		LinkedList<String> path = new LinkedList<>();
+		//path.add("0");
+		path.add("T");
+		MailTarget target = new MailTarget(hand,0,path);
+		takeBaseline();
+		setTransition(prov,EditAction.Edit,target);
+		checkFormContent("/normalize.xsl","edit_text_form.xml");
+		addParam("text","Look a strange \r\nline break and unicode \u00f6");
+		runTransition();
+		target = new MailTarget(fac.getHandler(1,user));
+		checkViewRedirect(prov,target);
+		target = (MailTarget) checkViewContent("/normalize.xsl","view_broken_text.xml");
+		checkDiff("/cleanup.xsl","edit_broken_text.xml");
+		target.getHandler().getMessageProvider().getMessage().writeTo(System.out);
 	}
 	@Test
 	@DataBaseFixtures({"new_compose.xml","subject_edit.xml","add_recipient.xml","edit_text.xml"})
