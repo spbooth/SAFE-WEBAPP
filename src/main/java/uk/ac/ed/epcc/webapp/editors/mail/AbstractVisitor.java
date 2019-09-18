@@ -43,9 +43,9 @@ import uk.ac.ed.epcc.webapp.editors.mail.MessageWalker.WalkerException;
 public class AbstractVisitor extends AbstractContexed implements Visitor {
 
 	/** Pattern for line breaks. Note this requires Java8
-	 * 
+	 * remove trailing normal spaces. Can't use \\s as this would match repeated newlines
 	 */
-	private static final String LINE_BREAK_PATTERN = "\\R";
+	private static final String LINE_BREAK_PATTERN = "\\u0020*\\R";
 	/**
 	 * 
 	 */
@@ -191,18 +191,24 @@ public void doBCC(Address address, int i, int length,
 		int wrap_thresh = getContext().getIntegerParameter(EMAIL_EDIT_WRAP_THRESHOLD_CFG, MAX_TEXT_LINE);
 		StringBuilder sb = new StringBuilder();
 		for( String line : text.split(LINE_BREAK_PATTERN,-1)) {
+			// remove trailing whitespace
     		if( line.length() > wrap_thresh){
+    			// spaces are returned as tokens
     			StringTokenizer words = new StringTokenizer(line," \t",true);
     			int count=0;
     			while(words.hasMoreElements()){
     				String word = words.nextToken();
-    				sb.append(word);
+    				
     				count += word.length();
     				if( count > wrap_thresh){
     					if( words.hasMoreElements()){
+    					  // don't want trailing whitespace on a line
+    					  sb.append(word.trim());
     					  sb.append("\n");
     					}
     					count=0;
+    				}else {
+    					sb.append(word);
     				}
     			}
     		}else{
