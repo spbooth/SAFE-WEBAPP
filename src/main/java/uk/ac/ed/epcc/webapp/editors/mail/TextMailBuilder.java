@@ -51,7 +51,7 @@ public class TextMailBuilder {
 		if( prefix.length()==0){
 			text.append(s);
 		}else{
-			StringTokenizer st = new StringTokenizer(s,"\n",true);
+			StringTokenizer st = new StringTokenizer(s.replaceAll("\\R", "\n"),"\n",true);
 			while(st.hasMoreElements()){
 				if( at_start ){
 					doPrefix();

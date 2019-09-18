@@ -81,7 +81,8 @@ public class TemplateFinder {
 		if( ov != null ){
 			TextFile tf = ov.find(group,name);
 			if( tf != null){
-				return expand(name,tf.getData());
+				// force consistent newlines
+				return expand(name,tf.getData().replaceAll("\\R", "\n"));
 			}
 			throw new DataNotFoundException("No template file "+group+":"+name);
 		}
