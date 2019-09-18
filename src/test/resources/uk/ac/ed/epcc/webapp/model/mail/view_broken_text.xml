@@ -49,7 +49,7 @@
 <input type="hidden" name="Transition" value="EditSubject"/>
 <input class="input_button" type="submit" value="Edit Subject"/>
 </form> Subject: to change</h4>
-<pre class="loose">Look a strange 
+<pre class="loose">Look a strange
 line break and unicode ö</pre>
 <form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/T">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0/T"/>
