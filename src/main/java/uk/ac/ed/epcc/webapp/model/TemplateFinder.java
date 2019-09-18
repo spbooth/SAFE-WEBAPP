@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -93,14 +94,17 @@ public class TemplateFinder {
 				if( stream != null ){
 
 					StringBuilder file_buffer = new StringBuilder();
-					InputStreamReader f = new InputStreamReader(stream);
-
-					char buffer[] = new char[4096];
-					int chars_read = f.read(buffer, 0, 4096);
-					while (chars_read != -1) { // while not EOF
-						file_buffer.append(buffer, 0, chars_read);
-
-						chars_read = f.read(buffer, 0, 4096);
+					BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+					
+					String line = reader.readLine();
+					boolean seen=false;
+					while(line != null) {
+						if( seen) {
+							file_buffer.append("\n");
+						}
+						file_buffer.append(line);
+						seen=true;
+						line=reader.readLine();
 					}
 					return expand(name,file_buffer.toString());
 

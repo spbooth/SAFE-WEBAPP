@@ -746,6 +746,17 @@ public class Emailer {
 		return ctx.getInitParameter("email.encoding", DEFAULT_ENCODING);
 	}
 
+	/** make a blank email as a starting point
+	 * 
+	 * @param conn {@link AppContext}
+	 * @param notify_emails
+	 * @param from   Address to send from, may be blank
+	 * @param subject
+	 * @return
+	 * @throws MessagingException
+	 * @throws AddressException
+	 * @throws UnsupportedEncodingException
+	 */
 	public MimeMessage makeBlankEmail(AppContext conn, String[] notify_emails,
 			InternetAddress from, String subject)
 			throws MessagingException, AddressException,
