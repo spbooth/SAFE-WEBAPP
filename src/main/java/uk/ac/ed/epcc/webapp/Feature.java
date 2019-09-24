@@ -13,14 +13,10 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.OnOffInput;
 
 /** A {@link Feature} represents optional feature in the code. 
  * Normally this should be encapsulated as a singleton constant field so we can
@@ -37,101 +33,25 @@ import uk.ac.ed.epcc.webapp.content.Table;
  * @author spb
  *
  */
-public class Feature implements Comparable<Feature>{
-	private static Set<Feature> known_features = Collections.synchronizedSet( new HashSet<Feature>());
-	private static Map<String,Feature> previous = Collections.synchronizedMap(new HashMap<String, Feature>());
-	/** Return a set of known {@link Feature}s.
-	 * 
-	 * Early in application life-time this list may be incomplete as the declaring class might not be loaded yet.
-	 * 
-	 * @return Set.
-	 */
-	public static Set<Feature> getKnownFeatures(){
-		synchronized (known_features) {
-			return new HashSet<>(known_features);
-		}
-		
-	}
+public class Feature extends AbstractSetting<Boolean> {
+	
 	public Feature(String name, boolean def, String description) {
-		super();
-		this.name = name;
-		this.def = def;
-		this.description = description;
-		synchronized (known_features) {
-
-
-			if( ! known_features.contains(this)){
-				known_features.add(this);
-				previous.put(name, this);
-			}else{
-				// Try do detect duplicate named features.
-				Feature prev=previous.get(name);
-				//assert(prev == null || (description==null && prev.getDescription()==null) || (description !=null && description.equals(prev.getDescription()))) : name+":description";
-				assert(prev==null || def == prev.isDef()): name+":def";
-			}
-		}
+		super(name,description,def);
+		
 	}
 	public Feature(String name){
 		this(name,false,null);
 	}
-	private final String name;
-	private final boolean def;
-	private final String description;
-	public final String getName() {
-		return name;
-	}
+	
+	
 	public final boolean isDef() {
-		return def;
-	}
-	public final String getDescription() {
-		return description;
-	}
-	@Override
-	public final int hashCode() {
-		return name.hashCode();
-	}
-	@Override
-	public final boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Feature other = (Feature) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		return true;
-	}
-	public final String toString(){
-		return name;
-	}
-	public static Table getFeatureTable(AppContext c){
-		Table<String, Feature> t = new Table();
-		// Use getKnownFeatures. This copies the list so
-		// avoids any concurrent modifications if the
-		// loop code queries a new one.
-		for(Feature f : getKnownFeatures() ){
-			t.put("Name", f, f.getName());
-			t.put("Description",f,f.getDescription());
-			t.put("Default setting",f,f.isDef());
-			t.put("Current Setting",f,f.isEnabled(c));
-			t.setHighlight(f, f.isEnabled(c) != f.isDef());
-		}
-
-		t.sortRows();
-		return t;
+		return getDefault();
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
-	public final int compareTo(Feature o) {
-		return name.compareTo(o.name);
-	}
+	
+	
+	
+	
 	
 	
 	public boolean isEnabled(AppContext conn){
@@ -173,22 +93,13 @@ public class Feature implements Comparable<Feature>{
 	 * @return
 	 */
 	public static boolean checkFeature(AppContext conn, String name){
-		Feature f = previous.get(name);
+		Feature f = findFeatureByName(Feature.class,name);
 		if( f == null ){
 			return false;
 		}
 		return f.isEnabled(conn);
 	}
-	/** Locate a {@link Feature} by name
-	 * 
-	 * This is needed for transitions that operate on {@link Feature}s. However it will only
-	 * return a {@link Feature} once the class that actually defines it is loaded.
-	 * @param name
-	 * @return Feature or null.
-	 */
-	public static Feature findFeatureByName(String name){
-		return previous.get(name);
-	}
+	
 	/** checks a feature that is only defined by name (ie the name is generated dynamically)
 	 * 
 	 * @param conn
@@ -196,10 +107,31 @@ public class Feature implements Comparable<Feature>{
 	 * @return
 	 */
 	public static boolean checkDynamicFeature(AppContext conn, String name, boolean def){
-		Feature f = previous.get(name);
+		Feature f = findFeatureByName(Feature.class,name);
 		if( f == null ){
 			f= new Feature(name,def,"dynamic feature");
 		}
 		return f.isEnabled(conn);
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.Setting#getInput()
+	 */
+	@Override
+	public ItemInput<String,Boolean> getInput() {
+		return new OnOffInput();
+	}
+	
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.Setting#getCurrent(uk.ac.ed.epcc.webapp.AppContext)
+	 */
+	@Override
+	public Boolean getCurrent(AppContext conn) {
+		return isEnabled(conn);
+	}
+	public String getText(Boolean b) {
+		if( b.booleanValue()) {
+			return "On";
+		}
+		return "Off";
 	}
 }

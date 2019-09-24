@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.preferences;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.PreferenceSetting;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.preferences.UserSettingFactory.UserSetting;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -28,7 +29,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 
-public class Preference extends Feature {
+public class Preference extends Feature implements PreferenceSetting<Boolean>{
 
 	private String[] required_roles=null;
 	
@@ -67,10 +68,12 @@ public class Preference extends Feature {
 	public boolean canUserSet(AppContext conn){
 		return conn.getBooleanParameter(getTag()+".settable", true);
 	}
-	public boolean defaultSetting(AppContext conn){
+	@Override
+	public Boolean defaultSetting(AppContext conn){
 		return getConfigValue(conn);
 	}
 	
+	@Override
 	public boolean hasPreference(AppContext conn){
 		UserSettingFactory<UserSetting> fac = new UserSettingFactory<>(conn);
 		return fac.hasPreference(this);
@@ -83,7 +86,8 @@ public class Preference extends Feature {
 		conn.removeAttribute(this);
 		
 	}
-	public void setPreference(AppContext conn, boolean value){
+	@Override
+	public void setPreference(AppContext conn, Boolean value){
 		UserSettingFactory<UserSetting> fac = new UserSettingFactory<>(conn);
 		fac.setPreference(this, value);
 		conn.removeAttribute(this);
@@ -110,7 +114,7 @@ public class Preference extends Feature {
 	 * @return
 	 */
 	public static boolean checkDynamicPreference(AppContext conn, String name, boolean def,String desc){
-		Feature f = Feature.findFeatureByName(name);
+		Feature f = Feature.findFeatureByName(Feature.class,name);
 		if( f == null ){
 			f= new Preference(name,def,desc);
 		}
