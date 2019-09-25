@@ -14,21 +14,29 @@
 package uk.ac.ed.epcc.webapp.preferences;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.FieldType;
+import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.convert.TypeConverter;
 
-/** A class to hold user {@link Preference} settings.
+/** A class to hold user {@link PreferenceSetting} settings as strings.
+ * 
+ * This uses the {@link TypeConverter} methods in the {@link PreferenceSetting} to generate the database values so any type of
+ * {@link PreferenceSetting} can be stored in the same table. For data types that can be stored natively in the database
+ * a custom {@link AbstractUserSettingFactory} might be more appropriate.
+ * 
+ * @see UserSettingFactory
  * @author spb
+ * @param <D> target type of the {@link PreferenceSetting}
  * @param <S> Type of Setting object
  *
  */
 
-public class UserSettingFactory<S extends UserSettingFactory.UserSetting> extends AbstractUserSettingFactory<Boolean, Boolean, S> {
+public class UserStringSettingFactory<D,S extends UserStringSettingFactory.UserSetting<D>> extends AbstractUserSettingFactory<D,String, S> {
 
-	public static class UserSetting extends AbstractUserSettingFactory.UserSetting<Boolean>{
+	public static class UserSetting<D> extends AbstractUserSettingFactory.UserSetting<D>{
 
 		/**
 		 * @param r
@@ -37,19 +45,27 @@ public class UserSettingFactory<S extends UserSettingFactory.UserSetting> extend
 			super(r);
 		}
 		
+		public String getValue(){
+			return record.getStringProperty(VALUE_FIELD);
+		}
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.preferences.AbstractUserSettingFactory.UserSetting#getValue(uk.ac.ed.epcc.webapp.preferences.PreferenceSetting)
 		 */
 		@Override
-		public Boolean getValue(PreferenceSetting<Boolean> pref) {
-			return record.getBooleanProperty(VALUE_FIELD);
+		public D getValue(PreferenceSetting<D> pref) {
+			return pref.find(record.getStringProperty(VALUE_FIELD));
+		}
+
+		@Override
+		public void setValue(PreferenceSetting<D> pref, D val) {
+			record.setProperty(VALUE_FIELD, pref.getIndex(val));
 		}
 	}
 
 	
-	public UserSettingFactory(AppContext conn){
-		super(conn, "UserSettings");
+	public UserStringSettingFactory(AppContext conn){
+		super(conn, "UserStringSettings");
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
@@ -67,8 +83,8 @@ public class UserSettingFactory<S extends UserSettingFactory.UserSetting> extend
 	 * @see uk.ac.ed.epcc.webapp.preferences.AbstractUserSettingFactory#getFieldType()
 	 */
 	@Override
-	protected FieldType<Boolean> getFieldType() {
-		return new BooleanFieldType(false,false);
+	protected FieldType<String> getFieldType() {
+		return new StringFieldType(false, null, 256);
 	}
 
 	

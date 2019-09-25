@@ -18,8 +18,6 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AbstractSetting;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.PreferenceSetting;
-import uk.ac.ed.epcc.webapp.AbstractSetting;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.Table;
@@ -44,10 +42,10 @@ import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.preferences.UserSettingFactory.UserSetting;
+
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
-/** A {@link ViewTransitionFactory} for editing {@link Preference}s and {@link AbstractSetting}s.
+/** A {@link ViewTransitionFactory} for editing {@link PreferenceSetting}s and {@link AbstractSetting}s.
  * @author spb
  *
  */
@@ -101,9 +99,9 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		 */
 		@Override
 		public FormResult doTransition(AbstractSetting target, AppContext c) throws TransitionException {
-			UserSettingFactory<UserSetting> fac = new UserSettingFactory<>(c);
+		
 			try {
-				((Preference)target).clearPreference(c);
+				((PreferenceSetting)target).clearPreference(c);
 			} catch (DataFault e) {
 				c.getService(LoggerService.class).getLogger(getClass()).error("Error clearing preference",e);
 				throw new TransitionException("Internal error");
@@ -177,7 +175,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 			ItemInput input = target.getInput();
 			input.setItem(target.getCurrent(conn));
 			f.addInput(VALUE, "Preferred setting", input);
-			f.addAction("Update", new SetAction((Preference)target));
+			f.addAction("Update", new SetAction((PreferenceSetting)target));
 			
 		}
 		
@@ -369,8 +367,8 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		if(sess.hasRole(PreferenceAction.SET_FEATURES_ROLE) ){
 			return true;
 		}
-		if( target instanceof Preference){
-			return ((Preference)target).canView(sess);
+		if( target instanceof PreferenceSetting){
+			return ((PreferenceSetting)target).canView(sess);
 		}
 		return false;
 	}

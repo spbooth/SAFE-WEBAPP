@@ -14,7 +14,6 @@
 package uk.ac.ed.epcc.webapp.preferences;
 
 import uk.ac.ed.epcc.webapp.AbstractSetting;
-import uk.ac.ed.epcc.webapp.PreferenceSetting;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** Permitted actions on Preferences.
