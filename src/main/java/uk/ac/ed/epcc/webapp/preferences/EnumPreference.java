@@ -96,28 +96,5 @@ public class EnumPreference<E extends Enum> extends EnumSetting<E> implements Pr
 		conn.removeAttribute(this);
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.data.convert.TypeConverter#find(java.lang.Object)
-	 */
-	@Override
-	public E find(String o) {
-		return (E) Enum.valueOf(clazz, o);
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.data.convert.TypeConverter#getIndex(java.lang.Object)
-	 */
-	@Override
-	public String getIndex(E value) {
-		return value.name();
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
-	 */
-	@Override
-	public Class<E> getTarget() {
-		return clazz;
-	}
 
 }

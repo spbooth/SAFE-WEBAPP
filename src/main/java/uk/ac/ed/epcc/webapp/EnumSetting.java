@@ -95,4 +95,28 @@ public class EnumSetting<E extends Enum> extends AbstractSetting<E> {
 	public String getText(E b) {
 		return b.toString();
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.data.convert.TypeConverter#find(java.lang.Object)
+	 */
+	@Override
+	public E find(String o) {
+		return (E) Enum.valueOf(clazz, o);
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.data.convert.TypeConverter#getIndex(java.lang.Object)
+	 */
+	@Override
+	public String getIndex(E value) {
+		return value.name();
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
+	 */
+	@Override
+	public Class<E> getTarget() {
+		return clazz;
+	}
+
 }

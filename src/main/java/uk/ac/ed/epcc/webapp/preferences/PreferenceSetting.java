@@ -23,7 +23,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @author Stephen Booth
  *
  */
-public interface PreferenceSetting<V> extends Setting<V> , TypeConverter<V, String>{
+public interface PreferenceSetting<V> extends Setting<V> {
 
 	public void setPreference(AppContext conn, V value);
 	

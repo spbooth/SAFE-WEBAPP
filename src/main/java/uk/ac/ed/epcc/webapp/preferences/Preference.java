@@ -119,25 +119,5 @@ public class Preference extends Feature implements PreferenceSetting<Boolean>{
 		}
 		return f.isEnabled(conn);
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.data.convert.TypeConverter#find(java.lang.Object)
-	 */
-	@Override
-	public Boolean find(String o) {
-		return Boolean.valueOf(o);
-	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.data.convert.TypeConverter#getIndex(java.lang.Object)
-	 */
-	@Override
-	public String getIndex(Boolean value) {
-		return value.toString();
-	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
-	 */
-	@Override
-	public Class<Boolean> getTarget() {
-		return Boolean.class;
-	}
+	
 }

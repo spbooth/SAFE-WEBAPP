@@ -186,24 +186,24 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		 * 
 		 */
 		private static final String VALUE = "value";
-		public class SetFeatureAction extends FormAction{
+		public class SetFeatureAction<X> extends FormAction{
 			/**
 			 * @param f
 			 */
-			public SetFeatureAction(AbstractSetting f) {
+			public SetFeatureAction(AbstractSetting<X> f) {
 				this.feature = f;
 				setConfirm("change_feature");
 			}
 
-			private final AbstractSetting feature;
+			private final AbstractSetting<X> feature;
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#action(uk.ac.ed.epcc.webapp.forms.Form)
 			 */
 			@Override
 			public FormResult action(Form f) throws ActionException {
-				Boolean b = (Boolean) f.getItem(VALUE);
+				X b =  (X) f.getItem(VALUE);
 				ConfigService serv = getContext().getService(ConfigService.class);
-				serv.setProperty("service.feature."+feature.getName(), Boolean.toString(b));
+				serv.setProperty("service.feature."+feature.getName(), feature.getIndex(b));
 				return new IndexTransitionResult<>(PreferenceTransitionProvider.this);
 			}
 		}

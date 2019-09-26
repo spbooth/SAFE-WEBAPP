@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp;
 
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
+import uk.ac.ed.epcc.webapp.model.data.convert.TypeConverter;
 
 /** A {@link Setting} is a configuration parameter with a fixed set of valid values and encapsulted in a model object
  * (usually a singleton)
@@ -30,7 +31,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
  * @param <V> type of Setting
  *
  */
-public interface Setting<V> extends Comparable<Setting>{
+public interface Setting<V> extends Comparable<Setting>, TypeConverter<V, String>{
 
 	/** Name of the setting.
 	 * Other than a type-specific prefix this is also the name of the configuration parameter corresponding to the setting
