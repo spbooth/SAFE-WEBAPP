@@ -1,0 +1,104 @@
+:root {
+  --main-bg-color: #80b0ff;
+  --heading-bg-color: #ffffff;
+  --notice-bg-color: #ffcccc;
+  --highlight-bg-color: #ffffcc;
+  --highlight-hover-color: #ffeecc;
+  --warn-bg-color: #ff0000;
+  --content-bg-color: #ffffff;
+  --table-bg-color: #80b0ff;
+  --table-border-color: #e7e7e7;
+  --form-border-color: black;
+  --button-bg-color: #e7e7e7;
+  --th-bg-color: #e7e7e7;
+  --th-hover-bg-color: #f3f3f3;
+  --form-bg-color: #ffffff;
+  --form-hover-bg-color: #eeeeee;
+  
+}
+
+
+body header , body footer{
+	background-color: white;
+}
+
+/* we use three levels of header as standard 
+ * h1 or h2 is the top level header in a block
+ * h3 is a secondary header or a header in a div.bar
+ * h4 is a smaller header for subdivisions.
+*/
+
+h1, h2, h3, h4, h5, h6 {
+	font-size: 110%;
+	color: black;
+    text-align: left;
+    line-height: normal;
+    
+    padding: 4px;
+}
+
+h1, h2{
+	 background-color: var(--heading-bg-color);
+	 border-radius: 15px;
+	/* text-decoration: underline; */
+}
+
+/** add preceding margin to headings
+ */
+h3, h4, h5, h6 {
+	margin: 4px 0px 0px 0px;
+}
+/* No preceding margin if first child heading is first element
+ */
+h1 + h2 , h2 + h3, h3 + h4 , h4 + h5, h5 + h6{
+	margin: 0;
+}
+
+ /*
+  * secondary headers as log items
+  */
+div.item h3{
+background-color: #ffffcc;
+}
+
+div.item  h4{
+background-color: #ffeebb;
+}
+
+div.item  h5{
+background-color: #eeeeee;
+}
+
+div.item h6{
+background-color: #ffffff;
+}
+/* Form styles
+ */
+
+/** div.block form.transition, div.wideblock form.transition {
+	 border-radius: 15px;
+     padding: 5px;
+     border: solid black;
+}
+*/
+form.transition table.form {
+	 border-radius: 15px 15px 0 0;
+	 background-color: var(--form-bg-color);
+	 padding: 10px;
+    margin: 0 0 5px 0 ;
+}
+
+form.transition .action_buttons{
+    margin: 0;
+	 border-radius: 0 0 15px 15px;
+	 background-color: var(--form-bg-color);
+	 padding: 10px;
+}
+
+div.action_buttons {
+	border-radius: 0 0 15px 15px;
+	 background-color: var(--form-bg-color);
+	  padding: 10px;
+	  border-color: var(--form-border-color);
+	  border-style: solid;
+}

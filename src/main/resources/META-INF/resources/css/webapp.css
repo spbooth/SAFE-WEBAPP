@@ -1,8 +1,7 @@
 body {
 	color: black;
 	font-size: medium;
-	background-color: #ffffff;
-	font-family: "MS Arial", "Helvetica", sans-serif;
+	background-color: var(--main-bg-color);
     font-style: normal;
     font-variant: normal;
     font-weight: normal;
@@ -10,7 +9,30 @@ body {
     text-decoration: none;
 	margin: 0;
 }
+body{
+font-family: "MS Arial", "Helvetica", sans-serif;	
+}
+pre.loose{
+	font-family: "MS Arial", "Helvetica", sans-serif;
+}
+/* The basic centered Grey block
+ * This can hold headers paragraphs and forms.
+ */
+div.block, div.wideblock{
+background-color: var(--content-bg-color);
+}
+div.bar, div.bar h1, div.bar h2, div.bar h3{
+	background-color: var(--content-bg-color);
+}
 
+/* simple single bar containing only text */
+div.textbar{
+background-color: var(--paragraph-bg-color);
+}
+
+div.block form, div.wideblock form{
+background-color: var(--form-bg-color);
+}
 /** Allow a block heading to be the summary element 
  */
 div.block details summary h2{
@@ -59,47 +81,18 @@ div.block div.block {
 	padding-right: 0px;
 	width: 100%;
 }
-/* The basic centered Grey block
- * This can hold headers paragraphs and forms.
- */
-div.block, div.wideblock{
-background-color: #cccccc;
-}
+
 
 div.scrollwrapper {
 	overflow: auto;
 }
-div div.overflowblock{
-	overflow: scroll;
-	margin-left:6em;
-}
+
 .login{
 	font-weight: bold;
 }
-div.overflowblock table{
-    display:block;
-    white-space: nowrap;
-}
 
-div.overflowblock table{
-}
 
-div.overflowblock .bodycol{
-	 margin-left: 6.5em;
-}
 
-div.overflowblock .headcolhead {
-	position:absolute;
-	margin-left: -6.5em;
-	border: solid #e7e7e7; 
-	background-color: #e7e7e7;
-	width: 6em;
-	top:auto;
-	border-right: 0px none black;
-	border-top: 0px none black;
-	border-top-width:3px; /*only relevant for first row*/
-	margin-top:-3px; /*compensate for top border*/
-}
 /** Acts as pre-formatted without changing the font
  */
 p.preformatted{
@@ -110,22 +103,10 @@ p.preformatted{
 }
 
 pre.loose{
-	font-family: "MS Arial", "Helvetica", sans-serif;
 	overflow: auto;
 	white-space: pre;
 }
-div.overflowblock .headcol {
-	position:absolute;
-	margin-left: -6.5em;
-	border: solid #e7e7e7; 
-	background-color: #ffffff;
-	width: 6em;
-	top:auto;
-	border-right: 0px none black;
-	border-top: 0px none black;
-	border-top-width:3px; /*only relevant for first row*/
-	margin-top:-3px; /*compensate for top border*/
-}
+
 
 /* Simple single line bar contains a single h3 heading and 
  * a submit button only form. We swap the text direction to get the button on the right
@@ -135,109 +116,45 @@ text-align: left;
 /* background-color: #e7e7e7; */
 }
 
-div.bar, div.bar h1, div.bar h2, div.bar h3{
-	background-color: #cccccc;
-}
-/* simple single bar containing only text */
-div.textbar{
-background-color: #e7e7e7;
-}
+
+
 /* Button like links so we can open new page using right mouse */
 table.navbar tr td a {
-    background-color: #e7e7e7;
+    background-color: var(--button-bg-color);
     border-width: 1px;
     border: solid black;
     display: block;
     text-align:center;
 }
 
-/** Report formats */
 
 
-/* large table based report */
-div.report {
-    text-align: left;
-    background-color: white;
-}
-div.report h1, div.report h2{
-text-align: center;
-}
-div.report  th {
-background-color: #dddddd;
-}
-div.report td {
-	background-color: #eeeeee;
-}
-div.report table {
-	width: 100%;
-	border: solid black;
-}
-/* block containing an image */
-div.graph{
-	width: 100%;
-	text-align: center;
-}
-div.graph h1, div.graph h2{
-	text-align: center;
-}
-/* supress normal formatting in reports
-*/
-div.report h1, div.report h2, div.report h3, div.report h4{
-	color: black;
-	background-color: #ffffff;
-}
-
-/* we use three levels of header as standard 
- * h1 or h2 is the top level header in a block
- * h3 is a secondary header or a header in a div.bar
- * h4 is a smaller header for subdivisions.
-*/
-
-h1, h2, h3, h4, h5, h6 {
-	font-size: 110%;
-	color: black;
-    text-align: left;
-    line-height: normal;
-    
-    padding: 4px;
-}
-
-h1, h2{
-	margin: 8px 0px 0px 0px;
-}
-h3, h4, h5, h6 {
-	margin: 0;
-}
- /*
-  * secondary header in a block
-  */
-div h3{
-background-color: #ffffcc;
-}
-
-div h4{
-background-color: #ffeebb;
-}
-
-div h5{
-background-color: #eeeeee;
-}
-
-div h6{
-background-color: #ffffff;
-}
 
 label{
 text-align: left;
 }
 
+h1, h2{
+	margin: 8px 0px 0px 0px;
+}
+/*  First major heading at top of div
+ */
+h1:first-child, h2:first-child{
+	margin: 0px 0px 0px 0px;
+}
+
+/* no seperation when showing log items
+ */
+div.item h3, div.item h4, div.item h5 , div.item h6 , div.item pre, div.item p{
+	margin: 0;
+}
 
 
 /* A form within a block element. This can contain a nested 
  * table for fine grain layout.
  */
 div.block form, div.wideblock form{
-background-color: #cccccc;
+
 margin: 2px 0px;
 padding: 0;
 }
@@ -262,11 +179,7 @@ border-width: 2px;
 margin-bottom: 10px;
 
 }
-fieldset.action_buttons{
-border: solid #e7e7e7;
-border-width: 2px;
-margin: 5px 0px;
-}
+
 /** Single button forms in an actionbutton block
  */
 .action_buttons form{
@@ -287,21 +200,7 @@ form.button{
 	display: inline;
 	text-align: right;
 }
-.input_button {
-	margin: 3px 0px;
-	border-style: outset;
-}
-/* table for fine tuning the layout within a form
- * these have an explicit border 
- */
-table.form{
-	border: solid #e7e7e7;
-	border-width: 2px;
-    background-color: #cccccc;
-    margin: 5px 0px;
-    text-align: left;
-   
-}
+
 
 label.required, span.required {
 	font-weight: bold;
@@ -325,17 +224,17 @@ label.missing::after, span.missing::after {
 	font-weight: bold;
 	color: #ff0000;
 }
+.disabled {
+	cursor: not-allowed;
+}
 table.form tr {
         width: 100%;
 }
 table.form td {
         padding: 2px;
-        background-color: #cccccc;
+   
 }
 
-form table tr:hover td {
-	 background-color: #dddddd;
-}
 
 /* auto generated table from Table class */
 table.auto {
@@ -364,7 +263,7 @@ text-align: left;
  */
 div.block p,  div.block ul,  div.block pre, div.block div.para{
 margin: 0px 0px 6px 0px;
-background-color: #e7e7e7;
+
 color: black;
 padding: 8px;
 display: block;
@@ -384,10 +283,7 @@ list-style: inside;
 div.block  table, div.wideblock  table, div.report  table {
     width: 100%;
 }
-div.block > table, div.wideblock > table, div.report > table {
-	 border: solid #e7e7e7; 
-   /* margin-top: 10px;*/  
-}
+
 /* supress the cell seperators for nested tables */
 div.block table table {
 	    border-collapse: collapse;
@@ -469,21 +365,21 @@ margin: 2px;
  }
 
 div tr.notice td, div tr td.notice{
-	background-color: #ffcccc;
+	background-color: var(--notice-bg-color);
 }
 
 div  *.highlight td, div table.auto *.highlight td form{
-	 background-color: #ffffcc;
+	 background-color: var(--highlight-bg-color);
 }
 /* hover highlighting to indicate the active row in a form
 */
 form table.form tr.highlight:hover td {
-	 background-color: #ffeecc;
+	 background-color: var(--highlight-hover-bg-color);
 }
 /* some transitions dont set form class
  */ 
 form table tr.highlight:hover td {
-	 background-color: #ffeecc;
+	 background-color: var(--highlight-hover-bg-color);
 }
 details div.description{
 	 border-radius: 15px;
@@ -500,22 +396,60 @@ text-align: right;
 white-space: nowrap;
 }
 
-/* a table cell intended to hold a form buton */
+/* a table cell intended to hold a form button */
 div td.button {
 	text-align: center;
-	background-color: #e7e7e7;
+	background-color: var(--th-bg-color);
 }
 div th {
         color: black;
-        background-color: #e7e7e7;
+        background-color: var(--th-bg-color);
 }
 form table.form tr:hover th{
-	background-color: #f3f3f3;
+	background-color: var(--th-hover-bg-color);
 }
+table.form td {
+        background-color: var(--form-bg-color);
+}
+
+form table tr:hover td {
+	 background-color: var(--form-hover-bg-color);
+}
+
 th.button-col, td.button-col {
 	width: 5%;
 	text-align: center;
 }
+fieldset.action_buttons{
+border: solid var(--form-border-color);
+border-width: 2px;
+margin: 5px 0px;
+}
+
+.input_button {
+	margin: 3px 0px;
+	border-style: outset;
+}
+/* table for fine tuning the layout within a form
+ * these have an explicit border 
+ */
+table.form{
+	border: solid var(--form-border-color);
+	border-width: 2px;
+    background-color: var(--form-bg-color);
+    margin: 5px 0px;
+    text-align: left;
+}
+div.block p,  div.block ul,  div.block pre, div.block div.para{
+	background-color: var(--paragraph-bg-color);
+}
+div.block > table, div.wideblock > table, div.report > table {
+	 border: solid var(--table-border-color); 
+	 background-color: var(--table-bg-color);
+   /* margin-top: 10px;*/  
+}
+
+
 /* Resoruce table */
 td.notes{
 	text-align: right;
@@ -529,7 +463,7 @@ div table table.resource{
 /* a warning paragraph */
 div p.warn{
 	color: #ff0000;
-		}
+}
 .center{
 text-align: center;
 	}
@@ -537,7 +471,7 @@ text-align: center;
 	background-color: #ffffff;
 	}
 .warn, .warn.sorting_1 {
-	color: #ff0000;
+	color: var(--warn-bg-color);
 }
 .pass:after {
 	content: " \2714";
@@ -555,38 +489,14 @@ text-align: center;
 	color: orange;
 }
 .notice, .notice.sorting_1 {
-	background-color: #ffcccc;
-	}
+	background-color: var(--notice-bg-color);
+}
 .highlight,div.block  p.highlight {
-  background-color: #ffffcc;
-}
-.grey {
- background-color: #cccccc;
-}
-.lightgrey{
-	background-color: #e7e7e7;
+  background-color: var(--highlight-bg-color);
 }
 
-/* rules for the survey code */
-div.question_noanswer, div.question_answered{
- text-align: center;
- border-width: thin;
- border-style: solid;
- padding: 2px;
- margin-top: 5px;
-}
-div.question_noanswer {
-  border-color: red;	
-}
-div.question_answered {
-  border-color: green;	
-}
-div.noquestion {
-  border-color: green;	
-}
-div.block p.question {
-	background-color: #f0f0f0;
-}
+
+
 
 div.block div.compact {
 	display: block;
@@ -618,129 +528,19 @@ textarea.comment {
   margin-right: auto;
   width: 95%;
 }
-/* survey formatting for results */
-/* These numbers come from a linear interpolation between reg and green
- * but using the square of the fractional value to componsate for high %ages being
- * harder to reach if there are multiple choices.
-*/
-li.frac_0{
-  	background-color: #ff9999;
-}
-li.frac_1{
-  	background-color: #ebac99;
-}
-li.frac_2{
-	background-color: #dabd99;
-}
-li.frac_3{
-	background-color: #cacd99;
-}
-li.frac_4{
-	background-color: #bdda99;
-}
-li.frac_5{
-	background-color: #b2e599;
-}
-li.frac_6{
-	background-color: #a9ee99;
-}
-li.frac_7{
-	background-color: #a2f599;
-}
-li.frac_8{
-	background-color: #9dfa99;
-}
-li.frac_9{
-	background-color: #9afd99;
-}
-li.frac_10{
-	background-color: #99ff99;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-div.report td.frac_0 {
-  	background-color: #ed1818;
-  	text-align: right;
-	white-space: nowrap;
-}
-div.report td.frac_1 {
-  	background-color: #ed4218;
-  	text-align: right;
-	white-space: nowrap;  	
-}
-div.report td.frac_2 {
-	background-color: #ed6d18;
-  	text-align: right;
-	white-space: nowrap;	
-}
-div.report td.frac_3{
-	background-color: #ed9818;
-  	text-align: right;
-	white-space: nowrap;	
-}
-div.report td.frac_4{
-	background-color: #edc218;
-  	text-align: right;
-	white-space: nowrap;
-}
-div.report td.frac_5{
-	background-color: #eded18;
-  	text-align: right;
-	white-space: nowrap;
-}
-div.report td.frac_6{
-	background-color: #c2ed18;
-  	text-align: right;
-	white-space: nowrap;
-}
-div.report td.frac_7{
-	background-color: #98ed18;
-  	text-align: right;
-	white-space: nowrap;
-}
-div.report td.frac_8{
-	background-color: #6ded18;
-  	text-align: right;
-	white-space: nowrap;
-}
-div.report td.frac_9{
-	background-color: #42ed18;
-  	text-align: right;
-	white-space: nowrap;
-}
-div.report td.frac_10{
-	background-color: #18ed18;
-  	text-align: right;
-	white-space: nowrap;
-}
 
 
 div td[format=under]{
-	color: #ff0000;
+	color: red;
 }
 div td[format=over]{
-	color: #0000ff;
+	color: blue;
 }
 div td[highlight=true]{
-	background-color: #ffffcc;
+	background-color: var(--highlight-bg-color);
 }
 div td[notice=true]{
-	background-color: #ffcccc;
+	background-color: var(--notice-bg-color);
 }
 div.block p.comment {
 	background-color: #ffeebb;

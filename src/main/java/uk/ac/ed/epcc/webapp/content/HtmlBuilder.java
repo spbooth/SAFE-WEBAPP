@@ -633,6 +633,7 @@ public void addActionButtons(Form f,String legend,Set<String> actions) {
 				// non validsating actions always enabled
 				if( action instanceof DisabledAction || ! can_submit){
 					attr("disabled",null);
+					addClass("disabled");
 				}
 			}
 			

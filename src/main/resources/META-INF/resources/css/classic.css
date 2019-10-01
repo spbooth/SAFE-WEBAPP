@@ -1,0 +1,71 @@
+:root {
+  --main-bg-color: #ffffff;
+  --notice-bg-color: #ffcccc;
+  --warn-bg-color: #ff0000;
+  --highlight-bg-color: #ffffcc;
+  --highlight-hover-color: #ffeecc;
+  --content-bg-color: #cccccc;
+  --table-bg-color: #cccccc;
+  --paragraph-bg-color: #e7e7e7;
+  --table-bg-color: #cccccc;
+  --table-border-color: #e7e7e7;
+  --button-bg-color: #e7e7e7;
+  --th-bg-color: #e7e7e7;
+  --form-border-color: #e7e7e7;
+  --table-border-color: #e7e7e7;
+  --th-hover-bg-color: #f3f3f3;
+  --form-bg-color: #cccccc;
+  --form-hover-bg-color: #dddddd;
+}
+
+
+/* we use three levels of header as standard 
+ * h1 or h2 is the top level header in a block
+ * h3 is a secondary header or a header in a div.bar
+ * h4 is a smaller header for subdivisions.
+*/
+
+h1, h2, h3, h4, h5, h6 {
+	font-size: 110%;
+	color: black;
+    text-align: left;
+    line-height: normal;
+    
+    padding: 4px;
+}
+
+h1, h2{
+	margin: 8px 0px 0px 0px;
+}
+h3, h4, h5, h6 {
+	margin: 0;
+}
+ /*
+  * secondary header in a block
+  */
+div h3{
+background-color: #ffffcc;
+}
+
+div h4{
+background-color: #ffeebb;
+}
+
+div h5{
+background-color: #eeeeee;
+}
+
+div h6{
+background-color: #ffffff;
+}
+/* Form styles
+ */
+ 
+
+
+.grey {
+ background-color: #cccccc;
+}
+.lightgrey{
+	background-color: #e7e7e7;
+}

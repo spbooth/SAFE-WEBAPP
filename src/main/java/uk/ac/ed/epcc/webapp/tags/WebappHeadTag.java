@@ -27,6 +27,7 @@ import javax.servlet.jsp.tagext.Tag;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.preferences.EnumPreference;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.ErrorFilter;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
@@ -37,6 +38,7 @@ import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
  */
 public class WebappHeadTag extends TagSupport implements Tag {
 	public static final Preference SCRIPT_FORMS_FEATURE = new Preference("script.forms",true,"Augment unsupported html5 inputs using javascript");
+	public static final EnumPreference<Styles> STYLE_PREFERENCE = new EnumPreference<Styles>(Styles.class, "page.style", Styles.Classic, "Web page style");
 	/**
 	 * 
 	 */
@@ -74,10 +76,18 @@ public class WebappHeadTag extends TagSupport implements Tag {
         		if( favicon != null && ! favicon.isEmpty()){
         			doIcon(out, response, template_path, conn.getInitParameter("favicon.type", "image/png"), favicon);
         		}
-        		doCSS(out, response, template_path,"default css","webapp.css");
+        		//doCSS(out, response, template_path,"default css","webapp.css");
+        		Styles style = STYLE_PREFERENCE.getCurrent(conn);
+        		for(String css : conn.getExpandedProperty("styles."+style.name()+".css", "webapp.css").split("\\s*,\\s*")) {
+        			doCSS(out, response, template_path,"default css",css);
+        		}
+        		for(String script : conn.getExpandedProperty("styles."+style.name()+".scripts", "").split("\\s*,\\s*")) {
+        			doScript(scripts,out, request,response, script);
+        		}
         		if( NavigationMenuService.NAVIGATION_MENU_FEATURE.isEnabled(conn)){
         			doCSS(out, response, template_path,null,"nav_menu.css");
         		}
+        		
         		if(SCRIPT_FORMS_FEATURE.isEnabled(conn) && request.getAttribute(FORM_PAGE_ATTR) != null){
         			doCSS(out, response, template_path,null,conn.expandText("${jquery-ui.css}"));
         		}

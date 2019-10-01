@@ -132,7 +132,7 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
     	}
 	}
 %>
-<form id="form" method="post" 
+<form id="form" class="transition" method="post" 
 <% if( multi ){ %>
    enctype="multipart/form-data"
 <% } %>
