@@ -43,19 +43,29 @@ public class NumericEnumProducer<E extends Enum<E>> implements TypeProducer<E,In
 	public E find(Integer n) {
 		int i=n.intValue();
 		for(E e: EnumSet.allOf(clazz)){
-			if( e.ordinal() == i ){
+			if( getValue(e) == i ){
 				return e;
 			}
 		}
 		return null;
 	}
 
+	/** Method to generate the integer value of an enum.
+	 * Defaults to using {@link Enum#ordinal()} but can be overridden if
+	 * a the Enum type can generate a custom value.
+	 * 
+	 * @param e
+	 * @return
+	 */
+	protected int getValue(E e) {
+		return e.ordinal();
+	}
 	public String getField() {
 		return field;
 	}
 
 	public Integer getIndex(E value) {
-		return new Integer(value.ordinal());
+		return new Integer(getValue(value));
 	}
 
 	
