@@ -21,7 +21,6 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -144,8 +143,8 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
-		return new PersonalResponse(this,res);
+	protected R makeBDO(Record res) throws DataFault {
+		return (R) new PersonalResponse(this,res);
 	}
 	/** get/make a response for the specified form and the current user.
 	 * This assumes only a single response per user and form.

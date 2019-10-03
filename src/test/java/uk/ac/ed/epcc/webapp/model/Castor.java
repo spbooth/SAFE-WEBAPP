@@ -26,7 +26,6 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.Dummy1.Factory;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Removable;
@@ -74,7 +73,7 @@ public class Castor extends DataObject implements Removable {
 		}
        
 		@Override
-		protected DataObject makeBDO(Repository.Record res) throws DataFault {
+		protected Castor makeBDO(Repository.Record res) throws DataFault {
 			return new Castor(res);
 		}
     	public void nuke() throws DataFault{

@@ -14,10 +14,8 @@
 package uk.ac.ed.epcc.webapp.model.serv;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
@@ -233,11 +231,11 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 
 
 	@Override
-	protected MimeData makeBDO(Record res) throws DataFault {
+	protected D makeBDO(Record res) throws DataFault {
 		
 		
 		MimeData data = new MimeData(res);
-		return data;
+		return (D) data;
 	}
 
 	/* (non-Javadoc)

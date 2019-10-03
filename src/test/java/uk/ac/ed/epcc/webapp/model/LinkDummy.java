@@ -129,7 +129,7 @@ public class LinkDummy extends LinkManager<LinkDummy.DummyLink,Dummy1,Dummy2> {
 	 * @see uk.ac.ed.epcc.webapp.model.data.LinkManager#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository)
 	 */
 	@Override
-	protected DataObject makeBDO(Repository.Record res) throws DataFault {
+	protected DummyLink makeBDO(Repository.Record res) throws DataFault {
 		return new DummyLink(this,res);
 	}
 	

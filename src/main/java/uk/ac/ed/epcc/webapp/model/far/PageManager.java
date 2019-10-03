@@ -13,7 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far;
 
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
@@ -85,7 +84,7 @@ public class PageManager extends PartManager<DynamicFormManager.DynamicForm,Page
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
+	protected Page makeBDO(Record res) throws DataFault {
 		return new Page(res);
 	}
 	@Override

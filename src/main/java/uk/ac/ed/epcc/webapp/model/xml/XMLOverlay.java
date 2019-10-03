@@ -55,7 +55,6 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.TextFileOverlay;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
@@ -221,8 +220,8 @@ public class XMLOverlay<X extends XMLOverlay.XMLFile> extends TextFileOverlay<X>
 	}
 
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
-		return new XMLFile(res, getBaseURL());
+	protected X makeBDO(Record res) throws DataFault {
+		return (X) new XMLFile(res, getBaseURL());
 	}
 
 	@Override

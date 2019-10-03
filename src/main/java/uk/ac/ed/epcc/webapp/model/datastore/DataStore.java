@@ -16,20 +16,15 @@ package uk.ac.ed.epcc.webapp.model.datastore;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
 import uk.ac.ed.epcc.webapp.jdbc.table.BlobType;
-import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
 import uk.ac.ed.epcc.webapp.model.Classification;
 import uk.ac.ed.epcc.webapp.model.ClassificationFactory;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
-import uk.ac.ed.epcc.webapp.model.datastore.DataStore.Data;
 
 /** A {@link DataObjectFactory} for storing named data fixtures in the database.
  * 
@@ -92,7 +87,7 @@ public class DataStore extends ClassificationFactory<DataStore.Data>  {
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
+	protected Data makeBDO(Record res) throws DataFault {
 		return new Data(res);
 	}
 

@@ -31,10 +31,9 @@ import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 
 /** Factory for Configuration {@link Property}s stored in the database.
@@ -92,7 +91,7 @@ public class PropertyFactory extends DataObjectFactory<Property> {
 		return s;
     }
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
+	protected Property makeBDO(Record res) throws DataFault {
 		return new Property(res);
 	}
     public void loadProperties(Properties props){

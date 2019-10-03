@@ -24,7 +24,6 @@ import uk.ac.ed.epcc.webapp.editors.mail.MessageProvider;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Removable;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
@@ -66,9 +65,9 @@ public class MessageData extends MessageDataObject implements MessageProvider , 
 		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 		 */
 		@Override
-		protected DataObject makeBDO(Record res) throws DataFault {
+		protected M makeBDO(Record res) throws DataFault {
 			
-			return new MessageData(res);
+			return (M) new MessageData(res);
 		}
 
 		/* (non-Javadoc)

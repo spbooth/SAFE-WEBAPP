@@ -20,7 +20,6 @@ import uk.ac.ed.epcc.webapp.forms.inputs.URLInput;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.ClassificationFactory;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
@@ -63,7 +62,7 @@ public class PreferedViewFactory extends ClassificationFactory<PreferedView> {
 	 * @see uk.ac.ed.epcc.webapp.model.ClassificationFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
+	protected PreferedView makeBDO(Record res) throws DataFault {
 		return new PreferedView(res, this);
 	}
 

@@ -16,7 +16,6 @@ package uk.ac.ed.epcc.webapp.model.log;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -41,9 +40,9 @@ public class TextDataFactory<T extends TextData> extends DataObjectFactory<T> im
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
+	protected T makeBDO(Record res) throws DataFault {
 	
-		return new TextData(res);
+		return (T) new TextData(res);
 	}
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c, String table) {

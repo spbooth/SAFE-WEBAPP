@@ -42,7 +42,7 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
     	this.set = set;
     	lookup = new HashMap<>();
     	for(E s: set){
-    		lookup.put(s.ordinal(), s);
+    		lookup.put(getValue(s), s);
     	}
     	addValidator(new FieldValidator<Integer>() {
 			
@@ -58,6 +58,16 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
     public EnumIntegerInput(Class<E> clazz){
     	this(EnumSet.allOf(clazz));
     }
+    /** Method to generate the integer value of an enum.
+	 * Defaults to using {@link Enum#ordinal()} but can be overridden if
+	 * a the Enum type can generate a custom value.
+	 * 
+	 * @param e
+	 * @return
+	 */
+	protected int getValue(E e) {
+		return e.ordinal();
+	}
 	@Override
 	public E getItembyValue(Integer value) {
 		if( value == null ){
@@ -80,7 +90,7 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
 		if( item == null){
 			return null;
 		}
-		return Integer.toString(item.ordinal());
+		return Integer.toString(getValue(item));
 	}
 
 	@Override
@@ -112,7 +122,7 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
 			setValue(null);
 			return;
 		}
-		setValue(v.ordinal());
+		setValue(getValue(v));
 	}
 	
 	@Override
@@ -129,7 +139,7 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
 			return null;
 		}
 		if( set.contains(v)){
-			return ((Enum)v).ordinal();
+			return getValue((E)v);
 		}
 		return super.convert(v);
 	}

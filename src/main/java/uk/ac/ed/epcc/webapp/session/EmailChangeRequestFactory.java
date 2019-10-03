@@ -34,7 +34,6 @@ import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
@@ -108,7 +107,7 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractReques
 	}
 	
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
+	protected EmailChangeRequestFactory<A>.EmailChangeRequest makeBDO(Record res) throws DataFault {
 		return new EmailChangeRequest(res);
 	}
 	

@@ -1883,7 +1883,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return new object of correct class.
 	 * @throws DataFault
 	 */
-	protected abstract DataObject makeBDO(Repository.Record res) throws DataFault;
+	protected abstract BDO makeBDO(Repository.Record res) throws DataFault;
 
 	/**
 	 * generate the DataObject from the ResultSet as part of a join

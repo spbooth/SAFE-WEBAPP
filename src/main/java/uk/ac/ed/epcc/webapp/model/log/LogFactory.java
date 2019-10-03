@@ -600,7 +600,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 */
 	protected abstract ItemType<T> getStaticItemType();
 	@Override
-	protected final DataObject makeBDO(Record res) throws DataFault {
+	protected final T makeBDO(Record res) throws DataFault {
 		return getItemType().makeBDO(this, res);
 	}
 	/** purge all entries for an owner.

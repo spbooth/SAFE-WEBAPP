@@ -24,10 +24,8 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.incava.diff.Diff;
 import org.incava.diff.Difference;
@@ -44,7 +42,6 @@ import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdate;
 import uk.ac.ed.epcc.webapp.forms.inputs.InfoInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
@@ -59,9 +56,9 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.FilterResult;
+import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Retirable;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 import uk.ac.ed.epcc.webapp.model.data.forms.RetireAction;
@@ -364,8 +361,8 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 	}
 
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
-		return new TextFile(res,url_base);
+	protected T makeBDO(Record res) throws DataFault {
+		return (T) new TextFile(res,url_base);
 	}
 	
 	public void setBaseURL(URL base){

@@ -13,19 +13,12 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far.response;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
-import uk.ac.ed.epcc.webapp.content.UIGenerator;
-import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.BlobType;
-import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
@@ -35,8 +28,6 @@ import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
-import uk.ac.ed.epcc.webapp.model.serv.ServeDataProducer;
-import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link ResponseDataManager} for storing {@link StreamData} objects from uploaded files
  * @author spb
@@ -139,8 +130,8 @@ extends ResponseDataManager<M, R, F> {
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
-		return new StreamDataRecord(res);
+	protected M makeBDO(Record res) throws DataFault {
+		return (M) new StreamDataRecord(res);
 	}
 
 	@Override
