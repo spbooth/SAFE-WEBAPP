@@ -16,7 +16,6 @@ package uk.ac.ed.epcc.webapp.preferences;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.FieldType;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
@@ -55,8 +54,8 @@ public class UserSettingFactory<S extends UserSettingFactory.UserSetting> extend
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
-		return new UserSetting(res);
+	protected S makeBDO(Record res) throws DataFault {
+		return (S) new UserSetting(res);
 	}
 
 	@Override

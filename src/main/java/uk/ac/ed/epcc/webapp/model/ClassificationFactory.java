@@ -39,9 +39,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFormFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
@@ -124,8 +122,8 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
     	}
     }
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
-		return new Classification(res, this);
+	protected T makeBDO(Record res) throws DataFault {
+		return (T) new Classification(res, this);
 	}
 	@Override
 	public Class<T> getTarget() {

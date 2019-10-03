@@ -13,15 +13,11 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.far.response;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-
-import com.sun.mail.iap.ByteArray;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
@@ -92,8 +88,8 @@ extends ResponseDataManager<M, R, F> {
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
-		return new StringData(res);
+	protected M makeBDO(Record res) throws DataFault {
+		return (M) new StringData(res);
 	}
 
 	@Override

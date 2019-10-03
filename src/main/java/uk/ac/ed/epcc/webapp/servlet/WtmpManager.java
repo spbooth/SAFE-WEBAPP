@@ -217,7 +217,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	
 
 	@Override
-	protected DataObject makeBDO(Repository.Record res) throws DataFault {
+	protected Wtmp makeBDO(Repository.Record res) throws DataFault {
 		return new Wtmp(res);
 	}
 

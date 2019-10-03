@@ -29,7 +29,6 @@ import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.Classification;
 import uk.ac.ed.epcc.webapp.model.ClassificationFactory;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.FieldSQLExpression;
 import uk.ac.ed.epcc.webapp.model.data.FieldValue;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
@@ -146,7 +145,7 @@ public class ExpressionTestFactory extends ClassificationFactory<ExpressionTestF
 	 * @see uk.ac.ed.epcc.webapp.model.ClassificationFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
+	protected ExpressionTest makeBDO(Record res) throws DataFault {
 		return new ExpressionTest(res, this);
 	}
 

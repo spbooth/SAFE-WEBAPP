@@ -45,7 +45,7 @@ public class TestFactory extends DataObjectFactory<TestFactory.TestData> {
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
+	protected TestData makeBDO(Record res) throws DataFault {
 		return new TestData(res);
 	}
 	

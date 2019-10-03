@@ -756,9 +756,9 @@ AnonymisingFactory
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
+	protected AU makeBDO(Record res) throws DataFault {
 		
-		return new AppUser(this,res);
+		return (AU) new AppUser(this,res);
 	}
 
 

@@ -760,13 +760,13 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository)
 	 */
 	@Override
-	protected DataObject makeBDO(Repository.Record res) throws DataFault {
+	protected H makeBDO(Repository.Record res) throws DataFault {
 		/*
 		 * We can use a generic history object where we don't need any special
 		 * behaviour
 		 * 
 		 */
-		return new HistoryRecord<>(this,res);
+		return (H) new HistoryRecord<P>(this,res);
 	}
 	@Override
 	public Class<H> getTarget(){

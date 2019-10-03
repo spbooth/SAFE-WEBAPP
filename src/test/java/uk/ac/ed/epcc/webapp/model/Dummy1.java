@@ -17,7 +17,6 @@
 package uk.ac.ed.epcc.webapp.model;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -242,7 +241,7 @@ public class Dummy1 extends DataObject implements Removable {
         	return getCount(f);
         }
 		@Override
-		protected DataObject makeBDO(Repository.Record res) throws DataFault {
+		protected Dummy1 makeBDO(Repository.Record res) throws DataFault {
 			return new Dummy1(res);
 		}
     	public void nuke() throws DataFault{
