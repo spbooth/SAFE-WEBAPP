@@ -128,9 +128,11 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * <p>
  * Repository can implement a cache of Record data based on id. This is enabled on a table by table basis via the
  * <em>cache.<i>tag-name</i></em> property.
+ * This is only intended to cache values within the lifetime of an {@link AppContext} (ie during a single request).
  * The cache is populated 
  * whenever <code>SetContents</code> is called with the record ejected whenever <code>put</code> is called. 
- * This is to ensure the cache never contains a dirty record. 
+ * This is to ensure the cache never contains a dirty record.
+ * The cache should also be flushed if the table is modified directly via an SQL update, though this is only an issue if a single request re-fetches records after a SQL update.
  
  * The <code>setID</code> checks for cached data and populates itself by copying the cached record  instead of fetching a database record.
  * 
