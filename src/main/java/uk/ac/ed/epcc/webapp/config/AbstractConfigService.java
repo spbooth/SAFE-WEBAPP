@@ -124,7 +124,7 @@ public abstract class AbstractConfigService extends AbstractContexed implements 
 				}
 				for(String file : props.getProperty(name).split(SPLIT_REGEX)){
 				
-					if( null ==  props.getProperty(CONFIG_LOADED+file)){
+					if( null ==  props.getProperty(CONFIG_LOADED+file.trim())){
 						try(InputStream service_props_stream = serv.getResourceAsStream(file)){
 							if (service_props_stream != null) {
 								seen=true;
