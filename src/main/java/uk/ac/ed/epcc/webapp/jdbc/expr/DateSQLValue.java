@@ -23,7 +23,6 @@ import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 
 
 /** A {@link SQLValue} that converts a millisecond value into a Date.
@@ -32,9 +31,14 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  *
  */
 public class DateSQLValue implements NestedSQLValue<Date,Number>{
-	private final SQLValue<Number> a;
-	public DateSQLValue(SQLValue<Number> a){
+	private final SQLValue<? extends Number> a;
+	private final long res;
+	public DateSQLValue(SQLValue<? extends Number> a) {
+		this(a,1L);
+	}
+	public DateSQLValue(SQLValue<? extends Number> a,long res){
 		this.a=a;
+		this.res=res;
 	}
 	
 	public Class<Date> getTarget() {
@@ -54,7 +58,7 @@ public class DateSQLValue implements NestedSQLValue<Date,Number>{
 	
 
 	public Date makeObject(ResultSet rs, int pos) throws DataException, SQLException {
-		return new Date(a.makeObject(rs, pos).longValue());
+		return new Date(a.makeObject(rs, pos).longValue()*res);
 	}
 
 	/* (non-Javadoc)
@@ -62,6 +66,6 @@ public class DateSQLValue implements NestedSQLValue<Date,Number>{
 	 */
 	@Override
 	public SQLValue<Number> getNested() {
-		return a;
+		return (SQLValue<Number>) a;
 	}
 }

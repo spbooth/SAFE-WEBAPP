@@ -48,7 +48,11 @@ public class FuncExpression<T,D> implements SQLExpression<T> {
 			try{
 				
 				SQLContext sqc = db_serv.getSQLContext();
-				return (SQLExpression<T>) sqc.convertToDate(new FuncExpression<>(f, Number.class, dse.getSeconds()), 1000L);
+				if( dse.preferSeconds()) {
+					return (SQLExpression<T>) sqc.convertToDate(new FuncExpression<>(f, Number.class, dse.getSeconds()), 1000L);
+				}else {
+					return (SQLExpression<T>) sqc.convertToDate(new FuncExpression<>(f, Number.class, dse.getMillis()), 1L);
+				}
 			}catch(SQLException ee){
 				db_serv.logError("Error getting SQLContext",ee);
 			}

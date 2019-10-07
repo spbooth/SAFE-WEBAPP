@@ -22,7 +22,6 @@ import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 
 /** {@link SQLValue} that converts an {@link SQLValue} of a different type to an integer
  * Note that this will prevent SQL filtering.

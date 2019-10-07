@@ -27,7 +27,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  * @author spb
  *
  */
-public class MysqlDateConverter implements DateSQLExpression{
+public class MysqlDateConverter implements DateSQLExpression, WrappedSQLExpression<Date>{
 
 	public MysqlDateConverter(long res, SQLExpression<? extends Number> val) {
 		super();
@@ -144,6 +144,12 @@ public class MysqlDateConverter implements DateSQLExpression{
 	@Override
 	public boolean preferSeconds() {
 		return res == 1000L;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.WrappedSQLExpression#getSQLValue()
+	 */
+	public SQLValue<Date> getSQLValue() {
+		return new DateSQLValue(val, res);
 	}
 	
 
