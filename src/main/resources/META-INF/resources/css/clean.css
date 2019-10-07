@@ -1,12 +1,12 @@
 :root {
-  --main-bg-color: #80b0ff;
+  --main-bg-color: #ffffff;
   --heading-bg-color: #ffffff;
   --notice-bg-color: #ffcccc;
   --highlight-bg-color: #ffffcc;
   --highlight-hover-color: #ffeecc;
   --warn-bg-color: #ff0000;
   --content-bg-color: #ffffff;
-  --table-bg-color: #80b0ff;
+  --table-bg-color: #cccccc;
   --table-border-color: #e7e7e7;
   --form-border-color: black;
   --button-bg-color: #e7e7e7;
@@ -20,6 +20,10 @@
 
 body header , body footer{
 	background-color: white;
+}
+
+body > div.block , body div.bar{
+	border: solid var(--table-bg-color);
 }
 
 /* we use three levels of header as standard 
@@ -96,9 +100,10 @@ form.transition .action_buttons{
 }
 
 div.action_buttons {
-	border-radius: 0 0 15px 15px;
+	border-radius: 15px;
 	 background-color: var(--form-bg-color);
 	  padding: 10px;
 	  border-color: var(--form-border-color);
 	  border-style: solid;
+	  margin: 5px 0 0 0;
 }

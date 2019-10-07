@@ -443,10 +443,10 @@ table.form{
 div.block p,  div.block ul,  div.block pre, div.block div.para{
 	background-color: var(--paragraph-bg-color);
 }
-div.block > table, div.wideblock > table, div.report > table {
+div.block > table, div.wideblock > table, div.report > table, details > table , div.scrollwrapper > table {
 	 border: solid var(--table-border-color); 
 	 background-color: var(--table-bg-color);
-   /* margin-top: 10px;*/  
+     margin-top: 10px;  
 }
 
 
