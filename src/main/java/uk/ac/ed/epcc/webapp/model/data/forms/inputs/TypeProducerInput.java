@@ -36,7 +36,10 @@ public class TypeProducerInput<T> extends TextInput implements PreSelectInput<St
     private Set<T> item_set=null;
     private String unselected_text=null;
     private boolean pre_select=true;
-    
+    /** Change the set of valid items for the input.
+     * 
+     * @param set
+     */
     public void setSelectSet(Set<T> set){
     	item_set=set;
     }
