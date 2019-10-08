@@ -23,10 +23,13 @@ import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 
 
-
+/** A {@link SQLValue} that extracts the millisecond value from {@link Date} {@link SQLExpression}
+ * 
+ * @author Stephen Booth
+ *
+ */
 public class MillisecondSQLValue implements NestedSQLValue<Long,Date>{
 	private final SQLValue<Date> a;
 	public MillisecondSQLValue(SQLValue<Date> a){
