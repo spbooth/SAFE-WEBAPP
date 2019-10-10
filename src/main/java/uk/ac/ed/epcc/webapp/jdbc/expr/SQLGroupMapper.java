@@ -92,6 +92,9 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 	     */
 	    public  <T> SQLValue<T> addClause(SQLValue<T> orig, String name){
 	    	SQLValue<T> expr=orig;
+	    	if( expr instanceof WrappedSQLExpression) {
+	    		expr = ((WrappedSQLExpression<T>)expr).getSQLValue();
+	    	}
 	    	if(use_alias &&  name != null && orig instanceof SQLExpression ){
 	    		expr=new AliasSQLValue<>((SQLExpression<T>)orig,name);
 	    	}
@@ -130,7 +133,7 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 	     * @param field   field to min
 	     * @param name  name for result column
 	     */
-	    public final void addMin(SQLExpression<? extends Number> field, String name){
+	    public final void addMinNumber(SQLExpression<? extends Number> field, String name){
 	    	if( field == null ){
 	    		return;
 	    	}
@@ -152,7 +155,7 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 	     * @param field   field to max
 	     * @param name  name for result column
 	     */
-	    public final void addMax(SQLExpression<? extends Number> field, String name){
+	    public final void addMaxNumber(SQLExpression<? extends Number> field, String name){
 	    	if( field == null ){
 	    		return;
 	    	}

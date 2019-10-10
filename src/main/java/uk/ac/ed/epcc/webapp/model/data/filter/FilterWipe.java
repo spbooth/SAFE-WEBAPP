@@ -87,7 +87,11 @@ public class FilterWipe<T> extends FilterSelect<T> {
 	    		if( DatabaseService.LOG_UPDATE.isEnabled(res.getContext())){
 	    			res.getContext().getService(LoggerService.class).getLogger(getClass()).debug("Query is "+sql);
 	    		}
-	    		return stmt.executeUpdate();
+	    		int updates = stmt.executeUpdate();
+	    		if( updates > 0) {
+	    			res.flushCache();
+	    		}
+				return updates;
 	    	}catch(SQLException e){
 	    		sqlContext.getService().handleError("Error on update",e);
 	    		return 0; // actually unreachable

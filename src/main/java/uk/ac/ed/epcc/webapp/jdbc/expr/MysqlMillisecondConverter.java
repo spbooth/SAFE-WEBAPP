@@ -31,7 +31,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  */
 
 
-public class MysqlMillisecondConverter implements SQLExpression<Number>{
+public class MysqlMillisecondConverter implements SQLExpression<Long>, WrappedSQLExpression<Long>{
    @Override
 	public int hashCode() {
 		return exp.hashCode();
@@ -82,10 +82,19 @@ public String toString() {
 	return sb.toString();
  }
 
-public Class<Number> getTarget() {
-	return Number.class;
+public Class<Long> getTarget() {
+	return Long.class;
 }
 public SQLFilter getRequiredFilter() {
 	return exp.getRequiredFilter();
+}
+
+/* (non-Javadoc)
+ * @see uk.ac.ed.epcc.webapp.jdbc.expr.WrappedSQLExpression#getSQLValue()
+ */
+@Override
+public SQLValue<Long> getSQLValue() {
+	
+	return new MillisecondSQLValue(exp);
 }
 }

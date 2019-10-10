@@ -88,7 +88,11 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    		if( DatabaseService.LOG_UPDATE.isEnabled(res.getContext())){
 	    			res.getContext().getService(LoggerService.class).getLogger(getClass()).debug("Query is "+sql);
 	    		}
-	    		return stmt.executeUpdate();
+	    		int count = stmt.executeUpdate();
+	    		if( count > 0 ) {
+	    			res.flushCache();
+	    		}
+				return count;
 	    	}catch(SQLException e){
 	    		sqlContext.getService().handleError("Error on update",e);
 	    		return 0; // acutally unreachable

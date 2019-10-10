@@ -16,9 +16,11 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
+import java.util.Date;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.NumberOp;
-/** A {@link MapMapper} where the data field is Numerical that the maximum is selected from.
+/** A {@link MapMapper} where the data field is Numerical that the minimum is selected from.
  * As the key is a {@link SQLValue} rather than a {@link SQLExpression} we may have multiple SQL rows mapping to the
  * same key so numerical results may have to be combined.
  * 
@@ -28,19 +30,25 @@ import uk.ac.ed.epcc.webapp.NumberOp;
  */
 
 
-public class MaximumMapMapper<K> extends MapMapper<K, Number> {
+public class MinimumDateMapMapper<K> extends MapMapper<K, Date> {
 
-	public MaximumMapMapper(AppContext c, GroupingSQLValue<K> key, String key_name,SQLExpression<? extends Number> val, String value_name) throws InvalidKeyException {
+	public MinimumDateMapMapper(AppContext c, GroupingSQLValue<K> key, String key_name,SQLExpression<? extends Date> val, String value_name) throws InvalidKeyException {
 		super(c, key, key_name);
-		addMaxNumber(val, value_name);
+		addMinDate(val, value_name);
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.MapMapper#combine(java.lang.Object, java.lang.Object)
 	 */
 	@Override
-	protected Number combine(Number a, Number b) {
-		return NumberOp.max(a, b);		
+	protected Date combine(Date a, Date b) {
+		if( a == null ) {
+			return b;
+		}
+		if( b == null ) {
+			return a;
+		}
+		return a.before(b) ? a : b;		
 	}
 	
 

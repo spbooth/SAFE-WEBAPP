@@ -89,7 +89,7 @@ public class ExpressionFilterTest extends WebappTestBase {
 		SQLFilter<ExpressionTest> filter = SQLExpressionFilter.getFilter(fac.getTarget(),exp,MatchCondition.LT,c.getTime());
 		assertTrue(fac.matches(filter, obj));
 		assertEquals("FieldExpression(ExpressionTest.DateA->java.util.Date)", exp.toString());
-		assertEquals("SQLExpressionFilter(FieldExpression(ExpressionTest.DateA->java.lang.Integer)<1514764800)",filter.toString());
+		assertEquals("SQLExpressionFilter(FieldExpression(ExpressionTest.DateA->java.lang.Long)<1514764800)",filter.toString());
 	}
 	@Test
 	public void testMatchDate2() {

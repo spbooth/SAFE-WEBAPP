@@ -17,7 +17,7 @@ import java.util.Date;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.BoundedDateInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TimeStampMultiInput;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 /** Interface for class that can split {@link TimePeriod}s
  * Normally this is implemented by the appropriate factory class
@@ -40,7 +40,9 @@ public interface SplitManager<T extends TimePeriod> {
 	 * @param d
 	 * @throws ValidateException
 	 */
-	public abstract void canSplit(T orig, Date d) throws ValidateException;
+	public default void canSplit(T orig, Date d) throws ValidateException{
+		
+	}
 	/** Split a record at a specified time returning new record starting
 	 * at the split.
 	 * 
@@ -55,4 +57,15 @@ public interface SplitManager<T extends TimePeriod> {
 	 * @return Date or null
 	 */
 	 public Date getEditMarker();
+	 
+	 
+	 /** Get a date before which edits are forbidden for the current user
+	  * If no limit return null.
+	  * 
+	  * 
+	  * @return Date or null
+	  */
+	 default public Date getEditLimit(SessionService<?> sess) {
+		 return null;
+	 }
 }

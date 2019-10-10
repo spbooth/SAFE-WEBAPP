@@ -27,9 +27,10 @@ import uk.ac.ed.epcc.webapp.forms.inputs.BoundedDateInput;
 import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
-public class SplitTransition<T extends TimePeriod,K> extends AbstractFormTransition<T>{
+public class SplitTransition<T extends TimePeriod,K> extends AbstractFormTransition<T> implements GatedTransition<T>{
 	public class SplitAction extends FormAction{
 		
 		private final boolean nav_first;
@@ -114,6 +115,14 @@ public class SplitTransition<T extends TimePeriod,K> extends AbstractFormTransit
 			throws TransitionException {
 		Date start=target.getStart();
 		Date end = target.getEnd();
+		Date lock = fac.getEditLimit(conn.getService(SessionService.class));
+		
+		if( lock != null && lock.after(start)) {
+			start=lock;
+		}
+		if( ! start.before(end)) {
+			throw new TransitionException("No valid split");
+		}
 		Date guess;
 		guess = guessSplit(start,end);
 		BoundedDateInput input = fac.getDateInput();
@@ -160,6 +169,19 @@ public class SplitTransition<T extends TimePeriod,K> extends AbstractFormTransit
 			return start;
 		}
 		return guess;
+	}
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.period.GatedTransition#allow(uk.ac.ed.epcc.webapp.session.SessionService, java.lang.Object)
+	 */
+	@Override
+	public boolean allow(SessionService<?> serv, T target) {
+		Date limit = fac.getEditLimit(serv);
+		if( limit != null ) {
+			return limit.before(target.getEnd());
+		}
+		
+		return true;
 	}
 	
 }
