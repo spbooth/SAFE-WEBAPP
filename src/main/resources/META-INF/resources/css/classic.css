@@ -16,6 +16,11 @@
   --th-hover-bg-color: #f3f3f3;
   --form-bg-color: #cccccc;
   --form-hover-bg-color: #dddddd;
+  --menu-bg-color: #000000;
+  --menu-text-color: #ffffff;
+  --menu-border-color: #888;
+  --menu-hover-bg-color: #444444;
+  --menu-hover-text-color: #ff4040;
 }
 
 

@@ -8,8 +8,8 @@ body{
 .nav {
   margin: 0;
   padding: 0;
-  background: #000;
-  color: #fff;
+  background: var(--menu-bg-color);
+  color: var(--menu-text-color);
   position: relative;
   text-align: left;
   line-height: 11px;
@@ -24,7 +24,7 @@ body{
  */
 .nav ul {
   list-style: none;
-  background-color: #000;
+  background-color: var(--menu-bg-color);
   text-align: left;
   padding: 0;
   margin: 0;
@@ -44,12 +44,12 @@ body{
  */
 .nav a , .nav div{
   text-decoration: none;
-  color: #ffffff;
+  color: var(--menu-text-color);
   display: block;
   padding-left: 15px;
   padding-right: 5px;
   height: 30px;
-  border-bottom: 1px solid #888;
+  border-bottom: 1px solid var(--menu-border-color);
   transition: .3s background-color;
 }
 
@@ -58,8 +58,8 @@ body{
 .nav a:hover , .nav a:focus{
  /* background-color: #005f5f;
   */
-    background-color: #444;
-    color: #ff4040;
+    background-color: var(--menu-hover-bg-color);
+    color: var(--menu-hover-text-color);
     cursor: pointer;
 }
 
