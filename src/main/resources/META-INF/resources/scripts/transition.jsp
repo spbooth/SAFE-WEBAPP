@@ -109,7 +109,6 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 	form_content.setErrors(getErrors(request));
 }
 %>
-<%@ include file="/scripts/form_context.jsf" %>
 <div class="block">
 <h2><%=new HtmlBuilder().clean(page_heading).toString() %></h2>
 
@@ -132,6 +131,7 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
     	}
 	}
 %>
+<%@ include file="/scripts/inline_form_context.jsf" %>
 <form id="form" method="post" 
 <% if( multi ){ %>
    enctype="multipart/form-data"

@@ -80,14 +80,18 @@ public interface SequenceManager<T extends TimePeriod> extends SplitManager<T>{
 	 * @param d
 	 * @throws ValidateException
 	 */
-	public void canChangeStart(T current, Date d)throws ValidateException;
+	default public void canChangeStart(T current, Date d)throws ValidateException{
+		
+	}
 	/** Additional validation checks
 	 * 
 	 * @param current
 	 * @param d
 	 * @throws ValidateException
 	 */
-	public void canChangeEnd(T current, Date d)throws ValidateException;
+	default public void canChangeEnd(T current, Date d)throws ValidateException{
+		
+	}
 	/** Change the start date on the period
 	 * 
 	 * @param period

@@ -245,8 +245,16 @@ div.form {
 text-align: left;
 }
 
-
-
+/** inline errors for transition
+ */
+div.block div.error {
+margin: 10px 0px 0px 0px;
+padding: 0;
+}
+div.block div.error + form, div.wideblock div.error + form{
+margin: 0;
+border: solid red;
+}
 
 /*  keep the label widths limited so inputs are closer to the label
  */
