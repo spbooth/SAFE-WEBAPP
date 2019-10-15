@@ -24,6 +24,7 @@ import java.util.Arrays;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 
 /** Chart is a base class for chart generation.
  * Its essentially a facade class around underlying implementation classes (that implement the {@link ChartData} interface) to allow the underlying chart 
@@ -184,8 +185,9 @@ public abstract class Chart<P extends Plot> extends AbstractContexed {
 		if (nother > 0) {
 			new_nset++;
 		}
-		p.permSets(new_nset, perm);
-
+		try(TimeClosable time=new TimeClosable(getContext(), "permSets")){
+			p.permSets(new_nset, perm);
+		}
 		String legs[] = p.getLegends();
 		if( nother > 0 ){
 			legs[legs.length-1]="Others";
