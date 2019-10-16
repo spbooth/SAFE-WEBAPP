@@ -18,10 +18,15 @@ import java.util.Date;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.jdbc.expr.BinaryExpression;
+import uk.ac.ed.epcc.webapp.jdbc.expr.BinarySQLValue;
+import uk.ac.ed.epcc.webapp.jdbc.expr.ConstExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.DateSQLExpression;
+import uk.ac.ed.epcc.webapp.jdbc.expr.Operator;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.filter.CannotUseSQLException;
 import uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor;
+import uk.ac.ed.epcc.webapp.model.data.expr.DurationSQLExpression;
 import uk.ac.ed.epcc.webapp.session.Hash;
 /** This encodes the differences between different databases and
  * dialects of SQL.
@@ -57,6 +62,23 @@ public interface SQLContext extends Contexed{
 	 */
 	
 	public SQLExpression<? extends Number> convertToMilliseconds(SQLExpression<Date> expr);
+	
+	/** generate a {@link SQLExpression} for the difference between two dates.
+	 * 
+	 * @param resolution  size of time unit (in milliseconds)
+	 * @param start 
+	 * @param end
+	 * @return {@link SQLExpression}
+	 */
+	default public SQLExpression<? extends Number> dateDifference(long resolution, SQLExpression<Date> start, SQLExpression<Date> end){
+		if( resolution == 1L) {
+			return new DurationSQLExpression(convertToMilliseconds(start), convertToMilliseconds(end));
+		}
+		
+		return new DurationSQLExpression(resolution, 
+				BinaryExpression.create(getContext(), convertToMilliseconds(start), Operator.DIV, new ConstExpression(Long.class, resolution)),
+				BinaryExpression.create(getContext(), convertToMilliseconds(end), Operator.DIV, new ConstExpression(Long.class, resolution)));
+	}
 	/** Convert a Number {@link SQLExpression} to a date.
 	 * 
 	 * @param val

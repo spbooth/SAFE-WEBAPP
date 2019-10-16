@@ -27,6 +27,7 @@ import uk.ac.ed.epcc.webapp.jdbc.expr.DerefSQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.MysqlDateConverter;
 import uk.ac.ed.epcc.webapp.jdbc.expr.MysqlMillisecondConverter;
 import uk.ac.ed.epcc.webapp.jdbc.expr.MysqlSQLHashExpression;
+import uk.ac.ed.epcc.webapp.jdbc.expr.MysqlTimestampDiffExpr;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.filter.CannotUseSQLException;
 import uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor;
@@ -74,6 +75,18 @@ public class MysqlSQLContext implements SQLContext {
 		}
 		return new MysqlMillisecondConverter(expr);
 	}
+	@Override
+	public SQLExpression<? extends Number> dateDifference(long resolution, SQLExpression<Date> start,
+			SQLExpression<Date> end) {
+		if( start instanceof DateSQLExpression && end instanceof DateSQLExpression) {
+			return SQLContext.super.dateDifference(resolution, start, end);
+		}
+		return new MysqlTimestampDiffExpr(resolution, start, end);
+		
+		
+		
+	}
+
 	public DateSQLExpression convertToDate(SQLExpression<? extends Number> val, long res) {
 		if( val instanceof DerefSQLExpression){
 			return DateDerefSQLExpression.convertToDate(this, (DerefSQLExpression) val,res);

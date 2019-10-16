@@ -38,13 +38,19 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  */
 public class DurationSQLExpression  implements SQLExpression<Duration> {
   private final SQLExpression<? extends Number> start, end;
+  private final long resolution;
   int offset;
-  public DurationSQLExpression(SQLExpression<? extends Number> start, SQLExpression<? extends Number> end){
+  public DurationSQLExpression( SQLExpression<? extends Number> start, SQLExpression<? extends Number> end){
+	  // default to milliseconds
+	  this(1L,start,end);
+  }
+  public DurationSQLExpression(long resolution, SQLExpression<? extends Number> start, SQLExpression<? extends Number> end){
 	  this.start=start;
 	  this.end=end;
+	  this.resolution=resolution;
   }
   public DurationSQLExpression(DateSQLExpression start, DateSQLExpression end){
-	  this(start.getMillis(),end.getMillis());
+	  this(1L,start.getMillis(),end.getMillis());
   }
 
 public Class<Duration> getTarget() {
@@ -70,7 +76,7 @@ public List<PatternArgument> getParameters(List<PatternArgument> list) {
 
 
 public Duration makeObject(ResultSet rs, int pos) throws DataException, SQLException {
-		return new Duration(rs.getLong(pos),1L);
+		return new Duration(rs.getLong(pos),resolution);
 }
 @SuppressWarnings("unchecked")
 public SQLFilter getRequiredFilter() {
