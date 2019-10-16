@@ -220,7 +220,7 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	 */
 	@Override
 	public SQLExpression<Integer> getIDExpression() {
-		return new ConstExpression<Integer, T>(Integer.class, Integer.valueOf(val.getID()));
+		return new ConstExpression<>(clazz,Integer.class, Integer.valueOf(val.getID()));
 	}
 	
 

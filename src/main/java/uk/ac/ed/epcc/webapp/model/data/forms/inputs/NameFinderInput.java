@@ -33,6 +33,8 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	 * 
 	 */
 	protected final F factory;
+	
+	private String match_error = null;
 	/** create input
 	 * 
 	 * @param create   make entry if not found
@@ -57,6 +59,9 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 				if( restrict){
 					
 					if( ! factory.matches(autocomplete, item)){
+						if( match_error != null) {
+							throw new ValidateException(match_error);
+						}
 						throw new ValidateException("Input does not match required filter");
 					}
 				}
@@ -195,6 +200,12 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 			}
 		}
 		return super.convert(v);
+	}
+	public String getMatchError() {
+		return match_error;
+	}
+	public void setMatchError(String match_error) {
+		this.match_error = match_error;
 	}
 	
 }

@@ -51,6 +51,7 @@ import uk.ac.ed.epcc.webapp.forms.factory.FormUpdateProducer;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.PreSelectInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
@@ -1528,6 +1529,15 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	public final DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil){
 		return getInput(fil,true);
 	}
+	/** Generate the default input type. This is usually a {@link ListInput}
+	 * but can be overidden to return an auto-complete input.
+	 * 
+	 * Note that the error message when a 
+	 * 
+	 * @param fil   {@link BaseFilter} for suggested values
+	 * @param restrict boolean should filter restrict results
+	 * @return
+	 */
 	public DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil,boolean restrict){
 		return new DataObjectInput(fil,restrict);
 	}

@@ -19,6 +19,9 @@ import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ConstPatternArgument;
+import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
+import uk.ac.ed.epcc.webapp.jdbc.filter.NoSQLFilterException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
@@ -31,15 +34,20 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  * @param <T>  type of constant
  * @param <R> type of target object
  */
-public final class ConstExpression<T,R> implements SQLExpression<T>, SQLAccessor<T,R>, GroupingSQLValue<T> {
+public final class ConstExpression<T,R> implements SQLExpression<T>, SQLAccessor<T,R>, GroupingSQLValue<T>, FilterProvider<R, T> {
 	  	private final T n;
 	    private final Class<T> target;
+	    private final Class<R> filter_type;
 	    private final boolean log;
-	    public ConstExpression(Class<T>target,T n){
-	    	this(target,n,true);
+	    public ConstExpression(Class<T>target, T n) {
+	    	this((Class<R>) Object.class,target,n);
 	    }
-	    public ConstExpression(Class<T>target,T n,boolean log){
+	    public ConstExpression(Class<R> filter_type,Class<T>target,T n){
+	    	this(filter_type,target,n,true);
+	    }
+	    public ConstExpression(Class<R> filter_type,Class<T>target,T n,boolean log){
 	    	this.n=n;
+	    	this.filter_type=filter_type;
 	    	this.target=target;
 	    	this.log=log;
 	    }
@@ -132,5 +140,34 @@ public final class ConstExpression<T,R> implements SQLExpression<T>, SQLAccessor
 		public List<PatternArgument> getGroupParameters(
 				List<PatternArgument> list) {
 			return list;
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilter(uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition, java.lang.Object)
+		 */
+		@Override
+		public SQLFilter<R> getFilter(MatchCondition match, T val) throws CannotFilterException, NoSQLFilterException {
+			return new GenericBinaryFilter<R>(getFilterType(), match.compare(n,val));
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getNullFilter(boolean)
+		 */
+		@Override
+		public SQLFilter<R> getNullFilter(boolean is_null) throws CannotFilterException, NoSQLFilterException {
+			return new GenericBinaryFilter<R>(getFilterType(), (n == null) == is_null);
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getOrderFilter(boolean)
+		 */
+		@Override
+		public SQLFilter<R> getOrderFilter(boolean descending) throws CannotFilterException, NoSQLFilterException {
+			// No impact on order
+			return null;
+		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilterType()
+		 */
+		@Override
+		public Class<R> getFilterType() {
+			return filter_type;
 		}
 }

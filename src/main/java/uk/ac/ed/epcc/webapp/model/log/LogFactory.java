@@ -519,7 +519,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		spec.setField(OPERATOR_ID, new ReferenceFieldType(uf.getTag()));
 		spec.setField(LINK_ID, new IntegerFieldType());
 		try {
-			spec.new Index("OwnerKey",false,OWNER_ID);
+			spec.new Index("OwnerKey",false,OWNER_ID,DATE);
 		} catch (InvalidArgument e) {
 			getLogger().error("Error making key",e);
 		}
