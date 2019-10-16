@@ -104,7 +104,7 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 			}else{
 				fac.canChangeEnd(current, d);
 			}
-			if( move == null || ! move ){
+			if(bound != null && ( move == null || ! move )){
 				if( (move_start && d.before(bound.getEnd())) ||
 					((! move_start) && d.after(bound.getStart()))){
 			
