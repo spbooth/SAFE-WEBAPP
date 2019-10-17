@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.NoSQLFilterException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 
 /** A constant value {@link SQLAccessor}
@@ -146,6 +147,12 @@ public final class ConstExpression<T,R> implements SQLExpression<T>, SQLAccessor
 		 */
 		@Override
 		public SQLFilter<R> getFilter(MatchCondition match, T val) throws CannotFilterException, NoSQLFilterException {
+			if( match == null ) {
+				if( n == null ) {
+					return new GenericBinaryFilter<R>(getFilterType(), val == null);
+				}
+				return new GenericBinaryFilter<R>(getFilterType(), n.equals(val));
+			}
 			return new GenericBinaryFilter<R>(getFilterType(), match.compare(n,val));
 		}
 		/* (non-Javadoc)
@@ -153,6 +160,9 @@ public final class ConstExpression<T,R> implements SQLExpression<T>, SQLAccessor
 		 */
 		@Override
 		public SQLFilter<R> getNullFilter(boolean is_null) throws CannotFilterException, NoSQLFilterException {
+			if( n instanceof IndexedReference) {
+				return new GenericBinaryFilter<R>(getFilterType(), (n == null || ((IndexedReference)n).isNull()) == is_null);
+			}
 			return new GenericBinaryFilter<R>(getFilterType(), (n == null) == is_null);
 		}
 		/* (non-Javadoc)
