@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
@@ -42,6 +43,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.log.Viewable;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.ServeDataServlet;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
@@ -704,7 +706,11 @@ public <X> void addObject(X target) {
 	}else if(target instanceof XMLPrinter) {
 		append((XMLPrinter)target);
 	}else if( target instanceof Identified){
-		clean(((Identified)target).getIdentifier());
+		if( target instanceof Viewable && target instanceof Contexed) {
+			addLink(((Contexed)target).getContext(), ((Identified)target).getIdentifier(), ((Viewable)target).getViewTransition());
+		}else {
+			clean(((Identified)target).getIdentifier());
+		}
 	}else if( target  instanceof Iterable){
 		addList((Iterable)target);
 	}else if( target instanceof Object[]) {
