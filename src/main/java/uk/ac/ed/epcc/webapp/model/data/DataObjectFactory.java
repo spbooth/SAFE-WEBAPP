@@ -959,60 +959,17 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}		
       
 	}
-	/** Filter that selects based on a condition on a referenced object.
-	 * 
-	 * Adds a join to the remote table and adds a Filter on that table. 
-	 * This extends {@link Joiner} and provides the same functionality but
-	 * takes {@link DataObjectFactory} classes as argument instead of the underlying {@link Repository}.
-	 * This is an inner class of the factory that makes the reference.
-	 * 
-	 * If you need a remote filter which is not known to be a 
-	 * {@link SQLFilter} use 
-	 * {@link DataObjectFactory#getRemoteFilter(DataObjectFactory, String, BaseFilter)}
-	 * 
-	 * @author spb
-	 * @see RemoteAcceptFilter
-	 * @param <T> type of remote table
-	 */
-	public class RemoteFilter<T extends DataObject> extends Joiner<T,BDO> implements SQLFilter<BDO>{
-		/** Make filter from remote filter 
-		 * @param join_fac {@link DataObjectFactory} for remote object
-		 * @param join_field  field referencing remote object
-		 * @param fil  {@link SQLFilter} on remote object
-		 */
-		public RemoteFilter(DataObjectFactory<T> join_fac, String join_field, SQLFilter<T> fil){
-        	super(DataObjectFactory.this.getTarget(),fil,join_field,res,join_fac.res);
-        }
-	}
-	/** Filter that selects referenced objects based on a filter on this table
-	 * 
-	 * Adds a join to the remote table and adds a Filter on this table. 
-	 * This extends {@link Joiner} and provides the same functionality but
-	 * takes {@link DataObjectFactory} classes as argument instead of the underlying {@link Repository}.
-	 * This is an inner class of the factory that makes the reference.
-	 * 
-	 * @author spb
-	 *
-	 * @param <T> type of remote table
-	 */
-	public class DestFilter<T extends DataObject> extends Joiner<BDO,T> implements SQLFilter<T>{
-		/** Default filter for use when we want to select remote objects referenced from this table
-		 * with a select clause on this table.
-		 * 
-		 * @param fil {@link SQLFilter} on local object
-		 * @param join_field field pointing to remote object
-		 * @param join_fac {@link DataObjectFactory} for remote object.
-		 */
-		public DestFilter(SQLFilter<BDO> fil, String join_field, DataObjectFactory<T> join_fac){
-        	super(join_fac.getTarget(),fil,join_field,join_fac.res,res,false);
-        }
-	}
+	
+	
+	
 	/** An {@link AcceptFilter} version of DestFilter
 	 * 
 	 * @author spb
 	 * @see DestFilter
 	 * @param <T>
 	 */
+
+
 	public class DestAcceptFilter<T extends DataObject> extends AbstractAcceptFilter<T>{
 		private final BaseFilter<BDO> fil;
 		private final String join_field;
@@ -2264,7 +2221,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			if( sqlfilter == null ) {
 				return null;
 			}
-			return new DestFilter<>(sqlfilter, link_field,remote_fac);
+			return getDestFilter(sqlfilter, link_field,remote_fac);
 		}catch(NoSQLFilterException e){
 			return new DestAcceptFilter<>(fil, link_field, remote_fac);
 		}
@@ -2294,13 +2251,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		public BaseFilter<BDO> visitBaseFilter(BaseFilter<R> fil){
 			try{
 				SQLFilter<R> sqlfilter = FilterConverter.convert(fil);
-				return new RemoteFilter<>(remote_fac,field,sqlfilter);
+				return visitSQLFilter(sqlfilter);
 			}catch(NoSQLFilterException e){
 				return new RemoteAcceptFilter<>(getTarget(), remote_fac, field, fil);
 			}
 		}
-		public RemoteFilter<R> visitSQLFilter(SQLFilter<R> fil){
-			return new RemoteFilter<>(remote_fac, field, fil);
+		public SQLFilter<BDO> visitSQLFilter(SQLFilter<R> fil){
+			return getRemoteSQLFilter(remote_fac, field, fil);
 		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor#visitPatternFilter(uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter)
@@ -2326,13 +2283,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			try{
 				if( ! fil.hasAcceptFilters()){
 					SQLFilter<R> sqlfilter = FilterConverter.convert(fil);
-					return new RemoteFilter<>(remote_fac,field,sqlfilter);
+					return getRemoteSQLFilter(remote_fac, field, sqlfilter);
 				}
 			}catch(NoSQLFilterException e){
 			}
 			BaseFilter<BDO> result =new RemoteAcceptFilter<>(getTarget(), remote_fac, field, fil);
 			if( fil.hasPatternFilters() ){
-				result = new AndFilter<>(getTarget(),result, new RemoteFilter<>(remote_fac,field,fil.getNarrowingFilter()));
+				result = new AndFilter<>(getTarget(),result, getRemoteSQLFilter(remote_fac,field,fil.getNarrowingFilter()));
 			}
 			return result;
 
@@ -2416,6 +2373,17 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 		
 	}
-
-
+	public <R extends DataObject> SQLFilter<BDO> getRemoteSQLFilter(DataObjectFactory<R> remote_fac, String link_field,SQLFilter<R> fil){
+		return Joiner.getRemoteFilter(getTarget(), fil, link_field, res, remote_fac.res);
+	}
+	/** Default filter for use when we want to select remote objects referenced from this table
+	 * with a select clause on this table.
+	 * 
+	 * @param fil {@link SQLFilter} on local object
+	 * @param join_field field pointing to remote object
+	 * @param join_fac {@link DataObjectFactory} for remote object.
+	 */
+	public <T extends DataObject> SQLFilter<T> getDestFilter(SQLFilter<BDO> fil, String join_field, DataObjectFactory<T> join_fac){
+		return Joiner.getDestFilter(join_fac.getTarget(), fil, join_field,join_fac.res,res);
+	}
 }

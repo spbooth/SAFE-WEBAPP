@@ -62,7 +62,7 @@ public class DummyReferenceFactory extends DataObjectFactory<DummyReference> {
 	 * @return
 	 */
 	public SQLFilter<Dummy1> getReferencedFilter(String name){
-		return new DestFilter<>(new SQLValueFilter<>(getTarget(),res,DummyReference.STRING_FIELD,name), DummyReference.REF_FIELD, new Dummy1.Factory(getContext()));
+		return getDestFilter(new SQLValueFilter<>(getTarget(),res,DummyReference.STRING_FIELD,name), DummyReference.REF_FIELD, new Dummy1.Factory(getContext()));
 	}
 	public BaseFilter<DummyReference> getRemoteFilter(BaseFilter<Dummy1> fil){
 		Dummy1.Factory fac = new Dummy1.Factory(getContext());

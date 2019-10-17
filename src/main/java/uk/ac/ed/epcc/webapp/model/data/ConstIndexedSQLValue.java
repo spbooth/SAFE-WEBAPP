@@ -143,7 +143,7 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	public SQLFilter<T> getSQLFilter(SQLFilter<I> fil) throws CannotFilterException {
 		try{
 			DataObjectFactory<I> fac = getFactory();
-			return new Joiner<>(clazz, fil, fac.res, val.getID());
+			return Joiner.joinFixedRef(clazz, fil, fac.res, val.getID());
 		}catch(Exception e){
 			throw new CannotFilterException(e);
 		}

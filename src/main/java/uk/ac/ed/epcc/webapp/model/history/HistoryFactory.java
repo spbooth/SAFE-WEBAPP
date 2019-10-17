@@ -371,7 +371,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		 */
 		public HistoryFilter(SQLFilter<P> peer_filter, Date start, Date end) {
 			this(start,end);
-			addFilter(new RemoteFilter<>(getPeerFactory(),getPeerName(),peer_filter));
+			addFilter(getRemoteSQLFilter(getPeerFactory(),getPeerName(),peer_filter));
 		}
 		/** Select all history objects in a date range.
 		 * Start may be null to indicate a wild-card.
