@@ -1387,7 +1387,12 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	    	}
 	    	AccessRoleProvider<A,T> arp = getContext().makeObjectWithDefault(AccessRoleProvider.class,null,base);
 	    	if( arp != null ){
-	    		return arp.personInRelationFilter(this, sub, target);
+	    		BaseFilter<A> result = arp.personInRelationFilter(this, sub, target);
+	    		if( result != null) {
+	    			return result;
+	    		}
+	    		// unrecognised role
+	    		throw new UnknownRelationshipException(role);
 	    	}
 	    	NamedFilterProvider<T> nfp = getContext().makeObjectWithDefault(NamedFilterProvider.class, null, base);
 	    	if( nfp != null ) {
