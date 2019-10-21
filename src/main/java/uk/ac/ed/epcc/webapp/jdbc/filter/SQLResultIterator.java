@@ -30,6 +30,8 @@ import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.CloseableIterator;
 import uk.ac.ed.epcc.webapp.model.data.Removable;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 /** Iterator over filter results based on the SQL parts of a filter
  * 
@@ -57,7 +59,10 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 	static final int DEFAULT_CHUNKSIZE = 1024;
 		
 	// Would like this to be a preference but this class is needed to evaluate preferences
-    static final Feature CHUNKING_FEATURE= new Feature("chunking",true,"retrieve SQL data in chunks using limit clause");
+	// Nasty interaction with basic-auth and password-fail count
+	// 
+    //static final Feature CHUNKING_FEATURE= new Preference("chunking",true,"retrieve SQL data in chunks using limit clause",SessionService.ADMIN_ROLE,"Tester");
+	static final Feature CHUNKING_FEATURE= new Feature("chunking",false,"retrieve SQL data in chunks using limit clause");
 		private PreparedStatement stmt;
 		private ResultSet rs;
 		

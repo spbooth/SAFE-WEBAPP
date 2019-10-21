@@ -53,13 +53,17 @@ public class Preference extends Feature implements PreferenceSetting<Boolean>{
 		// Preference queries may occur often so cache the result in the context
 		Boolean b = (Boolean) conn.getAttribute(this);
 		if (b == null) {
+			// In case of recursion store default first
+			// The preference lookup will then use the global default
+			// This allows preferences to be set in low level functions used in the lookup
+			// once lookup is complete the user preference will be applied.
+			b = new Boolean(defaultSetting(conn));
+			conn.setAttribute(this, b);
 			if( canUserSet(conn)){
 				UserSettingFactory<UserSetting> fac = new UserSettingFactory<>(conn);
 				b = new Boolean(fac.getPreference(this));
-			}else{
-				b = new Boolean(defaultSetting(conn));
+				conn.setAttribute(this, b);
 			}
-			conn.setAttribute(this, b);
 		}
 		return b.booleanValue();
 	}
