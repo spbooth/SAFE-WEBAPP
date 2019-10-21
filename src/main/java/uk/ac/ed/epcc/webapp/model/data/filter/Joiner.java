@@ -79,6 +79,11 @@ public class Joiner<T extends DataObject, BDO extends DataObject> extends SQLAnd
 
 			// unique references/filters can also use a simple join. A unique reference
 			// could be implemented in either direction equivalently
+			// Ie there is ONLY ONE record in the remote table that references each parent 
+			// record. This substitutes for the case where we could have also created a 
+			// forward reference.
+			
+			
 			result.addFilter(new JoinerFilter(target,join_field, remote_res, res));
 			result.addRemoteFilter(fil);
 

@@ -40,7 +40,7 @@ public class Preference extends Feature implements PreferenceSetting<Boolean>{
 	public Preference(String name, boolean def, String description) {
 		this(name,def,description,null);
 	}
-	public Preference(String name, boolean def, String description, String required_roles[]) {
+	public Preference(String name, boolean def, String description, String ... required_roles) {
 		super(name, def, description);
 		this.required_roles=required_roles;
 	}

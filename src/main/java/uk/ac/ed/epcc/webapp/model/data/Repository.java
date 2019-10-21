@@ -35,6 +35,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -164,13 +165,15 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  */
 
 public final class Repository implements AppContextCleanup{
-	/**
-	 * 
+	/** config property prefix to mark that text fields should truncate 
+	 *  to the size of the field
 	 */
 	private static final String TRUNCATE_PREFIX = "truncate.";
 
-	/**
-	 * 
+	/** config property prefix to mark that a reference field
+	 * is a unique reference where at most one record in this table
+	 * links to the destination. Usually this is used in combination with
+	 * a single field unique key on the source table but there is no way
 	 */
 	private static final String UNIQUE_PREFIX = "unique.";
 
@@ -209,6 +212,7 @@ public final class Repository implements AppContextCleanup{
 	private static final int DEFAULT_RESOLUTION = 1000;
 
 	public static final Feature REQUIRE_ID_KEY = new Feature("require.id_key", true, "Require all tables to have an integer primary key");
+	public static final Feature CHECK_INDEX = new Feature("repository.check_index", true, "Always read indexinfo when getting metadata (for unique keys)");
 
 	public static final Feature READ_ONLY_FEATURE = new Feature("read-only",false,"supress (most) database writes");
 	
@@ -235,8 +239,8 @@ public final class Repository implements AppContextCleanup{
 		public boolean getUnique(){
 			return unique;
 		}
-		public Iterator<String> getCols(){
-			return cols.iterator();
+		public Iterable<String> getCols(){
+			return Collections.unmodifiableList(cols);
 		}
 		void addCol(int pos, String name){
 			pos--;
@@ -411,6 +415,9 @@ public final class Repository implements AppContextCleanup{
          */
         public boolean isUnique() {
         	return unique;
+        }
+        public void setUnique(boolean value) {
+        	unique=value;
         }
         public String getForeignKeyName(){
         	return key_name;
@@ -2933,6 +2940,9 @@ public final class Repository implements AppContextCleanup{
 			try(Statement stmt=c.createStatement(); ResultSet rs = stmt.executeQuery(sb.toString())) {
 				setMetaData(rs);
 				setReferences(ctx,c);
+				if(CHECK_INDEX.isEnabled(getContext())) {
+					setIndexes();
+				}
 			}catch( SQLSyntaxErrorException se) {
 				// This occurs when table does not exist
 				throw new NoTableException(getTable(), se);
@@ -2965,6 +2975,16 @@ public final class Repository implements AppContextCleanup{
 				}
 				
 			}
+			}
+			// Mark any fields we know to be unique
+			for( IndexInfo i : result.values()) {
+				if(i.unique && i.cols.size() == 1) {
+					String f = i.cols.get(0);
+					FieldInfo fi = getInfo(f);
+					if( fi != null ) {
+						fi.setUnique(true);
+					}
+				}
 			}
 			indexes=result;
 		}catch(SQLException e){
@@ -2999,7 +3019,7 @@ public final class Repository implements AppContextCleanup{
 					table=ctx.getInitParameter(name,table); // use param in preference because of windows case mangle
 					String tag = TableToTag(ctx, table);
 					//log.debug("field "+field+" references "+table);
-					info.setReference(true,key_name,tag,ctx.getBooleanParameter(UNIQUE_PREFIX+suffix, false));
+					info.setReference(true,key_name,tag,ctx.getBooleanParameter(UNIQUE_PREFIX+suffix, info.isUnique()));
 				}
 				
 			}
@@ -3387,4 +3407,23 @@ public final class Repository implements AppContextCleanup{
 		}
 		find_statement=null;
 	}
+    public static String typeName(int type) {
+    	switch(type) {
+    	case(Types.INTEGER): return "Integer";
+    	case(Types.BIGINT): return "BigInteger";
+    	case(Types.BOOLEAN): return "Boolean";
+    	case(Types.TIMESTAMP): return "Timestamp";
+    	case(Types.DATE): return "Date";
+    	case(Types.TIME): return "Time";
+    	case(Types.FLOAT): return "Float";
+    	case(Types.DOUBLE): return "Double";
+    	case(Types.CHAR): return "Char";
+    	case(Types.VARCHAR): return "Varchar";
+    	case(Types.LONGVARCHAR): return "LongVarChar";
+    	case(Types.BLOB): return "Blob";
+    	case(Types.VARBINARY): return "VarBianry";
+    	case(Types.LONGVARBINARY): return "LongVarBinary";
+    	default: return "Unknown";
+    	}
+    }
 }
