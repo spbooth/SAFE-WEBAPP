@@ -21,7 +21,7 @@ import java.util.List;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 
-/**
+/** A MYSQL specific SQLExpression for the difference between two {@link Date} valued expressions.
  * @author Stephen Booth
  *
  */
