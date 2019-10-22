@@ -61,8 +61,8 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 	// Would like this to be a preference but this class is needed to evaluate preferences
 	// Nasty interaction with basic-auth and password-fail count
 	// 
-    static final Feature CHUNKING_FEATURE= new Preference("chunking",true,"retrieve SQL data in chunks using limit clause",SessionService.ADMIN_ROLE,"Tester");
-	//static final Feature CHUNKING_FEATURE= new Feature("chunking",true,"retrieve SQL data in chunks using limit clause");
+    static final Feature CHUNKING_FEATURE= new Preference("chunking",false,"retrieve SQL data in chunks using limit clause",SessionService.ADMIN_ROLE,"Tester");
+	//static final Feature CHUNKING_FEATURE= new Feature("chunking",false,"retrieve SQL data in chunks using limit clause");
 		private PreparedStatement stmt;
 		private ResultSet rs;
 		
