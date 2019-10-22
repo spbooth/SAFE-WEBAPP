@@ -53,13 +53,21 @@ public class Preference extends Feature implements PreferenceSetting<Boolean>{
 		// Preference queries may occur often so cache the result in the context
 		Boolean b = (Boolean) conn.getAttribute(this);
 		if (b == null) {
+			
+			b = new Boolean(defaultSetting(conn));
+			SessionService sess = conn.getService(SessionService.class);
+			if( ! sess.isAuthenticated()) {
+				// This ensures that preferences don't trigger authentication
+				// within the authentication flow itself
+				// user must already have authenticated for preferences to take effect.
+				// don't cache as this will change once user authenticates
+				return b.booleanValue();
+			}
 			// In case of recursion store default first
 			// The preference lookup will then use the global default
 			// This allows preferences to be set in low level functions used in the lookup
 			// once lookup is complete the user preference will be applied.
-			b = new Boolean(defaultSetting(conn));
 			conn.setAttribute(this, b);
-			SessionService sess = conn.getService(SessionService.class);
 			if( sess !=null && canView(sess)){
 				UserSettingFactory<UserSetting> fac = new UserSettingFactory<>(conn);
 				b = new Boolean(fac.getPreference(this));
@@ -103,12 +111,6 @@ public class Preference extends Feature implements PreferenceSetting<Boolean>{
 	 * @return
 	 */
 	public boolean canView(SessionService<?> sess){
-		if( ! sess.isAuthenticated()) {
-			// This ensures that preferences don't trigger authentication
-			// within the authentication flow itself
-			// user must already have autehnticated for preferences to take effect.
-			return false;
-		}
 		if( canUserSet(sess.getContext())){
 			if( required_roles == null || required_roles.length == 0){
 				return true;
