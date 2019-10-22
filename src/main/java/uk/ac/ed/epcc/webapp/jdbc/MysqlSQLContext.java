@@ -78,7 +78,7 @@ public class MysqlSQLContext implements SQLContext {
 	@Override
 	public SQLExpression<? extends Number> dateDifference(long resolution, SQLExpression<Date> start,
 			SQLExpression<Date> end) {
-		if( start instanceof DateSQLExpression && end instanceof DateSQLExpression) {
+		if( start instanceof DateSQLExpression || end instanceof DateSQLExpression) {
 			return SQLContext.super.dateDifference(resolution, start, end);
 		}
 		return new MysqlTimestampDiffExpr(resolution, start, end);
