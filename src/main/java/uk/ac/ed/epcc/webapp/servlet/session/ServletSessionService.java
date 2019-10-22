@@ -369,48 +369,59 @@ protected Integer getPersonID() {
 	}
 	try{
 		if( ! ss.isComitted() ){
-			// We can't make a session once response is committed so
-			// no point doing the lookup we can't store it.
-			// We should not need to do person lookup after the fact
-			ss.populateSession(this);
-			id = super.getPersonID();
-			if( id != null ){
-				return id;
-			}
-			String name = getCrossAppCookieName();
-			if( name != null){
-				try{
-					// look for a cross-login cookie
-					Cookie[] cookies = request.getCookies();
-					if( cookies != null){
-						for(Cookie c : cookies){
-							if( c.getName().equals(name) ){
-								String value = c.getValue();
-								WtmpManager man = getWtmpManager();
-								if( man != null ){
-									CrossCookieComposite ccs = man.getComposite(CrossCookieComposite.class);
-									if( ccs != null){
-										Wtmp w = man.find(ccs.getFilter(value),true);
-										if( w != null){
-											CurrentTimeService cts = getContext().getService(CurrentTimeService.class);
-											Date now = cts.getCurrentTime();
-											if( w.getEndTime().after(now)){
-												AppUser person = w.getPerson();
-												setCurrentPersonNoWtmp((A) person);
-												setAttribute(WTMP_ID, w.getID());
-												setAttribute(WTMP_EXPIRY_DATE, w.getEndTime());
-												return person.getID();
+			// suppress recursive lookup
+			// no current person will be found until this block ends
+			// This will allow us to check Preferences within the block
+			// only makes sense for logging/debug preferences but these are still useful
+			force_no_person=true;
+
+			try {
+				// We can't make a session once response is committed so
+				// no point doing the lookup we can't store it.
+				// We should not need to do person lookup after the fact
+				ss.populateSession(this);
+				id = super.getPersonID();
+				if( id != null ){
+					return id;
+				}
+				String name = getCrossAppCookieName();
+				if( name != null){
+					try{
+						// look for a cross-login cookie
+						Cookie[] cookies = request.getCookies();
+						if( cookies != null){
+							for(Cookie c : cookies){
+								if( c.getName().equals(name) ){
+									String value = c.getValue();
+									WtmpManager man = getWtmpManager();
+									if( man != null ){
+										CrossCookieComposite ccs = man.getComposite(CrossCookieComposite.class);
+										if( ccs != null){
+											Wtmp w = man.find(ccs.getFilter(value),true);
+											if( w != null){
+												CurrentTimeService cts = getContext().getService(CurrentTimeService.class);
+												Date now = cts.getCurrentTime();
+												if( w.getEndTime().after(now)){
+													AppUser person = w.getPerson();
+													setCurrentPersonNoWtmp((A) person);
+													setAttribute(WTMP_ID, w.getID());
+													setAttribute(WTMP_EXPIRY_DATE, w.getEndTime());
+													return person.getID();
+												}
 											}
 										}
 									}
 								}
 							}
 						}
+					}catch(Exception t){
+						getContext().error(t,"Error reading cross app cookie");
 					}
-				}catch(Exception t){
-					getContext().error(t,"Error reading cross app cookie");
 				}
+			}finally {
+				force_no_person=false;
 			}
+
 		}	
 		// At one stage we explicitly stored 0 as the personid to prevent additional lookups.
 		// This breaks the sign-up code as the newly created user is remembered as being
