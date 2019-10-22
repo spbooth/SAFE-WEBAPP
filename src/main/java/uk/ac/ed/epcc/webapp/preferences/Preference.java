@@ -59,7 +59,8 @@ public class Preference extends Feature implements PreferenceSetting<Boolean>{
 			// once lookup is complete the user preference will be applied.
 			b = new Boolean(defaultSetting(conn));
 			conn.setAttribute(this, b);
-			if( canView(conn.getService(SessionService.class))){
+			SessionService sess = conn.getService(SessionService.class);
+			if( sess !=null && canView(sess)){
 				UserSettingFactory<UserSetting> fac = new UserSettingFactory<>(conn);
 				b = new Boolean(fac.getPreference(this));
 				conn.setAttribute(this, b);
