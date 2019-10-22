@@ -103,6 +103,12 @@ public class Preference extends Feature implements PreferenceSetting<Boolean>{
 	 * @return
 	 */
 	public boolean canView(SessionService<?> sess){
+		if( ! sess.isAuthenticated()) {
+			// This ensures that preferences don't trigger authentication
+			// within the authentication flow itself
+			// user must already have autehnticated for preferences to take effect.
+			return false;
+		}
 		if( canUserSet(sess.getContext())){
 			if( required_roles == null || required_roles.length == 0){
 				return true;

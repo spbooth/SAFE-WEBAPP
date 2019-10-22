@@ -535,7 +535,11 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		if (answer == null) {
 			if( haveCurrentUser() ){
 				answer = testRole(role);
-				role_map.put(role, answer);
+				if( answer != null && role_map != null) {
+					role_map.put(role, answer);
+				}else {
+					return false;
+				}
 			}else{
 				return false;
 			}
@@ -668,6 +672,13 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		return person;
 	}
 
+	 /* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.session.SessionService#isAuthenticated()
+	 */
+	@Override
+	public final boolean isAuthenticated() {
+		return person != null;
+	}
 	@Override
 	public final boolean haveCurrentUser() {
 		if( person != null ){
