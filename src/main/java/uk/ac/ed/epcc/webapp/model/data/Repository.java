@@ -212,7 +212,8 @@ public final class Repository implements AppContextCleanup{
 	private static final int DEFAULT_RESOLUTION = 1000;
 
 	public static final Feature REQUIRE_ID_KEY = new Feature("require.id_key", true, "Require all tables to have an integer primary key");
-	public static final Feature CHECK_INDEX = new Feature("repository.check_index", true, "Always read indexinfo when getting metadata (for unique keys)");
+	// This seems to serialise in the database affecting performance.
+	public static final Feature CHECK_INDEX = new Feature("repository.check_index", false, "Always read indexinfo when getting metadata (for unique keys)");
 
 	public static final Feature READ_ONLY_FEATURE = new Feature("read-only",false,"supress (most) database writes");
 	
