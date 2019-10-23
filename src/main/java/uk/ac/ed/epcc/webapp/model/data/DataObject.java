@@ -77,7 +77,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  * <p>
  * 
  */
-public abstract class DataObject implements ContextIndexed, Identified{
+public abstract class DataObject implements ContextIndexed, Identified, Releasable{
 	protected static final boolean DEBUG = false;
 
 	/** All the fields for this record. */
@@ -342,6 +342,7 @@ public abstract class DataObject implements ContextIndexed, Identified{
 	 * This will also clear the record from the {@link Repository} cache if this is enabled;S
 	 * 
 	 * */
+	@Override
 	public void release() {
 		if( record != null ){
 		  record.clear();

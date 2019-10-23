@@ -24,6 +24,7 @@ import uk.ac.ed.epcc.webapp.charts.strategy.QueryMapper;
 import uk.ac.ed.epcc.webapp.charts.strategy.SetRangeMapper;
 import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.limits.LimitService;
+import uk.ac.ed.epcc.webapp.model.data.Releasable;
 //import uk.ac.ed.epcc.webapp.time.Period;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
@@ -104,7 +105,11 @@ public abstract class PeriodChart<P extends PeriodPlot> extends Chart {
 		// Note we can't call this method addData or there may be an ambiguity against
 		// this single addData because the type erases to Object  
 		while (i.hasNext()) {
-			addData(ds, t, i.next());
+			D data = i.next();
+			addData(ds, t, data);
+			if( data instanceof Releasable) {
+				((Releasable)data).release();
+			}
 		}
 	}
 
