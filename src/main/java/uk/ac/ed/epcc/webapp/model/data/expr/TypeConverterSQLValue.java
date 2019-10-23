@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider;
 import uk.ac.ed.epcc.webapp.jdbc.expr.NestedSQLValue;
+import uk.ac.ed.epcc.webapp.jdbc.expr.SQLAccessor;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpressionFilter;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue;
@@ -30,7 +31,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeConverter;
 /** A type converter wrapper SQLValue.
- * 
+ * normally you want a {@link TypeFilterProducerSQLValue}
  * @author spb
  *
  * @param <H> type of host object
@@ -40,6 +41,8 @@ import uk.ac.ed.epcc.webapp.model.data.convert.TypeConverter;
 
 
 public class TypeConverterSQLValue<H,T,D> implements  NestedSQLValue<T,D>, FilterProvider<H,T>{
+	
+	
 	private final Class<H> target;
 	public TypeConverterSQLValue(Class<H> target,TypeConverter<T, D> converter, SQLValue<D> inner) {
 		super();
