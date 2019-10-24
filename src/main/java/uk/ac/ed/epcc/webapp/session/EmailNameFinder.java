@@ -28,6 +28,7 @@ import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
 import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.email.inputs.EmailInput;
+import uk.ac.ed.epcc.webapp.email.inputs.ServiceAllowedEmailFieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
@@ -142,6 +143,7 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		Field field = f.getField(EMAIL);
 		if( field !=null) {
 			field.addValidator(new ParseFactoryValidator<>(this, null));
+			field.addValidator(new ServiceAllowedEmailFieldValidator(getContext()));
 		}
 	}
 

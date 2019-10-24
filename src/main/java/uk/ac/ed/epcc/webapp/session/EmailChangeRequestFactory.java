@@ -22,6 +22,8 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.email.inputs.EmailInput;
+import uk.ac.ed.epcc.webapp.email.inputs.ServiceAllowedEmailFieldValidator;
+import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
@@ -174,8 +176,10 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractReques
 	    	}
 			f.addInput(EmailNameFinder.EMAIL, "New Email Address", input);
 			// Must not change to existing email unless already taken by same user.
-			f.getField(EmailNameFinder.EMAIL).removeValidator(new ParseFactoryValidator<AppUser>(factory, null));
-			f.getField(EmailNameFinder.EMAIL).addValidator(new ParseFactoryValidator<AppUser>(factory, user));
+			Field field = f.getField(EmailNameFinder.EMAIL);
+			field.addValidator(new ServiceAllowedEmailFieldValidator(getContext()));
+			field.removeValidator(new ParseFactoryValidator<AppUser>(factory, null));
+			field.addValidator(new ParseFactoryValidator<AppUser>(factory, user));
 			
 	    	f.addAction(REQUEST_ACTION, new RequestAction(user));
 	    	if( include_verify) {
