@@ -22,6 +22,7 @@ import uk.ac.ed.epcc.webapp.jdbc.expr.BinaryExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.BinarySQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.expr.ConstExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.DateSQLExpression;
+import uk.ac.ed.epcc.webapp.jdbc.expr.DerefSQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.Operator;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.filter.CannotUseSQLException;
@@ -63,6 +64,15 @@ public interface SQLContext extends Contexed{
 	
 	public SQLExpression<? extends Number> convertToMilliseconds(SQLExpression<Date> expr);
 	
+	default public SQLExpression<? extends Number> convertToSeconds(SQLExpression<Date> expr){
+		if( expr instanceof DateSQLExpression) {
+			return ((DateSQLExpression)expr).getSeconds();
+		}
+		if( expr instanceof DerefSQLExpression){
+			return DerefSQLExpression.convertToSeconds(this, (DerefSQLExpression) expr);
+		}
+		return BinaryExpression.create(getContext(), convertToMilliseconds(expr), Operator.DIV, new ConstExpression(Long.class, 1000L));
+	}
 	/** generate a {@link SQLExpression} for the difference between two dates.
 	 * 
 	 * @param resolution  size of time unit (in milliseconds)
@@ -72,12 +82,45 @@ public interface SQLContext extends Contexed{
 	 */
 	default public SQLExpression<? extends Number> dateDifference(long resolution, SQLExpression<Date> start, SQLExpression<Date> end){
 		if( resolution == 1L) {
-			return new DurationSQLExpression(convertToMilliseconds(start), convertToMilliseconds(end));
+			// Generate a duration if resolution is millisecond
+			if( start instanceof DateSQLExpression && end instanceof DateSQLExpression) {
+				DateSQLExpression s = (DateSQLExpression) start;
+				DateSQLExpression e = (DateSQLExpression) end;
+				if( s.preferSeconds() && e.preferSeconds()) {
+					// work in seconds if we can
+					return new DurationSQLExpression(1000L, s.getSeconds(), e.getSeconds());
+				}
+					
+			}
+			// fall-back duration	
+			return new DurationSQLExpression(1L,convertToMilliseconds(start), convertToMilliseconds(end));
+		}else {
+		    // Just a numeric expression	
+			if( start instanceof DateSQLExpression && end instanceof DateSQLExpression) {
+				DateSQLExpression s = (DateSQLExpression) start;
+				DateSQLExpression e = (DateSQLExpression) end;
+				if( s.preferSeconds() && e.preferSeconds() && resolution%1000L == 0) {
+					// work in seconds if we can
+					SQLExpression<Number> diff = BinaryExpression.create(getContext(), e.getSeconds(), Operator.SUB, s.getSeconds());
+					if( resolution == 1000L) {
+						return diff;
+					}
+					return BinaryExpression.create(getContext(), 
+							diff, 
+							Operator.DIV,
+							new ConstExpression(Long.class,resolution/1000L));
+				}
+			}
+			// fall back
+			return BinaryExpression.create(getContext(), 
+					BinaryExpression.create(getContext(), convertToMilliseconds(end), Operator.SUB, convertToMilliseconds(start)), 
+					Operator.DIV,
+					new ConstExpression(Long.class,resolution));
 		}
 		
-		return new DurationSQLExpression(resolution, 
-				BinaryExpression.create(getContext(), convertToMilliseconds(start), Operator.DIV, new ConstExpression(Long.class, resolution)),
-				BinaryExpression.create(getContext(), convertToMilliseconds(end), Operator.DIV, new ConstExpression(Long.class, resolution)));
+		
+		
+		
 	}
 	/** Convert a Number {@link SQLExpression} to a date.
 	 * 

@@ -65,8 +65,8 @@ public class MysqlTimestampDiffExpr implements SQLExpression<Long> {
 		return true;
 	}
 
-	/**
-	 * @param resolution
+	/** 
+	 * @param resolution  size of unit in milliseconds.
 	 * @param start
 	 * @param end
 	 */

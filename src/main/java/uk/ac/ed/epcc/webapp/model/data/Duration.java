@@ -27,14 +27,13 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
  * in months and years that can't necessarily be compared. This is a simple
  * implementation that just wraps around a <code>long</code>.
  * 
- * These constructors for these objects always work in seconds. 
+ * Most constructors for these objects  work in seconds. 
  * Seconds were chosen primarily because the SI unit of time is a
  * second, so it seems as good a choice as any. Many durations stored in various
  * formats are accurate to at least seconds but not necessarily any more.
  * 
- * Internally the value is stored in a finer resolution unit that defaults to milliseconds but can be overridden
- * when constructing the object.
- * {@link Duration} extends {@link Number} and the numerical value is the duration in the internal units.
+ * Internally the value is stored in milliseconds but can be overridden
+ * {@link Duration} extends {@link Number} and the numerical value is milliseconds.
  * 
  * This is the value used when storing {@link Duration}s to the database. However by default  If you wish to persist objects in custom units a 
  * {@link DurationFieldValue} with a custom resolution must be installed in the factory. So if the 

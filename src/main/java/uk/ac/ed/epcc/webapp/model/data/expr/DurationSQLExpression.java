@@ -21,17 +21,15 @@ import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.expr.DateSQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.Duration;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 
-/** SQLExpression for duration. Only works where the
- * start and end dates can be Millisecond SQLExpressions
+/** SQLExpression for duration. 
+
  * 
  * @author spb
  *
@@ -40,17 +38,21 @@ public class DurationSQLExpression  implements SQLExpression<Duration> {
   private final SQLExpression<? extends Number> start, end;
   private final long resolution;
   int offset;
-  public DurationSQLExpression( SQLExpression<? extends Number> start, SQLExpression<? extends Number> end){
-	  // default to milliseconds
-	  this(1L,start,end);
-  }
+  
+  
+  /** {@link Duration} {@link SQLExpression}  (value in milliseconds)
+   * 
+   * @param resolution
+   * @param start  start-time in units of resolution milliseconds
+   * @param end    end-time in units of resolution  milliseconds
+   */
   public DurationSQLExpression(long resolution, SQLExpression<? extends Number> start, SQLExpression<? extends Number> end){
 	  this.start=start;
 	  this.end=end;
 	  this.resolution=resolution;
   }
-  public DurationSQLExpression(DateSQLExpression start, DateSQLExpression end){
-	  this(1L,start.getMillis(),end.getMillis());
+  public DurationSQLExpression(SQLExpression<? extends Number> start, SQLExpression<? extends Number> end){
+	  this(1L,start,end);
   }
 
 public Class<Duration> getTarget() {
@@ -61,22 +63,33 @@ public String toString() {
 	return "Duration("+start.toString()+","+end.toString()+")";
 }
 
+
 public int add(StringBuilder sb, boolean qualify) {
+	if( resolution != 1L) {
+		sb.append("(");
+		sb.append(Long.toString(resolution));
+		sb.append("*");
+	}
 	sb.append("(");
 	end.add(sb, qualify);
 	sb.append("-");
 	start.add(sb, qualify);
 	sb.append(")");
+	if( resolution != 1L) {
+		sb.append(")");
+	}
 	return 1;
 }
 public List<PatternArgument> getParameters(List<PatternArgument> list) {
 	list = end.getParameters(list);
-	return start.getParameters(list);
+	list =  start.getParameters(list);
+	return list;
 }
 
 
 public Duration makeObject(ResultSet rs, int pos) throws DataException, SQLException {
-		return new Duration(rs.getLong(pos),resolution);
+	// expression is always valued in milliseconds
+		return new Duration(rs.getLong(pos),1L);
 }
 @SuppressWarnings("unchecked")
 public SQLFilter getRequiredFilter() {
