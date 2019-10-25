@@ -177,7 +177,7 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractReques
 			f.addInput(EmailNameFinder.EMAIL, "New Email Address", input);
 			// Must not change to existing email unless already taken by same user.
 			Field field = f.getField(EmailNameFinder.EMAIL);
-			field.addValidator(new ServiceAllowedEmailFieldValidator(getContext()));
+			field.addValidator(EmailNameFinder.getEmailValidator(getContext()));
 			field.removeValidator(new ParseFactoryValidator<AppUser>(factory, null));
 			field.addValidator(new ParseFactoryValidator<AppUser>(factory, user));
 			

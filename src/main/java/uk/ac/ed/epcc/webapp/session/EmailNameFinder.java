@@ -26,13 +26,18 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
+import uk.ac.ed.epcc.webapp.content.XMLBuilderSaxHandler;
+import uk.ac.ed.epcc.webapp.content.XMLPrinter;
 import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.email.inputs.EmailInput;
 import uk.ac.ed.epcc.webapp.email.inputs.ServiceAllowedEmailFieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Field;
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
@@ -137,13 +142,16 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 	}
 
 
-
+   public static FieldValidator<String> getEmailValidator(AppContext conn){
+	   return conn.makeObjectWithDefault(FieldValidator.class, ServiceAllowedEmailFieldValidator.class, "email.field-validator");
+   }
+	
 	@Override
 	public void customiseForm(Form f) {
 		Field field = f.getField(EMAIL);
 		if( field !=null) {
 			field.addValidator(new ParseFactoryValidator<>(this, null));
-			field.addValidator(new ServiceAllowedEmailFieldValidator(getContext()));
+			field.addValidator(getEmailValidator(getContext()));
 		}
 	}
 
@@ -260,6 +268,18 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 			if( needVerify(target)) {
 				cb.addObject(new PreDefinedContent(op.getContext(), "email_verification_required",verifyRefreshDays()));
 			}
+			String email = getCanonicalName(target);
+			FieldValidator<String> val = getEmailValidator(getContext());
+			try {
+				val.validate(email);
+			}catch(ValidateException e) {
+				ExtendedXMLBuilder text = cb.getText();
+				text.addClass("warn");
+				text.clean(e.getMessage());
+				text.appendParent();
+			}catch(Exception x) {
+				getLogger().error("Error validating email", x);
+			}
 			return cb;
 		}
 
@@ -299,8 +319,17 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		 */
 		@Override
 		public boolean required(SessionService<AU> user) {
-			
-			return needVerify(user.getCurrentPerson());
+			AU currentPerson = user.getCurrentPerson();
+			String email = getCanonicalName(currentPerson);
+			FieldValidator<String> val = getEmailValidator(getContext());
+			try {
+				val.validate(email);
+			}catch(ValidateException e) {
+				return true;
+			}catch(Exception x) {
+				getLogger().error("Error validating email", x);
+			}
+			return needVerify(currentPerson);
 		}
 
 		
@@ -314,6 +343,8 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		}
 		
 	}
+	
+
 
 	@Override
 	public void addEraseFields(Set<String> fields) {
@@ -379,6 +410,7 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		}
 		return false;
 	}
+	
 
 
 }
