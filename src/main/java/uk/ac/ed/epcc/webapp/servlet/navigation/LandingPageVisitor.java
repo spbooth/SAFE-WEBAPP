@@ -27,6 +27,14 @@ public class LandingPageVisitor implements Visitor{
 	private final AppContext conn;
 	private final HtmlBuilder builder;
 	private boolean active=false;
+	private boolean list_only=false;
+	public boolean isListOnly() {
+		return list_only;
+	}
+	public void setListOnly(boolean list_only) {
+		this.list_only = list_only;
+	}
+
 	private final String target_name;
 	public LandingPageVisitor(AppContext conn,HtmlBuilder builder, String target_name){
 		this.conn=conn;
@@ -62,9 +70,11 @@ public class LandingPageVisitor implements Visitor{
 		boolean target_node = target_name != null && target_name.equals(node.getID());
 		if( target_node){
 			active=true;
-			builder.open("div");
-			builder.attr("class","block");
-			builder.addHeading(2, node.getMenuText(conn));
+			if( ! list_only) {
+				builder.open("div");
+				builder.attr("class","block");
+				builder.addHeading(2, node.getMenuText(conn));
+			}
 		}else{
 			if(active ){
 				builder.open("li");
@@ -103,7 +113,9 @@ public class LandingPageVisitor implements Visitor{
 			visitContainer(node);
 		}
 		if( active){
-			builder.close(); // close node
+			if( ! target_node || ! list_only) {
+				builder.close(); // close node
+			}
 		}
 		if( target_node){
 			active=false;
