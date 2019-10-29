@@ -20,7 +20,6 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.DataCache;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 /** A DataCache keyed by IndexedReference objects.
  * This needs no additional logic to create the target objects as the IndexedRefenece can do this 
  * directly. However the use of a cache can reduce the number of database lookups.

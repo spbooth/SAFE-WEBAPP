@@ -63,6 +63,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.LockedRecordException;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
@@ -629,6 +630,8 @@ public final class Repository implements AppContextCleanup{
 		private int id;
 
 		private Set<String> dirty = null;
+		
+		private boolean locked=false;
 		public Record() {
 			super();
 		}
@@ -650,6 +653,9 @@ public final class Repository implements AppContextCleanup{
 		 */
 		@Override
 		public synchronized void clear() {
+			if( locked) {
+				throw new LockedRecordException("clear called on locked record");
+			}
 			deCache();
 			super.clear();
 			clean();
@@ -662,6 +668,7 @@ public final class Repository implements AppContextCleanup{
 		@Override
 		public synchronized Object clone() {
 			Record copy = (Record) super.clone();
+			copy.locked=false;
 			if( have_id ){
 				copy.have_id=true;
 				copy.id=id;
@@ -731,13 +738,19 @@ public final class Repository implements AppContextCleanup{
         		throw new ConsistencyError("copying Record from different repository");
         	}
         	clear();
-        	putAll(r);
+        	// copy raw values without impacting dirty values
+        	for(Entry<String,Object> e : r.entrySet()) {
+        		super.put(e.getKey(),e.getValue());
+        	}
         	if( r.have_id){
         		have_id=true;
         		id=r.id;
         	}
         	if( r.dirty != null){
         		dirty=new HashSet( r.dirty );
+        	}else {
+        		// putAll will have set local diry flags
+        		dirty = null;
         	}
         }
         
@@ -1168,6 +1181,9 @@ public final class Repository implements AppContextCleanup{
 //				// never allow null in initial object
 //				throw new UnsupportedOperationException("Null value stored in "+key);
 //			}
+			if( locked) {
+				throw new LockedRecordException("put on locked record "+getID());
+			}
 
 			if (!hasField(key)) {
 				if (optional &&  ! key.equals(id_name)) {
@@ -1301,6 +1317,9 @@ public final class Repository implements AppContextCleanup{
 		 * @param val
 		 */
 		synchronized void setDirty(String key, boolean val) {
+			if( val && locked) {
+				throw new LockedRecordException("setDirty called on locked record");
+			}
 			if (dirty == null) {
 				if( ! val ){
 					return;
@@ -1808,6 +1827,21 @@ public final class Repository implements AppContextCleanup{
 		    		}
 		    		sb.append(" ]");
 		    	return sb.toString();
+		    }
+		    /** mark the record as read-only/locked
+		     * 
+		     * This is intended for when 
+		     * 
+		     * @throws DataFault
+		     */
+		    public void lock() throws DataFault {
+		    	if( isDirty()) {
+		    		throw new DataFault("lock of dirty record");
+		    	}
+		    	locked=true;
+		    }
+		    public boolean isLocked() {
+		    	return locked;
 		    }
 	}
 

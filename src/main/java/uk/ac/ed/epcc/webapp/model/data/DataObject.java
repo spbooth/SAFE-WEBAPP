@@ -339,19 +339,35 @@ public abstract class DataObject implements ContextIndexed, Identified, Releasab
 	}
 
 	/** This is used like a destructor - means less connections, etc lying around 
-	 * This will also clear the record from the {@link Repository} cache if this is enabled;S
+	 * This will also clear the record from the {@link Repository} cache if this is enabled
 	 * 
 	 * */
 	@Override
 	public void release() {
 		if( record != null ){
+			// Note this will throw LockedRecordException if locked.
 		  record.clear();
 		  record = null;
 		}
 	}
 
-
-	
+	/** Lock record so it is unmodifiable.
+	 * 
+	 * This is intended for when {@link DataObject}s are being cached to reduce risk
+	 * 
+	 * @throws DataFault
+	 */
+    protected void lock() throws DataFault {
+    	if( record != null ) {
+    		record.lock();
+    	}
+    }
+	protected boolean isLocked() {
+		if( record != null) {
+			return record.isLocked();
+		}
+		return false;
+	}
 
 	/**
 	 * update multiple fields at once using a Map
