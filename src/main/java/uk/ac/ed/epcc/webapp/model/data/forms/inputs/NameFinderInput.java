@@ -191,7 +191,13 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 			}
 		}
 		if( v instanceof Number) {
-			return Integer.valueOf(((Number)v).intValue());
+			int intValue = ((Number)v).intValue();
+			if( intValue <= 0 ) {
+				// This is for legacy references where "null" references are stored
+				// as 0 or -1
+				return null;
+			}
+			return Integer.valueOf(intValue);
 		}
 		if(v instanceof String) {
 			T item = factory.findFromString((String)v);
