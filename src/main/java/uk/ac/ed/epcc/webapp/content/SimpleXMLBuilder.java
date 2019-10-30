@@ -15,6 +15,9 @@
  * Copyright (c) - The University of Edinburgh 2010
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.content;
+
+import java.util.Map;
+
 /** Interface for classes that build XML
  * This interface could either be used to build a DOM tree or perform simple text formatting.
  * It should be more straight-forward to use than DOM but it does require 
@@ -61,7 +64,14 @@ public interface SimpleXMLBuilder {
 	 */
 	public abstract SimpleXMLBuilder attr(String name, CharSequence s);
 	
-	
+	public default  SimpleXMLBuilder attr(Map<String,String> attr){
+		if( attr != null ){
+			for(String key : attr.keySet()){
+				attr(key,attr.get(key));
+			}
+		}
+		return this;
+	}
 	/** close the last opened tag.
 	 * @return reference to self
 	 */

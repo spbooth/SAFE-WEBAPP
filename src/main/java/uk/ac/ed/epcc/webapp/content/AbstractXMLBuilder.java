@@ -274,4 +274,22 @@ public abstract class AbstractXMLBuilder implements SimpleXMLBuilder {
 	public boolean getValidXML(){
 		return valid_xml;
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder#addClass(java.lang.CharSequence)
+	 */
+	public SimpleXMLBuilder addClass(CharSequence s) {
+		if( s != null && s.length() > 0 ) {
+			CharSequence prev = getAttribute("class");
+			if( prev == null) {
+				prev=s;
+			}else {
+				StringBuilder sb = new StringBuilder(prev);
+				sb.append(' ');
+				sb.append(s);
+				prev=sb.toString();
+			}
+			return attr("class", prev);
+		}
+		return this;
+	}
 }

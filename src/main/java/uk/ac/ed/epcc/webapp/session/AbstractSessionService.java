@@ -1575,7 +1575,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	}
 	@Override
 	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target, String role, boolean fallback) {
-		try {
+		try(TimeClosable time = new TimeClosable(conn,"hasRelationship("+fac.getTag()+","+role+")")) {
 			return hasRelationship(fac, target, role);
 		}catch(UnknownRelationshipException e) {
 			return fallback;

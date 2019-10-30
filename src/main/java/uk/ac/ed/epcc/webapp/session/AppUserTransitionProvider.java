@@ -36,6 +36,7 @@ import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider
 import uk.ac.ed.epcc.webapp.servlet.LoginServlet;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 
 
 /** A {@link TransitionProvider} for operations on {@link AppUser}s
@@ -60,7 +61,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 	/**
 	 * 
 	 */
-	private static final String PERSON_TRANSITION_TAG = "Person";
+	public static final String PERSON_TRANSITION_TAG = "Person";
 	public static final String VIEW_PERSON_RELATIONSHIP = "ViewPerson";
 	public static final AppUserKey SU_KEY = new AppUserKey("SU","Become User","Switch to this user identity") {
 
@@ -187,11 +188,8 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 	 */
 	@Override
 	public boolean canView(AU target, SessionService<?> sess) {
-		try {
-			return ((SessionService)sess).isCurrentPerson(target) || ((SessionService)sess).hasRelationship((AppUserFactory)sess.getLoginFactory(), target, VIEW_PERSON_RELATIONSHIP);
-		} catch (UnknownRelationshipException e) {
-			getLogger().error("Error checking view", e);
-			return false;
+		try(TimeClosable time = new TimeClosable(getContext(), "AppUserTransitionProvider.canView")){
+		return ((SessionService)sess).isCurrentPerson(target) || ((SessionService)sess).hasRelationship((AppUserFactory)sess.getLoginFactory(), target, VIEW_PERSON_RELATIONSHIP,false);
 		}
 	}
 

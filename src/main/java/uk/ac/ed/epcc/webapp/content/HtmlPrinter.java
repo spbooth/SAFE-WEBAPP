@@ -87,24 +87,6 @@ public class HtmlPrinter extends XMLPrinter implements ExtendedXMLBuilder{
 		sb.append("<br/>\n");
 		
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder#addClass(java.lang.CharSequence)
-	 */
-	@Override
-	public SimpleXMLBuilder addClass(CharSequence s) {
-		if( s != null && s.length() > 0 ) {
-			CharSequence prev = getAttribute("class");
-			if( prev == null) {
-				prev=s;
-			}else {
-				StringBuilder sb = new StringBuilder(prev);
-				sb.append(' ');
-				sb.append(s);
-				prev=sb.toString();
-			}
-			return attr("class", prev);
-		}
-		return this;
-	}
+	
 
 }

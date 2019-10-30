@@ -58,7 +58,7 @@ import uk.ac.ed.epcc.webapp.servlet.ServletService;
 
 
 
-public class HtmlBuilder extends HtmlPrinter implements ContentBuilder {
+public class HtmlBuilder extends HtmlPrinter implements XMLContentBuilder {
   
 public static final Feature HTML_USE_LABEL_FEATURE = new Preference("html.use_label",true,"generate html labels in automatic forms");
 public static final Feature HTML_TABLE_SECTIONS_FEATURE = new Preference("html.table_sections",false,"generate thead/tbody in tables");
@@ -210,89 +210,17 @@ public HtmlBuilder(){
 	}
 }
 
-
-@Override
-public void addButton(AppContext conn,String text, FormResult action) {
-	AddButtonVisitor vis = new AddButtonVisitor(conn, this, text);
-	vis.new_tab=new_tab;
-	try {
-		action.accept(vis);
-	} catch (Exception e) {
-		getLogger(conn).error("Error adding Button",e);
-	}
-}
-@Override
-public void addButton(AppContext conn,String text, String hover,FormResult action) {
-	AddButtonVisitor vis = new AddButtonVisitor(conn, this, text,hover);
-	vis.new_tab=new_tab;
-	try {
-		action.accept(vis);
-	} catch (Exception e) {
-		getLogger(conn).error("Error adding Button",e);
-	}
-}
-@Override
-public void addLink(AppContext conn,String text, FormResult action) {
-	addLink(conn,text,null,action);
-}
-@Override
-public void addLink(AppContext conn,String text, String hover,FormResult action) {
-	if( action == null){
-		clean(text);
-		return;
-	}
-	AddLinkVisitor vis = new AddLinkVisitor(conn, this, text,hover);
-	vis.new_tab=new_tab;
-	try {
-		action.accept(vis);
-	} catch (Exception e) {
-		getLogger(conn).error("Error adding Link",e);
-	}
-}
-@Override
-public void addImage(AppContext conn, String alt, String hover,Integer width, Integer height, ServeDataResult image) {
-	if( image == null) {
-		return;
-	}
-	try {
-		String url = conn.getService(ServletService.class).encodeURL(ServeDataServlet.getURL(conn, image.getProducer(), image.getArgs()));
-		open("img");
-		if( alt != null) {
-			attr("alt", alt);
+  @Override
+	public <C,R> void addTable(AppContext conn,Table<C,R> t,NumberFormat nf,String style) {
+		TableXMLFormatter<C,R> fmt = new TableXMLFormatter<>(this, nf,style);
+		if( use_table_section != null){
+			// If set explicitly this takes preference.
+			fmt.setTableSections(use_table_section);
+		}else{
+			fmt.setTableSections(HTML_TABLE_SECTIONS_FEATURE.isEnabled(conn));
 		}
-		if( hover != null ) {
-			attr("title",hover);
-		}
-		if( width != null && width.intValue() > 0) {
-			attr("width",width.toString());
-		}
-		if( height != null && height.intValue() > 0) {
-			attr("height",height.toString());
-		}
-
-		attr("src",url);
-		close();
-	}catch(Exception t) {
-		getLogger(conn).error("Error adding image",t);
+		fmt.add(t);
 	}
-}
-
-
-@Override
-public <C,R> void addTable(AppContext conn,Table<C,R> t,String style) {
-	addTable(conn,t,null,style);
-}
-@Override
-public <C,R> void addTable(AppContext conn,Table<C,R> t,NumberFormat nf,String style) {
-	TableXMLFormatter<C,R> fmt = new TableXMLFormatter<>(this, nf,style);
-	if( use_table_section != null){
-		// If set explicitly this takes preference.
-		fmt.setTableSections(use_table_section);
-	}else{
-		fmt.setTableSections(HTML_TABLE_SECTIONS_FEATURE.isEnabled(conn));
-	}
-	fmt.add(t);
-}
 
 
 public void paragraph(String text) {
@@ -339,40 +267,6 @@ public ContentBuilder addParent() throws UnsupportedOperationException {
 }
 
 
-@Override
-public <C, R> void addColumn(AppContext conn, Table<C, R> t, C col) {
-	TableXMLFormatter<C,R> fmt = new TableXMLFormatter<>(this, null,"auto");
-	fmt.addColumn(t,col);
-}
-
-
-@Override
-public void addText(String text) {
-	open("div");
-	addClass("para");
-	clean(text);
-	close();
-}
-
-
-@Override
-public void addHeading(int level, String text) {
-	open("h"+level);
-	clean(text);
-	close();
-	
-}
-
-
-@Override
-public <C, R> void addTable(AppContext conn, Table<C, R> t) {
-	addTable(conn,null,t);
-}
-@Override
-public <C, R> void addTable(AppContext conn, NumberFormat nf,Table<C, R> t) {
-	addTable(conn, t, nf, "auto");
-	
-}
 
 private Collection<String> missing_fields=null;
 private Map<String,String> errors=null;
@@ -658,78 +552,7 @@ public void setTableSections(boolean value){
 }
 
 
-/* (non-Javadoc)
- * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addList(java.util.Collection)
- */
-@Override
-public <X> void addList(Iterable<X> list) {
-	addList(null,list);
-}
-@Override
-public <X> void addList(Map<String,String> attr,Iterable<X> list) {
-	open("ul");
-	attr(attr);
-	for(X target : list){
-		open("li");
-		addObject(target);
-		close();
-	}
-	close();
-	clean("\n");
-}
-@Override
-public <X> void addNumberedList(int start,Iterable<X> list) {
-	open("ol");
-	attr("start",Integer.toString(start));
-	for(X target : list){
-		open("li");
-		addObject(target);
-		close();
-	}
-	close();
-	clean("\n");
-}
 
-
-/**
- * @param target
- */
-@Override
-public <X> void addObject(X target) {
-	if( target == null ) {
-		return;
-	}
-	if( target instanceof UIProvider){
-		((UIProvider)target).getUIGenerator().addContent(this);
-	}else if( target instanceof UIGenerator){
-		((UIGenerator)target).addContent(this);
-	}else if(target instanceof XMLPrinter) {
-		append((XMLPrinter)target);
-	}else if( target instanceof Identified){
-		if( target instanceof Viewable && target instanceof Contexed) {
-			addLink(((Contexed)target).getContext(), ((Identified)target).getIdentifier(), ((Viewable)target).getViewTransition());
-		}else {
-			clean(((Identified)target).getIdentifier());
-		}
-	}else if( target  instanceof Iterable){
-		addList((Iterable)target);
-	}else if( target instanceof Object[]) {
-		addList((Object []) target);
-	}else{
-		clean(target.toString());
-	}
-}
-@Override
-public <X> void addList(X[] list) {
-	open("ul");
-	for(X target : list){
-		open("li");
-		addObject(target);
-		close();
-	}
-	close();
-	clean("\n");
-}
 /** Add a script element to HTML. 
  * This only works for html so classes that want to add script elements
  * will need to check the class of the content builder.
@@ -748,7 +571,7 @@ public void addScriptFile(String path){
 	endOpen();
 	close();
 }
-protected final Logger getLogger(AppContext conn){
+public final Logger getLogger(AppContext conn){
 	return conn.getService(LoggerService.class).getLogger(getClass());
 }
 
