@@ -25,6 +25,16 @@ public class StreamingTable {
 	private final SimpleXMLBuilder sb;
 	private String cols[];
 	private boolean open=false;
+	private boolean append=false;
+
+	public static StreamingTable getInstance(ContentBuilder cb, String ... headings) {
+		if( cb instanceof SimpleXMLBuilder) {
+			return new StreamingTable((SimpleXMLBuilder)cb, headings);
+		}
+		StreamingTable result = new StreamingTable(cb.getText(), headings);
+		result.append=true;
+		return result;
+	}
 	/**
 	 * 
 	 * @param sb  {@link ExtendedXMLBuilder} to add too.
@@ -72,6 +82,9 @@ public class StreamingTable {
 		if( open ) {
 			sb.close(); //tbody
 			sb.close(); //table
+		}
+		if( append) {
+			sb.appendParent();
 		}
 	}
 
