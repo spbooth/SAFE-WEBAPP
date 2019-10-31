@@ -27,66 +27,11 @@ public class HtmlPrinter extends XMLPrinter implements ExtendedXMLBuilder{
 	public HtmlPrinter() {
 		super();
 	}
-	public HtmlPrinter(HtmlPrinter parent){
+	public HtmlPrinter(AbstractXMLBuilder parent){
 		super(parent);
 	}
 
-	public void nbs() {
-		endOpen();
-		if( getValidXML()){
-			// &nbs; is an XML entity reference and only valid if defined.
-			// we substitute the unicode equivalent for valid XML
-			sb.append("&#160;");
-		}else{
-			sb.append("&nbsp;");
-		}
-	}
-
-	/** Convert a string into a html fragment with matching linebreaks
-	 * also comparing the line lengths with a maximum value
-	 * @param max
-	 * @param s
-	 * @return true if lines are long
-	 */
-	public final boolean longLines(int max, String s) {
-		boolean is_long=false;
-		open("p");
-		addClass("longlines");
-		clean("\n");
-		for(String line : s.split("\n")){
-			String tmp = line.replace("\t", "        ");
-			if( tmp.length() > max){
-				is_long = true;
-			}
-			clean(line);
-			br();
-		}
-		close();
-		clean("\n");
-		return is_long;
-	}
-
-	public final boolean cleanFormatted(int max, String s) {
-		HtmlPrinter hb = new HtmlPrinter();
-		if( hb.longLines(max,s)){
-			append(hb);
-			return true;
-		}else{
-			//open("p");
-			//addClass("preformatted");
-			open("pre");
-			addClass("loose");
-			clean(s);
-			close();
-			return false;
-		}
-	}
-
-	public void br() {
-		endOpen();
-		sb.append("<br/>\n");
-		
-	}
+	
 	
 
 }

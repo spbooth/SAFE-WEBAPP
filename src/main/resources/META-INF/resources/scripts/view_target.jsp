@@ -73,7 +73,12 @@ try{
 <%@ include file="/main__logged_in.jsf" %>
 <%= provider.getTopContent(new HtmlBuilder(),target,session_service).toString() %>
 <div class="block" role="main">
+<% if( XMLContentBuilder.STREAM_BUILDER_FEATURE.isEnabled(conn)){
+	provider.getLogContent(new HtmlWriter(conn,out),target,session_service);
+}else{	
+%>
 <%= provider.getLogContent(new HtmlBuilder(),target,session_service).toString() %>
+<%} %>
 <form id="form" action="<%=response.encodeURL(web_path +TransitionServlet.getURL(conn,provider,target)+"#form") %>" method="post">
 <% if( crsf != null ){ %>
 <input type='hidden' name='<%=TransitionServlet.TRANSITION_CSRF_ATTR %>' value='<%=crsf %>'/>

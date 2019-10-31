@@ -742,7 +742,11 @@ public class SwingContentBuilder  implements ContentBuilder{
 	@Override
 	public ContentBuilder getDetails(Object summary_text) {
 		addObject(summary_text);
-		return getPanel();
+		return this;
+	}
+	@Override
+	public void closeDetails() {
+		
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addNumberedList(int, java.lang.Iterable)

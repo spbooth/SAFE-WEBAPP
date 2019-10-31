@@ -19,7 +19,6 @@ package uk.ac.ed.epcc.webapp.forms.html;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +26,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
+import uk.ac.ed.epcc.webapp.content.HtmlFormPolicy;
 import uk.ac.ed.epcc.webapp.content.HtmlPrinter;
+import uk.ac.ed.epcc.webapp.content.XMLContentBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.MapForm;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
@@ -82,13 +83,14 @@ public class HTMLForm extends BaseHTMLForm {
 	 * @param result to modify
 	 * @return HtmlPrinter form fragment
 	 */
-	public <X extends HtmlBuilder> X getHtmlFieldTable(X result){
+	public <X extends XMLContentBuilder> X getHtmlFieldTable(X result){
 		Collection<String> missing = new HashSet<>();
 		Map<String,String> errors = new HashMap<>();
 		validate(missing, errors);
-		result.setMissingFields(missing);
-		result.setErrors(errors);
-		result.setPostParams(null);
+		HtmlFormPolicy policy = result.getFormPolicy();
+		policy.setMissingFields(missing);
+		policy.setErrors(errors);
+		policy.setPostParams(null);
 		result.addFormTable(getContext(), this);
 		return result;
 	}
@@ -112,7 +114,7 @@ public class HTMLForm extends BaseHTMLForm {
 	}
 	public String getHtmlFieldTableFromRequest(HttpServletRequest req,boolean use_required) {
 		HtmlBuilder hb = new HtmlBuilder();
-		hb.setUseRequired(use_required);
+		hb.getFormPolicy().setUseRequired(use_required);
 		return getHtmlFieldTable(hb, req).toString();
 	}
 	/**

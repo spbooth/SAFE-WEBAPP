@@ -74,7 +74,7 @@ public class TableDescription implements UIGenerator {
 			builder.addHeading(5, "Indexes");
 			builder.addTable(res.getContext(), indexes);
 		}
-		builder.addParent();
+		builder.closeDetails();
 		return cb;
 	}
 

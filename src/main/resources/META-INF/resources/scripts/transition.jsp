@@ -88,7 +88,8 @@ if( t instanceof BaseFormTransition ){
 
 String default_charset = conn.getService(ServletService.class).defaultCharset();
 boolean multi = f.containsInput(FileInput.class);
-HtmlBuilder form_content = new HtmlBuilder();
+HtmlBuilder form_builder = new HtmlBuilder();
+HtmlFormPolicy form_content=form_builder.getFormPolicy();
 if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 	// force initial validation and use internal state
 	Collection<String> m = getMissing(request);
@@ -150,15 +151,15 @@ action="<%= response.encodeURL(web_path+TransitionServlet.getURL(conn,tp,target)
 <% 
 form_content.setLockedAsHidden(f.getTargetStage()>0);
 if( t instanceof CustomFormContent ){
-	((CustomFormContent)t).addFormContent(form_content, session_service, f, target);
+	((CustomFormContent)t).addFormContent(form_builder, session_service, f, target);
 }else{
 	form_content.setActionName(f.getActionName());
-	form_content.addFormTable(conn, f);
-	form_content.addActionButtons(f);
+	form_builder.addFormTable(conn, f);
+	form_builder.addActionButtons(f);
 }
 
 %>
-<%= form_content.toString() %>
+<%= form_builder.toString() %>
 </form>
 </div>
 <%
