@@ -153,7 +153,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 	// this allows the TextFileOverlay to be inserted into 
 	// a URL resolver class
 	private URL url_base=null;
-	public static class TextFile extends DataObject implements Retirable{
+	public static class TextFile extends DataObject implements Retirable, TextProvider{
 
 		private final  URL base_url;
 		
@@ -285,6 +285,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		 * 
 		 * @return
 		 */
+		@Override
 		public String getData(){
 			String text = getText();
 			if( text != null ){
@@ -299,13 +300,6 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			return "";
 		}
 		
-		public Reader getDataReader(){
-			String text = getData();
-			if( text == null ){
-				return null;
-			}
-			return new StringReader(text);
-		}
 		@Override
 		public String getIdentifier(int max) {
 			String tag ="";
