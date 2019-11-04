@@ -327,7 +327,20 @@ public void setTableSections(boolean value){
 	use_table_section=Boolean.valueOf(value);
 }
 
-
+@Override
+public final ContentBuilder getDetails(Object summary_text) {
+	Panel details = new Panel("details",this,false,"details");
+	if( summary_text != null ){
+		details.open("summary");
+		details.addObject(summary_text);
+		details.close();
+	}
+	return details;
+}
+@Override
+public final void closeDetails() {
+	addParent();
+}
 
 /** Add a script element to HTML. 
  * This only works for html so classes that want to add script elements
