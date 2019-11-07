@@ -321,7 +321,7 @@ public class Duration extends Number implements Comparable<Duration> {
 			return Long.toString(returnVal);
 			
 		} else {
-			return Float.toString(this.value / SCALE_FLOAT);
+			return Double.toString(this.value / SCALE_DOUBLE);
 			
 		}
 	}

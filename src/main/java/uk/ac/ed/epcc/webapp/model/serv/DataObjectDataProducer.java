@@ -166,6 +166,7 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 			int live_months = conn.getIntegerParameter(SERV_DATA_LIFETIME_MONTHS_PROP, 1);
 			if( live_months > 0 ){
 				Calendar cal = Calendar.getInstance();
+				cal.setTime(conn.getService(CurrentTimeService.class).getCurrentTime());
 				cal.add(Calendar.MONTH, live_months);
 				record.setProperty(EXPIRES_FIELD, cal.getTime());
 				SessionService<?> sess = conn.getService(SessionService.class);
