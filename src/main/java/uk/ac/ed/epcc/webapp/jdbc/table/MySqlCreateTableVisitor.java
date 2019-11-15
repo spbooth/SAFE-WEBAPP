@@ -36,6 +36,7 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	public static final Feature FOREIGN_KEY_FEATURE=new Feature("foreign-key",false,"Generate foreign keys");
 	public static final Feature FOREIGN_KEY_DELETE_CASCASE_FEATURE = new Feature("foreign-key.delete_cascase",true,"Default to DELETE CASCASE on foreign keys for references that do not allow null");
     public static final Feature FORCE_MYISAM_ON_FULLTEXT_FEATURE=new Feature("mysql.force_myisam_on_fulltext",false,"Always use MyISAM if table contains fulltext index");
+    public static final Feature USE_TIMESTAMP=new Feature("mysql.use_timestamp",false,"use timestamp fields by default");
 	private final MysqlSQLContext ctx;
 	private final StringBuilder sb;
 	// Keep table in memory if we can only use for unit tests
@@ -64,14 +65,34 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 			if( d != null ){
 				sb.append(" DEFAULT ?");
 				args.add(new java.sql.Date(dateFieldType.getDefault().getTime()));
+			}else {
+				if( dateFieldType.canBeNull()) {
+					// mysql null-date
+					sb.append(" DEFAULT 0");
+				}
 			}
 		}else {
-			sb.append("BIGINT(20)");
-			doNull(dateFieldType);
-			Date d = dateFieldType.getDefault();
-			if( d != null ){
-				sb.append(" DEFAULT ?");
-				args.add(dateFieldType.getDefault().getTime()/1000);
+			if( USE_TIMESTAMP.isEnabled(ctx.getContext())) {
+				sb.append("TIMESTAMP");
+				doNull(dateFieldType);
+				Date d = dateFieldType.getDefault();
+				if( d != null ){
+					sb.append(" DEFAULT ?");
+					args.add(d);
+				}else {
+					if( dateFieldType.canBeNull()) {
+						// mysql null-date
+						sb.append(" DEFAULT 0");
+					}
+				}
+			}else {
+				sb.append("BIGINT(20)");
+				doNull(dateFieldType);
+				Date d = dateFieldType.getDefault();
+				if( d != null ){
+					sb.append(" DEFAULT ?");
+					args.add(dateFieldType.getDefault().getTime()/1000);
+				}
 			}
 		}
 		
