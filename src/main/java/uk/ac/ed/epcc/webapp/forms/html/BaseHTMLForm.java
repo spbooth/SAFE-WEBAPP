@@ -48,6 +48,8 @@ public abstract class BaseHTMLForm extends MapForm {
 	public static final String FORM_STATE_ATTR = "form_state";
 	public static final String FORM_STAGE_INPUT = "form_stage";
 	
+	
+	
 	public BaseHTMLForm(AppContext c) {
 		super(c);
 	}

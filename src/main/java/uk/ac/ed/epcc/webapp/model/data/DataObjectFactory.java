@@ -1518,12 +1518,19 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	}
 	/** create a {@link Selector} from a filter.
 	 * 
-	 * @param fil
-	 * @return
+	 * Input will be restricted to the filter
+	 * @param fil {@link BaseFilter} for selection
+	 * @return {@link Selector}
 	 */
 	public final Selector<DataObjectItemInput<BDO>> getSelector(BaseFilter<BDO> fil){
 		return new FilterSelector(fil,true);
 	}
+	/** create a {@link Selector} from a filter.
+	 * 
+	 * @param fil      {@link BaseFilter} for selection
+	 * @param restrict  should validation fail if filter does not match
+	 * @return {@link Selector}
+	 */
 	public final Selector<DataObjectItemInput<BDO>> getSelector(BaseFilter<BDO> fil,boolean restrict){
 		return new FilterSelector(fil,restrict);
 	}

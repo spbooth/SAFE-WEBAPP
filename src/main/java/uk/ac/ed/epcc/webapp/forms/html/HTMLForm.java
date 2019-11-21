@@ -31,6 +31,7 @@ import uk.ac.ed.epcc.webapp.content.HtmlPrinter;
 import uk.ac.ed.epcc.webapp.content.XMLContentBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.MapForm;
+import uk.ac.ed.epcc.webapp.forms.action.ConfirmMessage;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 //import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -52,6 +53,7 @@ public class HTMLForm extends BaseHTMLForm {
 	private static final String MISSING_FIELDS_TAG = "MissingFields";
 
 	private static final String ERRORS_TAG = "Errors";
+	
 	
    
 
@@ -157,8 +159,11 @@ public class HTMLForm extends BaseHTMLForm {
 	 * @return String, the action string or null if confirmation not needed
 	 * @throws ActionException
 	 */
-	public String mustConfirm(Map params) throws ActionException {
+	public ConfirmMessage mustConfirm(Map params) throws ActionException {
 
+		if( additional_confirm != null ) {
+			return additional_confirm;
+		}
 		for (String name : getActionNames()) {
 			if (params.get(name) != null) {
 				return mustConfirm(name);

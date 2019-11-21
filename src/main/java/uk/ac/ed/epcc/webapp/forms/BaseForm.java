@@ -25,6 +25,7 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.forms.action.ConfirmMessage;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
@@ -370,12 +371,12 @@ public class BaseForm implements Form {
 	 * @return String message name or null
 	 * @throws ActionException
 	 */
-	public String mustConfirm(String name) throws ActionException {
+	public ConfirmMessage mustConfirm(String name) throws ActionException {
 		FormAction action = actions.get(name);
 		if (action == null) {
 			throw new ActionException("Unknown action");
 		}
-		return action.getConfirm(this);
+		return action.getConfirmMessage(this);
 	}
 
 	/**
@@ -611,4 +612,5 @@ public class BaseForm implements Form {
 	public String getAutoFocus() {
 		return auto_focus;
 	}
+
 }

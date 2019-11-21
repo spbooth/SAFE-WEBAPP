@@ -18,6 +18,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.action.ConfirmMessage;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionValidationException;
@@ -70,9 +71,9 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 		    try{
 		    	FormAction shortcut = f.getShortcutAction(params);
 		    	if( shortcut != null ){
-		    		String confirm_action = shortcut.getConfirm(f);
+		    		ConfirmMessage confirm_action = shortcut.getConfirmMessage(f);
 		    		if( confirm_action != null ){
-		    			FormResult result = confirmTransition(req, conn, provider, tag, target,confirm_action,shortcut.getConfirmArgs(f));
+		    			FormResult result = confirmTransition(req, conn, provider, tag, target,confirm_action.getMessage(),confirm_action.getArgs());
 						if( result != null ){
 							return result;
 						}
@@ -90,11 +91,10 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 		    		
 		    	}
 
-		    	String confirm_action = f.mustConfirm(params);
+		    	ConfirmMessage confirm_action = f.mustConfirm(params);
 
 				if( confirm_action != null ){
-					FormAction action = f.getAction(f.locateAction(params));
-					FormResult result = confirmTransition(req, conn, provider, tag, target,confirm_action,action.getConfirmArgs(f));
+					FormResult result = confirmTransition(req, conn, provider, tag, target,confirm_action.getMessage(),confirm_action.getArgs());
 					if( result != null ){
 						return result;
 					}
@@ -135,9 +135,9 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 		    try{
 		    FormAction shortcut = f.getShortcutAction(params);
 		    if( shortcut != null ){
-	    		String confirm_action = shortcut.getConfirm(f);
+	    		ConfirmMessage confirm_action = shortcut.getConfirmMessage(f);
 	    		if( confirm_action != null ){
-					FormResult result = confirmTransition(req, conn, provider, tag, target,confirm_action,null);
+					FormResult result = confirmTransition(req, conn, provider, tag, target,confirm_action.getMessage(),confirm_action.getArgs());
 					if( result != null ){
 						return result;
 					}
@@ -148,9 +148,9 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 				return new ErrorFormResult<>(provider, target, tag, HTMLForm.getErrors(req), HTMLForm.getMissing(req)); 
 			}
 			
-				String confirm_action = f.mustConfirm(params);
+				ConfirmMessage confirm_action = f.mustConfirm(params);
 				if( confirm_action != null ){
-					FormResult result = confirmTransition(req, conn, provider, tag, target,confirm_action,null);
+					FormResult result = confirmTransition(req, conn, provider, tag, target,confirm_action.getMessage(),confirm_action.getArgs());
 					if( result != null ){
 						return result;
 					}
