@@ -55,7 +55,7 @@ public class MapForm extends BaseForm {
 	public static final String GENERAL_ERROR = "general";
 	protected String action_name = null;
 	
-	protected ConfirmMessage additional_confirm=null;
+	
 	
 	public MapForm(AppContext c) {
 		super(c);
