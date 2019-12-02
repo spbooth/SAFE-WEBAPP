@@ -254,6 +254,7 @@ public abstract class WebappTestBase implements ContextHolder{
 		Transformer t = tfac.newTransformer(source);
 		assertNotNull(t);
 
+		expected_xml = ctx.expandText(expected_xml);
 		String expected = XMLDataUtils.transform(t,getClass(), expected_xml);
 		
 		String raw = diff.toString();

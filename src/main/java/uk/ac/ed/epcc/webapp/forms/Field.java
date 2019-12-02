@@ -16,10 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms;
 
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;

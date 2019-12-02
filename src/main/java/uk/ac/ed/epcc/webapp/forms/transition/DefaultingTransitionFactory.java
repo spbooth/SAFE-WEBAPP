@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.servlet.ViewTransitionKey;
  * An default transition should usually not modify state. Consider having the key
  * implement {@link ViewTransitionKey} if this is not the case.
  * @author spb
+ * @see IndexTransitionFactory
  *
  * @param <K>
  * @param <T>
@@ -36,6 +37,9 @@ public interface DefaultingTransitionFactory<K, T> extends
 	 * 
 	 * This method can return null if a sub-class wants to suppress the default transition, if
 	 * there is no valid default for the target or if a view transition is to be used.
+	 * 
+	 * Note that the target msut be non-null. To implement a default transition with no target use
+	 * {@link IndexTransitionFactory}
 	 * @param target 
 	 * @return transition key
 	 */

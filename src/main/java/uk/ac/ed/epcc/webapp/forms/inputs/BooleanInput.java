@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 public class BooleanInput extends AbstractInput<Boolean> implements ParseInput<Boolean> ,BinaryInput<Boolean>{
     
 
+	@Override
 	public Boolean parseValue(String v) throws ParseException {
 		if( v==null || v.trim().length() == 0){
 			// unchecked boxes are false
@@ -34,6 +35,7 @@ public class BooleanInput extends AbstractInput<Boolean> implements ParseInput<B
 		}
 	}
 
+	@Override
 	public Boolean convert(Object v) throws TypeError {
 		if( v instanceof String ){
 		    return Boolean.valueOf((String) v);
@@ -46,19 +48,23 @@ public class BooleanInput extends AbstractInput<Boolean> implements ParseInput<B
 
 	
 
+	@Override
 	public String getPrettyString(Boolean value) {
 		return value.toString();
 	}
 
+	@Override
 	public String getString(Boolean value) {
 		return value.toString();
 	}
 
 
+	@Override
 	public final <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitBinaryInput(this);
 	}
 
+	@Override
 	public boolean isChecked() {
 		Boolean v = getValue();
 		if( v == null) {
@@ -67,10 +73,12 @@ public class BooleanInput extends AbstractInput<Boolean> implements ParseInput<B
 		return v;
 	}
 
+	@Override
 	public void setChecked(boolean value) {
 		setValue(value);
 	}
 
+	@Override
 	public String getChecked() {
 		return "true";
 	}

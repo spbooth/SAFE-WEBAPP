@@ -24,7 +24,7 @@ import uk.ac.ed.epcc.webapp.servlet.ViewTransitionKey;
  * implement {@link ViewTransitionKey}
  * 
  * @author spb
- *
+ * @see DefaultingTransitionFactory
  * @param <K>
  * @param <T>
  */

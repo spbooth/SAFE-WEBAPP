@@ -38,18 +38,24 @@ import uk.ac.ed.epcc.webapp.model.data.forms.CreateTemplate;
 
 public final class CreateAction<BDO extends DataObject> extends FormAction {
 
+	
 	/**
 	 * 
 	 */
 	private final CreateTemplate<BDO> creator;
     private final String type_name;
+    private final Object text;
 	/**
 	 * @param type_name User presetned name of type being created.
 	 * @param dataObjectFactory
 	 */
 	public CreateAction(String type_name,CreateTemplate<BDO> dataObjectFactory) {
+		this(type_name,null,dataObjectFactory);
+	}
+	public CreateAction(String type_name,Object text,CreateTemplate<BDO> dataObjectFactory) {
 		creator = dataObjectFactory;
 		this.type_name=type_name;
+		this.text=text;
 	}
 
 	@Override
@@ -98,5 +104,8 @@ public final class CreateAction<BDO extends DataObject> extends FormAction {
 		}
 		return res;
 	}
-   
+	@Override
+	public Object getText() {
+		return text;
+	}
 }
