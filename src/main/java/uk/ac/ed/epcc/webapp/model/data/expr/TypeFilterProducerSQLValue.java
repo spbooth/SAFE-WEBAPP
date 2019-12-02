@@ -35,21 +35,26 @@ public class TypeFilterProducerSQLValue<T,D,X> extends TypeConverterSQLValue<X, 
 		super(target,converter,inner);
 		
 	}
+	@Override
 	public TypeProducer<T, D> getConverter(){
 		return (TypeProducer<T, D>) super.getConverter();
 	}
+	@Override
 	public SQLAccessor<D,X> getNested(){
 		return (SQLAccessor<D, X>) super.getNested();
 	}
+	@Override
 	public T getValue(X r) {
 
 		return getConverter().find(getNested().getValue(r));
 	}
 	
+	@Override
 	public void setValue(X r, T value) {
 		getNested().setValue(r, getConverter().getIndex(value));
 
 	}
+	@Override
 	public boolean canSet() {
 		return getNested().canSet();
 	}

@@ -42,6 +42,7 @@ public class CheckBoxInput extends AbstractInput<String> implements ParseInput<S
 		setValue(unchecked);
 	}
 
+	@Override
 	public String getChecked() {
 		return checked_value;
 	}
@@ -53,6 +54,7 @@ public class CheckBoxInput extends AbstractInput<String> implements ParseInput<S
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.BinaryInput#isChecked()
 	 */
+	@Override
 	public boolean isChecked() {
 		return checkString(getValue());
 	}
@@ -63,6 +65,7 @@ public class CheckBoxInput extends AbstractInput<String> implements ParseInput<S
 			return false;
 		}
     }
+	@Override
 	public String parseValue(String v) throws ParseException {
 		return getValue(checkString(v));
 	}
@@ -70,12 +73,14 @@ public class CheckBoxInput extends AbstractInput<String> implements ParseInput<S
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.BinaryInput#setChecked(boolean)
 	 */
+	@Override
 	public void setChecked(boolean value) {
 		setValue(getValue(value));
 	}
 
 	
 
+	@Override
 	public String convert(Object o) throws TypeError{
 		if( o == null ){
 			return getUnChecked();
@@ -91,10 +96,12 @@ public class CheckBoxInput extends AbstractInput<String> implements ParseInput<S
 	}
 
 	
+	@Override
 	public String getPrettyString(String value) {
 		return getString(value);
 	}
 
+	@Override
 	public String getString(String value) {
 		return getValue(checkString(value));
 	}
@@ -107,6 +114,7 @@ public class CheckBoxInput extends AbstractInput<String> implements ParseInput<S
 		}
 	}
 
+	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitBinaryInput(this);
 	}

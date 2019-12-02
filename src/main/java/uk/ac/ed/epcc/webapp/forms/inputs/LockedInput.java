@@ -31,12 +31,14 @@ public class LockedInput<V> extends WrappingInput<V> implements UnmodifiableInpu
     	super(wrapped_input);
     }
    
+	@Override
 	public String getLabel() {
 		return getNested().getPrettyString(getNested().getValue());
 	}
 
 
 	
+	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitLockedInput(this);
 	}

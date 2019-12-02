@@ -49,6 +49,7 @@ public class TextInput extends ParseAbstractInput<String> {
 		});
 	}
 
+	@Override
 	public String parseValue(String v) throws ParseException {
 		if (v == null || v.length() == 0) {
 			return null;

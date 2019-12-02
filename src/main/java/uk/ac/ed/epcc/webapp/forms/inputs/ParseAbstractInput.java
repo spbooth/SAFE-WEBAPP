@@ -40,11 +40,13 @@ public abstract class ParseAbstractInput<V> extends AbstractInput<V> implements
 	 *  A zero or -ve value implies no limit.
 	 * 
 	 */
+	@Override
 	public int getMaxResultLength() {
 		return len;
 	}
 
 	
+	@Override
 	public int getBoxWidth() {
 		return maxwid;
 	}
@@ -54,6 +56,7 @@ public abstract class ParseAbstractInput<V> extends AbstractInput<V> implements
 	 * 
 	 * @return boolean
 	 */
+	@Override
 	public boolean getSingle() {
 		return force_single;
 	}
@@ -65,6 +68,7 @@ public abstract class ParseAbstractInput<V> extends AbstractInput<V> implements
 	 * @param l
 	 *            int input_length
 	 */
+	@Override
 	public void setMaxResultLength(int l) {
 		len = l;
 	}
@@ -75,6 +79,7 @@ public abstract class ParseAbstractInput<V> extends AbstractInput<V> implements
 	 * @param l
 	 *            int maximum input width
 	 */
+	@Override
 	public void setBoxWidth(int l) {
 		maxwid = l;
 	}
@@ -90,6 +95,7 @@ public abstract class ParseAbstractInput<V> extends AbstractInput<V> implements
 	}
 
 
+	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitLengthInput(this);
 	}

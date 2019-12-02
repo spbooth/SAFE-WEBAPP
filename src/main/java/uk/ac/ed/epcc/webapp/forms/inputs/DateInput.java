@@ -36,6 +36,7 @@ public class DateInput extends AbstractDateInput implements HTML5Input, PatternI
 	}
 	
 
+	@Override
 	public String[] getFormats(){
 		return new String[] {DEFAULT_FORMAT} ;
 	}
@@ -43,6 +44,7 @@ public class DateInput extends AbstractDateInput implements HTML5Input, PatternI
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input#getType()
 	 */
+	@Override
 	public String getType() {
 		return "date";
 	}

@@ -64,6 +64,7 @@ public class FileInput extends AbstractInput<StreamData> {
     	return old;
     }
 	
+	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitFileInput(this);
 	}

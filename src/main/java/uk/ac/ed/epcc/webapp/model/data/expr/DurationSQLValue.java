@@ -38,6 +38,7 @@ public class DurationSQLValue implements SQLValue<Duration> {
 	  this.end=end;
   }
 
+@Override
 public Class<Duration> getTarget() {
 	return Duration.class;
 }
@@ -46,21 +47,25 @@ public String toString() {
 	return "Duration("+start.toString()+","+end.toString()+")";
 }
 
+@Override
 public int add(StringBuilder sb, boolean qualify) {
 	offset = start.add(sb, qualify);
 	sb.append(" , ");
 	return offset + end.add(sb, qualify);
 }
+@Override
 public List<PatternArgument> getParameters(List<PatternArgument> list) {
 	list = start.getParameters(list);
 	return end.getParameters(list);
 }
 
 
+@Override
 public Duration makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 	
 	return new Duration(start.makeObject(rs, pos), end.makeObject(rs, pos+offset));
 }
+@Override
 @SuppressWarnings("unchecked")
 public SQLFilter getRequiredFilter() {
 	SQLFilter a_fil = start.getRequiredFilter();

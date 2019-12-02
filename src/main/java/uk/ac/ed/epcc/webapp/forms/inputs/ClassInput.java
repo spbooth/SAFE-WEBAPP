@@ -24,7 +24,6 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
@@ -79,6 +78,7 @@ public class ClassInput<T> extends AbstractInput<String> implements ListInput<St
     public ClassInput(AppContext c, Class<T> target){
     	this(c,target,false,"classdef");
     }
+	@Override
 	public Class<? extends T> getItembyValue(String value) {
 		if( value == null ){
 			return null;
@@ -86,14 +86,17 @@ public class ClassInput<T> extends AbstractInput<String> implements ListInput<St
 		return reg.get(value);
 	}
 
+	@Override
 	public Iterator<Class<? extends T>> getItems() {
 		return reg.values().iterator();
 	}
 	
+	@Override
 	public int getCount(){
 		return reg.size();
 	}
 
+	@Override
 	public String getTagByItem(Class<? extends T> item) {
 		for(String key : reg.keySet()){
 			if( item == reg.get(key)){
@@ -103,15 +106,18 @@ public class ClassInput<T> extends AbstractInput<String> implements ListInput<St
 		return null;
 	}
 
+	@Override
 	public String getTagByValue(String value) {
 		return value;
 	}
 
+	@Override
 	public String getText(Class<? extends T> item) {
 		String tag = getTagByItem(item);
 		return c.getInitParameter("classinput.text."+prefix+tag, tag);
 	}
 
+	@Override
 	public String convert(Object v) throws TypeError {
 		if( v instanceof String ){
 			return (String) v;
@@ -126,14 +132,17 @@ public class ClassInput<T> extends AbstractInput<String> implements ListInput<St
 
 	
 
+	@Override
 	public Class<? extends T> getItem() {
 		return reg.get(getValue());
 	}
 
+	@Override
 	public void setItem(Class<? extends T> item) {
 		setValue(getTagByItem(item));
 		
 	}
+	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitListInput(this);
 	}

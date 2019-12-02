@@ -53,27 +53,33 @@ public class TypeConverterSQLValue<H,T,D> implements  NestedSQLValue<T,D>, Filte
 	private final TypeConverter<T,D> converter;
 	private final SQLValue<D> inner;
 	
+	@Override
 	public SQLValue<D> getNested(){
 		return inner;
 	}
 	protected TypeConverter<T, D> getConverter(){
 		return converter;
 	}
+	@Override
 	public final Class<T> getTarget() {
 		return converter.getTarget();
 	}
 	
+	@Override
 	public final int add(StringBuilder sb, boolean qualify) {
 		
 		return inner.add(sb, qualify);
 	}
+	@Override
 	public final List<PatternArgument> getParameters(List<PatternArgument> list) {
 		return inner.getParameters(list);
 	}
+	@Override
 	public final T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		return converter.find(inner.makeObject(rs, pos));
 	}
 	
+	@Override
 	public final String toString(){
 		return converter.toString()+"("+inner.toString()+")";
 	}
@@ -81,6 +87,7 @@ public class TypeConverterSQLValue<H,T,D> implements  NestedSQLValue<T,D>, Filte
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilter(uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition, java.lang.Object)
 	 */
+	@Override
 	public final SQLFilter<H> getFilter(MatchCondition match, T val)
 			throws CannotFilterException, NoSQLFilterException {
 		if( match != null && match != MatchCondition.NE){
@@ -98,6 +105,7 @@ public class TypeConverterSQLValue<H,T,D> implements  NestedSQLValue<T,D>, Filte
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getNullFilter(boolean)
 	 */
+	@Override
 	public final SQLFilter<H> getNullFilter(boolean is_null)
 			throws CannotFilterException, NoSQLFilterException {
 		if( inner instanceof FilterProvider){
@@ -109,6 +117,7 @@ public class TypeConverterSQLValue<H,T,D> implements  NestedSQLValue<T,D>, Filte
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getOrderFilter(boolean)
 	 */
+	@Override
 	public final SQLFilter<H> getOrderFilter(boolean descending)
 			throws CannotFilterException, NoSQLFilterException {
 		throw new CannotFilterException("Cannot generate order using TypeConverter");
@@ -117,6 +126,7 @@ public class TypeConverterSQLValue<H,T,D> implements  NestedSQLValue<T,D>, Filte
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilterType()
 	 */
+	@Override
 	public final Class<H> getFilterType() {
 		return target;
 	}

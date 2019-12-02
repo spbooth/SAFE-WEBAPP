@@ -39,10 +39,12 @@ public class PrintWrapper implements Logger {
     public PrintWrapper(){
     	this(System.out);
     }
+	@Override
 	public void debug(Object message) {
 		dest.println(message);
 	}
 
+	@Override
 	public void debug(Object message, Throwable t) {
 		dest.println(message);
 		if( t != null ){
@@ -50,11 +52,13 @@ public class PrintWrapper implements Logger {
 		}
 	}
 
+	@Override
 	public void error(Object message) {
 		dest.println(message);
 
 	}
 
+	@Override
 	public void error(Object message, Throwable t) {
 		dest.println(message);
 		if( t != null ){
@@ -62,11 +66,13 @@ public class PrintWrapper implements Logger {
 		}
 	}
 
+	@Override
 	public void fatal(Object message) {
 		dest.println(message);
 
 	}
 
+	@Override
 	public void fatal(Object message, Throwable t) {
 		dest.println(message);
 		if( t != null ){
@@ -74,10 +80,12 @@ public class PrintWrapper implements Logger {
 		}
 	}
 
+	@Override
 	public void info(Object message) {
 		dest.println(message);
 	}
 
+	@Override
 	public void info(Object message, Throwable t) {
 		dest.println(message);
 		if( t != null ){
@@ -85,11 +93,13 @@ public class PrintWrapper implements Logger {
 		}
 	}
 
+	@Override
 	public void warn(Object message) {
 		dest.println(message);
 
 	}
 
+	@Override
 	public void warn(Object message, Throwable t) {
 		dest.println(message);
 		if( t != null ){

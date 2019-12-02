@@ -24,7 +24,6 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.NestedSQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.Duration;
 
 /** SQLAccessor that converts an SQLAccessor of a different type to a Duration
@@ -42,13 +41,16 @@ public class DurationConvertSQLValue<T extends Number>  implements NestedSQLValu
     	this.a = a;
     	this.resolution=resolution;
     }
+	@Override
 	public int add(StringBuilder sb, boolean qualify) {
 		return a.add(sb,qualify);
 	}
+	@Override
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
 		return a.getParameters(list);
 	}
 	
+	@Override
 	public Duration makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 		T temp = a.makeObject(rs, pos);
 		if( temp != null ){
@@ -70,6 +72,7 @@ public class DurationConvertSQLValue<T extends Number>  implements NestedSQLValu
     	return sb.toString();
     }
 	
+	@Override
 	public Class<Duration> getTarget() {
 		return Duration.class;
 	}

@@ -34,41 +34,51 @@ public class InfoInput implements Input<String>, UnmodifiableInput{
     public InfoInput(String text){
     	label=text;
     }
+	@Override
 	public String convert(Object v) throws TypeError {
 		return null;
 	}
 
+	@Override
 	public String getKey() {
 		return key;
 	}
 
+	@Override
 	public String getPrettyString(String value) {
 		return value;
 	}
 
+	@Override
 	public String getString(String value) {
 		return value;
 	}
 
+	@Override
 	public String getValue() {
 		return label;
 	}
 
+	@Override
 	public void setKey(String key) {
 		this.key=key;
 	}
 
+	@Override
 	public String setValue(String v) throws TypeError {
 		return label;
 	}
 
+	@Override
 	public void validate() throws FieldException {
 		return;
 	}
 
+	@Override
 	public String getLabel() {
 		return label;
 	}
+	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitUnmodifyableInput(this);
 	}

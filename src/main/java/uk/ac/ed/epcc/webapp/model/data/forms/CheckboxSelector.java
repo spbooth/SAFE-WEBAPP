@@ -64,6 +64,7 @@ public class CheckboxSelector implements Selector<Input<String>> {
 		this.unchecked_tag = unchecked_tag;
 	}
 
+	@Override
 	public Input<String> getInput() {
 		return new CheckBoxInput(checked_tag, unchecked_tag);
 	}

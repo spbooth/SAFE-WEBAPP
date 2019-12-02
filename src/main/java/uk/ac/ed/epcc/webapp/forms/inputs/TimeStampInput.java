@@ -41,6 +41,7 @@ public class TimeStampInput extends AbstractDateInput implements HTML5Input{
 	public TimeStampInput(){
 		super();
 	}
+	@Override
 	public String getType(){
 		return "datetime-local";
 	}

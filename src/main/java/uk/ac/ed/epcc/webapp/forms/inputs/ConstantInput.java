@@ -35,17 +35,20 @@ public class ConstantInput<V> extends AbstractInput<V> implements UnmodifiableIn
 		setValue(value);
 	}
 
+	@Override
 	public String getLabel() {
 		return label;
 	}
 
+	@Override
 	public String getString(V val) {
 		if (val == null) {
 			return null;
 		}
 		return val.toString();
 	}
-	 public String getPrettyString(V val){
+	 @Override
+	public String getPrettyString(V val){
 	    	if( val == null ){
 	    		return "no value";
 	    	}
@@ -58,6 +61,7 @@ public class ConstantInput<V> extends AbstractInput<V> implements UnmodifiableIn
 	}
 
 	
+	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitUnmodifyableInput(this);
 	}

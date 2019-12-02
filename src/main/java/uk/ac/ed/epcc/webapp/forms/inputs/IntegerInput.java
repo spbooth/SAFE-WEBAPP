@@ -44,6 +44,7 @@ public class IntegerInput extends NumberInput<Integer> {
 		return nf.format(i.intValue());
 	}
 
+	@Override
 	public Integer parseValue(String v) throws ParseException {
 		if (v == null) {
 			return null;

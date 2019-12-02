@@ -54,6 +54,7 @@ public class URLInput extends TextInput implements HTML5Input{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input#getType()
 	 */
+	@Override
 	public String getType() {
 		return "url";
 	}

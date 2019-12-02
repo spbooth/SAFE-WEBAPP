@@ -13,10 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import java.util.Iterator;
-
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-
 /** A {@link ListInput} where the items tags and values are the same String
  * 
  * 

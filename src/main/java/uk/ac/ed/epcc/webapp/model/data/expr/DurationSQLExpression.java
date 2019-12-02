@@ -87,6 +87,7 @@ private final SQLExpression<? extends Number> start, end;
 	  this(1L,start,end);
   }
 
+@Override
 public Class<Duration> getTarget() {
 	return Duration.class;
 }
@@ -96,6 +97,7 @@ public String toString() {
 }
 
 
+@Override
 public int add(StringBuilder sb, boolean qualify) {
 	if( resolution != 1L) {
 		sb.append("(");
@@ -112,6 +114,7 @@ public int add(StringBuilder sb, boolean qualify) {
 	}
 	return 1;
 }
+@Override
 public List<PatternArgument> getParameters(List<PatternArgument> list) {
 	list = end.getParameters(list);
 	list =  start.getParameters(list);
@@ -119,10 +122,12 @@ public List<PatternArgument> getParameters(List<PatternArgument> list) {
 }
 
 
+@Override
 public Duration makeObject(ResultSet rs, int pos) throws DataException, SQLException {
 	// expression is always valued in milliseconds
 		return new Duration(rs.getLong(pos),1L);
 }
+@Override
 @SuppressWarnings("unchecked")
 public SQLFilter getRequiredFilter() {
 	SQLFilter a_fil = start.getRequiredFilter();
