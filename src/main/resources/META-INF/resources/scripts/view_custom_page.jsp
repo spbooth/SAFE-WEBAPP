@@ -29,6 +29,7 @@ String page_title=conn.expandText(custom_page.getTitle());
 %>
 <%@ include file="/std_header.jsf" %>
 <%@ include file="/main__logged_in.jsf" %>
+<%@ include file="/back.jsf" %>
 <div class="block" role="main">
 <% 
 if( XMLContentBuilder.STREAM_BUILDER_FEATURE.isEnabled(conn)){

@@ -71,6 +71,7 @@ try{
 %>
 <%@ include file="/std_header.jsf" %>
 <%@ include file="/main__logged_in.jsf" %>
+<%@ include file="/back.jsf" %>
 <%= provider.getTopContent(new HtmlBuilder(),target,session_service).toString() %>
 <div class="block" role="main">
 <% if( XMLContentBuilder.STREAM_BUILDER_FEATURE.isEnabled(conn)){

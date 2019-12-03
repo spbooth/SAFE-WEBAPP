@@ -66,6 +66,7 @@ the form could just submit to self. This might break form error reporting though
 <wb:css url="service_desk.css"/>
 <%@ include file="/std_header.jsf" %>
 <%@ include file="/main__logged_in.jsf" %>
+<%@ include file="/back.jsf" %>
 <% if( tp instanceof NavigationProvider){
    HtmlBuilder top = new HtmlBuilder();
    ((NavigationProvider)tp).getTopNavigation(top, target);
