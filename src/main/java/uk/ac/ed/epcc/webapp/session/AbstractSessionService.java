@@ -535,7 +535,11 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		if (answer == null) {
 			if( haveCurrentUser() ){
 				answer = testRole(role);
-				role_map.put(role, answer);
+				if( answer != null && role_map != null) {
+					role_map.put(role, answer);
+				}else {
+					return false;
+				}
 			}else{
 				return false;
 			}
@@ -668,6 +672,13 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		return person;
 	}
 
+	 /* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.session.SessionService#isAuthenticated()
+	 */
+	@Override
+	public final boolean isAuthenticated() {
+		return person != null;
+	}
 	@Override
 	public final boolean haveCurrentUser() {
 		if( person != null ){
@@ -1387,7 +1398,12 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	    	}
 	    	AccessRoleProvider<A,T> arp = getContext().makeObjectWithDefault(AccessRoleProvider.class,null,base);
 	    	if( arp != null ){
-	    		return arp.personInRelationFilter(this, sub, target);
+	    		BaseFilter<A> result = arp.personInRelationFilter(this, sub, target);
+	    		if( result != null) {
+	    			return result;
+	    		}
+	    		// unrecognised role
+	    		throw new UnknownRelationshipException(role);
 	    	}
 	    	NamedFilterProvider<T> nfp = getContext().makeObjectWithDefault(NamedFilterProvider.class, null, base);
 	    	if( nfp != null ) {
@@ -1559,7 +1575,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	}
 	@Override
 	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target, String role, boolean fallback) {
-		try {
+		try(TimeClosable time = new TimeClosable(conn,"hasRelationship("+fac.getTag()+","+role+")")) {
 			return hasRelationship(fac, target, role);
 		}catch(UnknownRelationshipException e) {
 			return fallback;

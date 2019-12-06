@@ -35,6 +35,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,6 +63,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.LockedRecordException;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
@@ -164,13 +166,15 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  */
 
 public final class Repository implements AppContextCleanup{
-	/**
-	 * 
+	/** config property prefix to mark that text fields should truncate 
+	 *  to the size of the field
 	 */
 	private static final String TRUNCATE_PREFIX = "truncate.";
 
-	/**
-	 * 
+	/** config property prefix to mark that a reference field
+	 * is a unique reference where at most one record in this table
+	 * links to the destination. Usually this is used in combination with
+	 * a single field unique key on the source table but there is no way
 	 */
 	private static final String UNIQUE_PREFIX = "unique.";
 
@@ -209,6 +213,8 @@ public final class Repository implements AppContextCleanup{
 	private static final int DEFAULT_RESOLUTION = 1000;
 
 	public static final Feature REQUIRE_ID_KEY = new Feature("require.id_key", true, "Require all tables to have an integer primary key");
+	// This seems to serialise in the database affecting performance.
+	public static final Feature CHECK_INDEX = new Feature("repository.check_index", false, "Always read indexinfo when getting metadata (for unique keys)");
 
 	public static final Feature READ_ONLY_FEATURE = new Feature("read-only",false,"supress (most) database writes");
 	
@@ -235,8 +241,8 @@ public final class Repository implements AppContextCleanup{
 		public boolean getUnique(){
 			return unique;
 		}
-		public Iterator<String> getCols(){
-			return cols.iterator();
+		public Iterable<String> getCols(){
+			return Collections.unmodifiableList(cols);
 		}
 		void addCol(int pos, String name){
 			pos--;
@@ -411,6 +417,9 @@ public final class Repository implements AppContextCleanup{
          */
         public boolean isUnique() {
         	return unique;
+        }
+        public void setUnique(boolean value) {
+        	unique=value;
         }
         public String getForeignKeyName(){
         	return key_name;
@@ -621,6 +630,8 @@ public final class Repository implements AppContextCleanup{
 		private int id;
 
 		private Set<String> dirty = null;
+		
+		private boolean locked=false;
 		public Record() {
 			super();
 		}
@@ -642,6 +653,9 @@ public final class Repository implements AppContextCleanup{
 		 */
 		@Override
 		public synchronized void clear() {
+			if( locked) {
+				throw new LockedRecordException("clear called on locked record");
+			}
 			deCache();
 			super.clear();
 			clean();
@@ -654,6 +668,7 @@ public final class Repository implements AppContextCleanup{
 		@Override
 		public synchronized Object clone() {
 			Record copy = (Record) super.clone();
+			copy.locked=false;
 			if( have_id ){
 				copy.have_id=true;
 				copy.id=id;
@@ -723,13 +738,19 @@ public final class Repository implements AppContextCleanup{
         		throw new ConsistencyError("copying Record from different repository");
         	}
         	clear();
-        	putAll(r);
+        	// copy raw values without impacting dirty values
+        	for(Entry<String,Object> e : r.entrySet()) {
+        		super.put(e.getKey(),e.getValue());
+        	}
         	if( r.have_id){
         		have_id=true;
         		id=r.id;
         	}
         	if( r.dirty != null){
         		dirty=new HashSet( r.dirty );
+        	}else {
+        		// putAll will have set local diry flags
+        		dirty = null;
         	}
         }
         
@@ -1160,6 +1181,9 @@ public final class Repository implements AppContextCleanup{
 //				// never allow null in initial object
 //				throw new UnsupportedOperationException("Null value stored in "+key);
 //			}
+			if( locked) {
+				throw new LockedRecordException("put on locked record "+getID());
+			}
 
 			if (!hasField(key)) {
 				if (optional &&  ! key.equals(id_name)) {
@@ -1293,6 +1317,9 @@ public final class Repository implements AppContextCleanup{
 		 * @param val
 		 */
 		synchronized void setDirty(String key, boolean val) {
+			if( val && locked) {
+				throw new LockedRecordException("setDirty called on locked record");
+			}
 			if (dirty == null) {
 				if( ! val ){
 					return;
@@ -1800,6 +1827,21 @@ public final class Repository implements AppContextCleanup{
 		    		}
 		    		sb.append(" ]");
 		    	return sb.toString();
+		    }
+		    /** mark the record as read-only/locked
+		     * 
+		     * This is intended for when 
+		     * 
+		     * @throws DataFault
+		     */
+		    public void lock() throws DataFault {
+		    	if( isDirty()) {
+		    		throw new DataFault("lock of dirty record");
+		    	}
+		    	locked=true;
+		    }
+		    public boolean isLocked() {
+		    	return locked;
 		    }
 	}
 
@@ -2933,6 +2975,9 @@ public final class Repository implements AppContextCleanup{
 			try(Statement stmt=c.createStatement(); ResultSet rs = stmt.executeQuery(sb.toString())) {
 				setMetaData(rs);
 				setReferences(ctx,c);
+				if(CHECK_INDEX.isEnabled(getContext())) {
+					setIndexes();
+				}
 			}catch( SQLSyntaxErrorException se) {
 				// This occurs when table does not exist
 				throw new NoTableException(getTable(), se);
@@ -2965,6 +3010,16 @@ public final class Repository implements AppContextCleanup{
 				}
 				
 			}
+			}
+			// Mark any fields we know to be unique
+			for( IndexInfo i : result.values()) {
+				if(i.unique && i.cols.size() == 1) {
+					String f = i.cols.get(0);
+					FieldInfo fi = getInfo(f);
+					if( fi != null ) {
+						fi.setUnique(true);
+					}
+				}
 			}
 			indexes=result;
 		}catch(SQLException e){
@@ -2999,7 +3054,7 @@ public final class Repository implements AppContextCleanup{
 					table=ctx.getInitParameter(name,table); // use param in preference because of windows case mangle
 					String tag = TableToTag(ctx, table);
 					//log.debug("field "+field+" references "+table);
-					info.setReference(true,key_name,tag,ctx.getBooleanParameter(UNIQUE_PREFIX+suffix, false));
+					info.setReference(true,key_name,tag,ctx.getBooleanParameter(UNIQUE_PREFIX+suffix, info.isUnique()));
 				}
 				
 			}
@@ -3387,4 +3442,23 @@ public final class Repository implements AppContextCleanup{
 		}
 		find_statement=null;
 	}
+    public static String typeName(int type) {
+    	switch(type) {
+    	case(Types.INTEGER): return "Integer";
+    	case(Types.BIGINT): return "BigInteger";
+    	case(Types.BOOLEAN): return "Boolean";
+    	case(Types.TIMESTAMP): return "Timestamp";
+    	case(Types.DATE): return "Date";
+    	case(Types.TIME): return "Time";
+    	case(Types.FLOAT): return "Float";
+    	case(Types.DOUBLE): return "Double";
+    	case(Types.CHAR): return "Char";
+    	case(Types.VARCHAR): return "Varchar";
+    	case(Types.LONGVARCHAR): return "LongVarChar";
+    	case(Types.BLOB): return "Blob";
+    	case(Types.VARBINARY): return "VarBianry";
+    	case(Types.LONGVARBINARY): return "LongVarBinary";
+    	default: return "Unknown";
+    	}
+    }
 }

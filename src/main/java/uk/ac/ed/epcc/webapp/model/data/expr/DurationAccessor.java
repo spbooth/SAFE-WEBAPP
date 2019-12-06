@@ -29,10 +29,12 @@ public class DurationAccessor<R> implements Accessor<Duration,R> {
 	  this.start=start;
 	  this.end=end;
   }
+@Override
 public Duration getValue(R r) {
 
 	return new Duration(start.getValue(r),end.getValue(r));
 }
+@Override
 public Class<Duration> getTarget() {
 	return Duration.class;
 }
@@ -40,10 +42,12 @@ public Class<Duration> getTarget() {
 public String toString() {
 	return "Duration("+start.toString()+","+end.toString()+")";
 }
+@Override
 public boolean canSet() {
 	
 	return false;
 }
+@Override
 public void setValue(R r, Duration value) {
 	throw new UnsupportedOperationException("Set not supported");
 	

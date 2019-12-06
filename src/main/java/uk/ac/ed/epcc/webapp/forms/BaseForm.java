@@ -25,8 +25,10 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.forms.action.ConfirmMessage;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ConfirmException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
@@ -65,7 +67,7 @@ public class BaseForm implements Form {
 
 	private AppContext conn;
 	protected Logger log;
-
+	protected ConfirmMessage additional_confirm=null;
 	
 	public BaseForm(AppContext c) {
 		fields = new LinkedHashMap<>();
@@ -370,12 +372,12 @@ public class BaseForm implements Form {
 	 * @return String message name or null
 	 * @throws ActionException
 	 */
-	public String mustConfirm(String name) throws ActionException {
+	public ConfirmMessage mustConfirm(String name) throws ActionException {
 		FormAction action = actions.get(name);
 		if (action == null) {
 			throw new ActionException("Unknown action");
 		}
-		return action.getConfirm(this);
+		return action.getConfirmMessage(this);
 	}
 
 	/**
@@ -555,6 +557,8 @@ public class BaseForm implements Form {
 				for(FormValidator v : validators){
 					try{
 						v.validate(this);
+					}catch( ConfirmException e ) {
+						additional_confirm = new ConfirmMessage(e.getConfirm(), new String[] {e.getMessage()});
 					}catch(ValidateException e){
 							return false;
 					}
@@ -611,4 +615,5 @@ public class BaseForm implements Form {
 	public String getAutoFocus() {
 		return auto_focus;
 	}
+
 }

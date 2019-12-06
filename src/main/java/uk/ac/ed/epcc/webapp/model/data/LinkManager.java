@@ -758,7 +758,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @return SQLFilter on left peer
 	 */
 	public SQLFilter<L> getLeftFilter(SQLFilter<T> fil){
-		return new DestFilter<>(fil, getLeftField(), getLeftFactory());
+		return getDestFilter(fil, getLeftField(), getLeftFactory());
 	}
 	/** Get a {@link SQLFilter} for the link from a {@link SQLFilter} on the left peer
 	 * 
@@ -766,7 +766,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @return SQLFilter on self
 	 */
 	public SQLFilter<T> getLeftJoinFilter(SQLFilter<L> fil){
-		return new RemoteFilter<>(getLeftFactory(), getLeftField(), fil);
+		return getRemoteSQLFilter(getLeftFactory(), getLeftField(), fil);
 	}
 	/** get a {@link BaseFilter} for the link from a {@link BaseFilter} on the left peer
 	 * 
@@ -794,7 +794,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @return SQLFilter on left peer
 	 */
 	public SQLFilter<R> getRightFilter(SQLFilter<T> fil){
-		return new DestFilter<>(fil, getRightField(), getRightFactory());
+		return getDestFilter(fil, getRightField(), getRightFactory());
 	}
 	/** Get a {@link SQLFilter} for the link from a {@link SQLFilter} on the right peer
 	 * 
@@ -802,7 +802,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @return {@link SQLFilter} on self
 	 */
 	public SQLFilter<T> getRightJoinFilter(SQLFilter<R> fil){
-		return new RemoteFilter<>(getRightFactory(), getRightField(), fil);
+		return getRemoteSQLFilter(getRightFactory(), getRightField(), fil);
 	}
 	/** get a {@link BaseFilter} for the link from a {@link BaseFilter} on the right peer.
 	 * 

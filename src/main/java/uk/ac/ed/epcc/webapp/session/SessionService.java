@@ -301,5 +301,11 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target,String role,boolean fallback);
 	
-	
+	/** Tests if the session has already authenticated. This can return false even if {@link #haveCurrentUser()} could return true
+	 * provided it is called first.
+	 * 
+	 * 
+	 * 
+	 */
+	public boolean isAuthenticated();
 }

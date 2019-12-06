@@ -37,22 +37,27 @@ public abstract class BaseInput<V> implements Input<V> {
 		super();
 	}
 
+	@Override
 	public final void addValidator(FieldValidator<V> val) {
 		validators.add(val);
 	}
 
+	@Override
 	public final void removeValidator(FieldValidator<V> val) {
 		validators.remove(val);
 	}
 
+	@Override
 	public final String getKey() {
 		return key;
 	}
 
+	@Override
 	public void setKey(String key) {
 		this.key = key;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public V convert(Object v) throws TypeError {
 		return (V) v;
@@ -77,21 +82,24 @@ public abstract class BaseInput<V> implements Input<V> {
 	 * @param val
 	 * @return String or null if val is null
 	 */
-    public String getString(V val){
+    @Override
+	public String getString(V val){
     	if( val == null ){
     		return null;
     	}
     	return val.toString();
     }
     
-    public String getPrettyString(V val){
+    @Override
+	public String getPrettyString(V val){
     	if( val == null ){
     		return "no value";
     	}
     	return getString(val);
     }
    
-    public final void validate() throws FieldException {
+    @Override
+	public final void validate() throws FieldException {
     	validateInner();
 		if( isEmpty() ) {
 			return;

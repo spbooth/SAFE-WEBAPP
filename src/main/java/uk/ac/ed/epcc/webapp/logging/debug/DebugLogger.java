@@ -38,18 +38,21 @@ public class DebugLogger implements Logger {
     }
   
 	
+	@Override
 	public void debug(Object message) {
 		if( nested != null)
 		nested.debug(message);
 	}
 
 	
+	@Override
 	public void debug(Object message, Throwable t) {
 		if( nested != null)
 		nested.debug(message, t);
 	}
 
 	
+	@Override
 	public void error(Object message) {
 		if( nested != null)
 		nested.error(message);
@@ -57,6 +60,7 @@ public class DebugLogger implements Logger {
 	}
 
 	
+	@Override
 	public void error(Object message, Throwable t) {
 		if( nested != null)
 		nested.error(message,t);
@@ -82,6 +86,7 @@ public class DebugLogger implements Logger {
 	}
 
 
+	@Override
 	public void fatal(Object message) {
 		if( nested != null)
 		nested.fatal(message);
@@ -89,6 +94,7 @@ public class DebugLogger implements Logger {
 	}
 
 	
+	@Override
 	public void fatal(Object message, Throwable t) {
 		if( nested != null)
 		nested.fatal(message, t);
@@ -96,6 +102,7 @@ public class DebugLogger implements Logger {
 	}
 
 	
+	@Override
 	public void info(Object message) {
 		if( nested != null)
 		nested.info(message);
@@ -103,6 +110,7 @@ public class DebugLogger implements Logger {
 	}
 
 	
+	@Override
 	public void info(Object message, Throwable t) {
 		if( nested != null)
 		nested.info(message,t);
@@ -110,12 +118,14 @@ public class DebugLogger implements Logger {
 	}
 
 	
+	@Override
 	public void warn(Object message) {
 		if( nested != null)
 		nested.warn(message);
 	}
 
 	
+	@Override
 	public void warn(Object message, Throwable t) {
 		if( nested != null)
 		nested.warn(message, t);

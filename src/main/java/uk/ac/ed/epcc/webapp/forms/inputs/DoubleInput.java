@@ -59,6 +59,7 @@ public class DoubleInput extends NumberInput<Double> {
 		return nf.format(val.doubleValue());
 	}
 
+	@Override
 	public Double parseValue(String v) throws ParseException {
 		if (v == null) {
 			return null;

@@ -304,6 +304,7 @@ public class RepositoryTest extends WebappTestBase {
 		assertFalse(r.commit());
 		Record p = res.new Record();
 		p.setID(354);
+		assertFalse(p.isDirty());
 		assertEquals("boris",p.get("Name"));
 		assertNull(p.get("Date"));
 		p.delete();

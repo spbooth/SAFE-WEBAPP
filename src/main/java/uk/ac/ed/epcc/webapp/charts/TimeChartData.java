@@ -83,4 +83,10 @@ public interface TimeChartData<P extends PeriodSequencePlot> extends PeriodChart
 	
 	public List<P> getPlots();
 	
+	/** get the number of plot points in the chart
+	 * 
+	 * @return
+	 */
+	public int getItems();
+	
 }

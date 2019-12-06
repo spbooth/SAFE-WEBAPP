@@ -387,6 +387,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 		
     }
 
+	@Override
 	public void addButton(AppContext c,String text, FormResult action) {
 		log.debug("add button");
 		JButton button = new JButton(text);
@@ -395,6 +396,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 		addComponent(button);
 	}
 
+	@Override
 	public void addButton(AppContext c, String text, String hover, FormResult action){
 		log.debug("add button");
 		JButton button = new JButton(text);
@@ -402,19 +404,23 @@ public class SwingContentBuilder  implements ContentBuilder{
 		button.addActionListener(new FormResultActionListener(conn, frame, action));
 		addComponent(button);
 	}
+	@Override
 	public void addLink(AppContext c,String text, FormResult action) {
 		log.debug("add link");
 		addButton(c,text, action);
 
 	}
+	@Override
 	public void addLink(AppContext c,String text, String hover,FormResult action) {
 		log.debug("add link");
 		addButton(c,text, hover,action);
 
 	}
+	@Override
 	public <C,R> void addTable(AppContext conn,Table<C,R> t) {
 		addTable(conn,null,t);
 	}
+	@Override
 	public <C,R> void addTable(AppContext conn,NumberFormat nf,Table<C,R> t) {
 		log.debug("add table");
 		JPanel table=new JPanel(new GridBagLayout());
@@ -470,15 +476,18 @@ public class SwingContentBuilder  implements ContentBuilder{
 	}
 	
 	
+	@Override
 	public ExtendedXMLBuilder getText() {
 		log.debug("getText");
 		return new XMLPanel(this,new HtmlBuilder(),false);
 	}
+	@Override
 	public ExtendedXMLBuilder getSpan() {
 		log.debug("getSpan");
 		return new XMLPanel(this,new HtmlBuilder(),true);
 	}
 
+	@Override
 	public ContentBuilder getHeading(int level) {
 		log.debug("getHeading");
 		SwingContentBuilder builder = new SwingContentBuilder(this,"h"+level,"");
@@ -487,6 +496,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 		builder.content.setAlignmentX(Component.CENTER_ALIGNMENT);
 		return builder;
 	}
+	@Override
 	public ContentBuilder getPanel(String ... type)
 			throws UnsupportedOperationException {
 		log.debug("getPanel");
@@ -498,6 +508,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 		return panel;
 	}
 	
+	@Override
 	public ContentBuilder addParent() throws UnsupportedOperationException {
 		log.debug("addParent");
 		if( parent == null){
@@ -508,6 +519,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 		return parent;
 	}
 	
+	@Override
 	public <C, R> void addColumn(AppContext conn, Table<C, R> t, C col) {
 		JPanel table=new JPanel(new GridBagLayout());
 		setStyle(table);
@@ -542,6 +554,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 		}
 		addComponent(inner.getComponent());
 	}
+	@Override
 	public void addText(String text) {
 		if( text != null ) {
 			log.debug("addText: "+text);
@@ -584,12 +597,14 @@ public class SwingContentBuilder  implements ContentBuilder{
 			comp.setBackground(bg);
 		}
 	}
+	@Override
 	public void addHeading(int level, String text) {
 		log.debug("addHeading: "+text);
 		ContentBuilder heading = getHeading(level);
 		heading.addText(text);
 		heading.addParent();
 	}
+	@Override
 	public boolean cleanFormatted(int max, String s) {
 		HtmlBuilder hb = new HtmlBuilder();
 		boolean result = hb.cleanFormatted(max, s);
@@ -599,9 +614,11 @@ public class SwingContentBuilder  implements ContentBuilder{
 		addComponent(comp);
 		return result;
 	}
+	@Override
 	public <C, R> void addTable(AppContext conn, Table<C, R> t, String style) {
 		addTable(conn,t,null,style);
 	}
+	@Override
 	public <C, R> void addTable(AppContext conn, Table<C, R> t, NumberFormat nf,String style) {
 		addTable(conn, nf,t);
 		
@@ -609,6 +626,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormTable(uk.ac.ed.epcc.webapp.AppContext, java.lang.Iterable)
 	 */
+	@Override
 	public void addFormTable(AppContext conn, Iterable<Field> f) {
 		addFormTable(conn, f, false);
 	}
@@ -624,7 +642,8 @@ public class SwingContentBuilder  implements ContentBuilder{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormLabel(uk.ac.ed.epcc.webapp.AppContext, uk.ac.ed.epcc.webapp.forms.Field)
 	 */
-	public <I> void addFormLabel(AppContext conn, Field<I> f) {
+	@Override
+	public <I,T> void addFormLabel(AppContext conn, Field<I> f,T item) {
 		if( listener != null){
 		SwingField<I> field = listener.getSwingField(f);
 		try {
@@ -637,6 +656,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormInput(uk.ac.ed.epcc.webapp.AppContext, uk.ac.ed.epcc.webapp.forms.Field)
 	 */
+	@Override
 	public <I,T> void addFormInput(AppContext conn, Field<I> f,T radio_selector) {
 		if( listener != null){
 		SwingField<I> field = listener.getSwingField(f);
@@ -650,6 +670,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addActionButtons(uk.ac.ed.epcc.webapp.forms.Form)
 	 */
+	@Override
 	public void addActionButtons(Form f,String legend,Set<String> actions) {
 		if( form_dialog != null ){
 			content.add(form_dialog.getActionButtons(f,actions),BorderLayout.EAST);
@@ -667,6 +688,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addList(java.util.Collection)
 	 */
+	@Override
 	public <X> void addList(X[] list) {
 		for(X target : list){
 			if( target instanceof UIGenerator){
@@ -686,6 +708,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 		
 		
 	}
+	@Override
 	public <X> void addObject(X target) {
 		if( target instanceof UIProvider){
 			((UIProvider)target).getUIGenerator().addContent(this);
@@ -710,6 +733,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 	}
 	/* (non-Javadoc)
 	 */
+	@Override
 	public <X> void addList(Iterable<X> list) {
 		for(X target : list){
 			if( target instanceof UIGenerator){
@@ -742,7 +766,11 @@ public class SwingContentBuilder  implements ContentBuilder{
 	@Override
 	public ContentBuilder getDetails(Object summary_text) {
 		addObject(summary_text);
-		return getPanel();
+		return this;
+	}
+	@Override
+	public void closeDetails() {
+		
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addNumberedList(int, java.lang.Iterable)

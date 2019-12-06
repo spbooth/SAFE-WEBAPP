@@ -50,51 +50,61 @@ public class Log4JWrapper implements uk.ac.ed.epcc.webapp.logging.Logger {
 		log = Logger.getLogger(c);
 	}
 
+	@Override
 	public void debug(Object message) {
 		tag();
 		if( log != null ) log.debug(message);
 	}
 
+	@Override
 	public void debug(Object message, Throwable t) {
 		tag();
 		if( log != null )log.debug(message,t);
 	}
 
+	@Override
 	public void error(Object message) {
 		tag();
 		if( log != null )log.error(message);
 	}
 
+	@Override
 	public void error(Object message, Throwable t) {
 		tag();
 		if( log != null )log.error(message, t);
 	}
 
+	@Override
 	public void fatal(Object message) {
 		tag();
 		if( log != null )log.fatal(message);
 	}
 
+	@Override
 	public void fatal(Object message, Throwable t) {
 		tag();
 		if( log != null )log.fatal(message, t);
 	}
 
+	@Override
 	public void info(Object message) {
 		tag();
 		if( log != null )log.info(message);
 	}
 
+	@Override
 	public void info(Object message, Throwable t) {
 		tag();
 		if( log != null )log.info(message, t);
 	}
 
+	@Override
 	public void warn(Object message) {
 		tag();
 		if( log != null )log.warn(message);
 	}
 
+	@Override
 	public void warn(Object message, Throwable t) {
 		tag();
 		if( log != null )log.warn(message, t);

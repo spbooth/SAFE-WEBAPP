@@ -74,6 +74,7 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 	 * 
 	 * @return String representing unit to use or null if not defined
 	 */
+	@Override
 	public String getUnit() {
 		return unit;
 	}
@@ -81,6 +82,7 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.RangedInput#getMin()
 	 */
+	@Override
 	public N getMin(){
 		return min;
 	}
@@ -103,15 +105,18 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.RangedInput#getMax()
 	 */
+	@Override
 	public N getMax(){
 		return max;
 	}
+	@Override
 	public N setMax(N m) {
 		N old = max;
 		max = m;
 		return old;
 	}
 
+	@Override
 	public N setMin(N m) {
 		N old = min;
 		min = m;
@@ -159,6 +164,7 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 		return super.getString(val);
 	}
 
+	@Override
 	public String formatRange(N n) {
 		// Normally getString is the correct conversion
 		//This handles scale factors
@@ -166,6 +172,7 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 		return getString(n);
 	}
 
+	@Override
 	public String getType() {
 		return "number";
 	}

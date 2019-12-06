@@ -66,6 +66,7 @@ the form could just submit to self. This might break form error reporting though
 <wb:css url="service_desk.css"/>
 <%@ include file="/std_header.jsf" %>
 <%@ include file="/main__logged_in.jsf" %>
+<%@ include file="/back.jsf" %>
 <% if( tp instanceof NavigationProvider){
    HtmlBuilder top = new HtmlBuilder();
    ((NavigationProvider)tp).getTopNavigation(top, target);
@@ -88,7 +89,8 @@ if( t instanceof BaseFormTransition ){
 
 String default_charset = conn.getService(ServletService.class).defaultCharset();
 boolean multi = f.containsInput(FileInput.class);
-HtmlBuilder form_content = new HtmlBuilder();
+HtmlBuilder form_builder = new HtmlBuilder();
+HtmlFormPolicy form_content=form_builder.getFormPolicy();
 if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 	// force initial validation and use internal state
 	Collection<String> m = getMissing(request);
@@ -109,7 +111,6 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 	form_content.setErrors(getErrors(request));
 }
 %>
-<%@ include file="/scripts/form_context.jsf" %>
 <div class="block">
 <h2><%=new HtmlBuilder().clean(page_heading).toString() %></h2>
 
@@ -132,6 +133,7 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
     	}
 	}
 %>
+<%@ include file="/scripts/inline_form_context.jsf" %>
 <form id="form" class="transition" method="post" 
 <% if( multi ){ %>
    enctype="multipart/form-data"
@@ -150,15 +152,15 @@ action="<%= response.encodeURL(web_path+TransitionServlet.getURL(conn,tp,target)
 <% 
 form_content.setLockedAsHidden(f.getTargetStage()>0);
 if( t instanceof CustomFormContent ){
-	((CustomFormContent)t).addFormContent(form_content, session_service, f, target);
+	((CustomFormContent)t).addFormContent(form_builder, session_service, f, target);
 }else{
 	form_content.setActionName(f.getActionName());
-	form_content.addFormTable(conn, f);
-	form_content.addActionButtons(f);
+	form_builder.addFormTable(conn, f);
+	form_builder.addActionButtons(f);
 }
 
 %>
-<%= form_content.toString() %>
+<%= form_builder.toString() %>
 </form>
 </div>
 <%

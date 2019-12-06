@@ -35,7 +35,9 @@ public interface CreateCustomizer <BDO extends DataObject>{
 	 *            Form to be modified
 	 * @throws Exception 
 	 */
-	public void customiseCreationForm(Form f) throws Exception;
+	public default void customiseCreationForm(Form f) throws Exception{
+		
+	}
 	
 	/** Populate target from creation form.
 	 * This can be sub-classes to add additional information such as the requesting Person
@@ -48,7 +50,9 @@ public interface CreateCustomizer <BDO extends DataObject>{
 	 * @throws DataException 
 	 * @throws ActionException 
 	 */
-	public abstract void preCommit(BDO dat, Form f) throws DataException, ActionException;
+	public default void preCommit(BDO dat, Form f) throws DataException, ActionException{
+		
+	}
 
 	/** Take any action after object commit.
 	 * 
@@ -56,6 +60,8 @@ public interface CreateCustomizer <BDO extends DataObject>{
 	 * @param f
 	 * @throws Exception
 	 */
-	public abstract void postCreate(BDO dat, Form f) throws  Exception;
+	public default void postCreate(BDO dat, Form f) throws  Exception{
+		
+	}
 
 }

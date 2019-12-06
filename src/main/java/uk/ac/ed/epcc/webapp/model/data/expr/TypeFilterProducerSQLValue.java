@@ -30,26 +30,31 @@ import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
  */
 
 
-public class TypeFilterProducerSQLValue<T,D,X extends DataObject> extends TypeConverterSQLValue<X, T, D> implements  SQLAccessor<T,X>,  FilterProvider<X,T> , Targetted<T> {
-	public TypeFilterProducerSQLValue(DataObjectFactory<X> fac, TypeProducer<T, D> converter, SQLAccessor<D,X> inner) {
-		super(fac.getTarget(),converter,inner);
+public class TypeFilterProducerSQLValue<T,D,X> extends TypeConverterSQLValue<X, T, D> implements  SQLAccessor<T,X>,  FilterProvider<X,T> , Targetted<T> {
+	public TypeFilterProducerSQLValue(Class<X> target, TypeProducer<T, D> converter, SQLAccessor<D,X> inner) {
+		super(target,converter,inner);
 		
 	}
+	@Override
 	public TypeProducer<T, D> getConverter(){
 		return (TypeProducer<T, D>) super.getConverter();
 	}
+	@Override
 	public SQLAccessor<D,X> getNested(){
 		return (SQLAccessor<D, X>) super.getNested();
 	}
+	@Override
 	public T getValue(X r) {
 
 		return getConverter().find(getNested().getValue(r));
 	}
 	
+	@Override
 	public void setValue(X r, T value) {
 		getNested().setValue(r, getConverter().getIndex(value));
 
 	}
+	@Override
 	public boolean canSet() {
 		return getNested().canSet();
 	}

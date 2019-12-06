@@ -33,6 +33,7 @@ public class FormattedInput<N> extends ParseAbstractInput<N> {
     	format=f;
     }
     
+	@Override
 	@SuppressWarnings("unchecked")
 	public N parseValue(String v) throws ParseException {
 		try{

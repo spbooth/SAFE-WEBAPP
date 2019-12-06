@@ -12,3 +12,7 @@
 <%--| See the License for the specific language governing permissions and      |--%>
 <%--| limitations under the License.                                           |--%>
 <%-- Copyright - The University of Edinburgh 2015 --%>
+<%@include file="/service_init.jsf" %>
+<div class="text">	
+      <a href="<%=response.encodeURL(request.getContextPath()+"/main.jsp") %>"><b>&lt;&lt; Back to the Main Page</b></a>
+</div>

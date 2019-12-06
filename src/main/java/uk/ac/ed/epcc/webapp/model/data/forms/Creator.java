@@ -60,9 +60,15 @@ public class Creator<BDO extends DataObject> extends DataObjectFormFactory<BDO> 
 		}
 	}
     public void setAction(String type_name,Form f) {
-    	f.addAction(" Create ", new CreateAction<>(type_name,this));
+    	f.addAction(" Create ", new CreateAction<>(type_name,getActionText(),this));
     }
-	
+    /** Override the text for the create button
+	 * 
+	 * @return object added as button content
+	 */
+	public Object getActionText() {
+		return null;
+	}
 	/**
 	 * Perform target specific customisation of a creation Form. For example
 	 * adding a special validator. Note that this is called in addition to the

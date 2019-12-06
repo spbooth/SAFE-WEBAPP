@@ -1138,6 +1138,18 @@ public class Table<C, R> {
 			row_keys.add(key);
 		}
 	}
+	
+	/** Add a Map as a table row using the map keys
+	 * to set the columns
+	 * 
+	 * @param key  Row key
+	 * @param data  Row data
+	 */
+	public void addRow(R key, Map<C,Object> data) {
+		for(Map.Entry<C, Object> e : data.entrySet()) {
+			put(e.getKey(),key,e.getValue());
+		}
+	}
 
 
 	/**
@@ -1151,7 +1163,7 @@ public class Table<C, R> {
 	 *            Object key to use for total
 	 * @return total calculated or null if no column.
 	 */
-	public Double addTotalToCol(C col_name, R key) {
+ 	public Double addTotalToCol(C col_name, R key) {
 		if( hasColumnGroup(col_name)) {
 			for(C g : getColumnGroup(col_name)) {
 				Col c = getCol(g);

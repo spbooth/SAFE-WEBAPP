@@ -17,6 +17,8 @@
 package uk.ac.ed.epcc.webapp.model.data.forms;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.content.UIGenerator;
+import uk.ac.ed.epcc.webapp.content.UIProvider;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
@@ -49,7 +51,7 @@ public abstract  class CreateTransition<BDO extends DataObject> extends DataObje
 		try {
 			
 			buildForm(f);
-			f.addAction("Create", new CreateAction<>(name, this));
+			f.addAction("Create", new CreateAction<>(name, getActionText(),this));
 			customiseCreationForm(f);
 			for(CreateCustomizer comp : getFactory().getComposites(CreateCustomizer.class)){
 				comp.customiseCreationForm(f);		
@@ -59,6 +61,13 @@ public abstract  class CreateTransition<BDO extends DataObject> extends DataObje
 			throw new TransitionException("Error creating object");
 		}
 		
+	}
+	/** Override the text for the create button
+	 * 
+	 * @return object added as button content
+	 */
+	public Object getActionText() {
+		return null;
 	}
 
 	@Override

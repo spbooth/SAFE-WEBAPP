@@ -34,10 +34,11 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
  * 
  */
 public abstract class FormAction{
-String confirm = null;  // 
+	String confirm = null;  // 
+	String confirm_args[] = null;
 	private boolean must_validate=true;
 	private boolean new_window=false;
-
+	
 	public boolean wantNewWindow() {
 		return new_window;
 	}
@@ -64,26 +65,36 @@ String confirm = null;  //
 	 * The form is passed to allow a sub-class to trigger confirm based on form parameters.
 	 * However in this case the implementation must handle an incomplete form.
 	 * 
+	 * Note that the message can be set by calling {@link #setConfirm(String)} or
+	 * this method can be overidden
+	 * 
 	 * @param f Form calling action.
 	 * 
 	 * @return String confirm name
 	 */
+	
 	public String getConfirm(Form f) {
 		return confirm;
 	}
-
-	/** Method to supply arguments to a form confirmation.
-	 * 
-	 * @param f Form calling action.
-	 * @return  null or arguement list
-	 */
-	public String[] getConfirmArgs(Form f){
+	public final ConfirmMessage getConfirmMessage(Form f) {
+		// call method as sub-classes might override
+		String tag = getConfirm(f);
+		if( tag != null ) {
+			return new ConfirmMessage(tag, confirm_args);
+		}
 		return null;
 	}
+
+	
+	
 	
 	public void setConfirm(String c) {
 		confirm = c;
 	}
+	public void setConfirmArgs(String args[]) {
+		confirm_args=args;
+	}
+	
 	/** Return an optional help text for this action that can be presented as a tooltip etc.
 	 * 
 	 * @return String or null

@@ -43,6 +43,7 @@ public class LongInput extends NumberInput<Long> {
 		return nf.format(l.longValue());
 	}
 
+	@Override
 	public Long parseValue(String v) throws ParseException {
 		if (v == null) {
 			return null;

@@ -23,18 +23,22 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 public class PrintLoggerService implements LoggerService {
 
+	@Override
 	public Logger getLogger(String name) {
 		return new PrintWrapper();
 	}
 
+	@Override
 	public Logger getLogger(Class c) {
 		return new PrintWrapper();
 	}
 
+	@Override
 	public void cleanup() {
 		
 	}
 
+	@Override
 	public Class<? super LoggerService> getType() {
 		return LoggerService.class;
 	}

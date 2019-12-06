@@ -312,6 +312,7 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 
 
 
+	@Override
 	public int getItems(){
 		return period.getNsplit()*nsplits;
 	}
@@ -382,5 +383,9 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 	public boolean isCumulative() {
 		return is_cumulative;
 	}
+
+
+
+	
 
 }

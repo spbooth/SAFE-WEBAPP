@@ -24,7 +24,9 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
+import uk.ac.ed.epcc.webapp.content.HtmlFormPolicy;
 import uk.ac.ed.epcc.webapp.content.HtmlPrinter;
+import uk.ac.ed.epcc.webapp.content.XMLContentBuilder;
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.MapForm;
@@ -45,6 +47,8 @@ import uk.ac.ed.epcc.webapp.servlet.ServletService;
 public abstract class BaseHTMLForm extends MapForm {
 	public static final String FORM_STATE_ATTR = "form_state";
 	public static final String FORM_STAGE_INPUT = "form_stage";
+	
+	
 	
 	public BaseHTMLForm(AppContext c) {
 		super(c);
@@ -133,12 +137,12 @@ public abstract class BaseHTMLForm extends MapForm {
 	public String getActionButtons() {
 		return getActionButtons(new HtmlBuilder()).toString();
 	}
-	public HtmlBuilder getActionButtons(HtmlBuilder result){
+	public XMLContentBuilder getActionButtons(XMLContentBuilder result){
 		if( target_stage > 0 ) {
 			// record which stage we are at
 			BaseHTMLForm.emitHiddenParam(result, FORM_STAGE_INPUT, Integer.toString(target_stage));
 		}
-		result.setActionName(action_name);
+		result.getFormPolicy().setActionName(action_name);
 		result.addActionButtons(this);
 		return result;
 	}
@@ -179,12 +183,13 @@ public abstract class BaseHTMLForm extends MapForm {
 	}
 
 	
-	protected < X extends HtmlBuilder> X getHtmlFieldTable(X result,Collection<String> missing_fields, Map<String,String> errors,
+	protected < X extends XMLContentBuilder> X getHtmlFieldTable(X result,Collection<String> missing_fields, Map<String,String> errors,
 				Map<String,Object> post_params) {
-		result.setLockedAsHidden(stage>0);
-		result.setErrors(errors);
-		result.setMissingFields(missing_fields);
-		result.setPostParams(post_params);
+		HtmlFormPolicy policy = result.getFormPolicy();
+		policy.setLockedAsHidden(stage>0);
+		policy.setErrors(errors);
+		policy.setMissingFields(missing_fields);
+		policy.setPostParams(post_params);
 		result.addFormTable(getContext(), this);
 		
 		return result;

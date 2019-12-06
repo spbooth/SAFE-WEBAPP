@@ -51,6 +51,7 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#convert(java.lang.Object)
 	 */
+	@Override
 	public String convert(Object v) throws TypeError {
 		if( v == null ){
 			return (String) v;

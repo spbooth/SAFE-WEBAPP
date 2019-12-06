@@ -50,6 +50,7 @@ public class ElapsedSecondInput extends ParseAbstractInput<Number> implements Fo
 		});
 	}
 
+	@Override
 	public Long parseValue(String v) throws ParseException {
 		if( v == null || v.trim().length()== 0){
 			return null;
@@ -90,6 +91,7 @@ public class ElapsedSecondInput extends ParseAbstractInput<Number> implements Fo
 		return total+":"+min+":"+seconds;
 	}
 
+	@Override
 	public String getFormatHint() {
 		return "HH:MM:SS";
 	}

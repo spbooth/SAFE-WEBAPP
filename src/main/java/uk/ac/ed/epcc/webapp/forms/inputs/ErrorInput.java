@@ -38,27 +38,35 @@ public class ErrorInput<T> implements UnmodifiableInput, Input<T> {
 	public ErrorInput(String text){
 		this.text=text;
 	}
+	@Override
 	public String getLabel() {
 		return text;
 	}
+	@Override
 	public T convert(Object v) throws TypeError {
 		return null;
 	}
+	@Override
 	public String getKey() {
 		return key;
 	}
+	@Override
 	public String getPrettyString(T value) {
 		return null;
 	}
+	@Override
 	public String getString(T value) {
 		return null;
 	}
+	@Override
 	public T getValue() {
 		return null;
 	}
+	@Override
 	public void setKey(String key) {
 		this.key=key;
 	}
+	@Override
 	public T setValue(T v) throws TypeError {
 		return null;
 	}
@@ -67,9 +75,11 @@ public class ErrorInput<T> implements UnmodifiableInput, Input<T> {
 		// force validation
 		return false;
 	}
+	@Override
 	public void validate() throws FieldException {
 		throw new ValidateException("No legal value possible");
 	}
+	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitUnmodifyableInput(this);
 	}

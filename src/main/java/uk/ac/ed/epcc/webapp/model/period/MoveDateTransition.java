@@ -104,7 +104,7 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 			}else{
 				fac.canChangeEnd(current, d);
 			}
-			if( ! move ){
+			if(bound != null && ( move == null || ! move )){
 				if( (move_start && d.before(bound.getEnd())) ||
 					((! move_start) && d.after(bound.getStart()))){
 			
@@ -177,8 +177,8 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 		f.addInput(MoveDateTransition.DATE_FIELD, label, input);
 		if( move_split ){
 			f.addInput(MoveDateTransition.MOVE_SPLIT_FIELD,"Move boundary with neighbour",new BooleanInput());
-			f.addValidator(new MoveValidator(move_start,target,next_seq));
 		}
+		f.addValidator(new MoveValidator(move_start,target,next_seq));
 		f.addAction("Change", new MoveDateAction(move_start, target));
 		Date e = fac.getEditMarker();
 		if( e != null && def.before(e)){

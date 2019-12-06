@@ -24,10 +24,9 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
-import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
 
-/**
+/** {@link FileInput} for image files
  * @author Stephen Booth
  *
  */
@@ -70,7 +69,7 @@ public class ImageInput extends FileInput implements ItemInput<StreamData,Buffer
 
 	/**
 	 * @param data
-	 * @return
+	 * @return {@link BufferedImage}
 	 * @throws IOException
 	 */
 	public BufferedImage getBufferedImage(StreamData data) throws IOException {

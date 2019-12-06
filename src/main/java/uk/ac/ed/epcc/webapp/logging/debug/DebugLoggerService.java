@@ -43,6 +43,7 @@ public class DebugLoggerService implements Contexed, LoggerService {
     public LoggerService getNested(){
     	return nested;
     }
+	@Override
 	public Logger getLogger(String name) {
 		Logger l = null;
 		if( nested != null ){
@@ -55,6 +56,7 @@ public class DebugLoggerService implements Contexed, LoggerService {
 	}
 
 
+	@Override
 	public Logger getLogger(Class c) {
 		Logger l = null;
 		if( nested != null ){
@@ -67,16 +69,19 @@ public class DebugLoggerService implements Contexed, LoggerService {
 	}
 
 	
+	@Override
 	public void cleanup() {
 		nested.cleanup();
 	}
 	
+	@Override
 	public AppContext getContext() {
 		return conn;
 	}
 	
 	
 
+	@Override
 	public Class<? super LoggerService> getType() {
 		return LoggerService.class;
 	}

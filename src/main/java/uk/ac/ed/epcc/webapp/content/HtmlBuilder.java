@@ -17,54 +17,40 @@
 package uk.ac.ed.epcc.webapp.content;
 
 import java.text.NumberFormat;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
-import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
-import uk.ac.ed.epcc.webapp.forms.Identified;
 import uk.ac.ed.epcc.webapp.forms.action.DisabledAction;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
-import uk.ac.ed.epcc.webapp.forms.html.AddButtonVisitor;
-import uk.ac.ed.epcc.webapp.forms.html.AddLinkVisitor;
-import uk.ac.ed.epcc.webapp.forms.html.EmitHtmlInputVisitor;
-import uk.ac.ed.epcc.webapp.forms.html.InputIdVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.CanSubmitVisistor;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.PrefixInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TagInput;
-import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
-import uk.ac.ed.epcc.webapp.servlet.ServeDataServlet;
-import uk.ac.ed.epcc.webapp.servlet.ServletService;
 
 
 /** A {@link HtmlPrinter} that also implements {@link ContentBuilder} 
  * in terms of web based interfaces.
  * 
+ * @see HtmlWriter
  * @author spb
  *
  */
 
 
 
-public class HtmlBuilder extends HtmlPrinter implements ContentBuilder {
+public class HtmlBuilder extends HtmlPrinter implements XMLContentBuilder {
   
-public static final Feature HTML_USE_LABEL_FEATURE = new Preference("html.use_label",true,"generate html labels in automatic forms");
 public static final Feature HTML_TABLE_SECTIONS_FEATURE = new Preference("html.table_sections",false,"generate thead/tbody in tables");
 Boolean use_table_section=null;
 
 private boolean new_tab=false; // Do  we want to open links/buttons in new tab/window
+private HtmlFormPolicy policy = new HtmlFormPolicy();
 protected static final class Text extends Panel {
-	  Text(HtmlBuilder parent){
+	  Text(AbstractXMLBuilder parent){
 		  super("div",parent,true,"para");
 	  }
 	}
@@ -75,13 +61,13 @@ protected static final class Text extends Panel {
     *
     */
    protected static final class SpanText extends Panel {
-	  SpanText(HtmlBuilder parent){
+	  SpanText(AbstractXMLBuilder parent){
 		  super(null,parent,true,null);
 	  }
 	}
   protected static final class Heading extends Panel {
 	  
-	  Heading(HtmlBuilder parent,int level){
+	  Heading(AbstractXMLBuilder parent,int level){
 		  super("h"+level,parent,true,null);
 	  }
 	}
@@ -102,7 +88,7 @@ protected static final class Text extends Panel {
 	   * @param inline   Should nested text be inline or block
 	   * @param type    class of element
 	   */
-	  Panel(String element,HtmlBuilder parent, boolean inline,String type){
+	  Panel(String element,AbstractXMLBuilder parent, boolean inline,String type){
 		  super(parent);
 		  this.element=element;
 		  this.inline=inline;
@@ -194,103 +180,31 @@ public HtmlBuilder(){
 }
   
   
-  public HtmlBuilder(HtmlBuilder htmlBuilder) {
-	super(htmlBuilder);
-	if( htmlBuilder != null ){
-		setUseRequired(htmlBuilder.use_required);
-		setActionName(htmlBuilder.action_name);
-		if( htmlBuilder.use_table_section != null ){
-			setTableSections(htmlBuilder.use_table_section);
+  public HtmlBuilder(AbstractXMLBuilder parent) {
+	super(parent);
+	if( parent != null && parent instanceof XMLContentBuilder){
+		XMLContentBuilder xcb=(XMLContentBuilder) parent;
+		this.policy=xcb.getFormPolicy().getChild();
+		if( parent instanceof HtmlBuilder) {
+			HtmlBuilder htmlBuilder = (HtmlBuilder) parent;
+			if( htmlBuilder.use_table_section != null ){
+				setTableSections(htmlBuilder.use_table_section);
+			}
 		}
-		setMissingFields(htmlBuilder.missing_fields);
-		setErrors(htmlBuilder.errors);
-		setPostParams(htmlBuilder.post_params);
 	}
 }
 
-
-@Override
-public void addButton(AppContext conn,String text, FormResult action) {
-	AddButtonVisitor vis = new AddButtonVisitor(conn, this, text);
-	vis.new_tab=new_tab;
-	try {
-		action.accept(vis);
-	} catch (Exception e) {
-		getLogger(conn).error("Error adding Button",e);
-	}
-}
-@Override
-public void addButton(AppContext conn,String text, String hover,FormResult action) {
-	AddButtonVisitor vis = new AddButtonVisitor(conn, this, text,hover);
-	vis.new_tab=new_tab;
-	try {
-		action.accept(vis);
-	} catch (Exception e) {
-		getLogger(conn).error("Error adding Button",e);
-	}
-}
-@Override
-public void addLink(AppContext conn,String text, FormResult action) {
-	addLink(conn,text,null,action);
-}
-@Override
-public void addLink(AppContext conn,String text, String hover,FormResult action) {
-	if( action == null){
-		clean(text);
-		return;
-	}
-	AddLinkVisitor vis = new AddLinkVisitor(conn, this, text,hover);
-	vis.new_tab=new_tab;
-	try {
-		action.accept(vis);
-	} catch (Exception e) {
-		getLogger(conn).error("Error adding Link",e);
-	}
-}
-@Override
-public void addImage(AppContext conn, String alt, String hover,Integer width, Integer height, ServeDataResult image) {
-	if( image == null) {
-		return;
-	}
-	try {
-		String url = conn.getService(ServletService.class).encodeURL(ServeDataServlet.getURL(conn, image.getProducer(), image.getArgs()));
-		open("img");
-		if( alt != null) {
-			attr("alt", alt);
+  @Override
+	public <C,R> void addTable(AppContext conn,Table<C,R> t,NumberFormat nf,String style) {
+		TableXMLFormatter<C,R> fmt = new TableXMLFormatter<>(this, nf,style);
+		if( use_table_section != null){
+			// If set explicitly this takes preference.
+			fmt.setTableSections(use_table_section);
+		}else{
+			fmt.setTableSections(HTML_TABLE_SECTIONS_FEATURE.isEnabled(conn));
 		}
-		if( hover != null ) {
-			attr("title",hover);
-		}
-		if( width != null && width.intValue() > 0) {
-			attr("width",width.toString());
-		}
-		if( height != null && height.intValue() > 0) {
-			attr("height",height.toString());
-		}
-
-		attr("src",url);
-		close();
-	}catch(Exception t) {
-		getLogger(conn).error("Error adding image",t);
+		fmt.add(t);
 	}
-}
-
-
-@Override
-public <C,R> void addTable(AppContext conn,Table<C,R> t,String style) {
-	addTable(conn,t,null,style);
-}
-@Override
-public <C,R> void addTable(AppContext conn,Table<C,R> t,NumberFormat nf,String style) {
-	TableXMLFormatter<C,R> fmt = new TableXMLFormatter<>(this, nf,style);
-	if( use_table_section != null){
-		// If set explicitly this takes preference.
-		fmt.setTableSections(use_table_section);
-	}else{
-		fmt.setTableSections(HTML_TABLE_SECTIONS_FEATURE.isEnabled(conn));
-	}
-	fmt.add(t);
-}
 
 
 public void paragraph(String text) {
@@ -337,249 +251,8 @@ public ContentBuilder addParent() throws UnsupportedOperationException {
 }
 
 
-@Override
-public <C, R> void addColumn(AppContext conn, Table<C, R> t, C col) {
-	TableXMLFormatter<C,R> fmt = new TableXMLFormatter<>(this, null,"auto");
-	fmt.addColumn(t,col);
-}
 
 
-@Override
-public void addText(String text) {
-	open("div");
-	addClass("para");
-	clean(text);
-	close();
-}
-
-
-@Override
-public void addHeading(int level, String text) {
-	open("h"+level);
-	clean(text);
-	close();
-	
-}
-
-
-@Override
-public <C, R> void addTable(AppContext conn, Table<C, R> t) {
-	addTable(conn,null,t);
-}
-@Override
-public <C, R> void addTable(AppContext conn, NumberFormat nf,Table<C, R> t) {
-	addTable(conn, t, nf, "auto");
-	
-}
-
-private Collection<String> missing_fields=null;
-private Map<String,String> errors=null;
-private Map<String,Object> post_params=null;
-
-
-/* (non-Javadoc)
- * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormTable(java.lang.Iterable)
- */
-@Override
-public void addFormTable(AppContext conn,Iterable<Field> form) {
-	Iterator<Field> it = form.iterator();
-	boolean even=true;
-	if( it.hasNext() ){
-		open("table");
-		addClass( "form");
-		while (it.hasNext()) {
-			Field<?> f = it.next();
-		    try {
-		    	open("tr");
-		    	if( even ){
-		    		addClass( "even");
-		    	}else{
-		    		addClass("odd");
-		    	}
-		    	open("th");
-				addFormLabel(conn, f);
-				close();
-				open("td");
-				addFormInput(conn, f,null);
-				close();
-				close();
-				clean('\n');
-				even = ! even;
-			} catch (Exception e) {
-				getLogger(conn).error("Error making html from form",e);
-			}
-		}
-		close();
-		}
-}
-
-private boolean isMissing(String field){
-	if( missing_fields == null ){
-		HtmlBuilder parent = (HtmlBuilder) getParent();
-		if( parent != null){
-			return parent.isMissing(field);
-		}else{
-			return false;
-		}
-	}
-	return missing_fields.contains(field);
-}
-private String getError(String field){
-	if( errors == null ){
-		return null;
-	}
-	return errors.get(field);
-}
-/* (non-Javadoc)
- * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormLabel(uk.ac.ed.epcc.webapp.forms.Field)
- */
-@Override
-public <I> void addFormLabel(AppContext conn,Field<I> f) {
-	String key = f.getKey();
-	boolean missing = isMissing(key);
-	String error = getError(key);
-	Input<I> i = f.getInput();
-	boolean optional = f.isOptional();
-	if( HTML_USE_LABEL_FEATURE.isEnabled(conn)){
-		open("label");
-		InputIdVisitor vis = new InputIdVisitor(f.getForm().getFormID());
-		try {
-			String id =  (String) i.accept(vis);
-			if( id != null){
-				attr("for",id);
-			}
-		} catch (Exception e) {
-			getLogger(conn).error("Error getting id",e);
-		}
-	}else{
-		open("span");
-	}
-	if (optional) {
-		addClass("optional");
-	}else{
-		addClass("required");
-	}
-	if( missing) {
-		addClass("missing");
-	}
-	String tooltip = f.getTooltip();
-	if( tooltip != null && ! tooltip.isEmpty()) {
-		attr("title",tooltip);
-	}
-	
-	clean(f.getLabel());
-	
-	close(); // span or label
-
-//	if (missing) {
-//		open("b");
-//		open("span");
-//		addClass( "warn");
-//		clean("*");
-//		close(); //span
-//		close(); //b
-//	}
-	if (error != null) {
-		nbs();
-		open("span");
-		addClass( "field_error");
-		clean(error);
-		close(); //span
-	}
-	
-}
-
-
-/** should we do browser required field validation
- * 
- */
-private boolean use_required=true;
-public boolean setUseRequired(boolean use_required){
-	boolean old_value = use_required;
-	this.use_required=use_required;
-	return old_value;
-}
-
-/** Should locked inputs have their vvalues posed as hidden parameters
- * 
- */
-private boolean locked_as_hidden=false;
-public boolean setLockedAsHidden(boolean value) {
-	boolean old = locked_as_hidden;
-	this.locked_as_hidden=value;
-	return old;
-}
-
-/* (non-Javadoc)
- * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormInput(uk.ac.ed.epcc.webapp.forms.Field)
- */
-@Override
-public <I,T> void addFormInput(AppContext conn,Field<I> f,T item) {
-	String key =  f.getKey();
-	String error = null;
-	boolean optional = f.isOptional();
-	// If we have errors to report then we are showing the post_params.
-	// if we want to force errors to be shown from the Form state (say
-	// updating an old object with
-	// invalid state then pass null post_params or set validate
-	boolean use_post = (post_params != null)
-			&& ((errors != null && errors.size() > 0) || (missing_fields != null && missing_fields
-					.size() > 0));
-	if (errors != null) {
-		error = errors.get(key);
-	}
-	Input<I> i = f.getInput();
-	if( i instanceof PrefixInput){
-		clean(((PrefixInput)i).getPrefix());
-	}
-	try{
-		EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(conn,optional,this, use_post, post_params,f.getForm().getFormID(),f.getAttributes());
-		vis.setRadioTarget(item);
-		vis.setUseRequired(use_required);
-		vis.setAutoFocus(f.getKey().equals(f.getForm().getAutoFocus()));
-		vis.setLockedAsHidden(locked_as_hidden);
-		i.accept(vis);
-	}catch(Exception e){
-		getLogger(conn).error("Error generating input",e);
-	}
-	if( i instanceof TagInput){
-		clean(((TagInput)i).getTag());
-	}
-	
-}
-
-
-
-public Collection<String> getMissingFields() {
-	return missing_fields;
-}
-
-
-public void setMissingFields(Collection<String> missing_fields) {
-	this.missing_fields = missing_fields;
-}
-
-
-public Map<String,String> getErrors() {
-	return errors;
-}
-
-
-public void setErrors(Map<String,String> errors) {
-	this.errors = errors;
-}
-
-
-public Map<String,Object> getPostParams() {
-	return post_params;
-}
-
-
-public void setPostParams(Map<String,Object> post_params) {
-	this.post_params = post_params;
-}
-
-private String action_name=null;
 
 /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addActionButtons(uk.ac.ed.epcc.webapp.forms.Form)
@@ -623,6 +296,7 @@ public void addActionButtons(Form f,String legend,Set<String> actions) {
 			if( shortcut != null){
 				attr("accesskey", shortcut);
 			}
+			String action_name = getFormPolicy().getActionName();
 			if( action_name != null ){
 				attr("name", action_name);
 			}else{
@@ -649,82 +323,26 @@ public void addActionButtons(Form f,String legend,Set<String> actions) {
 
 
 
-public void setActionName(String action_name) {
-	this.action_name = action_name;
-}
+
 public void setTableSections(boolean value){
 	use_table_section=Boolean.valueOf(value);
 }
 
-
-/* (non-Javadoc)
- * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addList(java.util.Collection)
- */
 @Override
-public <X> void addList(Iterable<X> list) {
-	addList(null,list);
+public final ContentBuilder getDetails(Object summary_text) {
+	Panel details = new Panel("details",this,false,"details");
+	if( summary_text != null ){
+		details.open("summary");
+		details.addObject(summary_text);
+		details.close();
+	}
+	return details;
 }
 @Override
-public <X> void addList(Map<String,String> attr,Iterable<X> list) {
-	open("ul");
-	attr(attr);
-	for(X target : list){
-		open("li");
-		addObject(target);
-		close();
-	}
-	close();
-	clean("\n");
-}
-@Override
-public <X> void addNumberedList(int start,Iterable<X> list) {
-	open("ol");
-	attr("start",Integer.toString(start));
-	for(X target : list){
-		open("li");
-		addObject(target);
-		close();
-	}
-	close();
-	clean("\n");
+public final void closeDetails() {
+	addParent();
 }
 
-
-/**
- * @param target
- */
-@Override
-public <X> void addObject(X target) {
-	if( target == null ) {
-		return;
-	}
-	if( target instanceof UIProvider){
-		((UIProvider)target).getUIGenerator().addContent(this);
-	}else if( target instanceof UIGenerator){
-		((UIGenerator)target).addContent(this);
-	}else if(target instanceof XMLPrinter) {
-		append((XMLPrinter)target);
-	}else if( target instanceof Identified){
-		clean(((Identified)target).getIdentifier());
-	}else if( target  instanceof Iterable){
-		addList((Iterable)target);
-	}else if( target instanceof Object[]) {
-		addList((Object []) target);
-	}else{
-		clean(target.toString());
-	}
-}
-@Override
-public <X> void addList(X[] list) {
-	open("ul");
-	for(X target : list){
-		open("li");
-		addObject(target);
-		close();
-	}
-	close();
-	clean("\n");
-}
 /** Add a script element to HTML. 
  * This only works for html so classes that want to add script elements
  * will need to check the class of the content builder.
@@ -743,31 +361,20 @@ public void addScriptFile(String path){
 	endOpen();
 	close();
 }
-protected final Logger getLogger(AppContext conn){
+public final Logger getLogger(AppContext conn){
 	return conn.getService(LoggerService.class).getLogger(getClass());
 }
 
 
-/* (non-Javadoc)
- * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#getDetails(java.lang.String)
- */
 @Override
-public ContentBuilder getDetails(Object summary_text) {
-	Panel details = new Panel("details",this,false,"details");
-	if( summary_text != null ){
-		details.open("summary");
-		details.addObject(summary_text);
-		details.close();
-	}
-	return details;
-}
-
-
 public boolean useNewTab() {
 	return new_tab;
 }
-
-
+@Override
+public HtmlFormPolicy getFormPolicy() {
+	return policy;
+}
+@Override
 public boolean setNewTab(boolean new_tab) {
 	boolean old = this.new_tab;
 	this.new_tab = new_tab;

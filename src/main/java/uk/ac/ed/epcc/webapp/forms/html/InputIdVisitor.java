@@ -77,14 +77,25 @@ public class InputIdVisitor implements InputVisitor<String> {
 		return prefix+listInput.getKey();
 	}
 
+	private Object radio_selector=null;
+	public void setRadioTarget(Object o){
+		radio_selector=o;
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor#visitRadioButtonInput(uk.ac.ed.epcc.webapp.forms.inputs.ListInput)
 	 */
 	public <V, T> String visitRadioButtonInput(ListInput<V, T> listInput)
 			throws Exception {
+		if( radio_selector == null || listInput == null || prefix == null ) {
+			return null;
+		}
+		String tag = listInput.getTagByItem((T) radio_selector);
+		if( tag != null) {
+			return prefix+listInput.getKey()+tag;
+		}
 		return null;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor#visitLengthInput(uk.ac.ed.epcc.webapp.forms.inputs.LengthInput)
 	 */

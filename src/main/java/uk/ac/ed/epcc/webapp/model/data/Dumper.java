@@ -349,8 +349,7 @@ public class Dumper extends AbstractContexed{
 			sb.open(index);
 			sb.attr(TYPE_ATTR,"Index");
 			sb.attr(UNIQUE_ATTR,Boolean.toString(info.getUnique()));
-			for(Iterator<String> it = info.getCols(); it.hasNext(); ){
-				String col = it.next();
+			for(String col : info.getCols()){
 				if( col != null && col.trim().length() > 0){
 					sb.open(COLUMN);
 					sb.attr(NAME_ATTR,col);

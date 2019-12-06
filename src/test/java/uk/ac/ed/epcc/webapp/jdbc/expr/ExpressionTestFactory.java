@@ -214,7 +214,7 @@ public class ExpressionTestFactory extends ClassificationFactory<ExpressionTestF
 	}
 	
 	public SQLExpression<Integer> getLocateExpression(String sub,int pos){
-		return new LocateSQLExpression(new ConstExpression(String.class, sub), res.getStringExpression(getTarget(), Classification.NAME), new ConstExpression(Integer.class, pos));
+		return new LocateSQLExpression(new ConstExpression(getTarget(),String.class, sub), res.getStringExpression(getTarget(), Classification.NAME), new ConstExpression(getTarget(),Integer.class, pos));
 	}
 	
 	public StringFieldExpression getNameSQLAccessor(){
@@ -223,6 +223,6 @@ public class ExpressionTestFactory extends ClassificationFactory<ExpressionTestF
 	}
 	
 	public SQLValue<Integer> getLocateValue(String sub,int pos){
-		return new LocateSQLValue(new ConstExpression(String.class, sub), res.getStringExpression(getTarget(), Classification.NAME), new ConstExpression(Integer.class, pos));
+		return new LocateSQLValue(new ConstExpression(getTarget(),String.class, sub), res.getStringExpression(getTarget(), Classification.NAME), new ConstExpression(getTarget(),Integer.class, pos));
 	}
 }

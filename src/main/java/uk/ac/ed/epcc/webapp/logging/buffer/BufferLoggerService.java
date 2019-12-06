@@ -39,6 +39,7 @@ public class BufferLoggerService implements LoggerService, Contexed{
 /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.AppContextService#cleanup()
  */
+@Override
 public void cleanup() {
 	nested.cleanup();
 }
@@ -46,6 +47,7 @@ public void cleanup() {
 /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.AppContextService#getType()
  */
+@Override
 public Class<? super LoggerService> getType() {
 	return LoggerService.class;
 }
@@ -53,6 +55,7 @@ public Class<? super LoggerService> getType() {
 /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.logging.LoggerService#getLogger(java.lang.String)
  */
+@Override
 public Logger getLogger(String name) {
 	return new BufferLogger(buffer, max_length,nested.getLogger(name));
 }
@@ -60,12 +63,14 @@ public Logger getLogger(String name) {
 /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.logging.LoggerService#getLogger(java.lang.Class)
  */
+@Override
 public Logger getLogger(Class c) {
 	return new BufferLogger(buffer,max_length, nested.getLogger(c));
 }
 /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
  */
+	@Override
 	public AppContext getContext() {
 		return conn;
 	}

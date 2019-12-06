@@ -17,6 +17,7 @@ import java.util.Date;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -37,6 +38,8 @@ public class DefaultLimitService extends LimitService {
 	private final long max_millis;
 	private final double max_mem_fraction;
 	private final Logger log;
+	public static final Feature RUN_GC = new Feature("limit_service.try_gc",true,"Try to run GC to reclaim memory");
+	private final boolean run_gc;
 	/**
 	 * @param conn
 	 */
@@ -55,6 +58,7 @@ public class DefaultLimitService extends LimitService {
 		}else {
 			log=null;
 		}
+		run_gc = RUN_GC.isEnabled(conn);
 	}
 
 	/* (non-Javadoc)
@@ -76,7 +80,15 @@ public class DefaultLimitService extends LimitService {
 			if( log != null) {
 				log.warn("Resource check fail: start="+start+" now="+now+" memory "+inital_available_memory+"->"+free_mem+" "+fraction_used);
 			}
-			throw new LimitException("Memory use is too high");
+			// can we reclaim
+			if( run_gc) {
+				rt.gc();
+				free_mem = rt.maxMemory()-rt.totalMemory()+rt.freeMemory();
+				fraction_used = ((double)(inital_available_memory-free_mem))/(double)inital_available_memory;
+			}
+			if( fraction_used >max_mem_fraction) {
+				throw new LimitException("Memory use is too high");
+			}
 		}
 		if( log != null ) {
 			log.debug("Resource check: start="+start+" now="+now+" memory "+inital_available_memory+"->"+free_mem+" "+fraction_used);

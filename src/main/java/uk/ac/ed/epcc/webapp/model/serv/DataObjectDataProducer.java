@@ -138,7 +138,11 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 			touch();
 		}		
 		public MimeStreamData getData() throws DataFault{
-		    return new MimeStreamDataWrapper(record.getStreamDataProperty(DATA),record.getStringProperty(MIME_TYPE),getName());
+		    return new MimeStreamDataWrapper(record.getStreamDataProperty(DATA),getMimeType(),getName());
+		}
+
+		public String getMimeType() {
+			return record.getStringProperty(MIME_TYPE);
 		}
 
 		/**
@@ -162,6 +166,7 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 			int live_months = conn.getIntegerParameter(SERV_DATA_LIFETIME_MONTHS_PROP, 1);
 			if( live_months > 0 ){
 				Calendar cal = Calendar.getInstance();
+				cal.setTime(conn.getService(CurrentTimeService.class).getCurrentTime());
 				cal.add(Calendar.MONTH, live_months);
 				record.setProperty(EXPIRES_FIELD, cal.getTime());
 				SessionService<?> sess = conn.getService(SessionService.class);
@@ -181,9 +186,9 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 
 	public MimeData getMimeData(SessionService user, List<String> path) throws Exception{
 		// Auto clean the table once per user session.
-		if( user != null && user.getAttribute(CLEANED_ATTR) == null){
+		if( user != null && user.getAttribute(CLEANED_ATTR+getTag()) == null){
 			clean();
-			user.setAttribute(CLEANED_ATTR, "yes");
+			user.setAttribute(CLEANED_ATTR+getTag(), "yes");
 		}
 		MimeData d = find(Integer.parseInt(path.get(0)));
 		if( d == null || ! d.allow(user)){

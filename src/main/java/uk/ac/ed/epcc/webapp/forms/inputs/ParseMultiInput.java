@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 public abstract class ParseMultiInput<V,I extends Input> extends MultiInput<V,I> implements
 		ParseMapInput {
+	@Override
 	public final <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitParseMultiInput(this);
 	}

@@ -33,6 +33,7 @@ public class PhoneInput extends PatternTextInput implements HTML5Input {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input#getType()
 	 */
+	@Override
 	public String getType() {
 		return "tel";
 	}

@@ -265,7 +265,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
         public SQLHashFilter(AppContext conn,Hash hash,String password) throws DataFault, CannotUseSQLException{
         	this.hash=hash;
         	this.password=password;
-        	SQLExpression<String> c = new ConstExpression<String, String>(String.class, password,false);
+        	SQLExpression<String> c = new ConstExpression<String, T>(getFactory().getTarget(),String.class, password,false);
         	if( useSalt()){
         		if( DatabasePasswordComposite.SALT_FIRST_FEATURE.isEnabled(getContext())){
 					c = new ConcatSQLExpression(getRepository().getStringExpression(getTarget(),DatabasePasswordComposite.SALT),c);
@@ -484,7 +484,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 								sb.append("=? , ");
 							}
 							res.getInfo(DatabasePasswordComposite.PASSWORD).addName(sb, false, false);
-							SQLExpression<String> crypt = sqlContext.hashFunction(h, new ConstExpression<String, AppUser>(String.class,new_password , false));
+							SQLExpression<String> crypt = sqlContext.hashFunction(h, new ConstExpression<>(getFactory().getTarget(),String.class,new_password , false));
 							sb.append("=");
 							crypt.add(sb, false);
 							sb.append(" WHERE ");

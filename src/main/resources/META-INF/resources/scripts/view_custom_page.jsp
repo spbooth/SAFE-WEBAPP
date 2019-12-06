@@ -25,12 +25,20 @@
        return;
     }	
 String page_title=conn.expandText(custom_page.getTitle());
-HtmlBuilder hb = new HtmlBuilder();
-custom_page.addContent(conn, hb);
+
 %>
 <%@ include file="/std_header.jsf" %>
 <%@ include file="/main__logged_in.jsf" %>
+<%@ include file="/back.jsf" %>
 <div class="block" role="main">
+<% 
+if( XMLContentBuilder.STREAM_BUILDER_FEATURE.isEnabled(conn)){
+	custom_page.addContent(conn, new HtmlWriter(conn,out));
+}else{
+	HtmlBuilder hb = new HtmlBuilder();
+	custom_page.addContent(conn, hb);
+%>
 <%=hb.toString()%>
+<%} %>
 </div>
 <%@ include file="/std_footer.jsf" %>

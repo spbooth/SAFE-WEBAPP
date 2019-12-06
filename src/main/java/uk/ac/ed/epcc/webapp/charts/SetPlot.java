@@ -57,7 +57,7 @@ public interface SetPlot extends Plot {
 	 * @param new_nset
 	 *            number of sets to truncate to
 	 * @param perm
-	 *            permutation array, can be may to one to merge sets
+	 *            permutation array, can be many to one to merge sets
 	 */
 	public abstract void permSets(int new_nset, int[] perm);
 

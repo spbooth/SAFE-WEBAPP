@@ -73,7 +73,7 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 	}
 
 	@Override
-	public float get(int i, int j, int k) {
+	public final float get(int i, int j, int k) {
 		if (i >= nset || j >= ncat || k >= nitem) {
 			return 0;
 		}
@@ -81,16 +81,16 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 	}
 
 	@Override
-	public int getNumCats() {
+	public final int getNumCats() {
 		return ncat;
 	}
 
 	@Override
-	public int getNumItems() {
+	public final int getNumItems() {
 		return nitem;
 	}
 
-	public int getNumSets() {
+	public final int getNumSets() {
 		return nset;
 	}
 
@@ -108,7 +108,7 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 	
 
 	@Override
-	public void set(int i, int j, int k, float f) {
+	public final void set(int i, int j, int k, float f) {
 		grow(i + 1, j + 1, k + 1);
 		data[i][j][k] = f;
 		notifyChange();
@@ -121,7 +121,7 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 				&& new_numItems == nitem) {
 			return;
 		}
-		float new_data[][][] = new float[new_nset][new_numCats][new_numItems];
+		
 		int ns, nc, ni;
 		if (new_nset > nset) {
 			ns = nset;
@@ -138,10 +138,37 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 		} else {
 			ni = new_numItems;
 		}
-		for (int i = 0; i < ns; i++) {
-			for (int j = 0; j < nc; j++) {
-				for (int k = 0; k < ni; k++) {
-					new_data[i][j][k] = data[i][j][k];
+		float new_data[][][]; 
+		if( new_numItems == nitem ) {
+			if( new_numCats == ncat) {
+				new_data = new float[new_nset][][];
+				for (int i = 0; i < ns; i++) {
+					new_data[i] = data[i];
+				}
+				for(int i=ns ; i< new_nset ; i++) {
+					new_data[i] = new float[new_numCats][new_numItems];
+				}
+			}else {
+				new_data=new float[new_nset][new_numCats][];
+				for (int i = 0; i < ns; i++) {
+					for (int j = 0; j < nc; j++) {
+						new_data[i][j] = data[i][j];
+					}
+					for(int j=nc; j< new_numCats; j++) {
+						new_data[i][j] = new float[new_numItems];
+					}
+				}
+				for(int i=ns ; i< new_nset ; i++) {
+					new_data[i] = new float[new_numCats][new_numItems];
+				}
+			}
+		}else {
+			new_data = new float[new_nset][new_numCats][new_numItems];
+			for (int i = 0; i < ns; i++) {
+				for (int j = 0; j < nc; j++) {
+					for (int k = 0; k < ni; k++) {
+						new_data[i][j][k] = data[i][j][k];
+					}
 				}
 			}
 		}
@@ -153,7 +180,7 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 	}
 
 	@Override
-	public void add(int nset, int cat, int item, float value) {
+	public final void add(int nset, int cat, int item, float value) {
 		set(nset,cat,item,get(nset,cat,item)+value);
 		
 	}
@@ -187,6 +214,45 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 				}
 			}
 		}
+	
+		
+	}
+	@Override
+	public void permSets(int new_nset, int[] perm) {
+		
+		float temp[][][] = new float[new_nset][][];
+		for (int k = 0; k < nset; k++) {
+			int dest = perm[k];
+			if( temp[dest] == null) {
+				temp[dest] = data[k]; 
+			}else {
+				for (int i = 0; i < getNumCats(); i++) {
+					for (int j = 0; j < getNumItems(); j++) {
+						temp[dest][i][j] += data[k][i][j];
+					}
+				}
+			}
+		}
+		
+		
+		if( lab != null ){
+			String new_lab[] = new String[new_nset];
+			for (int i = 0; i < new_nset; i++) {
+				new_lab[i]="";
+			}
+			for (int k = 0; k < nset; k++) {
+				
+				int new_pos = perm[k];
+				if( new_pos >= 0 && new_pos < new_lab.length){
+					new_lab[new_pos]=lab[k];
+				}
+			}
+			setLegends(new_lab);
+		}
+		nset = new_nset;
+		
+		
+		data = temp;
 	
 		
 	}

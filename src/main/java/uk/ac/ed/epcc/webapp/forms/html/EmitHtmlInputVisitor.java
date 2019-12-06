@@ -18,10 +18,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
+import uk.ac.ed.epcc.webapp.content.HtmlFormPolicy;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
+import uk.ac.ed.epcc.webapp.content.XMLContentBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.inputs.AutoComplete;
 import uk.ac.ed.epcc.webapp.forms.inputs.BinaryInput;
@@ -45,10 +48,11 @@ import uk.ac.ed.epcc.webapp.forms.inputs.RangedInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnitInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnmodifiableInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.WrappedInput;
+import uk.ac.ed.epcc.webapp.forms.registry.FormPolicy;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 
-public class EmitHtmlInputVisitor implements InputVisitor<Object>{
+public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisitor<Object>{
 	/**
 	 * 
 	 */
@@ -60,7 +64,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	private static final Preference ESCAPE_UNICODE_FEATURE = new Preference("html.input.escape_unicode",false,"Escape high code point characters in input values");
 	private static final Feature USE_DATALIST = new Feature("html5.use_datalist",true,"Use html5 datalist syntax, disable to test the fallback mode (as if browser does not userstand datalist)");
 	private static final Feature LOCK_FORCED_LIST = new Feature("html.list_input.lock_forced",false,"Supress mandatory pull-down inputs with a single choice");
-	AppContext conn;
+	
 	private ExtendedXMLBuilder hb;
 	private boolean use_post;
 	private boolean use_html5;
@@ -73,7 +77,7 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 	private Object radio_selector=null;
 	private boolean auto_focus=false;
 	public EmitHtmlInputVisitor(AppContext conn,boolean optional,ExtendedXMLBuilder hb, boolean use_post, Map post_params,String prefix,Map<String,String> data_attr){
-		this.conn=conn;
+		super(conn);
 		this.optional=optional;
 		this.hb=hb;
 		this.use_post=use_post;
@@ -299,9 +303,26 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 			T current = iter.next();
 			emitRadioButtonHTML(hb, use_post,input, param, current);
 			String label = input.getText(current);
-			hb.clean( label );
-			hb.open("br");
-			hb.close();
+			if( HtmlFormPolicy.HTML_USE_LABEL_FEATURE.isEnabled(getContext())) {
+				hb.open("label");
+				try {
+					id_vis.setRadioTarget(current);
+					String id = input.accept(id_vis);
+					if( id != null) {
+						hb.attr("for",id);
+					}
+				} catch (Exception e) {
+					getLogger().error("Error making radio button id", e);
+				}finally {
+					id_vis.setRadioTarget(null);
+				}
+				hb.clean(label);
+				hb.close();
+			}else {
+				hb.clean( label );
+				
+			}
+			hb.br();
 			hb.clean("\n");
 
 		}
@@ -335,8 +356,20 @@ public class EmitHtmlInputVisitor implements InputVisitor<Object>{
 		if( tag == null){
 			return;	
 		}
+		String id = null;
+		try {
+			id_vis.setRadioTarget(current);
+			id = input.accept(id_vis);
+		}catch(Exception e) {
+			getLogger().error("Error making radio button id", e);
+		}finally {
+			id_vis.setRadioTarget(null);
+		}
 		hb.open("input");
 		hb.attr("type","radio");
+		if( id != null) {
+			hb.attr("id",id);
+		}
 		hb.attr("name",input.getKey());
 		addDataAttr(hb);
 		hb.attr("value", tag );

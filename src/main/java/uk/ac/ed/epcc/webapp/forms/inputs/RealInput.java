@@ -40,6 +40,7 @@ public class RealInput extends NumberInput<Float> {
 		return nf.format(f.floatValue());
 	}
 
+	@Override
 	public Float parseValue(String v) throws ParseException {
 		if (v == null) {
 			return null;
