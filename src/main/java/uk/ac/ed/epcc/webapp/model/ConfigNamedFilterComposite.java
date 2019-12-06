@@ -43,7 +43,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * <b><i>factory-tag</i>.<i>field</i>.label</b>
  * <p>
  * Editing the fields can be made role dependent by setting the parameter
- * <b><i>factory-rag</i>.<i>field</i>.edit_role</b> to the required global role name.
+ * <b><i>factory-tag</i>.<i>field</i>.edit_role</b> to the required global role name.
  * @author spb
  *
  */

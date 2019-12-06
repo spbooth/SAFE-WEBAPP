@@ -16,11 +16,22 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data.forms;
 
+import java.util.Map;
+
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.model.data.CreateAction;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
+/** interface for objects that specify creation forms.
+ * 
+ * This is the interface taragetted by the standard {@link CreateAction}
+ * 
+ * @author Stephen Booth
+ *
+ * @param <BDO>
+ */
 public interface CreateTemplate<BDO extends DataObject> extends CreateCustomizer<BDO>{
 
 
@@ -34,6 +45,12 @@ public interface CreateTemplate<BDO extends DataObject> extends CreateCustomizer
 	 * @return confirm type or null 
 	 */
 	public abstract String getConfirm(Form f);
+	
+	/** get the default values to use on creation.
+	 * 
+	 * @return MAp
+	 */
+	public Map<String,Object> getDefaults();
 	
 	
 }

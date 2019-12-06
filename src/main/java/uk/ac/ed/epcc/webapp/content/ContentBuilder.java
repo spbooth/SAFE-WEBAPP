@@ -248,10 +248,19 @@ public interface ContentBuilder {
 	/** Add the label for a form {@link Field}
 	 * 
 	 * @param conn
-	 * @param f 
+	 * @param f Field
+	 * @param item item (only used by RadioInputs)
 	 * 
 	 */
-	public <I> void addFormLabel(AppContext conn,Field<I> f);
+	public <I,T> void addFormLabel(AppContext conn,Field<I> f,T item);
+	/** Add the label for a form {@link Field}
+	 * 
+	 * @param conn
+	 * @param f Field
+	 */
+	default public <I,T> void addFormLabel(AppContext conn,Field<I> f) {
+		addFormLabel(conn, f, null);
+	}
 	/** Add the input for a form {@link Field}
 	 * If the input is a {@link RadioButtonInput} then the item parameter
 	 * selects which item the input is for. If item is null then

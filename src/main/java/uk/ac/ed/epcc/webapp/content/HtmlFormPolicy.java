@@ -16,10 +16,25 @@ package uk.ac.ed.epcc.webapp.content;
 import java.util.Collection;
 import java.util.Map;
 
-import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.forms.Field;
+import uk.ac.ed.epcc.webapp.forms.html.EmitHtmlInputVisitor;
+import uk.ac.ed.epcc.webapp.forms.html.InputIdVisitor;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
+import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.PrefixInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TagInput;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
+/** container object for html form state and settings.
+ * 
+ * Added by composition to implement {@link XMLContentBuilder}
+ * 
+ * @author Stephen Booth
+ *
+ */
 public class HtmlFormPolicy{
-
+	public static final Feature HTML_USE_LABEL_FEATURE = new Preference("html.use_label",true,"generate html labels in automatic forms");
 private HtmlFormPolicy parent=null;
 private Collection<String> missing_fields=null;
 private Map<String,String> errors=null;
@@ -59,7 +74,7 @@ public boolean setUseRequired(boolean use_required){
 public boolean getUseRequired() {
 	return use_required;
 }
-/** Should locked inputs have their vvalues posed as hidden parameters
+/** Should locked inputs have their values posted as hidden parameters
  * 
  */
 private boolean locked_as_hidden=false;
@@ -106,6 +121,104 @@ public void setActionName(String action_name) {
 }
 public String getActionName() {
 	return action_name;
+}
+
+public <I,T> void addFormLabel(ExtendedXMLBuilder sb,AppContext conn,Field<I> f, T item) throws Exception {
+	String key = f.getKey();
+	boolean missing = isMissing(key);
+	String error = getError(key);
+	Input<I> i = f.getInput();
+	boolean optional = f.isOptional();
+	if( HTML_USE_LABEL_FEATURE.isEnabled(conn)){
+		sb.open("label");
+		InputIdVisitor vis = new InputIdVisitor(f.getForm().getFormID());
+		vis.setRadioTarget(item);
+
+		String id =  (String) i.accept(vis);
+		if( id != null){
+			sb.attr("for",id);
+		}
+
+	}else{
+		sb.open("span");
+	}
+	if( item == null ) {
+		// Not applicable to per item labels
+		if (optional) {
+			sb.addClass("optional");
+		}else{
+			sb.addClass("required");
+		}
+	}
+	if( missing) {
+		sb.addClass("missing");
+	}
+	String tooltip = f.getTooltip();
+	if( tooltip != null && ! tooltip.isEmpty()) {
+		sb.attr("title",tooltip);
+	}
+	if( item != null && i instanceof ListInput) {
+		sb.clean(((ListInput)i).getText(item)); // Label for a specific radio item
+	}else {
+		sb.clean(f.getLabel());
+	}
+	
+	sb.close(); // span or label
+
+//	if (missing) {
+//		open("b");
+//		open("span");
+//		addClass( "warn");
+//		clean("*");
+//		close(); //span
+//		close(); //b
+//	}
+	if (error != null) {
+		sb.nbs();
+		sb.open("span");
+		sb.addClass( "field_error");
+		sb.clean(error);
+		sb.close(); //span
+	}
+	
+}
+/* (non-Javadoc)
+ * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormInput(uk.ac.ed.epcc.webapp.forms.Field)
+ */
+public  <I,T> void addFormInput(ExtendedXMLBuilder sb,AppContext conn,Field<I> f,T item) throws Exception {
+	String key =  f.getKey();
+	String error = null;
+	
+	boolean optional = f.isOptional();
+	// If we have errors to report then we are showing the post_params.
+	// if we want to force errors to be shown from the Form state (say
+	// updating an old object with
+	// invalid state then pass null post_params or set validate
+	Map<String,Object> post_params = getPostParams();
+	Map<String,String> errors = getErrors();
+	Collection<String> missing_fields = getMissingFields();
+	boolean use_post = (post_params != null)
+			&& ((errors != null && errors.size() > 0) || (missing_fields != null && missing_fields
+					.size() > 0));
+	if (errors != null) {
+		error = errors.get(key);
+	}
+	Input<I> i = f.getInput();
+	if( i instanceof PrefixInput){
+		sb.clean(((PrefixInput)i).getPrefix());
+	}
+
+	EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(conn,optional,sb, use_post, post_params,f.getForm().getFormID(),f.getAttributes());
+	vis.setRadioTarget(item);
+	vis.setUseRequired(getUseRequired());
+	vis.setAutoFocus(f.getKey().equals(f.getForm().getAutoFocus()));
+	vis.setLockedAsHidden(getLockedAsHidden());
+	i.accept(vis);
+
+	if( i instanceof TagInput){
+		sb.clean(((TagInput)i).getTag());
+	}
+	
 }
 public HtmlFormPolicy getChild() {
 	HtmlFormPolicy child = new HtmlFormPolicy();

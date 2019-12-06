@@ -14,7 +14,6 @@
 package uk.ac.ed.epcc.webapp.content;
 
 import java.text.NumberFormat;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -29,17 +28,11 @@ import uk.ac.ed.epcc.webapp.forms.action.DisabledAction;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.html.AddButtonVisitor;
 import uk.ac.ed.epcc.webapp.forms.html.AddLinkVisitor;
-import uk.ac.ed.epcc.webapp.forms.html.EmitHtmlInputVisitor;
-import uk.ac.ed.epcc.webapp.forms.html.InputIdVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.CanSubmitVisistor;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.PrefixInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TagInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.log.Viewable;
-import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.ServeDataServlet;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 
@@ -56,108 +49,31 @@ import uk.ac.ed.epcc.webapp.servlet.ServletService;
  *
  */
 public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
-	public static final Feature HTML_USE_LABEL_FEATURE = new Preference("html.use_label",true,"generate html labels in automatic forms");
+	
 	public static final Feature STREAM_BUILDER_FEATURE = new Feature("html.stream_builder",true,"use HtmlWriter where possible");
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormLabel(uk.ac.ed.epcc.webapp.forms.Field)
 	 */
 	@Override
-	public default <I> void addFormLabel(AppContext conn,Field<I> f) {
-		String key = f.getKey();
-		HtmlFormPolicy p = getFormPolicy();
-		boolean missing = p.isMissing(key);
-		String error = p.getError(key);
-		Input<I> i = f.getInput();
-		boolean optional = f.isOptional();
-		if( HTML_USE_LABEL_FEATURE.isEnabled(conn)){
-			open("label");
-			InputIdVisitor vis = new InputIdVisitor(f.getForm().getFormID());
-			try {
-				String id =  (String) i.accept(vis);
-				if( id != null){
-					attr("for",id);
-				}
-			} catch (Exception e) {
-				getLogger(conn).error("Error getting id",e);
-			}
-		}else{
-			open("span");
+	public default <I,T> void addFormLabel(AppContext conn,Field<I> f, T item) {
+		try {
+			HtmlFormPolicy p = getFormPolicy();
+			p.addFormLabel(this, conn, f, item);
+		}catch(Exception e) {
+			getLogger(conn).error("Error making form label", e);
 		}
-		if (optional) {
-			addClass("optional");
-		}else{
-			addClass("required");
-		}
-		if( missing) {
-			addClass("missing");
-		}
-		String tooltip = f.getTooltip();
-		if( tooltip != null && ! tooltip.isEmpty()) {
-			attr("title",tooltip);
-		}
-		
-		clean(f.getLabel());
-		
-		close(); // span or label
-
-//		if (missing) {
-//			open("b");
-//			open("span");
-//			addClass( "warn");
-//			clean("*");
-//			close(); //span
-//			close(); //b
-//		}
-		if (error != null) {
-			nbs();
-			open("span");
-			addClass( "field_error");
-			clean(error);
-			close(); //span
-		}
-		
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormInput(uk.ac.ed.epcc.webapp.forms.Field)
 	 */
 	@Override
 	public default <I,T> void addFormInput(AppContext conn,Field<I> f,T item) {
-		String key =  f.getKey();
-		String error = null;
-		
-		boolean optional = f.isOptional();
-		// If we have errors to report then we are showing the post_params.
-		// if we want to force errors to be shown from the Form state (say
-		// updating an old object with
-		// invalid state then pass null post_params or set validate
-		HtmlFormPolicy p = getFormPolicy();
-		Map<String,Object> post_params = p.getPostParams();
-		Map<String,String> errors = p.getErrors();
-		Collection<String> missing_fields = p.getMissingFields();
-		boolean use_post = (post_params != null)
-				&& ((errors != null && errors.size() > 0) || (missing_fields != null && missing_fields
-						.size() > 0));
-		if (errors != null) {
-			error = errors.get(key);
+		try {
+			HtmlFormPolicy p = getFormPolicy();
+			p.addFormInput(this, conn, f, item);
+		}catch(Exception e) {
+			getLogger(conn).error("Error making form label", e);
 		}
-		Input<I> i = f.getInput();
-		if( i instanceof PrefixInput){
-			clean(((PrefixInput)i).getPrefix());
-		}
-		try{
-			EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(conn,optional,this, use_post, post_params,f.getForm().getFormID(),f.getAttributes());
-			vis.setRadioTarget(item);
-			vis.setUseRequired(p.getUseRequired());
-			vis.setAutoFocus(f.getKey().equals(f.getForm().getAutoFocus()));
-			vis.setLockedAsHidden(p.getLockedAsHidden());
-			i.accept(vis);
-		}catch(Exception e){
-			getLogger(conn).error("Error generating input",e);
-		}
-		if( i instanceof TagInput){
-			clean(((TagInput)i).getTag());
-		}
-		
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addList(java.util.Collection)

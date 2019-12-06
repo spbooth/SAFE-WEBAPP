@@ -124,7 +124,9 @@ public interface TransitionFactory<K,T> extends Contexed{
 	 * @return ContentBuilder
 	 * 
 	 */
-	public <X extends ContentBuilder> X getSummaryContent(AppContext c,X cb,T target);
+	default public <X extends ContentBuilder> X getSummaryContent(AppContext c,X cb,T target) {
+		return cb;
+	}
 
 
 	/** Accept a {@link TransitionFactoryVisitor}.
