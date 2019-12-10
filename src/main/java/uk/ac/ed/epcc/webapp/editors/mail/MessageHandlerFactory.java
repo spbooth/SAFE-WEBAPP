@@ -16,6 +16,9 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.editors.mail;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Tagged;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -29,16 +32,19 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 public interface MessageHandlerFactory extends Contexed,Tagged{
-	/** Locate a MessageHandler by id number
+	/** Locate a {@link MessageHandler} by id number
 	 * This method also does access control. 
 	 * If the user only has read permission
 	 * a simple MessageHandler should be returned.
 	 * If the user has edit permission a MessageComposer should be returned. 
 	 * Otherwise this method returns null.
-	 * @param id integer identifier for MessageComposers from this Factory
+	 * The path may contain additional path elements after the {@link MessageHandler} is 
+	 * identified.
+	 * 
+	 * @param id path identifier for MessageComposers from this Factory
 	 * @param user AppUSer making request
 	 * @return MessageHandler or MessageComposer or null
 	 */
-	public MessageHandler getHandler(int id, SessionService<?> user);
+	public MessageHandler getHandler(LinkedList<String> id, SessionService<?> user);
 
 }

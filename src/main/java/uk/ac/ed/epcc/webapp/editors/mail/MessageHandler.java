@@ -18,7 +18,6 @@ package uk.ac.ed.epcc.webapp.editors.mail;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** An object that represents a message. 
@@ -29,7 +28,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @author spb
  *
  */
-public interface MessageHandler extends Indexed{
+public interface MessageHandler {
 	/** get the {@link MessageProvider} corresponding to the Message
 	 * 
 	 * @return MessageProvider
@@ -54,4 +53,9 @@ public interface MessageHandler extends Indexed{
 	 * @return MessageHandlerFactory
 	 */
 	public MessageHandlerFactory getFactory(AppContext conn);
+	/** Get the path to generate the {@link MessageHandler} from the {@link MessageProvider}
+	 * 
+	 * @return
+	 */
+	public List<String> getPath();
 }
