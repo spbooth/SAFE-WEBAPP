@@ -31,6 +31,7 @@ import javax.mail.internet.MimePart;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
+import uk.ac.ed.epcc.webapp.content.XMLContentBuilder;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageWalker.WalkerException;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
@@ -116,10 +117,20 @@ public class ContentMessageVisitor extends AbstractVisitor {
 
 	@Override
 	public final void visitInputStream(MimePart parent, InputStream stream,MessageWalker w) throws MessageWalker.WalkerException {
+	boolean old =false;  // set new tab if we can
+	if( sb instanceof XMLContentBuilder) {
+		XMLContentBuilder x = (XMLContentBuilder) sb;
+		old = x.setNewTab(true);
+	}
 	try {
 		linkPart(w,parent);
 	} catch (MessagingException e) {
 		doMessageError(w,e);
+	}finally {
+		if( sb instanceof XMLContentBuilder) {
+			XMLContentBuilder x = (XMLContentBuilder) sb;
+			x.setNewTab(old);
+		}
 	}
 }
   
