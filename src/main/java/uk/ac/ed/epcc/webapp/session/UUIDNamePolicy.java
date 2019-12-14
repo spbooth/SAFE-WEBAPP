@@ -47,6 +47,12 @@ public class UUIDNamePolicy<AU extends AppUser> extends GlobalNamePolicy<AU, UUI
 		return 36;
 	}
 
+	@Override
+	public String getNameLabel() {
+		// supress by default but can still enable with property
+		return getContext().getInitParameter(PROPERTY_PREFIX+getRealm()+".label", null);
+	}
+
 	
 
 }

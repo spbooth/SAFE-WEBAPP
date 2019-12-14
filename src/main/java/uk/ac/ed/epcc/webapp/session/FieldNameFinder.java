@@ -47,7 +47,7 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	/**
 	 * 
 	 */
-	private static final String PROPERTY_PREFIX = "NameFinder.";
+	protected static final String PROPERTY_PREFIX = "NameFinder.";
 
 	
     //private final boolean user_supplied;
