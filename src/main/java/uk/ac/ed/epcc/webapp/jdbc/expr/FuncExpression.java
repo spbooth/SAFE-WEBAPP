@@ -86,13 +86,10 @@ public class FuncExpression<T,D> implements SQLExpression<T> {
 	@Override
 	public int add(StringBuilder sb, boolean qualify) {
 		int res=1;
-
-		if( func.equals(SQLFunc.DISTINCT)) {
-			sb.append("COUNT( DISTINCT ");
-		}else {
-			sb.append(func.name());
-			sb.append("(");
-		}
+		
+		sb.append(func.name());
+		sb.append("(");
+		
 		if( e == null){
 			sb.append("1");
 		}else{
