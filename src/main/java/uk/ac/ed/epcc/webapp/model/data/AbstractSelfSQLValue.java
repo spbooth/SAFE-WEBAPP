@@ -137,6 +137,9 @@ public abstract class AbstractSelfSQLValue<T extends DataObject,R> implements SQ
 	}
 
 	
-	
+	@Override
+	final public boolean groupingIsomorphic() {
+		return true;
+	}
 
 }

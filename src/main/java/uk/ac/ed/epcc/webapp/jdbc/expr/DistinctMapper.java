@@ -30,7 +30,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 /** Generate a {@link DistinctCount} for a {@link SQLValue}
  * @author Stephen Booth
  * @param <D> type of inner SQLValue
- *
+ * 
  */
 public class DistinctMapper<D> extends AbstractContexed implements ResultMapper<DistinctCount> {
 

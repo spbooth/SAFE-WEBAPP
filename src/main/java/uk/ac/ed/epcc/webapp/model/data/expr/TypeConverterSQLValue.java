@@ -131,6 +131,10 @@ public class TypeConverterSQLValue<H,T,D> implements  NestedSQLValue<T,D>, Filte
 		return target;
 	}
 
-	
+	@Override
+	public boolean groupingIsomorphic() {
+		// Can't assume mapping is isomorphic for all TypeConverters
+		return false;
+	}
 
 }

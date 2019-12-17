@@ -70,6 +70,13 @@ public class ReductionMapper<R> extends AbstractContexed implements ResultMapper
 		case MIN:  expr = FuncExpression.apply(conn,SQLFunc.MIN,target,exp);break;
 		case MAX:  expr = FuncExpression.apply(conn,SQLFunc.MAX,target,exp);break;
 		case AVG:  expr = FuncExpression.apply(conn,SQLFunc.AVG,target,exp);break;
+		case DISTINCT: 
+				if( ! (exp instanceof CountDistinctExpression)) {
+					// These actually wrap an SQLValue so need to be passed in from above
+					throw new ConsistencyError("Not a CountDistictExpression");
+				}
+				expr = exp; 
+				break; 
 		}
 		if( expr == null ){
 			throw new ConsistencyError("reduction did not generate expression");

@@ -17,75 +17,71 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.content.Labeller;
+import uk.ac.ed.epcc.webapp.AverageValue;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 
-/**
+/** A {@link SQLValue} that generates an {@link AverageValue} from a combination of
+ * a sum {@link SQLValue} and a count field. 
  * @author spb
- * @param <T> type of nested SQLValue
- * @param <R> type of returned object
  *
  */
 
-public class LabellerSQLValue<T,R> implements NestedSQLValue<R,T> {
+public class AverageValueSQLValue implements SQLValue<AverageValue>{
 
-	public LabellerSQLValue(AppContext c,Labeller<T,R> labeller, SQLValue<T> nested) {
+	public AverageValueSQLValue(SQLExpression<? extends Number> value) {
 		super();
-		this.conn=c;
-		this.labeller = labeller;
-		this.nested = nested;
+		this.value = value;
 	}
-	private final AppContext conn;
-	private final Labeller<T,R> labeller;
-	private final SQLValue<T> nested;
+
+	private final SQLExpression<? extends Number> value;
+
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
-	public Class<R> getTarget() {
-		return labeller.getTarget();
+	public Class<AverageValue> getTarget() {
+		return AverageValue.class;
 	}
+
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#add(java.lang.StringBuilder, boolean)
 	 */
 	public int add(StringBuilder sb, boolean qualify) {
-		return nested.add(sb,qualify);
+		sb.append("SUM(");
+		int fields = value.add(sb, qualify);
+		sb.append("), COUNT(");
+		// make sure we count the number of records where
+		// the value is actually defined.
+		fields += value.add(sb,qualify);
+		sb.append(")");
+		return fields;
 	}
+
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#getParameters(java.util.List)
 	 */
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
-		return nested.getParameters(list);
+		// first the sum clause
+		list = value.getParameters(list);
+		// then the count clause
+		return value.getParameters(list);
 	}
+
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#makeObject(java.sql.ResultSet, int)
 	 */
-	public R makeObject(ResultSet rs, int pos) throws DataException, SQLException {
-		return labeller.getLabel(conn, nested.makeObject(rs, pos));
+	public AverageValue makeObject(ResultSet rs, int pos) throws DataException, SQLException {
+		
+		return new AverageValue(value.makeObject(rs, pos).doubleValue(), rs.getLong(pos+1));
+
 	}
+
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#getRequiredFilter()
 	 */
 	public SQLFilter getRequiredFilter() {
-		return nested.getRequiredFilter();
-	}
-	@Override
-	public String toString() {
-		return labeller.getClass().getSimpleName()+"("+nested.toString()+")";
-	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.NestedSQLValue#getNested()
-	 */
-	@Override
-	public SQLValue<T> getNested() {
-		return nested;
+		return value.getRequiredFilter();
 	}
 
-	@Override
-	final public boolean groupingIsomorphic() {
-		// labeller may map multiple records to the same label
-		return false;
-	}
 }
