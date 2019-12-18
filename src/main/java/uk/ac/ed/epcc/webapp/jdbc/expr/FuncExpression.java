@@ -123,11 +123,19 @@ public class FuncExpression<T,D> implements SQLExpression<T> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
-		// count has null expression
-		if(e !=null &&  target_class.isAssignableFrom(e.getTarget())) {
-			return (T) e.makeObject(rs, pos);
+		//AVG FLOOR COUNT change type
+		switch(func) {
+		case AVG: 
+		case FLOOR:
+		case COUNT:
+			return (T) rs.getObject(pos);
+		default:
+			// count has null expression
+			if(e !=null &&  target_class.isAssignableFrom(e.getTarget())) {
+				return (T) e.makeObject(rs, pos);
+			}
+			return (T) rs.getObject(pos);
 		}
-		return (T) rs.getObject(pos);
 	}
 	@Override
 	public Class<T> getTarget() {

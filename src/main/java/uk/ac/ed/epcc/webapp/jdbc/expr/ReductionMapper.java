@@ -92,6 +92,10 @@ public class ReductionMapper<R> extends AbstractContexed implements ResultMapper
 
 	@Override
 	public R makeObject(ResultSet rs) throws DataException, SQLException {
+		// AVG changes type
+		if( op == Reduction.AVG) {
+			return (R) rs.getObject(1);
+		}
 		if( target.isAssignableFrom(exp.getTarget())) {
 			return (R) exp.makeObject(rs, 1);
 		}
