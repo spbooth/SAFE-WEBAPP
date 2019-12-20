@@ -130,11 +130,11 @@
 			<version>3.2.2</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.sun.mail/javax.mail -->
+		<!-- https://mvnrepository.com/artifact/com.sun.mail/jakarta.mail -->
 		<dependency>
 			<groupId>com.sun.mail</groupId>
-			<artifactId>javax.mail</artifactId>
-			<version>1.6.2</version>
+			<artifactId>jakarta.mail</artifactId>
+			<version>1.6.4</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.jfree/jfreechart -->
 		<dependency>
