@@ -1102,11 +1102,13 @@ public class Emailer {
 		String body="";
 		// Show stack trace
 		StringWriter stackTraceWriter = new StringWriter();
+		StringBuffer buf = stackTraceWriter.getBuffer();
+		int max_trace = conn.getIntegerParameter("error.max_strack_trace", 16384);
 		if( e != null ) {
 			PrintWriter printWriter = new PrintWriter(stackTraceWriter,true);
 			e.printStackTrace(printWriter);
 			Throwable rc = e.getCause();
-			while(rc != null){
+			while(rc != null && buf.length() < max_trace){
 				printWriter.println("Caused by:");
 				rc.printStackTrace(printWriter);
 				rc = rc.getCause();
