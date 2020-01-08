@@ -13,5 +13,7 @@
 //| limitations under the License.                                          |
 /** Log4J logging
  * 
+ * This uses the old deprecated Log4J 1 API
+ * 
  */
 package uk.ac.ed.epcc.webapp.logging.log4j;
