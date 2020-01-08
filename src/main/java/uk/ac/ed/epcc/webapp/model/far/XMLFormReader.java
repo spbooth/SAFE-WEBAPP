@@ -26,7 +26,6 @@ import org.xml.sax.XMLReader;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
 
 /**
  * @author spb

@@ -17,7 +17,6 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.XMLPrinter;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.far.HandlerPartManager.HandlerPart;
 import uk.ac.ed.epcc.webapp.model.far.PageManager.Page;
 import uk.ac.ed.epcc.webapp.model.far.PartManager.Part;
