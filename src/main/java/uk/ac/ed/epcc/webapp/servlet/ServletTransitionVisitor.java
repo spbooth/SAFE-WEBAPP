@@ -35,6 +35,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.FormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.ValidatingFormTransition;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 
 
 public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T>{
@@ -203,16 +204,20 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 		
 		 */
 		public FormResult confirmTransition(HttpServletRequest req,  AppContext conn, TransitionFactory<K,T> tp, K operation, T target,String type,String args[]) {
-			
+			Logger log = getLogger();
+			log.debug("Process confirm: "+type);
 			String yes = req.getParameter("yes");
 	    	String no = req.getParameter("no");
 	    	if( no != null ){
+	    		log.debug("aborted");
 	    		return new MessageResult("aborted");
 	    	}
 	    	if( yes != null ){
+	    		log.debug("confirmed");
 	    		// continue with processing
 	    		return null;
 	    	}
+	    	log.debug("show page");
 			// need to show page
 			return new ConfirmTransitionResult<>(tp,target,operation,type,args);
 		}
