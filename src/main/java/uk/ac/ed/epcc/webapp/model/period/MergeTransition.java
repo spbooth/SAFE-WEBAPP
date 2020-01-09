@@ -13,13 +13,13 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.period;
 
+import java.util.Date;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.DirectTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
@@ -40,9 +40,17 @@ public class MergeTransition<T extends TimePeriod,K> extends AbstractDirectTrans
 		if( peer == null){
 			return false;
 		}
+		Date limit = fac.getEditLimit(serv);
+		
 		if( move_up){
+			if( limit != null && target.getEnd().before(limit)) {
+				return false;
+			}
 			return fac.canMerge(target, peer); 
 		}else{
+			if( limit != null && target.getStart().before(limit)) {
+				return false;
+			}
 			return fac.canMerge(peer, target);
 		}
 	}

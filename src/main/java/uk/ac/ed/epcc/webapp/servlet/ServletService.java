@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.servlet;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -74,6 +75,13 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 */
     public void redirect(String url) throws IOException ;
    
+    /** Redirect to an external URI
+     * 
+     * This is intended for external URLs so session is never encoded
+     * 
+     * @param uri
+     */
+    public void redirect(URI uri) throws IOException;
 	
 	/**
 	 * Extract a Map of the request parameters from the request. This is made a
@@ -107,6 +115,9 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * the current person is not stored in the session. It handles authentication mechanisms that don't
 	 * use a specific login url.
 	 * 
+	 * If the session is not populated here it may trigger a call to {@link #requestAuthentication(SessionService)} later.
+	 * Any authentication errors could be cached in the request and handled there.
+	 * 
 	 * @param sess {@link SessionService}
 	 */
 	public <A extends AppUser> void populateSession(SessionService<A> sess);
@@ -114,6 +125,8 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	/** Authentication is required for this request but credentials are not available.
 	 * If possible this should request the client to re-send the request with correct
 	 * authorisation. e.g. by redirecting to a login page or requesting basic authentication.
+	 * 
+	 * The request could take account of authentication errors from an earlier call to {@link #populateSession(SessionService)}. These can be cahce din the request.
 	 * 
 	 * The {@link SessionService} is provided as a parameter to be queried for its capabilities.
 	 * 
@@ -123,7 +136,16 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * 
 	 */
 	public <A extends AppUser> void requestAuthentication(SessionService<A> sess) throws IOException, ServletException;
-	
+	/** Go to the login page to request a login.
+	 * 
+	 * @param <A>
+	 * @param sess {@link SessionService}
+	 * @param page  page to return to
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	public <A extends AppUser> void requestLogin(SessionService<A> sess, String page)
+			throws IOException, ServletException;
 	/** Return the default charset we want to use.
 	 * 
 	 * @return

@@ -33,11 +33,13 @@ public abstract class CodeListInput<O> extends BaseInput<String> implements List
 	
 
 	
+	@Override
 	public String getTagByValue(String value) {
 		return value;
 	}
 
 	
+	@Override
 	public String convert(Object v) throws TypeError {
 		if( v == null ){
 			return null;
@@ -46,6 +48,7 @@ public abstract class CodeListInput<O> extends BaseInput<String> implements List
 	}
 
 	
+	@Override
 	public String getPrettyString(String value) {
 		O tmp = getItembyValue(value);
 		if( tmp != null ){
@@ -54,10 +57,12 @@ public abstract class CodeListInput<O> extends BaseInput<String> implements List
 		return value;
 	}
 
+	@Override
 	public String getString(String value) {
 		return value;
 	}
 
+	@Override
 	public String getValue() {
 		if( item == null) {
 			return null;
@@ -65,6 +70,7 @@ public abstract class CodeListInput<O> extends BaseInput<String> implements List
 		return getTagByItem(item);
 	}
 
+	@Override
 	public String setValue(String v) throws TypeError {
 		String previous = getTagByItem(item);
 		item = getItembyValue(v);
@@ -73,15 +79,18 @@ public abstract class CodeListInput<O> extends BaseInput<String> implements List
 
 
 
+	@Override
 	public O getItem() {
 		return item;
 	}
 
+	@Override
 	public void setItem(O item) {
 		this.item=item;		
 	}
 
 
+	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitListInput(this);
 	}

@@ -32,10 +32,12 @@ public class UserPolicy implements FormPolicy {
     	this.create=create;
     	this.update=update;
     }
+	@Override
 	public boolean canCreate(SessionService p) {
 		return create;
 	}
 
+	@Override
 	public boolean canUpdate(SessionService p) {
 		return update;
 	}

@@ -301,8 +301,8 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		 */
 		@Override
 		public final void terminate() {
-
-			setEndTime(new Date());
+			
+			setEndTime(now(getContext()));
 			setStatus(EXPIRED);
 		}
 
@@ -371,7 +371,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		 */
 		public HistoryFilter(SQLFilter<P> peer_filter, Date start, Date end) {
 			this(start,end);
-			addFilter(new RemoteFilter<>(getPeerFactory(),getPeerName(),peer_filter));
+			addFilter(getRemoteSQLFilter(getPeerFactory(),getPeerName(),peer_filter));
 		}
 		/** Select all history objects in a date range.
 		 * Start may be null to indicate a wild-card.
@@ -760,13 +760,13 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository)
 	 */
 	@Override
-	protected DataObject makeBDO(Repository.Record res) throws DataFault {
+	protected H makeBDO(Repository.Record res) throws DataFault {
 		/*
 		 * We can use a generic history object where we don't need any special
 		 * behaviour
 		 * 
 		 */
-		return new HistoryRecord<>(this,res);
+		return (H) new HistoryRecord<P>(this,res);
 	}
 	@Override
 	public Class<H> getTarget(){
@@ -1098,7 +1098,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		// actually we won't trigger till the following transition but its still good 
 		// to do.
 		try {
-			expireSequence(null, new Date());
+			expireSequence(null, now(getContext()));
 		} catch (DataFault e) {
 			getLogger().error("Problem expiring records",e);
 		}

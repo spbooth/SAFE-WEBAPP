@@ -59,7 +59,7 @@ public abstract class SessionServlet extends WebappServlet {
 			// the context we need here and
 			// best to handle as soon as we can in case ErrorFilter not
 			// configured.
-			conn.error(e,  "Throwable caught in SessionServlet");
+			getLogger(conn).error("Throwable caught in SessionServlet",e);
 			return;
 		}
 	}
@@ -85,7 +85,7 @@ public abstract class SessionServlet extends WebappServlet {
 			// the context we need here and
 			// best to handle as soon as we can in case ErrorFilter not
 			// configured.
-			conn.error(e,  "Throwable caught in SessionServlet");
+			getLogger(conn).error( "Throwable caught in SessionServlet",e);
 			return;
 		}
 	}

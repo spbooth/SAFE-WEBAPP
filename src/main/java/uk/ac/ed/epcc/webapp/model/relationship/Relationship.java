@@ -66,8 +66,12 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 
 	@SuppressWarnings("unchecked")
 	public Relationship(AppContext c,String tag){
-    	this(c,tag,c.makeObject(DataObjectFactory.class, c.getInitParameter("reference."+tag+"."+TARGET_ID)),TARGET_ID);
+    	this(c,tag,c.makeObject(DataObjectFactory.class, c.getInitParameter(getReferenceProp(tag))),TARGET_ID);
     }
+
+	public static String getReferenceProp(String tag) {
+		return "reference."+tag+"."+TARGET_ID;
+	}
 	
 	/** Extension constructor to allow sub-classes to set factory and field
 	 * 

@@ -14,11 +14,11 @@
 package uk.ac.ed.epcc.webapp.model.serv;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.table.BlobType;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
@@ -28,6 +28,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
@@ -91,7 +92,8 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 		if( res.hasField(EXPIRES_FIELD)){
 			FilterDelete<D> del = new FilterDelete<>(res);
 			try {
-				del.delete(new SQLValueFilter<>(getTarget(),res, EXPIRES_FIELD,MatchCondition.LT, new Date()));
+				CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+				del.delete(new SQLValueFilter<>(getTarget(),res, EXPIRES_FIELD,MatchCondition.LT, time.getCurrentTime()));
 			} catch (DataFault e) {
 				getContext().error(e,"Error deleting old data");
 			}
@@ -106,7 +108,14 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 
 		public void setData(MimeStreamData data){
 			record.setProperty(NAME, data.getName());
-			record.setProperty(MIME_TYPE, data.getContentType());
+			// Sometimes get charset/name arguments in the content-type.
+			// sacrifice these if they push us over the allowed field length
+			String contentType = data.getContentType();
+			FieldInfo info = record.getRepository().getInfo(MIME_TYPE);
+			while( contentType.contains(";") && contentType.length() > info.getMax()) {
+				contentType = contentType.substring(0, contentType.lastIndexOf(';'));
+			}
+			record.setProperty(MIME_TYPE, contentType);
 			record.setProperty(DATA, data);
 			AppContext conn = getContext();
 			int live_months = conn.getIntegerParameter("serv_data.lifetime.months", 1);
@@ -129,7 +138,11 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 			touch();
 		}		
 		public MimeStreamData getData() throws DataFault{
-		    return new MimeStreamDataWrapper(record.getStreamDataProperty(DATA),record.getStringProperty(MIME_TYPE),getName());
+		    return new MimeStreamDataWrapper(record.getStreamDataProperty(DATA),getMimeType(),getName());
+		}
+
+		public String getMimeType() {
+			return record.getStringProperty(MIME_TYPE);
 		}
 
 		/**
@@ -153,6 +166,7 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 			int live_months = conn.getIntegerParameter(SERV_DATA_LIFETIME_MONTHS_PROP, 1);
 			if( live_months > 0 ){
 				Calendar cal = Calendar.getInstance();
+				cal.setTime(conn.getService(CurrentTimeService.class).getCurrentTime());
 				cal.add(Calendar.MONTH, live_months);
 				record.setProperty(EXPIRES_FIELD, cal.getTime());
 				SessionService<?> sess = conn.getService(SessionService.class);
@@ -172,9 +186,9 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 
 	public MimeData getMimeData(SessionService user, List<String> path) throws Exception{
 		// Auto clean the table once per user session.
-		if( user != null && user.getAttribute(CLEANED_ATTR) == null){
+		if( user != null && user.getAttribute(CLEANED_ATTR+getTag()) == null){
 			clean();
-			user.setAttribute(CLEANED_ATTR, "yes");
+			user.setAttribute(CLEANED_ATTR+getTag(), "yes");
 		}
 		MimeData d = find(Integer.parseInt(path.get(0)));
 		if( d == null || ! d.allow(user)){
@@ -222,11 +236,11 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 
 
 	@Override
-	protected MimeData makeBDO(Record res) throws DataFault {
+	protected D makeBDO(Record res) throws DataFault {
 		
 		
 		MimeData data = new MimeData(res);
-		return data;
+		return (D) data;
 	}
 
 	/* (non-Javadoc)

@@ -218,6 +218,35 @@ public class NumberOpTest {
 	}
 	
 	@Test
+	public void testMedian() {
+		
+		Number n  = NumberOp.median(1, 2);
+		assertEquals(1.5, n.doubleValue(),0.0001);
+		
+		n = NumberOp.median(n, 100);
+		assertEquals(2.0, n.doubleValue(),0.0001);
+		
+		n = NumberOp.median(4, n);
+		assertEquals(3.0, n.doubleValue(),0.0001);
+		
+		n = NumberOp.median(1000, n);
+		assertEquals(4.0, n.doubleValue(),0.0001);
+		
+		
+		n = NumberOp.median(1, n);
+		assertEquals(3.0, n.doubleValue(),0.0001);
+		
+		n = NumberOp.median(1000, n);
+		assertEquals(4.0, n.doubleValue(),0.0001);
+		
+		n = NumberOp.median(2000, n);
+		assertEquals(52.0, n.doubleValue(),0.0001);
+		
+		n = NumberOp.median(200, n);
+		assertEquals(100.0, n.doubleValue(),0.0001);
+	}
+	
+	@Test
 	public void testCountDistinct() {
 		DistinctCount n = DistinctCount.make("hello");
 		assertEquals(1, n.intValue());

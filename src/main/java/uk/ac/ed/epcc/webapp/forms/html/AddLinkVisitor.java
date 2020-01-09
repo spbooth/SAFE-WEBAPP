@@ -98,6 +98,18 @@ public class AddLinkVisitor implements WebFormResultVisitor {
 		hb.close();
 	}
 
+	public void visitExternalRedirectResult(ExternalRedirectResult res) throws Exception {
+		hb.open("a");
+		if( title != null && ! title.isEmpty()){
+			hb.attr("title", title);
+		}
+		hb.attr("href", res.getRedirect().toASCIIString());
+		if( new_tab) {
+			hb.attr("target","_blank");
+		}
+		hb.clean(text);
+		hb.close();
+	}
 	public void visitMessageResult(MessageResult res) throws Exception {
 		throw new UnsupportedResultException("Cannot use MessageResult for link");
 	}

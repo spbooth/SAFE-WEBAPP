@@ -28,7 +28,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 
-public class Preference extends Feature {
+public class Preference extends Feature implements PreferenceSetting<Boolean>{
 
 	private String[] required_roles=null;
 	
@@ -40,7 +40,7 @@ public class Preference extends Feature {
 	public Preference(String name, boolean def, String description) {
 		this(name,def,description,null);
 	}
-	public Preference(String name, boolean def, String description, String required_roles[]) {
+	public Preference(String name, boolean def, String description, String ... required_roles) {
 		super(name, def, description);
 		this.required_roles=required_roles;
 	}
@@ -53,13 +53,26 @@ public class Preference extends Feature {
 		// Preference queries may occur often so cache the result in the context
 		Boolean b = (Boolean) conn.getAttribute(this);
 		if (b == null) {
-			if( canUserSet(conn)){
+			
+			b = new Boolean(defaultSetting(conn));
+			SessionService sess = conn.getService(SessionService.class);
+			if( ! sess.isAuthenticated()) {
+				// This ensures that preferences don't trigger authentication
+				// within the authentication flow itself
+				// user must already have authenticated for preferences to take effect.
+				// don't cache as this will change once user authenticates
+				return b.booleanValue();
+			}
+			// In case of recursion store default first
+			// The preference lookup will then use the global default
+			// This allows preferences to be set in low level functions used in the lookup
+			// once lookup is complete the user preference will be applied.
+			conn.setAttribute(this, b);
+			if( sess !=null && canView(sess)){
 				UserSettingFactory<UserSetting> fac = new UserSettingFactory<>(conn);
 				b = new Boolean(fac.getPreference(this));
-			}else{
-				b = new Boolean(defaultSetting(conn));
+				conn.setAttribute(this, b);
 			}
-			conn.setAttribute(this, b);
 		}
 		return b.booleanValue();
 	}
@@ -67,10 +80,12 @@ public class Preference extends Feature {
 	public boolean canUserSet(AppContext conn){
 		return conn.getBooleanParameter(getTag()+".settable", true);
 	}
-	public boolean defaultSetting(AppContext conn){
+	@Override
+	public Boolean defaultSetting(AppContext conn){
 		return getConfigValue(conn);
 	}
 	
+	@Override
 	public boolean hasPreference(AppContext conn){
 		UserSettingFactory<UserSetting> fac = new UserSettingFactory<>(conn);
 		return fac.hasPreference(this);
@@ -83,7 +98,8 @@ public class Preference extends Feature {
 		conn.removeAttribute(this);
 		
 	}
-	public void setPreference(AppContext conn, boolean value){
+	@Override
+	public void setPreference(AppContext conn, Boolean value){
 		UserSettingFactory<UserSetting> fac = new UserSettingFactory<>(conn);
 		fac.setPreference(this, value);
 		conn.removeAttribute(this);
@@ -110,10 +126,11 @@ public class Preference extends Feature {
 	 * @return
 	 */
 	public static boolean checkDynamicPreference(AppContext conn, String name, boolean def,String desc){
-		Feature f = Feature.findFeatureByName(name);
+		Feature f = Feature.findFeatureByName(Feature.class,name);
 		if( f == null ){
 			f= new Preference(name,def,desc);
 		}
 		return f.isEnabled(conn);
 	}
+	
 }

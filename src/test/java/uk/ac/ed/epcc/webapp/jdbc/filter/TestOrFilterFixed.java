@@ -13,14 +13,14 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.model.Dummy1;
-import uk.ac.ed.epcc.webapp.model.DummyReferenceFactory;
-
-import static org.junit.Assert.*;
-
-import org.junit.Before;
-import org.junit.Test;
 /**
  * @author spb
  *

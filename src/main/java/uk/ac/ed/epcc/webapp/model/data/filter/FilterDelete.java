@@ -68,7 +68,11 @@ public class FilterDelete<T extends DataObject> extends FilterSelect<T>{
     		if( DatabaseService.LOG_QUERY_FEATURE.isEnabled(res.getContext())){
     			res.getContext().getService(LoggerService.class).getLogger(getClass()).debug("Query is "+sql);
     		}
-    		return stmt.executeUpdate();
+    		int count = stmt.executeUpdate();
+    		if( count > 0) {
+    			res.flushCache();
+    		}
+			return count;
     	}catch(SQLException e){
     		sqlContext.getService().handleError("Error on delete",e);
     		return 0; // actually unreachable

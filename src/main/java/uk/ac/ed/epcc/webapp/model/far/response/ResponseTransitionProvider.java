@@ -19,7 +19,7 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
-import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
+import uk.ac.ed.epcc.webapp.content.XMLContentBuilder;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.FormValidator;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
@@ -320,10 +320,10 @@ public class ResponseTransitionProvider<D extends DynamicForm,R extends Response
 			R response = target.getResponse();
 			Section s = (Section) target.getPart();
 			Page p = s.getOwner();
-			if( cb instanceof HtmlBuilder){
+			if( cb instanceof XMLContentBuilder){
 				// We want to be able to process a partially filled in form
 				// can't do this if browser won't submit 
-				((HtmlBuilder)cb).setUseRequired(false);
+				((XMLContentBuilder)cb).getFormPolicy().setUseRequired(false);
 			}
 			SectionEditVisitor<X> vis = new SectionEditVisitor<>(cb, op, response, f, s);
 			vis.visitPage(p);

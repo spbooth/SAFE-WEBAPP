@@ -48,7 +48,7 @@ public class CalendarFieldPeriodInputTest extends MultiInputTestBase<CalendarFie
 	@Override
 	public CalendarFieldPeriodInput getInput() throws Exception {
 		
-		return new CalendarFieldPeriodInput();
+		return CalendarFieldPeriodInput.getInstance(ctx);
 	}
 
 

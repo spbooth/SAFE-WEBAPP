@@ -16,7 +16,10 @@ package uk.ac.ed.epcc.webapp.charts.jfreechart.defaults;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
 
+import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.charts.jfreechart.JFreeSetup;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.servlet.ErrorFilter;
 import uk.ac.ed.epcc.webapp.servlet.WebappContextListener;
 
 /**
@@ -28,10 +31,20 @@ public class JFreeSetupListener extends WebappContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
+		AppContext conn=null;
 		try{
-			JFreeSetup.setup();
+			conn = ErrorFilter.makeContext(arg0.getServletContext(), null, null);
+
+			JFreeSetup.setup(conn);
+
+
 		}catch(Exception t){
-			arg0.getServletContext().log("Error setting up JFreeChart", t);
+			arg0.getServletContext().log("Error setting up JFreeChart",t);
+			JFreeSetup.setup(null);
+		}finally {
+			if( conn != null) {
+				conn.close();
+			}
 		}
 	}
 

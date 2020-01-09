@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Map;
@@ -37,6 +38,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
+import org.apache.commons.codec.binary.Base64;
 import org.junit.After;
 import org.junit.Before;
 
@@ -413,6 +415,12 @@ public abstract class ServletTest extends WebappTestBase{
 		deferredEmails();
 
 	}
+	protected final void doGet() throws ServletException, IOException{
+		req.method="GET";
+		servlet.doGet(req, res);
+		deferredEmails();
+
+	}
 
 	/** Lookup a user by email and install them as the current person in the session.
 	 * @param email
@@ -556,5 +564,14 @@ public abstract class ServletTest extends WebappTestBase{
 	public <K,T> void checkViewRedirect(ViewTransitionFactory<K, T> provider, T target) throws TransitionException{
 		checkRedirectToTransition(provider, null, target);
 		assertTrue("redirect to forbidden view",provider.canView(target, getContext().getService(SessionService.class)));
+	}
+	
+	public void setBasicAuth(String name,String password) throws UnsupportedEncodingException {
+		String pack=name+":"+password;
+		req.header.put("Authorization", "Basic "+Base64.encodeBase64String(pack.getBytes("UTF-8")));
+	}
+	
+	public void setToken(String token) {
+		req.header.put("Authorization", "Bearer "+token);
 	}
 }

@@ -21,6 +21,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.action.ConfirmMessage;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
@@ -114,9 +115,9 @@ public class HTMLCreationForm {
 		FormAction shortcut = f.getShortcutAction(params);
     	if( shortcut != null ){
     		FormResult result=null;
-    		String confirm_action = shortcut.getConfirm(f);
+    		ConfirmMessage confirm_action = shortcut.getConfirmMessage(f);
     		if( confirm_action != null ){
-				result = confirmTransition(req, conn, confirm_action,null);
+				result = confirmTransition(req, conn, confirm_action.getMessage(),confirm_action.getArgs());
 				if( result != null ){
 					return result;
 				}
@@ -132,10 +133,10 @@ public class HTMLCreationForm {
 			conn.getService(LoggerService.class).getLogger(getClass()).debug("form failed to parse");
 			return null;
 		}
-		String confirm_action = f.mustConfirm(params);
+		ConfirmMessage confirm_action = f.mustConfirm(params);
 
 		if( confirm_action != null ){
-			FormResult result = confirmTransition(req, conn, confirm_action,null);
+			FormResult result = confirmTransition(req, conn, confirm_action.getMessage(),confirm_action.getArgs());
 			if( result != null ){
 				return result;
 			}

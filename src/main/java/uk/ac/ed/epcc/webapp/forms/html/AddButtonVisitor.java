@@ -110,6 +110,22 @@ public class AddButtonVisitor implements WebFormResultVisitor {
 		  hb.close();
 		hb.close();
 	}
+	public void visitExternalRedirectResult(ExternalRedirectResult res) throws Exception {
+		hb.open("form");
+		hb.attr("action", res.getRedirect().toASCIIString());
+		if( new_tab) {
+			hb.attr("formtarget","_blank");
+		}
+		  hb.open("input");
+		  	hb.attr("class", "input_button");
+		    hb.attr("type", "submit");
+		    hb.attr("value",text);
+	        if( title != null && title.trim().length() > 0){
+	            	hb.attr("title", title);
+	        }
+		  hb.close();
+		hb.close();
+	}
 
 	public void visitMessageResult(MessageResult res) throws Exception {
 		throw new UnsupportedOperationException("Cannot use MessageResult for button");

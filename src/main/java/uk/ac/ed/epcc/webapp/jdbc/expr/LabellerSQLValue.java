@@ -83,4 +83,9 @@ public class LabellerSQLValue<T,R> implements NestedSQLValue<R,T> {
 		return nested;
 	}
 
+	@Override
+	final public boolean groupingIsomorphic() {
+		// labeller may map multiple records to the same label
+		return false;
+	}
 }

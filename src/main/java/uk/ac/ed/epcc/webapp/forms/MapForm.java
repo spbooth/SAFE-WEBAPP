@@ -18,8 +18,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.action.ConfirmMessage;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ConfirmException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
@@ -52,6 +54,9 @@ public class MapForm extends BaseForm {
 
 	public static final String GENERAL_ERROR = "general";
 	protected String action_name = null;
+	
+	
+	
 	public MapForm(AppContext c) {
 		super(c);
 	}
@@ -119,7 +124,7 @@ public class MapForm extends BaseForm {
 					}
 					ok = false;
 				} catch (FieldException e) {
-					log.debug("exception " + key,e);
+					log.debug("FieldException " + key,e);
 					if (errors != null) {
 						// error message for user
 						errors.put(key, e.getMessage());
@@ -132,12 +137,15 @@ public class MapForm extends BaseForm {
 		try {
 			if (ok) {
 				for(FormValidator v : validators){
-					v.validate(this);
+					try {
+						v.validate(this);
+					}catch( ConfirmException e) {
+						additional_confirm=new ConfirmMessage(e.getConfirm(), new String[] {e.getMessage()});
+					}
 					//log.debug("validator " + ok);
 
 				}
 			}
-
 		} catch (ValidateException e) {
 			ok = false;
 			log.debug("form validator failed with exception",e);

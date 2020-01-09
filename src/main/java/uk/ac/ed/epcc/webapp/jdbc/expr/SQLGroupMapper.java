@@ -92,6 +92,9 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 	     */
 	    public  <T> SQLValue<T> addClause(SQLValue<T> orig, String name){
 	    	SQLValue<T> expr=orig;
+	    	if( expr instanceof WrappedSQLExpression) {
+	    		expr = ((WrappedSQLExpression<T>)expr).getSQLValue();
+	    	}
 	    	if(use_alias &&  name != null && orig instanceof SQLExpression ){
 	    		expr=new AliasSQLValue<>((SQLExpression<T>)orig,name);
 	    	}
@@ -121,8 +124,23 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 	    	if( field == null ){
 	    		return;
 	    	}
-	    	addClause(new SQLAverageValue(field),name);
+	    	addClause(new AverageValueSQLValue(field),name);
 	    	//addClause(new FuncExpression<Number>(SQLFunc.AVG,Number.class,field),name);
+	    }
+	    
+	    /** Add a column AVG to the table output
+	     * 
+	     * The average is applied in SQL so cannot be combined/merged with other groups or
+	     * other queries. Use {@link #addAverage(SQLExpression, String)} unless this is the case.
+	     * 
+	     * @param field   field to sum
+	     * @param name  name for result column
+	     */
+	    public final void addSQLAverage(SQLExpression<? extends Number> field, String name){
+	    	if( field == null ){
+	    		return;
+	    	}
+	    	addClause(FuncExpression.apply(getContext(),SQLFunc.AVG,Number.class,field),name);
 	    }
 	    
 	    /** Add a column min to the table output
@@ -130,7 +148,7 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 	     * @param field   field to min
 	     * @param name  name for result column
 	     */
-	    public final void addMin(SQLExpression<? extends Number> field, String name){
+	    public final void addMinNumber(SQLExpression<? extends Number> field, String name){
 	    	if( field == null ){
 	    		return;
 	    	}
@@ -152,7 +170,7 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 	     * @param field   field to max
 	     * @param name  name for result column
 	     */
-	    public final void addMax(SQLExpression<? extends Number> field, String name){
+	    public final void addMaxNumber(SQLExpression<? extends Number> field, String name){
 	    	if( field == null ){
 	    		return;
 	    	}
@@ -175,13 +193,28 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 	    /** Add a column counting distinct values. 
 	     * 
 	     * We allow SQLValues so we can count references but we are counting the underlying values 
-	     * the count will be too high if multiple values are mapped to the same result
+	     * the count will be too high if multiple values are mapped to the same result so this should not be used if multiple
+	     * values map to the same key or the results of multiple queries need to be combined
 	     * 
 	     * @param expr
 	     * @param name
 	     */
-	    public final <T> void addCount(SQLValue<T> expr,String name){
+	    public final <T> void addSQLCount(SQLValue<T> expr,String name){
 	    	addClause(new CountDistinctExpression<>(expr), name);
+	    }
+	    
+	    /** Add a column counting distinct values.
+	     * 
+	     * @param <T>
+	     * @param expr
+	     * @param name
+	     * @throws InvalidKeyException
+	     */
+	    public final <T> void addCount(GroupingSQLValue<T> expr, String name) throws InvalidKeyException{
+	    	if( ! expr.checkContentsCanGroup()) {
+    			throw new InvalidKeyException("Expression does not support Group By");
+    		}
+    	    key_list.add((GroupingSQLValue) addClause(new DistinctCountSQLValue(expr),name));
 	    }
 		@Override
 		public String getTarget() {

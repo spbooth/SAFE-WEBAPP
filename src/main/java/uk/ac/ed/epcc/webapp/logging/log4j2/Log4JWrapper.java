@@ -14,11 +14,14 @@
 /*******************************************************************************
  * Copyright (c) - The University of Edinburgh 2010
  *******************************************************************************/
-package uk.ac.ed.epcc.webapp.logging.log4j;
+package uk.ac.ed.epcc.webapp.logging.log4j2;
 
-import org.apache.log4j.Logger;
+import java.util.function.Supplier;
 
-import uk.ac.ed.epcc.webapp.Version;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+
 
 /**
  * Implementation of out Logger interface using Log4J
@@ -30,73 +33,113 @@ import uk.ac.ed.epcc.webapp.Version;
 
 public class Log4JWrapper implements uk.ac.ed.epcc.webapp.logging.Logger {
 	private Logger log;
-	private Class<?> target;
-	private boolean tagged=false;
+	
 
 	public Log4JWrapper(String name){
-		log=Logger.getLogger(name);
+		log=LogManager.getLogger(name);
 	}
-	private void tag(){
-		if( log != null && target != null && tagged == false){
-			tagged = true;
-			if(target.isAnnotationPresent(Version.class)){
-				Version v=target.getAnnotation(Version.class);
-				log.debug(target.getCanonicalName()+" "+v.value());
-			}
-		}
-	}
+	
 	public Log4JWrapper(Class<?> c) {
-		target=c;
-		log = Logger.getLogger(c);
+		log = LogManager.getLogger(c);
 	}
 
+	@Override
 	public void debug(Object message) {
-		tag();
 		if( log != null ) log.debug(message);
 	}
 
+	@Override
 	public void debug(Object message, Throwable t) {
-		tag();
 		if( log != null )log.debug(message,t);
 	}
 
+	@Override
 	public void error(Object message) {
-		tag();
 		if( log != null )log.error(message);
 	}
 
+	@Override
 	public void error(Object message, Throwable t) {
-		tag();
 		if( log != null )log.error(message, t);
 	}
 
+	@Override
 	public void fatal(Object message) {
-		tag();
 		if( log != null )log.fatal(message);
 	}
 
+	@Override
 	public void fatal(Object message, Throwable t) {
-		tag();
 		if( log != null )log.fatal(message, t);
 	}
 
+	@Override
 	public void info(Object message) {
-		tag();
 		if( log != null )log.info(message);
 	}
 
+	@Override
 	public void info(Object message, Throwable t) {
-		tag();
 		if( log != null )log.info(message, t);
 	}
 
+	@Override
 	public void warn(Object message) {
-		tag();
 		if( log != null )log.warn(message);
 	}
 
+	@Override
 	public void warn(Object message, Throwable t) {
-		tag();
 		if( log != null )log.warn(message, t);
+	}
+
+	@Override
+	public void debug(Supplier<String> message) {
+		if( log != null) log.debug(message);
+	}
+
+	@Override
+	public void debug(Supplier<String> message, Throwable t) {
+		if( log != null) log.debug(message,t);
+	}
+
+	@Override
+	public void error(Supplier<String> message) {
+		if( log != null) log.error(message);
+	}
+
+	@Override
+	public void error(Supplier<String> message, Throwable t) {
+		if( log != null) log.error(message,t);
+	}
+
+	@Override
+	public void fatal(Supplier<String> message) {
+		if( log != null) log.fatal(message);
+	}
+
+	@Override
+	public void fatal(Supplier<String> message, Throwable t) {
+		if( log != null) log.fatal(message,t);
+	}
+
+	@Override
+	public void info(Supplier<String> message) {
+		if( log != null) log.info(message);
+	}
+
+	@Override
+	public void info(Supplier<String> message, Throwable t) {
+		if( log != null) log.info(message,t);
+	}
+
+	@Override
+	public void warn(Supplier<String> message) {
+		if( log != null) log.warn(message);
+	}
+
+	@Override
+	public void warn(Supplier<String> message, Throwable t) {
+		if( log != null) log.warn(message,t);
 	}
 }

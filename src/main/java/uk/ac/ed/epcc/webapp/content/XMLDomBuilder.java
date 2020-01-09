@@ -23,7 +23,6 @@ import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
-import uk.ac.ed.epcc.webapp.Version;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 
 /** A SimpleXMLBuilder that modifies a DocumentFragment
@@ -137,7 +136,12 @@ public class XMLDomBuilder implements SimpleXMLBuilder {
 		if( parent == null ){
 			throw new UnsupportedOperationException("No parent");
 		}
-		parent.frag.appendChild(getFragment());
+		if( parent.stack.isEmpty()) {
+			parent.frag.appendChild(getFragment());
+		}else {
+			Element e = parent.stack.peek();
+			e.appendChild(getFragment());
+		}
 		return parent;
 	}
 	public SimpleXMLBuilder getParent() {

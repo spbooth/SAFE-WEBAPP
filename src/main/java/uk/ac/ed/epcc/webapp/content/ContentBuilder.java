@@ -93,14 +93,23 @@ public interface ContentBuilder {
 	
 	/** get an expanding/folding section if supported
 	 * 
-	 *  Otherwise this just maps to 
-	 *  {@link #addObject(Object)} on the summary text followed by
-	 *  {@link #getPanel(String...)}
+	 * This method can either return a new {@link ContentBuilder} or
+	 * the current object. Once content has been added the {@link #closeDetails()}
+	 * method should be called on whichever object was returned which will
+	 * perform any additional actions necessary.
+	 * 
+	 *  If expanded/folding sections are not supported this will map to
+	 *  {@link #addObject(Object)} on the summary text 
+	 *  and the current {@link ContentBuilder} will be returned.
 	 * 
 	 * @param summary_text
 	 * @return
 	 */
 	public ContentBuilder getDetails(Object summary_text);
+	/** finish a section started by {@link #getDetails(Object)}
+	 * this may be a no-op if expended section are not supported
+	 */
+	public void closeDetails();
 	/** append a nested panel to its parent content.
 	 * @return parent ContentBuilder
 	 * 
@@ -239,10 +248,19 @@ public interface ContentBuilder {
 	/** Add the label for a form {@link Field}
 	 * 
 	 * @param conn
-	 * @param f 
+	 * @param f Field
+	 * @param item item (only used by RadioInputs)
 	 * 
 	 */
-	public <I> void addFormLabel(AppContext conn,Field<I> f);
+	public <I,T> void addFormLabel(AppContext conn,Field<I> f,T item);
+	/** Add the label for a form {@link Field}
+	 * 
+	 * @param conn
+	 * @param f Field
+	 */
+	default public <I,T> void addFormLabel(AppContext conn,Field<I> f) {
+		addFormLabel(conn, f, null);
+	}
 	/** Add the input for a form {@link Field}
 	 * If the input is a {@link RadioButtonInput} then the item parameter
 	 * selects which item the input is for. If item is null then

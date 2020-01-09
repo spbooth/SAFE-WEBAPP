@@ -32,7 +32,7 @@ public class MaximumMapMapper<K> extends MapMapper<K, Number> {
 
 	public MaximumMapMapper(AppContext c, GroupingSQLValue<K> key, String key_name,SQLExpression<? extends Number> val, String value_name) throws InvalidKeyException {
 		super(c, key, key_name);
-		addMax(val, value_name);
+		addMaxNumber(val, value_name);
 	}
 
 	/* (non-Javadoc)

@@ -61,6 +61,7 @@ public class Classification extends DataObject implements Principal, Comparable<
 	public static final String DESCRIPTION = "Description";
 	public static final String NAME = "Name";
 
+	@Override
 	public String getName()     { return record.getStringProperty(NAME); }
     public void setName(String name){ record.setProperty(NAME, name); }
     public String getDescription()     { return record.getStringProperty(DESCRIPTION); }
@@ -80,7 +81,7 @@ public class Classification extends DataObject implements Principal, Comparable<
     public String getIdentifier(int max_length) {
     	String name=  getName();
     	String description = getDescription();
-    	if( description != null && (name.length()+description.length()+2 < max_length)){
+    	if( description != null && ! description.trim().isEmpty() && (name.length()+description.length()+2 < max_length)){
     		return name+": "+description;
     	}
     	return name;

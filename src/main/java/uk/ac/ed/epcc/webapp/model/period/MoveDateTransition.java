@@ -28,9 +28,10 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
-public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTransition<T>{
+public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTransition<T> implements GatedTransition<T>{
 	public class MoveDateAction extends FormAction{
 		
 		
@@ -103,7 +104,7 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 			}else{
 				fac.canChangeEnd(current, d);
 			}
-			if( ! move ){
+			if(bound != null && ( move == null || ! move )){
 				if( (move_start && d.before(bound.getEnd())) ||
 					((! move_start) && d.after(bound.getStart()))){
 			
@@ -159,6 +160,15 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 				}
 			}
 		}
+		Date limit = fac.getEditLimit(conn.getService(SessionService.class));
+		if( limit != null ) {
+			if( min_date == null || min_date.before(limit)) {
+				min_date = limit;
+			}
+			if( max_date.before(min_date)) {
+				throw new TransitionException("No valid moves");
+			}
+		}
 		
 		BoundedDateInput input = fac.getDateInput();
 		input.setValue(def);
@@ -167,14 +177,29 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 		f.addInput(MoveDateTransition.DATE_FIELD, label, input);
 		if( move_split ){
 			f.addInput(MoveDateTransition.MOVE_SPLIT_FIELD,"Move boundary with neighbour",new BooleanInput());
-			f.addValidator(new MoveValidator(move_start,target,next_seq));
 		}
+		f.addValidator(new MoveValidator(move_start,target,next_seq));
 		f.addAction("Change", new MoveDateAction(move_start, target));
 		Date e = fac.getEditMarker();
 		if( e != null && def.before(e)){
 			f.setConfirm("Change", Confirmations.PAST_EDIT_CONFIRM);
 		}
 		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.period.GatedTransition#allow(uk.ac.ed.epcc.webapp.session.SessionService, java.lang.Object)
+	 */
+	@Override
+	public boolean allow(SessionService<?> serv, T target) {
+		Date limit = fac.getEditLimit(serv);
+		if( limit != null ) {
+			if( move_start ) {
+				return target.getStart().after(limit);
+			}else {
+				return target.getEnd().after(limit);
+			}
+		}
+		return true;
 	}
 	
 }

@@ -47,7 +47,8 @@ public interface ResultMapper<O> {
 	 * 
 	 * @param rs ResultSet or null
 	 * @return domain object
-	 * @throws DataFault
+	 * @throws DataException 
+	 * @throws SQLException 
 	 */
   public O makeObject(ResultSet rs) throws DataException, SQLException;
  /** Create a default Object to be returned if no SQL results are generated. 
@@ -78,7 +79,9 @@ public interface ResultMapper<O> {
    *  null to use default order from filters
    * @return String SQL clause
    */
-  public String getModify();
+  public default String getModify() {
+	  return null;
+  }
   
   /** Add parameters for the GROUP/ORDER  clause to a list.
 	 * @param list to modify
@@ -94,6 +97,8 @@ public interface ResultMapper<O> {
    * 
    * @return null or SQLFilter
    */
-  public SQLFilter getRequiredFilter();
+  public default SQLFilter getRequiredFilter() {
+	  return null;
+  }
 }
   

@@ -178,7 +178,7 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 	 * @see uk.ac.ed.epcc.webapp.model.MetaDataContributer#addMetaData(java.util.Map, uk.ac.ed.epcc.webapp.model.data.DataObject)
 	 */
 	@Override
-	public void addMetaData(Map<String, String> attributes, AppUser person) {
+	public void addMetaData(Map<String, Object> attributes, AppUser person) {
 		String publickey = getPublicKey(person);
 		if( publickey != null){
 			attributes.put(PUBLIC_KEY_META_ATTR,publickey);

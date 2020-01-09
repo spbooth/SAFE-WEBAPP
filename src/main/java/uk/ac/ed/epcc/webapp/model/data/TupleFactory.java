@@ -122,7 +122,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 
 		}
 		
-		public class AddMemberVisitor extends AbstractAddFilterVisitor{
+		public class AddMemberVisitor extends AddFilterVisitor{
 			
 
 			public AddMemberVisitor(String tag) {

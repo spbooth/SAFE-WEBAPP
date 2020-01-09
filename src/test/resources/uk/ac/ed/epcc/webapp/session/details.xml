@@ -5,7 +5,7 @@
 <PasswordStatus type='String' nullable='false' max='1'/>
 <Salt type='String' nullable='false' max='16'/>
 <Alg type='Integer' nullable='false'/>
-<Password type='String' nullable='false' max='32'/>
+<Password type='String' nullable='false' max='64'/>
 <WebName type='String' nullable='true' max='128'/>
 <SignupDate type='Long' nullable='true'/>
 <Title type='String' nullable='true' max='32'/>
@@ -23,7 +23,7 @@
 <PasswordFails>0</PasswordFails>
 <PasswordStatus>V</PasswordStatus>
 <Salt>PFL1kQ5ZBOmBc4gs</Salt>
-<Alg>0</Alg>
+<Alg>2</Alg>
 <Password>40a83e182d4f80f46096ea2445bfe6f8</Password>
 <Firstname>Albert</Firstname>
 <Lastname>Spangler</Lastname>

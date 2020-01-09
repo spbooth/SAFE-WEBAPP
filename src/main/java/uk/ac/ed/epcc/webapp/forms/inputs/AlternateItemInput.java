@@ -29,6 +29,7 @@ import java.util.Iterator;
  */
 public class AlternateItemInput<T,I> extends AlternateInput<T> implements ItemInput<T,I> {
 
+	@Override
 	public I getItem() {
 		for(Iterator<Input<T>> it = getInputs();it.hasNext();){
 			ItemInput<T,I> i =  (ItemInput<T,I>) it.next();
@@ -40,6 +41,7 @@ public class AlternateItemInput<T,I> extends AlternateInput<T> implements ItemIn
 		return null;
 	}
 
+	@Override
 	public void setItem(I item) {
 		
 			boolean set=false;

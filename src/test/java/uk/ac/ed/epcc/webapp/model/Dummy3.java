@@ -96,7 +96,7 @@ public class Dummy3 extends DataObject {
         	return getCount(f);
         }
 		@Override
-		protected DataObject makeBDO(Repository.Record res) throws DataFault {
+		protected Dummy3 makeBDO(Repository.Record res) throws DataFault {
 			return new Dummy3(res);
 		}
     	public void nuke() throws DataFault{

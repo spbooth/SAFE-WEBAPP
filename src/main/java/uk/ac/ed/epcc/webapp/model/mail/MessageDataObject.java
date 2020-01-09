@@ -32,6 +32,7 @@ import uk.ac.ed.epcc.webapp.editors.mail.MessageProvider;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.table.BlobType;
+import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
@@ -227,6 +228,12 @@ public abstract class MessageDataObject extends DataObject implements
 		try{
 			if( Repository.READ_ONLY_FEATURE.isEnabled(c)){
 				return;
+			}
+			DataBaseHandlerService serv = c.getService(DataBaseHandlerService.class);
+			if( serv != null ){
+				if( ! serv.tableExists(MESSAGE)) {
+					return;
+				}
 			}
 			
 			SQLContext conn = db_service.getSQLContext();

@@ -14,21 +14,24 @@
 package uk.ac.ed.epcc.webapp.servlet.navigation;
 
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 
-/** An {@link ExactNode} that includes the calling page in the target URL
+/** An {@link ExactNode} that records the calling page.
  * @author spb
  *
  */
 
 public class PageNode extends ExactNode {
-
+	public static final String MENU_PAGE_ATTR="MenuPage";
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.servlet.navigation.Node#getTargetURL(uk.ac.ed.epcc.webapp.servlet.ServletService)
 	 */
 	@Override
 	public String getTargetURL(ServletService servlet_service) {
-		
-		return servlet_service.encodeURL(getTargetPath(servlet_service.getContext())+"?page="+servlet_service.encodePage());
+		SessionService sess = servlet_service.getContext().getService(SessionService.class);
+		String page = servlet_service.encodePage();
+		sess.setAttribute(MENU_PAGE_ATTR, page);
+		return super.getTargetURL(servlet_service);
 	}
 
 }

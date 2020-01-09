@@ -17,7 +17,7 @@ import java.util.Iterator;
 
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
-import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /** An {@link InputVisitor} that detects any input that  is impossible to validate
@@ -82,9 +82,10 @@ public class CanSubmitVisistor implements InputVisitor<Boolean> {
 	 */
 	@Override
 	public Boolean visitLengthInput(LengthInput input) throws Exception {
-		if( input.getMaxResultLength() < 1) {
-			return false;
-		}
+		// A max length of zero or less implies no limit
+//		if( input.getMaxResultLength() < 1) {
+//			return false;
+//		}
 		if( input instanceof RangedInput) {
 			RangedInput<?> r = (RangedInput<?>)input;
 			Number min = r.getMin();
@@ -120,7 +121,14 @@ public class CanSubmitVisistor implements InputVisitor<Boolean> {
 	public Boolean visitPasswordInput(PasswordInput input) throws Exception {
 		return true;
 	}
-    public static boolean canSubmit(Form f) {
+   
+	
+	/**
+	 * 
+	 * @param f
+	 * @return
+	 */
+	public static boolean canSubmit(Form f) {
     	boolean can_submit=true;
     	CanSubmitVisistor vis = new CanSubmitVisistor();
     	for( Iterator<String>it = f.getFieldIterator(); it.hasNext() ;) {
@@ -131,6 +139,15 @@ public class CanSubmitVisistor implements InputVisitor<Boolean> {
     			try {
     				if( ! ((Boolean)i.accept(vis))) {
     					can_submit=false;
+    				}
+    				if( field.isLocked()) {
+    					// check for non validating unmodified input explicitly
+    					// this may be a field validator so check the field.
+    					try {
+    						field.validate();
+    					}catch(FieldException e) {
+    						return false;
+    					}
     				}
     			} catch (Exception e) {
     				f.getContext().getService(LoggerService.class).getLogger(CanSubmitVisistor.class).error("Error checking submit",e);

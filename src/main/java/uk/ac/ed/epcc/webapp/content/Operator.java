@@ -161,6 +161,21 @@ public enum Operator {
 			return a;
 		}
 	},
+	MEDIAN {
+		@Override
+		public Object operate(Object a, Object b) {
+			if ((a == null || a instanceof Number)
+					&& (b == null || b instanceof Number)) {
+
+				return NumberOp.median((Number) a, (Number) b);
+			}
+
+			if (a == null) {
+				return b;
+			}
+			return a;
+		}
+	},
 	MERGE {
 		@Override
 		public Object operate(Object a, Object b) {

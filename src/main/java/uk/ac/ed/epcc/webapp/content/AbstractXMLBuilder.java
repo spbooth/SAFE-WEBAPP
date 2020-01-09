@@ -25,7 +25,7 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
  * @author spb
  *
  */
-public abstract class AbstractXMLBuilder implements SimpleXMLBuilder {
+public abstract class AbstractXMLBuilder implements ExtendedXMLBuilder {
 	private Stack<String> tags;
 	private boolean in_open = false;
     private final Map<String,CharSequence> attributes;
@@ -273,5 +273,91 @@ public abstract class AbstractXMLBuilder implements SimpleXMLBuilder {
 	}
 	public boolean getValidXML(){
 		return valid_xml;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder#addClass(java.lang.CharSequence)
+	 */
+	public SimpleXMLBuilder addClass(CharSequence s) {
+		if( s != null && s.length() > 0 ) {
+			CharSequence prev = getAttribute("class");
+			if( prev == null) {
+				prev=s;
+			}else {
+				StringBuilder sb = new StringBuilder(prev);
+				sb.append(' ');
+				sb.append(s);
+				prev=sb.toString();
+			}
+			return attr("class", prev);
+		}
+		return this;
+	}
+
+	public final void nbs() {
+		endOpen();
+		if( getValidXML()){
+			// &nbs; is an XML entity reference and only valid if defined.
+			// we substitute the unicode equivalent for valid XML
+			append("&#160;");
+		}else{
+			append("&nbsp;");
+		}
+	}
+
+	/** Convert a string into a html fragment with matching linebreaks
+	 * also comparing the line lengths with a maximum value
+	 * @param max
+	 * @param s
+	 * @return true if lines are long
+	 */
+	public final boolean longLines(int max, String s) {
+		boolean is_long=false;
+		open("p");
+		addClass("longlines");
+		clean("\n");
+		for(String line : s.split("\n")){
+			String tmp = line.replace("\t", "        ");
+			if( tmp.length() > max){
+				is_long = true;
+			}
+			clean(line);
+			br();
+		}
+		close();
+		clean("\n");
+		return is_long;
+	}
+
+	public final boolean cleanFormatted(int max, String s) {
+		HtmlPrinter hb = new HtmlPrinter();
+		if( hb.longLines(max,s)){
+			append(hb);
+			return true;
+		}else{
+			//open("p");
+			//addClass("preformatted");
+			open("pre");
+			addClass("loose");
+			clean(s);
+			close();
+			return false;
+		}
+	}
+
+	public void br() {
+		endOpen();
+		append("<br/>\n");
+		
+	}
+	public final void append(XMLPrinter hb) {
+		if( hb.getParent() == this) {
+			hb.appendParent();
+			return;
+		}
+		if( ! hb.matched()){
+			throw new ConsistencyError("unclosed tag "+hb.getTags().peek());
+		}
+		endOpen();
+		append(hb.toString());
 	}
 }

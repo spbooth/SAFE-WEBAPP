@@ -95,8 +95,27 @@ public class MimeStreamDataVisitor extends AbstractVisitor{
 			contentType=contentType.replaceAll("\\s+", " ");
 			log.debug("serving attachment "+contentType);
 			data = new ByteArrayMimeStreamData();
+			StringBuilder type = new StringBuilder();
+			for(String clause : contentType.split("\\s*;\\s*")) {
+				if( type.length() == 0 ) {
+					type.append(clause);
+				}else {
+					// We have a name in the content-type map this to the stream-data name
+					String prefix = "name=";
+					if( clause.startsWith(prefix)) {
+						String name = clause.substring(prefix.length());
+						if( name.startsWith("\"") && name.endsWith("\"")) {
+							name = name.substring(1, name.length()-1);
+						}
+						data.setName(name);
+					}else {
+						type.append("; ");
+						type.append(clause);
+					}
+				}
+			}
 			
-			data.setMimeType(contentType);
+			data.setMimeType(type.toString());
 			data.read((InputStream)content);
 		}catch(Exception e){
 			throw new WalkerException(e);

@@ -21,7 +21,6 @@ import java.util.Iterator;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.table.DoubleFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.LongFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -73,7 +72,7 @@ public class Dummy2 extends DataObject {
 		}
 
 		@Override
-		protected DataObject makeBDO(Repository.Record res) throws DataFault {
+		protected Dummy2 makeBDO(Repository.Record res) throws DataFault {
 			return new Dummy2(res);
 		}
 		public void nuke() throws DataFault{

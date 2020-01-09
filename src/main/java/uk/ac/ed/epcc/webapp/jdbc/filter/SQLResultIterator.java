@@ -30,6 +30,8 @@ import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.CloseableIterator;
 import uk.ac.ed.epcc.webapp.model.data.Removable;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 /** Iterator over filter results based on the SQL parts of a filter
  * 
@@ -56,7 +58,11 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
 public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implements CloseableIterator<O> {
 	static final int DEFAULT_CHUNKSIZE = 1024;
 		
-    static final Feature CHUNKING_FEATURE= new Feature("chunking",true,"retrieve SQL data in chunks using limit clause");
+	// Would like this to be a preference but this class is needed to evaluate preferences
+	// Nasty interaction with basic-auth and password-fail count
+	// 
+    static final Feature CHUNKING_FEATURE= new Preference("chunking",false,"retrieve SQL data in chunks using limit clause",SessionService.ADMIN_ROLE,"Tester");
+	//static final Feature CHUNKING_FEATURE= new Feature("chunking",false,"retrieve SQL data in chunks using limit clause");
 		private PreparedStatement stmt;
 		private ResultSet rs;
 		
@@ -66,6 +72,7 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 
 		private int chunksize;
 
+		private int nchunck=0;
 		private int pos = 0;
 
 		private int parm_pos = 1;
@@ -139,15 +146,24 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 			try{
 				if( timer != null ){
 					timer.startTimer(tag);
+					if( nchunck > 0) {
+						// explicit timer for impact of chunked 
+						// if this shows up consider disabling or increasing chunksize
+						timer.startTimer("chunk-"+tag);
+					}
 				}
 			    rs = stmt.executeQuery();
 			}finally{
 				if( timer != null ){ 
+					if( nchunck > 0) {
+						timer.stopTimer("chunk-"+tag);
+					}
 					timer.stopTimer(tag);
 				}
 			}
 			pos = 0;
 			chunkstart += chunk;
+			nchunck++;
 			if (maxreturn > 0) {
 				maxreturn -= chunk;
 			}

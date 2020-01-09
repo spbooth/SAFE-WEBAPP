@@ -19,6 +19,7 @@ import java.util.Date;
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener;
 
 /** A {@link HeartbeatListener} that runs {@link DataObjectDataProducer#clean()} once a day.
@@ -39,7 +40,8 @@ public class DataProducerHeartbeatListener extends AbstractContexed implements H
 	 */
 	@Override
 	public Date run() {
-		Date now = new Date();
+		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+		Date now = time.getCurrentTime();
 		if( next_run == null || next_run.before(now)){
 			String tags = getContext().getInitParameter("data_producer.clean_tags",ServeDataProducer.DEFAULT_SERVE_DATA_TAG);
 			for(String tag : tags.split("\\s*,\\s*")){

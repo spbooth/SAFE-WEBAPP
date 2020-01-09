@@ -21,6 +21,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterSelect;
 import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MultiTableFilter;
@@ -55,12 +57,12 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  */
 
 
-public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> extends FilterSelect<T> implements SQLFilter<BDO>, PatternFilter<BDO>, MultiTableFilter {
+public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> extends FilterSelect<T> implements SQLFilter<BDO>, PatternFilter<BDO>, MultiTableFilter,Contexed {
 	private final Class<BDO> target;
 	// Note this is a filter on the remote that points back to the target
 	private final JoinerFilter<BDO, T> link;
 	private final SQLFilter<T> fil;
-	private final Repository remote_res;
+	
 	/**
 	 * 
 	 * @param join_field String reference field
@@ -71,14 +73,31 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 	public BackJoinFilter( Class<BDO> target,String join_field, Repository res, Repository remote_res, SQLFilter<T> fil){
 		this.target=target;
 		this.link = new JoinerFilter<>((Class<T>) (fil != null ? fil.getTarget(): DataObject.class), join_field, remote_res, res);
-		this.remote_res=remote_res;
 		this.fil=fil;
 	}
 		
+	
 		
 		
 		
 		
+	/**
+	 * @param target
+	 * @param link
+	 * @param fil
+	 */
+	public BackJoinFilter(Class<BDO> target, JoinerFilter<BDO, T> link, SQLFilter<T> fil) {
+		super();
+		this.target = target;
+		this.link = link;
+		this.fil = fil;
+	}
+
+
+
+
+
+
 		@Override
 		@SuppressWarnings("unchecked")
 		
@@ -91,8 +110,8 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 			Set<Repository> inner_tables = new HashSet<>(tables);
 			// this is the clause that matches the tables.
 			sb.append("EXISTS( SELECT 1 FROM ");
-			remote_res.addSource(sb, true);
-			inner_tables.add(remote_res);
+			link.getTargetRes().addSource(sb, true);
+			inner_tables.add(link.getTargetRes());
 			
 			Set<LinkClause> additions = new LinkedHashSet<>();
 			additions.add(link);
@@ -105,7 +124,9 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 				sb.append(" AND ");
 			}
 	        if( fil != null ){
+	        	sb.append("("); // might be an OR combinations
 	        	makeWhere(inner_tables,fil, sb, true);
+	        	sb.append(")");
 	        }else {
 	        	sb.append("true");
 	        }
@@ -132,7 +153,7 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 		@Override
 		public <X> X acceptVisitor(FilterVisitor<X, BDO> vis)
 				throws Exception {
-			return vis.visitPatternFilter(this);
+			return vis.visitBackJoinFilter(this);
 		}
 
 
@@ -170,5 +191,79 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 		@Override
 		public boolean qualifyTables() {
 			return true;
+		}
+
+
+
+
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((fil == null) ? 0 : fil.hashCode());
+			result = prime * result + ((link == null) ? 0 : link.hashCode());
+			result = prime * result + ((target == null) ? 0 : target.hashCode());
+			return result;
+		}
+
+
+
+
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			BackJoinFilter other = (BackJoinFilter) obj;
+			if (fil == null) {
+				if (other.fil != null)
+					return false;
+			} else if (!fil.equals(other.fil))
+				return false;
+			if (link == null) {
+				if (other.link != null)
+					return false;
+			} else if (!link.equals(other.link))
+				return false;
+			if (target == null) {
+				if (other.target != null)
+					return false;
+			} else if (!target.equals(other.target))
+				return false;
+			return true;
+		}
+
+
+
+
+
+		public JoinerFilter<BDO, T> getLink() {
+			return link;
+		}
+
+
+
+
+
+		public SQLFilter<T> getFil() {
+			return fil;
+		}
+
+
+
+
+
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
+		 */
+		@Override
+		public AppContext getContext() {
+			return link.getContext();
 		}
 }

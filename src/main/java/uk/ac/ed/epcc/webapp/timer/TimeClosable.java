@@ -13,7 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.timer;
 
-import java.io.IOException;
+import java.util.function.Supplier;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 
@@ -32,8 +32,22 @@ public class TimeClosable implements AutoCloseable{
 	public TimeClosable(TimerService service, String name) {
 		super();
 		this.service = service;
-		this.name = name;
 		if( service != null ) {
+			this.name = name;
+			service.startTimer(name);
+		}
+	}
+	/** start the named timer (if the service is not null).
+	 * timer will be stopped when the object is closed.
+	 * @param service
+	 * @param name_supplier
+	 */
+	public TimeClosable(TimerService service, Supplier<String> name_supplier) {
+		super();
+		this.service = service;
+		if( service != null ) {
+			String name = name_supplier.get();
+			this.name = name;
 			service.startTimer(name);
 		}
 	}
@@ -48,7 +62,17 @@ public class TimeClosable implements AutoCloseable{
 	public TimeClosable(AppContext conn,String name) {
 		this(conn.getService(TimerService.class),name);
 	}
-
+	/** Create with the default {@link TimerService}
+	 * 
+	 * If no {@link TimerService} is enabled the {@link TimeClosable}
+	 * will have no effect.
+	 * 
+	 * @param conn
+	 * @param name_supplier
+	 */
+	public TimeClosable(AppContext conn,Supplier<String> name_supplier) {
+		this(conn.getService(TimerService.class),name_supplier);
+	}
 	private final TimerService service;
 	private String name;
 	

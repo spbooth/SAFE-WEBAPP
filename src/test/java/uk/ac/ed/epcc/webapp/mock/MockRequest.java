@@ -45,6 +45,8 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
+import uk.ac.ed.epcc.webapp.servlet.WebappServlet;
+
 import java.util.Hashtable;
 import java.util.Iterator;
 
@@ -136,7 +138,18 @@ public class MockRequest implements HttpServletRequest {
 
 	@Override
 	public String getQueryString() {
-		
+		if( method.equalsIgnoreCase("GET")) {
+			StringBuilder sb = new StringBuilder();
+			for(Map.Entry<String,Object> e : params.entrySet()) {
+				if(sb.length()>0) {
+					sb.append("&");
+				}
+				sb.append(e.getKey());
+				sb.append("=");
+				sb.append(WebappServlet.encodeCGI(e.getValue().toString()));
+			}
+			return sb.toString();
+		}
 		return null;
 	}
 
@@ -304,7 +317,7 @@ public class MockRequest implements HttpServletRequest {
 	@Override
 	public int getLocalPort() {
 		
-		return 0;
+		return 443;
 	}
 
 	@Override
@@ -362,7 +375,7 @@ public class MockRequest implements HttpServletRequest {
 	@Override
 	public String getProtocol() {
 		
-		return null;
+		return "https";
 	}
 
 	@Override

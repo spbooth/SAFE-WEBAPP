@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?><log>
 <h2>Table TableTest</h2>
 <h3>Table Type:TableStructureTestFactory</h3>
+<details class="details">
+<summary>Database table TableTest</summary>
+<table class="auto" rows="1" cols="5">
+<tr count="0">
+<th class="key" count="0">Field</th>
+<th class="main" count="1">Type</th>
+<th class="main" count="2">Unique</th>
+<th class="main" count="3">Nullable</th>
+<th class="main" count="4">Size</th>
+</tr>
+<tr count="1">
+<td class="key" count="0">Name</td>
+<td class="main" count="1">Varchar</td>
+<td class="main" count="2">false</td>
+<td class="main" count="3">true</td>
+<td class="main" count="4" numeric="true">48</td>
+</tr>
+</table>
+</details>
 </log>

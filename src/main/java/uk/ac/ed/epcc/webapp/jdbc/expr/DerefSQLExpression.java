@@ -115,4 +115,13 @@ public class DerefSQLExpression<H extends DataObject,R extends DataObject,T> imp
 	public static <H extends DataObject,R extends DataObject> DerefSQLExpression<H, R, ? extends Number> convertToMillis(SQLContext sql, DerefSQLExpression<H, R, Date> expr){
 		return new DerefSQLExpression<>(expr.a, sql.convertToMilliseconds(expr.remote_expression),expr.required_filter);
 	}
+	/** helper method to allow a {@link SQLContext} to convert {@link DerefSQLExpression}s
+	 * 
+	 * @param sql {@link SQLContext}
+	 * @param expr
+	 * @return
+	 */
+	public static <H extends DataObject,R extends DataObject> DerefSQLExpression<H, R, ? extends Number> convertToSeconds(SQLContext sql, DerefSQLExpression<H, R, Date> expr){
+		return new DerefSQLExpression<>(expr.a, sql.convertToSeconds(expr.remote_expression),expr.required_filter);
+	}
 }

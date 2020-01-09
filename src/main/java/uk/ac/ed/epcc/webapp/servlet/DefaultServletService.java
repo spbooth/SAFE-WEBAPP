@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.servlet;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
@@ -41,11 +42,14 @@ import org.apache.commons.codec.binary.Base64;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.servlet.session.token.BearerTokenService;
+import uk.ac.ed.epcc.webapp.servlet.session.token.ErrorCodes;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.AppUserNameFinder;
@@ -79,14 +83,17 @@ public class DefaultServletService implements ServletService{
 	/**
 	 * 
 	 */
+	private static final String BEARER_ERROR_ATTR = "BearerError";
+	/**
+	 * 
+	 */
 	private static final String LOGOUT_REMOVE_COOKIE_PREFIX = "logout.remove_cookie.";
 	public static final String BASIC_AUTH_REALM_PARAM="basic_auth.realm";
 	public static final Feature NEED_CERTIFICATE_FEATURE = new Feature("need-certificate", true,"try additional mechanisms to retrieve certificate DN as web-name");
 	public static final String PARAMS_KEY_NAME = "Params";
 	public static final String ARG_TERRMINATOR = "-";
 	
-	Pattern auth_patt = Pattern.compile("\\s*Basic\\s+(\\S*)");
-	
+	Pattern auth_patt =  Pattern.compile("\\s*(\\w+)\\s+([\\w~/\\.\\+\\-]+=*)");
 	protected final AppContext conn;
 	private final ServletContext ctx;
     private final ServletRequest req; // cached request may be null
@@ -105,6 +112,7 @@ public class DefaultServletService implements ServletService{
 
 	public static final Feature EXTERNAL_AUTH_VIA_LOGIN_FEATURE = new Feature("external_auth.use_login",false,"Mandatory external auth with only login.jsp protected externally");
 
+	public static final Feature REDIRECT_TO_LOGIN_FEATURE = new Feature("login_page.always_redirect",false,"Always use redirect to go to login page");
 	public DefaultServletService(AppContext conn,ServletContext ctx, ServletRequest req,
 			ServletResponse res) {
 		super();
@@ -167,6 +175,8 @@ public class DefaultServletService implements ServletService{
 		return res;
 
 	}
+    
+	private String page = null;
 	/** request page when ServletAppContext was created. 
 	 * This uses a cached request object because the request URL will be
 	 * re-written if the request is forwarded to a different servlet/jsp.
@@ -174,8 +184,12 @@ public class DefaultServletService implements ServletService{
 	 * @return String URL
 	 */
     public String encodePage(){
+    	if( page != null ) {
+    		return page;
+    	}
     	if( req != null && req instanceof HttpServletRequest){
-    		return encodePage((HttpServletRequest) req);
+    		page = encodePage((HttpServletRequest) req);
+    		return page;
     	}
     	return "";
     }
@@ -228,6 +242,12 @@ public class DefaultServletService implements ServletService{
     	}
     }
    
+    public void redirect(URI url) throws IOException {
+    	conn.getService(LoggerService.class).getLogger(getClass()).debug("redirect to "+url);
+    	if( req instanceof HttpServletRequest && res instanceof HttpServletResponse){
+    		((HttpServletResponse)res).sendRedirect(url.toASCIIString());
+    	}
+    }
 
     public void message(String message, Object ... args) throws IOException, ServletException {
     	if( req instanceof HttpServletRequest && res instanceof HttpServletResponse){
@@ -449,22 +469,57 @@ public class DefaultServletService implements ServletService{
 	 * @see uk.ac.ed.epcc.webapp.servlet.ServletService#requestAuthorization()
 	 */
 	public <A extends AppUser> void requestAuthentication(SessionService<A> sess) throws IOException, ServletException {
-		AppUserFactory<A> factory = sess.getLoginFactory();
-		@SuppressWarnings("unchecked")
-		PasswordAuthComposite<A> composite = (PasswordAuthComposite<A>) factory.getComposite(PasswordAuthComposite.class);
-		if( composite != null ){
-			// Should we attempt basic auth
-			String realm = conn.getInitParameter(BASIC_AUTH_REALM_PARAM);
-			if( realm != null && realm.trim().length() > 0 && res instanceof HttpServletResponse){
-				((HttpServletResponse)res).setHeader("WWW-Authenticate", "Basic realm=\""+realm+"\"");
-				((HttpServletResponse)res).sendError(HttpServletResponse.SC_UNAUTHORIZED);
-				return;
-			}
-		}
 		if( isComitted()) {
 			// Can't do anything
 			return;
 		}
+		AppUserFactory<A> factory = sess.getLoginFactory();
+		BearerTokenService bearer = getContext().getService(BearerTokenService.class);
+		int code = HttpServletResponse.SC_UNAUTHORIZED;
+		if( bearer != null ) {
+			
+			if(  bearer.request() && res instanceof HttpServletResponse) {
+				StringBuilder header =new StringBuilder();
+				header.append("Bearer");
+				String token_realm = bearer.getRealm();
+				if( token_realm != null &&  ! token_realm.isEmpty()) {
+					header.append(" realm=\"");
+					header.append(token_realm);
+					header.append("\"");
+				}
+			
+				Set<String> scopes = bearer.requestedScopes();
+				if( scopes != null && ! scopes.isEmpty()) {
+					header.append(", scope=\"");
+					header.append(String.join(" ", scopes));
+					header.append("\"");
+				}
+				ErrorCodes token_error = bearer.getError();
+				if( token_error != null ) {
+					header.append(", error=\"");
+					header.append(token_error.toString());
+					header.append("\"");
+					code=token_error.getCode();
+				}
+				((HttpServletResponse)res).setHeader("WWW-Authenticate", header.toString());
+				((HttpServletResponse)res).sendError(code);
+				return;
+				
+				
+			}
+		}
+		@SuppressWarnings("unchecked")
+		PasswordAuthComposite<A> composite = (PasswordAuthComposite<A>) factory.getComposite(PasswordAuthComposite.class);
+		if( composite != null ){
+			// Should we request basic auth
+			String realm = conn.getInitParameter(BASIC_AUTH_REALM_PARAM);
+			if( realm != null && realm.trim().length() > 0 && res instanceof HttpServletResponse){
+				((HttpServletResponse)res).setHeader("WWW-Authenticate", "Basic realm=\""+realm+"\"");
+				((HttpServletResponse)res).sendError(code);
+				return;
+			}
+		}
+		
 		boolean external_via_login = EXTERNAL_AUTH_VIA_LOGIN_FEATURE.isEnabled(conn);
 		if( getWebName() == null  
 				&& (! external_via_login) &&
@@ -473,20 +528,27 @@ public class DefaultServletService implements ServletService{
 			warn("No webname when required");
 			message( "access_denied", (Object[])null);
 		}else{
-			// standard login page supports both custom password login and self-register for external-auth
-			// If built_in login is off we might change the login page to an external auth servlet url.
-			String login_page=LoginServlet.getLoginPage(conn);
-			// Need to remember page and redirect to login
 			String page = encodePage();
-			if( page !=null&& ! page.isEmpty()) {
-				sess.setAttribute(LoginServlet.INITIAL_PAGE_ATTR, new RedirectResult(page));
-			}
-			if( external_via_login || ! LoginServlet.BUILT_IN_LOGIN.isEnabled(getContext())) {
-				
-				redirect(login_page);
-			}else {
-				forward(login_page);
-			}
+			requestLogin(sess, page);
+		}
+	}
+
+
+	public <A extends AppUser> void requestLogin(SessionService<A> sess, String page)
+			throws IOException, ServletException {
+		// standard login page supports both custom password login and self-register for external-auth
+		// If built_in login is off we might change the login page to an external auth servlet url.
+		String login_page=LoginServlet.getLoginPage(getContext());
+		// Need to remember page and redirect to login
+		
+		if( page !=null&& ! page.isEmpty()) {
+			sess.setAttribute(LoginServlet.INITIAL_PAGE_ATTR, new RedirectResult(page));
+		}
+		if( EXTERNAL_AUTH_VIA_LOGIN_FEATURE.isEnabled(getContext()) || REDIRECT_TO_LOGIN_FEATURE.isEnabled(getContext()) || ! LoginServlet.BUILT_IN_LOGIN.isEnabled(getContext())) {
+			
+			redirect(login_page);
+		}else {
+			forward(login_page);
 		}
 	}
 
@@ -533,6 +595,7 @@ public class DefaultServletService implements ServletService{
 								l.authenticated(remote_auth_realm,person);
 							}
 							person.commit();
+							person.historyUpdate();
 							if( factory.mustRegister(person)){
 								// don't populate session this will trigger redirect to
 								// the registration page
@@ -541,38 +604,56 @@ public class DefaultServletService implements ServletService{
 							// If we want to support 2-factor with external login 
 							// we should do this via a required page.
 							sess.setCurrentPerson(person);
+							
+							CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+							if( time != null) {
+								sess.setAuthenticationTime(time.getCurrentTime());
+							}
 						}	
 					}
 
 				}
 			}else if (DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn) ){
-			}else{
-				// only consider basic-auth if no webname found
+				// name must be null
+				return;
+			}
+			HttpServletRequest request = getRequest();
+			if(request != null && ! DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn) ) {
+				// only consider authorisation headers if no webname found
 				// Note we pick up the top level config service so that per-servlet parameters
 				// are available
-				String realm = conn.getInitParameter(BASIC_AUTH_REALM_PARAM);
-				HttpServletRequest request = getRequest();
-				if( request != null && realm != null && realm.trim().length() > 0 && ! DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn)) {
-					
-					String auth = request.getHeader("Authorization");
-					AppUserFactory<A> factory = sess.getLoginFactory();
-					@SuppressWarnings("unchecked")
-					PasswordAuthComposite<A> comp = factory.getComposite(PasswordAuthComposite.class);
-					if( auth != null && comp != null ){
-						Matcher m = auth_patt.matcher(auth);
-						if( m.matches()){
-							String base64 = m.group(1);
-							String userpass= decode(base64);
+				String auth = request.getHeader("Authorization");
+				if( auth != null ) {
+					Matcher m = auth_patt.matcher(auth);
+					if( m.matches()) {
+						String type = m.group(1);
+						String cred = m.group(2);
+						if( type.equals("Bearer")) {
+							BearerTokenService bearer = getContext().getService(BearerTokenService.class);
+							if( bearer != null ) {
+								// Let the bearer token service do everything
+								// this is to allow it to implement anonymous role only sessions
+								bearer.processToken(sess, cred);
+								return;
+							}
+						}else if( type.equals("Basic")) {
+							AppUserFactory<A> factory = sess.getLoginFactory();
+							@SuppressWarnings("unchecked")
+							PasswordAuthComposite<A> comp = factory.getComposite(PasswordAuthComposite.class);
+							String userpass= decode(cred);
 							int pos = userpass.indexOf(":");
 							if( pos > 0 ){
 								String user = userpass.substring(0, pos);
 								String pass = userpass.substring(pos+1);
 								try {
-									
-										A person = (A) comp.findByLoginNamePassword(user, pass);
-										if( person != null && person.canLogin()){
-											sess.setCurrentPerson(person);
-										}
+
+									A person = (A) comp.findByLoginNamePassword(user, pass);
+									if( person != null && person.canLogin()){
+										sess.setCurrentPerson(person);
+									}else {
+										//TODO handle bad authentication
+										// could remember error in response and return forbidden in requestAuthentication
+									}
 								} catch (DataException e) {
 									error(e,"Error looking up person");
 								}

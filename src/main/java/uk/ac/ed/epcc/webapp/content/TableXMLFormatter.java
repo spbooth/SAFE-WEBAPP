@@ -91,7 +91,7 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 					if( key instanceof XMLGenerator){
 						((XMLGenerator)key).addContent(hb);
 					}else{
-						hb.clean(key.toString());
+						hb.clean(t.getCol(key).getName());
 					}
 
 					hb.close();
@@ -104,7 +104,7 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 					if( key instanceof XMLGenerator){
 						((XMLGenerator)key).addContent(hb);
 					}else{
-						hb.clean(key.toString());
+						hb.clean(t.getCol(key).getName());
 					}
 					hb.close();
 				}

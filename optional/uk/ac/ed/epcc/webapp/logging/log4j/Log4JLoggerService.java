@@ -55,24 +55,30 @@ public class Log4JLoggerService implements LoggerService, Contexed , ConfigServi
 			}
 		}
 	}
+	@Override
 	public Logger getLogger(String name) {
 		return new Log4JWrapper(name);
 	}
 
+	@Override
 	public Logger getLogger(Class c) {
 		return new Log4JWrapper(c);
 	}
+	@Override
 	public void cleanup() {
 		
 	}
+	@Override
 	public void resetConfig() {
 		getLogger(getClass()).debug("Resetting initialised flag");
 		initialised=false;
 		
 	}
+	@Override
 	public Class<? super LoggerService> getType() {
 		return LoggerService.class;
 	}
+	@Override
 	public AppContext getContext() {
 		return conn;
 	}

@@ -41,16 +41,34 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 public class FuncExpression<T,D> implements SQLExpression<T> {
 	
 	public static <T,D> SQLExpression<T> apply(AppContext c,SQLFunc f, Class<T> target, SQLExpression<D> e){
-		if(c != null &&  e instanceof DateSQLExpression){
-			// move date convert outside function
+		if( e instanceof DateSQLExpression){
+			// certain functions can use the wrapped numeric expression
 			DateSQLExpression dse = (DateSQLExpression) e;
-			DatabaseService db_serv = c.getService(DatabaseService.class);
-			try{
-				
-				SQLContext sqc = db_serv.getSQLContext();
-				return (SQLExpression<T>) sqc.convertToDate(new FuncExpression<>(f, Number.class, dse.getSeconds()), 1000L);
-			}catch(SQLException ee){
-				db_serv.logError("Error getting SQLContext",ee);
+			if( f == SQLFunc.MIN || f == SQLFunc.MAX) {
+				// move date convert outside function
+				// minor optimisation benefit but allows unecessary conversions to be removed higher up
+				// important to avoid mysql 2038 23-bit date problem
+				if( c != null ) {
+					DatabaseService db_serv = c.getService(DatabaseService.class);
+					try{
+
+						SQLContext sqc = db_serv.getSQLContext();
+						if( dse.preferSeconds()) {
+							return (SQLExpression<T>) sqc.convertToDate(new FuncExpression<>(f, Number.class, dse.getSeconds()), 1000L);
+						}else {
+							return (SQLExpression<T>) sqc.convertToDate(new FuncExpression<>(f, Number.class, dse.getMillis()), 1L);
+						}
+					}catch(SQLException ee){
+						db_serv.logError("Error getting SQLContext",ee);
+					}
+				}
+			}else if ( f == SQLFunc.COUNT) {
+				// Just count the underlying expression
+				if( dse.preferSeconds() ) {
+					return new FuncExpression<>(f, target, ((DateSQLExpression) e).getSeconds());
+				}else {
+					return new FuncExpression<>(f, target, ((DateSQLExpression) e).getMillis());
+				}
 			}
 		}
 		return new FuncExpression<>(f, target, e);
@@ -68,13 +86,10 @@ public class FuncExpression<T,D> implements SQLExpression<T> {
 	@Override
 	public int add(StringBuilder sb, boolean qualify) {
 		int res=1;
-
-		if( func.equals(SQLFunc.DISTINCT)) {
-			sb.append("COUNT( DISTINCT ");
-		}else {
-			sb.append(func.name());
-			sb.append("(");
-		}
+		
+		sb.append(func.name());
+		sb.append("(");
+		
 		if( e == null){
 			sb.append("1");
 		}else{
@@ -108,11 +123,19 @@ public class FuncExpression<T,D> implements SQLExpression<T> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
-		// count has null expression
-		if(e !=null &&  target_class.isAssignableFrom(e.getTarget())) {
-			return (T) e.makeObject(rs, pos);
+		//AVG FLOOR COUNT change type
+		switch(func) {
+		case AVG: 
+		case FLOOR:
+		case COUNT:
+			return (T) rs.getObject(pos);
+		default:
+			// count has null expression
+			if(e !=null &&  target_class.isAssignableFrom(e.getTarget())) {
+				return (T) e.makeObject(rs, pos);
+			}
+			return (T) rs.getObject(pos);
 		}
-		return (T) rs.getObject(pos);
 	}
 	@Override
 	public Class<T> getTarget() {

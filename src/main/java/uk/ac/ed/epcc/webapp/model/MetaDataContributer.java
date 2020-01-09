@@ -32,12 +32,5 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
  * @author spb
  *
  */
-public interface MetaDataContributer<T extends DataObject> {
-
-	/** Add to the set of meta-data.
-	 * 
-	 * @param attributes
-	 * @param target
-	 */
-	public void addMetaData(Map<String,String> attributes,T target);
+public interface MetaDataContributer<T extends DataObject> extends DataContributor<T> {
 }

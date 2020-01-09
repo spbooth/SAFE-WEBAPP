@@ -31,8 +31,13 @@ public enum Hash{
 	MD5{
 
 		@Override
-		public boolean enableByDefault() {
+		public boolean deprecatedByDefault() {
 			return true;
+		}
+
+		@Override
+		public boolean enableByDefault() {
+			return true; // used to be the default
 		}
 	
 	},
@@ -43,6 +48,10 @@ public enum Hash{
 		}
 	},
 	SHA256{
+		@Override
+		public boolean enableByDefault() {
+			return true;
+		}
 		public String toString(){
 			return "SHA-256";
 		}
@@ -65,6 +74,26 @@ public enum Hash{
 		public int size(){
 			return 512;
 		}
+	},
+	LOCKED{
+
+		@Override
+		public MessageDigest getDigest() throws NoSuchAlgorithmException {
+			throw new NoSuchAlgorithmException("Locked value");
+		}
+
+		@Override
+		public boolean enableByDefault() {
+			return false;
+		}
+
+		
+
+		@Override
+		public boolean isEnabled(AppContext conn) {
+			return false; // never enabled
+		}
+		
 	};
 	public MessageDigest getDigest() throws NoSuchAlgorithmException{
 		return MessageDigest.getInstance(toString());
@@ -98,12 +127,26 @@ public enum Hash{
 	public boolean enableByDefault(){
 		return false;
 	}
-	
+	public boolean deprecatedByDefault(){
+		return false;
+	}
+	/** Can this hash value be used to login
+	 * 
+	 * @param conn
+	 * @return
+	 */
 	public boolean isEnabled(AppContext conn){
 		return conn.getBooleanParameter(name()+".allowed", enableByDefault());
 	}
-	
+	/** Is this an insecure hash that needs to be replaced
+	 * 
+	 * @param conn
+	 * @return
+	 */
+	public boolean isDeprecated(AppContext conn){
+		return conn.getBooleanParameter(name()+".deprecated", deprecatedByDefault());
+	}
 	public static Hash getDefault(AppContext c){
-		return c.getEnumParameter(Hash.class, "password.hash",MD5);
+		return c.getEnumParameter(Hash.class, "password.hash",SHA256);
 	}
 }

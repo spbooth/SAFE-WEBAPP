@@ -33,7 +33,10 @@ public interface ExtendedXMLBuilder extends SimpleXMLBuilder{
 	/** Insert line break.
 	 * 
 	 */
-	public abstract void br();
+	public default void br() {
+		open("br");
+		close();
+	}
 	
 	/** Convenience method to add an additional class attribute using
 	 * the HTML convention that multiple classes are represented 

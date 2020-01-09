@@ -23,7 +23,7 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 
 
 public class RangeDateInput extends DateInput {
-    
+
     public RangeDateInput(Date start,Date end){
     	setMin(start);
     	setMax(end);

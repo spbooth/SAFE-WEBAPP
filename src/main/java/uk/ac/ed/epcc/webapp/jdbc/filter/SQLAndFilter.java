@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
+import uk.ac.ed.epcc.webapp.model.data.filter.BackJoinFilter;
 
 /** SQL only version of AndFilter 
  * It can combine {@link PatternFilter}s.
@@ -49,7 +50,11 @@ public class SQLAndFilter<T> extends BaseSQLCombineFilter<T>  {
 		return FilterCombination.AND;
 	}
 	
-	
+	@Override
+	protected void addBackJoinFilter(BackJoinFilter filter) {
+		addPatternFilter(filter);
+		
+	}
 	
 	
 

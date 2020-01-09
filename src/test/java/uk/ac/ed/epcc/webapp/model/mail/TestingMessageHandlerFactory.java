@@ -16,14 +16,13 @@ package uk.ac.ed.epcc.webapp.model.mail;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageComposerFormResult;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageCreator;
+import uk.ac.ed.epcc.webapp.editors.mail.MessageHandlerFactory;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.model.mail.AbstractMessageHandlerFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 /** A simple implementaton of a {@link MessageHandlerFactory} to act as the target of
  * mail editing tests.
@@ -100,8 +99,8 @@ public class TestingMessageHandlerFactory<H extends TestingMessageHandlerFactory
 	}
 
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
-		return new ExampleMessage(res);
+	protected H makeBDO(Record res) throws DataFault {
+		return (H) new ExampleMessage(res);
 	}
 
 	@Override

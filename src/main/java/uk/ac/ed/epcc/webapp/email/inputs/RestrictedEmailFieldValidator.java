@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.email.inputs;
 
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,5 +56,27 @@ public class RestrictedEmailFieldValidator implements FieldValidator<String> {
 				}
 			}
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(bad_pattern_text);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RestrictedEmailFieldValidator other = (RestrictedEmailFieldValidator) obj;
+		if (!Arrays.equals(bad_pattern_text, other.bad_pattern_text))
+			return false;
+		return true;
 	}
 }

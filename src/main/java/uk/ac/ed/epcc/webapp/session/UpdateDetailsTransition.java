@@ -53,8 +53,10 @@ public class UpdateDetailsTransition<A extends AppUser> extends StandAloneFormUp
 	@Override
 	public <X extends ContentBuilder> X getExtraHtml(X cb, SessionService<?> op, A target) {
 		AppUserFactory<A> fac = getAppUserFactory();
-		if( fac.needDetailsUpdate(target)) {
-			
+		boolean my_details = ((SessionService<A>)op).isCurrentPerson(target);
+		if( my_details && fac.needDetailsUpdate(target)) {
+			// This will only be a forced update if the current user.
+			// We may allow other users to udpdate via a role
 			try {
 				ContentBuilder div = cb.getPanel();
 				div.addHeading(2, "Update required");

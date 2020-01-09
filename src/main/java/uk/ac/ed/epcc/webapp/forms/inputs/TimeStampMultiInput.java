@@ -36,7 +36,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  */
 
 
-public class TimeStampMultiInput extends AbstractCalendarMultiInput implements ParseInput<Date>, BoundedDateInput {
+public class TimeStampMultiInput extends AbstractCalendarMultiInput implements BoundedDateInput {
 	private final long resolution;
 
     private final DateFormat df;
@@ -99,6 +99,7 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements P
 			}
 		});
     }
+	@Override
 	public Date convert(Object v) throws TypeError {
 		if( v == null ){
 			return null;
@@ -160,6 +161,7 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements P
 		setBounds();
 		return old;
 	}
+	@Override
 	public Date parseValue(String v) throws ParseException {
 		if (v == null) {
 			return null;

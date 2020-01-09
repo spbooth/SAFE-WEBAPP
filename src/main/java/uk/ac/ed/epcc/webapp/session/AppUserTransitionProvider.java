@@ -33,8 +33,10 @@ import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider;
+import uk.ac.ed.epcc.webapp.servlet.LoginServlet;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 
 
 /** A {@link TransitionProvider} for operations on {@link AppUser}s
@@ -44,7 +46,12 @@ import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
 public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewTransitionProvider<AU, AppUserKey<AU>> implements TitleTransitionProvider<AppUserKey<AU>, AU> {
 	
-	/**
+	/** Relationship that allows a different user to edit this persons details
+	 * 
+	 */
+	public static final String EDIT_DETAILS_ROLE = "EditDetails";
+
+	/** Relationship that allows somebody to edit this persons roles
 	 * 
 	 */
 	public static final String SET_ROLES_ROLE = "SetRoles";
@@ -54,7 +61,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 	/**
 	 * 
 	 */
-	private static final String PERSON_TRANSITION_TAG = "Person";
+	public static final String PERSON_TRANSITION_TAG = "Person";
 	public static final String VIEW_PERSON_RELATIONSHIP = "ViewPerson";
 	public static final AppUserKey SU_KEY = new AppUserKey("SU","Become User","Switch to this user identity") {
 
@@ -67,7 +74,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 	};
 	public static final AppUserKey SET_ROLE_KEY = new RoleAppUserKey("Roles", "Set roles", "Set permission roles for this user", SET_ROLES_ROLE);
-	public static final CurrentUserKey UPDATE = new CurrentUserKey("Details", "Update personal details", "Update the information we hold about you");
+	public static final CurrentUserKey UPDATE = new CurrentUserKey("Details", "Update personal details", "Update the information we hold about you",EDIT_DETAILS_ROLE);
 	
 	public static final class SUTransition<AU extends AppUser> extends AbstractDirectTransition<AU>{
 
@@ -80,7 +87,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 			if( sess instanceof ServletSessionService) {
 				((ServletSessionService)sess).su(target);
 			}
-			return new RedirectResult("/main.jsp");
+			return new RedirectResult(LoginServlet.getMainPage(c));
 		}
 		
 	}
@@ -181,11 +188,8 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 	 */
 	@Override
 	public boolean canView(AU target, SessionService<?> sess) {
-		try {
-			return ((SessionService)sess).isCurrentPerson(target) || ((SessionService)sess).hasRelationship((AppUserFactory)sess.getLoginFactory(), target, VIEW_PERSON_RELATIONSHIP);
-		} catch (UnknownRelationshipException e) {
-			getLogger().error("Error checking view", e);
-			return false;
+		try(TimeClosable time = new TimeClosable(getContext(), "AppUserTransitionProvider.canView")){
+		return ((SessionService)sess).isCurrentPerson(target) || ((SessionService)sess).hasRelationship((AppUserFactory)sess.getLoginFactory(), target, VIEW_PERSON_RELATIONSHIP,false);
 		}
 	}
 

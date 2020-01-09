@@ -143,7 +143,7 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	public SQLFilter<T> getSQLFilter(SQLFilter<I> fil) throws CannotFilterException {
 		try{
 			DataObjectFactory<I> fac = getFactory();
-			return new Joiner<>(clazz, fil, fac.res, val.getID());
+			return Joiner.joinFixedRef(clazz, fil, fac.res, val.getID());
 		}catch(Exception e){
 			throw new CannotFilterException(e);
 		}
@@ -210,6 +210,11 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 			List<PatternArgument> list) {
 		return list;
 	}
+	
+	@Override
+	final public boolean groupingIsomorphic() {
+		return true;
+	}
 	@Override
 	public String toString(){
 		return "CONST("+val.toString()+")";
@@ -220,7 +225,7 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	 */
 	@Override
 	public SQLExpression<Integer> getIDExpression() {
-		return new ConstExpression<Integer, T>(Integer.class, Integer.valueOf(val.getID()));
+		return new ConstExpression<>(clazz,Integer.class, Integer.valueOf(val.getID()));
 	}
 	
 

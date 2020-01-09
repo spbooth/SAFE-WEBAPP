@@ -32,7 +32,7 @@ public class CountDistinctMapMapper<K> extends MapMapper<K, Number> {
 
 	public CountDistinctMapMapper(AppContext c, GroupingSQLValue<K> key, String key_name,SQLExpression<? extends Number> val, String value_name) throws InvalidKeyException {
 		super(c, key, key_name);
-		addCount(val, value_name);
+		addSQLCount(val, value_name);
 	}
 
 	/* (non-Javadoc)

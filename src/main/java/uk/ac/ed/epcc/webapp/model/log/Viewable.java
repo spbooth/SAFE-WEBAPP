@@ -16,9 +16,12 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.log;
 
+import uk.ac.ed.epcc.webapp.content.UIProvider;
 import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
 
-/** Interface for types that have a view transition
+/** Interface for types that have a view transition.
+ * 
+ * This can be used as an alternative to {@link UIProvider}
  * 
  * @author spb
  *

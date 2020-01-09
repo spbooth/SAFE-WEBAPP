@@ -77,9 +77,11 @@ public class PatternTextInput extends TextInput implements TagInput, PatternInpu
    /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.forms.inputs.PatternInput#getPattern()
  */
+@Override
 public String getPattern(){
 	   return pattern;
    }
+@Override
 public String getTag() {
 	if( tag != null ){
 		return tag;

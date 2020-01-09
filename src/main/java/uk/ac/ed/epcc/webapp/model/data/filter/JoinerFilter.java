@@ -18,6 +18,9 @@ package uk.ac.ed.epcc.webapp.model.data.filter;
 
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BadJoinException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseCombineFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
@@ -48,7 +51,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
  */
 
 
-public final class JoinerFilter<T extends DataObject, BDO extends DataObject> implements SQLFilter<BDO>, JoinFilter<BDO>, LinkClause {
+public final class JoinerFilter<T extends DataObject, BDO extends DataObject> implements SQLFilter<BDO>, JoinFilter<BDO>, LinkClause,Contexed {
 	private final Class<BDO> target;
 	private final String join_field;
 	private final Repository res;
@@ -186,7 +189,12 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 		}
 
 
-
+        Repository getTargetRes() {
+        	return res;
+        }
+        Repository getRemoteRes() {
+        	return remote_res;
+        }
 
 
 		/* (non-Javadoc)
@@ -197,7 +205,10 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 			if( tables.contains(remote_res) && tables.contains(res)) {
 				additions.add(this);
 			}else {
-				assert( tables.contains(res) || tables.contains(remote_res));
+				if( ! tables.contains(res) && ! tables.contains(remote_res)) {
+					throw new BadJoinException("Neither end of join already in query");
+				}
+				//assert( tables.contains(res) || tables.contains(remote_res));
 				if( ! tables.contains(remote_res)) {
 					// see comments for reason for left join
 					join_clause.append(" left join ");
@@ -208,7 +219,10 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 				}
 				if( ! tables.contains(res)) {
 					// This allows us to use a simple join when using a unique remote reference
-					assert(res.getInfo(join_field).isUnique());
+					if( ! res.getInfo(join_field).isUnique()) {
+						throw new BadJoinException("simple back join to non unique field "+join_field);
+					}
+					//assert(res.getInfo(join_field).isUnique());
 					// see comments for reason for left join
 					join_clause.append(" left join ");
 					res.addSource(join_clause, true);
@@ -218,5 +232,23 @@ public final class JoinerFilter<T extends DataObject, BDO extends DataObject> im
 				}
 			}
 			
+		}
+
+
+
+
+
+
+
+
+
+
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
+		 */
+		@Override
+		public AppContext getContext() {
+			return res.getContext();
 		}
 }

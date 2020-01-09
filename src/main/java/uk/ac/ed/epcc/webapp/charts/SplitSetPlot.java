@@ -54,17 +54,22 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 
 	public abstract void add(int nset, int cat, int item, float value);
 
+	@Override
 	public String[] getLegends() {
 		return lab;
 	}
 
+	@Override
 	public void setLegends(String[] leg) {
 		this.lab=leg;
 	}
+	@Override
 	public boolean hasLegends(){
 		return lab != null;
 	}
-	public final void permSets(int new_nset, int[] perm) {
+	
+	@Override
+	public void permSets(int new_nset, int[] perm) {
 		int nset = perm.length;
 		float temp[] = new float[nset];
 		
@@ -101,6 +106,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 	public void setUsingLogSearch(boolean usingLogSearch) {
 		this.usingLogSearch = usingLogSearch;
 	}
+	@Override
 	public void scale(float scale) {
 		for (int s = 0; s < getNumSets(); s++) {
 			for (int i = 0; i < getNumCats(); i++) {
@@ -111,12 +117,14 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 			}
 		}
 	}
+	@Override
 	public void setNumSets(int nset){
 		setSize(nset,getNumCats(),getNumItems());
 	}
 
 	protected abstract void setSize(int new_nset, int numCats, int numItems);
 
+	@Override
 	public abstract void doConvertToStacked();
 
 	private String getMajorRange(int i) {
@@ -146,6 +154,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 	 * 			  index of first label in this set
 	 * @return number of labels used;
 	 */
+	@Override
 	public Table getTable(String quantity) {
 		
 		Table result = new Table();
@@ -221,6 +230,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 		return count;
 	}
 
+	@Override
 	public final double[] getCounts() {
 		int nset = getNumSets();
 		double count[] = new double[nset];
@@ -244,6 +254,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 	 * @param o
 	 * @throws Exception 
 	 */
+	@Override
 	public <D> void   addData(SetRangeMapper<D> t, D o)
 			throws Exception {
 		int set = t.getSet(o);
@@ -304,6 +315,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 						if (t.overlapps(o, start_bound[i][j], end_bound[i][j])) {
 							float val = t.getOverlapp(o, start_bound[i][j],
 									end_bound[i][j]);
+							// this won't work with min/max
 							set(set, i, j, get(set, i, j) + val);
 							seen = true;
 						} else {
@@ -323,6 +335,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 
 							float val = t.getOverlapp(o, start_bound[i][j],
 									end_bound[i][j]);
+							// this wont work with min max
 							set(set, i, j, get(set, i, j) + val);
 						}
 					}
@@ -332,6 +345,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 
 		}
 	}
+	@Override
 	public <F> boolean addMapData(QueryMapper<F> t, F o)
 			throws InvalidTransformException {
 		boolean added=false;
@@ -352,6 +366,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 						if (set >= getNumSets()) {
 							setSize(set + 1, nMajor, nMinor);
 						}
+						// this won't work with min max if called more then once
 						set(set, i, j, get(set, i, j) + val);
 					}
 				}
@@ -361,10 +376,12 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 	 public class PeriodIterator implements Iterator<TimePeriod>{
 	        private int i=0;
 	        private int j=0;
+			@Override
 			public boolean hasNext() {
 				return i<getNumCats();
 			}
 
+			@Override
 			public TimePeriod next() {
 				TimePeriod p = new Period(start_bound[i][j],end_bound[i][j]);
 				j++;
@@ -375,12 +392,14 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 				return p;
 			}
 
+			@Override
 			public void remove() {
 				throw new UnsupportedOperationException();
 			}
 	    	
 	    }
-	 public Iterator<TimePeriod> getSubPeriods(){
+	 @Override
+	public Iterator<TimePeriod> getSubPeriods(){
 	    	return new PeriodIterator();
 	    }
 	 public void setSplits(int nset,SplitTimePeriod p, int minor,boolean need_multi) throws InvalidArgument {
@@ -508,6 +527,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 		 * @param ds
 		 * @param scale
 		 */
+		@Override
 		public void rateScale(double scale) {
 			for (int i = 0; i < getNumCats(); i++) {
 				for (int j = 0; j < getNumItems(); j++) {
@@ -528,6 +548,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 		 * @param scale
 		 * @param norm
 		 */
+		@Override
 		public void datasetScale(double scale, PeriodSequencePlot nm) {
 			SplitSetPlot norm=(SplitSetPlot)nm;
 			for (int i = 0; i < getNumCats(); i++) {
@@ -558,6 +579,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 		 * @param src
 		 * @param dest
 		 */
+		@Override
 		public void scaleCopy(double scale, int src, int dest) {
 			for (int i = 0; i < getNumCats(); i++) {
 				for (int j = 0; j < getNumItems(); j++) {
@@ -567,6 +589,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 			}
 		}
 		
+		@Override
 		public void scaleCumulative(double scale, double initial[]) {
 		
 			for (int i = 0; i < getNumCats(); i++) {

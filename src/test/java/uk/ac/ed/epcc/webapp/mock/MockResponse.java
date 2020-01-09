@@ -35,7 +35,9 @@ public class MockResponse implements HttpServletResponse {
 	public int error=HttpServletResponse.SC_OK;
 	public String error_str=null;
 	public MockOutputStream stream = new MockOutputStream();
+	public String encoding="UTF-8";
 	public String content_type="text/html";
+	public Locale locale=Locale.getDefault();
 	int content_length=0;
 	Map<String,String> headers=new HashMap<>();
 	public void addCookie(Cookie arg0) {
@@ -112,12 +114,12 @@ public class MockResponse implements HttpServletResponse {
 	}
 
 	public void setStatus(int arg0) {
-		
-
+		error=arg0;
 	}
 
 	public void setStatus(int arg0, String arg1) {
-		
+		error=arg0;
+		error_str=arg1;
 	}
 
 	public void flushBuffer() throws IOException {
@@ -132,7 +134,7 @@ public class MockResponse implements HttpServletResponse {
 
 	public String getCharacterEncoding() {
 	
-		return null;
+		return encoding;
 	}
 
 	public String getContentType() {
@@ -142,7 +144,7 @@ public class MockResponse implements HttpServletResponse {
 
 	public Locale getLocale() {
 		
-		return null;
+		return locale;
 	}
 
 	public ServletOutputStream getOutputStream() throws IOException {
@@ -179,8 +181,7 @@ public class MockResponse implements HttpServletResponse {
 	}
 
 	public void setCharacterEncoding(String arg0) {
-		
-
+		encoding=arg0;
 	}
 
 	public void setContentLength(int arg0) {
@@ -194,8 +195,7 @@ public class MockResponse implements HttpServletResponse {
 	}
 
 	public void setLocale(Locale arg0) {
-		
-
+		locale=arg0;
 	}
 
 	/* (non-Javadoc)
@@ -203,8 +203,7 @@ public class MockResponse implements HttpServletResponse {
 	 */
 	
 	public String getHeader(String arg0) {
-		// TODO Auto-generated method stub
-		return null;
+		return headers.get(arg0);
 	}
 
 	/* (non-Javadoc)
@@ -212,8 +211,7 @@ public class MockResponse implements HttpServletResponse {
 	 */
 	
 	public Collection<String> getHeaderNames() {
-		// TODO Auto-generated method stub
-		return null;
+		return headers.keySet();
 	}
 
 	/* (non-Javadoc)
@@ -230,7 +228,7 @@ public class MockResponse implements HttpServletResponse {
 	 */
 	
 	public int getStatus() {
-		return 0;
+		return error;
 	}
 
 	/* (non-Javadoc)

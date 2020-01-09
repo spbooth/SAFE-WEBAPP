@@ -26,6 +26,9 @@ import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.TestTimeService;
 import uk.ac.ed.epcc.webapp.email.MockTansport;
+import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
@@ -35,6 +38,8 @@ import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.AppUserTransitionProvider;
+import uk.ac.ed.epcc.webapp.session.DatabasePasswordComposite;
+import uk.ac.ed.epcc.webapp.session.Hash;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
 import uk.ac.ed.epcc.webapp.session.RequiredPage;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -79,6 +84,109 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		
 	}
 	
+	@Test
+	public void testLoginOldAlg() throws DataFault, ServletException, IOException{
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		if( ! (composite instanceof DatabasePasswordComposite)) {
+			return;
+		}
+		user.setEmail("fred@example.com");
+		((DatabasePasswordComposite)composite).setPassword(Hash.MD5,user,"FredIsDead");
+		user.commit();
+		
+		
+		addParam("username", "fred@example.com");
+		addParam("password", "FredIsDead");
+		doPost();
+		loginRedirects();
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		assertTrue(sess.haveCurrentUser());
+		
+		Set<RequiredPage<A>> pages = fac.getRequiredPages();
+		assertEquals(1,pages.size());
+		RequiredPage page = pages.iterator().next();
+		assertTrue(page.required(sess));
+		FormResult res = page.getPage(sess);
+		assertTrue( res instanceof ChainedTransitionResult);
+		assertEquals(PasswordAuthComposite.CHANGE_PASSWORD,((ChainedTransitionResult)res).getTransition());
+		
+	}
+	
+	@Test
+	public void testTooManyFailed() throws ServletException, IOException, DataException{
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		if( ! (composite instanceof DatabasePasswordComposite)) {
+			return;
+		}
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		
+		for(int i=0; i< 4 ; i++) {
+			composite.findByLoginNamePassword("fred@example.com", "Bonk");
+		}
+		
+		addParam("username", "fred@example.com");
+		addParam("password", "FredIsDead");
+		doPost();
+		
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		assertFalse(sess.haveCurrentUser());
+		
+		checkRedirect("/login.jsp?error=login");
+		
+	}
+	@Test
+	public void testLoginBasic() throws DataFault, ServletException, IOException{
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		// Should be able to use basic auth spontaneously
+		setBasicAuth("fred@example.com","FredIsDead");
+		doPost();
+		checkRedirect("/main.jsp");  // should redirect immediately for basic auth
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		assertTrue(sess.haveCurrentUser());
+		
+		Set<RequiredPage<A>> pages = fac.getRequiredPages();
+		assertEquals(1,pages.size());
+		RequiredPage page = pages.iterator().next();
+		assertFalse(page.required(sess));
+		
+	}
+	
+	@Test
+	public void testTooManyFailedBasic() throws ServletException, IOException, DataException{
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		if( ! (composite instanceof DatabasePasswordComposite)) {
+			return;
+		}
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		
+		for(int i=0; i< 4 ; i++) {
+			composite.findByLoginNamePassword("fred@example.com", "Bonk");
+		}
+		
+		setBasicAuth("fred@example.com","FredIsDead");
+		doPost();
+		
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		assertFalse(sess.haveCurrentUser());
+		
+		checkRedirect("/login.jsp?error=login");
+		
+	}
 	@ConfigFixtures("wtmp.properties")
 	@Test
 	public void testLoginWithWtmp() throws DataException, Exception{
@@ -200,7 +308,7 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 	}
 	
 	@Test
-	public void testBadPassword() throws DataFault, ServletException, IOException{
+	public void testBadPassword() throws Exception{
 		AppUserFactory<A> fac =  ctx.getService(SessionService.class).getLoginFactory();
 		A user =  fac.makeBDO();
 		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
@@ -208,12 +316,32 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		composite.setPassword(user,"FredIsDead");
 		user.commit();
 		
-		
+		takeBaseline();
 		addParam("username", "fred@example.com");
 		addParam("password", "FredIsAlive");
 		doPost();
 		checkRedirect("/login.jsp?error=login");
+		checkDiff("/cleanup.xsl", "password_fail.xml");
 		
+		
+	}
+	@Test
+	public void testBadPasswordBasic() throws Exception{
+		SessionService sess = ctx.getService(SessionService.class);
+		AppUserFactory<A> fac =  sess.getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		
+		takeBaseline();
+		setBasicAuth("fred@example.com","FredIsAlive");
+		doPost();
+		assertFalse(sess.haveCurrentUser());
+		checkDiff("/cleanup.xsl", "password_fail.xml"); // key thing is that password fails must increment
+		checkRedirect("/login.jsp?error=login");
+	
 		
 		
 	}

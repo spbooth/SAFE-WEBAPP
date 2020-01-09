@@ -76,6 +76,10 @@ public class ServletSessionService<A extends AppUser> extends AbstractSessionSer
 	
 	// Flag to supress re-populate if we logged out
 	private boolean force_no_person=false;
+	// Flag to supress read/write to http session
+	// This is to force per request authentication in an api call and to prevent
+	// a restricted permission api call from creating a session
+	private boolean use_session=true;
 	private ServletService ss;
 	private HttpServletRequest request;
   public ServletSessionService(AppContext c){
@@ -111,7 +115,7 @@ protected boolean shortcutTestRole(String role) {
 public void setAttribute(String key, Object value) {
     //need a session if we are storing anything
 	HttpSession sess = null;
-	if( ss instanceof DefaultServletService){
+	if( use_session && ss instanceof DefaultServletService){
 		DefaultServletService dss = (DefaultServletService)ss;
 		// can't create session if comitted response
 		sess = dss.getSession(! dss.isComitted());
@@ -131,7 +135,7 @@ public void setAttribute(String key, Object value) {
 public void removeAttribute(String key) {
 	
 	HttpSession sess = null;
-	if( ss instanceof DefaultServletService){
+	if( use_session && ss instanceof DefaultServletService){
 		sess = ((DefaultServletService)ss).getSession();
 	}
 	if( sess != null ){
@@ -143,7 +147,7 @@ public void removeAttribute(String key) {
 public Object getAttribute(String key) {
 	
 	HttpSession sess = null;
-	if( ss instanceof DefaultServletService){
+	if( use_session && ss instanceof DefaultServletService){
 		sess = ((DefaultServletService)ss).getSession();
 	}
 	if( sess != null ){
@@ -170,7 +174,8 @@ protected A lookupPerson() {
 			try{
 				WtmpManager man = getWtmpManager();
 				if( man != null ){
-					Date now = new Date();
+					CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+					Date now = time.getCurrentTime();
 					if( d.before(now)){
 						Integer id = (Integer) getAttribute(WTMP_ID);
 						if( id != null ){
@@ -195,6 +200,9 @@ public void clearCurrentPerson() {
 	
 	super.clearCurrentPerson();
 	force_no_person=true;
+	if( ! use_session) {
+		return;
+	}
 	try{
 		WtmpManager man = getWtmpManager();
 		if( man != null ){
@@ -259,33 +267,35 @@ public A getSuperPerson(){
 public void setCurrentPerson(A person) {
 	
 	setCurrentPersonNoWtmp(person);
-	try {
-		WtmpManager man = getWtmpManager();
-		if( man != null ){
+	if( use_session) {
+		try {
+			WtmpManager man = getWtmpManager();
+			if( man != null ){
 
 
-			Integer id = (Integer) getAttribute(WTMP_ID);
-			if( id != null ){
-				Wtmp w = man.find(id);
-				w.logout();
+				Integer id = (Integer) getAttribute(WTMP_ID);
+				if( id != null ){
+					Wtmp w = man.find(id);
+					w.logout();
+				}
+
+				if( request != null){
+					AppUser real = getSuperPerson();
+					Wtmp w = man.create(person, real,request);
+					setCrossCookie(man, w);
+					setAttribute(WTMP_ID, w.getID());
+					setAttribute(WTMP_EXPIRY_DATE, w.getEndTime());
+				}
 			}
-			
-			if( request != null){
-				AppUser real = getSuperPerson();
-				Wtmp w = man.create(person, real,request);
-				setCrossCookie(man, w);
-				setAttribute(WTMP_ID, w.getID());
-				setAttribute(WTMP_EXPIRY_DATE, w.getEndTime());
-			}
+		} catch (DataException e) {
+			getContext().error(e,"Error setting wtmp");
+			removeAttribute(WTMP_EXPIRY_DATE);
+			removeAttribute(WTMP_ID);
 		}
-	} catch (DataException e) {
-		getContext().error(e,"Error setting wtmp");
-		removeAttribute(WTMP_EXPIRY_DATE);
-		removeAttribute(WTMP_ID);
+		// Store name as an attribute.We don't use this
+		// but it helps to identify users from the tomcat manager app.
+		setAttribute(NAME_ATTR, person.getName());
 	}
-	// Store name as an attribute.We don't use this
-	// but it helps to identify users from the tomcat manager app.
-	setAttribute(NAME_ATTR, person.getName());
 }
 
 /**
@@ -359,48 +369,59 @@ protected Integer getPersonID() {
 	}
 	try{
 		if( ! ss.isComitted() ){
-			// We can't make a session once response is committed so
-			// no point doing the lookup we can't store it.
-			// We should not need to do person lookup after the fact
-			ss.populateSession(this);
-			id = super.getPersonID();
-			if( id != null ){
-				return id;
-			}
-			String name = getCrossAppCookieName();
-			if( name != null){
-				try{
-					// look for a cross-login cookie
-					Cookie[] cookies = request.getCookies();
-					if( cookies != null){
-						for(Cookie c : cookies){
-							if( c.getName().equals(name) ){
-								String value = c.getValue();
-								WtmpManager man = getWtmpManager();
-								if( man != null ){
-									CrossCookieComposite ccs = man.getComposite(CrossCookieComposite.class);
-									if( ccs != null){
-										Wtmp w = man.find(ccs.getFilter(value),true);
-										if( w != null){
-											CurrentTimeService cts = getContext().getService(CurrentTimeService.class);
-											Date now = cts.getCurrentTime();
-											if( w.getEndTime().after(now)){
-												AppUser person = w.getPerson();
-												setCurrentPersonNoWtmp((A) person);
-												setAttribute(WTMP_ID, w.getID());
-												setAttribute(WTMP_EXPIRY_DATE, w.getEndTime());
-												return person.getID();
+			// suppress recursive lookup
+			// no current person will be found until this block ends
+			// This will allow us to check Preferences within the block
+			// only makes sense for logging/debug preferences but these are still useful
+			force_no_person=true;
+
+			try {
+				// We can't make a session once response is committed so
+				// no point doing the lookup we can't store it.
+				// We should not need to do person lookup after the fact
+				ss.populateSession(this);
+				id = super.getPersonID();
+				if( id != null ){
+					return id;
+				}
+				String name = getCrossAppCookieName();
+				if( name != null){
+					try{
+						// look for a cross-login cookie
+						Cookie[] cookies = request.getCookies();
+						if( cookies != null){
+							for(Cookie c : cookies){
+								if( c.getName().equals(name) ){
+									String value = c.getValue();
+									WtmpManager man = getWtmpManager();
+									if( man != null ){
+										CrossCookieComposite ccs = man.getComposite(CrossCookieComposite.class);
+										if( ccs != null){
+											Wtmp w = man.find(ccs.getFilter(value),true);
+											if( w != null){
+												CurrentTimeService cts = getContext().getService(CurrentTimeService.class);
+												Date now = cts.getCurrentTime();
+												if( w.getEndTime().after(now)){
+													AppUser person = w.getPerson();
+													setCurrentPersonNoWtmp((A) person);
+													setAttribute(WTMP_ID, w.getID());
+													setAttribute(WTMP_EXPIRY_DATE, w.getEndTime());
+													return person.getID();
+												}
 											}
 										}
 									}
 								}
 							}
 						}
+					}catch(Exception t){
+						getContext().error(t,"Error reading cross app cookie");
 					}
-				}catch(Exception t){
-					getContext().error(t,"Error reading cross app cookie");
 				}
+			}finally {
+				force_no_person=false;
 			}
+
 		}	
 		// At one stage we explicitly stored 0 as the personid to prevent additional lookups.
 		// This breaks the sign-up code as the newly created user is remembered as being
@@ -458,6 +479,10 @@ public PersonRelationship<A> getPersonRelationship(){
 public boolean isSU(){
 	Object super_person = getAttribute(SUPER_PERSON_ID_ATTR);
 	return super_person != null;
+}
+
+public void setUseSession(boolean use) {
+	use_session=use;
 }
 
 @Override

@@ -57,17 +57,7 @@ public class XMLPrinter extends AbstractXMLBuilder {
 
 	
 
-	public void append(XMLPrinter hb) {
-		if( hb.parent == this) {
-			hb.appendParent();
-			return;
-		}
-		if( ! hb.matched()){
-			throw new ConsistencyError("unclosed tag "+hb.getTags().peek());
-		}
-		endOpen();
-		sb.append(hb.toString());
-	}
+	
 
 	
 
@@ -130,4 +120,6 @@ public class XMLPrinter extends AbstractXMLBuilder {
 	public boolean hasContent(){
 		return sb.length() > 0;
 	}
+	
+	
 }

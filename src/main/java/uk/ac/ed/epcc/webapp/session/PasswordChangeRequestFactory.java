@@ -23,7 +23,6 @@ import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
@@ -135,7 +134,7 @@ public class PasswordChangeRequestFactory<A extends AppUser> extends AbstractReq
 		return request;
 	}
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
+	protected PasswordChangeRequestFactory<A>.PasswordChangeRequest makeBDO(Record res) throws DataFault {
 		return new PasswordChangeRequest(res);
 	}
 	

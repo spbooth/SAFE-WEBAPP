@@ -68,9 +68,9 @@ public class RangeSearch<D extends DataObject> {
 		 */
 		public InfoMapper(AppContext c) {
 			super(c);
-			addMin(fac.res.getNumberExpression(fac.getTarget(), Long.class, field_name), null);
-			addMax(fac.res.getNumberExpression(fac.getTarget(), Long.class, field_name), null);
-			addCount(fac.res.getNumberExpression(fac.getTarget(), Long.class, field_name), null);
+			addMinNumber(fac.res.getNumberExpression(fac.getTarget(), Long.class, field_name), null);
+			addMaxNumber(fac.res.getNumberExpression(fac.getTarget(), Long.class, field_name), null);
+			addSQLCount(fac.res.getNumberExpression(fac.getTarget(), Long.class, field_name), null);
 			
 		}
 

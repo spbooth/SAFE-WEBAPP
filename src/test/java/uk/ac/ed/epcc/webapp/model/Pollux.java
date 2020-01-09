@@ -74,7 +74,7 @@ public class Pollux extends DataObject implements Removable {
 		}
        
 		@Override
-		protected DataObject makeBDO(Repository.Record res) throws DataFault {
+		protected Pollux makeBDO(Repository.Record res) throws DataFault {
 			return new Pollux(res);
 		}
     	public void nuke() throws DataFault{

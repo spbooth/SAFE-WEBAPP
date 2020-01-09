@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
+import uk.ac.ed.epcc.webapp.servlet.navigation.PageNode;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -84,7 +85,7 @@ public class UserServlet<T extends AppUser> extends SessionServlet {
 			nav.resetMenu();
 		}
 		
-		returnCaller(req, res, params);
+		returnCaller(conn,req, res, params);
 		return; // Should have handled error display already
 	}
 	/**
@@ -109,7 +110,7 @@ public class UserServlet<T extends AppUser> extends SessionServlet {
 			nav.resetMenu();
 		}
 		
-		returnCaller(req, res, params);
+		returnCaller(conn,req, res, params);
 		return; // Should have handled error display already
 	}
 
@@ -119,9 +120,11 @@ public class UserServlet<T extends AppUser> extends SessionServlet {
 	 * @param params
 	 * @throws IOException
 	 */
-	protected void returnCaller(HttpServletRequest req, HttpServletResponse res, Map<String, Object> params)
+	protected void returnCaller(AppContext conn,HttpServletRequest req, HttpServletResponse res, Map<String, Object> params)
 			throws IOException {
-		String page=(String) params.get("page");
+		SessionService sess = conn.getService(SessionService.class);
+		String page=(String) sess.getAttribute(PageNode.MENU_PAGE_ATTR);
+		sess.removeAttribute(PageNode.MENU_PAGE_ATTR);
 		if( empty(page)){
 			page="/main.jsp";
 		}

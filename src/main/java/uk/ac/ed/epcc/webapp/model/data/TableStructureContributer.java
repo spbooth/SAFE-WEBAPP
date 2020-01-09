@@ -66,8 +66,8 @@ public interface TableStructureContributer<BDO extends DataObject> {
 	 */
 	Map<String, String> addTranslations(Map<String, String> translations);
 
-	/**
-	 * return a default set of field help text.
+	/** return a default set of tooltip help text for form fields.
+	 * 
 	 * This method provides a class specific set of defaults. The individual Form classes can still override this.
 	 * @param help
 	 * @return {@link Map}

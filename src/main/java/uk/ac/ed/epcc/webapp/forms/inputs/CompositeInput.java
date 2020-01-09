@@ -19,10 +19,6 @@
  */
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import java.util.Iterator;
-
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-
 /** Composite input is a potentially optional MultiInput where each of the
  * Inputs has to validate independently
  * 

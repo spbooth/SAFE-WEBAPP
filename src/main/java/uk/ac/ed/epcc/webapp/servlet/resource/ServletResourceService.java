@@ -24,6 +24,7 @@ import javax.servlet.ServletContext;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.resource.DefaultResourceService;
+import uk.ac.ed.epcc.webapp.resource.ResourceService;
 /** ResourceServlet that can also get resources from the {@link ServletContext}
  * 
  * @author spb
@@ -31,13 +32,16 @@ import uk.ac.ed.epcc.webapp.resource.DefaultResourceService;
  */
 
 
-public class ServletResourceService extends DefaultResourceService {
+public class ServletResourceService implements ResourceService{
 	
 
+	private final AppContext conn;
 	private final ServletContext ctx;
+	private final ResourceService nested;
 	public ServletResourceService(AppContext conn,ServletContext c){
-		super(conn);
+		this.conn=conn;
 		this.ctx=c;
+		this.nested=conn.getService(ResourceService.class);
 	}
 	@Override
 	public URL getResource(String name) {
@@ -54,7 +58,7 @@ public class ServletResourceService extends DefaultResourceService {
 			getContext().error(e,"Error in ServletContext.getResource");
 		}
 		//log.debug("revert to super.getResource");
-		return super.getResource(name);
+		return nested.getResource(name);
 	}
 	private String mapName(String name){
 		// ServletContext names need to be absolute
@@ -65,7 +69,7 @@ public class ServletResourceService extends DefaultResourceService {
 	}
 
 	@Override
-	public InputStream getResourceAsStream(String name) throws FileNotFoundException {
+	public InputStream getResourceAsStream(String name) throws Exception {
 		try {
 			if( ctx != null ) {
 				//Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
@@ -79,12 +83,22 @@ public class ServletResourceService extends DefaultResourceService {
 			getContext().error(e,"Error in ServletContext.getResource");
 		}
 		//log.debug("revert to super.getResourceAsStream");
-		return super.getResourceAsStream(name);
+		return nested.getResourceAsStream(name);
 	}
 
 	@Override
 	public void cleanup() {
-
+		nested.cleanup();
+	}
+	public AppContext getContext() {
+		return conn;
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.AppContextService#getType()
+	 */
+	@Override
+	public Class<? super ResourceService> getType() {
+		return ResourceService.class;
 	}
 
 }

@@ -13,10 +13,12 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.content;
 
+import uk.ac.ed.epcc.webapp.model.log.Viewable;
 
 /** Interface for objects that can add themselves to an {@link ContentBuilder}
  *   
  * @see UIProvider
+ * @see Viewable
  * @author spb
  *
  */

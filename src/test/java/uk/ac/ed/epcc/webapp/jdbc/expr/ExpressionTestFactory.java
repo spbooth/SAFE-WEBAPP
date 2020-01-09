@@ -29,7 +29,6 @@ import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.Classification;
 import uk.ac.ed.epcc.webapp.model.ClassificationFactory;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.FieldSQLExpression;
 import uk.ac.ed.epcc.webapp.model.data.FieldValue;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
@@ -146,7 +145,7 @@ public class ExpressionTestFactory extends ClassificationFactory<ExpressionTestF
 	 * @see uk.ac.ed.epcc.webapp.model.ClassificationFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
+	protected ExpressionTest makeBDO(Record res) throws DataFault {
 		return new ExpressionTest(res, this);
 	}
 
@@ -215,7 +214,7 @@ public class ExpressionTestFactory extends ClassificationFactory<ExpressionTestF
 	}
 	
 	public SQLExpression<Integer> getLocateExpression(String sub,int pos){
-		return new LocateSQLExpression(new ConstExpression(String.class, sub), res.getStringExpression(getTarget(), Classification.NAME), new ConstExpression(Integer.class, pos));
+		return new LocateSQLExpression(new ConstExpression(getTarget(),String.class, sub), res.getStringExpression(getTarget(), Classification.NAME), new ConstExpression(getTarget(),Integer.class, pos));
 	}
 	
 	public StringFieldExpression getNameSQLAccessor(){
@@ -224,6 +223,6 @@ public class ExpressionTestFactory extends ClassificationFactory<ExpressionTestF
 	}
 	
 	public SQLValue<Integer> getLocateValue(String sub,int pos){
-		return new LocateSQLValue(new ConstExpression(String.class, sub), res.getStringExpression(getTarget(), Classification.NAME), new ConstExpression(Integer.class, pos));
+		return new LocateSQLValue(new ConstExpression(getTarget(),String.class, sub), res.getStringExpression(getTarget(), Classification.NAME), new ConstExpression(getTarget(),Integer.class, pos));
 	}
 }

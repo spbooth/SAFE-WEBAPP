@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.session;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
@@ -41,6 +42,13 @@ public class AppUserUpdater<A extends AppUser> extends Updater<A> {
 
 	@Override
 	public FormResult getResult(String typeName, A dat, Form f) {
+		// This  might be a required page update
+		SessionService sess = dat.getContext().getService(SessionService.class);
+		String return_url = (String) sess.getAttribute(RequiredPage.REQUIRED_PAGE_RETURN_ATTR);
+		if( return_url != null && ! return_url.isEmpty()) {
+			sess.removeAttribute(RequiredPage.REQUIRED_PAGE_RETURN_ATTR);
+			return new RedirectResult(return_url);
+		}
 		AppUserTransitionProvider<A> provider = AppUserTransitionProvider.getInstance(getContext());
 		if( provider != null) {
 			return provider.new ViewResult(dat);

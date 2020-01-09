@@ -63,6 +63,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.transition.SimpleTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
+import uk.ac.ed.epcc.webapp.servlet.LoginServlet;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -110,6 +111,14 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		}
 	}
 
+	/** Base class for a log entry
+	 * 
+	 * @author Stephen Booth
+	 *
+	 * @param <L>
+	 * @param <F>
+	 * @param <O>
+	 */
 	public abstract static class Entry<L extends Indexed, F extends LogFactory, O extends DataObject>
 			extends DataObject implements Removable {
 		protected F item_factory;
@@ -296,11 +305,11 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		}
 
 		/**
-		 * set the ID of the date entry in the data table.
+		 * set the ID of the link item entry in the data table.
 		 * 
 		 * @param id
 		 */
-		private final void setLinkID(int id) {
+		protected final void setLinkID(int id) {
 			record.setProperty(LINK_ID, id);
 		}
 
@@ -350,7 +359,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 			try {
 				target.commit();
 			} catch (DataFault e1) {
-				throw new ActionException("Error performaing update", e1);
+				throw new ActionException("Error performing update", e1);
 			}
 			Object owner;
 			try {
@@ -362,7 +371,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 			// redirect back to parent query page
 			   return ((Viewable) owner).getViewTransition();
 			}else{
-				return new RedirectResult("/main.jsp");
+				return new RedirectResult(LoginServlet.getMainPage(target.getContext()));
 			}
 		}
 
@@ -510,7 +519,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		spec.setField(OPERATOR_ID, new ReferenceFieldType(uf.getTag()));
 		spec.setField(LINK_ID, new IntegerFieldType());
 		try {
-			spec.new Index("OwnerKey",false,OWNER_ID);
+			spec.new Index("OwnerKey",false,OWNER_ID,DATE);
 		} catch (InvalidArgument e) {
 			getLogger().error("Error making key",e);
 		}
@@ -591,7 +600,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 */
 	protected abstract ItemType<T> getStaticItemType();
 	@Override
-	protected final DataObject makeBDO(Record res) throws DataFault {
+	protected final T makeBDO(Record res) throws DataFault {
 		return getItemType().makeBDO(this, res);
 	}
 	/** purge all entries for an owner.

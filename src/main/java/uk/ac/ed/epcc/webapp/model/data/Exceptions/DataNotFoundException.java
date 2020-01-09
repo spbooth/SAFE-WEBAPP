@@ -29,6 +29,14 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 
 public class DataNotFoundException extends DataException {
 	/**
+	 * @param str
+	 * @param cause
+	 */
+	public DataNotFoundException(String str, Throwable cause) {
+		super(str, cause);
+	}
+
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;

@@ -13,7 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.preferences;
 
-import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.AbstractSetting;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** Permitted actions on Preferences.
@@ -25,7 +25,7 @@ public enum PreferenceAction {
   SET_SYSTEM_DEFAULT(){
 
 	@Override
-	public boolean allow(SessionService sess, Feature f) {
+	public boolean allow(SessionService sess, AbstractSetting f) {
 		return f != null && sess != null && sess.hasRole(SET_FEATURES_ROLE);
 	}
 
@@ -37,10 +37,10 @@ public enum PreferenceAction {
   SET_PREFERENCE(){
 
 		@Override
-		public boolean allow(SessionService sess, Feature f) {
+		public boolean allow(SessionService sess, AbstractSetting f) {
 			return f!= null && 
 					sess != null && sess.haveCurrentUser() && 
-					f instanceof Preference &&
+					f instanceof PreferenceSetting &&
 					UserSettingFactory.PER_USER_SETTINGS_FEATURE.isEnabled(sess.getContext());
 		}
 
@@ -53,9 +53,9 @@ public enum PreferenceAction {
   CLEAR_PREFERENCE(){
 
 		@Override
-		public boolean allow(SessionService sess, Feature f) {
-			return f!= null && sess != null && sess.haveCurrentUser() && f instanceof Preference &&
-					((Preference)f).hasPreference(sess.getContext()) &&
+		public boolean allow(SessionService sess, AbstractSetting f) {
+			return f!= null && sess != null && sess.haveCurrentUser() && f instanceof PreferenceSetting &&
+					((PreferenceSetting)f).hasPreference(sess.getContext()) &&
 					UserSettingFactory.PER_USER_SETTINGS_FEATURE.isEnabled(sess.getContext());
 		}
 
@@ -68,7 +68,7 @@ public enum PreferenceAction {
   LIST(){
 
 	@Override
-	public boolean allow(SessionService sess, Feature f) {
+	public boolean allow(SessionService sess, AbstractSetting f) {
 		return f == null && sess != null && sess.haveCurrentUser();
 	}
 
@@ -83,6 +83,6 @@ public enum PreferenceAction {
 	 * 
 	 */
 	public static final String SET_FEATURES_ROLE = "SetFeatures";
-public abstract boolean allow(SessionService sess, Feature f);
+public abstract boolean allow(SessionService sess, AbstractSetting f);
   public abstract String getHelp();
 }

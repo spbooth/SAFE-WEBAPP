@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.forms.factory;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 
+
 /**
  * Interface implemented by objects that generate HTML forms
  * 
@@ -27,5 +28,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 public interface FormFactory {
 
 	public AppContext getContext();
+	
+   
 
 }

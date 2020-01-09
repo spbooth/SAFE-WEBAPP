@@ -83,6 +83,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	public static final Feature NON_RANDOM_PASSWORD = new Feature("password.non-random",false,"Force randomly chosen passwords to be a series of x's (for bootstapping without email access)");
 	public static final Feature LOG_RANDOM_PASSWORD = new Feature("password.log-random",false,"Log randomly generated passwords (for bootstrapping without email access)");
 	public static final Feature NOTIFY_PASSWORD_LOCK = new Feature("password.notify-lock",true,"Notify be email if maximum password attempts are exceeded");
+	public static final Feature CHANGE_OLD_HASH = new Feature("passord.change_old_hash",true,"Force change for non enabled hash values");
 	/** config parameter name for maximum age of password.
 	 * 
 	 */
@@ -167,7 +168,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		public boolean accept(T o) {
 			Handler handler = getHandler(o);
 			Hash h = handler.getAlgorithm();
-			if( h == null){
+			if( h == null || h.equals(Hash.LOCKED)){
 				getLogger().error("No hash algorithm for"+o.getIdentifier());
 				return false;
 			}
@@ -217,6 +218,38 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			return getFactory().getTarget();
 		}
 
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getEnclosingInstance().hashCode();
+			result = prime * result + ((password == null) ? 0 : password.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			AcceptHashFilter other = (AcceptHashFilter) obj;
+			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
+				return false;
+			if (password == null) {
+				if (other.password != null)
+					return false;
+			} else if (!password.equals(other.password))
+				return false;
+			return true;
+		}
+
+		private DatabasePasswordComposite getEnclosingInstance() {
+			return DatabasePasswordComposite.this;
+		}
+
 		
 	}
 	/** Filter to select from a hashed (possibly salted) string.
@@ -232,7 +265,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
         public SQLHashFilter(AppContext conn,Hash hash,String password) throws DataFault, CannotUseSQLException{
         	this.hash=hash;
         	this.password=password;
-        	SQLExpression<String> c = new ConstExpression<String, String>(String.class, password,false);
+        	SQLExpression<String> c = new ConstExpression<String, T>(getFactory().getTarget(),String.class, password,false);
         	if( useSalt()){
         		if( DatabasePasswordComposite.SALT_FIRST_FEATURE.isEnabled(getContext())){
 					c = new ConcatSQLExpression(getRepository().getStringExpression(getTarget(),DatabasePasswordComposite.SALT),c);
@@ -395,10 +428,13 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 				 * 
 				 * 
 				 */
-				public void setPassword(String new_password) throws DataFault {
+			 public void setPassword(String new_password) throws DataFault {
+				 setPassword(Hash.getDefault(getContext()), new_password);
+			 }
+				public void setPassword(Hash h,String new_password) throws DataFault {
 					String salt="";
 					AppContext conn = getContext();
-					Hash h = Hash.getDefault(conn);
+				
 					if( h == null ){
 						throw new DataFault("bad hash algorithm");
 					}
@@ -406,7 +442,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 					boolean use_salt = res.hasField(DatabasePasswordComposite.SALT);
 
 					if( use_salt ){
-						RandomService serv = getContext().getService(RandomService.class);
+						RandomService serv = conn.getService(RandomService.class);
 						salt=serv.randomString(res.getInfo(DatabasePasswordComposite.SALT).getMax());
 						if( DatabasePasswordComposite.SALT_FIRST_FEATURE.isEnabled(conn)){
 							new_password=salt+new_password;
@@ -448,7 +484,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 								sb.append("=? , ");
 							}
 							res.getInfo(DatabasePasswordComposite.PASSWORD).addName(sb, false, false);
-							SQLExpression<String> crypt = sqlContext.hashFunction(h, new ConstExpression<String, AppUser>(String.class,new_password , false));
+							SQLExpression<String> crypt = sqlContext.hashFunction(h, new ConstExpression<>(getFactory().getTarget(),String.class,new_password , false));
 							sb.append("=");
 							crypt.add(sb, false);
 							sb.append(" WHERE ");
@@ -589,6 +625,9 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 				
 					PasswordStatus.Value v = getPasswordStatus();
 					if (v == DatabasePasswordComposite.INVALID || v == DatabasePasswordComposite.FIRST) {
+						return true;
+					}
+					if( CHANGE_OLD_HASH.isEnabled(getContext()) && getAlgorithm().isDeprecated(getContext())) {
 						return true;
 					}
 					Date last_changed = getPasswordChanged();
@@ -780,9 +819,15 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.session.PasswordAuthComposite#setPassword(uk.ac.ed.epcc.webapp.session.AppUser, java.lang.String)
 	 */
+	
 	@Override
 	public void setPassword(T user, String password) throws DataFault {
 		getHandler(user).setPassword(password);
+		
+	}
+	
+	public void setPassword(Hash h,T user, String password) throws DataFault {
+		getHandler(user).setPassword(h,password);
 		
 	}
 
@@ -857,7 +902,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	 */
 	@Override
 	public void lockPassword(T user) {
-		getHandler(user).setCryptPassword(Hash.getDefault(getContext()),"", "Locked");
+		getHandler(user).setCryptPassword(Hash.LOCKED,"", "Locked");
 	}
 
 	@Override

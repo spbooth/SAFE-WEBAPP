@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.model.far.response;
 import java.util.Date;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
@@ -100,7 +101,8 @@ public abstract class ResponseDataManager<D extends ResponseDataManager.Response
 		 protected void pre_commit(boolean dirty) throws DataFault {
 			 super.pre_commit(dirty);
 			 if(dirty){
-				 record.setOptionalProperty(MODIFIED_FIELD, new Date());
+				 CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+				 record.setOptionalProperty(MODIFIED_FIELD, time.getCurrentTime());
 				 SessionService<?> sess = getContext().getService(SessionService.class);
 				 if( sess != null && sess.haveCurrentUser()){
 					 record.setOptionalProperty(CHANGED_BY_FIELD, sess.getCurrentPerson().getID());

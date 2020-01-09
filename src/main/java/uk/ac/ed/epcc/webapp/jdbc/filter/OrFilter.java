@@ -375,6 +375,10 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		return result;
 	}
 	
+	public final int size() {
+		return sql_filters.size()+pure_accept_filters.size()+mixed_filters.size()+dual_filters.size();
+	}
+	
 	public FilterMatcher<T> getMatcher(){
 		return matcher;
 	}

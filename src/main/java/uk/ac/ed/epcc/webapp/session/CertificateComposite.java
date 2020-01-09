@@ -113,7 +113,7 @@ public class CertificateComposite extends AppUserComposite<AppUser, CertificateC
 	 * @see uk.ac.ed.epcc.webapp.model.MetaDataContributer#addMetaData(java.util.Map, uk.ac.ed.epcc.webapp.model.data.DataObject)
 	 */
 	@Override
-	public void addMetaData(Map<String, String> attributes, AppUser person) {
+	public void addMetaData(Map<String, Object> attributes, AppUser person) {
 		String dn = getPersonalCertificateDn(person);
 		if( dn != null && dn.trim().length() > 0){
 			attributes.put("Certificate",dn);

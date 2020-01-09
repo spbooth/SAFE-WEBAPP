@@ -16,11 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import java.util.LinkedHashSet;
-
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-
 /**
  * Superclass for general non-composite Inputs
  * 
@@ -44,6 +39,7 @@ public abstract class AbstractInput<V> extends BaseInput<V> {
 	 * 
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#getValue()
 	 */
+	@Override
 	public final V getValue() {
 		return value;
 	}
@@ -55,6 +51,7 @@ public abstract class AbstractInput<V> extends BaseInput<V> {
 	 * 
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#setValue(java.lang.Object)
 	 */
+	@Override
 	public final V setValue(V v) throws TypeError{
 		V old = value;
 		// in case we are called without generic checking but have a convert method.

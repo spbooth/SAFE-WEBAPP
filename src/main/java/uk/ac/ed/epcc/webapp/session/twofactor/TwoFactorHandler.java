@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session.twofactor;
 
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.SerializableFormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -95,6 +96,10 @@ public class TwoFactorHandler<A extends AppUser> {
 		// No two factor request to process
 		if( ! sess.haveCurrentUser()) {
 			sess.setCurrentPerson(user);
+			CurrentTimeService time = sess.getContext().getService(CurrentTimeService.class);
+			if( time != null) {
+				sess.setAuthenticationTime(time.getCurrentTime());
+			}
 		}
 	
 		return next_page;
@@ -122,6 +127,10 @@ public class TwoFactorHandler<A extends AppUser> {
 					A user = sess.getLoginFactory().find(requested_id);
 					logger.debug("setting user to "+user.getIdentifier());
 					sess.setCurrentPerson(user);
+					CurrentTimeService time = sess.getContext().getService(CurrentTimeService.class);
+					if( time != null) {
+						sess.setAuthenticationTime(time.getCurrentTime());
+					}
 				}
 				FormResult result = (FormResult) sess.getAttribute(AUTH_RESULT_ATTR);
 				return result;

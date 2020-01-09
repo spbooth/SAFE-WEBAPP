@@ -35,6 +35,11 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 public class ConfirmTransition<T> implements ExtraFormTransition<T>{
+	/** attribute that that can be added to an AppContext to convert ConfirmTransition
+	 * into a single action form (ie with a default action) for api use
+	 * 
+	 */
+	public static final String FORCE_CONFIRM_ATTR="TransitionForceConfirm";
 	/**
 	 * 
 	 */
@@ -54,9 +59,16 @@ public class ConfirmTransition<T> implements ExtraFormTransition<T>{
 	@Override
 	public void buildForm(Form f, T target, AppContext c)
 			throws TransitionException {
-		f.addAction(YES, new ChainAction<>(target,c,yes_transition));
-		f.addAction(NO, new ChainAction<>(target,c,no_transition));
+		Object force = c.getAttribute(FORCE_CONFIRM_ATTR);
+		boolean show_no=true;
+		if( force != null && force instanceof Boolean && ((Boolean)force).booleanValue()) {
+			show_no=false;
+		}
 		
+		f.addAction(YES, new ChainAction<>(target,c,yes_transition));
+		if( show_no) {
+			f.addAction(NO, new ChainAction<>(target,c,no_transition));
+		}
 		
 	}
 	@Override

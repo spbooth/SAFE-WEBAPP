@@ -42,6 +42,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdate;
+import uk.ac.ed.epcc.webapp.forms.inputs.CanSubmitVisistor;
 import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
@@ -208,6 +209,38 @@ AnonymisingFactory
 		public String toString() {
 			return "RoleFilter("+role+")";
 		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getEnclosingInstance().hashCode();
+			result = prime * result + ((role == null) ? 0 : role.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			RoleFilter other = (RoleFilter) obj;
+			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
+				return false;
+			if (role == null) {
+				if (other.role != null)
+					return false;
+			} else if (!role.equals(other.role))
+				return false;
+			return true;
+		}
+
+		private AppUserFactory getEnclosingInstance() {
+			return AppUserFactory.this;
+		}
 	
     }
    
@@ -224,7 +257,11 @@ AnonymisingFactory
 		if( finder == null ){
 			return null;
 		}
+		try {
 		return find(finder.getStringFinderFilter(getTarget(), email),allow_null);
+		}catch(DataNotFoundException e) {
+			throw new DataNotFoundException("No AppUser found with email "+email,e);
+		}
 	}
 	
 
@@ -371,15 +408,20 @@ AnonymisingFactory
 				
 				SessionService service = user.getContext().getService(SessionService.class);
 				u.buildUpdateForm("Person", f, user,service);
-				f.removeField(EmailNameFinder.EMAIL); // This should be locked and un-editable
 				if( ! service.hasRole(SessionService.ADMIN_ROLE)){
 					f.removeField(ALLOW_EMAIL_FIELD);
+				}
+				if( ! CanSubmitVisistor.canSubmit(f)) {
+					// As a safety check don't force a form that can't
+					// be submitted
+					getLogger().warn("User details form cannot be submitted for "+user.getIdentifier());
+					return false;
 				}
 				if( ! f.validate()){
 					return true;
 				}
 			} catch (Exception e) {
-				getContext().error(e,"Error checking for person update");
+				getLogger().error("Error checking for person update",e);
 			}
 
 			if( res.hasField(AppUser.UPDATED_TIME)){
@@ -714,9 +756,9 @@ AnonymisingFactory
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
+	protected AU makeBDO(Record res) throws DataFault {
 		
-		return new AppUser(this,res);
+		return (AU) new AppUser(this,res);
 	}
 
 
@@ -991,24 +1033,28 @@ AnonymisingFactory
 		Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
 		SessionService sess =  getContext().getService(SessionService.class);
 		AppUser currentPerson = sess == null ? null : sess.getCurrentPerson();
-		for(AU p : new FilterSet(new PrimaryOrderFilter<>(getTarget(),res, false))){
-			
-			
-			if(currentPerson == null || ! currentPerson.equals(p)){
-				log.debug("Anonymise "+p.getIdentifier()+" "+p.getID());
-				for(AnonymisingComposite anon : getComposites(AnonymisingComposite.class)){
-					anon.anonymise(p);
+		try(FilterSet set = new FilterSet(new PrimaryOrderFilter<>(getTarget(),res, false))){
+			for(AU p : set){
+
+
+				if(currentPerson == null || ! currentPerson.equals(p)){
+					log.debug("Anonymise "+p.getIdentifier()+" "+p.getID());
+					for(AnonymisingComposite anon : getComposites(AnonymisingComposite.class)){
+						anon.anonymise(p);
+					}
+				}else{
+					// for debugging current user just has password reset
+					PasswordAuthComposite<AU> comp = getComposite(PasswordAuthComposite.class);
+					if( comp != null) {
+						comp.setPassword(p,"Password");
+					}
 				}
-			}else{
-				// for debugging current user just has password reset
-				PasswordAuthComposite<AU> comp = getComposite(PasswordAuthComposite.class);
-				if( comp != null) {
-					comp.setPassword(p,"Password");
-				}
+				p.commit();
 			}
-			p.commit();
+		}catch(Exception e) {
+			log.error("Error anonymising person",e);
 		}
-		
+
 	}
 	private ActionList<AU> getEraseListeners(){
 		return new ActionList<>(this, "EraseActions");
@@ -1041,6 +1087,7 @@ AnonymisingFactory
 				PersonHistoryFactory<AU> fac = new PersonHistoryFactory<>(this);
 				fac.wipe(p, fields);
 				fac.update(p);
+				fac.terminate(p);
 			} catch (Exception e) {
 				conn.error(e, "Error updating PersonHistory");
 				return;
@@ -1048,7 +1095,5 @@ AnonymisingFactory
 		}
 		
 	}
-	public SQLFilter<AU> getEraseCandidates(){
-		return new GenericBinaryFilter<>(getTarget(), true);
-	}
+	
 }

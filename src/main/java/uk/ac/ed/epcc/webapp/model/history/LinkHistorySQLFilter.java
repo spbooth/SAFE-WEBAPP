@@ -66,7 +66,7 @@ public class LinkHistorySQLFilter<L extends Indexed, R extends Indexed,
 				addFilter(new ReferenceFilter<>(this.linkHistoryManager,left_field,left));
 			}else{
 				// join with parent
-				addFilter(((DataObjectFactory<H>)linkHistoryManager).new RemoteFilter<>(linkHistoryManager.getLinkManager(),
+				addFilter(((DataObjectFactory<H>)linkHistoryManager).getRemoteSQLFilter(linkHistoryManager.getLinkManager(),
 						linkHistoryManager.getPeerName(),
 						new ReferenceFilter<>(linkHistoryManager.getLinkManager(), left_field,left)));
 			}
@@ -75,7 +75,7 @@ public class LinkHistorySQLFilter<L extends Indexed, R extends Indexed,
 				addFilter(new ReferenceFilter<>(this.linkHistoryManager,right_field,right));
 			}else{
 				// join with parent 
-				addFilter(((DataObjectFactory<H>)linkHistoryManager).new RemoteFilter<>(linkHistoryManager.getLinkManager(),
+				addFilter(((DataObjectFactory<H>)linkHistoryManager).getRemoteSQLFilter(linkHistoryManager.getLinkManager(),
 						linkHistoryManager.getPeerName(),
 						new ReferenceFilter<>(linkHistoryManager.getLinkManager(), right_field,right)));
 			}

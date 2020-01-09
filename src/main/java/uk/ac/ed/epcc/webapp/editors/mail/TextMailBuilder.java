@@ -16,6 +16,9 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.editors.mail;
 
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.mail.MessagingException;
@@ -28,6 +31,7 @@ import javax.mail.MessagingException;
 
 
 public class TextMailBuilder {
+	private Set<String> refs = new LinkedHashSet<String>();
 	protected StringBuilder text;  // current text part
 	protected String separator=null;
 	
@@ -51,7 +55,7 @@ public class TextMailBuilder {
 		if( prefix.length()==0){
 			text.append(s);
 		}else{
-			StringTokenizer st = new StringTokenizer(s,"\n",true);
+			StringTokenizer st = new StringTokenizer(s.replaceAll("\\R", "\n"),"\n",true);
 			while(st.hasMoreElements()){
 				if( at_start ){
 					doPrefix();
@@ -104,6 +108,20 @@ public class TextMailBuilder {
 		text.append(prefix);
 	}
 
-	
+	/** A a message-id referenced by this email
+	 * 
+	 * @param msg_id
+	 */
+	public void addReference(String msg_id) {
+		if( msg_id == null || msg_id.isEmpty()) {
+			return;
+		}
+		for(String s : msg_id.split("\\s+")) {
+			refs.add(s);
+		}
+	}
 
+	public Set<String> getReferences(){
+		return refs;
+	}
 }

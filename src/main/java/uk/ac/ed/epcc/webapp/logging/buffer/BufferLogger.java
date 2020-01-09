@@ -56,6 +56,7 @@ public class BufferLogger implements Logger {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.logging.Logger#debug(java.lang.Object)
 	 */
+	@Override
 	public void debug(Object message) {
 		nested.debug(message);
 		doLog(message, null);
@@ -65,6 +66,7 @@ public class BufferLogger implements Logger {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.logging.Logger#debug(java.lang.Object, java.lang.Throwable)
 	 */
+	@Override
 	public void debug(Object message, Throwable t) {
 		nested.debug(message,t);
 		doLog(message, t);
@@ -73,6 +75,7 @@ public class BufferLogger implements Logger {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.logging.Logger#error(java.lang.Object)
 	 */
+	@Override
 	public void error(Object message) {
 		nested.error(message);
 		doLog(message, null);
@@ -81,6 +84,7 @@ public class BufferLogger implements Logger {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.logging.Logger#error(java.lang.Object, java.lang.Throwable)
 	 */
+	@Override
 	public void error(Object message, Throwable t) {
 		nested.error(message,t);
 		doLog(message, t);
@@ -90,6 +94,7 @@ public class BufferLogger implements Logger {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.logging.Logger#fatal(java.lang.Object)
 	 */
+	@Override
 	public void fatal(Object message) {
 		nested.fatal(message);
 		doLog(message, null);
@@ -99,6 +104,7 @@ public class BufferLogger implements Logger {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.logging.Logger#fatal(java.lang.Object, java.lang.Throwable)
 	 */
+	@Override
 	public void fatal(Object message, Throwable t) {
 		nested.fatal(message, t);
 		doLog(message, t);
@@ -107,6 +113,7 @@ public class BufferLogger implements Logger {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.logging.Logger#info(java.lang.Object)
 	 */
+	@Override
 	public void info(Object message) {
 		nested.info(message);
 		doLog(message, null);
@@ -116,6 +123,7 @@ public class BufferLogger implements Logger {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.logging.Logger#info(java.lang.Object, java.lang.Throwable)
 	 */
+	@Override
 	public void info(Object message, Throwable t) {
 		nested.info(message, t);
 		doLog(message, t);
@@ -125,6 +133,7 @@ public class BufferLogger implements Logger {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.logging.Logger#warn(java.lang.Object)
 	 */
+	@Override
 	public void warn(Object message) {
 		nested.warn(message);
 		doLog(message, null);
@@ -134,6 +143,7 @@ public class BufferLogger implements Logger {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.logging.Logger#warn(java.lang.Object, java.lang.Throwable)
 	 */
+	@Override
 	public void warn(Object message, Throwable t) {
 		nested.warn(message, t);
 		doLog(message, t);

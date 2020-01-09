@@ -436,7 +436,10 @@ public final AppContext getContext(){
 		}
 		return addTranslations(getContext(),translations,factory.res);
 	}
-	
+	/** create additional tooltip help text for form fields.
+	 * 
+	 * @return
+	 */
 	protected  Map<String,String> getFieldHelp() {
 		Map<String, String> help = factory.getFieldHelp();
 		if( help == null){

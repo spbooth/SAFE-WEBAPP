@@ -140,6 +140,7 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 		return 0;
 	}
 
+	@Override
 	public String getFormatHint() {
 		//With html5 enabled this shows as a placeholder so if the browser overrides
 		// format to show a date picker this is hidden.
@@ -170,6 +171,7 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input#getType()
 	 */
+	@Override
 	public String getType() {
 		return "date";
 	}

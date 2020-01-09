@@ -14,20 +14,10 @@
 package uk.ac.ed.epcc.webapp.preferences;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Feature;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.jdbc.table.FieldType;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
-import uk.ac.ed.epcc.webapp.session.AppUser;
-import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A class to hold user {@link Preference} settings.
  * @author spb
@@ -35,12 +25,9 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 
-public class UserSettingFactory<S extends UserSettingFactory.UserSetting> extends DataObjectFactory<S> {
-	public static final Feature PER_USER_SETTINGS_FEATURE = new Feature("user.preferences",true,"Allow per user preferences");
-	public static final String PERSON_FIELD="PersonID";
-	public static final String SETTING_FIELD="Setting";
-	public static final String VALUE_FIELD="Value";
-	public static class UserSetting extends DataObject{
+public class UserSettingFactory<S extends UserSettingFactory.UserSetting> extends AbstractUserSettingFactory<Boolean, Boolean, S> {
+
+	public static class UserSetting extends AbstractUserSettingFactory.UserSetting<Boolean>{
 
 		/**
 		 * @param r
@@ -49,104 +36,38 @@ public class UserSettingFactory<S extends UserSettingFactory.UserSetting> extend
 			super(r);
 		}
 		
-		public void setName(String name){
-			record.setProperty(SETTING_FIELD, name);
-		}
-		public void setPerson(AppUser u){
-			record.setProperty(PERSON_FIELD, u.getID());
-		}
-		public void setValue(boolean val){
-			record.setProperty(VALUE_FIELD, val);
-		}
-		public boolean getValue(){
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.preferences.AbstractUserSettingFactory.UserSetting#getValue(uk.ac.ed.epcc.webapp.preferences.PreferenceSetting)
+		 */
+		@Override
+		public Boolean getValue(PreferenceSetting<Boolean> pref) {
 			return record.getBooleanProperty(VALUE_FIELD);
 		}
 	}
 
-	public boolean getPreference(Preference pref){
-		S setting = makeSetting(pref,false);
-		if( setting == null ){
-			return pref.defaultSetting(getContext());
-		}
-		return setting.getValue();
-	}
-	public boolean hasPreference(Preference pref){
-		S setting = makeSetting(pref,false);
-		if( setting == null ){
-			return false;
-		}
-		return true;
-	}
-	
-	public void clearPreference(Preference pref) throws DataFault{
-		S setting = makeSetting(pref,false);
-		if( setting != null){
-			setting.delete();
-		}
-	}
-	public void setPreference(Preference pref, boolean value){
-		S setting = makeSetting(pref,true);
-
-		setting.setValue(value);
-		try {
-			setting.commit();
-		} catch (DataFault e) {
-			getContext().error(e,"Error setting value");
-		}
-
-	}
-	
-	
-	public S makeSetting(Preference pref,boolean create){
-		SessionService serv = getContext().getService(SessionService.class);
-		if( serv == null || ! serv.haveCurrentUser() || ! PER_USER_SETTINGS_FEATURE.isEnabled(getContext())){
-			return null;
-		}
-		SQLAndFilter<S> fil = new SQLAndFilter<>(getTarget());
-		fil.addFilter(new SQLValueFilter<>(getTarget(),res, SETTING_FIELD, pref.getName()));
-		fil.addFilter(new SQLValueFilter<>(getTarget(),res, PERSON_FIELD, serv.getCurrentPerson().getID()));
-		try {
-			S result = find(fil,true);
-			if( result == null ){
-				if( create ){
-					result = makeBDO();
-					result.setName(pref.getName());
-					result.setPerson(serv.getCurrentPerson());
-					result.setValue(pref.defaultSetting(getContext()));
-					result.commit();
-				}
-			}
-			return result;
-		} catch (DataException e) {
-			getContext().error(e,"Error getting setting");
-		}
-		return null;
-	}
 	
 	public UserSettingFactory(AppContext conn){
-		setContext(conn, "UserSettings");
+		super(conn, "UserSettings");
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
-		return new UserSetting(res);
+	protected S makeBDO(Record res) throws DataFault {
+		return (S) new UserSetting(res);
 	}
 
 	@Override
 	public Class<S> getTarget() {
 		return (Class) UserSetting.class;
 	}
-
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.preferences.AbstractUserSettingFactory#getFieldType()
+	 */
 	@Override
-	protected TableSpecification getDefaultTableSpecification(AppContext c,
-			String table) {
-		TableSpecification spec = new TableSpecification("SettingID");
-		spec.setField(PERSON_FIELD, new IntegerFieldType());
-		spec.setField(SETTING_FIELD, new StringFieldType(false, "", 128));
-		spec.setField(VALUE_FIELD, new BooleanFieldType(false,false));
-		return spec;
+	protected FieldType<Boolean> getFieldType() {
+		return new BooleanFieldType(false,false);
 	}
 
 	

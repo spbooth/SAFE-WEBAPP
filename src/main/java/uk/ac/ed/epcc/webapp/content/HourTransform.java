@@ -17,7 +17,19 @@
 package uk.ac.ed.epcc.webapp.content;
 
 import uk.ac.ed.epcc.webapp.model.data.Duration;
-
+/** A {@link NumberTransform} that format a second-count into a
+ * H:MM:SS format.
+ * 
+ * If the input is a {@link Duration} then the second value will be taken
+ * (even though the default numerical value of a {@link Duration} is millisecond. However as it is easy to
+ * lose the duration nature of a value (for example by taking averages) it is better to use a {@link MillisToHourTransform}
+ * for {@link Duration} values.
+ * 
+ * 
+ * @author Stephen Booth
+ * @See {@link MillisToHourTransform}
+ *
+ */
 public class HourTransform implements NumberTransform{
 	private String default_value="0:00:00";
 	

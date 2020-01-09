@@ -46,6 +46,7 @@ public class SimplePeriodInput extends MultiInput<Period, TimeStampMultiInput> {
 		addInput("end", " Until ",end);
 		setLineBreaks(true);
 	}
+	@Override
 	public Period convert(Object v) throws TypeError {
 		if( v == null || v instanceof Period){
 			return ((Period)v);

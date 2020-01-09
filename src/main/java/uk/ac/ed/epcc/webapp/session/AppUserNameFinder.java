@@ -19,6 +19,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.ParseFactory;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
+import uk.ac.ed.epcc.webapp.model.data.DataCache;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 
 /** An {@link Composite} that implements the {@link NameFinder} logic for an {@link AppUserFactory}.
@@ -31,8 +32,8 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
  * to have it query an external directory and lazily create database records. 
  * 
  * @author spb
- * @param <AU> 
- * @param <X> 
+ * @param <AU> type of {@link AppUser}
+ * @param <X> registration type
  *
  */
 
@@ -149,4 +150,13 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 		return (Class<? super X>) getClass();
 	}
 	
+	public DataCache<String,AU> getDataCache(){
+		return new DataCache<String, AU>() {
+
+			@Override
+			protected AU find(String key) throws DataException {
+				return findFromString(key);
+			}
+		};
+	}
 }

@@ -25,18 +25,23 @@ import uk.ac.ed.epcc.webapp.forms.Form;
  * @see Control
  */
 public class Label<I> implements UIGenerator{
-	public Label(AppContext conn,Field<I> field) {
+	public Label(AppContext conn, Field<I> field) {
+		this(conn,field,null);
+	}
+	public Label(AppContext conn,Field<I> field, Object item) {
 		this.conn=conn;
 		this.field = field;
+		this.radio_selector=item;
 	}
 	public final Field<I> field;
 	public final AppContext conn;
+	public final Object radio_selector;
 	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.UIGenerator#addContent(uk.ac.ed.epcc.webapp.content.ContentBuilder)
 	 */
 	public ContentBuilder addContent(ContentBuilder builder) {
-		builder.addFormLabel(conn, field);
+		builder.addFormLabel(conn, field,radio_selector);
 		return builder;
 	}
 }

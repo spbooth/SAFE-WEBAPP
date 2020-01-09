@@ -124,6 +124,10 @@ public  class TransitionServlet<K,T> extends WebappServlet {
  	public void doPost(HttpServletRequest req, HttpServletResponse res,
 			AppContext conn) {
 		try{
+			if( ! enabled(conn)) {
+				res.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
+				return;
+			}
 		// first find the transition provider
 		ServletService servlet_service = conn.getService(ServletService.class);
 		TimerService timer_service = conn.getService(TimerService.class);
@@ -145,7 +149,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
         }
         log.debug("provider is "+tp.getClass().getCanonicalName());
         req.setAttribute(TRANSITION_PROVIDER_ATTR, tp);
-        SessionService<?> sess = getSessionService(conn,params);
+        SessionService<?> sess = getSessionService(conn,tp,params);
         if( ! (tp instanceof AnonymousTransitionFactory) && ( sess == null || ! sess.haveCurrentUser())){
         	sessionError(conn,sess,req, res);
         	return;
@@ -434,12 +438,14 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		}
 		return null;
 	}
-	/** Extension point to get the session including any custom login code based on the parameters.
-	 * This allows sub-classes to that parse the parameters for login credentials
+	/** Extension point to get the session including any custom login code based on the parameters and the {@link TransitionFactory}
+	 * This allows sub-classes to that parse the parameters for login credentials or look for annotations on the {@link TransitionFactory}.
 	 * @param conn
+	 * @param tp
+	 * @param raw_params
 	 * @return
 	 */
-	protected SessionService getSessionService(AppContext conn, Map<String,Object> raw_params) {
+	protected SessionService getSessionService(AppContext conn, TransitionFactory<K,T> tp,Map<String,Object> raw_params) {
 		return conn.getService(SessionService.class);
 	}
 	
@@ -915,6 +921,14 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 //		logger.debug("origin is "+origin);
 //		String referer = req.getHeader("Referer");
 //		logger.debug("referer is "+referer);
+		return true;
+	}
+	
+	/** Extension point to allow sub-classes to enable/disable the servlet
+	 * 
+	 * @return
+	 */
+	protected boolean enabled(AppContext conn) {
 		return true;
 	}
 }

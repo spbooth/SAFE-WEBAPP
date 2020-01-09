@@ -41,7 +41,7 @@ public class DurationDataObjectFactory extends DataObjectFactory<DurationDataObj
 	}
 
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
+	protected DurationObject makeBDO(Record res) throws DataFault {
 		return new DurationObject(res);
 	}
 

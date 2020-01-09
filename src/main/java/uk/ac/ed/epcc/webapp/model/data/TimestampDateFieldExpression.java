@@ -39,12 +39,12 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 
 public class TimestampDateFieldExpression<T extends DataObject> extends FieldExpression<Date,T> implements DateSQLExpression,FilterProvider<T,Date>{
     private final long res;
-    private final NumberFieldExpression<Integer, T> num_field;
+    private final NumberFieldExpression<Long, T> num_field;
     private final DateSQLExpression date_expr;
 	protected TimestampDateFieldExpression(Class<T> target,Repository rep,String field) {
 		super(target,rep, Date.class,field);
 		this.res=rep.getResolution();
-		num_field=rep.getNumberExpression(target,Integer.class, field);
+		num_field=rep.getNumberExpression(target,Long.class, field);
 		date_expr = rep.getSQLContext().convertToDate(num_field, res);
 	}
 	@Override

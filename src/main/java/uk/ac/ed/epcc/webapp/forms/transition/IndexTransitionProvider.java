@@ -14,8 +14,8 @@
 package uk.ac.ed.epcc.webapp.forms.transition;
 
 
-/** TransitionProvider that can generate a default indexing transition
- * i.e. a {@link TargetLessTransition} for selecting a target or a navigation transition
+/** TransitionProvider that can generate a default {@link TargetLessTransition} indexing transition
+ * e.g.. a indexing transition for selecting a target or a navigation transition
  * to an index page.
  * 
  * @author spb

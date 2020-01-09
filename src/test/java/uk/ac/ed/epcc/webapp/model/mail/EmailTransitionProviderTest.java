@@ -173,12 +173,45 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		takeBaseline();
 		setTransition(prov,EditAction.Edit,target);
 		checkFormContent("/normalize.xsl","edit_text_form.xml");
-		addParam("text","Look a \u00f6 character");
+		String text = "Look a \u00f6 character";
+		addParam("text",text);
 		runTransition();
 		target = new MailTarget(fac.getHandler(1,user));
 		checkViewRedirect(prov,target);
 		target = (MailTarget) checkViewContent("/normalize.xsl","view_unicode_text.xml");
 		checkDiff("/cleanup.xsl","edit_text.xml");
+		MimeMessage m = target.getHandler().getMessageProvider().getMessage();
+		assertEquals(text, m.getContent());
+		m.writeTo(System.out);
+	}
+	
+	@Test
+	@DataBaseFixtures({"new_compose.xml","subject_edit.xml","add_recipient.xml"})
+	public void editMisBrokenText() throws Exception{
+		SessionService user  = setupPerson();
+		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
+		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
+		MessageHandler hand = fac.getHandler(1,user);
+		LinkedList<String> path = new LinkedList<>();
+		//path.add("0");
+		path.add("T");
+		MailTarget target = new MailTarget(hand,0,path);
+		takeBaseline();
+		setTransition(prov,EditAction.Edit,target);
+		checkFormContent("/normalize.xsl","edit_text_form.xml");
+		addParam("text","Look a strange \r\nline break and unicode \u00f6");
+		runTransition();
+		target = new MailTarget(fac.getHandler(1,user));
+		checkViewRedirect(prov,target);
+		target = (MailTarget) checkViewContent("/normalize.xsl","view_broken_text.xml");
+		checkDiff("/cleanup.xsl","edit_broken_text.xml");
+		MimeMessage m = target.getHandler().getMessageProvider().getMessage();
+		// expect normalised line breaks and trailing space removal
+		// but storage will remap to local system default
+		// so this only checks spaces are gone
+		String content = (String) m.getContent();
+		assertEquals("Look a strange\nline break and unicode \u00f6",content.replaceAll("\\R", "\n"));
+		m.writeTo(System.out);
 	}
 	@Test
 	@DataBaseFixtures({"new_compose.xml","subject_edit.xml","add_recipient.xml","edit_text.xml"})

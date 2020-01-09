@@ -46,7 +46,7 @@ public class NumberFactory extends DataObjectFactory<NumberFactory.NumberObject>
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
+	protected NumberObject makeBDO(Record res) throws DataFault {
 		return new NumberObject(res);
 	}
 	

@@ -78,6 +78,9 @@ public class RelationshipTableCreator extends AbstractContexed implements FormCr
 			    if( ! DataObjectFactory.AUTO_CREATE_TABLES_FEATURE.isEnabled(conn)){
 			    	// make a relationship table if class won't auto create
 			    	Relationship.makeTable(conn,table_name, peer_table);
+			    }else {
+			    	// Need reference tag for constructor to work
+			    	serv.setProperty(Relationship.getReferenceProp(table_name), peer_table);
 			    }
 			    	
 				return new TableListResult();

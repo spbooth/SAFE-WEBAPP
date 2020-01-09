@@ -146,23 +146,26 @@ public class LandingPageAppUserTransitionProvider<AU extends AppUser> extends Ap
 
 	@Override
 	public <X extends ContentBuilder> X getTopContent(X cb, AU target, SessionService<?> sess) {
-		SUNodeMaker maker = new SUNodeMaker(getContext());
-		Node top = new ParentNode();
-		top.setID("Person");
-		NavigationMenuService nav = getContext().getService(NavigationMenuService.class);
-		nav.addChildren(new HashSet<String>(), "Person", nav.getProperties(), maker, top);
-	
-		// Add sub-menus
-		for(Node n : top.getChildren()) {
-			if( ! n.isEmpty()) {
-				String targetPath = n.getTargetPath(getContext());
-				if( targetPath != null) {
-					ContentBuilder item = cb.getPanel("bar");
-					ContentBuilder header = item.getHeading(2);
-					header.addText(n.getHelpText());
-					header.addButton(getContext(), n.getMenuText(getContext()),new RedirectResult(targetPath));
-					header.addParent();
-					item.addParent();
+		if( ((SessionService<AU>)sess).isCurrentPerson(target)) {
+			// Only decorate page if viewing yourself
+			SUNodeMaker maker = new SUNodeMaker(getContext());
+			Node top = new ParentNode();
+			top.setID("Person");
+			NavigationMenuService nav = getContext().getService(NavigationMenuService.class);
+			nav.addChildren(new HashSet<String>(), "Person", nav.getProperties(), maker, top);
+
+			// Add sub-menus
+			for(Node n : top.getChildren()) {
+				if( ! n.isEmpty()) {
+					String targetPath = n.getTargetPath(getContext());
+					if( targetPath != null) {
+						ContentBuilder item = cb.getPanel("bar");
+						ContentBuilder header = item.getHeading(2);
+						header.addText(n.getHelpText());
+						header.addButton(getContext(), n.getMenuText(getContext()),new RedirectResult(targetPath));
+						header.addParent();
+						item.addParent();
+					}
 				}
 			}
 		}

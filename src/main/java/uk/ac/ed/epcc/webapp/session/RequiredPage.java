@@ -34,6 +34,11 @@ import uk.ac.ed.epcc.webapp.servlet.ServletFormResultVisitor;
  *
  */
 public interface RequiredPage<U extends AppUser> {
+	
+	public static final String AM_REQUIRED_PAGE_ATTR="AmRequiredPage";
+	
+	public static final String REQUIRED_PAGES_ATTR="RequiredPages";
+	public static final String REQUIRED_PAGE_RETURN_ATTR="RequiredPageReturn";
     public boolean required(SessionService<U> user);
     public FormResult getPage(SessionService<U> user);
 }

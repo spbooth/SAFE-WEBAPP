@@ -18,18 +18,24 @@ import java.awt.Font;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.StandardChartTheme;
 
+import uk.ac.ed.epcc.webapp.AppContext;
+
 /**
  * @author spb
  *
  */
 public class JFreeSetup {
 
-	public static void setup(){
+	public static void setup(AppContext conn){
 		StandardChartTheme theme = new StandardChartTheme("webapp");
-		theme.setSmallFont(new Font("Arial", Font.PLAIN, 10));
-		theme.setRegularFont(new Font("Arial", Font.PLAIN, 12));
-		theme.setLargeFont(new Font("Arial", Font.PLAIN, 14));
-		theme.setExtraLargeFont(new Font("Arial", Font.PLAIN, 20));
+		String font_family = "Arial";
+		if( conn != null ) {
+			font_family = conn.getInitParameter("webapp.jfreechart.font_family", font_family);
+		}
+		theme.setSmallFont(new Font(font_family, Font.PLAIN, 10));
+		theme.setRegularFont(new Font(font_family, Font.PLAIN, 12));
+		theme.setLargeFont(new Font(font_family, Font.PLAIN, 14));
+		theme.setExtraLargeFont(new Font(font_family, Font.PLAIN, 20));
 		
 		ChartFactory.setChartTheme(theme);
 	}

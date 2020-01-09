@@ -18,7 +18,7 @@ import java.util.Date;
 
 
 /**
- * Format numerical cells of a Table using a DateFormat.
+ * Format Date cells of a Table using a DateFormat.
  * 
  * @author spb
  * 

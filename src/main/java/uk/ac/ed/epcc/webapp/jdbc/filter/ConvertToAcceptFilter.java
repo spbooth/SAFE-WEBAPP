@@ -52,5 +52,34 @@ public class ConvertToAcceptFilter<T> implements AcceptFilter<T> {
 	public boolean accept(T o) {
 		return matcher.matches(inner, o);
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((inner == null) ? 0 : inner.hashCode());
+		result = prime * result + ((matcher == null) ? 0 : matcher.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ConvertToAcceptFilter other = (ConvertToAcceptFilter) obj;
+		if (inner == null) {
+			if (other.inner != null)
+				return false;
+		} else if (!inner.equals(other.inner))
+			return false;
+		if (matcher == null) {
+			if (other.matcher != null)
+				return false;
+		} else if (!matcher.equals(other.matcher))
+			return false;
+		return true;
+	}
 	
 }

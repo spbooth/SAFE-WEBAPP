@@ -14,7 +14,6 @@
 package uk.ac.ed.epcc.webapp.junit4;
 
 import java.io.InputStream;
-import java.util.Enumeration;
 import java.util.Properties;
 
 import org.junit.rules.ExternalResource;
@@ -32,6 +31,7 @@ import uk.ac.ed.epcc.webapp.jdbc.wrap.CheckCloseDatabaseService;
 import uk.ac.ed.epcc.webapp.logging.debug.DebugLoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintLoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.datastore.DataStoreResourceService;
 import uk.ac.ed.epcc.webapp.servlet.ErrorFilter;
 import uk.ac.ed.epcc.webapp.session.SimpleSessionService;
 import uk.ac.ed.epcc.webapp.timer.DefaultTimerService;
@@ -44,6 +44,10 @@ import uk.ac.ed.epcc.webapp.timer.DefaultTimerService;
  */
 public class AppContextFixtureRule extends ExternalResource{
 
+	/**
+	 * 
+	 */
+	private static final String TEST_PROPERTIES_DEFAULT = "test.properties";
 	ContextHolder holder;
 	public AppContextFixtureRule(ContextHolder h){
 		this.holder=h;
@@ -60,9 +64,9 @@ public class AppContextFixtureRule extends ExternalResource{
 		ctx=null;
 	}
 
-	protected void before(String global_fixtures[],String fixtures[]) throws Throwable {
+	protected void before(String test_properties,String global_fixtures[],String fixtures[]) throws Throwable {
 		ClassLoader cl = this.getClass().getClassLoader();
-		InputStream service_props_stream = cl.getResourceAsStream("test.properties");
+		InputStream service_props_stream = cl.getResourceAsStream(test_properties);
 		Properties overrides = new Properties();
 		if( service_props_stream != null ){
 			overrides.load(service_props_stream);
@@ -79,7 +83,7 @@ public class AppContextFixtureRule extends ExternalResource{
 				if( name.startsWith("db_") ){
 					Object value = sys_properties.get(name);
 					if( overrides.containsKey(name) && value != null && value.toString().trim().length() > 0){
-						System.out.println("property override "+name+"->"+value);
+						//System.out.println("property override "+name+"->"+value);
 						overrides.put(name, value);
 					}
 				}
@@ -91,7 +95,7 @@ public class AppContextFixtureRule extends ExternalResource{
 			for(String prop : new String[]{DefaultConfigService.CONFIG_PATH_PROP_NAME,DefaultConfigService.DEFAULT_PATH_PROP_NAME,DefaultConfigService.DEPLOY_PATH_PROP_NAME,"testing"}){
 				String value = overrides.getProperty(prop);
 				if( value != null ){
-					System.out.println("property override "+prop+"->"+value);
+					//System.out.println("property override "+prop+"->"+value);
 					sys_properties.setProperty(prop,value);
 				}
 			}
@@ -101,7 +105,7 @@ public class AppContextFixtureRule extends ExternalResource{
 //				System.out.println("Prop "+name+"="+overrides.getProperty(name));
 //			}
 		}else {
-			throw new DataFault("test.properties not found");
+			throw new DataFault(test_properties+" not found");
 		}
 		for(String fix : global_fixtures){
 			InputStream stream = holder.getClass().getResourceAsStream(fix);
@@ -132,7 +136,7 @@ public class AppContextFixtureRule extends ExternalResource{
 		//props only in test.properties will be visible from the service props but
 		// we also want to override any values in the normal config
 		ctx.setService( new OverrideConfigService(overrides,ctx));
-		
+		ctx.setService(new DataStoreResourceService(ctx));
 		// get config service configured first before wrapping database and logger
 		ctx.setService(new CheckCloseDatabaseService(ctx.getService(DatabaseService.class)));
 		ctx.setService(new DebugLoggerService(ctx));
@@ -145,6 +149,12 @@ public class AppContextFixtureRule extends ExternalResource{
 		return statement(base,description);
 	}
 	private Statement statement(final Statement base,final Description d) {
+		String test_properties = TEST_PROPERTIES_DEFAULT;
+		TestProperties tprop = holder.getClass().getAnnotation(TestProperties.class);
+		if( tprop != null) {
+			test_properties=tprop.value();
+		}
+		final String final_test_properties = test_properties;
 		ConfigFixtures gfix = holder.getClass().getAnnotation(ConfigFixtures.class);
 		final String global_fixtures[];
 		if( gfix == null ){
@@ -164,7 +174,7 @@ public class AppContextFixtureRule extends ExternalResource{
 			
 			@Override
 			public void evaluate() throws Throwable {
-				before(global_fixtures,fixtures);
+				before(final_test_properties,global_fixtures,fixtures);
 				try {
 					base.evaluate();
 				} finally {

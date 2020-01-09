@@ -127,7 +127,7 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 					new BinarySQLValue(c,
 							res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS),
 							Operator.MUL,
-							new ConstExpression<Integer, Integer>(Integer.class, 1)),
+							new ConstExpression<>(getTarget(),Integer.class, 1)),
 					"Hours", 
 					BinaryExpression.create(c,
 							res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS),
@@ -146,7 +146,7 @@ public class DateTableFactory extends DataObjectFactory<DateTable> {
 		public ConstSumMapFinder(AppContext c) throws InvalidKeyException {
 			super();
 			SumMapMapper<Integer> smm = new SumMapMapper<>(c, res.getNumberExpression(getTarget(),Integer.class, DateTableFactory.HOURS), "Hours", 
-					new ConstExpression<Integer, Integer>(Integer.class, 8), "sumconst");
+					new ConstExpression<>(getTarget(),Integer.class, 8), "sumconst");
 			setMapper(smm);
 		}
 	}

@@ -167,7 +167,11 @@ public class SQLValueFilter<T> implements SQLFilter<T>, PatternFilter<T> {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("SQLValueFilter(");
-		sb.append(field);
+		if( parent != null ) {
+			parent.getInfo(field).addName(sb, true, false);
+		}else {
+			sb.append(field);
+		}
 		sb.append(match);
 		sb.append(peer.toString());
 		sb.append(")");

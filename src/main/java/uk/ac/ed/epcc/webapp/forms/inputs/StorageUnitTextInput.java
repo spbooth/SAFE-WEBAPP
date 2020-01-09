@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import uk.ac.ed.epcc.webapp.UnitFormat;
+import uk.ac.ed.epcc.webapp.Units;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
 /** A {@link Input} for storage sizes where the
@@ -21,7 +22,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
  * @author Stephen Booth
  *
  */
-public class StorageUnitTextInput extends NumberInput<Long> {
+public class StorageUnitTextInput extends NumberInput<Long> implements FormatHintInput{
 
 	/**
 	 * 
@@ -79,6 +80,18 @@ public class StorageUnitTextInput extends NumberInput<Long> {
 	public String getType() {
 		// can't be a html5 number input with custom format browser may not show
 		return null;
+	}
+
+
+
+
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput#getFormatHint()
+	 */
+	@Override
+	public String getFormatHint() {
+
+		return "500"+Units.KiB.toString();
 	}
 
 }

@@ -88,6 +88,12 @@ public abstract class SQLContextWrapper implements SQLContext {
 		return nested.convertToMilliseconds(expr);
 	}
 
+	@Override
+	public SQLExpression<? extends Number> dateDifference(long resolution, SQLExpression<Date> start,
+			SQLExpression<Date> end) {
+		return nested.dateDifference(resolution, start, end);
+	}
+
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.SQLContext#convertToDate(uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression, long)
 	 */

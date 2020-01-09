@@ -65,7 +65,7 @@ public class TableStructureTestFactory extends DataObjectFactory<TableStructureT
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */
 	@Override
-	protected DataObject makeBDO(Record res) throws DataFault {
+	protected TableStructureTestObject makeBDO(Record res) throws DataFault {
 		return new TableStructureTestObject(res);
 	}
 

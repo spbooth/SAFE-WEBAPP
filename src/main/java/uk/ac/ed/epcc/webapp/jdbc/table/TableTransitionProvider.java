@@ -54,6 +54,7 @@ import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.ConfigParamProvider;
 import uk.ac.ed.epcc.webapp.model.data.ConfigTransition;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.TableDescription;
 import uk.ac.ed.epcc.webapp.model.data.UnDumper;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.TableInput;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -142,6 +143,7 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 	 */
 	static final TableTransitionKey ADD_DOUBLE_FIELD_KEY = new TableDeveloperKey("AddDoubleField");
 
+	static final TableTransitionKey ADD_BOOLEAN_FIELD_KEY = new TableDeveloperKey("AddBooleanField");
 	/**
 	 * 
 	 */
@@ -183,6 +185,7 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 		map.put(ADD_LONG_FIELD_KEY, new AddLongFieldTransition<>());
 		map.put(ADD_FLOAT_FIELD_KEY, new AddFloatFieldTransition<>());
 		map.put(ADD_DOUBLE_FIELD_KEY, new AddDoubleFieldTransition<>());
+		map.put(ADD_BOOLEAN_FIELD_KEY,new AddBooleanFieldTransition<>());
 		if( target == null) {
 			return map;
 		}
@@ -324,7 +327,7 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 	public <X extends ContentBuilder> X getLogContent(X hb,DataObjectFactory target, SessionService<?> sess) {
 		hb.addHeading(2, "Table "+target.getTag());
 		hb.addHeading(3,"Table Type:"+target.getClass().getSimpleName());
-
+		hb.addObject(new TableDescription(target));
 
 		Collection<Composite> comps = target.getComposites();
 		if( ! comps.isEmpty()){

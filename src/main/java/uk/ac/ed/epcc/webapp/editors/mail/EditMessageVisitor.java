@@ -261,8 +261,16 @@ public class EditMessageVisitor extends ContentMessageVisitor {
 	}
 	@Override
 	public void doTo(Address[] recipients, MessageWalker w) {
-		if( w.isSubMessage() || recipients.length == 1 || ! edit_recipients){
+		if( w.isSubMessage() ||  ! edit_recipients){
 		   super.doTo(recipients, w);
+		   return;
+		}
+		if( recipients.length == 1 ){
+			// supress special header value on compose as it confuses people
+			if( ! recipients[0].toString().equals("undisclosed-recipients:;")) {
+			   super.doTo(recipients, w);
+			   return;
+			}
 		}
 	}
 	@Override

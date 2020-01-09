@@ -29,6 +29,8 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -99,7 +101,7 @@ public abstract class WebappTestBase implements ContextHolder{
 			String dir = getClass().getCanonicalName();
 			dir = dir.substring(0,dir.lastIndexOf("."));
 			dir = dir.replace('.', '/');
-			dir = "tests/"+dir;
+			dir = "src/main/test/resources/"+dir;
 			File output = new File(dir+"/"+name+".xml");
 			FileWriter w = new FileWriter(output);
 			SimpleXMLBuilder builder = new XMLWriter(w);
@@ -252,15 +254,21 @@ public abstract class WebappTestBase implements ContextHolder{
 		Transformer t = tfac.newTransformer(source);
 		assertNotNull(t);
 
+		expected_xml = ctx.expandText(expected_xml);
 		String expected = XMLDataUtils.transform(t,getClass(), expected_xml);
 		
-		String result = XMLDataUtils.transform(t, diff.toString());
+		String raw = diff.toString();
+		String result = XMLDataUtils.transform(t, raw);
 		//System.out.println(result);
 		String differ = TestDataHelper.diff(expected, result);
 		boolean same = differ.trim().length()==0;
 		if( ! same){
+		
+			//FileWriter w = new FileWriter(expected_xml);
+			//w.write(raw);
+			//w.close();
 			System.out.println("Raw:");
-			System.out.println(diff.toString());
+			System.out.println(raw);
 			System.out.println("====================================================================");
 			System.out.println("Got: "+result);
 			System.out.println("--------------------------------------------------------------------");
@@ -399,4 +407,26 @@ protected void writeFile(String file_name, byte data[]) throws IOException {
 			serv.action(Emailer.SendAction.class);
 		}
 	}
+
+	/** Convenience function to set the test-time via a {@link TestTimeService}
+	 *  
+	 * @param year
+	 * @param month
+	 * @param day
+	 * @param hour
+	 * @param min
+	 * @return Date set by method
+	 */
+    public Date setTime(int year, int month, int day, int hour, int min) {
+    	return setTime(year, month, day, hour, min, 0);
+    }
+    public Date setTime(int year, int month, int day, int hour, int min, int sec) {
+    	TestTimeService serv = new TestTimeService();
+		ctx.setService(serv);
+		Calendar cal = Calendar.getInstance();
+		cal.clear();
+		cal.set(year, month, day, hour, min,sec);
+		serv.setResult(cal.getTime());
+		return cal.getTime();
+    }
 }

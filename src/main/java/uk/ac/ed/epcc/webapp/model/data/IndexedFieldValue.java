@@ -152,13 +152,13 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 	 * @throws CannotFilterException
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public SQLFilter<T> getSQLFilter(SQLFilter<I> fil) throws CannotFilterException{
 		try{
 			IndexedProducer<I> ip = producer.getProducer();
 			if( ip instanceof DataObjectFactory){
 				DataObjectFactory fac = (DataObjectFactory) ip;
-				return new Joiner<>(getFilterType(),fil,producer.getField(),repository,fac.res);
+				
+				return Joiner.getRemoteFilter(getFilterType(),fil,producer.getField(),repository,fac.res);
 			}
 			throw new CannotFilterException("Not referencing a DataObjectFactory");
 		}catch(Exception e){

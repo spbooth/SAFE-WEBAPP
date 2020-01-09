@@ -18,7 +18,9 @@ package uk.ac.ed.epcc.webapp.model.data.convert;
 
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
@@ -34,9 +36,40 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
  */
 public interface TypeFilterProducer<T,D> extends TypeProducer<T,D>  {
 	public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac, T  val );
-	public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac, T ... val );
-	public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac,Set<T> val);
+	
 	public <I extends DataObject> SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,T val);
-	public <I extends DataObject> SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,T ... val);
-	public <I extends DataObject> SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,Set<T> val);
+	
+	
+	
+	default public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac,Set<T> val) {
+		SQLOrFilter<I> or = new SQLOrFilter<I>(fac.getTarget());
+		for( T t : val) {
+			or.addFilter(getFilter(fac, t));
+		}
+		return or;
+	}
+	
+	default public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac,T ... val) {
+		SQLOrFilter<I> or = new SQLOrFilter<I>(fac.getTarget());
+		for( T t : val) {
+			or.addFilter(getFilter(fac, t));
+		}
+		return or;
+	}
+	
+	default public <I extends DataObject> SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,Set<T> val) {
+		SQLAndFilter<I> and = new SQLAndFilter<I>(fac.getTarget());
+		for( T t : val) {
+			and.addFilter(getExcludeFilter(fac, t));
+		}
+		return and;
+	}
+	
+	default public <I extends DataObject> SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,T ... val) {
+		SQLAndFilter<I> and = new SQLAndFilter<I>(fac.getTarget());
+		for( T t : val) {
+			and.addFilter(getExcludeFilter(fac, t));
+		}
+		return and;
+	}
 }

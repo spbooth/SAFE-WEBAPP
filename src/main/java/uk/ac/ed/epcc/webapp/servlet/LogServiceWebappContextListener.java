@@ -34,7 +34,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  */
 
 @WebListener()
-public class Log4JWebappContextListener extends WebappContextListener {
+public class LogServiceWebappContextListener extends WebappContextListener {
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
 		AppContext conn=null;
@@ -66,6 +66,7 @@ public class Log4JWebappContextListener extends WebappContextListener {
 
 			LoggerService serv = conn.getService(LoggerService.class);
 			serv.initialiseLogging();
+			serv.getLogger(getClass()).info("Logging initialised");
 
 
 		}catch(Exception t){
