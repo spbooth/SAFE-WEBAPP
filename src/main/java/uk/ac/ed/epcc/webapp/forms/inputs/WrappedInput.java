@@ -120,8 +120,7 @@ public class WrappedInput<X> implements Input<X> {
 	 */
 	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return vis.visitWrappedInput(this);
 	}
 
 	/* (non-Javadoc)

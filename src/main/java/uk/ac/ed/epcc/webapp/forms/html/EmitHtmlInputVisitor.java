@@ -777,7 +777,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		if( my_class != null ) {
 			hb.addClass(my_class);
 		}
-		i.accept(this);
+		i.getWrappedInput().accept(this);
 		hb.close();
 		return null;
 	}
