@@ -136,7 +136,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		}
 		hb.open("input");
 		try {
-			String id = (String) input.accept(id_vis);
+			String id = makeID(input);
 			if( id != null){
 				hb.attr("id",id);
 			}
@@ -153,6 +153,10 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		hb.addClass("input");
 		hb.close();
 
+	}
+	protected String makeID(Input input) throws Exception {
+		String raw = (String) input.accept(id_vis);
+		return id_vis.normalise(raw);
 	}
 	
 	
@@ -174,7 +178,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		}
 		hb.open("input");
 		try {
-			String id = (String) input.accept(id_vis);
+			String id = makeID(input);
 			if( id != null){
 				hb.attr("id",id);
 			}
@@ -213,7 +217,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		if( iter.hasNext()){
 		hb.open("select");
 		try {
-			String id = (String) input.accept(id_vis);
+			String id = makeID(input);
 			if( id != null){
 				hb.attr("id",id);
 			}
@@ -307,7 +311,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				hb.open("label");
 				try {
 					id_vis.setRadioTarget(current);
-					String id = input.accept(id_vis);
+					String id = makeID(input);
 					if( id != null) {
 						hb.attr("for",id);
 					}
@@ -389,7 +393,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		
 		String id=null;
 		try {
-			id = (String) input.accept(id_vis);
+			id = makeID(input);
 		} catch (Exception e) {
 			conn.error(e,"Error getting id");
 		}
@@ -408,7 +412,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		}
 		String id=null;
 		try {
-			id = (String) input.accept(id_vis);
+			id = makeID(input);
 		} catch (Exception e) {
 			conn.error(e,"Error getting id");
 		}

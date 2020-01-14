@@ -77,7 +77,7 @@ the form could just submit to self. This might break form error reporting though
 Transition t = tp.getTransition(target,key);
 HTMLForm f = new HTMLForm(conn);
 //Don't use period to be jquery compatible
-f.setFormID("transition_");
+f.setFormID("transition.");
 try{
 if( t instanceof BaseFormTransition ){
 	BaseFormTransition ft = (BaseFormTransition) t;
