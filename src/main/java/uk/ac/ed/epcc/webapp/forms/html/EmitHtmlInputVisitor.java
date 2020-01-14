@@ -573,10 +573,6 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		if( input instanceof FormatHintInput){
 			format_hint = ((FormatHintInput)input).getFormatHint();
 		}
-		String wrapper=null;
-		if( input instanceof WrappedInput){
-			wrapper=((WrappedInput)input).getWrapperClass();
-		}
 		boolean old_escape = result.setEscapeUnicode(! force_password && ESCAPE_UNICODE_FEATURE.isEnabled(conn));
 		// max_result_length <= 0 is unlimited
 		if (force_single || ( max_result_length > 0 && max_result_length <= 2 * boxwid)) {
@@ -587,10 +583,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			boolean autocomplete = input instanceof AutoComplete;
 			boolean use_datalist = autocomplete && use_html5 && USE_DATALIST.isEnabled(conn);
 			
-			if (wrapper != null) {
-				result.open("div");
-				result.addClass( wrapper);
-			}
+			
 			
 			result.open("input");
 			if( id != null ){
@@ -678,9 +671,6 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				if (use_html5) {
 					emitDataList(result, use_datalist,(AutoComplete) input, name);
 				}
-			}
-			if( wrapper != null){
-				result.close(); // close the <div>
 			}
 		} else {
 			int rows = ((max_result_length + boxwid - 1) / boxwid);
@@ -779,6 +769,17 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 	public <V, I extends Input> Object visitParseMultiInput(
 			ParseMultiInput<V, I> multiInput) throws Exception {
 		return visitMultiInput(multiInput);
+	}
+	@Override
+	public <X> Object visitWrappedInput(WrappedInput<X> i) throws Exception {
+		hb.open("div");
+		String my_class = i.getWrapperClass();
+		if( my_class != null ) {
+			hb.addClass(my_class);
+		}
+		i.accept(this);
+		hb.close();
+		return null;
 	}
 	
 }

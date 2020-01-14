@@ -42,4 +42,7 @@ public interface InputVisitor<R> {
 	default R visitLockedInput(LockedInput l)throws Exception{
 		return visitUnmodifyableInput(l);
 	}
+	default <X> R visitWrappedInput(WrappedInput<X> i) throws Exception {
+		return (R) i.getWrappedInput().accept(this);
+	}
 }
