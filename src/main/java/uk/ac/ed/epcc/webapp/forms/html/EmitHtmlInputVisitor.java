@@ -304,6 +304,9 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		
 		
 		for (Iterator<T> iter = input.getItems(); iter.hasNext();) {
+			hb.open("div");
+			hb.addClass("option");
+			
 			T current = iter.next();
 			emitRadioButtonHTML(hb, use_post,input, param, current);
 			String label = input.getText(current);
@@ -326,7 +329,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				hb.clean( label );
 				
 			}
-			hb.br();
+			hb.close();
 			hb.clean("\n");
 
 		}
@@ -363,7 +366,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		String id = null;
 		try {
 			id_vis.setRadioTarget(current);
-			id = input.accept(id_vis);
+			id = makeID(input);
 		}catch(Exception e) {
 			getLogger().error("Error making radio button id", e);
 		}finally {
