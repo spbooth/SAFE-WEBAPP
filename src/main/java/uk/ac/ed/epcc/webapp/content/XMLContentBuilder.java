@@ -136,6 +136,16 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 			clean(target.toString());
 		}
 	}
+	@Override
+	default <X> boolean canAdd(X target) {
+		if( target == null ) {
+			return false;
+		}
+		if( (target instanceof UIProvider) || (target instanceof UIGenerator) || (target instanceof XMLPrinter) || ( target instanceof Viewable && target instanceof Contexed) || (target instanceof Identified) || (target instanceof Iterable)) {
+			return true;
+		}
+		return false;
+	}
 	public void append(XMLPrinter target);
 	public Logger getLogger(AppContext conn);
 	public boolean useNewTab();

@@ -22,19 +22,19 @@ public class ConfirmMessage {
 	 * @param message
 	 * @param args
 	 */
-	public ConfirmMessage(String message, String[] args) {
+	public ConfirmMessage(String message, Object[] args) {
 		super();
 		this.message = message;
 		this.args = args;
 	}
 	final String message;
-	final String args[];
+	final Object args[];
 	
 	public String getMessage() {
 		return message;
 	}
 	
-	public String[] getArgs() {
+	public Object[] getArgs() {
 		return args;
 	}
 }

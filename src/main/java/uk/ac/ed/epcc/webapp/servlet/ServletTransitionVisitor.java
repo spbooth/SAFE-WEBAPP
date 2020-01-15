@@ -203,7 +203,7 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 		 * @return FormResult or null if processing to continue.
 		
 		 */
-		public FormResult confirmTransition(HttpServletRequest req,  AppContext conn, TransitionFactory<K,T> tp, K operation, T target,String type,String args[]) {
+		public FormResult confirmTransition(HttpServletRequest req,  AppContext conn, TransitionFactory<K,T> tp, K operation, T target,String type,Object args[]) {
 			Logger log = getLogger();
 			log.debug("Process confirm: "+type);
 			String yes = req.getParameter("yes");

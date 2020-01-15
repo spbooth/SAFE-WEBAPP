@@ -35,7 +35,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
  */
 public abstract class FormAction{
 	String confirm = null;  // 
-	String confirm_args[] = null;
+	Object confirm_args[] = null;
 	private boolean must_validate=true;
 	private boolean new_window=false;
 	
@@ -91,7 +91,7 @@ public abstract class FormAction{
 	public void setConfirm(String c) {
 		confirm = c;
 	}
-	public void setConfirmArgs(String args[]) {
+	public void setConfirmArgs(Object args[]) {
 		confirm_args=args;
 	}
 	
