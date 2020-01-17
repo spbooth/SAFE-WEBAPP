@@ -44,14 +44,7 @@ public class SelectAccessor<T,R> implements Accessor<T,R> {
 		return null;
 	}
 	
-	public boolean canSet() {
-		
-		return false;
-	}
-	public void setValue(R r, T value) {
-		throw new UnsupportedOperationException("Set not supported");
-		
-	}
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

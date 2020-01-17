@@ -26,9 +26,11 @@ public class MillisecondAccessor<R> implements Accessor<Long,R>{
 	public MillisecondAccessor(Accessor<Date,R> a){
 		this.a=a;
 	}
+	@Override
 	public Long getValue(R r) {
 		return Long.valueOf(a.getValue(r).getTime());
 	}
+	@Override
 	public Class<Long> getTarget() {
 		return Long.class;
 	}
@@ -36,12 +38,5 @@ public class MillisecondAccessor<R> implements Accessor<Long,R>{
 	public String toString(){
 		return "Millis("+a.toString()+")";
 	}
-	public boolean canSet() {
-		
-		return false;
-	}
-	public void setValue(R r, Long value) {
-		throw new UnsupportedOperationException("Set not supported");
-		
-	}
+
 }

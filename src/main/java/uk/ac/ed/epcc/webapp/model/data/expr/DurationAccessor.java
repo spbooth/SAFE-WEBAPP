@@ -42,14 +42,5 @@ public Class<Duration> getTarget() {
 public String toString() {
 	return "Duration("+start.toString()+","+end.toString()+")";
 }
-@Override
-public boolean canSet() {
-	
-	return false;
-}
-@Override
-public void setValue(R r, Duration value) {
-	throw new UnsupportedOperationException("Set not supported");
-	
-}
+
 }
