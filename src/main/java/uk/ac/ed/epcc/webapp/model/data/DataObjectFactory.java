@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.ContextCached;
@@ -78,6 +79,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.PredicateAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultIterator;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultMapper;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
@@ -2392,5 +2394,20 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 */
 	public <T extends DataObject> SQLFilter<T> getDestFilter(SQLFilter<BDO> fil, String join_field, DataObjectFactory<T> join_fac){
 		return Joiner.getDestFilter(join_fac.getTarget(), fil, join_field,join_fac.res,res);
+	}
+
+	/** convert a {@link Predicate} into an {@link AcceptFilter} 
+	 * 
+	 * In general {@link SQLFilter}s are preferable as they filter at the SQL level.
+	 * However this gives an easy way of adding additional restrictions to a selection using lambdas.
+	 * These should really only be used as a final level of filtering as many of the query optimisations will be prevented by the presence 
+	 * of an {@link AcceptFilter}
+	 * 
+	 * 
+	 * @param p
+	 * @return
+	 */
+	public final AcceptFilter<BDO> getFilter(Predicate<BDO> p){
+		return new PredicateAcceptFilter<BDO>(getTarget(), p);
 	}
 }
