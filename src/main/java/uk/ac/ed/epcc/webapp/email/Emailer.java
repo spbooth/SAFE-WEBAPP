@@ -1107,10 +1107,12 @@ public class Emailer {
 		if( e != null ) {
 			PrintWriter printWriter = new PrintWriter(stackTraceWriter,true);
 			e.printStackTrace(printWriter);
+			printWriter.flush();
 			Throwable rc = e.getCause();
 			while(rc != null && buf.length() < max_trace){
 				printWriter.println("Caused by:");
 				rc.printStackTrace(printWriter);
+				printWriter.flush();
 				rc = rc.getCause();
 			}
 			printWriter.flush();

@@ -223,12 +223,16 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 		float temp[][][] = new float[new_nset][][];
 		for (int k = 0; k < nset; k++) {
 			int dest = perm[k];
-			if( temp[dest] == null) {
-				temp[dest] = data[k]; 
-			}else {
-				for (int i = 0; i < getNumCats(); i++) {
-					for (int j = 0; j < getNumItems(); j++) {
-						temp[dest][i][j] += data[k][i][j];
+			// out of range dest are a supressed "others" category
+			// these can be supressed when value is zero
+			if( dest < new_nset) {
+				if( temp[dest] == null) {
+					temp[dest] = data[k]; 
+				}else {
+					for (int i = 0; i < getNumCats(); i++) {
+						for (int j = 0; j < getNumItems(); j++) {
+							temp[dest][i][j] += data[k][i][j];
+						}
 					}
 				}
 			}
