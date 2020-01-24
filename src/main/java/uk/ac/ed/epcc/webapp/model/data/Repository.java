@@ -219,7 +219,8 @@ public final class Repository implements AppContextCleanup{
 	public static final Feature READ_ONLY_FEATURE = new Feature("read-only",false,"supress (most) database writes");
 	
 	public static final Feature BACKUP_WITH_SELECT = new Feature("repository.backup_by_select",true,"Use select/insert when backing up a record");
-	private static final DateFormat dump_format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss SSS");
+	// not static not thread safe
+	private final DateFormat dump_format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss SSS");
 	
 	/** information about indexes
 	 * 
