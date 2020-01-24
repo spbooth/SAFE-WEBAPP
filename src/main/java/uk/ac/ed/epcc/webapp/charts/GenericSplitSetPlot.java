@@ -225,7 +225,7 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 			int dest = perm[k];
 			// out of range dest are a supressed "others" category
 			// these can be supressed when value is zero
-			if( dest < new_nset) {
+			if( dest >= 0 && dest < new_nset) {
 				if( temp[dest] == null) {
 					temp[dest] = data[k]; 
 				}else {
