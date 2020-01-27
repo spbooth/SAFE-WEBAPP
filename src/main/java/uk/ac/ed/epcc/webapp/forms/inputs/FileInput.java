@@ -91,6 +91,9 @@ public class FileInput extends AbstractInput<StreamData> {
 	}
 	@Override
 	public StreamData convert(Object v) throws TypeError {
+		if( v == null ) {
+			return null;
+		}
 		if( v instanceof StreamData) {
 			return (StreamData) v;
 		}
