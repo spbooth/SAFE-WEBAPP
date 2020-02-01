@@ -20,6 +20,7 @@ import javax.mail.internet.MimePart;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
 
 /** Formats an mail message substituting a designated 
@@ -45,7 +46,10 @@ public class FormContentEditMessageVisitor extends ContentMessageVisitor {
 	public void doSubject(String subject, MessageWalker w) {
 		if( w.matchPath()){
 			form.put(field, subject);
-			sb.addFormInput(getContext(), form.getField(field),null);
+			
+			Field f = form.getField(field);
+			sb.addFormLabel(conn, f);
+			sb.addFormInput(getContext(), f,null);
 			sb.addActionButtons(form);
 		}else{
 			super.doSubject(subject, w);
