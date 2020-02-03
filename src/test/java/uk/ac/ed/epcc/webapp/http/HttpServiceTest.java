@@ -13,45 +13,40 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.http;
 
-import java.net.URL;
-import java.util.Map;
+import static org.junit.Assert.assertEquals;
 
-import uk.ac.ed.epcc.webapp.AppContextService;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URL;
+
+import org.junit.Test;
+
+import uk.ac.ed.epcc.webapp.WebappTestBase;
+import uk.ac.ed.epcc.webapp.mock.MockHttpService;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 
-/** A simple {@link AppContextService} to handle http client operaitons
- * 
- * This is implemented as a service to allow substitution for mock testing.
- * 
+/**
  * @author Stephen Booth
  *
  */
-public interface HttpService extends AppContextService<HttpService>{
+public class HttpServiceTest extends WebappTestBase {
 
-	/** fetch data from a URL
-	 * 
-	 * @param url  URL to fetch from
-	 * @param props additional request headers to set
-	 * @return {@link MimeStreamData}
-	 * @throws HttpException 
-	 */
-	MimeStreamData fetch(URL url, Map<String, String> props) throws HttpException;
-
-	/** post data to a URL
-	 * 
-	 * This is intended to post a single object rather than encoded form data.
-	 * 
-	 * @param url  URL to post to
-	 * @param props additional request headers to set
-	 * @param input {@link MimeStreamData} to post
-	 * @return {@link MimeStreamData}
-	 * @throws HttpException 
-	 */
-	MimeStreamData post(URL url, Map<String, String> props, MimeStreamData input) throws HttpException;
-
-
-	@Override
-	default Class<HttpService> getType() {
-		return HttpService.class;
+	
+	
+	@Test
+	public void testFetch() throws HttpException, DataFault, IOException {
+		MockHttpService serv = new MockHttpService(ctx);
+		ctx.setService(serv);
+		
+		URL url = new URL("http://www.example.com/message");
+		
+		MimeStreamData result = serv.fetch(url, null);
+		
+		//assertEquals("text/plain", result.getContentType());
+		ByteArrayOutputStream text = new ByteArrayOutputStream();
+		result.append(text);
+		assertEquals("Now is the winter of our discontent", text.toString());
+		
 	}
 }
