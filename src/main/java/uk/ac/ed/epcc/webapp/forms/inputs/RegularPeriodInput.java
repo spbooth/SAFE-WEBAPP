@@ -42,8 +42,8 @@ public class RegularPeriodInput extends MultiInput<RegularSplitPeriod, Input> {
 		this(null,res,finest);
 	}
 	public RegularPeriodInput(Date current_time,long res,int finest){
-		start = new TimeStampMultiInput(res,finest);
-		end = new TimeStampMultiInput(res,finest);
+		start = new TimeStampMultiInput(current_time,res,finest);
+		end = new TimeStampMultiInput(current_time,res,finest);
 		splits = new IntegerInput();
 		splits.setMin(2);
 		Calendar cal = Calendar.getInstance();

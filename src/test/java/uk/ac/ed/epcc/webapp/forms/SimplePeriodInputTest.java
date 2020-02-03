@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.forms.inputs.SimplePeriodInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TimeStampMultiInput;
 import uk.ac.ed.epcc.webapp.time.CalendarFieldSplitPeriod;
@@ -50,7 +50,7 @@ public class SimplePeriodInputTest extends MultiInputTestBase<Period,TimeStampMu
 
 	@Override
 	public SimplePeriodInput getInput() throws Exception {
-		return new SimplePeriodInput();
+		return new SimplePeriodInput(getContext().getService(CurrentTimeService.class).getCurrentTime());
 	}
 	
 	

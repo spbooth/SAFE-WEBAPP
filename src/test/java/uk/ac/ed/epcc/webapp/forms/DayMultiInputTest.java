@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.forms.inputs.DayMultiInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 
@@ -38,7 +39,7 @@ ParseInputInterfaceTest<Date, DayMultiInput, DayMultiInputTest>
 	
 	@Override
 	public DayMultiInput getInput() throws Exception {
-		return  new DayMultiInput();
+		return  new DayMultiInput(getContext().getService(CurrentTimeService.class).getCurrentTime());
 	}
    
 	/* (non-Javadoc)
