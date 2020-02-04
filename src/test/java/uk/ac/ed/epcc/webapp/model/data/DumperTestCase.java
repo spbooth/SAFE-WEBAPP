@@ -33,6 +33,7 @@ import org.xml.sax.XMLReader;
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.content.XMLPrinter;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.model.Dummy1;
 import uk.ac.ed.epcc.webapp.model.Dummy2;
 import uk.ac.ed.epcc.webapp.model.LinkDummy;
@@ -99,6 +100,47 @@ public class DumperTestCase extends WebappTestBase {
 	"</LinkTest1Test2>\n"+
 	"</Dump>";
 
+	String expect_rename ="<Dump>\n"+
+			"<TableSpecification name='LinkTest1Test2'>\n"+
+			"<Test1ID reference='Test'/>\n"+
+			"<Test2ID reference='Test2'/>\n"+
+			"<Status type='String' nullable='false' max='1'/>\n"+
+			"<Link type='Index' unique='true'><Column name='Test1ID'/><Column name='Test2ID'/></Link>\n"+
+			"<LeftKey type='Index' unique='false'><Column name='Test1ID'/></LeftKey>\n"+
+			"<RightKey type='Index' unique='false'><Column name='Test2ID'/></RightKey>\n"+
+			"</TableSpecification>\n"+
+			"<TableSpecification name='Test'>\n"+
+			"<Name type='String' nullable='true' max='32'/>\n"+
+			"<Number type='Double' nullable='true'/>\n"+
+			"<UnsignedInt type='Long' nullable='true'/>\n"+
+			"<Mandatory type='String' nullable='false' max='32'/>\n"+
+			"<Time type='Long' nullable='true'/>\n"+
+			"<Bootleg type='String' nullable='false' max='6'/>\n"+
+			"<Ruttles type='Integer' nullable='false'/>\n"+
+			"</TableSpecification>\n" +
+			"<Test id='1'>\n" +
+			"<Name>fred</Name>\n" +
+			"<Number>5.0</Number>\n" +
+			"<UnsignedInt>0</UnsignedInt>\n"+
+			"<Mandatory>Junk</Mandatory>\n"+
+			"<Bootleg>Paul</Bootleg>\n"+
+			"<Ruttles>2</Ruttles>\n"+
+			"</Test>\n"+
+			"<TableSpecification name='Test2'>\n" +
+			"<Name type='String' nullable='true' max='32'/>\n" +
+			"<Number type='Double' nullable='true'/>\n" +
+			"</TableSpecification>\n"+
+			"<Test2 id='1'>\n" +
+			"<Name>boris</Name>\n" +
+			"<Number>8.0</Number>\n" +
+			"</Test2>\n"+
+			"<LinkTest1Test2 id='1'>\n" +
+			"<Test1ID>1</Test1ID>\n" +
+			"<Test2ID>1</Test2ID>\n" +
+			"<Status>I</Status>\n" +
+			"</LinkTest1Test2>\n"+
+			"</Dump>";
+
 	@Test
 	public void testDump() throws Exception{
 		
@@ -140,6 +182,50 @@ public class DumperTestCase extends WebappTestBase {
 		System.out.println(result);
 	
 		assertEquals("Unexpected result", expect, result);
+	}
+	
+	@Test
+	@ConfigFixtures("rename.properties")
+	public void testDumpRename() throws Exception{
+		
+		LinkDummy linker;
+		Dummy1.Factory d1_fac;
+		Dummy2.Factory d2_fac;
+	    linker = LinkDummy.getInstance(ctx);
+	    d1_fac = new Dummy1.Factory(ctx);
+	    d2_fac = new Dummy2.Factory(ctx);
+	    
+		Dummy1 d1 = new Dummy1(ctx);
+		d1.setName("fred");
+		d1.setNumber(5);
+		d1.commit();
+		Dummy2 d2 = new Dummy2(ctx);
+		d2.setName("boris");
+		d2.setNumber(8);
+		d2.commit();
+		
+		assertFalse(linker.isLinked(d1,d2));
+		linker.addLink(d1,d2);
+		assertTrue(linker.isLinked(d1,d2));
+		linker.removeLink(d1,d2);
+		assertFalse(linker.isLinked(d1,d2));
+		DummyLink l = linker.getLink(d1,d2);
+		assertEquals(d1,l.getDummy1());
+		assertEquals(d2,l.getDummy2());
+		XMLPrinter printer = new XMLPrinter();
+		printer.open("Dump");
+		printer.clean("\n");
+		Dumper dumper = new Dumper(ctx, printer);
+		
+		for( LinkDummy.DummyLink link : linker.all()){
+			dumper.dump(link.record);
+		}
+		printer.close();
+		
+		final String result = printer.toString();
+		System.out.println(result);
+	
+		assertEquals("Unexpected result", expect_rename, result);
 	}
 	@Test
 	public void testUnDump() throws IOException, SAXException, ParserConfigurationException, DataException{

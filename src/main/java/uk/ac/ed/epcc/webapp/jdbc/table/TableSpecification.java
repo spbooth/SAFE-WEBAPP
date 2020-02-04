@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -237,7 +238,7 @@ public class TableSpecification {
 		public Iterator<String> getindexNames(){
 			return index_fields.iterator();
 		}
-		public abstract void accept(FieldTypeVisitor vis);
+		public abstract void accept(UnaryOperator<String> name_map,FieldTypeVisitor vis);
 		/** Generate a copy of this index in a different specification.
 		 * 
 		 * @param spec
@@ -296,8 +297,8 @@ public class TableSpecification {
 		 * @see uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType#accept(uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor)
 		 */
 		@Override
-		public void accept(FieldTypeVisitor vis) {
-			vis.visitFullTextIndex(this);
+		public void accept(UnaryOperator<String> name_map,FieldTypeVisitor vis) {
+			vis.visitFullTextIndex(name_map,this);
 			
 		}
 
@@ -330,8 +331,8 @@ public class TableSpecification {
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType#accept(uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor)
 		 */
-		public void accept(FieldTypeVisitor vis) {
-			vis.visitIndex(this);
+		public void accept(UnaryOperator<String> name_map,FieldTypeVisitor vis) {
+			vis.visitIndex(name_map,this);
 			
 		}
 		/* (non-Javadoc)

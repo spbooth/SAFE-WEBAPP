@@ -108,6 +108,21 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     	}
     }
   
+	/** Create a database table based on a {@link TableSpecification}
+	 * 
+	 * The {@link TableSpecification} can be augmented by properties
+	 * starting with <b>create_table.<i>table-name</i></b> using
+	 * {@link TableSpecification#setFromParameters(AppContext, String, java.util.Map).
+	 * 
+	 * In addition fields can be renamed by setting <b>create_table.rename_field.<i>table</i>.<i>field</i>=<i>new-field</i></b>
+	 * This is usually only necessary for unit tests and will have to be combined with <b>rename.<i>new-field</i>=<i>field</i></b>
+	 * so the {@link Repository} maps the field back to the expected name. 
+	 * 
+	 * 
+	 * @param name
+	 * @param orig
+	 * @throws DataFault
+	 */
     public void createTable(String name, TableSpecification orig) throws DataFault{
     	TableSpecification s = new TableSpecification(orig);
     	// look for config overrides to specification
@@ -181,9 +196,10 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 		vis.visitAutoIncrement();
 		sb.append(",\n");
 		for(String s2: s.getFieldNames()){
+			String field_name = rename(name, s2);
 			FieldType field = s.getField(s2);
 			if( ! ( field instanceof PlaceHolderFieldType)){
-				c.quote(sb,s2);
+				c.quote(sb,field_name);
 				sb.append(" ");
 				field.accept(vis);
 				sb.append(",\n");
@@ -197,7 +213,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 			IndexType i1 = it.next();
 			if( vis.useIndex(i1)){
 				sb.append(",\n");
-				i1.accept(vis);
+				i1.accept(n -> rename(name,n),vis);
 			}
 		}
 		for(String s1 : s.getFieldNames()){
@@ -211,6 +227,10 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
  		vis.additions(true);
  		String text=sb.toString();
 		return text;
+	}
+
+	protected String rename(String name, String s2) {
+		return getContext().getInitParameter("create_table.rename_field."+name+"."+s2, s2);
 	}
 	public void updateTable(Repository res, TableSpecification orig) throws DataFault{
     	TableSpecification s = new TableSpecification(orig);

@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 import uk.ac.ed.epcc.webapp.jdbc.PostgresqlSQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.FullTextIndex;
@@ -133,7 +134,7 @@ public class PostgresqlCreateTableVisitor implements FieldTypeVisitor {
 	public void visitBlobType(BlobType blobType) {
 		sb.append("bytea");
 	}
-	public void visitIndex(Index idx) {
+	public void visitIndex(UnaryOperator<String> name_map,Index idx) {
 		if( ! idx.getUnique()){
 			// Don't seem to have non unique keys
 			return;
@@ -145,6 +146,9 @@ public class PostgresqlCreateTableVisitor implements FieldTypeVisitor {
 		sb.append("(");
 		for(Iterator<String> it = idx.getindexNames();it.hasNext();){
 			String name=it.next();
+			if( name_map != null ) {
+				name = name_map.apply(name);
+			}
 			if(seen){
 				sb.append(",");
 			}
@@ -170,7 +174,7 @@ public class PostgresqlCreateTableVisitor implements FieldTypeVisitor {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor#visitFullTextIndex(uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.FullTextIndex)
 	 */
-	public void visitFullTextIndex(FullTextIndex i) {
+	public void visitFullTextIndex(UnaryOperator<String> name_map,FullTextIndex i) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -73,7 +73,7 @@ public class AddStdIndexTransition<T extends DataObjectFactory> extends EditTabl
 				IndexType type = (IndexType) f.getItem(INDEX_FORMFIELD);
 				List<Object> args = new LinkedList<>();
 				
-				type.accept(sql.getCreateVisitor(query, args));
+				type.accept(null,sql.getCreateVisitor(query, args));
 				Logger log = res.getContext().getService(LoggerService.class).getLogger(getClass());
 				log.debug("Query is "+query.toString());
 				try(java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString())){

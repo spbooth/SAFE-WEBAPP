@@ -452,26 +452,27 @@ public final class Repository implements AppContextCleanup{
          * @throws IOException 
          */
         String dump(Record r) throws DataFault, IOException{
-        	if( r.getProperty(name) == null){
+        	String tag = getTag();
+        	if( r.getProperty(tag) == null){
         		return null;
         	}
         	if( isReference() && isNumeric()) {
-        		int id = r.getIntProperty(name, -1);
+        		int id = r.getIntProperty(tag, -1);
         		if(id <= 0) {
         			return null;
         		}
         		return Integer.toString(id);
         	}else if( isString()){
-        		return r.getStringProperty(name);
+        		return r.getStringProperty(tag);
         	}else if( isBoolean()){
-        		return Boolean.toString(r.getBooleanProperty(name));
+        		return Boolean.toString(r.getBooleanProperty(tag));
         	}else if( isDate()){
-        		return dump_format.format(r.getDateProperty(name));
+        		return dump_format.format(r.getDateProperty(tag));
         	}else if( isNumeric()){
-        		return r.getNumberProperty(name).toString();
+        		return r.getNumberProperty(tag).toString();
         	}else if ( isData()){
         		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        		StreamData data = r.getStreamDataProperty(name);
+        		StreamData data = r.getStreamDataProperty(tag);
         		data.write(stream);
         		return Base64.encodeBase64String(stream.toByteArray());
         	}
@@ -486,46 +487,55 @@ public final class Repository implements AppContextCleanup{
         	if( text == null ){
         		return;
         	}
+        	String tag = getTag();
         	if( isReference()&& isNumeric()) {
-        		r.setProperty(name,Integer.parseInt(text));
+        		r.setProperty(tag,Integer.parseInt(text));
     			return;
         	}else if( isString()){
-        		r.setProperty(name, text);
+        		r.setProperty(tag, text);
         	}else if ( isBoolean()){
-        		r.setProperty(name, Boolean.parseBoolean(text));
+        		r.setProperty(tag, Boolean.parseBoolean(text));
         	}else if( isDate()){
         		try {
-					r.setProperty(name, dump_format.parse(text));
+					r.setProperty(tag, dump_format.parse(text));
 				} catch (ParseException e) {
 					// try a numeric timestamp 
-					r.setProperty(name, Long.parseLong(text));
+					r.setProperty(tag, Long.parseLong(text));
 				}
         	}else if( isNumeric()){
         		try{
-        			r.setProperty(name,Integer.parseInt(text));
+        			r.setProperty(tag,Integer.parseInt(text));
         			return;
         		}catch(NumberFormatException e){
         						
         		}
         		try{
-        			r.setProperty(name, Long.parseLong(text));
+        			r.setProperty(tag, Long.parseLong(text));
         			return;
         		}catch(NumberFormatException e){
         						
         		}
         		try{
-        			r.setProperty(name,Double.parseDouble(text));
+        			r.setProperty(tag,Double.parseDouble(text));
         			return;
         		}catch(NumberFormatException e){
         						
         		}
         		// Try a date
-        		r.setProperty(name, dump_format.parse(text));
+        		r.setProperty(tag, dump_format.parse(text));
         	}else if( isData()){
         		ByteArrayStreamData data = new ByteArrayStreamData(Base64.decodeBase64(text));
-        		r.setProperty(name,data);
+        		r.setProperty(tag,data);
         	}
         }
+        /** get the tag used to store this field in the record.
+         * Normally the field name unless renaming taking place
+         * 
+         * @return
+         */
+		public String getTag() {
+			return dbFieldtoTag(name);
+		}
         // Optionally truncate the value before storage
         Object truncate(Object input) {
         	if( truncate && input != null && isString() && input instanceof String) {
@@ -3132,7 +3142,7 @@ public final class Repository implements AppContextCleanup{
 	 * Normally this is the identity but this method allows field renaming.
 	 * 
 	 */
-	protected String dbFieldtoTag(String name){
+	public String dbFieldtoTag(String name){
 		return ctx.getInitParameter("rename."+table_name+"."+name, name);
 	}
 	
