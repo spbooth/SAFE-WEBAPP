@@ -42,7 +42,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
 
 
 
-public class EmailChangeRequestFactory<A extends AppUser> extends AbstractRequestFactory<A,EmailChangeRequestFactory<A>.EmailChangeRequest> implements AnonymisingFactory{
+public class EmailChangeRequestFactory<A extends AppUser> extends AbstractUserRequestFactory<A,EmailChangeRequestFactory<A>.EmailChangeRequest> implements AnonymisingFactory{
 	/**
 	 * 
 	 */
@@ -69,7 +69,7 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractReques
 		return spec;
 	}
 	
-	public final class EmailChangeRequest extends uk.ac.ed.epcc.webapp.session.AbstractRequestFactory.AbstractRequest<A>{
+	public final class EmailChangeRequest extends uk.ac.ed.epcc.webapp.session.AbstractUserRequestFactory.AbstractRequest<A>{
 
 		protected EmailChangeRequest(Record r) {
 			super(getAppUserFactory(),r);
