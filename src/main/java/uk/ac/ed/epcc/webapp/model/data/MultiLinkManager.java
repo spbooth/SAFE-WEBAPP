@@ -22,7 +22,9 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -133,9 +135,9 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		 * @return boolean true on match
 		 */
 		public boolean accept(MultiLink o) {
-			for (Iterator<String> it = map.keySet().iterator(); it.hasNext();) {
-				String key =  it.next();
-				DataObject d = map.get(key);
+			for (Map.Entry<String, DataObject> e : map.entrySet()) {
+				String key =  e.getKey();
+				DataObject d = e.getValue();
 				if (o.record.getIntProperty(key, 0) != d.getID()) {
 					return false;
 				}
@@ -149,7 +151,7 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 			if (table_to_key.containsKey(table)) {
 				map.put(table_to_key.get(table), peer);
 			} else {
-				throw new ConsistencyError("No coresponding factory for peer");
+				throw new ConsistencyError("No corresponding factory for peer");
 			}
 		}
 
@@ -159,9 +161,8 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		 */
 		public SQLFilter<M> getFilter(){
 			SQLAndFilter<M> fil = new SQLAndFilter<>(getTarget());
-			for(String key : map.keySet()){
-				DataObject d = map.get(key);
-				fil.addFilter(new ReferenceFilter<>(MultiLinkManager.this,key,d));
+			for(Map.Entry<String, DataObject> e: map.entrySet()){
+				fil.addFilter(new ReferenceFilter<>(MultiLinkManager.this,e.getKey(),e.getValue()));
 			}
 			return fil;
 		}
@@ -181,9 +182,12 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		 * @param o
 		 */
 		public void setPeers(MultiLink o) {
-			for (Iterator it = map.keySet().iterator(); it.hasNext();) {
-				String key = (String) it.next();
-				DataObject d = map.get(key);
+			if( o == null ) {
+				return;
+			}
+			for (Map.Entry<String, DataObject> e : map.entrySet()) {
+				String key = e.getKey();
+				DataObject d = e.getValue();
 				o.setPeer(key, d);
 			}
 		}
@@ -215,7 +219,7 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 	 }
 	/**
 	 * Method for sub-class to specify a link field and Factory. Normally called
-	 * withing the sub-class constructor
+	 * within the sub-class constructor
 	 * 
 	 * @param key
 	 * @param fac
@@ -260,7 +264,7 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 					"getLink called with incomplete template");
 		}
 		try {
-			res =  find(t.getFilter());
+			res =  find(t.getFilter(),true);
 			t.setPeers(res); // initialise the caches
 		} catch (DataNotFoundException e) {
 			res = null;
@@ -291,5 +295,19 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		return (Class) MultiLink.class;
 	}
 	
+	public <R extends DataObject> BaseFilter<R> getDestFilter(DataObjectFactory<R> fac,BaseFilter<M> fil) throws InvalidArgument{
+		if( ! table_to_key.containsKey(fac.getTag())) {
+			throw new InvalidArgument("BadFactory passed to MultiLink "+fac.getTag());
+		}
+		return convertToDestinationFilter(fac, table_to_key.get(fac.getTag()), fil);
+		
+	}
+	public <R extends DataObject> BaseFilter<M> getRemoteFilter(DataObjectFactory<R> fac,BaseFilter<R> fil) throws InvalidArgument{
+		if( ! table_to_key.containsKey(fac.getTag())) {
+			throw new InvalidArgument("BadFactory passed to MultiLink "+fac.getTag());
+		}
+		return getRemoteFilter(fac, table_to_key.get(fac.getTag()), fil);
+		
+	}
 
 }

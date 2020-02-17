@@ -43,7 +43,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  *
  * @param <R> type of request object.
  */
-public abstract class AbstractRequestFactory<R extends AbstractUserRequestFactory.AbstractRequest>
+public abstract class AbstractRequestFactory<R extends AbstractRequestFactory.AbstractRequest>
 		extends DataObjectFactory<R> {
 
 	protected static final String EXPIRES = "Expires";
