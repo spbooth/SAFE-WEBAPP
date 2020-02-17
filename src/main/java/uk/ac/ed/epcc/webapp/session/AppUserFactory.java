@@ -138,7 +138,11 @@ AnonymisingFactory
 	 public static final Feature AUTO_COMPLETE_APPUSER_INPUT = new Preference("app_user.autocomplete_input",false,"Use auto-complete input as the default person input");
 	public static final String ALLOW_EMAIL_FIELD ="AllowEmail";
 	
-    
+    /** A {@link SQLFilter} to select {@link AppUser}s based on their roles in the role table
+     * 
+     * @author Stephen Booth
+     *
+     */
     public class RoleFilter implements SQLFilter<AU>,PatternFilter<AU>{
     	private final String role;
     	private final SQLContext ctx;
