@@ -16,6 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+
 /** a read-only input that cannot be modified. For convenience in update forms it can cache an
  * object value but this should never actually be edited by the input instead the text label should be 
  * displayed. This input only validates against optional input
@@ -66,4 +68,14 @@ public class ConstantInput<V> extends AbstractInput<V> implements UnmodifiableIn
 		return vis.visitUnmodifyableInput(this);
 	}
 
+	public static <V>  Selector<ConstantInput<V>> getSelector(String text, V value){
+		return new Selector<ConstantInput<V>>() {
+
+			@Override
+			public ConstantInput<V> getInput() {
+				return new ConstantInput<>(text, value);
+			}
+			
+		};
+	}
 }

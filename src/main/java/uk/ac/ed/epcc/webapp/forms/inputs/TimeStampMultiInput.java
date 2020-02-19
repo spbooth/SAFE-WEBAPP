@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 /** An input that selects a timestamp using pull down menus.
  * The class also implements ParseInput to support setting 
  * default values.
@@ -268,5 +269,14 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements B
 		c=null;
 	}
 
-	
+	public static Selector<TimeStampMultiInput> getSelector(Date now,long resolution,int max_field){
+		return new Selector<TimeStampMultiInput>() {
+
+			@Override
+			public TimeStampMultiInput getInput() {
+				return new TimeStampMultiInput(now, resolution, max_field);
+			}
+			
+		};
+	}
 }

@@ -28,6 +28,7 @@ import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 /** A {@link TextInput} to input Globus/LDAP DN names.
  * 
  * for historical reasons the canonical {@link String} representation is the
@@ -195,5 +196,16 @@ public class DNInput extends ParseAbstractInput<String> implements ItemInput<Str
 	public boolean isEmpty() {
 		String value = getValue();
 		return value == null || value.trim().isEmpty();
+	}
+	
+	public static Selector<DNInput> getSelector(){
+		return new Selector<DNInput>() {
+
+			@Override
+			public DNInput getInput() {
+				return new DNInput();
+			}
+			
+		};
 	}
    }

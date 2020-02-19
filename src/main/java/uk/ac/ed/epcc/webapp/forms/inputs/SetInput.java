@@ -27,6 +27,7 @@ import uk.ac.ed.epcc.webapp.forms.Identified;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 /** Simple ListInput that gives a choice of items (parsed and returned as their String representation)
  * 
  * Optionally alternate string values/labels can be presented.
@@ -223,4 +224,15 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
 		return super.convert(v);
 	}
 	
+	
+	public static <T> Selector<SetInput<T>> getSelector(Collection<T> items){
+		return new Selector<SetInput<T>>() {
+
+			@Override
+			public SetInput<T> getInput() {
+				return new SetInput<>(items);
+			}
+			
+		};
+	}
 }

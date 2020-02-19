@@ -27,6 +27,7 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.FieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
@@ -35,6 +36,7 @@ import uk.ac.ed.epcc.webapp.model.data.convert.EnumeratingTypeConverter;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeFilterProducer;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.BasicTypeInput;
 
 /**
@@ -304,6 +306,31 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		BasicTypeInput<T> input = new BasicTypeInput<>(this);
 		return input;
 	}
+	public final Selector<BasicTypeInput<T>> getSelector(){
+		return new Selector<BasicTypeInput<T>>() {
+
+			@Override
+			public BasicTypeInput<T> getInput() {
+				
+				return BasicType.this.getInput();
+			}
+			
+		};
+	}
+	public final Selector<BasicTypeInput<T>> getSelector(boolean pre_select){
+		return new Selector<BasicTypeInput<T>>() {
+
+			@Override
+			public BasicTypeInput<T> getInput() {
+				
+				BasicTypeInput<T> input = BasicType.this.getInput();
+				input.setPreSelect(pre_select);
+				return input;
+			}
+			
+		};
+	}
+	
 
     @Override
 	public final String getIndex(T value){

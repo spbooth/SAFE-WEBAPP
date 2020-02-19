@@ -1690,7 +1690,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return Map
 	 * @see DataObjectFormFactory
 	 */
-	protected Map<String,Object> getSelectors() {
+	protected Map<String,Selector> getSelectors() {
 
 		return new HashMap<>();
 	}

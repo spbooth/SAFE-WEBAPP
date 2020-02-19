@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+
 /** Input for phone numbers
  * @author spb
  *
@@ -39,5 +41,14 @@ public class PhoneInput extends PatternTextInput implements HTML5Input {
 	}
 
 	
+	public static Selector<PhoneInput> getSelector(){
+		return new Selector<PhoneInput>() {
 
+			@Override
+			public PhoneInput getInput() {
+				return new PhoneInput();
+			}
+			
+		};
+	}
 }

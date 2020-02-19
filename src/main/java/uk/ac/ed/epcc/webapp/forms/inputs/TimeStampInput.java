@@ -16,10 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-
-
-
-
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 public class TimeStampInput extends AbstractDateInput implements HTML5Input{
 
@@ -49,5 +46,21 @@ public class TimeStampInput extends AbstractDateInput implements HTML5Input{
 	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitTimestampInput(this);
+	}
+
+
+	public static Selector<TimeStampInput> getSelector(long resolution){
+		return new Selector<TimeStampInput>() {
+
+			@Override
+			public TimeStampInput getInput() {
+				
+				return new TimeStampInput(resolution);
+			}
+			
+		};
+	}
+	public static Selector<TimeStampInput> getSelector(){
+		return getSelector(1000L);
 	}
 }

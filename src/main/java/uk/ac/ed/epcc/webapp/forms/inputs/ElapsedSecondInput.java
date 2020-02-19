@@ -22,6 +22,7 @@ import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 /** Input for a time duration in  HH:mm::ss format
  * returned in seconds
@@ -94,6 +95,16 @@ public class ElapsedSecondInput extends ParseAbstractInput<Number> implements Fo
 	@Override
 	public String getFormatHint() {
 		return "HH:MM:SS";
+	}
+	public static Selector<ElapsedSecondInput> getSelector(){
+		return new Selector<ElapsedSecondInput>() {
+
+			@Override
+			public ElapsedSecondInput getInput() {
+				return new ElapsedSecondInput();
+			}
+			
+		};
 	}
 
 }

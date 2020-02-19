@@ -22,6 +22,7 @@ import java.util.regex.PatternSyntaxException;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 
 /** Input for a regular expression pattern.
@@ -57,4 +58,15 @@ public class RegexpInput extends TextInput implements TagInput{
 		return "(Regular expression)";
 	}
 
+	
+	public static Selector<RegexpInput> getSelector(){
+		return new Selector<RegexpInput>() {
+
+			@Override
+			public RegexpInput getInput() {
+				return new RegexpInput();
+			}
+			
+		};
+	}
 }

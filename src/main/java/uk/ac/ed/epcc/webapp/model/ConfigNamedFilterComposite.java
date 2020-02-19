@@ -28,6 +28,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link Composite} that generates named filters based on boolean
@@ -133,9 +134,10 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#addSelectors(java.util.Map)
 	 */
 	@Override
-	public Map<String, Object> addSelectors(Map<String, Object> selectors) {
+	public Map<String, Selector> addSelectors(Map<String, Selector> selectors) {
+		Selector<BooleanInput> s = BooleanInput.getSelector();
 		for(String name : names) {
-			selectors.put(name, new BooleanInput());
+			selectors.put(name, s);
 		}
 		return selectors;
 	}

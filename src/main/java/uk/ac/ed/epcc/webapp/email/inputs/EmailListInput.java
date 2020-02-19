@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.MultipleInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 /** Input for a list of email addresses.
  * 
  * @author spb
@@ -86,4 +87,14 @@ public class EmailListInput extends TextInput implements MultipleInput, FormatHi
 		return "name@example.com, name2@example.com";
 	}
 
+	public static Selector<EmailListInput> getSelector(){
+		return new Selector<EmailListInput>() {
+
+			@Override
+			public EmailListInput getInput() {
+				return new EmailListInput();
+			}
+			
+		};
+	}
 }

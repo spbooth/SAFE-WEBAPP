@@ -84,6 +84,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.IdAcceptFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.PrimaryOrderFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.UpdateAction;
 import uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
@@ -275,15 +276,15 @@ AnonymisingFactory
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getSelectors()
 	 */
 	@Override
-	protected Map<String,Object> getSelectors() {
-		Map<String,Object> selectors = super.getSelectors();
-		if (selectors == null) {
-			selectors = new HashMap<>();
-		}
+	protected Map<String,Selector> getSelectors() {
+		// expose to EmailCahngeRequest 
+		// final to see if any overiddes.
+		Map<String,Selector> selectors = super.getSelectors();
+		
 		
 		return selectors;
 	}
-
+   
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -635,6 +636,16 @@ AnonymisingFactory
 	
 	public final DataObjectItemInput<AU> getNameInput(BaseFilter<AU> fil,boolean create,boolean restrict){
 		return new AppUserNameInput<>(this, create, restrict, fil);
+	}
+	public final Selector<DataObjectItemInput<AU>> getNameSelector(BaseFilter<AU> fil,boolean create,boolean restrict){
+		return new Selector<DataObjectItemInput<AU>>() {
+
+			@Override
+			public DataObjectItemInput<AU> getInput() {
+				return getNameInput(fil, create, restrict);
+			}
+
+		};
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.ParseFactory#getCanonicalName(java.lang.Object)

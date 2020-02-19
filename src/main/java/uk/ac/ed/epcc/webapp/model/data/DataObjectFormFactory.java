@@ -115,7 +115,7 @@ public final AppContext getContext(){
 	 * @throws DataFault
 	 */
 	public static final void buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
-			Set<String> optional, Map<String,Object> selectors,Map<String,String> labels) throws DataFault {
+			Set<String> optional, Map<String,Selector> selectors,Map<String,String> labels) throws DataFault {
 		buildForm(conn, res, f, supress_fields, optional, selectors, labels, null);
 	}
 	/**
@@ -139,7 +139,7 @@ public final AppContext getContext(){
 	 * @throws DataFault
 	 */
 	public static final void buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
-				Set<String> optional, Map<String,Object> selectors,Map<String,String> labels,Map<String,String> tooltips) throws DataFault {
+				Set<String> optional, Map<String,Selector> selectors,Map<String,String> labels,Map<String,String> tooltips) throws DataFault {
 		int maxwid = conn.getIntegerParameter("forms.max_text_input_width", 64);
 		Set<String> keys = res.getFields();
         String table = res.getTag();
@@ -240,7 +240,7 @@ public final AppContext getContext(){
 		}
 
 	}
-	public static final  Input<?> getInput(AppContext conn,Map<String, Object> selectors, String table,String name) {
+	public static final  Input<?> getInput(AppContext conn,Map<String, Selector> selectors, String table,String name) {
 		Input<?> input=null;
 		Object o = null;
 		if (selectors != null && selectors.containsKey(name)) {
@@ -280,7 +280,7 @@ public final AppContext getContext(){
 	 * @param res
 	 * @return modified map
 	 */
-	public static Map<String,Object> addSelectors(AppContext conn,Map<String,Object> sel,Repository res){
+	public static Map<String,Selector> addSelectors(AppContext conn,Map<String,Selector> sel,Repository res){
 		if( sel == null ){
 			sel = new HashMap<>();
 		}
@@ -386,8 +386,8 @@ public final AppContext getContext(){
 	 * 
 	 * @return Map
 	 */
-	protected  Map<String,Object> getSelectors() {
-		Map<String,Object>sel = factory.getSelectors();
+	protected  Map<String,Selector> getSelectors() {
+		Map<String,Selector>sel = factory.getSelectors();
 		if( sel == null ){
 			sel = new HashMap<>();
 		}

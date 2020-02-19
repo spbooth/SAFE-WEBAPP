@@ -17,6 +17,8 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.model.data.forms.CheckboxSelector;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 /** A checkbox input. 
  * 
@@ -117,5 +119,9 @@ public class CheckBoxInput extends AbstractInput<String> implements ParseInput<S
 	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitBinaryInput(this);
+	}
+	
+	public static Selector<CheckBoxInput> getSelector(){
+		return new CheckboxSelector();
 	}
 }

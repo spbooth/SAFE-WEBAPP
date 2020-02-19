@@ -19,6 +19,7 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** An interface for objects that contribute fields etc. to the structure of a table and control the default form generation
@@ -81,7 +82,7 @@ public interface TableStructureContributer<BDO extends DataObject> {
 	 * @param selectors
 	 * @return {@link Map} of modified selectors/inputs
 	 */
-	Map<String, Object> addSelectors(Map<String, Object> selectors);
+	Map<String, Selector> addSelectors(Map<String, Selector> selectors);
 
 	/**
 	 * generate the class specific set of suppressed fields to be used in form creation/update

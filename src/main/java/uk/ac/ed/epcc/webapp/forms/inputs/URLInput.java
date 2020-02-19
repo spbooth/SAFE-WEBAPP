@@ -19,6 +19,7 @@ import java.net.URL;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 /** Input for URLs
  * @author spb
@@ -59,5 +60,15 @@ public class URLInput extends TextInput implements HTML5Input{
 		return "url";
 	}
 
+	public static Selector<URLInput> getSelector(){
+		return new Selector<URLInput>() {
+
+			@Override
+			public URLInput getInput() {
+				return new URLInput();
+			}
+			
+		};
+	}
 	
 }

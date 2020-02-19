@@ -845,8 +845,8 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	}
 
 	@Override
-	protected Map<String, Object> getSelectors() {
-		HashMap<String, Object> result = new HashMap<>();
+	protected Map<String, Selector> getSelectors() {
+		Map<String, Selector> result = super.getSelectors();
 		result.put(getLeftField(),new Selector() {
 
 			@Override

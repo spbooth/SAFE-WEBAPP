@@ -62,6 +62,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 import uk.ac.ed.epcc.webapp.model.data.forms.RetireAction;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
@@ -562,8 +563,8 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			}
 			
 			f.addInput("Location", "Location",new InfoInput(location));
-			Map<String,Object> sel = getSelectors();
-			Input<String> text = (Input<String>) sel.get(TEXT);
+			Map<String,Selector> sel = getSelectors();
+			Input<String> text = (Input<String>) sel.get(TEXT).getInput();
 			text.setValue(dat.getData());
 		
 			f.addInput(TEXT, TEXT, text);
@@ -707,17 +708,33 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getSelectors()
 	 */
 	@Override
-	protected Map<String, Object> getSelectors() {
-		Map<String,Object> sel = new HashMap<>();
-		TextInput text = new TextInput();
-		text.setMaxResultLength(1<<24);
-		sel.put(TEXT,text);
-		TextInput name = new TextInput();
-		name.setSingle(true);
-		sel.put(NAME, name);
-		TextInput group = new TextInput();
-		group.setSingle(true);
-		sel.put(GROUP, group);
+	protected Map<String, Selector> getSelectors() {
+		Map<String,Selector> sel = new HashMap<>();
+		
+		sel.put(TEXT,new Selector() {
+
+			@Override
+			public Input getInput() {
+				TextInput text = new TextInput();
+				text.setMaxResultLength(1<<24);
+				return text;
+			}
+			
+		});
+		Selector s = new Selector() {
+
+			@Override
+			public Input getInput() {
+				TextInput name = new TextInput();
+				name.setSingle(true);
+				return name;
+			}
+			
+		};
+		
+		sel.put(NAME, s);
+		
+		sel.put(GROUP, s);
 		return sel;
 	}
 

@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link Composite} adds behaviour to a {@link DataObjectFactory}
@@ -123,7 +124,7 @@ public abstract class Composite<BDO extends DataObject, X extends Composite> imp
 	 * @see uk.ac.ed.epcc.webapp.model.data.TableStructureContributer#addSelectors(java.util.Map)
 	 */
 	@Override
-	public Map<String,Object> addSelectors(Map<String,Object> selectors) {
+	public Map<String,Selector> addSelectors(Map<String,Selector> selectors) {
 
 		return selectors;
 	}

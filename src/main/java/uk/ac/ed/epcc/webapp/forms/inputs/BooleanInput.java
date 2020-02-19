@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 
 
@@ -83,4 +84,15 @@ public class BooleanInput extends AbstractInput<Boolean> implements ParseInput<B
 		return "true";
 	}
 
+	
+	public static Selector<BooleanInput> getSelector(){
+		return new Selector<BooleanInput>() {
+
+			@Override
+			public BooleanInput getInput() {
+				return new BooleanInput();
+			}
+			
+		};
+	}
 }

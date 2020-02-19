@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileUploadDecorator;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.NoSpaceFieldValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnusedNameInput;
@@ -41,6 +42,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.forms.CreateTransition;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -183,12 +185,20 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 		}
 
 		@Override
-		protected Map<String, Object> getSelectors() {
-			Map<String, Object> selectors = super.getSelectors();
-			UnusedNameInput input = new UnusedNameInput((DynamicFormManager) getFactory());
-			input.setTrim(true);
-			input.addValidator(new NoSpaceFieldValidator());
-			selectors.put(DynamicFormManager.NAME_FIELD,input);
+		protected Map<String, Selector> getSelectors() {
+			Map<String, Selector> selectors = super.getSelectors();
+			
+			selectors.put(DynamicFormManager.NAME_FIELD,new Selector() {
+
+				@Override
+				public Input getInput() {
+					UnusedNameInput input = new UnusedNameInput((DynamicFormManager) getFactory());
+					input.setTrim(true);
+					input.addValidator(new NoSpaceFieldValidator());
+					return input;
+				}
+				
+			});
 			return selectors;
 		}
 		

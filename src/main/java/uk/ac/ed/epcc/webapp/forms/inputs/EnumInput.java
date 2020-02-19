@@ -24,6 +24,7 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 /** Input to select values from a Java Enum 
  * the DB will contain the Enum name and the menu the result of the toString call.
@@ -178,4 +179,17 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
 		return set.contains(item);
 	}
 
+	public static <E extends Enum<E>> Selector<EnumInput<E>> getSelector(EnumSet<E> set){
+		return new Selector<EnumInput<E>>() {
+
+			@Override
+			public EnumInput<E> getInput() {
+				return new EnumInput<>(set);
+			}
+			
+		};
+	}
+	public static <E extends Enum<E>> Selector<EnumInput<E>> getSelector(Class<E> clazz){
+		return getSelector(EnumSet.allOf(clazz));
+	}
 }

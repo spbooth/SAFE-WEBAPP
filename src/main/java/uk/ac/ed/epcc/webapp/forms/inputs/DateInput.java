@@ -16,8 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-
-
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 /** A text input for {@link Date}s on day boundaries-
  * 
@@ -56,6 +55,25 @@ public class DateInput extends AbstractDateInput implements HTML5Input, PatternI
 		return "\\d{4}-[0-1]\\d-[0-3]\\d";
 	}
 
-	
+	public static Selector<DateInput> getSelector(long resolution){
+		return new Selector<DateInput>() {
 
+			@Override
+			public DateInput getInput() {
+				return new DateInput(resolution);
+			}
+			
+		};
+	}
+	public static Selector<DateInput> getSelector(){
+		return new Selector<DateInput>() {
+
+			@Override
+			public DateInput getInput() {
+				return new DateInput();
+			}
+			
+		};
+	}
+	
 }
