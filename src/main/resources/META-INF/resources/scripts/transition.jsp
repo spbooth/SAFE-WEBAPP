@@ -20,6 +20,7 @@ attribute.
 Note that as the target and provider are encoded in the servlet-path
 the form could just submit to self. This might break form error reporting though.
 --%>
+<%@page import="uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult"%>
 <%@page import="uk.ac.ed.epcc.webapp.tags.WebappHeadTag"%>
 <%@ page import="uk.ac.ed.epcc.webapp.forms.html.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.forms.*" %>
@@ -75,7 +76,7 @@ the form could just submit to self. This might break form error reporting though
 %>
 <%
 Transition t = tp.getTransition(target,key);
-HTMLForm f = new HTMLForm(conn);
+HTMLForm f = new HTMLForm(conn,new ChainedTransitionResult(tp,target,key));
 //Don't use period to be jquery compatible
 f.setFormID("transition.");
 try{

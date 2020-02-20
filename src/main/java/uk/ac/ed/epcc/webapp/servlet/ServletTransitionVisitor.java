@@ -66,7 +66,7 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 				return new ChainedTransitionResult<>(provider,target,tag);
 			}
 //			 actually process the results of a transition
-			HTMLForm f = new HTMLForm(conn);
+			HTMLForm f = new HTMLForm(conn,getSelf());
 		
 		    ft.buildForm(f, target, conn);
 		    try{
@@ -130,7 +130,7 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 				return new ChainedTransitionResult<>(provider,null,tag);
 			}
 //			 actually process the results of a transition
-			HTMLForm f = new HTMLForm(conn);
+			HTMLForm f = new HTMLForm(conn,getSelf());
 		
 		    ft.buildForm(f, conn);
 		    try{

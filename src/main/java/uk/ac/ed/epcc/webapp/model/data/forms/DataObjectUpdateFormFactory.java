@@ -95,14 +95,16 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 
 	public final void buildUpdateForm(String type_name, Form f, BDO dat, SessionService<?> operator)
 			throws DataFault {
-			    buildForm(f);
+			    boolean complete = buildForm(f);
 				customiseForm(f);
 				for(TableStructureContributer<BDO> contrib : factory.getTableStructureContributers()){
 					contrib.customiseUpdateForm(f, dat, operator);
 				}
 				f.setContents(getDefaults());
-				f.addAction(UPDATE, new UpdateAction<>(type_name,this, dat));
-				addRetireAction(type_name, f, dat, operator);
+				if( complete ) {
+					f.addAction(UPDATE, new UpdateAction<>(type_name,this, dat));
+					addRetireAction(type_name, f, dat, operator);
+				}
 				customiseUpdateForm(f, dat);
 				if( dat != null ){
 					//this should never be called with dat null except from a unit test

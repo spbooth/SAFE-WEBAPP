@@ -94,6 +94,17 @@ public interface TableStructureContributer<BDO extends DataObject> {
 	 */
 	Set<String> addSuppress(Set<String> suppress);
 
+	/** Add any {@link FieldConstraint} for the form.
+	 * Note there may be multiple constraints for a field so existing values should
+	 * be merged using {@link FieldConstraint#add(FieldConstraint, FieldConstraint)}
+	 * 
+	 * 
+	 * @param constraints
+	 * @return modifed map
+	 */
+	default Map<String,FieldConstraint> addFieldConstraints(Map<String,FieldConstraint> constraints){
+		return constraints;
+	}
 	/**
 	 * Extension hook to allow additional Form customisation generic to all
 	 * types of Form (create and update) For example adding a FormValidator .

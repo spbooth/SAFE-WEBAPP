@@ -214,7 +214,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * @param <BDO> type produced by factory
  */
 @SuppressWarnings("javadoc")
-public abstract class DataObjectFactory<BDO extends DataObject> implements Tagged, ContextCached, Owner<BDO>, IndexedProducer<BDO>, Selector<DataObjectItemInput<BDO>> , FormCreatorProducer,FormUpdateProducer<BDO>,FilterMatcher<BDO>{
+public abstract class DataObjectFactory<BDO extends DataObject> implements Tagged, ContextCached, Owner<BDO>, IndexedProducer<BDO>, DataObjectSelector<BDO> , FormCreatorProducer,FormUpdateProducer<BDO>,FilterMatcher<BDO>{
     /**
 	 * 
 	 */
@@ -1500,7 +1500,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	public DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil,boolean restrict){
 		return new DataObjectInput(fil,restrict);
 	}
-	public class FilterSelector implements Selector<DataObjectItemInput<BDO>>{
+	public class FilterSelector implements DataObjectSelector<BDO>{
 		private final boolean restrict;
 		public FilterSelector(BaseFilter<BDO> fil,boolean restrict) {
 			super();
@@ -1517,6 +1517,14 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		public DataObjectItemInput<BDO> getInput() {
 			return DataObjectFactory.this.getInput(fil,restrict);
 		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectSelector#getSelector(uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter)
+		 */
+		@Override
+		public DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> filter) {
+			return new FilterSelector(new AndFilter<BDO>(getTarget(), fil, filter), restrict);
+		}
 	}
 	/** create a {@link Selector} from a filter.
 	 * 
@@ -1524,8 +1532,14 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param fil {@link BaseFilter} for selection
 	 * @return {@link Selector}
 	 */
-	public final Selector<DataObjectItemInput<BDO>> getSelector(BaseFilter<BDO> fil){
+	public final DataObjectSelector<BDO> getSelector(BaseFilter<BDO> fil){
 		return new FilterSelector(fil,true);
+	}
+	
+	@Override
+	public final DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> fil){
+		// This should narrow the default selector of this class
+		return new FilterSelector(new AndFilter<BDO>(getTarget(),getFinalSelectFilter(),fil),restrictDefaultInput());
 	}
 	/** create a {@link Selector} from a filter.
 	 * 
@@ -1706,6 +1720,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		return new HashSet<>();
 	}
 	
+	/** get the {@link FieldConstraint}s to apply in creation/update forms
+	 * 
+	 * @return
+	 */
+	protected Map<String,FieldConstraint> getFieldConstraints(){
+		return new HashMap<String, FieldConstraint>();
+	}
 	/** Generate the default text identifier of the client object.
 	 * This is used in urls and html inputs and defaults to the integer
 	 * representation of the object.

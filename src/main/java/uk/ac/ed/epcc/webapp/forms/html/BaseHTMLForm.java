@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlFormPolicy;
@@ -41,6 +42,10 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 /** Common Base class for different types of HTML Form
  * 
+ * This class supports stateful/multi-state forms but only if the
+ * <b>self</b> {@link FormResult} is set when creating the form 
+ * as multi-stage forms have 
+ * 
  * @author spb
  *
  */
@@ -48,12 +53,24 @@ public abstract class BaseHTMLForm extends MapForm {
 	public static final String FORM_STATE_ATTR = "form_state";
 	public static final String FORM_STAGE_INPUT = "form_stage";
 	
+	public static final Feature MULTI_STAGE_FORMS= new Feature("htmlform.multi_stage",true,"multi-stage html forms");
+	/** A {@link FormResult} to return to this form. 
+	 * This must be set to support stateful/multi-stage forms
+	 * 
+	 */
+	public final FormResult self; //
 	
-	
-	public BaseHTMLForm(AppContext c) {
+	public BaseHTMLForm(AppContext c,FormResult self) {
 		super(c);
+		if( MULTI_STAGE_FORMS.isEnabled(c)) {
+			this.self=self;
+		}else {
+			this.self=null;
+		}
 	}
-	
+	public BaseHTMLForm(AppContext c) {
+		this(c,null);
+	}
 	
 	protected int stage=0;// form stage we are considering
 	boolean last_poll=true;
@@ -68,7 +85,10 @@ public abstract class BaseHTMLForm extends MapForm {
 		this.target_stage=stage;
 	}
 	@Override
-	public boolean poll(FormResult self) throws TransitionException{
+	public boolean poll() throws TransitionException{
+		if( self == null) {
+			return true;
+		}
 		boolean result=false;
 		AppContext c = getContext();
 		
@@ -124,6 +144,10 @@ public abstract class BaseHTMLForm extends MapForm {
 		}
 		last_poll=result;
 		return result;
+	}
+	@Override
+	public final boolean supportsMultiStage() {
+		return self != null;
 	}
 	@Override
 	public boolean isComplete() {

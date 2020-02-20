@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.forms.transition;
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 
 public abstract class AbstractTransitionVisitor<K,T> extends AbstractContexed implements TransitionVisitor<T> {
@@ -39,5 +40,7 @@ public abstract class AbstractTransitionVisitor<K,T> extends AbstractContexed im
 	public FormResult doDirectTargetlessTransition(DirectTargetlessTransition<T> t) throws TransitionException {
 		return t.doTransition(conn);
 	}
-	
+	public FormResult getSelf() {
+		return new ChainedTransitionResult<T, K>(provider, target, tag);
+	}
 }

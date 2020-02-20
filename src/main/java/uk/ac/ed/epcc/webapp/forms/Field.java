@@ -101,6 +101,15 @@ public final class Field<I> {
     	}
     	return false;
     }
+    
+    /** Can the current form value be changed
+     * 
+     * @return
+     */
+    public boolean isFixed() {
+    	return isLocked();
+    	// TODO add a test against single value inputs
+    }
 	/**
 	 * Does this field use a particular type of input
 	 * 
