@@ -50,14 +50,7 @@ public class PreferedViewFactory extends ClassificationFactory<PreferedView> {
 	protected Map<String, Selector> getSelectors() {
 		
 		Map<String, Selector> selectors = super.getSelectors();
-		Selector s = new Selector() {
-
-			@Override
-			public Input getInput() {
-				return new URLInput();
-			}
-			
-		};
+		Selector s = URLInput::new;
 		selectors.put(SAFE_URL, s);
 		selectors.put(DOCUMENTATION_URL, s);
 		return selectors;

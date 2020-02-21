@@ -83,16 +83,4 @@ public class BooleanInput extends AbstractInput<Boolean> implements ParseInput<B
 	public String getChecked() {
 		return "true";
 	}
-
-	
-	public static Selector<BooleanInput> getSelector(){
-		return new Selector<BooleanInput>() {
-
-			@Override
-			public BooleanInput getInput() {
-				return new BooleanInput();
-			}
-			
-		};
-	}
 }

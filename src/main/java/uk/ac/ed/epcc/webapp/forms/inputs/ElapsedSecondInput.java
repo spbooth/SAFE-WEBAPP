@@ -96,15 +96,5 @@ public class ElapsedSecondInput extends ParseAbstractInput<Number> implements Fo
 	public String getFormatHint() {
 		return "HH:MM:SS";
 	}
-	public static Selector<ElapsedSecondInput> getSelector(){
-		return new Selector<ElapsedSecondInput>() {
-
-			@Override
-			public ElapsedSecondInput getInput() {
-				return new ElapsedSecondInput();
-			}
-			
-		};
-	}
 
 }

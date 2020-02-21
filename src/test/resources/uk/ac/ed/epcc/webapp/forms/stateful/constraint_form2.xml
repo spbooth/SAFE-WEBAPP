@@ -4,22 +4,22 @@
 <table class="form">
 <tr class="even">
 <th>
-<label class="optional">Min</label>
+<label class="required">Min</label>
 </th>
 <td>1</td>
 </tr>
 <tr class="odd">
 <th>
-<label class="optional">Max</label>
+<label class="required">Max</label>
 </th>
 <td>100</td>
 </tr>
 <tr class="even">
 <th>
-<label for="transition_Value" class="optional">Value</label>
+<label for="transition_Value" class="required">Value</label>
 </th>
 <td>
-<input id="transition_Value" type="number" size="32" maxlength="32" name="Value" class="input" min="1" max="100" step="1"/>
+<input id="transition_Value" type="number" size="32" maxlength="32" name="Value" class="input" min="1" max="100" step="1" required="required"/>
 </td>
 </tr>
 </table>

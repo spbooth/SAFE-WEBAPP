@@ -306,33 +306,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		BasicTypeInput<T> input = new BasicTypeInput<>(this);
 		return input;
 	}
-	public final Selector<BasicTypeInput<T>> getSelector(){
-		return new Selector<BasicTypeInput<T>>() {
-
-			@Override
-			public BasicTypeInput<T> getInput() {
-				
-				return BasicType.this.getInput();
-			}
-			
-		};
-	}
-	public final Selector<BasicTypeInput<T>> getSelector(boolean pre_select){
-		return new Selector<BasicTypeInput<T>>() {
-
-			@Override
-			public BasicTypeInput<T> getInput() {
-				
-				BasicTypeInput<T> input = BasicType.this.getInput();
-				input.setPreSelect(pre_select);
-				return input;
-			}
-			
-		};
-	}
-	
-
-    @Override
+	@Override
 	public final String getIndex(T value){
     	if( ! values.containsValue(value)){
     		return null;

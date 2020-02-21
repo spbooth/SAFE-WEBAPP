@@ -57,16 +57,4 @@ public class RegexpInput extends TextInput implements TagInput{
 	public String getTag() {
 		return "(Regular expression)";
 	}
-
-	
-	public static Selector<RegexpInput> getSelector(){
-		return new Selector<RegexpInput>() {
-
-			@Override
-			public RegexpInput getInput() {
-				return new RegexpInput();
-			}
-			
-		};
-	}
 }

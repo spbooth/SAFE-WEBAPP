@@ -223,16 +223,4 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
 		}
 		return super.convert(v);
 	}
-	
-	
-	public static <T> Selector<SetInput<T>> getSelector(Collection<T> items){
-		return new Selector<SetInput<T>>() {
-
-			@Override
-			public SetInput<T> getInput() {
-				return new SetInput<>(items);
-			}
-			
-		};
-	}
 }

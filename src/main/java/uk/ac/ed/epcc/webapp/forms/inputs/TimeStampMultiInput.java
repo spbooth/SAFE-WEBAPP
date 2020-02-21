@@ -269,14 +269,4 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements B
 		c=null;
 	}
 
-	public static Selector<TimeStampMultiInput> getSelector(Date now,long resolution,int max_field){
-		return new Selector<TimeStampMultiInput>() {
-
-			@Override
-			public TimeStampMultiInput getInput() {
-				return new TimeStampMultiInput(now, resolution, max_field);
-			}
-			
-		};
-	}
 }

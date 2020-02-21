@@ -73,16 +73,4 @@ public class EmailInput extends TextInput implements HTML5Input , FormatHintInpu
 	public String getFormatHint() {
 		return "name@example.com";
 	}
-
-	
-	public static Selector<EmailInput> getSelector(){
-		return new Selector<EmailInput>() {
-
-			@Override
-			public EmailInput getInput() {
-				return new EmailInput();
-			}
-			
-		};
-	}
 }

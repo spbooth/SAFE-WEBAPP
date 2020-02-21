@@ -81,15 +81,4 @@ public class IntegerInput extends NumberInput<Integer> {
 		}
 		throw new TypeError("Invalid type "+v.getClass().getCanonicalName()+" passed to IntegerInput");
 	}
-
-	public static Selector<IntegerInput> getSelector(){
-		return new Selector<IntegerInput>() {
-
-			@Override
-			public IntegerInput getInput() {
-				return new IntegerInput();
-			}
-			
-		};
-	}
 }

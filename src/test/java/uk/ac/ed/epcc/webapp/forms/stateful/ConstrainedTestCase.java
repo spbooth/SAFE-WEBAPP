@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.forms.stateful;
 
 import org.junit.Test;
 
+import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.servlet.AbstractTransitionServletTest;
 
 /**
@@ -44,6 +45,37 @@ public class ConstrainedTestCase extends AbstractTransitionServletTest {
 		runTransition();
 		checkMessage("object_created");
 		checkDiff("/cleanup.xsl", "constraint_created.xml");
+		
+	}
+	
+	@Test
+	@ConfigFixtures("nomulti.properties")
+	public void testCreateNoMulti() throws Exception {
+		takeBaseline();
+		ConstraintProvider provider = new ConstraintProvider(ctx);
+		setTransition(provider, ConstraintProvider.CREATE_KEY, null);
+		checkFormContent(null, "constrained_form_nomulti.xml");
+		addParam("Min", 1);
+		addParam("Max", 100);
+		addParam("Value",12);
+		runTransition();
+		checkMessage("object_created");
+		checkDiff("/cleanup.xsl", "constraint_created.xml");
+		
+	}
+	
+	@Test
+	@ConfigFixtures("nomulti.properties")
+	public void testCreateNoMultiBad() throws Exception {
+		takeBaseline();
+		ConstraintProvider provider = new ConstraintProvider(ctx);
+		setTransition(provider, ConstraintProvider.CREATE_KEY, null);
+		checkFormContent(null, "constrained_form_nomulti.xml");
+		addParam("Min", 100);
+		addParam("Max", 1);
+		addParam("Value",12);
+		runTransition();
+		checkGeneralError("Value too small");
 		
 	}
 	

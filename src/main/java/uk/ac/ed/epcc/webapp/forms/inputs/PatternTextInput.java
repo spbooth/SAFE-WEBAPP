@@ -89,20 +89,4 @@ public String getTag() {
 	}
 	return "Regexp: "+pattern;
 }
-
-
-public static Selector<PatternTextInput> getSelector(String pattern,String tag){
-	return new Selector<PatternTextInput>() {
-
-		@Override
-		public PatternTextInput getInput() {
-			
-			PatternTextInput input = new PatternTextInput(pattern);
-			input.setTag(tag);
-			return input;
-		}
-		
-	};
-	
-}
 }

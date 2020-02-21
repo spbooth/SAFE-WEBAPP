@@ -126,7 +126,7 @@ public class StateRelationshipComposite<U extends AppUser,BDO extends DataObject
 
 	@Override
 	public Map<String, Selector> addSelectors(Map<String, Selector> selectors) {
-		selectors.put(field,BooleanInput.getSelector());
+		selectors.put(field,BooleanInput::new);
 		return selectors;
 	}
 

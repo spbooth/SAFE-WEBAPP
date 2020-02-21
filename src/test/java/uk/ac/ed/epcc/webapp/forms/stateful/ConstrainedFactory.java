@@ -13,7 +13,9 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.stateful;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
@@ -154,5 +156,11 @@ public class ConstrainedFactory extends DataObjectFactory<ConstrainedFactory.Con
 				
 			}
 		});
+	}
+
+	@Override
+	protected Set<String> getOptional() {
+		
+		return new HashSet<String>();
 	}
 }

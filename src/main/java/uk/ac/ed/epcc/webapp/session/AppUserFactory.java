@@ -637,16 +637,6 @@ AnonymisingFactory
 	public final DataObjectItemInput<AU> getNameInput(BaseFilter<AU> fil,boolean create,boolean restrict){
 		return new AppUserNameInput<>(this, create, restrict, fil);
 	}
-	public final Selector<DataObjectItemInput<AU>> getNameSelector(BaseFilter<AU> fil,boolean create,boolean restrict){
-		return new Selector<DataObjectItemInput<AU>>() {
-
-			@Override
-			public DataObjectItemInput<AU> getInput() {
-				return getNameInput(fil, create, restrict);
-			}
-
-		};
-	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.ParseFactory#getCanonicalName(java.lang.Object)
 	 */

@@ -197,15 +197,4 @@ public class DNInput extends ParseAbstractInput<String> implements ItemInput<Str
 		String value = getValue();
 		return value == null || value.trim().isEmpty();
 	}
-	
-	public static Selector<DNInput> getSelector(){
-		return new Selector<DNInput>() {
-
-			@Override
-			public DNInput getInput() {
-				return new DNInput();
-			}
-			
-		};
-	}
    }

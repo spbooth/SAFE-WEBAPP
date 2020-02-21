@@ -120,8 +120,4 @@ public class CheckBoxInput extends AbstractInput<String> implements ParseInput<S
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitBinaryInput(this);
 	}
-	
-	public static Selector<CheckBoxInput> getSelector(){
-		return new CheckboxSelector();
-	}
 }

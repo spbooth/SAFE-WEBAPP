@@ -67,15 +67,4 @@ public class ConstantInput<V> extends AbstractInput<V> implements UnmodifiableIn
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitUnmodifyableInput(this);
 	}
-
-	public static <V>  Selector<ConstantInput<V>> getSelector(String text, V value){
-		return new Selector<ConstantInput<V>>() {
-
-			@Override
-			public ConstantInput<V> getInput() {
-				return new ConstantInput<>(text, value);
-			}
-			
-		};
-	}
 }

@@ -277,13 +277,8 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		@Override
 		protected Map<String, Selector> getSelectors() {
 			Map<String, Selector> selectors = super.getSelectors();
-			selectors.put(NAME_FIELD,new Selector(){
-
-				@Override
-				public Input getInput() {
+			selectors.put(NAME_FIELD,()-> {
 					return new UnusedNameInput(owner,null);
-				}
-				
 			});
 			return selectors;
 		}

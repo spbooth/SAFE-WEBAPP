@@ -67,19 +67,4 @@ protected Double normalise(Double val) {
 	int perc = (int) (val.doubleValue()*100.0);
 	return new Double((double)perc/100.0);
 }
-
-
-	public static Selector<PercentInput> getSelector(boolean integer_only){
-		return new Selector<PercentInput>() {
-
-			@Override
-			public PercentInput getInput() {
-				return new PercentInput(integer_only);
-			}
-			
-		};
-	}
-	public static Selector<PercentInput> getSelector(){
-		return getSelector(false);
-	}
 }

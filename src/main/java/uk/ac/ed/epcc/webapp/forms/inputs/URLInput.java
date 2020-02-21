@@ -59,16 +59,5 @@ public class URLInput extends TextInput implements HTML5Input{
 	public String getType() {
 		return "url";
 	}
-
-	public static Selector<URLInput> getSelector(){
-		return new Selector<URLInput>() {
-
-			@Override
-			public URLInput getInput() {
-				return new URLInput();
-			}
-			
-		};
-	}
 	
 }

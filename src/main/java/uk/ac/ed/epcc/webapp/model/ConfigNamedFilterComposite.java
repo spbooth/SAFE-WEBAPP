@@ -135,7 +135,7 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 	 */
 	@Override
 	public Map<String, Selector> addSelectors(Map<String, Selector> selectors) {
-		Selector<BooleanInput> s = BooleanInput.getSelector();
+		Selector<BooleanInput> s = BooleanInput::new;
 		for(String name : names) {
 			selectors.put(name, s);
 		}

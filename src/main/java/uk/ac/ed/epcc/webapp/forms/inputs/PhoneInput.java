@@ -39,16 +39,4 @@ public class PhoneInput extends PatternTextInput implements HTML5Input {
 	public String getType() {
 		return "tel";
 	}
-
-	
-	public static Selector<PhoneInput> getSelector(){
-		return new Selector<PhoneInput>() {
-
-			@Override
-			public PhoneInput getInput() {
-				return new PhoneInput();
-			}
-			
-		};
-	}
 }

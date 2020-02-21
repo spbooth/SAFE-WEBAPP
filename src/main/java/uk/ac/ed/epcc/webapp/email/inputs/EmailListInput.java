@@ -86,15 +86,4 @@ public class EmailListInput extends TextInput implements MultipleInput, FormatHi
 		
 		return "name@example.com, name2@example.com";
 	}
-
-	public static Selector<EmailListInput> getSelector(){
-		return new Selector<EmailListInput>() {
-
-			@Override
-			public EmailListInput getInput() {
-				return new EmailListInput();
-			}
-			
-		};
-	}
 }

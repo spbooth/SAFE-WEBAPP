@@ -12,6 +12,14 @@
 </tr>
 <tr class="odd">
 <th>
+<label for="transition_Value" class="required">Value</label>
+</th>
+<td>
+<input id="transition_Value" type="number" size="32" maxlength="32" name="Value" class="input" step="1" required="required"/>
+</td>
+</tr>
+<tr class="even">
+<th>
 <label for="transition_Max" class="required">Max</label>
 </th>
 <td>
@@ -20,7 +28,7 @@
 </tr>
 </table>
 <fieldset class="action_buttons">
-<input class="input_button" type="submit" name="Next" value="Next"/>
+<input class="input_button" type="submit" name="Create" value="Create"/>
 </fieldset>
 </Form>
 </transition_page>

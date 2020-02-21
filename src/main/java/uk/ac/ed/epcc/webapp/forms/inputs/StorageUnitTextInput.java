@@ -94,16 +94,4 @@ public class StorageUnitTextInput extends NumberInput<Long> implements FormatHin
 
 		return "500"+Units.KiB.toString();
 	}
-
-	
-	public static Selector<StorageUnitTextInput> getSelector(){
-		return new Selector<StorageUnitTextInput>() {
-
-			@Override
-			public StorageUnitTextInput getInput() {
-				return new StorageUnitTextInput();
-			}
-			
-		};
-	}
 }

@@ -178,18 +178,4 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
 	public boolean isValid(E item) {
 		return set.contains(item);
 	}
-
-	public static <E extends Enum<E>> Selector<EnumInput<E>> getSelector(EnumSet<E> set){
-		return new Selector<EnumInput<E>>() {
-
-			@Override
-			public EnumInput<E> getInput() {
-				return new EnumInput<>(set);
-			}
-			
-		};
-	}
-	public static <E extends Enum<E>> Selector<EnumInput<E>> getSelector(Class<E> clazz){
-		return getSelector(EnumSet.allOf(clazz));
-	}
 }

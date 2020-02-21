@@ -44,7 +44,7 @@ public class CertificateComposite extends AppUserComposite<AppUser, CertificateC
 	 */
 	@Override
 	public Map<String, Selector> addSelectors(Map<String, Selector> selectors) {
-		selectors.put(PERSONAL_CERTIFICATE, DNInput.getSelector());
+		selectors.put(PERSONAL_CERTIFICATE, DNInput::new);
 		return selectors;
 	}
 

@@ -97,15 +97,4 @@ public class InfoInput implements Input<String>, UnmodifiableInput{
 	public void removeValidator(FieldValidator<String> val) {
 		
 	}
-
-	public static Selector<InfoInput> getSelector(String text){
-		return new Selector<InfoInput>() {
-
-			@Override
-			public InfoInput getInput() {
-				return new InfoInput(text);
-			}
-			
-		};
-	}
 }
