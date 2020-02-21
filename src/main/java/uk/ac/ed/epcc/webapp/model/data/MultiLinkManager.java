@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.model.data;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -199,14 +200,14 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 
 	private Map<String,String> table_to_key;
 	/**
-	 * Basic Constructor subclasses should call addFaCtory to configure 
+	 * Basic Constructor subclasses should call addFactory to configure 
 	 * then call setContext
 	 * 
 	 * @param c
 	 */
 	protected MultiLinkManager() {
 		factories = new HashMap<>();
-		table_to_key = new HashMap<>();
+		table_to_key = new LinkedHashMap<>();
 	}
 	
 	
