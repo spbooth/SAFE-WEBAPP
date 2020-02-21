@@ -27,6 +27,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
@@ -197,24 +198,25 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 	private Map<String,DataObjectFactory> factories;
 
 	private Map<String,String> table_to_key;
-
 	/**
-	 * Basic Constructor subclasses should
+	 * Basic Constructor subclasses should call addFaCtory to configure 
+	 * then call setContext
 	 * 
 	 * @param c
 	 */
-	protected MultiLinkManager(AppContext ctx,String homeTable) {
-   	 	
-     		setContext(ctx, homeTable);
-     	
+	protected MultiLinkManager() {
 		factories = new HashMap<>();
 		table_to_key = new HashMap<>();
 	}
+	
+	
 	@Override
 	public TableSpecification getDefaultTableSpecification(AppContext ctx,
   			String homeTable) {
-		// need to extend
 		 TableSpecification spec = new TableSpecification();
+		 for(Map.Entry<String,String> e : table_to_key.entrySet()) {
+			 spec.setField(e.getValue(), new ReferenceFieldType(e.getKey()));
+		 }
 		 return spec;
 	 }
 	/**
@@ -225,13 +227,8 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 	 * @param fac
 	 */
 	protected void addFactory(String key, DataObjectFactory fac) {
-		if (res.hasField(key)) {
 			factories.put(key, fac);
 			table_to_key.put(fac.getTag(), key);
-		} else {
-			throw new ConsistencyError("Invalid field " + key
-					+ "for MultiLinkFactory");
-		}
 	}
 
 	/**
@@ -279,8 +276,8 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 	 * @return MultiLink
 	 * @throws DataException
 	 */
-	public MultiLink makeLink(Template t) throws DataException {
-		MultiLink res = getLink(t);
+	public M makeLink(Template t) throws DataException {
+		M res = getLink(t);
 		if (res == null) {
 			// make the object
 			res = makeBDO();
