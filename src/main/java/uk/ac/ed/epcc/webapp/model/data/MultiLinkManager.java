@@ -30,6 +30,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 
@@ -218,6 +219,11 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		 for(Map.Entry<String,String> e : table_to_key.entrySet()) {
 			 spec.setField(e.getValue(), new ReferenceFieldType(e.getKey()));
 		 }
+		 try {
+			Index m = spec.new Index("match_key", true, table_to_key.values().toArray(new String[table_to_key.size()]));
+		} catch (InvalidArgument e1) {
+			getLogger().error("Failed to make match index",e1);
+		}
 		 return spec;
 	 }
 	/**

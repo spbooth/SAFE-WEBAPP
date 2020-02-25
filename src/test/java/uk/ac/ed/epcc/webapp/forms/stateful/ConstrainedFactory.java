@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.stateful;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -63,14 +64,14 @@ public class ConstrainedFactory extends DataObjectFactory<ConstrainedFactory.Con
 			
 			@Override
 			public <I extends Input> Selector<I> apply(boolean support_multi_stage, String field, Selector<I> original,
-					Form form) {
+					Form form,HashMap fixtures) {
 				if( support_multi_stage ) {
 					if( ! (form.isFixed(MIN) && form.isFixed(MAX))){
 						// request a form stage
 						return null;
 					}
-					Integer min = (Integer) form.get(MIN);
-					Integer max = (Integer) form.get(MAX);
+					Integer min = (Integer) fixtures.get(MIN);
+					Integer max = (Integer) fixtures.get(MAX);
 					return new Selector() {
 
 						@Override

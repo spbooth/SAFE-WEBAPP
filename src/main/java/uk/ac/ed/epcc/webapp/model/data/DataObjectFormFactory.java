@@ -26,6 +26,7 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormFactory;
@@ -99,12 +100,15 @@ public final AppContext getContext(){
  * @throws TransitionException 
 	 */
 	public final boolean buildForm(Form f) throws DataFault{
-		boolean add_actions = buildForm(getContext(), factory.res,f,getSupress(),getOptional(),getSelectors(),getFieldConstraints(),getTranslations(),getFieldHelp());
+		return buildForm(f,null);
+	}
+
+	public final boolean buildForm(Form f,HashMap fixtures) throws DataFault{
+		boolean add_actions = buildForm(getContext(), factory.res,f,getSupress(),getOptional(),getSelectors(),getFieldConstraints(),getTranslations(),getFieldHelp(),fixtures);
 		customiseForm(f);
 		f.setContents(getDefaults());
 		return add_actions;
 	}
-
 	/**
 	 * Construct an edit Form for the associated DataObject based on database
 	 * meta-data
@@ -126,7 +130,7 @@ public final AppContext getContext(){
 	 */
 	public static final boolean buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
 			Set<String> optional, Map<String,Selector> selectors,Map<String,String> labels) throws DataFault {
-		return buildForm(conn, res, f, supress_fields, optional, selectors,null, labels, null);
+		return buildForm(conn, res, f, supress_fields, optional, selectors,null, labels, null,null);
 	}
 	/**
 	 * Construct an edit Form for the associated DataObject based on database
@@ -150,11 +154,14 @@ public final AppContext getContext(){
 	 * @throws TransitionException 
 	 */
 	public static final boolean buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
-				Set<String> optional, Map<String,Selector> selectors,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips) throws DataFault {
+				Set<String> optional, Map<String,Selector> selectors,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips,HashMap fixtures) throws DataFault {
 		//
 		String table = res.getTag();
 		Set<String> keys = new LinkedHashSet<String>(res.getFields());
 		boolean support_multi_stage = f.supportsMultiStage();
+		if( fixtures == null && constraints != null ) {
+			fixtures = new HashMap();
+		}
 		// Try multiple form stages until we have no fields left
 		while( ! keys.isEmpty() ) {
 			int start = keys.size();
@@ -200,7 +207,7 @@ public final AppContext getContext(){
 					// Consider field constraints
 					if( constraints != null && constraints.containsKey(name)) {
 						FieldConstraint fc = constraints.get(name);
-						Selector new_sel = fc.apply(support_multi_stage,name, sel, f);
+						Selector new_sel = fc.apply(support_multi_stage,name, sel, f,fixtures);
 						if( new_sel != null ) {
 							// constraint applied
 							sel = new_sel;
@@ -241,6 +248,10 @@ public final AppContext getContext(){
 							tooltip = conn.getInitParameter("form.tooltip."+table+"."+name);
 						}
 						f.addInput(name, lab,tooltip, input).setOptional(is_optional);
+						if( f.isFixed(name) && fixtures != null) {
+							// pre-emptive copy to fixtures
+							fixtures.put(name,f.get(name));
+						}
 						it.remove(); // field has been processed
 					}
 				}else {
@@ -258,6 +269,14 @@ public final AppContext getContext(){
 				try {
 					if( ! f.poll() ) {
 						return false;
+					}
+					if( fixtures != null ) {
+						// update the fixtures
+						for(Field existing : f) {
+							if( existing.isFixed()) {
+								fixtures.put(existing.getKey(),existing.getValue());
+							}
+						}
 					}
 				} catch (TransitionException e) {
 					conn.getService(LoggerService.class).getLogger(DataObjectFormFactory.class).error("Form poll failed",e);

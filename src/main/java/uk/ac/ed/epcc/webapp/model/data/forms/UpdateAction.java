@@ -22,6 +22,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionValidationException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -69,7 +70,7 @@ protected final UpdateTemplate<BDO> updater;
 	public void postUpdate(BDO dat,Form f,Map<String,Object> orig) throws Exception {
 		updater.postUpdate(dat,f,orig);
 	}
-	public void preCommit(BDO dat,Form f,Map<String,Object> orig) throws DataException {
+	public void preCommit(BDO dat,Form f,Map<String,Object> orig) throws DataException, TransitionValidationException {
 		updater.preCommit(dat, f, orig);
 	}
 	

@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.data;
 
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 
 import uk.ac.ed.epcc.webapp.forms.Form;
@@ -56,9 +57,9 @@ public class MultiFieldConstraint extends LinkedHashSet<FieldConstraint> impleme
 	 */
 	@Override
 	public <I extends Input> Selector<I> apply(boolean support_multi_stage, String field, Selector<I> sel,
-			Form form) {
+			Form form, HashMap fixtures) {
 		for(FieldConstraint c: this) {
-			sel = c.apply(support_multi_stage, field, sel, form);
+			sel = c.apply(support_multi_stage, field, sel, form, fixtures);
 			if( sel == null ) {
 				return null;
 			}

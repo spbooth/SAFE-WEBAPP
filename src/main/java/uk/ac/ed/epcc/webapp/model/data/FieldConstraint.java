@@ -13,6 +13,9 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.data;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.FormValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
@@ -30,10 +33,12 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 public interface FieldConstraint {
 	/** Mutate a {@link Selector} based on other form fields.
 	 * Normally this requires the value of the input to have a fixed value
-	 * e.g. an {@link UnmodifiableInput} or a {@link ListInput} with a single valid option.
+	 * e.g. an {@link UnmodifiableInput}, a {@link ListInput} with a single valid option or a suppressed field.
 	 * If the prerequisite fields are not fixed or not present then this method can return null
 	 * to request an additional form stage be introduced. The form builder should then retry this
-	 * field in subsequent stages (where previous fields will be locked).
+	 * field in subsequent stages (where previous fields will be locked). Fixed values are copied into the
+	 * <b>fixtures</b> map. This also can contain values for supressed fields. Care needs to be taken with pre-requisites that
+	 * are optional.
 	 * 
 	 * Ideally if <b>support_multi_stage</b> is false the method should add a corresponding {@link FormValidator} to the form instead and return
 	 * the original {@link Selector}
@@ -44,9 +49,10 @@ public interface FieldConstraint {
 	 * @param field Field that Selector is for
 	 * @param original {@link Selector}
 	 * @param form {@link Form} being built.
+	 * @param fixtures {@link HashMap} of fixed field data. This can include supressed fields. note values of optional fields may be null.
 	 * @return mutated {@link Selector} or null to request an additional form stage.
 	 */
-	public <I extends Input> Selector<I> apply(boolean support_multi_stage,String field, Selector<I> original, Form form);
+	public <I extends Input> Selector<I> apply(boolean support_multi_stage,String field, Selector<I> original, Form form,HashMap fixtures);
 
 	/** Merge two {@link FieldConstraint}s
 	 *  values can be null

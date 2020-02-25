@@ -20,6 +20,7 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionValidationException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -39,9 +40,10 @@ public interface UpdateTemplate<BDO extends DataObject> {
 	 * @param f
 	 * @param orig
 	 * @throws DataException
+	 * @throws TransitionValidationException 
 	 */
 	
-	public void preCommit(BDO dat,Form f,Map<String,Object> orig) throws DataException;
+	public void preCommit(BDO dat,Form f,Map<String,Object> orig) throws DataException, TransitionValidationException;
 	/** perform side-effects after a form update
 	 * 
 	 * 

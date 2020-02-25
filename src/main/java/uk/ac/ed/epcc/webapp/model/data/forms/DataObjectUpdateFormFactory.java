@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.model.data.forms;
 
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -95,14 +96,21 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 
 	public final void buildUpdateForm(String type_name, Form f, BDO dat, SessionService<?> operator)
 			throws DataFault {
-			    boolean complete = buildForm(f);
+				HashMap fixtures = new HashMap();
+				if( dat != null) {
+					Map data = dat.getMap();
+					for(String field : getSupress()) {
+						fixtures.put(field,data.get(field));
+					}
+				}
+			    boolean complete = buildForm(f,fixtures);
 				customiseForm(f);
 				for(TableStructureContributer<BDO> contrib : factory.getTableStructureContributers()){
 					contrib.customiseUpdateForm(f, dat, operator);
 				}
 				f.setContents(getDefaults());
 				if( complete ) {
-					f.addAction(UPDATE, new UpdateAction<>(type_name,this, dat));
+					f.addAction(getUpdateActionName(), new UpdateAction<>(type_name,this, dat));
 					addRetireAction(type_name, f, dat, operator);
 				}
 				customiseUpdateForm(f, dat);
@@ -111,6 +119,10 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 				   f.setContents(dat.getMap());
 				}
 			}
+
+	protected String getUpdateActionName() {
+		return UPDATE;
+	}
 
 	/**
 	 * @param type_name
