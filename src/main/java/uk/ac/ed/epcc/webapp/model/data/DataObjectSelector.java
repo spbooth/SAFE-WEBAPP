@@ -30,4 +30,12 @@ public interface DataObjectSelector<B extends DataObject> extends Selector<DataO
 	 * @return
 	 */
 	public DataObjectSelector<B> narrowSelector(BaseFilter<B> fil);
+	/** Generate a new selector with the valid selection further restricted by an additional filter.
+	 * Allow explict contol of the restrict option.
+	 * 
+	 * @param fil
+	 * @param new_restrict 
+	 * @return
+	 */
+	public DataObjectSelector<B> narrowSelector(BaseFilter<B> fil,boolean new_restrict);
 }

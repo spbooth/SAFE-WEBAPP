@@ -254,15 +254,17 @@ public abstract class DataObject implements ContextIndexed, Identified, Releasab
 	 * @return Hashtable
 	 */
 	public final Map<String,Object> getMap() {
+		return getMap(false);
+	}
+	public final Map<String,Object> getMap(boolean include_null) {
 		Map<String,Object> h = new HashMap<>();
 		if (record != null) {
-			// use explicit code as putAll has had problems with null entries in
-			// the past.
-			for (Iterator<String> it = record.keySet().iterator(); it.hasNext();) {
-				String key = it.next();
+			// Want to record values for all fields even if null
+			// don't want any bogus values
+			for (String key : record.getRepository().getFields()) {
 				if (key != null) {
 					Object value = record.get(key);
-					if (value != null) {
+					if ((value != null) || include_null) {
 						h.put(key, value);
 					}
 				}

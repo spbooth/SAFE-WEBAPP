@@ -104,22 +104,43 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 					}
 				}
 			    boolean complete = buildForm(f,fixtures);
-				customiseForm(f);
-				for(TableStructureContributer<BDO> contrib : factory.getTableStructureContributers()){
-					contrib.customiseUpdateForm(f, dat, operator);
-				}
+				//customiseForm(f);
+			    
+			    // set values before customise as it is common
+				// for the customise methods to lock fields
+				// and the values need to be in place before then.
+			    //
+			    // if buildForm is creating a multi-stage form then some of
+			    // the fields may already be locked and should NOT
+			    // be updated by the following
 				f.setContents(getDefaults());
-				if( complete ) {
-					f.addAction(getUpdateActionName(), new UpdateAction<>(type_name,this, dat));
-					addRetireAction(type_name, f, dat, operator);
-				}
-				customiseUpdateForm(f, dat);
 				if( dat != null ){
 					//this should never be called with dat null except from a unit test
 				   f.setContents(dat.getMap());
 				}
+				for(TableStructureContributer<BDO> contrib : factory.getTableStructureContributers()){
+					contrib.customiseUpdateForm(f, dat, operator);
+				}
+				
+				customiseUpdateForm(f, dat);
+				
+				if( complete ) {
+					customiseCompleteUpdateForm(f, dat);
+					f.addAction(getUpdateActionName(), new UpdateAction<>(type_name,this, dat));
+					addRetireAction(type_name, f, dat, operator);
+				}
+				
+				
 			}
 
+	/** Similar to {@link #customiseUpdateForm(Form, DataObject)} but only called when the form is complete
+	 * 
+	 * @param f
+	 * @param o
+	 */
+	public void customiseCompleteUpdateForm(Form f, BDO o) {
+		
+	}
 	protected String getUpdateActionName() {
 		return UPDATE;
 	}

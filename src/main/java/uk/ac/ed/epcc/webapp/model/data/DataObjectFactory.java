@@ -1525,6 +1525,10 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		public DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> filter) {
 			return new FilterSelector(new AndFilter<BDO>(getTarget(), fil, filter), restrict);
 		}
+		@Override
+		public DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> filter,boolean new_restrict) {
+			return new FilterSelector(new AndFilter<BDO>(getTarget(), fil, filter), new_restrict);
+		}
 	}
 	/** create a {@link Selector} from a filter.
 	 * 
@@ -1540,6 +1544,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	public final DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> fil){
 		// This should narrow the default selector of this class
 		return new FilterSelector(new AndFilter<BDO>(getTarget(),getFinalSelectFilter(),fil),restrictDefaultInput());
+	}
+	@Override
+	public final DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> fil, boolean new_restrict){
+		// This should narrow the default selector of this class
+		return new FilterSelector(new AndFilter<BDO>(getTarget(),getFinalSelectFilter(),fil),new_restrict);
 	}
 	/** create a {@link Selector} from a filter.
 	 * 

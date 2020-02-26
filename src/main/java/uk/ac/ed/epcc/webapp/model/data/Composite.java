@@ -195,7 +195,7 @@ public abstract class Composite<BDO extends DataObject, X extends Composite> imp
 	 * @see uk.ac.ed.epcc.webapp.model.data.TableStructureContributer#customiseUpdateForm(uk.ac.ed.epcc.webapp.forms.Form, uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
 	@Override
-	public void customiseUpdateForm(Form f, BDO target, SessionService operator) {
+	public void  customiseUpdateForm(Form f, BDO target, SessionService operator) {
 		
 	}
 	

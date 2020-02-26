@@ -22,7 +22,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 
 
-/**
+/** A composite {@link FieldConstraint}. The constaints are added in order
  * @author Stephen Booth
  *
  */

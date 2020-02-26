@@ -422,7 +422,10 @@ public class BaseForm implements Form {
 			String key = it.next();
 
 			if (m.containsKey(key) ) {
-				put(key, m.get(key));
+				Object value = m.get(key);
+				if( value != null ) {
+					put(key, value);
+				}
 			}
 
 		}
@@ -478,45 +481,49 @@ public class BaseForm implements Form {
     	StringBuilder sb = new StringBuilder();
     	for(Iterator<String> it = getFieldIterator(); it.hasNext();){
     		String key=it.next();
-    	    Field f = getField(key);
-    		Input i = f.getInput();
-    		String label = f.getLabel();
-    		Object val = i.convert(m.get(key));
-    		
-    		Object my_val = i.getValue();
-    		String my_text="null";
-    		if( my_val != null ){
-    			my_text = i.getPrettyString(my_val);
-    		}
-    		if( val == null){
-    			if(my_val != null ){
-    				if( my_text.contains("\n")){
-    					sb.append(label);
-    					sb.append(": updated\n");
-    				}else{
-    					sb.append(label);
-    					sb.append(": =");
-    					sb.append(my_text);
-    					sb.append("\n");
-    				}
+    		// assume that a transition from null will have a key entry but null stored in the map
+    		// if the map has no entry for the key we don't need to report
+    		if( m.containsKey(key)) {
+    			Field f = getField(key);
+    			Input i = f.getInput();
+    			String label = f.getLabel();
+    			Object val = i.convert(m.get(key));
+
+    			Object my_val = i.getValue();
+    			String my_text="null";
+    			if( my_val != null ){
+    				my_text = i.getPrettyString(my_val);
     			}
-    		}else{
-    			String text= i.getPrettyString(val);
-    			if( ! val.equals(my_val) ){
-    				if( val.equals("") && my_val == null ){
-    					// acceptable substitution
-    				}else{
-    				if( text.contains("\n") || my_text.contains("\n")){
-    					sb.append(label);
-    					sb.append(": updated\n");
-    				}else{
-    					sb.append(label);
-    					sb.append(": ");
-    					sb.append(text);
-    					sb.append("->");
-    					sb.append(my_text);
-    					sb.append("\n");
+    			if( val == null){
+    				if(my_val != null ){
+    					if( my_text.contains("\n")){
+    						sb.append(label);
+    						sb.append(": updated\n");
+    					}else{
+    						sb.append(label);
+    						sb.append(": =");
+    						sb.append(my_text);
+    						sb.append("\n");
+    					}
     				}
+    			}else{
+    				String text= i.getPrettyString(val);
+    				if( ! val.equals(my_val) ){
+    					if( val.equals("") && my_val == null ){
+    						// acceptable substitution
+    					}else{
+    						if( text.contains("\n") || my_text.contains("\n")){
+    							sb.append(label);
+    							sb.append(": updated\n");
+    						}else{
+    							sb.append(label);
+    							sb.append(": ");
+    							sb.append(text);
+    							sb.append("->");
+    							sb.append(my_text);
+    							sb.append("\n");
+    						}
+    					}
     				}
     			}
     		}

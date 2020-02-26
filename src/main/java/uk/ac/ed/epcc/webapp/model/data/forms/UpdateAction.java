@@ -54,7 +54,7 @@ protected final UpdateTemplate<BDO> updater;
 
 		try {
 			AppContext conn = dat.getContext();
-			Map<String,Object> orig=dat.getMap();
+			Map<String,Object> orig=dat.getMap(true); // want nulls for diff generation
 			dat.formUpdate(f);
 			preCommit(dat,f,orig);
 			boolean changed = dat.commit();
