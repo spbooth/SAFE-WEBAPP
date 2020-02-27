@@ -88,6 +88,11 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public void setApplyToggle(boolean value);
 	
+	/** are toggle roles currently enabled
+	 * 
+	 * @return
+	 */
+	public boolean getApplyToggle();
 	/** Toggle the state of a role
 	 * return the new value of the toggle or null if its not a togglable role
 	 * 

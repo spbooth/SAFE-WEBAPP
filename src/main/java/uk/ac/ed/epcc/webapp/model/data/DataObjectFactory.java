@@ -392,7 +392,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 
 		@Override
 		public String getPrettyString(Integer val) {
-			String res =  getText(getItembyValue(val));
+			// don't apply validation for getPrettyString
+			// we want to be able to format an invalid value for 
+			String res =  getText(find(val));
 			if( res == null ){
 				res = "Not Selected";
 			}
@@ -1366,7 +1368,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}catch(NoSQLFilterException e){
 			// do things the hard way
 
-			try(TimeClosable t = new TimeClosable(getContext(), "exists-iterator."+getTag());
+			try(TimeClosable t = new TimeClosable(getContext(), () -> "exists-iterator."+getTag());
 					FilterIterator  it = new FilterIterator(s)){
 				return it.hasNext();
 			}

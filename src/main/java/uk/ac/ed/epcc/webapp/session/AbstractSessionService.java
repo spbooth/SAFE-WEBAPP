@@ -1564,7 +1564,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		if( relationship_map != null && relationship_map.containsKey(tag)){
 			return relationship_map.get(tag).booleanValue();
 		}
-		try(TimeClosable t = new TimeClosable(getContext(),"hasRelationship."+tag.toString()) ){
+		try(TimeClosable t = new TimeClosable(getContext(),() -> "hasRelationship."+tag.toString()) ){
 			boolean result = fac.matches(getRelationshipRoleFilter(fac, role), target);
 			if( relationship_map != null ){
 				relationship_map.put(tag, result);
@@ -1575,7 +1575,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	}
 	@Override
 	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target, String role, boolean fallback) {
-		try(TimeClosable time = new TimeClosable(conn,"hasRelationship("+fac.getTag()+","+role+")")) {
+		try(TimeClosable time = new TimeClosable(conn,() -> "hasRelationship("+fac.getTag()+","+role+")")) {
 			return hasRelationship(fac, target, role);
 		}catch(UnknownRelationshipException e) {
 			return fallback;
@@ -1617,5 +1617,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	public void setApplyToggle(boolean value) {
 		apply_toggle=value;
 	}
-	
+	public boolean getApplyToggle() {
+		return apply_toggle;
+	}
 }

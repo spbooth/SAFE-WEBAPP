@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.result;
 
+import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryFinder;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 
@@ -40,4 +42,17 @@ public class ViewTransitionResult<T,K> extends ChainedTransitionResult<T, K> {
 		super(provider, target, null);
 	}
 
+	/** Alternate constructor that performs a lookup of the {@link ViewTransitionFactory}
+	 * 
+	 * This is preferable if an instance is not already available as it can utilise
+	 * any cached copy.
+	 * 
+	 * @param conn
+	 * @param template
+	 * @param tag
+	 * @param target
+	 */
+	public ViewTransitionResult(AppContext conn,Class<? extends ViewTransitionFactory> template,String tag, T target) {
+		super(TransitionFactoryFinder.getTransitionFactory(conn, template, tag),target,null);
+	}
 }

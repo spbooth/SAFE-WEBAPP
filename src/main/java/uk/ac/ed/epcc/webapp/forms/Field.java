@@ -22,9 +22,11 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
+import uk.ac.ed.epcc.webapp.forms.inputs.IsForcedVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.LockedInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnmodifiableInput;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /**
  * Field represents a single field in the form consisting of a label and and Input.
@@ -102,13 +104,28 @@ public final class Field<I> {
     	return false;
     }
     
-    /** Can the current form value be changed
+    /** If the current field value forced to particular value
+     * The value of the field is updated to that value if it is forced.
      * 
-     * @return
+     * 
+     * 
+     * @return boolean
      */
     public boolean isFixed() {
-    	return isLocked();
-    	// TODO add a test against single value inputs
+    	if( isLocked()){
+    		return true;
+    	}
+    	
+    	if( sel != null && ! optional ) {
+    		try {
+				return sel.accept(new IsForcedVisitor());
+			} catch (Exception e) {
+				f.getContext().getService(LoggerService.class).getLogger(getClass()).error("Error checking for fixed input",e);
+				return false;
+			}
+    	}
+    	return false;
+    	
     }
 	/**
 	 * Does this field use a particular type of input

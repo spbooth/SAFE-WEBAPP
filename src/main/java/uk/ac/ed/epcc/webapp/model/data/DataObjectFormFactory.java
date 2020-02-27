@@ -250,6 +250,7 @@ public final AppContext getContext(){
 						f.addInput(name, lab,tooltip, input).setOptional(is_optional);
 						if( f.isFixed(name) && fixtures != null) {
 							// pre-emptive copy to fixtures
+							f.getField(name).lock();
 							fixtures.put(name,f.get(name));
 						}
 						it.remove(); // field has been processed
@@ -273,7 +274,8 @@ public final AppContext getContext(){
 					if( fixtures != null ) {
 						// update the fixtures
 						for(Field existing : f) {
-							if( existing.isFixed()) {
+							if( existing.isFixed()) {  // this will update the value to the forced value
+								existing.lock(); // stop value being updated when form populates
 								fixtures.put(existing.getKey(),existing.getValue());
 							}
 						}
