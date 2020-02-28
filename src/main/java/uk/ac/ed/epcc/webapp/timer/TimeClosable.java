@@ -71,7 +71,7 @@ public class TimeClosable implements AutoCloseable{
 	 * @param name_supplier
 	 */
 	public TimeClosable(AppContext conn,Supplier<String> name_supplier) {
-		this(conn.getService(TimerService.class),name_supplier);
+		this(conn != null ? conn.getService(TimerService.class): null,name_supplier);
 	}
 	private final TimerService service;
 	private String name;

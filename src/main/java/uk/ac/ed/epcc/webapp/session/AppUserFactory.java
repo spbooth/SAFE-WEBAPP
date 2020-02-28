@@ -917,9 +917,8 @@ AnonymisingFactory
 		 * @see uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate#postUpdate(uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.forms.Form, java.util.Map)
 		 */
 		@Override
-		public void postUpdate(T o, Form f, Map<String, Object> orig) throws Exception {
-			postCreate(o, f);
-			
+		public void postUpdate(T o, Form f, Map<String, Object> orig, boolean changed) throws Exception {
+			postCreate(o, f);	
 		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate#preCommit(uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.forms.Form, java.util.Map)

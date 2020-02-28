@@ -52,8 +52,8 @@ public class CertificateComposite extends AppUserComposite<AppUser, CertificateC
 	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#postUpdate(uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.forms.Form, java.util.Map)
 	 */
 	@Override
-	public void postUpdate(AppUser o, Form f, Map<String, Object> orig) throws DataException {
-		if( NOTIFY_CERTIFICATE_CHANGE_FEATURE.isEnabled(getContext())){
+	public void postUpdate(AppUser o, Form f, Map<String, Object> orig, boolean changed ) throws DataException {
+		if( changed && NOTIFY_CERTIFICATE_CHANGE_FEATURE.isEnabled(getContext())){
 			String extra ="";
 			String old_dn = (String) orig.get(PERSONAL_CERTIFICATE);
 			String new_dn = getPersonalCertificateDn(o);

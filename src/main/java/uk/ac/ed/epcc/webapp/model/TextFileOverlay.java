@@ -588,10 +588,6 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			return TextFileOverlay.this.getContext();
 		}
 
-		@Override
-		public void postUpdate(T o, Form f,Map<String,Object> orig) throws DataException {
-			
-		}
 
 		@Override
 		public FormResult getResult(String typeName, T dat, Form f) {

@@ -58,17 +58,17 @@ protected final UpdateTemplate<BDO> updater;
 			dat.formUpdate(f);
 			preCommit(dat,f,orig);
 			boolean changed = dat.commit();
-			if (changed) {
-				postUpdate(dat,f,orig);
-			}
+			
+			postUpdate(dat,f,orig, changed);
+			
 			return updater.getResult(type_name, dat, f);
 			
 		} catch (Exception e) {
 			throw new ActionException("Update failed", e);
 		}
 	}
-	public void postUpdate(BDO dat,Form f,Map<String,Object> orig) throws Exception {
-		updater.postUpdate(dat,f,orig);
+	public void postUpdate(BDO dat,Form f,Map<String,Object> orig,boolean changed) throws Exception {
+		updater.postUpdate(dat,f,orig,changed);
 	}
 	public void preCommit(BDO dat,Form f,Map<String,Object> orig) throws DataException, TransitionValidationException {
 		updater.preCommit(dat, f, orig);

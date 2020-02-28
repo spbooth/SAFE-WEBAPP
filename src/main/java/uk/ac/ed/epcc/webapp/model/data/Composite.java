@@ -147,7 +147,7 @@ public abstract class Composite<BDO extends DataObject, X extends Composite> imp
 	 * @see uk.ac.ed.epcc.webapp.model.data.TableStructureContributer#postUpdate(BDO, uk.ac.ed.epcc.webapp.forms.Form, java.util.Map)
 	 */
 	@Override
-	public void postUpdate(BDO o, Form f,Map<String,Object> orig) throws DataException{
+	public void postUpdate(BDO o, Form f,Map<String,Object> orig, boolean changed) throws DataException{
 		
 	}
 	/** method to allow sub-classes to retrieve the {@link Record} from

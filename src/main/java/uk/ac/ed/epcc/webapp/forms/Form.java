@@ -156,6 +156,13 @@ public interface Form extends Iterable<Field>, Contexed{
 	 * @return Field
 	 */
 	public Field getField(String key); 
+	
+	/** Does form contain specified field
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public boolean hasField(String key);
 
 	/** Is the current value of this field fixed and connot be changed
 	 * Also returns false if the field is not defined.
@@ -204,7 +211,7 @@ public interface Form extends Iterable<Field>, Contexed{
 	 * 
 	 * @param key
 	 */
-	public void removeField(Object key);
+	public void removeField(String key);
 
 	
 	/**

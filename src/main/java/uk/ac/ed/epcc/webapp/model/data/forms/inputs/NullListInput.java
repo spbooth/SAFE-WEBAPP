@@ -259,12 +259,15 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 	 * @return
 	 */
 	public static  Selector getSelector(Selector s){
+		if( s == null) {
+			return null;
+		}
 		return new Selector() {
 
 			@Override
 			public Input getInput() {
 				Input input = s.getInput();
-				if( input instanceof ListInput && input instanceof IntegerInput){
+				if( input != null && input instanceof ListInput && input instanceof IntegerInput){
 					return new NullListInput((ListInput) input);
 				}
 				return input;

@@ -50,9 +50,12 @@ public interface UpdateTemplate<BDO extends DataObject> {
 	 * @param o object being updated
 	 * @param f Form used for update
 	 * @param orig Map of object state before update.
+	 * @param changed Did the update commit change the database object
 	 * @throws Exception
 	 */
-	public abstract void postUpdate(BDO o, Form f,Map<String,Object> orig) throws Exception;
+	default public void postUpdate(BDO o, Form f,Map<String,Object> orig, boolean changed) throws Exception{
+		
+	}
 	
 	public AppContext getContext();
 	

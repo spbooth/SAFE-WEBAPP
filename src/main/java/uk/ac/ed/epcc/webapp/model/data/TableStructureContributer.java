@@ -94,6 +94,16 @@ public interface TableStructureContributer<BDO extends DataObject> {
 	 */
 	Set<String> addSuppress(Set<String> suppress);
 
+	/** Add additional field named to be considered when building the form.
+	 * This could be added in the customise methods but this will work better with
+	 * multi-stage forms
+	 * 
+	 * @param fields
+	 * @return
+	 */
+	default Set<String> addFormFields(Set<String> fields){
+		return fields;
+	}
 	/** Add any {@link FieldConstraint} for the form.
 	 * Note there may be multiple constraints for a field so existing values should
 	 * be merged using {@link FieldConstraint#add(FieldConstraint, FieldConstraint)}
@@ -132,6 +142,6 @@ public interface TableStructureContributer<BDO extends DataObject> {
 	 * @param orig
 	 * @throws DataException
 	 */
-	void postUpdate(BDO o, Form f, Map<String, Object> orig) throws DataException;
+	void postUpdate(BDO o, Form f, Map<String, Object> orig, boolean changed) throws DataException;
 
 }

@@ -124,9 +124,9 @@ public abstract class MultiComposite<BDO extends DataObject, X extends Composite
 	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#postUpdate(uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.forms.Form, java.util.Map)
 	 */
 	@Override
-	public void postUpdate(BDO o, Form f, Map<String, Object> orig) throws DataException {
+	public void postUpdate(BDO o, Form f, Map<String, Object> orig, boolean changed) throws DataException {
 		for(Composite<BDO, X> c : getNested()){
-			c.postUpdate(o, f, orig);
+			c.postUpdate(o, f, orig, changed);
 		}
 	}
 	

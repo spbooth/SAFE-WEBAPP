@@ -57,12 +57,14 @@ public class AppUserUpdater<A extends AppUser> extends Updater<A> {
 	}
 	
 	@Override
-	public void postUpdate(A p, Form f,Map<String,Object> orig) {
+	public void postUpdate(A p, Form f,Map<String,Object> orig,boolean changed) {
 		
 		try {
 			
-			super.postUpdate(p, f, orig);
-			p.historyUpdate();
+			super.postUpdate(p, f, orig,changed);
+			if( changed ) {
+				p.historyUpdate();
+			}
 		} catch (Exception e) {
 			getLogger().error("Error in history update",e);
 		}

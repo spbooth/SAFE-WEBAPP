@@ -84,8 +84,8 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 	}
 
 	@Override
-	public void postUpdate(AppUser o, Form f, Map<String, Object> orig) throws DataException {
-		if( NOTIFY_SSH_KEY_CHANGE_FEATURE.isEnabled(getContext())){
+	public void postUpdate(AppUser o, Form f, Map<String, Object> orig, boolean changed) throws DataException {
+		if( changed && NOTIFY_SSH_KEY_CHANGE_FEATURE.isEnabled(getContext())){
 			String extra="";
 			String old_key = (String) orig.get(PUBLIC_KEY);
 			try{

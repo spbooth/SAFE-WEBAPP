@@ -51,6 +51,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.WrappedInput;
 import uk.ac.ed.epcc.webapp.forms.registry.FormPolicy;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 
 public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisitor<Object>{
 	/**
@@ -732,6 +733,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			result.open("datalist");
 			result.attr("id", name + "_list");
 		}
+		try(TimeClosable time = new TimeClosable(getContext(), () -> "datalist."+name)){
 		// As susggested in the HTML standard if the datalist element is
 		// not recognised can use a select with the same input name as the text input
 		// if datalist is recognised then select element will have no effect
@@ -764,6 +766,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			result.close(); // datalist
 		}
 		//result.close(); // noscript
+		}
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor#visitParseMultiInput(uk.ac.ed.epcc.webapp.forms.inputs.ParseMultiInput)

@@ -293,6 +293,9 @@ public class BaseForm implements Form {
 		return  fields.get(key);
 	}
 
+	public final boolean hasField(String key) {
+		return fields.containsKey(key);
+	}
 	/**
 	 * get an iterator over the field names
 	 * 
@@ -404,7 +407,7 @@ public class BaseForm implements Form {
 	 * @param key
 	 */
 	@Override
-	public void removeField(Object key) {
+	public void removeField(String key) {
 		fields.remove(key);
 	}
 
