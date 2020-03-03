@@ -368,7 +368,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 		 * 
 		 * @return
 		 */
-		protected boolean isForced(){
+		public boolean isForced(){
 			return force_value != getFilterCombiner().getDefault();
 		}
 		/** Is this filter exactly a {@link BinaryFilter}
