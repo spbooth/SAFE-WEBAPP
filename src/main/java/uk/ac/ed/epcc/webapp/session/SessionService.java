@@ -21,6 +21,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.Supplier;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
@@ -304,7 +305,20 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @param fallback boolean value to use if relationship undefined
 	 * @return  boolean true if has relationship
 	 */
-	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target,String role,boolean fallback);
+	public default <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target,String role,boolean fallback) {
+		return hasRelationship(fac, target, role, () -> fallback);
+	};
+	
+	/** Method to check relationships on a specified target object.
+	 * 
+	 * 
+	 * @param fac     {@link DataObjectFactory}
+	 * @param target  {@link DataObject} to test for relationship
+	 * @param role    String role to test
+	 * @param fallback {@link Supplier} value to use if relationship undefined
+	 * @return  boolean true if has relationship
+	 */
+	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target,String role,Supplier<Boolean> fallback);
 	
 	/** Tests if the session has already authenticated. This can return false even if {@link #haveCurrentUser()} could return true
 	 * provided it is called first.
