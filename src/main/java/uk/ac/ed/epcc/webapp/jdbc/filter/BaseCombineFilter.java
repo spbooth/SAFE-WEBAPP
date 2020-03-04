@@ -43,7 +43,11 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 	    // Note some filters may appear in both 
 		protected LinkedHashSet<PatternFilter> filters;
 	    protected LinkedHashSet<OrderClause> order=null;
+	    // value filter is forced to. This also encoded if the filter is forced
+	    // depending on if the value is the same or different from the default
 	    private boolean force_value;
+	    // Do we care about order filters or can we ignore them.
+	    private transient boolean select_only=false;
 	    public BaseCombineFilter(Class<T> target){
 	    	super(target);
 	    	filters = new LinkedHashSet<>();
@@ -247,7 +251,24 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			return new AddFilterVisitor();
 		}
 
+		/**
+		 * @return the select_only
+		 */
+		public boolean isSelectOnly() {
+			return select_only;
+		}
+
+		/**
+		 * @param select_only the select_only to set
+		 */
+		public void setSelectOnly(boolean select_only) {
+			this.select_only = select_only;
+		}
+
 		protected final void addOrder(List<OrderClause> new_order) throws ConsistencyError {
+			if( isSelectOnly()) {
+				return;
+			}
 			if( new_order == null || new_order.size() == 0 ){
 				return;
 			}

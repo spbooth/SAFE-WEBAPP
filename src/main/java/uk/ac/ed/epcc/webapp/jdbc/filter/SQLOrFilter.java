@@ -43,9 +43,10 @@ public class SQLOrFilter<T> extends BaseSQLCombineFilter<T> {
 	
 	public SQLOrFilter(Class<T> target) {
 		super(target);
+		setSelectOnly(true);
 	}
 	public SQLOrFilter(Class<T> target,SQLFilter<? super T> ...filters ){
-		super(target);
+		this(target);
 		for(SQLFilter<? super T> f : filters){
 			addFilter(f);
 		}
