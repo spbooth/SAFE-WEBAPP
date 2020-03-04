@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -56,6 +57,9 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 public class DataBaseHandlerService implements Contexed, AppContextService<DataBaseHandlerService>{
 	public static final Feature CLEAR_DATABASE = new Feature("clear_database", false, "Is the clear database feature enabled");
 	public static final Feature COMMIT_ON_CREATE = new Feature("database.commit_on_create_table", false, "Add explicit commit on table modify (will be effective commit anyway)");
+	
+	// Hook for tests if this attribute is in the AppContext then properties are not added
+	public static final String NO_PROPS_ATTR = "NoPropertiesAdded";
     private AppContext conn;
     public DataBaseHandlerService(AppContext c){
     	conn=c;
@@ -151,18 +155,26 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 				stmt.executeUpdate();
 			}
     		//TODO have SQLContext do this as some may use foreign keys
-    		ConfigService serv = conn.getService(ConfigService.class);
-    		for(String field_name : s.getFieldNames()){
-    			FieldType type = s.getField(field_name);
-    			if( type instanceof ReferenceFieldType){
-    				try{
-    					serv.setProperty("reference."+name+"."+field_name, Repository.TableToTag(conn,((ReferenceFieldType)type).getRemoteTable()));
-    				}catch(UnsupportedOperationException e){
-    					log.debug("set property not supported",e);
-    					break;
-    				}
-    			}
-    		}
+			if( ! conn.hasAttribute(NO_PROPS_ATTR)) {
+				ConfigService serv = conn.getService(ConfigService.class);
+				Properties prop = serv.getServiceProperties();
+				for(String field_name : s.getFieldNames()){
+					FieldType type = s.getField(field_name);
+					if( type instanceof ReferenceFieldType){
+						try{
+							
+							String prop_name = "reference."+name+"."+field_name;
+							if( prop.getProperty(prop_name) == null ) {
+								// don't replace an existing value
+								serv.setProperty(prop_name, Repository.TableToTag(conn,((ReferenceFieldType)type).getRemoteTable()));
+							}
+						}catch(UnsupportedOperationException e){
+							log.debug("set property not supported",e);
+							break;
+						}
+					}
+				}
+			}
     	}catch(SQLException e) {
     		db_service.handleError("Failed to create table using "+text,e);
     	}catch(Exception e){

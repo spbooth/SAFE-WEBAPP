@@ -160,7 +160,19 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @param role_list
 	 * @return boolean
 	 */
-	public boolean hasRoleFromList(String ...role_list);
+	
+	default public boolean hasRoleFromList(String ...roles){
+		if( roles == null ){
+			return false;
+		}
+		for(String role : roles){
+			if( hasRole(role)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	/** request a role change for a specified user.
 	 * This is an optional operation as a session service may not have the ability to modify roles.
 	 * 
@@ -186,6 +198,19 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @return is role permitted.
 	 */
 	public boolean canHaveRole(A user,String role);
+	
+	
+	default public boolean canHaveRoleFromList(A user,String ... roles) {
+		if( roles == null ) {
+			return false;
+		}
+		for(String role : roles) {
+			if( canHaveRole(user, role)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 //	/** get the set of users with the specified role.
 //	 * This only queries the roles managed directly by the session service.

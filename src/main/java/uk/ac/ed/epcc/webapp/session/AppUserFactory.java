@@ -1099,5 +1099,12 @@ AnonymisingFactory
 		}
 		
 	}
+	@Override
+	public SQLFilter<AU> getDefaultRelationshipFilter() {
+		// clear this explicitly 
+		// Can't default to the select filter as this is overridden to use View permission
+		// which in turn will call this
+		return null;
+	}
 	
 }

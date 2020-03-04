@@ -53,7 +53,7 @@ public interface MessageHandler {
 	 * @return MessageHandlerFactory
 	 */
 	public MessageHandlerFactory getFactory(AppContext conn);
-	/** Get the path to generate the {@link MessageHandler} from the {@link MessageProvider}
+	/** Get the path to generate the {@link MessageHandler} from the {@link MessageHandlerFactory}
 	 * 
 	 * @return
 	 */

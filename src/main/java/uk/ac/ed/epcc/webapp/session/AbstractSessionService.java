@@ -490,18 +490,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	}
 	
 	
-	@Override
-	public boolean hasRoleFromList(String ...roles){
-		if( roles == null ){
-			return false;
-		}
-		for(String role : roles){
-			if( hasRole(role)){
-				return true;
-			}
-		}
-		return false;
-	}
+	
 	/** Get the set of toggle roles this user is capable of assuming
 	 * 
 	 * @return Set<String>
