@@ -80,7 +80,7 @@ public class EmailChangeRequestServlet extends SessionServlet {
 						}
 						return;
 					}else {
-						getLogger(conn).warn("Email change request for "+target_user.getName()+" complet attempted by "+service.getName());
+						getLogger(conn).warn("Email change request for "+target_user.getName()+" complete attempted by "+service.getName());
 					}
 				}
 				message(conn, req, res, "email_change_request_denied");

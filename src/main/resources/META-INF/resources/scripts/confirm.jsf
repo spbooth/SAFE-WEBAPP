@@ -24,6 +24,8 @@ the dialog box if missing.
 --%>
 <%@ page import="java.util.*, java.text.*, uk.ac.ed.epcc.webapp.*,uk.ac.ed.epcc.webapp.servlet.*" %>
 <%@page import="uk.ac.ed.epcc.webapp.messages.MessageBundleService"%>
+<%@page import="uk.ac.ed.epcc.webapp.content.PreDefinedContent" %>
+<%@page import="uk.ac.ed.epcc.webapp.content.*"%>
 <%
 String message_type  = (String) request.getAttribute(WebappServlet.CONFIRM_TYPE);
 String message_title=null;
@@ -43,14 +45,16 @@ if( message_type != null ){
   no_text = mess.getString("no");
   if( message_title == null ){
 	  try{
-		  message_title = MessageFormat.format(mess.getString(message_type + ".title"),args);
+		  PreDefinedContent title = new PreDefinedContent(conn,mess,message_type + ".title",args);
+		  message_title = title.addContent((SimpleXMLBuilder) new HtmlBuilder()).toString();
 	  }catch(MissingResourceException e){
 		  conn.error(e,"missing confirm title for "+message_type);
 	  }
   }
   if( message_text == null ){
 	  try{
-		  message_text = MessageFormat.format(mess.getString(message_type + ".text"),args);
+		  PreDefinedContent text = new PreDefinedContent(conn,mess,message_type + ".text",args);
+		  message_text = text.addContent((SimpleXMLBuilder)new HtmlBuilder()).toString();
 	  }catch(MissingResourceException e){
 		  conn.error(e,"missing confirm text for "+message_type);
 	  }

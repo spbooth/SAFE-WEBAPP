@@ -731,6 +731,27 @@ public class SwingContentBuilder  implements ContentBuilder{
 			addText(target.toString());
 		}
 	}
+	public <X> boolean canAdd(X target) {
+		if( target instanceof UIProvider){
+			return true;
+		}else if( target instanceof UIGenerator){
+			return true;
+		}else if(target instanceof XMLPanel) {
+			return true;
+		}else if( target instanceof SwingContentBuilder) {
+			return true;
+		}else if( target instanceof Identified){
+			return true;
+		}else if( target instanceof Principal) {
+			return true;
+		}else if( target  instanceof Iterable){
+			return true;
+		}else if( target instanceof Object[]) {
+			return true;
+		}else{
+			return false;
+		}
+	}
 	/* (non-Javadoc)
 	 */
 	@Override

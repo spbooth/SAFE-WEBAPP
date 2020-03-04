@@ -25,7 +25,6 @@ public enum SQLFunc {
   MIN,
   SUM,
   COUNT,
-  DISTINCT,
   AVG,
   FLOOR
 }

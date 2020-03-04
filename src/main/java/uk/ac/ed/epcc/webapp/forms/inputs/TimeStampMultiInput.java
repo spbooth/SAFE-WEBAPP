@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 /** An input that selects a timestamp using pull down menus.
  * The class also implements ParseInput to support setting 
  * default values.
@@ -44,10 +45,10 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements B
     Calendar c=null;
     private Date min_date=null;
     private Date max_date=null;
-    public TimeStampMultiInput(){
-    	this(1000L,Calendar.SECOND);
+    public TimeStampMultiInput(Date now){
+    	this(now,1000L,Calendar.SECOND);
     }
-    public TimeStampMultiInput(long resolution,int max_field){
+    public TimeStampMultiInput(Date now,long resolution,int max_field){
     	super(max_field);
     	this.resolution=resolution;
     	//df = new RelativeDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -78,7 +79,7 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements B
     		date_format.append(" ");
     		date_format.append(time_format);
     	}
-    	df = new RelativeDateFormat(date_format.toString());
+    	df = new RelativeDateFormat(now,date_format.toString());
     	addValidator(new FieldValidator<Date>() {
 			
 			@Override
@@ -268,5 +269,4 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements B
 		c=null;
 	}
 
-	
 }

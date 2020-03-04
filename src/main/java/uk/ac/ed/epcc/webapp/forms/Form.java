@@ -156,7 +156,24 @@ public interface Form extends Iterable<Field>, Contexed{
 	 * @return Field
 	 */
 	public Field getField(String key); 
+	
+	/** Does form contain specified field
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public boolean hasField(String key);
 
+	/** Is the current value of this field fixed and connot be changed
+	 * Also returns false if the field is not defined.
+	 * 
+	 * @param key
+	 * @return boolean 
+	 */
+	default boolean isFixed(String key) {
+		Field f = getField(key);
+		return f != null && f.isFixed();
+	}
 	/**
 	 * get an iterator over the field names
 	 * 
@@ -194,7 +211,7 @@ public interface Form extends Iterable<Field>, Contexed{
 	 * 
 	 * @param key
 	 */
-	public void removeField(Object key);
+	public void removeField(String key);
 
 	
 	/**
@@ -255,17 +272,26 @@ public interface Form extends Iterable<Field>, Contexed{
 	 * form.
 	 * 
 	 * This is called during form construction when values from inputs are needed to construct the rest of the form.
-	 * If the method returns true then form construction can continue. If false then the method will have modified the
-	 * form to add actions to progress the multi-stage completion (by recursing to the self result) and the form should be displayed as-is.
+	 * If the method returns true then form construction can continue. 
+	 * For GUI forms this may mean that a partial form has been shown and completed by the end user.
+	 * 
+	 * If false then the method will have modified the
+	 * form to add actions to progress the multi-stage completion and the form should be displayed as-is.
 	 * 
 	 * <p>
 	 * If multi-stage submission is not supported the method will just return true.
-	 * @param self {@link FormResult} for this operation
 	 * @return boolean   true if form build should continue
 	 * @throws TransitionException
 	 */
-	default public boolean poll(FormResult self) throws TransitionException{
+	default public boolean poll() throws TransitionException{
 		return true;
+	}
+	/** Query if multi stage forms are supported by this implementation
+	 * 
+	 * @return
+	 */
+	default public boolean supportsMultiStage() {
+		return false;
 	}
 	/** returns the last value returned by {@link #poll(FormResult)}
 	 * 

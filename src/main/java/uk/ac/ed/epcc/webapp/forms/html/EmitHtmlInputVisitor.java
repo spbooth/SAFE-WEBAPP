@@ -51,6 +51,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.WrappedInput;
 import uk.ac.ed.epcc.webapp.forms.registry.FormPolicy;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 
 public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisitor<Object>{
 	/**
@@ -136,7 +137,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		}
 		hb.open("input");
 		try {
-			String id = (String) input.accept(id_vis);
+			String id = makeID(input);
 			if( id != null){
 				hb.attr("id",id);
 			}
@@ -153,6 +154,10 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		hb.addClass("input");
 		hb.close();
 
+	}
+	protected String makeID(Input input) throws Exception {
+		String raw = (String) input.accept(id_vis);
+		return id_vis.normalise(raw);
 	}
 	
 	
@@ -174,7 +179,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		}
 		hb.open("input");
 		try {
-			String id = (String) input.accept(id_vis);
+			String id = makeID(input);
 			if( id != null){
 				hb.attr("id",id);
 			}
@@ -213,7 +218,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		if( iter.hasNext()){
 		hb.open("select");
 		try {
-			String id = (String) input.accept(id_vis);
+			String id = makeID(input);
 			if( id != null){
 				hb.attr("id",id);
 			}
@@ -300,6 +305,9 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		
 		
 		for (Iterator<T> iter = input.getItems(); iter.hasNext();) {
+			hb.open("div");
+			hb.addClass("option");
+			
 			T current = iter.next();
 			emitRadioButtonHTML(hb, use_post,input, param, current);
 			String label = input.getText(current);
@@ -307,7 +315,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				hb.open("label");
 				try {
 					id_vis.setRadioTarget(current);
-					String id = input.accept(id_vis);
+					String id = makeID(input);
 					if( id != null) {
 						hb.attr("for",id);
 					}
@@ -322,7 +330,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				hb.clean( label );
 				
 			}
-			hb.br();
+			hb.close();
 			hb.clean("\n");
 
 		}
@@ -359,7 +367,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		String id = null;
 		try {
 			id_vis.setRadioTarget(current);
-			id = input.accept(id_vis);
+			id = makeID(input);
 		}catch(Exception e) {
 			getLogger().error("Error making radio button id", e);
 		}finally {
@@ -389,7 +397,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		
 		String id=null;
 		try {
-			id = (String) input.accept(id_vis);
+			id = makeID(input);
 		} catch (Exception e) {
 			conn.error(e,"Error getting id");
 		}
@@ -408,7 +416,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		}
 		String id=null;
 		try {
-			id = (String) input.accept(id_vis);
+			id = makeID(input);
 		} catch (Exception e) {
 			conn.error(e,"Error getting id");
 		}
@@ -569,10 +577,6 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		if( input instanceof FormatHintInput){
 			format_hint = ((FormatHintInput)input).getFormatHint();
 		}
-		String wrapper=null;
-		if( input instanceof WrappedInput){
-			wrapper=((WrappedInput)input).getWrapperClass();
-		}
 		boolean old_escape = result.setEscapeUnicode(! force_password && ESCAPE_UNICODE_FEATURE.isEnabled(conn));
 		// max_result_length <= 0 is unlimited
 		if (force_single || ( max_result_length > 0 && max_result_length <= 2 * boxwid)) {
@@ -583,10 +587,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			boolean autocomplete = input instanceof AutoComplete;
 			boolean use_datalist = autocomplete && use_html5 && USE_DATALIST.isEnabled(conn);
 			
-			if (wrapper != null) {
-				result.open("div");
-				result.addClass( wrapper);
-			}
+			
 			
 			result.open("input");
 			if( id != null ){
@@ -675,9 +676,6 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 					emitDataList(result, use_datalist,(AutoComplete) input, name);
 				}
 			}
-			if( wrapper != null){
-				result.close(); // close the <div>
-			}
 		} else {
 			int rows = ((max_result_length + boxwid - 1) / boxwid);
 			int max_text_rows = conn.getIntegerParameter(HTML_TEXTAREA_MAX_ROWS, 24);
@@ -735,6 +733,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			result.open("datalist");
 			result.attr("id", name + "_list");
 		}
+		try(TimeClosable time = new TimeClosable(getContext(), () -> "datalist."+name)){
 		// As susggested in the HTML standard if the datalist element is
 		// not recognised can use a select with the same input name as the text input
 		// if datalist is recognised then select element will have no effect
@@ -767,6 +766,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			result.close(); // datalist
 		}
 		//result.close(); // noscript
+		}
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor#visitParseMultiInput(uk.ac.ed.epcc.webapp.forms.inputs.ParseMultiInput)
@@ -775,6 +775,17 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 	public <V, I extends Input> Object visitParseMultiInput(
 			ParseMultiInput<V, I> multiInput) throws Exception {
 		return visitMultiInput(multiInput);
+	}
+	@Override
+	public <X> Object visitWrappedInput(WrappedInput<X> i) throws Exception {
+		hb.open("div");
+		String my_class = i.getWrapperClass();
+		if( my_class != null ) {
+			hb.addClass(my_class);
+		}
+		i.getWrappedInput().accept(this);
+		hb.close();
+		return null;
 	}
 	
 }

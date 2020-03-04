@@ -20,12 +20,10 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
-import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractTargetLessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AnonymousTransitionFactory;
-import uk.ac.ed.epcc.webapp.forms.transition.DefaultingTransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionFactory;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
@@ -62,21 +60,20 @@ public class MultiStageProvider extends AbstractTransitionProvider<Number,Transi
 		 */
 		@Override
 		public void buildForm(Form f, AppContext c) throws TransitionException {
-			FormResult self = new ChainedTransitionResult<>(MultiStageProvider.this, null, CREATE_KEY);
 			IntegerInput hundreds = new IntegerInput();
 			hundreds.setMin(0);
 			hundreds.setMax(1000);
 			hundreds.setStep(100);
 			
 			f.addInput(HUNDREDS, HUNDREDS, hundreds);
-			if( f.poll(self)) {
+			if( f.poll()) {
 				Integer h = (Integer) f.get(HUNDREDS);
 				IntegerInput tens = new IntegerInput();
 				tens.setMin(h.intValue());
 				tens.setMax(h.intValue()+90);
 				tens.setStep(10);
 				f.addInput(TENS, TENS, tens);
-				if( f.poll(self)) {
+				if( f.poll()) {
 					Integer t = (Integer) f.get(TENS);
 					IntegerInput units = new IntegerInput();
 					units.setMin(t.intValue());

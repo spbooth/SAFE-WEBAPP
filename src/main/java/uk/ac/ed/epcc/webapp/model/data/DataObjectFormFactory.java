@@ -26,10 +26,11 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormFactory;
 import uk.ac.ed.epcc.webapp.forms.inputs.BooleanInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.ConstantInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.DateInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.DoubleInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
@@ -40,6 +41,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.NoHtmlInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.RealInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TimeStampInput;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -57,6 +59,11 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  * <p>
  * The class implements {@link IndexedProducer} by forwarding onto the nested factory. This allows custom from factories to be installed in
  * {@link IndexedFormEntry}s to produce specialised creation forms that add entries to an existing factory.
+ * <p>
+ * Note that if {@link FieldConstraint}s are defined form building may return early (returning false from the buildForm methods)
+ * indicating that multi-stage forms are being used.
+ * The customise methods are usually still called so these (or any validators they add) may need to be tolerant about missing fields
+ * when using FieldConstraints
  * @author spb
  *
  * @param <BDO>
@@ -66,6 +73,7 @@ public  abstract class DataObjectFormFactory<BDO extends DataObject> implements 
 
 
 protected final DataObjectFactory<BDO> factory;
+
 
 
 protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
@@ -89,13 +97,18 @@ public final AppContext getContext(){
 	 * @param f
 	 *            Form to build
 	 * @throws DataFault
+ * @throws TransitionException 
 	 */
-	public final void buildForm(Form f) throws DataFault {
-		buildForm(getContext(), factory.res,f,getSupress(),getOptional(),getSelectors(),getTranslations(),getFieldHelp());
-		customiseForm(f);
-		f.setContents(getDefaults());
+	public final boolean buildForm(Form f) throws DataFault{
+		return buildForm(f,null);
 	}
 
+	public final boolean buildForm(Form f,HashMap fixtures) throws DataFault{
+		boolean complete = buildForm(getContext(), factory.res,getFields(),f,getOptional(),getSelectors(),getFieldConstraints(),getTranslations(),getFieldHelp(),fixtures);
+		customiseForm(f);
+		f.setContents(getDefaults());
+		return complete;
+	}
 	/**
 	 * Construct an edit Form for the associated DataObject based on database
 	 * meta-data
@@ -113,10 +126,15 @@ public final AppContext getContext(){
 	 * @param labels
 	 * 	          Map of field names to form labels
 	 * @throws DataFault
+	 * @throws TransitionException 
 	 */
-	public static final void buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
-			Set<String> optional, Map<String,Object> selectors,Map<String,String> labels) throws DataFault {
-		buildForm(conn, res, f, supress_fields, optional, selectors, labels, null);
+	public static final boolean buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
+			Set<String> optional, Map<String,Selector> selectors,Map<String,String> labels) throws DataFault {
+		Set<String> keys = new LinkedHashSet<String>(res.getFields());
+		if( supress_fields != null ) {
+			keys.removeAll(supress_fields);
+		}
+		return buildForm(conn, res, keys,f, optional, selectors,null, labels, null,null);
 	}
 	/**
 	 * Construct an edit Form for the associated DataObject based on database
@@ -137,141 +155,206 @@ public final AppContext getContext(){
 	 * @param tooltips 
 	 * 			  Map of tooltip/help text for form labels
 	 * @throws DataFault
+	 * @throws TransitionException 
 	 */
-	public static final void buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
-				Set<String> optional, Map<String,Object> selectors,Map<String,String> labels,Map<String,String> tooltips) throws DataFault {
-		int maxwid = conn.getIntegerParameter("forms.max_text_input_width", 64);
-		Set<String> keys = res.getFields();
-        String table = res.getTag();
-		for (Iterator<String> it = keys.iterator(); it.hasNext();) {
-			String name =  it.next();
-			Repository.FieldInfo info = res.getInfo(name);
+	public static final boolean buildForm(AppContext conn, Repository res, Set<String> keys, Form f, 
+				Set<String> optional, Map<String,Selector> selectors,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips,HashMap fixtures) throws DataFault {
+		//
+		String table = res.getTag();
+		
+		boolean support_multi_stage = f.supportsMultiStage();
+		if( fixtures == null && constraints != null ) {
+			fixtures = new HashMap();
+		}
+		// Try multiple form stages until we have no fields left
+		while( ! keys.isEmpty() ) {
+			int start = keys.size();
+			boolean multi_stage=false;
+			for (Iterator<String> it = keys.iterator(); it.hasNext();) {
+				String name =  it.next();
+				Repository.FieldInfo info = res.getInfo(name);
 
-			if (!(supress_fields != null && supress_fields.contains(name)) ) {
-				int sql_type = info.getType();
+
+				//
 				boolean is_optional;
 				if (optional != null) {
 					// Don't set optional unless the DB allows this
 					// for legacy reasons a non nullable string field will map to
 					// the empty string if marked optional
-					is_optional = optional.contains(name) && (info.isString() || info.getNullable());
+					is_optional = optional.contains(name) && (info == null || info.isString() || info.getNullable());
 				} else {
 					// default to follow nullability of field.
-					is_optional = info.getNullable();
+					is_optional = info != null && info.getNullable();
 				}
 				// override can set a non-nullable field to optional
 				// this allows default values set post-create.
 				// The other alternative is to change the field to optional in form customisation
 				is_optional = conn.getBooleanParameter("form.optional."+table+"."+name, is_optional);
-				Input<?> input = getInput(conn,selectors,table,name);
-				if( input == null ){
-				    // build default based on type
-					switch (sql_type) {
-					case Types.BIGINT:
-						input = new LongInput();
-						break;
-					case Types.INTEGER:
-					case Types.SMALLINT:
-					case Types.TINYINT:
-						input = new IntegerInput();
-						break;
-					case Types.REAL:
-					case Types.FLOAT:
-						input = new RealInput();
-						break;
-					case Types.DOUBLE:
-						input = new DoubleInput();
-						break;
-					case Types.CHAR:
-					case Types.VARCHAR:
-					case Types.LONGVARCHAR:
-						TextInput ti;
-						if( DEFAULT_FORBID_HTML.isEnabled(conn)){
-							ti = new NoHtmlInput();
-						}else{
-							ti= new TextInput();
-						}
-						ti.setMaxResultLength(info.getMax());
-						ti.setBoxWidth(maxwid);
-						input = ti;
-						break;
-					case Types.DATE:
-						input = new DateInput(res.getResolution());
-						break;
-					case Types.BLOB:
-					case Types.LONGVARBINARY:
-						input = new FileInput();
-						break;
-					case Types.TIMESTAMP:
-						input = new TimeStampInput(res.getResolution());
-						break;
-					case Types.BOOLEAN:
-					case Types.BIT:
-						input = new BooleanInput();
-						break;
-					default:
-						throw new DataFault("Unsupported sql.Type: " + sql_type);
-					}
-				}
-				if( input instanceof TextInput){
-					// If MaxResultLength out of range then
-					// set from the DB.
-					TextInput ti = (TextInput) input;
-					int length=ti.getMaxResultLength();
-					int max = info.getMax();
-					if( max > 0 && (length <= 0 || length > max)){
-						ti.setMaxResultLength(max);
-					}
-				}
-				String lab = name;
-				if (labels != null && labels.containsKey(name)) {
-					lab = labels.get(name);
-				}else{
-					lab = conn.getInitParameter("form.label."+table+"."+name,name);
-				}
-				String tooltip=null;
-				if( tooltips != null && tooltips.containsKey(name)) {
-					tooltip = tooltips.get(name);
-				}else {
-					tooltip = conn.getInitParameter("form.tooltip."+table+"."+name);
-				}
-				f.addInput(name, lab,tooltip, input).setOptional(is_optional);
-			}
-		}
+				Selector sel = selectors == null ? null : selectors.get(name);
+				if( sel == null ) {
+					// fallback routes
+					sel = new Selector() {
 
-	}
-	public static final  Input<?> getInput(AppContext conn,Map<String, Object> selectors, String table,String name) {
-		Input<?> input=null;
-		Object o = null;
-		if (selectors != null && selectors.containsKey(name)) {
-			o = selectors.get(name);
-			
-		}
-		if( o == null ){
-			// parameter based form override. Note that table cross references are handled in
-			// the addSelectors call
-			Class<? extends Input> c = conn.getPropertyClass(Input.class,null, "input."+table+"."+name);
-			if( c != null ){
-				try{
-					input = conn.makeObject(c);
-				}catch(Exception e){
-					conn.getService(LoggerService.class).getLogger(DataObjectFormFactory.class).error("Failed to make input",e);
+						@Override
+						public Input getInput() {
+							Input i = getInputFromName(conn, table, name);
+							if( i == null ) {
+								i = getInputFromType(conn, res, info);
+							}
+							return i;
+						}
+
+					};
+				}
+				boolean emit_input = true;
+
+				// Consider field constraints
+				if( constraints != null && constraints.containsKey(name)) {
+					FieldConstraint fc = constraints.get(name);
+					Selector new_sel = fc.apply(support_multi_stage,name, sel, f,fixtures);
+					if( new_sel != null ) {
+						// constraint applied
+						sel = new_sel;
+					}else {
+						// multi-stage requested
+						if( support_multi_stage ) {
+							emit_input=false;  // skip this input
+							multi_stage=true;  // do the request
+						}
+					}
+				}
+
+				if( emit_input ) {
+					Input<?> input = sel.getInput();
+					if( input == null) {
+						throw new DataFault("Unable to create input for "+name);
+					}
+					if( input instanceof TextInput){
+						// If MaxResultLength out of range then
+						// set from the DB.
+						TextInput ti = (TextInput) input;
+						int length=ti.getMaxResultLength();
+						if( info != null ) {
+							int max = info.getMax();
+							if( max > 0 && (length <= 0 || length > max)){
+								ti.setMaxResultLength(max);
+							}
+						}
+					}
+					String lab = name;
+					if (labels != null && labels.containsKey(name)) {
+						lab = labels.get(name);
+					}else{
+						lab = conn.getInitParameter("form.label."+table+"."+name,name);
+					}
+					String tooltip=null;
+					if( tooltips != null && tooltips.containsKey(name)) {
+						tooltip = tooltips.get(name);
+					}else {
+						tooltip = conn.getInitParameter("form.tooltip."+table+"."+name);
+					}
+					f.addInput(name, lab,tooltip, input).setOptional(is_optional);
+					if( f.isFixed(name) && fixtures != null) {
+						// pre-emptive copy to fixtures
+						f.getField(name).lock();
+						fixtures.put(name,f.get(name));
+					}
+					it.remove(); // field has been processed
+				}
+			}
+			if( start == keys.size()) {
+				// No additional inputs have been added this pass
+				conn.getService(LoggerService.class).getLogger(DataObjectFormFactory.class).error("No additional inputs added");
+				support_multi_stage=false; // This should emit the remaining inputs next pass
+				multi_stage=false; // should be false anyway
+			}
+			if( multi_stage ) {
+				try {
+					if( ! f.poll() ) {
+						return false;
+					}
+					if( fixtures != null ) {
+						// update the fixtures
+						for(Field existing : f) {
+							if( existing.isFixed()) {  // this will update the value to the forced value
+								existing.lock(); // stop value being updated when form populates
+								fixtures.put(existing.getKey(),existing.getValue());
+							}
+						}
+					}
+				} catch (TransitionException e) {
+					conn.getService(LoggerService.class).getLogger(DataObjectFormFactory.class).error("Form poll failed",e);
+					support_multi_stage=false; // This should emit the remaining inputs next pass
 				}
 			}
 		}
-		
-		if( o == null ){
+		return true;
+	}
+	public static Input<?> getInputFromType(AppContext conn, Repository res,  Repository.FieldInfo info) {
+		int sql_type = info.getType();
+		// build default based on type
+		switch (sql_type) {
+		case Types.BIGINT:
+			return new LongInput();
+			
+		case Types.INTEGER:
+		case Types.SMALLINT:
+		case Types.TINYINT:
+			return new IntegerInput();
+			
+		case Types.REAL:
+		case Types.FLOAT:
+			return new RealInput();
+			
+		case Types.DOUBLE:
+			return new DoubleInput();
+			
+		case Types.CHAR:
+		case Types.VARCHAR:
+		case Types.LONGVARCHAR:
+			TextInput ti;
+			if( DEFAULT_FORBID_HTML.isEnabled(conn)){
+				ti = new NoHtmlInput();
+			}else{
+				ti= new TextInput();
+			}
+			ti.setMaxResultLength(info.getMax());
+			int maxwid = conn.getIntegerParameter("forms.max_text_input_width", 64);
+			ti.setBoxWidth(maxwid);
+			return ti;
+			
+		case Types.DATE:
+			return new DateInput(res.getResolution());
+			
+		case Types.BLOB:
+		case Types.LONGVARBINARY:
+			return new FileInput();
+			
+		case Types.TIMESTAMP:
+			return new TimeStampInput(res.getResolution());
+			
+		case Types.BOOLEAN:
+		case Types.BIT:
+			return new BooleanInput();
+			
+		default:
 			return null;
 		}
-		if (o instanceof Input) {
-			input = (Input) o;
-		} else if (o instanceof String) {
-			input = new ConstantInput((String) o);
-		} else {
-			Selector s = (Selector) o;
-			input = s.getInput();
+	}
+	
+	public static Input<?> getInputFromName(AppContext conn, String table, String name) {
+		// parameter based form override. Note that table cross references are handled in
+		// the addSelectors call
+		Class<? extends Input> c = conn.getPropertyClass(Input.class,null, "input."+table+"."+name);
+		if( c != null ){
+			try{
+				return conn.makeObject(c);
+			}catch(Exception e){
+				conn.getService(LoggerService.class).getLogger(DataObjectFormFactory.class).error("Failed to make input",e);
+				
+			}
 		}
-		return input;
+		return null;
 	}
 	
 	/** Add a set of selectors based on the tables referenced by field keys
@@ -280,7 +363,7 @@ public final AppContext getContext(){
 	 * @param res
 	 * @return modified map
 	 */
-	public static Map<String,Object> addSelectors(AppContext conn,Map<String,Object> sel,Repository res){
+	public static Map<String,Selector> addSelectors(AppContext conn,Map<String,Selector> sel,Repository res){
 		if( sel == null ){
 			sel = new HashMap<>();
 		}
@@ -372,8 +455,9 @@ public final AppContext getContext(){
 	 * types of Form For example adding a FormValidator or adding min, max
 	 * values to NumberInputs.
 	 * 
-	 * @param f
-	 *            Form to modify
+	 * 
+	 * 
+	 * @param f {@link Form} to modify
 	 */
 	public  void customiseForm(Form f) {
            factory.customiseForm(f);
@@ -386,8 +470,8 @@ public final AppContext getContext(){
 	 * 
 	 * @return Map
 	 */
-	protected  Map<String,Object> getSelectors() {
-		Map<String,Object>sel = factory.getSelectors();
+	protected  Map<String,Selector> getSelectors() {
+		Map<String,Selector>sel = factory.getSelectors();
 		if( sel == null ){
 			sel = new HashMap<>();
 		}
@@ -411,13 +495,18 @@ public final AppContext getContext(){
 		}
 		return supress;
 	}
+	
+	
 	protected Set<String> getFields(){
-		LinkedHashSet<String> result = new LinkedHashSet<>();
+		Set<String> result = new LinkedHashSet<>();
 		Set<String> supress = getSupress();
 		for(String field : factory.res.getFields()){
 			if( supress == null || ! supress.contains(field)){
 				result.add(field);
 			}
+		}
+		for(TableStructureContributer<?> c : factory.getTableStructureContributers()){
+			result = c.addFormFields(result);
 		}
 		return result;
 	}
@@ -477,6 +566,7 @@ public final AppContext getContext(){
 		optional = addOptionalFromComposites(optional);
 		return optional;
 	}
+	
 	/**
 	 * @param optional
 	 * @return
@@ -503,6 +593,19 @@ public final AppContext getContext(){
 		
 		return defaults;
 	}
+
+	/** get {@link FieldConstraint}s to apply when building the form
+	 * 
+	 * @return
+	 */
+	protected Map<String,FieldConstraint> getFieldConstraints(){
+		Map<String,FieldConstraint> cst = factory.getFieldConstraints();
+		for(TableStructureContributer c : factory.getTableStructureContributers()){
+			 cst = c.addFieldConstraints(cst);
+		}
+		return cst;
+	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer#find(int)
 	 */

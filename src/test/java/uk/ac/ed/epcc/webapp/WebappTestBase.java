@@ -267,12 +267,14 @@ public abstract class WebappTestBase implements ContextHolder{
 			//FileWriter w = new FileWriter(expected_xml);
 			//w.write(raw);
 			//w.close();
-			System.out.println("Raw:");
-			System.out.println(raw);
-			System.out.println("====================================================================");
+			
+			
 			System.out.println("Got: "+result);
 			System.out.println("--------------------------------------------------------------------");
 			System.out.println("Expected: "+expected);
+			System.out.println("====================================================================");
+			System.out.println("Raw:");
+			System.out.println(raw);
 		}
 		assertEquals("Unexpected result:"+expected_xml+"\n"+differ,expected,result);
 	}

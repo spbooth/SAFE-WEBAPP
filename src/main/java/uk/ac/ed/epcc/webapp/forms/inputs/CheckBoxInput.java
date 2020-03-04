@@ -17,6 +17,8 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.model.data.forms.CheckboxSelector;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 /** A checkbox input. 
  * 

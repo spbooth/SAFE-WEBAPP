@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
@@ -169,7 +170,7 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 		sb.append("LONGBLOB");
 		use_memory=false;
 	}
-	public void visitIndex(Index idx) {
+	public void visitIndex(UnaryOperator<String> name_map,Index idx) {
 		if( idx.getUnique()){
 			sb.append("UNIQUE ");
 		}
@@ -183,6 +184,9 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 		sb.append("(");
 		for(Iterator<String> it = idx.getindexNames();it.hasNext();){
 			String name=it.next();
+			if( name_map != null ) {
+				name = name_map.apply(name);
+			}
 			if(seen){
 				sb.append(",");
 			}
@@ -234,7 +238,7 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor#visitFullTextIndex(uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.FullTextIndex)
 	 */
-	public void visitFullTextIndex(FullTextIndex idx) {
+	public void visitFullTextIndex(UnaryOperator<String> name_map,FullTextIndex idx) {
 		boolean seen=false;
 		sb.append("FULLTEXT INDEX ");
 		String iname=idx.getName();
@@ -245,6 +249,9 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 		sb.append("(");
 		for(Iterator<String> it = idx.getindexNames();it.hasNext();){
 			String name=it.next();
+			if( name_map != null ) {
+				name = name_map.apply(name);
+			}
 			if(seen){
 				sb.append(",");
 			}

@@ -21,7 +21,7 @@ the form could just submit to self.
 <%@ page import="uk.ac.ed.epcc.webapp.content.*,uk.ac.ed.epcc.webapp.forms.html.*,uk.ac.ed.epcc.webapp.forms.*, uk.ac.ed.epcc.webapp.forms.transition.*" %>
 <%@ page %>
 <%@ include file="/session.jsf" %>
-<% WebappHeadTag.addCss(conn, request, "service_desk.css"); %>
+<wb:css url="service_desk.css"/>
 <%
     TransitionFactory tp = TransitionServlet.getProvider(conn,request);
 	Object target =   TransitionServlet.getTarget(conn,tp,request);

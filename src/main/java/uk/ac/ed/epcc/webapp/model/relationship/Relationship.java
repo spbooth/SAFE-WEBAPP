@@ -155,7 +155,7 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 	@Override
 	protected SQLFilter<Link<A, B>> getFilterFromRole(String role) throws UnknownRelationshipException {
 		if( ! res.hasField(role)){
-			throw new UnknownRelationshipException(role);
+			throw new UnknownRelationshipException(role+"@"+getTag());
 		}
 		return new SQLValueFilter<>(getTarget(),res,role,Boolean.TRUE);
 	}

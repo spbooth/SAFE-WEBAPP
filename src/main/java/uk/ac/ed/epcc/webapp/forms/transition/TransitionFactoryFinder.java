@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.forms.transition;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 
 /** class that encodes the rules for locating a {@link TransitionFactory} from its 
  * {@link TransitionFactory#getTargetName()} tag,
@@ -48,9 +49,13 @@ public class TransitionFactoryFinder extends AbstractContexed {
 	 * @param type  TargetName of the TransitionProvider
 	 * @return {@link TransitionFactory}
 	 */
+	public TransitionFactory getProviderFromName( String type) {
+		return getProviderFromName(null, type);
+	}
 		
-	 public TransitionFactory getProviderFromName( String type) {
-			TransitionFactory result=null;
+	 public <X extends TransitionFactory> X getProviderFromName(Class<X> template, String type) {
+		 try(TimeClosable time = new TimeClosable(getContext(),() -> "FindTransition."+type)){
+			X result=null;
 			if( type==null || type.trim().length() ==0 ){
 				return null;
 			}
@@ -61,14 +66,14 @@ public class TransitionFactoryFinder extends AbstractContexed {
 				String tag = type.substring(index+1);
 				TransitionFactoryCreator<TransitionFactory> f = conn.makeObjectWithDefault(TransitionFactoryCreator.class,null, group);
 				if( f != null ){
-					result = f.getTransitionProvider(tag);
+					result = (X) f.getTransitionProvider(tag);
 				}
 			}else{
-				result = conn.makeObjectWithDefault(TransitionFactory.class,null,TRANSITION_PROVIDER_PREFIX,type);
+				result = (X) conn.makeObjectWithDefault(TransitionFactory.class,template,TRANSITION_PROVIDER_PREFIX,type);
 				if( result == null ){
 					TransitionFactoryCreator<TransitionFactory> f = conn.makeObjectWithDefault(TransitionFactoryCreator.class,null, type);
 					if( f != null ){
-						result = f.getTransitionProvider(type);
+						result = (X) f.getTransitionProvider(type);
 					}
 				}
 			}
@@ -76,5 +81,17 @@ public class TransitionFactoryFinder extends AbstractContexed {
 			assert(result == null || result.getTargetName().equals(type));
 			
 			return result;
+		 }
+	 }
+	 
+	 /** static factory method to get {@link TransitionFactory}s
+	  * 
+	  * @param conn
+	  * @param name
+	  * @return
+	  */
+	 public static <X extends TransitionFactory> X getTransitionFactory(AppContext conn, Class<X> template,String name) {
+		 TransitionFactoryFinder finder = new TransitionFactoryFinder(conn);
+		 return finder.getProviderFromName(template,name);
 	 }
 }

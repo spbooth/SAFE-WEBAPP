@@ -44,5 +44,6 @@ public interface FieldValue<T,X> extends  SQLAccessor<T,X>, GroupingSQLValue<T>{
 	 * @throws SQLException 
 	 */
 	public void setObject(PreparedStatement stmt, int pos, T value) throws SQLException;
+	
 
 }

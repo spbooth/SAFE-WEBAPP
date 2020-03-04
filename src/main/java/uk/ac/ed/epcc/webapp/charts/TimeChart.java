@@ -303,7 +303,9 @@ public class TimeChart<P extends PeriodSequencePlot> extends PeriodChart<P>{
 		}
 		if( plot_points > max_plot_points) {
 			// Check to avoid chart code using too much memory
-			throw new InvalidArgument("Too many datapoints requested "+plot_points+">"+max_plot_points);
+			//throw new InvalidArgument("Too many datapoints requested "+plot_points+">"+max_plot_points);
+			// fall back to regular
+			return getInstance(c, p.getStart(), p.getEnd(), RegularPeriodInput.PERIOD_INPUT_MAX_SPLITS, 2);
 		}
 	
 		TimeChartData chartData = t.getChartData();

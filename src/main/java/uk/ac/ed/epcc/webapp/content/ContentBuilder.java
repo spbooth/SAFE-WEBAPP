@@ -124,6 +124,15 @@ public interface ContentBuilder {
 	 */
 	public <X> void addObject(X target);
 	
+	/** Does this ContentBuilder have special handling for the object
+	 * beyond adding the string representation.
+	 * 
+	 * @param <X>
+	 * @param target
+	 * @return
+	 */
+	public <X> boolean canAdd(X target);
+	
 	/** add a bullet list of objects to the content.
 	 * Any {@link UIGenerator}s will generate their content otherwise 
 	 * a suitable text representation will be used.

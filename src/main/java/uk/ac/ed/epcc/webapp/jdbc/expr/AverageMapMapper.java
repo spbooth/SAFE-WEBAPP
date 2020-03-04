@@ -17,10 +17,11 @@
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.AverageValue;
+import uk.ac.ed.epcc.webapp.NumberOp;
 /** A MapMapper where the data field is Numerical data averaged out.
  * 
- * Note that there is no way of combing averages to give an average.
- * so the keys need to generate unique values.
+ * This relies on the {@link AverageValue} type to allow partial averages to be combined.
  * 
  * @author adrianj
  *
@@ -35,6 +36,10 @@ public class AverageMapMapper<K> extends MapMapper<K, Number> {
 		addAverage(val, value_name);
 	}
 
-	
+	@Override
+	protected Number combine(Number a, Number b) {
+		return NumberOp.average(a,b);
+		
+	}
 
 }

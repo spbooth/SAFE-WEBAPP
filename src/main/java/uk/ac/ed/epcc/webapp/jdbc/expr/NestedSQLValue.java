@@ -54,6 +54,13 @@ public interface NestedSQLValue<T,N> extends SQLValue<T>, GroupingSQLValue<T> {
 
 	@Override
 	default boolean checkContentsCanGroup() {
-		return getNested() instanceof GroupingSQLValue;
+		SQLValue<N> nested = getNested();
+		return nested instanceof GroupingSQLValue && ((GroupingSQLValue)nested).checkContentsCanGroup();
+	}
+
+	@Override
+	default boolean groupingIsomorphic() {
+		SQLValue<N> nested = getNested();
+		return nested instanceof GroupingSQLValue && ((GroupingSQLValue)nested).groupingIsomorphic();
 	}
 }

@@ -13,6 +13,9 @@ td.ORANGE,  span.ORANGE{
 td.RED, span.RED{
    background-color: red;
 }
+td.MAGENTA,  span.MAGENTA{
+   background-color: magenta;
+}
 td.PURPLE,  span.PURPLE{
    background-color: purple;
 }

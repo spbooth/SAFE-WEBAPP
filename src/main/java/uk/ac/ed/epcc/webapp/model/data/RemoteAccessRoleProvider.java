@@ -47,7 +47,7 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 		}
 		FieldInfo info = home_fac.res.getInfo(link_field);
 		if( info == null || ! info.isReference() ){
-			throw new UnknownRelationshipException("No reference field "+link_field);
+			throw new UnknownRelationshipException("No reference field "+link_field+"@"+home_fac.getTag());
 		}
 		TypeProducer prod = info.getTypeProducer();
 		if( prod instanceof IndexedTypeProducer){

@@ -22,6 +22,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionValidationException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -53,23 +54,23 @@ protected final UpdateTemplate<BDO> updater;
 
 		try {
 			AppContext conn = dat.getContext();
-			Map<String,Object> orig=dat.getMap();
+			Map<String,Object> orig=dat.getMap(true); // want nulls for diff generation
 			dat.formUpdate(f);
 			preCommit(dat,f,orig);
 			boolean changed = dat.commit();
-			if (changed) {
-				postUpdate(dat,f,orig);
-			}
+			
+			postUpdate(dat,f,orig, changed);
+			
 			return updater.getResult(type_name, dat, f);
 			
 		} catch (Exception e) {
 			throw new ActionException("Update failed", e);
 		}
 	}
-	public void postUpdate(BDO dat,Form f,Map<String,Object> orig) throws Exception {
-		updater.postUpdate(dat,f,orig);
+	public void postUpdate(BDO dat,Form f,Map<String,Object> orig,boolean changed) throws Exception {
+		updater.postUpdate(dat,f,orig,changed);
 	}
-	public void preCommit(BDO dat,Form f,Map<String,Object> orig) throws DataException {
+	public void preCommit(BDO dat,Form f,Map<String,Object> orig) throws DataException, TransitionValidationException {
 		updater.preCommit(dat, f, orig);
 	}
 	

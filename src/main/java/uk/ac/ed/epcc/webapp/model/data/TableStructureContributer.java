@@ -19,6 +19,7 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** An interface for objects that contribute fields etc. to the structure of a table and control the default form generation
@@ -81,7 +82,7 @@ public interface TableStructureContributer<BDO extends DataObject> {
 	 * @param selectors
 	 * @return {@link Map} of modified selectors/inputs
 	 */
-	Map<String, Object> addSelectors(Map<String, Object> selectors);
+	Map<String, Selector> addSelectors(Map<String, Selector> selectors);
 
 	/**
 	 * generate the class specific set of suppressed fields to be used in form creation/update
@@ -93,6 +94,27 @@ public interface TableStructureContributer<BDO extends DataObject> {
 	 */
 	Set<String> addSuppress(Set<String> suppress);
 
+	/** Add additional field named to be considered when building the form.
+	 * This could be added in the customise methods but this will work better with
+	 * multi-stage forms
+	 * 
+	 * @param fields
+	 * @return
+	 */
+	default Set<String> addFormFields(Set<String> fields){
+		return fields;
+	}
+	/** Add any {@link FieldConstraint} for the form.
+	 * Note there may be multiple constraints for a field so existing values should
+	 * be merged using {@link FieldConstraint#add(FieldConstraint, FieldConstraint)}
+	 * 
+	 * 
+	 * @param constraints
+	 * @return modifed map
+	 */
+	default Map<String,FieldConstraint> addFieldConstraints(Map<String,FieldConstraint> constraints){
+		return constraints;
+	}
 	/**
 	 * Extension hook to allow additional Form customisation generic to all
 	 * types of Form (create and update) For example adding a FormValidator .
@@ -120,6 +142,6 @@ public interface TableStructureContributer<BDO extends DataObject> {
 	 * @param orig
 	 * @throws DataException
 	 */
-	void postUpdate(BDO o, Form f, Map<String, Object> orig) throws DataException;
+	void postUpdate(BDO o, Form f, Map<String, Object> orig, boolean changed) throws DataException;
 
 }

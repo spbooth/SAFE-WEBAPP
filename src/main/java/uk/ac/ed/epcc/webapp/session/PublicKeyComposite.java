@@ -10,6 +10,7 @@ import uk.ac.ed.epcc.webapp.content.TemplateContributor;
 import uk.ac.ed.epcc.webapp.content.TemplateFile;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileUploadDecorator;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
@@ -18,6 +19,7 @@ import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.MetaDataContributer;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
 
 /** A {@link Composite} that adds a SSH public key to an {@link AppUser}
@@ -68,15 +70,22 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 	protected abstract String format(X key) throws PublicKeyParseException, IOException;
 	protected abstract ParseAbstractInput<String> getInput();
 	@Override
-	public Map<String, Object> addSelectors(Map<String, Object> selectors) {
-		ParseAbstractInput<String> input = getInput();
-		selectors.put(PUBLIC_KEY, new FileUploadDecorator(input));
+	public Map<String, Selector> addSelectors(Map<String, Selector> selectors) {
+		
+		selectors.put(PUBLIC_KEY,new Selector() {
+
+			@Override
+			public Input getInput() {
+				return  new FileUploadDecorator(PublicKeyComposite.this.getInput());
+			}
+			
+		});
 		return selectors;
 	}
 
 	@Override
-	public void postUpdate(AppUser o, Form f, Map<String, Object> orig) throws DataException {
-		if( NOTIFY_SSH_KEY_CHANGE_FEATURE.isEnabled(getContext())){
+	public void postUpdate(AppUser o, Form f, Map<String, Object> orig, boolean changed) throws DataException {
+		if( changed && NOTIFY_SSH_KEY_CHANGE_FEATURE.isEnabled(getContext())){
 			String extra="";
 			String old_key = (String) orig.get(PUBLIC_KEY);
 			try{

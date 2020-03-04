@@ -70,7 +70,7 @@ public class RangeSearch<D extends DataObject> {
 			super(c);
 			addMinNumber(fac.res.getNumberExpression(fac.getTarget(), Long.class, field_name), null);
 			addMaxNumber(fac.res.getNumberExpression(fac.getTarget(), Long.class, field_name), null);
-			addCount(fac.res.getNumberExpression(fac.getTarget(), Long.class, field_name), null);
+			addSQLCount(fac.res.getNumberExpression(fac.getTarget(), Long.class, field_name), null);
 			
 		}
 

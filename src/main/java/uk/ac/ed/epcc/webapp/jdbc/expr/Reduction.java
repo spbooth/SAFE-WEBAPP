@@ -37,42 +37,44 @@ public enum Reduction {
   /** values are summed
    * 
    */
-  SUM(Operator.ADD),
+  SUM(Operator.ADD,false),
   /** values are averaged
    * 
    */
-  AVG(Operator.AVG),
+  AVG(Operator.AVG,true),
   /** median value of values is calcualted
    * 
    */
-  MEDIAN(Operator.MEDIAN),
+  MEDIAN(Operator.MEDIAN,true),
   /** minimum value taken
    * 
    */
-  MIN(Operator.MIN),
+  MIN(Operator.MIN,false),
   /** maximum value taken.
    * 
    */
-  MAX(Operator.MAX),
+  MAX(Operator.MAX,false),
   /** The INDEX reduction is equivalent to the SQL GROUP BY CLAUSE, when combined with other
  * Reductions it requests that multiple results should be returned, with reductions only happening
  * across sets of records where the INDEX property is the same.
    * 
    */
-  INDEX(Operator.MERGE),
+  INDEX(Operator.MERGE,false),
   /** SELECT just selects a value without adding to the SQL GROUP BY. The expression is assumed to be
  * derivable from the INDEXs or the same for all records. 
    * 
    */
-  SELECT(Operator.MERGE),
+  SELECT(Operator.MERGE,false),
   /** Count distinct values. This always generates a number whatever is being reduced
    * 
    */
-  DISTINCT(Operator.ADD);
+  DISTINCT(Operator.ADD,true);
   
   private final Operator op;
-  private Reduction(Operator o){
+  private final boolean custom_number;
+  private Reduction(Operator o, boolean custom){
 	  this.op=o;
+	  this.custom_number=custom;
   }
   /** get a {@link Operator} suitable for combing partial results.
    * 
@@ -80,5 +82,13 @@ public enum Reduction {
    */
   public Operator operator(){
 	  return op;
+  }
+
+  /** Can these reductions reductions be implemented by a custom number type
+   * 
+   * @return
+   */
+  public boolean customNumber() {
+	  return custom_number;
   }
 }

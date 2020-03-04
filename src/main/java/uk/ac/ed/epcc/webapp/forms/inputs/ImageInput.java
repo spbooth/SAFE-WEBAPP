@@ -116,28 +116,28 @@ public class ImageInput extends FileInput implements ItemInput<StreamData,Buffer
 	/**
 	 * @return the max_x
 	 */
-	private int getMaxX() {
+	public int getMaxX() {
 		return max_x;
 	}
 
 	/**
 	 * @param max_x the max_x to set
 	 */
-	private void setMaxX(int max_x) {
+	public void setMaxX(int max_x) {
 		this.max_x = max_x;
 	}
 
 	/**
 	 * @return the max_y
 	 */
-	private int getMaxY() {
+	public int getMaxY() {
 		return max_y;
 	}
 
 	/**
 	 * @param max_y the max_y to set
 	 */
-	private void setMaxY(int max_y) {
+	public void setMaxY(int max_y) {
 		this.max_y = max_y;
 	}
 	

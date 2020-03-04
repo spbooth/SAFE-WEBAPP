@@ -227,6 +227,7 @@ public abstract class ServletTest extends WebappTestBase{
 		AppUser user = old_service.getCurrentPerson();
         // As the session is preserved this will preserve the logged in person toggle-roles etc.
 		ServletSessionService service = new ServletSessionService(ctx);
+		service.setApplyToggle(old_service.getApplyToggle());
 		ctx.setService(service);
 
 		

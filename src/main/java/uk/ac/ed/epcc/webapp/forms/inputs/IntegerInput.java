@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 
 
@@ -80,5 +81,4 @@ public class IntegerInput extends NumberInput<Integer> {
 		}
 		throw new TypeError("Invalid type "+v.getClass().getCanonicalName()+" passed to IntegerInput");
 	}
-
 }

@@ -23,6 +23,7 @@ import java.util.Properties;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.NoSpaceFieldValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -35,6 +36,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 /** Factory for Configuration {@link Property}s stored in the database.
  * 
@@ -51,19 +53,35 @@ public class PropertyFactory extends DataObjectFactory<Property> {
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getSelectors()
 	 */
 	@Override
-	protected Map<String, Object> getSelectors() {
-		Map<String, Object> selectors = super.getSelectors();
-		TextInput name_input = new TextInput();
-		name_input.setSingle(true);
-		name_input.setTrim(true);
-		name_input.addValidator(new NoSpaceFieldValidator());
-		selectors.put(Property.NAME, name_input);
+	protected Map<String, Selector> getSelectors() {
+		Map<String, Selector> selectors = super.getSelectors();
+		
+		selectors.put(Property.NAME, new Selector() {
+
+			@Override
+			public Input getInput() {
+				TextInput name_input = new TextInput();
+				name_input.setSingle(true);
+				name_input.setTrim(true);
+				name_input.addValidator(new NoSpaceFieldValidator());
+				return name_input;
+			}
+			
+		});
 		// default input may forbid html but this should be allowed in props
-		TextInput prop_input = new TextInput();
-		prop_input.setBoxWidth(64);
-		prop_input.setMaxResultLength(MAX_PROP_LENGTH);
-		prop_input.setSingle(true);
-		selectors.put(Property.VALUE, prop_input);
+		
+		selectors.put(Property.VALUE, new Selector() {
+
+			@Override
+			public Input getInput() {
+				TextInput prop_input = new TextInput();
+				prop_input.setBoxWidth(64);
+				prop_input.setMaxResultLength(MAX_PROP_LENGTH);
+				prop_input.setSingle(true);
+				return prop_input;
+			}
+			
+		});
 		return selectors;
 	}
 	public PropertyFactory(AppContext c, String table){

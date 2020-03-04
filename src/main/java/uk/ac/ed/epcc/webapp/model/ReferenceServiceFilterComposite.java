@@ -18,6 +18,7 @@ import uk.ac.ed.epcc.webapp.model.data.SelectModifier;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link ServiceFilterComposite} that uses a reference to a classifier table
@@ -167,7 +168,7 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#addSelectors(java.util.Map)
 	 */
 	@Override
-	public Map<String, Object> addSelectors(Map<String, Object> selectors) {
+	public Map<String, Selector> addSelectors(Map<String, Selector> selectors) {
 		ClassificationFactory<Classification> fac = getServicesFactory();
 		selectors.put(SERVICE_ID_FIELD, fac);
 		return selectors;

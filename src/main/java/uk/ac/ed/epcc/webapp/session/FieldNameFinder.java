@@ -47,7 +47,7 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	/**
 	 * 
 	 */
-	private static final String PROPERTY_PREFIX = "NameFinder.";
+	protected static final String PROPERTY_PREFIX = "NameFinder.";
 
 	
     //private final boolean user_supplied;
@@ -101,13 +101,21 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 
 	@Override
 	public TableSpecification modifyDefaultTableSpecification(TableSpecification spec, String table) {
-		spec.setField(getField(), new StringFieldType(true, null, getContext().getIntegerParameter(PROPERTY_PREFIX+getRealm()+".length", 128)));
+		spec.setField(getField(), new StringFieldType(true, null, getContext().getIntegerParameter(PROPERTY_PREFIX+getRealm()+".length", defaultFieldLength())));
 		try{
 			spec.new Index(getRealm()+"_index", true, getField());
 		}catch(InvalidArgument e){
 			getLogger().error("Problem making index ",e);
 		}
 		return spec;
+	}
+
+	/** default filed length when creating table.
+	 * 
+	 * @return
+	 */
+	protected int defaultFieldLength() {
+		return 128;
 	}
 
 	@Override

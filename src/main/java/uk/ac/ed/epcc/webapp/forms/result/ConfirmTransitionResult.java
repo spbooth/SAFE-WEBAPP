@@ -31,8 +31,8 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 public class ConfirmTransitionResult<T,K> extends ChainedTransitionResult<T, K> {
 	
 	 private final String type;
-	 private final String args[];
-	 public ConfirmTransitionResult(TransitionFactory<K, T> provider, T target, K key,String type, String args[]){
+	 private final Object args[];
+	 public ConfirmTransitionResult(TransitionFactory<K, T> provider, T target, K key,String type, Object args[]){
 		 super(provider,target,key);
 		 this.type=type;
 		 this.args=args;
@@ -40,7 +40,7 @@ public class ConfirmTransitionResult<T,K> extends ChainedTransitionResult<T, K> 
 	 public String getType(){
 		 return type;
 	 }
-	 public String[] getArgs(){
+	 public Object[] getArgs(){
 		 return args;
 	 }
 	 @Override

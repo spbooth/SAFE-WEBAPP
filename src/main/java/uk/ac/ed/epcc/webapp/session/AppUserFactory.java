@@ -84,6 +84,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.IdAcceptFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.PrimaryOrderFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.UpdateAction;
 import uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
@@ -138,7 +139,11 @@ AnonymisingFactory
 	 public static final Feature AUTO_COMPLETE_APPUSER_INPUT = new Preference("app_user.autocomplete_input",false,"Use auto-complete input as the default person input");
 	public static final String ALLOW_EMAIL_FIELD ="AllowEmail";
 	
-    
+    /** A {@link SQLFilter} to select {@link AppUser}s based on their roles in the role table
+     * 
+     * @author Stephen Booth
+     *
+     */
     public class RoleFilter implements SQLFilter<AU>,PatternFilter<AU>{
     	private final String role;
     	private final SQLContext ctx;
@@ -271,15 +276,15 @@ AnonymisingFactory
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getSelectors()
 	 */
 	@Override
-	protected Map<String,Object> getSelectors() {
-		Map<String,Object> selectors = super.getSelectors();
-		if (selectors == null) {
-			selectors = new HashMap<>();
-		}
+	protected Map<String,Selector> getSelectors() {
+		// expose to EmailCahngeRequest 
+		// final to see if any overiddes.
+		Map<String,Selector> selectors = super.getSelectors();
+		
 		
 		return selectors;
 	}
-
+   
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -912,9 +917,8 @@ AnonymisingFactory
 		 * @see uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate#postUpdate(uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.forms.Form, java.util.Map)
 		 */
 		@Override
-		public void postUpdate(T o, Form f, Map<String, Object> orig) throws Exception {
-			postCreate(o, f);
-			
+		public void postUpdate(T o, Form f, Map<String, Object> orig, boolean changed) throws Exception {
+			postCreate(o, f);	
 		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate#preCommit(uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.forms.Form, java.util.Map)

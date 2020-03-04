@@ -98,4 +98,9 @@ public final class AliasSQLValue<T> implements GroupingSQLValue<T> {
 			return list;
 		}
 	}
+	@Override
+	public boolean groupingIsomorphic() {
+		// actually should always be true
+		return exp.groupingIsomorphic();
+	}
 }

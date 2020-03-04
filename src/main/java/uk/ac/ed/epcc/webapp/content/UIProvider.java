@@ -13,11 +13,15 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.content;
 
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
+import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionGenerator;
+
 /** An interface for objects that can produce a {@link UIGenerator} to add
  * themselves to a {@link ContentBuilder}.
  * 
  * This serves the same purpose as the {@link UIGenerator} interface but is better suited
  * to cases where the content logic is added by composition.
+ * It also allows the generation of the {@link TransitionFactory} to be deferred by using a {@link ViewTransitionGenerator} 
  * 
  * 
  * @see UIGenerator

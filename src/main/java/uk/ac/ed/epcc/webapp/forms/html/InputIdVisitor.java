@@ -143,4 +143,10 @@ public class InputIdVisitor implements InputVisitor<String> {
 		return visitMultiInput(multiInput);
 	}
 
+	public String normalise(String raw) {
+		if( raw == null ) {
+			return null;
+		}
+		return raw.replace('.', '_'); // jquery does not like periods in ids 
+	}
 }

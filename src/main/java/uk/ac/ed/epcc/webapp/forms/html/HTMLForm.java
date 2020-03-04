@@ -33,6 +33,7 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.MapForm;
 import uk.ac.ed.epcc.webapp.forms.action.ConfirmMessage;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 //import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
@@ -60,7 +61,9 @@ public class HTMLForm extends BaseHTMLForm {
 	public HTMLForm(AppContext c) {
 		super(c);
 	}
-
+	public HTMLForm(AppContext c,FormResult self) {
+		super(c,self);
+	}
 	
 	
 	

@@ -19,12 +19,14 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.inputs.ClassInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInputWrapper;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.far.handler.FormHandler;
 import uk.ac.ed.epcc.webapp.model.far.handler.PartConfigFactory;
 
@@ -136,13 +138,21 @@ public abstract class HandlerPartManager<O extends PartOwner, X extends FormHand
 		return new PartConfigFactory<>(this);
 	}
 	@Override
-	protected Map<String, Object> getSelectors() {
-		Map<String, Object> selectors = super.getSelectors();
-		ListInput i = new ClassInput<>(getContext(), getHandlerClass());
-		if( ! requireHandler()){
-			i = new OptionalListInputWrapper(i);
-		}
-		selectors.put(HANDLER_TYPE_FIELD, i );
+	protected Map<String, Selector> getSelectors() {
+		Map<String, Selector> selectors = super.getSelectors();
+		
+		selectors.put(HANDLER_TYPE_FIELD, new Selector() {
+
+			@Override
+			public Input getInput() {
+				ListInput i = new ClassInput<>(getContext(), getHandlerClass());
+				if( ! requireHandler()){
+					i = new OptionalListInputWrapper(i);
+				}
+				return i;
+			}
+			
+		});
 		return selectors;
 	}
 	

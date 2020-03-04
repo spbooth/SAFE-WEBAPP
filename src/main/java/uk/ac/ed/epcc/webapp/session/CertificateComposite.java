@@ -14,6 +14,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.MetaDataContributer;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 public class CertificateComposite extends AppUserComposite<AppUser, CertificateComposite> implements AnonymisingComposite<AppUser>, SummaryContributer<AppUser>,MetaDataContributer<AppUser>,TemplateContributor<AppUser> {
 	/* (non-Javadoc)
@@ -42,8 +43,8 @@ public class CertificateComposite extends AppUserComposite<AppUser, CertificateC
 	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#addSelectors(java.util.Map)
 	 */
 	@Override
-	public Map<String, Object> addSelectors(Map<String, Object> selectors) {
-		selectors.put(PERSONAL_CERTIFICATE, new DNInput());
+	public Map<String, Selector> addSelectors(Map<String, Selector> selectors) {
+		selectors.put(PERSONAL_CERTIFICATE, DNInput::new);
 		return selectors;
 	}
 
@@ -51,8 +52,8 @@ public class CertificateComposite extends AppUserComposite<AppUser, CertificateC
 	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#postUpdate(uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.forms.Form, java.util.Map)
 	 */
 	@Override
-	public void postUpdate(AppUser o, Form f, Map<String, Object> orig) throws DataException {
-		if( NOTIFY_CERTIFICATE_CHANGE_FEATURE.isEnabled(getContext())){
+	public void postUpdate(AppUser o, Form f, Map<String, Object> orig, boolean changed ) throws DataException {
+		if( changed && NOTIFY_CERTIFICATE_CHANGE_FEATURE.isEnabled(getContext())){
 			String extra ="";
 			String old_dn = (String) orig.get(PERSONAL_CERTIFICATE);
 			String new_dn = getPersonalCertificateDn(o);

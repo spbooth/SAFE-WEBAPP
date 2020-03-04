@@ -134,7 +134,7 @@ public <I,T> void addFormLabel(ExtendedXMLBuilder sb,AppContext conn,Field<I> f,
 		InputIdVisitor vis = new InputIdVisitor(f.getForm().getFormID());
 		vis.setRadioTarget(item);
 
-		String id =  (String) i.accept(vis);
+		String id =  vis.normalise((String) i.accept(vis));
 		if( id != null){
 			sb.attr("for",id);
 		}

@@ -16,12 +16,14 @@ package uk.ac.ed.epcc.webapp.session;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.URLInput;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.ClassificationFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 /**
  * @author spb
@@ -45,10 +47,12 @@ public class PreferedViewFactory extends ClassificationFactory<PreferedView> {
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getSelectors()
 	 */
 	@Override
-	protected Map<String, Object> getSelectors() {
-		Map<String, Object> selectors = super.getSelectors();
-		selectors.put(SAFE_URL, new URLInput());
-		selectors.put(DOCUMENTATION_URL, new URLInput());
+	protected Map<String, Selector> getSelectors() {
+		
+		Map<String, Selector> selectors = super.getSelectors();
+		Selector s = URLInput::new;
+		selectors.put(SAFE_URL, s);
+		selectors.put(DOCUMENTATION_URL, s);
 		return selectors;
 	}
 

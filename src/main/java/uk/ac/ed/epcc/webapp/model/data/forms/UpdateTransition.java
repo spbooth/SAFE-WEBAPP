@@ -21,6 +21,7 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionValidationException;
 import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdateProducerTransition;
 import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdateTransition;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
@@ -73,7 +74,7 @@ public abstract class UpdateTransition<BDO extends DataObject> extends DataObjec
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate#preCommit(uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.forms.Form, java.util.Map)
 	 */
 	@Override
-	public void preCommit(BDO dat, Form f, Map<String, Object> orig) throws DataException {
+	public void preCommit(BDO dat, Form f, Map<String, Object> orig) throws DataException, TransitionValidationException {
 		for(UpdateContributor<BDO> comp : getFactory().getComposites(UpdateContributor.class)) {
 			comp.preCommit(dat, f, orig);
 		}

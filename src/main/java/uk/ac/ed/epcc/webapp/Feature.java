@@ -113,6 +113,10 @@ public class Feature extends AbstractSetting<Boolean> {
 		}
 		return f.isEnabled(conn);
 	}
+
+	public static void setTempFeature(AppContext conn, Feature f, boolean val) {
+		conn.setAttribute(f, Boolean.valueOf(val));
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Setting#getInput()
 	 */
