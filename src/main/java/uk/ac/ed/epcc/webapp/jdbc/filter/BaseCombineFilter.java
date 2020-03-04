@@ -77,6 +77,13 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 				// handle joins and order
 				// Do this first to ensure we get the joins in the correct order
 				handleBaseCombineFilter(fil);
+				
+				if( fil.isForced()) {
+					// we have the joins and order
+					// just need to process the forced value
+					visitBinaryFilter(fil);
+					return null;
+				}
 				// First handle the selection branches
 				// must NOT process join here as we need to preserve
 				// the order in the explicit join set.
@@ -120,25 +127,31 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 				// Do this first to ensure the joins are added in the correct order
 				handleBaseCombineFilter(fil);
 				if(getFilterCombiner() == FilterCombination.AND) {
-					// These methods will loop over the inner filters to remove
-					// nesting if appropriate (ie combine mechanism is right).
-					visitAcceptFilter(fil);
-					for(PatternFilter p : fil.getPatternFilters()) {
-						// This will duplicate adding the joins but they should already be in place
-						// use visitor in preference so we can  customise the add.
-						// by sub-type.
-						p.acceptVisitor(this);
+					if( fil.isForced()) {
+						force_value=false;
+					}else {
+						// These methods will loop over the inner filters to remove
+						// nesting if appropriate (ie combine mechanism is right).
+						visitAcceptFilter(fil);
+						for(PatternFilter p : fil.getPatternFilters()) {
+							// This will duplicate adding the joins but they should already be in place
+							// use visitor in preference so we can  customise the add.
+							// by sub-type.
+							p.acceptVisitor(this);
+						}
 					}
 				}else {
-					// This filter is adding in OR combination
-					if( fil.hasAcceptFilters() && 
-							fil.hasPatternFilters()) {
-						throw new ConsistencyError("Cannot combine accept/pattern in OR combination");
+					if( ! fil.isForced()) {
+						// This filter is adding in OR combination
+						if( fil.hasAcceptFilters() && 
+								fil.hasPatternFilters()) {
+							throw new ConsistencyError("Cannot combine accept/pattern in OR combination");
+						}
+						// Either one or both of these is empty 
+						// so we can add separately
+						visitAcceptFilter(fil);
+						visitPatternFilter(fil);
 					}
-					// Either one or both of these is empty 
-					// so we can add separately
-					visitAcceptFilter(fil);
-					visitPatternFilter(fil);
 				}
 				
 				return null;
