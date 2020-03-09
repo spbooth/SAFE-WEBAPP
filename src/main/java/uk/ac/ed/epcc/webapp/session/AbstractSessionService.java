@@ -671,7 +671,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 */
 	@Override
 	public final boolean isAuthenticated() {
-		return person != null;
+		return person != null || (getAttribute(person_tag) != null);
 	}
 	@Override
 	public final boolean haveCurrentUser() {
