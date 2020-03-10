@@ -20,6 +20,7 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -145,18 +146,20 @@ AnonymisingFactory
      *
      */
     public class RoleFilter implements SQLFilter<AU>,PatternFilter<AU>{
-    	private final String role;
+    	private final String roles[];
     	private final SQLContext ctx;
-    	public RoleFilter(SQLContext ctx,String role){
+    	public RoleFilter(SQLContext ctx,String ... roles){
     		this.ctx=ctx;
-    		this.role=role;
+    		this.roles=roles;
     	}
 		
 		public void accept(AU o) {
 			
 		}
 		public List<PatternArgument> getParameters(List<PatternArgument> list) {
-			addRoleParameter(list, role);
+			for(String role : roles) {
+				addRoleParameter(list, role);
+			}
 			return list;
 		}
 		/**
@@ -180,7 +183,9 @@ AnonymisingFactory
 			sb.append(" = ");
 			res.addUniqueName(sb, true, false);
 			sb.append(" AND (");
-			addRolePattern(sb,role);
+			for(String role : roles) {
+				addRolePattern(sb,role);
+			}
 			sb.append("))");
 			return sb;
 		}
@@ -212,7 +217,12 @@ AnonymisingFactory
 			return AppUserFactory.this.getTarget();
 		}
 		public String toString() {
-			return "RoleFilter("+role+")";
+			return "RoleFilter("+String.join(",",roles)+")";
+		}
+
+
+		private AppUserFactory getEnclosingInstance() {
+			return AppUserFactory.this;
 		}
 
 		@Override
@@ -220,7 +230,7 @@ AnonymisingFactory
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + getEnclosingInstance().hashCode();
-			result = prime * result + ((role == null) ? 0 : role.hashCode());
+			result = prime * result + Arrays.hashCode(roles);
 			return result;
 		}
 
@@ -235,16 +245,9 @@ AnonymisingFactory
 			RoleFilter other = (RoleFilter) obj;
 			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
 				return false;
-			if (role == null) {
-				if (other.role != null)
-					return false;
-			} else if (!role.equals(other.role))
+			if (!Arrays.equals(roles, other.roles))
 				return false;
 			return true;
-		}
-
-		private AppUserFactory getEnclosingInstance() {
-			return AppUserFactory.this;
 		}
 	
     }
@@ -354,8 +357,8 @@ AnonymisingFactory
     }
 
 
-	public RoleFilter getRoleFilter(String role) {
-		return new RoleFilter(res.getSQLContext(),role);
+	protected RoleFilter getRoleFilter(String ... roles) {
+		return new RoleFilter(res.getSQLContext(),roles);
 	}
     @Override
     protected final void postCreateTableSetup(AppContext c, String table){

@@ -1628,4 +1628,9 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	public boolean getApplyToggle() {
 		return apply_toggle;
 	}
+
+	@Override
+	public BaseFilter<A> getPersonInRoleFilter(String... role_list) {
+		return getLoginFactory().getRoleFilter(role_list);
+	}
 }

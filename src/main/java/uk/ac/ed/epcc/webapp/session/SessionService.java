@@ -27,6 +27,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 /** {@link AppContextService} for managing session information.
@@ -299,6 +300,13 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public <T extends DataObject> BaseFilter<A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,T target) throws UnknownRelationshipException;
 	
+	/** Get a filter for {@link AppUser}s that can be in any of the specified global roles.
+	 * as defined in {@link #canHaveRoleFromList(AppUser, String...)}
+	 * 
+	 * @param role_list
+	 * @return
+	 */
+	public BaseFilter<A> getPersonInRoleFilter(String ... role_list);
 	/** get a {@link BaseFilter} representing the set of targets that a specified {@link AppUser} is in a particular
 	 * relationship-role with.
 	 * @param fac
