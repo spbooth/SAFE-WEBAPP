@@ -27,7 +27,6 @@ import uk.ac.ed.epcc.webapp.forms.Identified;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 /** Simple ListInput that gives a choice of items (parsed and returned as their String representation)
  * 
  * Optionally alternate string values/labels can be presented.
@@ -222,5 +221,13 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
 			return mapTag((String)v);
 		}
 		return super.convert(v);
+	}
+
+	@Override
+	public String getPrettyString(String val) {
+		if(val == null) {
+			return super.getPrettyString(val);
+		}
+		return labels.get(getItembyValue(val));
 	}
 }

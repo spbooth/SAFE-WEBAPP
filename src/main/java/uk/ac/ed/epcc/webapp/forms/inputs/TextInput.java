@@ -40,7 +40,7 @@ public class TextInput extends ParseAbstractInput<String> {
 				}
 				String s = (String) v;
 				if (s != null && s.length() > getMaxResultLength() && getMaxResultLength() > 0) {
-					throw new ValidateException("Input too long");
+					throw new ValidateException("Input too long "+s.length()+">"+getMaxResultLength());
 				}
 				
 				
