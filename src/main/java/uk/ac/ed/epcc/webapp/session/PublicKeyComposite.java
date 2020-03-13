@@ -60,14 +60,14 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 		return translations;
 	}
 
-	protected String normalise(String old) throws PublicKeyParseException, IOException {
+	protected String normalise(String old) throws Exception {
 		if( old == null ) {
 			return null;
 		}
 		return format(load(old));
 	}
-	protected abstract X load(String value) throws PublicKeyParseException;
-	protected abstract String format(X key) throws PublicKeyParseException, IOException;
+	protected abstract X load(String value) throws Exception;
+	protected abstract String format(X key) throws Exception;
 	protected abstract ParseAbstractInput<String> getInput();
 	@Override
 	public Map<String, Selector> addSelectors(Map<String, Selector> selectors) {
@@ -151,7 +151,7 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 	public String getPublicKey(AppUser person){
 		return getRecord(person).getStringProperty(PUBLIC_KEY);
 	}
-	public String getNormalisedPublicKey(AppUser person) throws PublicKeyParseException, IOException{
+	public String getNormalisedPublicKey(AppUser person) throws Exception{
 		return normalise(getPublicKey(person));
 	}
 	public void setPublickey(AppUser person,String key){

@@ -220,7 +220,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		IntegerInput input = new IntegerInput();
 		input.setMin(0);
 		input.setMax(999999);
-		input.setBoxWidth(6);
+		input.setBoxWidth(8); // use longer box as many browsers reduce size with added number picker
 		return input;
 	}
 
@@ -267,10 +267,10 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	 * @return
 	 */
 	public long getNorm() {
-		return 30000L; // 30 second
+		return getContext().getLongParameter("totp.refresh.millis", 30000L); // 30 second
 	}
 	public int getWindow() {
-		return 3;
+		return getContext().getIntegerParameter("totp.window",3);
 	}
 
 	@Override

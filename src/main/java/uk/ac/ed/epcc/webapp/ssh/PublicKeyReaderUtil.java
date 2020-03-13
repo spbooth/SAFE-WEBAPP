@@ -393,7 +393,7 @@ public final class PublicKeyReaderUtil
      * @see <a href="http://en.wikipedia.org/wiki/RSA">RSA on Wikipedia</a>
      * @see <a href="http://tools.ietf.org/html/rfc4253#section-6.6">RFC 4253 Section 6.6</a>
      */
-    private static PublicKey decodePublicKey(final SSH2DataBuffer _buffer)
+    static PublicKey decodePublicKey(final SSH2DataBuffer _buffer)
         throws PublicKeyParseException
     {
         final BigInteger e = _buffer.readMPint();
@@ -550,6 +550,10 @@ public final class PublicKeyReaderUtil
         
         public int pos() {
         	return pos;
+        }
+        
+        public void reset() {
+        	pos=0;
         }
     }
 
