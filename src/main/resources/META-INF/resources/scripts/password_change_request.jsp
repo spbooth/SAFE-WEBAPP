@@ -39,7 +39,7 @@
 <%} %>
 <p><%=policy %>
 </p>
-<form>
+<form method="POST">
 <%= form.getHtmlForm() %>
 </form>
 </div>
