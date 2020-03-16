@@ -579,8 +579,8 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		@Override
 		@SuppressWarnings("unchecked")
 		public T getSelected(Form f) {
-			DataObjectItemInput<T> input = (DataObjectItemInput<T>) f.getInput(getUniqueIdName());
-			return input.getItem();
+			//DataObjectItemInput<T> input = (DataObjectItemInput<T>) f.getInput(getUniqueIdName());
+			return (T) f.getItem(getUniqueIdName());
 		}
 
 		@Override

@@ -60,7 +60,7 @@ public class DropFieldTransition<T extends DataObjectFactory> extends EditTableF
 		}
 		@Override
 		public FormResult action(Form f) throws ActionException {
-			ItemInput<String,FieldInfo> input = (ItemInput<String,FieldInfo>) f.getInput(FIELD_INPUT);
+			FieldInfo info = (FieldInfo) f.getItem(FIELD_INPUT);
 			try {
 				Repository res = getRepository(target);
 				SQLContext sql = res.getSQLContext();
@@ -68,7 +68,7 @@ public class DropFieldTransition<T extends DataObjectFactory> extends EditTableF
 				query.append("ALTER TABLE ");
 				res.addTable(query, true);
 				query.append(" DROP ");
-				input.getItem().addName(query, false, true);
+				info.addName(query, false, true);
 				query.append(" ");
 				
 				try(java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString())){

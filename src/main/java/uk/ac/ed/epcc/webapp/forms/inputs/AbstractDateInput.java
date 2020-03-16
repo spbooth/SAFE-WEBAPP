@@ -130,7 +130,8 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 		return df.format(date);
 	}
 	
-	/** 
+	/** Which of the available formats in {@link #getFormats()}
+	 * should be used as the hint text.
 	 * 
 	 * @return
 	 */
