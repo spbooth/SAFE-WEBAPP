@@ -222,22 +222,26 @@ public abstract class BaseHTMLForm extends MapForm {
 	
 	
 	public static void emitHiddenParam(ExtendedXMLBuilder hb,Input i) {
-		String value;
+		String value=null;
 		if (i instanceof ParseInput) {
 			ParseInput p = (ParseInput) i;
 			value = p.getString();
 		} else {
-			value = i.getValue().toString();
+			Object v = i.getValue();
+			if( v != null) {
+				value = v.toString();
+			}
 		}
 		emitHiddenParam(hb,i.getKey(), value);
 	}
 	public static void emitHiddenParam(ExtendedXMLBuilder hb,String key, String value){
-		hb.open("input");
-		hb.attr("type","hidden");
-		hb.attr("name",key);
-		hb.attr("value",value);
-		hb.close();
-
+		if( value != null) {
+			hb.open("input");
+			hb.attr("type","hidden");
+			hb.attr("name",key);
+			hb.attr("value",value);
+			hb.close();
+		}
 	}
 	public static void getHiddenParam(ExtendedXMLBuilder hb,Input i){
 		if(i instanceof ParseMapInput){
