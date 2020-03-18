@@ -56,8 +56,10 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -86,6 +88,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.filter.IdAcceptFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.PrimaryOrderFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
+import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.UpdateAction;
@@ -335,6 +338,20 @@ AnonymisingFactory
 		public FormResult getPage(SessionService<AU> user) {
 			return new ChainedTransitionResult(AppUserTransitionProvider.getInstance(user.getContext()), user.getCurrentPerson(), AppUserTransitionProvider.UPDATE);
 		}
+
+		@Override
+		public BaseFilter<AU> notifiable(SessionService<AU> sess) {
+			return getWarnRefreshFilter();
+		}
+
+		@Override
+		public String getNotifyText(AU person) {
+			Date d = person.nextRequiredUpdate();
+			if( d == null ) {
+				return null;
+			}
+			return "Your user details need to be updates/verified before "+d;
+		}
 		
 	}
 
@@ -470,6 +487,16 @@ AnonymisingFactory
 	}
 	public int warnRefreshDays() {
 		return (int)(0.9 * requireRefreshDays());
+	}
+	
+	public BaseFilter<AU> getWarnRefreshFilter(){
+		if( REQUIRE_PERSON_UPDATE_FEATURE.isEnabled(getContext())) {
+			Calendar thresh = Calendar.getInstance();
+			thresh.setTime(getContext().getService(CurrentTimeService.class).getCurrentTime());
+			thresh.add(Calendar.DAY_OF_YEAR, -1 * warnRefreshDays());
+			return new SQLValueFilter<AU>(getTarget(), res,AppUser.UPDATED_TIME ,MatchCondition.LT , thresh.getTime());
+		}
+		return new FalseFilter<AU>(getTarget());
 	}
 	/** add Notes to be included in a signup/update form.
 	 * This is included within the block element above the
