@@ -350,7 +350,7 @@ AnonymisingFactory
 			if( d == null ) {
 				return null;
 			}
-			return "Your user details need to be updates/verified before "+d;
+			return "Your user details need to be updated/verified before "+d;
 		}
 		
 	}
@@ -497,6 +497,17 @@ AnonymisingFactory
 			return new SQLValueFilter<AU>(getTarget(), res,AppUser.UPDATED_TIME ,MatchCondition.LT , thresh.getTime());
 		}
 		return new FalseFilter<AU>(getTarget());
+	}
+	
+	/** a filter for people that we might ever send emails to.
+	 * 
+	 * @return
+	 */
+	public BaseFilter<AU> getEmailFilter(){
+		if( res.hasField(ALLOW_EMAIL_FIELD)) {
+			return new SQLValueFilter<AU>(getTarget(), res, ALLOW_EMAIL_FIELD, Boolean.TRUE);
+		}
+		return null;
 	}
 	/** add Notes to be included in a signup/update form.
 	 * This is included within the block element above the
