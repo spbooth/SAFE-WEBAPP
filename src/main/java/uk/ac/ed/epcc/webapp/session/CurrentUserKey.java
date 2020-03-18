@@ -69,4 +69,8 @@ public class CurrentUserKey extends AppUserKey {
 	public boolean addMenu(AppUser user) {
 		return true;
 	}
+	
+	public boolean notify(AppUser user) {
+		return false;
+	}
 }

@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -41,6 +42,9 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
@@ -248,7 +252,18 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		setName(target, null);
 	}
 
-	public static CurrentUserKey CHANGE_EMAIL = new CurrentUserKey("Email", "Update email", "Change the email address we use to contact you");
+	public static CurrentUserKey CHANGE_EMAIL = new CurrentUserKey("Email", "Update email", "Change the email address we use to contact you") {
+
+		@Override
+		public boolean notify(AppUser user) {
+			EmailNameFinder comp  = (EmailNameFinder) user.getFactory().getComposite(EmailNameFinder.class);
+			if( comp != null ) {
+				return comp.warnVerify(user);
+			}
+			return false;
+		}
+		
+	};
 
 
 	public class ChangeEmailTransition extends AbstractFormTransition<AU> implements ExtraFormTransition<AU>{
@@ -259,7 +274,17 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		@Override
 		public <X extends ContentBuilder> X getExtraHtml(X cb, SessionService<?> op, AU target) {
 			if( useEmailVerificationDate()) {
+				SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 				cb.addObject(new PreDefinedContent(op.getContext(), "verify_email"));
+				Date last = getVerificationDate(target);
+				if( last != null ) {
+					cb.addObject(new PreDefinedContent(op.getContext(), "email_last_verified",(Object)fmt.format(last)));
+				}
+				if( warnVerify(target)) {
+					ContentBuilder panel = cb.getPanel("warn");
+					panel.addObject(new PreDefinedContent(op.getContext(), "warn_verify_email",(Object)fmt.format(needVerifyBy(target))));
+					panel.addParent();
+				}
 			}
 			cb.addObject(new PreDefinedContent(op.getContext(), "change_email"));
 			if( userVisible()) {
@@ -349,6 +374,26 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		public FormResult getPage(SessionService<AU> user) {
 			return new ChainedTransitionResult(AppUserTransitionProvider.getInstance(getContext()),user.getCurrentPerson(),CHANGE_EMAIL);
 		}
+
+
+
+		
+
+
+
+		@Override
+		public String getNotifyText(AU person) {
+			SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+			PreDefinedContent c = new PreDefinedContent(person.getContext(), "warn_verify_email",(Object)fmt.format(needVerifyBy(person)));
+			return c.toString();
+		}
+
+
+
+		@Override
+		public BaseFilter<AU> notifiable(SessionService<AU> sess) {
+			return needVerifyFilter();
+		}
 		
 	}
 	
@@ -419,6 +464,64 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		return false;
 	}
 	
+	public BaseFilter<AU> needVerifyFilter(){
+		int days = verifyRefreshDays();
+		if( days > 0 ) {
+			
+			Calendar point = Calendar.getInstance();
+			// 90% there
+			point.add(Calendar.DAY_OF_YEAR, (int)(-0.9 * days));
+
+			Date target_time = point.getTime();
+			return new SQLValueFilter<AU>(getFactory().getTarget(),getRepository(),EMAIL_VERIFIED_FIELD,MatchCondition.LT,target_time);
+		}
+		return new FalseFilter(getFactory().getTarget());
+	}
+	public boolean warnVerify(AU user) {
+		int days = verifyRefreshDays();
+		if( days > 0 ) {
+			Date d = getVerificationDate(user);
+			if( d == null ) {
+				return true;
+			}
+			Calendar point = Calendar.getInstance();
+			// 90% there
+			point.add(Calendar.DAY_OF_YEAR, (int)(-0.9 * days));
+
+			Date target_time = point.getTime();
+			return d.before(target_time);
+		}
+		return false;
+	}
+	/** If email needs to be regularly verified when does this next need to be done by
+	 * 
+	 * @param user
+	 * @return {@link Date} or null
+	 */
+	public Date needVerifyBy(AU user) {
+		int days = verifyRefreshDays();
+		if( days > 0 ) {
+			Date d = getVerificationDate(user);
+			Calendar point = Calendar.getInstance();
+			if( d == null ) {
+				point.setTime(getContext().getService(CurrentTimeService.class).getCurrentTime());
+			}else {
+				point.setTime(d);
+				point.add(Calendar.DAY_OF_YEAR,  days);
+			}
+			return point.getTime();
+		}
+		return null;
+	}
+
+
+
+	@Override
+	protected final Class<? super EmailNameFinder<AU>> getType() {
+		// hardwire so we can sub-type but still only one
+		// Also allows us to retreive the installed finder
+		return EmailNameFinder.class;
+	}
 
 
 }

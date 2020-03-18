@@ -34,7 +34,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.LockedInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.WrappingInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -215,8 +215,8 @@ public class BaseForm implements Form {
 		if( sel == null ){
 			return null;
 		}
-		if( sel instanceof LockedInput){
-			sel = ((LockedInput)sel).getNested();
+		if( sel instanceof WrappingInput){
+			sel = ((WrappingInput)sel).getNested();
 		}
 		if( sel instanceof ItemInput){
 			return ((ItemInput) sel).getItem();

@@ -33,8 +33,10 @@ import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.content.Span;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.BaseForm;
 import uk.ac.ed.epcc.webapp.forms.Form;
@@ -438,7 +440,8 @@ AnonymisingFactory
 					return true;
 				}
 				Calendar point = Calendar.getInstance();
-				point.add(Calendar.DAY_OF_YEAR, -1 * getContext().getIntegerParameter("person_details.refresh_days", 365));
+				point.setTime(getContext().getService(CurrentTimeService.class).getCurrentTime());
+				point.add(Calendar.DAY_OF_YEAR, -1 * requireRefreshDays());
 
 				Date target_time = point.getTime();
 				try{
@@ -456,6 +459,17 @@ AnonymisingFactory
 			}
 		}
 		return false;
+	}
+	
+	/** number of days between required review of personal details
+	 * 
+	 * @return
+	 */
+	public int requireRefreshDays() {
+		return getContext().getIntegerParameter("person_details.refresh_days", 365);
+	}
+	public int warnRefreshDays() {
+		return (int)(0.9 * requireRefreshDays());
 	}
 	/** add Notes to be included in a signup/update form.
 	 * This is included within the block element above the
@@ -978,6 +992,24 @@ AnonymisingFactory
 			c.addAttributes(attributes, target);
 		}
 		
+		addUpdateAttributes(attributes, target);
+		
+	}
+	public void addUpdateAttributes(Map<String, Object> attributes, AU target) {
+		Date d = target.getLastTimeDetailsUpdated();
+		if( d != null ) {
+			attributes.put("Details updated",d);
+		}
+		if( REQUIRE_PERSON_UPDATE_FEATURE.isEnabled(getContext())) {
+			Date next = target.nextRequiredUpdate();
+			if( next != null ) {
+				if( target.warnRequiredUpdate()) {
+					attributes.put("Next update required",new Span("warn",next.toString()));
+				}else {
+					attributes.put("Next update required",next);
+				}
+			}
+		}
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#validateNameFormat(java.lang.String)

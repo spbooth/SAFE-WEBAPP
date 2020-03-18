@@ -22,6 +22,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.forms.Updater;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionFactory.ViewResult;
+import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
 
 /**
  * @author Stephen Booth
@@ -64,6 +65,10 @@ public class AppUserUpdater<A extends AppUser> extends Updater<A> {
 			super.postUpdate(p, f, orig,changed);
 			if( changed ) {
 				p.historyUpdate();
+			}
+			NavigationMenuService nav = getContext().getService(NavigationMenuService.class);
+			if( nav != null ) {
+				nav.resetMenu(); // update needed warning in menu may need to be cleared
 			}
 		} catch (Exception e) {
 			getLogger().error("Error in history update",e);

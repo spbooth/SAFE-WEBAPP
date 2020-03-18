@@ -423,12 +423,16 @@ protected void writeFile(String file_name, byte data[]) throws IOException {
     	return setTime(year, month, day, hour, min, 0);
     }
     public Date setTime(int year, int month, int day, int hour, int min, int sec) {
-    	TestTimeService serv = new TestTimeService();
-		ctx.setService(serv);
+    	
 		Calendar cal = Calendar.getInstance();
 		cal.clear();
 		cal.set(year, month, day, hour, min,sec);
+		return setTime(cal);
+    }
+   public Date setTime(Calendar cal) {
+		TestTimeService serv = new TestTimeService();
 		serv.setResult(cal.getTime());
+		ctx.setService(serv);
 		return cal.getTime();
     }
 }

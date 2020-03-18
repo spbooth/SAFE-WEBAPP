@@ -52,6 +52,18 @@ public interface ContentBuilder {
 	 * @return {@link ExtendedXMLBuilder}
 	 */
 	public ExtendedXMLBuilder getSpan();
+	/** convenience method to generate a span with defined class/types
+	 * 
+	 * @param type
+	 * @return
+	 */
+	default public ExtendedXMLBuilder getSpan(String ... type) {
+		ExtendedXMLBuilder h = getSpan();
+		for(String t : type) {
+			h.addClass(t);
+		}
+		return h;
+	}
 	/** Add unformatted text. Equivalent to
 	 * {@link #getText()}.clean(text).appendParent().
 	 * @param text string to add to content

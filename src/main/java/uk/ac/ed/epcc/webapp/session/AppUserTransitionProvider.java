@@ -75,7 +75,14 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 	};
 	public static final AppUserKey SET_ROLE_KEY = new RoleAppUserKey("Roles", "Set roles", "Set permission roles for this user", SET_ROLES_ROLE);
-	public static final CurrentUserKey UPDATE = new CurrentUserKey("Details", "Update personal details", "Update the information we hold about you",EDIT_DETAILS_ROLE);
+	public static final CurrentUserKey UPDATE = new CurrentUserKey("Details", "Update personal details", "Update the information we hold about you",EDIT_DETAILS_ROLE) {
+
+		@Override
+		public boolean notify(AppUser user) {
+			return user.warnRequiredUpdate();
+		}
+		
+	};
 	
 	public static final class SUTransition<AU extends AppUser> extends AbstractDirectTransition<AU>{
 
