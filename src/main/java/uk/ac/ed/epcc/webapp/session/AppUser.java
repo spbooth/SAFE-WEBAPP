@@ -277,9 +277,14 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 	/** Extension point for when updates to person state may need to be
 	 * notified to external parties.
 	 * 
+	 * The field string is a tag to identify the type of update being notified.
+	 * This allows some degree of additional filtering in the sub-class.
+	 * Use the db field triggering the update where this makes sense.
+	 * 
+	 * @param field
 	 * @param extra
 	 */
-	public void notifyChange(String extra) {
+	public void notifyChange(String field, String extra) {
 		
 	}
 

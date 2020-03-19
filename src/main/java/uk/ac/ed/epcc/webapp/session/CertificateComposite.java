@@ -66,7 +66,7 @@ public class CertificateComposite extends AppUserComposite<AppUser, CertificateC
 				extra += "personal certificate dn removed\n";
 			}
 			if( ! extra.isEmpty()){
-				o.notifyChange(extra);
+				o.notifyChange(PERSONAL_CERTIFICATE,extra);
 			}
 		}
 		

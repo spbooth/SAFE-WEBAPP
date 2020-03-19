@@ -108,7 +108,8 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 				extra += "public key removed\n";
 			}
 			if( ! extra.isEmpty()){
-				o.notifyChange(extra);
+				// still want to supress key based updates  if the machine manages keys explicitly
+				o.notifyChange(PUBLIC_KEY, extra);
 			}
 		}
 	}
