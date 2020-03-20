@@ -6,6 +6,7 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
 import uk.ac.ed.epcc.webapp.content.TemplateContributor;
 import uk.ac.ed.epcc.webapp.content.TemplateFile;
@@ -143,7 +144,9 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 	public <CB extends ContentBuilder> CB addUpdateNotes(CB cb,AppUser person) {
 		if( usePublicKey() ){
 			if(isOptional()){
-				cb.addObject(new PreDefinedContent(getContext(), "ssh_key.note"));
+				ExtendedXMLBuilder text = cb.getText();
+				text.addObject(new PreDefinedContent(getContext(), "ssh_key.note"));
+				text.appendParent();
 			}
 		}
 		return cb;
