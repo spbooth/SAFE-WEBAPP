@@ -6,6 +6,7 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
 import uk.ac.ed.epcc.webapp.content.TemplateContributor;
 import uk.ac.ed.epcc.webapp.content.TemplateFile;
 import uk.ac.ed.epcc.webapp.forms.Form;
@@ -142,9 +143,7 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 	public <CB extends ContentBuilder> CB addUpdateNotes(CB cb,AppUser person) {
 		if( usePublicKey() ){
 			if(isOptional()){
-			cb.addText("Any SSH key you register here will be included when new login accounts are requested. "
-					+ "However this does not automatically mean that it will be installed when the account is created."
-					+ " See the individual system documentation for details of their policy on SSH keys.");
+				cb.addObject(new PreDefinedContent(getContext(), "ssh_key.note"));
 			}
 		}
 		return cb;
