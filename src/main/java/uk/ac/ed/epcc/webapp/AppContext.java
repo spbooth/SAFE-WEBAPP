@@ -38,8 +38,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.DefaultConfigService;
@@ -531,10 +529,7 @@ public final class AppContext {
 		}
 		return service.getServiceProperties().getProperty(name);
 	}
-	/** A regexp for parameter expansion
-	 * 
-	 */
-    private final Pattern expand_pattern = Pattern.compile("\\$\\{([^\\s}]+)\\}");
+	
     /** Query an environmental parameter with nested parameter expansion
      * 
      */
@@ -542,13 +537,13 @@ public final class AppContext {
 		String text_to_expand = getInitParameter(name);
 		Map<String,String> values = new HashMap<>();
 		values.put(name, "");
-		return expandText(values,text_to_expand);
+		return getPropertyExpander().expandText(values,text_to_expand);
 	}
 	public final String getExpandedProperty(String name,String def){
 		String text_to_expand = getInitParameter(name,def);
 		Map<String,String> values = new HashMap<>();
 		values.put(name, "");
-		return expandText(values,text_to_expand);
+		return getPropertyExpander().expandText(values,text_to_expand);
 	}
 
 	/** perform config parameter expansion on a text fragment.
@@ -560,41 +555,17 @@ public final class AppContext {
 	 * @return expanded text
 	 */
 	public String expandText(String text_to_expand) {
-		return expandText(new HashMap<String,String>(), text_to_expand);
+		return getPropertyExpander().expandText(new HashMap<String,String>(), text_to_expand);
 	}
-	private String expandText(Map<String,String> values,String text_to_expand) {
-		try {
-			if( text_to_expand == null || text_to_expand.length() == 0){
-				return text_to_expand;
-			}
-			StringBuffer result = new StringBuffer();
-			Matcher m = expand_pattern.matcher(text_to_expand);
-			while(m.find()){
-				String default_text ="";
-				String subname = m.group(1);
-				if( subname.contains(":")){
-					int pos = subname.indexOf(':');
-					default_text = subname.substring(pos+1);
-					subname=subname.substring(0, pos);
-				}
-				String text = values.get(subname);
-				if( text == null){
-					text=getInitParameter(subname,default_text);
-					values.put(subname, ""); // recursive go to empty string
-					values.put(subname, text=expandText(values,text));
-				}
-				// supress unintended back subs
-				text = text.replace("\\", "\\\\");
-				text = text.replace("$", "\\$");
-				m.appendReplacement(result, text);
-			}
-			m.appendTail(result);
-			return result.toString();
-		}catch(Exception e) {
-			error(e, "Error expanding text");
-			return null;
+	private PropertyExpander getPropertyExpander() {
+		Properties p =null;
+		ConfigService cfg= getService(ConfigService.class);
+		if( cfg != null) {
+			p=cfg.getServiceProperties();
 		}
+		return new PropertyExpander(p);
 	}
+	
 	/** Query a property with generic and specialised forms.
 	 * First look for a property called <b>name.tag</b> If this does not exist 
 	 * look for a property called <b>name</b>

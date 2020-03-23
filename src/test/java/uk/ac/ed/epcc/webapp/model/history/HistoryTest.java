@@ -62,10 +62,11 @@ public class HistoryTest extends WebappTestBase {
 		assertEquals(1, fac.getCount(null));
 		// now check no mod does not change History
 		t.setNumber(14);
-		t.commit();
+		boolean changed = t.commit();
+		assertFalse("commit changed", changed);
 		ret = fac.update(t);
-		assertTrue(first.equals(ret));
-		assertTrue(ret.equals(first));
+		assertTrue("Same history",first.equals(ret));
+		assertTrue("same history again",ret.equals(first));
 		assertEquals(t.getID(),first.getPeerID());
 		assertEquals(first.getID(),ret.getID());
 		

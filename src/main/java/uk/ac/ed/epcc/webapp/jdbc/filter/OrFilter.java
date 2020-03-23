@@ -272,6 +272,10 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 	public boolean getBooleanResult() {
 		return force_value;
 	}
+	
+	public boolean isForced() {
+		return force_value;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;

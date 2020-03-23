@@ -19,6 +19,8 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
 
 /**
@@ -33,6 +35,8 @@ import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
 
 
 public class FileInput extends AbstractInput<StreamData> {
+	
+
 	/**
 	 * 
 	 */
@@ -85,5 +89,21 @@ public class FileInput extends AbstractInput<StreamData> {
 		StreamData value = getValue();
 		return ( value == null || value.getLength() == 0L);
 	}
-
+	@Override
+	public StreamData convert(Object v) throws TypeError {
+		if( v == null ) {
+			return null;
+		}
+		if( v instanceof StreamData) {
+			return (StreamData) v;
+		}
+		if( v instanceof byte[]) {
+			try {
+				return new ByteArrayStreamData((byte[]) v);
+			} catch (DataFault e) {
+				throw new TypeError("Error converting byte array", e);
+			}
+		}
+		throw new TypeError("Invalid conversion "+v.getClass().getCanonicalName());
+	}
 }

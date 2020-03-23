@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2019                            |
+//| Copyright - The University of Edinburgh 2020                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -23,7 +23,6 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -36,59 +35,55 @@ import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 
-/**
+/** Abstract class for building request links (with expiry time).
+ * 
+ * If the {@link AppUser} the link is for is known in advance use {@link AbstractUserRequestFactory} 
+ * 
  * @author Stephen Booth
  *
- * @param <A>
+ * @param <R> type of request object.
  */
-public abstract class AbstractRequestFactory<A extends AppUser,R extends AbstractRequestFactory.AbstractRequest>
+public abstract class AbstractRequestFactory<R extends AbstractRequestFactory.AbstractRequest>
 		extends DataObjectFactory<R> {
 
-	/**
-	 * @param user_fac
-	 */
-	protected AbstractRequestFactory(AppUserFactory<A> user_fac) {
-		super();
-		this.user_fac = user_fac;
-	}
-
-	protected static final String USER_ID = "UserID";
 	protected static final String EXPIRES = "Expires";
-	static final String TAG="Tag";
-	protected final AppUserFactory<A> user_fac;
-	
-	public static class AbstractRequest<A extends AppUser> extends DataObject{
-		protected final AppUserFactory<A> user_fac;
-		/**
-		 * @param r
-		 */
-		protected AbstractRequest(AppUserFactory<A> user_fac,Record r) {
-			super(r);
-			this.user_fac=user_fac;
-		}
-		public final A getUser(){
-			return getUserFactory().find(record.getNumberProperty(USER_ID));
-		}
-		public final AppUserFactory<A> getUserFactory(){
-			return user_fac;
-		}
-		
-		public final boolean expired() {
-			if ( record.getRepository().hasField(EXPIRES)) {
-				Date d = record.getDateProperty(EXPIRES);
-				if( d != null) {
-					CurrentTimeService time = getContext().getService(CurrentTimeService.class);
-					return d.before(time.getCurrentTime());
-				}
+	protected static final String TAG = "Tag";
+
+	public static class AbstractRequest extends DataObject{
+			
+			/**
+			 * @param r
+			 */
+			protected AbstractRequest(Record r) {
+				super(r);
 			}
-			return false;
+			
+			public final boolean expired() {
+				if ( record.getRepository().hasField(EXPIRES)) {
+					Date d = record.getDateProperty(EXPIRES);
+					if( d != null) {
+						CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+						return d.before(time.getCurrentTime());
+					}
+				}
+				return false;
+			}
+			public final String getTag(){
+				return record.getStringProperty(TAG);
+			}
 		}
-		public final String getTag(){
-			return record.getStringProperty(TAG);
-		}
+
+	/**
+	 * 
+	 */
+	public AbstractRequestFactory() {
+		super();
 	}
 
-
+	/** remove any time expired requests
+	 * 
+	 * @throws DataFault
+	 */
 	public final void purge() throws DataFault {
 		if( res.hasField(EXPIRES)) {
 			FilterDelete<R> del = new FilterDelete<>(res);
@@ -100,10 +95,31 @@ public abstract class AbstractRequestFactory<A extends AppUser,R extends Abstrac
 			del.delete(fil);
 		}
 	}
-	public R findByTag(String tag) throws DataException{
+
+	/** locate a request object by tag.
+	 * 
+	 * @param tag
+	 * @return
+	 * @throws DataException
+	 */
+	public R findByTag(String tag) throws DataException {
 		return find(new SQLValueFilter<>(getTarget(),res,TAG,tag),true );
 	}
-	public final String makeTag(int id,String seed) {
+
+	/** Generate a new tag used to create the request url.
+	 * This always contains a random value and an explicit integer id.
+	 * 
+	 * The random value is generated from a hash of both a random number generator and a Seed value.
+	 * The seed value should come from the context of the request. It is intended to mitigate against attacks against the random number generator.
+	 * Both by making it harder to determine random number state by  generating URLs and to guess urls (without also guessing/knowing the seed value).
+	 * 
+	 * The id value specifies an object the request is in respect to. For example a user account being changed. This is to reduce the
+	 * possibility of a tag clash. 
+	 * @param id - Integer id of object owning the request.
+	 * @param seed - a String based on the context of the request. 
+	 * @return
+	 */
+	public final String makeTag(int id, String seed) {
 		Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
 		StringBuilder input = new StringBuilder();
 		input.append(seed);
@@ -113,7 +129,7 @@ public abstract class AbstractRequestFactory<A extends AppUser,R extends Abstrac
 		log.debug("Input is "+input.toString());
 		try {
 			// obfuscate the tag
-			MessageDigest digest = MessageDigest.getInstance("MD5");
+			MessageDigest digest = MessageDigest.getInstance("SHA-256");
 			digest.update(input.toString().getBytes());
 			StringBuilder output= new StringBuilder();
 			output.append(id); // make sure different users can't have a tag clash.
@@ -129,17 +145,13 @@ public abstract class AbstractRequestFactory<A extends AppUser,R extends Abstrac
 			return input.toString();
 		}
 	}
-
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c, String table) {
 		TableSpecification spec = new TableSpecification();
-		spec.setField(USER_ID, new IntegerFieldType());
 		
 		spec.setField(EXPIRES, new DateFieldType(true, null));
 		spec.setField(TAG, new StringFieldType(false, "", 256));
 		return spec;
 	}
-	public final AppUserFactory<A> getAppUserFactory() {
-		return user_fac;
-	}
+
 }

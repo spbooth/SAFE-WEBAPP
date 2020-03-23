@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory;
 import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory.EmailChangeRequest;
@@ -80,13 +81,17 @@ public class EmailChangeRequestServlet extends SessionServlet {
 						}
 						return;
 					}else {
-						getLogger(conn).warn("Email change request for "+target_user.getName()+" complet attempted by "+service.getName());
+						getLogger(conn).warn("Email change request for "+target_user.getName()+" complete attempted by "+service.getName());
 					}
 				}
 				message(conn, req, res, "email_change_request_denied");
 				return;
 			}finally {
 				fac.purge();
+				NavigationMenuService nav = conn.getService(NavigationMenuService.class);
+				if( nav != null) {
+					nav.resetMenu(); // in case there are notifications
+				}
 			}
 		}catch(Exception e){
 			getLogger(conn).error("Error in EmailChangeRequest form",e);

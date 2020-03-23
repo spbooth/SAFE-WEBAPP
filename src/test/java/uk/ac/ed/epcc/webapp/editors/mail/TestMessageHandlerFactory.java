@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.editors.mail;
 
 import java.io.InputStream;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.mail.Address;
@@ -315,12 +316,22 @@ public class TestMessageHandlerFactory implements MessageHandlerFactory{
 		public boolean showBcc() {
 			return true;
 		}
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageHandler#getPath()
+		 */
+		@Override
+		public List<String> getPath() {
+			LinkedList<String> path = new LinkedList<String>();
+			path.add(Integer.toString(getID()));
+			return path;
+		}
 		
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Contexed#getContext()
 	 */
+	@Override
 	public AppContext getContext() {
 		return conn;
 	}
@@ -331,6 +342,7 @@ public class TestMessageHandlerFactory implements MessageHandlerFactory{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Tagged#getTag()
 	 */
+	@Override
 	public String getTag() {
 		return "TestMail";
 	}
@@ -338,10 +350,12 @@ public class TestMessageHandlerFactory implements MessageHandlerFactory{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageHandlerFactory#getHandler(int, uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
-	public MessageHandler getHandler(int id, SessionService<?> user) {
-		return new TestComposer(names[id]);
+	@Override
+	public MessageHandler getHandler(LinkedList<String> path, SessionService<?> user) {
+		return new TestComposer(names[Integer.parseInt(path.get(0))]);
 	}
-    public boolean equals(Object other){
+    @Override
+	public boolean equals(Object other){
     	return other != null && other.getClass()==getClass();
     }
 }

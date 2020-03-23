@@ -315,6 +315,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 						if (t.overlapps(o, start_bound[i][j], end_bound[i][j])) {
 							float val = t.getOverlapp(o, start_bound[i][j],
 									end_bound[i][j]);
+							// this won't work with min/max
 							set(set, i, j, get(set, i, j) + val);
 							seen = true;
 						} else {
@@ -334,6 +335,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 
 							float val = t.getOverlapp(o, start_bound[i][j],
 									end_bound[i][j]);
+							// this wont work with min max
 							set(set, i, j, get(set, i, j) + val);
 						}
 					}
@@ -364,6 +366,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 						if (set >= getNumSets()) {
 							setSize(set + 1, nMajor, nMinor);
 						}
+						// this won't work with min max if called more then once
 						set(set, i, j, get(set, i, j) + val);
 					}
 				}

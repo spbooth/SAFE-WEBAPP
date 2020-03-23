@@ -41,7 +41,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  *
  */
 public abstract class AbstractDateInput extends ParseAbstractInput<Date> implements BoundedDateInput, FormatHintInput {
-	DateFormat df[];
+	
     Date min=null;
     Date max=null;
     long resolution=1000L; // number of milliseconds in a tick
@@ -53,19 +53,13 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 		setSingle(true);
 		int length=0;
 		String formats[] = getFormats();
-		df = new DateFormat[formats.length];
-	
+
 		for(int i=0 ; i< formats.length;i++){
-			try{
-				df[i] = getDateFormat(formats[i]);
-				df[i].setLenient(false);
-				if( formats[i].length() > length){
-					length = formats[i].length();
-				}
-			}catch(IllegalArgumentException e){
-				// be lenient here in case of old java version
-				df[i]=null;
+
+			if( formats[i].length() > length){
+				length = formats[i].length();
 			}
+
 		}
 		setBoxWidth(length);
 		setMaxResultLength(length);
@@ -101,16 +95,20 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 			return null;
 		}
 		Date d=null;
-		for(int i=0 ; i< df.length ; i++){
+		String fmt[] = getFormats();
+		for(int i=0 ; i< fmt.length ; i++){
 			try {
-				if( df[i] != null ){
-					d = df[i].parse(v);
+				DateFormat df = getDateFormat(fmt[i]);
+				
+				if( df != null ){
+					df.setLenient(false);
+					d = df.parse(v);
 					break;
 				}
 			} catch (java.text.ParseException e) {
-				if( i == (df.length-1)){
+				if( i == (fmt.length-1)){
 					// none worked
-					throw new ParseException("Bad date format ["+v+"] expecting "+getFormats()[0]);
+					throw new ParseException("Bad date format ["+v+"] expecting "+fmt[0]);
 				}
 			}
 		}
@@ -128,11 +126,12 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 	public  String getString(java.util.Date date) {
 		if (date == null)
 			return null;
-
-		return df[0].format(date);
+		DateFormat df = getDateFormat(getFormats()[0]);
+		return df.format(date);
 	}
 	
-	/** 
+	/** Which of the available formats in {@link #getFormats()}
+	 * should be used as the hint text.
 	 * 
 	 * @return
 	 */

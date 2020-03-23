@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 /**
  * test input that must be a valid email address
@@ -72,5 +73,4 @@ public class EmailInput extends TextInput implements HTML5Input , FormatHintInpu
 	public String getFormatHint() {
 		return "name@example.com";
 	}
-
 }

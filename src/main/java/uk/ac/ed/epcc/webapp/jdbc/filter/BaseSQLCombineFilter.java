@@ -52,7 +52,8 @@ public abstract class BaseSQLCombineFilter<T> extends BaseCombineFilter<T> imple
 
 	}
 	public final <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
-		if( useBinary(false)){
+		// we can ignore join and order for an OR filter
+		if( useBinary(getFilterCombiner() == FilterCombination.OR)){
 			return vis.visitBinaryFilter(this);
 		}
 		return vis.visitSQLCombineFilter(this);

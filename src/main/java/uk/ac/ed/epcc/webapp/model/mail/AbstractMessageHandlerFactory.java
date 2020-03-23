@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.mail;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.mail.Part;
@@ -32,7 +33,6 @@ import uk.ac.ed.epcc.webapp.email.inputs.EmailInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.BasicType;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
@@ -125,8 +125,10 @@ public abstract class AbstractMessageHandlerFactory<H extends AbstractMessageHan
 		 * @see uk.ac.ed.epcc.webapp.Indexed#getID()
 		 */
 		@Override
-		public int getID() {
-			return provider.getID();
+		public List<String> getPath() {
+			LinkedList<String> path = new LinkedList<>();
+			path.add(Integer.toString(provider.getID()));
+			return path;
 		}
 
 		/* (non-Javadoc)
@@ -290,13 +292,17 @@ public abstract class AbstractMessageHandlerFactory<H extends AbstractMessageHan
 	 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageHandlerFactory#getHandler(int, uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
 	@Override
-	public MessageHandler getHandler(int id, SessionService<?> user) {
+	public MessageHandler getHandler(LinkedList<String> path, SessionService<?> user) {
 		try {
-			H h = find(id);
-			return getHandler(user, h);
-		} catch (DataException e) {
-			return null;
+			if( path.size() > 0) {
+				H h = find(Integer.parseInt(path.get(0)));
+				return getHandler(user, h);
+			}
+		} catch (Exception e) {
+			getLogger().error("Error getting MessageHander", e);
+			
 		}
+		return null;
 	}
 
 	/**

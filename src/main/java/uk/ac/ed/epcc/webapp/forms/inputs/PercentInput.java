@@ -18,6 +18,8 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.text.NumberFormat;
 
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+
 /** A DoubleInput which defaults to input a value between 0 and 1 using a
  * percent number format.
  * 

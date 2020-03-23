@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 /** Represents an UnmodifiableInput that takes no part in the
  * form validation it just displays informational text.
@@ -96,5 +97,4 @@ public class InfoInput implements Input<String>, UnmodifiableInput{
 	public void removeValidator(FieldValidator<String> val) {
 		
 	}
-
 }

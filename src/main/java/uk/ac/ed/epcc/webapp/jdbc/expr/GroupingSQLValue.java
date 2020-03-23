@@ -64,4 +64,12 @@ public interface GroupingSQLValue<T> extends SQLValue<T> {
 	default public boolean checkContentsCanGroup() {
 		return true;
 	}
+	
+	/** Is there always a one-to-one mapping between groups and values
+	 * 
+	 * @return
+	 */
+	default public boolean groupingIsomorphic() {
+		return false;
+	}
 }

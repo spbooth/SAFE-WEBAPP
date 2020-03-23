@@ -31,7 +31,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.Input;
  */
 
 
-public class CheckboxSelector implements Selector<Input<String>> {
+public class CheckboxSelector implements Selector<CheckBoxInput> {
 	String checked_tag;
 
 	String unchecked_tag;
@@ -65,7 +65,7 @@ public class CheckboxSelector implements Selector<Input<String>> {
 	}
 
 	@Override
-	public Input<String> getInput() {
+	public CheckBoxInput getInput() {
 		return new CheckBoxInput(checked_tag, unchecked_tag);
 	}
 

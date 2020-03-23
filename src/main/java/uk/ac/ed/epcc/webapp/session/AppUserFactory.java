@@ -20,6 +20,7 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -32,8 +33,10 @@ import java.util.Map;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.content.Span;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.BaseForm;
 import uk.ac.ed.epcc.webapp.forms.Form;
@@ -53,8 +56,10 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -83,7 +88,9 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.filter.IdAcceptFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.PrimaryOrderFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLIdFilter;
+import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.UpdateAction;
 import uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
@@ -138,20 +145,26 @@ AnonymisingFactory
 	 public static final Feature AUTO_COMPLETE_APPUSER_INPUT = new Preference("app_user.autocomplete_input",false,"Use auto-complete input as the default person input");
 	public static final String ALLOW_EMAIL_FIELD ="AllowEmail";
 	
-    
+    /** A {@link SQLFilter} to select {@link AppUser}s based on their roles in the role table
+     * 
+     * @author Stephen Booth
+     *
+     */
     public class RoleFilter implements SQLFilter<AU>,PatternFilter<AU>{
-    	private final String role;
+    	private final String roles[];
     	private final SQLContext ctx;
-    	public RoleFilter(SQLContext ctx,String role){
+    	public RoleFilter(SQLContext ctx,String ... roles){
     		this.ctx=ctx;
-    		this.role=role;
+    		this.roles=roles;
     	}
 		
 		public void accept(AU o) {
 			
 		}
 		public List<PatternArgument> getParameters(List<PatternArgument> list) {
-			addRoleParameter(list, role);
+			for(String role : roles) {
+				addRoleParameter(list, role);
+			}
 			return list;
 		}
 		/**
@@ -175,7 +188,9 @@ AnonymisingFactory
 			sb.append(" = ");
 			res.addUniqueName(sb, true, false);
 			sb.append(" AND (");
-			addRolePattern(sb,role);
+			for(String role : roles) {
+				addRolePattern(sb,role);
+			}
 			sb.append("))");
 			return sb;
 		}
@@ -207,7 +222,12 @@ AnonymisingFactory
 			return AppUserFactory.this.getTarget();
 		}
 		public String toString() {
-			return "RoleFilter("+role+")";
+			return "RoleFilter("+String.join(",",roles)+")";
+		}
+
+
+		private AppUserFactory getEnclosingInstance() {
+			return AppUserFactory.this;
 		}
 
 		@Override
@@ -215,7 +235,7 @@ AnonymisingFactory
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + getEnclosingInstance().hashCode();
-			result = prime * result + ((role == null) ? 0 : role.hashCode());
+			result = prime * result + Arrays.hashCode(roles);
 			return result;
 		}
 
@@ -230,16 +250,9 @@ AnonymisingFactory
 			RoleFilter other = (RoleFilter) obj;
 			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
 				return false;
-			if (role == null) {
-				if (other.role != null)
-					return false;
-			} else if (!role.equals(other.role))
+			if (!Arrays.equals(roles, other.roles))
 				return false;
 			return true;
-		}
-
-		private AppUserFactory getEnclosingInstance() {
-			return AppUserFactory.this;
 		}
 	
     }
@@ -271,15 +284,15 @@ AnonymisingFactory
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getSelectors()
 	 */
 	@Override
-	protected Map<String,Object> getSelectors() {
-		Map<String,Object> selectors = super.getSelectors();
-		if (selectors == null) {
-			selectors = new HashMap<>();
-		}
+	protected Map<String,Selector> getSelectors() {
+		// expose to EmailCahngeRequest 
+		// final to see if any overiddes.
+		Map<String,Selector> selectors = super.getSelectors();
+		
 		
 		return selectors;
 	}
-
+   
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -325,6 +338,20 @@ AnonymisingFactory
 		public FormResult getPage(SessionService<AU> user) {
 			return new ChainedTransitionResult(AppUserTransitionProvider.getInstance(user.getContext()), user.getCurrentPerson(), AppUserTransitionProvider.UPDATE);
 		}
+
+		@Override
+		public BaseFilter<AU> notifiable(SessionService<AU> sess) {
+			return getWarnRefreshFilter();
+		}
+
+		@Override
+		public String getNotifyText(AU person) {
+			Date d = person.nextRequiredUpdate();
+			if( d == null ) {
+				return null;
+			}
+			return "Your user details need to be updated/verified before "+d;
+		}
 		
 	}
 
@@ -349,8 +376,8 @@ AnonymisingFactory
     }
 
 
-	public RoleFilter getRoleFilter(String role) {
-		return new RoleFilter(res.getSQLContext(),role);
+	protected RoleFilter getRoleFilter(String ... roles) {
+		return new RoleFilter(res.getSQLContext(),roles);
 	}
     @Override
     protected final void postCreateTableSetup(AppContext c, String table){
@@ -430,7 +457,8 @@ AnonymisingFactory
 					return true;
 				}
 				Calendar point = Calendar.getInstance();
-				point.add(Calendar.DAY_OF_YEAR, -1 * getContext().getIntegerParameter("person_details.refresh_days", 365));
+				point.setTime(getContext().getService(CurrentTimeService.class).getCurrentTime());
+				point.add(Calendar.DAY_OF_YEAR, -1 * requireRefreshDays());
 
 				Date target_time = point.getTime();
 				try{
@@ -448,6 +476,38 @@ AnonymisingFactory
 			}
 		}
 		return false;
+	}
+	
+	/** number of days between required review of personal details
+	 * 
+	 * @return
+	 */
+	public int requireRefreshDays() {
+		return getContext().getIntegerParameter("person_details.refresh_days", 365);
+	}
+	public int warnRefreshDays() {
+		return (int)(0.9 * requireRefreshDays());
+	}
+	
+	public BaseFilter<AU> getWarnRefreshFilter(){
+		if( REQUIRE_PERSON_UPDATE_FEATURE.isEnabled(getContext())) {
+			Calendar thresh = Calendar.getInstance();
+			thresh.setTime(getContext().getService(CurrentTimeService.class).getCurrentTime());
+			thresh.add(Calendar.DAY_OF_YEAR, -1 * warnRefreshDays());
+			return new SQLValueFilter<AU>(getTarget(), res,AppUser.UPDATED_TIME ,MatchCondition.LT , thresh.getTime());
+		}
+		return new FalseFilter<AU>(getTarget());
+	}
+	
+	/** a filter for people that we might ever send emails to.
+	 * 
+	 * @return
+	 */
+	public BaseFilter<AU> getEmailFilter(){
+		if( res.hasField(ALLOW_EMAIL_FIELD)) {
+			return new SQLValueFilter<AU>(getTarget(), res, ALLOW_EMAIL_FIELD, Boolean.TRUE);
+		}
+		return null;
 	}
 	/** add Notes to be included in a signup/update form.
 	 * This is included within the block element above the
@@ -912,9 +972,8 @@ AnonymisingFactory
 		 * @see uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate#postUpdate(uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.forms.Form, java.util.Map)
 		 */
 		@Override
-		public void postUpdate(T o, Form f, Map<String, Object> orig) throws Exception {
-			postCreate(o, f);
-			
+		public void postUpdate(T o, Form f, Map<String, Object> orig, boolean changed) throws Exception {
+			postCreate(o, f);	
 		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate#preCommit(uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.forms.Form, java.util.Map)
@@ -971,6 +1030,24 @@ AnonymisingFactory
 			c.addAttributes(attributes, target);
 		}
 		
+		addUpdateAttributes(attributes, target);
+		
+	}
+	public void addUpdateAttributes(Map<String, Object> attributes, AU target) {
+		Date d = target.getLastTimeDetailsUpdated();
+		if( d != null ) {
+			attributes.put("Details updated",d);
+		}
+		if( REQUIRE_PERSON_UPDATE_FEATURE.isEnabled(getContext())) {
+			Date next = target.nextRequiredUpdate();
+			if( next != null ) {
+				if( target.warnRequiredUpdate()) {
+					attributes.put("Next update required",new Span("warn",next.toString()));
+				}else {
+					attributes.put("Next update required",next);
+				}
+			}
+		}
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#validateNameFormat(java.lang.String)
@@ -1094,6 +1171,13 @@ AnonymisingFactory
 			}
 		}
 		
+	}
+	@Override
+	public SQLFilter<AU> getDefaultRelationshipFilter() {
+		// clear this explicitly 
+		// Can't default to the select filter as this is overridden to use View permission
+		// which in turn will call this
+		return null;
 	}
 	
 }

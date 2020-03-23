@@ -19,21 +19,16 @@ package uk.ac.ed.epcc.webapp.model.relationship;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.LinkManager;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-
-import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
-import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
 
 
-/** abstract Link class that encodes a relationship between an AppUser and a
+/** abstract Link class that encodes an editable relationship between an AppUser and a
  * domain object and used to implement {@link RelationshipProvider} and {@link RoleSelector} for the domain object.
  *
  * How roles are actually encoded into the link object is deferred to the sub-class.
@@ -48,17 +43,15 @@ import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
 
 
 public abstract class AbstractRelationship<A extends AppUser,B extends DataObject, L extends AbstractRelationship.Link<A, B>> extends 
-         LinkManager<L,A,B> implements 
-         RelationshipProvider<A, B>{
+         RelationshipLinkManager<A, B, L> {
     
 	
 	
 	/** Extension constructor to allow sub-classes to set factory and field
 	 * 
 	 */
-	@SuppressWarnings("unchecked")
 	protected AbstractRelationship(AppContext c,String tag,String person_field, DataObjectFactory<B> b_fac, String field) {
-		super(c,tag,c.getService(SessionService.class).getLoginFactory(),person_field,b_fac,field);
+		super(c,tag,person_field,b_fac,field);
 	}
 	
     
@@ -78,48 +71,6 @@ public abstract class AbstractRelationship<A extends AppUser,B extends DataObjec
 		public abstract void setRole(String role, boolean value);
     	
     }
-
-	
-	public final BaseFilter<L> getUserRoleFilter(A user,String role) throws UnknownRelationshipException{
-		return new LinkFilter(user, null, getFilterFromRole(role));
-	}
-
-	/** get a filter corresponding to the role.
-	 * @param role
-	 * @return
-	 */
-	protected abstract BaseFilter<L> getFilterFromRole(String role) throws UnknownRelationshipException;
-	
-	
-	public final BaseFilter<L> getTargetRoleFilter(B target,String role) throws UnknownRelationshipException{
-		LinkFilter fil = new LinkFilter(null,target, getFilterFromRole(role));
-		if( target == null ){
-			// if no target use factory default.
-			fil.addFilter(getRightRemoteFilter(getRightFactory().getDefaultRelationshipFilter()));
-		}
-		return fil;
-	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.safe.accounting.db.RelationshipProvider#getTargetFilter(uk.ac.ed.epcc.webapp.session.AppUser, java.lang.String)
-	 */
-	@SuppressWarnings("unchecked")
-	public final BaseFilter<B> getTargetFilter(AppUser user,String role) throws UnknownRelationshipException{
-		return getRightFilter(getUserRoleFilter((A) user,role));
-	}
-	
-	
-	public final BaseFilter<A> getUserFilter(B target,String role) throws UnknownRelationshipException{
-		return getLeftFilter(getTargetRoleFilter(target, role));
-	}
-    public final BaseFilter<A> getUserFilter(BaseFilter<B> fil,String role) throws UnknownRelationshipException{
-    	AndFilter<L> and = new AndFilter<>(getTarget());
-    	and.addFilter(getFilterFromRole(role));
-    	and.addFilter(getRightRemoteFilter(fil));
-    	return getLeftFilter(and);
-    }
-	
-	
-	
 
 	
 	/* (non-Javadoc)
@@ -173,39 +124,6 @@ public abstract class AbstractRelationship<A extends AppUser,B extends DataObjec
 	public final boolean canCreate(SessionService c){
 		// link objects are created from the update form
 		return false;
-	}
-
-	@Override
-	public final DataObjectFactory<B> getTargetFactory() {
-		return getRightFactory();
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider#hasRelationFilter(uk.ac.ed.epcc.webapp.session.SessionService, java.lang.String)
-	 */
-	@Override
-	public final BaseFilter<B> hasRelationFilter(String role, A user) {
-		try {
-			return getTargetFilter(user, role);
-		} catch (UnknownRelationshipException e) {
-			return null;
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider#personInRelationFilter(uk.ac.ed.epcc.webapp.session.SessionService, java.lang.String, uk.ac.ed.epcc.webapp.model.data.DataObject)
-	 */
-	@Override
-	public final BaseFilter<A> personInRelationFilter(SessionService<A> sess, String role, B target) {
-		try {
-			return getUserFilter(target, role);
-		} catch (UnknownRelationshipException e) {
-			return null;
-		}
-	}
-	@Override
-	public final  boolean providesRelationship(String role) {
-		return getRelationships().contains(role);
 	}
 
 }

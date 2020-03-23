@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.editors.mail;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 import org.junit.Test;
@@ -54,7 +55,9 @@ ViewTransitionFactoryInterfaceTest<MailTarget, EditAction, EmailTransitionProvid
 	public Set<MailTarget> getTargets() {
 		HashSet<MailTarget> targets = new HashSet<>();
 		for(int i=0;i<getFac().names.length;i++){
-			MessageHandler hand = getFac().getHandler(i, null);
+			LinkedList<String> path = new LinkedList<String>();
+			path.add(Integer.toString(i));
+			MessageHandler hand = getFac().getHandler(path, null);
 			try {
 				targets.add(new MailTarget(hand, hand.getMessageProvider().getMessageHash(), null));
 			} catch (Exception e) {
@@ -240,7 +243,7 @@ ViewTransitionFactoryInterfaceTest<MailTarget, EditAction, EmailTransitionProvid
 	 */
 	@Override
 	public String getLogContentExpected(MailTarget target) {
-		return target.getHandler().getID()+"_log.xml";
+		return String.join("_", target.getHandler().getPath())+"_log.xml";
 	}
 
 	

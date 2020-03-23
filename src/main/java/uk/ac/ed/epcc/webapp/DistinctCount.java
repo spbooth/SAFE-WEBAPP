@@ -68,6 +68,9 @@ public class DistinctCount<D> extends Number {
 	}
 	
 	public static <D> DistinctCount<D> make(D obj){
+		if( obj instanceof DistinctCount) {
+			return (DistinctCount<D>) obj;
+		}
 		HashSet<D> v = new HashSet<>();
 		v.add(obj);
 		return new DistinctCount<>(v);

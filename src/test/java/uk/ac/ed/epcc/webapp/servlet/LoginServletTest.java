@@ -68,14 +68,17 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		user.setEmail("fred@example.com");
 		composite.setPassword(user,"FredIsDead");
 		user.commit();
-		
-		
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		assertFalse(sess.isAuthenticated());
+		assertFalse(sess.haveCurrentUser());
 		addParam("username", "fred@example.com");
 		addParam("password", "FredIsDead");
 		doPost();
 		loginRedirects();
-		SessionService<A> sess = ctx.getService(SessionService.class);
+		 sess = ctx.getService(SessionService.class);
+		assertTrue(sess.isAuthenticated());
 		assertTrue(sess.haveCurrentUser());
+		
 		
 		Set<RequiredPage<A>> pages = fac.getRequiredPages();
 		assertEquals(1,pages.size());
@@ -83,6 +86,27 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		assertFalse(page.required(sess));
 		
 	}
+	
+	@Test
+	public void testLoginFromSession() throws Exception{
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		
+		// isAuthenticated should be a no-side effects check
+		// so preferences can be queries in the login flow
+		assertFalse(sess.isAuthenticated());
+		req.getSession(true).setAttribute("SESSION_PersonID", Integer.valueOf(user.getID()));
+		req.servlet_path="/main.jsp";
+		assertTrue(sess.isAuthenticated());
+		assertTrue(sess.haveCurrentUser());
+		assertTrue( sess.isCurrentPerson(user));
+	}
+	
 	
 	@Test
 	public void testLoginOldAlg() throws DataFault, ServletException, IOException{

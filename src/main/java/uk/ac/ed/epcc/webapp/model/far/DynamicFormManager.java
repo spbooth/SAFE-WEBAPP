@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.XMLPrinter;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.inputs.ClassInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInputWrapper;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
@@ -40,6 +41,7 @@ import uk.ac.ed.epcc.webapp.model.data.FilterResult;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.Status.Value;
@@ -343,11 +345,19 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 		return supress;
 	}
 	@Override
-	protected Map<String, Object> getSelectors() {
-		Map<String, Object> selectors = super.getSelectors();
-		ClassInput<CompleteVisitor> input =  new ClassInput<>(getContext(), CompleteVisitor.class);
-		OptionalListInputWrapper<String, Class<? extends CompleteVisitor>> optional_input = new OptionalListInputWrapper<>(input,"use default");
-		selectors.put(VALIDATING_VISITOR_FIELD, optional_input);
+	protected Map<String, Selector> getSelectors() {
+		Map<String, Selector> selectors = super.getSelectors();
+		
+		selectors.put(VALIDATING_VISITOR_FIELD, new Selector() {
+
+			@Override
+			public Input getInput() {
+				ClassInput<CompleteVisitor> input =  new ClassInput<>(getContext(), CompleteVisitor.class);
+				OptionalListInputWrapper<String, Class<? extends CompleteVisitor>> optional_input = new OptionalListInputWrapper<>(input,"use default");
+				return input;
+			}
+			
+		});
 		
 		return selectors;
 	}

@@ -20,6 +20,7 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 /** An abstract base class for a {@link Composite} that combines multiple {@link Composite}s of the same type.
  * 
@@ -91,7 +92,7 @@ public abstract class MultiComposite<BDO extends DataObject, X extends Composite
 	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#addSelectors(java.util.Map)
 	 */
 	@Override
-	public Map<String, Object> addSelectors(Map<String, Object> selectors) {
+	public Map<String, Selector> addSelectors(Map<String, Selector> selectors) {
 		for(Composite<BDO, X> c : getNested()){
 			selectors=c.addSelectors(selectors);
 		}
@@ -123,9 +124,9 @@ public abstract class MultiComposite<BDO extends DataObject, X extends Composite
 	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#postUpdate(uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.forms.Form, java.util.Map)
 	 */
 	@Override
-	public void postUpdate(BDO o, Form f, Map<String, Object> orig) throws DataException {
+	public void postUpdate(BDO o, Form f, Map<String, Object> orig, boolean changed) throws DataException {
 		for(Composite<BDO, X> c : getNested()){
-			c.postUpdate(o, f, orig);
+			c.postUpdate(o, f, orig, changed);
 		}
 	}
 	

@@ -98,7 +98,7 @@ public class ViewTransitionGenerator<X> implements UIGenerator, Comparable<ViewT
 	 */
 	@Override
 	public ContentBuilder addContent(ContentBuilder builder) {
-		try(TimeClosable time=new TimeClosable(conn, "ViewTranditionGenerator."+transition_tag)){
+		try(TimeClosable time=new TimeClosable(conn, ()->"ViewTranditionGenerator."+transition_tag)){
 			SessionService sess = conn.getService(SessionService.class);
 			TransitionFactory<?, X> fac =new TransitionFactoryFinder(conn).getProviderFromName(transition_tag);
 			// Check for current user so as not to add links in emails for public viewable objects

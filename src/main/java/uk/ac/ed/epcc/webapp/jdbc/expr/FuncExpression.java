@@ -86,13 +86,10 @@ public class FuncExpression<T,D> implements SQLExpression<T> {
 	@Override
 	public int add(StringBuilder sb, boolean qualify) {
 		int res=1;
-
-		if( func.equals(SQLFunc.DISTINCT)) {
-			sb.append("COUNT( DISTINCT ");
-		}else {
-			sb.append(func.name());
-			sb.append("(");
-		}
+		
+		sb.append(func.name());
+		sb.append("(");
+		
 		if( e == null){
 			sb.append("1");
 		}else{
@@ -126,11 +123,19 @@ public class FuncExpression<T,D> implements SQLExpression<T> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public T makeObject(ResultSet rs, int pos) throws DataException, SQLException {
-		// count has null expression
-		if(e !=null &&  target_class.isAssignableFrom(e.getTarget())) {
-			return (T) e.makeObject(rs, pos);
+		//AVG FLOOR COUNT change type
+		switch(func) {
+		case AVG: 
+		case FLOOR:
+		case COUNT:
+			return (T) rs.getObject(pos);
+		default:
+			// count has null expression
+			if(e !=null &&  target_class.isAssignableFrom(e.getTarget())) {
+				return (T) e.makeObject(rs, pos);
+			}
+			return (T) rs.getObject(pos);
 		}
-		return (T) rs.getObject(pos);
 	}
 	@Override
 	public Class<T> getTarget() {

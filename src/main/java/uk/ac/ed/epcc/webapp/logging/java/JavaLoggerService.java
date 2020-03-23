@@ -13,8 +13,15 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.logging.java;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.logging.LogManager;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.config.ConfigService;
+import uk.ac.ed.epcc.webapp.config.FilteredProperties;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
@@ -70,20 +77,20 @@ public class JavaLoggerService implements Contexed, LoggerService {
 
 	@Override
 	public void initialiseLogging() {
-//		ConfigService config = conn.getService(ConfigService.class);
-//		if( config != null ) {
-//			FilteredProperties props = new FilteredProperties(config.getServiceProperties(), "logconfig");
-//			if( ! props.isEmpty()) {
-//				try {
-//					ByteArrayOutputStream out = new ByteArrayOutputStream();
-//					props.store(out, "# config props");
-//					System.out.println(out.toString());
-//					LogManager.getLogManager().readConfiguration(new ByteArrayInputStream(out.toByteArray()));
-//				} catch (IOException e) {
-//					e.printStackTrace(System.err);
-//				}
-//			}
-//		}
+		ConfigService config = conn.getService(ConfigService.class);
+		if( config != null ) {
+			FilteredProperties props = new FilteredProperties(config.getServiceProperties(), "logconfig");
+			if( ! props.isEmpty()) {
+				try {
+					ByteArrayOutputStream out = new ByteArrayOutputStream();
+					props.store(out, "# config props");
+					System.out.println(out.toString());
+					LogManager.getLogManager().readConfiguration(new ByteArrayInputStream(out.toByteArray()));
+				} catch (IOException e) {
+					e.printStackTrace(System.err);
+				}
+			}
+		}
 	}
 //
 //	@Override

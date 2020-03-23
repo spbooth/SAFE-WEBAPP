@@ -35,7 +35,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  * @author spb
  *
  */
-public class PasswordChangeRequestFactory<A extends AppUser> extends AbstractRequestFactory<A,PasswordChangeRequestFactory<A>.PasswordChangeRequest> {
+public class PasswordChangeRequestFactory<A extends AppUser> extends AbstractUserRequestFactory<A,PasswordChangeRequestFactory<A>.PasswordChangeRequest> {
 	/**
 	 * 
 	 */
@@ -59,7 +59,7 @@ public class PasswordChangeRequestFactory<A extends AppUser> extends AbstractReq
 		return spec;
 	}
 	
-	public final class PasswordChangeRequest extends AbstractRequestFactory.AbstractRequest<A>{
+	public final class PasswordChangeRequest extends AbstractUserRequestFactory.AbstractRequest<A>{
 
 		protected PasswordChangeRequest(Record r) {
 			super(getAppUserFactory(),r);

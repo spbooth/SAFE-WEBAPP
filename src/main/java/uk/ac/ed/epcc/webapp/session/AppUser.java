@@ -20,6 +20,7 @@
  */
 package uk.ac.ed.epcc.webapp.session;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -181,6 +182,34 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 	public Date getLastTimeDetailsUpdated(){
 		return record.getDateProperty(UPDATED_TIME);
 	}
+	
+	/** Get the next date that personal details are required to be updated
+	 * 
+	 * @return Date or null
+	 */
+	public Date nextRequiredUpdate() {
+		return updatePlusOffset(getFactory().requireRefreshDays());
+	}
+	public boolean warnRequiredUpdate() {
+		Date w = updatePlusOffset(getFactory().warnRefreshDays());
+		if( w == null ) {
+			return false;
+		}
+		return getContext().getService(CurrentTimeService.class).getCurrentTime().after(w);
+	}
+	private Date updatePlusOffset(int offset) {
+		if( AppUserFactory.REQUIRE_PERSON_UPDATE_FEATURE.isEnabled(getContext())){
+			Date last  = getLastTimeDetailsUpdated();
+			if( last == null ){
+				return getContext().getService(CurrentTimeService.class).getCurrentTime();
+			}
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(last);
+			cal.add(Calendar.DAY_OF_YEAR,  offset);
+			return cal.getTime();
+		}
+		return null;
+	}
 	public void markDetailsUpdated(){
 		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 		record.setOptionalProperty(UPDATED_TIME, time.getCurrentTime());
@@ -248,9 +277,14 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 	/** Extension point for when updates to person state may need to be
 	 * notified to external parties.
 	 * 
+	 * The field string is a tag to identify the type of update being notified.
+	 * This allows some degree of additional filtering in the sub-class.
+	 * Use the db field triggering the update where this makes sense.
+	 * 
+	 * @param field
 	 * @param extra
 	 */
-	public void notifyChange(String extra) {
+	public void notifyChange(String field, String extra) {
 		
 	}
 

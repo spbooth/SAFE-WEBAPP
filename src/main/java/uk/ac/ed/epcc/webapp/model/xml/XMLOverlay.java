@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -49,6 +50,8 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
+import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -57,6 +60,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.TextFileOverlay;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -321,13 +325,27 @@ public class XMLOverlay<X extends XMLOverlay.XMLFile> extends TextFileOverlay<X>
 	}
 
 	@Override
-	protected Map<String, Object> getSelectors() {
-		Map<String,Object> res= super.getSelectors();
-		try {
-			res.put(TEXT, new XMLDocumentInput(getContext(), TransformerFactory.newInstance(), getSchema()));
-		} catch (Exception e) {
-			getContext().error(e,"Error creating DocumumentInput");
-		}
+	protected Map<String, Selector> getSelectors() {
+		Map<String,Selector> res= super.getSelectors();
+
+		res.put(TEXT, new Selector() {
+
+			@Override
+			public Input getInput() {
+
+				try {
+					return new XMLDocumentInput(getContext(), TransformerFactory.newInstance(), getSchema());
+				} catch (Exception e) {
+					getLogger().error("Error making input",e);
+					TextInput input = new TextInput();
+					input.setSingle(false);
+					input.setMaxResultLength(1<<24);
+					return input;
+				}
+			}
+
+		});
+
 		return res;
 	}
 

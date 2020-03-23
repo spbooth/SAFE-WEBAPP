@@ -190,7 +190,10 @@ public abstract class Chart<P extends Plot> extends AbstractContexed {
 		}
 		String legs[] = p.getLegends();
 		if( nother > 0 ){
-			legs[legs.length-1]="Others";
+			if( nother > 1) {
+				// keep original label if only one other
+				legs[legs.length-1]="Others";
+			}
 			p.setLegends(legs);
 		}
 

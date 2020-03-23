@@ -16,7 +16,10 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data.forms;
 
+import uk.ac.ed.epcc.webapp.content.UIGenerator;
+import uk.ac.ed.epcc.webapp.content.UIProvider;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.Identified;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
@@ -40,6 +43,11 @@ import uk.ac.ed.epcc.webapp.model.data.UnRetirable;
 		public UnRetireAction(String type_name, BDO r) {
 			setMustValidate(false);
 			setConfirm("restore");
+			Object t = "";
+			if( r instanceof UIGenerator || r instanceof UIProvider || r instanceof Identified) {
+				t = r;
+			}
+			setConfirmArgs(new Object[] {type_name, t});
 			this.type_name=type_name;
 			this.dat=r;
 		}

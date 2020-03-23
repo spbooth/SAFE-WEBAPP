@@ -68,11 +68,7 @@ public class UpdateDetailsTransition<A extends AppUser> extends StandAloneFormUp
 			}
 		}
 		fac.addUpdateNotes(cb, target);
-		Date last = target.getLastTimeDetailsUpdated();
-		if( last != null) {
-			DateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
-			cb.addHeading(3, "Last updated: "+df.format(last));
-		}
+		
 		AppContext c = op.getContext();
 		String privacy_policy=c.getExpandedProperty("service.url.privacypolicy");
 	    if( privacy_policy != null && ! privacy_policy.isEmpty() ){ 

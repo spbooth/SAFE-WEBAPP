@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.ContextCached;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
@@ -44,7 +45,7 @@ import uk.ac.ed.epcc.webapp.timer.TimeClosable;
  *
  */
 
-public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewTransitionProvider<AU, AppUserKey<AU>> implements TitleTransitionProvider<AppUserKey<AU>, AU> {
+public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewTransitionProvider<AU, AppUserKey<AU>> implements TitleTransitionProvider<AppUserKey<AU>, AU>, ContextCached {
 	
 	/** Relationship that allows a different user to edit this persons details
 	 * 
@@ -74,7 +75,14 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 	};
 	public static final AppUserKey SET_ROLE_KEY = new RoleAppUserKey("Roles", "Set roles", "Set permission roles for this user", SET_ROLES_ROLE);
-	public static final CurrentUserKey UPDATE = new CurrentUserKey("Details", "Update personal details", "Update the information we hold about you",EDIT_DETAILS_ROLE);
+	public static final CurrentUserKey UPDATE = new CurrentUserKey("Details", "Update personal details", "Update the information we hold about you",EDIT_DETAILS_ROLE) {
+
+		@Override
+		public boolean notify(AppUser user) {
+			return user.warnRequiredUpdate();
+		}
+		
+	};
 	
 	public static final class SUTransition<AU extends AppUser> extends AbstractDirectTransition<AU>{
 

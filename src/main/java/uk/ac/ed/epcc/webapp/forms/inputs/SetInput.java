@@ -222,5 +222,12 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
 		}
 		return super.convert(v);
 	}
-	
+
+	@Override
+	public String getPrettyString(String val) {
+		if(val == null) {
+			return super.getPrettyString(val);
+		}
+		return labels.get(getItembyValue(val));
+	}
 }

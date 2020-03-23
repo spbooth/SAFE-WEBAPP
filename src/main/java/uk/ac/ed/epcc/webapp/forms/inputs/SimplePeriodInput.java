@@ -27,12 +27,12 @@ public class SimplePeriodInput extends MultiInput<Period, TimeStampMultiInput> {
 	private final TimeStampMultiInput start;
 	private final TimeStampMultiInput end;
 	
-	public SimplePeriodInput(){
-		this(1000L,Calendar.SECOND);
+	public SimplePeriodInput(Date now){
+		this(now,1000L,Calendar.SECOND);
 	}
-	public SimplePeriodInput(long res,int finest_field){
-		start = new TimeStampMultiInput(res,finest_field);
-		end = new TimeStampMultiInput(res,finest_field);
+	public SimplePeriodInput(Date now,long res,int finest_field){
+		start = new TimeStampMultiInput(now,res,finest_field);
+		end = new TimeStampMultiInput(now,res,finest_field);
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.MILLISECOND,0);
 		cal.set(Calendar.SECOND, 0);

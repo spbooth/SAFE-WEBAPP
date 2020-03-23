@@ -43,9 +43,11 @@ import java.util.regex.Pattern;
 
 public class RelativeDateFormat extends SimpleDateFormat{
     private static final Pattern p = Pattern.compile("\\s*Now([+-])(\\d+)([dwmy])\\s*");
-    public RelativeDateFormat(String format){
+    private final Date now;
+    public RelativeDateFormat(Date now,String format){
     	super(format);
     	setLenient(false);
+    	this.now=now;
     }
 	
 
@@ -57,6 +59,9 @@ public class RelativeDateFormat extends SimpleDateFormat{
 			Matcher m = p.matcher(v.substring(pos.getIndex()));
 			if(m.lookingAt()){
 				Calendar c = Calendar.getInstance();
+				if( now != null ) {
+					c.setTime(now);
+				}
 				c.set(Calendar.MILLISECOND,0);
 				c.set(Calendar.SECOND, 0);
 				c.set(Calendar.MINUTE,0);

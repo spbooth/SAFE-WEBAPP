@@ -56,7 +56,7 @@ public class MultiPartServletService extends DefaultServletService implements Se
 	public Map<String,Object> makeParams(HttpServletRequest req)  {
 		
 		Map<String,Object> h = super.makeParams(req);
-		if( FileUploadBase.isMultipartContent(req)){
+		if( ServletFileUpload.isMultipartContent(req)){
 			FileItemFactory factory = new DiskFileItemFactory();
 			Logger log = conn.getService(LoggerService.class).getLogger(getClass());
 			log.debug("Processing multipart form");
@@ -72,14 +72,22 @@ public class MultiPartServletService extends DefaultServletService implements Se
 			
 					if( i.isFormField()){
 						log.debug("add parameter <"+name+":"+i.getString()+">");
+						String val=null;
 						try {
+							
 							if( characterEncoding == null ){
-								h.put(name, i.getString());
+								val=i.getString();
 							}else{
-								h.put(name, i.getString(characterEncoding));
+								val = i.getString(characterEncoding);
 							}
 						} catch (UnsupportedEncodingException e) {
-							h.put(name, i.getString());
+							val = i.getString();
+						}
+						// name inputs generate a nested slelect within a the datalist
+						// this can generate two items for the input one empty.
+						// therefore explicitly skip empty strings.
+						if( val != null && ! val.isEmpty()) {
+							h.put(name,val);
 						}
 					}else{
 						if( i.getSize() > 0 ){

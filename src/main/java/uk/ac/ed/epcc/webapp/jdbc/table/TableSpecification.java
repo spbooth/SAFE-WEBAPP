@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -34,6 +35,24 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  * 
  * We can also store optional fields. These are not created by default but might
  * be presented as options when editing the table structure.
+ * 
+ * Normally a handler class will create this programmatically which can be used to create the underlying table if it does not
+ * exist. This can be customised by setting configuration parameters though obviously these need to be in place 
+ * before the table is created. Configuration parameters are of the form
+ * <b>create_table.<i>table</i>.<i>field</i>=<i>specification</i></b>
+ * Where the specification is one of:
+ * <ul>
+ * <li>double</li>
+ * <li>float</li>
+ * <li>int</li>
+ * <li>long</li>
+ * <li>date</li>
+ * <li>boolean</li>
+ * <li>string<i>xxx</i> where xxx is the string length</li>
+ * <li>required - promote an optional field</li>
+ * 
+ * </ul>
+ * 
  * @author spb
  *
  */
@@ -87,6 +106,18 @@ public class TableSpecification {
 	public boolean hasField(String name){
 		return required_field_names.contains(name);
 	}
+	/** add a {@link FieldType} to the specification
+	 * An optional field is not created by default but it does show up as an option in the 
+	 * table edit forms.
+	 * An optional field can be promoted to required by setting a configuration 
+	 * <b>create_table.<i>table</i>.<i>field</i>=required</b> 
+	 * @see #setFromParameters(AppContext, String, Map)
+	 * 
+	 * 
+	 * @param name field name
+	 * @param type {@link FieldType}
+	 * @param optional boolean
+	 */
 	public void setField(String name, FieldType type,boolean optional){
 		if( primary_key.equalsIgnoreCase(name)){
 			throw new ConsistencyError("Field name matches primary key name");
@@ -99,6 +130,17 @@ public class TableSpecification {
 			required_field_names.add(name);
 		}
 	}
+	/** add a {@link FieldType} to the specificationas an optional field
+	 * An optional field is not created by default but it does show up as an option in the 
+	 * table edit forms.
+	 * An optional field can be promoted to required by setting a configuration 
+	 * <b>create_table.<i>table</i>.<i>field</i>=required</b> 
+	 * @see #setFromParameters(AppContext, String, Map)
+	 * 
+	 * 
+	 * @param name field name
+	 * @param type {@link FieldType}
+	 */
 	public void setOptionalField(String name, FieldType type){
 		setField(name, type, true);
 	}
@@ -237,7 +279,7 @@ public class TableSpecification {
 		public Iterator<String> getindexNames(){
 			return index_fields.iterator();
 		}
-		public abstract void accept(FieldTypeVisitor vis);
+		public abstract void accept(UnaryOperator<String> name_map,FieldTypeVisitor vis);
 		/** Generate a copy of this index in a different specification.
 		 * 
 		 * @param spec
@@ -296,8 +338,8 @@ public class TableSpecification {
 		 * @see uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType#accept(uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor)
 		 */
 		@Override
-		public void accept(FieldTypeVisitor vis) {
-			vis.visitFullTextIndex(this);
+		public void accept(UnaryOperator<String> name_map,FieldTypeVisitor vis) {
+			vis.visitFullTextIndex(name_map,this);
 			
 		}
 
@@ -330,8 +372,8 @@ public class TableSpecification {
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType#accept(uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor)
 		 */
-		public void accept(FieldTypeVisitor vis) {
-			vis.visitIndex(this);
+		public void accept(UnaryOperator<String> name_map,FieldTypeVisitor vis) {
+			vis.visitIndex(name_map,this);
 			
 		}
 		/* (non-Javadoc)

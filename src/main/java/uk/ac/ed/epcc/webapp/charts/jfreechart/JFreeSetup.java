@@ -25,18 +25,22 @@ import uk.ac.ed.epcc.webapp.AppContext;
  *
  */
 public class JFreeSetup {
+    private static StandardChartTheme theme=null;
+	public synchronized static void setup(AppContext conn){
+		if( theme == null ) {
+			// ChartFactory stores these in static variable so 
+			// make sure we don't serialise this
+			theme = new StandardChartTheme("webapp");
+			String font_family = "Arial";
+			if( conn != null ) {
+				font_family = conn.getInitParameter("webapp.jfreechart.font_family", font_family);
+			}
+			theme.setSmallFont(new Font(font_family, Font.PLAIN, 10));
+			theme.setRegularFont(new Font(font_family, Font.PLAIN, 12));
+			theme.setLargeFont(new Font(font_family, Font.PLAIN, 14));
+			theme.setExtraLargeFont(new Font(font_family, Font.PLAIN, 20));
 
-	public static void setup(AppContext conn){
-		StandardChartTheme theme = new StandardChartTheme("webapp");
-		String font_family = "Arial";
-		if( conn != null ) {
-			font_family = conn.getInitParameter("webapp.jfreechart.font_family", font_family);
+			ChartFactory.setChartTheme(theme);
 		}
-		theme.setSmallFont(new Font(font_family, Font.PLAIN, 10));
-		theme.setRegularFont(new Font(font_family, Font.PLAIN, 12));
-		theme.setLargeFont(new Font(font_family, Font.PLAIN, 14));
-		theme.setExtraLargeFont(new Font(font_family, Font.PLAIN, 20));
-		
-		ChartFactory.setChartTheme(theme);
 	}
 }

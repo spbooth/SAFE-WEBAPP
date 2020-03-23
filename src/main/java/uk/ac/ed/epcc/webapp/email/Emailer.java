@@ -330,7 +330,7 @@ public class Emailer {
 		email_template.setProperty("person.password", new_password);
 		String email = person.getEmail();
 		if( email == null){
-			getLogger().error("Signup email destination not known "+person.getIdentifier());;
+			getLogger().error("Signup email destination not known "+person.getIdentifier());
 			return;
 		}
 		email_template.setProperty("person.email", email);
@@ -346,6 +346,33 @@ public class Emailer {
 		}
 		doSend(templateMessage(person,email_template));
 
+	}
+	public void notificationEmail(AppUser person, Set<String> notices) throws Exception {
+		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("update_notices.txt");
+		String name = person.getName();
+		if( name == null || name.trim().length() == 0){
+			name = "User";
+		}
+		email_template.setProperty("person.name", name);
+		StringBuilder text = new StringBuilder();
+		boolean seen=false;
+		for(String s : notices) {
+			if( seen ) {
+				text.append("\n");
+			}
+			text.append("* ");
+			text.append(s);
+			seen=true;
+		}
+		email_template.setProperty("person.notices", text.toString());
+		String email = person.getEmail();
+		if( email == null){
+			getLogger().error("Notification email destination not known "+person.getIdentifier());;
+			return;
+		}
+		email_template.setProperty("person.email", email);
+		
+		doSend(templateMessage(person,email_template));
 	}
 	public MimeMessage templateMessage(String sendto, Hashtable h,
 			TemplateFile email_template) throws IOException, MessagingException, InvalidArgument {
@@ -1102,13 +1129,17 @@ public class Emailer {
 		String body="";
 		// Show stack trace
 		StringWriter stackTraceWriter = new StringWriter();
+		StringBuffer buf = stackTraceWriter.getBuffer();
+		int max_trace = conn.getIntegerParameter("error.max_strack_trace", 16384);
 		if( e != null ) {
 			PrintWriter printWriter = new PrintWriter(stackTraceWriter,true);
 			e.printStackTrace(printWriter);
+			printWriter.flush();
 			Throwable rc = e.getCause();
-			while(rc != null){
+			while(rc != null && buf.length() < max_trace){
 				printWriter.println("Caused by:");
 				rc.printStackTrace(printWriter);
+				printWriter.flush();
 				rc = rc.getCause();
 			}
 			printWriter.flush();

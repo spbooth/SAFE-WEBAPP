@@ -52,6 +52,18 @@ public interface ContentBuilder {
 	 * @return {@link ExtendedXMLBuilder}
 	 */
 	public ExtendedXMLBuilder getSpan();
+	/** convenience method to generate a span with defined class/types
+	 * 
+	 * @param type
+	 * @return
+	 */
+	default public ExtendedXMLBuilder getSpan(String ... type) {
+		ExtendedXMLBuilder h = getSpan();
+		for(String t : type) {
+			h.addClass(t);
+		}
+		return h;
+	}
 	/** Add unformatted text. Equivalent to
 	 * {@link #getText()}.clean(text).appendParent().
 	 * @param text string to add to content
@@ -123,6 +135,15 @@ public interface ContentBuilder {
 	 * @param target
 	 */
 	public <X> void addObject(X target);
+	
+	/** Does this ContentBuilder have special handling for the object
+	 * beyond adding the string representation.
+	 * 
+	 * @param <X>
+	 * @param target
+	 * @return
+	 */
+	public <X> boolean canAdd(X target);
 	
 	/** add a bullet list of objects to the content.
 	 * Any {@link UIGenerator}s will generate their content otherwise 

@@ -21,11 +21,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.Supplier;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 /** {@link AppContextService} for managing session information.
@@ -88,6 +90,11 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public void setApplyToggle(boolean value);
 	
+	/** are toggle roles currently enabled
+	 * 
+	 * @return
+	 */
+	public boolean getApplyToggle();
 	/** Toggle the state of a role
 	 * return the new value of the toggle or null if its not a togglable role
 	 * 
@@ -154,7 +161,19 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @param role_list
 	 * @return boolean
 	 */
-	public boolean hasRoleFromList(String ...role_list);
+	
+	default public boolean hasRoleFromList(String ...roles){
+		if( roles == null ){
+			return false;
+		}
+		for(String role : roles){
+			if( hasRole(role)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	/** request a role change for a specified user.
 	 * This is an optional operation as a session service may not have the ability to modify roles.
 	 * 
@@ -180,6 +199,19 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @return is role permitted.
 	 */
 	public boolean canHaveRole(A user,String role);
+	
+	
+	default public boolean canHaveRoleFromList(A user,String ... roles) {
+		if( roles == null ) {
+			return false;
+		}
+		for(String role : roles) {
+			if( canHaveRole(user, role)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 //	/** get the set of users with the specified role.
 //	 * This only queries the roles managed directly by the session service.
@@ -268,6 +300,13 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public <T extends DataObject> BaseFilter<A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,T target) throws UnknownRelationshipException;
 	
+	/** Get a filter for {@link AppUser}s that can be in any of the specified global roles.
+	 * as defined in {@link #canHaveRoleFromList(AppUser, String...)}
+	 * 
+	 * @param role_list
+	 * @return
+	 */
+	public BaseFilter<A> getPersonInRoleFilter(String ... role_list);
 	/** get a {@link BaseFilter} representing the set of targets that a specified {@link AppUser} is in a particular
 	 * relationship-role with.
 	 * @param fac
@@ -299,7 +338,20 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @param fallback boolean value to use if relationship undefined
 	 * @return  boolean true if has relationship
 	 */
-	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target,String role,boolean fallback);
+	public default <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target,String role,boolean fallback) {
+		return hasRelationship(fac, target, role, () -> fallback);
+	};
+	
+	/** Method to check relationships on a specified target object.
+	 * 
+	 * 
+	 * @param fac     {@link DataObjectFactory}
+	 * @param target  {@link DataObject} to test for relationship
+	 * @param role    String role to test
+	 * @param fallback {@link Supplier} value to use if relationship undefined
+	 * @return  boolean true if has relationship
+	 */
+	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target,String role,Supplier<Boolean> fallback);
 	
 	/** Tests if the session has already authenticated. This can return false even if {@link #haveCurrentUser()} could return true
 	 * provided it is called first.

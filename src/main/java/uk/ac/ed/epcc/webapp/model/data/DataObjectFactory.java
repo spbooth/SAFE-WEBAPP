@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.ContextCached;
@@ -78,6 +79,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.PredicateAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultIterator;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultMapper;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
@@ -212,7 +214,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * @param <BDO> type produced by factory
  */
 @SuppressWarnings("javadoc")
-public abstract class DataObjectFactory<BDO extends DataObject> implements Tagged, ContextCached, Owner<BDO>, IndexedProducer<BDO>, Selector<DataObjectItemInput<BDO>> , FormCreatorProducer,FormUpdateProducer<BDO>,FilterMatcher<BDO>{
+public abstract class DataObjectFactory<BDO extends DataObject> implements Tagged, ContextCached, Owner<BDO>, IndexedProducer<BDO>, DataObjectSelector<BDO> , FormCreatorProducer,FormUpdateProducer<BDO>,FilterMatcher<BDO>{
     /**
 	 * 
 	 */
@@ -390,7 +392,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 
 		@Override
 		public String getPrettyString(Integer val) {
-			String res =  getText(getItembyValue(val));
+			// don't apply validation for getPrettyString
+			// we want to be able to format an invalid value for 
+			String res =  getText(find(val));
 			if( res == null ){
 				res = "Not Selected";
 			}
@@ -1364,7 +1368,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}catch(NoSQLFilterException e){
 			// do things the hard way
 
-			try(TimeClosable t = new TimeClosable(getContext(), "exists-iterator."+getTag());
+			try(TimeClosable t = new TimeClosable(getContext(), () -> "exists-iterator."+getTag());
 					FilterIterator  it = new FilterIterator(s)){
 				return it.hasNext();
 			}
@@ -1498,7 +1502,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	public DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil,boolean restrict){
 		return new DataObjectInput(fil,restrict);
 	}
-	public class FilterSelector implements Selector<DataObjectItemInput<BDO>>{
+	public class FilterSelector implements DataObjectSelector<BDO>{
 		private final boolean restrict;
 		public FilterSelector(BaseFilter<BDO> fil,boolean restrict) {
 			super();
@@ -1515,6 +1519,18 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		public DataObjectItemInput<BDO> getInput() {
 			return DataObjectFactory.this.getInput(fil,restrict);
 		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectSelector#getSelector(uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter)
+		 */
+		@Override
+		public DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> filter) {
+			return new FilterSelector(new AndFilter<BDO>(getTarget(), fil, filter), restrict);
+		}
+		@Override
+		public DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> filter,boolean new_restrict) {
+			return new FilterSelector(new AndFilter<BDO>(getTarget(), fil, filter), new_restrict);
+		}
 	}
 	/** create a {@link Selector} from a filter.
 	 * 
@@ -1522,8 +1538,19 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param fil {@link BaseFilter} for selection
 	 * @return {@link Selector}
 	 */
-	public final Selector<DataObjectItemInput<BDO>> getSelector(BaseFilter<BDO> fil){
+	public final DataObjectSelector<BDO> getSelector(BaseFilter<BDO> fil){
 		return new FilterSelector(fil,true);
+	}
+	
+	@Override
+	public final DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> fil){
+		// This should narrow the default selector of this class
+		return new FilterSelector(new AndFilter<BDO>(getTarget(),getFinalSelectFilter(),fil),restrictDefaultInput());
+	}
+	@Override
+	public final DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> fil, boolean new_restrict){
+		// This should narrow the default selector of this class
+		return new FilterSelector(new AndFilter<BDO>(getTarget(),getFinalSelectFilter(),fil),new_restrict);
 	}
 	/** create a {@link Selector} from a filter.
 	 * 
@@ -1688,7 +1715,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return Map
 	 * @see DataObjectFormFactory
 	 */
-	protected Map<String,Object> getSelectors() {
+	protected Map<String,Selector> getSelectors() {
 
 		return new HashMap<>();
 	}
@@ -1704,6 +1731,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		return new HashSet<>();
 	}
 	
+	/** get the {@link FieldConstraint}s to apply in creation/update forms
+	 * 
+	 * @return
+	 */
+	protected Map<String,FieldConstraint> getFieldConstraints(){
+		return new HashMap<String, FieldConstraint>();
+	}
 	/** Generate the default text identifier of the client object.
 	 * This is used in urls and html inputs and defaults to the integer
 	 * representation of the object.
@@ -2392,5 +2426,20 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 */
 	public <T extends DataObject> SQLFilter<T> getDestFilter(SQLFilter<BDO> fil, String join_field, DataObjectFactory<T> join_fac){
 		return Joiner.getDestFilter(join_fac.getTarget(), fil, join_field,join_fac.res,res);
+	}
+
+	/** convert a {@link Predicate} into an {@link AcceptFilter} 
+	 * 
+	 * In general {@link SQLFilter}s are preferable as they filter at the SQL level.
+	 * However this gives an easy way of adding additional restrictions to a selection using lambdas.
+	 * These should really only be used as a final level of filtering as many of the query optimisations will be prevented by the presence 
+	 * of an {@link AcceptFilter}
+	 * 
+	 * 
+	 * @param p
+	 * @return
+	 */
+	public final AcceptFilter<BDO> getFilter(Predicate<BDO> p){
+		return new PredicateAcceptFilter<BDO>(getTarget(), p);
 	}
 }

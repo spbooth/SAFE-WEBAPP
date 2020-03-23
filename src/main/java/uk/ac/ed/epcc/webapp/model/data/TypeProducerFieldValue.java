@@ -42,7 +42,7 @@ import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
  */
 
 
-public class TypeProducerFieldValue<T extends DataObject,O,D> implements FieldValue<O,T>,GroupingSQLValue<O> {
+public class TypeProducerFieldValue<T extends DataObject,O,D> implements FieldValue<O,T> {
 	private final Repository repository;
 	private final TypeProducer<O,D> producer;
 	public TypeProducerFieldValue(Repository repository, TypeProducer<O,D> producer) {
@@ -108,5 +108,4 @@ public class TypeProducerFieldValue<T extends DataObject,O,D> implements FieldVa
 	}
 
 	
-
 }

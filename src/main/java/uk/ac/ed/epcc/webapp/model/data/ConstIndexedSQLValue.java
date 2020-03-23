@@ -210,6 +210,11 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 			List<PatternArgument> list) {
 		return list;
 	}
+	
+	@Override
+	final public boolean groupingIsomorphic() {
+		return true;
+	}
 	@Override
 	public String toString(){
 		return "CONST("+val.toString()+")";

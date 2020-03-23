@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2016                            |
+//| Copyright - The University of Edinburgh 2020                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -13,95 +13,45 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.http;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 
-import uk.ac.ed.epcc.webapp.AbstractContexed;
-import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
-import uk.ac.ed.epcc.webapp.Contexed;
-import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 
-/** A simple {@link AppContextService} to handle Http operations.
+/** A simple {@link AppContextService} to handle http client operaitons
  * 
- * These are implemented as a service to allow substitute code to be inserted for mock testing
- * @author spb
+ * This is implemented as a service to allow substitution for mock testing.
+ * 
+ * @author Stephen Booth
  *
  */
-public class HttpService extends AbstractContexed implements AppContextService<HttpService> {
-
-	/**
-	 * 
-	 */
-	public HttpService(AppContext conn) {
-		super(conn);
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.AppContextService#cleanup()
-	 */
-	@Override
-	public void cleanup() {
-		// TODO Auto-generated method stub
-		
-	}
+public interface HttpService extends AppContextService<HttpService>{
 
 	/** fetch data from a URL
 	 * 
-	 * @param url
-	 * @return
+	 * @param url  URL to fetch from
+	 * @param props additional request headers to set
+	 * @return {@link MimeStreamData}
 	 * @throws HttpException 
 	 */
-	public MimeStreamData fetch(URL url, Map<String,String> props ) throws HttpException{
-		try {
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			if( props != null){
-				for(String key : props.keySet()){
-					connection.setRequestProperty(key, props.get(key));
-				}
-			}
+	MimeStreamData fetch(URL url, Map<String, String> props) throws HttpException;
 
-			connection.setRequestMethod("GET");
-			connection.connect();
-			connection.setConnectTimeout(getContext().getIntegerParameter("http.connection_timeout", 30000));
-			connection.setReadTimeout(getContext().getIntegerParameter("http.read_timeout", 30000));
-
-
-			int code = connection.getResponseCode();
-
-			if( code != HttpURLConnection.HTTP_ACCEPTED){
-				HttpException e = new HttpException(connection.getResponseMessage());
-				e.setError_code(code);
-				throw e;
-			}
-			String type = connection.getContentType();
-
-			ByteArrayMimeStreamData data = new ByteArrayMimeStreamData();
-			data.setMimeType(type);
-			String name = url.getFile();
-			if( name != null){
-				if( name.contains("/")){
-					name = name.substring(name.lastIndexOf("/"));
-				}
-				data.setName(name);
-			}
-			data.read(connection.getInputStream());
-			return data;
-		} catch (Exception e) {
-			throw new HttpException(e);
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.AppContextService#getType()
+	/** post data to a URL
+	 * 
+	 * This is intended to post a single object rather than encoded form data.
+	 * 
+	 * @param url  URL to post to
+	 * @param props additional request headers to set
+	 * @param input {@link MimeStreamData} to post
+	 * @return {@link MimeStreamData}
+	 * @throws HttpException 
 	 */
+	MimeStreamData post(URL url, Map<String, String> props, MimeStreamData input) throws HttpException;
+
+
 	@Override
-	public Class<? super HttpService> getType() {
+	default Class<HttpService> getType() {
 		return HttpService.class;
 	}
-
-	
 }

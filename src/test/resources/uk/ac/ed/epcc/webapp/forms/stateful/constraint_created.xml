@@ -1,0 +1,11 @@
+<Diff><TableSpecification name='Constrained'>
+<Min type='Integer' nullable='true'/>
+<Value type='Integer' nullable='true'/>
+<Max type='Integer' nullable='true'/>
+</TableSpecification>
+<Constrained id='1'>
+<Min>1</Min>
+<Value>12</Value>
+<Max>100</Max>
+</Constrained>
+</Diff>

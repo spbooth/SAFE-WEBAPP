@@ -30,6 +30,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.inputs.CodeListInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.NameInputProvider;
 import uk.ac.ed.epcc.webapp.forms.inputs.NoHtmlInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.NoSpaceFieldValidator;
@@ -44,6 +45,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.Updater;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectAlternateInput;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
@@ -321,22 +323,38 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFormFactory#getSelectors()
 		 */
 		@Override
-		protected Map<String, Object> getSelectors() {
-			Map<String,Object> result = super.getSelectors();
-			// done here as only the create form can check that the name does not exist
-			// the update form has to rely on the sql update generating an error.
-			UnusedNameInput<T> input = new UnusedNameInput<>(ClassificationFactory.this);
-			input.setMaxResultLength(res.getInfo(Classification.NAME).getMax());
-			input.setTrim(true);
+		protected Map<String, Selector> getSelectors() {
+			Map<String,Selector> result = super.getSelectors();
 			
-			result.put(Classification.NAME, input);
+			
+			result.put(Classification.NAME, new Selector() {
+
+				@Override
+				public Input getInput() {
+					// done here as only the create form can check that the name does not exist
+					// the update form has to rely on the sql update generating an error.
+					UnusedNameInput<T> input = new UnusedNameInput<>(ClassificationFactory.this);
+					input.setMaxResultLength(res.getInfo(Classification.NAME).getMax());
+					input.setTrim(true);
+					return input;
+				}
+				
+			});
 			
 			// Description is likely to be displayed to user so inhibit html by default
-			NoHtmlInput desc_input = new NoHtmlInput();
-			if( res.hasField(Classification.DESCRIPTION)){
-				desc_input.setMaxResultLength(res.getInfo(Classification.DESCRIPTION).getMax());
-			}
-			result.put(Classification.DESCRIPTION,desc_input);
+			
+			result.put(Classification.DESCRIPTION,new Selector() {
+
+				@Override
+				public Input getInput() {
+					NoHtmlInput desc_input = new NoHtmlInput();
+					if( res.hasField(Classification.DESCRIPTION)){
+						desc_input.setMaxResultLength(res.getInfo(Classification.DESCRIPTION).getMax());
+					}
+					return desc_input;
+				}
+				
+			});
 			return result;
 		}
 		

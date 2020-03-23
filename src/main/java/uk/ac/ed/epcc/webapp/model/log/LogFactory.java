@@ -537,11 +537,15 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	public T find(O q, ItemType.ItemValue v, int link, boolean allow_null)
 			throws DataException {
 		SQLAndFilter<T> fil = new SQLAndFilter<>(getTarget());
-		fil.addFilter(new ReferenceFilter<>(this, OWNER_ID, q));
-		fil.addFilter(getItemType().getFilter(this, v));
+		fil.addFilter(getOwnerFilter(q));
+		fil.addFilter(getItemFilter(v));
 		fil.addFilter(new SQLValueFilter<>(getTarget(),res, LINK_ID, link));
 		return find(fil,allow_null);
 		
+	}
+	
+	protected ReferenceFilter<T, O> getOwnerFilter(O q) {
+		return new ReferenceFilter<>(this, OWNER_ID, q);
 	}
 	/** Find and item only by what it points to.
 	 * Only makes sense for a unique target.
@@ -567,7 +571,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	private SQLAndFilter<T> getItemFilter(ItemType.ItemValue v, int link) {
 		SQLAndFilter<T> fil;
 		fil = new SQLAndFilter<>(getTarget());
-		fil.addFilter(getItemType().getFilter(this, v));
+		fil.addFilter(getItemFilter(v));
 		fil.addFilter(new SQLValueFilter<>(getTarget(),res, LINK_ID, link));
 		return fil;
 	}
@@ -635,7 +639,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	}
 	
 	public CloseableIterator<T> getLog(O q) throws DataFault {
-		return new FilterIterator(new ReferenceFilter<>(this, OWNER_ID, q));
+		return new FilterIterator(getOwnerFilter(q));
 	}
 
 	protected final LogOwner<O> getOwnerFactory() {

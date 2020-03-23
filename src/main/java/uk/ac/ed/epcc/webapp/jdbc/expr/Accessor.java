@@ -45,12 +45,16 @@ public interface Accessor<T,R> extends Targetted<T>{
    * 
    * @return
    */
-  public boolean canSet();
+  default public boolean canSet() {
+	  return false;
+  }
   /** Set value if supported otherwise throw a {@link UnsupportedOperationException}.
    * 
    * @param r 
    * @param value
    */
-  public void setValue(R r, T value);
+  default public void setValue(R r, T value) {
+	  throw new UnsupportedOperationException("Accessor does not support setValue");
+  }
  
 }

@@ -60,8 +60,8 @@ public  class RoleUpdate<U extends AppUser> implements Contexed, StandAloneFormU
 	@Override
 	@SuppressWarnings("unchecked")
 	public U getSelected(Form f) {
-		DataObjectItemInput<U> i = (DataObjectItemInput<U>) f.getInput(PERSON);
-		return i.getItem();
+		//DataObjectItemInput<U> i = (DataObjectItemInput<U>) f.getInput(PERSON);
+		return (U) f.getItem(PERSON);
 	}
 
 	@Override

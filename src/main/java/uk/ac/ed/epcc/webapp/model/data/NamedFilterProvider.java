@@ -44,7 +44,8 @@ public interface NamedFilterProvider<T> {
 	
 	/** Add names of all the directly supported filters.
 	 * 
-	 * This does not include any qualified name filters referenced through a {@link NamedFilterWrapper}
+	 * This does not include any qualified name filters referenced through a {@link NamedFilterWrapper}. 
+	 * Normally used to generate per-class online documentation or to build interactive search forms.
 	 * 
 	 * @param names
 	 */

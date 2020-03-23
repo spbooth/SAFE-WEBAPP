@@ -32,6 +32,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.Input;
  * @param <T> type of input
  * 
  */
+@FunctionalInterface
 public interface Selector<T extends Input> {
 
 	/**

@@ -16,7 +16,7 @@
 <label for="transition_Code" class="required">Verification code from Authenticator App</label>
 </th>
 <td>
-<input id="transition_Code" autofocus="autofocus" type="number" size="6" maxlength="32" name="Code" class="input" min="0" max="999999" step="1" required="required"/>
+<input id="transition_Code" autofocus="autofocus" type="number" size="8" maxlength="32" name="Code" class="input" min="0" max="999999" step="1" required="required"/>
 </td>
 </tr>
 <tr class="odd">
@@ -30,7 +30,7 @@
 <label for="transition_NewCode" class="required">Verification code (New key)</label>
 </th>
 <td>
-<input id="transition_NewCode" type="number" size="6" maxlength="32" name="NewCode" class="input" min="0" max="999999" step="1" required="required"/>
+<input id="transition_NewCode" type="number" size="8" maxlength="32" name="NewCode" class="input" min="0" max="999999" step="1" required="required"/>
 </td>
 </tr>
 </table>

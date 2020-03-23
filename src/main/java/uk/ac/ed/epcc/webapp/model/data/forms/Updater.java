@@ -68,8 +68,8 @@ public class Updater<BDO extends DataObject> extends DataObjectUpdateFormFactory
 	}
 	@SuppressWarnings("unchecked")
 	public BDO getSelected(Form f) {
-		DataObjectItemInput<BDO> i = (DataObjectItemInput<BDO>) f.getInput(TARGET);
-		return i.getItem();
+		//DataObjectItemInput<BDO> i = (DataObjectItemInput<BDO>) f.getInput(TARGET);
+		return (BDO) f.getItem(TARGET);
 	}
 
 	/* (non-Javadoc)
