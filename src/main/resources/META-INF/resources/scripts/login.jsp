@@ -54,7 +54,7 @@
 	   return;
 	}
 	AppUserFactory<?> fac = serv.getLoginFactory();
-	log.debug("Login serv is "+serv);
+	//log.debug("Login serv is "+serv);
 	if(fac == null ||  ! fac.isValid()){
 		%>
 <jsp:forward page="/messages.jsp">

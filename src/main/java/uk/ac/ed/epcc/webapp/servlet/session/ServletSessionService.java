@@ -79,6 +79,7 @@ public class ServletSessionService<A extends AppUser> extends AbstractSessionSer
 	// Flag to supress read/write to http session
 	// This is to force per request authentication in an api call and to prevent
 	// a restricted permission api call from creating a session
+	// also used to supress access to an invalidated session on logout
 	private boolean use_session=true;
 	private ServletService ss;
 	private HttpServletRequest request;
@@ -255,6 +256,8 @@ public void logOut(){
 		DefaultServletService defss = (DefaultServletService)ss;
 		defss.logout(true);
 	}
+	// session is invalid may throw exception if accessed now
+	use_session=false;
 }
 public A getSuperPerson(){
 	Integer super_person_id = (Integer) getAttribute(SUPER_PERSON_ID_ATTR);
