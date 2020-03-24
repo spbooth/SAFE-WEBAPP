@@ -22,16 +22,16 @@ div.block, div.wideblock{
 background-color: var(--content-bg-color);
 }
 div.bar, div.bar h1, div.bar h2, div.bar h3{
-	background-color: var(--content-bg-color);
+	background-color: var(--header-bg-color);
 }
 
 /* simple single bar containing only text */
 div.textbar{
-background-color: var(--paragraph-bg-color);
+	background-color: var(--paragraph-bg-color);
 }
 
 div.block form, div.wideblock form{
-background-color: var(--form-bg-color);
+	background-color: var(--form-bg-color);
 }
 /** Allow a block heading to be the summary element 
  */
@@ -42,34 +42,35 @@ div.block details summary h2{
 
 /* all divs form a centered column */
 div.block, div.bar, div.textbar,div.text, div.graph {
-width: 95%;
-}
-div.bar{
-height: 25px;
+	width: 95%;
 }
 div.wideblock {
-width: 95%;
+	width: 95%;
 }
 div.report {
-width: 95%;
+	width: 95%;
 }
-
+div.bar{
+	height: 25px;
+}
 /* common properties of all divs */
 div.block, div.bar, div.textbar,div.text, div.graph, div.report, div.wideblock {
-margin-left: auto;
-margin-right: auto;
-margin-top: 20px;
-margin-bottom: 20px;
-text-align: left;
-color: black;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: var(--block-v-margin);
+	margin-bottom: var(--block-v-margin);
+
+	text-align: left;
+	color: black;
+	white-space: normal;
  
-        padding-left: 10px;
-        padding-right: 10px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        border-radius: 15px;
-        white-space: normal;
-	}
+	padding-left: var(--block-h-padding);
+	padding-right: var(--block-h-padding);
+    padding-top: var(--block-v-padding);
+    padding-bottom: var(--block-v-padding);
+    border-radius: var(--block-radius);
+        
+}
 
 /** nested block have same width as parent
  * but keep top-bottom spacing
@@ -131,11 +132,13 @@ table.navbar tr td a {
 
 
 label{
-text-align: left;
+	text-align: left;
 }
 
+/* Add space before a h1/h2 heading
+ */
 h1, h2{
-	margin: 8px 0px 0px 0px;
+	margin: var(--heading-pre-space) 0px 0px 0px;
 }
 /*  First major heading at top of div
  */
@@ -143,19 +146,24 @@ h1:first-child, h2:first-child{
 	margin: 0px 0px 0px 0px;
 }
 
-/* no seperation when showing log items
+/* no separation when showing log items
  */
 div.item h3, div.item h4, div.item h5 , div.item h6 , div.item pre, div.item p{
 	margin: 0;
 }
-
-
+div.item{
+	margin-left: var(--content-h-margin);
+	margin-right: var(--content-h-margin);
+}
+div div.item div.item {
+	margin-left: 0;
+	margin-right: 0;
+}
 /* A form within a block element. This can contain a nested 
  * table for fine grain layout.
  */
 div.block form, div.wideblock form{
-
-margin: 2px 0px;
+margin: 2px var(--content-h-margin);
 padding: 0;
 }
 div.form {
@@ -165,7 +173,7 @@ text-align: left;
 /** inline errors for transition
  */
 div.block div.error {
-margin: 10px 0px 0px 0px;
+margin: 10px var(--content-h-margin) 0px var(--content-h-margin);
 padding: 0;
 }
 div.block div.error + form, div.wideblock div.error + form{
@@ -188,7 +196,7 @@ margin-bottom: 10px;
 
 }
 
-/** Single button forms in an actionbutton block
+/** Single button forms in an action button block
  */
 .action_buttons form{
 	display: inline;
@@ -261,25 +269,29 @@ div.ifms_summary td.key {
 background-color: #e7e7e7;	
 text-align: left;
 }
-/* paragraph within a block add margin at bottom so headers associate with following content
+/* paragraph within a block 
  */
 div.block p,  div.block ul, div.block ol, div.block pre, div.block div.para, div.block table{
 text-align: left;
+margin-left: var(--content-h-margin);
+margin-right: var(--content-h-margin);
 
 }
-/* block content not including table
+/* block content (not including table)
+ * add margin at bottom so headers associate with following content
  */
 div.block p,  div.block ul,  div.block pre, div.block div.para{
-margin: 0px 0px 6px 0px;
+margin-top: 0p;
+margin-bottom:  6px;
 
 color: black;
 padding: 8px;
 display: block;
 }
 div.block ol {
-	margin: 0px 0px 6px 0px;
-background-color: white;
-color: black;
+	margin: 0px var(--content-h-margin) 6px var(--content-h-margin);
+	background-color: white;
+	color: black;
 }
 /* no margin inside table */
 div.block td p,  div.block  td ul, div.block td ol, div.block  td pre, div.block  td div.para{
@@ -390,7 +402,7 @@ form table tr.highlight:hover td {
 	 background-color: var(--highlight-hover-bg-color);
 }
 details div.description{
-	 border-radius: 15px;
+	 border-radius: var(--block-radius);
 	 padding: 5px;
 	 background-color: #ffffcc;
 	 font-size: small;
@@ -431,7 +443,7 @@ th.button-col, td.button-col {
 fieldset.action_buttons{
 border: solid var(--form-border-color);
 border-width: 2px;
-margin: 5px 0px;
+margin: 5px var(--content-h-margin);
 }
 
 .input_button {
@@ -445,7 +457,7 @@ table.form{
 	border: solid var(--form-border-color);
 	border-width: 2px;
     background-color: var(--form-bg-color);
-    margin: 5px 0px;
+    margin: 5px var(--content-h-margin);
     text-align: left;
 }
 div.block p,  div.block ul,  div.block pre, div.block div.para{
@@ -666,6 +678,12 @@ div.mail {
 }
 div.mail pre, div.message pre, p.longlines{
 	overflow: auto;
+}
+input[type=number][size="6"] {
+	width: 7em;
+}
+input[type=number][size="5"] {
+	width: 6em;
 }
 input[type=number][size="4"] {
 	width: 5em;

@@ -6,6 +6,8 @@
   --highlight-hover-color: #ffeecc;
   --content-bg-color: #cccccc;
   --table-bg-color: #cccccc;
+  --content-border-color: #cccccc;
+  --header-border-color: #cccccc;
   --paragraph-bg-color: #e7e7e7;
   --table-bg-color: #cccccc;
   --table-border-color: #e7e7e7;
@@ -21,6 +23,12 @@
   --menu-border-color: #888;
   --menu-hover-bg-color: #444444;
   --menu-hover-text-color: #ff4040;
+  --block-radius: 15px;
+  --block-v-padding: 10px;
+  --block-h-padding: 10px;
+  --block-v-margin: 20px;
+  --heading-pre-space: 8px;
+  --content-h-margin: 0px;
 }
 
 

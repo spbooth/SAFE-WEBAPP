@@ -7,6 +7,7 @@
   --warn-bg-color: #ff0000;
   --content-bg-color: #ffffff;
   --table-bg-color: #cccccc;
+  --content-border-color: #201f5b;
   --table-border-color: #e7e7e7;
   --form-border-color: black;
   --button-bg-color: #e7e7e7;
@@ -19,17 +20,48 @@
   --menu-border-color: #888;
   --menu-hover-bg-color: #444444;
   --menu-hover-text-color: #ff4040;
+  --block-radius: 15px;
+  --block-v-padding: 0px;
+  --block-h-padding: 0px;
+  --block-v-margin: 20px;
+  --heading-pre-space: 8px;
+  --content-h-margin: 10px;
 }
 
-
+div.block table {
+	width: auto;
+	margin-left: auto;
+	margin-right: auto;
+}
+body{
+font-family: "Open Sans", sans-serif;	
+}
+pre.loose{
+	font-family: "Open Sans", sans-serif;
+}
 body header , body footer{
 	background-color: white;
 }
 
 body > div.block , body div.bar{
-	border: solid var(--table-bg-color);
+	border: solid var(--content-border-color);
+}
+body{
+	box-sizing: border-box;
 }
 
+body > div.block {
+	padding: 0;
+}
+
+body > div.block > h1:first-child, body > div.block h2:first-child {
+	color: white;
+	background-color: var(--content-border-color);
+	padding 0;
+	margin 0;
+	text-align: center;
+	
+}
 /* we use three levels of header as standard 
  * h1 or h2 is the top level header in a block
  * h3 is a secondary header or a header in a div.bar
@@ -42,12 +74,12 @@ h1, h2, h3, h4, h5, h6 {
     text-align: left;
     line-height: normal;
     
-    padding: 4px;
+    
 }
 
 h1, h2{
 	 background-color: var(--heading-bg-color);
-	 border-radius: 15px;
+	 border-radius: var(--block-radius);
 	/* text-decoration: underline; */
 }
 
@@ -90,7 +122,7 @@ background-color: #ffffff;
 }
 */
 form.transition table.form {
-	 border-radius: 15px 15px 0 0;
+	 border-radius: var(--block-radius) var(--block-radius) 0 0;
 	 background-color: var(--form-bg-color);
 	 padding: 10px;
     margin: 0 0 5px 0 ;
@@ -98,13 +130,13 @@ form.transition table.form {
 
 form.transition .action_buttons{
     margin: 0;
-	 border-radius: 0 0 15px 15px;
+	 border-radius: 0 0 var(--block-radius) var(--block-radius);
 	 background-color: var(--form-bg-color);
 	 padding: 10px;
 }
 
 div.action_buttons {
-	border-radius: 15px;
+	border-radius: var(--block-radius);
 	 background-color: var(--form-bg-color);
 	  padding: 10px;
 	  border-color: var(--form-border-color);
