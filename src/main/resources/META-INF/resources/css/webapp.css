@@ -271,7 +271,7 @@ text-align: left;
 }
 /* paragraph within a block 
  */
-div.block p,  div.block ul, div.block ol, div.block pre, div.block div.para, div.block table{
+div.block p,  div.block ul, div.block ol, div.block pre, div.block div.para, div.block div.table, div.block div.column {
 text-align: left;
 margin-left: var(--content-h-margin);
 margin-right: var(--content-h-margin);
@@ -281,7 +281,7 @@ margin-right: var(--content-h-margin);
  * add margin at bottom so headers associate with following content
  */
 div.block p,  div.block ul,  div.block pre, div.block div.para{
-margin-top: 0p;
+margin-top: 0px;
 margin-bottom:  6px;
 
 color: black;
