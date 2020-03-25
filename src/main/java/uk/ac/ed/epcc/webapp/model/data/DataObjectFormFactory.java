@@ -138,7 +138,7 @@ public final AppContext getContext(){
 		if( supress_fields != null ) {
 			keys.removeAll(supress_fields);
 		}
-		return buildForm(conn, res, keys,f, optional, selectors,null, tooltips, null,null);
+		return buildForm(conn, res, keys,f, optional, selectors,null,labels, tooltips, null);
 	}
 	/**
 	 * Construct an edit Form for the associated DataObject based on database
