@@ -109,6 +109,10 @@ public final AppContext getContext(){
 		f.setContents(getDefaults());
 		return complete;
 	}
+	public static final boolean buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
+			Set<String> optional, Map<String,Selector> selectors,Map<String,String> labels) throws DataFault {
+		return buildForm(conn, res, f, supress_fields, optional, selectors, labels, null);
+	}
 	/**
 	 * Construct an edit Form for the associated DataObject based on database
 	 * meta-data
@@ -129,12 +133,12 @@ public final AppContext getContext(){
 	 * @throws TransitionException 
 	 */
 	public static final boolean buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
-			Set<String> optional, Map<String,Selector> selectors,Map<String,String> labels) throws DataFault {
+			Set<String> optional, Map<String,Selector> selectors,Map<String,String> labels,Map<String,String> tooltips) throws DataFault {
 		Set<String> keys = new LinkedHashSet<String>(res.getFields());
 		if( supress_fields != null ) {
 			keys.removeAll(supress_fields);
 		}
-		return buildForm(conn, res, keys,f, optional, selectors,null, labels, null,null);
+		return buildForm(conn, res, keys,f, optional, selectors,null,labels, tooltips, null);
 	}
 	/**
 	 * Construct an edit Form for the associated DataObject based on database
