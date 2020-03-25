@@ -270,9 +270,14 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 	}
 	@Override
 	public default <C,R> void addTable(AppContext conn,Table<C,R> t,NumberFormat nf,String style) {
-		TableXMLFormatter<C,R> fmt = new TableXMLFormatter<>(this, nf,style);
-		fmt.setTableSections(true);
-		fmt.add(t);
+		if( t.hasData()) {
+			open("div");
+			addClass("table");
+			TableXMLFormatter<C,R> fmt = new TableXMLFormatter<>(this, nf,style);
+			fmt.setTableSections(true);
+			fmt.add(t);
+			close();
+		}
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormTable(java.lang.Iterable)

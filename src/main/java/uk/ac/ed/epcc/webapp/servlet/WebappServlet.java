@@ -102,16 +102,24 @@ public abstract class WebappServlet extends HttpServlet {
 	@Override
 	protected final void doPost(HttpServletRequest req, HttpServletResponse res)
 			throws ServletException, IOException {
-		AppContext conn;
-
-		conn = ErrorFilter.retrieveAppContext(req,res);
-		// pick up servlet specific init params if there are any
-		ServletConfig cfg = getServletConfig();
-		Enumeration e = cfg.getInitParameterNames();
-		if( e.hasMoreElements()){
-			conn.setService(new ServletConfigService(cfg, conn));
+		AppContext conn=null;
+		try {
+			conn = ErrorFilter.retrieveAppContext(req,res);
+			// pick up servlet specific init params if there are any
+			ServletConfig cfg = getServletConfig();
+			Enumeration e = cfg.getInitParameterNames();
+			if( e.hasMoreElements()){
+				conn.setService(new ServletConfigService(cfg, conn));
+			}
+			doPost(req, res, conn);
+		}catch(IOException e){
+			throw e;
+		}catch(Exception e2) {
+			if( conn !=null ) {
+				getLogger(conn).error("Error in servlet post",e2);
+			}
+			throw e2;
 		}
-		doPost(req, res, conn);
 	}
 
 	@Override

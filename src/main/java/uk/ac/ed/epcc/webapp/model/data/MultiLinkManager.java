@@ -299,6 +299,14 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		return (Class) MultiLink.class;
 	}
 	
+	/** Get a {@link BaseFilter} on one of the linked {@link DataObjectFactory}s
+	 * 
+	 * @param <R>
+	 * @param fac
+	 * @param fil
+	 * @return
+	 * @throws InvalidArgument
+	 */
 	public <R extends DataObject> BaseFilter<R> getDestFilter(DataObjectFactory<R> fac,BaseFilter<M> fil) throws InvalidArgument{
 		if( ! table_to_key.containsKey(fac.getTag())) {
 			throw new InvalidArgument("BadFactory passed to MultiLink "+fac.getTag());
@@ -306,6 +314,14 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		return convertToDestinationFilter(fac, table_to_key.get(fac.getTag()), fil);
 		
 	}
+	/** get a {@link BaseFilter} on the {@link MultiLink} from a filter on a remote {@link DataObjectFactory}
+	 * 
+	 * @param <R>
+	 * @param fac
+	 * @param fil
+	 * @return
+	 * @throws InvalidArgument
+	 */
 	public <R extends DataObject> BaseFilter<M> getRemoteFilter(DataObjectFactory<R> fac,BaseFilter<R> fil) throws InvalidArgument{
 		if( ! table_to_key.containsKey(fac.getTag())) {
 			throw new InvalidArgument("BadFactory passed to MultiLink "+fac.getTag());
