@@ -8,6 +8,8 @@
   --table-bg-color: #cccccc;
   --content-border-color: #cccccc;
   --header-border-color: #cccccc;
+  --bar-bg-color: #cccccc;
+  --bar-text-color: #000000;
   --paragraph-bg-color: #e7e7e7;
   --table-bg-color: #cccccc;
   --table-border-color: #e7e7e7;
@@ -29,6 +31,7 @@
   --block-v-margin: 20px;
   --heading-pre-space: 8px;
   --content-h-margin: 0px;
+  --content-width: 100%;
 }
 
 

@@ -116,18 +116,14 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 <h2><%=new HtmlBuilder().clean(page_heading).toString() %></h2>
 
 <% if(target != null ){ %>
-<div id="summary">
 <%= tp.getSummaryContent(conn,new HtmlBuilder(),target).toString() %>
-</div>
 <% } %>
 <%
 	if( t instanceof ExtraContent ){
 		HtmlBuilder extra=(HtmlBuilder)((ExtraContent) t).getExtraHtml(new HtmlBuilder(),session_service,target,f);
-		if( extra != null){
+		if( extra != null && extra.hasContent()){
 %>
-<div id="extra">
 <%=extra.toString()%>
-</div>
 <%
 		}else{
 		  conn.error("Null builder from ExtraContent");

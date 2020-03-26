@@ -22,7 +22,8 @@ div.block, div.wideblock{
 background-color: var(--content-bg-color);
 }
 div.bar, div.bar h1, div.bar h2, div.bar h3{
-	background-color: var(--header-bg-color);
+	background-color: var(--bar-bg-color);
+	color: var(--bar-text-color);
 }
 
 /* simple single bar containing only text */
@@ -40,29 +41,25 @@ div.block details summary h2{
 	margin: 0;
 }
 
-/* all divs form a centered column */
-div.block, div.bar, div.textbar,div.text, div.graph {
+/* all top level divs form a centered column */
+body > div.block, body> div.bar, body > div.textbar, body > div.text, body > div.graph {
 	width: 95%;
 }
-div.wideblock {
+body > div.wideblock {
 	width: 95%;
 }
-div.report {
+body > div.report {
 	width: 95%;
 }
-div.bar{
+body > div.bar{
 	height: 25px;
 }
-/* common properties of all divs */
-div.block, div.bar, div.textbar,div.text, div.graph, div.report, div.wideblock {
+/* common properties of all top level divs */
+body > div.block, body > div.bar, body > div.textbar,body > div.text, body > div.graph, body >div.report,  body > div.wideblock {
 	margin-left: auto;
 	margin-right: auto;
 	margin-top: var(--block-v-margin);
 	margin-bottom: var(--block-v-margin);
-
-	text-align: left;
-	color: black;
-	white-space: normal;
  
 	padding-left: var(--block-h-padding);
 	padding-right: var(--block-h-padding);
@@ -71,18 +68,23 @@ div.block, div.bar, div.textbar,div.text, div.graph, div.report, div.wideblock {
     border-radius: var(--block-radius);
         
 }
+div.block, div.bar, div.textbar,div.text, div.graph, div.report, div.wideblock {
+	text-align: left;
+	color: black;
+	white-space: normal;        
+}
 
 /** nested block have same width as parent
  * but keep top-bottom spacing
  */
 div.block div.block {
-	margin-left: 0px;
-	margin-right: 0px;
-	padding-left: 0px;
-	padding-right: 0px;
+	margin-top: var(--block-v-margin);
+	margin-bottom: var(--block-v-margin);
 	width: 100%;
 }
-
+body > div.block > div.block {
+	 width: var(--content-width);
+}
 
 div.scrollwrapper {
 	overflow: auto;
@@ -138,12 +140,13 @@ label{
 /* Add space before a h1/h2 heading
  */
 h1, h2{
-	margin: var(--heading-pre-space) 0px 0px 0px;
+	margin-top: var(--heading-pre-space);
 }
 /*  First major heading at top of div
+ * remove any spacing margins
  */
 h1:first-child, h2:first-child{
-	margin: 0px 0px 0px 0px;
+	margin: 0px;
 }
 
 /* no separation when showing log items
@@ -151,19 +154,13 @@ h1:first-child, h2:first-child{
 div.item h3, div.item h4, div.item h5 , div.item h6 , div.item pre, div.item p{
 	margin: 0;
 }
-div.item{
-	margin-left: var(--content-h-margin);
-	margin-right: var(--content-h-margin);
-}
-div div.item div.item {
-	margin-left: 0;
-	margin-right: 0;
-}
+
 /* A form within a block element. This can contain a nested 
  * table for fine grain layout.
  */
 div.block form, div.wideblock form{
-margin: 2px var(--content-h-margin);
+margin-top: 2px;
+margin-bottom: 2px;
 padding: 0;
 }
 div.form {
@@ -173,11 +170,13 @@ text-align: left;
 /** inline errors for transition
  */
 div.block div.error {
-margin: 10px var(--content-h-margin) 0px var(--content-h-margin);
+margin-top: 10px;
+margin-bottom: 0px;
 padding: 0;
 }
 div.block div.error + form, div.wideblock div.error + form{
-margin: 0;
+margin-top: 0;
+margin-bottom: 0;
 border: solid red;
 }
 
@@ -273,9 +272,12 @@ text-align: left;
  */
 div.block p,  div.block ul, div.block ol, div.block pre, div.block div.para, div.block div.table, div.block div.column {
 text-align: left;
+
+}
+
+body > div.block > * {
 margin-left: var(--content-h-margin);
 margin-right: var(--content-h-margin);
-
 }
 /* block content (not including table)
  * add margin at bottom so headers associate with following content
@@ -289,13 +291,14 @@ padding: 8px;
 display: block;
 }
 div.block ol {
-	margin: 0px var(--content-h-margin) 6px var(--content-h-margin);
+	margin-top: 0px;
+	margin-bottom: 6px;
 	background-color: white;
 	color: black;
 }
 /* no margin inside table */
 div.block td p,  div.block  td ul, div.block td ol, div.block  td pre, div.block  td div.para{
-margin: 0px 0px 0px 0px;
+margin: 0;
 }
 div.block ul{
 list-style: inside;
@@ -303,13 +306,18 @@ list-style: inside;
 div.block  table, div.wideblock  table, div.report  table {
     width: 100%;
 }
+/* special rule for top level */
+body > div.block > table, body > div.wideblock > table, body > div.report > table {
+    width: var(--content-width);
+}
+
 
 /* supress the cell seperators for nested tables */
 div.block table table {
 	    border-collapse: collapse;
 		border-spacing: 0;
 		border-width: 0;
-		margin: 0px;
+		margin: 0;
 }
 /* need to ensure cells are seperated if this is an auto-table not a form table
  * as data may be packed in there.
@@ -324,13 +332,15 @@ div.block table table.auto td, div.block table table.auto th{
 div.block > table.compact, table.compact {
 	    border: none;
 		border-spacing: 0;
-		margin: 0px 0px 6px 0px;	
+		margin-top: 0;
+		margin-bottom: 6px;	
 }
 
 table.listing {
 	border: none;
 	border-spacing: 0;
-	margin: 0px 0px 6px 0px;	
+	margin-top: 0;
+	margin-bottom: 6px;	
 	background-color: white;
 }
 
@@ -443,7 +453,8 @@ th.button-col, td.button-col {
 fieldset.action_buttons{
 border: solid var(--form-border-color);
 border-width: 2px;
-margin: 5px var(--content-h-margin);
+margin-top: 5px;
+margin-bottom: 5px;
 }
 
 .input_button {
@@ -457,7 +468,8 @@ table.form{
 	border: solid var(--form-border-color);
 	border-width: 2px;
     background-color: var(--form-bg-color);
-    margin: 5px var(--content-h-margin);
+    margin-top: 5px;
+    margin-bottom: 5px;
     text-align: left;
 }
 div.block p,  div.block ul,  div.block pre, div.block div.para{

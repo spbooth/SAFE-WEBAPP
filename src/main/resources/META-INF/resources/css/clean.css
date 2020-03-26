@@ -1,6 +1,8 @@
 :root {
   --main-bg-color: #ffffff;
   --heading-bg-color: #ffffff;
+  --bar-bg-color: #201f5b;
+  --bar-text-color: #ffffff;
   --notice-bg-color: #ffcccc;
   --highlight-bg-color: #ffffcc;
   --highlight-hover-color: #ffeecc;
@@ -25,7 +27,8 @@
   --block-h-padding: 0px;
   --block-v-margin: 20px;
   --heading-pre-space: 8px;
-  --content-h-margin: 10px;
+  --content-h-margin: 2%;
+  --content-width: 96%;
 }
 
 
@@ -42,19 +45,19 @@ body header , body footer{
 body > div.block , body div.bar{
 	border: solid var(--content-border-color);
 }
-body{
-	box-sizing: border-box;
-}
+
+
+
 
 body > div.block {
 	padding: 0;
 }
 
-body > div.block > h1:first-child, body > div.block h2:first-child {
+body > div.block > h1:first-child, body > div.block > h2:first-child {
 	color: white;
 	background-color: var(--content-border-color);
-	padding 0;
-	margin 0;
+	padding: 0;
+	margin: 0;
 	text-align: center;
 	
 }
