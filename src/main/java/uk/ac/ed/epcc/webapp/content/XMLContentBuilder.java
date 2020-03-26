@@ -271,12 +271,9 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 	@Override
 	public default <C,R> void addTable(AppContext conn,Table<C,R> t,NumberFormat nf,String style) {
 		if( t.hasData()) {
-			open("div");
-			addClass("table");
 			TableXMLFormatter<C,R> fmt = new TableXMLFormatter<>(this, nf,style);
 			fmt.setTableSections(true);
 			fmt.add(t);
-			close();
 		}
 	}
 	/* (non-Javadoc)
