@@ -293,7 +293,9 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 					panel.addParent();
 				}
 			}
-			cb.addObject(new PreDefinedContent(op.getContext(), "change_email"));
+			ExtendedXMLBuilder ce = cb.getText();
+			ce.addObject(new PreDefinedContent(op.getContext(), "change_email"));
+			ce.appendParent();
 			if( userVisible()) {
 				AppUserFactory<AU> login_fac =  (AppUserFactory<AU>) op.getLoginFactory();
 				if( login_fac.hasComposite(PasswordAuthComposite.class)){
