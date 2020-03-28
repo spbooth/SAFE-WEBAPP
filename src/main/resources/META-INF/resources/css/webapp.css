@@ -460,6 +460,7 @@ margin-bottom: 5px;
 .input_button {
 	margin: 3px 0px;
 	border-style: outset;
+	background-color: var(--button-bg-color);
 }
 /* table for fine tuning the layout within a form
  * these have an explicit border 
@@ -481,6 +482,9 @@ div.block > table, div.wideblock > table, div.report > table, details > table , 
      margin-top: 10px;  
 }
 
+div.block > table:last-child, div.wideblock > table:last-child, div.report > table:last-child, details > table:last-child , div.scrollwrapper > table:last-child{
+	margin-bottom:10px;
+}
 
 /* Resoruce table */
 td.notes{
@@ -725,4 +729,7 @@ img.qrcode{
     display: block;
     margin-left: auto;
 	margin-right: auto;
+}
+div.dataTables_wrapper {
+	margin-top: 10px;
 }

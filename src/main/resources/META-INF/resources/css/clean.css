@@ -8,19 +8,19 @@
   --highlight-hover-color: #ffeecc;
   --warn-bg-color: #ff0000;
   --content-bg-color: #ffffff;
-  --table-bg-color: #cccccc;
+  --table-bg-color: #302f89;
   --content-border-color: #201f5b;
-  --table-border-color: #e7e7e7;
+  --table-border-color: #201f5b;
   --form-border-color: black;
-  --button-bg-color: #e7e7e7;
-  --th-bg-color: #e7e7e7;
+  --button-bg-color: #51baa0;
+  --th-bg-color: #51baa0;
   --th-hover-bg-color: #f3f3f3;
   --form-bg-color: #ffffff;
   --form-hover-bg-color: #eeeeee;
-  --menu-bg-color: #000000;
+  --menu-bg-color: #201f5b;
   --menu-text-color: #ffffff;
-  --menu-border-color: #888;
-  --menu-hover-bg-color: #444444;
+  --menu-border-color: #4e4cc2;
+  --menu-hover-bg-color: #302f89;
   --menu-hover-text-color: #ff4040;
   --block-radius: 15px;
   --block-v-padding: 0px;
@@ -124,7 +124,7 @@ form.transition table.form {
 	 border-radius: var(--block-radius) var(--block-radius) 0 0;
 	 background-color: var(--form-bg-color);
 	 padding: 10px;
-    margin: 0 0 5px 0 ;
+    margin-bottom: 5px;
 }
 
 form.transition .action_buttons{
@@ -143,5 +143,8 @@ div.action_buttons {
 	  padding: 10px;
 	  border-color: var(--form-border-color);
 	  border-style: solid;
-	  margin: 5px var(--content-h-margin);
+	  margin-top: var(--content-h-margin);
+}
+.input_button{
+	border-radius: 8px;
 }
