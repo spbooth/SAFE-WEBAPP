@@ -273,20 +273,29 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		 */
 		@Override
 		public <X extends ContentBuilder> X getExtraHtml(X cb, SessionService<?> op, AU target) {
+			
 			if( useEmailVerificationDate()) {
 				SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-				cb.addObject(new PreDefinedContent(op.getContext(), "verify_email"));
+				ExtendedXMLBuilder t = cb.getText();
+				t.addObject(new PreDefinedContent(op.getContext(), "verify_email"));
+				t.appendParent();
 				Date last = getVerificationDate(target);
 				if( last != null ) {
-					cb.addObject(new PreDefinedContent(op.getContext(), "email_last_verified",(Object)fmt.format(last)));
+					ExtendedXMLBuilder inner = cb.getText();
+					inner.addObject(new PreDefinedContent(op.getContext(), "email_last_verified",(Object)fmt.format(last)));
+					inner.appendParent();
 				}
 				if( warnVerify(target)) {
 					ContentBuilder panel = cb.getPanel("warn");
-					panel.addObject(new PreDefinedContent(op.getContext(), "warn_verify_email",(Object)fmt.format(needVerifyBy(target))));
+					ExtendedXMLBuilder w = panel.getText();
+					w.addObject(new PreDefinedContent(op.getContext(), "warn_verify_email",(Object)fmt.format(needVerifyBy(target))));
+					w.appendParent();
 					panel.addParent();
 				}
 			}
-			cb.addObject(new PreDefinedContent(op.getContext(), "change_email"));
+			ExtendedXMLBuilder ce = cb.getText();
+			ce.addObject(new PreDefinedContent(op.getContext(), "change_email"));
+			ce.appendParent();
 			if( userVisible()) {
 				AppUserFactory<AU> login_fac =  (AppUserFactory<AU>) op.getLoginFactory();
 				if( login_fac.hasComposite(PasswordAuthComposite.class)){
@@ -299,7 +308,9 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 				}
 			}
 			if( needVerify(target)) {
-				cb.addObject(new PreDefinedContent(op.getContext(), "email_verification_required",verifyRefreshDays()));
+				ExtendedXMLBuilder text = cb.getText();
+				text.addObject(new PreDefinedContent(op.getContext(), "email_verification_required",verifyRefreshDays()));
+				text.appendParent();
 			}
 			String email = getCanonicalName(target);
 			FieldValidator<String> val = getEmailValidator(getContext());
