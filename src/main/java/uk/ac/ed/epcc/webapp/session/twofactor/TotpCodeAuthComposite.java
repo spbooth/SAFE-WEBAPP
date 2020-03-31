@@ -406,7 +406,8 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		@Override
 		public void buildForm(Form f, A target, AppContext conn) throws TransitionException {
 			try {
-				if( VERIFY_OLD_CODE.isEnabled(conn) && needAuth(target)) {
+				boolean verify = VERIFY_OLD_CODE.isEnabled(conn) && needAuth(target);
+				if( verify) {
 					modifyForm(target, f);
 				}
 				Key key2 = getKey();
@@ -414,6 +415,10 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 				f.addInput(KEY, "New key", new ConstantInput<>(enc,enc));
 				f.addInput(NEW_CODE, "Verification code (New key)", getInput());
 				f.getField(NEW_CODE).addValidator(new CodeValidator(key2));
+				if( ! verify ) {
+					// will be single field
+					f.setAutoFocus(NEW_CODE);
+				}
 				f.addAction("Set", new setKeyAction(prov,target));
 			} catch (Exception e) {
 				getLogger().error("Error building form", e);

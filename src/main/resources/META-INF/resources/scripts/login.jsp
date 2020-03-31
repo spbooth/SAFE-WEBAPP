@@ -213,8 +213,22 @@ if(  login_urls != null ){
 <small><small>As part of its normal functioning when you log in the <%=website_name %> will install a temporary session cookie that will be removed when you log off or close your browser. If you do not wish this cookie 
 to be set, disable cookies in your browser settings.</small></small>
 </p>
-
-
 <% } %>
 </div>
+<%
+for(String name : conn.getInitParameter("login-page.extra-content","").split(",") ){
+	if( name.trim().length() > 0 ){
+		UIGenerator content = conn.makeObjectWithDefault(UIGenerator.class,null,name.trim());
+		if(content != null ){
+			HtmlBuilder html_content = new HtmlBuilder();
+			content.addContent(html_content);
+			if( html_content.hasContent()){
+%>
+<%=html_content.toString()%>
+<%		
+		    }
+		}
+	}
+}
+%>
 <%@ include file="/login_footer.jsf"%>

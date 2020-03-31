@@ -126,7 +126,9 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 <%=extra.toString()%>
 <%
 		}else{
-		  conn.error("Null builder from ExtraContent");
+		  if( extra == null){
+		  	conn.error("Null builder from ExtraContent in transition.jsp ");
+		  }
     	}
 	}
 %>

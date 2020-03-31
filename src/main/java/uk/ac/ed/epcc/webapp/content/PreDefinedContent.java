@@ -91,6 +91,9 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 	 */
 	@Override
 	public SimpleXMLBuilder addContent(SimpleXMLBuilder builder) {
+		if( fmt == null ) {
+			return builder;
+		}
 		if( builder instanceof XMLPrinter) {
 			XMLPrinter printer = (XMLPrinter) builder;
 			MessageFormat fmt2 = (MessageFormat) fmt.clone();
@@ -120,6 +123,9 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 	 */
 	@Override
 	public ContentBuilder addContent(ContentBuilder builder) {
+		if( fmt == null ) {
+			return builder;
+		}
 		if( builder instanceof XMLPrinter) {
 			addContent((XMLPrinter)builder);
 		}else {
@@ -130,6 +136,30 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 		return builder;
 	}
 
+	/** Add this content to a {@link ContentBuilder} as a text block
+	 * 
+	 * @param cb
+	 */
+	public void addAsText(ContentBuilder cb) {
+		if( fmt == null ) {
+			return;
+		}
+		ExtendedXMLBuilder text = cb.getText();
+		text.addObject(this);
+		text.appendParent();
+	}
+	public void addAsBlock(ContentBuilder cb) {
+		if( fmt == null ) {
+			return;
+		}
+		ContentBuilder inner = cb.getPanel("block");
+		if( inner instanceof SimpleXMLBuilder) {
+			addContent((SimpleXMLBuilder)inner);
+		}else {
+			addContent(inner);
+		}
+		inner.addParent();
+	}
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -139,6 +169,10 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 			return "";
 		}
 		return fmt.format(args, new StringBuffer(), null).toString();
+	}
+	
+	public boolean hasContent() {
+		return fmt != null;
 	}
 
 }

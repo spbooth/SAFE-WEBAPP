@@ -20,7 +20,7 @@
 <label for="transition_NewCode" class="required">Verification code (New key)</label>
 </th>
 <td>
-<input id="transition_NewCode" type="number" size="8" maxlength="32" name="NewCode" class="input" min="0" max="999999" step="1" required="required"/>
+<input id="transition_NewCode" autofocus="autofocus" type="number" size="8" maxlength="32" name="NewCode" class="input" min="0" max="999999" step="1" required="required"/>
 </td>
 </tr>
 </table>
