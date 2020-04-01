@@ -439,7 +439,7 @@ form table.form tr:hover th{
 	background-color: var(--th-hover-bg-color);
 }
 table.form td {
-        background-color: var(--form-bg-color);
+        background-color: var(--form-content-bg-color);
 }
 
 form table tr:hover td {
@@ -468,13 +468,22 @@ margin-bottom: 5px;
 table.form{
 	border: solid var(--form-border-color);
 	border-width: 2px;
-    background-color: var(--form-bg-color);
+    background-color: var(--form-content-bg-color);
     margin-top: 5px;
     margin-bottom: 5px;
     text-align: left;
 }
-div.block p,  div.block ul,  div.block pre, div.block div.para{
+form.transition table.form {
+	 background-color: var(--form-content-bg-color);
+}
+div.action_buttons {
+	 background-color: var(--form-content-bg-color);
+}
+div.block p,  div.block pre, div.block div.para{
 	background-color: var(--paragraph-bg-color);
+}
+div.block ul{
+	background-color: var(--list-bg-color);
 }
 div.block > table, div.wideblock > table, div.report > table, details > table , div.scrollwrapper > table {
 	 border: solid var(--table-border-color); 

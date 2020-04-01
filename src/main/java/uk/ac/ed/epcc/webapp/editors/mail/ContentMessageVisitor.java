@@ -88,6 +88,7 @@ public class ContentMessageVisitor extends AbstractVisitor {
 
 	public final void linkPart(MessageWalker w,MimePart parent) throws MessagingException {
 		String filename = parent.getFileName();
+		
 		String desc = parent.getDescription();
 		if( filename != null ){
 			Pattern p = Pattern.compile("([^\\s/\\\\:]+)\\s*\\z");
@@ -109,9 +110,19 @@ public class ContentMessageVisitor extends AbstractVisitor {
 		if( desc == null ){
 			desc = "attachment ("+parent.getContentType()+")";
 		}
+		if( parent.isMimeType("message/rfc822")){
+			// Don't add name to an email attachment 
+			// because there is a  valid path under this point in the tree
+			// that does not contain the name
+			filename = null;
+		}
 		// link to html alternatives
 		sb=sb.getPanel("link");
-		addLink(w.getPath(),  filename, filename+": "+desc);
+		if( filename == null ) {
+			addLink(w.getPath(),  null, desc);
+		}else {
+			addLink(w.getPath(),  filename, filename+": "+desc);
+		}
 		sb=sb.addParent();
 	}
 

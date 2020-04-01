@@ -7,15 +7,18 @@
   --highlight-bg-color: #ffffcc;
   --highlight-hover-color: #ffeecc;
   --warn-bg-color: #ff0000;
-  --content-bg-color: #ffffff;
+  --content-bg-color: #d9d9f2;
   --table-bg-color: #302f89;
   --content-border-color: #201f5b;
   --table-border-color: #201f5b;
   --form-border-color: black;
-  --button-bg-color: #51baa0;
-  --th-bg-color: #51baa0;
+  --button-bg-color: #c8e9e1;
+  --th-bg-color: #c8e9e1;
   --th-hover-bg-color: #f3f3f3;
-  --form-bg-color: #ffffff;
+  --form-bg-color: var(--content-bg-color);
+  --form-content-bg-color: #ffffff;
+  --paragraph-bg-color: #ffffff;
+  --list-bg-color: var(--content-bg-color);
   --form-hover-bg-color: #eeeeee;
   --menu-bg-color: #201f5b;
   --menu-text-color: #ffffff;
@@ -47,7 +50,9 @@ body > div.block , body div.bar{
 }
 
 
-
+body > div.bar >h1, body > div.bar >h2, body > div.bar >h3{
+	margin-left: 10px;
+}
 
 body > div.block {
 	padding: 0;
@@ -56,6 +61,7 @@ body > div.block {
 body > div.block > h1:first-child, body > div.block > h2:first-child {
 	color: white;
 	background-color: var(--content-border-color);
+	border-radius: var(--block-radius);
 	padding: 0;
 	margin: 0;
 	text-align: center;
@@ -76,11 +82,6 @@ h1, h2, h3, h4, h5, h6 {
     
 }
 
-h1, h2{
-	 background-color: var(--heading-bg-color);
-	 border-radius: var(--block-radius);
-	/* text-decoration: underline; */
-}
 
 /** add preceding margin to headings
  */
@@ -122,7 +123,7 @@ background-color: #ffffff;
 */
 form.transition table.form {
 	 border-radius: var(--block-radius) var(--block-radius) 0 0;
-	 background-color: var(--form-bg-color);
+	 background-color: var(--form-content-bg-color);
 	 padding: 10px;
     margin-bottom: 5px;
 }
@@ -133,13 +134,13 @@ form.transition .action_buttons{
     margin-right: 0;
     margin-bottom: 5px;
 	 border-radius: 0 0 var(--block-radius) var(--block-radius);
-	 background-color: var(--form-bg-color);
+	 background-color: var(--form-content-bg-color);
 	 padding: 10px;
 }
 
 div.action_buttons {
 	border-radius: var(--block-radius);
-	 background-color: var(--form-bg-color);
+	 background-color: var(--form-content-bg-color);
 	  padding: 10px;
 	  border-color: var(--form-border-color);
 	  border-style: solid;

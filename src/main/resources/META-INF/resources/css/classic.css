@@ -11,6 +11,7 @@
   --bar-bg-color: #cccccc;
   --bar-text-color: #000000;
   --paragraph-bg-color: #e7e7e7;
+  --list-bg-color: #e7e7e7;
   --table-bg-color: #cccccc;
   --table-border-color: #e7e7e7;
   --button-bg-color: #e7e7e7;
@@ -19,6 +20,7 @@
   --table-border-color: #e7e7e7;
   --th-hover-bg-color: #f3f3f3;
   --form-bg-color: #cccccc;
+  --form-content-bg-color: #cccccc;
   --form-hover-bg-color: #dddddd;
   --menu-bg-color: #000000;
   --menu-text-color: #ffffff;
