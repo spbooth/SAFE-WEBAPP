@@ -1,7 +1,8 @@
 :root {
   --main-bg-color: #ffffff;
   --notice-bg-color: #ffcccc;
-  --warn-bg-color: #ff0000;
+  --warn-bg-color: #ffb3b3;
+  --warn-color: black;
   --highlight-bg-color: #ffffcc;
   --highlight-hover-color: #ffeecc;
   --content-bg-color: #cccccc;

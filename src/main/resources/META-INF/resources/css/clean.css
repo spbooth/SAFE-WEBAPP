@@ -32,6 +32,8 @@
   --heading-pre-space: 8px;
   --content-h-margin: 2%;
   --content-width: 96%;
+  --warn-bg-color: #ffb3b3;
+  --warn-color: black;
 }
 
 

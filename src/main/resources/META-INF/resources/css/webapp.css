@@ -506,8 +506,15 @@ div table table.resource{
 	text-align: right;
 }
 /* a warning paragraph */
-div p.warn{
-	color: #ff0000;
+
+div.warn{
+	border: solid red;
+}
+
+
+div p.warn, div.warn p, .warn, .warn.sorting_1 {
+	background-color: var(--warn-bg-color);
+	color: var(--warn-color);
 }
 .center{
 text-align: center;
@@ -515,9 +522,7 @@ text-align: center;
 .plain {
 	background-color: #ffffff;
 	}
-.warn, .warn.sorting_1 {
-	color: var(--warn-bg-color);
-}
+
 .pass:after {
 	content: " \2714";
 	color: green;
@@ -741,4 +746,23 @@ img.qrcode{
 }
 div.dataTables_wrapper {
 	margin-top: 10px;
+}
+
+/* These are also in helpdesk.css but added here for
+ * traffic-light type markup elsewhere
+*/
+table.dataTable.display tbody tr td.GREEN.sorting_1, td.GREEN ,  span.GREEN{
+	background: #00ff00;
+}
+table.dataTable.display tbody tr td.YELLOW.sorting_1,td.YELLOW,  span.YELLOW{
+	background: yellow;
+}
+table.dataTable.display tbody tr td.AMBER.sorting_1, td.AMBER,  span.AMBER{
+	background: orange;
+}
+table.dataTable.display tbody tr td.ORANGE.sorting_1, td.ORANGE,  span.ORANGE{
+   background: orange;
+}
+table.dataTable.display tbody tr td.RED.sorting_1, td.RED,  span.RED{
+   background: red;
 }
