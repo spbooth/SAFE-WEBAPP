@@ -3,7 +3,7 @@
 <PageHeading>Update personal details</PageHeading>
 <SummaryContent/>
 <ExtraContent>
-<div>
+<div class="warn">
 <h2>Update required</h2>
 <p>It is important that we keep the details we hold on you up to date. We need up to date contact details in the event that we ever need to contact you. Other information is needed to perform demographic analysis of the use of our systems.</p>
 <p>We would therefore be grateful if you could check the following details that we currently hold and update any that need changing.</p>
