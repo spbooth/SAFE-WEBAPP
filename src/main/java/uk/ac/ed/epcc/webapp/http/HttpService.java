@@ -14,6 +14,8 @@
 package uk.ac.ed.epcc.webapp.http;
 
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContextService;
@@ -49,6 +51,16 @@ public interface HttpService extends AppContextService<HttpService>{
 	 */
 	MimeStreamData post(URL url, Map<String, String> props, MimeStreamData input) throws HttpException;
 
+	/** Add an encoded Basic Authorization header
+	 * 
+	 * @param props
+	 * @param username
+	 * @param password
+	 */
+	default void addBasicAuth(Map<String, String> props,String username,String password) {
+		String encoded = Base64.getEncoder().encodeToString((username+":"+password).trim().getBytes(StandardCharsets.UTF_8));  //Java 8
+		props.put("Authorization", "Basic "+encoded);
+	}
 
 	@Override
 	default Class<HttpService> getType() {

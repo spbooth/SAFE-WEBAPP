@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.LinkedList;
@@ -22,7 +23,9 @@ import javax.servlet.ServletException;
 
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -93,6 +96,37 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 */
 	
 	public Map<String,Object> getParams() ;
+	
+	/** get a named paramter as a string
+	 * 
+	 * This should include conversion f uplaoded files etc.
+	 * 
+	 * @param name
+	 * @return
+	 */
+	default public String getTextParameter(String name) {
+		Object o = getParams().get(name);
+		if( o == null ) {
+			return null;
+		}
+		if( o instanceof String) {
+			return (String) o;
+		}
+		if( o instanceof MimeStreamData) {
+			MimeStreamData msd= (MimeStreamData) o;
+			if( msd.getContentType().contains("text")) {
+				ByteArrayOutputStream stream = new ByteArrayOutputStream();
+				try {
+					msd.write(stream);
+					return stream.toString("UTF-8");
+				} catch (Exception e) {
+					getContext().getService(LoggerService.class).getLogger(getClass()).error("error converting to string",e);
+					return null;
+				}
+			}
+		}
+		return o.toString();
+	}
 	
 	/** Get the ServletPath as a list of strings
 	 * A path element of "-" terminates the list. 

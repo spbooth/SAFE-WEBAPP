@@ -62,8 +62,9 @@ public class MockRequest implements HttpServletRequest {
     public String method="POST";
     public MockSession session;
     public String remote_user=null;
-    public String content_type=null;
+    public String content_type="application/x-www-form-urlencoded";
     public Principal principal=null;
+    public MockInputStream stream=null;
     public MockRequest(String path){
     	context_path=path;
     }
@@ -299,7 +300,7 @@ public class MockRequest implements HttpServletRequest {
 	@Override
 	public ServletInputStream getInputStream() throws IOException {
 		
-		return null;
+		return stream;
 	}
 
 	@Override
