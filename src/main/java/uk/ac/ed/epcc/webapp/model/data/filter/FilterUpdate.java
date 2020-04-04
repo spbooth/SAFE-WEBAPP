@@ -56,7 +56,7 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 		 * @param target {@link FieldValue}
 		 * @param value
 		 * @param my_filter
-		 * @return
+		 * @return number of records updates.
 		 * @throws DataFault
 		 */
 	    public <R> int update(FieldValue<R,T> target, R value,SQLFilter<T> my_filter) throws DataFault{
@@ -67,7 +67,7 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    	sql.append("UPDATE ");
 	    	res.addSource(sql, true);
 	    	sql.append(" SET ");
-	    	target.add(sql, false);
+	    	target.addField(sql, false);
 	    	sql.append("=?");
 	    	
 	    	if( my_filter != null ){

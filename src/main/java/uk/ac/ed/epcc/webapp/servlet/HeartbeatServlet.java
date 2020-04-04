@@ -203,11 +203,11 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 	public void destroy() {
 		if( service != null ){
 			try {
+				service.shutdownNow();
 				service.awaitTermination(15, TimeUnit.MINUTES);
 			} catch (InterruptedException e) {
 				
 			}
-			service.shutdown();
 		}
 		super.destroy();
 	}

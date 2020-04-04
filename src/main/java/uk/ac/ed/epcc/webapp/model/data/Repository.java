@@ -636,14 +636,18 @@ public final class Repository implements AppContextCleanup{
 		 */
 		private static final long serialVersionUID = 2L;
 
-		/** does this Record exist in the database */
-		private boolean have_id = false;
-
+		
 		private int id;
 
 		private Set<String> dirty = null;
-		
+		/** does this Record exist in the database */
+		private boolean have_id = false;
+
+		/** are updates to this record forbidden
+		 * 
+		 */
 		private boolean locked=false;
+		
 		public Record() {
 			super();
 		}
@@ -1622,6 +1626,7 @@ public final class Repository implements AppContextCleanup{
 			if (!isDirty()) {
 				return false;
 			}
+			
 			TimerService time = ctx.getService(TimerService.class);
 			if( time != null ){
 				time.startTimer(getTag()+"-update");
@@ -1855,6 +1860,8 @@ public final class Repository implements AppContextCleanup{
 		    public boolean isLocked() {
 		    	return locked;
 		    }
+
+			
 	}
 
 	/** Class representing an Order clause 

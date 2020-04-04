@@ -62,6 +62,10 @@ public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
 			query.append(" ");
 			query.append(modify);
 		}
+		String lock_clause = getLockClause();
+		if( lock_clause != null ) {
+			query.append(lock_clause);
+		}
 		AppContext conn = getContext();
 		String q = query.toString();
 		TimerService timer = conn.getService(TimerService.class);

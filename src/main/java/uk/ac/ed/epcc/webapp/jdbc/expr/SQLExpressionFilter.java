@@ -128,7 +128,11 @@ public class SQLExpressionFilter<T,V> implements SQLFilter<T>, PatternFilter<T> 
 	@Override
 	public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify) {
 		sb.append("(");
-		expr.add(sb,qualify);
+		if( expr instanceof FieldValue){
+			((FieldValue)expr).addField(sb, qualify);
+		}else {
+			expr.add(sb,qualify);
+		}
 		if( match != null){
 			sb.append(match.match());
 		}else{

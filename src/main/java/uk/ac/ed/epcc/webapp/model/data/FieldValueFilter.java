@@ -74,7 +74,7 @@ public class FieldValueFilter<V,T> implements PatternFilter<T>, SQLFilter<T> {
 	 */
 	@Override
 	public StringBuilder addPattern(Set<Repository> tables, StringBuilder sb, boolean qualify) {
-		field.add(sb, qualify);
+		field.addField(sb, qualify);
 		sb.append("=?");
 		return sb;
 	}

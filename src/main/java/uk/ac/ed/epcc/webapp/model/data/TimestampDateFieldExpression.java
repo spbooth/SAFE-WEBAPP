@@ -97,5 +97,9 @@ public class TimestampDateFieldExpression<T extends DataObject> extends FieldExp
 	public boolean preferSeconds() {
 		return res == 1000L;
 	}
+	@Override
+	public int addField(StringBuilder sb, boolean qualify) {
+		return num_field.add(sb, qualify);
+	}
 	
 }
