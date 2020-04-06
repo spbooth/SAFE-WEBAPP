@@ -121,7 +121,7 @@ public class Feature extends AbstractSetting<Boolean> {
 	 * @see uk.ac.ed.epcc.webapp.Setting#getInput()
 	 */
 	@Override
-	public ItemInput<String,Boolean> getInput() {
+	public ItemInput<String,Boolean> getInput(AppContext conn) {
 		return new OnOffInput();
 	}
 	

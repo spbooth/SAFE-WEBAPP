@@ -172,7 +172,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		 */
 		@Override
 		public void buildForm(Form f, AbstractSetting target, AppContext conn) throws TransitionException {
-			ItemInput input = target.getInput();
+			ItemInput input = target.getInput(conn);
 			input.setItem(target.getCurrent(conn));
 			f.addInput(VALUE, "Preferred setting", input);
 			f.addAction("Update", new SetAction((PreferenceSetting)target));
@@ -212,7 +212,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		 */
 		@Override
 		public void buildForm(Form f, AbstractSetting target, AppContext conn) throws TransitionException {
-			ItemInput input = target.getInput();
+			ItemInput input = target.getInput(conn);
 			input.setItem(target.getCurrent(conn));
 			f.addInput(VALUE, "Feature setting", input);
 			f.addAction("Update", new SetFeatureAction(target));

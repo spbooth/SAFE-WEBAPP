@@ -51,7 +51,7 @@ public interface Setting<V> extends Comparable<Setting>, TypeConverter<V, String
 	 * 
 	 * @return
 	 */
-	public ItemInput<String,V> getInput();
+	public ItemInput<String,V> getInput(AppContext conn);
 
 
 	@Override

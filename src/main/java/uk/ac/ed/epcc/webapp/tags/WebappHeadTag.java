@@ -27,8 +27,8 @@ import javax.servlet.jsp.tagext.Tag;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.preferences.EnumPreference;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
+import uk.ac.ed.epcc.webapp.preferences.StringPreference;
 import uk.ac.ed.epcc.webapp.servlet.ErrorFilter;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
 
@@ -38,7 +38,7 @@ import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
  */
 public class WebappHeadTag extends TagSupport implements Tag {
 	public static final Preference SCRIPT_FORMS_FEATURE = new Preference("script.forms",true,"Augment unsupported html5 inputs using javascript");
-	public static final EnumPreference<Styles> STYLE_PREFERENCE = new EnumPreference<Styles>(Styles.class, "page.style", Styles.Classic, "Web page style");
+	public static final StringPreference STYLE_PREFERENCE = new StringPreference("page.style", "Web page style", "Classic","Clean");
 	/**
 	 * 
 	 */
@@ -77,11 +77,11 @@ public class WebappHeadTag extends TagSupport implements Tag {
         			doIcon(out, response, template_path, conn.getInitParameter("favicon.type", "image/png"), favicon);
         		}
         		//doCSS(out, response, template_path,"default css","webapp.css");
-        		Styles style = STYLE_PREFERENCE.getCurrent(conn);
-        		for(String css : conn.getExpandedProperty("styles."+style.name()+".css", "webapp.css").split("\\s*,\\s*")) {
+        		String style = STYLE_PREFERENCE.getCurrent(conn);
+        		for(String css : conn.getExpandedProperty("styles."+style+".css", "webapp.css").split("\\s*,\\s*")) {
         			doCSS(out, response, template_path,"default css",css);
         		}
-        		for(String script : conn.getExpandedProperty("styles."+style.name()+".scripts", "").split("\\s*,\\s*")) {
+        		for(String script : conn.getExpandedProperty("styles."+style+".scripts", "").split("\\s*,\\s*")) {
         			doScript(scripts,out, request,response, script);
         		}
         		if( NavigationMenuService.NAVIGATION_MENU_FEATURE.isEnabled(conn)){

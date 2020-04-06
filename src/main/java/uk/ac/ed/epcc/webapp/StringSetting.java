@@ -13,31 +13,30 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp;
 
-import uk.ac.ed.epcc.webapp.forms.inputs.EnumInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.SetInput;
 
-/** A {@link EnumSetting} represents optional feature in the code. 
+/** A {@link StringSetting} represents optional feature in the code. 
  * Normally this should be encapsulated as a singleton constant field so we can
  * locate them by reflection and generate on-line documentation.
- * Each {@link EnumSetting} object defines a <em>name</em> for the feature a default setting and descriptive documentation.
- * Some legacy features may be generated dynamically so the same feature may be constructed multiple times but {@link EnumSetting}s with
+ * Each {@link StringSetting} object defines a <em>name</em> for the feature a default setting and descriptive documentation.
+ * Some legacy features may be generated dynamically so the same feature may be constructed multiple times but {@link StringSetting}s with
  * the same name should be identical.
  * <p>
- * {@link EnumSetting}s can be turned on and off using configuration parameters
+ * {@link StringSetting}s can be turned on and off using configuration parameters
  * e.g. <b>service.feature.<em>feature-name</em>=true</b>
  * 
- * The results are also cached in the {@link AppContext} as the same {@link EnumSetting} may be queried a large number of times in the same request.
+ * The results are also cached in the {@link AppContext} as the same {@link StringSetting} may be queried a large number of times in the same request.
  * 
  * @author spb
  *
  */
-public class EnumSetting<E extends Enum> extends AbstractSetting<E> {
+public class StringSetting extends AbstractSetting<String> {
 	
-	protected final Class<E> clazz;
-	public EnumSetting(Class<E> clazz,String name,E  def, String description) {
-		super(name,description,def);
-		this.clazz=clazz;
-		
+    private final String default_options[];
+	public StringSetting(String name,String description, String ... options) {
+		super(name,description,options[0]);
+		this.default_options=options;
 	}
 	
 	
@@ -49,12 +48,13 @@ public class EnumSetting<E extends Enum> extends AbstractSetting<E> {
 	
 	
 	
-	public E getCurrent(AppContext conn){
+	@Override
+	public String getCurrent(AppContext conn){
 		if( conn == null ){
 			return getDefault();
 		}
 		// Feature queries may occur often so cache the result in the context
-		E b = (E) conn.getAttribute(this);
+		String b = (String) conn.getAttribute(this);
 		if (b == null) {
 			b = getConfigValue(conn);
 			conn.setAttribute(this, b);
@@ -71,8 +71,8 @@ public class EnumSetting<E extends Enum> extends AbstractSetting<E> {
 
 
 
-	protected E getConfigValue(AppContext conn) {
-		return conn.getEnumParameter(clazz,getTag(), getDefault());
+	protected String getConfigValue(AppContext conn) {
+		return conn.getInitParameter(getTag(), getDefault());
 	}
 	
 	protected String getTag() {
@@ -87,36 +87,48 @@ public class EnumSetting<E extends Enum> extends AbstractSetting<E> {
 	 * @see uk.ac.ed.epcc.webapp.Setting#getInput()
 	 */
 	@Override
-	public ItemInput<String,E> getInput(AppContext conn) {
-		return new EnumInput<>(clazz);
+	public ItemInput<String,String> getInput(AppContext conn) {
+		SetInput<String> input = new SetInput<String>();
+		String option_string = conn.getInitParameter(getTag()+".options");
+		String options[];
+		if( option_string != null ) {
+			options = option_string.trim().split("\\s*,\\s*");
+		}else {
+			options = default_options;
+		}
+		for(String s : options) {
+			input.addChoice(s);
+		}
+		return input;
 	}
 	
 	
-	public String getText(E b) {
-		return b.toString();
+	@Override
+	public String getText(String b) {
+		return b;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.convert.TypeConverter#find(java.lang.Object)
 	 */
 	@Override
-	public E find(String o) {
-		return (E) Enum.valueOf(clazz, o);
+	public String find(String o) {
+		return o;
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.convert.TypeConverter#getIndex(java.lang.Object)
 	 */
 	@Override
-	public String getIndex(E value) {
-		return value.name();
+	public String getIndex(String value) {
+		return value;
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<E> getTarget() {
-		return clazz;
+	public Class<String> getTarget() {
+		return String.class;
 	}
 
 }
