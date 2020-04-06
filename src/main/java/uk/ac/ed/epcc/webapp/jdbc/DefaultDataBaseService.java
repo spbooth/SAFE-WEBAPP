@@ -38,6 +38,7 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.TransientDataFault;
 /** Default implementation of the {@link DatabaseService}
  * 
  * This gets connection parameters from the {@link ConfigService} but this is only queried
@@ -429,10 +430,14 @@ public class DefaultDataBaseService implements DatabaseService {
 	
 	@Override
 	public void handleError(String message,SQLException e) throws DataFault {
-		if( force_rollback && e instanceof SQLTransientException) {
+		boolean trans = e instanceof SQLTransientException;
+		if( force_rollback && trans) {
 			if( inTransaction() && transactionStage() == 0) {
 				throw new ForceRollBack(message, e);
 			}
+		}
+		if( trans ) {
+			throw new TransientDataFault("Transient error", (SQLTransientException) e);
 		}
 		throw new DataFault(message, e);
 		

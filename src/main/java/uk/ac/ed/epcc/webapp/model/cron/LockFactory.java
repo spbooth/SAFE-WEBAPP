@@ -14,10 +14,12 @@
 package uk.ac.ed.epcc.webapp.model.cron;
 
 import uk.ac.ed.epcc.webapp.model.ClassificationFactory;
+import uk.ac.ed.epcc.webapp.model.data.FieldValuePatternArgument;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Retirable;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.TransientDataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterUpdate;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 
@@ -27,6 +29,7 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -83,48 +86,75 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 		}
 		public boolean takeLock() throws DataFault {
 			if( holding) {
-				throw new ConsistencyError("Alreay locked "+getName());
+				throw new ConsistencyError("Already locked "+getName());
 			}
 			if( isLocked()) {
 				// locked by other request alerady
 				return false;
 			}
+			DatabaseService db = getContext().getService(DatabaseService.class);
+			
 			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 			Date now = time.getCurrentTime();
 			Repository res = record.getRepository();
 			FilterUpdate<Lock> update = new FilterUpdate<LockFactory.Lock>(res);
 			SQLAndFilter<Lock> fil = new SQLAndFilter<Lock>(Lock.class,getFilter(this),new NullFieldFilter<Lock>(Lock.class, res, LOCK_FIELD, true));
-			int i = update.update(res.getDateExpression(Lock.class, LOCK_FIELD), now, fil);
-			if( i != 1 ) {
-				// other thread got there first
+			try {
+				int i = update.update(fil, 
+						new FieldValuePatternArgument<Date,Lock>(res.getDateExpression(Lock.class, LOCK_FIELD), now),
+						new FieldValuePatternArgument<Date,Lock>(res.getDateExpression(Lock.class, LAST_LOCK_FIELD), now)
+						);
+				if( i != 1 ) {
+					// other thread got there first
+					return false;
+				}
+				record.setProperty(LOCK_FIELD, now);
+				setDirty(LOCK_FIELD, false);
+
+				record.setProperty(LAST_LOCK_FIELD, now);
+				setDirty(LAST_LOCK_FIELD, false);
+
+				holding=true;
+				
+				return true;
+			}catch(TransientDataFault e) {
+				// transient error treat as failed to get lock
 				return false;
 			}
-			record.setProperty(LOCK_FIELD, now);
-			setDirty(LOCK_FIELD, false);
-			holding=true;
-			
-			record.setProperty(LAST_LOCK_FIELD, now);
-			commit();
-			return true;
 		}
 		
 		public void releaseLock() throws DataFault {
 			if( ! holding ) {
 				throw new ConsistencyError("Not holding lock "+getName());
 			}
-			// save any other changes
-			commit();
-			Repository res = record.getRepository();
-			FilterUpdate<Lock> update = new FilterUpdate<LockFactory.Lock>(res);
-			SQLAndFilter<Lock> fil = new SQLAndFilter<Lock>(Lock.class,getFilter(this),new NullFieldFilter<Lock>(Lock.class, res, LOCK_FIELD, false));
-			int i = update.update(res.getDateExpression(Lock.class, LOCK_FIELD), null, fil);
-			if( i != 1 ) {
-				// other thread got there first
-				throw new ConsistencyError("Failed to remove lock");
+			// loop  to retry transient failures
+			for(int t=0 ; t < 100 ; t++) {
+				try {
+					// save any other changes
+					commit();
+					Repository res = record.getRepository();
+					FilterUpdate<Lock> update = new FilterUpdate<LockFactory.Lock>(res);
+					SQLAndFilter<Lock> fil = new SQLAndFilter<Lock>(Lock.class,getFilter(this),new NullFieldFilter<Lock>(Lock.class, res, LOCK_FIELD, false));
+					int i = update.update(res.getDateExpression(Lock.class, LOCK_FIELD), null, fil);
+					if( i != 1 ) {
+						// How did this happen
+						throw new ConsistencyError("Failed to remove lock "+getName());
+					}
+					record.setProperty(LOCK_FIELD, null);
+					setDirty(LOCK_FIELD, false);
+					holding=false;
+					return ;
+
+				}catch(TransientDataFault e) {
+					getLogger().warn("Re-try unlock "+getName(), e);
+					try {
+						Thread.sleep(1000L);
+					} catch (InterruptedException e1) {
+						
+					}
+				}
 			}
-			record.setProperty(LOCK_FIELD, null);
-			setDirty(LOCK_FIELD, false);
-			holding=false;
+			getLogger().error("Failed to unlock "+getName());
 		}
 
 		/* (non-Javadoc)
