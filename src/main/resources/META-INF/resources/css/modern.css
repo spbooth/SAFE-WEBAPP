@@ -1,43 +1,49 @@
 :root {
   --main-bg-color: #ffffff;
   --heading-bg-color: #ffffff;
-  --bar-bg-color: #201f5b;
-  --bar-text-color: #ffffff;
+  --bar-bg-color: #ffffff;
+  --bar-text-color: #000;
   --notice-bg-color: #ffcccc;
   --highlight-bg-color: #ffffcc;
   --highlight-hover-color: #ffeecc;
   --warn-bg-color: #ff0000;
-  --content-bg-color: #d9d9f2;
-  --table-bg-color: #302f89;
-  --content-border-color: #201f5b;
-  --table-border-color: #201f5b;
+  --content-bg-color: #ffffff;
+  --table-bg-color: #000;
+  --content-border-color: #000;
+  --table-border-color: #000;
   --form-border-color: black;
-  --button-bg-color: #c8e9e1;
-  --button-color: black;
-  --th-color: black;
-  --th-bg-color: #c8e9e1;
+  --button-bg-color: #0d8040;
+  --button-color: white;
+  --th-color: #ffffff;
+  --th-bg-color: #0d8040;
   --th-hover-bg-color: #f3f3f3;
   --form-bg-color: var(--content-bg-color);
   --form-content-bg-color: #ffffff;
   --paragraph-bg-color: #ffffff;
   --list-bg-color: var(--content-bg-color);
   --form-hover-bg-color: #eeeeee;
-  --menu-bg-color: #201f5b;
-  --menu-text-color: #ffffff;
-  --menu-border-color: #4e4cc2;
-  --menu-hover-bg-color: #302f89;
-  --menu-hover-text-color: #ff4040;
-  --block-radius: 15px;
-  --block-v-padding: 0px;
-  --block-h-padding: 0px;
+  --menu-bg-color: #ffffff;
+  --menu-text-color: #000000;
+  --menu-border-color: #000;
+  --menu-hover-bg-color: #ddd;
+  --menu-hover-text-color: #ff0000;
+  --block-radius: 0px;
+  --form-radius: 15px;
+   --block-v-padding: 10px;
+  --block-h-padding: 10px;
   --block-v-margin: 20px;
   --heading-pre-space: 8px;
-  --content-h-margin: 2%;
-  --content-width: 96%;
+  --content-h-margin: 0px;
+  --content-width: 100%;
   --warn-bg-color: #ffb3b3;
   --warn-color: black;
-  --menu-bg-has-role: #060;
-  --menu-bg-missing-role: #600;
+  --menu-bg-has-role: #66ff66;
+  --menu-bg-missing-role: #ff6666;
+  
+   --column-th-color: black;
+  --column-th-bg-color: #e7e7e7;
+   --form-th-color: black;
+  --form-th-bg-color: #e7e7e7;
 }
 
 
@@ -52,30 +58,17 @@ body header , body footer{
 }
 
 body > div.block , body div.bar{
-	border: solid var(--content-border-color);
+	border: none;
 }
 
 
-body > div.bar >h1, body > div.bar >h2, body > div.bar >h3{
-	margin-left: 10px;
-}
+
 
 body > div.block {
 	padding: 0;
 }
 
-body > div.block > h1:first-child, body > div.block > h2:first-child {
-	color: white;
-	background-color: var(--content-border-color);
-	border-radius: var(--block-radius);
-	padding: 0;
-	margin-top: 0;
-    margin-left: 0;
-    margin-right: 0;
-    margin-bottom: 5px;
-	text-align: center;
-	
-}
+
 /* we use three levels of header as standard 
  * h1 or h2 is the top level header in a block
  * h3 is a secondary header or a header in a div.bar
@@ -102,7 +95,11 @@ h3, h4, h5, h6 {
 h1 + h2 , h2 + h3, h3 + h4 , h4 + h5, h5 + h6{
 	margin: 0;
 }
-
+div.bar form{
+ display: inline;
+ float: none;
+ text-align: center;
+}
  /*
   * secondary headers as log items
   */
@@ -131,7 +128,7 @@ background-color: #ffffff;
 }
 */
 form.transition table.form {
-	 border-radius: var(--block-radius) var(--block-radius) 0 0;
+	border: black;
 	 background-color: var(--form-content-bg-color);
 	 padding: 10px;
     margin-bottom: 5px;
@@ -142,19 +139,27 @@ form.transition .action_buttons{
     margin-left: 0;
     margin-right: 0;
     margin-bottom: 5px;
-	 border-radius: 0 0 var(--block-radius) var(--block-radius);
+	border: none;
 	 background-color: var(--form-content-bg-color);
 	 padding: 10px;
 }
-
+.nav ul li ul  {
+	border-color: black;
+	border-width: 0.2px;
+}
+div td.button{
+	background-color: #fff;
+}
 div.action_buttons {
-	border-radius: var(--block-radius);
 	 background-color: var(--form-content-bg-color);
-	  padding: 10px;
+	  padding: 5px;
 	  border-color: var(--form-border-color);
-	  border-style: solid;
-	  margin-top: var(--content-h-margin);
 }
 .input_button{
 	border-radius: 8px;
+}
+
+form.transition table.form, table.form {
+	background-color: black;
+	padding: 0;
 }

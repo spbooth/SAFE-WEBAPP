@@ -1,3 +1,10 @@
+:root{
+	--column-th-color: var(--th-color);
+	--column-th-bg-color: var(--th-bg-color);
+	--form-th-color: var(--th-color);
+	--form-th-bg-color: var(--th-bg-color);
+}
+
 body {
 	color: black;
 	font-size: medium;
@@ -329,7 +336,7 @@ div.block table table.auto td, div.block table table.auto th{
 */
 
 
-div.block > table.compact, table.compact {
+table.compact {
 	    border: none;
 		border-spacing: 0;
 		margin-top: 0;
@@ -432,8 +439,20 @@ div td.button {
 	background-color: var(--th-bg-color);
 }
 div th {
-        color: black;
+        color: var(--th-color);
         background-color: var(--th-bg-color);
+}
+div table.column th{
+        color: var(--column-th-color);
+        background-color: var(--column-th-bg-color);
+}
+div table.column td th{
+        color: var(--th-color);
+        background-color: var(--th-bg-color);
+}
+form table.form th{
+        color: var(--form-th-color);
+        background-color: var(--form-th-bg-color);
 }
 form table.form tr:hover th{
 	background-color: var(--th-hover-bg-color);
@@ -461,6 +480,7 @@ margin-bottom: 5px;
 	margin: 3px 0px;
 	border-style: outset;
 	background-color: var(--button-bg-color);
+	color: var(--button-color);
 }
 /* table for fine tuning the layout within a form
  * these have an explicit border 
@@ -485,10 +505,10 @@ div.block p,  div.block pre, div.block div.para{
 div.block ul{
 	background-color: var(--list-bg-color);
 }
-div.block > table, div.wideblock > table, div.report > table, details > table , div.scrollwrapper > table {
+div.block > table, div.wideblock > table, div.report > table, details > table , div.scrollwrapper > table, div > table {
 	 border: solid var(--table-border-color); 
 	 background-color: var(--table-bg-color);
-     margin-top: 10px;  
+     margin-bottom: 10px;  
 }
 
 div.block > table:last-child, div.wideblock > table:last-child, div.report > table:last-child, details > table:last-child , div.scrollwrapper > table:last-child{

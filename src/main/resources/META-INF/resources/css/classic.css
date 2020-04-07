@@ -16,6 +16,8 @@
   --table-bg-color: #cccccc;
   --table-border-color: #e7e7e7;
   --button-bg-color: #e7e7e7;
+  --button-color: black;
+  --th-color: black;
   --th-bg-color: #e7e7e7;
   --form-border-color: #e7e7e7;
   --table-border-color: #e7e7e7;
@@ -35,6 +37,8 @@
   --heading-pre-space: 8px;
   --content-h-margin: 0px;
   --content-width: 100%;
+  --menu-bg-has-role: #060;
+  --menu-bg-missing-role: #600;
 }
 
 

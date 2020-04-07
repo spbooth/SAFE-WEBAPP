@@ -87,17 +87,23 @@ body{
 }
 
 .nav li.has_role a {
-	background-color: #060;
+	background-color: var(--menu-bg-has-role);
 } 
 .nav li.missing_role a {
-	background-color: #600;
+	background-color: var(--menu-bg-missing-role);
 } 
 
-.nav li.notify >  a {
+.nav li.notify >  a , span.notify {
 	background-color: #bf7a00;
 	color: black;
 }
-nav li.notify >  a:after {
+span.notify{
+	display: inline-block;
+	border: thin;
+	border-color: black;
+	padding: 5px;
+}
+nav li.notify >  a:after, span.notify::after {
 	content: " \1F514";
 }
 .nav li.notify >  a:hover , .nav li.notify > a:focus{
@@ -210,7 +216,11 @@ nav li.notify >  a:after {
     left: 100px;
     box-shadow: 2px 4px #888888;
   }
-  
+  .nav ul li ul  {
+	
+    box-shadow: 1px 1px #888888;
+    
+}
   /* sub-menu items need to auto-calculate height
    * so the sub-menu can do overflow properly
    */

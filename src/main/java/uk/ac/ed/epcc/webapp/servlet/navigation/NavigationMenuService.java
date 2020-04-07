@@ -20,6 +20,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import sun.java2d.HeadlessGraphicsEnvironment;
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
@@ -35,6 +36,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.tags.WebappHeadTag;
 
 /** A {@link AppContextService} for building navigation menus.
  * <p>
@@ -201,8 +203,11 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 			String path = conn.expandText(menu_prop.getProperty(name+".path"));
 			String help = conn.expandText(menu_prop.getProperty(name+".help"));
 			String type = conn.expandText(menu_prop.getProperty(name+".type","default_node_type"));
+			// styles can customise text and image
+			String style = WebappHeadTag.STYLE_PREFERENCE.getCurrent(conn);
 			
 			String image = menu_prop.getProperty(name+".image");
+			image = menu_prop.getProperty(name+".image."+style, image);
 			String key = menu_prop.getProperty(name+".accesskey");
 			NodeMaker maker = getContext().makeObjectWithDefault(NodeMaker.class, ParentNodeMaker.class, type);
 			Node n = maker.makeNode(name, menu_prop);
@@ -210,7 +215,9 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 				n.setID(name);
 				// Default to maker set text or failing that name
 				String menu_text = n.getMenuText(getContext());
-				n.setMenuText(conn.expandText(menu_prop.getProperty(name+".text", menu_text == null ? name : menu_text)));
+				menu_text=menu_prop.getProperty(name+".text", menu_text == null ? name : menu_text);
+				menu_text=menu_prop.getProperty(name+".text."+style,menu_text);
+				n.setMenuText(conn.expandText(menu_text));
 				n.setImage(image);
 				if( path != null){
 					n.setTargetPath(path);

@@ -10,9 +10,11 @@ div.report h1, div.report h2{
 text-align: center;
 }
 div.report  th {
-background-color: #dddddd;
+	color: black;
+	background-color: #dddddd;
 }
 div.report td {
+	color: black;
 	background-color: #eeeeee;
 }
 div.report table {

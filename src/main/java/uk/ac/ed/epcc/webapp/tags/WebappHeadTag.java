@@ -38,7 +38,7 @@ import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
  */
 public class WebappHeadTag extends TagSupport implements Tag {
 	public static final Preference SCRIPT_FORMS_FEATURE = new Preference("script.forms",true,"Augment unsupported html5 inputs using javascript");
-	public static final StringPreference STYLE_PREFERENCE = new StringPreference("page.style", "Web page style", "Classic","Clean");
+	public static final StringPreference STYLE_PREFERENCE = new StringPreference("page.style", "Web page style", "Classic","Clean","Modern");
 	/**
 	 * 
 	 */
