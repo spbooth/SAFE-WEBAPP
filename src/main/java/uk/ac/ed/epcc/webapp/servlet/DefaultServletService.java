@@ -414,6 +414,12 @@ public class DefaultServletService implements ServletService{
 				}
 			}
 		}
+		String type = req.getContentType();
+		// if this is not one of the already handled form types
+		// map the request body to a StreamData
+		if( ! h.containsKey(ServletService.DEFAULT_PAYLOAD_PARAM) && type != null && ! type.contains("x-www-form-urlencoded") && !  type.startsWith("multipart")) {
+			h.put(ServletService.DEFAULT_PAYLOAD_PARAM,new RequestMimeStreamData(getContext(), req));
+		}
 		return h;
 	}
 

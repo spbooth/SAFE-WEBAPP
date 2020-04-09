@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.servlet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.Map;
@@ -25,6 +26,7 @@ import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -39,6 +41,11 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 public interface ServletService extends AppContextService<ServletService>, Contexed{
 	
+	/**
+	 * 
+	 */
+	String DEFAULT_PAYLOAD_PARAM = "update";
+
 	/** un-encoded version of the original request page.
 	 * 
 	 *  * This uses a cached value because the request URL will be
@@ -126,6 +133,21 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 			}
 		}
 		return o.toString();
+	}
+	default public MimeStreamData getStreamParam(String name) throws DataFault{
+		Object o = getParams().get(name);
+		if( o == null ) {
+			return null;
+		}
+		if( o instanceof MimeStreamData) {
+			return (MimeStreamData) o;
+		}
+		if( o instanceof String) {
+			ByteArrayMimeStreamData result = new ByteArrayMimeStreamData(((String)o).getBytes());
+			result.setMimeType("text/plain");
+			return result;
+		}
+		throw new DataFault("Unsupported object "+o.getClass().getCanonicalName());
 	}
 	
 	/** Get the ServletPath as a list of strings

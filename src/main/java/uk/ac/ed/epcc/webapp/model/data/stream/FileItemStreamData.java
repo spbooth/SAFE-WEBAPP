@@ -30,7 +30,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
  * @author spb
  *
  */
-public class FileItemStreamData extends AbstractStreamData implements
+public class FileItemStreamData  implements
 MimeStreamData {
 	FileItem item;
 	AppContext conn;
