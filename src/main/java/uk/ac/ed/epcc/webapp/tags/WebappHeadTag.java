@@ -76,6 +76,9 @@ public class WebappHeadTag extends TagSupport implements Tag {
         		if( favicon != null && ! favicon.isEmpty()){
         			doIcon(out, response, template_path, conn.getInitParameter("favicon.type", "image/png"), favicon);
         		}
+           		if( NavigationMenuService.NAVIGATION_MENU_FEATURE.isEnabled(conn)){
+        			doCSS(out, response, template_path,null,"nav_menu.css");
+        		}
         		//doCSS(out, response, template_path,"default css","webapp.css");
         		String style = STYLE_PREFERENCE.getCurrent(conn);
         		for(String css : conn.getExpandedProperty("styles."+style+".css", "webapp.css").split("\\s*,\\s*")) {
@@ -84,9 +87,7 @@ public class WebappHeadTag extends TagSupport implements Tag {
         		for(String script : conn.getExpandedProperty("styles."+style+".scripts", "").split("\\s*,\\s*")) {
         			doScript(scripts,out, request,response, script);
         		}
-        		if( NavigationMenuService.NAVIGATION_MENU_FEATURE.isEnabled(conn)){
-        			doCSS(out, response, template_path,null,"nav_menu.css");
-        		}
+ 
         		
         		if(SCRIPT_FORMS_FEATURE.isEnabled(conn) && request.getAttribute(FORM_PAGE_ATTR) != null){
         			doCSS(out, response, template_path,null,conn.expandText("${jquery-ui.css}"));

@@ -12,7 +12,7 @@
   --content-border-color: #000;
   --table-border-color: #000;
   --form-border-color: black;
-  --button-bg-color: #0d8040;
+  --button-bg-color: #d04016;
   --button-color: white;
   --th-color: #ffffff;
   --th-bg-color: #0d8040;
@@ -44,6 +44,14 @@
   --column-th-bg-color: #e7e7e7;
    --form-th-color: black;
   --form-th-bg-color: #e7e7e7;
+  --text-h-padding: 0px;
+  --text-h-margin: 0px;
+  --menu-hover-text-color: var(--button-bg-color);
+  
+  --notify-color: #0d8040;
+ --notify-bg-color: #ffffff;
+ --notify-hover-color: #800000;
+ --notify-hover-bg-color: #ddd;
 }
 
 
@@ -162,4 +170,17 @@ div.action_buttons {
 form.transition table.form, table.form {
 	background-color: black;
 	padding: 0;
+}
+
+
+/* put links into selected pallete */
+a:link {
+	color: var(--button-bg-color);
+}
+
+a:visited {
+	color: #983010;
+}
+.nav a img {
+	height: var(--menu-height);
 }

@@ -1,3 +1,20 @@
+:root{
+ --menu-bg-color: #000000;
+ --menu-text-color: #ffffff;
+ --menu-border-color: #888;
+ --menu-hover-bg-color: #444444;
+ --menu-hover-text-color: #ff4040;	
+ --menu-bg-has-role: #060;
+ --menu-bg-missing-role: #600;
+ --notify-color: black;
+ --notify-bg-color: #bf7a00;
+ --notify-hover-color: #800000;
+ --notify-hover-bg-color: #ffa300;
+ --menu-height: 30px;
+ --menu-height-inner: var(--menu-height);
+ --menu-min-width: 170px;
+}
+
 body{
 	margin: 0;
 }
@@ -35,11 +52,14 @@ body{
   font-size: 1.2em;
   line-height: 40px;
  */
- line-height: 30px;
+ line-height: (--var-menu-height);
   font-size: 1.0em;
   text-align: left;
 }
 
+.nav li li {
+	line-height: (--var-menu-height-inner);
+}
 /* content of a menu is a link or a div. Format them the same
  */
 .nav a , .nav div{
@@ -48,14 +68,17 @@ body{
   display: block;
   padding-left: 15px;
   padding-right: 5px;
-  height: 30px;
+  height: var(--menu-height);
   border-bottom: 1px solid var(--menu-border-color);
   transition: .3s background-color;
+}
+.nav li li a, .nav li li div{
+	height: var(--menu-height-inner);
 }
 
 /*  links change colour on hover
  */
-.nav a:hover , .nav a:focus{
+.nav li a:hover , .nav li a:focus{
  /* background-color: #005f5f;
   */
     background-color: var(--menu-hover-bg-color);
@@ -86,6 +109,10 @@ body{
 /*  line-height: auto; */
 }
 
+.nav a:link, .nav a:visited {
+	color: inherit;
+	background-color: inherit;
+}
 .nav li.has_role a {
 	background-color: var(--menu-bg-has-role);
 } 
@@ -94,8 +121,8 @@ body{
 } 
 
 .nav li.notify >  a , span.notify {
-	background-color: #bf7a00;
-	color: black;
+	background-color: var(--notify-bg-color);
+	color: var(--notify-color);
 }
 span.notify{
 	display: inline-block;
@@ -107,8 +134,8 @@ nav li.notify >  a:after, span.notify::after {
 	content: " \1F514";
 }
 .nav li.notify >  a:hover , .nav li.notify > a:focus{
-	background-color: #ffa300;
-	color: #800000;
+	background-color: var(--notify-hover-bg-color);
+	color: var(--notify-hover-color);
 }
 .nav li.external > a:after {
 	content:   url("link.png");
@@ -129,7 +156,7 @@ nav li.notify >  a:after, span.notify::after {
 /* reserve parking space at top 
  */	
   .nav{
-    min-height: 30px;
+    min-height: var(--menu-height);
     width: 100%;
     display: block;
   }
@@ -145,10 +172,10 @@ nav li.notify >  a:after, span.notify::after {
      width: auto;
   }
   .nav li {
-    min-width: 170px;
+    min-width: var(--menu-min-width);
     border-bottom: none;
-    height: 30px;
-    line-height: 30px;
+    height: var(--menu-height);
+    line-height: var(--menu-height);
     font-size: 1.0em;
     display: inline-block;
     white-space: nowrap;
@@ -159,6 +186,10 @@ nav li.notify >  a:after, span.notify::after {
  */
   }
   
+  .nav li li {
+     height: var(--menu-height-inner);
+    line-height: var(--menu-height-inner);
+  }
  
   /* restore second level to being a list ;
    */
@@ -170,15 +201,21 @@ nav li.notify >  a:after, span.notify::after {
  */
   .nav a, .nav div {
     border-bottom: none;
-    height: 30px;
+    height: var(--menu-height);
+  }
+  
+  .nav li li a, .nav li li div {
+  height: var(--menu-height-inner);
   }
   
 /*  This seems to stop image links being pushed down
  */
  .nav a img{
-    margin-bottom: 3px;
+    display: inline-block;
+ 	vertical-align: middle;
     height: 1em;
  }
+ 
 
 /*  First level menu shows centered
  */
