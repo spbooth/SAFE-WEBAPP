@@ -17,6 +17,9 @@
   --th-color: #ffffff;
   --th-bg-color: #0d8040;
   --th-hover-bg-color: #f3f3f3;
+  --menu-height: 60px;
+  --menu-height-inner: 30px;
+  
   --form-bg-color: var(--content-bg-color);
   --form-content-bg-color: #ffffff;
   --paragraph-bg-color: #ffffff;
@@ -43,7 +46,7 @@
    --column-th-color: black;
   --column-th-bg-color: #e7e7e7;
    --form-th-color: black;
-  --form-th-bg-color: #e7e7e7;
+  --form-th-bg-color: #ffffff;
   --text-h-padding: 0px;
   --text-h-margin: 0px;
   --menu-hover-text-color: var(--button-bg-color);
@@ -57,6 +60,7 @@
 
 body{
 font-family: "Open Sans", sans-serif;	
+box-sizing: border-box;
 }
 pre.loose{
 	font-family: "Open Sans", sans-serif;
@@ -135,11 +139,48 @@ background-color: #ffffff;
      border: solid black;
 }
 */
-form.transition table.form {
-	border: black;
+
+/* In this style put padding round entire form
+ */
+body > div.block > form, body > div.wideblock > form{
+  border-style: solid;
+  border-color: black;	
+  padding: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  width: auto;
+  min-width: 650px;
+}
+
+body > div.block > form.button {
+	border-style: none;
+}
+
+/** just action buttons
+ */
+body > div.block > form.view {
+	width: auto;
+	margin-left: var(--content-h-margin);
+	margin-right: var(--content-h-margin);
+	padding: 0;
+}
+table.form tr {
+        width: inherit;
+}
+table.form td , table.form. th {
+	padding: 0;
+	border-style: none;
+}
+
+table.form{
+	border-spacing: 0;
+}
+
+div.block form table.form {
+	border-style: none;
 	 background-color: var(--form-content-bg-color);
-	 padding: 10px;
-    margin-bottom: 5px;
+	 padding: 0;
+    table-layout: auto;
 }
 
 form.transition .action_buttons{
@@ -184,3 +225,16 @@ a:visited {
 .nav a img {
 	height: var(--menu-height);
 }
+
+.nav > ul {
+  padding-bottom: 1px;
+  border-bottom-style: solid;
+  border-bottom-width: 5px;
+  border-bottom-color: #0d8040;
+}
+/* This ensures room for menu wrapped to 2 rows 
+ */ 
+div.nav {
+  margin-bottom: var(--menu-height);
+}
+

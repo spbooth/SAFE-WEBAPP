@@ -159,6 +159,10 @@ public class MenuVisitor implements Visitor{
 					  builder.attr("src", servlet_service.encodeURL(image));
 					  builder.attr("alt", node.getMenuText(conn));
 					builder.close();
+					String post = node.getPostImageText();
+					if( post != null && ! post.isEmpty()) {
+						builder.clean(post);
+					}
 				}
 			builder.close();
 		}else{

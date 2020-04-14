@@ -102,6 +102,10 @@ public class LandingPageVisitor implements Visitor{
 						builder.attr("alt", node.getMenuText(conn));
 						builder.attr("title", node.getMenuText(conn));
 						builder.close();
+						String post = node.getPostImageText();
+						if( post != null && ! post.isEmpty()) {
+							builder.clean(post);
+						}
 					}
 					builder.close();
 				}else{

@@ -11,7 +11,7 @@
 	--block-v-margin: 20px;
 	/* width of content within a block, default is to use padding in block to narrow */
 	--content-width: 100%;
-	/* padding/margin for text paragraphs looks better without if content and paragraph text the same*/
+	/* padding/margin for text paragraphs looks better without if content and paragraph background the same*/
 	--text-h-padding: 8px;
 	--text-v-padding: 8px;
 	--text-v-margin: 6px;
@@ -189,15 +189,17 @@ div.item h3, div.item h4, div.item h5 , div.item h6 , div.item pre, div.item p{
 	margin: 0;
 }
 
-/* A form within a block element. This can contain a nested 
- * table for fine grain layout.
- * These are usually direct children of the top level block
+/* A form within a block element. This usually contains a nested 
+ * table for fine grain layout and a fieldset.action_button
+ * for the submit buttons. 
+ * These are usually direct children of the top level block.
+ * normally the form is just a container with styling applied
+ * to the inner elements  
+
  */
 body > div.block form, body > div.wideblock form{
 margin-top: 2px;
 margin-bottom: 2px;
-margin-left: auto;
-margin-right: auto;
 padding: 0;
 }
 
@@ -229,10 +231,15 @@ div.block p,  div.block ul, div.block ol, div.block pre, div.block div.para, div
 text-align: left;
 
 }
-
+/* first level children default to the same horizontal margin to align equally.
+ * alternatively padding can be added to the div.block but if we want any elemments
+ * full width use --content-h-margin instead.
+ * this also needs to be overridden to centre content
+ */
 body > div.block > * {
 margin-left: var(--content-h-margin);
 margin-right: var(--content-h-margin);
+border-width: 2px;
 }
 /* block content (not including table)
  * add margin at bottom so headers associate with following content
@@ -493,7 +500,11 @@ border-width: 2px;
 margin-bottom: 10px;
 
 }
-
+/** form with ONLY action buttons
+ */
+form.view > .action_buttons{
+	margin-bottom: 0;
+}
 
 label{
 	text-align: left;
@@ -571,11 +582,24 @@ margin-right: 0;
 }
 
 /* Button like links so we can open new page using right mouse */
+div.block table.navbar{
+	margin-top: 10px;
+	margin-bottom: 10px;
+	border: none;
+	border-spacing: 0;
+	background-color: inherit;	
+}
+div.block table.navbar td {
+	background-color: inherit;	
+}
 table.navbar tr td a {
     background-color: var(--button-bg-color);
     color: var(--button-color);
-    border-width: 1px;
-    border: solid black;
+    margin: 3px 0px;
+	border-style: outset;
+	border-color: black;
+    border-width: 2px;
+  
     display: block;
     text-align:center;
 }
@@ -602,7 +626,8 @@ div.block ul{
 	background-color: var(--list-bg-color);
 }
 div.block > table, div.wideblock > table, div.report > table, details > table , div.scrollwrapper > table, div > table {
-	 border: solid var(--table-border-color); 
+	 border-style: solid; 
+	 border-color: var(--table-border-color); 
 	 background-color: var(--table-bg-color);
      margin-bottom: 10px;  
 }

@@ -219,6 +219,10 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 				menu_text=menu_prop.getProperty(name+".text."+style,menu_text);
 				n.setMenuText(conn.expandText(menu_text));
 				n.setImage(image);
+				String post_text=null;
+				post_text = menu_prop.getProperty(name+".post_image_text",post_text);
+				post_text = menu_prop.getProperty(name+".post_image_text."+style,post_text);
+				n.setPostImageText(post_text);
 				if( path != null){
 					n.setTargetPath(path);
 				}

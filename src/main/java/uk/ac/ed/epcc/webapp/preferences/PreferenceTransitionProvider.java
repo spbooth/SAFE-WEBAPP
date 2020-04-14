@@ -42,7 +42,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-
+import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link ViewTransitionFactory} for editing {@link PreferenceSetting}s and {@link AbstractSetting}s.
@@ -164,6 +164,10 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 			public FormResult action(Form f) throws ActionException {
 				Object b =  f.getItem(VALUE);
 				pref.setPreference(getContext(), b);
+				NavigationMenuService nav = getContext().getService(NavigationMenuService.class);
+				if( nav != null ) {
+					nav.resetMenu();
+				}
 				return new IndexTransitionResult<>(PreferenceTransitionProvider.this);
 			}
 		}

@@ -158,3 +158,6 @@ div.action_buttons {
 .input_button{
 	border-radius: 8px;
 }
+
+table.navbar tr td a {
+	border-radius: 8px;

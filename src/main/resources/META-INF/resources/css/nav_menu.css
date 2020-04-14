@@ -13,6 +13,7 @@
  --menu-height: 30px;
  --menu-height-inner: var(--menu-height);
  --menu-min-width: 170px;
+ 
 }
 
 body{
@@ -202,6 +203,7 @@ nav li.notify >  a:after, span.notify::after {
   .nav a, .nav div {
     border-bottom: none;
     height: var(--menu-height);
+   
   }
   
   .nav li li a, .nav li li div {
