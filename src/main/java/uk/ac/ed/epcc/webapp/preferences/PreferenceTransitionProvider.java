@@ -102,6 +102,10 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		
 			try {
 				((PreferenceSetting)target).clearPreference(c);
+				NavigationMenuService nav = getContext().getService(NavigationMenuService.class);
+				if( nav != null ) {
+					nav.resetMenu();
+				}
 			} catch (DataFault e) {
 				c.getService(LoggerService.class).getLogger(getClass()).error("Error clearing preference",e);
 				throw new TransitionException("Internal error");
