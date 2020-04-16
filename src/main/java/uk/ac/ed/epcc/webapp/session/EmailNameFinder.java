@@ -301,6 +301,7 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 				if( login_fac.hasComposite(PasswordAuthComposite.class)){
 					ExtendedXMLBuilder text = cb.getText();
 					text.open("em");
+					text.addClass("notice");
 					PreDefinedContent m = new PreDefinedContent(op.getContext(),"change_email_password");
 					m.addContent(text);
 					text.close();
