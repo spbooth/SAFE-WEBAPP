@@ -672,9 +672,12 @@ text-align: center;
 	color: orange;
 }
 .notice, .notice.sorting_1 {
+	color: var(--notice-color);
 	background-color: var(--notice-bg-color);
+	font-style: italic;
 }
 .highlight,div.block  p.highlight {
+  color: var(--highlight-color);
   background-color: var(--highlight-bg-color);
 }
 
@@ -720,9 +723,11 @@ div td[format=over]{
 	color: blue;
 }
 div td[highlight=true]{
+	color: var(--hightlight-color);
 	background-color: var(--highlight-bg-color);
 }
 div td[notice=true]{
+	color: var(--notice-color);
 	background-color: var(--notice-bg-color);
 }
 div.block p.comment {

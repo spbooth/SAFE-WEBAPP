@@ -3,9 +3,11 @@
   --heading-bg-color: #ffffff;
   --bar-bg-color: #ffffff;
   --bar-text-color: #000;
-  --notice-bg-color: #ffcccc;
-  --highlight-bg-color: #ffffcc;
-  --highlight-hover-color: #ffeecc;
+  --notice-color: #0d8040;
+  --notice-bg-color: #ffffff;
+  --highlight-color: #0d8040;
+  --highlight-bg-color: #ffffff;
+  --highlight-hover-color: #f3f3f3;
   --warn-bg-color: #ff0000;
   --content-bg-color: #ffffff;
   --table-bg-color: #000;
@@ -183,7 +185,7 @@ div.block form table.form {
     table-layout: auto;
 }
 
-form.transition .action_buttons{
+form.transition .action_buttons, form .action_buttons{
     margin-top: 0;
     margin-left: 0;
     margin-right: 0;
