@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2017                            |
+//| Copyright - The University of Edinburgh 2020                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -14,45 +14,28 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.util.Iterator;
-import java.util.Set;
 
-/** Interface for inputs that provide auto-complete text.
- * @author spb
+/** An {@link ItemInput} that suggests possible items.
+ * 
+ * The input may also allow additional items beyond the suggested set
+ * @author Stephen Booth
  *
- * @param <T> item type
- * @param <V> input type
  */
-public interface AutoComplete<T,V> extends SuggestedItemInput<V,T>, ParseInput<V> {
-
-	/** Get the set of Items corresponding to a suggested values
+public interface SuggestedItemInput<V, T> extends ItemInput<V, T> {
+	/**
+	 * get a list of domain objects that are being selected
 	 * 
-	 * @return
+	 * @return Iterator
 	 */
-	// subclasses should override to return a list of possible completions
-	Set<T> getSuggestions();
+	public abstract Iterator<T> getItems();
 
-	/** Map an item to the corresponding value (compatible with the parse method).
+	/** get the number of suggested items.
+	 * null selections don't count.
 	 * 
-	 * @param item
-	 * @return String value
+	 * @return int
 	 */
-	String getValue(T item);
-
-	/** get the suggestion text. This can be an expanded form of the value
-	 * 
-	 * @param item
-	 * @return
-	 */
-	String getSuggestionText(T item);
-
-	@Override
-	default Iterator<T> getItems() {
-		return getSuggestions().iterator();
-	}
-
-	@Override
-	default int getCount() {
-		return getSuggestions().size();
-	}
-
+	public int getCount();
+	
+	
+	
 }

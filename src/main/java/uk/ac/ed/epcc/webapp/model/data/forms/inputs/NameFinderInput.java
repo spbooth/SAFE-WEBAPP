@@ -1,5 +1,6 @@
 package uk.ac.ed.epcc.webapp.model.data.forms.inputs;
 
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -213,5 +214,6 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	public void setMatchError(String match_error) {
 		this.match_error = match_error;
 	}
+	
 	
 }

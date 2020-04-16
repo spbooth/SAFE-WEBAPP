@@ -19,6 +19,7 @@ import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.SuggestedItemInput;
 
 /** A {@link Selector} that pre-populates an input to a valid value if it can.
  * (ie a valid item if the input is a {@link ListInput}.
@@ -44,8 +45,8 @@ public class GuessSelector<T extends Input> extends AbstractContexed implements 
 	@Override
 	public T getInput() {
 		T input = nested.getInput();
-		if( input instanceof ListInput) {
-			ListInput listInput = (ListInput)input;
+		if( input instanceof SuggestedItemInput) {
+			SuggestedItemInput listInput = (SuggestedItemInput)input;
 			Iterator it = listInput.getItems();
 			if( it.hasNext()) {
 				listInput.setItem(it.next());
