@@ -631,6 +631,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		}
 		String url = getURL(c, tp, target, null);
 		hb.open("form");
+		hb.addClass("button");
         hb.attr("method", "post");
         ServletService serv = c.getService(ServletService.class);
          if (serv != null) {

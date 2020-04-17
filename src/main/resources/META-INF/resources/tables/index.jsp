@@ -38,7 +38,7 @@ for(String table : map.keySet()){
 	<h4>Table Type: <%=clazz.getSimpleName() %></h4>
 	<form action="<%=response.encodeURL(request.getContextPath()+TransitionServlet.getURL(conn, provider, target))%>" method="post">
 	<div class="action_buttons">
-	<input type="submit" value="Administer Table"/>
+	<input class="input_button" type="submit" value="Administer Table"/>
 	</div>
 	</form>
 <%  }else{ %>
