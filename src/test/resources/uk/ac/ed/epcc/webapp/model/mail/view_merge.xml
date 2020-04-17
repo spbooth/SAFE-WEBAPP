@@ -3,7 +3,7 @@
 <top>
 <div class="bar">
 <h2>Send Message</h2>
-<form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
+<form class="button" method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0"/>
 <input type="hidden" name="Transition" value="Send"/>
 <input class="input_button" type="submit" value="Send"/>
@@ -11,7 +11,7 @@
 </div>
 <div class="bar">
 <h2>Abort Message</h2>
-<form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
+<form class="button" method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0"/>
 <input type="hidden" name="Transition" value="Abort"/>
 <input class="input_button" type="submit" value="Abort"/>
@@ -19,7 +19,7 @@
 </div>
 <div class="bar">
 <h2>Undo all edits</h2>
-<form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
+<form class="button" method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0"/>
 <input type="hidden" name="Transition" value="StartOver"/>
 <input class="input_button" type="submit" value="StartOver"/>
@@ -31,20 +31,20 @@
 <div class="message">
 <h4>To: fred@example.com</h4>
 <h4>
-<form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/CC0">
+<form class="button" method="post" action="test/TransitionServlet/Email:TestMessage/1/0/CC0">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0/CC0"/>
 <input type="hidden" name="Transition" value="Delete"/>
 <input class="input_button" type="submit" value="Delete recipient"/>
 </form> CC: boris@example.xcom</h4>
 <h3>
-<form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
+<form class="button" method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0"/>
 <input type="hidden" name="Transition" value="AddRecipient"/>
 <input class="input_button" type="submit" value="Add"/>
 </form> New Recipient</h3>
 <h4>From: dummy@example.com</h4>
 <h4>
-<form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/Subject">
+<form class="button" method="post" action="test/TransitionServlet/Email:TestMessage/1/0/Subject">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0/Subject"/>
 <input type="hidden" name="Transition" value="EditSubject"/>
 <input class="input_button" type="submit" value="Edit Subject"/>
@@ -58,12 +58,12 @@
 &gt; A header
 &gt; And a [http://www.example.com] link
 </pre>
-<form method="post" action="test/TransitionServlet/Email:TestMessage/1/0/T">
+<form class="button" method="post" action="test/TransitionServlet/Email:TestMessage/1/0/T">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0/T"/>
 <input type="hidden" name="Transition" value="Edit"/>
 <input class="input_button" type="submit" value="Edit"/>
 </form>
-<form method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
+<form class="button" method="post" action="test/TransitionServlet/Email:TestMessage/1/0">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMessage1/0"/>
 <input type="hidden" name="Transition" value="AddAttachment"/>
 <input class="input_button" type="submit" value="Add Attachment"/>

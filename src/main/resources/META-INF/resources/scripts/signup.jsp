@@ -57,7 +57,7 @@ signup.jsp - Page used to sign up for an account using password auth.
 
 <div class="block">
 <H2><%=page_title%></H2>
-<p class="highlight">
+<p class="notice">
 This is the <%=service_name%> <%=website_name%>.  
 </p>
 </div>
@@ -73,7 +73,7 @@ boolean multi = creator.useMultiPart();
 <div class="block" role="main">
 <h2>Registration form</h2>
 <% if( person_fac.hasComposite(PasswordAuthComposite.class)){ %>
-<p class="highlight"> This form is to sign-up for a new <%=website_name%> account.
+<p class="notice"> This form is to sign-up for a new <%=website_name%> account.
 If you already have an account then
 <a href="<%=web_path%>/login.jsp">login</a>.
 <% PasswordAuthComposite password_auth = person_fac.getComposite(PasswordAuthComposite.class);
