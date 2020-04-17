@@ -206,10 +206,15 @@ div.action_buttons {
 	  padding: 5px;
 	  border-color: var(--form-border-color);
 }
+
 .input_button{
 	border-radius: 8px;
 }
 
+:disabled, .disabled, .input_button:disabled, .input_button.disabled{
+	color: white;
+	background-color: grey;
+}
 form.transition table.form, table.form {
 	background-color: black;
 	padding: 0;
