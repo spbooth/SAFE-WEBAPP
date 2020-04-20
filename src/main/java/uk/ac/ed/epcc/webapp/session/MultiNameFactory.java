@@ -144,7 +144,7 @@ public class MultiNameFactory<N extends MultiNameFactory.Name, AU extends AppUse
 		}
 		result = makeBDO();
 		result.setName(name);
-		return null;
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -157,7 +157,7 @@ public class MultiNameFactory<N extends MultiNameFactory.Name, AU extends AppUse
 	}
 
 	public SQLFilter<AU> getPersonFilter(String name){
-		return getDestFilter(getStringFinderFilter(name), NAME, getContext().getService(SessionService.class).getLoginFactory());
+		return getDestFilter(getStringFinderFilter(name), PERSON, getContext().getService(SessionService.class).getLoginFactory());
 	}
 	
 	public Set<String> getNames(AU person){

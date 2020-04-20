@@ -53,7 +53,7 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 		super(factory);
 		if( realm.contains(".")){
 			// realm names should be unqualified so strip of any qualifying prefix.
-			realm=realm.substring(realm.lastIndexOf('.'));
+			realm=realm.substring(realm.lastIndexOf('.')+1);
 		}
 		this.realm=realm;
 	}

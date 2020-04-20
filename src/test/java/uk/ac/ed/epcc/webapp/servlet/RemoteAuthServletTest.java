@@ -71,7 +71,24 @@ public class RemoteAuthServletTest<A extends AppUser> extends ServletTest {
 		checkMessage("remote_auth_set");
 		checkDiff("/cleanup.xsl", "remote_set.xml");
 	}
-	
+	@Test
+	@ConfigFixtures("multi_remote.properties")
+	public void testRegisterMulti() throws ConsistencyError, Exception{
+		MockTansport.clear();
+		takeBaseline();
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		ctx.getService(SessionService.class).setCurrentPerson(user);
+		
+		req.remote_user="fred";
+		doPost();
+		checkMessage("remote_auth_set");
+		checkDiff("/cleanup.xsl", "remote_set2.xml");
+	}
 	
 	@Test
 	public void testSignupRegister() throws ConsistencyError, Exception{
@@ -97,6 +114,29 @@ public class RemoteAuthServletTest<A extends AppUser> extends ServletTest {
 	}
 	
 	@Test
+	@ConfigFixtures("multi_remote.properties")
+	public void testSignupRegisterMulti() throws ConsistencyError, Exception{
+		MockTansport.clear();
+		takeBaseline();
+		SessionService sess = ctx.getService(SessionService.class);
+		AppUserFactory<A> fac = sess.getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		//  Calling registerNewuser should allow a user to bind
+		// an existing is and login
+		RemoteAuthServlet.registerNewUser(ctx, user);
+		assertFalse(sess.haveCurrentUser());
+		
+		req.remote_user="fred";
+		doPost();
+		checkMessage("remote_auth_set");
+		assertTrue(sess.isCurrentPerson(user));
+		checkDiff("/cleanup.xsl", "remote_set2.xml");
+	}
+	@Test
 	@DataBaseFixtures("remote_set.xml")
 	public void testReRegister() throws ConsistencyError, Exception{
 		MockTansport.clear();
@@ -119,8 +159,42 @@ public class RemoteAuthServletTest<A extends AppUser> extends ServletTest {
 	}
 	
 	@Test
+	@DataBaseFixtures("remote_set2.xml")
+	@ConfigFixtures("multi_remote.properties")
+	public void testReRegisterMulti() throws ConsistencyError, Exception{
+		MockTansport.clear();
+		takeBaseline();
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred2@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		ctx.getService(SessionService.class).setCurrentPerson(user);
+		
+		req.remote_user="fred";
+		doPost();
+		checkMessage("remote_auth_set");
+		checkDiff("/cleanup.xsl", "remote_reset2.xml");
+		
+		A old_user  = fac.findByEmail("fred@example.com");
+		assertNull(old_user.getRealmName(WebNameFinder.WEB_NAME));
+	}
+	
+	@Test
 	@DataBaseFixtures("remote_set.xml")
 	public void testLogin() throws ConsistencyError, Exception{
+		
+		req.remote_user="fred";
+		doPost();
+		checkRedirect("/main.jsp");
+		assertEquals("fred@example.com",ctx.getService(SessionService.class).getCurrentPerson().getEmail());
+	}
+	
+	@Test
+	@DataBaseFixtures("remote_set2.xml")
+	@ConfigFixtures("multi_remote.properties")
+	public void testLoginMulti() throws ConsistencyError, Exception{
 		
 		req.remote_user="fred";
 		doPost();

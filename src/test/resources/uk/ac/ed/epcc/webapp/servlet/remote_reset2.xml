@@ -1,0 +1,12 @@
+<Diff><OIDC id='1'>
+<Person>2</Person>
+</OIDC>
+<Person id='2'>
+<Email>fred2@example.com</Email>
+<PasswordFails>0</PasswordFails>
+<PasswordStatus>V</PasswordStatus>
+<Salt>WrX169i6YjprvypI</Salt>
+<Alg>2</Alg>
+<Password>c3a6fbbccbce2e54305622c001a78c9b4c820b1804c3b338e9da5992e008f6be</Password>
+</Person>
+</Diff>
