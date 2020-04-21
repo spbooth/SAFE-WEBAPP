@@ -17,7 +17,7 @@
 	--text-v-margin: 6px;
 	
 	--table-width: 100%;
-	
+	--cell-padding: 3px;
 	/* standard special markup 
 	 * different hover color for styles used in form tables
 	 */
@@ -407,6 +407,7 @@ details div.description{
 
 div td, div table.auto td form , div.block td ul, div.block td ol{
         background-color: #ffffff;
+        padding: var(--cell-padding);
 }
 td.numeric, td[numeric] ,  td.numeric input {
 text-align: right;
@@ -416,6 +417,7 @@ white-space: nowrap;
 div th {
         color: var(--th-color);
         background-color: var(--th-bg-color);
+        padding: var(--cell-padding);
 }
 div table.column th{
         color: var(--column-th-color);
@@ -572,10 +574,12 @@ margin-bottom: 5px;
 margin-left: 0;
 margin-right: 0;
 }
+.action_buttons > * {
+	margin: 5px;
+}
 
 /* styling for input buttons */
 .input_button {
-	margin: 3px 0px;
 	border-style: outset;
 	background-color: var(--button-bg-color);
 	color: var(--button-color);
@@ -630,6 +634,15 @@ div.block > table, div.wideblock > table, div.report > table, details > table , 
 	 border-color: var(--table-border-color); 
 	 background-color: var(--table-bg-color);
      margin-bottom: 10px;  
+}
+
+/* custom content table within a form should be a normal table
+ * it it was a a table.form we set differently
+ */
+div table {
+	 border-style: solid; 
+	 border-color: var(--table-border-color); 
+	 background-color: var(--table-bg-color);
 }
 
 div.block > table:last-child, div.wideblock > table:last-child, div.report > table:last-child, details > table:last-child , div.scrollwrapper > table:last-child{
@@ -903,4 +916,9 @@ table.dataTable.display tbody tr td.ORANGE.sorting_1, td.ORANGE,  span.ORANGE{
 }
 table.dataTable.display tbody tr td.RED.sorting_1, td.RED,  span.RED{
    background: red;
+}
+
+/* allocations use this for end dates in the past */
+.grey {
+ background-color: #cccccc;
 }

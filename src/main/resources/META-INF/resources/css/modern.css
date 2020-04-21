@@ -5,9 +5,7 @@
   --bar-text-color: #000;
   --notice-color: #0d8040;
   --notice-bg-color: #ffffff;
-  --highlight-color: #0d8040;
-  --highlight-bg-color: #ffffff;
-  --highlight-hover-color: #f3f3f3;
+  
   --warn-bg-color: #ff0000;
   --content-bg-color: #ffffff;
   --table-bg-color: #000;
@@ -19,6 +17,7 @@
   --th-color: #ffffff;
   --th-bg-color: #0d8040;
   --th-hover-bg-color: #f3f3f3;
+  --cell-padding: 6px;
   --menu-height: 60px;
   --menu-height-inner: 30px;
   
@@ -33,7 +32,7 @@
   --menu-hover-bg-color: #ddd;
   --menu-hover-text-color: #ff0000;
   --block-radius: 0px;
-  --form-radius: 15px;
+  
    --block-v-padding: 10px;
   --block-h-padding: 10px;
   --block-v-margin: 20px;
@@ -194,10 +193,7 @@ form.transition .action_buttons, form .action_buttons{
 	 background-color: var(--form-content-bg-color);
 	 padding: 10px;
 }
-.nav ul li ul  {
-	border-color: black;
-	border-width: 0.2px;
-}
+
 div td.button{
 	background-color: #fff;
 }
@@ -208,7 +204,8 @@ div.action_buttons {
 }
 
 .input_button{
-	border-radius: 8px;
+	border-radius: 4px;
+  padding: 3px;
 }
 
 :disabled, .disabled, .input_button:disabled, .input_button.disabled{
@@ -229,8 +226,11 @@ a:link {
 a:visited {
 	color: #983010;
 }
-.nav a img {
-	height: var(--menu-height);
+
+/* fix image size in top level menu */
+.nav > ul > li > a > img {
+	height: 50px;
+	margin-left: 10px;
 }
 
 .nav > ul {

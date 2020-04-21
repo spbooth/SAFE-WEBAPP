@@ -256,7 +256,7 @@ nav li.notify >  a:after, span.notify::after {
     box-shadow: 2px 4px #888888;
   }
   .nav ul li ul  {
-	
+	border: 1px solid rgba(0,0,0,.15);
     box-shadow: 1px 1px #888888;
     
 }
