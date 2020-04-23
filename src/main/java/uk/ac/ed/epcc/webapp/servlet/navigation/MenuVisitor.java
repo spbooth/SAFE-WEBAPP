@@ -25,6 +25,11 @@ import uk.ac.ed.epcc.webapp.servlet.ServletService;
  *
  */
 public class MenuVisitor implements Visitor{
+	
+	/** preference switch for access keys in menus. Off be default as it can be an accessibility issue
+	 * 
+	 */
+	public static final Preference ACCESS_KEYS = new Preference("navigation.access_keys", false, "Set access-keys for quick navigation to menu entries");
 	/**
 	 * 
 	 */
@@ -143,9 +148,11 @@ public class MenuVisitor implements Visitor{
 			
 			builder.open("a");
 				builder.attr("href", node.getTargetURL(servlet_service));
-				char key = node.getAccessKey(conn);
-				if( key != 0 ){
-					builder.attr("accesskey",String.valueOf(key));
+				if( ACCESS_KEYS.isEnabled(conn)) {
+					char key = node.getAccessKey(conn);
+					if( key != 0 ){
+						builder.attr("accesskey",String.valueOf(key));
+					}
 				}
 				String target_attr = node.getTargetAttr();
 				if( target_attr != null ) {
