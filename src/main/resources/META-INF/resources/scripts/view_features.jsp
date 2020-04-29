@@ -37,7 +37,7 @@
 <br>
 <%@page import="uk.ac.ed.epcc.webapp.content.*" %>
 <div class="block">
-<h2>Configuration features</h2>
+<h1>Configuration features</h1>
 <p>This is the list of current configurable features. The list is populated as
 features are referenced so may be incomplete when the server first starts.</p>
 <% HtmlBuilder builder = new HtmlBuilder();

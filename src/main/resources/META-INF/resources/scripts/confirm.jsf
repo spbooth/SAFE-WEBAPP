@@ -70,7 +70,7 @@ if( message_type != null ){
 	if( post_url == null ) post_url = 	request.getParameter(WebappServlet.CONFIRM_POST_URL);
 %>
 <div class="block" role="main">
-<h2><%=message_title %></h2>
+<h1><%=message_title %></h1>
 <%if( extra_html != null ){ %>
 <%= extra_html %>
 <%} %>

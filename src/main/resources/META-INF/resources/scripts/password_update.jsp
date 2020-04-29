@@ -53,7 +53,7 @@ you cannot change the password for this account.<br/><br/>
 if( must_change ){
 %>
 <div class="block">
-<h2>Please change your <%=website_name %> password</h2>
+<h1>Please change your <%=website_name %> password</h1>
 <p class="warn">
 Your <%=website_name %> password has expired and should be changed.
 </p>
@@ -76,7 +76,7 @@ fac.buildForm(f,sess.getCurrentPerson(),conn);
 
 %>
 <div class="block">
-<h2><%=page_title %></h2>
+<h1><%=page_title %></h1>
 <p>
 <%=fac.getPasswordPolicy() %>
 </p>

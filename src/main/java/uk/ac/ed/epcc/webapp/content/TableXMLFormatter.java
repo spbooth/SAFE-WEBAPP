@@ -32,6 +32,7 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
     protected final SimpleXMLBuilder hb;
     private final NumberFormat nf;
     private boolean table_sections=false;
+    private boolean add_scope=false;
     private String style;
     public TableXMLFormatter(SimpleXMLBuilder builder,NumberFormat nf,String style){
     	this.hb=builder;
@@ -43,6 +44,9 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
     }
     public void setTableSections(boolean val){
     	table_sections=val;
+    }
+    public void setUseScope(boolean val) {
+    	add_scope=val;
     }
     /* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.TableFormatPolicy#add(uk.ac.ed.epcc.webapp.content.Table)
@@ -77,6 +81,9 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 						{"class","key"},
 						{"count",Integer.toString(col++)}
 				});
+				if( add_scope) {
+					hb.attr("scope","col" );
+				}
 				hb.clean( t.getKeyName());
 				hb.close();
 				first_col=false;
@@ -88,6 +95,9 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 							{"class","first"},
 							{"count",Integer.toString(col++)}
 					});
+					if( add_scope) {
+						hb.attr("scope","col" );
+					}
 					if( key instanceof XMLGenerator){
 						((XMLGenerator)key).addContent(hb);
 					}else{
@@ -225,6 +235,9 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 			}
     		if( t.printKeys()){
     			hb.open("th");
+    			if( add_scope ) {
+    				hb.attr("scope", "row");
+    			}
     			addContent(t.getKeyText(row));
     			hb.close();
     		}

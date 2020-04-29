@@ -113,7 +113,7 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 }
 %>
 <div class="block">
-<h2><%=new HtmlBuilder().clean(page_heading).toString() %></h2>
+<h1><%=new HtmlBuilder().clean(page_heading).toString() %></h1>
 
 <% if(target != null ){ %>
 <%= tp.getSummaryContent(conn,new HtmlBuilder(),target).toString() %>

@@ -38,7 +38,7 @@
 <br>
 <%@page import="uk.ac.ed.epcc.webapp.content.*" %>
 <div class="block">
-<h2>Database connections</h2>
+<h1>Database connections</h1>
 <% HtmlBuilder builder = new HtmlBuilder();
 builder.addTable(conn, WrappedDatabaseService.getStatusTable());
 %>

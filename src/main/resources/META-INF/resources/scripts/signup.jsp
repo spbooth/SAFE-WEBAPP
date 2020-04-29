@@ -56,7 +56,7 @@ signup.jsp - Page used to sign up for an account using password auth.
 <%@ include file="/std_header.jsf" %>
 
 <div class="block">
-<H2><%=page_title%></H2>
+<H1><%=page_title%></H1>
 <p class="notice">
 This is the <%=service_name%> <%=website_name%>.  
 </p>

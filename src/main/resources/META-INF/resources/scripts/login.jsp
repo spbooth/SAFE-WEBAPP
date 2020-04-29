@@ -83,14 +83,14 @@
       String webname = conn.getService(ServletService.class).getWebName(); 
       if( webname==null || webname.trim().length() == 0  ){ %>
 <div class="block">
-<H2>User not authenticated</H2>
+<H1>User not authenticated</H1>
 <p>
 Please authenticate with the web-server before registering with this service.
 <p>
 </div>
 <%}else if(! RegisterServlet.ALLOW_SIGNUPS.isEnabled(conn)){ %>
 <div class="block">
-<H2>User <%=webname %> not registered</H2>
+<H1>User <%=webname %> not registered</H1>
 <p>
 This service is only available to pre-registered users.
 <p>
@@ -98,7 +98,7 @@ This service is only available to pre-registered users.
 <%}else{ %>
 
 <div class="block" role="main">
-<h2>Register <%=webname %></h2>
+<h1>Register <%=webname %></h1>
 <p>Welcome to the <%=service_name%> <%=website_name%>.</p>
 <p> Please fill in this form to register with this service</p>
 </div>
@@ -109,7 +109,7 @@ This service is only available to pre-registered users.
 %>
 <div class="block">
 <%@ include file="/scripts/form_context.jsf" %>
-  <h2>Your Details:</h2>
+  <h1>Your Details:</h1>
   <form method="post" action="<%= web_path %>/RegisterServlet">
    <input type="hidden" name="action" value="REGISTER">
       <table class="form">
@@ -124,7 +124,7 @@ This service is only available to pre-registered users.
       // offer password based login   
 %>
 <div class="block" role="main">
-<h2><%=page_title %></h2>
+<h1><%=page_title %></h1>
 <%=conn.getExpandedProperty("login.welcome","Welcome to ${service.name}")%>
 <%=conn.getExpandedProperty("login.link","")%>
 <% if("login".equals(request.getParameter("error"))) { %>

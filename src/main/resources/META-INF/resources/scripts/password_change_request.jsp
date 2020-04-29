@@ -29,7 +29,7 @@
 
 <%@ include file="/scripts/form_context.jsf" %>
 <div class="block" role="main">
-<h2>Please set a password for use with the <%=website_name %></h2>
+<h1>Please set a password for use with the <%=website_name %></h1>
 <% if( form.hasSubmitted() && form.hasError()){ %>
 <h3>This form contains errors:</h3>
 <p class="warn">	
