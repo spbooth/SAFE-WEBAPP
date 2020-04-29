@@ -4,13 +4,13 @@
 <table class="form">
 <tr class="even">
 <th>
-<label class="required">Min</label>
+<span class="required">Min</span>
 </th>
 <td>1</td>
 </tr>
 <tr class="odd">
 <th>
-<label class="required">Max</label>
+<span class="required">Max</span>
 </th>
 <td>100</td>
 </tr>

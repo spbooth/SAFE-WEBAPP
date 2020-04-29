@@ -3,13 +3,13 @@
 <table class="form">
 <tr class="even">
 <th>
-<label class="required">Hundreds</label>
+<span class="required">Hundreds</span>
 </th>
 <td>700</td>
 </tr>
 <tr class="odd">
 <th>
-<label class="required">Tens</label>
+<span class="required">Tens</span>
 </th>
 <td>730</td>
 </tr>

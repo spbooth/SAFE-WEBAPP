@@ -11,7 +11,7 @@
 <table class="form">
 <tr class="even">
 <th>
-<label class="required">New key</label>
+<span class="required">New key</span>
 </th>
 <td>UJ4SLJJPNPXVGIPLXDTQUGVKNI</td>
 </tr>

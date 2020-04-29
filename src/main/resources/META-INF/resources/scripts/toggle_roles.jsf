@@ -18,7 +18,11 @@ for(Iterator it=session_service.getToggleRoles().iterator(); it.hasNext(); ){
 	  String role_name=role;
 	  HtmlBuilder role_hb = new HtmlBuilder();
 	  role_hb = (HtmlBuilder)role_hb.getPanel("bar");
-	  role_hb.addHeading(3, "You are "+ (session_service.hasRole(role)? "": " NOT ")+role_name );
+	  boolean has_role= session_service.hasRole(role);
+	  ExtendedXMLBuilder h = (ExtendedXMLBuilder) role_hb.getHeading(3);
+	  h.addClass(has_role ? "has_role" : "missing_role" );
+	  h.clean("You are "+ (has_role? "": " NOT ")+role_name );
+	  h.appendParent();
 	  role_hb.open("form");
 	  role_hb.attr("method", "post");
 	  role_hb.attr("action",response.encodeURL(request.getContextPath()+"/UserServlet"));

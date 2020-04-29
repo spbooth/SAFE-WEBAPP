@@ -114,10 +114,10 @@ body{
 	color: inherit;
 	background-color: inherit;
 }
-.nav li.has_role a {
+.nav li.has_role a , div.bar h3.has_role{
 	background-color: var(--menu-bg-has-role);
 } 
-.nav li.missing_role a {
+.nav li.missing_role a , div.bar h3.missing_role{
 	background-color: var(--menu-bg-missing-role);
 } 
 

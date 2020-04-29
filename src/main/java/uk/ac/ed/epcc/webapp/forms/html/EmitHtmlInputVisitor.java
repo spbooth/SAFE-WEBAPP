@@ -64,7 +64,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 	private static final Preference USE_HTML5_FEATURE = new Preference("html5", true,"use html5 input types"); 
 	private static final Preference ESCAPE_UNICODE_FEATURE = new Preference("html.input.escape_unicode",false,"Escape high code point characters in input values");
 	private static final Feature USE_DATALIST = new Feature("html5.use_datalist",true,"Use html5 datalist syntax, disable to test the fallback mode (as if browser does not userstand datalist)");
-	private static final Feature LOCK_FORCED_LIST = new Feature("html.list_input.lock_forced",false,"Supress mandatory pull-down inputs with a single choice");
+	static final Feature LOCK_FORCED_LIST = new Feature("html.list_input.lock_forced",false,"Supress mandatory pull-down inputs with a single choice");
 	
 	private ExtendedXMLBuilder hb;
 	private boolean use_post;
@@ -83,7 +83,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		this.hb=hb;
 		this.use_post=use_post;
 		this.post_params=post_params;
-		this.id_vis = new InputIdVisitor(prefix);
+		this.id_vis = new InputIdVisitor(conn,optional,prefix);
 		this.data_attr=data_attr;
 		use_html5 = conn==null || USE_HTML5_FEATURE.isEnabled(conn);
 	}

@@ -13,7 +13,7 @@
 <table class="form">
 <tr class="even">
 <th>
-<label class="required">Email</label>
+<span class="required">Email</span>
 </th>
 <td>fred@example.com</td>
 </tr>

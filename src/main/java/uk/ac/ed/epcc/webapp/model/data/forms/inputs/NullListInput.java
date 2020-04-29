@@ -75,7 +75,7 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 	}
 	@Override
 	public int getCount(){
-		return internal.getCount();
+		return internal.getCount()+1;
 	}
 
 	@Override
