@@ -325,7 +325,7 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 		checkFormContent(null, "set_roles_form.xml");
 		addParam("Pig", "Y");
 		runTransition();
-		checkMessage("object_updated");
+		checkMessage("roles_updated");
 		checkDiff("/cleanup.xsl", "roles.xml");
 	}
 }

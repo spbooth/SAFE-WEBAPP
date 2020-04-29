@@ -67,6 +67,10 @@ public class FileInput extends AbstractInput<StreamData> {
     	max_upload=val;
     	return old;
     }
+    
+    public long getMaxUpload() {
+    	return max_upload;
+    }
 	
 	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
