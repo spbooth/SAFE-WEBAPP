@@ -525,24 +525,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		}
 		return spec;
 	}
-	/** find an item by owner and value
-	 * 
-	 * @param q
-	 * @param v
-	 * @param link
-	 * @param allow_null
-	 * @return Item
-	 * @throws DataException
-	 */
-	public T find(O q, ItemType.ItemValue v, int link, boolean allow_null)
-			throws DataException {
-		SQLAndFilter<T> fil = new SQLAndFilter<>(getTarget());
-		fil.addFilter(getOwnerFilter(q));
-		fil.addFilter(getItemFilter(v));
-		fil.addFilter(new SQLValueFilter<>(getTarget(),res, LINK_ID, link));
-		return find(fil,allow_null);
-		
-	}
+	
 	
 	protected ReferenceFilter<T, O> getOwnerFilter(O q) {
 		return new ReferenceFilter<>(this, OWNER_ID, q);
@@ -563,16 +546,37 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		return find(fil,allow_null);
 		
 	}
+	/** find an item by owner and value
+	 * 
+	 * @param q
+	 * @param v
+	 * @param link
+	 * @param allow_null
+	 * @return Item
+	 * @throws DataException
+	 */
+	public  T find(O owner,ItemType.ItemValue v, int link, boolean allow_null)
+			throws DataException {
+		SQLAndFilter<T> fil;
+		fil = getItemFilter(owner,v, link);
+		return find(fil,allow_null);
+		
+	}
 	/** get a SQL filter to items that point to a particular target.
 	 * @param v
 	 * @param link
 	 * @return
 	 */
-	private SQLAndFilter<T> getItemFilter(ItemType.ItemValue v, int link) {
+	protected SQLAndFilter<T> getItemFilter(ItemType.ItemValue v, int link) {
 		SQLAndFilter<T> fil;
 		fil = new SQLAndFilter<>(getTarget());
 		fil.addFilter(getItemFilter(v));
 		fil.addFilter(new SQLValueFilter<>(getTarget(),res, LINK_ID, link));
+		return fil;
+	}
+	protected SQLAndFilter<T> getItemFilter(O q, ItemType.ItemValue v, int link) {
+		SQLAndFilter<T> fil = getItemFilter(v,link);
+		fil.addFilter(getOwnerFilter(q));
 		return fil;
 	}
 	/** get all owners that reference a particular owner from their log.
