@@ -55,13 +55,17 @@ public class TextInput extends ParseAbstractInput<String> {
 			return null;
 		} else {
 			if( force_single ){
-				v = v.replace("\n", "");
+				v = mapToSingleLine(v);
 			}
 			if( getTrim()){
 				v = v.trim();
 			}
 			return v;
 		}
+	}
+
+	protected String mapToSingleLine(String v) {
+		return v.replace("\n", "");
 	}
 
 	public boolean getTrim() {

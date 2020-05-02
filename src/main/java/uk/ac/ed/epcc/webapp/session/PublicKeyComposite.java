@@ -1,6 +1,5 @@
 package uk.ac.ed.epcc.webapp.session;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -8,6 +7,7 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
+import uk.ac.ed.epcc.webapp.content.ScrollText;
 import uk.ac.ed.epcc.webapp.content.TemplateContributor;
 import uk.ac.ed.epcc.webapp.content.TemplateFile;
 import uk.ac.ed.epcc.webapp.forms.Form;
@@ -22,7 +22,6 @@ import uk.ac.ed.epcc.webapp.model.MetaDataContributer;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
-import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
 
 /** A {@link Composite} that adds a SSH public key to an {@link AppUser}
  * 
@@ -174,14 +173,15 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 	public void addAttributes(Map<String, Object> attributes, AppUser target) {
 		String ssh_key = getPublicKey(target);
 		if( ssh_key != null && ssh_key.trim().length() > 0 ){
-			StringBuilder sb = new StringBuilder();
-			for(int i=0 ; i< ssh_key.length() ; i++){
-				sb.append(ssh_key.charAt(i));
-				if( i > 0 && (i % 40 == 0)){
-					sb.append("\n");
-				}
-			}
-			attributes.put("SSH Key", sb.toString());
+//			StringBuilder sb = new StringBuilder();
+//			for(int i=0 ; i< ssh_key.length() ; i++){
+//				sb.append(ssh_key.charAt(i));
+//				if( i > 0 && (i % 40 == 0)){
+//					sb.append("\n");
+//				}
+//			}
+//			attributes.put("SSH Key", sb.toString());
+			attributes.put("SSH Key", new ScrollText(ssh_key));
 		}
 
 	}

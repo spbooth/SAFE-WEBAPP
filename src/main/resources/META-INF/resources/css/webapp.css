@@ -147,6 +147,14 @@ div.scrollwrapper {
 	overflow: auto;
 }
 
+div.scrolltext {
+	display: inline-block;
+	max-width: 600px;
+}
+div.scrolltext > div.para{
+	white-space: nowrap;
+}
+
 .login{
 	font-weight: bold;
 }
