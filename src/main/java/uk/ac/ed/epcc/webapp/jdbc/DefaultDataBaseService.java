@@ -486,4 +486,32 @@ public class DefaultDataBaseService implements DatabaseService {
 		}
 		
 	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.DatabaseService#getConnectionAttributes()
+	 */
+	@Override
+	public Map<String, Object> getConnectionAttributes() throws Exception{
+		Map<String,Object> map = new HashMap<String, Object>();
+		SQLContext sqlContext = getSQLContext();
+		Connection conn = sqlContext.getConnection();
+		map.put("read-only",conn.isReadOnly());
+		String hostname = System.getenv("HOSTNAME");
+		if( hostname == null ){
+			hostname="unknown";
+		}
+		map.put("client",hostname);
+		String name=sqlContext.getConnectionHost();
+        map.put("server",name);
+        int level = conn.getTransactionIsolation();
+        switch(level) {
+        case Connection.TRANSACTION_READ_UNCOMMITTED: map.put("transaction","READ_UNCOMMITTED"); break;
+        case Connection.TRANSACTION_READ_COMMITTED: map.put("transaction","READ_UNCOMMITTED"); break;
+        case Connection.TRANSACTION_REPEATABLE_READ: map.put("transaction","REPEATABLE_READ"); break;
+        case Connection.TRANSACTION_SERIALIZABLE: map.put("transaction","SERIALIZABLE"); break;
+        case Connection.TRANSACTION_NONE: map.put("transaction","NONE"); break;
+        default: map.put("transaction",Integer.toString(level));
+        }
+		
+		return map;
+	}
 }

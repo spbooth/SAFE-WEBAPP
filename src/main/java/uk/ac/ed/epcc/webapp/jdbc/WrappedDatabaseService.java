@@ -239,5 +239,13 @@ public class WrappedDatabaseService implements DatabaseService {
 		inner.closeRetainedClosables();
 		
 	}
-
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.DatabaseService#getConnectionAttributes()
+	 */
+	@Override
+	public Map<String, Object> getConnectionAttributes() throws Exception {
+		Map<String,Object> result = inner.getConnectionAttributes();
+		result.put("wrapped",getClass().getCanonicalName());
+		return result;
+	}
 }

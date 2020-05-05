@@ -21,6 +21,7 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 
@@ -122,11 +123,15 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 				}
 			}
 
+			Logger log = getLogger();
+			log.debug("Post to "+url);
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Content-Type", input.getContentType());
+			log.debug("Content-Type: "+input.getContentType());
 			connection.setRequestProperty("Content-Length", Long.toString(input.getLength()));
+			log.debug("Content-Length: "+input.getLength());
 			connection.setDoOutput(true);
-		
+		    
 			
 			connection.setConnectTimeout(getContext().getIntegerParameter("http.connection_timeout", 30000));
 			connection.setReadTimeout(getContext().getIntegerParameter("http.read_timeout", 30000));

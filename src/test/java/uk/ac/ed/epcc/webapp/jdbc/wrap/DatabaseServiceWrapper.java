@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.jdbc.wrap;
 
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Properties;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -170,6 +171,15 @@ public abstract class DatabaseServiceWrapper implements DatabaseService {
 	public void closeRetainedClosables() {
 		nested.closeRetainedClosables();
 		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.DatabaseService#getConnectionAttributes()
+	 */
+	@Override
+	public Map<String, Object> getConnectionAttributes() throws Exception {
+		Map<String,Object> result = nested.getConnectionAttributes();
+		result.put("wrapped",getClass().getCanonicalName());
+		return result;
 	}
 
 }

@@ -37,14 +37,27 @@
 <%@ include file="/back.jsf" %>
 <br>
 <%@page import="uk.ac.ed.epcc.webapp.content.*" %>
+<%@page import="uk.ac.ed.epcc.webapp.jdbc.DatabaseService" %>
 <div class="block">
+<%if ( ErrorFilter.CONNECTION_STATUS_FEATURE.isEnabled(conn)){ %>
 <h1>Database connections</h1>
 <% HtmlBuilder builder = new HtmlBuilder();
 builder.addTable(conn, WrappedDatabaseService.getStatusTable());
 %>
 <%= builder.toString() %>
 </div>	
-
+<%} %>
+<div class="block">
+<h1>Current connections</h1>
+<% HtmlBuilder builder2 = new HtmlBuilder();
+DatabaseService s = conn.getService(DatabaseService.class);
+Table t = new Table();
+t.addMap("Attributes",s.getConnectionAttributes());
+t.setKeyName("Attribute");
+builder2.addColumn(conn, t, "Attributes");
+%>
+<%= builder2.toString() %>
+</div>	
 <br/>
 <%@ include file="/back.jsf" %>
 <%@ include file="/std_footer.jsf" %>
