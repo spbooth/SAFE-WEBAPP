@@ -463,7 +463,7 @@ public class DefaultDataBaseService implements DatabaseService {
 			case "SERIALIZABLE": return Connection.TRANSACTION_SERIALIZABLE;
 			}
 		}
-		return Connection.TRANSACTION_SERIALIZABLE;
+		return Connection.TRANSACTION_REPEATABLE_READ;
 	}
 	
 	/* (non-Javadoc)

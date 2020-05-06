@@ -31,15 +31,12 @@
 	String page_title = " View active database connections ";
 %>
 <%@ include file="/std_header.jsf" %>
-<br>
 <%@ include file="/main__logged_in.jsf" %>
-<br>
 <%@ include file="/back.jsf" %>
-<br>
 <%@page import="uk.ac.ed.epcc.webapp.content.*" %>
 <%@page import="uk.ac.ed.epcc.webapp.jdbc.DatabaseService" %>
-<div class="block">
 <%if ( ErrorFilter.CONNECTION_STATUS_FEATURE.isEnabled(conn)){ %>
+<div class="block">
 <h1>Database connections</h1>
 <% HtmlBuilder builder = new HtmlBuilder();
 builder.addTable(conn, WrappedDatabaseService.getStatusTable());
