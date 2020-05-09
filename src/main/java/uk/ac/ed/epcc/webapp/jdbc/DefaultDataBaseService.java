@@ -19,7 +19,6 @@ package uk.ac.ed.epcc.webapp.jdbc;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLTransientException;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -49,6 +48,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.TransientDataFault;
  * <li> <b>db_name<i>[.tag]</b> connection url</li>
  * <li> <b>db_type<i>[.tag]</b> connection type [mysql or postgres]</li>
  * <li> <b>db_name<i>[.tag]</b> connection url</li>
+ * <li> <b>transaction.isolation_level</b> isolationlevel to use for transactions </li>
  * </ul>
  * 
  * @author spb
