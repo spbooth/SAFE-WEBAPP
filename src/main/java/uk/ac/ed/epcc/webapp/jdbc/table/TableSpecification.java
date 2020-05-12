@@ -50,6 +50,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  * <li>boolean</li>
  * <li>string<i>xxx</i> where xxx is the string length</li>
  * <li>required - promote an optional field</li>
+ * <li><i>table-tag</i> reference to remote table</li>
  * 
  * </ul>
  * 
