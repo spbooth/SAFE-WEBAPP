@@ -38,6 +38,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexField;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.IdMode;
@@ -369,7 +370,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 		}else if( state == State.SchemaIndex && index != null && name.equals(Dumper.COLUMN)){
 			String col_name = arg3.getValue(Dumper.NAME_ATTR);
 			try {
-				index.addField(col_name);
+				index.addField(new IndexField(col_name));
 				
 			} catch (InvalidArgument e) {
 				getLogger().error("Error adding column", e);

@@ -23,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.UnaryOperator;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -232,19 +233,60 @@ public class TableSpecification {
 	public Map<String,FieldType> getStdFields(){
 		return (Map<String, FieldType>) all_fields.clone();
 	}
-	
+	public static class IndexField{
+		@Override
+		public String toString() {
+			return name;
+		}
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + length;
+			result = prime * result + ((name == null) ? 0 : name.hashCode());
+			return result;
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			IndexField other = (IndexField) obj;
+			if (length != other.length)
+				return false;
+			if (name == null) {
+				if (other.name != null)
+					return false;
+			} else if (!name.equals(other.name))
+				return false;
+			return true;
+		}
+		public final String name;
+		public final int length;
+		public IndexField(String name,int len) {
+			this.name=name;
+			this.length=len;
+		}
+		public IndexField(String name) {
+			this(name,-1);
+		}
+	}
 	public abstract class IndexType {
 		private final String name;
-		private LinkedHashSet<String> index_fields = new LinkedHashSet<>();
+		private LinkedHashSet<IndexField> index_fields = new LinkedHashSet<>();
 		public IndexType(String name, String ...strings) throws InvalidArgument{
 			this.name=name;
 			for(String s : strings){
-				addField(s);
+				addField(new IndexField(s));
 			}
 			indexes.add(this);
 		}
-		public void addField(String s) throws InvalidArgument {
-			if( getFieldNames().contains(s)){
+		public void addField(IndexField s) throws InvalidArgument {
+			
+			if( getFieldNames().contains(s.name)){
 				index_fields.add(s);
 			}else{
 				throw new InvalidArgument("Table does not contain field "+s);
@@ -253,8 +295,9 @@ public class TableSpecification {
 		public IndexType(IndexType i) {
 			this.name=i.name;
 			Set<String> names = getFieldNames();
-			for(String s : i.index_fields){
-				if( names.contains(s)){
+			for(IndexField s : i.index_fields){
+				
+				if( getFieldNames().contains(s.name)){
 					index_fields.add(s);
 				}
 			}
@@ -269,15 +312,15 @@ public class TableSpecification {
 		 */
 		public boolean isRef() {
 			if(index_fields.size() == 1 ) {
-				for(String s : index_fields) {
-					if( getField(s) instanceof ReferenceFieldType) {
+				for(IndexField s : index_fields) {
+					if( getField(s.name) instanceof ReferenceFieldType) {
 						return true;
 					}
 				}
 			}
 			return false;
 		}
-		public Iterator<String> getindexNames(){
+		public Iterator<IndexField> getindexNames(){
 			return index_fields.iterator();
 		}
 		public abstract void accept(UnaryOperator<String> name_map,FieldTypeVisitor vis);

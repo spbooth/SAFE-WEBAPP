@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.ssh;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
@@ -23,6 +24,8 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexField;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
@@ -71,6 +74,12 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 		TableSpecification spec = new TableSpecification("KeyID");
 		//spec.setField("PersonID", c.getService(SessionService.class).getLoginFactory().getReferenceFieldType());
 		spec.setField(PUBLIC_KEY, new StringFieldType(true, null, 4096));
+		try {
+			Index i = spec.new Index("key_index",true);
+			i.addField(new IndexField(PUBLIC_KEY, 64));
+		} catch (InvalidArgument e) {
+			getLogger().error("Bad index", e);
+		}
 		return spec;
 	}
 
