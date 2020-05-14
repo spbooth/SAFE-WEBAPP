@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.ssh;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -181,6 +183,79 @@ public class AuthorizedKeyValidator implements FieldValidator<String>{
 	   }
 	   String base64 = base64_m.group(1);
 	   return algorithm+" "+base64;
+   }
+   
+   public String fingerprint(String key) throws ParseException, NoSuchAlgorithmException {
+	   if( key == null || key.isEmpty()) {
+		   return null;
+	   }
+	   Matcher prefix_m = PREFIX_PATTERN.matcher(key);
+	   if( prefix_m.lookingAt() ) {
+		   key = key.substring(prefix_m.end());
+	   }
+	   Matcher alg_m= ALG_PATTERN.matcher(key);
+	   if( ! alg_m.lookingAt()) {
+		   // unrecognised algorithm
+		   throw new ParseException("Unrecognised key algorithm");
+	   }
+	   String algorithm = alg_m.group(1);
+	   key = key.substring(alg_m.end());
+	   
+	   Matcher base64_m = BASE64_PATTERN.matcher(key);
+	   if( ! base64_m.lookingAt()) {
+		   throw new ParseException("Missing Base64 encoded key");
+	   }
+	   String base64 = base64_m.group(1);
+	   
+	   MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+       
+       byte[] digest = messageDigest.digest(Base64.decodeBase64(base64.getBytes()));
+       final StringBuilder toRet = new StringBuilder();
+       toRet.append("MD5");
+       for (int i = 0; i < digest.length; i++) {
+           toRet.append(":");
+           int b = digest[i] & 0xff;
+           String hex = Integer.toHexString(b);
+           if (hex.length() == 1) toRet.append("0");
+           toRet.append(hex);
+       }
+       return toRet.toString();
+	   
+   }
+   public String fingerprint2(String key) throws ParseException, NoSuchAlgorithmException {
+	   if( key == null || key.isEmpty()) {
+		   return null;
+	   }
+	   Matcher prefix_m = PREFIX_PATTERN.matcher(key);
+	   if( prefix_m.lookingAt() ) {
+		   key = key.substring(prefix_m.end());
+	   }
+	   Matcher alg_m= ALG_PATTERN.matcher(key);
+	   if( ! alg_m.lookingAt()) {
+		   // unrecognised algorithm
+		   throw new ParseException("Unrecognised key algorithm");
+	   }
+	   String algorithm = alg_m.group(1);
+	   key = key.substring(alg_m.end());
+	   
+	   Matcher base64_m = BASE64_PATTERN.matcher(key);
+	   if( ! base64_m.lookingAt()) {
+		   throw new ParseException("Missing Base64 encoded key");
+	   }
+	   String base64 = base64_m.group(1);
+	   
+	   MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+       
+       byte[] digest = messageDigest.digest(Base64.decodeBase64(base64.getBytes()));
+       final StringBuilder toRet = new StringBuilder();
+       toRet.append("SHA256:");
+       String b = Base64.encodeBase64String(digest);
+       while( b.endsWith("=")) {
+    	   b = b.substring(0, b.length()-1);
+       }
+       toRet.append(b);
+       return toRet.toString();
+	   
    }
    /** return the trailing comment from a key
     * If the key fails to parse null is returned.
