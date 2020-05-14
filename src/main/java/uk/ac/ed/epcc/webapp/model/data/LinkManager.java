@@ -159,7 +159,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 				return "(" + getLeft().getIdentifier(max_length) + ")-("
 						+ getRight().getIdentifier(max_length) + ")";
 			} catch (DataException e) {
-				return super.getIdentifier();
+				return super.getIdentifier(max_length);
 			}
 		}
 		@Override
