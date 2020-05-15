@@ -19,12 +19,12 @@
 </TableSpecification>
 <Person id='1'>
 <Email>fred@example.com</Email>
-<Updated>1547809678</Updated>
+<Updated>1589549330</Updated>
 <PasswordFails>0</PasswordFails>
 <PasswordStatus>V</PasswordStatus>
-<Salt>PFL1kQ5ZBOmBc4gs</Salt>
+<Salt>dcHTP6yifSXsJfnb</Salt>
 <Alg>2</Alg>
-<Password>40a83e182d4f80f46096ea2445bfe6f8</Password>
+<Password>a090ac23407e80e8101b9de6d198e18fd3c9b80b4513550eafa27b8efe90fb9d</Password>
 <Firstname>Albert</Firstname>
 <Lastname>Spangler</Lastname>
 <PublicKey>ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQBRQkTnsRzUM9mLrgEMFk78CLdOxtepxPp1JQSfRc3/A1cyD8NV/gxINRNhMIVkIofUexxtLfAfmNRf666SSei/w2kPX9ndOJ32y2OUUKkijJvEdeMEuFido9Kifc79p0q1KcOhAdRNmmE+LriqsbhJJVQz0OeOKw7wPN9KNYfTevZleQAJBRKr99rBgyRrtrXBhnjYu3yb8E/lf4g8MiBuLGcezzi310RwKMFnamr6MTbA3KBvgvFrPmsjVyedn1IyMdgQ0x8OZMQbr6hesvnR8HuKYfFtm4Vjx7bS+Dyqn+PlPrWH/fjs1957fe57gtZ9eM2S0lsv5cagcWghPAZP</PublicKey>
@@ -40,16 +40,18 @@
 <Firstname type='String' nullable='true' max='32'/>
 <Initials type='String' nullable='true' max='3'/>
 <Lastname type='String' nullable='true' max='32'/>
+<PublicKey type='String' nullable='true' max='16777215'/>
 <PeerIndex type='Index' unique='false'><Column name='PeerID'/><Column name='EndTime'/><Column name='StartTime'/></PeerIndex>
 <SearchIndex type='Index' unique='false'><Column name='EndTime'/><Column name='StartTime'/></SearchIndex>
 </TableSpecification>
 <PersonHistory id='1'>
 <PeerID>1</PeerID>
-<StartTime>1547809678</StartTime>
+<StartTime>1589549330</StartTime>
 <EndTime>9223372036854775</EndTime>
 <Email>fred@example.com</Email>
 <Firstname>Albert</Firstname>
 <Lastname>Spangler</Lastname>
+<PublicKey>ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQBRQkTnsRzUM9mLrgEMFk78CLdOxtepxPp1JQSfRc3/A1cyD8NV/gxINRNhMIVkIofUexxtLfAfmNRf666SSei/w2kPX9ndOJ32y2OUUKkijJvEdeMEuFido9Kifc79p0q1KcOhAdRNmmE+LriqsbhJJVQz0OeOKw7wPN9KNYfTevZleQAJBRKr99rBgyRrtrXBhnjYu3yb8E/lf4g8MiBuLGcezzi310RwKMFnamr6MTbA3KBvgvFrPmsjVyedn1IyMdgQ0x8OZMQbr6hesvnR8HuKYfFtm4Vjx7bS+Dyqn+PlPrWH/fjs1957fe57gtZ9eM2S0lsv5cagcWghPAZP</PublicKey>
 </PersonHistory>
 <TableSpecification name='role_table'>
 <PersonID type='Integer' nullable='false'/>

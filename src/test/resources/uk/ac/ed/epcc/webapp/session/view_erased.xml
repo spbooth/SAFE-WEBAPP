@@ -10,13 +10,11 @@
 </tr>
 <tr>
 <th>Details updated</th>
-<td>Fri Jan 18 11:07:58 GMT 2019</td>
+<td>Fri May 15 14:28:50 BST 2020</td>
 </tr>
 <tr>
 <th>Next update required</th>
-<td>
-<span class="warn">Sat Jan 18 11:07:58 GMT 2020</span>
-</td>
+<td>Sat May 15 14:28:50 BST 2021</td>
 </tr>
 </table>
 </log>
@@ -24,3 +22,4 @@
 <active value="Anonymise" help="Remove personally identifiable information"/>
 </buttons>
 </view_page>
+

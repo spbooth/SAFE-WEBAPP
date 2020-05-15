@@ -69,6 +69,23 @@ public class TwoFactorHandler<A extends AppUser> {
 		return false;
     }
 
+    public boolean requireTwoFactor(A user) {
+    	AppUserFactory<A> person_fac = sess.getLoginFactory();
+    	boolean is_super=false;
+		if( sess instanceof ServletSessionService) {
+			is_super = ((ServletSessionService<A>)sess).isSU();
+		}
+		if( ! is_super) {
+			for( TwoFactorComposite<A> comp : person_fac.getComposites(TwoFactorComposite.class)) {
+				if( comp.needAuth(user)) {
+					return true;
+				}
+			}
+		}
+		return false;
+
+    }
+    
     public FormResult doLogin(A user,SerializableFormResult next_page) {
 		 
 		AppUserFactory<A> person_fac = sess.getLoginFactory();

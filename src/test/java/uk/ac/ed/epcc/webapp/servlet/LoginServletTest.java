@@ -410,8 +410,9 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 	}
 
 	@Test
-	@ConfigFixtures("password_server.properties")
+	@ConfigFixtures({"password_server.properties","twofactor.properties"})
 	public void testRequestNewPasswordFromServlet() throws DataException, Exception{
+		setTime(2020, Calendar.MAY, 15, 15, 00);
 		MockTansport.clear();
 		takeBaseline();
 		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();

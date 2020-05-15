@@ -30,22 +30,25 @@ import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
 import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
 import uk.ac.ed.epcc.webapp.session.AppUser;
+import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordUpdateFormBuilder;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.session.twofactor.FormAuthComposite;
+import uk.ac.ed.epcc.webapp.session.twofactor.TotpCodeAuthComposite;
 
 /**
  * @author spb
  *
  */
-@ConfigFixtures("password_server.properties")
+@ConfigFixtures({"password_server.properties","twofactor.properties"})
 public class PasswordResetServletTest extends ServletTest {
 
 	/**
 	 * 
 	 */
-	private static final String CORRECT_TAG = "1-49191c4u425rw2f3k103a52231x2g10";
+	private static final String CORRECT_TAG = "1-4m26w232f6c2i4n3w361m3u4r5j343e6m495505v1k5t4f5d6f73b73h3uu";
 
 	/**
 	 * 
@@ -82,7 +85,7 @@ public class PasswordResetServletTest extends ServletTest {
 		takeBaseline();
 		TestTimeService t = (TestTimeService) ctx.getService(CurrentTimeService.class);
 		Calendar c = Calendar.getInstance();
-		c.set(2019, Calendar.JULY, 6);
+		c.set(2020, Calendar.JULY, 6);
 		t.setResult(c.getTime());
 		PasswordChangeRequestFactory fac = new PasswordChangeRequestFactory<>(ctx.getService(SessionService.class).getLoginFactory());
 		fac.purge();
@@ -114,6 +117,44 @@ public class PasswordResetServletTest extends ServletTest {
 		assertEquals(1, MockTansport.nSent());
 		assertEquals(ctx.expandText("${service.name} Password has been changed"),MockTansport.getMessage(0).getSubject());
 	}
+	
+	@Test
+	@DataBaseFixtures("new_password_from_server.xml")
+	
+	public void testPasswordChangeWith2FA() throws ConsistencyError, Exception{
+		// setup two factor
+		
+		SessionService sess = ctx.getService(SessionService.class);
+		AppUserFactory fac = sess.getLoginFactory();
+		AppUser user = (AppUser) fac.find(1);
+		TotpCodeAuthComposite ta = (TotpCodeAuthComposite) fac.getComposite(FormAuthComposite.class);
+		String external = "UJ4SLJJPNPXVGIPLXDTQUGVKNI";
+		ta.setSecret(user, external);
+		user.commit();
+		
+		
+		takeBaseline();
+		MockTansport.clear();
+		
+		req.path_info=CORRECT_TAG;
+		doPost();
+		checkForward("/scripts/password_change_request.jsp");
+		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD1,"BorisTheSpider");
+		addParam(PasswordUpdateFormBuilder.NEW_PASSWORD2,"BorisTheSpider");
+		addParam("submitted","true");
+		
+		setAction(PasswordUpdateFormBuilder.CHANGE_ACTION);
+		doPost();
+		checkMessage("password_changed");
+		
+		assertFalse(sess.haveCurrentUser());
+		
+		checkDiff("/cleanup.xsl", "servlet_password_reset.xml");
+		PasswordAuthComposite comp = (PasswordAuthComposite) sess.getLoginFactory().getComposite(PasswordAuthComposite.class);
+		assertTrue(comp.checkPassword(user, "BorisTheSpider"));
+		assertEquals(1, MockTansport.nSent());
+		assertEquals(ctx.expandText("${service.name} Password has been changed"),MockTansport.getMessage(0).getSubject());
+	}
 	@Test
 	@DataBaseFixtures("new_password_from_server.xml")
 	public void testExpired() throws ConsistencyError, Exception{
@@ -121,7 +162,7 @@ public class PasswordResetServletTest extends ServletTest {
 		MockTansport.clear();
 		TestTimeService t = (TestTimeService) ctx.getService(CurrentTimeService.class);
 		Calendar c = Calendar.getInstance();
-		c.set(2019, Calendar.JULY, 6);
+		c.set(2020, Calendar.JULY, 16);
 		t.setResult(c.getTime());
 		req.path_info=CORRECT_TAG;
 		doPost();
