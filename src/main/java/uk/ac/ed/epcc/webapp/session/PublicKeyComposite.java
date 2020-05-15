@@ -22,6 +22,7 @@ import uk.ac.ed.epcc.webapp.model.MetaDataContributer;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
 
 /** A {@link Composite} that adds a SSH public key to an {@link AppUser}
  * 
@@ -30,7 +31,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
  *
  *
  */
-public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, PublicKeyComposite> implements UpdateNoteProvider<AppUser> , AnonymisingComposite<AppUser>, SummaryContributer<AppUser>, MetaDataContributer<AppUser>, TemplateContributor<AppUser>{
+public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, PublicKeyComposite> implements UpdateNoteProvider<AppUser> , AnonymisingComposite<AppUser>, SummaryContributer<AppUser>, MetaDataContributer<AppUser>, TemplateContributor<AppUser>, HistoryFieldContributor{
 	/**
 	 * 
 	 */
@@ -110,7 +111,7 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 			}
 			if( ! extra.isEmpty()){
 				// still want to supress key based updates  if the machine manages keys explicitly
-				o.notifyChange(PUBLIC_KEY, extra);
+				o.notifyChange(PUBLIC_KEY, extra, old_key, new_key);
 			}
 		}
 	}
@@ -213,5 +214,11 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 		if(key != null){
 			template.setProperty(prefix+"publickey", key);
 		}
+	}
+
+	@Override
+	public void addToHistorySpecification(TableSpecification spec) {
+		spec.setField(PUBLIC_KEY, new StringFieldType(true, null, 4096),isOptional());
+		
 	}
 }

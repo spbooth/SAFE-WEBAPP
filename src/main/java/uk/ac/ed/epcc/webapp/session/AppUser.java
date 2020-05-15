@@ -279,12 +279,16 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 	 * 
 	 * The field string is a tag to identify the type of update being notified.
 	 * This allows some degree of additional filtering in the sub-class.
-	 * Use the db field triggering the update where this makes sense.
+	 * Use the db field triggering the update where this makes sense and
+	 * pass the old/new values
+	 * @param <X> value type
 	 * 
-	 * @param field
-	 * @param extra
+	 * @param field  type of update
+	 * @param extra  text of update
+	 * @param prev   previous value
+	 * @param curr   relacement value
 	 */
-	public void notifyChange(String field, String extra) {
+	public <X> void notifyChange(String field, String extra, X prev, X curr) {
 		
 	}
 
