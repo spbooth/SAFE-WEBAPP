@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.ssh;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -21,20 +22,29 @@ import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.table.AdminOperationKey;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexField;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableTransitionContributor;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableTransitionKey;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 /** Simple class to implement a table of forbidden ssh keys
@@ -43,7 +53,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
  * @author Stephen Booth
  *
  */
-public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> implements FieldValidator<String>{
+public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> implements FieldValidator<String>, TableTransitionContributor{
 	private final AuthorizedKeyValidator val = new AuthorizedKeyValidator();
 	public BadKeyFactory(AppContext conn) {
 		setContext(conn, "BadKeys");
@@ -171,5 +181,36 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 			getLogger().error("Error in bad key lookup",e);
 		}
 		throw new ValidateException("Key found in forbidden list");
+	}
+	
+	public void reFingerprint() throws DataFault, ParseException, NoSuchAlgorithmException {
+		if( ! res.hasField(FINGERPRINT)) {
+			return;
+		}
+		for(BadKey k : all()) {
+			k.setKey(k.getKey());
+			k.commit();
+		}
+	}
+	public static final TableTransitionKey REFINGERPRINT = new AdminOperationKey( "ReFingerprint", "Regenerate key fingerprints");
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.table.TableTransitionContributor#getTableTransitions()
+	 */
+	@Override
+	public Map<TableTransitionKey, Transition> getTableTransitions() {
+		Map<TableTransitionKey, Transition> result = new LinkedHashMap<TableTransitionKey, Transition>();
+		result.put(REFINGERPRINT,new AbstractDirectTransition() {
+
+			@Override
+			public FormResult doTransition(Object target, AppContext c) throws TransitionException {
+				try {
+					reFingerprint();
+				} catch (Exception e) {
+					getLogger().error("Error regenerating fingerprint",e);
+				}
+				return new RedirectResult("/main.jsp");
+			}
+		});
+		return result;
 	}
 }
