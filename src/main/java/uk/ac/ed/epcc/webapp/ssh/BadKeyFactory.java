@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.ssh;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -22,6 +23,8 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
@@ -41,7 +44,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
  *
  */
 public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> implements FieldValidator<String>{
-	
+	private final AuthorizedKeyValidator val = new AuthorizedKeyValidator();
 	public BadKeyFactory(AppContext conn) {
 		setContext(conn, "BadKeys");
 	}
@@ -58,6 +61,7 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 	 * 
 	 */
 	private static final String PUBLIC_KEY = "PublicKey";
+	private static final String FINGERPRINT = "FingerPrint";
 
 	@Override
 	public Class<BadKey> getTarget() {
@@ -74,9 +78,9 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 		TableSpecification spec = new TableSpecification("KeyID");
 		//spec.setField("PersonID", c.getService(SessionService.class).getLoginFactory().getReferenceFieldType());
 		spec.setField(PUBLIC_KEY, new StringFieldType(true, null, 4096));
+		spec.setField(FINGERPRINT,new StringFieldType(true, null, 64));
 		try {
-			Index i = spec.new Index("key_index",true);
-			i.addField(new IndexField(PUBLIC_KEY, 64));
+			Index i = spec.new Index("key_index",false,FINGERPRINT);
 		} catch (InvalidArgument e) {
 			getLogger().error("Bad index", e);
 		}
@@ -97,9 +101,22 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 			return record.getStringProperty(PUBLIC_KEY);
 		}
 		
-		public void setKey(String key) throws ParseException {
+		public void setKey(String key) throws ParseException, NoSuchAlgorithmException {
 			AuthorizedKeyValidator val = new AuthorizedKeyValidator();
 			record.setProperty(PUBLIC_KEY, val.normalise(key));
+			record.setProperty(FINGERPRINT, val.fingerprint2(key));
+		}
+		
+		public String getFingerprint() {
+			String f = record.getStringProperty(FINGERPRINT,null);
+			if( f == null ) {
+				try {
+					f = val.fingerprint2(getKey());
+				} catch (Exception e) {
+					getLogger().error("Error making fingerprint",e);
+				}
+			}
+			return f;
 		}
 	}
 	
@@ -114,12 +131,27 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 		if( key ==null) {
 			return false;
 		}
-		AuthorizedKeyValidator val = new AuthorizedKeyValidator();
+		
 		key = val.normalise(key);
-		return ! exists(new SQLValueFilter<BadKeyFactory.BadKey>(getTarget(), res, PUBLIC_KEY, key));
+		return ! exists(getKeyFilter(key));
+	}
+	public SQLFilter<BadKey> getKeyFilter(String key) {
+		SQLAndFilter<BadKey> fil = new SQLAndFilter<BadKey>(getTarget());
+		if( res.hasField(PUBLIC_KEY)) {
+			fil.addFilter(new SQLValueFilter<BadKey>(getTarget(), res, PUBLIC_KEY, key));
+		}
+		if( res.hasField(FINGERPRINT)) {
+			try {
+				fil.addFilter(new SQLValueFilter<BadKey>(getTarget(), res, FINGERPRINT, val.fingerprint2(key)));
+			} catch (Exception e) {
+				getLogger().error("Error filter on fingerprint", e);
+			}
+		}
+		
+		return fil;
 	}
 
-	public void forbid(String key) throws ParseException, DataFault, DataException {
+	public void forbid(String key) throws ParseException, DataFault, DataException, NoSuchAlgorithmException {
 		if( allow(key)) {
 			BadKey b = makeBDO();
 			b.setKey(key);

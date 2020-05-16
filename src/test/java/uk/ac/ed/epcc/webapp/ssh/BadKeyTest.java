@@ -16,6 +16,8 @@ package uk.ac.ed.epcc.webapp.ssh;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.security.NoSuchAlgorithmException;
+
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
@@ -38,7 +40,7 @@ public class BadKeyTest extends WebappTestBase {
 	
 	
 	@Test
-	public void testBadKeyList() throws FieldException, DataException {
+	public void testBadKeyList() throws FieldException, DataException, NoSuchAlgorithmException {
 		BadKeyFactory fac = new BadKeyFactory(ctx);
 		
 		String keys[] = {
