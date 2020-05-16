@@ -182,6 +182,7 @@ public class AuthorizedKeyValidator implements FieldValidator<String>{
 		   throw new ParseException("Missing Base64 encoded key");
 	   }
 	   String base64 = base64_m.group(1);
+	   base64 = Base64.encodeBase64String(Base64.decodeBase64(base64));
 	   return algorithm+" "+base64;
    }
    

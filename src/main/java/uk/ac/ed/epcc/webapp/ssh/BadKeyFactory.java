@@ -31,6 +31,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.AdminOperationKey;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -42,6 +43,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -114,7 +116,7 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 		public void setKey(String key) throws ParseException, NoSuchAlgorithmException {
 			AuthorizedKeyValidator val = new AuthorizedKeyValidator();
 			record.setProperty(PUBLIC_KEY, val.normalise(key));
-			record.setProperty(FINGERPRINT, val.fingerprint2(key));
+			record.setOptionalProperty(FINGERPRINT, val.fingerprint2(key));
 		}
 		
 		public String getFingerprint() {
@@ -152,7 +154,11 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 		}
 		if( res.hasField(FINGERPRINT)) {
 			try {
-				fil.addFilter(new SQLValueFilter<BadKey>(getTarget(), res, FINGERPRINT, val.fingerprint2(key)));
+				fil.addFilter(
+						new SQLOrFilter<BadKey>(getTarget(),
+								new SQLValueFilter<BadKey>(getTarget(), res, FINGERPRINT, val.fingerprint2(key)),	
+								new NullFieldFilter<BadKey>(getTarget(), res, FINGERPRINT, true)
+								));
 			} catch (Exception e) {
 				getLogger().error("Error filter on fingerprint", e);
 			}
