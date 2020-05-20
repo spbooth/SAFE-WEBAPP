@@ -211,12 +211,10 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 				String key = k.getKey();
 				val.validate(key);
 				k.setKey(key);
-				k.commit();
-			}catch(ValidateException e) {
-				it.remove();
-				
+				k.commit();	
 			}catch(Exception e) {
-				getLogger().error("Error fingerprinting key", e);
+				getLogger().error("Error fingerprinting key ", e);
+				it.remove();
 			}
 		}
 	}
