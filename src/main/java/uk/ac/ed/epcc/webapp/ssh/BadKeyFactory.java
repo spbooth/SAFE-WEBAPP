@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.ssh;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -41,6 +42,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableTransitionContributor;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableTransitionKey;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.Removable;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
@@ -99,7 +101,7 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 		return spec;
 	}
 
-	public class BadKey extends DataObject{
+	public class BadKey extends DataObject implements Removable{
 
 		
 		/**
@@ -115,7 +117,8 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 		
 		public void setKey(String key) throws ParseException, NoSuchAlgorithmException {
 			AuthorizedKeyValidator val = new AuthorizedKeyValidator();
-			record.setProperty(PUBLIC_KEY, val.normalise(key));
+			key = val.normalise(key);
+			record.setProperty(PUBLIC_KEY, key);
 			record.setOptionalProperty(FINGERPRINT, val.fingerprint2(key));
 		}
 		
@@ -129,6 +132,14 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 				}
 			}
 			return f;
+		}
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.model.data.Removable#remove()
+		 */
+		@Override
+		public void remove() throws Exception {
+			delete();
 		}
 	}
 	
@@ -167,11 +178,12 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 		return fil;
 	}
 
-	public void forbid(String key) throws ParseException, DataFault, DataException, NoSuchAlgorithmException {
+	public void forbid(String key) throws ParseException, DataFault, DataException, NoSuchAlgorithmException, ValidateException {
 		if( allow(key)) {
-			BadKey b = makeBDO();
-			b.setKey(key);
-			b.commit();
+				val.validate(key);
+				BadKey b = makeBDO();
+				b.setKey(key);
+				b.commit();
 		}
 	}
 	/* (non-Javadoc)
@@ -189,13 +201,23 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 		throw new ValidateException("Key found in forbidden list");
 	}
 	
-	public void reFingerprint() throws DataFault, ParseException, NoSuchAlgorithmException {
+	public void reFingerprint() throws DataFault {
 		if( ! res.hasField(FINGERPRINT)) {
 			return;
 		}
-		for(BadKey k : all()) {
-			k.setKey(k.getKey());
-			k.commit();
+		for(Iterator<BadKey>it = all().iterator(); it.hasNext();) {
+			BadKey k = it.next();
+			try {
+				String key = k.getKey();
+				val.validate(key);
+				k.setKey(key);
+				k.commit();
+			}catch(ValidateException e) {
+				it.remove();
+				
+			}catch(Exception e) {
+				getLogger().error("Error fingerprinting key", e);
+			}
 		}
 	}
 	public static final TableTransitionKey REFINGERPRINT = new AdminOperationKey( "ReFingerprint", "Regenerate key fingerprints");
