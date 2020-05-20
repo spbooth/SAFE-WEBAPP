@@ -108,13 +108,16 @@ public class AuthorizedKeyValidator implements FieldValidator<String>{
    @Override
    public void validate(String key) throws ValidateException{
 	   
-	   if( key == null || key.isEmpty()) {
+	   if( key == null || key.trim().isEmpty()) {
 		   throw new ValidateException("No public key found");
 	   }
+	   key=key.trim();
 	   if( key.contains("PRIVATE KEY")) {
 		   throw new ValidateException("This is a PRIVATE key, a PUBLIC key is required");
 	   }
-	   
+	   if( key.contains("BEGIN")) {
+		   throw new ValidateException("Please use the openssh public key format");
+	   }
 	   Matcher prefix_m = PREFIX_PATTERN.matcher(key);
 	   if( prefix_m.lookingAt() ) {
 		   key = key.substring(prefix_m.end());
@@ -162,9 +165,10 @@ public class AuthorizedKeyValidator implements FieldValidator<String>{
     * @return normalised key or null
     */
    public String normalise(String key) throws ParseException{
-	   if( key == null || key.isEmpty()) {
+	   if( key == null || key.trim().isEmpty()) {
 		   return null;
 	   }
+	   key=key.trim();
 	   Matcher prefix_m = PREFIX_PATTERN.matcher(key);
 	   if( prefix_m.lookingAt() ) {
 		   key = key.substring(prefix_m.end());
@@ -187,9 +191,10 @@ public class AuthorizedKeyValidator implements FieldValidator<String>{
    }
    
    public String fingerprint(String key) throws ParseException, NoSuchAlgorithmException {
-	   if( key == null || key.isEmpty()) {
+	   if( key == null || key.trim().isEmpty()) {
 		   return null;
 	   }
+	   key=key.trim();
 	   Matcher prefix_m = PREFIX_PATTERN.matcher(key);
 	   if( prefix_m.lookingAt() ) {
 		   key = key.substring(prefix_m.end());
@@ -224,9 +229,10 @@ public class AuthorizedKeyValidator implements FieldValidator<String>{
 	   
    }
    public String fingerprint2(String key) throws ParseException, NoSuchAlgorithmException {
-	   if( key == null || key.isEmpty()) {
+	   if( key == null || key.trim().isEmpty()) {
 		   return null;
 	   }
+	   key=key.trim();
 	   Matcher prefix_m = PREFIX_PATTERN.matcher(key);
 	   if( prefix_m.lookingAt() ) {
 		   key = key.substring(prefix_m.end());
