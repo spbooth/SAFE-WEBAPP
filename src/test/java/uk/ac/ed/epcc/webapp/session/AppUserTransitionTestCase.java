@@ -210,9 +210,9 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 		assertEquals(2,requiredPages.size());
 		Iterator<RequiredPage<A>> it = requiredPages.iterator();
 		RequiredPage<A> page = it.next();
-		//assertTrue(page.getClass().getCanonicalName(),page instanceof PasswordAuthComposite.PasswordResetRequiredPage);
-		//assertFalse(page.required(sess));
-		//page = it.next();
+		assertTrue(page.getClass().getCanonicalName(),page instanceof PasswordAuthComposite.PasswordResetRequiredPage);
+		assertFalse(page.required(sess));
+		page = it.next();
 		assertTrue(page.getClass().getCanonicalName(),page instanceof UpdatePersonRequiredPage);
 		assertTrue(page.required(sess));
 		String return_page = "/noddy.jsp";
