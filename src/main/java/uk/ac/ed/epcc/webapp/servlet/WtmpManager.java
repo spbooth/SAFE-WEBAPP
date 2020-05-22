@@ -31,6 +31,7 @@ import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.ValueResultMapper;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
@@ -50,6 +51,7 @@ import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterUpdate;
+import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -374,7 +376,11 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	}
 	public Date lastLogin(AppUser person) throws DataException {
 		LoginFinder finder = new LoginFinder();
-		return finder.find(new ReferenceFilter<>(WtmpManager.this, PERSON_ID, person),true);
+		SQLAndFilter fil = new SQLAndFilter(getTarget(),new ReferenceFilter<>(WtmpManager.this, PERSON_ID, person));
+		if( res.hasField(SUPER_PERSON_ID)) {
+			fil.addFilter(new NullFieldFilter<Wtmp>(getTarget(), res, SUPER_PERSON_ID, true));
+		}
+		return finder.find(fil,true);
 	}
 	/** Get a filter for {@link AppUser}s who have logged in since
 	 * a target date.
@@ -384,7 +390,10 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	 */
     public SQLFilter<AppUser> getActiveFilter(Date d){
     	AppUserFactory<AppUser> login = getContext().getService(SessionService.class).getLoginFactory();
-    	
-    	return (SQLFilter<AppUser>) convertToDestinationFilter(login, PERSON_ID, new TimeFilter(START_TIME,MatchCondition.GT, d) );
+    	SQLAndFilter fil = new SQLAndFilter(getTarget(),new TimeFilter(START_TIME,MatchCondition.GT, d));
+		if( res.hasField(SUPER_PERSON_ID)) {
+			fil.addFilter(new NullFieldFilter<Wtmp>(getTarget(), res, SUPER_PERSON_ID, true));
+		}
+    	return (SQLFilter<AppUser>) convertToDestinationFilter(login, PERSON_ID, fil );
     }
 }
