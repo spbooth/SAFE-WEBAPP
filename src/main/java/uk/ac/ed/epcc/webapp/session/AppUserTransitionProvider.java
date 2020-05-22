@@ -26,6 +26,7 @@ import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FatalTransitionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
+import uk.ac.ed.epcc.webapp.forms.result.CustomPageResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
@@ -36,6 +37,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.servlet.LoginServlet;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
+import uk.ac.ed.epcc.webapp.servlet.WtmpManager;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 
@@ -47,6 +49,11 @@ import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 
 public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewTransitionProvider<AU, AppUserKey<AU>> implements TitleTransitionProvider<AppUserKey<AU>, AU>, ContextCached {
 	
+	/**
+	 * 
+	 */
+	public static final String SEE_LOGIN_HISTORY_ROLE = "SeeLoginHistory";
+
 	/** Relationship that allows a different user to edit this persons details
 	 * 
 	 */
@@ -110,6 +117,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 		
 	};
+	public static final AppUserKey LOGIN_HISTORY = new RelationshipAppUserKey<AppUser>("LoginHistory", "See when this user logged into the website", SEE_LOGIN_HISTORY_ROLE);
 	public final class EraseTransition extends AbstractDirectTransition<AU>{
 
 		@Override
@@ -124,13 +132,54 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 		
 	}
+	public final class LoginHistoryTransition extends AbstractDirectTransition<AU>{
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
+		 */
+		@Override
+		public FormResult doTransition(AU target, AppContext c) throws TransitionException {
+			return new CustomPageResult() {
+				
+				@Override
+				public String getTitle() {
+					return "Login history for "+target.getIdentifier();
+				}
+				
+				@Override
+				public ContentBuilder addContent(AppContext conn, ContentBuilder cb) {
+					SessionService sess = conn.getService(SessionService.class);
+					if( sess instanceof ServletSessionService) {
+						try {
+						WtmpManager man = ((ServletSessionService)sess).getWtmpManager();
+						if( man != null ) {
+							Table t = new Table();
+							for(WtmpManager.Wtmp w : man.getLoginHistory(target)) {
+								man.addTable(t, w, sess);
+							}
+							man.formatTable(t);
+							ContentBuilder panel = cb.getPanel("scrollwrapper");
+							panel.addTable(conn, t);
+							panel.addParent();
+						}
+						}catch(Exception e) {
+							getLogger().error("Error getting login history");
+						}
+					}
+					return cb;
+				}
+			};
+		}
+		
+	}
 	private final AppUserFactory<AU> fac;
 	/**
 	 * @param c
 	 */
 	public AppUserTransitionProvider(AppContext c) {
 		super(c);
-		fac = c.getService(SessionService.class).getLoginFactory();
+		SessionService sess = c.getService(SessionService.class);
+		fac = sess.getLoginFactory();
 		for(AppUserTransitionContributor<AU> cont : fac.getComposites(AppUserTransitionContributor.class)) {
 			for(Entry<AppUserKey<AU>, Transition<AU>> e : cont.getTransitions(this).entrySet()) {
 				addTransition( e.getKey(), e.getValue());
@@ -142,6 +191,13 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		addTransition(SET_ROLE_KEY, new SetRoleTransition<AU>());
 		addTransition(SU_KEY, new SUTransition());
 		addTransition(ERASE, new ConfirmTransition<>("Are you sure you want to anonymise this person record", new EraseTransition(), new ViewTransition()));
+		if( sess instanceof ServletSessionService) {
+			WtmpManager w = ((ServletSessionService)sess).getWtmpManager();
+			if( w != null ) {
+				addTransition(LOGIN_HISTORY, new LoginHistoryTransition());
+			}
+			
+		}
 	}
 
 	/* (non-Javadoc)
