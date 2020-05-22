@@ -313,14 +313,17 @@ AnonymisingFactory
     @Override
 	public Set<RequiredPage<AU>> getRequiredPages(){
     	Set<RequiredPage<AU>> requiredPages= new LinkedHashSet<>();
-    	if( REQUIRE_PERSON_UPDATE_FEATURE.isEnabled(getContext())){
-			requiredPages.add(new UpdatePersonRequiredPage());
-		}
+    	
     	for(Composite<AU, ?> c : getComposites()){
     		if( c instanceof RequiredPageProvider){
     			requiredPages.addAll(((RequiredPageProvider<AU>)c).getRequiredPages());
     		}
     	}
+    	// want email verified before details
+    	// for security don't want ssh key tickets if email not verified
+    	if( REQUIRE_PERSON_UPDATE_FEATURE.isEnabled(getContext())){
+			requiredPages.add(new UpdatePersonRequiredPage());
+		}
     	return requiredPages;
     }
     public class UpdatePersonRequiredPage implements RequiredPage<AU>{
