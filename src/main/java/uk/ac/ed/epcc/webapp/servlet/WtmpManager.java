@@ -305,10 +305,16 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 
 	
 	public void addTable(Table t,Wtmp w,SessionService viewer) {
+		AppUser real = w.getSuperPerson();
+		boolean see_su = viewer.hasRole("view_su");
+		if(real != null && ! see_su) {
+			// don't show su sessions
+			return;
+		}
+		
 		t.put(PERSON_COL,w,w.getPerson());
 		
-		AppUser real = w.getSuperPerson();
-		if( real != null) {
+		if( real != null && see_su) {
 			t.put(REAL_PERSON_COL,w,real);
 		}
 		t.put(HOST_COL,w,w.getHost());
