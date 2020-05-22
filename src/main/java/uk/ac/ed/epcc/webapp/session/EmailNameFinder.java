@@ -230,7 +230,11 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		}
 		Date d = getVerificationDate(target);
 		if( d != null ) {
-			attributes.put(EMAIL_VERIFIED_FIELD, d);
+			attributes.put("Email last verified", d);
+			Date need_by = needVerifyBy(target);
+			if( need_by != null ){
+				attributes.put("Next Email verification required",need_by);
+			}
 		}
 	}
 
