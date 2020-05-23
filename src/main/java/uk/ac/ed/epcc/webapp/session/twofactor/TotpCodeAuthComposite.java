@@ -291,7 +291,9 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		sb.append(URLEncoder.encode(getContext().getInitParameter("service.name"),"UTF-8"));
 		sb.append(":");
 		AppUserFactory<A> factory = (AppUserFactory<A>) getFactory();
-		sb.append(factory.getCanonicalName(user));
+		String name = factory.getCanonicalName(user);
+		name=URLEncoder.encode(name.trim(), "UTF-8");
+		sb.append(name);
 		sb.append("?secret=");
 		sb.append(getEncodedSecret(key));
 		
