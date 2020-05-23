@@ -254,6 +254,20 @@ public class Emailer {
 		doSend(templateMessage(req.getEmail(), null, email_template));
 
 	}
+	public void newRemoteHostLogin(AppUser person, String host) throws Exception {
+		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("new_login_location.txt");
+		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+		email_template.setProperty("person.name", person.getName());
+		email_template.setProperty("person.email", person.getEmail());
+		email_template.setProperty("login.location", host);
+		email_template.setProperty("login.time", time.getCurrentTime());
+		AppUserFactory<?> fac = person.getFactory();
+		PasswordAuthComposite comp = fac.getComposite(PasswordAuthComposite.class);
+		
+		email_template.setRegionEnabled("ChangePassword", comp != null && comp.canResetPassword(person));
+		
+		doSend(templateMessage(person, null, email_template));
+	}
 	/**
 	 * Notify user their password has been changed.
 	 * 

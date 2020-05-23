@@ -20,7 +20,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import sun.java2d.HeadlessGraphicsEnvironment;
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;

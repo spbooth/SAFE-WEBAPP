@@ -26,8 +26,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.DateTransform;
 import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.ValueResultMapper;
@@ -52,6 +54,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterUpdate;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
+import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -65,6 +68,8 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements AnonymisingFactory{
+	public static final Feature NEW_HOST_EMAIL = new Feature("wtmp.new_login_warnings",false,"Send info emails each time a new IP address is logged in from");
+	
 	/**
 	 * 
 	 */
@@ -289,11 +294,38 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	}
 
 	public Wtmp create(AppUser p, AppUser real,HttpServletRequest req) throws DataFault{
+		String remoteHost = req.getRemoteHost();
+		// new ip warning email
+		if( real == null && remoteHost != null && ! remoteHost.isEmpty()) {
+			// this is not an SU login
+			if( NEW_HOST_EMAIL.isEnabled(getContext())){
+				String email = p.getEmail();
+				if( email != null ) {
+					SQLAndFilter fil = new SQLAndFilter(getTarget(),new ReferenceFilter<Wtmp, AppUser>(this, PERSON_ID, p),
+							new SQLValueFilter<Wtmp>(getTarget(), res, HOST, remoteHost));
+					try {
+						if( ! exists(fil)) {
+							// this is a new host
+							Emailer mailer = new Emailer(getContext());
+							try {
+								mailer.newRemoteHostLogin(p, remoteHost);
+							} catch (Exception e1) {
+								getLogger().error("Error sending notification email");
+							}
+						}
+					} catch (DataException e1) {
+						getLogger().error("Error checking for previous logins",e1);
+					}
+				}
+			}
+		}
+		
 		Wtmp w =  makeBDO();
 
 		w.setPerson(p);
 		w.setSuperPerson(real);
-		w.setHost(req.getRemoteHost());
+		
+		w.setHost(remoteHost);
 		w.setBrowser(req.getHeader("user-agent"));
 		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 		Date s = time.getCurrentTime();

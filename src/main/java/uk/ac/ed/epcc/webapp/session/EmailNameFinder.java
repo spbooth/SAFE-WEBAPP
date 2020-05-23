@@ -133,7 +133,12 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 	 */
 	@Override
 	public String getCanonicalName(AU object) {
-		return getRecord(object).getStringProperty(EMAIL);
+		String email = getRecord(object).getStringProperty(EMAIL);
+		if( email != null) {
+			// just to be safe 
+			email=email.trim();
+		}
+		return email;
 	}
 
 	/* (non-Javadoc)
