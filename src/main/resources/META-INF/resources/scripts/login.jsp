@@ -27,7 +27,10 @@
   Set session=false to avoid dropping a cookie until the user has indicated consent by logging in 
 --%>
 <%@ page session="false"
-	import="uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*,uk.ac.ed.epcc.webapp.forms.html.*,java.util.*"%>
+	import="uk.ac.ed.epcc.webapp.* %>
+<%@ page import="uk.ac.ed.epcc.webapp.model.*" %>
+<%@ page import="uk.ac.ed.epcc.webapp.forms.html.*,java.util.*,uk.ac.ed.epcc.webapp.session.*"%>
+<%@ page import="uk.ac.ed.epcc.webapp.content.*" %>
 <%@ include file="/service_init.jsf"%>
 <%
     if( conn == null ){

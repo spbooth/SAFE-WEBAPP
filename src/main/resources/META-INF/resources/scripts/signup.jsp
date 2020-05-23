@@ -21,8 +21,9 @@ signup.jsp - Page used to sign up for an account using password auth.
 	SignupServlet POST - Validates details and creates database records if appropriate
 
 --%>
-<%@ page import="java.util.*, uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*,uk.ac.ed.epcc.webapp.forms.html.*,uk.ac.ed.epcc.webapp.session.AppUserFactory"
+<%@ page import="java.util.*, uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*,uk.ac.ed.epcc.webapp.forms.html.*,uk.ac.ed.epcc.webapp.session.*"
 %>
+<%@ page import="uk.ac.ed.epcc.webapp.session.*" %>
 <%@page session="false" %>
 <%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
 <wb:formpage/>
