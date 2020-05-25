@@ -180,6 +180,12 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		super(c);
 		SessionService sess = c.getService(SessionService.class);
 		fac = sess.getLoginFactory();
+		if( fac instanceof AppUserTransitionContributor) {
+			AppUserTransitionContributor<AU> cont = (AppUserTransitionContributor<AU>) fac;
+			for(Entry<AppUserKey<AU>, Transition<AU>> e : cont.getTransitions(this).entrySet()) {
+				addTransition( e.getKey(), e.getValue());
+			}
+		}
 		for(AppUserTransitionContributor<AU> cont : fac.getComposites(AppUserTransitionContributor.class)) {
 			for(Entry<AppUserKey<AU>, Transition<AU>> e : cont.getTransitions(this).entrySet()) {
 				addTransition( e.getKey(), e.getValue());
