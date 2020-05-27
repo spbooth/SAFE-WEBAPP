@@ -70,6 +70,8 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 	 * 
 	 * This will also disable forgotten password requests.
 	 * 
+	 * 
+	 * @see AppUserFactory#getCanLoginFilter()
 	 * @see #canReregister()
 	 * @return boolean true for permitted.
 	 */

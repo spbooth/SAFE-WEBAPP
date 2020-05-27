@@ -106,6 +106,7 @@ import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.RemoteAuthServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
+
 /** A Factory for creating {@link AppUser} objects that represent users of the system.
  * 
  * If the <b>bootstrap.admin</b> {@link Feature} is set then the first user in the system will automatically be given the ADMIN role (or the role
@@ -325,6 +326,14 @@ AnonymisingFactory
 			requiredPages.add(new UpdatePersonRequiredPage());
 		}
     	return requiredPages;
+    }
+    /** get a filter equivalent to {@link AppUser#canLogin()}
+     * 
+     * @see AppUser#canLogin()
+     * @return {@link SQLFilter}
+     */
+    public SQLFilter<AU> getCanLoginFilter(){
+    	return new GenericBinaryFilter<AU>(getTarget(), true);
     }
     public class UpdatePersonRequiredPage implements RequiredPage<AU>{
 

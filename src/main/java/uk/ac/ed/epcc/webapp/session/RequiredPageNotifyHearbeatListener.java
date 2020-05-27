@@ -67,18 +67,21 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 			fil.addFilter(rp.notifiable(sess));
 		}
 		Emailer mailer = new Emailer(getContext());
-		AndFilter<AU> notify_filter = new AndFilter<AU>(login.getTarget(), fil, login.getEmailFilter());
+		AndFilter<AU> notify_filter = new AndFilter<AU>(login.getTarget(), fil, login.getEmailFilter(), login.getCanLoginFilter());
 		try {
 			for( AU person : login.getResult(notify_filter)) {
-				Set<String> notices = new LinkedHashSet<String>();
-				for(RequiredPage<AU> rp : requiredPages) {
-					String t = rp.getNotifyText(person);
-					if( t!=null && ! t.isEmpty()) {
-						notices.add(t);
+				// Don't notify a user who can't login to fix
+				if( person.canLogin()) {
+					Set<String> notices = new LinkedHashSet<String>();
+					for(RequiredPage<AU> rp : requiredPages) {
+						String t = rp.getNotifyText(person);
+						if( t!=null && ! t.isEmpty()) {
+							notices.add(t);
+						}
 					}
-				}
-				if( ! notices.isEmpty()) {
-					mailer.notificationEmail(person, notices);
+					if( ! notices.isEmpty()) {
+						mailer.notificationEmail(person, notices);
+					}
 				}
 			}
 		} catch (Exception e) {

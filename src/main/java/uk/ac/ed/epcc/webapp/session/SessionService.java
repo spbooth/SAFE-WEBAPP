@@ -27,7 +27,6 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 /** {@link AppContextService} for managing session information.
@@ -353,6 +352,24 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public <T extends DataObject> boolean hasRelationship(DataObjectFactory<T> fac, T target,String role,Supplier<Boolean> fallback);
 	
+	/** Convenience method to query the relationships of a specified person rather than
+	 * the current user
+	 * 
+	 * @param <T>
+	 * @param person
+	 * @param fac
+	 * @param target
+	 * @param role
+	 * @param fallback
+	 * @return
+	 */
+	public default <T extends DataObject> boolean personHasRelationship(A person,DataObjectFactory<T> fac, T target,String role,Supplier<Boolean> fallback ) {
+		try {
+			return getLoginFactory().matches(getPersonInRelationshipRoleFilter(fac, role, target), person);
+		} catch (UnknownRelationshipException e) {
+			return fallback.get();
+		}
+	}
 	/** Tests if the session has already authenticated. This can return false even if {@link #haveCurrentUser()} could return true
 	 * provided it is called first.
 	 * 
