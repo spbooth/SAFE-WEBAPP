@@ -312,11 +312,13 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			if( fil instanceof ResultVisitor){
 				setVisitor((ResultVisitor<T>)fil);
 			}
+			
 			try {
 				setup(fil,0,-1);
 			} catch (DataException e) {
 				throw new DataFault("Error in setup",e);
 			}
+			
 		}
 		@Override
 		public final void addSource(StringBuilder source) {
@@ -738,6 +740,10 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	@Override
 	public FilterResult<T> getFilterResult(L left, R right, BaseFilter<T> fil) throws DataFault{
 		return new LinkResult(left, right, fil);
+	}
+	
+	public BaseFilter<T> getFilter(L left, R right, BaseFilter<T> fil) {
+		return new LinkFilter(left, right, fil);
 	}
 
 	@Override
