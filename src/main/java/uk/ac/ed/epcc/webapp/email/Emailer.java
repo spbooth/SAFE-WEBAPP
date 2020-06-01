@@ -355,9 +355,11 @@ public class Emailer {
 				email_template.setRegionEnabled("password_value.region", false);
 				email_template.setProperty("password_reset.tag", request.getTag());
 			}
-			
+			// The user needs the password info so we want to see any send exceptions
+			doSendNow(templateMessage(person,email_template));
+		}else {
+			doSend(templateMessage(person,email_template));
 		}
-		doSend(templateMessage(person,email_template));
 
 	}
 	public void notificationEmail(AppUser person, Set<String> notices) throws Exception {
