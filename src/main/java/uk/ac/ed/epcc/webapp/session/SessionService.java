@@ -354,7 +354,7 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	
 	/** Convenience method to query the relationships of a specified person rather than
 	 * the current user
-	 * 
+	 * Note this will not consider global roles unless the person matches the current person
 	 * @param <T>
 	 * @param person
 	 * @param fac
@@ -365,6 +365,9 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public default <T extends DataObject> boolean personHasRelationship(A person,DataObjectFactory<T> fac, T target,String role,Supplier<Boolean> fallback ) {
 		try {
+			if( isCurrentPerson(person)) {
+				return hasRelationship(fac, target, role, fallback);
+			}
 			return getLoginFactory().matches(getPersonInRelationshipRoleFilter(fac, role, target), person);
 		} catch (UnknownRelationshipException e) {
 			return fallback.get();
