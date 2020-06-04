@@ -116,9 +116,11 @@ body{
 }
 .nav li.has_role a , div.bar h3.has_role{
 	background-color: var(--menu-bg-has-role);
+	color: var(--menu-text-color);
 } 
 .nav li.missing_role a , div.bar h3.missing_role{
 	background-color: var(--menu-bg-missing-role);
+	color: var(--menu-text-color);
 } 
 
 .nav li.notify >  a , span.notify {
