@@ -737,10 +737,10 @@ textarea.comment {
 }
 
 
-div td[format=under]{
+div table tr td[format=under]{
 	color: red;
 }
-div td[format=over]{
+div table tr td[format=over]{
 	color: blue;
 }
 div td[highlight=true]{
