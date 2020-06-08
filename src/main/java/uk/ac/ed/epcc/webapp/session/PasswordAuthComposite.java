@@ -18,6 +18,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.logging.log4j.util.Strings;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
@@ -71,7 +73,13 @@ public abstract class PasswordAuthComposite<T extends AppUser> extends AppUserCo
 			if( mustResetPassword(target)) {
 				ExtendedXMLBuilder text = cb.getText();
 				text.addClass("warn");
-				text.clean(getContext().expandText("Your ${service.website-name} password has expired and should be changed."));
+				String reason =reasonForReset(target);
+				if( Strings.isNotBlank(reason)) {
+					text.clean(reason);
+					text.clean(" ");
+				}
+				text.clean(getContext().expandText("Your ${service.website-name} password must be changed."));
+				
 				text.appendParent();
 			}
 			builder.getExtraHtml(cb, op, target);
@@ -145,6 +153,12 @@ public abstract class PasswordAuthComposite<T extends AppUser> extends AppUserCo
 	 * @return boolean
 	 */
 	public abstract boolean mustResetPassword(T user);
+	/** Text explanation of why {@link #mustResetPassword(AppUser)} returned true.
+	 * 
+	 * @param user
+	 * @return
+	 */
+	public abstract String reasonForReset(T user);
 	/** Change the password for a user
 	 * 
 	 * @param user
