@@ -49,7 +49,11 @@ public interface BearerTokenService extends AppContextService<BearerTokenService
 	public void setActive(boolean active);
 	
 	
-	
+	/** set the realm to request if bearer authorisation is requested
+	 * 
+	 * @param realm
+	 */
+	public void setRealm(String realm);
 	/** get the realm to request for bearer token authentication.
 	 * 
 	 * Realms are distinct token spaces. They may be set per url so only a sub-set of
@@ -93,6 +97,14 @@ public interface BearerTokenService extends AppContextService<BearerTokenService
 	 */
 	public void processToken(SessionService sess, String token);
 	
+	
+	/** Can we request a token via an authorization header.
+	 * This allows an endpoint that primarily uses basic-auth but
+	 * can process a token if present to suppress token requests.
+	 * 
+	 * @param requestable
+	 */
+	public void setRequestable(boolean requestable);
 	/** Should authentication be requested or errors reported.
 	 * If this returns false then no authentication should be requested. 
 	 * This should return false after {@link #processToken(SessionService, String)}
@@ -100,7 +112,8 @@ public interface BearerTokenService extends AppContextService<BearerTokenService
 	 * This should always return true if there is an error to report.
 	 * 
 	 * If this returns false then bearer authentication will not be explicitly requested but a client can still provide a
-	 * token spontaneously provided the realm is non null.
+	 * token spontaneously. 
+	 * A non-empty set of requested scopes are usually required fro authorisation to be requested.
 	 * 
 	 * @return boolean
 	 */
