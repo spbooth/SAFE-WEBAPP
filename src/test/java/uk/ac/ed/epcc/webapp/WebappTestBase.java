@@ -101,7 +101,7 @@ public abstract class WebappTestBase implements ContextHolder{
 			String dir = getClass().getCanonicalName();
 			dir = dir.substring(0,dir.lastIndexOf("."));
 			dir = dir.replace('.', '/');
-			dir = "src/main/test/resources/"+dir;
+			dir = "src/test/resources/"+dir;
 			File output = new File(dir+"/"+name+".xml");
 			FileWriter w = new FileWriter(output);
 			SimpleXMLBuilder builder = new XMLWriter(w);
@@ -111,8 +111,12 @@ public abstract class WebappTestBase implements ContextHolder{
 			for(String tab : serv.getTables()){
 				try{
 					DataObjectFactory<? extends DataObject> fac = ctx.makeObject(DataObjectFactory.class, tab);
-					for(DataObject o: fac.all()){
-						d.dump(o);
+					if( fac != null ) {
+						for(DataObject o: fac.all()){
+							d.dump(o);
+						}
+					}else {
+						log.warn("No factory for "+tab);
 					}
 				}catch(Exception t){
 					log.warn("Error in dump of "+tab, t);
