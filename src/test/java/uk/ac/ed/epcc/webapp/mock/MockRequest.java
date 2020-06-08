@@ -438,7 +438,7 @@ public class MockRequest implements HttpServletRequest {
 	@Override
 	public boolean isSecure() {
 		
-		return false;
+		return true;
 	}
 
 	@Override
