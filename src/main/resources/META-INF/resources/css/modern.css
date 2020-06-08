@@ -43,7 +43,8 @@
   --warn-color: black;
   --menu-bg-has-role: #66ff66;
   --menu-bg-missing-role: #ff6666;
-  
+  --menu-hover-bg-has-role: #ccffcc;
+  --menu-hover-bg-missing-role: #ffcccc;
    --column-th-color: black;
   --column-th-bg-color: #e7e7e7;
    --form-th-color: black;

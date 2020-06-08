@@ -6,6 +6,8 @@
  --menu-hover-text-color: #ff4040;	
  --menu-bg-has-role: #060;
  --menu-bg-missing-role: #600;
+ --menu-hover-bg-has-role: #009900;
+ --menu-hover-bg-missing-role: #990000;
  --notify-color: black;
  --notify-bg-color: #bf7a00;
  --notify-hover-color: #800000;
@@ -118,9 +120,19 @@ body{
 	background-color: var(--menu-bg-has-role);
 	color: var(--menu-text-color);
 } 
+.nav li.has_role a:hover {
+	background-color: var(--menu-hover-bg-has-role);
+	color: var(--menu-text-color);
+    cursor: pointer;
+} 
 .nav li.missing_role a , div.bar h3.missing_role{
 	background-color: var(--menu-bg-missing-role);
 	color: var(--menu-text-color);
+} 
+.nav li.missing_role a:hover {
+	background-color: var(--menu-hover-bg-missing-role);
+	color: var(--menu-text-color);
+    cursor: pointer;
 } 
 
 .nav li.notify >  a , span.notify {
