@@ -8,6 +8,7 @@
 <td>
 <select id="transition_table" name="table" class="input" required="required">
 <option value="BadKeys">BadKeys: BadKeyFactory</option>
+<option value="DataStore">DataStore: DataStore</option>
 <option value="Locks">Locks: LockFactory</option>
 <option value="Person">Person: AppUserFactory</option>
 <option value="PersonHistory">PersonHistory: PersonHistoryFactory</option>
