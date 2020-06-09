@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.BinaryExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.BinarySQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.expr.ConstExpression;
@@ -36,6 +37,7 @@ import uk.ac.ed.epcc.webapp.session.Hash;
  *
  */
 public interface SQLContext extends Contexed{
+	
 	/** Get a database connection for the current context
 	 * 
 	 * @return
@@ -162,4 +164,10 @@ public interface SQLContext extends Contexed{
 	 */
 	public DatabaseService getService();
 	
+	/** Is this a read-only connection
+	 * 
+	 * @return
+	 * @throws DataException 
+	 */
+	public boolean isReadOnly();
 }

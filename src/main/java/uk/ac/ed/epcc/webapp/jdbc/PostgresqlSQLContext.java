@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.DateDerefSQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.DateSQLExpression;
@@ -36,6 +37,7 @@ public class PostgresqlSQLContext implements SQLContext {
 	private final AppContext ctx;
 	private final Connection conn;
 	private final DatabaseService serv;
+	private Boolean read_only=null;
 
 	public PostgresqlSQLContext(AppContext ctx,DatabaseService serv,Connection conn) {
 		this.ctx=ctx;
@@ -119,5 +121,18 @@ public class PostgresqlSQLContext implements SQLContext {
 	public DatabaseService getService() {
 		return serv;
 	}
+	@Override
+	public boolean isReadOnly()  {
+		if( read_only == null ) {
+			try {
+				read_only = getConnection().isReadOnly();
+			} catch (SQLException e) {
+				read_only=true;
+				throw new DataError("Error checking read_only", e);
+			}
+		}
+		return read_only.booleanValue();
+	}
+
 	
 }

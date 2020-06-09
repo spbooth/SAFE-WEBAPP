@@ -841,7 +841,7 @@ public final class Repository implements AppContextCleanup{
 					throw new DataFault("No connection");
 				}
 				deCache();
-				if( Repository.READ_ONLY_FEATURE.isEnabled(getContext())){
+				if( Repository.READ_ONLY_FEATURE.isEnabled(getContext()) || sql.isReadOnly()){
 					return;
 				}
 				StringBuilder sb = new StringBuilder();
@@ -1620,7 +1620,7 @@ public final class Repository implements AppContextCleanup{
 		synchronized private boolean update() throws ConsistencyError, DataFault {
 			int pattern_count=1;
 
-			if( READ_ONLY_FEATURE.isEnabled(ctx)){
+			if( READ_ONLY_FEATURE.isEnabled(ctx)|| sql.isReadOnly()){
 				return false;
 			}
 			if (!isDirty()) {
@@ -2772,7 +2772,7 @@ public final class Repository implements AppContextCleanup{
 	 * @throws DataFault
 	 */
 	protected int insert(Record r) throws DataFault {
-			if( READ_ONLY_FEATURE.isEnabled(ctx)){
+			if( READ_ONLY_FEATURE.isEnabled(ctx) || sql.isReadOnly()){
 				return -1;
 			}
 			TimerService time = ctx.getService(TimerService.class);

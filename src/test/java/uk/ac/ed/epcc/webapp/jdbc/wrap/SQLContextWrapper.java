@@ -143,4 +143,9 @@ public abstract class SQLContextWrapper implements SQLContext {
 		return db;
 	}
 
+	@Override
+	public boolean isReadOnly() {
+		return nested.isReadOnly();
+	}
+
 }
