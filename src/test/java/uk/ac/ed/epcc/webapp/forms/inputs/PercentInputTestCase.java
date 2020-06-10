@@ -131,7 +131,7 @@ public class PercentInputTestCase extends NumberInputTestCase<Double, PercentInp
 		PercentInput i = new PercentInput(true);
 		
 		i.parse("12.6%");
-		assertEquals(0.12, i.getValue(), 0.0001);
+		assertEquals(0.13, i.getValue(), 0.0001);
 		
 		
 	}
