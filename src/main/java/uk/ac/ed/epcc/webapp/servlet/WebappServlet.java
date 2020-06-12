@@ -160,7 +160,8 @@ public abstract class WebappServlet extends HttpServlet {
 	protected void doPut(HttpServletRequest req,
 			HttpServletResponse res, AppContext conn)
 			throws ServletException, java.io.IOException{
-		
+		res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Put not allowed");
+		return;
 	}
 	
 	/**
