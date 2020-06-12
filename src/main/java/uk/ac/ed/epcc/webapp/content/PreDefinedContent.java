@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.content;
 
+import java.text.Format;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
@@ -97,7 +98,11 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 		if( builder instanceof XMLPrinter) {
 			XMLPrinter printer = (XMLPrinter) builder;
 			MessageFormat fmt2 = (MessageFormat) fmt.clone();
-			if( args != null && builder instanceof HtmlBuilder) {
+			if( args != null ) {
+				Format f = new TextContentFormat();
+				if(builder instanceof HtmlBuilder) {
+					f = new HtmlContentFormat();
+				}
 				// apply HtmlFormat 
 				for(int i=0 ; i< args.length; i++) {
 					Object a = args[i];
@@ -106,7 +111,7 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 					// raw html can be added by wrapping in a UIGenerator or XMLPrinter
 					// @see messages.jsf
 					if( !( a instanceof Number || a instanceof Date )) {
-						fmt2.setFormatByArgumentIndex(i, new HtmlContentFormat());
+						fmt2.setFormatByArgumentIndex(i, f);
 					}
 				}
 			}

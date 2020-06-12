@@ -17,22 +17,21 @@ import java.text.FieldPosition;
 import java.text.Format;
 import java.text.ParsePosition;
 
-/** A {@link Format} that adds the argument to a {@link HtmlBuilder}.
+import uk.ac.ed.epcc.webapp.forms.Identified;
+
+/** A {@link Format} that understands the Webapp interfaces for string generation
  * 
- * This allows {@link UIGenerator}s and {@link XMLGenerator}s to be added with markup
- * to a message, it should also ensure that String values are properly escaped
- * 
- * @see TextContentFormat
+ * @see HtmlContentFormat
  * @author spb
  *
  */
-public class HtmlContentFormat extends Format {
+public class TextContentFormat extends Format {
 
 	/**
 	 * 
 	 */
-	public HtmlContentFormat() {
-		// TODO Auto-generated constructor stub
+	public TextContentFormat() {
+		
 	}
 
 	/* (non-Javadoc)
@@ -40,9 +39,19 @@ public class HtmlContentFormat extends Format {
 	 */
 	@Override
 	public StringBuffer format(Object arg0, StringBuffer arg1, FieldPosition arg2) {
-		HtmlBuilder hb = new HtmlBuilder();
-		hb.addObject(arg0);
-		arg1.append(hb.toString());
+		if( arg0 instanceof Identified) {
+			arg1.append(((Identified)arg0).getIdentifier());
+		}else if( arg0 instanceof Iterable) {
+			for( Object o : (Iterable) arg0) {
+				format(o,arg1,arg2);
+				arg1.append(" ");
+			}
+		}else if( arg0 instanceof Object[]) {
+			for( Object o : (Object[]) arg0) {
+				format(o,arg1,arg2);
+				arg1.append(" ");
+			}
+		}
 		return arg1;
 	}
 
