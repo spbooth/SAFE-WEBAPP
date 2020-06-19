@@ -70,20 +70,40 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 		protected Lock(Record res) {
 			super(res, LockFactory.this);
 		}
-		
+		/** is the lock taken
+		 * 
+		 */
 		public boolean isLocked() {
 			return wasLockedAt() != null;
 		}
 
+		/** when was the lock taken.
+		 * returns null if lock not taken
+		 * 
+		 * @return {@link Date}
+		 */
 		public Date wasLockedAt() {
 			return record.getDateProperty(LOCK_FIELD);
 		}
+		/** when was the lock last taken (may not be locked now)
+		 * 
+		 * @return
+		 */
 		public Date lastLocked() {
 			return record.getDateProperty(LAST_LOCK_FIELD);
 		}
+		/** Is THIS instance holding the lock
+		 * 
+		 * @return
+		 */
 		public boolean isHolding() {
 			return holding;
 		}
+		/** attempt to take the lock
+		 * 
+		 * @return true if lock taken
+		 * @throws DataFault
+		 */
 		public boolean takeLock() throws DataFault {
 			if( holding) {
 				throw new ConsistencyError("Already locked "+getName());
@@ -122,7 +142,10 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 				return false;
 			}
 		}
-		
+		/** release the lock
+		 * 
+		 * @throws DataFault
+		 */
 		public void releaseLock() throws DataFault {
 			if( ! holding ) {
 				throw new ConsistencyError("Not holding lock "+getName());

@@ -471,7 +471,7 @@ public abstract class DataObject implements ContextIndexed, Identified, Releasab
 	}
 
 	public static boolean empty(String input) {
-		return ((input == null) || (input.length() == 0));
+		return ((input == null) || (input.trim().length() == 0));
 	}
 	/** A static method to locate the {@link DataObjectFactory} used to create a {@link DataObject}
 	 * This will be necessary when behaviour added as {@link Composite}s is required but
