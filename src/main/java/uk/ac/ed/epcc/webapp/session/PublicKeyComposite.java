@@ -193,7 +193,7 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 	@Override
 	public void addMetaData(Map<String, Object> attributes, AppUser person) {
 		String publickey = getPublicKey(person);
-		if( publickey != null){
+		if( publickey != null && ! publickey.trim().isEmpty()){
 			attributes.put(PUBLIC_KEY_META_ATTR,publickey);
 			try{
 				X key = load(publickey);
