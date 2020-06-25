@@ -58,6 +58,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.exception.FatalDataError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.NoTableException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
@@ -2025,6 +2026,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				TableSpecification spec = getFinalTableSpecification(ctx,
 						homeTable);
 				if( spec != null ){
+					try {
+						if( ctx.getService(DatabaseService.class).getSQLContext().isReadOnly()) {
+							throw new DataError("Cannot create table, read-only connection");
+						}
+					} catch (SQLException e) {
+						throw new FatalDataError("Cannot retreive SQLContext", e);
+					}
 					if( timer != null ){ timer.startTimer("makeTable"); timer.startTimer("makeTable:"+homeTable);}
 					try{
 						return makeTable(ctx, homeTable, spec);

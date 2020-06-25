@@ -26,6 +26,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.SQLNonTransientConnectionException;
 import java.sql.SQLSyntaxErrorException;
 import java.sql.Statement;
 import java.sql.Timestamp;
@@ -58,6 +59,7 @@ import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.exception.FatalDataError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.NoTableException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -2997,6 +2999,8 @@ public final class Repository implements AppContextCleanup{
 				if(CHECK_INDEX.isEnabled(getContext())) {
 					setIndexes();
 				}
+			}catch( SQLNonTransientConnectionException nt) {
+				throw new FatalDataError("Connection error in setMetaData for "+getTag(),nt);
 			}catch( SQLSyntaxErrorException se) {
 				// This occurs when table does not exist
 				throw new NoTableException(getTable(), se);
@@ -3043,7 +3047,7 @@ public final class Repository implements AppContextCleanup{
 			indexes=result;
 		}catch(SQLException e){
 			db_serv.logError("Error getting index names", e);
-			throw new DataError("Error getting index names",e);
+			throw new FatalDataError("Error getting index names",e);
 		}
 	}
 	/** Set the table References for the fields  

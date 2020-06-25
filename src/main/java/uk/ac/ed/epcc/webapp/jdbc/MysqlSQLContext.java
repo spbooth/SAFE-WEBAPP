@@ -23,6 +23,7 @@ import java.util.List;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.exception.FatalDataError;
 import uk.ac.ed.epcc.webapp.jdbc.expr.DateDerefSQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.DateSQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.DerefSQLExpression;
@@ -163,7 +164,7 @@ public class MysqlSQLContext implements SQLContext {
 				read_only = getConnection().isReadOnly();
 			} catch (SQLException e) {
 				read_only=true;
-				throw new DataError("Error checking read_only", e);
+				throw new FatalDataError("Error checking read_only", e);
 			}
 		}
 		return read_only.booleanValue();
