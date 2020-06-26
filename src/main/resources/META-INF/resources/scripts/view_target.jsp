@@ -109,11 +109,11 @@ for(Object key : provider.getTransitions(target)){
 				String help=provider.getHelp(key);
 				if( help == null ){
 			 	  %>
-			 	  <button class='input_button' disabled name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>'  value='<%=key.toString() %>' ><%=valueString%></button>
+			 	  <button class='input_button disabled' disabled name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>'  value='<%=key.toString() %>' ><%=valueString%></button>
 			 	  <% 
 				}else{
 					%>
-					<button class='input_button' disabled name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>' title='<%=help %> (disabled)'  value='<%=key.toString() %>' ><%=valueString%></button>
+					<button class='input_button disabled' disabled name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>' title='<%=help %> (disabled)'  value='<%=key.toString() %>' ><%=valueString%></button>
 					<% 		
 				}
 			}

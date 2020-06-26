@@ -85,7 +85,9 @@ background-color: #ffffff;
  */
  
 
-
+:disabled, .disabled, .input_button:disabled, .input_button.disabled{
+	color: gray;
+}
 
 .lightgrey{
 	background-color: #e7e7e7;

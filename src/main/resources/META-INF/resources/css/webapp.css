@@ -542,7 +542,7 @@ label.missing::after, span.missing::after {
 	font-weight: bold;
 	color: #ff0000;
 }
-.disabled {
+:disabled, .disabled {
 	cursor: not-allowed;
 }
 
