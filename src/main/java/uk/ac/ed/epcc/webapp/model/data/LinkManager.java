@@ -717,13 +717,16 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			return this.new JoinLinkFilterIterator(new LinkFilter(l, r, f));
 		}
 		// This will still set the known links as LinkFilter is a ResultVisitor
-		return new FilterIterator(new LinkFilter(l, r, f));
+		return new FilterIterator(getFilter(l, r, f));
 	}
 	public long getLinkCount(L l, R r,BaseFilter<T> f) throws DataException{
-		return getCount(new LinkFilter(l, r, f));
+		return getCount(getFilter(l, r, f));
 	}
 	public T find(L l, R r,BaseFilter<T> f) throws DataException{
-		return find(new LinkFilter(l, r, f));
+		return find(getFilter(l, r, f));
+	}
+	public T find(L l, R r,BaseFilter<T> f, boolean allow_null) throws DataException{
+		return find(getFilter(l, r, f),allow_null);
 	}
 	public DataObjectFactory<R> getRightFactory(){
 		return (DataObjectFactory<R>) getRightProducer();
