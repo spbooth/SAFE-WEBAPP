@@ -42,13 +42,14 @@ public class TimeChartTest extends ChartTestCase {
 		  System.out.println(nsets);
 		  //String legs[] = ((Chart2DChartData)tc.getChartData()).getLegends();
 		ChartData<?> c = tc.getChartData();
-		c.createPNG(new File(System.getProperty("java.io.tmpdir")+"/daystrip"+".png"));
+		File pngfile = new File(System.getProperty("java.io.tmpdir")+"/daystrip"+".png");
+		c.createPNG(pngfile);
 		  c.getSize();
 		  //tc.createSVG("/tmp/daystrip2");
 		  Table t = tc.getTable();
 		  t.setKeyName("Day of week");
 		  checkTable(t);
 		 
-		  
+		  pngfile.delete();
 	  }
 }
