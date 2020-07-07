@@ -128,7 +128,7 @@ public class AuthorizedKeyValidator implements FieldValidator<String>{
 	   Matcher alg_m= ALG_PATTERN.matcher(key);
 	   if( ! alg_m.lookingAt()) {
 		   // unrecognised algorithm
-		   throw new ValidateException("Unrecognised key algorithm");
+		   throw new ValidateException("Unrecognised key algorithm "+key);
 	   }
 	   String algorithm = alg_m.group(1);
 	   key = key.substring(alg_m.end());
