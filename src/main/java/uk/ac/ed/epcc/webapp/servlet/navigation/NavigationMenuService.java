@@ -13,6 +13,11 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet.navigation;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Properties;
@@ -74,7 +79,7 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 	public static final String NAVIGATIONAL_PREFIX = "navigation";
 	public static final Feature NAVIGATION_MENU_FEATURE = new Preference("navigation_menu", false, "Support for navigation menu code");
 	public static final Feature NAVIGATION_MENU_JS_FEATURE = new Preference("navigation_menu.script", false, "Add javascript for keyboard access to navigaition menu sub-menus");
-
+    public static final Feature FORCE_SERIALISE_FEATURE = new Feature("navigation_menu.force_Serialise",true,"Force serialisation when caching menu in session");
 	/**
 	 * 
 	 */
@@ -106,16 +111,38 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 		}
 		NodeContainer menu = null;
 		try{
-			menu = (NodeContainer) service.getAttribute(NAVIGATION_MENU_ATTR);
-		}catch(Exception t){
-			// Any de-serialisation problem will probably jus destory the session
+			Object attribute = service.getAttribute(NAVIGATION_MENU_ATTR);
+			if( attribute != null) {
+				if( attribute instanceof NodeContainer) {
+					menu = (NodeContainer) attribute;
+				}else if( attribute instanceof byte[]) {
+					ObjectInputStream os = new ObjectInputStream(new ByteArrayInputStream(((byte[])attribute)));
+					menu = (NodeContainer) os.readObject();
+				}
+			}
+		}catch(Throwable t){
+			// Any de-serialisation problem will probably just destroy the session
 			// but just to be fail-safe trap all throwables.
+			getLogger().error("Error getting menu from session",t);
 		}
 		Date too_old = new Date(System.currentTimeMillis()-getContext().getLongParameter("navigation.expire_millis", 600000));
 		if( menu == null || menu.getDate().before(too_old)){
 			menu = makeMenu();
 			if( menu != null ){
-				service.setAttribute(NAVIGATION_MENU_ATTR, menu);
+				if( FORCE_SERIALISE_FEATURE.isEnabled(getContext())) {
+					// make sure we don't have any classloader leaks
+					ByteArrayOutputStream out = new ByteArrayOutputStream();
+					try {
+						ObjectOutputStream os = new ObjectOutputStream(out);
+						os.writeObject(menu);
+						os.close();
+						service.setAttribute(NAVIGATION_MENU_ATTR, out.toByteArray());
+					} catch (Throwable t) {
+						getLogger().error("Error writting menu", t);
+					}
+				}else {
+					service.setAttribute(NAVIGATION_MENU_ATTR, menu);
+				}
 			}
 		}
 		return menu;

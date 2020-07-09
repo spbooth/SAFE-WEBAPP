@@ -64,6 +64,11 @@ public abstract class Node extends NodeContainer implements Externalizable{
 		}else{
 			out.writeObject(image);
 		}
+		if( post_image_text == null ){
+			out.writeObject("");
+		}else{
+			out.writeObject(post_image_text);
+		}
 		if( display_class == null){
 			out.writeObject("");
 		}else{
@@ -87,6 +92,7 @@ public abstract class Node extends NodeContainer implements Externalizable{
 		setTargetPath((String)in.readObject());
 		setMenuText((String)in.readObject());
 		setImage((String) in.readObject());
+		setPostImageText((String)in.readObject());
 		setDisplayClass((String)in.readObject());
 		setHelpText((String)in.readObject());
 		setAccessKey(in.readChar());
