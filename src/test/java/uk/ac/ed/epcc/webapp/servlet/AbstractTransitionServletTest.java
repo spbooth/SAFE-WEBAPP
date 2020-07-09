@@ -409,7 +409,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 			if( text.equals(key.toString())) {
 				text=null;
 			}
-			if( provider.allowTransition(getContext(),target,key) ){
+			if( provider.showTransition(getContext(),target,key) ){
 				builder.open("active");
 				  builder.attr("value", key.toString());
 				  String help=provider.getHelp(key);

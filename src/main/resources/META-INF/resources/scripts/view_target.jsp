@@ -92,7 +92,7 @@ for(Object key : provider.getTransitions(target)){
     builder.clean(provider.getText(key));
     String valueString = builder.toString();
 
-	if( provider.allowTransition(conn,target,key) ){
+	if( provider.showTransition(conn,target,key) ){
 		String help=provider.getHelp(key);
 		if( help == null ){
 	 	  %>

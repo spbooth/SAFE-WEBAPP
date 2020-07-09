@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.transition;
 
+import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -88,4 +89,18 @@ public interface ViewTransitionFactory<K, T> extends TransitionFactory<K, T> {
    default public String getText(K key) {
 	   return key.toString();
    }
+   
+   /** Should the transition be listed on the view page.
+    * Normally this just shows enabled transitions but we might want to hide some of these.
+    * 
+    * The show a disabled button for some transitions implement {@link ShowDisabledTransitions}
+	 * 
+	 * @param c
+	 * @param target
+	 * @param key
+	 * @return
+	 */
+	public default boolean showTransition(AppContext c, T target, K key) {
+		return allowTransition(c, target, key);
+	}
 }
