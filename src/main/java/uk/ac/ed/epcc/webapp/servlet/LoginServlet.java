@@ -261,7 +261,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 						next_page = new RedirectResult(getMainPage(conn));
 					}
 					TwoFactorHandler<T> handler = new TwoFactorHandler<>(serv);
-					next_page =  handler.doLogin(person, (SerializableFormResult) next_page);
+					next_page =  handler.doLogin(person, "password",(SerializableFormResult) next_page);
 					doLoginResult(conn, req, res, next_page);
 					return;
 				}
@@ -292,7 +292,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 	public static void doLoginResult(AppContext conn,HttpServletRequest req, HttpServletResponse res, FormResult result) throws Exception {
 		if( COOKIE_TEST.isEnabled(conn) && result instanceof SerializableFormResult) {
 			SessionService sess = conn.getService(SessionService.class);
-			sess.setAttribute(INITIAL_PAGE_ATTR, result);
+			sess.setAttribute(INITIAL_PAGE_ATTR,(SerializableFormResult) result);
 			res.sendRedirect(res.encodeRedirectURL(req.getContextPath()+"/LoginServlet"));
 			return;
 		}

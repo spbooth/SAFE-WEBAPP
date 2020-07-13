@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
@@ -95,6 +96,7 @@ public class RemoteAuthServlet extends WebappServlet {
 	public static final String REMOTE_AUTH_REALM_PROP = "remote_auth.realm";
 
 
+	public static final String REMOTE_AUTH_NEXT_URL="remote_auth.next_url";
 	/**
 	 * 
 	 */
@@ -220,7 +222,7 @@ public class RemoteAuthServlet extends WebappServlet {
 					if( next_page == null) {
 						next_page = new RedirectResult(LoginServlet.getMainPage(conn));
 					}
-					FormResult result = handler.doLogin(person, next_page);
+					FormResult result = handler.doLogin(person,remote_auth_realm, next_page);
 					handleFormResult(conn, req, res, result);
 					return;
 				}else{
@@ -228,6 +230,8 @@ public class RemoteAuthServlet extends WebappServlet {
 					return;
 				}
 			} else {
+				// binding or registration
+				
 				// Check for existing binding
 				// and replace rather than duplicate
 				AppUser existing = parser.findFromString(web_name);
@@ -243,8 +247,27 @@ public class RemoteAuthServlet extends WebappServlet {
 				}
 				try {
 					person.commit();
-					message(conn, req, res, "remote_auth_set",web_name);
-					return;
+					FormResult next = (FormResult) session_service.getAttribute(REMOTE_AUTH_NEXT_URL);
+					if( next == null ) {
+						message(conn, req, res, "remote_auth_set",web_name);
+						return;
+					}else {
+						// This is a re-authenticaiton
+						parser.verified(person); // record sucessful authentication
+						for(RemoteAuthListener l : ((AppUserFactory<?>)person.getFactory()).getComposites(RemoteAuthListener.class)){
+							l.authenticated(remote_auth_realm,person);
+						}
+						person.commit();
+						person.historyUpdate();
+						session_service.setAuthenticationType(remote_auth_realm);
+						session_service.removeAttribute(REMOTE_AUTH_NEXT_URL);
+						CurrentTimeService time = conn.getService(CurrentTimeService.class);
+						if( time != null ) {
+							session_service.setAuthenticationTime(time.getCurrentTime());
+						}
+						handleFormResult(conn, req, res, next);
+						return;
+					}
 				} catch (DataFault e) {
 					getLogger(conn).error("error in RemoteAuthServlet",e);
 					throw new ServletException(e);

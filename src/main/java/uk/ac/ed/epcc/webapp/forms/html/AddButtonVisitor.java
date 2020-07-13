@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.forms.html;
 
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.forms.result.BackResult;
@@ -36,9 +37,8 @@ import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
  */
 
 
-public class AddButtonVisitor implements WebFormResultVisitor {
+public class AddButtonVisitor extends AbstractContexed implements WebFormResultVisitor {
     private final ExtendedXMLBuilder hb;
-    private final AppContext conn;
     private final String text;
     private final String title;
     public boolean new_tab=false;
@@ -46,7 +46,7 @@ public class AddButtonVisitor implements WebFormResultVisitor {
     	this(c,hb,text,null);
     }
     public AddButtonVisitor(AppContext c, ExtendedXMLBuilder hb,String text,String title){
-    	conn=c;
+    	super(c);
     	this.hb=hb;
     	this.text=text;
     	this.title=title;
@@ -160,6 +160,7 @@ public class AddButtonVisitor implements WebFormResultVisitor {
 	public void visitErrorFormResult(ErrorFormResult res) throws Exception {
 		throw new UnsupportedResultException("Cannot use ErrorFormResult for Button");
 	}
+
 	
 
 }

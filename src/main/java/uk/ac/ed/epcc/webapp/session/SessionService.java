@@ -144,6 +144,17 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @param d
 	 */
 	public void setAuthenticationTime(Date d);
+	/** Get the authentication type used for the session.
+	 * This should be one of "password" or a remote auth realm
+	 * 
+	 * @return
+	 */
+	public String getAuthenticationType();
+	/** Set the authenticaiton type used for the session.
+	 * This should be one of "password" or a remote auth realm.
+	 * @param type
+	 */
+	public void setAuthenticationType(String type);
 	/** Clear current person and any saved state
 	 * 
 	 */

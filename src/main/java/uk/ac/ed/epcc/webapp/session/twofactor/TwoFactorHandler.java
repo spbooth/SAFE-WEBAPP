@@ -35,6 +35,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 public class TwoFactorHandler<A extends AppUser> {
 	public static final String AUTH_USER_ATTR="TwoFactorCandidate";
+	public static final String AUTH_TYPE_ATTR="TwoFactorAuthType";
 	public static final String AUTH_RESULT_ATTR="TwoFactorResult";
    /**
 	 * @param sess
@@ -86,7 +87,7 @@ public class TwoFactorHandler<A extends AppUser> {
 
     }
     
-    public FormResult doLogin(A user,SerializableFormResult next_page) {
+    public FormResult doLogin(A user,String type,SerializableFormResult next_page) {
 		 
 		AppUserFactory<A> person_fac = sess.getLoginFactory();
 		
@@ -100,6 +101,7 @@ public class TwoFactorHandler<A extends AppUser> {
 				if( result != null ) {
 					// Need two factor
 					sess.setAttribute(AUTH_USER_ATTR, user.getID());
+					sess.setAttribute(AUTH_TYPE_ATTR, type);
 					if( next_page != null ) {
 						sess.setAttribute(AUTH_RESULT_ATTR, next_page);
 					}else {
@@ -117,6 +119,7 @@ public class TwoFactorHandler<A extends AppUser> {
 			if( time != null) {
 				sess.setAuthenticationTime(time.getCurrentTime());
 			}
+			sess.setAuthenticationType(type);
 		}
 	
 		return next_page;
@@ -129,6 +132,7 @@ public class TwoFactorHandler<A extends AppUser> {
 		try {
 			Logger logger = getLogger();
 			Integer requested_id = (Integer)sess.getAttribute(AUTH_USER_ATTR);
+			String type = (String) sess.getAttribute(AUTH_TYPE_ATTR);
 			if( requested_id == null || (expected != null && expected.getID() != requested_id.intValue())) {
 				logger.warn("Inconsistent request and result, possible security problem "+requested_id+" "+expected.getIdentifier());
 				return null;
@@ -148,6 +152,9 @@ public class TwoFactorHandler<A extends AppUser> {
 					if( time != null) {
 						sess.setAuthenticationTime(time.getCurrentTime());
 					}
+					if( type != null ) {
+						sess.setAuthenticationType(AUTH_TYPE_ATTR);
+					}
 				}
 				FormResult result = (FormResult) sess.getAttribute(AUTH_RESULT_ATTR);
 				return result;
@@ -155,6 +162,7 @@ public class TwoFactorHandler<A extends AppUser> {
 		}finally {
 			sess.removeAttribute(AUTH_RESULT_ATTR);
 			sess.removeAttribute(AUTH_USER_ATTR);
+			sess.removeAttribute(AUTH_TYPE_ATTR);
 		}
 		return null;
 	}

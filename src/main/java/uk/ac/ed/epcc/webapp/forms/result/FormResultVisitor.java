@@ -16,8 +16,14 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.result;
 
+import java.util.LinkedList;
+
+import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.forms.html.WebFormResultVisitor;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryFinder;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
+import uk.ac.ed.epcc.webapp.servlet.TransitionServlet.GetTargetVisitor;
 
 
 /** This handles the mandatory types of FormResult.
@@ -32,8 +38,28 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionVisitor;
  * @author spb
  * @see WebFormResultVisitor
  */
-public interface FormResultVisitor {
+public interface FormResultVisitor extends Contexed{
   public <T,K> void visitChainedTransitionResult(ChainedTransitionResult<T,K> res) throws Exception;
+  default public <T,K> void visitSerializableChainedTransitionResult(SerializableChainedTransitionResult<T,K> res) throws Exception{
+	  TransitionFactoryFinder finder = new TransitionFactoryFinder(getContext());
+	  TransitionFactory<K, T> fac = finder.getProviderFromName(res.getTargetName());
+	  T target =null;
+	  String id=res.getId();
+	  if( id != null && ! id.isEmpty()) {
+		  LinkedList<String> path = new LinkedList<String>();
+		  for(String s : id.split("/")) {
+			  path.add(s);
+		  }
+		  GetTargetVisitor<T,K> vis = new GetTargetVisitor<T,K>(path);
+		  target = fac.accept(vis);
+	  }
+	  K key = null;
+	  if( res.getKey() != null) {
+		  key = fac.lookupTransition(target, res.getKey());
+	  }
+	  
+	  visitChainedTransitionResult(new ChainedTransitionResult<T, K>(fac, target, key));
+  }
   public <T,K> void visitConfirmTransitionResult(ConfirmTransitionResult<T,K> res) throws Exception;
   public void visitMessageResult(MessageResult res) throws Exception;
   public void visitServeDataResult(ServeDataResult res)throws Exception;

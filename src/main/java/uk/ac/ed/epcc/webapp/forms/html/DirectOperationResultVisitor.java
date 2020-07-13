@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.html;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.result.BackResult;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
@@ -29,17 +30,16 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
  * @author Stephen Booth
  *
  */
-public class DirectOperationResultVisitor implements WebFormResultVisitor {
+public class DirectOperationResultVisitor extends AbstractContexed implements WebFormResultVisitor {
 	
 	/**
 	 * @param conn
 	 */
 	public DirectOperationResultVisitor(AppContext conn) {
-		super();
-		this.conn = conn;
+		super(conn);
 	}
 
-	private final AppContext conn;
+	
 	private FormResult final_result=null;
 	
 	public FormResult getFinalResult() {
@@ -143,4 +143,5 @@ public class DirectOperationResultVisitor implements WebFormResultVisitor {
 		final_result=res;
 
 	}
+	
 }

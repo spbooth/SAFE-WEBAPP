@@ -611,7 +611,7 @@ public class DefaultServletService implements ServletService{
 							// If we want to support 2-factor with external login 
 							// we should do this via a required page.
 							sess.setCurrentPerson(person);
-							
+							sess.setAuthenticationType(remote_auth_realm);
 							CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 							if( time != null) {
 								sess.setAuthenticationTime(time.getCurrentTime());

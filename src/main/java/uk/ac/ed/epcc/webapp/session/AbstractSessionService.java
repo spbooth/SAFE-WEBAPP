@@ -163,6 +163,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	private static final String role_map_tag = "SESSION_role_map";
 	
 	private static final String auth_time_tag = "SESSION_auth_time";
+	private static final String auth_type_tag = "SESSION_auth_type";
 	private boolean apply_toggle=true;
 	/** A keying object representing a relationship.
 	 * 
@@ -745,7 +746,14 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	public void setAuthenticationTime(Date d) {
 		setAttribute(auth_time_tag, d);
 	}
-
+	@Override
+	public String getAuthenticationType() {
+		return (String) getAttribute(auth_type_tag);
+	}
+	
+	public void setAuthenticationType(String type) {
+		setAttribute(auth_type_tag, type);
+	}
 	@Override
 	public void setCurrentRoleToggle(Map<String, Boolean> toggleMap) {
 		toggle_map=toggleMap;	

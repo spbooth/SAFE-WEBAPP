@@ -124,7 +124,7 @@ public void setAttribute(String key, Object value) {
 	if( value != null &&  ! (value instanceof Serializable)){
 		LoggerService serv = getContext().getService(LoggerService.class);
 		if( serv != null){
-			serv.getLogger(getClass()).warn("Non serializable object "+key+" "+value.getClass().getCanonicalName()+" added to session");
+			serv.getLogger(getClass()).error("Non serializable object "+key+" "+value.getClass().getCanonicalName()+" added to session");
 		}
 	}
 	if( sess != null ){

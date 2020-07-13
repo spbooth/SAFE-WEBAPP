@@ -585,17 +585,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 
 		public String visitPathTransitionProvider(
 				PathTransitionProvider<K, T> prov) {
-			StringBuilder path = new StringBuilder();
-			boolean seen=false;
-			for(String pe : prov.getID(target)){
-				if( seen ) {
-					path.append("/");
-				}else {
-					seen=true;
-				}
-				path.append(pe);
-			}
-			return path.toString();
+			return String.join("/", prov.getID(target));
 		}
 	}
 	/** Add a button to perform the required operation on the target
