@@ -19,7 +19,8 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
+/** Recursively expand {@link Properties} into text.
+ * Parameters are references in the form ${name:fallback-text}
  * @author Stephen Booth
  *
  */
@@ -52,7 +53,7 @@ public class PropertyExpander {
 	}
 	/** expand text with override map.
 	 * As properties are expanded the override map is populated with the resolved values.
-	 * circular definisions expansion will terminate the search
+	 * circular-definition expansion will terminate the search
 	 * 
 	 * @param values
 	 * @param text_to_expand
