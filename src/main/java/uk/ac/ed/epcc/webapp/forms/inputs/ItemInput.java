@@ -20,6 +20,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
  * an input that has some Domain Object associated with its values
  * 
  * @author spb
+ * @param <V> type of input
  * @param <T> type of item object
  * 
  */
