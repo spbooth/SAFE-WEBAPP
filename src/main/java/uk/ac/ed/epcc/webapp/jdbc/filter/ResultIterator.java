@@ -115,6 +115,7 @@ public abstract class ResultIterator<O> extends SQLResultIterator<O,O> implement
 		 */
 		@Override
 		protected void setup(BaseFilter<O> f, int start, int max) throws DataException {
+			f=OptionalFilterConverter.convert(f);
 			// must come before super.setup as setup calls iterate
 			if (f instanceof AcceptFilter) {
 				this.f = (AcceptFilter<? super O>) f;

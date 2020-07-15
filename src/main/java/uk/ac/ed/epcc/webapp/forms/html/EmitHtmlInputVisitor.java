@@ -215,81 +215,81 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		}
 		
 		Iterator<T> iter = input.getItems();
-		if( iter.hasNext()){
-		hb.open("select");
-		try {
-			String id = makeID(input);
-			if( id != null){
-				hb.attr("id",id);
+		if(iter != null &&  iter.hasNext()){
+			hb.open("select");
+			try {
+				String id = makeID(input);
+				if( id != null){
+					hb.attr("id",id);
+				}
+			} catch (Exception e) {
+				conn.error(e,"Error getting id");
 			}
-		} catch (Exception e) {
-			conn.error(e,"Error getting id");
-		}
-		hb.attr("name",input.getKey());
-		hb.addClass("input");
-		
-		if( use_html5 && use_required && ! optional){
-			hb.attr("required",null);
-		}
-		if( optional ||
-				(input instanceof PreSelectInput && ! ((PreSelectInput)input).allowPreSelect()) && input.getCount() > 1){
-			// need ability to select nothing
-			// a non optional pre-select input with only 1 valid answer always 
-			// pre-selects.
-			hb.open("option");
-			hb.attr("value","");
-			String unselected="Not Selected";
-			if(input instanceof OptionalListInput){
-				String override = ((OptionalListInput) input).getUnselectedText();
-				if(override != null && override.trim().length() > 0){
-					unselected = override;
+			hb.attr("name",input.getKey());
+			hb.addClass("input");
+
+			if( use_html5 && use_required && ! optional){
+				hb.attr("required",null);
+			}
+			if( optional ||
+					(input instanceof PreSelectInput && ! ((PreSelectInput)input).allowPreSelect()) && input.getCount() > 1){
+				// need ability to select nothing
+				// a non optional pre-select input with only 1 valid answer always 
+				// pre-selects.
+				hb.open("option");
+				hb.attr("value","");
+				String unselected="Not Selected";
+				if(input instanceof OptionalListInput){
+					String override = ((OptionalListInput) input).getUnselectedText();
+					if(override != null && override.trim().length() > 0){
+						unselected = override;
+					}
+				}
+				hb.clean(unselected);
+				hb.close();
+			}
+			String def = null;
+			if (use_post) {
+				def = param;
+			} else {
+				X default_value = input.getValue();
+				if (default_value != null) {
+					def = input.getTagByValue(default_value);
+
 				}
 			}
-			hb.clean(unselected);
-			hb.close();
-		}
-		String def = null;
-		if (use_post) {
-			def = param;
-		} else {
-			X default_value = input.getValue();
-			if (default_value != null) {
-				def = input.getTagByValue(default_value);
-
-			}
-		}
-		boolean seen_selected=false;
-		for (; iter.hasNext();) {
-			T current = iter.next();
-			String tag = input.getTagByItem(current);
-			hb.open("option");
-			hb.attr("value", tag );
-			if ((def != null && def.equals(tag)) || forced) {
-				hb.attr("selected",null);
-				seen_selected=true;
-			}
-			String label = input.getText(current);
-			hb.clean( label );
-			hb.close();
-			hb.clean("\n");
-
-		}
-		if( def != null && ! seen_selected ){
-			// check for an out of band value
-			T item = input.getItem();
-			if( item != null ){
-				String tag = input.getTagByItem(item);
+			boolean seen_selected=false;
+			for (; iter.hasNext();) {
+				T current = iter.next();
+				String tag = input.getTagByItem(current);
 				hb.open("option");
-				hb.attr("value", tag);
-				hb.attr("selected", null);
-				String label = input.getText(item);
+				hb.attr("value", tag );
+				if ((def != null && def.equals(tag)) || forced) {
+					hb.attr("selected",null);
+					seen_selected=true;
+				}
+				String label = input.getText(current);
 				hb.clean( label );
-				hb.clean(" [not in default selection]");
 				hb.close();
 				hb.clean("\n");
+
 			}
-		}
-		hb.close();
+			if( def != null && ! seen_selected ){
+				// check for an out of band value
+				T item = input.getItem();
+				if( item != null ){
+					String tag = input.getTagByItem(item);
+					hb.open("option");
+					hb.attr("value", tag);
+					hb.attr("selected", null);
+					String label = input.getText(item);
+					hb.clean( label );
+					hb.clean(" [not in default selection]");
+					hb.close();
+					hb.clean("\n");
+				}
+			}
+			hb.close();
 		}else{
 			// no items !
 			hb.open("span");

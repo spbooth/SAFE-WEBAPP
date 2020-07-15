@@ -466,6 +466,8 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
 			sb.append(getClass().getSimpleName());
+			//sb.append("@");
+			//sb.append(getTarget().getSimpleName());
 			sb.append("(");
 			listContents(sb);
 			sb.append(")");

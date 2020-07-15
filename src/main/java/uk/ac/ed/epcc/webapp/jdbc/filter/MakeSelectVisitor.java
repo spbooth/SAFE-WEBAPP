@@ -75,10 +75,12 @@ public class MakeSelectVisitor<T> implements FilterVisitor<StringBuilder, T>{
 	 */
 	@Override
 	public StringBuilder visitOrFilter(OrFilter<T> fil) throws Exception {
-		if( fil.nonSQL() ){
-			return visitAcceptFilter(fil);
-		}
-		return fil.getSQLFilter().acceptVisitor(this);
+		// We can only use the SQL version here if there
+		// are no joins because joins would have required corresponding
+		// changes elsewhere in the query.
+		// 
+		
+		return visitAcceptFilter(fil);
 	}
 
 	/* (non-Javadoc)
