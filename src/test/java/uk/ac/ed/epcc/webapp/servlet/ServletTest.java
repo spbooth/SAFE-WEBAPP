@@ -282,7 +282,7 @@ public abstract class ServletTest extends WebappTestBase{
 	public void checkRequestAuth(String page) {
 		HttpSession session = req.getSession(false);
 		assertNotNull(session);
-		RedirectResult result = (RedirectResult) session.getAttribute(LoginServlet.INITIAL_PAGE_ATTR);
+		RedirectResult result = (RedirectResult) LoginServlet.getSavedResult(ctx.getService(SessionService.class));
 		assertNotNull(result);
 		assertEquals(page, result.getURL());
 		checkForward(LoginServlet.getLoginPage(ctx));

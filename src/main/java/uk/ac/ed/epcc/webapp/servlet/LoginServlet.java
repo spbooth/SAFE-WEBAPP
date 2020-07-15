@@ -73,7 +73,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 	private static final String LOGIN_PAGE_PARAM = "login.page";
 	
 	
-	public static final String INITIAL_PAGE_ATTR = "initial_page";
+	private static final String INITIAL_PAGE_ATTR = "initial_page";
 	/**
 	 * 
 	 */
@@ -292,7 +292,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 	public static void doLoginResult(AppContext conn,HttpServletRequest req, HttpServletResponse res, FormResult result) throws Exception {
 		if( COOKIE_TEST.isEnabled(conn) && result instanceof SerializableFormResult) {
 			SessionService sess = conn.getService(SessionService.class);
-			sess.setAttribute(INITIAL_PAGE_ATTR,(SerializableFormResult) result);
+			setSavedResult(sess,(SerializableFormResult) result);
 			res.sendRedirect(res.encodeRedirectURL(req.getContextPath()+"/LoginServlet"));
 			return;
 		}
@@ -301,6 +301,15 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 		 }
 		 ServletFormResultVisitor vis = new ServletFormResultVisitor(conn, req, res);
 		 result.accept(vis);
+	}
+	public static void setSavedResult(SessionService sess, SerializableFormResult result) {
+		sess.setAttribute(INITIAL_PAGE_ATTR, result);
+	}
+	public static void clearSavedResult(SessionService sess) {
+		sess.removeAttribute(INITIAL_PAGE_ATTR);
+	}
+	public static SerializableFormResult getSavedResult(SessionService sess) {
+		return (SerializableFormResult) sess.getAttribute(INITIAL_PAGE_ATTR);
 	}
 	public static String getWelcomePage(AppContext conn) {
 		return conn.getInitParameter("welcome.page","/welcome.jsp");

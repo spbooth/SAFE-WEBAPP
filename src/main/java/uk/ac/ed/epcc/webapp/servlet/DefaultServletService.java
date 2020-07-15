@@ -549,7 +549,7 @@ public class DefaultServletService implements ServletService{
 		// Need to remember page and redirect to login
 		
 		if( page !=null&& ! page.isEmpty()) {
-			sess.setAttribute(LoginServlet.INITIAL_PAGE_ATTR, new RedirectResult(page));
+			LoginServlet.setSavedResult(sess,  new RedirectResult(page));
 		}
 		if( EXTERNAL_AUTH_VIA_LOGIN_FEATURE.isEnabled(getContext()) || REDIRECT_TO_LOGIN_FEATURE.isEnabled(getContext()) || ! LoginServlet.BUILT_IN_LOGIN.isEnabled(getContext())) {
 			

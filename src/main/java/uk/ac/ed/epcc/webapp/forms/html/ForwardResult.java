@@ -96,4 +96,8 @@ public class ForwardResult implements FormResult {
 			return false;
 		return true;
 	}
+	@Override
+	public String toString() {
+		return "ForwardResult [url=" + url + ", attr=" + attr + "]";
+	}
 }
