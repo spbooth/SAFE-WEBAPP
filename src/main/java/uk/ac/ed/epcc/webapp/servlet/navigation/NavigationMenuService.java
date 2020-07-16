@@ -272,7 +272,26 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 			return null;
 		}
 	}
-
+	protected boolean willMakeNode(String name, FilteredProperties menu_prop) {
+		// optional required role
+		String role=conn.expandText(menu_prop.getProperty(name+".role"));
+		if( role != null && ! conn.getService(SessionService.class).hasRoleFromList(role.split("\\s*,\\s*"))){
+			return false;
+		}
+		String required_feature = menu_prop.getProperty(name+".required_feature");
+		if( required_feature != null && ! Feature.checkDynamicFeature(conn, required_feature, false)){
+			return false;
+		}
+		String disable_feature = menu_prop.getProperty(name+".disable_feature");
+		if( disable_feature != null && Feature.checkDynamicFeature(conn, disable_feature, false)){
+			return false;
+		}
+		String required_parameter = menu_prop.getProperty(name+".require_parameter");
+		if( required_parameter != null && conn.getInitParameter(required_parameter, null) == null){
+			return false;
+		}
+		return true;
+	}
 	/**
 	 * @param seen
 	 * @param name
@@ -292,6 +311,18 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 			}
 		}
 		maker.addChildren(n, name, menu_prop);
+	}
+	public boolean willAddChildren(String name, FilteredProperties menu_prop) {
+		String child_list = conn.expandText(menu_prop.getProperty(name+".list"));
+		// Add config nodes first
+		if( child_list != null && ! child_list.isEmpty()){
+			for(String child_name : child_list.trim().split("\\s*,\\s*")){
+				if( willMakeNode(name, menu_prop)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public void disableNavigation(HttpServletRequest request){
