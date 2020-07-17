@@ -233,8 +233,9 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			o = t.getResult(getShortcutVisitor(conn, params, tp, target, key));
 			if( o == null){
 				log.debug("No shortcut result");
-				if( ! (non_modifying || req.getMethod().equalsIgnoreCase("POST"))) {
-					getLogger(conn).error("Modify not from POST");
+				if( ! (non_modifying || req.getMethod().equalsIgnoreCase("POST") || req.getMethod().equalsIgnoreCase("PUT"))) {
+					// allow put as restservlet sub-class can take a put request document
+					getLogger(conn).error("Modify not from POST/PUT");
 					if( MODIFY_ON_POST_ONLY.isEnabled(conn)) {
 						res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			        	return;

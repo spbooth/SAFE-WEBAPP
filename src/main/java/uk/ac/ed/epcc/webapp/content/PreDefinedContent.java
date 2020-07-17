@@ -173,7 +173,22 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 		if( fmt == null) {
 			return "";
 		}
-		return fmt.format(args, new StringBuffer(), null).toString();
+		MessageFormat fmt2 = (MessageFormat) fmt.clone();
+		if( args != null ) {
+			Format f = new TextContentFormat();
+			
+			for(int i=0 ; i< args.length; i++) {
+				Object a = args[i];
+				// MessageFormat has direct support for number and date formats. These are safe to add to html
+				// Strings in particular should use HtmlContentFormat to force html escaping.
+				// raw html can be added by wrapping in a UIGenerator or XMLPrinter
+				// @see messages.jsf
+				if( !( a instanceof Number || a instanceof Date || a instanceof String)) {
+					fmt2.setFormatByArgumentIndex(i, f);
+				}
+			}
+		}
+		return fmt2.format(args, new StringBuffer(), null).toString();
 	}
 	
 	public boolean hasContent() {
