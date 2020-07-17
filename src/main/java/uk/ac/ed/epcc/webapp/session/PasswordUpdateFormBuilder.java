@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.email.Emailer;
@@ -389,6 +390,11 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 				boolean do_login = ! handler.requireTwoFactor(user);
 				if( do_login ) {
 					service.setCurrentPerson(user);
+					service.setAuthenticationType("passwordreset");
+					CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+					if( time != null) {
+						service.setAuthenticationTime(time.getCurrentTime());
+					}
 				}
 				if (doWelcome) {
 					getLogger().debug("Doing welcome page");

@@ -249,7 +249,13 @@ public class RemoteAuthServlet extends WebappServlet {
 				}
 				try {
 					person.commit();
+					session_service.setAuthenticationType(remote_auth_realm);
+					CurrentTimeService time = conn.getService(CurrentTimeService.class);
+					if( time != null ) {
+						session_service.setAuthenticationTime(time.getCurrentTime());
+					}
 					SerializableFormResult next = getNextResult(session_service);
+					session_service.removeAttribute(REMOTE_AUTH_NEXT_URL);
 					if( next == null ) {
 						message(conn, req, res, "remote_auth_set",web_name);
 						return;
@@ -261,12 +267,7 @@ public class RemoteAuthServlet extends WebappServlet {
 						}
 						person.commit();
 						person.historyUpdate();
-						session_service.setAuthenticationType(remote_auth_realm);
-						session_service.removeAttribute(REMOTE_AUTH_NEXT_URL);
-						CurrentTimeService time = conn.getService(CurrentTimeService.class);
-						if( time != null ) {
-							session_service.setAuthenticationTime(time.getCurrentTime());
-						}
+
 						handleFormResult(conn, req, res, next);
 						return;
 					}
