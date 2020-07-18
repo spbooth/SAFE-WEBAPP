@@ -33,7 +33,8 @@ import org.apache.logging.log4j.Logger;
 
 public class Log4JWrapper implements uk.ac.ed.epcc.webapp.logging.Logger {
 	private Logger log;
-	
+	// Note we need to explicitly test for log level as 
+	// the Supplier interface in Log4J2 is not the java interface
 
 	public Log4JWrapper(String name){
 		log=LogManager.getLogger(name);
@@ -95,51 +96,51 @@ public class Log4JWrapper implements uk.ac.ed.epcc.webapp.logging.Logger {
 
 	@Override
 	public void debug(Supplier<String> message) {
-		if( log != null) log.debug(message);
+		if( log != null && log.isDebugEnabled()) log.debug(message.get());
 	}
 
 	@Override
 	public void debug(Supplier<String> message, Throwable t) {
-		if( log != null) log.debug(message,t);
+		if( log != null && log.isDebugEnabled()) log.debug(message.get(),t);
 	}
 
 	@Override
 	public void error(Supplier<String> message) {
-		if( log != null) log.error(message);
+		if( log != null && log.isErrorEnabled()) log.error(message.get());
 	}
 
 	@Override
 	public void error(Supplier<String> message, Throwable t) {
-		if( log != null) log.error(message,t);
+		if( log != null && log.isErrorEnabled()) log.error(message.get(),t);
 	}
 
 	@Override
 	public void fatal(Supplier<String> message) {
-		if( log != null) log.fatal(message);
+		if( log != null && log.isFatalEnabled()) log.fatal(message.get());
 	}
 
 	@Override
 	public void fatal(Supplier<String> message, Throwable t) {
-		if( log != null) log.fatal(message,t);
+		if( log != null && log.isFatalEnabled()) log.fatal(message.get(),t);
 	}
 
 	@Override
 	public void info(Supplier<String> message) {
-		if( log != null) log.info(message);
+		if( log != null && log.isInfoEnabled()) log.info(message.get());
 	}
 
 	@Override
 	public void info(Supplier<String> message, Throwable t) {
-		if( log != null) log.info(message,t);
+		if( log != null && log.isInfoEnabled()) log.info(message.get(),t);
 	}
 
 	@Override
 	public void warn(Supplier<String> message) {
-		if( log != null) log.warn(message);
+		if( log != null && log.isWarnEnabled()) log.warn(message.get());
 	}
 
 	@Override
 	public void warn(Supplier<String> message, Throwable t) {
-		if( log != null) log.warn(message,t);
+		if( log != null && log.isWarnEnabled()) log.warn(message.get(),t);
 	}
 }

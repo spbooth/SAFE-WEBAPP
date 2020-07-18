@@ -628,7 +628,8 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 					if (v == DatabasePasswordComposite.INVALID || v == DatabasePasswordComposite.FIRST) {
 						return true;
 					}
-					if( CHANGE_OLD_HASH.isEnabled(getContext()) && getAlgorithm().isDeprecated(getContext())) {
+					Hash algorithm = getAlgorithm();
+					if( CHANGE_OLD_HASH.isEnabled(getContext()) && ( algorithm == null || algorithm.isDeprecated(getContext()))) {
 						return true;
 					}
 					if( periodicResetRequired()) {
