@@ -31,6 +31,7 @@ String page_title=conn.expandText(custom_page.getTitle());
 <%@ include file="/main__logged_in.jsf" %>
 <%@ include file="/back.jsf" %>
 <div class="block" role="main">
+<%@page import="uk.ac.ed.epcc.webapp.content.*" %>
 <% 
 if( XMLContentBuilder.STREAM_BUILDER_FEATURE.isEnabled(conn)){
 	custom_page.addContent(conn, new HtmlWriter(conn,out));

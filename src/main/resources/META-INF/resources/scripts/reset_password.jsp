@@ -13,6 +13,8 @@
 <%--| limitations under the License.                                           |--%>
 <%@ page session="false"
 	import="uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*,uk.ac.ed.epcc.webapp.forms.html.*,java.util.*"%>
+<%@page import="uk.ac.ed.epcc.webapp.logging.*" %>
+<%@page import="uk.ac.ed.epcc.webapp.session.*" %>
 <%@ include file="/service_init.jsf"%>
 <%
     if( conn == null ){

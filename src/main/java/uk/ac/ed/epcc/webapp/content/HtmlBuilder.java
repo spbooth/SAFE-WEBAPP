@@ -387,4 +387,14 @@ public boolean setNewTab(boolean new_tab) {
 	this.new_tab = new_tab;
 	return old;
 }
+
+public static String strip(String input) {
+	if( input == null) {
+		return null;
+	}
+	HtmlBuilder hb=new HtmlBuilder();
+	hb.clean(input);
+	return hb.toString();
+}
+
 }

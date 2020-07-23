@@ -17,6 +17,7 @@ Page to edit a LogItem
 <%@ page import="uk.ac.ed.epcc.webapp.model.log.*,uk.ac.ed.epcc.webapp.forms.html.*" %>
 <%@ include file="/session.jsf" %>
 <wb:css url="service_desk.css"/>
+<%@page import="uk.ac.ed.epcc.webapp.model.log.LogFactory" %>
 <%
 // This page must be invoked from LogItemServlet
 LogFactory.Entry item = (LogFactory.Entry) request.getAttribute("Item");

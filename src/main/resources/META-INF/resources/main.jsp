@@ -1,9 +1,8 @@
-<%@ include file="/session.jsf"%>
+<%@ include file="session.jsf"%>
 <%
 	String page_title = service_name+" Main";
 %>
-
-<%@ include file="/std_header.jsf"%>
+<%@ include file="std_header.jsf"%>
 <div class="block">
 <h2>Default main page</h2>
 <p> This is a placeholder main page for the webapp framework.
@@ -15,4 +14,4 @@ If you are seeing this then then either:
 </p>
 </div>
 
-<%@ include file="/std_footer.jsf"%>
+<%@ include file="std_footer.jsf"%>

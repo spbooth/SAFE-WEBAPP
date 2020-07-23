@@ -28,6 +28,7 @@ the form could just submit to self. This might break form error reporting though
 <%@ page import="uk.ac.ed.epcc.webapp.forms.exceptions.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.forms.inputs.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.content.*" %>
+<%@ page import="uk.ac.ed.epcc.webapp.servlet.TransitionServlet" %>
 <%@ include file="/scripts/service_init.jsf" %>
 <%
     TransitionFactory tp = TransitionServlet.getProvider(conn,request);
@@ -63,6 +64,7 @@ the form could just submit to self. This might break form error reporting though
     }
     request.setAttribute(WebappHeadTag.FORM_PAGE_ATTR, Boolean.TRUE);
 %>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
 <wb:formpage/>
 <wb:css url="service_desk.css"/>
 <%@ include file="/std_header.jsf" %>
@@ -94,8 +96,8 @@ HtmlBuilder form_builder = new HtmlBuilder();
 HtmlFormPolicy form_content=form_builder.getFormPolicy();
 if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 	// force initial validation and use internal state
-	Collection<String> m = getMissing(request);
-	Map<String,String> e = getErrors(request);
+	Collection<String> m = HTMLForm.getMissing(request);
+	Map<String,String> e = HTMLForm.getErrors(request);
 	f.validate(m,e);
     form_content.setMissingFields(m);
     form_content.setErrors(e);
@@ -108,8 +110,8 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 	}else{
 		form_content.setPostParams(new HashMap<String,Object>());
 	}
-	form_content.setMissingFields(getMissing(request));
-	form_content.setErrors(getErrors(request));
+	form_content.setMissingFields(HTMLForm.getMissing(request));
+	form_content.setErrors(HTMLForm.getErrors(request));
 }
 %>
 <div class="block">
@@ -132,7 +134,7 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
     	}
 	}
 %>
-<%@ include file="/scripts/inline_form_context.jsf" %>
+<wb:FormContext inlime="true"/>
 <form id="form" class="transition" method="post" 
 <% if( multi ){ %>
    enctype="multipart/form-data"

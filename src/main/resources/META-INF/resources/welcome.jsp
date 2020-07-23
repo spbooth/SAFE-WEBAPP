@@ -8,7 +8,7 @@ This page will stop being displayed once the user resets their initial random pa
 %>
 <%@ include file="std_header.jsf" %>
 <br/>
-<%@ include file="/main__logged_in.jsf" %>
+<%@ include file="main__logged_in.jsf" %>
 <br/>
 
 <div class="block">

@@ -27,7 +27,7 @@
     String 	page_title=service_name+" "+website_name+ " "+node_name+" Menu";
 %>
 <%@ include file="/std_header.jsf"%>
-
+<%@ page import="uk.ac.ed.epcc.webapp.content.HtmlBuilder" %>
 <% if( node_name != null && NavigationMenuService.NAVIGATION_MENU_FEATURE.isEnabled(conn)){
 	NavigationMenuService serv = conn.getService(NavigationMenuService.class);
 	NodeContainer menu = serv.getMenu();

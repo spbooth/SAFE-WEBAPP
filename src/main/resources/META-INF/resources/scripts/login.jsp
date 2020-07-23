@@ -30,7 +30,8 @@
 <%@ page import="uk.ac.ed.epcc.webapp.model.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.forms.html.*,java.util.*,uk.ac.ed.epcc.webapp.session.*"%>
 <%@ page import="uk.ac.ed.epcc.webapp.content.*" %>
-<%@ include file="/service_init.jsf"%>
+<%@ page import="uk.ac.ed.epcc.webapp.logging.*" %>
+<%@ include file="/scripts/service_init.jsf"%>
 <%
     if( conn == null ){
 %>
@@ -76,8 +77,10 @@
 	log.debug("Showing login page");
 	String page_title = service_name+" "+website_name+" Login";
 %>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
 <wb:formpage/>
 <%@ include file="/std_header.jsf"%>
+<%@page import="uk.ac.ed.epcc.webapp.servlet.LoginServlet" %>
 <%
     PasswordAuthComposite password_auth = fac.getComposite(PasswordAuthComposite.class);
     boolean use_reset_page = LoginServlet.RESET_PASSWORD_PAGE.isEnabled(conn);
@@ -104,9 +107,8 @@ This service is only available to pre-registered users.
 <p>Welcome to the <%=service_name%> <%=website_name%>.</p>
 <p> Please fill in this form to register with this service</p>
 </div>
-
+<%@page import="uk.ac.ed.epcc.webapp.servlet.RegisterServlet" %>
 <%
-     
      HTMLCreationForm person_form = new HTMLCreationForm("Person",fac.getSignupFormCreator(RegisterServlet.getRealm(conn),webname));
 %>
 <div class="block">

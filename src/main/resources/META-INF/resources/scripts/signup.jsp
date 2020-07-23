@@ -21,8 +21,11 @@ signup.jsp - Page used to sign up for an account using password auth.
 	SignupServlet POST - Validates details and creates database records if appropriate
 
 --%>
-<%@ page import="java.util.*, uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*,uk.ac.ed.epcc.webapp.forms.html.*,uk.ac.ed.epcc.webapp.session.*"
-%>
+<%@ page import="java.util.*"%>
+<%@page import="uk.ac.ed.epcc.webapp.*"%>
+<%@page import="uk.ac.ed.epcc.webapp.model.*"%>
+<%@page import="uk.ac.ed.epcc.webapp.forms.html.*"%>
+<%@page import="uk.ac.ed.epcc.webapp.session.*"%>
 <%@ page import="uk.ac.ed.epcc.webapp.session.*" %>
 <%@page session="false" %>
 <%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
@@ -50,12 +53,9 @@ signup.jsp - Page used to sign up for an account using password auth.
 	     return;
       }
    }
-
-	
-	String page_title = service_name+" "+website_name+" Signup";
+   String page_title = service_name+" "+website_name+" Signup";
 %>
 <%@ include file="/std_header.jsf" %>
-
 <div class="block">
 <H1><%=page_title%></H1>
 <p class="notice">
@@ -65,6 +65,7 @@ This is the <%=service_name%> <%=website_name%>.
 
 
 <%@ include file="/scripts/form_context.jsf" %>
+<%@page import="uk.ac.ed.epcc.webapp.servlet.RegisterServlet" %>
 <%
 String default_charset = conn.getService(ServletService.class).defaultCharset();
 AppUserFactory<?> person_fac =  session_service.getLoginFactory();

@@ -65,7 +65,7 @@ Your <%=website_name %> password has expired and should be changed.
 <%} %>
 <br/>
 <%@ include file="/scripts/form_context.jsf" %>
-
+<%@page import="uk.ac.ed.epcc.webapp.servlet.ServletService" %>
 <%
 String default_charset = conn.getService(ServletService.class).defaultCharset();
 HTMLForm f = new HTMLForm(conn);

@@ -17,6 +17,7 @@
 --%>
 <%@ include file="/session.jsf" %>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService" %>
+<%@page import="uk.ac.ed.epcc.webapp.Feature" %>
 <%	
 	/* Must be an admin */
 	if( !((ServletSessionService)session_service).hasRole(SessionService.ADMIN_ROLE)) {

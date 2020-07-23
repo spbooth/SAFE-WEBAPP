@@ -11,54 +11,5 @@
 <%--| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. |--%>
 <%--| See the License for the specific language governing permissions and      |--%>
 <%--| limitations under the License.                                           |--%>
-<%@page import="java.util.*" %>
-<%@page import="uk.ac.ed.epcc.webapp.forms.*" %>
-<%@page import="uk.ac.ed.epcc.webapp.forms.inputs.*" %> 
-<%@page import="uk.ac.ed.epcc.webapp.forms.html.*" %>
-<%@page import="uk.ac.ed.epcc.webapp.content.*" %>
-<%!
-	 public static java.util.Map<String,String> getErrors(HttpServletRequest req) {
-		 return HTMLForm.getErrors(req);
-	 }
-	 public static java.util.Collection<String> getMissing(HttpServletRequest req) {
-		 return HTMLForm.getMissing(req);
-	 }
- 
-%>
-<%
-    // Handle any fields missing input.
-	Collection<String> missing_fields = getMissing(request);
-	Map<String,String> errors = getErrors(request);
-   String general_error="";
-    if( missing_fields != null &&  missing_fields.size() > 0 ){
-%>
-<br/>
-<div class="block">
-<h2>Form errors:</h2>
-<A name="form_error"/>
-<p>
-There are <%= missing_fields.size() %> required fields missing from 
-this form. These are marked with
-a <span class="warn">*</span>.
-</p>
-</div>
-<% 
-  } 
-  if( errors != null && errors.size() > 0 ){ 
-		  
-	if( errors.containsKey("general") ){
-       general_error=(String) errors.get("general");
-	}else{
-		general_error = "See individual field errors";
-	}
-	HtmlBuilder hb = new HtmlBuilder();
-	hb.clean(general_error);
-	
-%>
-<div class="block">
-<h3>This form contains errors:</h3>
-<p class="warn">	
-<%= hb %>
-</p>
-</div>
- <% } %>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:FormContext/>

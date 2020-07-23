@@ -23,6 +23,7 @@
 <h2>Table Administration</h2>
 <p>This page lists the current tables in the accounting database and gives access to the built-in administration operations for each table</p>
 </div>
+<%@ page import="uk.ac.ed.epcc.webapp.model.data.DataObjectFactory" %>
 <%
 Map<String,Class> map = conn.getClassMap(DataObjectFactory.class);
 TableTransitionProvider provider = new TableTransitionProvider(conn);

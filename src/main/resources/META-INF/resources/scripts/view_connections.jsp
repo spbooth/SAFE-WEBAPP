@@ -35,6 +35,7 @@
 <%@ include file="/back.jsf" %>
 <%@page import="uk.ac.ed.epcc.webapp.content.*" %>
 <%@page import="uk.ac.ed.epcc.webapp.jdbc.DatabaseService" %>
+<%@page import="uk.ac.ed.epcc.webapp.servlet.ErrorFilter" %>
 <%if ( ErrorFilter.CONNECTION_STATUS_FEATURE.isEnabled(conn)){ %>
 <div class="block">
 <h1>Database connections</h1>

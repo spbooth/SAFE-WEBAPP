@@ -19,6 +19,7 @@ the form could just submit to self.
 --%>
 <%@page import="uk.ac.ed.epcc.webapp.tags.WebappHeadTag"%>
 <%@ page import="uk.ac.ed.epcc.webapp.content.*,uk.ac.ed.epcc.webapp.forms.html.*,uk.ac.ed.epcc.webapp.forms.*, uk.ac.ed.epcc.webapp.forms.transition.*" %>
+<%@page import="uk.ac.ed.epcc.webapp.servlet.TransitionServlet" %>
 <%@ page %>
 <%@ include file="/session.jsf" %>
 <wb:css url="service_desk.css"/>

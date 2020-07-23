@@ -15,6 +15,7 @@
 <%@ page	
    import="uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*, uk.ac.ed.epcc.webapp.session.*,uk.ac.ed.epcc.webapp.forms.html.*"
 %>
+<%@page import="uk.ac.ed.epcc.webapp.forms.html.PageHTMLForm" %>
 <%@ include file="/service_init.jsf" %>
 <wb:formpage/>
 <%	

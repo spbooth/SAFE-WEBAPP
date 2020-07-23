@@ -20,12 +20,11 @@ The current plan is that the target servlet should check for a "confirm" paramet
 the dialog box if missing.
 
 --%>
-<%@ include file="/scripts/service_init.jsf"%>
+<%@ include file="service_init.jsf"%>
 <%
     String 	page_title="Confirm Request";
 %>
-<%@ include file="/std_header.jsf"%>
-
-<%@ include file="/scripts/confirm.jsf"%>
-
-<%@ include file="/std_footer.jsf"%>
+<%@ include file="../std_header.jsf"%>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:Confirm/>
+<%@ include file="../std_footer.jsf"%>
