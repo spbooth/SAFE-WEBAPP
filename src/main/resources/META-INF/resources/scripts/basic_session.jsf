@@ -1,2 +1,3 @@
 <%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
 <wb:basic_session/>

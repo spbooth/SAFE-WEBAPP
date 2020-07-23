@@ -16,8 +16,11 @@
 	
 --%>
 <%@page import="uk.ac.ed.epcc.webapp.jdbc.WrappedDatabaseService"%>
-<%@ include file="/session.jsf" %>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
+<wb:session/>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService" %>
+<%@page import="uk.ac.ed.epcc.webapp.session.SessionService" %>
 <%	
 	/* Must be an admin */
 	if( !((ServletSessionService)session_service).hasRole(SessionService.ADMIN_ROLE)) {
@@ -30,9 +33,9 @@
 <%	
 	String page_title = " View active database connections ";
 %>
-<%@ include file="/std_header.jsf" %>
-<%@ include file="/main__logged_in.jsf" %>
-<%@ include file="/back.jsf" %>
+<%@ include file="../std_header.jsf" %>
+<%@ include file="../main__logged_in.jsf" %>
+<%@ include file="../back.jsf" %>
 <%@page import="uk.ac.ed.epcc.webapp.content.*" %>
 <%@page import="uk.ac.ed.epcc.webapp.jdbc.DatabaseService" %>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.ErrorFilter" %>
@@ -57,5 +60,5 @@ builder2.addColumn(conn, t, "Attributes");
 <%= builder2.toString() %>
 </div>	
 <br/>
-<%@ include file="/back.jsf" %>
-<%@ include file="/std_footer.jsf" %>
+<%@ include file="../back.jsf" %>
+<%@ include file="../std_footer.jsf" %>

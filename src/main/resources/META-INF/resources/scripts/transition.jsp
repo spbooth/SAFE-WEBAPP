@@ -20,6 +20,7 @@ attribute.
 Note that as the target and provider are encoded in the servlet-path
 the form could just submit to self. This might break form error reporting though.
 --%>
+<%@page import="java.util.*" %>
 <%@page import="uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult"%>
 <%@page import="uk.ac.ed.epcc.webapp.tags.WebappHeadTag"%>
 <%@ page import="uk.ac.ed.epcc.webapp.forms.html.*" %>
@@ -28,8 +29,11 @@ the form could just submit to self. This might break form error reporting though
 <%@ page import="uk.ac.ed.epcc.webapp.forms.exceptions.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.forms.inputs.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.content.*" %>
+<%@ page import="uk.ac.ed.epcc.webapp.session.SessionService" %>
+<%@ page import="uk.ac.ed.epcc.webapp.servlet.ServletService" %>
 <%@ page import="uk.ac.ed.epcc.webapp.servlet.TransitionServlet" %>
-<%@ include file="/scripts/service_init.jsf" %>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
 <%
     TransitionFactory tp = TransitionServlet.getProvider(conn,request);
     Object key =  request.getAttribute(TransitionServlet.TRANSITION_KEY_ATTR);
@@ -45,8 +49,7 @@ the form could just submit to self. This might break form error reporting though
     boolean allow_anonymous = tp instanceof AnonymousTransitionFactory;
     if( ! allow_anonymous ){
 %>
-<%@ include file="/scripts/basic_session.jsf" %>
-<%@ include file="/scripts/required_pages.jsf" %>
+<wb:session/>
 <%    	
     }
     Object target =   TransitionServlet.getTarget(conn,tp,request);
@@ -67,9 +70,9 @@ the form could just submit to self. This might break form error reporting though
 <%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
 <wb:formpage/>
 <wb:css url="service_desk.css"/>
-<%@ include file="/std_header.jsf" %>
-<%@ include file="/main__logged_in.jsf" %>
-<%@ include file="/back.jsf" %>
+<%@ include file="../std_header.jsf" %>
+<%@ include file="../main__logged_in.jsf" %>
+<%@ include file="../back.jsf" %>
 <% if( tp instanceof NavigationProvider){
    HtmlBuilder top = new HtmlBuilder();
    ((NavigationProvider)tp).getTopNavigation(top, target);
@@ -184,4 +187,4 @@ if( t instanceof CustomFormContent ){
 %><%=bottom.toString() %><%
 }
 %>
-<%@ include file="/std_footer.jsf" %>
+<%@ include file="../std_footer.jsf" %>

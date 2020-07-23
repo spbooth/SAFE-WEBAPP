@@ -15,7 +15,9 @@
 --%>
 <%@ page import="uk.ac.ed.epcc.webapp.forms.html.*,uk.ac.ed.epcc.webapp.forms.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.forms.result.*" %>
-<%@ include file="/session.jsf" %>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
+<wb:session/>
 <%
 	CustomPage custom_page =(CustomPage) request.getAttribute(CustomPage.CUSTOM_PAGE_TAG);
     if(custom_page==null){
@@ -27,9 +29,9 @@
 String page_title=conn.expandText(custom_page.getTitle());
 
 %>
-<%@ include file="/std_header.jsf" %>
-<%@ include file="/main__logged_in.jsf" %>
-<%@ include file="/back.jsf" %>
+<%@ include file="../std_header.jsf" %>
+<%@ include file="../main__logged_in.jsf" %>
+<%@ include file="../back.jsf" %>
 <div class="block" role="main">
 <%@page import="uk.ac.ed.epcc.webapp.content.*" %>
 <% 
@@ -42,4 +44,4 @@ if( XMLContentBuilder.STREAM_BUILDER_FEATURE.isEnabled(conn)){
 <%=hb.toString()%>
 <%} %>
 </div>
-<%@ include file="/std_footer.jsf" %>
+<%@ include file="../std_footer.jsf" %>

@@ -14,6 +14,6 @@
 <%--
  Do password change (and other required page) if required
 --%>
-<%@ include file="scripts/service_init.jsf" %>
 <%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
 <wb:session/>

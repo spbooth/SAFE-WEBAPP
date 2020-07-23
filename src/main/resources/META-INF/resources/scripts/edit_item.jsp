@@ -15,7 +15,9 @@
 Page to edit a LogItem
 --%>
 <%@ page import="uk.ac.ed.epcc.webapp.model.log.*,uk.ac.ed.epcc.webapp.forms.html.*" %>
-<%@ include file="/session.jsf" %>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
+<wb:basic_session/>
 <wb:css url="service_desk.css"/>
 <%@page import="uk.ac.ed.epcc.webapp.model.log.LogFactory" %>
 <%
@@ -32,8 +34,8 @@ if( item == null ){
 	String page_title = service_name+"Edit Item";
 %>
 <wb:formpage/>
-<%@ include file="/std_header.jsf" %>
-<%@ include file="/main__logged_in.jsf" %>
+<%@ include file="../std_header.jsf" %>
+<%@ include file="../main__logged_in.jsf" %>
 
 <div class="block">
 <%
@@ -51,4 +53,4 @@ f.setContents(item.getMap());
 
 
 
-<%@ include file="/std_footer.jsf" %>
+<%@ include file="../std_footer.jsf" %>

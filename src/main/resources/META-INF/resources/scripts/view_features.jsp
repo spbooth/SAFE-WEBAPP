@@ -15,7 +15,10 @@
     
 	
 --%>
-<%@ include file="/session.jsf" %>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
+<wb:session/>
+<%@page import="uk.ac.ed.epcc.webapp.session.SessionService" %>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService" %>
 <%@page import="uk.ac.ed.epcc.webapp.Feature" %>
 <%	
@@ -30,11 +33,11 @@
 <%	
 	String page_title = " View configured features ";
 %>
-<%@ include file="/std_header.jsf" %>
+<%@ include file="../std_header.jsf" %>
 <br>
-<%@ include file="/main__logged_in.jsf" %>
+<%@ include file="../main__logged_in.jsf" %>
 <br>
-<%@ include file="/back.jsf" %>
+<%@ include file="../back.jsf" %>
 <br>
 <%@page import="uk.ac.ed.epcc.webapp.content.*" %>
 <div class="block">
@@ -48,5 +51,5 @@ builder.addTable(conn, Feature.getFeatureTable(conn));
 </div>	
 
 <br/>
-<%@ include file="/back.jsf" %>
-<%@ include file="/std_footer.jsf" %>
+<%@ include file="../back.jsf" %>
+<%@ include file="../std_footer.jsf" %>

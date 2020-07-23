@@ -20,8 +20,9 @@ the form could just submit to self.
 <%@page import="uk.ac.ed.epcc.webapp.tags.WebappHeadTag"%>
 <%@ page import="uk.ac.ed.epcc.webapp.content.*,uk.ac.ed.epcc.webapp.forms.html.*,uk.ac.ed.epcc.webapp.forms.*, uk.ac.ed.epcc.webapp.forms.transition.*" %>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.TransitionServlet" %>
-<%@ page %>
-<%@ include file="/session.jsf" %>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
+<wb:session/>
 <wb:css url="service_desk.css"/>
 <%
     TransitionFactory tp = TransitionServlet.getProvider(conn,request);
@@ -70,9 +71,9 @@ if( tp instanceof TitleTransitionFactory){
 	TransitionServlet.recordView(session_service,provider,target);
 try{
 %>
-<%@ include file="/std_header.jsf" %>
-<%@ include file="/main__logged_in.jsf" %>
-<%@ include file="/back.jsf" %>
+<%@ include file="../std_header.jsf" %>
+<%@ include file="../main__logged_in.jsf" %>
+<%@ include file="../back.jsf" %>
 <%= provider.getTopContent(new HtmlBuilder(),target,session_service).toString() %>
 <div class="block" role="main">
 <% if( XMLContentBuilder.STREAM_BUILDER_FEATURE.isEnabled(conn)){
@@ -130,4 +131,4 @@ for(Object key : provider.getTransitions(target)){
 </form>
 </div>
 <%= provider.getBottomContent(new HtmlBuilder(),target,session_service).toString() %>
-<%@ include file="/std_footer.jsf" %>
+<%@ include file="../std_footer.jsf" %>
