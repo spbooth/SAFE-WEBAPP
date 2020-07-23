@@ -137,7 +137,7 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
     	}
 	}
 %>
-<wb:FormContext inlime="true"/>
+<wb:FormContext inline="true"/>
 <form id="form" class="transition" method="post" 
 <% if( multi ){ %>
    enctype="multipart/form-data"

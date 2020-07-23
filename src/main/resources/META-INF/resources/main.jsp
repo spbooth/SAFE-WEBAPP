@@ -1,4 +1,6 @@
-<%@ include file="session.jsf"%>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
+<wb:session/>
 <%
 	String page_title = service_name+" Main";
 %>
