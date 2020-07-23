@@ -574,7 +574,7 @@ public class Emailer {
 				m.setRecipients(RecipientType.BCC,(Address[]) null);
 				m.saveChanges();
 			}else{
-				// apply blacklist pattern
+				// apply ban-list pattern
 				LinkedHashSet<Address> use_address = new LinkedHashSet<>();
 				for(Address a :  recipients){
 					if( ! supressSend(a)){
@@ -658,7 +658,9 @@ public class Emailer {
 		if( email_template.isEmpty()) {
 			throw new InvalidArgument("Empty template");
 		}
-		
+		if( notify_emails == null || notify_emails.length == 0) {
+			throw new InvalidArgument("No recipients specified");
+		}
 		//		 Set a lot of standard properties from init parameters
 		email_template.setProperties(conn.getInitParameters("service."));
 		email_template.setProperties(conn.getInitParameters("email."));
