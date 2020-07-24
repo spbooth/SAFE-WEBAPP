@@ -55,13 +55,13 @@ body{
   font-size: 1.2em;
   line-height: 40px;
  */
- line-height: (--var-menu-height);
+ line-height: var(--menu-height);
   font-size: 1.0em;
   text-align: left;
 }
 
 .nav li li {
-	line-height: (--var-menu-height-inner);
+	line-height: var(--menu-height-inner);
 }
 /* content of a menu is a link or a div. Format them the same
  */

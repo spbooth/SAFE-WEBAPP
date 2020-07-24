@@ -169,7 +169,7 @@ body > div.block > form.view {
 table.form tr {
         width: inherit;
 }
-table.form td , table.form. th {
+table.form td , table.form th {
 	padding: 0;
 	border-style: none;
 }
