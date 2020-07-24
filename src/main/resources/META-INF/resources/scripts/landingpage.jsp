@@ -16,7 +16,9 @@
  a fragment of the navigation menus.
 
 --%>
-<%@ include file="/basic_session.jsf" %>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
+<wb:basic_session/>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.navigation.*" %>
 <%
 	String node_name = (String) request.getAttribute("MenuNode");
@@ -26,8 +28,8 @@
     
     String 	page_title=service_name+" "+website_name+ " "+node_name+" Menu";
 %>
-<%@ include file="/std_header.jsf"%>
-
+<%@ include file="../std_header.jsf"%>
+<%@ page import="uk.ac.ed.epcc.webapp.content.HtmlBuilder" %>
 <% if( node_name != null && NavigationMenuService.NAVIGATION_MENU_FEATURE.isEnabled(conn)){
 	NavigationMenuService serv = conn.getService(NavigationMenuService.class);
 	NodeContainer menu = serv.getMenu();
@@ -40,4 +42,4 @@
 }
 %>
 
-<%@ include file="/std_footer.jsf"%>
+<%@ include file="../std_footer.jsf"%>

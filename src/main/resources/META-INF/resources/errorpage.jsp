@@ -27,12 +27,12 @@ This needs to be explicilty closed as the errorpage runs outside the ErrorFilter
 --%>
 <%@page isErrorPage="true" %>
 <%@page session="false" %>
-<%@ include file="/service_init.jsf"%>
+<%@ include file="service_init.jsf"%>
 <%try{ %>
 <% String page_title = "Errorpage"; %>
-<%@ include file="/std_header.jsf"%>
-<%@ include file="/scripts/errorpage.jsf" %>
-<%@ include file="/std_footer.jsf"%>
+<%@ include file="std_header.jsf"%>
+<%@ include file="scripts/errorpage.jsf" %>
+<%@ include file="std_footer.jsf"%>
 <%}finally{
 	// Errorpage is called outside the filter
 	if( conn != null){

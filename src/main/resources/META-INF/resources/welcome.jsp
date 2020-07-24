@@ -2,13 +2,15 @@
 We bypass the change password check for this page otherwise the user would never see it.
 This page will stop being displayed once the user resets their initial random password
 --%>
-<%@ include file="basic_session.jsf" %>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
+<wb:basic_session/>
 <%	
 	String page_title = service_name+" Welcome";
 %>
 <%@ include file="std_header.jsf" %>
 <br/>
-<%@ include file="/main__logged_in.jsf" %>
+<%@ include file="main__logged_in.jsf" %>
 <br/>
 
 <div class="block">

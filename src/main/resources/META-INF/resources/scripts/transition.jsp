@@ -20,6 +20,7 @@ attribute.
 Note that as the target and provider are encoded in the servlet-path
 the form could just submit to self. This might break form error reporting though.
 --%>
+<%@page import="java.util.*" %>
 <%@page import="uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult"%>
 <%@page import="uk.ac.ed.epcc.webapp.tags.WebappHeadTag"%>
 <%@ page import="uk.ac.ed.epcc.webapp.forms.html.*" %>
@@ -28,7 +29,11 @@ the form could just submit to self. This might break form error reporting though
 <%@ page import="uk.ac.ed.epcc.webapp.forms.exceptions.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.forms.inputs.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.content.*" %>
-<%@ include file="/scripts/service_init.jsf" %>
+<%@ page import="uk.ac.ed.epcc.webapp.session.SessionService" %>
+<%@ page import="uk.ac.ed.epcc.webapp.servlet.ServletService" %>
+<%@ page import="uk.ac.ed.epcc.webapp.servlet.TransitionServlet" %>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
 <%
     TransitionFactory tp = TransitionServlet.getProvider(conn,request);
     Object key =  request.getAttribute(TransitionServlet.TRANSITION_KEY_ATTR);
@@ -44,8 +49,7 @@ the form could just submit to self. This might break form error reporting though
     boolean allow_anonymous = tp instanceof AnonymousTransitionFactory;
     if( ! allow_anonymous ){
 %>
-<%@ include file="/scripts/basic_session.jsf" %>
-<%@ include file="/scripts/required_pages.jsf" %>
+<wb:session/>
 <%    	
     }
     Object target =   TransitionServlet.getTarget(conn,tp,request);
@@ -63,11 +67,12 @@ the form could just submit to self. This might break form error reporting though
     }
     request.setAttribute(WebappHeadTag.FORM_PAGE_ATTR, Boolean.TRUE);
 %>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
 <wb:formpage/>
 <wb:css url="service_desk.css"/>
-<%@ include file="/std_header.jsf" %>
-<%@ include file="/main__logged_in.jsf" %>
-<%@ include file="/back.jsf" %>
+<%@ include file="../std_header.jsf" %>
+<%@ include file="../main__logged_in.jsf" %>
+<%@ include file="../back.jsf" %>
 <% if( tp instanceof NavigationProvider){
    HtmlBuilder top = new HtmlBuilder();
    ((NavigationProvider)tp).getTopNavigation(top, target);
@@ -94,8 +99,8 @@ HtmlBuilder form_builder = new HtmlBuilder();
 HtmlFormPolicy form_content=form_builder.getFormPolicy();
 if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 	// force initial validation and use internal state
-	Collection<String> m = getMissing(request);
-	Map<String,String> e = getErrors(request);
+	Collection<String> m = HTMLForm.getMissing(request);
+	Map<String,String> e = HTMLForm.getErrors(request);
 	f.validate(m,e);
     form_content.setMissingFields(m);
     form_content.setErrors(e);
@@ -108,8 +113,8 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 	}else{
 		form_content.setPostParams(new HashMap<String,Object>());
 	}
-	form_content.setMissingFields(getMissing(request));
-	form_content.setErrors(getErrors(request));
+	form_content.setMissingFields(HTMLForm.getMissing(request));
+	form_content.setErrors(HTMLForm.getErrors(request));
 }
 %>
 <div class="block">
@@ -132,7 +137,7 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
     	}
 	}
 %>
-<%@ include file="/scripts/inline_form_context.jsf" %>
+<wb:FormContext inline="true"/>
 <form id="form" class="transition" method="post" 
 <% if( multi ){ %>
    enctype="multipart/form-data"
@@ -182,4 +187,4 @@ if( t instanceof CustomFormContent ){
 %><%=bottom.toString() %><%
 }
 %>
-<%@ include file="/std_footer.jsf" %>
+<%@ include file="../std_footer.jsf" %>

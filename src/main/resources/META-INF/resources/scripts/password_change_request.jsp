@@ -15,7 +15,9 @@
 <%@ page	
    import="uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*, uk.ac.ed.epcc.webapp.session.*,uk.ac.ed.epcc.webapp.forms.html.*"
 %>
-<%@ include file="/service_init.jsf" %>
+<%@page import="uk.ac.ed.epcc.webapp.forms.html.PageHTMLForm" %>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
 <wb:formpage/>
 <%	
 	String page_title = service_name+" Change "+website_name+" Password";
@@ -25,18 +27,11 @@
 <%if( form == null ){ %>
 <jsp:forward page="/messages.jsp?message_type=access_denied" />
 <%} %>
-<%@ include file="/std_header.jsf" %>
+<%@ include file="../std_header.jsf" %>
 
-<%@ include file="/scripts/form_context.jsf" %>
+<wb:FormContext/>
 <div class="block" role="main">
 <h1>Please set a password for use with the <%=website_name %></h1>
-<% if( form.hasSubmitted() && form.hasError()){ %>
-<h3>This form contains errors:</h3>
-<p class="warn">	
-<% String error = form.getGeneralError(); %>
-<%= error == null ? "" : error %>
-</p>
-<%} %>
 <p><%=policy %>
 </p>
 <form method="POST">
@@ -45,4 +40,4 @@
 </div>
 
 
-<%@ include file="/std_footer.jsf" %>
+<%@ include file="../std_footer.jsf" %>

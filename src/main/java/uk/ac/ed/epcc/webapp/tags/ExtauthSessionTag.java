@@ -21,13 +21,9 @@ import javax.servlet.jsp.tagext.Tag;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.servlet.ErrorFilter;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 import uk.ac.ed.epcc.webapp.servlet.WebappServlet;
-import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
-import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A custom {@link Tag} that ensures that a current session exists for the user viewing the page
  * 
@@ -35,7 +31,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 
-public class BasicSessionTag extends TagSupport implements Tag {
+public class ExtauthSessionTag extends TagSupport implements Tag {
 
 	private String role=null;
 	
@@ -57,31 +53,17 @@ public class BasicSessionTag extends TagSupport implements Tag {
 	    	page.forward(WebappServlet.MESSAGES_JSP_URL);
 	    	return SKIP_PAGE;
 	    }
+	   ServletService servlet_service = conn.getService(ServletService.class);
 	    
-		/* Retrieve database connection and person currently logged in - 
-	     * if an error is returned, return to login page. 
-	     */
-	    ServletSessionService<?> session_service = (ServletSessionService) conn.getService(SessionService.class);
-	    ServletService servlet_service = conn.getService(ServletService.class);
-		if(session_service == null || ! session_service.haveCurrentUser()) {
-	             String page_request=servlet_service.encodePage();
-	             Logger log =conn.getService(LoggerService.class).getLogger(AppContext.class);
-	             log.info("existing person/session not found "+page_request);
-	             if( session_service == null ){
-	            	 log.debug("Session service is null");
-	             }else{
-	            	 log.debug("Service "+session_service.getClass().getCanonicalName()+" haveCurrentUser="+session_service.haveCurrentUser());
-	             }
-	             servlet_service.requestAuthentication(session_service); 
-	             return SKIP_PAGE;
-		}
-		if( role != null ) {
-	    	if( ! session_service.hasRoleFromList(role.split("\\s*,\\s*"))) {
-	    		WebappServlet.messageWithArgs(conn, request, response, "access_denied", null);
-	    		return SKIP_PAGE;
-	    	}
+	 	String username = null;
+	    if( conn != null ){
+	    	 username = conn.getService(ServletService.class).getWebName();
 	    }
-		pageContext.setAttribute("session_service", session_service);
+		if(username == null || username.trim().length() == 0) {
+			WebappServlet.messageWithArgs(conn, request, response, "access_denied", null);
+    		return SKIP_PAGE;
+		}
+	
 		return EVAL_PAGE;
 		}catch(Exception e){
 			throw new JspException(e);
