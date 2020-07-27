@@ -14,7 +14,7 @@ This page will stop being displayed once the user resets their initial random pa
 <br/>
 
 <div class="block">
-<h2>Welcome to the <%=service_name%> <%=website_name %></h2>
+<h1>Welcome to the <%=service_name%> <%=website_name %></h1>
  
  
   <form method="GET" action="<%= response.encodeURL(web_path+"/main.jsp") %>">

@@ -25,7 +25,7 @@
 <%@ include file="../std_header.jsf"%>
 <%@ include file="../main__logged_in.jsf" %>
 <div class='block'>
-<h2>Table Administration</h2>
+<h1>Table Administration</h1>
 <p>This page lists the current tables in the accounting database and gives access to the built-in administration operations for each table</p>
 </div>
 <%@ page import="uk.ac.ed.epcc.webapp.model.data.DataObjectFactory" %>

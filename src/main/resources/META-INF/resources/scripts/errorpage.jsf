@@ -44,7 +44,7 @@ if( error_code != null ){
 }
 %>
 <div class="block" role="main">
-<h2>An error has occurred</h2>
+<h1>An error has occurred</h1>
 <% if( error_exception != null ){
 
 if( error_exception != null && show != null && show.equals("yes")){

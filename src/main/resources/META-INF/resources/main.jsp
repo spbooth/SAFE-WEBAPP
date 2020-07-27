@@ -6,7 +6,7 @@
 %>
 <%@ include file="std_header.jsf"%>
 <div class="block">
-<h2>Default main page</h2>
+<h1>Default main page</h1>
 <p> This is a placeholder main page for the webapp framework.
 If you are seeing this then then either:
 <ol>

@@ -80,7 +80,7 @@ AppContext text expansion.
 	}
 %>
 <div class="block" role="main">
- <h2><%=message_title %></h2>
+ <h1><%=message_title %></h1>
  <p>
  <%=message_text %>
  </p>

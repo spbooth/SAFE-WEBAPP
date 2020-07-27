@@ -24,7 +24,7 @@ Display version information held in properties
 %>
 <%@ include file="std_header.jsf"%>
 <div class="block">
-<h2>module versions</h2>
+<h1>module versions</h1>
 <ul>
 <%@ page import="uk.ac.ed.epcc.webapp.config.ConfigService" %>
 <%@ page import="uk.ac.ed.epcc.webapp.config.FilteredProperties" %>

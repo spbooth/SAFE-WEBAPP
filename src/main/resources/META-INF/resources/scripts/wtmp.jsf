@@ -25,7 +25,7 @@ uk.ac.ed.epcc.webapp.content.*"%>
      if( man != null ){
  %>
 <div class="wideblock">
-<H2>Current users  logged in to the <%=website_name %></H2>
+<H1>Current users  logged in to the <%=website_name %></H1>
 <%
   Table t = new Table();
   for(WtmpManager.Wtmp w : man.getCurrent()){
