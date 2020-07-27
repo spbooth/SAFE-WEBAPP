@@ -405,7 +405,15 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		@Override
 		public String getNotifyText(AU person) {
 			SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-			PreDefinedContent c = new PreDefinedContent(person.getContext(), "warn_verify_email",(Object)fmt.format(needVerifyBy(person)));
+			Date point = needVerifyBy(person);
+			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+			if( time != null) {
+				if( point.before(time.getCurrentTime())) {
+					PreDefinedContent c = new PreDefinedContent(person.getContext(), "fail_verify_email");
+					return c.toString();
+				}
+			}
+			PreDefinedContent c = new PreDefinedContent(person.getContext(), "warn_verify_email",(Object)fmt.format(point));
 			return c.toString();
 		}
 
