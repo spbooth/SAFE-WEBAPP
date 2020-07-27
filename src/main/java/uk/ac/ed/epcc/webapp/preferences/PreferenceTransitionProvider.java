@@ -129,7 +129,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		 */
 		@Override
 		public ContentBuilder addContent(AppContext conn, ContentBuilder cb) {
-			cb.addHeading(2, conn.expandText(getTitle()));
+			cb.addHeading(1, conn.expandText(getTitle()));
 			cb.addTable(getContext(), getIndexTable(conn.getService(SessionService.class)));
 			return cb;
 		}

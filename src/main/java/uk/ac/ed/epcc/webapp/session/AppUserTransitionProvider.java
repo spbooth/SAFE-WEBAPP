@@ -148,6 +148,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 				
 				@Override
 				public ContentBuilder addContent(AppContext conn, ContentBuilder cb) {
+					cb.addHeading(1, getTitle());
 					SessionService sess = conn.getService(SessionService.class);
 					if( sess instanceof ServletSessionService) {
 						try {
@@ -281,7 +282,11 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 	@Override
 	public String getTitle(AppUserKey key, AppUser target) {
 		if( key == null ) {
-			return target.getIdentifier();
+			String identifier = target.getIdentifier();
+			if( identifier != null && ! identifier.isEmpty()) {
+				return identifier;
+			}
+			return "User details";
 		}
 		return getText(key);
 	}
@@ -298,7 +303,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 
 	@Override
 	public <X extends ContentBuilder> X getLogContent(X cb, AU target, SessionService<?> sess) {
-		cb.addHeading(2, target.getIdentifier());
+		cb.addHeading(1, getTitle(null, target));
 		AppContext c = sess.getContext();
 		Map<String,Object> attr = new LinkedHashMap<>();
 		((AppUserFactory)fac).addAttributes(attr, target);

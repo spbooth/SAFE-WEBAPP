@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?><view_page>
-<Title/>
+<Title>User details</Title>
 <top/>
 <log>
-<h2/>
+<h1>User details</h1>
 <table class="column">
 <tr>
 <th>Name</th>
