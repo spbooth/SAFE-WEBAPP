@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><transition_page>
+<Title>Update personal details</Title>
+<PageHeading>Update personal details</PageHeading>
+<SummaryContent/>
+<ExtraContent>
+<div class="para">Any SSH key you register here is a default for when new login accounts are requested. However this does not automatically mean that it will be installed when the account is created. See the individual system documentation for details of their policy on SSH keys.</div>
+</ExtraContent>
+<Form>
+<table class="form">
+<tr class="even">
+<th>
+<span class="required">Email</span>
+</th>
+<td>fred@example.com</td>
+</tr>
+<tr class="odd">
+<th>
+<label for="transition_Title" class="optional">Title (Mr,Mrs,Dr etc.)</label>
+</th>
+<td>
+<input id="transition_Title" type="text" size="32" maxlength="32" name="Title" class="input"/>
+</td>
+</tr>
+<tr class="even">
+<th>
+<label for="transition_Firstname" class="required">First Name</label>
+</th>
+<td>
+<input id="transition_Firstname" type="text" size="32" maxlength="32" name="Firstname" value="Albert" class="input" required="required"/>
+</td>
+</tr>
+<tr class="odd">
+<th>
+<label for="transition_Initials" class="optional">Initials</label>
+</th>
+<td>
+<input id="transition_Initials" type="text" size="3" maxlength="3" name="Initials" class="input"/>
+</td>
+</tr>
+<tr class="even">
+<th>
+<label for="transition_Lastname" class="required">Last Name</label>
+</th>
+<td>
+<input id="transition_Lastname" type="text" size="32" maxlength="32" name="Lastname" value="Spangler" class="input" required="required"/>
+</td>
+</tr>
+<tr class="odd">
+<th>
+<label for="transition_PublicKey_Text" class="optional">SSH Public key</label>
+</th>
+<td>
+<table class="multi_input">
+<tr>
+<td>
+<input id="transition_PublicKey_Text" type="text" size="48" maxlength="4096" name="PublicKey.Text" value="ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQBRQkTnsRzUM9mLrgEMFk78CLdOxtepxPp1JQSfRc3/A1cyD8NV/gxINRNhMIVkIofUexxtLfAfmNRf666SSei/w2kPX9ndOJ32y2OUUKkijJvEdeMEuFido9Kifc79p0q1KcOhAdRNmmE+LriqsbhJJVQz0OeOKw7wPN9KNYfTevZleQAJBRKr99rBgyRrtrXBhnjYu3yb8E/lf4g8MiBuLGcezzi310RwKMFnamr6MTbA3KBvgvFrPmsjVyedn1IyMdgQ0x8OZMQbr6hesvnR8HuKYfFtm4Vjx7bS+Dyqn+PlPrWH/fjs1957fe57gtZ9eM2S0lsv5cagcWghPAZP" class="input"/>
+</td>
+</tr>
+<tr>
+<td>
+<input id="transition_PublicKey_File" type="file" name="PublicKey.File" class="input"/>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr class="even">
+<th>
+<label for="transition_PersonalCertificate" class="optional" title="This is the DN of your default X509 certificate for use with Globus or GridFTP">PersonalCertificate</label>
+</th>
+<td>
+<input id="transition_PersonalCertificate" type="text" size="64" maxlength="256" name="PersonalCertificate" value="/c=UK/o=eScience/ou=Edinburgh/l=NeSC/cn=stephen booth" class="input"/>
+</td>
+</tr>
+</table>
+<fieldset class="action_buttons">
+<input class="input_button" type="submit" name="Update" value="Update"/>
+</fieldset>
+</Form>
+</transition_page>

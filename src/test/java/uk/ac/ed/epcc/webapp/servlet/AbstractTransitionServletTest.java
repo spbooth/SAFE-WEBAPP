@@ -97,7 +97,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		path.append(provider.getTargetName());
 		TransitionFactory<K,T> prov2 = TransitionServlet.getProviderFromName(getContext(), provider.getTargetName());
 		assertNotNull("Provider not registered "+provider.getTargetName(),prov2);
-		assertEquals("Provider targetName does not generate same class",provider.getClass(), prov2.getClass());
+		assertEquals("Provider targetName="+provider.getTargetName()+" does not generate same class",provider.getClass(), prov2.getClass());
 		assertEquals("generated provider does not produce same target name", provider.getTargetName(),prov2.getTargetName());
 		if( target != null ){
 			if( provider instanceof TransitionProvider){

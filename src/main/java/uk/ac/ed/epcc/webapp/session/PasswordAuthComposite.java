@@ -18,7 +18,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.logging.log4j.util.Strings;
+
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
@@ -74,7 +74,7 @@ public abstract class PasswordAuthComposite<T extends AppUser> extends AppUserCo
 				ExtendedXMLBuilder text = cb.getText();
 				text.addClass("warn");
 				String reason =reasonForReset(target);
-				if( Strings.isNotBlank(reason)) {
+				if( reason != null && ! reason.isEmpty()) {
 					text.clean(reason);
 					text.clean(" ");
 				}

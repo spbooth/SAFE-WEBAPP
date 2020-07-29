@@ -119,7 +119,7 @@ public class FilteredProperties extends Properties {
 	 * begin with the specified <code>base</code> string. The base string along
 	 * with the dot that should follow it will be stripped off all property keys.
 	 * When fetching properties, properties that begin with the specified
-	 * <code>mode</code> will take presidence.
+	 * <code>mode</code> will take precedence.
 	 * 
 	 * @param properties
 	 *          The <code>AppContext</code> to extract properties from

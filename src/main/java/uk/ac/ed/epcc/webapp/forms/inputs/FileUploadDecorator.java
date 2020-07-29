@@ -30,11 +30,11 @@ import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
 public class FileUploadDecorator extends ParseMultiInput<String,Input> implements  ParseInput<String>{
 	
 
-	private ParseAbstractInput<String> master;
+	private ParseAbstractInput<String> parent;
 	private FileInput file;
 	
 	public FileUploadDecorator(ParseAbstractInput<String> input){
-		master=input;
+		parent=input;
 		addInput("Text", input);
 		file = new FileInput();
 	
@@ -46,7 +46,7 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 	}
 
 	public Input<String> getMaster(){
-		return master;
+		return parent;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#convert(java.lang.Object)
@@ -66,7 +66,7 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 			}
 			return stream.toString();
 		}
-		return master.convert(v);
+		return parent.convert(v);
 	}
 
 	
@@ -76,8 +76,8 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 	@Override
 	public String getValue() {
 		// Take first value.
-		if( ! master.isEmpty()) {
-			return master.getValue();
+		if( ! parent.isEmpty()) {
+			return parent.getValue();
 		}
 		return convert(file.getValue());
 	}
@@ -88,7 +88,7 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 	@Override
 	public String setValue(String v) throws TypeError {
 		String old = getValue();
-		master.setValue(v);
+		parent.setValue(v);
 		return old;
 	}
 
@@ -99,10 +99,10 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 
 	@Override
 	public void validateInner() throws FieldException {
-		if( master.isEmpty() && ! file.isEmpty()) {
-			master.setValue(convert(file.getValue()));
+		if( parent.isEmpty() && ! file.isEmpty()) {
+			parent.setValue(convert(file.getValue()));
 		}
-		master.validate();
+		parent.validate();
 	}
 
 	
@@ -112,7 +112,7 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 	 */
 	@Override
 	public String parseValue(String v) throws ParseException {
-		return master.parseValue(v);
+		return parent.parseValue(v);
 	}
 
 	/* (non-Javadoc)
@@ -121,8 +121,14 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 	@Override
 	public Map<String, Object> getMap() {
 		Map<String,Object> map = new HashMap<>();
-		map.put(master.getKey(),master.getString());
-		map.put(file.getKey(), file.getValue());
+		String parent_string = parent.getString();
+		if( parent_string != null ) {
+			map.put(parent.getKey(),parent_string);
+		}
+		StreamData file_value = file.getValue();
+		if( file_value != null ) {
+			map.put(file.getKey(), file_value);
+		}
 		return map;
 	}
 
@@ -133,24 +139,34 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 	public boolean parse(Map<String, Object> v) throws ParseException {
 		
 		boolean is_leaf=true;
+		boolean is_set=false;
 		// First consider a global param-name
 		Object data = v.get(getKey());
 		if( data != null) {
-			master.parse(convert(data));
+			parent.parse(convert(data));
 			is_leaf=false;
+			is_set=true;
 		}
 		// Parse master input (overrides a global value)
-		Object text = v.get(master.getKey());
+		Object text = v.get(parent.getKey());
 		if( text != null ) {
-			master.parse(master.convert(text));
+			parent.parse(parent.convert(text));
 			is_leaf=true;
+			is_set=true;
 		}
 		// finally override with any file-upload
 		Object f = v.get(file.getKey());
 		if( f != null ) {
-			master.parse(convert(f));
+			parent.parse(convert(f));
+			is_leaf=true;
+			is_set=true;
+		}
+		if( ! is_set ) {
+			// no values have been seen at all
+			parent.parse(null);
 			is_leaf=true;
 		}
+		
 		return is_leaf;
 	}
 

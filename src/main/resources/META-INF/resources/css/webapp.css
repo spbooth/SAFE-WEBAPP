@@ -51,6 +51,33 @@ body{
 font-family: var(--font-family);
 }
 
+div.banner {
+	font-family: sans-serif,verdana,arial,helvetica;
+	
+}
+div.banner div.link {
+	font-size-adjust: -1;
+	display: inline;
+}
+div.banner div.service_title{
+	font-size: xx-large;
+}
+div.banner div.logo img{
+	height: 65px;
+}
+div.banner div.content {
+	font-size: x-large;
+	min-height: 65px;
+	width: 60%;
+	margin-left: auto;
+	margin-right: auto;
+}
+div.banner div.left{
+	float: left;
+}
+div.banner div.right{
+	float: right;
+}
 /* The basic centered  block
  * This can hold headers paragraphs and forms.
  */
