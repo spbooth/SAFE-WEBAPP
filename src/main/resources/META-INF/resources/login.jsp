@@ -29,9 +29,12 @@
 --%>
 <%@ page session="false" import="uk.ac.ed.epcc.webapp.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.model.*" %>
-<%@ page import="uk.ac.ed.epcc.webapp.forms.html.*,java.util.*,uk.ac.ed.epcc.webapp.session.*"%>
+<%@ page import="uk.ac.ed.epcc.webapp.forms.html.*"%>
+<%@page import="java.util.*"%>
+<%@page import="uk.ac.ed.epcc.webapp.session.*"%>
 <%@ page import="uk.ac.ed.epcc.webapp.content.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.logging.*" %>
+<%@ page import="uk.ac.ed.epcc.webapp.Feature" %>
 <%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
 <wb:ServiceInit/>
 <%
@@ -83,6 +86,7 @@
 <wb:formpage/>
 <%@ include file="std_header.jsf"%>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.LoginServlet" %>
+<%@page import="uk.ac.ed.epcc.webapp.servlet.RegisterServlet" %>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.ServletService" %>
 <%
     PasswordAuthComposite password_auth = fac.getComposite(PasswordAuthComposite.class);
@@ -110,7 +114,6 @@ This service is only available to pre-registered users.
 <p>Welcome to the <%=service_name%> <%=website_name%>.</p>
 <p> Please fill in this form to register with this service</p>
 </div>
-<%@page import="uk.ac.ed.epcc.webapp.servlet.RegisterServlet" %>
 <%
      HTMLCreationForm person_form = new HTMLCreationForm("Person",fac.getSignupFormCreator(RegisterServlet.getRealm(conn),webname));
 %>
