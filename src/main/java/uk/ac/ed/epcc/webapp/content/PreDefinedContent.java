@@ -73,16 +73,21 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 			if( mess != null) {
 				pattern = conn.expandText(mess.getString(message));
 			}
-			if( pattern != null) {
-				f = new MessageFormat(pattern);
-				a=args;
+			if( pattern != null ) {
+				if( pattern.isEmpty()) {
+					f=null;
+					a=null;
+				}else {
+					f = new MessageFormat(pattern);
+					a=args;
+				}
 			}else {
 				f=null;
 				a=null;
 				conn.getService(LoggerService.class).getLogger(getClass()).error("missing content "+(mess == null ? " no bundle ":mess.getBaseBundleName())+":"+message);
 			}
 		}catch(MissingResourceException e) {
-			getLogger().warn("Missing content", e);
+			conn.getService(LoggerService.class).getLogger(getClass()).error("missing content "+(mess == null ? " no bundle ":mess.getBaseBundleName())+":"+message, e);
 			f=null;
 			a=null;
 			
