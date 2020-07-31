@@ -54,18 +54,14 @@
 <label for="transition_PublicKey_Text" class="required">SSH Public key</label>
 </th>
 <td>
-<table class="multi_input">
-<tr>
-<td>
+<div class="multi_input">
+<div>
 <input id="transition_PublicKey_Text" type="text" size="48" maxlength="4096" name="PublicKey.Text" class="input"/>
-</td>
-</tr>
-<tr>
-<td>
+</div>
+<div>
 <input id="transition_PublicKey_File" type="file" name="PublicKey.File" class="input"/>
-</td>
-</tr>
-</table>
+</div>
+</div>
 </td>
 </tr>
 <tr class="even">

@@ -65,7 +65,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 	private static final Preference ESCAPE_UNICODE_FEATURE = new Preference("html.input.escape_unicode",false,"Escape high code point characters in input values");
 	private static final Feature USE_DATALIST = new Feature("html5.use_datalist",true,"Use html5 datalist syntax, disable to test the fallback mode (as if browser does not userstand datalist)");
 	static final Feature LOCK_FORCED_LIST = new Feature("html.list_input.lock_forced",false,"Supress mandatory pull-down inputs with a single choice");
-	
+	private static final Feature MULTI_INPUT_TABLE = new Feature("html.multi_input.use_table",false,"Use layout tables for multi-input");
 	private ExtendedXMLBuilder hb;
 	private boolean use_post;
 	private boolean use_html5;
@@ -474,10 +474,11 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			optional = optional || !input.requireAll();
 		
 		if( input.hasLineBreaks()){
-			hb.open("table");
-			hb.addClass("multi_input");
-			for(String sub_key : input.getSubKeys()){
-				hb.open("tr");
+			if( MULTI_INPUT_TABLE.isEnabled(getContext()) ) {
+				hb.open("table");
+				hb.addClass("multi_input");
+				for(String sub_key : input.getSubKeys()){
+					hb.open("tr");
 					if( input.hasSubLabels()){
 						hb.open("td");
 						String lab = input.getSubLabel(sub_key);
@@ -485,15 +486,41 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 							hb.clean(lab);
 						}
 						hb.close();
-					
+
 					}
 					hb.open("td");
 					T i = input.getInput(sub_key);
 					i.accept(this);
 					hb.close();
+					hb.close();
+				}
+				hb.close();
+			}else{
+				hb.open("div");
+				hb.addClass("multi_input");
+				if( input.hasSubLabels()) {
+					// use grid layout to make 2 col
+					// at time of writting all sub-label inputs are single line
+					hb.addClass("sub_labels");
+				}
+				for(String sub_key : input.getSubKeys()){
+
+					if( input.hasSubLabels()){
+						hb.open("div");
+						String lab = input.getSubLabel(sub_key);
+						if( lab != null ){
+							hb.clean(lab);
+						}
+						hb.close();
+
+					}
+					hb.open("div");
+					T i = input.getInput(sub_key);
+					i.accept(this);
+					hb.close();
+				}
 				hb.close();
 			}
-			hb.close();
 		}else{
 			hb.open("span");
 			hb.addClass("multi_input");

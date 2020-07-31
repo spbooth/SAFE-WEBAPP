@@ -448,6 +448,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 					xml.addClass("qrcode");
 					URI uri=getURI(target, getKey());
 					xml.attr("src",serv.encodeURL(QRServlet.getImageURL(getContext(), "code.png", uri.toString())));
+					xml.attr("alt","QRCode to be read by smartphone");
 					// no alt as we want to avoid the value being cached
 					//xml.attr("alt",uri.toString());
 					xml.close();
