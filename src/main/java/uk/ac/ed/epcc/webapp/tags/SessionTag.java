@@ -77,7 +77,7 @@ public class SessionTag extends BasicSessionTag {
 		}catch(Exception e){
 			throw new JspException(e);
 		}
-		return EVAL_PAGE;
+		return res;
 	}
 
 	@Override
