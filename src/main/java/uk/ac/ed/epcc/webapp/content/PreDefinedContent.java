@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.content;
 import java.text.Format;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
@@ -65,18 +66,29 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 	 */
 	public PreDefinedContent(AppContext conn,ResourceBundle mess,String message, Object ... args) {
 		super(conn);
-		String pattern = null;
-		if( mess != null) {
-			pattern = conn.expandText(mess.getString(message));
+		MessageFormat f=null;
+		Object a[]= null;
+		try {
+			String pattern = null;
+			if( mess != null) {
+				pattern = conn.expandText(mess.getString(message));
+			}
+			if( pattern != null) {
+				f = new MessageFormat(pattern);
+				a=args;
+			}else {
+				f=null;
+				a=null;
+				conn.getService(LoggerService.class).getLogger(getClass()).error("missing content "+(mess == null ? " no bundle ":mess.getBaseBundleName())+":"+message);
+			}
+		}catch(MissingResourceException e) {
+			getLogger().warn("Missing content", e);
+			f=null;
+			a=null;
+			
 		}
-		if( pattern != null) {
-			fmt = new MessageFormat(pattern);
-			this.args=args;
-		}else {
-			fmt=null;
-			this.args=null;
-			conn.getService(LoggerService.class).getLogger(getClass()).error("missing content "+(mess == null ? " no bundle ":mess.getBaseBundleName())+":"+message);
-		}
+		fmt=f;
+		this.args=a;
 	}
 	/** extension point to apply additional processing
 	 * 
