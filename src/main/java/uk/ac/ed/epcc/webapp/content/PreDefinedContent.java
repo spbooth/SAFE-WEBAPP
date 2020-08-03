@@ -65,6 +65,9 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 	 * @param args
 	 */
 	public PreDefinedContent(AppContext conn,ResourceBundle mess,String message, Object ... args) {
+		this(conn, false,mess,message,args);
+	}
+	public PreDefinedContent(AppContext conn,boolean optional ,ResourceBundle mess,String message, Object ... args) {
 		super(conn);
 		MessageFormat f=null;
 		Object a[]= null;
@@ -84,10 +87,14 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 			}else {
 				f=null;
 				a=null;
-				conn.getService(LoggerService.class).getLogger(getClass()).error("missing content "+(mess == null ? " no bundle ":mess.getBaseBundleName())+":"+message);
+				if( ! optional) {
+					conn.getService(LoggerService.class).getLogger(getClass()).error("missing content "+(mess == null ? " no bundle ":mess.getBaseBundleName())+":"+message);
+				}
 			}
 		}catch(MissingResourceException e) {
-			conn.getService(LoggerService.class).getLogger(getClass()).error("missing content "+(mess == null ? " no bundle ":mess.getBaseBundleName())+":"+message, e);
+			if( ! optional) {
+				conn.getService(LoggerService.class).getLogger(getClass()).error("missing content "+(mess == null ? " no bundle ":mess.getBaseBundleName())+":"+message, e);
+			}
 			f=null;
 			a=null;
 			

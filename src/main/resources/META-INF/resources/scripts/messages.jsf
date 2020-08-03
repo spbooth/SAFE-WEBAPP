@@ -59,7 +59,8 @@ AppContext text expansion.
 	  }
 	  if( message_extra == null ){
 		  try{
-			  PreDefinedContent extra = new PreDefinedContent(conn,mess,message_type + ".extra",args);
+			  // optional content
+			  PreDefinedContent extra = new PreDefinedContent(conn,true,mess,message_type + ".extra",args);
 			  message_extra = extra.addContent((SimpleXMLBuilder)new HtmlBuilder()).toString();
 		  }catch(MissingResourceException e){
 			  // Not an error
