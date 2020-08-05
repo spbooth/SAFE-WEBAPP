@@ -81,7 +81,7 @@ public class WebappMessage extends TagSupport implements Tag {
         try{
         	AppContext conn = ErrorFilter.retrieveAppContext(request,response);
         	if( conn != null ){
-        		PreDefinedContent content = new PreDefinedContent(conn,bundle, message);
+        		PreDefinedContent content = new PreDefinedContent(conn,optional,bundle, message);
         		HtmlBuilder hb = new HtmlBuilder();
         		content.addContent((SimpleXMLBuilder) hb);
         		out.print(hb.toString());

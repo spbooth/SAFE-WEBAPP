@@ -56,6 +56,9 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 	public PreDefinedContent(AppContext conn,String bundle,String message, Object ... args) {
 		this(conn,conn.getService(MessageBundleService.class).getBundle(bundle == null ? DEFAULT_BUNDLE : bundle),message,args);
 	}
+	public PreDefinedContent(AppContext conn,boolean optional,String bundle,String message, Object ... args) {
+		this(conn,optional,conn.getService(MessageBundleService.class).getBundle(bundle == null ? DEFAULT_BUNDLE : bundle),message,args);
+	}
 	
 	/** Create {@link PreDefinedContent} from a specific message from a {@link ResourceBundle}
 	 * 
