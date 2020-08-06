@@ -237,7 +237,8 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	/** clear all cached relationships
 	 * 
 	 */
-	private void flushRelationships(){
+	@Override
+	public void flushRelationships(){
 		relationship_map=null;
 		roles.clear();
 	}

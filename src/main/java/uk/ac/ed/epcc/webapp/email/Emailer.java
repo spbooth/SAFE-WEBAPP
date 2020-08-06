@@ -1324,9 +1324,7 @@ public class Emailer {
 	}
 
 	public static boolean checkAddressList(String list) {
-		StringTokenizer st = new StringTokenizer(list,",",false);
-    	while(st.hasMoreTokens()){
-             String s = st.nextToken();
+		for(String s : list.split("\\s*,\\s*")) {
              if(! checkAddress(s)){
             	 return false;
              }
