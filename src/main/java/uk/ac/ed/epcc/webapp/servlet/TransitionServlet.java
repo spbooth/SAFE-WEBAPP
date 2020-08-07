@@ -139,11 +139,13 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		log.debug("In TransitionServlet");
 		FormResult o = null;
 		TransitionFactory<K,T> tp = null;
+		String provider_name="Unspecified";
 		if( path.size() > 0){
-			tp = (TransitionFactory<K, T>) getProviderFromName(conn, path.removeFirst());
+			provider_name=path.removeFirst();
+			tp = (TransitionFactory<K, T>) getProviderFromName(conn, provider_name);
 		}
 		if( tp == null ){
-        	log.warn("No transition provider");
+        	log.warn("No transition provider "+provider_name);
         	message(conn,req,res,"invalid_input");
 			return;
         }
