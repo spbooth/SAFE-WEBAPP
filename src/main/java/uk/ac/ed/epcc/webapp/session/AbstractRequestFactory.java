@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
@@ -86,14 +87,21 @@ public abstract class AbstractRequestFactory<R extends AbstractRequestFactory.Ab
 	 */
 	public final void purge() throws DataFault {
 		if( res.hasField(EXPIRES)) {
-			FilterDelete<R> del = new FilterDelete<>(res);
+			
 			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 			Date d = time.getCurrentTime();
 			SQLOrFilter<R> fil = new SQLOrFilter<>(getTarget());
 			fil.addFilter(new SQLValueFilter<>(getTarget(), res, EXPIRES,MatchCondition.LT, d));
 			fil.addFilter(new NullFieldFilter<>(getTarget(), res, EXPIRES, true));
-			del.delete(fil);
+			purge(fil);
 		}
+	}
+
+	/** remove expired reqeusts based on a {@link SQLFilter}
+	*/
+	protected void purge(SQLFilter<R> fil) throws DataFault {
+		FilterDelete<R> del = new FilterDelete<>(res);
+		del.delete(fil);
 	}
 
 	/** locate a request object by tag.
