@@ -61,7 +61,7 @@ public abstract class AbstractRequestFactory<R extends AbstractRequestFactory.Ab
 			
 			public final boolean expired() {
 				if ( record.getRepository().hasField(EXPIRES)) {
-					Date d = record.getDateProperty(EXPIRES);
+					Date d = expires();
 					if( d != null) {
 						CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 						return d.before(time.getCurrentTime());
@@ -69,6 +69,11 @@ public abstract class AbstractRequestFactory<R extends AbstractRequestFactory.Ab
 				}
 				return false;
 			}
+
+			public Date expires() {
+				return record.getDateProperty(EXPIRES);
+			}
+			
 			public final String getTag(){
 				return record.getStringProperty(TAG);
 			}

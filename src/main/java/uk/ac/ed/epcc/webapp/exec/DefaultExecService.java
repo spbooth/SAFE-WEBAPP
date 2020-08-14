@@ -79,6 +79,22 @@ public class DefaultExecService extends AbstractContexed implements ExecService 
 	 */
 	@Override
 	public DeferredProcessProxy exec_deferred(byte input[], String command) throws IOException {
+		if( command.contains(":")) {
+			String frags[] = command.split("\\s*:\\s*");
+			
+			StringBuilder sb = new StringBuilder();
+			sb.append(getContext().getInitParameter("ssh.command","ssh"));
+			for( int i=0 ; i< frags.length ; i++) {
+				if( i < (frags.length - 2)) {
+					sb.append(" -J ");
+				}else {
+					sb.append(" ");
+				}
+				sb.append(frags[i]);
+			}
+			
+			command= sb.toString();
+		}
 		Runtime rt = Runtime.getRuntime();
 		String result=null;
 		Process p =rt.exec(command);
@@ -86,4 +102,5 @@ public class DefaultExecService extends AbstractContexed implements ExecService 
 		
 	}
 
+	
 }

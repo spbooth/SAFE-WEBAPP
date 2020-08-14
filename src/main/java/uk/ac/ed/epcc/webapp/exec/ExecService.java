@@ -20,6 +20,12 @@ import uk.ac.ed.epcc.webapp.AppContextService;
 /** A service to run external commands.
  * 
  * This is encapsulated as a service to allow substitution in tests and to re-use common code.
+ * 
+ * If a command contains colons then it is assumed to denote a remote command to be run through ssh
+ * and be of the form:
+ * [username@host:]+command
+ * If there is more than one username@host fragment then all but the last denote a series of jump-hosts
+ * 
  * @author spb
  *
  */

@@ -387,7 +387,8 @@ public abstract class DataObject implements ContextIndexed, Identified, Releasab
 	}
 	@Override
 	public String toString(){
-		return getClass().getCanonicalName()+" "+record.toString();
+		return getIdentifier();
+		//return getClass().getCanonicalName()+" "+record.toString();
 	}
 
 	/**

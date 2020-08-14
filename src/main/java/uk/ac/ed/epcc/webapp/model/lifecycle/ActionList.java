@@ -31,7 +31,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
  * listeners. The target classes for the listeners and the factory are checked for type conflicts.
  * 
  * @author spb
- * @param <T> 
+ * @param <T> type of target
  *
  */
 public class ActionList<T extends DataObject> extends AbstractConstructedTargetList<T,ActionListener<T>> implements ActionListener<T>  {

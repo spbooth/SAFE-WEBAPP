@@ -157,7 +157,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	}
 	/**
 	 * 
-	 * @param expected_stages number of expected additional transaction stages
+	 * @param expected_stages number of expected additional transaction stages (-ve for allow any)
 	 * @throws ServletException
 	 * @throws IOException
 	 */

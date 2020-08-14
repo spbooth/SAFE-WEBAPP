@@ -27,6 +27,9 @@ import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 /** Abstract superclass for building {@link TransitionFactory}s.
  * 
+ * This implementation stores the keys and transitions in maps generated when the class is constructed
+ * so dynamic transitions are not supported.
+ * 
  * @author spb
  *
  * @param <T>
