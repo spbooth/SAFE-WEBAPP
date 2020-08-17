@@ -83,6 +83,11 @@
 		<body-content>none</body-content>
 	</tag>
 	<tag>
+		<name>MainLoggedIn</name>
+		<tag-class>uk.ac.ed.epcc.webapp.tags.MainLoggedInTag</tag-class>
+		<body-content>none</body-content>
+	</tag>
+	<tag>
 		<name>RoleButtons</name>
 		<tag-class>uk.ac.ed.epcc.webapp.tags.RoleButtonsTag</tag-class>
 		<body-content>none</body-content>
