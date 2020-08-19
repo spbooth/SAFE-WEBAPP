@@ -21,6 +21,7 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -373,7 +374,7 @@ public class DefaultServletService implements ServletService{
 	 * @return Map of request parameters
 	 */
 	public Map<String,Object> makeParams(HttpServletRequest req)  {
-		Hashtable<String,Object> h = new Hashtable<>();
+		Map<String,Object> h = new LinkedHashMap<String, Object>();
 		
 		
 		String path = req.getPathInfo();
