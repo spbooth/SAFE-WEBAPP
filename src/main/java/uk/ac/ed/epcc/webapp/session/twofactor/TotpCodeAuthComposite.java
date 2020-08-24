@@ -39,6 +39,7 @@ import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
+import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
@@ -585,6 +586,16 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	@Override
 	protected String getConfigPrefix() {
 		return "totp_auth_code";
+	}
+
+	@Override
+	public ContentBuilder addExtra(ContentBuilder cb) {
+		cb = super.addExtra(cb);
+		PreDefinedContent extra = new PreDefinedContent(getContext(), true, PreDefinedContent.DEFAULT_BUNDLE, "two_factor.extra_content");
+		if( extra.hasContent()) {
+			cb.addObject(extra);
+		}
+		return cb;
 	}
 
 }

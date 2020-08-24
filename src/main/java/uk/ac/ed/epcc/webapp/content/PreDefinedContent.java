@@ -39,7 +39,7 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 	/**
 	 * 
 	 */
-	private static final String DEFAULT_BUNDLE = "content";
+	public static final String DEFAULT_BUNDLE = "content";
 
 
 
