@@ -80,7 +80,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		 */
 		@Override
 		public ContentBuilder addContent(ContentBuilder builder) {
-			builder.addLink(conn, target.getName(), new ViewTransitionResult<>(PreferenceTransitionProvider.this, target));
+			builder.addLink(conn, target.getDescription(), new ViewTransitionResult<>(PreferenceTransitionProvider.this, target));
 			return builder;
 		}
 
@@ -89,6 +89,8 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		 */
 		@Override
 		public int compareTo(Linker o) {
+			// Even if we display the description this will group by
+			// function
 			return target.getName().compareTo(o.target.getName());
 		}
 	}
@@ -290,6 +292,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		}
 		t.setKeyName("Feature");
 		t.removeCol("Name");
+		t.removeCol("Description");
 		t.setKeyTransform( new Transform() {
 			
 			@Override
