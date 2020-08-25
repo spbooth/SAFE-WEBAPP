@@ -214,6 +214,8 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 				}
 				return;
 			}else{
+				badInputCheck(conn);
+				
 				log.debug("No transition");
 				message(conn, req, res, "invalid_input");
 				return;

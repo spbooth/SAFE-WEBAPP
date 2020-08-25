@@ -74,6 +74,7 @@ public class UserServlet<T extends AppUser> extends SessionServlet {
 			return;
 		}
 		message(conn, req, res, "invalid_input");
+		badInputCheck(conn);
 		return;
 	}
 	

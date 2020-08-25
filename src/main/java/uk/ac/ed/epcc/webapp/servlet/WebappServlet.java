@@ -38,6 +38,7 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 import uk.ac.ed.epcc.webapp.servlet.config.ServletConfigService;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
  * webappServlet Base class for servlets in the web application, it hold
@@ -173,8 +174,31 @@ public abstract class WebappServlet extends HttpServlet {
 	public Logger getLogger(AppContext c) {
 		return c.getService(LoggerService.class).getLogger(getClass());
 	}
+	private static final String SUSPISIOUS_ARGUMENT_ATTR = "SuspiciousArgumentCount";
 
-	
+	/** Call this method when invalid data is passed to something that
+	 * should have been application generated and is therefore might be 
+	 * indicative of somebody probing for vulnerabilities. 
+	 * 
+	 * @param conn
+	 */
+	public void badInputCheck(AppContext conn) {
+		SessionService sess = conn.getService(SessionService.class);
+		if( sess != null ) {
+			// This is a test for somebody/fuzzing probing the 
+			// interface too many fails suggest something odd is going on. 
+			Integer fail_count = (Integer) sess.getAttribute(SUSPISIOUS_ARGUMENT_ATTR);
+			if( fail_count == null ) {
+				fail_count = Integer.valueOf(1);
+			}else {
+				fail_count = Integer.valueOf(fail_count.intValue()+1);
+			}
+			sess.setAttribute(SUSPISIOUS_ARGUMENT_ATTR, fail_count);
+			if( fail_count.intValue() > conn.getIntegerParameter("transition.fail_count_thresh", 10)) {
+				getLogger(conn).error("Too many bad transition targets, possible probing?");
+			}
+		}
+	}
 
 	/**
 	 * Show a standard pre-formatted message page from the servlet. This can

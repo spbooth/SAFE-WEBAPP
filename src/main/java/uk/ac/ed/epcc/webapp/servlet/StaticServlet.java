@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -49,6 +50,7 @@ public class StaticServlet extends SessionServlet {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	public static final Feature STATIC_SERVER_FEATURE = new Feature("static-servlet",false,"Enable tthe StaticServlet");
 	public static class ExistFilter implements FilenameFilter {
 		File dir;
 
@@ -147,6 +149,12 @@ public class StaticServlet extends SessionServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse res,
 			AppContext conn, SessionService person) throws Exception {
+		
+		if( ! STATIC_SERVER_FEATURE.isEnabled(conn)) {
+			message(conn,req,res,"disabled_feature_error");
+
+			return;
+		}
 		Logger log = getLogger(conn);
 		String param_basedir=conn.getExpandedProperty("static.basedir");
 		if( param_basedir == null ){
