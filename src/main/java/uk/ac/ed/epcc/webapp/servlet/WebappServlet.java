@@ -184,6 +184,21 @@ public abstract class WebappServlet extends HttpServlet {
 	 */
 	public void badInputCheck(AppContext conn) {
 		SessionService sess = conn.getService(SessionService.class);
+		Logger logger = getLogger(conn);
+		doBadInputCheck(conn, sess, logger);
+	}
+
+	public static void checkBadInput(SessionService sess) {
+		doBadInputCheck(sess.getContext(), sess, sess.getContext().getService(LoggerService.class).getLogger(WebappServlet.class));
+	}
+	/** static version of {@link #badInputCheck(AppContext)}
+	 * for use by jsp pages
+	 * 
+	 * @param conn
+	 * @param sess
+	 * @param logger
+	 */
+	private static void doBadInputCheck(AppContext conn, SessionService sess, Logger logger) {
 		if( sess != null ) {
 			// This is a test for somebody/fuzzing probing the 
 			// interface too many fails suggest something odd is going on. 
@@ -195,7 +210,8 @@ public abstract class WebappServlet extends HttpServlet {
 			}
 			sess.setAttribute(SUSPISIOUS_ARGUMENT_ATTR, fail_count);
 			if( fail_count.intValue() > conn.getIntegerParameter("transition.fail_count_thresh", 10)) {
-				getLogger(conn).error("Too many bad transition targets, possible probing?");
+				
+				logger.error("Too many bad transition targets, possible probing?");
 			}
 		}
 	}
