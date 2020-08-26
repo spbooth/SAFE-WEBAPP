@@ -77,7 +77,8 @@ import uk.ac.ed.epcc.webapp.timer.TimeClosable;
  * Relationships are configured via the {@link ConfigService} by setting:
  * <b>use_relationship.<em>factory-tag</em>.<em>relationship</em></b>
  * If this is a comma separated list it implies an OR of the component parts.
- * within this AND combinations can be specified as + separated terms.
+ * within this AND combinations can be specified as + separated terms. If both OR and AND combinations exist 
+ * the AND operator binds more tightly.
  * <p>
  * The factory (or its {@link Composite}s) can implement {@link AccessRoleProvider} to provide relationships.
  * <p>

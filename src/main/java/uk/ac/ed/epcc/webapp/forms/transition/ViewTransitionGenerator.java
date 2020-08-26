@@ -102,7 +102,7 @@ public class ViewTransitionGenerator<X> implements UIGenerator, Comparable<ViewT
 			SessionService sess = conn.getService(SessionService.class);
 			TransitionFactory<?, X> fac =new TransitionFactoryFinder(conn).getProviderFromName(transition_tag);
 			// Check for current user so as not to add links in emails for public viewable objects
-			if( fac != null && sess.haveCurrentUser() && fac instanceof ViewTransitionFactory && ((ViewTransitionFactory)fac).canView(target, sess)){
+			if( fac != null && sess != null && sess.haveCurrentUser() && fac instanceof ViewTransitionFactory && ((ViewTransitionFactory)fac).canView(target, sess)){
 				builder.addLink(conn, toString(), title,new ViewTransitionResult((ViewTransitionFactory)fac, target));
 			}else{
 				builder.getSpan().clean(toString()).appendParent();
