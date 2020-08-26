@@ -71,6 +71,9 @@ import uk.ac.ed.epcc.webapp.timer.TimeClosable;
  * has relationship (see below) <i>rel</i> against one of the records from factory constructed using <i>tag</i>.
  * If the optional name-filter  <i>name</i> is specified it must be one of the records that match that filter.
  * <p>
+ * A role starting with <i>@</i> denotes a named filter on the {@link AppUser} that must match a
+ * person for them to have the role.
+ * <p>
  * The {@link AppUserFactory} or its {@link Composite}s can provide roles by implementing
  * {@link StateRoleProvider}. 
  * <p>
@@ -985,10 +988,109 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			return false;
 		}
 	}
+	private <X extends DataObject> BaseFilter<A> getRelationshipRoleFilter(String tag, String relationship, String name_filter) {
+		AppUserFactory<A> login = getLoginFactory();
+		try {
+			
+			DataObjectFactory<X> fac = getContext().makeObject(DataObjectFactory.class, tag);
+			if( fac == null) {
+				error("tag "+tag+" failed to resolve to DataObjectFactory");
+				return new FalseFilter<A>(login.getTarget());
+			}
+			if( name_filter == null) {
+				// Any target
+				return getPersonInRelationshipRoleFilter(fac, relationship, null);
+			}
+			BaseFilter<X> nf = makeNamedFilter(fac, name_filter);
+			if( nf == null ) {
+				error("Bad name filter on "+fac.getTag()+" "+name_filter);
+				return new FalseFilter(login.getTarget());
+			}
+			OrFilter<A> fil = new OrFilter<>(login.getTarget(),login);
+			for(X o : fac.getResult(nf)) {
+				fil.addFilter(getPersonInRelationshipRoleFilter(fac, relationship, o));
+			}
+			return fil;
+		}catch(Exception t) {
+			error(t,"Error checking relationship based role");
+			return new FalseFilter<A>(login.getTarget());
+		}
+	}
+	
+	/** get a {@link BaseFilter} for all {@link AppUser}s who
+	 * have access to a global role.
+	 * 
+	 * This is the same selection as {@link #canHaveRole(AppUser, String)
+	 * 
+	 * @param role
+	 * @return
+	 */
+	@Override
+	public BaseFilter<A> getGlobalRoleFilter(String role){
+		return getGlobalRoleFilter(null, role);
+	}
+	public BaseFilter<A> getGlobalRoleFilter(Set<String> skip,String role){
+		AppUserFactory<A> login = getLoginFactory();
+		if( role == null || role.isEmpty()) {
+			return new FalseFilter<A>(login.getTarget());
+		}
+		if(role.startsWith("@")) {
+			BaseFilter<A> nf = makeNamedFilter(login, role.substring(1));
+			if( nf == null ) {
+				error("Bad named filter on AppUser "+role);
+				return new FalseFilter(login.getTarget());
+			}
+			return nf;
+		}
+		int pos = role.indexOf('%');
+		if( pos > 0) {
+			// role based on relationship and optional nameFilter
+		    String tag = role.substring(0, pos);
+		    String rel = role.substring(pos+1);
+		    String name=null;
+		    int namepos = rel.indexOf('@');
+		    if( namepos > 0) {
+		    	name=rel.substring(namepos+1);
+		    	rel=rel.substring(0, namepos);
+		    }
+		    // can't alias a complex role to return directly
+		    return getRelationshipRoleFilter(tag, rel, name);
+		}
+		BaseFilter<A> fil = login.getRoleFilter(role);
+		if( skip == null ) {
+			skip = new HashSet<String>();
+		}
+		skip.add(role);
+		String list = mapRoleName(role);
+		if( ! list.equals(role)) {
+			OrFilter<A> or = new OrFilter<A>(login.getTarget(), login);
+			or.addFilter(fil);
+			for(String r : list.split("\\s*,\\s*")) {
+				if( ! skip.contains(r)) {
+					or.addFilter(getGlobalRoleFilter(skip, r));
+				}
+			}
+			fil = or;
+		}
+		return fil;
+	}
+	
 	@Override
 	public boolean canHaveRole(A user, String role) {
 		if( user == null || role == null){
 			return false;
+		}
+		if( role.startsWith("@")) {
+			AppUserFactory<A> login = getLoginFactory();
+			if( role.length() < 2) {
+				return false;
+			}
+			BaseFilter<A> nf = makeNamedFilter(login, role.substring(1));
+			if( nf == null) {
+				error("Invalid named filter on AppUser "+role);
+				return false;
+			}
+			return login.matches(nf, user);
 		}
 		int pos = role.indexOf('%');
 		if( pos > 0) {

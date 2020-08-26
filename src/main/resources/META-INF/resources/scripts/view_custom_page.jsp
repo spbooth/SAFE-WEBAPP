@@ -13,6 +13,7 @@
 <%--| limitations under the License.                                           |--%>
 <%-- A generic page to view CustomPageResults
 --%>
+<%@page import="uk.ac.ed.epcc.webapp.tags.WebappHeadTag"%>
 <%@ page import="uk.ac.ed.epcc.webapp.forms.html.*,uk.ac.ed.epcc.webapp.forms.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.forms.result.*" %>
 <%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
@@ -27,6 +28,11 @@
        return;
     }	
 String page_title=conn.expandText(custom_page.getTitle());
+if( custom_page instanceof ScriptCustomPage){
+	ScriptCustomPage scp = (ScriptCustomPage) custom_page;
+	WebappHeadTag.addCss(conn, request, scp.getAdditionalCSS());
+	WebappHeadTag.addScript(conn, request, scp.getAdditionalScript());
+}
 
 %>
 <%@ include file="../std_header.jsf" %>

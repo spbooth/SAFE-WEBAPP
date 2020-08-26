@@ -31,12 +31,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.Span;
+import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.BaseForm;
 import uk.ac.ed.epcc.webapp.forms.Form;
@@ -72,6 +74,7 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
+import uk.ac.ed.epcc.webapp.model.IndexTableContributor;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
@@ -105,6 +108,7 @@ import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.RemoteAuthServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
+
 
 
 /** A Factory for creating {@link AppUser} objects that represent users of the system.
@@ -1191,5 +1195,36 @@ AnonymisingFactory
 		// which in turn will call this
 		return null;
 	}
-	
+	public Table<String,AU> getPersonTable(SessionService<?> sess,BaseFilter<AU> fil) throws DataFault{
+		Table<String,AU> t = new Table<>();
+		Collection<GlobalNamePolicy> composites = getComposites(GlobalNamePolicy.class);
+		Collection<IndexTableContributor> att = getComposites(IndexTableContributor.class);
+		for(AU p : getResult(fil)){
+			p.addIndexTable(t);
+			
+			
+			
+			for(GlobalNamePolicy policy : composites){
+				if( policy.active()){
+					String label = policy.getNameLabel();
+					if( label != null ){
+						t.put(label,p,policy.getCanonicalName(p));
+					}
+				}
+			}
+			
+			LinkedHashMap<String, Object> attr = new LinkedHashMap<>();
+			for(IndexTableContributor c: att) {
+				try {
+				c.addAttributes(attr, p);
+				}catch(Exception tr) {
+					getLogger().error("Error adding attribute from "+c.getClass().getCanonicalName(), tr);
+				}
+			}
+			for(Entry<String,Object> e : attr.entrySet()) {
+				t.put(e.getKey(), p, e.getValue());
+			}
+		}
+		return t;
+	}
 }

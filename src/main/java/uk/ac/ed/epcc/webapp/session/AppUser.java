@@ -21,11 +21,16 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.model.IndexTableContributor;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Owned;
@@ -323,6 +328,14 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 		}
 	}
 	
-	
+	/** Add this {@link AppUser} to an index table with rows keyed by {@link AppUser}.
+	 * 
+	 * @see AppUserFactory#getPersonTable(SessionService, uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter)
+	 * 
+	 * @param tab
+	 */
+	public void addIndexTable(Table tab) {
+		tab.put("Email", this, getEmail());
+	}
 	
 }

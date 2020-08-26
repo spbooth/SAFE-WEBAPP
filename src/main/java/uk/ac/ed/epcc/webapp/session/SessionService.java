@@ -210,6 +210,15 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public boolean canHaveRole(A user,String role);
 	
+	/** get a {@link BaseFilter} for all {@link AppUser}s who
+	 * have access to a global role.
+	 * 
+	 * This is the same selection as {@link #canHaveRole(AppUser, String)
+	 * 
+	 * @param role
+	 * @return
+	 */
+	public BaseFilter<A> getGlobalRoleFilter(String role);
 	
 	default public boolean canHaveRoleFromList(A user,String ... roles) {
 		if( roles == null ) {
