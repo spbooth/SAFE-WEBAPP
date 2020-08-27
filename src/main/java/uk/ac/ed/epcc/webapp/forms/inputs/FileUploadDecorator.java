@@ -45,7 +45,7 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 		setLineBreaks(true);
 	}
 
-	public Input<String> getMaster(){
+	public Input<String> getParent(){
 		return parent;
 	}
 	/* (non-Javadoc)
@@ -147,7 +147,7 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 			is_leaf=false;
 			is_set=true;
 		}
-		// Parse master input (overrides a global value)
+		// Parse parent input (overrides a global value)
 		Object text = v.get(parent.getKey());
 		if( text != null ) {
 			parent.parse(parent.convert(text));
