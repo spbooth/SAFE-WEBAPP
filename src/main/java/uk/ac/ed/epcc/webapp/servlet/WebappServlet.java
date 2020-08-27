@@ -174,7 +174,7 @@ public abstract class WebappServlet extends HttpServlet {
 	public Logger getLogger(AppContext c) {
 		return c.getService(LoggerService.class).getLogger(getClass());
 	}
-	private static final String SUSPISIOUS_ARGUMENT_ATTR = "SuspiciousArgumentCount";
+	private static final String SUSPICIOUS_ARGUMENT_ATTR = "SuspiciousArgumentCount";
 
 	/** Call this method when invalid data is passed to something that
 	 * should have been application generated and is therefore might be 
@@ -202,13 +202,13 @@ public abstract class WebappServlet extends HttpServlet {
 		if( sess != null ) {
 			// This is a test for somebody/fuzzing probing the 
 			// interface too many fails suggest something odd is going on. 
-			Integer fail_count = (Integer) sess.getAttribute(SUSPISIOUS_ARGUMENT_ATTR);
+			Integer fail_count = (Integer) sess.getAttribute(SUSPICIOUS_ARGUMENT_ATTR);
 			if( fail_count == null ) {
 				fail_count = Integer.valueOf(1);
 			}else {
 				fail_count = Integer.valueOf(fail_count.intValue()+1);
 			}
-			sess.setAttribute(SUSPISIOUS_ARGUMENT_ATTR, fail_count);
+			sess.setAttribute(SUSPICIOUS_ARGUMENT_ATTR, fail_count);
 			if( fail_count.intValue() > conn.getIntegerParameter("transition.fail_count_thresh", 10)) {
 				
 				logger.error("Too many bad transition targets, possible probing?");

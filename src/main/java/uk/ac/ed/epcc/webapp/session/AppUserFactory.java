@@ -1227,4 +1227,9 @@ AnonymisingFactory
 		}
 		return t;
 	}
+	@Override
+	public void addRelationships(Set<String> roles) {
+		roles.add(MY_SELF_RELATIONSHIP);
+		
+	}
 }

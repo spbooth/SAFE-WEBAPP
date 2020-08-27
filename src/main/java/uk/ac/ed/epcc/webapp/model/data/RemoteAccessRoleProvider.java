@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.data;
 
+import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
@@ -113,6 +115,11 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 		} catch (UnknownRelationshipException e) {
 			return false;
 		}
+		
+	}
+	@Override
+	public void addRelationships(Set<String> roles) {
+		
 		
 	}
 

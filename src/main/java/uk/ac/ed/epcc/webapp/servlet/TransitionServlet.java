@@ -530,7 +530,12 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			
 				return null;
 			}
-			return prov.getTarget(target_id);
+			T target = prov.getTarget(target_id);
+			if( target == null) {
+				// non empty id failed to resolve
+				WebappServlet.checkBadInput(prov.getContext().getService(SessionService.class));
+			}
+			return target;
 		}
 
 		public  T visitPathTransitionProvider(
