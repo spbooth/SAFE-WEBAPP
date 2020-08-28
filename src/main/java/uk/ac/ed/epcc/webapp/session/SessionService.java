@@ -401,7 +401,9 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public boolean isAuthenticated();
 	
-	/**
+	/** clear the internal relationship cache as things may have changed
 	 */
 	public void flushRelationships();
+	
+	
 }

@@ -68,7 +68,7 @@ public class ServletSessionService<A extends AppUser> extends AbstractSessionSer
 
 	protected static final String SUPER_PERSON_ID_ATTR = "SuperPersonID";
 	
-	private static final String WTMP_ID = "SESSION_WTMP_ID";
+	public static final String WTMP_ID = "SESSION_WTMP_ID";
 	private static final String WTMP_EXPIRY_DATE = "SESSION_WTMP_EXPIRTY_DATE";
 	private static final String NAME_ATTR="UserName";
 	
@@ -178,7 +178,7 @@ protected A lookupPerson() {
 					CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 					Date now = time.getCurrentTime();
 					if( d.before(now)){
-						Integer id = (Integer) getAttribute(WTMP_ID);
+						Integer id = getWtmpID();
 						if( id != null ){
 							Wtmp w = man.find(id);
 							w.update();
@@ -196,6 +196,10 @@ protected A lookupPerson() {
 	return user;
 }
 
+public Integer getWtmpID() {
+	return (Integer) getAttribute(WTMP_ID);
+}
+
 @Override
 public void clearCurrentPerson() {
 	
@@ -207,7 +211,7 @@ public void clearCurrentPerson() {
 	try{
 		WtmpManager man = getWtmpManager();
 		if( man != null ){
-			Integer id = (Integer) getAttribute(WTMP_ID);
+			Integer id = getWtmpID();
 			if( id != null ){
 				Wtmp w = man.find(id);
 				w.logout();
@@ -240,7 +244,7 @@ public void logOut(){
 	try{
 		WtmpManager man = getWtmpManager();
 		if( man != null ){
-			Integer wtmp_id = (Integer) getAttribute(WTMP_ID);
+			Integer wtmp_id = getWtmpID();
 			if( wtmp_id != null ){
 				Wtmp w = man.find(wtmp_id);
 				if( w != null){
@@ -276,7 +280,7 @@ public void setCurrentPerson(A person) {
 			if( man != null ){
 
 
-				Integer id = (Integer) getAttribute(WTMP_ID);
+				Integer id = getWtmpID();
 				if( id != null ){
 					Wtmp w = man.find(id);
 					w.logout();
@@ -492,6 +496,7 @@ public void setUseSession(boolean use) {
 protected boolean canLogin(A person) {
 	return person.canLogin() || isSU();
 }
+
 
 
 

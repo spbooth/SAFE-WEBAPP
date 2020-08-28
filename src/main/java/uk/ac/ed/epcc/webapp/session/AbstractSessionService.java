@@ -162,12 +162,12 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	public static final String ROLE_FIELD = "Role";
 	public static final String ROLE_TABLE = "role_table";
 	
-	private static final String person_tag = "SESSION_PersonID";
+	public static final String person_tag = "SESSION_PersonID";
 	private static final String toggle_map_tag = "SESSION_toggle_map";
 	private static final String role_map_tag = "SESSION_role_map";
 	
-	private static final String auth_time_tag = "SESSION_auth_time";
-	private static final String auth_type_tag = "SESSION_auth_type";
+	public static final String auth_time_tag = "SESSION_auth_time";
+	public static final String auth_type_tag = "SESSION_auth_type";
 	private boolean apply_toggle=true;
 	/** A keying object representing a relationship.
 	 * 
