@@ -844,6 +844,33 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		return false;
 	}
 
+	public static Set<String> getExplicitRoles(AppContext conn,int id){
+		HashSet<String> roles = new HashSet<String>();
+		try {
+			SQLContext ctx = conn.getService(DatabaseService.class).getSQLContext();
+			StringBuilder role_query = new StringBuilder();
+			role_query.append("SELECT DISTINCT ");
+			ctx.quote(role_query,ROLE_FIELD);
+			role_query.append(" FROM ");
+			ctx.quote(role_query, ROLE_TABLE);
+			role_query.append(" WHERE ");
+			ctx.quote(role_query,ROLE_PERSON_ID);
+			role_query.append("=? ");
+			try(PreparedStatement stmt =ctx.getConnection().prepareStatement(role_query.toString())) {
+				stmt.setInt(1, id);
+				try(ResultSet rs = stmt.executeQuery()){
+					while (rs.next()) {
+						roles.add(rs.getString(1));
+					}
+				}
+			} 
+		} catch (SQLException e) {
+			conn.getService(DatabaseService.class).logError("Error getting AppUser roles",e);
+		}
+
+		return roles;
+	}
+	
 //public Set<A> withRole(String role) {
 //		role = mapRoleName(role);
 //		AppContext conn = getContext();
