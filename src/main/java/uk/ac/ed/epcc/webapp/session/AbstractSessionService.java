@@ -1772,4 +1772,22 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	public BaseFilter<A> getPersonInRoleFilter(String... role_list) {
 		return getLoginFactory().getRoleFilter(role_list);
 	}
+
+	@Override
+	public void addSecurityContext(Map att) {
+		// Use the same tags as the session
+		Integer id = getPersonID();
+		if( id != null && id.intValue() > 0) {
+			att.put(person_tag, id);
+		}
+		String type = getAuthenticationType();
+		if( type != null ) {
+			att.put(auth_type_tag, type);
+		}
+		Date d = getAuthenticationTime();
+		if( d != null ) {
+			att.put(auth_time_tag,d);
+		}
+		
+	}
 }

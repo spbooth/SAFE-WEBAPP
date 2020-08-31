@@ -21,6 +21,8 @@
 package uk.ac.ed.epcc.webapp.servlet;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -35,6 +37,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.SerializableFormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -271,7 +274,12 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 			throw new ServletException(e);
 		}
 
-		log.info("login failed for " + username);
+		LoggerService ls = conn.getService(LoggerService.class);
+		Map attr = new HashMap();
+		attr.put("user", username);
+		ls.securityEvent("LoginFailed",serv, attr);
+		
+		
 		// Go to the login page again - perhaps with polite message
 		// Don't use the ServletService method as the explicit login page
 		// may not be the default implementation. (may try Basic Auth for example)

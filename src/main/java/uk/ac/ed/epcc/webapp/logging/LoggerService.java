@@ -16,7 +16,11 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.logging;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import uk.ac.ed.epcc.webapp.AppContextService;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A service to provide logging capabilities.
  *<code>
@@ -35,7 +39,8 @@ import uk.ac.ed.epcc.webapp.AppContextService;
  *
  */
 public interface LoggerService extends AppContextService<LoggerService>{
-   public Logger getLogger(String name);
+   public static final String SECURITY_LOG = "uk.ac.ed.epcc.webapp.security";
+public Logger getLogger(String name);
    public Logger getLogger(Class c);
    
    /** Initialise the logging system. Called once per application
@@ -49,5 +54,38 @@ public interface LoggerService extends AppContextService<LoggerService>{
     */
    public default void shutdownLogging() {
 	   
+   }
+   /** Log a security event.
+    * 
+    * 
+    * To aid analysis the event string should be a fixed string 
+    * for the type of event.
+    * Optionally a map of additional attributes can be passed to place the event in context.
+    * Attributes from the session such as the current user are generated automatically
+    * 
+    * 
+    * @param event
+    * @param sess {@link SessionService}
+    * @param context
+    * @return
+    */
+   public default void securityEvent(String event,SessionService sess, Map context) {
+	   Logger logger = getLogger(SECURITY_LOG);
+	   Map attr = new HashMap();
+	   if( context != null) {
+		   attr.putAll(context);
+	   }
+	  if( sess != null ) {
+		  sess.addSecurityContext(attr);
+	  }
+	   if( attr.isEmpty()) {
+		   logger.info(event);
+	   }else {
+		   logger.info(event+": "+attr.toString());
+	   }
+	   
+   }
+   public default void securityEvent(String event,SessionService sess) {
+	   securityEvent(event,sess,null);
    }
 }

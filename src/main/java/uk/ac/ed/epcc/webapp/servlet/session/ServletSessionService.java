@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.servlet.session;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -495,6 +496,15 @@ public void setUseSession(boolean use) {
 @Override
 protected boolean canLogin(A person) {
 	return person.canLogin() || isSU();
+}
+
+@Override
+public void addSecurityContext(Map att) {
+	super.addSecurityContext(att);
+	Integer wtmp = getWtmpID();
+	if( wtmp != null ) {
+		att.put(WTMP_ID, wtmp);
+	}
 }
 
 

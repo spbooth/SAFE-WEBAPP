@@ -174,6 +174,7 @@ public abstract class WebappServlet extends HttpServlet {
 	public Logger getLogger(AppContext c) {
 		return c.getService(LoggerService.class).getLogger(getClass());
 	}
+	
 	private static final String SUSPICIOUS_ARGUMENT_ATTR = "SuspiciousArgumentCount";
 
 	/** Call this method when invalid data is passed to something that

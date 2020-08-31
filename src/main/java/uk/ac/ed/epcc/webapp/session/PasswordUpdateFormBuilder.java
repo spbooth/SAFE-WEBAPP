@@ -395,6 +395,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 					if( time != null) {
 						service.setAuthenticationTime(time.getCurrentTime());
 					}
+					getContext().getService(LoggerService.class).securityEvent("PasswordReset",service);
 				}
 				if (doWelcome) {
 					getLogger().debug("Doing welcome page");

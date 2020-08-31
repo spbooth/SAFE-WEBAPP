@@ -13,6 +13,9 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session.twofactor;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.SerializableFormResult;
@@ -90,7 +93,7 @@ public class TwoFactorHandler<A extends AppUser> {
     public FormResult doLogin(A user,String type,SerializableFormResult next_page) {
 		 
 		AppUserFactory<A> person_fac = sess.getLoginFactory();
-		
+		securityEvent("SucessfulAuthentication");
 		boolean is_super=false;
 		if( sess instanceof ServletSessionService) {
 			is_super = ((ServletSessionService<A>)sess).isSU();
@@ -141,11 +144,14 @@ public class TwoFactorHandler<A extends AppUser> {
 			// We could loop over the composites again
 			// to support more than 2 factors.  Keep thing simple for now
 			if( success) {
+			
 				if(  ! sess.haveCurrentUser()) {
 					// Use a full AppUser because there are various overrides
 					// in ServletSessionServlet that break if you try to login
 					// by just setting the personID
 					A user = sess.getLoginFactory().find(requested_id);
+					securityEvent("Sucessful2FA");
+					
 					logger.debug("setting user to "+user.getIdentifier());
 					sess.setCurrentPerson(user);
 					CurrentTimeService time = sess.getContext().getService(CurrentTimeService.class);
@@ -155,6 +161,11 @@ public class TwoFactorHandler<A extends AppUser> {
 					if( type != null ) {
 						sess.setAuthenticationType(AUTH_TYPE_ATTR);
 					}
+				}else {
+					A user = sess.getLoginFactory().find(requested_id);
+					Map attr = new HashMap();
+					attr.put("user",user.getIdentifier());
+					securityEvent("Failed2FA", attr);
 				}
 				FormResult result = (FormResult) sess.getAttribute(AUTH_RESULT_ATTR);
 				return result;
@@ -167,6 +178,12 @@ public class TwoFactorHandler<A extends AppUser> {
 		return null;
 	}
 
+	public void securityEvent(String event) {
+		sess.getContext().getService(LoggerService.class).securityEvent(event,sess);
+	}
+	public void securityEvent(String event,Map attr) {
+		sess.getContext().getService(LoggerService.class).securityEvent(event,sess,attr);
+	}
 	/**
 	 * @return
 	 */

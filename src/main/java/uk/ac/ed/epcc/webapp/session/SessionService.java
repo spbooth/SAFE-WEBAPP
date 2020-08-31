@@ -405,5 +405,9 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public void flushRelationships();
 	
-	
+	/** Add context parameters for security logging.
+	 * 
+	 * @param att
+	 */
+	public void addSecurityContext(Map att);
 }
