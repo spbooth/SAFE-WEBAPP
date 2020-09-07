@@ -705,7 +705,7 @@ public final class AppContext {
 	 * @return created object
 	 * @throws Exception 
 	 */
-	public <T extends Contexed> T makeContexedObject(Class<T> clazz, String tag) throws Exception{
+	private <T extends Contexed> T makeContexedObject(Class<T> clazz, String tag) throws Exception{
 		if( tag == null ){
 			return makeContexedObject(clazz);
 		}

@@ -45,7 +45,7 @@ public class MultiNameFinder<AU extends AppUser, X extends MultiNameFinder> exte
 	private MultiNameFactory<Name, AU> name_fac=null;
 	private MultiNameFactory<Name, AU> getNameFactory() throws Exception{
 		if( name_fac == null ) {
-			name_fac = getContext().makeContexedObject(MultiNameFactory.class, getContext().getInitParameter(PROPERTY_PREFIX+getRealm()+".table", getRealm()));
+			name_fac = getContext().makeObject(MultiNameFactory.class, getContext().getInitParameter(PROPERTY_PREFIX+getRealm()+".table", getRealm()));
 		}
 		return name_fac;
 	}
