@@ -496,10 +496,13 @@ public class BaseForm implements Form {
     			String my_text="null";
     			if( my_val != null ){
     				my_text = i.getPrettyString(my_val);
+    				if( my_text == null) {
+    					my_text="";
+    				}
     			}
     			if( val == null){
     				if(my_val != null ){
-    					if( my_text.contains("\n")){
+    					if(  my_text.contains("\n")){
     						sb.append(label);
     						sb.append(": updated\n");
     					}else{
@@ -511,11 +514,14 @@ public class BaseForm implements Form {
     				}
     			}else{
     				String text= i.getPrettyString(val);
+    				if( text == null) {
+    					text="";
+    				}
     				if( ! val.equals(my_val) ){
     					if( val.equals("") && my_val == null ){
     						// acceptable substitution
     					}else{
-    						if( text.contains("\n") || my_text.contains("\n")){
+    						if(  text.contains("\n") || my_text.contains("\n")){
     							sb.append(label);
     							sb.append(": updated\n");
     						}else{
