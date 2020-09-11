@@ -131,7 +131,12 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 		}else if( target  instanceof Iterable){
 			addList((Iterable)target);
 		}else if( target instanceof Object[]) {
-			addList((Object []) target);
+			Object[] data = (Object[]) target;
+			if( data.length == 1) {
+				addObject(data[0]);
+			}else {
+				addList(data);
+			}
 		}else{
 			clean(target.toString());
 		}
