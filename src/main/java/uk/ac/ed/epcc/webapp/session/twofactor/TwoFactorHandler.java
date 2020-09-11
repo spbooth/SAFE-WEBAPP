@@ -22,6 +22,7 @@ import uk.ac.ed.epcc.webapp.forms.result.SerializableFormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
+import uk.ac.ed.epcc.webapp.session.AbstractSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -93,7 +94,7 @@ public class TwoFactorHandler<A extends AppUser> {
     public FormResult doLogin(A user,String type,SerializableFormResult next_page) {
 		 
 		AppUserFactory<A> person_fac = sess.getLoginFactory();
-		securityEvent("SucessfulAuthentication");
+		
 		boolean is_super=false;
 		if( sess instanceof ServletSessionService) {
 			is_super = ((ServletSessionService<A>)sess).isSU();
@@ -102,14 +103,20 @@ public class TwoFactorHandler<A extends AppUser> {
 			for( TwoFactorComposite<A> comp : person_fac.getComposites(TwoFactorComposite.class)) {
 				FormResult result = comp.requireAuth(user);
 				if( result != null ) {
+					Map logattr = new HashMap();
 					// Need two factor
 					sess.setAttribute(AUTH_USER_ATTR, user.getID());
+					logattr.put(AbstractSessionService.person_tag,user.getID());
+					logattr.put("user", user.getIdentifier());
 					sess.setAttribute(AUTH_TYPE_ATTR, type);
+					logattr.put(AbstractSessionService.auth_type_tag,type);
 					if( next_page != null ) {
 						sess.setAttribute(AUTH_RESULT_ATTR, next_page);
 					}else {
 						sess.removeAttribute(AUTH_RESULT_ATTR);
 					}
+					// session is not populated so we need to set the context manually
+					securityEvent("SucessfulAuthentication",logattr);
 					return result;
 				}
 			}
@@ -124,7 +131,7 @@ public class TwoFactorHandler<A extends AppUser> {
 			}
 			sess.setAuthenticationType(type);
 		}
-	
+		securityEvent("SucessfulAuthentication");
 		return next_page;
 	
 	
@@ -150,7 +157,7 @@ public class TwoFactorHandler<A extends AppUser> {
 					// in ServletSessionServlet that break if you try to login
 					// by just setting the personID
 					A user = sess.getLoginFactory().find(requested_id);
-					securityEvent("Sucessful2FA");
+					
 					
 					logger.debug("setting user to "+user.getIdentifier());
 					sess.setCurrentPerson(user);
@@ -161,6 +168,7 @@ public class TwoFactorHandler<A extends AppUser> {
 					if( type != null ) {
 						sess.setAuthenticationType(AUTH_TYPE_ATTR);
 					}
+					securityEvent("Sucessful2FA");
 				}else {
 					A user = sess.getLoginFactory().find(requested_id);
 					Map attr = new HashMap();

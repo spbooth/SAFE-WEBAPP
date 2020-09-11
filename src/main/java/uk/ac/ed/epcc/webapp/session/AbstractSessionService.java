@@ -1780,6 +1780,10 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		Integer id = getPersonID();
 		if( id != null && id.intValue() > 0) {
 			att.put(person_tag, id);
+			A p = getCurrentPerson();
+			if( p != null ) {
+				att.put("user",p.getIdentifier());
+			}
 		}
 		String type = getAuthenticationType();
 		if( type != null ) {
