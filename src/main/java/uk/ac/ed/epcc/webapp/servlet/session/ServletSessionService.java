@@ -302,10 +302,23 @@ public void setCurrentPerson(A person) {
 		}
 		// Store name as an attribute.We don't use this
 		// but it helps to identify users from the tomcat manager app.
-		setAttribute(NAME_ATTR, person.getName());
+		setNameHint( person.getName());
+		
+		// Increase session timeout if configured
+		int timeout = getContext().getIntegerParameter("session.logged_in.timeout", -1);
+		if( timeout >= 0 ) {
+			ss.setTimeout(timeout);
+		}
 	}
 }
-
+/** Set a name hint in the session.
+ * This helps to identify users in the container admin/logging.
+ * 
+ * @param name
+ */
+public void setNameHint(String name) {
+	setAttribute(NAME_ATTR, name);
+}
 /**
  * @param person
  */

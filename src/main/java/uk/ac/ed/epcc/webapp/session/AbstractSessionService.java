@@ -602,6 +602,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	@Override
 	public void logOut(){
 		clearCurrentPerson();
+		removeAttribute(toggle_map_tag);
 	}
 
 	@Override

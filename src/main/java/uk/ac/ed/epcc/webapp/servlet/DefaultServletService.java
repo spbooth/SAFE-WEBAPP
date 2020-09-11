@@ -896,4 +896,14 @@ public class DefaultServletService implements ServletService{
 		}
 		return names;
 	}
+
+
+	@Override
+	public void setTimeout(int seconds) {
+		HttpSession sess = getSession();
+		if( sess != null ) {
+			sess.setMaxInactiveInterval(seconds);
+		}
+		
+	}
 }

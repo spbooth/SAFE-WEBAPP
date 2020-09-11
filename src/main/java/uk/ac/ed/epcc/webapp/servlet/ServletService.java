@@ -241,5 +241,9 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 */
 	public Object getRequestAttribute(String name);
 	
-	
+	/** Set an inactivity timeout if supported
+	 * 
+	 * @param seconds
+	 */
+	public void setTimeout(int seconds);
 }

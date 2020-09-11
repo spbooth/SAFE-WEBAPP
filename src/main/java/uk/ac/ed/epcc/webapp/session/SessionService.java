@@ -410,4 +410,6 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @param att
 	 */
 	public void addSecurityContext(Map att);
+	
+	
 }

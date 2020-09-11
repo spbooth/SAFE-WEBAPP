@@ -44,6 +44,13 @@ public abstract class ContainerAuthServlet extends WebappServlet {
 			   // but we don't want to lose a session for a logged in user visiting the servlet in a browser.
 			   if( ! sess.getAttributeNames().hasMoreElements()){
 				   sess.invalidate();
+			   }else {
+				   if( sess.getAttribute("UserName") == null) {
+					   // If we are keeping the session record how it was generated
+					   // so we can see this in the container admin 
+					   sess.setAttribute("UserName", user);
+				   }
+				   sess.setAttribute("LastServlet", getClass().getCanonicalName());
 			   }
 		   }
 		   return;
