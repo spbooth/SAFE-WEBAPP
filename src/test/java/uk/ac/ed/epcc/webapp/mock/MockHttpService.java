@@ -28,12 +28,15 @@ public class MockHttpService extends DefaultHttpService {
 	
 	public String status="HTTP/1.1 200 OK";
 	public String response="Now is the winter of our discontent";
+	public URL last_url;
 
 	@Override
 	protected HttpURLConnection connect(URL url) throws IOException {
+		last_url = url;
 		MockHttpURLConnection c = new MockHttpURLConnection(url);
 		c.setStatus(status);
 		c.setReponse(response.getBytes());
+		c.addResponseHeader("content-type", "text/plain");
 		return c;
 	}
 

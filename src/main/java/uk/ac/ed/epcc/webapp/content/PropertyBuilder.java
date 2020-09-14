@@ -99,8 +99,11 @@ public class PropertyBuilder implements SimpleXMLBuilder {
 	 */
 	@Override
 	public SimpleXMLBuilder close() {
-		prop.setProperty(String.join(".", path),content.toString());
+		if( content.length() > 0 ) {
+			prop.setProperty(String.join(".", path),content.toString());
+		}
 		path.removeLast();
+		content.setLength(0);
 		return this;
 	}
 
