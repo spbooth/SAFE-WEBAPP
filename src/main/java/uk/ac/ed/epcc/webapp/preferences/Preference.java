@@ -125,10 +125,10 @@ public class Preference extends Feature implements PreferenceSetting<Boolean>{
 	 * @param name
 	 * @return
 	 */
-	public static boolean checkDynamicPreference(AppContext conn, String name, boolean def,String desc){
+	public static boolean checkDynamicPreference(AppContext conn, String name, boolean def,String desc, String ... roles){
 		Feature f = Feature.findFeatureByName(Feature.class,name);
 		if( f == null ){
-			f= new Preference(name,def,desc);
+			f= new Preference(name,def,desc,roles);
 		}
 		return f.isEnabled(conn);
 	}

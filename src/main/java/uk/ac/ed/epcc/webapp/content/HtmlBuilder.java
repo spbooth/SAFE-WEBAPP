@@ -44,8 +44,8 @@ import uk.ac.ed.epcc.webapp.preferences.Preference;
 
 public class HtmlBuilder extends HtmlPrinter implements XMLContentBuilder {
   
-public static final Feature HTML_TABLE_SECTIONS_FEATURE = new Preference("html.table_sections",false,"generate thead/tbody in tables");
-public static final Feature HTML_TABLE_HEADER_SCOPE_FEATURE = new Preference("html.table_header_scope",false,"generate scope attributes for table headers");
+public static final Feature HTML_TABLE_SECTIONS_FEATURE = new Preference("html.table_sections",false,"generate thead/tbody in html tables");
+public static final Feature HTML_TABLE_HEADER_SCOPE_FEATURE = new Preference("html.table_header_scope",false,"generate scope attributes for html table headers");
 Boolean use_table_section=null;
 Boolean use_table_scope=null;
 private boolean new_tab=false; // Do  we want to open links/buttons in new tab/window

@@ -109,7 +109,7 @@ public class Feature extends AbstractSetting<Boolean> {
 	public static boolean checkDynamicFeature(AppContext conn, String name, boolean def){
 		Feature f = findFeatureByName(Feature.class,name);
 		if( f == null ){
-			f= new Feature(name,def,"dynamic feature");
+			f= new Feature(name,def,name);
 		}
 		return f.isEnabled(conn);
 	}
