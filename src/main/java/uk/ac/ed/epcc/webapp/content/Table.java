@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -1619,10 +1620,17 @@ public class Table<C, R> {
 		// make sure col exists
 		getCol(after);
 		if (col_keys.contains(first)) {
-			col_keys.remove(after);
-			int pos = col_keys.indexOf(first);
+			if( col_keys.contains(after)) {
+				col_keys.remove(after);
+				int pos = col_keys.indexOf(first);
 
-			col_keys.add(pos + 1, after);
+				col_keys.add(pos + 1, after);
+			}else if (column_groups.containsKey(after)) {
+				// add the entire group
+				for(C after2 : getColumnGroup(after)) {
+					setColAfter(first, after2);
+				}
+			}
 		}
 	}
 
@@ -1939,7 +1947,7 @@ public class Table<C, R> {
 		}
 		Set<C> g = column_groups.get(group);
 		if( g == null ) {
-			g = new HashSet<>();
+			g = new LinkedHashSet<>();
 			column_groups.put(group, g);
 		}
 		if( column_groups.containsKey(col)) {
@@ -1957,7 +1965,59 @@ public class Table<C, R> {
 		}
 		return Collections.unmodifiableSet(group);
 	}
+	/** get all the defined Column Groups
+	 * 
+	 * @return
+	 */
+	public Iterable<C> getColumnGroups(){
+		if( column_groups == null ) {
+			return new EmptyIterable<>();
+		}
+		return Collections.unmodifiableSet(column_groups.keySet());
+	}
 	public boolean hasColumnGroup(C name) {
 		return column_groups != null && column_groups.containsKey(name);
+	}
+	/** place all members of a column group after the first member of the group.
+	 * 
+	 * If column names are generated dynamically then the first entry will
+	 * be in the correct column position but subsequent rows may place additional 
+	 * column names at the end. This operation packs them into a contiguous group.
+	 * 
+	 * 
+	 * @param name
+	 */
+	public void packColumnGroup(C name) {
+		if( hasColumnGroup(name)) {
+			C prev = null;
+			for(C x : getColumnGroup(name)) {
+				if( prev != null) {
+					setColAfter(prev, x);
+				}
+				prev = x;
+			}
+			
+		}
+	}
+	/** For all column groups.
+	 * place member columns after the first member of the group.
+	 * 
+	 * If column names are generated dynamically then the first entry will
+	 * be in the correct column position but subsequent rows may place additional 
+	 * column names at the end. This operation packs them into contiguous groups.
+	
+	 */
+	public void packAllColumnGroups() {
+		if( column_groups != null) {
+			for(Set<C> s : column_groups.values()) {
+				C prev = null;
+				for(C x : s) {
+					if( prev != null) {
+						setColAfter(prev, x);
+					}
+					prev = x;
+				}
+			}
+		}
 	}
 }
