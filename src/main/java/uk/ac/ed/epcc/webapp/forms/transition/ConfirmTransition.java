@@ -73,9 +73,7 @@ public class ConfirmTransition<T> implements ExtraFormTransition<T>{
 	}
 	@Override
 	public <X extends ContentBuilder> X getExtraHtml(X cb,SessionService<?> op, T target) {
-		ExtendedXMLBuilder t = cb.getText();
-		t.clean(text);
-		t.appendParent();
+		cb.addHeading(2, text);
 		return cb;
 	}
 	@Override
