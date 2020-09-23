@@ -50,9 +50,9 @@ public class ConfirmTransition<T> implements ExtraFormTransition<T>{
 	public static final String YES = "Yes";
 	private final DirectTransition<T> yes_transition;
 	private final DirectTransition<T> no_transition;
-	private final String name;
-	public ConfirmTransition(String name, DirectTransition<T> yes, DirectTransition<T> no){
-		this.name=name;
+	private final String text;
+	public ConfirmTransition(String text, DirectTransition<T> yes, DirectTransition<T> no){
+		this.text=text;
 		this.yes_transition=yes;
 		this.no_transition=no;
 	}
@@ -73,9 +73,9 @@ public class ConfirmTransition<T> implements ExtraFormTransition<T>{
 	}
 	@Override
 	public <X extends ContentBuilder> X getExtraHtml(X cb,SessionService<?> op, T target) {
-		ExtendedXMLBuilder text = cb.getText();
-		text.clean(name);
-		text.appendParent();
+		ExtendedXMLBuilder t = cb.getText();
+		t.clean(text);
+		t.appendParent();
 		return cb;
 	}
 	@Override
