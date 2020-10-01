@@ -1425,7 +1425,13 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 					if( person == null){
 						person=getCurrentPerson();
 					}
-					return arp.hasRelationFilter(sub,person);
+					
+					BaseFilter<T> rel = arp.hasRelationFilter(sub,person);
+					if( rel != null ) {
+						return rel;
+					}
+					// unrecognised role
+		    		throw new UnknownRelationshipException(role+"@"+fac2.getTag());
 				}
 				NamedFilterProvider<T> nfp = getContext().makeObjectWithDefault(NamedFilterProvider.class, null, base);
 				if( nfp != null ) {
