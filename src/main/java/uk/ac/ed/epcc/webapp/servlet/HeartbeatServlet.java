@@ -212,4 +212,7 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 		super.destroy();
 	}
 
+	public synchronized static void reset() {
+		last_call=null;
+	}
 }
