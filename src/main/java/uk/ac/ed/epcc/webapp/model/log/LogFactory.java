@@ -527,7 +527,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	}
 	
 	
-	protected ReferenceFilter<T, O> getOwnerFilter(O q) {
+	public ReferenceFilter<T, O> getOwnerFilter(O q) {
 		return new ReferenceFilter<>(this, OWNER_ID, q);
 	}
 	/** Find and item only by what it points to.
@@ -703,7 +703,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 * @param v
 	 * @return
 	 */
-	protected SQLFilter<T> getItemFilter(ItemType.ItemValue<T> v) {
+	public SQLFilter<T> getItemFilter(ItemType.ItemValue<T> v) {
 		return getItemType().getFilter(LogFactory.this, v);
 	}
 	
