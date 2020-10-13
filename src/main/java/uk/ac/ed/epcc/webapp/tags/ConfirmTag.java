@@ -118,7 +118,7 @@ public class ConfirmTag extends TagSupport implements Tag{
 					}
 					ExtendedXMLBuilder text = block.getText();
 					text.addObject(message_text);
-					
+					text.appendParent();
 					
 			
 					HtmlBuilder hb = new HtmlBuilder();
