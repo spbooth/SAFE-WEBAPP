@@ -1,6 +1,5 @@
 package uk.ac.ed.epcc.webapp.model.data.forms.inputs;
 
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
