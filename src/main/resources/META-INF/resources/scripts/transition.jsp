@@ -137,14 +137,15 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
     	}
 	}
 %>
+<div id="form">
 <wb:FormContext inline="true"/>
-<form id="form" class="transition" method="post" 
+<form class="transition" method="post" 
 <% if( multi ){ %>
    enctype="multipart/form-data"
 <% } %>
 <% if( default_charset != null && ! default_charset.isEmpty()){ %> accept-charset="<%=default_charset %>"
 <% } %>
-action="<%= response.encodeURL(web_path+TransitionServlet.getURL(conn,tp,target))%>" role="main">
+action="<%= response.encodeURL(web_path+TransitionServlet.getActionURL(conn,tp,target))%>" role="main">
 <input type='hidden' name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>' value='<%=action %>'/>
 <% if( crsf != null ){ %>
 <input type='hidden' name='<%=TransitionServlet.TRANSITION_CSRF_ATTR %>' value='<%=crsf %>'/>
@@ -166,6 +167,7 @@ if( t instanceof CustomFormContent ){
 %>
 <%= form_builder.toString() %>
 </form>
+</div>
 </div>
 <%
 }catch(TransitionException e){

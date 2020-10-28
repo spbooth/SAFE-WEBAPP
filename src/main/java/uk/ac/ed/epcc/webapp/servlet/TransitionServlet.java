@@ -61,6 +61,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.ForceRollBack;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 
@@ -98,6 +99,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	private static final String DATABASE_TRANSACTION_TIMER = "DatabaseTransaction";
 	public static final String VIEW_TRANSITION = "ViewTransition.";
 	public static final Feature TRANSITION_TRANSACTIONS = new Feature("transition.transactions", true, "Use database transaction within transitions");
+	public static final Preference TRANSITION_ANCHOR = new Preference("transition.use_anchor", true, "Navigate to main form in a page rather than page start");
 	
 	/** This is a security control. It is intended to prevent a malicious web-page from including
 	 * image links that will be automatically fetched causing un-approved side effects.
@@ -797,6 +799,13 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	 */
 	public static <A,B> String getURL(AppContext conn, TransitionFactory<A, B> tp,B target){
 		return getURL(conn, tp, target,null);
+	}
+	public static <A,B> String getActionURL(AppContext conn, TransitionFactory<A, B> tp,B target) {
+		String url = getURL(conn, tp, target);
+		if( TRANSITION_ANCHOR.isEnabled(conn)) {
+			return url+"#form";
+		}
+		return url;
 	}
 	public static <A,B> String getURL(HttpServletRequest req,HttpServletResponse res,AppContext conn, TransitionFactory<A, B> tp,B target){
 		return getURL(req,res,conn, tp, target,null);

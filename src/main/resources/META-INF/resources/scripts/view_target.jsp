@@ -82,7 +82,7 @@ try{
 %>
 <%= provider.getLogContent(new HtmlBuilder(),target,session_service).toString() %>
 <%} %>
-<form class="view" id="form" action="<%=response.encodeURL(web_path +TransitionServlet.getURL(conn,provider,target)+"#form") %>" method="post">
+<form class="view" id="form" action="<%=response.encodeURL(web_path +TransitionServlet.getActionURL(conn,provider,target)) %>" method="post">
 <% if( crsf != null ){ %>
 <input type='hidden' name='<%=TransitionServlet.TRANSITION_CSRF_ATTR %>' value='<%=crsf %>'/>
 <%} %>
