@@ -49,5 +49,16 @@ public interface ActionListener<R> extends Targetted<R> {
 	 * @param target
 	 */
 	public default void action(R target) {}
+	
+	/** Get an optional object (usually a String or other object that can be added to display content) that should be presented to
+	 * the user as warning before performing the operation.  Usually this would be included in a confirm dialog.
+	 * Confirmation might be triggered by one of the {@link ActionListener}s returning a non-null value
+	 * 
+	 * @param target
+	 * @return Object or null
+	 */
+	public default Object getWarning(R target) {
+		return null;
+	}
 
 }
