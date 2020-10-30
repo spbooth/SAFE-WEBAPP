@@ -88,6 +88,9 @@ public class ActionList<T extends DataObject> extends AbstractConstructedTargetL
 				result.add(o);
 			}
 		}
+		if( result != null && result.size() == 1) {
+			return result.iterator().next();
+		}
 		return result;
 	}
 	

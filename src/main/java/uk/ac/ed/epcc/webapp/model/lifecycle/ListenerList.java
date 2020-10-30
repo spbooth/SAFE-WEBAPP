@@ -85,6 +85,9 @@ public class ListenerList<T extends DataObject> extends AbstractConstructedTarge
 				result.add(o);
 			}
 		}
+		if( result != null && result.size() == 1) {
+			return result.iterator().next();
+		}
 		return result;
 	}
 	/* (non-Javadoc)
