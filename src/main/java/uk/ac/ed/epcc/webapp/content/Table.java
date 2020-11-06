@@ -543,9 +543,9 @@ public class Table<C, R> {
 		private C keys[];
 		private int reverse = 1;
 		private Comparator comp[];
-		private Table t;
+		private Table<C,?> t;
 
-		public Sorter(C sort_keys[], Comparator comp[], Table tt,
+		public Sorter(C sort_keys[], Comparator comp[], Table<C,?> tt,
 				boolean reverse) {
 
 			keys = sort_keys;
@@ -574,30 +574,54 @@ public class Table<C, R> {
 		@SuppressWarnings("unchecked")
 		public int compare(Object o1, Object o2) {
 			for (int i = 0; i < keys.length; i++) {
-				Table.Col c = t.getCol(keys[i]);
-				Object oa = c.get(o1);
-				Object ob = c.get(o2);
-				// null fields always sort to one end
-				if (oa == null && ob != null) {
-					return reverse;
+				Comparator cmp = null;
+				if (comp != null && comp.length > i && comp[i] != null) {
+					cmp = comp[i];
 				}
-				if (oa != null && ob == null) {
-					return -reverse;
-				}
-				if (oa != null && ob != null) {
-					int v;
-					if (comp != null && comp.length > i && comp[i] != null) {
-						v = comp[i].compare(oa, ob);
-					} else {
-						v = compareNonNull(c.format, oa, ob);
+				if( t.hasColumnGroup(keys[i])) {
+					for(C k : t.getColumnGroup(keys[i])) {
+						Table.Col c = t.getCol(k);
+						
+						int diff = compareCol(c, cmp, o1, o2);
+						if( diff != 0) {
+							return diff;
+						}
 					}
-					if (v != 0) {
-						return reverse * v;
+				}else {
+					Table.Col c = t.getCol(keys[i]);
+					
+					int diff = compareCol(c, cmp, o1, o2);
+					if( diff != 0) {
+						return diff;
 					}
 				}
 			}
 			// order by keys if data the same
 			return reverse * compareNonNull(null, o1, o2);
+		}
+		
+		public int compareCol(Table.Col c, Comparator cmp, Object o1, Object o2) {
+			Object oa = c.get(o1);
+			Object ob = c.get(o2);
+			// null fields always sort to one end
+			if (oa == null && ob != null) {
+				return reverse;
+			}
+			if (oa != null && ob == null) {
+				return -reverse;
+			}
+			if (oa != null && ob != null) {
+				int v;
+				if (cmp != null) {
+					v = cmp.compare(oa, ob);
+				} else {
+					v = compareNonNull(c.format, oa, ob);
+				}
+				if (v != 0) {
+					return reverse * v;
+				}
+			}
+			return 0;
 		}
 
 		@SuppressWarnings("unchecked")
