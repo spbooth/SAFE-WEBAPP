@@ -879,6 +879,13 @@ display: block;
 div.message form, form div.message{
 	text-align: left;
 }
+div.message {
+	border-style: solid;
+	border-color: var(--table-border-color);
+	border-width: 1px;
+	background-color: var(--column-th-bg-color);
+	color: var(--column-th-color);
+}
 
 h3 form, h4 form{
     display: inline-block;
