@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link Composite} adds behaviour to a {@link DataObjectFactory}
@@ -69,7 +70,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 @SuppressWarnings("javadoc")
 
-public abstract class Composite<BDO extends DataObject, X extends Composite> implements Contexed, TableStructureContributer<BDO> {
+public abstract class Composite<BDO extends DataObject, X > implements Contexed, TableStructureContributer<BDO> {
 
 	protected final DataObjectFactory<BDO> fac;
 	protected Composite(DataObjectFactory<BDO> fac){
@@ -123,7 +124,7 @@ public abstract class Composite<BDO extends DataObject, X extends Composite> imp
 	 * @see uk.ac.ed.epcc.webapp.model.data.TableStructureContributer#addSelectors(java.util.Map)
 	 */
 	@Override
-	public Map<String,Object> addSelectors(Map<String,Object> selectors) {
+	public Map<String,Selector> addSelectors(Map<String,Selector> selectors) {
 
 		return selectors;
 	}
@@ -146,7 +147,7 @@ public abstract class Composite<BDO extends DataObject, X extends Composite> imp
 	 * @see uk.ac.ed.epcc.webapp.model.data.TableStructureContributer#postUpdate(BDO, uk.ac.ed.epcc.webapp.forms.Form, java.util.Map)
 	 */
 	@Override
-	public void postUpdate(BDO o, Form f,Map<String,Object> orig) throws DataException{
+	public void postUpdate(BDO o, Form f,Map<String,Object> orig, boolean changed) throws DataException{
 		
 	}
 	/** method to allow sub-classes to retrieve the {@link Record} from
@@ -194,7 +195,7 @@ public abstract class Composite<BDO extends DataObject, X extends Composite> imp
 	 * @see uk.ac.ed.epcc.webapp.model.data.TableStructureContributer#customiseUpdateForm(uk.ac.ed.epcc.webapp.forms.Form, uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
 	@Override
-	public void customiseUpdateForm(Form f, BDO target, SessionService operator) {
+	public void  customiseUpdateForm(Form f, BDO target, SessionService operator) {
 		
 	}
 	

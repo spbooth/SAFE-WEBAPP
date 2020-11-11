@@ -15,4 +15,4 @@
 <%-- This JSP in included at the start of every logged in page unless the 
      navigation menu is enabled
 --%>
-<%@include file="/basic_session.jsf" %>
+<%@include file="basic_session.jsf" %>

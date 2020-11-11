@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
+import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
@@ -31,7 +33,10 @@ public class SetRoleTransition<U extends AppUser> extends AbstractFormTransition
 	@Override
 	public void buildForm(Form f, U dat, AppContext conn) throws TransitionException {
 		SessionService<U> serv = conn.getService(SessionService.class);
-		for(String role : serv.getStandardRoles()){
+		Set<String> standardRoles = serv.getStandardRoles();
+		// make sure we can also remove any additional role not in standard list
+		standardRoles.addAll(AbstractSessionService.getExplicitRoles(conn,dat.getID()));
+		for(String role : standardRoles){
 			CheckBoxInput i = new CheckBoxInput("Y","N");
 			i.setChecked(dat!=null && serv.canHaveRole(dat, role));
 			f.addInput(role, role, i);

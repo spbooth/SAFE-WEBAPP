@@ -50,4 +50,9 @@ public class ExternalRedirectResult implements SerializableFormResult {
 	public URI getRedirect() {
 		return redirect;
 	}
+
+	@Override
+	public String toString() {
+		return "ExternalRedirectResult [redirect=" + redirect + "]";
+	}
 }

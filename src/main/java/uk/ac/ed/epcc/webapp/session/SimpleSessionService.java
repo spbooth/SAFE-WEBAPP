@@ -45,6 +45,5 @@ public class SimpleSessionService<A extends AppUser> extends AbstractSessionServ
 	public final Object getAttribute(String key) {
 		return getContext().getAttribute(key);
 	}
-
 	
 }

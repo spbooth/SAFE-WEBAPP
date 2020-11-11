@@ -42,7 +42,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-
+import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link ViewTransitionFactory} for editing {@link PreferenceSetting}s and {@link AbstractSetting}s.
@@ -80,7 +80,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		 */
 		@Override
 		public ContentBuilder addContent(ContentBuilder builder) {
-			builder.addLink(conn, target.getName(), new ViewTransitionResult<>(PreferenceTransitionProvider.this, target));
+			builder.addLink(conn, target.getDescription(), new ViewTransitionResult<>(PreferenceTransitionProvider.this, target));
 			return builder;
 		}
 
@@ -89,6 +89,8 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		 */
 		@Override
 		public int compareTo(Linker o) {
+			// Even if we display the description this will group by
+			// function
 			return target.getName().compareTo(o.target.getName());
 		}
 	}
@@ -102,6 +104,10 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		
 			try {
 				((PreferenceSetting)target).clearPreference(c);
+				NavigationMenuService nav = getContext().getService(NavigationMenuService.class);
+				if( nav != null ) {
+					nav.resetMenu();
+				}
 			} catch (DataFault e) {
 				c.getService(LoggerService.class).getLogger(getClass()).error("Error clearing preference",e);
 				throw new TransitionException("Internal error");
@@ -125,7 +131,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		 */
 		@Override
 		public ContentBuilder addContent(AppContext conn, ContentBuilder cb) {
-			cb.addHeading(2, conn.expandText(getTitle()));
+			cb.addHeading(1, conn.expandText(getTitle()));
 			cb.addTable(getContext(), getIndexTable(conn.getService(SessionService.class)));
 			return cb;
 		}
@@ -164,6 +170,10 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 			public FormResult action(Form f) throws ActionException {
 				Object b =  f.getItem(VALUE);
 				pref.setPreference(getContext(), b);
+				NavigationMenuService nav = getContext().getService(NavigationMenuService.class);
+				if( nav != null ) {
+					nav.resetMenu();
+				}
 				return new IndexTransitionResult<>(PreferenceTransitionProvider.this);
 			}
 		}
@@ -172,7 +182,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		 */
 		@Override
 		public void buildForm(Form f, AbstractSetting target, AppContext conn) throws TransitionException {
-			ItemInput input = target.getInput();
+			ItemInput input = target.getInput(conn);
 			input.setItem(target.getCurrent(conn));
 			f.addInput(VALUE, "Preferred setting", input);
 			f.addAction("Update", new SetAction((PreferenceSetting)target));
@@ -212,7 +222,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		 */
 		@Override
 		public void buildForm(Form f, AbstractSetting target, AppContext conn) throws TransitionException {
-			ItemInput input = target.getInput();
+			ItemInput input = target.getInput(conn);
 			input.setItem(target.getCurrent(conn));
 			f.addInput(VALUE, "Feature setting", input);
 			f.addAction("Update", new SetFeatureAction(target));
@@ -282,6 +292,7 @@ public class PreferenceTransitionProvider implements ViewTransitionProvider<Pref
 		}
 		t.setKeyName("Feature");
 		t.removeCol("Name");
+		t.removeCol("Description");
 		t.setKeyTransform( new Transform() {
 			
 			@Override

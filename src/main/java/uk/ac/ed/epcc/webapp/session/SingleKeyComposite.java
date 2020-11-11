@@ -13,50 +13,50 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
-import java.io.IOException;
-import java.security.PublicKey;
-
+import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
-import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil;
-import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
-import uk.ac.ed.epcc.webapp.ssh.RsaPublicKeyInput;
-import uk.ac.ed.epcc.webapp.ssh.SshPublicKeyInput;
+import uk.ac.ed.epcc.webapp.ssh.AuthorizedKeyValidator;
+import uk.ac.ed.epcc.webapp.ssh.BadKeyFactory;
+import uk.ac.ed.epcc.webapp.ssh.SimpleKeyInput;
 
 /**
  * @author spb
  *
  */
-public class SingleKeyComposite extends PublicKeyComposite<PublicKey> {
-
+public class SingleKeyComposite extends PublicKeyComposite<String> {
+	public static final Feature CHECK_BAD_KEYS = new Feature("ssh.public_keys.bad_key_list",false,"Check a table of known bad keys");
 	/**
 	 * @param fac
 	 */
 	public SingleKeyComposite(AppUserFactory fac) {
 		super(fac);
-		// TODO Auto-generated constructor stub
 	}
+	
+	@Override
 	protected ParseAbstractInput<String> getInput(){
-		SshPublicKeyInput input = new SshPublicKeyInput();
-		if( SSH_REQUIRE_RSA_FEATURE.isEnabled(getContext())){
-			input = new RsaPublicKeyInput();	
+		
+		SimpleKeyInput input = new SimpleKeyInput(getContext());
+		if( CHECK_BAD_KEYS.isEnabled(getContext())) {
+			input.addValidator(new BadKeyFactory(getContext()));
 		}
-		input.setMinBits(getContext().getIntegerParameter("ssh.min.bits", 2048));
 		return input;
+		
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.session.PublicKeyComposite#load(java.lang.String)
 	 */
 	@Override
-	protected PublicKey load(String value) throws PublicKeyParseException {
-
-		return PublicKeyReaderUtil.load(value);
+	protected String load(String value) throws ParseException {
+		AuthorizedKeyValidator val = new AuthorizedKeyValidator();
+		return val.normalise(value);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.session.PublicKeyComposite#format(java.lang.Object)
 	 */
 	@Override
-	protected String format(PublicKey key) throws PublicKeyParseException, IOException {
-		return PublicKeyReaderUtil.format(key);
+	protected String format(String key) {
+		return key;
 	}
 	
 	

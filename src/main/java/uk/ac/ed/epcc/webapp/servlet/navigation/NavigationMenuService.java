@@ -13,6 +13,11 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet.navigation;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Properties;
@@ -35,6 +40,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.tags.WebappHeadTag;
 
 /** A {@link AppContextService} for building navigation menus.
  * <p>
@@ -73,7 +79,7 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 	public static final String NAVIGATIONAL_PREFIX = "navigation";
 	public static final Feature NAVIGATION_MENU_FEATURE = new Preference("navigation_menu", false, "Support for navigation menu code");
 	public static final Feature NAVIGATION_MENU_JS_FEATURE = new Preference("navigation_menu.script", false, "Add javascript for keyboard access to navigaition menu sub-menus");
-
+    public static final Feature FORCE_SERIALISE_FEATURE = new Feature("navigation_menu.force_Serialise",true,"Force serialisation when caching menu in session");
 	/**
 	 * 
 	 */
@@ -105,16 +111,38 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 		}
 		NodeContainer menu = null;
 		try{
-			menu = (NodeContainer) service.getAttribute(NAVIGATION_MENU_ATTR);
-		}catch(Exception t){
-			// Any de-serialisation problem will probably jus destory the session
+			Object attribute = service.getAttribute(NAVIGATION_MENU_ATTR);
+			if( attribute != null) {
+				if( attribute instanceof NodeContainer) {
+					menu = (NodeContainer) attribute;
+				}else if( attribute instanceof byte[]) {
+					ObjectInputStream os = new ObjectInputStream(new ByteArrayInputStream(((byte[])attribute)));
+					menu = (NodeContainer) os.readObject();
+				}
+			}
+		}catch(Throwable t){
+			// Any de-serialisation problem will probably just destroy the session
 			// but just to be fail-safe trap all throwables.
+			getLogger().error("Error getting menu from session",t);
 		}
 		Date too_old = new Date(System.currentTimeMillis()-getContext().getLongParameter("navigation.expire_millis", 600000));
 		if( menu == null || menu.getDate().before(too_old)){
 			menu = makeMenu();
 			if( menu != null ){
-				service.setAttribute(NAVIGATION_MENU_ATTR, menu);
+				if( FORCE_SERIALISE_FEATURE.isEnabled(getContext())) {
+					// make sure we don't have any classloader leaks
+					ByteArrayOutputStream out = new ByteArrayOutputStream();
+					try {
+						ObjectOutputStream os = new ObjectOutputStream(out);
+						os.writeObject(menu);
+						os.close();
+						service.setAttribute(NAVIGATION_MENU_ATTR, out.toByteArray());
+					} catch (Throwable t) {
+						getLogger().error("Error writting menu", t);
+					}
+				}else {
+					service.setAttribute(NAVIGATION_MENU_ATTR, menu);
+				}
 			}
 		}
 		return menu;
@@ -201,8 +229,11 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 			String path = conn.expandText(menu_prop.getProperty(name+".path"));
 			String help = conn.expandText(menu_prop.getProperty(name+".help"));
 			String type = conn.expandText(menu_prop.getProperty(name+".type","default_node_type"));
+			// styles can customise text and image
+			String style = WebappHeadTag.STYLE_PREFERENCE.getCurrent(conn);
 			
 			String image = menu_prop.getProperty(name+".image");
+			image = menu_prop.getProperty(name+".image."+style, image);
 			String key = menu_prop.getProperty(name+".accesskey");
 			NodeMaker maker = getContext().makeObjectWithDefault(NodeMaker.class, ParentNodeMaker.class, type);
 			Node n = maker.makeNode(name, menu_prop);
@@ -210,8 +241,14 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 				n.setID(name);
 				// Default to maker set text or failing that name
 				String menu_text = n.getMenuText(getContext());
-				n.setMenuText(conn.expandText(menu_prop.getProperty(name+".text", menu_text == null ? name : menu_text)));
+				menu_text=menu_prop.getProperty(name+".text", menu_text == null ? name : menu_text);
+				menu_text=menu_prop.getProperty(name+".text."+style,menu_text);
+				n.setMenuText(conn.expandText(menu_text));
 				n.setImage(image);
+				String post_text=null;
+				post_text = menu_prop.getProperty(name+".post_image_text",post_text);
+				post_text = menu_prop.getProperty(name+".post_image_text."+style,post_text);
+				n.setPostImageText(post_text);
 				if( path != null){
 					n.setTargetPath(path);
 				}
@@ -235,7 +272,26 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 			return null;
 		}
 	}
-
+	protected boolean willMakeNode(String name, FilteredProperties menu_prop) {
+		// optional required role
+		String role=conn.expandText(menu_prop.getProperty(name+".role"));
+		if( role != null && ! conn.getService(SessionService.class).hasRoleFromList(role.split("\\s*,\\s*"))){
+			return false;
+		}
+		String required_feature = menu_prop.getProperty(name+".required_feature");
+		if( required_feature != null && ! Feature.checkDynamicFeature(conn, required_feature, false)){
+			return false;
+		}
+		String disable_feature = menu_prop.getProperty(name+".disable_feature");
+		if( disable_feature != null && Feature.checkDynamicFeature(conn, disable_feature, false)){
+			return false;
+		}
+		String required_parameter = menu_prop.getProperty(name+".require_parameter");
+		if( required_parameter != null && conn.getInitParameter(required_parameter, null) == null){
+			return false;
+		}
+		return true;
+	}
 	/**
 	 * @param seen
 	 * @param name
@@ -255,6 +311,18 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 			}
 		}
 		maker.addChildren(n, name, menu_prop);
+	}
+	public boolean willAddChildren(String name, FilteredProperties menu_prop) {
+		String child_list = conn.expandText(menu_prop.getProperty(name+".list"));
+		// Add config nodes first
+		if( child_list != null && ! child_list.isEmpty()){
+			for(String child_name : child_list.trim().split("\\s*,\\s*")){
+				if( willMakeNode(name, menu_prop)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public void disableNavigation(HttpServletRequest request){

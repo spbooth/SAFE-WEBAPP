@@ -109,7 +109,7 @@ public class Feature extends AbstractSetting<Boolean> {
 	public static boolean checkDynamicFeature(AppContext conn, String name, boolean def){
 		Feature f = findFeatureByName(Feature.class,name);
 		if( f == null ){
-			f= new Feature(name,def,"dynamic feature");
+			f= new Feature(name,def,name);
 		}
 		return f.isEnabled(conn);
 	}
@@ -121,7 +121,7 @@ public class Feature extends AbstractSetting<Boolean> {
 	 * @see uk.ac.ed.epcc.webapp.Setting#getInput()
 	 */
 	@Override
-	public ItemInput<String,Boolean> getInput() {
+	public ItemInput<String,Boolean> getInput(AppContext conn) {
 		return new OnOffInput();
 	}
 	

@@ -16,7 +16,8 @@ Restrict access to this info as it is personal data.
  -->
 <%@page import="uk.ac.ed.epcc.webapp.servlet.WtmpManager, 
 uk.ac.ed.epcc.webapp.session.SessionService, 
-uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService"%>
+uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService,
+uk.ac.ed.epcc.webapp.content.*"%>
  <%
  SessionService sess = conn.getService(SessionService.class);
  if( sess != null && sess instanceof ServletSessionService){
@@ -24,20 +25,21 @@ uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService"%>
      if( man != null ){
  %>
 <div class="wideblock">
-<H2>Current users  logged in to the <%=website_name %></H2>
-<table>
-<%= man.getHTMLHeader() %>
+<H1>Current users  logged in to the <%=website_name %></H1>
 <%
-		for(Iterator it = man.getCurrent() ; it.hasNext();){
-			WtmpManager.Wtmp w = (WtmpManager.Wtmp) it.next();
+  Table t = new Table();
+  for(WtmpManager.Wtmp w : man.getCurrent()){
+	man.addTable(t, w, sess);
+  }
+  man.formatTable(t);
+  HtmlBuilder hb = new HtmlBuilder();
+  hb.addTable(conn,t);
 %>
-<%= man.getHTML(w,sess) %>
-<% 
-		}
-     }
-%>
-</table>
+<div class="scrollwrapper"></div>
+<%= hb.toString() %>
+</div>
 </div>
 <%
+ }
 }
 %>

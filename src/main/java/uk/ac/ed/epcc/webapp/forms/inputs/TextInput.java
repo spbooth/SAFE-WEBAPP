@@ -40,7 +40,7 @@ public class TextInput extends ParseAbstractInput<String> {
 				}
 				String s = (String) v;
 				if (s != null && s.length() > getMaxResultLength() && getMaxResultLength() > 0) {
-					throw new ValidateException("Input too long");
+					throw new ValidateException("Input too long "+s.length()+">"+getMaxResultLength());
 				}
 				
 				
@@ -55,13 +55,17 @@ public class TextInput extends ParseAbstractInput<String> {
 			return null;
 		} else {
 			if( force_single ){
-				v = v.replace("\n", "");
+				v = mapToSingleLine(v);
 			}
 			if( getTrim()){
 				v = v.trim();
 			}
 			return v;
 		}
+	}
+
+	protected String mapToSingleLine(String v) {
+		return v.replace("\n", "");
 	}
 
 	public boolean getTrim() {

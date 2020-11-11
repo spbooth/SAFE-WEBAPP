@@ -22,6 +22,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.UnaryOperator;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -34,6 +36,25 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  * 
  * We can also store optional fields. These are not created by default but might
  * be presented as options when editing the table structure.
+ * 
+ * Normally a handler class will create this programmatically which can be used to create the underlying table if it does not
+ * exist. This can be customised by setting configuration parameters though obviously these need to be in place 
+ * before the table is created. Configuration parameters are of the form
+ * <b>create_table.<i>table</i>.<i>field</i>=<i>specification</i></b>
+ * Where the specification is one of:
+ * <ul>
+ * <li>double</li>
+ * <li>float</li>
+ * <li>int</li>
+ * <li>long</li>
+ * <li>date</li>
+ * <li>boolean</li>
+ * <li>string<i>xxx</i> where xxx is the string length</li>
+ * <li>required - promote an optional field</li>
+ * <li><i>table-tag</i> reference to remote table</li>
+ * 
+ * </ul>
+ * 
  * @author spb
  *
  */
@@ -87,6 +108,18 @@ public class TableSpecification {
 	public boolean hasField(String name){
 		return required_field_names.contains(name);
 	}
+	/** add a {@link FieldType} to the specification
+	 * An optional field is not created by default but it does show up as an option in the 
+	 * table edit forms.
+	 * An optional field can be promoted to required by setting a configuration 
+	 * <b>create_table.<i>table</i>.<i>field</i>=required</b> 
+	 * @see #setFromParameters(AppContext, String, Map)
+	 * 
+	 * 
+	 * @param name field name
+	 * @param type {@link FieldType}
+	 * @param optional boolean
+	 */
 	public void setField(String name, FieldType type,boolean optional){
 		if( primary_key.equalsIgnoreCase(name)){
 			throw new ConsistencyError("Field name matches primary key name");
@@ -99,6 +132,17 @@ public class TableSpecification {
 			required_field_names.add(name);
 		}
 	}
+	/** add a {@link FieldType} to the specificationas an optional field
+	 * An optional field is not created by default but it does show up as an option in the 
+	 * table edit forms.
+	 * An optional field can be promoted to required by setting a configuration 
+	 * <b>create_table.<i>table</i>.<i>field</i>=required</b> 
+	 * @see #setFromParameters(AppContext, String, Map)
+	 * 
+	 * 
+	 * @param name field name
+	 * @param type {@link FieldType}
+	 */
 	public void setOptionalField(String name, FieldType type){
 		setField(name, type, true);
 	}
@@ -189,19 +233,60 @@ public class TableSpecification {
 	public Map<String,FieldType> getStdFields(){
 		return (Map<String, FieldType>) all_fields.clone();
 	}
-	
+	public static class IndexField{
+		@Override
+		public String toString() {
+			return name;
+		}
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + length;
+			result = prime * result + ((name == null) ? 0 : name.hashCode());
+			return result;
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			IndexField other = (IndexField) obj;
+			if (length != other.length)
+				return false;
+			if (name == null) {
+				if (other.name != null)
+					return false;
+			} else if (!name.equals(other.name))
+				return false;
+			return true;
+		}
+		public final String name;
+		public final int length;
+		public IndexField(String name,int len) {
+			this.name=name;
+			this.length=len;
+		}
+		public IndexField(String name) {
+			this(name,-1);
+		}
+	}
 	public abstract class IndexType {
 		private final String name;
-		private LinkedHashSet<String> index_fields = new LinkedHashSet<>();
+		private LinkedHashSet<IndexField> index_fields = new LinkedHashSet<>();
 		public IndexType(String name, String ...strings) throws InvalidArgument{
 			this.name=name;
 			for(String s : strings){
-				addField(s);
+				addField(new IndexField(s));
 			}
 			indexes.add(this);
 		}
-		public void addField(String s) throws InvalidArgument {
-			if( getFieldNames().contains(s)){
+		public void addField(IndexField s) throws InvalidArgument {
+			
+			if( getFieldNames().contains(s.name)){
 				index_fields.add(s);
 			}else{
 				throw new InvalidArgument("Table does not contain field "+s);
@@ -210,8 +295,9 @@ public class TableSpecification {
 		public IndexType(IndexType i) {
 			this.name=i.name;
 			Set<String> names = getFieldNames();
-			for(String s : i.index_fields){
-				if( names.contains(s)){
+			for(IndexField s : i.index_fields){
+				
+				if( getFieldNames().contains(s.name)){
 					index_fields.add(s);
 				}
 			}
@@ -226,18 +312,18 @@ public class TableSpecification {
 		 */
 		public boolean isRef() {
 			if(index_fields.size() == 1 ) {
-				for(String s : index_fields) {
-					if( getField(s) instanceof ReferenceFieldType) {
+				for(IndexField s : index_fields) {
+					if( getField(s.name) instanceof ReferenceFieldType) {
 						return true;
 					}
 				}
 			}
 			return false;
 		}
-		public Iterator<String> getindexNames(){
+		public Iterator<IndexField> getindexNames(){
 			return index_fields.iterator();
 		}
-		public abstract void accept(FieldTypeVisitor vis);
+		public abstract void accept(UnaryOperator<String> name_map,FieldTypeVisitor vis);
 		/** Generate a copy of this index in a different specification.
 		 * 
 		 * @param spec
@@ -296,8 +382,8 @@ public class TableSpecification {
 		 * @see uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType#accept(uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor)
 		 */
 		@Override
-		public void accept(FieldTypeVisitor vis) {
-			vis.visitFullTextIndex(this);
+		public void accept(UnaryOperator<String> name_map,FieldTypeVisitor vis) {
+			vis.visitFullTextIndex(name_map,this);
 			
 		}
 
@@ -330,8 +416,8 @@ public class TableSpecification {
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType#accept(uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor)
 		 */
-		public void accept(FieldTypeVisitor vis) {
-			vis.visitIndex(this);
+		public void accept(UnaryOperator<String> name_map,FieldTypeVisitor vis) {
+			vis.visitIndex(name_map,this);
 			
 		}
 		/* (non-Javadoc)

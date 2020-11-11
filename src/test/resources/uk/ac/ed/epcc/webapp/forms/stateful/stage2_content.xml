@@ -3,7 +3,7 @@
 <table class="form">
 <tr class="even">
 <th>
-<label class="required">Hundreds</label>
+<span class="required">Hundreds</span>
 </th>
 <td>700</td>
 </tr>

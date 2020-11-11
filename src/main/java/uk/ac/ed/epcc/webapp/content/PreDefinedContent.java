@@ -13,8 +13,10 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.content;
 
+import java.text.Format;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
@@ -37,7 +39,7 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 	/**
 	 * 
 	 */
-	private static final String DEFAULT_BUNDLE = "content";
+	public static final String DEFAULT_BUNDLE = "content";
 
 
 
@@ -54,6 +56,9 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 	public PreDefinedContent(AppContext conn,String bundle,String message, Object ... args) {
 		this(conn,conn.getService(MessageBundleService.class).getBundle(bundle == null ? DEFAULT_BUNDLE : bundle),message,args);
 	}
+	public PreDefinedContent(AppContext conn,boolean optional,String bundle,String message, Object ... args) {
+		this(conn,optional,conn.getService(MessageBundleService.class).getBundle(bundle == null ? DEFAULT_BUNDLE : bundle),message,args);
+	}
 	
 	/** Create {@link PreDefinedContent} from a specific message from a {@link ResourceBundle}
 	 * 
@@ -63,19 +68,42 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 	 * @param args
 	 */
 	public PreDefinedContent(AppContext conn,ResourceBundle mess,String message, Object ... args) {
+		this(conn, false,mess,message,args);
+	}
+	public PreDefinedContent(AppContext conn,boolean optional ,ResourceBundle mess,String message, Object ... args) {
 		super(conn);
-		String pattern = null;
-		if( mess != null) {
-			pattern = conn.expandText(mess.getString(message));
+		MessageFormat f=null;
+		Object a[]= null;
+		try {
+			String pattern = null;
+			if( mess != null) {
+				pattern = conn.expandText(mess.getString(message));
+			}
+			if( pattern != null ) {
+				if( pattern.isEmpty()) {
+					f=null;
+					a=null;
+				}else {
+					f = new MessageFormat(pattern);
+					a=args;
+				}
+			}else {
+				f=null;
+				a=null;
+				if( ! optional) {
+					conn.getService(LoggerService.class).getLogger(getClass()).error("missing content "+(mess == null ? " no bundle ":mess.getBaseBundleName())+":"+message);
+				}
+			}
+		}catch(MissingResourceException e) {
+			if( ! optional) {
+				conn.getService(LoggerService.class).getLogger(getClass()).error("missing content "+(mess == null ? " no bundle ":mess.getBaseBundleName())+":"+message, e);
+			}
+			f=null;
+			a=null;
+			
 		}
-		if( pattern != null) {
-			fmt = new MessageFormat(pattern);
-			this.args=args;
-		}else {
-			fmt=null;
-			this.args=null;
-			conn.getService(LoggerService.class).getLogger(getClass()).error("missing content "+(mess == null ? " no bundle ":mess.getBaseBundleName())+":"+message);
-		}
+		fmt=f;
+		this.args=a;
 	}
 	/** extension point to apply additional processing
 	 * 
@@ -91,10 +119,17 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 	 */
 	@Override
 	public SimpleXMLBuilder addContent(SimpleXMLBuilder builder) {
+		if( fmt == null ) {
+			return builder;
+		}
 		if( builder instanceof XMLPrinter) {
 			XMLPrinter printer = (XMLPrinter) builder;
 			MessageFormat fmt2 = (MessageFormat) fmt.clone();
-			if( args != null && builder instanceof HtmlBuilder) {
+			if( args != null ) {
+				Format f = new TextContentFormat();
+				if(builder instanceof HtmlBuilder) {
+					f = new HtmlContentFormat();
+				}
 				// apply HtmlFormat 
 				for(int i=0 ; i< args.length; i++) {
 					Object a = args[i];
@@ -103,7 +138,7 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 					// raw html can be added by wrapping in a UIGenerator or XMLPrinter
 					// @see messages.jsf
 					if( !( a instanceof Number || a instanceof Date )) {
-						fmt2.setFormatByArgumentIndex(i, new HtmlContentFormat());
+						fmt2.setFormatByArgumentIndex(i, f);
 					}
 				}
 			}
@@ -120,6 +155,9 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 	 */
 	@Override
 	public ContentBuilder addContent(ContentBuilder builder) {
+		if( fmt == null ) {
+			return builder;
+		}
 		if( builder instanceof XMLPrinter) {
 			addContent((XMLPrinter)builder);
 		}else {
@@ -130,6 +168,30 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 		return builder;
 	}
 
+	/** Add this content to a {@link ContentBuilder} as a text block
+	 * 
+	 * @param cb
+	 */
+	public void addAsText(ContentBuilder cb) {
+		if( fmt == null ) {
+			return;
+		}
+		ExtendedXMLBuilder text = cb.getText();
+		text.addObject(this);
+		text.appendParent();
+	}
+	public void addAsBlock(ContentBuilder cb) {
+		if( fmt == null ) {
+			return;
+		}
+		ContentBuilder inner = cb.getPanel("block");
+		if( inner instanceof SimpleXMLBuilder) {
+			addContent((SimpleXMLBuilder)inner);
+		}else {
+			addContent(inner);
+		}
+		inner.addParent();
+	}
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -138,7 +200,26 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 		if( fmt == null) {
 			return "";
 		}
-		return fmt.format(args, new StringBuffer(), null).toString();
+		MessageFormat fmt2 = (MessageFormat) fmt.clone();
+		if( args != null ) {
+			Format f = new TextContentFormat();
+			
+			for(int i=0 ; i< args.length; i++) {
+				Object a = args[i];
+				// MessageFormat has direct support for number and date formats. These are safe to add to html
+				// Strings in particular should use HtmlContentFormat to force html escaping.
+				// raw html can be added by wrapping in a UIGenerator or XMLPrinter
+				// @see messages.jsf
+				if( !( a instanceof Number || a instanceof Date || a instanceof String)) {
+					fmt2.setFormatByArgumentIndex(i, f);
+				}
+			}
+		}
+		return fmt2.format(args, new StringBuffer(), null).toString();
+	}
+	
+	public boolean hasContent() {
+		return fmt != null;
 	}
 
 }

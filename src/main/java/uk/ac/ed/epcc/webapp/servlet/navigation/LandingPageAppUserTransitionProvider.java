@@ -161,8 +161,18 @@ public class LandingPageAppUserTransitionProvider<AU extends AppUser> extends Ap
 					if( targetPath != null) {
 						ContentBuilder item = cb.getPanel("bar");
 						ContentBuilder header = item.getHeading(2);
-						header.addText(n.getHelpText());
-						header.addButton(getContext(), n.getMenuText(getContext()),new RedirectResult(targetPath));
+						String helpText = n.getHelpText();
+						String menuText = n.getMenuText(getContext());
+						
+						String text=helpText;
+						String button = menuText;
+						if( text == null || text.isEmpty()) {
+							text=menuText;
+							button="Go";
+						}
+						
+						header.addText(text);
+						header.addButton(getContext(), button,new RedirectResult(targetPath));
 						header.addParent();
 						item.addParent();
 					}

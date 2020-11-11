@@ -570,6 +570,18 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 */
 	public Set<L> getLeftSet( R r ,BaseFilter<T> f) throws DataException{
 		Set<L> res= new LinkedHashSet<>();
+		return addLeftSet(res, r, f);
+	}
+	/** Add to a set of Left Objects
+	 * 
+	 * @param res {@link Set} to add too
+	 * @param r Right {@link Indexed} required null for any
+	 * @param f extension Filter
+	 * @return Set of Left objects
+	 * @throws DataException 
+	 */
+	public Set<L> addLeftSet(Set<L> res, R r ,BaseFilter<T> f) throws DataException{	
+	
 		for(T link : getFilterResult(null, r, f)){
 			res.add(link.getLeft());
 		}
@@ -650,14 +662,24 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
     
 	
 	/** Get a Set of Right  objects
-	 * 
-	 * 	 * @param l Left DataObject required null for any
+	 * @param l Left DataObject required null for any
 	 * @param f extension Filter
 	 * @return Set of Right objects
 	 * @throws DataException 
 	 */
 	public Set<R> getRightSet(L l ,BaseFilter<T> f) throws DataException{
 		Set<R> res= new LinkedHashSet<>();
+		return addRightSet(res, l, f);
+	}
+	/** Add to a set of Right objects
+	 * 	
+	 * @param res {@link Set} to add too
+	 * @param l Left DataObject required null for any
+	 * @param f extension Filter
+	 * @return Set of Right objects
+	 * @throws DataException 
+	 */
+	public Set<R> addRightSet(Set<R> res,L l ,BaseFilter<T> f) throws DataException{
 		for(T link : getFilterResult(l, null, f)){
 			res.add(link.getRight());
 		}

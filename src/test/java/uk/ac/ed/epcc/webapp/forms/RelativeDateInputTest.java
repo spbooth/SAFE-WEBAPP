@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms;
 
+import java.util.Date;
 import java.util.Set;
 
 import org.junit.Test;
@@ -33,7 +34,7 @@ public class RelativeDateInputTest extends DateInputTest<RelativeDateInput> {
 	}
 	@Override
 	public RelativeDateInput getInput() {
-		return  new RelativeDateInput();
+		return  new RelativeDateInput(new Date());
 	}
     
 	/* (non-Javadoc)

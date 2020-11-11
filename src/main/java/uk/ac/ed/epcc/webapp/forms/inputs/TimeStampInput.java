@@ -16,11 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-
-
-
-
-
 public class TimeStampInput extends AbstractDateInput implements HTML5Input{
 
 	@Override

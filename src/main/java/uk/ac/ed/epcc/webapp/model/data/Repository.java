@@ -26,6 +26,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.SQLNonTransientConnectionException;
 import java.sql.SQLSyntaxErrorException;
 import java.sql.Statement;
 import java.sql.Timestamp;
@@ -58,8 +59,10 @@ import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.exception.FatalDataError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.NoTableException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
@@ -219,7 +222,8 @@ public final class Repository implements AppContextCleanup{
 	public static final Feature READ_ONLY_FEATURE = new Feature("read-only",false,"supress (most) database writes");
 	
 	public static final Feature BACKUP_WITH_SELECT = new Feature("repository.backup_by_select",true,"Use select/insert when backing up a record");
-	private static final DateFormat dump_format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss SSS");
+	// not static not thread safe
+	private final DateFormat dump_format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss SSS");
 	
 	/** information about indexes
 	 * 
@@ -451,26 +455,27 @@ public final class Repository implements AppContextCleanup{
          * @throws IOException 
          */
         String dump(Record r) throws DataFault, IOException{
-        	if( r.getProperty(name) == null){
+        	String tag = getTag();
+        	if( r.getProperty(tag) == null){
         		return null;
         	}
         	if( isReference() && isNumeric()) {
-        		int id = r.getIntProperty(name, -1);
+        		int id = r.getIntProperty(tag, -1);
         		if(id <= 0) {
         			return null;
         		}
         		return Integer.toString(id);
         	}else if( isString()){
-        		return r.getStringProperty(name);
+        		return r.getStringProperty(tag);
         	}else if( isBoolean()){
-        		return Boolean.toString(r.getBooleanProperty(name));
+        		return Boolean.toString(r.getBooleanProperty(tag));
         	}else if( isDate()){
-        		return dump_format.format(r.getDateProperty(name));
+        		return dump_format.format(r.getDateProperty(tag));
         	}else if( isNumeric()){
-        		return r.getNumberProperty(name).toString();
+        		return r.getNumberProperty(tag).toString();
         	}else if ( isData()){
         		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        		StreamData data = r.getStreamDataProperty(name);
+        		StreamData data = r.getStreamDataProperty(tag);
         		data.write(stream);
         		return Base64.encodeBase64String(stream.toByteArray());
         	}
@@ -485,46 +490,55 @@ public final class Repository implements AppContextCleanup{
         	if( text == null ){
         		return;
         	}
+        	String tag = getTag();
         	if( isReference()&& isNumeric()) {
-        		r.setProperty(name,Integer.parseInt(text));
+        		r.setProperty(tag,Integer.parseInt(text));
     			return;
         	}else if( isString()){
-        		r.setProperty(name, text);
+        		r.setProperty(tag, text);
         	}else if ( isBoolean()){
-        		r.setProperty(name, Boolean.parseBoolean(text));
+        		r.setProperty(tag, Boolean.parseBoolean(text));
         	}else if( isDate()){
         		try {
-					r.setProperty(name, dump_format.parse(text));
+					r.setProperty(tag, dump_format.parse(text));
 				} catch (ParseException e) {
 					// try a numeric timestamp 
-					r.setProperty(name, Long.parseLong(text));
+					r.setProperty(tag, Long.parseLong(text));
 				}
         	}else if( isNumeric()){
         		try{
-        			r.setProperty(name,Integer.parseInt(text));
+        			r.setProperty(tag,Integer.parseInt(text));
         			return;
         		}catch(NumberFormatException e){
         						
         		}
         		try{
-        			r.setProperty(name, Long.parseLong(text));
+        			r.setProperty(tag, Long.parseLong(text));
         			return;
         		}catch(NumberFormatException e){
         						
         		}
         		try{
-        			r.setProperty(name,Double.parseDouble(text));
+        			r.setProperty(tag,Double.parseDouble(text));
         			return;
         		}catch(NumberFormatException e){
         						
         		}
         		// Try a date
-        		r.setProperty(name, dump_format.parse(text));
+        		r.setProperty(tag, dump_format.parse(text));
         	}else if( isData()){
         		ByteArrayStreamData data = new ByteArrayStreamData(Base64.decodeBase64(text));
-        		r.setProperty(name,data);
+        		r.setProperty(tag,data);
         	}
         }
+        /** get the tag used to store this field in the record.
+         * Normally the field name unless renaming taking place
+         * 
+         * @return
+         */
+		public String getTag() {
+			return dbFieldtoTag(name);
+		}
         // Optionally truncate the value before storage
         Object truncate(Object input) {
         	if( truncate && input != null && isString() && input instanceof String) {
@@ -624,14 +638,18 @@ public final class Repository implements AppContextCleanup{
 		 */
 		private static final long serialVersionUID = 2L;
 
-		/** does this Record exist in the database */
-		private boolean have_id = false;
-
+		
 		private int id;
 
 		private Set<String> dirty = null;
-		
+		/** does this Record exist in the database */
+		private boolean have_id = false;
+
+		/** are updates to this record forbidden
+		 * 
+		 */
 		private boolean locked=false;
+		
 		public Record() {
 			super();
 		}
@@ -825,7 +843,7 @@ public final class Repository implements AppContextCleanup{
 					throw new DataFault("No connection");
 				}
 				deCache();
-				if( Repository.READ_ONLY_FEATURE.isEnabled(getContext())){
+				if( Repository.READ_ONLY_FEATURE.isEnabled(getContext()) || sql.isReadOnly()){
 					return;
 				}
 				StringBuilder sb = new StringBuilder();
@@ -1604,12 +1622,13 @@ public final class Repository implements AppContextCleanup{
 		synchronized private boolean update() throws ConsistencyError, DataFault {
 			int pattern_count=1;
 
-			if( READ_ONLY_FEATURE.isEnabled(ctx)){
+			if( READ_ONLY_FEATURE.isEnabled(ctx)|| sql.isReadOnly()){
 				return false;
 			}
 			if (!isDirty()) {
 				return false;
 			}
+			
 			TimerService time = ctx.getService(TimerService.class);
 			if( time != null ){
 				time.startTimer(getTag()+"-update");
@@ -1843,6 +1862,8 @@ public final class Repository implements AppContextCleanup{
 		    public boolean isLocked() {
 		    	return locked;
 		    }
+
+			
 	}
 
 	/** Class representing an Order clause 
@@ -2753,7 +2774,7 @@ public final class Repository implements AppContextCleanup{
 	 * @throws DataFault
 	 */
 	protected int insert(Record r) throws DataFault {
-			if( READ_ONLY_FEATURE.isEnabled(ctx)){
+			if( READ_ONLY_FEATURE.isEnabled(ctx) || sql.isReadOnly()){
 				return -1;
 			}
 			TimerService time = ctx.getService(TimerService.class);
@@ -2978,6 +2999,8 @@ public final class Repository implements AppContextCleanup{
 				if(CHECK_INDEX.isEnabled(getContext())) {
 					setIndexes();
 				}
+			}catch( SQLNonTransientConnectionException nt) {
+				throw new FatalDataError("Connection error in setMetaData for "+getTag(),nt);
 			}catch( SQLSyntaxErrorException se) {
 				// This occurs when table does not exist
 				throw new NoTableException(getTable(), se);
@@ -3024,7 +3047,7 @@ public final class Repository implements AppContextCleanup{
 			indexes=result;
 		}catch(SQLException e){
 			db_serv.logError("Error getting index names", e);
-			throw new DataError("Error getting index names",e);
+			throw new FatalDataError("Error getting index names",e);
 		}
 	}
 	/** Set the table References for the fields  
@@ -3034,8 +3057,8 @@ public final class Repository implements AppContextCleanup{
 	 * @throws SQLException 
 	 */
 	private void setReferences(AppContext ctx, Connection c) throws SQLException{
-		//Logger log = ctx.getService(LoggerService.class).getLogger(getClass());
-		//log.debug("SetReferences for "+getTable());
+		Logger log = ctx.getService(LoggerService.class).getLogger(getClass());
+		log.debug("SetReferences for "+getTable());
 		// look for foreign keys to identify remote tables.
 		DatabaseMetaData meta = c.getMetaData();
 		ResultSet rs = meta.getImportedKeys(c.getCatalog(),null , table_name);
@@ -3053,7 +3076,7 @@ public final class Repository implements AppContextCleanup{
 					String name = REFERENCE_PREFIX+suffix;
 					table=ctx.getInitParameter(name,table); // use param in preference because of windows case mangle
 					String tag = TableToTag(ctx, table);
-					//log.debug("field "+field+" references "+table);
+					log.debug("field "+field+" references "+table+"->"+tag);
 					info.setReference(true,key_name,tag,ctx.getBooleanParameter(UNIQUE_PREFIX+suffix, info.isUnique()));
 				}
 				
@@ -3067,7 +3090,7 @@ public final class Repository implements AppContextCleanup{
 				String suffix = param_name+"."+i.getName(false);
 				String tag = REFERENCE_PREFIX+suffix;
 				String table=ctx.getInitParameter(tag);
-				//log.debug("tag "+tag+" resolves to "+table);
+				log.debug("tag "+tag+" resolves to "+table);
 				i.setReference(false,null,table,ctx.getBooleanParameter(UNIQUE_PREFIX+suffix, false));
 			}
 			if( i.isString()) {
@@ -3131,7 +3154,7 @@ public final class Repository implements AppContextCleanup{
 	 * Normally this is the identity but this method allows field renaming.
 	 * 
 	 */
-	protected String dbFieldtoTag(String name){
+	public String dbFieldtoTag(String name){
 		return ctx.getInitParameter("rename."+table_name+"."+name, name);
 	}
 	

@@ -66,7 +66,7 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 				return new ChainedTransitionResult<>(provider,target,tag);
 			}
 //			 actually process the results of a transition
-			HTMLForm f = new HTMLForm(conn);
+			HTMLForm f = new HTMLForm(conn,getSelf());
 		
 		    ft.buildForm(f, target, conn);
 		    try{
@@ -130,7 +130,7 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 				return new ChainedTransitionResult<>(provider,null,tag);
 			}
 //			 actually process the results of a transition
-			HTMLForm f = new HTMLForm(conn);
+			HTMLForm f = new HTMLForm(conn,getSelf());
 		
 		    ft.buildForm(f, conn);
 		    try{
@@ -203,7 +203,7 @@ public class ServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T
 		 * @return FormResult or null if processing to continue.
 		
 		 */
-		public FormResult confirmTransition(HttpServletRequest req,  AppContext conn, TransitionFactory<K,T> tp, K operation, T target,String type,String args[]) {
+		public FormResult confirmTransition(HttpServletRequest req,  AppContext conn, TransitionFactory<K,T> tp, K operation, T target,String type,Object args[]) {
 			Logger log = getLogger();
 			log.debug("Process confirm: "+type);
 			String yes = req.getParameter("yes");

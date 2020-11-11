@@ -11,27 +11,5 @@
 <%--| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. |--%>
 <%--| See the License for the specific language governing permissions and      |--%>
 <%--| limitations under the License.                                           |--%>
-<%@page import="uk.ac.ed.epcc.webapp.servlet.ServletService" %>
-<%
-for(Iterator it=session_service.getToggleRoles().iterator(); it.hasNext(); ){
-	  String role=(String) it.next();
-	  String role_name=role;
-	  HtmlBuilder role_hb = new HtmlBuilder();
-	  role_hb = (HtmlBuilder)role_hb.getPanel("bar");
-	  role_hb.addHeading(3, "You are "+ (session_service.hasRole(role)? "": " NOT ")+role_name );
-	  role_hb.open("form");
-	  role_hb.attr("method", "post");
-	  role_hb.attr("action",response.encodeURL(request.getContextPath()+"/UserServlet"));
-	  role_hb.open("input",new String[][]{{"type","hidden"},{"name","page"},{"value",conn.getService(ServletService.class).encodePage()}});
-	  role_hb.close();
-	  role_hb.open("input",new String[][]{{"type","hidden"},{"name","action"},{"value","TOGGLE_PRIV"}});
-	  role_hb.close();
-	  role_hb.open("input",new String[][]{{"type","hidden"},{"name","role"},{"value",role}});
-	  role_hb.close();
-	  role_hb.open("input",new String[][]{{"class","input_button"},{"type","submit"},{"value"," Toggle "}});
-	  role_hb.close();
-	  role_hb.close();
-	  role_hb=(HtmlBuilder)role_hb.appendParent();
-%><%=role_hb.toString()%><% 
-}
-%>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:RoleButtons/>

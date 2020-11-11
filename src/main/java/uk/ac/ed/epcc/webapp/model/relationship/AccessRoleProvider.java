@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.relationship;
 
+import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -83,4 +85,12 @@ public interface AccessRoleProvider<U extends AppUser,T extends DataObject> {
      * @return true if relationship provided by this class.
      */
     public boolean providesRelationship(String role);
+    
+    /** Add known roles to a set. This can be roles provided or consumed
+     * by the class. This is only used as auto-complete suggestions so
+     * should be a useful subset rather than an exhaustive list
+     * 
+     * @param roles
+     */
+    public void addRelationships(Set<String> roles);
 }

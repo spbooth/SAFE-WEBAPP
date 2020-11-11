@@ -1,0 +1,248 @@
+:root {
+  --main-bg-color: #ffffff;
+  --heading-bg-color: #ffffff;
+  --bar-bg-color: #ffffff;
+  --bar-text-color: #000;
+  --notice-color: #0d8040;
+  --notice-bg-color: #fadad1;
+  
+  --warn-bg-color: #ff0000;
+  --content-bg-color: #ffffff;
+  --table-bg-color: #000;
+  --content-border-color: #000;
+  --table-border-color: #000;
+  --form-border-color: black;
+  --button-bg-color: #d04016;
+  --button-color: white;
+  --th-color: #ffffff;
+  --th-bg-color: #0d8040;
+  --th-hover-bg-color: #f3f3f3;
+  --cell-padding: 6px;
+  --menu-height: 60px;
+  --menu-height-inner: 30px;
+  
+  --form-bg-color: var(--content-bg-color);
+  --form-content-bg-color: #ffffff;
+  --paragraph-bg-color: #ffffff;
+  --list-bg-color: var(--content-bg-color);
+  --form-hover-bg-color: #eeeeee;
+  --menu-bg-color: #ffffff;
+  --menu-text-color: #000000;
+  --menu-border-color: #000;
+  --menu-hover-bg-color: #ddd;
+  --menu-hover-text-color: #ff0000;
+  --block-radius: 0px;
+  
+   --block-v-padding: 10px;
+  --block-h-padding: 10px;
+  --block-v-margin: 20px;
+  --heading-pre-space: 8px;
+  --content-h-margin: 0px;
+  --content-width: 100%;
+  --warn-bg-color: #ffb3b3;
+  --warn-color: black;
+  --menu-bg-has-role: #66ff66;
+  --menu-bg-missing-role: #ff6666;
+  --menu-hover-bg-has-role: #ccffcc;
+  --menu-hover-bg-missing-role: #ffcccc;
+   --column-th-color: black;
+  --column-th-bg-color: #e7e7e7;
+   --form-th-color: black;
+  --form-th-bg-color: #ffffff;
+  --text-h-padding: 0px;
+  --text-h-margin: 0px;
+  --menu-hover-text-color: var(--button-bg-color);
+  
+  --notify-color: #0d8040;
+ --notify-bg-color: #ffffff;
+ --notify-hover-color: #800000;
+ --notify-hover-bg-color: #ddd;
+}
+
+
+body{
+font-family: "Open Sans", sans-serif;	
+box-sizing: border-box;
+}
+pre.loose{
+	font-family: "Open Sans", sans-serif;
+}
+body header , body footer{
+	background-color: white;
+}
+
+body > div.block , body div.bar{
+	border: none;
+}
+
+
+
+
+body > div.block {
+	padding: 0;
+}
+
+
+/* we use three levels of header as standard 
+ * h1 or h2 is the top level header in a block
+ * h3 is a secondary header or a header in a div.bar
+ * h4 is a smaller header for subdivisions.
+*/
+
+h1, h2, h3, h4, h5, h6 {
+	font-size: 110%;
+	color: black;
+    text-align: left;
+    line-height: normal;
+    
+    
+}
+
+
+/** add preceding margin to headings
+ */
+h3, h4, h5, h6 {
+	margin: 4px 0px 0px 0px;
+}
+/* No preceding margin if first child heading is first element
+ */
+h1 + h2 , h2 + h3, h3 + h4 , h4 + h5, h5 + h6{
+	margin: 0;
+}
+div.bar form{
+ display: inline;
+ float: none;
+ text-align: center;
+}
+ /*
+  * secondary headers as log items
+  */
+div.item h3{
+background-color: #ffffcc;
+}
+
+div.item  h4{
+background-color: #ffeebb;
+}
+
+div.item  h5{
+background-color: #eeeeee;
+}
+
+div.item h6{
+background-color: #ffffff;
+}
+/* Form styles
+ */
+
+/** div.block form.transition, div.wideblock form.transition {
+	 border-radius: 15px;
+     padding: 5px;
+     border: solid black;
+}
+*/
+
+/* In this style put padding round entire form
+ */
+body > div.block > form, body > div.wideblock > form{
+  border-style: solid;
+  border-color: black;	
+  padding: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  width: auto;
+  min-width: 650px;
+}
+
+body > div.block > form.button {
+	border-style: none;
+}
+
+/** just action buttons
+ */
+body > div.block > form.view {
+	width: auto;
+	margin-left: var(--content-h-margin);
+	margin-right: var(--content-h-margin);
+	padding: 0;
+}
+table.form tr {
+        width: inherit;
+}
+table.form td , table.form th {
+	padding: 0;
+	border-style: none;
+}
+
+table.form{
+	border-spacing: 0;
+}
+
+div.block form table.form {
+	border-style: none;
+	 background-color: var(--form-content-bg-color);
+	 padding: 0;
+    table-layout: auto;
+}
+
+form.transition .action_buttons, form .action_buttons{
+    margin-top: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 5px;
+	border: none;
+	 background-color: var(--form-content-bg-color);
+	 padding: 10px;
+}
+
+div td.button{
+	background-color: #fff;
+}
+div.action_buttons {
+	 background-color: var(--form-content-bg-color);
+	  padding: 5px;
+	  border-color: var(--form-border-color);
+}
+
+.input_button{
+	border-radius: 4px;
+  padding: 3px;
+}
+
+:disabled, .disabled, .input_button:disabled, .input_button.disabled{
+	color: white;
+	background-color: grey;
+}
+form.transition table.form, table.form {
+	background-color: black;
+	padding: 0;
+}
+
+
+/* put links into selected pallete */
+a:link {
+	color: var(--button-bg-color);
+}
+
+a:visited {
+	color: #983010;
+}
+
+/* fix image size in top level menu */
+.nav > ul > li > a > img {
+	height: 50px;
+	margin-left: 10px;
+}
+
+.nav > ul {
+  padding-bottom: 1px;
+  border-bottom-style: solid;
+  border-bottom-width: 5px;
+  border-bottom-color: #0d8040;
+}
+/* This ensures room for menu wrapped to 2 rows 
+ */ 
+div.nav {
+  margin-bottom: var(--menu-height);
+}
+

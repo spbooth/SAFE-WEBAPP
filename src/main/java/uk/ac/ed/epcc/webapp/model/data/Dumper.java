@@ -20,7 +20,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -42,6 +41,11 @@ import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 /** Class to dump {@link DataObject}s to files.
  * 
  * Mostly this works at the {@link Repository} level 
+ * 
+ * If field renaming is in place the dump used the database field not the tag used by the code.
+ * This allows tests to be written with renames in place. The dump parser will look for a renamed field if it can't 
+ * find the code-tag. Note that undump creates a table using the normal code so if renames are applied duringtable creation an
+ * undump can generate a renamed repository 
  * 
  * References are followed and the dependencies dumped in a depth-first order as well so that
  * self-consistant subsets of data can be extracted.

@@ -22,6 +22,8 @@ import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.forms.ParseAbstractInputTestCase;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
 
 /**
  * @author spb
@@ -122,5 +124,15 @@ good.add("ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDXA9/mz912d721UhE0bP5othL0sqWrG6
 				"m4Vjx7bS+Dyqn+PlPrWH/fjs1957fe57gtZ9eM2S0lsv5cagcWghPAZP",
 				input.getValue()
 				);
+	}
+	
+	@Test
+	public void testGoodValidate() throws PublicKeyParseException, ValidateException {
+		 AuthorizedKeyValidator x = new AuthorizedKeyValidator();
+		for(String g: getGoodData()) {
+			String dat = g.replaceAll("\\n", "");
+			PublicKeyReaderUtil.load(dat);
+			x.validate(dat);
+		}
 	}
 }

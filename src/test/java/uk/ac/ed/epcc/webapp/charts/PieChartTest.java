@@ -37,13 +37,14 @@ public void testPie() throws Exception{
 	  PeriodSetPlot plot = pie.addPieChart(8);
 	  loadData(pie, plot);
 	ChartData<?> c = pie.getChartData();
-	c.createPNG(new File(System.getProperty("java.io.tmpdir")+"/daypie"+".png"));
+	File pngfile = new File(System.getProperty("java.io.tmpdir")+"/daypie"+".png");
+	c.createPNG(pngfile);
 	  c.getSize();
 	  //pie.createSVG("/tmp/daypie2");
 	  Table t = pie.getTable();
 	  t.setKeyName("Day of week");
 	  checkTable(t);
 	  
-	  
+	  pngfile.delete();
   }
 }

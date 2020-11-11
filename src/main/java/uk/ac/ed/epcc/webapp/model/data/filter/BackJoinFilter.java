@@ -171,6 +171,8 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
 			sb.append(getClass().getSimpleName());
+			//sb.append("@");
+			//sb.append(getTarget().getSimpleName());
 			sb.append("(");
 			sb.append(link.toString());
 			if( fil != null ) {

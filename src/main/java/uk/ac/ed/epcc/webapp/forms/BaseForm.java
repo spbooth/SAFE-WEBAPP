@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.LockedInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.WrappingInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -59,7 +60,7 @@ public class BaseForm implements Form {
 
 	private LinkedHashMap<String,FormAction> actions;
     
-	protected Set<FormValidator> validators = new HashSet<>();
+	protected Set<FormValidator> validators = new LinkedHashSet<>();
 
 	private String form_id="form";
 	
@@ -214,8 +215,8 @@ public class BaseForm implements Form {
 		if( sel == null ){
 			return null;
 		}
-		if( sel instanceof LockedInput){
-			sel = ((LockedInput)sel).getNested();
+		if( sel instanceof WrappingInput){
+			sel = ((WrappingInput)sel).getNested();
 		}
 		if( sel instanceof ItemInput){
 			return ((ItemInput) sel).getItem();
@@ -292,6 +293,9 @@ public class BaseForm implements Form {
 		return  fields.get(key);
 	}
 
+	public final boolean hasField(String key) {
+		return fields.containsKey(key);
+	}
 	/**
 	 * get an iterator over the field names
 	 * 
@@ -403,7 +407,7 @@ public class BaseForm implements Form {
 	 * @param key
 	 */
 	@Override
-	public void removeField(Object key) {
+	public void removeField(String key) {
 		fields.remove(key);
 	}
 
@@ -421,7 +425,10 @@ public class BaseForm implements Form {
 			String key = it.next();
 
 			if (m.containsKey(key) ) {
-				put(key, m.get(key));
+				Object value = m.get(key);
+				if( value != null ) {
+					put(key, value);
+				}
 			}
 
 		}
@@ -477,45 +484,55 @@ public class BaseForm implements Form {
     	StringBuilder sb = new StringBuilder();
     	for(Iterator<String> it = getFieldIterator(); it.hasNext();){
     		String key=it.next();
-    	    Field f = getField(key);
-    		Input i = f.getInput();
-    		String label = f.getLabel();
-    		Object val = i.convert(m.get(key));
-    		
-    		Object my_val = i.getValue();
-    		String my_text="null";
-    		if( my_val != null ){
-    			my_text = i.getPrettyString(my_val);
-    		}
-    		if( val == null){
-    			if(my_val != null ){
-    				if( my_text.contains("\n")){
-    					sb.append(label);
-    					sb.append(": updated\n");
-    				}else{
-    					sb.append(label);
-    					sb.append(": =");
-    					sb.append(my_text);
-    					sb.append("\n");
+    		// assume that a transition from null will have a key entry but null stored in the map
+    		// if the map has no entry for the key we don't need to report
+    		if( m.containsKey(key)) {
+    			Field f = getField(key);
+    			Input i = f.getInput();
+    			String label = f.getLabel();
+    			Object val = i.convert(m.get(key));
+
+    			Object my_val = i.getValue();
+    			String my_text="null";
+    			if( my_val != null ){
+    				my_text = i.getPrettyString(my_val);
+    				if( my_text == null) {
+    					my_text="";
     				}
     			}
-    		}else{
-    			String text= i.getPrettyString(val);
-    			if( ! val.equals(my_val) ){
-    				if( val.equals("") && my_val == null ){
-    					// acceptable substitution
-    				}else{
-    				if( text.contains("\n") || my_text.contains("\n")){
-    					sb.append(label);
-    					sb.append(": updated\n");
-    				}else{
-    					sb.append(label);
-    					sb.append(": ");
-    					sb.append(text);
-    					sb.append("->");
-    					sb.append(my_text);
-    					sb.append("\n");
+    			if( val == null){
+    				if(my_val != null ){
+    					if(  my_text.contains("\n")){
+    						sb.append(label);
+    						sb.append(": updated\n");
+    					}else{
+    						sb.append(label);
+    						sb.append(": =");
+    						sb.append(my_text);
+    						sb.append("\n");
+    					}
     				}
+    			}else{
+    				String text= i.getPrettyString(val);
+    				if( text == null) {
+    					text="";
+    				}
+    				if( ! val.equals(my_val) ){
+    					if( val.equals("") && my_val == null ){
+    						// acceptable substitution
+    					}else{
+    						if(  text.contains("\n") || my_text.contains("\n")){
+    							sb.append(label);
+    							sb.append(": updated\n");
+    						}else{
+    							sb.append(label);
+    							sb.append(": ");
+    							sb.append(text);
+    							sb.append("->");
+    							sb.append(my_text);
+    							sb.append("\n");
+    						}
+    					}
     				}
     			}
     		}

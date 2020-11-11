@@ -28,7 +28,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -255,6 +254,20 @@ public class Emailer {
 		doSend(templateMessage(req.getEmail(), null, email_template));
 
 	}
+	public void newRemoteHostLogin(AppUser person, String host) throws Exception {
+		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("new_login_location.txt");
+		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+		email_template.setProperty("person.name", person.getName());
+		email_template.setProperty("person.email", person.getEmail());
+		email_template.setProperty("login.location", host);
+		email_template.setProperty("login.time", time.getCurrentTime());
+		AppUserFactory<?> fac = person.getFactory();
+		PasswordAuthComposite comp = fac.getComposite(PasswordAuthComposite.class);
+		
+		email_template.setRegionEnabled("ChangePassword", comp != null && comp.canResetPassword(person));
+		
+		doSend(templateMessage(person, null, email_template));
+	}
 	/**
 	 * Notify user their password has been changed.
 	 * 
@@ -330,7 +343,7 @@ public class Emailer {
 		email_template.setProperty("person.password", new_password);
 		String email = person.getEmail();
 		if( email == null){
-			getLogger().error("Signup email destination not known "+person.getIdentifier());;
+			getLogger().error("Signup email destination not known "+person.getIdentifier());
 			return;
 		}
 		email_template.setProperty("person.email", email);
@@ -342,10 +355,39 @@ public class Emailer {
 				email_template.setRegionEnabled("password_value.region", false);
 				email_template.setProperty("password_reset.tag", request.getTag());
 			}
-			
+			// The user needs the password info so we want to see any send exceptions
+			doSendNow(templateMessage(person,email_template));
+		}else {
+			doSend(templateMessage(person,email_template));
 		}
-		doSend(templateMessage(person,email_template));
 
+	}
+	public void notificationEmail(AppUser person, Set<String> notices) throws Exception {
+		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("update_notices.txt");
+		String name = person.getName();
+		if( name == null || name.trim().length() == 0){
+			name = "User";
+		}
+		email_template.setProperty("person.name", name);
+		StringBuilder text = new StringBuilder();
+		boolean seen=false;
+		for(String s : notices) {
+			if( seen ) {
+				text.append("\n");
+			}
+			text.append("* ");
+			text.append(s);
+			seen=true;
+		}
+		email_template.setProperty("person.notices", text.toString());
+		String email = person.getEmail();
+		if( email == null){
+			getLogger().error("Notification email destination not known "+person.getIdentifier());;
+			return;
+		}
+		email_template.setProperty("person.email", email);
+		
+		doSend(templateMessage(person,email_template));
 	}
 	public MimeMessage templateMessage(String sendto, Hashtable h,
 			TemplateFile email_template) throws IOException, MessagingException, InvalidArgument {
@@ -532,7 +574,7 @@ public class Emailer {
 				m.setRecipients(RecipientType.BCC,(Address[]) null);
 				m.saveChanges();
 			}else{
-				// apply blacklist pattern
+				// apply ban-list pattern
 				LinkedHashSet<Address> use_address = new LinkedHashSet<>();
 				for(Address a :  recipients){
 					if( ! supressSend(a)){
@@ -616,7 +658,9 @@ public class Emailer {
 		if( email_template.isEmpty()) {
 			throw new InvalidArgument("Empty template");
 		}
-		
+		if( notify_emails == null || notify_emails.length == 0) {
+			throw new InvalidArgument("No recipients specified");
+		}
 		//		 Set a lot of standard properties from init parameters
 		email_template.setProperties(conn.getInitParameters("service."));
 		email_template.setProperties(conn.getInitParameters("email."));
@@ -1107,10 +1151,12 @@ public class Emailer {
 		if( e != null ) {
 			PrintWriter printWriter = new PrintWriter(stackTraceWriter,true);
 			e.printStackTrace(printWriter);
+			printWriter.flush();
 			Throwable rc = e.getCause();
 			while(rc != null && buf.length() < max_trace){
 				printWriter.println("Caused by:");
 				rc.printStackTrace(printWriter);
+				printWriter.flush();
 				rc = rc.getCause();
 			}
 			printWriter.flush();
@@ -1278,9 +1324,7 @@ public class Emailer {
 	}
 
 	public static boolean checkAddressList(String list) {
-		StringTokenizer st = new StringTokenizer(list,",",false);
-    	while(st.hasMoreTokens()){
-             String s = st.nextToken();
+		for(String s : list.split("\\s*,\\s*")) {
              if(! checkAddress(s)){
             	 return false;
              }

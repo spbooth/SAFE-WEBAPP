@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -56,6 +57,9 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 public class DataBaseHandlerService implements Contexed, AppContextService<DataBaseHandlerService>{
 	public static final Feature CLEAR_DATABASE = new Feature("clear_database", false, "Is the clear database feature enabled");
 	public static final Feature COMMIT_ON_CREATE = new Feature("database.commit_on_create_table", false, "Add explicit commit on table modify (will be effective commit anyway)");
+	
+	// Hook for tests if this attribute is in the AppContext then properties are not added
+	public static final String NO_PROPS_ATTR = "NoPropertiesAdded";
     private AppContext conn;
     public DataBaseHandlerService(AppContext c){
     	conn=c;
@@ -108,6 +112,21 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
     	}
     }
   
+	/** Create a database table based on a {@link TableSpecification}
+	 * 
+	 * The {@link TableSpecification} can be augmented by properties
+	 * starting with <b>create_table.<i>table-name</i></b> using
+	 * {@link TableSpecification#setFromParameters(AppContext, String, java.util.Map).
+	 * 
+	 * In addition fields can be renamed by setting <b>create_table.rename_field.<i>table</i>.<i>field</i>=<i>new-field</i></b>
+	 * This is usually only necessary for unit tests and will have to be combined with <b>rename.<i>new-field</i>=<i>field</i></b>
+	 * so the {@link Repository} maps the field back to the expected name. 
+	 * 
+	 * 
+	 * @param name
+	 * @param orig
+	 * @throws DataFault
+	 */
     public void createTable(String name, TableSpecification orig) throws DataFault{
     	TableSpecification s = new TableSpecification(orig);
     	// look for config overrides to specification
@@ -136,18 +155,26 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 				stmt.executeUpdate();
 			}
     		//TODO have SQLContext do this as some may use foreign keys
-    		ConfigService serv = conn.getService(ConfigService.class);
-    		for(String field_name : s.getFieldNames()){
-    			FieldType type = s.getField(field_name);
-    			if( type instanceof ReferenceFieldType){
-    				try{
-    					serv.setProperty("reference."+name+"."+field_name, Repository.TableToTag(conn,((ReferenceFieldType)type).getRemoteTable()));
-    				}catch(UnsupportedOperationException e){
-    					log.debug("set property not supported",e);
-    					break;
-    				}
-    			}
-    		}
+			if( ! conn.hasAttribute(NO_PROPS_ATTR)) {
+				ConfigService serv = conn.getService(ConfigService.class);
+				Properties prop = serv.getServiceProperties();
+				for(String field_name : s.getFieldNames()){
+					FieldType type = s.getField(field_name);
+					if( type instanceof ReferenceFieldType){
+						try{
+							
+							String prop_name = "reference."+name+"."+field_name;
+							if( prop.getProperty(prop_name) == null ) {
+								// don't replace an existing value
+								serv.setProperty(prop_name, Repository.TableToTag(conn,((ReferenceFieldType)type).getRemoteTable()));
+							}
+						}catch(UnsupportedOperationException e){
+							log.debug("set property not supported",e);
+							break;
+						}
+					}
+				}
+			}
     	}catch(SQLException e) {
     		db_service.handleError("Failed to create table using "+text,e);
     	}catch(Exception e){
@@ -181,9 +208,10 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 		vis.visitAutoIncrement();
 		sb.append(",\n");
 		for(String s2: s.getFieldNames()){
+			String field_name = rename(name, s2);
 			FieldType field = s.getField(s2);
 			if( ! ( field instanceof PlaceHolderFieldType)){
-				c.quote(sb,s2);
+				c.quote(sb,field_name);
 				sb.append(" ");
 				field.accept(vis);
 				sb.append(",\n");
@@ -197,7 +225,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 			IndexType i1 = it.next();
 			if( vis.useIndex(i1)){
 				sb.append(",\n");
-				i1.accept(vis);
+				i1.accept(n -> rename(name,n),vis);
 			}
 		}
 		for(String s1 : s.getFieldNames()){
@@ -211,6 +239,10 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
  		vis.additions(true);
  		String text=sb.toString();
 		return text;
+	}
+
+	protected String rename(String name, String s2) {
+		return getContext().getInitParameter("create_table.rename_field."+name+"."+s2, s2);
 	}
 	public void updateTable(Repository res, TableSpecification orig) throws DataFault{
     	TableSpecification s = new TableSpecification(orig);

@@ -55,6 +55,10 @@ public class FieldValuePatternArgument<T,X> implements PatternArgument {
 	public String getField() {
 		return field.getFieldName();
 	}
+	
+	public FieldValue<T,X> getFieldValue(){
+		return field;
+	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument#getArg()

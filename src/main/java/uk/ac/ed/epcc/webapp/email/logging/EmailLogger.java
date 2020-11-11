@@ -36,7 +36,7 @@ public class EmailLogger implements Logger {
      * @param t
      */
     public void email(LogLevels level,Object message, Throwable t){
-    	serv.emailError(LogLevels.Error,t, message.toString());
+    	serv.emailError(level,t, message.toString());
     }
 	
 	public void debug(Object message) {

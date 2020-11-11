@@ -13,7 +13,9 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.lifecycle;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.model.AbstractConstructedTargetList;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -71,7 +73,23 @@ public class ListenerList<T extends DataObject> extends AbstractConstructedTarge
 			l.action(target);
 		}
 	}
-	
+	@Override
+	public Object getWarning(T target) {
+		Set result = null;
+		for( ActionListener l : this) {
+			Object o = l.getWarning(target);
+			if( o != null) {
+				if( result == null ) {
+					result = new LinkedHashSet<>();
+				}
+				result.add(o);
+			}
+		}
+		if( result != null && result.size() == 1) {
+			return result.iterator().next();
+		}
+		return result;
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.lifecycle.LifeCycleListener#prepare(java.lang.Object)
 	 */

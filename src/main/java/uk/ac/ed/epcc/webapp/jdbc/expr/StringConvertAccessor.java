@@ -45,14 +45,7 @@ public class StringConvertAccessor<T,R> implements Accessor<String,R> {
 	    }
 		return null;
 	}
-	public boolean canSet() {
-		
-		return false;
-	}
-	public void setValue(R r, String value) {
-		throw new UnsupportedOperationException("Set not supported");
-		
-	}
+	
     @Override
 	public String toString(){
     	StringBuilder sb = new StringBuilder();

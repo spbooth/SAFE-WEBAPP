@@ -1,0 +1,94 @@
+:root {
+  --main-bg-color: #ffffff;
+  --notice-bg-color: #ffcccc;
+  --warn-bg-color: #ffb3b3;
+  --warn-color: black;
+  --highlight-bg-color: #ffffcc;
+  --highlight-hover-bg-color: #ffeecc;
+  --content-bg-color: #cccccc;
+  --table-bg-color: #cccccc;
+  --content-border-color: #cccccc;
+  --header-border-color: #cccccc;
+  --bar-bg-color: #cccccc;
+  --bar-text-color: #000000;
+  --paragraph-bg-color: #e7e7e7;
+  --list-bg-color: #e7e7e7;
+  --table-bg-color: #cccccc;
+  --table-border-color: #e7e7e7;
+  --button-bg-color: #e7e7e7;
+  --button-color: black;
+  --th-color: black;
+  --th-bg-color: #e7e7e7;
+  --form-border-color: #e7e7e7;
+  --table-border-color: #e7e7e7;
+  --th-hover-bg-color: #f3f3f3;
+  --form-bg-color: #cccccc;
+  --form-content-bg-color: #cccccc;
+  --form-hover-bg-color: #dddddd;
+  --menu-bg-color: #000000;
+  --menu-text-color: #ffffff;
+  --menu-border-color: #888;
+  --menu-hover-bg-color: #444444;
+  --menu-hover-text-color: #ff4040;
+  --block-radius: 15px;
+  --block-v-padding: 10px;
+  --block-h-padding: 10px;
+  --block-v-margin: 20px;
+  --heading-pre-space: 8px;
+  --content-h-margin: 0px;
+  --content-width: 100%;
+  --menu-bg-has-role: #060;
+  --menu-bg-missing-role: #600;
+}
+
+
+/* we use three levels of header as standard 
+ * h1 or h2 is the top level header in a block
+ * h3 is a secondary header or a header in a div.bar
+ * h4 is a smaller header for subdivisions.
+*/
+
+h1, h2, h3, h4, h5, h6 {
+	font-size: 110%;
+	color: black;
+    text-align: left;
+    line-height: normal;
+    
+    padding: 4px;
+}
+
+h1, h2{
+	margin: 8px 0px 0px 0px;
+}
+h3, h4, h5, h6 {
+	margin: 0;
+}
+ /*
+  * secondary header in a block
+  */
+div h3{
+background-color: #ffffcc;
+}
+
+div h4{
+background-color: #ffeebb;
+}
+
+div h5{
+background-color: #eeeeee;
+}
+
+div h6{
+background-color: #ffffff;
+}
+/* Form styles
+ */
+ 
+
+:disabled, .disabled, .input_button:disabled, .input_button.disabled{
+	color: gray;
+}
+
+.lightgrey{
+	background-color: #e7e7e7;
+}

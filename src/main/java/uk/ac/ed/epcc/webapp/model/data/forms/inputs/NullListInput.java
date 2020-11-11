@@ -23,7 +23,9 @@ import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
+import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
@@ -32,6 +34,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.SQLMatcher;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 /** This is a wrapper round some other class that implements ListInput intended to
  * add a null-value option to the list. This is for use in SQLFormFilters to allow for null fields to be searched for
  * The null-value entry corresponds to -1 so the internal input must not support that value.
@@ -72,7 +75,7 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 	}
 	@Override
 	public int getCount(){
-		return internal.getCount();
+		return internal.getCount()+1;
 	}
 
 	@Override
@@ -249,6 +252,29 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		
 	}
 	
-	
+	/** wrap any Selector with a compatible inptu
+	 * 
+	 * @param <T>
+	 * @param s
+	 * @return
+	 */
+	public static  Selector getSelector(Selector s){
+		if( s == null) {
+			return null;
+		}
+		return new Selector() {
+
+			@Override
+			public Input getInput() {
+				Input input = s.getInput();
+				if( input != null && input instanceof ListInput && input instanceof IntegerInput){
+					return new NullListInput((ListInput) input);
+				}
+				return input;
+			}
+			
+		};
+				
+	}
 
 }

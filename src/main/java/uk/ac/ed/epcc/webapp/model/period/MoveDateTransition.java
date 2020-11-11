@@ -165,7 +165,7 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 			if( min_date == null || min_date.before(limit)) {
 				min_date = limit;
 			}
-			if( max_date.before(min_date)) {
+			if( max_date != null && max_date.before(min_date)) {
 				throw new TransitionException("No valid moves");
 			}
 		}

@@ -82,8 +82,9 @@ BoundedInputInterfaceTest<Date, TimeStampMultiInput, TimeStampMultiInputTestCase
 	 */
 	@Override
 	public TimeStampMultiInput getInput() throws Exception {
-		TimeStampMultiInput input = new TimeStampMultiInput();
+		
 		Calendar c = Calendar.getInstance();
+		TimeStampMultiInput input = new TimeStampMultiInput(c.getTime());
 		c.add(Calendar.YEAR,-1);
 		input.setMinDate(c.getTime());
 		c.add(Calendar.YEAR,2);

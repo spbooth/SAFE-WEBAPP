@@ -28,6 +28,7 @@ public class LandingPageVisitor implements Visitor{
 	private final HtmlBuilder builder;
 	private boolean active=false;
 	private boolean list_only=false;
+	private int header_level=1;
 	public boolean isListOnly() {
 		return list_only;
 	}
@@ -73,7 +74,7 @@ public class LandingPageVisitor implements Visitor{
 			if( ! list_only) {
 				builder.open("div");
 				builder.attr("class","block");
-				builder.addHeading(2, node.getMenuText(conn));
+				builder.addHeading(header_level, node.getMenuText(conn));
 			}
 		}else{
 			if(active ){
@@ -102,6 +103,10 @@ public class LandingPageVisitor implements Visitor{
 						builder.attr("alt", node.getMenuText(conn));
 						builder.attr("title", node.getMenuText(conn));
 						builder.close();
+						String post = node.getPostImageText();
+						if( post != null && ! post.isEmpty()) {
+							builder.clean(post);
+						}
 					}
 					builder.close();
 				}else{

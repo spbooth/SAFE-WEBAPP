@@ -19,12 +19,14 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.jdbc.MysqlSQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.FullTextIndex;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexField;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
@@ -169,7 +171,7 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 		sb.append("LONGBLOB");
 		use_memory=false;
 	}
-	public void visitIndex(Index idx) {
+	public void visitIndex(UnaryOperator<String> name_map,Index idx) {
 		if( idx.getUnique()){
 			sb.append("UNIQUE ");
 		}
@@ -181,13 +183,22 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 			sb.append(" ");
 		}
 		sb.append("(");
-		for(Iterator<String> it = idx.getindexNames();it.hasNext();){
-			String name=it.next();
+		for(Iterator<IndexField> it = idx.getindexNames();it.hasNext();){
+			IndexField f = it.next();
+			String name=f.name;
+			if( name_map != null ) {
+				name = name_map.apply(name);
+			}
 			if(seen){
 				sb.append(",");
 			}
 			seen=true;
 			ctx.quote(sb,name);
+			if( f.length > 0 ) {
+				sb.append("(");
+				sb.append(Integer.toString(f.length));
+				sb.append(")");
+			}
 		}
 		sb.append(")");
 		
@@ -207,7 +218,7 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 				// Try to make referenced factory.
 				// This is to ensure the referenced table is auto-created before the
 				// current one (in case we have a foreign key)
-				conn.makeContexedObject(DataObjectFactory.class, tag);
+				conn.makeObject(DataObjectFactory.class, tag);
 			}catch(Exception t){
 				conn.getService(LoggerService.class).getLogger(getClass()).error("Problem making referenced facory for "+tag);
 			}
@@ -234,7 +245,7 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.table.FieldTypeVisitor#visitFullTextIndex(uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.FullTextIndex)
 	 */
-	public void visitFullTextIndex(FullTextIndex idx) {
+	public void visitFullTextIndex(UnaryOperator<String> name_map,FullTextIndex idx) {
 		boolean seen=false;
 		sb.append("FULLTEXT INDEX ");
 		String iname=idx.getName();
@@ -243,13 +254,22 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 			sb.append(" ");
 		}
 		sb.append("(");
-		for(Iterator<String> it = idx.getindexNames();it.hasNext();){
-			String name=it.next();
+		for(Iterator<IndexField> it = idx.getindexNames();it.hasNext();){
+			IndexField f = it.next();
+			String name=f.name;
+			if( name_map != null ) {
+				name = name_map.apply(name);
+			}
 			if(seen){
 				sb.append(",");
 			}
 			seen=true;
 			ctx.quote(sb,name);
+			if( f.length > 0 ) {
+				sb.append("(");
+				sb.append(Integer.toString(f.length));
+				sb.append(")");
+			}
 		}
 		sb.append(")");
 		if( FORCE_MYISAM_ON_FULLTEXT_FEATURE.isEnabled(ctx.getContext())) {

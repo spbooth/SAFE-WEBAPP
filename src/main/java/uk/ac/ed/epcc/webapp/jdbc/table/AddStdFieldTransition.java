@@ -27,6 +27,9 @@ public class AddStdFieldTransition<T extends DataObjectFactory> extends AddField
 	protected void addFormParams(Form f, T target, AppContext c) {
 		TableSpecification spec = target.getTableSpecification();
 		if( spec != null) {
+			// use spec augemented by config
+			String prefix ="create_table."+target.getTag()+".";
+	    	spec.setFromParameters(c,prefix, c.getInitParameters(prefix));
 			Repository res = getRepository(target);
 			f.addInput(FIELD_FORMFIELD, "Field to add", new OptionalFieldInput<>(res,true,  spec.getStdFields()));
 		}

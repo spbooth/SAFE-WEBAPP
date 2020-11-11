@@ -48,7 +48,7 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    public FilterUpdate(Repository r){
 	    	res=r;
 	    }
-		/** Update t a constant value
+		/** Update a field to a constant value
 		 * 
 		 * This can update any {@link FieldValue} including references because
 		 * {@link FieldValue} knows how to add its target type to a statement
@@ -56,10 +56,23 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 		 * @param target {@link FieldValue}
 		 * @param value
 		 * @param my_filter
-		 * @return
+		 * @return number of records updated.
 		 * @throws DataFault
 		 */
 	    public <R> int update(FieldValue<R,T> target, R value,SQLFilter<T> my_filter) throws DataFault{
+	    	return update(my_filter, new FieldValuePatternArgument<R,T>(target, value));
+	    }
+	    /** Update multiple fields to a constant values
+		 * 
+		 * This can update any {@link FieldValue} including references because
+		 * {@link FieldValue} knows how to add its target type to a statement
+		 * 
+		 * @param my_filter
+		 * @param args {@link FieldValuePatternArgument}s for each update
+		 * @return number of records updated.
+		 * @throws DataFault
+		 */	
+	    public  int update(SQLFilter<T> my_filter, FieldValuePatternArgument<?,T> ... args) throws DataFault {
 	    	if( isEmpty(my_filter)){
 	    		return 0;
 	    	}
@@ -67,13 +80,22 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    	sql.append("UPDATE ");
 	    	res.addSource(sql, true);
 	    	sql.append(" SET ");
-	    	target.add(sql, false);
-	    	sql.append("=?");
+	    	boolean seen=false;
+	    	for(FieldValuePatternArgument<?,T> a : args) {
+	    		if( seen ) {
+	    			sql.append(",");
+	    		}
+	    		a.getFieldValue().addField(sql, false);
+	    		sql.append("=? ");
+	    		seen=true;
+	    	}
+	
+	    	
 	    	
 	    	if( my_filter != null ){
 	    		HashSet<Repository> tables = new HashSet<>();
 		    	tables.add(res);
-	    		sql.append(" WHERE ");
+	    		sql.append("WHERE ");
 	    		makeWhere(tables,my_filter, sql, false);
 	    	}
 	    	SQLContext sqlContext = res.getSQLContext();
@@ -81,7 +103,9 @@ public class FilterUpdate<T> extends FilterSelect<T> {
 	    	try(PreparedStatement stmt=sqlContext.getConnection().prepareStatement(
     				sql.toString())){
 	    		List<PatternArgument> list = new LinkedList<>();
-				list.add(new FieldValuePatternArgument<>(target, value));
+	    		for(FieldValuePatternArgument<?,T> a : args) {
+	    			list.add(a);
+	    		}
 	    		
 				list = getFilterArguments(my_filter, list);
 	    		setParams(1, sql, stmt, list);

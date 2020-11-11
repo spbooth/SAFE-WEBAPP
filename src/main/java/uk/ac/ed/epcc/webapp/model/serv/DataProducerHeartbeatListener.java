@@ -21,6 +21,8 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener;
+import uk.ac.ed.epcc.webapp.model.cron.LockFactory;
+import uk.ac.ed.epcc.webapp.model.cron.LockFactory.Lock;
 
 /** A {@link HeartbeatListener} that runs {@link DataObjectDataProducer#clean()} once a day.
  * This defaults to cleaning the default producer but this can be customised by putting a comma seperated list of
@@ -34,26 +36,58 @@ public class DataProducerHeartbeatListener extends AbstractContexed implements H
 	public DataProducerHeartbeatListener(AppContext conn) {
 		super(conn);
 	}
-	private Date next_run=null;
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener#run()
 	 */
 	@Override
 	public Date run() {
-		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
-		Date now = time.getCurrentTime();
-		if( next_run == null || next_run.before(now)){
-			String tags = getContext().getInitParameter("data_producer.clean_tags",ServeDataProducer.DEFAULT_SERVE_DATA_TAG);
-			for(String tag : tags.split("\\s*,\\s*")){
-				DataObjectDataProducer prod = new DataObjectDataProducer(getContext(), tag);
-				if( prod != null ){
-					prod.clean();
+		try {
+			LockFactory lock_f = new LockFactory(getContext());
+			Lock lock = lock_f.makeFromString("DataProducerHeartbeatListener");
+			Calendar cal = Calendar.getInstance();
+			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+			Date now = time.getCurrentTime();
+
+			if( lock.isLocked()) {
+				Date d = lock.wasLockedAt();
+				cal.setTime(d);
+				cal.add(Calendar.HOUR,1);
+				if(now.after(cal.getTime())) {
+					getLogger().error(lock.getName()+" locked since "+d);
+				}
+				return null;
+			}
+			Date lastLocked = lock.lastLocked();
+			if( lastLocked != null ) {
+				cal.setTime(lastLocked);
+				cal.add(Calendar.DAY_OF_YEAR,1);
+				Date target = cal.getTime();
+				if( target.after(now)) {
+					return target;
 				}
 			}
-			Calendar cal = Calendar.getInstance();
-			cal.add(Calendar.DAY_OF_YEAR, 1);
-			next_run = cal.getTime();
+		
+			if( lock.takeLock()) {
+				try {
+
+					String tags = getContext().getInitParameter("data_producer.clean_tags",ServeDataProducer.DEFAULT_SERVE_DATA_TAG);
+					for(String tag : tags.split("\\s*,\\s*")){
+						DataObjectDataProducer prod = new DataObjectDataProducer(getContext(), tag);
+						if( prod != null ){
+							prod.clean();
+						}
+					}
+				}finally {
+					lock.releaseLock();
+				}
+				cal.setTime(now);
+				cal.add(Calendar.DAY_OF_YEAR, 1);
+				return cal.getTime();
+			}
+			return null;
+		}catch(Exception e) {
+			getLogger().error("Error in DataProducerHeartbeatistener", e);
+			return null;
 		}
-		return next_run;
 	}
 }

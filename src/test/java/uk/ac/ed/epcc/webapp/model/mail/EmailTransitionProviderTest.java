@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -51,6 +52,12 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		return setupPerson("dummy@example.com");
 	}
 	
+	public LinkedList<String> getPath(int id){
+		LinkedList<String> path = new LinkedList<String>();
+		path.add(Integer.toString(id));
+		return path;
+	}
+	
 	@Test
 	public void testCreateEmail() throws Exception{
 		setupPerson();
@@ -70,7 +77,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		SessionService user  = setupPerson();
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
-		MessageHandler hand = fac.getHandler(1,user);
+		MessageHandler hand = fac.getHandler(getPath(1),user);
 		LinkedList<String> path = new LinkedList<>();
 		path.add("Subject");
 		MailTarget target = new MailTarget(hand,0,path);
@@ -80,7 +87,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		addParam("text","to change");
 		runTransition();
 		checkDiff("/cleanup.xsl","subject_edit.xml");
-		target = new MailTarget(fac.getHandler(1,user));
+		target = new MailTarget(fac.getHandler(getPath(1),user));
 		checkViewRedirect(prov,target);
 		target = (MailTarget) checkViewContent("/normalize.xsl","view_change_subject.xml");
 		assertEquals("to change",fac.find(1).getMessage().getSubject());
@@ -95,7 +102,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		SessionService user  = setupPerson();
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
-		MessageHandler hand = fac.getHandler(1,user);
+		MessageHandler hand = fac.getHandler(getPath(1),user);
 		LinkedList<String> path = new LinkedList<>();
 		MailTarget target = new MailTarget(hand,0,path);
 		takeBaseline();
@@ -104,7 +111,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		addParam("text","boris@example.xcom");
 		setAction(EditAction.AddCC.toString());
 		runTransition();
-		target = new MailTarget(fac.getHandler(1,user));
+		target = new MailTarget(fac.getHandler(getPath(1),user));
 		checkViewRedirect(prov,target);
 		target = (MailTarget) checkViewContent("/normalize.xsl","view_add_recipient.xml");
 		checkDiff("/cleanup.xsl","add_recipient.xml");
@@ -116,7 +123,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		SessionService user  = setupPerson();
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
-		MessageHandler hand = fac.getHandler(1,user);
+		MessageHandler hand = fac.getHandler(getPath(1),user);
 		LinkedList<String> path = new LinkedList<>();
 		MailTarget target = new MailTarget(hand,0,path);
 		takeBaseline();
@@ -130,7 +137,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		w.close();
 		req.addPart(part);
 		runTransition();
-		target = new MailTarget(fac.getHandler(1,user));
+		target = new MailTarget(fac.getHandler(getPath(1),user));
 		checkViewRedirect(prov,target);
 		target = (MailTarget) checkViewContent("/normalize.xsl","view_add_attachment.xml");
 		checkDiff("/cleanup.xsl","add_attachment.xml");
@@ -143,7 +150,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		SessionService user  = setupPerson();
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
-		MessageHandler hand = fac.getHandler(1,user);
+		MessageHandler hand = fac.getHandler(getPath(1),user);
 		LinkedList<String> path = new LinkedList<>();
 		//path.add("0");
 		path.add("T");
@@ -153,7 +160,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		checkFormContent("/normalize.xsl","edit_text_form.xml");
 		addParam("text","Now is the winter of our discontent");
 		runTransition();
-		target = new MailTarget(fac.getHandler(1,user));
+		target = new MailTarget(fac.getHandler(getPath(1),user));
 		checkViewRedirect(prov,target);
 		target = (MailTarget) checkViewContent("/normalize.xsl","view_edit_text.xml");
 		checkDiff("/cleanup.xsl","edit_text.xml");
@@ -165,7 +172,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		SessionService user  = setupPerson();
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
-		MessageHandler hand = fac.getHandler(1,user);
+		MessageHandler hand = fac.getHandler(getPath(1),user);
 		LinkedList<String> path = new LinkedList<>();
 		//path.add("0");
 		path.add("T");
@@ -176,7 +183,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		String text = "Look a \u00f6 character";
 		addParam("text",text);
 		runTransition();
-		target = new MailTarget(fac.getHandler(1,user));
+		target = new MailTarget(fac.getHandler(getPath(1),user));
 		checkViewRedirect(prov,target);
 		target = (MailTarget) checkViewContent("/normalize.xsl","view_unicode_text.xml");
 		checkDiff("/cleanup.xsl","edit_text.xml");
@@ -191,7 +198,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		SessionService user  = setupPerson();
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
-		MessageHandler hand = fac.getHandler(1,user);
+		MessageHandler hand = fac.getHandler(getPath(1),user);
 		LinkedList<String> path = new LinkedList<>();
 		//path.add("0");
 		path.add("T");
@@ -201,7 +208,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		checkFormContent("/normalize.xsl","edit_text_form.xml");
 		addParam("text","Look a strange \r\nline break and unicode \u00f6");
 		runTransition();
-		target = new MailTarget(fac.getHandler(1,user));
+		target = new MailTarget(fac.getHandler(getPath(1),user));
 		checkViewRedirect(prov,target);
 		target = (MailTarget) checkViewContent("/normalize.xsl","view_broken_text.xml");
 		checkDiff("/cleanup.xsl","edit_broken_text.xml");
@@ -219,7 +226,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		SessionService user  = setupPerson();
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
-		MessageHandler hand = fac.getHandler(1,user);
+		MessageHandler hand = fac.getHandler(getPath(1),user);
 		LinkedList<String> path = new LinkedList<>();
 		MailTarget target = new MailTarget(hand,0,path);
 		takeBaseline();
@@ -240,7 +247,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 	
 		req.addPart(part);
 		runTransition();
-		target = new MailTarget(fac.getHandler(1,user));
+		target = new MailTarget(fac.getHandler(getPath(1),user));
 		checkViewRedirect(prov,target);
 		target = (MailTarget) checkViewContent("/normalize.xsl","view_add_email_attachment.xml");
 		checkDiff("/cleanup.xsl","add_email_attachment.xml");
@@ -252,7 +259,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		SessionService user  = setupPerson();
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
-		MessageHandler hand = fac.getHandler(1,user);
+		MessageHandler hand = fac.getHandler(getPath(1),user);
 		LinkedList<String> path = new LinkedList<>();
 		path.add("1");
 		
@@ -260,7 +267,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		takeBaseline();
 		setTransition(prov,EditAction.Quote,target);
 		runTransition();
-		target = new MailTarget(fac.getHandler(1,user));
+		target = new MailTarget(fac.getHandler(getPath(1),user));
 		checkViewRedirect(prov,target);
 		target = (MailTarget) checkViewContent("/normalize.xsl","view_quote.xml");
 		checkDiff("/cleanup.xsl","quote.xml");
@@ -272,7 +279,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		SessionService user  = setupPerson();
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
-		MessageHandler hand = fac.getHandler(1,user);
+		MessageHandler hand = fac.getHandler(getPath(1),user);
 		LinkedList<String> path = new LinkedList<>();
 		
 		
@@ -280,7 +287,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		takeBaseline();
 		setTransition(prov,EditAction.Merge,target);
 		runTransition();
-		target = new MailTarget(fac.getHandler(1,user));
+		target = new MailTarget(fac.getHandler(getPath(1),user));
 		checkViewRedirect(prov,target);
 		target = (MailTarget) checkViewContent("/normalize.xsl","view_merge.xml");
 		checkDiff("/cleanup.xsl","merge.xml");
@@ -292,7 +299,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		SessionService user  = setupPerson();
 		TestingMessageHandlerFactory<?> fac = new TestingMessageHandlerFactory(ctx,"TestMessage");
 		EmailTransitionProvider prov = new EmailTransitionProvider(fac);
-		MessageHandler hand = fac.getHandler(1,user);
+		MessageHandler hand = fac.getHandler(getPath(1),user);
 		LinkedList<String> path = new LinkedList<>();
 		
 		
@@ -300,7 +307,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		takeBaseline();
 		setTransition(prov,EditAction.Flatten,target);
 		runTransition();
-		target = new MailTarget(fac.getHandler(1,user));
+		target = new MailTarget(fac.getHandler(getPath(1),user));
 		checkViewRedirect(prov,target);
 		target = (MailTarget) checkViewContent("/normalize.xsl","view_flatten.xml");
 		checkDiff("/cleanup.xsl","flatten.xml");

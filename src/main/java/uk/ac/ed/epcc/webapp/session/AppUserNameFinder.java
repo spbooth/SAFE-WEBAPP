@@ -13,6 +13,9 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -25,11 +28,14 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 /** An {@link Composite} that implements the {@link NameFinder} logic for an {@link AppUserFactory}.
  * 
  * These are included by composition in the {@link AppUserFactory} allowing multiple name schemes to be supported at the same time.
- * {@link AppUserNameFinder}s where {@link #userVisible()} return false have to be explicitly requests and are not
+ * {@link AppUserNameFinder}s where {@link #userVisible()} return false have to be explicitly requested and are not
  * included in the {@link AppUserFactory} {@link NameFinder} implementation. 
- * 
+ * <p>
  * Though the normal operation of a {@link AppUserNameFinder} is to locate existing database records it is also possible to
  * to have it query an external directory and lazily create database records. 
+ * <p>
+ * Though a {@link AppUserNameFinder} normally only supports a single name per realm it can support
+ * many-to-one mappings for example Openid names where a user uses multiple identities.
  * 
  * @author spb
  * @param <AU> type of {@link AppUser}
@@ -47,7 +53,7 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 		super(factory);
 		if( realm.contains(".")){
 			// realm names should be unqualified so strip of any qualifying prefix.
-			realm=realm.substring(realm.lastIndexOf('.'));
+			realm=realm.substring(realm.lastIndexOf('.')+1);
 		}
 		this.realm=realm;
 	}
@@ -140,7 +146,17 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 		}
 	}
 
-	
+	/** Get all of the defined names for this realm.
+	 * Defaults to just the canonical name.
+	 * 
+	 * @param user
+	 * @return Set
+	 */
+	public Set<String> getAllNames(AU user){
+		Set<String> names = new LinkedHashSet<>();
+		names.add(getCanonicalName(user));
+		return names;
+	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#getType()

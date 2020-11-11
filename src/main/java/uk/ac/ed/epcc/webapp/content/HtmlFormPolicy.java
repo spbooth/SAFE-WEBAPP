@@ -130,13 +130,19 @@ public <I,T> void addFormLabel(ExtendedXMLBuilder sb,AppContext conn,Field<I> f,
 	Input<I> i = f.getInput();
 	boolean optional = f.isOptional();
 	if( HTML_USE_LABEL_FEATURE.isEnabled(conn)){
-		sb.open("label");
-		InputIdVisitor vis = new InputIdVisitor(f.getForm().getFormID());
+		
+		InputIdVisitor vis = new InputIdVisitor(conn,optional,f.getForm().getFormID());
 		vis.setRadioTarget(item);
 
-		String id =  (String) i.accept(vis);
+		String id =  vis.normalise((String) i.accept(vis));
 		if( id != null){
+			sb.open("label");
 			sb.attr("for",id);
+		}else {
+			// accessability testers don't like orphan labels as they
+			// confuse screen readers so revert to span if no id
+			// e.g. for locked input
+			sb.open("span");
 		}
 
 	}else{

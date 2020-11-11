@@ -1,0 +1,26 @@
+%%begin{Subject}%%
+[%%service.name%%] Login to %%service.website-name%% from new location
+%%end{Subject}%%
+Dear %%person.name%%,
+
+Your account on the %%service.name%% %%service.website-name%% has just been accessed 
+from a new IP address.
+
+Remote host:  %%login.location%%
+Access time:  %%login.time%%
+
+If this was not you, then your account may have been compromised.
+%%begin{ChangePassword}%%
+If you think this is the case, please go to 
+%%service.saf.url%% 
+and change your password.
+%%end{ChangePassword}%%
+
+If you have any questions or comments concerning the %%service.name%% Service,
+please do not hesitate to contact us.
+
+Regards,
+
+  The %%service.name%% Team
+  %%service.support.email%%
+

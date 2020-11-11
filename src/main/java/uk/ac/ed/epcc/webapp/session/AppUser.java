@@ -20,11 +20,17 @@
  */
 package uk.ac.ed.epcc.webapp.session;
 
+import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.model.IndexTableContributor;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Owned;
@@ -69,6 +75,8 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 	 * 
 	 * This will also disable forgotten password requests.
 	 * 
+	 * 
+	 * @see AppUserFactory#getCanLoginFilter()
 	 * @see #canReregister()
 	 * @return boolean true for permitted.
 	 */
@@ -181,6 +189,34 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 	public Date getLastTimeDetailsUpdated(){
 		return record.getDateProperty(UPDATED_TIME);
 	}
+	
+	/** Get the next date that personal details are required to be updated
+	 * 
+	 * @return Date or null
+	 */
+	public Date nextRequiredUpdate() {
+		return updatePlusOffset(getFactory().requireRefreshDays());
+	}
+	public boolean warnRequiredUpdate() {
+		Date w = updatePlusOffset(getFactory().warnRefreshDays());
+		if( w == null ) {
+			return false;
+		}
+		return getContext().getService(CurrentTimeService.class).getCurrentTime().after(w);
+	}
+	private Date updatePlusOffset(int offset) {
+		if( AppUserFactory.REQUIRE_PERSON_UPDATE_FEATURE.isEnabled(getContext())){
+			Date last  = getLastTimeDetailsUpdated();
+			if( last == null ){
+				return getContext().getService(CurrentTimeService.class).getCurrentTime();
+			}
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(last);
+			cal.add(Calendar.DAY_OF_YEAR,  offset);
+			return cal.getTime();
+		}
+		return null;
+	}
 	public void markDetailsUpdated(){
 		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 		record.setOptionalProperty(UPDATED_TIME, time.getCurrentTime());
@@ -248,9 +284,18 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 	/** Extension point for when updates to person state may need to be
 	 * notified to external parties.
 	 * 
-	 * @param extra
+	 * The field string is a tag to identify the type of update being notified.
+	 * This allows some degree of additional filtering in the sub-class.
+	 * Use the db field triggering the update where this makes sense and
+	 * pass the old/new values
+	 * @param <X> value type
+	 * 
+	 * @param field  type of update
+	 * @param extra  text of update
+	 * @param prev   previous value
+	 * @param curr   relacement value
 	 */
-	public void notifyChange(String extra) {
+	public <X> void notifyChange(String field, String extra, X prev, X curr) {
 		
 	}
 
@@ -283,6 +328,14 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 		}
 	}
 	
-	
+	/** Add this {@link AppUser} to an index table with rows keyed by {@link AppUser}.
+	 * 
+	 * @see AppUserFactory#getPersonTable(SessionService, uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter)
+	 * 
+	 * @param tab
+	 */
+	public void addIndexTable(Table tab) {
+		tab.put("Email", this, getEmail());
+	}
 	
 }

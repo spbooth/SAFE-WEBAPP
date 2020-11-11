@@ -50,8 +50,9 @@ public class Creator<BDO extends DataObject> extends DataObjectFormFactory<BDO> 
 	}
 	@Override
 	public void buildCreationForm(String type_name,Form f) throws Exception {
-		buildForm(f);
-		setAction(type_name,f);
+		if( buildForm(f) ) {
+			setAction(type_name,f);
+		}
 		customiseCreationForm(f);
 		for(TableStructureContributer comp : getFactory().getTableStructureContributers()){
 			if( comp instanceof CreateCustomizer){

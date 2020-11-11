@@ -37,11 +37,24 @@ public class TokenFieldValidator<A extends AppUser, T> implements FieldValidator
 	 */
 	@Override
 	public void validate(T data) throws FieldException {
-		boolean ok = comp.verify(user, data);
-		if( ! ok ) {
-			throw new ValidateException("Incorrect");
+		// Try to prevent brute-forcing by
+		// simultaneously posting multiple codes to the form.
+		synchronized (getClass()) {
+
+			boolean ok = comp.verify(user, data);
+			if( ! ok ) {
+				try {
+					long delay = comp.getContext().getLongParameter("twofactor.auth-delay", 500);
+					if( delay > 0L ) {
+						Thread.sleep(delay);
+					}
+				} catch (InterruptedException e) {
+
+				}
+				throw new ValidateException("Incorrect");
+			}
+			comp.authenticated();
 		}
-		comp.authenticated();
 	}
 	private final CodeAuthComposite<A, T> comp;
 	private final A user;

@@ -73,6 +73,10 @@ public class SUNodeMaker extends AbstractNodeMaker  {
 					n.setMenuText(prov.getText(key));
 					n.setHelpText(prov.getHelp(key));
 					n.setTargetPath(TransitionServlet.getURL(getContext(), prov,user,key));
+					if(((CurrentUserKey)key).notify(user)){
+						n.setDisplayClass("notify");
+						parent.setDisplayClass("notify");
+					}
 					parent.addChild(n);
 				}
 			}

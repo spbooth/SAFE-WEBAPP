@@ -18,14 +18,16 @@ Display version information held in properties
 <%@page import="uk.ac.ed.epcc.webapp.email.logging.EmailLoggerService"%>
 <%@ page
 	import="uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*, java.util.* "%>
-<%@ include file="/service_init.jsf"%>
+<%@ include file="service_init.jsf"%>
 <%
     String page_title = service_name+" "+website_name+" Versions";
 %>
-<%@ include file="/std_header.jsf"%>
+<%@ include file="std_header.jsf"%>
 <div class="block">
-<h2>module versions</h2>
+<h1>module versions</h1>
 <ul>
+<%@ page import="uk.ac.ed.epcc.webapp.config.ConfigService" %>
+<%@ page import="uk.ac.ed.epcc.webapp.config.FilteredProperties" %>
 <%
 // show same set as reported in email
 Properties props = conn.getService(ConfigService.class).getServiceProperties();
@@ -44,4 +46,4 @@ for(String name : m.keySet()){
 %>
 </ul>
 </div>
-<%@ include file="/std_footer.jsf"%>
+<%@ include file="std_footer.jsf"%>

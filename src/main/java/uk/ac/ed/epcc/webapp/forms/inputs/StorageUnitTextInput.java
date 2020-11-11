@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import uk.ac.ed.epcc.webapp.UnitFormat;
 import uk.ac.ed.epcc.webapp.Units;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 /** A {@link Input} for storage sizes where the
  * unit is parsed as part of the input.
@@ -93,5 +94,4 @@ public class StorageUnitTextInput extends NumberInput<Long> implements FormatHin
 
 		return "500"+Units.KiB.toString();
 	}
-
 }

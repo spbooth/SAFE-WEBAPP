@@ -14,27 +14,39 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.ContextCached;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.action.FormAction;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FatalTransitionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
+import uk.ac.ed.epcc.webapp.forms.result.CustomPageResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.ScriptCustomPage;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.AbstractTargetLessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
 import uk.ac.ed.epcc.webapp.forms.transition.TitleTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.servlet.LoginServlet;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
+import uk.ac.ed.epcc.webapp.servlet.WtmpManager;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 
@@ -44,8 +56,13 @@ import uk.ac.ed.epcc.webapp.timer.TimeClosable;
  *
  */
 
-public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewTransitionProvider<AU, AppUserKey<AU>> implements TitleTransitionProvider<AppUserKey<AU>, AU> {
+public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewTransitionProvider<AU, AppUserKey<AU>> implements TitleTransitionProvider<AppUserKey<AU>, AU>, ContextCached {
 	
+	/**
+	 * 
+	 */
+	public static final String SEE_LOGIN_HISTORY_ROLE = "SeeLoginHistory";
+
 	/** Relationship that allows a different user to edit this persons details
 	 * 
 	 */
@@ -74,7 +91,15 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 	};
 	public static final AppUserKey SET_ROLE_KEY = new RoleAppUserKey("Roles", "Set roles", "Set permission roles for this user", SET_ROLES_ROLE);
-	public static final CurrentUserKey UPDATE = new CurrentUserKey("Details", "Update personal details", "Update the information we hold about you",EDIT_DETAILS_ROLE);
+	public static final AppUserKey QUERY_ROLE_KEY = new TargetlessAppUserKey("QueryRoles", "Query roles", "Find all users with specified roles", SET_ROLES_ROLE);
+	public static final CurrentUserKey UPDATE = new CurrentUserKey("Details", "Update personal details", "Update the information we hold about you",EDIT_DETAILS_ROLE) {
+
+		@Override
+		public boolean notify(AppUser user) {
+			return user.warnRequiredUpdate();
+		}
+		
+	};
 	
 	public static final class SUTransition<AU extends AppUser> extends AbstractDirectTransition<AU>{
 
@@ -102,6 +127,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 		
 	};
+	public static final AppUserKey LOGIN_HISTORY = new RelationshipAppUserKey<AppUser>("LoginHistory", "See when this user logged into the website", SEE_LOGIN_HISTORY_ROLE);
 	public final class EraseTransition extends AbstractDirectTransition<AU>{
 
 		@Override
@@ -116,13 +142,142 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 		
 	}
+	public final class LoginHistoryTransition extends AbstractDirectTransition<AU>{
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
+		 */
+		@Override
+		public FormResult doTransition(AU target, AppContext c) throws TransitionException {
+			return new CustomPageResult() {
+				
+				@Override
+				public String getTitle() {
+					return "Login history for "+target.getIdentifier();
+				}
+				
+				@Override
+				public ContentBuilder addContent(AppContext conn, ContentBuilder cb) {
+					cb.addHeading(1, getTitle());
+					SessionService sess = conn.getService(SessionService.class);
+					if( sess instanceof ServletSessionService) {
+						try {
+						WtmpManager man = ((ServletSessionService)sess).getWtmpManager();
+						if( man != null ) {
+							Table t = new Table();
+							for(WtmpManager.Wtmp w : man.getLoginHistory(target)) {
+								man.addTable(t, w, sess);
+							}
+							man.formatTable(t);
+							ContentBuilder panel = cb.getPanel("scrollwrapper");
+							panel.addTable(conn, t);
+							panel.addParent();
+						}
+						}catch(Exception e) {
+							getLogger().error("Error getting login history");
+						}
+					}
+					return cb;
+				}
+			};
+		}
+		
+	}
+	public class QueryRoleTransition extends AbstractTargetLessTransition<AU> implements ExtraContent<AU>{
+
+		private final class RoleTablePage extends CustomPageResult implements ScriptCustomPage {
+			private final String role;
+
+			private RoleTablePage(String role) {
+				this.role = role;
+			}
+
+			@Override
+			public String getTitle() {
+				return "Users with role "+role;
+			}
+
+			@Override
+			public ContentBuilder addContent(AppContext conn, ContentBuilder cb) {
+				cb.addHeading(1, "Users with role "+role);
+				SessionService<AU> sess = conn.getService(SessionService.class);
+				try {
+					Table<String, AU> t = fac.getPersonTable(sess, sess.getGlobalRoleFilter(role));
+					if( t.hasData()) {
+						t.setId("datatable");
+						cb.addTable(conn, t);
+					}else {
+						cb.addText("No entries match");
+					}
+				} catch (DataFault e) {
+					getLogger().error("Error building role table",e);
+					cb.addText("An error occured");
+				}
+				return cb;
+			}
+			@Override
+			public Set<String> getAdditionalCSS() {
+				LinkedHashSet<String> result = new LinkedHashSet<>();
+				result.add("${datatables.css}");
+				result.add("${colVis.css}");
+				result.add("${colReorder.css}");
+				return result;
+				
+			}
+
+			@Override
+			public Set<String> getAdditionalScript() {
+				LinkedHashSet<String> result = new LinkedHashSet<>();
+				result.add("${jquery.script}");
+				result.add("${datatables.script}");
+				result.add("${colVis.script}");
+				result.add("${colReorder.script}");
+				result.add(
+				"$(document).ready( function(){ $('#datatable').DataTable({ stateSave: true , stateDuration: 3600, pageLength: 50 , lengthMenu: [[ 10, 25, 50, 100, -1 ],[ 10, 25, 50, 100, 'All'] ] , paging: true ,  order: [[ 0, 'desc' ]] , dom: 'C<\"clear\">Rlfrtip'   });});");
+				return result;
+			}
+
+		}
+
+		@Override
+		public void buildForm(Form f, AppContext c) throws TransitionException {
+			f.addInput("role", "Role to query", new RoleNameInput(c.getService(SessionService.class))).setOptional(false);
+			f.addAction("Search", new FormAction() {
+				
+				@Override
+				public FormResult action(Form f) throws ActionException {
+					String role = (String) f.get("role");
+					return new RoleTablePage(role);
+				}
+			});
+		}
+
+		@Override
+		public <X extends ContentBuilder> X getExtraHtml(X cb, SessionService<?> op, AU target) {
+			cb.addText("This form generates a table of people with the specified role. "+
+		"This uses the standard syntax for defining roles. "+
+		"Role names starting with @ correspond to named filters on the person. "+
+		"Roles of the form tag%relationship return any person with the relationship against any object of type tag. "+
+					"Roles of the form tag%relation@name return people with the specified relationship against one of the"
+					+ " objects of type tag that match the named filter name.");
+			return cb;
+		}
+		
+	}
 	private final AppUserFactory<AU> fac;
 	/**
 	 * @param c
 	 */
 	public AppUserTransitionProvider(AppContext c) {
 		super(c);
-		fac = c.getService(SessionService.class).getLoginFactory();
+		SessionService sess = c.getService(SessionService.class);
+		fac = sess.getLoginFactory();
+		if( fac instanceof AppUserTransitionContributor) {
+			AppUserTransitionContributor<AU> cont = (AppUserTransitionContributor<AU>) fac;
+			for(Entry<AppUserKey<AU>, Transition<AU>> e : cont.getTransitions(this).entrySet()) {
+				addTransition( e.getKey(), e.getValue());
+			}
+		}
 		for(AppUserTransitionContributor<AU> cont : fac.getComposites(AppUserTransitionContributor.class)) {
 			for(Entry<AppUserKey<AU>, Transition<AU>> e : cont.getTransitions(this).entrySet()) {
 				addTransition( e.getKey(), e.getValue());
@@ -132,8 +287,16 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 			addTransition(UPDATE, new UpdateDetailsTransition(this,fac));
 		}
 		addTransition(SET_ROLE_KEY, new SetRoleTransition<AU>());
+		addTransition(QUERY_ROLE_KEY, new QueryRoleTransition());
 		addTransition(SU_KEY, new SUTransition());
 		addTransition(ERASE, new ConfirmTransition<>("Are you sure you want to anonymise this person record", new EraseTransition(), new ViewTransition()));
+		if( sess instanceof ServletSessionService) {
+			WtmpManager w = ((ServletSessionService)sess).getWtmpManager();
+			if( w != null ) {
+				addTransition(LOGIN_HISTORY, new LoginHistoryTransition());
+			}
+			
+		}
 	}
 
 	/* (non-Javadoc)
@@ -211,7 +374,11 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 	@Override
 	public String getTitle(AppUserKey key, AppUser target) {
 		if( key == null ) {
-			return target.getIdentifier();
+			String identifier = target.getIdentifier();
+			if( identifier != null && ! identifier.isEmpty()) {
+				return identifier;
+			}
+			return "User details";
 		}
 		return getText(key);
 	}
@@ -228,7 +395,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 
 	@Override
 	public <X extends ContentBuilder> X getLogContent(X cb, AU target, SessionService<?> sess) {
-		cb.addHeading(2, target.getIdentifier());
+		cb.addHeading(1, getTitle(null, target));
 		AppContext c = sess.getContext();
 		Map<String,Object> attr = new LinkedHashMap<>();
 		((AppUserFactory)fac).addAttributes(attr, target);

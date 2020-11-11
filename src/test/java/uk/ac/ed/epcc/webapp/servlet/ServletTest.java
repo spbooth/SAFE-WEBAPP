@@ -227,6 +227,7 @@ public abstract class ServletTest extends WebappTestBase{
 		AppUser user = old_service.getCurrentPerson();
         // As the session is preserved this will preserve the logged in person toggle-roles etc.
 		ServletSessionService service = new ServletSessionService(ctx);
+		service.setApplyToggle(old_service.getApplyToggle());
 		ctx.setService(service);
 
 		
@@ -281,7 +282,7 @@ public abstract class ServletTest extends WebappTestBase{
 	public void checkRequestAuth(String page) {
 		HttpSession session = req.getSession(false);
 		assertNotNull(session);
-		RedirectResult result = (RedirectResult) session.getAttribute(LoginServlet.INITIAL_PAGE_ATTR);
+		RedirectResult result = (RedirectResult) LoginServlet.getSavedResult(ctx.getService(SessionService.class));
 		assertNotNull(result);
 		assertEquals(page, result.getURL());
 		checkForward(LoginServlet.getLoginPage(ctx));

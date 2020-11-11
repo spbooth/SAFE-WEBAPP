@@ -50,8 +50,9 @@ public abstract  class CreateTransition<BDO extends DataObject> extends DataObje
 	public void buildForm(Form f, AppContext c) throws TransitionException {
 		try {
 			
-			buildForm(f);
-			f.addAction("Create", new CreateAction<>(name, getActionText(),this));
+			if( buildForm(f)) {
+				f.addAction("Create", new CreateAction<>(name, getActionText(),this));
+			}
 			customiseCreationForm(f);
 			for(CreateCustomizer comp : getFactory().getComposites(CreateCustomizer.class)){
 				comp.customiseCreationForm(f);		

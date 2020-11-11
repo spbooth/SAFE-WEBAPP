@@ -28,7 +28,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
  */
 
 
-public class FileStreamData extends AbstractStreamData {
+public class FileStreamData implements StreamData {
 
 	private File file;
 	AppContext conn;

@@ -101,7 +101,7 @@ public abstract class WebappTestBase implements ContextHolder{
 			String dir = getClass().getCanonicalName();
 			dir = dir.substring(0,dir.lastIndexOf("."));
 			dir = dir.replace('.', '/');
-			dir = "src/main/test/resources/"+dir;
+			dir = "src/test/resources/"+dir;
 			File output = new File(dir+"/"+name+".xml");
 			FileWriter w = new FileWriter(output);
 			SimpleXMLBuilder builder = new XMLWriter(w);
@@ -111,8 +111,12 @@ public abstract class WebappTestBase implements ContextHolder{
 			for(String tab : serv.getTables()){
 				try{
 					DataObjectFactory<? extends DataObject> fac = ctx.makeObject(DataObjectFactory.class, tab);
-					for(DataObject o: fac.all()){
-						d.dump(o);
+					if( fac != null ) {
+						for(DataObject o: fac.all()){
+							d.dump(o);
+						}
+					}else {
+						log.warn("No factory for "+tab);
 					}
 				}catch(Exception t){
 					log.warn("Error in dump of "+tab, t);
@@ -267,12 +271,14 @@ public abstract class WebappTestBase implements ContextHolder{
 			//FileWriter w = new FileWriter(expected_xml);
 			//w.write(raw);
 			//w.close();
-			System.out.println("Raw:");
-			System.out.println(raw);
-			System.out.println("====================================================================");
+			
+			
 			System.out.println("Got: "+result);
 			System.out.println("--------------------------------------------------------------------");
 			System.out.println("Expected: "+expected);
+			System.out.println("====================================================================");
+			System.out.println("Raw:");
+			System.out.println(raw);
 		}
 		assertEquals("Unexpected result:"+expected_xml+"\n"+differ,expected,result);
 	}
@@ -421,12 +427,16 @@ protected void writeFile(String file_name, byte data[]) throws IOException {
     	return setTime(year, month, day, hour, min, 0);
     }
     public Date setTime(int year, int month, int day, int hour, int min, int sec) {
-    	TestTimeService serv = new TestTimeService();
-		ctx.setService(serv);
+    	
 		Calendar cal = Calendar.getInstance();
 		cal.clear();
 		cal.set(year, month, day, hour, min,sec);
+		return setTime(cal);
+    }
+   public Date setTime(Calendar cal) {
+		TestTimeService serv = new TestTimeService();
 		serv.setResult(cal.getTime());
+		ctx.setService(serv);
 		return cal.getTime();
     }
 }

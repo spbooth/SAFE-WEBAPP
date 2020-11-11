@@ -76,7 +76,7 @@ public class MockTansport extends Transport {
 	@Override
 	public void sendMessage(Message arg0, Address[] arg1)
 			throws MessagingException {
-		System.out.println("Send message called");
+		System.out.println("Send message called "+arg0.getSubject());
 		messages.add(arg0);
 		addresses.add(arg1);
 	}

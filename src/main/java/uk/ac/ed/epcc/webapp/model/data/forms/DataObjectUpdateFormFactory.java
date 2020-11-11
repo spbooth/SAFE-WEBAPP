@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.model.data.forms;
 
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -95,20 +96,54 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 
 	public final void buildUpdateForm(String type_name, Form f, BDO dat, SessionService<?> operator)
 			throws DataFault {
-			    buildForm(f);
-				customiseForm(f);
-				for(TableStructureContributer<BDO> contrib : factory.getTableStructureContributers()){
-					contrib.customiseUpdateForm(f, dat, operator);
+				HashMap fixtures = new HashMap();
+				if( dat != null) {
+					Map data = dat.getMap();
+					for(String field : getSupress()) {
+						fixtures.put(field,data.get(field));
+					}
 				}
+			    boolean complete = buildForm(f,fixtures);
+				//customiseForm(f);
+			    
+			    // set values before customise as it is common
+				// for the customise methods to lock fields
+				// and the values need to be in place before then.
+			    //
+			    // if buildForm is creating a multi-stage form then some of
+			    // the fields may already be locked and should NOT
+			    // be updated by the following
 				f.setContents(getDefaults());
-				f.addAction(UPDATE, new UpdateAction<>(type_name,this, dat));
-				addRetireAction(type_name, f, dat, operator);
-				customiseUpdateForm(f, dat);
 				if( dat != null ){
 					//this should never be called with dat null except from a unit test
 				   f.setContents(dat.getMap());
 				}
+				for(TableStructureContributer<BDO> contrib : factory.getTableStructureContributers()){
+					contrib.customiseUpdateForm(f, dat, operator);
+				}
+				
+				customiseUpdateForm(f, dat);
+				
+				if( complete ) {
+					customiseCompleteUpdateForm(f, dat);
+					f.addAction(getUpdateActionName(), new UpdateAction<>(type_name,this, dat));
+					addRetireAction(type_name, f, dat, operator);
+				}
+				
+				
 			}
+
+	/** Similar to {@link #customiseUpdateForm(Form, DataObject)} but only called when the form is complete
+	 * 
+	 * @param f
+	 * @param o
+	 */
+	public void customiseCompleteUpdateForm(Form f, BDO o) {
+		
+	}
+	protected String getUpdateActionName() {
+		return UPDATE;
+	}
 
 	/**
 	 * @param type_name
@@ -127,9 +162,9 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 	}
 
 	@Override
-	public void postUpdate(BDO o, Form f, Map<String,Object> origs)
+	public void postUpdate(BDO o, Form f, Map<String,Object> origs,boolean changed)
 			throws DataException {
-		compositesPostUpdate(o, f, origs);
+		compositesPostUpdate(o, f, origs,changed);
 	}
 
 	/**
@@ -138,9 +173,9 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 	 * @param origs
 	 * @throws DataException
 	 */
-	protected void compositesPostUpdate(BDO o, Form f, Map<String, Object> origs) throws DataException {
+	protected void compositesPostUpdate(BDO o, Form f, Map<String, Object> origs, boolean changed) throws DataException {
 		for(TableStructureContributer c : factory.getTableStructureContributers()){
-			c.postUpdate(o, f, origs);
+			c.postUpdate(o, f, origs, changed);
 		}
 	}
 

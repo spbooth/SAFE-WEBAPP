@@ -17,6 +17,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 
 /** Interface for Date inputs with bounds
@@ -28,10 +29,12 @@ public interface BoundedDateInput extends ParseInput<Date>, BoundedInput<Date> {
 	
 	
 	public static BoundedDateInput getInstance(AppContext conn,long resolution,int finest_field) {
+		CurrentTimeService time = conn.getService(CurrentTimeService.class);
 		if( USE_DATE_INPUT.isEnabled(conn) && finest_field == Calendar.DAY_OF_MONTH) {
-			return new RelativeDateInput();
+			
+			return new RelativeDateInput(time.getCurrentTime());
 		}
-		return new TimeStampMultiInput(resolution, finest_field);
+		return new TimeStampMultiInput(time.getCurrentTime(),resolution, finest_field);
 	}
 	
 	public static BoundedDateInput getInstance(AppContext conn, int finest_field) {

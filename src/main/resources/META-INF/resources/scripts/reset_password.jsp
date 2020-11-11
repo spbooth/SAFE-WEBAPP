@@ -13,7 +13,10 @@
 <%--| limitations under the License.                                           |--%>
 <%@ page session="false"
 	import="uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*,uk.ac.ed.epcc.webapp.forms.html.*,java.util.*"%>
-<%@ include file="/service_init.jsf"%>
+<%@page import="uk.ac.ed.epcc.webapp.logging.*" %>
+<%@page import="uk.ac.ed.epcc.webapp.session.*" %>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
 <%
     if( conn == null ){
 %>
@@ -60,27 +63,27 @@
 	String page_title = service_name+" "+website_name+" Password recovery";
 %>
 <wb:formpage/>
-<%@ include file="/std_header.jsf"%>
+<%@ include file="../std_header.jsf"%>
 <%
     PasswordAuthComposite password_auth = fac.getComposite(PasswordAuthComposite.class);
 	if( password_auth == null ){
 %>
 <div class="block">
-<H2>Password authentication disabled</H2>
+<H1>Password authentication disabled</H1>
 <p>
 Password based authentication is not allowed for this site.
 <p>
 </div>
 <% }else if( ! password_auth.canResetPassword(null) ){ %>
 <div class="block">
-<H2>Password resets disabled</H2>
+<H1>Password resets disabled</H1>
 <p>
 Password resets are not allowed for this site.
 <p>
 </div>
 <% }else{ %>
 <div class="block" role="main">
-<h2><%=page_title %></h2>
+<h1><%=page_title %></h1>
 <p> If you already have an account for the <%=website_name %> but can't
 remember your password, you can use this form to send yourself a password recovery email.
 </p>
@@ -99,4 +102,4 @@ remember your password, you can use this form to send yourself a password recove
 </form>
 </div>
 <% } %>
-<%@ include file="/login_footer.jsf"%>
+<%@ include file="../login_footer.jsf"%>

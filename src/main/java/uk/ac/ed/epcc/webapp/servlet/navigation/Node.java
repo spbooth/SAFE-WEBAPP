@@ -39,6 +39,7 @@ public abstract class Node extends NodeContainer implements Externalizable{
 	private  String target_url;
 	private  String menu_text;
 	private String image;
+	private String post_image_text;
 	private String display_class;
 	private String help_text;
 	private char access_key=0;
@@ -63,6 +64,11 @@ public abstract class Node extends NodeContainer implements Externalizable{
 		}else{
 			out.writeObject(image);
 		}
+		if( post_image_text == null ){
+			out.writeObject("");
+		}else{
+			out.writeObject(post_image_text);
+		}
 		if( display_class == null){
 			out.writeObject("");
 		}else{
@@ -86,6 +92,7 @@ public abstract class Node extends NodeContainer implements Externalizable{
 		setTargetPath((String)in.readObject());
 		setMenuText((String)in.readObject());
 		setImage((String) in.readObject());
+		setPostImageText((String)in.readObject());
 		setDisplayClass((String)in.readObject());
 		setHelpText((String)in.readObject());
 		setAccessKey(in.readChar());
@@ -178,13 +185,18 @@ public abstract class Node extends NodeContainer implements Externalizable{
 	public String getImage() {
 		return image;
 	}
-
+    public String getPostImageText() {
+    	return post_image_text;
+    }
 	public void setImage(String image) {
 		if( image != null && image.length() == 0){
 			image=null;
 		}else{
 			this.image = image;
 		}
+	}
+	public void setPostImageText(String text) {
+		post_image_text= text;
 	}
 
 	public void setParent(NodeContainer parent){

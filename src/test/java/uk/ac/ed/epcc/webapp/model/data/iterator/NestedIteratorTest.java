@@ -19,6 +19,8 @@ import java.util.LinkedHashSet;
 
 import org.junit.Test;
 
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+
 /**
  * @author spb
  *
@@ -27,7 +29,7 @@ import org.junit.Test;
 public class NestedIteratorTest {
 
 	@Test
-	public void test() {
+	public void test() throws DataFault {
 		NestedIterator<Number> it = new NestedIterator<>();
 		LinkedHashSet<Number> set1= new LinkedHashSet<>();
 		set1.add(1.0);

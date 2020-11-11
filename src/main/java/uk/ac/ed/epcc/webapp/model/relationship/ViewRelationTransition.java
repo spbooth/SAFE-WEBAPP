@@ -87,7 +87,7 @@ public class ViewRelationTransition<X extends DataObject> extends AbstractFormTr
 		 */
 		@Override
 		public ContentBuilder addContent(AppContext conn, ContentBuilder cb) {
-			cb.addHeading(2, getTitle());
+			cb.addHeading(1, getTitle());
 			SessionService sess = conn.getService(SessionService.class);
 			try {
 				cb.addList(sess.getLoginFactory().getResult(sess.getPersonInRelationshipRoleFilter(fac, relationship, target)));

@@ -38,6 +38,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexField;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.IdMode;
@@ -115,7 +116,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 				String tab = field.getReferencedTable();
 				if( tab != null){
 					if( field.getNullable() && null_value ) {
-						current.setProperty(field.getName(false), null);
+						current.setProperty(field.getTag(), null);
 					}else {
 						// Have to explicitly apply mappings
 						int doc_id = Integer.parseInt(text);
@@ -129,11 +130,11 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 							// have to assume the dump is using the same id-space as currently loaded.
 							value=doc_id;
 						}
-						current.setProperty(field.getName(false), value);
+						current.setProperty(field.getTag(), value);
 					}
 				}else{
 					if( field.getNullable() && null_value ) {
-						current.setProperty(field.getName(false), null);
+						current.setProperty(field.getTag(), null);
 					}else {
 						try {
 							field.unDump(current, text);
@@ -304,6 +305,10 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 		}else if( state == State.Record && res != null ){
 			// must be field element
 			field=res.getInfo(name);
+			if( field == null) {
+				// try for a renamed field
+				field = res.getInfo(res.dbFieldtoTag(name));
+			}
 			sb.setLength(0);
 			null_value = arg3.getValue(Dumper.NULL_VALUE_ATTR) != null;
 		}else if( state == State.Schema && spec != null){
@@ -365,7 +370,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 		}else if( state == State.SchemaIndex && index != null && name.equals(Dumper.COLUMN)){
 			String col_name = arg3.getValue(Dumper.NAME_ATTR);
 			try {
-				index.addField(col_name);
+				index.addField(new IndexField(col_name));
 				
 			} catch (InvalidArgument e) {
 				getLogger().error("Error adding column", e);

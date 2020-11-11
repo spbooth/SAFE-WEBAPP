@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?><view_page>
-<Title/>
+<Title>User details</Title>
 <top/>
 <log>
-<h2/>
+<h1>User details</h1>
 <table class="column">
 <tr>
 <th>Name</th>
 <td>Anonymous-1</td>
+</tr>
+<tr>
+<th>Details updated</th>
+<td>Fri May 15 14:28:50 BST 2020</td>
+</tr>
+<tr>
+<th>Next update required</th>
+<td>Sat May 15 14:28:50 BST 2021</td>
 </tr>
 </table>
 </log>
@@ -14,3 +22,4 @@
 <active value="Anonymise" help="Remove personally identifiable information"/>
 </buttons>
 </view_page>
+

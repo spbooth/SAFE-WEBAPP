@@ -32,6 +32,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
+import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
@@ -60,6 +61,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SelfReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.Updater;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionFactory.ViewResult;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
@@ -273,9 +275,11 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 	}
 	public class PartCreator extends Creator<P>{
 		@Override
-		protected Map<String, Object> getSelectors() {
-			Map<String, Object> selectors = super.getSelectors();
-			selectors.put(NAME_FIELD,new UnusedNameInput(owner,null));
+		protected Map<String, Selector> getSelectors() {
+			Map<String, Selector> selectors = super.getSelectors();
+			selectors.put(NAME_FIELD,()-> {
+					return new UnusedNameInput(owner,null);
+			});
 			return selectors;
 		}
 

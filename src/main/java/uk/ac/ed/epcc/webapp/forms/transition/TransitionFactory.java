@@ -75,6 +75,10 @@ public interface TransitionFactory<K,T> extends Contexed{
 	 * Additional hidden operations may also be supported but these will never be presented to the user
 	 * as options and can only generated as a {@link ChainedTransitionResult}.
 	 *  
+	 * In most cases the transition set will be the same for all null/non-null targets
+	 * though in principal dynamic transitions could be generated based on the state of the target e.g. a parameterised
+	 * transition with the parameter encoded in the key. 
+	 *  
 	 * @param target
 	 * @return Set of keys
 	 */
@@ -82,6 +86,7 @@ public interface TransitionFactory<K,T> extends Contexed{
 	/** Find a transition operator for this type by key.
 	 * This method is permitted to return null for example if the current user
 	 * is not permitted to perform the transition.
+	 * 
 	 * 
 	 * 
 	 * @param target  target (may be null)

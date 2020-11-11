@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.html;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.forms.result.BackResult;
@@ -35,20 +36,19 @@ import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
  */
 
 
-public class AddLinkVisitor implements WebFormResultVisitor {
+public class AddLinkVisitor extends AbstractContexed implements WebFormResultVisitor {
     private final ExtendedXMLBuilder hb;
-    private final AppContext conn;
     private final String text;
     private final String title;
     public boolean new_tab=false;
     public AddLinkVisitor(AppContext c, ExtendedXMLBuilder hb,String text,String title){
-    	conn=c;
+    	super(c);
     	this.hb=hb;
     	this.text=text;
     	this.title=title;
     }
     private String encodeURL(String url){
-    	ServletService serv = conn.getService(ServletService.class);
+    	ServletService serv = getContext().getService(ServletService.class);
     	if( serv != null){
     		return serv.encodeURL(url);
     	}
@@ -56,7 +56,7 @@ public class AddLinkVisitor implements WebFormResultVisitor {
     }
 	public <T, K> void visitChainedTransitionResult(
 			ChainedTransitionResult<T, K> res) throws Exception {
-		TransitionServlet.addLink(conn,hb,res.getProvider(),res.getTransition(),res.getTarget(),text,title,new_tab);
+		TransitionServlet.addLink(getContext(),hb,res.getProvider(),res.getTransition(),res.getTarget(),text,title,new_tab);
 	}
 
 	public <T, K> void visitConfirmTransitionResult(
@@ -115,7 +115,7 @@ public class AddLinkVisitor implements WebFormResultVisitor {
 	}
 
 	public void visitServeDataResult(ServeDataResult res) throws Exception{
-		ServeDataServlet.addLink(conn, hb, res.getProducer(), res.getArgs(), text);
+		ServeDataServlet.addLink(getContext(), hb, res.getProducer(), res.getArgs(), text);
 	}
 	public void visitBackResult(BackResult res) throws Exception {
 		throw new UnsupportedResultException("Cannot use BackResult for link");

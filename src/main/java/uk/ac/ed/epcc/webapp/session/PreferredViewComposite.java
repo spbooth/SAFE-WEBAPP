@@ -20,6 +20,7 @@ import uk.ac.ed.epcc.webapp.content.TemplateFile;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
 
 /** An {@link AppUserComposite} that returns an optional  preferred view for 
@@ -95,7 +96,7 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 	}
 
 	@Override
-	public Map<String, Object> addSelectors(Map<String, Object> selectors) {
+	public Map<String, Selector> addSelectors(Map<String, Selector> selectors) {
 		
 		selectors.put(PREFERRED_VIEW, getViewFactory());
 		return selectors;

@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.text.DateFormat;
+import java.util.Date;
 
 
 /** A DateInput that parses a relative date notation.
@@ -29,17 +30,20 @@ import java.text.DateFormat;
 
 public class RelativeDateInput extends DateInput {
 
-	public RelativeDateInput() {
+	private final Date reference;
+	public RelativeDateInput(Date ref) {
 		super();
+		this.reference=ref;
 	}
 
-	public RelativeDateInput(long resolution) {
+	public RelativeDateInput(Date ref,long resolution) {
 		super(resolution);
+		this.reference=ref;
 	}
 
 	@Override
 	protected DateFormat getDateFormat(String format) {
-		return new RelativeDateFormat(format);
+		return new RelativeDateFormat(reference,format);
 	}
 
 	

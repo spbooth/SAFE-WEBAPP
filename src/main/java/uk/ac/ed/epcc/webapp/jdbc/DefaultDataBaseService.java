@@ -19,7 +19,6 @@ package uk.ac.ed.epcc.webapp.jdbc;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLTransientException;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -38,6 +37,7 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.TransientDataFault;
 /** Default implementation of the {@link DatabaseService}
  * 
  * This gets connection parameters from the {@link ConfigService} but this is only queried
@@ -48,6 +48,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  * <li> <b>db_name<i>[.tag]</b> connection url</li>
  * <li> <b>db_type<i>[.tag]</b> connection type [mysql or postgres]</li>
  * <li> <b>db_name<i>[.tag]</b> connection url</li>
+ * <li> <b>transaction.isolation_level</b> isolationlevel to use for transactions </li>
  * </ul>
  * 
  * @author spb
@@ -429,10 +430,14 @@ public class DefaultDataBaseService implements DatabaseService {
 	
 	@Override
 	public void handleError(String message,SQLException e) throws DataFault {
-		if( force_rollback && e instanceof SQLTransientException) {
+		boolean trans = e instanceof SQLTransientException;
+		if( force_rollback && trans) {
 			if( inTransaction() && transactionStage() == 0) {
 				throw new ForceRollBack(message, e);
 			}
+		}
+		if( trans ) {
+			throw new TransientDataFault("Transient error", (SQLTransientException) e);
 		}
 		throw new DataFault(message, e);
 		
@@ -458,7 +463,7 @@ public class DefaultDataBaseService implements DatabaseService {
 			case "SERIALIZABLE": return Connection.TRANSACTION_SERIALIZABLE;
 			}
 		}
-		return Connection.TRANSACTION_SERIALIZABLE;
+		return Connection.TRANSACTION_REPEATABLE_READ;
 	}
 	
 	/* (non-Javadoc)
@@ -480,5 +485,33 @@ public class DefaultDataBaseService implements DatabaseService {
 			closes.remove(c);
 		}
 		
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.jdbc.DatabaseService#getConnectionAttributes()
+	 */
+	@Override
+	public Map<String, Object> getConnectionAttributes() throws Exception{
+		Map<String,Object> map = new HashMap<String, Object>();
+		SQLContext sqlContext = getSQLContext();
+		Connection conn = sqlContext.getConnection();
+		map.put("read-only",conn.isReadOnly());
+		String hostname = System.getenv("HOSTNAME");
+		if( hostname == null ){
+			hostname="unknown";
+		}
+		map.put("client",hostname);
+		String name=sqlContext.getConnectionHost();
+        map.put("server",name);
+        int level = conn.getTransactionIsolation();
+        switch(level) {
+        case Connection.TRANSACTION_READ_UNCOMMITTED: map.put("transaction","READ_UNCOMMITTED"); break;
+        case Connection.TRANSACTION_READ_COMMITTED: map.put("transaction","READ_UNCOMMITTED"); break;
+        case Connection.TRANSACTION_REPEATABLE_READ: map.put("transaction","REPEATABLE_READ"); break;
+        case Connection.TRANSACTION_SERIALIZABLE: map.put("transaction","SERIALIZABLE"); break;
+        case Connection.TRANSACTION_NONE: map.put("transaction","NONE"); break;
+        default: map.put("transaction",Integer.toString(level));
+        }
+		
+		return map;
 	}
 }

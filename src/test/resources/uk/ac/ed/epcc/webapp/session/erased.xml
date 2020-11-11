@@ -16,4 +16,10 @@
 <Alg>0</Alg>
 <Password>locked</Password>
 </Person>
+<PersonHistory id="2">
+<EndTime>1234567890</EndTime>
+<PeerID>1</PeerID>
+<PublicKey/>
+<StartTime>1234567890</StartTime>
+</PersonHistory>
 </Diff>

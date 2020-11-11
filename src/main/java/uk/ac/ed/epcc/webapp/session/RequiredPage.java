@@ -17,6 +17,8 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.servlet.ServletFormResultVisitor;
 
@@ -39,6 +41,39 @@ public interface RequiredPage<U extends AppUser> {
 	
 	public static final String REQUIRED_PAGES_ATTR="RequiredPages";
 	public static final String REQUIRED_PAGE_RETURN_ATTR="RequiredPageReturn";
-    public boolean required(SessionService<U> user);
+   
+	/** Does this required page need to be shown now
+	 * 
+	 * @param user
+	 * @return
+	 */
+	public boolean required(SessionService<U> user);
+	/** What page should be shown
+	 * 
+	 * @param user
+	 * @return
+	 */
     public FormResult getPage(SessionService<U> user);
+    
+    
+   
+    /** Filter for people who should be notified by email of a message
+     * (e.g. update required).
+     * 
+     * @param sess
+     * @return
+     */
+    default BaseFilter<U> notifiable(SessionService<U> sess){
+    	return new FalseFilter<U>(sess.getLoginFactory().getTarget()) ;
+    }
+    
+    /** If a notification email is being sent (possibly triggered 
+     * by a different required page). Is there any message we want to add.
+     * 
+     * @param person
+     * @return
+     */
+    default public String getNotifyText(U person) {
+    	return null;
+    }
 }

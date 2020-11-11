@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.data;
 
+import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
@@ -47,7 +49,7 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 		}
 		FieldInfo info = home_fac.res.getInfo(link_field);
 		if( info == null || ! info.isReference() ){
-			throw new UnknownRelationshipException("No reference field "+link_field);
+			throw new UnknownRelationshipException("No reference field "+link_field+"@"+home_fac.getTag());
 		}
 		TypeProducer prod = info.getTypeProducer();
 		if( prod instanceof IndexedTypeProducer){
@@ -113,6 +115,11 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 		} catch (UnknownRelationshipException e) {
 			return false;
 		}
+		
+	}
+	@Override
+	public void addRelationships(Set<String> roles) {
+		
 		
 	}
 

@@ -159,7 +159,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 				return "(" + getLeft().getIdentifier(max_length) + ")-("
 						+ getRight().getIdentifier(max_length) + ")";
 			} catch (DataException e) {
-				return super.getIdentifier();
+				return super.getIdentifier(max_length);
 			}
 		}
 		@Override
@@ -312,11 +312,13 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			if( fil instanceof ResultVisitor){
 				setVisitor((ResultVisitor<T>)fil);
 			}
+			
 			try {
 				setup(fil,0,-1);
 			} catch (DataException e) {
 				throw new DataFault("Error in setup",e);
 			}
+			
 		}
 		@Override
 		public final void addSource(StringBuilder source) {
@@ -715,13 +717,16 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			return this.new JoinLinkFilterIterator(new LinkFilter(l, r, f));
 		}
 		// This will still set the known links as LinkFilter is a ResultVisitor
-		return new FilterIterator(new LinkFilter(l, r, f));
+		return new FilterIterator(getFilter(l, r, f));
 	}
 	public long getLinkCount(L l, R r,BaseFilter<T> f) throws DataException{
-		return getCount(new LinkFilter(l, r, f));
+		return getCount(getFilter(l, r, f));
 	}
 	public T find(L l, R r,BaseFilter<T> f) throws DataException{
-		return find(new LinkFilter(l, r, f));
+		return find(getFilter(l, r, f));
+	}
+	public T find(L l, R r,BaseFilter<T> f, boolean allow_null) throws DataException{
+		return find(getFilter(l, r, f),allow_null);
 	}
 	public DataObjectFactory<R> getRightFactory(){
 		return (DataObjectFactory<R>) getRightProducer();
@@ -738,6 +743,10 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	@Override
 	public FilterResult<T> getFilterResult(L left, R right, BaseFilter<T> fil) throws DataFault{
 		return new LinkResult(left, right, fil);
+	}
+	
+	public BaseFilter<T> getFilter(L left, R right, BaseFilter<T> fil) {
+		return new LinkFilter(left, right, fil);
 	}
 
 	@Override
@@ -845,8 +854,8 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	}
 
 	@Override
-	protected Map<String, Object> getSelectors() {
-		HashMap<String, Object> result = new HashMap<>();
+	protected Map<String, Selector> getSelectors() {
+		Map<String, Selector> result = super.getSelectors();
 		result.put(getLeftField(),new Selector() {
 
 			@Override

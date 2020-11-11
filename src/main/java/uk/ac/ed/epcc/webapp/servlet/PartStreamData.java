@@ -21,7 +21,6 @@ import javax.servlet.http.Part;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.model.data.stream.AbstractStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 
 /**
@@ -29,7 +28,7 @@ import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
  *
  */
 
-public class PartStreamData extends AbstractStreamData implements
+public class PartStreamData implements
 		MimeStreamData {
 	private static final String CONTENT_DISPOSITION = "content-disposition";
     private static final String CONTENT_DISPOSITION_FILENAME = "filename";

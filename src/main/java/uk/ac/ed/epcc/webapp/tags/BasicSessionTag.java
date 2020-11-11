@@ -37,7 +37,11 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 public class BasicSessionTag extends TagSupport implements Tag {
 
+	private String role=null;
 	
+	public void setrole(String role) {
+		this.role=role;
+	}
 	@Override
 	public int doEndTag() throws JspException {
 		try{
@@ -53,6 +57,7 @@ public class BasicSessionTag extends TagSupport implements Tag {
 	    	page.forward(WebappServlet.MESSAGES_JSP_URL);
 	    	return SKIP_PAGE;
 	    }
+	    
 		/* Retrieve database connection and person currently logged in - 
 	     * if an error is returned, return to login page. 
 	     */
@@ -70,6 +75,13 @@ public class BasicSessionTag extends TagSupport implements Tag {
 	             servlet_service.requestAuthentication(session_service); 
 	             return SKIP_PAGE;
 		}
+		if( role != null ) {
+	    	if( ! session_service.hasRoleFromList(role.split("\\s*,\\s*"))) {
+	    		WebappServlet.messageWithArgs(conn, request, response, "access_denied", null);
+	    		return SKIP_PAGE;
+	    	}
+	    }
+		pageContext.setAttribute("session_service", session_service);
 		return EVAL_PAGE;
 		}catch(Exception e){
 			throw new JspException(e);

@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,7 +36,7 @@ import uk.ac.ed.epcc.webapp.servlet.ServletService;
  * Config parameters:
  * <ul>
  * <li> <b><i>tag</i>.attributes</b> - list of attribute names<li>
- * <li> <b><i>tag</i>.realm<b> - authentication realm to listen to</li>
+ * <li> <b><i>tag</i>.realm<b> - authentication realms to listen to (comma seperated list)</li>
  * <li> <b><i>attribute-name</i>.label</b> - alternative descriptive text for attr</li>
  * </ul>
  * 
@@ -54,7 +55,7 @@ HistoryFieldContributor
 	 */
 	private static final String AUTHENTICATED_SUFFIX = "Authenticated";
 	private final String tag;
-	private final String target_realm;
+	private final Set<String> target_realms;
 	private final String attr[];
 	/**
 	 * @param fac
@@ -63,7 +64,11 @@ HistoryFieldContributor
 		super(fac);
 		this.tag=tag;
 		this.attr=fac.getContext().getInitParameter(tag+".attributes", "").split("\\s*,\\s*");
-		this.target_realm=fac.getContext().getInitParameter(tag+".realm", WebNameFinder.WEB_NAME);
+		String list = fac.getContext().getInitParameter(tag+".realm", WebNameFinder.WEB_NAME);
+		this.target_realms=new HashSet<String>();
+		for(String t : list.split("\\s*,\\s*")) {
+			target_realms.add(t);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -71,7 +76,7 @@ HistoryFieldContributor
 	 */
 	@Override
 	public void authenticated(String realm, AU user) {
-		if( realm.equals(target_realm)) {
+		if( target_realms.contains(realm)) {
 			ServletService serv = getContext().getService(ServletService.class);
 			if( serv==null) {
 				return;

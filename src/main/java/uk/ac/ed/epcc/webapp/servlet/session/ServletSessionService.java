@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.servlet.session;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -68,7 +69,7 @@ public class ServletSessionService<A extends AppUser> extends AbstractSessionSer
 
 	protected static final String SUPER_PERSON_ID_ATTR = "SuperPersonID";
 	
-	private static final String WTMP_ID = "SESSION_WTMP_ID";
+	public static final String WTMP_ID = "SESSION_WTMP_ID";
 	private static final String WTMP_EXPIRY_DATE = "SESSION_WTMP_EXPIRTY_DATE";
 	private static final String NAME_ATTR="UserName";
 	
@@ -79,6 +80,7 @@ public class ServletSessionService<A extends AppUser> extends AbstractSessionSer
 	// Flag to supress read/write to http session
 	// This is to force per request authentication in an api call and to prevent
 	// a restricted permission api call from creating a session
+	// also used to supress access to an invalidated session on logout
 	private boolean use_session=true;
 	private ServletService ss;
 	private HttpServletRequest request;
@@ -123,7 +125,7 @@ public void setAttribute(String key, Object value) {
 	if( value != null &&  ! (value instanceof Serializable)){
 		LoggerService serv = getContext().getService(LoggerService.class);
 		if( serv != null){
-			serv.getLogger(getClass()).warn("Non serializable object "+key+" "+value.getClass().getCanonicalName()+" added to session");
+			serv.getLogger(getClass()).error("Non serializable object "+key+" "+value.getClass().getCanonicalName()+" added to session");
 		}
 	}
 	if( sess != null ){
@@ -177,7 +179,7 @@ protected A lookupPerson() {
 					CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 					Date now = time.getCurrentTime();
 					if( d.before(now)){
-						Integer id = (Integer) getAttribute(WTMP_ID);
+						Integer id = getWtmpID();
 						if( id != null ){
 							Wtmp w = man.find(id);
 							w.update();
@@ -195,6 +197,10 @@ protected A lookupPerson() {
 	return user;
 }
 
+public Integer getWtmpID() {
+	return (Integer) getAttribute(WTMP_ID);
+}
+
 @Override
 public void clearCurrentPerson() {
 	
@@ -206,7 +212,7 @@ public void clearCurrentPerson() {
 	try{
 		WtmpManager man = getWtmpManager();
 		if( man != null ){
-			Integer id = (Integer) getAttribute(WTMP_ID);
+			Integer id = getWtmpID();
 			if( id != null ){
 				Wtmp w = man.find(id);
 				w.logout();
@@ -239,7 +245,7 @@ public void logOut(){
 	try{
 		WtmpManager man = getWtmpManager();
 		if( man != null ){
-			Integer wtmp_id = (Integer) getAttribute(WTMP_ID);
+			Integer wtmp_id = getWtmpID();
 			if( wtmp_id != null ){
 				Wtmp w = man.find(wtmp_id);
 				if( w != null){
@@ -255,6 +261,8 @@ public void logOut(){
 		DefaultServletService defss = (DefaultServletService)ss;
 		defss.logout(true);
 	}
+	// session is invalid may throw exception if accessed now
+	use_session=false;
 }
 public A getSuperPerson(){
 	Integer super_person_id = (Integer) getAttribute(SUPER_PERSON_ID_ATTR);
@@ -273,7 +281,7 @@ public void setCurrentPerson(A person) {
 			if( man != null ){
 
 
-				Integer id = (Integer) getAttribute(WTMP_ID);
+				Integer id = getWtmpID();
 				if( id != null ){
 					Wtmp w = man.find(id);
 					w.logout();
@@ -294,10 +302,23 @@ public void setCurrentPerson(A person) {
 		}
 		// Store name as an attribute.We don't use this
 		// but it helps to identify users from the tomcat manager app.
-		setAttribute(NAME_ATTR, person.getName());
+		setNameHint( person.getName());
+		
+		// Increase session timeout if configured
+		int timeout = getContext().getIntegerParameter("session.logged_in.timeout", -1);
+		if( timeout >= 0 ) {
+			ss.setTimeout(timeout);
+		}
 	}
 }
-
+/** Set a name hint in the session.
+ * This helps to identify users in the container admin/logging.
+ * 
+ * @param name
+ */
+public void setNameHint(String name) {
+	setAttribute(NAME_ATTR, name);
+}
 /**
  * @param person
  */
@@ -489,6 +510,16 @@ public void setUseSession(boolean use) {
 protected boolean canLogin(A person) {
 	return person.canLogin() || isSU();
 }
+
+@Override
+public void addSecurityContext(Map att) {
+	super.addSecurityContext(att);
+	Integer wtmp = getWtmpID();
+	if( wtmp != null ) {
+		att.put(WTMP_ID, wtmp);
+	}
+}
+
 
 
 

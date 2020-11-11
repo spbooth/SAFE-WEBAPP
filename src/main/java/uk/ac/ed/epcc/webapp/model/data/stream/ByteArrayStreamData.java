@@ -37,7 +37,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  */
 
 
-public class ByteArrayStreamData extends AbstractStreamData implements StreamData, Externalizable {
+public class ByteArrayStreamData  implements StreamData, Externalizable {
 	private ByteArrayOutputStream data;
 
 	public ByteArrayStreamData() {

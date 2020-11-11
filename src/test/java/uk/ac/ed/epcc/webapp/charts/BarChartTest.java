@@ -16,8 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.charts;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
 import java.util.Calendar;
 
@@ -41,13 +39,15 @@ public class BarChartTest extends ChartTestCase {
 		  loadData(bar, plot);
 		  System.out.println("Size is "+plot.getNumSets());
 		ChartData<?> c = bar.getChartData();
-		c.createPNG(new File(System.getProperty("java.io.tmpdir")+"/daybar"+".png"));
+		File pngfile = new File(System.getProperty("java.io.tmpdir")+"/daybar"+".png");
+		c.createPNG(pngfile);
 		  c.getSize();
 		  //pie.createSVG("/tmp/daypie2");
 		  Table t = bar.getTable();
 		  t.setKeyName("Day of week");
 		  checkTable(t);
 		  //System.out.println(t.getHTML());
+		  pngfile.delete();
 		  
 	  }
 	
@@ -66,13 +66,15 @@ public class BarChartTest extends ChartTestCase {
 		  loadData(bar, plot2,2.0F);
 		  System.out.println("Size is "+plot.getNumSets());
 		ChartData<?> c = bar.getChartData();
-		c.createPNG(new File(System.getProperty("java.io.tmpdir")+"/daymultibar"+".png"));
+		File pngfile = new File(System.getProperty("java.io.tmpdir")+"/daymultibar"+".png");
+		c.createPNG(pngfile);
 		  c.getSize();
 		  //pie.createSVG("/tmp/daypie2");
 		  Table t = bar.getTable();
 		  t.setKeyName("Day of week");
 		  checkTable(t);
 		  //System.out.println(t.getHTML());
+		  pngfile.delete();
 		  
 	  }
 	}

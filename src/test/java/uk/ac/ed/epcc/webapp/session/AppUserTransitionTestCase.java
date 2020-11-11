@@ -38,6 +38,7 @@ import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionFactory.ViewResult;
 import uk.ac.ed.epcc.webapp.servlet.AbstractTransitionServletTest;
+import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory.UpdatePersonRequiredPage;
 
@@ -210,9 +211,9 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 		assertEquals(2,requiredPages.size());
 		Iterator<RequiredPage<A>> it = requiredPages.iterator();
 		RequiredPage<A> page = it.next();
-		//assertTrue(page.getClass().getCanonicalName(),page instanceof PasswordAuthComposite.PasswordResetRequiredPage);
-		//assertFalse(page.required(sess));
-		//page = it.next();
+		assertTrue(page.getClass().getCanonicalName(),page instanceof PasswordAuthComposite.PasswordResetRequiredPage);
+		assertFalse(page.required(sess));
+		page = it.next();
 		assertTrue(page.getClass().getCanonicalName(),page instanceof UpdatePersonRequiredPage);
 		assertTrue(page.required(sess));
 		String return_page = "/noddy.jsp";
@@ -242,7 +243,36 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 		}
 		checkDiff("/cleanup.xsl", "details.xml");
 	}
+	@Test
+	@ConfigFixtures("require_update2.properties")
+	@DataBaseFixtures("details.xml")
+	public void testRemoveKey() throws Exception {
+		MockTansport.clear();
+		takeBaseline();
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.findByEmail("fred@example.com");
+		
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setCurrentPerson(user);
+		assertTrue(sess.haveCurrentUser());
+		AppUserTransitionProvider prov = (AppUserTransitionProvider) TransitionServlet.getProviderFromName(ctx, "Person");
+		setTransition(prov, AppUserTransitionProvider.UPDATE, user);
+		
+		
+		
+		checkFormContent(null, "details_form2.xml");
+		
+		addParam(PublicKeyComposite.PUBLIC_KEY+".Text","");
+		runTransition();
 	
+			AppUserTransitionProvider<A> provider = AppUserTransitionProvider.getInstance(getContext());
+			if( provider != null) {
+				checkViewRedirect(provider, user);
+			}else{
+				checkMessage("object_updated");
+			}
+		checkDiff("/cleanup.xsl", "details2.xml");
+	}
 	@Test
 	@DataBaseFixtures("details.xml")
 	@ConfigFixtures("require_update.properties")
@@ -325,7 +355,7 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 		checkFormContent(null, "set_roles_form.xml");
 		addParam("Pig", "Y");
 		runTransition();
-		checkMessage("object_updated");
+		checkMessage("roles_updated");
 		checkDiff("/cleanup.xsl", "roles.xml");
 	}
 }

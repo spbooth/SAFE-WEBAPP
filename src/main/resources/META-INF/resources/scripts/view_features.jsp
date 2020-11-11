@@ -15,8 +15,12 @@
     
 	
 --%>
-<%@ include file="/session.jsf" %>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
+<wb:session/>
+<%@page import="uk.ac.ed.epcc.webapp.session.SessionService" %>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService" %>
+<%@page import="uk.ac.ed.epcc.webapp.Feature" %>
 <%	
 	/* Must be an admin */
 	if( !((ServletSessionService)session_service).hasRole(SessionService.ADMIN_ROLE)) {
@@ -29,15 +33,15 @@
 <%	
 	String page_title = " View configured features ";
 %>
-<%@ include file="/std_header.jsf" %>
+<%@ include file="../std_header.jsf" %>
 <br>
-<%@ include file="/main__logged_in.jsf" %>
+<%@ include file="../main__logged_in.jsf" %>
 <br>
-<%@ include file="/back.jsf" %>
+<%@ include file="../back.jsf" %>
 <br>
 <%@page import="uk.ac.ed.epcc.webapp.content.*" %>
 <div class="block">
-<h2>Configuration features</h2>
+<h1>Configuration features</h1>
 <p>This is the list of current configurable features. The list is populated as
 features are referenced so may be incomplete when the server first starts.</p>
 <% HtmlBuilder builder = new HtmlBuilder();
@@ -47,5 +51,5 @@ builder.addTable(conn, Feature.getFeatureTable(conn));
 </div>	
 
 <br/>
-<%@ include file="/back.jsf" %>
-<%@ include file="/std_footer.jsf" %>
+<%@ include file="../back.jsf" %>
+<%@ include file="../std_footer.jsf" %>

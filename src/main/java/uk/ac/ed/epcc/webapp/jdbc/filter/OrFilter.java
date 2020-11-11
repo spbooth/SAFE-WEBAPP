@@ -61,7 +61,7 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		 */
 		@Override
 		public Boolean visitPatternFilter(PatternFilter<T> fil) throws Exception {
-			sql_filters.addPatternFilter(fil);;
+			sql_filters.addPatternFilter(fil);
 			return null;
 		}
 
@@ -134,6 +134,9 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		 */
 		@Override
 		public Boolean visitOrFilter(OrFilter<T> fil) throws Exception {
+			if( fil.force_value ) {
+				force_value=true;
+			}
 			sql_filters.addFilter(fil.sql_filters);
 			pure_accept_filters.addAll(fil.pure_accept_filters);
 			mixed_filters.addAll(fil.mixed_filters);
@@ -270,6 +273,10 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 	 */
 	@Override
 	public boolean getBooleanResult() {
+		return force_value;
+	}
+	
+	public boolean isForced() {
 		return force_value;
 	}
 	@Override

@@ -19,9 +19,11 @@ the form could just submit to self.
 --%>
 <%@page import="uk.ac.ed.epcc.webapp.tags.WebappHeadTag"%>
 <%@ page import="uk.ac.ed.epcc.webapp.content.*,uk.ac.ed.epcc.webapp.forms.html.*,uk.ac.ed.epcc.webapp.forms.*, uk.ac.ed.epcc.webapp.forms.transition.*" %>
-<%@ page %>
-<%@ include file="/session.jsf" %>
-<% WebappHeadTag.addCss(conn, request, "service_desk.css"); %>
+<%@page import="uk.ac.ed.epcc.webapp.servlet.TransitionServlet" %>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
+<wb:session/>
+<wb:css url="service_desk.css"/>
 <%
     TransitionFactory tp = TransitionServlet.getProvider(conn,request);
 	Object target =   TransitionServlet.getTarget(conn,tp,request);
@@ -69,9 +71,9 @@ if( tp instanceof TitleTransitionFactory){
 	TransitionServlet.recordView(session_service,provider,target);
 try{
 %>
-<%@ include file="/std_header.jsf" %>
-<%@ include file="/main__logged_in.jsf" %>
-<%@ include file="/back.jsf" %>
+<%@ include file="../std_header.jsf" %>
+<%@ include file="../main__logged_in.jsf" %>
+<%@ include file="../back.jsf" %>
 <%= provider.getTopContent(new HtmlBuilder(),target,session_service).toString() %>
 <div class="block" role="main">
 <% if( XMLContentBuilder.STREAM_BUILDER_FEATURE.isEnabled(conn)){
@@ -80,7 +82,7 @@ try{
 %>
 <%= provider.getLogContent(new HtmlBuilder(),target,session_service).toString() %>
 <%} %>
-<form id="form" action="<%=response.encodeURL(web_path +TransitionServlet.getURL(conn,provider,target)+"#form") %>" method="post">
+<form class="view" id="form" action="<%=response.encodeURL(web_path +TransitionServlet.getActionURL(conn,provider,target)) %>" method="post">
 <% if( crsf != null ){ %>
 <input type='hidden' name='<%=TransitionServlet.TRANSITION_CSRF_ATTR %>' value='<%=crsf %>'/>
 <%} %>
@@ -92,7 +94,7 @@ for(Object key : provider.getTransitions(target)){
     builder.clean(provider.getText(key));
     String valueString = builder.toString();
 
-	if( provider.allowTransition(conn,target,key) ){
+	if( provider.showTransition(conn,target,key) ){
 		String help=provider.getHelp(key);
 		if( help == null ){
 	 	  %>
@@ -109,11 +111,11 @@ for(Object key : provider.getTransitions(target)){
 				String help=provider.getHelp(key);
 				if( help == null ){
 			 	  %>
-			 	  <button class='input_button' disabled name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>'  value='<%=key.toString() %>' ><%=valueString%></button>
+			 	  <button class='input_button disabled' disabled name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>'  value='<%=key.toString() %>' ><%=valueString%></button>
 			 	  <% 
 				}else{
 					%>
-					<button class='input_button' disabled name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>' title='<%=help %> (disabled)'  value='<%=key.toString() %>' ><%=valueString%></button>
+					<button class='input_button disabled' disabled name='<%=TransitionServlet.TRANSITION_KEY_ATTR %>' title='<%=help %> (disabled)'  value='<%=key.toString() %>' ><%=valueString%></button>
 					<% 		
 				}
 			}
@@ -129,4 +131,4 @@ for(Object key : provider.getTransitions(target)){
 </form>
 </div>
 <%= provider.getBottomContent(new HtmlBuilder(),target,session_service).toString() %>
-<%@ include file="/std_footer.jsf" %>
+<%@ include file="../std_footer.jsf" %>

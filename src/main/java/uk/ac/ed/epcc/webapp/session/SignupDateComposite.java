@@ -41,7 +41,8 @@ public class SignupDateComposite<BDO extends DataObject> extends CreateComposite
  implements IndexTableContributor<BDO>{
 	public static final String SIGNUP_DATE = "SignupDate";
 
-	private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+	// not static not thread safe
+	private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	/**
 	 * @param fac
 	 */

@@ -236,5 +236,10 @@ public class Dummy3 extends DataObject {
 		public Class<Dummy3> getTarget() {
 			return Dummy3.class;
 		}
+		@Override
+		public void addRelationships(Set<String> roles) {
+			roles.add(SELF);
+			
+		}
     }
 }

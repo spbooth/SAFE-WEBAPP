@@ -131,10 +131,25 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 		}else if( target  instanceof Iterable){
 			addList((Iterable)target);
 		}else if( target instanceof Object[]) {
-			addList((Object []) target);
+			Object[] data = (Object[]) target;
+			if( data.length == 1) {
+				addObject(data[0]);
+			}else {
+				addList(data);
+			}
 		}else{
 			clean(target.toString());
 		}
+	}
+	@Override
+	default <X> boolean canAdd(X target) {
+		if( target == null ) {
+			return false;
+		}
+		if( (target instanceof UIProvider) || (target instanceof UIGenerator) || (target instanceof XMLPrinter) || ( target instanceof Viewable && target instanceof Contexed) || (target instanceof Identified) || (target instanceof Iterable)) {
+			return true;
+		}
+		return false;
 	}
 	public void append(XMLPrinter target);
 	public Logger getLogger(AppContext conn);
@@ -260,9 +275,11 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 	}
 	@Override
 	public default <C,R> void addTable(AppContext conn,Table<C,R> t,NumberFormat nf,String style) {
-		TableXMLFormatter<C,R> fmt = new TableXMLFormatter<>(this, nf,style);
-		fmt.setTableSections(true);
-		fmt.add(t);
+		if( t.hasData()) {
+			TableXMLFormatter<C,R> fmt = new TableXMLFormatter<>(this, nf,style);
+			fmt.setTableSections(true);
+			fmt.add(t);
+		}
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormTable(java.lang.Iterable)

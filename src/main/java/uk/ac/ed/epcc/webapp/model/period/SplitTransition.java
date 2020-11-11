@@ -117,9 +117,7 @@ public class SplitTransition<T extends TimePeriod,K> extends AbstractFormTransit
 		Date end = target.getEnd();
 		Date lock = fac.getEditLimit(conn.getService(SessionService.class));
 		
-		if( lock != null && lock.after(start)) {
-			start=lock;
-		}
+		
 		if( ! start.before(end)) {
 			throw new TransitionException("No valid split");
 		}
@@ -128,7 +126,15 @@ public class SplitTransition<T extends TimePeriod,K> extends AbstractFormTransit
 		BoundedDateInput input = fac.getDateInput();
 		
 		input.setValue(guess);
-		input.setMin(new Date(start.getTime()+1));
+		if( lock != null && lock.after(start)) {
+			if( !lock.before(end)) {
+				throw new TransitionException("No valid split");
+			}
+			// allowed to split exactly on lock date
+			input.setMin(new Date(lock.getTime()));
+		}else {
+			input.setMin(new Date(start.getTime()+1));
+		}
 		input.setMax(new Date(end.getTime()-1));
 		f.addInput("Date", "Split date", input );
 		// This ensures within the range were min/max allow

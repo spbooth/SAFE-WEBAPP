@@ -50,6 +50,7 @@ public interface StreamData {
 	 */
 	public OutputStream getOutputStream() ;
 
+	
 	/**
 	 * read data from an Input Stream
 	 * 
@@ -57,8 +58,21 @@ public interface StreamData {
 	 *            InputStream
 	 * @throws DataFault
 	 */
-	public void read(InputStream in) throws DataFault, IOException;
-
+	default public void read(InputStream in) throws DataFault, IOException {
+		OutputStream out = getOutputStream();
+		if( out == null){
+			throw new DataFault("Cannot get output stream");
+		}
+		int i;
+		
+			while((i=in.read())!=-1){
+				out.write(i);
+			}
+			in.close();
+			out.close();
+		
+	
+	}
 	/**
 	 * write contents to an OutputStream and close
 	 * 
@@ -66,7 +80,13 @@ public interface StreamData {
 	 *            OutputStream
 	 * @throws DataFault
 	 */
-	public void write(OutputStream out) throws DataFault, IOException;
+	default public void write(OutputStream out) throws DataFault, IOException {
+		append(out);
+		out.close();
+
+
+	}
+
 	/**
 	 * write contents to an OutputStream without closing.
 	 * 
@@ -74,6 +94,16 @@ public interface StreamData {
 	 *            OutputStream
 	 * @throws DataFault
 	 */
-	public void append(OutputStream out) throws DataFault, IOException;
+	default public  void append(OutputStream out) throws DataFault, IOException {
+		InputStream in = getInputStream();
+		if( in == null){
+			throw new DataFault("Cannot get input stream");
+		}
+		int i;
 
+		while((i=in.read())!=-1){
+			out.write(i);
+		}
+		in.close();
+	}
 }

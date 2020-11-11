@@ -24,9 +24,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.SerializableFormResult;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
@@ -95,6 +97,7 @@ public class RemoteAuthServlet extends WebappServlet {
 	public static final String REMOTE_AUTH_REALM_PROP = "remote_auth.realm";
 
 
+	private static final String REMOTE_AUTH_NEXT_URL="remote_auth.next_result";
 	/**
 	 * 
 	 */
@@ -215,12 +218,13 @@ public class RemoteAuthServlet extends WebappServlet {
 					person.historyUpdate();
 				// attempt a login
 					TwoFactorHandler handler = new TwoFactorHandler<>(session_service);
-					RedirectResult next_page = (RedirectResult) session_service.getAttribute(LoginServlet.INITIAL_PAGE_ATTR);
-					session_service.removeAttribute(LoginServlet.INITIAL_PAGE_ATTR);
+					RedirectResult next_page = (RedirectResult) LoginServlet.getSavedResult(session_service);
+					LoginServlet.clearSavedResult(session_service);
+					
 					if( next_page == null) {
 						next_page = new RedirectResult(LoginServlet.getMainPage(conn));
 					}
-					FormResult result = handler.doLogin(person, next_page);
+					FormResult result = handler.doLogin(person,remote_auth_realm, next_page);
 					handleFormResult(conn, req, res, result);
 					return;
 				}else{
@@ -228,6 +232,8 @@ public class RemoteAuthServlet extends WebappServlet {
 					return;
 				}
 			} else {
+				// binding or registration
+				
 				// Check for existing binding
 				// and replace rather than duplicate
 				AppUser existing = parser.findFromString(web_name);
@@ -243,8 +249,28 @@ public class RemoteAuthServlet extends WebappServlet {
 				}
 				try {
 					person.commit();
-					message(conn, req, res, "remote_auth_set",web_name);
-					return;
+					session_service.setAuthenticationType(remote_auth_realm);
+					CurrentTimeService time = conn.getService(CurrentTimeService.class);
+					if( time != null ) {
+						session_service.setAuthenticationTime(time.getCurrentTime());
+					}
+					SerializableFormResult next = getNextResult(session_service);
+					session_service.removeAttribute(REMOTE_AUTH_NEXT_URL);
+					if( next == null ) {
+						message(conn, req, res, "remote_auth_set",web_name);
+						return;
+					}else {
+						// This is a re-authenticaiton
+						parser.verified(person); // record sucessful authentication
+						for(RemoteAuthListener l : ((AppUserFactory<?>)person.getFactory()).getComposites(RemoteAuthListener.class)){
+							l.authenticated(remote_auth_realm,person);
+						}
+						person.commit();
+						person.historyUpdate();
+
+						handleFormResult(conn, req, res, next);
+						return;
+					}
 				} catch (DataFault e) {
 					getLogger(conn).error("error in RemoteAuthServlet",e);
 					throw new ServletException(e);
@@ -260,6 +286,10 @@ public class RemoteAuthServlet extends WebappServlet {
 				throw (IOException) e;
 			}
 		}
+	}
+
+	private SerializableFormResult getNextResult(SessionService session_service) {
+		return (SerializableFormResult) session_service.getAttribute(REMOTE_AUTH_NEXT_URL);
 	}
 
 	/** Set the user that should be registered (and logged in) if the
@@ -324,6 +354,15 @@ public class RemoteAuthServlet extends WebappServlet {
     	return null;
     }
 
+    /** set a result to go to after re-authentication/register
+     * 
+     * @param sess
+     * @param next
+     */
+    public static void setNextResult(SessionService<?> sess, SerializableFormResult next) {
+    	sess.setAttribute(REMOTE_AUTH_NEXT_URL, next);
+    }
+   
 	/**
 	 * @param token
 	 * @return

@@ -61,6 +61,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.ForceRollBack;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 
@@ -98,6 +99,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	private static final String DATABASE_TRANSACTION_TIMER = "DatabaseTransaction";
 	public static final String VIEW_TRANSITION = "ViewTransition.";
 	public static final Feature TRANSITION_TRANSACTIONS = new Feature("transition.transactions", true, "Use database transaction within transitions");
+	public static final Preference TRANSITION_ANCHOR = new Preference("transition.use_anchor", true, "Navigate to main form in a page rather than page start");
 	
 	/** This is a security control. It is intended to prevent a malicious web-page from including
 	 * image links that will be automatically fetched causing un-approved side effects.
@@ -139,11 +141,13 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		log.debug("In TransitionServlet");
 		FormResult o = null;
 		TransitionFactory<K,T> tp = null;
+		String provider_name="Unspecified";
 		if( path.size() > 0){
-			tp = (TransitionFactory<K, T>) getProviderFromName(conn, path.removeFirst());
+			provider_name=path.removeFirst();
+			tp = (TransitionFactory<K, T>) getProviderFromName(conn, provider_name);
 		}
 		if( tp == null ){
-        	log.warn("No transition provider");
+        	log.warn("No transition provider "+provider_name);
         	message(conn,req,res,"invalid_input");
 			return;
         }
@@ -212,6 +216,8 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 				}
 				return;
 			}else{
+				badInputCheck(conn);
+				
 				log.debug("No transition");
 				message(conn, req, res, "invalid_input");
 				return;
@@ -233,8 +239,9 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			o = t.getResult(getShortcutVisitor(conn, params, tp, target, key));
 			if( o == null){
 				log.debug("No shortcut result");
-				if( ! (non_modifying || req.getMethod().equalsIgnoreCase("POST"))) {
-					getLogger(conn).error("Modify not from POST");
+				if( ! (non_modifying || req.getMethod().equalsIgnoreCase("POST") || req.getMethod().equalsIgnoreCase("PUT"))) {
+					// allow put as restservlet sub-class can take a put request document
+					getLogger(conn).error("Modify not from POST/PUT");
 					if( MODIFY_ON_POST_ONLY.isEnabled(conn)) {
 						res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			        	return;
@@ -525,7 +532,12 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			
 				return null;
 			}
-			return prov.getTarget(target_id);
+			T target = prov.getTarget(target_id);
+			if( target == null) {
+				// non empty id failed to resolve
+				WebappServlet.checkBadInput(prov.getContext().getService(SessionService.class));
+			}
+			return target;
 		}
 
 		public  T visitPathTransitionProvider(
@@ -585,17 +597,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 
 		public String visitPathTransitionProvider(
 				PathTransitionProvider<K, T> prov) {
-			StringBuilder path = new StringBuilder();
-			boolean seen=false;
-			for(String pe : prov.getID(target)){
-				if( seen ) {
-					path.append("/");
-				}else {
-					seen=true;
-				}
-				path.append(pe);
-			}
-			return path.toString();
+			return String.join("/", prov.getID(target));
 		}
 	}
 	/** Add a button to perform the required operation on the target
@@ -631,6 +633,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		}
 		String url = getURL(c, tp, target, null);
 		hb.open("form");
+		hb.addClass("button");
         hb.attr("method", "post");
         ServletService serv = c.getService(ServletService.class);
          if (serv != null) {
@@ -796,6 +799,13 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 	 */
 	public static <A,B> String getURL(AppContext conn, TransitionFactory<A, B> tp,B target){
 		return getURL(conn, tp, target,null);
+	}
+	public static <A,B> String getActionURL(AppContext conn, TransitionFactory<A, B> tp,B target) {
+		String url = getURL(conn, tp, target);
+		if( TRANSITION_ANCHOR.isEnabled(conn)) {
+			return url+"#form";
+		}
+		return url;
 	}
 	public static <A,B> String getURL(HttpServletRequest req,HttpServletResponse res,AppContext conn, TransitionFactory<A, B> tp,B target){
 		return getURL(req,res,conn, tp, target,null);

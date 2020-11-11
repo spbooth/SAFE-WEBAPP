@@ -51,6 +51,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.WrappedInput;
 import uk.ac.ed.epcc.webapp.forms.registry.FormPolicy;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 
 public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisitor<Object>{
 	/**
@@ -63,8 +64,8 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 	private static final Preference USE_HTML5_FEATURE = new Preference("html5", true,"use html5 input types"); 
 	private static final Preference ESCAPE_UNICODE_FEATURE = new Preference("html.input.escape_unicode",false,"Escape high code point characters in input values");
 	private static final Feature USE_DATALIST = new Feature("html5.use_datalist",true,"Use html5 datalist syntax, disable to test the fallback mode (as if browser does not userstand datalist)");
-	private static final Feature LOCK_FORCED_LIST = new Feature("html.list_input.lock_forced",false,"Supress mandatory pull-down inputs with a single choice");
-	
+	static final Feature LOCK_FORCED_LIST = new Feature("html.list_input.lock_forced",false,"Supress mandatory pull-down inputs with a single choice");
+	private static final Feature MULTI_INPUT_TABLE = new Feature("html.multi_input.use_table",false,"Use layout tables for multi-input");
 	private ExtendedXMLBuilder hb;
 	private boolean use_post;
 	private boolean use_html5;
@@ -82,7 +83,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		this.hb=hb;
 		this.use_post=use_post;
 		this.post_params=post_params;
-		this.id_vis = new InputIdVisitor(prefix);
+		this.id_vis = new InputIdVisitor(conn,optional,prefix);
 		this.data_attr=data_attr;
 		use_html5 = conn==null || USE_HTML5_FEATURE.isEnabled(conn);
 	}
@@ -136,7 +137,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		}
 		hb.open("input");
 		try {
-			String id = (String) input.accept(id_vis);
+			String id = makeID(input);
 			if( id != null){
 				hb.attr("id",id);
 			}
@@ -153,6 +154,10 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		hb.addClass("input");
 		hb.close();
 
+	}
+	protected String makeID(Input input) throws Exception {
+		String raw = (String) input.accept(id_vis);
+		return id_vis.normalise(raw);
 	}
 	
 	
@@ -174,7 +179,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		}
 		hb.open("input");
 		try {
-			String id = (String) input.accept(id_vis);
+			String id = makeID(input);
 			if( id != null){
 				hb.attr("id",id);
 			}
@@ -210,81 +215,81 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		}
 		
 		Iterator<T> iter = input.getItems();
-		if( iter.hasNext()){
-		hb.open("select");
-		try {
-			String id = (String) input.accept(id_vis);
-			if( id != null){
-				hb.attr("id",id);
+		if(iter != null &&  iter.hasNext()){
+			hb.open("select");
+			try {
+				String id = makeID(input);
+				if( id != null){
+					hb.attr("id",id);
+				}
+			} catch (Exception e) {
+				conn.error(e,"Error getting id");
 			}
-		} catch (Exception e) {
-			conn.error(e,"Error getting id");
-		}
-		hb.attr("name",input.getKey());
-		hb.addClass("input");
-		
-		if( use_html5 && use_required && ! optional){
-			hb.attr("required",null);
-		}
-		if( optional ||
-				(input instanceof PreSelectInput && ! ((PreSelectInput)input).allowPreSelect()) && input.getCount() > 1){
-			// need ability to select nothing
-			// a non optional pre-select input with only 1 valid answer always 
-			// pre-selects.
-			hb.open("option");
-			hb.attr("value","");
-			String unselected="Not Selected";
-			if(input instanceof OptionalListInput){
-				String override = ((OptionalListInput) input).getUnselectedText();
-				if(override != null && override.trim().length() > 0){
-					unselected = override;
+			hb.attr("name",input.getKey());
+			hb.addClass("input");
+
+			if( use_html5 && use_required && ! optional){
+				hb.attr("required",null);
+			}
+			if( optional ||
+					(input instanceof PreSelectInput && ! ((PreSelectInput)input).allowPreSelect()) && input.getCount() > 1){
+				// need ability to select nothing
+				// a non optional pre-select input with only 1 valid answer always 
+				// pre-selects.
+				hb.open("option");
+				hb.attr("value","");
+				String unselected="Not Selected";
+				if(input instanceof OptionalListInput){
+					String override = ((OptionalListInput) input).getUnselectedText();
+					if(override != null && override.trim().length() > 0){
+						unselected = override;
+					}
+				}
+				hb.clean(unselected);
+				hb.close();
+			}
+			String def = null;
+			if (use_post) {
+				def = param;
+			} else {
+				X default_value = input.getValue();
+				if (default_value != null) {
+					def = input.getTagByValue(default_value);
+
 				}
 			}
-			hb.clean(unselected);
-			hb.close();
-		}
-		String def = null;
-		if (use_post) {
-			def = param;
-		} else {
-			X default_value = input.getValue();
-			if (default_value != null) {
-				def = input.getTagByValue(default_value);
-
-			}
-		}
-		boolean seen_selected=false;
-		for (; iter.hasNext();) {
-			T current = iter.next();
-			String tag = input.getTagByItem(current);
-			hb.open("option");
-			hb.attr("value", tag );
-			if ((def != null && def.equals(tag)) || forced) {
-				hb.attr("selected",null);
-				seen_selected=true;
-			}
-			String label = input.getText(current);
-			hb.clean( label );
-			hb.close();
-			hb.clean("\n");
-
-		}
-		if( def != null && ! seen_selected ){
-			// check for an out of band value
-			T item = input.getItem();
-			if( item != null ){
-				String tag = input.getTagByItem(item);
+			boolean seen_selected=false;
+			for (; iter.hasNext();) {
+				T current = iter.next();
+				String tag = input.getTagByItem(current);
 				hb.open("option");
-				hb.attr("value", tag);
-				hb.attr("selected", null);
-				String label = input.getText(item);
+				hb.attr("value", tag );
+				if ((def != null && def.equals(tag)) || forced) {
+					hb.attr("selected",null);
+					seen_selected=true;
+				}
+				String label = input.getText(current);
 				hb.clean( label );
-				hb.clean(" [not in default selection]");
 				hb.close();
 				hb.clean("\n");
+
 			}
-		}
-		hb.close();
+			if( def != null && ! seen_selected ){
+				// check for an out of band value
+				T item = input.getItem();
+				if( item != null ){
+					String tag = input.getTagByItem(item);
+					hb.open("option");
+					hb.attr("value", tag);
+					hb.attr("selected", null);
+					String label = input.getText(item);
+					hb.clean( label );
+					hb.clean(" [not in default selection]");
+					hb.close();
+					hb.clean("\n");
+				}
+			}
+			hb.close();
 		}else{
 			// no items !
 			hb.open("span");
@@ -300,6 +305,9 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		
 		
 		for (Iterator<T> iter = input.getItems(); iter.hasNext();) {
+			hb.open("div");
+			hb.addClass("option");
+			
 			T current = iter.next();
 			emitRadioButtonHTML(hb, use_post,input, param, current);
 			String label = input.getText(current);
@@ -307,7 +315,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				hb.open("label");
 				try {
 					id_vis.setRadioTarget(current);
-					String id = input.accept(id_vis);
+					String id = makeID(input);
 					if( id != null) {
 						hb.attr("for",id);
 					}
@@ -322,7 +330,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				hb.clean( label );
 				
 			}
-			hb.br();
+			hb.close();
 			hb.clean("\n");
 
 		}
@@ -359,7 +367,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		String id = null;
 		try {
 			id_vis.setRadioTarget(current);
-			id = input.accept(id_vis);
+			id = makeID(input);
 		}catch(Exception e) {
 			getLogger().error("Error making radio button id", e);
 		}finally {
@@ -389,7 +397,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		
 		String id=null;
 		try {
-			id = (String) input.accept(id_vis);
+			id = makeID(input);
 		} catch (Exception e) {
 			conn.error(e,"Error getting id");
 		}
@@ -408,7 +416,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		}
 		String id=null;
 		try {
-			id = (String) input.accept(id_vis);
+			id = makeID(input);
 		} catch (Exception e) {
 			conn.error(e,"Error getting id");
 		}
@@ -466,10 +474,11 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			optional = optional || !input.requireAll();
 		
 		if( input.hasLineBreaks()){
-			hb.open("table");
-			hb.addClass("multi_input");
-			for(String sub_key : input.getSubKeys()){
-				hb.open("tr");
+			if( MULTI_INPUT_TABLE.isEnabled(getContext()) ) {
+				hb.open("table");
+				hb.addClass("multi_input");
+				for(String sub_key : input.getSubKeys()){
+					hb.open("tr");
 					if( input.hasSubLabels()){
 						hb.open("td");
 						String lab = input.getSubLabel(sub_key);
@@ -477,15 +486,41 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 							hb.clean(lab);
 						}
 						hb.close();
-					
+
 					}
 					hb.open("td");
 					T i = input.getInput(sub_key);
 					i.accept(this);
 					hb.close();
+					hb.close();
+				}
+				hb.close();
+			}else{
+				hb.open("div");
+				hb.addClass("multi_input");
+				if( input.hasSubLabels()) {
+					// use grid layout to make 2 col
+					// at time of writting all sub-label inputs are single line
+					hb.addClass("sub_labels");
+				}
+				for(String sub_key : input.getSubKeys()){
+
+					if( input.hasSubLabels()){
+						hb.open("div");
+						String lab = input.getSubLabel(sub_key);
+						if( lab != null ){
+							hb.clean(lab);
+						}
+						hb.close();
+
+					}
+					hb.open("div");
+					T i = input.getInput(sub_key);
+					i.accept(this);
+					hb.close();
+				}
 				hb.close();
 			}
-			hb.close();
 		}else{
 			hb.open("span");
 			hb.addClass("multi_input");
@@ -569,10 +604,6 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		if( input instanceof FormatHintInput){
 			format_hint = ((FormatHintInput)input).getFormatHint();
 		}
-		String wrapper=null;
-		if( input instanceof WrappedInput){
-			wrapper=((WrappedInput)input).getWrapperClass();
-		}
 		boolean old_escape = result.setEscapeUnicode(! force_password && ESCAPE_UNICODE_FEATURE.isEnabled(conn));
 		// max_result_length <= 0 is unlimited
 		if (force_single || ( max_result_length > 0 && max_result_length <= 2 * boxwid)) {
@@ -583,10 +614,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			boolean autocomplete = input instanceof AutoComplete;
 			boolean use_datalist = autocomplete && use_html5 && USE_DATALIST.isEnabled(conn);
 			
-			if (wrapper != null) {
-				result.open("div");
-				result.addClass( wrapper);
-			}
+			
 			
 			result.open("input");
 			if( id != null ){
@@ -675,9 +703,6 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 					emitDataList(result, use_datalist,(AutoComplete) input, name);
 				}
 			}
-			if( wrapper != null){
-				result.close(); // close the <div>
-			}
 		} else {
 			int rows = ((max_result_length + boxwid - 1) / boxwid);
 			int max_text_rows = conn.getIntegerParameter(HTML_TEXTAREA_MAX_ROWS, 24);
@@ -735,6 +760,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			result.open("datalist");
 			result.attr("id", name + "_list");
 		}
+		try(TimeClosable time = new TimeClosable(getContext(), () -> "datalist."+name)){
 		// As susggested in the HTML standard if the datalist element is
 		// not recognised can use a select with the same input name as the text input
 		// if datalist is recognised then select element will have no effect
@@ -767,6 +793,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			result.close(); // datalist
 		}
 		//result.close(); // noscript
+		}
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor#visitParseMultiInput(uk.ac.ed.epcc.webapp.forms.inputs.ParseMultiInput)
@@ -775,6 +802,17 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 	public <V, I extends Input> Object visitParseMultiInput(
 			ParseMultiInput<V, I> multiInput) throws Exception {
 		return visitMultiInput(multiInput);
+	}
+	@Override
+	public <X> Object visitWrappedInput(WrappedInput<X> i) throws Exception {
+		hb.open("div");
+		String my_class = i.getWrapperClass();
+		if( my_class != null ) {
+			hb.addClass(my_class);
+		}
+		i.getWrappedInput().accept(this);
+		hb.close();
+		return null;
 	}
 	
 }

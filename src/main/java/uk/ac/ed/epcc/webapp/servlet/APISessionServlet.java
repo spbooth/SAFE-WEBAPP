@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.servlet;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -60,6 +61,11 @@ public abstract class APISessionServlet extends SessionServlet {
 							AppUser p =composite.findByLoginNamePassword(user, password,CHECK_API_FAILS.isEnabled(conn));
 							if( p != null && p.canLogin()){
 								sess.setCurrentPerson(p);
+								sess.setAuthenticationType("password");
+								CurrentTimeService time = conn.getService(CurrentTimeService.class);
+								if( time != null ) {
+									sess.setAuthenticationTime(time.getCurrentTime());
+								}
 							}
 					} catch (DataException e) {
 						conn.getService(LoggerService.class).getLogger(getClass()).error("Error locating person", e);

@@ -43,7 +43,11 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 	    // Note some filters may appear in both 
 		protected LinkedHashSet<PatternFilter> filters;
 	    protected LinkedHashSet<OrderClause> order=null;
+	    // value filter is forced to. This also encoded if the filter is forced
+	    // depending on if the value is the same or different from the default
 	    private boolean force_value;
+	    // Do we care about order filters or can we ignore them.
+	    private transient boolean select_only=false;
 	    public BaseCombineFilter(Class<T> target){
 	    	super(target);
 	    	filters = new LinkedHashSet<>();
@@ -77,6 +81,13 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 				// handle joins and order
 				// Do this first to ensure we get the joins in the correct order
 				handleBaseCombineFilter(fil);
+				
+				if( fil.isForced()) {
+					// we have the joins and order
+					// just need to process the forced value
+					visitBinaryFilter(fil);
+					return null;
+				}
 				// First handle the selection branches
 				// must NOT process join here as we need to preserve
 				// the order in the explicit join set.
@@ -120,25 +131,31 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 				// Do this first to ensure the joins are added in the correct order
 				handleBaseCombineFilter(fil);
 				if(getFilterCombiner() == FilterCombination.AND) {
-					// These methods will loop over the inner filters to remove
-					// nesting if appropriate (ie combine mechanism is right).
-					visitAcceptFilter(fil);
-					for(PatternFilter p : fil.getPatternFilters()) {
-						// This will duplicate adding the joins but they should already be in place
-						// use visitor in preference so we can  customise the add.
-						// by sub-type.
-						p.acceptVisitor(this);
+					if( fil.isForced()) {
+						force_value=false;
+					}else {
+						// These methods will loop over the inner filters to remove
+						// nesting if appropriate (ie combine mechanism is right).
+						visitAcceptFilter(fil);
+						for(PatternFilter p : fil.getPatternFilters()) {
+							// This will duplicate adding the joins but they should already be in place
+							// use visitor in preference so we can  customise the add.
+							// by sub-type.
+							p.acceptVisitor(this);
+						}
 					}
 				}else {
-					// This filter is adding in OR combination
-					if( fil.hasAcceptFilters() && 
-							fil.hasPatternFilters()) {
-						throw new ConsistencyError("Cannot combine accept/pattern in OR combination");
+					if( ! fil.isForced()) {
+						// This filter is adding in OR combination
+						if( fil.hasAcceptFilters() && 
+								fil.hasPatternFilters()) {
+							throw new ConsistencyError("Cannot combine accept/pattern in OR combination");
+						}
+						// Either one or both of these is empty 
+						// so we can add separately
+						visitAcceptFilter(fil);
+						visitPatternFilter(fil);
 					}
-					// Either one or both of these is empty 
-					// so we can add separately
-					visitAcceptFilter(fil);
-					visitPatternFilter(fil);
 				}
 				
 				return null;
@@ -234,7 +251,24 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 			return new AddFilterVisitor();
 		}
 
+		/**
+		 * @return the select_only
+		 */
+		public boolean isSelectOnly() {
+			return select_only;
+		}
+
+		/**
+		 * @param select_only the select_only to set
+		 */
+		public void setSelectOnly(boolean select_only) {
+			this.select_only = select_only;
+		}
+
 		protected final void addOrder(List<OrderClause> new_order) throws ConsistencyError {
+			if( isSelectOnly()) {
+				return;
+			}
 			if( new_order == null || new_order.size() == 0 ){
 				return;
 			}
@@ -368,7 +402,7 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 		 * 
 		 * @return
 		 */
-		protected boolean isForced(){
+		public boolean isForced(){
 			return force_value != getFilterCombiner().getDefault();
 		}
 		/** Is this filter exactly a {@link BinaryFilter}
@@ -432,6 +466,8 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
 			sb.append(getClass().getSimpleName());
+			//sb.append("@");
+			//sb.append(getTarget().getSimpleName());
 			sb.append("(");
 			listContents(sb);
 			sb.append(")");

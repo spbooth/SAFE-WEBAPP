@@ -39,6 +39,7 @@ import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
+import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
@@ -220,7 +221,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		IntegerInput input = new IntegerInput();
 		input.setMin(0);
 		input.setMax(999999);
-		input.setBoxWidth(6);
+		input.setBoxWidth(8); // use longer box as many browsers reduce size with added number picker
 		return input;
 	}
 
@@ -267,10 +268,10 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	 * @return
 	 */
 	public long getNorm() {
-		return 30000L; // 30 second
+		return getContext().getLongParameter("totp.refresh.millis", 30000L); // 30 second
 	}
 	public int getWindow() {
-		return 3;
+		return getContext().getIntegerParameter("totp.window",3);
 	}
 
 	@Override
@@ -291,7 +292,9 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		sb.append(URLEncoder.encode(getContext().getInitParameter("service.name"),"UTF-8"));
 		sb.append(":");
 		AppUserFactory<A> factory = (AppUserFactory<A>) getFactory();
-		sb.append(factory.getCanonicalName(user));
+		String name = factory.getCanonicalName(user);
+		name=URLEncoder.encode(name.trim(), "UTF-8");
+		sb.append(name);
 		sb.append("?secret=");
 		sb.append(getEncodedSecret(key));
 		
@@ -406,7 +409,8 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		@Override
 		public void buildForm(Form f, A target, AppContext conn) throws TransitionException {
 			try {
-				if( VERIFY_OLD_CODE.isEnabled(conn) && needAuth(target)) {
+				boolean verify = VERIFY_OLD_CODE.isEnabled(conn) && needAuth(target);
+				if( verify) {
 					modifyForm(target, f);
 				}
 				Key key2 = getKey();
@@ -414,6 +418,10 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 				f.addInput(KEY, "New key", new ConstantInput<>(enc,enc));
 				f.addInput(NEW_CODE, "Verification code (New key)", getInput());
 				f.getField(NEW_CODE).addValidator(new CodeValidator(key2));
+				if( ! verify ) {
+					// will be single field
+					f.setAutoFocus(NEW_CODE);
+				}
 				f.addAction("Set", new setKeyAction(prov,target));
 			} catch (Exception e) {
 				getLogger().error("Error building form", e);
@@ -441,6 +449,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 					xml.addClass("qrcode");
 					URI uri=getURI(target, getKey());
 					xml.attr("src",serv.encodeURL(QRServlet.getImageURL(getContext(), "code.png", uri.toString())));
+					xml.attr("alt","QRCode to be read by smartphone");
 					// no alt as we want to avoid the value being cached
 					//xml.attr("alt",uri.toString());
 					xml.close();
@@ -577,6 +586,16 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	@Override
 	protected String getConfigPrefix() {
 		return "totp_auth_code";
+	}
+
+	@Override
+	public ContentBuilder addExtra(ContentBuilder cb) {
+		cb = super.addExtra(cb);
+		PreDefinedContent extra = new PreDefinedContent(getContext(), true, PreDefinedContent.DEFAULT_BUNDLE, "two_factor.extra_content");
+		if( extra.hasContent()) {
+			cb.addObject(extra);
+		}
+		return cb;
 	}
 
 }

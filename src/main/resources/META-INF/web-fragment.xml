@@ -16,13 +16,14 @@
  <name>WEBAPP</name> 
  
  
-<filter>
-  <filter-name>Fault-filter</filter-name>
-  <filter-class>uk.ac.ed.epcc.webapp.servlet.ErrorFilter</filter-class>
-</filter>
+
 <filter-mapping>
-  <filter-name>Fault-filter</filter-name>
+  <filter-name>FaultFilter</filter-name>
   <url-pattern>/*</url-pattern>
+</filter-mapping>
+<filter-mapping>
+ <filter-name>Log4JInfoFilter</filter-name>
+ <url-pattern>/*</url-pattern>
 </filter-mapping>
 <listener>
  <listener-class>uk.ac.ed.epcc.webapp.servlet.LogServiceWebappContextListener</listener-class>

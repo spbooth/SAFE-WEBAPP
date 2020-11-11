@@ -21,6 +21,7 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -112,6 +113,7 @@ public class DefaultServletService implements ServletService{
 
 	public static final Feature EXTERNAL_AUTH_VIA_LOGIN_FEATURE = new Feature("external_auth.use_login",false,"Mandatory external auth with only login.jsp protected externally");
 
+	public static final Feature ALLOW_INSECURE = new Feature("session.allow_insecure",false,"Allow insecure connections to use tokes");
 	public static final Feature REDIRECT_TO_LOGIN_FEATURE = new Feature("login_page.always_redirect",false,"Always use redirect to go to login page");
 	public DefaultServletService(AppContext conn,ServletContext ctx, ServletRequest req,
 			ServletResponse res) {
@@ -372,7 +374,7 @@ public class DefaultServletService implements ServletService{
 	 * @return Map of request parameters
 	 */
 	public Map<String,Object> makeParams(HttpServletRequest req)  {
-		Hashtable<String,Object> h = new Hashtable<>();
+		Map<String,Object> h = new LinkedHashMap<String, Object>();
 		
 		
 		String path = req.getPathInfo();
@@ -413,6 +415,12 @@ public class DefaultServletService implements ServletService{
 					}
 				}
 			}
+		}
+		String type = req.getContentType();
+		// if this is not one of the already handled form types
+		// map the request body to a StreamData
+		if( ! h.containsKey(ServletService.DEFAULT_PAYLOAD_PARAM) && type != null && ! type.contains("x-www-form-urlencoded") && !  type.startsWith("multipart")) {
+			h.put(ServletService.DEFAULT_PAYLOAD_PARAM,new RequestMimeStreamData(getContext(), req));
 		}
 		return h;
 	}
@@ -477,8 +485,8 @@ public class DefaultServletService implements ServletService{
 		BearerTokenService bearer = getContext().getService(BearerTokenService.class);
 		int code = HttpServletResponse.SC_UNAUTHORIZED;
 		if( bearer != null ) {
-			
-			if(  bearer.request() && res instanceof HttpServletResponse) {
+			// only request if secure conneciton
+			if(  bearer.request() && res instanceof HttpServletResponse && req.isSecure()) {
 				StringBuilder header =new StringBuilder();
 				header.append("Bearer");
 				String token_realm = bearer.getRealm();
@@ -542,7 +550,7 @@ public class DefaultServletService implements ServletService{
 		// Need to remember page and redirect to login
 		
 		if( page !=null&& ! page.isEmpty()) {
-			sess.setAttribute(LoginServlet.INITIAL_PAGE_ATTR, new RedirectResult(page));
+			LoginServlet.setSavedResult(sess,  new RedirectResult(page));
 		}
 		if( EXTERNAL_AUTH_VIA_LOGIN_FEATURE.isEnabled(getContext()) || REDIRECT_TO_LOGIN_FEATURE.isEnabled(getContext()) || ! LoginServlet.BUILT_IN_LOGIN.isEnabled(getContext())) {
 			
@@ -604,7 +612,7 @@ public class DefaultServletService implements ServletService{
 							// If we want to support 2-factor with external login 
 							// we should do this via a required page.
 							sess.setCurrentPerson(person);
-							
+							sess.setAuthenticationType(remote_auth_realm);
 							CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 							if( time != null) {
 								sess.setAuthenticationTime(time.getCurrentTime());
@@ -631,6 +639,10 @@ public class DefaultServletService implements ServletService{
 						if( type.equals("Bearer")) {
 							BearerTokenService bearer = getContext().getService(BearerTokenService.class);
 							if( bearer != null ) {
+								if( ! (request.isSecure() || ALLOW_INSECURE.isEnabled(getContext()))){
+									error("Bearer token from insecure connection");
+									return;
+								}
 								// Let the bearer token service do everything
 								// this is to allow it to implement anonymous role only sessions
 								bearer.processToken(sess, cred);
@@ -883,5 +895,15 @@ public class DefaultServletService implements ServletService{
 			names.add(e.nextElement());
 		}
 		return names;
+	}
+
+
+	@Override
+	public void setTimeout(int seconds) {
+		HttpSession sess = getSession();
+		if( sess != null ) {
+			sess.setMaxInactiveInterval(seconds);
+		}
+		
 	}
 }

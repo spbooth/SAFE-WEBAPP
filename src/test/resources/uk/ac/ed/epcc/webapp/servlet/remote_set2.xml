@@ -1,0 +1,37 @@
+<Diff><TableSpecification name='OIDC'>
+<Name type='String' nullable='false' max='128'/>
+<Person reference='Person'/>
+<name_index type='Index' unique='true'><Column name='Name'/></name_index>
+</TableSpecification>
+<TableSpecification name='Person'>
+<Email type='String' nullable='true' max='254'/>
+<Updated type='Long' nullable='true'/>
+<PasswordFails type='Integer' nullable='false'/>
+<PasswordStatus type='String' nullable='false' max='1'/>
+<Salt type='String' nullable='false' max='16'/>
+<Alg type='Integer' nullable='false'/>
+<Password type='String' nullable='false' max='64'/>
+<SignupDate type='Long' nullable='true'/>
+<Email_index type='Index' unique='true'><Column name='Email'/></Email_index>
+</TableSpecification>
+<Person id='1'>
+<Email>fred@example.com</Email>
+<PasswordFails>0</PasswordFails>
+<PasswordStatus>V</PasswordStatus>
+<Salt>UGjHKekNOf8wwd9F</Salt>
+<Alg>2</Alg>
+<Password>ba59c942921bd18c0ad8b49c79aeb31f7e7745ffbd40f008a2bc80e6d2e6eecc</Password>
+</Person>
+<OIDC id='1'>
+<Name>fred</Name>
+<Person>1</Person>
+</OIDC>
+<TableSpecification name='role_table'>
+<PersonID type='Integer' nullable='false'/>
+<Role type='String' nullable='false' max='32'/>
+</TableSpecification>
+<role_table id='1'>
+<PersonID>1</PersonID>
+<Role>Admin</Role>
+</role_table>
+</Diff>

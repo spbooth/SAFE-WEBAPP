@@ -44,9 +44,10 @@ import uk.ac.ed.epcc.webapp.preferences.Preference;
 
 public class HtmlBuilder extends HtmlPrinter implements XMLContentBuilder {
   
-public static final Feature HTML_TABLE_SECTIONS_FEATURE = new Preference("html.table_sections",false,"generate thead/tbody in tables");
+public static final Feature HTML_TABLE_SECTIONS_FEATURE = new Preference("html.table_sections",false,"generate thead/tbody in html tables");
+public static final Feature HTML_TABLE_HEADER_SCOPE_FEATURE = new Preference("html.table_header_scope",false,"generate scope attributes for html table headers");
 Boolean use_table_section=null;
-
+Boolean use_table_scope=null;
 private boolean new_tab=false; // Do  we want to open links/buttons in new tab/window
 private HtmlFormPolicy policy = new HtmlFormPolicy();
 protected static final class Text extends Panel {
@@ -203,6 +204,12 @@ public HtmlBuilder(){
 		}else{
 			fmt.setTableSections(HTML_TABLE_SECTIONS_FEATURE.isEnabled(conn));
 		}
+		if( use_table_scope != null){
+			// If set explicitly this takes preference.
+			fmt.setUseScope(use_table_scope);
+		}else{
+			fmt.setUseScope(HTML_TABLE_HEADER_SCOPE_FEATURE.isEnabled(conn));
+		}
 		fmt.add(t);
 	}
 
@@ -307,6 +314,7 @@ public void addActionButtons(Form f,String legend,Set<String> actions) {
 				// non validsating actions always enabled
 				if( action instanceof DisabledAction || ! can_submit){
 					attr("disabled",null);
+					addClass("disabled");
 				}
 			}
 			
@@ -379,4 +387,14 @@ public boolean setNewTab(boolean new_tab) {
 	this.new_tab = new_tab;
 	return old;
 }
+
+public static String strip(String input) {
+	if( input == null) {
+		return null;
+	}
+	HtmlBuilder hb=new HtmlBuilder();
+	hb.clean(input);
+	return hb.toString();
+}
+
 }

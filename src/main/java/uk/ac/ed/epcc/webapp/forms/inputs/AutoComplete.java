@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import java.util.Iterator;
 import java.util.Set;
 
 /** Interface for inputs that provide auto-complete text.
@@ -21,7 +22,7 @@ import java.util.Set;
  * @param <T> item type
  * @param <V> input type
  */
-public interface AutoComplete<T,V> extends ItemInput<V,T>, ParseInput<V> {
+public interface AutoComplete<T,V> extends SuggestedItemInput<V,T>, ParseInput<V> {
 
 	/** Get the set of Items corresponding to a suggested values
 	 * 
@@ -43,5 +44,15 @@ public interface AutoComplete<T,V> extends ItemInput<V,T>, ParseInput<V> {
 	 * @return
 	 */
 	String getSuggestionText(T item);
+
+	@Override
+	default Iterator<T> getItems() {
+		return getSuggestions().iterator();
+	}
+
+	@Override
+	default int getCount() {
+		return getSuggestions().size();
+	}
 
 }

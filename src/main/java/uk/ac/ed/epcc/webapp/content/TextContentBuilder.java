@@ -109,6 +109,20 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 			clean(target.toString());
 		}
 	}
+	
+	public <X> boolean canAdd(X target) {
+		if( target instanceof UIProvider){
+			return true;
+		}else if( target instanceof UIGenerator){
+			return true;
+		}else if( target instanceof Identified){
+			return true;
+		}else if( target  instanceof Iterable){
+			return true;
+		}else{
+			return false;
+		}
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addList(java.lang.Iterable)
 	 */

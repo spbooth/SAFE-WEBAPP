@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 /** an input that validates text against a pattern
  * 
  * @author spb
@@ -88,6 +89,4 @@ public String getTag() {
 	}
 	return "Regexp: "+pattern;
 }
-
-
 }

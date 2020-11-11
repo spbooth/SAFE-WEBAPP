@@ -393,7 +393,7 @@ public final class PublicKeyReaderUtil
      * @see <a href="http://en.wikipedia.org/wiki/RSA">RSA on Wikipedia</a>
      * @see <a href="http://tools.ietf.org/html/rfc4253#section-6.6">RFC 4253 Section 6.6</a>
      */
-    private static PublicKey decodePublicKey(final SSH2DataBuffer _buffer)
+    static PublicKey decodePublicKey(final SSH2DataBuffer _buffer)
         throws PublicKeyParseException
     {
         final BigInteger e = _buffer.readMPint();
@@ -525,15 +525,21 @@ public final class PublicKeyReaderUtil
         public byte[] readByteArray()
             throws PublicKeyParseException
         {
-            final int len = this.readUInt32();
-            if ((len < 0) || (len > (this.data.length - this.pos)))  {
-                throw new PublicKeyParseException(
-                        PublicKeyParseException.ErrorCode.CORRUPT_BYTE_ARRAY_ON_READ);
-            }
-            final byte[] str = new byte[len];
-            System.arraycopy(this.data, this.pos, str, 0, len);
-            this.pos += len;
-            return str;
+        	try {
+        		final int len = this.readUInt32();
+        		if ((len < 0) || (len > (this.data.length - this.pos)))  {
+        			throw new PublicKeyParseException(
+        					PublicKeyParseException.ErrorCode.CORRUPT_BYTE_ARRAY_ON_READ);
+        		}
+        		final byte[] str = new byte[len];
+        		System.arraycopy(this.data, this.pos, str, 0, len);
+        		this.pos += len;
+        		return str;
+        	}catch(ArrayIndexOutOfBoundsException e) {
+        		// from the readUINT32
+        		throw new PublicKeyParseException(
+        				PublicKeyParseException.ErrorCode.CORRUPT_BYTE_ARRAY_ON_READ);
+        	}
         }
         /** reads a nested buffer.
          * 
@@ -550,6 +556,10 @@ public final class PublicKeyReaderUtil
         
         public int pos() {
         	return pos;
+        }
+        
+        public void reset() {
+        	pos=0;
         }
     }
 

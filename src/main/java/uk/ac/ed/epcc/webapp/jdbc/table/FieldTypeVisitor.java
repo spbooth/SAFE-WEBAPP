@@ -16,6 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
+import java.util.function.UnaryOperator;
+
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.FullTextIndex;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType;
@@ -31,8 +33,8 @@ public interface FieldTypeVisitor {
     public void visitBooleanFieldType(BooleanFieldType booleanFieldType);
     public void visitBlobType(BlobType blobType);
     public void visitAutoIncrement();
-    public void visitIndex(Index i);
-    public void visitFullTextIndex(FullTextIndex i);
+    public void visitIndex(UnaryOperator<String> name_map,Index i);
+    public void visitFullTextIndex(UnaryOperator<String> name_map,FullTextIndex i);
     public void visitPlaceHolderFieldType(PlaceHolderFieldType p);
     public void additions(boolean create);
     /** Do we use this type of index

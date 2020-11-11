@@ -13,13 +13,14 @@
 <%--| limitations under the License.                                           |--%>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.ServletFormResultVisitor"%>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.session.*" %>
+<%@page import="uk.ac.ed.epcc.webapp.session.*" %>
 <%@page import="uk.ac.ed.epcc.webapp.forms.result.FormResult" %>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.ServletFormResultVisitor" %>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.ServletService" %>
 <%@page import="uk.ac.ed.epcc.webapp.session.RequiredPage" %>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService" %>
 <% 
-    //  fragment to check for required pages. include from session
+   //  fragment to check for required pages. include from session
     try{
         if( request.getAttribute(RequiredPage.AM_REQUIRED_PAGE_ATTR) == null){
     		Object skip=session.getAttribute(RequiredPage.REQUIRED_PAGES_ATTR);

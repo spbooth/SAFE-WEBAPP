@@ -3,7 +3,7 @@
 <div class="message">
 <h4>To: saf@epcc.ed.ac.uk</h4>
 <h3>
-<form method="post" action="/TransitionServlet/Email:TestMail/1/870875925">
+<form class="button" method="post" action="/TransitionServlet/Email:TestMail/1/870875925">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMail1/870875925"/>
 <input type="hidden" name="Transition" value="AddRecipient"/>
 <input class="input_button" type="submit" value="Add"/>
@@ -11,7 +11,7 @@
 <h4>From: "J.Random" &lt;punter3@epcc.ed.ac.uk&gt;</h4>
 <h4>ReplyTo: s.booth@epcc.ed.ac.uk</h4>
 <h4>
-<form method="post" action="/TransitionServlet/Email:TestMail/1/870875925/Subject">
+<form class="button" method="post" action="/TransitionServlet/Email:TestMail/1/870875925/Subject">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMail1/870875925/Subject"/>
 <input type="hidden" name="Transition" value="EditSubject"/>
 <input class="input_button" type="submit" value="Edit Subject"/>
@@ -25,12 +25,12 @@ test message
 |epcc| s.booth@epcc.ed.ac.uk          Phone 0131 650 5746       |epcc|
 ======================================================================
 </pre>
-<form method="post" action="/TransitionServlet/Email:TestMail/1/870875925/0/T">
+<form class="button" method="post" action="/TransitionServlet/Email:TestMail/1/870875925/0/T">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMail1/870875925/0/T"/>
 <input type="hidden" name="Transition" value="Edit"/>
 <input class="input_button" type="submit" value="Edit"/>
 </form>
-<form method="post" action="/TransitionServlet/Email:TestMail/1/870875925/0">
+<form class="button" method="post" action="/TransitionServlet/Email:TestMail/1/870875925/0">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMail1/870875925/0"/>
 <input type="hidden" name="Transition" value="Delete"/>
 <input class="input_button" type="submit" value="Delete"/>
@@ -40,12 +40,12 @@ test message
 <div class="link">
 <a href="/TransitionServlet/Email:TestMail/1/870875925/1/T/-/Transition=Serve">.bashrc: </a>
 </div>
-<form method="post" action="/TransitionServlet/Email:TestMail/1/870875925/1/T">
+<form class="button" method="post" action="/TransitionServlet/Email:TestMail/1/870875925/1/T">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMail1/870875925/1/T"/>
 <input type="hidden" name="Transition" value="Edit"/>
 <input class="input_button" type="submit" value="Edit"/>
 </form>
-<form method="post" action="/TransitionServlet/Email:TestMail/1/870875925/1">
+<form class="button" method="post" action="/TransitionServlet/Email:TestMail/1/870875925/1">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMail1/870875925/1"/>
 <input type="hidden" name="Transition" value="Delete"/>
 <input class="input_button" type="submit" value="Delete"/>
@@ -55,24 +55,24 @@ test message
 <div class="link">
 <a href="/TransitionServlet/Email:TestMail/1/870875925/2/S/-/Transition=Serve">vtc-linux.tar.gz: </a>
 </div>
-<form method="post" action="/TransitionServlet/Email:TestMail/1/870875925/2">
+<form class="button" method="post" action="/TransitionServlet/Email:TestMail/1/870875925/2">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMail1/870875925/2"/>
 <input type="hidden" name="Transition" value="Delete"/>
 <input class="input_button" type="submit" value="Delete"/>
 </form>
 </div>
-<form method="post" action="/TransitionServlet/Email:TestMail/1/870875925">
+<form class="button" method="post" action="/TransitionServlet/Email:TestMail/1/870875925">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMail1/870875925"/>
 <input type="hidden" name="Transition" value="Merge"/>
 <input class="input_button" type="submit" value="Merge Text"/>
 </form>
-<form method="post" action="/TransitionServlet/Email:TestMail/1/870875925">
+<form class="button" method="post" action="/TransitionServlet/Email:TestMail/1/870875925">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMail1/870875925"/>
 <input type="hidden" name="Transition" value="Flatten"/>
 <input class="input_button" type="submit" value="Flatten Tree"/>
 </form>
 </div>
-<form method="post" action="/TransitionServlet/Email:TestMail/1/870875925">
+<form class="button" method="post" action="/TransitionServlet/Email:TestMail/1/870875925">
 <input type="hidden" name="TransitionCRSF" value="12345Email:TestMail1/870875925"/>
 <input type="hidden" name="Transition" value="AddAttachment"/>
 <input class="input_button" type="submit" value="Add Attachment"/>

@@ -14,12 +14,14 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import java.util.Map;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.forms.inputs.BooleanInput;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -124,8 +126,8 @@ public class StateRelationshipComposite<U extends AppUser,BDO extends DataObject
 	}
 
 	@Override
-	public Map<String, Object> addSelectors(Map<String, Object> selectors) {
-		selectors.put(field,new BooleanInput());
+	public Map<String, Selector> addSelectors(Map<String, Selector> selectors) {
+		selectors.put(field,BooleanInput::new);
 		return selectors;
 	}
 
@@ -146,6 +148,12 @@ public class StateRelationshipComposite<U extends AppUser,BDO extends DataObject
 	@Override
 	public boolean providesRelationship(String role) {
 		return role.equals(field);
+	}
+
+	@Override
+	public void addRelationships(Set<String> roles) {
+		roles.add(field);
+		
 	}
 
 }

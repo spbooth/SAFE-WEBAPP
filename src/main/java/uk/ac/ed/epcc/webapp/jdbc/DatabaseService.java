@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.jdbc;
 
 import java.sql.SQLException;
 import java.sql.SQLTransientException;
+import java.util.Map;
 import java.util.Properties;
 
 import uk.ac.ed.epcc.webapp.AppContextService;
@@ -127,4 +128,10 @@ public void handleError(String message,SQLException e)throws DataFault;
  * @param e
  */
 public void logError(String message,SQLException e);
+/** get a map of information about the connection
+ * 
+ * @return
+ * @throws Exception 
+ */
+public Map<String,Object> getConnectionAttributes() throws Exception;
 }

@@ -36,10 +36,7 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
  * {@link Duration} extends {@link Number} and the numerical value is milliseconds.
  * 
  * This is the value used when storing {@link Duration}s to the database. However by default  If you wish to persist objects in custom units a 
- * {@link DurationFieldValue} with a custom resolution must be installed in the factory. So if the 
- *  holding a number of milliseconds. 
- * This object can persist to the database (where it will be stored as a number of milliseconds) end extends
- * {@link Number} (again representing a number of milliseconds).
+ * {@link DurationFieldValue} with a custom resolution must be installed in the factory. 
  * </p>
  * <p>
  * Though the numerical value is held in milliseconds the accuracy of the 

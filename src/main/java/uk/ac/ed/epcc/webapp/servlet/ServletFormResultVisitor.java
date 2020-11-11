@@ -21,6 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.html.ErrorFormResult;
 import uk.ac.ed.epcc.webapp.forms.html.ExternalRedirectResult;
@@ -45,13 +46,12 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 
-public class ServletFormResultVisitor implements WebFormResultVisitor{
-	private AppContext conn;
+public class ServletFormResultVisitor extends AbstractContexed implements WebFormResultVisitor {
 	private HttpServletRequest req; 
 	private HttpServletResponse res;
 	public static final String CHAIN_ATTRIBUTE = "ChainResult";
 	public ServletFormResultVisitor(AppContext conn,HttpServletRequest req, HttpServletResponse res){
-		this.conn=conn;
+		super(conn);
 		this.req=req;
 		this.res=res;
 	}
@@ -179,8 +179,6 @@ public class ServletFormResultVisitor implements WebFormResultVisitor{
 		req.setAttribute(TransitionServlet.TRANSITION_KEY_ATTR, result.getKey());
 		HTMLForm.doFormError(conn, req, res);
 	}
-	public Logger getLogger(){
-		return conn.getService(LoggerService.class).getLogger(getClass());
-	}
+	
 	
 }

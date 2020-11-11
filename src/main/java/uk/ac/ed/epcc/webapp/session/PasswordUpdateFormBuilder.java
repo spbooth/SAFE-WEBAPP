@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.email.Emailer;
@@ -36,6 +37,7 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.LoginServlet;
+import uk.ac.ed.epcc.webapp.session.twofactor.TwoFactorHandler;
 
 /** A class that build password update forms
  * @author spb
@@ -380,9 +382,21 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 				getLogger().error("Error calling PasswordChangeListener", t);
 			}
 			SessionService<U> service = getContext().getService(SessionService.class);
+			FormResult next_result = null;
+			boolean login=false;
 			if( ! service.haveCurrentUser()) {
 				// This must be a reset or initial password via an email link
-				service.setCurrentPerson(user);
+				TwoFactorHandler<U> handler = new TwoFactorHandler<U>(service);
+				boolean do_login = ! handler.requireTwoFactor(user);
+				if( do_login ) {
+					service.setCurrentPerson(user);
+					service.setAuthenticationType("passwordreset");
+					CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+					if( time != null) {
+						service.setAuthenticationTime(time.getCurrentTime());
+					}
+					getContext().getService(LoggerService.class).securityEvent("PasswordReset",service);
+				}
 				if (doWelcome) {
 					getLogger().debug("Doing welcome page");
 					// Ok, got a first time visit from a new user - send

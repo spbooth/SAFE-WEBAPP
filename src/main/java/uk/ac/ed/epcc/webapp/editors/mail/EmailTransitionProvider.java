@@ -487,21 +487,27 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		if( path.size() < 2 ){
 			return null;
 		}
-		MessageHandler mh;
-		String target = path.pop();
+		MessageHandler mh=messageFactory.getHandler(path, c.getService(SessionService.class));
+		if( mh == null ){
+			return null;
+		}
+		path = new LinkedList<String>(path);
+		for(String s : mh.getPath()) {
+			String part = path.pop();
+			if( ! part.equals(s)) {
+				getLogger().error("Unexpected path part "+part+"!="+s);
+				return null;
+			}
+		}
 		String hash_str=path.pop();
-		int item_id = 0;
+		
 		int hash = 0;
 		try{
-			item_id =Integer.parseInt(target);
 			hash = Integer.parseInt(hash_str);
 		}catch(NumberFormatException e){
 			return null;
 		}
-		mh = messageFactory.getHandler(item_id, c.getService(SessionService.class));
-		if( mh == null ){
-			return null;
-		}
+		
 		return new MailTarget(mh, hash,path);
 	}
 
@@ -510,7 +516,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 	public LinkedList<String> getID(MailTarget target) {
 		LinkedList<String> result = new LinkedList<>();
 		MessageHandler handler = target.getHandler();
-		result.add(Integer.toString(handler.getID()));
+		result.addAll(handler.getPath());
 		result.add(Integer.toString(target.getMessageHash()));
 		result.addAll(target.getPath());
 		return result;

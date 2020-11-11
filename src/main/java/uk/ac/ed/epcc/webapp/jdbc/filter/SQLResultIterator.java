@@ -387,6 +387,10 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 			if (useChunking() || maxreturn > 0) {
 				query.append(" LIMIT ?,?");
 			}
+			String lock_clause = getLockClause();
+			if( lock_clause != null ) {
+				query.append(lock_clause);
+			}
 			DatabaseService db_serv = getContext().getService(DatabaseService.class);
 			db_serv.addClosable(this);
 			

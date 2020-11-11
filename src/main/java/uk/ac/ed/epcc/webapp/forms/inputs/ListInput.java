@@ -39,23 +39,11 @@ import java.util.Iterator;
  * @param <T> type of Item object
  * 
  */
-public abstract interface ListInput<V,T> extends  ItemInput<V,T> {
+public abstract interface ListInput<V,T> extends  SuggestedItemInput<V,T> {
 
 	
 
-	/**
-	 * get a list of domain objects that are being selected
-	 * 
-	 * @return Iterator
-	 */
-	public abstract Iterator<T> getItems();
-
-	/** get the number of valid choices in the list.
-	 * null selections don't count.
-	 * 
-	 * @return int
-	 */
-	public int getCount();
+	
 	/**
 	 * get an identifying tag string from the domain object
 	 * 

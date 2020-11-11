@@ -22,17 +22,18 @@ AppContext text expansion.
 <%@page import="uk.ac.ed.epcc.webapp.messages.MessageBundleService"%>
 <%@page import="uk.ac.ed.epcc.webapp.content.PreDefinedContent" %>
 <%@page import="uk.ac.ed.epcc.webapp.content.*"%>
+<%@page import="java.util.*" %>
 <%
 // Call strip on any text provided from the request to stop external entities inserting html such as javascript
 // its ok to include html from attributes or the messages file as we control these.
 	String message_type  = (String) request.getAttribute("message_type");
-	if(message_type == null) message_type = strip(request.getParameter("message_type"));
+	if(message_type == null) message_type = request.getParameter("message_type");
 	String message_title = (String) request.getAttribute("message_title");	
-	if(message_title == null) message_title = strip(request.getParameter("message_title"));
+	if(message_title == null) message_title = HtmlBuilder.strip(request.getParameter("message_title"));
 	String message_text  = (String) request.getAttribute("message_text");	
-	if(message_text == null) message_text = strip(request.getParameter("message_text"));
+	if(message_text == null) message_text = HtmlBuilder.strip(request.getParameter("message_text"));
 	String message_extra  = (String) request.getAttribute("message_extra");	
-	if(message_extra == null) message_extra = strip(request.getParameter("message_extra"));
+	if(message_extra == null) message_extra = HtmlBuilder.strip(request.getParameter("message_extra"));
 
 	Object args[] = (Object[]) request.getAttribute("args");
 	if(args == null) args = new Object[0];
@@ -58,7 +59,8 @@ AppContext text expansion.
 	  }
 	  if( message_extra == null ){
 		  try{
-			  PreDefinedContent extra = new PreDefinedContent(conn,mess,message_type + ".extra",args);
+			  // optional content
+			  PreDefinedContent extra = new PreDefinedContent(conn,true,mess,message_type + ".extra",args);
 			  message_extra = extra.addContent((SimpleXMLBuilder)new HtmlBuilder()).toString();
 		  }catch(MissingResourceException e){
 			  // Not an error
@@ -79,7 +81,7 @@ AppContext text expansion.
 	}
 %>
 <div class="block" role="main">
- <h2><%=message_title %></h2>
+ <h1><%=message_title %></h1>
  <p>
  <%=message_text %>
  </p>

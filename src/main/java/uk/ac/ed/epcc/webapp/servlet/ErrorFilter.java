@@ -216,7 +216,9 @@ public class ErrorFilter implements Filter {
 			
 			// Note that Servlet2.4 spec says exceptions thrown from a filter
 			// are not handled by error-page but error codes are
-			res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			if( ! res.isCommitted()) {
+			  res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			}
 		} catch(Throwable t){ // YES this should be throwable as we want some logging if we can
 			
 			// generic throwable catch  We do want o

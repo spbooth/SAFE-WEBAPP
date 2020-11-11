@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.model.datastore;
 
 import java.util.Map;
 
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
 import uk.ac.ed.epcc.webapp.jdbc.table.BlobType;
@@ -24,6 +25,7 @@ import uk.ac.ed.epcc.webapp.model.ClassificationFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
 
 /** A {@link DataObjectFactory} for storing named data fixtures in the database.
@@ -60,9 +62,15 @@ public class DataStore extends ClassificationFactory<DataStore.Data>  {
 		return Data.class;
 	}
 	@Override
-	protected Map<String, Object> getSelectors() {
-		Map<String, Object> selectors = super.getSelectors();
-		selectors.put(DATA,new FileInput());
+	protected Map<String, Selector> getSelectors() {
+		Map<String, Selector> selectors = super.getSelectors();
+		selectors.put(DATA,new Selector<FileInput>() {
+
+			@Override
+			public FileInput getInput() {
+				return new FileInput();
+			}
+		});
 		return selectors;
 	}
 	public class Data extends Classification{

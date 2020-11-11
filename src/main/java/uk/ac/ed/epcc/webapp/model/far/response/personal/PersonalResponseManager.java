@@ -127,7 +127,7 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 	 */
 	@SuppressWarnings("unchecked")
 	public PersonalResponseManager(AppContext conn, String tag) throws Exception {
-		super(conn.makeContexedObject(DynamicFormManager.class, conn.getInitParameter(FORM_MANAGER_CONF_PREFIX+tag)),tag);
+		super(conn.makeObject(DynamicFormManager.class, conn.getInitParameter(FORM_MANAGER_CONF_PREFIX+tag)),tag);
 	}
 
 	/** Standard constructor. Notm

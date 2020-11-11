@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.util.Calendar;
+import java.util.Date;
 
 /** An input that selects a day using pull down menus.
  * The class also implements ParseInput to support setting 
@@ -26,10 +27,10 @@ import java.util.Calendar;
 
 public class MonthMultiInput extends TimeStampMultiInput {
     
-	public MonthMultiInput(){
-		super(1000L,Calendar.MONTH);
+	public MonthMultiInput(Date now){
+		super(now,1000L,Calendar.MONTH);
 	}
-	public MonthMultiInput(long resolution){
-		super(resolution,Calendar.MONTH);
+	public MonthMultiInput(Date now,long resolution){
+		super(now,resolution,Calendar.MONTH);
 	}
 }

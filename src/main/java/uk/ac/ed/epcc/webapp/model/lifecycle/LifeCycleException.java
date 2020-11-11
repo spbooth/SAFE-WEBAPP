@@ -27,7 +27,6 @@ public class LifeCycleException extends Exception {
 	 */
 	public LifeCycleException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
 	}
 
 }

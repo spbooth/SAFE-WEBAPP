@@ -52,12 +52,4 @@ public class IntConvertAccessor<T,R> implements Accessor<Integer,R> {
     	sb.append(")");
     	return sb.toString();
     }
-    public boolean canSet() {
-    	
-    	return false;
-    }
-    public void setValue(R r, Integer value) {
-    	throw new UnsupportedOperationException("Set not supported");
-    	
-    }
 }

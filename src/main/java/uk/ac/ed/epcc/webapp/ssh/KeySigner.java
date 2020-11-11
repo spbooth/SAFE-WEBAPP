@@ -33,7 +33,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.session.RandomService;
 import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.SSH2ByteBuffer;
 
-/** Class to generate OpenSSH 
+/** Class to generate OpenSSH signed keys
  * @author Stephen Booth
  *
  */

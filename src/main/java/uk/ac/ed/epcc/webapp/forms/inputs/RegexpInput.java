@@ -56,5 +56,4 @@ public class RegexpInput extends TextInput implements TagInput{
 	public String getTag() {
 		return "(Regular expression)";
 	}
-
 }

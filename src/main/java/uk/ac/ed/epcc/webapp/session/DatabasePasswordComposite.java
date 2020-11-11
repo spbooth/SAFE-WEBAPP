@@ -17,6 +17,7 @@ package uk.ac.ed.epcc.webapp.session;
 import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -627,12 +628,22 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 					if (v == DatabasePasswordComposite.INVALID || v == DatabasePasswordComposite.FIRST) {
 						return true;
 					}
-					if( CHANGE_OLD_HASH.isEnabled(getContext()) && getAlgorithm().isDeprecated(getContext())) {
+					Hash algorithm = getAlgorithm();
+					if( CHANGE_OLD_HASH.isEnabled(getContext()) && ( algorithm == null || algorithm.isDeprecated(getContext()))) {
 						return true;
 					}
+					if( periodicResetRequired()) {
+						return true;
+					}
+					if( passwordFailsExceeded()) {
+						return true;
+					}
+					return false;
+				}
+				public boolean periodicResetRequired() {
 					Date last_changed = getPasswordChanged();
 					if( last_changed != null ){
-						int max_age_days = getContext().getIntegerParameter(PASSWORD_EXPIRY_DAYS, 0);
+						int max_age_days = getMaxAgeDays();
 						if( max_age_days > 0 ){
 							Calendar last = Calendar.getInstance();
 							last.setTime(last_changed);
@@ -647,7 +658,27 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 					}
 					return false;
 				}
-
+				private int getMaxAgeDays() {
+					return getContext().getIntegerParameter(PASSWORD_EXPIRY_DAYS, 0);
+				}
+				public String resonForReset() {
+					if( periodicResetRequired()) {
+						StringBuilder sb = new StringBuilder();
+						sb.append("Your password was last reset on ");
+						sb.append(getPasswordChanged().toString());
+						sb.append(" and must be changed every ");
+						sb.append(Integer.toString(getMaxAgeDays()));
+						sb.append(" days.");
+						return sb.toString();
+					}
+					if( passwordFailsExceeded()) {
+						StringBuilder sb = new StringBuilder();
+						sb.append("An incorrect password has been provided ");
+						sb.append(Integer.toString(getFailCount()));
+						sb.append(" times in a row.");
+					}
+					return "";
+				}
 			
 				/**
 				 * should the user get the welcome message.
@@ -917,6 +948,11 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	@Override
 	public boolean mustResetPassword(T user) {
 		return getHandler(user).mustChangePassword();
+	}
+	
+	@Override
+	public String reasonForReset(T user) {
+		return getHandler(user).resonForReset();
 	}
 
 	/* (non-Javadoc)

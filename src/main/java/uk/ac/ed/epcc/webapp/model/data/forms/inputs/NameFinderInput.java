@@ -176,6 +176,9 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	 */
 	@Override
 	public Integer convert(Object v) throws TypeError {
+		if( v == null) {
+			return null;
+		}
 		if( v instanceof DataObject){
 			if( factory.isMine(v)){
 				return Integer.valueOf(((T)v).getID());
@@ -199,10 +202,13 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 			}
 			return Integer.valueOf(intValue);
 		}
-		if(v instanceof String) {
-			T item = factory.findFromString((String)v);
-			if( item != null) {
-				return item.getID();
+		if(v instanceof String  ) {
+			String name = (String)v;
+			if( ! name.trim().isEmpty()) {
+				T item = factory.findFromString(name);
+				if( item != null) {
+					return item.getID();
+				}
 			}
 		}
 		return super.convert(v);
@@ -213,5 +219,6 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	public void setMatchError(String match_error) {
 		this.match_error = match_error;
 	}
+	
 	
 }

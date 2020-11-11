@@ -18,6 +18,8 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.text.NumberFormat;
 
+import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+
 /** A DoubleInput which defaults to input a value between 0 and 1 using a
  * percent number format.
  * 
@@ -62,7 +64,8 @@ protected Double normalise(Double val) {
 	if( val == null || ! integer_only) {
 		return val;
 	}
-	int perc = (int) (val.doubleValue()*100.0);
-	return new Double((double)perc/100.0);
+	double d = val.doubleValue()*100.0;
+	return Double.valueOf(Math.rint(d)/100.0);
+	
 }
 }

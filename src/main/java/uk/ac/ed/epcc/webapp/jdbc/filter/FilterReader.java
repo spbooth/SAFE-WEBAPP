@@ -50,6 +50,7 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 	
 	
 	private boolean qualify=false;
+	private boolean db_lock=false;
 	public FilterReader(AppContext c,Class<T> target){
 		ctx=c;
 		this.target=target;
@@ -174,6 +175,15 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 	protected final String getModify(){
 		return  mapper.getModify();
 	}
+	protected final String getLockClause() {
+		if( useDbLock()) {
+			DatabaseService db = getContext().getService(DatabaseService.class);
+			if(db.inTransaction() ) {
+				return " FOR UPDATE";
+			}
+		}
+		return "";
+	}
 	public List<PatternArgument> getModifyParameters(List<PatternArgument> list){
 		return mapper.getModifyParameters(list);
 	}
@@ -211,5 +221,19 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 	@Override
 	public String toString() {
 		return getClass().getSimpleName()+" [my_filter=" + my_filter + ", mapper=" + mapper + "]";
+	}
+
+	/**
+	 * @return the db_lock
+	 */
+	private boolean useDbLock() {
+		return db_lock;
+	}
+
+	/**
+	 * @param db_lock the db_lock to set
+	 */
+	private void setDbLock(boolean db_lock) {
+		this.db_lock = db_lock;
 	}
 }

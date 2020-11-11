@@ -97,7 +97,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		path.append(provider.getTargetName());
 		TransitionFactory<K,T> prov2 = TransitionServlet.getProviderFromName(getContext(), provider.getTargetName());
 		assertNotNull("Provider not registered "+provider.getTargetName(),prov2);
-		assertEquals("Provider targetName does not generate same class",provider.getClass(), prov2.getClass());
+		assertEquals("Provider targetName="+provider.getTargetName()+" does not generate same class",provider.getClass(), prov2.getClass());
 		assertEquals("generated provider does not produce same target name", provider.getTargetName(),prov2.getTargetName());
 		if( target != null ){
 			if( provider instanceof TransitionProvider){
@@ -122,7 +122,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 			if(transition != null &&  (transition instanceof BaseFormTransition || transition instanceof TargetLessTransition)){
 				req.params.put("Transition", key.toString());
 				req.params.put("transition_form", "true");
-				HTMLForm f = new HTMLForm(getContext());
+				HTMLForm f = new HTMLForm(getContext(),new ChainedTransitionResult<T, K>(provider, target, key));
 				
 				if( transition instanceof BaseFormTransition){
 					BaseFormTransition ft = (BaseFormTransition)transition;
@@ -157,7 +157,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	}
 	/**
 	 * 
-	 * @param expected_stages number of expected additional transaction stages
+	 * @param expected_stages number of expected additional transaction stages (-ve for allow any)
 	 * @throws ServletException
 	 * @throws IOException
 	 */
@@ -301,7 +301,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		 Transition t = factory.getTransition(target,key);
 		 assertNotNull("Transition not null",t);
 		 
-		 HTMLForm f = new HTMLForm(getContext());
+		 HTMLForm f = new HTMLForm(getContext(),new ChainedTransitionResult<T, K>(factory, target, key));
 		 f.setFormID("transition_");
 		 if( t instanceof BaseFormTransition ){
 		 	BaseFormTransition ft = (BaseFormTransition) t;
@@ -409,7 +409,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 			if( text.equals(key.toString())) {
 				text=null;
 			}
-			if( provider.allowTransition(getContext(),target,key) ){
+			if( provider.showTransition(getContext(),target,key) ){
 				builder.open("active");
 				  builder.attr("value", key.toString());
 				  String help=provider.getHelp(key);

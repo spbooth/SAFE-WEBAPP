@@ -16,7 +16,14 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.result;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
+import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryFinder;
 
 
 /** A {@link FormResult} to recurse to a new transition after this one.
@@ -44,6 +51,23 @@ public class ChainedTransitionResult<T,K> implements FormResult {
    this.key=next;
    this.target=target;
  }
+ 
+ /**Alternate constructor that performs a lookup of the {@link TransitionFactory}
+	 * 
+	 * This is preferable if an instance is not already available as it can utilise
+	 * any cached copy.
+	 * 
+  * 
+  * @param conn
+  * @param template
+  * @param tag
+  * @param target
+  * @param next
+  */
+ public ChainedTransitionResult(AppContext conn, Class<? extends TransitionFactory> template, String tag, T target, K next) {
+	 this(TransitionFactoryFinder.getTransitionFactory(conn, template, tag),target,next);
+ }
+ 
  public K getTransition(){
 	 return key;
  }
@@ -106,4 +130,6 @@ public boolean equals(Object obj) {
 		return false;
 	return true;
 }
+
+
 }

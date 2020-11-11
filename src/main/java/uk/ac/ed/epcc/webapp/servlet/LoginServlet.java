@@ -21,6 +21,8 @@
 package uk.ac.ed.epcc.webapp.servlet;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -35,6 +37,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.SerializableFormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -73,7 +76,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 	private static final String LOGIN_PAGE_PARAM = "login.page";
 	
 	
-	public static final String INITIAL_PAGE_ATTR = "initial_page";
+	private static final String INITIAL_PAGE_ATTR = "initial_page";
 	/**
 	 * 
 	 */
@@ -261,7 +264,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 						next_page = new RedirectResult(getMainPage(conn));
 					}
 					TwoFactorHandler<T> handler = new TwoFactorHandler<>(serv);
-					next_page =  handler.doLogin(person, (SerializableFormResult) next_page);
+					next_page =  handler.doLogin(person, "password",(SerializableFormResult) next_page);
 					doLoginResult(conn, req, res, next_page);
 					return;
 				}
@@ -271,7 +274,12 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 			throw new ServletException(e);
 		}
 
-		log.info("login failed for " + username);
+		LoggerService ls = conn.getService(LoggerService.class);
+		Map attr = new HashMap();
+		attr.put("user", username);
+		ls.securityEvent("LoginFailed",serv, attr);
+		
+		
 		// Go to the login page again - perhaps with polite message
 		// Don't use the ServletService method as the explicit login page
 		// may not be the default implementation. (may try Basic Auth for example)
@@ -292,7 +300,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 	public static void doLoginResult(AppContext conn,HttpServletRequest req, HttpServletResponse res, FormResult result) throws Exception {
 		if( COOKIE_TEST.isEnabled(conn) && result instanceof SerializableFormResult) {
 			SessionService sess = conn.getService(SessionService.class);
-			sess.setAttribute(INITIAL_PAGE_ATTR, result);
+			setSavedResult(sess,(SerializableFormResult) result);
 			res.sendRedirect(res.encodeRedirectURL(req.getContextPath()+"/LoginServlet"));
 			return;
 		}
@@ -301,6 +309,15 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 		 }
 		 ServletFormResultVisitor vis = new ServletFormResultVisitor(conn, req, res);
 		 result.accept(vis);
+	}
+	public static void setSavedResult(SessionService sess, SerializableFormResult result) {
+		sess.setAttribute(INITIAL_PAGE_ATTR, result);
+	}
+	public static void clearSavedResult(SessionService sess) {
+		sess.removeAttribute(INITIAL_PAGE_ATTR);
+	}
+	public static SerializableFormResult getSavedResult(SessionService sess) {
+		return (SerializableFormResult) sess.getAttribute(INITIAL_PAGE_ATTR);
 	}
 	public static String getWelcomePage(AppContext conn) {
 		return conn.getInitParameter("welcome.page","/welcome.jsp");

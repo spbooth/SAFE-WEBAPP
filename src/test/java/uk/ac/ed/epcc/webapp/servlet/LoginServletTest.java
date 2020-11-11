@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Set;
 
+import javax.mail.Message;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 
@@ -68,14 +69,17 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		user.setEmail("fred@example.com");
 		composite.setPassword(user,"FredIsDead");
 		user.commit();
-		
-		
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		assertFalse(sess.isAuthenticated());
+		assertFalse(sess.haveCurrentUser());
 		addParam("username", "fred@example.com");
 		addParam("password", "FredIsDead");
 		doPost();
 		loginRedirects();
-		SessionService<A> sess = ctx.getService(SessionService.class);
+		 sess = ctx.getService(SessionService.class);
+		assertTrue(sess.isAuthenticated());
 		assertTrue(sess.haveCurrentUser());
+		
 		
 		Set<RequiredPage<A>> pages = fac.getRequiredPages();
 		assertEquals(1,pages.size());
@@ -83,6 +87,27 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		assertFalse(page.required(sess));
 		
 	}
+	
+	@Test
+	public void testLoginFromSession() throws Exception{
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		
+		// isAuthenticated should be a no-side effects check
+		// so preferences can be queries in the login flow
+		assertFalse(sess.isAuthenticated());
+		req.getSession(true).setAttribute("SESSION_PersonID", Integer.valueOf(user.getID()));
+		req.servlet_path="/main.jsp";
+		assertTrue(sess.isAuthenticated());
+		assertTrue(sess.haveCurrentUser());
+		assertTrue( sess.isCurrentPerson(user));
+	}
+	
 	
 	@Test
 	public void testLoginOldAlg() throws DataFault, ServletException, IOException{
@@ -190,6 +215,8 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 	@ConfigFixtures("wtmp.properties")
 	@Test
 	public void testLoginWithWtmp() throws DataException, Exception{
+		setTime(2020, Calendar.JANUARY, 1, 10, 00);
+		MockTansport.clear();
 		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
 		A user =  fac.makeBDO();
 		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
@@ -211,8 +238,68 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		RequiredPage page = pages.iterator().next();
 		assertFalse(page.required(sess));
 		checkDiff("/cleanup.xsl", "login_wtmp.xml");
+		assertEquals(0, MockTansport.nSent());
 	}
-
+	@ConfigFixtures({"wtmp.properties","newlogin.properties"})
+	@Test
+	public void testLoginWithWtmpNewlogin() throws DataException, Exception{
+		setTime(2020, Calendar.JANUARY, 1, 10, 00);
+		MockTansport.clear();
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		takeBaseline();
+		
+		req.header.put("user-agent", "junit");
+		addParam("username", "fred@example.com");
+		addParam("password", "FredIsDead");
+		doPost();
+		loginRedirects();
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		assertTrue(sess.haveCurrentUser());
+		
+		Set<RequiredPage<A>> pages = fac.getRequiredPages();
+		assertEquals(1,pages.size());
+		RequiredPage page = pages.iterator().next();
+		assertFalse(page.required(sess));
+		checkDiff("/cleanup.xsl", "login_wtmp.xml");
+		assertEquals(1, MockTansport.nSent());
+		Message m = MockTansport.getMessage(0);
+		assertEquals("[test] Login to Web site from new location", m.getSubject());
+	}
+	
+	@ConfigFixtures({"wtmp.properties","newlogin.properties"})
+	@Test
+	@DataBaseFixtures("login_wtmp.xml")
+	public void testLoginWithWtmpOldlogin() throws DataException, Exception{
+		setTime(2020, Calendar.MAY, 1, 10, 00);
+		MockTansport.clear();
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
+		user.setEmail("fred@example.com");
+		composite.setPassword(user,"FredIsDead");
+		user.commit();
+		takeBaseline();
+		
+		req.header.put("user-agent", "junit");
+		addParam("username", "fred@example.com");
+		addParam("password", "FredIsDead");
+		doPost();
+		loginRedirects();
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		assertTrue(sess.haveCurrentUser());
+		
+		Set<RequiredPage<A>> pages = fac.getRequiredPages();
+		assertEquals(1,pages.size());
+		RequiredPage page = pages.iterator().next();
+		assertFalse(page.required(sess));
+		checkDiff("/cleanup.xsl", "login_wtmp2.xml");
+		assertEquals(0, MockTansport.nSent());
+	}
 	/**
 	 * @throws IOException 
 	 * @throws ServletException 
@@ -386,8 +473,9 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 	}
 
 	@Test
-	@ConfigFixtures("password_server.properties")
+	@ConfigFixtures({"password_server.properties","twofactor.properties"})
 	public void testRequestNewPasswordFromServlet() throws DataException, Exception{
+		setTime(2020, Calendar.MAY, 15, 15, 00);
 		MockTansport.clear();
 		takeBaseline();
 		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();

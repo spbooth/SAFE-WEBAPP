@@ -18,14 +18,19 @@ package uk.ac.ed.epcc.webapp.model.data;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 
@@ -133,9 +138,9 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		 * @return boolean true on match
 		 */
 		public boolean accept(MultiLink o) {
-			for (Iterator<String> it = map.keySet().iterator(); it.hasNext();) {
-				String key =  it.next();
-				DataObject d = map.get(key);
+			for (Map.Entry<String, DataObject> e : map.entrySet()) {
+				String key =  e.getKey();
+				DataObject d = e.getValue();
 				if (o.record.getIntProperty(key, 0) != d.getID()) {
 					return false;
 				}
@@ -149,7 +154,7 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 			if (table_to_key.containsKey(table)) {
 				map.put(table_to_key.get(table), peer);
 			} else {
-				throw new ConsistencyError("No coresponding factory for peer");
+				throw new ConsistencyError("No corresponding factory for peer");
 			}
 		}
 
@@ -159,9 +164,8 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		 */
 		public SQLFilter<M> getFilter(){
 			SQLAndFilter<M> fil = new SQLAndFilter<>(getTarget());
-			for(String key : map.keySet()){
-				DataObject d = map.get(key);
-				fil.addFilter(new ReferenceFilter<>(MultiLinkManager.this,key,d));
+			for(Map.Entry<String, DataObject> e: map.entrySet()){
+				fil.addFilter(new ReferenceFilter<>(MultiLinkManager.this,e.getKey(),e.getValue()));
 			}
 			return fil;
 		}
@@ -181,9 +185,12 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		 * @param o
 		 */
 		public void setPeers(MultiLink o) {
-			for (Iterator it = map.keySet().iterator(); it.hasNext();) {
-				String key = (String) it.next();
-				DataObject d = map.get(key);
+			if( o == null ) {
+				return;
+			}
+			for (Map.Entry<String, DataObject> e : map.entrySet()) {
+				String key = e.getKey();
+				DataObject d = e.getValue();
 				o.setPeer(key, d);
 			}
 		}
@@ -193,41 +200,42 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 	private Map<String,DataObjectFactory> factories;
 
 	private Map<String,String> table_to_key;
-
 	/**
-	 * Basic Constructor subclasses should
+	 * Basic Constructor subclasses should call addFactory to configure 
+	 * then call setContext
 	 * 
 	 * @param c
 	 */
-	protected MultiLinkManager(AppContext ctx,String homeTable) {
-   	 	
-     		setContext(ctx, homeTable);
-     	
+	protected MultiLinkManager() {
 		factories = new HashMap<>();
-		table_to_key = new HashMap<>();
+		table_to_key = new LinkedHashMap<>();
 	}
+	
+	
 	@Override
 	public TableSpecification getDefaultTableSpecification(AppContext ctx,
   			String homeTable) {
-		// need to extend
 		 TableSpecification spec = new TableSpecification();
+		 for(Map.Entry<String,String> e : table_to_key.entrySet()) {
+			 spec.setField(e.getValue(), new ReferenceFieldType(e.getKey()));
+		 }
+		 try {
+			Index m = spec.new Index("match_key", true, table_to_key.values().toArray(new String[table_to_key.size()]));
+		} catch (InvalidArgument e1) {
+			getLogger().error("Failed to make match index",e1);
+		}
 		 return spec;
 	 }
 	/**
 	 * Method for sub-class to specify a link field and Factory. Normally called
-	 * withing the sub-class constructor
+	 * within the sub-class constructor
 	 * 
 	 * @param key
 	 * @param fac
 	 */
 	protected void addFactory(String key, DataObjectFactory fac) {
-		if (res.hasField(key)) {
 			factories.put(key, fac);
 			table_to_key.put(fac.getTag(), key);
-		} else {
-			throw new ConsistencyError("Invalid field " + key
-					+ "for MultiLinkFactory");
-		}
 	}
 
 	/**
@@ -260,7 +268,7 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 					"getLink called with incomplete template");
 		}
 		try {
-			res =  find(t.getFilter());
+			res =  find(t.getFilter(),true);
 			t.setPeers(res); // initialise the caches
 		} catch (DataNotFoundException e) {
 			res = null;
@@ -275,8 +283,8 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 	 * @return MultiLink
 	 * @throws DataException
 	 */
-	public MultiLink makeLink(Template t) throws DataException {
-		MultiLink res = getLink(t);
+	public M makeLink(Template t) throws DataException {
+		M res = getLink(t);
 		if (res == null) {
 			// make the object
 			res = makeBDO();
@@ -291,5 +299,35 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		return (Class) MultiLink.class;
 	}
 	
+	/** Get a {@link BaseFilter} on one of the linked {@link DataObjectFactory}s
+	 * 
+	 * @param <R>
+	 * @param fac
+	 * @param fil
+	 * @return
+	 * @throws InvalidArgument
+	 */
+	public <R extends DataObject> BaseFilter<R> getDestFilter(DataObjectFactory<R> fac,BaseFilter<M> fil) throws InvalidArgument{
+		if( ! table_to_key.containsKey(fac.getTag())) {
+			throw new InvalidArgument("BadFactory passed to MultiLink "+fac.getTag());
+		}
+		return convertToDestinationFilter(fac, table_to_key.get(fac.getTag()), fil);
+		
+	}
+	/** get a {@link BaseFilter} on the {@link MultiLink} from a filter on a remote {@link DataObjectFactory}
+	 * 
+	 * @param <R>
+	 * @param fac
+	 * @param fil
+	 * @return
+	 * @throws InvalidArgument
+	 */
+	public <R extends DataObject> BaseFilter<M> getRemoteFilter(DataObjectFactory<R> fac,BaseFilter<R> fil) throws InvalidArgument{
+		if( ! table_to_key.containsKey(fac.getTag())) {
+			throw new InvalidArgument("BadFactory passed to MultiLink "+fac.getTag());
+		}
+		return getRemoteFilter(fac, table_to_key.get(fac.getTag()), fil);
+		
+	}
 
 }

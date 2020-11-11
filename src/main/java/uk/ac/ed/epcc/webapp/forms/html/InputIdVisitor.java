@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.forms.html;
 
 import java.util.Iterator;
 
+import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.inputs.BinaryInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
@@ -32,11 +33,15 @@ import uk.ac.ed.epcc.webapp.forms.inputs.UnmodifiableInput;
  */
 
 public class InputIdVisitor implements InputVisitor<String> {
+	private AppContext conn;
 	private String prefix;
+	private boolean optional;
 	/**
 	 * 
 	 */
-	public InputIdVisitor(String prefix) {
+	public InputIdVisitor(AppContext conn,boolean optional,String prefix) {
+		    this.conn=conn;
+			this.optional=optional;
 			this.prefix=prefix;
 	}
 
@@ -74,6 +79,14 @@ public class InputIdVisitor implements InputVisitor<String> {
 		if( listInput == null || prefix==null){
 			return null;
 		}
+		if( listInput.getCount() == 0) {
+			return null;
+		}
+		boolean forced=(! optional) &&(listInput.getCount() == 1);
+		if( forced && EmitHtmlInputVisitor.LOCK_FORCED_LIST.isEnabled(conn) ) {
+			return null;
+		}
+		
 		return prefix+listInput.getKey();
 	}
 
@@ -143,4 +156,10 @@ public class InputIdVisitor implements InputVisitor<String> {
 		return visitMultiInput(multiInput);
 	}
 
+	public String normalise(String raw) {
+		if( raw == null ) {
+			return null;
+		}
+		return raw.replace('.', '_'); // jquery does not like periods in ids 
+	}
 }

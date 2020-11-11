@@ -360,7 +360,10 @@ public class LdapPasswordComposite<T extends AppUser> extends PasswordAuthCompos
 	public boolean mustResetPassword(T user) {
 		return false;
 	}
-
+	@Override
+	public String reasonForReset(T user) {
+		return "";
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#modifyDefaultTableSpecification(uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification, java.lang.String)
 	 */

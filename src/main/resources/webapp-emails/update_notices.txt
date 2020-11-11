@@ -1,0 +1,21 @@
+%%begin{Subject}%%
+[%%service.name%%] Account update required
+%%end{Subject}%%
+Dear %%person.name%%,
+
+There are some account updates or other actions that need your attention 
+in the  %%service.website-name=Web-site%%:
+
+%%person.notices%%
+
+This is an important part of your use of the %%service.name%% Service.
+
+Please log in at following URL:
+  %%service.saf.url%%
+to provide these updates.
+
+Regards,
+
+  The %%service.name%% Team
+  %%service.support.email%%
+

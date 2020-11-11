@@ -13,8 +13,14 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.logging.log4j2;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.logging.log4j.CloseableThreadContext;
+
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
  * @author Stephen Booth
@@ -53,6 +59,23 @@ public class Log4JLoggerService implements LoggerService {
 	@Override
 	public Logger getLogger(Class c) {
 		return new Log4JWrapper(c);
+	}
+
+	@Override
+	public void securityEvent(String event, SessionService sess, Map context) {
+		Logger logger = getLogger(SECURITY_LOG);
+		   Map attr = new HashMap();
+		   if( context != null) {
+			   attr.putAll(context);
+		   }
+		  if( sess != null ) {
+			  sess.addSecurityContext(attr);
+		  }
+		  // add context as Log4J thread-context rather than text
+		  // as this will be better for parsability
+		  try( CloseableThreadContext.Instance ctc = CloseableThreadContext.putAll(attr)){
+			  logger.info(event);
+		  }
 	}
 
 }

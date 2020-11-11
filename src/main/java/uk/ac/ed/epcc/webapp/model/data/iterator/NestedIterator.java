@@ -49,8 +49,18 @@ public class NestedIterator<T> implements CloseableIterator<T> {
 		count = 0;
 	}
 
-	public void add(Iterator<? extends T> i) {
-		list.add(i);
+	public void add(Iterator<? extends T> i) throws DataFault {
+		if( i.hasNext()) {
+			list.add(i);
+		}else {
+			if( i instanceof AutoCloseable) {
+				try {
+					((AutoCloseable)i).close();
+				} catch (Exception e) {
+					throw new DataFault("Error closing iterator", e);
+				}
+			}
+		}
 	}
 
 	/*

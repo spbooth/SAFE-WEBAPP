@@ -87,7 +87,7 @@ public class EnumSetting<E extends Enum> extends AbstractSetting<E> {
 	 * @see uk.ac.ed.epcc.webapp.Setting#getInput()
 	 */
 	@Override
-	public ItemInput<String,E> getInput() {
+	public ItemInput<String,E> getInput(AppContext conn) {
 		return new EnumInput<>(clazz);
 	}
 	

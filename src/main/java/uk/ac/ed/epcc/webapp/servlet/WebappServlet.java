@@ -38,6 +38,7 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 import uk.ac.ed.epcc.webapp.servlet.config.ServletConfigService;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
  * webappServlet Base class for servlets in the web application, it hold
@@ -102,16 +103,24 @@ public abstract class WebappServlet extends HttpServlet {
 	@Override
 	protected final void doPost(HttpServletRequest req, HttpServletResponse res)
 			throws ServletException, IOException {
-		AppContext conn;
-
-		conn = ErrorFilter.retrieveAppContext(req,res);
-		// pick up servlet specific init params if there are any
-		ServletConfig cfg = getServletConfig();
-		Enumeration e = cfg.getInitParameterNames();
-		if( e.hasMoreElements()){
-			conn.setService(new ServletConfigService(cfg, conn));
+		AppContext conn=null;
+		try {
+			conn = ErrorFilter.retrieveAppContext(req,res);
+			// pick up servlet specific init params if there are any
+			ServletConfig cfg = getServletConfig();
+			Enumeration e = cfg.getInitParameterNames();
+			if( e.hasMoreElements()){
+				conn.setService(new ServletConfigService(cfg, conn));
+			}
+			doPost(req, res, conn);
+		}catch(IOException e){
+			throw e;
+		}catch(Exception e2) {
+			if( conn !=null ) {
+				getLogger(conn).error("Error in servlet post",e2);
+			}
+			throw e2;
 		}
-		doPost(req, res, conn);
 	}
 
 	@Override
@@ -152,7 +161,8 @@ public abstract class WebappServlet extends HttpServlet {
 	protected void doPut(HttpServletRequest req,
 			HttpServletResponse res, AppContext conn)
 			throws ServletException, java.io.IOException{
-		
+		res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Put not allowed");
+		return;
 	}
 	
 	/**
@@ -164,8 +174,48 @@ public abstract class WebappServlet extends HttpServlet {
 	public Logger getLogger(AppContext c) {
 		return c.getService(LoggerService.class).getLogger(getClass());
 	}
-
 	
+	private static final String SUSPICIOUS_ARGUMENT_ATTR = "SuspiciousArgumentCount";
+
+	/** Call this method when invalid data is passed to something that
+	 * should have been application generated and is therefore might be 
+	 * indicative of somebody probing for vulnerabilities. 
+	 * 
+	 * @param conn
+	 */
+	public void badInputCheck(AppContext conn) {
+		SessionService sess = conn.getService(SessionService.class);
+		Logger logger = getLogger(conn);
+		doBadInputCheck(conn, sess, logger);
+	}
+
+	public static void checkBadInput(SessionService sess) {
+		doBadInputCheck(sess.getContext(), sess, sess.getContext().getService(LoggerService.class).getLogger(WebappServlet.class));
+	}
+	/** static version of {@link #badInputCheck(AppContext)}
+	 * for use by jsp pages
+	 * 
+	 * @param conn
+	 * @param sess
+	 * @param logger
+	 */
+	private static void doBadInputCheck(AppContext conn, SessionService sess, Logger logger) {
+		if( sess != null ) {
+			// This is a test for somebody/fuzzing probing the 
+			// interface too many fails suggest something odd is going on. 
+			Integer fail_count = (Integer) sess.getAttribute(SUSPICIOUS_ARGUMENT_ATTR);
+			if( fail_count == null ) {
+				fail_count = Integer.valueOf(1);
+			}else {
+				fail_count = Integer.valueOf(fail_count.intValue()+1);
+			}
+			sess.setAttribute(SUSPICIOUS_ARGUMENT_ATTR, fail_count);
+			if( fail_count.intValue() > conn.getIntegerParameter("transition.fail_count_thresh", 10)) {
+				
+				logger.error("Too many bad transition targets, possible probing?");
+			}
+		}
+	}
 
 	/**
 	 * Show a standard pre-formatted message page from the servlet. This can

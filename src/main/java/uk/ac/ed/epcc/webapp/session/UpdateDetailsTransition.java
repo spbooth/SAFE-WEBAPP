@@ -58,7 +58,7 @@ public class UpdateDetailsTransition<A extends AppUser> extends StandAloneFormUp
 			// This will only be a forced update if the current user.
 			// We may allow other users to udpdate via a role
 			try {
-				ContentBuilder div = cb.getPanel();
+				ContentBuilder div = cb.getPanel("warn");
 				div.addHeading(2, "Update required");
 				PreDefinedContent content = new PreDefinedContent(op.getContext(), "person_update_required");
 				div.addObject(content);
@@ -68,11 +68,7 @@ public class UpdateDetailsTransition<A extends AppUser> extends StandAloneFormUp
 			}
 		}
 		fac.addUpdateNotes(cb, target);
-		Date last = target.getLastTimeDetailsUpdated();
-		if( last != null) {
-			DateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
-			cb.addHeading(3, "Last updated: "+df.format(last));
-		}
+		
 		AppContext c = op.getContext();
 		String privacy_policy=c.getExpandedProperty("service.url.privacypolicy");
 	    if( privacy_policy != null && ! privacy_policy.isEmpty() ){ 

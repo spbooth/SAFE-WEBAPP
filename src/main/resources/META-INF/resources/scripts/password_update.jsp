@@ -22,7 +22,9 @@
    import="uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*, uk.ac.ed.epcc.webapp.session.*"
 %>
 <%--Must be only basic_session as this may be a required page --%>
-<%@ include file="/basic_session.jsf" %>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
+<wb:basic_session/>
 <wb:formpage/>
 <%	
 	String page_title = "Change "+service_name+" "+website_name+" Password";
@@ -33,9 +35,9 @@
 		request.setAttribute(NavigationMenuService.DISABLE_NAVIGATION_ATTR, Boolean.TRUE);
 	}
 %>
-<%@ include file="/std_header.jsf" %>
+<%@ include file="../std_header.jsf" %>
 <br/>
-<%@ include file="/main__logged_in.jsf"%>
+<%@ include file="../main__logged_in.jsf"%>
 <br/>
 <%
 if( comp == null || ! comp.canResetPassword(sess.getCurrentPerson()) ){
@@ -53,7 +55,7 @@ you cannot change the password for this account.<br/><br/>
 if( must_change ){
 %>
 <div class="block">
-<h2>Please change your <%=website_name %> password</h2>
+<h1>Please change your <%=website_name %> password</h1>
 <p class="warn">
 Your <%=website_name %> password has expired and should be changed.
 </p>
@@ -61,11 +63,12 @@ Your <%=website_name %> password has expired and should be changed.
 <%
 }else{
 %>
-<%@ include file="/back.jsf" %>
+<%@ include file="../back.jsf" %>
 <%} %>
 <br/>
-<%@ include file="/scripts/form_context.jsf" %>
-
+<wb:FormContext/>
+<%@page import="uk.ac.ed.epcc.webapp.servlet.ServletService" %>
+<%@page import="uk.ac.ed.epcc.webapp.forms.html.*" %>
 <%
 String default_charset = conn.getService(ServletService.class).defaultCharset();
 HTMLForm f = new HTMLForm(conn);
@@ -76,7 +79,7 @@ fac.buildForm(f,sess.getCurrentPerson(),conn);
 
 %>
 <div class="block">
-<h2><%=page_title %></h2>
+<h1><%=page_title %></h1>
 <p>
 <%=fac.getPasswordPolicy() %>
 </p>
@@ -95,4 +98,4 @@ accept-charset="<%=default_charset %>"
 <%
 }
 %>
-<%@ include file="/std_footer.jsf" %>
+<%@ include file="../std_footer.jsf" %>

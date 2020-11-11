@@ -16,6 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.servlet;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -24,10 +26,16 @@ import javax.servlet.http.HttpServletRequest;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
+import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.content.DateTransform;
+import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.ValueResultMapper;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
+import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
@@ -40,10 +48,13 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.FilterResult;
 import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterUpdate;
+import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
+import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -57,12 +68,49 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements AnonymisingFactory{
+	public static final Feature NEW_HOST_EMAIL = new Feature("wtmp.new_login_warnings",false,"Send info emails each time a new IP address is logged in from");
+	
+	/**
+	 * 
+	 */
+	private static final String END_COL = "End";
+
+	/**
+	 * 
+	 */
+	private static final String START_COL = "Start";
+
+	/**
+	 * 
+	 */
+	private static final String BROWSER_COL = "Browser";
+
+	/**
+	 * 
+	 */
+	private static final String NAME_COL = "Name";
+
+	/**
+	 * 
+	 */
+	private static final String HOST_COL = "Host";
+
+	/**
+	 * 
+	 */
+	private static final String REAL_PERSON_COL = "Real person";
+
+	/**
+	 * 
+	 */
+	private static final String PERSON_COL = "Person";
+
 	private static final String END_TIME = "EndTime";
 
 	private static final String START_TIME = "StartTime";
-	private static final String BROWSER = "Browser";
+	private static final String BROWSER = BROWSER_COL;
 
-	private static final String HOST = "Host";
+	private static final String HOST = HOST_COL;
 
 	private static final String PERSON_ID = "PersonID";
 	private static final String SUPER_PERSON_ID = "SuperPersonID";
@@ -99,6 +147,23 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 			return record.getStringProperty(HOST);
 		}
 
+		/** return text DNS name if known
+		 * @return DNS name or null
+		 * 
+		 */
+		public String getDNSName() {
+			try {
+				String h = getHost();
+				InetAddress a = InetAddress.getByName(h);
+				String name = a.getHostName();
+				if( name != null && ! name.equals(h)) {
+					return name;
+				}
+			} catch (UnknownHostException e) {
+				return null;
+			}
+			return null;
+		}
 
 
 		public AppUser getPerson()  {
@@ -209,12 +274,19 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 		  } 
 		  return spec;
 	  }
-	public Iterator getCurrent() throws DataFault {
+	public FilterResult<Wtmp> getCurrent() throws DataFault {
 		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
-		return new FilterIterator(new DateFilter(time.getCurrentTime()));
+		return getResult(new DateFilter(time.getCurrentTime()));
 	}
 
-	
+	public FilterResult<Wtmp> getLoginHistory(AppUser person) throws DataFault{
+		OrFilter<Wtmp> fil = new OrFilter<WtmpManager.Wtmp>(getTarget(), this);
+		fil.addFilter(new ReferenceFilter<>(WtmpManager.this, PERSON_ID, person));
+		if( res.hasField(SUPER_PERSON_ID)) {
+			fil.addFilter(new ReferenceFilter<>(WtmpManager.this, SUPER_PERSON_ID, person));
+		}
+		return getResult(fil);
+	}
 
 	@Override
 	protected Wtmp makeBDO(Repository.Record res) throws DataFault {
@@ -222,11 +294,38 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	}
 
 	public Wtmp create(AppUser p, AppUser real,HttpServletRequest req) throws DataFault{
+		String remoteHost = req.getRemoteHost();
+		// new ip warning email
+		if( real == null && remoteHost != null && ! remoteHost.isEmpty()) {
+			// this is not an SU login
+			if( NEW_HOST_EMAIL.isEnabled(getContext())){
+				String email = p.getEmail();
+				if( email != null ) {
+					SQLAndFilter fil = new SQLAndFilter(getTarget(),new ReferenceFilter<Wtmp, AppUser>(this, PERSON_ID, p),
+							new SQLValueFilter<Wtmp>(getTarget(), res, HOST, remoteHost));
+					try {
+						if( ! exists(fil)) {
+							// this is a new host
+							Emailer mailer = new Emailer(getContext());
+							try {
+								mailer.newRemoteHostLogin(p, remoteHost);
+							} catch (Exception e1) {
+								getLogger().error("Error sending notification email");
+							}
+						}
+					} catch (DataException e1) {
+						getLogger().error("Error checking for previous logins",e1);
+					}
+				}
+			}
+		}
+		
 		Wtmp w =  makeBDO();
 
 		w.setPerson(p);
 		w.setSuperPerson(real);
-		w.setHost(req.getRemoteHost());
+		
+		w.setHost(remoteHost);
 		w.setBrowser(req.getHeader("user-agent"));
 		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 		Date s = time.getCurrentTime();
@@ -238,30 +337,41 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	}
 	
 
-	public String getHTMLHeader() {
-		return "<tr><th>Person</th><th>Host</th><th>Browser</th><th>Start</th><th>End</th></tr>\n";
-	}
-	public String getHTML(Wtmp w,SessionService viewer) {
-		DateFormat df = DateFormat.getDateTimeInstance();
-		StringBuilder buff = new StringBuilder();
-		buff.append("<tr><td><small>");
-		buff.append(w.getPerson().getIdentifier());
+	
+	public void addTable(Table t,Wtmp w,SessionService viewer) {
 		AppUser real = w.getSuperPerson();
-		if( real != null) {
-			buff.append(" [");
-			buff.append(real.getIdentifier());
-			buff.append("]");
+		boolean see_su = viewer.hasRole("view_su");
+		if(real != null && ! see_su) {
+			// don't show su sessions
+			return;
 		}
-		buff.append("</small></td><td><small>");
-		buff.append(w.getHost());
-		buff.append("</small></td><td><small>");
-		buff.append(w.getBrowser());
-		buff.append("</small></td><td><small>");
-		buff.append(df.format(w.getStartTime()));
-		buff.append("</small></td><td><small>");
-		buff.append(df.format(w.getEndTime()));
-		buff.append("</small></td></tr>\n");
-		return buff.toString();
+		
+		t.put(PERSON_COL,w,w.getPerson());
+		
+		if( real != null && see_su) {
+			t.put(REAL_PERSON_COL,w,real);
+		}
+		t.put(HOST_COL,w,w.getHost());
+		String dns = w.getDNSName();
+		if( dns != null && ! dns.isEmpty()) {
+			t.put(NAME_COL,w,dns);
+		}
+		t.put(BROWSER_COL,w,w.getBrowser());
+		t.put(START_COL,w,w.getStartTime());
+		t.put(END_COL,w,w.getEndTime());
+		
+		
+	}
+	public void formatTable(Table t) {
+		if( t.hasCol(REAL_PERSON_COL)) {
+			t.setColAfter(PERSON_COL, REAL_PERSON_COL);
+		}
+		if( t.hasCol(NAME_COL)) {
+			t.setColAfter(HOST_COL,NAME_COL);
+		}
+		DateFormat df = DateFormat.getDateTimeInstance();
+		t.setColFormat(START_COL, new DateTransform(df));
+		t.setColFormat(END_COL, new DateTransform(df));
 	}
 	@Override
 	public Class<Wtmp> getTarget() {
@@ -298,7 +408,11 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	}
 	public Date lastLogin(AppUser person) throws DataException {
 		LoginFinder finder = new LoginFinder();
-		return finder.find(new ReferenceFilter<>(WtmpManager.this, PERSON_ID, person),true);
+		SQLAndFilter fil = new SQLAndFilter(getTarget(),new ReferenceFilter<>(WtmpManager.this, PERSON_ID, person));
+		if( res.hasField(SUPER_PERSON_ID)) {
+			fil.addFilter(new NullFieldFilter<Wtmp>(getTarget(), res, SUPER_PERSON_ID, true));
+		}
+		return finder.find(fil,true);
 	}
 	/** Get a filter for {@link AppUser}s who have logged in since
 	 * a target date.
@@ -308,7 +422,10 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	 */
     public SQLFilter<AppUser> getActiveFilter(Date d){
     	AppUserFactory<AppUser> login = getContext().getService(SessionService.class).getLoginFactory();
-    	
-    	return (SQLFilter<AppUser>) convertToDestinationFilter(login, PERSON_ID, new TimeFilter(START_TIME,MatchCondition.GT, d) );
+    	SQLAndFilter fil = new SQLAndFilter(getTarget(),new TimeFilter(START_TIME,MatchCondition.GT, d));
+		if( res.hasField(SUPER_PERSON_ID)) {
+			fil.addFilter(new NullFieldFilter<Wtmp>(getTarget(), res, SUPER_PERSON_ID, true));
+		}
+    	return (SQLFilter<AppUser>) convertToDestinationFilter(login, PERSON_ID, fil );
     }
 }

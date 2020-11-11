@@ -1,11 +1,12 @@
-<%@ include file="/session.jsf"%>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
+<wb:session/>
 <%
 	String page_title = service_name+" Main";
 %>
-
-<%@ include file="/std_header.jsf"%>
+<%@ include file="std_header.jsf"%>
 <div class="block">
-<h2>Default main page</h2>
+<h1>Default main page</h1>
 <p> This is a placeholder main page for the webapp framework.
 If you are seeing this then then either:
 <ol>
@@ -15,4 +16,4 @@ If you are seeing this then then either:
 </p>
 </div>
 
-<%@ include file="/std_footer.jsf"%>
+<%@ include file="std_footer.jsf"%>

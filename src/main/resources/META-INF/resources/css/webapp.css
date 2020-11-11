@@ -1,8 +1,45 @@
+:root{
+	/* By default form tables and normal tables style heading the same
+	 */
+	--column-th-color: var(--th-color);
+	--column-th-bg-color: var(--th-bg-color);
+	--form-th-color: var(--th-color);
+	--form-th-bg-color: var(--th-bg-color);
+	/* width of the top level content blocks */
+	--block-width: 95%;
+	/* separation between top level block elements */
+	--block-v-margin: 20px;
+	/* width of content within a block, default is to use padding in block to narrow */
+	--content-width: 100%;
+	/* padding/margin for text paragraphs looks better without if content and paragraph background the same*/
+	--text-h-padding: 8px;
+	--text-v-padding: 8px;
+	--text-v-margin: 6px;
+	
+	--table-width: 100%;
+	--cell-padding: 3px;
+	/* standard special markup 
+	 * different hover color for styles used in form tables
+	 */
+	--notice-bg-color: #ffcccc;
+	--notice-color: black;
+	
+	--highlight-color: black;
+	--highlight-bg-color: #ffffcc;
+    --highlight-hover-bg-color: #ffeecc;
+    --warn-bg-color: #ffb3b3;
+  	--warn-color: black;
+  	--warn-border: solid red;
+  	--font-family: "MS Arial", "Helvetica", sans-serif;
+}
+
+
+
+
 body {
 	color: black;
 	font-size: medium;
-	background-color: #ffffff;
-	font-family: "MS Arial", "Helvetica", sans-serif;
+	background-color: var(--main-bg-color);
     font-style: normal;
     font-variant: normal;
     font-weight: normal;
@@ -10,6 +47,64 @@ body {
     text-decoration: none;
 	margin: 0;
 }
+body{
+font-family: var(--font-family);
+}
+
+div.banner {
+	font-family: sans-serif,verdana,arial,helvetica;
+	padding: 5px;
+}
+div.banner div.link {
+	font-size-adjust: -1;
+	display: inline;
+	margin: 5px;
+}
+div.banner div.service_title{
+	font-size: xx-large;
+}
+div.banner div.logo img{
+	height: 65px;
+}
+div.banner div.content {
+	font-size: x-large;
+	min-height: 65px;
+	width: 60%;
+	margin-left: auto;
+	margin-right: auto;
+}
+div.banner div.left{
+	float: left;
+}
+div.banner div.right{
+	float: right;
+}
+/* The basic centered  block
+ * This can hold headers paragraphs and forms.
+ */
+div.block, div.wideblock{
+background-color: var(--content-bg-color);
+}
+/* a single line block containing a heading 
+ * this has no following content so usually contains a button
+ * or link
+ */
+div.bar, div.bar h1, div.bar h2, div.bar h3{
+	background-color: var(--bar-bg-color);
+	color: var(--bar-text-color);
+}
+/* Simple single line bar contains a single h3 heading and 
+ * a submit button only form. We swap the text direction to get the button on the right
+ */
+div.bar{
+text-align: left;
+/* background-color: #e7e7e7; */
+}
+/* simple single bar containing only text */
+div.textbar{
+	background-color: var(--paragraph-bg-color);
+}
+
 
 /** Allow a block heading to be the summary element 
  */
@@ -18,88 +113,82 @@ div.block details summary h2{
 	margin: 0;
 }
 
-/* all divs form a centered column */
-div.block, div.bar, div.textbar,div.text, div.graph {
-width: 95%;
+/* all top level divs form a centered column */
+body > div.block, body> div.bar, body > div.textbar, body > div.text, body > div.graph {
+	width: var(--block-width);
 }
-div.bar{
-height: 25px;
+body > div.wideblock {
+	width: var(--block-width);
 }
-div.wideblock {
-width: 95%;
+body > div.report {
+	width: var(--block-width);
 }
-div.report {
-width: 95%;
+body > div.bar{
+	height: 25px;
 }
-
-/* common properties of all divs */
-div.block, div.bar, div.textbar,div.text, div.graph, div.report, div.wideblock {
-margin-left: auto;
-margin-right: auto;
-margin-top: 20px;
-margin-bottom: 20px;
-text-align: left;
-color: black;
+/* common properties of all top level divs */
+body > div.block, body > div.bar, body > div.textbar,body > div.text, body > div.graph, body >div.report,  body > div.wideblock {
+    /* centered */
+	margin-left: auto;
+	margin-right: auto;
+	/* seperated from other top level content */
+	margin-top: var(--block-v-margin);
+	margin-bottom: var(--block-v-margin);
  
-        padding-left: 10px;
-        padding-right: 10px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        border-radius: 15px;
-        white-space: normal;
-	}
+    /* if top level blocks have a background color
+     * this clears the content from the edge of the physical block
+     * for all elements.
+     *
+     * If we want some content to take the full width of the block
+     * zero the padding and set var(--content-width) to the desired width
+     * then override width of the wide content
+     * setting the top level block to full-width will allow
+     * elements to be full width as well
+     */
+	padding-left: var(--block-h-padding);
+	padding-right: var(--block-h-padding);
+    padding-top: var(--block-v-padding);
+    padding-bottom: var(--block-v-padding);
+    border-radius: var(--block-radius);
+        
+}
+div.block, div.bar, div.textbar,div.text, div.graph, div.report, div.wideblock {
+	text-align: left;
+	color: black;
+	white-space: normal;        
+}
 
 /** nested block have same width as parent
  * but keep top-bottom spacing
  */
 div.block div.block {
-	margin-left: 0px;
-	margin-right: 0px;
-	padding-left: 0px;
-	padding-right: 0px;
+	margin-top: var(--block-v-margin);
+	margin-bottom: var(--block-v-margin);
 	width: 100%;
 }
-/* The basic centered Grey block
- * This can hold headers paragraphs and forms.
- */
-div.block, div.wideblock{
-background-color: #cccccc;
+body > div.block > div.block {
+	 width: var(--content-width);
 }
 
+/* wrapper to add automatic scrollbar */
 div.scrollwrapper {
 	overflow: auto;
 }
-div div.overflowblock{
-	overflow: scroll;
-	margin-left:6em;
+
+div.scrolltext {
+	display: inline-block;
+	max-width: 600px;
 }
+div.scrolltext > div.para{
+	white-space: nowrap;
+}
+
 .login{
 	font-weight: bold;
 }
-div.overflowblock table{
-    display:block;
-    white-space: nowrap;
-}
 
-div.overflowblock table{
-}
 
-div.overflowblock .bodycol{
-	 margin-left: 6.5em;
-}
 
-div.overflowblock .headcolhead {
-	position:absolute;
-	margin-left: -6.5em;
-	border: solid #e7e7e7; 
-	background-color: #e7e7e7;
-	width: 6em;
-	top:auto;
-	border-right: 0px none black;
-	border-top: 0px none black;
-	border-top-width:3px; /*only relevant for first row*/
-	margin-top:-3px; /*compensate for top border*/
-}
 /** Acts as pre-formatted without changing the font
  */
 p.preformatted{
@@ -110,245 +199,50 @@ p.preformatted{
 }
 
 pre.loose{
-	font-family: "MS Arial", "Helvetica", sans-serif;
 	overflow: auto;
 	white-space: pre;
-}
-div.overflowblock .headcol {
-	position:absolute;
-	margin-left: -6.5em;
-	border: solid #e7e7e7; 
-	background-color: #ffffff;
-	width: 6em;
-	top:auto;
-	border-right: 0px none black;
-	border-top: 0px none black;
-	border-top-width:3px; /*only relevant for first row*/
-	margin-top:-3px; /*compensate for top border*/
+	font-family: var(--font-family);
 }
 
-/* Simple single line bar contains a single h3 heading and 
- * a submit button only form. We swap the text direction to get the button on the right
+
+
+/* Add space before a h1/h2 heading
  */
-div.bar{
-text-align: left;
-/* background-color: #e7e7e7; */
-}
-
-div.bar, div.bar h1, div.bar h2, div.bar h3{
-	background-color: #cccccc;
-}
-/* simple single bar containing only text */
-div.textbar{
-background-color: #e7e7e7;
-}
-/* Button like links so we can open new page using right mouse */
-table.navbar tr td a {
-    background-color: #e7e7e7;
-    border-width: 1px;
-    border: solid black;
-    display: block;
-    text-align:center;
-}
-
-/** Report formats */
-
-
-/* large table based report */
-div.report {
-    text-align: left;
-    background-color: white;
-}
-div.report h1, div.report h2{
-text-align: center;
-}
-div.report  th {
-background-color: #dddddd;
-}
-div.report td {
-	background-color: #eeeeee;
-}
-div.report table {
-	width: 100%;
-	border: solid black;
-}
-/* block containing an image */
-div.graph{
-	width: 100%;
-	text-align: center;
-}
-/* default image size generated by graphing tools */
-div.graph img{
-	width: 800px;
-	height: 400px;
-}
-div.graph h1, div.graph h2{
-	text-align: center;
-}
-/* supress normal formatting in reports
-*/
-div.report h1, div.report h2, div.report h3, div.report h4{
-	color: black;
-	background-color: #ffffff;
-}
-
-/* we use three levels of header as standard 
- * h1 or h2 is the top level header in a block
- * h3 is a secondary header or a header in a div.bar
- * h4 is a smaller header for subdivisions.
-*/
-
-h1, h2, h3, h4, h5, h6 {
-	font-size: 110%;
-	color: black;
-    text-align: left;
-    line-height: normal;
-    
-    padding: 4px;
-}
-
 h1, h2{
-	margin: 8px 0px 0px 0px;
+	margin-top: var(--heading-pre-space);
 }
-h3, h4, h5, h6 {
+/*  First major heading at top of div
+ * remove any spacing margins
+ */
+h1:first-child, h2:first-child{
+	margin: 0px;
+}
+
+/* no separation when showing log items as these use
+ * headings as labels shown in a sequence
+ */
+div.item h3, div.item h4, div.item h5 , div.item h6 , div.item pre, div.item p{
 	margin: 0;
 }
- /*
-  * secondary header in a block
-  */
-div h3{
-background-color: #ffffcc;
-}
 
-div h4{
-background-color: #ffeebb;
-}
+/* A form within a block element. This usually contains a nested 
+ * table for fine grain layout and a fieldset.action_button
+ * for the submit buttons. 
+ * These are usually direct children of the top level block.
+ * normally the form is just a container with styling applied
+ * to the inner elements  
 
-div h5{
-background-color: #eeeeee;
-}
-
-div h6{
-background-color: #ffffff;
-}
-
-label{
-text-align: left;
-}
-
-
-
-/* A form within a block element. This can contain a nested 
- * table for fine grain layout.
  */
-div.block form, div.wideblock form{
-background-color: #cccccc;
-margin: 2px 0px;
+body > div.block form, body > div.wideblock form{
+margin-top: 2px;
+margin-bottom: 2px;
 padding: 0;
 }
-div.form {
-text-align: left;
-}
 
-/** inline errors for transition
- */
-div.block div.error {
-margin: 10px 0px 0px 0px;
-padding: 0;
-}
-div.block div.error + form, div.wideblock div.error + form{
-margin: 0;
-border: solid red;
-}
 
-/*  keep the label widths limited so inputs are closer to the label
- */
-table.form th {
-	width: 33%;
-}
 
-/* block of action buttons at the end of a form
-*/
-.action_buttons{
-text-align: right;
-border-width: 2px;
-margin-bottom: 10px;
 
-}
-fieldset.action_buttons{
-border: solid #e7e7e7;
-border-width: 2px;
-margin: 5px 0px;
-}
-/** Single button forms in an actionbutton block
- */
-.action_buttons form{
-	display: inline;
-}
 
-/** button in a list
-*/
-li form{
-	display: inline;
-}
-
-div.block td form, div.wideblock td form{
-	background-color: inherit;
-}
-
-form.button{
-	display: inline;
-	text-align: right;
-}
-.input_button {
-	margin: 3px 0px;
-	border-style: outset;
-}
-/* table for fine tuning the layout within a form
- * these have an explicit border 
- */
-table.form{
-	border: solid #e7e7e7;
-	border-width: 2px;
-    background-color: #cccccc;
-    margin: 5px 0px;
-    text-align: left;
-   
-}
-
-label.required, span.required {
-	font-weight: bold;
-}
-/* Add a black star to labels of required fields.
- */
-label.required::after, span.required::after {
-	content: " \2605"
-}
-label.missing::after, span.missing::after {
-	color: #ff0000
-}
-/* Label for an optional form parameter
- */
-.optional{
-	color: #555555;
-}
-/* error added to a form input label 
- */
-.field_error{
-	font-weight: bold;
-	color: #ff0000;
-}
-table.form tr {
-        width: 100%;
-}
-table.form td {
-        padding: 2px;
-        background-color: #cccccc;
-}
-
-form table tr:hover td {
-	 background-color: #dddddd;
-}
 
 /* auto generated table from Table class */
 table.auto {
@@ -367,29 +261,50 @@ div.ifms_summary td.key {
 background-color: #e7e7e7;	
 text-align: left;
 }
-/* paragraph within a block add margin at bottom so headers associate with following content
+/* paragraph within a block 
  */
-div.block p,  div.block ul, div.block ol, div.block pre, div.block div.para, div.block table{
+div.block p,  div.block ul, div.block ol, div.block pre, div.block div.para, div.block div.table, div.block div.column {
 text-align: left;
 
 }
-/* block content not including table
+/* first level children default to the same horizontal margin to align equally.
+ * alternatively padding can be added to the div.block but if we want any elemments
+ * full width use --content-h-margin instead.
+ * this also needs to be overridden to centre content
+ */
+body > div.block > * {
+margin-left: var(--content-h-margin);
+margin-right: var(--content-h-margin);
+border-width: 2px;
+}
+/* block content (not including table)
+ * add margin at bottom so headers associate with following content
+ * if the content and background have different backgounds you need
+ * padding but this indents the text if they are the same 
  */
 div.block p,  div.block ul,  div.block pre, div.block div.para{
-margin: 0px 0px 6px 0px;
-background-color: #e7e7e7;
+margin-top: 0px;
+margin-bottom:  var(--text-v-margin);
+
 color: black;
-padding: 8px;
+padding-top: var(--text-v-padding);
+padding-bottom: var(--text-v-padding);
+padding-left: var(--text-h-padding);
+padding-right: var(--text-h-padding);
 display: block;
 }
+div.block p,  div.block pre, div.block div.para{
+	background-color: var(--paragraph-bg-color);
+}
 div.block ol {
-	margin: 0px 0px 6px 0px;
-background-color: white;
-color: black;
+	margin-top: 0px;
+	margin-bottom: 6px;
+	background-color: white;
+	color: black;
 }
 /* no margin inside table */
 div.block td p,  div.block  td ul, div.block td ol, div.block  td pre, div.block  td div.para{
-margin: 0px 0px 0px 0px;
+margin: 0;
 }
 div.block ul{
 list-style: inside;
@@ -397,16 +312,18 @@ list-style: inside;
 div.block  table, div.wideblock  table, div.report  table {
     width: 100%;
 }
-div.block > table, div.wideblock > table, div.report > table {
-	 border: solid #e7e7e7; 
-   /* margin-top: 10px;*/  
+/* special rule for top level */
+body > div.block > table, body > div.wideblock > table, body > div.report > table {
+    width: var(--content-width);
 }
+
+
 /* supress the cell seperators for nested tables */
 div.block table table {
 	    border-collapse: collapse;
 		border-spacing: 0;
 		border-width: 0;
-		margin: 0px;
+		margin: 0;
 }
 /* need to ensure cells are seperated if this is an auto-table not a form table
  * as data may be packed in there.
@@ -418,16 +335,18 @@ div.block table table.auto td, div.block table table.auto th{
 */
 
 
-div.block > table.compact, table.compact {
+table.compact {
 	    border: none;
 		border-spacing: 0;
-		margin: 0px 0px 6px 0px;	
+		margin-top: 0;
+		margin-bottom: 6px;	
 }
 
 table.listing {
 	border: none;
 	border-spacing: 0;
-	margin: 0px 0px 6px 0px;	
+	margin-top: 0;
+	margin-bottom: 6px;	
 	background-color: white;
 }
 
@@ -435,7 +354,8 @@ table.listing td.public_access {
 	background-color: #ff6666;
 }
 
-
+/* buttons in bar float to the right
+ */
 div.bar form{
  display: block;
  float: right;
@@ -482,24 +402,40 @@ margin: 2px;
  }
 
 div tr.notice td, div tr td.notice{
-	background-color: #ffcccc;
+	background-color: var(--notice-bg-color);
+	color: var(--notice-color);
 }
 
 div  *.highlight td, div table.auto *.highlight td form{
-	 background-color: #ffffcc;
+	 background-color: var(--highlight-bg-color);
+	 color: var(--highlight-color);
 }
 /* hover highlighting to indicate the active row in a form
 */
 form table.form tr.highlight:hover td {
-	 background-color: #ffeecc;
+	 background-color: var(--highlight-hover-bg-color);
 }
 /* some transitions dont set form class
  */ 
 form table tr.highlight:hover td {
-	 background-color: #ffeecc;
+	 background-color: var(--highlight-hover-bg-color);
 }
+
+/* a warning paragraph */
+div.warn{
+	border: var(--warn-border);
+	background-color: var(--warn-bg-color);
+	color: var(--warn-color);
+}
+
+div p.warn, div.warn p, .warn, .warn.sorting_1 {
+	background-color: var(--warn-bg-color);
+	color: var(--warn-color);
+}
+
+
 details div.description{
-	 border-radius: 15px;
+	 border-radius: var(--block-radius);
 	 padding: 5px;
 	 background-color: #ffffcc;
 	 font-size: small;
@@ -507,28 +443,248 @@ details div.description{
 
 div td, div table.auto td form , div.block td ul, div.block td ol{
         background-color: #ffffff;
+        padding: var(--cell-padding);
 }
 td.numeric, td[numeric] ,  td.numeric input {
 text-align: right;
 white-space: nowrap;
 }
 
-/* a table cell intended to hold a form buton */
+div th {
+        color: var(--th-color);
+        background-color: var(--th-bg-color);
+        padding: var(--cell-padding);
+}
+div table.column th{
+        color: var(--column-th-color);
+        background-color: var(--column-th-bg-color);
+}
+div table.column td th{
+        color: var(--th-color);
+        background-color: var(--th-bg-color);
+}
+
+/* Forms may be used for single buttons often in table cells.
+ * The other common idiom is a collection of single button forms
+ * in an "action_button" group at the end of descriptive content
+ * these are intended to be like a pseudo form without input fields.
+ * 
+ * or major forms with labels/inputs in a 2-column table
+ * followed by a fieldset of submit buttons.
+ *
+ * The fieldset and action_button group share the action_buton class
+ */
+
+/* single button forms */
+/** Single button forms in an action button block
+ */
+.action_buttons form{
+	display: inline;
+}
+
+/** button in a list
+*/
+li form{
+	display: inline;
+}
+/* embedded forms should use the background of their parent we
+ * just want to see a single button
+ */
+div.block td form, div.wideblock td form{
+	background-color: inherit;
+}
+
+/* a table cell intended to hold a form button */
 div td.button {
 	text-align: center;
-	background-color: #e7e7e7;
-}
-div th {
-        color: black;
-        background-color: #e7e7e7;
-}
-form table.form tr:hover th{
-	background-color: #f3f3f3;
+	background-color: var(--th-bg-color);
 }
 th.button-col, td.button-col {
 	width: 5%;
 	text-align: center;
 }
+form.button{
+	display: inline;
+	text-align: right;
+	background-color: inherit;
+}
+
+
+/** inline errors for transition
+ * shown above the form
+ */
+div.block div.error {
+margin-top: 10px;
+margin-bottom: 0px;
+padding: 0;
+}
+div.block div.error + form, div.wideblock div.error + form{
+margin-top: 0;
+margin-bottom: 0;
+border: solid red;
+}
+div.block form, div.wideblock form{
+	background-color: var(--form-bg-color);
+}
+
+
+
+/* block of action buttons at the end of a form
+ * buttons pack to the right
+*/
+.action_buttons{
+text-align: right;
+border-width: 2px;
+margin-bottom: 10px;
+
+}
+/** form with ONLY action buttons
+ */
+form.view > .action_buttons{
+	margin-bottom: 0;
+}
+
+label{
+	text-align: left;
+}
+/* form label for a required field */
+label.required, span.required {
+	font-weight: bold;
+}
+/* Add a black star to labels of required fields.
+ */
+label.required::after, span.required::after {
+	content: " \2605"
+}
+label.missing::after, span.missing::after {
+	color: #ff0000
+}
+/* Label for an optional form parameter
+ */
+.optional{
+	color: #555555;
+}
+/* error added to a form input label 
+ */
+.field_error{
+	font-weight: bold;
+	color: #ff0000;
+}
+:disabled, .disabled {
+	cursor: not-allowed;
+}
+
+/*  keep the label widths limited so inputs are closer to the label
+ */
+table.form th {
+	width: 33%;
+}
+table.form tr {
+        width: 100%;
+}
+table.form td {
+        padding: 2px;
+   
+}
+form table.form th{
+        color: var(--form-th-color);
+        background-color: var(--form-th-bg-color);
+}
+form table.form tr:hover th{
+	background-color: var(--th-hover-bg-color);
+}
+table.form td {
+        background-color: var(--form-content-bg-color);
+}
+
+form table tr:hover td {
+	 background-color: var(--form-hover-bg-color);
+}
+
+
+fieldset.action_buttons{
+border: solid var(--form-border-color);
+border-width: 2px;
+margin-top: 5px;
+margin-bottom: 5px;
+margin-left: 0;
+margin-right: 0;
+}
+.action_buttons > * {
+	margin: 5px;
+}
+
+/* styling for input buttons */
+.input_button {
+	border-style: outset;
+	background-color: var(--button-bg-color);
+	color: var(--button-color);
+}
+
+/* Button like links so we can open new page using right mouse */
+div.block table.navbar{
+	margin-top: 10px;
+	margin-bottom: 10px;
+	border: none;
+	border-spacing: 0;
+	background-color: inherit;	
+}
+div.block table.navbar td {
+	background-color: inherit;	
+}
+table.navbar tr td a {
+    background-color: var(--button-bg-color);
+    color: var(--button-color);
+    margin: 3px 0px;
+	border-style: outset;
+	border-color: black;
+    border-width: 2px;
+  
+    display: block;
+    text-align:center;
+}
+
+/* table for fine tuning the layout within a form
+ * these have an explicit border 
+ */
+table.form{
+	border: solid var(--form-border-color);
+	border-width: 2px;
+    background-color: var(--form-content-bg-color);
+    margin-top: 5px;
+    margin-bottom: 5px;
+    text-align: left;
+}
+form.transition table.form {
+	 background-color: var(--form-content-bg-color);
+}
+div.action_buttons {
+	 background-color: var(--form-content-bg-color);
+}
+
+div.block ul{
+	background-color: var(--list-bg-color);
+}
+div.block > table, div.wideblock > table, div.report > table, details > table , div.scrollwrapper > table, div > table {
+	 border-style: solid; 
+	 border-color: var(--table-border-color); 
+	 background-color: var(--table-bg-color);
+     margin-bottom: 10px;  
+}
+
+/* custom content table within a form should be a normal table
+ * it it was a a table.form we set differently
+ */
+div table {
+	 border-style: solid; 
+	 border-color: var(--table-border-color); 
+	 background-color: var(--table-bg-color);
+}
+
+div.block > table:last-child, div.wideblock > table:last-child, div.report > table:last-child, details > table:last-child , div.scrollwrapper > table:last-child{
+	margin-bottom:10px;
+}
+
 /* Resoruce table */
 td.notes{
 	text-align: right;
@@ -539,19 +695,16 @@ td.resource table.auto td.main, td.resource table.auto th.main{
 div table table.resource{
 	text-align: right;
 }
-/* a warning paragraph */
-div p.warn{
-	color: #ff0000;
-		}
+
+
+
 .center{
 text-align: center;
 	}
 .plain {
 	background-color: #ffffff;
 	}
-.warn, .warn.sorting_1 {
-	color: #ff0000;
-}
+
 .pass:after {
 	content: " \2714";
 	color: green;
@@ -568,38 +721,17 @@ text-align: center;
 	color: orange;
 }
 .notice, .notice.sorting_1 {
-	background-color: #ffcccc;
-	}
+	color: var(--notice-color);
+	background-color: var(--notice-bg-color);
+	font-style: italic;
+}
 .highlight,div.block  p.highlight {
-  background-color: #ffffcc;
-}
-.grey {
- background-color: #cccccc;
-}
-.lightgrey{
-	background-color: #e7e7e7;
+  color: var(--highlight-color);
+  background-color: var(--highlight-bg-color);
 }
 
-/* rules for the survey code */
-div.question_noanswer, div.question_answered{
- text-align: center;
- border-width: thin;
- border-style: solid;
- padding: 2px;
- margin-top: 5px;
-}
-div.question_noanswer {
-  border-color: red;	
-}
-div.question_answered {
-  border-color: green;	
-}
-div.noquestion {
-  border-color: green;	
-}
-div.block p.question {
-	background-color: #f0f0f0;
-}
+
+
 
 div.block div.compact {
 	display: block;
@@ -631,129 +763,21 @@ textarea.comment {
   margin-right: auto;
   width: 95%;
 }
-/* survey formatting for results */
-/* These numbers come from a linear interpolation between reg and green
- * but using the square of the fractional value to componsate for high %ages being
- * harder to reach if there are multiple choices.
-*/
-li.frac_0{
-  	background-color: #ff9999;
-}
-li.frac_1{
-  	background-color: #ebac99;
-}
-li.frac_2{
-	background-color: #dabd99;
-}
-li.frac_3{
-	background-color: #cacd99;
-}
-li.frac_4{
-	background-color: #bdda99;
-}
-li.frac_5{
-	background-color: #b2e599;
-}
-li.frac_6{
-	background-color: #a9ee99;
-}
-li.frac_7{
-	background-color: #a2f599;
-}
-li.frac_8{
-	background-color: #9dfa99;
-}
-li.frac_9{
-	background-color: #9afd99;
-}
-li.frac_10{
-	background-color: #99ff99;
-}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-div.report td.frac_0 {
-  	background-color: #ed1818;
-  	text-align: right;
-	white-space: nowrap;
+div table tr td[format=under]{
+	color: red;
 }
-div.report td.frac_1 {
-  	background-color: #ed4218;
-  	text-align: right;
-	white-space: nowrap;  	
-}
-div.report td.frac_2 {
-	background-color: #ed6d18;
-  	text-align: right;
-	white-space: nowrap;	
-}
-div.report td.frac_3{
-	background-color: #ed9818;
-  	text-align: right;
-	white-space: nowrap;	
-}
-div.report td.frac_4{
-	background-color: #edc218;
-  	text-align: right;
-	white-space: nowrap;
-}
-div.report td.frac_5{
-	background-color: #eded18;
-  	text-align: right;
-	white-space: nowrap;
-}
-div.report td.frac_6{
-	background-color: #c2ed18;
-  	text-align: right;
-	white-space: nowrap;
-}
-div.report td.frac_7{
-	background-color: #98ed18;
-  	text-align: right;
-	white-space: nowrap;
-}
-div.report td.frac_8{
-	background-color: #6ded18;
-  	text-align: right;
-	white-space: nowrap;
-}
-div.report td.frac_9{
-	background-color: #42ed18;
-  	text-align: right;
-	white-space: nowrap;
-}
-div.report td.frac_10{
-	background-color: #18ed18;
-  	text-align: right;
-	white-space: nowrap;
-}
-
-
-div td[format=under]{
-	color: #ff0000;
-}
-div td[format=over]{
-	color: #0000ff;
+div table tr td[format=over]{
+	color: blue;
 }
 div td[highlight=true]{
-	background-color: #ffffcc;
+	color: var(--hightlight-color);
+	background-color: var(--highlight-bg-color);
 }
 div td[notice=true]{
-	background-color: #ffcccc;
+	color: var(--notice-color);
+	background-color: var(--notice-bg-color);
 }
 div.block p.comment {
 	background-color: #ffeebb;
@@ -855,6 +879,13 @@ display: block;
 div.message form, form div.message{
 	text-align: left;
 }
+div.message {
+	border-style: solid;
+	border-color: var(--table-border-color);
+	border-width: 1px;
+	background-color: var(--column-th-bg-color);
+	color: var(--column-th-color);
+}
 
 h3 form, h4 form{
     display: inline-block;
@@ -871,6 +902,12 @@ div.mail {
 }
 div.mail pre, div.message pre, p.longlines{
 	overflow: auto;
+}
+input[type=number][size="6"] {
+	width: 7em;
+}
+input[type=number][size="5"] {
+	width: 6em;
 }
 input[type=number][size="4"] {
 	width: 5em;
@@ -900,4 +937,32 @@ img.qrcode{
     display: block;
     margin-left: auto;
 	margin-right: auto;
+}
+
+div.dataTables_wrapper {
+	margin-top: 10px;
+}
+
+/* These are also in helpdesk.css but added here for
+ * traffic-light type markup elsewhere
+*/
+table.dataTable.display tbody tr td.GREEN.sorting_1, td.GREEN ,  span.GREEN{
+	background: #00ff00;
+}
+table.dataTable.display tbody tr td.YELLOW.sorting_1,td.YELLOW,  span.YELLOW{
+	background: yellow;
+}
+table.dataTable.display tbody tr td.AMBER.sorting_1, td.AMBER,  span.AMBER{
+	background: orange;
+}
+table.dataTable.display tbody tr td.ORANGE.sorting_1, td.ORANGE,  span.ORANGE{
+   background: orange;
+}
+table.dataTable.display tbody tr td.RED.sorting_1, td.RED,  span.RED{
+   background: red;
+}
+
+/* allocations use this for end dates in the past */
+.grey {
+ background-color: #cccccc;
 }

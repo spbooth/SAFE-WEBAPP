@@ -31,6 +31,7 @@ import javax.mail.internet.MimePart;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
+import uk.ac.ed.epcc.webapp.content.XMLContentBuilder;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageWalker.WalkerException;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
@@ -87,6 +88,7 @@ public class ContentMessageVisitor extends AbstractVisitor {
 
 	public final void linkPart(MessageWalker w,MimePart parent) throws MessagingException {
 		String filename = parent.getFileName();
+		
 		String desc = parent.getDescription();
 		if( filename != null ){
 			Pattern p = Pattern.compile("([^\\s/\\\\:]+)\\s*\\z");
@@ -108,18 +110,38 @@ public class ContentMessageVisitor extends AbstractVisitor {
 		if( desc == null ){
 			desc = "attachment ("+parent.getContentType()+")";
 		}
+		if( parent.isMimeType("message/rfc822")){
+			// Don't add name to an email attachment 
+			// because there is a  valid path under this point in the tree
+			// that does not contain the name
+			filename = null;
+		}
 		// link to html alternatives
 		sb=sb.getPanel("link");
-		addLink(w.getPath(),  filename, filename+": "+desc);
+		if( filename == null ) {
+			addLink(w.getPath(),  null, desc);
+		}else {
+			addLink(w.getPath(),  filename, filename+": "+desc);
+		}
 		sb=sb.addParent();
 	}
 
 	@Override
 	public final void visitInputStream(MimePart parent, InputStream stream,MessageWalker w) throws MessageWalker.WalkerException {
+	boolean old =false;  // set new tab if we can
+	if( sb instanceof XMLContentBuilder) {
+		XMLContentBuilder x = (XMLContentBuilder) sb;
+		old = x.setNewTab(true);
+	}
 	try {
 		linkPart(w,parent);
 	} catch (MessagingException e) {
 		doMessageError(w,e);
+	}finally {
+		if( sb instanceof XMLContentBuilder) {
+			XMLContentBuilder x = (XMLContentBuilder) sb;
+			x.setNewTab(old);
+		}
 	}
 }
   
