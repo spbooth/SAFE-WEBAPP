@@ -36,7 +36,7 @@ public class LocksTest extends WebappTestBase {
 	@Test
 	public void testLock() throws DataFault {
 		Date d = setTime(2020, Calendar.APRIL, 4, 9, 00);
-		LockFactory fac = new LockFactory(ctx);
+		LockFactory fac = LockFactory.getFactory(ctx);
 		
 		Lock a = fac.makeFromString("first-lock");
 		

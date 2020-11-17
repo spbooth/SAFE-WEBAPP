@@ -23,11 +23,15 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.TransientDataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterUpdate;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
+import uk.ac.ed.epcc.webapp.content.DateTransform;
+import uk.ac.ed.epcc.webapp.content.Table;
+import uk.ac.ed.epcc.webapp.content.Transform;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
@@ -56,7 +60,9 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 	
 	private static final String LAST_LOCK_FIELD = "LastLock";
 
-	
+	public static LockFactory getFactory(AppContext conn) {
+		return conn.makeObject(LockFactory.class, LOCKS_TABLE);
+	}
 	public LockFactory(AppContext conn) {
 		super();
 		setContext(conn, LOCKS_TABLE);
@@ -220,6 +226,23 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 	@Override
 	public Class<Lock> getTarget() {
 		return Lock.class;
+	}
+	public Table getTable() {
+		Table t = new Table();
+		try {
+			for(Lock l : all()) {
+				t.put("Name", l, l.getName());
+				t.put("Description", l, l.getDescription());
+				t.put("Locked since", l, l.wasLockedAt());
+				t.put("Last locked", l, l.lastLocked());
+			}
+		} catch (DataFault e) {
+			getLogger().error("Error building lock table", e);
+		}
+		Transform f = new DateTransform(SimpleDateFormat.getDateTimeInstance());
+		t.setColFormat("Locked since", f);
+		t.setColFormat("Last locked", f);
+		return t;
 	}
 
 }
