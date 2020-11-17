@@ -19,8 +19,6 @@ package uk.ac.ed.epcc.webapp.content;
 import java.text.DateFormat;
 import java.util.Date;
 
-import uk.ac.ed.epcc.webapp.Version;
-
 
 
 public class DateTransform implements Transform{

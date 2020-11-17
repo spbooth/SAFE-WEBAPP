@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.content.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.inputs.BooleanInput;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
@@ -45,6 +46,9 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * <p>
  * Editing the fields can be made role dependent by setting the parameter
  * <b><i>factory-tag</i>.<i>field</i>.edit_role</b> to the required global role name.
+ * <p>
+ * The default value (to use when no database field present can be set using
+ * <b><i>factory-tag</i>.<i>field</i>.default</b> (false if unspecified).
  * @author spb
  *
  */
@@ -73,7 +77,7 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 			if( getRepository().hasField(name)) {
 				return new SQLValueFilter<>(getFactory().getTarget(), getRepository(), name, Boolean.TRUE);
 			}else {
-				return new FalseFilter<>(getFactory().getTarget());
+				return new GenericBinaryFilter<BDO>(getFactory().getTarget(), getDefault(name));
 			}
 		}
 		return null;
@@ -110,7 +114,7 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 	@Override
 	public TableSpecification modifyDefaultTableSpecification(TableSpecification spec, String table) {
 		for(String name : names) {
-			spec.setField(name, new BooleanFieldType(true, false));
+			spec.setField(name, new BooleanFieldType(true, getDefault(name)),getContext().getBooleanParameter(getFactory().getConfigTag()+"."+name+".optional", false));
 		}
 		
 		return spec;
@@ -155,6 +159,10 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 			}
 		}
 		return suppress;
+	}
+	
+	public boolean getDefault(String name) {
+		return getContext().getBooleanParameter(getFactory().getConfigTag()+"."+name+".default", false);
 	}
 
 }
