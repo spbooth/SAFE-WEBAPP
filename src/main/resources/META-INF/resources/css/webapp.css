@@ -665,6 +665,10 @@ div.action_buttons {
 div.block ul{
 	background-color: var(--list-bg-color);
 }
+/* nested lists (in body content) indent */
+div.block li li {
+	margin-left: 20px;
+}
 div.block > table, div.wideblock > table, div.report > table, details > table , div.scrollwrapper > table, div > table {
 	 border-style: solid; 
 	 border-color: var(--table-border-color); 

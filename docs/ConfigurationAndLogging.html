@@ -3,58 +3,47 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
 	<title></title>
-	<meta name="generator" content="LibreOffice 5.1.5.2 (Windows)"/>
+	<meta name="generator" content="LibreOffice 6.4.5.2 (Windows)"/>
 	<meta name="created" content="2017-03-07T20:37:53.968000000"/>
-	<meta name="changed" content="2017-03-07T20:38:20.924000000"/>
+	<meta name="changed" content="2020-11-17T12:24:30.636000000"/>
 	<style type="text/css">
 		h2.western { font-family: "Albany", sans-serif; font-size: 16pt }
 		h2.cjk { font-family: "SimSun"; font-size: 16pt }
 		h2.ctl { font-family: "Mangal"; font-size: 16pt }
 	</style>
 </head>
-<body lang="en-GB" dir="ltr">
-<h2 class="western">General configuration properties and logging</h2>
+<body lang="en-GB" dir="ltr"><h2 class="western">General
+configuration properties and logging</h2>
 <p>The following are general configuration parameters you might that
 may need to be set when creating a new application:</p>
 <ul>
-	<li/>
-<p><b>service.name</b> This parameter identifies the name of
-	the  service supported by the application e.g. &ldquo;ARCHER&rdquo;
-	. Keep this name short, ideally a single identifying name, as it is
+	<li><p><b>service.name</b> This parameter identifies the name of the
+	service supported by the application e.g. &ldquo;ARCHER&rdquo; .
+	Keep this name short, ideally a single identifying name, as it is
 	usually used to qualify other terms such as &ldquo;web-site&rdquo;,
 	&ldquo;service&rdquo; &ldquo;helpdesk&rdquo; etc.</p>
-	<li/>
-<p><b>service.url</b> The canonical URL of the application. 
+	<li><p><b>service.url</b> The canonical URL of the application. 
 	</p>
-	<li/>
-<p><b>service.website-name</b> The short name used to refer to
+	<li><p><b>service.website-name</b> The short name used to refer to
 	the application itself. 
 	</p>
-	<li/>
-<p><b>mail.smtp.host</b> Address of an SMTP server the
+	<li><p><b>mail.smtp.host</b> Address of an SMTP server the
 	application will use to send outgoing emails. 
 	</p>
-	<li/>
-<p><b>email.from_address</b> The default FROM address for
-	mails sent by the application</p>
-	<li/>
-<p><b>error.email_notify_address</b> An email address where
+	<li><p><b>email.from_address</b> The default FROM address for mails
+	sent by the application</p>
+	<li><p><b>error.email_notify_address</b> An email address where
 	application internal errors should be reported by email</p>
-	<li/>
-<p><b>error.email_from_address</b> The FROM address to use for
+	<li><p><b>error.email_from_address</b> The FROM address to use for
 	error emails.</p>
-	<li/>
-<p><b>info.email_notify_address</b> An email address where the
+	<li><p><b>info.email_notify_address</b> An email address where the
 	application should send informational/warning messages.</p>
-	<li/>
-<p><b>info.email_from_address</b> The FROM address to use for
+	<li><p><b>info.email_from_address</b> The FROM address to use for
 	informational/warning messages.</p>
-	<li/>
-<p><b>email.force.address</b> A debugging option that forces
-	all emails from the application to be sent to only the specified
-	email address.</p>
-	<li/>
-<p><b>service.systems </b><span style="font-weight: normal">Text
+	<li><p><b>email.force.address</b> A debugging option that forces all
+	emails from the application to be sent to only the specified email
+	address.</p>
+	<li><p><b>service.systems </b><span style="font-weight: normal">Text
 	describing the resources the application manages defaults to
 	&ldquo;</span><i><span style="font-weight: normal">service.name</span></i>
 	<span style="font-weight: normal">machines&rdquo; </span>
@@ -64,50 +53,7 @@ may need to be set when creating a new application:</p>
 <br/>
 
 </p>
-<p><br/>
-<br/>
-
-</p>
-<p>The application uses the Log4J logging package. Logging is
-configured via the application configuration system so you can add
-any standard Log4J logging configuration to the configuration files.
-For example to generate a rolling debug log in <b>/tmp</b> add:</p>
-<p align="left" style="margin-bottom: 0cm"><font color="#000000"><font face="Monospace"><font size="2" style="font-size: 10pt">logdir=</font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">${java.io.tmpdir}</font></font></font></p>
-<p align="left" style="margin-bottom: 0cm"><font color="#3f7f5f"><font face="Monospace"><font size="2" style="font-size: 10pt">#
-main log is rolled daily</font></font></font></p>
-<p align="left" style="margin-bottom: 0cm"><font color="#000000"><font face="Monospace"><font size="2" style="font-size: 10pt">log4j.logger.uk.ac=</font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">DEBUG,</font></font></font><font color="#1a1a1a">
-</font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">H</font></font></font></p>
-<p align="left" style="margin-bottom: 0cm"><font color="#000000"><font face="Monospace"><font size="2" style="font-size: 10pt">log4j.appender.H=</font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">org.apache.log4j.RollingFileAppender</font></font></font></p>
-<p align="left" style="margin-bottom: 0cm"><font color="#000000"><font face="Monospace"><font size="2" style="font-size: 10pt">log4j.appender.H.File=</font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">${</font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt"><u>logdir</u></font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">}/DebugSaf.log</font></font></font></p>
-<p align="left" style="margin-bottom: 0cm"><font color="#000000"><font face="Monospace"><font size="2" style="font-size: 10pt">log4j.appender.H.MaxFileSize=</font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">100KB</font></font></font></p>
-<p align="left" style="margin-bottom: 0cm"><font color="#000000"><font face="Monospace"><font size="2" style="font-size: 10pt">log4j.appender.H.MaxBackupIndex=</font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">100</font></font></font></p>
-<p align="left" style="margin-bottom: 0cm"><font color="#000000"><font face="Monospace"><font size="2" style="font-size: 10pt">log4j.appender.H.layout=</font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">org.apache.log4j.PatternLayout</font></font></font></p>
-<p align="left" style="margin-bottom: 0cm"><font color="#000000"><font face="Monospace"><font size="2" style="font-size: 10pt">log4j.appender.H.layout.ConversionPattern=</font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">%-5p</font></font></font><font color="#1a1a1a">
-</font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">%d</font></font></font><font color="#1a1a1a">
-</font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">%c</font></font></font><font color="#1a1a1a">
-</font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">%m</font></font></font><font color="#1a1a1a">
-</font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">%n</font></font></font></p>
-<p align="left" style="margin-bottom: 0cm"><br/>
-
-</p>
-<p><br/>
-<br/>
-
-</p>
-<p>There is a special log location used to record resource allocation
-changes that you may want to capture explicitly:</p>
-<p align="left" style="margin-bottom: 0cm"><font color="#3f7f5f"><font face="Monospace"><font size="2" style="font-size: 10pt">#
-special resource logger rolled monthly</font></font></font></p>
-<p align="left" style="margin-bottom: 0cm"><font color="#000000"><font face="Monospace"><font size="2" style="font-size: 10pt">log4j.logger.uk.ac.hpcx.resource=</font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">DEBUG,</font></font></font><font color="#1a1a1a">
-</font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">X</font></font></font></p>
-<p align="left" style="margin-bottom: 0cm"><font color="#000000"><font face="Monospace"><font size="2" style="font-size: 10pt">log4j.appender.X=</font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">org.apache.log4j.DailyRollingFileAppender</font></font></font></p>
-<p align="left" style="margin-bottom: 0cm"><font color="#000000"><font face="Monospace"><font size="2" style="font-size: 10pt">log4j.appender.X.File=</font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">${</font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt"><u>logdir</u></font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">}/resource.log</font></font></font></p>
-<p align="left" style="margin-bottom: 0cm"><font color="#000000"><font face="Monospace"><font size="2" style="font-size: 10pt">log4j.appender.X.DatePattern=</font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">.</font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt"><u>yyyy</u></font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">-MM</font></font></font></p>
-<p align="left" style="margin-bottom: 0cm"><font color="#000000"><font face="Monospace"><font size="2" style="font-size: 10pt">log4j.appender.X.layout=</font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">org.apache.log4j.PatternLayout</font></font></font></p>
-<p align="left"><font color="#000000"><font face="Monospace"><font size="2" style="font-size: 10pt">log4j.appender.X.layout.ConversionPattern=</font></font></font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">%-5p</font></font></font><font color="#1a1a1a">
-</font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">%d</font></font></font><font color="#1a1a1a">
-</font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">%c</font></font></font><font color="#1a1a1a">
-</font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">%m</font></font></font><font color="#1a1a1a">
-</font><font color="#2a00ff"><font face="Monospace"><font size="2" style="font-size: 10pt">%n</font></font></font></p>
+<p>Logging is handled by an abstraction layer that can wrap various
+standard logging packages. The default underlying logger is Log4J2.</p>
 </body>
 </html>

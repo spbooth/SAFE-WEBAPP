@@ -115,7 +115,7 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 				throw new ConsistencyError("Already locked "+getName());
 			}
 			if( isLocked()) {
-				// locked by other request alerady
+				// locked by other request already
 				return false;
 			}
 			DatabaseService db = getContext().getService(DatabaseService.class);
