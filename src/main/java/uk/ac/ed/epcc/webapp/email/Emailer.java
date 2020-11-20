@@ -434,8 +434,11 @@ public class Emailer {
 	public MimeMessage templateMessage(AppUser recipient, Hashtable headers,TemplateFile email_template)
 			throws IOException, MessagingException, InvalidArgument {
 	Logger log = getLogger();
+	// might return null if emails supressed
 	String email = getEmail(recipient);
-	log.debug("Email mapped "+recipient.getEmail()+"->"+email);
+	if( email != null ) {
+		log.debug("Email mapped "+recipient.getEmail()+"->"+email);
+	}
 	if( email != null && email.trim().length() > 0){
 		Map<String,String> params = new HashMap<>();
 		if( recipient != null) {
@@ -447,7 +450,7 @@ public class Emailer {
 		}
 		return templateMessage(email, headers, email_template,params);
 	}else{
-		log.warn("Email to "+recipient.getIdentifier()+" mapped to null");
+		log.warn("Email to "+recipient.getIdentifier()+" mapped to null/empty");
 	}
 	return null;
 }
