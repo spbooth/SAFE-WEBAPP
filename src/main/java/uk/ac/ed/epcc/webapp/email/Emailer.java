@@ -560,7 +560,9 @@ public class Emailer {
 					for(String addr : conn.getInitParameter(EMAIL_BYPASS_FORCE_ADDRESS,"").split("\\s*,\\s*")){
 						allow.add(addr);
 					}
-					m.setRecipient(RecipientType.TO, new InternetAddress(force_email));
+					for(String a : force_email.split("\\s*,\\s*")) {
+						m.setRecipient(RecipientType.TO,new InternetAddress(a));
+					}
 					for(Address a : old){
 						if(a instanceof InternetAddress && allow.contains(((InternetAddress)a).getAddress())){
 							m.addRecipient(RecipientType.TO, a);
@@ -844,8 +846,9 @@ public class Emailer {
 				}
 			}
 		} else {
-			
-			set.add(new InternetAddress(force_email));
+			for(String a : force_email.split("\\s*,\\s*")) {
+				set.add(new InternetAddress(a));
+			}
 			text_recip=force_email;
 			Set<String> allowed = new HashSet<>();
 			for(String allow : conn.getInitParameter(EMAIL_BYPASS_FORCE_ADDRESS, "").split("\\s*,\\s*")){
