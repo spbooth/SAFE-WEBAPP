@@ -39,21 +39,21 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
-import javax.mail.Address;
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.Message.RecipientType;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Part;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import jakarta.mail.Address;
+import jakarta.mail.Authenticator;
+import jakarta.mail.Message;
+import jakarta.mail.Message.RecipientType;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
+import jakarta.mail.Part;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CleanupService;
@@ -90,7 +90,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * all emails sent by the Web-app are funneled through this class so we can
  * enforce debugging modes that allow us to debug with a copy of the main
  * database without sending spurious emails to users. All dependencies on
- * javax.mail are also routed through this class to reduce dependencies.
+ * jakarta.mail are also routed through this class to reduce dependencies.
  * 
  * We could implement encrypted emails or crytographic signing here if we
  * wanted.
@@ -1001,7 +1001,7 @@ public class Emailer {
 		if( email == null || email.trim().length() == 0){
 			return false;
 		}
-		// We use javax.mail.internet.InternetAddress to parse
+		// We use jakarta.mail.internet.InternetAddress to parse
 		// and
 		// verify the email address.
 		try {

@@ -17,10 +17,10 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.mail.Address;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.Address;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.email.inputs.EmailInput;
@@ -52,7 +52,7 @@ public class TestMessageHandlerFactory implements MessageHandlerFactory{
 	private class TestMessageProvider implements MessageProvider{
 		private MimeMessage m;
 		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#setMessage(javax.mail.internet.MimeMessage)
+		 * @see uk.ac.ed.epcc.webapp.editors.mail.MessageProvider#setMessage(jakarta.mail.internet.MimeMessage)
 		 */
 		public void setMessage(MimeMessage m) {
 			this.m=m;
@@ -111,7 +111,7 @@ public class TestMessageHandlerFactory implements MessageHandlerFactory{
 					return "";
 				}
 				StringBuilder sb = new StringBuilder();
-				javax.mail.Address[] recip = m.getAllRecipients();
+				jakarta.mail.Address[] recip = m.getAllRecipients();
 				if (recip != null && recip.length > 0) {
 					sb.append(recip[0]);
 					for (int i = 1; i < recip.length; i++) {

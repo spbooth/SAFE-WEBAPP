@@ -21,7 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 /** Basic class for building email messages
  * 
  * 

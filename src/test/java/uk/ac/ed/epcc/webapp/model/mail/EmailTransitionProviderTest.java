@@ -19,13 +19,11 @@ import static org.junit.Assert.assertEquals;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.LinkedList;
-import java.util.List;
-
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
 
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import uk.ac.ed.epcc.webapp.editors.mail.EditAction;
 import uk.ac.ed.epcc.webapp.editors.mail.EmailTransitionProvider;
 import uk.ac.ed.epcc.webapp.editors.mail.MailTarget;

@@ -14,13 +14,8 @@
 package uk.ac.ed.epcc.webapp.servlet;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.util.Calendar;
-
-import javax.mail.Message;
-import javax.servlet.ServletException;
 
 import org.junit.Test;
 
@@ -28,16 +23,11 @@ import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.TestTimeService;
 import uk.ac.ed.epcc.webapp.email.MockTansport;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
 import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory;
-import uk.ac.ed.epcc.webapp.session.EmailNameFinder;
-import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
-import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**

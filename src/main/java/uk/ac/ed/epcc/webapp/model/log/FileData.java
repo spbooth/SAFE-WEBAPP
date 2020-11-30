@@ -16,9 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.log;
 
-import javax.activation.DataSource;
-
-import uk.ac.ed.epcc.webapp.AppContext;
+import jakarta.activation.DataSource;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.BlobType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;

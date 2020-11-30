@@ -21,10 +21,10 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import javax.mail.Address;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.Address;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageHandler;
@@ -66,7 +66,7 @@ public abstract class MessageDataObject extends DataObject implements
 		
 	}
 	/* (non-Javadoc)
-	 * @see uk.ac.hpcx.model.helpdesk.MessageProvider#setMessage(javax.mail.internet.MimeMessage)
+	 * @see uk.ac.hpcx.model.helpdesk.MessageProvider#setMessage(jakarta.mail.internet.MimeMessage)
 	 */
 	public final void setMessage(MimeMessage m) {
 		this.m = m;
@@ -142,7 +142,7 @@ public abstract class MessageDataObject extends DataObject implements
 				return "";
 			}
 			StringBuilder sb = new StringBuilder();
-			javax.mail.Address[] recip = m.getAllRecipients();
+			jakarta.mail.Address[] recip = m.getAllRecipients();
 			if (recip != null && recip.length > 0) {
 				sb.append(recip[0]);
 				for (int i = 1; i < recip.length; i++) {

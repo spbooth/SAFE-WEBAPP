@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 /** Class to convert a StreamData to a MimeStreamData

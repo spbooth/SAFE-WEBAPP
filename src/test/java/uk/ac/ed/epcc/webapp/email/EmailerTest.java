@@ -25,12 +25,12 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
-import javax.mail.MessagingException;
-import javax.mail.NoSuchProviderException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
+import jakarta.mail.MessagingException;
+import jakarta.mail.NoSuchProviderException;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -112,7 +112,7 @@ public class EmailerTest extends WebappTestBase {
 		
 	}
 	
-	@Test(expected=javax.mail.SendFailedException.class)
+	@Test(expected=jakarta.mail.SendFailedException.class)
 	@ConfigFixtures("blacklist.properties")
 	public void testBlacklist() throws IOException, MessagingException, InvalidArgument{
 		Emailer mailer = new Emailer(ctx);

@@ -19,11 +19,11 @@ package uk.ac.ed.epcc.webapp.editors.mail;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.mail.Address;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.MimePart;
+import jakarta.mail.Address;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.internet.MimePart;
 
 
 /** Interface for classes that visit the parts of a message

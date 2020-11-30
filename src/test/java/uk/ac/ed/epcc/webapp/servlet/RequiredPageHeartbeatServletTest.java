@@ -13,18 +13,17 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.Calendar;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
 
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 import uk.ac.ed.epcc.webapp.email.MockTansport;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;

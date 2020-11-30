@@ -15,12 +15,12 @@ package uk.ac.ed.epcc.webapp.email;
 
 import java.util.Vector;
 
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.URLName;
+import jakarta.mail.Address;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.URLName;
 
 /** A Mock {@link Transport} for testing
  * 
@@ -71,7 +71,7 @@ public class MockTansport extends Transport {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.mail.Transport#sendMessage(javax.mail.Message, javax.mail.Address[])
+	 * @see jakarta.mail.Transport#sendMessage(jakarta.mail.Message, jakarta.mail.Address[])
 	 */
 	@Override
 	public void sendMessage(Message arg0, Address[] arg1)
