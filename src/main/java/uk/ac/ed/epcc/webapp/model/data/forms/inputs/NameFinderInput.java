@@ -76,10 +76,10 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 		if( v == null || v.trim().isEmpty()) {
 			return null;
 		}
-		factory.validateNameFormat(v);
 		try{
 			T target=null;
 			if( create){
+				factory.validateNameFormat(v);
 				target=factory.makeFromString(v);
 			}else{
 				target=factory.findFromString(v);
