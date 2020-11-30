@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.content;
 
 import java.text.NumberFormat;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -122,6 +123,8 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 			((UIGenerator)target).addContent(this);
 		}else if(target instanceof XMLPrinter) {
 			append((XMLPrinter)target);
+		}else if( target instanceof XMLGenerator) {
+			((XMLGenerator)target).addContent(this);
 		}else if( target instanceof Identified){
 			if( target instanceof Viewable && target instanceof Contexed) {
 				addLink(((Contexed)target).getContext(), ((Identified)target).getIdentifier(), ((Viewable)target).getViewTransition());
@@ -129,7 +132,11 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 				clean(((Identified)target).getIdentifier());
 			}
 		}else if( target  instanceof Iterable){
-			addList((Iterable)target);
+			if( target instanceof Collection && ((Collection)target).size()==1) {
+				addObject(((Iterable)target).iterator().next());
+			}else {
+				addList((Iterable)target);
+			}
 		}else if( target instanceof Object[]) {
 			Object[] data = (Object[]) target;
 			if( data.length == 1) {
