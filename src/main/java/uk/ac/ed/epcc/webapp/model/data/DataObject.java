@@ -81,7 +81,7 @@ public abstract class DataObject implements ContextIndexed, Identified, Releasab
 	protected static final boolean DEBUG = false;
 
 	/** All the fields for this record. */
-	public Repository.Record record;
+	protected Repository.Record record;
 
 	
 

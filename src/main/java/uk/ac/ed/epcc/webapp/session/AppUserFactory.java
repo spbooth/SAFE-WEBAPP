@@ -24,14 +24,13 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
@@ -130,6 +129,11 @@ SummaryContributer<AU>,
 AccessRoleProvider<AU, AU>,
 AnonymisingFactory
 {
+	/** config property for a list of stand-alone RequiredPageProviders
+	 * ie those that are not the AppUserFactory or its composites.
+	 * 
+	 */
+	public static final String STAND_ALONE_REQUIRED_PAGES = "required-pages";
 	private static final String MY_SELF_RELATIONSHIP = "MySelf";
 	
 	//RegistrationDateComposite<AU> signup_date = new RegistrationDateComposite<AU>(this);
@@ -330,6 +334,9 @@ AnonymisingFactory
     	if( REQUIRE_PERSON_UPDATE_FEATURE.isEnabled(getContext())){
 			requiredPages.add(new UpdatePersonRequiredPage());
 		}
+    	// stand alone RequiedPageProviders
+    	RequiredPageProvider<AU> list = new RequiredPageProviderList<AU>(getContext(), STAND_ALONE_REQUIRED_PAGES);
+    	requiredPages.addAll(list.getRequiredPages());
     	return requiredPages;
     }
     /** get a filter equivalent to {@link AppUser#canLogin()}

@@ -87,9 +87,10 @@ public class BaseForm implements Form {
 	 *            FormAction
 	 */
 	@Override
-	public void addAction(String name, FormAction action) {
+	public FormAction addAction(String name, FormAction action) {
 		name=name.trim(); 
 		actions.put(name, action);
+		return action;
 	}
 
 	@Override
