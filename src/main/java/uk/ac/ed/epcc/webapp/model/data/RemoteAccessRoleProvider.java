@@ -122,5 +122,8 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 		
 		
 	}
+	public DataObjectFactory<R> getRemoteFactory(){
+		return remote_fac;
+	}
 
 }

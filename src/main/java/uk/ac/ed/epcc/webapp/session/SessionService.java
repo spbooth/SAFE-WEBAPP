@@ -393,6 +393,18 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 			return fallback.get();
 		}
 	}
+	/** Return an object explaining how the specified relationship is implemented.
+	 * Though this could just return a String (and casting the returned object to a String
+	 * should give a text explanation) the returned object could also implement
+	 * interfaces from uk.ac.ed.epcc.webapp.content to utilise formatting.
+	 * 
+	 * @param <T> type of target
+	 * @param fac {@link DataObjectFactory}Factory for target
+	 * @param role
+	 * @return
+	 */
+	 public <T extends DataObject> Object explainRelationship(DataObjectFactory<T> fac,String role);
+	 
 	/** Tests if the session has already authenticated. This can return false even if {@link #haveCurrentUser()} could return true
 	 * provided it is called first.
 	 * 

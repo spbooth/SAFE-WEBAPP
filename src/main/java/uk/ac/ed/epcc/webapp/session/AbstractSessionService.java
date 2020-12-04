@@ -33,6 +33,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
+import uk.ac.ed.epcc.webapp.content.ContentList;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
@@ -1247,6 +1248,96 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		return result;
 	}
 	@Override
+	public <T extends DataObject> Object explainRelationship(DataObjectFactory<T> fac2, String role) {
+		String search_tag = fac2.getTag()+":"+role;
+		if( searching_roles.contains(search_tag)){
+			return "ERROR(recursive definition of "+search_tag+")";
+		}
+		searching_roles.add(search_tag);
+		try{
+			if( role == null || role.trim().isEmpty()) {
+				return "Error(empty role)";
+			}
+			if( role.contains(OR_RELATIONSHIP_COMBINER)){
+				// OR combination of filters
+				ContentList or = new ContentList("OR");
+				for( String  s  : role.split(OR_RELATIONSHIP_COMBINER)){
+					or.add(explainRelationship(fac2, s));
+				}
+				return or;
+			}
+			if( role.contains(AND_RELATIONSHIP_COMBINER)){
+				// AND combination of filters
+				ContentList and = new ContentList("AND");
+				for( String  s  : role.split("\\+")){
+					and.add(explainRelationship(fac2, s));
+				}
+				return and;
+			}
+			// should be a single filter now.
+			if( role.startsWith("!")) {
+				ContentList not = new ContentList("NOT");
+				not.add(explainRelationship(fac2, role.substring(1)));
+				return not;
+			}else if( role.contains(RELATIONSHIP_DEREF)){
+				return role;
+			}else if( role.contains(".")){
+				// qualified role
+				int pos = role.indexOf('.');
+				String base =role.substring(0, pos);
+				String sub = role.substring(pos+1);
+				if( base.equals(GLOBAL_ROLE_RELATIONSHIP_BASE)){
+					return "GlobalRole("+sub+")";
+				}
+				if( base.equals(BOOLEAN_RELATIONSHIP_BASE)){
+
+					return Boolean.valueOf(sub);
+
+				}
+				if( base.contentEquals(FEATURE_RELATIONSHIP_BASE)) {
+					return "Feature("+sub+","+(Feature.checkFeature(getContext(), sub)?"on":"off")+")";
+		    	}
+				
+
+				if( base.equals(fac2.getTag())){
+					// This is a reference a factory/composite role from within a redefined
+					// definition. direct roles can be qualified if we want qualified names cannot
+					// be overridden. 
+					Object result = explainDirectRelationship(fac2, sub);
+					if( result != null ){
+						return result;
+					}
+					// unrecognised direct role alias maybe
+					
+					return explainRelationship(fac2, sub);
+					
+				}
+				AccessRoleProvider<A,T> arp = getContext().makeObjectWithDefault(AccessRoleProvider.class,null,base);
+				if( arp != null ){
+					if( arp.providesRelationship(sub)) {
+						return "ExplicitRelationship("+base+"."+sub+")";
+					}
+					
+					return "ERROR(Undefined ExplicitRelationship("+base+"."+sub+"))";
+				}
+				NamedFilterProvider<T> nfp = getContext().makeObjectWithDefault(NamedFilterProvider.class, null, base);
+				if( nfp != null ) {
+					return "NamedFilter("+base+"."+sub+")";
+				}
+			}else{
+				// Non qualified name
+
+				// direct roles can be un-qualified though not if we want multiple levels of qualification.
+				return explainDirectRelationship(fac2, role);
+			}
+			return "Error(Unknown relationship "+role+")";
+		
+		}finally{
+			searching_roles.remove(search_tag);
+		}
+	}
+
+	@Override
 	public <T extends DataObject> BaseFilter<T> getTargetInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,
 			A person) throws UnknownRelationshipException {
 		if( person == null){
@@ -1651,12 +1742,53 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	    // unrecognised role
 	    throw new UnknownRelationshipException(role);
 	}
+
+	protected <T extends DataObject> Object explainDirectRelationship(DataObjectFactory<T> fac2, String role){
+		if( role == null || role.trim().isEmpty()) {
+			return "Error(empty role";
+		}
+	    if( fac2 instanceof AccessRoleProvider){  // first check factory itself.
+	    	if(((AccessRoleProvider<A,T>)fac2).providesRelationship(role)){
+	    		return "FactoryRelationship("+fac2.getTag()+"."+role+")";
+	    	}
+	    }
+	    // then check composites
+	    for(AccessRoleProvider prov : fac2.getComposites(AccessRoleProvider.class)){
+	    	if( prov.providesRelationship(role)){
+	    		return "CompositeRelationship("+fac2.getTag()+"."+prov.getClass().getSimpleName()+"."+role+")";
+	    	}
+	    }
+	    
+	    
+	    // Its not one of the directly implemented roles maybe its derived
+	    String name = USE_RELATIONSHIP_PREFIX+fac2.getTag()+"."+role;
+		String defn = getContext().getInitParameter(name);
+	    if( defn != null){
+	    	ContentList x = new ContentList(role);
+	    	x.add(explainRelationship(fac2, defn));
+	    	return x;
+	    	
+	    }
+	    Object result = explainNamedFilter(fac2, role);
+	    if( result != null){
+	    	return result;
+	    }
+	    return "Error(unknown direct relationship"+role+")";
+	}
 	/** look for a named filter from the factory or composites.
 	 * 
 	 */
 	protected <T extends DataObject> BaseFilter<T> makeNamedFilter(DataObjectFactory<T> fac2, String name){
 		NamedFilterWrapper<T> wrapper = new NamedFilterWrapper<>(fac2);
 		return wrapper.getNamedFilter(name);
+	}
+	protected <T extends DataObject> Object explainNamedFilter(DataObjectFactory<T> fac2, String name) {
+		// for now just check if it resolves
+		NamedFilterWrapper<T> wrapper = new NamedFilterWrapper<>(fac2);
+		if( wrapper.getNamedFilter(name) != null) {
+			return "NamedFilter("+fac2.getTag()+"."+name+")";
+		}
+		return null;
 	}
 	protected <T extends DataObject> BaseFilter<A> makeDirectPersonInRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,T target) throws UnknownRelationshipException {
 		BaseFilter<A> result=null;
