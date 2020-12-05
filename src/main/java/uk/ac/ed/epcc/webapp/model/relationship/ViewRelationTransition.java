@@ -91,7 +91,7 @@ public class ViewRelationTransition<X extends DataObject> extends AbstractFormTr
 			SessionService sess = conn.getService(SessionService.class);
 			ContentBuilder defn = cb.getDetails("Implementation");
 			defn.addObject(sess.explainRelationship(fac, relationship));
-			defn.addParent();
+			defn.closeDetails();
 			try {
 				cb.addList(sess.getLoginFactory().getResult(sess.getPersonInRelationshipRoleFilter(fac, relationship, target)));
 			} catch (Exception e) {

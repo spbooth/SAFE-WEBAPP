@@ -25,6 +25,8 @@ import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener;
+import uk.ac.ed.epcc.webapp.model.cron.LockFactory;
+import uk.ac.ed.epcc.webapp.model.cron.LockFactory.Lock;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 /**
@@ -40,7 +42,7 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 		super(conn);
 	}
 
-	private static Date target=null;
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener#run()
 	 */
@@ -48,55 +50,84 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 	public Date run() {
 		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 		Date now = time.getCurrentTime();
-		
-		synchronized(getClass()) {
-			if( target != null && target.after(now)){
-				return target;
+		int hours = getContext().getIntegerParameter("required_page.heartbeat.hours", 24);
+		Calendar thresh = Calendar.getInstance();
+		thresh.setTime(now);
+		thresh.add(Calendar.HOUR, - hours);
+
+		LockFactory locks = LockFactory.getFactory(getContext());
+		try(Lock lock = locks.makeFromString("RequiredPageListener")){
+			if( lock == null) {
+				return null;
 			}
-		}
-		SessionService<AU> sess = getContext().getService(SessionService.class);
-		if(sess == null ) {
-			getLogger().error("No session service");
-			return null;
-		}
-		
-		AppUserFactory<AU> login = sess.getLoginFactory();
-		OrFilter<AU> fil = new OrFilter<AU>(login.getTarget(), login);
-		Set<RequiredPage<AU>> requiredPages = login.getRequiredPages();
-		for(RequiredPage<AU> rp : requiredPages) {
-			fil.addFilter(rp.notifiable(sess));
-		}
-		Emailer mailer = new Emailer(getContext());
-		AndFilter<AU> notify_filter = new AndFilter<AU>(login.getTarget(), fil, login.getEmailFilter(), login.getCanLoginFilter());
-		try {
-			for( AU person : login.getResult(notify_filter)) {
-				// Don't notify a user who can't login to fix
-				if( person.canLogin()) {
-					Set<String> notices = new LinkedHashSet<String>();
-					for(RequiredPage<AU> rp : requiredPages) {
-						String t = rp.getNotifyText(person);
-						if( t!=null && ! t.isEmpty()) {
-							notices.add(t);
+			Date last = lock.lastLocked();
+			Calendar next = Calendar.getInstance();
+			next.setTime(now);
+			if( last != null) {
+				next.setTime(last);
+			}
+			next.add(Calendar.HOUR, hours);
+
+			if( lock.isLocked()) {
+				Date locked = lock.wasLockedAt();
+				if( locked.getTime()+60000L < time.getCurrentTime().getTime()) {
+					getLogger().error("Lock "+lock.getName()+" held since "+locked);
+				}
+				return next.getTime();
+			}
+			if( last != null && last.after(thresh.getTime())) {
+				return next.getTime();
+			}
+			if( ! lock.takeLock()) {
+				return next.getTime();
+			}
+			
+			SessionService<AU> sess = getContext().getService(SessionService.class);
+			if(sess == null ) {
+				getLogger().error("No session service");
+				return null;
+			}
+
+			AppUserFactory<AU> login = sess.getLoginFactory();
+			OrFilter<AU> fil = new OrFilter<AU>(login.getTarget(), login);
+			Set<RequiredPage<AU>> requiredPages = login.getRequiredPages();
+			for(RequiredPage<AU> rp : requiredPages) {
+				fil.addFilter(rp.notifiable(sess));
+			}
+			Emailer mailer = new Emailer(getContext());
+			AndFilter<AU> notify_filter = new AndFilter<AU>(login.getTarget(), fil, login.getEmailFilter(), login.getCanLoginFilter());
+			try {
+				for( AU person : login.getResult(notify_filter)) {
+					// Don't notify a user who can't login to fix
+					if( person.canLogin()) {
+						Set<String> notices = new LinkedHashSet<String>();
+						for(RequiredPage<AU> rp : requiredPages) {
+							String t = rp.getNotifyText(person);
+							if( t!=null && ! t.isEmpty()) {
+								notices.add(t);
+							}
+						}
+						if( ! notices.isEmpty()) {
+							mailer.notificationEmail(person, notices);
 						}
 					}
-					if( ! notices.isEmpty()) {
-						mailer.notificationEmail(person, notices);
-					}
 				}
+			} catch (Exception e) {
+				getLogger().error("Error generating notification emails", e);
 			}
+
+			lock.releaseLock();
+			Calendar c = Calendar.getInstance();
+			c.setTime(time.getCurrentTime());
+			c.add(Calendar.HOUR,hours);
+			
+			return c.getTime();
 		} catch (Exception e) {
-			getLogger().error("Error generating notification emails", e);
+			getLogger().error("Error in required page listener",e);
+			return null;
 		}
-		
-		Calendar c = Calendar.getInstance();
-		c.setTime(time.getCurrentTime());
-		c.add(Calendar.HOUR,getContext().getIntegerParameter("required_page.heartbeat.hours", 24));
-		target=c.getTime();
-		return c.getTime();
 	}
+
 	
-	public static void reset() {
-		target=null;
-	}
 
 }

@@ -67,7 +67,7 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 		super();
 		setContext(conn, LOCKS_TABLE);
 	}
-	public class Lock extends Classification implements Retirable{
+	public class Lock extends Classification implements Retirable, AutoCloseable{
 		private boolean holding=false;
 		/**
 		 * @param res
@@ -200,6 +200,12 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 		@Override
 		public void retire() throws Exception {
 			delete();
+		}
+		@Override
+		public void close() throws Exception {
+			if( isHolding()) {
+				releaseLock();
+			}
 		}
 	}
 
