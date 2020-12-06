@@ -22,6 +22,7 @@ import org.junit.Test;
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.model.Dummy2;
 import uk.ac.ed.epcc.webapp.model.Dummy3;
 import uk.ac.ed.epcc.webapp.model.Dummy4;
@@ -128,7 +129,7 @@ public class RelationshipTest extends WebappTestBase {
 	@Test
 	public void testRelation() throws DataException, UnknownRelationshipException{
 		SessionService<AppUser> service = ctx.getService(SessionService.class);
-		AppUserFactory login = service.getLoginFactory();
+		AppUserFactory<AppUser> login = service.getLoginFactory();
 		
 		AppUser fred = login.findByEmail("fred@example.com");
 		Assert.assertNotNull(fred);
@@ -147,16 +148,42 @@ public class RelationshipTest extends WebappTestBase {
 		Relationship<AppUser, Dummy3> rel = ctx.makeObject(Relationship.class, "TestRelationship");
 		// the shark relationship should make fred a manager
 		Assert.assertTrue(rel.hasRole(fred, t, "shark"));
+		Assert.assertTrue(service.hasRelationship(fac, t, "TestRelationship.shark"));
+		AppUser shark = (AppUser) login.find(service.getPersonInRelationshipRoleFilter(fac, "TestRelationship.shark", t));
+		assertNotNull(shark);
+		assertEquals(fred,shark);
 		
+		Assert.assertTrue(service.hasRelationship(fac, t, MANAGER));
 		Assert.assertTrue(fac.matches(service.getRelationshipRoleFilter(fac, MANAGER), t));
 		assertFalse(fac.matches(service.getRelationshipRoleFilter(fac, DOUBLE_MANAGER), t));
 		assertEquals("AND(GlobalRole(Manager),AccessRoleProvider(TestRelationship.shark))", service.explainRelationship(fac, DOUBLE_MANAGER).toString());
-
+		AppUser manager = login.find(service.getPersonInRelationshipRoleFilter(fac, MANAGER, t));
+		assertNotNull(manager);
+		assertEquals(fred, manager);
+		// can't get people by double maanger as it uses a role
+		//AppUser doublemanager = login.find(service.getPersonInRelationshipRoleFilter(fac, DOUBLE_MANAGER, t));
+		//assertNotNull(doublemanager);
+		//assertEquals(fred, doublemanager);
+		
+		// Test qualified
+		Assert.assertTrue(service.hasRelationship(fac, t, "Test3."+MANAGER));
+		Assert.assertTrue(fac.matches(service.getRelationshipRoleFilter(fac, "Test3."+MANAGER), t));
+		assertFalse(fac.matches(service.getRelationshipRoleFilter(fac, "Test3."+DOUBLE_MANAGER), t));
+		assertEquals("AND(GlobalRole(Manager),AccessRoleProvider(TestRelationship.shark))", service.explainRelationship(fac, "Test3."+DOUBLE_MANAGER).toString());
+		AppUser qmanager = login.find(service.getPersonInRelationshipRoleFilter(fac, "Test3."+MANAGER, t));
+		assertNotNull(qmanager);
+		assertEquals(fred, qmanager);
+		
+		Assert.assertTrue(service.hasRelationship(fac2, p, "Ref->"+MANAGER));
 		Assert.assertTrue(fac2.matches(service.getRelationshipRoleFilter(fac2, "Ref->"+MANAGER), p));
 		assertFalse(fac2.matches(service.getRelationshipRoleFilter(fac2, "Ref->"+DOUBLE_MANAGER), p));
 		assertEquals("RemoteRelationship(Ref->DoubleManager)", service.explainRelationship(fac2, "Ref->"+DOUBLE_MANAGER).toString());
-
-		
+        AppUser manager2 = login.find(service.getPersonInRelationshipRoleFilter(fac2, "Ref->"+MANAGER, p));
+        assertNotNull(manager2);
+		assertEquals(fred,manager2);
+		//AppUser doublemanager2 = login.find(service.getPersonInRelationshipRoleFilter(fac2, "Ref->"+DOUBLE_MANAGER, p));
+		//assertNotNull(doublemanager2);
+		//assertEquals(fred, doublemanager2);
 		// Check accessed as roles
 		Assert.assertTrue("Manager role",service.hasRole(fac.getTag()+"%"+MANAGER+"@name:"+t.getName()));
 		Assert.assertTrue("Manager role",service.hasRole(fac.getTag()+"%"+MANAGER+"@CalledTest1")); // alt named filter
@@ -168,10 +195,7 @@ public class RelationshipTest extends WebappTestBase {
 		assertTrue(service.hasRelationship(fac, t, MANAGER));
 		assertFalse(service.hasRelationship(fac, t, DOUBLE_MANAGER));
 		
-		//people with role should be fred 
-		AppUser manager = (AppUser) login.find(service.getPersonInRelationshipRoleFilter(fac, MANAGER, t),true);
-		assertNotNull(manager);
-		assertTrue(fred.equals(manager));
+		
 		assertNull(login.find(service.getPersonInRelationshipRoleFilter(fac, DOUBLE_MANAGER, t),true));
 		
 		AppUser not_manager = (AppUser) login.find(service.getPersonInRelationshipRoleFilter(fac, "!"+MANAGER, t),true);
@@ -306,5 +330,20 @@ public class RelationshipTest extends WebappTestBase {
 		}
 		Assert.assertTrue("Expecting exception",thrown);
 	
+	}
+	
+	@Test
+	public void testFeature() throws UnknownRelationshipException, DataException {
+		SessionService service = ctx.getService(SessionService.class);
+		AppUserFactory login = service.getLoginFactory();
+		Dummy3 t = fac.find(fac.new StringFilter("Test1"));
+		
+		assertEquals(new GenericBinaryFilter(fac.getTarget(), false), service.getRelationshipRoleFilter(fac, "feature.nofeature"));
+		assertEquals(new GenericBinaryFilter(login.getTarget(), false), service.getPersonInRelationshipRoleFilter(fac, "feature.nofeature", t));
+		
+		
+		assertEquals(new GenericBinaryFilter(fac.getTarget(), true), service.getRelationshipRoleFilter(fac, "feature.testfeature"));
+		assertEquals(new GenericBinaryFilter(login.getTarget(), true), service.getPersonInRelationshipRoleFilter(fac, "feature.testfeature", t));
+
 	}
 }

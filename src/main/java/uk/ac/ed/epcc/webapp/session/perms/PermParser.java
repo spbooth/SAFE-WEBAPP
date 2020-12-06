@@ -122,7 +122,7 @@ public class PermParser<A extends AppUser> extends AbstractContexed {
 					return new BinaryPermissionClause<T>(fac2.getTarget(), Boolean.valueOf(sub));
 				}
 				if( base.contentEquals(FEATURE_RELATIONSHIP_BASE)) {
-		    		return new BinaryPermissionClause<T>(fac2.getTarget(),Feature.checkFeature(getContext(), sub));
+		    		return new BinaryPermissionClause<T>(fac2.getTarget(),Feature.checkDynamicFeature(getContext(), sub,false));
 		    	}
 				
 
