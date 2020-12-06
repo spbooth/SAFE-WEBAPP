@@ -32,4 +32,20 @@ public class ContentList<E>  implements UIGenerator, XMLGenerator{
 	}
 	private final String tag;
 	private final LinkedList<E> list=new LinkedList<E>();
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(tag);
+		sb.append("(");
+		boolean seen=false;
+		for( E e : list) {
+			if( seen ) {
+				sb.append(",");
+			}
+			sb.append(e.toString());
+			seen=true;
+		}
+		sb.append(")");
+		return sb.toString();		
+	}
 }

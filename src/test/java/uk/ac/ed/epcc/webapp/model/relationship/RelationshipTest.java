@@ -22,7 +22,9 @@ import org.junit.Test;
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.model.Dummy2;
 import uk.ac.ed.epcc.webapp.model.Dummy3;
+import uk.ac.ed.epcc.webapp.model.Dummy4;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
@@ -40,10 +42,12 @@ public class RelationshipTest extends WebappTestBase {
 	private static final String MANAGER = "Manager";
 	private static final String DOUBLE_MANAGER = "DoubleManager";
 	Dummy3.Factory fac;
+    Dummy4.Factory fac2;
 	
 	@Before
 	public void setup() throws DataFault{
 		fac = new Dummy3.Factory(getContext());
+		fac2 = new Dummy4.Factory(getContext());
 		
 		AppUserFactory login = ctx.getService(SessionService.class).getLoginFactory();
 		AppUser fred = (AppUser) login.makeBDO();
@@ -63,7 +67,10 @@ public class RelationshipTest extends WebappTestBase {
 		t2.setPerson(bill); // bill should have self role wrt Test2
 		t2.commit();
 		
-		
+		Dummy4 p = new Dummy4(ctx);
+		p.setName("joey");
+		p.setRef(t);
+		p.commit();
 		
 		Relationship<AppUser, Dummy3> rel = new Relationship<>(ctx, "TestRelationship");
 		rel.setRole(fred, t, "shark", true);		
@@ -87,9 +94,11 @@ public class RelationshipTest extends WebappTestBase {
 		// bill is not manager
 		Assert.assertFalse(fac.matches(service.getRelationshipRoleFilter(fac, MANAGER), t));
 		assertFalse(service.hasRelationship(fac, t,MANAGER));
+		assertEquals("OR(GlobalRole(Manager),AccessRoleProvider(TestRelationship.shark))", service.explainRelationship(fac, MANAGER).toString());
 		
 		Assert.assertTrue(fac.matches(service.getRelationshipRoleFilter(fac, "!"+MANAGER), t));
 		assertTrue(service.hasRelationship(fac, t,"!"+MANAGER));
+		assertEquals("NOT(OR(GlobalRole(Manager),AccessRoleProvider(TestRelationship.shark)))", service.explainRelationship(fac, "!"+MANAGER).toString());
 	}
 	@Test
 	public void testGlobalSet() throws DataException, UnknownRelationshipException{
@@ -131,14 +140,22 @@ public class RelationshipTest extends WebappTestBase {
 		serv.setCurrentPerson(fred);
 		
 		Dummy3 t = fac.find(fac.new StringFilter("Test1"));
+		Dummy4 p = fac2.find(fac2.new StringFilter("joey"));
 		
 		Assert.assertNotNull(t);
+		Assert.assertNotNull(p);
 		Relationship<AppUser, Dummy3> rel = ctx.makeObject(Relationship.class, "TestRelationship");
 		// the shark relationship should make fred a manager
 		Assert.assertTrue(rel.hasRole(fred, t, "shark"));
 		
 		Assert.assertTrue(fac.matches(service.getRelationshipRoleFilter(fac, MANAGER), t));
 		assertFalse(fac.matches(service.getRelationshipRoleFilter(fac, DOUBLE_MANAGER), t));
+		assertEquals("AND(GlobalRole(Manager),AccessRoleProvider(TestRelationship.shark))", service.explainRelationship(fac, DOUBLE_MANAGER).toString());
+
+		Assert.assertTrue(fac2.matches(service.getRelationshipRoleFilter(fac2, "Ref->"+MANAGER), p));
+		assertFalse(fac2.matches(service.getRelationshipRoleFilter(fac2, "Ref->"+DOUBLE_MANAGER), p));
+		assertEquals("RemoteRelationship(Ref->DoubleManager)", service.explainRelationship(fac2, "Ref->"+DOUBLE_MANAGER).toString());
+
 		
 		// Check accessed as roles
 		Assert.assertTrue("Manager role",service.hasRole(fac.getTag()+"%"+MANAGER+"@name:"+t.getName()));
@@ -203,7 +220,7 @@ public class RelationshipTest extends WebappTestBase {
 		// bill should not have self role wrt Test1
 		Assert.assertFalse(fac.matches(service.getRelationshipRoleFilter(fac, "self"), t));
 		assertFalse(service.hasRelationship(fac, t, "self"));
-		
+		assertEquals("AccessRoleProvider(Test3.self)",service.explainRelationship(fac, "self").toString());
 		
 		// bill should have self role wrt Test2
 		Assert.assertTrue(fac.matches(service.getRelationshipRoleFilter(fac, "self"), t2));
@@ -222,6 +239,7 @@ public class RelationshipTest extends WebappTestBase {
 	    // Named filters
 	    assertTrue(service.hasRelationship(fac, t, "CalledTest1"));
 	    assertFalse(service.hasRelationship(fac, t2, "CalledTest1"));
+	    assertEquals("NamedFilter(CalledTest1)",service.explainRelationship(fac, "CalledTest1").toString());
 	}
 	@Test
 	public void testNoUser() throws DataException, UnknownRelationshipException{
