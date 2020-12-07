@@ -1039,10 +1039,21 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 * @return
 	 */
 	@Override
-	public BaseFilter<A> getGlobalRoleFilter(String role){
-		return getGlobalRoleFilter(null, role);
+	public final BaseFilter<A> getGlobalRoleFilter(String ...roles){
+		AppUserFactory<A> loginFactory = getLoginFactory();
+		if( roles == null || roles.length == 0) {
+			return new FalseFilter<A>(loginFactory.getTarget());
+		}else if( roles.length == 1) {
+			return getGlobalRoleFilter(null, roles[0]);
+		}else {
+			OrFilter<A> or = new OrFilter<A>(loginFactory.getTarget(), loginFactory);
+			for(String role : roles) {
+				or.addFilter(getGlobalRoleFilter(null, role));
+			}
+			return or;
+		}
 	}
-	public BaseFilter<A> getGlobalRoleFilter(Set<String> skip,String role){
+	public final BaseFilter<A> getGlobalRoleFilter(Set<String> skip,String role){
 		AppUserFactory<A> login = getLoginFactory();
 		if( role == null || role.isEmpty()) {
 			return new FalseFilter<A>(login.getTarget());
@@ -1069,7 +1080,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		    // can't alias a complex role to return directly
 		    return getRelationshipRoleFilter(tag, rel, name);
 		}
-		BaseFilter<A> fil = login.getRoleFilter(role);
+		BaseFilter<A> fil = getPersonInRoleFilter(role);
 		if( skip == null ) {
 			skip = new HashSet<String>();
 		}
@@ -1360,8 +1371,12 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		return apply_toggle;
 	}
 
-	@Override
-	public BaseFilter<A> getPersonInRoleFilter(String... role_list) {
+	/** Extension point for sub-classes used to implement  {@link #getGlobalRoleFilter(String)}
+	 * 
+	 * @param role_list
+	 * @return
+	 */
+	protected BaseFilter<A> getPersonInRoleFilter(String... role_list) {
 		return getLoginFactory().getRoleFilter(role_list);
 	}
 

@@ -395,10 +395,6 @@ AnonymisingFactory
 		}
 		return false;
 	}
-    public DataObjectItemInput<AU> getRoleInput(String role){
-    	return new DataObjectInput(getRoleFilter(role));
-    }
-
 
 	protected RoleFilter getRoleFilter(String ... roles) {
 		return new RoleFilter(res.getSQLContext(),roles);

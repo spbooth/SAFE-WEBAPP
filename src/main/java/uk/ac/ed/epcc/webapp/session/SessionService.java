@@ -213,12 +213,12 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	/** get a {@link BaseFilter} for all {@link AppUser}s who
 	 * have access to a global role.
 	 * 
-	 * This is the same selection as {@link #canHaveRole(AppUser, String)
+	 * This is the same selection as {@link #canHaveRoleFromList(AppUser, String)
 	 * 
 	 * @param role
 	 * @return
 	 */
-	public BaseFilter<A> getGlobalRoleFilter(String role);
+	public BaseFilter<A> getGlobalRoleFilter(String ...roles);
 	
 	default public boolean canHaveRoleFromList(A user,String ... roles) {
 		if( roles == null ) {
@@ -319,13 +319,7 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public <T extends DataObject> BaseFilter<A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,T target) throws UnknownRelationshipException;
 	
-	/** Get a filter for {@link AppUser}s that can be in any of the specified global roles.
-	 * as defined in {@link #canHaveRoleFromList(AppUser, String...)}
-	 * 
-	 * @param role_list
-	 * @return
-	 */
-	public BaseFilter<A> getPersonInRoleFilter(String ... role_list);
+	
 	/** get a {@link BaseFilter} representing the set of targets that a specified {@link AppUser} is in a particular
 	 * relationship-role with.
 	 * @param fac
