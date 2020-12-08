@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.servlet;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -29,6 +30,8 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
+import uk.ac.ed.epcc.webapp.session.AppUserFactory;
+import uk.ac.ed.epcc.webapp.session.MaxNotifyComposite;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
@@ -123,7 +126,10 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 				"\n" + 
 				"  The test Team\n" + 
 				"  \n", m.getContent().toString());
-		
+		AppUserFactory<?> login = p.getLoginFactory();
+		MaxNotifyComposite comp = login.getComposite(MaxNotifyComposite.class);
+		assertNotNull(comp);
+		assertEquals(1, comp.getNotifiedCount(login.find(person1.getID())));
 	}
 	
 	@Test
