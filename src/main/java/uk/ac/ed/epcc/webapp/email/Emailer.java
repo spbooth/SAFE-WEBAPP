@@ -363,6 +363,15 @@ public class Emailer {
 
 	}
 	public void notificationEmail(AppUser person, Set<String> notices) throws Exception {
+		MimeMessage m = notificationMessage(person, notices);
+		
+		
+		if( m != null) {
+			doSend(m);
+		}
+	}
+
+	public MimeMessage notificationMessage(AppUser person, Set<String> notices) throws Exception {
 		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("update_notices.txt");
 		String name = person.getName();
 		if( name == null || name.trim().length() == 0){
@@ -383,11 +392,11 @@ public class Emailer {
 		String email = person.getEmail();
 		if( email == null){
 			getLogger().error("Notification email destination not known "+person.getIdentifier());;
-			return;
+			return null;
 		}
 		email_template.setProperty("person.email", email);
-		
-		doSend(templateMessage(person,email_template));
+		MimeMessage m = templateMessage(person,email_template);
+		return m;
 	}
 	public MimeMessage templateMessage(String sendto, Hashtable h,
 			TemplateFile email_template) throws IOException, MessagingException, InvalidArgument {

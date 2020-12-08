@@ -16,6 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.session;
 
+import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
@@ -73,7 +75,7 @@ public interface RequiredPage<U extends AppUser> {
      * @param person
      * @return
      */
-    default public String getNotifyText(U person) {
-    	return null;
+    default void addNotifyText(Set<String> notices,U person) {
+    
     }
 }

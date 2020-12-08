@@ -18,6 +18,8 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.apache.logging.log4j.core.pattern.MaxLengthConverter;
+
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
@@ -27,7 +29,6 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener;
 import uk.ac.ed.epcc.webapp.model.cron.LockFactory;
 import uk.ac.ed.epcc.webapp.model.cron.LockFactory.Lock;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 /**
  * @author Stephen Booth
@@ -50,7 +51,7 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 	public Date run() {
 		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 		Date now = time.getCurrentTime();
-		int hours = getContext().getIntegerParameter("required_page.heartbeat.hours", 24);
+		int hours = getContext().getIntegerParameter("required_page.heartbeat.hours", 48);
 		Calendar thresh = Calendar.getInstance();
 		thresh.setTime(now);
 		thresh.add(Calendar.HOUR, - hours);
@@ -89,6 +90,7 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 			}
 
 			AppUserFactory<AU> login = sess.getLoginFactory();
+			MaxNotifyComposite<AU> max = login.getComposite(MaxNotifyComposite.class);
 			OrFilter<AU> fil = new OrFilter<AU>(login.getTarget(), login);
 			Set<RequiredPage<AU>> requiredPages = login.getRequiredPages();
 			for(RequiredPage<AU> rp : requiredPages) {
@@ -96,18 +98,21 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 			}
 			Emailer mailer = new Emailer(getContext());
 			AndFilter<AU> notify_filter = new AndFilter<AU>(login.getTarget(), fil, login.getEmailFilter(), login.getCanLoginFilter());
+			if( max != null) {
+				notify_filter.addFilter(max.getNotifyFilter());
+			}
 			try {
 				for( AU person : login.getResult(notify_filter)) {
 					// Don't notify a user who can't login to fix
-					if( person.canLogin()) {
+					if( person.canLogin() && (max == null || max.sendNotifications(person))) {
 						Set<String> notices = new LinkedHashSet<String>();
 						for(RequiredPage<AU> rp : requiredPages) {
-							String t = rp.getNotifyText(person);
-							if( t!=null && ! t.isEmpty()) {
-								notices.add(t);
-							}
+							rp.addNotifyText(notices,person);
 						}
 						if( ! notices.isEmpty()) {
+							if( max != null) {
+								max.addNotified(person);
+							}
 							mailer.notificationEmail(person, notices);
 						}
 					}

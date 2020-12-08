@@ -81,6 +81,7 @@ import uk.ac.ed.epcc.webapp.model.data.CreateAction;
 import uk.ac.ed.epcc.webapp.model.data.DataCache;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
 import uk.ac.ed.epcc.webapp.model.data.PatternArg;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
@@ -127,7 +128,8 @@ NameFinder<AU> ,
 RegisterTrigger<AU>, 
 SummaryContributer<AU>,
 AccessRoleProvider<AU, AU>,
-AnonymisingFactory
+AnonymisingFactory,
+NamedFilterProvider<AU>
 {
 	/** config property for a list of stand-alone RequiredPageProviders
 	 * ie those that are not the AppUserFactory or its composites.
@@ -154,6 +156,10 @@ AnonymisingFactory
 	 public static final Feature AUTO_COMPLETE_APPUSER_INPUT = new Preference("app_user.autocomplete_input",false,"Use auto-complete input as the default person input");
 	 // optional field to allow users to be marked as never to recieve emails
 	public static final String ALLOW_EMAIL_FIELD ="AllowEmail";
+	
+	
+	public static final String ALLOW_EMAIL_FILTER = "AllowEmail";
+	public static final String CAN_LOGIN_FILTER = "CanLogin";
 	
     /** A {@link SQLFilter} to select {@link AppUser}s based on their roles in the role table
      * 
@@ -369,12 +375,18 @@ AnonymisingFactory
 		}
 
 		@Override
-		public String getNotifyText(AU person) {
+		public void addNotifyText(Set<String> notices,AU person) {
+			if( needDetailsUpdate(person)) {
+				notices.add("Your user detains need to be updated/verified");
+				return;
+			}
 			Date d = person.nextRequiredUpdate();
 			if( d == null ) {
-				return null;
+				return;
 			}
-			return "Your user details need to be updated/verified before "+d;
+			if( person.warnRequiredUpdate()) {
+				notices.add("Your user details need to be updated/verified before "+d);
+			}
 		}
 		
 	}
@@ -1234,6 +1246,23 @@ AnonymisingFactory
 	@Override
 	public void addRelationships(Set<String> roles) {
 		roles.add(MY_SELF_RELATIONSHIP);
+		
+	}
+	@Override
+	public BaseFilter<AU> getNamedFilter(String name) {
+		if( name  == null || name.isEmpty()) {
+			return null;
+		}
+		switch(name) {
+		case ALLOW_EMAIL_FILTER: return getEmailFilter();
+		case CAN_LOGIN_FILTER: return getCanLoginFilter();
+		default: return null;
+		}
+	}
+	@Override
+	public void addFilterNames(Set<String> names) {
+		names.add(ALLOW_EMAIL_FILTER);
+		names.add(CAN_LOGIN_FILTER);
 		
 	}
 }

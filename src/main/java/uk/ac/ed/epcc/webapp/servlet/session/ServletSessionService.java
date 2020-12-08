@@ -38,6 +38,7 @@ import uk.ac.ed.epcc.webapp.servlet.WtmpManager.Wtmp;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
 import uk.ac.ed.epcc.webapp.session.AbstractSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
+import uk.ac.ed.epcc.webapp.session.LoginObserver;
 /** A SessionService for servlet context.
  * This is normally created and added to the AppContext in a Filter. 
  * 
@@ -308,6 +309,9 @@ public void setCurrentPerson(A person) {
 		int timeout = getContext().getIntegerParameter("session.logged_in.timeout", -1);
 		if( timeout >= 0 ) {
 			ss.setTimeout(timeout);
+		}
+		for(LoginObserver<A> o : getLoginFactory().getComposites(LoginObserver.class)) {
+			o.userLoggedIn(person);
 		}
 	}
 }
