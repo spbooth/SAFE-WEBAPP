@@ -406,9 +406,10 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		public void addNotifyText(Set<String> notices,AU person) {
 			SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 			Date point = needVerifyBy(person);
+			Date last = getVerificationDate(person);
 			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
-			if( time != null) {
-				if( point.before(time.getCurrentTime())) {
+			if( time != null || last == null) {
+				if( last == null || point.before(time.getCurrentTime())) {
 					PreDefinedContent c = new PreDefinedContent(person.getContext(), "fail_verify_email");
 					notices.add(c.toString());
 					return;
