@@ -26,7 +26,9 @@ import java.util.function.Supplier;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 /** {@link AppContextService} for managing session information.
@@ -312,6 +314,11 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * relationship-role with a target object.
 	 * A null target selects all {@link AppUser}s that have the specified role with any target matched by the
 	 * factories default  {@link DataObjectFactory#getDefaultRelationshipFilter()}.
+	 * 
+	 * Care needs to be taken when using a null target as named filter relations will only test that
+	 * a target matching the named filter exists so AND combinations may return a wider set of {@link AppUser}s
+	 * than desired. This can be addressed by adding an AcceptFilter verifying the full and-condition though this can be expensive.  
+	 * 
 	 * @param fac
 	 * @param role
 	 * @param target
@@ -378,13 +385,27 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @return
 	 */
 	public default <T extends DataObject> boolean personHasRelationship(A person,DataObjectFactory<T> fac, T target,String role,Supplier<Boolean> fallback ) {
-		try {
-			if( isCurrentPerson(person)) {
-				return hasRelationship(fac, target, role, fallback);
+		if( target == null) {
+			// Check for targets by preference as these filters are more reliable
+			try {
+				return fac.exists(getTargetInRelationshipRoleFilter(fac, role, person));
+			} catch (DataException e) {
+				person.getContext().getService(LoggerService.class).getLogger(getClass()).error("Error checking role",e);
+				return fallback.get();
+			} catch (UnknownRelationshipException e) {
+				return fallback.get();
 			}
-			return getLoginFactory().matches(getPersonInRelationshipRoleFilter(fac, role, target), person);
-		} catch (UnknownRelationshipException e) {
-			return fallback.get();
+		}else {
+
+			try {
+				if( isCurrentPerson(person)) {
+					// this may cache
+					return hasRelationship(fac, target, role, fallback);
+				}
+				return getLoginFactory().matches(getPersonInRelationshipRoleFilter(fac, role, target), person);
+			} catch (UnknownRelationshipException e) {
+				return fallback.get();
+			}
 		}
 	}
 	/** Return an object explaining how the specified relationship is implemented.

@@ -185,4 +185,16 @@ public class TestAndFilter extends WebappTestBase {
 		assertFalse(fac.matches(fil, simon));
 		checkStd(fil, "AndFilter( filters=[SQLValueFilter(Test.Name= fred), SQLValueFilter(Test.Number= 1)] force=true)");
 	}
+	
+	@Test
+	public void testReferences() throws DataException {
+		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTarget());
+		assertFalse(fil.isForced());
+		fil.addFilter(ref.getDestFilter("RefFred"));
+		assertFalse(fil.isForced());
+		assertEquals(1, fac.getCount(fil));
+		assertTrue(fac.matches(fil, fred));
+		assertFalse(fac.matches(fil, bill));
+		assertFalse(fac.matches(fil, simon));
+	}
 }

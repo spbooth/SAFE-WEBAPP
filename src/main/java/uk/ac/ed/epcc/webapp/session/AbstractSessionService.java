@@ -107,6 +107,11 @@ import uk.ac.ed.epcc.webapp.timer.TimeClosable;
  * <li> The tag of a {@link AccessRoleProvider}</li>
  * </ul> 
  * 
+ * When generating a filter for all people with a relationship against any target named filters can
+ * only check that some target matches the filter. Complex relationships involving these in AND combination
+ * with other clauses may be less restrictive than desired in this case.
+ * 
+ * 
  * @author spb
  * @see NamedFilterWrapper
  * @see RemoteAccessRoleProvider
@@ -1225,6 +1230,9 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		
 		PermissionClause<T> ast = perm_parser.parse(fac2, role);
 		if( ast == null) {
+			if( fallback != null) {
+				return fallback;
+			}
 			throw new UnknownRelationshipException(role);
 		}
 		return ast.accept(new RelationshipRoleFilterPermissionVisitor<A, T>(this, fac2, person));

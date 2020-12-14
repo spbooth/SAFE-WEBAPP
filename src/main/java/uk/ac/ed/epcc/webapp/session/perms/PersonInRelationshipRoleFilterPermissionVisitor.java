@@ -1,5 +1,6 @@
 package uk.ac.ed.epcc.webapp.session.perms;
 
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -45,11 +46,19 @@ public class PersonInRelationshipRoleFilterPermissionVisitor<U extends AppUser,T
 	}
 	@Override
 	public BaseFilter<U> visitFilterPermissionClause(FilterPermissionClause<T> f) throws UnknownRelationshipException {
-		
+		if( target == null ) {
+			try {
+				// check that some target object matches the filter
+				return new GenericBinaryFilter<U>(getFactory().getTarget(), fac.exists(f.getFilter()));
+			} catch (DataException e) {
+				throw new UnknownRelationshipException(f.getName());
+			}
+		}
 		return new GenericBinaryFilter<U>(getFactory().getTarget(), fac.matches(f.getFilter(), target));
 	}
 	@Override
 	public DataObjectFactory<U> getFactory() {
 		return sess.getLoginFactory();
 	}
+	
 }
