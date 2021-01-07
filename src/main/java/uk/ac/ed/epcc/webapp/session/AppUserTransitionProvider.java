@@ -127,7 +127,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 		
 	};
-	public static final AppUserKey LOGIN_HISTORY = new RelationshipAppUserKey<AppUser>("LoginHistory", "See when this user logged into the website", SEE_LOGIN_HISTORY_ROLE);
+	public static final AppUserKey LOGIN_HISTORY = new BookmarkableRelationshipAppUserKey<AppUser>("LoginHistory", "See when this user logged into the website", SEE_LOGIN_HISTORY_ROLE);
 	public final class EraseTransition extends AbstractDirectTransition<AU>{
 
 		@Override
@@ -142,7 +142,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 		
 	}
-	public final class LoginHistoryTransition extends AbstractDirectTransition<AU>{
+	public final class LoginHistoryTransition extends AbstractDirectTransition<AU> {
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)

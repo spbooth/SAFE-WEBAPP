@@ -86,6 +86,7 @@ try{
 <% if( crsf != null ){ %>
 <input type='hidden' name='<%=TransitionServlet.TRANSITION_CSRF_ATTR %>' value='<%=crsf %>'/>
 <%} %>
+<input type='hidden' name='from_view' value='true'/> 
 <div class="action_buttons">
 <%
 for(Object key : provider.getTransitions(target)){
