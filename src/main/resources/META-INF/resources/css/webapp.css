@@ -204,6 +204,12 @@ pre.loose{
 	font-family: var(--font-family);
 }
 
+span.password{
+	font-family: monospace;
+	font-weight: bold;
+	user-select: all;
+	
+}
 
 
 /* Add space before a h1/h2 heading
