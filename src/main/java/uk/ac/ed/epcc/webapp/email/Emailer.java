@@ -161,18 +161,20 @@ public class Emailer {
 
 	public static final Feature DEBUG_SEND = new Feature("email.send.debug", false, "Log send internal operations");
 	AppContext ctx;
-	private Pattern dont_send_pattern=null;
-	
+	private final Pattern dont_send_pattern;
+	private TemplateFinder finder=null;
 	public Emailer(AppContext c) {
 		ctx = c;
+		Pattern tmp = null;
 		try{
 			String pattern_text = c.getInitParameter("email.dont_send_pattern");
 			if( pattern_text != null){
-				dont_send_pattern = Pattern.compile(pattern_text);
+				tmp = Pattern.compile(pattern_text);
 			}
 		}catch(Exception t){
 			getLogger().error("Error making dont_send_pattern", t);
 		}
+		dont_send_pattern=tmp;
 	}
 
 	protected AppContext getContext() {
@@ -189,7 +191,7 @@ public class Emailer {
 	public void newPassword(AppUser person, PasswordAuthComposite comp)
 			throws Exception {
 
-		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("request_password.txt");
+		TemplateFile email_template = getFinder().getTemplateFile("request_password.txt");
 
 		if( email_template == null ){
 			if( ! PASSWORD_RESET_SERVLET.isEnabled(ctx)) {
@@ -243,7 +245,7 @@ public class Emailer {
 		if( verify_only ) {
 			name = "verify_email.txt";
 		}
-		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile(name);
+		TemplateFile email_template = getFinder().getTemplateFile(name);
 
 		email_template.setProperty("person.name", person.getName());
 		email_template.setProperty("person.email", person.getEmail());
@@ -255,7 +257,7 @@ public class Emailer {
 
 	}
 	public void newRemoteHostLogin(AppUser person, String host) throws Exception {
-		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("new_login_location.txt");
+		TemplateFile email_template = getFinder().getTemplateFile("new_login_location.txt");
 		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 		email_template.setProperty("person.name", person.getName());
 		email_template.setProperty("person.email", person.getEmail());
@@ -280,7 +282,7 @@ public class Emailer {
 	public void passwordChanged(AppUser person)
 			throws Exception {
 
-		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("password_changed.txt");
+		TemplateFile email_template = getFinder().getTemplateFile("password_changed.txt");
 		
 
 		String name = person.getName();
@@ -309,7 +311,7 @@ public class Emailer {
 	public void passwordFailsExceeded(AppUser person)
 			throws Exception {
 
-		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("password_fails_exceeded.txt");
+		TemplateFile email_template = getFinder().getTemplateFile("password_fails_exceeded.txt");
 		
 
 		String name = person.getName();
@@ -329,7 +331,7 @@ public class Emailer {
 	public void newSignup(AppUser person, String new_password)
 			throws Exception {
 
-		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("new_signup.txt");
+		TemplateFile email_template = getFinder().getTemplateFile("new_signup.txt");
 		if( email_template == null){
 			getLogger().debug(new_password);
 			return;
@@ -372,7 +374,7 @@ public class Emailer {
 	}
 
 	public MimeMessage notificationMessage(AppUser person, Set<String> notices) throws Exception {
-		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("update_notices.txt");
+		TemplateFile email_template = getFinder().getTemplateFile("update_notices.txt");
 		String name = person.getName();
 		if( name == null || name.trim().length() == 0){
 			name = "User";
@@ -776,7 +778,7 @@ public class Emailer {
 	 * @param email_template
 	 * @return
 	 */
-	private static String getSubject(Logger log,TemplateFile email_template) {
+	private String getSubject(Logger log,TemplateFile email_template) {
 		String subject;
 		subject = (String) email_template.getProperty("subject");
 		// Try to get subject from template
@@ -1072,10 +1074,10 @@ public class Emailer {
 	 * @param conn
 	 * @param text
 	 */
-	public static void errorEmail(AppContext conn, Logger log,String subject,String text) {
+	public void errorEmail(Logger log,String subject,String text) {
 		
 		try {
-			
+			AppContext conn = getContext();
 			if (!doReport(log,conn)) {
 				if( log != null ) {
 					log.error("error email supressed " + text);
@@ -1151,8 +1153,9 @@ public class Emailer {
 	 * @param additional_info
 	 * @throws Exception 
 	 */
-	public static void errorEmail(AppContext conn, Logger log,Throwable e,
+	public void errorEmail(Logger log,Throwable e,
 			Map props, String additional_info) throws Exception {
+		AppContext conn = getContext();
 		if( conn == null || conn.getInitParameter(ERROR_EMAIL_NOTIFY_ADDRESS) == null ){
 			// abort early if no notify address set.
 			return;
@@ -1179,7 +1182,7 @@ public class Emailer {
 		}
 		try {
 			TemplateFile errorEmail;
-			errorEmail = new TemplateFinder(conn).getTemplateFile("error_email.txt");
+			errorEmail = getFinder().getTemplateFile("error_email.txt");
 
 
 
@@ -1239,7 +1242,7 @@ public class Emailer {
 				log.error("error in email formatting", x);
 			}
 		}
-		errorEmail(conn,log, subject,body);
+		errorEmail(log, subject,body);
 	}
 
 	/**
@@ -1345,6 +1348,13 @@ public class Emailer {
              }
     	}
 		return true;
+	}
+
+	private TemplateFinder getFinder() {
+		if( finder == null) {
+			finder= new TemplateFinder(getContext());
+		}
+		return finder;
 	}
 	
 }

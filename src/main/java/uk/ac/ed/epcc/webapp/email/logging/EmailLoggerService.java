@@ -47,6 +47,7 @@ public class EmailLoggerService implements Contexed, LoggerService {
     private LoggerService nested;
     private Logger self_logger=null;
     private boolean in_error=false;
+    private final Emailer mailer;
     public EmailLoggerService(AppContext conn){
     	this.conn=conn;
     	nested=conn.getService(LoggerService.class);
@@ -60,6 +61,7 @@ public class EmailLoggerService implements Contexed, LoggerService {
     	if( nested != null ) {
     		self_logger = nested.getLogger(getClass());
     	}
+    	mailer = new Emailer(conn);
     }
 	
 	public Logger getLogger(String name) {
@@ -174,7 +176,7 @@ public class EmailLoggerService implements Contexed, LoggerService {
 					}
 				}
 				props.put("report_level", level.toString());
-				Emailer.errorEmail(getContext(),self_logger, e, props, text);
+				mailer.errorEmail(self_logger, e, props, text);
 			}catch(Exception t){
 				if( self_logger != null ){
 					self_logger.error("Error reporting error by email",t);
