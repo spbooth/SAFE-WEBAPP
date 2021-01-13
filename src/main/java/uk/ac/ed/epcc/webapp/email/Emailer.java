@@ -1037,6 +1037,7 @@ public class Emailer {
 	}
     synchronized public static void resetReport() {
     	last_send=0;
+    	send_count=0;
     }
 	/**
 	 * Test if its ok to send an email report. Throttle back if too many emails
