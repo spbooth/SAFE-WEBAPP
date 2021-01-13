@@ -11,6 +11,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -83,4 +84,29 @@ public class ErrorFilterTest {
 		String value = res.getOutputStream().toString();
 		assertEquals("hello", value);
 	}
+	
+	@Test
+	public void doFilterErrorTest() throws ServletException, IOException {
+		MockTansport.clear();
+		ErrorFilter fil = new ErrorFilter();
+		ctx.addProp("service.feature.email.deferred_send", "on");
+		fil.init(new MockFilterConfig(ctx, "ErrorFilter"));
+		MockRequest req = new MockRequest("/test");
+		MockResponse res = new MockResponse();
+		fil.doFilter(req, res, new FilterChain() {
+			
+			@Override
+			public void doFilter(ServletRequest request, ServletResponse response) throws IOException, ServletException {
+					// make appcontext so proper logger used
+				    AppContext conn = ErrorFilter.retrieveAppContext(req, res);
+				
+					throw new ServletException(new Exception("A test error"));
+				
+			}
+		});
+		
+		assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, res.getStatus());
+		assertTrue("Emails sent", MockTansport.nSent()>0);
+	}
+	
 }
