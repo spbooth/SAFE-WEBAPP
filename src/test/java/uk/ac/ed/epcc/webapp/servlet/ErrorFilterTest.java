@@ -89,7 +89,9 @@ public class ErrorFilterTest {
 	public void doFilterErrorTest() throws ServletException, IOException {
 		MockTansport.clear();
 		ErrorFilter fil = new ErrorFilter();
-		ctx.addProp("service.feature.email.deferred_send", "on");
+		// error emails never defferred
+		//ctx.addProp("service.feature.email.deferred_send", "on");
+		Emailer.resetReport();
 		fil.init(new MockFilterConfig(ctx, "ErrorFilter"));
 		MockRequest req = new MockRequest("/test");
 		MockResponse res = new MockResponse();
