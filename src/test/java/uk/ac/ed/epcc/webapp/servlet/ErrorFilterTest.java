@@ -18,6 +18,7 @@ import org.junit.Test;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.email.MockTansport;
 import uk.ac.ed.epcc.webapp.mock.MockFilterConfig;
 import uk.ac.ed.epcc.webapp.mock.MockRequest;
@@ -47,6 +48,7 @@ public class ErrorFilterTest {
 	@Test
 	public void testRetreiveContext() throws ServletException, MessagingException {
 		MockTansport.clear();
+		Emailer.resetReport();
 		MockRequest req = new MockRequest("/test");
 		MockResponse res = new MockResponse();
 		req.setAttribute(ErrorFilter.SERVLET_CONTEXT_ATTR, ctx);
@@ -56,7 +58,7 @@ public class ErrorFilterTest {
 		String value = conn.getInitParameter("test.value");
 		assertEquals("hello", value);
 		int count = MockTansport.nSent();
-		assertTrue(count > 0);
+		assertTrue("emails sent" ,count > 0);
 		Message first = MockTansport.getMessage(0);
 		String subject = first.getSubject();
 		assertEquals("test Error Report Need to specify class name in environment or system property, or", subject);
