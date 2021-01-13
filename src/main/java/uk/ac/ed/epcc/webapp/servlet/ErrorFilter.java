@@ -81,7 +81,7 @@ public class ErrorFilter implements Filter {
 	private static final Feature SESSION_STEALING_CHECK_FEATURE = new Feature("session-stealing-check",false,"reset session if ip address changes");
 	private static final Feature CONTEXT_CONFIG_FEATURE = new Feature("context.configuration",false,"Allow additional properties files based on the application Context");
 	private static final Feature CLEANUP_THREAD_FEATURE = new Feature("appcontext.cleanup_thread",true,"Close the AppContext in a thread if CleanupServices are defined");
-	private static final Feature EMAIL_LOGGING_FEATURE = new Feature("logging.send_email",true,"Send error reports by email");
+	
 	public static final Feature CONNECTION_STATUS_FEATURE = new Feature("database.connection_status",false,"Track active database connections");
 	public static final Feature TIMER_FEATURE = new Feature("Timer",false,"gather timing information for performance analyis");
 	public static final Feature DATASTORE_RESOURCE_FEATURE = new Feature("resource_service.use_datastore",true,"Use datastore table to hold resources");
@@ -304,19 +304,29 @@ public class ErrorFilter implements Filter {
 	}
 	 
 	/**
-	 * Construct the correct AppContext for use in the Application
+	 * Construct a basic AppContext for use in the Application
+	 * independent of any request.
 	 * 
 	 * This is static so classes like ContextListers can make their own
 	 * AppContext even if they never see a request object. 
 	 * @param ctx 
-	 * @param request 
-	 * @param response 
-	 * @return ServletAppContext
+	 * @return {@link AppContext}
 	 * @throws Exception
 	 */
-	public static AppContext makeContext(ServletContext ctx,ServletRequest request,ServletResponse response) throws Exception{
+	public static AppContext makeContext(ServletContext ctx) throws Exception{
+		// Ordering of statements in this method is crucial
+		// If a DatabaseConfigService is in place then any lookup of config
+		// will trigger database activity If this generates errors then 
+		// it may need the logger service in place to be reported properly
+		// In addition services may retrieve their pre-requisites
+		// during construction so later overrides will have no effect
+		// The DatabaseConfigService will try to forward calls to the inner
+		// service if called recursively
 		
-		// This includes the default services like DeaultDatabaseService
+		
+		
+		
+		// This includes the default services like DefaultDatabaseService
 		AppContext  conn = new AppContext();
 		
 		
@@ -330,23 +340,12 @@ public class ErrorFilter implements Filter {
 		// Look for a connection pool. The pool name or database params may be in the 
 		// servlet config parameters so we need the ServletConfig first.
 		DatabaseService db_service = new JNDIDatabaseService(conn);
-		if( CONNECTION_STATUS_FEATURE.isEnabled(conn) && request instanceof HttpServletRequest) {
-			HttpServletRequest hs = (HttpServletRequest) request;
-			String id = hs.getServletPath();
-			String path = hs.getPathInfo();
-			if( path != null) {
-				id = id+"/"+hs.getPathInfo();
-			}
-			db_service = new WrappedDatabaseService(db_service,id);
-		}
-		conn.setService( db_service);
-		// Now add support for DataBase overrides. This needs the db connection
-		// so requires the db service.
-		conn.setService(new DataBaseConfigService(conn));
 		
-		if( DATASTORE_RESOURCE_FEATURE.isEnabled(conn)) {
-			conn.setService(new DataStoreResourceService(conn));
-		}
+		
+		conn.setService( db_service);
+		
+		
+		
 		// cache the parameters between requests.
 		// We want to be able to configure the use of the cache but it completely removes the whole point of 
 		// the cache if we query the nested services for a config parameter before installing the cache service
@@ -358,30 +357,22 @@ public class ErrorFilter implements Filter {
 		
 
 
-		// This is going to use the config service so apply after the cache is in place
+		// This is going to use the config service 
+		// Want logger service in place before querying config
+		// as this may/probably will trigger a db lookup
+		// logging generally cannot be reconfigured via properties to install
+		// this before the DatabseConfigService
 		conn.setService(conn.makeObjectWithDefault(LoggerService.class, PrintLoggerService.class, "logger.service"));
-		if( request != null && response != null ){
-			// null request/response means this is a dummy context generated for
-			// a context listener
-			Class<? extends ServletService> clazz = conn.getPropertyClass(ServletService.class,DefaultServletService.class,  "servlet.service");
-			conn.setService(conn.makeParamObject(clazz, conn,ctx,request,response));
-			conn.setService(conn.makeObject(ServletSessionService.class, "session.service"));
-			// Check for a per view override
-			
-// Allow additional configuration files based on the application context.
-// This allows view customisation from a single war-file mapped to multiple contexts
-// using context.xml files with docBase set
-// Unfortunately this is cumbersome to use with parallel deployment
-// as versioned context.xml files need to be uploaded
-			if( request instanceof HttpServletRequest && CONTEXT_CONFIG_FEATURE.isEnabled(conn)) {
-				String path = ((HttpServletRequest)request).getContextPath();
-				String view_prop = "view_properties"+path.replace('/', '.');
-				String config_list = conn.getInitParameter(view_prop);
-				if( config_list != null) {
-					conn.setService(new OverrideConfigService(null, config_list, conn));
-				}
-			}
-		}
+		
+		
+		
+		
+		// Now add support for DataBase overrides. This needs the db connection
+		// so requires the db service.
+		conn.setService(new DataBaseConfigService(conn));
+		
+		
+		
 		return conn;
 	}
 
@@ -420,7 +411,7 @@ public class ErrorFilter implements Filter {
 	 * have the choice of either using a constructor. Or or retrieving an
 	 * existing object cached as an attribute.
 	 * 
-	 * Currently we crate it in a lazy fashion (so no AppContext created for static content)
+	 * Currently we create it in a lazy fashion (so no AppContext created for static content)
 	 * then cache in the request.
 	 * 
 	 * @param req
@@ -433,47 +424,83 @@ public class ErrorFilter implements Filter {
 		return retrieveAppContext(req, res, true);
 	}
 	public static AppContext retrieveAppContext(
-				HttpServletRequest req, HttpServletResponse res,boolean create) throws ServletException {	
-		AppContext conn = (AppContext) req.getAttribute(APP_CONTEXT_ATTR);
-		ServletContext servlet_ctx = (ServletContext) req.getAttribute(SERVLET_CONTEXT_ATTR);
+			HttpServletRequest request, HttpServletResponse response,boolean create) throws ServletException {	
+		AppContext conn = (AppContext) request.getAttribute(APP_CONTEXT_ATTR);
+		ServletContext servlet_ctx = (ServletContext) request.getAttribute(SERVLET_CONTEXT_ATTR);
 		// IF there is already an AppContext in the request then this is a recursive filter call so skip
 		if( conn == null && servlet_ctx != null && create){
 			try {
 
-				
-				conn = makeContext(servlet_ctx,req,res);
-				req.setAttribute(APP_CONTEXT_ATTR, conn);
-				if( EMAIL_LOGGING_FEATURE.isEnabled(conn)) {
-					// report error logs by email with page info need to replace this within closer
-					conn.setService( new ServletEmailLoggerService(conn));
-				}
-				if( TIMER_FEATURE.isEnabled(conn)){
-					DefaultTimerService timer_service = new DefaultTimerService(conn);
-					conn.setService( timer_service);
-					// Note this timer won't be stopped explicitly
-					timer_service.startTimer(req.getServletPath());
-				}else{
-					conn.clearService(TimerService.class);
-				}
 
-				//check for session stealing
-				HttpSession sess = req.getSession(false);
-				if( sess != null && SESSION_STEALING_CHECK_FEATURE.isEnabled(conn) ){
-					String host=(String) sess.getAttribute(LAST_ADDR_ATTR);
-					if( host != null ){
-						if( ! host.equals(req.getRemoteAddr())){ // host address has changed in a session
-							// we have an AppContext so don't recurse to getCustomLogger
-							conn.getService(LoggerService.class).getLogger(ErrorFilter.class).error("Possible session stealing remote address has changed "+host+" != "+req.getRemoteAddr());
-							if(  conn.getBooleanParameter("session.ipcheck", true)){
-								conn.getService(SessionService.class).clearCurrentPerson();
-							}
+				conn = makeContext(servlet_ctx);
+				// report error logs by email with page info need to replace this within closer
+				conn.setService( new ServletEmailLoggerService(conn));
+				request.setAttribute(APP_CONTEXT_ATTR, conn);
+				
+				
+				// Now for request specific customisation
+				//
+				if( request != null && response != null ){
+					// null request/response means this is a dummy context generated for
+					// a context listener
+					Class<? extends ServletService> clazz = conn.getPropertyClass(ServletService.class,DefaultServletService.class,  "servlet.service");
+					conn.setService(conn.makeParamObject(clazz, conn,servlet_ctx,request,response));
+					conn.setService(conn.makeObject(ServletSessionService.class, "session.service"));
+					// Check for a per view override
+
+					// Allow additional configuration files based on the application context.
+					// This allows view customisation from a single war-file mapped to multiple contexts
+					// using context.xml files with docBase set
+					// Unfortunately this is cumbersome to use with parallel deployment
+					// as versioned context.xml files need to be uploaded
+					if( request instanceof HttpServletRequest && CONTEXT_CONFIG_FEATURE.isEnabled(conn)) {
+						String path = ((HttpServletRequest)request).getContextPath();
+						String view_prop = "view_properties"+path.replace('/', '.');
+						String config_list = conn.getInitParameter(view_prop);
+						if( config_list != null) {
+							conn.setService(new OverrideConfigService(null, config_list, conn));
 						}
+					}
+
+					if( CONNECTION_STATUS_FEATURE.isEnabled(conn) && request instanceof HttpServletRequest) {
+						HttpServletRequest hs = (HttpServletRequest) request;
+						String id = hs.getServletPath();
+						String path = hs.getPathInfo();
+						if( path != null) {
+							id = id+"/"+hs.getPathInfo();
+						}
+
+						conn.setService(new WrappedDatabaseService(conn.getService(DatabaseService.class),id));
+					}
+					if( TIMER_FEATURE.isEnabled(conn)){
+						DefaultTimerService timer_service = new DefaultTimerService(conn);
+						conn.setService( timer_service);
+						// Note this timer won't be stopped explicitly
+						timer_service.startTimer(request.getServletPath());
 					}else{
-						sess.setAttribute(LAST_ADDR_ATTR, req.getRemoteAddr());
+						conn.clearService(TimerService.class);
+					}
+
+					//check for session stealing
+					HttpSession sess = request.getSession(false);
+					if( sess != null && SESSION_STEALING_CHECK_FEATURE.isEnabled(conn) ){
+						String host=(String) sess.getAttribute(LAST_ADDR_ATTR);
+						if( host != null ){
+							if( ! host.equals(request.getRemoteAddr())){ // host address has changed in a session
+								// we have an AppContext so don't recurse to getCustomLogger
+								conn.getService(LoggerService.class).getLogger(ErrorFilter.class).error("Possible session stealing remote address has changed "+host+" != "+request.getRemoteAddr());
+								if(  conn.getBooleanParameter("session.ipcheck", true)){
+									conn.getService(SessionService.class).clearCurrentPerson();
+								}
+							}
+						}else{
+							sess.setAttribute(LAST_ADDR_ATTR, request.getRemoteAddr());
+						}
 					}
 				}
-
-				
+				if( DATASTORE_RESOURCE_FEATURE.isEnabled(conn)) {
+					conn.setService(new DataStoreResourceService(conn));
+				}
 
 			} catch (Throwable e1) {
 				throw new ServletException("Exception making AppContext", e1);

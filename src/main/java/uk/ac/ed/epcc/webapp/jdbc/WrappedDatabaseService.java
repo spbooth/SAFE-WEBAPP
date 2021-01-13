@@ -26,7 +26,7 @@ import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 
-/** A {@link DatabaseService} wrapper that can beused to generate a tabe
+/** A {@link DatabaseService} wrapper that can be used to generate a table
  * showing the current active connections
  * @author Stephen Booth
  *

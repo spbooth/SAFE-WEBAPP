@@ -33,7 +33,7 @@ public class JFreeSetupListener extends WebappContextListener {
 	public void contextInitialized(ServletContextEvent arg0) {
 		AppContext conn=null;
 		try{
-			conn = ErrorFilter.makeContext(arg0.getServletContext(), null, null);
+			conn = ErrorFilter.makeContext(arg0.getServletContext());
 
 			JFreeSetup.setup(conn);
 

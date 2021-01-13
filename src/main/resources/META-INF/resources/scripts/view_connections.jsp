@@ -49,7 +49,7 @@ builder.addTable(conn, WrappedDatabaseService.getStatusTable());
 </div>	
 <%} %>
 <div class="block">
-<h1>Current connections</h1>
+<h1>Current connection</h1>
 <% HtmlBuilder builder2 = new HtmlBuilder();
 DatabaseService s = conn.getService(DatabaseService.class);
 Table t = new Table();
