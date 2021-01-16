@@ -24,7 +24,6 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlFormPolicy;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
-import uk.ac.ed.epcc.webapp.content.XMLContentBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.inputs.AutoComplete;
 import uk.ac.ed.epcc.webapp.forms.inputs.BinaryInput;
@@ -48,7 +47,6 @@ import uk.ac.ed.epcc.webapp.forms.inputs.RangedInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnitInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnmodifiableInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.WrappedInput;
-import uk.ac.ed.epcc.webapp.forms.registry.FormPolicy;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.timer.TimeClosable;
@@ -215,6 +213,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		}
 		
 		Iterator<T> iter = input.getItems();
+		
 		if(iter != null &&  iter.hasNext()){
 			hb.open("select");
 			try {
@@ -258,9 +257,23 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 
 				}
 			}
+			String grouplabel=null;
+			boolean ingroup=false;
 			boolean seen_selected=false;
 			for (; iter.hasNext();) {
 				T current = iter.next();
+				String glabel = input.getGroup(current);
+				if( ingroup && (glabel == null || ! glabel.equals(grouplabel))){
+					// close group
+					hb.close();
+					ingroup=false;
+				}
+				if( glabel != null && ! glabel.equals(grouplabel)) {
+					hb.open("optgroup");
+					hb.attr("label", glabel);
+					ingroup=true;
+					grouplabel=glabel;
+				}
 				String tag = input.getTagByItem(current);
 				hb.open("option");
 				hb.attr("value", tag );
@@ -273,6 +286,9 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				hb.close();
 				hb.clean("\n");
 
+			}
+			if( ingroup) {
+				hb.close();
 			}
 			if( def != null && ! seen_selected ){
 				// check for an out of band value
