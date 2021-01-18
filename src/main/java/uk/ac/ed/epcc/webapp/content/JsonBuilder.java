@@ -106,11 +106,21 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 
 	private void addString(String s){
 		content.append('"');
+		for(char c : s.toCharArray()) {
+			switch(c) {
+			case '\\' : content.append("\\\\"); break;
+			case '"' : content.append("\\\""); break;
+			case '\n' : content.append("\\n"); break;
+			default:
+				if( c > 0x1F && c < 0xFF ) {
+					content.append(c);
+				}else {
+					content.append("\\u");
+					content.append(String.format("%1$04x", (int) c));
+				}
+			}
+		}
 		
-		s=s.replace("\\", "\\\\");
-		s=s.replace("\"", "\\\"");
-		s=s.replace("\n", "\\n");
-		content.append(s);
 		content.append('"');
 	}
 	
