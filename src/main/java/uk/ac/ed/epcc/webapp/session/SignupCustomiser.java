@@ -25,5 +25,5 @@ import uk.ac.ed.epcc.webapp.model.data.Composite;
 public interface SignupCustomiser {
   public void customiseSignupForm(Form f);
   
-  public void addSignupSuppress(Set<String> supress);
+  public default void addSignupSuppress(Set<String> supress){};
 }
