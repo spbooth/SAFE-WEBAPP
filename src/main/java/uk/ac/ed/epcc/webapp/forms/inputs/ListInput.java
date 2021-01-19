@@ -74,5 +74,18 @@ public abstract interface ListInput<V,T> extends  SuggestedItemInput<V,T> {
 	 * @return String user text
 	 */
 	public abstract String getText(T item);
+	
+	/** Get a group name for the option
+	 * If supported this collects the values in the input into
+	 * groups (eg. using html optgroup)
+	 * All items in the same group should occur contiguously in the
+	 * item list. A null value (the default) indicates no grouping
+	 * 
+	 * @param item
+	 * @return group label or null.
+	 */
+	public default String getGroup(T item) {
+		return null;
+	}
 
 }

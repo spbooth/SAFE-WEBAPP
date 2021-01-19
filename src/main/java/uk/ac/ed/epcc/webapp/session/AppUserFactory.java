@@ -969,6 +969,9 @@ NamedFilterProvider<AU>
 		protected Set<String> getSupress() {
 			Set<String> supress = super.getSupress();
 			supress.add(ALLOW_EMAIL_FIELD);
+			for(SignupCustomiser c : getAppUserFactory().getComposites(SignupCustomiser.class)){
+				c.addSignupSuppress(supress);
+			}
 			return supress;
 		}
 		/* (non-Javadoc)
