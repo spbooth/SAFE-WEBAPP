@@ -20,7 +20,6 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.content.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.inputs.BooleanInput;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -52,7 +51,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @author spb
  *
  */
-public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composite<BDO, ConfigNamedFilterComposite> implements NamedFilterProvider<BDO> {
+public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composite<BDO, ConfigNamedFilterComposite> implements NamedFilterProvider<BDO> , SummaryContributer<BDO>{
 
 	LinkedHashSet<String> names = new LinkedHashSet<>();
 	/**
@@ -81,6 +80,13 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 			}
 		}
 		return null;
+	}
+	
+	public boolean hasNamedFilter(BDO target,String name) {
+		if( names.contains(name)) {
+			return getRecord(target).getBooleanProperty(name, getDefault(name));
+		}
+		return false;
 	}
 
 	/* (non-Javadoc)
@@ -126,12 +132,16 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 	@Override
 	public Map<String, String> addTranslations(Map<String, String> translations) {
 		for(String name : names) {
-			String label = getContext().getInitParameter(getFactory().getConfigTag()+"."+name+".label");
+			String label = getLabel(name);
 			if( label != null) {
 				translations.put(name, label);
 			}
 		}
 		return translations;
+	}
+
+	private String getLabel(String name) {
+		return getContext().getInitParameter(getFactory().getConfigTag()+"."+name+".label");
 	}
 
 	/* (non-Javadoc)
@@ -163,6 +173,16 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 	
 	public boolean getDefault(String name) {
 		return getContext().getBooleanParameter(getFactory().getConfigTag()+"."+name+".default", false);
+	}
+
+	@Override
+	public void addAttributes(Map<String, Object> attributes, BDO target) {
+		for(String name : names) {
+			if( getRepository().hasField(name) && getContext().getBooleanParameter(getFactory().getConfigTag()+"."+name+".show_attribute", false)) {
+				attributes.put(getLabel(name), hasNamedFilter(target, name));
+			}
+		}
+		
 	}
 
 }
