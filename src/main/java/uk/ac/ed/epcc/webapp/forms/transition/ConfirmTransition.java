@@ -51,8 +51,13 @@ public class ConfirmTransition<T> implements ExtraFormTransition<T>{
 	private final DirectTransition<T> yes_transition;
 	private final DirectTransition<T> no_transition;
 	private final String text;
+	private final ExtraContent<T> extra;
 	public ConfirmTransition(String text, DirectTransition<T> yes, DirectTransition<T> no){
+		this(text,null,yes,no);
+	}
+	public ConfirmTransition(String text, ExtraContent<T> extra,DirectTransition<T> yes, DirectTransition<T> no) {
 		this.text=text;
+		this.extra=extra;
 		this.yes_transition=yes;
 		this.no_transition=no;
 	}
@@ -74,6 +79,9 @@ public class ConfirmTransition<T> implements ExtraFormTransition<T>{
 	@Override
 	public <X extends ContentBuilder> X getExtraHtml(X cb,SessionService<?> op, T target) {
 		cb.addHeading(2, text);
+		if( extra != null ) {
+			extra.getExtraHtml(cb, op, target);
+		}
 		return cb;
 	}
 	@Override
