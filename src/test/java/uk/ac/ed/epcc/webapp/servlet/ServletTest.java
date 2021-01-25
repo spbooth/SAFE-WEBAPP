@@ -69,6 +69,8 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.jdbc.config.DataBaseConfigService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.GetListFilterVisitor;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.logging.debug.DebugLoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintLoggerService;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
@@ -88,6 +90,7 @@ import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.session.SimpleSessionService;
+import uk.ac.ed.epcc.webapp.tags.ConfirmTag;
 import uk.ac.ed.epcc.webapp.timer.DefaultTimerService;
 /** This is an abstract test class for performing high
  * level tests of operations against servlets.
@@ -300,6 +303,23 @@ public abstract class ServletTest extends WebappTestBase{
 		if( param != null) {
 			assertEquals(error, errors.get(param));
 		}
+	}
+	
+	/** Check the expected content of a confirm message
+	 * @throws TransformerException 
+	 * @throws TransformerFactoryConfigurationError 
+	 * @throws TransformerConfigurationException 
+	 * 
+	 */
+	public void checkConfirmContent(String normalise_transform,String expected) throws TransformerConfigurationException, TransformerFactoryConfigurationError, TransformerException {
+		String type = (String) req.getAttribute(WebappServlet.CONFIRM_TYPE);
+		assertNotNull(type);
+		
+		HtmlBuilder hb = new HtmlBuilder();
+		ConfirmTag.addContent(req, getContext(), getContext().getService(LoggerService.class).getLogger(ConfirmTag.class), hb);
+		checkContent(normalise_transform, expected, hb.toString());
+		
+		
 	}
 	/** Check that the specified confirm message has been requested
 	 * then reset the response and modify the request with the specified confirmation
