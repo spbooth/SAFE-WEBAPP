@@ -1109,6 +1109,12 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		if( user == null || role == null){
 			return false;
 		}
+		if( role.equalsIgnoreCase("true")) {
+			return true;
+		}
+		if( role.equalsIgnoreCase("false")) {
+			return false;
+		}
 		if( role.startsWith("@")) {
 			AppUserFactory<A> login = getLoginFactory();
 			if( role.length() < 2) {
