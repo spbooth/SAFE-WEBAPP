@@ -707,6 +707,9 @@ public final class Repository implements AppContextCleanup{
 		 */
 		public synchronized  boolean commit()
 				throws uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault {
+			if( locked ) {
+				throw new DataFault("commit called on locked record "+id);
+			}
 			// Don't check for dirty flags here but in update
 			// It should be legal to commit a new object without setting any
 			// fields
@@ -1849,13 +1852,15 @@ public final class Repository implements AppContextCleanup{
 		    }
 		    /** mark the record as read-only/locked
 		     * 
-		     * This is intended for when 
-		     * 
 		     * @throws DataFault
 		     */
-		    public void lock() throws DataFault {
+		    public void lock(boolean allow_dirty) throws DataFault {
 		    	if( isDirty()) {
-		    		throw new DataFault("lock of dirty record");
+		    		if( allow_dirty) {
+		    			clean();
+		    		}else {
+		    			throw new DataFault("lock of dirty record");
+		    		}
 		    	}
 		    	locked=true;
 		    }

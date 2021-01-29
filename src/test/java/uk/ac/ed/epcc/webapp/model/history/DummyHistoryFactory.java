@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.LongFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.Dummy1;
+import uk.ac.ed.epcc.webapp.model.data.HistoryFactory;
 
 public class DummyHistoryFactory extends HistoryFactory<Dummy1,HistoryFactory.HistoryRecord<Dummy1>>{
 	 public static final String DEFAULT_TABLE="TestHistory";

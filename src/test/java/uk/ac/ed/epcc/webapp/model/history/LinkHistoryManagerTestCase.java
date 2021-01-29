@@ -27,9 +27,10 @@ import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.model.data.HistoryFactory;
 import uk.ac.ed.epcc.webapp.model.data.LinkManager;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
-import uk.ac.ed.epcc.webapp.model.history.HistoryFactory.HistoryRecord;
+import uk.ac.ed.epcc.webapp.model.data.HistoryFactory.HistoryRecord;
 
 public abstract class LinkHistoryManagerTestCase<L extends LinkHistoryHandler> extends WebappTestBase {
 

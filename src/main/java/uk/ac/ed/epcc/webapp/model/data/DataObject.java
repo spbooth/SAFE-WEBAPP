@@ -359,9 +359,9 @@ public abstract class DataObject implements ContextIndexed, Identified, Releasab
 	 * 
 	 * @throws DataFault
 	 */
-    protected void lock() throws DataFault {
+    protected void lock(boolean allow_dirty) throws DataFault {
     	if( record != null ) {
-    		record.lock();
+    		record.lock(allow_dirty);
     	}
     }
 	protected boolean isLocked() {

@@ -29,6 +29,9 @@ public interface History<P extends DataObject> {
 	 * initialised. Note that the changes still need to be comitted if you
 	 * want the database to be rolled back.
 	 * 
+	 * If the peer object has been deleted then fields may be missing or reverted to default values
+	 * but the id will still be that of the original peer.
+	 * 
 	 * @return peer DataObject
 	 * @throws DataException
 	 */

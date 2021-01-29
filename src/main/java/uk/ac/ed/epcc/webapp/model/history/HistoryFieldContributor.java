@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.model.history;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.HistoryFactory;
 
 /** interfact for {@link DataObjectFactory}s or {@link Composite}s that add fields to their {@link HistoryFactory}
  * @author spb

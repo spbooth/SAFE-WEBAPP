@@ -95,6 +95,7 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.ParseFactory;
+import uk.ac.ed.epcc.webapp.model.data.Repository.IdMode;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
@@ -1232,7 +1233,6 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public  BDO find(int id)
 			throws uk.ac.ed.epcc.webapp.jdbc.exception.DataException {
 		

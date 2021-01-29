@@ -42,7 +42,7 @@ public class LockedDataCache<BDO extends DataObject> extends DataCache<Integer, 
 		}
 		BDO obj = fac.find(key);
 		if( obj != null ) {
-			obj.lock();
+			obj.lock(false);
 		}
 		return obj;
 	}

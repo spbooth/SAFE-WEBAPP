@@ -14,7 +14,7 @@
 /*******************************************************************************
  * Copyright (c) - The University of Edinburgh 2010
  *******************************************************************************/
-package uk.ac.ed.epcc.webapp.model.history;
+package uk.ac.ed.epcc.webapp.model.data;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -49,14 +49,9 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableStructureListener;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.TimePurgeFactory;
-import uk.ac.ed.epcc.webapp.model.data.BasicType;
-import uk.ac.ed.epcc.webapp.model.data.CachedIndexedProducer;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.Owned;
-import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
-import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
+import uk.ac.ed.epcc.webapp.model.data.Repository.IdMode;
+import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.MultipleResultException;
@@ -67,6 +62,9 @@ import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.iterator.DecoratingIterator;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
+import uk.ac.ed.epcc.webapp.model.history.History;
+import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
+import uk.ac.ed.epcc.webapp.model.history.HistoryHandler;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 /**
@@ -156,7 +154,16 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		 */
 		@Override
 		public final P getAsPeer() throws DataException {
-			P peer = getPeer();
+			// need to consider the possiblity of a deleted peer
+			int id = getPeerID();
+			
+			DataObjectFactory<P> fac = history_factory.getPeerFactory();
+			Record r = fac.makeRecord();
+			// This is the same as find if the record exists
+			// otherwise an empty record with the specified id
+			// obviously any data not held in the history table will be missing
+			r.setID(id, IdMode.UseExistingIfPresent);
+			P peer = fac.makeBDO(r);
 			peer.setContents(getMap());
 			return peer;
 		}
@@ -241,7 +248,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		 *            DataObject to check
 		 * @return boolean true if changed
 		 */
-		protected boolean hasChanged(P peer) {
+		public boolean hasChanged(P peer) {
 			// generic implementation
 			return !record.equals(peer.getMap());
 		}
@@ -386,7 +393,9 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 							"null end date in History.Filter");
 				}
 				addFilter(new TimeFilter(START_TIME_FIELD,MatchCondition.LE,end));
-				addFilter(new TimeFilter(END_TIME_FIELD,MatchCondition.GT,start));
+				SQLOrFilter<H> or = new SQLOrFilter<H>(HistoryFactory.this.getTarget(),new TimeFilter(END_TIME_FIELD,MatchCondition.GT,start),
+						new NullFieldFilter<H>(HistoryFactory.this.getTarget(), res, END_TIME_FIELD, true));
+				addFilter(or);
 			}
 		}
 	}
@@ -438,20 +447,25 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	 *
 	 */
     public class PeerIterator extends DecoratingIterator<P,HistoryRecord<P>>{
-
+    	private boolean lock;
 		@Override
 		public P next() {
 			HistoryRecord<P> i = nextInput();
 			try {
-				return i.getAsPeer();
+				P peer = i.getAsPeer();
+				if( lock ) {
+					peer.lock(true);
+				}
+				return peer;
 			} catch (DataException e) {
 				i.getContext().error(e,"Error getting peer");
 				return null;
 			}
 		}
 
-		public PeerIterator(Iterator<? extends HistoryRecord<P>> i) {
+		public PeerIterator(Iterator<? extends HistoryRecord<P>> i,boolean lock) {
 			super(i);
+			this.lock=lock;
 		}
     	
     }
@@ -679,13 +693,8 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		if( timer != null ){
 			timer.startTimer(getTag()+"findPeer");
 		}
-		SQLAndFilter<H> fil =new  SQLAndFilter<>(getTarget());
+		SQLAndFilter<H> fil = getPointFilter(time);
 		fil.addFilter(new ReferenceFilter<>(this, getPeerName(),peer));
-		fil.addFilter(new TimeFilter(START_TIME_FIELD,MatchCondition.LE,time));
-		SQLOrFilter<H> end_fil = new SQLOrFilter<>(getTarget());
-		end_fil.addFilter(new TimeFilter(END_TIME_FIELD,MatchCondition.GT,time));
-		end_fil.addFilter(new NullFieldFilter<>(getTarget(), res, END_TIME_FIELD, true));
-		fil.addFilter(end_fil);
 		if( want_tail && res.hasField(status.getField())){
 			fil.addFilter(status.getFilter(this, TAIL));
 		}
@@ -706,6 +715,15 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 			timer.stopTimer(getTag()+"findPeer");
 		}
 		return  current;
+	}
+	protected SQLAndFilter<H> getPointFilter(Date time) {
+		SQLAndFilter<H> fil =new  SQLAndFilter<>(getTarget());
+		fil.addFilter(new TimeFilter(START_TIME_FIELD,MatchCondition.LE,time));
+		SQLOrFilter<H> end_fil = new SQLOrFilter<>(getTarget());
+		end_fil.addFilter(new TimeFilter(END_TIME_FIELD,MatchCondition.GT,time));
+		end_fil.addFilter(new NullFieldFilter<>(getTarget(), res, END_TIME_FIELD, true));
+		fil.addFilter(end_fil);
+		return fil;
 	}
 
 	/* (non-Javadoc)
@@ -732,6 +750,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	public Iterator<H> getIterator(Date start, Date end) throws DataFault {
 		return new FilterIterator(new HistoryFilter( start, end));
 	}
+	
 
 	/**
 	 * Name of the field containing the peer id This must match the equivalent
