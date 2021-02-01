@@ -353,14 +353,23 @@ public abstract class ServletTest extends WebappTestBase{
 	
 	public void checkMessageText( String expected) {
 		String message_type = (String) req.getAttribute("message_type");
-		Object args[] = (Object[]) req.getAttribute("args");
-		if(args == null) args = new Object[0];
+		Object[] args = getMessageArgs();
 		
 		ResourceBundle mess = getContext().getService(MessageBundleService.class).getBundle();
 		PreDefinedContent text = new PreDefinedContent(ctx,mess,message_type + ".text",args);
 		HtmlBuilder buffer = new HtmlBuilder();
 		text.addContent((SimpleXMLBuilder)buffer);
 		assertEquals(expected, buffer.toString());
+	}
+
+	/** Extract the arguments that have been passed to a message result
+	 * 
+	 * @return
+	 */
+	public Object[] getMessageArgs() {
+		Object args[] = (Object[]) req.getAttribute("args");
+		if(args == null) args = new Object[0];
+		return args;
 	}
 	
 	public void checkTransitionException(String message){
