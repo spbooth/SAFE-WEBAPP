@@ -29,13 +29,16 @@ public class ReferenceFieldType extends IntegerFieldType {
    }
    /** Constructor that allows the reference to be defined
     * as non-null. When adding foreign keys to these our convention
-    * is to cascase delete operations.
+    * is to cascade delete operations.
     * 
     * @param allow_null
     * @param remote
     */
    public ReferenceFieldType(boolean allow_null,String remote){
-	   super(allow_null,null);
+	   this(allow_null,remote,null);
+   }
+   public ReferenceFieldType(boolean allow_null,String remote,Integer def){
+	   super(allow_null,def);
 	   remote_table=remote;
    }
    public String getRemoteTable(){
