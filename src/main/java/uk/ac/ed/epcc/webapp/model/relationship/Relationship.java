@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
@@ -155,6 +156,12 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 	@Override
 	protected SQLFilter<Link<A, B>> getFilterFromRole(String role) throws UnknownRelationshipException {
 		if( ! res.hasField(role)){
+			for(String s : getDefaultRoles(getContext(), getConfigTag())) {
+				if( role.equals(s)) {
+					// a default role without a field
+					return new FalseFilter<Relationship.Link<A,B>>(getTarget());
+				}
+			}
 			throw new UnknownRelationshipException(role+"@"+getTag());
 		}
 		return new SQLValueFilter<>(getTarget(),res,role,Boolean.TRUE);
@@ -194,6 +201,9 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 			if( res.getInfo(s).isBoolean()){
 				result.add(s);
 			}
+		}
+		for(String s : getDefaultRoles(getContext(), getConfigTag())) {
+			result.add(s);
 		}
 		return result;
 	}
