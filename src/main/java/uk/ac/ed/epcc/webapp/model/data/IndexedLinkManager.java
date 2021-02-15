@@ -582,10 +582,12 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 */
 	public Set<L> addLeftSet(Set<L> res, R r ,BaseFilter<T> f) throws DataException{	
 	
-		for(T link : getFilterResult(null, r, f)){
-			res.add(link.getLeft());
+		try(FilterResult<T> filterResult = getFilterResult(null, r, f)){
+			for(T link : filterResult){
+				res.add(link.getLeft());
+			}
+			return res;
 		}
-		return res;
 	}
 
 	/**
@@ -680,10 +682,12 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 * @throws DataException 
 	 */
 	public Set<R> addRightSet(Set<R> res,L l ,BaseFilter<T> f) throws DataException{
-		for(T link : getFilterResult(l, null, f)){
-			res.add(link.getRight());
+		try(FilterResult<T> filterResult = getFilterResult(l, null, f)){
+			for(T link : filterResult){
+				res.add(link.getRight());
+			}
+			return res;
 		}
-		return res;
 	}
 
 
