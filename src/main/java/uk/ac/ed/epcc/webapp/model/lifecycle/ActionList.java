@@ -70,7 +70,7 @@ public class ActionList<T extends DataObject> extends AbstractConstructedTargetL
 	 * @see uk.ac.ed.epcc.webapp.model.lifecycle.ActionListener#action(java.lang.Object)
 	 */
 	@Override
-	public void action(T target) {
+	public void action(T target) throws Exception {
 		for(ActionListener<T> l  : this){
 			l.action(target);
 		}

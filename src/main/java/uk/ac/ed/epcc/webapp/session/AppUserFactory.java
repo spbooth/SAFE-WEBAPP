@@ -1183,9 +1183,9 @@ NamedFilterProvider<AU>
 	/** Erase the personal data for the specified user
 	 * 
 	 * @param p
-	 * @throws DataFault 
+	 * @throws Exception 
 	 */
-	public void erasePersonalData(AU p) throws DataFault {
+	public void erasePersonalData(AU p) throws Exception {
 		Set<String> fields = new HashSet<>();
 		for(AnonymisingComposite anon : getComposites(AnonymisingComposite.class)){
 			anon.anonymise(p);
