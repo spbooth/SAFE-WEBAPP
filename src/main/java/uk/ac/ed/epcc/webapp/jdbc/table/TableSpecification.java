@@ -209,7 +209,7 @@ public class TableSpecification {
 								}
 							}
 						}
-						setField(name,new ReferenceFieldType(true, type, r));
+						setField(name,new ReferenceFieldType(r==null, type, r));
 					}else {
 						setField(name, new ReferenceFieldType(type));
 					}
