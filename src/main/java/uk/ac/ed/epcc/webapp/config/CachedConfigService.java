@@ -36,7 +36,7 @@ import uk.ac.ed.epcc.webapp.jdbc.config.DataBaseConfigService;
  */
 @PreRequisiteService({ConfigService.class})
 
-/**
+/** {@link ConfigService} that caches config operations in a static map.
  * 
  * @author spb
  *
@@ -136,6 +136,11 @@ public class CachedConfigService implements ConfigService {
 
 	public Class<ConfigService> getType() {
 		return ConfigService.class;
+	}
+
+	@Override
+	public ConfigService getNested() {
+		return service;
 	}
 
 

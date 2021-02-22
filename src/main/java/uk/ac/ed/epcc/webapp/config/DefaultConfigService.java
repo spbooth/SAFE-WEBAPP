@@ -145,6 +145,10 @@ public class DefaultConfigService extends AbstractConfigService implements Confi
 		}
 		
 	}
+	@Override
+	public ConfigService getNested() {
+		return null;
+	}
 
 	
 

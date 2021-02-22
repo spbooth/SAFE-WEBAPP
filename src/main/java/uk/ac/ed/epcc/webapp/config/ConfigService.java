@@ -56,5 +56,9 @@ public interface ConfigService extends Contexed, AppContextService<ConfigService
    */
   public void addListener(ConfigServiceListener listener);
   
-  
+  /** Get the {@link ConfigService} this servcie delegates to (if any)
+   * 
+   * @return {@link ConfigService} or nullkl
+   */
+  public ConfigService getNested();
 }

@@ -123,4 +123,9 @@ public class OverrideConfigService extends AbstractConfigService {
 		
 	}
 
+	@Override
+	public ConfigService getNested() {
+		return parent;
+	}
+
 }
