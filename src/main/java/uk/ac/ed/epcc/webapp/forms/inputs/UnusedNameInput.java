@@ -35,7 +35,7 @@ public class UnusedNameInput<F extends DataObject> extends NoHtmlInput{
 		this(fac);
 		this.existing=existing;
 		if( existing != null ){
-			setValue(fac.getCanonicalName(existing));
+			setText(fac.getCanonicalName(existing));
 		}
 	}
     public UnusedNameInput(ParseFactory<F> fac){

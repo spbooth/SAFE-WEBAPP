@@ -55,7 +55,7 @@ public class ConfigTransition<T extends DataObjectFactory> extends AbstractFormT
 		for(String param : params){
 			TextInput input = new TextInput();
 			input.setSingle(true);
-			input.setValue(conn.getInitParameter(param));
+			input.setText(conn.getInitParameter(param));
 			f.addInput(param, param, input).setOptional(true);
 		}
 		f.addAction("Update", new UpdateConfig(target));

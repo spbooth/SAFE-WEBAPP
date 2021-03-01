@@ -122,11 +122,14 @@ public class ConstructedObjectInput<T> extends AbstractInput<String> implements 
 	}
 
 	@Override
-	public String convert(Object v) throws TypeError {
+	public String convert(Object v) throws TypeException  {
+		if( v == null) {
+			return null;
+		}
 		if( v instanceof String ){
 			return (String) v;
 		}
-		return null;
+		throw new TypeException(v.getClass());
 	}
 
 	
@@ -146,7 +149,11 @@ public class ConstructedObjectInput<T> extends AbstractInput<String> implements 
 
 	@Override
 	public void setItem(T item) {
-		setValue(getTagByItem(item));
+		try {
+			setValue(getTagByItem(item));
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 		
 	}
 	@Override

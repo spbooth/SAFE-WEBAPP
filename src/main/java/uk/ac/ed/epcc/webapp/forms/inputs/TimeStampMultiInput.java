@@ -101,7 +101,7 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements B
 		});
     }
 	@Override
-	public Date convert(Object v) throws TypeError {
+	public Date convert(Object v) throws TypeException {
 		if( v == null ){
 			return null;
 		}
@@ -118,10 +118,10 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements B
 			try {
 				return df.parse((String)v);
 			} catch (java.text.ParseException e) {
-				throw new TypeError("Invalid date "+v);
+				throw new TypeException("Invalid date "+v);
 			}
 		}
-		throw new TypeError(v.getClass());
+		throw new TypeException(v.getClass());
 	}
 
 	@Override
@@ -135,7 +135,7 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements B
 		return c.getTime();
 	}
 	@Override
-	public final Date setValue(Date v) throws TypeError {
+	public final Date setValue(Date v) throws TypeException {
 		Date old = getValue();
 		if( v != null){
 			if( c == null ){
@@ -265,8 +265,17 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements B
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AbstractCalendarMultiInput#setNull()
 	 */
 	@Override
-	protected void setNull() {
+	public void setNull() {
+		super.setNull();
 		c=null;
+	}
+	@Override
+	public void setDate(Date d) {
+		try {
+			setValue(d);
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 	}
 
 }

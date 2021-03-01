@@ -121,22 +121,24 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 			Transition<T> transition = provider.getTransition(target, key);
 			if(transition != null &&  (transition instanceof BaseFormTransition || transition instanceof TargetLessTransition)){
 				req.params.put("Transition", key.toString());
-				req.params.put("transition_form", "true");
-				HTMLForm f = new HTMLForm(getContext(),new ChainedTransitionResult<T, K>(provider, target, key));
-				
-				if( transition instanceof BaseFormTransition){
-					BaseFormTransition ft = (BaseFormTransition)transition;
-					ft.buildForm(f, target, getContext());
-					
-				}else if( transition instanceof TargetLessTransition){
-					((TargetLessTransition)transition).buildForm(f, getContext());
-					
+				if( populateForm()) {
+					// Set the default form parameters and hidden parameters
+					req.params.put("transition_form", "true");
+					HTMLForm f = new HTMLForm(getContext(),new ChainedTransitionResult<T, K>(provider, target, key));
+
+					if( transition instanceof BaseFormTransition){
+						BaseFormTransition ft = (BaseFormTransition)transition;
+						ft.buildForm(f, target, getContext());
+
+					}else if( transition instanceof TargetLessTransition){
+						((TargetLessTransition)transition).buildForm(f, getContext());
+
+					}
+					if( f.getTargetStage() > 0 ) {
+						req.params.put(BaseHTMLForm.FORM_STAGE_INPUT, Integer.toString(f.getTargetStage()));
+					}
+					f.addStringMap(req.params);
 				}
-				if( f.getTargetStage() > 0 ) {
-					req.params.put(BaseHTMLForm.FORM_STAGE_INPUT, Integer.toString(f.getTargetStage()));
-				}
-				f.addStringMap(req.params);
-				
 			}
 		}
 		}else {
@@ -457,5 +459,9 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	 */
 	public void setConfirmTransition(boolean yes_no){
 		setAction(yes_no ? ConfirmTransition.YES : ConfirmTransition.NO);
+	}
+	
+	protected boolean populateForm() {
+		return true;
 	}
 }

@@ -94,7 +94,11 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 		}
 		if( nf != null ){
 			if( nf.isParseIntegerOnly()){
-				return convert(1);
+				try {
+					return convert(1);
+				} catch (TypeException e) {
+					return null;
+				}
 			}
 		}
 		return null;

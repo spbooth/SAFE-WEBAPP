@@ -24,6 +24,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.BaseInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 /** Input to select one of the fields of a Repository
@@ -68,11 +69,14 @@ public class RepositoryFieldInput extends BaseInput<String> implements ListInput
 		return item.getName(false);
 	}
 
-	public String convert(Object v) throws TypeError {
+	public String convert(Object v) throws TypeException {
+		if( v == null ) {
+			return null;
+		}
 		if( v instanceof String){
 			return (String)v;
 		}
-		throw new TypeError();
+		throw new TypeException(v.getClass());
 	}
 
 	
@@ -85,7 +89,7 @@ public class RepositoryFieldInput extends BaseInput<String> implements ListInput
 
 	
 
-	public String setValue(String v) throws TypeError {
+	public String setValue(String v){
 		String old = getValue();
 		item=res.getInfo(v);
 		return old;
@@ -113,6 +117,11 @@ public class RepositoryFieldInput extends BaseInput<String> implements ListInput
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#validate()
 	 */
+	@Override
+	public void setNull() {
+		item=null;
+		
+	}
 	
 
 }

@@ -171,7 +171,7 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 		}
 		
 		BoundedDateInput input = fac.getDateInput();
-		input.setValue(def);
+		input.setDate(def);
 		input.setMin(min_date);
 		input.setMax(max_date);
 		f.addInput(MoveDateTransition.DATE_FIELD, label, input);

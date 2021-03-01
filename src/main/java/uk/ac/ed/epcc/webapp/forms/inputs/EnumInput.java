@@ -113,9 +113,13 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
 	@Override
 	public void setItem(E v) {
 		if( v == null ){
-			setValue(null);
+			setNull();
 		}
-		setValue(getTagByItem(v));
+		try {
+			setValue(getTagByItem(v));
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 	}
 	
 	@Override
@@ -127,7 +131,7 @@ public class EnumInput<E extends Enum<E>> extends TextInput implements  ListInpu
 	}
 	@SuppressWarnings("unchecked")
 	@Override
-	public String convert(Object v) throws TypeError {
+	public String convert(Object v) throws TypeException {
 		if( v == null ){
 			return null;
 		}

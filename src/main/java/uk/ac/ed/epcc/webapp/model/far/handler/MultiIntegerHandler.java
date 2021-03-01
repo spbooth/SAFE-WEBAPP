@@ -9,6 +9,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseDataManager;
 import uk.ac.ed.epcc.webapp.model.far.response.StringDataManager;
 
@@ -24,11 +25,14 @@ public class MultiIntegerHandler implements QuestionFormHandler<MultiInput> {
 		 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#convert(java.lang.Object)
 		 */
 		@Override
-		public String convert(Object v) throws TypeError {
+		public String convert(Object v) throws TypeException {
+			if( v == null) {
+				return null;
+			}
 			if( v instanceof String){
 				return (String) v;
 			}
-			throw new TypeError("Unsupported conversion");
+			throw new TypeException(v.getClass());
 		}
 
 		/* (non-Javadoc)
@@ -56,7 +60,7 @@ public class MultiIntegerHandler implements QuestionFormHandler<MultiInput> {
 		 * @see uk.ac.ed.epcc.webapp.forms.inputs.MultiInput#setValue(java.lang.Object)
 		 */
 		@Override
-		public String setValue(String v) throws TypeError {
+		public String setValue(String v) throws TypeException {
 			String old = getValue();
 			Iterator<Input<Integer>> it = getInputs();
 			if( v != null ){
@@ -64,13 +68,13 @@ public class MultiIntegerHandler implements QuestionFormHandler<MultiInput> {
 					if( it.hasNext()){
 						Input<Integer> input = it.next();
 						try{
-						Integer value = Integer.valueOf(s);
-						input.setValue(value);
+							Integer value = Integer.valueOf(s);
+							input.setValue(value);
 						}catch(NumberFormatException e){
-							throw new TypeError("Not an integer", e);
+							throw new TypeException("Not an integer", e);
 						}
 					}else{
-						throw new TypeError("Too many fields");
+						throw new TypeException("Too many fields");
 					}
 				}
 			}

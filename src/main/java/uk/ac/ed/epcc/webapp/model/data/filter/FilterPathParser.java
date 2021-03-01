@@ -20,6 +20,7 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLCombineFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
@@ -90,7 +91,11 @@ public class FilterPathParser<T extends DataObject> {
 						((ParseInput)i).parse(value);
 						obj = i.getValue();
 					}else{
-						obj = i.convert(value);
+						try {
+							obj = i.convert(value);
+						} catch (TypeException e) {
+							throw new ParseException("Cannot convert value", e);
+						}
 					}
 				}
 				if( matchers != null && matchers.containsKey(name)){

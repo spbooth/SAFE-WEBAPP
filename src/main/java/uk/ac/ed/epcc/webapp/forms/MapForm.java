@@ -37,6 +37,8 @@ import uk.ac.ed.epcc.webapp.forms.inputs.ParseInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseMapInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseMultiInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.PasswordInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnmodifiableInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -328,7 +330,11 @@ public class MapForm extends BaseForm {
 				// so html usually does not set skip_null
 				// however in the command line form it is generally better to 
 				// use the default values where they exist
-				input.setValue(input.convert(data));
+				try {
+					input.setValue(input.convert(data));
+				} catch (TypeException e) {
+					throw new ParseException("Illegal type conversion", e);
+				}
 				return true;
 			}
 			return false;

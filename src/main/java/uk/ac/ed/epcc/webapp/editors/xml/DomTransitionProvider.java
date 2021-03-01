@@ -194,7 +194,7 @@ public class DomTransitionProvider extends AbstractViewPathTransitionProvider<XM
 			if( value != null && value.length() > 8){
 				input.setBoxWidth(value.length());
 			}
-			input.setValue(value);
+			input.setText(value);
 			if( n.getNodeType() == Node.ATTRIBUTE_NODE){
 				input.setSingle(true);
 			}

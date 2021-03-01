@@ -43,7 +43,7 @@ public class ErrorInput<T> implements UnmodifiableInput, Input<T> {
 		return text;
 	}
 	@Override
-	public T convert(Object v) throws TypeError {
+	public T convert(Object v) {
 		return null;
 	}
 	@Override
@@ -67,7 +67,7 @@ public class ErrorInput<T> implements UnmodifiableInput, Input<T> {
 		this.key=key;
 	}
 	@Override
-	public T setValue(T v) throws TypeError {
+	public T setValue(T v) {
 		return null;
 	}
 	@Override
@@ -95,6 +95,11 @@ public class ErrorInput<T> implements UnmodifiableInput, Input<T> {
 	 */
 	@Override
 	public void removeValidator(FieldValidator<T> val) {
+		
+	}
+	@Override
+	public void setNull() {
+		
 		
 	}
 

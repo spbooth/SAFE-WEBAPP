@@ -40,6 +40,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterConverter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.NoSQLFilterException;
@@ -214,42 +215,42 @@ ListInputInterfaceTest
    
    @SuppressWarnings("unchecked")
    @Test
-   public void testBuildForm() throws DataFault, FieldException{
+   public void testBuildForm() throws DataFault, FieldException, TypeException{
 	   DataObjectFactory<O> f = getFactory();
 	   if( f.isValid()){
-	   for(Iterator<O> it = f.new FilterIterator(null,0,64); it.hasNext();){
-		   O o =  it.next();
-		   //System.out.println(o.getIdentifier());
-		   Form form = new HTMLForm(f.getContext());
-		   DataObjectFormFactory.buildForm(f.getContext(),f.res,form,f.getSupress(),f.getOptional(),f.getSelectors(),f.getTranslations(),f.getFieldHelp());
-		   Map h = o.getMap();
-		   form.setContents(h);
-		   form.validate();
-		   Map m = form.getContents();
-		 
-		   for(Iterator it2 = m.keySet().iterator();it2.hasNext();){
-			   String key = (String) it2.next();
-			   Input i = form.getInput(key);
-			   //System.out.println(key);
-			   Object v = h.get(key);
-			Object dat_value = i.convert(v);
-			   Object form_value = m.get(key);
-			   // map to strings as some inputs handle null in a special fashion
-			   String expect = i.getString(dat_value);
-			String string = i.getString(form_value);
-			if( ! string.equals(expect)){
-				assertEquals(expect, string);
-			}
-			   if( dat_value != null ){
-				   assertEquals(dat_value, form_value);
+		   for(Iterator<O> it = f.new FilterIterator(null,0,64); it.hasNext();){
+			   O o =  it.next();
+			   //System.out.println(o.getIdentifier());
+			   Form form = new HTMLForm(f.getContext());
+			   DataObjectFormFactory.buildForm(f.getContext(),f.res,form,f.getSupress(),f.getOptional(),f.getSelectors(),f.getTranslations(),f.getFieldHelp());
+			   Map h = o.getMap();
+			   form.setContents(h);
+			   form.validate();
+			   Map m = form.getContents();
+
+			   for(Iterator it2 = m.keySet().iterator();it2.hasNext();){
+				   String key = (String) it2.next();
+				   Input i = form.getInput(key);
+				   //System.out.println(key);
+				   Object v = h.get(key);
+				   Object dat_value = i.convert(v);
+				   Object form_value = m.get(key);
+				   // map to strings as some inputs handle null in a special fashion
+				   String expect = i.getString(dat_value);
+				   String string = i.getString(form_value);
+				   if( ! string.equals(expect)){
+					   assertEquals(expect, string);
+				   }
+				   if( dat_value != null ){
+					   assertEquals(dat_value, form_value);
+				   }
 			   }
+			   o.release();
+			   m.clear();
+			   h.clear();
+			   //form.clear();
+			   // assertTrue(o.getHashtable().equals(form.getContents()));
 		   }
-		   o.release();
-		   m.clear();
-		   h.clear();
-		   //form.clear();
-		  // assertTrue(o.getHashtable().equals(form.getContents()));
-	   }
 	   }
    }
    
@@ -347,7 +348,7 @@ public Set<Integer> getBadData() throws Exception{
 
 	@Override
 	@Test
-	public final void testGood() throws TypeError, Exception {
+	public final void testGood() throws  Exception {
 		input_test.testGood();
 		
 	}

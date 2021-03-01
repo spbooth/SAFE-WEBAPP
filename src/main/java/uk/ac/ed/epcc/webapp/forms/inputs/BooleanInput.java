@@ -37,7 +37,7 @@ public class BooleanInput extends AbstractInput<Boolean> implements ParseInput<B
 	}
 
 	@Override
-	public Boolean convert(Object v) throws TypeError {
+	public Boolean convert(Object v) {
 		if( v instanceof String ){
 		    return Boolean.valueOf((String) v);
 		}
@@ -76,7 +76,12 @@ public class BooleanInput extends AbstractInput<Boolean> implements ParseInput<B
 
 	@Override
 	public void setChecked(boolean value) {
-		setValue(value);
+		try {
+			setValue(value);
+		} catch (TypeException e) {
+			// should never happen but just in case
+			throw new TypeError(e);
+		}
 	}
 
 	@Override

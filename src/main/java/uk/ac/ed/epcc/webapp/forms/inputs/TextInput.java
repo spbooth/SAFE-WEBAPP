@@ -75,7 +75,13 @@ public class TextInput extends ParseAbstractInput<String> {
 	public void setTrim(boolean trim) {
 		this.trim = trim;
 	}
-
+	public void setText(String s) {
+		try {
+			setValue(s);
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
+	}
 
 	@Override
 	public boolean isEmpty() {

@@ -126,7 +126,7 @@ public abstract class MultiInput<V,I extends Input> extends BaseInput<V> impleme
 		}
 	}
 	@Override
-	public abstract V setValue(V v) throws TypeError;
+	public abstract V setValue(V v) throws TypeException;
 	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitMultiInput(this);
@@ -180,5 +180,11 @@ public abstract class MultiInput<V,I extends Input> extends BaseInput<V> impleme
 	}
 	public void setLineBreaks(boolean line_breaks) {
 		this.line_breaks = line_breaks;
+	}
+	@Override
+	public void setNull() {
+		for( I i : m.values()) {
+			i.setNull();
+		}
 	}
 }

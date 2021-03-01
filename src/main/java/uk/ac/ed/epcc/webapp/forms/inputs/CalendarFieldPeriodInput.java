@@ -78,26 +78,26 @@ public class CalendarFieldPeriodInput extends MultiInput<CalendarFieldSplitPerio
 		cal.set(Calendar.DAY_OF_MONTH, 1);
 		cal.add(Calendar.MONTH, -1);
 		start = date_input;
-		start.setValue(cal.getTime());
+		start.setDate(cal.getTime());
 		IntegerInput bare = new IntegerInput();
 		bare.setMin(1);
 		bare.setBoxWidth(2);
 		bare.setMaxResultLength(3);
 		if( fixed_blocks <= 0 ){
-			bare.setValue(1);
+			bare.setInteger(1);
 			count=bare;
 		}else{
-			bare.setValue(fixed_blocks);
+			bare.setInteger(fixed_blocks);
 			count = new LockedInput<>(bare);
 		}
 		field = new CalendarFieldInput(finest_field);
-		field.setValue(finest_field > Calendar.MONTH? Calendar.MONTH : finest_field);
+		field.setInteger(finest_field > Calendar.MONTH? Calendar.MONTH : finest_field);
 		splits = new IntegerInput();
 		splits.setMin(1);
 		splits.setBoxWidth(2);
 		splits.setMaxResultLength(3);
 		splits.setMax(RegularPeriodInput.PERIOD_INPUT_MAX_SPLITS);
-		splits.setValue(1);
+		splits.setInteger(1);
 		addInput("start", "From ", start);
 		
 		addInput("splits"," for " ,splits);
@@ -105,7 +105,11 @@ public class CalendarFieldPeriodInput extends MultiInput<CalendarFieldSplitPerio
 		addInput("field", field);
 	}
 	public void setStartTime(Calendar c){
-		start.setValue(c.getTime());
+		try {
+			start.setValue(c.getTime());
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 	}
 	public Calendar getStartTime(){
 		Date d = start.getValue();
@@ -117,32 +121,36 @@ public class CalendarFieldPeriodInput extends MultiInput<CalendarFieldSplitPerio
 		return c;
 	}
 	public void setBlockField(int f){
-		field.setValue(f);
+		field.setInteger(f);
 	}
 	public int getBlockField(){
 		return field.getValue();
 	}
 	public void setSplitCount(int count){
-		splits.setValue(count);
+		splits.setInteger(count);
 	}
 	public int getSplitCount(){
 		return splits.getValue();
 	}
 	public void setBlockCount(int n){
-		count.setValue(n);
+		try {
+			count.setValue(n);
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 	}
 	public int getBlockCount(){
 		return count.getValue();
 	}
 	@Override
-	public CalendarFieldSplitPeriod convert(Object v) throws TypeError {
+	public CalendarFieldSplitPeriod convert(Object v) throws TypeException {
 		if( v == null ){
 			return null;
 		}
 		if( v instanceof CalendarFieldSplitPeriod){
 			return ((CalendarFieldSplitPeriod)v);
 		}
-		throw new TypeError(v.getClass());
+		throw new TypeException(v.getClass());
 	}
 
 	@Override
@@ -160,7 +168,7 @@ public class CalendarFieldPeriodInput extends MultiInput<CalendarFieldSplitPerio
 	}
 
 	@Override
-	public CalendarFieldSplitPeriod setValue(CalendarFieldSplitPeriod v) throws TypeError {
+	public CalendarFieldSplitPeriod setValue(CalendarFieldSplitPeriod v) throws TypeException {
 		CalendarFieldSplitPeriod old = getValue();
 		start.setValue(v.getStart());
 		field.setValue(v.getField());

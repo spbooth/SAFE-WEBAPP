@@ -27,6 +27,8 @@ import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.PreSelectInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.model.data.convert.EnumeratingTypeConverter;
 
 
@@ -125,7 +127,11 @@ public class TypeProducerInput<T> extends TextInput implements PreSelectInput<St
 
 	@Override
 	public void setItem(T item) {
-		setValue(getTagByItem(item));
+		try {
+			setValue(getTagByItem(item));
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 	}
 	@Override
 	public String getPrettyString(String val) {

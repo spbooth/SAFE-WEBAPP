@@ -101,7 +101,7 @@ public class MonthInput extends ParseAbstractInput<Date> implements FormatHintIn
 	}
 
 	@Override
-	public Date convert(Object v) throws TypeError {
+	public Date convert(Object v) throws TypeException {
 		if( v instanceof Date || v == null){
 		   return (Date) v;
 		}
@@ -112,10 +112,10 @@ public class MonthInput extends ParseAbstractInput<Date> implements FormatHintIn
 			try {
 				return df.parse((String)v);
 			} catch (java.text.ParseException e) {
-					throw new TypeError("Bad date format "+v);
+					throw new TypeException("Bad date format "+v);
 			}
 		}
-		throw new TypeError(v.getClass());
+		throw new TypeException(v.getClass());
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input#getType()

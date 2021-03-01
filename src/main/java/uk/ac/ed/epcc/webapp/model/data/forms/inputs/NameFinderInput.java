@@ -11,6 +11,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.AutoComplete;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -114,9 +115,13 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	@Override
 	public void setItem(T item) {
 		if( item == null){
-			setValue(null);
+			setNull();
 		}else{
-			setValue(item.getID());
+			try {
+				setValue(item.getID());
+			} catch (TypeException e) {
+				throw new TypeError(e);
+			}
 		}
 	}
 	@Override
@@ -175,7 +180,7 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AbstractInput#convert(java.lang.Object)
 	 */
 	@Override
-	public Integer convert(Object v) throws TypeError {
+	public Integer convert(Object v) throws TypeException {
 		if( v == null) {
 			return null;
 		}
@@ -183,14 +188,14 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 			if( factory.isMine(v)){
 				return Integer.valueOf(((T)v).getID());
 			}else{
-				throw new TypeError("DataObject "+v.getClass().getCanonicalName()+" passed to "+getClass().getCanonicalName());
+				throw new TypeException("DataObject "+v.getClass().getCanonicalName()+" passed to "+getClass().getCanonicalName());
 			}
 		}
 		if( v instanceof IndexedReference ){
 			if( factory.isMyReference((IndexedReference) v)){
 				return Integer.valueOf(((IndexedReference)v).getID());
 			}else{
-				throw new TypeError("IndexedReference "+v.toString()+" passed to "+getClass().getCanonicalName());
+				throw new TypeException("IndexedReference "+v.toString()+" passed to "+getClass().getCanonicalName());
 			}
 		}
 		if( v instanceof Number) {

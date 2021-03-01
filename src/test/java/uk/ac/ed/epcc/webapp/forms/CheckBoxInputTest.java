@@ -193,7 +193,7 @@ ParseInputInterfaceTest<String, CheckBoxInput, CheckBoxInputTest>
 	 */
 	@Override
 	@Test
-	public void testGood() throws TypeError, Exception {
+	public void testGood() throws  Exception {
 		input_test.testGood();
 		
 	}

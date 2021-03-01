@@ -17,7 +17,6 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 
 
@@ -30,6 +29,13 @@ public class IntegerInput extends NumberInput<Integer> {
 		setStep(1);
 	}
 
+	public Integer setInteger(int i) {
+		try {
+			return setValue(i);
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
+	}
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -69,7 +75,7 @@ public class IntegerInput extends NumberInput<Integer> {
 
 	}
 	@Override
-	public Integer convert(Object v) throws TypeError {
+	public Integer convert(Object v) throws TypeException {
 		if( v == null || v instanceof Integer){
 			return (Integer) v;
 		}
@@ -79,6 +85,6 @@ public class IntegerInput extends NumberInput<Integer> {
 		if( v instanceof String){
 			return new Integer((String)v);
 		}
-		throw new TypeError("Invalid type "+v.getClass().getCanonicalName()+" passed to IntegerInput");
+		throw new TypeException("Invalid type "+v.getClass().getCanonicalName()+" passed to IntegerInput");
 	}
 }

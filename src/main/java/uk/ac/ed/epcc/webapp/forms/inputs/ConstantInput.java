@@ -28,11 +28,16 @@ public class ConstantInput<V> extends AbstractInput<V> implements UnmodifiableIn
 	private String label;
 
 	public ConstantInput(String label){
-		this(label,null);
+		this.label=label;
+		setNull();
 	}
 	public ConstantInput(String label,V value) {
 		this.label = label;
-		setValue(value);
+		try {
+			setValue(value);
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 	}
 
 	@Override

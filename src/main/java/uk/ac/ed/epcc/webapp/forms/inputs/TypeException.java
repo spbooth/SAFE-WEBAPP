@@ -1,4 +1,4 @@
-//| Copyright - The University of Edinburgh 2015                            |
+//| Copyright - The University of Edinburgh 2011                            |
 //|                                                                         |
 //| Licensed under the Apache License, Version 2.0 (the "License");         |
 //| you may not use this file except in compliance with the License.        |
@@ -12,33 +12,35 @@
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
 /*******************************************************************************
- * Copyright (c) - The Univeristy of Edinburgh 2010
+ * Copyright (c) - The University of Edinburgh 2010
  *******************************************************************************/
-package uk.ac.ed.epcc.webapp.forms;
+package uk.ac.ed.epcc.webapp.forms.inputs;
+/** Error thrown if the value passed to an input has no defined 
+ * convertion to the expected type.
+ * 
+ * @author spb
+ *
+ */
 
-import org.junit.Test;
 
-import uk.ac.ed.epcc.webapp.ContextHolder;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+public class TypeException extends Exception {
 
+	public TypeException() {
+	}
 
-public interface InputInterfaceTest<T,I extends Input<T>,X extends TestDataProvider<T,I>&ContextHolder>  {
+	public TypeException(String message) {
+		super(message);
+	}
+	public TypeException(Class t){
+		super("Cannot convert type "+t.getCanonicalName());
+	}
 
-	@Test
-	public void testGetKey() throws Exception;
-	@Test
-	public void testMakeHtml() throws Exception;
-	
-	@Test
-	public void testMakeSwing() throws Exception;
-	@Test
-    public void testGood() throws Exception;
-	@Test
-    public void testBad() throws Exception;
-   
-    
-    @Test
-    public void testGetString() throws Exception;
+	public TypeException(Throwable cause) {
+		super(cause);
+	}
+
+	public TypeException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 }

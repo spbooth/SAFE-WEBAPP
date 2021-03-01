@@ -63,7 +63,7 @@ public abstract class WrappingInput<V> implements Input<V> {
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#setValue(java.lang.Object)
 	 */
 	@Override
-	public V setValue(V v) throws TypeError {
+	public V setValue(V v) throws TypeException {
 		return nested.setValue(v);
 	}
 
@@ -71,7 +71,7 @@ public abstract class WrappingInput<V> implements Input<V> {
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#convert(java.lang.Object)
 	 */
 	@Override
-	public V convert(Object v) throws TypeError {
+	public V convert(Object v) throws TypeException {
 		return nested.convert(v);
 	}
 
@@ -120,4 +120,8 @@ public abstract class WrappingInput<V> implements Input<V> {
 		
 	}
 
+	@Override
+	public void setNull() {
+		nested.setNull();
+	}
 }

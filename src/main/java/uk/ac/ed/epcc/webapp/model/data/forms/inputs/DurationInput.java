@@ -25,8 +25,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.ElapsedSecondInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TagInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.model.data.Duration;
 /** Input for a {@link Duration} in  HH:mm::ss format.
  *  @see ElapsedSecondInput
@@ -108,7 +107,7 @@ public class DurationInput extends ParseAbstractInput<Duration> implements Forma
 		return "HH:MM:SS";
 	}
 	@Override
-	public Duration convert(Object v) throws TypeError {
+	public Duration convert(Object v) throws TypeException {
 		if( v == null ){
 			return null;
 		}
@@ -118,7 +117,7 @@ public class DurationInput extends ParseAbstractInput<Duration> implements Forma
 		if( v instanceof Number){
 			return new Duration((Number)v,resolution);
 		}
-		throw new TypeError(v.getClass());
+		throw new TypeException(v.getClass());
 	}
 
 }

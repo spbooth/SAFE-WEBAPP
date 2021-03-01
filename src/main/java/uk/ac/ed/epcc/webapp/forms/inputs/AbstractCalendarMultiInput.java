@@ -167,8 +167,8 @@ public abstract class AbstractCalendarMultiInput extends MultiInput<Date, Input<
 		}
 		return in;
 	}
-    protected abstract void setNull();
-	protected void setInputsFromCalendar(Calendar in) throws TypeError {
+   
+	protected void setInputsFromCalendar(Calendar in) throws TypeException {
 		if( in == null ){
 			if( sec_input != null){
 				sec_input.setValue(null);

@@ -94,7 +94,7 @@ public class FileInput extends AbstractInput<StreamData> {
 		return ( value == null || value.getLength() == 0L);
 	}
 	@Override
-	public StreamData convert(Object v) throws TypeError {
+	public StreamData convert(Object v) throws TypeException {
 		if( v == null ) {
 			return null;
 		}
@@ -105,9 +105,9 @@ public class FileInput extends AbstractInput<StreamData> {
 			try {
 				return new ByteArrayStreamData((byte[]) v);
 			} catch (DataFault e) {
-				throw new TypeError("Error converting byte array", e);
+				throw new TypeException("Error converting byte array", e);
 			}
 		}
-		throw new TypeError("Invalid conversion "+v.getClass().getCanonicalName());
+		throw new TypeException("Invalid conversion "+v.getClass().getCanonicalName());
 	}
 }

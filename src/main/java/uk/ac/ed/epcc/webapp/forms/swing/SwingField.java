@@ -62,6 +62,8 @@ import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseMultiInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.PasswordInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnmodifiableInput;
 import uk.ac.ed.epcc.webapp.model.data.stream.FileStreamData;
 
@@ -119,11 +121,11 @@ public class SwingField<I>  {
 			clearError();
 			if (e.getStateChange() == ItemEvent.SELECTED) {
 				
-				input.setValue(true);
+				input.setChecked(true);
 			}
 			if (e.getStateChange() == ItemEvent.DESELECTED) {
 				
-				input.setValue(false);
+				input.setChecked(false);
 			}
 
 		}
@@ -244,7 +246,11 @@ public class SwingField<I>  {
 				JFileChooser chooser = SwingFormComponentListener.getChooser(conn);
 				int ret = chooser.showOpenDialog(parent);
 				if( ret == JFileChooser.APPROVE_OPTION){
-					input.setValue(new FileStreamData(conn,chooser.getSelectedFile()));
+					try {
+						input.setValue(new FileStreamData(conn,chooser.getSelectedFile()));
+					} catch (TypeException e) {
+						throw new TypeError(e);
+					}
 				}
 			}
 			

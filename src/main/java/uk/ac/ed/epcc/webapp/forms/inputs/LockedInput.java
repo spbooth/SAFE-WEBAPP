@@ -49,7 +49,7 @@ public class LockedInput<V> extends WrappingInput<V> implements UnmodifiableInpu
 	}
 
 	@Override
-	public V setValue(V v) throws TypeError {
+	public V setValue(V v) {
 		// non modifyable
 		// for multi stage update forms we need to be able to call form setContents
 		// without the value being updated.

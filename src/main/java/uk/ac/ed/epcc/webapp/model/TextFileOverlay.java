@@ -43,6 +43,8 @@ import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdate;
 import uk.ac.ed.epcc.webapp.forms.inputs.InfoInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
@@ -522,7 +524,11 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
             }
 			f.addInput(getUniqueIdName(), label, i);
 			if (dat != null && isMine(dat)) {
-			    i.setValue(new Integer(dat.getID()));
+			    try {
+					i.setValue(new Integer(dat.getID()));
+				} catch (TypeException e) {
+					throw new TypeError(e);
+				}
 			}
 		}
 
@@ -565,7 +571,11 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			f.addInput("Location", "Location",new InfoInput(location));
 			Map<String,Selector> sel = getSelectors();
 			Input<String> text = (Input<String>) sel.get(TEXT).getInput();
-			text.setValue(dat.getData());
+			try {
+				text.setValue(dat.getData());
+			} catch (TypeException e) {
+				throw new TypeError(e);
+			}
 		
 			f.addInput(TEXT, TEXT, text);
 			f.addAction("Update", new TextFileUpdateAction(type_name,dat));

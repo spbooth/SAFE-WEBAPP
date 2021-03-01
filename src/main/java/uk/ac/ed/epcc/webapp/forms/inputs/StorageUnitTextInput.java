@@ -57,7 +57,7 @@ public class StorageUnitTextInput extends NumberInput<Long> implements FormatHin
 
 
 	@Override
-	public Long convert(Object v) throws TypeError {
+	public Long convert(Object v) throws TypeException {
 		if( v == null ) {
 			return null;
 		}
@@ -65,13 +65,13 @@ public class StorageUnitTextInput extends NumberInput<Long> implements FormatHin
 			try {
 				return (Long) nf.parse((String)v);
 			} catch (java.text.ParseException e) {
-				throw new TypeError(e);
+				throw new TypeException(e);
 			}
 		}
 		if( v instanceof Number ) {
 			return Long.valueOf(((Number)v).longValue());
 		}
-		throw new TypeError("Type "+v.getClass().getCanonicalName()+" not convertable to Long");
+		throw new TypeException("Type "+v.getClass().getCanonicalName()+" not convertable to Long");
 	}
 
 

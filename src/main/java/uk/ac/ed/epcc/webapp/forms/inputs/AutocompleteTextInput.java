@@ -58,7 +58,11 @@ public abstract class AutocompleteTextInput<T> extends TextInput implements Item
 	 */
 	@Override
 	public void setItem(T item) {
-		setValue(getValue(item));
+		try {
+			setValue(getValue(item));
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 		
 	}
 }

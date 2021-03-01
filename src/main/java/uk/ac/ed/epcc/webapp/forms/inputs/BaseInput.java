@@ -57,11 +57,7 @@ public abstract class BaseInput<V> implements Input<V> {
 		this.key = key;
 	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public V convert(Object v) throws TypeError {
-		return (V) v;
-	}
+	
 
 	
 	/**

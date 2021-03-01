@@ -35,6 +35,8 @@ import uk.ac.ed.epcc.webapp.forms.inputs.NameInputProvider;
 import uk.ac.ed.epcc.webapp.forms.inputs.NoHtmlInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.NoSpaceFieldValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnusedNameInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
@@ -254,6 +256,8 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		public boolean isValid(T item) {
 			return matches(fil,item);
 		}
+
+		
 	}
 	/** An {@link DataObjectItemInput} that uses the {@link ParseFactory#findFromString(String)} method to locate
 	 * 
@@ -276,10 +280,15 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		@Override
 		public void setItem(T item) {
 			if( item == null ){
-				setValue(null);
+				setNull();
 				return;
 			}
-			setValue(item.getID());
+			try {
+				setValue(item.getID());
+			} catch (TypeException e) {
+				// should never happend
+				throw new TypeError(e);
+			}
 			
 		}
 
@@ -289,7 +298,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		@Override
 		public void parse(String v) throws ParseException {
 			if( v == null || v.trim().length()==0){
-				setValue(null);
+				setNull();
 				return;
 			}
 			setItem(findFromString(v));

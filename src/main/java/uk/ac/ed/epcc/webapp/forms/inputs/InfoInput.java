@@ -36,7 +36,7 @@ public class InfoInput implements Input<String>, UnmodifiableInput{
     	label=text;
     }
 	@Override
-	public String convert(Object v) throws TypeError {
+	public String convert(Object v)  {
 		return null;
 	}
 
@@ -66,7 +66,7 @@ public class InfoInput implements Input<String>, UnmodifiableInput{
 	}
 
 	@Override
-	public String setValue(String v) throws TypeError {
+	public String setValue(String v) {
 		return label;
 	}
 
@@ -95,6 +95,10 @@ public class InfoInput implements Input<String>, UnmodifiableInput{
 	 */
 	@Override
 	public void removeValidator(FieldValidator<String> val) {
+		
+	}
+	@Override
+	public void setNull() {
 		
 	}
 }

@@ -55,6 +55,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.PreSelectInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -273,15 +274,20 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
         @Override
 		public void setItem(BDO o) {
             if (o == null) {
-                setValue(null);
+                setNull();
             } else {
-                setValue(new Integer(o.getID()));
+            	
+                try {
+					setValue(new Integer(o.getID()));
+				} catch (TypeException e) {
+					throw new TypeError(e);
+				}
             }
         }
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public final Integer convert(Object v) throws TypeError {
+		public final Integer convert(Object v) throws TypeException {
 			if( v == null ){
 				return null;
 			}
@@ -289,14 +295,14 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				if( isMine(v)){
 					return Integer.valueOf(((BDO)v).getID());
 				}else{
-					throw new TypeError("DataObject "+v.getClass().getCanonicalName()+" passed to "+getClass().getCanonicalName());
+					throw new TypeException("DataObject "+v.getClass().getCanonicalName()+" passed to "+getClass().getCanonicalName());
 				}
 			}
 			if( v instanceof IndexedReference ){
 				if( isMyReference((IndexedReference) v)){
 					return Integer.valueOf(((IndexedReference)v).getID());
 				}else{
-					throw new TypeError("IndexedReference "+v.toString()+" passed to "+getClass().getCanonicalName());
+					throw new TypeException("IndexedReference "+v.toString()+" passed to "+getClass().getCanonicalName());
 				}
 			}
 			return super.convert(v);

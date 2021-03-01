@@ -87,12 +87,12 @@ public class RadioButtonInput<V, T> implements ListInput<V, T>, ParseInput<V> {
 	}
 
 	@Override
-	public V setValue(V v) throws TypeError {
+	public V setValue(V v) throws TypeException {
 		return nested.setValue(v);
 	}
 
 	@Override
-	public V convert(Object v) throws TypeError {
+	public V convert(Object v) throws TypeException {
 		return nested.convert(v);
 	}
 
@@ -174,7 +174,11 @@ public class RadioButtonInput<V, T> implements ListInput<V, T>, ParseInput<V> {
 		if( nested instanceof ParseInput){
 			return ((ParseInput<V>)nested).parseValue(v);
 		}
-		return nested.convert(v);
+		try {
+			return nested.convert(v);
+		} catch (TypeException e) {
+			throw new ParseException(e);
+		}
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ListInput#isValid(java.lang.Object)
@@ -224,6 +228,11 @@ public class RadioButtonInput<V, T> implements ListInput<V, T>, ParseInput<V> {
 		} else if (!nested.equals(other.nested))
 			return false;
 		return true;
+	}
+	@Override
+	public void setNull() {
+		nested.setNull();
+		
 	}
 
 }

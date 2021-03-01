@@ -36,6 +36,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.CompositeInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ConstantInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
@@ -426,11 +427,11 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 
 		public void parse(String v) throws ParseException {
 			if (v == null) {
-				setValue(null);
+				setNull();
 				return;
 			}
 			if (v.trim().length() == 0) {
-				setValue(null);
+				setNull();
 				return;
 			}
 			try {
@@ -438,7 +439,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 
 				i = new Integer(Integer.parseInt(v.trim()));
 
-				setValue(i);
+				setNull();
 			} catch (NumberFormatException e) {
 				throw new ParseException("Invalid integer format");
 			}
@@ -449,12 +450,22 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		public void setItem(T l) {
 
 		
-			setValue(new Integer(l.getID()));
+			try {
+				setValue(new Integer(l.getID()));
+			} catch (TypeException e) {
+				// should never happen
+				throw new TypeError(e);
+			}
 
 		}
 
 		@Override
-		public Integer setValue(Integer v) throws TypeError {
+		public void setNull() {
+			super.setNull();
+			l=null;
+		}
+		@Override
+		public Integer setValue(Integer v) throws TypeException {
 			if( v == null ){
 				Integer old = getValue();
 				l = null;
@@ -479,17 +490,17 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			}
 			return old;
 			}
-			throw new TypeError("Unknown type pased to LinkInput");
+			throw new TypeException("Unknown type pased to LinkInput");
 		}
         @Override
-		public Integer convert(Object v){
+		public Integer convert(Object v) throws TypeException{
         	if( v == null || v instanceof Integer){
         		return (Integer) v;
         	}
         	if( v instanceof Number){
         		return new Integer(((Number)v).intValue());
         	}
-        	throw new TypeError("Unknown type pased to LinkInput");
+        	throw new TypeException("Unknown type pased to LinkInput");
         }
 		@Override
 		public void validateInner() throws FieldException {

@@ -34,6 +34,8 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.forms.inputs.WrappingInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -399,7 +401,11 @@ public class BaseForm implements Form {
 			throw new UnsupportedOperationException("Invalid field specified "
 					+ key + ":" + value);
 		}
-		return f.setValue(value);
+		try {
+			return f.setValue(value);
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 	}
 
 	/**
@@ -491,7 +497,12 @@ public class BaseForm implements Form {
     			Field f = getField(key);
     			Input i = f.getInput();
     			String label = f.getLabel();
-    			Object val = i.convert(m.get(key));
+    			Object val=null;
+				try {
+					val = i.convert(m.get(key));
+				} catch (TypeException e) {
+					log.error("Illegal convert in form diff",e);
+				}
 
     			Object my_val = i.getValue();
     			String my_text="null";

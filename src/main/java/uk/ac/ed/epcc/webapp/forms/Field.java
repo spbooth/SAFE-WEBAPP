@@ -25,6 +25,8 @@ import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.IsForcedVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.LockedInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnmodifiableInput;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
@@ -215,9 +217,12 @@ public final class Field<I> {
 	 * @param o
 	 *            Value to set
 	 * @return previous value
+	 * @throws TypeException
 	 */
-	public I setValue(Object o) {
+	public I setValue(Object o)  throws TypeException{
+		
 		return sel.setValue(sel.convert(o));
+		
 	}
 	
 	/**

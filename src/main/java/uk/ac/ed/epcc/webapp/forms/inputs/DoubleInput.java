@@ -24,7 +24,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 public class DoubleInput extends NumberInput<Double> {
 
 	@Override
-	public Double convert(Object v) throws TypeError {
+	public Double convert(Object v) throws TypeException {
 		if( v == null || v instanceof Double){
 			return  (Double) v;
 		}
@@ -35,10 +35,10 @@ public class DoubleInput extends NumberInput<Double> {
 			try {
 				return  parseValue((String) v);
 			} catch (ParseException e) {
-				throw new TypeError(e);
+				throw new TypeException(e);
 			}
 		}
-		throw new TypeError(v.getClass());
+		throw new TypeException(v.getClass());
 	}
 
 	public DoubleInput() {
@@ -91,4 +91,11 @@ public class DoubleInput extends NumberInput<Double> {
 		return val;
 	}
 	
+	public Double setDouble(Double d) {
+		try {
+			return setValue(d);
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
+	}
 }

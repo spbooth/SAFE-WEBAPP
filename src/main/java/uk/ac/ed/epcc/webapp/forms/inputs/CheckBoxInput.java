@@ -41,7 +41,7 @@ public class CheckBoxInput extends AbstractInput<String> implements ParseInput<S
 	public CheckBoxInput(String checked, String unchecked) {
 		this.checked_value = checked;
 		this.unchecked_value = unchecked;
-		setValue(unchecked);
+		value=unchecked;
 	}
 
 	@Override
@@ -77,13 +77,17 @@ public class CheckBoxInput extends AbstractInput<String> implements ParseInput<S
 	 */
 	@Override
 	public void setChecked(boolean value) {
-		setValue(getValue(value));
+		try {
+			setValue(getValue(value));
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 	}
 
 	
 
 	@Override
-	public String convert(Object o) throws TypeError{
+	public String convert(Object o) throws TypeException{
 		if( o == null ){
 			return getUnChecked();
 		}
@@ -94,7 +98,7 @@ public class CheckBoxInput extends AbstractInput<String> implements ParseInput<S
 		if( o instanceof Boolean){
 			return getValue(((Boolean)o).booleanValue());
 		}
-		throw new TypeError(o.getClass());
+		throw new TypeException(o.getClass());
 	}
 
 	
