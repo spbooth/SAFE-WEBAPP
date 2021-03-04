@@ -286,7 +286,7 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 			if( useEmailVerificationDate()) {
 				SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 				ExtendedXMLBuilder t = cb.getText();
-				t.addObject(new PreDefinedContent(op.getContext(), "verify_email"));
+				t.addObject(new PreDefinedContent(op.getContext(), "verify_email",new Object[] {getCanonicalName(target)}));
 				t.appendParent();
 				Date last = getVerificationDate(target);
 				if( last != null ) {
@@ -294,7 +294,13 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 					inner.addObject(new PreDefinedContent(op.getContext(), "email_last_verified",(Object)fmt.format(last)));
 					inner.appendParent();
 				}
-				if( warnVerify(target)) {
+				if( needVerify(target)) {
+					ContentBuilder panel = cb.getPanel("warn");
+					ExtendedXMLBuilder w = panel.getText();
+					w.addObject(new PreDefinedContent(op.getContext(), "fail_verify_email"));
+					w.appendParent();
+					panel.addParent();
+				}else if( warnVerify(target)) {
 					ContentBuilder panel = cb.getPanel("warn");
 					ExtendedXMLBuilder w = panel.getText();
 					w.addObject(new PreDefinedContent(op.getContext(), "warn_verify_email",(Object)fmt.format(needVerifyBy(target))));
