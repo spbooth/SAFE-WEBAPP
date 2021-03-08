@@ -87,7 +87,7 @@ public class PasswordChangeRequestServlet<A extends AppUser> extends WebappServl
 					builder.buildForm(form, user, conn);
 
 					if ( ! form.hasSubmitted(req) ){
-						showForm(req, serv, builder, form);
+						showForm(req, serv, builder, form,user);
 						return;
 					}
 					
@@ -100,7 +100,7 @@ public class PasswordChangeRequestServlet<A extends AppUser> extends WebappServl
 				    		return;
 				    	}
 				    	if( ! form.parsePost(req)) {
-				    		showForm(req, serv, builder, form);
+				    		showForm(req, serv, builder, form,user);
 							return;
 				    	}
 						
@@ -139,9 +139,10 @@ public class PasswordChangeRequestServlet<A extends AppUser> extends WebappServl
 	 * @throws IOException
 	 */
 	private void showForm(HttpServletRequest req, ServletService serv, PasswordUpdateFormBuilder<A> builder,
-			PageHTMLForm form) throws ServletException, IOException {
+			PageHTMLForm form,AppUser user) throws ServletException, IOException {
 		req.setAttribute("Form", form);
 		req.setAttribute("policy", builder.getPasswordPolicy());
+		req.setAttribute("User", user);
 		serv.forward("/scripts/password_change_request.jsp");
 	}
 

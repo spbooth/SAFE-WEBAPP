@@ -764,7 +764,21 @@ NamedFilterProvider<AU>
 	
 		return fil;
 	}
-	
+	/** Get a set of names that can be used to find the target via
+	 * {@link #findFromString(String)} or {@link #getStringFinderFilter(String)}
+	 * 
+	 * @param target
+	 * @return
+	 */
+	public Collection<String> getNames(AU target){
+		LinkedHashSet<String> result = new LinkedHashSet<String>();
+		for(  AppUserNameFinder<AU,?> finder : getRealms()){
+			if( finder.userVisible() ){
+				result.add(finder.getCanonicalName(target));
+			}
+		}
+		return result;
+	}
 	
 	/** Get a name where the String sort order matches the 
 	 * presentation order. If we change this we need to keep getIdentifier roughly consistent.

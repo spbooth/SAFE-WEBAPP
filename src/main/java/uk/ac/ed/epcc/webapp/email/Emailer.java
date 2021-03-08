@@ -208,6 +208,7 @@ public class Emailer {
 			return;
 		}
 		email_template.setProperty("person.email", email);
+		email_template.setProperty("person.loginnames", person.getFactory().getNames(person));
 		if( PASSWORD_RESET_SERVLET.isEnabled(ctx)){
 			PasswordChangeRequestFactory fac = new PasswordChangeRequestFactory(ctx.getService(SessionService.class).getLoginFactory());
 			PasswordChangeRequest request = fac.createRequest(person);
@@ -251,7 +252,7 @@ public class Emailer {
 		email_template.setProperty("person.email", person.getEmail());
 		email_template.setProperty("request.email", req.getEmail());
 		email_template.setProperty("request.tag", req.getTag());
-		
+		email_template.setProperty("person.loginnames", person.getFactory().getNames(person));
 
 		doSend(templateMessage(req.getEmail(), null, email_template));
 
@@ -296,6 +297,7 @@ public class Emailer {
 			return;
 		}
 		email_template.setProperty("person.email", email);
+		email_template.setProperty("person.loginnames", person.getFactory().getNames(person));
 		doSend(templateMessage(person,email_template));
 
 	}
@@ -397,6 +399,8 @@ public class Emailer {
 			return null;
 		}
 		email_template.setProperty("person.email", email);
+		email_template.setProperty("person.loginnames", person.getFactory().getNames(person));
+
 		MimeMessage m = templateMessage(person,email_template);
 		return m;
 	}
