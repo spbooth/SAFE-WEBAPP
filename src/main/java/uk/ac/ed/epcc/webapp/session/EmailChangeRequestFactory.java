@@ -182,7 +182,10 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractUserRe
 			field.addValidator(new ParseFactoryValidator<AppUser>(factory, user));
 			
 	    	f.addAction(REQUEST_ACTION, new RequestAction(user));
-	    	String email = user.getEmail();
+	    	String email = null;
+	    	if( user != null ) {
+	    		email=user.getEmail();
+	    	}
 	    	if( include_verify && email != null && ! email.isEmpty()) {
 	    		f.addAction(VERIFY_ACTION, new VerifyAction(user));
 	    	}
