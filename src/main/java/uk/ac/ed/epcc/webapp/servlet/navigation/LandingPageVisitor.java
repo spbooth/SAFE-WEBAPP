@@ -89,6 +89,10 @@ public class LandingPageVisitor implements Visitor{
 				if( display_class != null ){
 					builder.attr("class",display_class);
 				}
+				String help = node.getHelpText();
+				if( help != null && ! help.isEmpty()){
+					builder.attr("title",help);
+				}
 				if( targetPath != null ){
 
 					builder.open("a");
