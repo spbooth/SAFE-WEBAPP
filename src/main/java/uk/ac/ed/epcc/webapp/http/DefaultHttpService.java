@@ -91,7 +91,7 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 			data.read(connection.getInputStream());
 			return data;
 		} catch (Exception e) {
-			throw new HttpException(e);
+			throw new HttpException("Error GET from "+url,e);
 		}finally {
 			if( connection != null) {
 				connection.disconnect();
@@ -159,7 +159,7 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 			data.read(connection.getInputStream());
 			return data;
 		} catch (Exception e) {
-			throw new HttpException(e);
+			throw new HttpException("Exception POST to "+url,e);
 		}finally {
 			if( connection!= null) {
 				connection.disconnect();
