@@ -156,9 +156,12 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 
 	@Override
 	public AU makeFromString(String name) throws DataFault, ParseException {
-		AU user = ((AppUserFactory<AU>)getFactory()).makeUser();
-		setName(user, name);
-		user.commit();
+		AU user = findFromString(name);
+		if( user == null) {
+			user =	((AppUserFactory<AU>)getFactory()).makeUser();
+			setName(user, name);
+			user.commit();
+		}
 		return user;
 	}
 
