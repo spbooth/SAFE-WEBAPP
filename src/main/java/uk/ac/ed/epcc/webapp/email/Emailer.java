@@ -845,22 +845,27 @@ public class Emailer {
 		Set<InternetAddress> set = new LinkedHashSet<>();
 		if (force_email == null) {
 			for (int i = 0; i < notify_emails.length; i++) {
-				log.debug("Add recipient "+notify_emails[i]);
-				if (text_recip == null) {
-					text_recip = notify_emails[i];
-				} else {
-					text_recip += "," + notify_emails[i];
-				}
-				set.add(new InternetAddress(notify_emails[i]));
-				try{
-					// Hack to allow some emails to be automatically
-					// sent to two locations
-					String additional = conn.getInitParameter("email.alsoto."+notify_emails[i]);
-					if( additional != null ){
-						set.add(new InternetAddress(additional));
+				String email = notify_emails[i];
+				if( email == null || email.isEmpty()) {
+					log.error("Missing notify email");
+				}else {
+					log.debug("Add recipient "+email);
+					if (text_recip == null) {
+						text_recip = email;
+					} else {
+						text_recip += "," + email;
 					}
-				}catch(Exception t){
-					getLogger().error("Error in alsoto hack", t);
+					set.add(new InternetAddress(email));
+					try{
+						// Hack to allow some emails to be automatically
+						// sent to two locations
+						String additional = conn.getInitParameter("email.alsoto."+email);
+						if( additional != null ){
+							set.add(new InternetAddress(additional));
+						}
+					}catch(Exception t){
+						getLogger().error("Error in alsoto hack", t);
+					}
 				}
 			}
 		} else {

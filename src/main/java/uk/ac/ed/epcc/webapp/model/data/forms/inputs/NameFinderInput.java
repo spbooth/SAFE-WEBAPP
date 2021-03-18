@@ -29,11 +29,12 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  * @author spb
  *
  */
-public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>&NameFinder<T>> extends ParseAbstractInput<Integer> implements AutoComplete<T, Integer>, DataObjectItemInput<T>{
+public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>> extends ParseAbstractInput<Integer> implements AutoComplete<T, Integer>, DataObjectItemInput<T>{
 	/**
 	 * 
 	 */
 	protected final F factory;
+	protected final NameFinder<T> finder; // in most cases this will aslo be the factory but not always
 	
 	private String match_error = null;
 	/** create input
@@ -43,9 +44,10 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	 * @param autocomplete  suggestions/restrict filter
 	 * @param factory {@link DataObjectFactory} and {@link NameFinder}
 	 */
-	public NameFinderInput(F factory, boolean create, boolean restrict,BaseFilter<T> autocomplete) {
+	public NameFinderInput(F factory, NameFinder<T> finder,boolean create, boolean restrict,BaseFilter<T> autocomplete) {
 		super();
 		this.factory = factory;
+		this.finder = finder;
 		this.create = create;
 		this.restrict=restrict;
 		this.autocomplete = autocomplete;
@@ -80,10 +82,10 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 		try{
 			T target=null;
 			if( create){
-				factory.validateNameFormat(v);
-				target=factory.makeFromString(v);
+				finder.validateNameFormat(v);
+				target=finder.makeFromString(v);
 			}else{
-				target=factory.findFromString(v);
+				target=finder.findFromString(v);
 				
 			}
 			if(target == null) {
@@ -146,7 +148,7 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	}
 	@Override
 	public String getValue(T item) {
-		return factory.getCanonicalName(item);
+		return finder.getCanonicalName(item);
 	}
 	@Override
 	public String getSuggestionText(T item) {
@@ -160,7 +162,7 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	public String getString(Integer val) {
 		T p = this.factory.find(val);
 		if( p != null ){
-			return factory.getCanonicalName(p);
+			return finder.getCanonicalName(p);
 		}
 		return "";
 	}
@@ -210,7 +212,7 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 		if(v instanceof String  ) {
 			String name = (String)v;
 			if( ! name.trim().isEmpty()) {
-				T item = factory.findFromString(name);
+				T item = finder.findFromString(name);
 				if( item != null) {
 					return item.getID();
 				}

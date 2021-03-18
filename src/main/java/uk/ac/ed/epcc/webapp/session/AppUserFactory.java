@@ -653,9 +653,9 @@ NamedFilterProvider<AU>
 		 * @param restrict
 		 * @param autocomplete
 		 */
-		public AppUserNameInput(AppUserFactory<A> factory, boolean create, boolean restrict,
+		public AppUserNameInput(AppUserFactory<A> factory,NameFinder<A>finder, boolean create, boolean restrict,
 				BaseFilter<A> autocomplete) {
-			super(factory, create, restrict, autocomplete);
+			super(factory, finder,create, restrict, autocomplete);
 		}
 
 		/* (non-Javadoc)
@@ -673,11 +673,7 @@ NamedFilterProvider<AU>
 		 * @return
 		 */
 		public boolean useEmail() {
-			AppUserNameFinder default_finder = factory.getRealmFinder(factory.getDefaultRealm());
-			if( default_finder != null){
-				return default_finder instanceof EmailNameFinder;
-			}
-			return false;
+			return finder instanceof EmailNameFinder;
 		}
 
 		/* (non-Javadoc)
@@ -707,7 +703,7 @@ NamedFilterProvider<AU>
 	public DataObjectItemInput<AU> getInput() {
 		if( useAutoCompleteForSelect()) {
 			//return getNameInput(getFinalSelectFilter(),false, restrictDefaultInput() );
-			return getNameInput(getFinalSelectFilter(),false, restrictDefaultInput() );
+			return getNameInput(getFinalSelectFilter(),this,false, restrictDefaultInput() );
 		}
 		return super.getInput();
 	}
@@ -721,8 +717,8 @@ NamedFilterProvider<AU>
 		return AUTO_COMPLETE_APPUSER_INPUT.isEnabled(getContext());
 	}
 	
-	public final DataObjectItemInput<AU> getNameInput(BaseFilter<AU> fil,boolean create,boolean restrict){
-		return new AppUserNameInput<>(this, create, restrict, fil);
+	public final DataObjectItemInput<AU> getNameInput(BaseFilter<AU> fil,NameFinder<AU> finder,boolean create,boolean restrict){
+		return new AppUserNameInput<>(this, finder,create, restrict, fil);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.ParseFactory#getCanonicalName(java.lang.Object)

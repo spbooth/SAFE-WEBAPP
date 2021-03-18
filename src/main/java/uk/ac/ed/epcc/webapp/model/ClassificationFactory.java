@@ -513,7 +513,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		return object.getName();
 	}
 	public final DataObjectItemInput<T> getAutocompleteInput(BaseFilter<T> fil,boolean create,boolean restrict){
-		NameFinderInput<T, ClassificationFactory<T>> input = new NameFinderInput<>(this, create, restrict, fil);
+		NameFinderInput<T, ClassificationFactory<T>> input = new NameFinderInput<>(this, this,create, restrict, fil);
 		return input;
 	}
 	/* (non-Javadoc)
@@ -546,7 +546,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	@Override
 	public DataObjectItemInput<T> getInput(BaseFilter<T> fil, boolean restrict) {
 		if( useAutoCompleteInput(fil)) {
-			return new NameFinderInput<>(this, false, restrict, fil);
+			return new NameFinderInput<>(this,this, false, restrict, fil);
 		}
 		return super.getInput(fil,restrict);
 	}
