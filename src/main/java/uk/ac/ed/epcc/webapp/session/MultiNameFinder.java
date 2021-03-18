@@ -76,7 +76,7 @@ public class MultiNameFinder<AU extends AppUser, X extends MultiNameFinder> exte
 	 * @see uk.ac.ed.epcc.webapp.session.AppUserNameFinder#getStringFinderFilter(java.lang.Class, java.lang.String)
 	 */
 	@Override
-	public SQLFilter<AU> getStringFinderFilter(Class<? super AU> target, String name) {
+	public SQLFilter<AU> getStringFinderFilter(String name) {
 		MultiNameFactory<Name, AU> f;
 		try {
 			f = getNameFactory();
@@ -84,7 +84,7 @@ public class MultiNameFinder<AU extends AppUser, X extends MultiNameFinder> exte
 		} catch (Exception e) {
 			getLogger().error("Error getting filer", e);
 		}
-		return new FalseFilter<AU>((Class<AU>) target);
+		return new FalseFilter<AU>((Class<AU>) getFactory().getTarget());
 		
 	}
 

@@ -153,8 +153,7 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 	 * @see uk.ac.ed.epcc.webapp.session.AppUserNameFinder#getStringFinderFilter(java.lang.Class, java.lang.String)
 	 */
 	@Override
-	public SQLFilter<AU> getStringFinderFilter(Class<? super AU> target,
-			String name) {
+	public SQLFilter<AU> getStringFinderFilter(String name) {
 		return new SQLValueFilter<>(getFactory().getTarget(), getRepository(), EMAIL, name);
 	}
 
@@ -216,7 +215,7 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 	 * @see uk.ac.ed.epcc.webapp.session.AppUserNameFinder#validateName(java.lang.String)
 	 */
 	@Override
-	public void validateName(String name) throws ParseException {
+	public void validateNameFormat(String name) throws ParseException {
 		if( ! Emailer.checkAddress(name)){
 			throw new ParseException("Not a valid email address: "+name);
 		}

@@ -88,7 +88,7 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	 * @see uk.ac.ed.epcc.webapp.session.AppUserNameFinder#getStringFinderFilter(java.lang.Class, java.lang.String)
 	 */
 	@Override
-	public SQLFilter getStringFinderFilter(Class target, String name) {
+	public SQLFilter<AU> getStringFinderFilter(String name) {
 		return new SQLValueFilter<>(getFactory().getTarget(), getRepository(), getField(), normalizeName(name));
 	}
 

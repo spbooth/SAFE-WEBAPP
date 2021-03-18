@@ -287,7 +287,7 @@ NamedFilterProvider<AU>
 			return null;
 		}
 		try {
-		return find(finder.getStringFinderFilter(getTarget(), email),allow_null);
+		return find(finder.getStringFinderFilter( email),allow_null);
 		}catch(DataNotFoundException e) {
 			throw new DataNotFoundException("No AppUser found with email "+email,e);
 		}
@@ -703,7 +703,7 @@ NamedFilterProvider<AU>
 	public DataObjectItemInput<AU> getInput() {
 		if( useAutoCompleteForSelect()) {
 			//return getNameInput(getFinalSelectFilter(),false, restrictDefaultInput() );
-			return getNameInput(getFinalSelectFilter(),this,false, restrictDefaultInput() );
+			return getNameInput(getFinalSelectFilter(),getRealmFinder(getDefaultRealm()),false, restrictDefaultInput() );
 		}
 		return super.getInput();
 	}
@@ -754,7 +754,7 @@ NamedFilterProvider<AU>
 		SQLOrFilter<AU> fil = new SQLOrFilter<>(getTarget());
 		for(  AppUserNameFinder<AU,?> finder : getRealms()){
 			if( finder.userVisible() || ! require_user_supplied){
-				fil.addFilter(finder.getStringFinderFilter(getTarget(), name));
+				fil.addFilter(finder.getStringFinderFilter( name));
 			}
 		}
 	
@@ -809,7 +809,7 @@ NamedFilterProvider<AU>
 		if(default_finder == null){
 			return null;
 		}
-		default_finder.validateName(name);
+		default_finder.validateNameFormat(name);
 		result = makeUser();
 		if( result != null){
 			default_finder.setName(result, name);

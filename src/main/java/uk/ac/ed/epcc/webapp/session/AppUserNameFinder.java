@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.ParseFactory;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataCache;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 
 /** An {@link Composite} that implements the {@link NameFinder} logic for an {@link AppUserFactory}.
@@ -43,7 +44,9 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
  *
  */
 
-public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNameFinder> extends AppUserComposite<AU, X> implements ParseFactory<AU>{
+public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNameFinder> extends AppUserComposite<AU, X> implements NameFinder<AU>{
+	
+
 	private final String realm;
 	/**
 	 * @param factory {@link AppUserFactory} we are adding finder to.
@@ -77,14 +80,7 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 	public final String getRealm(){
 		return realm;
 	}
-	/** get a filter than locates the target object from a String.
-	 * 
-	 * This should use the same logic as {@link #findFromString(String)}
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public abstract SQLFilter<AU> getStringFinderFilter(Class<? super AU> target, String name);
+	
 	
 	
 	/** Checks if sufficient database fields exist to use this {@link AppUserNameFinder}
@@ -105,7 +101,7 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 	 * @param name
 	 * @throws ParseException
 	 */
-	public void validateName(String name) throws ParseException{
+	public void validateNameFormat(String name) throws ParseException{
 		
 	}
 	/** Is this a name we might expect the user to know or an internal generated id.
@@ -136,7 +132,7 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 			return null;
 		}
 		try {
-			AU user = getFactory().find(getStringFinderFilter(getFactory().getTarget(), name),true);
+			AU user = getFactory().find(getStringFinderFilter( name),true);
 			return user;
 		} catch ( DataNotFoundException dne){
 			return null;
@@ -156,6 +152,14 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 		Set<String> names = new LinkedHashSet<>();
 		names.add(getCanonicalName(user));
 		return names;
+	}
+
+	@Override
+	public AU makeFromString(String name) throws DataFault, ParseException {
+		AU user = ((AppUserFactory<AU>)getFactory()).makeUser();
+		setName(user, name);
+		user.commit();
+		return user;
 	}
 
 	/* (non-Javadoc)
