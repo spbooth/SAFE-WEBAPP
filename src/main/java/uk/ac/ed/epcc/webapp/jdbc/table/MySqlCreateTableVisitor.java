@@ -232,12 +232,14 @@ public class MySqlCreateTableVisitor implements FieldTypeVisitor {
 				ctx.quote(sb, name);
 				sb.append(" ) REFERENCES ");
 				sb.append(desc);
-				sb.append(" ON UPDATE CASCADE");
 				if(FOREIGN_KEY_DELETE_CASCASE_FEATURE.isEnabled(conn)) {
 					if( ! referenceField.canBeNull()) {
 						sb.append(" ON DELETE CASCADE");
+					}else {
+						sb.append(" ON DELETE SET NULL");
 					}
 				}
+				sb.append(" ON UPDATE CASCADE");
 			}
 		}
 	}
