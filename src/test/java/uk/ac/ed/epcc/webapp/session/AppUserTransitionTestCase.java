@@ -18,6 +18,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -278,6 +279,7 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 	public void testEraseTransition() throws Exception {
 		MockTansport.clear();
 		takeBaseline();
+		setTime(2021, Calendar.MARCH, 1, 9, 0); // avoid details warning in view
 		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
 		A user =  fac.makeBDO();
 	
