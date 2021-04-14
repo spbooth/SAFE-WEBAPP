@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.apps;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
@@ -66,7 +67,7 @@ public class CommandLauncherTest extends WebappTestBase {
 	}
 	@Test
 	public void testThrow() throws Exception{
-		
+		assertNotNull(ctx.getInitParameter("testing"));
 		/**************************************************
 		 * Important. The CommandLauncher ususally catches
 		 * exceptions and calls exit. This will abort
