@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.charts;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.charts.strategy.QueryMapper;
@@ -497,7 +498,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 			} else if (hourLength(start, end_bound[0][getNumItems()-1]) < 24) {
 				// major split less than a day
 				df = DateFormat.getDateTimeInstance(DateFormat.SHORT,
-						DateFormat.SHORT);
+						DateFormat.SHORT,Locale.UK);
 			} else {
 				df = DateFormat.getDateInstance(format);
 			}

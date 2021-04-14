@@ -24,6 +24,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageWalker.WalkerException;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link ContentMessageVisitor} that only shows each message once.
  * If a message has already been displayed but occurs a second time (e.g. 
@@ -56,7 +57,7 @@ public class ShortContentMessageVisitor extends ContentMessageVisitor {
 					if( sb instanceof HtmlBuilder) {
 						((HtmlBuilder)sb).setNewTab(true);
 					}
-					DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+					DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT,getContext().getService(SessionService.class).getLocale());
 					addLink(messageWalker.getPath(), id, "["+df.format(m.getSentDate())+"] "+m.getSubject());
 					sb=sb.addParent();
 					return false; // truncate recursion
