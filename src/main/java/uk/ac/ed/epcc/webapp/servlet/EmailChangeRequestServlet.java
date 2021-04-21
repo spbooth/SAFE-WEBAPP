@@ -74,6 +74,12 @@ public class EmailChangeRequestServlet extends SessionServlet {
 						String old = target_user.getEmail();
 						String email=request.getEmail();
 						request.complete();
+						NavigationMenuService nav = conn.getService(NavigationMenuService.class);
+						if( nav != null) {
+							// validating email may change menu state
+							// for the current user if requirement was marked up in menu
+							nav.resetMenu();
+						}
 						if( old.equalsIgnoreCase(email)) {
 							message(conn, req, res, "email_verification_request_successful",email);
 						}else {
