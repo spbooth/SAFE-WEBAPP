@@ -19,9 +19,9 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /** A {@link AbstractListener} that implements {@link Contexed}
- * @author spb
- * @param <R> 
+ *  @param <R> type of object being listened to.
  *
+ * @author spb
  */
 public class AbstractContextedListener<R> extends AbstractListener<R> implements Contexed {
 

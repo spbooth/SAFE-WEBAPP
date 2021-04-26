@@ -189,7 +189,37 @@ public class AuthorizedKeyValidator implements FieldValidator<String>{
 	   base64 = Base64.encodeBase64String(Base64.decodeBase64(base64));
 	   return algorithm+" "+base64;
    }
-   
+   /** Get just the Base64 encoded key-block without options or algorithm.
+    * 
+    * @param key
+    * @return
+    * @throws ParseException
+    */
+   public String getKeyBlock(String key) throws ParseException{
+	   if( key == null || key.trim().isEmpty()) {
+		   return null;
+	   }
+	   key=key.trim();
+	   Matcher prefix_m = PREFIX_PATTERN.matcher(key);
+	   if( prefix_m.lookingAt() ) {
+		   key = key.substring(prefix_m.end());
+	   }
+	   Matcher alg_m= ALG_PATTERN.matcher(key);
+	   if( ! alg_m.lookingAt()) {
+		   // unrecognised algorithm
+		   throw new ParseException("Unrecognised key algorithm");
+	   }
+	   String algorithm = alg_m.group(1);
+	   key = key.substring(alg_m.end());
+	   
+	   Matcher base64_m = BASE64_PATTERN.matcher(key);
+	   if( ! base64_m.lookingAt()) {
+		   throw new ParseException("Missing Base64 encoded key");
+	   }
+	   String base64 = base64_m.group(1);
+	   base64 = Base64.encodeBase64String(Base64.decodeBase64(base64));
+	   return base64;
+   }
    public String fingerprint(String key) throws ParseException, NoSuchAlgorithmException {
 	   if( key == null || key.trim().isEmpty()) {
 		   return null;

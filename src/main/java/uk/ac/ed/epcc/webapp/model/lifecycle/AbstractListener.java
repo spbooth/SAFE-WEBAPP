@@ -14,8 +14,9 @@
 package uk.ac.ed.epcc.webapp.model.lifecycle;
 
 /** A default (does nothing) {@link LifeCycleListener}.
+ * 
+  * @param <R> type of object being listened to.
  * @author spb
- *
  */
 
 public abstract class AbstractListener<R> extends AbstractAction<R> implements LifeCycleListener<R> {
