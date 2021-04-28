@@ -405,7 +405,7 @@ public final AppContext getContext(){
 				}
 				
 			}else{
-				// check for consistency against repo don't allow value sthat will overflow field.
+				// check for consistency against repo don't allow values that will overflow field.
 				Object input =  sel.get(field);
 				if( input instanceof TextInput && info.isString()){
 					int len = info.getMax();

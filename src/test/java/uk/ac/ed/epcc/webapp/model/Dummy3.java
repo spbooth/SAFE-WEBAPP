@@ -223,11 +223,18 @@ public class Dummy3 extends DataObject {
 		 * @see uk.ac.ed.epcc.webapp.model.NameFinder#getDataCache()
 		 */
 		@Override
-		public DataCache<String, Dummy3> getDataCache() {
+		public DataCache<String, Dummy3> getDataCache(boolean auto_create) {
 			return new DataCache<String, Dummy3>() {
 				
 				@Override
 				protected Dummy3 find(String key) throws DataException {
+					if( auto_create ) {
+						try {
+							return makeFromString(key);
+						} catch (ParseException e) {
+							throw new DataFault("Bad name", e);
+						}
+					}
 					return findFromString(key);
 				}
 			};

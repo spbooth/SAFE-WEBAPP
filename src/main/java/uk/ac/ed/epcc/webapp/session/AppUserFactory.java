@@ -830,7 +830,7 @@ NamedFilterProvider<AU>
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#getDataCache()
 	 */
 	@Override
-	public DataCache<String, AU> getDataCache() {
+	public DataCache<String, AU> getDataCache(boolean auto_create) {
 		return new IndexedDataCache<String, AU>(getContext()) {
 
 			
@@ -842,7 +842,7 @@ NamedFilterProvider<AU>
 
 			@Override
 			protected AU findIndexed(String key) throws DataException {
-				if( autoCreate()){
+				if( auto_create){
 					try {
 						return makeFromString(key);
 					} catch (ParseException e) {

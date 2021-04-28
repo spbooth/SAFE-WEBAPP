@@ -161,7 +161,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#makeByName(java.lang.String)
 	 */
 	@Override
-	public T makeFromString(String name) throws DataFault{
+	public final T makeFromString(String name) throws DataFault{
 		if( name == null || name.isEmpty()){
 			return null;
 		}
@@ -379,12 +379,16 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#getDataCache()
 	 */
 	@Override
-	public IndexedDataCache<String,T> getDataCache(){
+	public IndexedDataCache<String,T> getDataCache(boolean auto_create){
 		return new IndexedDataCache<String, T>(getContext()){
 
 			@Override
 			protected T findIndexed(String key) throws DataException {
-				return makeFromString(key);
+				if( auto_create ) {
+					return makeFromString(key);
+				}else {
+					return findFromString(key);
+				}
 			}
 
 			@SuppressWarnings("unchecked")

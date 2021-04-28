@@ -172,12 +172,18 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 	protected Class<? super X> getType() {
 		return (Class<? super X>) getClass();
 	}
-	
-	public DataCache<String,AU> getDataCache(){
+	public DataCache<String,AU> getDataCache(boolean auto_create){
 		return new DataCache<String, AU>() {
 
 			@Override
 			protected AU find(String key) throws DataException {
+				if( auto_create) {
+					try {
+						return makeFromString(key);
+					} catch (ParseException e) {
+						throw new DataFault("Bad name",e);
+					}
+				}
 				return findFromString(key);
 			}
 		};

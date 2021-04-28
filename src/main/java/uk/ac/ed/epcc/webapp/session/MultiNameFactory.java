@@ -175,11 +175,18 @@ public class MultiNameFactory<N extends MultiNameFactory.Name, AU extends AppUse
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#getDataCache()
 	 */
 	@Override
-	public DataCache<String, N> getDataCache() {
+	public DataCache<String, N> getDataCache(boolean auto_create) {
 		return new DataCache<String, N>() {
 
 			@Override
 			protected N find(String key) throws DataException {
+				if( auto_create) {
+					try {
+						return makeFromString(key);
+					} catch ( ParseException e) {
+						throw new DataFault("Bad name",e);
+					}
+				}
 				return findFromString(key);
 			}
 		};

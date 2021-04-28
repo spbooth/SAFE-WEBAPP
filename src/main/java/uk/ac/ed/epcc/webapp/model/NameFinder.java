@@ -67,6 +67,6 @@ public interface NameFinder<T extends DataObject> extends ParseFactory<T> {
 	 * 
 	 * @return DataCache
 	 */
-	public abstract DataCache<String, T> getDataCache();
+	public abstract DataCache<String, T> getDataCache(boolean auto_create);
 
 }
