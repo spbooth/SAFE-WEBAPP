@@ -122,4 +122,37 @@ public interface SimpleXMLBuilder {
 			clean(target.toString());
 		}
 	}
+	
+	/** Convenience method to add elements of an array each element surrounded
+	 * by a tag.
+	 * 
+	 * If the builder is actually building a non XML representation that 
+	 * can represent arrays this may be used instead
+	 * 
+	 * @param tag
+	 * @param data
+	 */
+	public default  void addArray(String tag, String data[]) {
+		for(String s : data ) {
+			open(tag);
+			clean(s);
+			close();
+		}
+	}
+	/** Convenience method to add elements of an {@link Iterable} each element surrounded
+	 * by a tag.
+	 * 
+	 * If the builder is actually building a non XML representation that 
+	 * can represent arrays this may be used instead
+	 * 
+	 * @param tag
+	 * @param data
+	 */
+	public default void addArray(String tag, Iterable<String> data) {
+		for(String s : data ) {
+			open(tag);
+			clean(s);
+			close();
+		}
+	}
 }

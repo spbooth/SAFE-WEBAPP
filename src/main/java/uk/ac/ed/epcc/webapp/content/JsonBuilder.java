@@ -30,6 +30,38 @@ import uk.ac.ed.epcc.webapp.AppContext;
 
 public class JsonBuilder   implements SimpleXMLBuilder{
 
+	@Override
+	public void addArray(String tag, String[] data) {
+		boolean seen=false;
+		StringBuilder tmp = new StringBuilder();
+		tmp.append("[");
+		for(String s : data) {
+			if( seen ) {
+				tmp.append(",");
+			}
+			addString(tmp,s);
+			seen=true;
+		}
+		tmp.append("]");
+		raw=tmp.toString();
+	}
+
+	@Override
+	public void addArray(String tag, Iterable<String> data) {
+		boolean seen=false;
+		StringBuilder tmp = new StringBuilder();
+		tmp.append("[");
+		for(String s : data) {
+			if( seen ) {
+				tmp.append(",");
+			}
+			addString(tmp,s);
+			seen=true;
+		}
+		tmp.append("]");
+		raw=tmp.toString();
+	}
+
 	/** static factory method to allow implementations to be replaced.
 	 * 
 	 * @param conn
@@ -105,23 +137,26 @@ public class JsonBuilder   implements SimpleXMLBuilder{
 	}
 
 	private void addString(String s){
-		content.append('"');
+		addString(content,s);
+	}
+	private void addString(StringBuilder t,String s){
+		t.append('"');
 		for(char c : s.toCharArray()) {
 			switch(c) {
-			case '\\' : content.append("\\\\"); break;
-			case '"' : content.append("\\\""); break;
-			case '\n' : content.append("\\n"); break;
+			case '\\' : t.append("\\\\"); break;
+			case '"' : t.append("\\\""); break;
+			case '\n' : t.append("\\n"); break;
 			default:
 				if( c > 0x1F && c < 0xFF ) {
-					content.append(c);
+					t.append(c);
 				}else {
-					content.append("\\u");
-					content.append(String.format("%1$04x", (int) c));
+					t.append("\\u");
+					t.append(String.format("%1$04x", (int) c));
 				}
 			}
 		}
 		
-		content.append('"');
+		t.append('"');
 	}
 	
 	/* (non-Javadoc)
