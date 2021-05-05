@@ -28,13 +28,7 @@ public abstract class AbstractAcceptFilter<T> implements AcceptFilter<T> {
 	protected AbstractAcceptFilter(Class<T> target) {
 		this.target=target;
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-	 */
-	@Override
-	public final <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
-		return vis.visitAcceptFilter(this);
-	}
+	
 
 	@Override
 	public final Class<T> getTarget(){

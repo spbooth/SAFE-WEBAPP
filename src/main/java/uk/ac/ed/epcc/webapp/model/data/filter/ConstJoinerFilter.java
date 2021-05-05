@@ -51,27 +51,6 @@ public final class ConstJoinerFilter<T extends DataObject, BDO extends DataObjec
 	private final Repository remote_res;
 		
 		
-		
-		
-
-		
-		public void accept(BDO o) {
-		}
-
-
-
-
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-		 */
-		public <X> X acceptVisitor(FilterVisitor<X, BDO> vis)
-				throws Exception {
-			return vis.visitJoinFilter(this);
-		}
-
-
-
 
 
 		/* (non-Javadoc)

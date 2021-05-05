@@ -174,9 +174,6 @@ NamedFilterProvider<AU>
     		this.roles=roles;
     	}
 		
-		public void accept(AU o) {
-			
-		}
 		public List<PatternArgument> getParameters(List<PatternArgument> list) {
 			for(String role : roles) {
 				addRoleParameter(list, role);
@@ -224,13 +221,7 @@ NamedFilterProvider<AU>
 				}
 			}
 		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-		 */
-		public <X> X acceptVisitor(FilterVisitor<X, AU> vis)
-				throws Exception {
-			return vis.visitPatternFilter(this);
-		}
+	
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */

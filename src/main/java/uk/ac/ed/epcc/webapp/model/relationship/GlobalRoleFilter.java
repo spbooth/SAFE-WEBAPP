@@ -42,13 +42,7 @@ public class GlobalRoleFilter<T> implements BinaryFilter<T> {
 
 	private final SessionService<?> session;
 	private final String role;
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-	 */
-	@Override
-	public <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
-		return vis.visitBinaryFilter(this);
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()

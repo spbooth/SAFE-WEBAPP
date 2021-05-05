@@ -34,6 +34,11 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 public interface PatternFilter<T> extends BaseSQLFilter<T> {
 	
 
+	@Override
+	default <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
+		return vis.visitPatternFilter(this);
+	}
+
 	/** Add parameters for this filter to a list.
 	 * @param list to modify
 	 * 

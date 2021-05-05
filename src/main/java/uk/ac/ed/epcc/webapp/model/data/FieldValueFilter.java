@@ -47,13 +47,7 @@ public class FieldValueFilter<V,T> implements PatternFilter<T>, SQLFilter<T> {
 	private final Class<T> target;
 	private final FieldValue<V, T> field;
 	private final V value;
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-	 */
-	@Override
-	public <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
-		return vis.visitPatternFilter(this);
-	}
+
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */

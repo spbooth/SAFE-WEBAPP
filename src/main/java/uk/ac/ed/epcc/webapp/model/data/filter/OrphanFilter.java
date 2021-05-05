@@ -93,13 +93,7 @@ public class OrphanFilter<T extends DataObject, BDO extends DataObject> extends 
 
 
 
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-		 */
-		public final <X> X acceptVisitor(FilterVisitor<X, BDO> vis)
-				throws Exception {
-			return vis.visitPatternFilter(this);
-		}
+		
 
 
 

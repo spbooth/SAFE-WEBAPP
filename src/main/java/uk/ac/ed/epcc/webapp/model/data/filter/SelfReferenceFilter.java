@@ -66,9 +66,6 @@ public class SelfReferenceFilter<T> implements SQLFilter<T> , PatternFilter<T>{
 		this.ref=ref;
 	}
 	
-	public void accept(T o) {
-		
-	}
 
 	public List<PatternArgument> getParameters(List<PatternArgument> list) {
 		list.add(new PatternArgument() {
@@ -102,12 +99,7 @@ public class SelfReferenceFilter<T> implements SQLFilter<T> , PatternFilter<T>{
 		return sb;
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-	 */
-	public <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
-		return vis.visitPatternFilter(this);
-	}
+
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()

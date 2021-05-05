@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,10 +40,12 @@ import uk.ac.ed.epcc.webapp.forms.inputs.ConstantInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrderFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
@@ -447,6 +450,21 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		}
 
 	}
+	public class DateOrderFilter implements SQLOrderFilter<T>{
+
+		@Override
+		public Class<T> getTarget() {
+			return LogFactory.this.getTarget();
+		}
+
+		@Override
+		public List<OrderClause> OrderBy() {
+			LinkedList<OrderClause> order = new LinkedList<>();
+			order.add(res.getOrder(DATE, false));
+			return order;
+		}
+		
+	}
 
 	protected static final String OWNER_ID = "QueryID";
 
@@ -643,7 +661,8 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	}
 	
 	public CloseableIterator<T> getLog(O q) throws DataFault {
-		return new FilterIterator(getOwnerFilter(q));
+		SQLAndFilter<T> fil = new SQLAndFilter<T>(getTarget(),   getOwnerFilter(q),  new DateOrderFilter());
+		return new FilterIterator(fil);
 	}
 
 	protected final LogOwner<O> getOwnerFactory() {

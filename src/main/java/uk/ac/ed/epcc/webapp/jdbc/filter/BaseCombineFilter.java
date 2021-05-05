@@ -518,4 +518,5 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 		public boolean qualifyTables() {
 			return join != null && ! join.isEmpty();
 		}
+		public abstract <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception;
 }

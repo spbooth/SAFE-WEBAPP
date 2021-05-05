@@ -19,4 +19,9 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
  */
 public interface SQLOrderFilter<T> extends SQLFilter<T>, OrderFilter<T> {
 
+	@Override
+	default <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
+		return vis.visitOrderFilter(this);
+	}
+
 }
