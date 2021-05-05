@@ -461,6 +461,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		public List<OrderClause> OrderBy() {
 			LinkedList<OrderClause> order = new LinkedList<>();
 			order.add(res.getOrder(DATE, false));
+			order.add(res.getOrder(null, false));
 			return order;
 		}
 		
