@@ -13,6 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
+import uk.ac.ed.epcc.webapp.model.data.transition.ButtonText;
 import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
 
 /**
@@ -20,7 +21,7 @@ import uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey;
  *
  */
 
-public abstract class AppUserKey<AU extends AppUser> extends TransitionKey<AU> {
+public abstract class AppUserKey<AU extends AppUser> extends TransitionKey<AU> implements ButtonText {
 	private final String button_text;
 	/**
 	 * @param name

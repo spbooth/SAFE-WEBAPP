@@ -273,9 +273,6 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 	public String getHelp(TransitionKey<Number> key) {
 		return null;
 	}
-	@Override
-	public String getText(TransitionKey<Number> key){
-		return key.toString();
-	}
+	
 	
 }

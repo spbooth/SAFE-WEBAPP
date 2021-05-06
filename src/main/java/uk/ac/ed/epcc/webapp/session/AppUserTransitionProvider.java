@@ -356,13 +356,6 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionFactory#getText(uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey)
-	 */
-	@Override
-	public String getText(AppUserKey key) {
-		return getContext().expandText(key.getText());
-	}
 
 	public static AppUserTransitionProvider getInstance(AppContext conn) {
 		return (AppUserTransitionProvider) TransitionServlet.getProviderFromName(conn, PERSON_TRANSITION_TAG);

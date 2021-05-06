@@ -50,7 +50,10 @@ public abstract class AbstractViewTransitionFactory<T, K extends TransitionKey<T
 		return getContext().expandText(key.getHelp());
 	}
 	
-	public String getText(K key){
+	public final String getText(K key){
+		if( key instanceof ButtonText ) {
+			return getContext().expandText(((ButtonText)key).getText());
+		}
 		return key.toString();
 	}
 	/** a direct transtition to view the target.
