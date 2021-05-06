@@ -15,7 +15,9 @@ package uk.ac.ed.epcc.webapp.session;
 
 import java.io.IOException;
 import java.security.PublicKey;
+import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
 import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
 import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil;
@@ -28,6 +30,7 @@ import uk.ac.ed.epcc.webapp.ssh.SshPublicKeyArrayInput;
  */
 public class MultiKeyComposite extends PublicKeyComposite<PublicKey[]> {
 
+	public static final Feature NO_KEY_FROM_REST = new Feature("sshkey.no_key_from_rest",false,"Supress changing keys from REST api");
 	/**
 	 * @param fac
 	 */
@@ -83,5 +86,16 @@ public class MultiKeyComposite extends PublicKeyComposite<PublicKey[]> {
 			getLogger().error("Error generating key list",e);
 			return new String[0];
 		}
+	}
+
+
+	@Override
+	public Set<String> addSuppress(Set<String> suppress) {
+	
+		Set<String> supress = super.addSuppress(suppress);
+		if(NO_KEY_FROM_REST.isEnabled(getContext())) {
+			supress.add(PUBLIC_KEY);
+		}
+		return supress;
 	}
 }
