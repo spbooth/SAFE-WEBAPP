@@ -7,5 +7,7 @@ package uk.ac.ed.epcc.webapp.model.data.transition;
  *
  */
 public interface ButtonText {
-	public String getText();
+	public default String getText() {
+		return toString();
+	}
 }
