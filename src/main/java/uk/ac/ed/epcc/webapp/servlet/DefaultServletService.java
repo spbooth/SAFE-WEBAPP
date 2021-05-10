@@ -81,6 +81,8 @@ import uk.ac.ed.epcc.webapp.session.WebNameFinder;
  */
 public class DefaultServletService implements ServletService{
 	
+	public static final String BASIC_AUTH_TYPE = "Basic";
+	public static final String BEARER_AUTH_TYPE = "Bearer";
 	/**
 	 * 
 	 */
@@ -488,7 +490,7 @@ public class DefaultServletService implements ServletService{
 			// only request if secure conneciton
 			if(  bearer.request() && res instanceof HttpServletResponse && req.isSecure()) {
 				StringBuilder header =new StringBuilder();
-				header.append("Bearer");
+				header.append(BEARER_AUTH_TYPE);
 				String token_realm = bearer.getRealm();
 				if( token_realm != null &&  ! token_realm.isEmpty()) {
 					header.append(" realm=\"");
@@ -644,7 +646,7 @@ public class DefaultServletService implements ServletService{
 					if( m.matches()) {
 						String type = m.group(1);
 						String cred = m.group(2);
-						if( type.equalsIgnoreCase("Bearer")) {
+						if( type.equalsIgnoreCase(BEARER_AUTH_TYPE)) {
 							BearerTokenService bearer = getContext().getService(BearerTokenService.class);
 							if( bearer != null ) {
 								if( ! (request.isSecure() || ALLOW_INSECURE.isEnabled(getContext()))){
@@ -666,7 +668,7 @@ public class DefaultServletService implements ServletService{
 								 log.debug("No BearerTokenService");
 								}
 							}
-						}else if( type.equalsIgnoreCase("Basic")) {
+						}else if( type.equalsIgnoreCase(BASIC_AUTH_TYPE)) {
 							AppUserFactory<A> factory = sess.getLoginFactory();
 							@SuppressWarnings("unchecked")
 							PasswordAuthComposite<A> comp = factory.getComposite(PasswordAuthComposite.class);
