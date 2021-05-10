@@ -15,7 +15,6 @@ package uk.ac.ed.epcc.webapp.servlet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.Map;

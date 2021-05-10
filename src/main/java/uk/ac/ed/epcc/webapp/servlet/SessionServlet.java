@@ -71,6 +71,7 @@ public abstract class SessionServlet extends WebappServlet {
 
 		ServletSessionService serv = getSessionService(conn);
 		if (serv == null || ! authorized(serv)) {
+			getLogger(conn).debug("Requesting authorization");
 			conn.getService(ServletService.class).requestAuthentication(serv);
 			return;
 		}

@@ -571,6 +571,11 @@ public class DefaultServletService implements ServletService{
 				return;
 			}
 			AppContext conn = getContext();
+			Logger log = null;
+			LoggerService ls = conn.getService(LoggerService.class);
+			if( ls != null ) {
+				log = ls.getLogger(getClass());
+			}
 			String name = getWebName();
 			// This is for on-the-fly remote authentication at any url
 			// don't do this if the authentication flow is expensive
@@ -631,6 +636,9 @@ public class DefaultServletService implements ServletService{
 				// Note we pick up the top level config service so that per-servlet parameters
 				// are available
 				String auth = request.getHeader("Authorization");
+				if( log != null ) {
+					log.debug(()->"Authorization header: "+auth);
+				}
 				if( auth != null ) {
 					Matcher m = auth_patt.matcher(auth);
 					if( m.matches()) {
@@ -640,13 +648,23 @@ public class DefaultServletService implements ServletService{
 							BearerTokenService bearer = getContext().getService(BearerTokenService.class);
 							if( bearer != null ) {
 								if( ! (request.isSecure() || ALLOW_INSECURE.isEnabled(getContext()))){
+									if( log != null) {
+										log.error("Bearer token sent via insecure connection");
+									}
 									error("Bearer token from insecure connection");
 									return;
+								}
+								if( log != null) {
+									log.debug("Processing bearer token "+cred);
 								}
 								// Let the bearer token service do everything
 								// this is to allow it to implement anonymous role only sessions
 								bearer.processToken(sess, cred);
 								return;
+							}else {
+								if( log != null ) {
+								 log.debug("No BearerTokenService");
+								}
 							}
 						}else if( type.equals("Basic")) {
 							AppUserFactory<A> factory = sess.getLoginFactory();
