@@ -644,7 +644,7 @@ public class DefaultServletService implements ServletService{
 					if( m.matches()) {
 						String type = m.group(1);
 						String cred = m.group(2);
-						if( type.equals("Bearer")) {
+						if( type.equalsIgnoreCase("Bearer")) {
 							BearerTokenService bearer = getContext().getService(BearerTokenService.class);
 							if( bearer != null ) {
 								if( ! (request.isSecure() || ALLOW_INSECURE.isEnabled(getContext()))){
@@ -666,7 +666,7 @@ public class DefaultServletService implements ServletService{
 								 log.debug("No BearerTokenService");
 								}
 							}
-						}else if( type.equals("Basic")) {
+						}else if( type.equalsIgnoreCase("Basic")) {
 							AppUserFactory<A> factory = sess.getLoginFactory();
 							@SuppressWarnings("unchecked")
 							PasswordAuthComposite<A> comp = factory.getComposite(PasswordAuthComposite.class);
@@ -683,10 +683,17 @@ public class DefaultServletService implements ServletService{
 									}else {
 										//TODO handle bad authentication
 										// could remember error in response and return forbidden in requestAuthentication
+										if( person != null && log != null) {
+											log.warn("Forbidden login "+person.getIdentifier());
+										}
 									}
 								} catch (DataException e) {
 									error(e,"Error looking up person");
 								}
+							}
+						}else {
+							if( log != null ) {
+								log.debug("Unrecognised authentication type "+type);
 							}
 						}
 					}
