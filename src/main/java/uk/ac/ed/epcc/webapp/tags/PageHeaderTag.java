@@ -16,7 +16,7 @@ import uk.ac.ed.epcc.webapp.servlet.ErrorFilter;
  * 
  * A dynamic include is used to allow the content to be overridden by the top level application.
  * 
- * This is essentially a jsp:include with a proeprty configurable target
+ * This is essentially a jsp:include with a property configurable target
  * The main motivation for a customtag is that authoring tools such as eclipse will report
  * errors if a fragment that does not exist is included. Even if it does exist they frequently fail to resolve
  * absolute paths correctly in web-fragment projects
@@ -35,14 +35,20 @@ public class PageHeaderTag extends TagSupport implements Tag {
 		
 		try {
 			AppContext conn = ErrorFilter.retrieveAppContext(request, response);
-			Logger log = conn.getService(LoggerService.class).getLogger(getClass());
-			String frag = conn.getInitParameter("service.std_header", "/page_header.jsp");
-			if( frag != null && ! frag.isEmpty() && ! frag.contentEquals("none")) {
-				try {
-					page.include(frag);
-				}catch(Exception e1) {
-					log.error("Error including page "+frag, e1);
+			if( conn != null ){
+				Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+
+				String frag = conn.getInitParameter("service.std_header", "/page_header.jsp");
+				if( frag != null && ! frag.isEmpty() && ! frag.contentEquals("none")) {
+					try {
+						page.include(frag);
+					}catch(Exception e1) {
+						log.error("Error including page "+frag, e1);
+					}
 				}
+			}else {
+				// fall back to default if no context
+				page.include("/page_header.jsp");
 			}
 		}catch(Exception e){
 			throw new JspException(e);
