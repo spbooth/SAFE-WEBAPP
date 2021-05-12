@@ -57,7 +57,7 @@ public class ExtauthSessionTag extends TagSupport implements Tag {
 	    
 	 	String username = null;
 	    if( conn != null ){
-	    	 username = conn.getService(ServletService.class).getWebName();
+	    	 username = conn.getService(ServletService.class).getWebName(request);
 	    }
 		if(username == null || username.trim().length() == 0) {
 			WebappServlet.messageWithArgs(conn, request, response, "access_denied", null);

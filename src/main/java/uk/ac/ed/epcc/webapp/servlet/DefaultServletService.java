@@ -325,9 +325,27 @@ public class DefaultServletService implements ServletService{
 	 * web-server/container authorisation layer. This will be null unless the
 	 * container/web-server has authorisation turned on for this URL.
 	 * 
+	 * This method uses the request object cached in the high level filter
+	 * 
 	 * @return String webname
 	 */
 	public String getWebName() {
+		return getWebName(req);
+	}
+	/**
+	 * get the authenticated name for the current user as provided by the
+	 * web-server/container authorisation layer. This will be null unless the
+	 * container/web-server has authorisation turned on for this URL.
+	 * 
+	 * This method takes an explicit {@link ServletRequest} object rather than
+	 * the one cached in the service itself. It can therefore be used when a
+	 * filter may be in place.
+	 * 
+	 * 
+	 * @param ServletRequest
+	 * @return String webname
+	 */
+	public String getWebName(ServletRequest req) {
 		String name=null;
 		if( req != null) {
 		// If the web.xml defines a certificate based security-constraint then the

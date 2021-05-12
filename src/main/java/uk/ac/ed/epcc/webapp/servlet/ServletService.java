@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Contexed;
@@ -164,7 +165,20 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * @return String webname
 	 */
 	public String getWebName() ;
-	
+	/**
+	 * get the authenticated name for the current user as provided by the
+	 * web-server/container authorisation layer. This will be null unless the
+	 * container/web-server has authorisation turned on for this URL.
+	 * 
+	 * This method takes an explicit {@link ServletRequest} object rather than
+	 * the one cached in the service itself. It can therefore be used when a
+	 * filter may be in place.
+	 * 
+	 * 
+	 * @param ServletRequest
+	 * @return String webname
+	 */
+	public String getWebName(ServletRequest req);
 	/** Populate a session automatically using information from the request.
 	 * This is invoked by the {@link ServletSessionService} if a person is requested and
 	 * the current person is not stored in the session. It handles authentication mechanisms that don't

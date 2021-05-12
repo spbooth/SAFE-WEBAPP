@@ -65,7 +65,7 @@ public class RegisterServlet extends WebappServlet {
 			message(conn,req,res,"access_denied");
 			return;
 		}
-		String webName = conn.getService(ServletService.class).getWebName();
+		String webName = conn.getService(ServletService.class).getWebName(req);
 		if( webName == null && DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn) ){
 			message(conn,req,res,"access_denied");
 			return;
