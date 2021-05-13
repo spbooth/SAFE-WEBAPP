@@ -3063,7 +3063,7 @@ public final class Repository implements AppContextCleanup{
 	 */
 	private void setReferences(AppContext ctx, Connection c) throws SQLException{
 		Logger log = ctx.getService(LoggerService.class).getLogger(getClass());
-		log.debug("SetReferences for "+getTable());
+		//log.debug("SetReferences for "+getTable());
 		// look for foreign keys to identify remote tables.
 		DatabaseMetaData meta = c.getMetaData();
 		ResultSet rs = meta.getImportedKeys(c.getCatalog(),null , table_name);
@@ -3081,7 +3081,7 @@ public final class Repository implements AppContextCleanup{
 					String name = REFERENCE_PREFIX+suffix;
 					table=ctx.getInitParameter(name,table); // use param in preference because of windows case mangle
 					String tag = TableToTag(ctx, table);
-					log.debug("field "+field+" references "+table+"->"+tag);
+					//log.debug("field "+field+" references "+table+"->"+tag);
 					info.setReference(true,key_name,tag,ctx.getBooleanParameter(UNIQUE_PREFIX+suffix, info.isUnique()));
 				}
 				
@@ -3095,7 +3095,7 @@ public final class Repository implements AppContextCleanup{
 				String suffix = param_name+"."+i.getName(false);
 				String tag = REFERENCE_PREFIX+suffix;
 				String table=ctx.getInitParameter(tag);
-				log.debug("tag "+tag+" resolves to "+table);
+				//log.debug("tag "+tag+" resolves to "+table);
 				i.setReference(false,null,table,ctx.getBooleanParameter(UNIQUE_PREFIX+suffix, false));
 			}
 			if( i.isString()) {
