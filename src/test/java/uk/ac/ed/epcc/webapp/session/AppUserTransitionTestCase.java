@@ -249,6 +249,7 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 	public void testRemoveKey() throws Exception {
 		MockTansport.clear();
 		takeBaseline();
+		setTime(2021, Calendar.MARCH, 1, 9, 0); // so update not forced.
 		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
 		A user =  fac.findByEmail("fred@example.com");
 		
