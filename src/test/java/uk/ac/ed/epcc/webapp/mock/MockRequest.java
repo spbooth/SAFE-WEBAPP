@@ -49,6 +49,7 @@ import uk.ac.ed.epcc.webapp.servlet.WebappServlet;
 
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 public class MockRequest implements HttpServletRequest {
     public Hashtable<String,Object> params=new Hashtable<>();
@@ -348,7 +349,16 @@ public class MockRequest implements HttpServletRequest {
 
 	@Override
 	public Map getParameterMap() {
-		return params;
+		Map<String,String[]> result = new LinkedHashMap<String, String[]>();
+		for(Map.Entry e : params.entrySet()) {
+			Object o = e.getValue();
+			if( o instanceof String[]) {
+				result.put((String)e.getKey(),(String[]) o);
+			}else if ( o instanceof String) {
+				result.put((String) e.getKey(), new String[] { (String) e.getValue() });
+			}
+		}
+		return Collections.unmodifiableMap(result);
 	}
 
 	@Override

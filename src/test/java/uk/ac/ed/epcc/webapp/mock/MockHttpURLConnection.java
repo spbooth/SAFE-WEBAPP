@@ -20,10 +20,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Stephen Booth
@@ -62,7 +59,7 @@ public class MockHttpURLConnection extends HttpURLConnection {
 	/**
 	 * @param u
 	 */
-	protected MockHttpURLConnection(URL u) {
+	public MockHttpURLConnection(URL u) {
 		super(u);
 	}
 
@@ -112,6 +109,9 @@ public class MockHttpURLConnection extends HttpURLConnection {
 	}
 	public void setStatus(String status) {
 		this.status=status;
+	}
+	public void setOK() {
+		this.status="HTTP/1.1 200 OK";
 	}
 	public void addResponseHeader(String fiels,String value  ) {
 		headers.put(fiels,value);
