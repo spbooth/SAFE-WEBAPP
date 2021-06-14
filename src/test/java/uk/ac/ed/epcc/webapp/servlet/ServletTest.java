@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -57,13 +58,18 @@ import uk.ac.ed.epcc.webapp.forms.SetParamVisitor;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
+import uk.ac.ed.epcc.webapp.forms.html.PageHTMLForm;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.CustomPage;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.BaseFormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.CustomFormContent;
+import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
+import uk.ac.ed.epcc.webapp.forms.transition.NavigationProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.TitleTransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
@@ -570,7 +576,55 @@ public abstract class ServletTest extends WebappTestBase{
 		checkForward("/scripts/transition.jsp");
 
 	}
-	
+	/** Check that the servlet has forwarded to the jsp that displays an PageForm
+	 * (one that posts back to itself) also check the necesary attributes are in the request object
+	 * 
+	 */
+	public void checkForwardToPageForm() {
+		assertNotNull("No Title",req.getAttribute("Title"));
+		assertNotNull("No Form",req.getAttribute("Form"));
+		checkForward("/scripts/page_form.jsp");
+	}
+	/** Generates a XML (mostly HTML) representation of the 
+	 * contents of the PAgeForm
+	 * 
+	 * This is then (optionally) put through a
+	 * normalisation XLST transform to remove time dependent 
+	 * output and compared with a file of expected output.
+	 * 
+	 * 
+	 * @param normalise_transform
+	 * @param expected
+	 * @throws Exception 
+	 */
+	public <K,T> void checkPageFormContent(String normalize_transform, String expected_xml) throws Exception{
+		
+		PageHTMLForm form = (PageHTMLForm) req.getAttribute("Form");
+		String title = (String) req.getAttribute("Title");
+		assertNotNull(form);
+		assertNotNull(title);
+		checkForward("/scripts/pate_form.jsp");
+		HtmlBuilder builder = new HtmlBuilder();
+		builder.setValidXML(true);
+		builder.open("page_form");
+			 // could do this for all transitions but
+			 // would need to update results for all non Title factories
+			builder.open("Title");
+				builder.clean(title);
+			builder.close();
+		
+			builder.open("Form");
+		
+			 builder.addFormTable(getContext(), form);
+			 builder.addActionButtons(form);
+		
+			 builder.close();
+        
+		
+		 builder.close();
+		 String xml = builder.toString();
+		 checkContent(normalize_transform, expected_xml, xml);
+	}
 	/** check that the result is consistent with a forward to the view_target page. 
 	 * Normally this should not be needed in tests as most operations should be written 
 	 * to use a redirect to the canonical object URL to generate the view page.

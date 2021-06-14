@@ -134,7 +134,20 @@ public class ConfirmTag extends TagSupport implements Tag{
 				HtmlBuilder hb = new HtmlBuilder();
 				hb.open("form");
 				hb.attr("method", "post");
-				hb.attr("action", post_url);
+				if( post_url != null ) {
+					// submit to self often ok for confirm.
+					hb.attr("action", post_url);
+				}
+				// mark submitted similar to a page_form
+				// this is so a servlet can test at a high level if its a re-submit
+				// in case it needs to store state in the session.
+				hb.open("input");
+				hb.attr("type","hidden");
+				hb.attr("name","submitted");
+				hb.attr("value","true");
+				hb.close();
+				hb.clean("\n");
+				
 				Map<String,Object> h = null;
 				// look for cached value if we have it may lose the parameters as part of a forward
 				h = (Map<String,Object>) request.getAttribute(DefaultServletService.PARAMS_KEY_NAME);
