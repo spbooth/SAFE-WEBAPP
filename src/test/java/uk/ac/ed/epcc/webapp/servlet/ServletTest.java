@@ -346,6 +346,7 @@ public abstract class ServletTest extends WebappTestBase{
 		}else{
 			addParam(WebappServlet.CONFIRM_NO, "anything");
 		}
+		addParam("submitted","true");
 	}
 	/** Check that the response has forwarded to the messages page to show the
 	 * specified message

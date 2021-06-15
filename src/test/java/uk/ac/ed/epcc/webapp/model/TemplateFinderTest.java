@@ -26,7 +26,7 @@ public class TemplateFinderTest extends WebappTestBase {
 
 	@Test
 	public void testInclude() throws Exception{
-		TemplateFinder finder = new TemplateFinder(getContext());
+		TemplateFinder finder = TemplateFinder.getTemplateFinder(getContext());
 		String text = finder.getText("toplevel.txt");
 		System.out.println(text);
 		text = text.replace("\r", ""); // running tests on windows ?

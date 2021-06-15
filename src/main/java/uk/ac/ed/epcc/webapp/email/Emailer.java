@@ -1364,7 +1364,7 @@ public class Emailer {
 
 	private TemplateFinder getFinder() {
 		if( finder == null) {
-			finder= new TemplateFinder(getContext());
+			finder= TemplateFinder.getTemplateFinder(getContext());
 		}
 		return finder;
 	}

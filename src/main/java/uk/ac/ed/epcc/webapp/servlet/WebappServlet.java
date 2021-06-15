@@ -316,7 +316,7 @@ public abstract class WebappServlet extends HttpServlet {
 	 }
 	 /** Does the {@link #confirm(HttpServletRequest, HttpServletResponse, AppContext, String, Object[])}
 	  * method need to show the dialog form.
-	  * 
+	  * This will return true if a call to confirm would return null.
 	  * @param req
 	  * @return
 	  */
