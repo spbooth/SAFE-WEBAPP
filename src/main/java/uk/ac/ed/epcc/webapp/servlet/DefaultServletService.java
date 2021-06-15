@@ -173,7 +173,7 @@ public class DefaultServletService implements ServletService{
 			res = res + "/" + tmp;
 		}
 		tmp = req.getQueryString();
-		if (tmp != null) {
+		if (tmp != null && ! tmp.isEmpty()) {
 			res = res + "?" + tmp;
 		}
 		return res;
