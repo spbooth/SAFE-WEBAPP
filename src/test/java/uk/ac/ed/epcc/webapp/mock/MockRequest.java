@@ -163,8 +163,12 @@ public class MockRequest implements HttpServletRequest {
 
 	@Override
 	public String getRequestURI() {
-		
-		return getServletPath()+"/"+getPathInfo();
+		// pathinfo is supposed to start with a /
+		String pathInfo = getPathInfo();
+		if( ! pathInfo.startsWith("/")) {
+			pathInfo="/"+pathInfo;
+		}
+		return getServletPath()+pathInfo;
 	}
 
 	@Override
