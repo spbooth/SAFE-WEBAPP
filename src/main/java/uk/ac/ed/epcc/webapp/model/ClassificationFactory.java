@@ -564,7 +564,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		TableSpecification ts = getFinalTableSpecification(getContext(), getTag());
 		Set<String> fields = ts.getFieldNames();
 		for (String field : fields) {
-			if (!field.equals(Classification.NAME)) {
+			if (  getContext().getBooleanParameter(getConfigTag()+".history_field."+field,  !field.equals(Classification.NAME)) ) {
 				spec.setField(field, ts.getField(field));
 			}
 		}

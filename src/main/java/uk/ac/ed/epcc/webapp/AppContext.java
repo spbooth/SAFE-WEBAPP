@@ -899,8 +899,13 @@ public final class AppContext {
 	 * We therefore look for a string parameterised constructor in preference.
 	 * If such a constructor is found:
 	 *  
-	
-	
+	 * If the target class is an interface that extends {@link Composable} and the tag matches a {@link DataObjectFactory}
+	 * which does not implement the interface directly then the {@link DataObjectFactory} will be constructed and
+	 * a {@link Composite} matching the interface returned instead (provided that a matching composite exists).
+	 * this allows both the main class and composites to be searched for an implementation.
+	 * 
+	 * 
+	 * 
 	 * @param <T>  return type 
 	 * @param clazz  default super class 
 	 * @param tag 
