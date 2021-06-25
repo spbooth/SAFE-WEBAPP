@@ -37,8 +37,10 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import uk.ac.ed.epcc.webapp.EmptyIterable;
+import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.NumberOp;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
+import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 /**
  * 
@@ -55,8 +57,8 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
  * summation etc.
  * 
  * @author spb
- * @param <C> 
- * @param <R> 
+ * @param <C> type (or common supertype) of column keys
+ * @param <R> type (or common supertype) of row keys
  */
 
 public class Table<C, R> {
@@ -1837,8 +1839,24 @@ public class Table<C, R> {
 	 * 
 	 */
 	public void sortRows() {
+		// make sure that there is always some defined order
+		// Indexed or hash order if nothing else.
+		// Ideally we would de-refeference IndexedReferences here
+		// but that would need an AppContext added to Table
+		sortRows(new Comparator() {
 
-		sortRows(null);
+			@Override
+			public int compare(Object o1, Object o2) {
+				if( o1 instanceof Comparable && o2 instanceof Comparable) {
+					return ((Comparable)o1).compareTo(o2);
+				}else if( o1 instanceof Indexed && o2 instanceof Indexed) {
+					return ((Indexed)o1).getID() - ((Indexed)o2).getID();
+				}else {
+					return o1.hashCode() - o2.hashCode();
+				}
+			}
+			
+		});
 
 	}
 
