@@ -147,7 +147,7 @@ public abstract class HashLabeller<T,K> extends AbstractContexed implements Labe
 	 *            the label object to use for this o
 	 * @return Number
 	 */
-	private Number newSet(Object lab) {
+	protected Number newSet(Object lab) {
 
 		Number set =  label_to_set.get(lab);
 		if (set != null) {
