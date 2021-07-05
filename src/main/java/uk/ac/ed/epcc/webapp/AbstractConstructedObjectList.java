@@ -47,16 +47,20 @@ public abstract class AbstractConstructedObjectList<L> extends LinkedList<L> imp
 		String list = conn.getExpandedProperty(tag+".list","");
 		for(String action : list.split("\\s*,\\s*")){
 			if( ! action.isEmpty()){
-				try{
-				@SuppressWarnings("unchecked")
-				L a = (L) conn.makeObject(getTemplate(), action);
-				if( a == null){
-					getLogger().error(action+" failed to resolve to "+getTemplate().getCanonicalName());
-				}else{
-					add(a);
-				}
-				}catch(Exception t){
-					getLogger().error("Error making list for tag="+action,t);
+				if( action.equals(tag)) {
+					getLogger().error("Explicit recursion in construted object list tag="+tag);
+				}else {
+					try{
+						@SuppressWarnings("unchecked")
+						L a = (L) conn.makeObject(getTemplate(), action);
+						if( a == null){
+							getLogger().error(action+" failed to resolve to "+getTemplate().getCanonicalName());
+						}else{
+							add(a);
+						}
+					}catch(Exception t){
+						getLogger().error("Error making list for tag="+action,t);
+					}
 				}
 			}
 		}

@@ -46,6 +46,7 @@ import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -568,14 +569,29 @@ public class DefaultServletService implements ServletService{
 
 	public <A extends AppUser> void requestLogin(SessionService<A> sess, String page)
 			throws IOException, ServletException {
-		// standard login page supports both custom password login and self-register for external-auth
-		// If built_in login is off we might change the login page to an external auth servlet url.
-		String login_page=LoginServlet.getLoginPage(getContext());
 		// Need to remember page and redirect to login
-		
 		if( page !=null&& ! page.isEmpty()) {
 			LoginServlet.setSavedResult(sess,  new RedirectResult(page));
 		}
+		if( req instanceof HttpServletRequest && res instanceof HttpServletResponse) {
+			// IF we want more than one rule then configure a RequestLoginPluginList
+			RequestLoginPlugin plugin = getContext().makeObject(RequestLoginPlugin.class, "request_login_plugin");
+			if( plugin != null) {
+				FormResult result = plugin.requestLogin((HttpServletRequest)req, (HttpServletResponse) res);
+				if( result != null) {
+					try {
+						result.accept(new ServletFormResultVisitor(getContext(),(HttpServletRequest) req, (HttpServletResponse) res));
+						return;
+					} catch (Exception e) {
+						error(e,"Error implementing login request from plug-in");
+					}
+
+				}
+			}
+		}
+		// standard login page supports both custom password login and self-register for external-auth
+		// If built_in login is off we might change the login page to an external auth servlet url.
+		String login_page=LoginServlet.getLoginPage(getContext());
 		if( EXTERNAL_AUTH_VIA_LOGIN_FEATURE.isEnabled(getContext()) || REDIRECT_TO_LOGIN_FEATURE.isEnabled(getContext()) || ! LoginServlet.BUILT_IN_LOGIN.isEnabled(getContext())) {
 			
 			redirect(login_page);
