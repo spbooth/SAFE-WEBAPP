@@ -149,44 +149,21 @@ This service is only available to pre-registered users.
 <p><b>please try again later</b></p>
 <% } %>
 <% 
-
-
-// Give urls for alternate external auth login. Normally just the one but
-// can use comma seperated list to support multiple types.
-String login_urls = conn.getInitParameter("service.web_login.url");
-if(  login_urls != null ){ 
- String urls[] = login_urls.trim().split("\\s*,\\s*");
- String labels[] = conn.getInitParameter("service.web_login.login-text","Alternate login").split("\\s*,\\s*");
- String help[]= conn.getInitParameter("service.web_login.help-text","").split("\\s*,\\s*");
- for( int i = 0 ; i < urls.length ; i++){
-	 HtmlBuilder a = new HtmlBuilder();
-	 a.open("form");
-	 a.addClass("button");
-	 a.attr("method","post");
-	 a.attr("action",web_path+"/LoginServlet");
-	 a.open("input");
-	 a.attr("type","hidden");
-	 a.attr("name","authtype");
-	 a.attr("value",Integer.toString(i));
-	 a.close();
-	
-	 a.open("input");
-	 a.addClass("input_button");
-	 a.addClass("login");
-	 a.attr("type","submit");
-	 String tt = help[i%help.length];
-	 if( tt != null && ! tt.isEmpty()){
-		a.attr("title",tt);
-	 }
-	 a.attr("value",labels[i%labels.length]);
-	 a.close();
-	 a.close(); // form
+for(String name : conn.getInitParameter("login-page.login-content","").split(",") ){
+	if( name.trim().length() > 0 ){
+		UIGenerator content = conn.makeObjectWithDefault(UIGenerator.class,null,name.trim());
+		if(content != null ){
+			HtmlBuilder html_content = new HtmlBuilder();
+			content.addContent(html_content);
+			if( html_content.hasContent()){
 %>
-<%=a.toString() %>
-<%
- }
-%>or<%
-} 
+<%=html_content.toString()%>
+<%		
+		    }
+		}
+	}
+}
+
 %>
 <form method="post" action="<%=web_path%>/LoginServlet">
    <table class="form">
