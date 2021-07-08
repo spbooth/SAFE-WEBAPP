@@ -627,7 +627,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			if (max_result_length > boxwid) {
 				size = boxwid;
 			}
-			boolean autocomplete = input instanceof AutoComplete;
+			boolean autocomplete = input instanceof AutoComplete && ((AutoComplete)input).useAutoComplete();
 			boolean use_datalist = autocomplete && use_html5 && USE_DATALIST.isEnabled(conn);
 			
 			

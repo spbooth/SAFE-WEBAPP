@@ -54,5 +54,16 @@ public interface AutoComplete<T,V> extends SuggestedItemInput<V,T>, ParseInput<V
 	default int getCount() {
 		return getSuggestions().size();
 	}
+	
+	/** should the auto-complete option be used?
+	 * If this method returns false the input should fall back to a text
+	 * input without generating the suggestion list. This is for cases where
+	 * the enumerating the suggestions may be very costly.
+	 * 
+	 * @return
+	 */
+	default boolean useAutoComplete() {
+		return true;
+	}
 
 }

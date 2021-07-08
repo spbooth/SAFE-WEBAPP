@@ -9,6 +9,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.AutoComplete;
+import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
@@ -25,6 +26,8 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  * 
  * This is a text {@link AutoComplete} input using the permitted names
  * optionally creating bootstrap entries 
+ * 
+ * Autocompletion can be 
  * 
  * @author spb
  *
@@ -45,12 +48,25 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	 * @param factory {@link DataObjectFactory} and {@link NameFinder}
 	 */
 	public NameFinderInput(F factory, NameFinder<T> finder,boolean create, boolean restrict,BaseFilter<T> autocomplete) {
+		this(factory,finder,create,true,restrict,autocomplete);
+	}
+	/** create input
+	 * 
+	 * @param create   make entry if not found
+	 * @param use_autocomplete   use autocomplete input or a simple text input
+	 * @param restrict  restrict with filter
+	 * @param autocomplete  suggestions/restrict filter
+	 * @param factory {@link DataObjectFactory} and {@link NameFinder}
+	 */
+	public NameFinderInput(F factory, NameFinder<T> finder,boolean create, boolean use_autocomplete, boolean restrict,BaseFilter<T> autocomplete) {
+
 		super();
 		this.factory = factory;
 		this.finder = finder;
 		this.create = create;
-		this.restrict=restrict;
 		this.autocomplete = autocomplete;
+		this.restrict=restrict;
+		this.use_autocomplete = use_autocomplete;
 		addValidator(new FieldValidator<Integer>() {
 			
 			@Override
@@ -73,6 +89,7 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	}
 	private boolean create;
 	private final boolean restrict;
+	private boolean use_autocomplete;  // allow autocomplete to be turned off while keeping the filter for restrictions.
 	private final BaseFilter<T> autocomplete;
 	
 	public T parseItem(String v) throws ParseException {
@@ -80,16 +97,25 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 			return null;
 		}
 		try{
-			T target=null;
-			if( create){
+			boolean created = false;
+			T target=finder.findFromString(v);
+			if( target == null && create ){
 				finder.validateNameFormat(v);
 				target=finder.makeFromString(v);
-			}else{
-				target=finder.findFromString(v);
-				
+				created=true;
 			}
 			if(target == null) {
 				throw new ParseException("["+v+"] Not found");
+			}
+			// validate against the filter unless we created a new object
+			// a newly created object is unlikely to match the filter but
+			// probably will as a result of the operation.
+			// we assume if creating a new object is requested then
+			// any newly created object is a valid result
+			if( restrict && autocomplete != null && ! created) {
+				if( ! factory.matches(autocomplete, target)) {
+					throw new ParseException("["+v+"] Not valid");
+				}
 			}
 			return target;
 		}catch(ParseException p) {
@@ -226,6 +252,15 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	public void setMatchError(String match_error) {
 		this.match_error = match_error;
 	}
+	@Override
+	public boolean useAutoComplete() {
+		return use_autocomplete;
+	}
+	
+	public void setUseAutoComplete(boolean val) {
+		use_autocomplete = val;
+	}
+	
 	
 	
 }
