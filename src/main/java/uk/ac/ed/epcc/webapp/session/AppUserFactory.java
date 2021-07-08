@@ -709,7 +709,7 @@ NamedFilterProvider<AU>
 	}
 	
 	public final DataObjectItemInput<AU> getNameInput(BaseFilter<AU> fil,NameFinder<AU> finder,boolean create,boolean use_autocomplete,boolean restrict){
-		return new AppUserNameInput<>(this, finder,create, use_autocomplete,create, fil);
+		return new AppUserNameInput<>(this, finder,create, use_autocomplete,restrict, fil);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.ParseFactory#getCanonicalName(java.lang.Object)

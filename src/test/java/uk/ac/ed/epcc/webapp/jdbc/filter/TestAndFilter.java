@@ -96,6 +96,57 @@ public class TestAndFilter extends WebappTestBase {
 		assertTrue(fil.isEmpty());
 		checkStd(fil, "AndFilter( force=true)");
 	}
+	
+	
+	@Test 
+	public void testDoubleAndContainingFalse() throws DataException {
+		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTarget());
+		AndFilter<Dummy1> fil2 = new AndFilter<>(fac.getTarget());
+		fil2.addFilter(new FalseFilter<Dummy1>(fac.getTarget()));
+		fil.addFilter(fil2);
+		
+		// This should match nothing as an empty or matches nothing
+		
+		assertEquals(0, fac.getCount(fil));
+		assertFalse(fac.matches(fil, fred));
+		assertFalse(fac.matches(fil, bill));
+		assertFalse(fac.matches(fil, simon));
+		assertTrue(fil.isForced());
+		assertTrue(fil.isEmpty());
+		checkStd(fil, "AndFilter( force=false)");
+	}
+	
+	@Test 
+	public void testAndContainingFalse() throws DataException {
+		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTarget());
+		fil.addFilter(new FalseFilter<Dummy1>(fac.getTarget()));
+		
+		// This should match nothing as an empty or matches nothing
+		
+		assertEquals(0, fac.getCount(fil));
+		assertFalse(fac.matches(fil, fred));
+		assertFalse(fac.matches(fil, bill));
+		assertFalse(fac.matches(fil, simon));
+		assertTrue(fil.isForced());
+		assertTrue(fil.isEmpty());
+		checkStd(fil, "AndFilter( force=false)");
+	}
+	@Test 
+	public void testAndContainingOr() throws DataException {
+		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTarget());
+		OrFilter<Dummy1> or = new OrFilter<Dummy1>(fac.getTarget(), fac);
+		fil.addFilter(or);
+		
+		// This should match nothing as an empty or matches nothing
+		
+		assertEquals(0, fac.getCount(fil));
+		assertFalse(fac.matches(fil, fred));
+		assertFalse(fac.matches(fil, bill));
+		assertFalse(fac.matches(fil, simon));
+		assertTrue(fil.isForced());
+		assertTrue(fil.isEmpty());
+		checkStd(fil, "AndFilter( force=false)");
+	}
 	@Test 
 	public void testPattern() throws DataException {
 		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTarget());
