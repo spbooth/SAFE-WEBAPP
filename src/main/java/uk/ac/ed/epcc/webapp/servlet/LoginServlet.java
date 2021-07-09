@@ -42,6 +42,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
+import uk.ac.ed.epcc.webapp.session.LoginRedirects;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
 import uk.ac.ed.epcc.webapp.session.ReRegisterComposite;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -149,22 +150,28 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 				return;
 			}
 			if( authtype != null ) {
-				try {
-					Integer i = Integer.parseInt(authtype);
-					String login_urls = conn.getInitParameter("service.web_login.url");
-					if(  login_urls != null ){ 
-						String urls[] = login_urls.trim().split("\\s*,\\s*");
-						if( i < 0 || i > urls.length) {
-							message(conn,req,res,"invalid_argument");
+				// we are doing a double redirect through the login server 
+				// to establish a container session. This is so we can
+				// avoid making a session when showing the login page (cookie consent)
+				// as well as avoid showing a page url containing the session id
+				String bits[] = authtype.split(":");
+				if( bits.length == 2) {
+					LoginRedirects red = conn.makeObject(LoginRedirects.class, bits[0]);
+					if( red != null) {
+						FormResult fr = red.getRedirect(bits[1]);
+						if( fr != null) {
+							// want to make a session 
+							// cookie should get set on the redirect and
+							// (unless cookies are disabled) by the time
+							// the logged in page is shown (redirect from the external auth server) 
+							// there will not be a session encoded in the url
+							req.getSession(true);
+							handleFormResult(conn, req, res, fr);
 							return;
 						}
-						// ok to make a session at this point
-						handleFormResult(conn, req, res, new RedirectResult(urls[i]));
 					}
-				}catch(Exception e) {
-					getLogger(conn).error("Error parsing alternate login", e);
-					message(conn, req, res, "invalid_argument");
 				}
+				message(conn,req,res,"invalid_argument");
 				return;
 			}
 			AppUserFactory<T> person_fac = serv.getLoginFactory();
