@@ -114,6 +114,13 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 	 */
 	@Override
 	public MimeStreamData post(URL url, Map<String,String> props, MimeStreamData input ) throws HttpException{
+		return upload(url,"POST",props,input);
+	}
+	@Override
+	public void put(URL url, Map<String,String> props, MimeStreamData input ) throws HttpException{
+		upload(url,"PUT",props,input);
+	}
+	private MimeStreamData upload(URL url,String method, Map<String,String> props, MimeStreamData input ) throws HttpException{
 		HttpURLConnection connection=null;
 		try {
 			connection = connect(url);
@@ -124,8 +131,8 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 			}
 
 			Logger log = getLogger();
-			log.debug("Post to "+url);
-			connection.setRequestMethod("POST");
+			log.debug(method+" to "+url);
+			connection.setRequestMethod(method);
 			connection.setRequestProperty("Content-Type", input.getContentType());
 			log.debug("Content-Type: "+input.getContentType());
 			connection.setRequestProperty("Content-Length", Long.toString(input.getLength()));
@@ -140,10 +147,14 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 
 			int code = connection.getResponseCode();
 
-			if( code < HttpURLConnection.HTTP_OK || code > HttpURLConnection.HTTP_ACCEPTED){
+			if( code < HttpURLConnection.HTTP_OK || code > HttpURLConnection.HTTP_NO_CONTENT){
 				HttpException e = new HttpException(connection.getResponseMessage());
 				e.setError_code(code);
 				throw e;
+			}
+			if( method.equals("PUT") || code == HttpURLConnection.HTTP_NO_CONTENT) {
+				// No content returned from PUT
+				return null;
 			}
 			String type = connection.getContentType();
 
@@ -159,7 +170,7 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 			data.read(connection.getInputStream());
 			return data;
 		} catch (Exception e) {
-			throw new HttpException("Exception POST to "+url,e);
+			throw new HttpException("Exception "+method+" to "+url,e);
 		}finally {
 			if( connection!= null) {
 				connection.disconnect();

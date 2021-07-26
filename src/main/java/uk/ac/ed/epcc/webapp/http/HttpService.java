@@ -21,7 +21,7 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 
-/** A simple {@link AppContextService} to handle http client operaitons
+/** A simple {@link AppContextService} to handle http client operations
  * 
  * This is implemented as a service to allow substitution for mock testing.
  * 
@@ -41,7 +41,9 @@ public interface HttpService extends AppContextService<HttpService>{
 
 	/** post data to a URL
 	 * 
-	 * This is intended to post a single object rather than encoded form data.
+	 * This is intended to post a single object rather than encoded form data, though
+	 * a conventional form POST can be implemented by passing a {@link MimeStreamData}
+	 * of type application/x-www-form-urlencoded
 	 * 
 	 * @param url  URL to post to
 	 * @param props additional request headers to set
@@ -50,6 +52,17 @@ public interface HttpService extends AppContextService<HttpService>{
 	 * @throws HttpException 
 	 */
 	MimeStreamData post(URL url, Map<String, String> props, MimeStreamData input) throws HttpException;
+
+	/** put data to a URL
+	 * 
+	 * 
+	 * @param url  URL to put to
+	 * @param props additional request headers to set
+	 * @param input {@link MimeStreamData} to put
+	 * @return {@link MimeStreamData}
+	 * @throws HttpException 
+	 */
+	void put(URL url, Map<String, String> props, MimeStreamData input) throws HttpException;
 
 	/** Add an encoded Basic Authorization header
 	 * 
@@ -61,7 +74,9 @@ public interface HttpService extends AppContextService<HttpService>{
 		String encoded = Base64.getEncoder().encodeToString((username+":"+password).trim().getBytes(StandardCharsets.UTF_8));  //Java 8
 		props.put("Authorization", "Basic "+encoded);
 	}
-
+	default void addBearerAuth(Map<String, String> props,String token) {
+		props.put("Authorization", "Bearer "+token);
+	}
 	@Override
 	default Class<HttpService> getType() {
 		return HttpService.class;
