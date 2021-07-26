@@ -51,11 +51,11 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
  */
 
 
-public final class JoinerFilter<T extends DataObject, BDO extends DataObject> implements SQLFilter<BDO>, JoinFilter<BDO>, LinkClause,Contexed {
+public class JoinerFilter<T extends DataObject, BDO extends DataObject> implements SQLFilter<BDO>, JoinFilter<BDO>, LinkClause,Contexed {
 	private final Class<BDO> target;
-	private final String join_field;
-	private final Repository res;
-	private final Repository remote_res;
+	protected final String join_field;
+	protected final Repository res;
+	protected final Repository remote_res;
 	
 	/**
 	 * 
