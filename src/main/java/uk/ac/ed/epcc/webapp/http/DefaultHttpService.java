@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
+import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 
 /** A simple {@link HttpService} 
@@ -117,8 +118,8 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 		return upload(url,"POST",props,input);
 	}
 	@Override
-	public void put(URL url, Map<String,String> props, MimeStreamData input ) throws HttpException{
-		upload(url,"PUT",props,input);
+	public MimeStreamData put(URL url, Map<String,String> props, MimeStreamData input ) throws HttpException{
+		return upload(url,"PUT",props,input);
 	}
 	private MimeStreamData upload(URL url,String method, Map<String,String> props, MimeStreamData input ) throws HttpException{
 		HttpURLConnection connection=null;
@@ -150,12 +151,17 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 			if( code < HttpURLConnection.HTTP_OK || code > HttpURLConnection.HTTP_NO_CONTENT){
 				HttpException e = new HttpException(connection.getResponseMessage());
 				e.setError_code(code);
+				// Try to capture content as well
+				ByteArrayStreamData res = new ByteArrayStreamData();
+				try {
+					res.read(connection.getInputStream());
+					e.setContent(res.toString());
+				}catch(Exception e2) {
+					e.addSuppressed(e2);
+				}
 				throw e;
 			}
-			if( method.equals("PUT") || code == HttpURLConnection.HTTP_NO_CONTENT) {
-				// No content returned from PUT
-				return null;
-			}
+			
 			String type = connection.getContentType();
 
 			ByteArrayMimeStreamData data = new ByteArrayMimeStreamData();

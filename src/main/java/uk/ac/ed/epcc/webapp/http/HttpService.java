@@ -62,7 +62,7 @@ public interface HttpService extends AppContextService<HttpService>{
 	 * @return {@link MimeStreamData}
 	 * @throws HttpException 
 	 */
-	void put(URL url, Map<String, String> props, MimeStreamData input) throws HttpException;
+	MimeStreamData put(URL url, Map<String, String> props, MimeStreamData input) throws HttpException;
 
 	/** Add an encoded Basic Authorization header
 	 * 

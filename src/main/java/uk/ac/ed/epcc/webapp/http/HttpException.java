@@ -19,7 +19,7 @@ package uk.ac.ed.epcc.webapp.http;
  */
 public class HttpException extends Exception {
     private int error_code;
-    
+    private String content=null;
     
 	public int getError_code() {
 		return error_code;
@@ -58,7 +58,11 @@ public class HttpException extends Exception {
 	 */
 	public HttpException(String message, Throwable cause) {
 		super(message, cause);
-		
+		if( cause instanceof HttpException) {
+			HttpException h = (HttpException) cause;
+			error_code = h.getError_code();
+			content = h.getContent();
+		}
 	}
 
 	/**
@@ -69,6 +73,14 @@ public class HttpException extends Exception {
 	 */
 	public HttpException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
 	}
 
 }

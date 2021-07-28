@@ -89,6 +89,8 @@ public class MockHttpURLConnection extends HttpURLConnection {
 	public void connect() throws IOException {
 		if( response != null) {
 			in = new ByteArrayInputStream(response);
+		}else {
+			in = new ByteArrayInputStream(new byte[0]);
 		}
 		if( getDoOutput()) {
 			out = new ByteArrayOutputStream();
