@@ -138,6 +138,9 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 			log.debug("Content-Type: "+input.getContentType());
 			connection.setRequestProperty("Content-Length", Long.toString(input.getLength()));
 			log.debug("Content-Length: "+input.getLength());
+			connection.setRequestProperty("Accept", "*/*"); 
+			log.debug("Accept: */*");
+			
 			connection.setDoOutput(true);
 		    
 			
