@@ -41,6 +41,7 @@ public class TwoFactorHandler<A extends AppUser> {
 	public static final String AUTH_USER_ATTR="TwoFactorCandidate";
 	public static final String AUTH_TYPE_ATTR="TwoFactorAuthType";
 	public static final String AUTH_RESULT_ATTR="TwoFactorResult";
+	public static final String AUTH_USES_2FA_ATTR="TwoFactorUsed";
    /**
 	 * @param sess
 	 */
@@ -168,6 +169,7 @@ public class TwoFactorHandler<A extends AppUser> {
 					if( type != null ) {
 						sess.setAuthenticationType(AUTH_TYPE_ATTR);
 					}
+					sess.setAttribute(AUTH_USES_2FA_ATTR, Boolean.TRUE);
 					securityEvent("Sucessful2FA");
 				}else {
 					A user = sess.getLoginFactory().find(requested_id);
@@ -197,5 +199,17 @@ public class TwoFactorHandler<A extends AppUser> {
 	 */
 	public Logger getLogger() {
 		return sess.getContext().getService(LoggerService.class).getLogger(getClass());
+	}
+	/** Query the session to see if TwoFactor authentication was used on login.
+	 * 
+	 * @param sess
+	 * @return
+	 */
+	public static boolean usedTwoFactor(SessionService<?> sess) {
+		Boolean b = (Boolean) sess.getAttribute(AUTH_USES_2FA_ATTR);
+		if( b != null && b.booleanValue()) {
+			return true;
+		}
+		return false;
 	}
 }
