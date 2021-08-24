@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.editors.mail;
 
+import jakarta.mail.Address;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
@@ -67,4 +68,19 @@ public interface MessageProvider {
 	 * @throws DataFault
 	 */
     public boolean commit() throws DataFault;
+    
+    /** Check if the message is in a sendable state
+     * 
+     * @return
+     * @throws DataFault
+     * @throws MessagingException
+     */
+    public default boolean canSend() throws DataFault, MessagingException {
+    	MimeMessage m = getMessage();
+    	Address[] recip = m.getAllRecipients();
+    	if( recip == null || recip.length==0) {
+    		return false;
+    	}
+    	return true;
+    }
 }

@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 
 import jakarta.mail.internet.MimeMessage;
-
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
@@ -543,7 +542,22 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		if( key == EditAction.Serve){
 			return target.canView(operator);
 		}
-		return target.canEdit(operator);
+		if( ! target.canEdit(operator)) {
+			return false;
+		}
+		if( key == EditAction.Send) {
+			
+			try {
+				MessageProvider prov = target.getHandler().getMessageProvider();
+				if( ! prov.canSend()){
+					return false;
+				}
+			} catch (Exception e) {
+				getLogger().error("Error checking sendable",e);
+				return false;
+			}
+		}
+		return true;
 	}
 
 	
@@ -554,10 +568,12 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		MessageHandler handler = target.getHandler();
 		if( handler instanceof MessageComposer && ((MessageComposer)handler).canEdit(target.getPath(), sess)){
 			for(EditAction action : getTransitions(target)){
-				ContentBuilder div = cb.getPanel("bar");
-				div.addHeading(2,action.getHelp());
-				div.addButton(getContext(), action.toString(), new ChainedTransitionResult<>(EmailTransitionProvider.this, target, action));
-				div.addParent();
+				if( allowTransition(getContext(),target,action)) {
+					ContentBuilder div = cb.getPanel("bar");
+					div.addHeading(2,action.getHelp());
+					div.addButton(getContext(), action.toString(), new ChainedTransitionResult<>(EmailTransitionProvider.this, target, action));
+					div.addParent();
+				}
 			}
 		}
 		return cb;
