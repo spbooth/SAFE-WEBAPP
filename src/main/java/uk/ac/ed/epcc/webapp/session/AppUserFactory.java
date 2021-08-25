@@ -1148,7 +1148,7 @@ NamedFilterProvider<AU>
 		AppUser currentPerson = sess == null ? null : sess.getCurrentPerson();
 		try(FilterSet set = new FilterSet(new PrimaryOrderFilter<>(getTarget(),res, false))){
 			for(AU p : set){
-
+               try {
 
 				if(currentPerson == null || ! currentPerson.equals(p)){
 					log.debug("Anonymise "+p.getIdentifier()+" "+p.getID());
@@ -1163,9 +1163,12 @@ NamedFilterProvider<AU>
 					}
 				}
 				p.commit();
+               }catch(Exception e1) {
+            	   log.error("Error anonymising person",e1);
+               }
 			}
 		}catch(Exception e) {
-			log.error("Error anonymising person",e);
+			log.error("Error anonymising people",e);
 		}
 
 	}
