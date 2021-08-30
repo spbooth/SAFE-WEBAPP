@@ -1611,7 +1611,16 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return
 	 */
     public BaseFilter<BDO> getSelectFilter(){
-    	// By default just supply the default ordering if there is one.
+    	return getDefaultOrderFilter();
+    }
+
+    /** Get a {@link SQLOrderFilter} corresponding to the
+     * factory default ordering.
+     * 
+     * @return
+     */
+	protected SQLOrderFilter<BDO> getDefaultOrderFilter() {
+		// By default just supply the default ordering if there is one.
     	String order = OrderBy(false);
     	Logger log = getLogger();
     	log.debug("selectfilter get order by of "+order);
@@ -1646,7 +1655,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			};
     	}
     	return null;
-    }
+	}
     /** Get a {@link SQLFilter} to use as the default target for relationship filters.
      * This should exclude targets that should not be used as relationship targets such as retired objects.
      * 
