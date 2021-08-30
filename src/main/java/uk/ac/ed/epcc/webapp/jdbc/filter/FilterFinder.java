@@ -44,7 +44,7 @@ public abstract  class FilterFinder<T,O> extends FilterMaker<T,O> {
 	   setFilter((BaseFilter<T>)f);
 	   O res = make();
 	   if( res == null && ! allow_null){
-		  throw new DataNotFoundException("No result from FilterFinder");
+		  throw new DataNotFoundException("No result from FilterFinder "+getLastQuery());
 	   }
 	   return res;
    }

@@ -44,9 +44,18 @@ public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
 	public FilterMaker(AppContext c,Class<T> target) {
 		super(c,target);
 	}
+	private StringBuilder query=null;
+	
+	protected String getLastQuery() {
+		if( query == null) {
+			return "";
+		}
+		return query.toString();
+	}
+	
 	
    protected O make() throws DataException{
-	   StringBuilder query = new StringBuilder();
+	    query = new StringBuilder();
 		BaseFilter<? super T> f = getFilter();
 		if( isEmpty(f)){
 			return makeDefault();
