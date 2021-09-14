@@ -20,6 +20,7 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -368,7 +369,7 @@ NamedFilterProvider<AU>
 		@Override
 		public void addNotifyText(Set<String> notices,AU person) {
 			if( needDetailsUpdate(person)) {
-				notices.add("Your user detains need to be updated/verified");
+				notices.add("Your user details need to be updated/verified");
 				return;
 			}
 			Date d = person.nextRequiredUpdate();
@@ -376,7 +377,8 @@ NamedFilterProvider<AU>
 				return;
 			}
 			if( person.warnRequiredUpdate()) {
-				notices.add("Your user details need to be updated/verified before "+d);
+				SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+				notices.add("Your user details need to be updated/verified before "+fmt.format(d));
 			}
 		}
 		
