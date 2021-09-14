@@ -69,6 +69,9 @@ public class SessionTag extends BasicSessionTag {
 	    				}
 	    			}
 	    			// all checks passed cache for session
+	    			// remove the cached destination url if set as we mutate the result url
+	    			// for some operations if this exists to ensure that required pages can chain properly
+	    			session_service.removeAttribute(RequiredPage.REQUIRED_PAGE_RETURN_ATTR);
 	    			session.setAttribute(RequiredPage.REQUIRED_PAGES_ATTR,"done");
 	    		}
 	    	}
