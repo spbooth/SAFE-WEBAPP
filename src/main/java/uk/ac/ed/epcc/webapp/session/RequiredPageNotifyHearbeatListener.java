@@ -23,6 +23,7 @@ import org.apache.logging.log4j.core.pattern.MaxLengthConverter;
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
@@ -35,7 +36,7 @@ import uk.ac.ed.epcc.webapp.model.cron.LockFactory.Lock;
  *
  */
 public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends AbstractContexed implements HeartbeatListener {
-
+    public static final Feature REQUIRED_PAGE_HEARTBEAT = new Feature("required_page.heartbeat",true,"Send emails to notify users of required actions from heartbeat");
 	/**
 	 * @param conn
 	 */
@@ -49,6 +50,9 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 	 */
 	@Override
 	public Date run() {
+		if( ! REQUIRED_PAGE_HEARTBEAT.isEnabled(getContext())) {
+			return null;
+		}
 		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 		Date now = time.getCurrentTime();
 		int hours = getContext().getIntegerParameter("required_page.heartbeat.hours", 48);
@@ -105,15 +109,19 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 				for( AU person : login.getResult(notify_filter)) {
 					// Don't notify a user who can't login to fix
 					if( person.canLogin() && (max == null || max.sendNotifications(person))) {
-						Set<String> notices = new LinkedHashSet<String>();
-						for(RequiredPage<AU> rp : requiredPages) {
-							rp.addNotifyText(notices,person);
-						}
-						if( ! notices.isEmpty()) {
-							if( max != null) {
-								max.addNotified(person);
+						try {
+							Set<String> notices = new LinkedHashSet<String>();
+							for(RequiredPage<AU> rp : requiredPages) {
+								rp.addNotifyText(notices,person);
 							}
-							mailer.notificationEmail(person, notices);
+							if( ! notices.isEmpty()) {
+								if( max != null) {
+									max.addNotified(person);
+								}
+								mailer.notificationEmail(person, notices);
+							}
+						}catch(Exception em) {
+							getLogger().error("Error sending required page notifications to "+person.getEmail(), em);
 						}
 					}
 				}
