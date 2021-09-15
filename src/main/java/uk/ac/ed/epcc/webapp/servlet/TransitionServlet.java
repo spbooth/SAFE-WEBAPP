@@ -343,6 +343,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 						message(conn, req, res, "transition_error",  key, e.getMessage());
 						return;
 					}catch(Exception|ForceRollBack tr){
+						log.error("Error in TransitionSerlet", tr);
 						if (use_transactions){
 							// assume this is bad and roll-back
 							serv.rollbackTransaction();
