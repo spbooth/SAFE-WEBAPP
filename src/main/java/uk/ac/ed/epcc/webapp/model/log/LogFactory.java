@@ -40,6 +40,8 @@ import uk.ac.ed.epcc.webapp.forms.inputs.ConstantInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
@@ -593,6 +595,20 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		fil.addFilter(new SQLValueFilter<>(getTarget(),res, LINK_ID, link));
 		return fil;
 	}
+	
+	/** get a Filter for items that point to a DataObject that match a particular filter
+	 * @param v
+	 * @param link
+	 * @return
+	 */
+	public <L extends DataObject> AndFilter<T> getItemFilter(DataObjectFactory<L> fac, ItemType.ItemValue v, BaseFilter<L> link_fil) {
+		AndFilter<T> fil;
+		fil = new AndFilter<>(getTarget());
+		fil.addFilter(getItemFilter(v));
+		fil.addFilter(getRemoteFilter(fac, LINK_ID, link_fil));
+		return fil;
+	}
+	
 	protected SQLAndFilter<T> getItemFilter(O q, ItemType.ItemValue v, int link) {
 		SQLAndFilter<T> fil = getItemFilter(v,link);
 		fil.addFilter(getOwnerFilter(q));
