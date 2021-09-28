@@ -91,7 +91,16 @@ public class MaxNotifyComposite<A extends AppUser> extends Composite<A, MaxNotif
 		return getRepository().hasField(NOTIFY_COUNT_FIELD);
 	}
 
-	private static RoleAppUserKey STOP_NOTIFY = new RoleAppUserKey("StopNotifications","Stop automatic notifications of required updates for the user", "StopNotifications");
+	private static RoleAppUserKey STOP_NOTIFY = new RoleAppUserKey("StopNotifications","Stop automatic notifications of required updates for the user", "StopNotifications") {
+
+		@Override
+		protected boolean allowState(AppUser user) {
+			AppUserFactory fac = user.getFactory();
+			MaxNotifyComposite comp = (MaxNotifyComposite) fac.getComposite(MaxNotifyComposite.class);
+			return ( comp != null && comp.sendNotifications(user));
+		}
+		
+	};
 	@Override
 	public Map<AppUserKey<A>, Transition<A>> getTransitions(AppUserTransitionProvider<A> provider) {
 		Map<AppUserKey<A>, Transition<A>> t = new HashMap<AppUserKey<A>, Transition<A>>();
