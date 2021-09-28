@@ -108,7 +108,7 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 			try {
 				for( AU person : login.getResult(notify_filter)) {
 					// Don't notify a user who can't login to fix
-					if( person.canLogin() && (max == null || max.sendNotifications(person))) {
+					if( person.canLogin() && person.allowEmail() && (max == null || max.sendNotifications(person))) {
 						try {
 							Set<String> notices = new LinkedHashSet<String>();
 							for(RequiredPage<AU> rp : requiredPages) {
