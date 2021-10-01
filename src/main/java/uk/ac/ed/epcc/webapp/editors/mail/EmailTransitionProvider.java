@@ -36,6 +36,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.CustomFormContent;
 import uk.ac.ed.epcc.webapp.forms.transition.DirectTargetlessTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.ShowDisabledTransitions;
 import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
@@ -65,7 +66,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @author spb
  *
  */
-public class EmailTransitionProvider implements ViewPathTransitionProvider<EditAction, MailTarget>{
+public class EmailTransitionProvider implements ViewPathTransitionProvider<EditAction, MailTarget>, ShowDisabledTransitions<EditAction, MailTarget>{
 	public static Feature SEND_NOW=new Feature("email.send_now", false, "Enable a send-now button for email text updates");
 	public class TransitionLinker implements MessageEditLinker{
 		private final AppContext conn;
@@ -729,5 +730,17 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 	public <X extends ContentBuilder> X getBottomContent(X cb, MailTarget target, SessionService<?> sess) {
 		return cb;
 	}
+
+
+	@Override
+	public boolean showDisabledTransition(AppContext c, MailTarget target, EditAction key) {
+		if( key != null && key.equals(EditAction.Send) && target.canEdit(c.getService(SessionService.class))) {
+			return true;
+		}
+		return false;
+	}
+
+
+	
 
 }

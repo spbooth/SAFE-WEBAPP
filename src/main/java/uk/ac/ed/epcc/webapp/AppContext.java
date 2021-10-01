@@ -281,6 +281,15 @@ public final class AppContext {
 			}
 		}
 	}
+	public final void warn(String errors) {
+		LoggerService serv = getService(LoggerService.class);
+		if( serv != null ){
+			Logger log = serv.getLogger(getClass());
+			if( log != null ){
+				log.warn(errors);
+			}
+		}
+	}
 
 	
 	/**
@@ -1038,8 +1047,8 @@ public final class AppContext {
 	 */
 	@SuppressWarnings("unchecked")
 	public final <T> T makeObjectWithDefault(Class<T> clazz, Class<? extends T> default_class,String path, String name){
-		if( name == null || name.isEmpty()) {
-			error("makeObject with null/empty tag");
+		if( default_class == null && ( name == null || name.isEmpty())) {
+			error("makeObject with null/empty tag and no default");
 			return null;
 		}
 		String tag=name;
