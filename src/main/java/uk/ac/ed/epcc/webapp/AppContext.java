@@ -1038,7 +1038,10 @@ public final class AppContext {
 	 */
 	@SuppressWarnings("unchecked")
 	public final <T> T makeObjectWithDefault(Class<T> clazz, Class<? extends T> default_class,String path, String name){
-		
+		if( name == null || name.isEmpty()) {
+			error("makeObject with null/empty tag");
+			return null;
+		}
 		String tag=name;
 		if( path != null && name != null && path.length() > 0 && name.length() > 0){
 			tag = path+"."+name;
