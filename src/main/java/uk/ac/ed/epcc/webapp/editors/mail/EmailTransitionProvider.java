@@ -18,6 +18,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.mail.Address;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
@@ -597,6 +601,8 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 					heading.addParent();
 					cb.addText("This email has been changed while you were editing.");
 				}
+				
+				
 			}else{
 				MessageHandlerFormat mhf = new MessageHandlerFormat(getContext(), handler, new TransitionLinker(getContext(), target));
 				mhf.getContent(cb);
@@ -740,7 +746,17 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		return false;
 	}
 
-
+    public static boolean hasRecipient(Message m) throws MessagingException {
+    	Address[] recip = m.getAllRecipients();
+    	if( recip == null || recip.length==0) {
+    		return false;
+    	}
+    	if( recip.length == 1 && recip[0].equals(new InternetAddress("undisclosed-recipients:;"))) {
+    		// no real recipients for a mailing list
+    		return false;
+    	}
+    	return true;
+    }
 	
 
 }

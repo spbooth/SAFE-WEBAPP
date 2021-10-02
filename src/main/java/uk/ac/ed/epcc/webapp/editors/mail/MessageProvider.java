@@ -16,11 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.editors.mail;
 
-import jakarta.mail.Address;
 import jakarta.mail.MessagingException;
-import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
-
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 /** This interface indicates an object that stores a MimeMessage
  * In addition to get/set methods for the MimeMessage there are also
@@ -78,14 +75,6 @@ public interface MessageProvider {
      */
     public default boolean canSend() throws DataFault, MessagingException {
     	MimeMessage m = getMessage();
-    	Address[] recip = m.getAllRecipients();
-    	if( recip == null || recip.length==0) {
-    		return false;
-    	}
-    	if( recip.length == 1 && recip[0].equals(new InternetAddress("undisclosed-recipients:;"))) {
-    		// no real recipients for a mailing list
-    		return false;
-    	}
-    	return true;
+    	return EmailTransitionProvider.hasRecipient(m);
     }
 }

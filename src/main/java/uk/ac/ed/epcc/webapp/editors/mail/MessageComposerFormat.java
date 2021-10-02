@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.editors.mail;
 
 import java.util.List;
 
+import jakarta.mail.Message;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
@@ -74,6 +75,14 @@ public class MessageComposerFormat {
 			}
 			((MessageComposerExtraFormat)composer).addTopContent(top);
 			top.addParent();
+		}
+		try {
+			Message m = composer.getMessageProvider().getMessage();
+			if( m != null && ! EmailTransitionProvider.hasRecipient(m)) {
+				sb.getPanel("warn").getText().clean("This message cannot be sent as it has no recipients").appendParent().appendParent();
+			}
+		}catch(Exception e) {
+			getLogger().error("Error checking for recipients", e);
 		}
 		EditMessageVisitor v = new EditMessageVisitor(conn,sb,lk);
 		MessageWalker mw = new MessageWalker(conn);
