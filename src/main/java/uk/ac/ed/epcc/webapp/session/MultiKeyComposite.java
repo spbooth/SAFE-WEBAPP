@@ -30,7 +30,6 @@ import uk.ac.ed.epcc.webapp.ssh.SshPublicKeyArrayInput;
  */
 public class MultiKeyComposite extends PublicKeyComposite<PublicKey[]> {
 
-	public static final Feature NO_KEY_FROM_REST = new Feature("sshkey.no_key_from_rest",false,"Supress changing keys from REST api");
 	/**
 	 * @param fac
 	 */
@@ -89,13 +88,4 @@ public class MultiKeyComposite extends PublicKeyComposite<PublicKey[]> {
 	}
 
 
-	@Override
-	public Set<String> addSuppress(Set<String> suppress) {
-	
-		Set<String> supress = super.addSuppress(suppress);
-		if(NO_KEY_FROM_REST.isEnabled(getContext())) {
-			supress.add(PUBLIC_KEY);
-		}
-		return supress;
-	}
 }
