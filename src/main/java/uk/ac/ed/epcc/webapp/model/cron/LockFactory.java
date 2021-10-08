@@ -34,6 +34,7 @@ import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.content.Transform;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -250,5 +251,55 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 		t.setColFormat("Last locked", f);
 		return t;
 	}
+	/** Create and take an optional serialisation lock
+	 * These are optional in the sense that if it is unable to
+	 * obtain the lock after a period of time then it will
+	 * return null to allow the code to continue
+	 * 
+	 * @param lock_name
+	 * @return
+	 */
+	public Lock takeOptionalLock(String lock_name) {
+		try {
+			AppContext conn = getContext();
+			// retry 1N times
+			int max = conn.getIntegerParameter(lock_name+".retry", 100);
+			long max_hold_millis = conn.getLongParameter(lock_name+".max_hold", 60000L);
+			for(int retry=0 ; retry<max;retry++) {
+				LockFactory.Lock dblock = makeFromString(lock_name);
+				if( dblock != null ) {
+					if( dblock.isLocked()) {
+						Date locked = dblock.wasLockedAt();
+						CurrentTimeService time = conn.getService(CurrentTimeService.class);
+						if( locked.getTime()+max_hold_millis < time.getCurrentTime().getTime()) {
+							getLogger().error("Lock "+dblock.getName()+" held since "+locked);
+							// proceed without lock its blocked somehow.
+							return null;
+						}
+					
+					}else if( dblock.takeLock()) {
+						return dblock;
+					}
+					// want to retry was locked or lock failed
+					getLogger().warn("Retrying lock "+lock_name+": "+retry);
+					dblock.release();
+					dblock=null;
+					try {
+						Thread.sleep(1000L);
+					} catch (InterruptedException e) {
+						getLogger().error("Wait interrupted",e);
+					}
 
+				}else {
+					getLogger().error("No DB lock created "+lock_name);
+					return null;
+				}
+			}
+		}catch(DataException e) {
+			getLogger().error("Error making lock "+lock_name,e);
+
+		}
+		// continue without lock
+		return null;
+	}
 }
