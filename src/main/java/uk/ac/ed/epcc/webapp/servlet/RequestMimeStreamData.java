@@ -66,7 +66,7 @@ public class RequestMimeStreamData extends AbstractContexed implements MimeStrea
 	 */
 	@Override
 	public OutputStream getOutputStream() {
-		throw new UnsupportedOperationException("setDataStream not supported for RequestStreamData");
+		throw new UnsupportedOperationException("getOutputStream not supported for RequestStreamData");
 	}
 
 	
