@@ -125,11 +125,7 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 		HttpURLConnection connection=null;
 		try {
 			connection = connect(url);
-			if( props != null){
-				for(String key : props.keySet()){
-					connection.setRequestProperty(key, props.get(key));
-				}
-			}
+			
 
 			Logger log = getLogger();
 			log.debug(method+" to "+url);
@@ -138,9 +134,17 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 			log.debug("Content-Type: "+input.getContentType());
 			connection.setRequestProperty("Content-Length", Long.toString(input.getLength()));
 			log.debug("Content-Length: "+input.getLength());
-			connection.setRequestProperty("Accept", "*/*"); 
-			log.debug("Accept: */*");
-			
+			if( ! props.containsKey("Accept")) {
+				connection.setRequestProperty("Accept", "*/*"); 
+				log.debug("Accept: */*");
+			}
+			if( props != null){
+				for(String key : props.keySet()){
+					String value = props.get(key);
+					connection.setRequestProperty(key, value);
+					log.debug(key+": "+value);
+				}
+			}
 			connection.setDoOutput(true);
 		    
 			
