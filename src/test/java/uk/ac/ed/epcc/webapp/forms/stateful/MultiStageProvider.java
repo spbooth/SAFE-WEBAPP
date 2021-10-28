@@ -103,6 +103,10 @@ public class MultiStageProvider extends AbstractTransitionProvider<Number,Transi
 	 */
 	public MultiStageProvider(AppContext c) {
 		super(c);
+	}
+	@Override
+	protected void setupTransitions() {
+		super.setupTransitions();
 		addTransition(CREATE_KEY, new MultiStageCreate());
 	}
 

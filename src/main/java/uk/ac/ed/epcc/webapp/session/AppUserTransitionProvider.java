@@ -272,6 +272,11 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		super(c);
 		SessionService sess = c.getService(SessionService.class);
 		fac = sess.getLoginFactory();
+	}
+	@Override
+	protected void setupTransitions() {
+		super.setupTransitions();
+		SessionService sess = getContext().getService(SessionService.class);
 		if( fac instanceof AppUserTransitionContributor) {
 			AppUserTransitionContributor<AU> cont = (AppUserTransitionContributor<AU>) fac;
 			for(Entry<AppUserKey<AU>, Transition<AU>> e : cont.getTransitions(this).entrySet()) {
@@ -283,7 +288,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 				addTransition( e.getKey(), e.getValue());
 			}
 		}
-		if( USER_SELF_UPDATE_FEATURE.isEnabled(c)) {
+		if( USER_SELF_UPDATE_FEATURE.isEnabled(getContext())) {
 			addTransition(UPDATE, new UpdateDetailsTransition(this,fac));
 		}
 		addTransition(SET_ROLE_KEY, new SetRoleTransition<AU>());

@@ -122,6 +122,10 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 	 */
 	public TestTransitionProvider(AppContext c) {
 		super(c);
+	}
+	@Override
+	protected void setupTransitions() {
+		
 		addTransition(THREE_KEY,new AbstractDirectTargetlessTransition<Number>() {
 
 			@Override

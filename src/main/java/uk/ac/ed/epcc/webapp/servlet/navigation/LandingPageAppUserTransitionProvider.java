@@ -131,6 +131,10 @@ public class LandingPageAppUserTransitionProvider<AU extends AppUser> extends Ap
 	 */
 	public LandingPageAppUserTransitionProvider(AppContext c) {
 		super(c);
+	}
+	@Override
+	protected void setupTransitions() {
+		super.setupTransitions();
 		// Add the top-level leaf menu items as transitions
 		SUNodeMaker maker = new SUNodeMaker(getContext());
 		Node top = new ParentNode();

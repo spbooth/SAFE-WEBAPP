@@ -277,7 +277,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		if( key == null ){
 			key = (K) factory.lookupTransition(target, req.getParameter(TransitionServlet.TRANSITION_KEY_ATTR));
 		 }
-		 assertNotNull(key);
+		 assertNotNull("No transition found for key "+key,key);
 		 if( factory instanceof TitleTransitionFactory){
 			 // could do this for all transitions but
 			 // would need to update results for all non Title factories

@@ -1072,11 +1072,27 @@ public final class AppContext {
 					return (T) o;
 				}else {
 					error("Unexpected class "+o.getClass().getCanonicalName()+" not assignable to "+clazz.getCanonicalName()+" tag:"+tag);
+					key=null;
 					removeAttribute(key);
 				}
 			}
 		}
 		Class<? extends T> target = getPropertyClass(clazz,default_class,tag);
+		// now consider if only the resolved class implements ContexedCached
+		if( key == null && target != null && tag != null  && ContextCached.class.isAssignableFrom(target)&&CONTEXT_CACHE_FEATURE.isEnabled(this) ) {
+			key = new ObjectCacheKey(path, tag);
+			Object o = getAttribute(key);
+			if( o != null) {
+				if( target.isAssignableFrom(o.getClass())) {
+					return (T) o;
+				}else {
+					error("Unexpected class "+o.getClass().getCanonicalName()+" not assignable to "+clazz.getCanonicalName()+" tag:"+tag);
+					key=null;
+					removeAttribute(key);
+				}
+			}
+		}
+		
 		if( target == null ){
 			// try without path
 			target = getPropertyClass(clazz,default_class,name);
