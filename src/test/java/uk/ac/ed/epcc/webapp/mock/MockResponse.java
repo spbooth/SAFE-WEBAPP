@@ -34,6 +34,7 @@ public class MockResponse implements HttpServletResponse {
 
 	public int error=HttpServletResponse.SC_OK;
 	public String error_str=null;
+	public boolean output_added=false;
 	public MockOutputStream stream = new MockOutputStream();
 	public String encoding="UTF-8";
 	public String content_type="text/html";
@@ -83,11 +84,13 @@ public class MockResponse implements HttpServletResponse {
 	}
 
 	public void sendError(int arg0) throws IOException {
-		error=arg0;
-		error_str="Unspecified error";
+		sendError(arg0, "Unspewcified error");
 	}
 
 	public void sendError(int arg0, String arg1) throws IOException {
+		if( output_added) {
+			throw new IllegalStateException("Output already added");
+		}
 		this.error=arg0;
 		this.error_str = arg1;
 
@@ -148,21 +151,21 @@ public class MockResponse implements HttpServletResponse {
 	}
 
 	public ServletOutputStream getOutputStream() throws IOException {
-		
+		output_added=true;
 		return stream;
 	}
 
 	PrintWriter writer = null;
 	public PrintWriter getWriter() throws IOException {
 		if( writer == null) {
-			writer = new PrintWriter(stream);
+			writer = new PrintWriter(getOutputStream());
 		}
 		return writer;
 	}
 
 	public boolean isCommitted() {
 		
-		return false;
+		return output_added;
 	}
 
 	public void reset() {
