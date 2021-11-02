@@ -109,6 +109,7 @@ public class PasswordChangeRequestServlet<A extends AppUser> extends WebappServl
 						AppUserNameFinder finder = user.getFactory().getRealmFinder(EmailNameFinder.EMAIL);
 						if( finder != null ) {
 							finder.verified(user); // email address verified by reset link
+							user.commit();
 						}
 						handleFormResult(conn, req, res, result);
 					} catch (Exception e) {

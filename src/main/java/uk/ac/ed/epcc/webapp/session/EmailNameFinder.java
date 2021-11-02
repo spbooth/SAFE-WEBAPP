@@ -239,6 +239,10 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 			if( need_by != null ){
 				attributes.put("Next Email verification required",need_by);
 			}
+		}else {
+			if( getRepository().hasField(EMAIL_VERIFIED_FIELD)) {
+				attributes.put("Email verification", "Email address has noit been verified");
+			}
 		}
 	}
 
