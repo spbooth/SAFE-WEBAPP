@@ -18,9 +18,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -39,7 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.codec.binary.Base64;
+
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
@@ -788,7 +788,7 @@ public class DefaultServletService implements ServletService{
 		}
 	}
 	protected static String decode(String base64) {
-		return new String(Base64.decodeBase64(base64));
+		return new String(Base64.getDecoder().decode(base64));
 	}
 	/**
 	 * Report an application error.
@@ -970,5 +970,14 @@ public class DefaultServletService implements ServletService{
 			sess.setMaxInactiveInterval(seconds);
 		}
 		
+	}
+
+
+	@Override
+	public void sendError(int code, String message) throws IOException {
+		getRequest().setAttribute(ERROR_MSG_ATTR, message);
+		if( res != null && res instanceof HttpServletResponse ){
+			((HttpServletResponse)res).sendError(code, message);
+		}
 	}
 }

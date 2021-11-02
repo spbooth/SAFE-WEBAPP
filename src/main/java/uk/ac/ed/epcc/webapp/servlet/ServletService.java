@@ -41,11 +41,17 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 public interface ServletService extends AppContextService<ServletService>, Contexed{
 	
-	/**
+	/** form parameter for the default payload.
+	 * unencoded PUT data is mapped to this param
 	 * 
 	 */
 	String DEFAULT_PAYLOAD_PARAM = "update";
 
+	/** request attribute for a custom message to add
+	 * to errorpage content
+	 * 
+	 */
+	String ERROR_MSG_ATTR = "uk.ac.ed.epcc.webapp.error.message";
 	/** un-encoded version of the original request page.
 	 * 
 	 *  * This uses a cached value because the request URL will be
@@ -259,4 +265,14 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * @param seconds
 	 */
 	public void setTimeout(int seconds);
+	
+	/** Send an error reponse.
+	 * The message is included in the response header but
+	 * also included in the html error page
+	 * 
+	 * @param code  Http error code
+	 * @param message custom message
+	 * @throws IOException 
+	 */
+	public void sendError(int code, String message) throws IOException;
 }
