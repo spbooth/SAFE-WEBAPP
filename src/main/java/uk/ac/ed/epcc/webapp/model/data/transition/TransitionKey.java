@@ -33,7 +33,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  */
 
 
-public class TransitionKey<T> {
+public class TransitionKey<T> implements HelpText{
 	private final String name;
 	private final String help;
 	private final Class<? super T> target;

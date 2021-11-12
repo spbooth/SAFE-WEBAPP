@@ -56,7 +56,9 @@ public interface SplitManager<T extends TimePeriod> {
 	 * 
 	 * @return Date or null
 	 */
-	 public Date getEditMarker();
+	 public default Date getEditMarker() {
+		 return null;
+	 }
 	 
 	 
 	 /** Get a date before which edits are forbidden for the current user
