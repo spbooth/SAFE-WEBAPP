@@ -16,62 +16,48 @@ package uk.ac.ed.epcc.webapp.time;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.apache.logging.log4j.util.Supplier;
+
+import uk.ac.ed.epcc.webapp.AppContext;
+
 /** A {@link TimePeriod} corresponding to the standard {@link CalendarFieldSplitPeriod}
  * representation. This is usually used as part of the target for transitions with
  * a time-period view-port
  * @author Stephen Booth
  *
  */
-public class ViewPeriod implements TimePeriod {
+public class ViewPeriod extends CalendarFieldSplitPeriod {
 	protected static final String SEPERATOR = "-";
-	
-	protected final Calendar start;
-	protected final int field;
-	protected final int block;
-	protected final int num_periods;
+
 	
 	
-	public ViewPeriod(ViewPeriod p){
-		this(p.start,p.field,p.block,p.num_periods);
+	public ViewPeriod(CalendarFieldSplitPeriod p){
+		this(p.getCalStart(),p.getField(),p.getCount(),p.getNsplit());
 	}
 
 	public ViewPeriod(Calendar start, int field, int block, int num_periods) {
-		this.start = (Calendar) start.clone();
-		this.field = field;
-		this.block = block;
-		this.num_periods=num_periods;
+		super(start,field,block,num_periods);
 	}
 
 	
 	  
-	public final Date getStart() {
-		  return start.getTime();
-	  }
-
-	public final Date getEnd() {
-	   Calendar cal = (Calendar) start.clone();
-	   cal.add(field,num_periods*block);
-	   return cal.getTime();
-	}
-	public final int getField(){
-		return field;
-	}
+	
 	public final int getBlock(){
-		return block;
+		return getNsplit();
 	}
 	public final int getNumPeriods(){
-		return num_periods;
+		return getCount();
 	}
 	
-	public final ViewPeriod up(){
-		Calendar c = (Calendar) start.clone();
-		c.add(field, block);
-		return create(c,field,block,num_periods);
+	public ViewPeriod up(){
+		Calendar c = (Calendar) getCalStart().clone();
+		c.add(getField(), getCount());
+		return new ViewPeriod(c,getField(),getCount(),getNsplit());
 	}
-	public final ViewPeriod down(){
-		Calendar c = (Calendar) start.clone();
-		c.add(field, - block);
-		return create(c,field,block,num_periods);
+	public ViewPeriod down(){
+		Calendar c = (Calendar) getCalStart().clone();
+		c.add(getField(), - getCount());
+		return new ViewPeriod(c,getField(),getCount(),getNsplit());
 	}
 	protected ViewPeriod create(Calendar c, int field, int block, int num_periods) {
 		return new ViewPeriod(c,field,block,num_periods);
@@ -88,21 +74,9 @@ public class ViewPeriod implements TimePeriod {
 		Integer.parseInt(tags[3]));
 	}
 	public String toString(){
-		return start.getTimeInMillis()+SEPERATOR+field+SEPERATOR+block+SEPERATOR+num_periods;
+		return getCalStart().getTimeInMillis()+SEPERATOR+getField()+SEPERATOR+getCount()+SEPERATOR+getNsplit();
 	}
-	@Override
-	public int hashCode() {
-		return start.hashCode()+field+block;
-	}
-	@Override
-	public boolean equals(Object obj) {
-		if(obj instanceof ViewPeriod){
-			ViewPeriod p = (ViewPeriod) obj;
-			return start.equals(p.start)  &&
-			   field==p.field && block == p.block && num_periods == p.num_periods;
-		}
-		return false;
-	}
+	
 	
 	
 
@@ -156,6 +130,27 @@ public class ViewPeriod implements TimePeriod {
 		return Double.valueOf(full_months+fraction);
 		
 	}
-	
+	/** Generate a ViewPeriod matching a specified {@link Period}
+	 * 
+	 * If this is not possible the default period is returned
+	 * 
+	 * @param conn
+	 * @param p
+	 * @return
+	 */
+	public static ViewPeriod getViewPeriod(AppContext conn,TimePeriod p,Supplier<ViewPeriod> def) {
+		if( p instanceof ViewPeriod) {
+			return (ViewPeriod) p;
+		}
+		if( p instanceof CalendarFieldSplitPeriod) {
+			return new ViewPeriod((CalendarFieldSplitPeriod)p);
+		}
+		SplitPeriod split = SplitPeriod.getInstance(p.getStart(), p.getEnd());
+		if( split instanceof CalendarFieldSplitPeriod) {
+			return new ViewPeriod((CalendarFieldSplitPeriod) split);
+		}
+		return def.get();
+	}
 
+	
 }

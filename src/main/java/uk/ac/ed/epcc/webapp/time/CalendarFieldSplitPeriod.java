@@ -83,4 +83,38 @@ public class CalendarFieldSplitPeriod extends SplitPeriod {
 	public Calendar getCalStart(){
 		return cal;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((cal == null) ? 0 : cal.hashCode());
+		result = prime * result + count;
+		result = prime * result + field;
+		result = prime * result + nsplit;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CalendarFieldSplitPeriod other = (CalendarFieldSplitPeriod) obj;
+		if (cal == null) {
+			if (other.cal != null)
+				return false;
+		} else if (!cal.equals(other.cal))
+			return false;
+		if (count != other.count)
+			return false;
+		if (field != other.field)
+			return false;
+		if (nsplit != other.nsplit)
+			return false;
+		return true;
+	}
 }
