@@ -40,7 +40,7 @@ public class ViewPeriod extends CalendarFieldSplitPeriod {
 	}
 
 	
-	  
+	
 	
 	public final int getBlock(){
 		return getNsplit();
@@ -52,13 +52,22 @@ public class ViewPeriod extends CalendarFieldSplitPeriod {
 	public ViewPeriod up(){
 		Calendar c = (Calendar) getCalStart().clone();
 		c.add(getField(), getCount());
-		return new ViewPeriod(c,getField(),getCount(),getNsplit());
+		return create(c,getField(),getCount(),getNsplit());
 	}
 	public ViewPeriod down(){
 		Calendar c = (Calendar) getCalStart().clone();
 		c.add(getField(), - getCount());
-		return new ViewPeriod(c,getField(),getCount(),getNsplit());
+		return create(c,getField(),getCount(),getNsplit());
 	}
+	/** create a new object of the same type as this one.
+	 * 
+	 * This is needed so sub-classes can create new objects of the corret type
+	 * @param c
+	 * @param field
+	 * @param block
+	 * @param num_periods
+	 * @return
+	 */
 	protected ViewPeriod create(Calendar c, int field, int block, int num_periods) {
 		return new ViewPeriod(c,field,block,num_periods);
 	}
