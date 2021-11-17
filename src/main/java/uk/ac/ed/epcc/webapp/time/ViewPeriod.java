@@ -43,10 +43,10 @@ public class ViewPeriod extends CalendarFieldSplitPeriod {
 	
 	
 	public final int getBlock(){
-		return getNsplit();
+		return getCount();
 	}
 	public final int getNumPeriods(){
-		return getCount();
+		return getNsplit();
 	}
 	
 	public ViewPeriod up(){
