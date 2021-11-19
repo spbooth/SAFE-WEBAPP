@@ -66,13 +66,6 @@ public final class AutoNamePolicy<AU extends AppUser> extends FieldNameFinder<AU
 	
 	
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.session.FieldNameFinder#userSupplied()
-	 */
-	@Override
-	public boolean userVisible() {
-		return true;
-	}
 
 	@Override
 	public void anonymise(AU target) {
