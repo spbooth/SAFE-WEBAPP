@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.ExpressionTestFactory.ExpressionTest;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
@@ -42,7 +43,7 @@ public class ExpressionFilterTest extends WebappTestBase {
 	public ExpressionTest obj;
 	
 	@Before
-	public void setup() throws DataFault {
+	public void setup() throws DataFault, ParseException {
 		fac = new ExpressionTestFactory(ctx);
 		obj=fac.makeFromString("Boris");
 		Calendar c = Calendar.getInstance();

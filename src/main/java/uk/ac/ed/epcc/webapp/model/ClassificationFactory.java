@@ -161,7 +161,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#makeByName(java.lang.String)
 	 */
 	@Override
-	public final T makeFromString(String name) throws DataFault{
+	public final T makeFromString(String name) throws DataFault, ParseException{
 		if( name == null || name.isEmpty()){
 			return null;
 		}
@@ -169,6 +169,9 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		if( c != null ){
 			return c;
 		}
+		
+		validateNameFormat(name);
+		
 		c = makeBDO();
 		c.setName(name);
 		postMakeByName(c, name);
@@ -385,7 +388,11 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			@Override
 			protected T findIndexed(String key) throws DataException {
 				if( auto_create ) {
-					return makeFromString(key);
+					try {
+						return makeFromString(key);
+					} catch (ParseException e) {
+						throw new DataException("Invalid name",e);
+					}
 				}else {
 					return findFromString(key);
 				}
@@ -525,7 +532,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	 */
 	@Override
 	public void validateNameFormat(String name) throws ParseException {
-		if( ! allowSpacesInName() && WHITESPACE.matcher(name).matches()){
+		if( ! allowSpacesInName() && WHITESPACE.matcher(name).find()){
 			throw new ParseException("No whitespace allowed");
 		}
 		if( name.length() > res.getInfo(Classification.NAME).getMax()){

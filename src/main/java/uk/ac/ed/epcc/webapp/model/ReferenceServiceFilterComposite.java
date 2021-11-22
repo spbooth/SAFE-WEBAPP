@@ -219,7 +219,7 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 				}
 			}
 			
-		} catch (DataFault e) {
+		} catch (Exception e) {
 			getLogger().error("Error looking up serviceID", e);
 		}
 		return ids;
