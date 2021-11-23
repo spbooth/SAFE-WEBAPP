@@ -136,21 +136,16 @@ public class TimePeriods implements Iterable<TimePeriods.Period>{
 		}
 		return false;
 	}
-	public Period intersection(Period in) {
-		for(Period p : set) {
-			if( p.overlapps(in)) {
-				return p.intersection(in);
-			}
-		}
-		return null;
-	}
+	
 	
 	public TimePeriods intersection(TimePeriods in) {
 		TimePeriods result = new TimePeriods();
 		for( Period p : in.set) {
-			Period i = intersection(p);
-			if( i != null ) {
-				result.add(i);
+			for( Period p2 : set) {
+				Period i = p2.intersection(p);
+				if( i != null ) {
+					result.add(i);
+				}
 			}
 		}
 		return result;
@@ -265,6 +260,9 @@ public class TimePeriods implements Iterable<TimePeriods.Period>{
 				return getEnd().compareTo(o.getEnd());
 			}
 			return c1;
+		}
+		public String toString() {
+			return "Period("+getStart()+","+getEnd()+(tag != null? " "+tag:"");
 		}
 	}
     /** total number of seconds in the set
