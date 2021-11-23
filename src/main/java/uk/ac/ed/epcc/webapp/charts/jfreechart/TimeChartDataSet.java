@@ -27,6 +27,7 @@ import org.jfree.data.xy.TableXYDataset;
 import org.jfree.data.xy.XYDomainInfo;
 import org.jfree.data.xy.XYRangeInfo;
 
+import uk.ac.ed.epcc.webapp.charts.DataRange;
 import uk.ac.ed.epcc.webapp.charts.GenericSplitSetPlot;
 import uk.ac.ed.epcc.webapp.charts.TimeChartData;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
@@ -333,7 +334,10 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 	@Override
 	public Range getRangeBounds(List visibleSeriesKeys, Range xrange, boolean include_int) {
 		// start with just global range
-		return new Range(0.0,getMaximum());
+		DataRange r = getRange();
+		Number min = r.getMin();
+		Number max = r.getMax();
+		return new Range(min != null ? min.doubleValue() : getMinimum(),max != null ? max.doubleValue() : getMaximum());
 	}
 
 }
