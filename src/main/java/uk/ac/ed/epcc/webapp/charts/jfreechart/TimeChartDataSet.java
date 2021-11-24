@@ -337,7 +337,24 @@ public class TimeChartDataSet extends GenericSplitSetPlot implements IntervalXYD
 		DataRange r = getRange();
 		Number min = r.getMin();
 		Number max = r.getMax();
-		return new Range(min != null ? min.doubleValue() : getMinimum(),max != null ? max.doubleValue() : getMaximum());
+		if( min == null && max == null) {
+			// auto range
+			min=getMinimum();
+			max=getMaximum();
+		}else if ( min == null ) {
+			// auto mimimum cap at fixed max
+			min = getMinimum();
+			if( min.doubleValue() > max.doubleValue()) {
+				min = max;
+			}
+		}else if ( max == null ) {
+			// auto maximum cap at fixed min.
+			max = getMaximum();
+			if( max.doubleValue() < min.doubleValue()) {
+				max = min;
+			}
+		}
+		return new Range( min.doubleValue() ,max.doubleValue());
 	}
 
 }
