@@ -69,7 +69,7 @@ public final class AutoNamePolicy<AU extends AppUser> extends FieldNameFinder<AU
 
 	@Override
 	public void anonymise(AU target) {
-		if( getContext().getBooleanParameter("person.anonymise."+getRealm(), true)) {
+		if( getContext().getBooleanParameter("person.anonymise."+getRealm(), true) && getRepository().hasField(getRealm())) {
 			getRecord(target).setProperty(getRealm(), "Person-"+target.getID());
 		}
 	}
