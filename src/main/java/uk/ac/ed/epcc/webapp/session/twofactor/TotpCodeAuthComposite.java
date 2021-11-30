@@ -63,6 +63,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.QRServlet;
@@ -87,7 +88,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @author Stephen Booth
  *
  */
-public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<A,Integer> implements AppUserTransitionContributor, SummaryContributer<A>, RequiredPageProvider<A> {
+public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<A,Integer> implements AppUserTransitionContributor, SummaryContributer<A>, RequiredPageProvider<A>, AnonymisingComposite<A> {
 	public static final Feature REQUIRED_TWO_FACTOR= new Feature("two_factor.required",false,"Is two factor authentication required");
 	public static final Feature VERIFY_OLD_CODE=new Feature("two_factor.verify_previous_code",true,"Verify current code on key change");
 	private static final String SECRET_FIELD="AuthCodeSecret";
@@ -597,6 +598,14 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 			cb.addObject(extra);
 		}
 		return cb;
+	}
+
+	@Override
+	public void anonymise(A target) {
+		if( ! REQUIRED_TWO_FACTOR.isEnabled(getContext())) {
+			clearSecret(target);
+		}
+		
 	}
 
 }
