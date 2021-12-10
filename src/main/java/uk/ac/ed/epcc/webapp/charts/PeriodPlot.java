@@ -43,4 +43,16 @@ public interface PeriodPlot extends SetPlot {
 	 */
 	public abstract <F> boolean addMapData(QueryMapper<F> t, F fac)
 	        throws uk.ac.ed.epcc.webapp.charts.InvalidTransformException;
+
+
+	/** Set a custom Y axis range
+	 * 
+	 * @param range
+	 */
+	public void setRange(DataRange range);
+	/** Get a custom Y axis range
+	 * 
+	 * @return
+	 */
+	public DataRange getRange();
 }

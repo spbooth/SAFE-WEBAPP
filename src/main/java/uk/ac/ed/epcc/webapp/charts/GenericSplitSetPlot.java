@@ -71,7 +71,25 @@ public class GenericSplitSetPlot extends SplitSetPlot {
 		return max;
 
 	}
+	public float getMinimum() {
+		if( nset == 0 || ncat == 0 || nitem == 0){
+			// There is no data
+			return 0.0F;
+		}
+		float min = data[0][0][0];
+		// assumes sets are plotted front to back
+		for (int i = 0; i < nset; i++) {
+			for (int j = 0; j < ncat; j++) {
+				for (int k = 0; k < nitem; k++) {
+					if( data[i][j][k] < min ){
+						min=data[i][j][k];
+					}
+				}
+			}
+		}
+		return min;
 
+	}
 	@Override
 	public final float get(int i, int j, int k) {
 		if (i >= nset || j >= ncat || k >= nitem) {

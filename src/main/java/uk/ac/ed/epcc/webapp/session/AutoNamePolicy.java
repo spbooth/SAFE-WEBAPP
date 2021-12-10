@@ -66,17 +66,10 @@ public final class AutoNamePolicy<AU extends AppUser> extends FieldNameFinder<AU
 	
 	
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.session.FieldNameFinder#userSupplied()
-	 */
-	@Override
-	public boolean userVisible() {
-		return true;
-	}
 
 	@Override
 	public void anonymise(AU target) {
-		if( getContext().getBooleanParameter("person.anonymise."+getRealm(), true)) {
+		if( getContext().getBooleanParameter("person.anonymise."+getRealm(), true) && getRepository().hasField(getRealm())) {
 			getRecord(target).setProperty(getRealm(), "Person-"+target.getID());
 		}
 	}

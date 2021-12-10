@@ -19,6 +19,7 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -89,6 +90,9 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	 */
 	@Override
 	public SQLFilter<AU> getStringFinderFilter(String name) {
+		if( ! getRepository().hasField(getField())) {
+			return new FalseFilter<AU>(getFactory().getTarget());
+		}
 		return new SQLValueFilter<>(getFactory().getTarget(), getRepository(), getField(), normalizeName(name));
 	}
 

@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.model.data.transition;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
+import uk.ac.ed.epcc.webapp.model.data.IndexedTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 
 /** Abstract base class for building {@link TransitionProvider}s on {@link Indexed} objects.
@@ -29,7 +30,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
  * @param <T> target type
  * @param <K> 
  */
-public abstract class SimpleTransitionProvider<T extends Indexed,K extends TransitionKey<T>> extends AbstractTransitionProvider<T, K> implements TransitionProvider<K, T> {
+public abstract class SimpleTransitionProvider<T extends Indexed,K extends TransitionKey<T>> extends AbstractTransitionProvider<T, K> implements IndexedTransitionProvider<K, T> {
 
 	 
     private final IndexedProducer<? extends T> fac;
@@ -43,21 +44,7 @@ public abstract class SimpleTransitionProvider<T extends Indexed,K extends Trans
 		return fac;
 	}
 	
-    @Override
-    public final String getID(T target) {
-		return AbstractIndexedTransitionProvider.getIndexedID(getContext(),fac,target);
-	}
-
-	
-    @Override
-	public final T getTarget(String id) {
-		return AbstractIndexedTransitionProvider.getIndexedTarget(getContext(),fac,normaliseID(id));
-	}
-
-    public String normaliseID(String id) {
-    	return id;
-    }
-	@Override
+   	@Override
 	public final String getTargetName(){
 		return target_name;
 	}

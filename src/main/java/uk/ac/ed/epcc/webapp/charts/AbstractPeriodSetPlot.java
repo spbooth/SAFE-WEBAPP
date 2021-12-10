@@ -79,6 +79,18 @@ public abstract class AbstractPeriodSetPlot extends AbstractSingleValueSetPlot i
 			}
 	
 
-	
+	private DataRange  yrange = new DataRange(0.0,null);
+	@Override
+	public void setRange(DataRange range) {
+		yrange=range;
+		
+	}
+
+
+
+	@Override
+	public DataRange getRange() {
+		return yrange;
+	}
 
 }

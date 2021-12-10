@@ -30,6 +30,9 @@ public class TimePeriods implements Iterable<TimePeriods.Period>{
 		this();
 		add(new Period(start_date,end_date));
 	}
+	public TimePeriods(TimePeriod p) {
+		this(p.getStart(),p.getEnd());
+	}
 	public void add(TimePeriods t){
 		if( t == this){
 			return;
@@ -38,6 +41,7 @@ public class TimePeriods implements Iterable<TimePeriods.Period>{
 			add(p);
 		}
 	}
+	
 	public void subtract(TimePeriods t){
 		if( t == this){
 			empty();
@@ -71,6 +75,9 @@ public class TimePeriods implements Iterable<TimePeriods.Period>{
 		}
 		set.add(p);
 		//checkConsistancy();
+	}
+	public void add(TimePeriod single) {
+		add(new Period(single));
 	}
 	public void subtract(final Period p){
 		if( max != -1L && p.end >= max && p.start < max){
@@ -111,7 +118,9 @@ public class TimePeriods implements Iterable<TimePeriods.Period>{
 		set.addAll(tmp);
 		//checkConsistancy();
 	}
-
+	public void subtract(TimePeriod single) {
+		subtract(new Period(single));
+	}
 	private void empty() {
 		min=-1L;
 		max=-1L;
@@ -127,24 +136,24 @@ public class TimePeriods implements Iterable<TimePeriods.Period>{
 		}
 		return false;
 	}
-	public Period intersection(Period in) {
-		for(Period p : set) {
-			if( p.overlapps(in)) {
-				return p.intersection(in);
-			}
-		}
-		return null;
-	}
+	
 	
 	public TimePeriods intersection(TimePeriods in) {
 		TimePeriods result = new TimePeriods();
 		for( Period p : in.set) {
-			Period i = intersection(p);
-			if( i != null ) {
-				result.add(i);
+			for( Period p2 : set) {
+				Period i = p2.intersection(p);
+				if( i != null ) {
+					result.add(i);
+				}
 			}
 		}
 		return result;
+	}
+	public TimePeriods copy() {
+		TimePeriods c = new TimePeriods();
+		c.add(this);
+		return c;
 	}
 	/** A single time period
 	 * Strictly speaking the end date is not included in the period but the start date is
@@ -154,7 +163,10 @@ public class TimePeriods implements Iterable<TimePeriods.Period>{
 	public final static class Period implements TimePeriod, Comparable<TimePeriod>{
 	    private long start;
 		private long end;
-		private String tag=null;;
+		private String tag=null;
+		public Period(TimePeriod p) {
+			this(p.getStart(),p.getEnd());
+		}
 		public Period(Date start, Date end){
 			if( start == null ){
 				throw new IllegalArgumentException("Illegal constructor arguments for Period null start");
@@ -248,6 +260,9 @@ public class TimePeriods implements Iterable<TimePeriods.Period>{
 				return getEnd().compareTo(o.getEnd());
 			}
 			return c1;
+		}
+		public String toString() {
+			return "Period("+getStart()+","+getEnd()+(tag != null? " "+tag:"");
 		}
 	}
     /** total number of seconds in the set

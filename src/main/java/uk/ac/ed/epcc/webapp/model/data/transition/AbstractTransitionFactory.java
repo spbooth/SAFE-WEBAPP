@@ -57,7 +57,7 @@ public abstract class AbstractTransitionFactory<T , K extends TransitionKey<T>> 
 		}
 	}
 	
-	/** Exxtension point to allow transition setup to be lazy and deferred until
+	/** Extension point to allow transition setup to be lazy and deferred until
 	 * required. This method is called by the first call to {@link #checkTransitions()} 
 	 * and can contain calls to {@link #addTransition(TransitionKey, Transition)}.
 	 * 

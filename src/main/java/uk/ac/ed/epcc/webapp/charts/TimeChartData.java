@@ -89,4 +89,5 @@ public interface TimeChartData<P extends PeriodSequencePlot> extends PeriodChart
 	 */
 	public int getItems();
 	
+
 }

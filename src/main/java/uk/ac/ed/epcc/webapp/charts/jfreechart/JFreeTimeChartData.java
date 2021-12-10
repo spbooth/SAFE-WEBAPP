@@ -44,8 +44,7 @@ import org.jfree.chart.title.LegendTitle;
 import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.chart.util.SortOrder;
 
-
-
+import uk.ac.ed.epcc.webapp.charts.DataRange;
 import uk.ac.ed.epcc.webapp.charts.TimeChartData;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.time.CalendarFieldSplitPeriod;
@@ -69,7 +68,8 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 	boolean use_bar=false;
 	private boolean use_step=false;
 	private boolean is_cumulative=false;
-
+    
+	
 	@Override
 	public JFreeChart getJFreeChart() {
 		return chart;
@@ -383,8 +383,6 @@ public class JFreeTimeChartData extends JFreeChartData<TimeChartDataSet> impleme
 	public boolean isCumulative() {
 		return is_cumulative;
 	}
-
-
 
 	
 

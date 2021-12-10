@@ -20,7 +20,6 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
-import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 public abstract class AbstractViewTransitionFactory<T, K extends TransitionKey<T>> extends AbstractTransitionFactory<T, K> implements ViewTransitionFactory<K, T>{
@@ -30,16 +29,7 @@ public abstract class AbstractViewTransitionFactory<T, K extends TransitionKey<T
 	}
 
 
-	
-	public <X extends ContentBuilder> X getTopContent(X cb, T target,
-			SessionService<?> sess) {
-		return cb;
-	}
 
-	public <X extends ContentBuilder> X getBottomContent(X cb, T target,
-			SessionService<?> sess) {
-		return cb;
-	}
 	public <X extends ContentBuilder> X getLogContent(X cb, T target,
 			SessionService<?> sess) {
 		return cb;
@@ -50,12 +40,7 @@ public abstract class AbstractViewTransitionFactory<T, K extends TransitionKey<T
 		return getContext().expandText(key.getHelp());
 	}
 	
-	public final String getText(K key){
-		if( key instanceof ButtonText ) {
-			return getContext().expandText(((ButtonText)key).getText());
-		}
-		return key.toString();
-	}
+	
 	/** a direct transtition to view the target.
 	 * 
 	 * @author spb

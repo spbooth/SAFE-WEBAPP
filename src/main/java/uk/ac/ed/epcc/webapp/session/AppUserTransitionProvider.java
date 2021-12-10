@@ -44,6 +44,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider;
+import uk.ac.ed.epcc.webapp.model.data.transition.DataObjectTransitionProvider;
 import uk.ac.ed.epcc.webapp.servlet.LoginServlet;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.servlet.WtmpManager;
@@ -56,7 +57,10 @@ import uk.ac.ed.epcc.webapp.timer.TimeClosable;
  *
  */
 
-public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewTransitionProvider<AU, AppUserKey<AU>> implements TitleTransitionProvider<AppUserKey<AU>, AU>, ContextCached {
+public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewTransitionProvider<AU, AppUserKey<AU>> implements 
+TitleTransitionProvider<AppUserKey<AU>, AU>, 
+ContextCached,
+DataObjectTransitionProvider<AU, AppUserFactory<AU>, AppUserKey<AU>>{
 	
 	/**
 	 * 
@@ -274,6 +278,10 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		fac = sess.getLoginFactory();
 	}
 	@Override
+	public AppUserFactory<AU> getFactory(){
+		return fac;
+	}
+	@Override
 	protected void setupTransitions() {
 		super.setupTransitions();
 		SessionService sess = getContext().getService(SessionService.class);
@@ -304,29 +312,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider#getTarget(java.lang.String)
-	 */
-	@Override
-	public AU getTarget(String id) {
-		try {
-			return fac.find(Integer.parseInt(id));
-		} catch (NumberFormatException e) {
-			return null;
-		} catch (DataException e) {
-			getLogger().error("Error getting AppUser",e );
-			return null;
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider#getID(java.lang.Object)
-	 */
-	@Override
-	public String getID(AppUser target) {
-		return Integer.toString(target.getID());
-	}
-
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#getTargetName()
 	 */
@@ -423,5 +409,10 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 	}
 	public AppUserFactory<AU> getAppUserFactory(){
 		return fac;
+	}
+	@Override
+	public boolean useParser() {
+		// stick with integer ids for AppUser as the possible parse behaviour is very complex
+		return false;
 	}
 }

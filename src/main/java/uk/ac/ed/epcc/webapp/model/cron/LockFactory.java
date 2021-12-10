@@ -295,7 +295,7 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 					return null;
 				}
 			}
-		}catch(DataException e) {
+		}catch(Exception e) {
 			getLogger().error("Error making lock "+lock_name,e);
 
 		}

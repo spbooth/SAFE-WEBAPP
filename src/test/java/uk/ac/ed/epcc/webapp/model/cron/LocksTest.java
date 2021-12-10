@@ -24,6 +24,7 @@ import java.util.Date;
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.model.cron.LockFactory.Lock;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
@@ -34,7 +35,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 public class LocksTest extends WebappTestBase {
 	
 	@Test
-	public void testLock() throws DataFault {
+	public void testLock() throws DataFault, ParseException {
 		Date d = setTime(2020, Calendar.APRIL, 4, 9, 00);
 		LockFactory fac = LockFactory.getFactory(ctx);
 		
