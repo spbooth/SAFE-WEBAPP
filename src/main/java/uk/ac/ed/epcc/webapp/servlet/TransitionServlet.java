@@ -161,7 +161,13 @@ public  class TransitionServlet<K,T> extends WebappServlet {
         if( ! checkOrigin(conn,req, res)) {
         	return;
         }
-        T target = getTarget(conn,tp,path) ;
+        T target=null;
+        try {
+        	target = getTarget(conn,tp,path) ;
+        }catch(InvalidArgument e) {
+        	message(conn, req, res, "invalid_target");
+        	return;
+        }
         // A null target is allowed with some transitions e.g. select/create
         // so null targets need to be checked for later.
         // set as attribute for scripts we forward to.
@@ -524,6 +530,14 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 		}
 
 		private final LinkedList<String> path;
+		private boolean bad_input=false;
+		
+		public boolean getBadInput() {
+			return bad_input;
+		}
+		public void setBadInput(boolean val) {
+			bad_input=val;
+		}
 
 		public T visitTransitionProvider(TransitionProvider<K, T> prov) {
 			final String target_id= path.removeFirst();
@@ -535,6 +549,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 			}
 			T target = prov.getTarget(target_id);
 			if( target == null) {
+				bad_input=true;
 				// non empty id failed to resolve
 				WebappServlet.checkBadInput(prov.getContext().getService(SessionService.class));
 			}
@@ -543,7 +558,16 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 
 		public  T visitPathTransitionProvider(
 				PathTransitionProvider<K, T> prov) {
-			return  prov.getTarget(path);
+			if(path == null || path.size() == 0) {
+				return null;
+			}
+			T target = prov.getTarget(path);
+			if( target == null) {
+				bad_input=true;
+				// non empty id failed to resolve
+				WebappServlet.checkBadInput(prov.getContext().getService(SessionService.class));
+			}
+			return  target;
 		}
  	}
  	/** Extracts the Target form the URL and sets it as an attribute for any scripts we forward to.
@@ -553,13 +577,18 @@ public  class TransitionServlet<K,T> extends WebappServlet {
  	 * @param path
  	 * @param req
  	 * @return
+ 	 * @throws InvalidArgument 
  	 */
-	protected   T getTarget(AppContext conn,TransitionFactory<K,T> provider, LinkedList<String> path){
+	protected  final  T getTarget(AppContext conn,TransitionFactory<K,T> provider, LinkedList<String> path) throws InvalidArgument{
 		if( path == null || path.size() == 0){
 			return null;
 		}
 		GetTargetVisitor<T,K> vis = new GetTargetVisitor<>(path);
-		return provider.accept(vis);
+		T target = provider.accept(vis);
+		if( target == null && vis.getBadInput()) {
+			throw new InvalidArgument("Invalid transition target");
+		}
+		return target;
 	}
 	/** Static method for jsp pages to use to retieve the target in a way compatible with the
 	 * TransitionServlet
