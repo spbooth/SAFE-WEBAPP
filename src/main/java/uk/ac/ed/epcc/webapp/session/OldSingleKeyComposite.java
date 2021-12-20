@@ -33,7 +33,7 @@ public class OldSingleKeyComposite extends PublicKeyComposite<PublicKey> {
 	 */
 	public OldSingleKeyComposite(AppUserFactory fac) {
 		super(fac);
-		// TODO Auto-generated constructor stub
+		
 	}
 	protected ParseAbstractInput<String> getInput(){
 		SshPublicKeyInput input = new SshPublicKeyInput();

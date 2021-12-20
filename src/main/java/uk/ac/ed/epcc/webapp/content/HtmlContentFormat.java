@@ -32,7 +32,7 @@ public class HtmlContentFormat extends Format {
 	 * 
 	 */
 	public HtmlContentFormat() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

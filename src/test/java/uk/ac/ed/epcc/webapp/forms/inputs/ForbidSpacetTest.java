@@ -28,7 +28,7 @@ public class ForbidSpacetTest extends TextInputTest {
 	 * 
 	 */
 	public ForbidSpacetTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

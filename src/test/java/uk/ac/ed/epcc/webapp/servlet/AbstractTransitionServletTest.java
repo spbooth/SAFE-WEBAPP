@@ -70,7 +70,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	 * 
 	 */
 	public AbstractTransitionServletTest() {
-		// TODO Auto-generated constructor stub
+	
 	}
 
 	/** setup the request for a transition. 

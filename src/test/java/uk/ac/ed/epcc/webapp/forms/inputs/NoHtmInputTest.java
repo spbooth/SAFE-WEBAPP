@@ -29,7 +29,7 @@ public class NoHtmInputTest<I extends NoHtmlInput> extends TextInputTest<I> {
 	 * 
 	 */
 	public NoHtmInputTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	

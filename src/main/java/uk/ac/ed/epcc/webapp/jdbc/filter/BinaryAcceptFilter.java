@@ -55,7 +55,6 @@ public class BinaryAcceptFilter<T> implements AcceptFilter<T>, BinaryFilter<T> {
 	 */
 	@Override
 	public Class<T> getTarget() {
-		// TODO Auto-generated method stub
 		return nested.getTarget();
 	}
 

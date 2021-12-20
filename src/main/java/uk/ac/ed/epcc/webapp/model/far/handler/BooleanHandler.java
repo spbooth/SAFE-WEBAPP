@@ -32,7 +32,7 @@ public class BooleanHandler implements QuestionFormHandler<Boolean> {
 	 * 
 	 */
 	public BooleanHandler() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	

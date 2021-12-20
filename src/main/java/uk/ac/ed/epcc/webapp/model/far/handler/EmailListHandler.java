@@ -48,7 +48,7 @@ public class EmailListHandler implements QuestionFormHandler<String> {
 	 * 
 	 */
 	public EmailListHandler() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	

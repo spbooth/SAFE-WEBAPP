@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Test;
 
-import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
@@ -54,7 +53,7 @@ public class TestBasicAuth extends ServletTest {
 	 * 
 	 */
 	public TestBasicAuth() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	@Override
 	public void setUp() throws Exception {

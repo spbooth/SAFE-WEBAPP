@@ -29,7 +29,7 @@ public class RollbackInsertionPreparedStatement extends PreparedStatementWrapper
 	 */
 	public RollbackInsertionPreparedStatement(RollbackInsertionWrapper conn, PreparedStatement nested) {
 		super(conn, nested);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	@Override

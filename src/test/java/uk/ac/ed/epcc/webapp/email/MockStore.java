@@ -34,7 +34,7 @@ public class MockStore extends Store {
 	 */
 	public MockStore(Session session, URLName urlname) {
 		super(session, urlname);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)
@@ -42,7 +42,7 @@ public class MockStore extends Store {
 	 */
 	@Override
 	public Folder getDefaultFolder() throws MessagingException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 

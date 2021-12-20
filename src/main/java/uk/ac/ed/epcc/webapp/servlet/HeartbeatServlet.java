@@ -54,7 +54,7 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 	 * 
 	 */
 	public HeartbeatServlet() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

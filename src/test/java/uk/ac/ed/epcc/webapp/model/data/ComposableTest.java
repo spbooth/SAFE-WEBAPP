@@ -36,7 +36,7 @@ public class ComposableTest extends WebappTestBase {
 	 * 
 	 */
 	public ComposableTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	

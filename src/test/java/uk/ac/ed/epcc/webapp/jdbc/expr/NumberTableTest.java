@@ -37,7 +37,7 @@ public class NumberTableTest extends WebappTestBase {
 	 * 
 	 */
 	public NumberTableTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	@Before

@@ -28,7 +28,7 @@ public class MatchConditionTest {
 	 * 
 	 */
 	public MatchConditionTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	@Test

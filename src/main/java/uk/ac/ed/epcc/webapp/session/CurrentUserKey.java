@@ -44,7 +44,7 @@ public class CurrentUserKey extends AppUserKey {
 	 */
 	public CurrentUserKey(String name, String help) {
 		this(name, null,help,null);
-		// TODO Auto-generated constructor stub
+
 	}
 
 	/**

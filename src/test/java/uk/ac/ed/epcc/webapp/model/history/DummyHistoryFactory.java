@@ -35,7 +35,7 @@ public class DummyHistoryFactory extends HistoryFactory<Dummy1,HistoryFactory.Hi
 	@Override
 	public TableSpecification getDefaultTableSpecification(AppContext c,
 			String homeTable) {
-		// TODO Auto-generated method stub
+		
 		TableSpecification spec = super.getDefaultTableSpecification(c, homeTable);
 		spec.setField(Dummy1.NAME, new StringFieldType(true, "", 32));
 		spec.setField(Dummy1.NUMBER, new DoubleFieldType(true, 0.0));

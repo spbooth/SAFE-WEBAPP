@@ -35,7 +35,7 @@ public class TestAutoCreate extends ServletTest {
 	 * 
 	 */
 	public TestAutoCreate() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	@Override
 	public void setUp() throws Exception {

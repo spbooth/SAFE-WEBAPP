@@ -54,7 +54,7 @@ public class PasswordResetServletTest extends ServletTest {
 	 * 
 	 */
 	public PasswordResetServletTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	@Override
 	public void setUp() throws Exception {

@@ -26,7 +26,7 @@ public class ExactNode extends Node {
 	 * 
 	 */
 	public ExactNode() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

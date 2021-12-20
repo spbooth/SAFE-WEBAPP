@@ -44,7 +44,7 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 	 * 
 	 */
 	public RequiredPageHeartbeatServletTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

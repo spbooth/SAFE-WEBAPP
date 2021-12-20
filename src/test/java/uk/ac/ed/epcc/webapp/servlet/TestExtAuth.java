@@ -35,7 +35,7 @@ public class TestExtAuth extends ServletTest {
 	 * 
 	 */
 	public TestExtAuth() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	@Override
 	public void setUp() throws Exception {

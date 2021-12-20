@@ -27,7 +27,7 @@ public class DummyNullListInputTest extends NullListInputTestCase {
 	 * 
 	 */
 	public DummyNullListInputTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

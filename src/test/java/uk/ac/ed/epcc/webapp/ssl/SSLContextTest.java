@@ -12,7 +12,7 @@ import uk.ac.ed.epcc.webapp.WebappTestBase;
 public class SSLContextTest extends WebappTestBase {
 
 	public SSLContextTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	@Test

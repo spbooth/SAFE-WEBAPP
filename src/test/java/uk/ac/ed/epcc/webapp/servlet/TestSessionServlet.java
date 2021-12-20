@@ -29,7 +29,7 @@ public class TestSessionServlet extends SessionServlet {
 	 * 
 	 */
 	public TestSessionServlet() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

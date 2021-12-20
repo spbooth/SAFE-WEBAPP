@@ -225,7 +225,7 @@ public class ActionMessageVisitor extends AbstractVisitor {
 
 	@Override
 	public void doReplyTo(Address[] cc, MessageWalker messageWalker) throws WalkerException {
-		// TODO Auto-generated method stub
+		
 		super.doReplyTo(cc, messageWalker);
 	}
 

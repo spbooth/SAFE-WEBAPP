@@ -98,7 +98,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	 */
 	public TotpCodeAuthComposite(AppUserFactory<A> fac) {
 		super(fac);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

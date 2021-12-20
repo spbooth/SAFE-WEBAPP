@@ -60,7 +60,7 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 	 * 
 	 */
 	public LoginServletTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	@Test

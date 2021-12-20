@@ -26,7 +26,7 @@ public abstract class StringListInput extends AbstractInput<String> implements L
 	 * 
 	 */
 	public StringListInput() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

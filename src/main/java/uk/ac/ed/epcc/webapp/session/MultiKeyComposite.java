@@ -35,7 +35,7 @@ public class MultiKeyComposite extends PublicKeyComposite<PublicKey[]> {
 	 */
 	public MultiKeyComposite(AppUserFactory fac) {
 		super(fac);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	

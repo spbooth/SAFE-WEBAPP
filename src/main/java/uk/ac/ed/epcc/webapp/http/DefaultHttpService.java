@@ -47,7 +47,7 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 	 */
 	@Override
 	public void cleanup() {
-		// TODO Auto-generated method stub
+		
 		
 	}
 

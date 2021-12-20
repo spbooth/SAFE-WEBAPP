@@ -33,7 +33,7 @@ public class ExternalNode extends Node {
 	 * 
 	 */
 	public ExternalNode() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

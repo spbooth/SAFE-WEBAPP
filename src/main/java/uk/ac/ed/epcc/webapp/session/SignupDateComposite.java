@@ -50,7 +50,7 @@ public class SignupDateComposite<BDO extends DataObject> extends CreateComposite
 	 */
 	public SignupDateComposite(DataObjectFactory<BDO> fac) {
 		super(fac);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	

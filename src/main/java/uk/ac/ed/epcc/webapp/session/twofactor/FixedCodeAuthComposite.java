@@ -69,7 +69,7 @@ public class FixedCodeAuthComposite<A extends AppUser> extends CodeAuthComposite
 	 */
 	@Override
 	protected String getConfigPrefix() {
-		// TODO Auto-generated method stub
+		
 		return "fixed_auth_code";
 	}
 

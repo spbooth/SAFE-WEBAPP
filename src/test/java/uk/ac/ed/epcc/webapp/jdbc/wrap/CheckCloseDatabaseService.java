@@ -37,7 +37,7 @@ public class CheckCloseDatabaseService extends DatabaseServiceWrapper {
 	 */
 	public CheckCloseDatabaseService(DatabaseService nested) {
 		super(nested);
-		// TODO Auto-generated constructor stub
+		
 	}
 	public final class CheckClosedSQLContext extends SQLContextWrapper {
 		private CheckCloseConnectionWrapper c=null;

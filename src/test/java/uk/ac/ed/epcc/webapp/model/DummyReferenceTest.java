@@ -37,7 +37,7 @@ public class DummyReferenceTest extends WebappTestBase{
 	 * 
 	 */
 	public DummyReferenceTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	@Before

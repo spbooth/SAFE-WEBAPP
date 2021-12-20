@@ -30,7 +30,7 @@ public final class DisabledAction extends FormAction {
 	 * 
 	 */
 	public DisabledAction() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)
