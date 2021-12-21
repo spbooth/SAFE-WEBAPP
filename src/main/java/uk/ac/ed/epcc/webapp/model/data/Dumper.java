@@ -89,6 +89,8 @@ public class Dumper extends AbstractContexed{
 		seen = new HashMap<>();
 		specifications = new HashMap<>();
 	}
+	private boolean erase=false;
+	
     private final SimpleXMLBuilder builder;
     /** records that have already been processed so should
      * not be dumped if referenced again.
@@ -186,7 +188,11 @@ public class Dumper extends AbstractContexed{
 				}
 				String dat;
 
-				dat = field.dump(rec);
+				if( erase && conn.getBooleanParameter("security_field."+tag+"."+name, false)) {
+					dat="xxxx"; // erase fields marked as security fields.
+				}else {
+					dat = field.dump(rec);
+				}
 				if( dat != null ){
 					sb.open(name);
 					sb.clean(dat);
@@ -392,5 +398,13 @@ public class Dumper extends AbstractContexed{
 
 	public String normaliseTag(String tag) {
 		return Repository.TableToTag(getContext(), Repository.tagToTable(getContext(), tag));
+	}
+
+	public boolean isErase() {
+		return erase;
+	}
+
+	public void setErase(boolean erase) {
+		this.erase = erase;
 	}
 }
