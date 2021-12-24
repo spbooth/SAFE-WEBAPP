@@ -161,7 +161,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 						}
 					}
 				}catch(Exception t){
-					conn.error(t,"Error commiting record");
+					conn.error(t,"Error commiting record "+current.getRepository().getTable()+":"+id);
 				}finally{
 					res=null;
 					current=null;

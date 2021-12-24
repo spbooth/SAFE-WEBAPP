@@ -268,9 +268,10 @@ public abstract class ServletTest extends WebappTestBase{
 	 * @param url URL to check
 	 */
 	public void checkRedirect(String url){
-		assertEquals(HttpServletResponse.SC_OK,res.error);
-		assertNull(res.error_str);
 		assertNull("Forward not redirect",res.forward);
+		assertEquals(HttpServletResponse.SC_FOUND,res.error);
+		assertNull(res.error_str);
+		
 		if( url.startsWith("http")){
 			assertEquals("Wrong redirect", url, res.redirect);
 		}else{

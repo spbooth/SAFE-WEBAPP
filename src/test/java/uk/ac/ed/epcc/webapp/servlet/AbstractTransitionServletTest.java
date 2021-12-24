@@ -237,7 +237,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		checkForward("/scripts/transition.jsp");
 		Collection<String> missing = HTMLForm.getMissing(req);
 		for(String p : params) {
-			assertTrue("Param "+p+"should be missing",missing.contains(p));
+			assertTrue("Param "+p+" should be missing",missing.contains(p));
 		}
 	}
 	

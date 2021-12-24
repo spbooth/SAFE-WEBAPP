@@ -97,6 +97,7 @@ public class MockResponse implements HttpServletResponse {
 	}
 
 	public void sendRedirect(String arg0) throws IOException {
+		this.error=HttpServletResponse.SC_FOUND;
 		forward=null;
 		redirect=arg0;
 	}
