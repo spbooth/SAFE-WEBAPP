@@ -25,6 +25,7 @@ forward from the servlet so all arguments are passed through the request.
 <%
 PageHTMLForm form = (PageHTMLForm) request.getAttribute("Form");
 String title = (String) request.getAttribute("Title");
+Object extra = request.getAttribute("ExtraContent");
 %>
 <% if( form == null){ %>
 <jsp:forward page="/messages.jsp?message_type=access_denied" />
@@ -44,6 +45,12 @@ String title = (String) request.getAttribute("Title");
 </header>
 <div class="block">
 <h2><%=title %></h2>
+<% if( extra != null){
+	HtmlBuilder hb = new HtmlBuilder();
+	hb.addObject(extra);
+%><p><%=hb.toString() %></p><%
+}
+%>
 <div id="form">
 <wb:FormContext inline="true"/>
 <form method="POST">

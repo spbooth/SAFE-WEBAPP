@@ -603,9 +603,10 @@ public abstract class ServletTest extends WebappTestBase{
 		
 		PageHTMLForm form = (PageHTMLForm) req.getAttribute("Form");
 		String title = (String) req.getAttribute("Title");
+		Object extra = req.getAttribute("ExtraContent");
 		assertNotNull(form);
 		assertNotNull(title);
-		checkForward("/scripts/pate_form.jsp");
+		checkForward("/scripts/page_form.jsp");
 		HtmlBuilder builder = new HtmlBuilder();
 		builder.setValidXML(true);
 		builder.open("page_form");
@@ -614,12 +615,13 @@ public abstract class ServletTest extends WebappTestBase{
 			builder.open("Title");
 				builder.clean(title);
 			builder.close();
-		
+			if( extra != null) {
+				builder.open("Extra");
+				builder.addObject(extra);
+				builder.close();
+			}
 			builder.open("Form");
-		
-			 builder.addFormTable(getContext(), form);
-			 builder.addActionButtons(form);
-		
+			form.getHtmlForm(builder);
 			 builder.close();
         
 		
