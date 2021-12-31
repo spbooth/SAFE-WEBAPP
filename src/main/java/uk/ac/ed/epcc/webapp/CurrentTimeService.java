@@ -41,4 +41,14 @@ public class CurrentTimeService implements AppContextService<CurrentTimeService>
 		return CurrentTimeService.class;
 	}
 
+	/** Sleep the current thread. Normally this maps onto
+	 * {@link Thread#sleep(long)} though in testing we can make this
+	 * a no-op to suppress rate throttling
+	 * 
+	 * @param millis
+	 * @throws InterruptedException
+	 */
+	public void sleep(long millis) throws InterruptedException {
+		Thread.sleep(millis);
+	}
 }

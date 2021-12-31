@@ -34,7 +34,7 @@ public class TestTimeService extends CurrentTimeService {
 	}
 
 private Date result;
-
+private long total_sleep=0;
 /**
  * @return the result
  */
@@ -48,6 +48,14 @@ public Date getResult() {
 public void setResult(Date result) {
 	this.result = result;
 }
+
+@Override
+public void sleep(long millis) throws InterruptedException {
+	total_sleep+= millis;
+}
   
+public long getTotalSleep() {
+	return total_sleep;
+}
   
 }
