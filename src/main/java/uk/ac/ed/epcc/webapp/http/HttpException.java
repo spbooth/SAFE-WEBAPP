@@ -13,13 +13,15 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.http;
 
+import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
+
 /**
  * @author spb
  *
  */
 public class HttpException extends Exception {
     private int error_code;
-    private String content=null;
+    private MimeStreamData content=null;
     
 	public int getError_code() {
 		return error_code;
@@ -61,7 +63,7 @@ public class HttpException extends Exception {
 		if( cause instanceof HttpException) {
 			HttpException h = (HttpException) cause;
 			error_code = h.getError_code();
-			content = h.getContent();
+			content = h.getMimeContent();
 		}
 	}
 
@@ -76,10 +78,13 @@ public class HttpException extends Exception {
 	}
 
 	public String getContent() {
+		return content.toString();
+	}
+	public MimeStreamData getMimeContent() {
 		return content;
 	}
 
-	public void setContent(String content) {
+	public void setContent(MimeStreamData content) {
 		this.content = content;
 	}
 

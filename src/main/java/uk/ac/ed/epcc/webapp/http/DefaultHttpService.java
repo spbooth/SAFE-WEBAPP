@@ -159,10 +159,11 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 				HttpException e = new HttpException(connection.getResponseMessage());
 				e.setError_code(code);
 				// Try to capture content as well
-				ByteArrayStreamData res = new ByteArrayStreamData();
+				ByteArrayMimeStreamData res = new ByteArrayMimeStreamData();
+				res.setMimeType(connection.getContentType());
 				try {
 					res.read(connection.getInputStream());
-					e.setContent(res.toString());
+					e.setContent(res);
 				}catch(Exception e2) {
 					e.addSuppressed(e2);
 				}
