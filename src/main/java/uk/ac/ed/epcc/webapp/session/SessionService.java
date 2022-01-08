@@ -175,11 +175,11 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	
 	default public boolean hasRoleFromList(String ...roles){
-		if( roles == null ){
+		if( roles == null || roles.length == 0){
 			return false;
 		}
 		for(String role : roles){
-			if( hasRole(role)){
+			if( (!role.isEmpty()) && hasRole(role)){
 				return true;
 			}
 		}
