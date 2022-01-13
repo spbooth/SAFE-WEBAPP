@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -1199,7 +1200,7 @@ public class Emailer {
 
 
 			// Show current date and time
-			DateFormat df = DateFormat.getDateTimeInstance();
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			CurrentTimeService time = conn.getService(CurrentTimeService.class);
 			errorEmail.setProperty("date", df.format(time.getCurrentTime()));
 			if (props != null) {

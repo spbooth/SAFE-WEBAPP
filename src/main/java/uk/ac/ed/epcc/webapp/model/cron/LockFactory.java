@@ -246,7 +246,7 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 		} catch (DataFault e) {
 			getLogger().error("Error building lock table", e);
 		}
-		Transform f = new DateTransform(SimpleDateFormat.getDateTimeInstance());
+		Transform f = new DateTransform(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 		t.setColFormat("Locked since", f);
 		t.setColFormat("Last locked", f);
 		return t;

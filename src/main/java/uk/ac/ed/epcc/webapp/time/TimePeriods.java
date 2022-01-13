@@ -5,6 +5,7 @@
 package uk.ac.ed.epcc.webapp.time;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -175,7 +176,7 @@ public class TimePeriods implements Iterable<TimePeriods.Period>{
 				throw new IllegalArgumentException("Illegal constructor arguments for Period null end");
 			}
 			if( start.after(end)){
-				DateFormat df = DateFormat.getDateTimeInstance();
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				throw new IllegalArgumentException("Illegal constructor arguments for Period "+df.format(start)+" "+df.format(end));
 			}
 			this.start=start.getTime();

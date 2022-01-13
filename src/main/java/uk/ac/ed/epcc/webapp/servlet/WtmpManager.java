@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.servlet;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -371,7 +372,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 		if( t.hasCol(NAME_COL)) {
 			t.setColAfter(HOST_COL,NAME_COL);
 		}
-		DateFormat df = DateFormat.getDateTimeInstance();
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		t.setColFormat(START_COL, new DateTransform(df));
 		t.setColFormat(END_COL, new DateTransform(df));
 	}

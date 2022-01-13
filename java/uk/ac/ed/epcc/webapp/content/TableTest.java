@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -757,10 +758,10 @@ public class TableTest {
 	 */
 	@Test
 	public void testFormatDate() {
-		FormatDateTransform fd = new FormatDateTransform(DateFormat.getDateInstance(DateFormat.SHORT, Locale.UK));
+		FormatDateTransform fd = new FormatDateTransform(new SimpleDateFormat("yyyy-MM-dd"));
 		assertNull(fd.convert(null));
 		assertEquals(123, fd.convert(123));
-		assertEquals("01/01/70", fd.convert(new Date(0)));
+		assertEquals("1970-01-01", fd.convert(new Date(0)));
 	}
 	
 	/**

@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.editors.mail;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Set;
 
 import jakarta.mail.MessagingException;
@@ -57,7 +58,7 @@ public class ShortContentMessageVisitor extends ContentMessageVisitor {
 					if( sb instanceof HtmlBuilder) {
 						((HtmlBuilder)sb).setNewTab(true);
 					}
-					DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT,getContext().getService(SessionService.class).getLocale());
+					DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 					addLink(messageWalker.getPath(), id, "["+df.format(m.getSentDate())+"] "+m.getSubject());
 					sb=sb.addParent();
 					return false; // truncate recursion

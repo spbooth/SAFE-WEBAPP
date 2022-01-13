@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -1079,7 +1080,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		String name=peer.getIdentifier();
 		int changes=0;
 		int deletes=0;
-		DateFormat df = DateFormat.getDateTimeInstance();
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		log.debug("close gaps for "+peer.getClass().getCanonicalName()+":"+peer.getID());
 		while(it.hasNext()){
 			
