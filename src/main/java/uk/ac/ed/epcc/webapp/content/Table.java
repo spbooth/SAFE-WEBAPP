@@ -1118,7 +1118,7 @@ public class Table<C, R> {
 
 	public void addPercentCol(C old_name, C new_name, Double sum,
 			NumberFormat nf) {
-		if (sum.doubleValue() <= 0.0) {
+		if (sum == null || sum.isNaN() || sum.isInfinite() || sum.doubleValue() <= 0.0) {
 			return;
 		}
 		if (old_name == null || new_name == null) {
