@@ -59,10 +59,8 @@ public class QRServletTest extends ServletTest {
 		assertEquals(300,image.getHeight());
 		assertEquals(300,image.getWidth());
 		//writeFile("image.png", content);
-		byte[] expected = getResourceAsBytes("image.png");
-		assertEquals(expected.length, content.length);
-		for(int i=0;i<content.length;i++) {
-			assertEquals(expected[i],content[i]);
-		}
+		checkImageEqual("image.png", image);
+		
+		
 	}
 }

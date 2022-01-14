@@ -18,7 +18,8 @@ A generic message page used for printing standardised messages
 <%@ page import="uk.ac.ed.epcc.webapp.*"%> 
 <%@ page import="uk.ac.ed.epcc.webapp.model.*"%>
 <%@ page import="java.util.* "%>
-<%@ include file="service_init.jsf"%>
+<%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
+<wb:ServiceInit/>
 <%
     String page_title = service_name+" "+website_name+" Information";
 %>

@@ -60,11 +60,7 @@ public class ServeAvatarTest extends ServletTest{
 		MockOutputStream stream = (MockOutputStream) res.getOutputStream();
 		//writeFile("avatar2.png",stream.getData());
 		byte[] data = stream.getData();
-		byte[] expected = getResourceAsBytes("avatar2.png");
-		assertEquals(expected.length,data.length);
-		for(int i=0;i<data.length;i++) {
-			assertEquals("byte "+i,  expected[i], data[i]);
-		}
+		checkImageEqual("avatar2.png", data);
 	}
 	
 	@Test
