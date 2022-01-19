@@ -838,6 +838,31 @@ public class TableTest {
 		assertEquals(120, t.get("col1", "row2"));
 	}
 	@Test
+	public void testRunningTotalTransform() {
+		Table<String,String> t = new Table<>();
+		t.put("col1", "a", 1);
+		t.put("col1", "b", 2);
+		t.put("col1", "c", 4);
+		t.transformCol("col1", new RunningTotalTransform());
+		assertEquals(1.0, t.get("col1", "a"));
+		assertEquals(3.0, t.get("col1", "b"));
+		assertEquals(7.0, t.get("col1", "c"));
+	}
+	@Test
+	public void testRunningTotalTransform2() {
+		Table<String,String> t = new Table<>();
+		t.put("col1", "a", 1);
+		t.put("col1", "b", 2);
+		t.put("col1", "c", 4);
+		t.transformCol("col1", new RunningTotalTransform(),"col2");
+		assertEquals(1, t.get("col1", "a"));
+		assertEquals(2, t.get("col1", "b"));
+		assertEquals(4, t.get("col1", "c"));
+		assertEquals(1.0, t.get("col2", "a"));
+		assertEquals(3.0, t.get("col2", "b"));
+		assertEquals(7.0, t.get("col2", "c"));
+	}
+	@Test
 	public void testToString(){
 		
 		Table<String, String> t = new Table<>();

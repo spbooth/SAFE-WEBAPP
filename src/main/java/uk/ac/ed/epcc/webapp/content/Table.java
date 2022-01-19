@@ -462,7 +462,7 @@ public class Table<C, R> {
 					sum += value.doubleValue();
 				}
 			}
-			return new Double(sum);
+			return Double.valueOf(sum);
 		}
 
 		// Transform a column
@@ -473,12 +473,21 @@ public class Table<C, R> {
 				data.put(key, t.convert(value));
 			}
 		}
+		public void transform(Collection<R> e, Transform t,Col dest) {
 
+			for (R key : e) {
+				Object value = data.get(key);
+				dest.put(key, t.convert(value));
+			}
+		}
 		public void transform(Transform t) {
 			// transforms hidden values as well note
 			transform(data.keySet(), t);
 		}
-
+		public void transform(Transform t, Col dest) {
+			// transforms hidden values as well note
+			transform(data.keySet(), t,dest);
+		}
 	}
 
 	public static class NumberFormatGenerator implements XMLGenerator{
@@ -1916,6 +1925,11 @@ public class Table<C, R> {
 			Col c = getCol(col_name);
 			c.transform(row_keys, t);
 		}
+	}
+	public void transformCol(C col_name,Transform t, C dest) {
+		Col src_col  = getCol(col_name);
+		Col dest_col = getCol(dest);
+		src_col.transform(t, dest_col);
 	}
 
 	/** apply a {@link Transform} to a column selected by index.

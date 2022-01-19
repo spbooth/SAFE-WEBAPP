@@ -23,7 +23,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.Input;
  * For example a pull-down menu. Normally we will have the Factory classes
  * implement this interface to provide a selector for the objects they create.
  * The same selector should be used to both generate the HTML form fragment and
- * to parse the resulting input. Note that a useful convension is to use the
+ * to parse the resulting input. Note that a useful convention is to use the
  * name parameter as the name of the form input. If there are multiple form
  * inputs for a single selector then the names should be derived from the name
  * parameter.
