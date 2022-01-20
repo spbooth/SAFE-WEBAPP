@@ -1147,7 +1147,7 @@ public class Table<C, R> {
 			Number n = old_col.getNumber(key);
 			if (n != null) {
 				new_col.put(key,
-						new Double(n.doubleValue() / sum.doubleValue()));
+						Double.valueOf(n.doubleValue() / sum.doubleValue()));
 			}
 		}
 	}
