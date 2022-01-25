@@ -488,6 +488,33 @@ public class Table<C, R> {
 			// transforms hidden values as well note
 			transform(data.keySet(), t,dest);
 		}
+		public boolean isEmpty() {
+			return data.isEmpty();
+		}
+		/** If all values in the column
+		 * indexed by the specified keys are the same return 
+		 * that value otherwise null;
+		 * @return
+		 */
+		public Object getCommon(Collection<R> keys) {
+			Object result = null;
+			for( R key : keys) {
+				Object val = get(key);
+				if( val == null) {
+					// either all values are null or they differ either way
+					// return null;
+					return null;
+				}
+				if( result == null) {
+					result = val;
+				}else {
+					if( ! result.equals(val)) {
+						return null;
+					}
+				}
+			}
+			return result;
+		}
 	}
 
 	public static class NumberFormatGenerator implements XMLGenerator{
@@ -2073,5 +2100,38 @@ public class Table<C, R> {
 				}
 			}
 		}
+	}
+	/** Extract a single column table containing values that are the same in all rows of a 
+	 * column. Each sutch column becomes a row of the extracted table and the column
+	 * is removed.
+	 * Method returns null if no columns are extracted or the table only has one row.
+	 * 
+	 * @return Table or null
+	 */
+	public Table<String,C> extractCommonColums(){
+		if( nRows() < 2) {
+			return null;
+		}
+		
+		Table<String,C> result = new Table<String, C>();
+		// we are going to be modifying the column list so
+		// take a copy
+		for( C c : new LinkedList<C>(col_keys)) {
+			Col col = getCol(c);
+			if( col.isEmpty()) {
+				result.put("Value", c, null);
+				removeCol(c);
+			}else {
+				Object common = col.getCommon(row_keys);
+				if( common != null) {
+					result.put("Value", c, common);
+					removeCol(c);
+				}
+			}
+		}
+		if( result.hasData()) {
+			return result;
+		}
+		return null;
 	}
 }

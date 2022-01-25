@@ -101,7 +101,7 @@ public interface ViewTransitionFactory<K, T> extends TransitionFactory<K, T> {
    /** Should the transition be listed on the view page.
     * Normally this just shows enabled transitions but we might want to hide some of these.
     * 
-    * The show a disabled button for some transitions implement {@link ShowDisabledTransitions}
+    * To show a disabled button for some transitions implement {@link ShowDisabledTransitions}
 	 * 
 	 * @param c
 	 * @param target
