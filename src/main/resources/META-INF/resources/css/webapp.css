@@ -638,6 +638,14 @@ div.block table.navbar{
 div.block table.navbar td {
 	background-color: inherit;	
 }
+/* can put single input forms with class input_button in navbar */
+table.navbar tr td form input{
+	width: 100%;
+	border-style: outset;
+	background-color: var(--button-bg-color);
+	color: var(--button-color);
+}
+/* or can put links that look similar */
 table.navbar tr td a {
     background-color: var(--button-bg-color);
     color: var(--button-color);
