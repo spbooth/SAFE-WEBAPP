@@ -676,6 +676,11 @@ public class SwingContentBuilder  implements ContentBuilder{
 			content.add(form_dialog.getActionButtons(f,actions),BorderLayout.EAST);
 		}
 	}
+	@Override
+	public void addActionButton(Form f, String name) {
+		content.add(form_dialog.getActionButton(f,name));
+		
+	}
 	/**
 	 * 
 	 */

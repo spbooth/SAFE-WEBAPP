@@ -271,6 +271,11 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 		
 	}
 
+	@Override
+	public void addActionButton(Form f, String name) {
+		// TODO Auto-generated method stub
+		
+	}
 	public String toString(){
 		return sb.toString();
 	}

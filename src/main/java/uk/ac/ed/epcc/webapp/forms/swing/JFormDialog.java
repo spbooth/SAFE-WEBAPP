@@ -150,16 +150,22 @@ public class JFormDialog extends JDialog implements Contexed{
 		//buttons.add(Box.createHorizontalGlue());
 		buttons.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		for (String action : actions) {
-			JButton b = new JButton(action);
-			String help = form.getAction(action).getHelp();
-			if( help != null && help.trim().length() > 0){
-				b.setToolTipText(help);
-			}
+			JButton b = getActionButton(form, action);
+			
 			buttons.add(b);
-			b.addActionListener(new Action(form,action));
 		}
 		buttons.validate();
 		return buttons;
+	}
+
+	public JButton getActionButton(Form form, String action) {
+		JButton b = new JButton(action);
+		String help = form.getAction(action).getHelp();
+		if( help != null && help.trim().length() > 0){
+			b.setToolTipText(help);
+		}
+		b.addActionListener(new Action(form,action));
+		return b;
 	}
 	
 	/* (non-Javadoc)

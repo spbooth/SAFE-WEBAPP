@@ -306,4 +306,11 @@ public interface ContentBuilder {
 	 * @param names {@link Set} of action names
 	 */
 	public void addActionButtons(Form f,String legend,Set<String> names);
+	
+	/** Add a single action button with no enclosing container.
+	 * 
+	 * @param f {@link Form}
+	 * @param name String name
+	 */
+	public void addActionButton(Form f, String name);
 }

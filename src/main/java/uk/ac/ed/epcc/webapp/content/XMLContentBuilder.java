@@ -323,6 +323,7 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 			close();
 			}
 	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addActionButtons(uk.ac.ed.epcc.webapp.forms.Form)
 	 */
@@ -339,52 +340,68 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 				close();
 			}
 			for( String name : actions) {
-				FormAction action = f.getAction(name);
-				Object content = action.getText();
-				
-				if( content != null ){
-					open("button");
-				}else{
-					open("input");
-				}
-				addClass("input_button");
-				attr("type","submit");
-				boolean must_validate = action.getMustValidate();
-				if( ! must_validate){
-					attr("formnovalidate",null);
-				}
-				if( action.wantNewWindow()) {
-					attr("formtarget","_blank");
-				}
-				
-				String help = action.getHelp();
-				if( help != null){
-					attr("title", help);
-				}
-				String shortcut = action.getShortcut();
-				if( shortcut != null){
-					attr("accesskey", shortcut);
-				}
-				
-				attr("name",name);
-				
-				attr("value",name);
-				if( must_validate) {
-					// non validsating actions always enabled
-					if( action instanceof DisabledAction || ! can_submit){
-						attr("disabled",null);
-					}
-				}
-				
-				if( content != null ){
-					addObject(content);
-				}
-				close();
+				addActionButton(f, can_submit, name);
 			}
 			close();
 		}
 		
 	}
+
+
+	public default void addActionButton(Form f, String name) {
+		boolean can_submit=CanSubmitVisistor.canSubmit(f);
+
+		addActionButton(f, can_submit, name);
+	}
+	default void addActionButton(Form f, boolean can_submit, String name) {
+		FormAction action = f.getAction(name);
+		Object content = action.getText();
+		
+		if( content != null ){
+			open("button");
+		}else{
+			open("input");
+		}
+		addClass("input_button");
+		attr("type","submit");
+		boolean must_validate = action.getMustValidate();
+		if( ! must_validate){
+			attr("formnovalidate",null);
+		}
+		if( action.wantNewWindow()) {
+			attr("formtarget","_blank");
+		}
+		
+		String help = action.getHelp();
+		if( help != null){
+			attr("title", help);
+		}
+		String shortcut = action.getShortcut();
+		if( shortcut != null){
+			attr("accesskey", shortcut);
+		}
+		String action_name = getFormPolicy().getActionName();
+		if( action_name != null ){
+			attr("name", action_name);
+		}else{
+			attr("name",name);
+		}
+		attr("value",name);
+		if( must_validate) {
+			// non validating actions always enabled
+			if( action instanceof DisabledAction || ! can_submit){
+				attr("disabled",null);
+				addClass("disabled");
+			}
+		}
+		
+		if( content != null ){
+			addObject(content);
+		}
+		close();
+	}
+
+	
 	@Override
 	default ContentBuilder getDetails(Object summary_text) {
 		open("details");
