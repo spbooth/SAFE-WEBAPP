@@ -16,6 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data;
 
+import uk.ac.ed.epcc.webapp.model.lifecycle.ActionListener;
+
 /**
  * Interface for DataObjects that support a Retire action
  * 
@@ -36,4 +38,22 @@ public interface Retirable {
 	 * @throws Exception
 	 */
 	public void retire() throws Exception;
+	
+	/** Should retire be available as an action on the
+	 * object edit form.
+	 * 
+	 * @return
+	 */
+	public default boolean useAction() {
+		return true;
+	}
+	/**Get an optional object (usually a String or other object that can be added to display content) that should be presented to
+	 * the user as warning before performing the operation.  Usually this would be included in a confirm dialog.
+	 * Confirmation might be triggered by one of the {@link ActionListener}s returning a non-null value
+	 * 
+	 * @return
+	 */
+	public default Object getRetireWarning() {
+		return null;
+	}
 }

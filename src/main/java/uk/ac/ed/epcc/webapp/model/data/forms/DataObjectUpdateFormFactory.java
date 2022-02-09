@@ -153,10 +153,13 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 	 */
 	protected void addRetireAction(String type_name, Form f, BDO dat, SessionService<?> operator) {
 		if (dat instanceof Retirable && ( ! (dat instanceof RestrictedRetirable)  || ((RestrictedRetirable)dat).allowRetire(operator))){
-			if(((Retirable) dat).canRetire()) {
-				f.addAction(RETIRE, new RetireAction(type_name, dat));
-			}else if( dat instanceof UnRetirable && ((UnRetirable)dat).canRestore()){
-				f.addAction(UN_RETIRE, new UnRetireAction(type_name, dat));
+			Retirable retirable = (Retirable) dat;
+			if( retirable.useAction()) {
+				if(retirable.canRetire()) {
+					f.addAction(RETIRE, new RetireAction(type_name, dat));
+				}else if( dat instanceof UnRetirable && ((UnRetirable)dat).canRestore()){
+					f.addAction(UN_RETIRE, new UnRetireAction(type_name, dat));
+				}
 			}
 		}
 	}

@@ -49,7 +49,11 @@ import uk.ac.ed.epcc.webapp.model.data.Retirable;
 			if( r instanceof UIGenerator || r instanceof UIProvider || r instanceof Identified) {
 				t = r;
 			}
-			setConfirmArgs(new Object[] {type_name, t});
+			Object warnings = r.getRetireWarning();
+			if( warnings == null) {
+				warnings="";
+			}
+			setConfirmArgs(new Object[] {type_name, t, warnings});
 			this.type_name=type_name;
 			this.dat=r;
 		}
