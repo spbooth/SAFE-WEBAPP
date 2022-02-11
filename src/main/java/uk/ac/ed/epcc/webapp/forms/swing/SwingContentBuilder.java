@@ -417,6 +417,12 @@ public class SwingContentBuilder  implements ContentBuilder{
 
 	}
 	@Override
+	public void addLink(AppContext c,String text, String hover,String style,FormResult action) {
+		log.debug("add link");
+		addButton(c,text, hover,action);
+
+	}
+	@Override
 	public <C,R> void addTable(AppContext conn,Table<C,R> t) {
 		addTable(conn,null,t);
 	}

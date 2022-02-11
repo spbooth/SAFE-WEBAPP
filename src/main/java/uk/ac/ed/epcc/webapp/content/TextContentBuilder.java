@@ -185,6 +185,11 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 		sb.append(text);
 		
 	}
+	
+	@Override
+	public void addLink(AppContext conn, String text,String hover,String style, FormResult action) {
+		sb.append(text);
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addLink(uk.ac.ed.epcc.webapp.AppContext, java.lang.String, uk.ac.ed.epcc.webapp.forms.result.FormResult)
 	 */

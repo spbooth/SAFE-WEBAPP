@@ -207,6 +207,16 @@ public interface ContentBuilder {
 	 * @param action FormResult to navigate to.
 	 */
 	public abstract void addLink(AppContext conn,String text, String hover,FormResult action);
+	
+	/** Add an action link to the Content
+	 * @param conn AppContext
+	 * 
+	 * @param text  link text
+	 * @param hover tooltip text
+	 * @param style  link class for CSS
+	 * @param action FormResult to navigate to.
+	 */
+	public abstract void addLink(AppContext conn,String text, String hover,String style,FormResult action);
 	/** Add an image served by a {@link ServeDataResult}
 	 * 
 	 * @param conn

@@ -200,11 +200,15 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 	}
 	@Override
 	public default void addLink(AppContext conn,String text, String hover,FormResult action) {
+		addLink(conn,text,hover,null,action);
+	}
+	@Override
+	public default void addLink(AppContext conn,String text, String hover,String style,FormResult action) {
 		if( action == null){
 			clean(text);
 			return;
 		}
-		AddLinkVisitor vis = new AddLinkVisitor(conn, this, text,hover);
+		AddLinkVisitor vis = new AddLinkVisitor(conn, this, text,hover,style);
 		vis.new_tab=useNewTab();
 		try {
 			action.accept(vis);

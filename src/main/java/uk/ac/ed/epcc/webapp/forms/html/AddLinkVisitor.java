@@ -40,12 +40,14 @@ public class AddLinkVisitor extends AbstractContexed implements WebFormResultVis
     private final ExtendedXMLBuilder hb;
     private final String text;
     private final String title;
+    private final String style;
     public boolean new_tab=false;
-    public AddLinkVisitor(AppContext c, ExtendedXMLBuilder hb,String text,String title){
+    public AddLinkVisitor(AppContext c, ExtendedXMLBuilder hb,String text,String title,String style){
     	super(c);
     	this.hb=hb;
     	this.text=text;
     	this.title=title;
+    	this.style=style;
     }
     private String encodeURL(String url){
     	ServletService serv = getContext().getService(ServletService.class);
@@ -72,6 +74,9 @@ public class AddLinkVisitor extends AbstractContexed implements WebFormResultVis
 		hb.open("a");
 		if( title != null && ! title.isEmpty()){
 			hb.attr("title", title);
+		}
+		if( style != null && ! style.isEmpty()) {
+			hb.attr("class",style);
 		}
 		hb.attr("href", encodeURL(res.getURL()));	
 		if( new_tab) {
