@@ -730,7 +730,12 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 * @return Link
 	 * @throws DataException
 	 */
-	synchronized protected final T makeLink(L left_end, R right_end)
+	
+	protected final T makeLink(L left_end, R right_end)
+			throws Exception {
+		return makeLink(left_end,right_end,true);
+	}
+	synchronized protected final T makeLink(L left_end, R right_end, boolean commit)
 			throws Exception {
 		if( left_end == null || right_end == null){
 			throw new IllegalArgumentException("Null arguments to makeLink");
@@ -744,7 +749,9 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 			l.setCachedLeft(left_end);
 			l.setCachedRight(right_end);
 			l.setup();
-			l.commit();
+			if( commit) {
+				l.commit();
+			}
 		}
 		return l;
 	}
