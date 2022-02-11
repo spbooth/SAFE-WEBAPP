@@ -42,7 +42,7 @@ public class ConstrainedTestCase extends AbstractTransitionServletTest {
 		runTransition();
 		checkFormContent(null, "constraint_form2.xml");
 		addParam("Value",12);
-		runTransition();
+		runTransition(1);
 		checkMessage("object_created");
 		checkDiff("/cleanup.xsl", "constraint_created.xml");
 		
@@ -58,7 +58,7 @@ public class ConstrainedTestCase extends AbstractTransitionServletTest {
 		addParam("Min", 1);
 		addParam("Max", 100);
 		addParam("Value",12);
-		runTransition();
+		runTransition(1);
 		checkMessage("object_created");
 		checkDiff("/cleanup.xsl", "constraint_created.xml");
 		
