@@ -26,8 +26,8 @@ import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 public interface Composable {
 
 	/** Convert an object to a {@link Composable}.
-	 * The object either has to implement the interface or be a {@link DataObjectFactory} in which cast
-	 * the target is used to look up a {@link Composite}
+	 * The object either has to implement the interface or be a {@link DataObjectFactory} in which case
+	 * the key is used to look up a {@link Composite}
 	 * 
 	 * @param target
 	 * @param o

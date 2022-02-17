@@ -359,6 +359,9 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 	}
 	default void addActionButton(Form f, boolean can_submit, String name) {
 		FormAction action = f.getAction(name);
+		if( action == null ) {
+			return;
+		}
 		Object content = action.getText();
 		
 		if( content != null ){
