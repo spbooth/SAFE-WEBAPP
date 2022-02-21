@@ -41,15 +41,15 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  *
  */
 public abstract class AbstractDateInput extends ParseAbstractInput<Date> implements BoundedDateInput, FormatHintInput {
-	public static final Date DEFAULT_MAX_DATE;
-	static {
-		Calendar c = Calendar.getInstance();
-		c.clear();
-		c.set(9999, Calendar.DECEMBER, 31);
-		DEFAULT_MAX_DATE=c.getTime();
-	}
+//	public static final Date DEFAULT_MAX_DATE;
+//	static {
+//		Calendar c = Calendar.getInstance();
+//		c.clear();
+//		c.set(9999, Calendar.DECEMBER, 31);
+//		DEFAULT_MAX_DATE=c.getTime();
+//	}
     Date min=null;
-    Date max=DEFAULT_MAX_DATE;
+    Date max=null;
     long resolution=1000L; // number of milliseconds in a tick
     public AbstractDateInput(){
     	this(1000L);
