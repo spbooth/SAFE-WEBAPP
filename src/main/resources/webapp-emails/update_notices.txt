@@ -8,11 +8,16 @@ in the  %%service.website-name=Web-site%%:
 
 %%person.notices%%
 
-This is an important part of your use of the %%service.name%% Service.
-
 Please log in at following URL:
   %%service.saf.url%%
 to provide these updates.
+
+%%begin{Verification}%%
+We appreciate that automated emails like this can appear suspicious,
+The following information is provided to help verify that this is a genuine
+request:
+%%person.verifications%%
+%%end{Verification}%%
 
 Regards,
 

@@ -84,6 +84,7 @@ import uk.ac.ed.epcc.webapp.session.PasswordChangeListener;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory.PasswordChangeRequest;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.session.VerificationProvider;
 
 /**
  * Emailer Class that sends emails.
@@ -400,8 +401,31 @@ public class Emailer {
 			return null;
 		}
 		email_template.setProperty("person.email", email);
-		email_template.setProperty("person.loginnames", person.getFactory().getNames(person));
+		AppUserFactory<AppUser> factory = person.getFactory();
+		email_template.setProperty("person.loginnames", factory.getNames(person));
 
+		Set<String> verifications = new LinkedHashSet<>();
+		if( factory instanceof VerificationProvider) {
+			((VerificationProvider)factory).addVerifications(verifications,person);
+		}
+		for(VerificationProvider comp : factory.getComposites(VerificationProvider.class)) {
+			comp.addVerifications(verifications,person);
+		}
+		if( ! verifications.isEmpty()) {
+			StringBuilder v_text = new StringBuilder();
+			boolean v_seen=false;
+			for(String s : verifications) {
+				if( v_seen ) {
+					v_text.append("\n");
+				}
+				v_text.append("* ");
+				v_text.append(s);
+				v_seen=true;
+			}
+			email_template.setRegionEnabled("Verification", true);
+			email_template.setProperty("person.verifications", v_text.toString());
+			
+		}
 		MimeMessage m = templateMessage(person,email_template);
 		return m;
 	}

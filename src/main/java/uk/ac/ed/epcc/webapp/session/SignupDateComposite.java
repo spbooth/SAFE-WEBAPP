@@ -39,8 +39,8 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  *
  */
 
-public class SignupDateComposite<BDO extends DataObject> extends CreateComposite<BDO, SignupDateComposite<BDO>> 
- implements IndexTableContributor<BDO>{
+public class SignupDateComposite<BDO extends AppUser> extends CreateComposite<BDO, SignupDateComposite<BDO>> 
+ implements IndexTableContributor<BDO>, VerificationProvider<BDO>{
 	public static final String SIGNUP_DATE = "SignupDate";
 
 	// not static not thread safe
@@ -126,5 +126,15 @@ public class SignupDateComposite<BDO extends DataObject> extends CreateComposite
 			return or;
 		}
 		return null;
+	}
+
+
+	@Override
+	public void addVerifications(Set<String> verifications,BDO person) {
+		Date d = getSignupDate(person);
+		if( d != null ) {
+			verifications.add("You were registered on this site at "+df.format(d));
+		}
+		
 	}
 }
