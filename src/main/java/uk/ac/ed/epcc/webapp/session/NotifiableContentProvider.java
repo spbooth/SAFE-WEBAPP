@@ -27,6 +27,15 @@ public class NotifiableContentProvider<AU extends AppUser> extends AbstractConte
 
 	@Override
 	public ContentBuilder addContent(ContentBuilder builder) {
+		Table<String, AU> tab = getTable();
+		if( tab.hasData()) {
+			builder.addTable(getContext(), tab);
+		}
+		
+		return builder;
+	}
+
+	public Table<String, AU> getTable() {
 		SessionService<AU> sess = getContext().getService(SessionService.class);
 		AppUserFactory<AU> login = sess.getLoginFactory();
 		OrFilter<AU> fil = new OrFilter<AU>(login.getTarget(), login);
@@ -61,17 +70,14 @@ public class NotifiableContentProvider<AU extends AppUser> extends AbstractConte
 						Retirable r = (Retirable) p;
 						tab.put("Retirable", p, r.canRetire());
 					}
+					tab.put("Emails allowed", p, p.allowEmail());
 				}
 			}
 		} catch (Exception e) {
 			getLogger().error("Error generating notifications table",e);
 		}
 		tab.setKeyName("Person");
-		if( tab.hasData()) {
-			builder.addTable(getContext(), tab);
-		}
-		
-		return builder;
+		return tab;
 	}
 
 }

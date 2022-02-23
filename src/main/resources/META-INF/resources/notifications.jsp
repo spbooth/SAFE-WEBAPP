@@ -1,9 +1,20 @@
 <%@page import="uk.ac.ed.epcc.webapp.session.NotifiableContentProvider"%>
+<%@page import="uk.ac.ed.epcc.webapp.tags.WebappHeadTag" %>
 <%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
 <wb:ServiceInit/>
 <wb:session role="Admin"/>
 <%	
-String page_title = service_name+" user norifications";
+String page_title = service_name+" user notifications";
+WebappHeadTag.addScript(conn, request, "${jquery.script}");
+WebappHeadTag.addScript(conn, request, "${datatables.script}");
+WebappHeadTag.addCss(conn, request, "${datatables.css}");
+WebappHeadTag.addScript(conn, request, "${colVis.script}");
+WebappHeadTag.addCss(conn, request, "${colVis.css}");
+WebappHeadTag.addScript(conn, request, "${colReorder.script}");
+WebappHeadTag.addCss(conn, request, "${colReorder.css}");
+WebappHeadTag.addScript(conn, request,
+		"$(document).ready( function(){ $('#users').DataTable({ stateSave: true , stateDuration: 3600, pageLength: 100 , lengthMenu: [[ 10, 25, 50, 100, -1 ],[ 10, 25, 50, 100, 'All'] ] , paging: true ,  order: [[ 0, 'desc' ]] , dom: 'C<\"clear\">Rlfrtip'   });});");
+
 %>
 <%@ include file="std_header.jsf" %>
 <br>
@@ -16,8 +27,23 @@ String page_title = service_name+" user norifications";
 if email notifications of required pages are enabled.
 </p>
 <%@page import="uk.ac.ed.epcc.webapp.content.HtmlBuilder" %>
+<%@page import="uk.ac.ed.epcc.webapp.content.Table" %>
 <%@page import="uk.ac.ed.epcc.webapp.session.NotifiableContentProvider" %>
-<%= (new  NotifiableContentProvider(conn)).addContent(new HtmlBuilder()) %>
+<%
+HtmlBuilder hb = new HtmlBuilder();
+NotifiableContentProvider ncp = new NotifiableContentProvider(conn);
+Table t = ncp.getTable();
+if( t.hasData()){
+   HtmlBuilder wrapper=(HtmlBuilder)hb.getPanel("scrollwrapper");
+
+	wrapper.setTableSections(true);
+	t.setId("users");
+	wrapper.addTable(conn, t,"display");
+	wrapper.addParent();
+    %><%= hb %><%
+}
+%>
+
 </div>
 <%@ include file="back.jsf" %>
 <%@ include file="std_footer.jsf" %>

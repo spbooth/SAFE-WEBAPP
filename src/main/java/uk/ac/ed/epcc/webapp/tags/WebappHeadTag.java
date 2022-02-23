@@ -214,6 +214,9 @@ public class WebappHeadTag extends TagSupport implements Tag {
 	 * @param script
 	 */
 	public static void addScript(AppContext conn,HttpServletRequest request, String script){
+		if( script == null || script.trim().isEmpty()) {
+			return;
+		}
 		Set<String> scripts = (Set<String>) request.getAttribute(REQUEST_SCRIPT_ATTR);
 		if( scripts == null ){
 			scripts=new LinkedHashSet<>();
@@ -230,6 +233,9 @@ public class WebappHeadTag extends TagSupport implements Tag {
 		}
 	}
 	public static void addCss(AppContext conn,HttpServletRequest request, String css){
+		if( css == null || css.trim().isEmpty()) {
+			return;
+		}
 		Set<String> stylesheets = (Set<String>) request.getAttribute(REQUEST_CSS_ATTR);
 		if( stylesheets == null ){
 			stylesheets=new LinkedHashSet<>();
