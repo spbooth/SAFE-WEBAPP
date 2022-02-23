@@ -15,6 +15,7 @@ import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.model.TemplateFinder;
+import uk.ac.ed.epcc.webapp.model.data.Retirable;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 
@@ -55,6 +56,10 @@ public class NotifiableContentProvider<AU extends AppUser> extends AbstractConte
 					}
 					if( max != null && max.apply()) {
 						tab.put("Notifications sent", p, max.getNotifiedCount(p));
+					}
+					if( p instanceof Retirable) {
+						Retirable r = (Retirable) p;
+						tab.put("Retirable", p, r.canRetire());
 					}
 				}
 			}
