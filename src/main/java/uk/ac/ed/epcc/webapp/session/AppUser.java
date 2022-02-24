@@ -219,7 +219,13 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 	}
 	public void markDetailsUpdated(){
 		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
-		record.setOptionalProperty(UPDATED_TIME, time.getCurrentTime());
+		Date d = time.getCurrentTime();
+		setDetailsUpdated(d);
+	}
+
+
+	public void setDetailsUpdated(Date d) {
+		record.setOptionalProperty(UPDATED_TIME, d);
 	}
 	
 	

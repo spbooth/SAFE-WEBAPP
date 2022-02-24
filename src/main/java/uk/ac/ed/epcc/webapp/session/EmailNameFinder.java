@@ -453,8 +453,15 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 	public void verified(AU user) {
 		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 		if( time != null) {
-			getRecord(user).setOptionalProperty(EMAIL_VERIFIED_FIELD,time.getCurrentTime() );
+			Date d = time.getCurrentTime();
+			setEmailVerifiedDate(user, d);
 		}
+	}
+
+
+
+	public void setEmailVerifiedDate(AU user, Date d) {
+		getRecord(user).setOptionalProperty(EMAIL_VERIFIED_FIELD,d );
 	}
 
     public boolean useEmailVerificationDate() {
