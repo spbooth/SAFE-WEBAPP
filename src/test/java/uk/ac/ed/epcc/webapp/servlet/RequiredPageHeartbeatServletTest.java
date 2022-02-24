@@ -106,26 +106,24 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 		assertEquals(1, MockTansport.nSent());
 		Message m = MockTansport.getMessage(0);
 		assertEquals("[test] Account update required", m.getSubject());
-		assertEquals("\n" + 
-				"Dear person1@example.com,\n" + 
-				"\n" + 
-				"There are some account updates or other actions that need your attention \n" + 
-				"in the  Web site:\n" + 
-				"\n" + 
-				"* Your email address needs to be verified (or changed and the new address verified).\n" + 
-				"* Your user details need to be updated/verified before 2020-06-30 09:00\n" + 				
-				"\n" + 
-				
-				"This is an important part of your use of the test Service.\n" + 
-				"\n" + 
-				"Please log in at following URL:\n" + 
-				"  http://www.example.com/test\n" + 
-				"to provide these updates.\n" + 
-				"\n" + 
-				"Regards,\n" + 
-				"\n" + 
-				"  The test Team\n" + 
-				"  \n", m.getContent().toString());
+		assertEquals("\n"
+				+ "Dear person1@example.com,\n"
+				+ "\n"
+				+ "There are some account updates or other actions that need your attention \n"
+				+ "in the  Web site:\n"
+				+ "\n"
+				+ "* Your email address needs to be verified (or changed and the new address verified).\n"
+				+ "* Your user details need to be updated/verified before 2020-06-30 09:00\n"
+				+ "\n"
+				+ "Please log into the Web site to provide these updates.\n"
+				+ "  http://www.example.com/test\n"
+				+ "\n"
+				+ "\n"
+				+ "Regards,\n"
+				+ "\n"
+				+ "  The test Team\n"
+				+ "  \n"
+				+ "", m.getContent().toString());
 		AppUserFactory<?> login = p.getLoginFactory();
 		MaxNotifyComposite comp = login.getComposite(MaxNotifyComposite.class);
 		assertNotNull(comp);
