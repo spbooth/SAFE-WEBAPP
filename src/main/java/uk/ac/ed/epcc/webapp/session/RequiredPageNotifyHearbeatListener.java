@@ -37,6 +37,7 @@ import uk.ac.ed.epcc.webapp.model.cron.LockFactory.Lock;
  */
 public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends AbstractContexed implements HeartbeatListener {
     public static final Feature REQUIRED_PAGE_HEARTBEAT = new Feature("required_page.heartbeat",true,"Send emails to notify users of required actions from heartbeat");
+    public static final Feature REQUIRE_VERIFIED = new Feature("required_page.heartbeat.require_verified",true,"Require email address has been verified at least once before sending email");
 	/**
 	 * @param conn
 	 */
@@ -104,6 +105,11 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 			AndFilter<AU> notify_filter = new AndFilter<AU>(login.getTarget(), fil, login.getEmailFilter(), login.getCanLoginFilter());
 			if( max != null) {
 				notify_filter.addFilter(max.getNotifyFilter());
+			}
+			EmailNameFinder<AU> finder = login.getComposite(EmailNameFinder.class);
+			if( finder != null && REQUIRE_VERIFIED.isEnabled(getContext())) {
+				// Don't send emails to an address that has never been verified
+				notify_filter.addFilter(finder.getIsVerifiedFilter());
 			}
 			try {
 				for( AU person : login.getResult(notify_filter)) {

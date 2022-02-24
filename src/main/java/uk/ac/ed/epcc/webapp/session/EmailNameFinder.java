@@ -52,6 +52,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
+import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
@@ -484,8 +485,20 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		return result;
 	}
 
+	
+    public boolean isEmailVerified(AU user) {
+    	if( ! useEmailVerificationDate()) {
+    		return true;
+    	}
+    	return getVerificationDate(user) != null;
+    }
 
-
+    public SQLFilter<AU> getIsVerifiedFilter(){
+    	if( ! useEmailVerificationDate()) {
+    		return null;
+    	}
+    	return new NullFieldFilter<AU>(getFactory().getTarget(), getRepository(), EMAIL_VERIFIED_FIELD, false);
+    }
 	/**
 	 * @param user
 	 * @return

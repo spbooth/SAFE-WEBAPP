@@ -31,6 +31,7 @@ import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
+import uk.ac.ed.epcc.webapp.session.EmailNameFinder;
 import uk.ac.ed.epcc.webapp.session.MaxNotifyComposite;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -64,8 +65,10 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 			MockTansport.clear();
 			setTime(2019, Calendar.JULY, 1, 9, 0);
 			SessionService p = setupPerson("person1@example.com");
+			EmailNameFinder finder = (EmailNameFinder) p.getLoginFactory().getComposite(EmailNameFinder.class);
 			AppUser person1 = p.getCurrentPerson();
 			person1.markDetailsUpdated();
+			finder.verified(person1);
 			person1.commit();
 			System.out.println(person1.nextRequiredUpdate());
 			setTime(2019, Calendar.DECEMBER, 1, 9, 0);
@@ -88,8 +91,10 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 		MockTansport.clear();
 		setTime(2019, Calendar.JULY, 1, 9, 0);
 		SessionService p = setupPerson("person1@example.com");
+		EmailNameFinder finder = (EmailNameFinder) p.getLoginFactory().getComposite(EmailNameFinder.class);
 		AppUser person1 = p.getCurrentPerson();
 		person1.markDetailsUpdated();
+		finder.verified(person1);
 		person1.commit();
 		System.out.println(person1.nextRequiredUpdate());
 		setTime(2019, Calendar.DECEMBER, 1, 9, 0);
@@ -110,12 +115,12 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 				+ "Dear person1@example.com,\n"
 				+ "\n"
 				+ "There are some account updates or other actions that need your attention \n"
-				+ "in the  Web site:\n"
+				+ "in the test Web site:\n"
 				+ "\n"
-				+ "* Your email address needs to be verified (or changed and the new address verified).\n"
+				+ "* Your email will need verifying soon. You will have to so this before 2020-06-30 09:00.\n"
 				+ "* Your user details need to be updated/verified before 2020-06-30 09:00\n"
 				+ "\n"
-				+ "Please log into the Web site to provide these updates.\n"
+				+ "Please log into the test Web site to provide these updates.\n"
 				+ "  http://www.example.com/test\n"
 				+ "\n"
 				+ "\n"
@@ -136,14 +141,17 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 		MockTansport.clear();
 		setTime(2019, Calendar.JULY, 1, 9, 0);
 		SessionService p = setupPerson("person1@example.com");
+		EmailNameFinder finder = (EmailNameFinder) p.getLoginFactory().getComposite(EmailNameFinder.class);
 		AppUser person1 = p.getCurrentPerson();
 		person1.markDetailsUpdated();
+		finder.verified(person1);
 		person1.commit();
 		System.out.println(person1.nextRequiredUpdate());
 		setTime(2019, Calendar.DECEMBER, 1, 9, 0);
 		p = setupPerson("person2@example.com");
 		AppUser person2 = p.getCurrentPerson();
 		person2.markDetailsUpdated();
+		finder.verified(person2);
 		person2.commit();
 		System.out.println(person2.nextRequiredUpdate());
 		

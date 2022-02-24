@@ -46,6 +46,11 @@ public class NotifiableContentProvider<AU extends AppUser> extends AbstractConte
 		AndFilter<AU> notify_filter = new AndFilter<AU>(login.getTarget(), fil, login.getEmailFilter(), login.getCanLoginFilter());
 		MaxNotifyComposite<AU> max = login.getComposite(MaxNotifyComposite.class);
 		// don't apply filter from max notify
+		EmailNameFinder<AU> finder = login.getComposite(EmailNameFinder.class);
+		// ignore unverified accounts
+		if( finder != null && RequiredPageNotifyHearbeatListener.REQUIRE_VERIFIED.isEnabled(getContext())) {
+			notify_filter.addFilter(finder.getIsVerifiedFilter());
+		}
 		Table<String, AU> tab = new Table<>();
 		try {
 			Emailer em = new Emailer(getContext());
