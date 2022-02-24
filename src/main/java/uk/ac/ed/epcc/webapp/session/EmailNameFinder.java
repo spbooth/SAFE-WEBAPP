@@ -511,6 +511,8 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 				return true;
 			}
 			Calendar point = Calendar.getInstance();
+			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+			point.setTime(time.getCurrentTime());
 			point.add(Calendar.DAY_OF_YEAR, -1 * days);
 
 			Date target_time = point.getTime();
@@ -524,6 +526,8 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 		if( days > 0 ) {
 			
 			Calendar point = Calendar.getInstance();
+			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+			point.setTime(time.getCurrentTime());
 			// 90% there
 			point.add(Calendar.DAY_OF_YEAR, (int)(-0.9 * days));
 
@@ -540,6 +544,8 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU,Em
 				return true;
 			}
 			Calendar point = Calendar.getInstance();
+			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
+			point.setTime(time.getCurrentTime());
 			// 90% there
 			point.add(Calendar.DAY_OF_YEAR, (int)(-0.9 * days));
 

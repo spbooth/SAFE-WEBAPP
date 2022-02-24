@@ -75,6 +75,7 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 			p = setupPerson("person2@example.com");
 			AppUser person2 = p.getCurrentPerson();
 			person2.markDetailsUpdated();
+			finder.verified(person2);
 			person2.commit();
 			System.out.println(person2.nextRequiredUpdate());
 		
