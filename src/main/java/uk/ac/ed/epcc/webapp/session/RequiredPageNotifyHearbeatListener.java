@@ -30,6 +30,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener;
 import uk.ac.ed.epcc.webapp.model.cron.LockFactory;
 import uk.ac.ed.epcc.webapp.model.cron.LockFactory.Lock;
+import uk.ac.ed.epcc.webapp.model.data.FilterResult;
 
 /**
  * @author Stephen Booth
@@ -95,11 +96,19 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 			RequiredPageNotify<AU> pol = RequiredPageNotify.getPolicy(getContext());
  			AppUserFactory<AU> login = sess.getLoginFactory();
  			MaxNotifyComposite<AU> max = pol.getMax();
+ 			int max_send = getContext().getIntegerParameter("required_page.notifications.max_batch", 50);
 			Emailer mailer = new Emailer(getContext());
-			try {
-				for( AU person : login.getResult(pol.getNotifyFilter(true))) {
+			try(FilterResult<AU> res = login.getResult(pol.getNotifyFilter(true))) {
+				int count=0;
+				for( AU person : res) {
 					// Don't notify a user who can't login to fix
+					// these rules should also be in the filter.
 					if( pol.allow(person, true)) {
+						if( max_send >0 && count > max_send) {
+							getLogger().debug("Terminating notify due to max_send");
+							break;
+						}
+						count++;
 						try {
 							Set<String> notices = new LinkedHashSet<String>();
 							for(RequiredPage<AU> rp : pol.getRequiredPages()) {
