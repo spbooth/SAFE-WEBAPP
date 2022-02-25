@@ -37,8 +37,7 @@ import uk.ac.ed.epcc.webapp.model.cron.LockFactory.Lock;
  */
 public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends AbstractContexed implements HeartbeatListener {
     public static final Feature REQUIRED_PAGE_HEARTBEAT = new Feature("required_page.heartbeat",true,"Send emails to notify users of required actions from heartbeat");
-    public static final Feature REQUIRE_VERIFIED = new Feature("required_page.heartbeat.require_verified",true,"Require email address has been verified at least once before sending email");
-	/**
+    /**
 	 * @param conn
 	 */
 	public RequiredPageNotifyHearbeatListener(AppContext conn) {
@@ -93,31 +92,17 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 				getLogger().error("No session service");
 				return null;
 			}
-
-			AppUserFactory<AU> login = sess.getLoginFactory();
-			MaxNotifyComposite<AU> max = login.getComposite(MaxNotifyComposite.class);
-			OrFilter<AU> fil = new OrFilter<AU>(login.getTarget(), login);
-			Set<RequiredPage<AU>> requiredPages = login.getRequiredPages();
-			for(RequiredPage<AU> rp : requiredPages) {
-				fil.addFilter(rp.notifiable(sess));
-			}
+			RequiredPageNotify<AU> pol = RequiredPageNotify.getPolicy(getContext());
+ 			AppUserFactory<AU> login = sess.getLoginFactory();
+ 			MaxNotifyComposite<AU> max = pol.getMax();
 			Emailer mailer = new Emailer(getContext());
-			AndFilter<AU> notify_filter = new AndFilter<AU>(login.getTarget(), fil, login.getEmailFilter(), login.getCanLoginFilter());
-			if( max != null) {
-				notify_filter.addFilter(max.getNotifyFilter());
-			}
-			EmailNameFinder<AU> finder = login.getComposite(EmailNameFinder.class);
-			if( finder != null && REQUIRE_VERIFIED.isEnabled(getContext())) {
-				// Don't send emails to an address that has never been verified
-				notify_filter.addFilter(finder.getIsVerifiedFilter());
-			}
 			try {
-				for( AU person : login.getResult(notify_filter)) {
+				for( AU person : login.getResult(pol.getNotifyFilter(true))) {
 					// Don't notify a user who can't login to fix
-					if( person.canLogin() && person.allowEmail() && (max == null || max.sendNotifications(person))) {
+					if( pol.allow(person, true)) {
 						try {
 							Set<String> notices = new LinkedHashSet<String>();
-							for(RequiredPage<AU> rp : requiredPages) {
+							for(RequiredPage<AU> rp : pol.getRequiredPages()) {
 								rp.addNotifyText(notices,person);
 							}
 							if( ! notices.isEmpty()) {

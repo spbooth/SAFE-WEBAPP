@@ -60,6 +60,12 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 	
 	@Test
 	@ConfigFixtures("required_page_heartbeat.properties")
+	/** No reminders sent till 1 year is up
+	 * 
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws DataException
+	 */
 	public void testNotify1() throws ServletException, IOException, DataException{
 		
 			MockTansport.clear();
@@ -88,6 +94,13 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 	
 	@Test
 	@ConfigFixtures("required_page_heartbeat.properties")
+	/** One account expired the other is  up
+	 * 
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws DataException
+	 * @throws MessagingException
+	 */
 	public void testNotify2() throws ServletException, IOException, DataException, MessagingException{
 		MockTansport.clear();
 		setTime(2019, Calendar.JULY, 1, 9, 0);
@@ -138,6 +151,13 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 	
 	@Test
 	@ConfigFixtures("required_page_heartbeat.properties")
+	/** Both accounts are expired
+	 * 
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws DataException
+	 * @throws MessagingException
+	 */
 	public void testNotify3() throws ServletException, IOException, DataException, MessagingException{
 		MockTansport.clear();
 		setTime(2019, Calendar.JULY, 1, 9, 0);

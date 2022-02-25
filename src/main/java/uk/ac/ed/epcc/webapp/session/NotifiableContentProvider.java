@@ -36,28 +36,20 @@ public class NotifiableContentProvider<AU extends AppUser> extends AbstractConte
 	}
 
 	public Table<String, AU> getTable() {
+		RequiredPageNotify<AU> pol = RequiredPageNotify.getPolicy(getContext());
 		SessionService<AU> sess = getContext().getService(SessionService.class);
 		AppUserFactory<AU> login = sess.getLoginFactory();
-		OrFilter<AU> fil = new OrFilter<AU>(login.getTarget(), login);
-		Set<RequiredPage<AU>> requiredPages = login.getRequiredPages();
-		for(RequiredPage<AU> rp : requiredPages) {
-			fil.addFilter(rp.notifiable(sess));
-		}
-		AndFilter<AU> notify_filter = new AndFilter<AU>(login.getTarget(), fil, login.getEmailFilter(), login.getCanLoginFilter());
-		MaxNotifyComposite<AU> max = login.getComposite(MaxNotifyComposite.class);
-		// don't apply filter from max notify
-		EmailNameFinder<AU> finder = login.getComposite(EmailNameFinder.class);
-		// ignore unverified accounts
-		if( finder != null && RequiredPageNotifyHearbeatListener.REQUIRE_VERIFIED.isEnabled(getContext())) {
-			notify_filter.addFilter(finder.getIsVerifiedFilter());
-		}
+		
+		
+		MaxNotifyComposite<AU> max = pol.getMax();
+		
 		Table<String, AU> tab = new Table<>();
 		try {
 			Emailer em = new Emailer(getContext());
-			for(AU p : login.getResult(notify_filter)) {
-				if( p.canLogin()) {
+			for(AU p : login.getResult(pol.getNotifyFilter(false))) {
+				if( pol.allow(p, false)) {
 					Set<String> notices = new LinkedHashSet<String>();
-					for(RequiredPage<AU> rp : requiredPages) {
+					for(RequiredPage<AU> rp : pol.getRequiredPages()) {
 						rp.addNotifyText(notices,p);
 					}
 					if( ! notices.isEmpty()) {
