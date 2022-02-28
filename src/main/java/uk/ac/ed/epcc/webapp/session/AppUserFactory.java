@@ -187,12 +187,12 @@ NamedFilterProvider<AU>
 		 */
 		public void addRoleParameter(List<PatternArgument> list, String test_role) {
 			list.add(new PatternArg(null,AbstractSessionService.ROLE_FIELD,test_role));
-			String use = getContext().getInitParameter(AbstractSessionService.USE_ROLE_PREFIX+test_role);
-			if( use != null) {
-				for(String r : use.split("\\s*,\\s*")) {
-					addRoleParameter(list, r);
-				}
-			}
+//			String use = getContext().getInitParameter(AbstractSessionService.USE_ROLE_PREFIX+test_role);
+//			if( use != null) {
+//				for(String r : use.split("\\s*,\\s*")) {
+//					addRoleParameter(list, r);
+//				}
+//			}
 		}
 		public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify) {
 			sb.append(" EXISTS( SELECT 1 FROM ");
@@ -202,8 +202,13 @@ NamedFilterProvider<AU>
 			sb.append(" = ");
 			res.addUniqueName(sb, true, false);
 			sb.append(" AND (");
+			boolean seen=false;
 			for(String role : roles) {
+				if( seen ) {
+					sb.append(" OR ");
+				}
 				addRolePattern(sb,role);
+				seen=true;
 			}
 			sb.append("))");
 			return sb;
@@ -214,13 +219,13 @@ NamedFilterProvider<AU>
 		public void addRolePattern(StringBuilder sb,String test_role) {
 			ctx.quoteQualified(sb, AbstractSessionService.ROLE_TABLE, AbstractSessionService.ROLE_FIELD);
 			sb.append("=?");
-			String use = getContext().getInitParameter(AbstractSessionService.USE_ROLE_PREFIX+test_role);
-			if( use != null) {
-				for(String r : use.split("\\s*,\\s*")) {
-					sb.append(" OR ");
-					addRolePattern(sb, r);
-				}
-			}
+//			String use = getContext().getInitParameter(AbstractSessionService.USE_ROLE_PREFIX+test_role);
+//			if( use != null) {
+//				for(String r : use.split("\\s*,\\s*")) {
+//					sb.append(" OR ");
+//					addRolePattern(sb, r);
+//				}
+//			}
 		}
 	
 		/* (non-Javadoc)

@@ -39,6 +39,7 @@ import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
@@ -424,7 +425,9 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		// role name aliasing
 		
 		// shortcutTest must bypass
-		// all caching
+		// all caching.
+		// canHaveRole must not do alias expansion, we need to do it at this level
+		// so we can check toggle values on values in aliases
 		boolean result=false;
 		if( shortcutTestRole(name) || canHaveRole(name)){ // check queried role first
 			result=true;
@@ -470,7 +473,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	 */
 	@Override
 	public String mapRoleName(String name) {
-		return getContext().getInitParameter(USE_ROLE_PREFIX+name, name);
+		return getContext().getInitParameter(USE_ROLE_PREFIX+name, name).trim();
 	}
 	
 	
@@ -496,7 +499,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		return set;
 	}
 	/** Checks if this session can have the role (ignoring toggle values).
-	 * No name mapping is applied.
+	 * No name mapping is applied. (to allow toggle roles to work correctly)
 	 * 
 	 * @param role
 	 * @return  true if role set/permitted
@@ -554,13 +557,13 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	}
 	/** underlying check for role membership.
 	 * Sub-classes can override this. 
-	 * No role mapping is applied
+	 * No role mapping is applied. (to allow toggle roles to work correctly)
 	 * 
 	 * @param role
 	 * @return
 	 */
 	protected  Boolean testRole(String role){
-	    return canHaveRole(getCurrentPerson(), role);
+	    return canHaveRole(null,getCurrentPerson(), role,false);
 	}
 
 	/** clears all record of the current person.
@@ -946,7 +949,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	@Override
 	public void setRole(A user, String role, boolean value)
 			throws UnsupportedOperationException {
-		boolean current = canHaveRole(user,role);
+		boolean current = canHaveRole(null,user,role,false);
 		if( value == current){
 			return;
 		}
@@ -1054,8 +1057,11 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	}
 	public final BaseFilter<A> getGlobalRoleFilter(Set<String> skip,String role){
 		AppUserFactory<A> login = getLoginFactory();
-		if( role == null || role.isEmpty()) {
+		if( role == null || role.isEmpty() || role.equalsIgnoreCase("false")) {
 			return new FalseFilter<A>(login.getTarget());
+		}
+		if( role.equalsIgnoreCase("true")) {
+			return new GenericBinaryFilter<A>(login.getTarget(), true);
 		}
 		if(role.startsWith("@")) {
 			BaseFilter<A> nf = makeNamedFilter(login, role.substring(1));
@@ -1100,7 +1106,10 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	
 	@Override
 	public boolean canHaveRole(A user, String role) {
-		if( user == null || role == null){
+		return canHaveRole(null,user,role,true);
+	}
+	protected boolean canHaveRole(Set<String> skip, A user, String role,boolean expand_alias) {	
+		if( user == null || role == null || role.isEmpty()){
 			return false;
 		}
 		if( role.equalsIgnoreCase("true")) {
@@ -1146,6 +1155,22 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		for(StateRoleProvider<A> comp : login_fac.getComposites(StateRoleProvider.class)){
 			if( comp.testRole(user, role)){
 				return true;
+			}
+		}
+		if( expand_alias) {
+			if( skip == null ) {
+				skip = new HashSet<String>();
+			}
+			skip.add(role);
+			String list = mapRoleName(role);
+			if( ! list.equals(role)) {
+				for(String r : list.split("\\s*,\\s*")) {
+					if( ! skip.contains(r)) {
+						if(canHaveRole(skip, user, r,expand_alias)) {
+							return true;
+						}
+					}
+				}
 			}
 		}
 		return false;
