@@ -79,6 +79,11 @@ public class MaxNotifyComposite<A extends AppUser> extends Composite<A, MaxNotif
 		}
 		return null;
 	}
+	public void setLastNotified(A user,Date t) {
+		getRecord(user).setOptionalProperty(LAST_NOTIFY__FIELD, t);
+	}
+	
+	
 	/** record an additional notification sent to the user
 	 * 
 	 * @param user

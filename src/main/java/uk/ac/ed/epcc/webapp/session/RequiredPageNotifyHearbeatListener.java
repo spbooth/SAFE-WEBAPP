@@ -104,7 +104,7 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 					// Don't notify a user who can't login to fix
 					// these rules should also be in the filter.
 					if( pol.allow(person, true)) {
-						if( max_send >0 && count > max_send) {
+						if( max_send >0 && count >= max_send) {
 							getLogger().debug("Terminating notify due to max_send");
 							break;
 						}

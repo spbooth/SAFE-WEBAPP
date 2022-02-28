@@ -66,7 +66,8 @@ import uk.ac.ed.epcc.webapp.timer.TimeClosable;
  * <p>
  * A config parameter of the form <b>use_role.<i>role-name</i></b> defines a role-name mapping
  * the value of the parameter is the actual role queried. A comma separated list of sufficient roles 
- * may also be specified.
+ * may also be specified. Multiple roles separated by + must all be present. If both command and + are present then
+ * the + combination binds more tightly.
  * <p>
  * A role of the form <b><i>tag</i>%<i>rel[@name]</i></b> is possessed by a user if that user
  * has relationship (see below) <i>rel</i> against one of the records from factory constructed using <i>tag</i>.
@@ -1095,7 +1096,17 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			OrFilter<A> or = new OrFilter<A>(login.getTarget(), login);
 			or.addFilter(fil);
 			for(String r : list.split("\\s*,\\s*")) {
-				if( ! skip.contains(r)) {
+				if( r.contains("+")) {
+					AndFilter<A> and = new AndFilter<A>(login.getTarget());
+					for(String r2 : r.split("\\s*+\\s*")) {
+						if( skip.contains(r2)) {
+							and.addFilter(new FalseFilter<A>(login.getTarget()));
+						}else {
+							and.addFilter(getGlobalRoleFilter(skip, r2));
+						}
+					}
+					or.addFilter(and);
+				}else if( ! skip.contains(r)) {
 					or.addFilter(getGlobalRoleFilter(skip, r));
 				}
 			}
@@ -1165,7 +1176,16 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			String list = mapRoleName(role);
 			if( ! list.equals(role)) {
 				for(String r : list.split("\\s*,\\s*")) {
-					if( ! skip.contains(r)) {
+					if( r.contains("+")) {
+						boolean ok = true;
+						for(String r2 : r.split("\\s*+\\s*")) {
+							if( skip.contains(r2) || ! canHaveRole(skip, user, r2, expand_alias)) {
+								ok=false;
+								break;
+							}
+						}
+						return ok;
+					}else if( ! skip.contains(r)) {
 						if(canHaveRole(skip, user, r,expand_alias)) {
 							return true;
 						}

@@ -35,7 +35,6 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
-import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -54,12 +53,13 @@ import uk.ac.ed.epcc.webapp.session.WebNameFinder;
  *
  */
 
-public class LoginServletTest<A extends AppUser> extends ServletTest {
+public class LoginServletTest<A extends AppUser> extends AbstractLoginServletTest<A> {
 
 	/**
 	 * 
 	 */
 	public LoginServletTest() {
+		super();
 		
 	}
 	
@@ -302,22 +302,6 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		checkDiff("/cleanup.xsl", "login_wtmp2.xml");
 		assertEquals(0, MockTansport.nSent());
 	}
-	/**
-	 * @throws IOException 
-	 * @throws ServletException 
-	 * 
-	 */
-	public void loginRedirects() throws ServletException, IOException {
-		loginRedirects("/main.jsp");
-	}
-	public void loginRedirects(String expected) throws ServletException, IOException {
-		if( LoginServlet.COOKIE_TEST.isEnabled(ctx)) {
-			checkRedirect("/LoginServlet");
-			doPost();
-		}
-		checkRedirect(expected);
-	}
-	
 	@ConfigFixtures({"wtmp.properties","crosscookie.properties"})
 	@Test
 	public void testLoginWithWtmpAndCrossCookie() throws DataException, Exception{
@@ -645,16 +629,6 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		assertTrue(sess.haveCurrentUser());
 		assertTrue(sess.isCurrentPerson(user));
 		checkRedirect("/main.jsp");
-	}
-	@Override
-	public void setUp() throws Exception {
-		// TODO Auto-generated method stub
-		super.setUp();
-		servlet=new LoginServlet<A>();
-		MockServletConfig config = new MockServletConfig(serv_ctx, "LoginServlet");
-		servlet.init(config);
-		req.servlet_path="LoginServlet";
-		
 	}
 
 	
