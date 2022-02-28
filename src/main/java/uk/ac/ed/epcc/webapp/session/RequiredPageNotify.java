@@ -67,7 +67,7 @@ public class RequiredPageNotify<AU extends AppUser> extends AbstractContexed {
 	}
 	
 	public boolean allow(AU person, boolean apply_rate_limit) {
-		return person.canLogin() && person.allowEmail() && (max == null || ! apply_rate_limit ||  max.sendNotifications(person)) && ( policy_role == null|| sess.canHaveRole(person, policy_role));
+		return person.canLogin() && person.allowEmail() && (max == null || ! apply_rate_limit ||  max.sendNotifications(person)) && ( policy_role == null || policy_role.isEmpty() || sess.canHaveRole(person, policy_role));
 	}
 
 	public Set<RequiredPage<AU>> getRequiredPages() {
