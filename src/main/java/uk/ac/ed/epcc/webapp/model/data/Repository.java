@@ -47,8 +47,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import org.apache.commons.codec.binary.Base64;
+import java.util.Base64;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextCleanup;
@@ -477,7 +476,7 @@ public final class Repository implements AppContextCleanup{
         		ByteArrayOutputStream stream = new ByteArrayOutputStream();
         		StreamData data = r.getStreamDataProperty(tag);
         		data.write(stream);
-        		return Base64.encodeBase64String(stream.toByteArray());
+        		return Base64.getEncoder().encodeToString(stream.toByteArray());
         	}
         	return null;
         }
@@ -527,7 +526,7 @@ public final class Repository implements AppContextCleanup{
         		// Try a date
         		r.setProperty(tag, dump_format.parse(text));
         	}else if( isData()){
-        		ByteArrayStreamData data = new ByteArrayStreamData(Base64.decodeBase64(text));
+        		ByteArrayStreamData data = new ByteArrayStreamData(Base64.getDecoder().decode(text));
         		r.setProperty(tag,data);
         	}
         }
