@@ -1892,6 +1892,18 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		return record;
 	}
 
+	/** create a record with a specified id. 
+	 * USed when unpacking a data dump where we want to preserve ids.
+	 * 
+	 * @param id
+	 * @return
+	 * @throws DataException
+	 */
+	protected final Repository.Record makeRecordForImport(int id) throws DataException{
+		Repository.Record r = makeRecord();
+		r.setID(id, IdMode.UseExistingIfPresent);
+		return r;
+	}
 	/**
 	 * Construct a new Blank DataObject of the correct Class
 	 * This method takes a Record as an argument. This allows the factory to either create 
