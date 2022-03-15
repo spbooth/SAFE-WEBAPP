@@ -209,7 +209,7 @@ public abstract class AbstractMessageHandlerFactory<H extends AbstractMessageHan
 					from = new InternetAddress(email);
 				}
 			}
-			MimeMessage m = es.makeBlankEmail(getContext(), provider.getdefaultRecipients(), from, null);
+			MimeMessage m = es.makeBlankEmail(getContext(), provider.getdefaultRecipients(), from,true, null);
 			MimeMultipart mp = new MimeMultipart("mixed");
 			  MimeBodyPart mbp = new MimeBodyPart();
 			  mbp.setText("");

@@ -445,7 +445,7 @@ public class Emailer {
 		String email = mapRecipients(sendto);
 		
 		log.info("EmailSender sending an email to " + email);
-		return templateMessage(new String[] { email }, DEFAULT_HEADER_PREFIX,h,null,false, email_template,params);
+		return templateMessage(new String[] { email }, DEFAULT_HEADER_PREFIX,h,null,true,false, email_template,params);
 	}
     public String mapRecipients(String sendto){
     	return sendto;
@@ -689,12 +689,12 @@ public class Emailer {
 	 * @throws InvalidArgument 
 	 */
 	public MimeMessage templateMessage(String[] notify_emails, Hashtable headers, TemplateFile email_template) throws MessagingException, UnsupportedEncodingException, InvalidArgument {
-		return templateMessage(notify_emails,headers,null,false,email_template);
+		return templateMessage(notify_emails,headers,null,true,false,email_template);
 	}
-	public MimeMessage templateMessage(String[] notify_emails, Hashtable headers, InternetAddress from, boolean multipart, TemplateFile email_template) throws MessagingException, UnsupportedEncodingException, InvalidArgument {
-		return templateMessage(notify_emails, DEFAULT_HEADER_PREFIX,headers, from, multipart, email_template,null);
+	public MimeMessage templateMessage(String[] notify_emails, Hashtable headers, InternetAddress from, boolean set_sender,boolean multipart, TemplateFile email_template) throws MessagingException, UnsupportedEncodingException, InvalidArgument {
+		return templateMessage(notify_emails, DEFAULT_HEADER_PREFIX,headers, from, set_sender,multipart, email_template,null);
 	}
-	public MimeMessage templateMessage(String[] notify_emails, String header_prefix,Hashtable headers, InternetAddress from, boolean multipart, TemplateFile email_template,Map<String,String> params) throws MessagingException, UnsupportedEncodingException, InvalidArgument {
+	public MimeMessage templateMessage(String[] notify_emails, String header_prefix,Hashtable headers, InternetAddress from,boolean set_sender, boolean multipart, TemplateFile email_template,Map<String,String> params) throws MessagingException, UnsupportedEncodingException, InvalidArgument {
 			
 		AppContext conn = getContext();
 		if( email_template == null ) {
@@ -717,7 +717,7 @@ public class Emailer {
 		
 		subject = getSubject(getLogger(),email_template);
 		
-		MimeMessage m = makeBlankEmail(conn, notify_emails, from, subject);
+		MimeMessage m = makeBlankEmail(conn, notify_emails, from,set_sender, subject);
 		if (headers != null) {
 			for (Iterator it = headers.keySet().iterator(); it.hasNext();) {
 				String key = (String) it.next();
@@ -834,12 +834,10 @@ public class Emailer {
 	public String getEncoding() {
 		return ctx.getInitParameter("email.encoding", DEFAULT_ENCODING);
 	}
-
-	/** make a blank email as a starting point
+	/** make a blank email as a starting point using the default sender
 	 * 
 	 * @param conn {@link AppContext}
 	 * @param notify_emails
-	 * @param from   Address to send from, may be blank
 	 * @param subject
 	 * @return
 	 * @throws MessagingException
@@ -847,7 +845,26 @@ public class Emailer {
 	 * @throws UnsupportedEncodingException
 	 */
 	public MimeMessage makeBlankEmail(AppContext conn, String[] notify_emails,
-			InternetAddress from, String subject)
+			String subject)
+			throws MessagingException, AddressException,
+			UnsupportedEncodingException {
+		return makeBlankEmail(conn, notify_emails, null, true, subject);
+	}
+	/** make a blank email as a starting point
+	 * 
+	 * @param conn {@link AppContext}
+	 * @param notify_emails
+	 * @param from   Address to send from, may be blank
+	 * @param set_sender Set the default sending address as the sender
+	 * @param subject
+	 * @return
+	 * @throws MessagingException
+	 * @throws AddressException
+	 * @throws UnsupportedEncodingException
+	 */
+	public MimeMessage makeBlankEmail(AppContext conn, String[] notify_emails,
+			InternetAddress from, boolean set_sender,
+			String subject)
 			throws MessagingException, AddressException,
 			UnsupportedEncodingException {
 		Logger log = getLogger();
@@ -924,8 +941,10 @@ public class Emailer {
 		   m.setFrom(sender);
 		   log.debug("from "+sender.toString());
         }else{
-           m.setSender(sender);
-           log.debug("sender "+sender.toString());
+        	if( set_sender) {
+        		m.setSender(sender);
+        		log.debug("sender "+sender.toString());
+        	}
            m.setFrom(from);
            log.debug("from "+from.toString());
         }
