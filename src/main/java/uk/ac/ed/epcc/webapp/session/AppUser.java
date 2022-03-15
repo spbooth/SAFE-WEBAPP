@@ -119,7 +119,16 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 	}
 
 	public boolean allowEmail(){
-		return record.getBooleanProperty(AppUserFactory.ALLOW_EMAIL_FIELD, true);
+		if( ! record.getBooleanProperty(AppUserFactory.ALLOW_EMAIL_FIELD, true)) {
+			return false;
+		}
+		AppUserFactory<?> f = getFactory();
+		for(AllowedEmailContributor c : f.getComposites(AllowedEmailContributor.class)){
+			if( ! c.allowEmail(this)) {
+				return false;
+			}
+		}
+		return true;
 	}
 	public void setEmailsAllowed(boolean value){
 		record.setOptionalProperty(AppUserFactory.ALLOW_EMAIL_FIELD, value);

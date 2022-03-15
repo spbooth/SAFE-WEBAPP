@@ -534,10 +534,14 @@ NamedFilterProvider<AU>
 	 * @return
 	 */
 	public BaseFilter<AU> getEmailFilter(){
+		AndFilter<AU> fil = new AndFilter<AU>(getTarget());
 		if( res.hasField(ALLOW_EMAIL_FIELD)) {
-			return new SQLValueFilter<AU>(getTarget(), res, ALLOW_EMAIL_FIELD, Boolean.TRUE);
+			fil.addFilter(new SQLValueFilter<AU>(getTarget(), res, ALLOW_EMAIL_FIELD, Boolean.TRUE));
 		}
-		return null;
+		for( AllowedEmailContributor<AU> c : getComposites(AllowedEmailContributor.class)) {
+			fil.addFilter(c.allowedEmailFilter());
+		}
+		return fil;
 	}
 	/** add Notes to be included in a signup/update form.
 	 * This is included within the block element above the

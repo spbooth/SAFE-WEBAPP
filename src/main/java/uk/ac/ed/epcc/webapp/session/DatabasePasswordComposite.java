@@ -99,7 +99,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	 * 16 characters gives nearly 96 bits
 	 * */
 	public static final int GENERATED_PASSWORD_LENGTH = 16;
-	static PasswordStatus p_status = new PasswordStatus();
+	static final PasswordStatus p_status = new PasswordStatus();
 	public static final PasswordStatus.Value VALID = DatabasePasswordComposite.p_status.new Value("V",
 	"Valid");
 	public static final PasswordStatus.Value INVALID = DatabasePasswordComposite.p_status.new Value("I",
