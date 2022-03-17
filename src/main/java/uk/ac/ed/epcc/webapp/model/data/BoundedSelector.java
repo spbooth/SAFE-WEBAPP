@@ -6,8 +6,8 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
  * 
  * @author Stephen Booth
  *
- * @param <N>
- * @param <I>
+ * @param <N> type of bound/value
+ * @param <I> type of input
  */
 public interface BoundedSelector<N,I extends BoundedInput<N>> extends Selector<I> {
 
