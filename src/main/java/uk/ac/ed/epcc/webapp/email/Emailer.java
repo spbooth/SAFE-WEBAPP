@@ -368,8 +368,8 @@ public class Emailer {
 		}
 
 	}
-	public void notificationEmail(AppUser person, Set<String> notices) throws Exception {
-		MimeMessage m = notificationMessage(person, notices);
+	public void notificationEmail(AppUser person, Set<String> notices,Set<String> actions) throws Exception {
+		MimeMessage m = notificationMessage(person, notices,actions);
 		
 		
 		if( m != null) {
@@ -377,7 +377,7 @@ public class Emailer {
 		}
 	}
 
-	public MimeMessage notificationMessage(AppUser person, Set<String> notices) throws Exception {
+	public MimeMessage notificationMessage(AppUser person, Set<String> notices,Set<String> actions) throws Exception {
 		TemplateFile email_template = getFinder().getTemplateFile("update_notices.txt");
 		String name = person.getName();
 		if( name == null || name.trim().length() == 0){
@@ -395,6 +395,20 @@ public class Emailer {
 			seen=true;
 		}
 		email_template.setProperty("person.notices", text.toString());
+		if( actions != null && ! actions.isEmpty()) {
+			StringBuilder action_text = new StringBuilder();
+			seen=false;
+			for(String s: actions) {
+				if( seen ) {
+					action_text.append("\n");
+				}
+				action_text.append("* ");
+				action_text.append(s);
+				seen=true;
+			}
+			email_template.setProperty("person.actions", action_text.toString());
+			email_template.setRegionEnabled("automatic_actions", true);
+		}
 		String email = person.getEmail();
 		if( email == null){
 			getLogger().error("Notification email destination not known "+person.getIdentifier());;

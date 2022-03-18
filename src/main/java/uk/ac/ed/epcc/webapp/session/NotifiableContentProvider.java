@@ -51,11 +51,15 @@ public class NotifiableContentProvider<AU extends AppUser> extends AbstractConte
 			for(AU p : login.getResult(pol.getNotifyFilter(false))) {
 				if( pol.allow(p, false)) {
 					Set<String> notices = new LinkedHashSet<String>();
+					Set<String> actions = new LinkedHashSet<String>();
 					for(RequiredPage<AU> rp : pol.getRequiredPages()) {
 						rp.addNotifyText(notices,p);
+						if( rp instanceof RequiredPageWithAction) {
+							((RequiredPageWithAction<AU>)rp).addActionText(actions, p);
+						}
 					}
 					if( ! notices.isEmpty()) {
-						MimeMessage m = em.notificationMessage(p, notices);
+						MimeMessage m = em.notificationMessage(p, notices,actions);
 						if( m != null ) {
 							tab.put("Notications",p,new PreformattedTextGenerator(m.getContent().toString()));
 						}else {

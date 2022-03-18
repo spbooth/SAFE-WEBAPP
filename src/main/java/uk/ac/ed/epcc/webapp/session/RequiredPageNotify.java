@@ -10,6 +10,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.model.data.NamedFilterWrapper;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 /** Policy object for required page notifications
  * 
  * @author Stephen Booth
@@ -77,4 +78,35 @@ public class RequiredPageNotify<AU extends AppUser> extends AbstractContexed {
 	public MaxNotifyComposite<AU> getMax() {
 		return max;
 	}
+	
+	public void applyActions() throws DataFault {
+		for(RequiredPage<AU> rp : requiredPages) {
+			if( rp instanceof RequiredPageAction) {
+				applyAction((RequiredPageAction<AU>) rp);
+			}
+		}
+	}
+	
+	public void applyAction(RequiredPageAction<AU> rpa) throws DataFault {
+		for(AU person : login.getResult(rpa.triggerFilter(sess))) {
+			boolean apply=true;
+			// skip people who might still ge betting notifications
+			if( person.canLogin() && person.allowEmail() ) {
+				if( max !=null && ! max.maxSent(person)) {
+					apply = false; // still some notifications to get
+				}
+			}
+			if(sess != null &&  policy_role != null && ! policy_role.isEmpty()) {
+				if( ! sess.canHaveRole(person, policy_role)) {
+					// person not eligible for notifications or actions
+					apply = false;
+				}
+			}
+			if( apply) {
+				rpa.applyAction(person);
+			}
+		}
+	}
+	
+	
  }

@@ -139,6 +139,7 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 				+ "  http://www.example.com/test\n"
 				+ "\n"
 				+ "\n"
+				+ "\n"
 				+ "Regards,\n"
 				+ "\n"
 				+ "  The test Team\n"

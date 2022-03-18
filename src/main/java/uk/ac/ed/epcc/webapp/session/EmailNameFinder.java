@@ -18,6 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,6 +48,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
+import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
@@ -70,6 +72,8 @@ import uk.ac.ed.epcc.webapp.servlet.session.token.Scopes;
  * The email address is required not to resolve to an existing name on the
  * factory unless it corresponds to the current object. (we query the full
  * factory in case we have a {@link NameFinder} for known aliases as well.
+ * 
+ * 
  * 
  * @author spb
  * @param <AU> type of AppUser
@@ -457,8 +461,17 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 		return getContext().getIntegerParameter("email_validate.refresh_days", 0);
 	}
 
-	public class VerifyEmailRequiredPage implements RequiredPage<AU> {
-
+	public class VerifyEmailRequiredPage implements RequiredPageWithAction<AU> {
+		private Set<RequiredPageAction> action;
+		public VerifyEmailRequiredPage() {
+			action = new LinkedHashSet<RequiredPageAction>();
+			String tags = getContext().getExpandedProperty("VerifyEmailRequiredPage.actions");
+			if( tags != null && ! tags.isEmpty()) {
+				for(String s : tags.split("\\s*,\\s*")) {
+					action.add(getContext().makeObject(RequiredPageAction.class, s));
+				}
+			}
+		}
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -515,6 +528,23 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 		@Override
 		public BaseFilter<AU> notifiable(SessionService<AU> sess) {
 			return needVerifyFilter();
+		}
+
+		@Override
+		public BaseFilter<AU> triggerFilter(SessionService<AU> sess) {
+			OrFilter<AU> fil = new OrFilter<AU>(getFactory().getTarget(), getFactory());
+			for(RequiredPageAction<AU> a : action) {
+				fil.addFilter(a.triggerFilter(sess));
+			}
+			return fil;
+		}
+
+		@Override
+		public void applyAction(AU user) {
+			for(RequiredPageAction<AU> a : action) {
+				a.applyAction(user);
+			}
+			
 		}
 
 	}

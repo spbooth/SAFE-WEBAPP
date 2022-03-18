@@ -133,7 +133,7 @@ public class MaxNotifyComposite<A extends AppUser> extends Composite<A, MaxNotif
 	 * @return
 	 */
 	public boolean sendNotifications(A user) {
-		if( getNotifiedCount(user) >= maxNotify()) {
+		if( maxSent(user)) {
 			return false;
 		}
 		// use raw field just in case we cleared without fixing the problem
@@ -145,6 +145,10 @@ public class MaxNotifyComposite<A extends AppUser> extends Composite<A, MaxNotif
 			}
 		}
 		return true;
+	}
+
+	public boolean maxSent(A user) {
+		return getNotifiedCount(user) >= maxNotify();
 	}
 	/** get a filter for who notifications should be sent to
 	 * 

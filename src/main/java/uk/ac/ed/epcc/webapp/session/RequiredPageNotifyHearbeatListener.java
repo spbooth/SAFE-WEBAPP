@@ -111,14 +111,18 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 						count++;
 						try {
 							Set<String> notices = new LinkedHashSet<String>();
+							Set<String> actions = new LinkedHashSet<String>();
 							for(RequiredPage<AU> rp : pol.getRequiredPages()) {
 								rp.addNotifyText(notices,person);
+								if( rp instanceof RequiredPageWithAction) {
+									((RequiredPageWithAction<AU>)rp).addActionText(actions, person);
+								}
 							}
 							if( ! notices.isEmpty()) {
 								if( max != null) {
 									max.addNotified(person);
 								}
-								mailer.notificationEmail(person, notices);
+								mailer.notificationEmail(person, notices,actions);
 							}
 						}catch(Exception em) {
 							getLogger().error("Error sending required page notifications to "+person.getEmail(), em);

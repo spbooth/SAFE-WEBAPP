@@ -10,6 +10,12 @@ in the %%service.name%% %%service.website-name=Web-site%%:
 
 Please log into the %%service.name%% %%service.website-name=Web-site%% to provide these updates.
   %%service.saf.url%%
+%%begin{automatic_actions}%%
+
+The following actions will be taken if the required updates are not made:
+%%person.actions%%
+
+%%end{automatic_actions}%%
 %%begin{Verification}%%
 
 We appreciate that automated emails like this can appear suspicious,
