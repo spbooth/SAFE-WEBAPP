@@ -132,7 +132,7 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 				+ "There are some account updates or other actions that need your attention \n"
 				+ "in the test Web site:\n"
 				+ "\n"
-				+ "* Your email will need verifying soon. You will have to so this before 2020-06-30 09:00.\n"
+				+ "* Your email will need verifying soon. You will have to do this before 2020-06-30 09:00.\n"
 				+ "* Your user details need to be updated/verified before 2020-06-30 09:00\n"
 				+ "\n"
 				+ "Please log into the test Web site to provide these updates.\n"
