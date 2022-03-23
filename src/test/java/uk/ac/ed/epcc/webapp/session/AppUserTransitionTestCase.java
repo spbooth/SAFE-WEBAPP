@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.session;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -41,6 +42,7 @@ import uk.ac.ed.epcc.webapp.servlet.AbstractTransitionServletTest;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory.UpdatePersonRequiredPage;
+import uk.ac.ed.epcc.webapp.session.EmailNameFinder.VerifyEmailRequiredPage;
 
 /**
  * @author Stephen Booth
@@ -359,5 +361,62 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 		runTransition();
 		checkMessage("roles_updated");
 		checkDiff("/cleanup.xsl", "roles.xml");
+	}
+	
+	@Test
+	@ConfigFixtures("email_status.properties")
+	public void testMarkEmailInvalid() throws Exception {
+		MockTansport.clear();
+		takeBaseline();
+		setTime(2022, Calendar.MARCH, 23, 14, 00);
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		
+		Set<RequiredPage<A>> pages = fac.getRequiredPages();
+		assertEquals(2, pages.size());
+		
+		VerifyEmailRequiredPage p = null;
+		for(RequiredPage<A> x : pages) {
+			if( x instanceof VerifyEmailRequiredPage) {
+				p = (VerifyEmailRequiredPage) x;
+			}
+		}
+		assertNotNull("Expect a VerifyEmailRequiredPage",p);
+		A user =  fac.makeBDO();
+	
+		user.setEmail("fred@example.com");
+		user.commit();
+		EmailNameFinder<A> finder = fac.getComposite(EmailNameFinder.class);
+		assertNotNull(finder);
+		finder.verified(user);
+		assertTrue(finder.useEmailStatus());
+		assertTrue(user.allowEmail());
+		assertFalse(finder.emailMarkedInvalid(user));
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setCurrentPerson(user);
+		assertFalse(p.required(sess));
+		
+		
+		
+		A manager = fac.makeBDO();
+		manager.setEmail("bill@example.com");
+		manager.commit();
+		
+		
+		sess.setRole(manager,EmailNameFinder.INVALIDATE_EMAIL_ROLE, true);
+		sess.setCurrentPerson(manager);
+		assertTrue(sess.haveCurrentUser());
+		
+		AppUserTransitionProvider provider = AppUserTransitionProvider.getInstance(ctx);
+		setTransition(provider, EmailNameFinder.INVALIDATE_EMAIL, user);
+		checkFormContent(null, "invalidate_email_form.xml");
+		setAction("Yes");
+		runTransition();
+		checkViewRedirect(provider, user);
+		checkDiff("/cleanup.xsl", "invalidate_email.xml");
+		user = fac.find(user.getID());
+		assertFalse(user.allowEmail());
+		assertTrue(finder.emailMarkedInvalid(user));
+		sess.setCurrentPerson(user);
+		assertTrue(p.required(sess)); // user now required to verify
 	}
 }

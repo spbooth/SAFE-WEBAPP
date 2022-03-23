@@ -14,7 +14,8 @@
 package uk.ac.ed.epcc.webapp.servlet;
 
 import static org.junit.Assert.assertEquals;
-
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import java.util.Calendar;
 
 import org.junit.Test;
@@ -28,6 +29,7 @@ import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory;
+import uk.ac.ed.epcc.webapp.session.EmailNameFinder;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
@@ -55,6 +57,7 @@ public class EmailChangeServletTest<A extends AppUser> extends ServletTest {
 		req.servlet_path="EmailChangeRequestServlet";
 		TestTimeService t = new TestTimeService();
 		Calendar c = Calendar.getInstance();
+		c.clear();
 		c.set(2019, Calendar.FEBRUARY, 6);
 		t.setResult(c.getTime());
 		ctx.setService(t);
@@ -97,6 +100,30 @@ public class EmailChangeServletTest<A extends AppUser> extends ServletTest {
 		checkMessage("email_change_request_successful");
 		assertEquals("bilbo@example.com",fac.find(user.getID()).getEmail());
 		checkDiff("/cleanup.xsl", "email_change_complete.xml");
+	
+	}
+	
+	@Test
+	@DataBaseFixtures("email_change_invalid.xml")
+	public void testCompleteInvalid() throws ConsistencyError, Exception{
+		MockTansport.clear();
+		takeBaseline();
+		
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		EmailNameFinder<A> finder = fac.getComposite(EmailNameFinder.class);
+		assertTrue(finder.useEmailStatus());
+		assertTrue(finder.useEmailVerificationDate());
+		A user =  fac.findByEmail("fred@example.com");
+		assertTrue(finder.emailMarkedInvalid(user));
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setCurrentPerson(user);
+		req.path_info=CORRECT_TAG;
+		doPost();
+		checkMessage("email_change_request_successful");
+		A user2 = fac.find(user.getID());
+		assertEquals("bilbo@example.com",user2.getEmail());
+		assertFalse(finder.emailMarkedInvalid(user2));
+		checkDiff("/cleanup.xsl", "email_change_complete2.xml");
 	
 	}
 	

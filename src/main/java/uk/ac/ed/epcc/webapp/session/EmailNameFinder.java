@@ -84,6 +84,8 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 		implements HistoryFieldContributor, SummaryContributer<AU>, AppUserTransitionContributor,
 		AnonymisingComposite<AU>, RequiredPageProvider<AU>, AllowedEmailContributor<AU> {
 
+	public static final String INVALIDATE_EMAIL_ROLE = "invalidate_email";
+
 	protected static class EmailStatus extends BasicType<EmailStatus.Value> {
 		public EmailStatus() {
 			super("EmailStatus");
@@ -317,7 +319,7 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 
 	};
 	public static RoleAppUserKey INVALIDATE_EMAIL = new RoleAppUserKey("InvalidateEmail",
-			"Mark email address as bouncing/invalid", "invalidate_email");
+			"Mark email address as bouncing/invalid", INVALIDATE_EMAIL_ROLE);
 
 	public class ChangeEmailTransition extends AbstractFormTransition<AU> implements ExtraFormTransition<AU> {
 
@@ -481,6 +483,9 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 		@Override
 		public boolean required(SessionService<AU> user) {
 			AU currentPerson = user.getCurrentPerson();
+			if( currentPerson == null) {
+				return false;
+			}
 			String email = getCanonicalName(currentPerson);
 			FieldValidator<String> val = getEmailValidator(getContext());
 			try {
@@ -652,7 +657,7 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 	 * @return
 	 */
 	private boolean needVerify(AU user) {
-		if (getStatus(user) == INVALID) {
+		if (emailMarkedInvalid(user)) {
 			return true;
 		}
 		int days = verifyRefreshDays();
@@ -670,6 +675,10 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 			return d.before(target_time);
 		}
 		return false;
+	}
+
+	public boolean emailMarkedInvalid(AU user) {
+		return getStatus(user) == INVALID;
 	}
 
 	public BaseFilter<AU> needVerifyFilter() {
