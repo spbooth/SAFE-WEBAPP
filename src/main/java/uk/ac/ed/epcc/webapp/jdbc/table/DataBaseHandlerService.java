@@ -310,6 +310,52 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 		return text;
 	}
 
+	public String addFieldText(Repository res, String name, FieldType f,SQLContext c, List<Object> args) {
+		StringBuilder query = new StringBuilder();
+		FieldTypeVisitor vis = c.getCreateVisitor(query,args);
+		query.append("ALTER TABLE ");
+		res.addTable(query, true);
+		query.append(" ADD ");
+		c.quote(query,name);
+		query.append(" ");
+		f.accept(vis);
+		vis.additions(false);
+		return query.toString();
+	}
+	
+	public void addField(Repository res, String name, FieldType f) throws DataFault {
+		DatabaseService service = conn.getService(DatabaseService.class);
+    	try{
+    		
+    		if( COMMIT_ON_CREATE.isEnabled(conn)) {
+    			// table creation implicitly commits the transaction anyway
+        		// this lets the db_server know a commit has taken place so the transaction count
+        		// is correct.
+    			service.commitTransaction(); 
+    		}
+    		Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+    		
+			SQLContext c = service.getSQLContext();
+			
+			 LinkedList<Object> args = new LinkedList<>();	
+			 
+			 	String text = addFieldText(res, name,f, c, args);
+    		// This is overly noisy in junit tests
+    		//log.debug("Creating table using "+text);
+			 	try(PreparedStatement stmt = c.getConnection().prepareStatement(text)){
+			 		for( int i=0; i< args.size(); i++){
+			 			Object x = args.get(i);
+			 			stmt.setObject(i+1, x);
+			 		}
+			 		stmt.executeUpdate();
+			 	}
+    		Repository.reset(getContext(), res.getTag());
+    	}catch(SQLException se) {
+    		service.handleError("Cannot add field "+res.getTable(), se);
+    	}catch(Exception e){
+    		throw new DataFault("Cannot add field "+res.getTable(),e);
+    	}
+	}
     public void deleteTable(String name) throws Exception{
     	DatabaseService service = conn.getService(DatabaseService.class);
     	try{

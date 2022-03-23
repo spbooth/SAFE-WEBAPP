@@ -1978,7 +1978,10 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      */
     public void updateTable() throws DataFault{
     	DataBaseHandlerService serv = getContext().getService(DataBaseHandlerService.class);
-    	serv.updateTable(res, getFinalTableSpecification(getContext(), getTag()));
+    	TableSpecification spec = getFinalTableSpecification(getContext(), getTag());
+    	String prefix ="create_table."+getTag()+".";
+    	spec.setFromParameters(conn,prefix, conn.getInitParameters(prefix));
+		serv.updateTable(res, spec);
     }
 	/**
 	 * method to return a default ORDER by clause used. This can be overridden

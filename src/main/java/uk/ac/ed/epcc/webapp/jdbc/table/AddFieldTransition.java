@@ -71,24 +71,14 @@ public abstract class AddFieldTransition<T extends DataObjectFactory>
 				throws uk.ac.ed.epcc.webapp.forms.exceptions.ActionException {
 			try {
 				Repository res = getRepository(target);
-				SQLContext sql = res.getSQLContext();
-				StringBuilder query = new StringBuilder();
-				query.append("ALTER TABLE ");
-				res.addTable(query, true);
-				query.append(" ADD ");
+				DataBaseHandlerService dbh = res.getContext().getService(DataBaseHandlerService.class);
+				
+				
 				String name = (String) f.get(FIELD);
-				sql.quote(query,name);
-				query.append(" ");
-				List<Object> args = new LinkedList<>();
 				FieldType fieldType = getFieldType(f);
-				fieldType.accept(sql.getCreateVisitor(query, args));
-				try(java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString())){
-					int pos=1;
-					for(Object o: args){
-						stmt.setObject(pos++, o);
-					}
-					stmt.execute();
-				}
+				dbh.addField(res, name, fieldType);
+				
+				
 				if( fieldType instanceof ReferenceFieldType){
 					ReferenceFieldType ref = (ReferenceFieldType) fieldType;
 					ConfigService serv = res.getContext().getService(ConfigService.class);
