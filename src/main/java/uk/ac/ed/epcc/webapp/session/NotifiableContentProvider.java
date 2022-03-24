@@ -11,14 +11,9 @@ import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.DateTransform;
 import uk.ac.ed.epcc.webapp.content.PreformattedTextGenerator;
 import uk.ac.ed.epcc.webapp.content.Table;
-import uk.ac.ed.epcc.webapp.content.TemplateFile;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.email.Emailer;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
-import uk.ac.ed.epcc.webapp.model.TemplateFinder;
 import uk.ac.ed.epcc.webapp.model.data.Retirable;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 
 public class NotifiableContentProvider<AU extends AppUser> extends AbstractContexed implements UIGenerator {
@@ -64,6 +59,7 @@ public class NotifiableContentProvider<AU extends AppUser> extends AbstractConte
 							tab.put("Notications",p,new PreformattedTextGenerator(m.getContent().toString()));
 						}else {
 							tab.put("Notications",p, notices);
+							tab.put("Actions",p, actions);
 						}
 					}
 					if( max != null && max.apply()) {

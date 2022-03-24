@@ -1,9 +1,5 @@
 package uk.ac.ed.epcc.webapp.session;
 
-import java.util.Set;
-
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-
 /** A required page that can trigger side-effects if not completed in a timely manner
  * 
  * e.g. locking accounts etc.

@@ -45,6 +45,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
@@ -470,7 +471,12 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 			String tags = getContext().getExpandedProperty("VerifyEmailRequiredPage.actions");
 			if( tags != null && ! tags.isEmpty()) {
 				for(String s : tags.split("\\s*,\\s*")) {
-					action.add(getContext().makeObject(RequiredPageAction.class, s));
+					RequiredPageAction a = getContext().makeObject(RequiredPageAction.class, s);
+					if( a != null ) {
+						action.add(a);
+					}else {
+						getLogger().error("RequiredPageAction "+s+" failed to resolve");
+					}
 				}
 			}
 		}
@@ -532,16 +538,20 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 
 		@Override
 		public BaseFilter<AU> notifiable(SessionService<AU> sess) {
-			return needVerifyFilter();
+			return needVerifyFilter(true);
 		}
 
 		@Override
 		public BaseFilter<AU> triggerFilter(SessionService<AU> sess) {
+			AndFilter<AU> result = new AndFilter<AU>(getFactory().getTarget()); 
+			result.addFilter(applyActionFilter());
 			OrFilter<AU> fil = new OrFilter<AU>(getFactory().getTarget(), getFactory());
 			for(RequiredPageAction<AU> a : action) {
 				fil.addFilter(a.triggerFilter(sess));
 			}
-			return fil;
+			result.addFilter(fil);
+			
+			return result;
 		}
 
 		@Override
@@ -550,6 +560,12 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 				a.applyAction(user);
 			}
 			
+		}
+		@Override
+		public void addActionText(Set<String> notices, AU person) {
+			for(RequiredPageAction<AU> a : action) {
+				a.addActionText(notices, person);
+			}
 		}
 
 	}
@@ -650,13 +666,32 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 		return fil;
 	}
 
+	/** Get a filter for any user where the email state would require the actoins
+	 * to be applied
+	 * 
+	 * @return
+	 */
+	public BaseFilter<AU> applyActionFilter(){
+		AppUserFactory<AU> fac = (AppUserFactory<AU>) getFactory();
+		OrFilter<AU> fil = new OrFilter<AU>(fac.getTarget(), fac);
+		if( useEmailStatus()) {
+			// always apply if email invalid
+			fil.addFilter(e_status.getFilter(fac, INVALID));
+		}
+		if( useEmailVerificationDate()) {
+			// past the required verification date
+			fil.addFilter(needVerifyFilter(false));
+		}
+		return fil;
+	}
+	
 	/**
 	 * Does the users email need to be verified
 	 * 
 	 * @param user
 	 * @return
 	 */
-	private boolean needVerify(AU user) {
+	public boolean needVerify(AU user) {
 		if (emailMarkedInvalid(user)) {
 			return true;
 		}
@@ -681,15 +716,18 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 		return getStatus(user) == INVALID;
 	}
 
-	public BaseFilter<AU> needVerifyFilter() {
+	public BaseFilter<AU> needVerifyFilter(boolean apply_grace) {
 		int days = verifyRefreshDays();
-		if (days > 0) {
+		if (days > 0 && useEmailVerificationDate()) {
 
 			Calendar point = Calendar.getInstance();
 			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 			point.setTime(time.getCurrentTime());
 			// 90% there
-			point.add(Calendar.DAY_OF_YEAR, (int) (-0.9 * days));
+			if( apply_grace) {
+				days = (int)(0.9 * days);
+			}
+			point.add(Calendar.DAY_OF_YEAR, - days);
 
 			Date target_time = point.getTime();
 			return new SQLValueFilter<AU>(getFactory().getTarget(), getRepository(), EMAIL_VERIFIED_FIELD,
