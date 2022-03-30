@@ -40,6 +40,13 @@ public class Preference extends Feature implements PreferenceSetting<Boolean>{
 	public Preference(String name, boolean def, String description) {
 		this(name,def,description,null);
 	}
+	/** Create a {@link Preference} visible only to people with one of a set of roles
+	 * 
+	 * @param name String Name of Preference
+	 * @param def  boolean default setting
+	 * @param description String description
+	 * @param required_roles List of roles which can see the preference
+	 */
 	public Preference(String name, boolean def, String description, String ... required_roles) {
 		super(name, def, description);
 		this.required_roles=required_roles;

@@ -1200,6 +1200,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     public SQLFilter<BDO> getFindFilter(int id){
     	return new SelfReferenceFilter<>(getTarget(), res, makeReference(id));
     }
+    /** Get a {@link SQLFilter} that excludes  a certain object
+     * 
+     * @param obj
+     * @return
+     */
     public SQLFilter<BDO> getExcludeFilter(BDO obj){
     	return new SelfReferenceFilter<>(getTarget(), res,true, makeReference(obj));
     }

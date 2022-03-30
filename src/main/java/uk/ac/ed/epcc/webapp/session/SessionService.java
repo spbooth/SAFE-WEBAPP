@@ -438,5 +438,11 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public void addSecurityContext(Map att);
 	
-	
+	/** Is this an assumed identity 
+	 * 
+	 * @return
+	 */
+	public default boolean isSU(){
+		return false;
+	}
 }
