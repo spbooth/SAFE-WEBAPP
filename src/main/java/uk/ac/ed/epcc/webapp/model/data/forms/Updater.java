@@ -62,7 +62,7 @@ public class Updater<BDO extends DataObject> extends DataObjectUpdateFormFactory
 		f.addInput(TARGET, label, i);
 		if (dat != null && factory.isMine(dat)) {
 		    try {
-				i.setValue(new Integer(dat.getID()));
+				i.setValue(Integer.valueOf(dat.getID()));
 			} catch (TypeException e) {
 				throw new TypeError(e);
 			}

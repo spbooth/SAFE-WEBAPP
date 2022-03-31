@@ -38,6 +38,8 @@ import uk.ac.ed.epcc.webapp.model.data.FilterResult;
  */
 public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends AbstractContexed implements HeartbeatListener {
     public static final Feature REQUIRED_PAGE_HEARTBEAT = new Feature("required_page.heartbeat",true,"Send emails to notify users of required actions from heartbeat");
+    
+    public static final Feature REQUIRED_PAGE_ACTIONS = new Feature("required_page.heartbeat.actions",true,"Apply side effects if users do not complete required page actions");
     /**
 	 * @param conn
 	 */
@@ -133,6 +135,9 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 				getLogger().error("Error generating notification emails", e);
 			}
 
+			if( REQUIRED_PAGE_ACTIONS.isEnabled(getContext())) {
+				pol.applyActions();
+			}
 			lock.releaseLock();
 			Calendar c = Calendar.getInstance();
 			c.setTime(time.getCurrentTime());

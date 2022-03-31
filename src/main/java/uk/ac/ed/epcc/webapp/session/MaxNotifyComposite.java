@@ -136,15 +136,21 @@ public class MaxNotifyComposite<A extends AppUser> extends Composite<A, MaxNotif
 		if( maxSent(user)) {
 			return false;
 		}
+		if( recentNotification(user)) {
+			return false;
+		}
+		return true;
+	}
+	public boolean recentNotification(A user) {
 		// use raw field just in case we cleared without fixing the problem
 		Date d = getRecord(user).getDateProperty(LAST_NOTIFY__FIELD);
 		if( d != null && d.getTime() > 0L) {
 			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 			if( time != null ) {
-				return (time.getCurrentTime().getTime() - (minRepeatHours() * 3600000L)) > d.getTime() ;
+				return (time.getCurrentTime().getTime() - (minRepeatHours() * 3600000L)) < d.getTime() ;
 			}
 		}
-		return true;
+		return false;
 	}
 
 	public boolean maxSent(A user) {

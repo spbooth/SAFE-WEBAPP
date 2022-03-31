@@ -28,14 +28,14 @@ public class RequiredPageNotify<AU extends AppUser> extends AbstractContexed {
 	private final AppUserFactory<AU> login;
 	private final Set<RequiredPage<AU>> requiredPages;
 	private final MaxNotifyComposite<AU> max;
-	private final String policy_role;
+	private final String notification_policy_role;
 	public RequiredPageNotify(AppContext conn) {
 		super(conn);
 		sess = getContext().getService(SessionService.class);
 		login = sess.getLoginFactory();
 		requiredPages = login.getRequiredPages();
 		max = login.getComposite(MaxNotifyComposite.class);
-		policy_role = getContext().getInitParameter("required_page.notifications.role");
+		notification_policy_role = getContext().getInitParameter("required_page.notifications.role");
 	}
 
 	public BaseFilter<AU> getNotifyFilter(boolean apply_rate_limit){ 
@@ -54,10 +54,10 @@ public class RequiredPageNotify<AU extends AppUser> extends AbstractContexed {
 			notify_filter.addFilter(max.getNotifyFilter());
 		}
 		
-		if( policy_role != null && ! policy_role.isEmpty()) {
+		if( notification_policy_role != null && ! notification_policy_role.isEmpty()) {
 			
 			// add a named filter to specify who should receive notifications
-			notify_filter.addFilter(sess.getGlobalRoleFilter(policy_role));
+			notify_filter.addFilter(sess.getGlobalRoleFilter(notification_policy_role));
 		}
 		EmailNameFinder<AU> finder = login.getComposite(EmailNameFinder.class);
 		if( finder != null && RequiredPageNotify.REQUIRE_VERIFIED.isEnabled(getContext())) {
@@ -68,7 +68,7 @@ public class RequiredPageNotify<AU extends AppUser> extends AbstractContexed {
 	}
 	
 	public boolean allow(AU person, boolean apply_rate_limit) {
-		return person.canLogin() && person.allowEmail() && (max == null || ! apply_rate_limit ||  max.sendNotifications(person)) && ( policy_role == null || policy_role.isEmpty() || sess.canHaveRole(person, policy_role));
+		return person.canLogin() && person.allowEmail() && (max == null || ! apply_rate_limit ||  max.sendNotifications(person)) && ( notification_policy_role == null || notification_policy_role.isEmpty() || sess.canHaveRole(person, notification_policy_role));
 	}
 
 	public Set<RequiredPage<AU>> getRequiredPages() {
@@ -90,16 +90,20 @@ public class RequiredPageNotify<AU extends AppUser> extends AbstractContexed {
 	public void applyAction(RequiredPageAction<AU> rpa) throws DataFault {
 		for(AU person : login.getResult(rpa.triggerFilter(sess))) {
 			boolean apply=true;
-			// skip people who might still ge betting notifications
-			if( person.canLogin() && person.allowEmail() ) {
-				if( max !=null && ! max.maxSent(person)) {
-					apply = false; // still some notifications to get
-				}
-			}
-			if(sess != null &&  policy_role != null && ! policy_role.isEmpty()) {
-				if( ! sess.canHaveRole(person, policy_role)) {
-					// person not eligible for notifications or actions
-					apply = false;
+			
+			if(sess != null ) {
+				// might we be getting any notification due to the policy role.
+				if( notification_policy_role == null || notification_policy_role.isEmpty() || sess.canHaveRole(person, notification_policy_role)) {
+					
+					// skip people who might still be betting notifications
+					if( person.canLogin() && person.allowEmail() ) {
+						if( max !=null && ! max.maxSent(person)) {
+							apply = false; // still some notifications to get
+						}
+						if( max != null && max.recentNotification(person)) {
+							apply = false; // too soon after last notification
+						}
+					}
 				}
 			}
 			if( apply) {
