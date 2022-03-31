@@ -142,12 +142,17 @@ public class MaxNotifyComposite<A extends AppUser> extends Composite<A, MaxNotif
 		return true;
 	}
 	public boolean recentNotification(A user) {
+		int minRepeatHours = minRepeatHours();
+		if( minRepeatHours <= 0) {
+			return false;
+		}
 		// use raw field just in case we cleared without fixing the problem
 		Date d = getRecord(user).getDateProperty(LAST_NOTIFY__FIELD);
 		if( d != null && d.getTime() > 0L) {
 			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 			if( time != null ) {
-				return (time.getCurrentTime().getTime() - (minRepeatHours() * 3600000L)) < d.getTime() ;
+				
+				return (time.getCurrentTime().getTime() - (minRepeatHours * 3600000L)) < d.getTime() ;
 			}
 		}
 		return false;
