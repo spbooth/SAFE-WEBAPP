@@ -116,7 +116,7 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 							Set<String> actions = new LinkedHashSet<String>();
 							for(RequiredPage<AU> rp : pol.getRequiredPages()) {
 								rp.addNotifyText(notices,person);
-								if( rp instanceof RequiredPageWithAction) {
+								if(REQUIRED_PAGE_ACTIONS.isEnabled(getContext()) && rp instanceof RequiredPageWithAction) {
 									((RequiredPageWithAction<AU>)rp).addActionText(actions, person);
 								}
 							}
