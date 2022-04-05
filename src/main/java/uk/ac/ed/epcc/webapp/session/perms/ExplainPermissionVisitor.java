@@ -41,6 +41,9 @@ public class ExplainPermissionVisitor<T extends DataObject> implements Permissio
 
 	@Override
 	public Object visitRemotePermissionClause(RemotePermissionClause<T> r) {
+		if( r.getFieldOptional()) {
+			return "OptionalRemoteRelationship("+r.getField()+"->"+r.getRelationship()+")";
+		}
 		return "RemoteRelationship("+r.getField()+"->"+r.getRelationship()+")";
 	}
 

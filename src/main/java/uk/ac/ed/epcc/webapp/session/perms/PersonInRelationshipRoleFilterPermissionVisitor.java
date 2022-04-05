@@ -25,7 +25,7 @@ public class PersonInRelationshipRoleFilterPermissionVisitor<U extends AppUser,T
 	public BaseFilter<U> visitRemotePermissionClause(RemotePermissionClause<T> r) throws UnknownRelationshipException {
 		String remote_role=r.getRelationship();
 		String link_field=r.getField();
-		RemoteAccessRoleProvider<U, T, ?> rarp = new RemoteAccessRoleProvider<>(sess, fac, link_field);
+		RemoteAccessRoleProvider<U, T, ?> rarp = new RemoteAccessRoleProvider<>(sess, fac, link_field,r.getFieldOptional());
 		BaseFilter<U> fil = rarp.personInRelationFilter(sess, remote_role, target);
 		if( fil == null ){
 			throw new UnknownRelationshipException(link_field+"->"+remote_role);

@@ -39,7 +39,7 @@ import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
  */
 public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R extends DataObject> implements AccessRoleProvider<U, T> {
 
-	public RemoteAccessRoleProvider(SessionService<U> sess,DataObjectFactory<T> home_fac, String link_field) throws UnknownRelationshipException {
+	public RemoteAccessRoleProvider(SessionService<U> sess,DataObjectFactory<T> home_fac, String link_field, boolean field_optional) throws UnknownRelationshipException {
 		super();
 		this.sess=sess;
 		this.home_fac = home_fac;
@@ -48,29 +48,41 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 			throw new UnknownRelationshipException("Bad link field");
 		}
 		FieldInfo info = home_fac.res.getInfo(link_field);
-		if( info == null || ! info.isReference() ){
-			throw new UnknownRelationshipException("No reference field "+link_field+"@"+home_fac.getTag());
-		}
-		TypeProducer prod = info.getTypeProducer();
-		if( prod instanceof IndexedTypeProducer){
-			IndexedProducer ip = ((IndexedTypeProducer)prod).getProducer();
-			if( ip instanceof DataObjectFactory){
-				remote_fac = (DataObjectFactory<R>) ip;
-				return;
+		if( info == null ) {
+			if( field_optional) {
+				force=true;           // not an error but should never match
+				remote_fac=null;
+			}else {
+				throw new UnknownRelationshipException("No reference field "+link_field+"@"+home_fac.getTag());
 			}
+		}else {
+			force=false;
+
+			if( ! info.isReference() ){
+				throw new UnknownRelationshipException("Not a reference field "+link_field+"@"+home_fac.getTag());
+			}
+			TypeProducer prod = info.getTypeProducer();
+			if( prod instanceof IndexedTypeProducer){
+				IndexedProducer ip = ((IndexedTypeProducer)prod).getProducer();
+				if( ip instanceof DataObjectFactory){
+					remote_fac = (DataObjectFactory<R>) ip;
+					return;
+				}
+			}
+			throw new UnknownRelationshipException("Field "+link_field+" does not resolve to a DataObjectFactory");
 		}
-		throw new UnknownRelationshipException("Field "+link_field+" does not resolve to a DataObjectFactory");
 	}
 	private final SessionService<U> sess;
 	private final DataObjectFactory<T> home_fac;
 	private final String link_field;
 	private final DataObjectFactory<R> remote_fac;
+	private final boolean force;
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider#hasRelationFilter(java.lang.String, uk.ac.ed.epcc.webapp.session.AppUser)
 	 */
 	@Override
 	public BaseFilter<T> hasRelationFilter(String role, U user) {
-		if( role == null || role.isEmpty()){
+		if( role == null || role.isEmpty()|| force){
 			return null;
 		}
 		try {
@@ -86,6 +98,9 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 	public BaseFilter<U> personInRelationFilter(SessionService<U> sess, String role, T target) {
 		if( role == null || role.isEmpty()){
 			return null;
+		}
+		if( force ) {
+			return new FalseFilter<>((Class<U>) AppUser.class);
 		}
 		if( target == null){
 			try {
@@ -109,6 +124,9 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 	 */
 	@Override
 	public boolean providesRelationship(String role) {
+		if( force ) {
+			return false;
+		}
 		try {
 			sess.getPersonInRelationshipRoleFilter(remote_fac, role, null);
 			return true;

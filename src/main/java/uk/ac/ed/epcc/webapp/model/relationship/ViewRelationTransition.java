@@ -13,12 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.relationship;
 
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.session.SessionService;
-import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -33,6 +27,9 @@ import uk.ac.ed.epcc.webapp.forms.result.CustomPageResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A transition to show all people with a specific Relationship
  * @author spb

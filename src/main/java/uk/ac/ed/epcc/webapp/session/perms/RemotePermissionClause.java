@@ -10,11 +10,12 @@ import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
  * @param <T>
  */
 public class RemotePermissionClause<T extends DataObject> implements PermissionClause<T> {
-	public RemotePermissionClause(DataObjectFactory<T> fac, String field, String relationship) {
+	public RemotePermissionClause(DataObjectFactory<T> fac, String field, String relationship,boolean optional_field) {
 		super();
 		this.fac = fac;
 		this.field = field;
 		this.relationship = relationship;
+		this.is_optional= optional_field;
 	}
 	private final DataObjectFactory<T> fac;
 	public DataObjectFactory<T> getFac() {
@@ -28,6 +29,10 @@ public class RemotePermissionClause<T extends DataObject> implements PermissionC
 	public String getRelationship() {
 		return relationship;
 	}
+	private final boolean is_optional;
+	public boolean getFieldOptional() {
+		return is_optional;
+	}
 	@Override
 	public Class<T> getTarget() {
 		return fac.getTarget();
@@ -36,12 +41,17 @@ public class RemotePermissionClause<T extends DataObject> implements PermissionC
 	public <X> X accept(PermissionVisitor<X,T> visitor) throws UnknownRelationshipException {
 		return visitor.visitRemotePermissionClause(this);
 	}
+	
+	public String toString() {
+		return "RemotePermissionClause("+field+"->"+relationship+")";
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((fac == null) ? 0 : fac.hashCode());
 		result = prime * result + ((field == null) ? 0 : field.hashCode());
+		result = prime * result + (is_optional ? 1231 : 1237);
 		result = prime * result + ((relationship == null) ? 0 : relationship.hashCode());
 		return result;
 	}
@@ -64,14 +74,13 @@ public class RemotePermissionClause<T extends DataObject> implements PermissionC
 				return false;
 		} else if (!field.equals(other.field))
 			return false;
+		if (is_optional != other.is_optional)
+			return false;
 		if (relationship == null) {
 			if (other.relationship != null)
 				return false;
 		} else if (!relationship.equals(other.relationship))
 			return false;
 		return true;
-	}
-	public String toString() {
-		return "RemotePermissionClause("+field+"->"+relationship+")";
 	}
 }

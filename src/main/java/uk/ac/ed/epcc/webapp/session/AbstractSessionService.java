@@ -1256,6 +1256,9 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		BaseFilter<T> result;
 		try {
 			result = makeRelationshipRoleFilter(fac,role,null,fallback);
+			if( result == null ) {
+				return fallback;
+			}
 			// narrow the selection
 			result = new AndFilter<>(fac.getTarget(),result,fallback);
 		} catch (UnknownRelationshipException e) {
@@ -1280,7 +1283,11 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			}
 			throw new UnknownRelationshipException(role);
 		}
-		return ast.accept(new RelationshipRoleFilterPermissionVisitor<A, T>(this, fac2, person));
+		BaseFilter<T> fil = ast.accept(new RelationshipRoleFilterPermissionVisitor<A, T>(this, fac2, person));
+		if( fil == null) {
+			return fallback;
+		}
+		return fil;
 	}
 
 	@Override
@@ -1301,6 +1308,9 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 					result = new AndFilter<>(getLoginFactory().getTarget(),result,fil);
 				}
 			}
+			if( result == null ) {
+				throw new UnknownRelationshipException(role);
+			}
 			roles.put(store_tag, result);
 		}
 		return result;
@@ -1311,7 +1321,11 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		if( ast == null ) {
 			throw new UnknownRelationshipException(role);
 		}
-		return ast.accept(new PersonInRelationshipRoleFilterPermissionVisitor<A, T>(this, fac2, target));
+		BaseFilter<A> fil = ast.accept(new PersonInRelationshipRoleFilterPermissionVisitor<A, T>(this, fac2, target));
+		if( fil == null) {
+			throw new UnknownRelationshipException(role);
+		}
+		return fil;
 	}
 
 	@Override
@@ -1342,6 +1356,9 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 				if( fil != null ){
 					result = new AndFilter<>(fac.getTarget(),result,fil);
 				}
+			}
+			if( result == null) {
+				throw new UnknownRelationshipException(role);
 			}
 			roles.put(store_tag, result);
 		}

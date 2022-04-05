@@ -4,27 +4,20 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
-import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.NegatingFilterVisitor;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
 import uk.ac.ed.epcc.webapp.model.data.NamedFilterWrapper;
-import uk.ac.ed.epcc.webapp.model.data.RemoteAccessRoleProvider;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
-import uk.ac.ed.epcc.webapp.model.relationship.GlobalRoleFilter;
 import uk.ac.ed.epcc.webapp.session.AbstractSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
 
 public class PermParser<A extends AppUser> extends AbstractContexed {
-	/**
+	/** Dereference a field and take relationship on referenced object.
 	 * 
 	 */
 	private static final String RELATIONSHIP_DEREF = "->";
@@ -107,9 +100,14 @@ public class PermParser<A extends AppUser> extends AbstractContexed {
 				// Match this first as the remote relationship
 				// might be qualified but the field name never is
 				int pos = role.indexOf(RELATIONSHIP_DEREF);
+				boolean is_optional=false;
 				String link_field = role.substring(0, pos);
+				if( link_field.endsWith("?")) {
+					is_optional=true;
+					link_field = link_field.substring(0, link_field.indexOf('?'));
+				}
 				String remote_role = role.substring(pos+RELATIONSHIP_DEREF.length());
-				return new RemotePermissionClause<T>(fac2, link_field, remote_role);
+				return new RemotePermissionClause<T>(fac2, link_field, remote_role,is_optional);
 			}else if( role.contains(".")){
 				// qualified role
 				int pos = role.indexOf('.');
