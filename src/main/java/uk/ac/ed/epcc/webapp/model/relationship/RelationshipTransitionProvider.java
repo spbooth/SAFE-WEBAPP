@@ -57,8 +57,8 @@ public class RelationshipTransitionProvider extends SimpleTransitionProvider<Rel
 
 		@Override
 		public void buildForm(Form f, Link target, AppContext conn) throws TransitionException {
-			Relationship rel = getRelationship();
-			Set<String> relationships = (Set<String>)rel.getRelationships();
+			Relationship<?,?> rel = getRelationship();
+			Set<String> relationships = rel.getSettableRelationships();
 			for(String role : relationships) {
 				BooleanInput i = new BooleanInput();
 				f.addInput(role, role, i);
