@@ -702,12 +702,15 @@ NamedFilterProvider<AU>
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getInput()
 	 */
 	@Override
-	public DataObjectItemInput<AU> getInput() {
+	public DataObjectItemInput<AU> getInput(){
+		return getInput(restrictDefaultInput());
+	}
+	public DataObjectItemInput<AU> getInput(boolean restrict) {
 		if( useAutoCompleteForSelect()) {
 			//return getNameInput(getFinalSelectFilter(),false, restrictDefaultInput() );
-			return getNameInput(getFinalSelectFilter(),getRealmFinder(getDefaultRealm()),false,true, restrictDefaultInput() );
+			return getNameInput(getFinalSelectFilter(),getRealmFinder(getDefaultRealm()),false,true, restrict );
 		}
-		return super.getInput();
+		return super.getInput(getFinalSelectFilter(),restrict);
 	}
 	/** Are we using an auto-complete input for {@link #getInput()}
 	 * 
@@ -1283,4 +1286,5 @@ NamedFilterProvider<AU>
 		names.add(CAN_LOGIN_FILTER);
 		
 	}
+	
 }

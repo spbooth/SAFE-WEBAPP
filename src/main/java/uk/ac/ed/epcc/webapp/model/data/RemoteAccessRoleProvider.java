@@ -82,8 +82,13 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 	 */
 	@Override
 	public BaseFilter<T> hasRelationFilter(String role, U user) {
-		if( role == null || role.isEmpty()|| force){
+		if( role == null || role.isEmpty()){
 			return null;
+		}
+		if( force ) {
+			// Don't know type unless optional field exists
+			// missing field should default to false
+			return new FalseFilter<>((Class<T>)DataObject.class);
 		}
 		try {
 			return home_fac.getRemoteFilter(remote_fac, link_field, sess.getTargetInRelationshipRoleFilter(remote_fac, role, user));

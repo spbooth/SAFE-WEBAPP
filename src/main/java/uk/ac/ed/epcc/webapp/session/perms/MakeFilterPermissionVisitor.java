@@ -9,7 +9,16 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
-
+/** common superclass for {@link PermissionVisitor}s that generate {@link BaseFilter}s
+ * 
+ * this handles filter combinations and true/false conditions that are the same
+ * for all such visitors
+ * 
+ * @author Stephen Booth
+ *
+ * @param <R>
+ * @param <T>
+ */
 public abstract class MakeFilterPermissionVisitor<R extends DataObject,T extends DataObject> implements PermissionVisitor<BaseFilter<R>, T>{
    public abstract DataObjectFactory<R> getFactory();
    

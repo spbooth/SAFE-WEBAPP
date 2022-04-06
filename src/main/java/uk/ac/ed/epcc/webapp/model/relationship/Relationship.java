@@ -139,6 +139,12 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 		public void setRole(String role, boolean value){
 			record.setProperty(role, value);
 		}
+		public A getUser() throws DataException {
+			return getLeft();
+		}
+		public B getTarget() throws DataException {
+			return getRight();
+		}
     	
     }
 
@@ -147,6 +153,16 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 		return new Link<>(this,res);
 	}
 
+	/** Access method for the {@link SetRelationshipTransition}
+	 * 
+	 * @param user
+	 * @param target
+	 * @return
+	 * @throws Exception
+	 */
+	Link<A,B> make(A user, B target) throws Exception{
+		return makeLink(user, target);
+	}
 
 	/**
 	 * @param role

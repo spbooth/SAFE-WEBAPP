@@ -10,8 +10,20 @@ import uk.ac.ed.epcc.webapp.model.relationship.GlobalRoleFilter;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
-
+/** a {@link PermissionVisitor} for generating a filter on the target object
+ * 
+ * @author Stephen Booth
+ *
+ * @param <A> type of {@link AppUser}
+ * @param <T> type of target
+ */
 public class RelationshipRoleFilterPermissionVisitor<A extends AppUser,T extends DataObject> extends MakeFilterPermissionVisitor<T, T> implements PermissionVisitor<BaseFilter<T>, T> {
+	/** Create a visitor
+	 * 
+	 * @param sess {@link SessionService}
+	 * @param fac2
+	 * @param person {@link AppUser} to check. This should be null to check the current user
+	 */
 	public RelationshipRoleFilterPermissionVisitor(SessionService<A> sess, DataObjectFactory<T> fac2, A person) {
 		super();
 		this.sess = sess;
@@ -29,7 +41,7 @@ public class RelationshipRoleFilterPermissionVisitor<A extends AppUser,T extends
 		RemoteAccessRoleProvider<A, T, ?> rarp = new RemoteAccessRoleProvider<>(sess, fac2, link_field,r.getFieldOptional());
 		BaseFilter<T> fil = rarp.hasRelationFilter(remote_role, person);
 		if( fil == null ){
-			throw new UnknownRelationshipException(link_field+"->"+remote_role);
+			throw new UnknownRelationshipException(link_field+"->"+remote_role+" (null filter)");
 		}
 		return fil;
 	}

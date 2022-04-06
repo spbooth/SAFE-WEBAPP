@@ -10,7 +10,14 @@ import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
-
+/** A {@link PermissionVisitor} that generates 
+ * filters for {@link AppUser}s that have the relation with a specified target
+ * 
+ * @author Stephen Booth
+ *
+ * @param <U> type of {@link AppUser}
+ * @param <T> type of target
+ */
 public class PersonInRelationshipRoleFilterPermissionVisitor<U extends AppUser,T extends DataObject> extends MakeFilterPermissionVisitor<U, T> {
 	public PersonInRelationshipRoleFilterPermissionVisitor(SessionService<U> sess, DataObjectFactory<T> fac, T target) {
 		super();
