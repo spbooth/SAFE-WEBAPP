@@ -96,6 +96,20 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 			return null;
 		}
 	}
+	
+	@Override
+	public BaseFilter<T> hasRelationFilter(String role, SessionService<U> sess) {
+		if( role == null || role.isEmpty()){
+			return null;
+		}
+		if( force ) {
+			// Don't know type unless optional field exists
+			// missing field should default to false
+			return new FalseFilter<>((Class<T>)DataObject.class);
+		}
+		
+		return home_fac.getRemoteFilter(remote_fac, link_field, sess.getRelationshipRoleFilter(remote_fac, role,null));
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider#personInRelationFilter(uk.ac.ed.epcc.webapp.session.SessionService, java.lang.String, uk.ac.ed.epcc.webapp.model.data.DataObject)
 	 */

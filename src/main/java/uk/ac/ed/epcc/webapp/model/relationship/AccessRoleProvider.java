@@ -61,11 +61,29 @@ public interface AccessRoleProvider<U extends AppUser,T extends DataObject> {
 	 * @return {@link BaseFilter} or null
 	 */
 	public BaseFilter<T> hasRelationFilter(String role, U user);
+	/**Get a {@link BaseFilter} corresponding to target objects where the current session has
+	 * the specified relation.
+	 * If the method returns null then the role is not recognised by the provider. 
+	 * A non-null result means the role is recognised but does not imply
+	 * that any target will match. The relation with a specific target object can be tested using
+	 * {@link DataObjectFactory#matches(BaseFilter, DataObject)}
+	 * 
+	 * This method should not be called directly only via a call to {@link SessionService#getRelationshipRoleFilter(DataObjectFactory, String)}
+	 * to allow the {@link SessionService} to combine and customise access rules.
+	 * 
+	 * 
+	 * @param role
+	 * @param sess
+	 * @return
+	 */
+	public default BaseFilter<T> hasRelationFilter(String role, SessionService<U> sess){
+		return hasRelationFilter(role, sess.getCurrentPerson());
+	}
 	
 	/** Get a {@link BaseFilter} for {@link AppUser}s that are in the specified relationship with
 	 * the target object.
 	 * 
-	 * This is the inverse of {@link #hasRelationFilter(SessionService, String)} used to generate a list
+	 * This is the inverse of {@link #hasRelationFilter(String, AppUser)} used to generate a list
 	 * of {@link AppUser} with the relation. It can always be implemented (inefficiently) by creating an {@link AcceptFilter}
 	 * that uses {@link #hasRelationFilter(String, AppUser)} to check each person in turn but though it is usually possible to find some {@link SQLFilter}
 	 * to narrow the selection first even if a full SQL implementation is not possible.

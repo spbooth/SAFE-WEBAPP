@@ -61,6 +61,7 @@ import uk.ac.ed.epcc.webapp.session.perms.PermParser;
 import uk.ac.ed.epcc.webapp.session.perms.PermissionClause;
 import uk.ac.ed.epcc.webapp.session.perms.PersonInRelationshipRoleFilterPermissionVisitor;
 import uk.ac.ed.epcc.webapp.session.perms.RelationshipRoleFilterPermissionVisitor;
+import uk.ac.ed.epcc.webapp.session.perms.SessionRelationshipRoleFilterPermissionVisitor;
 import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 /** Abstract base implementation of {@link SessionService}
  * <p>
@@ -1244,7 +1245,10 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		String store_tag=fac.getTag()+"."+role;
 		BaseFilter<T> result = roles.get(store_tag);
 		if( result == null ){
-			result = makeRelationshipRoleFilter(fac,role,null,null);
+			result = makeRelationshipRoleFilter(fac,role,null);
+			if( result == null) {
+				throw new UnknownRelationshipException(role);
+			}
 			roles.put(store_tag, result);
 		}
 		return result;
@@ -1255,7 +1259,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		
 		BaseFilter<T> result;
 		try {
-			result = makeRelationshipRoleFilter(fac,role,null,fallback);
+			result = makeRelationshipRoleFilter(fac,role,null);
 			if( result == null ) {
 				return fallback;
 			}
@@ -1273,7 +1277,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		
 		return result;
 	}
-	private <T extends DataObject> BaseFilter<T> makeRelationshipRoleFilter(DataObjectFactory<T> fac2, String role, A person,
+	private <T extends DataObject> BaseFilter<T> makeRelationshipRoleFilterForPerson(DataObjectFactory<T> fac2, String role, A person,
 			BaseFilter<T> fallback) throws UnknownRelationshipException {
 		
 		PermissionClause<T> ast = perm_parser.parse(fac2, role);
@@ -1284,6 +1288,22 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			throw new UnknownRelationshipException(role);
 		}
 		BaseFilter<T> fil = ast.accept(new RelationshipRoleFilterPermissionVisitor<A, T>(this, fac2, person));
+		if( fil == null) {
+			return fallback;
+		}
+		return fil;
+	}
+	private <T extends DataObject> BaseFilter<T> makeRelationshipRoleFilter(DataObjectFactory<T> fac2, String role,
+			BaseFilter<T> fallback) throws UnknownRelationshipException {
+		
+		PermissionClause<T> ast = perm_parser.parse(fac2, role);
+		if( ast == null) {
+			if( fallback != null) {
+				return fallback;
+			}
+			throw new UnknownRelationshipException(role);
+		}
+		BaseFilter<T> fil = ast.accept(new SessionRelationshipRoleFilterPermissionVisitor<A, T>(this, fac2));
 		if( fil == null) {
 			return fallback;
 		}
@@ -1346,7 +1366,10 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		String store_tag="TargetFilter."+fac.getTag()+"."+person.getID()+"."+role;
 		BaseFilter<T> result = roles.get(store_tag);
 		if( result == null ){
-			result = makeRelationshipRoleFilter(fac,role,person,null);
+			result = makeRelationshipRoleFilterForPerson(fac,role,person,null);
+			if( result == null) {
+				throw new UnknownRelationshipException(role);
+			}
 			if(APPLY_DEFAULT_TARGET_RELATIONSHIP_FILTER.isEnabled(getContext())){
 				// Add in the default relationship filter on target
 				//
@@ -1356,9 +1379,6 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 				if( fil != null ){
 					result = new AndFilter<>(fac.getTarget(),result,fil);
 				}
-			}
-			if( result == null) {
-				throw new UnknownRelationshipException(role);
 			}
 			roles.put(store_tag, result);
 		}
