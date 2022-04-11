@@ -209,6 +209,9 @@ public class WebappHeadTag extends TagSupport implements Tag {
 	 * 
 	 * This method is to include scripts from a java fragment.
 	 * 
+	 * Note that you usually want to include scripts from a local url so the application set
+	 * a restrictive content-security-policy 
+	 * 
 	 * @param conn
 	 * @param request
 	 * @param script
