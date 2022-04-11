@@ -175,10 +175,14 @@ public class ErrorFilter implements Filter {
 			toplevel=true;
 			req.setAttribute(SERVLET_CONTEXT_ATTR, ctx);
 			
-			// standard security headers
+			// standard static security headers
 			res.setHeader("X-XSS-Protection", "1;mode-block");
 			res.setHeader("X-Content-Type-Options", "nosniff");
 			res.setHeader("X-Frame-Options","DENY");
+			String csp = ctx.getInitParameter("ContentSecurityPolicy");
+			if( csp != null ) {
+				res.setHeader("Content-Security-Policy", csp);
+			}
 		
 		}
 		

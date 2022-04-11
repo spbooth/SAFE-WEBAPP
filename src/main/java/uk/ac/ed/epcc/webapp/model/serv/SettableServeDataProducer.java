@@ -26,6 +26,12 @@ public interface SettableServeDataProducer extends ServeDataProducer {
 	 * @return path to stored data
 	 */
 	public List<String> setData(MimeStreamData data);
+
+	@Override
+	default boolean isExternalContent(List<String> path) {
+		// Settable implies internally generated content.
+		return false;
+	}
 	
 
 	

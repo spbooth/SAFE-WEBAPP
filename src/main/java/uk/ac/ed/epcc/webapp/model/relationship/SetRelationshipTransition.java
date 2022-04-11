@@ -37,7 +37,7 @@ public class SetRelationshipTransition<X extends DataObject,A extends AppUser> e
 				
 				RelationshipTransitionProvider prov = TransitionFactoryFinder.getTransitionFactory(conn, null, rel.getTag());
 				if( prov == null ) {
-					throw new ActionException("TransitionProvider not registered");
+					throw new ActionException("TransitionProvider "+rel.getTag()+" not registered");
 				}
 				return new ChainedTransitionResult<>(prov, l,RelationshipTransitionProvider.EDIT );
 			}
