@@ -72,7 +72,7 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 	 */
 	@Override
 	public BaseFilter<BDO> getNamedFilter(String name) {
-		if( names.contains(name) ) {
+		if( useName(name) ) {
 			if( getRepository().hasField(name)) {
 				return new SQLValueFilter<>(getFactory().getTarget(), getRepository(), name, Boolean.TRUE);
 			}else {
@@ -83,7 +83,7 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 	}
 	
 	public boolean hasNamedFilter(BDO target,String name) {
-		if( names.contains(name)) {
+		if( useName(name)) {
 			return getRecord(target).getBooleanProperty(name, getDefault(name));
 		}
 		return false;
@@ -100,11 +100,15 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 	}
 
 	public void setNamedFilter(BDO obj,String name, boolean value) throws InvalidArgument {
-		if( names.contains(name)) {
+		if( useName(name)) {
 			getRecord(obj).setOptionalProperty(name, value);
 		}else {
 			throw new InvalidArgument("Not a configured filter: "+name);
 		}
+	}
+
+	public boolean useName(String name) {
+		return names.contains(name);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#getType()
