@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -1165,6 +1166,19 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			}
 		}
 		return result;
+	}
+	/** Apply an action to all {@link Composite}s matching a template
+	 * 
+	 * @param <Y>
+	 * @param template
+	 * @param action
+	 */
+	public <Y> void visitComposites(Class<Y> template,Consumer<Y> action) {
+		for( Composite<BDO,?> c : composites.values()){
+			if( template.isAssignableFrom(c.getClass()) ){
+				action.accept((Y) c);				
+			}
+		}
 	}
 	
 	/** use like a destructor. clears internal references

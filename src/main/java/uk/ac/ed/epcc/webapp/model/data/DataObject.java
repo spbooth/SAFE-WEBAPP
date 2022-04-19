@@ -219,9 +219,12 @@ public abstract class DataObject implements ContextIndexed, Identified, Releasab
 	 *            Form to use
 	 */
 	public void formUpdate(Form f) {
+		formUpdate(f,f.getFieldIterator());
+	}
+	public void formUpdate(Form f, Iterator<String> fields) {
 		Repository res = record.getRepository();
 		boolean allow_bogus = res.setAllowBogusPut(true);
-		for (Iterator<String> it = f.getFieldIterator(); it.hasNext();) {
+		for (Iterator<String> it = fields; it.hasNext();) {
 			String key = it.next();
 			record.setProperty(key, f.get(key));
 		}

@@ -230,6 +230,9 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	 */
 	@Override
 	public final T find(String o) {
+		if( o == null || o.isEmpty()) {
+			return null;
+		}
 		return  values.get(o);
 	}
 
