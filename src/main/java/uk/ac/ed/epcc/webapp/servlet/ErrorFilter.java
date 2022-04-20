@@ -176,11 +176,14 @@ public class ErrorFilter implements Filter {
 			req.setAttribute(SERVLET_CONTEXT_ATTR, ctx);
 			
 			// standard static security headers
+			// want to do this without creating an AppContext
 			res.setHeader("X-XSS-Protection", "1;mode-block");
 			res.setHeader("X-Content-Type-Options", "nosniff");
 			res.setHeader("X-Frame-Options","DENY");
 			String csp = ctx.getInitParameter("ContentSecurityPolicy");
 			if( csp != null ) {
+				String base_url = req.getScheme()+"://"+req.getServerName()+":"+req.getLocalPort()+req.getContextPath();
+				csp = csp.replace("{base-url}", base_url);
 				res.setHeader("Content-Security-Policy", csp);
 			}
 		

@@ -13,7 +13,7 @@ WebappHeadTag.addCss(conn, request, "${colVis.css}");
 WebappHeadTag.addScript(conn, request, "${colReorder.script}");
 WebappHeadTag.addCss(conn, request, "${colReorder.css}");
 WebappHeadTag.addScript(conn, request,
-		"$(document).ready( function(){ $('#users').DataTable({ stateSave: true , stateDuration: 3600, pageLength: 100 , lengthMenu: [[ 10, 25, 50, 100, -1 ],[ 10, 25, 50, 100, 'All'] ] , paging: true ,  order: [[ 0, 'desc' ]] , dom: 'C<\"clear\">Rlfrtip'   });});");
+		"/js/appuser_datatable.js");
 
 %>
 <%@ include file="std_header.jsf" %>
@@ -37,7 +37,7 @@ if( t.hasData()){
    HtmlBuilder wrapper=(HtmlBuilder)hb.getPanel("scrollwrapper");
 
 	wrapper.setTableSections(true);
-	t.setId("users");
+	t.setId("datatable");
 	wrapper.addTable(conn, t,"display");
 	wrapper.addParent();
     %><%= hb %><%
