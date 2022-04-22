@@ -295,7 +295,7 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 		person2.commit();
 		System.out.println(person2.nextRequiredUpdate());
 		
-		setTime(2020, Calendar.JUNE, 20, 10, 0);
+		setTime(2020, Calendar.JUNE, 20, 10, 0); // in warning period for person1
 		req.remote_user="fred";
 		doPost();
 		

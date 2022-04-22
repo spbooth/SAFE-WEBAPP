@@ -65,7 +65,12 @@ public class NotificationsLoginServletTest<A extends AppUser> extends AbstractLo
 	}
 	
 	
-	
+	/** Test that the MaxNotify counter is reset to zero when a user sucessfully logs in.
+	 * 
+	 * @throws DataFault
+	 * @throws ServletException
+	 * @throws IOException
+	 */
 	@Test
 	@ConfigFixtures("required_page_heartbeat.properties")
 	public void testLoginNotificationReset() throws DataFault, ServletException, IOException{

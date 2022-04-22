@@ -51,7 +51,7 @@ public class BasicSessionTag extends TagSupport implements Tag {
 		AppContext conn = ErrorFilter.retrieveAppContext(request, response);
 				
 	    if( conn == null ){
-	    	// have to do this explicitly as normal method needs AppContesx
+	    	// have to do this explicitly as normal method needs AppContext
 	    	request.setAttribute(WebappServlet.MESSAGE_TYPE_ATTR, "internal_error");
 	    	request.setAttribute(WebappServlet.MESSAGE_EXTRA_ATTR, "No AppContext");
 	    	page.forward(WebappServlet.MESSAGES_JSP_URL);

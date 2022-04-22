@@ -263,6 +263,7 @@ public class ErrorFilter implements Filter {
 				// remove the cached AppContext as this request object may be passed to
 				// the error-page and we are about to invalidate it
 				req.removeAttribute(APP_CONTEXT_ATTR);
+				AppContext.clearContext();
 				
 				CleanupService cleanup = conn.getService(CleanupService.class);
 				// Run cleanup in a seperate thread IF interactive and cleanup actions
@@ -379,7 +380,8 @@ public class ErrorFilter implements Filter {
 		// so requires the db service.
 		conn.setService(new DataBaseConfigService(conn));
 		
-		
+		// Save as thread-local
+		AppContext.setContext(conn);
 		
 		return conn;
 	}

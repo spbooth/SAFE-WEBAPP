@@ -169,6 +169,7 @@ TargetType t = conn.makeObject(TargetType.class,"tag-name");
  */
 public final class AppContext {
 	
+
 	public static final String CLASSDEF_PROP_PREFIX = "classdef.";
 	public static final Feature CONTEXT_CACHE_FEATURE = new Feature("ContextCache",true,"cache objects that implement ContextCache in the AppContext");
 	public static final Feature DATABASE_FEATURE = new Feature("database",true,"use database");
@@ -1419,6 +1420,27 @@ public final class AppContext {
 
 	public final void removeCached(String path,String tag) {
 		removeAttribute(new ObjectCacheKey(path, tag));
+	}
+	private static ThreadLocal<AppContext> local_ctx = new ThreadLocal<AppContext>();
+	/** Save a thread-local AppContext
+	 * 
+	 * @param c
+	 */
+	public static void setContext(AppContext c) {
+		local_ctx.set(c);
+	}
+	/** Retrieve a thread-local {@link AppContext} previously set using {@link #setContext(AppContext)}
+	 * 
+	 * @return
+	 */
+	public static AppContext getContext() {
+		return local_ctx.get();
+	}
+	/** Clear the thread-local reference to the {@link AppContext}
+	 * 
+	 */
+	public static void clearContext() {
+		local_ctx.remove();
 	}
 	
 }
