@@ -180,6 +180,7 @@ public class ErrorFilter implements Filter {
 			res.setHeader("X-XSS-Protection", "1;mode-block");
 			res.setHeader("X-Content-Type-Options", "nosniff");
 			res.setHeader("X-Frame-Options","DENY");
+			res.setHeader("Referrer-Policy", "same-origin");
 			String csp = ctx.getInitParameter("ContentSecurityPolicy");
 			if( csp != null ) {
 				String base_url = req.getScheme()+"://"+req.getServerName()+":"+req.getLocalPort()+req.getContextPath();
