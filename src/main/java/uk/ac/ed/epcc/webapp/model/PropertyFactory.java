@@ -51,7 +51,8 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 
 public class PropertyFactory extends DataObjectFactory<Property> {
-    /**
+    private static final int MAX_NAME_LENGTH = 255;
+	/**
 	 * 
 	 */
 	private static final int MAX_PROP_LENGTH = 4096;
@@ -69,6 +70,8 @@ public class PropertyFactory extends DataObjectFactory<Property> {
 				TextInput name_input = new TextInput();
 				name_input.setSingle(true);
 				name_input.setTrim(true);
+				name_input.setBoxWidth(64);
+				name_input.setMaxResultLength(MAX_NAME_LENGTH);
 				name_input.addValidator(new NoSpaceFieldValidator());
 				return name_input;
 			}
@@ -105,7 +108,7 @@ public class PropertyFactory extends DataObjectFactory<Property> {
     @Override
     protected TableSpecification getDefaultTableSpecification(AppContext c,String table){
     	TableSpecification s = new TableSpecification();
-		s.setField(Property.NAME, new StringFieldType(false,null,255));
+		s.setField(Property.NAME, new StringFieldType(false,null,MAX_NAME_LENGTH));
 		s.setField(Property.VALUE, new StringFieldType(false,null,255));
 		try {
 			s.new Index("name_key", true, Property.NAME);
