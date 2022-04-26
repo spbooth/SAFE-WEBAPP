@@ -95,8 +95,6 @@ public class DefaultServletService implements ServletService{
 	public static final String BASIC_AUTH_REALM_PARAM="basic_auth.realm";
 	public static final Feature NEED_CERTIFICATE_FEATURE = new Feature("need-certificate", true,"try additional mechanisms to retrieve certificate DN as web-name");
 	public static final String PARAMS_KEY_NAME = "Params";
-	public static final String ARG_TERRMINATOR = "-";
-	
 	Pattern auth_patt =  Pattern.compile("\\s*(\\w+)\\s+([\\w~/\\.\\+\\-]+=*)");
 	protected final AppContext conn;
 	private final ServletContext ctx;
@@ -315,7 +313,7 @@ public class DefaultServletService implements ServletService{
 			StringTokenizer st = new StringTokenizer(path, "/", false);
 			while( st.hasMoreTokens()) {
 				String val = st.nextToken();
-				if( val.equals(ARG_TERRMINATOR)){
+				if( val.equals(ServletService.ARG_TERRMINATOR)){
 					return h;
 				}
 				h.add(val);
@@ -323,6 +321,30 @@ public class DefaultServletService implements ServletService{
 		}
     	}
 		return h;
+    }
+    
+    public String getFilePath() {
+    	
+    	LinkedList<String> h = new LinkedList<>();
+    	if( req != null && req instanceof HttpServletRequest){
+    	String path = ((HttpServletRequest)req).getPathInfo();
+    	boolean add = false;
+		if (path != null) {
+			StringTokenizer st = new StringTokenizer(path, "/", false);
+			while( st.hasMoreTokens()) {
+				String val = st.nextToken();
+				if( val.equals(ServletService.ARG_TERRMINATOR)){
+					add=true;
+				}else if( add ) {
+					h.add(val);
+				}
+			}
+		}
+    	}
+    	if( h.isEmpty()) {
+    		return "";
+    	}
+    	return "/"+String.join("/", h);
     }
 	
 	/**

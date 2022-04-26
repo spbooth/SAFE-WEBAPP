@@ -22,16 +22,17 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 
 public class PageNode extends ExactNode {
-	public static final String MENU_PAGE_ATTR="MenuPage";
+
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.servlet.navigation.Node#getTargetURL(uk.ac.ed.epcc.webapp.servlet.ServletService)
 	 */
 	@Override
 	public String getTargetURL(ServletService servlet_service) {
-		SessionService sess = servlet_service.getContext().getService(SessionService.class);
 		String page = servlet_service.encodePage();
-		sess.setAttribute(MENU_PAGE_ATTR, page);
-		return super.getTargetURL(servlet_service);
+		if( ! page.startsWith("/")) {
+			page = "/"+page;
+		}
+		return super.getTargetURL(servlet_service)+"/"+ServletService.ARG_TERRMINATOR+page;
 	}
 
 }

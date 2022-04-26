@@ -52,6 +52,8 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * 
 	 */
 	String ERROR_MSG_ATTR = "uk.ac.ed.epcc.webapp.error.message";
+
+	String ARG_TERRMINATOR = "-";
 	/** un-encoded version of the original request page.
 	 * 
 	 *  * This uses a cached value because the request URL will be
@@ -163,6 +165,13 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * @return LinkedList<String> arguments in order.
 	 */
     public LinkedList<String> getArgs();
+    
+    /** Get the remaining path after arguments have been extracted
+     * ie the ServletPath after the first "-" element.
+     * 
+     * @return
+     */
+    public String getFilePath();
 	/**
 	 * get the authenticated name for the current user as provided by the
 	 * web-server/container authorisation layer. This will be null unless the

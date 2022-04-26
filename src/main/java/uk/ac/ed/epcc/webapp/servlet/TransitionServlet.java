@@ -863,7 +863,7 @@ public  class TransitionServlet<K,T> extends WebappServlet {
 				}
 			}
 			url.append("/");
-			url.append(DefaultServletService.ARG_TERRMINATOR);
+			url.append(ServletService.ARG_TERRMINATOR);
 			url.append("/");
 			url.append(TRANSITION_KEY_ATTR);
 			url.append("=");
