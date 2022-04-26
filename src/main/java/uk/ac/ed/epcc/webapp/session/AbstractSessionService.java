@@ -331,6 +331,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		}
 		if( toggle_map != null && toggle_map.containsKey(name)){
 			toggle_map.put(name,Boolean.valueOf(value));
+			saveMap(); // re-add to session to trigger sync
 		}else{
 			error("setToggle for non toggle role "+name);
 		}
@@ -350,6 +351,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		if( v != null ){
 			v = Boolean.valueOf(! v);
 		   toggle_map.put(name, v);
+		   saveMap(); // re-add to session to trigger sync
 		}else{
 			error("toggleRole called for not toggle role "+name);
 		}
@@ -393,9 +395,13 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			toggle_map = (Map<String, Boolean>) getAttribute(toggle_map_tag);
 			if( toggle_map == null ){
 				toggle_map = makeToggleMap();
-				setAttribute(toggle_map_tag, toggle_map);
+				saveMap();
 			}
 		}
+	}
+
+	private void saveMap() {
+		setAttribute(toggle_map_tag, toggle_map);
 	}
 	
 	
