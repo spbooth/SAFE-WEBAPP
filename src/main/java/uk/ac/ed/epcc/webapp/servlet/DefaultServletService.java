@@ -167,6 +167,9 @@ public class DefaultServletService implements ServletService{
 
 		
 		res = req.getServletPath();
+		if( res == null ) {
+			res="";
+		}
 		tmp = req.getPathInfo();
 		if (tmp != null) {
 			if( ! tmp.startsWith("/")) {
