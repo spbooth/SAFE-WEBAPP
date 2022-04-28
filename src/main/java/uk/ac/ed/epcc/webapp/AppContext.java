@@ -1421,7 +1421,7 @@ public final class AppContext {
 	public final void removeCached(String path,String tag) {
 		removeAttribute(new ObjectCacheKey(path, tag));
 	}
-	private static ThreadLocal<AppContext> local_ctx = new ThreadLocal<AppContext>();
+	private static final ThreadLocal<AppContext> local_ctx = new ThreadLocal<AppContext>();
 	/** Save a thread-local AppContext
 	 * 
 	 * @param c
