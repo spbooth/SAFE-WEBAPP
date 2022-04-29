@@ -659,6 +659,17 @@ public class SwingContentBuilder  implements ContentBuilder{
 		}
 		}
 	}
+	@Override
+	public <I,T> void addFormError(AppContext conn, Field<I> f,T item) {
+		if( listener != null){
+		SwingField<I> field = listener.getSwingField(f);
+		try {
+			field.addError(content);
+		} catch (Exception e) {
+			conn.error(e,"Error adding label");
+		}
+		}
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormInput(uk.ac.ed.epcc.webapp.AppContext, uk.ac.ed.epcc.webapp.forms.Field)
 	 */

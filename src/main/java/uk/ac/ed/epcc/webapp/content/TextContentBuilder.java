@@ -418,4 +418,9 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 		clean(alt);
 		
 	}
+	@Override
+	public <I, T> void addFormError(AppContext conn, Field<I> f, T item) {
+	
+		
+	}
 }

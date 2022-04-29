@@ -262,6 +262,7 @@ public class SwingField<I>  {
 	private final AppContext conn;
 	//private Logger log;
 	private JLabel lab;
+	private String error=null;
 
 	private Map<Input,JComponent> components; // map of inputs to components
 
@@ -276,6 +277,7 @@ public class SwingField<I>  {
 		if( lab != null ){
 			lab.setText(field.getLabel());
 		}
+		error=null;
 	}
 	public class MakeComponentVisitor implements InputVisitor<JComponent>{
 		
@@ -490,6 +492,15 @@ public class SwingField<I>  {
 		JComponent field_component = getComponent(input,null);
 		lab.setLabelFor(field_component);
 	}
+	void addError(JComponent form) throws Exception {
+		JLabel err = new JLabel(error);
+		form.add(err);
+		Input<I> input = field.getInput();
+		err.setForeground(Color.RED);
+		
+		JComponent field_component = getComponent(input,null);
+		err.setLabelFor(field_component);
+	}
 	<T> void addInput(JComponent form,T radio_selector) throws Exception {
 		Input<I> input = field.getInput();
 		JComponent field_component = getComponent(input,radio_selector);
@@ -655,6 +666,7 @@ public class SwingField<I>  {
 	}
 	private void setError(String message) {
 		if (message != null && message.length() > 0) {
+			error=message;
 			lab.setText("<html>" + field.getLabel() + " <font color=#ff0000>"
 					+ message + "</font></html>");
 		} else {

@@ -277,6 +277,7 @@ public interface ContentBuilder {
 	 */
 	public void addFormTable(AppContext conn,Iterable<Field> f);
 	/** Add the label for a form {@link Field}
+	 * field errors sill be added automatically
 	 * 
 	 * @param conn
 	 * @param f Field
@@ -284,6 +285,16 @@ public interface ContentBuilder {
 	 * 
 	 */
 	public <I,T> void addFormLabel(AppContext conn,Field<I> f,T item);
+	
+	/** Add just the field error for a label
+	 * 
+	 * @param <I>
+	 * @param <T>
+	 * @param conn
+	 * @param f
+	 * @param item
+	 */
+	public <I,T> void addFormError(AppContext conn,Field<I> f,T item);
 	/** Add the label for a form {@link Field}
 	 * 
 	 * @param conn

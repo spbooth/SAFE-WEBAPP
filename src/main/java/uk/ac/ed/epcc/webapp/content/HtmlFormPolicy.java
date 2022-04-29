@@ -126,7 +126,7 @@ public String getActionName() {
 public <I,T> void addFormLabel(ExtendedXMLBuilder sb,AppContext conn,Field<I> f, T item) throws Exception {
 	String key = f.getKey();
 	boolean missing = isMissing(key);
-	String error = getError(key);
+	
 	Input<I> i = f.getInput();
 	boolean optional = f.isOptional();
 	if( HTML_USE_LABEL_FEATURE.isEnabled(conn)){
@@ -179,6 +179,11 @@ public <I,T> void addFormLabel(ExtendedXMLBuilder sb,AppContext conn,Field<I> f,
 //		close(); //span
 //		close(); //b
 //	}
+	addFieldError(sb, key);
+	
+}
+public void addFieldError(ExtendedXMLBuilder sb, String key) {
+	String error = getError(key);
 	if (error != null) {
 		sb.nbs();
 		sb.open("span");
@@ -186,7 +191,6 @@ public <I,T> void addFormLabel(ExtendedXMLBuilder sb,AppContext conn,Field<I> f,
 		sb.clean(error);
 		sb.close(); //span
 	}
-	
 }
 /* (non-Javadoc)
  * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormInput(uk.ac.ed.epcc.webapp.forms.Field)

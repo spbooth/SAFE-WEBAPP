@@ -64,6 +64,16 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 			getLogger(conn).error("Error making form label", e);
 		}
 	}
+	
+	@Override
+	public default <I,T> void addFormError(AppContext conn,Field<I> f, T item) {
+		try {
+			HtmlFormPolicy p = getFormPolicy();
+			p.addFieldError(this, f.getKey());
+		}catch(Exception e) {
+			getLogger(conn).error("Error making form label", e);
+		}
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormInput(uk.ac.ed.epcc.webapp.forms.Field)
 	 */
