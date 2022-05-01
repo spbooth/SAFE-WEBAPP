@@ -79,6 +79,7 @@ public class Table<C, R> {
 		private Map<R, Map<String, String>> element_attr = null; // per element
 																	// attributes
 
+		private boolean dedup =false;
 		public void clear(){
 			data.clear();
 			format=null;
@@ -514,6 +515,12 @@ public class Table<C, R> {
 				}
 			}
 			return result;
+		}
+		public boolean isDedup() {
+			return dedup;
+		}
+		public void setDedup(boolean dedup) {
+			this.dedup = dedup;
 		}
 	}
 

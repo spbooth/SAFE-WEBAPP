@@ -15,6 +15,7 @@ package uk.ac.ed.epcc.webapp.content;
 
 import java.security.Principal;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.forms.Identified;
@@ -160,8 +161,10 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 				addContent(t.getKeyText(row_key));
 				hb.close();
 			}
+			ArrayList<R> row_keys=null;
 			int skip_col=0;
 			for (C key: t.getColumNames()) {
+				Table<C,R>.Col column = t.getCol(key);
 				if( skip_col > 0) {
 					skip_col--;
 					col++;
@@ -179,7 +182,17 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 						dc = ((MultiColumn) n).getDisplayClass();
 						
 					}
-					addTd(t, row_key, nrow-1,col, key, n, dc, cols,1);
+					if( column.isDedup()) {
+						if( row_keys == null ) {
+							row_keys = new ArrayList<R>();
+							for(R row : t.getRows()) {
+								row_keys.add(row);
+							}
+						}
+						addTdWithDeDup(row_keys, t, row_key, nrow-1, col, key, n, dc, cols);
+					}else {
+						addTd(t, row_key, nrow-1,col, key, n, dc, cols,1);
+					}
 					col++;
 				}
 			}
@@ -218,7 +231,25 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 		addCell(t,key,row_key, n);
 		hb.close();
 	}
-    
+    protected void addTdWithDeDup(ArrayList<R> row_keys,Table<C, R> t, R row_key, int row,int col, C key, Object n, String dc, int cols) {
+    	int rows=1;
+    	if( row > 0 ) {
+			Object prev = t.get(key, row_keys.get(row-1));
+			if( n != null && prev != null && n.equals(prev)) {
+				hb.clean("\t\t");
+				return;  //supress duplicate
+			}
+		}
+		for( int i=row+1; i< t.nRows();i++) {
+			Object next= t.get(key, row_keys.get(i));
+			if( n != null && next != null && n.equals(next)) {
+				rows++;
+			}else {
+				break;
+			}
+		}
+		addTd(t, row_key, row, col, key, n, dc, cols, rows);
+    }
     /* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.TableFormatPolicy#addColumn(uk.ac.ed.epcc.webapp.content.Table, C)
 	 */

@@ -17,7 +17,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.transition.PathTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
 
-/**
+/** An {@link AbstractTransitionFactory} that implements {@link PathTransitionProvider}
  * @author spb
  *
  */
