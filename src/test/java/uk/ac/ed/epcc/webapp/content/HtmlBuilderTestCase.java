@@ -268,15 +268,17 @@ public class HtmlBuilderTestCase extends WebappTestBase {
 	}
 	
 	@Test
-	public void testDeDupTableFormat() {
+	public void testDeDupTable() {
 		HtmlBuilder hb = new HtmlBuilder();
 		Table t = new Table();
 		t.put("col1", "row1", "A");
 		t.put("col2", "row1", "B");
 		t.put("col1", "row2", "A");
 		t.put("col2", "row2", "C");
-		DeDupTableXMLFormatter fmt = new DeDupTableXMLFormatter<>(hb, null);
-		fmt.add(t);
+		
+		t.getCol("col1").setDedup(true);
+		t.getCol("col2").setDedup(true);
+		hb.addTable(ctx, t);
 		
 		Assert.assertEquals(
 				"<table class='auto' rows='2' cols='2'>\n" + 
