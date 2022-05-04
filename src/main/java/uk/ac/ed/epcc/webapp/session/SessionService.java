@@ -28,6 +28,8 @@ import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.CannotUseSQLException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
@@ -326,6 +328,7 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public <T extends DataObject> BaseFilter<A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,T target) throws UnknownRelationshipException;
 	
+	public <T extends DataObject> SQLFilter<A> getPersonInRelationshipRoleToFilter(DataObjectFactory<T> fac, String role,SQLFilter<T> target) throws UnknownRelationshipException, CannotUseSQLException;
 	
 	/** get a {@link BaseFilter} representing the set of targets that a specified {@link AppUser} is in a particular
 	 * relationship-role with.

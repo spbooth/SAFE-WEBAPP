@@ -151,6 +151,14 @@ public class Dummy3 extends DataObject {
 			}
 			return null;
 		}
+		
+		@Override
+		public SQLFilter<AppUser> personInRelationToFilter(SessionService<AppUser> sess, String role, SQLFilter<Dummy3> fil) {
+			if( role.equals(SELF)){
+				return getDestFilter(fil,PERSON_ID,sess.getLoginFactory());
+			}
+			return null;
+		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider#getNamedFilter(java.lang.String)
 		 */

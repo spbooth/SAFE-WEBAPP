@@ -15,9 +15,7 @@ package uk.ac.ed.epcc.webapp.model.relationship;
 
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
@@ -94,6 +92,27 @@ public interface AccessRoleProvider<U extends AppUser,T extends DataObject> {
 	 * @return {@link BaseFilter} or null
 	 */
     public BaseFilter<U> personInRelationFilter(SessionService<U> sess, String role, T target);
+    
+    /**
+     *  Get a {@link SQLFilter} for {@link AppUser}s that have a specified relationship
+     *  with any target that matches a {@link SQLFilter}
+     *  
+     *  This is largely an optimisation for SQLfilters and will not be possible unless the
+     *  role is implemented as a {@link SQLFilter}. Non SQL cases can always loop over {@link AppUser}s
+     *  or target objects. 
+     *  
+     * @param sess
+     * @param role
+     * @param fil
+     * @return
+     * @throws CannotUseSQLException
+     */
+    default public SQLFilter<U> personInRelationToFilter(SessionService<U> sess, String role, SQLFilter<T> fil) throws CannotUseSQLException{
+    	if( providesRelationship(role)) {
+    		throw new NoSQLFilterException("personInRelationToFilter not implemented in "+getClass().getCanonicalName());
+    	}
+    	return null;
+    }
     
     /** Does this class provide the named relationship.
      * 

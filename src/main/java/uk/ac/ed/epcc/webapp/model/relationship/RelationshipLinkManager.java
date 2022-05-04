@@ -16,8 +16,7 @@ package uk.ac.ed.epcc.webapp.model.relationship;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.LinkManager;
@@ -101,7 +100,14 @@ public abstract class RelationshipLinkManager<A extends AppUser, B extends DataO
 			return null;
 		}
 	}
-
+	@Override
+	public final SQLFilter<A> personInRelationToFilter(SessionService<A> sess, String role, SQLFilter<B> fil) throws NoSQLFilterException {
+		try {
+			return FilterConverter.convert(getUserFilter(fil, role));
+		} catch (UnknownRelationshipException e) {
+			return null;
+		}
+	}
 	@Override
 	public final boolean providesRelationship(String role) {
 		return getRelationships().contains(role);

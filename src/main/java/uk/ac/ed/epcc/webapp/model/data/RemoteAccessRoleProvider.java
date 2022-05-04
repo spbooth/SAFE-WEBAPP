@@ -15,8 +15,7 @@ package uk.ac.ed.epcc.webapp.model.data;
 
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
@@ -138,6 +137,24 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 			return null;
 		}
 	}
+	
+	@Override
+	public SQLFilter<U> personInRelationToFilter(SessionService<U> sess, String role, SQLFilter<T> fil) throws CannotUseSQLException {
+		if( role == null || role.isEmpty()){
+			return null;
+		}
+		if( force ) {
+			return new FalseFilter<>((Class<U>) AppUser.class);
+		}
+
+		try {
+			return sess.getPersonInRelationshipRoleToFilter(remote_fac, role, home_fac.getDestFilter(fil, link_field, remote_fac));
+		} catch (UnknownRelationshipException e) {
+			return null;
+		}
+
+	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider#providesRelationship(java.lang.String)
 	 */

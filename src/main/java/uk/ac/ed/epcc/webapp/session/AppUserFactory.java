@@ -1125,6 +1125,13 @@ NamedFilterProvider<AU>
 		return null;
 	}
 	@Override
+	public SQLFilter<AU> personInRelationToFilter(SessionService<AU> sess, String role, SQLFilter<AU> fil) {
+		if( role.equals(MY_SELF_RELATIONSHIP)) {
+			return fil;
+		}
+		return null;
+	}
+	@Override
 	public boolean providesRelationship(String role) {
 		if( role.equals(MY_SELF_RELATIONSHIP)) {
 			return true;
@@ -1286,5 +1293,6 @@ NamedFilterProvider<AU>
 		names.add(CAN_LOGIN_FILTER);
 		
 	}
+	
 	
 }

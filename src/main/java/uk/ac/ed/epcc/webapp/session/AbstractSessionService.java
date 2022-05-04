@@ -36,12 +36,7 @@ import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
@@ -56,12 +51,7 @@ import uk.ac.ed.epcc.webapp.model.data.RemoteAccessRoleProvider;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.model.relationship.RelationshipProvider;
-import uk.ac.ed.epcc.webapp.session.perms.ExplainPermissionVisitor;
-import uk.ac.ed.epcc.webapp.session.perms.PermParser;
-import uk.ac.ed.epcc.webapp.session.perms.PermissionClause;
-import uk.ac.ed.epcc.webapp.session.perms.PersonInRelationshipRoleFilterPermissionVisitor;
-import uk.ac.ed.epcc.webapp.session.perms.RelationshipRoleFilterPermissionVisitor;
-import uk.ac.ed.epcc.webapp.session.perms.SessionRelationshipRoleFilterPermissionVisitor;
+import uk.ac.ed.epcc.webapp.session.perms.*;
 import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 /** Abstract base implementation of {@link SessionService}
  * <p>
@@ -1023,11 +1013,16 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 				error("Bad name filter on "+fac.getTag()+" "+name_filter);
 				return new FalseFilter(login.getTarget());
 			}
-			OrFilter<A> fil = new OrFilter<>(login.getTarget(),login);
-			for(X o : fac.getResult(nf)) {
-				fil.addFilter(getPersonInRelationshipRoleFilter(fac, relationship, o));
+			try {
+				return getPersonInRelationshipRoleToFilter(fac, relationship, FilterConverter.convert(nf));
+			}catch(CannotUseSQLException e) {
+				// Try all matching targets explicitly
+				OrFilter<A> fil = new OrFilter<>(login.getTarget(),login);
+				for(X o : fac.getResult(nf)) {
+					fil.addFilter(getPersonInRelationshipRoleFilter(fac, relationship, o));
+				}
+				return fil;
 			}
-			return fil;
 		}catch(Exception t) {
 			error(t,"Error checking relationship based role");
 			return new FalseFilter<A>(login.getTarget());
@@ -1353,7 +1348,26 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		}
 		return fil;
 	}
-
+	@Override
+	public <T extends DataObject> SQLFilter<A> getPersonInRelationshipRoleToFilter(DataObjectFactory<T> fac2, String role, SQLFilter<T> fil) throws UnknownRelationshipException, CannotUseSQLException {
+		// We don't cache these as they have an embedded target filter and
+		// are unlikely to be re-used anyway
+		PermissionClause<T> ast = perm_parser.parse(fac2, role);
+		if( ast == null ) {
+			throw new UnknownRelationshipException(role);
+		}
+		try {
+			BaseFilter<A> result = ast.accept(new PersonInRelationshipRoleToFilterPermissionVisitor<A, T>(this, fac2, fil));
+			if( result != null ) {
+				return FilterConverter.convert(result);
+			}
+		}catch(NoSQLFilterException n) {
+			throw n;
+		}catch(Exception e) {
+			throw new NoSQLFilterException(e);
+		}
+		throw new NoSQLFilterException();
+	}
 	@Override
 	public <T extends DataObject> Object explainRelationship(DataObjectFactory<T> fac2, String role) {
 		try {

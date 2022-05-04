@@ -796,8 +796,6 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	public BaseFilter<T> getLeftRemoteFilter(BaseFilter<L> fil){
 		return getRemoteFilter(getLeftFactory(), getLeftField(), fil);
 	}
-	
-
 	/** Get a filter for the right peer from a filter on the link.
 	 * 
 	 * 
@@ -832,7 +830,6 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	public BaseFilter<T> getRightRemoteFilter(BaseFilter<R> fil){
 		return getRemoteFilter(getRightFactory(), getRightField(), fil);
 	}
-
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.IndexedLinkManager#isLeft(java.lang.Object)
 	 */
