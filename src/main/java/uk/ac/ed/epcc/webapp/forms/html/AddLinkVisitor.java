@@ -112,6 +112,7 @@ public class AddLinkVisitor extends AbstractContexed implements WebFormResultVis
 		if( new_tab) {
 			hb.attr("target","_blank");
 		}
+		hb.attr("rel","noopener noreferrer external");
 		hb.clean(text);
 		hb.close();
 	}

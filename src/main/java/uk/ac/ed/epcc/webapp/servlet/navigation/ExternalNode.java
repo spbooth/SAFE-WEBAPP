@@ -58,4 +58,9 @@ public class ExternalNode extends Node {
 		return "external"; // hardwire class attribute so all external links marked up the same.
 	}
 
+	@Override
+	public boolean isTrustedURL() {
+		return false;
+	}
+
 }
