@@ -306,7 +306,7 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 	}
 	@Test
 	@ConfigFixtures("required_page_heartbeat.properties")
-	/** Linited number of reminders per person
+	/** minimum time between reminders per person
 	 * 
 	 * @throws ServletException
 	 * @throws IOException
@@ -349,13 +349,13 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 	
 	@Test
 	@ConfigFixtures("required_page_heartbeat.properties")
-	/** Linited number of reminders per person
+	/** minimum time between reminders per person
 	 * 
 	 * @throws ServletException
 	 * @throws IOException
 	 * @throws DataException
 	 */
-	public void testNotifyMinWaitPass() throws ServletException, IOException, DataException{
+	public void testNotifyMinWaitElapsed() throws ServletException, IOException, DataException{
 		
 		MockTansport.clear();
 		setTime(2019, Calendar.JULY, 1, 9, 0);
@@ -375,7 +375,7 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 		person2.commit();
 		System.out.println(person2.nextRequiredUpdate());
 		
-		// mark a notification at 8 am on the same say
+		// mark a notification at 8 am on 3 days earlier
 		setTime(2020, Calendar.JUNE, 17, 8, 0);
 		max.addNotified(person1);
 		person1.commit();
