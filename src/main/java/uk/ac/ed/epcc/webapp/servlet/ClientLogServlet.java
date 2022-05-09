@@ -36,7 +36,7 @@ public class ClientLogServlet extends WebappServlet {
 				ss.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "");
 				return;
 			}
-			String input = ss.getTextParameter(ServletService.DEFAULT_PAYLOAD_PARAM);
+			String input = ss.getTextParameter(ServletService.DEFAULT_PAYLOAD_PARAM,true);
 			if( input.length() > conn.getIntegerParameter("client_log.max_message", 4096)) {
 				ss.sendError(HttpServletResponse.SC_BAD_REQUEST, "Message too long");
 				return;

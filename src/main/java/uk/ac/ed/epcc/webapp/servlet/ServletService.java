@@ -114,12 +114,15 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	
 	/** get a named paramter as a string
 	 * 
-	 * This should include conversion f uplaoded files etc.
+	 * This should include conversion of uploaded files etc.
 	 * 
 	 * @param name
 	 * @return
 	 */
 	default public String getTextParameter(String name) {
+		return getTextParameter(name,false);
+	}
+	default public String getTextParameter(String name,boolean ignore_mime) {
 		Object o = getParams().get(name);
 		if( o == null ) {
 			return null;
@@ -129,7 +132,7 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 		}
 		if( o instanceof MimeStreamData) {
 			MimeStreamData msd= (MimeStreamData) o;
-			if( msd.getContentType().contains("text")) {
+			if( ignore_mime || msd.getContentType().contains("text")) {
 				ByteArrayOutputStream stream = new ByteArrayOutputStream();
 				try {
 					msd.write(stream);
