@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
@@ -40,6 +41,7 @@ public abstract class LinkHistoryManagerTestCase<L extends LinkHistoryHandler> e
 
 	@SuppressWarnings("unchecked")
 	@Test
+	@Ignore
 	public void testhasChanged() throws IllegalArgumentException, DataException{
 		L fac = makeFactory();
 		LinkManager<?,?,?> lm = (LinkManager) fac.getLinkManager();
