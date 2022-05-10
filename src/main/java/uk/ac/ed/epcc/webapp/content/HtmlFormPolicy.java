@@ -218,7 +218,7 @@ public  <I,T> void addFormInput(ExtendedXMLBuilder sb,AppContext conn,Field<I> f
 		sb.clean(((PrefixInput)i).getPrefix());
 	}
 
-	EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(conn,optional,sb, use_post, post_params,f.getForm().getFormID(),f.getAttributes());
+	EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(conn,optional,sb, use_post, post_params,f.getForm().getFormID());
 	vis.setRadioTarget(item);
 	vis.setUseRequired(getUseRequired());
 	vis.setAutoFocus(f.getKey().equals(f.getForm().getAutoFocus()));

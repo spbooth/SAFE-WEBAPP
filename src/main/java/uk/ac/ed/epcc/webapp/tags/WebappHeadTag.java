@@ -38,6 +38,8 @@ import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
  */
 public class WebappHeadTag extends TagSupport implements Tag {
 	public static final Preference SCRIPT_FORMS_FEATURE = new Preference("script.forms",true,"Augment unsupported html5 inputs using javascript");
+	public static final Preference SCRIPT_TEXTBOX_FEATURE = new Preference("script.textbox_size",true,"Show progress bar for textbox with size limit");
+
 	public static final StringPreference STYLE_PREFERENCE = new StringPreference("page.style", "Web page style", "Classic","Clean","Modern");
 	/**
 	 * 
@@ -104,12 +106,21 @@ public class WebappHeadTag extends TagSupport implements Tag {
         			doScript(scripts,out,request,response,conn.expandText("${jquery.script}"));
         			doScript(scripts,out, request,response, "/scripts/menubar.js");
         		}
-        		if(SCRIPT_FORMS_FEATURE.isEnabled(conn)&& request.getAttribute(FORM_PAGE_ATTR) != null){
-        			doScript(scripts,out,request,response,conn.expandText("${jquery.script}"));
-        			doScript(scripts,out,request,response,conn.expandText("${jquery-ui.script}"));
-        			doScript(scripts,out,request,response,"/js/modernizr-custom.js");
-        			doScript(scripts,out,request,response,"/js/fixinputs.js");
+        		if( request.getAttribute(FORM_PAGE_ATTR) != null) {
+        			if(SCRIPT_FORMS_FEATURE.isEnabled(conn) ){
+            			doScript(scripts,out,request,response,conn.expandText("${jquery.script}"));
+            			doScript(scripts,out,request,response,conn.expandText("${jquery-ui.script}"));
+            			// modernizr inlined to fixinputs
+            			//doScript(scripts,out,request,response,"/js/modernizr-custom.js");
+            			doScript(scripts,out,request,response,"/js/fixinputs.js");
+            		}
+        			if( SCRIPT_TEXTBOX_FEATURE.isEnabled(conn)) {
+        				doScript(scripts,out,request,response,conn.expandText("${jquery.script}"));
+            			doScript(scripts,out,request,response,"/js/textbox.js");
+        			}
         		}
+        		
+        		
         		if( request_script != null  ){
         			// allow escaped commas in in-line scripts
         			for(String script : request_script){

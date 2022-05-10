@@ -56,7 +56,7 @@ div.banner {
 	padding: 5px;
 }
 div.banner div.link {
-	font-size-adjust: -1;
+/*	font-size-adjust: -1; */
 	display: inline;
 	margin: 5px;
 }

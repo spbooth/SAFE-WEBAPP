@@ -15,7 +15,6 @@ package uk.ac.ed.epcc.webapp.forms.html;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
@@ -25,28 +24,7 @@ import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlFormPolicy;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-import uk.ac.ed.epcc.webapp.forms.inputs.AutoComplete;
-import uk.ac.ed.epcc.webapp.forms.inputs.BinaryInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
-import uk.ac.ed.epcc.webapp.forms.inputs.LengthInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.LockedInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.MultipleInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.ParseMultiInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.PasswordInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.PatternInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.PreSelectInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.RangedInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.UnitInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.UnmodifiableInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.WrappedInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.timer.TimeClosable;
@@ -71,27 +49,20 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 	private boolean locked_as_hidden=false;
 	private boolean optional=false;
 	private Map post_params;
-	private Map<String,String> data_attr;
+	
 	private InputIdVisitor id_vis;
 	private Object radio_selector=null;
 	private boolean auto_focus=false;
-	public EmitHtmlInputVisitor(AppContext conn,boolean optional,ExtendedXMLBuilder hb, boolean use_post, Map post_params,String prefix,Map<String,String> data_attr){
+	public EmitHtmlInputVisitor(AppContext conn,boolean optional,ExtendedXMLBuilder hb, boolean use_post, Map post_params,String prefix){
 		super(conn);
 		this.optional=optional;
 		this.hb=hb;
 		this.use_post=use_post;
 		this.post_params=post_params;
 		this.id_vis = new InputIdVisitor(conn,optional,prefix);
-		this.data_attr=data_attr;
 		use_html5 = conn==null || USE_HTML5_FEATURE.isEnabled(conn);
 	}
-	private void addDataAttr(SimpleXMLBuilder hb) {
-		if( data_attr != null) {
-			for(Entry<String, String> e : data_attr.entrySet()) {
-				hb.attr("data-"+e.getKey().toLowerCase(), e.getValue());
-			}
-		}
-	}
+	
 	
 	private void constantHTML(SimpleXMLBuilder hb,UnmodifiableInput input) {
 		String label = input.getLabel();
@@ -148,7 +119,6 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		if( checked != null){
 		  hb.attr(checked,null);
 		}
-		addDataAttr(hb);
 		hb.addClass("input");
 		hb.close();
 
@@ -395,7 +365,6 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			hb.attr("id",id);
 		}
 		hb.attr("name",input.getKey());
-		addDataAttr(hb);
 		hb.attr("value", tag );
 		if (def != null && def.equals(tag)) {
 			hb.attr("checked",null);
@@ -660,8 +629,10 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			if (default_value != null && default_value.length() > 0) {
 				result.attr("value",default_value);
 			}
-			addDataAttr(result);
+
+			
 			result.addClass("input");
+			
 			if (use_datalist) {
 				// add list attribute
 				result.attr("list", name + "_list");
@@ -716,7 +687,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			
 			if (autocomplete) {
 				if (use_html5) {
-					emitDataList(result, use_datalist,(AutoComplete) input, name);
+					emitDataList(result, use_datalist,(AutoComplete) input, name,false);
 				}
 			}
 		} else {
@@ -767,7 +738,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 	 * @param input
 	 * @param name
 	 */
-	private <T,V> void emitDataList(SimpleXMLBuilder result, boolean use_datalist, AutoComplete<T,V> input, String name) {
+	private <T,V> void emitDataList(SimpleXMLBuilder result, boolean use_datalist, AutoComplete<T,V> input, String name,boolean wrap) {
 		// add actual list of completions
 		
 		// can't put in noscritp as some browsers show all noscript contents as text.
@@ -780,14 +751,15 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		// As susggested in the HTML standard if the datalist element is
 		// not recognised can use a select with the same input name as the text input
 		// if datalist is recognised then select element will have no effect
+		if( wrap ) {
 		result.open("select");
 		result.attr("name", name);
-		
-		// Must have a not selected first entry
-		result.open("option");
-		result.attr("value", "");
-		result.clean("Not selected");
-		result.close();
+			// Must have a not selected first entry
+			result.open("option");
+			result.attr("value", "");
+			result.clean("Not selected");
+			result.close();
+		}
 		Set<T> suggestions = input.getSuggestions();
 		if(suggestions!=null){
 			for(T item : suggestions){
@@ -804,7 +776,9 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				}
 			}
 		}
-		result.close(); // select
+		if( wrap ) {
+			result.close(); // select
+		}
 		if( use_datalist){
 			result.close(); // datalist
 		}
