@@ -247,6 +247,10 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				String tag = input.getTagByItem(current);
 				hb.open("option");
 				hb.attr("value", tag );
+				String hover = input.getTooltip(current);
+				if( hover != null ) {
+					hb.attr("title", hover);
+				}
 				if ((def != null && def.equals(tag)) || forced) {
 					hb.attr("selected",null);
 					seen_selected=true;

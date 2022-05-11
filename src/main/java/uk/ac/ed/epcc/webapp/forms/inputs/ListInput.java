@@ -87,5 +87,12 @@ public abstract interface ListInput<V,T> extends  SuggestedItemInput<V,T> {
 	public default String getGroup(T item) {
 		return null;
 	}
-
+	/** optionally generate hover text for an item.
+	 * 
+	 * @param item
+	 * @return
+	 */
+	public default String getTooltip(T item) {
+		return null;
+	}
 }
