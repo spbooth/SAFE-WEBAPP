@@ -209,7 +209,12 @@ public final class AppContext {
 	 * 
 	 */
 	public synchronized void close()  {
-		
+		AppContext lc = getContext();
+		if( lc != null && lc == this) {
+			// Don't want to rely on this but make sure a closing context
+			// is removed from the thread
+			clearContext();
+		}
 		// Don't want to re-populate 
 		disable_service_creation=true;
 		

@@ -170,6 +170,7 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 			config.getServletContext().log("Error checking for heartbeat-thread", t);
 		}finally {
 			if( conn != null ) {
+				AppContext.clearContext();
 				conn.close();
 			}
 		}
@@ -198,7 +199,8 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 				config.getServletContext().log("Error in Runner", e);
 			}finally {
 				if( conn != null ) {
-					conn.close();
+					AppContext.clearContext();
+					conn.close();	
 				}
 			}
 

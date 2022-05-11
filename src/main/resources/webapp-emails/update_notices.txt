@@ -18,7 +18,7 @@ The following actions will be taken if the required updates are not made:
 %%end{automatic_actions}%%
 %%begin{Verification}%%
 
-We appreciate that automated emails like this can appear suspicious,
+We appreciate that automated emails like this can appear suspicious.
 The following information is provided to help verify that this is a genuine
 request:
 %%person.verifications%%

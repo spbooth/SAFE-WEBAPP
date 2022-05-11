@@ -44,6 +44,8 @@ public class ErrorFilterTest {
 		
 		String value = conn.getInitParameter("test.value");
 		assertEquals("hello", value);
+		AppContext.clearContext();
+		conn.close();
 	}
 	
 	@Test

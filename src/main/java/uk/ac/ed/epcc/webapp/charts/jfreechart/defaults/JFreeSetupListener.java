@@ -43,6 +43,7 @@ public class JFreeSetupListener extends WebappContextListener {
 			JFreeSetup.setup(null);
 		}finally {
 			if( conn != null) {
+				AppContext.clearContext();
 				conn.close();
 			}
 		}

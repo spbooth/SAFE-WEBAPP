@@ -49,6 +49,7 @@ public class LogServiceWebappContextListener extends WebappContextListener {
 			arg0.getServletContext().log("Error starting logging WebappContextListener",t);
 		}finally {
 			if( conn != null) {
+				AppContext.clearContext();
 				conn.close();
 			}
 		}
@@ -73,6 +74,7 @@ public class LogServiceWebappContextListener extends WebappContextListener {
 			arg0.getServletContext().log("Error starting logging WebappContextListener",t);
 		}finally {
 			if( conn != null) {
+				AppContext.clearContext();
 				conn.close();
 			}
 		}
