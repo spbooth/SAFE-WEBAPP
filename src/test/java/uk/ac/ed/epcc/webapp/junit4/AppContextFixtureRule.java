@@ -56,6 +56,7 @@ public class AppContextFixtureRule extends ExternalResource{
 	AppContext ctx;
 	@Override
 	protected void after() {
+		AppContext.clearContext();
 		CleanupService serv = ctx.getService(CleanupService.class);
 		if( serv != null ){
 			serv.reset(); // don't run cleanups
@@ -146,6 +147,7 @@ public class AppContextFixtureRule extends ExternalResource{
 		if( ErrorFilter.TIMER_FEATURE.isEnabled(ctx)) {
 			ctx.setService(new DefaultTimerService(ctx));
 		}
+		AppContext.setContext(ctx);
 		holder.setContext(ctx);
 	}
 	public Statement apply(Statement base, Description description) {
