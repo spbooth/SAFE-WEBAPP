@@ -37,10 +37,14 @@ public class EditMessageVisitor extends ContentMessageVisitor {
 	private boolean edit_recipients=false;
 	private boolean edit_reply_to=false;
 	private boolean allow_new_attachments=false;
+	private boolean edit_cc_only=false;
 	
 
 	public void editRecipients(boolean val){
 		edit_recipients=val;
+	}
+	public void editCCOnly(boolean val){
+		edit_cc_only=val;
 	}
 	public void editReplyTo(boolean val) {
 		edit_reply_to=val;
@@ -247,7 +251,7 @@ public class EditMessageVisitor extends ContentMessageVisitor {
 	@Override
 	public void doTo(Address recipients, int i, int len,MessageWalker w) throws WalkerException {
 		
-		if( len > 1 && ! w.isSubMessage() && edit_recipients){
+		if( len > 1 && ! w.isSubMessage() && edit_recipients && ! edit_cc_only){
 			sb=sb.getHeading(4);
 			addButton(w,EditAction.Delete, "Delete recipient");
 			ExtendedXMLBuilder text = sb.getText();
@@ -261,7 +265,7 @@ public class EditMessageVisitor extends ContentMessageVisitor {
 	}
 	@Override
 	public void doTo(Address[] recipients, MessageWalker w) {
-		if( w.isSubMessage() ||  ! edit_recipients){
+		if( w.isSubMessage() ||  (! edit_recipients) || edit_cc_only){
 		   super.doTo(recipients, w);
 		   return;
 		}

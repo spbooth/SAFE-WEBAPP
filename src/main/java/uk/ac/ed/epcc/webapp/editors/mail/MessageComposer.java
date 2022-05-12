@@ -85,4 +85,11 @@ public interface MessageComposer extends MessageHandler{
 	default public boolean editReplyTo() {
 		return false;
 	}
+	/** Should recipient editing only allow the CC recipients to be changed.
+	 * This has no impact if {@link #editRecipients()} returns false
+	 * @return
+	 */
+	default public boolean editCCOnly() {
+		return false;
+	}
 }

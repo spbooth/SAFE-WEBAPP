@@ -17,11 +17,7 @@ import javax.servlet.ServletException;
 
 import org.junit.Before;
 
-import uk.ac.ed.epcc.webapp.forms.MapForm;
-import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
-import uk.ac.ed.epcc.webapp.session.AppUserFactory;
-import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /**
  * @author spb

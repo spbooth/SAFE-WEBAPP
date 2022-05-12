@@ -270,7 +270,9 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 			f.addInput(DATA_FORM_FIELD, "Recipient Email", ((MessageComposer)target.getHandler()).getEmailInput());
 			if( messageProvider == null || ! composer.bccOnly()) {
 				f.addAction(EditAction.AddCC.toString(), new EditFormAction(target, EditAction.AddCC));
-				f.addAction(EditAction.AddTo.toString(), new EditFormAction(target, EditAction.AddTo));
+				if( ! composer.editCCOnly()) {
+					f.addAction(EditAction.AddTo.toString(), new EditFormAction(target, EditAction.AddTo));
+				}
 			}
 			f.addAction(EditAction.AddBcc.toString(), new EditFormAction(target, EditAction.AddBcc));
 		}
