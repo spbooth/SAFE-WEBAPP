@@ -53,7 +53,15 @@ public class RegisterServletTest extends AbstractRegisterServletTest {
 		assertEquals(1,MockTansport.nSent());
 	}
 
-	
+	@Test
+	@DataBaseFixtures("signup.xml")
+	public void testRegisterSecondTime() throws Exception{
+		MockTansport.clear();
+		takeBaseline();
+		addParam(EmailNameFinder.EMAIL, "thing@example.com");
+		doPost();
+		checkError("/signup.jsp", EmailNameFinder.EMAIL, "Already in use");
+	}
 	@ConfigFixtures("/extauth.properties")
 	@Test
 	public void testExtAuthRegister() throws ConsistencyError, Exception{
