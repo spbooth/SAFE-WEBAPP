@@ -34,6 +34,7 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
     private final NumberFormat nf;
     private boolean table_sections=false;
     private boolean add_scope=false;
+  
     private String style;
     public TableXMLFormatter(SimpleXMLBuilder builder,NumberFormat nf,String style){
     	this.hb=builder;
@@ -49,6 +50,7 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
     public void setUseScope(boolean val) {
     	add_scope=val;
     }
+    
     /* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.TableFormatPolicy#add(uk.ac.ed.epcc.webapp.content.Table)
 	 */
@@ -66,78 +68,161 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
     		hb.attr("id", id);
     	}
 		hb.clean("\n");
+		int nrow=0;
 		if(t.isPrintHeadings()){
 			if(table_sections){
 				hb.open("thead");
 				hb.clean("\n");
 			}
-			hb.open( "tr", new String[][]{
-					{"count","0"}
-			});
-
-			int col=0;
-			boolean first_col=true;
-			if (t.printKeys()) {
-				hb.open("th",new String[][]{
-						{"class","key"},
-						{"count",Integer.toString(col++)}
+			if(t.printGroups()) {
+				
+				hb.open( "tr", new String[][]{
+					{"count",Integer.toString(nrow++)}
 				});
-				if( add_scope) {
-					hb.attr("scope","col" );
-				}
-				hb.clean( t.getKeyName());
-				hb.close();
-				first_col=false;
-			}
-
-			for (C key : t.getColumNames()) {
-				if( first_col ){
+				int col=0;
+				boolean first_col=true;
+				if (t.printKeys()) {
 					hb.open("th",new String[][]{
-							{"class","first"},
-							{"count",Integer.toString(col++)}
+						{"class","key"},
+						{"count",Integer.toString(col)},
+						{"rowspan","2"}
 					});
 					if( add_scope) {
 						hb.attr("scope","col" );
 					}
-					if( key instanceof XMLGenerator){
-						((XMLGenerator)key).addContent(hb);
-					}else{
-						hb.clean(t.getCol(key).getName());
+					hb.clean( t.getKeyName());
+					hb.close();
+					col++;
+					first_col=false;
+				}
+				C prev_group = null;
+				int span=0;
+				for (C key : t.getColumNames()) {
+					C group = t.getGroup(key);
+					if( prev_group != null && ! prev_group.equals(group)) {
+						// output previous group
+						addTh(t,prev_group,col,first_col,1,span);
+						col+=span;
+						span=0;
 					}
+					if( group == null ) {
+						// no group show as 2 row
+						addTh(t, key, col, first_col, 2,1);
+						first_col=false;
+						col++;
+					}else {
+						// we have group
+						span++;
+					}
+					prev_group = group;
+				}
+				if( prev_group != null ) {
+					// output previous group
+					addTh(t,prev_group,col,first_col,1,span);
+					col+=span;
+					span=0;
+				}
+				hb.close();
+				hb.clean("\n");
+				hb.open( "tr", new String[][]{
+					{"count",Integer.toString(nrow++)}
+				});
+				first_col=true;
+				col=0;
+				if (t.printKeys()) {
+					first_col=false;
+					col++;
+				}
+				
+				for (C key : t.getColumNames()) {
+					C group = t.getGroup(key);
+					if( group != null ) {
+						// only add elements with a group
+						// all others had a rowspan.
+						addTh(t, key, col, first_col, 1,1);
+						
+					}
+					first_col=false;
+					col++;
+				}
+				
+				hb.close();
+				hb.clean("\n");
+			}else {
+				hb.open( "tr", new String[][]{
+					{"count",Integer.toString(nrow++)}
+				});
 
+				int col=0;
+				boolean first_col=true;
+				if (t.printKeys()) {
+					hb.open("th",new String[][]{
+						{"class","key"},
+						{"count",Integer.toString(col++)}
+					});
+					if( add_scope) {
+						hb.attr("scope","col" );
+					}
+					hb.clean( t.getKeyName());
 					hb.close();
 					first_col=false;
-				}else{
-					hb.open("th",new String[][]{
-							{"class","main"},
-							{"count",Integer.toString(col++)}
-					});
-					if( key instanceof XMLGenerator){
-						((XMLGenerator)key).addContent(hb);
-					}else{
-						hb.clean(t.getCol(key).getName());
-					}
-					hb.close();
 				}
+
+				for (C key : t.getColumNames()) {
+					addTh(t, key, col, first_col,1,1);
+					col++;
+					first_col=false;
+				}
+				hb.close();
+				hb.clean("\n");
 			}
-			hb.close();
-			hb.clean("\n");
+			
 			if( table_sections){
 				hb.close();
 				hb.clean("\n");
 			}
 		}
-		addBody(t);
+		addBody(nrow,t);
 		hb.close();
 		hb.clean("\n");
 		
+    }
+    protected void addTh(Table<C, R> t, C key, int col, boolean first_col,int row_span,int col_span) {
+
+    	hb.open("th",new String[][]{
+    		{"class",first_col ? "first" : "main"},
+    		{"count",Integer.toString(col)}
+    	});
+    	if( row_span > 1) {
+    		hb.attr("rowspan",Integer.toString(row_span));
+    	}
+    	if( col_span > 1) {
+    		hb.attr("colspan",Integer.toString(col_span));
+    	}
+    	if( add_scope) {
+    		hb.attr("scope","col" );
+    	}
+    	if( key instanceof XMLGenerator){
+    		((XMLGenerator)key).addContent(hb);
+    	}else{
+    		if( t.containsCol(key)) {
+    			// this is a normal column
+    			hb.clean(t.getCol(key).getName());
+    		}else {
+    			// a group
+    			hb.addObject(key);
+    		}
+    		
+    	}
+
+    	hb.close();
+
     }
 
 	public final String getTableTag() {
 		return style;
 	}
-    public  void addBody(Table<C,R> t){
-		int nrow=1; // after header
+    public  void addBody(int nrow,Table<C,R> t){
 		if( table_sections){
 			hb.open("tbody");
 			hb.clean("\n");

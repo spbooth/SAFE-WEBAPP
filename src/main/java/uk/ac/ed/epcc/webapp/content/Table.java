@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
+import java.util.function.Function;
 
 import uk.ac.ed.epcc.webapp.EmptyIterable;
 import uk.ac.ed.epcc.webapp.Indexed;
@@ -46,13 +47,18 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
  * A generic representation of a table that we can easily change into html/xml
  * or other text.
  * 
- * Table can be sparse and is essentially a Hashtable of Hashtables. Entries can
+ * Table can be sparse and is essentially a Map of Maps. Entries can
  * be any type of object The table class maintains a list of keys determining
  * the order which rows/cols are presented. by default this reflects the order
  * the elements were added to the table. but there are special functions for
  * handling subclasses of Number (summing cols/rows etc). Summary lines like
- * totals can be inserted as Strings to prevent them being inluded in futher
+ * totals can be inserted as Strings to prevent them being included in further
  * summation etc.
+ * 
+ * Columns can be arranged in groups (groups use the same key type columns and must not
+ * duplicate any of the keys used by the columns). Formatting instructions can be applied
+ * to all columns in the group. The columns of a group can be packed together. It is also possible to
+ * show the groups as an additional table header row.
  * 
  * @author spb
  * @param <C> type (or common supertype) of column keys
@@ -62,7 +68,10 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 public class Table<C, R> {
 
 	/**
-	 * A column of the table
+	 * A column of the table.
+	 * 
+	 * Optionally a name may be specified for the column that is used in formatting rather than
+	 * the column key. Unlike the key column names do not need to be unique.
 	 * 
 	 * @see Table
 	 * @author spb
@@ -71,7 +80,7 @@ public class Table<C, R> {
 	public class Col {
 		private Map<R, Object> data;
 
-		private String name; // name to be used when printing
+		private String name; // optional name to be used when printing
 		private final C col_key;
 		private Table.Formatter<C, R> format = null;
 		private Map<String, String> attr = null; // XML attributes to apply to
@@ -133,6 +142,14 @@ public class Table<C, R> {
 		 * @param other
 		 */
 		public void combine(Operator op,Col other){
+			combineData(op,other);
+			if (format == null) {
+				// pick up side effects.
+				setFormat(other.format);
+			}
+			
+		}
+		public void combineData(Operator op,Table<?,R>.Col other){
 			for(R row : other.data.keySet()){
 				Object val = other.get(row);
 				// Only add a value if there is one, Hashtable doesn't like
@@ -146,10 +163,6 @@ public class Table<C, R> {
 					}
 
 				}
-			}
-			if (format == null) {
-				// pick up side effects.
-				setFormat(other.format);
 			}
 			
 		}
@@ -516,9 +529,19 @@ public class Table<C, R> {
 			}
 			return result;
 		}
+		/** Do we want duplicated values to be shown as a single merged cell.
+		 * This is a formatting hint and may be ignored.
+		 * 
+		 * @return
+		 */
 		public boolean isDedup() {
 			return dedup;
 		}
+		/** Request that duplicated values be shown as a single merged cell.
+		 * This is a formatting hint and may be ignored.
+		 * 
+		 * @param dedup
+		 */
 		public void setDedup(boolean dedup) {
 			this.dedup = dedup;
 		}
@@ -725,6 +748,7 @@ public class Table<C, R> {
 	 * 
 	 */
 	private Map<C,Set<C>> column_groups = null;
+	private Map<C,C> key_to_group = null;
 
 	// printed with this as the col header
 
@@ -739,6 +763,7 @@ public class Table<C, R> {
 	private Set<R> highlight = null;
 	private boolean type_debug = false;
 	private boolean printHeadings = true;
+	private boolean printGroups = false;
 	private String id;
 	public Table() {
 		cols = new HashMap<>();
@@ -781,7 +806,7 @@ public class Table<C, R> {
 			put(my_col_key,row_key,t.get(col_key,my_col_key ));
 		}
 	}
-	/** Add contents of existing table 
+	/** Add contents of on existing table 
 	 * 
 	 * @param t
 	 */
@@ -791,12 +816,31 @@ public class Table<C, R> {
 			Col c = getCol(col);
 			Col src = t.getCol(col);
 			c.combine(Operator.ADD,src);
-			
-			
+		}
+	}
+	/** Add the contents from a donor table transforming the column keys
+	 * optionally the imported columns are added to a column group
+	 * 
+	 * @param <X> Column type of donor table.
+	 * @param t
+	 * @param transform
+	 * @param col_group
+	 * @throws InvalidArgument 
+	 */
+	public <X> void addTable( Function<X,C> transform, Table<X,R> t, C col_group ) throws InvalidArgument {
+		addRows(t);
+		for (X col : t.col_keys) {
+			C dest = transform.apply(col);
+			Col c = getCol(dest);
+			Table<X,R>.Col src = t.getCol(col);
+			c.combineData(Operator.ADD, src);
+			if( col_group != null ) {
+				addToGroup(col_group, dest);
+			}
 		}
 	}
 
-	/** Add contents from donor table transforming the keys
+	/** Add contents from donor table transforming the row keys
 	 * 
 	 * @param key_transform {@link Transform} to map donor rows to local rows
 	 * @param table
@@ -855,7 +899,7 @@ public class Table<C, R> {
 	/** Add rows (including formatting) from a table. 
 	 * @param t
 	 */
-	public void addRows(Table<C, R> t) {
+	public <X> void addRows(Table<X, R> t) {
 		for (R row : t.row_keys) {
 			if (row_keys != null) {
 				if (!row_keys.contains(row)) {
@@ -1600,7 +1644,15 @@ public class Table<C, R> {
 	public boolean printKeys() {
 		return keyName != null && keyName.trim().length() > 0;
 	}
-
+	/** Should column groups be shown as an additional level of column headers
+	 * 
+	 * @return
+	 */
+	public boolean printGroups() {
+		return column_groups != null && ! column_groups.isEmpty() && printGroups;
+	}
+	
+	
 	public Object put(C col_key, R row_key, Object value) {
 		Object ret = null;
 		Col col = getCol(col_key);
@@ -1804,6 +1856,9 @@ public class Table<C, R> {
 		this.printHeadings = printHeadings;
 	}
 
+	public void setPrintGroups(boolean printGroups) {
+		this.printGroups=printGroups;
+	}
 	/**
 	 * set row to specified position
 	 * 
@@ -2026,13 +2081,34 @@ public class Table<C, R> {
 			remove.clear();
 		}
 	}
+	public C getGroup(C col) {
+		if( key_to_group != null) {
+			return key_to_group.get(col);
+		}
+		return null;
+	}
+	/** Add a column to a column-group
+	 * 
+	 * @param group
+	 * @param col
+	 * @throws InvalidArgument
+	 */
 	public void addToGroup(C group, C col) throws InvalidArgument {
 		if( cols.containsKey(group) ) {
 			throw new InvalidArgument("Bad group "+group.toString());
 		}
 		if( column_groups == null) {
 			column_groups= new HashMap<>();
+			key_to_group = new HashMap<>();
 		}
+		C old_group = key_to_group.get(col);
+		if( old_group != null) {
+			Set<C> old_g = column_groups.get(old_group);
+			if( old_g != null) {
+				old_g.remove(col);
+			}
+		}
+		key_to_group.put(col, group);
 		Set<C> g = column_groups.get(group);
 		if( g == null ) {
 			g = new LinkedHashSet<>();
@@ -2043,6 +2119,11 @@ public class Table<C, R> {
 		}
 		g.add(col);
 	}
+	/** Get the columns belonging to a column groun
+	 * 
+	 * @param name  key for the column group
+	 * @return
+	 */
 	public Iterable<C> getColumnGroup(C name){
 		if( column_groups == null) {
 			return new EmptyIterable<>();
