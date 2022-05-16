@@ -29,7 +29,7 @@ public enum ErrorCodes {
 	invalid_token {
 		@Override
 		public int getCode() {
-			return HttpServletResponse.SC_UNAUTHORIZED;
+			return HttpServletResponse.SC_FORBIDDEN;
 		}
 	},
 	insufficient_scope {
