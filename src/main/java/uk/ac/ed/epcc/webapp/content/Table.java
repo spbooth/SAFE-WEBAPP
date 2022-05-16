@@ -141,12 +141,7 @@ public class Table<C, R> {
 		 * 
 		 * @param other
 		 */
-		public void combine(Operator op,Col other){
-			combineData(op,other);
-			mergeFormatting(other);
-			
-		}
-		public void combineData(Operator op,Table<?,R>.Col other){
+		public void combine(Operator op,Table<?,R>.Col other){
 			for(R row : other.data.keySet()){
 				Object val = other.get(row);
 				// Only add a value if there is one, Hashtable doesn't like
@@ -161,8 +156,9 @@ public class Table<C, R> {
 
 				}
 			}
-			
+			mergeFormatting(other);
 		}
+		
 		/** merge contents of a different col
 		 * 
 		 * @param other
@@ -184,10 +180,12 @@ public class Table<C, R> {
 		 * 
 		 * @param other
 		 */
-		public void mergeFormatting(Col other) {
+		public void mergeFormatting(Table<?,?>.Col other) {
 			if (format == null) {
-				// pick up side effects.
-				setFormat(other.format);
+				if( other.format != null && other.format instanceof TransformFormatter) {
+					TransformFormatter tf = (TransformFormatter) other.format;
+					setFormat(tf.getTransform());
+				}
 			}
 			mergeName(other);
 		}
@@ -196,7 +194,7 @@ public class Table<C, R> {
 		 * 
 		 * @param other
 		 */
-		public <X,Y> void mergeName(Table<X,Y>.Col other) {
+		public void mergeName(Table<?,?>.Col other) {
 			if( name == null ) {
 				setName(other.name);
 			}
@@ -599,6 +597,9 @@ public class Table<C, R> {
 	 * 
 	 * Note this also dereferences the table so it may also use the key values
 	 * or other table cells when generating the result.
+	 * 
+	 * If a Formatter only acts on the actual values it should probably be A {@link Transform}
+	 * which can be embedded in a {@link TransformFormatter}
 	 * 
 	 * Note a Formatter can customise XML or UI generation by returning an
 	 * object that implements either {@link XMLGenerator} or {@link UIGenerator}

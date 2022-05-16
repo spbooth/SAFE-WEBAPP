@@ -27,18 +27,13 @@ package uk.ac.ed.epcc.webapp.content;
  */
 
 
-public class HTMLTransform <C,R> extends Object implements Table.Formatter<C,R> {
+public class HTMLTransform extends Object implements Transform {
 
-	public Object convert(Object old) {
-		return old;
-	}
-
-	
-
-	public Object convert(Table<C, R> t, C col, R row, Object raw) {
+	public Object convert(Object raw) {
 		if( raw instanceof String){
 			return new HtmlSpaceGenerator((String)raw);
 		}
 		return raw;
 	}
+
 }
