@@ -143,10 +143,7 @@ public class Table<C, R> {
 		 */
 		public void combine(Operator op,Col other){
 			combineData(op,other);
-			if (format == null) {
-				// pick up side effects.
-				setFormat(other.format);
-			}
+			mergeFormatting(other);
 			
 		}
 		public void combineData(Operator op,Table<?,R>.Col other){
@@ -179,11 +176,30 @@ public class Table<C, R> {
 						put(row, val);
 				}
 			}	
+			mergeFormatting(other);
+			
+		}
+		/** merge name and format from donor table
+		 * unless this is already set locally
+		 * 
+		 * @param other
+		 */
+		public void mergeFormatting(Col other) {
 			if (format == null) {
 				// pick up side effects.
 				setFormat(other.format);
 			}
-			
+			mergeName(other);
+		}
+		/** merge name  from donor table
+		 * unless this is already set locally
+		 * 
+		 * @param other
+		 */
+		public <X,Y> void mergeName(Table<X,Y>.Col other) {
+			if( name == null ) {
+				setName(other.name);
+			}
 		}
 
 		/**
@@ -818,27 +834,7 @@ public class Table<C, R> {
 			c.combine(Operator.ADD,src);
 		}
 	}
-	/** Add the contents from a donor table transforming the column keys
-	 * optionally the imported columns are added to a column group
-	 * 
-	 * @param <X> Column type of donor table.
-	 * @param t
-	 * @param transform
-	 * @param col_group
-	 * @throws InvalidArgument 
-	 */
-	public <X> void addTable( Function<X,C> transform, Table<X,R> t, C col_group ) throws InvalidArgument {
-		addRows(t);
-		for (X col : t.col_keys) {
-			C dest = transform.apply(col);
-			Col c = getCol(dest);
-			Table<X,R>.Col src = t.getCol(col);
-			c.combineData(Operator.ADD, src);
-			if( col_group != null ) {
-				addToGroup(col_group, dest);
-			}
-		}
-	}
+	
 
 	/** Add contents from donor table transforming the row keys
 	 * 
