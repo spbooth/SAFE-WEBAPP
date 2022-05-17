@@ -34,6 +34,7 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
     private final NumberFormat nf;
     private boolean table_sections=false;
     private boolean add_scope=false;
+    private boolean allow_span=true;
   
     private String style;
     public TableXMLFormatter(SimpleXMLBuilder builder,NumberFormat nf,String style){
@@ -49,6 +50,9 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
     }
     public void setUseScope(boolean val) {
     	add_scope=val;
+    }
+    public void setAllowSpan(boolean val) {
+    	allow_span=val;
     }
     
     /* (non-Javadoc)
@@ -84,9 +88,11 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 				if (t.printKeys()) {
 					hb.open("th",new String[][]{
 						{"class","key"},
-						{"count",Integer.toString(col)},
-						{"rowspan","2"}
+						{"count",Integer.toString(col)}
 					});
+					if( allow_span ) {
+						hb.attr("rowspan", "2");
+					}
 					if( add_scope) {
 						hb.attr("scope","col" );
 					}
@@ -95,32 +101,45 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 					col++;
 					first_col=false;
 				}
-				C prev_group = null;
-				int span=0;
-				for (C key : t.getColumNames()) {
-					C group = t.getGroup(key);
-					if( prev_group != null && ! prev_group.equals(group)) {
+				if( allow_span ) {
+					C prev_group = null;
+					int span=0;
+					for (C key : t.getColumNames()) {
+						C group = t.getGroup(key);
+						if( prev_group != null && ! prev_group.equals(group)) {
+							// output previous group
+							addTh(t,prev_group,col,first_col,1,span);
+							col+=span;
+							span=0;
+						}
+						if( group == null  ) {
+							// no group show as 2 row
+							addTh(t, key, col, first_col, 2,1);
+							first_col=false;
+							col++;
+						}else {
+							// we have group
+							span++;
+						}
+						prev_group = group;
+					}
+					if( prev_group != null  ) {
 						// output previous group
 						addTh(t,prev_group,col,first_col,1,span);
 						col+=span;
 						span=0;
 					}
-					if( group == null ) {
-						// no group show as 2 row
-						addTh(t, key, col, first_col, 2,1);
+				}else {
+					for (C key : t.getColumNames()) {
+						C group = t.getGroup(key);
+						if( group == null ) {
+							addTh(t,key,col,first_col,1,1);
+						}else {
+							addTh(t,group,col,first_col,1,1);
+						}
 						first_col=false;
 						col++;
-					}else {
-						// we have group
-						span++;
 					}
-					prev_group = group;
-				}
-				if( prev_group != null ) {
-					// output previous group
-					addTh(t,prev_group,col,first_col,1,span);
-					col+=span;
-					span=0;
 				}
 				hb.close();
 				hb.clean("\n");
@@ -130,13 +149,19 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 				first_col=true;
 				col=0;
 				if (t.printKeys()) {
+					if( ! allow_span ) {
+						hb.open("th",new String[][]{
+							{"class","key"},
+							{"count",Integer.toString(col)}
+						});
+					}
 					first_col=false;
 					col++;
 				}
 				
 				for (C key : t.getColumNames()) {
 					C group = t.getGroup(key);
-					if( group != null ) {
+					if( group != null || ! allow_span) {
 						// only add elements with a group
 						// all others had a rowspan.
 						addTh(t, key, col, first_col, 1,1);
@@ -207,7 +232,12 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
     	}else{
     		if( t.containsCol(key)) {
     			// this is a normal column
-    			hb.clean(t.getCol(key).getName());
+    			String text = t.getCol(key).getName();
+    			if( text != null) {
+    				hb.clean(text);
+    			}else {
+    				hb.addObject(key);
+    			}
     		}else {
     			// a group
     			hb.addObject(key);
@@ -258,7 +288,7 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 					String dc=null;
 					int cols=0;
 					
-					if( n instanceof MultiColumn && hb instanceof HtmlPrinter) {
+					if( n instanceof MultiColumn && hb instanceof HtmlPrinter && allow_span) {
 						cols = ((MultiColumn) n).getColumns();
 						if( cols > 1 ) {
 							
@@ -267,7 +297,7 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
 						dc = ((MultiColumn) n).getDisplayClass();
 						
 					}
-					if( column.isDedup()) {
+					if( column.isDedup() && allow_span) {
 						if( row_keys == null ) {
 							row_keys = new ArrayList<R>();
 							for(R row : t.getRows()) {

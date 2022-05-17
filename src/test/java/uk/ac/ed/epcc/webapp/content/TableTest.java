@@ -704,6 +704,34 @@ public class TableTest {
 				"+-----------++----+\n", s);
 	}
 	
+	@Test
+	public void testPrintKeysAndGroup() throws InvalidArgument {
+		Table<String, String> t = new Table<>();
+		t.put("col1", "row1", 100);
+		t.addToGroup("boris", "col1");
+		t.setKeyName("keys_column");
+		String s = t.toString();
+		System.out.println(s);
+		assertEquals(
+				"+-----------++----+\n"+
+				"|keys_column||col1|\n"+
+				"+-----------++----+\n"+
+				"|row1       || 100|\n"+
+				"+-----------++----+\n", s);
+		
+		t.setPrintGroups(true);
+		t.getCol("col1").setName("emu");
+		s = t.toString();
+		System.out.println(s);
+		assertEquals(
+				  "+-----------++-----+\n"
+				+ "|           ||boris|\n"
+				+ "|keys_column||  emu|\n"
+				+ "+-----------++-----+\n"
+				+ "|row1       ||  100|\n"
+				+ "+-----------++-----+\n", s);
+	}
+	
 	/**
 	 * Tests the method {@link Table#setFormat(Transform)}.
 	 */

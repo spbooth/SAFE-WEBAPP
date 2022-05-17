@@ -21,20 +21,7 @@
 package uk.ac.ed.epcc.webapp.content;
 
 import java.text.NumberFormat;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Vector;
-import java.util.function.Function;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.EmptyIterable;
 import uk.ac.ed.epcc.webapp.Indexed;
