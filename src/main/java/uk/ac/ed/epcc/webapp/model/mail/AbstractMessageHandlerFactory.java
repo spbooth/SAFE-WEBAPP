@@ -189,7 +189,7 @@ public abstract class AbstractMessageHandlerFactory<H extends AbstractMessageHan
 		public FormResult send(SessionService<?> operator) throws Exception {
 			MimeMessage m = getMessageProvider().getMessage();
 			m.saveChanges();
-			Emailer es = new Emailer(getContext());
+			Emailer es = Emailer.getFactory(getContext());
 			es.doSendNow(m);
 			provider.setStatus(SENT);
 			provider.commit();
@@ -201,7 +201,7 @@ public abstract class AbstractMessageHandlerFactory<H extends AbstractMessageHan
 		 */
 		@Override
 		public void repopulate(SessionService<?> operator) throws Exception {
-			Emailer es = new Emailer(getContext());
+			Emailer es = Emailer.getFactory(getContext());
 			InternetAddress from = null;
 			if( operator.haveCurrentUser()){
 				String email = operator.getCurrentPerson().getEmail();

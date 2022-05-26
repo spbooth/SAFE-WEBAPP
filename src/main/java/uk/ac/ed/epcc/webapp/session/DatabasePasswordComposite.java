@@ -778,7 +778,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 									// count as at limit and we just incremented it.
 
 									try {
-										Emailer m = new Emailer(getContext());
+										Emailer m = Emailer.getFactory(getContext());
 										m.passwordFailsExceeded(u);
 									} catch (Exception e) {
 										getLogger().error("Failed to notify of password lock", e);
@@ -853,7 +853,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	public void newPassword(T user) throws Exception {
 		Handler h = getHandler(user);	
 		
-		Emailer m = new Emailer(getContext());
+		Emailer m = Emailer.getFactory(getContext());
 		m.newPassword(user, this);
 	}
 

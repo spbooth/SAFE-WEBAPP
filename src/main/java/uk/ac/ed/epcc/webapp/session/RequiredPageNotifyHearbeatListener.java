@@ -99,7 +99,7 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
  			AppUserFactory<AU> login = sess.getLoginFactory();
  			MaxNotifyComposite<AU> max = pol.getMax();
  			int max_send = getContext().getIntegerParameter("required_page.notifications.max_batch", 50);
-			Emailer mailer = new Emailer(getContext());
+			Emailer mailer = Emailer.getFactory(getContext());
 			try(FilterResult<AU> res = login.getResult(pol.getNotifyFilter(true))) {
 				int count=0;
 				for( AU person : res) {

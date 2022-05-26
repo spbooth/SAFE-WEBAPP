@@ -42,7 +42,7 @@ public class NotifiableContentProvider<AU extends AppUser> extends AbstractConte
 		
 		Table<String, AU> tab = new Table<>();
 		try {
-			Emailer em = new Emailer(getContext());
+			Emailer em = Emailer.getFactory(getContext());
 			for(AU p : login.getResult(pol.getNotifyFilter(false))) {
 				if( pol.allow(p, false)) {
 					Set<String> notices = new LinkedHashSet<String>();

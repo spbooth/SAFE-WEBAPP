@@ -234,7 +234,7 @@ public class EmailTransitionProviderTest extends AbstractTransitionServletTest {
 		part.setFileName("hello.msg");
 		part.data.setMimeType("message/rfc822");
 		
-		Emailer mailer = new Emailer(ctx);
+		Emailer mailer = Emailer.getFactory(ctx);
 		MimeMessage m = mailer.makeBlankEmail(ctx, new String[] {"fred@example.com" }, new InternetAddress("bill@example.com"),true, "A test email");
 		m.setContent("<h1>A header</h1>\nAnd a <a href='http://www.example.com'>link</a>\n", "text/html");
 		m.saveChanges();

@@ -309,7 +309,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 					try {
 						if( ! exists(fil)) {
 							// this is a new host
-							Emailer mailer = new Emailer(getContext());
+							Emailer mailer = Emailer.getFactory(getContext());
 							try {
 								mailer.newRemoteHostLogin(p, remoteHost);
 							} catch (Exception e1) {

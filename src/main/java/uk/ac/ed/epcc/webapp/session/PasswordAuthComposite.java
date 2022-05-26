@@ -210,7 +210,7 @@ public abstract class PasswordAuthComposite<T extends AppUser> extends AppUserCo
 	public void newSignup(T user) throws Exception {
 		// Make a new password
 		String new_password = firstPassword(user);
-		Emailer m = new Emailer(getContext());
+		Emailer m = Emailer.getFactory(getContext());
 		m.newSignup(user, new_password);
 	}
 	public static CurrentUserKey CHANGE_PASSWORD = new CurrentUserKey("Password", "Change ${service.website-name} password", "Update the password for this web-site") {

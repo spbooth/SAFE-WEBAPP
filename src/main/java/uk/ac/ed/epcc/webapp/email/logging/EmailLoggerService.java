@@ -205,7 +205,7 @@ public class EmailLoggerService implements Contexed, LoggerService {
 
 	public Emailer getMailer() {
 		if( mailer == null) {
-			mailer = new Emailer(getContext());
+			mailer = Emailer.getFactory(getContext());
 		}
 		return mailer;
 	}

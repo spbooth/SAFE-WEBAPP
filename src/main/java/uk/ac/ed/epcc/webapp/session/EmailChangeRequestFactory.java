@@ -125,7 +125,7 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractUserRe
 			try {
 				
 				EmailChangeRequest req = createRequest(user,(String)f.get(EmailNameFinder.EMAIL));
-				Emailer em= new Emailer(getContext());
+				Emailer em= Emailer.getFactory(getContext());
 				em.newEmailRequest(user, req);
 				return new MessageResult("email_change_request_made");
 			} catch (Exception e) {
@@ -150,7 +150,7 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractUserRe
 			try {
 				
 				EmailChangeRequest req = createRequest(user,user.getEmail());
-				Emailer em= new Emailer(getContext());
+				Emailer em= Emailer.getFactory(getContext());
 				em.newEmailRequest(user, req);
 				return new MessageResult("email_verify_request_made",user.getEmail());
 			} catch (Exception e) {
