@@ -497,6 +497,7 @@ public class Emailer implements Contexed{
 	if( email != null && email.trim().length() > 0){
 		Map<String,String> params = new HashMap<>();
 		if( recipient != null) {
+			addParams(params, recipient);
 			AppUserFactory<?> factory = recipient.getFactory();
 			for(EmailParamContributor epc : factory.getComposites(EmailParamContributor.class)) {
 				epc.addParams(params, recipient);
@@ -1448,7 +1449,7 @@ public class Emailer implements Contexed{
 		return finder;
 	}
 	
-	/** Extendsion point to customise the sender address based on the recipient
+	/** Extension point to customise the sender address based on the recipient
 	 * 
 	 * Default is to return null and take the default sender
 	 * 
@@ -1458,5 +1459,12 @@ public class Emailer implements Contexed{
 	public InternetAddress getFrom(AppUser user) {
 		return null;
 	}
-	
+	/** Extension point to customise the template params based on the recipient
+	 * 
+	 * @param params
+	 * @param user
+	 */
+	public void addParams(Map<String,String> params, AppUser user) {
+		
+	}
 }
