@@ -67,5 +67,16 @@ public class MultiFieldConstraint extends LinkedHashSet<FieldConstraint> impleme
 		return sel;
 	}
 
+	@Override
+	public <I extends Input> boolean suppress(String field, Selector<I> original, Form form,
+			HashMap fixtures) {
+		for(FieldConstraint c: this) {
+			if( c.suppress( field, original, form, fixtures)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	
 }

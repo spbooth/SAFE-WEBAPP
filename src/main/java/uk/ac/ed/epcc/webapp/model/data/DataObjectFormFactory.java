@@ -215,15 +215,20 @@ public final AppContext getContext(){
 				// Consider field constraints
 				if( constraints != null && constraints.containsKey(name)) {
 					FieldConstraint fc = constraints.get(name);
-					Selector new_sel = fc.apply(support_multi_stage,name, sel, f,fixtures);
-					if( new_sel != null ) {
-						// constraint applied
-						sel = new_sel;
+					if( fc.suppress(name, sel, f, fixtures)) {
+						emit_input=false;
+						it.remove();
 					}else {
-						// multi-stage requested
-						if( support_multi_stage ) {
-							emit_input=false;  // skip this input
-							multi_stage=true;  // do the request
+						Selector new_sel = fc.apply(support_multi_stage,name, sel, f,fixtures);
+						if( new_sel != null ) {
+							// constraint applied
+							sel = new_sel;
+						}else {
+							// multi-stage requested
+							if( support_multi_stage ) {
+								emit_input=false;  // skip this input
+								multi_stage=true;  // do the request
+							}
 						}
 					}
 				}

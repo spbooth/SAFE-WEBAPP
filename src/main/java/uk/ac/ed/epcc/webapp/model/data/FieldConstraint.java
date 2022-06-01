@@ -14,7 +14,6 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.FormValidator;
@@ -54,6 +53,19 @@ public interface FieldConstraint {
 	 */
 	public <I extends Input> Selector<I> apply(boolean support_multi_stage,String field, Selector<I> original, Form form,HashMap fixtures);
 
+	/** Should this form field be skipped entirely based on other form fields. 
+	 * e.g a text box that is only used for an "other" response
+	 * @param <I>
+	
+	 * @param field
+	 * @param original
+	 * @param form
+	 * @param fixtures
+	 * @return
+	 */
+	default public <I extends Input>  boolean suppress(String field, Selector<I> original, Form form,HashMap fixtures) {
+		return false;
+	}
 	/** Merge two {@link FieldConstraint}s
 	 *  values can be null
 	 * 
