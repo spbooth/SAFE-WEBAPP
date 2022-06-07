@@ -17,7 +17,7 @@ import java.util.UUID;
 
 /** A {@link GlobalNamePolicy} that assigns a random UUID for the {@link AppUser}
  * 
- * These can safely be anonymised without risk of re-issue so aresuitable for
+ * These can safely be anonymised without risk of re-issue so are suitable for
  * ids sent to external providers.
  * 
  * @author Stephen Booth

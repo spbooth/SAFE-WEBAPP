@@ -32,7 +32,7 @@ import uk.ac.ed.epcc.webapp.session.RequiredPage;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A custom {@link Tag} that ensures that a current session exists for the user viewing the page
- * 
+ * This also checks for requried pages.
  * @author spb
  *
  */
@@ -61,7 +61,11 @@ public class SessionTag extends BasicSessionTag {
 	    					ServletFormResultVisitor vis = new ServletFormResultVisitor(conn, request, response);
 	    					FormResult form_result = p.getPage(session_service);
 	    					// we are displaying a required page.
-	    					session_service.setAttribute(RequiredPage.REQUIRED_PAGE_RETURN_ATTR, conn.getService(ServletService.class).encodePage());
+	    					if( session_service.getAttribute(RequiredPage.REQUIRED_PAGE_RETURN_ATTR)==null) {
+	    						// only set this once as the required page processing may result in
+	    						// page re-displays from a different location
+	    						session_service.setAttribute(RequiredPage.REQUIRED_PAGE_RETURN_ATTR, conn.getService(ServletService.class).encodePage());
+	    					}
 	    					request.setAttribute(NavigationMenuService.DISABLE_NAVIGATION_ATTR, Boolean.TRUE);
 	    					request.setAttribute(RequiredPage.AM_REQUIRED_PAGE_ATTR,Boolean.TRUE);
 	    					form_result.accept(vis);
