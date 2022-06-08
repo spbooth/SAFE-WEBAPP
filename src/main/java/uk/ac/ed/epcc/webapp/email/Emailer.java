@@ -110,7 +110,7 @@ public class Emailer implements Contexed{
 	/**
 	 * 
 	 */
-	private static final String DEFAULT_HEADER_PREFIX = "X-Saf-";
+	public static final String DEFAULT_HEADER_PREFIX = "X-Saf-";
 	/**
 	 * 
 	 */
@@ -272,7 +272,7 @@ public class Emailer implements Contexed{
 		
 		email_template.setRegionEnabled("ChangePassword", comp != null && comp.canResetPassword(person));
 		
-		doSend(templateMessage(person, null,null, email_template));
+		doSend(templateMessage(person, null,null,null, email_template));
 	}
 	/**
 	 * Notify user their password has been changed.
@@ -483,10 +483,10 @@ public class Emailer implements Contexed{
 	 */
 	public MimeMessage templateMessage(AppUser recipient,InternetAddress from, TemplateFile email_template)
 			throws IOException, MessagingException, InvalidArgument {
-		return templateMessage(recipient, from,null, email_template);
+		return templateMessage(recipient, from,null, null,email_template);
 	}
 	
-	public MimeMessage templateMessage(AppUser recipient,InternetAddress from, Hashtable headers,TemplateFile email_template)
+	public MimeMessage templateMessage(AppUser recipient,InternetAddress from, Hashtable headers,Map<String,String> params,TemplateFile email_template)
 			throws IOException, MessagingException, InvalidArgument {
 	Logger log = getLogger();
 	// might return null if emails supressed
@@ -495,7 +495,9 @@ public class Emailer implements Contexed{
 		log.debug("Email mapped "+recipient.getEmail()+"->"+email);
 	}
 	if( email != null && email.trim().length() > 0){
-		Map<String,String> params = new HashMap<>();
+		if( params == null ) {
+			params = new HashMap<>();
+		}
 		if( recipient != null) {
 			addParams(params, recipient);
 			AppUserFactory<?> factory = recipient.getFactory();
