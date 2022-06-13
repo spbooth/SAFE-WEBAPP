@@ -174,6 +174,58 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 	}
 	
 	@Test
+	@ConfigFixtures("email_status.properties")
+	@DataBaseFixtures("invalidate_email.xml")
+	public void testRequestEmailChangeFromInvalid() throws ConsistencyError, Exception{
+		MockTansport.clear();
+		takeBaseline();
+	
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.findByEmail("fred@example.com");
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setCurrentPerson(user); // User is logged in but this will be a required page
+		
+		AppUserTransitionProvider provider = AppUserTransitionProvider.getInstance(ctx);
+		setTransition(provider, EmailNameFinder.CHANGE_EMAIL, user);
+		addParam(EmailNameFinder.EMAIL, "bilbo@example.com");
+		setAction(EmailChangeRequestFactory.REQUEST_ACTION);
+		runTransition();
+		checkMessage("email_change_request_made");
+		assertEquals(1,MockTansport.nSent());
+		Message message = MockTansport.getMessage(0);
+		assertEquals(ctx.expandText("${service.name} Email Change request Request"),message.getSubject());
+		assertEquals("bilbo@example.com",message.getAllRecipients()[0].toString());
+		checkDiff("/cleanup.xsl", "../servlet/email_change2.xml");
+	
+	}
+	
+	@Test
+	@ConfigFixtures("email_status.properties")
+	@DataBaseFixtures("invalidate_email.xml")
+	public void testRequestEmailVerifyFromInvalid() throws ConsistencyError, Exception{
+		MockTansport.clear();
+		takeBaseline();
+	
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.findByEmail("fred@example.com");
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setCurrentPerson(user); // User is logged in but this will be a required page
+		
+		AppUserTransitionProvider provider = AppUserTransitionProvider.getInstance(ctx);
+		setTransition(provider, EmailNameFinder.CHANGE_EMAIL, user);
+
+		setAction(EmailChangeRequestFactory.VERIFY_ACTION);
+		runTransition();
+		checkMessage("email_verify_request_made");
+		assertEquals(1,MockTansport.nSent());
+		Message message = MockTansport.getMessage(0);
+		assertEquals(ctx.expandText("${service.name} Email verification request Request"),message.getSubject());
+		assertEquals("fred@example.com",message.getAllRecipients()[0].toString());
+		checkDiff("/cleanup.xsl", "../servlet/email_change3.xml");
+	
+	}
+	
+	@Test
 	public void testRequirePasswordChange() throws Exception {
 		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
 		A user =  fac.makeBDO();

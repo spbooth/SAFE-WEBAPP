@@ -218,6 +218,8 @@ public final class Repository implements AppContextCleanup{
 	// This seems to serialise in the database affecting performance.
 	public static final Feature CHECK_INDEX = new Feature("repository.check_index", false, "Always read indexinfo when getting metadata (for unique keys)");
 
+	public static final Feature AT_LEAST_ONE = new Feature("repository.at_least_one",false,"At least one field must be set when creating a record");
+	
 	public static final Feature READ_ONLY_FEATURE = new Feature("read-only",false,"supress (most) database writes");
 	
 	public static final Feature BACKUP_WITH_SELECT = new Feature("repository.backup_by_select",true,"Use select/insert when backing up a record");
@@ -2818,7 +2820,7 @@ public final class Repository implements AppContextCleanup{
 			}
 			query.append(query_values.toString());
 			query.append(')');
-			if( ! atleastone){
+			if( ! atleastone && AT_LEAST_ONE.isEnabled(ctx)){
 				throw new DataFault("Insert with no values");
 			}
 			

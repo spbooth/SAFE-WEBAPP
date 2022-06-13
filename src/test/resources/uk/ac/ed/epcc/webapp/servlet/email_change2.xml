@@ -1,0 +1,13 @@
+<Diff><TableSpecification name='EmailChangeRequest'>
+<UserID type='Integer' nullable='true'/>
+<NewEmail type='String' nullable='false' max='64'/>
+<Tag type='String' nullable='true' max='16777215'/>
+<Expires type='Long' nullable='true'/>
+</TableSpecification>
+<EmailChangeRequest id='1'>
+<UserID>1</UserID>
+<NewEmail>bilbo@example.com</NewEmail>
+<Tag>1-394r353ww6x5r1a3p1k226z633k1s6t3o3a3s111o4b5n28y3s5g43vox2s</Tag>
+<Expires>1655997406</Expires>
+</EmailChangeRequest>
+</Diff>
