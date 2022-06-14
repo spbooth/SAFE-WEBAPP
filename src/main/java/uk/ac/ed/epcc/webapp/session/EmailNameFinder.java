@@ -55,9 +55,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
-import uk.ac.ed.epcc.webapp.model.NameFinder;
-import uk.ac.ed.epcc.webapp.model.SummaryContributer;
+import uk.ac.ed.epcc.webapp.model.*;
 import uk.ac.ed.epcc.webapp.model.data.BasicType;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
@@ -82,7 +80,7 @@ import uk.ac.ed.epcc.webapp.servlet.session.token.Scopes;
 @Scopes(scopes = { "email", "impersonate" })
 public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, EmailNameFinder<AU>>
 		implements HistoryFieldContributor, SummaryContributer<AU>, AppUserTransitionContributor,
-		AnonymisingComposite<AU>, RequiredPageProvider<AU>, AllowedEmailContributor<AU> {
+		AnonymisingComposite<AU>, RequiredPageProvider<AU>, AllowedEmailContributor<AU>, IndexTableContributor<AU> {
 
 	public static final String INVALIDATE_EMAIL_ROLE = "invalidate_email";
 
@@ -289,7 +287,13 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 			attributes.put("Email status", getStatus(target).getName());
 		}
 	}
-
+	@Override
+	public void addIndexAttributes(Map<String, Object> attributes, AU target) {
+		// Just show email status
+		if (useEmailStatus()) {
+			attributes.put("Email status", getStatus(target).getName());
+		}
+	}
 	/*
 	 * (non-Javadoc)
 	 * 

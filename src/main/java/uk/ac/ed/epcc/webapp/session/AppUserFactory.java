@@ -1260,7 +1260,7 @@ NamedFilterProvider<AU>
 			LinkedHashMap<String, Object> attr = new LinkedHashMap<>();
 			for(IndexTableContributor c: att) {
 				try {
-				c.addAttributes(attr, p);
+				c.addIndexAttributes(attr, p);
 				}catch(Exception tr) {
 					getLogger().error("Error adding attribute from "+c.getClass().getCanonicalName(), tr);
 				}
