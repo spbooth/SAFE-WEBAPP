@@ -678,7 +678,7 @@ public class Emailer implements Contexed{
 			}else{
 				Transport.send(m);
 			}
-			log.info("mail sent ok "+m.getSubject()+" "+m.getAllRecipients().toString());
+			log.info("mail sent ok "+m.getSubject()+" "+formatAddresses(m.getAllRecipients()));
 		}else{
 			log.info("email send supressed "+m.getSubject());
 			try{
@@ -690,6 +690,21 @@ public class Emailer implements Contexed{
 			}
 		}
 		return m;
+	}
+	
+	private String formatAddresses(Address list[]) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		boolean seen = false;
+		for( Address a : list) {
+			if( seen ) {
+				sb.append(",");
+			}
+			sb.append(a.toString());
+			seen=true;
+		}
+		sb.append("]");
+		return sb.toString();
 	}
 	/**
 	 * make an email from a template file to multiple recipients with custom
