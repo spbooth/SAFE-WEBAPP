@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.session;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.session.MultiNameFactory.Name;
@@ -77,15 +78,25 @@ public class MultiNameFinder<AU extends AppUser, X extends MultiNameFinder> exte
 	 */
 	@Override
 	public SQLFilter<AU> getStringFinderFilter(String name) {
-		MultiNameFactory<Name, AU> f;
 		try {
-			f = getNameFactory();
+			MultiNameFactory<Name, AU> f = getNameFactory();
 			return f.getPersonFilter(name);
 		} catch (Exception e) {
 			getLogger().error("Error getting filer", e);
 		}
 		return new FalseFilter<AU>((Class<AU>) getFactory().getTarget());
 		
+	}
+	
+	@Override
+	public SQLFilter<AU> hasCanonicalNameFilter(){
+		try {
+			MultiNameFactory<Name, AU> f = getNameFactory();
+			return f.hasNameFilter();
+		} catch (Exception e) {
+			getLogger().error("Error getting filer", e);
+		}
+		return new FalseFilter<AU>((Class<AU>) getFactory().getTarget());
 	}
 
 	/* (non-Javadoc)

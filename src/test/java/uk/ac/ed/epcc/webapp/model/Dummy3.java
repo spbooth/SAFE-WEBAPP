@@ -35,6 +35,7 @@ import uk.ac.ed.epcc.webapp.model.data.FilterResult;
 import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -226,6 +227,10 @@ public class Dummy3 extends DataObject {
 		@Override
 		public SQLFilter<Dummy3> getStringFinderFilter(String name) {
 			return new StringFilter(name);
+		}
+		@Override
+		public SQLFilter<Dummy3> hasCanonicalNameFilter(){
+			return new NullFieldFilter<Dummy3>(getTarget(), res, NAME, false);
 		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.NameFinder#getDataCache()

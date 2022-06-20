@@ -193,6 +193,10 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 		return new SQLValueFilter<>(getFactory().getTarget(), getRepository(), EMAIL, name);
 	}
 
+	@Override
+	public SQLFilter<AU> hasCanonicalNameFilter(){
+		return new NullFieldFilter<AU>(getFactory().getTarget(), getRepository(), EMAIL, false);
+	}
 	public static FieldValidator<String> getEmailValidator(AppContext conn) {
 		return conn.makeObjectWithDefault(FieldValidator.class, ServiceAllowedEmailFieldValidator.class,
 				"email.field-validator");

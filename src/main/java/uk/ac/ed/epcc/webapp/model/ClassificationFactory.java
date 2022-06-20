@@ -39,8 +39,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnusedNameInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.HistoryFactory;
@@ -155,6 +154,11 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	@Override
 	public SQLValueFilter<T> getStringFinderFilter(String name) {
 		return new SQLValueFilter<>(getTarget(),res,Classification.NAME,name);
+	}
+	@Override
+	public SQLFilter<T> hasCanonicalNameFilter(){
+		// all classifications have names
+		return new GenericBinaryFilter<T>(getTarget(), true);
 	}
 	
 	/* (non-Javadoc)

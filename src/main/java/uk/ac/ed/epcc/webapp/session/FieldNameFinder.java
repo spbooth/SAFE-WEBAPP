@@ -98,7 +98,10 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 		}
 		return new SQLValueFilter<>(getFactory().getTarget(), getRepository(), getField(), normalizeName(name));
 	}
-
+	@Override
+	public SQLFilter<AU> hasCanonicalNameFilter(){
+		return new NullFieldFilter<AU>(getFactory().getTarget(), getRepository(), getField(), false);
+	}
 	
 
 	@Override

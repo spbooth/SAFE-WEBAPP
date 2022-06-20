@@ -20,6 +20,8 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -155,9 +157,18 @@ public class MultiNameFactory<N extends MultiNameFactory.Name, AU extends AppUse
 		
 		return new SQLValueFilter<N>(getTarget(), res, NAME, name);
 	}
-
+    @Override
+    public GenericBinaryFilter<N> hasCanonicalNameFilter(){
+    	// all entries have names
+    	return new GenericBinaryFilter<N>(getTarget(), true);
+    }
+	
 	public SQLFilter<AU> getPersonFilter(String name){
 		return getDestFilter(getStringFinderFilter(name), PERSON, getContext().getService(SessionService.class).getLoginFactory());
+	}
+	
+	public SQLFilter<AU> hasNameFilter(){
+		return getDestFilter(hasCanonicalNameFilter(), PERSON, getContext().getService(SessionService.class).getLoginFactory());
 	}
 	
 	public Set<String> getNames(AU person){

@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.model;
 
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataCache;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -63,6 +64,13 @@ public interface NameFinder<T extends DataObject> extends ParseFactory<T> {
 	 * @return
 	 */
 	public SQLFilter<T> getStringFinderFilter(String name);
+	/** Get a {@link BaseFilter} for objects that have a non-null 
+	 * canonical name
+	 * 
+	 * @return
+	 */
+	public SQLFilter<T> hasCanonicalNameFilter();
+	
 	/** get a DataCache for fetching the target
 	 * 
 	 * @return DataCache
