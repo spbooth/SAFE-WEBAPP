@@ -18,9 +18,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import uk.ac.ed.epcc.webapp.forms.ListInputInterfaceTest;
-import uk.ac.ed.epcc.webapp.forms.ListInputInterfaceTestImpl;
-import uk.ac.ed.epcc.webapp.forms.ParseAbstractInputTestCase;
+import uk.ac.ed.epcc.webapp.forms.*;
 import uk.ac.ed.epcc.webapp.model.data.TestType.TestValue;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.BasicTypeInput;
 
@@ -28,7 +26,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.inputs.BasicTypeInput;
  * @author Stephen Booth
  *
  */
-public class BasicTypeInputTest extends ParseAbstractInputTestCase<String, BasicTypeInput<TestType.TestValue>> implements
+public class BasicTypeInputTest extends AbstractInputTestCase<String, BasicTypeInput<TestType.TestValue>> implements
 ListInputInterfaceTest<String, TestType.TestValue, BasicTypeInput<TestType.TestValue>, BasicTypeInputTest>{
 
 	/* (non-Javadoc)
@@ -63,23 +61,7 @@ ListInputInterfaceTest<String, TestType.TestValue, BasicTypeInput<TestType.TestV
 		return TestType.monsters.getInput();
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.TestParseDataProvider#getGoodParseData()
-	 */
-	@Override
-	public Set<String> getGoodParseData() {
-		
-		return getGoodData();
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.TestParseDataProvider#getBadParseData()
-	 */
-	@Override
-	public Set<String> getBadParseData() {
 	
-		return getBadData();
-	}
 	
 	public final ListInputInterfaceTest<String, TestType.TestValue,BasicTypeInput<TestType.TestValue> , BasicTypeInputTest> list_tests = new ListInputInterfaceTestImpl<>(this);
 
