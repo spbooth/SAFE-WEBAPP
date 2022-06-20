@@ -19,12 +19,14 @@ package uk.ac.ed.epcc.webapp.model.data.forms;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionValidationException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 
 /**	
@@ -37,6 +39,8 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 
 
 public class UpdateAction<BDO extends DataObject> extends FormAction {
+	
+	public static final Feature LOG_FORM_UPDATES = new Feature("log_form_updates",false,"Log changes made from update forms");
 	/**
  * 
  */
@@ -55,9 +59,14 @@ protected final UpdateTemplate<BDO> updater;
 		try {
 			AppContext conn = dat.getContext();
 			Map<String,Object> orig=dat.getMap(true); // want nulls for diff generation
+			
 			dat.formUpdate(f);
 			preCommit(dat,f,orig);
 			boolean changed = dat.commit();
+			if( changed && LOG_FORM_UPDATES.isEnabled(conn)) {
+				String diff = f.diff(orig);
+				conn.getService(LoggerService.class).getLogger(dat.getClass()).info("Form update "+diff);
+			}
 			
 			postUpdate(dat,f,orig, changed);
 			
