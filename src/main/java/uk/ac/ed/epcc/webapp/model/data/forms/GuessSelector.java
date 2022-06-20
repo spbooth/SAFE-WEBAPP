@@ -18,13 +18,17 @@ import java.util.Iterator;
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.SuggestedItemInput;
 
 /** A {@link Selector} that pre-populates an input to a valid value if it can.
- * (ie a valid item if the input is a {@link ListInput}.
+ * (ie a valid item if the input is a {@link SuggestedItemInput}.)
  * This is intended for optional fields where we want to guess a value rather than defaulting
- * to no value. 
+ * to no value. A value should only be guessed if the set of suggested values is less than a threshold.
+ * A {@link SuggestedItemInput} may generate a large list of all valid inputs and it is unhelpful to
+ * just suggest the first of these.
+ * A zero or negative threshold means guess in all cases.
+ * 
+ * 
  * @author Stephen Booth
  *
  */
@@ -32,12 +36,14 @@ public class GuessSelector<T extends Input> extends AbstractContexed implements 
 	/**
 	 * @param nested
 	 */
-	public GuessSelector(AppContext c,Selector<T> nested) {
+	public GuessSelector(AppContext c,Selector<T> nested, int threshold) {
 		super(c);
 		this.nested = nested;
+		this.threshold=threshold;
 	}
 
 	private final Selector<T> nested;
+	private final int threshold;
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#getInput()
@@ -47,14 +53,16 @@ public class GuessSelector<T extends Input> extends AbstractContexed implements 
 		T input = nested.getInput();
 		if( input instanceof SuggestedItemInput) {
 			SuggestedItemInput listInput = (SuggestedItemInput)input;
-			Iterator it = listInput.getItems();
-			if( it.hasNext()) {
-				listInput.setItem(it.next());
-				if(it instanceof AutoCloseable) {
-					try {
-						((AutoCloseable)it).close();
-					} catch (Exception e) {
-						getLogger().error("Error closing iterator",e);
+			if( threshold <= 0 || listInput.getCount() < threshold) {
+				Iterator it = listInput.getItems();
+				if( it.hasNext()) {
+					listInput.setItem(it.next());
+					if(it instanceof AutoCloseable) {
+						try {
+							((AutoCloseable)it).close();
+						} catch (Exception e) {
+							getLogger().error("Error closing iterator",e);
+						}
 					}
 				}
 			}
