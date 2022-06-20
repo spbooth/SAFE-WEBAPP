@@ -23,17 +23,12 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
-import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.PreSelectInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.model.data.convert.EnumeratingTypeConverter;
 
 
 
-public class TypeProducerInput<T> extends TextInput implements PreSelectInput<String,T>, OptionalListInput<String, T> {
+public class TypeProducerInput<T> extends AbstractInput<String> implements PreSelectInput<String,T>, OptionalListInput<String, T> {
     private final EnumeratingTypeConverter<T,String> t;
     private Set<T> item_set=null;
     private String unselected_text=null;
