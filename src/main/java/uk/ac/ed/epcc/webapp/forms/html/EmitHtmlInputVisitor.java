@@ -201,10 +201,11 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				hb.attr("required",null);
 			}
 			if( optional ||
-					(input instanceof PreSelectInput && ! ((PreSelectInput)input).allowPreSelect()) && input.getCount() > 1){
+					(input instanceof PreSelectInput && ! ((PreSelectInput)input).allowPreSelect()) && input.getCount() > 1 && (input.getValue() == null)){
 				// need ability to select nothing
 				// a non optional pre-select input with only 1 valid answer always 
 				// pre-selects.
+				// Non optional with an existing value does not need this either as it defaults to existing
 				hb.open("option");
 				hb.attr("value","");
 				String unselected="Not Selected";
