@@ -40,6 +40,12 @@ public class BasicTypeInput<T extends BasicType.Value> extends TypeProducerInput
 		}
 	}
 
+	@Override
+	public boolean isEmpty() {
+		String value = getValue();
+		return value == null || value.isEmpty() ||  getItem() == null;
+	}
+	
 	
 
 }

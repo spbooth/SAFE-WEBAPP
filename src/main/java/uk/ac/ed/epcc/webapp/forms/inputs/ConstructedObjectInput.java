@@ -141,7 +141,7 @@ public class ConstructedObjectInput<T> extends AbstractInput<String> implements 
 	@Override
 	public T getItem() {
 		String value = getValue();
-		if( value == null) {
+		if( value == null || value.isEmpty()) {
 			return null;
 		}
 		return c.makeObject(clazz, value);
@@ -177,5 +177,12 @@ public class ConstructedObjectInput<T> extends AbstractInput<String> implements 
 		}
 		return false;
 	}
-
+	public  boolean isEmpty() {
+		// Don't try to  generate an item for this check
+		// as an invalid value that resolves to an illegal class
+		// will generate an exception
+		// Also don't want to construct an item as part of this check
+		String v = getValue();
+		return v == null || v.isEmpty();
+	}
 }
