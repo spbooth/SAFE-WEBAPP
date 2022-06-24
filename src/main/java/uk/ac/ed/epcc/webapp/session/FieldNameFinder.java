@@ -48,10 +48,7 @@ import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
 
 public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> extends AppUserNameFinder<AU,F> implements HistoryFieldContributor, NamedFilterProvider<AU>{
 
-	/**
-	 * 
-	 */
-	protected static final String PROPERTY_PREFIX = "NameFinder.";
+	
 
 	
     //private final boolean user_supplied;
@@ -153,6 +150,10 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 		return suppress;
 	}
 
+	/** Does the user get to choose this name
+	 * 
+	 * @return
+	 */
 	protected boolean userSet() {
 		return getContext().getBooleanParameter(PROPERTY_PREFIX+getRealm()+".user_supplied", false);
 	}

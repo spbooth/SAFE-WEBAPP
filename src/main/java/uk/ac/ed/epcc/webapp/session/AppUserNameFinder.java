@@ -18,9 +18,7 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
-import uk.ac.ed.epcc.webapp.model.ParseFactory;
 import uk.ac.ed.epcc.webapp.model.data.Composite;
 import uk.ac.ed.epcc.webapp.model.data.DataCache;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -45,7 +43,10 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
  */
 
 public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNameFinder> extends AppUserComposite<AU, X> implements NameFinder<AU>{
-	
+	/** prefix for configuration properties
+	 * 
+	 */
+	protected static final String PROPERTY_PREFIX = "NameFinder.";
 
 	private final String realm;
 	/**
@@ -105,7 +106,8 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 		
 	}
 	/** Is this a name we might expect the user to know or an internal generated id.
-	 * 
+	 * This also controls if the realm name can be used via the default {@link NameFinder} of
+	 * the {@link AppUserFactory}
 	 * @return
 	 */
 	public boolean userVisible(){

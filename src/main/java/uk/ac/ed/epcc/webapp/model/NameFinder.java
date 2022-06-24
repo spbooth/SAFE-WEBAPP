@@ -55,6 +55,14 @@ public interface NameFinder<T extends DataObject> extends ParseFactory<T> {
 	 * @throws DataFault 
 	 */
 	public abstract T makeFromString(String name) throws DataFault, ParseException;
+	
+	/** Can this class make new values via the {@link #makeFromString(String)} method
+	 * 
+	 * @return
+	 */
+	public default boolean canMakeFromString() {
+		return true;
+	}
 
 	/** get a filter than locates the target object from a String.
 	 * 

@@ -607,7 +607,7 @@ NamedFilterProvider<AU>
 		}
 		name = name.trim();
 		try {
-			return find(getStringFinderFilter(name));
+			return find(getStringFinderFilter(name),true);
 		}catch(DataNotFoundException e){
 			return null;
 		} catch (DataException e) {
@@ -823,6 +823,11 @@ NamedFilterProvider<AU>
 			result.commit();
 		}
 		return result;
+	}
+	@Override
+	public boolean canMakeFromString() {
+		AppUserNameFinder default_finder = getRealmFinder(getDefaultRealm());
+		return default_finder.canMakeFromString();
 	}
 	/** make an uncommited user suitable for automatic user creation.
 	 *  return null if automatic creation is not supported.
