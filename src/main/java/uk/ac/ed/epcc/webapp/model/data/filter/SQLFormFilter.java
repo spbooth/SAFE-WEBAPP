@@ -58,9 +58,10 @@ public class SQLFormFilter<T extends DataObject> extends SQLAndFilter<T>{
 				m = (SQLMatcher<T>) i;
 			}
 			
-			Object o =  f.get(field);
+			
 			// At the moment we treat null as a wildcard so can't select for null
-			if( o != null ){
+			if( ! i.isEmpty() ){
+				Object o =  f.get(field);
 				if( m == null ){
 					if( res.hasField(field)){
 						addFilter(new SQLValueFilter<>(target,res,field,o));
