@@ -115,7 +115,8 @@ public class Table<C, R> {
 			} else {
 				return put(key, NumberOp.add(old, value));
 			}
-		}public Object combine(Operator op,R key, Number value) {
+		}
+		public Object combine(Operator op,R key, Number value) {
 			Number old = getNumber(key);
 			if (old == null) {
 				return put(key, value);
@@ -2036,7 +2037,6 @@ public class Table<C, R> {
 	public void setId(String id) {
 		this.id = id;
 	}
-
 	/** Remove all rows based on values in a column
 	 * row is removed if <b>col-value <i>Condition</i> value = true</b>
 	 * @param col    Column to query
@@ -2044,6 +2044,16 @@ public class Table<C, R> {
 	 * @param value  value
 	 */
 	public <T>void thresholdRows(C col, MatchCondition cond, T value ){
+		thresholdRows(col, cond, value, null);
+	}
+	/** Remove all rows based on values in a column
+	 * row is removed if <b>col-value <i>Condition</i> value = true</b>
+	 * @param col    Column to query
+	 * @param cond   {@link MatchCondition} to compare
+	 * @param merge  optional row to add numeric values from removed rows too
+	 * @param value  value
+	 */
+	public <T>void thresholdRows(C col, MatchCondition cond, T value ,R merge){
 		Col c  = getCol(col);
 		if( c != null ) {
 			Set<R> remove = new LinkedHashSet<>();
@@ -2059,12 +2069,25 @@ public class Table<C, R> {
 					}
 				}
 			}
+			if( merge != null) {
+				remove.remove(merge); // make sure we are not removing the destination
+			}
 			for(R row : remove) {
+				if( merge != null) {
+					for(Col c2 : cols.values()) {
+						Number n = c2.getNumber(row);
+						if( n != null) {
+							c2.add(merge, n);
+						}
+					}
+				}
 				removeRow(row);
 			}
 			remove.clear();
 		}
 	}
+	
+	
 	public C getGroup(C col) {
 		if( key_to_group != null) {
 			return key_to_group.get(col);
