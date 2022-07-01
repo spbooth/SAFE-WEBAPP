@@ -76,9 +76,9 @@ public class StreamingTable {
 	}
 	
 	/** finish the table
-	 * 
+	 * @return true if table had data.
 	 */
-	public void close() {
+	public boolean close() {
 		if( open ) {
 			sb.close(); //tbody
 			sb.close(); //table
@@ -86,6 +86,7 @@ public class StreamingTable {
 		if( append) {
 			sb.appendParent();
 		}
+		return open;
 	}
 
 }

@@ -69,7 +69,10 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  * @param <BDO>
  */
 public  abstract class DataObjectFormFactory<BDO extends DataObject> implements FormFactory, IndexedProducer<BDO>{
-   public static final Feature DEFAULT_FORBID_HTML = new Feature("form_factory.default_forbid_html_text",true,"Forbid HTML in auto generated text inputs for database fields");
+   public static final String FORM_LABEL_PREFIX = "form.label.";
+
+
+public static final Feature DEFAULT_FORBID_HTML = new Feature("form_factory.default_forbid_html_text",true,"Forbid HTML in auto generated text inputs for database fields");
 
 
 protected final DataObjectFactory<BDO> factory;
@@ -254,7 +257,7 @@ public final AppContext getContext(){
 					if (labels != null && labels.containsKey(name)) {
 						lab = labels.get(name);
 					}else{
-						lab = conn.getInitParameter("form.label."+table+"."+name,name);
+						lab = conn.getInitParameter(FORM_LABEL_PREFIX+table+"."+name,name);
 					}
 					String tooltip=null;
 					if( tooltips != null && tooltips.containsKey(name)) {
