@@ -41,7 +41,7 @@ public class RequiredPageNotify<AU extends AppUser> extends AbstractContexed {
 	public BaseFilter<AU> getNotifyFilter(boolean apply_rate_limit){ 
 		if(sess == null ) {
 			getLogger().error("No session service");
-			return new FalseFilter<AU>(login.getTarget());
+			return new FalseFilter(AppUser.class);
 		}
 
 		

@@ -27,6 +27,7 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener;
 import uk.ac.ed.epcc.webapp.model.cron.LockFactory;
 import uk.ac.ed.epcc.webapp.model.cron.LockFactory.Lock;
@@ -64,6 +65,7 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 		thresh.add(Calendar.HOUR, - hours);
 
 		LockFactory locks = LockFactory.getFactory(getContext());
+		Logger logger = getLogger();
 		try(Lock lock = locks.makeFromString("RequiredPageListener")){
 			if( lock == null) {
 				return null;
@@ -79,7 +81,7 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 			if( lock.isLocked()) {
 				Date locked = lock.wasLockedAt();
 				if( locked.getTime()+60000L < time.getCurrentTime().getTime()) {
-					getLogger().error("Lock "+lock.getName()+" held since "+locked);
+					logger.error("Lock "+lock.getName()+" held since "+locked);
 				}
 				return next.getTime();
 			}
@@ -92,7 +94,7 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 			
 			SessionService<AU> sess = getContext().getService(SessionService.class);
 			if(sess == null ) {
-				getLogger().error("No session service");
+				logger.error("No session service");
 				return null;
 			}
 			RequiredPageNotify<AU> pol = RequiredPageNotify.getPolicy(getContext());
@@ -103,11 +105,12 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 			try(FilterResult<AU> res = login.getResult(pol.getNotifyFilter(true))) {
 				int count=0;
 				for( AU person : res) {
+					logger.debug(Integer.toString(count)+": Required page notifications for "+person.getIdentifier());
 					// Don't notify a user who can't login to fix
 					// these rules should also be in the filter.
 					if( pol.allow(person, true)) {
 						if( max_send >0 && count >= max_send) {
-							getLogger().debug("Terminating notify due to max_send");
+							logger.debug("Terminating notify due to max_send");
 							break;
 						}
 						count++;
@@ -121,21 +124,27 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 								}
 							}
 							if( ! notices.isEmpty()) {
+								logger.debug("Sending notification");
 								if( max != null) {
 									max.addNotified(person);
+									logger.debug("addNotified");
 								}
 								mailer.notificationEmail(person, notices,actions);
 							}
 						}catch(Exception em) {
-							getLogger().error("Error sending required page notifications to "+person.getEmail(), em);
+							logger.error("Error sending required page notifications to "+person.getEmail(), em);
 						}
+					}else {
+						logger.debug("Not allowed by policy");
 					}
 				}
+				logger.debug("Notifications sent :"+count);
 			} catch (Exception e) {
-				getLogger().error("Error generating notification emails", e);
+				logger.error("Error generating notification emails", e);
 			}
-
+			
 			if( REQUIRED_PAGE_ACTIONS.isEnabled(getContext())) {
+				logger.debug("Applying actions");
 				pol.applyActions();
 			}
 			lock.releaseLock();
@@ -145,7 +154,7 @@ public class RequiredPageNotifyHearbeatListener<AU extends AppUser> extends Abst
 			
 			return c.getTime();
 		} catch (Exception e) {
-			getLogger().error("Error in required page listener",e);
+			logger.error("Error in required page listener",e);
 			return null;
 		}
 	}
