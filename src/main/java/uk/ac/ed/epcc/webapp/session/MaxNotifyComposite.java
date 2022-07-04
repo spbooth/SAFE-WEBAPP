@@ -74,7 +74,7 @@ public class MaxNotifyComposite<A extends AppUser> extends Composite<A, MaxNotif
 	 * @return
 	 */
 	public Date getLastNotified(A user) {
-		if( getNotifiedCount(user) > 1) {
+		if( getNotifiedCount(user) > 0) {
 			return getRecord(user).getDateProperty(LAST_NOTIFY__FIELD);
 		}
 		return null;
