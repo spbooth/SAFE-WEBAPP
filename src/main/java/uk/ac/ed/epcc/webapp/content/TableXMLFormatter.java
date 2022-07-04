@@ -72,6 +72,12 @@ public class TableXMLFormatter<C,R> implements TableFormatPolicy<C, R> {
     		hb.attr("id", id);
     	}
 		hb.clean("\n");
+		Object caption = t.getCaption();
+		if( caption != null) {
+			hb.open("caption");
+			hb.addObject(caption);
+			hb.close();
+		}
 		int nrow=0;
 		if(t.isPrintHeadings()){
 			if(table_sections){

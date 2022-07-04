@@ -2229,4 +2229,22 @@ public class Table<C, R> {
 		}
 		return null;
 	}
+	
+	
+	private Object caption=null;
+	/** get an object to use as a table caption
+	 * 
+	 * @return
+	 */
+	public Object getCaption() {
+		return caption;
+	}
+
+	/** set an object to use as a table caption;
+	 * 
+	 * @param caption
+	 */
+	public void setCaption(Object caption) {
+		this.caption = caption;
+	}
 }
