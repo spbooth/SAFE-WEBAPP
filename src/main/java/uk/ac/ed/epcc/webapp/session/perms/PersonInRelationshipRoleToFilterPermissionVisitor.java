@@ -8,9 +8,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.RemoteAccessRoleProvider;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
-import uk.ac.ed.epcc.webapp.session.AppUser;
-import uk.ac.ed.epcc.webapp.session.SessionService;
-import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
+import uk.ac.ed.epcc.webapp.session.*;
 /** A {@link PermissionVisitor} that generates 
  * filters for {@link AppUser}s that have the relation with a specified target
  * 
@@ -42,8 +40,7 @@ public class PersonInRelationshipRoleToFilterPermissionVisitor<U extends AppUser
 		try {
 			result = rarp.personInRelationToFilter(sess, remote_role, fil);
 		} catch (CannotUseSQLException e) {
-			getLogger().info("Non SQL relationship",e);
-			throw new UnknownRelationshipException(link_field+"->"+remote_role);
+			throw new NonSQLRelationshipException(link_field+"->"+remote_role,e);
 		}
 		if( result == null ){
 			throw new UnknownRelationshipException(link_field+"->"+remote_role);
@@ -63,8 +60,7 @@ public class PersonInRelationshipRoleToFilterPermissionVisitor<U extends AppUser
 		try {
 			return provider.personInRelationToFilter(sess, a.getRole(), fil);
 		} catch (CannotUseSQLException e) {
-			getLogger().info("Non SQL relationship",e);
-			throw new UnknownRelationshipException(a.getRole());
+			throw new NonSQLRelationshipException(a.getRole(),e);
 		}
 	}
 	@Override
