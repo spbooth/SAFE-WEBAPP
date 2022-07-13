@@ -136,6 +136,13 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 			// TypeProducerInput uses toString for the name
 			return getName();
 		}
+		/** optional collection of values into groups.
+		 * 
+		 * @return
+		 */
+		public String getGroup() {
+			return null;
+		}
 		@Override
 		public boolean equals(Object obj) {
 			if( obj == null ){

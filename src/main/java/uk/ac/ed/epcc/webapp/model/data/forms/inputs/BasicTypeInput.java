@@ -26,6 +26,11 @@ import uk.ac.ed.epcc.webapp.model.data.BasicType;
 
 public class BasicTypeInput<T extends BasicType.Value> extends TypeProducerInput<T>  implements NameInput<T>{
 
+	@Override
+	public final String getGroup(T item) {
+		return item.getGroup();
+	}
+
 	public BasicTypeInput(BasicType<T> t) {
 		super(t); 
 	}
