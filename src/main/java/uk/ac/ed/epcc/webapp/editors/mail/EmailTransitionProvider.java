@@ -484,6 +484,15 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 	@Override
 	public <X extends ContentBuilder> X getSummaryContent(AppContext c, X cb,
 			MailTarget target) {
+		if( target != null ) {
+			long max_email = c.getLongParameter("email.max_length", -1);
+			if( max_email > 0L ) {
+				long len = target.getMessageLength();
+				if( len > max_email) {
+					cb.getSpan("warn").clean("Message is too long and may not send").appendParent();
+				}
+			}
+		}
 		return cb;
 	}
 	

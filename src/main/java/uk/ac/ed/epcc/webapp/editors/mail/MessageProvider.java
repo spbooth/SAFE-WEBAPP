@@ -16,6 +16,9 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.editors.mail;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -50,6 +53,26 @@ public interface MessageProvider {
 	public abstract MimeMessage getMessage() throws DataFault,
 			MessagingException;
 
+	/**Calculate the length of the message
+	 * 
+	 * @return
+	 * @throws IOException
+	 * @throws MessagingException
+	 * @throws DataFault
+	 */
+	public default long getMessageLength() throws IOException, MessagingException, DataFault {
+		MimeMessage m = getMessage();
+		if( m == null ) {
+			return 0L;
+		}
+		InputStream in = m.getInputStream();
+		long length=0;
+		int c;
+		while( (c = in.read()) != -1 ){
+			length++;
+		}
+		return length;
+	}
 	/** get a hash for the message
 	 * 
 	 * @return
