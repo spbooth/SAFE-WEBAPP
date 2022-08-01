@@ -15,8 +15,8 @@ package uk.ac.ed.epcc.webapp.time;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.function.Supplier;
 
-import org.apache.logging.log4j.util.Supplier;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 

@@ -1,14 +1,8 @@
 package uk.ac.ed.epcc.webapp.logging.log4j2;
 
 import java.io.IOException;
-import java.util.Map;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,11 +10,9 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.CloseableThreadContext;
 
-import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.servlet.ErrorFilter;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AbstractSessionService;
-import uk.ac.ed.epcc.webapp.session.SessionService;
 /** A {@link Filter} to add ThreadContext information for use by
  * Log4J logging.
  * 

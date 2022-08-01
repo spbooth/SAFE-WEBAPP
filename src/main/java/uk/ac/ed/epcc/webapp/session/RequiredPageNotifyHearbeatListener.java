@@ -13,20 +13,10 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
-import org.apache.logging.log4j.core.pattern.MaxLengthConverter;
-
-import uk.ac.ed.epcc.webapp.AbstractContexed;
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.CurrentTimeService;
-import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.*;
 import uk.ac.ed.epcc.webapp.email.Emailer;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener;
 import uk.ac.ed.epcc.webapp.model.cron.LockFactory;
