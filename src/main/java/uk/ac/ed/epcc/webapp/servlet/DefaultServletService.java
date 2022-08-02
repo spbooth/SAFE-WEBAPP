@@ -531,7 +531,7 @@ public class DefaultServletService implements ServletService{
 			// Can't do anything
 			return;
 		}
-		AppUserFactory<A> factory = sess.getLoginFactory();
+		
 		BearerTokenService bearer = getContext().getService(BearerTokenService.class);
 		int code = HttpServletResponse.SC_UNAUTHORIZED;
 		if( bearer != null ) {
@@ -566,6 +566,12 @@ public class DefaultServletService implements ServletService{
 				
 			}
 		}
+		if( sess == null) {
+			// jsut send code
+			((HttpServletResponse)res).sendError(code);
+			return;
+		}
+		AppUserFactory<A> factory = sess.getLoginFactory();
 		@SuppressWarnings("unchecked")
 		PasswordAuthComposite<A> composite = (PasswordAuthComposite<A>) factory.getComposite(PasswordAuthComposite.class);
 		if( composite != null ){
