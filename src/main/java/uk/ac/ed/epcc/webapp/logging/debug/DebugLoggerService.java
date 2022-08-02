@@ -34,7 +34,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 public class DebugLoggerService implements Contexed, LoggerService {
     private final AppContext conn;
     private LoggerService nested;
-    private static final Feature FATAL_FEATURE = new Feature("debug.errors_are_fatal",true,"DebugLogger throws fatal errors");
+    public static final Feature FATAL_FEATURE = new Feature("debug.errors_are_fatal",true,"DebugLogger throws fatal errors");
     public DebugLoggerService(AppContext conn){
     	this.conn=conn;
     	nested=conn.getService(LoggerService.class);
