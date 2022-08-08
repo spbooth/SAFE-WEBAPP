@@ -417,6 +417,12 @@ public class SwingContentBuilder  implements ContentBuilder{
 
 	}
 	@Override
+	public void addLink(AppContext c,String text, String hover,String style,FormResult action) {
+		log.debug("add link");
+		addButton(c,text, hover,action);
+
+	}
+	@Override
 	public <C,R> void addTable(AppContext conn,Table<C,R> t) {
 		addTable(conn,null,t);
 	}
@@ -653,6 +659,17 @@ public class SwingContentBuilder  implements ContentBuilder{
 		}
 		}
 	}
+	@Override
+	public <I,T> void addFormError(AppContext conn, Field<I> f,T item) {
+		if( listener != null){
+		SwingField<I> field = listener.getSwingField(f);
+		try {
+			field.addError(content);
+		} catch (Exception e) {
+			conn.error(e,"Error adding label");
+		}
+		}
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addFormInput(uk.ac.ed.epcc.webapp.AppContext, uk.ac.ed.epcc.webapp.forms.Field)
 	 */
@@ -675,6 +692,11 @@ public class SwingContentBuilder  implements ContentBuilder{
 		if( form_dialog != null ){
 			content.add(form_dialog.getActionButtons(f,actions),BorderLayout.EAST);
 		}
+	}
+	@Override
+	public void addActionButton(Form f, String name) {
+		content.add(form_dialog.getActionButton(f,name));
+		
 	}
 	/**
 	 * 

@@ -54,7 +54,7 @@ public class StorageUnitNumberInput extends NumberInput<Long> {
 		return Long.toString(val.longValue()/unit.bytes);
 	}
 	@Override
-	public Long convert(Object v) throws TypeError {
+	public Long convert(Object v) throws TypeException {
 		if( v == null ) {
 			return null;
 		}
@@ -65,10 +65,10 @@ public class StorageUnitNumberInput extends NumberInput<Long> {
 			try {
 				return parseValue((String) v);
 			} catch (ParseException e) {
-				throw new TypeError(e);
+				throw new TypeException(e);
 			}
 		}
-		throw new TypeError(v.getClass());
+		throw new TypeException(v.getClass());
 	}
 	@Override
 	public String getPrettyString(Long val) {

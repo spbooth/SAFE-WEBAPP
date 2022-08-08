@@ -56,6 +56,7 @@ public class AppContextFixtureRule extends ExternalResource{
 	AppContext ctx;
 	@Override
 	protected void after() {
+		AppContext.clearContext();
 		CleanupService serv = ctx.getService(CleanupService.class);
 		if( serv != null ){
 			serv.reset(); // don't run cleanups
@@ -68,6 +69,7 @@ public class AppContextFixtureRule extends ExternalResource{
 		ClassLoader cl = this.getClass().getClassLoader();
 		InputStream service_props_stream = cl.getResourceAsStream(test_properties);
 		Properties overrides = new Properties();
+		Properties bootstrap=null;
 		if( service_props_stream != null ){
 			overrides.load(service_props_stream);
 
@@ -79,6 +81,7 @@ public class AppContextFixtureRule extends ExternalResource{
 			// skip null or empty strings so null overrides can be passed from 
 			// ant that only take effect when overidden
 			Properties sys_properties = System.getProperties();
+			bootstrap = new Properties(sys_properties);
 			for(String name : sys_properties.stringPropertyNames()){
 				if( name.startsWith("db_") ){
 					Object value = sys_properties.get(name);
@@ -89,17 +92,18 @@ public class AppContextFixtureRule extends ExternalResource{
 				}
 			}
 			
-			// (spb) he DefaultConfigService needs config.path and deploy.path set
-			// in the system properties copy these if set in overrides.
+			// (spb) The DefaultConfigService needs config.path and deploy.path set
+			// in the initial properties copy these if set in overrides.
 			// also the "testing" flag
-			for(String prop : new String[]{DefaultConfigService.CONFIG_PATH_PROP_NAME,DefaultConfigService.DEFAULT_PATH_PROP_NAME,DefaultConfigService.DEPLOY_PATH_PROP_NAME,"testing"}){
+			for(String prop : new String[]{DefaultConfigService.CONFIG_PATH_PROP_NAME,DefaultConfigService.DEFAULT_PATH_PROP_NAME,DefaultConfigService.DEPLOY_PATH_PROP_NAME}){
 				String value = overrides.getProperty(prop);
 				if( value != null ){
 					//System.out.println("property override "+prop+"->"+value);
-					sys_properties.setProperty(prop,value);
+					bootstrap.setProperty(prop,value);
 				}
 			}
-			
+			// mark as testing in the system properties
+			sys_properties.setProperty("testing", "true");
 //			for(Enumeration e=overrides.keys(); e.hasMoreElements(); ) {
 //				String name = (String) e.nextElement(); 
 //				System.out.println("Prop "+name+"="+overrides.getProperty(name));
@@ -125,17 +129,17 @@ public class AppContextFixtureRule extends ExternalResource{
 				throw new DataFault("Resource not found "+fix);
 			}
 		}
-		ctx = new AppContext();
-		
-		ctx.setService(new PrintLoggerService());
+		ctx = new AppContext(bootstrap); // if this is null then system props will be used
 		
 		ctx.setService( new SimpleSessionService(ctx));
 		// make sure database service sees the loaded props
-		ctx.setService( new OverrideConfigService(overrides,ctx));
+		//ctx.setService( new OverrideConfigService(overrides,ctx));
 		ctx.setService(new DataBaseConfigService(ctx));
 		//props only in test.properties will be visible from the service props but
 		// we also want to override any values in the normal config
 		ctx.setService( new OverrideConfigService(overrides,ctx));
+		
+		
 		ctx.setService(new DataStoreResourceService(ctx));
 		// get config service configured first before wrapping database and logger
 		ctx.setService(new CheckCloseDatabaseService(ctx.getService(DatabaseService.class)));
@@ -143,6 +147,7 @@ public class AppContextFixtureRule extends ExternalResource{
 		if( ErrorFilter.TIMER_FEATURE.isEnabled(ctx)) {
 			ctx.setService(new DefaultTimerService(ctx));
 		}
+		AppContext.setContext(ctx);
 		holder.setContext(ctx);
 	}
 	public Statement apply(Statement base, Description description) {

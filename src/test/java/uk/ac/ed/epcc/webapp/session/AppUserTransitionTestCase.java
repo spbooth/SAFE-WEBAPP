@@ -15,17 +15,19 @@ package uk.ac.ed.epcc.webapp.session;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.mail.Message;
 import javax.servlet.ServletException;
 
 import org.junit.Test;
 
+import jakarta.mail.Message;
 import uk.ac.ed.epcc.webapp.email.MockTansport;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.MapForm;
@@ -36,11 +38,11 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionFactory.ViewResult;
 import uk.ac.ed.epcc.webapp.servlet.AbstractTransitionServletTest;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory.UpdatePersonRequiredPage;
+import uk.ac.ed.epcc.webapp.session.EmailNameFinder.VerifyEmailRequiredPage;
 
 /**
  * @author Stephen Booth
@@ -172,6 +174,58 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 	}
 	
 	@Test
+	@ConfigFixtures("email_status.properties")
+	@DataBaseFixtures("invalidate_email.xml")
+	public void testRequestEmailChangeFromInvalid() throws ConsistencyError, Exception{
+		MockTansport.clear();
+		takeBaseline();
+	
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.findByEmail("fred@example.com");
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setCurrentPerson(user); // User is logged in but this will be a required page
+		
+		AppUserTransitionProvider provider = AppUserTransitionProvider.getInstance(ctx);
+		setTransition(provider, EmailNameFinder.CHANGE_EMAIL, user);
+		addParam(EmailNameFinder.EMAIL, "bilbo@example.com");
+		setAction(EmailChangeRequestFactory.REQUEST_ACTION);
+		runTransition();
+		checkMessage("email_change_request_made");
+		assertEquals(1,MockTansport.nSent());
+		Message message = MockTansport.getMessage(0);
+		assertEquals(ctx.expandText("${service.name} Email Change request Request"),message.getSubject());
+		assertEquals("bilbo@example.com",message.getAllRecipients()[0].toString());
+		checkDiff("/cleanup.xsl", "../servlet/email_change2.xml");
+	
+	}
+	
+	@Test
+	@ConfigFixtures("email_status.properties")
+	@DataBaseFixtures("invalidate_email.xml")
+	public void testRequestEmailVerifyFromInvalid() throws ConsistencyError, Exception{
+		MockTansport.clear();
+		takeBaseline();
+	
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.findByEmail("fred@example.com");
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setCurrentPerson(user); // User is logged in but this will be a required page
+		
+		AppUserTransitionProvider provider = AppUserTransitionProvider.getInstance(ctx);
+		setTransition(provider, EmailNameFinder.CHANGE_EMAIL, user);
+
+		setAction(EmailChangeRequestFactory.VERIFY_ACTION);
+		runTransition();
+		checkMessage("email_verify_request_made");
+		assertEquals(1,MockTansport.nSent());
+		Message message = MockTansport.getMessage(0);
+		assertEquals(ctx.expandText("${service.name} Email verification request Request"),message.getSubject());
+		assertEquals("fred@example.com",message.getAllRecipients()[0].toString());
+		checkDiff("/cleanup.xsl", "../servlet/email_change3.xml");
+	
+	}
+	
+	@Test
 	public void testRequirePasswordChange() throws Exception {
 		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
 		A user =  fac.makeBDO();
@@ -249,6 +303,7 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 	public void testRemoveKey() throws Exception {
 		MockTansport.clear();
 		takeBaseline();
+		setTime(2021, Calendar.MARCH, 1, 9, 0); // so update not forced.
 		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
 		A user =  fac.findByEmail("fred@example.com");
 		
@@ -279,6 +334,7 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 	public void testEraseTransition() throws Exception {
 		MockTansport.clear();
 		takeBaseline();
+		setTime(2021, Calendar.MARCH, 1, 9, 0); // avoid details warning in view
 		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
 		A user =  fac.makeBDO();
 	
@@ -357,5 +413,62 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 		runTransition();
 		checkMessage("roles_updated");
 		checkDiff("/cleanup.xsl", "roles.xml");
+	}
+	
+	@Test
+	@ConfigFixtures("email_status.properties")
+	public void testMarkEmailInvalid() throws Exception {
+		MockTansport.clear();
+		takeBaseline();
+		setTime(2022, Calendar.MARCH, 23, 14, 00);
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		
+		Set<RequiredPage<A>> pages = fac.getRequiredPages();
+		assertEquals(2, pages.size());
+		
+		VerifyEmailRequiredPage p = null;
+		for(RequiredPage<A> x : pages) {
+			if( x instanceof VerifyEmailRequiredPage) {
+				p = (VerifyEmailRequiredPage) x;
+			}
+		}
+		assertNotNull("Expect a VerifyEmailRequiredPage",p);
+		A user =  fac.makeBDO();
+	
+		user.setEmail("fred@example.com");
+		user.commit();
+		EmailNameFinder<A> finder = fac.getComposite(EmailNameFinder.class);
+		assertNotNull(finder);
+		finder.verified(user);
+		assertTrue(finder.useEmailStatus());
+		assertTrue(user.allowEmail());
+		assertFalse(finder.emailMarkedInvalid(user));
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setCurrentPerson(user);
+		assertFalse(p.required(sess));
+		
+		
+		
+		A manager = fac.makeBDO();
+		manager.setEmail("bill@example.com");
+		manager.commit();
+		
+		
+		sess.setRole(manager,EmailNameFinder.INVALIDATE_EMAIL_ROLE, true);
+		sess.setCurrentPerson(manager);
+		assertTrue(sess.haveCurrentUser());
+		
+		AppUserTransitionProvider provider = AppUserTransitionProvider.getInstance(ctx);
+		setTransition(provider, EmailNameFinder.INVALIDATE_EMAIL, user);
+		checkFormContent(null, "invalidate_email_form.xml");
+		setAction("Yes");
+		runTransition();
+		checkViewRedirect(provider, user);
+		checkDiff("/cleanup.xsl", "invalidate_email.xml");
+		user = fac.find(user.getID());
+		assertFalse(user.allowEmail());
+		assertTrue(finder.emailMarkedInvalid(user));
+		sess.setCurrentPerson(user);
+		assertTrue(p.required(sess)); // user now required to verify
 	}
 }

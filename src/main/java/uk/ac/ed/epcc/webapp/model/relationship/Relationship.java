@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
@@ -127,6 +128,9 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 			super(arg0, arg1);
 		}
 
+		private Relationship<A,B> getRelationship(){
+			return (Relationship<A, B>) getLinkManager();
+		}
 		@Override
 		protected void setup() throws DataFault, DataException {
 		}
@@ -136,7 +140,13 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 		}
 		@Override
 		public void setRole(String role, boolean value){
-			record.setProperty(role, value);
+			record.setOptionalProperty(role, value);
+		}
+		public A getUser() throws DataException {
+			return getLeft();
+		}
+		public B getTarget() throws DataException {
+			return getRight();
 		}
     	
     }
@@ -146,6 +156,16 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 		return new Link<>(this,res);
 	}
 
+	/** Access method for the {@link SetRelationshipTransition}
+	 * 
+	 * @param user
+	 * @param target
+	 * @return
+	 * @throws Exception
+	 */
+	Link<A,B> make(A user, B target) throws Exception{
+		return makeLink(user, target);
+	}
 
 	/**
 	 * @param role
@@ -155,6 +175,12 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 	@Override
 	protected SQLFilter<Link<A, B>> getFilterFromRole(String role) throws UnknownRelationshipException {
 		if( ! res.hasField(role)){
+			for(String s : getDefaultRoles(getContext(), getConfigTag())) {
+				if( role.equals(s)) {
+					// a default role without a field
+					return new FalseFilter<Relationship.Link<A,B>>(getTarget());
+				}
+			}
 			throw new UnknownRelationshipException(role+"@"+getTag());
 		}
 		return new SQLValueFilter<>(getTarget(),res,role,Boolean.TRUE);
@@ -189,6 +215,14 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 	 */
 	@Override
 	public Set<String> getRelationships(){
+		Set<String> result = getSettableRelationships();
+		for(String s : getDefaultRoles(getContext(), getConfigTag())) {
+			result.add(s);
+		}
+		return result;
+	}
+
+	public Set<String> getSettableRelationships() {
 		Set<String> result = new HashSet<>();
 		for( String s: res.getFields()){
 			if( res.getInfo(s).isBoolean()){

@@ -35,29 +35,7 @@ public abstract class SimpleViewTransitionProvider<T extends Indexed,K extends T
 		super(c, fac, target_name);
 	}
 
-	
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#getSummaryContent(uk.ac.ed.epcc.webapp.AppContext, uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object)
-	 */
-	@Override
-	public <X extends ContentBuilder> X getSummaryContent(AppContext c, X cb, T target) {
-		return cb;
-	}
-
-	
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#getTopContent(uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object, uk.ac.ed.epcc.webapp.session.SessionService)
-	 */
-	@Override
-	public <X extends ContentBuilder> X getTopContent(X cb, T target, SessionService<?> sess) {
-		return cb;
-	}
-	@Override
-	public <X extends ContentBuilder> X getBottomContent(X cb, T target, SessionService<?> sess) {
-		return cb;
-	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#getLogContent(uk.ac.ed.epcc.webapp.content.ContentBuilder, java.lang.Object, uk.ac.ed.epcc.webapp.session.SessionService)
 	 */
@@ -66,24 +44,6 @@ public abstract class SimpleViewTransitionProvider<T extends Indexed,K extends T
 		return getSummaryContent(sess.getContext(), cb, target);
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#getHelp(java.lang.Object)
-	 */
-	@Override
-	public final String getHelp(K key) {
-		return key.getHelp();
-	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory#getText(java.lang.Object)
-	 */
-	@Override
-	public String getText(K key) {
-		return key.getName();
-	}
-
-
-
-	
 
 }

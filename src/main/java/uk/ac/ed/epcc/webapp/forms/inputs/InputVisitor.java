@@ -43,6 +43,6 @@ public interface InputVisitor<R> {
 		return visitUnmodifyableInput(l);
 	}
 	default <X> R visitWrappedInput(WrappedInput<X> i) throws Exception {
-		return (R) i.getWrappedInput().accept(this);
+		return (R) i.getNested().accept(this);
 	}
 }

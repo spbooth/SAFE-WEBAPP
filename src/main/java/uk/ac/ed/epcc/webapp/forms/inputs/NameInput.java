@@ -13,7 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-/** Inteface for {@link ItemInput}s where the value is
+/** Interface for {@link ItemInput}s where the value is
  * the canonical name of the item
  * @author Stephen Booth
  * @see NameInputProvider

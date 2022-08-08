@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -57,18 +58,25 @@ import uk.ac.ed.epcc.webapp.forms.SetParamVisitor;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
+import uk.ac.ed.epcc.webapp.forms.html.PageHTMLForm;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.CustomPage;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.BaseFormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.CustomFormContent;
+import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
+import uk.ac.ed.epcc.webapp.forms.transition.NavigationProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.TitleTransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
 import uk.ac.ed.epcc.webapp.jdbc.config.DataBaseConfigService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.GetListFilterVisitor;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.logging.debug.DebugLoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintLoggerService;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
@@ -88,6 +96,7 @@ import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.session.SimpleSessionService;
+import uk.ac.ed.epcc.webapp.tags.ConfirmTag;
 import uk.ac.ed.epcc.webapp.timer.DefaultTimerService;
 /** This is an abstract test class for performing high
  * level tests of operations against servlets.
@@ -259,9 +268,10 @@ public abstract class ServletTest extends WebappTestBase{
 	 * @param url URL to check
 	 */
 	public void checkRedirect(String url){
-		assertEquals(HttpServletResponse.SC_OK,res.error);
-		assertNull(res.error_str);
 		assertNull("Forward not redirect",res.forward);
+		assertEquals(HttpServletResponse.SC_FOUND,res.error);
+		assertNull(res.error_str);
+		
 		if( url.startsWith("http")){
 			assertEquals("Wrong redirect", url, res.redirect);
 		}else{
@@ -301,6 +311,23 @@ public abstract class ServletTest extends WebappTestBase{
 			assertEquals(error, errors.get(param));
 		}
 	}
+	
+	/** Check the expected content of a confirm message
+	 * @throws TransformerException 
+	 * @throws TransformerFactoryConfigurationError 
+	 * @throws TransformerConfigurationException 
+	 * 
+	 */
+	public void checkConfirmContent(String normalise_transform,String expected) throws TransformerConfigurationException, TransformerFactoryConfigurationError, TransformerException {
+		String type = (String) req.getAttribute(WebappServlet.CONFIRM_TYPE);
+		assertNotNull(type);
+		
+		HtmlBuilder hb = new HtmlBuilder();
+		ConfirmTag.addContent(req, getContext(), getContext().getService(LoggerService.class).getLogger(ConfirmTag.class), hb);
+		checkContent(normalise_transform, expected, hb.toString());
+		
+		
+	}
 	/** Check that the specified confirm message has been requested
 	 * then reset the response and modify the request with the specified confirmation
 	 * 
@@ -320,6 +347,7 @@ public abstract class ServletTest extends WebappTestBase{
 		}else{
 			addParam(WebappServlet.CONFIRM_NO, "anything");
 		}
+		addParam("submitted","true");
 	}
 	/** Check that the response has forwarded to the messages page to show the
 	 * specified message
@@ -333,14 +361,23 @@ public abstract class ServletTest extends WebappTestBase{
 	
 	public void checkMessageText( String expected) {
 		String message_type = (String) req.getAttribute("message_type");
-		Object args[] = (Object[]) req.getAttribute("args");
-		if(args == null) args = new Object[0];
+		Object[] args = getMessageArgs();
 		
 		ResourceBundle mess = getContext().getService(MessageBundleService.class).getBundle();
 		PreDefinedContent text = new PreDefinedContent(ctx,mess,message_type + ".text",args);
 		HtmlBuilder buffer = new HtmlBuilder();
 		text.addContent((SimpleXMLBuilder)buffer);
 		assertEquals(expected, buffer.toString());
+	}
+
+	/** Extract the arguments that have been passed to a message result
+	 * 
+	 * @return
+	 */
+	public Object[] getMessageArgs() {
+		Object args[] = (Object[]) req.getAttribute("args");
+		if(args == null) args = new Object[0];
+		return args;
 	}
 	
 	public void checkTransitionException(String message){
@@ -541,7 +578,57 @@ public abstract class ServletTest extends WebappTestBase{
 		checkForward("/scripts/transition.jsp");
 
 	}
-	
+	/** Check that the servlet has forwarded to the jsp that displays an PageForm
+	 * (one that posts back to itself) also check the necesary attributes are in the request object
+	 * 
+	 */
+	public void checkForwardToPageForm() {
+		assertNotNull("No Title",req.getAttribute("Title"));
+		assertNotNull("No Form",req.getAttribute("Form"));
+		checkForward("/scripts/page_form.jsp");
+	}
+	/** Generates a XML (mostly HTML) representation of the 
+	 * contents of the PAgeForm
+	 * 
+	 * This is then (optionally) put through a
+	 * normalisation XLST transform to remove time dependent 
+	 * output and compared with a file of expected output.
+	 * 
+	 * 
+	 * @param normalise_transform
+	 * @param expected
+	 * @throws Exception 
+	 */
+	public <K,T> void checkPageFormContent(String normalize_transform, String expected_xml) throws Exception{
+		
+		PageHTMLForm form = (PageHTMLForm) req.getAttribute("Form");
+		String title = (String) req.getAttribute("Title");
+		Object extra = req.getAttribute("ExtraContent");
+		assertNotNull(form);
+		assertNotNull(title);
+		checkForward("/scripts/page_form.jsp");
+		HtmlBuilder builder = new HtmlBuilder();
+		builder.setValidXML(true);
+		builder.open("page_form");
+			 // could do this for all transitions but
+			 // would need to update results for all non Title factories
+			builder.open("Title");
+				builder.clean(title);
+			builder.close();
+			if( extra != null) {
+				builder.open("Extra");
+				builder.addObject(extra);
+				builder.close();
+			}
+			builder.open("Form");
+			form.getHtmlForm(builder);
+			 builder.close();
+        
+		
+		 builder.close();
+		 String xml = builder.toString();
+		 checkContent(normalize_transform, expected_xml, xml);
+	}
 	/** check that the result is consistent with a forward to the view_target page. 
 	 * Normally this should not be needed in tests as most operations should be written 
 	 * to use a redirect to the canonical object URL to generate the view page.

@@ -157,6 +157,7 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 		if( service != null ){
 			service.removeAttribute(NAVIGATION_MENU_ATTR);
 		}
+		service.flushRelationships();  // menu may depend on roles, flush these as well inc ase this is what changed
 	}
 	
 	public FilteredProperties getProperties() {

@@ -123,8 +123,10 @@ public class SSLService extends AbstractContexed implements Contexed, ConfigServ
         String keystore = conn.getInitParameter("sslservice."+tag+".keystore.location");
         String keypass = conn.getInitParameter("sslservice."+tag+".keystore.pass","");
         String keytype = conn.getInitParameter("sslservice."+tag+".keystore.type");
-        if( keystore == null || keypass == null || keytype == null ){
-        	return kmFact.getKeyManagers(); 
+        if( keystore == null || keystore.isEmpty() || 
+        		keypass == null || keypass.isEmpty() || 
+        		keytype == null || keytype.isEmpty() ){
+        	return null; // use default 
         }
         InputStream fis = resources.getResourceAsStream(keystore);
         if( fis == null ){
@@ -152,8 +154,8 @@ public class SSLService extends AbstractContexed implements Contexed, ConfigServ
         TrustManagerFactory tmFact=TrustManagerFactory.getInstance(alg);
         ResourceService resources=conn.getService(ResourceService.class);
 
-        if( truststore==null || trusttype==null){
-        	return tmFact.getTrustManagers();
+        if( truststore==null || truststore.isEmpty() || trusttype==null || trusttype.isEmpty()){
+        	return null; // use default
         }
         InputStream fis = resources.getResourceAsStream(truststore);
         if( fis == null ){

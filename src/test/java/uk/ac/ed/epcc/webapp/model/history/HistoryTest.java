@@ -29,7 +29,7 @@ import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.Dummy1;
-import uk.ac.ed.epcc.webapp.model.history.HistoryFactory.HistoryRecord;
+import uk.ac.ed.epcc.webapp.model.data.HistoryFactory.HistoryRecord;
 
 public class HistoryTest extends WebappTestBase {
 

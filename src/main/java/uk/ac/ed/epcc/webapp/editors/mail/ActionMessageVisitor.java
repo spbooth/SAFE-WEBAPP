@@ -20,15 +20,15 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.mail.Address;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Part;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.MimePart;
+import jakarta.mail.Address;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
+import jakarta.mail.Part;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.internet.MimePart;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageWalker.WalkerException;
@@ -80,7 +80,7 @@ public class ActionMessageVisitor extends AbstractVisitor {
 	    	return s==null || s.trim().length()==0;
 	 }
 	 protected void addRecipient(AppContext c,MimeMessage m,
-			 javax.mail.Message.RecipientType cc,
+			 jakarta.mail.Message.RecipientType cc,
 			 String address
 			 ) throws WalkerException{
 		 try{
@@ -97,7 +97,7 @@ public class ActionMessageVisitor extends AbstractVisitor {
 		 }
 	 }
 	 protected void deleteRecipient(MimeMessage m,
-				javax.mail.Message.RecipientType cc, int id) throws MessagingException {
+				jakarta.mail.Message.RecipientType cc, int id) throws MessagingException {
                if( m.getAllRecipients().length == 1){
             	   // always leave one
             	   return;
@@ -181,7 +181,7 @@ public class ActionMessageVisitor extends AbstractVisitor {
 	public void doBCC(Address address, int i, int length, MessageWalker messageWalker) throws WalkerException {
 		if( request == EditAction.Delete){
 			try {
-				deleteRecipient(messageWalker.getCurrentMessage(), javax.mail.Message.RecipientType.BCC, i);
+				deleteRecipient(messageWalker.getCurrentMessage(), jakarta.mail.Message.RecipientType.BCC, i);
                 modified=true;
 			} catch (MessagingException e) {
 				getLogger().error("Error deleting recipient",e);
@@ -194,7 +194,7 @@ public class ActionMessageVisitor extends AbstractVisitor {
 	public void doCC(Address address, int i, int length, MessageWalker messageWalker) throws WalkerException {
 		if( request == EditAction.Delete){
 			try {
-				deleteRecipient(messageWalker.getCurrentMessage(), javax.mail.Message.RecipientType.CC, i);
+				deleteRecipient(messageWalker.getCurrentMessage(), jakarta.mail.Message.RecipientType.CC, i);
                 modified=true;
 			} catch (MessagingException e) {
 				getLogger().error("Error deleting recipient",e);
@@ -206,13 +206,13 @@ public class ActionMessageVisitor extends AbstractVisitor {
 	@Override
 	public void doRecipients(MessageWalker walker) throws WalkerException {
 		if( request == EditAction.AddCC){
-			addRecipient(walker.getContext(), walker.getCurrentMessage(), javax.mail.Message.RecipientType.CC, (String)data);
+			addRecipient(walker.getContext(), walker.getCurrentMessage(), jakarta.mail.Message.RecipientType.CC, (String)data);
 		}
 		if( request == EditAction.AddTo){
-			addRecipient(walker.getContext(), walker.getCurrentMessage(), javax.mail.Message.RecipientType.TO, (String)data);
+			addRecipient(walker.getContext(), walker.getCurrentMessage(), jakarta.mail.Message.RecipientType.TO, (String)data);
 		}
 		if( request == EditAction.AddBcc){
-			addRecipient(walker.getContext(), walker.getCurrentMessage(), javax.mail.Message.RecipientType.BCC, (String)data);
+			addRecipient(walker.getContext(), walker.getCurrentMessage(), jakarta.mail.Message.RecipientType.BCC, (String)data);
 		}
 	}
 	@Override
@@ -225,7 +225,7 @@ public class ActionMessageVisitor extends AbstractVisitor {
 
 	@Override
 	public void doReplyTo(Address[] cc, MessageWalker messageWalker) throws WalkerException {
-		// TODO Auto-generated method stub
+		
 		super.doReplyTo(cc, messageWalker);
 	}
 
@@ -260,7 +260,7 @@ public class ActionMessageVisitor extends AbstractVisitor {
 	public void doTo(Address address, int i, int length, MessageWalker messageWalker) throws WalkerException {
 		if( request == EditAction.Delete){
 			try {
-				deleteRecipient(messageWalker.getCurrentMessage(), javax.mail.Message.RecipientType.TO, i);
+				deleteRecipient(messageWalker.getCurrentMessage(), jakarta.mail.Message.RecipientType.TO, i);
 	            modified=true;
 			} catch (MessagingException e) {
 				getLogger().error("Error deleting recipient",e);

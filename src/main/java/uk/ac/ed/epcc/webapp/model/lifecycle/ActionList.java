@@ -13,9 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.lifecycle;
 
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.model.AbstractConstructedTargetList;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -70,7 +68,7 @@ public class ActionList<T extends DataObject> extends AbstractConstructedTargetL
 	 * @see uk.ac.ed.epcc.webapp.model.lifecycle.ActionListener#action(java.lang.Object)
 	 */
 	@Override
-	public void action(T target) {
+	public void action(T target) throws Exception {
 		for(ActionListener<T> l  : this){
 			l.action(target);
 		}
@@ -85,7 +83,11 @@ public class ActionList<T extends DataObject> extends AbstractConstructedTargetL
 				if( result == null ) {
 					result = new LinkedHashSet<>();
 				}
-				result.add(o);
+				if( o instanceof Collection) {
+					result.addAll((Collection)o);
+				}else {
+					result.add(o);
+				}
 			}
 		}
 		if( result != null && result.size() == 1) {

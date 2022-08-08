@@ -24,6 +24,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
 
 
@@ -122,7 +123,7 @@ public class SshPublicKeyInput extends ParseAbstractInput<String> implements Ite
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AbstractInput#convert(java.lang.Object)
 	 */
 	@Override
-	public String convert(Object v) throws TypeError {
+	public String convert(Object v) throws TypeException {
 		if( v == null ) {
 			return null;
 		}
@@ -135,7 +136,7 @@ public class SshPublicKeyInput extends ParseAbstractInput<String> implements Ite
 //				return getString((String)v);
 //			}
 		}catch(Exception e) {
-
+			throw new TypeException("Error formatting PublicKey", e);
 		}
 		return super.convert(v);
 	}

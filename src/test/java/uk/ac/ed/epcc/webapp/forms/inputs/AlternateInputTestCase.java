@@ -38,7 +38,7 @@ ParseMapInputInterfaceTest<Integer, AlternateInput<Integer>, AlternateInputTestC
 	 * 
 	 */
 	public AlternateInputTestCase() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

@@ -17,7 +17,6 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
@@ -52,7 +51,7 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#convert(java.lang.Object)
 	 */
 	@Override
-	public String convert(Object v) throws TypeError {
+	public String convert(Object v) throws TypeException {
 		if( v == null ){
 			return (String) v;
 		}
@@ -62,7 +61,7 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 			try {
 				data.write(stream);
 			} catch (Exception e) {
-				throw new TypeError(e);
+				throw new TypeException(e);
 			}
 			return stream.toString();
 		}
@@ -79,16 +78,21 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 		if( ! parent.isEmpty()) {
 			return parent.getValue();
 		}
-		return convert(file.getValue());
+		try {
+			return convert(file.getValue());
+		} catch (TypeException e) {
+			return null;
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.MultiInput#setValue(java.lang.Object)
 	 */
 	@Override
-	public String setValue(String v) throws TypeError {
+	public String setValue(String v) throws TypeException {
 		String old = getValue();
 		parent.setValue(v);
+		file.setNull();
 		return old;
 	}
 
@@ -100,7 +104,11 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 	@Override
 	public void validateInner() throws FieldException {
 		if( parent.isEmpty() && ! file.isEmpty()) {
-			parent.setValue(convert(file.getValue()));
+			try {
+				parent.setValue(convert(file.getValue()));
+			} catch (TypeException e) {
+				throw new ParseException("Failed to convert file to string", e);
+			}
 		}
 		parent.validate();
 	}
@@ -143,30 +151,43 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 		// First consider a global param-name
 		Object data = v.get(getKey());
 		if( data != null) {
-			parent.parse(convert(data));
+			try {
+				parent.parse(convert(data));
+			} catch (TypeException e) {
+				throw new ParseException("Failed to convert data to string", e);
+			}
+			file.setNull();
 			is_leaf=false;
 			is_set=true;
+		}else {
+			// Parse parent input (If no global value)
+			Object text = v.get(parent.getKey());
+			if( text != null ) {
+				try {
+					parent.parse(parent.convert(text));
+				} catch (TypeException e) {
+					throw new ParseException("Failed to convert data to string", e);
+				}
+				is_leaf=true;
+				is_set=true;
+			}
+			// finally override with any file-upload
+			Object f = v.get(file.getKey());
+			if( f != null ) {
+				try {
+					parent.parse(convert(f));
+				} catch (TypeException e) {
+					throw new ParseException("Failed to convert file data to string", e);
+				}
+				is_leaf=true;
+				is_set=true;
+			}
+			if( ! is_set ) {
+				// no values have been seen at all
+				parent.parse(null);
+				is_leaf=true;
+			}
 		}
-		// Parse parent input (overrides a global value)
-		Object text = v.get(parent.getKey());
-		if( text != null ) {
-			parent.parse(parent.convert(text));
-			is_leaf=true;
-			is_set=true;
-		}
-		// finally override with any file-upload
-		Object f = v.get(file.getKey());
-		if( f != null ) {
-			parent.parse(convert(f));
-			is_leaf=true;
-			is_set=true;
-		}
-		if( ! is_set ) {
-			// no values have been seen at all
-			parent.parse(null);
-			is_leaf=true;
-		}
-		
 		return is_leaf;
 	}
 

@@ -24,7 +24,7 @@ public class TestComposableComposite<BDO extends DataObject> extends Composite<B
 	 */
 	public TestComposableComposite(DataObjectFactory<BDO> fac) {
 		super(fac);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

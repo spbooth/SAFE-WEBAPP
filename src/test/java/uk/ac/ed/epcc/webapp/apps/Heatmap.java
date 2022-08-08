@@ -26,7 +26,7 @@ public class Heatmap {
 	 * 
 	 */
 	public Heatmap() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	public static void main(String argv[]){

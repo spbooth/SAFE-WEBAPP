@@ -113,7 +113,7 @@ ListInputInterfaceTest<Integer, Object,ListInput<Integer,Object>, NullListInputT
 
 	@Override
 	@Test
-	public final void testGood() throws TypeError, Exception {
+	public final void testGood() throws  Exception {
 		input_test.testGood();
 		
 	}

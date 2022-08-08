@@ -64,7 +64,7 @@ public class RealInput extends NumberInput<Float> {
 
 	}
 	@Override
-	public Float convert(Object v) throws TypeError {
+	public Float convert(Object v) throws TypeException {
 		if( v == null || v instanceof Float){
 			return (Float) v;
 		}
@@ -74,6 +74,6 @@ public class RealInput extends NumberInput<Float> {
 		if( v instanceof String){
 			return new Float((String)v);
 		}
-		throw new TypeError(v.getClass());
+		throw new TypeException(v.getClass());
 	}
 }

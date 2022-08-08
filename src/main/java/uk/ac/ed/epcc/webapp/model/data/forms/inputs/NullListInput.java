@@ -29,6 +29,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
@@ -127,18 +128,23 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 
 	@Override
 	public void setItem(Object item) {
-		if( item == null ){
-			setValue(null);
-			return;
+		try{
+			if( item == null ){
+				setValue(null);
+				return;
+			}
+			if( item == NULLTAG){
+				setValue(NULL_VALUE);
+				return;
+			}
+			setValue(((Indexed)item).getID());
+		}catch(TypeException e) {
+			// this should never happen
+			throw new TypeError(e);
 		}
-		if( item == NULLTAG){
-			setValue(NULL_VALUE);
-			return;
-		}
-		setValue(((Indexed)item).getID());
 	}
 	@Override
-	public Integer setValue(Integer v) throws TypeError {
+	public Integer setValue(Integer v) throws TypeException {
 			return internal.setValue(v);		
 	}
 	@Override
@@ -154,7 +160,7 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 	    return new 	SQLValueFilter(clazz,res,target,i);
 	}
 	@Override
-	public Integer convert(Object v) throws TypeError {
+	public Integer convert(Object v) throws TypeException {
 		return internal.convert(v);
 	}
 	@Override
@@ -275,6 +281,11 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 			
 		};
 				
+	}
+	@Override
+	public void setNull() {
+		internal.setNull();
+		
 	}
 
 }

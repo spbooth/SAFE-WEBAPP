@@ -30,5 +30,7 @@ public interface TableFormatPolicy<C, R> {
 	public abstract void add(Table<C, R> t);
 
 	public abstract void addColumn(Table<C, R> t, C key);
+	
+	 public abstract void setAllowSpan(boolean value);
 
 }

@@ -33,7 +33,11 @@ public class LockedInput<V> extends WrappingInput<V> implements UnmodifiableInpu
    
 	@Override
 	public String getLabel() {
-		return getNested().getPrettyString(getNested().getValue());
+		Input<V> nested = getNested();
+		if( nested instanceof UnmodifiableInput) {
+			return ((UnmodifiableInput)nested).getLabel();
+		}
+		return nested.getPrettyString(nested.getValue());
 	}
 
 
@@ -49,7 +53,7 @@ public class LockedInput<V> extends WrappingInput<V> implements UnmodifiableInpu
 	}
 
 	@Override
-	public V setValue(V v) throws TypeError {
+	public V setValue(V v) {
 		// non modifyable
 		// for multi stage update forms we need to be able to call form setContents
 		// without the value being updated.

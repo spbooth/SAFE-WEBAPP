@@ -29,6 +29,9 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 public interface ParseInput<T> extends Input<T> {
 	/** Parse a String into the correct type for this input.
 	 * 
+	 * This may apply tighter validation constraints than the {@link #convert(Object)}
+	 * method applied to a String
+	 * 
 	 * This must be compatible with the {@link #getString(Object)} method.
 	 * 
 	 * @param v
@@ -59,6 +62,26 @@ public interface ParseInput<T> extends Input<T> {
 	 * @throws ParseException
 	 */
 	public default void parse(String v) throws ParseException{
-		setValue(parseValue(v));
+		try {
+			setValue(parseValue(v));
+		} catch (TypeException e) {
+			// should never happen
+			throw new ParseException("Type convert failed",e);
+		}
 	}
+	
+//	@Override
+//	public default T convert(Object v) throws TypeException{
+//		if( v == null) {
+//			return null;
+//		}
+//		if( v instanceof String) {
+//			try {
+//				return parseValue((String) v);
+//			} catch (ParseException e) {
+//				throw new TypeException("String failed to parse", e);
+//			}
+//		}
+//		return (T) v;
+//	}
 }

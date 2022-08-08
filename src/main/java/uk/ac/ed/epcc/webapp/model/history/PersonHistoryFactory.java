@@ -6,6 +6,7 @@ package uk.ac.ed.epcc.webapp.model.history;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
+import uk.ac.ed.epcc.webapp.model.data.HistoryFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
 import uk.ac.ed.epcc.webapp.session.AppUser;

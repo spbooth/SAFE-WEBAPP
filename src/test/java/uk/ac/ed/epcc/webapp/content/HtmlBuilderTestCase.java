@@ -268,15 +268,17 @@ public class HtmlBuilderTestCase extends WebappTestBase {
 	}
 	
 	@Test
-	public void testDeDupTableFormat() {
+	public void testDeDupTable() {
 		HtmlBuilder hb = new HtmlBuilder();
 		Table t = new Table();
 		t.put("col1", "row1", "A");
 		t.put("col2", "row1", "B");
 		t.put("col1", "row2", "A");
 		t.put("col2", "row2", "C");
-		DeDupTableXMLFormatter fmt = new DeDupTableXMLFormatter<>(hb, null);
-		fmt.add(t);
+		
+		t.getCol("col1").setDedup(true);
+		t.getCol("col2").setDedup(true);
+		hb.addTable(ctx, t);
 		
 		Assert.assertEquals(
 				"<table class='auto' rows='2' cols='2'>\n" + 
@@ -285,6 +287,38 @@ public class HtmlBuilderTestCase extends WebappTestBase {
 				"<tr count='2'>		<td class='main' count='1'>C</td></tr>\n" + 
 				"</table>\n",
 				hb.toString());
+	}
+	
+	@Test
+	public void testFormatGroups() throws InvalidArgument {
+		HtmlBuilder hb = new HtmlBuilder();
+		Table t = new Table();
+		t.put("col1", "row1", "A");
+		t.put("col2", "row1", "B");
+		t.put("col3", "row1", "C");
+		t.put("col4", "row1", "D");
+		t.put("col1", "row2", "P");
+		t.put("col2", "row2", "Q");
+		t.put("col3", "row2", "R");
+		t.put("col4", "row2", "S");
+		t.addToGroup("G1", "col1");
+		t.addToGroup("G1", "col2");
+		t.addToGroup("G2", "col3");
+		t.addToGroup("G2", "col4");
+		t.setKeyName("rows");
+		t.setPrintGroups(true);
+	
+		hb.addTable(ctx, t);
+		
+		Assert.assertEquals(
+				"<table class='auto' rows='2' cols='5'>\n" + 
+				"<tr count='0'><th class='key' count='0' rowspan='2'>rows</th><th class='main' count='1' colspan='2'>G1</th><th class='main' count='3' colspan='2'>G2</th></tr>\n" + 
+				"<tr count='1'><th class='main' count='1'>col1</th><th class='main' count='2'>col2</th><th class='main' count='3'>col3</th><th class='main' count='4'>col4</th></tr>\n" + 		
+				"<tr count='2'><td class='key' count='0'>row1</td><td class='main' count='1'>A</td><td class='main' count='2'>B</td><td class='main' count='3'>C</td><td class='main' count='4'>D</td></tr>\n" + 
+				"<tr count='3'><td class='key' count='0'>row2</td><td class='main' count='1'>P</td><td class='main' count='2'>Q</td><td class='main' count='3'>R</td><td class='main' count='4'>S</td></tr>\n" + 
+				"</table>\n",
+				hb.toString());
+	
 	}
 	/**
 	 * Tests the method {@link HtmlBuilder#addColumn(AppContext, Table, Object)}.

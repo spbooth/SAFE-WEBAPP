@@ -39,7 +39,7 @@ public class FormComposeTest<D extends DynamicForm> extends AbstractTransitionSe
 	 * 
 	 */
 	public FormComposeTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	
@@ -54,7 +54,7 @@ public class FormComposeTest<D extends DynamicForm> extends AbstractTransitionSe
 		setTransition(provider, provider.CREATE, null);
 		checkFormContent(null,"create_form_content.xml");
 		addParam(DynamicFormManager.NAME_FIELD, "FirstForm");
-		runTransition();
+		runTransition(1);
 		D new_form = manager.findFromString("FirstForm");
 		checkViewRedirect(provider, new_form);
 		checkDiff("/cleanup.xsl", "create_form.xml");

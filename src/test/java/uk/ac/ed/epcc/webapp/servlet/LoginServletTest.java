@@ -13,27 +13,28 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Set;
 
-import javax.mail.Message;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 
 import org.junit.Test;
 
+import jakarta.mail.Message;
 import uk.ac.ed.epcc.webapp.TestTimeService;
 import uk.ac.ed.epcc.webapp.email.MockTansport;
-import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
-import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -52,13 +53,14 @@ import uk.ac.ed.epcc.webapp.session.WebNameFinder;
  *
  */
 
-public class LoginServletTest<A extends AppUser> extends ServletTest {
+public class LoginServletTest<A extends AppUser> extends AbstractLoginServletTest<A> {
 
 	/**
 	 * 
 	 */
 	public LoginServletTest() {
-		// TODO Auto-generated constructor stub
+		super();
+		
 	}
 	
 	@Test
@@ -300,22 +302,6 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		checkDiff("/cleanup.xsl", "login_wtmp2.xml");
 		assertEquals(0, MockTansport.nSent());
 	}
-	/**
-	 * @throws IOException 
-	 * @throws ServletException 
-	 * 
-	 */
-	public void loginRedirects() throws ServletException, IOException {
-		loginRedirects("/main.jsp");
-	}
-	public void loginRedirects(String expected) throws ServletException, IOException {
-		if( LoginServlet.COOKIE_TEST.isEnabled(ctx)) {
-			checkRedirect("/LoginServlet");
-			doPost();
-		}
-		checkRedirect(expected);
-	}
-	
 	@ConfigFixtures({"wtmp.properties","crosscookie.properties"})
 	@Test
 	public void testLoginWithWtmpAndCrossCookie() throws DataException, Exception{
@@ -643,16 +629,6 @@ public class LoginServletTest<A extends AppUser> extends ServletTest {
 		assertTrue(sess.haveCurrentUser());
 		assertTrue(sess.isCurrentPerson(user));
 		checkRedirect("/main.jsp");
-	}
-	@Override
-	public void setUp() throws Exception {
-		// TODO Auto-generated method stub
-		super.setUp();
-		servlet=new LoginServlet<A>();
-		MockServletConfig config = new MockServletConfig(serv_ctx, "LoginServlet");
-		servlet.init(config);
-		req.servlet_path="LoginServlet";
-		
 	}
 
 	

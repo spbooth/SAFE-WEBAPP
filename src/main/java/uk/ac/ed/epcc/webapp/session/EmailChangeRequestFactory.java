@@ -125,7 +125,7 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractUserRe
 			try {
 				
 				EmailChangeRequest req = createRequest(user,(String)f.get(EmailNameFinder.EMAIL));
-				Emailer em= new Emailer(getContext());
+				Emailer em= Emailer.getFactory(getContext());
 				em.newEmailRequest(user, req);
 				return new MessageResult("email_change_request_made");
 			} catch (Exception e) {
@@ -150,9 +150,9 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractUserRe
 			try {
 				
 				EmailChangeRequest req = createRequest(user,user.getEmail());
-				Emailer em= new Emailer(getContext());
+				Emailer em= Emailer.getFactory(getContext());
 				em.newEmailRequest(user, req);
-				return new MessageResult("email_verify_request_made");
+				return new MessageResult("email_verify_request_made",user.getEmail());
 			} catch (Exception e) {
 				getContext().error(e,"Error making EmailChangeRequest");
 				throw new ActionException("Internal Error");
@@ -182,7 +182,11 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractUserRe
 			field.addValidator(new ParseFactoryValidator<AppUser>(factory, user));
 			
 	    	f.addAction(REQUEST_ACTION, new RequestAction(user));
-	    	if( include_verify) {
+	    	String email = null;
+	    	if( user != null ) {
+	    		email=user.getEmail();
+	    	}
+	    	if( include_verify && email != null && ! email.isEmpty()) {
 	    		f.addAction(VERIFY_ACTION, new VerifyAction(user));
 	    	}
 	    }

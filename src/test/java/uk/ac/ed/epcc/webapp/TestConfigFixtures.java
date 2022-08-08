@@ -29,7 +29,7 @@ public class TestConfigFixtures extends WebappTestBase {
 	 * 
 	 */
 	public TestConfigFixtures() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	@ConfigFixtures("additional.properties")

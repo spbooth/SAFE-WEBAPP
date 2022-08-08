@@ -118,7 +118,7 @@ public class ClassInput<T> extends AbstractInput<String> implements ListInput<St
 	}
 
 	@Override
-	public String convert(Object v) throws TypeError {
+	public String convert(Object v)  {
 		if( v instanceof String ){
 			return (String) v;
 		}
@@ -139,7 +139,12 @@ public class ClassInput<T> extends AbstractInput<String> implements ListInput<St
 
 	@Override
 	public void setItem(Class<? extends T> item) {
-		setValue(getTagByItem(item));
+		try {
+			setValue(getTagByItem(item));
+		} catch (TypeException e) {
+			// should never happen
+			throw new TypeError(e);
+		}
 		
 	}
 	@Override

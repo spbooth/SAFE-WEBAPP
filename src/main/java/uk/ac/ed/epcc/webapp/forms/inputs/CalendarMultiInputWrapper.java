@@ -55,7 +55,7 @@ public class CalendarMultiInputWrapper extends AbstractCalendarMultiInput {
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#convert(java.lang.Object)
 	 */
 	@Override
-	public Date convert(Object v) throws TypeError {
+	public Date convert(Object v) throws TypeException {
 		return input.convert(v);
 	}
 
@@ -103,8 +103,14 @@ public class CalendarMultiInputWrapper extends AbstractCalendarMultiInput {
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AbstractCalendarMultiInput#setNull()
 	 */
 	@Override
-	protected void setNull() {
-		input.setValue(null);
+	public void setNull() {
+		super.setNull();
+		try {
+			input.setValue(null);
+		} catch (TypeException e) {
+			// should never happen but just in case
+			throw new TypeError(e);
+		}
 
 	}
 
@@ -121,9 +127,14 @@ public class CalendarMultiInputWrapper extends AbstractCalendarMultiInput {
 	    }
 	    c=setCalendarFromInputs(c);
 	    if( c == null ){
-	    	input.setValue(null);
+	    	setNull();
 	    }else{
-	    	input.setValue(c.getTime());
+	    	try {
+				input.setValue(c.getTime());
+			} catch (TypeException e) {
+				// should never happen but just in case
+				throw new TypeError(e);
+			}
 	    }
 	    if( c == null ) {
 	    	return null;
@@ -135,7 +146,7 @@ public class CalendarMultiInputWrapper extends AbstractCalendarMultiInput {
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.MultiInput#setValue(java.lang.Object)
 	 */
 	@Override
-	public Date setValue(Date v) throws TypeError {
+	public Date setValue(Date v) throws TypeException {
 		Date old = input.setValue(v);
 		if( v == null ){
 			setInputsFromCalendar(null);

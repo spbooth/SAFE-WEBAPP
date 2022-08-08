@@ -37,7 +37,7 @@ public class SessionServiceTest extends WebappTestBase {
 	 * 
 	 */
 	public SessionServiceTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	@Test

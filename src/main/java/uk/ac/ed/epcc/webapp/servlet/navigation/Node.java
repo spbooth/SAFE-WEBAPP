@@ -114,7 +114,9 @@ public abstract class Node extends NodeContainer implements Externalizable{
 	public String getTargetAttr() {
 		return null;
 	}
-
+	public boolean isTrustedURL(){
+		return true;
+	}
 	/**
 	 * @param conn
 	 * @return

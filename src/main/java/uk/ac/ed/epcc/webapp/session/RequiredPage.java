@@ -16,6 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.session;
 
+import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
@@ -27,7 +29,7 @@ import uk.ac.ed.epcc.webapp.servlet.ServletFormResultVisitor;
  * 
  * You must ensure that any JSP referenced in this way does not include
  * the redirect checks itself to avoid looping. Some {@link FormResult}s are
- * added as request attributes by {@link ServletFormResultVisitor} andare checked to prevent loops.
+ * added as request attributes by {@link ServletFormResultVisitor} and are checked to prevent loops.
  * 
  * {@link Composite}s in the {@link AppUserFactory} can add these if they implement {@link RequiredPageProvider}
  * 
@@ -73,7 +75,7 @@ public interface RequiredPage<U extends AppUser> {
      * @param person
      * @return
      */
-    default public String getNotifyText(U person) {
-    	return null;
+    default void addNotifyText(Set<String> notices,U person) {
+    
     }
 }

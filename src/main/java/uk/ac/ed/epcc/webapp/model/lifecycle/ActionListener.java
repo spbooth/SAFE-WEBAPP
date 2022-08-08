@@ -48,7 +48,7 @@ public interface ActionListener<R> extends Targetted<R> {
 	 * 
 	 * @param target
 	 */
-	public default void action(R target) {}
+	public default void action(R target) throws Exception {}
 	
 	/** Get an optional object (usually a String or other object that can be added to display content) that should be presented to
 	 * the user as warning before performing the operation.  Usually this would be included in a confirm dialog.

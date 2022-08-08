@@ -36,6 +36,11 @@ import uk.ac.ed.epcc.webapp.model.data.filter.LinkClause;
  */
 public interface JoinFilter<T> extends BaseFilter<T>, MultiTableFilter {
 	
+@Override
+	default <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
+		return vis.visitJoinFilter(this);
+	}
+
 /** add join clause to add to query. Each {@link Repository} should only be joined to once. 
  * A table may be joined to multiple times if via a {@link Repository} with an alias.
  * If the {@link Repository} being joined to is already present the <b>join_clause</b> is left unchanged but the

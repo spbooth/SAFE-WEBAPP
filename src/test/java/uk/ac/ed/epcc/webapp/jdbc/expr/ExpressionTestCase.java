@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -45,14 +46,14 @@ public class ExpressionTestCase extends WebappTestBase {
 	 * 
 	 */
 	public ExpressionTestCase() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	public ExpressionTestFactory fac;
 	public ExpressionTest obj;
 	
 	@Before
-	public void setup() throws DataFault {
+	public void setup() throws DataFault, ParseException {
 		fac = new ExpressionTestFactory(ctx);
 		obj=fac.makeFromString("Boris");
 	}
@@ -456,7 +457,7 @@ public class ExpressionTestCase extends WebappTestBase {
 	}
 	
 	@Test
-	public void testLocateValue() throws DataException {
+	public void testLocateValue() throws DataException, ParseException {
 		ExpressionTest sub = fac.makeFromString("bang");
 		ExpressionTest a = fac.makeFromString("123bang");
 		ExpressionTest b = fac.makeFromString("123456bang");
@@ -469,7 +470,7 @@ public class ExpressionTestCase extends WebappTestBase {
 	}
 	
 	@Test
-	public void testLocateExpression() throws DataException {
+	public void testLocateExpression() throws DataException, ParseException {
 		ExpressionTest sub = fac.makeFromString("bang");
 		ExpressionTest a = fac.makeFromString("123bang");
 		ExpressionTest b = fac.makeFromString("123456bang");

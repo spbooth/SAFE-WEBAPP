@@ -49,7 +49,7 @@ public class BounceAuthServlet extends SessionServlet {
 	 * 
 	 */
 	public BounceAuthServlet() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

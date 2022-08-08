@@ -138,13 +138,6 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 			return ! nested.accept(o);
 		}
 
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-		 */
-		@Override
-		public <Y> Y acceptVisitor(FilterVisitor<Y, X> vis) throws Exception {
-			return vis.visitAcceptFilter(this);
-		}
 
 		@Override
 		public int hashCode() {

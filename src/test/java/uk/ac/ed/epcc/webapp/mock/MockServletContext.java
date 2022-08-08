@@ -71,6 +71,12 @@ public class MockServletContext implements ServletContext {
 	public void setProps(Properties prop){
 		this.prop=prop;
 	}
+	public void addProp(String name,String value) {
+		if( prop == null ) {
+			prop=new Properties();
+		}
+		prop.setProperty(name, value);
+	}
 	@Override
 	public int getMajorVersion() {
 		
@@ -160,19 +166,21 @@ public class MockServletContext implements ServletContext {
 	@Override
 	public void log(String arg0) {
 		
-
+		System.err.println("MockServletContext log "+arg0);
 	}
 
 
 	@Override
 	public void log(Exception arg0, String arg1) {
 		
-
+		System.err.println("MockServletContext log "+arg1);
+		arg0.printStackTrace();
 	}
 
 	@Override
 	public void log(String arg0, Throwable arg1) {
-		
+		System.err.println("MockServletContext log "+arg0);
+		arg1.printStackTrace();
 
 	}
 

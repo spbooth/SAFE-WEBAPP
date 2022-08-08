@@ -3,19 +3,10 @@ package uk.ac.ed.epcc.webapp.model;
 import java.util.Map;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
-import uk.ac.ed.epcc.webapp.model.data.SelectModifier;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
@@ -219,7 +210,7 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 				}
 			}
 			
-		} catch (DataFault e) {
+		} catch (Exception e) {
 			getLogger().error("Error looking up serviceID", e);
 		}
 		return ids;

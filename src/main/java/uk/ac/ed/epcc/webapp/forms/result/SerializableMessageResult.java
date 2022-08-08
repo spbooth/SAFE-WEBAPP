@@ -34,7 +34,7 @@ public class SerializableMessageResult extends MessageResult implements Serializ
 	 */
 	public SerializableMessageResult(String mess) {
 		super(mess);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 }

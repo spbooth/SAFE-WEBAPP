@@ -53,9 +53,9 @@ public class JsonBuilderTest {
 		j.open("text");
 		j.clean(" This has a \" quote \" ");
 		j.clean("\n");
-		j.clean("And another line");
+		j.clean("And another\tline");
 		j.close();
-		assertEquals("{\n\"text\": \" This has a \\\" quote \\\" \\nAnd another line\"\n}", j.toString());
+		assertEquals("{\n\"text\": \" This has a \\\" quote \\\" \\nAnd another\\u0009line\"\n}", j.toString());
 		
 	}
 	@Test

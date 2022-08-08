@@ -38,18 +38,8 @@ public class SQLNotFilter<Q,F extends PatternFilter<Q>&SQLFilter<Q>> implements 
 		return nested;
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseSQLFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilterVisitor)
-	 */
-	public <X> X acceptVisitor(FilterVisitor<X,Q> vis) throws Exception {
-		return vis.visitPatternFilter(this);
-	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter#accept(java.lang.Object)
-	 */
-	public void accept(Q o) {
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter#getParameters(java.util.List)

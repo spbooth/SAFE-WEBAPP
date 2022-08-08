@@ -42,7 +42,7 @@ public class DataProducerHeartbeatListener extends AbstractContexed implements H
 	@Override
 	public Date run() {
 		try {
-			LockFactory lock_f = new LockFactory(getContext());
+			LockFactory lock_f = LockFactory.getFactory(getContext());
 			Lock lock = lock_f.makeFromString("DataProducerHeartbeatListener");
 			Calendar cal = Calendar.getInstance();
 			CurrentTimeService time = getContext().getService(CurrentTimeService.class);

@@ -35,6 +35,7 @@ import uk.ac.ed.epcc.webapp.model.data.FilterResult;
 import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -151,6 +152,14 @@ public class Dummy3 extends DataObject {
 			}
 			return null;
 		}
+		
+		@Override
+		public SQLFilter<AppUser> personInRelationToFilter(SessionService<AppUser> sess, String role, SQLFilter<Dummy3> fil) {
+			if( role.equals(SELF)){
+				return getDestFilter(fil,PERSON_ID,sess.getLoginFactory());
+			}
+			return null;
+		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider#getNamedFilter(java.lang.String)
 		 */
@@ -219,15 +228,26 @@ public class Dummy3 extends DataObject {
 		public SQLFilter<Dummy3> getStringFinderFilter(String name) {
 			return new StringFilter(name);
 		}
+		@Override
+		public SQLFilter<Dummy3> hasCanonicalNameFilter(){
+			return new NullFieldFilter<Dummy3>(getTarget(), res, NAME, false);
+		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.NameFinder#getDataCache()
 		 */
 		@Override
-		public DataCache<String, Dummy3> getDataCache() {
+		public DataCache<String, Dummy3> getDataCache(boolean auto_create) {
 			return new DataCache<String, Dummy3>() {
 				
 				@Override
 				protected Dummy3 find(String key) throws DataException {
+					if( auto_create ) {
+						try {
+							return makeFromString(key);
+						} catch (ParseException e) {
+							throw new DataFault("Bad name", e);
+						}
+					}
 					return findFromString(key);
 				}
 			};

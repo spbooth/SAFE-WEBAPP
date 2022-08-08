@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.servlet;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -46,12 +47,14 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
+import uk.ac.ed.epcc.webapp.model.data.CloseableIterator;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.FilterResult;
 import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.filter.FieldOrderFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterUpdate;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
@@ -306,7 +309,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 					try {
 						if( ! exists(fil)) {
 							// this is a new host
-							Emailer mailer = new Emailer(getContext());
+							Emailer mailer = Emailer.getFactory(getContext());
 							try {
 								mailer.newRemoteHostLogin(p, remoteHost);
 							} catch (Exception e1) {
@@ -369,7 +372,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 		if( t.hasCol(NAME_COL)) {
 			t.setColAfter(HOST_COL,NAME_COL);
 		}
-		DateFormat df = DateFormat.getDateTimeInstance();
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		t.setColFormat(START_COL, new DateTransform(df));
 		t.setColFormat(END_COL, new DateTransform(df));
 	}
@@ -413,6 +416,23 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 			fil.addFilter(new NullFieldFilter<Wtmp>(getTarget(), res, SUPER_PERSON_ID, true));
 		}
 		return finder.find(fil,true);
+	}
+	
+	public Wtmp lastRecord(AppUser person) {
+		SQLAndFilter fil = new SQLAndFilter(getTarget(),new ReferenceFilter<>(WtmpManager.this, PERSON_ID, person));
+		if( res.hasField(SUPER_PERSON_ID)) {
+			fil.addFilter(new NullFieldFilter<Wtmp>(getTarget(), res, SUPER_PERSON_ID, true));
+		}
+		fil.addFilter(new FieldOrderFilter<Wtmp>(getTarget(), res,START_TIME, true));
+		try( CloseableIterator<Wtmp> it = getResult(fil, 0, 1).iterator()){
+		  if( it.hasNext()) {
+			  return it.next();
+		  }
+		  return null;
+		} catch (Exception e) {
+			getLogger().error("Error finding last Wtmp", e);
+			return null;
+		}
 	}
 	/** Get a filter for {@link AppUser}s who have logged in since
 	 * a target date.

@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.lifecycle;
 
+import org.apache.logging.log4j.core.appender.rolling.TriggeringPolicy;
+
 /** A {@link LifeCycleListener} is a class with an interest in a particular 
  * life-cycle event such as object retirement. Usually this is used to handle cascaded changes required
  * by other classes that reference the target.
@@ -58,6 +60,21 @@ public interface LifeCycleListener<R> extends ActionListener<R> {
 	 * @throws Exception 
 	 */
 	public default void prepare(R target) throws Exception{};
+	
+	/** Similar to {@link #prepare(Object)} except that
+	 *  occurs after the triggering operation has been fully requested.
+	 *  
+	 *  This is slightly safer for notification etc.
+	 *  It can also be used to trigger follow on operations but these can be difficult
+	 *  to abort if the primary operation is aborted so it might be safer to send
+	 *  follow-ons from the action method.
+	 * 
+	 * 
+	 * 
+	 * @param target
+	 * @throws Exception
+	 */
+	public default void issued(R target) throws Exception{};
 	
 	/**  A prepared event has been aborted. This allows the {@link LifeCycleListener} try to clean-up any changes it made in
 	 * the {@link #prepare(Object)} call. For example by returning to the original state or cancelling the

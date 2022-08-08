@@ -154,6 +154,20 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 	public String getPublicKey(AppUser person){
 		return getRecord(person).getStringProperty(PUBLIC_KEY);
 	}
+	
+	/** Get an array of all the Public keys stored for the user.
+	 * This is an
+	 * 
+	 * @param person
+	 * @return
+	 */
+	public String[] getPublicKeys(AppUser person) {
+		String key = getPublicKey(person);
+		if( key == null || key.isEmpty()) {
+			return new String[0];
+		}
+		return new String[] { key };
+	}
 	public String getNormalisedPublicKey(AppUser person) throws Exception{
 		return normalise(getPublicKey(person));
 	}

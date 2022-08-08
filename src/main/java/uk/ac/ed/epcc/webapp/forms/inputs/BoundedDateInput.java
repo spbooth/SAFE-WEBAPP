@@ -40,4 +40,5 @@ public interface BoundedDateInput extends ParseInput<Date>, BoundedInput<Date> {
 	public static BoundedDateInput getInstance(AppContext conn, int finest_field) {
 		return getInstance(conn,1000L, finest_field);
 	}
+	public abstract void setDate(Date d);
 }

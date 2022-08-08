@@ -67,7 +67,7 @@ public class LongInput extends NumberInput<Long> {
 
 	}
 	@Override
-	public final Long convert(Object v) throws TypeError {
+	public final Long convert(Object v) throws TypeException {
 		if( v == null || v instanceof Long){
 			return (Long) v;
 		}
@@ -78,14 +78,22 @@ public class LongInput extends NumberInput<Long> {
 			try {
 				return parseValue((String) v);
 			} catch (ParseException e) {
-				throw new TypeError(e);
+				throw new TypeException(e);
 			}
 		}
-		throw new TypeError("Invalid type passed to LongInput");
+		throw new TypeException("Invalid type passed to LongInput "+v.getClass().getCanonicalName());
 	}
 
 	@Override
 	public Long getStep() {
 		return 1L;
+	}
+	
+	public void setLong(Long l) {
+		try {
+			setValue(l);
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 	}
 }

@@ -26,7 +26,7 @@ public class ReferenceComparator implements Comparator<IndexedReference> {
 	 * 
 	 */
 	public ReferenceComparator() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

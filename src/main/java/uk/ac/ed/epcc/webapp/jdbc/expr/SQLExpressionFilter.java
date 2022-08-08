@@ -174,21 +174,7 @@ public class SQLExpressionFilter<T,V> implements SQLFilter<T>, PatternFilter<T> 
 			return false;
 		return true;
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-	 */
-	@Override
-	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
-		return vis.visitPatternFilter(this);
-	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter#accept(java.lang.Object)
-	 */
-	@Override
-	public void accept(T o) {
-		
-		
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */

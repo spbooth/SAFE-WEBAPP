@@ -185,6 +185,11 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 		sb.append(text);
 		
 	}
+	
+	@Override
+	public void addLink(AppContext conn, String text,String hover,String style, FormResult action) {
+		sb.append(text);
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addLink(uk.ac.ed.epcc.webapp.AppContext, java.lang.String, uk.ac.ed.epcc.webapp.forms.result.FormResult)
 	 */
@@ -271,6 +276,11 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 		
 	}
 
+	@Override
+	public void addActionButton(Form f, String name) {
+		// TODO Auto-generated method stub
+		
+	}
 	public String toString(){
 		return sb.toString();
 	}
@@ -406,6 +416,11 @@ public class TextContentBuilder implements ContentBuilder, ExtendedXMLBuilder {
 	public void addImage(AppContext conn, String alt, String hover, Integer width, Integer height,
 			ServeDataResult image) {
 		clean(alt);
+		
+	}
+	@Override
+	public <I, T> void addFormError(AppContext conn, Field<I> f, T item) {
+	
 		
 	}
 }

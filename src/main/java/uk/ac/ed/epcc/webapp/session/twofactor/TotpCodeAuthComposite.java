@@ -63,6 +63,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.QRServlet;
@@ -87,7 +88,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @author Stephen Booth
  *
  */
-public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<A,Integer> implements AppUserTransitionContributor, SummaryContributer<A>, RequiredPageProvider<A> {
+public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<A,Integer> implements AppUserTransitionContributor, SummaryContributer<A>, RequiredPageProvider<A>, AnonymisingComposite<A> {
 	public static final Feature REQUIRED_TWO_FACTOR= new Feature("two_factor.required",false,"Is two factor authentication required");
 	public static final Feature VERIFY_OLD_CODE=new Feature("two_factor.verify_previous_code",true,"Verify current code on key change");
 	private static final String SECRET_FIELD="AuthCodeSecret";
@@ -97,7 +98,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	 */
 	public TotpCodeAuthComposite(AppUserFactory<A> fac) {
 		super(fac);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)
@@ -435,9 +436,10 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		 */
 		@Override
 		public <X extends ContentBuilder> X getExtraHtml(X cb, SessionService<?> op, A target) {
-			cb.addText("This is your new 2-factor authorisation key. You will need a smart-phone app such as Google Authenticator or Microsoft Authenticator to generate the verification codes.");
+			cb.addText("This will be your new 2-factor authorisation key. You will need a smart-phone app such as Google Authenticator or Microsoft Authenticator to generate the verification codes.");
+			cb.addText("You need to supply a verification code now to install the key");
 			if( VERIFY_OLD_CODE.isEnabled(getContext()) && needAuth(target)) {
-				cb.addText("You are changing an existing key and will have to input the codes for both the current and the new key.");
+				cb.addText("You are changing an existing key and will have to input the codes for both the current and the new key. You may find it easier to disable the existing key first, then return to this page to set a new key");
 			}
 			try {
 				ServletService serv = getContext().getService(ServletService.class);
@@ -596,6 +598,14 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 			cb.addObject(extra);
 		}
 		return cb;
+	}
+
+	@Override
+	public void anonymise(A target) {
+		if( ! REQUIRED_TWO_FACTOR.isEnabled(getContext())) {
+			clearSecret(target);
+		}
+		
 	}
 
 }

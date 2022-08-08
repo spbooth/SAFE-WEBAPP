@@ -27,6 +27,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlPrinter;
 import uk.ac.ed.epcc.webapp.forms.MapForm;
+import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 //import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
@@ -144,5 +145,18 @@ public class PageHTMLForm extends BaseHTMLForm {
 	public String getGeneralError(){
 		return errors.get(MapForm.GENERAL_ERROR);
 	}
-   
+    /** Set an error to be displayed in the form.
+     * This will be done automatically for errors found in the parse
+     * but errors generated in the {@link FormAction} as exceptions need
+     * to be caught and set explicitly
+     * 
+     * @param field
+     * @param error
+     */
+	public void setError(String field,String error) {
+		errors.put(field, error);
+	}
+	public void setGeneralError(String error) {
+		errors.put(MapForm.GENERAL_ERROR, error);
+	}
 }

@@ -27,7 +27,7 @@ public class BadJoinException extends DataError {
 	 */
 	public BadJoinException(String message, Throwable cause) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/**
@@ -35,7 +35,7 @@ public class BadJoinException extends DataError {
 	 */
 	public BadJoinException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/**
@@ -43,7 +43,7 @@ public class BadJoinException extends DataError {
 	 */
 	public BadJoinException(Throwable cause) {
 		super(cause);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	

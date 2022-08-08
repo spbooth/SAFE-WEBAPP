@@ -16,8 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.content;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;

@@ -20,18 +20,18 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
@@ -55,17 +55,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.DualFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
-import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.jdbc.table.BooleanFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.PlaceHolderFieldType;
@@ -82,6 +72,7 @@ import uk.ac.ed.epcc.webapp.model.data.CreateAction;
 import uk.ac.ed.epcc.webapp.model.data.DataCache;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
 import uk.ac.ed.epcc.webapp.model.data.PatternArg;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
@@ -128,8 +119,14 @@ NameFinder<AU> ,
 RegisterTrigger<AU>, 
 SummaryContributer<AU>,
 AccessRoleProvider<AU, AU>,
-AnonymisingFactory
+AnonymisingFactory,
+NamedFilterProvider<AU>
 {
+	/** config property for a list of stand-alone RequiredPageProviders
+	 * ie those that are not the AppUserFactory or its composites.
+	 * 
+	 */
+	public static final String STAND_ALONE_REQUIRED_PAGES = "required-pages";
 	private static final String MY_SELF_RELATIONSHIP = "MySelf";
 	
 	//RegistrationDateComposite<AU> signup_date = new RegistrationDateComposite<AU>(this);
@@ -148,7 +145,12 @@ AnonymisingFactory
 
 	public static final Feature REQUIRE_PERSON_UPDATE_FEATURE = new Feature("require-person-update",false,"require person update if needed");
 	 public static final Feature AUTO_COMPLETE_APPUSER_INPUT = new Preference("app_user.autocomplete_input",false,"Use auto-complete input as the default person input");
+	 // optional field to allow users to be marked as never to recieve emails
 	public static final String ALLOW_EMAIL_FIELD ="AllowEmail";
+	
+	
+	public static final String ALLOW_EMAIL_FILTER = "AllowEmail";
+	public static final String CAN_LOGIN_FILTER = "CanLogin";
 	
     /** A {@link SQLFilter} to select {@link AppUser}s based on their roles in the role table
      * 
@@ -163,9 +165,6 @@ AnonymisingFactory
     		this.roles=roles;
     	}
 		
-		public void accept(AU o) {
-			
-		}
 		public List<PatternArgument> getParameters(List<PatternArgument> list) {
 			for(String role : roles) {
 				addRoleParameter(list, role);
@@ -178,12 +177,12 @@ AnonymisingFactory
 		 */
 		public void addRoleParameter(List<PatternArgument> list, String test_role) {
 			list.add(new PatternArg(null,AbstractSessionService.ROLE_FIELD,test_role));
-			String use = getContext().getInitParameter(AbstractSessionService.USE_ROLE_PREFIX+test_role);
-			if( use != null) {
-				for(String r : use.split("\\s*,\\s*")) {
-					addRoleParameter(list, r);
-				}
-			}
+//			String use = getContext().getInitParameter(AbstractSessionService.USE_ROLE_PREFIX+test_role);
+//			if( use != null) {
+//				for(String r : use.split("\\s*,\\s*")) {
+//					addRoleParameter(list, r);
+//				}
+//			}
 		}
 		public StringBuilder addPattern(Set<Repository> tables,StringBuilder sb,boolean qualify) {
 			sb.append(" EXISTS( SELECT 1 FROM ");
@@ -193,8 +192,13 @@ AnonymisingFactory
 			sb.append(" = ");
 			res.addUniqueName(sb, true, false);
 			sb.append(" AND (");
+			boolean seen=false;
 			for(String role : roles) {
+				if( seen ) {
+					sb.append(" OR ");
+				}
 				addRolePattern(sb,role);
+				seen=true;
 			}
 			sb.append("))");
 			return sb;
@@ -205,21 +209,15 @@ AnonymisingFactory
 		public void addRolePattern(StringBuilder sb,String test_role) {
 			ctx.quoteQualified(sb, AbstractSessionService.ROLE_TABLE, AbstractSessionService.ROLE_FIELD);
 			sb.append("=?");
-			String use = getContext().getInitParameter(AbstractSessionService.USE_ROLE_PREFIX+test_role);
-			if( use != null) {
-				for(String r : use.split("\\s*,\\s*")) {
-					sb.append(" OR ");
-					addRolePattern(sb, r);
-				}
-			}
+//			String use = getContext().getInitParameter(AbstractSessionService.USE_ROLE_PREFIX+test_role);
+//			if( use != null) {
+//				for(String r : use.split("\\s*,\\s*")) {
+//					sb.append(" OR ");
+//					addRolePattern(sb, r);
+//				}
+//			}
 		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-		 */
-		public <X> X acceptVisitor(FilterVisitor<X, AU> vis)
-				throws Exception {
-			return vis.visitPatternFilter(this);
-		}
+	
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
@@ -276,7 +274,7 @@ AnonymisingFactory
 			return null;
 		}
 		try {
-		return find(finder.getStringFinderFilter(getTarget(), email),allow_null);
+		return find(finder.getStringFinderFilter( email),allow_null);
 		}catch(DataNotFoundException e) {
 			throw new DataNotFoundException("No AppUser found with email "+email,e);
 		}
@@ -329,6 +327,9 @@ AnonymisingFactory
     	if( REQUIRE_PERSON_UPDATE_FEATURE.isEnabled(getContext())){
 			requiredPages.add(new UpdatePersonRequiredPage());
 		}
+    	// stand alone RequiedPageProviders
+    	RequiredPageProvider<AU> list = new RequiredPageProviderList<AU>(getContext(), STAND_ALONE_REQUIRED_PAGES);
+    	requiredPages.addAll(list.getRequiredPages());
     	return requiredPages;
     }
     /** get a filter equivalent to {@link AppUser#canLogin()}
@@ -361,12 +362,19 @@ AnonymisingFactory
 		}
 
 		@Override
-		public String getNotifyText(AU person) {
+		public void addNotifyText(Set<String> notices,AU person) {
+			if( needDetailsUpdate(person)) {
+				notices.add("Your user details need to be updated/verified");
+				return;
+			}
 			Date d = person.nextRequiredUpdate();
 			if( d == null ) {
-				return null;
+				return;
 			}
-			return "Your user details need to be updated/verified before "+d;
+			if( person.warnRequiredUpdate()) {
+				SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+				notices.add("Your user details need to be updated/verified before "+fmt.format(d));
+			}
 		}
 		
 	}
@@ -387,10 +395,6 @@ AnonymisingFactory
 		}
 		return false;
 	}
-    public DataObjectItemInput<AU> getRoleInput(String role){
-    	return new DataObjectInput(getRoleFilter(role));
-    }
-
 
 	protected RoleFilter getRoleFilter(String ... roles) {
 		return new RoleFilter(res.getSQLContext(),roles);
@@ -520,10 +524,14 @@ AnonymisingFactory
 	 * @return
 	 */
 	public BaseFilter<AU> getEmailFilter(){
+		AndFilter<AU> fil = new AndFilter<AU>(getTarget());
 		if( res.hasField(ALLOW_EMAIL_FIELD)) {
-			return new SQLValueFilter<AU>(getTarget(), res, ALLOW_EMAIL_FIELD, Boolean.TRUE);
+			fil.addFilter(new SQLValueFilter<AU>(getTarget(), res, ALLOW_EMAIL_FIELD, Boolean.TRUE));
 		}
-		return null;
+		for( AllowedEmailContributor<AU> c : getComposites(AllowedEmailContributor.class)) {
+			fil.addFilter(c.allowedEmailFilter());
+		}
+		return fil;
 	}
 	/** add Notes to be included in a signup/update form.
 	 * This is included within the block element above the
@@ -599,7 +607,7 @@ AnonymisingFactory
 		}
 		name = name.trim();
 		try {
-			return find(getStringFinderFilter(name));
+			return find(getStringFinderFilter(name),true);
 		}catch(DataNotFoundException e){
 			return null;
 		} catch (DataException e) {
@@ -637,9 +645,9 @@ AnonymisingFactory
 		 * @param restrict
 		 * @param autocomplete
 		 */
-		public AppUserNameInput(AppUserFactory<A> factory, boolean create, boolean restrict,
+		public AppUserNameInput(AppUserFactory<A> factory,NameFinder<A>finder, boolean create, boolean use_autocomplete,boolean restrict,
 				BaseFilter<A> autocomplete) {
-			super(factory, create, restrict, autocomplete);
+			super(factory, finder,create,use_autocomplete, restrict, autocomplete);
 		}
 
 		/* (non-Javadoc)
@@ -657,11 +665,7 @@ AnonymisingFactory
 		 * @return
 		 */
 		public boolean useEmail() {
-			AppUserNameFinder default_finder = factory.getRealmFinder(factory.getDefaultRealm());
-			if( default_finder != null){
-				return default_finder instanceof EmailNameFinder;
-			}
-			return false;
+			return finder instanceof EmailNameFinder;
 		}
 
 		/* (non-Javadoc)
@@ -688,12 +692,15 @@ AnonymisingFactory
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getInput()
 	 */
 	@Override
-	public DataObjectItemInput<AU> getInput() {
+	public DataObjectItemInput<AU> getInput(){
+		return getInput(restrictDefaultInput());
+	}
+	public DataObjectItemInput<AU> getInput(boolean restrict) {
 		if( useAutoCompleteForSelect()) {
 			//return getNameInput(getFinalSelectFilter(),false, restrictDefaultInput() );
-			return getNameInput(getFinalSelectFilter(),false, restrictDefaultInput() );
+			return getNameInput(getFinalSelectFilter(),getRealmFinder(getDefaultRealm()),false,true, restrict );
 		}
-		return super.getInput();
+		return super.getInput(getFinalSelectFilter(),restrict);
 	}
 	/** Are we using an auto-complete input for {@link #getInput()}
 	 * 
@@ -705,8 +712,8 @@ AnonymisingFactory
 		return AUTO_COMPLETE_APPUSER_INPUT.isEnabled(getContext());
 	}
 	
-	public final DataObjectItemInput<AU> getNameInput(BaseFilter<AU> fil,boolean create,boolean restrict){
-		return new AppUserNameInput<>(this, create, restrict, fil);
+	public final DataObjectItemInput<AU> getNameInput(BaseFilter<AU> fil,NameFinder<AU> finder,boolean create,boolean use_autocomplete,boolean restrict){
+		return new AppUserNameInput<>(this, finder,create, use_autocomplete,restrict, fil);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.ParseFactory#getCanonicalName(java.lang.Object)
@@ -742,13 +749,39 @@ AnonymisingFactory
 		SQLOrFilter<AU> fil = new SQLOrFilter<>(getTarget());
 		for(  AppUserNameFinder<AU,?> finder : getRealms()){
 			if( finder.userVisible() || ! require_user_supplied){
-				fil.addFilter(finder.getStringFinderFilter(getTarget(), name));
+				fil.addFilter(finder.getStringFinderFilter( name));
 			}
 		}
 	
 		return fil;
 	}
 	
+	@Override
+	public   SQLFilter<AU> hasCanonicalNameFilter(){
+		SQLOrFilter<AU> fil = new SQLOrFilter<>(getTarget());
+		for(  AppUserNameFinder<AU,?> finder : getRealms()){
+			if( finder.userVisible() ){
+				fil.addFilter(finder.hasCanonicalNameFilter());
+			}
+		}
+	
+		return fil;
+	}
+	/** Get a set of names that can be used to find the target via
+	 * {@link #findFromString(String)} or {@link #getStringFinderFilter(String)}
+	 * 
+	 * @param target
+	 * @return
+	 */
+	public Collection<String> getNames(AU target){
+		LinkedHashSet<String> result = new LinkedHashSet<String>();
+		for(  AppUserNameFinder<AU,?> finder : getRealms()){
+			if( finder.userVisible() ){
+				result.add(finder.getCanonicalName(target));
+			}
+		}
+		return result;
+	}
 	
 	/** Get a name where the String sort order matches the 
 	 * presentation order. If we change this we need to keep getIdentifier roughly consistent.
@@ -783,13 +816,18 @@ AnonymisingFactory
 		if(default_finder == null){
 			return null;
 		}
-		default_finder.validateName(name);
+		default_finder.validateNameFormat(name);
 		result = makeUser();
 		if( result != null){
 			default_finder.setName(result, name);
 			result.commit();
 		}
 		return result;
+	}
+	@Override
+	public boolean canMakeFromString() {
+		AppUserNameFinder default_finder = getRealmFinder(getDefaultRealm());
+		return default_finder.canMakeFromString();
 	}
 	/** make an uncommited user suitable for automatic user creation.
 	 *  return null if automatic creation is not supported.
@@ -804,7 +842,7 @@ AnonymisingFactory
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#getDataCache()
 	 */
 	@Override
-	public DataCache<String, AU> getDataCache() {
+	public DataCache<String, AU> getDataCache(boolean auto_create) {
 		return new IndexedDataCache<String, AU>(getContext()) {
 
 			
@@ -816,7 +854,7 @@ AnonymisingFactory
 
 			@Override
 			protected AU findIndexed(String key) throws DataException {
-				if( autoCreate()){
+				if( auto_create){
 					try {
 						return makeFromString(key);
 					} catch (ParseException e) {
@@ -953,6 +991,9 @@ AnonymisingFactory
 		protected Set<String> getSupress() {
 			Set<String> supress = super.getSupress();
 			supress.add(ALLOW_EMAIL_FIELD);
+			for(SignupCustomiser c : getAppUserFactory().getComposites(SignupCustomiser.class)){
+				c.addSignupSuppress(supress);
+			}
 			return supress;
 		}
 		/* (non-Javadoc)
@@ -1091,6 +1132,13 @@ AnonymisingFactory
 		return null;
 	}
 	@Override
+	public SQLFilter<AU> personInRelationToFilter(SessionService<AU> sess, String role, SQLFilter<AU> fil) {
+		if( role.equals(MY_SELF_RELATIONSHIP)) {
+			return fil;
+		}
+		return null;
+	}
+	@Override
 	public boolean providesRelationship(String role) {
 		if( role.equals(MY_SELF_RELATIONSHIP)) {
 			return true;
@@ -1128,7 +1176,7 @@ AnonymisingFactory
 		AppUser currentPerson = sess == null ? null : sess.getCurrentPerson();
 		try(FilterSet set = new FilterSet(new PrimaryOrderFilter<>(getTarget(),res, false))){
 			for(AU p : set){
-
+               try {
 
 				if(currentPerson == null || ! currentPerson.equals(p)){
 					log.debug("Anonymise "+p.getIdentifier()+" "+p.getID());
@@ -1143,9 +1191,12 @@ AnonymisingFactory
 					}
 				}
 				p.commit();
+               }catch(Exception e1) {
+            	   log.error("Error anonymising person",e1);
+               }
 			}
 		}catch(Exception e) {
-			log.error("Error anonymising person",e);
+			log.error("Error anonymising people",e);
 		}
 
 	}
@@ -1164,9 +1215,9 @@ AnonymisingFactory
 	/** Erase the personal data for the specified user
 	 * 
 	 * @param p
-	 * @throws DataFault 
+	 * @throws Exception 
 	 */
-	public void erasePersonalData(AU p) throws DataFault {
+	public void erasePersonalData(AU p) throws Exception {
 		Set<String> fields = new HashSet<>();
 		for(AnonymisingComposite anon : getComposites(AnonymisingComposite.class)){
 			anon.anonymise(p);
@@ -1216,7 +1267,7 @@ AnonymisingFactory
 			LinkedHashMap<String, Object> attr = new LinkedHashMap<>();
 			for(IndexTableContributor c: att) {
 				try {
-				c.addAttributes(attr, p);
+				c.addIndexAttributes(attr, p);
 				}catch(Exception tr) {
 					getLogger().error("Error adding attribute from "+c.getClass().getCanonicalName(), tr);
 				}
@@ -1232,4 +1283,23 @@ AnonymisingFactory
 		roles.add(MY_SELF_RELATIONSHIP);
 		
 	}
+	@Override
+	public BaseFilter<AU> getNamedFilter(String name) {
+		if( name  == null || name.isEmpty()) {
+			return null;
+		}
+		switch(name) {
+		case ALLOW_EMAIL_FILTER: return getEmailFilter();
+		case CAN_LOGIN_FILTER: return getCanLoginFilter();
+		default: return null;
+		}
+	}
+	@Override
+	public void addFilterNames(Set<String> names) {
+		names.add(ALLOW_EMAIL_FILTER);
+		names.add(CAN_LOGIN_FILTER);
+		
+	}
+	
+	
 }

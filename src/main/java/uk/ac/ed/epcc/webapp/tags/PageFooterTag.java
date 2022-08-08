@@ -35,14 +35,19 @@ public class PageFooterTag extends TagSupport implements Tag {
 		
 		try {
 			AppContext conn = ErrorFilter.retrieveAppContext(request, response);
-			Logger log = conn.getService(LoggerService.class).getLogger(getClass());
-			String frag = conn.getInitParameter("service.std_footer", "/page_footer.jsp");
-			if( frag != null && ! frag.isEmpty() && ! frag.contentEquals("none")) {
-				try {
-					page.include(frag);
-				}catch(Exception e1) {
-					log.error("Error including page "+frag, e1);
+			if( conn != null ) {
+				Logger log = conn.getService(LoggerService.class).getLogger(getClass());
+				String frag = conn.getInitParameter("service.std_footer", "/page_footer.jsp");
+				if( frag != null && ! frag.isEmpty() && ! frag.contentEquals("none")) {
+					try {
+						page.include(frag);
+					}catch(Exception e1) {
+						log.error("Error including page "+frag, e1);
+					}
 				}
+			}else {
+				// fall back to default if no appcontext
+				page.include("/page_footer.jsp");
 			}
 		}catch(Exception e){
 			throw new JspException(e);

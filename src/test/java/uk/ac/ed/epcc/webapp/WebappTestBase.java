@@ -17,7 +17,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -32,6 +34,7 @@ import java.io.StringReader;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.imageio.ImageIO;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
@@ -361,10 +364,13 @@ protected void writeFile(String file_name, byte data[]) throws IOException {
 		return fileData.toString();
 	}
 	public byte[] getResourceAsBytes(String name) throws IOException, DataFault{
-		InputStream stream = getClass().getResourceAsStream(getContext().expandText(name));
+		InputStream stream = getResourceAsStream(name);
 		ByteArrayStreamData data = new ByteArrayStreamData();
 		data.read(stream);
 		return data.getBytes();
+	}
+	protected InputStream getResourceAsStream(String name) {
+		return getClass().getResourceAsStream(getContext().expandText(name));
 	}
 	
 	/** Check the contents of some test generated XML contenet
@@ -439,4 +445,27 @@ protected void writeFile(String file_name, byte data[]) throws IOException {
 		ctx.setService(serv);
 		return cal.getTime();
     }
+   
+   public void checkImageEqual(String expected,byte actual[]) throws IOException {
+	   checkImageEqual(expected, ImageIO.read(new ByteArrayInputStream(actual)));
+   }
+   public void checkImageEqual(String expected,BufferedImage actual) throws IOException {
+	   checkImageEqual(ImageIO.read(getResourceAsStream(expected)), actual);
+   }
+   public void checkImageEqual(BufferedImage expected, BufferedImage actual) {
+	   // compare images pixel by pixel. Comparing the binary file representation
+	   // is not as good as this depends on the library implementation and has been
+	   // known to change over major java versio updates
+	   int ew = expected.getWidth();
+	   int aw = actual.getWidth();
+	   assertEquals("Image Width", ew, aw);
+	   int eh = expected.getHeight();
+	   int ah = actual.getHeight();
+	   assertEquals("Image Height", eh, ah);
+	   for( int x=0; x< ew; x++ ) {
+		   for( int y=0; y < eh ; y++) {
+			   assertEquals("Image("+x+","+y+")",expected.getRGB(x, y),actual.getRGB(x, y));
+		   }
+	   }
+   }
 }

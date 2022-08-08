@@ -24,7 +24,21 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 /** The default {@link ConfigService}
  * 
- * This starts
+ * This starts with a default set of {@link Properties} usually the system properties
+ * but this can be augmented depending on the context by passing in an explicit {@link Properties} object on
+ * the constructor. A web-context may augment the properties from the Servlet config. When testing an additional set of
+ * properties is loaded from <b>test.properties</b>.
+ * Then a series of standard property files are loaded. For each standard file there is a property (that can be set in the initial set)
+ * that can be used to change the name of the property file from the default. Each file corresponds to a different
+ * module/jar-file in the final build.
+ * <table>
+ * <tr><th>prop-name</th><th>default filename</th><th>Intended purpose</th></tr>
+ * <tr><td>default.path</td><td>default-config.properties</td><td>Generic application configuration</td></tr>
+ * <tr><td>config.path</td><td>service-config.properties</td><td>Instance specific configuration</td></tr>
+ * <tr><td>deploy.path</td><td>deploy-config.properties</td><td>View configuration within a instance.</td></tr>
+ * <tr><td>build.path</td><td>build-config.properties</td><td>Generated automatically by the build to hold version information</td></tr>
+ * </table>
+ * 
  * 
  * @author Stephen Booth
  *
@@ -43,7 +57,10 @@ public class DefaultConfigService extends AbstractConfigService implements Confi
 	 * 
 	 */
 	public static final String DEFAULT_PATH_PROP_NAME = "default.path";
-	Properties service_props=null;
+	private Properties service_props=null;
+	// This is the bootstrap set of properties where the
+	// property path values can be set.
+	private final Properties bootstrap;
 	protected Set<ConfigServiceListener> listeners = null;
 	public DefaultConfigService(AppContext conn){
 		this(conn,null);
@@ -56,9 +73,16 @@ public class DefaultConfigService extends AbstractConfigService implements Confi
 	 */
 	public DefaultConfigService(AppContext conn,Properties p){
 		super(conn);
-		if( p != null ) {
-			setServiceProps(p);
+		if( p == null ) {
+			try {
+				p = System.getProperties();
+			}catch(SecurityException sex) {
+				// must have a restrictive manager inplace
+				// load from default names
+				p = new Properties();
+			}
 		}
+		bootstrap=p;
 	}
 	/**
 	 * Service Context Attributes - loadAttributes if the config.path property is
@@ -75,18 +99,7 @@ public class DefaultConfigService extends AbstractConfigService implements Confi
 			if (service_props == null ) {
 				// set this now to avoid looping when we call getInitParameter in this
 				// method
-			
-				Properties p =null;
-				// Initialise to an empty Properties object:
-				try {
-					p = System.getProperties();
-				}catch(SecurityException sex) {
-					// must have a restrictive manager inplace
-					// load from default names
-					p = new Properties();
-				}
-			
-				setServiceProps(p);
+				setServiceProps(bootstrap);
 				
 				
 			}
@@ -144,6 +157,10 @@ public class DefaultConfigService extends AbstractConfigService implements Confi
 			listeners=null;
 		}
 		
+	}
+	@Override
+	public ConfigService getNested() {
+		return null;
 	}
 
 	

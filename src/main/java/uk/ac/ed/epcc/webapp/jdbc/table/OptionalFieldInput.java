@@ -22,6 +22,8 @@ import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 /** Select a field from an option map that does not already exist
  * in a Repository.
@@ -58,7 +60,11 @@ public class OptionalFieldInput<I> extends ParseAbstractInput<String> implements
 
 	@Override
 	public void setItem(I item) {
-		setValue(getTagByItem(item));
+		try {
+			setValue(getTagByItem(item));
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 		
 	}
 

@@ -125,7 +125,7 @@ public class SplitTransition<T extends TimePeriod,K> extends AbstractFormTransit
 		guess = guessSplit(start,end);
 		BoundedDateInput input = fac.getDateInput();
 		
-		input.setValue(guess);
+		input.setDate(guess);
 		if( lock != null && lock.after(start)) {
 			if( !lock.before(end)) {
 				throw new TransitionException("No valid split");

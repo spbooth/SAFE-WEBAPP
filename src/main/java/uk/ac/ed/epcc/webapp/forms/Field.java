@@ -25,6 +25,8 @@ import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.IsForcedVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.LockedInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnmodifiableInput;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
@@ -54,23 +56,6 @@ public final class Field<I> {
 	private String tooltip;
 	private boolean optional=false;
 	
-	private Map<String,String> data_attr=null;
-	
-	/** Add a custom attribute to the input
-	 * this is mapped to a <b>data-</b>key on the input
-	 * in html and can be used for custom JS validatipm
-	 * @param key
-	 * @param value
-	 */
-	public void setDataAttr(String key, String value) {
-		if(data_attr==null) {
-			data_attr=new LinkedHashMap<>();
-		}
-		data_attr.put(key, value);
-	}
-	public Map<String,String> getAttributes(){
-		return data_attr;
-	}
 
 	private Input<I> sel;
 	
@@ -215,9 +200,12 @@ public final class Field<I> {
 	 * @param o
 	 *            Value to set
 	 * @return previous value
+	 * @throws TypeException
 	 */
-	public I setValue(Object o) {
+	public I setValue(Object o)  throws TypeException{
+		
 		return sel.setValue(sel.convert(o));
+		
 	}
 	
 	/**

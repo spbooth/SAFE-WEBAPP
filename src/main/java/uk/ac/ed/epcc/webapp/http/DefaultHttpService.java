@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
+import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 
 /** A simple {@link HttpService} 
@@ -46,7 +47,7 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 	 */
 	@Override
 	public void cleanup() {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
@@ -91,7 +92,7 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 			data.read(connection.getInputStream());
 			return data;
 		} catch (Exception e) {
-			throw new HttpException(e);
+			throw new HttpException("Error GET from "+url,e);
 		}finally {
 			if( connection != null) {
 				connection.disconnect();
@@ -114,22 +115,36 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 	 */
 	@Override
 	public MimeStreamData post(URL url, Map<String,String> props, MimeStreamData input ) throws HttpException{
+		return upload(url,"POST",props,input);
+	}
+	@Override
+	public MimeStreamData put(URL url, Map<String,String> props, MimeStreamData input ) throws HttpException{
+		return upload(url,"PUT",props,input);
+	}
+	private MimeStreamData upload(URL url,String method, Map<String,String> props, MimeStreamData input ) throws HttpException{
 		HttpURLConnection connection=null;
 		try {
 			connection = connect(url);
-			if( props != null){
-				for(String key : props.keySet()){
-					connection.setRequestProperty(key, props.get(key));
-				}
-			}
+			
 
 			Logger log = getLogger();
-			log.debug("Post to "+url);
-			connection.setRequestMethod("POST");
+			log.debug(method+" to "+url);
+			connection.setRequestMethod(method);
 			connection.setRequestProperty("Content-Type", input.getContentType());
 			log.debug("Content-Type: "+input.getContentType());
 			connection.setRequestProperty("Content-Length", Long.toString(input.getLength()));
 			log.debug("Content-Length: "+input.getLength());
+			if( props==null || ! props.containsKey("Accept")) {
+				connection.setRequestProperty("Accept", "*/*"); 
+				log.debug("Accept: */*");
+			}
+			if( props != null){
+				for(String key : props.keySet()){
+					String value = props.get(key);
+					connection.setRequestProperty(key, value);
+					log.debug(key+": "+value);
+				}
+			}
 			connection.setDoOutput(true);
 		    
 			
@@ -140,11 +155,21 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 
 			int code = connection.getResponseCode();
 
-			if( code < HttpURLConnection.HTTP_OK || code > HttpURLConnection.HTTP_ACCEPTED){
+			if( code < HttpURLConnection.HTTP_OK || code > HttpURLConnection.HTTP_NO_CONTENT){
 				HttpException e = new HttpException(connection.getResponseMessage());
 				e.setError_code(code);
+				// Try to capture content as well
+				ByteArrayMimeStreamData res = new ByteArrayMimeStreamData();
+				res.setMimeType(connection.getContentType());
+				try {
+					res.read(connection.getInputStream());
+					e.setContent(res);
+				}catch(Exception e2) {
+					e.addSuppressed(e2);
+				}
 				throw e;
 			}
+			
 			String type = connection.getContentType();
 
 			ByteArrayMimeStreamData data = new ByteArrayMimeStreamData();
@@ -159,7 +184,7 @@ public class DefaultHttpService extends AbstractContexed implements AppContextSe
 			data.read(connection.getInputStream());
 			return data;
 		} catch (Exception e) {
-			throw new HttpException(e);
+			throw new HttpException("Exception "+method+" to "+url,e);
 		}finally {
 			if( connection!= null) {
 				connection.disconnect();

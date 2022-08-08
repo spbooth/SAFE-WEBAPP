@@ -25,12 +25,12 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
-import javax.mail.MessagingException;
-import javax.mail.NoSuchProviderException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
+import jakarta.mail.MessagingException;
+import jakarta.mail.NoSuchProviderException;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -58,7 +58,7 @@ public class EmailerTest extends WebappTestBase {
 	}
 	@Test
 	public void testMocked() throws NoSuchProviderException{
-		Emailer mailer = new Emailer(getContext());
+		Emailer mailer = Emailer.getFactory(getContext());
 		Session sess = mailer.getSession();
 		Transport t = sess.getTransport("smtp");
 		assertEquals("Transport", MockTansport.class,t.getClass());
@@ -80,7 +80,8 @@ public class EmailerTest extends WebappTestBase {
 	
 	@Test
 	public void testErrorMail() throws IOException, MessagingException{
-		Emailer.errorEmail(ctx,log, null,"Some error text");
+		Emailer mailer = Emailer.getFactory(ctx);
+		mailer.errorEmail(log, null,"Some error text");
 		assertEquals("One message sent",1,MockTansport.nSent());
 		assertEquals("error@example.org", MockTansport.getAddress(0)[0].toString());
 		assertEquals("from@example.org", MockTansport.getMessage(0).getFrom()[0].toString());
@@ -88,7 +89,8 @@ public class EmailerTest extends WebappTestBase {
 	
 	@Test
 	public void testErrorMailWithThrowable() throws Exception{
-		Emailer.errorEmail(ctx, log,new Exception("HairyHamster",new Exception("Penguins")),new HashMap(),"A test error");
+		Emailer mailer = Emailer.getFactory(ctx);
+		mailer.errorEmail( log,new Exception("HairyHamster",new Exception("Penguins")),new HashMap(),"A test error");
 		
 		assertEquals("One message sent",1,MockTansport.nSent());
 		assertEquals("error@example.org", MockTansport.getAddress(0)[0].toString());
@@ -101,7 +103,7 @@ public class EmailerTest extends WebappTestBase {
 	}
 	@Test
 	public void testTemplateEmail() throws IOException, MessagingException, InvalidArgument{
-		Emailer mailer = new Emailer(ctx);
+		Emailer mailer = Emailer.getFactory(ctx);
 	
 		TemplateFile tf = TemplateFile.getFromString(getResourceAsString("/test_templates/test_email.txt")); // Load the page template
 		mailer.doSend(mailer.templateMessage("user@example.com", null, tf));
@@ -112,10 +114,10 @@ public class EmailerTest extends WebappTestBase {
 		
 	}
 	
-	@Test(expected=javax.mail.SendFailedException.class)
+	@Test(expected=jakarta.mail.SendFailedException.class)
 	@ConfigFixtures("blacklist.properties")
 	public void testBlacklist() throws IOException, MessagingException, InvalidArgument{
-		Emailer mailer = new Emailer(ctx);
+		Emailer mailer = Emailer.getFactory(ctx);
 	
 		TemplateFile tf = TemplateFile.getFromString(getResourceAsString("/test_templates/test_email.txt")); // Load the page template
 

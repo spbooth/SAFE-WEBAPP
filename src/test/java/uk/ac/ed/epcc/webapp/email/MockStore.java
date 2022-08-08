@@ -16,11 +16,11 @@ package uk.ac.ed.epcc.webapp.email;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.mail.Folder;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Store;
-import javax.mail.URLName;
+import jakarta.mail.Folder;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.Store;
+import jakarta.mail.URLName;
 
 /**
  * @author Stephen Booth
@@ -34,20 +34,20 @@ public class MockStore extends Store {
 	 */
 	public MockStore(Session session, URLName urlname) {
 		super(session, urlname);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.mail.Store#getDefaultFolder()
+	 * @see jakarta.mail.Store#getDefaultFolder()
 	 */
 	@Override
 	public Folder getDefaultFolder() throws MessagingException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.mail.Store#getFolder(java.lang.String)
+	 * @see jakarta.mail.Store#getFolder(java.lang.String)
 	 */
 	@Override
 	public Folder getFolder(String name) throws MessagingException {
@@ -64,7 +64,7 @@ public class MockStore extends Store {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.mail.Store#getFolder(javax.mail.URLName)
+	 * @see jakarta.mail.Store#getFolder(jakarta.mail.URLName)
 	 */
 	@Override
 	public Folder getFolder(URLName url) throws MessagingException {

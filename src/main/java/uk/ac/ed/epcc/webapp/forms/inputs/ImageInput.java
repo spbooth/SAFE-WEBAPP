@@ -79,7 +79,7 @@ public class ImageInput extends FileInput implements ItemInput<StreamData,Buffer
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.ItemInput#setItem(java.lang.Object)
 	 */
-	public void setBufferedImage(BufferedImage item) throws DataFault, TypeError {
+	public void setBufferedImage(BufferedImage item) throws DataFault, TypeException {
 		if( item == null) {
 			setValue(null);
 		}
@@ -107,8 +107,8 @@ public class ImageInput extends FileInput implements ItemInput<StreamData,Buffer
 	public void setItem(BufferedImage item) {
 		try {
 			setBufferedImage(item);
-		} catch (DataFault | TypeError e) {
-			setValue(null);
+		} catch (DataFault | TypeException e) {
+			setNull();
 		}
 		
 	}

@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.content.TemplateFile;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.TextFileOverlay.TextFile;
@@ -44,12 +45,20 @@ import uk.ac.ed.epcc.webapp.resource.ResourceService;
  */
 
 
-public class TemplateFinder {
+public class TemplateFinder implements Contexed{
 	private final AppContext conn;
-	private final String group;
+	private String group;
 	private final TextFileOverlay ov;
 	Map<String,String> cache = new HashMap<>();
 	private final Pattern expand_pattern = Pattern.compile("%%include\\s+([\\w.]+)%%");
+	
+	/** Construct a {@link TemplateFinder} with a specific group.
+	 * 
+	 * Note the construction tag is also the group tab.
+	 * 
+	 * @param conn
+	 * @param group
+	 */
 	public TemplateFinder(AppContext conn, String group){
 		this.conn=conn;
 		this.group=group;
@@ -64,8 +73,15 @@ public class TemplateFinder {
 			ov=null;
 		}
 	}
+	
+	public void setGroup(String group) {
+		
+	}
 	public TemplateFinder(AppContext conn){
 		this(conn,"email.template_directory");
+	}
+	public static TemplateFinder getTemplateFinder(AppContext conn) {
+		return conn.makeObject(TemplateFinder.class,"email.template_directory");
 	}
 	public TemplateFile getTemplateFile(String name) throws Exception{
 		String text = getText(name);
@@ -147,6 +163,10 @@ public class TemplateFinder {
 		String result = sb.toString();
 		cache.put(name, result);
 		return result;
+	}
+	@Override
+	public AppContext getContext() {
+		return conn;
 	}
 	
 	

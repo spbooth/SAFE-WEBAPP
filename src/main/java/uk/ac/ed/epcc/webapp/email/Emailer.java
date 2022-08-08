@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -39,26 +40,22 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
-import javax.mail.Address;
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.Message.RecipientType;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Part;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.CleanupService;
-import uk.ac.ed.epcc.webapp.CurrentTimeService;
-import uk.ac.ed.epcc.webapp.Feature;
+import jakarta.mail.Address;
+import jakarta.mail.Authenticator;
+import jakarta.mail.Message;
+import jakarta.mail.Message.RecipientType;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
+import jakarta.mail.Part;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import uk.ac.ed.epcc.webapp.*;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.content.TemplateFile;
@@ -83,6 +80,7 @@ import uk.ac.ed.epcc.webapp.session.PasswordChangeListener;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordChangeRequestFactory.PasswordChangeRequest;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.session.VerificationProvider;
 
 /**
  * Emailer Class that sends emails.
@@ -90,7 +88,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * all emails sent by the Web-app are funneled through this class so we can
  * enforce debugging modes that allow us to debug with a copy of the main
  * database without sending spurious emails to users. All dependencies on
- * javax.mail are also routed through this class to reduce dependencies.
+ * jakarta.mail are also routed through this class to reduce dependencies.
  * 
  * We could implement encrypted emails or crytographic signing here if we
  * wanted.
@@ -100,7 +98,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 
 
-public class Emailer {
+public class Emailer implements Contexed{
 	/** Config property to set an password for authenticated sends
 	 * 
 	 */
@@ -112,7 +110,7 @@ public class Emailer {
 	/**
 	 * 
 	 */
-	private static final String DEFAULT_HEADER_PREFIX = "X-Saf-";
+	public static final String DEFAULT_HEADER_PREFIX = "X-Saf-";
 	/**
 	 * 
 	 */
@@ -161,21 +159,28 @@ public class Emailer {
 
 	public static final Feature DEBUG_SEND = new Feature("email.send.debug", false, "Log send internal operations");
 	AppContext ctx;
-	private Pattern dont_send_pattern=null;
+	private final Pattern dont_send_pattern;
+	private TemplateFinder finder=null;
+	
+	public static Emailer getFactory(AppContext conn) {
+		return conn.makeObject(Emailer.class, "mailer");
+	}
 	
 	public Emailer(AppContext c) {
 		ctx = c;
+		Pattern tmp = null;
 		try{
 			String pattern_text = c.getInitParameter("email.dont_send_pattern");
 			if( pattern_text != null){
-				dont_send_pattern = Pattern.compile(pattern_text);
+				tmp = Pattern.compile(pattern_text);
 			}
 		}catch(Exception t){
 			getLogger().error("Error making dont_send_pattern", t);
 		}
+		dont_send_pattern=tmp;
 	}
 
-	protected AppContext getContext() {
+	public AppContext getContext() {
 		return ctx;
 	}
 
@@ -189,7 +194,7 @@ public class Emailer {
 	public void newPassword(AppUser person, PasswordAuthComposite comp)
 			throws Exception {
 
-		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("request_password.txt");
+		TemplateFile email_template = getFinder().getTemplateFile("request_password.txt");
 
 		if( email_template == null ){
 			if( ! PASSWORD_RESET_SERVLET.isEnabled(ctx)) {
@@ -206,6 +211,7 @@ public class Emailer {
 			return;
 		}
 		email_template.setProperty("person.email", email);
+		email_template.setProperty("person.loginnames", person.getFactory().getNames(person));
 		if( PASSWORD_RESET_SERVLET.isEnabled(ctx)){
 			PasswordChangeRequestFactory fac = new PasswordChangeRequestFactory(ctx.getService(SessionService.class).getLoginFactory());
 			PasswordChangeRequest request = fac.createRequest(person);
@@ -219,7 +225,7 @@ public class Emailer {
 			person.commit();
 		}
 		
-		doSend(templateMessage(person,email_template));
+		doSend(templateMessage(person,getFrom(person),email_template));
 		try{
 			PasswordChangeListener listener = ctx.makeObjectWithDefault(PasswordChangeListener.class,null, PasswordChangeListener.PASSWORD_LISTENER_PROP);
 			if( listener != null ){
@@ -243,19 +249,19 @@ public class Emailer {
 		if( verify_only ) {
 			name = "verify_email.txt";
 		}
-		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile(name);
+		TemplateFile email_template = getFinder().getTemplateFile(name);
 
 		email_template.setProperty("person.name", person.getName());
 		email_template.setProperty("person.email", person.getEmail());
 		email_template.setProperty("request.email", req.getEmail());
 		email_template.setProperty("request.tag", req.getTag());
-		
+		email_template.setProperty("person.loginnames", person.getFactory().getNames(person));
 
 		doSend(templateMessage(req.getEmail(), null, email_template));
 
 	}
 	public void newRemoteHostLogin(AppUser person, String host) throws Exception {
-		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("new_login_location.txt");
+		TemplateFile email_template = getFinder().getTemplateFile("new_login_location.txt");
 		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 		email_template.setProperty("person.name", person.getName());
 		email_template.setProperty("person.email", person.getEmail());
@@ -266,7 +272,7 @@ public class Emailer {
 		
 		email_template.setRegionEnabled("ChangePassword", comp != null && comp.canResetPassword(person));
 		
-		doSend(templateMessage(person, null, email_template));
+		doSend(templateMessage(person, null,null,null, email_template));
 	}
 	/**
 	 * Notify user their password has been changed.
@@ -280,7 +286,7 @@ public class Emailer {
 	public void passwordChanged(AppUser person)
 			throws Exception {
 
-		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("password_changed.txt");
+		TemplateFile email_template = getFinder().getTemplateFile("password_changed.txt");
 		
 
 		String name = person.getName();
@@ -294,7 +300,8 @@ public class Emailer {
 			return;
 		}
 		email_template.setProperty("person.email", email);
-		doSend(templateMessage(person,email_template));
+		email_template.setProperty("person.loginnames", person.getFactory().getNames(person));
+		doSend(templateMessage(person,getFrom(person),email_template));
 
 	}
 	/**
@@ -309,7 +316,7 @@ public class Emailer {
 	public void passwordFailsExceeded(AppUser person)
 			throws Exception {
 
-		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("password_fails_exceeded.txt");
+		TemplateFile email_template = getFinder().getTemplateFile("password_fails_exceeded.txt");
 		
 
 		String name = person.getName();
@@ -319,17 +326,17 @@ public class Emailer {
 		email_template.setProperty("person.name", name);
 		String email = person.getEmail();
 		if( email == null){
-			getLogger().error("Password change email destination not known "+person.getIdentifier());;
+			getLogger().error("Password change email destination not known "+person.getIdentifier());
 			return;
 		}
 		email_template.setProperty("person.email", email);
-		doSend(templateMessage(person,email_template));
+		doSend(templateMessage(person,getFrom(person),email_template));
 
 	}
 	public void newSignup(AppUser person, String new_password)
 			throws Exception {
 
-		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("new_signup.txt");
+		TemplateFile email_template = getFinder().getTemplateFile("new_signup.txt");
 		if( email_template == null){
 			getLogger().debug(new_password);
 			return;
@@ -356,14 +363,23 @@ public class Emailer {
 				email_template.setProperty("password_reset.tag", request.getTag());
 			}
 			// The user needs the password info so we want to see any send exceptions
-			doSendNow(templateMessage(person,email_template));
+			doSendNow(templateMessage(person,getFrom(person),email_template));
 		}else {
-			doSend(templateMessage(person,email_template));
+			doSend(templateMessage(person,getFrom(person),email_template));
 		}
 
 	}
-	public void notificationEmail(AppUser person, Set<String> notices) throws Exception {
-		TemplateFile email_template = new TemplateFinder(ctx).getTemplateFile("update_notices.txt");
+	public void notificationEmail(AppUser person, Set<String> notices,Set<String> actions) throws Exception {
+		MimeMessage m = notificationMessage(person, notices,actions);
+		
+		
+		if( m != null) {
+			doSend(m);
+		}
+	}
+
+	public MimeMessage notificationMessage(AppUser person, Set<String> notices,Set<String> actions) throws Exception {
+		TemplateFile email_template = getFinder().getTemplateFile("update_notices.txt");
 		String name = person.getName();
 		if( name == null || name.trim().length() == 0){
 			name = "User";
@@ -380,14 +396,53 @@ public class Emailer {
 			seen=true;
 		}
 		email_template.setProperty("person.notices", text.toString());
+		if( actions != null && ! actions.isEmpty()) {
+			StringBuilder action_text = new StringBuilder();
+			seen=false;
+			for(String s: actions) {
+				if( seen ) {
+					action_text.append("\n");
+				}
+				action_text.append("* ");
+				action_text.append(s);
+				seen=true;
+			}
+			email_template.setProperty("person.actions", action_text.toString());
+			email_template.setRegionEnabled("automatic_actions", true);
+		}
 		String email = person.getEmail();
 		if( email == null){
 			getLogger().error("Notification email destination not known "+person.getIdentifier());;
-			return;
+			return null;
 		}
 		email_template.setProperty("person.email", email);
-		
-		doSend(templateMessage(person,email_template));
+		AppUserFactory<AppUser> factory = person.getFactory();
+		email_template.setProperty("person.loginnames", factory.getNames(person));
+
+		Set<String> verifications = new LinkedHashSet<>();
+		if( factory instanceof VerificationProvider) {
+			((VerificationProvider)factory).addVerifications(verifications,person);
+		}
+		for(VerificationProvider comp : factory.getComposites(VerificationProvider.class)) {
+			comp.addVerifications(verifications,person);
+		}
+		if( ! verifications.isEmpty()) {
+			StringBuilder v_text = new StringBuilder();
+			boolean v_seen=false;
+			for(String s : verifications) {
+				if( v_seen ) {
+					v_text.append("\n");
+				}
+				v_text.append("* ");
+				v_text.append(s);
+				v_seen=true;
+			}
+			email_template.setRegionEnabled("Verification", true);
+			email_template.setProperty("person.verifications", v_text.toString());
+			
+		}
+		MimeMessage m = templateMessage(person,getFrom(person),email_template);
+		return m;
 	}
 	public MimeMessage templateMessage(String sendto, Hashtable h,
 			TemplateFile email_template) throws IOException, MessagingException, InvalidArgument {
@@ -398,14 +453,14 @@ public class Emailer {
 		log.info("EmailSender sending an email to " + email);
 		return templateMessage(new String[] { email }, h, email_template);
 	}
-	public MimeMessage templateMessage(String sendto, Hashtable h,
+	public MimeMessage templateMessage(String sendto, InternetAddress from,Hashtable h,
 			TemplateFile email_template,Map<String,String> params) throws IOException, MessagingException, InvalidArgument {
 		Logger log = getLogger();
 		// change destination depending on sendto:
 		String email = mapRecipients(sendto);
 		
 		log.info("EmailSender sending an email to " + email);
-		return templateMessage(new String[] { email }, DEFAULT_HEADER_PREFIX,h,null,false, email_template,params);
+		return templateMessage(new String[] { email }, DEFAULT_HEADER_PREFIX,h,from,true,false, email_template,params);
 	}
     public String mapRecipients(String sendto){
     	return sendto;
@@ -426,28 +481,34 @@ public class Emailer {
 	 * @throws MessagingException
 	 * @throws InvalidArgument 
 	 */
-	public MimeMessage templateMessage(AppUser recipient, TemplateFile email_template)
+	public MimeMessage templateMessage(AppUser recipient,InternetAddress from, TemplateFile email_template)
 			throws IOException, MessagingException, InvalidArgument {
-		return templateMessage(recipient, null, email_template);
+		return templateMessage(recipient, from,null, null,email_template);
 	}
 	
-	public MimeMessage templateMessage(AppUser recipient, Hashtable headers,TemplateFile email_template)
+	public MimeMessage templateMessage(AppUser recipient,InternetAddress from, Hashtable headers,Map<String,String> params,TemplateFile email_template)
 			throws IOException, MessagingException, InvalidArgument {
 	Logger log = getLogger();
+	// might return null if emails supressed
 	String email = getEmail(recipient);
-	log.debug("Email mapped "+recipient.getEmail()+"->"+email);
+	if( email != null ) {
+		log.debug("Email mapped "+recipient.getEmail()+"->"+email);
+	}
 	if( email != null && email.trim().length() > 0){
-		Map<String,String> params = new HashMap<>();
+		if( params == null ) {
+			params = new HashMap<>();
+		}
 		if( recipient != null) {
+			addParams(params, recipient);
 			AppUserFactory<?> factory = recipient.getFactory();
 			for(EmailParamContributor epc : factory.getComposites(EmailParamContributor.class)) {
 				epc.addParams(params, recipient);
 				epc.setRegions(email_template, recipient);
 			}
 		}
-		return templateMessage(email, headers, email_template,params);
+		return templateMessage(email, from,headers, email_template,params);
 	}else{
-		log.warn("Email to "+recipient.getIdentifier()+" mapped to null");
+		log.warn("Email to "+recipient.getIdentifier()+" mapped to null/empty");
 	}
 	return null;
 }
@@ -560,7 +621,9 @@ public class Emailer {
 					for(String addr : conn.getInitParameter(EMAIL_BYPASS_FORCE_ADDRESS,"").split("\\s*,\\s*")){
 						allow.add(addr);
 					}
-					m.setRecipient(RecipientType.TO, new InternetAddress(force_email));
+					for(String a : force_email.split("\\s*,\\s*")) {
+						m.setRecipient(RecipientType.TO,new InternetAddress(a));
+					}
 					for(Address a : old){
 						if(a instanceof InternetAddress && allow.contains(((InternetAddress)a).getAddress())){
 							m.addRecipient(RecipientType.TO, a);
@@ -615,7 +678,7 @@ public class Emailer {
 			}else{
 				Transport.send(m);
 			}
-			log.info("mail sent ok "+m.getSubject()+" "+m.getAllRecipients().toString());
+			log.info("mail sent ok "+m.getSubject()+" "+formatAddresses(m.getAllRecipients()));
 		}else{
 			log.info("email send supressed "+m.getSubject());
 			try{
@@ -627,6 +690,21 @@ public class Emailer {
 			}
 		}
 		return m;
+	}
+	
+	private String formatAddresses(Address list[]) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		boolean seen = false;
+		for( Address a : list) {
+			if( seen ) {
+				sb.append(",");
+			}
+			sb.append(a.toString());
+			seen=true;
+		}
+		sb.append("]");
+		return sb.toString();
 	}
 	/**
 	 * make an email from a template file to multiple recipients with custom
@@ -644,12 +722,12 @@ public class Emailer {
 	 * @throws InvalidArgument 
 	 */
 	public MimeMessage templateMessage(String[] notify_emails, Hashtable headers, TemplateFile email_template) throws MessagingException, UnsupportedEncodingException, InvalidArgument {
-		return templateMessage(notify_emails,headers,null,false,email_template);
+		return templateMessage(notify_emails,headers,null,true,false,email_template);
 	}
-	public MimeMessage templateMessage(String[] notify_emails, Hashtable headers, InternetAddress from, boolean multipart, TemplateFile email_template) throws MessagingException, UnsupportedEncodingException, InvalidArgument {
-		return templateMessage(notify_emails, DEFAULT_HEADER_PREFIX,headers, from, multipart, email_template,null);
+	public MimeMessage templateMessage(String[] notify_emails, Hashtable headers, InternetAddress from, boolean set_sender,boolean multipart, TemplateFile email_template) throws MessagingException, UnsupportedEncodingException, InvalidArgument {
+		return templateMessage(notify_emails, DEFAULT_HEADER_PREFIX,headers, from, set_sender,multipart, email_template,null);
 	}
-	public MimeMessage templateMessage(String[] notify_emails, String header_prefix,Hashtable headers, InternetAddress from, boolean multipart, TemplateFile email_template,Map<String,String> params) throws MessagingException, UnsupportedEncodingException, InvalidArgument {
+	public MimeMessage templateMessage(String[] notify_emails, String header_prefix,Hashtable headers, InternetAddress from,boolean set_sender, boolean multipart, TemplateFile email_template,Map<String,String> params) throws MessagingException, UnsupportedEncodingException, InvalidArgument {
 			
 		AppContext conn = getContext();
 		if( email_template == null ) {
@@ -672,7 +750,7 @@ public class Emailer {
 		
 		subject = getSubject(getLogger(),email_template);
 		
-		MimeMessage m = makeBlankEmail(conn, notify_emails, from, subject);
+		MimeMessage m = makeBlankEmail(conn, notify_emails, from,set_sender, subject);
 		if (headers != null) {
 			for (Iterator it = headers.keySet().iterator(); it.hasNext();) {
 				String key = (String) it.next();
@@ -762,7 +840,7 @@ public class Emailer {
 	 * @param email_template
 	 * @return
 	 */
-	private static String getSubject(Logger log,TemplateFile email_template) {
+	private String getSubject(Logger log,TemplateFile email_template) {
 		String subject;
 		subject = (String) email_template.getProperty("subject");
 		// Try to get subject from template
@@ -789,12 +867,10 @@ public class Emailer {
 	public String getEncoding() {
 		return ctx.getInitParameter("email.encoding", DEFAULT_ENCODING);
 	}
-
-	/** make a blank email as a starting point
+	/** make a blank email as a starting point using the default sender
 	 * 
 	 * @param conn {@link AppContext}
 	 * @param notify_emails
-	 * @param from   Address to send from, may be blank
 	 * @param subject
 	 * @return
 	 * @throws MessagingException
@@ -802,7 +878,26 @@ public class Emailer {
 	 * @throws UnsupportedEncodingException
 	 */
 	public MimeMessage makeBlankEmail(AppContext conn, String[] notify_emails,
-			InternetAddress from, String subject)
+			String subject)
+			throws MessagingException, AddressException,
+			UnsupportedEncodingException {
+		return makeBlankEmail(conn, notify_emails, null, true, subject);
+	}
+	/** make a blank email as a starting point
+	 * 
+	 * @param conn {@link AppContext}
+	 * @param notify_emails
+	 * @param from   Address to send from, may be blank
+	 * @param set_sender Set the default sending address as the sender
+	 * @param subject
+	 * @return
+	 * @throws MessagingException
+	 * @throws AddressException
+	 * @throws UnsupportedEncodingException
+	 */
+	public MimeMessage makeBlankEmail(AppContext conn, String[] notify_emails,
+			InternetAddress from, boolean set_sender,
+			String subject)
 			throws MessagingException, AddressException,
 			UnsupportedEncodingException {
 		Logger log = getLogger();
@@ -825,27 +920,33 @@ public class Emailer {
 		Set<InternetAddress> set = new LinkedHashSet<>();
 		if (force_email == null) {
 			for (int i = 0; i < notify_emails.length; i++) {
-				log.debug("Add recipient "+notify_emails[i]);
-				if (text_recip == null) {
-					text_recip = notify_emails[i];
-				} else {
-					text_recip += "," + notify_emails[i];
-				}
-				set.add(new InternetAddress(notify_emails[i]));
-				try{
-					// Hack to allow some emails to be automatically
-					// sent to two locations
-					String additional = conn.getInitParameter("email.alsoto."+notify_emails[i]);
-					if( additional != null ){
-						set.add(new InternetAddress(additional));
+				String email = notify_emails[i];
+				if( email == null || email.isEmpty()) {
+					log.error("Missing notify email");
+				}else {
+					log.debug("Add recipient "+email);
+					if (text_recip == null) {
+						text_recip = email;
+					} else {
+						text_recip += "," + email;
 					}
-				}catch(Exception t){
-					getLogger().error("Error in alsoto hack", t);
+					set.add(new InternetAddress(email));
+					try{
+						// Hack to allow some emails to be automatically
+						// sent to two locations
+						String additional = conn.getInitParameter("email.alsoto."+email);
+						if( additional != null ){
+							set.add(new InternetAddress(additional));
+						}
+					}catch(Exception t){
+						getLogger().error("Error in alsoto hack", t);
+					}
 				}
 			}
 		} else {
-			
-			set.add(new InternetAddress(force_email));
+			for(String a : force_email.split("\\s*,\\s*")) {
+				set.add(new InternetAddress(a));
+			}
 			text_recip=force_email;
 			Set<String> allowed = new HashSet<>();
 			for(String allow : conn.getInitParameter(EMAIL_BYPASS_FORCE_ADDRESS, "").split("\\s*,\\s*")){
@@ -873,8 +974,10 @@ public class Emailer {
 		   m.setFrom(sender);
 		   log.debug("from "+sender.toString());
         }else{
-           m.setSender(sender);
-           log.debug("sender "+sender.toString());
+        	if( set_sender) {
+        		m.setSender(sender);
+        		log.debug("sender "+sender.toString());
+        	}
            m.setFrom(from);
            log.debug("from "+from.toString());
         }
@@ -969,6 +1072,11 @@ public class Emailer {
 			MessagingException, InvalidArgument {
 		doSend(templateMessage(notify_emails,email_template));
 	}
+	public void templateEmail(String[] notify_emails,InternetAddress from,
+			TemplateFile email_template) throws UnsupportedEncodingException,
+			MessagingException, InvalidArgument {
+		doSend(templateMessageWithFrom(notify_emails,from,email_template));
+	}
 	/**
 	 * make an email from a template file to multiple recipients
 	 * 
@@ -985,6 +1093,21 @@ public class Emailer {
 		return templateMessage(notify_emails, null, email_template);
 	}
 	/**
+	 * make an email from a template file to multiple recipients
+	 * 
+	 * @param notify_emails
+	 * @param email_template
+	 * @return message
+	 * @throws UnsupportedEncodingException
+	 * @throws MessagingException
+	 * @throws InvalidArgument 
+	 */
+	public MimeMessage templateMessageWithFrom(String[] notify_emails,InternetAddress from,
+			TemplateFile email_template) throws UnsupportedEncodingException,
+			MessagingException, InvalidArgument {
+		return templateMessage(notify_emails, null,from,true,false, email_template);
+	}
+	/**
 	 * check the validity of an Email address
 	 * 
 	 * @param email
@@ -995,7 +1118,7 @@ public class Emailer {
 		if( email == null || email.trim().length() == 0){
 			return false;
 		}
-		// We use javax.mail.internet.InternetAddress to parse
+		// We use jakarta.mail.internet.InternetAddress to parse
 		// and
 		// verify the email address.
 		try {
@@ -1018,7 +1141,10 @@ public class Emailer {
 		}
 		return true;
 	}
-
+    synchronized public static void resetReport() {
+    	last_send=0;
+    	send_count=0;
+    }
 	/**
 	 * Test if its ok to send an email report. Throttle back if too many emails
 	 * are bein sent
@@ -1057,10 +1183,10 @@ public class Emailer {
 	 * @param conn
 	 * @param text
 	 */
-	public static void errorEmail(AppContext conn, Logger log,String subject,String text) {
+	public void errorEmail(Logger log,String subject,String text) {
 		
 		try {
-			
+			AppContext conn = getContext();
 			if (!doReport(log,conn)) {
 				if( log != null ) {
 					log.error("error email supressed " + text);
@@ -1136,8 +1262,9 @@ public class Emailer {
 	 * @param additional_info
 	 * @throws Exception 
 	 */
-	public static void errorEmail(AppContext conn, Logger log,Throwable e,
+	public void errorEmail(Logger log,Throwable e,
 			Map props, String additional_info) throws Exception {
+		AppContext conn = getContext();
 		if( conn == null || conn.getInitParameter(ERROR_EMAIL_NOTIFY_ADDRESS) == null ){
 			// abort early if no notify address set.
 			return;
@@ -1164,12 +1291,12 @@ public class Emailer {
 		}
 		try {
 			TemplateFile errorEmail;
-			errorEmail = new TemplateFinder(conn).getTemplateFile("error_email.txt");
+			errorEmail = getFinder().getTemplateFile("error_email.txt");
 
 
 
 			// Show current date and time
-			DateFormat df = DateFormat.getDateTimeInstance();
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			CurrentTimeService time = conn.getService(CurrentTimeService.class);
 			errorEmail.setProperty("date", df.format(time.getCurrentTime()));
 			if (props != null) {
@@ -1224,7 +1351,7 @@ public class Emailer {
 				log.error("error in email formatting", x);
 			}
 		}
-		errorEmail(conn,log, subject,body);
+		errorEmail(log, subject,body);
 	}
 
 	/**
@@ -1331,5 +1458,30 @@ public class Emailer {
     	}
 		return true;
 	}
+
+	private TemplateFinder getFinder() {
+		if( finder == null) {
+			finder= TemplateFinder.getTemplateFinder(getContext());
+		}
+		return finder;
+	}
 	
+	/** Extension point to customise the sender address based on the recipient
+	 * 
+	 * Default is to return null and take the default sender
+	 * 
+	 * @param user
+	 * @return
+	 */
+	public InternetAddress getFrom(AppUser user) {
+		return null;
+	}
+	/** Extension point to customise the template params based on the recipient
+	 * 
+	 * @param params
+	 * @param user
+	 */
+	public void addParams(Map<String,String> params, AppUser user) {
+		
+	}
 }

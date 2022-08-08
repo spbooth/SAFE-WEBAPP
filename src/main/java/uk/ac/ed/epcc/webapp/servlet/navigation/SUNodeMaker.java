@@ -51,12 +51,18 @@ public class SUNodeMaker extends AbstractNodeMaker  {
 		SessionService sess = getContext().getService(SessionService.class);
 		AppUserTransitionProvider tp = AppUserTransitionProvider.getInstance(getContext());
 		n.setTargetPath(TransitionServlet.getURL(getContext(), tp, sess.getCurrentPerson()));
+		addChildrenFromComposites(sess.getLoginFactory(), n);
 		addChildrenFromTransition(n,props);
 		String additions = props.getProperty(name+".head");
 		if( additions != null && ! additions.trim().isEmpty()){
 			addConfigNodes(n, props, additions.split(","));
 		}
 		return n;
+	}
+	private <AU extends AppUser> void addChildrenFromComposites(AppUserFactory<AU> fac, Node parent) {
+		for(MenuContributor comp : fac.getComposites(MenuContributor.class)) {
+			comp.addChildren(parent);
+		}
 	}
 	
 	private <AU extends AppUser> void addChildrenFromTransition(Node parent,FilteredProperties props){

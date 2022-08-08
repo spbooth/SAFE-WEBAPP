@@ -26,6 +26,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.BaseInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 /** Input to select one of the foreign keys of a Repository
@@ -86,11 +87,14 @@ public class RepositoryForeignKeyInput extends BaseInput<String> implements List
 	}
 
 	@Override
-	public String convert(Object v) throws TypeError {
+	public String convert(Object v) throws TypeException {
+		if( v == null ) {
+			return null;
+		}
 		if( v instanceof String){
 			return (String)v;
 		}
-		throw new TypeError();
+		throw new TypeException(v.getClass());
 	}
 
 	
@@ -115,7 +119,7 @@ public class RepositoryForeignKeyInput extends BaseInput<String> implements List
 
 
 	@Override
-	public String setValue(String v) throws TypeError {
+	public String setValue(String v)  {
 		String old = getValue();
 		item=getItembyValue(v);
 		return old;
@@ -141,6 +145,11 @@ public class RepositoryForeignKeyInput extends BaseInput<String> implements List
 	@Override
 	public boolean isValid(FieldInfo item) {
 		return data.containsValue(item);
+	}
+	@Override
+	public void setNull() {
+		item=null;
+		
 	}
 
 }

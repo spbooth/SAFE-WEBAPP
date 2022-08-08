@@ -36,7 +36,7 @@ public class OptionalListInputWrapper<V,T> extends ListInputWrapper<V, T> implem
 		return getInner().getText(item);
 	}
 	@Override
-	public V convert(Object v) throws TypeError {
+	public V convert(Object v) throws TypeException {
 		if( v == null){
 			return null;
 		}

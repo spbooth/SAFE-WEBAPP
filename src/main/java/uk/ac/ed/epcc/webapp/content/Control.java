@@ -30,19 +30,36 @@ public class Control<I> implements UIGenerator{
 		this(conn,field,null);
 	}
 	public Control(AppContext conn,Field<I> field,Object item) {
+		this(conn,field,item,false);
+	}
+	/** A control together with the form error
+	 * (This is for content where the normal form label is not shown)
+	 * 
+	 * @param conn
+	 * @param field
+	 * @param item
+	 * @param add_error
+	 */
+	public Control(AppContext conn,Field<I> field,Object item,boolean add_error) {
 		this.conn=conn;
 		this.field = field;
 		this.radio_selector=item;
+		this.add_error=add_error;
 	}
 	public final Field<I> field;
 	public final AppContext conn;
 	public final Object radio_selector;
+	public final boolean add_error;
 	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.UIGenerator#addContent(uk.ac.ed.epcc.webapp.content.ContentBuilder)
 	 */
 	public ContentBuilder addContent(ContentBuilder builder) {
+		if( add_error) {
+			builder.addFormError(conn, field, radio_selector);
+		}
 		builder.addFormInput(conn, field,radio_selector);
 		return builder;
 	}
+	
 }

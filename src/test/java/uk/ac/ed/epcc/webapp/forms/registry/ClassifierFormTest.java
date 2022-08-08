@@ -43,7 +43,7 @@ public class ClassifierFormTest extends AbstractTransitionServletTest {
 		setTransition(provider, FormOperations.Create, null);
 		addParam("Name", "Boris");
 		addParam("Description", "A test resource classification");
-		runTransition();
+		runTransition(1);
 		checkMessage("object_created");
 		checkDiff("/cleanup.xsl", "classification.xml");
 		

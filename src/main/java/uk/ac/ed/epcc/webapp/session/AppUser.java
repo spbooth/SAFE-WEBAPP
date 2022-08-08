@@ -119,7 +119,16 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 	}
 
 	public boolean allowEmail(){
-		return record.getBooleanProperty(AppUserFactory.ALLOW_EMAIL_FIELD, true);
+		if( ! record.getBooleanProperty(AppUserFactory.ALLOW_EMAIL_FIELD, true)) {
+			return false;
+		}
+		AppUserFactory<?> f = getFactory();
+		for(AllowedEmailContributor c : f.getComposites(AllowedEmailContributor.class)){
+			if( ! c.allowEmail(this)) {
+				return false;
+			}
+		}
+		return true;
 	}
 	public void setEmailsAllowed(boolean value){
 		record.setOptionalProperty(AppUserFactory.ALLOW_EMAIL_FIELD, value);
@@ -219,7 +228,13 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 	}
 	public void markDetailsUpdated(){
 		CurrentTimeService time = getContext().getService(CurrentTimeService.class);
-		record.setOptionalProperty(UPDATED_TIME, time.getCurrentTime());
+		Date d = time.getCurrentTime();
+		setDetailsUpdated(d);
+	}
+
+
+	public void setDetailsUpdated(Date d) {
+		record.setOptionalProperty(UPDATED_TIME, d);
 	}
 	
 	

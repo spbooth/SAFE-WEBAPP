@@ -22,6 +22,7 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.forms.CreateTemplate;
@@ -80,6 +81,11 @@ public final class CreateAction<BDO extends DataObject> extends FormAction {
 			preCommit(o,f);
 			log.debug("commit");
 			o.commit();
+			// commit transaction to ensure new objet visible as soon as possible
+			DatabaseService db = factory.getContext().getService(DatabaseService.class);
+			db.commitTransaction();
+			
+			
 			log.debug("postCreate");
 			postCreate(o,f);
 		}catch(ActionException ae) {

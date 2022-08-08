@@ -83,6 +83,21 @@ public class MailTarget {
 		}
 		return hash;
 	}
+	public long getMessageLength() {
+		try {
+			if( handler == null) {
+				return 0L;
+			}
+			MessageProvider prov = handler.getMessageProvider();
+			if( prov == null ) {
+				return 0L;
+			}
+			return prov.getMessageLength();
+		}catch(Exception e) {
+			return 0L;
+		}
+	}
+	
 	public boolean canView(SessionService<?> operator){
 		return handler.canView(path, operator);
 	}

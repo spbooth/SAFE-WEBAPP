@@ -39,8 +39,11 @@ import uk.ac.ed.epcc.webapp.forms.transition.ValidatingFormTransition;
 public class ShortcutServletTransitionVisitor<K,T> extends AbstractTransitionVisitor<K,T>{
  		
  		
- 		
- 		private final Map params;
+ 		/** hidden parameter to indicate this is a direct post from the view_target page.
+ 		 * 
+ 		 */
+ 		public static final String FROM_VIEW_PARAM = "from_view";
+		private final Map params;
  
  	
  		public ShortcutServletTransitionVisitor(AppContext c, 
@@ -97,6 +100,16 @@ public class ShortcutServletTransitionVisitor<K,T> extends AbstractTransitionVis
 		}
 		@Override
 		public FormResult doDirectTransition(DirectTransition<T> t) throws TransitionException {
+			if( tag instanceof ViewTransitionKey && ((ViewTransitionKey<T>)tag).isNonModifying(target) && params.containsKey(FROM_VIEW_PARAM)) {
+				// send redirect to a bookmarkable url
+				return new ChainedTransitionResult<T, K>(provider,target,tag){
+					@Override
+					public boolean useURL() {
+						return true;
+					}
+					
+				};
+			}
 			// DirectTransitions take a target so may have side effects.
 			return null;
 		}

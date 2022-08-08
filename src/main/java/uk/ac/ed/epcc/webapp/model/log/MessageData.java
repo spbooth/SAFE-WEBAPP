@@ -16,8 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.log;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageProvider;

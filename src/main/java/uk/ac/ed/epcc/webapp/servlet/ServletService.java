@@ -15,12 +15,12 @@ package uk.ac.ed.epcc.webapp.servlet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Contexed;
@@ -41,11 +41,19 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 public interface ServletService extends AppContextService<ServletService>, Contexed{
 	
-	/**
+	/** form parameter for the default payload.
+	 * unencoded PUT data is mapped to this param
 	 * 
 	 */
 	String DEFAULT_PAYLOAD_PARAM = "update";
 
+	/** request attribute for a custom message to add
+	 * to errorpage content
+	 * 
+	 */
+	String ERROR_MSG_ATTR = "uk.ac.ed.epcc.webapp.error.message";
+
+	String ARG_TERRMINATOR = "-";
 	/** un-encoded version of the original request page.
 	 * 
 	 *  * This uses a cached value because the request URL will be
@@ -106,12 +114,15 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	
 	/** get a named paramter as a string
 	 * 
-	 * This should include conversion f uplaoded files etc.
+	 * This should include conversion of uploaded files etc.
 	 * 
 	 * @param name
 	 * @return
 	 */
 	default public String getTextParameter(String name) {
+		return getTextParameter(name,false);
+	}
+	default public String getTextParameter(String name,boolean ignore_mime) {
 		Object o = getParams().get(name);
 		if( o == null ) {
 			return null;
@@ -121,7 +132,7 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 		}
 		if( o instanceof MimeStreamData) {
 			MimeStreamData msd= (MimeStreamData) o;
-			if( msd.getContentType().contains("text")) {
+			if( ignore_mime || msd.getContentType().contains("text")) {
 				ByteArrayOutputStream stream = new ByteArrayOutputStream();
 				try {
 					msd.write(stream);
@@ -157,6 +168,13 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * @return LinkedList<String> arguments in order.
 	 */
     public LinkedList<String> getArgs();
+    
+    /** Get the remaining path after arguments have been extracted
+     * ie the ServletPath after the first "-" element.
+     * 
+     * @return
+     */
+    public String getFilePath();
 	/**
 	 * get the authenticated name for the current user as provided by the
 	 * web-server/container authorisation layer. This will be null unless the
@@ -165,7 +183,20 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * @return String webname
 	 */
 	public String getWebName() ;
-	
+	/**
+	 * get the authenticated name for the current user as provided by the
+	 * web-server/container authorisation layer. This will be null unless the
+	 * container/web-server has authorisation turned on for this URL.
+	 * 
+	 * This method takes an explicit {@link ServletRequest} object rather than
+	 * the one cached in the service itself. It can therefore be used when a
+	 * filter may be in place.
+	 * 
+	 * 
+	 * @param ServletRequest
+	 * @return String webname
+	 */
+	public String getWebName(ServletRequest req);
 	/** Populate a session automatically using information from the request.
 	 * This is invoked by the {@link ServletSessionService} if a person is requested and
 	 * the current person is not stored in the session. It handles authentication mechanisms that don't
@@ -246,4 +277,14 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * @param seconds
 	 */
 	public void setTimeout(int seconds);
+	
+	/** Send an error reponse.
+	 * The message is included in the response header but
+	 * also included in the html error page
+	 * 
+	 * @param code  Http error code
+	 * @param message custom message
+	 * @throws IOException 
+	 */
+	public void sendError(int code, String message) throws IOException;
 }

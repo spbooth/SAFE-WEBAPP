@@ -42,7 +42,7 @@ public class FileUploadHandler implements QuestionFormHandler<StreamData> {
 	 * 
 	 */
 	public FileUploadHandler() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	

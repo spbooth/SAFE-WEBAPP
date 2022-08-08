@@ -50,12 +50,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionProvider;
-import uk.ac.ed.epcc.webapp.model.data.Composite;
-import uk.ac.ed.epcc.webapp.model.data.ConfigParamProvider;
-import uk.ac.ed.epcc.webapp.model.data.ConfigTransition;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.TableDescription;
-import uk.ac.ed.epcc.webapp.model.data.UnDumper;
+import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.TableInput;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -353,6 +348,13 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 			}
 			t.setKeyName("Parameter");
 			hb.addTable(getContext(), t);
+		}
+		NamedFilterWrapper wrapper = new NamedFilterWrapper<DataObject>(target);
+		Set<String> filters = new LinkedHashSet<String>();
+		wrapper.addFilterNames(filters);
+		if( ! filters.isEmpty()) {
+			hb.addHeading(2,"Named filters");
+			hb.addList(filters);
 		}
 		return hb;
 	}

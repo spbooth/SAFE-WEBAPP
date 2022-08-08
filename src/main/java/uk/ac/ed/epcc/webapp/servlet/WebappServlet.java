@@ -314,6 +314,29 @@ public abstract class WebappServlet extends HttpServlet {
 	 public Boolean confirm(HttpServletRequest req, HttpServletResponse res, AppContext conn, String type, Object args[]) throws IOException, ServletException{
 	   return confirm(req,res,conn,type,args,null);
 	 }
+	 /** Does the {@link #confirm(HttpServletRequest, HttpServletResponse, AppContext, String, Object[])}
+	  * method need to show the dialog form.
+	  * This will return true if a call to confirm would return null.
+	  * @param req
+	  * @return
+	  */
+	 public boolean needConfirmDialog(HttpServletRequest req) {
+		 return req.getParameter(CONFIRM_YES) == null && req.getParameter(CONFIRM_NO) == null;
+	 }
+	 /** Handle  confirm dialog
+	  * 
+	  * The method will return null if the dialog form is shown.
+	  * 
+	  * @param req
+	  * @param res
+	  * @param conn
+	  * @param type
+	  * @param args
+	  * @param extra
+	  * @return
+	  * @throws IOException
+	  * @throws ServletException
+	  */
 	 public Boolean confirm(HttpServletRequest req, HttpServletResponse res, AppContext conn, String type, Object args[],SimpleXMLBuilder extra) throws IOException, ServletException{	 
     	String yes = req.getParameter(CONFIRM_YES);
     	String no = req.getParameter(CONFIRM_NO);

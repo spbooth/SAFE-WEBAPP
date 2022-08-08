@@ -158,6 +158,11 @@ public class MenuVisitor implements Visitor{
 				if( target_attr != null ) {
 					builder.attr("target",target_attr);
 				}
+				if( ! node.isTrustedURL()) {
+					// Security. Stops external page from changing the source URL
+					// of the tab containing this page !!!
+					builder.attr("rel", "noopener noreferrer");
+				}
 				String image = node.getImage();
 				if( image == null ){
 					builder.clean(node.getMenuText(conn));

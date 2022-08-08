@@ -49,11 +49,12 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
 public class HeartbeatServlet extends ContainerAuthServlet {
 
 	private static Date last_call;
+	private static boolean running=false;
 	/**
 	 * 
 	 */
 	public HeartbeatServlet() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)
@@ -67,7 +68,12 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 		boolean ok=true;
 		res.setContentType("text/plain");
 		try(ServletOutputStream out = res.getOutputStream()){
-			ok = runHeartbeat(conn, out);
+			if( ! running) {
+				ok = runHeartbeat(conn, out);
+			}else {
+				getLogger(conn).error("Overlapping calls to HeartbeatServlet "+last_call);
+				ok=false;
+			}
 			if( ok ){
 				out.println("OK");
 			}else{
@@ -82,11 +88,13 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 	
 	public synchronized boolean runHeartbeat(AppContext conn, ServletOutputStream out) throws IOException{
 		boolean ok=true;
+		
 		long max_wait=conn.getLongParameter("max.heartbeat.millis", 60000L);
 		Logger log = getLogger(conn);
 		TimerService serv = conn.getService(TimerService.class);
 		if( serv != null ) serv.startTimer("Heartbeatlistener");
 		try{
+			running=true;
 			CurrentTimeService time = conn.getService(CurrentTimeService.class);
 			last_call=time.getCurrentTime();
 
@@ -132,6 +140,7 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 
 		}finally{
 			if( serv != null ) serv.stopTimer("Heartbeatlistener");
+			running=false;
 		}
 		
 		
@@ -147,7 +156,7 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 		AppContext conn=null;
 		try{
 
-			conn= ErrorFilter.makeContext(config.getServletContext(), null, null);
+			conn= ErrorFilter.makeContext(config.getServletContext());
 			boolean run_thread = conn.getBooleanParameter("HeartbeatServlet.run_thread",false);
 			long repeat = conn.getLongParameter("HeartbeatServlet.repeat", 5);
 
@@ -161,6 +170,7 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 			config.getServletContext().log("Error checking for heartbeat-thread", t);
 		}finally {
 			if( conn != null ) {
+				AppContext.clearContext();
 				conn.close();
 			}
 		}
@@ -183,13 +193,14 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 		public void run() {
 			AppContext conn=null;
 			try {
-				conn = ErrorFilter.makeContext(config.getServletContext(), null, null);
+				conn = ErrorFilter.makeContext(config.getServletContext());
 				runHeartbeat(conn, null);
 			} catch (Exception e) {
 				config.getServletContext().log("Error in Runner", e);
 			}finally {
 				if( conn != null ) {
-					conn.close();
+					AppContext.clearContext();
+					conn.close();	
 				}
 			}
 

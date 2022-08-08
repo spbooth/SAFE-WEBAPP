@@ -47,8 +47,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import org.apache.commons.codec.binary.Base64;
+import java.util.Base64;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextCleanup;
@@ -219,6 +218,8 @@ public final class Repository implements AppContextCleanup{
 	// This seems to serialise in the database affecting performance.
 	public static final Feature CHECK_INDEX = new Feature("repository.check_index", false, "Always read indexinfo when getting metadata (for unique keys)");
 
+	public static final Feature AT_LEAST_ONE = new Feature("repository.at_least_one",false,"At least one field must be set when creating a record");
+	
 	public static final Feature READ_ONLY_FEATURE = new Feature("read-only",false,"supress (most) database writes");
 	
 	public static final Feature BACKUP_WITH_SELECT = new Feature("repository.backup_by_select",true,"Use select/insert when backing up a record");
@@ -477,7 +478,7 @@ public final class Repository implements AppContextCleanup{
         		ByteArrayOutputStream stream = new ByteArrayOutputStream();
         		StreamData data = r.getStreamDataProperty(tag);
         		data.write(stream);
-        		return Base64.encodeBase64String(stream.toByteArray());
+        		return Base64.getEncoder().encodeToString(stream.toByteArray());
         	}
         	return null;
         }
@@ -527,7 +528,7 @@ public final class Repository implements AppContextCleanup{
         		// Try a date
         		r.setProperty(tag, dump_format.parse(text));
         	}else if( isData()){
-        		ByteArrayStreamData data = new ByteArrayStreamData(Base64.decodeBase64(text));
+        		ByteArrayStreamData data = new ByteArrayStreamData(Base64.getDecoder().decode(text));
         		r.setProperty(tag,data);
         	}
         }
@@ -707,6 +708,9 @@ public final class Repository implements AppContextCleanup{
 		 */
 		public synchronized  boolean commit()
 				throws uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault {
+			if( locked ) {
+				throw new DataFault("commit called on locked record "+id);
+			}
 			// Don't check for dirty flags here but in update
 			// It should be legal to commit a new object without setting any
 			// fields
@@ -1849,13 +1853,15 @@ public final class Repository implements AppContextCleanup{
 		    }
 		    /** mark the record as read-only/locked
 		     * 
-		     * This is intended for when 
-		     * 
 		     * @throws DataFault
 		     */
-		    public void lock() throws DataFault {
+		    public void lock(boolean allow_dirty) throws DataFault {
 		    	if( isDirty()) {
-		    		throw new DataFault("lock of dirty record");
+		    		if( allow_dirty) {
+		    			clean();
+		    		}else {
+		    			throw new DataFault("lock of dirty record");
+		    		}
 		    	}
 		    	locked=true;
 		    }
@@ -2814,7 +2820,7 @@ public final class Repository implements AppContextCleanup{
 			}
 			query.append(query_values.toString());
 			query.append(')');
-			if( ! atleastone){
+			if( ! atleastone && AT_LEAST_ONE.isEnabled(ctx)){
 				throw new DataFault("Insert with no values");
 			}
 			
@@ -3058,7 +3064,7 @@ public final class Repository implements AppContextCleanup{
 	 */
 	private void setReferences(AppContext ctx, Connection c) throws SQLException{
 		Logger log = ctx.getService(LoggerService.class).getLogger(getClass());
-		log.debug("SetReferences for "+getTable());
+		//log.debug("SetReferences for "+getTable());
 		// look for foreign keys to identify remote tables.
 		DatabaseMetaData meta = c.getMetaData();
 		ResultSet rs = meta.getImportedKeys(c.getCatalog(),null , table_name);
@@ -3076,7 +3082,7 @@ public final class Repository implements AppContextCleanup{
 					String name = REFERENCE_PREFIX+suffix;
 					table=ctx.getInitParameter(name,table); // use param in preference because of windows case mangle
 					String tag = TableToTag(ctx, table);
-					log.debug("field "+field+" references "+table+"->"+tag);
+					//log.debug("field "+field+" references "+table+"->"+tag);
 					info.setReference(true,key_name,tag,ctx.getBooleanParameter(UNIQUE_PREFIX+suffix, info.isUnique()));
 				}
 				
@@ -3090,7 +3096,7 @@ public final class Repository implements AppContextCleanup{
 				String suffix = param_name+"."+i.getName(false);
 				String tag = REFERENCE_PREFIX+suffix;
 				String table=ctx.getInitParameter(tag);
-				log.debug("tag "+tag+" resolves to "+table);
+				//log.debug("tag "+tag+" resolves to "+table);
 				i.setReference(false,null,table,ctx.getBooleanParameter(UNIQUE_PREFIX+suffix, false));
 			}
 			if( i.isString()) {

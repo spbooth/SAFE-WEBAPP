@@ -19,9 +19,13 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
+import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
 
@@ -42,12 +46,9 @@ import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
  *
  */
 
-public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> extends AppUserNameFinder<AU,F> implements HistoryFieldContributor{
+public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> extends AppUserNameFinder<AU,F> implements HistoryFieldContributor, NamedFilterProvider<AU>{
 
-	/**
-	 * 
-	 */
-	protected static final String PROPERTY_PREFIX = "NameFinder.";
+	
 
 	
     //private final boolean user_supplied;
@@ -88,10 +89,16 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	 * @see uk.ac.ed.epcc.webapp.session.AppUserNameFinder#getStringFinderFilter(java.lang.Class, java.lang.String)
 	 */
 	@Override
-	public SQLFilter getStringFinderFilter(Class target, String name) {
+	public SQLFilter<AU> getStringFinderFilter(String name) {
+		if( ! active()) {
+			return new FalseFilter<AU>(getFactory().getTarget());
+		}
 		return new SQLValueFilter<>(getFactory().getTarget(), getRepository(), getField(), normalizeName(name));
 	}
-
+	@Override
+	public SQLFilter<AU> hasCanonicalNameFilter(){
+		return new NullFieldFilter<AU>(getFactory().getTarget(), getRepository(), getField(), false);
+	}
 	
 
 	@Override
@@ -143,6 +150,10 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 		return suppress;
 	}
 
+	/** Does the user get to choose this name
+	 * 
+	 * @return
+	 */
 	protected boolean userSet() {
 		return getContext().getBooleanParameter(PROPERTY_PREFIX+getRealm()+".user_supplied", false);
 	}
@@ -190,6 +201,31 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	@Override
 	public boolean active() {
 		return getRepository().hasField(getField());
+	}
+
+	@Override
+	public BaseFilter<AU> getNamedFilter(String name) {
+		if( name.equals(getNamedFilterName())) {
+			AppUserFactory<AU> fac = (AppUserFactory<AU>) getFactory();
+			if(active()) {
+				return new NullFieldFilter<AU>(fac.getTarget(),getRepository(),getField(),false);
+			}else {
+				return new FalseFilter<AU>(fac.getTarget());
+			}
+		}
+		return null;
+	}
+
+	private String getNamedFilterName() {
+		return "Has"+getField();
+	}
+
+	@Override
+	public void addFilterNames(Set<String> names) {
+		if( active()) {
+			names.add(getNamedFilterName());
+		}
+		
 	}
 
 }

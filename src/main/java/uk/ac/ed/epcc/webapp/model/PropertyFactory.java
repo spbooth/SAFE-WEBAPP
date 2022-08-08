@@ -22,10 +22,14 @@ import java.util.Map;
 import java.util.Properties;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
+import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.NoSpaceFieldValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
+import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
@@ -37,6 +41,8 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+import uk.ac.ed.epcc.webapp.model.data.forms.Updater;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** Factory for Configuration {@link Property}s stored in the database.
  * 
@@ -45,7 +51,8 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
  */
 
 public class PropertyFactory extends DataObjectFactory<Property> {
-    /**
+    private static final int MAX_NAME_LENGTH = 255;
+	/**
 	 * 
 	 */
 	private static final int MAX_PROP_LENGTH = 4096;
@@ -63,6 +70,8 @@ public class PropertyFactory extends DataObjectFactory<Property> {
 				TextInput name_input = new TextInput();
 				name_input.setSingle(true);
 				name_input.setTrim(true);
+				name_input.setBoxWidth(64);
+				name_input.setMaxResultLength(MAX_NAME_LENGTH);
 				name_input.addValidator(new NoSpaceFieldValidator());
 				return name_input;
 			}
@@ -99,7 +108,7 @@ public class PropertyFactory extends DataObjectFactory<Property> {
     @Override
     protected TableSpecification getDefaultTableSpecification(AppContext c,String table){
     	TableSpecification s = new TableSpecification();
-		s.setField(Property.NAME, new StringFieldType(false,null,255));
+		s.setField(Property.NAME, new StringFieldType(false,null,MAX_NAME_LENGTH));
 		s.setField(Property.VALUE, new StringFieldType(false,null,255));
 		try {
 			s.new Index("name_key", true, Property.NAME);
@@ -162,5 +171,34 @@ public class PropertyFactory extends DataObjectFactory<Property> {
 		List<OrderClause> order = super.getOrder();
 		order.add(res.getOrder(Property.NAME,false));
 		return order;
+	}
+	public class PropertyUpdater extends Updater<Property> implements ExtraContent<Property>{
+
+		public PropertyUpdater() {
+			super(PropertyFactory.this);
+		}
+
+		@Override
+		public <X extends ContentBuilder> X getExtraHtml(X cb, SessionService<?> op, Property target) {
+			String u = target.getUnderlyingValue();
+			if( u == null ) {
+				cb.addText("Property only exists in the database");
+			}else if( u.equals(target.getValue())) {
+				cb.addText("Underlying value is the same as the database value");
+			}else {
+				ExtendedXMLBuilder text = cb.getText();
+				text.clean("Underlying value is:");
+				text.open("b");
+				text.clean(u);
+				text.close();
+				text.appendParent();
+			}
+			return cb;
+		}
+		
+	}
+	@Override
+	public FormUpdate<Property> getFormUpdate(AppContext c) {
+		return new PropertyUpdater();
 	}
 }

@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.model.data.HistoryFactory;
 import uk.ac.ed.epcc.webapp.model.data.IndexedLinkManager;
 /** History Factory for Link Objects
  * 

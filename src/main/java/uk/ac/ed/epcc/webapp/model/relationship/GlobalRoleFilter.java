@@ -13,12 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.relationship;
 
-import java.util.List;
-
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BinaryFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -42,13 +38,7 @@ public class GlobalRoleFilter<T> implements BinaryFilter<T> {
 
 	private final SessionService<?> session;
 	private final String role;
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-	 */
-	@Override
-	public <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
-		return vis.visitBinaryFilter(this);
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()

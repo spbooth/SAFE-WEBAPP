@@ -16,6 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.servlet;
 
+import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -71,7 +73,7 @@ public abstract class SessionServlet extends WebappServlet {
 
 		ServletSessionService serv = getSessionService(conn);
 		if (serv == null || ! authorized(serv)) {
-			conn.getService(ServletService.class).requestAuthentication(serv);
+			handleNotAuthorized(conn, serv);
 			return;
 		}
 
@@ -89,6 +91,11 @@ public abstract class SessionServlet extends WebappServlet {
 			return;
 		}
 	}
+
+	protected void handleNotAuthorized(AppContext conn, ServletSessionService serv) throws IOException, ServletException {
+		getLogger(conn).debug("Requesting authorization");
+		conn.getService(ServletService.class).requestAuthentication(serv);
+	}
 	/** Extension point to implement additional authorisation mechanisms on a per servlet basis.
 	 * 
 	 * @param conn
@@ -99,7 +106,7 @@ public abstract class SessionServlet extends WebappServlet {
 	}
 
 	protected boolean authorized(ServletSessionService serv) {
-		return serv.haveCurrentUser();
+		return serv != null && serv.haveCurrentUser();
 	}
 
 	

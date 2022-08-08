@@ -40,13 +40,7 @@ public class AndAcceptFilter<T> extends LinkedHashSet<AcceptFilter<? super T>> i
 		this.target=target;
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-	 */
-	@Override
-	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
-		return vis.visitAcceptFilter(this);
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()

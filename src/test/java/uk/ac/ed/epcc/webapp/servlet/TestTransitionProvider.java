@@ -19,7 +19,9 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.inputs.FileUploadDecorator;
 import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
@@ -65,6 +67,8 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 	public static final TransitionKey<Number> THREE_KEY = new TransitionKey<>(Number.class,"Three");
 	
 	public static final TransitionKey<Number> SET_KEY = new TransitionKey<>(Number.class,"Set");
+	
+	public static final TransitionKey<Number> UPLOAD_KEY = new TransitionKey<>(Number.class,"Upload");
 	/**
 	 * 
 	 */
@@ -96,11 +100,32 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 		}
     	
     }
+    
+    private class UploadAction extends FormAction{
+
+		/* (non-Javadoc)
+		 * @see uk.ac.ed.epcc.webapp.forms.action.FormAction#action(uk.ac.ed.epcc.webapp.forms.Form)
+		 */
+		@Override
+		public FormResult action(Form f) throws ActionException {
+			String text = (String) f.get(VALUE);
+			int result = 0;
+			if( text != null && ! text.isEmpty()) {
+				result = Integer.parseInt(text);
+			}
+			return new ViewResult(result);
+		}
+    	
+    }
 	/**
 	 * @param c
 	 */
 	public TestTransitionProvider(AppContext c) {
 		super(c);
+	}
+	@Override
+	protected void setupTransitions() {
+		
 		addTransition(THREE_KEY,new AbstractDirectTargetlessTransition<Number>() {
 
 			@Override
@@ -156,6 +181,18 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 				f.addAction("Set", new SetAction());
 			}
 		});
+		// Test the file-upload decorator (this is to expose a test to RestServlet)
+		addTransition(UPLOAD_KEY,new AbstractFormTransition<Number>() {
+
+			@Override
+			public void buildForm(Form f, Number target, AppContext conn) throws TransitionException {
+				f.addInput(VALUE,VALUE, new FileUploadDecorator(new TextInput())).setOptional(true);
+				f.put(VALUE, target.toString());
+				f.addAction("Set", new UploadAction());
+				
+			}
+			
+		});
 	}
 
 	/* (non-Javadoc)
@@ -189,7 +226,7 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 	public boolean allowTransition(AppContext c, Number target,
 			TransitionKey<Number> key) {
 		if(target == null) {
-			return key == THREE_KEY || key == SET_KEY;
+			return key == THREE_KEY || key == SET_KEY || key == UPLOAD_KEY;
 		}
 		return target.intValue() < MAX_ALLOWED ;
 	}
@@ -240,9 +277,6 @@ public class TestTransitionProvider extends AbstractViewTransitionProvider<Numbe
 	public String getHelp(TransitionKey<Number> key) {
 		return null;
 	}
-	@Override
-	public String getText(TransitionKey<Number> key){
-		return key.toString();
-	}
+	
 	
 }

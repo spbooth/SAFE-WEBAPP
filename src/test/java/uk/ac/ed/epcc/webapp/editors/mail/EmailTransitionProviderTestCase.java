@@ -94,7 +94,7 @@ ViewTransitionFactoryInterfaceTest<MailTarget, EditAction, EmailTransitionProvid
 	 */
 	@Override
 	public SessionService<?> getForbiddenUser(MailTarget target) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 

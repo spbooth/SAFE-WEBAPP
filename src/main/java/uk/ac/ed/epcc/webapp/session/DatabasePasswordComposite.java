@@ -99,7 +99,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	 * 16 characters gives nearly 96 bits
 	 * */
 	public static final int GENERATED_PASSWORD_LENGTH = 16;
-	static PasswordStatus p_status = new PasswordStatus();
+	static final PasswordStatus p_status = new PasswordStatus();
 	public static final PasswordStatus.Value VALID = DatabasePasswordComposite.p_status.new Value("V",
 	"Valid");
 	public static final PasswordStatus.Value INVALID = DatabasePasswordComposite.p_status.new Value("I",
@@ -203,13 +203,6 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			}
 		}
 
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-		 */
-		@Override
-		public <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
-			return vis.visitAcceptFilter(this);
-		}
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
@@ -299,10 +292,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			check_value.add(sb, qualify);
 			return sb;
 		}
-		@Override
-		public void accept(T o) {
-			
-		}
+		
 		
 		
 		@Override
@@ -338,13 +328,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		private AppUserFactory getOuterType() {
 			return (AppUserFactory) getFactory();
 		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-		 */
-		@Override
-		public <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
-			return vis.visitPatternFilter(this);
-		}
+	
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
@@ -794,7 +778,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 									// count as at limit and we just incremented it.
 
 									try {
-										Emailer m = new Emailer(getContext());
+										Emailer m = Emailer.getFactory(getContext());
 										m.passwordFailsExceeded(u);
 									} catch (Exception e) {
 										getLogger().error("Failed to notify of password lock", e);
@@ -869,7 +853,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	public void newPassword(T user) throws Exception {
 		Handler h = getHandler(user);	
 		
-		Emailer m = new Emailer(getContext());
+		Emailer m = Emailer.getFactory(getContext());
 		m.newPassword(user, this);
 	}
 

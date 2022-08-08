@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,10 +40,14 @@ import uk.ac.ed.epcc.webapp.forms.inputs.ConstantInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrderFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
@@ -447,6 +452,22 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		}
 
 	}
+	public class DateOrderFilter implements SQLOrderFilter<T>{
+
+		@Override
+		public Class<T> getTarget() {
+			return LogFactory.this.getTarget();
+		}
+
+		@Override
+		public List<OrderClause> OrderBy() {
+			LinkedList<OrderClause> order = new LinkedList<>();
+			order.add(res.getOrder(DATE, false));
+			order.add(res.getOrder(null, false));
+			return order;
+		}
+		
+	}
 
 	protected static final String OWNER_ID = "QueryID";
 
@@ -574,6 +595,20 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		fil.addFilter(new SQLValueFilter<>(getTarget(),res, LINK_ID, link));
 		return fil;
 	}
+	
+	/** get a Filter for items that point to a DataObject that match a particular filter
+	 * @param v
+	 * @param link
+	 * @return
+	 */
+	public <L extends DataObject> AndFilter<T> getItemFilter(DataObjectFactory<L> fac, ItemType.ItemValue v, BaseFilter<L> link_fil) {
+		AndFilter<T> fil;
+		fil = new AndFilter<>(getTarget());
+		fil.addFilter(getItemFilter(v));
+		fil.addFilter(getRemoteFilter(fac, LINK_ID, link_fil));
+		return fil;
+	}
+	
 	protected SQLAndFilter<T> getItemFilter(O q, ItemType.ItemValue v, int link) {
 		SQLAndFilter<T> fil = getItemFilter(v,link);
 		fil.addFilter(getOwnerFilter(q));
@@ -643,7 +678,8 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	}
 	
 	public CloseableIterator<T> getLog(O q) throws DataFault {
-		return new FilterIterator(getOwnerFilter(q));
+		SQLAndFilter<T> fil = new SQLAndFilter<T>(getTarget(),   getOwnerFilter(q),  new DateOrderFilter());
+		return new FilterIterator(fil);
 	}
 
 	protected final LogOwner<O> getOwnerFactory() {

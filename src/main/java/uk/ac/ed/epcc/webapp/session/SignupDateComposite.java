@@ -24,12 +24,14 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.IndexTableContributor;
 import uk.ac.ed.epcc.webapp.model.data.CreateComposite;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 
 /** Add a field to record the date the record was created.
@@ -37,8 +39,8 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  *
  */
 
-public class SignupDateComposite<BDO extends DataObject> extends CreateComposite<BDO, SignupDateComposite<BDO>> 
- implements IndexTableContributor<BDO>{
+public class SignupDateComposite<BDO extends AppUser> extends CreateComposite<BDO, SignupDateComposite<BDO>> 
+ implements IndexTableContributor<BDO>, VerificationProvider<BDO>{
 	public static final String SIGNUP_DATE = "SignupDate";
 
 	// not static not thread safe
@@ -48,7 +50,7 @@ public class SignupDateComposite<BDO extends DataObject> extends CreateComposite
 	 */
 	public SignupDateComposite(DataObjectFactory<BDO> fac) {
 		super(fac);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	
@@ -116,8 +118,23 @@ public class SignupDateComposite<BDO extends DataObject> extends CreateComposite
 
 	public SQLFilter<BDO> signupBeforeFilter(Date d){
 		if( getRepository().hasField(SIGNUP_DATE)) {
-			return new SQLValueFilter<BDO>(getFactory().getTarget(), getRepository(), SIGNUP_DATE,MatchCondition.LT, d);
+			DataObjectFactory<BDO> factory = getFactory();
+			Class<BDO> target = factory.getTarget();
+			SQLOrFilter<BDO> or = new SQLOrFilter<BDO>(target);
+			or.addFilter(new SQLValueFilter<BDO>(target, getRepository(), SIGNUP_DATE,MatchCondition.LT, d));
+			or.addFilter(new NullFieldFilter<BDO>(target, getRepository(), SIGNUP_DATE, true));
+			return or;
 		}
 		return null;
+	}
+
+
+	@Override
+	public void addVerifications(Set<String> verifications,BDO person) {
+		Date d = getSignupDate(person);
+		if( d != null ) {
+			verifications.add("You were registered on this site at "+df.format(d));
+		}
+		
 	}
 }

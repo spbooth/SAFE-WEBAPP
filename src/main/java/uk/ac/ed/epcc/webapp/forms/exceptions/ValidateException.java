@@ -55,7 +55,10 @@ public class ValidateException extends FieldException {
 		super(message, cause);
 
 	}
-
+	public ValidateException(String field,String message, Throwable cause) {
+		super(message, cause);
+		this.field=field;
+	}
 	public ValidateException(Throwable cause) {
 		super(cause);
 

@@ -122,11 +122,14 @@ public class ConstructedObjectInput<T> extends AbstractInput<String> implements 
 	}
 
 	@Override
-	public String convert(Object v) throws TypeError {
+	public String convert(Object v) throws TypeException  {
+		if( v == null) {
+			return null;
+		}
 		if( v instanceof String ){
 			return (String) v;
 		}
-		return null;
+		throw new TypeException(v.getClass());
 	}
 
 	
@@ -138,7 +141,7 @@ public class ConstructedObjectInput<T> extends AbstractInput<String> implements 
 	@Override
 	public T getItem() {
 		String value = getValue();
-		if( value == null) {
+		if( value == null || value.isEmpty()) {
 			return null;
 		}
 		return c.makeObject(clazz, value);
@@ -146,7 +149,11 @@ public class ConstructedObjectInput<T> extends AbstractInput<String> implements 
 
 	@Override
 	public void setItem(T item) {
-		setValue(getTagByItem(item));
+		try {
+			setValue(getTagByItem(item));
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 		
 	}
 	@Override
@@ -170,5 +177,12 @@ public class ConstructedObjectInput<T> extends AbstractInput<String> implements 
 		}
 		return false;
 	}
-
+	public  boolean isEmpty() {
+		// Don't try to  generate an item for this check
+		// as an invalid value that resolves to an illegal class
+		// will generate an exception
+		// Also don't want to construct an item as part of this check
+		String v = getValue();
+		return v == null || v.isEmpty();
+	}
 }

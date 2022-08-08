@@ -23,6 +23,8 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdate;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
@@ -59,7 +61,11 @@ public class Updater<BDO extends DataObject> extends DataObjectUpdateFormFactory
 
 		f.addInput(TARGET, label, i);
 		if (dat != null && factory.isMine(dat)) {
-		    i.setValue(new Integer(dat.getID()));
+		    try {
+				i.setValue(Integer.valueOf(dat.getID()));
+			} catch (TypeException e) {
+				throw new TypeError(e);
+			}
 		}
 	}
 

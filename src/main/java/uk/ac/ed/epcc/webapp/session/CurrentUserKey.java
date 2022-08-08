@@ -44,7 +44,7 @@ public class CurrentUserKey extends AppUserKey {
 	 */
 	public CurrentUserKey(String name, String help) {
 		this(name, null,help,null);
-		// TODO Auto-generated constructor stub
+
 	}
 
 	/**
@@ -65,11 +65,19 @@ public class CurrentUserKey extends AppUserKey {
 	public boolean allowState(AppUser user, SessionService op) {
 		return true;
 	}
-	
+	/** Should this transition be added to the navigation menu
+	 * 
+	 * @param user
+	 * @return
+	 */
 	public boolean addMenu(AppUser user) {
 		return true;
 	}
-	
+	/** Should the menu item be highlighted for attention of the user
+	 * 
+	 * @param user
+	 * @return
+	 */
 	public boolean notify(AppUser user) {
 		return false;
 	}

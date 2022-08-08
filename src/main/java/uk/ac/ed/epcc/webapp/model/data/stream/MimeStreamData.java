@@ -21,7 +21,7 @@ package uk.ac.ed.epcc.webapp.model.data.stream;
 
 /**
  * varient of StreamData where the data has an associated mime type and filename
- * Classes that implement this interface can also implement javax.activation.DataSource
+ * Classes that implement this interface can also implement jakarta.activation.DataSource
  * @author spb
  * 
  */

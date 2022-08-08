@@ -169,6 +169,7 @@ TargetType t = conn.makeObject(TargetType.class,"tag-name");
  */
 public final class AppContext {
 	
+
 	public static final String CLASSDEF_PROP_PREFIX = "classdef.";
 	public static final Feature CONTEXT_CACHE_FEATURE = new Feature("ContextCache",true,"cache objects that implement ContextCache in the AppContext");
 	public static final Feature DATABASE_FEATURE = new Feature("database",true,"use database");
@@ -208,7 +209,12 @@ public final class AppContext {
 	 * 
 	 */
 	public synchronized void close()  {
-		
+		AppContext lc = getContext();
+		if( lc != null && lc == this) {
+			// Don't want to rely on this but make sure a closing context
+			// is removed from the thread
+			clearContext();
+		}
 		// Don't want to re-populate 
 		disable_service_creation=true;
 		
@@ -278,6 +284,15 @@ public final class AppContext {
 			Logger log = serv.getLogger(getClass());
 			if( log != null ){
 				log.error(errors);
+			}
+		}
+	}
+	public final void warn(String errors) {
+		LoggerService serv = getService(LoggerService.class);
+		if( serv != null ){
+			Logger log = serv.getLogger(getClass());
+			if( log != null ){
+				log.warn(errors);
 			}
 		}
 	}
@@ -899,8 +914,13 @@ public final class AppContext {
 	 * We therefore look for a string parameterised constructor in preference.
 	 * If such a constructor is found:
 	 *  
-	
-	
+	 * If the target class is an interface that extends {@link Composable} and the tag matches a {@link DataObjectFactory}
+	 * which does not implement the interface directly then the {@link DataObjectFactory} will be constructed and
+	 * a {@link Composite} matching the interface returned instead (provided that a matching composite exists).
+	 * this allows both the main class and composites to be searched for an implementation.
+	 * 
+	 * 
+	 * 
 	 * @param <T>  return type 
 	 * @param clazz  default super class 
 	 * @param tag 
@@ -1033,7 +1053,10 @@ public final class AppContext {
 	 */
 	@SuppressWarnings("unchecked")
 	public final <T> T makeObjectWithDefault(Class<T> clazz, Class<? extends T> default_class,String path, String name){
-		
+		if( default_class == null && ( name == null || name.isEmpty())) {
+			error("makeObject with null/empty tag and no default");
+			return null;
+		}
 		String tag=name;
 		if( path != null && name != null && path.length() > 0 && name.length() > 0){
 			tag = path+"."+name;
@@ -1055,11 +1078,27 @@ public final class AppContext {
 					return (T) o;
 				}else {
 					error("Unexpected class "+o.getClass().getCanonicalName()+" not assignable to "+clazz.getCanonicalName()+" tag:"+tag);
+					key=null;
 					removeAttribute(key);
 				}
 			}
 		}
 		Class<? extends T> target = getPropertyClass(clazz,default_class,tag);
+		// now consider if only the resolved class implements ContexedCached
+		if( key == null && target != null && tag != null  && ContextCached.class.isAssignableFrom(target)&&CONTEXT_CACHE_FEATURE.isEnabled(this) ) {
+			key = new ObjectCacheKey(path, tag);
+			Object o = getAttribute(key);
+			if( o != null) {
+				if( target.isAssignableFrom(o.getClass())) {
+					return (T) o;
+				}else {
+					error("Unexpected class "+o.getClass().getCanonicalName()+" not assignable to "+clazz.getCanonicalName()+" tag:"+tag);
+					key=null;
+					removeAttribute(key);
+				}
+			}
+		}
+		
 		if( target == null ){
 			// try without path
 			target = getPropertyClass(clazz,default_class,name);
@@ -1386,6 +1425,27 @@ public final class AppContext {
 
 	public final void removeCached(String path,String tag) {
 		removeAttribute(new ObjectCacheKey(path, tag));
+	}
+	private static final ThreadLocal<AppContext> local_ctx = new ThreadLocal<AppContext>();
+	/** Save a thread-local AppContext
+	 * 
+	 * @param c
+	 */
+	public static void setContext(AppContext c) {
+		local_ctx.set(c);
+	}
+	/** Retrieve a thread-local {@link AppContext} previously set using {@link #setContext(AppContext)}
+	 * 
+	 * @return
+	 */
+	public static AppContext getContext() {
+		return local_ctx.get();
+	}
+	/** Clear the thread-local reference to the {@link AppContext}
+	 * 
+	 */
+	public static void clearContext() {
+		local_ctx.remove();
 	}
 	
 }

@@ -36,6 +36,13 @@ public class TextDataFactory<T extends TextData> extends DataObjectFactory<T> im
 	public TextDataFactory(AppContext conn) {
 		this(conn,DEFAULT_TABLE);
 	}
+	public static TextDataFactory getFactory(AppContext conn,String tag) {
+		return conn.makeObject(TextDataFactory.class, tag);
+	}
+	public static TextDataFactory getFactory(AppContext conn) {
+		return getFactory(conn,DEFAULT_TABLE);
+	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#makeBDO(uk.ac.ed.epcc.webapp.model.data.Repository.Record)
 	 */

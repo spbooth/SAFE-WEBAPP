@@ -135,7 +135,7 @@ public class DNInput extends ParseAbstractInput<String> implements ItemInput<Str
 	}
 
 	@Override
-	public String convert(Object v) throws TypeError {
+	public String convert(Object v)  {
 		String val = (String) v;
 		if( val == null ){
 			return null;
@@ -189,7 +189,11 @@ public class DNInput extends ParseAbstractInput<String> implements ItemInput<Str
 	 */
 	@Override
 	public void setItem(LdapName item) {
-		setValue(makeGlobusName(item));
+		try {
+			setValue(makeGlobusName(item));
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 	}
 
 	@Override

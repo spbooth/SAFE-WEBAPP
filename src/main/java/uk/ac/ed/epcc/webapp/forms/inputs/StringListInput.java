@@ -26,7 +26,7 @@ public abstract class StringListInput extends AbstractInput<String> implements L
 	 * 
 	 */
 	public StringListInput() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)
@@ -44,7 +44,11 @@ public abstract class StringListInput extends AbstractInput<String> implements L
 	 */
 	@Override
 	public final void setItem(String item) {
-		setValue(item);
+		try {
+			setValue(item);
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 	}
 
 	public final String getItem() {

@@ -15,7 +15,6 @@ package uk.ac.ed.epcc.webapp.ssh;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.security.PublicKey;
@@ -37,7 +36,7 @@ public class RejectedKeyTest extends WebappTestBase {
 	 * 
 	 */
 	public RejectedKeyTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	

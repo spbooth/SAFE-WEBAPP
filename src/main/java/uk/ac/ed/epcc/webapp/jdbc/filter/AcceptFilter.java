@@ -25,6 +25,11 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
  * 
  */
 public interface AcceptFilter<T> extends BaseFilter<T> {
+	@Override
+	default <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
+		return vis.visitAcceptFilter(this);
+	}
+
 	/**
 	 * does this object match the filter
 	 * 

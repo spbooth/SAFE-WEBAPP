@@ -85,6 +85,11 @@ public class ServletConfigService implements ConfigService {
 		return ConfigService.class;
 	}
 
+	@Override
+	public ConfigService getNested() {
+		return nested_service;
+	}
+
 	
 	
 }

@@ -29,7 +29,7 @@ public class NoSpaceFieldValidator implements FieldValidator<String> {
 	 * 
 	 */
 	public NoSpaceFieldValidator() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

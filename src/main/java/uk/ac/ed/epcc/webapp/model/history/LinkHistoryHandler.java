@@ -20,7 +20,7 @@ import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.IndexedLinkManager;
-import uk.ac.ed.epcc.webapp.model.history.HistoryFactory.HistoryRecord;
+import uk.ac.ed.epcc.webapp.model.data.HistoryFactory.HistoryRecord;
 
 public interface LinkHistoryHandler<L extends Indexed, R extends Indexed, T extends IndexedLinkManager.Link<L, R>> extends Contexed,HistoryHandler<T>{
 

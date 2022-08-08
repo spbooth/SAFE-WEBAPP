@@ -5,3 +5,5 @@ work
 ~*
 bin
 /target/
+/webapp/target
+/webapp-log4j2/target

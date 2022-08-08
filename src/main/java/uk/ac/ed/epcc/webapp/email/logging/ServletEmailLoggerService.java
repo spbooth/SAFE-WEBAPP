@@ -21,17 +21,16 @@ import java.util.Hashtable;
 import javax.servlet.ServletException;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 /** An EmailLoggerService that adds information about the servlet request
  * parameters to error emails.
  * 
+ * If no {@link ServletService} is installed then it behaves like a normal {@link EmailLoggerService}
+ * 
  * @author spb
  *
  */
-
-@PreRequisiteService(ServletService.class)
 public class ServletEmailLoggerService extends EmailLoggerService {
 	
     @SuppressWarnings("unchecked")

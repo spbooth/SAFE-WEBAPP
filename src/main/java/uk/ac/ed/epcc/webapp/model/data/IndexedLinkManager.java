@@ -582,10 +582,12 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 */
 	public Set<L> addLeftSet(Set<L> res, R r ,BaseFilter<T> f) throws DataException{	
 	
-		for(T link : getFilterResult(null, r, f)){
-			res.add(link.getLeft());
+		try(FilterResult<T> filterResult = getFilterResult(null, r, f)){
+			for(T link : filterResult){
+				res.add(link.getLeft());
+			}
+			return res;
 		}
-		return res;
 	}
 
 	/**
@@ -680,10 +682,12 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 * @throws DataException 
 	 */
 	public Set<R> addRightSet(Set<R> res,L l ,BaseFilter<T> f) throws DataException{
-		for(T link : getFilterResult(l, null, f)){
-			res.add(link.getRight());
+		try(FilterResult<T> filterResult = getFilterResult(l, null, f)){
+			for(T link : filterResult){
+				res.add(link.getRight());
+			}
+			return res;
 		}
-		return res;
 	}
 
 
@@ -726,7 +730,12 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 * @return Link
 	 * @throws DataException
 	 */
-	synchronized protected final T makeLink(L left_end, R right_end)
+	
+	protected final T makeLink(L left_end, R right_end)
+			throws Exception {
+		return makeLink(left_end,right_end,true);
+	}
+	synchronized protected final T makeLink(L left_end, R right_end, boolean commit)
 			throws Exception {
 		if( left_end == null || right_end == null){
 			throw new IllegalArgumentException("Null arguments to makeLink");
@@ -740,7 +749,9 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 			l.setCachedLeft(left_end);
 			l.setCachedRight(right_end);
 			l.setup();
-			l.commit();
+			if( commit) {
+				l.commit();
+			}
 		}
 		return l;
 	}

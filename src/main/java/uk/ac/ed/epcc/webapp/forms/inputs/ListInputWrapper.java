@@ -60,7 +60,7 @@ public abstract class ListInputWrapper<V, T> extends WrappingInput<V> implements
 	}
 
 	@Override
-	public V convert(Object v) throws TypeError {
+	public V convert(Object v) throws TypeException {
 		if( v == null){
 			return null;
 		}

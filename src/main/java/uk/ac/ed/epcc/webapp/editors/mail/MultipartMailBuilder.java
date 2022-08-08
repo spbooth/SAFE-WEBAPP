@@ -18,13 +18,13 @@ package uk.ac.ed.epcc.webapp.editors.mail;
 
 import java.io.IOException;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.mail.MessagingException;
-import javax.mail.Part;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Part;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 
 import uk.ac.ed.epcc.webapp.email.Emailer;
 

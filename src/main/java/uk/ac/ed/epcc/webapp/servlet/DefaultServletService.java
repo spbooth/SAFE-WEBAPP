@@ -18,9 +18,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -39,13 +39,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.codec.binary.Base64;
+
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
+import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -81,6 +82,8 @@ import uk.ac.ed.epcc.webapp.session.WebNameFinder;
  */
 public class DefaultServletService implements ServletService{
 	
+	public static final String BASIC_AUTH_TYPE = "Basic";
+	public static final String BEARER_AUTH_TYPE = "Bearer";
 	/**
 	 * 
 	 */
@@ -92,8 +95,6 @@ public class DefaultServletService implements ServletService{
 	public static final String BASIC_AUTH_REALM_PARAM="basic_auth.realm";
 	public static final Feature NEED_CERTIFICATE_FEATURE = new Feature("need-certificate", true,"try additional mechanisms to retrieve certificate DN as web-name");
 	public static final String PARAMS_KEY_NAME = "Params";
-	public static final String ARG_TERRMINATOR = "-";
-	
 	Pattern auth_patt =  Pattern.compile("\\s*(\\w+)\\s+([\\w~/\\.\\+\\-]+=*)");
 	protected final AppContext conn;
 	private final ServletContext ctx;
@@ -166,12 +167,19 @@ public class DefaultServletService implements ServletService{
 
 		
 		res = req.getServletPath();
+		if( res == null ) {
+			res="";
+		}
 		tmp = req.getPathInfo();
 		if (tmp != null) {
-			res = res + "/" + tmp;
+			if( ! tmp.startsWith("/")) {
+				res = res + "/" + tmp;
+			}else {
+				res = res + tmp;
+			}
 		}
 		tmp = req.getQueryString();
-		if (tmp != null) {
+		if (tmp != null && ! tmp.isEmpty()) {
 			res = res + "?" + tmp;
 		}
 		return res;
@@ -308,7 +316,7 @@ public class DefaultServletService implements ServletService{
 			StringTokenizer st = new StringTokenizer(path, "/", false);
 			while( st.hasMoreTokens()) {
 				String val = st.nextToken();
-				if( val.equals(ARG_TERRMINATOR)){
+				if( val.equals(ServletService.ARG_TERRMINATOR)){
 					return h;
 				}
 				h.add(val);
@@ -317,15 +325,57 @@ public class DefaultServletService implements ServletService{
     	}
 		return h;
     }
+    
+    public String getFilePath() {
+    	
+    	LinkedList<String> h = new LinkedList<>();
+    	if( req != null && req instanceof HttpServletRequest){
+    	String path = ((HttpServletRequest)req).getPathInfo();
+    	boolean add = false;
+		if (path != null) {
+			StringTokenizer st = new StringTokenizer(path, "/", false);
+			while( st.hasMoreTokens()) {
+				String val = st.nextToken();
+				if( val.equals(ServletService.ARG_TERRMINATOR)){
+					add=true;
+				}else if( add ) {
+					h.add(val);
+				}
+			}
+		}
+    	}
+    	if( h.isEmpty()) {
+    		return "";
+    	}
+    	return "/"+String.join("/", h);
+    }
 	
 	/**
 	 * get the authenticated name for the current user as provided by the
 	 * web-server/container authorisation layer. This will be null unless the
 	 * container/web-server has authorisation turned on for this URL.
 	 * 
+	 * This method uses the request object cached in the high level filter
+	 * 
 	 * @return String webname
 	 */
 	public String getWebName() {
+		return getWebName(req);
+	}
+	/**
+	 * get the authenticated name for the current user as provided by the
+	 * web-server/container authorisation layer. This will be null unless the
+	 * container/web-server has authorisation turned on for this URL.
+	 * 
+	 * This method takes an explicit {@link ServletRequest} object rather than
+	 * the one cached in the service itself. It can therefore be used when a
+	 * filter may be in place.
+	 * 
+	 * 
+	 * @param ServletRequest
+	 * @return String webname
+	 */
+	public String getWebName(ServletRequest req) {
 		String name=null;
 		if( req != null) {
 		// If the web.xml defines a certificate based security-constraint then the
@@ -481,14 +531,14 @@ public class DefaultServletService implements ServletService{
 			// Can't do anything
 			return;
 		}
-		AppUserFactory<A> factory = sess.getLoginFactory();
+		
 		BearerTokenService bearer = getContext().getService(BearerTokenService.class);
 		int code = HttpServletResponse.SC_UNAUTHORIZED;
 		if( bearer != null ) {
 			// only request if secure conneciton
 			if(  bearer.request() && res instanceof HttpServletResponse && req.isSecure()) {
 				StringBuilder header =new StringBuilder();
-				header.append("Bearer");
+				header.append(BEARER_AUTH_TYPE);
 				String token_realm = bearer.getRealm();
 				if( token_realm != null &&  ! token_realm.isEmpty()) {
 					header.append(" realm=\"");
@@ -516,6 +566,12 @@ public class DefaultServletService implements ServletService{
 				
 			}
 		}
+		if( sess == null) {
+			// jsut send code
+			((HttpServletResponse)res).sendError(code);
+			return;
+		}
+		AppUserFactory<A> factory = sess.getLoginFactory();
 		@SuppressWarnings("unchecked")
 		PasswordAuthComposite<A> composite = (PasswordAuthComposite<A>) factory.getComposite(PasswordAuthComposite.class);
 		if( composite != null ){
@@ -544,14 +600,29 @@ public class DefaultServletService implements ServletService{
 
 	public <A extends AppUser> void requestLogin(SessionService<A> sess, String page)
 			throws IOException, ServletException {
-		// standard login page supports both custom password login and self-register for external-auth
-		// If built_in login is off we might change the login page to an external auth servlet url.
-		String login_page=LoginServlet.getLoginPage(getContext());
 		// Need to remember page and redirect to login
-		
 		if( page !=null&& ! page.isEmpty()) {
 			LoginServlet.setSavedResult(sess,  new RedirectResult(page));
 		}
+		if( req instanceof HttpServletRequest && res instanceof HttpServletResponse) {
+			// IF we want more than one rule then configure a RequestLoginPluginList
+			RequestLoginPlugin plugin = getContext().makeObject(RequestLoginPlugin.class, "request_login_plugin");
+			if( plugin != null) {
+				FormResult result = plugin.requestLogin((HttpServletRequest)req, (HttpServletResponse) res);
+				if( result != null) {
+					try {
+						result.accept(new ServletFormResultVisitor(getContext(),(HttpServletRequest) req, (HttpServletResponse) res));
+						return;
+					} catch (Exception e) {
+						error(e,"Error implementing login request from plug-in");
+					}
+
+				}
+			}
+		}
+		// standard login page supports both custom password login and self-register for external-auth
+		// If built_in login is off we might change the login page to an external auth servlet url.
+		String login_page=LoginServlet.getLoginPage(getContext());
 		if( EXTERNAL_AUTH_VIA_LOGIN_FEATURE.isEnabled(getContext()) || REDIRECT_TO_LOGIN_FEATURE.isEnabled(getContext()) || ! LoginServlet.BUILT_IN_LOGIN.isEnabled(getContext())) {
 			
 			redirect(login_page);
@@ -571,6 +642,11 @@ public class DefaultServletService implements ServletService{
 				return;
 			}
 			AppContext conn = getContext();
+			Logger log = null;
+			LoggerService ls = conn.getService(LoggerService.class);
+			if( ls != null ) {
+				log = ls.getLogger(getClass());
+			}
 			String name = getWebName();
 			// This is for on-the-fly remote authentication at any url
 			// don't do this if the authentication flow is expensive
@@ -631,24 +707,37 @@ public class DefaultServletService implements ServletService{
 				// Note we pick up the top level config service so that per-servlet parameters
 				// are available
 				String auth = request.getHeader("Authorization");
+				if( log != null ) {
+					log.debug(()->"Authorization header: "+auth);
+				}
 				if( auth != null ) {
 					Matcher m = auth_patt.matcher(auth);
 					if( m.matches()) {
 						String type = m.group(1);
 						String cred = m.group(2);
-						if( type.equals("Bearer")) {
+						if( type.equalsIgnoreCase(BEARER_AUTH_TYPE)) {
 							BearerTokenService bearer = getContext().getService(BearerTokenService.class);
 							if( bearer != null ) {
 								if( ! (request.isSecure() || ALLOW_INSECURE.isEnabled(getContext()))){
+									if( log != null) {
+										log.error("Bearer token sent via insecure connection");
+									}
 									error("Bearer token from insecure connection");
 									return;
+								}
+								if( log != null) {
+									log.debug("Processing bearer token "+cred);
 								}
 								// Let the bearer token service do everything
 								// this is to allow it to implement anonymous role only sessions
 								bearer.processToken(sess, cred);
 								return;
+							}else {
+								if( log != null ) {
+								 log.debug("No BearerTokenService");
+								}
 							}
-						}else if( type.equals("Basic")) {
+						}else if( type.equalsIgnoreCase(BASIC_AUTH_TYPE)) {
 							AppUserFactory<A> factory = sess.getLoginFactory();
 							@SuppressWarnings("unchecked")
 							PasswordAuthComposite<A> comp = factory.getComposite(PasswordAuthComposite.class);
@@ -665,10 +754,17 @@ public class DefaultServletService implements ServletService{
 									}else {
 										//TODO handle bad authentication
 										// could remember error in response and return forbidden in requestAuthentication
+										if( person != null && log != null) {
+											log.warn("Forbidden login "+person.getIdentifier());
+										}
 									}
 								} catch (DataException e) {
 									error(e,"Error looking up person");
 								}
+							}
+						}else {
+							if( log != null ) {
+								log.debug("Unrecognised authentication type "+type);
 							}
 						}
 					}
@@ -723,7 +819,7 @@ public class DefaultServletService implements ServletService{
 		}
 	}
 	protected static String decode(String base64) {
-		return new String(Base64.decodeBase64(base64));
+		return new String(Base64.getDecoder().decode(base64));
 	}
 	/**
 	 * Report an application error.
@@ -905,5 +1001,14 @@ public class DefaultServletService implements ServletService{
 			sess.setMaxInactiveInterval(seconds);
 		}
 		
+	}
+
+
+	@Override
+	public void sendError(int code, String message) throws IOException {
+		getRequest().setAttribute(ERROR_MSG_ATTR, message);
+		if( res != null && res instanceof HttpServletResponse ){
+			((HttpServletResponse)res).sendError(code, message);
+		}
 	}
 }

@@ -5,6 +5,8 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.forms.inputs.AutoComplete;
 import uk.ac.ed.epcc.webapp.forms.inputs.PatternTextInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.model.data.NamedFilterWrapper;
 /** An input for valid role names.
  * If a {@link SessionService} is passed on constuction a the standard role names
@@ -30,7 +32,11 @@ public class RoleNameInput extends PatternTextInput implements AutoComplete<Stri
 
 	@Override
 	public void setItem(String item) {
-		setValue(item);
+		try {
+			setValue(item);
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 		
 	}
 

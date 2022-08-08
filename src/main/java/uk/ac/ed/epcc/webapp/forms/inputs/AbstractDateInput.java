@@ -41,15 +41,15 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  *
  */
 public abstract class AbstractDateInput extends ParseAbstractInput<Date> implements BoundedDateInput, FormatHintInput {
-	public static final Date DEFAULT_MAX_DATE;
-	static {
-		Calendar c = Calendar.getInstance();
-		c.clear();
-		c.set(9999, Calendar.DECEMBER, 31);
-		DEFAULT_MAX_DATE=c.getTime();
-	}
+//	public static final Date DEFAULT_MAX_DATE;
+//	static {
+//		Calendar c = Calendar.getInstance();
+//		c.clear();
+//		c.set(9999, Calendar.DECEMBER, 31);
+//		DEFAULT_MAX_DATE=c.getTime();
+//	}
     Date min=null;
-    Date max=DEFAULT_MAX_DATE;
+    Date max=null;
     long resolution=1000L; // number of milliseconds in a tick
     public AbstractDateInput(){
     	this(1000L);
@@ -153,7 +153,7 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 	}
 
 	@Override
-	public Date convert(Object v) throws TypeError {
+	public Date convert(Object v) throws TypeException {
 		if( v instanceof Date || v == null){
 		   return (Date) v;
 		}
@@ -168,10 +168,10 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 				return parseValue((String)v);
 				
 			} catch (ParseException e) {
-					throw new TypeError("Bad date format "+v);
+					throw new TypeException("Bad date format "+v);
 			}
 		}
-		throw new TypeError(v.getClass());
+		throw new TypeException(v.getClass());
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input#getType()
@@ -205,4 +205,12 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 		return getString(n);
 	}	
 
+	@Override
+	public void setDate(Date d) {
+		try {
+			setValue(d);
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
+	}
 }

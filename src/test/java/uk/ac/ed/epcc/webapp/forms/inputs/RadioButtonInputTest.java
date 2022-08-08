@@ -95,7 +95,7 @@ InputInterfaceTest<String, RadioButtonInput<String,TestEnum>, RadioButtonInputTe
 	 */
 	@Override
 	@Test
-	public final void testGood() throws TypeError, Exception {
+	public final void testGood() throws  Exception {
 		input_test.testGood();
 		
 	}

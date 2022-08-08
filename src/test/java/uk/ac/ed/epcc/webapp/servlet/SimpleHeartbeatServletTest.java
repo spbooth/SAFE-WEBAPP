@@ -36,7 +36,7 @@ public class SimpleHeartbeatServletTest extends HeartbeatServletTest {
 	 * 
 	 */
 	public SimpleHeartbeatServletTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

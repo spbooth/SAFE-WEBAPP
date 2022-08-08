@@ -18,8 +18,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.mail.internet.MimeMessage;
-
+import jakarta.mail.Address;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
@@ -37,6 +40,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.CustomFormContent;
 import uk.ac.ed.epcc.webapp.forms.transition.DirectTargetlessTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.ShowDisabledTransitions;
 import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
@@ -66,7 +70,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @author spb
  *
  */
-public class EmailTransitionProvider implements ViewPathTransitionProvider<EditAction, MailTarget>{
+public class EmailTransitionProvider implements ViewPathTransitionProvider<EditAction, MailTarget>, ShowDisabledTransitions<EditAction, MailTarget>{
 	public static Feature SEND_NOW=new Feature("email.send_now", false, "Enable a send-now button for email text updates");
 	public class TransitionLinker implements MessageEditLinker{
 		private final AppContext conn;
@@ -266,7 +270,9 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 			f.addInput(DATA_FORM_FIELD, "Recipient Email", ((MessageComposer)target.getHandler()).getEmailInput());
 			if( messageProvider == null || ! composer.bccOnly()) {
 				f.addAction(EditAction.AddCC.toString(), new EditFormAction(target, EditAction.AddCC));
-				f.addAction(EditAction.AddTo.toString(), new EditFormAction(target, EditAction.AddTo));
+				if( ! composer.editCCOnly()) {
+					f.addAction(EditAction.AddTo.toString(), new EditFormAction(target, EditAction.AddTo));
+				}
 			}
 			f.addAction(EditAction.AddBcc.toString(), new EditFormAction(target, EditAction.AddBcc));
 		}
@@ -478,6 +484,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 	@Override
 	public <X extends ContentBuilder> X getSummaryContent(AppContext c, X cb,
 			MailTarget target) {
+		
 		return cb;
 	}
 	
@@ -543,7 +550,22 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		if( key == EditAction.Serve){
 			return target.canView(operator);
 		}
-		return target.canEdit(operator);
+		if( ! target.canEdit(operator)) {
+			return false;
+		}
+		if( key == EditAction.Send) {
+			
+			try {
+				MessageProvider prov = target.getHandler().getMessageProvider();
+				if( ! prov.canSend()){
+					return false;
+				}
+			} catch (Exception e) {
+				getLogger().error("Error checking sendable",e);
+				return false;
+			}
+		}
+		return true;
 	}
 
 	
@@ -554,10 +576,12 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		MessageHandler handler = target.getHandler();
 		if( handler instanceof MessageComposer && ((MessageComposer)handler).canEdit(target.getPath(), sess)){
 			for(EditAction action : getTransitions(target)){
-				ContentBuilder div = cb.getPanel("bar");
-				div.addHeading(2,action.getHelp());
-				div.addButton(getContext(), action.toString(), new ChainedTransitionResult<>(EmailTransitionProvider.this, target, action));
-				div.addParent();
+				if( allowTransition(getContext(),target,action)) {
+					ContentBuilder div = cb.getPanel("bar");
+					div.addHeading(2,action.getHelp());
+					div.addButton(getContext(), action.toString(), new ChainedTransitionResult<>(EmailTransitionProvider.this, target, action));
+					div.addParent();
+				}
 			}
 		}
 		return cb;
@@ -570,7 +594,15 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 		try {
 			MessageHandler handler = target.getHandler();
 			if( handler instanceof MessageComposer){
-				
+				if( target != null ) {
+					long max_email = c.getLongParameter("email.max_length", -1);
+					if( max_email > 0L ) {
+						long len = target.getMessageLength();
+						if( len > max_email) {
+							cb.getHeading(2).getSpan("warn").clean("Message is too long and may not send").appendParent().appendParent();
+						}
+					}
+				}
 				if( target.hashMatches()){
 					MessageComposerFormat mcf = new MessageComposerFormat(getContext(), (MessageComposer) handler, new TransitionLinker(getContext(), target));
 					mcf.getContent(cb);
@@ -580,6 +612,8 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 					heading.addParent();
 					cb.addText("This email has been changed while you were editing.");
 				}
+				
+				
 			}else{
 				MessageHandlerFormat mhf = new MessageHandlerFormat(getContext(), handler, new TransitionLinker(getContext(), target));
 				mhf.getContent(cb);
@@ -713,5 +747,27 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 	public <X extends ContentBuilder> X getBottomContent(X cb, MailTarget target, SessionService<?> sess) {
 		return cb;
 	}
+
+
+	@Override
+	public boolean showDisabledTransition(AppContext c, MailTarget target, EditAction key) {
+		if( key != null && key.equals(EditAction.Send) && target.canEdit(c.getService(SessionService.class))) {
+			return true;
+		}
+		return false;
+	}
+
+    public static boolean hasRecipient(Message m) throws MessagingException {
+    	Address[] recip = m.getAllRecipients();
+    	if( recip == null || recip.length==0) {
+    		return false;
+    	}
+    	if( recip.length == 1 && recip[0].equals(new InternetAddress("undisclosed-recipients:;"))) {
+    		// no real recipients for a mailing list
+    		return false;
+    	}
+    	return true;
+    }
+	
 
 }

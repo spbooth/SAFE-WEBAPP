@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.LongFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.Dummy1;
+import uk.ac.ed.epcc.webapp.model.data.HistoryFactory;
 
 public class DummyHistoryFactory extends HistoryFactory<Dummy1,HistoryFactory.HistoryRecord<Dummy1>>{
 	 public static final String DEFAULT_TABLE="TestHistory";
@@ -34,7 +35,7 @@ public class DummyHistoryFactory extends HistoryFactory<Dummy1,HistoryFactory.Hi
 	@Override
 	public TableSpecification getDefaultTableSpecification(AppContext c,
 			String homeTable) {
-		// TODO Auto-generated method stub
+		
 		TableSpecification spec = super.getDefaultTableSpecification(c, homeTable);
 		spec.setField(Dummy1.NAME, new StringFieldType(true, "", 32));
 		spec.setField(Dummy1.NUMBER, new DoubleFieldType(true, 0.0));

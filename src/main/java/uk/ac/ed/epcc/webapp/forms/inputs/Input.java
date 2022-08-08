@@ -73,17 +73,25 @@ public interface Input<V> {
 	 * 
 	 * @param v
 	 * @return previous value Object
-	 * @throws TypeError
+	 * @throws TypeException 
 	 */
-	public abstract V setValue(V v) throws TypeError;
+	public abstract V setValue(V v) throws  TypeException;
+	
+	/** Set to a null value
+	 * never throws exceptions
+	 * 
+	 */
+	public abstract void setNull();
 	/** Perform any supported type conversions to to generate a value of the
 	 * target type
 	 * 
 	 * @param v Object input
 	 * @return target type
-	 * @throws TypeError
+	 * @throws TypeException
 	 */
-	public abstract V convert(Object v) throws TypeError;
+	public default V convert(Object v) throws TypeException{
+		return (V) v;
+	}
 	/** convert a value of the correct type for this input into a String.
 	 * If this input is a parseInput this must be compatible
 	 * with the way the input is parsed. To make testing easier equivalent values should convert 

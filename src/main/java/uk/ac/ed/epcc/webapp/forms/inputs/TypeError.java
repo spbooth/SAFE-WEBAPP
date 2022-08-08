@@ -16,7 +16,10 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 /** Error thrown if the value passed to an input has no defined 
- * convertion to the expected type.
+ * conversion to the expected type.
+ * 
+ * This is normally only used to wrap a {@link TypeException} in cases where
+ * type errors should never occur but for safety we don't want to silently trap the exception.
  * 
  * @author spb
  *
@@ -28,19 +31,11 @@ public class TypeError extends Error {
 	public TypeError() {
 	}
 
-	public TypeError(String message) {
-		super(message);
-	}
-	public TypeError(Class t){
-		super("Cannot convert type "+t.getCanonicalName());
-	}
+	
 
 	public TypeError(Throwable cause) {
 		super(cause);
 	}
 
-	public TypeError(String message, Throwable cause) {
-		super(message, cause);
-	}
 
 }

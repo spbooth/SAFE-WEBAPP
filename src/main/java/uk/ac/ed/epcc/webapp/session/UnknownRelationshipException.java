@@ -22,7 +22,7 @@ public class UnknownRelationshipException extends Exception {
 		super(msg);
 	}
 
-	public UnknownRelationshipException(String msg, UnknownRelationshipException nested) {
+	public UnknownRelationshipException(String msg, Throwable nested) {
 		super(msg, nested);
 	}
 }

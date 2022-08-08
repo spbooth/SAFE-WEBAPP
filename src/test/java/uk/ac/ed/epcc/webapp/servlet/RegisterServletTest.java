@@ -13,20 +13,18 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-
-import javax.servlet.ServletException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.email.MockTansport;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.EmailNameFinder;
@@ -42,7 +40,7 @@ public class RegisterServletTest extends AbstractRegisterServletTest {
 	 * 
 	 */
 	public RegisterServletTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	@Test
 	public void testRegister() throws Exception{
@@ -55,7 +53,15 @@ public class RegisterServletTest extends AbstractRegisterServletTest {
 		assertEquals(1,MockTansport.nSent());
 	}
 
-	
+	@Test
+	@DataBaseFixtures("signup.xml")
+	public void testRegisterSecondTime() throws Exception{
+		MockTansport.clear();
+		takeBaseline();
+		addParam(EmailNameFinder.EMAIL, "thing@example.com");
+		doPost();
+		checkError("/signup.jsp", EmailNameFinder.EMAIL, "Already in use");
+	}
 	@ConfigFixtures("/extauth.properties")
 	@Test
 	public void testExtAuthRegister() throws ConsistencyError, Exception{

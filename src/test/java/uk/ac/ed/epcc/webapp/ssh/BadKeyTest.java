@@ -34,7 +34,7 @@ public class BadKeyTest extends WebappTestBase {
 	 * 
 	 */
 	public BadKeyTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	

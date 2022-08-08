@@ -29,7 +29,7 @@ public class MockHeartbeatListener implements HeartbeatListener {
 	 * 
 	 */
 	public MockHeartbeatListener() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

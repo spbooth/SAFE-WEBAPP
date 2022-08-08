@@ -146,7 +146,11 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
 
 	@Override
 	public void setItem(T item) {
-		setValue(getTagByItem(item));
+		try {
+			setValue(getTagByItem(item));
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 	}
 	@Override
 	public String parseValue(String v) throws ParseException {
@@ -212,16 +216,7 @@ public class SetInput<T> extends ParseAbstractInput<String> implements ListInput
 		return super.getString(val);
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AbstractInput#convert(java.lang.Object)
-	 */
-	@Override
-	public String convert(Object v) throws TypeError {
-		if( v instanceof String) {
-			return mapTag((String)v);
-		}
-		return super.convert(v);
-	}
+	
 
 	@Override
 	public String getPrettyString(String val) {

@@ -4,15 +4,25 @@
 Dear %%person.name%%,
 
 There are some account updates or other actions that need your attention 
-in the  %%service.website-name=Web-site%%:
+in the %%service.name%% %%service.website-name=Web-site%%:
 
 %%person.notices%%
 
-This is an important part of your use of the %%service.name%% Service.
-
-Please log in at following URL:
+Please log into the %%service.name%% %%service.website-name=Web-site%% to provide these updates.
   %%service.saf.url%%
-to provide these updates.
+%%begin{automatic_actions}%%
+
+The following actions will be taken if the required updates are not made:
+%%person.actions%%
+
+%%end{automatic_actions}%%
+%%begin{Verification}%%
+
+We appreciate that automated emails like this can appear suspicious.
+The following information is provided to help verify that this is a genuine
+request:
+%%person.verifications%%
+%%end{Verification}%%
 
 Regards,
 

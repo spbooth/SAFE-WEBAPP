@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.PreRequisiteService;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.FilteredProperties;
@@ -39,6 +40,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 public class EmailLoggerService implements Contexed, LoggerService {
+	private static final Feature EMAIL_LOGGING_FEATURE = new Feature("logging.send_email",true,"Send error reports by email");
     /**
 	 * 
 	 */
@@ -47,6 +49,7 @@ public class EmailLoggerService implements Contexed, LoggerService {
     private LoggerService nested;
     private Logger self_logger=null;
     private boolean in_error=false;
+    private Emailer mailer=null;
     public EmailLoggerService(AppContext conn){
     	this.conn=conn;
     	nested=conn.getService(LoggerService.class);
@@ -60,12 +63,16 @@ public class EmailLoggerService implements Contexed, LoggerService {
     	if( nested != null ) {
     		self_logger = nested.getLogger(getClass());
     	}
+    	
     }
 	
 	public Logger getLogger(String name) {
 		Logger l = null;
 		if( nested != null ){
 			l = nested.getLogger(name);
+		}
+		if( EMAIL_LOGGING_FEATURE.isEnabled(getContext())) {
+			return l;
 		}
 		return new EmailLogger(this, l);
 	}
@@ -75,6 +82,9 @@ public class EmailLoggerService implements Contexed, LoggerService {
 		Logger l = null;
 		if( nested != null ){
 			l = nested.getLogger(c);
+		}
+		if( ! EMAIL_LOGGING_FEATURE.isEnabled(getContext())) {
+			return l;
 		}
 		return new EmailLogger(this, l);
 	}
@@ -174,7 +184,7 @@ public class EmailLoggerService implements Contexed, LoggerService {
 					}
 				}
 				props.put("report_level", level.toString());
-				Emailer.errorEmail(getContext(),self_logger, e, props, text);
+				getMailer().errorEmail(self_logger, e, props, text);
 			}catch(Exception t){
 				if( self_logger != null ){
 					self_logger.error("Error reporting error by email",t);
@@ -191,5 +201,12 @@ public class EmailLoggerService implements Contexed, LoggerService {
 
 	public Class<? super LoggerService> getType() {
 		return LoggerService.class;
+	}
+
+	public Emailer getMailer() {
+		if( mailer == null) {
+			mailer = Emailer.getFactory(getContext());
+		}
+		return mailer;
 	}
 }

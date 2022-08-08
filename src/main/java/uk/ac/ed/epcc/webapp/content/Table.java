@@ -21,22 +21,10 @@
 package uk.ac.ed.epcc.webapp.content;
 
 import java.text.NumberFormat;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Vector;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.EmptyIterable;
+import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.NumberOp;
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 
@@ -46,23 +34,31 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
  * A generic representation of a table that we can easily change into html/xml
  * or other text.
  * 
- * Table can be sparse and is essentially a Hashtable of Hashtables. Entries can
+ * Table can be sparse and is essentially a Map of Maps. Entries can
  * be any type of object The table class maintains a list of keys determining
  * the order which rows/cols are presented. by default this reflects the order
  * the elements were added to the table. but there are special functions for
  * handling subclasses of Number (summing cols/rows etc). Summary lines like
- * totals can be inserted as Strings to prevent them being inluded in futher
+ * totals can be inserted as Strings to prevent them being included in further
  * summation etc.
  * 
+ * Columns can be arranged in groups (groups use the same key type columns and must not
+ * duplicate any of the keys used by the columns). Formatting instructions can be applied
+ * to all columns in the group. The columns of a group can be packed together. It is also possible to
+ * show the groups as an additional table header row.
+ * 
  * @author spb
- * @param <C> 
- * @param <R> 
+ * @param <C> type (or common supertype) of column keys
+ * @param <R> type (or common supertype) of row keys
  */
 
 public class Table<C, R> {
 
 	/**
-	 * A column of the table
+	 * A column of the table.
+	 * 
+	 * Optionally a name may be specified for the column that is used in formatting rather than
+	 * the column key. Unlike the key column names do not need to be unique.
 	 * 
 	 * @see Table
 	 * @author spb
@@ -71,7 +67,7 @@ public class Table<C, R> {
 	public class Col {
 		private Map<R, Object> data;
 
-		private String name; // name to be used when printing
+		private String name; // optional name to be used when printing
 		private final C col_key;
 		private Table.Formatter<C, R> format = null;
 		private Map<String, String> attr = null; // XML attributes to apply to
@@ -79,6 +75,7 @@ public class Table<C, R> {
 		private Map<R, Map<String, String>> element_attr = null; // per element
 																	// attributes
 
+		private boolean dedup =false;
 		public void clear(){
 			data.clear();
 			format=null;
@@ -118,7 +115,8 @@ public class Table<C, R> {
 			} else {
 				return put(key, NumberOp.add(old, value));
 			}
-		}public Object combine(Operator op,R key, Number value) {
+		}
+		public Object combine(Operator op,R key, Number value) {
 			Number old = getNumber(key);
 			if (old == null) {
 				return put(key, value);
@@ -131,7 +129,7 @@ public class Table<C, R> {
 		 * 
 		 * @param other
 		 */
-		public void combine(Operator op,Col other){
+		public void combine(Operator op,Table<?,R>.Col other){
 			for(R row : other.data.keySet()){
 				Object val = other.get(row);
 				// Only add a value if there is one, Hashtable doesn't like
@@ -146,12 +144,9 @@ public class Table<C, R> {
 
 				}
 			}
-			if (format == null) {
-				// pick up side effects.
-				setFormat(other.format);
-			}
-			
+			mergeFormatting(other);
 		}
+		
 		/** merge contents of a different col
 		 * 
 		 * @param other
@@ -165,11 +160,32 @@ public class Table<C, R> {
 						put(row, val);
 				}
 			}	
-			if (format == null) {
-				// pick up side effects.
-				setFormat(other.format);
-			}
+			mergeFormatting(other);
 			
+		}
+		/** merge name and format from donor table
+		 * unless this is already set locally
+		 * 
+		 * @param other
+		 */
+		public void mergeFormatting(Table<?,?>.Col other) {
+			if (format == null) {
+				if( other.format != null && other.format instanceof TransformFormatter) {
+					TransformFormatter tf = (TransformFormatter) other.format;
+					setFormat(tf.getTransform());
+				}
+			}
+			mergeName(other);
+		}
+		/** merge name  from donor table
+		 * unless this is already set locally
+		 * 
+		 * @param other
+		 */
+		public void mergeName(Table<?,?>.Col other) {
+			if( name == null ) {
+				setName(other.name);
+			}
 		}
 
 		/**
@@ -462,7 +478,7 @@ public class Table<C, R> {
 					sum += value.doubleValue();
 				}
 			}
-			return new Double(sum);
+			return Double.valueOf(sum);
 		}
 
 		// Transform a column
@@ -473,12 +489,64 @@ public class Table<C, R> {
 				data.put(key, t.convert(value));
 			}
 		}
+		public void transform(Collection<R> e, Transform t,Col dest) {
 
+			for (R key : e) {
+				Object value = data.get(key);
+				dest.put(key, t.convert(value));
+			}
+		}
 		public void transform(Transform t) {
 			// transforms hidden values as well note
 			transform(data.keySet(), t);
 		}
-
+		public void transform(Transform t, Col dest) {
+			// transforms hidden values as well note
+			transform(data.keySet(), t,dest);
+		}
+		public boolean isEmpty() {
+			return data.isEmpty();
+		}
+		/** If all values in the column
+		 * indexed by the specified keys are the same return 
+		 * that value otherwise null;
+		 * @return
+		 */
+		public Object getCommon(Collection<R> keys) {
+			Object result = null;
+			for( R key : keys) {
+				Object val = get(key);
+				if( val == null) {
+					// either all values are null or they differ either way
+					// return null;
+					return null;
+				}
+				if( result == null) {
+					result = val;
+				}else {
+					if( ! result.equals(val)) {
+						return null;
+					}
+				}
+			}
+			return result;
+		}
+		/** Do we want duplicated values to be shown as a single merged cell.
+		 * This is a formatting hint and may be ignored.
+		 * 
+		 * @return
+		 */
+		public boolean isDedup() {
+			return dedup;
+		}
+		/** Request that duplicated values be shown as a single merged cell.
+		 * This is a formatting hint and may be ignored.
+		 * 
+		 * @param dedup
+		 */
+		public void setDedup(boolean dedup) {
+			this.dedup = dedup;
+		}
 	}
 
 	public static class NumberFormatGenerator implements XMLGenerator{
@@ -517,6 +585,9 @@ public class Table<C, R> {
 	 * 
 	 * Note this also dereferences the table so it may also use the key values
 	 * or other table cells when generating the result.
+	 * 
+	 * If a Formatter only acts on the actual values it should probably be A {@link Transform}
+	 * which can be embedded in a {@link TransformFormatter}
 	 * 
 	 * Note a Formatter can customise XML or UI generation by returning an
 	 * object that implements either {@link XMLGenerator} or {@link UIGenerator}
@@ -682,6 +753,7 @@ public class Table<C, R> {
 	 * 
 	 */
 	private Map<C,Set<C>> column_groups = null;
+	private Map<C,C> key_to_group = null;
 
 	// printed with this as the col header
 
@@ -696,6 +768,7 @@ public class Table<C, R> {
 	private Set<R> highlight = null;
 	private boolean type_debug = false;
 	private boolean printHeadings = true;
+	private boolean printGroups = false;
 	private String id;
 	public Table() {
 		cols = new HashMap<>();
@@ -738,7 +811,7 @@ public class Table<C, R> {
 			put(my_col_key,row_key,t.get(col_key,my_col_key ));
 		}
 	}
-	/** Add contents of existing table 
+	/** Add contents of on existing table 
 	 * 
 	 * @param t
 	 */
@@ -748,12 +821,11 @@ public class Table<C, R> {
 			Col c = getCol(col);
 			Col src = t.getCol(col);
 			c.combine(Operator.ADD,src);
-			
-			
 		}
 	}
+	
 
-	/** Add contents from donor table transforming the keys
+	/** Add contents from donor table transforming the row keys
 	 * 
 	 * @param key_transform {@link Transform} to map donor rows to local rows
 	 * @param table
@@ -812,7 +884,7 @@ public class Table<C, R> {
 	/** Add rows (including formatting) from a table. 
 	 * @param t
 	 */
-	public void addRows(Table<C, R> t) {
+	public <X> void addRows(Table<X, R> t) {
 		for (R row : t.row_keys) {
 			if (row_keys != null) {
 				if (!row_keys.contains(row)) {
@@ -1118,7 +1190,7 @@ public class Table<C, R> {
 
 	public void addPercentCol(C old_name, C new_name, Double sum,
 			NumberFormat nf) {
-		if (sum.doubleValue() <= 0.0) {
+		if (sum == null || sum.isNaN() || sum.isInfinite() || sum.doubleValue() <= 0.0) {
 			return;
 		}
 		if (old_name == null || new_name == null) {
@@ -1138,7 +1210,7 @@ public class Table<C, R> {
 			Number n = old_col.getNumber(key);
 			if (n != null) {
 				new_col.put(key,
-						new Double(n.doubleValue() / sum.doubleValue()));
+						Double.valueOf(n.doubleValue() / sum.doubleValue()));
 			}
 		}
 	}
@@ -1557,7 +1629,15 @@ public class Table<C, R> {
 	public boolean printKeys() {
 		return keyName != null && keyName.trim().length() > 0;
 	}
-
+	/** Should column groups be shown as an additional level of column headers
+	 * 
+	 * @return
+	 */
+	public boolean printGroups() {
+		return column_groups != null && ! column_groups.isEmpty() && printGroups;
+	}
+	
+	
 	public Object put(C col_key, R row_key, Object value) {
 		Object ret = null;
 		Col col = getCol(col_key);
@@ -1761,6 +1841,9 @@ public class Table<C, R> {
 		this.printHeadings = printHeadings;
 	}
 
+	public void setPrintGroups(boolean printGroups) {
+		this.printGroups=printGroups;
+	}
 	/**
 	 * set row to specified position
 	 * 
@@ -1837,8 +1920,24 @@ public class Table<C, R> {
 	 * 
 	 */
 	public void sortRows() {
+		// make sure that there is always some defined order
+		// Indexed or hash order if nothing else.
+		// Ideally we would de-refeference IndexedReferences here
+		// but that would need an AppContext added to Table
+		sortRows(new Comparator() {
 
-		sortRows(null);
+			@Override
+			public int compare(Object o1, Object o2) {
+				if( o1 instanceof Comparable && o2 instanceof Comparable) {
+					return ((Comparable)o1).compareTo(o2);
+				}else if( o1 instanceof Indexed && o2 instanceof Indexed) {
+					return ((Indexed)o1).getID() - ((Indexed)o2).getID();
+				}else {
+					return o1.hashCode() - o2.hashCode();
+				}
+			}
+			
+		});
 
 	}
 
@@ -1901,6 +2000,11 @@ public class Table<C, R> {
 			c.transform(row_keys, t);
 		}
 	}
+	public void transformCol(C col_name,Transform t, C dest) {
+		Col src_col  = getCol(col_name);
+		Col dest_col = getCol(dest);
+		src_col.transform(t, dest_col);
+	}
 
 	/** apply a {@link Transform} to a column selected by index.
 	 * 
@@ -1933,7 +2037,6 @@ public class Table<C, R> {
 	public void setId(String id) {
 		this.id = id;
 	}
-
 	/** Remove all rows based on values in a column
 	 * row is removed if <b>col-value <i>Condition</i> value = true</b>
 	 * @param col    Column to query
@@ -1941,6 +2044,16 @@ public class Table<C, R> {
 	 * @param value  value
 	 */
 	public <T>void thresholdRows(C col, MatchCondition cond, T value ){
+		thresholdRows(col, cond, value, null);
+	}
+	/** Remove all rows based on values in a column
+	 * row is removed if <b>col-value <i>Condition</i> value = true</b>
+	 * @param col    Column to query
+	 * @param cond   {@link MatchCondition} to compare
+	 * @param merge  optional row to add numeric values from removed rows too
+	 * @param value  value
+	 */
+	public <T>void thresholdRows(C col, MatchCondition cond, T value ,R merge){
 		Col c  = getCol(col);
 		if( c != null ) {
 			Set<R> remove = new LinkedHashSet<>();
@@ -1956,19 +2069,53 @@ public class Table<C, R> {
 					}
 				}
 			}
+			if( merge != null) {
+				remove.remove(merge); // make sure we are not removing the destination
+			}
 			for(R row : remove) {
+				if( merge != null) {
+					for(Col c2 : cols.values()) {
+						Number n = c2.getNumber(row);
+						if( n != null) {
+							c2.add(merge, n);
+						}
+					}
+				}
 				removeRow(row);
 			}
 			remove.clear();
 		}
 	}
+	
+	
+	public C getGroup(C col) {
+		if( key_to_group != null) {
+			return key_to_group.get(col);
+		}
+		return null;
+	}
+	/** Add a column to a column-group
+	 * 
+	 * @param group
+	 * @param col
+	 * @throws InvalidArgument
+	 */
 	public void addToGroup(C group, C col) throws InvalidArgument {
 		if( cols.containsKey(group) ) {
 			throw new InvalidArgument("Bad group "+group.toString());
 		}
 		if( column_groups == null) {
 			column_groups= new HashMap<>();
+			key_to_group = new HashMap<>();
 		}
+		C old_group = key_to_group.get(col);
+		if( old_group != null) {
+			Set<C> old_g = column_groups.get(old_group);
+			if( old_g != null) {
+				old_g.remove(col);
+			}
+		}
+		key_to_group.put(col, group);
 		Set<C> g = column_groups.get(group);
 		if( g == null ) {
 			g = new LinkedHashSet<>();
@@ -1979,6 +2126,11 @@ public class Table<C, R> {
 		}
 		g.add(col);
 	}
+	/** Get the columns belonging to a column groun
+	 * 
+	 * @param name  key for the column group
+	 * @return
+	 */
 	public Iterable<C> getColumnGroup(C name){
 		if( column_groups == null) {
 			return new EmptyIterable<>();
@@ -2043,5 +2195,56 @@ public class Table<C, R> {
 				}
 			}
 		}
+	}
+	/** Extract a single column table containing values that are the same in all rows of a 
+	 * column. Each sutch column becomes a row of the extracted table and the column
+	 * is removed.
+	 * Method returns null if no columns are extracted or the table only has one row.
+	 * 
+	 * @return Table or null
+	 */
+	public Table<String,C> extractCommonColums(){
+		if( nRows() < 2) {
+			return null;
+		}
+		
+		Table<String,C> result = new Table<String, C>();
+		// we are going to be modifying the column list so
+		// take a copy
+		for( C c : new LinkedList<C>(col_keys)) {
+			Col col = getCol(c);
+			if( col.isEmpty()) {
+				result.put("Value", c, null);
+				removeCol(c);
+			}else {
+				Object common = col.getCommon(row_keys);
+				if( common != null) {
+					result.put("Value", c, common);
+					removeCol(c);
+				}
+			}
+		}
+		if( result.hasData()) {
+			return result;
+		}
+		return null;
+	}
+	
+	
+	private Object caption=null;
+	/** get an object to use as a table caption
+	 * 
+	 * @return
+	 */
+	public Object getCaption() {
+		return caption;
+	}
+
+	/** set an object to use as a table caption;
+	 * 
+	 * @param caption
+	 */
+	public void setCaption(Object caption) {
+		this.caption = caption;
 	}
 }

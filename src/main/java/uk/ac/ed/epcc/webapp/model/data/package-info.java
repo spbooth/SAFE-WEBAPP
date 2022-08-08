@@ -42,7 +42,7 @@ classes (we often keep one as a static inner class of the
 other to keep them associated). Where the Objects are more likely to
 be implemented as Sets of objects rather than individuals we can make
 the <code>DataObject</code> an inner class (or pseudo-inner class) of the Factory see {@link uk.ac.ed.epcc.webapp.model.data.LinkManager} and
-{@link uk.ac.ed.epcc.webapp.model.history.HistoryFactory}. 
+{@link uk.ac.ed.epcc.webapp.model.data.HistoryFactory}. 
 </P>
 <P>The classes in <B>uk.ac.ed.epcc.model.data.forms</B> provide an
 interface for building user interface forms. These can be used to

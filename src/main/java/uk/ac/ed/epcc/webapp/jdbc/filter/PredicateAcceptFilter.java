@@ -33,13 +33,7 @@ public final class PredicateAcceptFilter<T> implements AcceptFilter<T> {
 	}
 	private final Class<T> target;
 	private final Predicate<T> pred;
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-	 */
-	@Override
-	public <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
-		return vis.visitAcceptFilter(this);
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */

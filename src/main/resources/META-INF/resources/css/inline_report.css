@@ -17,6 +17,10 @@ div.report td {
 	color: black;
 	background-color: #eeeeee;
 }
+div.report  *.highlight td, div table.auto *.highlight td form{
+	 background-color: #ffffcc;
+	 color: black;
+}
 div.report table {
 	width: 100%;
 	border: solid black;

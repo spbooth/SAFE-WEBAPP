@@ -16,7 +16,7 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
-/**
+/** A {@link TableTransitionKey} that requires the operator to have the Admin role
  * @author spb
  * @param <T> target type
  *

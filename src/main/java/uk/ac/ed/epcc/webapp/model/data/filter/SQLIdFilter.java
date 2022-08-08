@@ -54,11 +54,6 @@ public class SQLIdFilter<T extends DataObject> implements SQLFilter<T>, PatternF
 	
 	
 
-	
-	@Override
-	public void accept(T o) {
-		
-	}
 
 	
 	@Override
@@ -79,14 +74,6 @@ public class SQLIdFilter<T extends DataObject> implements SQLFilter<T>, PatternF
 		return sb;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-	 */
-	@Override
-	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
-		return vis.visitPatternFilter(this);
-	}
 
 
 	/* (non-Javadoc)

@@ -24,7 +24,7 @@ public class FractionalFormatTransform implements Transform {
 	 * 
 	 */
 	public FractionalFormatTransform() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

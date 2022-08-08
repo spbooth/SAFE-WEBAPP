@@ -15,6 +15,8 @@ package uk.ac.ed.epcc.webapp.content;
 
 import junit.framework.Assert;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
 /**
@@ -31,8 +33,8 @@ public class HTMLTransformTest {
 	 */
 	@Test
 	public void testConvert1() {
-		HTMLTransform<String, String> t = new HTMLTransform<>();
-		Assert.assertEquals(3.14, t.convert(3.14));
+		HTMLTransform t = new HTMLTransform();
+		assertEquals(3.14, t.convert(3.14));
 	}
 	
 	/**
@@ -40,11 +42,11 @@ public class HTMLTransformTest {
 	 */
 	@Test
 	public void testConvert2() {
-		HTMLTransform<String, String> t = new HTMLTransform<>();
-		Assert.assertEquals(12, t.convert(null, null, null, 12));
-		HtmlSpaceGenerator g = (HtmlSpaceGenerator) t.convert(null, null, null, "test text");
+		HTMLTransform t = new HTMLTransform();
+		assertEquals(12, t.convert( 12));
+		HtmlSpaceGenerator g = (HtmlSpaceGenerator) t.convert( "test text");
 		HtmlPrinter builder = new HtmlPrinter();
 		g.addContent(builder);
-		Assert.assertEquals("test&nbsp;text", builder.toString());
+		assertEquals("test&nbsp;text", builder.toString());
 	}
 }

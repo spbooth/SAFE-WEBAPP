@@ -18,6 +18,8 @@ package uk.ac.ed.epcc.webapp.forms.transition;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.model.data.transition.ButtonText;
+import uk.ac.ed.epcc.webapp.model.data.transition.HelpText;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link TransitionFactory} that can use the generic view_target pages.
@@ -78,6 +80,9 @@ public interface ViewTransitionFactory<K, T> extends TransitionFactory<K, T> {
     * @return String or null
     */
    default public String getHelp(K key) {
+	   if( key instanceof HelpText) {
+		   return getContext().expandText(((HelpText)key).getHelp());
+	   }
 	   return null;
    }
    
@@ -87,13 +92,16 @@ public interface ViewTransitionFactory<K, T> extends TransitionFactory<K, T> {
     * @return String
     */
    default public String getText(K key) {
+	   if( key instanceof ButtonText ) {
+			return getContext().expandText(((ButtonText)key).getText());
+		}
 	   return key.toString();
    }
    
    /** Should the transition be listed on the view page.
     * Normally this just shows enabled transitions but we might want to hide some of these.
     * 
-    * The show a disabled button for some transitions implement {@link ShowDisabledTransitions}
+    * To show a disabled button for some transitions implement {@link ShowDisabledTransitions}
 	 * 
 	 * @param c
 	 * @param target

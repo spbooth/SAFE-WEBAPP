@@ -30,7 +30,7 @@ public class DateHandler implements QuestionFormHandler<Date> {
 	public Input<Date> parseConfiguration(Form f) {
 		
 		DateInput input = new DateInput(); 
-		input.setValue(new Date());
+		input.setDate(new Date());
 		return input;
 	}
 

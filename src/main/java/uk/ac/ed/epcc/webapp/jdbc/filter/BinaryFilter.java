@@ -19,5 +19,10 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
  */
 public interface BinaryFilter<T> extends BaseFilter<T> {
 
+	@Override
+	default <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
+		return vis.visitBinaryFilter(this);
+	}
+
 	public boolean getBooleanResult();
 }

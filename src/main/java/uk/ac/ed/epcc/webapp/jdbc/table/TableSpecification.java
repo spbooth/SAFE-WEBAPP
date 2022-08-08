@@ -30,6 +30,8 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.NameFinder;
+import uk.ac.ed.epcc.webapp.model.data.DataObject;
 
 /** Table Description.  
  * We use an abstract representation to make it easier to port between database back-ends.
@@ -52,8 +54,10 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  * <li>string<i>xxx</i> where xxx is the string length</li>
  * <li>required - promote an optional field</li>
  * <li><i>table-tag</i> reference to remote table</li>
- * 
  * </ul>
+ * A default value can be specified for the field by appending it to the type
+ * seperated by a colon. If the referenced factory implements {@link NameFinder} then
+ * a default reference can be specified by name
  * 
  * @author spb
  *
@@ -163,26 +167,52 @@ public class TableSpecification {
 		for(String key : params.keySet()){
 			String name=key.substring(prefix.length());
 			String type=params.get(key);
+			String def = null;
+			if( type.contains(":")) {
+				int pos = type.indexOf(':');
+				def = type.substring(pos+1);
+				type = type.substring(0,pos);
+				if( def.length() == 0) {
+					def = null;
+				}
+			}
 			try {
 				if(type.equalsIgnoreCase("double")){
-					setField(name, new DoubleFieldType(true, null));
+					setField(name, new DoubleFieldType(true, def == null ? null: Double.parseDouble(def)));
 				}else if(type.equalsIgnoreCase("float")){
-					setField(name, new FloatFieldType(true, null));
+					setField(name, new FloatFieldType(true, def == null ? null : Float.parseFloat(def)));
 				}else if(type.equalsIgnoreCase("integer")){
-					setField(name, new IntegerFieldType(true, null));
+					setField(name, new IntegerFieldType(true, def == null ? null : Integer.parseInt(def)));
 				}else if(type.equalsIgnoreCase("long")){
-					setField(name, new LongFieldType(true, null));
+					setField(name, new LongFieldType(true, def == null ? null : Long.parseLong(def)));
 				}else if(type.equalsIgnoreCase("date")){
 					setField(name, new DateFieldType(true, null));
 				}else if(type.equalsIgnoreCase("boolean")){
-					setField(name, new BooleanFieldType(true, Boolean.FALSE));
+					setField(name, new BooleanFieldType(true, def == null ? Boolean.FALSE : Boolean.parseBoolean(def)));
 				}else if(type.equalsIgnoreCase("required")){
 					promoteOptionalField(name);
 				}else if( type.startsWith("string")){
 					int length = Integer.parseInt(type.substring("string".length()));
-					setField(name, new StringFieldType(true, null, length));
+					setField(name, new StringFieldType(true, def , length));
 				}else{
-					setField(name, new ReferenceFieldType(type));
+					if( def != null) {
+						Integer r = null;
+						try {
+							r = Integer.parseInt(def);
+						}catch(NumberFormatException e) {
+							NameFinder<?> nf = conn.makeObject(NameFinder.class, type);
+							if( nf != null ) {
+								DataObject o = nf.makeFromString(def);
+								if( o != null) {
+									r = o.getID();
+								
+								}
+							}
+						}
+						setField(name,new ReferenceFieldType(r==null, type, r));
+					}else {
+						setField(name, new ReferenceFieldType(type));
+					}
 				}
 			}catch(Exception t) {
 				conn.getService(LoggerService.class).getLogger(getClass()).error("Error parsing table specification parameter "+name+"="+type,t);

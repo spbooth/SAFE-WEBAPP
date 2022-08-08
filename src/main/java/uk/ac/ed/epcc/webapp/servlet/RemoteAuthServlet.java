@@ -29,6 +29,7 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.SerializableFormResult;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
@@ -128,17 +129,19 @@ public class RemoteAuthServlet extends WebappServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse res,
 			AppContext conn) throws ServletException, IOException {
-		
+		Logger log = getLogger(conn);
 		if( ! WEB_LOGIN_FEATURE.isEnabled(conn)){
+			log.debug("web-login is disabled");
 			message(conn,req,res,"disabled_feature_error");
 			return;
 		}
 		SessionService session_service = conn.getService(SessionService.class);
 		ServletService servlet_service = conn.getService(ServletService.class);
-		String web_name = servlet_service.getWebName();
+		String web_name = servlet_service.getWebName(req);
 		try {
 			
 			if (empty(web_name)) {
+				log.debug("No web-name found");
 				// Might have bounce-server authentication on this server
 				String auth_url = conn.getExpandedProperty("remote_auth_server.url");
 				
@@ -188,6 +191,7 @@ public class RemoteAuthServlet extends WebappServlet {
 					return;
 				}
 			}
+			log.debug("web_name is "+web_name);
 			AppUser person = null;
 
 			
@@ -197,7 +201,7 @@ public class RemoteAuthServlet extends WebappServlet {
 			AppUserFactory<?> fac = session_service.getLoginFactory();
 			AppUserNameFinder parser = fac.getRealmFinder(remote_auth_realm);
 			if( parser == null) {
-				getLogger(conn).error("No realm finder found for "+remote_auth_realm);
+				log.error("No realm finder found for "+remote_auth_realm);
 				message(conn,req,res,"internal_error","No realm finder found");
 				return;
 			}

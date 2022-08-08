@@ -42,7 +42,7 @@ ParseMapInputInterfaceTest<String, FileUploadDecorator, FileUploadDecoratorTestC
 	 * 
 	 */
 	public FileUploadDecoratorTestCase() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)
@@ -120,7 +120,7 @@ ParseMapInputInterfaceTest<String, FileUploadDecorator, FileUploadDecoratorTestC
 	 */
 	@Override
 	public void parseNull() throws Exception {
-		// TODO Auto-generated method stub
+		
 		
 	}
 

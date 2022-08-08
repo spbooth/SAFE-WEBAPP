@@ -20,13 +20,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
-import uk.ac.ed.epcc.webapp.forms.inputs.AbstractInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.StringListInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
 
 /** Input to select a database table
  * 

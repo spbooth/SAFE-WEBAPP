@@ -24,11 +24,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory;
+import uk.ac.ed.epcc.webapp.session.RequiredPage;
 import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory.EmailChangeRequest;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 /** Servlet to handle Email Change requests.
@@ -74,10 +76,27 @@ public class EmailChangeRequestServlet extends SessionServlet {
 						String old = target_user.getEmail();
 						String email=request.getEmail();
 						request.complete();
-						if( old.equalsIgnoreCase(email)) {
-							message(conn, req, res, "email_verification_request_successful",email);
+						NavigationMenuService nav = conn.getService(NavigationMenuService.class);
+						if( nav != null) {
+							// validating email may change menu state
+							// for the current user if requirement was marked up in menu
+							nav.resetMenu();
+						}
+						// This  might be a required page update
+						// we want to continue to the original request page
+						// or the next required page
+						SessionService sess = conn.getService(SessionService.class);
+						String return_url = (String) sess.getAttribute(RequiredPage.REQUIRED_PAGE_RETURN_ATTR);
+						if( return_url != null && ! return_url.isEmpty()) {
+							sess.removeAttribute(RequiredPage.REQUIRED_PAGE_RETURN_ATTR);
+							handleFormResult(conn, req, res, 
+									new RedirectResult(return_url));
 						}else {
-							message(conn, req, res, "email_change_request_successful",email);
+							if( old.equalsIgnoreCase(email)) {
+								message(conn, req, res, "email_verification_request_successful",email);
+							}else {
+								message(conn, req, res, "email_change_request_successful",email);
+							}
 						}
 						return;
 					}else {

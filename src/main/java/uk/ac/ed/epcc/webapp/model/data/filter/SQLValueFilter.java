@@ -102,9 +102,7 @@ public class SQLValueFilter<T> implements SQLFilter<T>, PatternFilter<T> {
 
 	
 	
-	public final void accept(T o) {
-		
-	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -146,12 +144,7 @@ public class SQLValueFilter<T> implements SQLFilter<T>, PatternFilter<T> {
 			return false;
 		return true;
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-	 */
-	public final <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
-		return vis.visitPatternFilter(this);
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */

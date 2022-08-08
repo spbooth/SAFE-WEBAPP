@@ -55,7 +55,7 @@ public interface Form extends Iterable<Field>, Contexed{
 	 * @param action
 	 *            FormAction
 	 */
-	public void addAction(String name, FormAction action); 
+	public FormAction addAction(String name, FormAction action); 
 	
 	/** remove a {@link FormAction}.
 	 * 

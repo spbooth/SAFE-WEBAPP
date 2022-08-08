@@ -207,6 +207,16 @@ public interface ContentBuilder {
 	 * @param action FormResult to navigate to.
 	 */
 	public abstract void addLink(AppContext conn,String text, String hover,FormResult action);
+	
+	/** Add an action link to the Content
+	 * @param conn AppContext
+	 * 
+	 * @param text  link text
+	 * @param hover tooltip text
+	 * @param style  link class for CSS
+	 * @param action FormResult to navigate to.
+	 */
+	public abstract void addLink(AppContext conn,String text, String hover,String style,FormResult action);
 	/** Add an image served by a {@link ServeDataResult}
 	 * 
 	 * @param conn
@@ -267,6 +277,7 @@ public interface ContentBuilder {
 	 */
 	public void addFormTable(AppContext conn,Iterable<Field> f);
 	/** Add the label for a form {@link Field}
+	 * field errors sill be added automatically
 	 * 
 	 * @param conn
 	 * @param f Field
@@ -274,6 +285,16 @@ public interface ContentBuilder {
 	 * 
 	 */
 	public <I,T> void addFormLabel(AppContext conn,Field<I> f,T item);
+	
+	/** Add just the field error for a label
+	 * 
+	 * @param <I>
+	 * @param <T>
+	 * @param conn
+	 * @param f
+	 * @param item
+	 */
+	public <I,T> void addFormError(AppContext conn,Field<I> f,T item);
 	/** Add the label for a form {@link Field}
 	 * 
 	 * @param conn
@@ -306,4 +327,11 @@ public interface ContentBuilder {
 	 * @param names {@link Set} of action names
 	 */
 	public void addActionButtons(Form f,String legend,Set<String> names);
+	
+	/** Add a single action button with no enclosing container.
+	 * 
+	 * @param f {@link Form}
+	 * @param name String name
+	 */
+	public void addActionButton(Form f, String name);
 }

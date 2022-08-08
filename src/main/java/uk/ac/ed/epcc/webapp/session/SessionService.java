@@ -26,7 +26,11 @@ import java.util.function.Supplier;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.Contexed;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.CannotUseSQLException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 /** {@link AppContextService} for managing session information.
@@ -173,11 +177,11 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	
 	default public boolean hasRoleFromList(String ...roles){
-		if( roles == null ){
+		if( roles == null || roles.length == 0){
 			return false;
 		}
 		for(String role : roles){
-			if( hasRole(role)){
+			if( (!role.isEmpty()) && hasRole(role)){
 				return true;
 			}
 		}
@@ -213,12 +217,12 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	/** get a {@link BaseFilter} for all {@link AppUser}s who
 	 * have access to a global role.
 	 * 
-	 * This is the same selection as {@link #canHaveRole(AppUser, String)
+	 * This is the same selection as {@link #canHaveRoleFromList(AppUser, String)
 	 * 
 	 * @param role
 	 * @return
 	 */
-	public BaseFilter<A> getGlobalRoleFilter(String role);
+	public BaseFilter<A> getGlobalRoleFilter(String ...roles);
 	
 	default public boolean canHaveRoleFromList(A user,String ... roles) {
 		if( roles == null ) {
@@ -312,6 +316,11 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * relationship-role with a target object.
 	 * A null target selects all {@link AppUser}s that have the specified role with any target matched by the
 	 * factories default  {@link DataObjectFactory#getDefaultRelationshipFilter()}.
+	 * 
+	 * Care needs to be taken when using a null target as named filter relations will only test that
+	 * a target matching the named filter exists so AND combinations may return a wider set of {@link AppUser}s
+	 * than desired. This can be addressed by adding an AcceptFilter verifying the full and-condition though this can be expensive.  
+	 * 
 	 * @param fac
 	 * @param role
 	 * @param target
@@ -319,13 +328,8 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public <T extends DataObject> BaseFilter<A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,T target) throws UnknownRelationshipException;
 	
-	/** Get a filter for {@link AppUser}s that can be in any of the specified global roles.
-	 * as defined in {@link #canHaveRoleFromList(AppUser, String...)}
-	 * 
-	 * @param role_list
-	 * @return
-	 */
-	public BaseFilter<A> getPersonInRoleFilter(String ... role_list);
+	public <T extends DataObject> SQLFilter<A> getPersonInRelationshipRoleToFilter(DataObjectFactory<T> fac, String role,SQLFilter<T> target) throws UnknownRelationshipException, CannotUseSQLException;
+	
 	/** get a {@link BaseFilter} representing the set of targets that a specified {@link AppUser} is in a particular
 	 * relationship-role with.
 	 * @param fac
@@ -384,15 +388,41 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @return
 	 */
 	public default <T extends DataObject> boolean personHasRelationship(A person,DataObjectFactory<T> fac, T target,String role,Supplier<Boolean> fallback ) {
-		try {
-			if( isCurrentPerson(person)) {
-				return hasRelationship(fac, target, role, fallback);
+		if( target == null) {
+			// Check for targets by preference as these filters are more reliable
+			try {
+				return fac.exists(getTargetInRelationshipRoleFilter(fac, role, person));
+			} catch (DataException e) {
+				person.getContext().getService(LoggerService.class).getLogger(getClass()).error("Error checking role",e);
+				return fallback.get();
+			} catch (UnknownRelationshipException e) {
+				return fallback.get();
 			}
-			return getLoginFactory().matches(getPersonInRelationshipRoleFilter(fac, role, target), person);
-		} catch (UnknownRelationshipException e) {
-			return fallback.get();
+		}else {
+
+			try {
+				if( isCurrentPerson(person)) {
+					// this may cache
+					return hasRelationship(fac, target, role, fallback);
+				}
+				return getLoginFactory().matches(getPersonInRelationshipRoleFilter(fac, role, target), person);
+			} catch (UnknownRelationshipException e) {
+				return fallback.get();
+			}
 		}
 	}
+	/** Return an object explaining how the specified relationship is implemented.
+	 * Though this could just return a String (and casting the returned object to a String
+	 * should give a text explanation) the returned object could also implement
+	 * interfaces from uk.ac.ed.epcc.webapp.content to utilise formatting.
+	 * 
+	 * @param <T> type of target
+	 * @param fac {@link DataObjectFactory}Factory for target
+	 * @param role
+	 * @return
+	 */
+	 public <T extends DataObject> Object explainRelationship(DataObjectFactory<T> fac,String role);
+	 
 	/** Tests if the session has already authenticated. This can return false even if {@link #haveCurrentUser()} could return true
 	 * provided it is called first.
 	 * 
@@ -411,5 +441,11 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public void addSecurityContext(Map att);
 	
-	
+	/** Is this an assumed identity 
+	 * 
+	 * @return
+	 */
+	public default boolean isSU(){
+		return false;
+	}
 }

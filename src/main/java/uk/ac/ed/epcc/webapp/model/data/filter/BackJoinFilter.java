@@ -135,18 +135,6 @@ public final class BackJoinFilter<T extends DataObject, BDO extends DataObject> 
 		}
 
 
-	
-
-
-		
-		@Override
-		public void accept(BDO o) {
-		}
-
-
-
-
-
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 		 */

@@ -23,15 +23,12 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
-import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.PreSelectInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.model.data.convert.EnumeratingTypeConverter;
 
 
 
-public class TypeProducerInput<T> extends TextInput implements PreSelectInput<String,T>, OptionalListInput<String, T> {
+public class TypeProducerInput<T> extends AbstractInput<String> implements PreSelectInput<String,T>, OptionalListInput<String, T> {
     private final EnumeratingTypeConverter<T,String> t;
     private Set<T> item_set=null;
     private String unselected_text=null;
@@ -51,10 +48,17 @@ public class TypeProducerInput<T> extends TextInput implements PreSelectInput<St
 			@Override
 			public void validate(String value) throws FieldException {
 				try {
-					if( t.find(value) == null){
+					T item = t.find(value);
+					if( item == null){
 						// not one of the valid types
 						throw new ValidateException("Invalid input");
 					}
+					if( ! isValid(item)) {
+						// correct type but invalid
+						throw new ValidateException("Invalid input");
+					}
+				}catch(ValidateException ve) {
+					throw ve;
 				} catch (Exception e) {
 					throw new ValidateException("Bad value");
 				}
@@ -125,7 +129,11 @@ public class TypeProducerInput<T> extends TextInput implements PreSelectInput<St
 
 	@Override
 	public void setItem(T item) {
-		setValue(getTagByItem(item));
+		try {
+			setValue(getTagByItem(item));
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 	}
 	@Override
 	public String getPrettyString(String val) {

@@ -105,6 +105,10 @@ public class StatefulProvider extends AbstractTransitionProvider<Number,Transiti
 	 */
 	public StatefulProvider(AppContext c) {
 		super(c);
+	}
+	
+	@Override
+	protected void setupTransitions() {
 		addTransition(CREATE_KEY, new MultiStageCreate());
 	}
 

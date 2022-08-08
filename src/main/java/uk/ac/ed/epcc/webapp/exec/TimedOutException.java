@@ -24,7 +24,7 @@ public class TimedOutException extends Exception {
 	 * 
 	 */
 	public TimedOutException() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/**
@@ -32,7 +32,7 @@ public class TimedOutException extends Exception {
 	 */
 	public TimedOutException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 }

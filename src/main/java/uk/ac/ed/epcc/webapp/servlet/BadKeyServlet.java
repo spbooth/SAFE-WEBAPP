@@ -40,7 +40,7 @@ public class BadKeyServlet extends WebappServlet {
 	 * 
 	 */
 	public BadKeyServlet() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)

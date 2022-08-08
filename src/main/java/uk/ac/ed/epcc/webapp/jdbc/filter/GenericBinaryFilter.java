@@ -86,22 +86,8 @@ public class GenericBinaryFilter<T> implements SQLFilter<T>, BinaryFilter<T>{
 		return target;
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-	 */
-	@Override
-	public final <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
-		// Default is to act as a binary filter
-		return vis.visitBinaryFilter(this);
-	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter#accept(java.lang.Object)
-	 */
-	@Override
-	public void accept(T o) {
-		
-	}
+	
 	public String toString() {
 		return "GenericBinaryFilter("+value+")";
 	}

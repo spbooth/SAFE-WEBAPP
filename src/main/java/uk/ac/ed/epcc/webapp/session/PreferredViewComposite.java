@@ -135,7 +135,7 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 		}
 		try {
 			return getViewFactory().makeFromString(name);
-		} catch (DataFault e) {
+		} catch (Exception e) {
 			getLogger().error("Error getting default view", e);
 			return null;
 		}

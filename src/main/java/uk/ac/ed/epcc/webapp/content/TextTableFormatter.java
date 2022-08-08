@@ -40,12 +40,33 @@ public class TextTableFormatter<C,R> {
 			wid = new int[ncols];
 			// Header width
 			int pos = 0;
+			if( table.printGroups()) {
+				if( table.printKeys()) {
+					wid[pos]=0;
+					pos++;
+				}
+				for( C name : cols){
+					C group = table.getGroup(name);
+					if( group != null) {
+						wid[pos++]=group.toString().length();
+					}else {
+						wid[pos++]=0;
+					}
+				}
+			}
+			pos=0;
+			// normal heading
 			if( table.printKeys()){
 				wid[pos] = table.getKeyName().length();
 				pos++;
 			}
 			for(  C name : cols){
-				wid[pos++]=name.toString().length();
+				String text = table.getCol(name).getName();
+				if( text == null ) {
+					text = name.toString();
+				}
+				wid[pos]=max(wid[pos],text.length());
+				pos++;
 			}
 			for( R row : table.getRows()){
 				pos = 0;
@@ -98,13 +119,35 @@ public class TextTableFormatter<C,R> {
 	}
 	private void addHeader(StringBuilder sb){
 		int pos=0;
+		if( table.printGroups()) {
+			sb.append("|");
+			if( table.printKeys()){
+				leftJustify(sb, "", wid[pos++]);
+				sb.append("||");
+			}
+			for( C col : table.getColumNames()){
+				C group = table.getGroup(col);
+				String text = "";
+				if( group != null) {
+					text = group.toString();
+				}
+				rightJustify(sb,text,wid[pos++]);
+				sb.append("|");
+			}
+			sb.append("\n");
+			pos=0;
+		}
 		sb.append("|");
 		if( table.printKeys()){
 			leftJustify(sb, table.getKeyName(), wid[pos++]);
 			sb.append("||");
 		}
 		for( C col : table.getColumNames()){
-			rightJustify(sb,col.toString(),wid[pos++]);
+			String text = table.getCol(col).getName();
+			if( text == null ) {
+				text = col.toString();
+			}
+			rightJustify(sb,text,wid[pos++]);
 			sb.append("|");
 		}
 		sb.append("\n");

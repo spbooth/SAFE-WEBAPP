@@ -16,7 +16,8 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
-/**
+/** A {@link TableTransitionKey} for operations that use the generated {@link TableSpecification}.
+ * This allows either Admins or table developers.
  * @author spb
  * @param <T> target type
  *

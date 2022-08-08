@@ -15,9 +15,12 @@ package uk.ac.ed.epcc.webapp.session;
 
 import java.io.IOException;
 import java.security.PublicKey;
+import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
 import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
+import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil;
 import uk.ac.ed.epcc.webapp.ssh.RsaPublicKeyArrayInput;
 import uk.ac.ed.epcc.webapp.ssh.SshPublicKeyArrayInput;
 
@@ -32,7 +35,7 @@ public class MultiKeyComposite extends PublicKeyComposite<PublicKey[]> {
 	 */
 	public MultiKeyComposite(AppUserFactory fac) {
 		super(fac);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	
@@ -65,5 +68,24 @@ public class MultiKeyComposite extends PublicKeyComposite<PublicKey[]> {
 	protected String format(PublicKey[] keys) throws PublicKeyParseException, IOException {
 		return SshPublicKeyArrayInput.format(keys);
 	}
+	@Override
+	public String[] getPublicKeys(AppUser person) {
+		String key = getPublicKey(person);
+		if( key == null || key.isEmpty()) {
+			return new String[0];
+		}
+		try {
+			PublicKey keys[] = load(key);
+			String result[] = new String[keys.length];
+			for(int i =0; i< keys.length ; i++) {
+				result[i]=PublicKeyReaderUtil.format(keys[i]);
+			}
+			return result;
+		}catch(Exception e) {
+			getLogger().error("Error generating key list",e);
+			return new String[0];
+		}
+	}
+
 
 }

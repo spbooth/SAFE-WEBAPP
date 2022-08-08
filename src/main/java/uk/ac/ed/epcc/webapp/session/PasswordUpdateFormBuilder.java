@@ -405,7 +405,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 				}else {
 					try {
 						// Notify password reset
-						Emailer emailer = new Emailer(getContext());
+						Emailer emailer = Emailer.getFactory(getContext());
 						emailer.passwordChanged(user);
 					}catch(Exception t) {
 						getLogger().error("Error in email notification", t);

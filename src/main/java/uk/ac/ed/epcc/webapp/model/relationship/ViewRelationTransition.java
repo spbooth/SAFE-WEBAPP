@@ -13,12 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.relationship;
 
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.session.SessionService;
-import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -33,6 +27,9 @@ import uk.ac.ed.epcc.webapp.forms.result.CustomPageResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A transition to show all people with a specific Relationship
  * @author spb
@@ -89,6 +86,9 @@ public class ViewRelationTransition<X extends DataObject> extends AbstractFormTr
 		public ContentBuilder addContent(AppContext conn, ContentBuilder cb) {
 			cb.addHeading(1, getTitle());
 			SessionService sess = conn.getService(SessionService.class);
+			ContentBuilder defn = cb.getDetails("Implementation");
+			defn.addObject(sess.explainRelationship(fac, relationship));
+			defn.closeDetails();
 			try {
 				cb.addList(sess.getLoginFactory().getResult(sess.getPersonInRelationshipRoleFilter(fac, relationship, target)));
 			} catch (Exception e) {

@@ -27,7 +27,6 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.FieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
@@ -36,7 +35,6 @@ import uk.ac.ed.epcc.webapp.model.data.convert.EnumeratingTypeConverter;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeFilterProducer;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
-import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.inputs.BasicTypeInput;
 
 /**
@@ -138,6 +136,13 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 			// TypeProducerInput uses toString for the name
 			return getName();
 		}
+		/** optional collection of values into groups.
+		 * 
+		 * @return
+		 */
+		public String getGroup() {
+			return null;
+		}
 		@Override
 		public boolean equals(Object obj) {
 			if( obj == null ){
@@ -232,6 +237,9 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	 */
 	@Override
 	public final T find(String o) {
+		if( o == null || o.isEmpty()) {
+			return null;
+		}
 		return  values.get(o);
 	}
 

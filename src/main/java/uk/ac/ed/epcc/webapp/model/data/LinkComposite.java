@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.model.data.IndexedLinkManager.Link;
 
 /** An interface for {@link Composite}s that wish
  * to take part in a {@link IndexedLinkManager.Link#setup()} operation
@@ -27,6 +28,10 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
  */
 public interface LinkComposite<L extends IndexedLinkManager.Link> {
 
+	/** Composite contribution to the {@link Link} setup operation
+	 * 
+	 * @param target
+	 */
 	public void setup(L target);
 	
 	/** Add Tracking fields to the history table default specification

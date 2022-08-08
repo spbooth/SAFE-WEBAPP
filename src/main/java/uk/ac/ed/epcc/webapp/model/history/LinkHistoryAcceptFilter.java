@@ -37,7 +37,7 @@ import uk.ac.ed.epcc.webapp.model.data.IndexedLinkManager;
  */
 
 
-public class LinkHistoryAcceptFilter<L extends Indexed, R extends Indexed, T extends IndexedLinkManager.Link<L,R>,H extends History<T>> extends AbstractAcceptFilter<H> implements AcceptFilter<H>{
+public class LinkHistoryAcceptFilter<L extends Indexed, R extends Indexed, T extends IndexedLinkManager.Link<L,R>,H extends History<T>> extends AbstractAcceptFilter<H> {
 	/**
 	 * 
 	 */

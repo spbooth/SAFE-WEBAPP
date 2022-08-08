@@ -33,7 +33,7 @@ public interface InputInterfaceTest<T,I extends Input<T>,X extends TestDataProvi
 	@Test
 	public void testMakeSwing() throws Exception;
 	@Test
-    public void testGood() throws TypeError, Exception;
+    public void testGood() throws Exception;
 	@Test
     public void testBad() throws Exception;
    

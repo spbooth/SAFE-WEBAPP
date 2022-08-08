@@ -13,11 +13,14 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
+import java.awt.Composite;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
-/**
+/** Interface for {@link DataObjectFactory}s or {@link Composite}s that contribute additional transitions to the
+ * {@link TableTransitionProvider}
  * @author spb
  *
  */

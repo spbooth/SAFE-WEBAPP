@@ -76,8 +76,18 @@ public class ServeDataServlet extends WebappServlet {
 					res.sendError(HttpServletResponse.SC_FORBIDDEN);
 					return;
 				}
+				String content_type = msd.getContentType();
+				if( producer.isExternalContent(args)) {
+					// Disable any scripting in this content
+					res.setHeader("Content-Security-Policy", "script-src 'none'; object-src 'none'; default-src 'none'");
+					String lc = content_type.toLowerCase();
+					if( lc.contains("javascript") ||  lc.contains("html") ) {
+						content_type="text/plain";
+					}
+				}
+				res.setContentType(content_type);
 				res.setContentLength((int) msd.getLength());
-				res.setContentType(msd.getContentType());
+				
 				try(ServletOutputStream out = res.getOutputStream()){
 					msd.write(out);
 				}

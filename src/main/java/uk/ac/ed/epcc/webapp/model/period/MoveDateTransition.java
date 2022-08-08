@@ -45,23 +45,43 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 		public FormResult action(Form f) throws ActionException {
 			Date d = (Date) f.get(MoveDateTransition.DATE_FIELD);
 			Boolean move_split = (Boolean) f.get(MoveDateTransition.MOVE_SPLIT_FIELD);
-		
-			T next_seq = fac.getNextInSequence(target, ! move_start);
-			try{
-			if( move_start ){
-				fac.setStart(target, d);
-			}else{
-				fac.setEnd(target, d);
+			boolean move_boundary = move_split != null && move_split.booleanValue();
+			T next_seq = null;
+			if( move_boundary ) {
+				next_seq = fac.getNextInSequence(target, ! move_start);
+				if( next_seq == null ) {
+					move_boundary=false;
+				}
 			}
-			if( move_split != null && move_split.booleanValue()){
-				if( next_seq != null){
-					if( move_start ){
+			// We need to be a little careful to ensure that we never have 2 records overlapping.
+			// (the edit may trigger side effects that assume a non-overlapping sequence)
+			// therefore we want to edit the record that is being made shorter first
+			
+			Date orig = move_start ? target.getStart() : target.getEnd();
+			boolean moving_down = d.before(orig);
+			
+			
+			
+			try{
+				
+				if( move_start ){
+					if( move_boundary && moving_down){
 						fac.setEnd(next_seq, d);
-					}else{
+					}
+					fac.setStart(target, d);
+					if( move_boundary && ! moving_down){
+						fac.setEnd(next_seq, d);
+					}
+				}else{
+					if( move_boundary && ! moving_down){
+						fac.setStart(next_seq, d);
+					}
+					fac.setEnd(target, d);
+					if( move_boundary && moving_down){
 						fac.setStart(next_seq, d);
 					}
 				}
-			}
+
 			}catch(Exception e){
 				tp.getContext().error(e,"Internal error");
 				throw new ActionException("Internal error");
@@ -171,7 +191,7 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 		}
 		
 		BoundedDateInput input = fac.getDateInput();
-		input.setValue(def);
+		input.setDate(def);
 		input.setMin(min_date);
 		input.setMax(max_date);
 		f.addInput(MoveDateTransition.DATE_FIELD, label, input);

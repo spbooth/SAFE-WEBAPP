@@ -30,7 +30,7 @@ public class UnitDisplayFormatTest {
 	 * 
 	 */
 	public UnitDisplayFormatTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	@Test

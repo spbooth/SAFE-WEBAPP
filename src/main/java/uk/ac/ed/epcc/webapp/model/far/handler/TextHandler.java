@@ -47,7 +47,7 @@ public class TextHandler implements QuestionFormHandler<String> {
 	 * 
 	 */
 	public TextHandler() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	

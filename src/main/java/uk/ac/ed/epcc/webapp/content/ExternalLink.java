@@ -47,6 +47,7 @@ public class ExternalLink extends AbstractContexed implements XMLGenerator{
 			builder.open("a");
 			builder.attr("href", url.toString());
 			builder.attr("target", "_blank");
+			builder.attr("rel","noopener noreferrer external");
 			builder.clean(text);
 			builder.close();
 			builder.appendParent();

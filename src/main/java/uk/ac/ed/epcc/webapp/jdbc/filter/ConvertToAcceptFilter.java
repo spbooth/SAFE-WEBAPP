@@ -31,13 +31,7 @@ public class ConvertToAcceptFilter<T> implements AcceptFilter<T> {
 	}
 	private final BaseFilter<T> inner;
 	private final FilterMatcher<T> matcher;
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#acceptVisitor(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
-	 */
-	@Override
-	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception {
-		return vis.visitAcceptFilter(this);
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */

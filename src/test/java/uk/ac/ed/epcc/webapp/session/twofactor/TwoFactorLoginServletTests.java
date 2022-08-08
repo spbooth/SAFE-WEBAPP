@@ -22,6 +22,7 @@ import uk.ac.ed.epcc.webapp.TestTimeService;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
+import uk.ac.ed.epcc.webapp.servlet.AbstractLoginServletTest;
 import uk.ac.ed.epcc.webapp.servlet.LoginServlet;
 import uk.ac.ed.epcc.webapp.servlet.LoginServletTest;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -34,7 +35,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 @ConfigFixtures("twofactor.properties")
-public class TwoFactorLoginServletTests<A extends AppUser> extends LoginServletTest<A> {
+public class TwoFactorLoginServletTests<A extends AppUser> extends AbstractLoginServletTest<A> {
 
 	
 	

@@ -13,12 +13,17 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
-import uk.ac.ed.epcc.webapp.forms.Form;
+import java.util.Set;
 
-/**
+import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.model.data.Composite;
+
+/** Interface for {@link Composite}s that contribute the the {@link AppUser} signup form
  * @author spb
  *
  */
 public interface SignupCustomiser {
   public void customiseSignupForm(Form f);
+  
+  public default void addSignupSuppress(Set<String> supress){};
 }

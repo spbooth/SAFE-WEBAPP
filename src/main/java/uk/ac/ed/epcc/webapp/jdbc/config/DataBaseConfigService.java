@@ -334,5 +334,9 @@ public class DataBaseConfigService implements ConfigService {
 	public Class<ConfigService> getType() {
 		return ConfigService.class;
 	}
+	@Override
+	public ConfigService getNested() {
+		return nested;
+	}
 
 }

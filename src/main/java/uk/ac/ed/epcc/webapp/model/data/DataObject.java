@@ -81,7 +81,7 @@ public abstract class DataObject implements ContextIndexed, Identified, Releasab
 	protected static final boolean DEBUG = false;
 
 	/** All the fields for this record. */
-	public Repository.Record record;
+	protected Repository.Record record;
 
 	
 
@@ -219,9 +219,12 @@ public abstract class DataObject implements ContextIndexed, Identified, Releasab
 	 *            Form to use
 	 */
 	public void formUpdate(Form f) {
+		formUpdate(f,f.getFieldIterator());
+	}
+	public void formUpdate(Form f, Iterator<String> fields) {
 		Repository res = record.getRepository();
 		boolean allow_bogus = res.setAllowBogusPut(true);
-		for (Iterator<String> it = f.getFieldIterator(); it.hasNext();) {
+		for (Iterator<String> it = fields; it.hasNext();) {
 			String key = it.next();
 			record.setProperty(key, f.get(key));
 		}
@@ -359,9 +362,9 @@ public abstract class DataObject implements ContextIndexed, Identified, Releasab
 	 * 
 	 * @throws DataFault
 	 */
-    protected void lock() throws DataFault {
+    protected void lock(boolean allow_dirty) throws DataFault {
     	if( record != null ) {
-    		record.lock();
+    		record.lock(allow_dirty);
     	}
     }
 	protected boolean isLocked() {

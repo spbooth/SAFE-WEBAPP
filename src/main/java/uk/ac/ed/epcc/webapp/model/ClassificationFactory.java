@@ -35,12 +35,14 @@ import uk.ac.ed.epcc.webapp.forms.inputs.NameInputProvider;
 import uk.ac.ed.epcc.webapp.forms.inputs.NoHtmlInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.NoSpaceFieldValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.forms.inputs.UnusedNameInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.HistoryFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
@@ -54,7 +56,6 @@ import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NameFinderInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedDataCache;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
-import uk.ac.ed.epcc.webapp.model.history.HistoryFactory;
 import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
 
 /** Factory class for Classification objects.
@@ -154,12 +155,17 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	public SQLValueFilter<T> getStringFinderFilter(String name) {
 		return new SQLValueFilter<>(getTarget(),res,Classification.NAME,name);
 	}
+	@Override
+	public SQLFilter<T> hasCanonicalNameFilter(){
+		// all classifications have names
+		return new GenericBinaryFilter<T>(getTarget(), true);
+	}
 	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#makeByName(java.lang.String)
 	 */
 	@Override
-	public T makeFromString(String name) throws DataFault{
+	public final T makeFromString(String name) throws DataFault, ParseException{
 		if( name == null || name.isEmpty()){
 			return null;
 		}
@@ -167,6 +173,9 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		if( c != null ){
 			return c;
 		}
+		
+		validateNameFormat(name);
+		
 		c = makeBDO();
 		c.setName(name);
 		postMakeByName(c, name);
@@ -254,6 +263,8 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		public boolean isValid(T item) {
 			return matches(fil,item);
 		}
+
+		
 	}
 	/** An {@link DataObjectItemInput} that uses the {@link ParseFactory#findFromString(String)} method to locate
 	 * 
@@ -276,10 +287,15 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		@Override
 		public void setItem(T item) {
 			if( item == null ){
-				setValue(null);
+				setNull();
 				return;
 			}
-			setValue(item.getID());
+			try {
+				setValue(item.getID());
+			} catch (TypeException e) {
+				// should never happend
+				throw new TypeError(e);
+			}
 			
 		}
 
@@ -289,7 +305,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		@Override
 		public void parse(String v) throws ParseException {
 			if( v == null || v.trim().length()==0){
-				setValue(null);
+				setNull();
 				return;
 			}
 			setItem(findFromString(v));
@@ -370,12 +386,20 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#getDataCache()
 	 */
 	@Override
-	public IndexedDataCache<String,T> getDataCache(){
+	public IndexedDataCache<String,T> getDataCache(boolean auto_create){
 		return new IndexedDataCache<String, T>(getContext()){
 
 			@Override
 			protected T findIndexed(String key) throws DataException {
-				return makeFromString(key);
+				if( auto_create ) {
+					try {
+						return makeFromString(key);
+					} catch (ParseException e) {
+						throw new DataException("Invalid name",e);
+					}
+				}else {
+					return findFromString(key);
+				}
 			}
 
 			@SuppressWarnings("unchecked")
@@ -504,7 +528,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		return object.getName();
 	}
 	public final DataObjectItemInput<T> getAutocompleteInput(BaseFilter<T> fil,boolean create,boolean restrict){
-		NameFinderInput<T, ClassificationFactory<T>> input = new NameFinderInput<>(this, create, restrict, fil);
+		NameFinderInput<T, ClassificationFactory<T>> input = new NameFinderInput<>(this, this,create, restrict, fil);
 		return input;
 	}
 	/* (non-Javadoc)
@@ -512,7 +536,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	 */
 	@Override
 	public void validateNameFormat(String name) throws ParseException {
-		if( ! allowSpacesInName() && WHITESPACE.matcher(name).matches()){
+		if( ! allowSpacesInName() && WHITESPACE.matcher(name).find()){
 			throw new ParseException("No whitespace allowed");
 		}
 		if( name.length() > res.getInfo(Classification.NAME).getMax()){
@@ -537,7 +561,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	@Override
 	public DataObjectItemInput<T> getInput(BaseFilter<T> fil, boolean restrict) {
 		if( useAutoCompleteInput(fil)) {
-			return new NameFinderInput<>(this, false, restrict, fil);
+			return new NameFinderInput<>(this,this, false, restrict, fil);
 		}
 		return super.getInput(fil,restrict);
 	}
@@ -551,9 +575,13 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		TableSpecification ts = getFinalTableSpecification(getContext(), getTag());
 		Set<String> fields = ts.getFieldNames();
 		for (String field : fields) {
-			if (!field.equals(Classification.NAME)) {
+			if (  getContext().getBooleanParameter(getConfigTag()+".history_field."+field,  !field.equals(Classification.NAME)) ) {
 				spec.setField(field, ts.getField(field));
 			}
 		}
+	}
+	@Override
+	protected boolean allowPreSelect() {
+		return getContext().getBooleanParameter(getConfigTag()+".allowPreSelect", super.allowPreSelect());
 	}
 }

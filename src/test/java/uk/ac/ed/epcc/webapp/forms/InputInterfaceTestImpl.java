@@ -33,6 +33,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.html.EmitHtmlInputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
+import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.forms.swing.JFormDialog;
 import uk.ac.ed.epcc.webapp.forms.swing.SwingContentBuilder;
 
@@ -59,7 +60,7 @@ public class InputInterfaceTestImpl<T,I extends Input<T>,X extends TestDataProvi
 		Input<T> input = target.getInput();
 		input.setKey("test");
 		HtmlBuilder hb = new HtmlBuilder();
-		EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(null,false,hb, false, new HashMap() ,null,null);
+		EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(null,false,hb, false, new HashMap() ,null);
 		input.accept(vis);
 	}
 	
@@ -81,7 +82,7 @@ public class InputInterfaceTestImpl<T,I extends Input<T>,X extends TestDataProvi
 	
 	@Override
 	@Test
-    public void testGood() throws TypeError, Exception{
+    public void testGood() throws  Exception{
     	
     	I in=target.getInput();
     	for(T dat : target.getGoodData()){
@@ -97,7 +98,7 @@ public class InputInterfaceTestImpl<T,I extends Input<T>,X extends TestDataProvi
     		try{
     			in.setValue(dat);
     			checkValid(dat,false, in);
-    		}catch(TypeError e){
+    		}catch(TypeException e){
     			//Type error is acceptible response to bad data
     			// e.g. ConstantInput
     		}

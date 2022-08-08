@@ -119,10 +119,14 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
 	@Override
 	public void setItem(E v) {
 		if( v == null ){
-			setValue(null);
+			setNull();
 			return;
 		}
-		setValue(getValue(v));
+		try {
+			setValue(getValue(v));
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 	}
 	
 	@Override
@@ -134,7 +138,7 @@ public class EnumIntegerInput<E extends Enum<E>> extends IntegerInput implements
 	}
 	@SuppressWarnings("unchecked")
 	@Override
-	public Integer convert(Object v) throws TypeError {
+	public Integer convert(Object v) throws TypeException {
 		if( v == null ){
 			return null;
 		}

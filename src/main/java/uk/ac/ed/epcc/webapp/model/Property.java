@@ -51,6 +51,25 @@ public class Property extends DataObject implements Retirable{
     public String getValue(){
     	return record.getStringProperty(VALUE);
     }
+    public String getUnderlyingValue() {
+    	ConfigService u = getUnderlyingService();
+    	if( u != null ) {
+    		return u.getServiceProperties().getProperty(getName());
+    	}
+    	return null;
+    }
+
+    private ConfigService getUnderlyingService() {
+    	ConfigService c = getContext().getService(ConfigService.class);
+    	while( c != null ) {
+    		if( c instanceof DataBaseConfigService) {
+    			return c.getNested();
+    		}else {
+    			c=c.getNested();
+    		}
+    	}
+    	return null;
+    }
     public void setName(String name){
     	record.setProperty(NAME, name);
     }
@@ -59,7 +78,16 @@ public class Property extends DataObject implements Retirable{
     }
     @Override
 	public String getIdentifier(int max){
-    	return getName();
+    	String tag="";
+    	String u = getUnderlyingValue();
+    	if( u == null ) {
+    		tag="[D]";
+    	}else if( u.equals(getValue())) {
+    		tag="[U]";
+    	}else {
+    		tag="[M]";
+    	}
+    	return getName()+tag;
     }
 	public boolean canRetire() {
 		return true;

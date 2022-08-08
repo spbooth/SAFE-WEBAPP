@@ -17,8 +17,10 @@
 package uk.ac.ed.epcc.webapp.charts;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.charts.strategy.QueryMapper;
@@ -482,24 +484,31 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 		 */
 		private DateFormat getDateFormat() {
 			DateFormat df;
-			int format = DateFormat.DEFAULT;
-			if (getNumCats() > SHORT_DATE_CUTOFF) {
-				format = DateFormat.SHORT;
-			}
-			if (getNumCats() < LONG_DATE_CUTOFF) {
-				format = DateFormat.LONG;
-			}
+//			int format = DateFormat.DEFAULT;
+//			if (getNumCats() > SHORT_DATE_CUTOFF) {
+//				format = DateFormat.SHORT;
+//			}
+//			if (getNumCats() < LONG_DATE_CUTOFF) {
+//				format = DateFormat.LONG;
+//			}
 			
 			Date start = start_bound[0][0];
 			Date end = end_bound[getNumCats()-1][getNumItems()-1];
+			long hours = hourLength(start, end);
 			if (hourLength(start, end) < 24) {
-				df = DateFormat.getTimeInstance(format);
-			} else if (hourLength(start, end_bound[0][getNumItems()-1]) < 24) {
-				// major split less than a day
-				df = DateFormat.getDateTimeInstance(DateFormat.SHORT,
-						DateFormat.SHORT);
+				//df = DateFormat.getTimeInstance(format);
+				df = new SimpleDateFormat("HH:mm:ss");
 			} else {
-				df = DateFormat.getDateInstance(format);
+				long major_hours = hourLength(start, end_bound[0][getNumItems()-1]);
+				if (major_hours < 24) {
+					// major split less than a day
+//				df = DateFormat.getDateTimeInstance(DateFormat.SHORT,
+//						DateFormat.SHORT,Locale.UK);
+					df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				} else {
+					//df = DateFormat.getDateInstance(format);
+					df = new SimpleDateFormat("yyyy-MM-dd");
+				}
 			}
 
 			return df;
@@ -600,5 +609,16 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 					}
 				}
 			}
+		}
+		private DataRange  yrange = new DataRange(0.0,null);
+		@Override
+		public void setRange(DataRange range) {
+			yrange=range;
+			
+		}
+
+		@Override
+		public DataRange getRange() {
+			return yrange;
 		}
 }

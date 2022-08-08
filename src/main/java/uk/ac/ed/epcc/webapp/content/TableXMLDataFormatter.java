@@ -137,4 +137,9 @@ public class TableXMLDataFormatter<C,R> implements TableFormatPolicy<C, R> {
 
 		hb.clean(n.toString());
 	}
+
+	@Override
+	public void setAllowSpan(boolean value) {
+		
+	}
 }

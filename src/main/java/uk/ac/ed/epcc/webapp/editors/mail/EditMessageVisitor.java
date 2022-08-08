@@ -16,10 +16,10 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.editors.mail;
 
-import javax.mail.Address;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.MimePart;
+import jakarta.mail.Address;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.internet.MimePart;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
@@ -37,10 +37,14 @@ public class EditMessageVisitor extends ContentMessageVisitor {
 	private boolean edit_recipients=false;
 	private boolean edit_reply_to=false;
 	private boolean allow_new_attachments=false;
+	private boolean edit_cc_only=false;
 	
 
 	public void editRecipients(boolean val){
 		edit_recipients=val;
+	}
+	public void editCCOnly(boolean val){
+		edit_cc_only=val;
 	}
 	public void editReplyTo(boolean val) {
 		edit_reply_to=val;
@@ -109,7 +113,7 @@ public class EditMessageVisitor extends ContentMessageVisitor {
 	
 	
 	/* (non-Javadoc)
-	 * @see uk.ac.hpcx.model.helpdesk.MessageVisitor#addPart(javax.mail.internet.MimePart, java.lang.Object, java.util.List)
+	 * @see uk.ac.hpcx.model.helpdesk.MessageVisitor#addPart(jakarta.mail.internet.MimePart, java.lang.Object, java.util.List)
 	 */
 	@Override
 	public boolean startSubPart(MimePart parent, MimeMultipart mp,MessageWalker w, int id, int count) {
@@ -247,7 +251,7 @@ public class EditMessageVisitor extends ContentMessageVisitor {
 	@Override
 	public void doTo(Address recipients, int i, int len,MessageWalker w) throws WalkerException {
 		
-		if( len > 1 && ! w.isSubMessage() && edit_recipients){
+		if( len > 1 && ! w.isSubMessage() && edit_recipients && ! edit_cc_only){
 			sb=sb.getHeading(4);
 			addButton(w,EditAction.Delete, "Delete recipient");
 			ExtendedXMLBuilder text = sb.getText();
@@ -261,7 +265,7 @@ public class EditMessageVisitor extends ContentMessageVisitor {
 	}
 	@Override
 	public void doTo(Address[] recipients, MessageWalker w) {
-		if( w.isSubMessage() ||  ! edit_recipients){
+		if( w.isSubMessage() ||  (! edit_recipients) || edit_cc_only){
 		   super.doTo(recipients, w);
 		   return;
 		}

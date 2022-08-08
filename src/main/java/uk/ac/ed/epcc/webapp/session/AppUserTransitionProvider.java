@@ -44,6 +44,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider;
+import uk.ac.ed.epcc.webapp.model.data.transition.DataObjectTransitionProvider;
 import uk.ac.ed.epcc.webapp.servlet.LoginServlet;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
 import uk.ac.ed.epcc.webapp.servlet.WtmpManager;
@@ -56,7 +57,10 @@ import uk.ac.ed.epcc.webapp.timer.TimeClosable;
  *
  */
 
-public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewTransitionProvider<AU, AppUserKey<AU>> implements TitleTransitionProvider<AppUserKey<AU>, AU>, ContextCached {
+public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewTransitionProvider<AU, AppUserKey<AU>> implements 
+TitleTransitionProvider<AppUserKey<AU>, AU>, 
+ContextCached,
+DataObjectTransitionProvider<AU, AppUserFactory<AU>, AppUserKey<AU>>{
 	
 	/**
 	 * 
@@ -127,7 +131,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 		
 	};
-	public static final AppUserKey LOGIN_HISTORY = new RelationshipAppUserKey<AppUser>("LoginHistory", "See when this user logged into the website", SEE_LOGIN_HISTORY_ROLE);
+	public static final AppUserKey LOGIN_HISTORY = new BookmarkableRelationshipAppUserKey<AppUser>("LoginHistory", "See when this user logged into the website", SEE_LOGIN_HISTORY_ROLE);
 	public final class EraseTransition extends AbstractDirectTransition<AU>{
 
 		@Override
@@ -142,7 +146,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 		
 	}
-	public final class LoginHistoryTransition extends AbstractDirectTransition<AU>{
+	public final class LoginHistoryTransition extends AbstractDirectTransition<AU> {
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.forms.transition.DirectTransition#doTransition(java.lang.Object, uk.ac.ed.epcc.webapp.AppContext)
@@ -233,7 +237,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 				result.add("${colVis.script}");
 				result.add("${colReorder.script}");
 				result.add(
-				"$(document).ready( function(){ $('#datatable').DataTable({ stateSave: true , stateDuration: 3600, pageLength: 50 , lengthMenu: [[ 10, 25, 50, 100, -1 ],[ 10, 25, 50, 100, 'All'] ] , paging: true ,  order: [[ 0, 'desc' ]] , dom: 'C<\"clear\">Rlfrtip'   });});");
+				"js/appuser_datatable.js");
 				return result;
 			}
 
@@ -272,6 +276,15 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		super(c);
 		SessionService sess = c.getService(SessionService.class);
 		fac = sess.getLoginFactory();
+	}
+	@Override
+	public AppUserFactory<AU> getFactory(){
+		return fac;
+	}
+	@Override
+	protected void setupTransitions() {
+		super.setupTransitions();
+		SessionService sess = getContext().getService(SessionService.class);
 		if( fac instanceof AppUserTransitionContributor) {
 			AppUserTransitionContributor<AU> cont = (AppUserTransitionContributor<AU>) fac;
 			for(Entry<AppUserKey<AU>, Transition<AU>> e : cont.getTransitions(this).entrySet()) {
@@ -283,7 +296,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 				addTransition( e.getKey(), e.getValue());
 			}
 		}
-		if( USER_SELF_UPDATE_FEATURE.isEnabled(c)) {
+		if( USER_SELF_UPDATE_FEATURE.isEnabled(getContext())) {
 			addTransition(UPDATE, new UpdateDetailsTransition(this,fac));
 		}
 		addTransition(SET_ROLE_KEY, new SetRoleTransition<AU>());
@@ -299,29 +312,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider#getTarget(java.lang.String)
-	 */
-	@Override
-	public AU getTarget(String id) {
-		try {
-			return fac.find(Integer.parseInt(id));
-		} catch (NumberFormatException e) {
-			return null;
-		} catch (DataException e) {
-			getLogger().error("Error getting AppUser",e );
-			return null;
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider#getID(java.lang.Object)
-	 */
-	@Override
-	public String getID(AppUser target) {
-		return Integer.toString(target.getID());
-	}
-
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory#getTargetName()
 	 */
@@ -356,13 +347,6 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionFactory#getText(uk.ac.ed.epcc.webapp.model.data.transition.TransitionKey)
-	 */
-	@Override
-	public String getText(AppUserKey key) {
-		return getContext().expandText(key.getText());
-	}
 
 	public static AppUserTransitionProvider getInstance(AppContext conn) {
 		return (AppUserTransitionProvider) TransitionServlet.getProviderFromName(conn, PERSON_TRANSITION_TAG);
@@ -415,6 +399,7 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 	    	text.open("a");
 	    		text.attr("href",privacy_policy);
 	    		text.attr("target", "_blank");
+	    		text.attr("rel","noopener noreferrer external");
 	    		text.clean("here");
 	    	text.close();
 	    	text.clean(".");
@@ -425,5 +410,10 @@ public class AppUserTransitionProvider<AU extends AppUser> extends AbstractViewT
 	}
 	public AppUserFactory<AU> getAppUserFactory(){
 		return fac;
+	}
+	@Override
+	public boolean useParser() {
+		// stick with integer ids for AppUser as the possible parse behaviour is very complex
+		return false;
 	}
 }

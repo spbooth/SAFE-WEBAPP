@@ -16,11 +16,11 @@ package uk.ac.ed.epcc.webapp.model.mail;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.mail.Part;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import jakarta.mail.Part;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
@@ -189,7 +189,7 @@ public abstract class AbstractMessageHandlerFactory<H extends AbstractMessageHan
 		public FormResult send(SessionService<?> operator) throws Exception {
 			MimeMessage m = getMessageProvider().getMessage();
 			m.saveChanges();
-			Emailer es = new Emailer(getContext());
+			Emailer es = Emailer.getFactory(getContext());
 			es.doSendNow(m);
 			provider.setStatus(SENT);
 			provider.commit();
@@ -201,7 +201,7 @@ public abstract class AbstractMessageHandlerFactory<H extends AbstractMessageHan
 		 */
 		@Override
 		public void repopulate(SessionService<?> operator) throws Exception {
-			Emailer es = new Emailer(getContext());
+			Emailer es = Emailer.getFactory(getContext());
 			InternetAddress from = null;
 			if( operator.haveCurrentUser()){
 				String email = operator.getCurrentPerson().getEmail();
@@ -209,7 +209,7 @@ public abstract class AbstractMessageHandlerFactory<H extends AbstractMessageHan
 					from = new InternetAddress(email);
 				}
 			}
-			MimeMessage m = es.makeBlankEmail(getContext(), provider.getdefaultRecipients(), from, null);
+			MimeMessage m = es.makeBlankEmail(getContext(), provider.getdefaultRecipients(), from,true, null);
 			MimeMultipart mp = new MimeMultipart("mixed");
 			  MimeBodyPart mbp = new MimeBodyPart();
 			  mbp.setText("");

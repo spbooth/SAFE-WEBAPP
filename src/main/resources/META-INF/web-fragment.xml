@@ -12,9 +12,9 @@
 <!--| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. |-->
 <!--| See the License for the specific language governing permissions and      |-->
 <!--| limitations under the License.                                           |-->
-<web-fragment id="WebFragment_ID" version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd">
+<web-fragment id="WEBAPP" version="4.0" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-fragment_4_0.xsd">
  <name>WEBAPP</name> 
- 
+ <distributable/>
  
 
 <filter-mapping>
@@ -127,4 +127,8 @@
     <error-code>401</error-code>
   	<location>/errorpage.jsp</location>
   </error-page>
+  <mime-mapping>
+   <extension>scss</extension>
+   <mime-type>text/css</mime-type>
+  </mime-mapping>
  </web-fragment>

@@ -27,6 +27,7 @@ Exception error_exception =null;
 
 String extra="An error occured";
 String show = application.getInitParameter("showExceptions");
+String custom = null;
 try{
 error_code = (Number) request.getAttribute("javax.servlet.error.status_code");
 error_exception = (Exception) request.getAttribute("javax.servlet.error.exception");
@@ -39,6 +40,8 @@ if( error_code != null ){
 	default:
 	}
 }
+// This allows a custom message to be added to the errorpage
+custom = (String) request.getAttribute("uk.ac.ed.epcc.webapp.error.message");
 }catch(Exception t){
 	// really try to make sure no exception occurs in the page
 }
@@ -74,4 +77,7 @@ Errors are automatically reported to the site administrators and we will attempt
 <% if( error_code != null ){ %>
 <p> <%= error_code.intValue() %> <%= extra %>
 <% } %>
+<% if( custom != null){ %>
+<p> <%=custom %>
+<%} %>
 </div>

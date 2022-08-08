@@ -18,7 +18,7 @@ package uk.ac.ed.epcc.webapp.forms.transition;
 
 
 /** Interface for classes that can generate a {@link TransitionFactory}.
- * This is intended for cases where a common set of transitions are implementeded
+ * This is intended for cases where a common set of transitions are implemented
  * on different target objects. 
  * The {@link TransitionFactory} is parameterised by the target factory
  * so we use a 2 step creation process. 

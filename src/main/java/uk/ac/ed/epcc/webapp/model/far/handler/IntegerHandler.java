@@ -94,7 +94,7 @@ public class IntegerHandler implements QuestionFormHandler<Integer> {
 		input.setMax((Integer) f.get(MAXIMUM));
 		input.setStep((Integer) f.get(STEP));
 		input.setUnit((String)f.get(UNIT));
-		input.setValue((Integer) f.get(DEFAULT_VALUE));
+		input.setInteger((Integer) f.get(DEFAULT_VALUE));
 		return input;
 	}
 

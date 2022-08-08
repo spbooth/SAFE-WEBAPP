@@ -42,7 +42,7 @@ public class RemoteAuthServletTest<A extends AppUser> extends ServletTest {
 	 * 
 	 */
 	public RemoteAuthServletTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	@Override
 	public void setUp() throws Exception {

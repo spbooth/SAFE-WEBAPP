@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -703,6 +704,34 @@ public class TableTest {
 				"+-----------++----+\n", s);
 	}
 	
+	@Test
+	public void testPrintKeysAndGroup() throws InvalidArgument {
+		Table<String, String> t = new Table<>();
+		t.put("col1", "row1", 100);
+		t.addToGroup("boris", "col1");
+		t.setKeyName("keys_column");
+		String s = t.toString();
+		System.out.println(s);
+		assertEquals(
+				"+-----------++----+\n"+
+				"|keys_column||col1|\n"+
+				"+-----------++----+\n"+
+				"|row1       || 100|\n"+
+				"+-----------++----+\n", s);
+		
+		t.setPrintGroups(true);
+		t.getCol("col1").setName("emu");
+		s = t.toString();
+		System.out.println(s);
+		assertEquals(
+				  "+-----------++-----+\n"
+				+ "|           ||boris|\n"
+				+ "|keys_column||  emu|\n"
+				+ "+-----------++-----+\n"
+				+ "|row1       ||  100|\n"
+				+ "+-----------++-----+\n", s);
+	}
+	
 	/**
 	 * Tests the method {@link Table#setFormat(Transform)}.
 	 */
@@ -757,10 +786,10 @@ public class TableTest {
 	 */
 	@Test
 	public void testFormatDate() {
-		FormatDateTransform fd = new FormatDateTransform(DateFormat.getDateInstance(DateFormat.SHORT, Locale.UK));
+		FormatDateTransform fd = new FormatDateTransform(new SimpleDateFormat("yyyy-MM-dd"));
 		assertNull(fd.convert(null));
 		assertEquals(123, fd.convert(123));
-		assertEquals("01/01/70", fd.convert(new Date(0)));
+		assertEquals("1970-01-01", fd.convert(new Date(0)));
 	}
 	
 	/**
@@ -835,6 +864,31 @@ public class TableTest {
 		assertEquals(20, t.get("col1", "row2"));
 		t.getCol("col1").add("row2", 100);
 		assertEquals(120, t.get("col1", "row2"));
+	}
+	@Test
+	public void testRunningTotalTransform() {
+		Table<String,String> t = new Table<>();
+		t.put("col1", "a", 1);
+		t.put("col1", "b", 2);
+		t.put("col1", "c", 4);
+		t.transformCol("col1", new RunningTotalTransform());
+		assertEquals(1.0, t.get("col1", "a"));
+		assertEquals(3.0, t.get("col1", "b"));
+		assertEquals(7.0, t.get("col1", "c"));
+	}
+	@Test
+	public void testRunningTotalTransform2() {
+		Table<String,String> t = new Table<>();
+		t.put("col1", "a", 1);
+		t.put("col1", "b", 2);
+		t.put("col1", "c", 4);
+		t.transformCol("col1", new RunningTotalTransform(),"col2");
+		assertEquals(1, t.get("col1", "a"));
+		assertEquals(2, t.get("col1", "b"));
+		assertEquals(4, t.get("col1", "c"));
+		assertEquals(1.0, t.get("col2", "a"));
+		assertEquals(3.0, t.get("col2", "b"));
+		assertEquals(7.0, t.get("col2", "c"));
 	}
 	@Test
 	public void testToString(){

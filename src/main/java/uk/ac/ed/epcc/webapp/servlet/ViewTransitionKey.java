@@ -16,6 +16,8 @@ package uk.ac.ed.epcc.webapp.servlet;
 /** Interface for Transition keys that can
  * implement bookmarkable non-modifying direct transitions that are
  * safe to access via direct GET URLs.
+ * If these reference direct transitions they will be presented as bookmarkable URLs via
+ * an additional redirect
  * 
  * @see TransitionServlet#MODIFY_ON_POST_ONLY
  * 
@@ -31,5 +33,7 @@ public interface ViewTransitionKey<T> {
    * @param target
    * @return
    */
-  public boolean isNonModifying(T target);
+  public default boolean isNonModifying(T target) {
+	  return true;
+  }
 }

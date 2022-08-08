@@ -33,7 +33,7 @@ public class ExternalNode extends Node {
 	 * 
 	 */
 	public ExternalNode() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/* (non-Javadoc)
@@ -56,6 +56,11 @@ public class ExternalNode extends Node {
 	@Override
 	public String getDisplayClass(AppContext conn) {
 		return "external"; // hardwire class attribute so all external links marked up the same.
+	}
+
+	@Override
+	public boolean isTrustedURL() {
+		return false;
 	}
 
 }

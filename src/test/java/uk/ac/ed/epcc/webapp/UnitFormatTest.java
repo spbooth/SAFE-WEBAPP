@@ -30,7 +30,7 @@ public class UnitFormatTest {
 	 * 
 	 */
 	public UnitFormatTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	@Test

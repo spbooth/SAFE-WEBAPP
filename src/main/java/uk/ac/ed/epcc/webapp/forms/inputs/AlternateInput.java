@@ -58,7 +58,7 @@ public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> {
 	}
 
 	@Override
-	public T setValue(T v) throws TypeError{
+	public T setValue(T v) throws TypeException{
 		T old = getValue();
 		boolean set=false;
 		for(Iterator<Input<T>> it = getInputs();it.hasNext();){
@@ -81,15 +81,15 @@ public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> {
 
 	
 	@Override
-	public T convert(Object v) throws TypeError{
-		TypeError e=null;
+	public T convert(Object v) throws TypeException{
+		TypeException e=null;
 		// normally take this form the first input
 		// but try alternatives if a TypeError is thrown
 		for(Iterator<Input<T>> it = getInputs();it.hasNext();){
 			Input<T> i = it.next();
 	        try{
 	        	return i.convert(v);
-	        }catch(TypeError e2){
+	        }catch(TypeException e2){
 	        	e = e2;
 	        }
 		}
@@ -156,9 +156,8 @@ public class AlternateInput<T> extends ParseMultiInput<T,Input<T>> {
 					try{
 					// Non string object
 						i.setValue(i.convert(val));
-					}catch(TypeError e){
+					}catch(TypeException e){
 						// report the error.
-						// TODO should TypeError by a reported excepion
 						throw new ParseException("Illegal type conversion ",e);
 					}
 				}else{

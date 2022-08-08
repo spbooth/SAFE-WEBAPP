@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.content;
 
 import java.text.NumberFormat;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -59,6 +60,16 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 		try {
 			HtmlFormPolicy p = getFormPolicy();
 			p.addFormLabel(this, conn, f, item);
+		}catch(Exception e) {
+			getLogger(conn).error("Error making form label", e);
+		}
+	}
+	
+	@Override
+	public default <I,T> void addFormError(AppContext conn,Field<I> f, T item) {
+		try {
+			HtmlFormPolicy p = getFormPolicy();
+			p.addFieldError(this, f.getKey());
 		}catch(Exception e) {
 			getLogger(conn).error("Error making form label", e);
 		}
@@ -122,6 +133,8 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 			((UIGenerator)target).addContent(this);
 		}else if(target instanceof XMLPrinter) {
 			append((XMLPrinter)target);
+		}else if( target instanceof XMLGenerator) {
+			((XMLGenerator)target).addContent(this);
 		}else if( target instanceof Identified){
 			if( target instanceof Viewable && target instanceof Contexed) {
 				addLink(((Contexed)target).getContext(), ((Identified)target).getIdentifier(), ((Viewable)target).getViewTransition());
@@ -129,7 +142,11 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 				clean(((Identified)target).getIdentifier());
 			}
 		}else if( target  instanceof Iterable){
-			addList((Iterable)target);
+			if( target instanceof Collection && ((Collection)target).size()==1) {
+				addObject(((Iterable)target).iterator().next());
+			}else {
+				addList((Iterable)target);
+			}
 		}else if( target instanceof Object[]) {
 			Object[] data = (Object[]) target;
 			if( data.length == 1) {
@@ -193,11 +210,15 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 	}
 	@Override
 	public default void addLink(AppContext conn,String text, String hover,FormResult action) {
+		addLink(conn,text,hover,null,action);
+	}
+	@Override
+	public default void addLink(AppContext conn,String text, String hover,String style,FormResult action) {
 		if( action == null){
 			clean(text);
 			return;
 		}
-		AddLinkVisitor vis = new AddLinkVisitor(conn, this, text,hover);
+		AddLinkVisitor vis = new AddLinkVisitor(conn, this, text,hover,style);
 		vis.new_tab=useNewTab();
 		try {
 			action.accept(vis);
@@ -316,6 +337,7 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 			close();
 			}
 	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.content.ContentBuilder#addActionButtons(uk.ac.ed.epcc.webapp.forms.Form)
 	 */
@@ -332,52 +354,71 @@ public interface XMLContentBuilder extends ContentBuilder,ExtendedXMLBuilder{
 				close();
 			}
 			for( String name : actions) {
-				FormAction action = f.getAction(name);
-				Object content = action.getText();
-				
-				if( content != null ){
-					open("button");
-				}else{
-					open("input");
-				}
-				addClass("input_button");
-				attr("type","submit");
-				boolean must_validate = action.getMustValidate();
-				if( ! must_validate){
-					attr("formnovalidate",null);
-				}
-				if( action.wantNewWindow()) {
-					attr("formtarget","_blank");
-				}
-				
-				String help = action.getHelp();
-				if( help != null){
-					attr("title", help);
-				}
-				String shortcut = action.getShortcut();
-				if( shortcut != null){
-					attr("accesskey", shortcut);
-				}
-				
-				attr("name",name);
-				
-				attr("value",name);
-				if( must_validate) {
-					// non validsating actions always enabled
-					if( action instanceof DisabledAction || ! can_submit){
-						attr("disabled",null);
-					}
-				}
-				
-				if( content != null ){
-					addObject(content);
-				}
-				close();
+				addActionButton(f, can_submit, name);
 			}
 			close();
 		}
 		
 	}
+
+
+	public default void addActionButton(Form f, String name) {
+		boolean can_submit=CanSubmitVisistor.canSubmit(f);
+
+		addActionButton(f, can_submit, name);
+	}
+	default void addActionButton(Form f, boolean can_submit, String name) {
+		FormAction action = f.getAction(name);
+		if( action == null ) {
+			return;
+		}
+		Object content = action.getText();
+		
+		if( content != null ){
+			open("button");
+		}else{
+			open("input");
+		}
+		addClass("input_button");
+		attr("type","submit");
+		boolean must_validate = action.getMustValidate();
+		if( ! must_validate){
+			attr("formnovalidate",null);
+		}
+		if( action.wantNewWindow()) {
+			attr("formtarget","_blank");
+		}
+		
+		String help = action.getHelp();
+		if( help != null){
+			attr("title", help);
+		}
+		String shortcut = action.getShortcut();
+		if( shortcut != null){
+			attr("accesskey", shortcut);
+		}
+		String action_name = getFormPolicy().getActionName();
+		if( action_name != null ){
+			attr("name", action_name);
+		}else{
+			attr("name",name);
+		}
+		attr("value",name);
+		if( must_validate) {
+			// non validating actions always enabled
+			if( action instanceof DisabledAction || ! can_submit){
+				attr("disabled",null);
+				addClass("disabled");
+			}
+		}
+		
+		if( content != null ){
+			addObject(content);
+		}
+		close();
+	}
+
+	
 	@Override
 	default ContentBuilder getDetails(Object summary_text) {
 		open("details");

@@ -16,6 +16,7 @@
    import="uk.ac.ed.epcc.webapp.*, uk.ac.ed.epcc.webapp.model.*, uk.ac.ed.epcc.webapp.session.*,uk.ac.ed.epcc.webapp.forms.html.*"
 %>
 <%@page import="uk.ac.ed.epcc.webapp.forms.html.PageHTMLForm" %>
+<%@page import="uk.ac.ed.epcc.webapp.content.HtmlBuilder" %>
 <%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
 <wb:ServiceInit/>
 <wb:formpage/>
@@ -23,6 +24,12 @@
 	String page_title = service_name+" Change "+website_name+" Password";
 	PageHTMLForm form = (PageHTMLForm) request.getAttribute("Form");
 	String policy = (String) request.getAttribute("policy");
+	AppUser user = (AppUser) request.getAttribute("User");
+	HtmlBuilder hb = new HtmlBuilder();
+	if( user != null){
+	hb.clean("You are setting a password for your account: ");
+	hb.addObject(user.getFactory().getNames(user));
+	}
 %>
 <%if( form == null ){ %>
 <jsp:forward page="/messages.jsp?message_type=access_denied" />
@@ -32,6 +39,7 @@
 <wb:FormContext/>
 <div class="block" role="main">
 <h1>Please set a password for use with the <%=website_name %></h1>
+<p><%=hb.toString() %></p>
 <p><%=policy %>
 </p>
 <form method="POST">

@@ -79,6 +79,7 @@ public class UpdateDetailsTransition<A extends AppUser> extends StandAloneFormUp
 	    	text.open("a");
 	    		text.attr("href",privacy_policy);
 	    		text.attr("target", "_blank");
+	    		text.attr("rel","noopener noreferrer external");
 	    		text.clean("here");
 	    	text.close();
 	    	text.clean(".");

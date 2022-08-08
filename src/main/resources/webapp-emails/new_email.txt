@@ -5,6 +5,7 @@ Dear %%person.name%%,
 
 You have requested an update to the email address held by the 
 %%service.name%% %%service.website-name%% (%%service.saf.url%%).
+For your account: %%person.loginnames%%
 
 Old Email: %%person.email%%
 New Email: %%request.email%%

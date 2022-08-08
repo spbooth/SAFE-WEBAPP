@@ -14,16 +14,18 @@
 package uk.ac.ed.epcc.webapp.editors.mail;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Set;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimePart;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimePart;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.editors.mail.MessageWalker.WalkerException;
+import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link ContentMessageVisitor} that only shows each message once.
  * If a message has already been displayed but occurs a second time (e.g. 
@@ -56,7 +58,7 @@ public class ShortContentMessageVisitor extends ContentMessageVisitor {
 					if( sb instanceof HtmlBuilder) {
 						((HtmlBuilder)sb).setNewTab(true);
 					}
-					DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+					DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 					addLink(messageWalker.getPath(), id, "["+df.format(m.getSentDate())+"] "+m.getSubject());
 					sb=sb.addParent();
 					return false; // truncate recursion

@@ -30,7 +30,7 @@ public class MockRandomService extends RandomService {
 	 * 
 	 */
 	public MockRandomService() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.session.RandomService#randomInt(int)

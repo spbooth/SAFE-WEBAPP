@@ -42,38 +42,42 @@ public class RegularPeriodInput extends MultiInput<RegularSplitPeriod, Input> {
 		this(null,res,finest);
 	}
 	public RegularPeriodInput(Date current_time,long res,int finest){
-		start = new TimeStampMultiInput(current_time,res,finest);
-		end = new TimeStampMultiInput(current_time,res,finest);
-		splits = new IntegerInput();
-		splits.setMin(2);
-		Calendar cal = Calendar.getInstance();
-		if( current_time != null) {
-			// allowing the current time to be passed
-			// in is needed to support time dependent tests.
-			cal.setTime(current_time);
+		try{
+			start = new TimeStampMultiInput(current_time,res,finest);
+			end = new TimeStampMultiInput(current_time,res,finest);
+			splits = new IntegerInput();
+			splits.setMin(2);
+			Calendar cal = Calendar.getInstance();
+			if( current_time != null) {
+				// allowing the current time to be passed
+				// in is needed to support time dependent tests.
+				cal.setTime(current_time);
+			}
+			cal.set(Calendar.MILLISECOND,0);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MINUTE,0);
+			cal.set(Calendar.HOUR_OF_DAY, 0);
+			cal.set(Calendar.DAY_OF_MONTH, 1);
+			end.setValue(cal.getTime());
+			cal.add(Calendar.MONTH, -1);
+			splits.setBoxWidth(2);
+			splits.setMaxResultLength(3);
+			splits.setValue(4);
+			splits.setMin(0);
+			splits.setMax(PERIOD_INPUT_MAX_SPLITS);
+			start.setValue(cal.getTime());
+			addInput("start", "Start Date", start);
+			addInput("end", "End Date",end);
+			addInput("splits","Number Of Sub Periods" ,splits);
+		}catch(TypeException e) {
+			throw new TypeError(e);
 		}
-		cal.set(Calendar.MILLISECOND,0);
-		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MINUTE,0);
-		cal.set(Calendar.HOUR_OF_DAY, 0);
-		cal.set(Calendar.DAY_OF_MONTH, 1);
-		end.setValue(cal.getTime());
-		cal.add(Calendar.MONTH, -1);
-		splits.setBoxWidth(2);
-		splits.setMaxResultLength(3);
-		splits.setValue(4);
-		splits.setMin(0);
-		splits.setMax(PERIOD_INPUT_MAX_SPLITS);
-		start.setValue(cal.getTime());
-		addInput("start", "Start Date", start);
-		addInput("end", "End Date",end);
-		addInput("splits","Number Of Sub Periods" ,splits);
 	}
-	public RegularSplitPeriod convert(Object v) throws TypeError {
+	public RegularSplitPeriod convert(Object v) throws TypeException {
 		if( v == null || v instanceof RegularSplitPeriod){
 			return ((RegularSplitPeriod)v);
 		}
-		throw new TypeError(v.getClass());
+		throw new TypeException(v.getClass());
 	}
 
 	@Override
@@ -89,7 +93,7 @@ public class RegularPeriodInput extends MultiInput<RegularSplitPeriod, Input> {
 	}
 
 	@Override
-	public RegularSplitPeriod setValue(RegularSplitPeriod v) throws TypeError {
+	public RegularSplitPeriod setValue(RegularSplitPeriod v) throws TypeException {
 		RegularSplitPeriod old = getValue();
 		start.setValue(v.getStart());
 		end.setValue(v.getEnd());
@@ -98,13 +102,25 @@ public class RegularPeriodInput extends MultiInput<RegularSplitPeriod, Input> {
 		
 	}
 	public void setStartDate(Date d){
-		start.setValue(d);
+		try {
+			start.setValue(d);
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 	}
 	public void setEndDate(Date d){
-		end.setValue(d);
+		try {
+			end.setValue(d);
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 	}
-	public void setSplits(int n){
-		splits.setValue(n);
+	public void setSplits(int n) {
+		try {
+			splits.setValue(n);
+		} catch (TypeException e) {
+			throw new TypeError(e);
+		}
 	}
 	@Override
 	public void validateInner() throws FieldException {
@@ -112,6 +128,13 @@ public class RegularPeriodInput extends MultiInput<RegularSplitPeriod, Input> {
 		if( start.getValue().after(end.getValue())){
 			throw new ValidateException("start after end");
 		}
+	}
+	@Override
+	public void setNull() {
+		start.setNull();
+		end.setNull();
+		splits.setNull();
+		
 	}
 
 }

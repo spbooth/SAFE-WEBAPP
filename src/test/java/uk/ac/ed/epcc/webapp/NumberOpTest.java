@@ -17,7 +17,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import uk.ac.ed.epcc.webapp.jdbc.expr.CountDistinctExpression;
 import uk.ac.ed.epcc.webapp.model.data.Duration;
 
 /**
@@ -30,7 +29,7 @@ public class NumberOpTest {
 	 * 
 	 */
 	public NumberOpTest() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	@Test

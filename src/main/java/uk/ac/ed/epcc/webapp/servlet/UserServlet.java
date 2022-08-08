@@ -123,9 +123,8 @@ public class UserServlet<T extends AppUser> extends SessionServlet {
 	 */
 	protected void returnCaller(AppContext conn,HttpServletRequest req, HttpServletResponse res, Map<String, Object> params)
 			throws IOException {
-		SessionService sess = conn.getService(SessionService.class);
-		String page=(String) sess.getAttribute(PageNode.MENU_PAGE_ATTR);
-		sess.removeAttribute(PageNode.MENU_PAGE_ATTR);
+		ServletService ss = conn.getService(ServletService.class);
+		String page=ss.getFilePath();
 		if( empty(page)){
 			page="/main.jsp";
 		}
