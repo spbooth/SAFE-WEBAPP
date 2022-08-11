@@ -108,7 +108,7 @@ public class AuthorizedKeyValidatorTest extends WebappTestBase{
 	   String keys[] = {
 			  
 			   "ssh-dss AAAAB3NzaC1kc3MAAACBAIgUuU08DtlGe+T/PeWfi8ytIurdcekESNnRU3XcQyD02KqZihMNTZlLKnz74c/L3LUnJNjMuDjFIOD+vOUqpUJiHnV6FHwdKJOr4GlpnrRQ03lZC9DPXir9ej5TK8nq4C88ZSVTQAJS1+oLqctNvEdHVdVYf79nEm7+6R0/YbavAAAAFQCMMmuHb0IOP5tMnMOYDm0ZVrmwFwAAAIBuurWgdSkJFO/+lSn9+V9OdVwIoLi+7N6t17VHkECvbud2oLtDjleQ5jPi/1qwFPZXfd3f7eiUtzk+uPeeixcE/E//Vekn43GJC7FB/usPL+YNIbGg7bP7deKuwqP5qkqN0cAfStuYwIwsf6mcuL90jUksjxYopctEygYR09f/gwAAAIBd8nR6JACAg6fHeqicBJ8lK4QVvTIrI/2Tj5wAyy5e+9nQ7d74ilxMssC9rRNcYrI2JZtW56bbNwFA5P2o3slkpsFddAqB4lyIEN9cwBi1XP+XVgivbcf8R5VjaqdPuCUtVQkB6PrIyhSoqGOycCWcbptiavxbL37JERqn1MrJpw== sbooth@safe-dev.epcc.ed.ac.uk",
-			   		   
+			   "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDBVlUvdXVeAjESsOwsXe8Uh8ZeSfckYKBeTtl348O5lkKfIeNguGbx561P91KP/b5XcJD5+O1G4Hr4wvAL0qXLTcj4t6cghVr5B4hgjB4dXjyD3Te2X889TKqT/H8rHg+uU4KQDKCEK44WsBimmOT5t8DihqRhJ2fNewTPBn8j+Q== sbooth@safe-dev.epcc.ed.ac.uk"
 			   
 	   };
 	   String options[] = {
