@@ -128,7 +128,7 @@ good.add("ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDXA9/mz912d721UhE0bP5othL0sqWrG6
 	
 	@Test
 	public void testGoodValidate() throws PublicKeyParseException, ValidateException {
-		 AuthorizedKeyValidator x = new AuthorizedKeyValidator();
+		 AuthorizedKeyValidator x = new AuthorizedKeyValidator(ctx);
 		for(String g: getGoodData()) {
 			String dat = g.replaceAll("\\n", "");
 			PublicKeyReaderUtil.load(dat);

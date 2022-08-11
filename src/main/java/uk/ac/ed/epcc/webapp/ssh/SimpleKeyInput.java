@@ -26,14 +26,8 @@ public class SimpleKeyInput extends TextInput{
 		setBoxWidth(48);
 		setMaxResultLength(4096);
 		setSingle(true);
+		this.val = new AuthorizedKeyValidator(conn);
 		
-		if( SingleKeyComposite.SSH_REQUIRE_RSA_FEATURE.isEnabled(conn)){
-			RsaKeyValidator val = new RsaKeyValidator();
-			val.setMinBits(conn.getIntegerParameter("ssh.min.bits", 2048));
-			this.val=val;
-		}else {
-			this.val = new AuthorizedKeyValidator();
-		}
 		addValidator(val);
 	}
 

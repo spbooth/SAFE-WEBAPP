@@ -58,9 +58,10 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> implements FieldValidator<String>, TableTransitionContributor{
-	private final AuthorizedKeyValidator val = new AuthorizedKeyValidator();
+	private final AuthorizedKeyValidator val; 
 	public BadKeyFactory(AppContext conn) {
 		setContext(conn, "BadKeys");
+		val = new AuthorizedKeyValidator(conn);
 	}
 	@Override
 	protected Map<String, Selector> getSelectors() {
@@ -116,7 +117,7 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 		}
 		
 		public void setKey(String key) throws ParseException, NoSuchAlgorithmException {
-			AuthorizedKeyValidator val = new AuthorizedKeyValidator();
+			AuthorizedKeyValidator val = new AuthorizedKeyValidator(getContext());
 			key = val.normalise(key);
 			record.setProperty(PUBLIC_KEY, key);
 			record.setOptionalProperty(FINGERPRINT, val.fingerprint2(key));

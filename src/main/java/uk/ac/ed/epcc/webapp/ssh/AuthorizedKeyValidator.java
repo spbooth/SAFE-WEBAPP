@@ -15,13 +15,15 @@ package uk.ac.ed.epcc.webapp.ssh;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.interfaces.RSAKey;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Base64;
 
-
-
+import uk.ac.ed.epcc.webapp.AbstractContexed;
+import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
@@ -32,8 +34,12 @@ import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.SSH2DataBuffer;
  * @author Stephen Booth
  *
  */
-public class AuthorizedKeyValidator implements FieldValidator<String>{
-   /** option keywords without arguments
+public class AuthorizedKeyValidator extends AbstractContexed implements FieldValidator<String>{
+   public AuthorizedKeyValidator(AppContext conn) {
+		super(conn);
+	}
+
+/** option keywords without arguments
     * 
     */
    public static final String options[] = {
@@ -131,6 +137,10 @@ public class AuthorizedKeyValidator implements FieldValidator<String>{
 		   throw new ValidateException("Unrecognised key algorithm "+key);
 	   }
 	   String algorithm = alg_m.group(1);
+	   if( ! validateAlgorith(algorithm)) {
+		   throw new ValidateException("Invalid/Forbidden key algorithn "+algorithm);
+	   }
+	   
 	   key = key.substring(alg_m.end());
 	   
 	   Matcher base64_m = BASE64_PATTERN.matcher(key);
@@ -328,7 +338,27 @@ public class AuthorizedKeyValidator implements FieldValidator<String>{
     * @param alg
     */
    protected void validateBlock(SSH2DataBuffer buf ) throws ValidateException{
-	   
+	   try {
+		   String alg = buf.readString();
+		   if( alg.equals("ssh-rsa")) {
+			   // RSA key specific validation
+			   PublicKey key= PublicKeyReaderUtil.decodePublicKey(buf);
+
+			   if( ! key.getAlgorithm().equalsIgnoreCase("RSA")){
+				   throw new ValidateException("Not an RSA key");
+			   }
+			   int minBits = getContext().getIntegerParameter("ssh.min.bits", 2048);
+			   int bits = ((RSAKey)key).getModulus().bitLength()+1;
+			   if( bits < minBits){
+				   throw new ValidateException("Key bit-length too short minimum="+minBits+" This key="+bits);
+			   }
+		   }
+		} catch (PublicKeyParseException e) {
+			throw new ValidateException("Corrupt public key");
+		}
+   }
+   protected boolean validateAlgorith(String alg) {
+	   return getContext().getBooleanParameter("allow_ssh_key."+alg, true);
    }
 /**
  * @return the allow_options

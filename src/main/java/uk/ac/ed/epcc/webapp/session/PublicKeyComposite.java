@@ -41,7 +41,7 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 	 */
 	public static final String PUBLIC_KEY_META_ATTR = "PublicKey";
 	private static final Feature PUBLIC_KEY_FEATURE = new Feature("public-key",false,"Can we collect ssh public key for people");
-	public static final Feature SSH_REQUIRE_RSA_FEATURE = new Feature("ssh.require.rsa", true,"ssh public keys must be RSA key");
+	public static final Feature SSH_REQUIRE_RSA_FEATURE = new Feature("ssh.require.rsa", false,"ssh public keys must be RSA key");
 	private static final Feature NOTIFY_SSH_KEY_CHANGE_FEATURE = new Feature("person.notify-key-change",false,"Generate notify ticket if user changes ssh-key");
 	private static final Feature OPTIONAL_PUBLIC_KEY_FEATURE = new Feature("optional.public-key",true,"Are ssh keys optional");
 	
