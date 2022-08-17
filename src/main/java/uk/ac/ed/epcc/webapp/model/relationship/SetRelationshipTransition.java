@@ -8,11 +8,20 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
+import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryFinder;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.SessionService;
-
+/** A generic transition for editing {@link Relationship}s on the target object.
+ * 
+ * This is added to a {@link TransitionFactory} for the target object.
+ * 
+ * @author Stephen Booth
+ *
+ * @param <X>
+ * @param <A>
+ */
 public class SetRelationshipTransition<X extends DataObject,A extends AppUser> extends AbstractFormTransition<X> {
 	public SetRelationshipTransition(Relationship<A, X> rel) {
 		super();
