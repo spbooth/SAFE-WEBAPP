@@ -441,6 +441,11 @@ public class Emailer implements Contexed{
 			email_template.setProperty("person.verifications", v_text.toString());
 			
 		}
+		String docs = getContext().getExpandedProperty("service.documentation");
+		if( docs != null && ! docs.trim().isEmpty()) {
+			email_template.setProperty("service.documentation",docs);
+			email_template.setRegionEnabled("Documentation", true);
+		}
 		MimeMessage m = templateMessage(person,getFrom(person),email_template);
 		return m;
 	}
