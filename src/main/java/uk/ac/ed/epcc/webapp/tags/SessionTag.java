@@ -54,7 +54,9 @@ public class SessionTag extends BasicSessionTag {
 			SessionService<?> session_service = conn.getService(SessionService.class);
 			if( request.getAttribute(RequiredPage.AM_REQUIRED_PAGE_ATTR) == null){
 	    		Object skip=session.getAttribute(RequiredPage.REQUIRED_PAGES_ATTR);
-	    		if( session_service != null && session_service.haveCurrentUser() && skip==null && ! ((ServletSessionService) session_service).isSU() ){
+	    		// We incldue a haveCurrentUSer check and a null check as haveCurrentUSer
+	    		// does not check login status of the appuser
+	    		if( session_service != null && session_service.haveCurrentUser() && session_service.getCurrentPerson() != null && skip==null && ! ((ServletSessionService) session_service).isSU() ){
 	    			AppUserFactory<?> fac = session_service.getLoginFactory();
 	    			for(RequiredPage p : fac.getRequiredPages() ){
 	    				if( p.required(session_service) ){
