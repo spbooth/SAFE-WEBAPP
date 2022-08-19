@@ -494,8 +494,10 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 					hb.addClass("sub_labels");
 				}
 				for(String sub_key : input.getSubKeys()){
-					hb.open("div");
-					hb.addClass("input_row");
+					if( input.hasSubLabels()) {
+						hb.open("div");
+						hb.addClass("input_row");
+					}
 					if( input.hasSubLabels()){
 						hb.open("div");
 						hb.addClass("sub_label");
@@ -507,11 +509,15 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 
 					}
 					hb.open("div");
-					hb.addClass("sub_input");
+					if( input.hasSubLabels()) {
+						hb.addClass("sub_input");
+					}
 					T i = input.getInput(sub_key);
 					i.accept(this);
 					hb.close();
-					hb.close();
+					if( input.hasSubLabels()) {
+						hb.close(); // close input_row
+					}
 				}
 				hb.close();
 			}
