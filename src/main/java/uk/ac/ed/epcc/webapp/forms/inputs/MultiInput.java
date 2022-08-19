@@ -34,7 +34,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
  * @param <I> Type of sub inputs
  *
  */
-public abstract class MultiInput<V,I extends Input> extends BaseInput<V> implements Input<V> {
+public abstract class MultiInput<V,I extends Input> extends BaseInput<V> implements Input<V> , Iterable<I> {
 	// map between sub-keys and inputs.
 	private Map<String,I> m;
 	// map between sub-keys and labels
@@ -72,6 +72,10 @@ public abstract class MultiInput<V,I extends Input> extends BaseInput<V> impleme
 	 * @return Iterator over sub-selectors
 	 */
 	public final Iterator<I> getInputs() {
+		return m.values().iterator();
+	}
+	@Override
+	public final Iterator<I> iterator(){
 		return m.values().iterator();
 	}
 	public final Set<String> getSubKeys(){

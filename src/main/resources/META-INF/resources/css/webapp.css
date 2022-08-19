@@ -984,3 +984,14 @@ table.dataTable.display tbody tr td.RED.sorting_1, td.RED,  span.RED{
 .grey {
  background-color: #cccccc;
 }
+
+div.input_row {
+	display: table-row;
+}
+div.sub_label {
+	display: table-cell;
+	text-align: center;
+}
+div.sub_input {
+	display: table-cell;
+}

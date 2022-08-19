@@ -16,13 +16,14 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import java.util.Set;
+
 /**
- * Input that selects values from a List. For consistency the parse method should
- * parse tag values. That is tags are String representations of the Input values.
+ * Input that selects multiple values from a (relatively small) set. For consistency the parse method should
+ * parse a comma separated list of tag values. That is tags are String representations of the Input values.
  * 
- * Each possible choice has 4 representations
+ * Each possible choice has 3 representations
  * <ul>
- * <li> The Value corresponding to the value stored in the Input
  * <li> The Item is the target object e.g. the DataObject being selected. We
  * sometimes need to call methods on these. For a simple list the Value and Item
  * may be the same.
@@ -32,13 +33,10 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
  * </ul>
  * 
  * @author spb
- * @param <V> type of value object
  * @param <T> type of Item object
  * 
  */
-public abstract interface ListInput<V,T> extends  SuggestedItemInput<V,T> {
-
-	
+public abstract interface MultiValueInput<T> extends ParseInput<String>, ItemInput<String, Set<T>>	{
 
 	
 	/**
@@ -49,47 +47,20 @@ public abstract interface ListInput<V,T> extends  SuggestedItemInput<V,T> {
 	 */
 	public abstract String getTagByItem(T item);
 	
-	/** Test if an object of the Item type is one of the possible items.
+	/** get the 
 	 * 
-	 * @param item
-	 * @return boolean
+	 * @param tag
+	 * @return
 	 */
-	public boolean isValid(T item);
+	public abstract T getItemByTag(String tag);
 
-	/**
-	 * get the tag string from the actual value of the input
-	 * 
-	 * @param value
-	 * @return String tag
-	 */
-	public abstract String getTagByValue(V value);
-
+	
 	/**
 	 * get the user presented text from the domain object
-	 * may return null if not selected
 	 * @param item
 	 * @return String user text
 	 */
 	public abstract String getText(T item);
 	
-	/** Get a group name for the option
-	 * If supported this collects the values in the input into
-	 * groups (eg. using html optgroup)
-	 * All items in the same group should occur contiguously in the
-	 * item list. A null value (the default) indicates no grouping
-	 * 
-	 * @param item
-	 * @return group label or null.
-	 */
-	public default String getGroup(T item) {
-		return null;
-	}
-	/** optionally generate hover text for an item.
-	 * 
-	 * @param item
-	 * @return
-	 */
-	public default String getTooltip(T item) {
-		return null;
-	}
+	
 }
