@@ -490,11 +490,12 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				hb.addClass("multi_input");
 				if( input.hasSubLabels()) {
 					// use grid layout to make 2 col
-					// at time of writting all sub-label inputs are single line
+					
 					hb.addClass("sub_labels");
 				}
 				for(String sub_key : input.getSubKeys()){
 					if( input.hasSubLabels()) {
+						// if there is only a single column then simplify the formatting by just using a simple div
 						hb.open("div");
 						hb.addClass("input_row");
 					}

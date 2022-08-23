@@ -22,6 +22,7 @@ import javax.servlet.jsp.tagext.Tag;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.servlet.ErrorFilter;
 import uk.ac.ed.epcc.webapp.servlet.ServletFormResultVisitor;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
@@ -63,15 +64,20 @@ public class SessionTag extends BasicSessionTag {
 	    					ServletFormResultVisitor vis = new ServletFormResultVisitor(conn, request, response);
 	    					FormResult form_result = p.getPage(session_service);
 	    					// we are displaying a required page.
-	    					if( session_service.getAttribute(RequiredPage.REQUIRED_PAGE_RETURN_ATTR)==null) {
-	    						// only set this once as the required page processing may result in
-	    						// page re-displays from a different location
-	    						session_service.setAttribute(RequiredPage.REQUIRED_PAGE_RETURN_ATTR, conn.getService(ServletService.class).encodePage());
+	    					if( form_result != null) {
+	    						if( session_service.getAttribute(RequiredPage.REQUIRED_PAGE_RETURN_ATTR)==null) {
+	    							// only set this once as the required page processing may result in
+	    							// page re-displays from a different location
+	    							session_service.setAttribute(RequiredPage.REQUIRED_PAGE_RETURN_ATTR, conn.getService(ServletService.class).encodePage());
+	    						}
+	    						request.setAttribute(NavigationMenuService.DISABLE_NAVIGATION_ATTR, Boolean.TRUE);
+	    						request.setAttribute(RequiredPage.AM_REQUIRED_PAGE_ATTR,Boolean.TRUE);
+	    						form_result.accept(vis);
+	    						return SKIP_PAGE;
+	    					}else {
+	    						conn.getService(LoggerService.class).getLogger(getClass()).error("Null FormResult from required page");
 	    					}
-	    					request.setAttribute(NavigationMenuService.DISABLE_NAVIGATION_ATTR, Boolean.TRUE);
-	    					request.setAttribute(RequiredPage.AM_REQUIRED_PAGE_ATTR,Boolean.TRUE);
-	    					form_result.accept(vis);
-	   		        		return SKIP_PAGE;
+	   		        		
 	    				}
 	    			}
 	    			// all checks passed cache for session

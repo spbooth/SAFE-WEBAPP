@@ -68,45 +68,10 @@ public class FormContextTag extends TagSupport implements Tag{
 			// Handle any fields missing input.
 			Collection<String> missing_fields = HTMLForm.getMissing(request);
 			Map<String,String> errors = HTMLForm.getErrors(request);
-			String general_error="";
+			
 			HtmlBuilder block = new HtmlBuilder();
-			if( missing_fields != null &&  missing_fields.size() > 0 ){
-				block.br();
-				block.open("div");
-				block.addClass(inline?"error":"block");
-				block.addHeading(2,"Form errors:");
-				block.open("A");
-				block.attr("name","form_error");
-				block.close();
-				ExtendedXMLBuilder text = block.getText();
-				text.clean("There are "+missing_fields.size()+" required fields missing from this form. These are marked with a ");
-				text.open("span");
-				text.addClass("warn");
-				text.clean("*");
-				text.close();
-				text.clean(".");
-				text.appendParent();
-
-				block.close();
-
-
-			} 
-			if( errors != null && errors.size() > 0 ){ 
-
-				if( errors.containsKey("general") ){
-					general_error=(String) errors.get("general");
-				}else{
-					general_error = "See individual field errors";
-				}
-				ContentBuilder hb = block.getPanel(inline?"error":"block");
-				hb.addHeading(3,"This form contains errors:");
-				ExtendedXMLBuilder m = hb.getText();
-				m.addClass("warn");
-				m.clean(general_error);
-				m.appendParent();
-				hb.addParent();
-
-
+			addContent(inline,missing_fields, errors, block);
+			if( block.hasContent()) {
 				JspWriter out = page.getOut();
 				out.print(block.toString());
 			}
@@ -114,6 +79,45 @@ public class FormContextTag extends TagSupport implements Tag{
 			throw new JspException(e);
 		}
 		return EVAL_PAGE;
+	}
+
+	public static void addContent(boolean inline,Collection<String> missing_fields, Map<String, String> errors, HtmlBuilder block) {
+		if( missing_fields != null &&  missing_fields.size() > 0 ){
+			block.br();
+			block.open("div");
+			block.addClass(inline?"error":"block");
+			block.addHeading(2,"Form errors:");
+			block.open("A");
+			block.attr("name","form_error");
+			block.close();
+			ExtendedXMLBuilder text = block.getText();
+			text.clean("There are "+missing_fields.size()+" required fields missing from this form. These are marked with a ");
+			text.open("span");
+			text.addClass("warn");
+			text.clean("*");
+			text.close();
+			text.clean(".");
+			text.appendParent();
+
+			block.close();
+
+
+		} 
+		if( errors != null && errors.size() > 0 ){ 
+			String general_error="";
+			if( errors.containsKey("general") ){
+				general_error=(String) errors.get("general");
+			}else{
+				general_error = "See individual field errors";
+			}
+			ContentBuilder hb = block.getPanel(inline?"error":"block");
+			hb.addHeading(3,"This form contains errors:");
+			ExtendedXMLBuilder m = hb.getText();
+			m.addClass("warn");
+			m.clean(general_error);
+			m.appendParent();
+			hb.addParent();				
+		}
 	}
 
 	@Override
