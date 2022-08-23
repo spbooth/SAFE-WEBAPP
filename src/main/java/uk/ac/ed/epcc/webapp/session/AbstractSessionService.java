@@ -215,7 +215,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	@Override
 	public void flushRelationships(){
 		relationship_map=null;
-		roles.clear();
+		clearRoleMap();
 	}
 	public static void setupRoleTable(AppContext ctx){
 		DataBaseHandlerService dbh = ctx.getService(DataBaseHandlerService.class);
