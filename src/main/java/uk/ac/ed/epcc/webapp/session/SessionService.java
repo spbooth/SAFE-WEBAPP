@@ -435,6 +435,11 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public void flushRelationships();
 	
+	/** Clear any cached roles. 
+	 * This will also clear any temporary roles
+	 * 
+	 */
+	public void flushCachedRoles();
 	/** Add context parameters for security logging.
 	 * 
 	 * @param att
