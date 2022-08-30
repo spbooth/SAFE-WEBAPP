@@ -292,7 +292,7 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 		p = setupPerson("person2@example.com");
 		AppUser person2 = p.getCurrentPerson();
 		person2.markDetailsUpdated();
-		person2.commit();               // person 2 defails updates 2018-12-1
+		person2.commit();               // person 2 defails updates 2019-12-1
 		System.out.println(person2.nextRequiredUpdate());
 		
 		setTime(2020, Calendar.JUNE, 20, 10, 0); // in warning period for person1
