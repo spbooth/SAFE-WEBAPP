@@ -75,26 +75,26 @@ public class NotificationsLoginServletTest<A extends AppUser> extends AbstractLo
 	@ConfigFixtures("required_page_heartbeat.properties")
 	public void testLoginNotificationReset() throws DataFault, ServletException, IOException{
 		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
-		A user =  fac.makeBDO();
+		A user =  fac.makeBDO();   // create a user
 		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
-		user.setEmail("fred@example.com");
+		user.setEmail("fred@example.com");    // set email and password
 		composite.setPassword(user,"FredIsDead");
 		MaxNotifyComposite<A> max = fac.getComposite(MaxNotifyComposite.class);
-		max.stopNotified(user);
+		max.stopNotified(user);  // set notification value to maximum
 		user.commit();
-		assertEquals(5, max.getNotifiedCount(user));
+		assertEquals(5, max.getNotifiedCount(user)); // user is at maximum
 		SessionService<A> sess = ctx.getService(SessionService.class);
 		assertFalse(sess.isAuthenticated());
 		assertFalse(sess.haveCurrentUser());
 		addParam("username", "fred@example.com");
 		addParam("password", "FredIsDead");
-		doPost();
-		loginRedirects();
+		doPost();          // simulate a login
+		loginRedirects();  // verify browser redirected to correct location
 		 sess = ctx.getService(SessionService.class);
-		assertTrue(sess.isAuthenticated());
+		assertTrue(sess.isAuthenticated());  // user has logged in
 		assertTrue(sess.haveCurrentUser());
 		
-		assertEquals(0, max.getNotifiedCount(sess.getCurrentPerson()));
+		assertEquals(0, max.getNotifiedCount(sess.getCurrentPerson())); // counter has been reset
 		
 	}
 	
