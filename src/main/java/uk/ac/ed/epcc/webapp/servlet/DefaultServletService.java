@@ -217,7 +217,7 @@ public class DefaultServletService implements ServletService{
 		}
 		return web_path+url;
 	}
-	private static final Pattern  FORWARD_PATT = Pattern.compile("^/[a-zA-Z0-9/_-]*(?:\\\\.[a-zA-Z0-9]+)?");
+	private static final Pattern  FORWARD_PATT = Pattern.compile("^/[a-zA-Z0-9/_-]*(?:\\.[a-zA-Z0-9]+)?");
 	/**
 	 * Forward request to a different page.
 	 * 
