@@ -217,6 +217,7 @@ public class DefaultServletService implements ServletService{
 		}
 		return web_path+url;
 	}
+	private static final Pattern  FORWARD_PATT = Pattern.compile("^/[a-zA-Z0-9/_-]*(?:\\\\.[a-zA-Z0-9]+)?");
 	/**
 	 * Forward request to a different page.
 	 * 
@@ -233,7 +234,7 @@ public class DefaultServletService implements ServletService{
 			}
 			return;
 		}
-		if( Pattern.matches("^/[a-zA-Z/_-]*(?:\\.[a-zA-Z]+)?$",url)){
+		if( FORWARD_PATT.matcher(url).matches()){
 		   ctx.getRequestDispatcher(url).forward(req, res);
 		   return;
 		}else{
