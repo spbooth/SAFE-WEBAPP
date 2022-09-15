@@ -42,6 +42,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.TitleTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.transition.AbstractViewTransitionProvider;
 import uk.ac.ed.epcc.webapp.model.data.transition.DataObjectTransitionProvider;
@@ -95,6 +96,8 @@ DataObjectTransitionProvider<AU, AppUserFactory<AU>, AppUserKey<AU>>{
 		}
 	};
 	public static final AppUserKey SET_ROLE_KEY = new RoleAppUserKey("Roles", "Set roles", "Set permission roles for this user", SET_ROLES_ROLE);
+	public static final AppUserKey VIEW_PERMISSIONS_KEY = new RoleAppUserKey("Permissions", "View permissions", "View explicit permissions granted to this user", SET_ROLES_ROLE);
+
 	public static final AppUserKey QUERY_ROLE_KEY = new TargetlessAppUserKey("QueryRoles", "Query roles", "Find all users with specified roles", SET_ROLES_ROLE);
 	public static final CurrentUserKey UPDATE = new CurrentUserKey("Details", "Update personal details", "Update the information we hold about you",EDIT_DETAILS_ROLE) {
 
@@ -181,6 +184,65 @@ DataObjectTransitionProvider<AU, AppUserFactory<AU>, AppUserKey<AU>>{
 							getLogger().error("Error getting login history");
 						}
 					}
+					return cb;
+				}
+			};
+		}
+		
+	}
+	/** A transition to view additional permissions for a user including the explicitly added roles.
+	 * This is not intended to show all possible relationships but should include  permissions added explicitly to
+	 * a user
+	 * 
+	 * @author Stephen Booth
+	 *
+	 */
+	public final class ViewPermissionsTransition extends AbstractDirectTransition<AU> {
+
+		@Override
+		public FormResult doTransition(AU target, AppContext c) throws TransitionException {
+			return new CustomPageResult() {
+				
+				@Override
+				public String getTitle() {
+					return "Permissions for "+target.getIdentifier();
+				}
+				
+				@Override
+				public ContentBuilder addContent(AppContext conn, ContentBuilder cb) {
+					SessionService<AU> sess = conn.getService(SessionService.class);
+					Set<String> roles = new LinkedHashSet<String>();
+					for(String role : sess.getStandardRoles()) {
+						if( sess.canHaveRole(target, role)) {
+							roles.add(role);
+						}
+					}
+					cb.addHeading(2, "Standard roles");
+					if( roles.isEmpty()) {
+						cb.addText("No standard roles added");
+					}else {
+						ExtendedXMLBuilder text = cb.getText();
+						text.addObject(roles);
+						text.appendParent();
+					}
+					Map<String,Class> tagmap = conn.getClassMap(PermissionSummary.class);
+					for(Entry<String,Class> e : tagmap.entrySet()) {
+						try {
+							Object s = conn.makeObject(e.getValue(), e.getKey());
+							if( s != null) {
+								if( s instanceof PermissionSummary) {
+									((PermissionSummary<AU>) s).addPermissionSummary(cb,target);
+								}else if( s instanceof DataObjectFactory) {
+									for(PermissionSummary ss : ((DataObjectFactory<?>)s).getComposites(PermissionSummary.class)) {
+										ss.addPermissionSummary(cb, target);
+									}
+								}
+							}
+						}catch(Exception e1) {
+							getLogger().error("Error making/adding PermissionSummary",e1);
+						}
+					}
+					
 					return cb;
 				}
 			};
@@ -300,6 +362,7 @@ DataObjectTransitionProvider<AU, AppUserFactory<AU>, AppUserKey<AU>>{
 			addTransition(UPDATE, new UpdateDetailsTransition(this,fac));
 		}
 		addTransition(SET_ROLE_KEY, new SetRoleTransition<AU>());
+		addTransition(VIEW_PERMISSIONS_KEY, new ViewPermissionsTransition());
 		addTransition(QUERY_ROLE_KEY, new QueryRoleTransition());
 		addTransition(SU_KEY, new SUTransition());
 		addTransition(ERASE, new ConfirmTransition<>("Are you sure you want to anonymise this person record", new EraseTransition(), new ViewTransition()));
