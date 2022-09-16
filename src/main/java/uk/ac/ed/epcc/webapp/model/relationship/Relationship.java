@@ -36,8 +36,10 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
+import uk.ac.ed.epcc.webapp.model.relationship.Relationship.Link;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.PermissionSummary;
 import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
@@ -264,5 +266,20 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 			getLogger().error("Error adding permission summary", e);
 		}
 		
+		
+		
+	}
+	/** remove all set permissions for the user
+	 * 
+	 * @param user
+	 * @throws DataFault 
+	 */
+	@Override
+	public void clearPermissions(A user) throws DataFault {
+		if( user == null) {
+			return;
+		}
+		FilterDelete del = new FilterDelete(res);
+		del.delete(new SQLValueFilter(getTarget(), res, getLeftField(), user));
 	}
 }
