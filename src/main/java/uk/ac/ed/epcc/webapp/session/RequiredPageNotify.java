@@ -50,8 +50,8 @@ public class RequiredPageNotify<AU extends AppUser> extends AbstractContexed {
 			fil.addFilter(rp.notifiable(sess));
 		}
 		AndFilter<AU> notify_filter = new AndFilter<AU>(login.getTarget(), fil, login.getEmailFilter(), login.getCanLoginFilter());
-		if( max != null && apply_rate_limit) {
-			notify_filter.addFilter(max.getNotifyFilter());
+		if( max != null ) {
+			notify_filter.addFilter(max.getNotifyFilter(apply_rate_limit));
 		}
 		
 		if( notification_policy_role != null && ! notification_policy_role.isEmpty()) {

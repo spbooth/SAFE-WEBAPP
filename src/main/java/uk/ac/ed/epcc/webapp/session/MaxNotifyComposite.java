@@ -165,7 +165,7 @@ public class MaxNotifyComposite<A extends AppUser> extends Composite<A, MaxNotif
 	 * 
 	 * @return
 	 */
-	public BaseFilter<A> getNotifyFilter(){
+	public BaseFilter<A> getNotifyFilter(boolean include_rate_limit){
 		if( ! apply()) {
 			return null;
 		}
@@ -178,7 +178,7 @@ public class MaxNotifyComposite<A extends AppUser> extends Composite<A, MaxNotif
 		   // to move down the list for the next run
 		   fil.addFilter(new FieldOrderFilter<A>(target, getRepository(), NOTIFY_COUNT_FIELD, false));
 		}
-		if( getRepository().hasField(LAST_NOTIFY__FIELD)) {
+		if( include_rate_limit    && getRepository().hasField(LAST_NOTIFY__FIELD)) {
 			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 			if( time != null ) {
 				fil.addFilter(new SQLValueFilter<A>(target, getRepository(), LAST_NOTIFY__FIELD, MatchCondition.LT, 
