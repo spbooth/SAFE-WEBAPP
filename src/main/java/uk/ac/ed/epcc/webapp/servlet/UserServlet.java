@@ -25,11 +25,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
 import uk.ac.ed.epcc.webapp.servlet.navigation.PageNode;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.session.twofactor.TwoFactorHandler;
 
 
 /** A servlet to allow a registered user to manage their identity.
@@ -40,6 +42,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 @WebServlet(name="UserServlet" , urlPatterns="/UserServlet/*")
 public class UserServlet<T extends AppUser> extends SessionServlet {
 
+	public static final Feature REQUIRE_MFA = new Feature("toggle_role.require_mfa", false, "Require MFA authentication to enable toggle role");
 	
 	
 	/**
@@ -102,6 +105,12 @@ public class UserServlet<T extends AppUser> extends SessionServlet {
 		if( sess == null || empty(role) ){
 			conn.getService(ServletService.class).requestAuthentication(sess);
 			return;
+		}
+		if( REQUIRE_MFA.isEnabled(sess.getContext())) {
+			if( (! sess.hasRole(role)) && (! TwoFactorHandler.usedTwoFactor(sess))){
+				message(sess.getContext(), req, res, "mfa_required", role);
+				return;
+			}
 		}
 		sess.toggleRole(role);
 		

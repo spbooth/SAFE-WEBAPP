@@ -68,6 +68,11 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	public String getCanonicalName(AU object) {
 		return getRecord(object).getStringProperty(getField());
 	}
+	
+	public boolean hasCanonicalName(AU object) {
+		String name = getCanonicalName(object);
+		return name != null && ! name.isEmpty();
+	}
 	/** If there are varient forms of the names this normalises the name to the form stored in the database
 	 * 
 	 * @param name

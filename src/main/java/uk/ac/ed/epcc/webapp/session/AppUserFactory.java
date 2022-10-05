@@ -317,10 +317,8 @@ NamedFilterProvider<AU>
 	public Set<RequiredPage<AU>> getRequiredPages(){
     	Set<RequiredPage<AU>> requiredPages= new LinkedHashSet<>();
     	
-    	for(Composite<AU, ?> c : getComposites()){
-    		if( c instanceof RequiredPageProvider){
-    			requiredPages.addAll(((RequiredPageProvider<AU>)c).getRequiredPages());
-    		}
+    	for(RequiredPageProvider<AU> c : getComposites(RequiredPageProvider.class)){
+    			requiredPages.addAll(c.getRequiredPages());
     	}
     	// want email verified before details
     	// for security don't want ssh key tickets if email not verified
