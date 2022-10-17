@@ -106,7 +106,7 @@ public class UserServlet<T extends AppUser> extends SessionServlet {
 			conn.getService(ServletService.class).requestAuthentication(sess);
 			return;
 		}
-		if( REQUIRE_MFA.isEnabled(sess.getContext())) {
+		if( REQUIRE_MFA.isEnabled(sess.getContext()) || conn.getBooleanParameter("require_mfa."+role, false)) {
 			if( (! sess.hasRole(role)) && (! TwoFactorHandler.usedTwoFactor(sess))){
 				message(sess.getContext(), req, res, "mfa_required", role);
 				return;
