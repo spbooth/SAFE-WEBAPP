@@ -585,17 +585,7 @@ public class Emailer implements Contexed{
 		if( m == null ){
 			return null;
 		}
-		AppContext conn = getContext();
 		
-
-		DatabaseService db = conn.getService(DatabaseService.class);
-		if( db != null ){
-			// always commit any transactions before an external operation
-			// in case it hangs up.
-			// Also ensures we don't roll back state inconsistent with info sent
-			// in an email
-			db.commitTransaction();
-		}
 		
 		m = send(m);
 		return m;
@@ -613,6 +603,15 @@ public class Emailer implements Contexed{
 			return null;
 		}
 		AppContext conn = getContext();
+		DatabaseService db = conn.getService(DatabaseService.class);
+		if( db != null ){
+			// always commit any transactions before an external operation
+			// in case it hangs up and leaves an uncommitted transaction open for
+			// a long time.
+			// Also ensures we don't roll back state inconsistent with info sent
+			// in an email so never roll back to before a point an email is sent
+			db.commitTransaction();
+		}
 		Logger log = conn.getService(LoggerService.class).getLogger(getClass());
 		if( EMAILS_FEATURE.isEnabled(conn)  && (conn.getAttribute(SUPRESS_EMAIL_ATTR) == null)){
 			String force_email = conn.getInitParameter(EMAIL_FORCE_ADDRESS);
