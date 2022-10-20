@@ -138,7 +138,30 @@ public class TwoFactorHandler<A extends AppUser> {
 	
 	}
 
-
+    /** Log the user in asserting that two-factor login has already taken place
+     * 
+     * @param user
+     * @param type
+     * @param next_page
+     * @return
+     */
+    public FormResult assertTwoFactorLogin(A user,String type,SerializableFormResult next_page) {
+		 
+  	
+  		if( ! sess.haveCurrentUser()) {
+  			sess.setCurrentPerson(user);
+  			CurrentTimeService time = sess.getContext().getService(CurrentTimeService.class);
+  			if( time != null) {
+  				sess.setAuthenticationTime(time.getCurrentTime());
+  			}
+  			sess.setAuthenticationType(type);
+  			sess.setAttribute(AUTH_USES_2FA_ATTR, Boolean.TRUE);
+  		}
+  		securityEvent("SucessfulAuthentication");
+  		return next_page;
+  	
+  	
+  	}
 	public FormResult completeTwoFactor(boolean success,A expected) {
 		try {
 			Logger logger = getLogger();
