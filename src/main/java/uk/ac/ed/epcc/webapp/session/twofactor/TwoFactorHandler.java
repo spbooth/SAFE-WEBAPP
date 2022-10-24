@@ -157,7 +157,7 @@ public class TwoFactorHandler<A extends AppUser> {
   			sess.setAuthenticationType(type);
   			sess.setAttribute(AUTH_USES_2FA_ATTR, Boolean.TRUE);
   		}
-  		securityEvent("SucessfulAuthentication");
+  		securityEvent("SucessfulAuthentication - asserted");
   		return next_page;
   	
   	

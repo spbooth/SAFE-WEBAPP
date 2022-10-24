@@ -17,6 +17,7 @@
 package uk.ac.ed.epcc.webapp.servlet;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -26,8 +27,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
-import uk.ac.ed.epcc.webapp.servlet.navigation.PageNode;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -112,6 +113,10 @@ public class UserServlet<T extends AppUser> extends SessionServlet {
 				return;
 			}
 		}
+		LoggerService ls = sess.getContext().getService(LoggerService.class);
+		Map values = new LinkedHashMap();
+		values.put("role", role);
+		ls.securityEvent("ToggleRole", sess,values);
 		sess.toggleRole(role);
 		
 		NavigationMenuService nav = conn.getService(NavigationMenuService.class);

@@ -126,7 +126,7 @@ public class SessionDataProducer implements SettableServeDataProducer {
 			if( SOFT_REFERENCE_FEATURE.isEnabled(conn)){
 				int max_len = conn.getIntegerParameter("SessionDataProducer.max_serialise",0);
 				SerialisableSoftReference<byte[]> ref = new SerialisableSoftReference<>((byte[])attribute);
-				if( max_len > 0 && data.getLength() > max_len){
+				if( max_len > 0 && (data != null && data.getLength() > max_len)){
 					ref.setForceNullOnSerialise(true);
 				}
 				attribute = ref;
