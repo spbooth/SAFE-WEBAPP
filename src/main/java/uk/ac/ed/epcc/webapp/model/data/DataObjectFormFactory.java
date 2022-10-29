@@ -454,7 +454,7 @@ public final AppContext getContext(){
 				
 			}
 			// allow config to override.
-			String override=conn.getInitParameter("form."+res.getTag()+"."+field);
+			String override=conn.getInitParameter(FORM_LABEL_PREFIX+res.getTag()+"."+field);
 			if( override != null){
 				trans.put(field, override);
 			}
