@@ -1607,7 +1607,9 @@ public final class Repository implements AppContextCleanup{
 				buff.append('=');
 				if (value instanceof StreamData) {
 					// setObject also understands StreamData
-					buff.append("file");
+					buff.append("file(");
+					buff.append(Long.toString( ((StreamData)value).getLength() ));
+					buff.append(")");
 				} else {
 					// needs to work with null values
 					buff.append(String.valueOf(value));
@@ -2844,9 +2846,17 @@ public final class Repository implements AppContextCleanup{
 						serv.getLogger(getClass()).debug("insert query is "+query.toString());
 					}
 				}
+				long start = System.currentTimeMillis();
 				int count = stmt.executeUpdate();
+				long end = System.currentTimeMillis();
 				if( time != null ){
 					time.stopTimer(getTag()+"-insert");
+				}
+				if( (end - start) > 60000L ) {
+					LoggerService serv = getContext().getService(LoggerService.class);
+					if( serv != null ){
+						serv.getLogger(getClass()).error("long running insert query "+Long.toString(end-start)+" "+query.toString());
+					}
 				}
 				if (count != 1) {
 					throw new DataFault("Wrong count from INSERT");
