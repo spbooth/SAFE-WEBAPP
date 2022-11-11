@@ -1090,7 +1090,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		    	name=rel.substring(namepos+1);
 		    	rel=rel.substring(0, namepos);
 		    }
-		    // can't alias a complex role to return directly
+		    // can't alias a complex role so return directly
 		    return getRelationshipRoleFilter(tag, rel, name);
 		}
 		BaseFilter<A> fil = getPersonInRoleFilter(role);

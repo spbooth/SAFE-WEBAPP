@@ -84,6 +84,7 @@ public class SessionDataProducer implements SettableServeDataProducer {
 		}
 		byte data[] = (byte[]) attribute;
 		if( data == null || data.length == 0){
+			conn.getService(LoggerService.class).getLogger(getClass()).error("Null data - reference may have been reclaimed");
 			return null;
 		}
 		try {

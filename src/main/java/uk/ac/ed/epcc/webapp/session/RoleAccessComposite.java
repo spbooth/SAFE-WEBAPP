@@ -62,6 +62,11 @@ public class RoleAccessComposite<BDO extends DataObject,A extends AppUser> exten
 	private String accessRoleList(BDO target){
 		return getRecord(target).getStringProperty(ACCESS_ROLE);
 	}
+	
+	public boolean hasAccessRoleList(BDO target) {
+		String list  = accessRoleList(target);
+		return list != null && ! list.isEmpty();
+	}
 	public void setAccessRoleList(BDO target,String roles) {
 		// only needed by tests usually set via a form
 		getRecord(target).setProperty(ACCESS_ROLE, roles);
