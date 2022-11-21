@@ -143,4 +143,26 @@ public class AuthorizedKeyValidatorTest extends WebappTestBase{
 
    
    }
+   @Test
+   public void testGetComment() throws ValidateException {
+	   AuthorizedKeyValidator x = new AuthorizedKeyValidator(ctx);
+	   
+	   String keys[] = {
+			   "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDNeMOshi5BBBJYQ69NuGLMWIRlyHHoOwpK/DMDdtvQaWdBiy/qc8uH1CV3WTKYeo2+9SqeAz+XtbLVgn5j17+ehQfdvOXkVom6/Qx9NqdHr2ajXbnRaHolqT++cuvDBgThM+hJfb5j+Xfq+aw1zg2cOZAgzBAmymdMOq0mO03EWD8qMqMNQ38DHZ/QsOqec90vivxmobeIuCpsvWlcUkLD9j/I/wbgrxV1pvOMwmXWxrTJp5iiUS46mLFtcDoUAXw6NgpEyKsrsKkpv8/0/YjGn67+LVopq9/GKmP5UI9Oi9JLQm8pJS/mean8h/bP8ATqpjEthT7z207HftGHA+NB sbooth@safe-dev.epcc.ed.ac.uk",
+			   "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBPp154ncTWFiS8eg8QjfYjk/X9sjOb0exvvEmujhDXpbDRa2AnDF8S/XMYpNkELFYTiPhHQk9r29DhTuokqO338= sbooth@safe-dev.epcc.ed.ac.uk",
+			   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHwhd4XOp1hr84ckEP2eYvbSyG6KxHcbHMgObQPv8FWf sbooth@safe-dev.epcc.ed.ac.uk",
+			   " ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAgEA2N2TXMvqmK5IDUTeUfLuccm5em3vbKKj+TUdqVioP50icoDBxaV6F0zGAYaJ1oCLcqmM9lqX91MkvNoFmtuHwlvqvr/cRq5oBlbxEbkObF4TNoXSq12fRrKnkIYO52On36TAOkv5oGmKY2JdFdiYXCSZ8kHa31+ZxpjiEb7XX0KbBeWI8BQie+a+PCcVgI7O7y9mP0+H4y37Ej5Xz7sBmlCcxLmpp5VwRjvlRgxUF8SVZw74rT4Fdr/yhogmJi0B5Ta9sN7Fl7QvyU1JCWW4KQpaLr93e+06RFiE9p/Zkq7IY8btpTXgvwuWzE/FRPLi5/ViIijshHwv2g86tNWB//wKZ7HarSqgRmT2aj/7qgaEM8PbnAZtaAmkZnfQdXF3BibuywJ5isjI1ZspZt7Gv3HytrH0X0nWgC5BRwQksIDTVZ4+oVGqhP9VmaQDP+wUOATh6miRitc4ERnR30XWcEoafa++V+v1+B7z5F0wcIzi+mpwrHx/89d3y81sRy0Qis4aJ4SY8z1pqiAxsaassEw0RKvv9hWLci8Y+LkZTwxyV+GyGQd9UFwLu4E6Z1nz2nKRDLbY7zvFPsxBq9KkQ2eUm1FiYBZ49uWg2l0RiGfLuTERPHH/INFWVeCqfW9yf69OWSeJgFpe3m9Ucau5bVq2fvcTC/zVBLz9a7yQj90= rsa-key-20200514 (Archer)",
+	   };
+	   String comments[] = {
+			   "sbooth@safe-dev.epcc.ed.ac.uk",
+			   "sbooth@safe-dev.epcc.ed.ac.uk",
+			   "sbooth@safe-dev.epcc.ed.ac.uk",
+			   "rsa-key-20200514 (Archer)",
+	   };
+	   
+	   for(int i=0 ; i< keys.length; i++) {
+		   x.validate(keys[i]);
+		   assertEquals(comments[i], x.getComment(keys[i]).trim());
+	   }
+   }
 }

@@ -313,6 +313,7 @@ public class AuthorizedKeyValidator extends AbstractContexed implements FieldVal
 	   if( key == null || key.isEmpty()) {
 		   return null;
 	   }
+	   key=key.trim();
 	   Matcher prefix_m = PREFIX_PATTERN.matcher(key);
 	   if( prefix_m.lookingAt() ) {
 		   key = key.substring(prefix_m.end());

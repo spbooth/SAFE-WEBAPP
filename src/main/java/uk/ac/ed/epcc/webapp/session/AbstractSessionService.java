@@ -1342,7 +1342,9 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		return result;
 	}
 	private <T extends DataObject> BaseFilter<A> makePersonInRelationshipRoleFilter(DataObjectFactory<T> fac2, String role, T target) throws UnknownRelationshipException {
-		
+		if(target != null && ! fac2.isMine(target)) {
+			throw new ConsistencyError("Factory/target mis-match "+fac2.getTag()+" "+target.toString());
+		}
 		PermissionClause<T> ast = perm_parser.parse(fac2, role);
 		if( ast == null ) {
 			throw new UnknownRelationshipException(role);
