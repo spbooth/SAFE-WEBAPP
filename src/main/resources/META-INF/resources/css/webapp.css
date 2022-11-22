@@ -727,7 +727,7 @@ text-align: center;
 	content: " \2714";
 	color: green;
 }
-.fail {
+.fail .additional {
 	color: red;
 }
 .fail:after {
