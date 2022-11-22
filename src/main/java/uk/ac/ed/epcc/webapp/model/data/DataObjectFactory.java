@@ -1383,7 +1383,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 					it.next();
 				}
 			} catch (Exception e1) {
-				throw new DataException("Error in close", e);
+				throw new DataException("Error in close", e1);
 			}
 			return count;
 		}

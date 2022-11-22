@@ -243,6 +243,9 @@ public class TwoFactorHandler<A extends AppUser> {
 	 * @return
 	 */
 	public static boolean usedTwoFactor(SessionService<?> sess) {
+		if( sess == null) {
+			return false;
+		}
 		Boolean b = (Boolean) sess.getAttribute(AUTH_USES_2FA_ATTR);
 		if( b != null && b.booleanValue()) {
 			return true;
