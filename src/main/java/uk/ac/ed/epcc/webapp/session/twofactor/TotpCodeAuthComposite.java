@@ -60,8 +60,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.DirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
-import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.jdbc.table.*;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
@@ -92,7 +91,9 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	public static final Feature REQUIRED_TWO_FACTOR= new Feature("two_factor.required",false,"Is two factor authentication required");
 	public static final Feature VERIFY_OLD_CODE=new Feature("two_factor.verify_previous_code",true,"Verify current code on key change");
 	private static final String SECRET_FIELD="AuthCodeSecret";
+	private static final String LAST_USED_FIELD="LastAuthCodeUsed";
 	public static final String REMOVE_KEY_ROLE="RemoveTwoFactor";
+	public static final String USED_COUNTER_ATTR="UsedCounter";
 	/**
 	 * @param fac
 	 */
@@ -226,19 +227,55 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		return input;
 	}
 
+	/** Get the timestamp/counter used for the last sucessful authentication. 
+	 * 
+	 * This is a long value corresponding to a java millisecond timestamp but
+	 * rounded to the normalisation value. 
+	 * If this field exists and is populated codes equal to or prior to this value will
+	 * not be accepted (to make the codes strictly one-time).
+	 * @param user
+	 * @return
+	 */
+	public long getLastUsed(A user) {
+		if( user == null) {
+			return 0L;
+		}
+		return getRecord(user).getLongProperty(LAST_USED_FIELD,0L);
+	}
+	
+	/** Set the counter value (not the time stamp) or a successful authentication.
+	 * 
+	 * @param user
+	 * @param counter
+	 */
+	public void setLastUsedCounter(A user, long counter) {
+		if( user == null) {
+			return;
+		}
+		getRecord(user).setOptionalProperty(LAST_USED_FIELD, Long.valueOf(counter * getNorm()));
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.session.twofactor.CodeAuthComposite#verify(java.lang.Object)
 	 */
 	@Override
 	public boolean verify(A user,Integer value) {
 		try {
-			return verify(getSecret(user),value);
+			return verify(user,getSecret(user),value);
 		} catch (Exception e) {
 			getLogger().error("Error getting secret", e);
 			return false;
 		}
 	}
-	public boolean verify(Key key,Integer value) {
+	/** Validate a value against a key.
+	 * 
+	 * If the user parameter is not null the last used value is also checked.
+	 * 
+	 * @param user
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	public boolean verify(A user,Key key,Integer value) {
 		Logger logger = getLogger();
 		if( key == null) {
 			logger.debug("No key allow login");
@@ -247,7 +284,9 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		CurrentTimeService serv = getContext().getService(CurrentTimeService.class);
 		Date currentTime = serv.getCurrentTime();
 		long counter = currentTime.getTime();
-		counter = counter / getNorm();
+		long norm = getNorm();
+		counter = counter / norm;
+		long last_counter = getLastUsed(user) / norm;
 		int window = getWindow();
 		
 		for(int i=-(window-1)/2 ; i<= window/2 ; ++i) {
@@ -255,7 +294,16 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 				long code = getCode(key, counter+i);
 				logger.debug("i="+i+" code="+code+" value="+value);
 				if( value.longValue() == code) {
-					return true;
+					if( (counter+i) > last_counter ) {
+						// Don't set the authenticated time here as
+						// verification may be called multiple times
+						// remember it in the AppContext
+						getContext().setAttribute(USED_COUNTER_ATTR, (counter+i));
+						return true;
+					}else {
+						logger.error("Code re-use for "+user.getIdentifier()+" "+(counter+i)+"<"+last_counter);
+						return false;
+					}
 				}
 			} catch (Exception e) {
 				logger.error("Error checking code", e);
@@ -278,12 +326,14 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	@Override
 	public TableSpecification modifyDefaultTableSpecification(TableSpecification spec, String table) {
 		spec.setOptionalField(SECRET_FIELD, new StringFieldType(true, null, 32));
+		spec.setOptionalField(LAST_USED_FIELD, new LongFieldType(true, null));
 		return spec;
 	}
 
 	@Override
 	public Set<String> addSuppress(Set<String> suppress) {
 		suppress.add(SECRET_FIELD);
+		suppress.add(LAST_USED_FIELD);
 		return suppress;
 	}
 
@@ -322,7 +372,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		 */
 		@Override
 		public void validate(Integer data) throws FieldException {
-			if( ! verify(key, data) ) {
+			if( ! verify(null,key, data) ) {
 				throw new ValidateException("Incorrect");
 			}
 			
@@ -606,6 +656,19 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 			clearSecret(target);
 		}
 		
+	}
+
+	@Override
+	public void completeAuth(A target) {
+		Long used = (Long) getContext().getAttribute(USED_COUNTER_ATTR);
+		if( used != null) {
+			setLastUsedCounter(target, used);
+			try {
+				target.commit();
+			} catch (DataFault e) {
+				getLogger().error("Error setting lastUsed", e);
+			}
+		}
 	}
 
 }

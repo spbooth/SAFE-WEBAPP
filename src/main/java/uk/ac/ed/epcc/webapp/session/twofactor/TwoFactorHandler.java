@@ -91,6 +91,19 @@ public class TwoFactorHandler<A extends AppUser> {
 		return false;
 
     }
+    private void completeAuth(A user) {
+    	AppUserFactory<A> person_fac = sess.getLoginFactory();
+    	boolean is_super=false;
+		if( sess instanceof ServletSessionService) {
+			is_super = ((ServletSessionService<A>)sess).isSU();
+		}
+		if( ! is_super) {
+			for( TwoFactorComposite<A> comp : person_fac.getComposites(TwoFactorComposite.class)) {
+				comp.completeAuth(user);
+			}
+		}
+
+    }
     
     public FormResult doLogin(A user,String type,SerializableFormResult next_page) {
 		 
@@ -193,6 +206,7 @@ public class TwoFactorHandler<A extends AppUser> {
 						sess.setAuthenticationType(AUTH_TYPE_ATTR);
 					}
 					sess.setAttribute(AUTH_USES_2FA_ATTR, Boolean.TRUE);
+					completeAuth(user);
 					securityEvent("Sucessful2FA");
 				}else {
 					A user = sess.getLoginFactory().find(requested_id);

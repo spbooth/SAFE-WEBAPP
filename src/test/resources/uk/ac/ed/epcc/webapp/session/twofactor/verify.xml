@@ -7,6 +7,7 @@
 <Alg type='Integer' nullable='false'/>
 <Password type='String' nullable='false' max='64'/>
 <AuthCodeSecret type='String' nullable='true' max='32'/>
+<LastAuthCodeUsed type='Long' nullable='true'/>
 <Email_index type='Index' unique='true'><Column name='Email'/></Email_index>
 </TableSpecification>
 <Person id='1'>
