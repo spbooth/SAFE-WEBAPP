@@ -85,5 +85,14 @@ public boolean equals(Object obj) {
 		return false;
 	return true;
 }
+public boolean overlapps(TimePeriod p) {
+	return p.getStart().before(end) && p.getEnd().after(start);
+}
+public Period intersection(TimePeriod p) {
+	if( overlapps(p)) {
+		return new Period(p.getStart().before(start) ? start : p.getStart(), p.getEnd().after(end) ? end : p.getEnd() );
+	}
+	return null;
+}
 
 }
