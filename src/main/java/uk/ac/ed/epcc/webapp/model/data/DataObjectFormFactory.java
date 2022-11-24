@@ -226,6 +226,9 @@ public final AppContext getContext(){
 						if( new_sel != null ) {
 							// constraint applied
 							sel = new_sel;
+							if( support_multi_stage) {
+								is_optional = fc.changeOptional(name, is_optional,f,fixtures);
+							}
 						}else {
 							// multi-stage requested
 							if( support_multi_stage ) {

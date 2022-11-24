@@ -78,5 +78,13 @@ public class MultiFieldConstraint extends LinkedHashSet<FieldConstraint> impleme
 		return false;
 	}
 
+	@Override
+	public boolean changeOptional(String field, boolean original, Form form,HashMap fixtures) {
+		for(FieldConstraint c : this) {
+			original = c.changeOptional(field, original,form,fixtures);
+		}
+		return original;
+	}
+
 	
 }
