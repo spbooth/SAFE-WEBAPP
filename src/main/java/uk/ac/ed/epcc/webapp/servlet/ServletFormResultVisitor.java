@@ -58,7 +58,14 @@ public class ServletFormResultVisitor extends AbstractContexed implements WebFor
 		TransitionFactory<K, T> provider = ctr.getProvider();
 		T target = ctr.getTarget();
 		K key = ctr.getTransition();
-		
+		if( key != null && ! provider.allowTransition(conn, target, key)) {
+			// chained transition results are generated internally so should
+			// not fail access checks. However if we get this wrong there will be an error
+			// later to best to flag this now
+			getLogger().error("Chained transition to forbidden transition");
+			WebappServlet.messageWithArgs(conn, req, res, "access_denied",null);
+			return;
+		}
 		if( ctr.useURL()){
 			// Note ViewTransitionResult gets caught here
 			conn.getService(ServletService.class).redirect(TransitionServlet.getURL(conn, provider, target,key));

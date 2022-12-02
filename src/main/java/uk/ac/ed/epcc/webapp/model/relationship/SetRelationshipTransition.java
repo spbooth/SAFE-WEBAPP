@@ -7,6 +7,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryFinder;
@@ -47,6 +48,9 @@ public class SetRelationshipTransition<X extends DataObject,A extends AppUser> e
 				RelationshipTransitionProvider prov = TransitionFactoryFinder.getTransitionFactory(conn, null, rel.getTag());
 				if( prov == null ) {
 					throw new ActionException("TransitionProvider "+rel.getTag()+" not registered");
+				}
+				if( ! prov.allowTransition(conn, l, RelationshipTransitionProvider.EDIT)) {
+					return new MessageResult("access_denied");
 				}
 				return new ChainedTransitionResult<>(prov, l,RelationshipTransitionProvider.EDIT );
 			}
