@@ -91,11 +91,11 @@ public class RoleAccessComposite<BDO extends DataObject,A extends AppUser> exten
 		if( ROLE_BASED_ACCESS_RELATIONSHIP.equals(role)) {
 			if( target != null ) {
 				String list = accessRoleList(target);
+				AppUserFactory<A> fac =  sess.getLoginFactory();
 				if( list != null && ! list.isEmpty()) {
-					AppUserFactory<A> fac =  sess.getLoginFactory();
 					return sess.getGlobalRoleFilter(list.split("\\s*,\\s*"));
 				}else {
-					return new FalseFilter(getFactory().getTarget());
+					return new FalseFilter(fac.getTarget());
 				}
 			}
 		}
