@@ -19,6 +19,7 @@ import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 /** An {@link DataObjectItemInput} for {@link NameFinder} factories.
@@ -104,7 +105,19 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 				created=true;
 			}
 			if(target == null) {
-				throw new ParseException("["+v+"] Not found");
+				// Fallback to trying an integer parse
+				// if we are also an IndexedProducer
+				if( finder instanceof IndexedProducer) {
+					try {
+						int id = Integer.valueOf(v);
+						target = ((IndexedProducer<T>)finder).find(id);
+					}catch(Exception e) {
+
+					}
+				}
+				if( target == null ) {
+					throw new ParseException("["+v+"] Not found");
+				}
 			}
 			// validate against the filter unless we created a new object
 			// a newly created object is unlikely to match the filter but
