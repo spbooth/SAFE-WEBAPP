@@ -253,19 +253,27 @@ public abstract class WebappTestBase implements ContextHolder{
 		diff.close();
 		//System.out.println(diff.toString());
 		
-		//This is a XSL transform to edit the dates in the project log as these will depend on the time the test is run.
-		TransformerFactory tfac = TransformerFactory.newInstance();
-		Source source = XMLDataUtils.readResourceAsSource(getClass(), normalize_transform);
-		if( timer !=null){ timer.stopTimer("diff"); }
-		assertNotNull(source);
-		Transformer t = tfac.newTransformer(source);
-		assertNotNull(t);
+		String expected;
+		String raw=diff.toString();
+		String result;
+		if( normalize_transform != null ) {
+			//This is a XSL transform to edit the dates in the project log as these will depend on the time the test is run.
+			TransformerFactory tfac = TransformerFactory.newInstance();
+			Source source = XMLDataUtils.readResourceAsSource(getClass(), normalize_transform);
+			if( timer !=null){ timer.stopTimer("diff"); }
+			assertNotNull(source);
+			Transformer t = tfac.newTransformer(source);
+			assertNotNull(t);
 
-		expected_xml = ctx.expandText(expected_xml);
-		String expected = XMLDataUtils.transform(t,getClass(), expected_xml);
-		
-		String raw = diff.toString();
-		String result = XMLDataUtils.transform(t, raw);
+			expected_xml = ctx.expandText(expected_xml);
+			expected = XMLDataUtils.transform(t,getClass(), expected_xml);
+
+			result = XMLDataUtils.transform(t, raw);
+		}else {
+			result = raw.trim();
+			expected = XMLDataUtils.readResourceAsString(getClass(), expected_xml);
+			expected.trim();
+		}
 		//System.out.println(result);
 		String differ = TestDataHelper.diff(expected, result);
 		boolean same = differ.trim().length()==0;
