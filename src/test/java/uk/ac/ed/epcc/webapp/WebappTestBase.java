@@ -43,6 +43,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.stream.StreamSource;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -256,18 +257,28 @@ public abstract class WebappTestBase implements ContextHolder{
 		String expected;
 		String raw=diff.toString();
 		String result;
+		expected_xml = ctx.expandText(expected_xml);
 		if( normalize_transform != null ) {
+			
+			String expected_text = XMLDataUtils.readResourceAsString(getClass(),expected_xml);
+			// Do a shortcut test in case the two are identical
+			if( expected_text.trim().equals(raw.trim())) {
+				System.out.println("@@@@@@ Shortcut Diff @@@@@@");
+				return;
+			}
+			
+			
 			//This is a XSL transform to edit the dates in the project log as these will depend on the time the test is run.
 			TransformerFactory tfac = TransformerFactory.newInstance();
+			
 			Source source = XMLDataUtils.readResourceAsSource(getClass(), normalize_transform);
 			if( timer !=null){ timer.stopTimer("diff"); }
 			assertNotNull(source);
 			Transformer t = tfac.newTransformer(source);
 			assertNotNull(t);
 
-			expected_xml = ctx.expandText(expected_xml);
-			expected = XMLDataUtils.transform(t,getClass(), expected_xml);
-
+			
+			expected = XMLDataUtils.transform(t,new StreamSource(new StringReader(expected_text)));
 			result = XMLDataUtils.transform(t, raw);
 		}else {
 			result = raw.trim();
@@ -388,9 +399,18 @@ protected void writeFile(String file_name, byte data[]) throws IOException {
 	 * @throws TransformerFactoryConfigurationError
 	 * @throws TransformerConfigurationException
 	 * @throws TransformerException
+	 * @throws IOException 
 	 */
 	public void checkContent(String normalize_transform, String expected_xml, String content)
-			throws TransformerFactoryConfigurationError, TransformerConfigurationException, TransformerException {
+			throws TransformerFactoryConfigurationError, TransformerConfigurationException, TransformerException, IOException {
+		
+		String expected_text = XMLDataUtils.readResourceAsString(getClass(), expected_xml);
+		// shortcut test
+		if( content.trim().equals(expected_text.trim())) {
+			System.out.println("@@@@ Shortcut checkConent @@@@@@");
+			return;
+		}
+		
 		TransformerFactory tfac = TransformerFactory.newInstance();
 		 Transformer tt;
 		 if( normalize_transform == null ){
@@ -404,7 +424,7 @@ protected void writeFile(String file_name, byte data[]) throws IOException {
 		 
 		String result = XMLDataUtils.transform(tt, content);
 		
-		 String expected = XMLDataUtils.transform(tt,getClass(), expected_xml);
+		 String expected = XMLDataUtils.transform(tt,new StreamSource(new StringReader(expected_text)));
 		 
 		 String differ = TestDataHelper.diff(expected, result);
 		 boolean same = differ.trim().length()==0;

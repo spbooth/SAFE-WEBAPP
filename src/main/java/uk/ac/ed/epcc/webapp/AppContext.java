@@ -1347,7 +1347,7 @@ public final class AppContext {
 				Class t = null;
 				try {
 					t = Class.forName(class_name);
-				} catch (ClassNotFoundException e) {
+				} catch (Exception e) {
 					error(e,"Class "+class_name+" not found");
 				}
 				if(t != null ){

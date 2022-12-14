@@ -316,9 +316,10 @@ public abstract class ServletTest extends WebappTestBase{
 	 * @throws TransformerException 
 	 * @throws TransformerFactoryConfigurationError 
 	 * @throws TransformerConfigurationException 
+	 * @throws IOException 
 	 * 
 	 */
-	public void checkConfirmContent(String normalise_transform,String expected) throws TransformerConfigurationException, TransformerFactoryConfigurationError, TransformerException {
+	public void checkConfirmContent(String normalise_transform,String expected) throws TransformerConfigurationException, TransformerFactoryConfigurationError, TransformerException, IOException {
 		String type = (String) req.getAttribute(WebappServlet.CONFIRM_TYPE);
 		assertNotNull(type);
 		
