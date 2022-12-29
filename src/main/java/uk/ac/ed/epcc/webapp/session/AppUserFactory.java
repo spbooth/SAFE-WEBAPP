@@ -67,14 +67,7 @@ import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
 import uk.ac.ed.epcc.webapp.model.IndexTableContributor;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
-import uk.ac.ed.epcc.webapp.model.data.Composite;
-import uk.ac.ed.epcc.webapp.model.data.CreateAction;
-import uk.ac.ed.epcc.webapp.model.data.DataCache;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
-import uk.ac.ed.epcc.webapp.model.data.PatternArg;
-import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -1172,7 +1165,7 @@ NamedFilterProvider<AU>
 		Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
 		SessionService sess =  getContext().getService(SessionService.class);
 		AppUser currentPerson = sess == null ? null : sess.getCurrentPerson();
-		try(FilterSet set = new FilterSet(new PrimaryOrderFilter<>(getTarget(),res, false))){
+		try(FilterResult<AU> set = getResult(new PrimaryOrderFilter<>(getTarget(),res, false))){
 			for(AU p : set){
                try {
 

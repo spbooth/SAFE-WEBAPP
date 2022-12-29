@@ -296,7 +296,7 @@ public Set<Integer> getBadData() throws Exception{
 	    	   // All records
 	    	   fil = new SQLAndFilter<>(getFactory().getTarget());
 	       }
-			for(O item : fac.new FilterSet(fil,0,100)){
+			for(O item : fac.getResult(fil,0,100)){
 				good.add(item.getID());
 			}
 		return good;

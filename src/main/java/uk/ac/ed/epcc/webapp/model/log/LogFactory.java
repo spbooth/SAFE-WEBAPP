@@ -623,7 +623,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 */
 	public Set<O> getOwners(ItemType.ItemValue v, int link) throws DataException {
 		HashSet<O> owners = new HashSet<>();
-		for( T item : new FilterSet(getItemFilter(v, link))){
+		for( T item : getResult(getItemFilter(v, link))){
 			owners.add((O) item.getOwner());
 		}
 		return owners;

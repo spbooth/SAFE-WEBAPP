@@ -309,21 +309,21 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 	}
 	
 	public FilterResult<F> getNew() throws DataFault{
-		return new FilterSet(getNewFilter());
+		return getResult(getNewFilter());
 	}
 	public SQLFilter<F> getNewFilter() {
 		return status.getFilter(this, NEW);
 	}
 	
 	public FilterResult<F> getActive() throws DataFault{
-		return new FilterSet(getActiveFilter());
+		return getResult(getActiveFilter());
 	}
 	public BaseFilter<F> getActiveFilter() {
 		return status.getFilter(this, ACTIVE);
 	}
 	
 	public FilterResult<F> getRetired() throws DataFault{
-		return new FilterSet(getRetiredFilter());
+		return getResult(getRetiredFilter());
 	}
 	public SQLFilter<F> getRetiredFilter() {
 		return status.getFilter(this, RETIRED);

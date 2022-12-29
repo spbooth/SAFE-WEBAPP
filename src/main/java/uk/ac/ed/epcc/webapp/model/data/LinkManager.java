@@ -746,7 +746,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	/** get A {@link FilterResult} for link objects
 	 * 
 	 * @param left  Left {@link DataObject} required null for any
-	 * @param right Right {@link DataObject} requeired null for any
+	 * @param right Right {@link DataObject} required null for any
 	 * @param fil Additional {@link BaseFilter}
 	 * @return {@link FilterResult}
 	 * @throws DataFault

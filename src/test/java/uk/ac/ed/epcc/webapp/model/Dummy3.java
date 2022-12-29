@@ -111,7 +111,7 @@ public class Dummy3 extends DataObject {
 		
 		public FilterResult<Dummy3> getWithFilter() throws DataFault{
 			AndFilter<Dummy3>fil = new AndFilter<>(getTarget());
-			return new FilterSet(fil);
+			return getResult(fil);
 			
 		}
 		@Override

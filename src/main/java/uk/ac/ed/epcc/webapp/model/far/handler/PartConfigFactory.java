@@ -92,7 +92,7 @@ public class PartConfigFactory<O extends PartOwner,P extends Part<O>> extends Da
 	
 	public Map<String,Object> getValues(P owner) throws DataFault{
 		Map<String,Object> result = new HashMap<>();
-		for( Config<P> c : new FilterSet(getPartFilter(owner))){
+		for( Config<P> c : getResult(getPartFilter(owner))){
 			result.put(c.getName(), c.getValue());
 		}
 		return result;

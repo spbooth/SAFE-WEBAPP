@@ -647,7 +647,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		return s;
 	}
 	public FilterResult<T> allbyGroup(String groupName) throws DataFault {		
-		return new FilterSet(new SQLValueFilter<>(getTarget(),res,TextFileOverlay.GROUP ,groupName.trim()));
+		return getResult(new SQLValueFilter<>(getTarget(),res,TextFileOverlay.GROUP ,groupName.trim()));
 		
 	}
 	/** Check we are only creating a new entry and one where no

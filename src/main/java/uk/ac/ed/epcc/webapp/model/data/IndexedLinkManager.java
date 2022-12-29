@@ -337,9 +337,9 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		 * create a LinkFilter
 		 * 
 		 * @param l
-		 *            required Left DataObject null for any
+		 *            required Left Indexed null for any
 		 * @param r
-		 *            requires Right DataObject null for any
+		 *            requires Right Indexed null for any
 		 * @param f
 		 *            extension Filter
 		 */
@@ -643,7 +643,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 *            Right {@link Indexed} required null for any
 	 * @param fil
 	 *            extension Filter
-	 * @return Iterator over Link
+	 * @return FilterResult over Link
 	 * @throws DataFault 
 	 * @throws DataFault
 	 */

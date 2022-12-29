@@ -166,17 +166,6 @@ public class DummyReferenceTest extends WebappTestBase{
 	}
 	
 	
-	@Test
-	public void testReferencedIterator() throws DataFault{
-		DummyReferenceFactory ref_fac = new DummyReferenceFactory(ctx);
-		Dummy1.Factory fac = new Dummy1.Factory(ctx);
-		
-		Set<Dummy1> set = ref_fac.geReferencedDummy("Ref11");
-		
-		assertEquals(1, set.size());
-		Dummy1 peer = set.iterator().next();
-		assertEquals("Test2", peer.getName());
-		
-	}
+	
 
 }

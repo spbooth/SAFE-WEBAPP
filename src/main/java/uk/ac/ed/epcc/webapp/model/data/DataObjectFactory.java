@@ -667,77 +667,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return "FilterAdapter [ factory="+DataObjectFactory.this.getClass().getSimpleName()+" tag="+DataObjectFactory.this.getTag()+"]";
 		}
     }
-    /** ResultMapper that generates the set of objects referenced from
-     * the targets selected by the filter
-     * 
-     * @author spb
-     *
-     * @param <I> destination type of reference.
-     */
-    public class ReferencedAdapter<I extends Indexed> implements ResultMapper<I>{
-    	boolean qualify = false;
-    	private final IndexedProducer<I> producer;
-    	private final String field;
-    	public ReferencedAdapter(String field, IndexedProducer<I> producer){
-    		this.field=field;
-    		this.producer=producer;
-    	}
-    	public ReferencedAdapter(IndexedTypeProducer<I,? extends IndexedProducer<I>> ref){
-    		this(ref.getField(),ref.getProducer());
-    	}
-		@Override
-		public I makeObject(ResultSet rs) throws SQLException, DataException{
-					int ref = rs.getInt(1);
-					if( ref < 1 ){
-						return null;
-					}
-					return  producer.find(ref);
-				
-		}
-
-		@Override
-		public String getTarget() {
-			StringBuilder sb = new StringBuilder();
-			sb.append("DISTINCT(");
-			res.getInfo(field).addName(sb, qualify, true);
-			sb.append(")");
-			return sb.toString();
-		}
-
-
-		@Override
-		public I makeDefault() {
-			return null;
-		}
-		@Override
-		public boolean setQualify(boolean qualify) {
-			boolean old = this.qualify;
-			this.qualify = qualify;
-			return old;
-		}
-		@Override
-		public String getModify() {
-			// Use a defined order
-			StringBuilder sb = new StringBuilder();
-			sb.append(" ORDER BY ");
-			res.getInfo(field).addName(sb, qualify, true);
-			return sb.toString();
-		}
-		@Override
-		public SQLFilter getRequiredFilter() {
-			return null;
-		}
-		@Override
-		public List<PatternArgument> getTargetParameters(
-				List<PatternArgument> list) {
-			return list;
-		}
-		@Override
-		public List<PatternArgument> getModifyParameters(
-				List<PatternArgument> list) {
-			return list;
-		}
-    }
+   
     public class FilterExists extends AbstractFinder<Boolean>{
 		public FilterExists() {
 			super();
@@ -861,47 +791,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 	   
 	}
-	/** Iterator that iterates over the set of objects referenced by the
-	 * targets selected by the filter.
-	 * 
-	 * @author spb
-	 *
-	 * @param <I> type of referenced object.
-	 */
-	public class ReferenceIterator<I extends Indexed> extends SQLResultIterator<BDO,I> {
-		
-		
-	    public ReferenceIterator(IndexedTypeProducer<I,? extends IndexedProducer<I>> ref,SQLFilter<BDO> fil) throws DataFault{
-	    	super(DataObjectFactory.this.getContext(),DataObjectFactory.this.getTarget());
-	    	setMapper(new ReferencedAdapter<>(ref));
-	    	// Don't return null
-	    	SQLAndFilter<BDO> ref_fil = new SQLAndFilter<>(DataObjectFactory.this.getTarget());
-	    	ref_fil.addFilter(fil);
-	    	ref_fil.addFilter(new NullFieldFilter<>(getTarget(),res, ref.getField(), false));
-	    	ref_fil.addFilter(new SQLValueFilter<>(getTarget(),res,ref.getField(), MatchCondition.GT, 0));
-	    	try {
-				setup(fil,0,-1);
-			} catch (DataException e) {
-				throw new DataFault("Error setting up Reference", e);
-			}
-	    }
-
-		@Override
-		protected final void addSource(StringBuilder sb) {
-			res.addSource(sb, true);
-			
-		}
-		@Override
-		protected final Set<Repository> getSourceTables() {
-			HashSet<Repository> set = new HashSet<>();
-			set.add(res);
-			return set;
-		}
-		@Override
-		protected final String getDBTag() {
-			return res.getDBTag();
-		}
-	}
+	
 	public class Finder extends AbstractFinder<BDO>{
         public Finder(){
         	this(false);
@@ -1430,13 +1320,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return false;
 		}
 	}
-	protected <I extends Indexed> Set<I> getReferenced(IndexedTypeProducer<I,? extends IndexedProducer<I>> producer, SQLFilter<BDO> fil) throws DataFault{
-		HashSet<I>res = new HashSet<>();
-		for(Iterator<I> it = new ReferenceIterator<>(producer,fil); it.hasNext();){
-			res.add(it.next());
-		}
-		return res;
-	}
+
 
 	/**
 	 * get an Iterator over all contents of a table

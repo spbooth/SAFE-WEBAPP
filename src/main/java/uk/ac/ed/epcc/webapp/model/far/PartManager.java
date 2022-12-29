@@ -342,7 +342,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 	 * @throws DataFault
 	 */
 	public FilterResult<P> getParts(O owner) throws DataFault{
-		return new FilterSet(getOwnerFilter(owner));
+		return getResult(getOwnerFilter(owner));
 	}
 
 
