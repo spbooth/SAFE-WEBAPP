@@ -32,7 +32,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.codec.binary.Base32;
+
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
@@ -148,8 +148,8 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 			clearSecret(user);
 			return;
 		}
-		Base32 codec = new Base32(false);
-		getRecord(user).setProperty(SECRET_FIELD, codec.encodeAsString(key.getEncoded()));
+		
+		getRecord(user).setProperty(SECRET_FIELD, Base32.encode(key.getEncoded()));
 	}
 	public void setSecret(A user, String enc) {
 		if( enc == null || enc.isEmpty()) {
@@ -169,8 +169,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
     	if( enc == null || enc.isEmpty()) {
     		return null;
     	}
-    	Base32 codec = new Base32();
-    	return new SecretKeySpec(codec.decode(enc), ALG);
+    	return new SecretKeySpec(Base32.decode(enc), ALG);
     }
 	public Key getSecret(A user) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeySpecException {
 		String secret = getRecord(user).getStringProperty(SECRET_FIELD);
@@ -183,12 +182,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		if( key == null) {
 			return null;
 		}
-		Base32 codec = new Base32();
-		String encode = codec.encodeToString(key.getEncoded());
-		int pos = encode.indexOf('=');
-		if( pos > -1) {
-			encode=encode.substring(0, pos);
-		}
+		String encode = Base32.encode(key.getEncoded());
 		return encode;
 	}
 	private static final String ALG="HmacSHA1";

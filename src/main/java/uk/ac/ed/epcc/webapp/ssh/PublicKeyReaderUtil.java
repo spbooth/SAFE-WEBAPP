@@ -43,16 +43,16 @@ import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.interfaces.DSAParams;
 import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.RSAKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.Base64;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
-import org.apache.commons.codec.binary.Base64;
-
+import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
 import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException.ErrorCode;
+import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.SSH2DataBuffer;
 
 /**
  * The class is a utility class to read OpenSSH or SECSH encoded public key
@@ -130,7 +130,7 @@ public final class PublicKeyReaderUtil
                     PublicKeyParseException.ErrorCode.UNKNOWN_PUBLIC_KEY_FILE_FORMAT);
         }
 
-        final SSH2DataBuffer buf = new SSH2DataBuffer(Base64.decodeBase64(base64.getBytes()));
+        final SSH2DataBuffer buf = new SSH2DataBuffer(Base64.getDecoder().decode(base64));
         final String type = buf.readString();
         final PublicKey ret;
         if (PublicKeyReaderUtil.SSH2_DSA_KEY.equals(type))  {
@@ -160,7 +160,7 @@ public final class PublicKeyReaderUtil
     		sb.append(" ");
     		SSH2ByteBuffer buf = new SSH2ByteBuffer();
     		packRSAkey(pub, buf);
-    		sb.append(Base64.encodeBase64String(buf.toByteArray()));
+    		sb.append(Base64.getEncoder().encodeToString(buf.toByteArray()));
     	}else if( alg.equalsIgnoreCase("DSA")){
     		DSAPublicKey pub = (DSAPublicKey) key;
     		sb.append(SSH2_DSA_KEY);
@@ -168,7 +168,7 @@ public final class PublicKeyReaderUtil
     		SSH2ByteBuffer buf = new SSH2ByteBuffer();
     		
     		packDSAkey(pub, buf);
-    		sb.append(Base64.encodeBase64String(buf.toByteArray()));
+    		sb.append(Base64.getEncoder().encodeToString(buf.toByteArray()));
     	}else{
     		throw new PublicKeyParseException(ErrorCode.UNKNOWN_PUBLIC_KEY_FILE_FORMAT);
     	}
@@ -225,6 +225,7 @@ public final class PublicKeyReaderUtil
     	return format(load(key));
     }
    
+    
     /**
      * <p>Extracts from the OpenSSH public key format the base64 encoded SSH
      * public key.</p>
@@ -247,9 +248,13 @@ public final class PublicKeyReaderUtil
             final StringTokenizer st = new StringTokenizer(_key);
             st.nextToken();
             StringBuilder sb =new StringBuilder();
-            sb.append(st.nextToken());
             while( st.hasMoreTokens()) {
-            	sb.append(st.nextToken());
+            	String tok = st.nextToken();
+            	if( tok.matches("[A-Za-z0-9+/=]+")) {
+            		sb.append(tok);
+            	}else {
+            		break;
+            	}
             }
             base64 = sb.toString();
             if( base64.isEmpty()) {

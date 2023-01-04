@@ -27,6 +27,7 @@ import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Base64;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +40,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
-import org.apache.commons.codec.binary.Base64;
+
 import org.junit.After;
 import org.junit.Before;
 
@@ -657,7 +658,7 @@ public abstract class ServletTest extends WebappTestBase{
 	
 	public void setBasicAuth(String name,String password) throws UnsupportedEncodingException {
 		String pack=name+":"+password;
-		req.header.put("Authorization", "Basic "+Base64.encodeBase64String(pack.getBytes("UTF-8")));
+		req.header.put("Authorization", "Basic "+Base64.getEncoder().encodeToString(pack.getBytes("UTF-8")));
 	}
 	
 	public void setToken(String token) {

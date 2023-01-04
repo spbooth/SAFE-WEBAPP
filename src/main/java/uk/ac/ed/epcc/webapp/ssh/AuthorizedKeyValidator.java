@@ -17,10 +17,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.interfaces.RSAKey;
+import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.codec.binary.Base64;
+
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -148,7 +149,7 @@ public class AuthorizedKeyValidator extends AbstractContexed implements FieldVal
 		   throw new ValidateException("Missing Base64 encoded key");
 	   }
 	   String base64 = base64_m.group(1);
-	   final SSH2DataBuffer buf = new SSH2DataBuffer(Base64.decodeBase64(base64.getBytes()));
+	   final SSH2DataBuffer buf = new SSH2DataBuffer(Base64.getDecoder().decode(base64.getBytes()));
 	   try {
 		   // The certificate should start with the correct algorithm.
 		   // don't validate beyond this
@@ -196,7 +197,7 @@ public class AuthorizedKeyValidator extends AbstractContexed implements FieldVal
 		   throw new ParseException("Missing Base64 encoded key");
 	   }
 	   String base64 = base64_m.group(1);
-	   base64 = Base64.encodeBase64String(Base64.decodeBase64(base64));
+	   base64 = Base64.getEncoder().encodeToString(Base64.getDecoder().decode(base64));
 	   return algorithm+" "+base64;
    }
    /** Get just the Base64 encoded key-block without options or algorithm.
@@ -227,7 +228,7 @@ public class AuthorizedKeyValidator extends AbstractContexed implements FieldVal
 		   throw new ParseException("Missing Base64 encoded key");
 	   }
 	   String base64 = base64_m.group(1);
-	   base64 = Base64.encodeBase64String(Base64.decodeBase64(base64));
+	   base64 = Base64.getEncoder().encodeToString(Base64.getDecoder().decode(base64));
 	   return base64;
    }
    public String fingerprint(String key) throws ParseException, NoSuchAlgorithmException {
@@ -255,7 +256,7 @@ public class AuthorizedKeyValidator extends AbstractContexed implements FieldVal
 	   
 	   MessageDigest messageDigest = MessageDigest.getInstance("MD5");
        
-       byte[] digest = messageDigest.digest(Base64.decodeBase64(base64.getBytes()));
+       byte[] digest = messageDigest.digest(Base64.getDecoder().decode(base64.getBytes()));
        final StringBuilder toRet = new StringBuilder();
        toRet.append("MD5");
        for (int i = 0; i < digest.length; i++) {
@@ -293,10 +294,10 @@ public class AuthorizedKeyValidator extends AbstractContexed implements FieldVal
 	   
 	   MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
        
-       byte[] digest = messageDigest.digest(Base64.decodeBase64(base64.getBytes()));
+       byte[] digest = messageDigest.digest(Base64.getDecoder().decode(base64));
        final StringBuilder toRet = new StringBuilder();
        toRet.append("SHA256:");
-       String b = Base64.encodeBase64String(digest);
+       String b = Base64.getEncoder().encodeToString(digest);
        while( b.endsWith("=")) {
     	   b = b.substring(0, b.length()-1);
        }

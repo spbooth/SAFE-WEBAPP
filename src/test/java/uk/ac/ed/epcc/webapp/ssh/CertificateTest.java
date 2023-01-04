@@ -27,7 +27,7 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.apache.commons.codec.binary.Base64;
+import java.util.Base64;
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
@@ -86,7 +86,7 @@ public class CertificateTest extends WebappTestBase {
 		String parts[] = input.split("\\s+");
 		
 		String base64 = parts[1];
-		byte[] data = Base64.decodeBase64(base64.getBytes());
+		byte[] data = Base64.getDecoder().decode(base64);
 		SSH2DataBuffer buf = new SSH2DataBuffer(data);
 		
 		String type=buf.readString();
@@ -124,7 +124,7 @@ public class CertificateTest extends WebappTestBase {
 		System.out.println("pos="+pos);
 		byte signature[] = buf.readByteArray();
 		assertEquals(0, buf.remaining());
-		String ca_base64 = Base64.encodeBase64String(sig_key);
+		String ca_base64 = Base64.getEncoder().encodeToString(sig_key);
 		SSH2DataBuffer key_buf = new SSH2DataBuffer(sig_key);
 		String ca_key_type= key_buf.readString();
 		assertEquals("ssh-rsa",ca_key_type);
@@ -144,7 +144,7 @@ public class CertificateTest extends WebappTestBase {
 		String ca_pub_parts[] = ca_pub.split("\\s+");
 		assertEquals(ca_pub_parts[1], ca_base64);
 		
-		System.out.println("Signature="+Base64.encodeBase64String(signature));
+		System.out.println("Signature="+Base64.getEncoder().encodeToString(signature));
 		SSH2DataBuffer sig_buf = new SSH2DataBuffer(signature);
 		String sig_type = sig_buf.readString();
 		System.out.println(sig_type);
@@ -238,7 +238,7 @@ public class CertificateTest extends WebappTestBase {
 		
 		String base64String = ca_parts[1];
 		System.out.println(base64String);
-		byte[] decode_data = Base64.decodeBase64(base64String);
+		byte[] decode_data = Base64.getDecoder().decode(base64String);
 		SSH2DataBuffer key_buf = new SSH2DataBuffer(decode_data);
 		String type = key_buf.readString();
 		System.out.println(type);

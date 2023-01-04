@@ -17,7 +17,7 @@
 <Salt>yO8LP6wxqg2bDXFi</Salt>
 <Alg>2</Alg>
 <Password>2572d3b5ffd52179d57b1b81708b3bdbccaa698c7c68c45e387d3e448fbc7af7</Password>
-<AuthCodeSecret>UJ4SLJJPNPXVGIPLXDTQUGVKNI======</AuthCodeSecret>
+<AuthCodeSecret>UJ4SLJJPNPXVGIPLXDTQUGVKNI</AuthCodeSecret>
 </Person>
 <TableSpecification name='role_table'>
 <PersonID type='Integer' nullable='false'/>
