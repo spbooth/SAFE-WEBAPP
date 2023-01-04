@@ -29,7 +29,7 @@ public class AsciiConverter {
 	   coll= Collator.getInstance();
 	   coll.setStrength(Collator.PRIMARY);
 	}
-	char target[] = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
+	static final char target[] = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
 	public char convert(char input){
 		if( allow_7bit && input < 128){
 			// 7 bit ascii
