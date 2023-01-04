@@ -194,7 +194,7 @@
 		<dependency>
     		<groupId>commons-io</groupId>
   			<artifactId>commons-io</artifactId>
-    		<version>2.10.0</version>
+    		<version>2.11.0</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
 		<dependency>
@@ -206,7 +206,7 @@
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
-			<version>2.7.6</version>
+			<version>2.7.7</version>
 			<exclusions>
 			<exclusion><groupId>org.apache.ant</groupId><artifactId>ant</artifactId></exclusion>
 			</exclusions>
