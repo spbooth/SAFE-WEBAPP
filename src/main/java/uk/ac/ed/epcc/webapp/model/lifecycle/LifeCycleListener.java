@@ -13,8 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.lifecycle;
 
-import org.apache.logging.log4j.core.appender.rolling.TriggeringPolicy;
-
 /** A {@link LifeCycleListener} is a class with an interest in a particular 
  * life-cycle event such as object retirement. Usually this is used to handle cascaded changes required
  * by other classes that reference the target.
@@ -33,21 +31,30 @@ import org.apache.logging.log4j.core.appender.rolling.TriggeringPolicy;
  */
 
 public interface LifeCycleListener<R> extends ActionListener<R> {
-	/** The target has started the event but will be waiting for external actions to be completed.
-	 * This allows the {@link LifeCycleListener} to make some immediate changes without waiting for
-	 * the external action to complete. These changes should ideally be capable of reverse/cancel as the operation may still be aborted by calling {@link #abort(Object)} rather than
+	/** The target has started the event but external operations have not yet been invoked.
+	 * 
+	 * This allows the {@link LifeCycleListener} to perform pre-requisite setup for the operation.
+	 * This could include issuing pre-requisite external operations that need to be issued first.
+	 * 
+	 * These changes should ideally be capable of reverse/cancel as the operation may still be aborted by calling {@link #abort(Object)} rather than
 	 * completed by calling {@link #action(Object)}.
 	 * <p>
 	 * Normally this is called after the target has been changed to an intermediate state
-	 * but before the external operation (such as a ticket) has been requested. Setting an intermediate state on the target allows it to detect and avoid a circular 
-	 * cascade where actions in the listener re-triggers the original event.
-	 *  
+	 * but before the external operation (such as a ticket) has been requested. 
+	 * 
+	 * This allows code called from the
+	 * method to know the event has been requested but still issue operations first.
+	 *In fact these actions are normally associated with the change in state.
+	 * Setting an intermediate state on the target allows it to detect and avoid a circular 
+	 * cascade where actions in the listener re-triggers the original event. However it is best to avoid
+	 * such circular dependencies as complex cases can still result in operations being issued out of order.
+	 * Best practice is to have a unique object state while the prepare methods are run to
+	 * allow possible circular calls to be detected.
 	 * <p>
-	 * This method could trigger its own cascaded life-cycle operations if we want their external operations to be issued
-	 * before the triggering operation. However this may impact our ability to make the operations abort-able as their
-	 * cascaded external operations may already have been completed when the primary operation is aborted. 
+	 * 
+	 *  Despite this the operations should be idempotent so it is ok to re-run the {@link #prepare(Object)} method if the ticket is re-issued.
 	 *  
-	 * <p>
+	  * <p>
 	 * If there are no external actions required this method may not be called and {@link #action(Object)}
 	 * will be called directly.
 	 * <p>
@@ -63,6 +70,11 @@ public interface LifeCycleListener<R> extends ActionListener<R> {
 	
 	/** Similar to {@link #prepare(Object)} except that
 	 *  occurs after the triggering operation has been fully requested.
+	 *  
+	 *  
+	 * This allows the {@link LifeCycleListener} to make some immediate changes without waiting for
+	 * the external action to complete. These are logically after the action but with weaker guarantees
+	 * (relying on action ordering rather then waiting for completion like {@link #action(Object)} does
 	 *  
 	 *  This is slightly safer for notification etc.
 	 *  It can also be used to trigger follow on operations but these can be difficult
