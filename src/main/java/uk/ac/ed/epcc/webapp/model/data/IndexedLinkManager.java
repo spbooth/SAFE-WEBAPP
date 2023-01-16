@@ -236,7 +236,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 			}
 			if (!manager.isLeft(o)) {
 				throw new ClassCastException(
-						"Illegal type passed to LinkManager");
+						"Illegal type passed to LinkManager "+o.getClass().getCanonicalName()+" expecting "+manager.getLeftProducer().getTarget().getCanonicalName());
 			}
 			// must be explicit getProperty as we are testing for uninitialised
 			// field
@@ -268,7 +268,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 			}
 			if (!manager.isRight(o)) {
 				throw new ClassCastException(
-						"Illegal type passed to LinkManager");
+						"Illegal type passed to LinkManager "+o.getClass().getCanonicalName()+" expecting "+manager.getRightProducer().getTarget().getCanonicalName());
 			}
 
 			// must be explicit getProperty as we are testing for uninitialised
