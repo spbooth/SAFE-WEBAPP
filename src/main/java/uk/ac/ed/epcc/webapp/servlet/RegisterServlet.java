@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.servlet;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,6 +43,7 @@ import uk.ac.ed.epcc.webapp.session.WebNameFinder;
  */
 
 @WebServlet(name="RegisterServlet", urlPatterns={"/SignupServlet/*","/RegisterServlet/*"})
+@MultipartConfig
 public class RegisterServlet extends WebappServlet {
 	
 
