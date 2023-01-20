@@ -70,9 +70,9 @@ public class RangeSearch<D extends DataObject> {
 		 */
 		public InfoMapper(AppContext c) {
 			super(c);
-			addMinNumber(fac.res.getNumberExpression(fac.getTarget(), Long.class, field_name), null);
-			addMaxNumber(fac.res.getNumberExpression(fac.getTarget(), Long.class, field_name), null);
-			addSQLCount(fac.res.getNumberExpression(fac.getTarget(), Long.class, field_name), null);
+			addMinNumber(fac.res.getNumberExpression(Long.class, field_name), null);
+			addMaxNumber(fac.res.getNumberExpression(Long.class, field_name), null);
+			addSQLCount(fac.res.getNumberExpression(Long.class, field_name), null);
 			
 		}
 
@@ -101,7 +101,7 @@ public class RangeSearch<D extends DataObject> {
 	}
 	public class InfoFinder extends FilterFinder<D, Info>{
 		public InfoFinder() {
-			super(fac.getContext(),fac.getTarget());
+			super(fac.getContext(),fac.getTag());
 			setMapper(new InfoMapper(fac.getContext()));
 		}
 
@@ -199,9 +199,9 @@ public class RangeSearch<D extends DataObject> {
 	}
 	
 	private Info query(long min, long max) throws DataException {
-		return finder.find(new SQLAndFilter<D>(fac.getTarget(), 
-				new SQLValueFilter<D>(fac.getTarget(), fac.res, field_name, MatchCondition.GE, min),
-				new SQLValueFilter<D>(fac.getTarget(), fac.res, field_name, MatchCondition.LE, max)
+		return finder.find(new SQLAndFilter<D>(fac.getTag(), 
+				new SQLValueFilter<D>(fac.res, field_name, MatchCondition.GE, min),
+				new SQLValueFilter<D>(fac.res, field_name, MatchCondition.LE, max)
 				));
 	}
 }

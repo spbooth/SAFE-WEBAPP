@@ -50,7 +50,7 @@ public class LinkHistorySQLFilter<L extends Indexed, R extends Indexed,
 	private final M linkHistoryManager;
 
 	public LinkHistorySQLFilter( M linkHistoryManager, L left, R right) {
-		super(linkHistoryManager.getTarget());
+		super(linkHistoryManager.getTag());
 		this.linkHistoryManager = linkHistoryManager;
 		if( left != null && right != null){
 			// should use normal HistoryFilter with peer id.

@@ -47,16 +47,16 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  */
 public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> implements IndexedSQLValue<T, I> , GroupingSQLValue<IndexedReference>{
 
-	public ConstIndexedSQLValue(AppContext conn, Class<T> clazz, IndexedReference<I> val) {
+	public ConstIndexedSQLValue(AppContext conn, IndexedReference<I> val) {
 		super();
 		this.conn = conn;
-		this.clazz = clazz;
+		
 		this.val = val;
 		assert( val != null);
 	}
 
 	private final AppContext conn;
-	private final Class<T> clazz;
+	
 	private final IndexedReference<I> val;
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#add(java.lang.StringBuilder, boolean)
@@ -107,7 +107,7 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	@Override
 	public SQLFilter<T> getFilter(MatchCondition match, IndexedReference val)
 			throws CannotFilterException, NoSQLFilterException {
-		return new GenericBinaryFilter<>(clazz, this.val.equals(val));
+		return new GenericBinaryFilter<>( this.val.equals(val));
 	}
 
 	/* (non-Javadoc)
@@ -116,7 +116,7 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	@Override
 	public SQLFilter<T> getNullFilter(boolean is_null) throws CannotFilterException, NoSQLFilterException {
 		// its never null
-		return new GenericBinaryFilter<>(clazz, ! is_null);
+		return new GenericBinaryFilter<>( ! is_null);
 	}
 
 	/* (non-Javadoc)
@@ -132,8 +132,12 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilterType()
 	 */
 	@Override
-	public Class<T> getFilterType() {
-		return clazz;
+	public String getFilterTag() {
+		try {
+			return getFactory().getTag();
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	/* (non-Javadoc)
@@ -143,7 +147,7 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	public SQLFilter<T> getSQLFilter(SQLFilter<I> fil) throws CannotFilterException {
 		try{
 			DataObjectFactory<I> fac = getFactory();
-			return Joiner.joinFixedRef(clazz, fil, fac.res, val.getID());
+			return Joiner.joinFixedRef(getFilterTag(), fil, fac.res, val.getID());
 		}catch(Exception e){
 			throw new CannotFilterException(e);
 		}
@@ -165,7 +169,6 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((clazz == null) ? 0 : clazz.hashCode());
 		result = prime * result + ((val == null) ? 0 : val.hashCode());
 		return result;
 	}
@@ -182,11 +185,6 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 		if (getClass() != obj.getClass())
 			return false;
 		ConstIndexedSQLValue other = (ConstIndexedSQLValue) obj;
-		if (clazz == null) {
-			if (other.clazz != null)
-				return false;
-		} else if (!clazz.equals(other.clazz))
-			return false;
 		if (val == null) {
 			if (other.val != null)
 				return false;
@@ -225,7 +223,7 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	 */
 	@Override
 	public SQLExpression<Integer> getIDExpression() {
-		return new ConstExpression<>(clazz,Integer.class, Integer.valueOf(val.getID()));
+		return new ConstExpression<>(Integer.class, Integer.valueOf(val.getID()));
 	}
 	
 

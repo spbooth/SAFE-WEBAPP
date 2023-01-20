@@ -10,19 +10,15 @@ import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
  */
 public class GlobalPermissionClause<T extends DataObject> implements PermissionClause<T> {
 
-	public GlobalPermissionClause(Class<T> target, String role) {
+	public GlobalPermissionClause(String role) {
 		super();
-		this.target = target;
 		this.role = role;
 	}
 
-	private final Class<T> target;
+	
 	private final String role;
 	
-	@Override
-	public Class<T> getTarget() {
-		return target;
-	}
+	
 
 	@Override
 	public <X> X accept(PermissionVisitor<X, T> visitor) throws UnknownRelationshipException {
@@ -47,7 +43,7 @@ public class GlobalPermissionClause<T extends DataObject> implements PermissionC
 		if (getClass() != obj.getClass())
 			return false;
 		GlobalPermissionClause other = (GlobalPermissionClause) obj;
-		return other.role.equals(role) && other.target==target;
+		return other.role.equals(role) ;
 	}
 
 	@Override

@@ -303,11 +303,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 	public final String getPartTag(){
 		return part_tag;
 	}
-	@Override
-	public Class<P> getTarget(){
-		return (Class) Part.class;
-	}
-
+	
 	
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c,
@@ -355,14 +351,14 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 	}
 	
 	public P findByParentAndName(O owner,String name) throws DataException{
-		SQLAndFilter<P> fil = new SQLAndFilter<>(getTarget());
+		SQLAndFilter<P> fil = new SQLAndFilter<>(getTag());
 		fil.addFilter(getOwnerFilter(owner));
-		fil.addFilter(new SQLValueFilter<>(getTarget(), res, NAME_FIELD, name));
+		fil.addFilter(new SQLValueFilter<>( res, NAME_FIELD, name));
 		return find(fil,true);
 	}
 	private class MaxFinder extends AbstractFinder<Number>{
 		private MaxFinder(){
-			setMapper(new ValueResultMapper<>(FuncExpression.apply(getContext(),SQLFunc.MAX,Number.class,res.getNumberExpression(getTarget(), Number.class, ORDER_FIELD))));
+			setMapper(new ValueResultMapper<>(FuncExpression.apply(getContext(),SQLFunc.MAX,Number.class,res.getNumberExpression(Number.class, ORDER_FIELD))));
 		}
 	}
 	private int getNextPosition(O owner) throws DataException{
@@ -432,8 +428,8 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
 		@Override
-		public Class<P> getTarget() {
-			return PartManager.this.getTarget();
+		public String getTag() {
+			return PartManager.this.getTag();
 		}
 
 		/* (non-Javadoc)
@@ -443,13 +439,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		public List<OrderClause> OrderBy() {
 			return order;
 		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter#accept(java.lang.Object)
-		 */
-		@Override
-		public void accept(P o) {
-			
-		}
+		
 		
 	}
 	/** get the next sibling (offspring of same parent)
@@ -460,10 +450,10 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 	 * @throws DataFault
 	 */
 	public P getSibling(P current, boolean up) throws DataFault{
-		SQLAndFilter<P> fil = new SQLAndFilter<>(getTarget());
-		fil.addFilter(new SQLValueFilter<>(getTarget(), res, OWNER_FIELD, current.getOwnerID()));
-		fil.addFilter(new SQLValueFilter<>(getTarget(), res, ORDER_FIELD, up ? MatchCondition.GE : MatchCondition.LE, current.getSortOrder()));
-		fil.addFilter(new SelfReferenceFilter<>(getTarget(), res, true, makeReference(current)));
+		SQLAndFilter<P> fil = new SQLAndFilter<>(getTag());
+		fil.addFilter(new SQLValueFilter<>(res, OWNER_FIELD, current.getOwnerID()));
+		fil.addFilter(new SQLValueFilter<>(res, ORDER_FIELD, up ? MatchCondition.GE : MatchCondition.LE, current.getSortOrder()));
+		fil.addFilter(new SelfReferenceFilter<>(res, true, makeReference(current)));
 		fil.addFilter(new PartOrderFilter(! up));
 		FilterIterator it = new FilterIterator(fil, 0, 1);
 		if( it.hasNext()){

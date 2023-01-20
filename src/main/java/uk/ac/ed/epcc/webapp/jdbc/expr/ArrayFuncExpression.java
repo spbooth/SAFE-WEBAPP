@@ -38,10 +38,10 @@ public class ArrayFuncExpression<F,T> implements SQLExpression<T> {
 	
     private final ArrayFunc func;
     private final SQLExpression<? extends T> e[];
-    private final Class<F> filter_class;
+    private final String filter_tag;
     private final Class<T> target_class;
-    public ArrayFuncExpression(Class<F> filter_type,ArrayFunc f, Class<T> target, SQLExpression<? extends T> ... e){
-    	this.filter_class=filter_type;
+    public ArrayFuncExpression(String tag,ArrayFunc f, Class<T> target, SQLExpression<? extends T> ... e){
+    	this.filter_tag=tag;
     	assert(f!=null);
     	// expression may be null 
     	func=f;
@@ -103,7 +103,7 @@ public class ArrayFuncExpression<F,T> implements SQLExpression<T> {
 			SQLFilter fil = x.getRequiredFilter();
 			if(fil != null){
 				if( result == null){
-					result = new SQLAndFilter<>(filter_class);
+					result = new SQLAndFilter<>(filter_tag);
 				}
 				result.addFilter(fil);
 			}

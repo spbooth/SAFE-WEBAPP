@@ -70,10 +70,10 @@ public class NumberTableTest extends WebappTestBase {
 	public void testCaseExpr() throws DataException {
 		NumberTableFactory fac = new NumberTableFactory(getContext());
 		Clause<NumberTable, Double> clause1 = new CaseExpression.Clause<>(
-				SQLExpressionMatchFilter.getFilter(fac.getTarget(),fac.getNumber1Expr(),MatchCondition.LT,fac.getNumber2Expr()),
+				SQLExpressionMatchFilter.getFilter(fac.getTag(),fac.getNumber1Expr(),MatchCondition.LT,fac.getNumber2Expr()),
 				fac.getNumber2Expr());
 		Clause<NumberTable, Double> clause2 = new CaseExpression.Clause<>(
-				SQLExpressionMatchFilter.getFilter(fac.getTarget(),fac.getNumber1Expr(),MatchCondition.GT,fac.getNumber2Expr()),
+				SQLExpressionMatchFilter.getFilter(fac.getTag(),fac.getNumber1Expr(),MatchCondition.GT,fac.getNumber2Expr()),
 				fac.getNumber1Expr());
 		CaseExpression< NumberTable,Double> expr = 
 				new CaseExpression<>(Double.class, 
@@ -104,10 +104,10 @@ public class NumberTableTest extends WebappTestBase {
 	public void testCaseExprFilter() throws DataException {
 		NumberTableFactory fac = new NumberTableFactory(getContext());
 		Clause<NumberTable, Double> clause1 = new CaseExpression.Clause<>(
-				SQLExpressionMatchFilter.getFilter(fac.getTarget(),fac.getNumber1Expr(),MatchCondition.LT,fac.getNumber2Expr()),
+				SQLExpressionMatchFilter.getFilter(fac.getTag(),fac.getNumber1Expr(),MatchCondition.LT,fac.getNumber2Expr()),
 				fac.getNumber2Expr());
 		Clause<NumberTable, Double> clause2 = new CaseExpression.Clause<>(
-				SQLExpressionMatchFilter.getFilter(fac.getTarget(),fac.getNumber1Expr(),MatchCondition.GT,fac.getNumber2Expr()),
+				SQLExpressionMatchFilter.getFilter(fac.getTag(),fac.getNumber1Expr(),MatchCondition.GT,fac.getNumber2Expr()),
 				fac.getNumber1Expr());
 		CaseExpression< NumberTable,Double> expr = 
 				new CaseExpression<>(Double.class, 
@@ -130,7 +130,7 @@ public class NumberTableTest extends WebappTestBase {
 		// 8 80 80 3      153
 		// 9 90 -1000     153
 
-		Double val = fac.getSum(SQLExpressionFilter.getFilter(fac.getTarget(), fac.getNumber1Expr(), MatchCondition.LE,  30.0),expr);
+		Double val = fac.getSum(SQLExpressionFilter.getFilter(fac.getTag(), fac.getNumber1Expr(), MatchCondition.LE,  30.0),expr);
 		assertEquals("Select value", 153.0, val.doubleValue(),0.001);
 	}
 	
@@ -139,10 +139,10 @@ public class NumberTableTest extends WebappTestBase {
 	public void testCaseExprNullFilter() throws DataException {
 		NumberTableFactory fac = new NumberTableFactory(getContext());
 		Clause<NumberTable, Double> clause1 = new CaseExpression.Clause<>(
-				SQLExpressionMatchFilter.getFilter(fac.getTarget(),fac.getNumber1Expr(),MatchCondition.LT,fac.getNumber2Expr()),
+				SQLExpressionMatchFilter.getFilter(fac.getTag(),fac.getNumber1Expr(),MatchCondition.LT,fac.getNumber2Expr()),
 				fac.getNumber2Expr());
 		Clause<NumberTable, Double> clause2 = new CaseExpression.Clause<>(
-				SQLExpressionMatchFilter.getFilter(fac.getTarget(),fac.getNumber1Expr(),MatchCondition.GT,fac.getNumber2Expr()),
+				SQLExpressionMatchFilter.getFilter(fac.getTag(),fac.getNumber1Expr(),MatchCondition.GT,fac.getNumber2Expr()),
 				fac.getNumber1Expr());
 		CaseExpression< NumberTable,Double> expr = 
 				new CaseExpression<>(Double.class, 
@@ -165,12 +165,12 @@ public class NumberTableTest extends WebappTestBase {
 		// 8 80 80 3      210    9
 		// 9 90 -1000     300    9
 
-		SQLFilter<NumberTable> fil1 = SQLExpressionNullFilter.getFilter(fac.getTarget(), fac.getNumber3Expr(), false);
+		SQLFilter<NumberTable> fil1 = SQLExpressionNullFilter.getFilter(fac.getTag(), fac.getNumber3Expr(), false);
 		Double val2 = fac.getSum(fil1,expr);
 		assertEquals("Select value", 9.0, val2.doubleValue(),0.001);
 		assertEquals("SQLExpressionNullFilter(FieldExpression(NumberTable.Number3->java.lang.Double)==null)",fil1.toString());
 		
-		SQLFilter<NumberTable> fil2 = SQLExpressionNullFilter.getFilter(fac.getTarget(), fac.getNumber3Expr(), true);
+		SQLFilter<NumberTable> fil2 = SQLExpressionNullFilter.getFilter(fac.getTag(), fac.getNumber3Expr(), true);
 		Double val = fac.getSum(fil2,expr);
 		assertEquals("Select value", 300.0, val.doubleValue(),0.001);
 		assertEquals("SQLExpressionNullFilter(FieldExpression(NumberTable.Number3->java.lang.Double)==null)",fil2.toString());

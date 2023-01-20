@@ -93,7 +93,7 @@ public class PasswordChangeRequestFactory<A extends AppUser> extends AbstractUse
 		
 		// delete any existing requests
 		FilterDelete<PasswordChangeRequest> del = new FilterDelete<>(res);
-		del.delete(new SQLValueFilter<>(getTarget(), res, USER_ID, user.getID()));
+		del.delete(new SQLValueFilter<>( res, USER_ID, user.getID()));
 		
 		PasswordAuthComposite<A> comp = user_fac.getComposite(PasswordAuthComposite.class);
 		if( comp == null ){
@@ -111,7 +111,7 @@ public class PasswordChangeRequestFactory<A extends AppUser> extends AbstractUse
 		return req;
 	}
 	public PasswordChangeRequest findByTag(String tag) throws DataException{
-		PasswordChangeRequest request = find(new SQLValueFilter<>(getTarget(),res,TAG,tag),true );
+		PasswordChangeRequest request = find(new SQLValueFilter<>(res,TAG,tag),true );
 		if( request == null ){
 			return null;
 		}

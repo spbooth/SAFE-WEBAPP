@@ -265,13 +265,13 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			}
 			// Use JoinerFilters so that if additional joins are added explicitly
 			// The join clauses will be identical and not duplicated.
-			Class<T> target = LinkManager.this.getTarget();
+			String target = LinkManager.this.getTag();
 			SQLAndFilter<T> fil = new SQLAndFilter<>(target);
 			if( join_left ){
-				fil.addFilter(new JoinerFilter<L,T>(target, getLeftField(), res, getLeftFactory().res));
+				fil.addFilter(new JoinerFilter<T,L>( getLeftField(), res, getLeftFactory().res));
 			}
 			if( join_right ){
-				fil.addFilter(new JoinerFilter<R,T>(target, getRightField(), res, getRightFactory().res));
+				fil.addFilter(new JoinerFilter<T,R>( getRightField(), res, getRightFactory().res));
 			}
 			return fil;
 		}
@@ -304,7 +304,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
         	this(fil,fil.getLeftTarget()==null,fil.getRightTarget()==null);
         }
     	public JoinLinkFilterIterator(BaseFilter<T> fil,boolean join_left,boolean join_right) throws DataFault {
-			super(LinkManager.this.getContext(),LinkManager.this.getTarget());
+			super(LinkManager.this.getContext(),LinkManager.this.getTag());
 			this.join_left=join_left;
 			this.join_right=join_right;
 			boolean use_join = join_left || join_right;
@@ -603,7 +603,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		 * @param fil
 		 */
 		public LeftAcceptFilter( BaseFilter<T> fil) {
-			super(getLeftFactory().getTarget());
+			super(getLeftFactory().getTag());
 			this.fil = fil;
 		}
 
@@ -613,7 +613,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
 		 */
 		@Override
-		public boolean accept(L o) {
+		public boolean test(L o) {
 			try {
 				return exists(new LinkFilter(o, null, fil));
 			} catch (DataException e) {
@@ -634,7 +634,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		 * @param fil
 		 */
 		public RightAcceptFilter( BaseFilter<T> fil) {
-			super(getRightFactory().getTarget());
+			super(getRightFactory().getTag());
 			this.fil = fil;
 		}
 
@@ -644,7 +644,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
 		 */
 		@Override
-		public boolean accept(R o) {
+		public boolean test(R o) {
 			try {
 				return exists(new LinkFilter(null, o,fil));
 			} catch (DataException e) {
@@ -760,10 +760,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		return new LinkFilter(left, right, fil);
 	}
 
-	@Override
-	public Class<T> getTarget(){
-		return (Class) Link.class;
-	}
+	
 	/** Get a filter for the left peer from a filter on the link
 	 * 
 	 * @param fil SQLFilter on self

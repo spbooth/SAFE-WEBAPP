@@ -15,14 +15,13 @@ import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
  */
 public class AccessRoleProviderPermissionClause<U extends AppUser,T extends DataObject> implements PermissionClause<T> {
 
-	public AccessRoleProviderPermissionClause(Class<T> target, AccessRoleProvider<U, T> provider, Supplier<String> name,String role) {
+	public AccessRoleProviderPermissionClause(AccessRoleProvider<U, T> provider, Supplier<String> name,String role) {
 		super();
-		this.target = target;
 		this.provider = provider;
 		this.name = name;
 		this.role = role;
 	}
-	private final Class<T> target;
+	
 	private final AccessRoleProvider<U, T> provider;
 	public AccessRoleProvider<U, T> getProvider() {
 		return provider;
@@ -36,10 +35,7 @@ public class AccessRoleProviderPermissionClause<U extends AppUser,T extends Data
 		return role;
 	}
 
-	@Override
-	public Class<T> getTarget() {
-		return target;
-	}
+	
 	@Override
 	public <X> X accept(PermissionVisitor<X, T> visitor) throws UnknownRelationshipException {
 		return visitor.visitAccessRolePermissionClause(this);
@@ -51,7 +47,6 @@ public class AccessRoleProviderPermissionClause<U extends AppUser,T extends Data
 		int result = 1;
 		result = prime * result + ((provider == null) ? 0 : provider.hashCode());
 		result = prime * result + ((role == null) ? 0 : role.hashCode());
-		result = prime * result + ((target == null) ? 0 : target.hashCode());
 		return result;
 	}
 
@@ -73,11 +68,6 @@ public class AccessRoleProviderPermissionClause<U extends AppUser,T extends Data
 			if (other.role != null)
 				return false;
 		} else if (!role.equals(other.role))
-			return false;
-		if (target == null) {
-			if (other.target != null)
-				return false;
-		} else if (!target.equals(other.target))
 			return false;
 		return true;
 	}

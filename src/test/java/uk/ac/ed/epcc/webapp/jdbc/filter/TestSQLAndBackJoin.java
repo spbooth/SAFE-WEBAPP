@@ -82,7 +82,7 @@ public class TestSQLAndBackJoin extends WebappTestBase {
 		// the original filter
 		// An and combination should still work if different source records match different branches
 		// provided they all point to the same desitiona
-		AndFilter<Dummy1> fil = new AndFilter(fac.getTarget());
+		AndFilter<Dummy1> fil = new AndFilter(fac.getTag());
 		fil.addFilter((SQLFilter<? super Dummy1>) ref.getDestFilter("RefBill"));
 		fil.addFilter((SQLFilter<? super Dummy1>) ref.getDestFilter("RefBill2"));
 		
@@ -99,7 +99,7 @@ public class TestSQLAndBackJoin extends WebappTestBase {
 		// the original filter
 		// An and combination should still work if different source records match different branches
 		// provided they all point to the same desitiona
-		AndFilter<Dummy1> fil = new AndFilter(fac.getTarget());
+		AndFilter<Dummy1> fil = new AndFilter(fac.getTag());
 		fil.addFilter((SQLFilter<? super Dummy1>) ref.getDestFilter("RefBill"));
 		fil.addFilter((SQLFilter<? super Dummy1>) ref.getDestFilter("RefBill2"));
 		fil.addFilter((SQLFilter<? super Dummy1>) ref.getDestFilter("RefFred"));

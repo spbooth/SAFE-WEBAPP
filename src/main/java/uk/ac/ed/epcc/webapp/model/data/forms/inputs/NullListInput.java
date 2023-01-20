@@ -148,16 +148,16 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 			return internal.setValue(v);		
 	}
 	@Override
-	public  SQLFilter getSQLFilter(Class clazz,Repository res, String target,
+	public  SQLFilter getSQLFilter(Repository res, String target,
 			Object form_value) {
 		if( form_value == null ){
 			return null;
 		}
 		Integer i = (Integer) form_value;
 		if( i.intValue() == NULL_VALUE ){
-			return new NullFieldFilter(clazz,res,target,true);
+			return new NullFieldFilter(res,target,true);
 		}
-	    return new 	SQLValueFilter(clazz,res,target,i);
+	    return new 	SQLValueFilter(res,target,i);
 	}
 	@Override
 	public Integer convert(Object v) throws TypeException {

@@ -39,7 +39,7 @@ public class RemoteAcceptFilter<T extends DataObject, R extends DataObject> exte
 	 * @param field field to join on
 	 * @param fil {@link AcceptFilter} to apply
 	 */
-	public RemoteAcceptFilter(Class<T> target,DataObjectFactory<R> remote,String field, BaseFilter<R> fil) {
+	public RemoteAcceptFilter(String target,DataObjectFactory<R> remote,String field, BaseFilter<R> fil) {
 		super(target);
 		this.remote=remote;
 		this.field=field;
@@ -52,7 +52,7 @@ public class RemoteAcceptFilter<T extends DataObject, R extends DataObject> exte
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
 	 */
 	@Override
-	public boolean accept(T o) {
+	public boolean test(T o) {
 	    R remote_target = remote.find(o.record.getNumberProperty(field));
 	    if( remote_target == null){
 	    	return false;

@@ -208,9 +208,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		if( values.containsKey(value.getTag())){
 			throw new ConsistencyError("Duplicate tag "+value.getTag()+" in "+getClass().getCanonicalName());
 		}
-		if( ! getTarget().isAssignableFrom(value.getClass())){
-			throw new ConsistencyError("Register called on invalid class "+getTarget().getCanonicalName()+" not assignable from "+value.getClass().getCanonicalName());
-		}
+		
 		// store value in parent type.
 		values.put(value.getTag(), value);
 	}
@@ -279,7 +277,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		if( val == null ){
 			return null;
 		}
-		return new SQLValueFilter<I>(fac.getTarget(), fac.res, getField(), val.getTag());
+		return new SQLValueFilter<I>( fac.res, getField(), val.getTag());
 	}
 	
 	/** Get a filter excluding a value
@@ -291,7 +289,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 	 */
 	@Override
 	public final <I extends DataObject> SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,T val){
-		return new SQLValueFilter<I>(fac.getTarget(), fac.res, getField(), val.getTag(),true);
+		return new SQLValueFilter<I>( fac.res, getField(), val.getTag(),true);
 	}
 	
 	
@@ -334,11 +332,7 @@ public abstract class BasicType<T extends BasicType.Value> implements TypeProduc
 		return set;
 	}
 
-	@Override
-	public Class<T> getTarget() {
-		
-		return (Class<T>) Value.class;
-	}
+	
 	@Override
 	public String toString(){
 		return getClass().getSimpleName()+"."+field;

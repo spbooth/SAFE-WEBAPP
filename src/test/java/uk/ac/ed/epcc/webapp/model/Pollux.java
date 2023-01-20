@@ -85,7 +85,7 @@ public class Pollux extends DataObject implements Removable {
     	}
 		
 		public SQLExpression<String> getNameExpression(){
-			return res.getStringExpression(getTarget(), NAME);
+			return res.getStringExpression(NAME);
 		}
 		
 		@Override
@@ -103,19 +103,13 @@ public class Pollux extends DataObject implements Removable {
 		public boolean fieldExists(String name){
 			return res.hasField(name);
 		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getTarget()
-		 */
-		@Override
-		public Class<Pollux> getTarget() {
-			return Pollux.class;
-		}
+		
 		public BaseFilter<Pollux> getFilterFromPeer(BaseFilter<Castor>  fil){
 			return getRemoteFilter(new Castor.Factory(getContext()), REMOTE, fil);
 		}
 		 public class StringFilter extends SQLValueFilter<Pollux>{
 	         	public StringFilter(String s){
-	         		super(Factory.this.getTarget(),res,NAME,s);
+	         		super(res,NAME,s);
 	         	}
 	         }
     }

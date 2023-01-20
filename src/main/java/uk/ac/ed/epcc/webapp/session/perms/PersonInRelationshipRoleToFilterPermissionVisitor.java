@@ -50,7 +50,7 @@ public class PersonInRelationshipRoleToFilterPermissionVisitor<U extends AppUser
 	@Override
 	public BaseFilter<U> visitGlobalPermissionClause(GlobalPermissionClause<T> b) throws UnknownRelationshipException {
 		// roles don't enumerate
-		return new GenericBinaryFilter<>(getFactory().getTarget(),false);
+		return new GenericBinaryFilter<>(false);
 	}
 	@Override
 	public <A extends AppUser> BaseFilter<U> visitAccessRolePermissionClause(AccessRoleProviderPermissionClause<A, T> a)
@@ -68,12 +68,12 @@ public class PersonInRelationshipRoleToFilterPermissionVisitor<U extends AppUser
 		
 		boolean exists=false;
 		try {
-			exists = fac.exists(new AndFilter<T>(fac.getTarget(),f.getFilter(),fil));
+			exists = fac.exists(new AndFilter<T>(fac.getTag(),f.getFilter(),fil));
 		} catch (DataException e) {
 			getLogger().info("Error checking for filter match",e);
 			throw new UnknownRelationshipException(f.getName());
 		}
-		return new GenericBinaryFilter<U>(getFactory().getTarget(), exists);
+		return new GenericBinaryFilter<U>(exists);
 	}
 	@Override
 	public DataObjectFactory<U> getFactory() {

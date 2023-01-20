@@ -78,7 +78,7 @@ public class TestOrFilter extends WebappTestBase {
 	
 	@Test
 	public void testPattern() throws DataException {
-		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTarget(), fac);
+		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTag(), fac);
 		
 		fil.addFilter(fac.new StringFilter("fred"));
 		fil.addFilter(fac.new NumberFilter(2));
@@ -91,7 +91,7 @@ public class TestOrFilter extends WebappTestBase {
 	
 	@Test
 	public void testPatternJoin() throws DataException {
-		OrFilter<DummyReference> fil = new OrFilter<>(ref.getTarget(), ref);
+		OrFilter<DummyReference> fil = new OrFilter<>(ref.getTag(), ref);
 		
 		fil.addFilter(ref.getRemoteNameFilter("fred"));
 		fil.addFilter(ref.getRemoteNumberFilter(2));
@@ -104,7 +104,7 @@ public class TestOrFilter extends WebappTestBase {
 	}
 	@Test
 	public void testAccept() throws DataException {
-		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTarget(), fac);
+		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTag(), fac);
 		
 		fil.addFilter(fac.new StringFilter("fred"));
 		fil.addFilter(fac.new NumberAcceptFilter(2));
@@ -116,7 +116,7 @@ public class TestOrFilter extends WebappTestBase {
 	}
 	@Test
 	public void testBackJoin() throws DataException{
-		OrFilter<Dummy1> fil = new OrFilter<Dummy1>(fac.getTarget(),fac);
+		OrFilter<Dummy1> fil = new OrFilter<Dummy1>(fac.getTag(),fac);
 		
 		BaseFilter<Dummy1> freddest = ref.getDestFilter("RefFred");
 		assertTrue(fac.matches(freddest, fred));
@@ -133,7 +133,7 @@ public class TestOrFilter extends WebappTestBase {
 	}
 	@Test
 	public void testBackJoinMulti() throws DataException{
-		OrFilter<Dummy1> fil = new OrFilter<Dummy1>(fac.getTarget(),fac);
+		OrFilter<Dummy1> fil = new OrFilter<Dummy1>(fac.getTag(),fac);
 		
 		BaseFilter<Dummy1> freddest = ref.getDestFilter("RefBill");
 		assertTrue(fac.matches(freddest, bill));
@@ -150,7 +150,7 @@ public class TestOrFilter extends WebappTestBase {
 	}
 	@Test
 	public void testAcceptJoin() throws DataException {
-		OrFilter<DummyReference> fil = new OrFilter<>(ref.getTarget(), ref);
+		OrFilter<DummyReference> fil = new OrFilter<>(ref.getTag(), ref);
 		
 		fil.addFilter(ref.getRemoteNameFilter("fred"));
 		fil.addFilter(ref.getRemoteNumberAcceptFilter(2));
@@ -162,12 +162,12 @@ public class TestOrFilter extends WebappTestBase {
 	}
 	@Test
 	public void testFixedFalse() throws DataException {
-		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTarget(), fac);
+		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTag(), fac);
 		
 		fil.addFilter(fac.new StringFilter("fred"));
 		fil.addFilter(fac.new NumberAcceptFilter(2));
 		// won't change result
-		fil.addFilter(new GenericBinaryFilter<>(fac.getTarget(), false));
+		fil.addFilter(new GenericBinaryFilter<>(false));
 		assertEquals(2, fac.getCount(fil));
 		assertTrue(fac.matches(fil, fred));
 		assertTrue(fac.matches(fil, bill));
@@ -176,11 +176,11 @@ public class TestOrFilter extends WebappTestBase {
 	}
 	@Test
 	public void testFixedTrue() throws DataException {
-		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTarget(), fac);
+		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTag(), fac);
 		
 		fil.addFilter(fac.new StringFilter("fred"));
 		fil.addFilter(fac.new NumberAcceptFilter(2));
-		fil.addFilter(new GenericBinaryFilter<>(fac.getTarget(), true));
+		fil.addFilter(new GenericBinaryFilter<>( true));
 		assertEquals(3, fac.getCount(fil));
 		assertTrue(fac.matches(fil, fred));
 		assertTrue(fac.matches(fil, bill));
@@ -190,11 +190,11 @@ public class TestOrFilter extends WebappTestBase {
 	
 	@Test
 	public void testFixedAcceptTrue() throws DataException {
-		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTarget(), fac);
+		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTag(), fac);
 		
 		fil.addFilter(fac.new StringFilter("fred"));
 		fil.addFilter(fac.new NumberAcceptFilter(2));
-		fil.addFilter(new BinaryAcceptFilter(new GenericBinaryFilter<>(fac.getTarget(), true)));
+		fil.addFilter(new BinaryAcceptFilter(new GenericBinaryFilter<>( true)));
 		assertEquals(3, fac.getCount(fil));
 		assertTrue(fac.matches(fil, fred));
 		assertTrue(fac.matches(fil, bill));
@@ -203,7 +203,7 @@ public class TestOrFilter extends WebappTestBase {
 	}
 	@Test
 	public void testDual() throws DataException {
-		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTarget(), fac);
+		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTag(), fac);
 		
 		fil.addFilter(fac.new StringFilter("fred"));
 		fil.addFilter(new DualFilter<>(fac.new NumberFilter(2), fac.new NumberAcceptFilter(2)));
@@ -215,7 +215,7 @@ public class TestOrFilter extends WebappTestBase {
 	}
 	@Test
 	public void testDualJoin() throws DataException {
-		OrFilter<DummyReference> fil = new OrFilter<>(ref.getTarget(), ref);
+		OrFilter<DummyReference> fil = new OrFilter<>(ref.getTag(), ref);
 		
 		fil.addFilter(ref.getRemoteNameFilter("fred"));
 		fil.addFilter(ref.getRemoteNumberDualFilter(2));
@@ -229,7 +229,7 @@ public class TestOrFilter extends WebappTestBase {
 	
 	@Test
 	public void testAndJoin() throws DataException {
-		OrFilter<DummyReference> fil = new OrFilter<>(ref.getTarget(), ref);
+		OrFilter<DummyReference> fil = new OrFilter<>(ref.getTag(), ref);
 		
 		fil.addFilter(ref.getRemoteNameFilter("fred"));
 		fil.addFilter(ref.getRemoteNumberAndFilter(2));
@@ -242,10 +242,10 @@ public class TestOrFilter extends WebappTestBase {
 	}
 	@Test
 	public void testMixed() throws DataException {
-		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTarget(), fac);
+		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTag(), fac);
 		
 		fil.addFilter(fac.new StringFilter("fred"));
-		AndFilter and = new AndFilter<>(fac.getTarget());
+		AndFilter and = new AndFilter<>(fac.getTag());
 		and.addFilter(fac.new StringFilter("bill"));
 		and.addFilter(fac.new NumberAcceptFilter(2));
 		fil.addFilter(and);
@@ -259,10 +259,10 @@ public class TestOrFilter extends WebappTestBase {
 	
 	@Test
 	public void testRemoteMixed() throws DataException {
-		OrFilter<DummyReference> fil = new OrFilter<>(ref.getTarget(), ref);
+		OrFilter<DummyReference> fil = new OrFilter<>(ref.getTag(), ref);
 		
 		fil.addFilter(ref.getRemoteNameFilter("fred"));
-		AndFilter and = new AndFilter<>(fac.getTarget());
+		AndFilter and = new AndFilter<>(fac.getTag());
 		and.addFilter(fac.new StringFilter("bill"));
 		and.addFilter(fac.new NumberAcceptFilter(2));
 		fil.addFilter(ref.getRemoteFilter(and));
@@ -275,10 +275,10 @@ public class TestOrFilter extends WebappTestBase {
 	}
 	@Test
 	public void testEmptyAnd() throws DataException {
-		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTarget(), fac);
+		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTag(), fac);
 		
 		fil.addFilter(fac.new StringFilter("fred"));
-		AndFilter and = new AndFilter<>(fac.getTarget());
+		AndFilter and = new AndFilter<>(fac.getTag());
 		
 		fil.addFilter(and);
 		assertEquals(3, fac.getCount(fil));
@@ -291,7 +291,7 @@ public class TestOrFilter extends WebappTestBase {
 	
 	private <X> void checkStd(OrFilter<X> fil, String expected) {
 		assertEquals(expected, fil.toString());
-		OrFilter<X> dup = new OrFilter<>(fil.getTarget(), fil.getMatcher());
+		OrFilter<X> dup = new OrFilter<>(fil.getTag(), fil.getMatcher());
 		dup.addFilter(fil);
 	
 		assertEquals(fil.hashCode(), dup.hashCode());
@@ -304,10 +304,10 @@ public class TestOrFilter extends WebappTestBase {
 	
 	@Test
 	public void testMixed2() throws DataException {
-		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTarget(), fac);
+		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTag(), fac);
 		
 		fil.addFilter(fac.new StringFilter("fred"));
-		AndFilter and = new AndFilter<>(fac.getTarget());
+		AndFilter and = new AndFilter<>(fac.getTag());
 		and.addFilter(fac.new StringFilter("bill"));
 		and.addFilter(fac.new NumberAcceptFilter(20));
 		fil.addFilter(and);
@@ -320,13 +320,13 @@ public class TestOrFilter extends WebappTestBase {
 	
 	@Test
 	public void testMixed3() throws DataException {
-		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTarget(), fac);
+		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTag(), fac);
 		
 		fil.addFilter(fac.new StringFilter("fred"));
-		AndFilter and = new AndFilter<>(fac.getTarget());
+		AndFilter and = new AndFilter<>(fac.getTag());
 		and.addFilter(fac.new StringFilter("bill"));
 		and.addFilter(fac.new NumberAcceptFilter(2));
-		and.addFilter(new GenericBinaryFilter<>(fac.getTarget(), false));
+		and.addFilter(new GenericBinaryFilter<>(false));
 		fil.addFilter(and);
 		assertEquals(1, fac.getCount(fil));
 		assertTrue(fac.matches(fil, fred));
@@ -337,13 +337,13 @@ public class TestOrFilter extends WebappTestBase {
 	
 	@Test
 	public void testNestedOr() throws DataException {
-		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTarget(), fac);
+		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTag(), fac);
 		
 		fil.addFilter(fac.new StringFilter("fred"));
-		OrFilter or = new OrFilter<>(fac.getTarget(),fac);
+		OrFilter or = new OrFilter<>(fac.getTag(),fac);
 		or.addFilter(fac.new StringFilter("bill"));
 		or.addFilter(fac.new NumberAcceptFilter(2));
-		or.addFilter(new GenericBinaryFilter<>(fac.getTarget(), false));
+		or.addFilter(new GenericBinaryFilter<>(false));
 		fil.addFilter(or);
 		assertEquals(2, fac.getCount(fil));
 		assertTrue(fac.matches(fil, fred));
@@ -353,7 +353,7 @@ public class TestOrFilter extends WebappTestBase {
 	}
 	@Test
 	public void testEmptyOr() throws DataException {
-		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTarget(), fac);
+		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTag(), fac);
 		assertEquals(0, fac.getCount(fil));
 		assertFalse(fac.matches(fil, fred));
 		assertFalse(fac.matches(fil, bill));

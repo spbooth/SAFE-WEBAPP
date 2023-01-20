@@ -33,8 +33,8 @@ public abstract class BaseSQLCombineFilter<T> extends BaseCombineFilter<T> imple
 	/**
 	 * @param target
 	 */
-	protected BaseSQLCombineFilter(Class<T> target) {
-		super(target);
+	protected BaseSQLCombineFilter(String tag) {
+		super(tag);
 	}
 
 	
@@ -48,9 +48,7 @@ public abstract class BaseSQLCombineFilter<T> extends BaseCombineFilter<T> imple
 		assert( fil != this ); // probably a typo
 		return (BaseSQLCombineFilter<T>) super.add(fil,true);
 	}
-	public final void accept(T o) {
-
-	}
+	
 	public final <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
 		// we can ignore join and order for an OR filter
 		if( useBinary(getFilterCombiner() == FilterCombination.OR)){

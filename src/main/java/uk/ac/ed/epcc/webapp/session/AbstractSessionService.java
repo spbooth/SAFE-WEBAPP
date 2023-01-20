@@ -982,7 +982,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 				error("tag "+tag+" failed to resolve to DataObjectFactory");
 				return false;
 			}
-			AndFilter<X> fil = new AndFilter<>(fac.getTarget());
+			AndFilter<X> fil = new AndFilter<>(fac.getTag());
 			fil.addFilter(getTargetInRelationshipRoleFilter(fac, relationship, user));
 			if( name_filter != null ) {
 				BaseFilter<? super X> nf = makeNamedFilter(fac, name_filter);
@@ -1007,7 +1007,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			DataObjectFactory<X> fac = getContext().makeObject(DataObjectFactory.class, tag);
 			if( fac == null) {
 				error("tag "+tag+" failed to resolve to DataObjectFactory");
-				return new FalseFilter<A>(login.getTarget());
+				return new FalseFilter<A>();
 			}
 			if( name_filter == null) {
 				// Any target
@@ -1016,13 +1016,13 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			BaseFilter<X> nf = makeNamedFilter(fac, name_filter);
 			if( nf == null ) {
 				error("Bad name filter on "+fac.getTag()+" "+name_filter);
-				return new FalseFilter(login.getTarget());
+				return new FalseFilter();
 			}
 			try {
 				return getPersonInRelationshipRoleToFilter(fac, relationship, FilterConverter.convert(nf));
 			}catch(CannotUseSQLException e) {
 				// Try all matching targets explicitly
-				OrFilter<A> fil = new OrFilter<>(login.getTarget(),login);
+				OrFilter<A> fil = new OrFilter<>(login.getTag(),login);
 				for(X o : fac.getResult(nf)) {
 					fil.addFilter(getPersonInRelationshipRoleFilter(fac, relationship, o));
 				}
@@ -1030,7 +1030,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			}
 		}catch(Exception t) {
 			error(t,"Error checking relationship based role");
-			return new FalseFilter<A>(login.getTarget());
+			return new FalseFilter<A>();
 		}
 	}
 	/** look for a named filter from the factory or composites.
@@ -1052,11 +1052,11 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	public final BaseFilter<A> getGlobalRoleFilter(String ...roles){
 		AppUserFactory<A> loginFactory = getLoginFactory();
 		if( roles == null || roles.length == 0) {
-			return new FalseFilter<A>(loginFactory.getTarget());
+			return new FalseFilter<A>();
 		}else if( roles.length == 1) {
 			return getGlobalRoleFilter(null, roles[0]);
 		}else {
-			OrFilter<A> or = new OrFilter<A>(loginFactory.getTarget(), loginFactory);
+			OrFilter<A> or = new OrFilter<A>(loginFactory.getTag(), loginFactory);
 			for(String role : roles) {
 				or.addFilter(getGlobalRoleFilter(null, role));
 			}
@@ -1066,16 +1066,16 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	public final BaseFilter<A> getGlobalRoleFilter(Set<String> skip,String role){
 		AppUserFactory<A> login = getLoginFactory();
 		if( role == null || role.isEmpty() || role.equalsIgnoreCase("false")) {
-			return new FalseFilter<A>(login.getTarget());
+			return new FalseFilter<A>();
 		}
 		if( role.equalsIgnoreCase("true")) {
-			return new GenericBinaryFilter<A>(login.getTarget(), true);
+			return new GenericBinaryFilter<A>(true);
 		}
 		if(role.startsWith("@")) {
 			BaseFilter<A> nf = makeNamedFilter(login, role.substring(1));
 			if( nf == null ) {
 				error("Bad named filter on AppUser "+role);
-				return new FalseFilter(login.getTarget());
+				return new FalseFilter();
 			}
 			return nf;
 		}
@@ -1100,14 +1100,14 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		skip.add(role);
 		String list = mapRoleName(role);
 		if( ! list.equals(role)) {
-			OrFilter<A> or = new OrFilter<A>(login.getTarget(), login);
+			OrFilter<A> or = new OrFilter<A>(login.getTag(), login);
 			or.addFilter(fil);
 			for(String r : list.split("\\s*,\\s*")) {
 				if( r.contains("+")) {
-					AndFilter<A> and = new AndFilter<A>(login.getTarget());
+					AndFilter<A> and = new AndFilter<A>(login.getTag());
 					for(String r2 : r.split("\\s*+\\s*")) {
 						if( skip.contains(r2)) {
-							and.addFilter(new FalseFilter<A>(login.getTarget()));
+							and.addFilter(new FalseFilter<A>());
 						}else {
 							and.addFilter(getGlobalRoleFilter(skip, r2));
 						}
@@ -1270,7 +1270,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 				return fallback;
 			}
 			// narrow the selection
-			result = new AndFilter<>(fac.getTarget(),result,fallback);
+			result = new AndFilter<>(fac.getTag(),result,fallback);
 		} catch (UnknownRelationshipException e) {
 			Throwable t = e.getCause();
 			if( t != null ) {
@@ -1331,7 +1331,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 				// Add in the default relationship filte on person
 				SQLFilter<A> fil = getLoginFactory().getDefaultRelationshipFilter();
 				if( fil != null ){
-					result = new AndFilter<>(getLoginFactory().getTarget(),result,fil);
+					result = new AndFilter<>(getLoginFactory().getTag(),result,fil);
 				}
 			}
 			if( result == null ) {
@@ -1404,7 +1404,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 				//
 				SQLFilter<T> fil = fac.getDefaultRelationshipFilter();
 				if( fil != null ){
-					result = new AndFilter<>(fac.getTarget(),result,fil);
+					result = new AndFilter<>(fac.getTag(),result,fil);
 				}
 			}
 			roles.put(store_tag, result);

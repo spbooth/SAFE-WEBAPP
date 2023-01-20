@@ -18,17 +18,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
-import uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider;
-import uk.ac.ed.epcc.webapp.jdbc.expr.NestedSQLValue;
-import uk.ac.ed.epcc.webapp.jdbc.expr.SQLAccessor;
-import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
-import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpressionFilter;
-import uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue;
-import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
-import uk.ac.ed.epcc.webapp.jdbc.filter.NoSQLFilterException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.expr.*;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeConverter;
 /** A type converter wrapper SQLValue.
  * normally you want a {@link TypeFilterProducerSQLValue}
@@ -43,14 +34,16 @@ import uk.ac.ed.epcc.webapp.model.data.convert.TypeConverter;
 public class TypeConverterSQLValue<H,T,D> implements  NestedSQLValue<T,D>, FilterProvider<H,T>{
 	
 	
-	private final Class<H> target;
-	public TypeConverterSQLValue(Class<H> target,TypeConverter<T, D> converter, SQLValue<D> inner) {
+	private final String filter_tag;
+	public TypeConverterSQLValue(String target,Class<T> type,TypeConverter<T, D> converter, SQLValue<D> inner) {
 		super();
-		this.target=target;
+		this.filter_tag=target;
 		this.converter = converter;
+		this.type=type;
 		this.inner = inner;
 	}
 	private final TypeConverter<T,D> converter;
+	private final Class<T> type;
 	private final SQLValue<D> inner;
 	
 	@Override
@@ -62,7 +55,7 @@ public class TypeConverterSQLValue<H,T,D> implements  NestedSQLValue<T,D>, Filte
 	}
 	@Override
 	public final Class<T> getTarget() {
-		return converter.getTarget();
+		return type;
 	}
 	
 	@Override
@@ -97,7 +90,7 @@ public class TypeConverterSQLValue<H,T,D> implements  NestedSQLValue<T,D>, Filte
 		if( inner instanceof FilterProvider){
 			return ((FilterProvider<H, D>)inner).getFilter(match, equiv);
 		}else if( inner instanceof SQLExpression){
-			return SQLExpressionFilter.getFilter(target,(SQLExpression<D>)inner,match, equiv);
+			return SQLExpressionFilter.getFilter(filter_tag,(SQLExpression<D>)inner,match, equiv);
 		}
 		throw new CannotFilterException();
 	}
@@ -127,8 +120,8 @@ public class TypeConverterSQLValue<H,T,D> implements  NestedSQLValue<T,D>, Filte
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilterType()
 	 */
 	@Override
-	public final Class<H> getFilterType() {
-		return target;
+	public final String getFilterTag() {
+		return filter_tag;
 	}
 
 	@Override

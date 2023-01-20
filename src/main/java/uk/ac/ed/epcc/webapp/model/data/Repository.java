@@ -2664,12 +2664,12 @@ public final class Repository implements AppContextCleanup{
 	 * @param key field name
 	 * @return {@link NumberFieldExpression}
 	 */
-	public <T extends Number,X extends DataObject> NumberFieldExpression<T,X> getNumberExpression(Class<X> filter_type,Class<T> target,String key){
+	public <T extends Number,X extends DataObject> NumberFieldExpression<T,X> getNumberExpression(Class<T> target,String key){
 		FieldInfo info = getInfo(key);
 		if( info == null || ! info.isNumeric()){
 			throw new ConsistencyError("Invalid numeric field "+getTag()+"."+key);
 		}
-		return new NumberFieldExpression<>(filter_type,target,this,key);
+		return new NumberFieldExpression<>(target,this,key);
 	}
 	/** get a {@link BooleanFieldExpression} for a field
 	 * 
@@ -2677,13 +2677,13 @@ public final class Repository implements AppContextCleanup{
 	 * @param key field name
 	 * @return {@link BooleanFieldExpression}
 	 */
-	public <X extends DataObject> BooleanFieldExpression<X> getBooleanExpression(Class<X> filter_type,String key){
+	public <X extends DataObject> BooleanFieldExpression<X> getBooleanExpression(String key){
 	
 		FieldInfo info = getInfo(key);
 		if( info == null || ! info.isBoolean()){
 			throw new ConsistencyError("Invalid boolean field "+getTag()+"."+key);
 		}
-		return new BooleanFieldExpression<>(filter_type,this,key);
+		return new BooleanFieldExpression<>(this,key);
 	}
 	/** get a {@link StringFieldExpression} for a field
 	 * 
@@ -2691,7 +2691,7 @@ public final class Repository implements AppContextCleanup{
 	 * @param key field name
 	 * @return {@link StringFieldExpression}
 	 */
-	public <X extends DataObject> StringFieldExpression<X> getStringExpression(Class<X> filter_type,String key) {
+	public <X extends DataObject> StringFieldExpression<X> getStringExpression(String key) {
 		
 		FieldInfo info = getInfo(key);
 
@@ -2699,7 +2699,7 @@ public final class Repository implements AppContextCleanup{
 			// note all types can be treated as strings
 			throw new ConsistencyError("Invalid string field "+getTag()+"."+key);
 		}
-		return new StringFieldExpression<>(filter_type,this,key);
+		return new StringFieldExpression<>(this,key);
 		
 	}
 	/** get a {@link Date} valued {@link FieldValue} for a field.
@@ -2710,17 +2710,17 @@ public final class Repository implements AppContextCleanup{
 	 * @param key field name
 	 * @return {@link FieldValue}
 	 */
-	public <X extends DataObject> FieldValue<Date,X> getDateExpression(Class<X> target,String key) {
+	public <X extends DataObject> FieldValue<Date,X> getDateExpression(String key) {
 		
 		FieldInfo info = getInfo(key);
 		if( info == null ){
 			throw new ConsistencyError("Invalid date field");
 		}
 		if( info.isDate()){
-		   return new DateFieldExpression<>(target,this,key);
+		   return new DateFieldExpression<>(this,key);
 		}
 		if( info.isNumeric()){
-			   return new TimestampDateFieldExpression<>(target,this, key);
+			   return new TimestampDateFieldExpression<>(this, key);
 		}
 		throw new ConsistencyError("Invalid date field");
 	}
@@ -2728,13 +2728,12 @@ public final class Repository implements AppContextCleanup{
 	
 	
 	/** Get a {@link IndexedFieldValue} for a reference field
-	 * @param self type of owning object
 	 * 
 	 * @param key
 	 * @return IndexedFieldValue
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends DataObject> IndexedFieldValue getReferenceExpression(Class<T> self,String key){
+	public <T extends DataObject> IndexedFieldValue getReferenceExpression(String key){
 		
 		FieldInfo info = getInfo(key);
 		if( info == null || ! info.isNumeric() || ! info.isReference()){
@@ -2742,12 +2741,12 @@ public final class Repository implements AppContextCleanup{
 		}
 		TypeProducer prod = info.getTypeProducer();
 		if( prod != null && prod instanceof IndexedTypeProducer){
-			return new IndexedFieldValue(self,this,(IndexedTypeProducer)prod);
+			return new IndexedFieldValue(this,(IndexedTypeProducer)prod);
 		}
 		throw new ConsistencyError("Invalid reference field "+getTag()+"."+key);
 	}
-	public <T extends DataObject,O,D> TypeProducerFieldValue<T,O,D> getTypeProducerExpression(TypeProducer<O,D> prod){
-		return new TypeProducerFieldValue<>(this, prod);
+	public <T extends DataObject,O,D> TypeProducerFieldValue<T,O,D> getTypeProducerExpression(Class<O> type,TypeProducer<O,D> prod){
+		return new TypeProducerFieldValue<>(this, type,prod);
 	}
 	/** Get a {@link IndexedFieldValue} for a field
 	 * The field does not have to be tagged as a reference field
@@ -2757,7 +2756,7 @@ public final class Repository implements AppContextCleanup{
 	 * @return IndexedFieldValue
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends DataObject,I extends DataObject> IndexedFieldValue<T,I> getReferenceExpression(Class<T> self,String key,IndexedProducer<I> prod){
+	public <T extends DataObject,I extends DataObject> IndexedFieldValue<T,I> getReferenceExpression(String key,IndexedProducer<I> prod){
 		
 		FieldInfo info = getInfo(key);
 		if( info == null || ! info.isNumeric() ){
@@ -2768,7 +2767,7 @@ public final class Repository implements AppContextCleanup{
 		if( info.isReference() && ! typeProducer.equals(producer)){
 			throw new ConsistencyError("Incompatible producer specified for field "+getTag()+"."+key+" "+typeProducer.toString()+"!="+producer.toString());
 		}
-		return new IndexedFieldValue<T,I>(self,this,producer);
+		return new IndexedFieldValue<T,I>(this,producer);
 		
 	}
 

@@ -41,9 +41,9 @@ import uk.ac.ed.epcc.webapp.model.data.filter.LinkClause;
  * @param <O> Type of object being produced
  *
  */
-public abstract class FilterReader<T,O> extends FilterSelect<T> implements Contexed, Targetted<T>{
+public abstract class FilterReader<T,O> extends FilterSelect<T> implements Contexed{
 	private final AppContext ctx;
-	private final Class<T> target;
+	private final String tag;
 	private BaseFilter<? super T> my_filter;
 
 	private ResultMapper<O> mapper;
@@ -51,9 +51,9 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 	
 	private boolean qualify=false;
 	private boolean db_lock=false;
-	public FilterReader(AppContext c,Class<T> target){
+	public FilterReader(AppContext c,String tag){
 		ctx=c;
-		this.target=target;
+		this.tag=tag;
 	}
 
 	public final AppContext getContext() {
@@ -94,12 +94,12 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 			}else{
 				// both non null
 				if( my_filter instanceof SQLFilter ){
-					SQLAndFilter<T> res = new SQLAndFilter<>(target);
+					SQLAndFilter<T> res = new SQLAndFilter<>(tag);
 					res.addFilter(mapper_filter);
 					res.addFilter((SQLFilter<? super T>) my_filter);
 					return res;
 				}else{
-					AndFilter<T> res = new AndFilter<>(target);
+					AndFilter<T> res = new AndFilter<>(tag);
 					res.addFilter(mapper_filter);
 					res.addFilter(my_filter);
 					return res;
@@ -109,9 +109,9 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 	}
 	protected final void setFilter(BaseFilter<? super T> f){
 		if( f != null ){
-			Class<? super T> fil_target = f.getTarget();
+			String fil_target = f.getTag();
 			//TODO enforce this always but run with assert for a bit.
-			assert(fil_target == null ||  fil_target.isAssignableFrom(target));
+			assert(fil_target == null || tag == null ||  fil_target.equals(tag));
 //			if( fil_target != null && ! fil_target.isAssignableFrom(target)){
 //				throw new ConsistencyError("Incompatible filter passed to FilterReader "+target.getCanonicalName()+" "+fil_target.getCanonicalName());
 //			}
@@ -214,8 +214,8 @@ public abstract class FilterReader<T,O> extends FilterSelect<T> implements Conte
 		return mapper.makeDefault();
 	}
 	
-	public final Class<T> getTarget(){
-		return target;
+	public final String getTag(){
+		return tag;
 	}
 
 	@Override

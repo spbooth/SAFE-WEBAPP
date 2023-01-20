@@ -33,10 +33,7 @@ public class RemotePermissionClause<T extends DataObject> implements PermissionC
 	public boolean getFieldOptional() {
 		return is_optional;
 	}
-	@Override
-	public Class<T> getTarget() {
-		return fac.getTarget();
-	}
+	
 	@Override
 	public <X> X accept(PermissionVisitor<X,T> visitor) throws UnknownRelationshipException {
 		return visitor.visitRemotePermissionClause(this);

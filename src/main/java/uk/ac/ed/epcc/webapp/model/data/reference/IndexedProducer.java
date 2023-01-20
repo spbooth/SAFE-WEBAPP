@@ -33,12 +33,7 @@ public interface IndexedProducer<A extends Indexed> extends TypeConverter<A, Num
 	public A find(int id)
 	throws uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 
-	/** Get a class object that all results of the producer are assignable to.
-	 * This is intended for run-time type checking so it should be as specific as possible
-	 * 
-	 * @return Class object for target
-	 */
-	public Class<A> getTarget();
+	
 	
 	/** Make a IndexedReference from a target object
 	 * 

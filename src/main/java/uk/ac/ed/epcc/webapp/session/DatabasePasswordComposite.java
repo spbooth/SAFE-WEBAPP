@@ -17,13 +17,7 @@ package uk.ac.ed.epcc.webapp.session;
 import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
@@ -35,20 +29,8 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.ConcatSQLExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.ConstExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.CannotUseSQLException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
-import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.LongFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
+import uk.ac.ed.epcc.webapp.jdbc.table.*;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
@@ -124,13 +106,13 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			Hash default_hash = Hash.getDefault(getContext());
 			if( getRepository().hasField(DatabasePasswordComposite.ALG)){
 				log.debug("Has alg field");
-				SQLOrFilter<T> of = new SQLOrFilter<>(getFactory().getTarget());
+				SQLOrFilter<T> of = new SQLOrFilter<>(getFactory().getTag());
 				AppContext conn = getContext();
 				for(Hash h : Hash.values()){
 					if( h.equals(default_hash) || h.isEnabled(conn)){
-						SQLAndFilter<T> clause = new SQLAndFilter<>(getFactory().getTarget());
+						SQLAndFilter<T> clause = new SQLAndFilter<>(getFactory().getTag());
 						
-						clause.addFilter(new SQLValueFilter<>(getFactory().getTarget(),getRepository(), DatabasePasswordComposite.ALG, h.ordinal()));
+						clause.addFilter(new SQLValueFilter<>(getRepository(), DatabasePasswordComposite.ALG, h.ordinal()));
 						clause.addFilter(new SQLHashFilter(getContext(),h, password));
 						of.addFilter(clause);
 					}
@@ -166,7 +148,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
 		 */
 		@Override
-		public boolean accept(T o) {
+		public boolean test(T o) {
 			Handler handler = getHandler(o);
 			Hash h = handler.getAlgorithm();
 			if( h == null || h.equals(Hash.LOCKED)){
@@ -208,8 +190,8 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
 		@Override
-		public Class<T> getTarget() {
-			return getFactory().getTarget();
+		public String getTag() {
+			return getFactory().getTag();
 		}
 
 		@Override
@@ -259,12 +241,12 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
         public SQLHashFilter(AppContext conn,Hash hash,String password) throws DataFault, CannotUseSQLException{
         	this.hash=hash;
         	this.password=password;
-        	SQLExpression<String> c = new ConstExpression<String, T>(getFactory().getTarget(),String.class, password,false);
+        	SQLExpression<String> c = new ConstExpression<String, T>(String.class, password,false);
         	if( useSalt()){
         		if( DatabasePasswordComposite.SALT_FIRST_FEATURE.isEnabled(getContext())){
-					c = new ConcatSQLExpression(getRepository().getStringExpression(getTarget(),DatabasePasswordComposite.SALT),c);
+					c = new ConcatSQLExpression(getRepository().getStringExpression(DatabasePasswordComposite.SALT),c);
 				}else{
-					c = new ConcatSQLExpression(c,getRepository().getStringExpression(getTarget(),DatabasePasswordComposite.SALT));
+					c = new ConcatSQLExpression(c,getRepository().getStringExpression(DatabasePasswordComposite.SALT));
 				}
         	}
         	DatabaseService db_service = conn.getService(DatabaseService.class);
@@ -333,8 +315,8 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
 		@Override
-		public Class<T> getTarget() {
-			return getFactory().getTarget();
+		public String getTag() {
+			return getFactory().getTag();
 		}
     	
     }
@@ -469,7 +451,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 								sb.append("=? , ");
 							}
 							res.getInfo(DatabasePasswordComposite.PASSWORD).addName(sb, false, false);
-							SQLExpression<String> crypt = sqlContext.hashFunction(h, new ConstExpression<>(getFactory().getTarget(),String.class,new_password , false));
+							SQLExpression<String> crypt = sqlContext.hashFunction(h, new ConstExpression<>(String.class,new_password , false));
 							sb.append("=");
 							crypt.add(sb, false);
 							sb.append(" WHERE ");
@@ -732,7 +714,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		}
 		// route all password checks through the same code
 		try {
-			AndFilter<T> fil = new AndFilter<>(getFactory().getTarget());
+			AndFilter<T> fil = new AndFilter<>(getFactory().getTag());
 			fil.addFilter(getFactory().getFilter(u));
 			fil.addFilter(getPasswordFilter(password));
 			T temp = getFactory().find(fil,true);
@@ -755,7 +737,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			public T findByLoginNamePassword(String email, String password,boolean check_fail_count)
 					throws DataException {
 				Logger log=getLogger();
-				AndFilter<T> fil = new AndFilter<>(getFactory().getTarget());
+				AndFilter<T> fil = new AndFilter<>(getFactory().getTag());
 				SQLFilter<T> nameFilter = getLoginFilter(email);
 				fil.addFilter(nameFilter);
 				fil.addFilter(getPasswordFilter(password));
@@ -768,7 +750,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 							
 							// atomic update via SQL
 							FilterAdd<T> adder = new FilterAdd<>(getRepository());
-							adder.update(getRepository().<Integer,T>getNumberExpression(getFactory().getTarget(),Integer.class, DatabasePasswordComposite.PASSWORD_FAILS), Integer.valueOf(1), nameFilter);
+							adder.update(getRepository().<Integer,T>getNumberExpression(Integer.class, DatabasePasswordComposite.PASSWORD_FAILS), Integer.valueOf(1), nameFilter);
 							u = getFactory().find(nameFilter,true);
 							if( u != null ) {
 								int fails = getHandler(u).getFailCount();

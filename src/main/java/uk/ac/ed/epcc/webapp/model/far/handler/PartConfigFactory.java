@@ -114,14 +114,14 @@ public class PartConfigFactory<O extends PartOwner,P extends Part<O>> extends Da
 	 * @return
 	 */
 	private SQLAndFilter<Config> getNamePartFilter(P owner, String name) {
-		return new SQLAndFilter<>(getTarget(), getPartFilter(owner),getNameFilter(name));
+		return new SQLAndFilter<>(getTag(), getPartFilter(owner),getNameFilter(name));
 	}
 	/**
 	 * @param name
 	 * @return
 	 */
 	private SQLValueFilter<Config> getNameFilter(String name) {
-		return new SQLValueFilter<>(getTarget(), res, NAME_FIELD, name);
+		return new SQLValueFilter<>(res, NAME_FIELD, name);
 	}
 
 	public void setValues(P owner,Map<String,Object> values) throws DataException{
@@ -161,10 +161,6 @@ public class PartConfigFactory<O extends PartOwner,P extends Part<O>> extends Da
 	}
 
 
-	@Override
-	public Class<Config> getTarget() {
-		return Config.class;
-	}
 
 
 	@Override

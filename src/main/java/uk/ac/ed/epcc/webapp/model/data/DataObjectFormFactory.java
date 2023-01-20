@@ -628,13 +628,7 @@ public final AppContext getContext(){
 	public final BDO find(int id) throws DataException {
 		return factory.find(id);
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer#getTarget()
-	 */
-	@Override
-	public final Class<BDO> getTarget() {
-		return factory.getTarget();
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer#makeReference(uk.ac.ed.epcc.webapp.Indexed)
 	 */

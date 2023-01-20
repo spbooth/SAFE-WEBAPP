@@ -169,24 +169,24 @@ public class MaxNotifyComposite<A extends AppUser> extends Composite<A, MaxNotif
 		if( ! apply()) {
 			return null;
 		}
-		Class<A> target = getFactory().getTarget();
+		String target = getFactory().getTag();
 		SQLAndFilter<A> fil = new SQLAndFilter<A>(target);
 		if( getRepository().hasField(NOTIFY_COUNT_FIELD)) {
-		   fil.addFilter(new SQLValueFilter<A>(target,getRepository(),NOTIFY_COUNT_FIELD,MatchCondition.LT,maxNotify()));
+		   fil.addFilter(new SQLValueFilter<A>(getRepository(),NOTIFY_COUNT_FIELD,MatchCondition.LT,maxNotify()));
 		   // low notification count first
 		   // if we limit the number of notifications sent we want those that were sent
 		   // to move down the list for the next run
-		   fil.addFilter(new FieldOrderFilter<A>(target, getRepository(), NOTIFY_COUNT_FIELD, false));
+		   fil.addFilter(new FieldOrderFilter<A>(getRepository(), NOTIFY_COUNT_FIELD, false));
 		}
 		if( include_rate_limit    && getRepository().hasField(LAST_NOTIFY__FIELD)) {
 			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 			if( time != null ) {
-				fil.addFilter(new SQLValueFilter<A>(target, getRepository(), LAST_NOTIFY__FIELD, MatchCondition.LT, 
+				fil.addFilter(new SQLValueFilter<A>(getRepository(), LAST_NOTIFY__FIELD, MatchCondition.LT, 
 				new Date(time.getCurrentTime().getTime() - (minRepeatHours() * 3600000L))));
 				// same with date more recent sends have lower priority than
 				// ones from the previous cycle.
 				// first time reminders have the highest 
-				fil.addFilter(new FieldOrderFilter<A>(target, getRepository(), LAST_NOTIFY__FIELD, false));
+				fil.addFilter(new FieldOrderFilter<A>(getRepository(), LAST_NOTIFY__FIELD, false));
 			}
 			
 		}

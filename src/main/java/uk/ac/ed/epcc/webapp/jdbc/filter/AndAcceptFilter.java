@@ -22,22 +22,22 @@ import java.util.LinkedHashSet;
  *
  */
 public class AndAcceptFilter<T> extends LinkedHashSet<AcceptFilter<? super T>> implements AcceptFilter<T> {
-	private final Class<T> target;
+	private final String tag;
 	/**
 	 * 
 	 * @param target
 	 */
-	public AndAcceptFilter(Class<T> target){
+	public AndAcceptFilter(String tag){
 		super();
-		this.target=target;
+		this.tag=tag;
 	}
 	/**
 	 * @param target 
 	 * @param c
 	 */
-	public AndAcceptFilter(Class<T> target,Collection<? extends AcceptFilter<? super T>> c) {
+	public AndAcceptFilter(String tag,Collection<? extends AcceptFilter<? super T>> c) {
 		super(c);
-		this.target=target;
+		this.tag=tag;
 	}
 
 	
@@ -46,27 +46,32 @@ public class AndAcceptFilter<T> extends LinkedHashSet<AcceptFilter<? super T>> i
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<T> getTarget() {
-		return target;
+	public String getTag() {
+		return tag;
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
 	 */
 	@Override
-	public boolean accept(T o) {
+	public boolean test(T o) {
 		for(AcceptFilter<? super T> fil : this){
-			if( ! fil.accept(o)){
+			if( ! fil.test(o)){
 				return false;
 			}
 		}
 		return true;
 	}
+	
+	@Override
+	public String toString() {
+		return "AndAcceptFilter(" + super.toString() + ")";
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((target == null) ? 0 : target.hashCode());
+		result = prime * result + ((tag == null) ? 0 : tag.hashCode());
 		return result;
 	}
 	@Override
@@ -78,16 +83,12 @@ public class AndAcceptFilter<T> extends LinkedHashSet<AcceptFilter<? super T>> i
 		if (getClass() != obj.getClass())
 			return false;
 		AndAcceptFilter other = (AndAcceptFilter) obj;
-		if (target == null) {
-			if (other.target != null)
+		if (tag == null) {
+			if (other.tag != null)
 				return false;
-		} else if (!target.equals(other.target))
+		} else if (!tag.equals(other.tag))
 			return false;
 		return true;
-	}
-	@Override
-	public String toString() {
-		return "AndAcceptFilter(" + super.toString() + ")";
 	}
 
 }

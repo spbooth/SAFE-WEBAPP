@@ -32,4 +32,7 @@ public abstract class AppUserComposite<AU extends AppUser,X extends AppUserCompo
 		super(fac);
 	}
 
+	public AppUserFactory<AU> getAppUserFactory(){
+		return (AppUserFactory<AU>) getFactory();
+	}
 }

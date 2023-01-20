@@ -41,23 +41,21 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 
 
 public class SQLValueFilter<T> implements SQLFilter<T>, PatternFilter<T> {
-	 private final Class<T> target;
 	 private final Object peer;
      private final String field;
      private final Repository parent;
      private final String match;
      
-     public SQLValueFilter(Class<T> target,Repository res,String field,Object peer){
-        this(target,res,field,peer,false);
+     public SQLValueFilter(Repository res,String field,Object peer){
+        this(res,field,peer,false);
      }
-     public SQLValueFilter(Class<T> target,Repository res,String field,Object peer, boolean negate ){
-    	this(target,res,field,negate ? "!=" : "= ",peer);
+     public SQLValueFilter(Repository res,String field,Object peer, boolean negate ){
+    	this(res,field,negate ? "!=" : "= ",peer);
      }
-     public SQLValueFilter(Class<T> target,Repository res, String field,MatchCondition cond, Object peer){
-    	 this(target,res,field,cond.match(),peer);
+     public SQLValueFilter(Repository res, String field,MatchCondition cond, Object peer){
+    	 this(res,field,cond.match(),peer);
      }
-     private SQLValueFilter(Class<T> target,Repository res,String field,String match,Object peer){
-    	 this.target=target;
+     private SQLValueFilter(Repository res,String field,String match,Object peer){
     	 parent=res;
     	 this.field=field;
     	 this.peer=peer;
@@ -148,8 +146,8 @@ public class SQLValueFilter<T> implements SQLFilter<T>, PatternFilter<T> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
-	public final Class<T> getTarget() {
-		return target;
+	public final String getTag() {
+		return parent.getTag();
 	}
 	/** Make sure sub-classes don't try to imlement OrderFilter as well
 	 * 

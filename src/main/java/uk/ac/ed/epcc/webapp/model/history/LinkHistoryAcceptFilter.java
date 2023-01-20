@@ -49,8 +49,8 @@ public class LinkHistoryAcceptFilter<L extends Indexed, R extends Indexed, T ext
 	boolean has_left_field;
 	boolean has_right_field;
 	Map<Integer,Boolean> cache;
-	public LinkHistoryAcceptFilter(Class<H> target,LinkHistoryHandler<L, R, T> linkHistoryHandler, L left, R right){
-		super(target);
+	public LinkHistoryAcceptFilter(String tag,LinkHistoryHandler<L, R, T> linkHistoryHandler, L left, R right){
+		super(tag);
 		this.linkHistoryHandler = linkHistoryHandler;
 		this.left=left;
 		this.right=right;
@@ -61,7 +61,7 @@ public class LinkHistoryAcceptFilter<L extends Indexed, R extends Indexed, T ext
 		has_right_field = this.linkHistoryHandler.canRightJoin();
 	}
 	@Override
-	public boolean accept(H h) {
+	public boolean test(H h) {
 		if( left != null ){
 			if( has_left_field ){
 				if( ! h.matchIntegerProperty(left_field, left.getID())){

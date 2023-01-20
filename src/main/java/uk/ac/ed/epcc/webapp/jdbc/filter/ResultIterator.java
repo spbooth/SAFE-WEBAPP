@@ -52,8 +52,8 @@ public abstract class ResultIterator<O> extends SQLResultIterator<O,O> implement
 	
 		
 		
-        protected ResultIterator(AppContext c,Class<O> target){
-            super(c,target);
+        protected ResultIterator(AppContext c,String tag){
+            super(c,tag);
         }
 		
 		
@@ -85,7 +85,7 @@ public abstract class ResultIterator<O> extends SQLResultIterator<O,O> implement
 				return super.iterate();
 			}
 			O next=super.iterate();
-			while( next != null && ! f.accept(next)){
+			while( next != null && ! f.test(next)){
 				next=super.iterate();
 			}
 			if( next != null && vis != null ){

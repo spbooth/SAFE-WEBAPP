@@ -35,11 +35,11 @@ import uk.ac.ed.epcc.webapp.model.data.filter.BackJoinFilter;
 
 public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<T>, AcceptFilter<T>{
     protected LinkedHashSet<AcceptFilter<? super T>> accepts= new LinkedHashSet<>();
-    public AndFilter(Class<T> target){
-    	super(target);
+    public AndFilter(String tag){
+    	super(tag);
     }
-    public AndFilter(Class<T> target,BaseFilter<? super T> ... fil){
-    	super(target);
+    public AndFilter(String tag,BaseFilter<? super T> ... fil){
+    	super(tag);
     	for(BaseFilter<? super T> f: fil){
     		add(f,true);
     	}
@@ -57,9 +57,9 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
      * they can add an inner class AcceptFiler in the constructor.
      */
 	@Override
-	public final boolean  accept(T o) {
+	public final boolean  test(T o) {
 		for(AcceptFilter<? super T> acc: accepts){
-			if( ! acc.accept(o)){
+			if( ! acc.test(o)){
 				return false;
 			}
 		}
@@ -109,9 +109,9 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 	 * @return {@link SQLFilter}
 	 */
 	public SQLFilter<T> getNarrowingFilter()  {
-		SQLAndFilter<T> res = new SQLAndFilter<>(getTarget());
+		SQLAndFilter<T> res = new SQLAndFilter<>(getTag());
 		if( isForced()){
-			res.addFilter(new GenericBinaryFilter<>(target, getBooleanResult()));
+			res.addFilter(new GenericBinaryFilter<>( getBooleanResult()));
 		}else{
 			for(PatternFilter<? super T> pat : filters){
 				res.addPatternFilter(pat);
@@ -151,7 +151,7 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
 			// a AndAcceptFilter will inhibit optimisation later
 			return (AcceptFilter<T>) accepts.iterator().next();
 		}
-		return new AndAcceptFilter<>(getTarget(), accepts);
+		return new AndAcceptFilter<>(getTag(), accepts);
 	}
 	public final AndFilter<T> addFilter(BaseFilter<? super T> fil){
 		return (AndFilter<T>) super.add(fil,true);

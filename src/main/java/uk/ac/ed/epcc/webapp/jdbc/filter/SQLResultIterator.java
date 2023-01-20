@@ -111,8 +111,8 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 		}
 		
 		
-        protected SQLResultIterator(AppContext c, Class<T> target){
-            super(c,target);
+        protected SQLResultIterator(AppContext c, String tag){
+            super(c,tag);
             use_chunking = CHUNKING_FEATURE.isEnabled(getContext());
 			chunk = getContext().getIntegerParameter("chunksize", DEFAULT_CHUNKSIZE);
         }

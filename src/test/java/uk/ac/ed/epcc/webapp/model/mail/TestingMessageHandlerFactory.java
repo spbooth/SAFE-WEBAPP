@@ -104,11 +104,6 @@ public class TestingMessageHandlerFactory<H extends TestingMessageHandlerFactory
 	}
 
 	@Override
-	public Class<H> getTarget() {
-		return (Class<H>) ExampleMessage.class;
-	}
-
-	@Override
 	public boolean canRead(
 			H h,
 			SessionService<?> user) {

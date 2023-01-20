@@ -22,7 +22,6 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 /** filter to select on null/non-null fields 
@@ -34,12 +33,10 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 public class NullFieldFilter<T> implements PatternFilter<T>, SQLFilter<T>{
-	private final Class<T> target;
     private final boolean match_null;
     private final String field;
     private final Repository res;
-    public NullFieldFilter(Class<T> target,Repository res,String field, boolean match_null){
-    	this.target=target;
+    public NullFieldFilter(Repository res,String field, boolean match_null){
     	this.field=field;
     	this.match_null=match_null;
     	this.res = res;
@@ -104,8 +101,9 @@ public class NullFieldFilter<T> implements PatternFilter<T>, SQLFilter<T>{
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
-	public Class<T> getTarget() {
-		return target;
+	@Override
+	public String getTag() {
+		return res.getTag();
 	}
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

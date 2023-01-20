@@ -66,7 +66,7 @@ public interface RequiredPage<U extends AppUser> {
      * @return
      */
     default BaseFilter<U> notifiable(SessionService<U> sess){
-    	return new FalseFilter<U>(sess.getLoginFactory().getTarget()) ;
+    	return new FalseFilter<U>() ;
     }
     
     /** If a notification email is being sent (possibly triggered 

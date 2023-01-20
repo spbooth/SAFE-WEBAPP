@@ -32,7 +32,7 @@ public interface SQLFilter<T> extends BaseSQLFilter<T> {
 	 * 
 	 * @param o
 	 */
-	default public void accept(T o) {
+	default public void test(T o) {
 		
 	}
 }

@@ -29,7 +29,6 @@ import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.IndexTableContributor;
 import uk.ac.ed.epcc.webapp.model.data.CreateComposite;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
@@ -67,7 +66,7 @@ public class SignupDateComposite<BDO extends AppUser> extends CreateComposite<BD
 	}
 
 	public SQLFilter<BDO> getFilter(MatchCondition m, Date point){
-		return new SQLValueFilter<>(getFactory().getTarget(), getRepository(), SIGNUP_DATE, m,point);
+		return new SQLValueFilter<>( getRepository(), SIGNUP_DATE, m,point);
 	}
 
 	@Override
@@ -119,10 +118,10 @@ public class SignupDateComposite<BDO extends AppUser> extends CreateComposite<BD
 	public SQLFilter<BDO> signupBeforeFilter(Date d){
 		if( getRepository().hasField(SIGNUP_DATE)) {
 			DataObjectFactory<BDO> factory = getFactory();
-			Class<BDO> target = factory.getTarget();
+			String target = factory.getTag();
 			SQLOrFilter<BDO> or = new SQLOrFilter<BDO>(target);
-			or.addFilter(new SQLValueFilter<BDO>(target, getRepository(), SIGNUP_DATE,MatchCondition.LT, d));
-			or.addFilter(new NullFieldFilter<BDO>(target, getRepository(), SIGNUP_DATE, true));
+			or.addFilter(new SQLValueFilter<BDO>( getRepository(), SIGNUP_DATE,MatchCondition.LT, d));
+			or.addFilter(new NullFieldFilter<BDO>( getRepository(), SIGNUP_DATE, true));
 			return or;
 		}
 		return null;

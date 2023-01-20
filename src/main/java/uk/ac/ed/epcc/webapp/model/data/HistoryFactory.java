@@ -387,15 +387,15 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		 * @param end
 		 */
 		public HistoryFilter(Date start, Date end) {
-			super(HistoryFactory.this.getTarget());
+			super(HistoryFactory.this.getTag());
 			if (start != null) {
 				if (end == null) {
 					throw new IllegalArgumentException(
 							"null end date in History.Filter");
 				}
 				addFilter(new TimeFilter(START_TIME_FIELD,MatchCondition.LE,end));
-				SQLOrFilter<H> or = new SQLOrFilter<H>(HistoryFactory.this.getTarget(),new TimeFilter(END_TIME_FIELD,MatchCondition.GT,start),
-						new NullFieldFilter<H>(HistoryFactory.this.getTarget(), res, END_TIME_FIELD, true));
+				SQLOrFilter<H> or = new SQLOrFilter<H>(HistoryFactory.this.getTag(),new TimeFilter(END_TIME_FIELD,MatchCondition.GT,start),
+						new NullFieldFilter<H>(res, END_TIME_FIELD, true));
 				addFilter(or);
 			}
 		}
@@ -718,11 +718,11 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		return  current;
 	}
 	protected SQLAndFilter<H> getPointFilter(Date time) {
-		SQLAndFilter<H> fil =new  SQLAndFilter<>(getTarget());
+		SQLAndFilter<H> fil =new  SQLAndFilter<>(getTag());
 		fil.addFilter(new TimeFilter(START_TIME_FIELD,MatchCondition.LE,time));
-		SQLOrFilter<H> end_fil = new SQLOrFilter<>(getTarget());
+		SQLOrFilter<H> end_fil = new SQLOrFilter<>(getTag());
 		end_fil.addFilter(new TimeFilter(END_TIME_FIELD,MatchCondition.GT,time));
-		end_fil.addFilter(new NullFieldFilter<>(getTarget(), res, END_TIME_FIELD, true));
+		end_fil.addFilter(new NullFieldFilter<>(res, END_TIME_FIELD, true));
 		fil.addFilter(end_fil);
 		return fil;
 	}
@@ -788,10 +788,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		 */
 		return (H) new HistoryRecord<P>(this,res);
 	}
-	@Override
-	public Class<H> getTarget(){
-		return (Class) HistoryRecord.class;
-	}
+
 
 	/**
 	 * make History object from peer
@@ -852,14 +849,14 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		if( ! res.hasField(status.getField())){
 			return;
 		}
-		SQLAndFilter<H> fil = new SQLAndFilter<>(getTarget());
+		SQLAndFilter<H> fil = new SQLAndFilter<>(getTag());
 		if( peer != null){
 			fil.addFilter(new ReferenceFilter<>(HistoryFactory.this,getPeerName(),peer));
 		}
 		fil.addFilter(status.getFilter(this, TAIL));
 		fil.addFilter(new TimeFilter(END_TIME_FIELD,MatchCondition.LT,time) );
 		FilterUpdate<H> update = new FilterUpdate<>(res);
-		update.update(res.getStringExpression(getTarget(), status.getField()), EXPIRED.getTag(), fil);
+		update.update(res.getStringExpression(status.getField()), EXPIRED.getTag(), fil);
 	}
 
 	/* (non-Javadoc)
@@ -1052,11 +1049,11 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 			prev.commit();
 		}
 		if( deletes > 0 ){
-			SQLAndFilter<H> delete_fil = new SQLAndFilter<>(getTarget());
+			SQLAndFilter<H> delete_fil = new SQLAndFilter<>(getTag());
 			delete_fil.addFilter(new ReferenceFilter<>(HistoryFactory.this,getPeerName(),peer));
-			delete_fil.addFilter(SQLExpressionMatchFilter.getFilter(getTarget(), 
-					(SQLExpression<Date>)res.getDateExpression(getTarget(), START_TIME_FIELD),
-					(SQLExpression<Date>)res.getDateExpression(getTarget(), END_TIME_FIELD)));
+			delete_fil.addFilter(SQLExpressionMatchFilter.getFilter(getTag(), 
+					(SQLExpression<Date>)res.getDateExpression(START_TIME_FIELD),
+					(SQLExpression<Date>)res.getDateExpression(END_TIME_FIELD)));
 			FilterDelete<H> reaper = new FilterDelete<>(res);
 			int actual = reaper.delete(delete_fil);
 			log.debug("Actual deletes="+actual+" expected="+deletes);

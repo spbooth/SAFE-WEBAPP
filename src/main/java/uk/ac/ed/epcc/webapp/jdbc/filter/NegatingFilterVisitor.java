@@ -55,9 +55,9 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 		FilterCombination c = fil.getFilterCombiner();
 		BaseCombineFilter<T> neg;
 		if( c == FilterCombination.AND) {
-			neg = new SQLOrFilter<>((Class<T>) fil.getTarget());
+			neg = new SQLOrFilter<>(fac.getTag());
 		}else {
-			neg = new SQLAndFilter<>((Class<T>) fil.getTarget());
+			neg = new SQLAndFilter<>(fac.getTag());
 		}
 		for( BaseFilter<T> f : fil.getSet()) {
 			neg.add(f.acceptVisitor(this), false);
@@ -77,7 +77,7 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 				getLogger().error("Unexpected error: SQL convert failed", t);
 			}
 		}
-		OrFilter<T> result = new OrFilter<>(fac.getTarget(), fac);
+		OrFilter<T> result = new OrFilter<>(fac.getTag(), fac);
 		for(BaseFilter f : fil.getSet()) {
 			result.add((BaseFilter<? super T>) f.acceptVisitor(this), false);
 		}
@@ -89,7 +89,7 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 */
 	@Override
 	public BaseFilter<T> visitOrFilter(OrFilter<T> fil) throws Exception {
-		AndFilter<T> result = new AndFilter<>((Class<T>) fil.getTarget());
+		AndFilter<T> result = new AndFilter<T>(fac.getTag());
 		for(BaseFilter f : fil.getSet()) {
 			result.add( (BaseFilter) f.acceptVisitor(this), false);
 		}
@@ -126,16 +126,16 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
 		@Override
-		public Class<X> getTarget() {
-			return nested.getTarget();
+		public String getTag() {
+			return nested.getTag();
 		}
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
 		 */
 		@Override
-		public boolean accept(X o) {
-			return ! nested.accept(o);
+		public boolean test(X o) {
+			return ! nested.test(o);
 		}
 
 
@@ -203,7 +203,7 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 */
 	@Override
 	public BaseFilter<T> visitBinaryFilter(BinaryFilter<T> fil) throws Exception {
-		return new GenericBinaryFilter<>(fac.getTarget(), ! fil.getBooleanResult());
+		return new GenericBinaryFilter<>( ! fil.getBooleanResult());
 	}
 
 	/* (non-Javadoc)

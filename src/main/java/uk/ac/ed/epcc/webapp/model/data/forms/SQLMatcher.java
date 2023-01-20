@@ -31,5 +31,5 @@ public interface SQLMatcher<T> {
 	 * @param form_value  
 	 * @return filter 
 	 */
-	public SQLFilter<T> getSQLFilter(Class<T> clazz, Repository res, String target, Object form_value);
+	public SQLFilter<T> getSQLFilter(Repository res, String target, Object form_value);
 }

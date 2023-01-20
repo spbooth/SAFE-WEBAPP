@@ -136,11 +136,6 @@ public class ConstrainedFactory extends DataObjectFactory<ConstrainedFactory.Con
 	}
 
 	@Override
-	public Class<ConstrainedObject> getTarget() {
-		return ConstrainedObject.class;
-	}
-
-	@Override
 	public void customiseForm(Form f) {
 		// Use form validator to validate  min against max
 		// we want these in one level

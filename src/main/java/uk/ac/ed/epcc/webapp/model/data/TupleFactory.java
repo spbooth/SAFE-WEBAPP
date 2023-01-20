@@ -14,30 +14,13 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import java.sql.ResultSet;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Targetted;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterConverter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterFinder;
-import uk.ac.ed.epcc.webapp.jdbc.filter.NoSQLFilterException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.ResultIterator;
-import uk.ac.ed.epcc.webapp.jdbc.filter.ResultMapper;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
@@ -51,7 +34,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  * @param <T> type of {@link Tuple}
  *
  */
-public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>, T extends TupleFactory.Tuple<A>> extends AbstractContexed implements  Targetted<T> {
+public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>, T extends TupleFactory.Tuple<A>> extends AbstractContexed implements  Owner<T> {
 	private final Map<String,AF> factories;
 	public TupleFactory(AppContext c,AF ... fac) {
 		super(c);
@@ -111,14 +94,14 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 	public class TupleAndFilter extends AndFilter<T>{
 	
 		public TupleAndFilter(BaseFilter<? super T>... fil) {
-			super((Class<T>) TupleFactory.this.getTarget(), fil);
+			super(null, fil);
 		}
 
 		/**
 		 * @param target
 		 */
 		public TupleAndFilter() {
-			super((Class<T>) TupleFactory.this.getTarget());
+			super(null);
 
 		}
 		
@@ -201,7 +184,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 			return true;
 		}
 		public AcceptFilterConverter(String tag, AcceptFilter<? super A> inner) {
-			super(TupleFactory.this.getTarget());
+			super(null);
 			this.tag = tag;
 			this.inner = inner;
 		}
@@ -211,8 +194,8 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
 		 */
 		@Override
-		public boolean accept(T o) {
-			return inner.accept(o.get(tag));
+		public boolean test(T o) {
+			return inner.test(o.get(tag));
 		}
 		private TupleFactory getOuterType() {
 			return TupleFactory.this;
@@ -326,7 +309,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
     	private final TupleMapper mapper;
     	
     	protected TupleIterator(){
-    		super(TupleFactory.this.getContext(), TupleFactory.this.getTarget());
+    		super(TupleFactory.this.getContext(), null);
 			mapper = new TupleMapper();
 			setMapper(mapper);
 			setQualify(true);
@@ -432,11 +415,11 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
     }
     protected abstract class AbstractFinder<X> extends FilterFinder<T, X>{
 		public AbstractFinder(boolean allow_null) {
-			super(TupleFactory.this.getContext(),TupleFactory.this.getTarget(),allow_null);
+			super(TupleFactory.this.getContext(),null,allow_null);
 		}
 		
 		public AbstractFinder() {
-			super(TupleFactory.this.getContext(),TupleFactory.this.getTarget());
+			super(TupleFactory.this.getContext(),null);
 		}
 		@Override
 		protected final void addSource(StringBuilder sb) {
@@ -519,13 +502,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 			return false;
 		}
     }
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
-	 */
-	@Override
-	public Class<T> getTarget() {
-		return (Class) Tuple.class;
-	}
+	
 
 	/** get the component factories of the tuples
 	 * @return
@@ -536,5 +513,26 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 	
 	public boolean hasMemberFactories() {
 		return factories != null && ! factories.isEmpty();
+	}
+
+	@Override
+	public boolean isMine(Object target) {
+		if( target == null) {
+			return false;
+		}
+		if( target instanceof Tuple) {
+			Tuple<DataObject> t = (Tuple<DataObject>) target;
+			if( t.size() != factories.size()) {
+				return false; // wrong size of tuple
+			}
+			for(Map.Entry<String, DataObject> e : t.entrySet()) {
+				String key = e.getKey();
+				AF fac = factories.get(key);
+				if( fac == null || ! fac.isMine(e.getValue())) {
+					return false;
+				}
+			}
+		}
+		return false;
 	}
 }

@@ -248,11 +248,6 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 	}
 	
 	
-	public Class getTarget(){
-		return DynamicForm.class;
-	}
-	
-
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.far.PartOwnerFactory#getChildManager()
 	 */
@@ -305,7 +300,7 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 	 * @return
 	 */
 	public SQLValueFilter<F> getNameFilter(String name) {
-		return new SQLValueFilter<F>(getTarget(), res, NAME_FIELD, name);
+		return new SQLValueFilter<F>(res, NAME_FIELD, name);
 	}
 	
 	public FilterResult<F> getNew() throws DataFault{

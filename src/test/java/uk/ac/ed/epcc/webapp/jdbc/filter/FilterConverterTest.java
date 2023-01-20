@@ -64,10 +64,10 @@ public class FilterConverterTest extends WebappTestBase {
 	
 	@Test
 	public void testAndFilter() throws Exception {
-		AndFilter fil = new AndFilter<>(fac.getTarget());
+		AndFilter fil = new AndFilter<>(fac.getTag());
 		fil.addFilter(fac.getStringFilter("bill"));
 		fil.addFilter(fac.getNumberFilter(2));
-		SQLAndFilter and = new SQLAndFilter<>(fac.getTarget());
+		SQLAndFilter and = new SQLAndFilter<>(fac.getTag());
 		and.addFilter(fac.getStringFilter("bill"));
 		and.addFilter(fac.getNumberFilter(2));
 		assertEquals(and, fil.acceptVisitor(conv));
@@ -75,10 +75,10 @@ public class FilterConverterTest extends WebappTestBase {
 	}
 	@Test
 	public void testOrFilter() throws Exception {
-		OrFilter fil = new OrFilter<>(fac.getTarget(),fac);
+		OrFilter fil = new OrFilter<>(fac.getTag(),fac);
 		fil.addFilter(fac.getStringFilter("bill"));
 		fil.addFilter(fac.getNumberFilter(2));
-		SQLOrFilter or = new SQLOrFilter<>(fac.getTarget());
+		SQLOrFilter or = new SQLOrFilter<>(fac.getTag());
 		or.addFilter(fac.getStringFilter("bill"));
 		or.addFilter(fac.getNumberFilter(2));
 		assertEquals(or, fil.acceptVisitor(conv));
@@ -88,14 +88,14 @@ public class FilterConverterTest extends WebappTestBase {
 	
 	@Test
 	public void testBinaryFilter() throws Exception {
-		BinaryFilter fil = new GenericBinaryFilter<>(fac.getTarget(), false);
+		BinaryFilter fil = new GenericBinaryFilter<>( false);
 		
 		assertEquals(fil,fil.acceptVisitor(conv));
 	}
 	
 	@Test
 	public void testBinaryAcceptFilter() throws Exception {
-		BinaryFilter fil = new GenericBinaryFilter<>(fac.getTarget(), false);
+		BinaryFilter fil = new GenericBinaryFilter<>( false);
 		BinaryAcceptFilter a = new BinaryAcceptFilter<>(fil);
 		assertEquals(fil,a.acceptVisitor(conv));
 	}

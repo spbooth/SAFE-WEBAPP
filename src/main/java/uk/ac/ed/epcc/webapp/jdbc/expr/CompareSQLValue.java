@@ -89,7 +89,7 @@ public class CompareSQLValue<C extends Comparable> implements SQLValue<Boolean> 
 			if( b_fil == null ){
 				return a_fil;
 			}
-			SQLAndFilter fil = new SQLAndFilter(a_fil.getTarget());
+			SQLAndFilter fil = new SQLAndFilter(a_fil.getTag());
 			fil.addFilter(a_fil);
 			fil.addFilter(b_fil);
 			return fil;

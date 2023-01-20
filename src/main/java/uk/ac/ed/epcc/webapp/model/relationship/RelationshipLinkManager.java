@@ -72,7 +72,7 @@ public abstract class RelationshipLinkManager<A extends AppUser, B extends DataO
 	}
 
 	public final BaseFilter<A> getUserFilter(BaseFilter<B> fil, String role) throws UnknownRelationshipException {
-		AndFilter<L> and = new AndFilter<>(getTarget());
+		AndFilter<L> and = new AndFilter<>(getTag());
 		and.addFilter(getFilterFromRole(role));
 		and.addFilter(getRightRemoteFilter(fil));
 		return getLeftFilter(and);

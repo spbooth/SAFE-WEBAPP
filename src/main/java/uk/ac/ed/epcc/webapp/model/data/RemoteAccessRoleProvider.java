@@ -87,7 +87,7 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 		if( force ) {
 			// Don't know type unless optional field exists
 			// missing field should default to false
-			return new FalseFilter<>((Class<T>)DataObject.class);
+			return new FalseFilter<>();
 		}
 		try {
 			return home_fac.getRemoteFilter(remote_fac, link_field, sess.getTargetInRelationshipRoleFilter(remote_fac, role, user));
@@ -104,7 +104,7 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 		if( force ) {
 			// Don't know type unless optional field exists
 			// missing field should default to false
-			return new FalseFilter<>((Class<T>)DataObject.class);
+			return new FalseFilter<>();
 		}
 		
 		return home_fac.getRemoteFilter(remote_fac, link_field, sess.getRelationshipRoleFilter(remote_fac, role,null));
@@ -118,7 +118,7 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 			return null;
 		}
 		if( force ) {
-			return new FalseFilter<>((Class<U>) AppUser.class);
+			return new FalseFilter<>();
 		}
 		if( target == null){
 			try {
@@ -129,7 +129,7 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 		}
 		R remote = remote_fac.find(target.record.getNumberProperty(link_field));
 		if( remote == null){
-			return new FalseFilter<>((Class<U>) AppUser.class);
+			return new FalseFilter<>();
 		}
 		try {
 			return sess.getPersonInRelationshipRoleFilter(remote_fac, role, remote);
@@ -144,7 +144,7 @@ public class RemoteAccessRoleProvider<U extends AppUser,T extends DataObject,R e
 			return null;
 		}
 		if( force ) {
-			return new FalseFilter<>((Class<U>) AppUser.class);
+			return new FalseFilter<>();
 		}
 
 		try {

@@ -71,18 +71,18 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	 */
 	@Override
 	public SQLFilter<BDO> getCurrentServiceFilter(){
-		Class<BDO> target = getFactory().getTarget();
+		String target = getFactory().getTag();
 		int[] currentIDs = getCurrentIDs();
 		if(currentIDs != null && currentIDs.length > 0){
 			// Match any id in current view list or null.
 			SQLOrFilter<BDO> fil = new SQLOrFilter<>(target);
 			for(int id : currentIDs) {
-				fil.addFilter(new SQLValueFilter<>(target, getRepository(), SERVICE_ID_FIELD, id) );
+				fil.addFilter(new SQLValueFilter<>( getRepository(), SERVICE_ID_FIELD, id) );
 			}
-			fil.addFilter(new NullFieldFilter<>(target, getRepository(), SERVICE_ID_FIELD, true));
+			fil.addFilter(new NullFieldFilter<>( getRepository(), SERVICE_ID_FIELD, true));
 			return fil;
 		}else{
-			return new GenericBinaryFilter<>(target, true);
+			return new GenericBinaryFilter<>( true);
 		}
 	}
 	
@@ -92,17 +92,17 @@ public class ReferenceServiceFilterComposite<BDO extends DataObject> extends Ser
 	 */
 	@Override
 	public SQLFilter<BDO> getOtherServiceFilter(){
-		Class<BDO> target = getFactory().getTarget();
+		String target = getFactory().getTag();
 		int[] currentIDs = getCurrentIDs();
 		if(currentIDs != null && currentIDs.length > 0){
 			SQLAndFilter<BDO> fil = new SQLAndFilter<>(target);
 			
 			for( int id : currentIDs) {
-				fil.addFilter(new SQLValueFilter<>(target, getRepository(), SERVICE_ID_FIELD, MatchCondition.NE, id));
+				fil.addFilter(new SQLValueFilter<>( getRepository(), SERVICE_ID_FIELD, MatchCondition.NE, id));
 			}
 			return fil;
 		}else{
-			return new GenericBinaryFilter<>(target, false);
+			return new GenericBinaryFilter<>( false);
 		}
 
 	}

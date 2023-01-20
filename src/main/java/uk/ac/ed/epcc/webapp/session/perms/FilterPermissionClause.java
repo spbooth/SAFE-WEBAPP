@@ -30,10 +30,7 @@ public class FilterPermissionClause<T extends DataObject> implements PermissionC
 		return fil;
 	}
 
-	@Override
-	public Class<T> getTarget() {
-		return fil.getTarget();
-	}
+
 
 	@Override
 	public <X> X accept(PermissionVisitor<X, T> visitor) throws UnknownRelationshipException {

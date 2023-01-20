@@ -46,7 +46,7 @@ public class BinaryAcceptFilter<T> implements AcceptFilter<T>, BinaryFilter<T> {
 		return vis.visitBinaryAcceptFilter(this);
 	}
 
-	public final boolean accept(T o){
+	public final boolean test(T o){
 		return nested.getBooleanResult();
 	}
 
@@ -54,8 +54,8 @@ public class BinaryAcceptFilter<T> implements AcceptFilter<T>, BinaryFilter<T> {
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<T> getTarget() {
-		return nested.getTarget();
+	public String getTag() {
+		return nested.getTag();
 	}
 
 	@Override

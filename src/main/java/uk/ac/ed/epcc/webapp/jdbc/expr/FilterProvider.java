@@ -70,9 +70,11 @@ public interface FilterProvider<T, D> extends Targetted<D> {
    */
   public SQLFilter<T> getOrderFilter(boolean descending) throws CannotFilterException, NoSQLFilterException;
   
-  /** get the type bounds on the produced {@link SQLFilter}.
+  /** get the filter tag for the generated {@link SQLFilter}.
    * 
-   * @return Class
+   * @return String
    */
-  public Class<T> getFilterType();
+  default public String getFilterTag() {
+	  return null;
+  };
 }

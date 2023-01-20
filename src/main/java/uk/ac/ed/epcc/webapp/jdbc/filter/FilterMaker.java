@@ -41,8 +41,8 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  */
 public abstract class FilterMaker<T,O> extends FilterReader<T,O> {
   
-	public FilterMaker(AppContext c,Class<T> target) {
-		super(c,target);
+	public FilterMaker(AppContext c,String tag) {
+		super(c,tag);
 	}
 	private StringBuilder query=null;
 	

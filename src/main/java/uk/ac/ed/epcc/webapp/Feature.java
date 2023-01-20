@@ -152,11 +152,5 @@ public class Feature extends AbstractSetting<Boolean> {
 	public String getIndex(Boolean value) {
 		return value.toString();
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
-	 */
-	@Override
-	public Class<Boolean> getTarget() {
-		return Boolean.class;
-	}
+	
 }

@@ -38,10 +38,10 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 	/**
 	 * @param target
 	 */
-	public OrFilter(Class<T> target, FilterMatcher<T> matcher) {
-		super(target);
+	public OrFilter(String tag, FilterMatcher<T> matcher) {
+		super(tag);
 		this.matcher=matcher;
-		sql_filters=new SQLOrFilter<>(target);
+		sql_filters=new SQLOrFilter<>(tag);
 		pure_accept_filters = new LinkedHashSet<>();
 		mixed_filters = new LinkedHashSet<>();
 		dual_filters = new LinkedHashSet<>();
@@ -194,18 +194,18 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
 	 */
 	@Override
-	public boolean accept(T o) {
+	public boolean test(T o) {
 		if( force_value){
 			return true;
 		}
 		// Start with pure accept filters
 		for( AcceptFilter<? super T> accept : pure_accept_filters){
-			if(accept.accept(o)){
+			if(accept.test(o)){
 				return true;
 			}
 		}
 		for( DualFilter<? super T> dual : dual_filters){
-			if(dual.getAcceptFilter().accept(o)){
+			if(dual.getAcceptFilter().test(o)){
 				return true;
 			}
 		}
@@ -245,15 +245,15 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 	 */
 	public SQLFilter<T> getSQLFilter() throws NoSQLFilterException{
 		if( force_value){
-			return new GenericBinaryFilter<>(target, true);
+			return new GenericBinaryFilter<>( true);
 		}
 		if( isEmpty()){
-			return new GenericBinaryFilter<>(target, false);
+			return new GenericBinaryFilter<>( false);
 		}
 		if( nonSQL()){
 			throw new NoSQLFilterException("OrFilter contains non SQL filter");
 		}
-		SQLOrFilter<T> or = new SQLOrFilter<>(target,sql_filters);
+		SQLOrFilter<T> or = new SQLOrFilter<>(getTag(),sql_filters);
 		for(DualFilter<? super T> fil : dual_filters){
 			or.addFilter(fil.getSQLFilter());
 		}

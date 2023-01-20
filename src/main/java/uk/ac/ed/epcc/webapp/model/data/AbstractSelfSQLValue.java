@@ -110,21 +110,21 @@ public abstract class AbstractSelfSQLValue<T extends DataObject,R> implements SQ
 	public final SQLFilter<R> getFilter(MatchCondition match, IndexedReference val)
 			throws CannotFilterException {
 		if( match == null ){
-			return new SelfReferenceFilter<>(getFilterType(),fac.res,val);
+			return new SelfReferenceFilter<>(fac.res,val);
 		}else if( match == MatchCondition.NE){
-			return new SelfReferenceFilter<>(getFilterType(),fac.res,true,val);
+			return new SelfReferenceFilter<>(fac.res,true,val);
 		}
 		throw new CannotFilterException("Relative MatchCondition requested for IndexedReference");
 	}
 	@Override
 	public final SQLFilter<R> getNullFilter(boolean is_null)
 			throws CannotFilterException {
-		return new GenericBinaryFilter<>(getFilterType(), ! is_null);
+		return new GenericBinaryFilter<>(! is_null);
 	}
 	@Override
 	public final SQLFilter<R> getOrderFilter(boolean descending)
 			throws CannotFilterException {
-		return new PrimaryOrderFilter<>(getFilterType(),fac.res, descending);
+		return new PrimaryOrderFilter<>(fac.res, descending);
 	}
 
 

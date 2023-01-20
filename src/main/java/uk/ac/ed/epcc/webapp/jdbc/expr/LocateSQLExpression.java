@@ -21,7 +21,6 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 /** Create locate expression in SQL.
  * @author spb
@@ -97,7 +96,7 @@ public class LocateSQLExpression implements SQLExpression<Integer>{
 			SQLFilter f = part.getRequiredFilter();
 			if( f != null ){
 				if( required == null){
-					required = new SQLAndFilter(f.getTarget(),f);
+					required = new SQLAndFilter(f.getTag(),f);
 				}else{
 					required.addFilter(f);
 				}

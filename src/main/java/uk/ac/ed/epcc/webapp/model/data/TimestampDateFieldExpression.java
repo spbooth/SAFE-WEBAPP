@@ -39,12 +39,14 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 
 public class TimestampDateFieldExpression<T extends DataObject> extends FieldExpression<Date,T> implements DateSQLExpression,FilterProvider<T,Date>{
     private final long res;
+    private final String tag;
     private final NumberFieldExpression<Long, T> num_field;
     private final DateSQLExpression date_expr;
-	protected TimestampDateFieldExpression(Class<T> target,Repository rep,String field) {
-		super(target,rep, Date.class,field);
+	protected TimestampDateFieldExpression(Repository rep,String field) {
+		super(rep, Date.class,field);
 		this.res=rep.getResolution();
-		num_field=rep.getNumberExpression(target,Long.class, field);
+		this.tag=rep.getTag();
+		num_field=rep.getNumberExpression(Long.class, field);
 		date_expr = rep.getSQLContext().convertToDate(num_field, res);
 	}
 	@Override
@@ -75,20 +77,20 @@ public class TimestampDateFieldExpression<T extends DataObject> extends FieldExp
 		//Repository will convert this to the correct number.
 		if( match == null ){
 			// null implies equality test
-			return new SQLValueFilter<>(filter_type,repository,name,val);
+			return new SQLValueFilter<>(repository,name,val);
 		}
 		// This to avoid unecessary conversions in the filter
-		return new SQLValueFilter<>(filter_type,repository,name,match,val);
+		return new SQLValueFilter<>(repository,name,match,val);
 	}
 	@Override
 	public SQLFilter<T> getNullFilter(boolean is_null)
 			throws CannotFilterException {
-		return new NullFieldFilter<>(filter_type,repository, name,is_null);
+		return new NullFieldFilter<>(repository, name,is_null);
 	}
 	@Override
 	public SQLFilter<T> getOrderFilter(boolean descending)
 			throws CannotFilterException {
-		return new FieldOrderFilter<>(filter_type,repository, name, descending);
+		return new FieldOrderFilter<>(repository, name, descending);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.DateSQLExpression#preferSeconds()
@@ -100,6 +102,10 @@ public class TimestampDateFieldExpression<T extends DataObject> extends FieldExp
 	@Override
 	public int addField(StringBuilder sb, boolean qualify) {
 		return num_field.add(sb, qualify);
+	}
+	@Override
+	public String getFilterTag() {
+		return tag;
 	}
 	
 }

@@ -136,7 +136,7 @@ public class TupleFactoryTest<A extends DataObject,AF extends DataObjectFactory<
 		TupleAndFilter fil = fac.new TupleAndFilter();
 		SQLExpression<String> nameExpression = fac1.getNameExpression();
 		SQLExpression<String> nameExpression2 = fac2.getNameExpression();
-		SQLFilter join = SQLExpressionMatchFilter.getFilter(fac.getTarget(), nameExpression, nameExpression2);
+		SQLFilter join = SQLExpressionMatchFilter.getFilter(null, nameExpression, nameExpression2);
 		fil.addFilter(join);
 		assertEquals(2,fac.getCount((BaseFilter<T>)fil));
 	}
@@ -144,7 +144,7 @@ public class TupleFactoryTest<A extends DataObject,AF extends DataObjectFactory<
 	@Test
 	public void TestSQLTupleFilter() throws Exception{
 		TupleAndFilter fil = fac.new TupleAndFilter();
-		fil.addFilter(SQLExpressionMatchFilter.getFilter(fac.getTarget(), fac1.getNameExpression(), fac2.getNameExpression()));
+		fil.addFilter(SQLExpressionMatchFilter.getFilter(null, fac1.getNameExpression(), fac2.getNameExpression()));
 		fil.addMemberFilter(fac1.getTag(), fac1.new NumberFilter(Integer.valueOf(1)));
 		assertEquals(1,fac.getCount((BaseFilter<T>)fil));
 	}
@@ -152,7 +152,7 @@ public class TupleFactoryTest<A extends DataObject,AF extends DataObjectFactory<
 	@Test
 	public void TestAcceptTupleFilter() throws Exception{
 		TupleAndFilter fil = fac.new TupleAndFilter();
-		fil.addFilter(SQLExpressionMatchFilter.getFilter(fac.getTarget(), fac1.getNameExpression(), fac2.getNameExpression()));
+		fil.addFilter(SQLExpressionMatchFilter.getFilter(null, fac1.getNameExpression(), fac2.getNameExpression()));
 		fil.addMemberFilter(fac1.getTag(), fac1.new NumberAcceptFilter(Integer.valueOf(1)));
 		assertEquals(1,fac.getCount((BaseFilter<T>)fil));
 	}

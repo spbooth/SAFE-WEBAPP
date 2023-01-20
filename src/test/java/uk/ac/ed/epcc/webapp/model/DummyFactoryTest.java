@@ -83,7 +83,7 @@ public class DummyFactoryTest extends DataObjectFactoryTestCase {
 	
 		
 		try{
-			SQLAndFilter<Dummy1> f = new SQLAndFilter<>(fac.getTarget());
+			SQLAndFilter<Dummy1> f = new SQLAndFilter<>(fac.getTag());
 			
 			System.out.println("hello\n");
 			fac.find(f);
@@ -91,10 +91,10 @@ public class DummyFactoryTest extends DataObjectFactoryTestCase {
 		}catch(MultipleResultException e){
 			
 		}
-		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTarget());
+		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTag());
 		// Dummy accept filter to force non sQLFilter
-		fil.addFilter(new AbstractAcceptFilter<Dummy1>(fac.getTarget()) {
-			public boolean accept(Dummy1 o) {
+		fil.addFilter(new AbstractAcceptFilter<Dummy1>(fac.getTag()) {
+			public boolean test(Dummy1 o) {
 				return true;
 			}
 		});
@@ -190,7 +190,7 @@ public class DummyFactoryTest extends DataObjectFactoryTestCase {
 		Dummy1 d = new Dummy1(ctx);
 		d.setName("Fred");
 		d.commit();
-		Iterator it = fac.getResult(new FalseFilter<>(Dummy1.class)).iterator();
+		Iterator it = fac.getResult(new FalseFilter<>()).iterator();
 		assertFalse(it.hasNext());
 	}
 	

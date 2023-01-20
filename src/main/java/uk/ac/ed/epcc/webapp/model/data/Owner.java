@@ -16,7 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data;
 
-import uk.ac.ed.epcc.webapp.Targetted;
+import uk.ac.ed.epcc.webapp.Tagged;
+
 
 /** Interface for factory classes.
  * 
@@ -24,11 +25,13 @@ import uk.ac.ed.epcc.webapp.Targetted;
  *
  * @param <D>
  */
-public interface Owner<D> extends Targetted<D>{
+public interface Owner<D> {
 	/** Does the specified target belong to this factory.
 	 * 
 	 * @param target
 	 * @return
 	 */
      public boolean isMine(Object target);
+     
+     
 }

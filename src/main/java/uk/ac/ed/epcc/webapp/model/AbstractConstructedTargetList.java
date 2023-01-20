@@ -44,10 +44,10 @@ public abstract class AbstractConstructedTargetList<T extends DataObject,L exten
 
 	private final AppContext conn;
 	private final Class<T> target;
-	public AbstractConstructedTargetList(DataObjectFactory<T> factory,String list_name){
+	public AbstractConstructedTargetList(Class<T> target,DataObjectFactory<T> factory,String list_name){
 		super();
 		this.conn=factory.getContext();
-		this.target=factory.getTarget();
+		this.target=target;
 		String list = conn.getExpandedProperty(factory.getConfigTag()+"."+list_name,"");
 		for(String action : list.split("\\s*,\\s*")){
 			if( ! action.isEmpty()){
@@ -56,8 +56,8 @@ public abstract class AbstractConstructedTargetList<T extends DataObject,L exten
 				L a = (L) conn.makeObject(getTemplate(), action);
 				if( a == null){
 					getLogger().error(action+" failed to resolve to "+getTemplate().getCanonicalName());
-				}else if( ! a.getTarget().isAssignableFrom(factory.getTarget())){
-					getLogger().error("Incompatible targets for list member "+a.getTarget().getCanonicalName()+" "+factory.getTarget().getCanonicalName());;
+				}else if( target != null && ! a.getTarget().isAssignableFrom(target)){
+					getLogger().error("Incompatible targets for list member "+a.getTarget().getCanonicalName()+" "+target.getCanonicalName());;
 				}else{
 					add(a);
 				}

@@ -21,7 +21,6 @@ import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -34,30 +33,14 @@ import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.ValueResultMapper;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
+import uk.ac.ed.epcc.webapp.jdbc.table.*;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
-import uk.ac.ed.epcc.webapp.model.data.CloseableIterator;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.FilterResult;
-import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
-import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.model.data.filter.FieldOrderFilter;
-import uk.ac.ed.epcc.webapp.model.data.filter.FilterUpdate;
-import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
-import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
+import uk.ac.ed.epcc.webapp.model.data.filter.*;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -120,7 +103,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	public class DateFilter extends SQLAndFilter<Wtmp> {
 
 		public DateFilter(Date point) {
-			super(WtmpManager.this.getTarget());
+			super(WtmpManager.this.getTag());
 			addFilter(new TimeFilter(START_TIME,MatchCondition.LT,point));
 			addFilter(new TimeFilter(END_TIME,MatchCondition.GT,point));
 		}
@@ -283,7 +266,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	}
 
 	public FilterResult<Wtmp> getLoginHistory(AppUser person) throws DataFault{
-		OrFilter<Wtmp> fil = new OrFilter<WtmpManager.Wtmp>(getTarget(), this);
+		OrFilter<Wtmp> fil = new OrFilter<WtmpManager.Wtmp>(getTag(), this);
 		fil.addFilter(new ReferenceFilter<>(WtmpManager.this, PERSON_ID, person));
 		if( res.hasField(SUPER_PERSON_ID)) {
 			fil.addFilter(new ReferenceFilter<>(WtmpManager.this, SUPER_PERSON_ID, person));
@@ -304,8 +287,8 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 			if( NEW_HOST_EMAIL.isEnabled(getContext())){
 				String email = p.getEmail();
 				if( email != null ) {
-					SQLAndFilter fil = new SQLAndFilter(getTarget(),new ReferenceFilter<Wtmp, AppUser>(this, PERSON_ID, p),
-							new SQLValueFilter<Wtmp>(getTarget(), res, HOST, remoteHost));
+					SQLAndFilter fil = new SQLAndFilter(getTag(),new ReferenceFilter<Wtmp, AppUser>(this, PERSON_ID, p),
+							new SQLValueFilter<Wtmp>( res, HOST, remoteHost));
 					try {
 						if( ! exists(fil)) {
 							// this is a new host
@@ -376,10 +359,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 		t.setColFormat(START_COL, new DateTransform(df));
 		t.setColFormat(END_COL, new DateTransform(df));
 	}
-	@Override
-	public Class<Wtmp> getTarget() {
-		return Wtmp.class;
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.AnonymisingFactory#anonymise()
 	 */
@@ -392,13 +372,12 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	}
 	public void anonymise(SQLFilter<Wtmp> fil) throws DataFault {
 		FilterUpdate<Wtmp> update = new FilterUpdate<>(res);
-		update.update(res.getStringExpression(getTarget(), HOST), "Removed", fil);
+		update.update(res.getStringExpression(HOST), "Removed", fil);
 		
 	}
 	public class LoginFinder extends AbstractFinder<Date>{
 		public LoginFinder() {
-			Class<Wtmp> target = WtmpManager.this.getTarget();
-			setMapper(new ValueResultMapper<Date>(res.getDateExpression(target, START_TIME)){
+			setMapper(new ValueResultMapper<Date>(res.getDateExpression(START_TIME)){
 				public String getTarget(){
 					StringBuilder sb = new StringBuilder();
 					sb.append("MAX(");
@@ -411,19 +390,19 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	}
 	public Date lastLogin(AppUser person) throws DataException {
 		LoginFinder finder = new LoginFinder();
-		SQLAndFilter fil = new SQLAndFilter(getTarget(),new ReferenceFilter<>(WtmpManager.this, PERSON_ID, person));
+		SQLAndFilter fil = new SQLAndFilter(getTag(),new ReferenceFilter<>(WtmpManager.this, PERSON_ID, person));
 		if( res.hasField(SUPER_PERSON_ID)) {
-			fil.addFilter(new NullFieldFilter<Wtmp>(getTarget(), res, SUPER_PERSON_ID, true));
+			fil.addFilter(new NullFieldFilter<Wtmp>(res, SUPER_PERSON_ID, true));
 		}
 		return finder.find(fil,true);
 	}
 	
 	public Wtmp lastRecord(AppUser person) {
-		SQLAndFilter fil = new SQLAndFilter(getTarget(),new ReferenceFilter<>(WtmpManager.this, PERSON_ID, person));
+		SQLAndFilter fil = new SQLAndFilter(getTag(),new ReferenceFilter<>(WtmpManager.this, PERSON_ID, person));
 		if( res.hasField(SUPER_PERSON_ID)) {
-			fil.addFilter(new NullFieldFilter<Wtmp>(getTarget(), res, SUPER_PERSON_ID, true));
+			fil.addFilter(new NullFieldFilter<Wtmp>( res, SUPER_PERSON_ID, true));
 		}
-		fil.addFilter(new FieldOrderFilter<Wtmp>(getTarget(), res,START_TIME, true));
+		fil.addFilter(new FieldOrderFilter<Wtmp>(res,START_TIME, true));
 		try( CloseableIterator<Wtmp> it = getResult(fil, 0, 1).iterator()){
 		  if( it.hasNext()) {
 			  return it.next();
@@ -442,9 +421,9 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	 */
     public SQLFilter<AppUser> getActiveFilter(Date d){
     	AppUserFactory<AppUser> login = getContext().getService(SessionService.class).getLoginFactory();
-    	SQLAndFilter fil = new SQLAndFilter(getTarget(),new TimeFilter(START_TIME,MatchCondition.GT, d));
+    	SQLAndFilter fil = new SQLAndFilter(getTag(),new TimeFilter(START_TIME,MatchCondition.GT, d));
 		if( res.hasField(SUPER_PERSON_ID)) {
-			fil.addFilter(new NullFieldFilter<Wtmp>(getTarget(), res, SUPER_PERSON_ID, true));
+			fil.addFilter(new NullFieldFilter<Wtmp>( res, SUPER_PERSON_ID, true));
 		}
     	return (SQLFilter<AppUser>) convertToDestinationFilter(login, PERSON_ID, fil );
     }

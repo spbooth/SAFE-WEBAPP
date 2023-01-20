@@ -44,12 +44,11 @@ public abstract class FieldExpression<T,X extends DataObject> implements FieldSQ
 	protected final Repository repository;
 	protected  final String name;
 	protected final Class<T> target;
-	protected final Class<X> filter_type;
-	protected FieldExpression(Class<X> filter_type,Repository repository, Class<T> target,String name){
+	
+	protected FieldExpression(Repository repository, Class<T> target,String name){
 		this.repository = repository;
 		this.target=target;
 		this.name=name;
-		this.filter_type=filter_type;
 		assert(repository.hasField(name));
 	}
 	public int add(StringBuilder sb, boolean qualify) {
@@ -76,6 +75,9 @@ public abstract class FieldExpression<T,X extends DataObject> implements FieldSQ
 	 */
 	public String getFieldName() {
 		return name;
+	}
+	public String getTag() {
+		return repository.getTag();
 	}
 	public void setObject(PreparedStatement stmt, int pos, T value)
 			throws SQLException {
@@ -109,9 +111,7 @@ public abstract class FieldExpression<T,X extends DataObject> implements FieldSQ
 	public final void setValue(X r, T value) {
 		setValue(r.record,value);
 	}
-	public final Class<X> getFilterType(){
-		return filter_type;
-	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -130,11 +130,6 @@ public abstract class FieldExpression<T,X extends DataObject> implements FieldSQ
 		if (getClass() != obj.getClass())
 			return false;
 		FieldExpression other = (FieldExpression) obj;
-		if (filter_type == null) {
-			if (other.filter_type != null)
-				return false;
-		} else if (!filter_type.equals(other.filter_type))
-			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;

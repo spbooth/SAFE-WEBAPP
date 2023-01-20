@@ -20,7 +20,6 @@ import java.util.Date;
 
 import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 
@@ -36,12 +35,12 @@ public class DatePatternMatcher<T> implements SQLMatcher<T>{
     }
 	
 	@Override
-	public SQLFilter<T> getSQLFilter(Class<T> clazz,Repository res, String target, Object form_value) {
+	public SQLFilter<T> getSQLFilter(Repository res, String target, Object form_value) {
 		Date d = (Date) form_value;
 		if( matchBefore()){
-			return new SQLValueFilter<>(clazz,res,target,MatchCondition.LT,d);
+			return new SQLValueFilter<>(res,target,MatchCondition.LT,d);
 		}else{
-			return new SQLValueFilter<>(clazz,res,target,MatchCondition.GE,d);
+			return new SQLValueFilter<>(res,target,MatchCondition.GE,d);
 		}
 		
 	}

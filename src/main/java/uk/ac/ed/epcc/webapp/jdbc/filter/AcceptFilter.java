@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
+import java.util.function.Predicate;
 
 /**
  * A Filter that accepts objects based on a Java method
@@ -24,18 +25,10 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
  * @param <T> type of object selected
  * 
  */
-public interface AcceptFilter<T> extends BaseFilter<T> {
+public interface AcceptFilter<T>  extends BaseFilter<T>, Predicate<T>{
 	@Override
 	default <X> X acceptVisitor(FilterVisitor<X, T> vis) throws Exception {
 		return vis.visitAcceptFilter(this);
 	}
 
-	/**
-	 * does this object match the filter
-	 * 
-	 * @param o
-	 *            Object to evaluate
-	 * @return boolean
-	 */
-	public boolean accept(T o);
 }

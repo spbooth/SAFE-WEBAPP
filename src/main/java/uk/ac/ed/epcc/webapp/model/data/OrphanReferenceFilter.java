@@ -26,7 +26,7 @@ public class OrphanReferenceFilter<T extends DataObject,BDO extends DataObject> 
 	 * 
 	 */
 	public OrphanReferenceFilter(DataObjectFactory<BDO> fac, String field,DataObjectFactory<T> remote_fac) {
-		super(fac.getTarget(), field,fac.res,remote_fac.res);
+		super( field,fac.res,remote_fac.res);
 	}
 
 }

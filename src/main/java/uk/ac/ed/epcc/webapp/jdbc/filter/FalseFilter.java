@@ -13,7 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
-/** A filter than never slects any records.
+/** A filter than never selects any records.
  * @author spb
  * @param <T> type of filter
  *
@@ -24,8 +24,8 @@ public class FalseFilter<T> extends GenericBinaryFilter<T>{
 	 * @param target
 	 * 
 	 */
-	public FalseFilter(Class<T> target) {
-		super(target, false);
+	public FalseFilter() {
+		super(false);
 	}
 
 

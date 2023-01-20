@@ -338,12 +338,12 @@ public class RelationshipTest extends WebappTestBase {
 		AppUserFactory login = service.getLoginFactory();
 		Dummy3 t = fac.find(fac.new StringFilter("Test1"));
 		
-		assertEquals(new GenericBinaryFilter(fac.getTarget(), false), service.getRelationshipRoleFilter(fac, "feature.nofeature"));
-		assertEquals(new GenericBinaryFilter(login.getTarget(), false), service.getPersonInRelationshipRoleFilter(fac, "feature.nofeature", t));
+		assertEquals(new GenericBinaryFilter(false), service.getRelationshipRoleFilter(fac, "feature.nofeature"));
+		assertEquals(new GenericBinaryFilter(false), service.getPersonInRelationshipRoleFilter(fac, "feature.nofeature", t));
 		
 		
-		assertEquals(new GenericBinaryFilter(fac.getTarget(), true), service.getRelationshipRoleFilter(fac, "feature.testfeature"));
-		assertEquals(new GenericBinaryFilter(login.getTarget(), true), service.getPersonInRelationshipRoleFilter(fac, "feature.testfeature", t));
+		assertEquals(new GenericBinaryFilter(true), service.getRelationshipRoleFilter(fac, "feature.testfeature"));
+		assertEquals(new GenericBinaryFilter(true), service.getPersonInRelationshipRoleFilter(fac, "feature.testfeature", t));
 
 	}
 }

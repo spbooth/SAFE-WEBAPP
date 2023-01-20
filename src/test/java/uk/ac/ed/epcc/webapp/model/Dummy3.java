@@ -87,7 +87,7 @@ public class Dummy3 extends DataObject {
 		
          public class StringFilter extends SQLValueFilter<Dummy3>{
          	public StringFilter(String s){
-         		super(Factory.this.getTarget(),res,NAME,s);
+         		super(res,NAME,s);
          	}
          }
 		public Factory(AppContext c) {
@@ -110,7 +110,7 @@ public class Dummy3 extends DataObject {
 	
 		
 		public FilterResult<Dummy3> getWithFilter() throws DataFault{
-			AndFilter<Dummy3>fil = new AndFilter<>(getTarget());
+			AndFilter<Dummy3>fil = new AndFilter<>(getTag());
 			return getResult(fil);
 			
 		}
@@ -138,7 +138,7 @@ public class Dummy3 extends DataObject {
 		@Override
 		public BaseFilter<Dummy3> hasRelationFilter( String role,AppUser user) {
 			if( role.equals(SELF)){
-				return new SQLValueFilter<>(getTarget(), res, PERSON_ID, user.getID());
+				return new SQLValueFilter<>( res, PERSON_ID, user.getID());
 			}
 			return null;
 		}
@@ -166,7 +166,7 @@ public class Dummy3 extends DataObject {
 		@Override
 		public BaseFilter<Dummy3> getNamedFilter(String name) {
 			if( name.equals("CalledTest1")){
-				return new SQLValueFilter<>(getTarget(), res, NAME, "Test1");
+				return new SQLValueFilter<>(res, NAME, "Test1");
 			}
 			return null;
 		}
@@ -230,7 +230,7 @@ public class Dummy3 extends DataObject {
 		}
 		@Override
 		public SQLFilter<Dummy3> hasCanonicalNameFilter(){
-			return new NullFieldFilter<Dummy3>(getTarget(), res, NAME, false);
+			return new NullFieldFilter<Dummy3>(res, NAME, false);
 		}
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.NameFinder#getDataCache()
@@ -252,10 +252,7 @@ public class Dummy3 extends DataObject {
 				}
 			};
 		}
-		@Override
-		public Class<Dummy3> getTarget() {
-			return Dummy3.class;
-		}
+		
 		@Override
 		public void addRelationships(Set<String> roles) {
 			roles.add(SELF);

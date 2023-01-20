@@ -19,12 +19,7 @@ package uk.ac.ed.epcc.webapp.model.data.filter;
 import java.util.List;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterSelect;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
-import uk.ac.ed.epcc.webapp.jdbc.filter.MultiTableFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 
@@ -41,7 +36,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 public class OrphanFilter<T extends DataObject, BDO extends DataObject> extends FilterSelect<T> implements SQLFilter<BDO>, PatternFilter<BDO>,MultiTableFilter {
-	private final Class<BDO> target;
+	
 	private final String join_field;
 	private final Repository res;
 	private final Repository remote_res;
@@ -52,8 +47,8 @@ public class OrphanFilter<T extends DataObject, BDO extends DataObject> extends 
 	 * @param res        Repository of target
 	 * @param remote_res Repository of remote
 	 */
-	public OrphanFilter( Class<BDO> target,String join_field, Repository res, Repository remote_res){
-		this.target=target;
+	public OrphanFilter( String join_field, Repository res, Repository remote_res){
+
 		this.join_field=join_field;
 		this.res=res;
 		this.remote_res=remote_res;
@@ -82,33 +77,6 @@ public class OrphanFilter<T extends DataObject, BDO extends DataObject> extends 
 		}
 
 
-	
-
-
-		
-		public final void accept(BDO o) {
-		}
-
-
-
-
-
-		
-
-
-
-
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
-		 */
-		public final Class<BDO> getTarget() {
-			return target;
-		}
-
-
-
-
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.filter.MultiTableFilter#qualifyTables()
 		 */
@@ -128,7 +96,7 @@ public class OrphanFilter<T extends DataObject, BDO extends DataObject> extends 
 			result = prime * result + ((join_field == null) ? 0 : join_field.hashCode());
 			result = prime * result + ((remote_res == null) ? 0 : remote_res.hashCode());
 			result = prime * result + ((res == null) ? 0 : res.hashCode());
-			result = prime * result + ((target == null) ? 0 : target.hashCode());
+			
 			return result;
 		}
 
@@ -158,11 +126,6 @@ public class OrphanFilter<T extends DataObject, BDO extends DataObject> extends 
 				if (other.res != null)
 					return false;
 			} else if (!res.equals(other.res))
-				return false;
-			if (target == null) {
-				if (other.target != null)
-					return false;
-			} else if (!target.equals(other.target))
 				return false;
 			return true;
 		}

@@ -31,11 +31,11 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrderFilter;
  * @param <T>
  */
 public class SQLExpressionOrderFilter<I,T> implements SQLOrderFilter<T> {
-	private final Class<T> target;
+	private final String filter_tag;
 	private final boolean descending;
 	private final SQLExpression<I> expr;
 	@SuppressWarnings("unchecked")
-	public static <I,T> SQLFilter<T> getFilter(Class<T> target,boolean descending,SQLExpression<I> expr) {
+	public static <I,T> SQLFilter<T> getFilter(String target,boolean descending,SQLExpression<I> expr) {
 		SQLExpressionOrderFilter<I, T> fil = new SQLExpressionOrderFilter<>(target, descending, expr);
 		SQLFilter<T> req = expr.getRequiredFilter();
     	if( req == null){
@@ -44,8 +44,8 @@ public class SQLExpressionOrderFilter<I,T> implements SQLOrderFilter<T> {
     	return new SQLAndFilter<>(target,fil,req);
 
 	}
-	private SQLExpressionOrderFilter(Class<T> target,boolean descending,SQLExpression<I> expr) {
-		this.target=target;
+	private SQLExpressionOrderFilter(String target,boolean descending,SQLExpression<I> expr) {
+		this.filter_tag=target;
 		this.descending=descending;
 		this.expr=expr;
 	}
@@ -56,9 +56,7 @@ public class SQLExpressionOrderFilter<I,T> implements SQLOrderFilter<T> {
 		result.add(new SQLExpressionOrderClause<>(descending,expr));
 		return result;
 	}
-	@Override
-	public void accept(T o) {
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
@@ -72,8 +70,8 @@ public class SQLExpressionOrderFilter<I,T> implements SQLOrderFilter<T> {
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<T> getTarget() {
-		return target;
+	public String getTag() {
+		return filter_tag;
 	}
 	@Override
 	public int hashCode() {
@@ -81,7 +79,7 @@ public class SQLExpressionOrderFilter<I,T> implements SQLOrderFilter<T> {
 		int result = 1;
 		result = prime * result + (descending ? 1231 : 1237);
 		result = prime * result + ((expr == null) ? 0 : expr.hashCode());
-		result = prime * result + ((target == null) ? 0 : target.hashCode());
+		result = prime * result + ((filter_tag == null) ? 0 : filter_tag.hashCode());
 		return result;
 	}
 	@Override
@@ -100,10 +98,10 @@ public class SQLExpressionOrderFilter<I,T> implements SQLOrderFilter<T> {
 				return false;
 		} else if (!expr.equals(other.expr))
 			return false;
-		if (target == null) {
-			if (other.target != null)
+		if (filter_tag == null) {
+			if (other.filter_tag != null)
 				return false;
-		} else if (!target.equals(other.target))
+		} else if (!filter_tag.equals(other.filter_tag))
 			return false;
 		return true;
 	}

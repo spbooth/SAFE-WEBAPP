@@ -63,12 +63,12 @@ public class Dummy4 extends DataObject {
     public static class Factory extends DataObjectFactory<Dummy4>{
 		public class NumberFilter extends SQLValueFilter<Dummy4>{
         	public NumberFilter(Number n){
-        		super(Factory.this.getTarget(),res,NUMBER,n);
+        		super(res,NUMBER,n);
         	}
         }
         public class StringFilter extends SQLValueFilter<Dummy4>{
         	public StringFilter(String s){
-        		super(Factory.this.getTarget(),res,NAME,s);
+        		super(res,NAME,s);
         	}
         }
 		public Factory(AppContext c) {
@@ -86,7 +86,7 @@ public class Dummy4 extends DataObject {
     		}
     	}
 		public SQLExpression<String> getNameExpression(){
-			return res.getStringExpression(getTarget(), NAME);
+			return res.getStringExpression(NAME);
 		}
 		@Override
 		protected TableSpecification getDefaultTableSpecification(AppContext c,

@@ -164,7 +164,7 @@ public abstract class Composite<BDO extends DataObject, X > implements Contexed,
 		if( data == null) {
 			throw new ConsistencyError("Null passed to getRecord");
 		}
-		throw new ConsistencyError("Wrong Object type passed to getRecord "+data.getIdentifier()+" expecting "+fac.getTarget().getSimpleName());
+		throw new ConsistencyError("Wrong Object type passed to getRecord "+data.getIdentifier());
 	}
 	/** method to allow sub-classes to retrieve the {@link Repository}.
 	 * 

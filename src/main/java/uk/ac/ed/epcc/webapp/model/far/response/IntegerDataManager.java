@@ -77,10 +77,7 @@ extends ResponseDataManager<M, R, F> {
 		return (M) new IntegerData(res);
 	}
 
-	@Override
-	public Class<M> getTarget() {
-		return (Class) IntegerData.class;
-	}
+	
 
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c,

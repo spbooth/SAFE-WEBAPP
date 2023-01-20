@@ -12,12 +12,10 @@ import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
  */
 public class AndPermissionClause<T extends DataObject> extends LinkedHashSet<PermissionClause<T>> implements PermissionClause<T>{
 
-	public AndPermissionClause(Class<T> target) {
+	public AndPermissionClause() {
 		super();
-		this.target = target;
 	}
 
-	private final Class<T> target;
 	/**
 	 * 
 	 */
@@ -28,10 +26,7 @@ public class AndPermissionClause<T extends DataObject> extends LinkedHashSet<Per
 		return visitor.visitAndPermissionClause(this);
 	}
 	
-	@Override
-	public Class<T> getTarget() {
-		return target;
-	}
+	
 	public String toString() {
 		return "AND("+super.toString()+")";
 	}

@@ -11,16 +11,12 @@ import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
 public class NegatingClause<T extends DataObject> implements PermissionClause<T> {
 
 	
-	public NegatingClause(Class<T> target, PermissionClause<T> inner) {
+	public NegatingClause( PermissionClause<T> inner) {
 		super();
 		this.inner = inner;
 	}
 
-	@Override
-	public Class<T> getTarget() {
-		return inner.getTarget();
-	}
-
+	
 	@Override
 	public <X> X accept(PermissionVisitor<X,T> visitor) throws UnknownRelationshipException {
 		return visitor.visitNegatingClause(this);

@@ -31,14 +31,14 @@ public final class ReferenceAcceptFilter<R extends Indexed,T extends DataObject>
          * @param field field referencing the peer
          * @param peer DataObject null for all records
          */
-        public ReferenceAcceptFilter(Class<T> target,String field, R peer){
+        public ReferenceAcceptFilter(String target,String field, R peer){
         	super(target);
         	this.field =field;
         	this.peer=peer;
         }
 		
 		
-		public final boolean accept(T d) {
+		public final boolean test(T d) {
 			return d.record.getIntProperty(field, 0) == peer.getID();
 		}	
 }

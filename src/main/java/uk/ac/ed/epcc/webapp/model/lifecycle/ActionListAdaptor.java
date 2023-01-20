@@ -12,8 +12,8 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
  */
 public class ActionListAdaptor<T extends DataObject> extends ActionList<T> implements LifeCycleListener<T> {
 
-	public ActionListAdaptor(DataObjectFactory<T> factory, String list_name) {
-		super(factory, list_name);
+	public ActionListAdaptor(Class<T> target,DataObjectFactory<T> factory, String list_name) {
+		super(target,factory, list_name);
 	}
 
 	@Override

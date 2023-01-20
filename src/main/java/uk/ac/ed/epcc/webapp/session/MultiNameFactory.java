@@ -20,18 +20,13 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
-import uk.ac.ed.epcc.webapp.model.data.DataCache;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.FilterResult;
-import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
+import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
@@ -87,10 +82,7 @@ public class MultiNameFactory<N extends MultiNameFactory.Name, AU extends AppUse
 		return (N) new  Name(res);
 	}
 
-	@Override
-	public Class<N> getTarget() {
-		return (Class<N>) Name.class;
-	}
+	
 
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c, String table) {
@@ -155,12 +147,12 @@ public class MultiNameFactory<N extends MultiNameFactory.Name, AU extends AppUse
 	@Override
 	public SQLFilter<N> getStringFinderFilter(String name) {
 		
-		return new SQLValueFilter<N>(getTarget(), res, NAME, name);
+		return new SQLValueFilter<N>(res, NAME, name);
 	}
     @Override
     public GenericBinaryFilter<N> hasCanonicalNameFilter(){
     	// all entries have names
-    	return new GenericBinaryFilter<N>(getTarget(), true);
+    	return new GenericBinaryFilter<N>( true);
     }
 	
 	public SQLFilter<AU> getPersonFilter(String name){

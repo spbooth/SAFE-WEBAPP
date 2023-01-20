@@ -31,12 +31,12 @@ import uk.ac.ed.epcc.webapp.model.data.filter.BackJoinFilter;
 
 public class SQLAndFilter<T> extends BaseSQLCombineFilter<T>  {
 
-	public SQLAndFilter(Class<T>target){
-		super(target);
+	public SQLAndFilter(String tag){
+		super(tag);
 	}
 	
-	public SQLAndFilter(Class<T>target,SQLFilter<? super T> ...filters ){
-		super(target);
+	public SQLAndFilter(String tag,SQLFilter<? super T> ...filters ){
+		super(tag);
 		for(SQLFilter<? super T> f : filters){
 			addFilter(f);
 		}

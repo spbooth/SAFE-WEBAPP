@@ -92,10 +92,6 @@ extends ResponseDataManager<M, R, F> {
 		return (M) new StringData(res);
 	}
 
-	@Override
-	public Class<M> getTarget() {
-		return (Class) StringData.class;
-	}
 
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c,

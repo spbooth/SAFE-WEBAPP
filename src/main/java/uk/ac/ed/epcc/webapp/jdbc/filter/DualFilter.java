@@ -32,8 +32,8 @@ private final SQLFilter<T> sql;
  * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
  */
 @Override
-public Class<T> getTarget() {
-	return sql.getTarget();
+public String getTag() {
+	return sql.getTag();
 }
 
 public SQLFilter<T> getSQLFilter(){

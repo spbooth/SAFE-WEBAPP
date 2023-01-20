@@ -13,25 +13,25 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.filter;
 
-/** An abstract class for implementing {@link AcceptFilter}.
+/** An abstract class for implementing {@link AcceptFilter} with tag checking
  * 
  * @author spb
  *
  */
 public abstract class AbstractAcceptFilter<T> implements AcceptFilter<T> {
 	
-	private final Class<T> target;
+	private String tag;
 
    /**
 	 * 
 	 */
-	protected AbstractAcceptFilter(Class<T> target) {
-		this.target=target;
+	protected AbstractAcceptFilter(String tag) {
+		this.tag=tag;
 	}
 	
 
 	@Override
-	public final Class<T> getTarget(){
-		return target;
+	public final String getTag() {
+		return tag;
 	}
 }

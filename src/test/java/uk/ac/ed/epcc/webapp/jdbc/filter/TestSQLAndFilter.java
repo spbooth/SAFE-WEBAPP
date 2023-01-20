@@ -81,10 +81,10 @@ public class TestSQLAndFilter extends WebappTestBase {
 		assertEquals(4, inter_count(d1_fac.new StringFilter("bill"),null,"bill"));
 		assertEquals(2, d1_fac.count(d1_fac.new NumberFilter(1.0)));
 		assertEquals(2, inter_count(d1_fac.new NumberFilter(1.0),1.0,null));
-		SQLAndFilter<Dummy1> fil = new SQLAndFilter<>(d1_fac.getTarget());
+		SQLAndFilter<Dummy1> fil = new SQLAndFilter<>(d1_fac.getTag());
 		assertEquals(8, d1_fac.count(fil));
 		assertEquals(8, inter_count(fil,null,null));
-		fil = new SQLAndFilter<>(d1_fac.getTarget());
+		fil = new SQLAndFilter<>(d1_fac.getTag());
 		fil.addFilter(d1_fac.new StringFilter("fred"));
 		assertEquals(4,d1_fac.count(fil));
 		assertEquals(4, inter_count(fil, null, "fred"));
@@ -92,15 +92,15 @@ public class TestSQLAndFilter extends WebappTestBase {
 		assertEquals(1, d1_fac.count(fil));
 		assertEquals(1, inter_count(fil, 1.0, "fred"));
 		// now try with AndFilter
-		AndFilter<Dummy1> fil2= new AndFilter<>(d1_fac.getTarget());
+		AndFilter<Dummy1> fil2= new AndFilter<>(d1_fac.getTag());
 		assertEquals(8, inter_count(fil2,null,null));
-		fil2= new AndFilter<>(d1_fac.getTarget());
+		fil2= new AndFilter<>(d1_fac.getTag());
 		fil2.addFilter(d1_fac.new StringFilter("fred"));
 		assertEquals(4, inter_count(fil2, null, "fred"));
 		fil2.addFilter(d1_fac.new NumberFilter(1.0));
 		assertEquals(1, inter_count(fil2, 1.0, "fred"));
 		
-		fil2= new AndFilter<>(d1_fac.getTarget());
+		fil2= new AndFilter<>(d1_fac.getTag());
 		fil2.addFilter(d1_fac.new StringFilter("fred"));
 		assertEquals(4, inter_count(fil2, null, "fred"));
 		fil2.addFilter(d1_fac.new NumberAcceptFilter(1.0));
@@ -109,28 +109,28 @@ public class TestSQLAndFilter extends WebappTestBase {
 		assertEquals(0, inter_count(fil2, null, null));
 		
 		// check explicit binary filters
-		assertEquals(8, d1_fac.count(new GenericBinaryFilter<>(d1_fac.getTarget(), true)));
-		assertEquals(8, inter_count(new GenericBinaryFilter<>(d1_fac.getTarget(), true),null,null));
+		assertEquals(8, d1_fac.count(new GenericBinaryFilter<>(true)));
+		assertEquals(8, inter_count(new GenericBinaryFilter<>( true),null,null));
 		
-		fil= new SQLAndFilter<>(d1_fac.getTarget());
-		fil.addFilter(new GenericBinaryFilter<>(d1_fac.getTarget(), true));
+		fil= new SQLAndFilter<>(d1_fac.getTag());
+		fil.addFilter(new GenericBinaryFilter<>(true));
 		assertEquals(8,d1_fac.count(fil));
 		assertEquals(8,inter_count(fil,null,null));
 		
-		assertEquals(0, d1_fac.count(new GenericBinaryFilter<>(d1_fac.getTarget(), false)));
-		assertEquals(0, inter_count(new GenericBinaryFilter<>(d1_fac.getTarget(), false),null,null));
-		fil= new SQLAndFilter<>(d1_fac.getTarget());
-		fil.addFilter(new GenericBinaryFilter<>(d1_fac.getTarget(), false));
+		assertEquals(0, d1_fac.count(new GenericBinaryFilter<>( false)));
+		assertEquals(0, inter_count(new GenericBinaryFilter<>(false),null,null));
+		fil= new SQLAndFilter<>(d1_fac.getTag());
+		fil.addFilter(new GenericBinaryFilter<>(false));
 		assertEquals(0,d1_fac.count(fil));
 		assertEquals(0,inter_count(fil,null,null));
 	}
 	
 	@Test
 	public void testAddFalse(){
-		SQLAndFilter<Dummy1> fil = new SQLAndFilter<>(Dummy1.class);
+		SQLAndFilter<Dummy1> fil = new SQLAndFilter<>(null);
 		
 		assertTrue(fil.getBooleanResult());
-		fil.addFilter(new FalseFilter<>(Dummy1.class));
+		fil.addFilter(new FalseFilter<>());
 		assertFalse("Filter should be forced false",fil.getBooleanResult()); 
 	}
 	

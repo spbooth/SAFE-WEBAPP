@@ -39,8 +39,8 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 public class ListenerList<T extends DataObject> extends AbstractConstructedTargetList<T,LifeCycleListener<T>> implements LifeCycleListener<T>{
 
 	
-	public ListenerList(DataObjectFactory<T> factory,String list_name){
-		super(factory,list_name);
+	public ListenerList(Class<T> target,DataObjectFactory<T> factory,String list_name){
+		super(target,factory,list_name);
 	}
 
 	/* (non-Javadoc)

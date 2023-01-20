@@ -55,10 +55,7 @@ public class TextDataFactory<T extends TextData> extends DataObjectFactory<T> im
 	protected TableSpecification getDefaultTableSpecification(AppContext c, String table) {
 		return TextData.getTableSpecification();
 	}
-	@Override
-	public Class<T> getTarget() {
-		return (Class) TextData.class;
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.AnonymisingFactory#anonymise()
 	 */
@@ -66,7 +63,7 @@ public class TextDataFactory<T extends TextData> extends DataObjectFactory<T> im
 	public void anonymise() throws DataFault {
 		FilterUpdate<T> update = new FilterUpdate<>(res);
 		// wipe all text data
-		update.update(res.getStringExpression(getTarget(), TextData.TEXT), "redacted-text", null);
+		update.update(res.getStringExpression(TextData.TEXT), "redacted-text", null);
 		
 	}
 

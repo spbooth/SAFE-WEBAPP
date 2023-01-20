@@ -134,10 +134,6 @@ extends ResponseDataManager<M, R, F> {
 		return (M) new StreamDataRecord(res);
 	}
 
-	@Override
-	public Class<M> getTarget() {
-		return (Class) StreamDataRecord.class;
-	}
 
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c,

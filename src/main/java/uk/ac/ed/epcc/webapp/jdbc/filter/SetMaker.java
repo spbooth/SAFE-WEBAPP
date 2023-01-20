@@ -30,8 +30,8 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
  */
 public abstract class SetMaker<F, O> extends FilterFinder<F, Set<O>> {
 
-	public SetMaker(AppContext c,Class<F> target) {
-		super(c, target,true);
+	public SetMaker(AppContext c,String tag) {
+		super(c, tag,true);
 	}
 
 	public Set<O> makeSet(SQLFilter<F> f) throws DataException {

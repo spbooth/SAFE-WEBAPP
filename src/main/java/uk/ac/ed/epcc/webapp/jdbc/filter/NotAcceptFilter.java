@@ -29,7 +29,7 @@ public class NotAcceptFilter<T extends DataObject> extends AbstractAcceptFilter<
 	 * @param fil
 	 */
 	public NotAcceptFilter(DataObjectFactory<T> fac, BaseFilter<T> fil) {
-		super(fac.getTarget());
+		super(fac.getTag());
 		this.fac = fac;
 		this.fil = fil;
 	}
@@ -44,7 +44,7 @@ public class NotAcceptFilter<T extends DataObject> extends AbstractAcceptFilter<
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
 	 */
 	@Override
-	public boolean accept(T o) {
+	public boolean test(T o) {
 		return ! fac.matches(fil, o);
 	}
 

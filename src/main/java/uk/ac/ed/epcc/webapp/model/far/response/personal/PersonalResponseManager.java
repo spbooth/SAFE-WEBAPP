@@ -155,7 +155,7 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 	 */
 	public R getResponse(D form) throws DataException{
 		SessionService<?> sess = getContext().getService(SessionService.class);
-		SQLAndFilter<R> fil = new SQLAndFilter<>(getTarget());
+		SQLAndFilter<R> fil = new SQLAndFilter<>(getTag());
 		fil.addFilter(getFormFilter(form));
 		fil.addFilter(getMyResponsesFilter(sess));
 		R result = find(fil,true);
@@ -182,10 +182,7 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 		return spec;
 	}
 
-	@Override
-	public Class<R> getTarget() {
-		return (Class) PersonalResponse.class;
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator#getTransitionProvider(java.lang.String)

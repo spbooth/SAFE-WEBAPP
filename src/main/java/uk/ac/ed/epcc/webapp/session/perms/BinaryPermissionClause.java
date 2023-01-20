@@ -10,20 +10,14 @@ import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
  */
 public class BinaryPermissionClause<T extends DataObject> implements PermissionClause<T> {
 
-	public BinaryPermissionClause(Class<T> target, boolean value) {
+	public BinaryPermissionClause( boolean value) {
 		super();
-		this.target = target;
 		this.value = value;
 	}
 
-	private final Class<T> target;
 	private final boolean value;
 	
-	@Override
-	public Class<T> getTarget() {
-		return target;
-	}
-
+	
 	@Override
 	public <X> X accept(PermissionVisitor<X, T> visitor) throws UnknownRelationshipException {
 		return visitor.visitBinaryPermissionClause(this);
@@ -37,7 +31,6 @@ public class BinaryPermissionClause<T extends DataObject> implements PermissionC
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((target == null) ? 0 : target.hashCode());
 		result = prime * result + (value ? 1231 : 1237);
 		return result;
 	}
@@ -51,11 +44,6 @@ public class BinaryPermissionClause<T extends DataObject> implements PermissionC
 		if (getClass() != obj.getClass())
 			return false;
 		BinaryPermissionClause other = (BinaryPermissionClause) obj;
-		if (target == null) {
-			if (other.target != null)
-				return false;
-		} else if (target != (other.target))
-			return false;
 		if (value != other.value)
 			return false;
 		return true;

@@ -85,10 +85,6 @@ extends ResponseDataManager<M, R, F> {
 		return (M) new BooleanData(res);
 	}
 
-	@Override
-	public Class<M> getTarget() {
-		return (Class) BooleanData.class;
-	}
 
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c,

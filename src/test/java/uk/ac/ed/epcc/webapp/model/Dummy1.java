@@ -128,20 +128,20 @@ public class Dummy1 extends DataObject implements Removable {
 		
 		public class NumberFilter extends SQLValueFilter<Dummy1>{
          	public NumberFilter(Number n){
-         		super(Factory.this.getTarget(),res,NUMBER,n);
+         		super(res,NUMBER,n);
          	}
          }
 		 public class StringAcceptFilter extends AbstractAcceptFilter<Dummy1>{
 			 String s;
 			 public StringAcceptFilter(String s) {
-				 super(Factory.this.getTarget());
+				 super(Factory.this.getTag());
 				 this.s=s;
 			 }
 			/* (non-Javadoc)
 			 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
 			 */
 			@Override
-			public boolean accept(Dummy1 o) {
+			public boolean test(Dummy1 o) {
 				return s.equals(o.getName());
 			}
 			@Override
@@ -181,10 +181,10 @@ public class Dummy1 extends DataObject implements Removable {
     	 public class NumberAcceptFilter extends AbstractAcceptFilter<Dummy1>{
     		 Number n;
           	public NumberAcceptFilter(Number n){
-          		super(Factory.this.getTarget());
+          		super(Factory.this.getTag());
           		this.n=n;
           	}
-			public boolean accept(Dummy1 d) {
+			public boolean test(Dummy1 d) {
 				return n.intValue() == d.getNumber();
 			}
 			@Override
@@ -223,12 +223,12 @@ public class Dummy1 extends DataObject implements Removable {
           }
          public class StringFilter extends SQLValueFilter<Dummy1>{
          	public StringFilter(String s){
-         		super(Factory.this.getTarget(),res,NAME,s);
+         		super(res,NAME,s);
          	}
          }
          public class BeatleFilter extends FieldValueFilter<Beatle, Dummy1>{
         	 public BeatleFilter(Beatle beat) {
-        		 super(Factory.this.getTarget(),res.getTypeProducerExpression(beatles),beat);
+        		 super(res.getTypeProducerExpression(Beatle.class,beatles),beat);
         	 }
          }
 		public Factory(AppContext c) {
@@ -256,23 +256,23 @@ public class Dummy1 extends DataObject implements Removable {
 		}
 		
 		public FilterResult<Dummy1> getReverse() throws DataFault{
-			AndFilter<Dummy1>fil = new AndFilter<>(getTarget());
-			fil.addFilter(new FieldOrderFilter<>(Factory.this.getTarget(),res, NUMBER, true));
+			AndFilter<Dummy1>fil = new AndFilter<>(getTag());
+			fil.addFilter(new FieldOrderFilter<>(res, NUMBER, true));
 			return getResult(fil);
 			
 		}
 		public SQLExpression<String> getNameExpression(){
-			return res.getStringExpression(getTarget(), NAME);
+			return res.getStringExpression(NAME);
 		}
 		public SQLExpression<Number> getNumberExpression(){
-			return res.getNumberExpression(getTarget(), Number.class, NUMBER);
+			return res.getNumberExpression(Number.class, NUMBER);
 		}
 		
 		public TypeProducerFieldValue<Dummy1, Beatle, String> getBeatleFieldValue(){
-			return res.getTypeProducerExpression(beatles);
+			return res.getTypeProducerExpression(Beatle.class,beatles);
 		}
 		public FilterResult<Dummy1> getWithFilter() throws DataFault{
-			AndFilter<Dummy1>fil = new AndFilter<>(getTarget());
+			AndFilter<Dummy1>fil = new AndFilter<>(getTag());
 			return getResult(fil);
 			
 		}
@@ -296,13 +296,7 @@ public class Dummy1 extends DataObject implements Removable {
 		public boolean fieldExists(String name){
 			return res.hasField(name);
 		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getTarget()
-		 */
-		@Override
-		public Class<Dummy1> getTarget() {
-			return Dummy1.class;
-		}
+		
 		public NumberFilter getNumberFilter(Number n) {
 			return new NumberFilter(n);
 		}

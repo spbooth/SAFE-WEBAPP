@@ -236,7 +236,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 			}
 			if (!manager.isLeft(o)) {
 				throw new ClassCastException(
-						"Illegal type passed to LinkManager "+o.getClass().getCanonicalName()+" expecting "+manager.getLeftProducer().getTarget().getCanonicalName());
+						"Illegal type passed to LinkManager "+o.getClass().getCanonicalName());
 			}
 			// must be explicit getProperty as we are testing for uninitialised
 			// field
@@ -268,7 +268,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 			}
 			if (!manager.isRight(o)) {
 				throw new ClassCastException(
-						"Illegal type passed to LinkManager "+o.getClass().getCanonicalName()+" expecting "+manager.getRightProducer().getTarget().getCanonicalName());
+						"Illegal type passed to LinkManager "+o.getClass().getCanonicalName());
 			}
 
 			// must be explicit getProperty as we are testing for uninitialised
@@ -344,7 +344,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		 *            extension Filter
 		 */
 		public LinkFilter(L l, R r, BaseFilter<T> f) {
-			super((Class<T>) IndexedLinkManager.this.getTarget());
+			super(IndexedLinkManager.this.getTag());
 			left_target = l;
 			right_target = r;
 			if (l != null && !isLeft(l)) {
@@ -407,7 +407,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		 *            extension Filter
 		 */
 		public SQLLinkFilter(L l, R r, SQLFilter<? super T> f) {
-			super((Class<T>) IndexedLinkManager.this.getTarget());
+			super(IndexedLinkManager.this.getTag());
 			left_target = l;
 			right_target = r;
 			if (l != null && !isLeft(l)) {
@@ -613,7 +613,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		   timer.startTimer(tag);
 		}
 		try {
-			SQLAndFilter<T> fil = new SQLAndFilter<>(getTarget());
+			SQLAndFilter<T> fil = new SQLAndFilter<>(getTag());
 			fil.addFilter(new ReferenceFilter<>(this, left_field, left_end));
 			fil.addFilter(new ReferenceFilter<>(this, right_field, right_end));
 			T l = find(fil,true);
@@ -692,10 +692,22 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 
 
 	protected boolean isLeft(Object o){
-		return o != null && getLeftProducer().getTarget().isAssignableFrom(o.getClass());
+		if( o == null) {
+			return false;
+		}
+		if( ! (o instanceof Indexed)) {
+			return false;
+		}
+		return true;
 	}
 	protected boolean isRight(Object o){
-		return o != null && getRightProducer().getTarget().isAssignableFrom(o.getClass());
+		if( o == null) {
+			return false;
+		}
+		if( ! (o instanceof Indexed)) {
+			return false;
+		}
+		return true;
 	}
 	/**
 	 * create a new HistoryFactory suitable for the Link objects produced by
@@ -825,8 +837,5 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		}
 	}
 
-	@Override
-	public Class<T> getTarget(){
-		return (Class) Link.class;
-	}
+	
 }

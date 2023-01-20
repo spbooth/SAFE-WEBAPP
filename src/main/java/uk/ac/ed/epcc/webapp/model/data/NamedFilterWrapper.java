@@ -68,14 +68,14 @@ public class NamedFilterWrapper<T extends DataObject> extends AbstractContexed i
 		// when called from the SessionService relationship code the AND/OR combinations should
 		// be parsed at that level
 		if( name.contains(",")) {
-			OrFilter<T> or = new OrFilter<>(fac.getTarget(), fac);
+			OrFilter<T> or = new OrFilter<>(fac.getTag(), fac);
 			for(String sub : name.split(",")) {
 				or.addFilter(getNamedFilter(sub));
 			}
 			return or;
 		}
 		if( name.contains("+")) {
-			AndFilter<T> and = new AndFilter<>(fac.getTarget());
+			AndFilter<T> and = new AndFilter<>(fac.getTag());
 			for(String sub : name.split("\\+")) {
 				and.addFilter(getNamedFilter(sub));
 			}

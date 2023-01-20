@@ -10,7 +10,7 @@ import uk.ac.ed.epcc.webapp.model.lifecycle.ActionList;
  */
 public class ActionFieldNameFinder<AU extends AppUser> extends FieldNameFinder<AU, ActionFieldNameFinder> {
 
-	public ActionFieldNameFinder(AppUserFactory factory, String realm) {
+	public ActionFieldNameFinder(AppUserFactory<AU> factory, String realm) {
 		super(factory, realm);
 	}
 
@@ -26,6 +26,6 @@ public class ActionFieldNameFinder<AU extends AppUser> extends FieldNameFinder<A
 
 	
 	public ActionList<AU> getSetActions() {
-		return new ActionList<AU>(getFactory(), getRealm()+"-set");
+		return new ActionList<AU>(getAppUserFactory().getTarget(),getAppUserFactory(), getRealm()+"-set");
 	}
 }

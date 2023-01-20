@@ -52,7 +52,7 @@ public class RelationshipRoleFilterPermissionVisitor<A extends AppUser,T extends
 	
 	@Override
 	public BaseFilter<T> visitGlobalPermissionClause(GlobalPermissionClause<T> b) {
-		return new GenericBinaryFilter<>(fac2.getTarget(),sess.canHaveRole(person, b.getRole()));
+		return new GenericBinaryFilter<>(sess.canHaveRole(person, b.getRole()));
 	}
 	@Override
 	public <U extends AppUser> BaseFilter<T> visitAccessRolePermissionClause(AccessRoleProviderPermissionClause<U, T> a) {

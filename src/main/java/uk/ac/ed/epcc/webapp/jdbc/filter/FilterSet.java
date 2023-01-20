@@ -28,15 +28,15 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 public abstract class FilterSet<T> {
 
 
-	protected Class<T> target;
+	protected String target_tag;
 
 	/**
 	 * @param target type of filter
 	 * 
 	 */
-	public FilterSet(Class<T> target) {
+	public FilterSet(String tag) {
 		super();
-		this.target=target;
+		this.target_tag=tag;
 	}
 
 	/** get a visitor to add the visitors target to the set.
@@ -50,19 +50,15 @@ public abstract class FilterSet<T> {
 			return this;
 		}
 		if( check_types){
-			if( target == null ){
-				target=(Class<T>) fil.getTarget();
+			if( target_tag == null ){
+				target_tag = fil.getTag();
 			}else{
 				// Its OK to add a super-type filter to a more specific filter but
 				// not the other way round.
-				Class target2 = fil.getTarget();
-				if( target2 != null && target != null && ! target2.isAssignableFrom(target)){
-					if( target.isAssignableFrom(target2)){
-						// adding more restricive target
-						target=target2;
-					}else{
-						throw new ConsistencyError("Incompatible filter types "+target2.getCanonicalName()+","+target.getCanonicalName());
-					}
+				String tag2 = fil.getTag();
+				if( target_tag != null && tag2 != null && ! target_tag.equals(tag2)){
+				
+						throw new ConsistencyError("Incompatible filter types "+target_tag+","+tag2);
 				}
 			}
 		}
@@ -74,34 +70,11 @@ public abstract class FilterSet<T> {
 		return this;
 	}
 	
-	public final Class<T> getTarget(){
-		return target;
+	public final String getTag() {
+		return target_tag;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((target == null) ? 0 : target.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		FilterSet other = (FilterSet) obj;
-		if (target == null) {
-			if (other.target != null)
-				return false;
-		} else if (!target.equals(other.target))
-			return false;
-		return true;
-	}
+	
 	/** is the set of selection filters empty
 	 * 
 	 * @return
@@ -119,4 +92,29 @@ public abstract class FilterSet<T> {
 	 * @return
 	 */
 	public abstract Set<BaseFilter> getSet();
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((target_tag == null) ? 0 : target_tag.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		FilterSet other = (FilterSet) obj;
+		if (target_tag == null) {
+			if (other.target_tag != null)
+				return false;
+		} else if (!target_tag.equals(other.target_tag))
+			return false;
+		return true;
+	}
 }

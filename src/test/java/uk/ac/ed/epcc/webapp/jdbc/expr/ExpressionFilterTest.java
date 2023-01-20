@@ -59,7 +59,7 @@ public class ExpressionFilterTest extends WebappTestBase {
 	@Test
 	public void testMatch() {
 		StringFieldExpression exp = fac.getNameSQLAccessor();
-		SQLFilter filter = SQLExpressionFilter.getFilter(fac.getTarget(),exp,"Boris");
+		SQLFilter filter = SQLExpressionFilter.getFilter(fac.getTag(),exp,"Boris");
 		assertTrue(fac.matches(filter, obj));
 		assertEquals("FieldExpression(ExpressionTest.Name->java.lang.String)",exp.toString());
 		assertEquals("SQLExpressionFilter(FieldExpression(ExpressionTest.Name->java.lang.String)=Boris)",filter.toString());
@@ -68,7 +68,7 @@ public class ExpressionFilterTest extends WebappTestBase {
 	@Test
 	public void testMatch2() {
 		FieldSQLExpression<Integer, ExpressionTest> exp = fac.getIntA();
-		SQLFilter<ExpressionTest> filter = SQLExpressionFilter.getFilter(fac.getTarget(),exp,MatchCondition.GT,3);
+		SQLFilter<ExpressionTest> filter = SQLExpressionFilter.getFilter(fac.getTag(),exp,MatchCondition.GT,3);
 		assertTrue(fac.matches(filter, obj));
 		assertEquals("FieldExpression(ExpressionTest.IntA->java.lang.Integer)", exp.toString());
 		assertEquals("SQLExpressionFilter(FieldExpression(ExpressionTest.IntA->java.lang.Integer)>3)",filter.toString());
@@ -76,7 +76,7 @@ public class ExpressionFilterTest extends WebappTestBase {
 	@Test
 	public void testMatch3() {
 		FieldSQLExpression<Integer, ExpressionTest> exp = fac.getIntA();
-		SQLFilter<ExpressionTest> filter = SQLExpressionFilter.getFilter(fac.getTarget(),exp,MatchCondition.LE,3);
+		SQLFilter<ExpressionTest> filter = SQLExpressionFilter.getFilter(fac.getTag(),exp,MatchCondition.LE,3);
 		assertFalse(fac.matches(filter, obj));
 		assertEquals("FieldExpression(ExpressionTest.IntA->java.lang.Integer)", exp.toString());
 		assertEquals("SQLExpressionFilter(FieldExpression(ExpressionTest.IntA->java.lang.Integer)<=3)",filter.toString());
@@ -87,7 +87,7 @@ public class ExpressionFilterTest extends WebappTestBase {
 		Calendar c = Calendar.getInstance();
 		c.clear();
 		c.set(2018, Calendar.JANUARY, 1);
-		SQLFilter<ExpressionTest> filter = SQLExpressionFilter.getFilter(fac.getTarget(),exp,MatchCondition.LT,c.getTime());
+		SQLFilter<ExpressionTest> filter = SQLExpressionFilter.getFilter(fac.getTag(),exp,MatchCondition.LT,c.getTime());
 		assertTrue(fac.matches(filter, obj));
 		assertEquals("FieldExpression(ExpressionTest.DateA->java.util.Date)", exp.toString());
 		assertEquals("SQLExpressionFilter(FieldExpression(ExpressionTest.DateA->java.lang.Long)<1514764800)",filter.toString());
@@ -98,7 +98,7 @@ public class ExpressionFilterTest extends WebappTestBase {
 		Calendar c = Calendar.getInstance();
 		c.clear();
 		c.set(2018, Calendar.JANUARY, 1);
-		SQLFilter<ExpressionTest> filter = SQLExpressionMatchFilter.getFilter(fac.getTarget(),exp,MatchCondition.LT,new ConstExpression<>(Date.class, c.getTime()));
+		SQLFilter<ExpressionTest> filter = SQLExpressionMatchFilter.getFilter(fac.getTag(),exp,MatchCondition.LT,new ConstExpression<>(Date.class, c.getTime()));
 		assertTrue(fac.matches(filter, obj));
 		assertEquals("FieldExpression(ExpressionTest.DateA->java.util.Date)", exp.toString());
 		assertEquals("SQLExpressionMatchFilter(FieldExpression(ExpressionTest.DateA->java.util.Date)<Const(Mon Jan 01 00:00:00 GMT 2018))", filter.toString());
@@ -106,6 +106,6 @@ public class ExpressionFilterTest extends WebappTestBase {
 	}
 	@Test
 	public void testConstant() {
-		assertEquals(new GenericBinaryFilter(fac.getTarget(),true),SQLExpressionMatchFilter.getFilter(fac.getTarget(), new ConstExpression<>(Integer.class, 100),MatchCondition.GT ,new ConstExpression<>(Integer.class, 12)));
+		assertEquals(new GenericBinaryFilter(true),SQLExpressionMatchFilter.getFilter(fac.getTag(), new ConstExpression<>(Integer.class, 100),MatchCondition.GT ,new ConstExpression<>(Integer.class, 12)));
 	}
 }

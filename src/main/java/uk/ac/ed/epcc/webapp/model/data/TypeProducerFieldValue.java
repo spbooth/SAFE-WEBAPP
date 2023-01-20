@@ -44,9 +44,11 @@ import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 
 public class TypeProducerFieldValue<T extends DataObject,O,D> implements FieldValue<O,T> {
 	private final Repository repository;
+	private final Class<O> type;
 	private final TypeProducer<O,D> producer;
-	public TypeProducerFieldValue(Repository repository, TypeProducer<O,D> producer) {
+	public TypeProducerFieldValue(Repository repository, Class<O> type,TypeProducer<O,D> producer) {
 		this.repository=repository;
+		this.type=type;
 		this.producer=producer;
 		
 	}
@@ -85,7 +87,7 @@ public class TypeProducerFieldValue<T extends DataObject,O,D> implements FieldVa
 		
 	}
 	public Class<O> getTarget() {
-		return producer.getTarget();
+		return type;
 	}
 	
 	

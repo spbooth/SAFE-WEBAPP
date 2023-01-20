@@ -51,7 +51,7 @@ public class SessionRelationshipRoleFilterPermissionVisitor<A extends AppUser,T 
 	@Override
 	public <U extends AppUser> BaseFilter<T> visitAccessRolePermissionClause(AccessRoleProviderPermissionClause<U, T> a) {
 			if( ! sess.haveCurrentUser()) {
-				return new FalseFilter<T>(getFactory().getTarget());
+				return new FalseFilter<T>();
 			}
 			return a.getProvider().hasRelationFilter(a.getRole(),(SessionService<U>) sess);
 	}

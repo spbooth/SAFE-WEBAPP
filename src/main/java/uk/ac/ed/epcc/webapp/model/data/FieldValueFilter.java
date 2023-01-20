@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -38,23 +37,16 @@ public class FieldValueFilter<V,T> implements PatternFilter<T>, SQLFilter<T> {
 	 * @param field
 	 * @param value
 	 */
-	public FieldValueFilter(Class<T> target,FieldValue<V, T> field, V value) {
+	public FieldValueFilter(FieldValue<V, T> field, V value) {
 		super();
-		this.target=target;
 		this.field = field;
 		this.value = value;
 	}
-	private final Class<T> target;
+	
 	private final FieldValue<V, T> field;
 	private final V value;
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
-	 */
-	@Override
-	public Class<T> getTarget() {
-		return target;
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter#getParameters(java.util.List)
 	 */
@@ -77,7 +69,6 @@ public class FieldValueFilter<V,T> implements PatternFilter<T>, SQLFilter<T> {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((field == null) ? 0 : field.hashCode());
-		result = prime * result + ((target == null) ? 0 : target.hashCode());
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
@@ -94,11 +85,6 @@ public class FieldValueFilter<V,T> implements PatternFilter<T>, SQLFilter<T> {
 			if (other.field != null)
 				return false;
 		} else if (!field.equals(other.field))
-			return false;
-		if (target == null) {
-			if (other.target != null)
-				return false;
-		} else if (!target.equals(other.target))
 			return false;
 		if (value == null) {
 			if (other.value != null)

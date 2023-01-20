@@ -182,12 +182,12 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 			for(String s : getDefaultRoles(getContext(), getConfigTag())) {
 				if( role.equals(s)) {
 					// a default role without a field
-					return new FalseFilter<Relationship.Link<A,B>>(getTarget());
+					return new FalseFilter<Relationship.Link<A,B>>();
 				}
 			}
 			throw new UnknownRelationshipException(role+"@"+getTag());
 		}
-		return new SQLValueFilter<>(getTarget(),res,role,Boolean.TRUE);
+		return new SQLValueFilter<>(res,role,Boolean.TRUE);
 	}
 		
 	
@@ -280,6 +280,6 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 			return;
 		}
 		FilterDelete del = new FilterDelete(res);
-		del.delete(new SQLValueFilter(getTarget(), res, getLeftField(), user));
+		del.delete(new SQLValueFilter(res, getLeftField(), user));
 	}
 }

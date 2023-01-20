@@ -47,7 +47,7 @@ public final class ReferenceFilter< BDO extends DataObject,R extends Indexed> ex
      * @param factory factory filter is for
      */
     public ReferenceFilter(DataObjectFactory<BDO> factory, String field,R peer){
-    	super(factory.getTarget(),factory.res,field,peer == null ? null : peer.getID());
+    	super(factory.res,field,peer == null ? null : peer.getID());
     }
     
     /** Make the filter from an {@link IndexedReference}
@@ -57,7 +57,7 @@ public final class ReferenceFilter< BDO extends DataObject,R extends Indexed> ex
      * @param index {@link IndexedReference} null for all records
      */
     public ReferenceFilter(DataObjectFactory<BDO> factory,String field,IndexedReference<R> index){
-    	super(factory.getTarget(),factory.res,field,index == null || index.isNull() ? null : index.getID());
+    	super(factory.res,field,index == null || index.isNull() ? null : index.getID());
     }
 	
 }

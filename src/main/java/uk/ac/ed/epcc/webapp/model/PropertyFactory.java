@@ -135,7 +135,7 @@ public class PropertyFactory extends DataObjectFactory<Property> {
 		}
     }
     public Property findByName(String name) throws DataException{
-    	return find(new SQLValueFilter<>(getTarget(),res, Property.NAME, name),true);
+    	return find(new SQLValueFilter<>(res, Property.NAME, name),true);
     }
     /** Save properties to the database.
      * 

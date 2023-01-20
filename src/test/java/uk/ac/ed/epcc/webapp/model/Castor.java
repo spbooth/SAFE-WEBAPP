@@ -84,7 +84,7 @@ public class Castor extends DataObject implements Removable {
     	}
 		
 		public SQLExpression<String> getNameExpression(){
-			return res.getStringExpression(getTarget(), NAME);
+			return res.getStringExpression(NAME);
 		}
 		
 		@Override
@@ -102,19 +102,13 @@ public class Castor extends DataObject implements Removable {
 		public boolean fieldExists(String name){
 			return res.hasField(name);
 		}
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getTarget()
-		 */
-		@Override
-		public Class<Castor> getTarget() {
-			return Castor.class;
-		}
+		
 		public BaseFilter<Castor> getFilterFromPeer(BaseFilter<Pollux>  fil){
 			return getRemoteFilter(new Pollux.Factory(getContext()), REMOTE, fil);
 		}
 		 public class StringFilter extends SQLValueFilter<Castor>{
 	         	public StringFilter(String s){
-	         		super(Factory.this.getTarget(),res,NAME,s);
+	         		super(res,NAME,s);
 	         	}
 	         }
     }

@@ -78,7 +78,7 @@ public class TestSQLOrFilter extends WebappTestBase {
 	
 	@Test
 	public void testPattern() throws DataException {
-		SQLOrFilter<Dummy1> fil = new SQLOrFilter<>(fac.getTarget());
+		SQLOrFilter<Dummy1> fil = new SQLOrFilter<>(fac.getTag());
 		
 		fil.addFilter(fac.new StringFilter("fred"));
 		fil.addFilter(fac.new NumberFilter(2));
@@ -91,7 +91,7 @@ public class TestSQLOrFilter extends WebappTestBase {
 	
 	@Test
 	public void testPatternJoin() throws DataException {
-		SQLOrFilter<DummyReference> fil = new SQLOrFilter<>(ref.getTarget());
+		SQLOrFilter<DummyReference> fil = new SQLOrFilter<>(ref.getTag());
 		
 		fil.addFilter((SQLFilter<? super DummyReference>) ref.getRemoteNameFilter("fred"));
 		fil.addFilter((SQLFilter<? super DummyReference>) ref.getRemoteNumberFilter(2));
@@ -105,7 +105,7 @@ public class TestSQLOrFilter extends WebappTestBase {
 	
 	@Test
 	public void testBackJoin() throws DataException{
-		SQLOrFilter<Dummy1> fil = new SQLOrFilter<Dummy1>(fac.getTarget());
+		SQLOrFilter<Dummy1> fil = new SQLOrFilter<Dummy1>(fac.getTag());
 		
 		BaseFilter<Dummy1> freddest = ref.getDestFilter("RefFred");
 		assertTrue(fac.matches(freddest, fred));
@@ -122,7 +122,7 @@ public class TestSQLOrFilter extends WebappTestBase {
 	}
 	@Test
 	public void testBackJoinMulti() throws DataException{
-		SQLOrFilter<Dummy1> fil = new SQLOrFilter<Dummy1>(fac.getTarget());
+		SQLOrFilter<Dummy1> fil = new SQLOrFilter<Dummy1>(fac.getTag());
 		
 		BaseFilter<Dummy1> freddest = ref.getDestFilter("RefBill");
 		assertTrue(fac.matches(freddest, bill));
@@ -140,12 +140,12 @@ public class TestSQLOrFilter extends WebappTestBase {
 	
 	@Test
 	public void testFixedFalse() throws DataException {
-		SQLOrFilter<Dummy1> fil = new SQLOrFilter<>(fac.getTarget());
+		SQLOrFilter<Dummy1> fil = new SQLOrFilter<>(fac.getTag());
 		
 		fil.addFilter(fac.new StringFilter("fred"));
 		fil.addFilter(fac.new NumberFilter(2));
 		// won't change result
-		fil.addFilter(new GenericBinaryFilter<>(fac.getTarget(), false));
+		fil.addFilter(new GenericBinaryFilter<>(false));
 		assertEquals(2, fac.getCount(fil));
 		assertTrue(fac.matches(fil, fred));
 		assertTrue(fac.matches(fil, bill));
@@ -154,11 +154,11 @@ public class TestSQLOrFilter extends WebappTestBase {
 	}
 	@Test
 	public void testFixedTrue() throws DataException {
-		SQLOrFilter<Dummy1> fil = new SQLOrFilter<>(fac.getTarget());
+		SQLOrFilter<Dummy1> fil = new SQLOrFilter<>(fac.getTag());
 		
 		fil.addFilter(fac.new StringFilter("fred"));
 		fil.addFilter(fac.new NumberFilter(2));
-		fil.addFilter(new GenericBinaryFilter<>(fac.getTarget(), true));
+		fil.addFilter(new GenericBinaryFilter<>(true));
 		assertEquals(3, fac.getCount(fil));
 		assertTrue(fac.matches(fil, fred));
 		assertTrue(fac.matches(fil, bill));
@@ -171,7 +171,7 @@ public class TestSQLOrFilter extends WebappTestBase {
 	
 	@Test
 	public void testAndJoin() throws DataException {
-		SQLOrFilter<DummyReference> fil = new SQLOrFilter<>(ref.getTarget());
+		SQLOrFilter<DummyReference> fil = new SQLOrFilter<>(ref.getTag());
 		
 		fil.addFilter((SQLFilter<? super DummyReference>) ref.getRemoteNameFilter("fred"));
 		fil.addFilter((SQLFilter<? super DummyReference>) ref.getRemoteNumberSQLAndFilter(2));
@@ -184,10 +184,10 @@ public class TestSQLOrFilter extends WebappTestBase {
 	}
 	@Test
 	public void testAnd() throws DataException {
-		SQLOrFilter<Dummy1> fil = new SQLOrFilter<>(fac.getTarget());
+		SQLOrFilter<Dummy1> fil = new SQLOrFilter<>(fac.getTag());
 		
 		fil.addFilter(fac.new StringFilter("fred"));
-		SQLAndFilter and = new SQLAndFilter<>(fac.getTarget());
+		SQLAndFilter and = new SQLAndFilter<>(fac.getTag());
 		and.addFilter(fac.new StringFilter("bill"));
 		and.addFilter(fac.new NumberFilter(2));
 		fil.addFilter(and);
@@ -200,10 +200,10 @@ public class TestSQLOrFilter extends WebappTestBase {
 	
 	@Test
 	public void testEmptyAnd() throws DataException {
-		SQLOrFilter<Dummy1> fil = new SQLOrFilter<>(fac.getTarget());
+		SQLOrFilter<Dummy1> fil = new SQLOrFilter<>(fac.getTag());
 		
 		fil.addFilter(fac.new StringFilter("fred"));
-		SQLAndFilter and = new SQLAndFilter<>(fac.getTarget());
+		SQLAndFilter and = new SQLAndFilter<>(fac.getTag());
 		
 		fil.addFilter(and);
 		assertEquals(3, fac.getCount(fil));
@@ -216,7 +216,7 @@ public class TestSQLOrFilter extends WebappTestBase {
 	
 	private <X> void checkStd(SQLOrFilter<X> fil, String expected) {
 		assertEquals(expected, fil.toString());
-		SQLOrFilter<X> dup = new SQLOrFilter<>(fil.getTarget());
+		SQLOrFilter<X> dup = new SQLOrFilter<>(fil.getTag());
 		dup.addFilter(fil);
 		if( ! fil.isForced()) {
 			// duplicates of forced filters won't have same string rep
@@ -236,13 +236,13 @@ public class TestSQLOrFilter extends WebappTestBase {
 	
 	@Test
 	public void testNestedOr() throws DataException {
-		SQLOrFilter<Dummy1> fil = new SQLOrFilter<>(fac.getTarget());
+		SQLOrFilter<Dummy1> fil = new SQLOrFilter<>(fac.getTag());
 		
 		fil.addFilter(fac.new StringFilter("fred"));
-		SQLOrFilter or = new SQLOrFilter<>(fac.getTarget());
+		SQLOrFilter or = new SQLOrFilter<>(fac.getTag());
 		or.addFilter(fac.new StringFilter("bill"));
 		or.addFilter(fac.new NumberFilter(2));
-		or.addFilter(new GenericBinaryFilter<>(fac.getTarget(), false));
+		or.addFilter(new GenericBinaryFilter<>(false));
 		fil.addFilter(or);
 		assertEquals(2, fac.getCount(fil));
 		assertTrue(fac.matches(fil, fred));
@@ -252,7 +252,7 @@ public class TestSQLOrFilter extends WebappTestBase {
 	}
 	@Test
 	public void testEmptyOr() throws DataException {
-		SQLOrFilter<Dummy1> fil = new SQLOrFilter<>(fac.getTarget());
+		SQLOrFilter<Dummy1> fil = new SQLOrFilter<>(fac.getTag());
 		assertEquals(0, fac.getCount(fil));
 		assertFalse(fac.matches(fil, fred));
 		assertFalse(fac.matches(fil, bill));

@@ -149,13 +149,7 @@ public class ExpressionTestFactory extends ClassificationFactory<ExpressionTestF
 		return new ExpressionTest(res, this);
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.ClassificationFactory#getTarget()
-	 */
-	@Override
-	public Class<ExpressionTest> getTarget() {
-		return ExpressionTest.class;
-	}
+	
 	public class ExpressionFinder<X> extends AbstractFinder<X>{
 		public ExpressionFinder(SQLValue<X> val){
 			setMapper(new ValueResultMapper<>(val));
@@ -170,7 +164,7 @@ public class ExpressionTestFactory extends ClassificationFactory<ExpressionTestF
 	 */
 	public <Y> Y evaluate(ExpressionTest target, SQLValue<Y> expr) throws DataException {
 		ExpressionFinder<Y> finder = new ExpressionFinder<>(expr);
-		return finder.find(new SQLIdFilter<>(getTarget(), res, target.getID()) , true);
+		return finder.find(new SQLIdFilter<>( res, target.getID()) , true);
 
 	}
 	
@@ -178,28 +172,28 @@ public class ExpressionTestFactory extends ClassificationFactory<ExpressionTestF
 		return res;
 	}
 	public FieldSQLExpression<Integer, ExpressionTest> getIntA(){
-		return res.getNumberExpression(getTarget(), Integer.class, INT_A);
+		return res.getNumberExpression( Integer.class, INT_A);
 	}
 	public FieldSQLExpression<Integer, ExpressionTest> getIntB(){
-		return res.getNumberExpression(getTarget(), Integer.class, INT_B);
+		return res.getNumberExpression( Integer.class, INT_B);
 	}
 	public FieldSQLExpression<Double, ExpressionTest> getDoubleA(){
-		return res.getNumberExpression(getTarget(), Double.class, DOUBLE_A);
+		return res.getNumberExpression( Double.class, DOUBLE_A);
 	}
 	public FieldSQLExpression<Double,ExpressionTest> getDoubleB(){
-		return res.getNumberExpression(getTarget(), Double.class, DOUBLE_B);
+		return res.getNumberExpression( Double.class, DOUBLE_B);
 	}
 	public FieldValue<Date, ExpressionTest> getDateA(){
-		return res.getDateExpression(getTarget(), DATE_A);
+		return res.getDateExpression( DATE_A);
 	}
 	public FieldValue<Date, ExpressionTest> getDateB(){
-		return res.getDateExpression(getTarget(), DATE_B);
+		return res.getDateExpression( DATE_B);
 	}
 	public FieldSQLExpression<String, ExpressionTest> getStringA(){
-		return res.getStringExpression(getTarget(), STRING_A);
+		return res.getStringExpression( STRING_A);
 	}
 	public FieldSQLExpression<Long, ExpressionTest> getLongA(){
-		return res.getNumberExpression(getTarget(), Long.class,LONG_A);
+		return res.getNumberExpression( Long.class,LONG_A);
 	}
 	public SQLExpression<? extends Number> convertDateExpression(FieldValue<Date, ExpressionTest> d) throws SQLException{
 		if( d instanceof DateSQLExpression){
@@ -214,15 +208,15 @@ public class ExpressionTestFactory extends ClassificationFactory<ExpressionTestF
 	}
 	
 	public SQLExpression<Integer> getLocateExpression(String sub,int pos){
-		return new LocateSQLExpression(new ConstExpression(getTarget(),String.class, sub), res.getStringExpression(getTarget(), Classification.NAME), new ConstExpression(getTarget(),Integer.class, pos));
+		return new LocateSQLExpression(new ConstExpression(String.class, sub), res.getStringExpression( Classification.NAME), new ConstExpression(Integer.class, pos));
 	}
 	
 	public StringFieldExpression getNameSQLAccessor(){
-		return res.getStringExpression(getTarget(), Classification.NAME);
+		return res.getStringExpression(Classification.NAME);
 		
 	}
 	
 	public SQLValue<Integer> getLocateValue(String sub,int pos){
-		return new LocateSQLValue(new ConstExpression(getTarget(),String.class, sub), res.getStringExpression(getTarget(), Classification.NAME), new ConstExpression(getTarget(),Integer.class, pos));
+		return new LocateSQLValue(new ConstExpression(String.class, sub), res.getStringExpression(Classification.NAME), new ConstExpression(Integer.class, pos));
 	}
 }

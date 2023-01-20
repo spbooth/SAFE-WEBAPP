@@ -34,12 +34,12 @@ public class RoleAccessComposite<BDO extends DataObject,A extends AppUser> exten
 		private SessionService<A> sess;
 		private A user;
 		protected RoleAccessFilter(SessionService<A>sess,A user) {
-			super(getFactory().getTarget());
+			super(getFactory().getTag());
 			this.sess=sess;
 			this.user=user;
 		}
 		@Override
-		public boolean accept(BDO o) {
+		public boolean test(BDO o) {
 			String list = accessRoleList(o);
 			if( list == null || list.isEmpty()) {
 				return false;
@@ -76,11 +76,11 @@ public class RoleAccessComposite<BDO extends DataObject,A extends AppUser> exten
 	public BaseFilter<BDO> hasRelationFilter(String role, A user) {
 		if( role.equals(ROLE_BASED_ACCESS_RELATIONSHIP)) {
 			if( ! getRepository().hasField(ACCESS_ROLE)) {
-				return new FalseFilter(getFactory().getTarget());
+				return new FalseFilter();
 			}
 			// Can only match targets with an access role set to narrow the selection
-			return new AndFilter<BDO>(getFactory().getTarget(), 
-					new NullFieldFilter<BDO>(getFactory().getTarget(), getRepository(), ACCESS_ROLE, false),
+			return new AndFilter<BDO>(getFactory().getTag(), 
+					new NullFieldFilter<BDO>( getRepository(), ACCESS_ROLE, false),
 					new RoleAccessFilter(getContext().getService(SessionService.class), user));
 		}
 		return null;
@@ -95,7 +95,7 @@ public class RoleAccessComposite<BDO extends DataObject,A extends AppUser> exten
 				if( list != null && ! list.isEmpty()) {
 					return sess.getGlobalRoleFilter(list.split("\\s*,\\s*"));
 				}else {
-					return new FalseFilter(fac.getTarget());
+					return new FalseFilter();
 				}
 			}
 		}

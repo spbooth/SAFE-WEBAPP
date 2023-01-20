@@ -37,8 +37,8 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 public class ActionList<T extends DataObject> extends AbstractConstructedTargetList<T,ActionListener<T>> implements ActionListener<T>  {
 
 	
-	public ActionList(DataObjectFactory<T> factory,String list_name){
-		super(factory,list_name);
+	public ActionList(Class<T> target,DataObjectFactory<T> factory,String list_name){
+		super(target,factory,list_name);
 	}
 
 	/* (non-Javadoc)

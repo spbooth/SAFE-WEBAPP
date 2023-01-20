@@ -35,8 +35,8 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
  * @param <X> type of hosting {@link DataObject}
  */
 public class NumberFieldExpression<T extends Number,X extends DataObject> extends FieldExpression<T,X>{
-	protected NumberFieldExpression(Class<X> filter_type,Class<T> target,Repository res,String field) {
-		super(filter_type,res, target,field);
+	protected NumberFieldExpression(Class<T> target,Repository res,String field) {
+		super(res, target,field);
 	}
 	@SuppressWarnings("unchecked")
 	public T getValue(Record r) {
