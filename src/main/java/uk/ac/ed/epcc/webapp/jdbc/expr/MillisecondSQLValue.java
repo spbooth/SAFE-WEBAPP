@@ -65,4 +65,9 @@ public class MillisecondSQLValue implements NestedSQLValue<Long,Date>{
 	public SQLValue<Date> getNested() {
 		return a;
 	}
+
+	@Override
+	public String getFilterTag() {
+		return a.getFilterTag();
+	}
 }

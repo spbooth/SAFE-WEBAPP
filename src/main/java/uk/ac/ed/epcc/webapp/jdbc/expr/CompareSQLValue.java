@@ -100,5 +100,12 @@ public class CompareSQLValue<C extends Comparable> implements SQLValue<Boolean> 
 		list = a.getParameters(list);
 		return b.getParameters(list);
 	}
-
+	@Override
+	public String getFilterTag() {
+		String t = a.getFilterTag();
+		if( t != null) {
+			return t;
+		}
+		return b.getFilterTag();
+	}
 }

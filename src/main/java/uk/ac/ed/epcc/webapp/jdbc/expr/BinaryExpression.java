@@ -322,4 +322,12 @@ public final class BinaryExpression implements SQLExpression<Number> {
 	public Operator getOp() {
 		return op;
 	}
+	@Override
+	public String getFilterTag() {
+		String t = a.getFilterTag();
+		if( t != null) {
+			return t;
+		}
+		return b.getFilterTag();
+	}
 }

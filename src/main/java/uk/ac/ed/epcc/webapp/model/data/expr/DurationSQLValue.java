@@ -82,5 +82,12 @@ public SQLFilter getRequiredFilter() {
 		return fil;
 	}
 }
-
+@Override
+public String getFilterTag() {
+	String t = start.getFilterTag();
+	if( t != null) {
+		return t;
+	}
+	return end.getFilterTag();
+}
 }

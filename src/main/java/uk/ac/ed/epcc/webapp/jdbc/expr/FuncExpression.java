@@ -148,5 +148,9 @@ public class FuncExpression<T,D> implements SQLExpression<T> {
 		}
 		return e.getRequiredFilter();
 	}
+	@Override
+	public String getFilterTag() {
+		return e.getFilterTag();
+	}
 
 }

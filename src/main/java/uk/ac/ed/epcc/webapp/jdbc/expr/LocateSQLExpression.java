@@ -153,4 +153,17 @@ public class LocateSQLExpression implements SQLExpression<Integer>{
 		
 		return true;
 	}
+
+	@Override
+	public String getFilterTag() {
+		String t = substr.getFilterTag();
+		if( t != null) {
+			return t;
+		}
+		t = str.getFilterTag();
+		if( t != null) {
+			return null;
+		}
+		return pos.getFilterTag();
+	}
 }

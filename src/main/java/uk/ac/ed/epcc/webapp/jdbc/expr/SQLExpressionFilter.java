@@ -35,47 +35,44 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  * @param <V> Type of expression
  */
 public class SQLExpressionFilter<T,V> implements SQLFilter<T>, PatternFilter<T> {
-	private final String filter_tag;
     private final SQLExpression<V> expr;
     private final V value;
     private final MatchCondition match;
 
     @SuppressWarnings("unchecked")
-	public static <T,V> SQLFilter<T> getFilter(String target,SQLExpression<V> expr,MatchCondition m,V value){
+	public static <T,V> SQLFilter<T> getFilter(SQLExpression<V> expr,MatchCondition m,V value){
     	SQLExpressionFilter<T, V> fil;
     	if( expr instanceof DateSQLExpression){
     		DateSQLExpression dse = (DateSQLExpression) expr;
     		if( dse.preferSeconds()){
-    			fil = new SQLExpressionFilter(target, dse.getSeconds(), m,((Date)value).getTime()/1000L);
+    			fil = new SQLExpressionFilter(dse.getSeconds(), m,((Date)value).getTime()/1000L);
     		}else{
-    			fil = new SQLExpressionFilter(target, dse.getMillis(), m,((Date)value).getTime());
+    			fil = new SQLExpressionFilter(dse.getMillis(), m,((Date)value).getTime());
     		}
     	}else{
-    		fil = new SQLExpressionFilter<>(target, expr, m,value);
+    		fil = new SQLExpressionFilter<>(expr, m,value);
     	}
 		SQLFilter<T> req = expr.getRequiredFilter();
     	if( req == null){
     		return fil;
     	}
-    	return new SQLAndFilter<>(target,fil,req);
+    	return new SQLAndFilter<>(expr.getFilterTag(),fil,req);
     }
     @SuppressWarnings("unchecked")
-	public static <T,V> SQLFilter<T> getFilter(String target,SQLExpression<V> expr,V value){
-    	SQLExpressionFilter<T, V> fil = new SQLExpressionFilter<>(target, expr, value);
+	public static <T,V> SQLFilter<T> getFilter(SQLExpression<V> expr,V value){
+    	SQLExpressionFilter<T, V> fil = new SQLExpressionFilter<>(expr, value);
 		SQLFilter<T> req = expr.getRequiredFilter();
     	if( req == null){
     		return fil;
     	}
-    	return new SQLAndFilter<>(target,fil,req);
+    	return new SQLAndFilter<>(expr.getFilterTag(),fil,req);
     }
-    private SQLExpressionFilter(String target,SQLExpression<V> expr,V value){
-		this.filter_tag=target;
+    private SQLExpressionFilter(SQLExpression<V> expr,V value){
     	this.expr=expr;
     	this.match=null;
     	this.value=value;
     }
-	private SQLExpressionFilter(String target,SQLExpression<V> expr,MatchCondition match,V value){
-		this.filter_tag=target;
+	private SQLExpressionFilter(SQLExpression<V> expr,MatchCondition match,V value){
     	this.expr=expr;
     	this.match=match;
     	this.value=value;
@@ -185,6 +182,10 @@ public class SQLExpressionFilter<T,V> implements SQLFilter<T>, PatternFilter<T> 
 		sb.append(value.toString());
 		sb.append(")");
 		return sb.toString();
+	}
+	@Override
+	public String getTag() {
+		return expr.getFilterTag();
 	}
 
 }

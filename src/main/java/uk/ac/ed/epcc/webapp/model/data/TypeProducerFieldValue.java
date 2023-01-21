@@ -109,5 +109,10 @@ public class TypeProducerFieldValue<T extends DataObject,O,D> implements FieldVa
 		return null;
 	}
 
+	@Override
+	public String getFilterTag() {
+		return repository.getTag();
+	}
+
 	
 }

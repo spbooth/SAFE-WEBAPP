@@ -91,5 +91,9 @@ public class MysqlSQLHashExpression implements SQLExpression<String>{
 	public Class<String> getTarget() {
 		return String.class;
 	}
+	@Override
+	public String getFilterTag() {
+		return inner.getFilterTag();
+	}
 
 }

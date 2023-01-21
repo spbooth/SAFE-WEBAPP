@@ -68,4 +68,8 @@ public class DateSQLValue implements NestedSQLValue<Date,Number>{
 	public SQLValue<Number> getNested() {
 		return (SQLValue<Number>) a;
 	}
+	@Override
+	public String getFilterTag() {
+		return a.getFilterTag();
+	}
 }

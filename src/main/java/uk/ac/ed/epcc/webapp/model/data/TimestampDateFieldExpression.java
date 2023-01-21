@@ -39,13 +39,11 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 
 public class TimestampDateFieldExpression<T extends DataObject> extends FieldExpression<Date,T> implements DateSQLExpression,FilterProvider<T,Date>{
     private final long res;
-    private final String tag;
     private final NumberFieldExpression<Long, T> num_field;
     private final DateSQLExpression date_expr;
 	protected TimestampDateFieldExpression(Repository rep,String field) {
 		super(rep, Date.class,field);
 		this.res=rep.getResolution();
-		this.tag=rep.getTag();
 		num_field=rep.getNumberExpression(Long.class, field);
 		date_expr = rep.getSQLContext().convertToDate(num_field, res);
 	}
@@ -104,8 +102,36 @@ public class TimestampDateFieldExpression<T extends DataObject> extends FieldExp
 		return num_field.add(sb, qualify);
 	}
 	@Override
-	public String getFilterTag() {
-		return tag;
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((date_expr == null) ? 0 : date_expr.hashCode());
+		result = prime * result + ((num_field == null) ? 0 : num_field.hashCode());
+		result = prime * result + (int) (res ^ (res >>> 32));
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TimestampDateFieldExpression other = (TimestampDateFieldExpression) obj;
+		if (date_expr == null) {
+			if (other.date_expr != null)
+				return false;
+		} else if (!date_expr.equals(other.date_expr))
+			return false;
+		if (num_field == null) {
+			if (other.num_field != null)
+				return false;
+		} else if (!num_field.equals(other.num_field))
+			return false;
+		if (res != other.res)
+			return false;
+		return true;
 	}
 	
 }

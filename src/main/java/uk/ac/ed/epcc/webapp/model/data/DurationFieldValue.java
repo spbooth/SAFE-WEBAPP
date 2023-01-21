@@ -131,7 +131,7 @@ public class DurationFieldValue<X extends DataObject> implements    SQLAccessor<
 
 	public SQLFilter<X> getFilter(MatchCondition match, Duration val)
 			throws CannotFilterException {
-		return SQLExpressionFilter.getFilter(expression.getTag(),expression, match,val.getTime(resolution));
+		return SQLExpressionFilter.getFilter(expression, match,val.getTime(resolution));
 	}
 
 	public SQLFilter<X> getNullFilter(boolean is_null)

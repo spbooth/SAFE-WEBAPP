@@ -173,5 +173,12 @@ public class BinarySQLValue implements GroupingSQLValue<Number> {
 		}
 		return true;
 	}
-	
+	@Override
+	public String getFilterTag() {
+		String t = a.getFilterTag();
+		if( t != null) {
+			return t;
+		}
+		return b.getFilterTag();
+	}
 }

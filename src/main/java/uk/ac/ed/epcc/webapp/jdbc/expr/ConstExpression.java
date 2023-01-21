@@ -174,5 +174,9 @@ public final class ConstExpression<T,R> implements SQLExpression<T>, SQLAccessor
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilterType()
 		 */
+		@Override
+		public String getFilterTag() {
+			return null;
+		}
 		
 }

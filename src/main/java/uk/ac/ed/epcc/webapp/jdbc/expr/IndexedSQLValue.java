@@ -52,4 +52,9 @@ FilterProvider<T,IndexedReference> {
 	 * @return {@link SQLExpression}
 	 */
 	public SQLExpression<Integer> getIDExpression();
+
+	@Override
+	default String getFilterTag() {
+		return null;
+	}
 }

@@ -130,7 +130,7 @@ public class NumberTableTest extends WebappTestBase {
 		// 8 80 80 3      153
 		// 9 90 -1000     153
 
-		Double val = fac.getSum(SQLExpressionFilter.getFilter(fac.getTag(), fac.getNumber1Expr(), MatchCondition.LE,  30.0),expr);
+		Double val = fac.getSum(SQLExpressionFilter.getFilter( fac.getNumber1Expr(), MatchCondition.LE,  30.0),expr);
 		assertEquals("Select value", 153.0, val.doubleValue(),0.001);
 	}
 	

@@ -34,10 +34,8 @@ import uk.ac.ed.epcc.webapp.model.data.convert.TypeConverter;
 public class TypeConverterSQLValue<H,T,D> implements  NestedSQLValue<T,D>, FilterProvider<H,T>{
 	
 	
-	private final String filter_tag;
-	public TypeConverterSQLValue(String target,Class<T> type,TypeConverter<T, D> converter, SQLValue<D> inner) {
+	public TypeConverterSQLValue(Class<T> type,TypeConverter<T, D> converter, SQLValue<D> inner) {
 		super();
-		this.filter_tag=target;
 		this.converter = converter;
 		this.type=type;
 		this.inner = inner;
@@ -90,7 +88,7 @@ public class TypeConverterSQLValue<H,T,D> implements  NestedSQLValue<T,D>, Filte
 		if( inner instanceof FilterProvider){
 			return ((FilterProvider<H, D>)inner).getFilter(match, equiv);
 		}else if( inner instanceof SQLExpression){
-			return SQLExpressionFilter.getFilter(filter_tag,(SQLExpression<D>)inner,match, equiv);
+			return SQLExpressionFilter.getFilter((SQLExpression<D>)inner,match, equiv);
 		}
 		throw new CannotFilterException();
 	}
@@ -121,7 +119,7 @@ public class TypeConverterSQLValue<H,T,D> implements  NestedSQLValue<T,D>, Filte
 	 */
 	@Override
 	public final String getFilterTag() {
-		return filter_tag;
+		return inner.getFilterTag();
 	}
 
 	@Override

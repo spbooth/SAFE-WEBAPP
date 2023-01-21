@@ -95,4 +95,9 @@ public class DistinctCountSQLValue implements GroupingSQLValue<DistinctCount>{
 		return value.checkContentsCanGroup();
 	}
 
+	@Override
+	public String getFilterTag() {
+		return value.getFilterTag();
+	}
+
 }

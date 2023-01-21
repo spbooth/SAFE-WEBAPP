@@ -39,11 +39,9 @@ public class ArrayFuncValue<F,T> implements SQLValue<T> {
 	
     private final ArrayFunc func;
     private final SQLValue<? extends T> e[];
-    private final String filter_tag;
     private final Class<T> target_class;
     private int sizes[];
-    public ArrayFuncValue(String tag,ArrayFunc f, Class<T> target, SQLValue<? extends T> ... e){
-    	this.filter_tag=tag;
+    public ArrayFuncValue(ArrayFunc f, Class<T> target, SQLValue<? extends T> ... e){
     	assert(f!=null);
     	// expression may be null 
     	func=f;
@@ -114,6 +112,21 @@ public class ArrayFuncValue<F,T> implements SQLValue<T> {
 			}
 		}
 		return result;
+	}
+	private String filter_tag=null;
+	@Override
+	public String getFilterTag() {
+		if( filter_tag != null) {
+			return filter_tag;
+		}
+		for(SQLValue exp : e) {
+			String t = exp.getFilterTag();
+			if( t!= null) {
+				filter_tag=t;
+				return t;
+			}
+		}
+		return null;
 	}
 
 }

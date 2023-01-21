@@ -139,4 +139,13 @@ public class MysqlTimestampDiffExpr implements SQLExpression<Long> {
 		return Long.class;
 	}
 
+	@Override
+	public String getFilterTag() {
+		String t = start.getFilterTag();
+		if( t != null) {
+			return t;
+		}
+		return end.getFilterTag();
+	}
+
 }

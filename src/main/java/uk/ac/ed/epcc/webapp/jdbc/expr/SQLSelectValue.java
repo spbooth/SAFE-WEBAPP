@@ -168,4 +168,15 @@ public class SQLSelectValue<T> implements GroupingSQLValue<T> {
 		return true;
 	}
 
+	@Override
+	public String getFilterTag() {
+		for(SQLValue<T> v : accessors) {
+			String t = v.getFilterTag();
+			if( t != null) {
+				return t;
+			}
+		}
+		return null;
+	}
+
 }

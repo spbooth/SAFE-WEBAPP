@@ -147,5 +147,9 @@ public abstract class FieldExpression<T,X extends DataObject> implements FieldSQ
 			return false;
 		return true;
 	}
+	@Override
+	public final String getFilterTag() {
+		return repository.getTag();
+	}
 	
 }

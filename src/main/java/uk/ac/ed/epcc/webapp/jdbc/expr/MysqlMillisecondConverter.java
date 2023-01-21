@@ -97,4 +97,9 @@ public SQLValue<Long> getSQLValue() {
 	
 	return new MillisecondSQLValue(exp);
 }
+
+@Override
+public String getFilterTag() {
+	return exp.getFilterTag();
+}
 }

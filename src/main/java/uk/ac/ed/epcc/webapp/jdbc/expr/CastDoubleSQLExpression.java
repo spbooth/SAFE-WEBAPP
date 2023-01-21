@@ -98,4 +98,9 @@ public class CastDoubleSQLExpression<N extends Number> implements SQLExpression<
 		return true;
 	}
 
+	@Override
+	public String getFilterTag() {
+		return expr.getFilterTag();
+	}
+
 }

@@ -298,10 +298,10 @@ public class ExpressionTestCase extends WebappTestBase {
 		obj.setIntB(5);
 		obj.commit();
 		Number res = fac.evaluate(obj, 
-				new ArrayFuncExpression<>(fac.getTag(), ArrayFunc.GREATEST, Number.class, fac.getIntA(),fac.getIntB()));
+				new ArrayFuncExpression<>(ArrayFunc.GREATEST, Number.class, fac.getIntA(),fac.getIntB()));
 		assertEquals(7, res);
 		res = fac.evaluate(obj, 
-				new ArrayFuncExpression<>(fac.getTag(), ArrayFunc.LEAST,    Number.class, fac.getIntA(),fac.getIntB()));
+				new ArrayFuncExpression<>(ArrayFunc.LEAST,    Number.class, fac.getIntA(),fac.getIntB()));
 		assertEquals(5, res);
 	}
 	@Test
@@ -310,10 +310,10 @@ public class ExpressionTestCase extends WebappTestBase {
 		obj.setIntB(5);
 		obj.commit();
 		Number res = fac.evaluate(obj, 
-				new ArrayFuncValue<>(fac.getTag(), ArrayFunc.GREATEST, Number.class, fac.getIntA(),fac.getIntB()));
+				new ArrayFuncValue<>(ArrayFunc.GREATEST, Number.class, fac.getIntA(),fac.getIntB()));
 		assertEquals(7, res);
 		res = fac.evaluate(obj, 
-				new ArrayFuncValue<>(fac.getTag(), ArrayFunc.LEAST, Number.class,    fac.getIntA(),fac.getIntB()));
+				new ArrayFuncValue<>(ArrayFunc.LEAST, Number.class,    fac.getIntA(),fac.getIntB()));
 		assertEquals(5, res);
 	}
 	
@@ -332,10 +332,10 @@ public class ExpressionTestCase extends WebappTestBase {
 		obj.setDateB(later);
 		obj.commit();
 		Date res = (Date)fac.evaluate(obj, 
-				new ArrayFuncExpression<>(fac.getTag(), ArrayFunc.GREATEST, Date.class, (SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()));
+				new ArrayFuncExpression<>(ArrayFunc.GREATEST, Date.class, (SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()));
 		assertEquals(later, res);
 		res = (Date)fac.evaluate(obj, 
-				new ArrayFuncExpression<>(fac.getTag(), ArrayFunc.LEAST, Date.class,(SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()));
+				new ArrayFuncExpression<>(ArrayFunc.LEAST, Date.class,(SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()));
 		assertEquals(least, res);
 	}
 	@Test
@@ -353,10 +353,10 @@ public class ExpressionTestCase extends WebappTestBase {
 		obj.setDateB(later);
 		obj.commit();
 		Date res = (Date)fac.evaluate(obj, 
-				new ArrayFuncValue<>(fac.getTag(), ArrayFunc.GREATEST, Date.class, (SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()));
+				new ArrayFuncValue<>(ArrayFunc.GREATEST, Date.class, (SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()));
 		assertEquals(later, res);
 		res = (Date)fac.evaluate(obj, 
-				new ArrayFuncValue<>(fac.getTag(), ArrayFunc.LEAST, Date.class,(SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()));
+				new ArrayFuncValue<>(ArrayFunc.LEAST, Date.class,(SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()));
 		assertEquals(least, res);
 	}
 	@Test 

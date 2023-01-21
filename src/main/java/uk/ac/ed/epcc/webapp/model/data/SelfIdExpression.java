@@ -80,4 +80,9 @@ public class SelfIdExpression implements SQLExpression<Integer> {
 		return Integer.class;
 	}
 
+	@Override
+	public String getFilterTag() {
+		return res.getTag();
+	}
+
 }

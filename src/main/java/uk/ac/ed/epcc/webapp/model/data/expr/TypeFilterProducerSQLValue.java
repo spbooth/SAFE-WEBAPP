@@ -29,8 +29,8 @@ import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 
 
 public class TypeFilterProducerSQLValue<T,D,X> extends TypeConverterSQLValue<X, T, D> implements  SQLAccessor<T,X>,  FilterProvider<X,T> , Targetted<T> {
-	public TypeFilterProducerSQLValue(String target,Class<T> type, TypeProducer<T, D> converter, SQLAccessor<D,X> inner) {
-		super(target,type,converter,inner);
+	public TypeFilterProducerSQLValue(Class<T> type, TypeProducer<T, D> converter, SQLAccessor<D,X> inner) {
+		super(type,converter,inner);
 		
 	}
 	@Override

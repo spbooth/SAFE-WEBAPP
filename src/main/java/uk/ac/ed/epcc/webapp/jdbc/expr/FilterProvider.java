@@ -40,7 +40,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  * @param <T> type of target
  * @param <D> type of data to compare against
  */
-public interface FilterProvider<T, D> extends Targetted<D> {
+public interface FilterProvider<T, D>  {
 	/** Create a {@link SQLFilter} comparing against the target value
 	 * 
 	 * @param match

@@ -151,6 +151,10 @@ public class MysqlDateConverter implements DateSQLExpression, WrappedSQLExpressi
 	public SQLValue<Date> getSQLValue() {
 		return new DateSQLValue(val, res);
 	}
+	@Override
+	public String getFilterTag() {
+		return val.getFilterTag();
+	}
 	
 
 }

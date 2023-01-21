@@ -142,4 +142,10 @@ public abstract class AbstractSelfSQLValue<T extends DataObject,R> implements SQ
 		return true;
 	}
 
+
+	@Override
+	public String getFilterTag() {
+		return fac.getTag();
+	}
+
 }

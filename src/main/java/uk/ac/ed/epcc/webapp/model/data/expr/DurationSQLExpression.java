@@ -138,11 +138,20 @@ public SQLFilter getRequiredFilter() {
 		if( b_fil == null ){
 			return a_fil;
 		}
-		SQLAndFilter fil = new SQLAndFilter(null);
+		SQLAndFilter fil = new SQLAndFilter(getFilterTag());
 		fil.addFilter(a_fil);
 		fil.addFilter(b_fil);
 		return fil;
 	}
 }
+@Override
+public String getFilterTag() {
+	String t = start.getFilterTag();
+	if( t != null) {
+		return t;
+	}
+	return end.getFilterTag();
+}
+
 
 }

@@ -88,4 +88,8 @@ public class LabellerSQLValue<T,R> implements NestedSQLValue<R,T> {
 		// labeller may map multiple records to the same label
 		return false;
 	}
+	@Override
+	public String getFilterTag() {
+		return nested.getFilterTag();
+	}
 }

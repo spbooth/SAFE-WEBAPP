@@ -136,6 +136,11 @@ public class PostgresqlDateConverter implements DateSQLExpression{
 	public boolean preferSeconds() {
 		return res == 1000L;
 	}
+
+	@Override
+	public String getFilterTag() {
+		return val.getFilterTag();
+	}
 	
 
 }

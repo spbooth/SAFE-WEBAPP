@@ -76,4 +76,13 @@ public interface SQLValue<T> extends Targetted<T>{
 	default public SQLFilter getRequiredFilter() {
 		return null;
 	}
+	/** Get the construction/repository tag for this value.
+	 * This is for use when constructing filters with the expression.
+	 * A null return value is allowed (e.g. a constant value)
+	 * 
+	 * @return
+	 */
+	default public String getFilterTag() {
+		return null;
+	}
 }
