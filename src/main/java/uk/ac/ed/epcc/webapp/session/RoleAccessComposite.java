@@ -30,11 +30,10 @@ public class RoleAccessComposite<BDO extends DataObject,A extends AppUser> exten
 	protected Class<? super RoleAccessComposite> getType() {
 		return RoleAccessComposite.class;
 	}
-	public class RoleAccessFilter extends AbstractAcceptFilter<BDO>{
+	public class RoleAccessFilter implements AcceptFilter<BDO>{
 		private SessionService<A> sess;
 		private A user;
 		protected RoleAccessFilter(SessionService<A>sess,A user) {
-			super(getFactory().getTag());
 			this.sess=sess;
 			this.user=user;
 		}

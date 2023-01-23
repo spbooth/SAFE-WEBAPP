@@ -144,7 +144,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 	 * @author spb
 	 *
 	 */
-	public class AcceptFilterConverter extends AbstractAcceptFilter<T>{
+	public class AcceptFilterConverter implements AcceptFilter<T>{
 		/* (non-Javadoc)
 		 * @see java.lang.Object#hashCode()
 		 */
@@ -184,7 +184,6 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 			return true;
 		}
 		public AcceptFilterConverter(String tag, AcceptFilter<? super A> inner) {
-			super(null);
 			this.tag = tag;
 			this.inner = inner;
 		}

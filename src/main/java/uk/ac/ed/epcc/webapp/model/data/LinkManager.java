@@ -579,13 +579,12 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @author spb
 	 *
 	 */
-    public class LeftAcceptFilter extends  AbstractAcceptFilter<L>{
+    public class LeftAcceptFilter implements AcceptFilter<L>{
     	/**
 		 * @param target
 		 * @param fil
 		 */
 		public LeftAcceptFilter( BaseFilter<T> fil) {
-			super(getLeftFactory().getTag());
 			this.fil = fil;
 		}
 
@@ -610,13 +609,12 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * @author spb
 	 *
 	 */
-    public class RightAcceptFilter extends  AbstractAcceptFilter<R>{
+    public class RightAcceptFilter implements AcceptFilter<R>{
     	/**
 		 * @param target
 		 * @param fil
 		 */
 		public RightAcceptFilter( BaseFilter<T> fil) {
-			super(getRightFactory().getTag());
 			this.fil = fil;
 		}
 

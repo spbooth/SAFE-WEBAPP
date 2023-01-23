@@ -21,7 +21,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
  * @author spb
  * @see NegatingFilterVisitor
  */
-public class NotAcceptFilter<T extends DataObject> extends AbstractAcceptFilter<T> implements NegatingFilter<BaseFilter<T>> {
+public class NotAcceptFilter<T extends DataObject> implements AcceptFilter<T>, NegatingFilter<BaseFilter<T>> {
 
 	/**
 	 * @param target
@@ -29,7 +29,6 @@ public class NotAcceptFilter<T extends DataObject> extends AbstractAcceptFilter<
 	 * @param fil
 	 */
 	public NotAcceptFilter(DataObjectFactory<T> fac, BaseFilter<T> fil) {
-		super(fac.getTag());
 		this.fac = fac;
 		this.fil = fil;
 	}

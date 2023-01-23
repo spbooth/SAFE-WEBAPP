@@ -171,21 +171,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 
     public static final Feature REJECT_MULTIPLE_RESULT_FEATURE = new Feature("multiple_result.error",true,"Throw an error if a filter find has multiple matching records");
 
-    /** abstract sub-class for implementing {@link AcceptFilter} for this factory.
-     *  
-     * @author spb
-     *
-     */
-    protected abstract class DataObjectAcceptFilter extends AbstractAcceptFilter<BDO>{
-
-		/**
-		 * @param target
-		 */
-		protected DataObjectAcceptFilter() {
-			super(DataObjectFactory.this.getTag());
-		}
-    	
-    }
+   
 
 	/** A basic form Input for selecting objects using their ID value as text.
      * Only use this where the table is too large to support a pull-down.
@@ -816,12 +802,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 */
 
 
-	public class DestAcceptFilter<T extends DataObject> extends AbstractAcceptFilter<T>{
+	public class DestAcceptFilter<T extends DataObject> implements AcceptFilter<T>{
 		private final BaseFilter<BDO> fil;
 		private final String join_field;
 		private final DataObjectFactory<T> join_fac;
 		public DestAcceptFilter(BaseFilter<BDO> fil, String join_field, DataObjectFactory<T> join_fac){
-			super(join_fac.getTag());
 			this.fil=fil;
 			this.join_field=join_field;
 			this.join_fac=join_fac;
@@ -869,13 +854,12 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	}
 	
 	
-	public static class  TimeAcceptFilter<T extends DataObject> extends AbstractAcceptFilter<T>{
+	public static class  TimeAcceptFilter<T extends DataObject> implements AcceptFilter<T>{
 	
         private final String field;
         private final MatchCondition cond;
         private final Date point;
 		public TimeAcceptFilter(String tag,String field, MatchCondition cond, Date point){
-			super(tag);
         	this.field=field;
         	this.cond=cond;
         	this.point=point;
@@ -2163,7 +2147,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				SQLFilter<R> sqlfilter = FilterConverter.convert(fil);
 				return visitSQLFilter(sqlfilter);
 			}catch(NoSQLFilterException e){
-				return new RemoteAcceptFilter<>(getTag(), remote_fac, field, fil);
+				return new RemoteAcceptFilter<>(remote_fac, field, fil);
 			}
 		}
 		public SQLFilter<BDO> visitSQLFilter(SQLFilter<R> fil){
@@ -2197,7 +2181,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				}
 			}catch(NoSQLFilterException e){
 			}
-			BaseFilter<BDO> result =new RemoteAcceptFilter<>(getTag(), remote_fac, field, fil);
+			BaseFilter<BDO> result =new RemoteAcceptFilter<>(remote_fac, field, fil);
 			if( fil.hasPatternFilters() ){
 				result = getAndFilter(result, getRemoteSQLFilter(remote_fac,field,fil.getNarrowingFilter()));
 			}
@@ -2227,7 +2211,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		@Override
 		public BaseFilter<BDO> visitAcceptFilter(AcceptFilter<R> fil) throws Exception {
 	
-			return new RemoteAcceptFilter<>(getTag(), remote_fac, field, fil);
+			return new RemoteAcceptFilter<>(remote_fac, field, fil);
 		}
 
 		/* (non-Javadoc)

@@ -14,7 +14,7 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import uk.ac.ed.epcc.webapp.Indexed;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 
 /** An AcceptFilter version of {@link ReferenceFilter}
  * 
@@ -22,7 +22,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
  *@see ReferenceFilter
  * @param <R>
  */
-public final class ReferenceAcceptFilter<R extends Indexed,T extends DataObject> extends AbstractAcceptFilter<T>{
+public final class ReferenceAcceptFilter<R extends Indexed,T extends DataObject> implements AcceptFilter<T>{
 	  
 	  private final R peer;
 	  private final String field;
@@ -31,8 +31,7 @@ public final class ReferenceAcceptFilter<R extends Indexed,T extends DataObject>
          * @param field field referencing the peer
          * @param peer DataObject null for all records
          */
-        public ReferenceAcceptFilter(String target,String field, R peer){
-        	super(target);
+        public ReferenceAcceptFilter(String field, R peer){
         	this.field =field;
         	this.peer=peer;
         }

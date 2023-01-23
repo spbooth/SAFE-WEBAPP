@@ -24,10 +24,7 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.DoubleFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.LongFieldType;
@@ -131,10 +128,9 @@ public class Dummy1 extends DataObject implements Removable {
          		super(res,NUMBER,n);
          	}
          }
-		 public class StringAcceptFilter extends AbstractAcceptFilter<Dummy1>{
+		 public class StringAcceptFilter implements AcceptFilter<Dummy1>{
 			 String s;
 			 public StringAcceptFilter(String s) {
-				 super(Factory.this.getTag());
 				 this.s=s;
 			 }
 			/* (non-Javadoc)
@@ -178,10 +174,9 @@ public class Dummy1 extends DataObject implements Removable {
 				return "StringAcceptFilter(" + s + ")";
 			}
 		 }
-    	 public class NumberAcceptFilter extends AbstractAcceptFilter<Dummy1>{
+    	 public class NumberAcceptFilter implements AcceptFilter<Dummy1>{
     		 Number n;
           	public NumberAcceptFilter(Number n){
-          		super(Factory.this.getTag());
           		this.n=n;
           	}
 			public boolean test(Dummy1 d) {

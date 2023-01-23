@@ -21,6 +21,12 @@ import java.util.function.Predicate;
 /**
  * A Filter that accepts objects based on a Java method
  * 
+ * This is a {@link Predicate} but also implements the {@link BaseFilter} accept method
+ * so it can be used wherever a {@link BaseFilter} can be used.
+ * As these work directly on the java instance types the additional run-time
+ * checking is largely redundant so the default {@link #getTag()} implementation
+ * that disables checking is generally fine for {@link AcceptFilter}s
+ * 
  * @author spb
  * @param <T> type of object selected
  * 

@@ -33,11 +33,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.BinaryExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.ConstExpression;
 import uk.ac.ed.epcc.webapp.jdbc.expr.Operator;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.model.Dummy1.Beatle;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactoryTestCase;
@@ -93,7 +89,7 @@ public class DummyFactoryTest extends DataObjectFactoryTestCase {
 		}
 		AndFilter<Dummy1> fil = fac.getAndFilter();
 		// Dummy accept filter to force non sQLFilter
-		fil.addFilter(new AbstractAcceptFilter<Dummy1>(fac.getTag()) {
+		fil.addFilter(new AcceptFilter<Dummy1>() {
 			public boolean test(Dummy1 o) {
 				return true;
 			}
