@@ -118,11 +118,9 @@ public class SignupDateComposite<BDO extends AppUser> extends CreateComposite<BD
 	public SQLFilter<BDO> signupBeforeFilter(Date d){
 		if( getRepository().hasField(SIGNUP_DATE)) {
 			DataObjectFactory<BDO> factory = getFactory();
-			String target = factory.getTag();
-			SQLOrFilter<BDO> or = new SQLOrFilter<BDO>(target);
-			or.addFilter(new SQLValueFilter<BDO>( getRepository(), SIGNUP_DATE,MatchCondition.LT, d));
-			or.addFilter(new NullFieldFilter<BDO>( getRepository(), SIGNUP_DATE, true));
-			return or;
+			return factory.getSQLOrFilter(
+					new SQLValueFilter<BDO>( getRepository(), SIGNUP_DATE,MatchCondition.LT, d),
+					new NullFieldFilter<BDO>( getRepository(), SIGNUP_DATE, true));
 		}
 		return null;
 	}

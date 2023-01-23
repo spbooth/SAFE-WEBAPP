@@ -86,7 +86,7 @@ public class TestAndFilter extends WebappTestBase {
 	
 	@Test 
 	public void testEmptyAnd() throws DataException {
-		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTag());
+		AndFilter<Dummy1> fil = fac.getAndFilter();
 		
 		assertEquals(3, fac.getCount(fil));
 		assertTrue(fac.matches(fil, fred));
@@ -100,8 +100,8 @@ public class TestAndFilter extends WebappTestBase {
 	
 	@Test 
 	public void testDoubleAndContainingFalse() throws DataException {
-		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTag());
-		AndFilter<Dummy1> fil2 = new AndFilter<>(fac.getTag());
+		AndFilter<Dummy1> fil = fac.getAndFilter();
+		AndFilter<Dummy1> fil2 = fac.getAndFilter();
 		fil2.addFilter(new FalseFilter<Dummy1>());
 		fil.addFilter(fil2);
 		
@@ -118,7 +118,7 @@ public class TestAndFilter extends WebappTestBase {
 	
 	@Test 
 	public void testAndContainingFalse() throws DataException {
-		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTag());
+		AndFilter<Dummy1> fil = fac.getAndFilter();
 		fil.addFilter(new FalseFilter<Dummy1>());
 		
 		// This should match nothing as an empty or matches nothing
@@ -133,8 +133,8 @@ public class TestAndFilter extends WebappTestBase {
 	}
 	@Test 
 	public void testAndContainingOr() throws DataException {
-		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTag());
-		OrFilter<Dummy1> or = new OrFilter<Dummy1>(fac.getTag(), fac);
+		AndFilter<Dummy1> fil = fac.getAndFilter();
+		OrFilter<Dummy1> or = fac.getOrFilter();
 		fil.addFilter(or);
 		
 		// This should match nothing as an empty or matches nothing
@@ -149,7 +149,7 @@ public class TestAndFilter extends WebappTestBase {
 	}
 	@Test 
 	public void testPattern() throws DataException {
-		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTag());
+		AndFilter<Dummy1> fil = fac.getAndFilter();
 		fil.addFilter(fac.getStringFilter("fred"));
 		fil.addFilter(fac.getNumberFilter(1));
 		assertFalse(fil.hasAcceptFilters());
@@ -164,7 +164,7 @@ public class TestAndFilter extends WebappTestBase {
 	}
 	@Test 
 	public void testAccept() throws DataException {
-		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTag());
+		AndFilter<Dummy1> fil = fac.getAndFilter();
 		fil.addFilter(fac.getStringFilter("fred"));
 		fil.addFilter(fac.getNumberAcceptFilter(1));
 		assertTrue(fil.hasAcceptFilters());
@@ -180,7 +180,7 @@ public class TestAndFilter extends WebappTestBase {
 	}
 	@Test 
 	public void testAccept2() throws DataException {
-		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTag());
+		AndFilter<Dummy1> fil = fac.getAndFilter();
 		fil.addFilter(fac.getStringFilter("fred"));
 		fil.addFilter(fac.getNumberAcceptFilter(2));
 		assertFalse(fil.isForced());
@@ -193,7 +193,7 @@ public class TestAndFilter extends WebappTestBase {
 	}
 	@Test 
 	public void testAccept3() throws DataException {
-		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTag());
+		AndFilter<Dummy1> fil = fac.getAndFilter();
 		fil.addFilter(fac.getNumberAcceptFilter(1));
 		assertTrue(fil.hasAcceptFilters());
 		assertFalse(fil.hasPatternFilters());
@@ -209,7 +209,7 @@ public class TestAndFilter extends WebappTestBase {
 	
 	@Test 
 	public void testAccept4() throws DataException {
-		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTag());
+		AndFilter<Dummy1> fil = fac.getAndFilter();
 		fil.addFilter(fac.getStringAcceptFilter("fred"));
 		fil.addFilter(fac.getNumberAcceptFilter(1));
 		assertTrue(fil.hasAcceptFilters());
@@ -225,7 +225,7 @@ public class TestAndFilter extends WebappTestBase {
 	}
 	@Test 
 	public void testDual() throws DataException {
-		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTag());
+		AndFilter<Dummy1> fil = fac.getAndFilter();
 		fil.addFilter(fac.getStringFilter("fred"));
 		fil.addFilter(new DualFilter<>(fac.getNumberFilter(1),fac.getNumberAcceptFilter(1)));
 		assertFalse(fil.hasAcceptFilters()); // promotes to SQL
@@ -239,7 +239,7 @@ public class TestAndFilter extends WebappTestBase {
 	
 	@Test
 	public void testReferences() throws DataException {
-		AndFilter<Dummy1> fil = new AndFilter<>(fac.getTag());
+		AndFilter<Dummy1> fil = fac.getAndFilter();
 		assertFalse(fil.isForced());
 		fil.addFilter(ref.getDestFilter("RefFred"));
 		assertFalse(fil.isForced());

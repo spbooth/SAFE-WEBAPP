@@ -34,7 +34,7 @@ public class SQLAndFilter<T> extends BaseSQLCombineFilter<T>  {
 	public SQLAndFilter(String tag){
 		super(tag);
 	}
-	
+	@SafeVarargs
 	public SQLAndFilter(String tag,SQLFilter<? super T> ...filters ){
 		super(tag);
 		for(SQLFilter<? super T> f : filters){

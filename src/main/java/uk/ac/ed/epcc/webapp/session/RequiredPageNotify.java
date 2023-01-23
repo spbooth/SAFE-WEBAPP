@@ -41,11 +41,11 @@ public class RequiredPageNotify<AU extends AppUser> extends AbstractContexed {
 		}
 
 		
-		OrFilter<AU> fil = new OrFilter<AU>(login.getTag(), login);
+		OrFilter<AU> fil = login.getOrFilter();
 		for(RequiredPage<AU> rp : requiredPages) {
 			fil.addFilter(rp.notifiable(sess));
 		}
-		AndFilter<AU> notify_filter = new AndFilter<AU>(login.getTag(), fil, login.getEmailFilter(), login.getCanLoginFilter());
+		AndFilter<AU> notify_filter = login.getAndFilter(fil, login.getEmailFilter(), login.getCanLoginFilter());
 		if( max != null ) {
 			notify_filter.addFilter(max.getNotifyFilter(apply_rate_limit));
 		}

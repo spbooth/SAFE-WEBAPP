@@ -46,7 +46,13 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 		mixed_filters = new LinkedHashSet<>();
 		dual_filters = new LinkedHashSet<>();
 	}
-
+	@SafeVarargs
+	public OrFilter(String tag, FilterMatcher<T> matcher, BaseFilter<? super T> ... filters) {
+		this(tag,matcher);
+		for(BaseFilter<? super T> f : filters) {
+			addFilter(f);
+		}
+	}
 	
 	private final FilterMatcher<T> matcher;
 	private SQLOrFilter<T> sql_filters;

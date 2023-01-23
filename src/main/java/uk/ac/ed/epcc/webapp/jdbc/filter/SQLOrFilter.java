@@ -45,6 +45,7 @@ public class SQLOrFilter<T> extends BaseSQLCombineFilter<T> {
 		super(tag);
 		setSelectOnly(true);
 	}
+	@SafeVarargs
 	public SQLOrFilter(String tag,SQLFilter<? super T> ...filters ){
 		this(tag);
 		for(SQLFilter<? super T> f : filters){

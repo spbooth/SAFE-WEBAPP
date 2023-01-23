@@ -31,7 +31,7 @@ public class TestOrFilterFixed extends WebappTestBase {
 	@Test
 	public void testAddFixed() throws NoSQLFilterException{
 		Dummy1.Factory fac = new Dummy1.Factory(getContext());
-		OrFilter<Dummy1> fil = new OrFilter<>(fac.getTag(), fac);
+		OrFilter<Dummy1> fil = fac.getOrFilter();
 		
 		assertFalse(fil.getBooleanResult());
 		fil.addFilter(new FalseFilter<>());

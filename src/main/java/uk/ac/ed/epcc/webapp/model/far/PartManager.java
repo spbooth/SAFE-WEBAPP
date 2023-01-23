@@ -351,7 +351,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 	}
 	
 	public P findByParentAndName(O owner,String name) throws DataException{
-		SQLAndFilter<P> fil = new SQLAndFilter<>(getTag());
+		SQLAndFilter<P> fil = getSQLAndFilter();
 		fil.addFilter(getOwnerFilter(owner));
 		fil.addFilter(new SQLValueFilter<>( res, NAME_FIELD, name));
 		return find(fil,true);
@@ -450,11 +450,11 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 	 * @throws DataFault
 	 */
 	public P getSibling(P current, boolean up) throws DataFault{
-		SQLAndFilter<P> fil = new SQLAndFilter<>(getTag());
-		fil.addFilter(new SQLValueFilter<>(res, OWNER_FIELD, current.getOwnerID()));
-		fil.addFilter(new SQLValueFilter<>(res, ORDER_FIELD, up ? MatchCondition.GE : MatchCondition.LE, current.getSortOrder()));
-		fil.addFilter(new SelfReferenceFilter<>(res, true, makeReference(current)));
-		fil.addFilter(new PartOrderFilter(! up));
+		SQLAndFilter<P> fil = getSQLAndFilter(
+				new SQLValueFilter<>(res, OWNER_FIELD, current.getOwnerID()),
+				new SQLValueFilter<>(res, ORDER_FIELD, up ? MatchCondition.GE : MatchCondition.LE, current.getSortOrder()),
+				new SelfReferenceFilter<>(res, true, makeReference(current)),
+				new PartOrderFilter(! up));
 		FilterIterator it = new FilterIterator(fil, 0, 1);
 		if( it.hasNext()){
 			return it.next();

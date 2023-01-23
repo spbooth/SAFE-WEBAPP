@@ -199,7 +199,7 @@ public class RangeSearch<D extends DataObject> {
 	}
 	
 	private Info query(long min, long max) throws DataException {
-		return finder.find(new SQLAndFilter<D>(fac.getTag(), 
+		return finder.find(fac.getSQLAndFilter( 
 				new SQLValueFilter<D>(fac.res, field_name, MatchCondition.GE, min),
 				new SQLValueFilter<D>(fac.res, field_name, MatchCondition.LE, max)
 				));

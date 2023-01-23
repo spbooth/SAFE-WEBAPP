@@ -159,7 +159,7 @@ public class TestNegatingFilter extends WebappTestBase {
 		bill.setNumber(2);
 		bill.commit();
 		
-		BaseFilter<Dummy1> fred_filter = new SQLAndFilter<>(fac.getTag(),fac.new StringFilter("fred"),fac.new NumberFilter(1));
+		BaseFilter<Dummy1> fred_filter = fac.getSQLAndFilter(fac.new StringFilter("fred"),fac.new NumberFilter(1));
 		
 		Dummy1 fred2 = fac.find(fred_filter);
 		assertEquals("fred", fred2.getName());
@@ -167,7 +167,7 @@ public class TestNegatingFilter extends WebappTestBase {
 		Dummy1 bill2 = fac.find((BaseFilter<Dummy1>)fred_filter.acceptVisitor(vis));
 		assertEquals("bill",bill2.getName());
 		
-		BaseFilter<Dummy1> no_filter = new SQLAndFilter<>(fac.getTag(),fac.new StringFilter("fred"),fac.new NumberFilter(2));
+		BaseFilter<Dummy1> no_filter = fac.getSQLAndFilter(fac.new StringFilter("fred"),fac.new NumberFilter(2));
 		
 		assertEquals(0,fac.getCount(no_filter));
 		
@@ -186,7 +186,7 @@ public class TestNegatingFilter extends WebappTestBase {
 		bill.setNumber(2);
 		bill.commit();
 		
-		BaseFilter<Dummy1> fred_filter = new AndFilter<>(fac.getTag(),fac.new StringFilter("fred"),fac.new NumberFilter(1));
+		BaseFilter<Dummy1> fred_filter = fac.getAndFilter(fac.new StringFilter("fred"),fac.new NumberFilter(1));
 		
 		Dummy1 fred2 = fac.find(fred_filter);
 		assertEquals("fred", fred2.getName());
@@ -194,7 +194,7 @@ public class TestNegatingFilter extends WebappTestBase {
 		Dummy1 bill2 = fac.find((BaseFilter<Dummy1>)fred_filter.acceptVisitor(vis));
 		assertEquals("bill",bill2.getName());
 		
-		BaseFilter<Dummy1> no_filter = new SQLAndFilter<>(fac.getTag(),fac.new StringFilter("fred"),fac.new NumberFilter(2));
+		BaseFilter<Dummy1> no_filter = fac.getSQLAndFilter(fac.new StringFilter("fred"),fac.new NumberFilter(2));
 		
 		assertEquals(0,fac.getCount(no_filter));
 		
@@ -213,7 +213,7 @@ public class TestNegatingFilter extends WebappTestBase {
 		bill.setNumber(2);
 		bill.commit();
 		
-		BaseFilter<Dummy1> fred_filter = new AndFilter<>(fac.getTag(),fac.new StringFilter("fred"),fac.new NumberAcceptFilter(1));
+		BaseFilter<Dummy1> fred_filter = fac.getAndFilter(fac.new StringFilter("fred"),fac.new NumberAcceptFilter(1));
 		
 		Dummy1 fred2 = fac.find(fred_filter);
 		assertEquals("fred", fred2.getName());
@@ -221,7 +221,7 @@ public class TestNegatingFilter extends WebappTestBase {
 		Dummy1 bill2 = fac.find((BaseFilter<Dummy1>)fred_filter.acceptVisitor(vis));
 		assertEquals("bill",bill2.getName());
 		
-		BaseFilter<Dummy1> no_filter = new SQLAndFilter<>(fac.getTag(),fac.new StringFilter("fred"),fac.new NumberFilter(2));
+		BaseFilter<Dummy1> no_filter = fac.getSQLAndFilter(fac.new StringFilter("fred"),fac.new NumberFilter(2));
 		
 		assertEquals(0,fac.getCount(no_filter));
 		
@@ -240,7 +240,7 @@ public class TestNegatingFilter extends WebappTestBase {
 		bill.setNumber(2);
 		bill.commit();
 		
-		OrFilter<Dummy1> fred_filter = new OrFilter<>(fac.getTag(),fac);
+		OrFilter<Dummy1> fred_filter = fac.getOrFilter();
 		
 		fred_filter.addFilter(fac.new StringFilter("fred"));
 		fred_filter.addFilter(fac.new NumberFilter(1));
@@ -264,7 +264,7 @@ public class TestNegatingFilter extends WebappTestBase {
 		bill.setNumber(2);
 		bill.commit();
 		
-		OrFilter<Dummy1> fred_filter = new OrFilter<>(fac.getTag(),fac);
+		OrFilter<Dummy1> fred_filter = fac.getOrFilter();
 		
 		fred_filter.addFilter(fac.new StringFilter("fred"));
 		fred_filter.addFilter(fac.new NumberFilter(1));
@@ -299,7 +299,7 @@ public class TestNegatingFilter extends WebappTestBase {
 		bill_ref.setName("RefBill");
 		bill_ref.commit();
 		
-		SQLOrFilter<DummyReference> fred_filter = new SQLOrFilter<>(ref.getTag());
+		SQLOrFilter<DummyReference> fred_filter = ref.getSQLOrFilter();
 	
 		fred_filter.addFilter((SQLFilter<? super DummyReference>) ref.getRemoteNameFilter("fred"));
 		fred_filter.addFilter((SQLFilter<? super DummyReference>) ref.getRemoteNumberFilter(1));

@@ -404,7 +404,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 * @return
 		 */
 		private AndFilter<BDO> getValidateFilter(Number num) {
-			return new AndFilter<>(getTag(), fil, 
+			return getAndFilter(fil, 
 					getMatchFilter(num.intValue()));
 		}
 		/** get the Value from an Item
@@ -832,9 +832,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 */
 		@Override
 		public boolean test(T o) {
-			AndFilter<BDO> and = new AndFilter(getTag());
-			and.addFilter(fil);
-			and.addFilter(new ReferenceFilter<>(DataObjectFactory.this, join_field, o));
+			AndFilter<BDO> and = getAndFilter(
+					fil,
+					new ReferenceFilter<>(DataObjectFactory.this, join_field, o));
 			try {
 				return exists(and);
 			} catch (DataException e) {
@@ -1244,7 +1244,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 		// Have to do a SQL query
 		@SuppressWarnings("unchecked")
-		AndFilter<BDO> and = new AndFilter<>(getTag(), fil, getFilter(o) );
+		AndFilter<BDO> and = getAndFilter(fil, getFilter(o) );
 		try {
 			return exists(and);
 		} catch (DataException e) {
@@ -1307,7 +1307,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	}
 
 	public final BaseFilter<BDO> getFinalSelectFilter(){
-		AndFilter<BDO> fil = new AndFilter<>(getTag());
+		AndFilter<BDO> fil = getAndFilter();
 		fil.addFilter(getSelectFilter());
 		for(SelectModifier mod : getComposites(SelectModifier.class)){
 			fil.addFilter(mod.getSelectFilter());
@@ -1369,11 +1369,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		 */
 		@Override
 		public DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> filter) {
-			return new FilterSelector(new AndFilter<BDO>(getTag(), fil, filter), restrict);
+			return new FilterSelector(getAndFilter(fil, filter), restrict);
 		}
 		@Override
 		public DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> filter,boolean new_restrict) {
-			return new FilterSelector(new AndFilter<BDO>(getTag(), fil, filter), new_restrict);
+			return new FilterSelector(getAndFilter(fil, filter), new_restrict);
 		}
 	}
 	/** create a {@link Selector} from a filter.
@@ -1389,12 +1389,12 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	@Override
 	public final DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> fil){
 		// This should narrow the default selector of this class
-		return new FilterSelector(new AndFilter<BDO>(getTag(),getFinalSelectFilter(),fil),restrictDefaultInput());
+		return new FilterSelector(getAndFilter(getFinalSelectFilter(),fil),restrictDefaultInput());
 	}
 	@Override
 	public final DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> fil, boolean new_restrict){
 		// This should narrow the default selector of this class
-		return new FilterSelector(new AndFilter<BDO>(getTag(),getFinalSelectFilter(),fil),new_restrict);
+		return new FilterSelector(getAndFilter(getFinalSelectFilter(),fil),new_restrict);
 	}
 	/** create a {@link Selector} from a filter.
 	 * 
@@ -2199,7 +2199,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			}
 			BaseFilter<BDO> result =new RemoteAcceptFilter<>(getTag(), remote_fac, field, fil);
 			if( fil.hasPatternFilters() ){
-				result = new AndFilter<>(getTag(),result, getRemoteSQLFilter(remote_fac,field,fil.getNarrowingFilter()));
+				result = getAndFilter(result, getRemoteSQLFilter(remote_fac,field,fil.getNarrowingFilter()));
 			}
 			return result;
 
@@ -2310,5 +2310,42 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 */
 	public final AcceptFilter<BDO> getFilter(Predicate<BDO> p){
 		return (o) -> p.test(o);
+	}
+	/** create a {@link AndFilter} for this factory
+	 * 
+	 * @param filters
+	 * @return
+	 */
+	@SafeVarargs
+	public final AndFilter<BDO> getAndFilter(BaseFilter<? super BDO> ... filters){
+		return new AndFilter<>(getTag(),filters);
+	}
+	/** create a {@link SQLAndFilter} for this factory
+	 * 
+	 * @param filters
+	 * @return
+	 */
+	@SafeVarargs
+	public final SQLAndFilter<BDO> getSQLAndFilter(SQLFilter<? super BDO> ... filters){
+		return new SQLAndFilter<>(getTag(),filters);
+	}
+	/** create a {@link OrFilter} for this factory
+	 * 
+	 * @param filters
+	 * @return
+	 */
+	@SafeVarargs
+	public final OrFilter<BDO> getOrFilter(BaseFilter<? super BDO> ... filters){
+		return new OrFilter<>(getTag(), this, filters);
+	}
+	
+	/** create a {@link SQLOrFilter} for this factory
+	 * 
+	 * @param filters
+	 * @return
+	 */
+	@SafeVarargs
+	public final SQLOrFilter<BDO> getSQLOrFilter(SQLFilter<? super BDO> ... filters){
+		return new SQLOrFilter<>(getTag(), filters);
 	}
 }

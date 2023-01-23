@@ -106,14 +106,13 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			Hash default_hash = Hash.getDefault(getContext());
 			if( getRepository().hasField(DatabasePasswordComposite.ALG)){
 				log.debug("Has alg field");
-				SQLOrFilter<T> of = new SQLOrFilter<>(getFactory().getTag());
+				SQLOrFilter<T> of = getFactory().getSQLOrFilter();
 				AppContext conn = getContext();
 				for(Hash h : Hash.values()){
 					if( h.equals(default_hash) || h.isEnabled(conn)){
-						SQLAndFilter<T> clause = new SQLAndFilter<>(getFactory().getTag());
-						
-						clause.addFilter(new SQLValueFilter<>(getRepository(), DatabasePasswordComposite.ALG, h.ordinal()));
-						clause.addFilter(new SQLHashFilter(getContext(),h, password));
+						SQLAndFilter<T> clause = getFactory().getSQLAndFilter(	
+								new SQLValueFilter<>(getRepository(), DatabasePasswordComposite.ALG, h.ordinal()),
+								new SQLHashFilter(getContext(),h, password));
 						of.addFilter(clause);
 					}
 				}
@@ -714,7 +713,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		}
 		// route all password checks through the same code
 		try {
-			AndFilter<T> fil = new AndFilter<>(getFactory().getTag());
+			AndFilter<T> fil = getFactory().getAndFilter();
 			fil.addFilter(getFactory().getFilter(u));
 			fil.addFilter(getPasswordFilter(password));
 			T temp = getFactory().find(fil,true);
@@ -737,7 +736,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 			public T findByLoginNamePassword(String email, String password,boolean check_fail_count)
 					throws DataException {
 				Logger log=getLogger();
-				AndFilter<T> fil = new AndFilter<>(getFactory().getTag());
+				AndFilter<T> fil = getFactory().getAndFilter();
 				SQLFilter<T> nameFilter = getLoginFilter(email);
 				fil.addFilter(nameFilter);
 				fil.addFilter(getPasswordFilter(password));

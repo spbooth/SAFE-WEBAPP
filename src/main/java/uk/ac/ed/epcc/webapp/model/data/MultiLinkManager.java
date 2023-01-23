@@ -163,7 +163,7 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 		 * @return SQLFilter
 		 */
 		public SQLFilter<M> getFilter(){
-			SQLAndFilter<M> fil = new SQLAndFilter<>(getTag());
+			SQLAndFilter<M> fil = getSQLAndFilter();
 			for(Map.Entry<String, DataObject> e: map.entrySet()){
 				fil.addFilter(new ReferenceFilter<>(MultiLinkManager.this,e.getKey(),e.getValue()));
 			}

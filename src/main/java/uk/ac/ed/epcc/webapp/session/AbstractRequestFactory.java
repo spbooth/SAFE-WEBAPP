@@ -95,9 +95,9 @@ public abstract class AbstractRequestFactory<R extends AbstractRequestFactory.Ab
 			
 			CurrentTimeService time = getContext().getService(CurrentTimeService.class);
 			Date d = time.getCurrentTime();
-			SQLOrFilter<R> fil = new SQLOrFilter<>(getTag());
-			fil.addFilter(new SQLValueFilter<>( res, EXPIRES,MatchCondition.LT, d));
-			fil.addFilter(new NullFieldFilter<>( res, EXPIRES, true));
+			SQLOrFilter<R> fil = getSQLOrFilter(
+					new SQLValueFilter<>( res, EXPIRES,MatchCondition.LT, d),
+					new NullFieldFilter<>( res, EXPIRES, true));
 			purge(fil);
 		}
 	}

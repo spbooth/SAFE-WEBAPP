@@ -125,7 +125,7 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 			Date now = time.getCurrentTime();
 			Repository res = record.getRepository();
 			FilterUpdate<Lock> update = new FilterUpdate<LockFactory.Lock>(res);
-			SQLAndFilter<Lock> fil = new SQLAndFilter<Lock>(LockFactory.this.getTag(),getFilter(this),new NullFieldFilter<Lock>(res, LOCK_FIELD, true));
+			SQLAndFilter<Lock> fil = LockFactory.this.getSQLAndFilter(getFilter(this),new NullFieldFilter<Lock>(res, LOCK_FIELD, true));
 			try {
 				int i = update.update(fil, 
 						new FieldValuePatternArgument<Date,Lock>(res.getDateExpression(LOCK_FIELD), now),
@@ -164,7 +164,7 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 					commit();
 					Repository res = record.getRepository();
 					FilterUpdate<Lock> update = new FilterUpdate<LockFactory.Lock>(res);
-					SQLAndFilter<Lock> fil = new SQLAndFilter<Lock>(LockFactory.this.getTag(),getFilter(this),new NullFieldFilter<Lock>(res, LOCK_FIELD, false));
+					SQLAndFilter<Lock> fil = LockFactory.this.getSQLAndFilter(getFilter(this),new NullFieldFilter<Lock>(res, LOCK_FIELD, false));
 					int i = update.update(res.getDateExpression( LOCK_FIELD), null, fil);
 					if( i != 1 ) {
 						// How did this happen

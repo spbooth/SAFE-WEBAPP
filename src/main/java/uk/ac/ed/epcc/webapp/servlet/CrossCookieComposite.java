@@ -71,7 +71,7 @@ public class CrossCookieComposite extends Composite<WtmpManager.Wtmp,CrossCookie
 	 * @return
 	 */
 	public BaseFilter<WtmpManager.Wtmp> getFilter(String fulldata){
-		String target = getFactory().getTag();
+		
 		Repository res = getRepository();
 		
 		int pos = fulldata.indexOf("-");
@@ -79,7 +79,7 @@ public class CrossCookieComposite extends Composite<WtmpManager.Wtmp,CrossCookie
 		if( pos < 1 || (fulldata.length()-(pos+1)) != DATA_LEN || ! res.hasField(COOKIE_DATA_FIELD)){
 			return new FalseFilter<>();
 		}
-		AndFilter fil = new AndFilter<>(target);
+		AndFilter fil = getFactory().getAndFilter();
 		Integer id = Integer.parseInt(fulldata.substring(0, pos));
 		
 		fil.addFilter(new SQLIdFilter<>(res, id));

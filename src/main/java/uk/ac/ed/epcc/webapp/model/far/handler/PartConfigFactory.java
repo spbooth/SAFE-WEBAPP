@@ -114,7 +114,7 @@ public class PartConfigFactory<O extends PartOwner,P extends Part<O>> extends Da
 	 * @return
 	 */
 	private SQLAndFilter<Config> getNamePartFilter(P owner, String name) {
-		return new SQLAndFilter<>(getTag(), getPartFilter(owner),getNameFilter(name));
+		return getSQLAndFilter(getPartFilter(owner),getNameFilter(name));
 	}
 	/**
 	 * @param name

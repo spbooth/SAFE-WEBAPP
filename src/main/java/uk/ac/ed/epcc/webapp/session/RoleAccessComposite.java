@@ -79,7 +79,7 @@ public class RoleAccessComposite<BDO extends DataObject,A extends AppUser> exten
 				return new FalseFilter();
 			}
 			// Can only match targets with an access role set to narrow the selection
-			return new AndFilter<BDO>(getFactory().getTag(), 
+			return getFactory().getAndFilter(
 					new NullFieldFilter<BDO>( getRepository(), ACCESS_ROLE, false),
 					new RoleAccessFilter(getContext().getService(SessionService.class), user));
 		}

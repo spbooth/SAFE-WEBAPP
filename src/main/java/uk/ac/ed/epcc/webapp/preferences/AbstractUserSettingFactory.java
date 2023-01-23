@@ -104,9 +104,9 @@ public abstract class AbstractUserSettingFactory<D,T, S extends AbstractUserSett
 		if( serv == null || ! serv.haveCurrentUser() || ! PER_USER_SETTINGS_FEATURE.isEnabled(getContext())){
 			return null;
 		}
-		SQLAndFilter<S> fil = new SQLAndFilter<>(getTag());
-		fil.addFilter(new SQLValueFilter<>(res, SETTING_FIELD, pref.getName()));
-		fil.addFilter(new SQLValueFilter<>(res, PERSON_FIELD, serv.getCurrentPerson().getID()));
+		SQLAndFilter<S> fil = getSQLAndFilter(
+				new SQLValueFilter<>(res, SETTING_FIELD, pref.getName()),
+				new SQLValueFilter<>(res, PERSON_FIELD, serv.getCurrentPerson().getID()));
 		try {
 			S result = find(fil,true);
 			if( result == null ){

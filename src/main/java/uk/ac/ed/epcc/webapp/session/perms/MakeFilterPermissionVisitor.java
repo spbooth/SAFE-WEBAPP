@@ -24,7 +24,7 @@ public abstract class MakeFilterPermissionVisitor<R extends DataObject,T extends
    
    @Override
 	public BaseFilter<R> visitAndPermissionClause(AndPermissionClause<T> andc) throws UnknownRelationshipException {
-		AndFilter<R> and = new AndFilter<R>(getFactory().getTag());
+		AndFilter<R> and = getFactory().getAndFilter();
 		for(PermissionClause<T> s : andc) {
 			if( ! and.isForced()) {
 				and.addFilter(s.accept(this));
@@ -34,7 +34,7 @@ public abstract class MakeFilterPermissionVisitor<R extends DataObject,T extends
 	}
 	@Override
 	public BaseFilter<R> visitOrPermissionClause(OrPermissionClause<T> orc) throws UnknownRelationshipException {
-		OrFilter<R> or = new OrFilter<>(getFactory().getTag(), getFactory());
+		OrFilter<R> or = getFactory().getOrFilter();
 		for( PermissionClause<T>  s  : orc){
 			if( ! or.isForced()) { // combinations shortcut if forced
 				or.addFilter(s.accept(this));

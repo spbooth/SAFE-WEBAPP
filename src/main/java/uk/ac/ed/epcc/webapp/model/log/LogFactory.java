@@ -590,7 +590,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 */
 	protected SQLAndFilter<T> getItemFilter(ItemType.ItemValue v, int link) {
 		SQLAndFilter<T> fil;
-		fil = new SQLAndFilter<>(getTag());
+		fil = getSQLAndFilter();
 		fil.addFilter(getItemFilter(v));
 		fil.addFilter(new SQLValueFilter<>(res, LINK_ID, link));
 		return fil;
@@ -603,7 +603,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 */
 	public <L extends DataObject> AndFilter<T> getItemFilter(DataObjectFactory<L> fac, ItemType.ItemValue v, BaseFilter<L> link_fil) {
 		AndFilter<T> fil;
-		fil = new AndFilter<>(getTag());
+		fil = getAndFilter();
 		fil.addFilter(getItemFilter(v));
 		fil.addFilter(getRemoteFilter(fac, LINK_ID, link_fil));
 		return fil;
@@ -678,7 +678,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	}
 	
 	public CloseableIterator<T> getLog(O q) throws DataFault {
-		SQLAndFilter<T> fil = new SQLAndFilter<T>(getTag(),   getOwnerFilter(q),  new DateOrderFilter());
+		SQLAndFilter<T> fil = getSQLAndFilter(getOwnerFilter(q),  new DateOrderFilter());
 		return new FilterIterator(fil);
 	}
 

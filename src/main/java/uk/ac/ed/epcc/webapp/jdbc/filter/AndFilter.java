@@ -38,6 +38,7 @@ public class AndFilter<T> extends BaseCombineFilter<T> implements PatternFilter<
     public AndFilter(String tag){
     	super(tag);
     }
+    @SafeVarargs
     public AndFilter(String tag,BaseFilter<? super T> ... fil){
     	super(tag);
     	for(BaseFilter<? super T> f: fil){

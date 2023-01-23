@@ -613,9 +613,9 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		   timer.startTimer(tag);
 		}
 		try {
-			SQLAndFilter<T> fil = new SQLAndFilter<>(getTag());
-			fil.addFilter(new ReferenceFilter<>(this, left_field, left_end));
-			fil.addFilter(new ReferenceFilter<>(this, right_field, right_end));
+			SQLAndFilter<T> fil = getSQLAndFilter(
+					new ReferenceFilter<>(this, left_field, left_end),
+					new ReferenceFilter<>(this, right_field, right_end));
 			T l = find(fil,true);
 			
 			if( l != null ){

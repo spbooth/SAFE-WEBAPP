@@ -266,7 +266,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	}
 
 	public FilterResult<Wtmp> getLoginHistory(AppUser person) throws DataFault{
-		OrFilter<Wtmp> fil = new OrFilter<WtmpManager.Wtmp>(getTag(), this);
+		OrFilter<Wtmp> fil = getOrFilter();
 		fil.addFilter(new ReferenceFilter<>(WtmpManager.this, PERSON_ID, person));
 		if( res.hasField(SUPER_PERSON_ID)) {
 			fil.addFilter(new ReferenceFilter<>(WtmpManager.this, SUPER_PERSON_ID, person));
@@ -287,7 +287,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 			if( NEW_HOST_EMAIL.isEnabled(getContext())){
 				String email = p.getEmail();
 				if( email != null ) {
-					SQLAndFilter fil = new SQLAndFilter(getTag(),new ReferenceFilter<Wtmp, AppUser>(this, PERSON_ID, p),
+					SQLAndFilter fil = getSQLAndFilter(new ReferenceFilter<Wtmp, AppUser>(this, PERSON_ID, p),
 							new SQLValueFilter<Wtmp>( res, HOST, remoteHost));
 					try {
 						if( ! exists(fil)) {
@@ -390,7 +390,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	}
 	public Date lastLogin(AppUser person) throws DataException {
 		LoginFinder finder = new LoginFinder();
-		SQLAndFilter fil = new SQLAndFilter(getTag(),new ReferenceFilter<>(WtmpManager.this, PERSON_ID, person));
+		SQLAndFilter fil = getSQLAndFilter(new ReferenceFilter<>(WtmpManager.this, PERSON_ID, person));
 		if( res.hasField(SUPER_PERSON_ID)) {
 			fil.addFilter(new NullFieldFilter<Wtmp>(res, SUPER_PERSON_ID, true));
 		}
@@ -398,7 +398,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	}
 	
 	public Wtmp lastRecord(AppUser person) {
-		SQLAndFilter fil = new SQLAndFilter(getTag(),new ReferenceFilter<>(WtmpManager.this, PERSON_ID, person));
+		SQLAndFilter fil = getSQLAndFilter(new ReferenceFilter<>(WtmpManager.this, PERSON_ID, person));
 		if( res.hasField(SUPER_PERSON_ID)) {
 			fil.addFilter(new NullFieldFilter<Wtmp>( res, SUPER_PERSON_ID, true));
 		}
@@ -421,7 +421,7 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 	 */
     public SQLFilter<AppUser> getActiveFilter(Date d){
     	AppUserFactory<AppUser> login = getContext().getService(SessionService.class).getLoginFactory();
-    	SQLAndFilter fil = new SQLAndFilter(getTag(),new TimeFilter(START_TIME,MatchCondition.GT, d));
+    	SQLAndFilter fil = getSQLAndFilter(new TimeFilter(START_TIME,MatchCondition.GT, d));
 		if( res.hasField(SUPER_PERSON_ID)) {
 			fil.addFilter(new NullFieldFilter<Wtmp>( res, SUPER_PERSON_ID, true));
 		}

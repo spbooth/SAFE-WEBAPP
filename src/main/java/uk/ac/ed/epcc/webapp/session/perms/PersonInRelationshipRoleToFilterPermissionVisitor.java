@@ -68,7 +68,7 @@ public class PersonInRelationshipRoleToFilterPermissionVisitor<U extends AppUser
 		
 		boolean exists=false;
 		try {
-			exists = fac.exists(new AndFilter<T>(fac.getTag(),f.getFilter(),fil));
+			exists = fac.exists(fac.getAndFilter(f.getFilter(),fil));
 		} catch (DataException e) {
 			getLogger().info("Error checking for filter match",e);
 			throw new UnknownRelationshipException(f.getName());

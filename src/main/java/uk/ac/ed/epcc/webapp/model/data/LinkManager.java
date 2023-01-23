@@ -17,11 +17,7 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import java.sql.ResultSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
@@ -29,24 +25,11 @@ import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.forms.inputs.CompositeInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.ConstantInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.ResultIterator;
-import uk.ac.ed.epcc.webapp.jdbc.filter.ResultMapper;
-import uk.ac.ed.epcc.webapp.jdbc.filter.ResultVisitor;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
@@ -265,8 +248,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			}
 			// Use JoinerFilters so that if additional joins are added explicitly
 			// The join clauses will be identical and not duplicated.
-			String target = LinkManager.this.getTag();
-			SQLAndFilter<T> fil = new SQLAndFilter<>(target);
+			SQLAndFilter<T> fil = LinkManager.this.getSQLAndFilter();
 			if( join_left ){
 				fil.addFilter(new JoinerFilter<T,L>( getLeftField(), res, getLeftFactory().res));
 			}

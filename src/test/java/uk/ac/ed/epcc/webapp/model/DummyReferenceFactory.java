@@ -79,11 +79,11 @@ public class DummyReferenceFactory extends DataObjectFactory<DummyReference> {
 	}
 	public BaseFilter<DummyReference> getRemoteNumberAndFilter(Number n){
 		Dummy1.Factory fac = new Dummy1.Factory(getContext());
-		return getRemoteFilter(fac, DummyReference.REF_FIELD,new AndFilter(fac.getTag(), fac.getNumberAcceptFilter(n), fac.getNumberFilter(n)));
+		return getRemoteFilter(fac, DummyReference.REF_FIELD,fac.getAndFilter( fac.getNumberAcceptFilter(n), fac.getNumberFilter(n)));
 	}
 	public BaseFilter<DummyReference> getRemoteNumberSQLAndFilter(Number n){
 		Dummy1.Factory fac = new Dummy1.Factory(getContext());
-		return getRemoteFilter(fac, DummyReference.REF_FIELD,new SQLAndFilter(fac.getTag(), fac.getNumberFilter(n), fac.getNumberFilter(n)));
+		return getRemoteFilter(fac, DummyReference.REF_FIELD,fac.getSQLAndFilter(fac.getNumberFilter(n), fac.getNumberFilter(n)));
 	}
 	public BaseFilter<DummyReference> getRemoteNumberDualFilter(Number n){
 		Dummy1.Factory fac = new Dummy1.Factory(getContext());

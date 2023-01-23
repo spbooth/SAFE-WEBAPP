@@ -256,9 +256,7 @@ public class Dummy1 extends DataObject implements Removable {
 		}
 		
 		public FilterResult<Dummy1> getReverse() throws DataFault{
-			AndFilter<Dummy1>fil = new AndFilter<>(getTag());
-			fil.addFilter(new FieldOrderFilter<>(res, NUMBER, true));
-			return getResult(fil);
+			return getResult(new FieldOrderFilter<>(res, NUMBER, true));
 			
 		}
 		public SQLExpression<String> getNameExpression(){
@@ -272,7 +270,7 @@ public class Dummy1 extends DataObject implements Removable {
 			return res.getTypeProducerExpression(Beatle.class,beatles);
 		}
 		public FilterResult<Dummy1> getWithFilter() throws DataFault{
-			AndFilter<Dummy1>fil = new AndFilter<>(getTag());
+			AndFilter<Dummy1>fil = getAndFilter();
 			return getResult(fil);
 			
 		}

@@ -64,10 +64,10 @@ public class FilterConverterTest extends WebappTestBase {
 	
 	@Test
 	public void testAndFilter() throws Exception {
-		AndFilter fil = new AndFilter<>(fac.getTag());
+		AndFilter fil = fac.getAndFilter();
 		fil.addFilter(fac.getStringFilter("bill"));
 		fil.addFilter(fac.getNumberFilter(2));
-		SQLAndFilter and = new SQLAndFilter<>(fac.getTag());
+		SQLAndFilter and = fac.getSQLAndFilter();
 		and.addFilter(fac.getStringFilter("bill"));
 		and.addFilter(fac.getNumberFilter(2));
 		assertEquals(and, fil.acceptVisitor(conv));
@@ -75,10 +75,10 @@ public class FilterConverterTest extends WebappTestBase {
 	}
 	@Test
 	public void testOrFilter() throws Exception {
-		OrFilter fil = new OrFilter<>(fac.getTag(),fac);
+		OrFilter fil = fac.getOrFilter();
 		fil.addFilter(fac.getStringFilter("bill"));
 		fil.addFilter(fac.getNumberFilter(2));
-		SQLOrFilter or = new SQLOrFilter<>(fac.getTag());
+		SQLOrFilter or = fac.getSQLOrFilter();
 		or.addFilter(fac.getStringFilter("bill"));
 		or.addFilter(fac.getNumberFilter(2));
 		assertEquals(or, fil.acceptVisitor(conv));

@@ -169,8 +169,7 @@ public class MaxNotifyComposite<A extends AppUser> extends Composite<A, MaxNotif
 		if( ! apply()) {
 			return null;
 		}
-		String target = getFactory().getTag();
-		SQLAndFilter<A> fil = new SQLAndFilter<A>(target);
+		SQLAndFilter<A> fil =getFactory().getSQLAndFilter();
 		if( getRepository().hasField(NOTIFY_COUNT_FIELD)) {
 		   fil.addFilter(new SQLValueFilter<A>(getRepository(),NOTIFY_COUNT_FIELD,MatchCondition.LT,maxNotify()));
 		   // low notification count first

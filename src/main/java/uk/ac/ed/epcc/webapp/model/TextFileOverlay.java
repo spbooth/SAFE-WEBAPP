@@ -320,7 +320,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		}
 	}
 	public TextFile find(String group,String name) throws DataFault{
-		SQLAndFilter<T> get = new SQLAndFilter<>(getTag());
+		SQLAndFilter<T> get = getSQLAndFilter();
 		get.addFilter(new SQLValueFilter<>(res,GROUP,group));
 		get.addFilter(new SQLValueFilter<>(res,NAME,name));
 		T tf;

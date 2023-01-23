@@ -121,7 +121,7 @@ ListInputInterfaceTest
 	   long expect = f.getCount(null);
 	   
 	   
-	   assertEquals(f.exists(new SQLAndFilter<>(f.getTag())), expect>0);
+	   assertEquals(f.exists(f.getSQLAndFilter()), expect>0);
 	   
 	   if( expect > 100000){
 		   System.out.println("Count to large to test");
@@ -294,7 +294,7 @@ public Set<Integer> getBadData() throws Exception{
 	    	   fil = FilterConverter.convert(fac.getSelectFilter());
 	       }catch(NoSQLFilterException e){
 	    	   // All records
-	    	   fil = new SQLAndFilter<>(getFactory().getTag());
+	    	   fil = getFactory().getSQLAndFilter();
 	       }
 			for(O item : fac.getResult(fil,0,100)){
 				good.add(item.getID());

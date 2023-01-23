@@ -510,7 +510,7 @@ Targetted<AU>
 	 * @return
 	 */
 	public BaseFilter<AU> getEmailFilter(){
-		AndFilter<AU> fil = new AndFilter<AU>(getTag());
+		AndFilter<AU> fil = getAndFilter();
 		if( res.hasField(ALLOW_EMAIL_FIELD)) {
 			fil.addFilter(new SQLValueFilter<AU>( res, ALLOW_EMAIL_FIELD, Boolean.TRUE));
 		}
@@ -732,7 +732,7 @@ Targetted<AU>
 		return getStringFinderFilter(name, false);
 	}
 	public   SQLFilter<AU> getStringFinderFilter(String name,boolean require_user_supplied){
-		SQLOrFilter<AU> fil = new SQLOrFilter<>(getTag());
+		SQLOrFilter<AU> fil = getSQLOrFilter();
 		for(  AppUserNameFinder<AU,?> finder : getRealms()){
 			if( finder.userVisible() || ! require_user_supplied){
 				fil.addFilter(finder.getStringFinderFilter( name));
@@ -744,7 +744,7 @@ Targetted<AU>
 	
 	@Override
 	public   SQLFilter<AU> hasCanonicalNameFilter(){
-		SQLOrFilter<AU> fil = new SQLOrFilter<>(getTag());
+		SQLOrFilter<AU> fil = getSQLOrFilter();
 		for(  AppUserNameFinder<AU,?> finder : getRealms()){
 			if( finder.userVisible() ){
 				fil.addFilter(finder.hasCanonicalNameFilter());
@@ -1137,9 +1137,8 @@ Targetted<AU>
 	}
 	@Override
 	public BaseFilter<AU> getSelectFilter() {
-		AndFilter<AU> result = new AndFilter<>(getTag(),super.getSelectFilter());
-		result.addFilter(getContext().getService(SessionService.class).getRelationshipRoleFilter(this, AppUserTransitionProvider.VIEW_PERSON_RELATIONSHIP,new GenericBinaryFilter<>(true)));
-		return result;
+		return getAndFilter(super.getSelectFilter(),
+				getContext().getService(SessionService.class).getRelationshipRoleFilter(this, AppUserTransitionProvider.VIEW_PERSON_RELATIONSHIP,new GenericBinaryFilter<>(true)));
 	}
 	@Override
 	public FormUpdate<AU> getFormUpdate(AppContext c) {

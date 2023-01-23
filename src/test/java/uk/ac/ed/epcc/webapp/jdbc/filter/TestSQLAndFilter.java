@@ -81,10 +81,10 @@ public class TestSQLAndFilter extends WebappTestBase {
 		assertEquals(4, inter_count(d1_fac.new StringFilter("bill"),null,"bill"));
 		assertEquals(2, d1_fac.count(d1_fac.new NumberFilter(1.0)));
 		assertEquals(2, inter_count(d1_fac.new NumberFilter(1.0),1.0,null));
-		SQLAndFilter<Dummy1> fil = new SQLAndFilter<>(d1_fac.getTag());
+		SQLAndFilter<Dummy1> fil = d1_fac.getSQLAndFilter();
 		assertEquals(8, d1_fac.count(fil));
 		assertEquals(8, inter_count(fil,null,null));
-		fil = new SQLAndFilter<>(d1_fac.getTag());
+		fil = d1_fac.getSQLAndFilter();
 		fil.addFilter(d1_fac.new StringFilter("fred"));
 		assertEquals(4,d1_fac.count(fil));
 		assertEquals(4, inter_count(fil, null, "fred"));
@@ -92,15 +92,15 @@ public class TestSQLAndFilter extends WebappTestBase {
 		assertEquals(1, d1_fac.count(fil));
 		assertEquals(1, inter_count(fil, 1.0, "fred"));
 		// now try with AndFilter
-		AndFilter<Dummy1> fil2= new AndFilter<>(d1_fac.getTag());
+		AndFilter<Dummy1> fil2= d1_fac.getAndFilter();
 		assertEquals(8, inter_count(fil2,null,null));
-		fil2= new AndFilter<>(d1_fac.getTag());
+		fil2= d1_fac.getAndFilter();
 		fil2.addFilter(d1_fac.new StringFilter("fred"));
 		assertEquals(4, inter_count(fil2, null, "fred"));
 		fil2.addFilter(d1_fac.new NumberFilter(1.0));
 		assertEquals(1, inter_count(fil2, 1.0, "fred"));
 		
-		fil2= new AndFilter<>(d1_fac.getTag());
+		fil2= d1_fac.getAndFilter();
 		fil2.addFilter(d1_fac.new StringFilter("fred"));
 		assertEquals(4, inter_count(fil2, null, "fred"));
 		fil2.addFilter(d1_fac.new NumberAcceptFilter(1.0));
@@ -112,14 +112,14 @@ public class TestSQLAndFilter extends WebappTestBase {
 		assertEquals(8, d1_fac.count(new GenericBinaryFilter<>(true)));
 		assertEquals(8, inter_count(new GenericBinaryFilter<>( true),null,null));
 		
-		fil= new SQLAndFilter<>(d1_fac.getTag());
+		fil= d1_fac.getSQLAndFilter();
 		fil.addFilter(new GenericBinaryFilter<>(true));
 		assertEquals(8,d1_fac.count(fil));
 		assertEquals(8,inter_count(fil,null,null));
 		
 		assertEquals(0, d1_fac.count(new GenericBinaryFilter<>( false)));
 		assertEquals(0, inter_count(new GenericBinaryFilter<>(false),null,null));
-		fil= new SQLAndFilter<>(d1_fac.getTag());
+		fil= d1_fac.getSQLAndFilter();
 		fil.addFilter(new GenericBinaryFilter<>(false));
 		assertEquals(0,d1_fac.count(fil));
 		assertEquals(0,inter_count(fil,null,null));

@@ -110,7 +110,7 @@ public class Dummy3 extends DataObject {
 	
 		
 		public FilterResult<Dummy3> getWithFilter() throws DataFault{
-			AndFilter<Dummy3>fil = new AndFilter<>(getTag());
+			AndFilter<Dummy3>fil = getAndFilter();
 			return getResult(fil);
 			
 		}

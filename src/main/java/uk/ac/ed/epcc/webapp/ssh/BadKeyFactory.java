@@ -147,14 +147,14 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 		return ! exists(getKeyFilter(key));
 	}
 	public SQLFilter<BadKey> getKeyFilter(String key) {
-		SQLAndFilter<BadKey> fil = new SQLAndFilter<BadKey>(getTag());
+		SQLAndFilter<BadKey> fil = getSQLAndFilter();
 		if( res.hasField(PUBLIC_KEY)) {
 			fil.addFilter(new SQLValueFilter<BadKey>(res, PUBLIC_KEY, key));
 		}
 		if( res.hasField(FINGERPRINT)) {
 			try {
 				fil.addFilter(
-						new SQLOrFilter<BadKey>(getTag(),
+						getSQLOrFilter(
 								new SQLValueFilter<BadKey>( res, FINGERPRINT, val.fingerprint2(key)),	
 								new NullFieldFilter<BadKey>( res, FINGERPRINT, true)
 								));

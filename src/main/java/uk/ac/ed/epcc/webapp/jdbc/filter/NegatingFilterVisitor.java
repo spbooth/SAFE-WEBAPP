@@ -55,9 +55,9 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 		FilterCombination c = fil.getFilterCombiner();
 		BaseCombineFilter<T> neg;
 		if( c == FilterCombination.AND) {
-			neg = new SQLOrFilter<>(fac.getTag());
+			neg = fac.getSQLOrFilter();
 		}else {
-			neg = new SQLAndFilter<>(fac.getTag());
+			neg = fac.getSQLAndFilter();
 		}
 		for( BaseFilter<T> f : fil.getSet()) {
 			neg.add(f.acceptVisitor(this), false);
@@ -77,7 +77,7 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 				getLogger().error("Unexpected error: SQL convert failed", t);
 			}
 		}
-		OrFilter<T> result = new OrFilter<>(fac.getTag(), fac);
+		OrFilter<T> result = fac.getOrFilter();
 		for(BaseFilter f : fil.getSet()) {
 			result.add((BaseFilter<? super T>) f.acceptVisitor(this), false);
 		}
@@ -89,7 +89,7 @@ public class NegatingFilterVisitor<T extends DataObject> implements FilterVisito
 	 */
 	@Override
 	public BaseFilter<T> visitOrFilter(OrFilter<T> fil) throws Exception {
-		AndFilter<T> result = new AndFilter<T>(fac.getTag());
+		AndFilter<T> result = fac.getAndFilter();
 		for(BaseFilter f : fil.getSet()) {
 			result.add( (BaseFilter) f.acceptVisitor(this), false);
 		}
