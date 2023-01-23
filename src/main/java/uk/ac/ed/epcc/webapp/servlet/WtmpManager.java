@@ -100,10 +100,10 @@ public class WtmpManager extends DataObjectFactory<WtmpManager.Wtmp> implements 
 
 	private static final String PERSON_ID = "PersonID";
 	private static final String SUPER_PERSON_ID = "SuperPersonID";
-	public class DateFilter extends SQLAndFilter<Wtmp> {
+	public class DateFilter extends DataObjectSQLAndFilter<WtmpManager,Wtmp> {
 
 		public DateFilter(Date point) {
-			super(WtmpManager.this.getTag());
+			super(WtmpManager.this);
 			addFilter(new TimeFilter(START_TIME,MatchCondition.LT,point));
 			addFilter(new TimeFilter(END_TIME,MatchCondition.GT,point));
 		}

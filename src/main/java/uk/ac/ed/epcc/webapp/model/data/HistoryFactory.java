@@ -348,7 +348,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	 * @author spb
 	 * 
 	 */
-	public class HistoryFilter extends SQLAndFilter<H> {
+	public class HistoryFilter extends DataObjectSQLAndFilter<HistoryFactory<P,H>,H> {
 		/**
 		 * Create a HistoryFilter by specifying peer object and date range peer
 		 * and start can be null to signify a wildcard
@@ -387,7 +387,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		 * @param end
 		 */
 		public HistoryFilter(Date start, Date end) {
-			super(HistoryFactory.this.getTag());
+			super(HistoryFactory.this);
 			if (start != null) {
 				if (end == null) {
 					throw new IllegalArgumentException(

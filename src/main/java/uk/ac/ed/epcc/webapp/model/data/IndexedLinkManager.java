@@ -26,11 +26,7 @@ import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.ResultVisitor;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -327,7 +323,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 * @author spb
 	 * 
 	 */
-	protected final class LinkFilter extends AndFilter<T> implements LinkProvider<T,L,R>{
+	protected final class LinkFilter extends DataObjectAndFilter<IndexedLinkManager<T,L,R>,T> implements LinkProvider<T,L,R>{
 		private L left_target = null;
 
 		private R right_target = null;
@@ -344,7 +340,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		 *            extension Filter
 		 */
 		public LinkFilter(L l, R r, BaseFilter<T> f) {
-			super(IndexedLinkManager.this.getTag());
+			super(IndexedLinkManager.this);
 			left_target = l;
 			right_target = r;
 			if (l != null && !isLeft(l)) {
@@ -390,7 +386,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 * @author spb
 	 * 
 	 */
-	protected final class SQLLinkFilter extends SQLAndFilter<T> implements LinkProvider<T,L,R>{
+	protected final class SQLLinkFilter extends DataObjectSQLAndFilter<IndexedLinkManager<T,L,R>,T> implements LinkProvider<T,L,R>{
 		private L left_target = null;
 
 		private R right_target = null;
@@ -407,7 +403,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		 *            extension Filter
 		 */
 		public SQLLinkFilter(L l, R r, SQLFilter<? super T> f) {
-			super(IndexedLinkManager.this.getTag());
+			super(IndexedLinkManager.this);
 			left_target = l;
 			right_target = r;
 			if (l != null && !isLeft(l)) {

@@ -53,14 +53,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.ClassType;
-import uk.ac.ed.epcc.webapp.model.data.CloseableIterator;
-import uk.ac.ed.epcc.webapp.model.data.Composite;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.OrphanReferenceFilter;
-import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
-import uk.ac.ed.epcc.webapp.model.data.Removable;
+import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
@@ -104,9 +97,9 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 * @author spb
 	 * 
 	 */
-	public class DateFilter extends SQLAndFilter<T> {
+	public class DateFilter extends DataObjectSQLAndFilter<LogFactory<T,O>,T> {
 		public DateFilter(Date start, Date end) {
-			super(LogFactory.this.getTag());
+			super(LogFactory.this);
 			if (start != null) {
 				addFilter(new TimeFilter(DATE, MatchCondition.GE, start));
 			}

@@ -15,11 +15,7 @@ package uk.ac.ed.epcc.webapp.model.history;
 
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.IndexedLinkManager;
-import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
+import uk.ac.ed.epcc.webapp.model.data.*;
 
 
 /** SQLFilter for LinkHistory objects. 
@@ -43,14 +39,14 @@ public class LinkHistorySQLFilter<L extends Indexed, R extends Indexed,
     H extends DataObject & History<T>,
     M extends DataObjectFactory<H> & LinkHistoryHandler<L, R, T>>
 
-	extends SQLAndFilter<H>{
+	extends DataObjectSQLAndFilter<M,H>{
 	/**
 	 * 
 	 */
 	private final M linkHistoryManager;
 
 	public LinkHistorySQLFilter( M linkHistoryManager, L left, R right) {
-		super(linkHistoryManager.getTag());
+		super(linkHistoryManager);
 		this.linkHistoryManager = linkHistoryManager;
 		if( left != null && right != null){
 			// should use normal HistoryFilter with peer id.
