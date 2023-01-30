@@ -119,7 +119,7 @@ public interface ContentBuilder {
 	 */
 	public ContentBuilder getDetails(Object summary_text);
 	/** finish a section started by {@link #getDetails(Object)}
-	 * this may be a no-op if expended section are not supported
+	 * this may be a no-op if expanded sections are not supported
 	 */
 	public void closeDetails();
 	/** append a nested panel to its parent content.

@@ -16,7 +16,7 @@ package uk.ac.ed.epcc.webapp.content;
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 
-/** A wrapper to convert {@link PreDefinedContent} into an {@link AppContext}
+/** A wrapper to convert {@link PreDefinedContent} into an {@link AbstractContexed} that implements {@link UIGenerator}
  * so it can be loaded as a plugin. For exmaple on the login page 
  *
  * @author Stephen Booth

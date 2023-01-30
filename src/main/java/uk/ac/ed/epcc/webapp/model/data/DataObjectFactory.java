@@ -2020,30 +2020,16 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	protected void postCreateTableSetup(AppContext c, String table){
 		
 	}
-	/** Allow factories to set properties via the TypeProducer
+	/** Access method to allow factory sub-classes to access the {@link Repository.Record} of their {@link DataObject}s
 	 * 
-	 * @param <F> type of data
-	 * @param <D> database type
-	 * @param o target object
-	 * @param prod TypeProducer
-	 * @param dat value
+	 * @param o
+	 * @return
 	 */
-    protected <F,D> void setProperty(BDO o,TypeProducer<F, D> prod, F dat){
-    	o.record.setProperty(prod, dat);
-    }
-    /** Allow factories to get properties via the TypeProducer
-	 * 
-	 * @param <F> type of data
-	 * @param <D> database type
-	 * @param o target object
-	 * @param prod TypeProducer
-	 * @param def default value
-	 */
-    protected <F,D> F getProperty(BDO o, TypeProducer<F, D> prod, F def){
-    	return o.record.getProperty(prod,def);
-    }
-    
-    /** get a filter that selects a particular target object.
+	protected Repository.Record getRecord(BDO o) {
+		assert(isMine(o));
+		return o.record;
+	}
+	/** get a filter that selects a particular target object.
      * 
      * @param target
      * @return
