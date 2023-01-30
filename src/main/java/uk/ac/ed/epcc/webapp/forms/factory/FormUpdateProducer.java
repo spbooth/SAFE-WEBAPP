@@ -41,5 +41,7 @@ public interface FormUpdateProducer<T> {
    * @param c
    * @return true if current user can update
    */
-  public boolean canUpdate(SessionService c);
+  default public boolean canUpdate(SessionService c) {
+	  return true;
+  }
 }

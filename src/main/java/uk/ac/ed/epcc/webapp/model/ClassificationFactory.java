@@ -577,8 +577,4 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			}
 		}
 	}
-	@Override
-	protected boolean allowPreSelect() {
-		return getContext().getBooleanParameter(getConfigTag()+".allowPreSelect", super.allowPreSelect());
-	}
 }
