@@ -40,6 +40,7 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
+import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
@@ -64,7 +65,9 @@ import uk.ac.ed.epcc.webapp.jdbc.table.*;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
+import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.filter.FilterAdd;
 import uk.ac.ed.epcc.webapp.servlet.QRServlet;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
@@ -92,8 +95,12 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	public static final Feature VERIFY_OLD_CODE=new Feature("two_factor.verify_previous_code",true,"Verify current code on key change");
 	private static final String SECRET_FIELD="AuthCodeSecret";
 	private static final String LAST_USED_FIELD="LastAuthCodeUsed";
+	private static final String FAIL_COUNT="AuthCodeFails";
 	public static final String REMOVE_KEY_ROLE="RemoveTwoFactor";
 	public static final String USED_COUNTER_ATTR="UsedCounter";
+	
+	public static final Feature NOTIFY_MFA_LOCK = new Feature("mfa.notify-lock",true,"Notify by email if maximum mfa attempts are exceeded");
+
 	/**
 	 * @param fac
 	 */
@@ -289,10 +296,18 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 				logger.debug("i="+i+" code="+code+" value="+value);
 				if( value.longValue() == code) {
 					if( (counter+i) > last_counter ) {
-						// Don't set the authenticated time here as
-						// verification may be called multiple times
-						// remember it in the AppContext
-						getContext().setAttribute(USED_COUNTER_ATTR, (counter+i));
+						if(user != null  ) {
+							// code is ok but check fail count
+							if( getFailCount(user) > getMaxFail() && getMaxFail() > 0) {
+								logger.error("User exceeded MFA fail count "+user.getIdentifier());
+								return false;
+							}
+							clearFailCount(user);
+							// Don't set the authenticated time here as
+							// verification may be called multiple times
+							// remember it in the AppContext
+							getContext().setAttribute(USED_COUNTER_ATTR, (counter+i));
+						}
 						return true;
 					}else {
 						logger.error("Code re-use for "+user.getIdentifier()+" "+(counter+i)+"<"+last_counter);
@@ -304,6 +319,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 			}
 		}
 		logger.debug("code does not match");
+		doFail(user);
 		return false;
 	}
 	/** number of milliseconds per code value
@@ -316,11 +332,15 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	public int getWindow() {
 		return getContext().getIntegerParameter("totp.window",3);
 	}
+	public int getMaxFail() {
+		return getContext().getIntegerParameter("totp.max_fail",100);
+	}
 
 	@Override
 	public TableSpecification modifyDefaultTableSpecification(TableSpecification spec, String table) {
 		spec.setOptionalField(SECRET_FIELD, new StringFieldType(true, null, 32));
 		spec.setOptionalField(LAST_USED_FIELD, new LongFieldType(true, null));
+		spec.setOptionalField(FAIL_COUNT, new IntegerFieldType(true, 0));
 		return spec;
 	}
 
@@ -328,6 +348,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	public Set<String> addSuppress(Set<String> suppress) {
 		suppress.add(SECRET_FIELD);
 		suppress.add(LAST_USED_FIELD);
+		suppress.add(FAIL_COUNT);
 		return suppress;
 	}
 
@@ -665,4 +686,49 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		}
 	}
 
+	public int getFailCount(A target) {
+		return getRecord(target).getIntProperty(FAIL_COUNT, 0);
+	}
+	private void clearFailCount(A target) {
+		if( target == null ) {
+			return;
+		}
+		getRecord(target).setOptionalProperty(FAIL_COUNT, 0);
+		try {
+			target.commit();
+		} catch (DataFault e) {
+			getLogger().error("Error resetting fail count", e);
+		}
+	}
+	private void doFail(A target) {
+		if( ! getRepository().hasField(FAIL_COUNT)) {
+			return;
+		}
+		// increment value in database to reduce chance
+		// of brute forcing by parallel streams
+		FilterAdd<A> adder = new FilterAdd<>(getRepository());
+		try {
+			adder.update(getRepository().getNumberExpression(Integer.class, FAIL_COUNT), 1, getFactory().getFilter(target));
+			Repository.Record r = getRecord(target);
+			int new_fail = r.getIntProperty(FAIL_COUNT, 0)+1;
+			r.setProperty(FAIL_COUNT, new_fail);
+			setDirty(FAIL_COUNT, target, false);
+			int max_fail = getMaxFail();
+			if( new_fail > max_fail && new_fail < (max_fail+10)) {
+				// limit to 10 emails per person
+				// but send more than 1 in case there were parallel fails
+				if( NOTIFY_MFA_LOCK.isEnabled(getContext())) {
+					try {
+						Emailer m = Emailer.getFactory(getContext());
+						m.mfaFailsExceeded(target);
+					} catch (Exception e) {
+						getLogger().error("Failed to notify of mfa lock", e);
+					}
+				}
+			}
+		} catch (DataFault e) {
+			getLogger().error("Error updating fail count",e);
+		}
+		
+	}
 }

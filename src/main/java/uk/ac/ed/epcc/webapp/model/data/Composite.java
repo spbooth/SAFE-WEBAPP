@@ -205,6 +205,15 @@ public abstract class Composite<BDO extends DataObject, X > implements Contexed,
 	protected void release() {
 		
 	}
+	/** Allow sub-classes to access the dirty flag
+	 * 
+	 * @param key
+	 * @param target
+	 * @param value
+	 */
+	protected void setDirty(String key, BDO target, boolean value) {
+		getRecord(target).setDirty(key, value);
+	}
 	/** used to list composites on table structure page.
 	 * 
 	 */

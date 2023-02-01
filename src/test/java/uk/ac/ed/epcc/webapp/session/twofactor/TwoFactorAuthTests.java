@@ -13,9 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session.twofactor;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static uk.ac.ed.epcc.webapp.session.twofactor.CodeAuthComposite.CODE;
 
 import java.io.IOException;
@@ -27,6 +25,7 @@ import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.TestTimeService;
+import uk.ac.ed.epcc.webapp.email.MockTansport;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
@@ -120,7 +119,9 @@ public class TwoFactorAuthTests<A extends AppUser> extends AbstractTransitionSer
 		
 	}
 	@Test
-	public void testBadCode() throws DataException, TransitionException, ServletException, IOException {
+	public void testBadCode() throws Exception {
+		MockTansport.clear();
+		takeBaseline();
 		TestTimeService serv = new TestTimeService();
 		ctx.setService(serv);
 		Calendar cal = Calendar.getInstance();
@@ -139,10 +140,90 @@ public class TwoFactorAuthTests<A extends AppUser> extends AbstractTransitionSer
 		runTransition();
 		assertFalse(ctx.getService(SessionService.class).haveCurrentUser());
 		checkError(CODE, "Incorrect");
-		
+		TotpCodeAuthComposite comp = fac.getComposite(FormAuthComposite.class);
+		assertNotNull(comp);
+		//assertEquals(1,comp.getFailCount(user));
+		user = fac.findByEmail("fred@example.com");
+		assertEquals(1,comp.getFailCount(user));
 		//checkRedirect(LoginServlet.getMainPage(ctx));
+		checkDiff("/cleanup.xsl", "bad_code.xml");
+		assertEquals(0, MockTansport.nSent());
+		setTransition(catp, CodeAuthTransitionProvider.AUTHENTICATE, user);
+		addParam(CODE, 123456);
+		runTransition();
+		assertFalse(ctx.getService(SessionService.class).haveCurrentUser());
+		checkError(CODE, "Incorrect");
+		user = fac.findByEmail("fred@example.com");
+		assertEquals(2,comp.getFailCount(user));
+		assertEquals(0, MockTansport.nSent());
+		setTransition(catp, CodeAuthTransitionProvider.AUTHENTICATE, user);
+		addParam(CODE, 123456);
+		runTransition();
+		assertFalse(ctx.getService(SessionService.class).haveCurrentUser());
+		checkError(CODE, "Incorrect");
+		user = fac.findByEmail("fred@example.com");
+		assertEquals(3,comp.getFailCount(user));
+		assertEquals(0, MockTansport.nSent());
+		setTransition(catp, CodeAuthTransitionProvider.AUTHENTICATE, user);
+		addParam(CODE, 123456);
+		runTransition();
+		assertFalse(ctx.getService(SessionService.class).haveCurrentUser());
+		checkError(CODE, "Incorrect");
+		user = fac.findByEmail("fred@example.com");
+		assertEquals(4,comp.getFailCount(user));
+		assertEquals(1, MockTansport.nSent());
+		assertEquals("test 2FA token has been locked", MockTansport.getMessage(0).getSubject());
+		MockTansport.clear();
+		Feature.setTempFeature(ctx,  DebugLoggerService.FATAL_FEATURE, false);
+		setTransition(catp, CodeAuthTransitionProvider.AUTHENTICATE, user);
+		addParam(CODE, 278504);
+		runTransition();
+		assertFalse(ctx.getService(SessionService.class).haveCurrentUser());
+		checkError(CODE, "Incorrect");
+		user = fac.findByEmail("fred@example.com");
+		assertEquals(4,comp.getFailCount(user));  // 
+		assertEquals(0, MockTansport.nSent());
 	}
-	
+	@Test
+	public void testBadCodeCorrected() throws Exception {
+		MockTansport.clear();
+		takeBaseline();
+		TestTimeService serv = new TestTimeService();
+		ctx.setService(serv);
+		Calendar cal = Calendar.getInstance();
+		cal.clear();
+		cal.set(2018, Calendar.JULY, 2, 20, 22);
+		serv.setResult(cal.getTime());
+		SessionService sess = ctx.getService(SessionService.class);
+		AppUserFactory<A> fac = sess.getLoginFactory();
+		A user = fac.findByEmail("fred@example.com");
+		
+		CodeAuthTransitionProvider<A> catp = new CodeAuthTransitionProvider<>(ctx);
+		sess.setAttribute(TwoFactorHandler.AUTH_USER_ATTR, user.getID());
+		sess.setAttribute(TwoFactorHandler.AUTH_RESULT_ATTR, new RedirectResult(LoginServlet.getMainPage(ctx)));
+		setTransition(catp, CodeAuthTransitionProvider.AUTHENTICATE, user);
+		addParam(CODE, 123456);
+		runTransition();
+		assertFalse(ctx.getService(SessionService.class).haveCurrentUser());
+		checkError(CODE, "Incorrect");
+		TotpCodeAuthComposite comp = fac.getComposite(FormAuthComposite.class);
+		assertNotNull(comp);
+		//assertEquals(1,comp.getFailCount(user));
+		user = fac.findByEmail("fred@example.com");
+		assertEquals(1,comp.getFailCount(user));
+		//checkRedirect(LoginServlet.getMainPage(ctx));
+		checkDiff("/cleanup.xsl", "bad_code.xml");
+		assertEquals(0, MockTansport.nSent());
+		
+		setTransition(catp, CodeAuthTransitionProvider.AUTHENTICATE, user);
+		addParam(CODE, 278504);
+		runTransition();
+		user = fac.findByEmail("fred@example.com");
+		assertEquals(0,comp.getFailCount(user)); // fail count reset by sucessful login
+		assertEquals(0, MockTansport.nSent());
+		assertTrue(ctx.getService(SessionService.class).haveCurrentUser());
+		checkRedirect(LoginServlet.getMainPage(ctx));
+	}
 	@Test
 	public void testClearKey() throws ConsistencyError, Exception {
 		TestTimeService serv = new TestTimeService();
