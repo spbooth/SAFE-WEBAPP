@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.editors.mail;
 import java.util.LinkedList;
 import java.util.List;
 
+import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -78,7 +79,8 @@ public class MailTarget {
 		return path;
 	}
 	public int getMessageHash(){
-		if( handler instanceof Contexed && IGNORE_HASH_FEATURE.isEnabled(((Contexed)handler).getContext())){
+		AppContext conn = AppContext.getContext();
+		if( conn != null && IGNORE_HASH_FEATURE.isEnabled(conn)){
 			return 0;
 		}
 		return hash;

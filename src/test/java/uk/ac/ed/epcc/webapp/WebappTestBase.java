@@ -429,7 +429,7 @@ protected void writeFile(String file_name, byte data[]) throws IOException {
 		 String differ = TestDataHelper.diff(expected, result);
 		 boolean same = differ.trim().length()==0;
 		 if( ! same ){
-			 System.out.println(result);
+			 System.out.println(content);
 		 }
 		assertEquals("Unexpected result:"+expected_xml+"\n"+differ,expected,result);
 	}

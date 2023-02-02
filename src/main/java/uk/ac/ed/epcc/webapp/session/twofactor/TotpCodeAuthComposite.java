@@ -455,6 +455,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 				boolean had_key = hasKey(user);
 				try {
 					setSecret(user, (String)f.get(KEY));
+					clearFailCount(user);
 					user.commit();
 				} catch (DataFault e) {
 					throw new ActionException("Error setting key", e);
@@ -701,7 +702,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		}
 	}
 	private void doFail(A target) {
-		if( ! getRepository().hasField(FAIL_COUNT)) {
+		if( ! getRepository().hasField(FAIL_COUNT)  || target == null) {
 			return;
 		}
 		// increment value in database to reduce chance
