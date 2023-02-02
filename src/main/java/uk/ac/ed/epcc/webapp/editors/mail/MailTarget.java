@@ -61,7 +61,12 @@ public class MailTarget {
 	public MailTarget(MessageHandler handler,int hash, List<String> path) {
 		super();
 		this.handler = handler;
-		this.hash = hash;
+		AppContext conn = AppContext.getContext();
+		if( conn != null && IGNORE_HASH_FEATURE.isEnabled(conn)) {
+			this.hash = 0;
+		}else {
+			this.hash = hash;
+		}
 		if( path == null){
 			this.path=new LinkedList<>();
 		}else{
@@ -110,7 +115,8 @@ public class MailTarget {
 		return false;
 	}
 	public boolean hashMatches() throws Exception{
-		if( handler instanceof Contexed && IGNORE_HASH_FEATURE.isEnabled(((Contexed)handler).getContext())){
+		AppContext conn = AppContext.getContext();
+		if(conn != null &&  IGNORE_HASH_FEATURE.isEnabled(conn)){
 			return true;
 		}
 		return hash == handler.getMessageProvider().getMessageHash();
