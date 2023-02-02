@@ -78,6 +78,9 @@ public class HttpException extends Exception {
 	}
 
 	public String getContent() {
+		if( content == null) {
+			return null;
+		}
 		return content.toString();
 	}
 	public MimeStreamData getMimeContent() {
