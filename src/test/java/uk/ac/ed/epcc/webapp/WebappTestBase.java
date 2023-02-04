@@ -436,6 +436,7 @@ protected void writeFile(String file_name, byte data[]) throws IOException {
 	@Before
 	public void clearEmails() {
 		MockTansport.clear();
+		Emailer.resetReport();
 	}
 	/**
 	 * 
