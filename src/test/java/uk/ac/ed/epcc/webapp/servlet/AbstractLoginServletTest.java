@@ -23,8 +23,13 @@ public abstract class AbstractLoginServletTest<A extends AppUser> extends Servle
 	}
 
 	public void loginRedirects(String expected) throws ServletException, IOException {
-		if( LoginServlet.COOKIE_TEST.isEnabled(ctx)) {
-			checkRedirect("/LoginServlet");
+		if( RequiredPageServlet.COOKIE_TEST.isEnabled(ctx)) {
+			checkRedirect(RequiredPageServlet.URL);
+			resetRequest();
+			servlet = new RequiredPageServlet();
+			MockServletConfig config = new MockServletConfig(serv_ctx, "RequiredPageServlet");
+			servlet.init(config);
+			req.servlet_path=RequiredPageServlet.URL;
 			doPost();
 		}
 		checkRedirect(expected);

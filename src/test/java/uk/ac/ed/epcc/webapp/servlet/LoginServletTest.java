@@ -30,11 +30,14 @@ import org.junit.Test;
 import jakarta.mail.Message;
 import uk.ac.ed.epcc.webapp.TestTimeService;
 import uk.ac.ed.epcc.webapp.email.MockTansport;
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
+import uk.ac.ed.epcc.webapp.mock.MockServletConfig;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -112,7 +115,7 @@ public class LoginServletTest<A extends AppUser> extends AbstractLoginServletTes
 	
 	
 	@Test
-	public void testLoginOldAlg() throws DataFault, ServletException, IOException{
+	public void testLoginOldAlg() throws DataFault, ServletException, IOException, TransitionException{
 		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
 		A user =  fac.makeBDO();
 		PasswordAuthComposite<A> composite = fac.getComposite(PasswordAuthComposite.class);
@@ -127,7 +130,14 @@ public class LoginServletTest<A extends AppUser> extends AbstractLoginServletTes
 		addParam("username", "fred@example.com");
 		addParam("password", "FredIsDead");
 		doPost();
-		loginRedirects();
+		checkRedirect(RequiredPageServlet.URL);
+		resetRequest();
+		servlet = new RequiredPageServlet();
+		MockServletConfig config = new MockServletConfig(serv_ctx, "RequiredPageServlet");
+		servlet.init(config);
+		req.servlet_path=RequiredPageServlet.URL;
+		doPost();
+		
 		SessionService<A> sess = ctx.getService(SessionService.class);
 		assertTrue(sess.haveCurrentUser());
 		
@@ -137,8 +147,11 @@ public class LoginServletTest<A extends AppUser> extends AbstractLoginServletTes
 		assertTrue(page.required(sess));
 		FormResult res = page.getPage(sess);
 		assertTrue( res instanceof ChainedTransitionResult);
-		assertEquals(PasswordAuthComposite.CHANGE_PASSWORD,((ChainedTransitionResult)res).getTransition());
+		ChainedTransitionResult chain = (ChainedTransitionResult) res;
+		assertEquals(PasswordAuthComposite.CHANGE_PASSWORD,chain.getTransition());
 		
+		checkForwardToTransition(chain.getProvider(), chain.getTransition(), chain.getTarget());
+			
 	}
 	
 	@Test
@@ -350,15 +363,21 @@ public class LoginServletTest<A extends AppUser> extends AbstractLoginServletTes
 		addParam("username","fred@example.com");
 		addParam("password",first);
 		doPost();
-		loginRedirects("/welcome.jsp");
+		checkRedirect(RequiredPageServlet.URL); // RP is required
 		assertTrue(sess.haveCurrentUser());
 		resetRequest();
 		Set<RequiredPage<A>> pages = fac.getRequiredPages();
 		assertEquals(1,pages.size());
 		RequiredPage page = pages.iterator().next();
 		assertTrue(page.required(sess));
-		doFormResult(page.getPage(sess));
+		servlet = new RequiredPageServlet();
+		MockServletConfig config = new MockServletConfig(serv_ctx, "RequiredPageServlet");
+		servlet.init(config);
+		req.servlet_path=RequiredPageServlet.URL;
+		doPost();
 		checkForwardToTransition(AppUserTransitionProvider.getInstance(ctx), PasswordAuthComposite.CHANGE_PASSWORD, sess.getCurrentPerson());
+		
+		assertEquals(new RedirectResult("/welcome.jsp"),sess.getAttribute(RequiredPageServlet.RP_ATTR));
 }
 	
 	

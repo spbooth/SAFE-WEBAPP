@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.SerializableFormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.servlet.RequiredPageServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AbstractSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -146,6 +147,9 @@ public class TwoFactorHandler<A extends AppUser> {
 			sess.setAuthenticationType(type);
 		}
 		securityEvent("SucessfulAuthentication");
+		
+		// consider if we need to go to the required page servlet as well
+		next_page = RequiredPageServlet.getNext(sess, next_page);
 		return next_page;
 	
 	
@@ -171,6 +175,7 @@ public class TwoFactorHandler<A extends AppUser> {
   			sess.setAttribute(AUTH_USES_2FA_ATTR, Boolean.TRUE);
   		}
   		securityEvent("SucessfulAuthentication - asserted");
+  		next_page = RequiredPageServlet.getNext(sess, next_page);
   		return next_page;
   	
   	
@@ -214,7 +219,9 @@ public class TwoFactorHandler<A extends AppUser> {
 					attr.put("user",user.getIdentifier());
 					securityEvent("Failed2FA", attr);
 				}
-				FormResult result = (FormResult) sess.getAttribute(AUTH_RESULT_ATTR);
+				SerializableFormResult result = (SerializableFormResult) sess.getAttribute(AUTH_RESULT_ATTR);
+				// consider if we need to go to the required page servlet as well
+				result = RequiredPageServlet.getNext(sess, result);
 				return result;
 			}
 		}finally {
