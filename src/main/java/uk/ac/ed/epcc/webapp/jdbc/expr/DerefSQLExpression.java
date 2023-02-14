@@ -129,4 +129,8 @@ public class DerefSQLExpression<H extends DataObject,R extends DataObject,T> imp
 	public String getFilterTag() {
 		return a.getFilterTag();
 	}
+	
+	public String toString() {
+		return "DerefSQLExpression("+a.toString()+","+remote_expression.toString()+")";
+	}
 }

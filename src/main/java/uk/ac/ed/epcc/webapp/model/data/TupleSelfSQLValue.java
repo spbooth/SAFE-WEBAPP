@@ -71,4 +71,9 @@ public class TupleSelfSQLValue<A extends DataObject,AF extends DataObjectFactory
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "TupleSelfSQLValue(" + getFactory().getTag() + ")";
+	}
+
 }
