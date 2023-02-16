@@ -338,6 +338,39 @@ public class ExpressionTestCase extends WebappTestBase {
 				new ArrayFuncExpression<>(ArrayFunc.LEAST, Date.class,(SQLExpression<Date>)fac.getDateA(),(SQLExpression<Date>)fac.getDateB()));
 		assertEquals(least, res);
 	}
+	
+	@Test
+	public void testDateArrayFunc() throws DataException {
+		Calendar c = Calendar.getInstance();
+		
+		c.clear();
+		c.set(1975,Calendar.DECEMBER, 12);
+		
+		Date least = c.getTime();
+		obj.setDateA( least);
+		
+		c.set(1975,Calendar.DECEMBER,25);
+		Date later = c.getTime();
+		obj.setDateB(later);
+		obj.commit();
+		DateArrayFuncExpression greatest_expr = new DateArrayFuncExpression(ArrayFunc.GREATEST,  (DateSQLExpression)fac.getDateA(),(DateSQLExpression)fac.getDateB());
+		Date res = (Date)fac.evaluate(obj, 
+				greatest_expr);
+		assertEquals(later, res);
+		Number milli_res = (Number) fac.evaluate(obj, greatest_expr.getMillis());
+		assertEquals(later.getTime(),milli_res.longValue());
+		Number sec_res = (Number) fac.evaluate(obj, greatest_expr.getSeconds());
+		assertEquals(later.getTime()/1000L,sec_res.longValue());
+		
+		DateArrayFuncExpression least_expr = new DateArrayFuncExpression(ArrayFunc.LEAST, (DateSQLExpression)fac.getDateA(),(DateSQLExpression)fac.getDateB());
+		res = (Date)fac.evaluate(obj, 
+				least_expr);
+		assertEquals(least, res);
+		milli_res = (Number) fac.evaluate(obj, least_expr.getMillis());
+		assertEquals(least.getTime(),milli_res.longValue());
+		sec_res = (Number) fac.evaluate(obj, least_expr.getSeconds());
+		assertEquals(least.getTime()/1000L,sec_res.longValue());
+	}
 	@Test
 	public void testArrayFuncValueDate() throws DataException {
 		Calendar c = Calendar.getInstance();
