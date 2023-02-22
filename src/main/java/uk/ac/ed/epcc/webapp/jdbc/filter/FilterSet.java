@@ -31,7 +31,7 @@ public abstract class FilterSet<T> {
 	protected String target_tag;
 
 	/**
-	 * @param target type of filter
+	 * @param tag construction tag for owning factory
 	 * 
 	 */
 	public FilterSet(String tag) {

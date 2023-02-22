@@ -355,10 +355,7 @@ public class TableTest {
 		assertEquals("Wrong column order.", 0, t.getColumNames().get(2).compareTo("col1"));
 	}
 	
-	/**
-	 * Tests the {@link Table#transformCol(Object, uk.ac.ed.epcc.webapp.content.Table.SetRangeMapper)}
-	 * and {@link Table#transformCol(int, uk.ac.ed.epcc.webapp.content.Table.SetRangeMapper)} methods.
-	 */
+	
 	@Test
 	public void testTransformCol() {
 		Table<String, Object> t = new Table<>();
@@ -371,9 +368,7 @@ public class TableTest {
 		assertEquals("Wrong BlankTransform.", "", t.get("col1", 1));
 	}
 	
-	/**
-	 * Tests the {@link Table#transformKeys(Object, uk.ac.ed.epcc.webapp.content.Table.SetRangeMapper)} method.
-	 */
+	
 	@Test
 	public void testTransformKeys() {
 		Table<String, String> t = new Table<>();

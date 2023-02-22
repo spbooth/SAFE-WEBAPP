@@ -43,11 +43,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 public class CodeAuthTransitionProvider<A extends AppUser> extends SimpleTransitionProvider<A, TransitionKey<A>> implements AnonymousTransitionFactory<TransitionKey<A>, A>, TitleTransitionFactory<TransitionKey<A>, A>, DefaultingTransitionFactory<TransitionKey<A>, A>{
 
-	/**
-	 * @param c
-	 * @param fac
-	 * @param target_name
-	 */
+	
 	public CodeAuthTransitionProvider(AppContext c) {
 		super(c, c.getService(SessionService.class).getLoginFactory(), "AuthenticationCode");
 		addTransition(AUTHENTICATE, new AuthenticateTransition());

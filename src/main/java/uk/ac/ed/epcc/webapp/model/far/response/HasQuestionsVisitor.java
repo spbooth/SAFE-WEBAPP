@@ -17,16 +17,11 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager;
+import uk.ac.ed.epcc.webapp.model.far.*;
 import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
-import uk.ac.ed.epcc.webapp.model.far.PageManager;
 import uk.ac.ed.epcc.webapp.model.far.PageManager.Page;
-import uk.ac.ed.epcc.webapp.model.far.PartVisitor;
-import uk.ac.ed.epcc.webapp.model.far.QuestionManager;
 import uk.ac.ed.epcc.webapp.model.far.QuestionManager.Question;
-import uk.ac.ed.epcc.webapp.model.far.SectionManager;
 import uk.ac.ed.epcc.webapp.model.far.SectionManager.Section;
-import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
 
 /** {@link PartVisitor} to check if a part contains any questions
  * @author spb
@@ -36,9 +31,7 @@ import uk.ac.ed.epcc.webapp.model.far.response.ResponseManager.Response;
 public class HasQuestionsVisitor<D extends DynamicForm> implements PartVisitor<Boolean> {
 
 	private final AppContext conn;
-	/**
-	 * @param response
-	 */
+	
 	public HasQuestionsVisitor(AppContext conn) {
 		super();
 		this.conn=conn;

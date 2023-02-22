@@ -481,8 +481,6 @@ public abstract class DataObject implements ContextIndexed, Identified, Releasab
 	 * This will be necessary when behaviour added as {@link Composite}s is required but
 	 * only the {@link DataObject} is available.
 	 * 
-	 * 
-	 * @param conn
 	 * @param obj
 	 * @return
 	 */

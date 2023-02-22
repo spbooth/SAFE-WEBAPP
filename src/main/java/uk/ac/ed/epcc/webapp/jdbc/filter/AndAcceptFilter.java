@@ -23,18 +23,12 @@ import java.util.LinkedHashSet;
  */
 public class AndAcceptFilter<T> extends LinkedHashSet<AcceptFilter<? super T>> implements AcceptFilter<T> {
 	private final String tag;
-	/**
-	 * 
-	 * @param target
-	 */
+	
 	public AndAcceptFilter(String tag){
 		super();
 		this.tag=tag;
 	}
-	/**
-	 * @param target 
-	 * @param c
-	 */
+	
 	public AndAcceptFilter(String tag,Collection<? extends AcceptFilter<? super T>> c) {
 		super(c);
 		this.tag=tag;

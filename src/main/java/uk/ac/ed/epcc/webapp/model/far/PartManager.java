@@ -256,9 +256,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 			return dat.getViewResult();
 		}
 
-		/**
-		 * @param dataObjectFactory
-		 */
+	
 		public PartUpdater() {
 			super(PartManager.this);
 		}
@@ -288,10 +286,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 			f.addAction("Create", new ChildCreateAction(owner));
 		}
 
-		/**
-		 * @param dataObjectFactory
-		 * @param owner
-		 */
+		
 		public PartCreator(O owner) {
 			super(PartManager.this);
 			this.owner = owner;

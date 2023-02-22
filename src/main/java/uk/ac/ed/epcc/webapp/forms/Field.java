@@ -184,7 +184,6 @@ public final class Field<I> {
 	 * 
 	 * @param v
 	 *            FieldValidator to set
-	 * @return the previous validator
 	 */
 	public void addValidator(FieldValidator<I> v) {
 		sel.addValidator(v);

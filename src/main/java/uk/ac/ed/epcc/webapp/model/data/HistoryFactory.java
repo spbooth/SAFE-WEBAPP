@@ -481,9 +481,6 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	
 	private static final class Status extends BasicType<Status.Value>{
 		
-		/**
-		 * @param field
-		 */
 		protected Status() {
 			super("HistoryStatus");
 		}
@@ -491,7 +488,6 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 		private class Value extends BasicType.Value{
 
 			/**
-			 * @param parent
 			 * @param tag
 			 * @param name
 			 */

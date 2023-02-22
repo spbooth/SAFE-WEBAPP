@@ -180,9 +180,6 @@ public class Emailer implements Contexed{
 	/**
 	 * Send an email with the person new password
 	 * 
-	 * @param person
-	 * @param new_password
-	 * @throws Exception 
 	 */
 	public void newPassword(AppUser person, PasswordAuthComposite comp)
 			throws Exception {
@@ -271,9 +268,6 @@ public class Emailer implements Contexed{
 	 * Notify user their password has been changed.
 	 * 
 	 * 
-	 * @param person
-	 * @param new_password
-	 * @throws Exception 
 	 * 
 	 */
 	public void passwordChanged(AppUser person)
@@ -301,9 +295,6 @@ public class Emailer implements Contexed{
 	 * Notify user their password has been locked-out.
 	 * 
 	 * 
-	 * @param person
-	 * @param new_password
-	 * @throws Exception 
 	 * 
 	 */
 	public void passwordFailsExceeded(AppUser person)
@@ -331,9 +322,6 @@ public class Emailer implements Contexed{
 	 * Notify user their MFA access has been locked-out.
 	 * 
 	 * 
-	 * @param person
-	 * @param new_password
-	 * @throws Exception 
 	 * 
 	 */
 	public void mfaFailsExceeded(AppUser person)
@@ -501,13 +489,7 @@ public class Emailer implements Contexed{
 	}
 	/**
 	 * Send an email based on a template file to a {@link AppUser}
-	 * 
-	 * @param sendto
-	 * @param email_template
-	 * @return {@link MimeMessage}
-	 * @throws IOException
-	 * @throws MessagingException
-	 * @throws InvalidArgument 
+	 *  
 	 */
 	public MimeMessage templateMessage(AppUser recipient,InternetAddress from, TemplateFile email_template)
 			throws IOException, MessagingException, InvalidArgument {
@@ -616,7 +598,7 @@ public class Emailer implements Contexed{
 
 	/**
 	 * @param m
-	 * @param conn
+
 	 * @return
 	 * @throws MessagingException
 	 * @throws AddressException
@@ -1035,10 +1017,7 @@ public class Emailer implements Contexed{
 	}
 
 	private  Session session=null;
-	/**
-	 * @param conn
-	 * @param log
-	 * @return
+	/** get the {@link Session} to use
 	 */
 	protected Session getSession() {
 		if( session == null ){
@@ -1207,8 +1186,7 @@ public class Emailer implements Contexed{
 	/**
 	 * General email error report
 	 * 
-	 * @param conn
-	 * @param text
+	 
 	 */
 	public void errorEmail(Logger log,String subject,String text) {
 		
@@ -1282,12 +1260,7 @@ public class Emailer implements Contexed{
 	 * This is called within {@link EmailLogger} so logging should always go through the
 	 * provided logger.  We need to be careful to recover from errors if we can so that we
 	 * can still send some email even if some things are failing
-	 * @param conn
-	 * @param log   Logger (optional)
-	 * @param props
-	 * @param e
-	 * @param additional_info
-	 * @throws Exception 
+	 *
 	 */
 	public void errorEmail(Logger log,Throwable e,
 			Map props, String additional_info) throws Exception {

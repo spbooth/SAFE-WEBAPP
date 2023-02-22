@@ -53,7 +53,7 @@ public class TwoFactorHandler<A extends AppUser> {
 
     private final SessionService<A> sess;
    
-    /** would a call to {@link #doLogin(AppUser, SerializableFormResult)}
+    /** would a call to {@link #doLogin(AppUser, String,SerializableFormResult)}
      * result in an authorisation request
      * 
      * @param user

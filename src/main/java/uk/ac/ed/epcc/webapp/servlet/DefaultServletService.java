@@ -365,8 +365,6 @@ public class DefaultServletService implements ServletService{
 	 * filter may be in place.
 	 * 
 	 * 
-	 * @param ServletRequest
-	 * @return String webname
 	 */
 	public String getWebName(ServletRequest req) {
 		String name=null;

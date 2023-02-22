@@ -36,7 +36,8 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
  */
 public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, BinaryFilter<T> {
 	/**
-	 * @param target
+	 * @param tag  construction tag for target table
+	 * @param matcher  A {@link FilterMatcher} for the target table
 	 */
 	public OrFilter(String tag, FilterMatcher<T> matcher) {
 		super(tag);
@@ -230,10 +231,10 @@ public final class OrFilter<T> extends FilterSet<T> implements AcceptFilter<T>, 
 	}
 	/** check for a match between a sub-filter and a target objec
 	 * 
-	 * @param fil
-	 * @param o
-	 * @return
-	 * @throws DataException 
+	 * @param fil filter to check
+	 * @param o target object
+	 * @return true if filter would select object
+	
 	 */
 	private boolean filterMatches(BaseFilter<? super T> fil, T o) {
 		return matcher.matches((BaseFilter<T>) fil, o);

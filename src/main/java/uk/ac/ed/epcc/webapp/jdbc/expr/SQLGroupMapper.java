@@ -248,7 +248,6 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 		}
 		/** add group by clauses corresponding to key list
 		 * @return true is any added.
-		 * @throws CannotGroupException 
 		 */
 		protected boolean addKeyList(StringBuilder sb)  {
 			boolean seen=false;

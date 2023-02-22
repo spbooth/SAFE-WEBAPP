@@ -22,9 +22,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 public class PhoneInput extends PatternTextInput implements HTML5Input {
 
-	/**
-	 * @param pattern
-	 */
+	
 	public PhoneInput() {
 		super("^\\+[\\d ]+$");
 		setTag("+ followed by numbers and spaces");

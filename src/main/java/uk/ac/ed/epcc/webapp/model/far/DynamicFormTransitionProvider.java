@@ -168,10 +168,7 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 	public static final DynamicFormTransitionKey UPLOAD = new DynamicFormComposeKey("Upload","Upload a XML description and add to this form"); 
 	public class Creator extends CreateTransition<T>{
 
-		/**
-		 * @param name
-		 * @param fac
-		 */
+		
 		protected Creator() {
 			super("DynamicForm", manager);
 		}

@@ -35,7 +35,7 @@ public class UpdateDetailsTransition<A extends AppUser> extends StandAloneFormUp
 	
 
 	/**
-	 * @param name
+	 * @param provider
 	 * @param fac
 	 */
 	protected UpdateDetailsTransition(AppUserTransitionProvider provider, AppUserFactory<A> fac) {

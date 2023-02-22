@@ -118,7 +118,7 @@ public void stopTransaction();
  * this also allow special handing of certain classes of error such as {@link SQLTransientException}s
  * 
  * @param e
- * @throws DataException
+ * @throws DataFault
  */
 public void handleError(String message,SQLException e)throws DataFault;
 

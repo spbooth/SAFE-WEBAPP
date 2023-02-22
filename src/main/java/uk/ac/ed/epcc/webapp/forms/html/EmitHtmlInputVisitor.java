@@ -327,10 +327,14 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		}
 		hb.close();
 	}
-	/**
+	/** Emit a {@link ListInput} option as radio button
+	 * 
+	 * @param <T>
+	 * @param <X>
 	 * @param hb
-	 * @param input
-	 * @param def
+	 * @param use_post
+	 * @param input   wrapped list input
+	 * @param param
 	 * @param current
 	 */
 	private <T, X> void emitRadioButtonHTML(SimpleXMLBuilder hb,boolean use_post,
@@ -585,7 +589,6 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 	}
 	/**
 	 * output HTML for a text parameter field
-	 * @param AppContext
 	 * @param result 
 	 * @param input
 	 * @param name

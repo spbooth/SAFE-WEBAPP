@@ -96,11 +96,7 @@ public class MultiStageProvider extends AbstractTransitionProvider<Number,Transi
 		
 	}
 
-	/**
-	 * @param c
-	 * @param fac
-	 * @param target_name
-	 */
+	
 	public MultiStageProvider(AppContext c) {
 		super(c);
 	}

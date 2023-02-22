@@ -89,7 +89,7 @@ public interface TableStructureContributer<BDO extends DataObject> {
 	 * The individual forms can override these so you usually use this method to define fields that should
 	 * be suppressed in <em>all</em> forms.
 	 * 
-	 * @param supress
+	 * @param suppress
 	 * @return {@link Set} of fields to suppress in forms.
 	 */
 	Set<String> addSuppress(Set<String> suppress);

@@ -98,11 +98,7 @@ public class StatefulProvider extends AbstractTransitionProvider<Number,Transiti
 		
 	}
 
-	/**
-	 * @param c
-	 * @param fac
-	 * @param target_name
-	 */
+	
 	public StatefulProvider(AppContext c) {
 		super(c);
 	}

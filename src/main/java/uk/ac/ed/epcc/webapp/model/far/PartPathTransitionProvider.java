@@ -313,9 +313,7 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 			f.addAction("Cancel", new CancelAction(dat));
 		}
 
-		/**
-		 * @param type_name
-		 */
+		
 		public EditPartTransition() {
 			super("Part");
 			

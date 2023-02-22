@@ -32,8 +32,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  * @see TypeProducerFieldValue
  */
 public class FieldValueFilter<V,T> implements PatternFilter<T>, SQLFilter<T> {
-	/**
-	 * @param target 
+	/** 
 	 * @param field
 	 * @param value
 	 */

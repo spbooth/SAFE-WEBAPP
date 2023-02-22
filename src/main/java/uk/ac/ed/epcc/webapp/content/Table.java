@@ -828,7 +828,7 @@ public class Table<C, R> {
 	/** Add contents from donor table transforming the row keys
 	 * 
 	 * @param key_transform {@link Transform} to map donor rows to local rows
-	 * @param table
+	 * @param donor {@link Table}
 	 */
 	public <X> void addTable(Transform key_transform,Table<C,X> donor ) {
 		for(X donor_row : donor.row_keys) {
@@ -852,7 +852,7 @@ public class Table<C, R> {
 	 * The key_col is not imported from the donor.
 	 * 
 	 * @param key_col column in donor table containing row key values to use
-	 * @param table
+	 * @param donor {@link Table}
 	 */
 	public <X> void addTable(C key_col,Table<C,X> donor ) {
 

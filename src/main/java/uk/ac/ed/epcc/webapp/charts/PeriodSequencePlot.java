@@ -66,7 +66,7 @@ public interface PeriodSequencePlot extends PeriodPlot {
 	 * rescale a dataset by constant divided by the value in a different dataset
 	 * The normalisation dataset is assumed to have a single Set belong to the same class 
 	 * as this object and use the same set of time periods.
-	 * @param ds
+	 
 	 * @param scale
 	 * @param norm
 	 */

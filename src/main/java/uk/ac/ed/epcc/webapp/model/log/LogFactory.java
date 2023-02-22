@@ -562,7 +562,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	}
 	/** find an item by owner and value
 	 * 
-	 * @param q
+	 * @param owner
 	 * @param v
 	 * @param link
 	 * @param allow_null
@@ -590,9 +590,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	}
 	
 	/** get a Filter for items that point to a DataObject that match a particular filter
-	 * @param v
-	 * @param link
-	 * @return
+	
 	 */
 	public <L extends DataObject> AndFilter<T> getItemFilter(DataObjectFactory<L> fac, ItemType.ItemValue v, BaseFilter<L> link_fil) {
 		AndFilter<T> fil;

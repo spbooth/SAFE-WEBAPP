@@ -23,19 +23,12 @@ import uk.ac.ed.epcc.webapp.model.far.response.personal.PersonalResponseManager.
 
 public class PersonalResponseKey<T extends PersonalResponse > extends TransitionKey<T> {
 
-	/**
-	 * @param t
-	 * @param name
-	 * @param help
-	 */
+	
 	public PersonalResponseKey(String name, String help) {
 		super(PersonalResponse.class, name, help);
 	}
 
-	/**
-	 * @param t
-	 * @param name
-	 */
+	
 	public PersonalResponseKey(String name) {
 		super(PersonalResponse.class, name);
 	}

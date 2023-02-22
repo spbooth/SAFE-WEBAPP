@@ -195,9 +195,7 @@ Targetted<AU>
 			sb.append("))");
 			return sb;
 		}
-		/**
-		 * @param sbFROM
-		 */
+		
 		public void addRolePattern(StringBuilder sb,String test_role) {
 			ctx.quoteQualified(sb, AbstractSessionService.ROLE_TABLE, AbstractSessionService.ROLE_FIELD);
 			sb.append("=?");

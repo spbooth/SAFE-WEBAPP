@@ -92,7 +92,7 @@ public interface BearerTokenService extends AppContextService<BearerTokenService
 	 * 
 	 * This method <b>MUST</b> verify the permitted scopes of the token.
 	 * 
-	 * @param SessionService to modify
+	 * @param sess {@link SessionService} to modify
 	 * @param token
 	 */
 	public void processToken(SessionService sess, String token);

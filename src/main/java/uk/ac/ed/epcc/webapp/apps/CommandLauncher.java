@@ -126,7 +126,6 @@ public class CommandLauncher extends AbstractContexed{
 	 * 
 	 * @param comm
 	 * @param args
-	 * @throws Exception 
 	 */
 	public void run(Class<? extends Command> comm, String args[]) {
 		LinkedList<String> data = new LinkedList<>();

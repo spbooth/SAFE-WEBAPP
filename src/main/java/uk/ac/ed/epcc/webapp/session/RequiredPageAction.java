@@ -30,7 +30,7 @@ public interface RequiredPageAction<U extends AppUser> {
 	
 	/** If side effects are configured add notification text explaining the actions to be taken.
 	 * These will be added to automatic emails requesting changes so an action should not
-	 * be added unless the corresponding requirement is added via {@link #addNotifyText(Set, AppUser)}
+	 * be added unless the corresponding requirement is added.
 	 * @param notices
 	 * @param person
 	 */

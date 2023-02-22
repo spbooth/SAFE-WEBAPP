@@ -263,10 +263,7 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 	 * We need to query the session to do this. This is used when logging
 	 * resource allocations so we can tell the difference between something done
 	 * by a user or and admin SU'd as that user.
-	 * 
-	 * @param req
-	 *            Request object
-	 * @return String
+
 	 * 
 	 */
 	public String getLogName() {

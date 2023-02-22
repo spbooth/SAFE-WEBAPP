@@ -34,7 +34,6 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
  * 
  * @author spb
  * @param <T> type of input
- * @param <I> class of sub-inputs
  *
  */
 

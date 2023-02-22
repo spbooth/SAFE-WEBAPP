@@ -44,7 +44,6 @@ public class SelfReferenceFilter<T> implements SQLFilter<T> , PatternFilter<T>{
 	private final boolean exclude;
 	/** Filter that matches an {@link IndexedReference} 
 	 * 
-	 * @param target   factory target
 	 * @param res  {@link Repository}
 	 * @param ref {@link IndexedReference}
 	 */
@@ -53,7 +52,6 @@ public class SelfReferenceFilter<T> implements SQLFilter<T> , PatternFilter<T>{
 	}
 	/** 
 	 * 
-	 * @param target factory target Class
 	 * @param res {@link Repository}
 	 * @param exclude if true, matches everything but reference
 	 * @param ref {@link IndexedReference}

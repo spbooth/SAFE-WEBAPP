@@ -27,7 +27,6 @@ public class UUIDNamePolicy<AU extends AppUser> extends GlobalNamePolicy<AU, UUI
 
 	/**
 	 * @param factory
-	 * @param realm
 	 */
 	public UUIDNamePolicy(AppUserFactory<AU> factory) {
 		super(factory, "UUID");

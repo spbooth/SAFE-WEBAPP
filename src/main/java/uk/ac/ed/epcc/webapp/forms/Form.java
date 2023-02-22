@@ -293,7 +293,7 @@ public interface Form extends Iterable<Field>, Contexed{
 	default public boolean supportsMultiStage() {
 		return false;
 	}
-	/** returns the last value returned by {@link #poll(FormResult)}
+	/** returns the last value returned by {@link #poll()}
 	 * 
 	 * @return
 	 */

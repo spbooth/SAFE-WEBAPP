@@ -77,7 +77,7 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	/** If there are varient forms of the names this normalises the name to the form stored in the database
 	 * 
 	 * @param name
-	 * @return
+	 * @return normalised name
 	 */
 	protected String normalizeName(String name){
 		return name;
@@ -125,7 +125,7 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 
 	/** default filed length when creating table.
 	 * 
-	 * @return
+	 * @return length
 	 */
 	protected int defaultFieldLength() {
 		return 128;
@@ -158,7 +158,7 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 
 	/** Does the user get to choose this name
 	 * 
-	 * @return
+	 * @return boolean
 	 */
 	protected boolean userSet() {
 		return getContext().getBooleanParameter(PROPERTY_PREFIX+getRealm()+".user_supplied", false);

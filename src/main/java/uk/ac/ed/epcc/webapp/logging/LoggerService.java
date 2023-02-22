@@ -67,7 +67,6 @@ public Logger getLogger(String name);
     * @param event
     * @param sess {@link SessionService}
     * @param context
-    * @return
     */
    public default void securityEvent(String event,SessionService sess, Map context) {
 	   Logger logger = getLogger(SECURITY_LOG);

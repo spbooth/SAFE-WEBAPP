@@ -51,9 +51,7 @@ public class PersonalResponseTransitionProvider<T extends PersonalResponse<D>,D 
 	
 	
 	public static final PersonalResponseKey CREATE = new PersonalResponseKey("Create", "Create a new reponse");
-	/**
-	 * @param c
-	 */
+	
 	public PersonalResponseTransitionProvider(String tag,PersonalResponseManager<T, D> manager) {
 		super(manager.getContext(),manager,tag);
 		addTransition((K) CREATE, new CreateTransition());

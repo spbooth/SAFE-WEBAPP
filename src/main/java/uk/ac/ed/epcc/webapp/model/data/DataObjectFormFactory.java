@@ -100,7 +100,6 @@ public final AppContext getContext(){
 	 * @param f
 	 *            Form to build
 	 * @throws DataFault
- * @throws TransitionException 
 	 */
 	public final boolean buildForm(Form f) throws DataFault{
 		return buildForm(f,null);
@@ -133,7 +132,7 @@ public final AppContext getContext(){
 	 * @param labels
 	 * 	          Map of field names to form labels
 	 * @throws DataFault
-	 * @throws TransitionException 
+	
 	 */
 	public static final boolean buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
 			Set<String> optional, Map<String,Selector> selectors,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips) throws DataFault {
@@ -151,8 +150,6 @@ public final AppContext getContext(){
 	 * 
 	 * @param f
 	 *            Form to build
-	 * @param supress_fields
-	 *            Vector of fields to supress in the form
 	 * @param optional
 	 *            Vector marking fields as optional
 	 * @param selectors
@@ -162,7 +159,6 @@ public final AppContext getContext(){
 	 * @param tooltips 
 	 * 			  Map of tooltip/help text for form labels
 	 * @throws DataFault
-	 * @throws TransitionException 
 	 */
 	public static final boolean buildForm(AppContext conn, Repository res, Set<String> keys, Form f, 
 				Set<String> optional, Map<String,Selector> selectors,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips,HashMap fixtures) throws DataFault {

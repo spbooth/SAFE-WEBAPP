@@ -20,7 +20,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.charts.strategy.QueryMapper;
@@ -138,7 +137,7 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 	/** Does this plot represent a cummulative plot.
 	 * 
 	 * This return value controls how items are combined in 
-	 * {@link #getCatCounts(boolean)}
+	 * {@link #getCatCounts()}
 	 * 
 	 * @return
 	 */
@@ -146,15 +145,6 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 	
 	/**
 	 * create a table from a Plot for this Timechart
-	 * @param t 
-	 * 
-	 * @param ds
-	 *            Plot to convert
-	 * @param lab
-	 *            Labels for the catagories
-	 * @param start
-	 * 			  index of first label in this set
-	 * @return number of labels used;
 	 */
 	@Override
 	public Table getTable(String quantity) {
@@ -251,10 +241,6 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 	/**
 	 * add data from an object to the dataset using strategy transform
 	 * 
-	 * @param ds
-	 * @param t
-	 * @param o
-	 * @throws Exception 
 	 */
 	@Override
 	public <D> void   addData(SetRangeMapper<D> t, D o)
@@ -533,7 +519,6 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 		/**
 		 * rescale a dataset by constant divided by number of miliseconds
 		 * 
-		 * @param ds
 		 * @param scale
 		 */
 		@Override
@@ -553,9 +538,8 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 		/**
 		 * rescale a dataset by constant divided by the value in a different dataset
 		 * The normalisation dataset is assumed to have a single Set.
-		 * @param ds
 		 * @param scale
-		 * @param norm
+		 * @param nm
 		 */
 		@Override
 		public void datasetScale(double scale, PeriodSequencePlot nm) {
@@ -583,7 +567,6 @@ public abstract class SplitSetPlot implements PeriodSequencePlot {
 		/**
 		 * rescale one set of a dataset and store result in a different set.
 		 * 
-		 * @param ds
 		 * @param scale
 		 * @param src
 		 * @param dest

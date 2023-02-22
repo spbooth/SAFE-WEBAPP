@@ -30,7 +30,6 @@ public class WebNameFinder<AU extends AppUser> extends FieldNameFinder<AU,WebNam
 
 	/**
 	 * @param factory
-	 * @param realm
 	 */
 	public WebNameFinder(AppUserFactory factory) {
 		super(factory, WEB_NAME);

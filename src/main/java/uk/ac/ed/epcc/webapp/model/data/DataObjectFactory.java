@@ -79,10 +79,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * <ul>
  * <li> <code>makeBDO(Record)</code> Which constructs an object of the target type.
  * </ul>
- * However the {@link #getTarget()} method should also be overridden to improve run-time type checking.
- * This is so simple that in principle we could have a
- * genericFactory class that implements them using reflection from a Class object
- * passed to the constructor but this is probably overkill for the moment. Note
+ * Note
  * that Factory is only concerned with retrieving records from the database. It
  * can therefore be used with read-only tables populated from elsewhere.
  * <p>
@@ -798,8 +795,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	/** An {@link AcceptFilter} version of DestFilter
 	 * 
 	 * @author spb
-	 * @see DestFilter
-	 * @param <T>
+	 * @param <T> type of filter
 	 */
 
 

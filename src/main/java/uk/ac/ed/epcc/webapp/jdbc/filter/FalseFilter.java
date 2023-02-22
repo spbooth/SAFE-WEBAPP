@@ -20,10 +20,7 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
  */
 public class FalseFilter<T> extends GenericBinaryFilter<T>{
 
-	/**
-	 * @param target
-	 * 
-	 */
+	
 	public FalseFilter() {
 		super(false);
 	}

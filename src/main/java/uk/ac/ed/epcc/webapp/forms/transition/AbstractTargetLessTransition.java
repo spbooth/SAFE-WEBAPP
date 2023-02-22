@@ -16,7 +16,7 @@ package uk.ac.ed.epcc.webapp.forms.transition;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 
-/** A simple abstract sub-class for {@link TargetlessTransition}s
+/** A simple abstract sub-class for {@link TargetLessTransition}s
  * 
  * This saves a small amount of boiler plate when no other superclass is required.
  * @author spb

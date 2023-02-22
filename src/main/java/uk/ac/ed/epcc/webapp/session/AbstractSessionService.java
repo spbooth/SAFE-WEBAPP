@@ -1043,9 +1043,9 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	/** get a {@link BaseFilter} for all {@link AppUser}s who
 	 * have access to a global role.
 	 * 
-	 * This is the same selection as {@link #canHaveRole(AppUser, String)
+	 * This is the same selection as {@link #canHaveRole(AppUser, String)}
 	 * 
-	 * @param role
+	 * @param roles
 	 * @return
 	 */
 	@Override
@@ -1488,7 +1488,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		return apply_toggle;
 	}
 
-	/** Extension point for sub-classes used to implement  {@link #getGlobalRoleFilter(String)}
+	/** Extension point for sub-classes used to implement  {@link #getGlobalRoleFilter(String ...)}
 	 * 
 	 * @param role_list
 	 * @return

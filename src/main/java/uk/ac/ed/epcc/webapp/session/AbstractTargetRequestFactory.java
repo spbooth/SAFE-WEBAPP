@@ -29,7 +29,7 @@ public abstract class AbstractTargetRequestFactory<A extends DataObject,R extend
 		extends AbstractRequestFactory<R> {
 
 	/**
-	 * @param user_fac
+	 * @param fac
 	 */
 	protected AbstractTargetRequestFactory(DataObjectFactory<A> fac) {
 		super();

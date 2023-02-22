@@ -174,7 +174,7 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	public abstract  AppUserFactory<A> getLoginFactory();
 	/** check for membership of any of the roles in list
 	 * 
-	 * @param role_list
+	 * @param roles
 	 * @return boolean
 	 */
 	
@@ -219,9 +219,9 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	/** get a {@link BaseFilter} for all {@link AppUser}s who
 	 * have access to a global role.
 	 * 
-	 * This is the same selection as {@link #canHaveRoleFromList(AppUser, String)
+	 * This is the same selection as {@link #canHaveRoleFromList(AppUser, String ...)}
 	 * 
-	 * @param role
+	 * @param roles
 	 * @return
 	 */
 	public BaseFilter<A> getGlobalRoleFilter(String ...roles);

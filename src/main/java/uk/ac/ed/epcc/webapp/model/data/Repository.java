@@ -1587,7 +1587,7 @@ public final class Repository implements AppContextCleanup{
 		 * @param buff
 		 *            query buffer. We append additional info to this to provide
 		 *            better debug messages
-		 * @param stms
+		 * @param stmt
 		 *            PreparedStatement fo populate
 		 * @param pos
 		 *            statement position to set
@@ -2659,7 +2659,6 @@ public final class Repository implements AppContextCleanup{
 	}
 	/** get a {@link NumberFieldExpression} for a field.
 	 * 
-	 * @param filter_type type of the hosting object
 	 * @param target desired numeric type for the field.
 	 * @param key field name
 	 * @return {@link NumberFieldExpression}
@@ -2673,7 +2672,6 @@ public final class Repository implements AppContextCleanup{
 	}
 	/** get a {@link BooleanFieldExpression} for a field
 	 * 
-	 * @param filter_type type of hosting object
 	 * @param key field name
 	 * @return {@link BooleanFieldExpression}
 	 */
@@ -2687,7 +2685,6 @@ public final class Repository implements AppContextCleanup{
 	}
 	/** get a {@link StringFieldExpression} for a field
 	 * 
-	 * @param filter_type type of hosting object
 	 * @param key field name
 	 * @return {@link StringFieldExpression}
 	 */
@@ -2706,7 +2703,6 @@ public final class Repository implements AppContextCleanup{
 	 * 
 	 * The underlying database field may be a time-stamp or a numeric field.
 	 * 
-	 * @param target type of hosting object
 	 * @param key field name
 	 * @return {@link FieldValue}
 	 */
@@ -2750,7 +2746,6 @@ public final class Repository implements AppContextCleanup{
 	}
 	/** Get a {@link IndexedFieldValue} for a field
 	 * The field does not have to be tagged as a reference field
-	 * @param self 
 	 * @param key
 	 * @param prod
 	 * @return IndexedFieldValue

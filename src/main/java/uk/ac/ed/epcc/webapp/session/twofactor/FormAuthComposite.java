@@ -112,7 +112,6 @@ public abstract class FormAuthComposite<AU extends AppUser> extends AppUserCompo
 
 	/** action to perform when authentication completed
 	 * 
-	 * @param ok was it a successful authentication.
 	 */
 	public void authenticated() {
 		Logger logger = getLogger();

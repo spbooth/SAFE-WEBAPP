@@ -67,17 +67,14 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extends PartOwnerFactory<F> implements ParseFactory<F>, TransitionFactoryCreator<TransitionFactory>, ServeDataProducer{
 	public static class Status extends BasicType<Status.Value>{
-		/**
-		 * @param field
-		 */
+		
 		public Status() {
 			super("Status");
 		}
 
 		public class Value extends BasicType.Value{
 
-			/**
-			 * @param parent
+			/*
 			 * @param tag
 			 * @param name
 			 */

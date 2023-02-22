@@ -337,7 +337,6 @@ public class AuthorizedKeyValidator extends AbstractContexed implements FieldVal
    /** Extension point validator.
     * This can add additional restrictions on the algorithm or the key itself
     * 
-    * @param alg
     */
    protected void validateBlock(SSH2DataBuffer buf ) throws ValidateException{
 	   try {

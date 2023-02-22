@@ -498,8 +498,8 @@ public abstract class ServletTest extends WebappTestBase{
 	 * output and compared with a file of expected output.
 	 * 
 	 * 
-	 * @param normalise_transform
-	 * @param expected
+	 * @param normalize_transform
+	 * @param expected_xml
 
 	 * @throws Exception 
 	 */
@@ -597,8 +597,8 @@ public abstract class ServletTest extends WebappTestBase{
 	 * output and compared with a file of expected output.
 	 * 
 	 * 
-	 * @param normalise_transform
-	 * @param expected
+	 * @param normalize_transform
+	 * @param expected_xml
 	 * @throws Exception 
 	 */
 	public <K,T> void checkPageFormContent(String normalize_transform, String expected_xml) throws Exception{

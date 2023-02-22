@@ -30,10 +30,7 @@ public class DataPersonManager extends LinkManager<DataPersonManager.DataPerson,
 	}
 	public class DataPerson extends LinkManager.Link<TestFactory.TestData,AppUser>{
 
-		/**
-		 * @param man
-		 * @param res
-		 */
+		
 		protected DataPerson( Record res) {
 			super(DataPersonManager.this, res);
 		}

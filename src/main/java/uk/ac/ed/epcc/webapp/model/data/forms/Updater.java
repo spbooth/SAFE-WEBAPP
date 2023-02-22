@@ -50,7 +50,6 @@ public class Updater<BDO extends DataObject> extends DataObjectUpdateFormFactory
 	public static final String TARGET = "Target";
 	/**
 	 * @param dataObjectFactory
-	 * @param req requesting person
 	 */
 	public Updater(DataObjectFactory<BDO> dataObjectFactory) {
 		super(dataObjectFactory);

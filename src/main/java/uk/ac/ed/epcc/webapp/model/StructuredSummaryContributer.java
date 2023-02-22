@@ -25,7 +25,6 @@ public interface StructuredSummaryContributer<T extends DataObject> extends Summ
 	 * 
 	 * @param attributes
 	 * @param fil
-	 * @return
 	 */
 	public void addSummaryFields(Set<String> attributes,BaseFilter<T> fil);
 }

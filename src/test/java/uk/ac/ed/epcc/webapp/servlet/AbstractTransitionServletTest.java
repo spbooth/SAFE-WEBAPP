@@ -251,8 +251,8 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	 * output and compared with a file of expected output.
 	 * 
 	 * 
-	 * @param normalise_transform
-	 * @param expected
+	 * @param normalize_transform
+	 * @param expected_xml
 	 * @throws Exception 
 	 */
 	public <K,T> void checkFormContent(String normalize_transform, String expected_xml) throws Exception{
@@ -347,8 +347,8 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	 * This works in the context of the current request so if called after running
 	 * a stage of a multi-stage transition it will use the request cached form state.
 	 * 
-	 * @param normalise_transform
-	 * @param expected
+	 * @param normalize_transform
+	 * @param expected_xml
 	 * @return view target
 	 * @throws Exception 
 	 */

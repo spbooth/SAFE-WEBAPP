@@ -280,7 +280,6 @@ public class LdapPasswordComposite<T extends AppUser> extends PasswordAuthCompos
 	/** generate the name of the authenticating user from the supplied id.
 	 * 
 	 * @param name
-	 * @param base_name
 	 * @return
 	 * @throws InvalidNameException
 	 */

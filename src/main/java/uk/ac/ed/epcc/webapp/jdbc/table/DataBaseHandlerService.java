@@ -116,7 +116,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 	 * 
 	 * The {@link TableSpecification} can be augmented by properties
 	 * starting with <b>create_table.<i>table-name</i></b> using
-	 * {@link TableSpecification#setFromParameters(AppContext, String, java.util.Map).
+	 * {@link TableSpecification#setFromParameters(AppContext, String, java.util.Map)}.
 	 * 
 	 * In addition fields can be renamed by setting <b>create_table.rename_field.<i>table</i>.<i>field</i>=<i>new-field</i></b>
 	 * This is usually only necessary for unit tests and will have to be combined with <b>rename.<i>new-field</i>=<i>field</i></b>

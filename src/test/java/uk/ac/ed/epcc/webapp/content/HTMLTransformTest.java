@@ -37,9 +37,7 @@ public class HTMLTransformTest {
 		assertEquals(3.14, t.convert(3.14));
 	}
 	
-	/**
-	 * Tests the method {@link HTMLTransform#convert(Table, Object, Object, Object)}.
-	 */
+	
 	@Test
 	public void testConvert2() {
 		HTMLTransform t = new HTMLTransform();

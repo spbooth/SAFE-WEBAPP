@@ -72,7 +72,6 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 		private boolean holding=false;
 		/**
 		 * @param res
-		 * @param fac
 		 */
 		protected Lock(Record res) {
 			super(res, LockFactory.this);

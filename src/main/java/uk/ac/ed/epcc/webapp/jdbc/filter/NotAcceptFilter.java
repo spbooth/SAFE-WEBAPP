@@ -24,7 +24,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 public class NotAcceptFilter<T extends DataObject> implements AcceptFilter<T>, NegatingFilter<BaseFilter<T>> {
 
 	/**
-	 * @param target
+	
 	 * @param fac
 	 * @param fil
 	 */

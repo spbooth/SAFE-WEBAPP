@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RUNTIME)
 @Target(TYPE)
-/** Annotation on a class (e.g. a {@link Transition}) restricting bearer access to the specified scopes.
+/** Annotation on a class (e.g. a transition) restricting bearer access to the specified scopes.
  * @author Stephen Booth
  *
  */

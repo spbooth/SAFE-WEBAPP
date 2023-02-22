@@ -200,18 +200,12 @@ public class PersonalResponseManager<R extends PersonalResponseManager.PersonalR
 		return null;
 	}
 
-	/**
-	 * @param tag
-	 * @return
-	 */
+	
 	public PersonalResponseTransitionProvider getPersonalResponseTransitionProvider() {
 		return new PersonalResponseTransitionProvider(getTag()+TransitionFactoryCreator.TYPE_SEPERATOR+RESPONSE_TAG, this);
 	}
 
-	/**
-	 * @param tag
-	 * @return
-	 */
+	
 	public ResponseTransitionProvider getPathResponseProvider() {
 		return new ResponseTransitionProvider(getTag()+TransitionFactoryCreator.TYPE_SEPERATOR+PART_TAG, this);
 	}

@@ -447,7 +447,6 @@ public class BaseForm implements Form {
 	 * 
 	 * @param v
 	 *            The FormValidator to set.
-	 * @return The previous FormValidator
 	 */
 	@Override
 	public final void addValidator(FormValidator v) {
@@ -560,7 +559,6 @@ public class BaseForm implements Form {
 	 * will return as soon as <b>any</b> validation condition fails.
 	 * 
 	 * @return boolean true if valid
-	 * @throws ValidateException
 	 */
 	@Override
 	public final boolean validate()  {

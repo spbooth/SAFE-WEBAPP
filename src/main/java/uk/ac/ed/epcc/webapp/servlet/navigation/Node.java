@@ -127,8 +127,7 @@ public abstract class Node extends NodeContainer implements Externalizable{
 
 	/** get the full url for the target location
 	 * 
-	 * @param request
-	 * @return
+	
 	 */
 	public String getTargetURL(ServletService servlet_service) {
 		 

@@ -31,7 +31,7 @@ public abstract class BaseSQLCombineFilter<T> extends BaseCombineFilter<T> imple
 
 
 	/**
-	 * @param target
+	 * @param tag construction tag for owning factory
 	 */
 	protected BaseSQLCombineFilter(String tag) {
 		super(tag);

@@ -77,7 +77,7 @@ public class Servlet3MultiPartServletService extends DefaultServletService imple
 		return h;
 	}
 	/**
-	 * @param req
+	 * @param request
 	 * @return
 	 */
 	private boolean isMultipartContent(HttpServletRequest request) {

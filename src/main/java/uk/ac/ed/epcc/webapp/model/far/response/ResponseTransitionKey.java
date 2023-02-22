@@ -26,7 +26,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 public class ResponseTransitionKey<D extends DynamicForm, R extends Response<D>> extends TransitionKey<ResponseTarget<D,R>> {
 
 	/**
-	 * @param t
+	
 	 * @param name
 	 * @param help
 	 */
@@ -35,7 +35,7 @@ public class ResponseTransitionKey<D extends DynamicForm, R extends Response<D>>
 	}
 
 	/**
-	 * @param t
+	
 	 * @param name
 	 */
 	public ResponseTransitionKey(String name) {

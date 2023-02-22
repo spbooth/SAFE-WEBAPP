@@ -62,7 +62,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
  * <p>
  * LinkManager can navigate the links in either direction the subclass may
  * choose only to expose one direction of navigation. Internally this is implemented using the
- * {@link LinkFilter} or {@link SQLLinkFilter} classes which select a set a <code>Link</code> objects
+ * {@link IndexedLinkManager.LinkFilter} or {@link IndexedLinkManager.SQLLinkFilter} classes which select a set a <code>Link</code> objects
  * based on the value of one or other end.
 <pre>
 <code>
@@ -520,9 +520,9 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	}
 	/** A {@link FilterResult} for link objects.
 	 * 
-	 * This generates a {@link LinkFilterIterator} to pre-populate the end-links if known.
+	 * This generates a iterator to pre-populate the end-links if known.
 	 * 
-	 * @see FilterSet
+	 * @see DataObjectFactory.FilterSet
 	 * @author spb
 	 *
 	 */
@@ -568,7 +568,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		 */
 		@Override
 		protected CloseableIterator<T> makeIterator() throws DataFault {
-			// TODO Auto-generated method stub
+			
 			return getLinkIterator(left, right, fil);
 		}		
 	}
@@ -583,8 +583,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 */
     public class LeftAcceptFilter implements AcceptFilter<L>{
     	/**
-		 * @param target
-		 * @param fil
+		 * @param fil nested {@link BaseFilter} on link object
 		 */
 		public LeftAcceptFilter( BaseFilter<T> fil) {
 			this.fil = fil;
@@ -613,7 +612,6 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 */
     public class RightAcceptFilter implements AcceptFilter<R>{
     	/**
-		 * @param target
 		 * @param fil
 		 */
 		public RightAcceptFilter( BaseFilter<T> fil) {

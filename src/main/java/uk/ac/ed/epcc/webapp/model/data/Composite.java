@@ -49,8 +49,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * modify the table specification. If the constructor takes the String parameter the construction tag of the <b>composite</b> will be passed. 
  * </p>
  * <p>
- * The areas that {@link Composite}s can customise can be extended by having a factory check all composites for specific interfaces for example
- * {@link TableStructureContributer} checks the composites for {@link TransitionSource}
+ * The areas that {@link Composite}s can customise can be extended by having a factory check all composites for specific interfaces 
  * If you find yourself testing for the existence of multiple composites at the same location consider extracting an interface for
  * that all the contributing composites can implement. 
  * </p>

@@ -29,7 +29,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 /** abstract Link class that encodes an editable relationship between an AppUser and a
- * domain object and used to implement {@link RelationshipProvider} and {@link RoleSelector} for the domain object.
+ * domain object and used to implement {@link RelationshipProvider} for the domain object.
  *
  * How roles are actually encoded into the link object is deferred to the sub-class.
  * 

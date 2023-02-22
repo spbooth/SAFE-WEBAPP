@@ -709,7 +709,7 @@ public final class PublicKeyReaderUtil
             /**
              * The RSA public key blob could not decoded.
              *
-             * @see PublicKeyReaderUtil#decodeRSAPublicKey(SSH2DataBuffer)
+             * @see PublicKeyReaderUtil#decodePublicKey(SSH2DataBuffer)
              */
             SSH2RSA_ERROR_DECODING_PUBLIC_KEY_BLOB("SSH2RSA: error decoding public key blob"),
 

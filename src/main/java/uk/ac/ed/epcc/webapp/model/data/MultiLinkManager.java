@@ -204,7 +204,6 @@ public abstract class MultiLinkManager<M extends MultiLinkManager.MultiLink> ext
 	 * Basic Constructor subclasses should call addFactory to configure 
 	 * then call setContext
 	 * 
-	 * @param c
 	 */
 	protected MultiLinkManager() {
 		factories = new HashMap<>();
