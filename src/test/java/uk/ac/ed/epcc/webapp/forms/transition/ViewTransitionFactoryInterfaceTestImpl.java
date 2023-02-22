@@ -18,6 +18,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.IOException;
+
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -69,6 +72,7 @@ public class ViewTransitionFactoryInterfaceTestImpl<T,K,X extends ViewTransition
 		ViewTransitionFactory<K, T> fac = provider.getTransitionFactory();
 		for(T target : provider.getTargets()){
 			HtmlBuilder builder = new HtmlBuilder();
+			builder.setValidXML(true);
 			builder.open("top");
 			fac.getTopContent(builder, target, provider.getAllowedUser(target));
 			builder.close();
@@ -84,6 +88,7 @@ public class ViewTransitionFactoryInterfaceTestImpl<T,K,X extends ViewTransition
 		ViewTransitionFactory<K, T> fac = provider.getTransitionFactory();
 		for(T target : provider.getTargets()){
 			HtmlBuilder builder = new HtmlBuilder();
+			builder.setValidXML(true); // we want to apply transforms
 			builder.open("log");
 			SessionService<?> user = provider.getAllowedUser(target);
 			fac.getLogContent(builder, target, user);
@@ -127,7 +132,13 @@ public class ViewTransitionFactoryInterfaceTestImpl<T,K,X extends ViewTransition
 		 String differ = TestDataHelper.diff(expected, result);
 		 boolean same = differ.trim().length()==0;
 		 if( ! same ){
-			 System.out.println(result);
+			 System.out.println(content);
+//			 try {
+//				TestDataHelper.writeFile(new File(expected_xml), content);
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 		 }
 		assertEquals("Unexpected result:"+expected_xml+"\n"+differ,expected,result);
 	}

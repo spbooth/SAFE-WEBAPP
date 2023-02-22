@@ -67,11 +67,15 @@ public class PermParser<A extends AppUser> extends AbstractContexed {
 			}
 			if( role.contains(OR_RELATIONSHIP_COMBINER)){
 				// OR combination of filters
-				OrPermissionClause<T> or = new OrPermissionClause<>(fac2.getTarget(), fac2);
+				OrPermissionClause<T> or = new OrPermissionClause<>(fac2);
 				for( String  s  : role.split(OR_RELATIONSHIP_COMBINER)){
 					
 						try{
-							or.add(parse(fac2,s));
+							PermissionClause<T> p = parse(fac2,s);
+							if(p == null) {
+								throw new UnknownRelationshipException(s);
+							}
+							or.add(p);
 						}catch(UnknownRelationshipException e){
 							if(AbstractSessionService.ALLOW_UNKNOWN_RELATIONSHIP_IN_OR_FEATURE.isEnabled(getContext())){
 								getLogger().error( "Bad relationship in OR branch",e);
@@ -85,15 +89,27 @@ public class PermParser<A extends AppUser> extends AbstractContexed {
 			}
 			if( role.contains(AND_RELATIONSHIP_COMBINER)){
 				// AND combination of filters
-				AndPermissionClause<T> and = new AndPermissionClause<>(fac2.getTarget());
+				AndPermissionClause<T> and = new AndPermissionClause<>();
 				for( String  s  : role.split("\\+")){
-					and.add(parse(fac2,s));
+					try {
+					PermissionClause<T> p = parse(fac2,s);
+					if(p == null) {
+						throw new UnknownRelationshipException(s);
+					}
+					and.add(p);
+					}catch(UnknownRelationshipException e){
+						if(AbstractSessionService.ALLOW_UNKNOWN_RELATIONSHIP_IN_OR_FEATURE.isEnabled(getContext())){
+							getLogger().error( "Bad relationship in AND branch",e);
+						}else{
+							throw e;
+						}
+					}
 				}
 				return and;
 			}
 			// should be a single filter now.
 			if( role.startsWith("!")) {
-				return new NegatingClause<T>(fac2.getTarget(), parse(fac2,role.substring(1)));
+				return new NegatingClause<T>( parse(fac2,role.substring(1)));
 			}else if( role.contains(RELATIONSHIP_DEREF)){
 				// This is a remote relationship
 				// Note this will also catch remote NamedRoles
@@ -114,13 +130,13 @@ public class PermParser<A extends AppUser> extends AbstractContexed {
 				String base =role.substring(0, pos);
 				String sub = role.substring(pos+1);
 				if( base.equals(GLOBAL_ROLE_RELATIONSHIP_BASE)){
-					return new GlobalPermissionClause<T>(fac2.getTarget(), sub);
+					return new GlobalPermissionClause<T>( sub);
 				}
 				if( base.equals(BOOLEAN_RELATIONSHIP_BASE)){
-					return new BinaryPermissionClause<T>(fac2.getTarget(), Boolean.valueOf(sub));
+					return new BinaryPermissionClause<T>( Boolean.valueOf(sub));
 				}
 				if( base.contentEquals(FEATURE_RELATIONSHIP_BASE)) {
-		    		return new BinaryPermissionClause<T>(fac2.getTarget(),Feature.checkDynamicFeature(getContext(), sub,false));
+		    		return new BinaryPermissionClause<T>(Feature.checkDynamicFeature(getContext(), sub,false));
 		    	}
 				
 
@@ -143,7 +159,7 @@ public class PermParser<A extends AppUser> extends AbstractContexed {
 				AccessRoleProvider<A,T> arp = getContext().makeObjectWithDefault(AccessRoleProvider.class,null,base);
 				if( arp != null ){
 					if( arp.providesRelationship(sub)) {
-						return new AccessRoleProviderPermissionClause<A, T>(fac2.getTarget(), arp,()->role, sub);
+						return new AccessRoleProviderPermissionClause<A, T>( arp,()->role, sub);
 					}
 		    		throw new UnknownRelationshipException(role+"@"+fac2.getTag());
 				}
@@ -160,7 +176,7 @@ public class PermParser<A extends AppUser> extends AbstractContexed {
 				}
 				throw new UnknownRelationshipException(role);
 			}
-			return null;
+			throw new UnknownRelationshipException(role);
 		}catch(UnknownRelationshipException ur){
 			if( ur.getMessage().equals(role)){
 				throw ur;
@@ -176,12 +192,12 @@ public class PermParser<A extends AppUser> extends AbstractContexed {
 		if( fac2 instanceof AccessRoleProvider) {
 			AccessRoleProvider<A, T> arp = (AccessRoleProvider<A, T>)fac2;
 			if( arp.providesRelationship(role)) {
-				return new AccessRoleProviderPermissionClause<A, T>(fac2.getTarget(), arp,()->fac2.getTag()+"."+role ,role);
+				return new AccessRoleProviderPermissionClause<A, T>(arp,()->fac2.getTag()+"."+role ,role);
 			}
 		}
 		for(AccessRoleProvider arp : fac2.getComposites(AccessRoleProvider.class)) {
 			if( arp.providesRelationship(role)) {
-				return new AccessRoleProviderPermissionClause<A, T>(fac2.getTarget(), arp,()->fac2.getTag()+"."+arp.getClass().getSimpleName()+"."+role ,role);
+				return new AccessRoleProviderPermissionClause<A, T>( arp,()->fac2.getTag()+"."+arp.getClass().getSimpleName()+"."+role ,role);
 			}
 		}
 	

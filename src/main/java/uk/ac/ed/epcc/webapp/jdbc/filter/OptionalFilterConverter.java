@@ -108,7 +108,7 @@ public class OptionalFilterConverter<T> implements FilterVisitor<BaseFilter<T>, 
 		if( fil instanceof SQLFilter){
 			return fil;
 		}
-		return new GenericBinaryFilter<>((Class<T>) fil.getTarget(), fil.getBooleanResult());
+		return new GenericBinaryFilter<>( fil.getBooleanResult());
 	}
 
 	/* (non-Javadoc)

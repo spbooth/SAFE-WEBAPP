@@ -140,6 +140,7 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 				+ "\n"
 				+ "\n"
 				+ "\n"
+				+ "\n"
 				+ "Regards,\n"
 				+ "\n"
 				+ "  The test Team\n"
@@ -282,26 +283,23 @@ public class RequiredPageHeartbeatServletTest extends HeartbeatServletTest {
 		EmailNameFinder finder = (EmailNameFinder) login.getComposite(EmailNameFinder.class);
 		AppUser person1 = p.getCurrentPerson();
 		person1.markDetailsUpdated();
-		finder.verified(person1);
+		finder.verified(person1);      // person 1 details updated and email verified 2019-07-01
 		MaxNotifyComposite max = (MaxNotifyComposite) p.getLoginFactory().getComposite(MaxNotifyComposite.class);
-		max.stopNotified(person1);
-		person1.commit();
+		max.stopNotified(person1);     // set counter to maximum value should supress reminders
 		person1.commit();
 		System.out.println(person1.nextRequiredUpdate());
-		setTime(2019, Calendar.DECEMBER, 1, 9, 0);
+		setTime(2019, Calendar.DECEMBER, 1, 9, 0);  
 		p = setupPerson("person2@example.com");
 		AppUser person2 = p.getCurrentPerson();
 		person2.markDetailsUpdated();
-		person2.commit();
+		person2.commit();               // person 2 defails updates 2019-12-1
 		System.out.println(person2.nextRequiredUpdate());
 		
 		setTime(2020, Calendar.JUNE, 20, 10, 0); // in warning period for person1
 		req.remote_user="fred";
 		doPost();
 		
-		assertEquals(0, MockTansport.nSent());
-		
-		
+		assertEquals(0, MockTansport.nSent());  // No reminders sent earlier test sent emails at this point
 		assertEquals(5, max.getNotifiedCount((AppUser) login.find(person1.getID())));
 	}
 	@Test

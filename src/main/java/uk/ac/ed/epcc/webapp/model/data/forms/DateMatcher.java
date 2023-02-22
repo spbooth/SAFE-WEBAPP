@@ -40,9 +40,9 @@ public class DateMatcher<T extends Date> extends DatePatternMatcher<T> implement
 
 	public <X extends DataObject> AcceptFilter<X> getAcceptFilter(DataObjectFactory<X> fac,String target, T form_value) {
 		if( matchBefore()){
-			return new DataObjectFactory.TimeAcceptFilter(fac.getTarget(),target,MatchCondition.LT,form_value);
+			return new DataObjectFactory.TimeAcceptFilter(fac.getTag(),target,MatchCondition.LT,form_value);
 		}else{
-			return new DataObjectFactory.TimeAcceptFilter(fac.getTarget(),target,MatchCondition.GE,form_value);
+			return new DataObjectFactory.TimeAcceptFilter(fac.getTag(),target,MatchCondition.GE,form_value);
 		}
 	}
 

@@ -224,7 +224,11 @@ public class XMLDataUtils extends AbstractContexed{
 	 */
 	public static String readResourceAsString(Class clazz, String name) throws IOException{
 		StringBuffer fileData = new StringBuffer(1000);
-		InputStreamReader reader = new InputStreamReader(clazz.getResourceAsStream(name));
+		InputStream stream = clazz.getResourceAsStream(name);
+		if( stream == null) {
+			throw new IOException("Resource "+name+" not found by "+clazz.getCanonicalName());
+		}
+		InputStreamReader reader = new InputStreamReader(stream);
 		char[] buf = new char[1024];
 		int numRead = 0;
 		while ((numRead = reader.read(buf)) != -1) {

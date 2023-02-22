@@ -16,11 +16,7 @@ package uk.ac.ed.epcc.webapp.model.data.filter;
 import java.util.List;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.jdbc.filter.ConstPatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 /** Filter to select/exclude an entry by Id.
@@ -34,19 +30,18 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 public class SQLIdFilter<T extends DataObject> implements SQLFilter<T>, PatternFilter<T>{
 
 	
-	public SQLIdFilter(Class<T> target,Repository res, int id) {
-		this( target,res,id,false);
+	public SQLIdFilter(Repository res, int id) {
+		this( res,id,false);
 	}
 		
-	public SQLIdFilter(Class<T> target,Repository res, int id,boolean exclude) {
+	public SQLIdFilter(Repository res, int id,boolean exclude) {
 		super();
-		this.target=target;
 		this.res = res;
 		this.id=id;
 		this.exclude=exclude;
 	}
 
-	private final Class<T> target;
+
 	private final Repository res;
 	private final int id;
 	private final boolean exclude;
@@ -80,8 +75,8 @@ public class SQLIdFilter<T extends DataObject> implements SQLFilter<T>, PatternF
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<T> getTarget() {
-		return target;
+	public String getTag() {
+		return res.getTag();
 	}
 	
 	@Override
@@ -100,7 +95,6 @@ public class SQLIdFilter<T extends DataObject> implements SQLFilter<T>, PatternF
 		result = prime * result + (exclude ? 1231 : 1237);
 		result = prime * result + id;
 		result = prime * result + ((res == null) ? 0 : res.hashCode());
-		result = prime * result + ((target == null) ? 0 : target.hashCode());
 		return result;
 	}
 
@@ -122,12 +116,9 @@ public class SQLIdFilter<T extends DataObject> implements SQLFilter<T>, PatternF
 				return false;
 		} else if (!res.equals(other.res))
 			return false;
-		if (target == null) {
-			if (other.target != null)
-				return false;
-		} else if (!target.equals(other.target))
-			return false;
 		return true;
 	}
+
+	
 
 }

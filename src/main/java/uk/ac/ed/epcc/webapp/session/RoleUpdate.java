@@ -23,7 +23,6 @@ import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdate;
 import uk.ac.ed.epcc.webapp.forms.inputs.CheckBoxInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
@@ -74,10 +73,7 @@ public  class RoleUpdate<U extends AppUser> implements Contexed, StandAloneFormU
 public U find(int id) throws DataException {
 	return fac.find(id);
 }
-@Override
-public Class<U> getTarget() {
-	return fac.getTarget();
-}
+
 @Override
 public IndexedReference<U> makeReference(U obj) {
 	return fac.makeReference(obj);

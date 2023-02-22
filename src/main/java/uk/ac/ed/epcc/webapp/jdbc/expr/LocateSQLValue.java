@@ -107,7 +107,7 @@ public class LocateSQLValue implements SQLValue<Integer>{
 			SQLFilter f = part.getRequiredFilter();
 			if( f != null ){
 				if( required == null){
-					required = new SQLAndFilter(f.getTarget(),f);
+					required = new SQLAndFilter(f.getTag(),f);
 				}else{
 					required.addFilter(f);
 				}
@@ -163,5 +163,17 @@ public class LocateSQLValue implements SQLValue<Integer>{
 			return false;
 		
 		return true;
+	}
+	@Override
+	public String getFilterTag() {
+		String t = substr.getFilterTag();
+		if( t != null) {
+			return t;
+		}
+		t = str.getFilterTag();
+		if( t != null) {
+			return null;
+		}
+		return pos.getFilterTag();
 	}
 }

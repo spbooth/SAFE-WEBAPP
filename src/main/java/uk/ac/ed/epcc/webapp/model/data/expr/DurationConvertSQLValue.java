@@ -83,4 +83,9 @@ public class DurationConvertSQLValue<T extends Number>  implements NestedSQLValu
 	public SQLValue<T> getNested() {
 		return a;
 	}
+	
+	@Override
+	public String getFilterTag() {
+		return a.getFilterTag();
+	}
 }

@@ -74,8 +74,8 @@ public class Relinker{
 					if( ! src_rep.hasField(field)){
 						continue;
 					}
-					FieldExpression<Number,DataObject>expr = src_rep.getNumberExpression(DataObject.class, Number.class, field);
-					update.update(expr, dest.getID(), new SQLValueFilter<>(DataObject.class, src_rep, field, src.getID()));
+					FieldExpression<Number,DataObject>expr = src_rep.getNumberExpression( Number.class, field);
+					update.update(expr, dest.getID(), new SQLValueFilter<>(src_rep, field, src.getID()));
 				}
 			}
 		}

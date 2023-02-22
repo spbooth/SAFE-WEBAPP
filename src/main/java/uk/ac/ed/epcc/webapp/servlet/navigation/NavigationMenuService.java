@@ -157,7 +157,8 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 		if( service != null ){
 			service.removeAttribute(NAVIGATION_MENU_ATTR);
 		}
-		service.flushRelationships();  // menu may depend on roles, flush these as well inc ase this is what changed
+		service.flushRelationships();  // menu may depend on roles, flush these as well in case this is what changed
+		service.flushCachedRoles();
 	}
 	
 	public FilteredProperties getProperties() {
@@ -211,8 +212,10 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 		seen.add(name);
 		// optional required role
 		String role=conn.expandText(menu_prop.getProperty(name+".role"));
-		if( role != null && ! conn.getService(SessionService.class).hasRoleFromList(role.split("\\s*,\\s*"))){
-			return null;
+		if( role != null ) {
+			if(! conn.getService(SessionService.class).hasRoleFromList(role.split("\\s*,\\s*"))){
+				return null;
+			}
 		}
 		String required_feature = menu_prop.getProperty(name+".required_feature");
 		if( required_feature != null && ! Feature.checkDynamicFeature(conn, required_feature, false)){
@@ -276,8 +279,10 @@ public class NavigationMenuService extends AbstractContexed implements  AppConte
 	protected boolean willMakeNode(String name, FilteredProperties menu_prop) {
 		// optional required role
 		String role=conn.expandText(menu_prop.getProperty(name+".role"));
-		if( role != null && ! conn.getService(SessionService.class).hasRoleFromList(role.split("\\s*,\\s*"))){
-			return false;
+		if( role != null ) {
+			if( ! conn.getService(SessionService.class).hasRoleFromList(role.split("\\s*,\\s*"))){
+				return false;
+			}
 		}
 		String required_feature = menu_prop.getProperty(name+".required_feature");
 		if( required_feature != null && ! Feature.checkDynamicFeature(conn, required_feature, false)){

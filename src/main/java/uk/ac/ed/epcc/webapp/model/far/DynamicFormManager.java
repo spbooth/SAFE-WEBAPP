@@ -248,11 +248,6 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 	}
 	
 	
-	public Class getTarget(){
-		return DynamicForm.class;
-	}
-	
-
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.far.PartOwnerFactory#getChildManager()
 	 */
@@ -305,25 +300,25 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 	 * @return
 	 */
 	public SQLValueFilter<F> getNameFilter(String name) {
-		return new SQLValueFilter<F>(getTarget(), res, NAME_FIELD, name);
+		return new SQLValueFilter<F>(res, NAME_FIELD, name);
 	}
 	
 	public FilterResult<F> getNew() throws DataFault{
-		return new FilterSet(getNewFilter());
+		return getResult(getNewFilter());
 	}
 	public SQLFilter<F> getNewFilter() {
 		return status.getFilter(this, NEW);
 	}
 	
 	public FilterResult<F> getActive() throws DataFault{
-		return new FilterSet(getActiveFilter());
+		return getResult(getActiveFilter());
 	}
 	public BaseFilter<F> getActiveFilter() {
 		return status.getFilter(this, ACTIVE);
 	}
 	
 	public FilterResult<F> getRetired() throws DataFault{
-		return new FilterSet(getRetiredFilter());
+		return getResult(getRetiredFilter());
 	}
 	public SQLFilter<F> getRetiredFilter() {
 		return status.getFilter(this, RETIRED);

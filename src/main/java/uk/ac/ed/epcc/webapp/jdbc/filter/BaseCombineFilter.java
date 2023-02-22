@@ -48,8 +48,8 @@ public abstract class BaseCombineFilter<T> extends FilterSet<T> implements Patte
 	    private boolean force_value;
 	    // Do we care about order filters or can we ignore them.
 	    private transient boolean select_only=false;
-	    public BaseCombineFilter(Class<T> target){
-	    	super(target);
+	    public BaseCombineFilter(String tag){
+	    	super(tag);
 	    	filters = new LinkedHashSet<>();
 	    	force_value=getFilterCombiner().getDefault();
 	    }

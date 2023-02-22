@@ -40,12 +40,7 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
-import uk.ac.ed.epcc.webapp.session.AppUser;
-import uk.ac.ed.epcc.webapp.session.AppUserFactory;
-import uk.ac.ed.epcc.webapp.session.LoginRedirects;
-import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
-import uk.ac.ed.epcc.webapp.session.ReRegisterComposite;
-import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.session.*;
 import uk.ac.ed.epcc.webapp.session.twofactor.TwoFactorHandler;
 
 // import uk.ac.hpcx.HpcxMain;
@@ -86,7 +81,6 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 	
 	public static final Feature REPORT_ACCOUNT_NOT_FOUND = new Feature("login.report_account_not_found",true,"Users are explicitly informed if resetting an account that is not found");
 	public static final Feature RESET_PASSWORD_PAGE = new Feature("login.reset_password_page",false,"Use a separate reset password page");
-	public static final Feature COOKIE_TEST = new Feature("login.cookie_test_redirect",true,"Use double redirect on login to check for cookie support and avoid url rewriting");
 	public static final Feature BUILT_IN_LOGIN = new Feature("login.built_in",true,"Use built-in login page and servlet. If false login.page parameter may be external url");
 	/**
 	 * 
@@ -260,7 +254,9 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 				if (person != null) {
 					// Go to the logged in page
 					// (we may have another page that should be accessed)
-					RedirectResult other_page = (RedirectResult) sess.getAttribute(INITIAL_PAGE_ATTR);
+					FormResult other_page = getSavedResult(sess);
+					clearSavedResult(sess);
+					
 					FormResult next_page=null;
 					if (password_auth.doWelcome(person)) {
 						next_page = new RedirectResult(getWelcomePage(conn));
@@ -272,7 +268,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 					}
 					TwoFactorHandler<T> handler = new TwoFactorHandler<>(serv);
 					next_page =  handler.doLogin(person, "password",(SerializableFormResult) next_page);
-					doLoginResult(conn, req, res, next_page);
+					handleFormResult(conn, req, res, next_page);
 					return;
 				}
 			}
@@ -294,29 +290,7 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 				+ getLoginPage(conn)+"?error=login"));
 	}
 
-	/** go to intial page on login.
-	 * optionally this performs a double redirect through the LoginServlet
-	 * to test if cookies are supported and suppress url rewriting for the initial page
-	 * 
-	 * @param conn
-	 * @param req
-	 * @param res
-	 * @param result
-	 * @throws Exception
-	 */
-	public static void doLoginResult(AppContext conn,HttpServletRequest req, HttpServletResponse res, FormResult result) throws Exception {
-		if( COOKIE_TEST.isEnabled(conn) && result instanceof SerializableFormResult) {
-			SessionService sess = conn.getService(SessionService.class);
-			setSavedResult(sess,(SerializableFormResult) result);
-			res.sendRedirect(res.encodeRedirectURL(req.getContextPath()+"/LoginServlet"));
-			return;
-		}
-		if( result == null ) {
-			 return;
-		 }
-		 ServletFormResultVisitor vis = new ServletFormResultVisitor(conn, req, res);
-		 result.accept(vis);
-	}
+	
 	public static void setSavedResult(SessionService sess, SerializableFormResult result) {
 		sess.setAttribute(INITIAL_PAGE_ATTR, result);
 	}

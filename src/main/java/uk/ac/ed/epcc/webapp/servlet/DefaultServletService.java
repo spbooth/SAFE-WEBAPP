@@ -18,15 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
-import java.util.Base64;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -217,6 +209,7 @@ public class DefaultServletService implements ServletService{
 		}
 		return web_path+url;
 	}
+	private static final Pattern  FORWARD_PATT = Pattern.compile("^/[a-zA-Z0-9/_-]*(?:\\.[a-zA-Z0-9]+)?");
 	/**
 	 * Forward request to a different page.
 	 * 
@@ -233,7 +226,7 @@ public class DefaultServletService implements ServletService{
 			}
 			return;
 		}
-		if( Pattern.matches("^/[a-zA-Z/_-]*(?:\\.[a-zA-Z]+)?$",url)){
+		if( FORWARD_PATT.matcher(url).matches()){
 		   ctx.getRequestDispatcher(url).forward(req, res);
 		   return;
 		}else{
@@ -887,7 +880,10 @@ public class DefaultServletService implements ServletService{
 			if( url != null ){
 				props.put("request_url", url);
 			}
-			
+			Date req_start = (Date) req.getAttribute(ErrorFilter.REQUEST_START);
+			if( req_start != null) {
+				props.put("request_date", req_start);
+			}
 			// Get the user-agent info
 			Vector<String> headers = new Vector<>();
 			for (Enumeration enumeration = req.getHeaderNames(); enumeration

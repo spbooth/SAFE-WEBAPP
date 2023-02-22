@@ -33,11 +33,9 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 public class PrimaryOrderFilter<T> implements SQLOrderFilter<T> {
-	private final Class<T> target;
 	private final Repository res;
 	private final boolean descending;
-	public PrimaryOrderFilter(Class<T> target,Repository res,boolean descending){
-		this.target=target;
+	public PrimaryOrderFilter(Repository res,boolean descending){
 		this.res=res;
 		this.descending=descending;
 	}
@@ -49,10 +47,6 @@ public class PrimaryOrderFilter<T> implements SQLOrderFilter<T> {
 	}
 	
 	
-	@Override
-	public void accept(T o) {
-		
-	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter#accept(uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor)
 	 */
@@ -64,8 +58,34 @@ public class PrimaryOrderFilter<T> implements SQLOrderFilter<T> {
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<T> getTarget() {
-		return target;
+	public String getTag() {
+		return res.getTag();
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (descending ? 1231 : 1237);
+		result = prime * result + ((res == null) ? 0 : res.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PrimaryOrderFilter other = (PrimaryOrderFilter) obj;
+		if (descending != other.descending)
+			return false;
+		if (res == null) {
+			if (other.res != null)
+				return false;
+		} else if (!res.equals(other.res))
+			return false;
+		return true;
 	}
 
 }

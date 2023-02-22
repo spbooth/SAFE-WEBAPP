@@ -53,14 +53,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.DateFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.ClassType;
-import uk.ac.ed.epcc.webapp.model.data.CloseableIterator;
-import uk.ac.ed.epcc.webapp.model.data.Composite;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.OrphanReferenceFilter;
-import uk.ac.ed.epcc.webapp.model.data.ReferenceFilter;
-import uk.ac.ed.epcc.webapp.model.data.Removable;
+import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
@@ -104,9 +97,9 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 * @author spb
 	 * 
 	 */
-	public class DateFilter extends SQLAndFilter<T> {
+	public class DateFilter extends DataObjectSQLAndFilter<LogFactory<T,O>,T> {
 		public DateFilter(Date start, Date end) {
-			super(LogFactory.this.getTarget());
+			super(LogFactory.this);
 			if (start != null) {
 				addFilter(new TimeFilter(DATE, MatchCondition.GE, start));
 			}
@@ -455,8 +448,8 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	public class DateOrderFilter implements SQLOrderFilter<T>{
 
 		@Override
-		public Class<T> getTarget() {
-			return LogFactory.this.getTarget();
+		public String getTag() {
+			return LogFactory.this.getTag();
 		}
 
 		@Override
@@ -590,9 +583,9 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 */
 	protected SQLAndFilter<T> getItemFilter(ItemType.ItemValue v, int link) {
 		SQLAndFilter<T> fil;
-		fil = new SQLAndFilter<>(getTarget());
+		fil = getSQLAndFilter();
 		fil.addFilter(getItemFilter(v));
-		fil.addFilter(new SQLValueFilter<>(getTarget(),res, LINK_ID, link));
+		fil.addFilter(new SQLValueFilter<>(res, LINK_ID, link));
 		return fil;
 	}
 	
@@ -603,7 +596,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 */
 	public <L extends DataObject> AndFilter<T> getItemFilter(DataObjectFactory<L> fac, ItemType.ItemValue v, BaseFilter<L> link_fil) {
 		AndFilter<T> fil;
-		fil = new AndFilter<>(getTarget());
+		fil = getAndFilter();
 		fil.addFilter(getItemFilter(v));
 		fil.addFilter(getRemoteFilter(fac, LINK_ID, link_fil));
 		return fil;
@@ -623,7 +616,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	 */
 	public Set<O> getOwners(ItemType.ItemValue v, int link) throws DataException {
 		HashSet<O> owners = new HashSet<>();
-		for( T item : new FilterSet(getItemFilter(v, link))){
+		for( T item : getResult(getItemFilter(v, link))){
 			owners.add((O) item.getOwner());
 		}
 		return owners;
@@ -678,7 +671,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	}
 	
 	public CloseableIterator<T> getLog(O q) throws DataFault {
-		SQLAndFilter<T> fil = new SQLAndFilter<T>(getTarget(),   getOwnerFilter(q),  new DateOrderFilter());
+		SQLAndFilter<T> fil = getSQLAndFilter(getOwnerFilter(q),  new DateOrderFilter());
 		return new FilterIterator(fil);
 	}
 
@@ -731,10 +724,6 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		return new TransitionProvider(getContext());
 	}
 
-	@Override
-	public Class<T> getTarget() {
-		return (Class) Entry.class;
-	}
 	/**
 	 * @param v
 	 * @return

@@ -59,4 +59,8 @@ public class LengthExpression  implements SQLExpression<Integer> {
 	public Class<Integer> getTarget() {
 		return Integer.class;
 	}
+	@Override
+	public String getFilterTag() {
+		return a.getFilterTag();
+	}
 }

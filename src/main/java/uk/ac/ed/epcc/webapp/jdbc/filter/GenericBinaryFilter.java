@@ -25,50 +25,17 @@ public class GenericBinaryFilter<T> implements SQLFilter<T>, BinaryFilter<T>{
 
 	
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((target == null) ? 0 : target.hashCode());
-		result = prime * result + (value ? 1231 : 1237);
-		return result;
-	}
+	
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		GenericBinaryFilter other = (GenericBinaryFilter) obj;
-		if (target == null) {
-			if (other.target != null)
-				return false;
-		} else if (!target.equals(other.target))
-			return false;
-		if (value != other.value)
-			return false;
-		return true;
-	}
-
-
-	protected final Class<T> target;
+	
 	protected boolean value;
+
 
 	/**
 	 * 
 	 */
-	public GenericBinaryFilter(Class<T> target,boolean value) {
+	public GenericBinaryFilter(boolean value) {
 		super();
-		this.target=target;
 		this.value=value;
 	}
 
@@ -81,15 +48,32 @@ public class GenericBinaryFilter<T> implements SQLFilter<T>, BinaryFilter<T>{
 		return value;
 	}
 	
-	
-	public final Class<T> getTarget() {
-		return target;
+	public String toString() {
+		return "GenericBinaryFilter("+value+")";
 	}
 
 
-	
-	public String toString() {
-		return "GenericBinaryFilter("+value+")";
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (value ? 1231 : 1237);
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GenericBinaryFilter other = (GenericBinaryFilter) obj;
+		if (value != other.value)
+			return false;
+		return true;
 	}
 	
 

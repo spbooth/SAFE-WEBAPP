@@ -18,13 +18,14 @@ package uk.ac.ed.epcc.webapp.model.data.filter;
 
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 /** Filter to a specific row of a remote table.
+ * There are no linking fields between the two tables. It just adds in a single
+ * row or the remote table to all rows of the result set.
  * 
  * 
  * @author spb
@@ -35,9 +36,15 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
 public final class ConstJoinerFilter<T extends DataObject, BDO extends DataObject> implements SQLFilter<BDO>, JoinFilter<BDO> , LinkClause{
-	public ConstJoinerFilter(Class<BDO> target, int id, Repository remote_res) {
+	/**
+	 * 
+	 * @param target_tag  tag of target table
+	 * @param id
+	 * @param remote_res
+	 */
+	public ConstJoinerFilter(String target_tag, int id, Repository remote_res) {
 		super();
-		this.target = target;
+		this.target_tag = target_tag;
 		this.id=id;
 		this.remote_res = remote_res;
 	}
@@ -46,7 +53,7 @@ public final class ConstJoinerFilter<T extends DataObject, BDO extends DataObjec
 
 
 
-	private final Class<BDO> target;
+	private final String target_tag;
 	private final int id;
 	private final Repository remote_res;
 		
@@ -56,8 +63,9 @@ public final class ConstJoinerFilter<T extends DataObject, BDO extends DataObjec
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
-		public Class<BDO> getTarget() {
-			return  target;
+	@Override
+		public String getTag() {
+			return  target_tag;
 		}
 
 
@@ -104,21 +112,15 @@ public final class ConstJoinerFilter<T extends DataObject, BDO extends DataObjec
 		}
 
 
-
-
-
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + id;
 			result = prime * result + ((remote_res == null) ? 0 : remote_res.hashCode());
-			result = prime * result + ((target == null) ? 0 : target.hashCode());
+			result = prime * result + ((target_tag == null) ? 0 : target_tag.hashCode());
 			return result;
 		}
-
-
-
 
 
 		@Override
@@ -137,11 +139,17 @@ public final class ConstJoinerFilter<T extends DataObject, BDO extends DataObjec
 					return false;
 			} else if (!remote_res.equals(other.remote_res))
 				return false;
-			if (target == null) {
-				if (other.target != null)
+			if (target_tag == null) {
+				if (other.target_tag != null)
 					return false;
-			} else if (!target.equals(other.target))
+			} else if (!target_tag.equals(other.target_tag))
 				return false;
 			return true;
 		}
+
+
+
+
+
+		
 }

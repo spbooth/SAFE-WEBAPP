@@ -25,7 +25,7 @@ import java.util.Calendar;
 
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.codec.binary.Base32;
+
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.TestTimeService;
@@ -52,20 +52,20 @@ public class TotpCompositeTest extends WebappTestBase {
 		Key key = comp.makeNewKey();
 		
 		assertNotNull(key);
-		Base32 codec = new Base32(false);
-		System.out.println(codec.encodeAsString(key.getEncoded()));
+		
+		System.out.println(Base32.encode(key.getEncoded()));
 		
 	}
 	
 	@Test
 	public void testImport() throws NoSuchAlgorithmException, InvalidKeySpecException, UnsupportedEncodingException {
 		String external = "BOUMKOPGJBA67NXX3XNM3EZ32E";
-		Base32 codec = new Base32(false);
-		byte[] data = codec.decode(external);
+		
+		byte[] data = Base32.decode(external);
 		//assertEquals(external.length()*5, data.length*8);
 		SecretKeySpec key = new SecretKeySpec(data,"HmacSHA1");
 		
-		String string = codec.encodeAsString(key.getEncoded());
+		String string = Base32.encode(key.getEncoded());
 		System.out.println(string);
 		assertTrue(string.startsWith(external));
 	}
@@ -84,8 +84,8 @@ public class TotpCompositeTest extends WebappTestBase {
 		takeBaseline();
 		AppUser user = fac.makeFromString("fred@example.com");
 		String external = "UJ4SLJJPNPXVGIPLXDTQUGVKNI";
-		Base32 codec = new Base32(false);
-		byte[] data = codec.decode(external);
+		
+		byte[] data = Base32.decode(external);
 		//assertEquals(external.length()*5, data.length*8);
 		SecretKeySpec key = new SecretKeySpec(data,"HmacSHA1");
 		comp.setSecret(user, key);

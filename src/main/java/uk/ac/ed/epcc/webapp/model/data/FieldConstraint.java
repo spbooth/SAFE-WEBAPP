@@ -53,6 +53,9 @@ public interface FieldConstraint {
 	 */
 	public <I extends Input> Selector<I> apply(boolean support_multi_stage,String field, Selector<I> original, Form form,HashMap fixtures);
 
+	public default boolean changeOptional(String field, boolean original, Form form,HashMap fixtures) {
+		return original;
+	}
 	/** Should this form field be skipped entirely based on other form fields. 
 	 * e.g a text box that is only used for an "other" response
 	 * @param <I>

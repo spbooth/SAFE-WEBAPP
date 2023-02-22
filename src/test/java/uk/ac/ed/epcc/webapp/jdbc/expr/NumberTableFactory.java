@@ -75,22 +75,16 @@ public class NumberTableFactory extends DataObjectFactory<NumberTableFactory.Num
 		return spec;
 	}
 	public NumberFieldExpression<Double,NumberTable> getNumber1Expr(){
-		return res.getNumberExpression(getTarget(),Double.class, NUM1);
+		return res.getNumberExpression(Double.class, NUM1);
 	}
 	public NumberFieldExpression<Double,NumberTable> getNumber2Expr(){
-		return res.getNumberExpression(getTarget(),Double.class, NUM2);
+		return res.getNumberExpression(Double.class, NUM2);
 	}
 	public NumberFieldExpression<Double,NumberTable> getNumber3Expr(){
-		return res.getNumberExpression(getTarget(),Double.class, NUM3);
+		return res.getNumberExpression(Double.class, NUM3);
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getTarget()
-	 */
-	@Override
-	public Class<NumberTable> getTarget() {
-		return NumberTable.class;
-	}
+	
 	public class ReductionFinder extends AbstractFinder<Double>{
 
 		/**

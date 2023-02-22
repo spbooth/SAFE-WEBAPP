@@ -21,6 +21,7 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
+import uk.ac.ed.epcc.webapp.content.Table;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
@@ -35,9 +36,12 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.filter.FilterDelete;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
+import uk.ac.ed.epcc.webapp.model.relationship.Relationship.Link;
 import uk.ac.ed.epcc.webapp.session.AppUser;
+import uk.ac.ed.epcc.webapp.session.PermissionSummary;
 import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
 
 
@@ -59,7 +63,7 @@ import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
 
 
 public class Relationship<A extends AppUser,B extends DataObject> extends 
-         AbstractRelationship<A,B,Relationship.Link<A,B>> implements TableContentProvider{
+         AbstractRelationship<A,B,Relationship.Link<A,B>> implements TableContentProvider, PermissionSummary<A>{
     
 	// This is the default field sub-classes may use a different value
 	private static final String TARGET_ID = "TargetID";
@@ -167,7 +171,7 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 		return makeLink(user, target);
 	}
 
-	/**
+	/** Get a {@link SQLFilter} for {@link Link}s that match a role
 	 * @param role
 	 * @return
 	 * @throws UnknownRelationshipException 
@@ -178,12 +182,12 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 			for(String s : getDefaultRoles(getContext(), getConfigTag())) {
 				if( role.equals(s)) {
 					// a default role without a field
-					return new FalseFilter<Relationship.Link<A,B>>(getTarget());
+					return new FalseFilter<Relationship.Link<A,B>>();
 				}
 			}
 			throw new UnknownRelationshipException(role+"@"+getTag());
 		}
-		return new SQLValueFilter<>(getTarget(),res,role,Boolean.TRUE);
+		return new SQLValueFilter<>(res,role,Boolean.TRUE);
 	}
 		
 	
@@ -239,5 +243,43 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 	public void addSummaryContent(ContentBuilder cb) {
 		cb.addHeading(3,"Roles");
 		cb.addList(getRelationships());
+	}
+
+	@Override
+	public void addPermissionSummary(ContentBuilder cb,A user) {
+		Table t = new Table();
+		try {
+			for(Link<A, B> link : getResult(new LinkFilter(user, null, null))) {
+				B target = link.getTarget();
+				for(String role : getRelationships()) {
+					if( link.hasRole(role)) {
+						t.put(role, target, Boolean.TRUE);
+					}
+				}
+			}
+			if( t.hasData()) {
+				t.setKeyName(getRightFactory().getTag());
+				cb.addHeading(2, getTag());
+				cb.addTable(getContext(), t);
+			}
+		} catch (DataException e) {
+			getLogger().error("Error adding permission summary", e);
+		}
+		
+		
+		
+	}
+	/** remove all set permissions for the user
+	 * 
+	 * @param user
+	 * @throws DataFault 
+	 */
+	@Override
+	public void clearPermissions(A user) throws DataFault {
+		if( user == null) {
+			return;
+		}
+		FilterDelete del = new FilterDelete(res);
+		del.delete(new SQLValueFilter(res, getLeftField(), user));
 	}
 }

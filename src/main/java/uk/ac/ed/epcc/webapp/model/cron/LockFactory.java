@@ -125,11 +125,11 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 			Date now = time.getCurrentTime();
 			Repository res = record.getRepository();
 			FilterUpdate<Lock> update = new FilterUpdate<LockFactory.Lock>(res);
-			SQLAndFilter<Lock> fil = new SQLAndFilter<Lock>(Lock.class,getFilter(this),new NullFieldFilter<Lock>(Lock.class, res, LOCK_FIELD, true));
+			SQLAndFilter<Lock> fil = LockFactory.this.getSQLAndFilter(getFilter(this),new NullFieldFilter<Lock>(res, LOCK_FIELD, true));
 			try {
 				int i = update.update(fil, 
-						new FieldValuePatternArgument<Date,Lock>(res.getDateExpression(Lock.class, LOCK_FIELD), now),
-						new FieldValuePatternArgument<Date,Lock>(res.getDateExpression(Lock.class, LAST_LOCK_FIELD), now)
+						new FieldValuePatternArgument<Date,Lock>(res.getDateExpression(LOCK_FIELD), now),
+						new FieldValuePatternArgument<Date,Lock>(res.getDateExpression(LAST_LOCK_FIELD), now)
 						);
 				if( i != 1 ) {
 					// other thread got there first
@@ -164,8 +164,8 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 					commit();
 					Repository res = record.getRepository();
 					FilterUpdate<Lock> update = new FilterUpdate<LockFactory.Lock>(res);
-					SQLAndFilter<Lock> fil = new SQLAndFilter<Lock>(Lock.class,getFilter(this),new NullFieldFilter<Lock>(Lock.class, res, LOCK_FIELD, false));
-					int i = update.update(res.getDateExpression(Lock.class, LOCK_FIELD), null, fil);
+					SQLAndFilter<Lock> fil = LockFactory.this.getSQLAndFilter(getFilter(this),new NullFieldFilter<Lock>(res, LOCK_FIELD, false));
+					int i = update.update(res.getDateExpression( LOCK_FIELD), null, fil);
 					if( i != 1 ) {
 						// How did this happen
 						throw new ConsistencyError("Failed to remove lock "+getName());
@@ -230,10 +230,7 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 		return new Lock(res);
 	}
 
-	@Override
-	public Class<Lock> getTarget() {
-		return Lock.class;
-	}
+	
 	public Table getTable() {
 		Table t = new Table();
 		try {

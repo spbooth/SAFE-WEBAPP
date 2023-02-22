@@ -19,8 +19,6 @@ package uk.ac.ed.epcc.webapp.model;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -40,11 +38,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.factory.StandAloneFormUpdate;
-import uk.ac.ed.epcc.webapp.forms.inputs.InfoInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
@@ -55,18 +49,11 @@ import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.FilterResult;
+import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
-import uk.ac.ed.epcc.webapp.model.data.Retirable;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
-import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
-import uk.ac.ed.epcc.webapp.model.data.forms.RetireAction;
-import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
-import uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate;
-import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
+import uk.ac.ed.epcc.webapp.model.data.forms.*;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
 import uk.ac.ed.epcc.webapp.model.serv.ServeDataProducer;
 import uk.ac.ed.epcc.webapp.model.serv.SettableServeDataProducer;
@@ -333,9 +320,9 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		}
 	}
 	public TextFile find(String group,String name) throws DataFault{
-		SQLAndFilter<T> get = new SQLAndFilter<>(getTarget());
-		get.addFilter(new SQLValueFilter<>(getTarget(),res,GROUP,group));
-		get.addFilter(new SQLValueFilter<>(getTarget(),res,NAME,name));
+		SQLAndFilter<T> get = getSQLAndFilter();
+		get.addFilter(new SQLValueFilter<>(res,GROUP,group));
+		get.addFilter(new SQLValueFilter<>(res,NAME,name));
 		T tf;
 		try {
 			tf = find(get,true);
@@ -647,7 +634,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		return s;
 	}
 	public FilterResult<T> allbyGroup(String groupName) throws DataFault {		
-		return new FilterSet(new SQLValueFilter<>(getTarget(),res,TextFileOverlay.GROUP ,groupName.trim()));
+		return getResult(new SQLValueFilter<>(res,TextFileOverlay.GROUP ,groupName.trim()));
 		
 	}
 	/** Check we are only creating a new entry and one where no
@@ -744,12 +731,6 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		return sel;
 	}
 
-	
-
-	@Override
-	public Class<T> getTarget() {
-		return (Class) TextFile.class;
-	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getOrder()

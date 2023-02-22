@@ -42,7 +42,7 @@ public interface TypeFilterProducer<T,D> extends TypeProducer<T,D>  {
 	
 	
 	default public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac,Set<T> val) {
-		SQLOrFilter<I> or = new SQLOrFilter<I>(fac.getTarget());
+		SQLOrFilter<I> or = fac.getSQLOrFilter();
 		for( T t : val) {
 			or.addFilter(getFilter(fac, t));
 		}
@@ -50,7 +50,7 @@ public interface TypeFilterProducer<T,D> extends TypeProducer<T,D>  {
 	}
 	
 	default public <I extends DataObject> SQLFilter<I> getFilter(DataObjectFactory<I> fac,T ... val) {
-		SQLOrFilter<I> or = new SQLOrFilter<I>(fac.getTarget());
+		SQLOrFilter<I> or = fac.getSQLOrFilter();
 		for( T t : val) {
 			or.addFilter(getFilter(fac, t));
 		}
@@ -58,7 +58,7 @@ public interface TypeFilterProducer<T,D> extends TypeProducer<T,D>  {
 	}
 	
 	default public <I extends DataObject> SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,Set<T> val) {
-		SQLAndFilter<I> and = new SQLAndFilter<I>(fac.getTarget());
+		SQLAndFilter<I> and = fac.getSQLAndFilter();
 		for( T t : val) {
 			and.addFilter(getExcludeFilter(fac, t));
 		}
@@ -66,7 +66,7 @@ public interface TypeFilterProducer<T,D> extends TypeProducer<T,D>  {
 	}
 	
 	default public <I extends DataObject> SQLFilter<I> getExcludeFilter(DataObjectFactory<I> fac,T ... val) {
-		SQLAndFilter<I> and = new SQLAndFilter<I>(fac.getTarget());
+		SQLAndFilter<I> and = fac.getSQLAndFilter();
 		for( T t : val) {
 			and.addFilter(getExcludeFilter(fac, t));
 		}

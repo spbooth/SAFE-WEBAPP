@@ -111,13 +111,6 @@ implements IndexedSQLValue<H,T>, GroupingSQLValue<IndexedReference>{
 		return base.getSQLFilter(branch.getOrderFilter(descending));
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilterType()
-	 */
-	@Override
-	public Class<H> getFilterType() {
-		return base.getFilterType();
-	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue#getSQLFilter(uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter)

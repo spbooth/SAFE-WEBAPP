@@ -81,10 +81,7 @@ public class EnumProducer<E extends Enum<E>> implements TypeProducer<E,String>,E
 		set.addAll(EnumSet.allOf(clazz));
 		return set;
 	}
-	@Override
-	public Class<E> getTarget() {
-		return clazz;
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#getInput()
 	 */

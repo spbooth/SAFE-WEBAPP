@@ -22,6 +22,8 @@
 
 package uk.ac.ed.epcc.webapp.servlet;
 
+import java.util.Date;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -78,6 +80,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 @WebFilter(filterName="FaultFilter", urlPatterns = {"/*"} )
 public class ErrorFilter implements Filter {
+	public static final String REQUEST_START = "RequestStart";
 	private static final Feature SESSION_STEALING_CHECK_FEATURE = new Feature("session-stealing-check",false,"reset session if ip address changes");
 	private static final Feature CONTEXT_CONFIG_FEATURE = new Feature("context.configuration",false,"Allow additional properties files based on the application Context");
 	private static final Feature CLEANUP_THREAD_FEATURE = new Feature("appcontext.cleanup_thread",true,"Close the AppContext in a thread if CleanupServices are defined");
@@ -174,6 +177,7 @@ public class ErrorFilter implements Filter {
 		if( req.getAttribute(SERVLET_CONTEXT_ATTR) == null){
 			toplevel=true;
 			req.setAttribute(SERVLET_CONTEXT_ATTR, ctx);
+			req.setAttribute(REQUEST_START, new Date());
 			
 			// standard static security headers
 			// want to do this without creating an AppContext

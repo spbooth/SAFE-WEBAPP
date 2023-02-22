@@ -140,10 +140,7 @@ public class SectionManager extends HandlerPartManager<PageManager.Page,uk.ac.ed
 	protected Section makeBDO(Record res) throws DataFault {
 		return new Section(res);
 	}
-	@Override
-	public Class<Section> getTarget() {
-		return Section.class;
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.far.PartOwnerFactory#getChildManager()
 	 */

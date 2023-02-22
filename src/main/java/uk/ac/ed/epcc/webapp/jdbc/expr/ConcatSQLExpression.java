@@ -95,6 +95,16 @@ public class ConcatSQLExpression implements SQLExpression<String>{
 	public SQLFilter getRequiredFilter() {
 		return null;
 	}
+	@Override
+	public String getFilterTag() {
+		for(SQLExpression<String> s : values) {
+			String t = s.getFilterTag();
+			if( t!= null) {
+				return t;
+			}
+		}
+		return null;
+	}
 
 	
 }

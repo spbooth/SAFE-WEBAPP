@@ -13,19 +13,18 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.data.filter;
 
-import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 
-/**
+/** An {@link AcceptFilter} that matches another instance of the same object
  * @author Stephen Booth
  *
  */
-public class IdAcceptFilter<T> extends AbstractAcceptFilter<T> {
+public class IdAcceptFilter<T> implements AcceptFilter<T> {
 
 	/**
 	 * @param target
 	 */
-	public IdAcceptFilter(Class<T> target,T obj) {
-		super(target);
+	public IdAcceptFilter(T obj) {
 		this.obj=obj;
 	}
 	private final T obj;
@@ -33,7 +32,7 @@ public class IdAcceptFilter<T> extends AbstractAcceptFilter<T> {
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
 	 */
 	@Override
-	public boolean accept(Object o) {
+	public boolean test(Object o) {
 		return obj.equals(o);
 	}
 	@Override

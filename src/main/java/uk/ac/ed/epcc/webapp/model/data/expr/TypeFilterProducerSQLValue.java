@@ -16,8 +16,6 @@ package uk.ac.ed.epcc.webapp.model.data.expr;
 import uk.ac.ed.epcc.webapp.Targetted;
 import uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLAccessor;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 /** A type converter wrapper SQLValue.
  * 
@@ -31,8 +29,8 @@ import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 
 
 public class TypeFilterProducerSQLValue<T,D,X> extends TypeConverterSQLValue<X, T, D> implements  SQLAccessor<T,X>,  FilterProvider<X,T> , Targetted<T> {
-	public TypeFilterProducerSQLValue(Class<X> target, TypeProducer<T, D> converter, SQLAccessor<D,X> inner) {
-		super(target,converter,inner);
+	public TypeFilterProducerSQLValue(Class<T> type, TypeProducer<T, D> converter, SQLAccessor<D,X> inner) {
+		super(type,converter,inner);
 		
 	}
 	@Override

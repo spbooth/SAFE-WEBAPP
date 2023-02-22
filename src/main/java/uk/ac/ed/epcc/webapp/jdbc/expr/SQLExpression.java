@@ -40,4 +40,5 @@ public interface SQLExpression<T> extends GroupingSQLValue<T>{
 	default public boolean groupingIsomorphic() {
 		return true;
 	}
+	
 }

@@ -16,9 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import java.util.Iterator;
-
-
 /**
  * Input that selects values from a List. For consistency the parse method should
  * parse tag values. That is tags are String representations of the Input values.

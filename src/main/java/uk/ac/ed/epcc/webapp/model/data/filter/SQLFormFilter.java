@@ -36,15 +36,15 @@ import uk.ac.ed.epcc.webapp.model.data.forms.SQLMatcher;
 public class SQLFormFilter<T extends DataObject> extends SQLAndFilter<T>{
 
 	public SQLFormFilter(Form f) {
-		this((Class<T>) DataObject.class,null,f,null);
+		this(null,f,null);
 
 	}
     public SQLFormFilter(Form f, Map<String,SQLMatcher<T>> m){
-    	this((Class<T>) DataObject.class,null,f,m);
+    	this(null,f,m);
     }
     @SuppressWarnings("unchecked")
-	public SQLFormFilter(Class<T> target,Repository res,Form f, Map<String,SQLMatcher<T>> matchers){ 
-    	super(target);
+	public SQLFormFilter(Repository res,Form f, Map<String,SQLMatcher<T>> matchers){ 
+    	super(res==null ? null : res.getTag());
     	for(Iterator<String> it=f.getFieldIterator(); it.hasNext();){
 			String field = it.next();
 			SQLMatcher<T> m=null;
@@ -64,16 +64,16 @@ public class SQLFormFilter<T extends DataObject> extends SQLAndFilter<T>{
 				Object o =  f.get(field);
 				if( m == null ){
 					if( res.hasField(field)){
-						addFilter(new SQLValueFilter<>(target,res,field,o));
+						addFilter(new SQLValueFilter<>(res,field,o));
 					}else{
 						if( res.isUniqueIdName(field)){
-							addFilter(new SQLIdFilter<>(target,res, (Integer)o));
+							addFilter(new SQLIdFilter<>(res, (Integer)o));
 						}else{
 							throw new ConsistencyError("Unrecognised field "+field);
 						}
 					}
 				}else{
-					addFilter(m.getSQLFilter(target,res,field, o));
+					addFilter(m.getSQLFilter(res,field, o));
 				}
 			}
 		}

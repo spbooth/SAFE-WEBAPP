@@ -72,4 +72,6 @@ public interface GroupingSQLValue<T> extends SQLValue<T> {
 	default public boolean groupingIsomorphic() {
 		return false;
 	}
+	
+	
 }

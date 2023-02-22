@@ -78,10 +78,6 @@ extends ResponseDataManager<M, R, F> {
 		return (M) new OptionData(res);
 	}
 
-	@Override
-	public Class<M> getTarget() {
-		return (Class) OptionData.class;
-	}
 
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c,

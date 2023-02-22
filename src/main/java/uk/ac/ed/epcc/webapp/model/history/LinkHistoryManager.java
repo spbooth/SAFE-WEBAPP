@@ -75,7 +75,7 @@ public  class LinkHistoryManager<L extends Indexed, R extends Indexed, T extends
 			peer = getLinkManager().getLink(left, right);
 			if( peer == null ){
 				// no result
-				return new FalseFilter<>(getTarget());
+				return new FalseFilter<>();
 			}
 		}
 	    HistoryFilter fil = new HistoryFilter(peer,start,end);

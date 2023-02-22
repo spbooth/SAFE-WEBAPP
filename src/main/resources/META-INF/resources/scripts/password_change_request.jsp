@@ -36,12 +36,12 @@
 <%} %>
 <%@ include file="../std_header.jsf" %>
 
-<wb:FormContext/>
 <div class="block" role="main">
 <h1>Please set a password for use with the <%=website_name %></h1>
 <p><%=hb.toString() %></p>
 <p><%=policy %>
 </p>
+<%=form.getFormContext() %>
 <form method="POST">
 <%= form.getHtmlForm() %>
 </form>

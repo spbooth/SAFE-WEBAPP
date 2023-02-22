@@ -13,13 +13,12 @@ import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
  */
 public class OrPermissionClause<T extends DataObject> extends LinkedHashSet<PermissionClause<T>> implements PermissionClause<T>{
 
-	public OrPermissionClause(Class<T> target,DataObjectFactory<T> fac) {
+	public OrPermissionClause(DataObjectFactory<T> fac) {
 		super();
-		this.target = target;
 		this.fac=fac;
 	}
 
-	private final Class<T> target;
+
 	private final DataObjectFactory<T> fac;
 	public DataObjectFactory<T> getFac() {
 		return fac;
@@ -35,10 +34,7 @@ public class OrPermissionClause<T extends DataObject> extends LinkedHashSet<Perm
 		return visitor.visitOrPermissionClause(this);
 	}
 
-	@Override
-	public Class<T> getTarget() {
-		return target;
-	}
+	
 	public String toString() {
 		return "OR("+super.toString()+")";
 	}

@@ -25,7 +25,7 @@ import uk.ac.ed.epcc.webapp.Targetted;
  *  @param <T> Type of object produced.
  * @param <D> Type of underlying Object.
  */
-public interface TypeConverter<T, D> extends Targetted<T> {
+public interface TypeConverter<T, D>  {
 	/** Find the required object.
 	   * 
 	   * @param o Value of the database field

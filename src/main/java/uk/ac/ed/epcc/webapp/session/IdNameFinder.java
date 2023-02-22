@@ -3,7 +3,6 @@ package uk.ac.ed.epcc.webapp.session;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.UnsupportedException;
 /** A {@link AppUserNameFinder} where the name comes from the object ID
  * 
  * This is useful if we want to generate a unique name independly of the fields
@@ -45,7 +44,7 @@ public class IdNameFinder<AU extends AppUser,X extends IdNameFinder> extends App
 
 	@Override
 	public SQLFilter<AU> hasCanonicalNameFilter() {
-		return new GenericBinaryFilter<AU>(getFactory().getTarget(), true);
+		return new GenericBinaryFilter<AU>(true);
 	}
 
 	@Override

@@ -20,13 +20,8 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.Date;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import org.apache.commons.codec.binary.Base64;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -158,7 +153,8 @@ public class KeySigner extends AbstractContexed {
 		StringBuilder sb = new StringBuilder();
 		sb.append(type);
 		sb.append(" ");
-		sb.append(Base64.encodeBase64String(data.toByteArray()));
+		
+		sb.append(Base64.getEncoder().encodeToString(data.toByteArray()));
 		return sb.toString();
 	}
 	public Date getValid_after() {

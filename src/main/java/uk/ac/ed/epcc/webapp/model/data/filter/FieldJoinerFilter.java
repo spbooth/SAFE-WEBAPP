@@ -14,12 +14,18 @@ package uk.ac.ed.epcc.webapp.model.data.filter;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
-
-public class FieldJoinerFilter<T extends DataObject, BDO extends DataObject> extends JoinerFilter<T, BDO> {
+/** A {@link JoinerFilter} that references a remote field other than the primary key
+ * 
+ * @author Stephen Booth
+ *
+ * @param <TARGET>
+ * @param <REMOTE>
+ */
+public class FieldJoinerFilter<TARGET extends DataObject, REMOTE extends DataObject> extends JoinerFilter<TARGET,REMOTE> {
 
 	private final String remote_field;
-	public FieldJoinerFilter(Class<BDO> target, String join_field, Repository res,String remote_field, Repository remote_res) {
-		super(target, join_field, res, remote_res);
+	public FieldJoinerFilter( String join_field, Repository res,String remote_field, Repository remote_res) {
+		super( join_field, res, remote_res);
 		this.remote_field = remote_field;
 	}
 	

@@ -32,7 +32,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.codec.binary.Base32;
+
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
@@ -40,6 +40,7 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
+import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
@@ -60,12 +61,13 @@ import uk.ac.ed.epcc.webapp.forms.transition.DirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
-import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.jdbc.table.*;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
+import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.model.data.filter.FilterAdd;
 import uk.ac.ed.epcc.webapp.servlet.QRServlet;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
@@ -92,7 +94,13 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	public static final Feature REQUIRED_TWO_FACTOR= new Feature("two_factor.required",false,"Is two factor authentication required");
 	public static final Feature VERIFY_OLD_CODE=new Feature("two_factor.verify_previous_code",true,"Verify current code on key change");
 	private static final String SECRET_FIELD="AuthCodeSecret";
+	private static final String LAST_USED_FIELD="LastAuthCodeUsed";
+	private static final String FAIL_COUNT="AuthCodeFails";
 	public static final String REMOVE_KEY_ROLE="RemoveTwoFactor";
+	public static final String USED_COUNTER_ATTR="UsedCounter";
+	
+	public static final Feature NOTIFY_MFA_LOCK = new Feature("mfa.notify-lock",true,"Notify by email if maximum mfa attempts are exceeded");
+
 	/**
 	 * @param fac
 	 */
@@ -147,8 +155,8 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 			clearSecret(user);
 			return;
 		}
-		Base32 codec = new Base32(false);
-		getRecord(user).setProperty(SECRET_FIELD, codec.encodeAsString(key.getEncoded()));
+		
+		getRecord(user).setProperty(SECRET_FIELD, Base32.encode(key.getEncoded()));
 	}
 	public void setSecret(A user, String enc) {
 		if( enc == null || enc.isEmpty()) {
@@ -168,8 +176,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
     	if( enc == null || enc.isEmpty()) {
     		return null;
     	}
-    	Base32 codec = new Base32();
-    	return new SecretKeySpec(codec.decode(enc), ALG);
+    	return new SecretKeySpec(Base32.decode(enc), ALG);
     }
 	public Key getSecret(A user) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeySpecException {
 		String secret = getRecord(user).getStringProperty(SECRET_FIELD);
@@ -182,12 +189,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		if( key == null) {
 			return null;
 		}
-		Base32 codec = new Base32();
-		String encode = codec.encodeToString(key.getEncoded());
-		int pos = encode.indexOf('=');
-		if( pos > -1) {
-			encode=encode.substring(0, pos);
-		}
+		String encode = Base32.encode(key.getEncoded());
 		return encode;
 	}
 	private static final String ALG="HmacSHA1";
@@ -226,19 +228,55 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		return input;
 	}
 
+	/** Get the timestamp/counter used for the last sucessful authentication. 
+	 * 
+	 * This is a long value corresponding to a java millisecond timestamp but
+	 * rounded to the normalisation value. 
+	 * If this field exists and is populated codes equal to or prior to this value will
+	 * not be accepted (to make the codes strictly one-time).
+	 * @param user
+	 * @return
+	 */
+	public long getLastUsed(A user) {
+		if( user == null) {
+			return 0L;
+		}
+		return getRecord(user).getLongProperty(LAST_USED_FIELD,0L);
+	}
+	
+	/** Set the counter value (not the time stamp) or a successful authentication.
+	 * 
+	 * @param user
+	 * @param counter
+	 */
+	public void setLastUsedCounter(A user, long counter) {
+		if( user == null) {
+			return;
+		}
+		getRecord(user).setOptionalProperty(LAST_USED_FIELD, Long.valueOf(counter * getNorm()));
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.session.twofactor.CodeAuthComposite#verify(java.lang.Object)
 	 */
 	@Override
 	public boolean verify(A user,Integer value) {
 		try {
-			return verify(getSecret(user),value);
+			return verify(user,getSecret(user),value);
 		} catch (Exception e) {
 			getLogger().error("Error getting secret", e);
 			return false;
 		}
 	}
-	public boolean verify(Key key,Integer value) {
+	/** Validate a value against a key.
+	 * 
+	 * If the user parameter is not null the last used value is also checked.
+	 * 
+	 * @param user
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	public boolean verify(A user,Key key,Integer value) {
 		Logger logger = getLogger();
 		if( key == null) {
 			logger.debug("No key allow login");
@@ -247,7 +285,9 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		CurrentTimeService serv = getContext().getService(CurrentTimeService.class);
 		Date currentTime = serv.getCurrentTime();
 		long counter = currentTime.getTime();
-		counter = counter / getNorm();
+		long norm = getNorm();
+		counter = counter / norm;
+		long last_counter = getLastUsed(user) / norm;
 		int window = getWindow();
 		
 		for(int i=-(window-1)/2 ; i<= window/2 ; ++i) {
@@ -255,13 +295,31 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 				long code = getCode(key, counter+i);
 				logger.debug("i="+i+" code="+code+" value="+value);
 				if( value.longValue() == code) {
-					return true;
+					if( (counter+i) > last_counter ) {
+						if(user != null  ) {
+							// code is ok but check fail count
+							if( getFailCount(user) > getMaxFail() && getMaxFail() > 0) {
+								logger.error("User exceeded MFA fail count "+user.getIdentifier());
+								return false;
+							}
+							clearFailCount(user);
+							// Don't set the authenticated time here as
+							// verification may be called multiple times
+							// remember it in the AppContext
+							getContext().setAttribute(USED_COUNTER_ATTR, (counter+i));
+						}
+						return true;
+					}else {
+						logger.error("Code re-use for "+user.getIdentifier()+" "+(counter+i)+"<"+last_counter);
+						return false;
+					}
 				}
 			} catch (Exception e) {
 				logger.error("Error checking code", e);
 			}
 		}
 		logger.debug("code does not match");
+		doFail(user);
 		return false;
 	}
 	/** number of milliseconds per code value
@@ -274,16 +332,23 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	public int getWindow() {
 		return getContext().getIntegerParameter("totp.window",3);
 	}
+	public int getMaxFail() {
+		return getContext().getIntegerParameter("totp.max_fail",100);
+	}
 
 	@Override
 	public TableSpecification modifyDefaultTableSpecification(TableSpecification spec, String table) {
 		spec.setOptionalField(SECRET_FIELD, new StringFieldType(true, null, 32));
+		spec.setOptionalField(LAST_USED_FIELD, new LongFieldType(true, null));
+		spec.setOptionalField(FAIL_COUNT, new IntegerFieldType(true, 0));
 		return spec;
 	}
 
 	@Override
 	public Set<String> addSuppress(Set<String> suppress) {
 		suppress.add(SECRET_FIELD);
+		suppress.add(LAST_USED_FIELD);
+		suppress.add(FAIL_COUNT);
 		return suppress;
 	}
 
@@ -322,7 +387,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		 */
 		@Override
 		public void validate(Integer data) throws FieldException {
-			if( ! verify(key, data) ) {
+			if( ! verify(null,key, data) ) {
 				throw new ValidateException("Incorrect");
 			}
 			
@@ -390,6 +455,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 				boolean had_key = hasKey(user);
 				try {
 					setSecret(user, (String)f.get(KEY));
+					clearFailCount(user);
 					user.commit();
 				} catch (DataFault e) {
 					throw new ActionException("Error setting key", e);
@@ -608,4 +674,62 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		
 	}
 
+	@Override
+	public void completeAuth(A target) {
+		Long used = (Long) getContext().getAttribute(USED_COUNTER_ATTR);
+		if( used != null) {
+			setLastUsedCounter(target, used);
+			try {
+				target.commit();
+			} catch (DataFault e) {
+				getLogger().error("Error setting lastUsed", e);
+			}
+		}
+	}
+
+	public int getFailCount(A target) {
+		return getRecord(target).getIntProperty(FAIL_COUNT, 0);
+	}
+	private void clearFailCount(A target) {
+		if( target == null ) {
+			return;
+		}
+		getRecord(target).setOptionalProperty(FAIL_COUNT, 0);
+		try {
+			target.commit();
+		} catch (DataFault e) {
+			getLogger().error("Error resetting fail count", e);
+		}
+	}
+	private void doFail(A target) {
+		if( ! getRepository().hasField(FAIL_COUNT)  || target == null) {
+			return;
+		}
+		// increment value in database to reduce chance
+		// of brute forcing by parallel streams
+		FilterAdd<A> adder = new FilterAdd<>(getRepository());
+		try {
+			adder.update(getRepository().getNumberExpression(Integer.class, FAIL_COUNT), 1, getFactory().getFilter(target));
+			Repository.Record r = getRecord(target);
+			int new_fail = r.getIntProperty(FAIL_COUNT, 0)+1;
+			r.setProperty(FAIL_COUNT, new_fail);
+			setDirty(FAIL_COUNT, target, false);
+			int max_fail = getMaxFail();
+			if( new_fail > max_fail && new_fail < (max_fail+10)) {
+				// limit to 10 emails per person
+				// but send more than 1 in case there were parallel fails
+				if( NOTIFY_MFA_LOCK.isEnabled(getContext())) {
+					try {
+						Emailer m = Emailer.getFactory(getContext());
+						m.mfaFailsExceeded(target);
+					} catch (Exception e) {
+						getLogger().error("Failed to notify of mfa lock", e);
+					}
+				}
+			}
+		} catch (DataFault e) {
+			getLogger().error("Error updating fail count",e);
+		}
+		
+	}
 }

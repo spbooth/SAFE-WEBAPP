@@ -121,7 +121,7 @@ ListInputInterfaceTest
 	   long expect = f.getCount(null);
 	   
 	   
-	   assertEquals(f.exists(new SQLAndFilter<>(f.getTarget())), expect>0);
+	   assertEquals(f.exists(f.getSQLAndFilter()), expect>0);
 	   
 	   if( expect > 100000){
 		   System.out.println("Count to large to test");
@@ -222,7 +222,7 @@ ListInputInterfaceTest
 			   O o =  it.next();
 			   //System.out.println(o.getIdentifier());
 			   Form form = new HTMLForm(f.getContext());
-			   DataObjectFormFactory.buildForm(f.getContext(),f.res,form,f.getSupress(),f.getOptional(),f.getSelectors(),f.getTranslations(),f.getFieldHelp());
+			   DataObjectFormFactory.buildForm(f.getContext(),f.res,form,f.getSupress(),f.getOptional(),f.getSelectors(),f.getFieldConstraints(),f.getTranslations(),f.getFieldHelp());
 			   Map h = o.getMap();
 			   form.setContents(h);
 			   form.validate();
@@ -262,7 +262,7 @@ ListInputInterfaceTest
 		   O uncle = f.makeBDO();
 	   for(Iterator<O> it = f.new FilterIterator(null,0,64); it.hasNext();){
 		   O o =  it.next();
-		   assertTrue( f.getTarget().isAssignableFrom(o.getClass()));
+		 
 		   
 		   IndexedReference<O> ref = f.makeReference(o);
 		   System.out.println(ref.toString());
@@ -294,9 +294,9 @@ public Set<Integer> getBadData() throws Exception{
 	    	   fil = FilterConverter.convert(fac.getSelectFilter());
 	       }catch(NoSQLFilterException e){
 	    	   // All records
-	    	   fil = new SQLAndFilter<>(getFactory().getTarget());
+	    	   fil = getFactory().getSQLAndFilter();
 	       }
-			for(O item : fac.new FilterSet(fil,0,100)){
+			for(O item : fac.getResult(fil,0,100)){
 				good.add(item.getID());
 			}
 		return good;

@@ -1,21 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?><log>
-<h3> Build TestMail</h3>
-<div class="message">
+<log><h3> Build TestMail</h3>
+<div class='message'>
 <h4>To: $REPLY</h4>
-<h3>
-<form class="button" method="post" action="/TransitionServlet/Email:TestMail/0/825508872">
-<input type="hidden" name="TransitionCRSF" value="12345Email:TestMail0/825508872"/>
-<input type="hidden" name="Transition" value="AddRecipient"/>
-<input class="input_button" type="submit" value="Add"/>
-</form> New Recipient</h3>
-<h4>From: "S.Booth" &lt;spb@epcc.ed.ac.uk&gt;</h4>
-<h4>
-<form class="button" method="post" action="/TransitionServlet/Email:TestMail/0/825508872/Subject">
-<input type="hidden" name="TransitionCRSF" value="12345Email:TestMail0/825508872/Subject"/>
-<input type="hidden" name="Transition" value="EditSubject"/>
-<input class="input_button" type="submit" value="Edit Subject"/>
-</form> Subject: GRIDtoday Daily News</h4>
-<p class="longlines">
+<h3><form class='button' method='post' action='/TransitionServlet/Email:TestMail/0/0'><input type='hidden' name='TransitionCRSF' value='12345Email:TestMail0/0'/><input type='hidden' name='Transition' value='AddRecipient'/><input class='input_button' type='submit' value='Add'/></form> New Recipient</h3>
+<h4>From: &#34;S.Booth&#34; &lt;spb@epcc.ed.ac.uk&gt;</h4>
+<h4><form class='button' method='post' action='/TransitionServlet/Email:TestMail/0/0/Subject'><input type='hidden' name='TransitionCRSF' value='12345Email:TestMail0/0/Subject'/><input type='hidden' name='Transition' value='EditSubject'/><input class='input_button' type='submit' value='Edit Subject'/></form> Subject: GRIDtoday Daily News</h4>
+<p class='longlines'>
 <br/>
 <br/>
 <br/>
@@ -38,7 +27,7 @@ border : thin black solid ; margin: 15px 0 ; font-weight: bold; font-size:110%; 
 <br/>
 <br/>
 <br/>
-<br/>
+      <br/>
 <br/>
 <br/>
 GRIDtoday - GRID &amp; Service-Oriented IT - Daily News Alert<br/>
@@ -49,15 +38,15 @@ January 18, 2007 - 1 PM PDT<br/>
 <br/>
 ASPEED: Grid Enabling your Applications<br/>
 News from the GRIDtoday Editors<br/>
-<br/>
+ <br/>
 - Permabit Announces Dynamic Information Grid <br/>
 - Demand for SOA-Related Change Management Services Grows <br/>
 - Mule Reaches 500,000 Downloads MilestoneUnited Devices: Grid-based Virtualization &#150; Are You Ready? Find out at UD:07<br/>
 Elsewhere on the Web (e.g. Google, Yahoo, MSN etc.)<br/>
-<br/>
+ <br/>
 - Budgeting for SOA Success <br/>
 - iPhone - gPhone - Embedded Grid? <br/>
-- Enterprise IT Guy "Horrified" By Cost of Outsourcing Data Center Requirements to Colo ProvidereXludus: Turbocharge your Storage with Parallel File Serving<br/>
+- Enterprise IT Guy &#34;Horrified&#34; By Cost of Outsourcing Data Center Requirements to Colo ProvidereXludus: Turbocharge your Storage with Parallel File Serving<br/>
 <br/>
 <br/>
 <br/>
@@ -81,15 +70,6 @@ Do you prefer ASCII/Text Delivery?  Modify Your  Preferences<br/>
 <br/>
 QUESTIONS?  Send a detailed message to: Customer Service<br/>
 </p>
-<form class="button" method="post" action="/TransitionServlet/Email:TestMail/0/825508872/T">
-<input type="hidden" name="TransitionCRSF" value="12345Email:TestMail0/825508872/T"/>
-<input type="hidden" name="Transition" value="Edit"/>
-<input class="input_button" type="submit" value="Edit"/>
-</form>
-<form class="button" method="post" action="/TransitionServlet/Email:TestMail/0/825508872">
-<input type="hidden" name="TransitionCRSF" value="12345Email:TestMail0/825508872"/>
-<input type="hidden" name="Transition" value="AddAttachment"/>
-<input class="input_button" type="submit" value="Add Attachment"/>
-</form>
+<form class='button' method='post' action='/TransitionServlet/Email:TestMail/0/0/T'><input type='hidden' name='TransitionCRSF' value='12345Email:TestMail0/0/T'/><input type='hidden' name='Transition' value='Edit'/><input class='input_button' type='submit' value='Edit'/></form><form class='button' method='post' action='/TransitionServlet/Email:TestMail/0/0'><input type='hidden' name='TransitionCRSF' value='12345Email:TestMail0/0'/><input type='hidden' name='Transition' value='AddAttachment'/><input class='input_button' type='submit' value='Add Attachment'/></form>
 </div>
 </log>

@@ -41,10 +41,10 @@ public class TimestampDateFieldExpression<T extends DataObject> extends FieldExp
     private final long res;
     private final NumberFieldExpression<Long, T> num_field;
     private final DateSQLExpression date_expr;
-	protected TimestampDateFieldExpression(Class<T> target,Repository rep,String field) {
-		super(target,rep, Date.class,field);
+	protected TimestampDateFieldExpression(Repository rep,String field) {
+		super(rep, Date.class,field);
 		this.res=rep.getResolution();
-		num_field=rep.getNumberExpression(target,Long.class, field);
+		num_field=rep.getNumberExpression(Long.class, field);
 		date_expr = rep.getSQLContext().convertToDate(num_field, res);
 	}
 	@Override
@@ -75,20 +75,20 @@ public class TimestampDateFieldExpression<T extends DataObject> extends FieldExp
 		//Repository will convert this to the correct number.
 		if( match == null ){
 			// null implies equality test
-			return new SQLValueFilter<>(filter_type,repository,name,val);
+			return new SQLValueFilter<>(repository,name,val);
 		}
 		// This to avoid unecessary conversions in the filter
-		return new SQLValueFilter<>(filter_type,repository,name,match,val);
+		return new SQLValueFilter<>(repository,name,match,val);
 	}
 	@Override
 	public SQLFilter<T> getNullFilter(boolean is_null)
 			throws CannotFilterException {
-		return new NullFieldFilter<>(filter_type,repository, name,is_null);
+		return new NullFieldFilter<>(repository, name,is_null);
 	}
 	@Override
 	public SQLFilter<T> getOrderFilter(boolean descending)
 			throws CannotFilterException {
-		return new FieldOrderFilter<>(filter_type,repository, name, descending);
+		return new FieldOrderFilter<>(repository, name, descending);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.DateSQLExpression#preferSeconds()
@@ -100,6 +100,38 @@ public class TimestampDateFieldExpression<T extends DataObject> extends FieldExp
 	@Override
 	public int addField(StringBuilder sb, boolean qualify) {
 		return num_field.add(sb, qualify);
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((date_expr == null) ? 0 : date_expr.hashCode());
+		result = prime * result + ((num_field == null) ? 0 : num_field.hashCode());
+		result = prime * result + (int) (res ^ (res >>> 32));
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TimestampDateFieldExpression other = (TimestampDateFieldExpression) obj;
+		if (date_expr == null) {
+			if (other.date_expr != null)
+				return false;
+		} else if (!date_expr.equals(other.date_expr))
+			return false;
+		if (num_field == null) {
+			if (other.num_field != null)
+				return false;
+		} else if (!num_field.equals(other.num_field))
+			return false;
+		if (res != other.res)
+			return false;
+		return true;
 	}
 	
 }

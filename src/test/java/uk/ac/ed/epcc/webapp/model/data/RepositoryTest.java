@@ -699,7 +699,7 @@ public class RepositoryTest extends WebappTestBase {
 	}
 	@Test 
 	public void testNumberFieldExpression(){
-		NumberFieldExpression f = res.getNumberExpression(DataObject.class,Number.class, "Number");
+		NumberFieldExpression f = res.getNumberExpression(Number.class, "Number");
 		assertNotNull(f);
 		StringBuilder sb = new StringBuilder();
 		assertEquals(Number.class, f.getTarget());
@@ -707,28 +707,28 @@ public class RepositoryTest extends WebappTestBase {
 	}
 	@Test 
 	public void testStringFieldExpression(){
-		StringFieldExpression f = res.getStringExpression(DataObject.class,"Name");
+		StringFieldExpression f = res.getStringExpression("Name");
 		assertNotNull(f);
 		assertEquals(String.class, f.getTarget());
 		
 	}
 	@Test 
 	public void testDateFieldExpression(){
-		FieldValue f = res.getDateExpression(DataObject.class,"Date");
+		FieldValue f = res.getDateExpression("Date");
 		assertNotNull(f);
 		assertEquals(Date.class, f.getTarget());
 		
 	}
 	@Test 
 	public void testBooleanFieldExpression(){
-		FieldValue f = res.getBooleanExpression(DataObject.class,"Boolean");
+		FieldValue f = res.getBooleanExpression("Boolean");
 		assertNotNull(f);
 		assertEquals(Boolean.class, f.getTarget());
 		
 	}
 	@Test 
 	public void testReferenceValue() throws Exception{
-		IndexedFieldValue f = res.getReferenceExpression(DataObject.class,"PersonID");
+		IndexedFieldValue f = res.getReferenceExpression("PersonID");
 		assertNotNull(f);
 		assertEquals(IndexedReference.class, f.getTarget());
 		assertEquals("Person", f.getFactory().getTag());

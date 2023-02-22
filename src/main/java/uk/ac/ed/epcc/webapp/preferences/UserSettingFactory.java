@@ -58,10 +58,7 @@ public class UserSettingFactory<S extends UserSettingFactory.UserSetting> extend
 		return (S) new UserSetting(res);
 	}
 
-	@Override
-	public Class<S> getTarget() {
-		return (Class) UserSetting.class;
-	}
+
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.preferences.AbstractUserSettingFactory#getFieldType()
 	 */

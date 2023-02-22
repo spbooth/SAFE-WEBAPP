@@ -20,11 +20,7 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BadJoinException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseCombineFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
-import uk.ac.ed.epcc.webapp.jdbc.filter.JoinFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
@@ -46,26 +42,24 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
  * 
  * @author spb
  *
- * @param <T> remote table type
- * @param <BDO> target table type
+ * @param <REMOTE> remote table type
+ * @param <TARGET> target table type
  */
 
 
-public class JoinerFilter<T extends DataObject, BDO extends DataObject> implements SQLFilter<BDO>, JoinFilter<BDO>, LinkClause,Contexed {
-	private final Class<BDO> target;
+public class JoinerFilter<TARGET extends DataObject,REMOTE extends DataObject > implements SQLFilter<TARGET>, JoinFilter<TARGET>, LinkClause,Contexed {
+	
 	protected final String join_field;
 	protected final Repository res;
 	protected final Repository remote_res;
 	
 	/**
 	 * 
-	 * @param target type of filter target
 	 * @param join_field String reference field
 	 * @param res        Repository of target
 	 * @param remote_res Repository of remote
 	 */
-	public JoinerFilter(Class<BDO> target, String join_field, Repository res, Repository remote_res){
-		this.target= target;
+	public JoinerFilter(String join_field, Repository res, Repository remote_res){
 		this.join_field=join_field;
 		this.res=res;
 		this.remote_res=remote_res;
@@ -145,8 +139,8 @@ public class JoinerFilter<T extends DataObject, BDO extends DataObject> implemen
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
-		public Class<BDO> getTarget() {
-			return target;
+		public String getTag() {
+			return res.getTag();
 		}
 		public String toString() {
 			StringBuilder sb = new StringBuilder();

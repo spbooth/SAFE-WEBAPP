@@ -73,4 +73,8 @@ public class StringConvertSQLValue<T>  implements NestedSQLValue<String,T> {
 	public SQLValue<T> getNested() {
 		return a;
 	}
+	@Override
+	public String getFilterTag() {
+		return a.getFilterTag();
+	}
 }

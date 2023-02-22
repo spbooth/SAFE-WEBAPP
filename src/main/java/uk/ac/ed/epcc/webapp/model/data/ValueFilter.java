@@ -39,7 +39,7 @@ public class ValueFilter<BDO extends DataObject> extends SQLValueFilter<BDO> {
 	 */
 	public ValueFilter(DataObjectFactory<BDO> fac, String field,
 			MatchCondition cond, Object peer) {
-		super(fac.getTarget(), fac.res, field, cond, peer);
+		super( fac.res, field, cond, peer);
 		
 	}
 
@@ -52,7 +52,7 @@ public class ValueFilter<BDO extends DataObject> extends SQLValueFilter<BDO> {
 	 */
 	public ValueFilter(DataObjectFactory<BDO> fac, String field,
 			Object peer, boolean negate) {
-		super(fac.getTarget(), fac.res, field, peer, negate);
+		super(fac.res, field, peer, negate);
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class ValueFilter<BDO extends DataObject> extends SQLValueFilter<BDO> {
 	 */
 	public ValueFilter(DataObjectFactory<BDO> fac, String field,
 			Object peer) {
-		super(fac.getTarget(),fac.res,field, peer);
+		super(fac.res,field, peer);
 	}
 
 }

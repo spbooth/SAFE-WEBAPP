@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.SerializableFormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.servlet.RequiredPageServlet;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 import uk.ac.ed.epcc.webapp.session.AbstractSessionService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
@@ -91,6 +92,19 @@ public class TwoFactorHandler<A extends AppUser> {
 		return false;
 
     }
+    private void completeAuth(A user) {
+    	AppUserFactory<A> person_fac = sess.getLoginFactory();
+    	boolean is_super=false;
+		if( sess instanceof ServletSessionService) {
+			is_super = ((ServletSessionService<A>)sess).isSU();
+		}
+		if( ! is_super) {
+			for( TwoFactorComposite<A> comp : person_fac.getComposites(TwoFactorComposite.class)) {
+				comp.completeAuth(user);
+			}
+		}
+
+    }
     
     public FormResult doLogin(A user,String type,SerializableFormResult next_page) {
 		 
@@ -133,12 +147,39 @@ public class TwoFactorHandler<A extends AppUser> {
 			sess.setAuthenticationType(type);
 		}
 		securityEvent("SucessfulAuthentication");
+		
+		// consider if we need to go to the required page servlet as well
+		next_page = RequiredPageServlet.getNext(sess, next_page);
 		return next_page;
 	
 	
 	}
 
-
+    /** Log the user in asserting that two-factor login has already taken place
+     * 
+     * @param user
+     * @param type
+     * @param next_page
+     * @return
+     */
+    public FormResult assertTwoFactorLogin(A user,String type,SerializableFormResult next_page) {
+		 
+  	
+  		if( ! sess.haveCurrentUser()) {
+  			sess.setCurrentPerson(user);
+  			CurrentTimeService time = sess.getContext().getService(CurrentTimeService.class);
+  			if( time != null) {
+  				sess.setAuthenticationTime(time.getCurrentTime());
+  			}
+  			sess.setAuthenticationType(type);
+  			sess.setAttribute(AUTH_USES_2FA_ATTR, Boolean.TRUE);
+  		}
+  		securityEvent("SucessfulAuthentication - asserted");
+  		next_page = RequiredPageServlet.getNext(sess, next_page);
+  		return next_page;
+  	
+  	
+  	}
 	public FormResult completeTwoFactor(boolean success,A expected) {
 		try {
 			Logger logger = getLogger();
@@ -170,6 +211,7 @@ public class TwoFactorHandler<A extends AppUser> {
 						sess.setAuthenticationType(AUTH_TYPE_ATTR);
 					}
 					sess.setAttribute(AUTH_USES_2FA_ATTR, Boolean.TRUE);
+					completeAuth(user);
 					securityEvent("Sucessful2FA");
 				}else {
 					A user = sess.getLoginFactory().find(requested_id);
@@ -177,7 +219,9 @@ public class TwoFactorHandler<A extends AppUser> {
 					attr.put("user",user.getIdentifier());
 					securityEvent("Failed2FA", attr);
 				}
-				FormResult result = (FormResult) sess.getAttribute(AUTH_RESULT_ATTR);
+				SerializableFormResult result = (SerializableFormResult) sess.getAttribute(AUTH_RESULT_ATTR);
+				// consider if we need to go to the required page servlet as well
+				result = RequiredPageServlet.getNext(sess, result);
 				return result;
 			}
 		}finally {
@@ -206,6 +250,9 @@ public class TwoFactorHandler<A extends AppUser> {
 	 * @return
 	 */
 	public static boolean usedTwoFactor(SessionService<?> sess) {
+		if( sess == null) {
+			return false;
+		}
 		Boolean b = (Boolean) sess.getAttribute(AUTH_USES_2FA_ATTR);
 		if( b != null && b.booleanValue()) {
 			return true;

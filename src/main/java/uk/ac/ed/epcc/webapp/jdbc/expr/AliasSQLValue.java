@@ -103,4 +103,8 @@ public final class AliasSQLValue<T> implements GroupingSQLValue<T> {
 		// actually should always be true
 		return exp.groupingIsomorphic();
 	}
+	@Override
+	public String getFilterTag() {
+		return exp.getFilterTag();
+	}
 }

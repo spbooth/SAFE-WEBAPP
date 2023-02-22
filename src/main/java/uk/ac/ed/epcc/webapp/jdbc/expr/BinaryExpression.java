@@ -269,7 +269,7 @@ public final class BinaryExpression implements SQLExpression<Number> {
 			if( b_fil == null ){
 				return a_fil;
 			}
-			SQLAndFilter fil = new SQLAndFilter(a_fil.getTarget());
+			SQLAndFilter fil = new SQLAndFilter(a_fil.getTag());
 			fil.addFilter(a_fil);
 			fil.addFilter(b_fil);
 			return fil;
@@ -321,5 +321,13 @@ public final class BinaryExpression implements SQLExpression<Number> {
 
 	public Operator getOp() {
 		return op;
+	}
+	@Override
+	public String getFilterTag() {
+		String t = a.getFilterTag();
+		if( t != null) {
+			return t;
+		}
+		return b.getFilterTag();
 	}
 }

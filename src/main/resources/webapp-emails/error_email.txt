@@ -10,6 +10,7 @@ Exception:     %%exception_message%%
 %%end{additional_info_region}%%
 
 Date:          %%date%%
+Request start: %%request_date%%
 Server:        %%server_url=<null>%%
 Hostname:	   %%host.name=<Unknown>%%
 DatabaseHost:  %%database.host=<Unknown>%%

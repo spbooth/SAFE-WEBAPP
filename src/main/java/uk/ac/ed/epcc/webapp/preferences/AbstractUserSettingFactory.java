@@ -104,9 +104,9 @@ public abstract class AbstractUserSettingFactory<D,T, S extends AbstractUserSett
 		if( serv == null || ! serv.haveCurrentUser() || ! PER_USER_SETTINGS_FEATURE.isEnabled(getContext())){
 			return null;
 		}
-		SQLAndFilter<S> fil = new SQLAndFilter<>(getTarget());
-		fil.addFilter(new SQLValueFilter<>(getTarget(),res, SETTING_FIELD, pref.getName()));
-		fil.addFilter(new SQLValueFilter<>(getTarget(),res, PERSON_FIELD, serv.getCurrentPerson().getID()));
+		SQLAndFilter<S> fil = getSQLAndFilter(
+				new SQLValueFilter<>(res, SETTING_FIELD, pref.getName()),
+				new SQLValueFilter<>(res, PERSON_FIELD, serv.getCurrentPerson().getID()));
 		try {
 			S result = find(fil,true);
 			if( result == null ){
@@ -130,10 +130,6 @@ public abstract class AbstractUserSettingFactory<D,T, S extends AbstractUserSett
 	}
 	
 
-	@Override
-	public Class<S> getTarget() {
-		return (Class) UserSetting.class;
-	}
 
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c,

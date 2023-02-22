@@ -36,14 +36,14 @@ public class ConvertToAcceptFilter<T> implements AcceptFilter<T> {
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<T> getTarget() {
-		return inner.getTarget();
+	public String getTag() {
+		return inner.getTag();
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
 	 */
 	@Override
-	public boolean accept(T o) {
+	public boolean test(T o) {
 		return matcher.matches(inner, o);
 	}
 	@Override

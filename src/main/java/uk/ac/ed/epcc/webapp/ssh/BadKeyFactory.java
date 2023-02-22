@@ -21,10 +21,7 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.*;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
@@ -33,13 +30,8 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLOrFilter;
-import uk.ac.ed.epcc.webapp.jdbc.table.AdminOperationKey;
-import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.jdbc.table.*;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexField;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableTransitionContributor;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableTransitionKey;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Removable;
@@ -48,7 +40,6 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
-import uk.ac.ed.epcc.webapp.session.SessionService;
 
 
 /** Simple class to implement a table of forbidden ssh keys
@@ -58,9 +49,10 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> implements FieldValidator<String>, TableTransitionContributor{
-	private final AuthorizedKeyValidator val = new AuthorizedKeyValidator();
+	private final AuthorizedKeyValidator val; 
 	public BadKeyFactory(AppContext conn) {
 		setContext(conn, "BadKeys");
+		val = new AuthorizedKeyValidator(conn);
 	}
 	@Override
 	protected Map<String, Selector> getSelectors() {
@@ -77,10 +69,6 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 	private static final String PUBLIC_KEY = "PublicKey";
 	private static final String FINGERPRINT = "FingerPrint";
 
-	@Override
-	public Class<BadKey> getTarget() {
-		return BadKey.class;
-	}
 
 	@Override
 	protected BadKey makeBDO(Record res) throws DataFault {
@@ -116,7 +104,7 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 		}
 		
 		public void setKey(String key) throws ParseException, NoSuchAlgorithmException {
-			AuthorizedKeyValidator val = new AuthorizedKeyValidator();
+			AuthorizedKeyValidator val = new AuthorizedKeyValidator(getContext());
 			key = val.normalise(key);
 			record.setProperty(PUBLIC_KEY, key);
 			record.setOptionalProperty(FINGERPRINT, val.fingerprint2(key));
@@ -159,16 +147,16 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 		return ! exists(getKeyFilter(key));
 	}
 	public SQLFilter<BadKey> getKeyFilter(String key) {
-		SQLAndFilter<BadKey> fil = new SQLAndFilter<BadKey>(getTarget());
+		SQLAndFilter<BadKey> fil = getSQLAndFilter();
 		if( res.hasField(PUBLIC_KEY)) {
-			fil.addFilter(new SQLValueFilter<BadKey>(getTarget(), res, PUBLIC_KEY, key));
+			fil.addFilter(new SQLValueFilter<BadKey>(res, PUBLIC_KEY, key));
 		}
 		if( res.hasField(FINGERPRINT)) {
 			try {
 				fil.addFilter(
-						new SQLOrFilter<BadKey>(getTarget(),
-								new SQLValueFilter<BadKey>(getTarget(), res, FINGERPRINT, val.fingerprint2(key)),	
-								new NullFieldFilter<BadKey>(getTarget(), res, FINGERPRINT, true)
+						getSQLOrFilter(
+								new SQLValueFilter<BadKey>( res, FINGERPRINT, val.fingerprint2(key)),	
+								new NullFieldFilter<BadKey>( res, FINGERPRINT, true)
 								));
 			} catch (Exception e) {
 				getLogger().error("Error filter on fingerprint", e);

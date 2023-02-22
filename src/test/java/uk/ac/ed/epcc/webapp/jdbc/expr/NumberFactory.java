@@ -50,15 +50,12 @@ public class NumberFactory extends DataObjectFactory<NumberFactory.NumberObject>
 		return new NumberObject(res);
 	}
 	
-	public Class<NumberObject>getTarget(){
-		return NumberObject.class;
-	}
 	
 	public SQLExpression<? extends Number> getExpr(){
-		return res.getNumberExpression(NumberObject.class, Number.class, "Number");
+		return res.getNumberExpression(Number.class, "Number");
 	}
 	public SQLExpression<? extends Number> getExpr2(){
-		return res.getNumberExpression(NumberObject.class, Number.class, "Number2");
+		return res.getNumberExpression(Number.class, "Number2");
 	}
 
 	@Override

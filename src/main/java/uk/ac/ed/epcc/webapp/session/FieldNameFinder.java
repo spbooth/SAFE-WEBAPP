@@ -68,6 +68,11 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	public String getCanonicalName(AU object) {
 		return getRecord(object).getStringProperty(getField());
 	}
+	
+	public boolean hasCanonicalName(AU object) {
+		String name = getCanonicalName(object);
+		return name != null && ! name.isEmpty();
+	}
 	/** If there are varient forms of the names this normalises the name to the form stored in the database
 	 * 
 	 * @param name
@@ -91,13 +96,13 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	@Override
 	public SQLFilter<AU> getStringFinderFilter(String name) {
 		if( ! active()) {
-			return new FalseFilter<AU>(getFactory().getTarget());
+			return new FalseFilter<AU>();
 		}
-		return new SQLValueFilter<>(getFactory().getTarget(), getRepository(), getField(), normalizeName(name));
+		return new SQLValueFilter<>(getRepository(), getField(), normalizeName(name));
 	}
 	@Override
 	public SQLFilter<AU> hasCanonicalNameFilter(){
-		return new NullFieldFilter<AU>(getFactory().getTarget(), getRepository(), getField(), false);
+		return new NullFieldFilter<AU>( getRepository(), getField(), false);
 	}
 	
 
@@ -208,9 +213,9 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 		if( name.equals(getNamedFilterName())) {
 			AppUserFactory<AU> fac = (AppUserFactory<AU>) getFactory();
 			if(active()) {
-				return new NullFieldFilter<AU>(fac.getTarget(),getRepository(),getField(),false);
+				return new NullFieldFilter<AU>(getRepository(),getField(),false);
 			}else {
-				return new FalseFilter<AU>(fac.getTarget());
+				return new FalseFilter<AU>();
 			}
 		}
 		return null;

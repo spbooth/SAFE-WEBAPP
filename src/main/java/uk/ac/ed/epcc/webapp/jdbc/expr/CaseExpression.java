@@ -224,5 +224,25 @@ public class CaseExpression<X,R> implements SQLExpression<R> {
 			return false;
 		return true;
 	}
+	@Override
+	public String getFilterTag() {
+		if( default_expr != null) {
+			String t = default_expr.getFilterTag();
+			if( t != null) {
+				return t;
+			}
+		}
+		for(Clause c : options) {
+			String t = c.value.getFilterTag();
+			if( t != null) {
+				return t;
+			}
+			t = c.filter.getTag();
+			if( t != null) {
+				return t;
+			}
+		}
+		return null;
+	}
 
 }

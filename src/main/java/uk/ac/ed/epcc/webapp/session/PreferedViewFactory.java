@@ -70,13 +70,7 @@ public class PreferedViewFactory extends ClassificationFactory<PreferedView> {
 		return new PreferedView(res, this);
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.ClassificationFactory#getTarget()
-	 */
-	@Override
-	public Class<PreferedView> getTarget() {
-		return PreferedView.class;
-	}
+
 	
 	@Override
 	public TableSpecification getDefaultTableSpecification(AppContext c,String homeTable){

@@ -33,9 +33,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.CurrentTimeService;
-import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.*;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.Span;
 import uk.ac.ed.epcc.webapp.content.Table;
@@ -67,14 +65,7 @@ import uk.ac.ed.epcc.webapp.model.AnonymisingFactory;
 import uk.ac.ed.epcc.webapp.model.IndexTableContributor;
 import uk.ac.ed.epcc.webapp.model.NameFinder;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
-import uk.ac.ed.epcc.webapp.model.data.Composite;
-import uk.ac.ed.epcc.webapp.model.data.CreateAction;
-import uk.ac.ed.epcc.webapp.model.data.DataCache;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.NamedFilterProvider;
-import uk.ac.ed.epcc.webapp.model.data.PatternArg;
-import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -120,7 +111,8 @@ RegisterTrigger<AU>,
 SummaryContributer<AU>,
 AccessRoleProvider<AU, AU>,
 AnonymisingFactory,
-NamedFilterProvider<AU>
+NamedFilterProvider<AU>,
+Targetted<AU>
 {
 	/** config property for a list of stand-alone RequiredPageProviders
 	 * ie those that are not the AppUserFactory or its composites.
@@ -221,8 +213,9 @@ NamedFilterProvider<AU>
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 		 */
-		public Class<AU> getTarget() {
-			return AppUserFactory.this.getTarget();
+		@Override
+		public String getTag() {
+			return AppUserFactory.this.getTag();
 		}
 		public String toString() {
 			return "RoleFilter("+String.join(",",roles)+")";
@@ -317,10 +310,8 @@ NamedFilterProvider<AU>
 	public Set<RequiredPage<AU>> getRequiredPages(){
     	Set<RequiredPage<AU>> requiredPages= new LinkedHashSet<>();
     	
-    	for(Composite<AU, ?> c : getComposites()){
-    		if( c instanceof RequiredPageProvider){
-    			requiredPages.addAll(((RequiredPageProvider<AU>)c).getRequiredPages());
-    		}
+    	for(RequiredPageProvider<AU> c : getComposites(RequiredPageProvider.class)){
+    			requiredPages.addAll(c.getRequiredPages());
     	}
     	// want email verified before details
     	// for security don't want ssh key tickets if email not verified
@@ -338,7 +329,7 @@ NamedFilterProvider<AU>
      * @return {@link SQLFilter}
      */
     public SQLFilter<AU> getCanLoginFilter(){
-    	return new GenericBinaryFilter<AU>(getTarget(), true);
+    	return new GenericBinaryFilter<AU>( true);
     }
     public class UpdatePersonRequiredPage implements RequiredPage<AU>{
 
@@ -433,11 +424,6 @@ NamedFilterProvider<AU>
 		return s;
 	}
 	
-	@Override
-	public Class<AU> getTarget(){
-		return (Class) AppUser.class;
-	}
-
 
 	/** do the persons details need updating.
 	 * This is only used by  {@link UpdatePersonRequiredPage} and the jsp pages that
@@ -514,9 +500,9 @@ NamedFilterProvider<AU>
 			Calendar thresh = Calendar.getInstance();
 			thresh.setTime(getContext().getService(CurrentTimeService.class).getCurrentTime());
 			thresh.add(Calendar.DAY_OF_YEAR, -1 * warnRefreshDays());
-			return new SQLValueFilter<AU>(getTarget(), res,AppUser.UPDATED_TIME ,MatchCondition.LT , thresh.getTime());
+			return new SQLValueFilter<AU>( res,AppUser.UPDATED_TIME ,MatchCondition.LT , thresh.getTime());
 		}
-		return new FalseFilter<AU>(getTarget());
+		return new FalseFilter<AU>();
 	}
 	
 	/** a filter for people that we might ever send emails to.
@@ -524,9 +510,9 @@ NamedFilterProvider<AU>
 	 * @return
 	 */
 	public BaseFilter<AU> getEmailFilter(){
-		AndFilter<AU> fil = new AndFilter<AU>(getTarget());
+		AndFilter<AU> fil = getAndFilter();
 		if( res.hasField(ALLOW_EMAIL_FIELD)) {
-			fil.addFilter(new SQLValueFilter<AU>(getTarget(), res, ALLOW_EMAIL_FIELD, Boolean.TRUE));
+			fil.addFilter(new SQLValueFilter<AU>( res, ALLOW_EMAIL_FIELD, Boolean.TRUE));
 		}
 		for( AllowedEmailContributor<AU> c : getComposites(AllowedEmailContributor.class)) {
 			fil.addFilter(c.allowedEmailFilter());
@@ -746,7 +732,7 @@ NamedFilterProvider<AU>
 		return getStringFinderFilter(name, false);
 	}
 	public   SQLFilter<AU> getStringFinderFilter(String name,boolean require_user_supplied){
-		SQLOrFilter<AU> fil = new SQLOrFilter<>(getTarget());
+		SQLOrFilter<AU> fil = getSQLOrFilter();
 		for(  AppUserNameFinder<AU,?> finder : getRealms()){
 			if( finder.userVisible() || ! require_user_supplied){
 				fil.addFilter(finder.getStringFinderFilter( name));
@@ -758,7 +744,7 @@ NamedFilterProvider<AU>
 	
 	@Override
 	public   SQLFilter<AU> hasCanonicalNameFilter(){
-		SQLOrFilter<AU> fil = new SQLOrFilter<>(getTarget());
+		SQLOrFilter<AU> fil = getSQLOrFilter();
 		for(  AppUserNameFinder<AU,?> finder : getRealms()){
 			if( finder.userVisible() ){
 				fil.addFilter(finder.hasCanonicalNameFilter());
@@ -1117,8 +1103,8 @@ NamedFilterProvider<AU>
 	@Override
 	public BaseFilter<AU> hasRelationFilter(String role, AU user) {
 		if( role.equals(MY_SELF_RELATIONSHIP)) {
-			return new DualFilter<AU>(new SQLIdFilter<>(getTarget(), res, user.getID()),
-					new IdAcceptFilter(getTarget(),user));
+			return new DualFilter<AU>(new SQLIdFilter<>(res, user.getID()),
+					new IdAcceptFilter(user));
 		}
 		return null;
 	}
@@ -1126,8 +1112,8 @@ NamedFilterProvider<AU>
 	public BaseFilter<AU> personInRelationFilter(SessionService<AU> sess, String role,
 			AU target) {
 		if( role.equals(MY_SELF_RELATIONSHIP)) {
-			return new DualFilter<AU>(new SQLIdFilter<>(getTarget(), res, target.getID()),
-					new IdAcceptFilter(getTarget(),target));
+			return new DualFilter<AU>(new SQLIdFilter<>( res, target.getID()),
+					new IdAcceptFilter(target));
 		}
 		return null;
 	}
@@ -1151,9 +1137,8 @@ NamedFilterProvider<AU>
 	}
 	@Override
 	public BaseFilter<AU> getSelectFilter() {
-		AndFilter<AU> result = new AndFilter<>(getTarget(),super.getSelectFilter());
-		result.addFilter(getContext().getService(SessionService.class).getRelationshipRoleFilter(this, AppUserTransitionProvider.VIEW_PERSON_RELATIONSHIP,new GenericBinaryFilter<>(getTarget(), true)));
-		return result;
+		return getAndFilter(super.getSelectFilter(),
+				getContext().getService(SessionService.class).getRelationshipRoleFilter(this, AppUserTransitionProvider.VIEW_PERSON_RELATIONSHIP,new GenericBinaryFilter<>(true)));
 	}
 	@Override
 	public FormUpdate<AU> getFormUpdate(AppContext c) {
@@ -1174,7 +1159,7 @@ NamedFilterProvider<AU>
 		Logger log = getContext().getService(LoggerService.class).getLogger(getClass());
 		SessionService sess =  getContext().getService(SessionService.class);
 		AppUser currentPerson = sess == null ? null : sess.getCurrentPerson();
-		try(FilterSet set = new FilterSet(new PrimaryOrderFilter<>(getTarget(),res, false))){
+		try(FilterResult<AU> set = getResult(new PrimaryOrderFilter<>(res, false))){
 			for(AU p : set){
                try {
 
@@ -1201,7 +1186,7 @@ NamedFilterProvider<AU>
 
 	}
 	private ActionList<AU> getEraseListeners(){
-		return new ActionList<>(this, "EraseActions");
+		return new ActionList<>(getTarget(),this, "EraseActions");
 	}
 	
 	public boolean canErase(AU person) {
@@ -1299,6 +1284,10 @@ NamedFilterProvider<AU>
 		names.add(ALLOW_EMAIL_FILTER);
 		names.add(CAN_LOGIN_FILTER);
 		
+	}
+	@Override
+	public Class<AU> getTarget() {
+		return (Class<AU>) AppUser.class;
 	}
 	
 	

@@ -111,12 +111,5 @@ public class EnumSetting<E extends Enum> extends AbstractSetting<E> {
 		return value.name();
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
-	 */
-	@Override
-	public Class<E> getTarget() {
-		return clazz;
-	}
-
+	
 }

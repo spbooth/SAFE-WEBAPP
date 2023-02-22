@@ -190,12 +190,12 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 	 */
 	@Override
 	public SQLFilter<AU> getStringFinderFilter(String name) {
-		return new SQLValueFilter<>(getFactory().getTarget(), getRepository(), EMAIL, name);
+		return new SQLValueFilter<>(getRepository(), EMAIL, name);
 	}
 
 	@Override
 	public SQLFilter<AU> hasCanonicalNameFilter(){
-		return new NullFieldFilter<AU>(getFactory().getTarget(), getRepository(), EMAIL, false);
+		return new NullFieldFilter<AU>( getRepository(), EMAIL, false);
 	}
 	public static FieldValidator<String> getEmailValidator(AppContext conn) {
 		return conn.makeObjectWithDefault(FieldValidator.class, ServiceAllowedEmailFieldValidator.class,
@@ -550,9 +550,8 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 
 		@Override
 		public BaseFilter<AU> triggerFilter(SessionService<AU> sess) {
-			AndFilter<AU> result = new AndFilter<AU>(getFactory().getTarget()); 
-			result.addFilter(applyActionFilter());
-			OrFilter<AU> fil = new OrFilter<AU>(getFactory().getTarget(), getFactory());
+			AndFilter<AU> result = getFactory().getAndFilter(applyActionFilter());
+			OrFilter<AU> fil = getFactory().getOrFilter();
 			for(RequiredPageAction<AU> a : action) {
 				fil.addFilter(a.triggerFilter(sess));
 			}
@@ -662,10 +661,10 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 	}
 
 	public SQLFilter<AU> getIsVerifiedFilter() {
-		SQLAndFilter<AU> fil = new SQLAndFilter<>(getFactory().getTarget());
+		SQLAndFilter<AU> fil = getFactory().getSQLAndFilter();
 		if (useEmailVerificationDate()) {
 			fil.addFilter(
-					new NullFieldFilter<AU>(getFactory().getTarget(), getRepository(), EMAIL_VERIFIED_FIELD, false));
+					new NullFieldFilter<AU>(getRepository(), EMAIL_VERIFIED_FIELD, false));
 		}
 		if (useEmailStatus()) {
 			fil.addFilter(e_status.getFilter(getFactory(), VALID));
@@ -680,7 +679,7 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 	 */
 	public BaseFilter<AU> applyActionFilter(){
 		AppUserFactory<AU> fac = (AppUserFactory<AU>) getFactory();
-		OrFilter<AU> fil = new OrFilter<AU>(fac.getTarget(), fac);
+		OrFilter<AU> fil = fac.getOrFilter();
 		if( useEmailStatus()) {
 			// always apply if email invalid
 			fil.addFilter(e_status.getFilter(fac, INVALID));
@@ -737,10 +736,10 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 			point.add(Calendar.DAY_OF_YEAR, - days);
 
 			Date target_time = point.getTime();
-			return new SQLValueFilter<AU>(getFactory().getTarget(), getRepository(), EMAIL_VERIFIED_FIELD,
+			return new SQLValueFilter<AU>( getRepository(), EMAIL_VERIFIED_FIELD,
 					MatchCondition.LT, target_time);
 		}
-		return new FalseFilter(getFactory().getTarget());
+		return new FalseFilter();
 	}
 
 	public boolean warnVerify(AU user) {
@@ -806,10 +805,10 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 	}
 
 	public ActionList<AU> getVerifyActions() {
-		return new ActionList<AU>(getFactory(), "email-verified");
+		return new ActionList<AU>(getAppUserFactory().getTarget(),getAppUserFactory(), "email-verified");
 	}
 	public ActionList<AU> getInvalidateActions() {
-		return new ActionList<AU>(getFactory(), "email-invalidated");
+		return new ActionList<AU>(getAppUserFactory().getTarget(),getAppUserFactory(), "email-invalidated");
 	}
 
 	

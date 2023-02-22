@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.editors.mail;
 import java.util.LinkedList;
 import java.util.List;
 
+import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.session.SessionService;
@@ -60,7 +61,12 @@ public class MailTarget {
 	public MailTarget(MessageHandler handler,int hash, List<String> path) {
 		super();
 		this.handler = handler;
-		this.hash = hash;
+		AppContext conn = AppContext.getContext();
+		if( conn != null && IGNORE_HASH_FEATURE.isEnabled(conn)) {
+			this.hash = 0;
+		}else {
+			this.hash = hash;
+		}
 		if( path == null){
 			this.path=new LinkedList<>();
 		}else{
@@ -78,7 +84,8 @@ public class MailTarget {
 		return path;
 	}
 	public int getMessageHash(){
-		if( handler instanceof Contexed && IGNORE_HASH_FEATURE.isEnabled(((Contexed)handler).getContext())){
+		AppContext conn = AppContext.getContext();
+		if( conn != null && IGNORE_HASH_FEATURE.isEnabled(conn)){
 			return 0;
 		}
 		return hash;
@@ -108,7 +115,8 @@ public class MailTarget {
 		return false;
 	}
 	public boolean hashMatches() throws Exception{
-		if( handler instanceof Contexed && IGNORE_HASH_FEATURE.isEnabled(((Contexed)handler).getContext())){
+		AppContext conn = AppContext.getContext();
+		if(conn != null &&  IGNORE_HASH_FEATURE.isEnabled(conn)){
 			return true;
 		}
 		return hash == handler.getMessageProvider().getMessageHash();

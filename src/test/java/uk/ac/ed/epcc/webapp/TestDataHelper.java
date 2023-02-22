@@ -133,7 +133,7 @@ public class TestDataHelper {
 		
         Diff diff = new Diff(origionalArray, newArray); 
       
-        for (Object object :diff.diff()) {
+        for (Object object :diff.execute()) {
         	Difference difference = (Difference)object;
         
         	int as = difference.getAddedStart();

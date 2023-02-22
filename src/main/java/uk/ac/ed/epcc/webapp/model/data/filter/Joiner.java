@@ -34,12 +34,12 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
 public class Joiner<T extends DataObject, BDO extends DataObject> extends SQLAndFilter<BDO>  {
 	/** Bypasses the normal type checks to insert the remote filter into the selection
 	 * This constructor is private to ensure the static factory methods are called to ensure
-	 * that one of the 
+	 * that one of the static methods defined in this class is used
 	 * 
-	 * @param target
+	 * @param target  tag to use for type checking
 	 */
-	private Joiner(Class<BDO> target) {
-		super(target);
+	private Joiner(String tag) {
+		super(tag);
 		
 	}
 
@@ -49,32 +49,42 @@ public class Joiner<T extends DataObject, BDO extends DataObject> extends SQLAnd
 			// note we are  using a non-generic type here to force a foreign type of filter to be
 			// included in the clause.
 			SQLFilter f = fil;
-			add(f,false); // remote end filter
+			add(f,false); // remote end filter added without type checking
 		}
 	}
-		
-	public static <T extends DataObject, BDO extends DataObject> Joiner<T,BDO> getRemoteFilter(Class<BDO> target,SQLFilter<T> fil, String join_field, Repository res, Repository remote_res){
-		Joiner<T,BDO> result = new Joiner<T, BDO>(target);
-		result.addFilter(new JoinerFilter(target,join_field, res, remote_res));
+	/** Add in a selection based on a filter in a referenced field
+	 * 	
+	 * @param <T>  Type of remote table
+	 * @param <BDO> Type of target table
+	 * @param fil   {@link SQLFilter}<T> filter on remote table
+	 * @param join_field  Joining field (on the target)
+	 * @param res   {@link Repository} of the target
+	 * @param remote_res {@link Repository} of the remote
+	 * @return
+	 */
+	public static <T extends DataObject, BDO extends DataObject> Joiner<T,BDO> getRemoteFilter(SQLFilter<T> fil, String join_field, Repository res, Repository remote_res){
+		Joiner<T,BDO> result = new Joiner<T, BDO>(res.getTag());
+		result.addFilter(new JoinerFilter<BDO,T>(join_field, res, remote_res));
 		result.addRemoteFilter(fil);
 		return result;
 	}
-		/**
+		/** Add a selection based on a filter in a remote table
+		 * that references this one.
 		 * 
-		 * @param target type of target
+		 * 
 		 * @param fil        Filter on remote table
-		 * @param join_field String reference field
+		 * @param join_field String reference field (on remote table)
 		 * @param res        Repository of target
 		 * @param remote_res Repository of remote
 		
 		 * 
 		 */
-	public static <T extends DataObject, BDO extends DataObject> SQLFilter<BDO> getDestFilter(Class<BDO> target,SQLFilter<T> fil, String join_field, Repository res, Repository remote_res){
-		Joiner<T, BDO> result = new Joiner(target);
+	public static <T extends DataObject, BDO extends DataObject> SQLFilter<BDO> getDestFilter(SQLFilter<T> fil, String join_field, Repository res, Repository remote_res){
+		Joiner<T, BDO> result = new Joiner(res.getTag());
 		if( ! remote_res.getInfo(join_field).isUnique()){
 			// use an EXISTS clause to select so as not to expand 
 			// result set.
-			result.addFilter( new BackJoinFilter<>(target,join_field, res, remote_res, fil));
+			result.addFilter( new BackJoinFilter<T,BDO>(join_field, res, remote_res, fil));
 		}else{
 
 			// unique references/filters can also use a simple join. A unique reference
@@ -84,7 +94,7 @@ public class Joiner<T extends DataObject, BDO extends DataObject> extends SQLAnd
 			// forward reference.
 			
 			
-			result.addFilter(new JoinerFilter(target,join_field, remote_res, res));
+			result.addFilter(new JoinerFilter<BDO,T>(join_field, remote_res, res));
 			result.addRemoteFilter(fil);
 
 		}
@@ -94,15 +104,15 @@ public class Joiner<T extends DataObject, BDO extends DataObject> extends SQLAnd
 		* @param <T> remote table type
 		* @param <BDO> target table type
 		 * 
-		 * @param target
+		 * @param target_tag
 		 * @param fil
 		 * @param remote_res
 		 * @param ref
 		 * @return 
 		 */
-		public static <T extends DataObject, BDO extends DataObject> Joiner<T,BDO> joinFixedRef(Class<BDO> target, SQLFilter<? super T> fil, Repository remote_res,int ref){
-			Joiner<T,BDO> res = new Joiner<T, BDO>(target);
-			res.addFilter(new ConstJoinerFilter<T,BDO>(target, ref, remote_res));
+		public static <T extends DataObject, BDO extends DataObject> Joiner<T,BDO> joinFixedRef(String target_tag, SQLFilter<? super T> fil, Repository remote_res,int ref){
+			Joiner<T,BDO> res = new Joiner<T, BDO>(target_tag);
+			res.addFilter(new ConstJoinerFilter<T,BDO>(target_tag, ref, remote_res));
 			res.addRemoteFilter(fil);
 			return res;
 		}

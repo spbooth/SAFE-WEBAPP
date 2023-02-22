@@ -106,7 +106,7 @@ public class FilterConverter<T> implements FilterVisitor<SQLFilter<T>, T> {
 		if( fil instanceof SQLFilter){
 			return (SQLFilter<T>) fil;
 		}
-		return new GenericBinaryFilter<>((Class<T>) fil.getTarget(), fil.getBooleanResult());
+		return new GenericBinaryFilter<>( fil.getBooleanResult());
 	}
 
 	/* (non-Javadoc)

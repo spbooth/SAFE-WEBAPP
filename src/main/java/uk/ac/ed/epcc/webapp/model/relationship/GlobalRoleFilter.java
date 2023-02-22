@@ -40,13 +40,7 @@ public class GlobalRoleFilter<T> implements BinaryFilter<T> {
 	private final String role;
 	
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
-	 */
-	@Override
-	public Class<T> getTarget() {
-		return (Class<T>) DataObject.class;
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()

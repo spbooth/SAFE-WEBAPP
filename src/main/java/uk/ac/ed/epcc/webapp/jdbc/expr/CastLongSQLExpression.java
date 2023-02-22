@@ -98,4 +98,9 @@ public class CastLongSQLExpression<N extends Number> implements SQLExpression<Lo
 		return true;
 	}
 
+	@Override
+	public String getFilterTag() {
+		return expr.getFilterTag();
+	}
+
 }

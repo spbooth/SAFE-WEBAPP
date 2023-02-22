@@ -52,7 +52,7 @@ Object extra = request.getAttribute("ExtraContent");
 }
 %>
 <div id="form">
-<wb:FormContext inline="true"/>
+<%=form.getFormContext() %>
 <form method="POST">
 <%= form.getHtmlForm() %>
 </form>

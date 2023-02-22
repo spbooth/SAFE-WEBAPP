@@ -50,11 +50,10 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
 
 
 public class IndexedFieldValue<T extends DataObject,I extends DataObject> implements FieldValue<IndexedReference,T>,IndexedSQLValue<T,I> ,Selector,GroupingSQLValue<IndexedReference>{
-	private final Class<T> target;
+
 	private final Repository repository;
 	private final IndexedTypeProducer<I,? extends DataObjectFactory<I>> producer;
-	public IndexedFieldValue(Class<T> target,Repository repository, IndexedTypeProducer<I,? extends DataObjectFactory<I>> producer) {
-		this.target=target;
+	public IndexedFieldValue(Repository repository, IndexedTypeProducer<I,? extends DataObjectFactory<I>> producer) {
 		this.repository=repository;
 		this.producer=producer;
 		
@@ -132,18 +131,18 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 	public SQLFilter<T> getFilter(MatchCondition match,
 			IndexedReference val) {
 		if(match == null ){
-			return new SQLValueFilter<>(target,repository,producer.getField(),val.getID());
+			return new SQLValueFilter<>(repository,producer.getField(),val.getID());
 		}
 		// This is slightly meaningless but there might be some call for it.
-		return new SQLValueFilter<>(target,repository,producer.getField(),match,val.getID());
+		return new SQLValueFilter<>(repository,producer.getField(),match,val.getID());
 	}
 	@Override
 	public SQLFilter<T> getNullFilter(boolean is_null){
-		return new NullFieldFilter<>(target,repository, producer.getField(), is_null);
+		return new NullFieldFilter<>(repository, producer.getField(), is_null);
 	}
 	@Override
 	public SQLFilter<T> getOrderFilter(boolean descending){
-		return new FieldOrderFilter<>(target,repository, producer.getField(), descending);
+		return new FieldOrderFilter<>(repository, producer.getField(), descending);
 	}
 	/** Create a filter for the home table out of a a filter on the target object
 	 * 
@@ -158,7 +157,7 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 			if( ip instanceof DataObjectFactory){
 				DataObjectFactory fac = (DataObjectFactory) ip;
 				
-				return Joiner.getRemoteFilter(getFilterType(),fil,producer.getField(),repository,fac.res);
+				return Joiner.getRemoteFilter(fil,producer.getField(),repository,fac.res);
 			}
 			throw new CannotFilterException("Not referencing a DataObjectFactory");
 		}catch(Exception e){
@@ -196,21 +195,20 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilterType()
-	 */
-	@Override
-	public Class<T> getFilterType() {
-		return target;
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue#getIDExpression()
 	 */
 	@Override
 	public SQLExpression<Integer> getIDExpression() {
-		return repository.getNumberExpression(getFilterType(), Integer.class, getFieldName());
+		return repository.getNumberExpression( Integer.class, getFieldName());
 		
+	}
+
+	@Override
+	public String getFilterTag() {
+		return repository.getTag();
 	}
 
 }

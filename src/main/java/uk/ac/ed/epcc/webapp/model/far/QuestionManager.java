@@ -152,10 +152,7 @@ public class QuestionManager extends HandlerPartManager<SectionManager.Section,Q
 	protected Class<QuestionFormHandler> getHandlerClass() {
 		return QuestionFormHandler.class;
 	}
-	@Override
-	public Class<Question> getTarget() {
-		return Question.class;
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.far.PartOwnerFactory#getChildManager()
 	 */

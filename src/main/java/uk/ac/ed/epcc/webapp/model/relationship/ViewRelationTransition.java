@@ -90,7 +90,7 @@ public class ViewRelationTransition<X extends DataObject> extends AbstractFormTr
 			defn.addObject(sess.explainRelationship(fac, relationship));
 			defn.closeDetails();
 			try {
-				cb.addList(sess.getLoginFactory().getResult(sess.getPersonInRelationshipRoleFilter(fac, relationship, target)));
+				cb.addList(sess.getPeopleInRelationship(fac, relationship, target));
 			} catch (Exception e) {
 				cb.addText("Internal error occured");
 				conn.getService(LoggerService.class).getLogger(getClass()).error("Error making list",e);

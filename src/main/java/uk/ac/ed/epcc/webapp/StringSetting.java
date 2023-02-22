@@ -123,12 +123,6 @@ public class StringSetting extends AbstractSetting<String> {
 		return value;
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
-	 */
-	@Override
-	public Class<String> getTarget() {
-		return String.class;
-	}
+
 
 }

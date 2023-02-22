@@ -14,11 +14,14 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.inputs.BinaryInput;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 public class RoleAction<U extends AppUser> extends FormAction{
 	U p ;
@@ -31,12 +34,23 @@ public class RoleAction<U extends AppUser> extends FormAction{
 	@SuppressWarnings("unchecked")
 	@Override
 	public MessageResult action(Form f) throws uk.ac.ed.epcc.webapp.forms.exceptions.ActionException {
+		LoggerService ls = p.getContext().getService(LoggerService.class);
 		for(Iterator<String> it = f.getFieldIterator(); it.hasNext();){
 			String key=it.next();
 			BinaryInput i = (BinaryInput) f.getInput(key);
 			try{
 				SessionService serv = p.getContext().getService(SessionService.class);
-				serv.setRole(p, key, i.isChecked());
+				boolean old_val = serv.canHaveRole(p, key);
+				boolean new_val = i.isChecked();
+				serv.setRole(p, key, new_val);
+				if( old_val != new_val) {
+					Map values=new LinkedHashMap();
+					values.put("target", p.getIdentifier());
+					values.put("old_value", old_val);
+					values.put("new_value", new_val);
+					values.put("role", key);
+					ls.securityEvent("SetRole", serv,values);
+				}
 			
 			}catch(Exception e){
 				p.getContext().error(e,"Error modifying role");

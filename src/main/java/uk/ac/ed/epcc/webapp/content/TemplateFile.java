@@ -668,6 +668,12 @@ public class TemplateFile {
 
 		}
 	}
+	
+	public void setProperties(TemplateFile donor) {
+		for(String name : donor.propertyNames()) {
+			setProperty(name, donor.getProperty(name));
+		}
+	}
 	public void setProperties(String prefix,Map h) {
 		if( h != null ){
 		for (Object key : h.keySet()) {

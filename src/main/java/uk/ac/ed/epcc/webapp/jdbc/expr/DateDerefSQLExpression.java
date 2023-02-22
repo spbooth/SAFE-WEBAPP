@@ -71,4 +71,7 @@ public class DateDerefSQLExpression<H extends DataObject,R extends DataObject> e
 	public boolean preferSeconds() {
 		return ((DateSQLExpression)remote_expression).preferSeconds();
 	}
+	public String toString() {
+		return "DateDerefSQLExpression("+a.toString()+","+remote_expression.toString()+")";
+	}
 }

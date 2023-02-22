@@ -28,10 +28,7 @@ public class LazyTypeConverter<T,D,F extends TypeConverter<T,D>> extends LazyObj
 		super(c, clazz, tag);
 	}
 
-	public Class<T> getTarget() {
-		return getInner().getTarget();
-	}
-
+	
 	public T find(D o) {
 		return getInner().find(o);
 	}

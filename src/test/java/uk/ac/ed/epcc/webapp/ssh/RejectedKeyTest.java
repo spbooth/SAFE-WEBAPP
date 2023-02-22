@@ -61,7 +61,7 @@ public class RejectedKeyTest extends WebappTestBase {
 
 
 	public void doTest(String key1) throws ValidateException, PublicKeyParseException, IOException, ParseException {
-		AuthorizedKeyValidator val = new AuthorizedKeyValidator();
+		AuthorizedKeyValidator val = new AuthorizedKeyValidator(ctx);
 		val.validate(key1);
 		PublicKey key = PublicKeyReaderUtil.load(key1);
 		assertNotNull(key);

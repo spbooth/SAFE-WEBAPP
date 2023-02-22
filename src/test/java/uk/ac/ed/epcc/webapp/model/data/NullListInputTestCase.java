@@ -71,7 +71,7 @@ ListInputInterfaceTest<Integer, Object,ListInput<Integer,Object>, NullListInputT
 		Set<Integer> good = new HashSet<>();
 		   good.add(NullListInput.NULL_VALUE);
 	       DataObjectFactory<BDO> fac = getFactory();
-			for(BDO item : fac.new FilterSet(fac.getSelectFilter())){
+			for(BDO item : fac.getResult(fac.getSelectFilter())){
 				good.add(item.getID());
 			}
 		return good;

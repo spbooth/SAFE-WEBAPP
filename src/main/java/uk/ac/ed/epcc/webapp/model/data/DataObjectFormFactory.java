@@ -114,7 +114,7 @@ public final AppContext getContext(){
 	}
 	public static final boolean buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
 			Set<String> optional, Map<String,Selector> selectors,Map<String,String> labels) throws DataFault {
-		return buildForm(conn, res, f, supress_fields, optional, selectors, labels, null);
+		return buildForm(conn, res, f, supress_fields, optional, selectors,null, labels, null);
 	}
 	/**
 	 * Construct an edit Form for the associated DataObject based on database
@@ -136,12 +136,12 @@ public final AppContext getContext(){
 	 * @throws TransitionException 
 	 */
 	public static final boolean buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
-			Set<String> optional, Map<String,Selector> selectors,Map<String,String> labels,Map<String,String> tooltips) throws DataFault {
+			Set<String> optional, Map<String,Selector> selectors,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips) throws DataFault {
 		Set<String> keys = new LinkedHashSet<String>(res.getFields());
 		if( supress_fields != null ) {
 			keys.removeAll(supress_fields);
 		}
-		return buildForm(conn, res, keys,f, optional, selectors,null,labels, tooltips, null);
+		return buildForm(conn, res, keys,f, optional, selectors,constraints,labels, tooltips, null);
 	}
 	/**
 	 * Construct an edit Form for the associated DataObject based on database
@@ -226,6 +226,9 @@ public final AppContext getContext(){
 						if( new_sel != null ) {
 							// constraint applied
 							sel = new_sel;
+							if( support_multi_stage) {
+								is_optional = fc.changeOptional(name, is_optional,f,fixtures);
+							}
 						}else {
 							// multi-stage requested
 							if( support_multi_stage ) {
@@ -454,7 +457,7 @@ public final AppContext getContext(){
 				
 			}
 			// allow config to override.
-			String override=conn.getInitParameter("form."+res.getTag()+"."+field);
+			String override=conn.getInitParameter(FORM_LABEL_PREFIX+res.getTag()+"."+field);
 			if( override != null){
 				trans.put(field, override);
 			}
@@ -625,13 +628,7 @@ public final AppContext getContext(){
 	public final BDO find(int id) throws DataException {
 		return factory.find(id);
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer#getTarget()
-	 */
-	@Override
-	public final Class<BDO> getTarget() {
-		return factory.getTarget();
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer#makeReference(uk.ac.ed.epcc.webapp.Indexed)
 	 */

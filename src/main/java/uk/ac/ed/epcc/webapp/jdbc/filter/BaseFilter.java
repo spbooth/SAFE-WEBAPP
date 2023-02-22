@@ -32,15 +32,25 @@ import uk.ac.ed.epcc.webapp.Targetted;
  * extend one of the canonical combining types. This is enforced using the 
  * visitor pattern.
  * <p>
- * All filters are parameterised by the type of object they select for and implements {@link Targetted} 
- * so that this can be checked at run-time. In most cases a filter for a super-type will also be valid but the types of filters should
- * normally be made as specific as possible, usually following the target type of the corresponding factory. 
+ * All filters are parameterised by the type of object they select for
+ * usually following the target type of the corresponding factory. Other than for
+ * {@link AcceptFilter}s this is purely for the compiler to do consistency checks
  * 
  * @author spb
  * @param <T> target type.
  */
-public interface BaseFilter<T> extends Targetted<T>{
+public interface BaseFilter<T> {
 	public <X> X acceptVisitor(FilterVisitor<X,T> vis) throws Exception;
 	public int hashCode();
 	public boolean equals(Object obj) ;
+	
+	/** Returns the construction tag of the target factory or null.
+	 * This is to allow limited run-time checking to detect if filters for two different targets
+	 * are being combined. It is however always permissible to return null
+	 * 
+	 * @return
+	 */
+	default public String getTag() {
+		return null;
+	}
 }

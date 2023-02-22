@@ -228,10 +228,6 @@ public class XMLOverlay<X extends XMLOverlay.XMLFile> extends TextFileOverlay<X>
 		return (X) new XMLFile(res, getBaseURL());
 	}
 
-	@Override
-	public Class<X> getTarget(){
-		return (Class<X>) XMLFile.class;
-	}
 
 	public boolean canView(SessionService<?> sess) {
 		return sess.hasRole(SessionService.ADMIN_ROLE);

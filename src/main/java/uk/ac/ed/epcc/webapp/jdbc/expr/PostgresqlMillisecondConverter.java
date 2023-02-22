@@ -91,4 +91,9 @@ public String toString() {
 	return sb.toString();
 	
  }
+
+@Override
+public String getFilterTag() {
+	return exp.getFilterTag();
+}
 }

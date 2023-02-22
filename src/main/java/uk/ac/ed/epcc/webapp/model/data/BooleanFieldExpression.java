@@ -22,8 +22,8 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 
 public class BooleanFieldExpression<X extends DataObject> extends FieldExpression<Boolean,X> {
 	
-	protected BooleanFieldExpression(Class<X> filter_type,Repository repository,String field) {
-		super(filter_type,repository, Boolean.class, field);
+	protected BooleanFieldExpression(Repository repository,String field) {
+		super(repository, Boolean.class, field);
 	}
 
 	protected void setValue(Record r, Boolean value) {

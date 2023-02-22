@@ -19,12 +19,8 @@ package uk.ac.ed.epcc.webapp.jdbc.expr;
 import java.util.List;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 
 
 /** A {@link SQLFilter} that compares a {@link SQLExpression} to null.
@@ -37,13 +33,13 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
  * @param <V>
  */
 public class SQLExpressionNullFilter<T,V> implements SQLFilter<T>, PatternFilter<T> {
-	private final Class<T> target;
+	private final String filter_tag;
     private final SQLExpression<V> expr;
     private final boolean is_null;
     
     @SuppressWarnings("unchecked")
-	public static <T,V> SQLFilter<T> getFilter(Class<T> target,SQLExpression<V> expr,boolean is_null){
-    	SQLExpressionNullFilter<T, V> fil = new SQLExpressionNullFilter<>(target, expr, is_null);
+	public static <T,V> SQLFilter<T> getFilter(String target,SQLExpression<V> expr,boolean is_null){
+    	SQLExpressionNullFilter<T, V> fil = new SQLExpressionNullFilter<T,V>(target, expr, is_null);
     	SQLFilter<T> req = expr.getRequiredFilter();
     	if( req == null){
     		return fil;
@@ -51,8 +47,8 @@ public class SQLExpressionNullFilter<T,V> implements SQLFilter<T>, PatternFilter
     	return new SQLAndFilter<>(target,fil,req);
 
     }
-	private SQLExpressionNullFilter(Class<T> target,SQLExpression<V> expr,boolean is_null){
-		this.target=target;
+	private SQLExpressionNullFilter(String target,SQLExpression<V> expr,boolean is_null){
+		this.filter_tag=target;
     	this.expr=expr;
     	this.is_null=is_null;
     }
@@ -111,8 +107,8 @@ public class SQLExpressionNullFilter<T,V> implements SQLFilter<T>, PatternFilter
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<T> getTarget() {
-		return target;
+	public String getTag() {
+		return filter_tag;
 	}
 	@Override
 	public String toString() {

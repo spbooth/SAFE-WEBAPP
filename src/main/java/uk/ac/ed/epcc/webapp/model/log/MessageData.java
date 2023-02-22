@@ -70,13 +70,6 @@ public class MessageData extends MessageDataObject implements MessageProvider , 
 			return (M) new MessageData(res);
 		}
 
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getTarget()
-		 */
-		@Override
-		public Class<M> getTarget() {
-			return (Class) MessageData.class;
-		}
 		
 	}
 	

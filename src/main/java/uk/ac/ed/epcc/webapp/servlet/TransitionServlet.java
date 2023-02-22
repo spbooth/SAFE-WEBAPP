@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -83,6 +84,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  */
 
 @WebServlet(name="TransitionServlet",urlPatterns=TransitionServlet.TRANSITION_SERVLET+"/*")
+@MultipartConfig
 public  class TransitionServlet<K,T> extends WebappServlet {
 
 	/**

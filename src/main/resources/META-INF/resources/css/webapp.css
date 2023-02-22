@@ -727,7 +727,7 @@ text-align: center;
 	content: " \2714";
 	color: green;
 }
-.fail {
+.fail .additional {
 	color: red;
 }
 .fail:after {
@@ -983,4 +983,15 @@ table.dataTable.display tbody tr td.RED.sorting_1, td.RED,  span.RED{
 /* allocations use this for end dates in the past */
 .grey {
  background-color: #cccccc;
+}
+
+div.input_row {
+	display: table-row;
+}
+div.sub_label {
+	display: table-cell;
+	text-align: center;
+}
+div.sub_input {
+	display: table-cell;
 }

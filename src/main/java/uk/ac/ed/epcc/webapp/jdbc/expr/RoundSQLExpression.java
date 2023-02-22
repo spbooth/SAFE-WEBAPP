@@ -102,4 +102,9 @@ public class RoundSQLExpression<N extends Number> implements SQLExpression<Integ
 		return true;
 	}
 
+	@Override
+	public String getFilterTag() {
+		return expr.getFilterTag();
+	}
+
 }

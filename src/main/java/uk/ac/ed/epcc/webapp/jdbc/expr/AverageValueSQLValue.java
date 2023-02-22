@@ -84,4 +84,9 @@ public class AverageValueSQLValue implements SQLValue<AverageValue>{
 		return value.getRequiredFilter();
 	}
 
+	@Override
+	public String getFilterTag() {
+		return value.getFilterTag();
+	}
+
 }

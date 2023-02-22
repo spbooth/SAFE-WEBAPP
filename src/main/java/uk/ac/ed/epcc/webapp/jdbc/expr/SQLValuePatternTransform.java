@@ -110,4 +110,12 @@ public class SQLValuePatternTransform implements NestedSQLValue<String,String> {
 	final public boolean groupingIsomorphic() {
 		return false;
 	}
+
+
+
+
+	@Override
+	public String getFilterTag() {
+		return base.getFilterTag();
+	}
 }

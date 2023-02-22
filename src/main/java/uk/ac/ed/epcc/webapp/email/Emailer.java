@@ -29,15 +29,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import jakarta.mail.Address;
@@ -71,6 +63,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.TemplateFinder;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
 import uk.ac.ed.epcc.webapp.resource.ResourceService;
+import uk.ac.ed.epcc.webapp.servlet.ErrorFilter;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.EmailChangeRequestFactory.EmailChangeRequest;
@@ -326,7 +319,37 @@ public class Emailer implements Contexed{
 		email_template.setProperty("person.name", name);
 		String email = person.getEmail();
 		if( email == null){
-			getLogger().error("Password change email destination not known "+person.getIdentifier());
+			getLogger().error("Password fails email destination not known "+person.getIdentifier());
+			return;
+		}
+		email_template.setProperty("person.email", email);
+		doSend(templateMessage(person,getFrom(person),email_template));
+
+	}
+	
+	/**
+	 * Notify user their MFA access has been locked-out.
+	 * 
+	 * 
+	 * @param person
+	 * @param new_password
+	 * @throws Exception 
+	 * 
+	 */
+	public void mfaFailsExceeded(AppUser person)
+			throws Exception {
+
+		TemplateFile email_template = getFinder().getTemplateFile("mfa_fails_exceeded.txt");
+		
+
+		String name = person.getName();
+		if( name == null || name.trim().length() == 0){
+			name = "User";
+		}
+		email_template.setProperty("person.name", name);
+		String email = person.getEmail();
+		if( email == null){
+			getLogger().error("MFA fails email destination not known "+person.getIdentifier());
 			return;
 		}
 		email_template.setProperty("person.email", email);
@@ -440,6 +463,11 @@ public class Emailer implements Contexed{
 			email_template.setRegionEnabled("Verification", true);
 			email_template.setProperty("person.verifications", v_text.toString());
 			
+		}
+		String docs = getContext().getExpandedProperty("service.documentation");
+		if( docs != null && ! docs.trim().isEmpty()) {
+			email_template.setProperty("update.documentation",docs);
+			email_template.setRegionEnabled("Documentation", true);
 		}
 		MimeMessage m = templateMessage(person,getFrom(person),email_template);
 		return m;
@@ -580,17 +608,7 @@ public class Emailer implements Contexed{
 		if( m == null ){
 			return null;
 		}
-		AppContext conn = getContext();
 		
-
-		DatabaseService db = conn.getService(DatabaseService.class);
-		if( db != null ){
-			// always commit any transactions before an external operation
-			// in case it hangs up.
-			// Also ensures we don't roll back state inconsistent with info sent
-			// in an email
-			db.commitTransaction();
-		}
 		
 		m = send(m);
 		return m;
@@ -608,6 +626,15 @@ public class Emailer implements Contexed{
 			return null;
 		}
 		AppContext conn = getContext();
+		DatabaseService db = conn.getService(DatabaseService.class);
+		if( db != null ){
+			// always commit any transactions before an external operation
+			// in case it hangs up and leaves an uncommitted transaction open for
+			// a long time.
+			// Also ensures we don't roll back state inconsistent with info sent
+			// in an email so never roll back to before a point an email is sent
+			db.commitTransaction();
+		}
 		Logger log = conn.getService(LoggerService.class).getLogger(getClass());
 		if( EMAILS_FEATURE.isEnabled(conn)  && (conn.getAttribute(SUPRESS_EMAIL_ATTR) == null)){
 			String force_email = conn.getInitParameter(EMAIL_FORCE_ADDRESS);

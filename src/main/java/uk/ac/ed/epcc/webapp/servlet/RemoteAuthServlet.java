@@ -213,6 +213,15 @@ public class RemoteAuthServlet extends WebappServlet {
 						return;
 				}
 				if( allow_login ) {
+					if( ! person.canLogin()) {
+						if( person.canReregister()) {
+							message(conn, req, res, "login_disabled_reregister");
+							return;
+						}else {
+							message(conn, req, res, "login_disabled");
+							return;
+						}
+					}
 					// Note same flow exists in DefaultServletService for global extauth
 					parser.verified(person); // record sucessful authentication
 					for(RemoteAuthListener l : ((AppUserFactory<?>)person.getFactory()).getComposites(RemoteAuthListener.class)){

@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.servlet;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,8 +29,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.cron.HeartbeatListener;
+import uk.ac.ed.epcc.webapp.model.cron.LockFactory;
+import uk.ac.ed.epcc.webapp.model.cron.LockFactory.Lock;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 /** A servlet to trigger timed events from a remote cron job
@@ -48,6 +55,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
 @WebServlet(name="HeartbeatServlet",urlPatterns="/HearbeatServlet/*,/HeartbeatServlet/*")
 public class HeartbeatServlet extends ContainerAuthServlet {
 
+	private static final String HEARTBEAT_SERVLET_LOCK_NAME = "HeartbeatServlet";
 	private static Date last_call;
 	private static boolean running=false;
 	/**
@@ -82,7 +90,17 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 		}
 		return;
 	}
-	public synchronized static Date getLastCall(){
+	public synchronized static Date getLastCall(AppContext conn){
+		try {
+			LockFactory lock_fac = LockFactory.getFactory(conn);
+			Lock lock = lock_fac.findFromString(HEARTBEAT_SERVLET_LOCK_NAME);
+			if( lock != null) {
+				return lock.lastLocked();
+			}
+		}catch(Exception e) {
+			conn.getService(LoggerService.class).getLogger(HeartbeatServlet.class).error("Error getting last locked",e);
+		}
+		// fall back to static value on this servlet
 		return last_call;
 	}
 	
@@ -92,8 +110,9 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 		long max_wait=conn.getLongParameter("max.heartbeat.millis", 60000L);
 		Logger log = getLogger(conn);
 		TimerService serv = conn.getService(TimerService.class);
-		if( serv != null ) serv.startTimer("Heartbeatlistener");
-		try{
+		
+		Lock lock = null;
+		try(TimeClosable timer = new TimeClosable(conn, "HeartbeatListener")){
 			running=true;
 			CurrentTimeService time = conn.getService(CurrentTimeService.class);
 			last_call=time.getCurrentTime();
@@ -106,40 +125,63 @@ public class HeartbeatServlet extends ContainerAuthServlet {
 				}
 				return ok;
 			}
+			LockFactory lock_f = LockFactory.getFactory(conn);
+			lock = lock_f.makeFromString(HEARTBEAT_SERVLET_LOCK_NAME);
+			Calendar cal = Calendar.getInstance();
+			Date now = time.getCurrentTime();
 
-
-			for(String l : listeners.split("\\s*,\\s*")){
-				if( serv != null ) serv.startTimer("HeartbeatListener."+l);
-				long begin=System.currentTimeMillis();
-				try{
-					HeartbeatListener listener = conn.makeObject(HeartbeatListener.class, l);
-					if( listener != null ){
-						if( out != null ){ 
-							out.println("Running"+l);
-						}
-						log.debug("Running "+l);
-						Date next = listener.run();
-						if( out != null ){ 
-							out.println("Next run expected "+next);
-						}
-						log.debug("Next run expected "+next);
-					}else{
-						log.error("No HearBeatListener constructed for tag "+l);
-					}
-				}catch(Exception t){
-					ok=false;
-					log.error("Error in hearbeatlistener "+l,t);
-				}finally{
-					if( serv != null ) serv.stopTimer("HeartbeatListener."+l);
+			if( lock.isLocked()) {
+				Date d = lock.wasLockedAt();
+				cal.setTime(d);
+				cal.add(Calendar.HOUR,1);
+				if(now.after(cal.getTime())) {
+					getLogger(conn).error(lock.getName()+" locked since "+d);
 				}
-				long elapsed = (System.currentTimeMillis() - begin);
-				if( elapsed > max_wait ){
-					log.error("Long heartbeat call "+l+" "+(elapsed/1000L)+" seconds");
+				return false;
+			}
+			if( lock.takeLock()) {
+				for(String l  : listeners.split("\\s*,\\s*")){
+					if( serv != null ) serv.startTimer("HeartbeatListener."+l);
+					long begin=System.currentTimeMillis();
+					try{
+						HeartbeatListener listener = conn.makeObject(HeartbeatListener.class, l);
+						if( listener != null ){
+							if( out != null ){ 
+								out.println("Running"+l);
+							}
+							log.debug("Running "+l);
+							Date next = listener.run();
+							if( out != null ){ 
+								out.println("Next run expected "+next);
+							}
+							log.debug("Next run expected "+next);
+						}else{
+							log.error("No HearBeatListener constructed for tag "+l);
+						}
+					}catch(Exception t){
+						ok=false;
+						log.error("Error in hearbeatlistener "+l,t);
+					}finally{
+						if( serv != null ) serv.stopTimer("HeartbeatListener."+l);
+					}
+					long elapsed = (System.currentTimeMillis() - begin);
+					if( elapsed > max_wait ){
+						log.error("Long heartbeat call "+l+" "+(elapsed/1000L)+" seconds");
+					}
+				}
+			}else {
+				getLogger(conn).error("Failed to take heartbeat lock");
+			}
+		} catch (Exception e) {
+			getLogger(conn).error("Error in HeartbeatListener",e);
+		}finally{
+			if( lock != null ) {
+				try {
+					lock.releaseLock();
+				} catch (DataFault e) {
+					getLogger(conn).error("Error removing lock");
 				}
 			}
-
-		}finally{
-			if( serv != null ) serv.stopTimer("Heartbeatlistener");
 			running=false;
 		}
 		

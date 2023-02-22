@@ -87,10 +87,7 @@ public class PageManager extends PartManager<DynamicFormManager.DynamicForm,Page
 	protected Page makeBDO(Record res) throws DataFault {
 		return new Page(res);
 	}
-	@Override
-	public Class<Page> getTarget() {
-		return Page.class;
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.far.PartManager#getChildTypeName()

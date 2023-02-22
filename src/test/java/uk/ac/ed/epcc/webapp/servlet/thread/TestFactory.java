@@ -49,9 +49,6 @@ public class TestFactory extends DataObjectFactory<TestFactory.TestData> {
 		return new TestData(res);
 	}
 	
-	public Class<TestData> getTarget(){
-		return TestData.class;
-	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getDefaultTableSpecification(uk.ac.ed.epcc.webapp.AppContext, java.lang.String)

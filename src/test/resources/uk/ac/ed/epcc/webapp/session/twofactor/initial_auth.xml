@@ -7,16 +7,19 @@
 <Alg type='Integer' nullable='false'/>
 <Password type='String' nullable='false' max='64'/>
 <AuthCodeSecret type='String' nullable='true' max='32'/>
+<LastAuthCodeUsed type='Long' nullable='true'/>
+<AuthCodeFails type='Integer' nullable='true'/>
 <Email_index type='Index' unique='true'><Column name='Email'/></Email_index>
 </TableSpecification>
 <Person id='1'>
 <Email>fred@example.com</Email>
 <PasswordFails>0</PasswordFails>
 <PasswordStatus>V</PasswordStatus>
-<Salt>yDHaacdiAlszgkel</Salt>
+<Salt>l4uRlu9tB8jpAOfA</Salt>
 <Alg>2</Alg>
-<Password>da2b4ab34816317a6204269a9223cc3d</Password>
-<AuthCodeSecret>UJ4SLJJPNPXVGIPLXDTQUGVKNI======</AuthCodeSecret>
+<Password>44c67761f9881be9f5b94b759dc89afa6267f8af17c96a9f3f5119320b20d2d2</Password>
+<AuthCodeSecret>UJ4SLJJPNPXVGIPLXDTQUGVKNI</AuthCodeSecret>
+<AuthCodeFails>0</AuthCodeFails>
 </Person>
 <TableSpecification name='role_table'>
 <PersonID type='Integer' nullable='false'/>

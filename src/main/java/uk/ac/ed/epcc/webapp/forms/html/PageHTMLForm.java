@@ -31,6 +31,7 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 //import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
+import uk.ac.ed.epcc.webapp.tags.FormContextTag;
 
 /** A HTML form intended to be used within pages where the form posts back to the 
  * calling page
@@ -112,8 +113,16 @@ public class PageHTMLForm extends BaseHTMLForm {
     public String getHtmlForm(){
     	return getHtmlForm(new HtmlBuilder()).toString();
     }
+    public String getFormContext() {
+    	HtmlBuilder result = new HtmlBuilder();
+    	// Explicitly add the FormContext context as error/missing are not in the request
+    	FormContextTag.addContent(true, missing, errors, result);
+    	return result.toString();
+    }
     public HtmlBuilder getHtmlForm(HtmlBuilder result){
-		  getHtmlFieldTable(result,missing, errors, params);
+    	
+		
+    	getHtmlFieldTable(result,missing, errors, params);
           result.clean('\n');
           result.open("input");
           result.attr("type", "hidden");

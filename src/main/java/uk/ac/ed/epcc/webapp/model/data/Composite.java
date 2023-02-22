@@ -164,7 +164,7 @@ public abstract class Composite<BDO extends DataObject, X > implements Contexed,
 		if( data == null) {
 			throw new ConsistencyError("Null passed to getRecord");
 		}
-		throw new ConsistencyError("Wrong Object type passed to getRecord "+data.getIdentifier()+" expecting "+fac.getTarget().getSimpleName());
+		throw new ConsistencyError("Wrong Object type passed to getRecord "+data.getIdentifier());
 	}
 	/** method to allow sub-classes to retrieve the {@link Repository}.
 	 * 
@@ -204,6 +204,15 @@ public abstract class Composite<BDO extends DataObject, X > implements Contexed,
 	 */
 	protected void release() {
 		
+	}
+	/** Allow sub-classes to access the dirty flag
+	 * 
+	 * @param key
+	 * @param target
+	 * @param value
+	 */
+	protected void setDirty(String key, BDO target, boolean value) {
+		getRecord(target).setDirty(key, value);
 	}
 	/** used to list composites on table structure page.
 	 * 

@@ -51,10 +51,7 @@ public class FileDataFactory<T extends FileData> extends DataObjectFactory<T> im
 	protected TableSpecification getDefaultTableSpecification(AppContext c, String table) {
 		return FileData.getDefaultTableSpecification();
 	}
-	@Override
-	public Class<T> getTarget() {
-		return (Class) FileData.class;
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.AnonymisingFactory#anonymise()
 	 */
@@ -63,7 +60,7 @@ public class FileDataFactory<T extends FileData> extends DataObjectFactory<T> im
 		FilterUpdate<T> update = new FilterUpdate<>(res);
 		StreamData data = new ByteArrayStreamData();
 		// wipe all text data
-		update.update(new StreamDataFieldExpression(getTarget(),res,FileData.DATA), data, null);
+		update.update(new StreamDataFieldExpression(res,FileData.DATA), data, null);
 		
 	}
 

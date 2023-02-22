@@ -48,7 +48,7 @@ public class SingleKeyComposite extends PublicKeyComposite<String> {
 	 */
 	@Override
 	protected String load(String value) throws ParseException {
-		AuthorizedKeyValidator val = new AuthorizedKeyValidator();
+		AuthorizedKeyValidator val = new AuthorizedKeyValidator(getContext());
 		return val.normalise(value);
 	}
 	/* (non-Javadoc)

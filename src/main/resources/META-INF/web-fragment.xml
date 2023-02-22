@@ -28,9 +28,6 @@
 <listener>
  <listener-class>uk.ac.ed.epcc.webapp.servlet.LogServiceWebappContextListener</listener-class>
  </listener>
- <listener>
- <listener-class>uk.ac.ed.epcc.webapp.servlet.FileUploadWebappContextListener</listener-class>
- </listener>
  
  <servlet>
  <description>Allows password login</description>

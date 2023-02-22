@@ -110,7 +110,7 @@ public class SQLSelectValue<T> implements GroupingSQLValue<T> {
 			SQLFilter tmp = accessors[i].getRequiredFilter();
 			if( tmp != null){
 				if(required==null){
-					required=new SQLAndFilter(tmp.getTarget());
+					required=new SQLAndFilter(tmp.getTag());
 				}
 				required.addFilter(tmp);
 			}
@@ -166,6 +166,17 @@ public class SQLSelectValue<T> implements GroupingSQLValue<T> {
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public String getFilterTag() {
+		for(SQLValue<T> v : accessors) {
+			String t = v.getFilterTag();
+			if( t != null) {
+				return t;
+			}
+		}
+		return null;
 	}
 
 }

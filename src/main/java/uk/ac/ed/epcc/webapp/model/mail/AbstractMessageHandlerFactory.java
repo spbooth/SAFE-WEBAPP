@@ -328,11 +328,6 @@ public abstract class AbstractMessageHandlerFactory<H extends AbstractMessageHan
 	
 
 	@Override
-	public Class<H> getTarget() {
-		return (Class) Provider.class;
-	}
-
-	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c,
 			String table) {
 		TableSpecification spec = MessageDataObject.getTableSpecification();

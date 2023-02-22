@@ -25,8 +25,8 @@ import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
 
 public class StreamDataFieldExpression<X extends DataObject> extends FieldExpression<StreamData,X> {
 	
-	public StreamDataFieldExpression(Class<X> filter_type,Repository repository,String field) {
-		super(filter_type,repository, StreamData.class, field);
+	public StreamDataFieldExpression(Repository repository,String field) {
+		super(repository, StreamData.class, field);
 	}
 
 	protected void setValue(Record r, StreamData value) {

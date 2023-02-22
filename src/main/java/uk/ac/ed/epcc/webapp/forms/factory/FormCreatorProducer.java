@@ -39,5 +39,7 @@ public interface FormCreatorProducer {
    * @param p
    * @return true if current user allowed to create objects
    */
-  public boolean canCreate(SessionService p);
+   default public boolean canCreate(SessionService p) {
+	   return true;
+   }
 }

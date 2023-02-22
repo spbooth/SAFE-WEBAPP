@@ -81,11 +81,6 @@ extends ResponseDataManager<M, R, F> {
 	}
 
 	@Override
-	public Class<M> getTarget() {
-		return (Class) DateData.class;
-	}
-
-	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c,
 			String table, IndexedProducer<Question> leftFac, String leftField,
 			IndexedProducer<R> rightFac, String rightField) {

@@ -292,7 +292,7 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 				SQLFilter f = v.getRequiredFilter();
 				if( f != null ){
 					if( fil == null ){
-						fil = new SQLAndFilter(f.getTarget());
+						fil = new SQLAndFilter(f.getTag());
 					}
 					fil.addFilter(f);
 				}

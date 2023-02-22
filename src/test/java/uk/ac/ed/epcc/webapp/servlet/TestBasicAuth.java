@@ -21,7 +21,7 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.codec.binary.Base64;
+import java.util.Base64;
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
@@ -82,7 +82,7 @@ public class TestBasicAuth extends ServletTest {
 		comp.setPassword(user, PW);
 		user.commit();
 		String d = USER+":"+PW;
-		req.header.put("Authorization", "Basic "+Base64.encodeBase64String(d.getBytes()));
+		req.header.put("Authorization", "Basic "+Base64.getEncoder().encodeToString(d.getBytes()));
 		
 		doPost();
 		assertEquals(HttpServletResponse.SC_OK, res.error);

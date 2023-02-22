@@ -19,13 +19,7 @@ package uk.ac.ed.epcc.webapp.jdbc.expr;
 import java.util.List;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
-import uk.ac.ed.epcc.webapp.jdbc.filter.GenericBinaryFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 
 
@@ -40,25 +34,25 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  * @param <V> type of expression
  */
 public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilter<T> {
-	private final Class<T> target;
+	private final String filter_tag;
     private final SQLExpression<? extends V> expr1;
     private final SQLExpression<? extends V> expr2;
   
     private final MatchCondition match;
     
     @SuppressWarnings("unchecked")
-	public static <T,V>  SQLFilter<T> getFilter(Class<T> target,SQLExpression<? extends V> expr1,SQLExpression<? extends V> expr2){
+	public static <T,V>  SQLFilter<T> getFilter(String target,SQLExpression<? extends V> expr1,SQLExpression<? extends V> expr2){
     	if( expr1 instanceof ConstExpression &&  expr1 instanceof ConstExpression){
     		ConstExpression<V,T> const1 = (ConstExpression<V,T>) expr1;
     		ConstExpression<V,T> const2 = (ConstExpression<V,T>) expr2;
-    		return new GenericBinaryFilter<>(target,const1.getValue().equals(const2.getValue()));
+    		return new GenericBinaryFilter<>(const1.getValue().equals(const2.getValue()));
     	}
     	if( expr1 instanceof DateSQLExpression && expr2 instanceof DateSQLExpression){
     		// compare underlying value
     		return getFilter(target, ((DateSQLExpression)expr1).getMillis(), ((DateSQLExpression)expr2).getMillis());
     	}
     	
-    	SQLExpressionMatchFilter<T, V> fil = new SQLExpressionMatchFilter<>(target, expr1, expr2);
+    	SQLExpressionMatchFilter<T, V> fil = new SQLExpressionMatchFilter<T,V>(target, expr1, expr2);
     	SQLFilter<T> req1 = expr1.getRequiredFilter();
     	SQLFilter<T> req2 = expr1.getRequiredFilter();
     	if( req1 == null && req2 == null){
@@ -68,11 +62,11 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
 
     }
     @SuppressWarnings("unchecked")
-	public static <T,V>  SQLFilter<T> getFilter(Class<T> target,SQLExpression<? extends V> expr1,MatchCondition m,SQLExpression<? extends V> expr2){
+	public static <T,V>  SQLFilter<T> getFilter(String target,SQLExpression<? extends V> expr1,MatchCondition m,SQLExpression<? extends V> expr2){
     	if( expr1 instanceof ConstExpression &&  expr1 instanceof ConstExpression){
     		ConstExpression<V,T> const1 = (ConstExpression<V,T>) expr1;
     		ConstExpression<V,T> const2 = (ConstExpression<V,T>) expr2;
-    		return new GenericBinaryFilter<>(target,m.compare(const1.getValue(), const2.getValue()));
+    		return new GenericBinaryFilter<>(m.compare(const1.getValue(), const2.getValue()));
     	}
     	if( expr1 instanceof DateSQLExpression && expr2 instanceof DateSQLExpression){
     		// compare underlying value
@@ -93,14 +87,14 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
     	return new SQLAndFilter<>(target,fil,req1,req2);
 
     }
-	private SQLExpressionMatchFilter(Class<T> target,SQLExpression<? extends V> expr1,SQLExpression<? extends V> expr2){
-		this.target=target;
+	private SQLExpressionMatchFilter(String target,SQLExpression<? extends V> expr1,SQLExpression<? extends V> expr2){
+		this.filter_tag=target;
     	this.expr1=expr1;
     	this.expr2=expr2;
     	this.match=null;
     }
-	private SQLExpressionMatchFilter(Class<T> target,SQLExpression<? extends V> expr1,MatchCondition match,SQLExpression<? extends V> expr2){
-		this.target=target;
+	private SQLExpressionMatchFilter(String target,SQLExpression<? extends V> expr1,MatchCondition match,SQLExpression<? extends V> expr2){
+		this.filter_tag=target;
     	this.expr1=expr1;
     	this.match=match;
     	this.expr2=expr2;
@@ -162,12 +156,13 @@ public class SQLExpressionMatchFilter<T,V> implements SQLFilter<T>, PatternFilte
 		return true;
 	}
 	
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
 	@Override
-	public Class<T> getTarget() {
-		return target;
+	public String getTag() {
+		return filter_tag;
 	}
 	@Override
 	public String toString() {

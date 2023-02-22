@@ -44,4 +44,12 @@ public interface TwoFactorComposite<A extends AppUser> {
 	 * @return
 	 */
 	public boolean needAuth(A user);
+	
+	/** optionally update the {@link AppUser} when authentication is successful.
+	 * 
+	 * @param user
+	 */
+	default public void completeAuth(A user) {
+		
+	}
 }

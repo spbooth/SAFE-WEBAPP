@@ -61,8 +61,8 @@ public class SQLNotFilter<Q,F extends PatternFilter<Q>&SQLFilter<Q>> implements 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
 	 */
-	public Class<Q> getTarget() {
-		return nested.getTarget();
+	public String getTag() {
+		return nested.getTag();
 	}
 	public String toString() {
 		return "SQLNotFilter("+nested+")";

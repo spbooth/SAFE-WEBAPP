@@ -41,12 +41,13 @@ public class SQLOrFilter<T> extends BaseSQLCombineFilter<T> {
 	// object or not only one branch needs to evaluate to true.
 	private Map<JoinerFilter,SQLOrFilter> back_joins=new LinkedHashMap<JoinerFilter, SQLOrFilter>();
 	
-	public SQLOrFilter(Class<T> target) {
-		super(target);
+	public SQLOrFilter(String tag) {
+		super(tag);
 		setSelectOnly(true);
 	}
-	public SQLOrFilter(Class<T> target,SQLFilter<? super T> ...filters ){
-		this(target);
+	@SafeVarargs
+	public SQLOrFilter(String tag,SQLFilter<? super T> ...filters ){
+		this(tag);
 		for(SQLFilter<? super T> f : filters){
 			addFilter(f);
 		}
@@ -64,7 +65,7 @@ public class SQLOrFilter<T> extends BaseSQLCombineFilter<T> {
 			JoinerFilter link = filter.getLink();
 			SQLOrFilter group = back_joins.get(link);
 			if( group == null ) {
-				group=new SQLOrFilter<T>(link.getTarget());
+				group=new SQLOrFilter<T>(link.getTag());
 				back_joins.put(link, group);
 			}
 			group.addFilter(filter.getFil());
@@ -89,9 +90,9 @@ public class SQLOrFilter<T> extends BaseSQLCombineFilter<T> {
 			JoinerFilter key = e.getKey();
 			if( value.size() == 1) {
 				// remove redundant wrapper
-				set.add(new BackJoinFilter(getTarget(), key, (SQLFilter) value.getSet().iterator().next()));
+				set.add(new BackJoinFilter(getTag(), key, (SQLFilter) value.getSet().iterator().next()));
 			}else {
-				set.add(new BackJoinFilter(getTarget(), key, value));
+				set.add(new BackJoinFilter(getTag(), key, value));
 			}
 		}
 		return set;

@@ -69,4 +69,8 @@ public class DurationSecondConvertSQLValue  implements NestedSQLValue<Number,Dur
 	public SQLValue<Duration> getNested() {
 		return a;
 	}
+	@Override
+	public String getFilterTag() {
+		return a.getFilterTag();
+	}
 }

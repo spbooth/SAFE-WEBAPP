@@ -57,10 +57,7 @@ public class DataStore extends ClassificationFactory<DataStore.Data>  {
 		return spec;
 	}
 
-	@Override
-	public Class<Data> getTarget() {
-		return Data.class;
-	}
+
 	@Override
 	protected Map<String, Selector> getSelectors() {
 		Map<String, Selector> selectors = super.getSelectors();

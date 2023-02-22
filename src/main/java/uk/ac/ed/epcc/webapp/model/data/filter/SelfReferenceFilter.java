@@ -18,7 +18,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterVisitor;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
@@ -39,7 +38,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 public class SelfReferenceFilter<T> implements SQLFilter<T> , PatternFilter<T>{
 
-	private final Class<T> target;
+	
 	private final IndexedReference ref;
 	private final Repository res;
 	private final boolean exclude;
@@ -49,8 +48,8 @@ public class SelfReferenceFilter<T> implements SQLFilter<T> , PatternFilter<T>{
 	 * @param res  {@link Repository}
 	 * @param ref {@link IndexedReference}
 	 */
-	public SelfReferenceFilter(Class<T> target,Repository res, IndexedReference ref){
-		this(target,res,false,ref);
+	public SelfReferenceFilter(Repository res, IndexedReference ref){
+		this(res,false,ref);
 	}
 	/** 
 	 * 
@@ -59,8 +58,7 @@ public class SelfReferenceFilter<T> implements SQLFilter<T> , PatternFilter<T>{
 	 * @param exclude if true, matches everything but reference
 	 * @param ref {@link IndexedReference}
 	 */
-	public SelfReferenceFilter(Class<T> target,Repository res, boolean exclude ,IndexedReference ref){
-		this.target=target;
+	public SelfReferenceFilter(Repository res, boolean exclude ,IndexedReference ref){
 		this.res=res;
 		this.exclude=exclude;
 		this.ref=ref;
@@ -101,12 +99,7 @@ public class SelfReferenceFilter<T> implements SQLFilter<T> , PatternFilter<T>{
 
 
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.Targetted#getTarget()
-	 */
-	public Class<T> getTarget() {
-		return target;
-	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -114,7 +107,7 @@ public class SelfReferenceFilter<T> implements SQLFilter<T> , PatternFilter<T>{
 		result = prime * result + (exclude ? 1231 : 1237);
 		result = prime * result + ((ref == null) ? 0 : ref.hashCode());
 		result = prime * result + ((res == null) ? 0 : res.hashCode());
-		result = prime * result + ((target == null) ? 0 : target.hashCode());
+		
 		return result;
 	}
 	@Override
@@ -137,11 +130,6 @@ public class SelfReferenceFilter<T> implements SQLFilter<T> , PatternFilter<T>{
 			if (other.res != null)
 				return false;
 		} else if (!res.equals(other.res))
-			return false;
-		if (target == null) {
-			if (other.target != null)
-				return false;
-		} else if (!target.equals(other.target))
 			return false;
 		return true;
 	}

@@ -16,7 +16,6 @@ package uk.ac.ed.epcc.webapp.session;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.session.MultiNameFactory.Name;
@@ -84,7 +83,7 @@ public class MultiNameFinder<AU extends AppUser, X extends MultiNameFinder> exte
 		} catch (Exception e) {
 			getLogger().error("Error getting filer", e);
 		}
-		return new FalseFilter<AU>((Class<AU>) getFactory().getTarget());
+		return new FalseFilter<AU>();
 		
 	}
 	
@@ -96,7 +95,7 @@ public class MultiNameFinder<AU extends AppUser, X extends MultiNameFinder> exte
 		} catch (Exception e) {
 			getLogger().error("Error getting filer", e);
 		}
-		return new FalseFilter<AU>((Class<AU>) getFactory().getTarget());
+		return new FalseFilter<AU>();
 	}
 
 	/* (non-Javadoc)

@@ -33,6 +33,8 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.FilterResult;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 /** {@link AppContextService} for managing session information.
  * This encodes all information about the current authenticated user, most importantly their
  * roles. The users may also have a database representation as an {@link AppUser} object which can also be 
@@ -328,7 +330,33 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public <T extends DataObject> BaseFilter<A> getPersonInRelationshipRoleFilter(DataObjectFactory<T> fac, String role,T target) throws UnknownRelationshipException;
 	
-	public <T extends DataObject> SQLFilter<A> getPersonInRelationshipRoleToFilter(DataObjectFactory<T> fac, String role,SQLFilter<T> target) throws UnknownRelationshipException, CannotUseSQLException;
+	/** helper method to retrieve {@link AppUser}s that match a relationship
+	 * 
+	 * @param <T>
+	 * @param fac
+	 * @param role
+	 * @param target
+	 * @return
+	 * @throws UnknownRelationshipException
+	 * @throws DataFault
+	 */
+	default public <T extends DataObject> FilterResult<A> getPeopleInRelationship(DataObjectFactory<T> fac, String role,T target) throws UnknownRelationshipException, DataFault{
+		return getLoginFactory().getResult(getPersonInRelationshipRoleFilter(fac, role, target));
+	}
+	/** Helpder method to test if any people exist with a relationship to a target
+	 * 
+	 * @param <T>
+	 * @param fac
+	 * @param role
+	 * @param target
+	 * @return
+	 * @throws UnknownRelationshipException
+	 * @throws DataException
+	 */
+	default public <T extends DataObject> boolean peopleExistInRelationship(DataObjectFactory<T> fac, String role,T target) throws UnknownRelationshipException, DataException{
+		return getLoginFactory().exists(getPersonInRelationshipRoleFilter(fac, role, target));
+	}
+	public<T extends DataObject> SQLFilter<A> getPersonInRelationshipRoleToFilter(DataObjectFactory<T> fac, String role,SQLFilter<T> target) throws UnknownRelationshipException, CannotUseSQLException;
 	
 	/** get a {@link BaseFilter} representing the set of targets that a specified {@link AppUser} is in a particular
 	 * relationship-role with.
@@ -435,6 +463,11 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 */
 	public void flushRelationships();
 	
+	/** Clear any cached roles. 
+	 * This will also clear any temporary roles
+	 * 
+	 */
+	public void flushCachedRoles();
 	/** Add context parameters for security logging.
 	 * 
 	 * @param att

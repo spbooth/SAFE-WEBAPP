@@ -128,10 +128,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	protected T makeBDO(Record res) throws DataFault {
 		return (T) new Classification(res, this);
 	}
-	@Override
-	public Class<T> getTarget() {
-		return (Class) Classification.class;
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.NameFinder#findByName(java.lang.String)
 	 */
@@ -153,12 +150,12 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	 */
 	@Override
 	public SQLValueFilter<T> getStringFinderFilter(String name) {
-		return new SQLValueFilter<>(getTarget(),res,Classification.NAME,name);
+		return new SQLValueFilter<>(res,Classification.NAME,name);
 	}
 	@Override
 	public SQLFilter<T> hasCanonicalNameFilter(){
 		// all classifications have names
-		return new GenericBinaryFilter<T>(getTarget(), true);
+		return new GenericBinaryFilter<T>( true);
 	}
 	
 	/* (non-Javadoc)
@@ -579,9 +576,5 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 				spec.setField(field, ts.getField(field));
 			}
 		}
-	}
-	@Override
-	protected boolean allowPreSelect() {
-		return getContext().getBooleanParameter(getConfigTag()+".allowPreSelect", super.allowPreSelect());
 	}
 }

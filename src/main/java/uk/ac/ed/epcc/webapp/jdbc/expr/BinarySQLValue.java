@@ -95,7 +95,7 @@ public class BinarySQLValue implements GroupingSQLValue<Number> {
 			if( b_fil == null ){
 				return a_fil;
 			}
-			SQLAndFilter fil = new SQLAndFilter(a_fil.getTarget());
+			SQLAndFilter fil = new SQLAndFilter(a_fil.getTag());
 			fil.addFilter(a_fil);
 			fil.addFilter(b_fil);
 			return fil;
@@ -173,5 +173,12 @@ public class BinarySQLValue implements GroupingSQLValue<Number> {
 		}
 		return true;
 	}
-	
+	@Override
+	public String getFilterTag() {
+		String t = a.getFilterTag();
+		if( t != null) {
+			return t;
+		}
+		return b.getFilterTag();
+	}
 }

@@ -13,7 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.data;
 
-import uk.ac.ed.epcc.webapp.jdbc.filter.AbstractAcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.Joiner;
@@ -31,16 +30,14 @@ import uk.ac.ed.epcc.webapp.model.data.filter.Joiner;
  * @param <R> remote type
  *
  */
-public class RemoteAcceptFilter<T extends DataObject, R extends DataObject> extends AbstractAcceptFilter<T>{
+public class RemoteAcceptFilter<T extends DataObject, R extends DataObject> implements AcceptFilter<T>{
 
 	/**
-	 * @param target  type of filter 
 	 * @param remote factory for remote type
 	 * @param field field to join on
 	 * @param fil {@link AcceptFilter} to apply
 	 */
-	public RemoteAcceptFilter(Class<T> target,DataObjectFactory<R> remote,String field, BaseFilter<R> fil) {
-		super(target);
+	public RemoteAcceptFilter(DataObjectFactory<R> remote,String field, BaseFilter<R> fil) {
 		this.remote=remote;
 		this.field=field;
 		this.fil=fil;
@@ -52,7 +49,7 @@ public class RemoteAcceptFilter<T extends DataObject, R extends DataObject> exte
 	 * @see uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter#accept(java.lang.Object)
 	 */
 	@Override
-	public boolean accept(T o) {
+	public boolean test(T o) {
 	    R remote_target = remote.find(o.record.getNumberProperty(field));
 	    if( remote_target == null){
 	    	return false;

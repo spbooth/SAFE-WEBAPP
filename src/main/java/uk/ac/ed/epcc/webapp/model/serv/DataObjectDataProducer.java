@@ -93,7 +93,7 @@ public class DataObjectDataProducer<D extends DataObjectDataProducer.MimeData> e
 			FilterDelete<D> del = new FilterDelete<>(res);
 			try {
 				CurrentTimeService time = getContext().getService(CurrentTimeService.class);
-				del.delete(new SQLValueFilter<>(getTarget(),res, EXPIRES_FIELD,MatchCondition.LT, time.getCurrentTime()));
+				del.delete(new SQLValueFilter<>(res, EXPIRES_FIELD,MatchCondition.LT, time.getCurrentTime()));
 			} catch (DataFault e) {
 				getContext().error(e,"Error deleting old data");
 			}

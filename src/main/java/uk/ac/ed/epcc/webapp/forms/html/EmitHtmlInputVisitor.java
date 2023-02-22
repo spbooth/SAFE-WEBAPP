@@ -490,13 +490,18 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				hb.addClass("multi_input");
 				if( input.hasSubLabels()) {
 					// use grid layout to make 2 col
-					// at time of writting all sub-label inputs are single line
+					
 					hb.addClass("sub_labels");
 				}
 				for(String sub_key : input.getSubKeys()){
-
+					if( input.hasSubLabels()) {
+						// if there is only a single column then simplify the formatting by just using a simple div
+						hb.open("div");
+						hb.addClass("input_row");
+					}
 					if( input.hasSubLabels()){
 						hb.open("div");
+						hb.addClass("sub_label");
 						String lab = input.getSubLabel(sub_key);
 						if( lab != null ){
 							hb.clean(lab);
@@ -505,9 +510,15 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 
 					}
 					hb.open("div");
+					if( input.hasSubLabels()) {
+						hb.addClass("sub_input");
+					}
 					T i = input.getInput(sub_key);
 					i.accept(this);
 					hb.close();
+					if( input.hasSubLabels()) {
+						hb.close(); // close input_row
+					}
 				}
 				hb.close();
 			}

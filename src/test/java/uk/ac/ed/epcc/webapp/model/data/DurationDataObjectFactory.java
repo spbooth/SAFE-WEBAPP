@@ -35,10 +35,6 @@ public class DurationDataObjectFactory extends DataObjectFactory<DurationDataObj
 	 */
 	private static final String DURATION = "Duration";
 
-@Override
-	public Class<DurationObject> getTarget() {
-		return DurationObject.class;
-	}
 
 	@Override
 	protected DurationObject makeBDO(Record res) throws DataFault {

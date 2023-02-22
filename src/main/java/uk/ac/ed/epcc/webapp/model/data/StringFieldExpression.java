@@ -24,8 +24,8 @@ import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 
 
 public class StringFieldExpression<X extends DataObject> extends FieldExpression<String,X> {
-	protected StringFieldExpression(Class<X> filter_type,Repository res,String field) {
-		super(filter_type,res, String.class,field);
+	protected StringFieldExpression(Repository res,String field) {
+		super(res, String.class,field);
 	}
 	protected String getValue(Record r) {
 		return r.getStringProperty(name);

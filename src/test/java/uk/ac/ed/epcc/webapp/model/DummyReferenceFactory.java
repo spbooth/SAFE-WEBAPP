@@ -37,10 +37,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
 
 public class DummyReferenceFactory extends DataObjectFactory<DummyReference> {
 
-	@Override
-	public Class<DummyReference> getTarget() {
-		return DummyReference.class;
-	}
+	
 
 
 
@@ -62,7 +59,7 @@ public class DummyReferenceFactory extends DataObjectFactory<DummyReference> {
 	 * @return
 	 */
 	public SQLFilter<Dummy1> getReferencedFilter(String name){
-		return getDestFilter(new SQLValueFilter<>(getTarget(),res,DummyReference.STRING_FIELD,name), DummyReference.REF_FIELD, new Dummy1.Factory(getContext()));
+		return getDestFilter(new SQLValueFilter<>(res,DummyReference.STRING_FIELD,name), DummyReference.REF_FIELD, new Dummy1.Factory(getContext()));
 	}
 	public BaseFilter<DummyReference> getRemoteFilter(BaseFilter<Dummy1> fil){
 		Dummy1.Factory fac = new Dummy1.Factory(getContext());
@@ -82,23 +79,20 @@ public class DummyReferenceFactory extends DataObjectFactory<DummyReference> {
 	}
 	public BaseFilter<DummyReference> getRemoteNumberAndFilter(Number n){
 		Dummy1.Factory fac = new Dummy1.Factory(getContext());
-		return getRemoteFilter(fac, DummyReference.REF_FIELD,new AndFilter(fac.getTarget(), fac.getNumberAcceptFilter(n), fac.getNumberFilter(n)));
+		return getRemoteFilter(fac, DummyReference.REF_FIELD,fac.getAndFilter( fac.getNumberAcceptFilter(n), fac.getNumberFilter(n)));
 	}
 	public BaseFilter<DummyReference> getRemoteNumberSQLAndFilter(Number n){
 		Dummy1.Factory fac = new Dummy1.Factory(getContext());
-		return getRemoteFilter(fac, DummyReference.REF_FIELD,new SQLAndFilter(fac.getTarget(), fac.getNumberFilter(n), fac.getNumberFilter(n)));
+		return getRemoteFilter(fac, DummyReference.REF_FIELD,fac.getSQLAndFilter(fac.getNumberFilter(n), fac.getNumberFilter(n)));
 	}
 	public BaseFilter<DummyReference> getRemoteNumberDualFilter(Number n){
 		Dummy1.Factory fac = new Dummy1.Factory(getContext());
 		return getRemoteFilter(fac, DummyReference.REF_FIELD,new DualFilter(fac.getNumberFilter(n), fac.getNumberAcceptFilter(n)));
 	}
-	public Set<Dummy1> geReferencedDummy(String name) throws DataFault{
-		IndexedTypeProducer<Dummy1, Dummy1.Factory>prod = new IndexedTypeProducer<>(getContext(), DummyReference.REF_FIELD, new Dummy1.Factory(getContext()));
-		return getReferenced(prod, new SQLValueFilter<>(getTarget(), res, DummyReference.STRING_FIELD, name));
-	}
+	
 	public BaseFilter<Dummy1> getDestFilter(String local_name){
 		Dummy1.Factory fac = new Dummy1.Factory(getContext());
-		return convertToDestinationFilter(fac, DummyReference.REF_FIELD, new SQLValueFilter<DummyReference>(getTarget(), res, DummyReference.STRING_FIELD, local_name));
+		return convertToDestinationFilter(fac, DummyReference.REF_FIELD, new SQLValueFilter<DummyReference>(res, DummyReference.STRING_FIELD, local_name));
 	}
 	/**
 	 * 

@@ -50,8 +50,8 @@ public class TupleSelfSQLValue<A extends DataObject,AF extends DataObjectFactory
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.FilterProvider#getFilterType()
 	 */
 	@Override
-	public Class<T> getFilterType() {
-		return tuple_fac.getTarget();
+	public String getFilterTag() {
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -69,6 +69,11 @@ public class TupleSelfSQLValue<A extends DataObject,AF extends DataObjectFactory
 		}catch(Exception e){
 			throw new CannotFilterException(e);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "TupleSelfSQLValue(" + getFactory().getTag() + ")";
 	}
 
 }

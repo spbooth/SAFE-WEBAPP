@@ -1,0 +1,17 @@
+%%begin{Subject}%%
+%%service.name%% 2FA token has been locked
+%%end{Subject}%%
+Dear %%person.name%%,
+
+Your 2FA access token has been locked on the %%service.name%% %%service.website-name=Web-site%%
+because too many authentication attempts have failed.
+%%service.saf.url%%
+
+As your primary login credentials must be known before the secondary code is asked for this may
+indicate a compromise of your primary credentials. Please contact our helpdesk for assistance
+in recovering access to your account. 
+
+Regards
+
+  The %%service.name%% Team
+
