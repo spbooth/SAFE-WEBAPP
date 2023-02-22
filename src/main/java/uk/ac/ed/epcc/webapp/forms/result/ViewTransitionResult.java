@@ -26,8 +26,8 @@ import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
  * two representations are identical. 
  * @author spb
  *
- * @param <T>
- * @param <K>
+ * @param <T> type of transition
+ * @param <K> type of transition key
  */
 
 

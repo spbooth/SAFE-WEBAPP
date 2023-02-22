@@ -36,7 +36,8 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  * 
  * @author spb
  *
- * @param <T>
+ * @param <T> type of expression
+ * @param <D> type of input expression
  */
 public class FuncExpression<T,D> implements SQLExpression<T> {
 	

@@ -22,8 +22,8 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
  * 
  * @author spb
  *
- * @param <K>
- * @param <X>
+ * @param <K> type of transition key
+ * @param <X> type of object
  */
 
 

@@ -62,7 +62,7 @@ import uk.ac.ed.epcc.webapp.session.twofactor.TwoFactorHandler;
  *<ul>
  *<li><b>remote_auth_server.url</b> A URL of a remote server the user will be redirected to. </li>
  *<li><b>remote_auth_server.secret</b> The shared secret.</li>
- *<li><b>remote_auth_server.hash</b> The name of the {@link Hash} to use defaults to SHA512</i>
+ *<li><b>remote_auth_server.hash</b> The name of the {@link Hash} to use defaults to SHA512</li>
  *<li><b>remote_auth_server.token_len</b> The length of the session token defaults to 64 </li>
  *</ul>
  *

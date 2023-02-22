@@ -29,7 +29,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * <p>
  * Additional property files can be included by adding a property of the form
  * <b>add_properties.<i>name</i>=<i>resource-list<\i></b>.
- * A property of the form <b>nest_properties.<i>name</i>=<i>resource-list<\i></b> will cause the 
+ * A property of the form <b>nest_properties.<i>name</i>=<i>resource-list</i></b> will cause the 
  * included properties to be prefixed by <i>name</i>.
  * 
  * @author spb

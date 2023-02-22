@@ -22,7 +22,7 @@ package uk.ac.ed.epcc.webapp;
  * 
  * @author spb
  *
- * @param <T>
+ * @param <T> type of returned object
  */
 public interface Targetted<T> {
 	 /** Get the type of the returned object as far as it is known.

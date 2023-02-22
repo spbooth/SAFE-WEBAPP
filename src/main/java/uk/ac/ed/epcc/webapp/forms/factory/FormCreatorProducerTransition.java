@@ -22,7 +22,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
  * 
  * @author spb
  *
- * @param <X>
+ * @param <X> type of object created
  */
 
 

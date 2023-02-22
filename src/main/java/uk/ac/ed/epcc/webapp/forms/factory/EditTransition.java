@@ -30,7 +30,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * 
  * @author spb
  *
- * @param <X>
+ * @param <X> type of object edited
  */
 public abstract class EditTransition<X> implements
 		ValidatingFormTransition<X> , ExtraContent<X>{

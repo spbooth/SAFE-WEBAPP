@@ -31,7 +31,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResultVisitor;
  * 
  * @author spb
  *
- * @param <X>
+ * @param <X> type of transition target
  */
 public interface TransitionVisitor<X> {
    FormResult doDirectTransition(DirectTransition<X> t) throws TransitionException;

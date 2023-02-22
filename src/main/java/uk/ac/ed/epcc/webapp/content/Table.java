@@ -593,8 +593,8 @@ public class Table<C, R> {
 	 * object that implements either {@link XMLGenerator} or {@link UIGenerator}
 	 * 
 	 * @author spb
-	 * @param <C> 
-	 * @param <R> 
+	 * @param <C> type of column key
+	 * @param <R> type of row key
 	 * 
 	 */
 	public static interface Formatter<C, R> {
@@ -607,7 +607,7 @@ public class Table<C, R> {
 	 * or Numbers
 	 * 
 	 * @author spb
-	 * @param <C> 
+	 * @param <C> type of column key
 	 * 
 	 */
 	public static class Sorter<C> implements Comparator {
@@ -722,8 +722,8 @@ public class Table<C, R> {
 	 * Adapter to convert a Transform into a Formatter
 	 * 
 	 * @author spb
-	 * @param <C> 
-	 * @param <R> 
+	 * @param <C> type of column key
+	 * @param <R> type of row key
 	 * 
 	 */
 	public static class TransformFormatter<C, R> implements Formatter<C, R> {

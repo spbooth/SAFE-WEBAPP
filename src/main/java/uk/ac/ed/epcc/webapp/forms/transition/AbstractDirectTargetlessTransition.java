@@ -20,7 +20,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
  * 
  * This saves a small amount of boiler plate when no other superclass is required.
  * @author spb
- * @param <X> 
+ * @param <X> type of transition target
  *
  */
 

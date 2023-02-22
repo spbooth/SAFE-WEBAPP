@@ -33,7 +33,7 @@ import uk.ac.ed.epcc.webapp.time.Period;
  * 
  * 
  * @author spb
- * @param <P> type of Plot object
+ * @param <S> type of Plot object
  * 
  */
 

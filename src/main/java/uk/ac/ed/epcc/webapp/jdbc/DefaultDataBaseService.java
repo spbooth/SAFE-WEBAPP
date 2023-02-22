@@ -45,9 +45,9 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.TransientDataFault;
  * 
  * The following config parameters are read:
  * <ul>
- * <li> <b>db_name<i>[.tag]</b> connection url</li>
- * <li> <b>db_type<i>[.tag]</b> connection type [mysql or postgres]</li>
- * <li> <b>db_name<i>[.tag]</b> connection url</li>
+ * <li> <b>db_name<i>[.tag]</i></b> connection url</li>
+ * <li> <b>db_type<i>[.tag]</i></b> connection type [mysql or postgres]</li>
+ * <li> <b>db_name<i>[.tag]</i></b> connection url</li>
  * <li> <b>transaction.isolation_level</b> isolationlevel to use for transactions </li>
  * </ul>
  * 

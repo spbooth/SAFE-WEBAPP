@@ -25,7 +25,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
  * This extends {@link NoHtmlInput} as these are user selected names that
  * are likely to be displayed in pages.
  * @author spb
- * @param <F> 
+ * @param <F> type of target object
  *
  */
 public class UnusedNameInput<F extends DataObject> extends NoHtmlInput{

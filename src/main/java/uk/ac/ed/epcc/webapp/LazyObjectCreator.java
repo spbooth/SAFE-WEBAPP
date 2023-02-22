@@ -21,7 +21,7 @@ package uk.ac.ed.epcc.webapp;
  * directly (forwarding onto the inner object).
  * @author spb
  *
- * @param <A>
+ * @param <A> type of object created
  */
 public class LazyObjectCreator<A> extends AbstractContexed {
   private final Class<? super A> clazz;

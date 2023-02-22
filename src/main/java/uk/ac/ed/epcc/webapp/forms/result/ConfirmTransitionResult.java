@@ -22,8 +22,8 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
  * 
  * This is used to implements confirm requests made by the action.
  * @author spb
- * @param <T> 
- * @param <K> 
+ * @param <T> type of transition target
+ * @param <K> type of result
  *
  */
 

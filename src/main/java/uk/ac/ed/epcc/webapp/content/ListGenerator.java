@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.content;
 
 import java.util.Collection;
+import java.lang.Iterable;
 
 import uk.ac.ed.epcc.webapp.forms.Identified;
 
@@ -22,7 +23,7 @@ import uk.ac.ed.epcc.webapp.forms.Identified;
  * or an object instance can be wrapped round the collection to
  * create a {@link XMLGenerator}
  * 
- * A {@link ContentBuilder} will be able to add a collection directly via {@link ContentBuilder#addList(Collection)}
+ * A {@link ContentBuilder} will be able to add a collection directly via {@link ContentBuilder#addList(Iterable)}
  * 
  * @author spb
  *

@@ -28,7 +28,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.UpdateTransition;
  * @author Stephen Booth
  *@see StandAloneFormUpdateTransition
  *@see UpdateTransition
- * @param <X>
+ * @param <X> type of object updated
  */
 public class StandAloneFormUpdateProducerTransition<X> extends
 		EditTransition<X> {

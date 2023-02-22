@@ -37,6 +37,7 @@ import uk.ac.ed.epcc.webapp.Contexed;
  * <tr><td>config.path</td><td>service-config.properties</td><td>Instance specific configuration</td></tr>
  * <tr><td>deploy.path</td><td>deploy-config.properties</td><td>View configuration within a instance.</td></tr>
  * <tr><td>build.path</td><td>build-config.properties</td><td>Generated automatically by the build to hold version information</td></tr>
+ * <caption>Configuration parameters</caption>
  * </table>
  * 
  * 

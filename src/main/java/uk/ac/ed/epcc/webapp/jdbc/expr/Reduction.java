@@ -27,9 +27,7 @@ import uk.ac.ed.epcc.webapp.content.Operator;
  * <p>
  * AVG is a mean value except when doing overlap mapping when it becomes a time average
  * </p>
- * <p>
- * 
- * </p>
+ 
  * @author spb
  *
  */

@@ -25,7 +25,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
  * 
  * @author spb
  *
- * @param <X>
+ * @param <X> type of object created
  */
 public abstract class CreatorTransition<X> extends AbstractTargetLessTransition<X> {
 	protected final String type_name;

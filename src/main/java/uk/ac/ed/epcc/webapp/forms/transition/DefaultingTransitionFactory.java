@@ -27,8 +27,8 @@ import uk.ac.ed.epcc.webapp.servlet.ViewTransitionKey;
  * @author spb
  * @see IndexTransitionFactory
  *
- * @param <K>
- * @param <T>
+ * @param <K> type of transition key
+ * @param <T> type of transition target
  */
 public interface DefaultingTransitionFactory<K, T> extends
 		TransitionFactory<K, T> {

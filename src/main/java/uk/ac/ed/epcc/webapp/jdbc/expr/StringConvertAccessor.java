@@ -23,8 +23,8 @@ package uk.ac.ed.epcc.webapp.jdbc.expr;
  * 
  * @author spb
  *
- * @param <T>
- * @param <R>
+ * @param <T> type returned by nexted accessor
+ * @param <R> type of target object
  */
 public class StringConvertAccessor<T,R> implements Accessor<String,R> {
 

@@ -28,8 +28,8 @@ import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
  * 
  * @author spb
  *
- * @param <K>
- * @param <T>
+ * @param <K> type of transition key
+ * @param <T> type of transition
  */
 public class NestAction<K,T> extends FormAction {
 	ViewTransitionFactory<K, T> provider;

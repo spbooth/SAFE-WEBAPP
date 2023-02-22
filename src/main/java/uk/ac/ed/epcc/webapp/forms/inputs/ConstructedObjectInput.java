@@ -34,7 +34,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  * than those specified.
  * @author spb
  *
- * @param <T>
+ * @param <T> type of object constructed
  */
 
 

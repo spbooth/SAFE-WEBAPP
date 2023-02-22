@@ -15,8 +15,8 @@ import java.util.Set;
  * 
  * @author Stephen Booth
  *
- * @param <T>
- * @param <R>
+ * @param <T> type of input
+ * @param <R> type of return
  */
 public interface EnumeratingLabeller<T,R> extends Labeller<T, R> {
 

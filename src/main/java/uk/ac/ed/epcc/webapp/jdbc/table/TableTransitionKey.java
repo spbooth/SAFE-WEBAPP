@@ -19,7 +19,6 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** a {@link TransitionKey} for table transitions
  * @author spb
- * @param <T> type of target
  *
  */
 public abstract class TableTransitionKey extends TransitionKey<DataObjectFactory> {

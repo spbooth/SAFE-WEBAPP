@@ -42,6 +42,7 @@ import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
  * <li> <em><b>NameFinder.</b>realm<b>.user_supplied</b></em> Is name user supplied default false</li> 
  * <li> <em><b>NameFinder.</b>realm<b>.user_visible</b></em> Is name user visible default as <b>user_supplied</b></li> 
  * <li> <em><b>NameFinder.</b>realm<b>.length</b></em> field width.</li> 
+ * </ul>
  * @author spb
  *
  */

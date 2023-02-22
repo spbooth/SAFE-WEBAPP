@@ -32,7 +32,6 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  * 
  * @author spb
  * @param <F> filter type
- * @param <T> type of expression
  */
 public class DateArrayFuncExpression<F> implements DateSQLExpression {
 	

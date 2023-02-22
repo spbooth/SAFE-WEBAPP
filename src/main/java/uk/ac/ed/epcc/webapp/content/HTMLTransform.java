@@ -21,8 +21,6 @@ package uk.ac.ed.epcc.webapp.content;
  * 
  * 
  * @author spb
- * @param <C> 
- * @param <R> 
  *
  */
 

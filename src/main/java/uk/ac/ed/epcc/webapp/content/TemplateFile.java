@@ -55,31 +55,30 @@ import uk.ac.ed.epcc.webapp.model.TemplateFinder;
  * 
  * Properties may also be given default values in the template file, like so:
  * %%property=default_value%%
- * <p>
  * 
  * 
+ * <pre>
  * 
+ * Regions
+ * Regions within a template file are marked with the syntax:
+ * &lt;region&gt; := &lt;begin term&gt; [text] &lt;end term&gt;
+ * &lt;begin term&gt; := "%%begin{" &lt;region_name&gt; ("," ("true"|"false")) "}%%"
+ * &lt;end term&gt; := "%%end{" (&lt;region_name&gt;) "}%%"
+ * &lt;region_name&gt; := ('0..9' | 'a..z' | 'A..Z' | '_' | '-')+
  * 
- * Regions <br>
- * Regions within a template file are marked with the syntax: <br>
- * <region> := <begin term> [text] <end term> <br>
- * <begin term> := "%%begin{" <region_name> ("," ("true"|"false")) "}%%" <br>
- * <end term> := "%%end{" (<region_name>) "}%%" <br>
- * <region_name> := ('0..9' | 'a..z' | 'A..Z' | '_' | '-')+ <br>
+ * e.g.:
+ * %%begin{region1}%% text in region1 %%end{region1}%%
+ * or
+ * %%begin{region2, true}%% text in region2 %%end{}%%
  * 
- * e.g.: <br>
- * %%begin{region1}%% text in region1 %%end{region1}%% <br>
- * or <br>
- * %%begin{region2, true}%% text in region2 %%end{}%% <br>
- * 
- * where <region_name> is an alphanumeric (or '_' and '-')
- * <p>
- * Regions are *disabled* by default and may be enabled with: setRegionEnabled(<region_name>,
- * <boolean value>);
+ * where &lt;region_name&gt; is an alphanumeric (or '_' and '-')
+ * </pre>
+ * Regions are *disabled* by default and may be enabled with: setRegionEnabled(&lt;region_name&gt;,
+ * &lt;boolean value&gt;);
  * <p>
  * Regions may be nested (though not overlapping) and can contain the usual
  * substitution tokens.
- * <p>
+ * </p>
  * 
  * <pre>
  *  Document Structure:
@@ -91,17 +90,18 @@ import uk.ac.ed.epcc.webapp.model.TemplateFinder;
  *         TemplateFile
  *         Object[]
  * </pre>
- * 
+ * <p>
  * FUTURE: Retire cached template files which haven't been accessed for a while
  * (idea: make the getTemplateFile method clean up every so often - it's
  * synchronized so shouldn't pose a problem)
+ * </p>
  * <p>
  * Possibly add a thread which is activated every second to reload modified
  * cached templates rather than checking their modification time each time they
  * are accessed.. might be faster in some cases.
- * <p>
- * Region pasting:
- * <p>
+ * </p>
+ * <h4>Region pasting:</h4>
+ * 
  * Add location types and allow regions to be pasted into them e.g. In HTML
  * document:
  * 

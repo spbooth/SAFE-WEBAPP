@@ -16,7 +16,6 @@ package uk.ac.ed.epcc.webapp.model.data;
 /** Interface for {@link DataObject}s that can directly retrieve
  * their factory.
  * 
- * @see DataObject#getFactory(uk.ac.ed.epcc.webapp.AppContext, DataObject)
  * @author spb
  *
  */

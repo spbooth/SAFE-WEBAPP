@@ -32,7 +32,7 @@ import uk.ac.ed.epcc.webapp.model.data.Repository;
  * element from the option map as the Item.
  * 
  * @author spb
- * @param <I> 
+ * @param <I> type of item
  *
  */
 public class OptionalIndexInput<I> extends ParseAbstractInput<String> implements ListInput<String, I>{

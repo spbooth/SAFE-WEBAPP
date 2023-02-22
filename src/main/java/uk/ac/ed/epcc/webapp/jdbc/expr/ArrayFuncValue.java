@@ -31,8 +31,8 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  * an {@link ArrayFunc} (e.g. greatest/least).
  * 
  * @author spb
- *
- * @param <T>
+  @param <F> type of parent object
+ * @param <T> type of expression
  */
 public class ArrayFuncValue<F,T> implements SQLValue<T> {
 	

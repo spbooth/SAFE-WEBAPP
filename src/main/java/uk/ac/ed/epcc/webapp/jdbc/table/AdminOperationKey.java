@@ -18,7 +18,6 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A {@link TableTransitionKey} that requires the operator to have the Admin role
  * @author spb
- * @param <T> target type
  *
  */
 public class AdminOperationKey extends TableTransitionKey {

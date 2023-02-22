@@ -19,7 +19,6 @@ package uk.ac.ed.epcc.webapp.forms.transition;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ContentBuilder;
-import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.ChainAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
@@ -30,7 +29,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @see ForwardTransition
  * @author spb
  *
- * @param <T>
+ * @param <T> type of transition target
  */
 
 

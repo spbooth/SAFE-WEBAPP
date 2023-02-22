@@ -24,7 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 /** A Format for Date objects that understands a relative date notation 
  * 
- * Now[+-]<number>[dwmy]
+ * Now[+-]&lt;number&gt;[dwmy]
  * 
  * which translates to the current time plus or minus the specified 
  * number of days,weeks,months,years.

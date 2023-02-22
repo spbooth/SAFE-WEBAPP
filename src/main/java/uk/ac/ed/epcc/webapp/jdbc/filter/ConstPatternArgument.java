@@ -21,7 +21,7 @@ import java.sql.SQLException;
  * 
  * @author spb
  *
- * @param <T>
+ * @param <T> type of argument
  */
 public class ConstPatternArgument<T> implements PatternArgument {
 

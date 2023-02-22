@@ -23,13 +23,13 @@ import uk.ac.ed.epcc.webapp.AppContextService;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
 /** A service to provide logging capabilities.
- *<code>
- <pre>
+ *<pre>
+ <code>
    uk.ac.ed.epcc.webapp.Logger log = c.getService(LoggerService.class).getLogger(getClass()); // gets logger for this class
    log.debug("A debug message");
    log.error("A error message");
-</pre>
 </code>
+</pre>
  *  Logger is a locally defined interface. In a servlet context this is usually a wrapper round a
  *  Log4J Logger class. However in a stand-alone context a the Logger just prints to <code>System.out</code>
  *  This is to allow lightweight applications to run without the full Log4J jar files and 

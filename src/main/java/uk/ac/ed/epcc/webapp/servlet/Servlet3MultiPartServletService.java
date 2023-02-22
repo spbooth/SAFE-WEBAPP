@@ -33,7 +33,6 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  * the allowCasualMultipartParsing attribute set to true in the Context. Unfortunately adding the annotation to a servlet
  * breaks the old implementation as the parts will already have been removed
  * 
- * @see MultiPartServletService
  * @author spb
  *
  */

@@ -19,7 +19,7 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
  * 
  * @author spb
  *
- * @param <T>
+ * @param <T> type of filter target
  */
 public class GenericBinaryFilter<T> implements SQLFilter<T>, BinaryFilter<T>{
 

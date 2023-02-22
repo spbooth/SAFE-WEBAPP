@@ -28,7 +28,7 @@ import uk.ac.ed.epcc.webapp.time.Period;
  * 
  * @author spb
  *
- * @param <P>
+ * @param <P> type of plot
  */
 public abstract class SetPeriodChart<P extends PeriodPlot> extends PeriodChart<P> {
 

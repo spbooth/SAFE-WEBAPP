@@ -25,7 +25,7 @@ import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
  * @see FormFactoryProviderRegistry
  * @author spb
  *
- * @param <T>
+ * @param <T> type of target
  */
 public interface FormFactoryProvider<T> extends FormPolicy, Comparable{
 	/** generate a FormUpdate object appropriate to the specified user.

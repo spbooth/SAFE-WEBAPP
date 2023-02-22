@@ -19,16 +19,18 @@
  */
 package uk.ac.ed.epcc.webapp.model.data;
 
+import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 
 
 /** A {@link FieldExpression} for {@link Number} values.
  * 
- * This supports {@link Integer}, {@link Long}, {@Link Double}, {@link Float} and {@Link Duration}
+ * This supports {@link Integer}, {@link Long}, {@Link Double}, {@link Float} and {@link Duration}
  * values.
  * <p>
  * {@link Duration} objects are stored at millisecond resolution so as to properly implement {@link SQLExpression}
  * to store values at a different resolution use a {@link DurationFieldValue}.
+ * </p>
  * @author spb
  *
  * @param <T> type of expression.

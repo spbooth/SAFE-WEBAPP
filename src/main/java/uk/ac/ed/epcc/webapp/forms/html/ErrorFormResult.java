@@ -22,8 +22,8 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 
 /** A {@link FormResult} that indicates a form validation error.
  * @author spb
- * @param <T> 
- * @param <K> 
+ * @param <T> type of transition target
+ * @param <K> type of transition key
  *
  */
 

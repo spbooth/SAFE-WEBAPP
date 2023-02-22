@@ -28,8 +28,8 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
  * 
  * @author spb
  *
- * @param <K>
- * @param <R>
+ * @param <K> type of result key
+ * @param <R> type of result value
  */
 public abstract class GeneralMapMapper<K,R> extends SQLGroupMapper<Map<K,R>>  implements Contexed {
 	

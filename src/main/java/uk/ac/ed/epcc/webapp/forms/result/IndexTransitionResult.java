@@ -19,8 +19,8 @@ import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionFactory;
  * 
  * @author spb
  *
- * @param <T>
- * @param <K>
+ * @param <T> type of transition
+ * @param <K> type of key
  */
 
 public class IndexTransitionResult<T, K> extends ChainedTransitionResult<T, K> {

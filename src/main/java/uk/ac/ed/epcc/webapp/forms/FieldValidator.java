@@ -23,7 +23,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
  * Interface for an additional external validator that can be added to a Field.
  * 
  * As {@link FieldValidator}s are stored in Sets it is good practice to implement
- * {@link #hashCode()} and {@link #equals(Object)}.
+ * <b>hashCode()</b> and <b>equals(Object)</b>.
  * 
  * 
  * Note that a {@link FieldValidator} could throw a {@link MissingFieldException} 
