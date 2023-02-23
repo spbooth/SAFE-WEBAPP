@@ -92,13 +92,19 @@ public class LoginServlet<T extends AppUser> extends WebappServlet {
 	private void doLogout(AppContext conn, HttpServletRequest req,
 			HttpServletResponse res) throws IOException {
 		SessionService<T> serv = conn.getService(SessionService.class);
+		String realm = serv.getAuthenticationType();
 		serv.logOut();
 		if( serv.haveCurrentUser()){
 			// must be a SU operation go to main page
 			res.sendRedirect(res.encodeRedirectURL(req.getContextPath() + getMainPage(conn)));
 			return;
 		}
-		res.sendRedirect(res.encodeRedirectURL(conn.getInitParameter(LOGOUT_URL_PARAM, req.getContextPath() + getLoginPage(conn))));
+		String url = conn.getInitParameter(LOGOUT_URL_PARAM, req.getContextPath() + getLoginPage(conn));
+		
+		if( realm != null && ! realm.isEmpty()) {
+			url = conn.getInitParameter(LOGOUT_URL_PARAM+"."+realm,url);
+		}
+		res.sendRedirect(res.encodeRedirectURL(url));
 	}
 
 	@SuppressWarnings("unchecked")

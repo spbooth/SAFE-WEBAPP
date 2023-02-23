@@ -156,7 +156,7 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @return
 	 */
 	public String getAuthenticationType();
-	/** Set the authenticaiton type used for the session.
+	/** Set the authentication type used for the session.
 	 * This should be one of "password" or a remote auth realm.
 	 * @param type
 	 */

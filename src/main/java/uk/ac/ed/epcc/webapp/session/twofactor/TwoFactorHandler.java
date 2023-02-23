@@ -208,7 +208,7 @@ public class TwoFactorHandler<A extends AppUser> {
 						sess.setAuthenticationTime(time.getCurrentTime());
 					}
 					if( type != null ) {
-						sess.setAuthenticationType(AUTH_TYPE_ATTR);
+						sess.setAuthenticationType(type);
 					}
 					sess.setAttribute(AUTH_USES_2FA_ATTR, Boolean.TRUE);
 					completeAuth(user);
