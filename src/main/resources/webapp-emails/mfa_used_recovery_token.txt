@@ -1,0 +1,18 @@
+%%begin{Subject}%%
+%%service.name%% A new 2FA recovery token has been used to access your account
+%%end{Subject}%%
+Dear %%person.name%%,
+
+The recovery token has been used to access your account for the %%service.name%% %%service.website-name=Web-site%%.
+%%service.saf.url%%
+This will invalidate your current MFA secret. This recovery token cannot be used again.
+
+If you did not use this token somebody else has access to your account.
+Please contact our helpdesk for assistance in recovering access to your account. 
+
+If you did use the token, please remember to re-enable MFA and create a replacement recovery token.
+
+Regards
+
+  The %%service.name%% Team
+

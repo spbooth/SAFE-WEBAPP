@@ -319,15 +319,16 @@ public class Emailer implements Contexed{
 	}
 	
 	/**
-	 * Notify user their MFA access has been locked-out.
+	 * Generic norification email where the only customisation
+	 * is based on the recipient
 	 * 
 	 * 
 	 * 
 	 */
-	public void mfaFailsExceeded(AppUser person)
+	public void userNotification(AppUser person,String template)
 			throws Exception {
 
-		TemplateFile email_template = getFinder().getTemplateFile("mfa_fails_exceeded.txt");
+		TemplateFile email_template = getFinder().getTemplateFile(template);
 		
 
 		String name = person.getName();
@@ -337,13 +338,14 @@ public class Emailer implements Contexed{
 		email_template.setProperty("person.name", name);
 		String email = person.getEmail();
 		if( email == null){
-			getLogger().error("MFA fails email destination not known "+person.getIdentifier());
+			getLogger().error("Notification email destination not known "+person.getIdentifier());
 			return;
 		}
 		email_template.setProperty("person.email", email);
 		doSend(templateMessage(person,getFrom(person),email_template));
 
 	}
+	
 	public void newSignup(AppUser person, String new_password)
 			throws Exception {
 

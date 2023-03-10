@@ -100,12 +100,12 @@ public class RandomService implements AppContextService<RandomService> {
 		return buff.toString();
 	}
 
-	/**
-	 * @param total_chars
+	/** generate an int between 0 (inclusive) and bound (exclusive)
+	 * @param bound
 	 * @return
 	 */
-	protected int randomInt(int total_chars) {
-		return random.nextInt(total_chars);
+	public int randomInt(int bound) {
+		return random.nextInt(bound);
 	}
 	/**
 	 * Generates random sequences of characters in the ranges 'a'..'z', 'A'..'Z'

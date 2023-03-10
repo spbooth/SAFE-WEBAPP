@@ -33,8 +33,10 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
 import uk.ac.ed.epcc.webapp.logging.debug.DebugLoggerService;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.servlet.AbstractTransitionServletTest;
 import uk.ac.ed.epcc.webapp.servlet.LoginServlet;
+import uk.ac.ed.epcc.webapp.servlet.MockRandomService;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.AppUserTransitionProvider;
@@ -400,5 +402,56 @@ public class TwoFactorAuthTests<A extends AppUser> extends AbstractTransitionSer
 		runTransition();
 		checkViewRedirect(prov, user);
 		checkDiff("/cleanup.xsl", "key_changed.xml");
+	}
+	@Test
+	@DataBaseFixtures({"key_cleared.xml","key_set.xml"})
+	public void recoveryCode() throws DataException, Exception {
+		TestTimeService serv = new TestTimeService();
+		ctx.setService(serv);
+		ctx.setService(new MockRandomService());
+		Calendar cal = Calendar.getInstance();
+		cal.clear();
+		cal.set(2018, Calendar.JULY, 2, 20, 22);
+		serv.setResult(cal.getTime());
+		SessionService sess = ctx.getService(SessionService.class);
+		AppUserFactory<A> fac = sess.getLoginFactory();
+		A user = fac.findByEmail("fred@example.com");
+		sess.setCurrentPerson(user);
+		takeBaseline();
+		
+		AppUserTransitionProvider prov = AppUserTransitionProvider.getInstance(ctx);
+		assertNotNull("No Person transition",prov);
+		
+		setTransition(prov, TotpCodeAuthComposite.RECOVERY, user);
+		checkFormContent("/normalize.xsl", "recovery_form.xml");
+		setAction("CreateCode");
+		runTransition();
+		checkMessage("recovery_token_set");
+		checkDiff("/cleanup.xsl", "recovery_code.xml");
+	}
+	
+	@Test
+	@DataBaseFixtures({"key_cleared.xml","key_set.xml","recovery_code.xml"})
+	public void testUseRecoveryCode() throws Exception {
+		TestTimeService serv = new TestTimeService();
+		ctx.setService(serv);
+		Calendar cal = Calendar.getInstance();
+		cal.clear();
+		cal.set(2018, Calendar.JULY, 3, 20, 22);
+		serv.setResult(cal.getTime());
+		SessionService sess = ctx.getService(SessionService.class);
+		AppUserFactory<A> fac = sess.getLoginFactory();
+		A user = fac.findByEmail("fred@example.com");
+		takeBaseline();
+		
+		CodeAuthTransitionProvider<A> catp = new CodeAuthTransitionProvider<>(ctx);
+		sess.setAttribute(TwoFactorHandler.AUTH_USER_ATTR, user.getID());
+		sess.setAttribute(TwoFactorHandler.AUTH_RESULT_ATTR, new RedirectResult(LoginServlet.getMainPage(ctx)));
+		setTransition(catp, CodeAuthTransitionProvider.AUTHENTICATE, user);
+		addParam(CODE, 1000000);
+		runTransition();
+		assertTrue(ctx.getService(SessionService.class).haveCurrentUser());
+		checkRedirect(LoginServlet.getMainPage(ctx));
+		checkDiff("/cleanup.xsl", "use_recovery_code.xml");
 	}
 }
