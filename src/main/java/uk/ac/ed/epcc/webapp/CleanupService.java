@@ -29,7 +29,7 @@ import java.util.LinkedHashSet;
 public class CleanupService extends AbstractContexed implements AppContextService<CleanupService>{
 
 	private final LinkedHashSet<Runnable> actions;
-	
+	private boolean in_action=false;
 	public CleanupService(AppContext conn){
 		super(conn);
 		this.actions=new LinkedHashSet<>();
@@ -49,7 +49,12 @@ public class CleanupService extends AbstractContexed implements AppContextServic
 				conn.getService(x);
 			}
 		}
-		actions.add(r);
+		if( in_action ) {
+			// Don't queue addition actions from an action.
+			r.run();
+		}else {
+			actions.add(r);
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -68,7 +73,7 @@ public class CleanupService extends AbstractContexed implements AppContextServic
 		action(null);
 	}
 	public synchronized  void action(Class template){
-
+		in_action=true;
 		for(Iterator<Runnable> it = actions.iterator() ; it.hasNext(); ){
 			Runnable r = it.next();
 			if( template == null || template.isAssignableFrom(r.getClass())) {
@@ -76,6 +81,7 @@ public class CleanupService extends AbstractContexed implements AppContextServic
 				it.remove();
 			}
 		}
+		in_action=false;
 	}
 
 	public boolean hasActions(){

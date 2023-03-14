@@ -284,6 +284,11 @@ public abstract class WebappTestBase implements ContextHolder{
 			result = raw.trim();
 			expected = XMLDataUtils.readResourceAsString(getClass(), expected_xml);
 			expected.trim();
+			// Do a shortcut test in case the two are identical
+			if( expected.equals(result)) {
+				System.out.println("@@@@@@ Shortcut Diff @@@@@@");
+				return;
+			}
 		}
 		//System.out.println(result);
 		String differ = TestDataHelper.diff(expected, result);
@@ -446,6 +451,13 @@ protected void writeFile(String file_name, byte data[]) throws IOException {
 		CleanupService serv = ctx.getService(CleanupService.class);
 		if( serv != null) {
 			serv.action(Emailer.SendAction.class);
+		}
+	}
+	public void deferredActions() {
+		// Run any deferred email sends
+		CleanupService serv = ctx.getService(CleanupService.class);
+		if( serv != null) {
+			serv.action();
 		}
 	}
 
