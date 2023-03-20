@@ -26,5 +26,6 @@ public enum SQLFunc {
   SUM,
   COUNT,
   AVG,
-  FLOOR
+  FLOOR,
+  CEILING
 }

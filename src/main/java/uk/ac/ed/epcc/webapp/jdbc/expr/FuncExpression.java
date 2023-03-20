@@ -128,6 +128,7 @@ public class FuncExpression<T,D> implements SQLExpression<T> {
 		switch(func) {
 		case AVG: 
 		case FLOOR:
+		case CEILING:
 		case COUNT:
 			return (T) rs.getObject(pos);
 		default:
