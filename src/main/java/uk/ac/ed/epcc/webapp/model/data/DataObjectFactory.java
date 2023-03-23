@@ -2252,7 +2252,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param p
 	 * @return
 	 */
-	public final AcceptFilter<BDO> getFilter(Predicate<BDO> p){
+	public final AcceptFilter<BDO> getPredicateFilter(Predicate<BDO> p){
 		return (o) -> p.test(o);
 	}
 	/** create a {@link AndFilter} for this factory
