@@ -406,7 +406,7 @@ protected Integer getPersonID() {
 		if( log_name == null ) {
 			// MAke sure we get the log name from the session at the point we
 			// get the person from the session. session state may change during the request.
-			log_name = getName();
+			log_name = getNameHint();
 		}
 		return id;
 	}
