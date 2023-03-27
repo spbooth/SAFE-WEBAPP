@@ -54,6 +54,7 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	public static final String ADMIN_ROLE="Admin";
 	/** Get the Name for the current user.
 	 * 
+	 * This is intended for logging purposes and may contain additional information like real-user
 	 * This method can still be used when no login factory is configured.
 	 * 
 	 * @return String

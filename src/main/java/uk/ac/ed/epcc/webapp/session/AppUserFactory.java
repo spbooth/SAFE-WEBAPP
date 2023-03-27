@@ -429,6 +429,10 @@ Targetted<AU>
 	 * @return boolean
 	 */
 	public boolean needDetailsUpdate(AU user){
+		if( ! AppUserTransitionProvider.USER_SELF_UPDATE_FEATURE.isEnabled(getContext())) {
+			// user cannot update details
+			return false;
+		}
 		if( REQUIRE_PERSON_UPDATE_FEATURE.isEnabled(getContext())){
 			Form f = new BaseForm(getContext());
 			try {
