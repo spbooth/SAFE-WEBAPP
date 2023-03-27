@@ -146,15 +146,15 @@ public class EmailLoggerService implements Contexed, LoggerService {
 			
 			//l.debug("have config service");
 			Properties p = cfg.getServiceProperties();
-//			Enumeration e = p.propertyNames();
-//			while( e.hasMoreElements()){
-//				Object key = e.nextElement();
-//				Object value = p.getProperty(key.toString());
-//				//l.debug("key="+key+" value="+value);
-//				if( value != null ){
-//					props.put(key.toString(), value);
-//				}
-//			}
+			Enumeration e = p.propertyNames();
+			while( e.hasMoreElements()){
+				Object key = e.nextElement();
+				Object value = p.getProperty(key.toString());
+				//l.debug("key="+key+" value="+value);
+				if( value != null && key.toString().startsWith("service.")){
+					props.put(key.toString(), value);
+				}
+			}
 			
 			// software versions
 			FilteredProperties version = new FilteredProperties(p, VERSION_PROP_PREFIX);
