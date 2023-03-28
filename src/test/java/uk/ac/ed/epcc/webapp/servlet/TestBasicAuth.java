@@ -13,10 +13,10 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +32,8 @@ import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.session.twofactor.FormAuthComposite;
+import uk.ac.ed.epcc.webapp.session.twofactor.TotpCodeAuthComposite;
 
 /**
  * @author spb
@@ -89,5 +91,34 @@ public class TestBasicAuth extends ServletTest {
 		assertEquals("Hello", res.stream.toString().trim());
 		sess = ctx.getService(SessionService.class);
 		assertTrue(sess.haveCurrentUser());
+	}
+	
+	/** Test that if MFA is configured BASIC auth cannot be used to bypass it.
+	 * @throws NoSuchAlgorithmException 
+	 * 
+	 */
+	@Test
+	public void testMFA() throws ServletException, IOException, DataFault, ParseException, NoSuchAlgorithmException{
+		SessionService sess = ctx.getService(SessionService.class);
+		AppUserFactory fac = sess.getLoginFactory();
+		
+		PasswordAuthComposite comp = (PasswordAuthComposite) fac.getComposite(PasswordAuthComposite.class);
+		AppUser user = fac.makeFromString(USER);
+		comp.setPassword(user, PW);
+		
+		TotpCodeAuthComposite totp = (TotpCodeAuthComposite) fac.getComposite(FormAuthComposite.class);
+		assertNotNull(totp);
+		totp.setSecret(user, totp.makeNewKey());
+		user.commit();
+		
+		assertTrue(totp.hasKey(user));
+		String d = USER+":"+PW;
+		req.header.put("Authorization", "Basic "+Base64.getEncoder().encodeToString(d.getBytes()));
+		
+		doPost();
+		assertEquals(HttpServletResponse.SC_UNAUTHORIZED, res.error);
+		
+		sess = ctx.getService(SessionService.class);
+		assertFalse(sess.haveCurrentUser());
 	}
 }

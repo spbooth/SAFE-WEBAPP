@@ -50,6 +50,7 @@ import uk.ac.ed.epcc.webapp.session.AppUserNameFinder;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.session.WebNameFinder;
+import uk.ac.ed.epcc.webapp.session.twofactor.TwoFactorHandler;
 /** A default implementation for {@link ServletService} for a HTTP servlet application.
  * 
  * This class implements the following strategy for extracting a user from a HTTP request
@@ -740,8 +741,13 @@ public class DefaultServletService implements ServletService{
 								try {
 
 									A person = (A) comp.findByLoginNamePassword(user, pass);
+									
 									if( person != null && person.canLogin()){
-										sess.setCurrentPerson(person);
+										TwoFactorHandler<A> hand = new TwoFactorHandler<>(sess);
+										// This will do the login UNLESS MFA required
+										if( hand.doLogin(person, type, null) != null) {
+											log.warn("Basic auth used with MFA configured "+person.getIdentifier());
+										}
 									}else {
 										//TODO handle bad authentication
 										// could remember error in response and return forbidden in requestAuthentication
