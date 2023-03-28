@@ -99,10 +99,18 @@ public class ServletSessionService<A extends AppUser> extends AbstractSessionSer
   
   @Override
   public String getName(){
-	  if( log_name != null) {
-		  return log_name;
-	  }
+	  
 	  String name = super.getName();
+	  if( log_name != null) {
+		  // This should be set if the session has already been queried (reflecting the state at that point)
+		  // but won't be for an anonymous page until after the getName call
+		  if( name == null || log_name.startsWith(name)) {
+			  return log_name;
+		  }else {
+			  // something funny here so return both
+			  return name + "/" + log_name;
+		  }
+	  }
 	  if( name == null ){
 		  // this for when we are not using a login table.
 		  return ss.getWebName();
