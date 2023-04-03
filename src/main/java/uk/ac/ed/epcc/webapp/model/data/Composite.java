@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -221,5 +222,14 @@ public abstract class Composite<BDO extends DataObject, X > implements Contexed,
 	 */
 	public String toString(){
 		return getClass().getSimpleName();
+	}
+	
+	/** Convert a BDO {@link BaseFilter} into a {@link BaseFilter} on a referenced factory.
+	 * 
+	 * @param fil
+	 * @return
+	 */
+	protected <T extends DataObject> BaseFilter<T> convertToDestinationFilter(DataObjectFactory<T> remote_fac, String link_field,BaseFilter<BDO> fil){
+		return getFactory().convertToDestinationFilter(remote_fac, link_field, fil);
 	}
 }
