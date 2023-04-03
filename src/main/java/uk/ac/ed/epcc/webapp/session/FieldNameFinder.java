@@ -197,7 +197,7 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	/**
 	 * @return the field
 	 */
-	private String getField() {
+	protected String getField() {
 		return getContext().getInitParameter(PROPERTY_PREFIX+getRealm()+".field", getRealm());
 	}
 

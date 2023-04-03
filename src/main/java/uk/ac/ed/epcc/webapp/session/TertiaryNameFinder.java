@@ -19,7 +19,7 @@ package uk.ac.ed.epcc.webapp.session;
  * @author spb
  *
  */
-public class TertiaryNameFinder<AU extends AppUser> extends FieldNameFinder<AU, TertiaryNameFinder> {
+public class TertiaryNameFinder<AU extends AppUser> extends RemoteFieldNameFinder<AU, TertiaryNameFinder> {
 
 	/**
 	 * @param factory

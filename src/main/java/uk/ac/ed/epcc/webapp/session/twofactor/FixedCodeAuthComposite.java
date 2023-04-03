@@ -39,7 +39,7 @@ public class FixedCodeAuthComposite<A extends AppUser> extends CodeAuthComposite
 	 * @see uk.ac.ed.epcc.webapp.session.twofactor.CodeAuthComposite#enabled(uk.ac.ed.epcc.webapp.session.AppUser)
 	 */
 	@Override
-	protected boolean enabled(A user) {
+	public boolean enabled(A user) {
 		return getAuthCode() != null;
 	}
 

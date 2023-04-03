@@ -75,6 +75,17 @@ public class TwoFactorHandler<A extends AppUser> {
 		}
 		return false;
     }
+    
+    public boolean enabled(A user) {
+    	AppUserFactory<A> person_fac = sess.getLoginFactory();
+    	for( TwoFactorComposite<A> comp : person_fac.getComposites(TwoFactorComposite.class)) {
+			if( comp.enabled(user)) {
+				return true;
+			}
+		}
+    	
+    	return false;
+    }
 
     public boolean requireTwoFactor(A user) {
     	AppUserFactory<A> person_fac = sess.getLoginFactory();

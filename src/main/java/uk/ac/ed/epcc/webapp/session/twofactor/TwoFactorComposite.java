@@ -52,4 +52,10 @@ public interface TwoFactorComposite<A extends AppUser> {
 	default public void completeAuth(A user) {
 		
 	}
+	/** Is MFA enabled for this user via this composite
+	 * 
+	 * @param user
+	 * @return
+	 */
+	public boolean enabled(A user);
 }
