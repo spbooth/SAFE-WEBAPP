@@ -410,7 +410,7 @@ public final class Repository implements AppContextCleanup{
         	return type==Types.DATE||type==Types.TIMESTAMP || type == Types.TIME;
         }
         public boolean isBoolean(){
-        	return type==Types.BIT||type==Types.TINYINT;
+        	return type==Types.BIT||type==Types.TINYINT || type==Types.BOOLEAN;
         }
         public boolean isIndexed(){
         	return indexed;
@@ -2956,11 +2956,14 @@ public final class Repository implements AppContextCleanup{
 				
 				
 				if (value != null) {
-					if (info.getType() == Types.BLOB) {
+					if (info.isData()) {
 						if (value instanceof Blob) {
 							value = new BlobStreamData(ctx, (Blob) value);
+						}else if( value instanceof byte[]) {
+							
+							value = new ByteArrayStreamData((byte[]) value);
 						} else {
-							throw new DataFault("Unexpected Blob type "
+							throw new DataFault("Unexpected Blob/data type "
 									+ value.getClass().getName());
 						}
 					}
