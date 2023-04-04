@@ -34,9 +34,9 @@ public class NumberOpTest {
 	
 	@Test
 	public void testAddInt() {
-		assertEquals(Integer.valueOf(7), NumberOp.add(Integer.valueOf(5), Integer.valueOf(2)));
-		assertEquals(Integer.valueOf(3), NumberOp.add(Integer.valueOf(5), Integer.valueOf(-2)));
-		assertEquals(Integer.valueOf(-15), NumberOp.add(Integer.valueOf(5), Integer.valueOf(-20)));
+		assertEquals(Long.valueOf(7), NumberOp.add(Integer.valueOf(5), Integer.valueOf(2)));
+		assertEquals(Long.valueOf(3), NumberOp.add(Integer.valueOf(5), Integer.valueOf(-2)));
+		assertEquals(Long.valueOf(-15), NumberOp.add(Integer.valueOf(5), Integer.valueOf(-20)));
 	}
 	@Test
 	public void testSubInt() {
@@ -48,9 +48,9 @@ public class NumberOpTest {
 	}
 	@Test
 	public void testMulInt() {
-		assertEquals(Integer.valueOf(10), NumberOp.mult(Integer.valueOf(5), Integer.valueOf(2)));
-		assertEquals(Integer.valueOf(-10), NumberOp.mult(Integer.valueOf(5), Integer.valueOf(-2)));
-		assertEquals(Integer.valueOf(-100), NumberOp.mult(Integer.valueOf(5), Integer.valueOf(-20)));
+		assertEquals(Long.valueOf(10), NumberOp.mult(Integer.valueOf(5), Integer.valueOf(2)));
+		assertEquals(Long.valueOf(-10), NumberOp.mult(Integer.valueOf(5), Integer.valueOf(-2)));
+		assertEquals(Long.valueOf(-100), NumberOp.mult(Integer.valueOf(5), Integer.valueOf(-20)));
 	}
 	@Test
 	public void testDivInt() {
@@ -110,29 +110,29 @@ public class NumberOpTest {
 	}
 	@Test
 	public void testAddFloat() {
-		assertEquals(Float.valueOf(7), NumberOp.add(Integer.valueOf(5), Float.valueOf(2)));
-		assertEquals(Float.valueOf(3), NumberOp.add(Long.valueOf(5), Float.valueOf(-2)));
-		assertEquals(Float.valueOf(-15), NumberOp.add(Float.valueOf(5), Float.valueOf(-20)));
+		assertEquals(Double.valueOf(7), NumberOp.add(Integer.valueOf(5), Float.valueOf(2)));
+		assertEquals(Double.valueOf(3), NumberOp.add(Long.valueOf(5), Float.valueOf(-2)));
+		assertEquals(Double.valueOf(-15), NumberOp.add(Float.valueOf(5), Float.valueOf(-20)));
 	}
 	@Test
 	public void testSubFloat() {
-		assertEquals(Float.valueOf(3), NumberOp.sub(Integer.valueOf(5), Float.valueOf(2)));
-		assertEquals(Float.valueOf(7), NumberOp.sub(Long.valueOf(5), Float.valueOf(-2)));
-		assertEquals(Float.valueOf(25), NumberOp.sub(Float.valueOf(5), Float.valueOf(-20)));
+		assertEquals(Double.valueOf(3), NumberOp.sub(Integer.valueOf(5), Float.valueOf(2)));
+		assertEquals(Double.valueOf(7), NumberOp.sub(Long.valueOf(5), Float.valueOf(-2)));
+		assertEquals(Double.valueOf(25), NumberOp.sub(Float.valueOf(5), Float.valueOf(-20)));
 		assertEquals(Float.valueOf(5), NumberOp.sub(Float.valueOf(5), null));
 		assertEquals(Float.valueOf(-5), NumberOp.sub(null,Float.valueOf(5)));
 	}
 	@Test
 	public void testMulFloat() {
-		assertEquals(Float.valueOf(10), NumberOp.mult(Integer.valueOf(5), Float.valueOf(2)));
-		assertEquals(Float.valueOf(-10), NumberOp.mult(Long.valueOf(5), Float.valueOf(-2)));
-		assertEquals(Float.valueOf(-100), NumberOp.mult(Float.valueOf(5), Float.valueOf(-20)));
+		assertEquals(Double.valueOf(10), NumberOp.mult(Integer.valueOf(5), Float.valueOf(2)));
+		assertEquals(Double.valueOf(-10), NumberOp.mult(Long.valueOf(5), Float.valueOf(-2)));
+		assertEquals(Double.valueOf(-100), NumberOp.mult(Float.valueOf(5), Float.valueOf(-20)));
 	}
 	@Test
 	public void testDivFloat() {
-		assertEquals(Float.valueOf(2.5f), NumberOp.div(Integer.valueOf(5), Float.valueOf(2)));
-		assertEquals(Float.valueOf(-2.5f), NumberOp.div(Long.valueOf(5), Float.valueOf(-2)));
-		assertEquals(Float.valueOf(-0.25f), NumberOp.div(Float.valueOf(5), Float.valueOf(-20)));
+		assertEquals(Double.valueOf(2.5f), NumberOp.div(Integer.valueOf(5), Float.valueOf(2)));
+		assertEquals(Double.valueOf(-2.5f), NumberOp.div(Long.valueOf(5), Float.valueOf(-2)));
+		assertEquals(Double.valueOf(-0.25f), NumberOp.div(Float.valueOf(5), Float.valueOf(-20)));
 	}
 	@Test
 	public void testMinFloat() {

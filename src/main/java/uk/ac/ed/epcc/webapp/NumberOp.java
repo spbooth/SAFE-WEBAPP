@@ -128,10 +128,14 @@ public class NumberOp {
 			// use scale of 1 as this will be the unit returned by a Duration.longValue
 			return new Duration(a.longValue()-b.longValue(),1L);
 		}
+		
 		if ( useDouble(a) || useDouble(b) ){
 			return Double.valueOf(a.doubleValue() - b.doubleValue());
 		}
-		
+		if( a instanceof Integer && b instanceof Integer) {
+			// no loss of precision
+			return Integer.valueOf(a.intValue() - b.intValue());
+		}
 		
 		return Long.valueOf(a.longValue() - b.longValue());
 		
@@ -180,7 +184,14 @@ public class NumberOp {
 		}
 		
 		if( a.longValue() == 0L){
+			if( a instanceof Integer) {
+				return Integer.valueOf(0);
+			}
 			return Long.valueOf(0l);
+		}
+		if( a instanceof Integer && b instanceof Integer) {
+			// no loss of precision
+			return Integer.valueOf(a.intValue()/b.intValue());
 		}
 		return Long.valueOf(a.longValue() / b.longValue());
 	}
