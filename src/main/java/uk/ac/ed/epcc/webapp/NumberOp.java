@@ -37,10 +37,10 @@ public class NumberOp {
      * @return
      */
 	private static boolean useDouble(Number n){
-    	if(n instanceof Double){
+    	if(n instanceof Double || n instanceof Float){
     		return true;
     	}
-    	if( n instanceof Float || n instanceof Long || n instanceof Integer){
+    	if( n instanceof Long || n instanceof Integer){
     		return false;
     	}
     	return true;
@@ -112,14 +112,9 @@ public class NumberOp {
 		if ( useDouble(a) || useDouble(b) ){
 			return Double.valueOf(a.doubleValue() + b.doubleValue());
 		}
-		if (a instanceof Float || b instanceof Float) {
-			return Float.valueOf(a.floatValue() + b.floatValue());
-		}
-	
-		if (a instanceof Long || b instanceof Long) {
-			return Long.valueOf(a.longValue() + b.longValue());
-		}
-		return Integer.valueOf(a.intValue() + b.intValue());
+		
+		return Long.valueOf(a.longValue() + b.longValue());
+		
 	}
 	public static Number sub(Number a, Number b) {
 		if (a == null) {
@@ -136,13 +131,10 @@ public class NumberOp {
 		if ( useDouble(a) || useDouble(b) ){
 			return Double.valueOf(a.doubleValue() - b.doubleValue());
 		}
-		if (a instanceof Float || b instanceof Float) {
-			return Float.valueOf(a.floatValue() - b.floatValue());
-		}
-		if (a instanceof Long || b instanceof Long) {
-			return Long.valueOf(a.longValue() - b.longValue());
-		}
-		return Integer.valueOf(a.intValue() - b.intValue());
+		
+		
+		return Long.valueOf(a.longValue() - b.longValue());
+		
 	}
 	public static Number mult(Number a, Number b) {
 		if (a == null || b == null) {
@@ -161,13 +153,8 @@ public class NumberOp {
 		if ( useDouble(a) || useDouble(b) ){
 			return Double.valueOf(a.doubleValue() * b.doubleValue());
 		}
-		if (a instanceof Float || b instanceof Float) {
-			return Float.valueOf(a.floatValue() * b.floatValue());
-		}
-		if (a instanceof Long || b instanceof Long) {
-			return Long.valueOf(a.longValue() * b.longValue());
-		}
-		return Integer.valueOf(a.intValue() * b.intValue());
+		
+		return Long.valueOf(a.longValue() * b.longValue());
 	}
 	public static Number div(Number a, Number b) {
 		if (a == null || b == null) {
@@ -191,22 +178,11 @@ public class NumberOp {
 			}
 			return Double.valueOf(a.doubleValue() / b.doubleValue());
 		}
-		if (a instanceof Float || b instanceof Float) {
-			if( a.floatValue() == 0.0f){
-				return Float.valueOf(0.0f);
-			}
-			return Float.valueOf(a.floatValue() / b.floatValue());
+		
+		if( a.longValue() == 0L){
+			return Long.valueOf(0l);
 		}
-		if (a instanceof Long || b instanceof Long) {
-			if( a.longValue() == 0L){
-				return Long.valueOf(0l);
-			}
-			return Long.valueOf(a.longValue() / b.longValue());
-		}
-		if( a.intValue() == 0){
-			return Integer.valueOf(0);
-		}
-		return Integer.valueOf(a.intValue() / b.intValue());
+		return Long.valueOf(a.longValue() / b.longValue());
 	}
 	public static Number min(Number a, Number b) {
 		if (a == null) {
@@ -242,15 +218,17 @@ public class NumberOp {
 			//durations are the same backwards
 			return a;
 		}
-		if( useDouble(a)){
-			return new Double(- a.doubleValue());
-		}
 		if( a instanceof Float){
-			return new Float(-a.floatValue());
+			return Float.valueOf(-a.floatValue());
 		}
-		if( a instanceof Long){
-			return new Long(-a.longValue());
+		if( useDouble(a)){
+			return Double.valueOf(- a.doubleValue());
 		}
-		return new Integer(-a.intValue());
+		if( a instanceof Integer) {
+			return Integer.valueOf( - a.intValue());
+		}
+		
+		return Long.valueOf(-a.longValue());
+		
 	}
 }
