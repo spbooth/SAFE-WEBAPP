@@ -13,8 +13,9 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
-import junit.framework.Assert;
 
+
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -32,11 +33,11 @@ public class OperatorTest {
 	@Test
 	public void testOperate() {
 		// tests ADD
-		Assert.assertEquals(10, Operator.ADD.operate(6, 4));
+		Assert.assertEquals(10L, Operator.ADD.operate(6, 4));
 		// tests SUB
 		Assert.assertEquals(8, Operator.SUB.operate(13, 5));
 		// tests MUL
-		Assert.assertEquals(18, Operator.MUL.operate(2, 9));
+		Assert.assertEquals(18L, Operator.MUL.operate(2, 9));
 		// tests DIV
 		Assert.assertEquals(2.5, Operator.DIV.operate(5, 2));
 	}

@@ -47,7 +47,7 @@ public class BinarySumMapMapperTest extends DateTableTest {
 			
 			for( int i=0 ; i< 24 ; i ++){
 				System.out.println(sum[i]);
-				assertEquals(sum[i], result.get(i).doubleValue(), 0.003);
+				assertEquals(sum[i], result.get(Long.valueOf(i)).doubleValue(), 0.003);
 			}
 		}
 		
