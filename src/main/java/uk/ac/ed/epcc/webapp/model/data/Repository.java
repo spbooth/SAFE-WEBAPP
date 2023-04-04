@@ -368,7 +368,7 @@ public final class Repository implements AppContextCleanup{
         	return type==Types.DOUBLE||type==Types.FLOAT|| type==Types.INTEGER|| type==Types.BIGINT|| type == Types.REAL;
         }
         public boolean isData(){
-        	return type==Types.BLOB || type == Types.VARBINARY || type == Types.LONGVARBINARY;
+        	return type==Types.BLOB || type == Types.VARBINARY || type == Types.LONGVARBINARY || type == Types.BINARY;
         }
         
         /** Get the tag that will-be/has-been used to create the referenced {@link IndexedTypeProducer}.
