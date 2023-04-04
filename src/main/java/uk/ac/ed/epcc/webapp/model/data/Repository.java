@@ -3203,6 +3203,9 @@ public final class Repository implements AppContextCleanup{
 					.getLength());
 			return;
 		}
+		if( value instanceof Duration) {
+			stmt.setLong(pos, ((Duration)value).longValue());
+		}
 		FieldInfo f = getInfo(key);
 		//Logger log = ctx.getService(LoggerService.class).getLogger(getClass());
 		if (f != null) {
@@ -3210,7 +3213,7 @@ public final class Repository implements AppContextCleanup{
 			stmt.setObject(pos, f.truncate(value), f.getType());
 		} else {
 			//log.debug("setObject "+pos+","+value);
-			stmt.setObject(pos, value);
+			setObject(stmt,pos, value);
 		}
 	}
 
@@ -3496,5 +3499,26 @@ public final class Repository implements AppContextCleanup{
     	case(Types.LONGVARBINARY): return "LongVarBinary";
     	default: return "Unknown";
     	}
+    }
+    /** Static wrapper of {@link PreparedStatement#setObject(int, Object)}
+     * This is to apply our own type mappings where a field type is not knows
+     * 
+     * @param stmt
+     * @param pos
+     * @param val
+     * @throws SQLException
+     */
+    public static void setObject(PreparedStatement stmt,int pos,Object val) throws SQLException {
+    	if (val instanceof StreamData) {
+			StreamData s = (StreamData) val;
+			stmt.setBinaryStream(pos, s.getInputStream(), (int) s
+					.getLength());
+			return;
+		}
+    	if( val instanceof Duration) {
+    		stmt.setLong(pos, ((Duration)val).longValue());
+    		return;
+    	}
+    	stmt.setObject(pos, val);
     }
 }

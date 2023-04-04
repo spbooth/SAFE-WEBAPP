@@ -107,7 +107,7 @@ public class DurationFieldValue<X extends DataObject> implements    SQLAccessor<
 
 	public void setObject(PreparedStatement stmt, int pos, Duration value)
 			throws SQLException {
-		stmt.setObject(pos, value.getTime(resolution));
+		stmt.setLong(pos, value.getTime(resolution));
 		
 	}
 

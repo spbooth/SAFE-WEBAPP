@@ -150,7 +150,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 			try(PreparedStatement stmt = c.getConnection().prepareStatement(text)){
 				for( int i=0; i< args.size(); i++){
 					Object x = args.get(i);
-					stmt.setObject(i+1, x);
+					Repository.setObject(stmt,i+1, x);
 				}
 				stmt.executeUpdate();
 			}
@@ -345,7 +345,7 @@ public class DataBaseHandlerService implements Contexed, AppContextService<DataB
 			 	try(PreparedStatement stmt = c.getConnection().prepareStatement(text)){
 			 		for( int i=0; i< args.size(); i++){
 			 			Object x = args.get(i);
-			 			stmt.setObject(i+1, x);
+			 			Repository.setObject(stmt,i+1, x);
 			 		}
 			 		stmt.executeUpdate();
 			 	}
