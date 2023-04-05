@@ -191,16 +191,16 @@ public class TableTest {
 		t.put("col2", 2, -30);
 		// test ADD
 		t.colOperation("colADD", Operator.ADD, "col1", "col2");
-		assertEquals("Wrong colOperation ADD.", 20L, t.get("colADD", 1));
-		assertEquals("Wrong colOperation ADD.", 0L, t.get("colADD", 2));
+		assertEquals("Wrong colOperation ADD.", 20, t.get("colADD", 1));
+		assertEquals("Wrong colOperation ADD.", 0, t.get("colADD", 2));
 		// test SUB
 		t.colOperation("colSUB", Operator.SUB, "col1", "col2");
 		assertEquals("Wrong colOperation SUB.", 20, t.get("colSUB", 1));
 		assertEquals("Wrong colOperation SUB.", 60, t.get("colSUB", 2));
 		// test MUL
 		t.colOperation("colMUL", Operator.MUL, "col1", "col2");
-		assertEquals("Wrong colOperation MUL.", 0L, t.get("colMUL", 1));
-		assertEquals("Wrong colOperation MUL.", -900L, t.get("colMUL", 2));
+		assertEquals("Wrong colOperation MUL.", 0, t.get("colMUL", 1));
+		assertEquals("Wrong colOperation MUL.", -900, t.get("colMUL", 2));
 		// test DIV
 		t.colOperation("colDIV", Operator.DIV, "col1", "col2");
 		assertEquals("Wrong colOperation DIV.", Double.POSITIVE_INFINITY, t.get("colDIV", 1));
@@ -225,16 +225,16 @@ public class TableTest {
 		t.put(2, "row2", 20);
 		// test ADD
 		t.rowOperation("rowADD", Operator.ADD, "row1", "row2");
-		assertEquals("Wrong rowOperation ADD.", 7L, t.get(1, "rowADD"));
-		assertEquals("Wrong rowOperation ADD.", 70L, t.get(2, "rowADD"));
+		assertEquals("Wrong rowOperation ADD.", 7, t.get(1, "rowADD"));
+		assertEquals("Wrong rowOperation ADD.", 70, t.get(2, "rowADD"));
 		// test SUB
 		t.rowOperation("rowSUB", Operator.SUB, "row1", "row2");
 		assertEquals("Wrong rowOperation SUB.", 3, t.get(1, "rowSUB"));
 		assertEquals("Wrong rowOperation SUB.", 30, t.get(2, "rowSUB"));
 		// test MUL
 		t.rowOperation("rowMUL", Operator.MUL, "row1", "row2");
-		assertEquals("Wrong rowOperation MUL.", 10L, t.get(1, "rowMUL"));
-		assertEquals("Wrong rowOperation MUL.", 1000L, t.get(2, "rowMUL"));
+		assertEquals("Wrong rowOperation MUL.", 10, t.get(1, "rowMUL"));
+		assertEquals("Wrong rowOperation MUL.", 1000, t.get(2, "rowMUL"));
 		// test DIV
 		t.rowOperation("rowDIV", Operator.DIV, "row1", "row2");
 		assertEquals("Wrong rowOperation DIV.", 2.5, t.get(1, "rowDIV"));
@@ -336,7 +336,7 @@ public class TableTest {
 		Table<String, Integer> t = new Table<>();
 		t.put("col1", 1, 100);
 		t.increment("col1", 1, 10);
-		assertEquals("Wrong increment.", 110L, t.get("col1",  1));
+		assertEquals("Wrong increment.", 110, t.get("col1",  1));
 	}
 	
 	/**
@@ -800,7 +800,7 @@ public class TableTest {
 		t.put("ValueCol", "row3", 300);
 		t.put("CategoryCol", "row3", "POSITIVE");
 		t.addCategoryTotalToCol("ValueCol", "CategoryCol");
-		assertEquals(400L, t.get("ValueCol", "POSITIVE Total"));
+		assertEquals(400, t.get("ValueCol", "POSITIVE Total"));
 		assertEquals(-200, t.get("ValueCol", "NEGATIVE Total"));
 	}
 	
@@ -858,7 +858,7 @@ public class TableTest {
 		t.getCol("col1").add("row2", 20);
 		assertEquals(20, t.get("col1", "row2"));
 		t.getCol("col1").add("row2", 100);
-		assertEquals(120L, t.get("col1", "row2"));
+		assertEquals(120, t.get("col1", "row2"));
 	}
 	@Test
 	public void testRunningTotalTransform() {

@@ -69,7 +69,7 @@ public class ExpressionTestCase extends WebappTestBase {
 		assertEquals(12.0, res);
 		
 		res = fac.evaluate(obj, new BinarySQLValue(ctx, fac.getIntA(), Operator.ADD, fac.getIntB()));	
-		assertEquals(12L, res);
+		assertEquals(12, res);
 		
 	}
 	@Test
@@ -95,7 +95,7 @@ public class ExpressionTestCase extends WebappTestBase {
 		assertEquals(35.0, res);
 		
 		res = fac.evaluate(obj, new BinarySQLValue(ctx, fac.getIntA(), Operator.MUL, fac.getIntB()));	
-		assertEquals(35L, res);
+		assertEquals(35, res);
 		
 	}
 	@Test

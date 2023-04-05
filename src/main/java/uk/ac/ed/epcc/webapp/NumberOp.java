@@ -105,15 +105,19 @@ public class NumberOp {
 		if( a instanceof DistinctCount || b instanceof DistinctCount) {
 			throw new UnsupportedOperation("Cannot add DistinctCount to other numbers");
 		}
+		long val = a.longValue() + b.longValue();
 		if( useDuration(a) || useDuration(b)){
 			// use scale of 1 as this will be the unit returned by a Duration.longValue
-			return new Duration(a.longValue()+b.longValue(),1L);
+			return new Duration(val,1L);
 		}
 		if ( useDouble(a) || useDouble(b) ){
 			return Double.valueOf(a.doubleValue() + b.doubleValue());
 		}
-		
-		return Long.valueOf(a.longValue() + b.longValue());
+		if( a instanceof Integer && b instanceof Integer && val <Integer.MAX_VALUE && val > Integer.MIN_VALUE) {
+			// no loss of precision
+			return Integer.valueOf((int)val);
+		}
+		return Long.valueOf(val);
 		
 	}
 	public static Number sub(Number a, Number b) {
@@ -124,20 +128,21 @@ public class NumberOp {
 		if (b == null) {
 			return a;
 		}
+		long val = a.longValue() - b.longValue();
 		if( useDuration(a) || useDuration(b)){
 			// use scale of 1 as this will be the unit returned by a Duration.longValue
-			return new Duration(a.longValue()-b.longValue(),1L);
+			return new Duration(val,1L);
 		}
 		
 		if ( useDouble(a) || useDouble(b) ){
 			return Double.valueOf(a.doubleValue() - b.doubleValue());
 		}
-		if( a instanceof Integer && b instanceof Integer) {
+		if( a instanceof Integer && b instanceof Integer && val <Integer.MAX_VALUE && val > Integer.MIN_VALUE) {
 			// no loss of precision
-			return Integer.valueOf(a.intValue() - b.intValue());
+			return Integer.valueOf((int)val);
 		}
 		
-		return Long.valueOf(a.longValue() - b.longValue());
+		return Long.valueOf(val);
 		
 	}
 	public static Number mult(Number a, Number b) {
@@ -158,7 +163,12 @@ public class NumberOp {
 			return Double.valueOf(a.doubleValue() * b.doubleValue());
 		}
 		
-		return Long.valueOf(a.longValue() * b.longValue());
+		long val = a.longValue() * b.longValue();
+		if( a instanceof Integer && b instanceof Integer && val <Integer.MAX_VALUE && val > Integer.MIN_VALUE) {
+			// no loss of precision
+			return Integer.valueOf((int)val);
+		}
+		return Long.valueOf(val);
 	}
 	public static Number div(Number a, Number b) {
 		if (a == null || b == null) {
@@ -184,16 +194,14 @@ public class NumberOp {
 		}
 		
 		if( a.longValue() == 0L){
-			if( a instanceof Integer) {
-				return Integer.valueOf(0);
-			}
-			return Long.valueOf(0l);
+			return a;
 		}
-		if( a instanceof Integer && b instanceof Integer) {
+		long val = a.longValue() / b.longValue();
+		if( a instanceof Integer && b instanceof Integer && val <Integer.MAX_VALUE && val > Integer.MIN_VALUE) {
 			// no loss of precision
-			return Integer.valueOf(a.intValue()/b.intValue());
+			return Integer.valueOf((int)val);
 		}
-		return Long.valueOf(a.longValue() / b.longValue());
+		return Long.valueOf(val);
 	}
 	public static Number min(Number a, Number b) {
 		if (a == null) {

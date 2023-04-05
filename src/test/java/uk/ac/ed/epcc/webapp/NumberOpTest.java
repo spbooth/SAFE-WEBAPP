@@ -34,9 +34,9 @@ public class NumberOpTest {
 	
 	@Test
 	public void testAddInt() {
-		assertEquals(Long.valueOf(7), NumberOp.add(Integer.valueOf(5), Integer.valueOf(2)));
-		assertEquals(Long.valueOf(3), NumberOp.add(Integer.valueOf(5), Integer.valueOf(-2)));
-		assertEquals(Long.valueOf(-15), NumberOp.add(Integer.valueOf(5), Integer.valueOf(-20)));
+		assertEquals(Integer.valueOf(7), NumberOp.add(Integer.valueOf(5), Integer.valueOf(2)));
+		assertEquals(Integer.valueOf(3), NumberOp.add(Integer.valueOf(5), Integer.valueOf(-2)));
+		assertEquals(Integer.valueOf(-15), NumberOp.add(Integer.valueOf(5), Integer.valueOf(-20)));
 	}
 	@Test
 	public void testSubInt() {
@@ -48,9 +48,9 @@ public class NumberOpTest {
 	}
 	@Test
 	public void testMulInt() {
-		assertEquals(Long.valueOf(10), NumberOp.mult(Integer.valueOf(5), Integer.valueOf(2)));
-		assertEquals(Long.valueOf(-10), NumberOp.mult(Integer.valueOf(5), Integer.valueOf(-2)));
-		assertEquals(Long.valueOf(-100), NumberOp.mult(Integer.valueOf(5), Integer.valueOf(-20)));
+		assertEquals(Integer.valueOf(10), NumberOp.mult(Integer.valueOf(5), Integer.valueOf(2)));
+		assertEquals(Integer.valueOf(-10), NumberOp.mult(Integer.valueOf(5), Integer.valueOf(-2)));
+		assertEquals(Integer.valueOf(-100), NumberOp.mult(Integer.valueOf(5), Integer.valueOf(-20)));
 	}
 	@Test
 	public void testDivInt() {
