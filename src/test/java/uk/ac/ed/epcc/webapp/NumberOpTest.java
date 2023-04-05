@@ -37,6 +37,7 @@ public class NumberOpTest {
 		assertEquals(Integer.valueOf(7), NumberOp.add(Integer.valueOf(5), Integer.valueOf(2)));
 		assertEquals(Integer.valueOf(3), NumberOp.add(Integer.valueOf(5), Integer.valueOf(-2)));
 		assertEquals(Integer.valueOf(-15), NumberOp.add(Integer.valueOf(5), Integer.valueOf(-20)));
+		assertEquals(((long)Integer.MAX_VALUE)*2L, NumberOp.add(Integer.MAX_VALUE, Integer.MAX_VALUE));
 	}
 	@Test
 	public void testSubInt() {
@@ -45,18 +46,22 @@ public class NumberOpTest {
 		assertEquals(Integer.valueOf(25), NumberOp.sub(Integer.valueOf(5), Integer.valueOf(-20)));
 		assertEquals(Integer.valueOf(5), NumberOp.sub(Integer.valueOf(5), null));
 		assertEquals(Integer.valueOf(-5), NumberOp.sub(null,Integer.valueOf(5)));
+		assertEquals(((long)Integer.MAX_VALUE)-((long)Integer.MIN_VALUE), NumberOp.sub(Integer.MAX_VALUE, Integer.MIN_VALUE));
 	}
 	@Test
 	public void testMulInt() {
 		assertEquals(Integer.valueOf(10), NumberOp.mult(Integer.valueOf(5), Integer.valueOf(2)));
 		assertEquals(Integer.valueOf(-10), NumberOp.mult(Integer.valueOf(5), Integer.valueOf(-2)));
 		assertEquals(Integer.valueOf(-100), NumberOp.mult(Integer.valueOf(5), Integer.valueOf(-20)));
+		assertEquals(((long)Integer.MAX_VALUE)*5L, NumberOp.mult(Integer.MAX_VALUE, 5));
 	}
 	@Test
 	public void testDivInt() {
 		assertEquals(Integer.valueOf(2), NumberOp.div(Integer.valueOf(5), Integer.valueOf(2)));
 		assertEquals(Integer.valueOf(-2), NumberOp.div(Integer.valueOf(5), Integer.valueOf(-2)));
 		assertEquals(Integer.valueOf(0), NumberOp.div(Integer.valueOf(5), Integer.valueOf(-20)));
+		
+		assertEquals(0, NumberOp.div(0, 0));
 	}
 	@Test
 	public void testMinInt() {
