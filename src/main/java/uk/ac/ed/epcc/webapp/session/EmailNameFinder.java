@@ -484,7 +484,13 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 
 				@Override
 				public FormResult doTransition(AU target, AppContext c) throws TransitionException {
-					unknown(target);
+					try {
+						unknown(target);
+						target.commit();
+					}catch(Exception e) {
+						getLogger().error("Error clearing invalidate",e);
+						throw new TransitionException("clear failed");
+					}
 					return provider.new ViewResult(target);
 				}
 			});
@@ -856,6 +862,7 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 			if( useEmailStatus()) {
 				// don't know the status of the new email
 				unknown(o);
+				o.commit();
 			}
 		}
 	}
