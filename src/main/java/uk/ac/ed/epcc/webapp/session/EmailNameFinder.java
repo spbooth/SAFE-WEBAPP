@@ -45,6 +45,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ConfirmTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.AndFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
@@ -81,6 +82,8 @@ import uk.ac.ed.epcc.webapp.servlet.session.token.Scopes;
 public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, EmailNameFinder<AU>>
 		implements HistoryFieldContributor, SummaryContributer<AU>, AppUserTransitionContributor,
 		AnonymisingComposite<AU>, RequiredPageProvider<AU>, AllowedEmailContributor<AU>, IndexTableContributor<AU> {
+
+	
 
 	public static final String INVALIDATE_EMAIL_ROLE = "invalidate_email";
 
@@ -327,8 +330,25 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 
 	};
 	public static RoleAppUserKey INVALIDATE_EMAIL = new RoleAppUserKey("InvalidateEmail",
-			"Mark email address as bouncing/invalid", INVALIDATE_EMAIL_ROLE);
-
+			"Mark email address as bouncing/invalid", INVALIDATE_EMAIL_ROLE) {
+		protected boolean allowState(AppUser user) {
+			EmailNameFinder finder = (EmailNameFinder) user.getFactory().getComposite(EmailNameFinder.class);
+			if( finder != null && finder.useEmailStatus()) {
+				return finder.allowEmail(user);
+			}
+			return false;
+		}
+	};
+	public static RoleAppUserKey CLEAR_INVALIDATE_EMAIL = new RoleAppUserKey("ClearInvalidateEmail",
+			"Mark email address as unknown state", INVALIDATE_EMAIL_ROLE) {
+		protected boolean allowState(AppUser user) {
+			EmailNameFinder finder = (EmailNameFinder) user.getFactory().getComposite(EmailNameFinder.class);
+			if( finder != null && finder.useEmailStatus()) {
+				return finder.isInvalid(user);
+			}
+			return false;
+		}
+	};
 	public class ChangeEmailTransition extends AbstractFormTransition<AU> implements ExtraFormTransition<AU> {
 
 		/*
@@ -460,6 +480,14 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 									return provider.new ViewResult(target);
 								}
 							}));
+			map.put(CLEAR_INVALIDATE_EMAIL, (Transition<AppUser>) new AbstractDirectTransition<AU>() {
+
+				@Override
+				public FormResult doTransition(AU target, AppContext c) throws TransitionException {
+					unknown(target);
+					return provider.new ViewResult(target);
+				}
+			});
 		}
 		return map;
 	}
@@ -605,7 +633,13 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 			getLogger().error("Error invalidating email", e);
 		}
 	}
-
+	public void unknown(AU target) {
+		try {
+			setStatus(target, UNKNOWN);
+		}catch(Exception e) {
+			getLogger().error("Error invalidating email", e);
+		}
+	}
 	public void setStatus(AU user, EmailStatus.Value v) {
 		getRecord(user).setOptionalProperty(e_status, v);
 	}
@@ -803,13 +837,27 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 	public boolean allowEmail(AU user) {
 		return getStatus(user) != INVALID;
 	}
-
+	public boolean isInvalid(AU user) {
+		return getStatus(user) == INVALID;
+	}
 	public ActionList<AU> getVerifyActions() {
 		return new ActionList<AU>(getAppUserFactory().getTarget(),getAppUserFactory(), "email-verified");
 	}
 	public ActionList<AU> getInvalidateActions() {
 		return new ActionList<AU>(getAppUserFactory().getTarget(),getAppUserFactory(), "email-invalidated");
 	}
-
+	@Override
+	public void postUpdate(AU o, Form f, Map<String, Object> orig, boolean changed) throws DataException {
+		String old_email = (String) orig.get(EMAIL);
+		String new_email = (String) f.get(EMAIL);
+		if( ! old_email.equalsIgnoreCase(new_email)) {
+			// email address has been updated using a form
+			// e.g. an admin
+			if( useEmailStatus()) {
+				// don't know the status of the new email
+				unknown(o);
+			}
+		}
+	}
 	
 }
