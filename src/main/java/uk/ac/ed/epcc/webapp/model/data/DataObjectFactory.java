@@ -933,7 +933,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     /** get all {@link Composite}s for this factory.
      * @return {@link Collection}
      */
-	public Collection<Composite<BDO,?>> getComposites() {
+	public final Collection<Composite<BDO,?>> getComposites() {
 		return composites.values();
 	}
     /** get a specific {@link Composite} based on its  registration type.
@@ -942,13 +942,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      * @return {@link Composite}
      */
 	@SuppressWarnings("unchecked")
-	public <X extends Composite> X getComposite(Class<? super X> clazz){
+	public final <X extends Composite> X getComposite(Class<? super X> clazz){
 		X found = (X) composites.get(clazz);
 		assert( found == null || checkComposite(clazz));
 		return found;
 	}
 	
-	public <X extends Composite> boolean checkComposite(Class<? super X> clazz) {
+	private final <X extends Composite> boolean checkComposite(Class<? super X> clazz) {
 		if( clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) {
 			return true; // can't check
 		}
@@ -962,7 +962,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		return false;
 	}
 	
-	public <X extends Composite> boolean hasComposite(Class<X> clazz){
+	public final  <X extends Composite> boolean hasComposite(Class<X> clazz){
 		return composites.containsKey(clazz);
 	}
 	/** Get all composites that are assignable to a particular type.
@@ -970,7 +970,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param template
 	 * @return
 	 */
-	public <Y> Collection<Y> getComposites(Class<Y> template){
+	public final  <Y> Collection<Y> getComposites(Class<Y> template){
 		LinkedList<Y> result = new LinkedList<>();
 		for( Composite<BDO,?> c : composites.values()){
 			if( template.isAssignableFrom(c.getClass()) ){
