@@ -70,6 +70,9 @@ public abstract class AbstractFormFactoryProvider<F extends Contexed, T> impleme
 	public String getName(){
 		return name;
 	}
+	public final String getTag() {
+		return FormFactoryProviderRegistry.cleanType(getName());
+	}
 	public boolean canUpdate(SessionService p){
 		try {
 			F factory = getFactory(p.getContext());
@@ -165,6 +168,8 @@ public abstract class AbstractFormFactoryProvider<F extends Contexed, T> impleme
 			return null;
 		}
 	}
+	
+	
 	public boolean targets(AppContext c, Object target) {
 		
 		// benefit of the doubt
