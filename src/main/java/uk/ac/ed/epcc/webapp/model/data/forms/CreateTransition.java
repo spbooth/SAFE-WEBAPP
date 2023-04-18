@@ -16,6 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data.forms;
 
+import java.util.HashMap;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.content.UIProvider;
@@ -50,7 +52,7 @@ public abstract  class CreateTransition<BDO extends DataObject> extends DataObje
 	public void buildForm(Form f, AppContext c) throws TransitionException {
 		try {
 			
-			if( buildForm(f)) {
+			if( buildForm(f,getInitialFixtures())) {
 				f.addAction("Create", new CreateAction<>(name, getActionText(),this));
 			}
 			customiseCreationForm(f);
@@ -109,5 +111,9 @@ public abstract  class CreateTransition<BDO extends DataObject> extends DataObje
 	@Override
 	public void customiseCreationForm(Form f) throws Exception {
 
+	}
+	
+	public HashMap getInitialFixtures() {
+		return null;
 	}
 }

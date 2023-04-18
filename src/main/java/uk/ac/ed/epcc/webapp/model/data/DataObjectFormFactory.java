@@ -265,10 +265,16 @@ public final AppContext getContext(){
 						tooltip = conn.getInitParameter("form.tooltip."+table+"."+name);
 					}
 					f.addInput(name, lab,tooltip, input).setOptional(is_optional);
-					if( f.isFixed(name) && fixtures != null) {
-						// pre-emptive copy to fixtures
-						f.getField(name).lock();
-						fixtures.put(name,f.get(name));
+					if( fixtures != null ) {
+						if( f.isFixed(name) ) {
+							// pre-emptive copy of fixed value to fixtures
+							f.getField(name).lock();
+							fixtures.put(name,f.get(name));
+						}else if ( fixtures.containsKey(name)) {
+							// externally supplied fixture 
+							f.put(name, fixtures.get(name));
+							f.getField(name).lock();
+						}
 					}
 					it.remove(); // field has been processed
 				}
