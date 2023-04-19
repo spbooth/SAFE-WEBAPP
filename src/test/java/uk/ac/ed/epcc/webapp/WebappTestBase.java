@@ -412,7 +412,7 @@ protected void writeFile(String file_name, byte data[]) throws IOException {
 		String expected_text = XMLDataUtils.readResourceAsString(getClass(), expected_xml);
 		// shortcut test
 		if( content.trim().equals(expected_text.trim())) {
-			System.out.println("@@@@ Shortcut checkConent @@@@@@");
+			System.out.println("@@@@ Shortcut checkContent @@@@@@");
 			return;
 		}
 		
