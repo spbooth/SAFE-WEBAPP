@@ -27,15 +27,14 @@ import uk.ac.ed.epcc.webapp.jdbc.expr.CannotFilterException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.GroupingSQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLExpression;
-import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
-import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.model.data.Repository.FieldInfo;
 import uk.ac.ed.epcc.webapp.model.data.filter.FieldOrderFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.Joiner;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
@@ -49,7 +48,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
  */
 
 
-public class IndexedFieldValue<T extends DataObject,I extends DataObject> implements FieldValue<IndexedReference,T>,IndexedSQLValue<T,I> ,Selector,GroupingSQLValue<IndexedReference>{
+public class IndexedFieldValue<T extends DataObject,I extends DataObject> implements FieldValue<IndexedReference,T>,IndexedSQLValue<T,I> ,DataObjectSelector<I>,GroupingSQLValue<IndexedReference>{
 
 	private final Repository repository;
 	private final IndexedTypeProducer<I,? extends DataObjectFactory<I>> producer;
@@ -173,18 +172,34 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 		return null;
 	}
 	@Override
-	public Input getInput() {
+	public DataObjectItemInput<I> getInput() {
 		try {
-			IndexedProducer<I> ip = producer.getProducer();
-			if( ip instanceof Selector){
-				return ((Selector)ip).getInput();
-			}
+			return getFactory().getInput();
+		} catch (Exception e) {
+			repository.getContext().error(e,"Error getting factory");
+		}
+		return null;
+	}
+	@Override
+	public DataObjectSelector<I> narrowSelector(BaseFilter<I> fil) {
+		
+		try {
+			return getFactory().narrowSelector(fil);
 		} catch (Exception e) {
 			repository.getContext().error(e,"Error getting factory");
 		}
 		return null;
 	}
 
+	@Override
+	public DataObjectSelector<I> narrowSelector(BaseFilter<I> fil, boolean new_restrict) {
+		try {
+			return getFactory().narrowSelector(fil,new_restrict);
+		} catch (Exception e) {
+			repository.getContext().error(e,"Error getting factory");
+		}
+		return null;
+	}
 	@Override
 	public DataObjectFactory<I> getFactory() throws Exception {
 		return (DataObjectFactory<I>) producer.getProducer();
@@ -210,5 +225,7 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 	public String getFilterTag() {
 		return repository.getTag();
 	}
+
+	
 
 }
