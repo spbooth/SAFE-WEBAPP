@@ -47,8 +47,8 @@ public class ConfirmTransition<T> implements ExtraFormTransition<T>{
 	 * 
 	 */
 	public static final String YES = "Yes";
-	private final DirectTransition<T> yes_transition;
-	private final DirectTransition<T> no_transition;
+	protected final DirectTransition<T> yes_transition;
+	protected final DirectTransition<T> no_transition;
 	private final String text;
 	private final ExtraContent<T> extra;
 	public ConfirmTransition(String text, DirectTransition<T> yes, DirectTransition<T> no){
