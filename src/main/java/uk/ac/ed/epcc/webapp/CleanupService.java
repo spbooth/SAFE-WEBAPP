@@ -70,10 +70,11 @@ public class CleanupService extends AbstractContexed implements AppContextServic
 	 * 
 	 */
 	
-	public   void action(){
-		action(null);
+	public int action(){
+		return action(null);
 	}
-	public synchronized  void action(Class template){
+	public synchronized  int action(Class template){
+		int count=0;
 		tail = new LinkedHashSet<>();
 		do {
 			tail.clear();
@@ -82,12 +83,14 @@ public class CleanupService extends AbstractContexed implements AppContextServic
 				if( template == null || template.isAssignableFrom(r.getClass())) {
 					r.run();
 					it.remove();
+					count++;
 				}
 			}
 			// add any actions added in the above stage.
 			actions.addAll(tail);
 		}while( ! tail.isEmpty());
 		tail = null;
+		return count;
 	}
 
 	public boolean hasActions(){

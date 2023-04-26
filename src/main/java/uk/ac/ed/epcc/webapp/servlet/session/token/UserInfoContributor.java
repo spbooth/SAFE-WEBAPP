@@ -22,7 +22,7 @@ import uk.ac.ed.epcc.webapp.session.AppUser;
  * 
  * 
  * Add a {@link Scopes} annotation to set global access control. Fine grained control can be added by overriding 
- * {@link #addMetaData(ScopeQuery, Map, AppUser)}
+ * {@link #addMetaData(boolean,ScopeQuery, Map, AppUser)}
  * @author Stephen Booth
  *
  */
@@ -30,13 +30,15 @@ public interface UserInfoContributor<T extends AppUser> extends DataContributor<
 
 	/** add metadata with fine grained access control
 	 * 
+	 * @param extended Are we generating the extended claim set
 	 * @param scopes   {@link ScopeQuery} representing the access permissions of the request.
 	 * @param attributes
 	 * @param target
 	 */
-	public default void addMetaData(ScopeQuery scopes, Map<String, Object> attributes, T target) {
+	
+	public default void addMetaData(boolean extended,ScopeQuery scopes, Map<String, Object> attributes, T target) {
 		// Default behaviour is to only do global access control
+		// and add all claims to the default set
 		addMetaData(attributes, target);
 	}
-	
 }
