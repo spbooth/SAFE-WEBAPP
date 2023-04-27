@@ -54,8 +54,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 	 * 
 	 */
 	public static final String CHANGE_ACTION = " Change ";
-	private static final Feature CHECK_COMPLEXITY = new Feature("password.check_complexity",true,"Perform complexity check on user generated passwords");
-    /**
+	    /**
 	 * 
 	 */
 	public static final String NEW_PASSWORD2 = "password2";
@@ -95,9 +94,13 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 		super();
 		this.comp = comp;
 		this.check_old= REQUIRE_OLD_PASSWORD.isEnabled(comp.getContext()) && check_old;
+		
+		this.policy = new PasswordPolicy(comp.getContext());
+		
 	}
-	private final PasswordAuthComposite<U> comp;
+   private final PasswordAuthComposite<U> comp;
    private final boolean check_old;
+   private final PasswordPolicy policy;
     
     /** Checks the field matches the current password
      * 
@@ -127,62 +130,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
     	
     }
     
-    /** Validate the complexity of the password
-     * 
-     * @author spb
-     *
-     */
-    private class ComplexityValidator implements FormValidator{
-    	
-    	private ValidateException decorate(ValidateException e) {
-    		e.setField(NEW_PASSWORD1);
-    		return e;
-    	}
-
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.forms.FieldValidator#validate(java.lang.Object)
-		 */
-		@Override
-		public void validate(Form f) throws ValidateException {
-		   String data = (String) f.get(NEW_PASSWORD1);
-		   Set<Character> chars = new HashSet<>();
-		   int neighbours=0;
-		   int specials=0;
-		   int numbers=0;
-		   char prev = 0;
-		   for(int i=0 ; i < data.length() ; i++){
-			   char c = data.charAt(i);
-			   if( Character.isDigit(c)){
-				   numbers++;
-			   }else if( ! Character.isLetter(c)){
-				   specials++;
-			   }
-			   chars.add(Character.valueOf(c));
-			   if( c == prev+1 || c+1 == prev || c == prev){
-				   neighbours++;
-			   }
-			   prev=c;
-			   
-		   }
-		   int min = minDiffChars();
-		   if( chars.size() < min){
-			   throw decorate(new ValidateException("Password must contain at least "+min+" different characters"));
-		   }
-		   if( (data.length() - neighbours) < minPasswordLength()){
-			   throw decorate(new ValidateException("Password too simple, too many repeated or consecutive characters"));
-		   }
-			
-		   int mindigit = minDigits();
-		   if( numbers < mindigit){
-			   throw decorate(new ValidateException("Password must contain at least "+mindigit+" numerical digits"));
-		   }
-		   int minspecial = minNonAlphaNumeric();
-		   if( specials < minspecial){
-			   throw decorate(new ValidateException("Password must contain at least "+minspecial+" non alpha-numeric characters"));
-		   }
-		}
-    	
-    }
+   
     /** checks both copies of the new password are the same
      * 
      * @author spb
@@ -257,14 +205,12 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
     		f.getField(PASSWORD_FIELD).addValidator(new MatchValidator(user));
     		f.addValidator(new ChangeValidator());
     	}
-    	f.addInput(NEW_PASSWORD1, "New Password:", makeNewInput());
-    	f.addInput(NEW_PASSWORD2, "New Password (again):", makeNewInput());
+    	f.addInput(NEW_PASSWORD1, "New Password:", policy.makeNewInput());
+    	f.addInput(NEW_PASSWORD2, "New Password (again):", policy.makeNewInput());
     	f.addValidator(new SamePasswordValidator());
     	
     	f.addValidator(new CanChangeValidator(user));
-    	if( CHECK_COMPLEXITY.isEnabled(getContext())){
-    		f.addValidator(new ComplexityValidator());
-    	}
+    	
     	f.addAction(CHANGE_ACTION, new UpdateAction(user));
     	if( comp.mustResetPassword(user)){
     		f.addAction(CANCEL_ACTION, new CancelLogoutAction());
@@ -424,39 +370,9 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
     	
     }
 	
-	private PasswordInput makeNewInput(){
-		PasswordInput input = new PasswordInput();
-		input.setMinimumLength(minPasswordLength());
-		return input;
-	}
 	
-	public int minPasswordLength() {
-		return getContext().getIntegerParameter("password.min_length", 8);
-	}
-	public int minDiffChars() {
-		int min = getContext().getIntegerParameter("password.min_diff_char", 6);
-		if( min > minPasswordLength()){
-			return minPasswordLength(); // can't ask for more chars than minimum length
-		}
-		return min;
-	}
-	public int minDigits() {
-		int min = getContext().getIntegerParameter("password.min_digits", 0);
-		if( min > minPasswordLength()){
-			return minPasswordLength(); // can't ask for more chars than minimum length
-		}
-		return min;
-	}
-	public int minNonAlphaNumeric() {
-		int min = getContext().getIntegerParameter("password.min_special", 0);
-		if( min > (minPasswordLength()- minDigits())){
-			return minPasswordLength(); // can't ask for more chars than minimum length
-		}
-		if( min < 0){
-			return 0;
-		}
-		return min;
-	}
+	
+
 	/**
 	 * @return
 	 */
@@ -464,46 +380,24 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 		return comp.getContext();
 	}
 	
-	public String getPasswordPolicy(){
-		if( CHECK_COMPLEXITY.isEnabled(getContext())){
-			StringBuilder sb = new StringBuilder();
-			
-			sb.append( "Passwords must be at least ");
-			sb.append(Integer.toString(minPasswordLength()));
-			sb.append(" characters long (not counting repeated characters and character sequences). ");
-			int mindiff = minDiffChars();
-			if( mindiff > 1){
-				sb.append("Passwords must contain at least ");
-				sb.append(Integer.toString(mindiff));
-				sb.append(" different characters. ");
-			}
-			int mindigit = minDigits();
-			if(mindigit > 0){
-				sb.append("Passwords must contain at least ");
-				sb.append(Integer.toString(mindigit));
-				sb.append(" numerical characters. ");
-			}
-			int minspecial = minNonAlphaNumeric();
-			if(minspecial > 0){
-				sb.append("Passwords must contain at least ");
-				sb.append(Integer.toString(minspecial));
-				sb.append(" non alpha-numeric characters. ");
-			}
-			return sb.toString();
-		}
-		return "Passwords must be at least "+minPasswordLength()+" characters long";
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.transition.ExtraContent#getExtraHtml(uk.ac.ed.epcc.webapp.content.ContentBuilder, uk.ac.ed.epcc.webapp.session.SessionService, java.lang.Object)
 	 */
 	@Override
 	public <X extends ContentBuilder> X getExtraHtml(X cb, SessionService<?> op, U target) {
-		cb.addText(getPasswordPolicy());
+		cb.addText(policy.getPasswordPolicy());
 		return cb;
 	}
 
 	public Logger getLogger(){
 		return getContext().getService(LoggerService.class).getLogger(getClass());
+	}
+
+
+
+	public Object getPasswordPolicy() {
+		return policy.getPasswordPolicy();
 	}
 }
