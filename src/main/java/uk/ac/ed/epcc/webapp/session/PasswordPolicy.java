@@ -16,7 +16,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.PasswordInput;
  * @author Stephen Booth
  *
  */
-public class PasswordPolicy extends AbstractContexed {
+public class PasswordPolicy extends AbstractContexed implements FieldValidator<String>{
 	private static final Feature CHECK_COMPLEXITY = new Feature("password.check_complexity",true,"Perform complexity check on user generated passwords");
 
 	public PasswordPolicy(AppContext conn) {
@@ -79,53 +79,50 @@ public class PasswordPolicy extends AbstractContexed {
 		}
 		return "Passwords must be at least "+minPasswordLength()+" characters long";
 	}
-	public class ComlexityValidator implements FieldValidator<String>{
-
-		@Override
-		public void validate(String data) throws FieldException {
-			 Set<Character> chars = new HashSet<>();
-			   int neighbours=0;
-			   int specials=0;
-			   int numbers=0;
-			   char prev = 0;
-			   for(int i=0 ; i < data.length() ; i++){
-				   char c = data.charAt(i);
-				   if( Character.isDigit(c)){
-					   numbers++;
-				   }else if( ! Character.isLetter(c)){
-					   specials++;
-				   }
-				   chars.add(Character.valueOf(c));
-				   if( c == prev+1 || c+1 == prev || c == prev){
-					   neighbours++;
-				   }
-				   prev=c;
-				   
+	@Override
+	public void validate(String data) throws FieldException {
+		 Set<Character> chars = new HashSet<>();
+		   int neighbours=0;
+		   int specials=0;
+		   int numbers=0;
+		   char prev = 0;
+		   for(int i=0 ; i < data.length() ; i++){
+			   char c = data.charAt(i);
+			   if( Character.isDigit(c)){
+				   numbers++;
+			   }else if( ! Character.isLetter(c)){
+				   specials++;
 			   }
-			   int min = minDiffChars();
-			   if( chars.size() < min){
-				   throw new ValidateException("Password must contain at least "+min+" different characters");
+			   chars.add(Character.valueOf(c));
+			   if( c == prev+1 || c+1 == prev || c == prev){
+				   neighbours++;
 			   }
-			   if( (data.length() - neighbours) < minPasswordLength()){
-				   throw new ValidateException("Password too simple, too many repeated or consecutive characters");
-			   }
-				
-			   int mindigit = minDigits();
-			   if( numbers < mindigit){
-				   throw new ValidateException("Password must contain at least "+mindigit+" numerical digits");
-			   }
-			   int minspecial = minNonAlphaNumeric();
-			   if( specials < minspecial){
-				   throw new ValidateException("Password must contain at least "+minspecial+" non alpha-numeric characters");
-			   }
+			   prev=c;
+			   
+		   }
+		   int min = minDiffChars();
+		   if( chars.size() < min){
+			   throw new ValidateException("Password must contain at least "+min+" different characters");
+		   }
+		   if( (data.length() - neighbours) < minPasswordLength()){
+			   throw new ValidateException("Password too simple, too many repeated or consecutive characters");
+		   }
 			
-		}
+		   int mindigit = minDigits();
+		   if( numbers < mindigit){
+			   throw new ValidateException("Password must contain at least "+mindigit+" numerical digits");
+		   }
+		   int minspecial = minNonAlphaNumeric();
+		   if( specials < minspecial){
+			   throw new ValidateException("Password must contain at least "+minspecial+" non alpha-numeric characters");
+		   }
 		
 	}
+	
 	public PasswordInput makeNewInput(){
 		PasswordInput input = new PasswordInput();
 		input.setMinimumLength(minPasswordLength());
-		input.addValidator(new ComlexityValidator());
+		input.addValidator(this);
 		return input;
 	}
 }
