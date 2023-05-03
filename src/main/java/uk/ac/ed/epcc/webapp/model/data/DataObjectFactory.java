@@ -1594,6 +1594,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return Map<String,String>
 	 * @see DataObjectFormFactory
 	 */
+	@Deprecated
 	protected Map<String, String> getTranslations() {
 		// default to no translations override this method in sub-classes
 		return new HashMap<>();
@@ -1605,6 +1606,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * 
 	 * @return Hashtable
 	 */
+	@Deprecated
 	protected Map<String, String> getFieldHelp() {
 		// default to no translations override this method in sub-classes
 		return new HashMap<>();

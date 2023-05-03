@@ -41,9 +41,8 @@ import uk.ac.ed.epcc.webapp.forms.inputs.UnusedNameInput;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.HistoryFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
+import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
@@ -67,7 +66,7 @@ import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
  */
 
 
-public class ClassificationFactory<T extends Classification> extends DataObjectFactory<T> implements Comparable<ClassificationFactory>, HistoryFieldContributor, NameFinder<T>,NameInputProvider<T>{
+public class ClassificationFactory<T extends Classification> extends DataObjectFactory<T> implements Comparable<ClassificationFactory>, HistoryFieldContributor, NameFinder<T>,NameInputProvider<T>,FieldHandler{
 	
 	/** Maximum size of pull-down menu in update form.
 	 * 
@@ -76,6 +75,15 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	private static final Pattern WHITESPACE = Pattern.compile("\\s");
 	
 	private HistoryFactory<T,HistoryFactory.HistoryRecord<T>> hist_fac=null;
+	@ConfigTag("Classification")
+	public static final String NAME = "Name";
+	@ConfigTag("Classification")
+	public static final String DESCRIPTION = "Description";
+	/**
+	 * 
+	 */
+	@ConfigTag("Classification")
+	public static final String SORT_ORDER = "SortOrder";
 	
 	
 	protected ClassificationFactory() {
@@ -150,7 +158,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	 */
 	@Override
 	public SQLValueFilter<T> getStringFinderFilter(String name) {
-		return new SQLValueFilter<>(res,Classification.NAME,name);
+		return new SQLValueFilter<>(res,ClassificationFactory.NAME,name);
 	}
 	@Override
 	public SQLFilter<T> hasCanonicalNameFilter(){
@@ -340,14 +348,14 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			Map<String,Selector> result = super.getSelectors();
 			
 			
-			result.put(Classification.NAME, new Selector() {
+			result.put(ClassificationFactory.NAME, new Selector() {
 
 				@Override
 				public Input getInput() {
 					// done here as only the create form can check that the name does not exist
 					// the update form has to rely on the sql update generating an error.
 					UnusedNameInput<T> input = new UnusedNameInput<>(ClassificationFactory.this);
-					input.setMaxResultLength(res.getInfo(Classification.NAME).getMax());
+					input.setMaxResultLength(res.getInfo(ClassificationFactory.NAME).getMax());
 					input.setTrim(true);
 					return input;
 				}
@@ -356,13 +364,13 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			
 			// Description is likely to be displayed to user so inhibit html by default
 			
-			result.put(Classification.DESCRIPTION,new Selector() {
+			result.put(ClassificationFactory.DESCRIPTION,new Selector() {
 
 				@Override
 				public Input getInput() {
 					NoHtmlInput desc_input = new NoHtmlInput();
-					if( res.hasField(Classification.DESCRIPTION)){
-						desc_input.setMaxResultLength(res.getInfo(Classification.DESCRIPTION).getMax());
+					if( res.hasField(ClassificationFactory.DESCRIPTION)){
+						desc_input.setMaxResultLength(res.getInfo(ClassificationFactory.DESCRIPTION).getMax());
 					}
 					return desc_input;
 				}
@@ -417,10 +425,10 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	@Override
 	protected List<OrderClause> getOrder() {
 		List<OrderClause> order = super.getOrder();
-		if( res.hasField(Classification.SORT_ORDER)){
-			order.add(res.getOrder(Classification.SORT_ORDER, false));
+		if( res.hasField(ClassificationFactory.SORT_ORDER)){
+			order.add(res.getOrder(ClassificationFactory.SORT_ORDER, false));
 		}
-		order.add(res.getOrder(Classification.NAME, false));
+		order.add(res.getOrder(ClassificationFactory.NAME, false));
 		return order;
 	}
 	public static class ClassificationUpdater<C extends Classification> extends Updater<C>{
@@ -441,9 +449,9 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			super.customiseUpdateForm(f, o);
 			if( allow_name_change){
 				UnusedNameInput<C> input = new UnusedNameInput<>(getClassificationFactory(),o);
-				f.getField(Classification.NAME).setInput(input);
+				f.getField(ClassificationFactory.NAME).setInput(input);
 			}else{
-				f.getField(Classification.NAME).lock();
+				f.getField(ClassificationFactory.NAME).lock();
 			}
 		}
 
@@ -485,7 +493,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	public void customiseForm(Form f) {
 		super.customiseForm(f);
 		if( ! allowSpacesInName()) {
-			f.getField(Classification.NAME).addValidator(new NoSpaceFieldValidator());
+			f.getField(ClassificationFactory.NAME).addValidator(new NoSpaceFieldValidator());
 		}
 		
 	}
@@ -501,20 +509,12 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	public final CodeListInput<T> getNameInput(BaseFilter<T> fil){
 		return new ClassificationCodeListInput(fil);
 	}
-	@Override
-	protected Map<String, String> getTranslations() {
-		Map<String,String> trans = super.getTranslations();
-		if( trans == null ){
-			trans =	new HashMap<>();
-		}
-		trans.put(Classification.SORT_ORDER, "Sort weighting");
-		return trans;
-	}
+	
 	
 	@Override
 	protected Set<String> getOptional() {
 		Set<String> optional = getNullable();
-		optional.remove(Classification.NAME);
+		optional.remove(ClassificationFactory.NAME);
 		return optional;
 	}
 	/* (non-Javadoc)
@@ -536,7 +536,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		if( ! allowSpacesInName() && WHITESPACE.matcher(name).find()){
 			throw new ParseException("No whitespace allowed");
 		}
-		if( name.length() > res.getInfo(Classification.NAME).getMax()){
+		if( name.length() > res.getInfo(ClassificationFactory.NAME).getMax()){
 			throw new ParseException("Too long");
 		}
 	}
@@ -572,7 +572,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		TableSpecification ts = getFinalTableSpecification(getContext(), getTag());
 		Set<String> fields = ts.getFieldNames();
 		for (String field : fields) {
-			if (  getContext().getBooleanParameter(getConfigTag()+".history_field."+field,  !field.equals(Classification.NAME)) ) {
+			if (  getContext().getBooleanParameter(getConfigTag()+".history_field."+field,  !field.equals(ClassificationFactory.NAME)) ) {
 				spec.setField(field, ts.getField(field));
 			}
 		}

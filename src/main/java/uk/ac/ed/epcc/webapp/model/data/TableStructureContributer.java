@@ -65,6 +65,7 @@ public interface TableStructureContributer<BDO extends DataObject> {
 	 * @param translations
 	 * @return {@link Map}
 	 */
+	@Deprecated
 	Map<String, String> addTranslations(Map<String, String> translations);
 
 	/** return a default set of tooltip help text for form fields.

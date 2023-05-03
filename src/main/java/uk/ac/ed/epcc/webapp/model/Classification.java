@@ -53,18 +53,11 @@ Table entries rarely change and may be populated manually.
 
 public class Classification extends DataObject implements Principal, Comparable<Classification>, Owned{
 
-    /**
-	 * 
-	 */
-	public static final String SORT_ORDER = "SortOrder";
-	public static final String DESCRIPTION = "Description";
-	public static final String NAME = "Name";
-
-	@Override
-	public String getName()     { return record.getStringProperty(NAME); }
-    public void setName(String name){ record.setProperty(NAME, name); }
-    public String getDescription()     { return record.getStringProperty(DESCRIPTION); }
-    public void setDescription(String desc){ record.setOptionalProperty(DESCRIPTION, desc); }
+    @Override
+	public String getName()     { return record.getStringProperty(ClassificationFactory.NAME); }
+    public void setName(String name){ record.setProperty(ClassificationFactory.NAME, name); }
+    public String getDescription()     { return record.getStringProperty(ClassificationFactory.DESCRIPTION); }
+    public void setDescription(String desc){ record.setOptionalProperty(ClassificationFactory.DESCRIPTION, desc); }
     
     protected ClassificationFactory fac;
     
@@ -97,13 +90,13 @@ public class Classification extends DataObject implements Principal, Comparable<
      */
     public static TableSpecification getTableSpecification(AppContext c,String table){
     	TableSpecification s = new TableSpecification();
-    	s.setField(NAME, new StringFieldType(false, null, c.getIntegerParameter(table+".name.length", c.getIntegerParameter("classifier.name.length", 32))));
+    	s.setField(ClassificationFactory.NAME, new StringFieldType(false, null, c.getIntegerParameter(table+".name.length", c.getIntegerParameter("classifier.name.length", 32))));
     	if( c.getBooleanParameter(table+".use_description", true)){
-    		s.setField(DESCRIPTION, new StringFieldType(true, null, c.getIntegerParameter(table+".description.length", c.getIntegerParameter("classifier.description.length", 255))));
+    		s.setField(ClassificationFactory.DESCRIPTION, new StringFieldType(true, null, c.getIntegerParameter(table+".description.length", c.getIntegerParameter("classifier.description.length", 255))));
     	}
-    	s.setOptionalField(SORT_ORDER, new IntegerFieldType(false, 0));
+    	s.setOptionalField(ClassificationFactory.SORT_ORDER, new IntegerFieldType(false, 0));
     	try {
-			s.new Index("name_key",true,NAME);
+			s.new Index("name_key",true,ClassificationFactory.NAME);
 		} catch (InvalidArgument e) {
 			c.error(e,"Error making classification key");
 		}
@@ -117,8 +110,8 @@ public class Classification extends DataObject implements Principal, Comparable<
 		// first compare for different factories
 		result = getFactoryTag().compareTo(o.getFactoryTag());
 		if( result == 0 ){
-			if( record.getRepository().hasField(SORT_ORDER)){
-				result = record.getIntProperty(SORT_ORDER, 0) - o.record.getIntProperty(SORT_ORDER, 0);
+			if( record.getRepository().hasField(ClassificationFactory.SORT_ORDER)){
+				result = record.getIntProperty(ClassificationFactory.SORT_ORDER, 0) - o.record.getIntProperty(ClassificationFactory.SORT_ORDER, 0);
 			}
 		}
 		if( result == 0 ){

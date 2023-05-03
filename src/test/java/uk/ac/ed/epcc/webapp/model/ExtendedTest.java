@@ -27,7 +27,7 @@ import org.junit.Test;
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 
-public class DummyTest extends WebappTestBase {
+public class ExtendedTest extends WebappTestBase {
     
 	Dummy1.Factory fac;
 	
@@ -35,41 +35,10 @@ public class DummyTest extends WebappTestBase {
 	
 	@Before
 	public void setUp() {
-		fac = new Dummy1.Factory(ctx);
+		fac = new ExtededDummyFactory(ctx);
 	}
 
-	@Test
-	public void testSQLInsert() throws DataException{
-		Dummy1 t = new Dummy1(ctx);
-		t.setName("Test");
-		t.setNumber(16);
-		t.commit();
-		try{
-		int id = t.getID();
-		String test_vector[] = {
-				"Hello world\n",
-			    "`",
-			    "\"",
-			    "\\",
-			    null,
-			    "\0"
-		};
-		for(int i=0 ;i<test_vector.length;i++){
-			t.setName(test_vector[i]);
-			t.setNumber(i);
-			t.setUnsigned(i);
-			t.commit();
-			Dummy1 res = fac.find(id);
-			assertEquals(test_vector[i],res.getName());
-			assertEquals("number wrong",res.getNumber(),i);
-			assertEquals("unsigned wrong",res.getUnsigned(),(long)i);
-			System.out.println("Test "+i+" "+test_vector[i]+" "+res.getName());
-			
-		}
-		}finally{
-			t.delete();
-		}
-	}
+	
 	
 	@Test
 	public void testConfigTags() throws Exception {
@@ -78,5 +47,6 @@ public class DummyTest extends WebappTestBase {
 		assertEquals("Dummy", config.get(Dummy1.MANDATORY));
 		assertEquals("Dummy", config.get(Dummy1.Factory.BASE));
 		assertEquals("Dummy", config.get(Dummy1.NAME));
+		assertEquals("Extended",config.get(ExtededDummyFactory.BOGUS));
 	}
 }

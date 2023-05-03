@@ -16,7 +16,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 
-/**
+/** An Input that wraps another input
  * @author Stephen Booth
  *
  */

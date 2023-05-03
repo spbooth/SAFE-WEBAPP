@@ -6,9 +6,7 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.Composite;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 
@@ -20,6 +18,7 @@ import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
  * @param <BDO>
  */
 public class RoleAccessComposite<BDO extends DataObject,A extends AppUser> extends Composite<BDO, RoleAccessComposite> implements AccessRoleProvider<A, BDO>{
+	@ConfigTag("RoleAccessComposite")
 	protected final static String ACCESS_ROLE="AccessRole";
 	public static final String ROLE_BASED_ACCESS_RELATIONSHIP ="RoleAccess";
 	public RoleAccessComposite(DataObjectFactory<BDO> fac) {
@@ -126,11 +125,4 @@ public class RoleAccessComposite<BDO extends DataObject,A extends AppUser> exten
 		return optional;
 	}
 
-
-
-	@Override
-	public Map<String, String> addTranslations(Map<String, String> translations) {
-		translations.put(ACCESS_ROLE, "Role for Group address");
-		return translations;
-	}
 }

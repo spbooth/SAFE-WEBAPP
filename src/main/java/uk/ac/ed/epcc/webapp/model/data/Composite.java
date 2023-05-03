@@ -73,7 +73,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 @SuppressWarnings("javadoc")
 
-public abstract class Composite<BDO extends DataObject, X > implements Contexed, TableStructureContributer<BDO> {
+public abstract class Composite<BDO extends DataObject, X > implements Contexed, TableStructureContributer<BDO>{
 
 	protected final DataObjectFactory<BDO> fac;
 	protected Composite(DataObjectFactory<BDO> fac){
