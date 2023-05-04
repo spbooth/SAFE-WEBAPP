@@ -222,7 +222,7 @@ ListInputInterfaceTest
 			   O o =  it.next();
 			   //System.out.println(o.getIdentifier());
 			   Form form = new HTMLForm(f.getContext());
-			   DataObjectFormFactory.buildForm(f.getContext(),f.res,form,f.getSupress(),f.getOptional(),f.getSelectors(),f.getFieldConstraints(),f.getTranslations(),f.getFieldHelp());
+			   DataObjectFormFactory.buildForm(f.getContext(),f.res,form,f.getSupress(),f.getOptional(),f.getSelectors(),f.getFieldConstraints(),f.getTranslations(),null);
 			   Map h = o.getMap();
 			   form.setContents(h);
 			   form.validate();

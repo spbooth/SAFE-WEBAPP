@@ -119,10 +119,7 @@ public abstract class Composite<BDO extends DataObject, X > implements Contexed,
 		return translations;
 	}
 	
-	@Override
-	public Map<String, String> addFieldHelp(Map<String, String> help) {
-		return help;
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.TableStructureContributer#addSelectors(java.util.Map)
 	 */

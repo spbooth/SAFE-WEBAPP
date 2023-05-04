@@ -43,6 +43,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
+import uk.ac.ed.epcc.webapp.model.data.forms.FieldHelpProvider;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.registry.IndexedFormEntry;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
@@ -160,11 +161,10 @@ public final AppContext getContext(){
 	 * 			  Map of tooltip/help text for form labels
 	 * @throws DataFault
 	 */
-	public static final boolean buildForm(AppContext conn, Repository res, Set<String> keys, Form f, 
+	public static boolean buildForm(AppContext conn,Repository res, Set<String> keys, Form f, 
 				Set<String> optional, Map<String,Selector> selectors,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips,HashMap fixtures) throws DataFault {
 		//
 		String table = res.getTag();
-		
 		boolean support_multi_stage = f.supportsMultiStage();
 		if( fixtures == null && constraints != null ) {
 			fixtures = new HashMap();
@@ -256,13 +256,17 @@ public final AppContext getContext(){
 					if (labels != null && labels.containsKey(name)) {
 						lab = labels.get(name);
 					}else{
-						lab = conn.getInitParameter(table+"."+name+FORM_LABEL_SUFFIX,name);
+						// This is a fall-back that should only be invoked if the static methods
+						// are called by an external class
+						lab = getTranslationFromConfig(conn,conn.getService(MessageBundleService.class).getBundle("form_content"),table, name);
 					}
 					String tooltip=null;
 					if( tooltips != null && tooltips.containsKey(name)) {
 						tooltip = tooltips.get(name);
 					}else {
-						tooltip = conn.getInitParameter(table+"."+name+FORM_HELP_TEXT_SUFFIX);
+						// This is a fall-back that should only be invoked if the static methods
+						// are called by an external class
+						tooltip = getHelpTextFromConfig(conn,conn.getService(MessageBundleService.class).getBundle("form_content"),table, name);
 					}
 					f.addInput(name, lab,tooltip, input).setOptional(is_optional);
 					if( fixtures != null ) {
@@ -489,7 +493,7 @@ public final AppContext getContext(){
 				String cfg = getConfigTags().get(field);
 				String label = null;
 				if( cfg != null ) {
-					label = getTranslationFromConfig(cfg, field);
+					label = getHelpTextFromConfig(cfg, field);
 				}
 				if( label != null ) {
 					help.put(field, label);
@@ -505,20 +509,27 @@ public final AppContext getContext(){
 		
 	}
 	private String getTranslationFromConfig(String qualifier, String field) {
+		return getTranslationFromConfig(getContext(), form_content, qualifier, field);
+	}
+	
+	public static String getTranslationFromConfig(AppContext conn, ResourceBundle form_content,String qualifier, String field) {
 		String key = qualifier+"."+field+FORM_LABEL_SUFFIX;
-		if( form_content.containsKey(key)) {
+		if( form_content != null && form_content.containsKey(key)) {
 			return form_content.getString(key);
 		}
 		// fall back to global config
-		return getContext().getInitParameter(key);
+		return conn.getInitParameter(key);
 	}
 	private String getHelpTextFromConfig(String qualifier, String field) {
+		return getHelpTextFromConfig(getContext(), form_content, qualifier, field);
+	}
+	public static String getHelpTextFromConfig(AppContext conn, ResourceBundle form_content,String qualifier, String field) {
 		String key = qualifier+"."+field+FORM_HELP_TEXT_SUFFIX;
-		if( form_content.containsKey(key)) {
+		if(  form_content != null && form_content.containsKey(key)) {
 			return form_content.getString(key);
 		}
-		// fall back to global config
-		return getContext().getInitParameter(key);
+		// fall back to global config this also allows parameter expansion
+		return conn.getExpandedProperty(key);
 	}
 	
 	
@@ -602,11 +613,11 @@ public final AppContext getContext(){
 	 * @return
 	 */
 	protected  final Map<String,String> getFieldHelp() {
-		Map<String, String> help = factory.getFieldHelp();
-		if( help == null){
-			help=new HashMap<>();
+		Map<String, String> help = new HashMap<>();
+		if( factory instanceof FieldHelpProvider) {
+			((FieldHelpProvider)factory).addFieldHelp(help);
 		}
-		for(TableStructureContributer c : factory.getTableStructureContributers()){
+		for(FieldHelpProvider c : factory.getComposites(FieldHelpProvider.class)){
 			Map mod = c.addFieldHelp(help);
 			assert(mod != null);
 		}

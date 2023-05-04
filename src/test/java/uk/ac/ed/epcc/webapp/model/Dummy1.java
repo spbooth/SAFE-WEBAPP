@@ -306,7 +306,7 @@ public class Dummy1 extends DataObject implements Removable {
 		@Override
 		public void addConfigTags(Map<String, String> config_tags) throws Exception {
 			FieldHandler.addConfigTags(getClass(),config_tags);
-			FieldHandler.addConfigTags(Dummy1.class, config_tags);
+			FieldHandler.addConfigTags(Dummy1.class,config_tags);
 		}
     }
 
