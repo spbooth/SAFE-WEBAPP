@@ -24,6 +24,7 @@ import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.factory.FormBuilder;
 import uk.ac.ed.epcc.webapp.forms.factory.FormFactory;
 import uk.ac.ed.epcc.webapp.forms.inputs.BooleanInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.DateInput;
@@ -66,7 +67,7 @@ import uk.ac.ed.epcc.webapp.timer.TimeClosable;
  *
  * @param <BDO>
  */
-public  abstract class DataObjectFormFactory<BDO extends DataObject> implements FormFactory, IndexedProducer<BDO>{
+public  abstract class DataObjectFormFactory<BDO extends DataObject> implements FormFactory, FormBuilder, IndexedProducer<BDO>{
    public static final String FORM_LABEL_SUFFIX = ".label";
    public static final String FORM_HELP_TEXT_SUFFIX = ".help_text";
 
@@ -103,7 +104,7 @@ public final AppContext getContext(){
 	public final boolean buildForm(Form f) throws DataFault{
 		return buildForm(f,null);
 	}
-
+	@Override
 	public final boolean buildForm(Form f,HashMap fixtures) throws DataFault{
 		try(TimeClosable build = new TimeClosable(getContext(), "buildForm")){
 			boolean complete = buildForm(getContext(), factory.res,getFields(),f,getOptional(),getSelectors(),getFieldConstraints(),getTranslations(),getFieldHelp(),fixtures);
