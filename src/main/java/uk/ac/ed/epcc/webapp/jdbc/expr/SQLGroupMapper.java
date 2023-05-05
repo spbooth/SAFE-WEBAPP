@@ -24,6 +24,7 @@ import java.util.List;
 
 import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.PatternArgument;
 import uk.ac.ed.epcc.webapp.jdbc.filter.ResultMapper;
@@ -36,6 +37,8 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  * @param <O> Type being produced
  */
 public abstract class SQLGroupMapper<O> extends AbstractContexed implements ResultMapper<O> {
+	
+	    public static final Feature GROUP_NULL_FEATURE= new Feature("sql_group_mapper.group_null",true,"Add group null if no explicit group fields generated (fix for constant values)");
 	// This is the list of key fields that need to be output in the GROUP BY clasue
 	    private List<GroupingSQLValue> key_list;
 	    private List<SQLValue> target_list; // either Fields  or strings that must be concatenated to make
@@ -273,8 +276,12 @@ public abstract class SQLGroupMapper<O> extends AbstractContexed implements Resu
 			if( hasKeys() ){
 				modify.append(" GROUP BY ");
 				if( ! addKeyList(modify)){
-					// actually no fields
-					return "";
+					// actually no fields but we may have const
+					if(GROUP_NULL_FEATURE.isEnabled(getContext())){
+						modify.append("null");
+					}else {
+						return "";
+					}
 				}
 			}
 	        return modify.toString();
