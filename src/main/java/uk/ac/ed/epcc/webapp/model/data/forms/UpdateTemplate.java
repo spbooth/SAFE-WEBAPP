@@ -43,7 +43,9 @@ public interface UpdateTemplate<BDO extends DataObject> {
 	 * @throws TransitionValidationException 
 	 */
 	
-	public void preCommit(BDO dat,Form f,Map<String,Object> orig) throws DataException, TransitionValidationException;
+	default public void preCommit(BDO dat,Form f,Map<String,Object> orig) throws DataException, TransitionValidationException{
+		
+	}
 	/** perform side-effects after a form update
 	 * 
 	 * 

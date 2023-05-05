@@ -217,12 +217,14 @@ ListInputInterfaceTest
    @Test
    public void testBuildForm() throws DataFault, FieldException, TypeException{
 	   DataObjectFactory<O> f = getFactory();
+	   DataObjectFormFactory<O> ff = new DataObjectFormFactory<O>(f) {
+	   };
 	   if( f.isValid()){
 		   for(Iterator<O> it = f.new FilterIterator(null,0,64); it.hasNext();){
 			   O o =  it.next();
 			   //System.out.println(o.getIdentifier());
 			   Form form = new HTMLForm(f.getContext());
-			   DataObjectFormFactory.buildForm(f.getContext(),f.res,form,f.getSupress(),f.getOptional(),f.getSelectors(),f.getFieldConstraints(),f.getTranslations(),null);
+			   ff.buildForm(form);
 			   Map h = o.getMap();
 			   form.setContents(h);
 			   form.validate();
