@@ -47,13 +47,13 @@ public  class RoleUpdate<U extends AppUser> implements Contexed, StandAloneFormU
 	
 	
 	@Override
-	public void buildUpdateForm(String type_name,Form f, U dat,SessionService<?> operator) throws DataFault {
+	public void buildUpdateForm(Form f, U dat,SessionService<?> operator) throws DataFault {
 		for(String role : serv.getStandardRoles()){
 			CheckBoxInput i = new CheckBoxInput("Y","N");
 			i.setChecked(dat!=null && serv.canHaveRole(dat, role));
 			f.addInput(role, role, i);
 		}
-		f.addAction("Update", new RoleAction<>(type_name,dat));
+		f.addAction("Update", new RoleAction<>(dat));
 	}
 
 	@Override

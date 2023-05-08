@@ -124,7 +124,7 @@ public class FormFactoryProviderTransitionProvider<T> implements
 				if( formCreator == null){
 					return null;
 				}
-				return new FormCreatorTransition<>(form_factory_provider.getName(),formCreator);
+				return new FormCreatorTransition<T>(formCreator);
 			}
 			FormUpdate<T> formUpdate = form_factory_provider.getFormUpdate(c);
 			if (formUpdate instanceof StandAloneFormUpdate) {
@@ -135,7 +135,7 @@ public class FormFactoryProviderTransitionProvider<T> implements
 							FormOperations.Edit);
 
 				} else if (key.equals(FormOperations.Edit)) {
-					return new StandAloneFormUpdateTransition<>(form_factory_provider.getName(),
+					return new StandAloneFormUpdateTransition<>(
 							(StandAloneFormUpdate<T>) formUpdate);
 
 				}

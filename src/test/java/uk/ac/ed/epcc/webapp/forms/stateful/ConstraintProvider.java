@@ -38,7 +38,7 @@ public class ConstraintProvider extends SimpleViewTransitionProvider<Constrained
 
 	
 		public CreateTransition(AppContext conn) {
-			super("ConstrainedObject", (new ConstrainedFactory(conn)).getFormCreator(conn));
+			super((new ConstrainedFactory(conn)).getFormCreator(conn));
 		}
 		
 	}

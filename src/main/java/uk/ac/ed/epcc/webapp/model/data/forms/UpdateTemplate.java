@@ -65,10 +65,9 @@ public interface UpdateTemplate<BDO extends DataObject> {
 	
 	/** select the {@link FormResult} after an update.
 	 * 
-	 * @param type_name
 	 * @param dat
 	 * @param f
 	 * @return
 	 */
-	public abstract FormResult getResult(String type_name,BDO dat, Form f);
+	public abstract FormResult getResult(BDO dat, Form f);
 }

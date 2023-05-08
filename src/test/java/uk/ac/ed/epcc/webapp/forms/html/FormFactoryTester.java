@@ -39,7 +39,7 @@ public  void testFactory(FormFactory fac) throws Exception{
 	  }
 }
 public void testCreate(FormCreator f){
-	HTMLCreationForm c = new HTMLCreationForm("Test",f);
+	HTMLCreationForm c = new HTMLCreationForm(f);
 	  c.getHtmlForm(null);
 	  
 	  //System.out.println(form.getHtmlForm(null,null,new HashMap()));
@@ -51,7 +51,7 @@ public <T> void testUpdate(FormUpdate<T> f) throws Exception{
 	  u.buildSelectForm(form);
 	  form.clear();
 	  if( u instanceof StandAloneFormUpdate){
-		  ((StandAloneFormUpdate)u).buildUpdateForm("Test",form,null,ctx.getService(SessionService.class));
+		  ((StandAloneFormUpdate)u).buildUpdateForm(form,null,ctx.getService(SessionService.class));
 	  }
 	
 	  

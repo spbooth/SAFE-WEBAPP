@@ -503,6 +503,9 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 	}
 	public class TextFileUpdator implements StandAloneFormUpdate<T>, UpdateTemplate<T>{
 
+		public String getTypeName() {
+			return "Text file";
+		}
 		@Override
 		public void buildSelectForm(Form f, String label, T dat) {
 			Input<Integer> i = getInput();
@@ -521,7 +524,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public void buildUpdateForm(String type_name,Form f, T dat,SessionService<?> operator) throws DataException {
+		public void buildUpdateForm(Form f, T dat,SessionService<?> operator) throws DataException {
 			boolean show_diff=false;
 			if(dat == null ||  ! isValid()){
 				return;
@@ -565,12 +568,12 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			}
 		
 			f.addInput(TEXT, TEXT, text);
-			f.addAction("Update", new TextFileUpdateAction(type_name,dat));
+			f.addAction("Update", new TextFileUpdateAction(getTypeName(),dat));
 			if( show_diff ) {
-				f.addAction("Revert",new TextFileRevertAction(type_name,dat));
+				f.addAction("Revert",new TextFileRevertAction(getTypeName(),dat));
 				f.addAction("Diff", new TextFileDiffAction(dat));
 			}
-			f.addAction("Delete",new RetireAction<>(type_name,dat));
+			f.addAction("Delete",new RetireAction<>(getTypeName(),dat));
 		}
 
 		@Override
@@ -587,8 +590,8 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 
 
 		@Override
-		public FormResult getResult(String typeName, T dat, Form f) {
-			return new MessageResult("object_updated",typeName,dat);
+		public FormResult getResult( T dat, Form f) {
+			return new MessageResult("object_updated","Text file",dat);
 		}
 
 		/* (non-Javadoc)

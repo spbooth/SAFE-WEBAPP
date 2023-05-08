@@ -25,9 +25,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 public class RoleAction<U extends AppUser> extends FormAction{
 	U p ;
-    String type_name;
-	public RoleAction(String type_name,U dat) {
-		this.type_name=type_name;
+	public RoleAction(U dat) {
 		p=dat;
 	}
 

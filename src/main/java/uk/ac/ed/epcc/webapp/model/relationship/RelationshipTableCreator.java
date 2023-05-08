@@ -51,7 +51,7 @@ public class RelationshipTableCreator extends AbstractContexed implements FormCr
 		super(c);
 	}
 	@Override
-	public void buildCreationForm(String type_name,Form f) throws Exception {
+	public void buildCreationForm(Form f) throws Exception {
 		f.addInput(TABLE, "Name of table to create", new NewTableInput(conn));
 		f.addInput(TYPE,"Table type",new ClassInput<>(conn, RelationshipProvider.class));
 		f.addInput(PEER,"Table Relationship applies to", new TableInput<>(conn, NameFinder.class));

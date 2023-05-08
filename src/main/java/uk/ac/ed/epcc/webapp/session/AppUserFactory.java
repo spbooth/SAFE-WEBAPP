@@ -443,7 +443,7 @@ Targetted<AU>
 				StandAloneFormUpdate<AU> u = (StandAloneFormUpdate<AU>) getFormUpdate(getContext());
 				
 				SessionService service = user.getContext().getService(SessionService.class);
-				u.buildUpdateForm("Person", f, user,service);
+				u.buildUpdateForm(f, user,service);
 				if( ! service.hasRole(SessionService.ADMIN_ROLE)){
 					f.removeField(ALLOW_EMAIL_FIELD);
 				}
@@ -946,16 +946,16 @@ Targetted<AU>
 			return (AppUserFactory<T>)getFactory();
 		}
 		@Override
-		public void setAction(String type_name,Form f) {
+		public void addActions(Form f) {
 			// Check for a placeholder record and update that instead if it exists
 			T existing = existingUser();
 
 			if( existing != null ){
-				f.addAction(REGISTER_ACTION, new UpdateAction<>("Person", this, existing));
+				f.addAction(REGISTER_ACTION, new UpdateAction<>( this, existing));
 				return;
 			}
 
-			f.addAction(REGISTER_ACTION, new CreateAction<>(type_name,this));
+			f.addAction(REGISTER_ACTION, new CreateAction<>(this));
 		}
 		
 		private T existingUser() {
@@ -984,11 +984,11 @@ Targetted<AU>
 
 
 		@Override
-		public FormResult getResult(String type_name,T dat, Form f) {
+		public FormResult getResult(T dat, Form f) {
 			if( getFactory().getComposite(PasswordAuthComposite.class)!=null){			
-				return new MessageResult("signup_ok_password",type_name);
+				return new MessageResult("signup_ok_password");
 			}else{
-				return new MessageResult("signup_ok",type_name);
+				return new MessageResult("signup_ok");
 			}
 		}
 		

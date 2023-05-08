@@ -83,7 +83,7 @@ public class RegisterServlet extends WebappServlet {
 		FormCreator signupFormCreator =fac.getSignupFormCreator();
 		
 		if( signupFormCreator != null ){
-			HTMLCreationForm person_form = new HTMLCreationForm("Signup",signupFormCreator);
+			HTMLCreationForm person_form = new HTMLCreationForm(signupFormCreator);
 
 			FormResult result = null;
 			try {

@@ -25,10 +25,11 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.CreateAction;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 /** interface for objects that specify creation forms.
  * 
- * This is the interface taragetted by the standard {@link CreateAction}
+ * This is the interface targeted by the standard {@link CreateAction}
  * It also provides default implementations for methods in {@link CreateCustomizer}
  * which it extends.
  * @author Stephen Booth
@@ -41,6 +42,30 @@ public interface CreateTemplate<BDO extends DataObject> extends CreateCustomizer
 	
 	public abstract DataObjectFactory<BDO> getFactory();
 
+    public default void customiseCompleteCreationForm(Form f) {
+    	
+    }
+	default public String getActionName() {
+		return "Create";
+	}
+    /** Override the text for the create button
+	 * 
+	 * @return object added as button content
+	 */
+	default public Object getActionText() {
+		return null;
+	}
+	/** create the uncomitted blank object to be populated
+	 * 
+	 * @return
+	 * @throws DataFault
+	 */
+	public default BDO makeObject() throws DataException {
+		return getFactory().makeBDO();
+	}
+	public default void addActions(Form f) {
+		f.addAction(getActionName(), new CreateAction<>(getActionText(),this));
+	}
 	@Override
 	default public void postCreate(BDO dat, Form f) throws Exception {
 		for(CreateCustomizer comp : getFactory().getComposites(CreateCustomizer.class)){
@@ -67,7 +92,7 @@ public interface CreateTemplate<BDO extends DataObject> extends CreateCustomizer
 	
 	
 	
-	public abstract FormResult getResult(String type_name,BDO dat, Form f);
+	public abstract FormResult getResult(BDO dat, Form f);
 	
 	
 	

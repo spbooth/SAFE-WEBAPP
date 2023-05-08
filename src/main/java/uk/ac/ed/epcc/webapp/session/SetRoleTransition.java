@@ -41,7 +41,7 @@ public class SetRoleTransition<U extends AppUser> extends AbstractFormTransition
 			i.setChecked(dat!=null && serv.canHaveRole(dat, role));
 			f.addInput(role, role, i);
 		}
-		f.addAction("Update", new RoleAction<>("Person role",dat));
+		f.addAction("Update", new RoleAction<>(dat));
 
 	}
 

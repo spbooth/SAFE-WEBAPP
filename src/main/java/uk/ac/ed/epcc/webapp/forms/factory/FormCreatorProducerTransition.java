@@ -31,8 +31,8 @@ public class FormCreatorProducerTransition<X> extends CreatorTransition<X> {
     private final FormCreatorProducer producer;
 	
    
-    public FormCreatorProducerTransition(String type_name,FormCreatorProducer producer){
-    	super(type_name);
+    public FormCreatorProducerTransition(FormCreatorProducer producer){
+    	super();
     	this.producer=producer;
     }
 	

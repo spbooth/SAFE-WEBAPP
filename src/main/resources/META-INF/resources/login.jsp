@@ -117,7 +117,7 @@ This service is only available to pre-registered users.
 <p> Please fill in this form to register with this service</p>
 </div>
 <%
-     HTMLCreationForm person_form = new HTMLCreationForm("Person",fac.getSignupFormCreator());
+     HTMLCreationForm person_form = new HTMLCreationForm(fac.getSignupFormCreator());
 %>
 <wb:FormContext />
 <div class="block">

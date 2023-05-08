@@ -13,9 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.MissingResourceException;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -39,7 +36,7 @@ public class UpdateDetailsTransition<A extends AppUser> extends StandAloneFormUp
 	 * @param fac
 	 */
 	protected UpdateDetailsTransition(AppUserTransitionProvider provider, AppUserFactory<A> fac) {
-		super("Details", fac);
+		super( fac);
 		this.provider=provider;
 	}
 	

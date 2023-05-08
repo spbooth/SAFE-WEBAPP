@@ -104,9 +104,9 @@ public class XMLOverlay<X extends XMLOverlay.XMLFile> extends TextFileOverlay<X>
 	public class XMLFileUpdator extends TextFileUpdator implements ExtraContent<X>{
 
 		@Override
-		public void buildUpdateForm(String type_name, Form f, X dat,SessionService<?> operator)
+		public void buildUpdateForm( Form f, X dat,SessionService<?> operator)
 				throws DataException {
-			super.buildUpdateForm(type_name, f, dat,operator);
+			super.buildUpdateForm( f, dat,operator);
 			f.addAction("XML-Editor", new XMLEditAction(new TemplateTarget(dat)));
 		}
 

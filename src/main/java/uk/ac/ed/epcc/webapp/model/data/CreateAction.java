@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.forms.CreateTemplate;
 
 /**
@@ -44,18 +45,15 @@ public final class CreateAction<BDO extends DataObject> extends FormAction {
 	 * 
 	 */
 	private final CreateTemplate<BDO> creator;
-    private final String type_name;
     private final Object text;
 	/**
-	 * @param type_name User presetned name of type being created.
 	 * @param dataObjectFactory
 	 */
-	public CreateAction(String type_name,CreateTemplate<BDO> dataObjectFactory) {
-		this(type_name,null,dataObjectFactory);
+	public CreateAction(CreateTemplate<BDO> dataObjectFactory) {
+		this(null,dataObjectFactory);
 	}
-	public CreateAction(String type_name,Object text,CreateTemplate<BDO> dataObjectFactory) {
+	public CreateAction(Object text,CreateTemplate<BDO> dataObjectFactory) {
 		creator = dataObjectFactory;
-		this.type_name=type_name;
 		this.text=text;
 	}
 
@@ -68,16 +66,14 @@ public final class CreateAction<BDO extends DataObject> extends FormAction {
 		log.debug("In create action");
 		try {
 			// populate as a record in case factory is polymorphic and needs form parameters to create object.
-			Repository.Record rec = factory.makeRecord();
+			o = creator.makeObject();
 			// we may have default values supressed in the form
 			Map<String,Object> defs = creator.getDefaults();
 			if( defs != null){
 				log.debug("set default contents");
-				rec.putAll(defs);
+				o.setContents(defs);
 			}
-			rec.putAll(f.getContents());
-			o = (BDO) factory.makeBDO(rec);
-			log.debug("set form contents");
+			o.formUpdate(f);
 			preCommit(o,f);
 			log.debug("commit");
 			o.commit();
@@ -94,7 +90,7 @@ public final class CreateAction<BDO extends DataObject> extends FormAction {
 			log.error("exception in CreateAction.action",e);
 			throw new ActionException("Create failed", e);
 		}
-		return creator.getResult(type_name,o, f);
+		return creator.getResult(o, f);
 		
 	}
 	public final void preCommit(BDO dat, Form f) throws DataException, ActionException {

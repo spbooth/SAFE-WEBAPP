@@ -23,10 +23,15 @@ import uk.ac.ed.epcc.webapp.model.data.*;
  * @param <BDO>
  */
 public interface CreatorInterface<BDO extends DataObject> extends FormCreator, CreateTemplate<BDO>, FormBuilder {
-	@Override
+	
 	default public void buildCreationForm(String type_name,Form f) throws Exception {
+		buildCreationForm(f);
+	}
+	@Override
+	default public void buildCreationForm(Form f) throws Exception {
 		if( buildForm(f,getInitialFixtures()) ) {
-			setAction(type_name,f);
+			customiseCompleteCreationForm(f);
+			addActions(f);
 		}
 		customiseCreationForm(f);
 		for(TableStructureContributer comp : getFactory().getTableStructureContributers()){
@@ -35,16 +40,7 @@ public interface CreatorInterface<BDO extends DataObject> extends FormCreator, C
 			}
 		}
 	}
-    default public void setAction(String type_name,Form f) {
-    	f.addAction(" Create ", new CreateAction<>(type_name,getActionText(),this));
-    }
-    /** Override the text for the create button
-	 * 
-	 * @return object added as button content
-	 */
-	default public Object getActionText() {
-		return null;
-	}
+   
 	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.CreateTemplate#preCommit(BDO, uk.ac.ed.epcc.webapp.model.data.forms.Form)
@@ -66,14 +62,17 @@ public interface CreatorInterface<BDO extends DataObject> extends FormCreator, C
 	}
 	
 	@Override
-	default public FormResult getResult(String type_name,BDO dat, Form f) {
-		Object thing = type_name;
+	default public FormResult getResult(BDO dat, Form f) {
+		Object thing = getTypeName();
 		if( dat instanceof UIGenerator || dat instanceof UIProvider || dat instanceof Identified) {
 			thing = dat;
 		}
-		MessageResult res = new MessageResult("object_created",type_name,thing);
+		MessageResult res = new MessageResult("object_created",getTypeName(),thing);
 		
 		return res;
+	}
+	default public String getTypeName() {
+		return getFactory().getTag();
 	}
 	
 	default public HashMap getInitialFixtures() {

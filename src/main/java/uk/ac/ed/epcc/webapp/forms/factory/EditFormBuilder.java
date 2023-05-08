@@ -26,8 +26,7 @@ public interface EditFormBuilder<T> extends FormFactory {
 
 	/**
 	 * Build a form for updating an object including the action buttons.
-	 * @param name String name of target type to be presented to user
-	 * 
+	 
 	 * @param f
 	 *            Form to build
 	 * @param dat
@@ -37,7 +36,7 @@ public interface EditFormBuilder<T> extends FormFactory {
 	 *             person editing the form
 	 * @throws Exception
 	 */
-	public abstract void buildUpdateForm(String name, Form f, T dat,SessionService<?> operator)
+	public abstract void buildUpdateForm( Form f, T dat,SessionService<?> operator)
 			throws Exception;
 
 }

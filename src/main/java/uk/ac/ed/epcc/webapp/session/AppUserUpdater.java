@@ -40,7 +40,7 @@ public class AppUserUpdater<A extends AppUser> extends Updater<A> {
 	}
 
 	@Override
-	public FormResult getResult(String typeName, A dat, Form f) {
+	public FormResult getResult( A dat, Form f) {
 		// This  might be a required page update
 		SessionService sess = dat.getContext().getService(SessionService.class);
 		String return_url = (String) sess.getAttribute(RequiredPage.REQUIRED_PAGE_RETURN_ATTR);
@@ -52,7 +52,7 @@ public class AppUserUpdater<A extends AppUser> extends Updater<A> {
 		if( provider != null) {
 			return provider.new ViewResult(dat);
 		}
-		return super.getResult(typeName, dat, f);
+		return super.getResult(dat, f);
 	}
 	
 	@Override

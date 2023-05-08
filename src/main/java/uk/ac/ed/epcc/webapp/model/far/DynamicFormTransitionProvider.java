@@ -177,7 +177,7 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 		 * @see uk.ac.ed.epcc.webapp.model.data.forms.CreateTemplate#getResult(java.lang.String, uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.forms.Form)
 		 */
 		@Override
-		public FormResult getResult(String type_name, T dat, Form f) {
+		public FormResult getResult(T dat, Form f) {
 			return new ViewResult(dat);
 		}
 

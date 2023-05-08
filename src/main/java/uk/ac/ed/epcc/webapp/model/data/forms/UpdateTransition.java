@@ -45,20 +45,17 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  */
 public abstract class UpdateTransition<BDO extends DataObject> extends DataObjectUpdateFormFactory<BDO> implements FormTransition<BDO>, UpdateTemplate<BDO>{
 
-	private final String name;
-	protected UpdateTransition(String name,DataObjectFactory<BDO> fac) {
+
+	protected UpdateTransition(DataObjectFactory<BDO> fac) {
 		super(fac);
-		this.name=name;
+		
 	}
 
-	public final String getName(){
-		return name;
-	}
 	
 	public final void buildForm(Form f, BDO dat, AppContext conn)
 			throws TransitionException {
 		try{
-		  buildUpdateForm(getName(), f, dat, conn.getService(SessionService.class));
+		  buildUpdateForm(f, dat, conn.getService(SessionService.class));
 		}catch(Exception e){
 			getLogger().error("Error making update transition form",e);
 			throw new TransitionException("Internal Error in update");

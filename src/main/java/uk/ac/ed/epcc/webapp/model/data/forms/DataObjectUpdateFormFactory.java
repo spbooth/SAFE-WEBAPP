@@ -89,7 +89,7 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 		}
 	}
 
-	public final void buildUpdateForm(String type_name, Form f, BDO dat, SessionService<?> operator)
+	public final void buildUpdateForm(Form f, BDO dat, SessionService<?> operator)
 			throws DataFault {
 				HashMap fixtures = new HashMap();
 				if( dat != null) {
@@ -121,8 +121,8 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 				
 				if( complete ) {
 					customiseCompleteUpdateForm(f, dat);
-					f.addAction(getUpdateActionName(), new UpdateAction<>(type_name,this, dat));
-					addRetireAction(type_name, f, dat, operator);
+					f.addAction(getUpdateActionName(), new UpdateAction<>(this, dat));
+					addRetireAction( f, dat, operator);
 				}
 				
 				
@@ -136,24 +136,25 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 	public void customiseCompleteUpdateForm(Form f, BDO o) {
 		
 	}
+	
+	
 	protected String getUpdateActionName() {
 		return UPDATE;
 	}
 
 	/**
-	 * @param type_name
 	 * @param f
 	 * @param dat
 	 * @param operator
 	 */
-	protected void addRetireAction(String type_name, Form f, BDO dat, SessionService<?> operator) {
+	protected void addRetireAction(Form f, BDO dat, SessionService<?> operator) {
 		if (dat instanceof Retirable && ( ! (dat instanceof RestrictedRetirable)  || ((RestrictedRetirable)dat).allowRetire(operator))){
 			Retirable retirable = (Retirable) dat;
 			if( retirable.useAction()) {
 				if(retirable.canRetire()) {
-					f.addAction(RETIRE, new RetireAction(type_name, dat));
+					f.addAction(RETIRE, new RetireAction(getTypeName(), dat));
 				}else if( dat instanceof UnRetirable && ((UnRetirable)dat).canRestore()){
-					f.addAction(UN_RETIRE, new UnRetireAction(type_name, dat));
+					f.addAction(UN_RETIRE, new UnRetireAction(getTypeName(), dat));
 				}
 			}
 		}
@@ -183,12 +184,15 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 	}
 
 	@Override
-	public FormResult getResult(String typeName, BDO dat, Form f) {
-		Object thing = typeName;
+	public FormResult getResult(BDO dat, Form f) {
+		Object thing = getTypeName();
 		if( dat instanceof UIGenerator || dat instanceof UIProvider || dat instanceof Identified) {
 			thing = dat;
 		}
-		return new MessageResult("object_updated",typeName,thing);
+		return new MessageResult("object_updated",getTypeName(),thing);
+	}
+	protected String getTypeName() {
+		return getFactory().getTag();
 	}
 
 }

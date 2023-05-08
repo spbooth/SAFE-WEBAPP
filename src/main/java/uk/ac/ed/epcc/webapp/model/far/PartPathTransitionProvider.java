@@ -315,7 +315,7 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 
 		
 		public EditPartTransition() {
-			super("Part");
+			super();
 			
 		}
 
