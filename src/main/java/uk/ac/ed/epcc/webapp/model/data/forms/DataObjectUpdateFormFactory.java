@@ -23,16 +23,11 @@ import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.content.UIProvider;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.Identified;
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionValidationException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFormFactory;
-import uk.ac.ed.epcc.webapp.model.data.RestrictedRetirable;
-import uk.ac.ed.epcc.webapp.model.data.Retirable;
-import uk.ac.ed.epcc.webapp.model.data.TableStructureContributer;
-import uk.ac.ed.epcc.webapp.model.data.UnRetirable;
+import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -163,7 +158,12 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 			}
 		}
 	}
-
+	@Override
+	public void preCommit(BDO dat,Form f,Map<String,Object> orig) throws DataException, TransitionValidationException{
+		for(UpdateContributor<BDO> comp : getFactory().getComposites(UpdateContributor.class)) {
+			comp.preCommit(dat, f, orig);
+		}
+	}
 	@Override
 	public void postUpdate(BDO o, Form f, Map<String,Object> origs,boolean changed)
 			throws DataException {

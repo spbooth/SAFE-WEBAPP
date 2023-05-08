@@ -24,6 +24,8 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionValidationException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+import uk.ac.ed.epcc.webapp.model.data.UpdateContributor;
 
 /** Interfaces for use with an {@link UpdateAction}
  * This allows a standard action to be used with the customisation points moved into the enclosing class.

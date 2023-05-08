@@ -29,7 +29,7 @@ public interface CreateTransitionInterface<BDO extends DataObject> extends Targe
 		try {
 			
 			if( buildForm(f,getInitialFixtures())) {
-				f.addAction("Create", new CreateAction<>(getTypeName(), getActionText(),this));
+				setAction(f);
 			}
 			customiseCreationForm(f);
 			for(CreateCustomizer comp : getFactory().getComposites(CreateCustomizer.class)){
@@ -40,6 +40,9 @@ public interface CreateTransitionInterface<BDO extends DataObject> extends Targe
 			throw new TransitionException("Error creating object");
 		}
 		
+	}
+	public default void setAction(Form f) {
+		f.addAction("Create", new CreateAction<>(getTypeName(), getActionText(),this));
 	}
 	/** Override the text for the create button
 	 * 

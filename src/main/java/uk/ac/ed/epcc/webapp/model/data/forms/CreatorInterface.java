@@ -46,7 +46,24 @@ public interface CreatorInterface<BDO extends DataObject> extends FormCreator, C
 		return null;
 	}
 	
-	
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.data.CreateTemplate#preCommit(BDO, uk.ac.ed.epcc.webapp.model.data.forms.Form)
+	 */
+	@Override
+	default public  void preCommit(BDO dat, Form f) throws DataException, ActionException {
+		for(CreateCustomizer comp : getFactory().getComposites(CreateCustomizer.class)){
+			comp.preCommit(dat, f);
+		}
+	}
+	/* (non-Javadoc)
+	 * @see uk.ac.ed.epcc.webapp.model.data.CreateTemplate#postCreate(BDO, uk.ac.ed.epcc.webapp.model.data.forms.Form)
+	 */
+	@Override
+	default public void postCreate(BDO dat, Form f) throws Exception {
+		for(CreateCustomizer comp : getFactory().getComposites(CreateCustomizer.class)){
+			comp.postCreate(dat, f);
+		}
+	}
 	
 	@Override
 	default public FormResult getResult(String type_name,BDO dat, Form f) {

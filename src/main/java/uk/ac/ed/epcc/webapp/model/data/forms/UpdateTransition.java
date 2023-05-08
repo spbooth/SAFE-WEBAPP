@@ -65,21 +65,8 @@ public abstract class UpdateTransition<BDO extends DataObject> extends DataObjec
 		}
 	}
 
-	public final FormResult getResult(TransitionVisitor<BDO> vis)
-			throws TransitionException {
-		return vis.doFormTransition(this);
-	}
-
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.data.forms.UpdateTemplate#preCommit(uk.ac.ed.epcc.webapp.model.data.DataObject, uk.ac.ed.epcc.webapp.forms.Form, java.util.Map)
-	 */
-	@Override
-	public void preCommit(BDO dat, Form f, Map<String, Object> orig) throws DataException, TransitionValidationException {
-		for(UpdateContributor<BDO> comp : getFactory().getComposites(UpdateContributor.class)) {
-			comp.preCommit(dat, f, orig);
-		}
-		
-	}
+	
+	
 
 	
 }
