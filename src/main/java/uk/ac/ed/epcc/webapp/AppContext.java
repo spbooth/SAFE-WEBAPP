@@ -24,20 +24,10 @@ package uk.ac.ed.epcc.webapp;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeMap;
 
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.DefaultConfigService;
@@ -692,8 +682,21 @@ public final class AppContext {
 		}
 		return res;
 	}
+    private static final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-
+    public Date getDateParameter(String name, Date def) {
+    	String param = getInitParameter(name);
+    	if( param == null) {
+    		return def;
+    	}
+    	Date res = def;
+    	try {
+    		df.parse(param);
+    	}catch(ParseException e) {
+    		error(e,"bady formatted parameter "+name+" value ["+param+"]");
+    	}
+    	return res;
+    }
 	/**
 	 * return a copy of the Service properties associated with the AppContext
 	 * 
