@@ -278,6 +278,8 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 			key = (K) factory.lookupTransition(target, req.getParameter(TransitionServlet.TRANSITION_KEY_ATTR));
 		 }
 		 assertNotNull("No transition found for key "+key,key);
+		 assertTrue("Access denied",factory.allowTransition(getContext(), target, key));
+		
 		 if( factory instanceof TitleTransitionFactory){
 			 // could do this for all transitions but
 			 // would need to update results for all non Title factories
