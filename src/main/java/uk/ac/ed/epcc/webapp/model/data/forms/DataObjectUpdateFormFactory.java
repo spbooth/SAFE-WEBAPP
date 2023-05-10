@@ -89,16 +89,23 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 		}
 	}
 
+	public HashMap getFixtures(BDO dat) {
+		HashMap fixtures = new HashMap();
+		if( dat != null) {
+			Map data = dat.getMap();
+			for(String field : getSupress()) {
+				Object value = data.get(field);
+				if( value != null) {
+					fixtures.put(field,value);
+				}
+			}
+		}
+		return fixtures;
+	}
 	public final void buildUpdateForm(Form f, BDO dat, SessionService<?> operator)
 			throws DataFault {
-				HashMap fixtures = new HashMap();
-				if( dat != null) {
-					Map data = dat.getMap();
-					for(String field : getSupress()) {
-						fixtures.put(field,data.get(field));
-					}
-				}
-			    boolean complete = buildForm(f,fixtures);
+				
+			    boolean complete = buildForm(f,getFixtures(dat));
 				//customiseForm(f);
 			    
 			    // set values before customise as it is common

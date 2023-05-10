@@ -117,6 +117,14 @@ public interface Input<V> {
 	 */
 	public abstract void validate() throws FieldException;
 	
+	/**
+	 * Check the validity of a prospective value
+	 * 
+	 * 
+	 * @throws FieldException
+	 */
+	public abstract void validate(V value) throws FieldException;
+	
 	public abstract <R> R accept(InputVisitor<R> vis) throws Exception;
 
 	/**Is the input empty.

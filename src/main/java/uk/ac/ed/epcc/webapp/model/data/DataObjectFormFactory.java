@@ -107,6 +107,7 @@ public final AppContext getContext(){
 	@Override
 	public final boolean buildForm(Form f,HashMap fixtures) throws DataFault{
 		try(TimeClosable build = new TimeClosable(getContext(), "buildForm")){
+			
 			boolean complete = buildForm(getContext(), factory.res,getFields(),f,getOptional(),getSelectors(),getFieldConstraints(),getTranslations(),getFieldHelp(),fixtures);
 			customiseForm(f);
 			f.setContents(getDefaults());

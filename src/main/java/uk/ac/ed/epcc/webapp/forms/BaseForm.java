@@ -422,6 +422,9 @@ public class BaseForm implements Form {
 	/**
 	 * set the contents of a Form from a Map
 	 * 
+	 * for optional fields non-validating values are omitted. This is to
+	 * handle objects that use non-null values to indicate un-set
+	 * 
 	 * @param m
 	 *            Map of values
 	 */
@@ -434,7 +437,22 @@ public class BaseForm implements Form {
 			if (m.containsKey(key) ) {
 				Object value = m.get(key);
 				if( value != null ) {
-					put(key, value);
+					Field f = getField(key);
+					if( f.isOptional()) {
+						try {
+							Input input = f.getInput();
+							value = input.convert(value);
+							input.validate(value);
+							put(key, value);
+						} catch (Exception e) {
+							// Only populate "valid" values
+							// invalid values are supressed for optional fields
+							// in case the object is unsing a non-null value to indicate unset
+							getLogger().warn("Invalid object in setContents "+key+" "+value, e);
+						}
+					}else {
+						put(key, value);
+					}
 				}
 			}
 

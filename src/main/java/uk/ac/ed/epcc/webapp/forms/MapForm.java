@@ -79,7 +79,7 @@ public class MapForm extends BaseForm {
 	 * @return boolean true if all OK
 	 * 
 	 */
-	protected boolean parsePost(Map<String,String> errors, Map<String,Object> params,boolean skip_null) {
+	public boolean parsePost(Map<String,String> errors, Map<String,Object> params,boolean skip_null) {
 		boolean ok = true;
 		for (Iterator<String> it = getFieldIterator(); it.hasNext();) {
 			String key = it.next();

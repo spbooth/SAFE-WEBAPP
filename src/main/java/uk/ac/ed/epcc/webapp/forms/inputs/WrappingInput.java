@@ -99,7 +99,11 @@ public abstract class WrappingInput<V> implements Input<V> {
 		nested.validate();
 		
 	}
-
+	@Override
+	public void validate(V value) throws FieldException {
+		nested.validate(value);
+		
+	}
 	
 
 	/* (non-Javadoc)
