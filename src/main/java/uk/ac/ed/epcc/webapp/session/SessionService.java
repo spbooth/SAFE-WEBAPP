@@ -215,7 +215,13 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @return is role permitted.
 	 */
 	public boolean canHaveRole(A user,String role);
-	
+	/** For a non explicit role, find the mapped role (if any that allows access;
+	 * 
+	 * @param user
+	 * @param original
+	 * @return role-name or null;
+	 */
+	public String fromRole(A user, String original);
 	/** query the default role set for the specified user.  
 	 * This only queries the roles managed directly by the session service.
 	 * This method should reflect the state set by setRole and should not be used to query 

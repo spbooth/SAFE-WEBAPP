@@ -214,7 +214,12 @@ DataObjectTransitionProvider<AU, AppUserFactory<AU>, AppUserKey<AU>>{
 					Set<String> roles = new LinkedHashSet<String>();
 					for(String role : sess.getStandardRoles()) {
 						if( sess.canHaveRole(target, role)) {
-							roles.add(role);
+							String from = sess.fromRole(target, role);
+							if( from != null) {
+								roles.add(role+" [ via: "+from+"]");
+							}else {
+								roles.add(role);
+							}
 						}
 					}
 					cb.addHeading(2, "Standard roles");

@@ -1206,6 +1206,20 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		}
 		return false;
 	}
+	public String fromRole(A user, String original) {
+		if( explicitRole(user, original)) {
+			return null;
+		}
+		String list = mapRoleName(original);
+		if( ! list.equals(original)) {
+			for(String r : list.split("\\s*,\\s*")) {
+				if( canHaveRole(user, r)) {
+					return r;
+				}
+			}
+		}
+		return null;
+	}
 
 	@Override
 	public String toString() {
