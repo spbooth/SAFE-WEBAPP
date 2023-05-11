@@ -38,7 +38,7 @@ public class SetRoleTransition<U extends AppUser> extends AbstractFormTransition
 		standardRoles.addAll(AbstractSessionService.getExplicitRoles(conn,dat.getID()));
 		for(String role : standardRoles){
 			CheckBoxInput i = new CheckBoxInput("Y","N");
-			i.setChecked(dat!=null && serv.canHaveRole(dat, role));
+			i.setChecked(dat!=null && serv.explicitRole(dat, role));
 			f.addInput(role, role, i);
 		}
 		f.addAction("Update", new RoleAction<>(dat));

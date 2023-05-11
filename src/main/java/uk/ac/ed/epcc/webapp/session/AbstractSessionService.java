@@ -1126,7 +1126,11 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	public boolean canHaveRole(A user, String role) {
 		return canHaveRole(null,user,role,true);
 	}
-	protected boolean canHaveRole(Set<String> skip, A user, String role,boolean expand_alias) {	
+	@Override
+	public boolean explicitRole(A user, String role) {
+		return canHaveRole(null,user,role,false);
+	}
+	public boolean canHaveRole(Set<String> skip, A user, String role,boolean expand_alias) {	
 		if( user == null || role == null || role.isEmpty()){
 			return false;
 		}

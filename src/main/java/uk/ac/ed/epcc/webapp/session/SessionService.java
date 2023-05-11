@@ -210,12 +210,22 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * This only queries the roles managed directly by the session service.
 	 * This method should reflect the state set by setRole and should not be used to query 
 	 * the current roles of the current user.
-	 * No role mapping is applied
 	 * @param user
 	 * @param role
 	 * @return is role permitted.
 	 */
 	public boolean canHaveRole(A user,String role);
+	
+	/** query the default role set for the specified user.  
+	 * This only queries the roles managed directly by the session service.
+	 * This method should reflect the state set by setRole and should not be used to query 
+	 * the current roles of the current user.
+	 * No role mapping is applied
+	 * @param user
+	 * @param role
+	 * @return is role permitted.
+	 */
+	public boolean explicitRole(A user,String role);
 	
 	/** get a {@link BaseFilter} for all {@link AppUser}s who
 	 * have access to a global role.

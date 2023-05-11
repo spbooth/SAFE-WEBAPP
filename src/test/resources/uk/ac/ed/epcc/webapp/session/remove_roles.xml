@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><Diff>
+<Person id="1">
+<Alg>2</Alg>
+<Email>fred@example.com</Email>
+<Password>FakePassword</Password>
+<PasswordFails>0</PasswordFails>
+<PasswordStatus>I</PasswordStatus>
+<Salt>FakeSalt</Salt>
+</Person>
+<Person id="2">
+<Alg>2</Alg>
+<Email>bill@example.com</Email>
+<Password>FakePassword</Password>
+<PasswordFails>0</PasswordFails>
+<PasswordStatus>I</PasswordStatus>
+<Salt>FakeSalt</Salt>
+</Person>
+<role_table id="1">
+<PersonID>1</PersonID>
+<Role>Admin</Role>
+</role_table>
+<role_table id="2">
+<PersonID>1</PersonID>
+<Role>SetRoles</Role>
+</role_table>
+<TableSpecification name="Person">
+<Alg type="Integer" nullable="false"/>
+<Email type="String" nullable="true" max="254"/>
+<Email_index type="Index" unique="true">
+<Column name="Email"/>
+</Email_index>
+<Password type="String" nullable="false" max="64"/>
+<PasswordFails type="Integer" nullable="false"/>
+<PasswordStatus type="String" nullable="false" max="1"/>
+<Salt type="String" nullable="false" max="16"/>
+<SignupDate>1234567890</SignupDate>
+<Updated type="Long" nullable="true"/>
+<WebName type="String" nullable="true" max="128"/>
+<WebName_index type="Index" unique="true">
+<Column name="WebName"/>
+</WebName_index>
+</TableSpecification>
+<TableSpecification name="role_table">
+<PersonID type="Integer" nullable="false"/>
+<Role type="String" nullable="false" max="32"/>
+</TableSpecification>
+</Diff>
