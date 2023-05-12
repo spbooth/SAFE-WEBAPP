@@ -45,6 +45,7 @@ import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 import uk.ac.ed.epcc.webapp.model.data.forms.FieldHelpProvider;
+import uk.ac.ed.epcc.webapp.model.data.forms.FormLabelProvider;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.registry.IndexedFormEntry;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
@@ -605,7 +606,10 @@ public final AppContext getContext(){
 		if( translations == null){
 			translations=new HashMap<>();
 		}
-		for(TableStructureContributer c : factory.getTableStructureContributers()){
+		if( factory instanceof FormLabelProvider) {
+			((FormLabelProvider)factory).addTranslations(translations);
+		}
+		for(FormLabelProvider c : factory.getComposites(FormLabelProvider.class)){
 			translations=c.addTranslations(translations);
 		}
 		return addTranslations(translations);

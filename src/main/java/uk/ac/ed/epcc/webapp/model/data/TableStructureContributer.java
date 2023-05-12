@@ -20,6 +20,7 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.data.forms.FieldHelpProvider;
+import uk.ac.ed.epcc.webapp.model.data.forms.FormLabelProvider;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -32,7 +33,7 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * @param <BDO>
  */
 
-public interface TableStructureContributer<BDO extends DataObject>  {
+public interface TableStructureContributer<BDO extends DataObject> extends FormLabelProvider {
 
 	
 	/** Modify the {@link TableSpecification} of the target factory.
@@ -60,14 +61,7 @@ public interface TableStructureContributer<BDO extends DataObject>  {
 	 */
 	Map<String, Object> addDefaults(Map<String, Object> defaults);
 
-	/**
-	 * return a default set of translation between field names and text labels.
-	 * This method provides a class specific set of defaults. The individual Form classes can still override this.
-	 * @param translations
-	 * @return {@link Map}
-	 */
-	@Deprecated
-	Map<String, String> addTranslations(Map<String, String> translations);
+	
 
 	
 	/**
