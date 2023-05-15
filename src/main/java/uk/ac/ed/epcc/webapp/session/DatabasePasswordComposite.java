@@ -940,7 +940,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 		if( fails > 0 ) {
 			attributes.put("Bad password count", fails);
 		}
-		if( h.mustChangePassword()) {
+		if( canResetPassword(target) &&  h.mustChangePassword()) {
 			attributes.put("Must change password", true);
 		}
 		
