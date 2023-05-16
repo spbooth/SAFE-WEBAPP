@@ -32,6 +32,7 @@ import java.util.Hashtable;
 import org.junit.Before;
 import org.junit.Test;
 import java.util.Properties;
+import java.util.Date;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.config.CachedConfigService;
@@ -144,4 +145,13 @@ public class AppContextTest {
 		assertNull(c.getAttribute("Null"));
 		
 	}
+	@Test
+	public void testDateProperty() {
+		AppContext c = new AppContext();
+		
+		Date d = c.getDateParameter("test.date_prop", null);
+		assertNotNull(d);
+		assertEquals(new Date(65,11,12,10,30,0),d);
+	}
+	
 }

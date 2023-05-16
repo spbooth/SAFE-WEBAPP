@@ -686,14 +686,14 @@ public final class AppContext {
 
     public Date getDateParameter(String name, Date def) {
     	String param = getInitParameter(name);
-    	if( param == null) {
+    	if( param == null || param.isEmpty()) {
     		return def;
     	}
     	Date res = def;
     	try {
-    		df.parse(param);
-    	}catch(ParseException e) {
-    		error(e,"bady formatted parameter "+name+" value ["+param+"]");
+    		res = df.parse(param);
+    	}catch(Exception e) {
+    		error(e,"badly formatted parameter "+name+" value ["+param+"]");
     	}
     	return res;
     }
