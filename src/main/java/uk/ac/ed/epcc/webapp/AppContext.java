@@ -682,7 +682,7 @@ public final class AppContext {
 		}
 		return res;
 	}
-    private static final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+   
 
     public Date getDateParameter(String name, Date def) {
     	String param = getInitParameter(name);
@@ -691,6 +691,8 @@ public final class AppContext {
     	}
     	Date res = def;
     	try {
+    		// local as not thread safe
+    		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     		res = df.parse(param);
     	}catch(Exception e) {
     		error(e,"badly formatted parameter "+name+" value ["+param+"]");
