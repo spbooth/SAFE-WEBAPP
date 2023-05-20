@@ -39,13 +39,10 @@ import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TimeStampInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
-import uk.ac.ed.epcc.webapp.model.data.forms.FieldHelpProvider;
-import uk.ac.ed.epcc.webapp.model.data.forms.FormLabelProvider;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.registry.IndexedFormEntry;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
@@ -68,31 +65,12 @@ import uk.ac.ed.epcc.webapp.timer.TimeClosable;
  *
  * @param <BDO>
  */
-public  abstract class DataObjectFormFactory<BDO extends DataObject> implements FormFactory, FormBuilder, IndexedProducer<BDO>{
-   public static final String FORM_LABEL_SUFFIX = ".label";
-   public static final String FORM_HELP_TEXT_SUFFIX = ".help_text";
-
-public static final Feature DEFAULT_FORBID_HTML = new Feature("form_factory.default_forbid_html_text",true,"Forbid HTML in auto generated text inputs for database fields");
-
-
-protected final DataObjectFactory<BDO> factory;
-protected final ResourceBundle form_content;
+public  abstract class DataObjectFormFactory<BDO extends DataObject> extends DataObjectLabeller<BDO> implements FormFactory, FormBuilder, IndexedProducer<BDO>{
+   public static final Feature DEFAULT_FORBID_HTML = new Feature("form_factory.default_forbid_html_text",true,"Forbid HTML in auto generated text inputs for database fields");
 
 
 protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
-	   assert( fac != null );
-	   factory=fac;
-	   form_content = fac.getContext().getService(MessageBundleService.class).getBundle("form_content");
-   }
-   @Override
-public final AppContext getContext(){
-	   return factory.getContext();
-   }
-   public final DataObjectFactory<BDO> getFactory() {
-		return factory;
-	}
-   protected final Logger getLogger(){
-	   return factory.getContext().getService(LoggerService.class).getLogger(getClass());
+	 super(fac);
    }
    /**
 	 * builds a default Form for editing the DataObjects belonging to this
@@ -442,100 +420,6 @@ public final AppContext getContext(){
 		return sel;
 		
 	}
-	/** Add default translations.
-	 * 
-	 * For reference fields use the table name in preference to the field name.
-	 * Add overrides from config.
-	 * @param trans
-	 * @return Map of translations
-	 */
-	public Map<String,String> addTranslations(Map<String,String> trans){
-		if( trans == null ){
-			trans = new HashMap<>();
-		}
-		for(String field : factory.res.getFields()){
-			if( ! trans.containsKey(field)){  // no explicit translation
-				
-				// look for a secondary config value
-				String cfg = getConfigTags().get(field);
-				String label = null;
-				if( cfg != null ) {
-					label = getTranslationFromConfig(cfg, field);
-				}
-				if( label != null ) {
-					trans.put(field, label);
-				}else {
-					// no config value map field name to table-name for refernces
-					Repository.FieldInfo info = factory.res.getInfo(field);
-					String ref_table = info.getReferencedTable();
-					if( ref_table != null ){
-						if( trans.get(field)==null){
-							trans.put(field,ref_table);
-						}
-					}
-				}
-				
-			}
-			// allow config to override if using factory tag.
-			String override=getTranslationFromConfig(factory.getTag(),field);
-			if( override != null){
-				trans.put(field, override);
-			}
-		}
-		return trans;
-		
-	}
-	public Map<String,String> addHelpText(Map<String,String> help){
-		if( help == null ){
-			help = new HashMap<>();
-		}
-		for(String field : factory.res.getFields()){
-			if( ! help.containsKey(field)){  // no explicit translation
-				
-				// look for a secondary config value
-				String cfg = getConfigTags().get(field);
-				String label = null;
-				if( cfg != null ) {
-					label = getHelpTextFromConfig(cfg, field);
-				}
-				if( label != null ) {
-					help.put(field, label);
-				}
-			}
-			// allow config to override if using factory tag.
-			String override=getHelpTextFromConfig(factory.getTag(),field);
-			if( override != null){
-				help.put(field, override);
-			}
-		}
-		return help;
-		
-	}
-	private String getTranslationFromConfig(String qualifier, String field) {
-		return getTranslationFromConfig(getContext(), form_content, qualifier, field);
-	}
-	
-	public static String getTranslationFromConfig(AppContext conn, ResourceBundle form_content,String qualifier, String field) {
-		String key = qualifier+"."+field+FORM_LABEL_SUFFIX;
-		if( form_content != null && form_content.containsKey(key)) {
-			return form_content.getString(key);
-		}
-		// fall back to global config
-		return conn.getInitParameter(key);
-	}
-	private String getHelpTextFromConfig(String qualifier, String field) {
-		return getHelpTextFromConfig(getContext(), form_content, qualifier, field);
-	}
-	public static String getHelpTextFromConfig(AppContext conn, ResourceBundle form_content,String qualifier, String field) {
-		String key = qualifier+"."+field+FORM_HELP_TEXT_SUFFIX;
-		if(  form_content != null && form_content.containsKey(key)) {
-			return form_content.getString(key);
-		}
-		// fall back to global config this also allows parameter expansion
-		return conn.getExpandedProperty(key);
-	}
-	
-	
 	/**
 	 * Extension hook to allow additional Form customisation generic to all
 	 * types of Form For example adding a FormValidator or adding min, max
@@ -596,41 +480,6 @@ public final AppContext getContext(){
 		}
 		return result;
 	}
-	/**
-	 * return a default set of translation between field names and text labels.
-	 * 
-	 * @return Map
-	 */
-	protected Map<String,String> getTranslations() {
-		Map<String, String> translations = factory.getTranslations();
-		if( translations == null){
-			translations=new HashMap<>();
-		}
-		if( factory instanceof FormLabelProvider) {
-			((FormLabelProvider)factory).addTranslations(translations);
-		}
-		for(FormLabelProvider c : factory.getComposites(FormLabelProvider.class)){
-			translations=c.addTranslations(translations);
-		}
-		return addTranslations(translations);
-	}
-	/** create additional tooltip help text for form fields.
-	 * 
-	 * @return
-	 */
-	protected  final Map<String,String> getFieldHelp() {
-		Map<String, String> help = new HashMap<>();
-		if( factory instanceof FieldHelpProvider) {
-			((FieldHelpProvider)factory).addFieldHelp(help);
-		}
-		for(FieldHelpProvider c : factory.getComposites(FieldHelpProvider.class)){
-			Map mod = c.addFieldHelp(help);
-			assert(mod != null);
-		}
-		addHelpText(help);
-		return help;
-	}
-	
 	/**
 	 * Generate the set of optional fields to be used in form creation/update
 	 * default behaviour is to take the set defined by the factory
@@ -696,31 +545,6 @@ public final AppContext getContext(){
 		return cst;
 	}
 	
-	/** Set of field config tags 
-	 * 
-	 */
-	private Map<String,String> config_tags = null;
-	/** Get a map of field names to secondary config tags.
-	 * 
-	 * @return
-	 */
-	protected Map<String,String> getConfigTags(){
-		if( config_tags == null) {
-			config_tags = new HashMap<>();
-			try {
-				if( factory instanceof FieldHandler) {
-					((FieldHandler)factory).addConfigTags(config_tags);
-				}
-				for(FieldHandler h : factory.getComposites(FieldHandler.class)) {
-					h.addConfigTags(config_tags);
-				}
-			}catch(Exception e) {
-				getLogger().error("Error getting config tags", e);
-			}
-		}
-		return config_tags;
-	}
-
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer#find(int)
 	 */
