@@ -37,6 +37,7 @@
 <%@ page import="uk.ac.ed.epcc.webapp.content.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.logging.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.Feature" %>
+<%@page import="uk.ac.ed.epcc.webapp.tags.WebappHeadTag"%>
 <%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
 <wb:ServiceInit/>
 <%
@@ -82,6 +83,14 @@
 		return;
 	}
 	log.debug("Showing login page");
+	for(String name : conn.getInitParameter("login-page.login-content","").split(",") ){
+		if( name.trim().length() > 0 ){
+			ScriptUIGenerator content = conn.makeObjectWithDefault(ScriptUIGenerator.class,null,name.trim());
+			if(content != null ){
+				WebappHeadTag.addScript(conn,request,content.getScript());
+			}
+		}
+	}
 	String page_title = service_name+" "+website_name+" Login";
 %>
 <%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
