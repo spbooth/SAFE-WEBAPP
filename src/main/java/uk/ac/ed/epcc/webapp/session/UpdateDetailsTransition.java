@@ -54,15 +54,13 @@ public class UpdateDetailsTransition<A extends AppUser> extends StandAloneFormUp
 		if( my_details && fac.needDetailsUpdate(target)) {
 			// This will only be a forced update if the current user.
 			// We may allow other users to udpdate via a role
-			try {
+		
 				ContentBuilder div = cb.getPanel("warn");
 				div.addHeading(2, "Update required");
 				PreDefinedContent content = new PreDefinedContent(op.getContext(), "person_update_required");
 				div.addObject(content);
 				div.addParent();
-			}catch(MissingResourceException e) {
-				// optional
-			}
+			
 		}
 		fac.addUpdateNotes(cb, target);
 		

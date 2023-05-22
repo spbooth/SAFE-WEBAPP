@@ -77,7 +77,12 @@ public class DataObjectLabeller<BDO extends DataObject> implements Contexed{
 					String ref_table = info.getReferencedTable();
 					if( ref_table != null ){
 						if( trans.get(field)==null){
-							trans.put(field,ref_table);
+							String table_label = ref_table;
+							// Support global reference labels
+							if( form_content.containsKey(ref_table+FORM_LABEL_SUFFIX)) {
+								table_label = form_content.getString(ref_table+FORM_LABEL_SUFFIX);
+							}
+							trans.put(field,table_label);
 						}
 					}
 				}

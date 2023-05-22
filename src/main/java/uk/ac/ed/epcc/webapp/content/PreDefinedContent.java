@@ -77,7 +77,11 @@ public class PreDefinedContent extends AbstractContexed implements  XMLGenerator
 		try {
 			String pattern = null;
 			if( mess != null) {
-				pattern = conn.expandText(mess.getString(message));
+				if( optional && ! mess.containsKey(message)) {
+					pattern = null;
+				}else {
+					pattern = conn.expandText(mess.getString(message));
+				}
 			}
 			if( pattern != null ) {
 				if( pattern.isEmpty()) {
