@@ -159,6 +159,7 @@ This service is only available to pre-registered users.
 <h3>Database error</h3>
 <p><b>please try again later</b></p>
 <% } %>
+<div id="additional-login">
 <% 
 for(String name : conn.getInitParameter("login-page.login-content","").split(",") ){
 	if( name.trim().length() > 0 ){
@@ -174,6 +175,9 @@ for(String name : conn.getInitParameter("login-page.login-content","").split(","
 		}
 	}
 }
+%>
+</div>
+<% 
 if( password_auth != null){
 %>
 <form method="post" action="<%=web_path%>/LoginServlet">
