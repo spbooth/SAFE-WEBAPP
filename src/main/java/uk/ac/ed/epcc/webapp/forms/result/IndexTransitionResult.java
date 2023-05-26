@@ -23,12 +23,8 @@ import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionFactory;
  * @param <K> type of key
  */
 
-public class IndexTransitionResult<T, K> extends ChainedTransitionResult<T, K> {
+public class IndexTransitionResult<T, K> extends RedirectChainedTransitionResult<T, K> {
 
-	@Override
-	public boolean useURL() {
-		return true;
-	}
 
 	public IndexTransitionResult(IndexTransitionFactory<K, T> provider) {
 		super(provider, null,null);

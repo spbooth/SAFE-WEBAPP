@@ -31,12 +31,7 @@ import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
  */
 
 
-public class ViewTransitionResult<T,K> extends ChainedTransitionResult<T, K> {
-
-	@Override
-	public boolean useURL() {
-		return true;
-	}
+public class ViewTransitionResult<T,K> extends RedirectChainedTransitionResult<T, K> {
 
 	public ViewTransitionResult(ViewTransitionFactory<K, T> provider, T target) {
 		super(provider, target, null);
