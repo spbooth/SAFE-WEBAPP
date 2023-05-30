@@ -74,8 +74,20 @@ public interface Form extends Iterable<Field>, Contexed{
 	 * 
 	 * @param key
 	 *            key to use to refer to field
+	 * @param s
+	 *            Input to add
+	 * @return Field object created
+	 */
+	default public <I> Field addInput(String key, Input<I> s) {
+		return addInput(key, null, s);
+	}
+	/**
+	 * Add and input to the next slot in the form
+	 * 
+	 * @param key
+	 *            key to use to refer to field
 	 * @param label
-	 *            String to display to user
+	 *            String to display to user. If null use the {@link FormTextGenerator}
 	 * @param s
 	 *            Input to add
 	 * @return Field object created
@@ -88,9 +100,9 @@ public interface Form extends Iterable<Field>, Contexed{
 	 * @param key
 	 *            key to use to refer to field
 	 * @param label
-	 *            String to display to user
+	 *            String to display to user. If null use the {@link FormTextGenerator}
 	 * @param  help
-	 *            tooltip String
+	 *            tooltip String. If null use the {@link FormTextGenerator}
 	 * @param s
 	 *            Input to add
 	 * @return Field object created
@@ -325,6 +337,18 @@ public interface Form extends Iterable<Field>, Contexed{
 	 * @return
 	 */
 	public String getFormID();
+	
+	/** Set a {@link FormTextGenerator} for generating form text.
+	 * 
+	 * @param gen
+	 */
+	public void setFormTextGenerator(FormTextGenerator gen);
+	
+	/** Get a {@link FormTextGenerator} for generating form text.
+	 *  
+	 * @return
+	 */
+	public FormTextGenerator getFormTextGenerator();
 	
 	/** set field for auto-focus
 	 * 

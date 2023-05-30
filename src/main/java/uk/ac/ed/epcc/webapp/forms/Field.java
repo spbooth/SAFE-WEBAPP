@@ -68,7 +68,7 @@ public final class Field<I> {
 		if (label != null) {
 			this.label = label;
 		} else {
-			this.label = key;
+			this.label = null;
 		}
 		this.sel = sel;
 		this.sel.setKey(key);
@@ -162,7 +162,17 @@ public final class Field<I> {
 	 * @return String label
 	 */
 	public String getLabel() {
-		return label;
+		if( label != null) {
+			return label; // explicit override
+		}
+		FormTextGenerator gen = f.getFormTextGenerator();
+		if( gen != null ) {
+			String l = gen.getLabel(getKey());
+			if( l != null) {
+				return l;
+			}
+		}
+		return getKey();
 	}
 
 	/**
@@ -233,7 +243,14 @@ public final class Field<I> {
 		
 	}
 	public String getTooltip() {
-		return tooltip;
+		if( tooltip != null) {
+			return tooltip;
+		}
+		FormTextGenerator gen = f.getFormTextGenerator();
+		if( gen != null) {
+			return gen.getFieldHelp(getKey());
+		}
+		return null;
 	}
 	public void setTooltip(String tooltip) {
 		this.tooltip = tooltip;

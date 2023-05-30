@@ -65,6 +65,7 @@ public class BaseForm implements Form {
 	protected Set<FormValidator> validators = new LinkedHashSet<>();
 
 	private String form_id="form";
+	private FormTextGenerator text=null;
 	
 	private String auto_focus=null;
 
@@ -116,9 +117,7 @@ public class BaseForm implements Form {
 		if( s == null ){
 			return null;
 		}
-		if (label == null) {
-			label = key;
-		}
+		
 		Field f =  makeField(key, label, s);
 		s.setKey(key);
 		fields.put(key, f);
@@ -644,6 +643,15 @@ public class BaseForm implements Form {
 		return form_id;
 	}
 
+	@Override
+	public void setFormTextGenerator(FormTextGenerator gen) {
+		text=gen;
+	}
+	@Override
+	public FormTextGenerator getFormTextGenerator() {
+		return text;
+	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.Form#setAutoFocus(java.lang.String)
 	 */

@@ -1,14 +1,10 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Contexed;
-import uk.ac.ed.epcc.webapp.forms.factory.FormBuilder;
-import uk.ac.ed.epcc.webapp.forms.factory.FormFactory;
-import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.logging.LoggerService;
-import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
+import uk.ac.ed.epcc.webapp.forms.AbstractFormTextGenerator;
 import uk.ac.ed.epcc.webapp.model.data.forms.FieldHelpProvider;
 import uk.ac.ed.epcc.webapp.model.data.forms.FormLabelProvider;
 
@@ -20,34 +16,19 @@ import uk.ac.ed.epcc.webapp.model.data.forms.FormLabelProvider;
  *
  * @param <BDO>
  */
-public class DataObjectLabeller<BDO extends DataObject> implements Contexed{
+public class DataObjectLabeller<BDO extends DataObject> extends AbstractFormTextGenerator{
 
-	public static final String FORM_LABEL_SUFFIX = ".label";
-	public static final String FORM_HELP_TEXT_SUFFIX = ".help_text";
+	
 	protected final DataObjectFactory<BDO> factory;
-	protected final ResourceBundle form_content;
+	
+	
 
-	public static String getTranslationFromConfig(AppContext conn, ResourceBundle form_content, String qualifier, String field) {
-		String key = qualifier+"."+field+FORM_LABEL_SUFFIX;
-		if( form_content != null && form_content.containsKey(key)) {
-			return form_content.getString(key);
-		}
-		// fall back to global config
-		return conn.getInitParameter(key);
-	}
-
-	@Override
-	public final AppContext getContext() {
-		   return factory.getContext();
-	   }
+	
 
 	public final DataObjectFactory<BDO> getFactory() {
 		return factory;
 	}
 
-	protected final Logger getLogger() {
-		   return factory.getContext().getService(LoggerService.class).getLogger(getClass());
-	   }
 
 	/** Add default translations.
 	 * 
@@ -79,8 +60,8 @@ public class DataObjectLabeller<BDO extends DataObject> implements Contexed{
 						if( trans.get(field)==null){
 							String table_label = ref_table;
 							// Support global reference labels
-							if( form_content.containsKey(ref_table+FORM_LABEL_SUFFIX)) {
-								table_label = form_content.getString(ref_table+FORM_LABEL_SUFFIX);
+							if( getFormContent().containsKey(ref_table+FORM_LABEL_SUFFIX)) {
+								table_label = getFormContent().getString(ref_table+FORM_LABEL_SUFFIX);
 							}
 							trans.put(field,table_label);
 						}
@@ -126,20 +107,13 @@ public class DataObjectLabeller<BDO extends DataObject> implements Contexed{
 	}
 
 	private String getTranslationFromConfig(String qualifier, String field) {
-		return getTranslationFromConfig(getContext(), form_content, qualifier, field);
+		return getTranslationFromConfig(getContext(), getFormContent(), qualifier, field);
 	}
 
-	public static String getHelpTextFromConfig(AppContext conn, ResourceBundle form_content, String qualifier, String field) {
-		String key = qualifier+"."+field+FORM_HELP_TEXT_SUFFIX;
-		if(  form_content != null && form_content.containsKey(key)) {
-			return form_content.getString(key);
-		}
-		// fall back to global config this also allows parameter expansion
-		return conn.getExpandedProperty(key);
-	}
+	
 
 	private String getHelpTextFromConfig(String qualifier, String field) {
-		return getHelpTextFromConfig(getContext(), form_content, qualifier, field);
+		return getHelpTextFromConfig(getContext(), getFormContent(), qualifier, field);
 	}
 
 	/** Set of field config tags 
@@ -195,9 +169,8 @@ public class DataObjectLabeller<BDO extends DataObject> implements Contexed{
 	}
 
 	public DataObjectLabeller(DataObjectFactory<BDO> fac) {
-		  assert( fac != null );
-		   factory=fac;
-		   form_content = fac.getContext().getService(MessageBundleService.class).getBundle("form_content");
+		super(fac.getContext());
+		factory=fac;  
 	}
 
 	/** Get a map of field names to secondary config tags.
@@ -221,11 +194,11 @@ public class DataObjectLabeller<BDO extends DataObject> implements Contexed{
 		}
 		return config_tags;
 	}
-	
+	@Override
 	public String getLabel(String field) {
 		return getTranslations().get(field);
 	}
-	
+	@Override
 	public String getFieldHelp(String field) {
 		return getFieldHelp().get(field);
 	}

@@ -143,4 +143,16 @@ public interface TransitionFactory<K,T> extends Contexed{
 	 * @return
 	 */
 	public <R> R accept(TransitionFactoryVisitor<R,T,K> vis);
+	
+	/** Generate a form tag for a form associated with the specified transition.
+	 * 
+	 * @param key K 
+	 * @return
+	 */
+	default public String getFormTag(K key) {
+		if( key == null ) {
+			return getTargetName()+".default";
+		}
+		return getTargetName()+"."+key.toString();
+	}
 }

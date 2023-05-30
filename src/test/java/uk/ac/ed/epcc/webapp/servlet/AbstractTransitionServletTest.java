@@ -27,6 +27,7 @@ import javax.servlet.ServletException;
 import org.junit.Before;
 
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
+import uk.ac.ed.epcc.webapp.forms.SimpleFormTextGenerator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.BaseHTMLForm;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
@@ -307,6 +308,8 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		 
 		 HTMLForm f = new HTMLForm(getContext(),new ChainedTransitionResult<T, K>(factory, target, key));
 		 f.setFormID("transition_");
+		 f.setFormTextGenerator(new SimpleFormTextGenerator(getContext(), factory.getFormTag(key)));
+		 
 		 if( t instanceof BaseFormTransition ){
 		 	BaseFormTransition ft = (BaseFormTransition) t;
 		 	ft.buildForm(f,target,getContext());

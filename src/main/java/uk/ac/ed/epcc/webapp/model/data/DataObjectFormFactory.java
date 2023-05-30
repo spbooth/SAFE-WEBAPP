@@ -67,7 +67,7 @@ import uk.ac.ed.epcc.webapp.timer.TimeClosable;
  */
 public  abstract class DataObjectFormFactory<BDO extends DataObject> extends DataObjectLabeller<BDO> implements FormFactory, FormBuilder, IndexedProducer<BDO>{
    public static final Feature DEFAULT_FORBID_HTML = new Feature("form_factory.default_forbid_html_text",true,"Forbid HTML in auto generated text inputs for database fields");
-
+   public static final Feature DEFER_CONTENT = new Feature("form_factory.defer_content",true,"Defer form label generation till needed.");
 
 protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	 super(fac);
@@ -86,8 +86,9 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	@Override
 	public final boolean buildForm(Form f,HashMap fixtures) throws DataFault{
 		try(TimeClosable build = new TimeClosable(getContext(), "buildForm")){
-			
-			boolean complete = buildForm(getContext(), factory.res,getFields(),f,getOptional(),getSelectors(),getFieldConstraints(),getTranslations(),getFieldHelp(),fixtures);
+			f.setFormTextGenerator(this);
+			boolean defer = DEFER_CONTENT.isEnabled(getContext());
+			boolean complete = buildForm(getContext(), factory.res,getFields(),f,getOptional(), getSelectors(),getFieldConstraints(),defer ? null :getTranslations(),defer ? null :getFieldHelp(),fixtures);
 			customiseForm(f);
 			f.setContents(getDefaults());
 			return complete;
@@ -233,21 +234,29 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 							}
 						}
 					}
-					String lab = name;
-					if (labels != null && labels.containsKey(name)) {
-						lab = labels.get(name);
-					}else{
-						// This is a fall-back that should only be invoked if the static methods
-						// are called by an external class
-						lab = getTranslationFromConfig(conn,conn.getService(MessageBundleService.class).getBundle("form_content"),table, name);
+					String lab = null;
+					if (labels != null ) {
+						if( labels.containsKey(name)) {
+
+							lab = labels.get(name);
+						}else{
+							// This is a fall-back that should only be invoked if the static methods
+							// are called by an external class
+							// a null labels param turns this off as it implied label generation is deferred
+							lab = getTranslationFromConfig(conn,conn.getService(MessageBundleService.class).getBundle("form_content"),table, name);
+						}
 					}
 					String tooltip=null;
-					if( tooltips != null && tooltips.containsKey(name)) {
-						tooltip = tooltips.get(name);
-					}else {
-						// This is a fall-back that should only be invoked if the static methods
-						// are called by an external class
-						tooltip = getHelpTextFromConfig(conn,conn.getService(MessageBundleService.class).getBundle("form_content"),table, name);
+					if( tooltips != null ) {
+						if( tooltips.containsKey(name)) {
+
+							tooltip = tooltips.get(name);
+						}else {
+							// This is a fall-back that should only be invoked if the static methods
+							// are called by an external class
+							// a null tooltips param turns this off as it implied label generation is deferred
+							tooltip = getHelpTextFromConfig(conn,conn.getService(MessageBundleService.class).getBundle("form_content"),table, name);
+						}
 					}
 					f.addInput(name, lab,tooltip, input).setOptional(is_optional);
 					if( fixtures != null ) {
