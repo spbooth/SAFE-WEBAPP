@@ -308,7 +308,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		 
 		 HTMLForm f = new HTMLForm(getContext(),new ChainedTransitionResult<T, K>(factory, target, key));
 		 f.setFormID("transition_");
-		 f.setFormTextGenerator(new SimpleFormTextGenerator(getContext(), factory.getFormTag(key)));
+		 f.setFormTextGenerator(new SimpleFormTextGenerator(getContext(), factory.getFormTag(key),factory.getTargetName()));
 		 
 		 if( t instanceof BaseFormTransition ){
 		 	BaseFormTransition ft = (BaseFormTransition) t;

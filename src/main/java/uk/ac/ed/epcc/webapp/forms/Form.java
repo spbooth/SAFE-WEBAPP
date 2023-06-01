@@ -84,6 +84,9 @@ public interface Form extends Iterable<Field>, Contexed{
 	/**
 	 * Add and input to the next slot in the form
 	 * 
+	 * * Note that unless the label is dynamically generated it may be better
+	 * to set it via the form_content bundle
+	 * 
 	 * @param key
 	 *            key to use to refer to field
 	 * @param label
@@ -95,7 +98,10 @@ public interface Form extends Iterable<Field>, Contexed{
 	public <I> Field addInput(String key, String label, Input<I> s); 
 
 	/**
-	 * Add and input to the next slot in the form
+	 * Add and input to the next slot in the form.
+	 * 
+	 * Note that unless the label and help string are dynamically generated it may be better
+	 * to set these via the form_content bundle
 	 * 
 	 * @param key
 	 *            key to use to refer to field

@@ -1,5 +1,8 @@
 package uk.ac.ed.epcc.webapp.forms;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 /** A simple {@link FormTextGenerator} that looks up qualified values from a resource bundle
  * 
@@ -7,26 +10,34 @@ import uk.ac.ed.epcc.webapp.AppContext;
  *
  */
 public class SimpleFormTextGenerator extends AbstractFormTextGenerator {
-    private final String prefix;
-	public SimpleFormTextGenerator(AppContext conn,String tag) {
+    private final Set<String> prefix;
+	public SimpleFormTextGenerator(AppContext conn,String ... tags) {
 		super(conn);
-		this.prefix=tag+".";
+		prefix = new LinkedHashSet<>();
+		for(String s : tags) {
+			prefix.add(s);
+		}
+	
 	}
 
 	@Override
 	public String getLabel(String field) {
-		String lab = getTranslationFromConfig(getContext(), getFormContent(), prefix, field);
-		if( lab != null) {
-			return lab;
+		for(String p : prefix) {
+			String lab = getTranslationFromConfig(getContext(), getFormContent(), p,field);
+			if( lab != null) {
+				return lab;
+			}
 		}
 		return field;
 	}
 
 	@Override
 	public String getFieldHelp(String field) {
-		String help = getHelpTextFromConfig(getContext(), getFormContent(), prefix, field);
-		if( help != null) {
-			return help;
+		for(String p : prefix) {
+			String help = getHelpTextFromConfig(getContext(), getFormContent(), p, field);
+			if( help != null) {
+				return help;
+			}
 		}
 		return null;
 	}

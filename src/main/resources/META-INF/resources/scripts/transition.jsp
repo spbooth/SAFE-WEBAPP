@@ -84,7 +84,7 @@ Transition t = tp.getTransition(target,key);
 HTMLForm f = new HTMLForm(conn,new ChainedTransitionResult(tp,target,key));
 //Don't use period to be jquery compatible
 f.setFormID("transition_");
-f.setFormTextGenerator(new SimpleFormTextGenerator(conn, tp.getFormTag(key)));
+f.setFormTextGenerator(new SimpleFormTextGenerator(conn, tp.getFormTag(key),tp.getTargetName()));
 try{
 if( t instanceof BaseFormTransition ){
 	BaseFormTransition ft = (BaseFormTransition) t;

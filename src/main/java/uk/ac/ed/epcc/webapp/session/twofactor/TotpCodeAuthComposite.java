@@ -513,8 +513,8 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 				}
 				Key key2 = getKey();
 				String enc = getEncodedSecret(key2);
-				f.addInput(KEY, "New key", new ConstantInput<>(enc,enc));
-				f.addInput(NEW_CODE, "Verification code (New key)", getInput());
+				f.addInput(KEY, new ConstantInput<>(enc,enc));
+				f.addInput(NEW_CODE,  getInput());
 				f.getField(NEW_CODE).addValidator(new CodeValidator(key2));
 				if( ! verify ) {
 					// will be single field
