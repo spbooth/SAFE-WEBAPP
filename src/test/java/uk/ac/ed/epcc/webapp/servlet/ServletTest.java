@@ -18,9 +18,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
-import java.util.Base64;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -49,9 +47,7 @@ import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
 import uk.ac.ed.epcc.webapp.forms.html.PageHTMLForm;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
-import uk.ac.ed.epcc.webapp.forms.result.CustomPage;
-import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.*;
 import uk.ac.ed.epcc.webapp.forms.transition.*;
 import uk.ac.ed.epcc.webapp.jdbc.config.DataBaseConfigService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -489,6 +485,19 @@ public abstract class ServletTest extends WebappTestBase{
 		String content = builder.toString();
 		 checkContent(normalize_transform, expected_xml, content);
 		
+	}
+	/** Get any scripts defined by a custom apge
+	 * 
+	 * @return Set or null
+	 */
+	public Set<String> getCustomPageScripts(){
+		checkForward("/scripts/view_custom_page.jsp");
+		CustomPage custom_page =(CustomPage) req.getAttribute(CustomPage.CUSTOM_PAGE_TAG);
+		assertNotNull(custom_page);
+		if( custom_page instanceof ScriptCustomPage) {
+			return ((ScriptCustomPage)custom_page).getAdditionalScript();
+		}
+		return null;
 	}
 
 	/** Process a {@link FormResult} directly
