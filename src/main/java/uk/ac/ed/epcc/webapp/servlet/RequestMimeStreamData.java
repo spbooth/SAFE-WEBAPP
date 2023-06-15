@@ -23,7 +23,8 @@ import uk.ac.ed.epcc.webapp.AbstractContexed;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 
-/**
+/** A wrapper around the {@link HttpServletRequest} to allow the input stream
+ * to be viewed as a {@link MimeStreamData}
  * @author Stephen Booth
  *
  */
@@ -83,7 +84,7 @@ public class RequestMimeStreamData extends AbstractContexed implements MimeStrea
 	 */
 	@Override
 	public String getName() {
-		return null;
+		return "Request";
 	}
 
 }

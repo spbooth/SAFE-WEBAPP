@@ -21,12 +21,8 @@ import java.sql.SQLTransientException;
 import java.util.Map;
 import java.util.Properties;
 
-import uk.ac.ed.epcc.webapp.AppContextService;
-import uk.ac.ed.epcc.webapp.CleanupService;
-import uk.ac.ed.epcc.webapp.Contexed;
-import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.*;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
-import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 
@@ -38,7 +34,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 public interface DatabaseService extends Contexed , AppContextService<DatabaseService>, CloseRegistry{
   public static final Feature LOG_QUERY_FEATURE = new Feature("log_query",false,"log all SQL queries");
 public static final Feature USE_SQL_DISTICT_FEATURE = new Feature("use_sql_distict",false,"add distinct clause when selecting objects from table. Should not need this unless filters are malformed");
-public static final Feature LOG_INSERT_FEATURE = new Feature("log_insert",false,"loag all SQL inserts");
+public static final Feature LOG_INSERT_FEATURE = new Feature("log_insert",false,"log all SQL inserts");
 public static final Feature LOG_UPDATE = new Feature("log_update",false,"log all SQL updates");
 
 /** get a {SQLContext} based on properties

@@ -79,7 +79,7 @@ public class RegisterServlet extends WebappServlet {
 		}
 		HTMLForm.setFormUrl(req, "/signup.jsp");
 		
-		String realm=getRealm(conn);
+		
 		FormCreator signupFormCreator =fac.getSignupFormCreator();
 		
 		if( signupFormCreator != null ){

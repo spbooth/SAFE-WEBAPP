@@ -126,6 +126,7 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 			FilterUpdate<Lock> update = new FilterUpdate<LockFactory.Lock>(res);
 			SQLAndFilter<Lock> fil = LockFactory.this.getSQLAndFilter(getFilter(this),new NullFieldFilter<Lock>(res, LOCK_FIELD, true));
 			try {
+				db.commitTransaction();
 				int i = update.update(fil, 
 						new FieldValuePatternArgument<Date,Lock>(res.getDateExpression(LOCK_FIELD), now),
 						new FieldValuePatternArgument<Date,Lock>(res.getDateExpression(LAST_LOCK_FIELD), now)
@@ -134,6 +135,9 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 					// other thread got there first
 					return false;
 				}
+			
+				db.commitTransaction();
+				
 				record.setProperty(LOCK_FIELD, now);
 				setDirty(LOCK_FIELD, false);
 
@@ -169,6 +173,8 @@ public class LockFactory extends ClassificationFactory<LockFactory.Lock> {
 						// How did this happen
 						throw new ConsistencyError("Failed to remove lock "+getName());
 					}
+					DatabaseService db = getContext().getService(DatabaseService.class);
+					db.commitTransaction();
 					record.setProperty(LOCK_FIELD, null);
 					setDirty(LOCK_FIELD, false);
 					holding=false;
