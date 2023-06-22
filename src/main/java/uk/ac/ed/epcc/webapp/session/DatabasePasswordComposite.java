@@ -66,7 +66,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	protected static final Feature SALT_FIRST_FEATURE = new Feature("salt_first", false, "Salt comes first in password hash");
 	public static final Feature NON_RANDOM_PASSWORD = new Feature("password.non-random",false,"Force randomly chosen passwords to be a series of x's (for bootstapping without email access)");
 	public static final Feature LOG_RANDOM_PASSWORD = new Feature("password.log-random",false,"Log randomly generated passwords (for bootstrapping without email access)");
-	public static final Feature NOTIFY_PASSWORD_LOCK = new Feature("password.notify-lock",true,"Notify be email if maximum password attempts are exceeded");
+	public static final Feature NOTIFY_PASSWORD_LOCK = new Feature("password.notify-lock",true,"Notify by email if maximum password attempts are exceeded");
 	public static final Feature CHANGE_OLD_HASH = new Feature("passord.change_old_hash",true,"Force change for non enabled hash values");
 	/** config parameter name for maximum age of password.
 	 * 
