@@ -36,7 +36,7 @@ public class PreferedViewFactory extends ClassificationFactory<PreferedView> {
 	
 	/**
 	 * @param ctx
-	 * @param homeTable
+	 * @param table
 	 */
 	public PreferedViewFactory(AppContext ctx,String table) {
 		super(ctx, table);

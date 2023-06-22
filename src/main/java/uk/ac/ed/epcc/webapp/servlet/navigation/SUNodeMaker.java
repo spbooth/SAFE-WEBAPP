@@ -104,11 +104,7 @@ public class SUNodeMaker extends AbstractNodeMaker  {
 
 
 
-	/**
-	 * @param parent
-	 * @param props
-	 * @param role
-	 */
+	
 	public void addConfigNodes(Node parent, FilteredProperties props, String names[]) {
 		if(names==null || names.length == 0){
 			return;

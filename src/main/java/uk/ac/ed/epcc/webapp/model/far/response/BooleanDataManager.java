@@ -36,10 +36,7 @@ public class BooleanDataManager<R extends Response<F>,F extends DynamicForm,M ex
 extends ResponseDataManager<M, R, F> {
 
 	private static final String DATA_FIELD="Data";
- 	/**
-	 * @param manager
-	 * @param data_tag
-	 */
+ 	
 	public BooleanDataManager(ResponseManager<R, F> manager) {
 		super(manager, "BooleanData");
 	}

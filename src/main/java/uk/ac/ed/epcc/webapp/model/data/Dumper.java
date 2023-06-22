@@ -216,8 +216,6 @@ public class Dumper extends AbstractContexed{
 	 * If the records are the same, record is just marked as seen.
 	 * If they differ dump the fields that have changed.
 	 * 
-	 * @param rec
-	 * @param orig
 	 */
 	
 	private boolean compare(String a, String b) {

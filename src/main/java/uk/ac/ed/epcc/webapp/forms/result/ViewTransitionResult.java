@@ -26,17 +26,12 @@ import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
  * two representations are identical. 
  * @author spb
  *
- * @param <T>
- * @param <K>
+ * @param <T> type of transition
+ * @param <K> type of transition key
  */
 
 
-public class ViewTransitionResult<T,K> extends ChainedTransitionResult<T, K> {
-
-	@Override
-	public boolean useURL() {
-		return true;
-	}
+public class ViewTransitionResult<T,K> extends RedirectChainedTransitionResult<T, K> {
 
 	public ViewTransitionResult(ViewTransitionFactory<K, T> provider, T target) {
 		super(provider, target, null);

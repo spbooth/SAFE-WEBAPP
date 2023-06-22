@@ -85,6 +85,7 @@ public class ServletSessionService<A extends AppUser> extends AbstractSessionSer
 	private boolean use_session=true;
 	private ServletService ss;
 	private HttpServletRequest request;
+	private String log_name = null;
   public ServletSessionService(AppContext c){
 	  super(c);
 	  ss = c.getService(ServletService.class);
@@ -98,7 +99,18 @@ public class ServletSessionService<A extends AppUser> extends AbstractSessionSer
   
   @Override
   public String getName(){
+	  
 	  String name = super.getName();
+	  if( log_name != null) {
+		  // This should be set if the session has already been queried (reflecting the state at that point)
+		  // but won't be for an anonymous page until after the getName call
+		  if( name == null || log_name.startsWith(name)) {
+			  return log_name;
+		  }else {
+			  // something funny here so return both
+			  return name + "/" + log_name;
+		  }
+	  }
 	  if( name == null ){
 		  // this for when we are not using a login table.
 		  return ss.getWebName();
@@ -303,7 +315,12 @@ public void setCurrentPerson(A person) {
 		}
 		// Store name as an attribute.We don't use this
 		// but it helps to identify users from the tomcat manager app.
-		setNameHint( person.getName());
+		log_name = person.getName();
+		A super_person = getSuperPerson();
+		if( super_person != null) {
+			log_name = log_name+" ("+super_person.getName()+")";
+		}
+		setNameHint( log_name);
 		
 		// Increase session timeout if configured
 		int timeout = getContext().getIntegerParameter("session.logged_in.timeout", -1);
@@ -322,6 +339,10 @@ public void setCurrentPerson(A person) {
  */
 public void setNameHint(String name) {
 	setAttribute(NAME_ATTR, name);
+}
+
+private String getNameHint() {
+	return (String) getAttribute(NAME_ATTR);
 }
 /**
  * @param person
@@ -390,6 +411,11 @@ protected Integer getPersonID() {
 	}
 	Integer id = super.getPersonID();
 	if( id != null ){
+		if( log_name == null ) {
+			// MAke sure we get the log name from the session at the point we
+			// get the person from the session. session state may change during the request.
+			log_name = getNameHint();
+		}
 		return id;
 	}
 	try{

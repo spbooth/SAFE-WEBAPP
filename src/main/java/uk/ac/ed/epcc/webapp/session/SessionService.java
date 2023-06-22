@@ -54,6 +54,7 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	public static final String ADMIN_ROLE="Admin";
 	/** Get the Name for the current user.
 	 * 
+	 * This is intended for logging purposes and may contain additional information like real-user
 	 * This method can still be used when no login factory is configured.
 	 * 
 	 * @return String
@@ -156,7 +157,7 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * @return
 	 */
 	public String getAuthenticationType();
-	/** Set the authenticaiton type used for the session.
+	/** Set the authentication type used for the session.
 	 * This should be one of "password" or a remote auth realm.
 	 * @param type
 	 */
@@ -174,7 +175,7 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	public abstract  AppUserFactory<A> getLoginFactory();
 	/** check for membership of any of the roles in list
 	 * 
-	 * @param role_list
+	 * @param roles
 	 * @return boolean
 	 */
 	
@@ -209,19 +210,35 @@ public interface SessionService<A extends AppUser> extends Contexed ,AppContextS
 	 * This only queries the roles managed directly by the session service.
 	 * This method should reflect the state set by setRole and should not be used to query 
 	 * the current roles of the current user.
-	 * No role mapping is applied
 	 * @param user
 	 * @param role
 	 * @return is role permitted.
 	 */
 	public boolean canHaveRole(A user,String role);
+	/** For a non explicit role, find the mapped role (if any that allows access;
+	 * 
+	 * @param user
+	 * @param original
+	 * @return role-name or null;
+	 */
+	public String fromRole(A user, String original);
+	/** query the default role set for the specified user.  
+	 * This only queries the roles managed directly by the session service.
+	 * This method should reflect the state set by setRole and should not be used to query 
+	 * the current roles of the current user.
+	 * No role mapping is applied
+	 * @param user
+	 * @param role
+	 * @return is role permitted.
+	 */
+	public boolean explicitRole(A user,String role);
 	
 	/** get a {@link BaseFilter} for all {@link AppUser}s who
 	 * have access to a global role.
 	 * 
-	 * This is the same selection as {@link #canHaveRoleFromList(AppUser, String)
+	 * This is the same selection as {@link #canHaveRoleFromList(AppUser, String ...)}
 	 * 
-	 * @param role
+	 * @param roles
 	 * @return
 	 */
 	public BaseFilter<A> getGlobalRoleFilter(String ...roles);

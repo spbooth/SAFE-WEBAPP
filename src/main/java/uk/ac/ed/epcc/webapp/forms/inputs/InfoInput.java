@@ -74,6 +74,10 @@ public class InfoInput implements Input<String>, UnmodifiableInput{
 	public void validate() throws FieldException {
 		return;
 	}
+	@Override
+	public void validate(String value) throws FieldException {
+		return;
+	}
 
 	@Override
 	public String getLabel() {

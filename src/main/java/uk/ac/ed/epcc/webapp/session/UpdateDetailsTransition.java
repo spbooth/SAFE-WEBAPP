@@ -13,9 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.MissingResourceException;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -35,11 +32,11 @@ public class UpdateDetailsTransition<A extends AppUser> extends StandAloneFormUp
 	
 
 	/**
-	 * @param name
+	 * @param provider
 	 * @param fac
 	 */
 	protected UpdateDetailsTransition(AppUserTransitionProvider provider, AppUserFactory<A> fac) {
-		super("Details", fac);
+		super( fac);
 		this.provider=provider;
 	}
 	
@@ -57,15 +54,13 @@ public class UpdateDetailsTransition<A extends AppUser> extends StandAloneFormUp
 		if( my_details && fac.needDetailsUpdate(target)) {
 			// This will only be a forced update if the current user.
 			// We may allow other users to udpdate via a role
-			try {
+		
 				ContentBuilder div = cb.getPanel("warn");
 				div.addHeading(2, "Update required");
 				PreDefinedContent content = new PreDefinedContent(op.getContext(), "person_update_required");
 				div.addObject(content);
 				div.addParent();
-			}catch(MissingResourceException e) {
-				// optional
-			}
+			
 		}
 		fac.addUpdateNotes(cb, target);
 		

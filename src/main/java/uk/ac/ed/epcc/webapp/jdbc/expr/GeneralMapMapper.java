@@ -28,8 +28,8 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
  * 
  * @author spb
  *
- * @param <K>
- * @param <R>
+ * @param <K> type of result key
+ * @param <R> type of result value
  */
 public abstract class GeneralMapMapper<K,R> extends SQLGroupMapper<Map<K,R>>  implements Contexed {
 	
@@ -83,16 +83,14 @@ public abstract class GeneralMapMapper<K,R> extends SQLGroupMapper<Map<K,R>>  im
 	}
 	/** Make the key object from the ResultSet
 	 * 
-	 * @param rs
-	 * @return
-	 * @throws DataFault
+	 * @param rs input {@link ResultSet}
+	 * @return result
 	 */
 	protected abstract K makeKey(ResultSet rs) throws DataException, SQLException;
 	/** make the result object from the ResultSet
 	 * 
-	 * @param rs
-	 * @return
-	 * @throws DataFault
+	 * @param rs input {@link ResultSet}
+	 * @return result
 	 */
 	protected abstract R makeResult(ResultSet rs) throws DataException, SQLException;
 }

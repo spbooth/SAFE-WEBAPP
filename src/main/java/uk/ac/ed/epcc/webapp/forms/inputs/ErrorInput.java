@@ -80,6 +80,10 @@ public class ErrorInput<T> implements UnmodifiableInput, Input<T> {
 		throw new ValidateException("No legal value possible");
 	}
 	@Override
+	public void validate(T value) throws FieldException {
+		throw new ValidateException("No legal value possible");
+	}
+	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitUnmodifyableInput(this);
 	}

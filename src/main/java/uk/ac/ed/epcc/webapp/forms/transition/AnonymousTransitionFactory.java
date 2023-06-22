@@ -12,7 +12,7 @@
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.transition;
-
+import uk.ac.ed.epcc.webapp.session.SessionService;
 /** A {@link TransitionFactory} that is allowed to implement anonymous transitions.
  * That is where there is no {@link SessionService} or no current user.
  * 

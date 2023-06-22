@@ -43,39 +43,40 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 /**
  * LinkManager is the base class of Factories that manage Link objects These
  * classes manage many-to-one relationships between model level objects. The <code>LinkManager</code>
- * class calls these the <it>left</it> and <it>right</it> objects. 
+ * class calls these the <i>left</i> and <i>right</i> objects. 
  * The actual <code>Link</code> DataObjects are pseudo inner classes of the <code>LinkManager</code>
  * Often the Link objects will remain hidden inside the <code>LinkManager</code> sub-class and only be
  * manipulated via an external interface. If we want to track the history of a Link object needs a status
  * field that marks if the link is valid. This way the same object is used to record the link between two peer objects
  * even if the link is broken and remade several times. <code>Link</code> can be selected based on the objects at the
  * end on the link. e.g.
-<code>
 <pre>
+<code>
     // get a link
     Link l = manager.getLink(left_peer,right_peer);  // null if link does not exist
     
     // or
     Link l2 = manager.makeLink(left_peer,right_peer);  // make link if it does not already exist
-</pre>
 </code>
+</pre>
  * <p>
  * LinkManager can navigate the links in either direction the subclass may
  * choose only to expose one direction of navigation. Internally this is implemented using the
- * {@link LinkFilter} or {@link SQLLinkFilter} classes which select a set a <code>Link</code> objects
+ * {@link IndexedLinkManager.LinkFilter} or {@link IndexedLinkManager.SQLLinkFilter} classes which select a set a <code>Link</code> objects
  * based on the value of one or other end.
-<code>
 <pre>
+<code>
    // links joining left_peer to something
    Iterator&lt;Link&gt; it = manager.getLinkIterator(left_peer,null,filter);
 
    // or go straight to the referenced object
    Iterator&lt;Right&gt;  right_it = manager.getRightIterator(left_peer,null,filter);
-</pre>
 </code>
+</pre>
  * <p>
  * The Link class can cache references to the objects it points to, these cached values are retrieved using
  * the <code>getLeft()</code> and <code>getRight()</code> methods. 
+ * </p>
  * <p>
  * LinkManager provides a single point in the code to optionally apply SQL join
  * optimisations. A SQL join can be used to initialise the cache fields in the
@@ -88,7 +89,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
  * 
  */
 
-@SuppressWarnings("javadoc")
+
 public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends DataObject,R extends DataObject> extends IndexedLinkManager<T,L,R> {
 
 	public static final Feature USE_JOIN = new Feature("linkmanager.use_join",true,"Use joins to pre-fetch link ends");
@@ -103,11 +104,12 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 * 
 	 * Link objects are pseudo inner classes.
 	 * We make the manage reference explicit to avoid Link being generic parameterised by itself.
+	 * </p>
 	 * <p>
 	 * The appropriate LinkManager Link should
 	 * always be subclasses to improve type safety. The <code>getLeft()</code>/<code>getRight()</code> methods are
 	 * made protected to force us to add sensibly named accessors in sub-classes
-	 * 
+	 * </p>
 	 * @author spb
 	 * @param <L> Left end type
 	 * @param <R> Right end type
@@ -518,9 +520,9 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	}
 	/** A {@link FilterResult} for link objects.
 	 * 
-	 * This generates a {@link LinkFilterIterator} to pre-populate the end-links if known.
+	 * This generates a iterator to pre-populate the end-links if known.
 	 * 
-	 * @see FilterSet
+	 * @see DataObjectFactory.FilterSet
 	 * @author spb
 	 *
 	 */
@@ -566,7 +568,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 		 */
 		@Override
 		protected CloseableIterator<T> makeIterator() throws DataFault {
-			// TODO Auto-generated method stub
+			
 			return getLinkIterator(left, right, fil);
 		}		
 	}
@@ -581,8 +583,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 */
     public class LeftAcceptFilter implements AcceptFilter<L>{
     	/**
-		 * @param target
-		 * @param fil
+		 * @param fil nested {@link BaseFilter} on link object
 		 */
 		public LeftAcceptFilter( BaseFilter<T> fil) {
 			this.fil = fil;
@@ -611,7 +612,6 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 	 */
     public class RightAcceptFilter implements AcceptFilter<R>{
     	/**
-		 * @param target
 		 * @param fil
 		 */
 		public RightAcceptFilter( BaseFilter<T> fil) {

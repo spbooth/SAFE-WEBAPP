@@ -53,7 +53,7 @@ public class TwoFactorHandler<A extends AppUser> {
 
     private final SessionService<A> sess;
    
-    /** would a call to {@link #doLogin(AppUser, SerializableFormResult)}
+    /** would a call to {@link #doLogin(AppUser, String,SerializableFormResult)}
      * result in an authorisation request
      * 
      * @param user
@@ -74,6 +74,17 @@ public class TwoFactorHandler<A extends AppUser> {
 			}
 		}
 		return false;
+    }
+    
+    public boolean enabled(A user) {
+    	AppUserFactory<A> person_fac = sess.getLoginFactory();
+    	for( TwoFactorComposite<A> comp : person_fac.getComposites(TwoFactorComposite.class)) {
+			if( comp.enabled(user)) {
+				return true;
+			}
+		}
+    	
+    	return false;
     }
 
     public boolean requireTwoFactor(A user) {
@@ -208,7 +219,7 @@ public class TwoFactorHandler<A extends AppUser> {
 						sess.setAuthenticationTime(time.getCurrentTime());
 					}
 					if( type != null ) {
-						sess.setAuthenticationType(AUTH_TYPE_ATTR);
+						sess.setAuthenticationType(type);
 					}
 					sess.setAttribute(AUTH_USES_2FA_ATTR, Boolean.TRUE);
 					completeAuth(user);

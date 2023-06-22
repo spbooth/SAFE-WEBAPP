@@ -20,8 +20,8 @@ import java.util.Map;
  * this uses an alternative format where each row becomes a data record with element names 
  * following the column headings.
  * @author spb
- * @param <C> 
- * @param <R> 
+ * @param <C> type of column key
+ * @param <R> type of row key
  *
  */
 

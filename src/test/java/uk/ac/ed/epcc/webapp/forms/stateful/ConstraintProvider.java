@@ -36,21 +36,14 @@ public class ConstraintProvider extends SimpleViewTransitionProvider<Constrained
 	
 	public static class CreateTransition extends FormCreatorTransition<ConstrainedObject>{
 
-		/**
-		 * @param type_name
-		 * @param creator
-		 */
+	
 		public CreateTransition(AppContext conn) {
-			super("ConstrainedObject", (new ConstrainedFactory(conn)).getFormCreator(conn));
+			super((new ConstrainedFactory(conn)).getFormCreator(conn));
 		}
 		
 	}
 
-	/**
-	 * @param c
-	 * @param fac
-	 * @param target_name
-	 */
+	
 	public ConstraintProvider(AppContext c) {
 		super(c,new ConstrainedFactory(c),"Constrained");
 		addTransition(CREATE_KEY, new CreateTransition(c));

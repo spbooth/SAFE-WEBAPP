@@ -13,8 +13,9 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.jdbc.expr;
 
-import junit.framework.Assert;
 
+
+import org.junit.Assert;
 import org.junit.Test;
 
 /**

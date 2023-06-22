@@ -103,7 +103,7 @@ public class RemoteAuthServletTest<A extends AppUser> extends ServletTest {
 		user.commit();
 		//  Calling registerNewuser should allow a user to bind
 		// an existing is and login
-		RemoteAuthServlet.registerNewUser(ctx, user);
+		AppUserFactory.registerNewUser(ctx, user);
 		assertFalse(sess.haveCurrentUser());
 		
 		req.remote_user="fred";
@@ -127,7 +127,7 @@ public class RemoteAuthServletTest<A extends AppUser> extends ServletTest {
 		user.commit();
 		//  Calling registerNewuser should allow a user to bind
 		// an existing is and login
-		RemoteAuthServlet.registerNewUser(ctx, user);
+		AppUserFactory.registerNewUser(ctx, user);
 		assertFalse(sess.haveCurrentUser());
 		
 		req.remote_user="fred";

@@ -13,9 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.lifecycle;
 
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.model.AbstractConstructedTargetList;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
@@ -82,7 +80,11 @@ public class ListenerList<T extends DataObject> extends AbstractConstructedTarge
 				if( result == null ) {
 					result = new LinkedHashSet<>();
 				}
-				result.add(o);
+				if( o instanceof Collection) {
+					result.addAll((Collection)o);
+				}else {
+					result.add(o);
+				}
 			}
 		}
 		if( result != null && result.size() == 1) {

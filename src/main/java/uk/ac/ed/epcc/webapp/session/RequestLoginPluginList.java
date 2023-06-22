@@ -7,7 +7,7 @@ import uk.ac.ed.epcc.webapp.AbstractConstructedObjectList;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.servlet.RequestLoginPlugin;
-/** A {@link RequestLoginPlugin} that 
+/** A {@link RequestLoginPlugin} that wraps multiple other plug-ins
  * 
  * @author Stephen Booth
  *

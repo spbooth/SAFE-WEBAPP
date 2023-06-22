@@ -28,13 +28,13 @@ import uk.ac.ed.epcc.webapp.model.data.forms.UpdateTransition;
  * @author Stephen Booth
  *@see StandAloneFormUpdateTransition
  *@see UpdateTransition
- * @param <X>
+ * @param <X> type of object updated
  */
 public class StandAloneFormUpdateProducerTransition<X> extends
 		EditTransition<X> {
 	private final FormUpdateProducer<X> producer;
-	public StandAloneFormUpdateProducerTransition(String type_name,FormUpdateProducer<X> producer){
-		super(type_name);
+	public StandAloneFormUpdateProducerTransition(FormUpdateProducer<X> producer){
+		super();
 		this.producer=producer;
 	}
 	@Override

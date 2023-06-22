@@ -21,7 +21,7 @@ import org.junit.Test;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
 
-/** An {@link InterfaceTest} for {@link ListInput}.
+/** An InterfaceTest for {@link ListInput}.
  * As factory classes override their default input to
  * not be a ListInput this is written to treat this case as an
  * automatic pass

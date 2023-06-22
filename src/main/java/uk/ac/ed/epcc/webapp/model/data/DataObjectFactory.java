@@ -79,10 +79,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * <ul>
  * <li> <code>makeBDO(Record)</code> Which constructs an object of the target type.
  * </ul>
- * However the {@link #getTarget()} method should also be overridden to improve run-time type checking.
- * This is so simple that in principle we could have a
- * genericFactory class that implements them using reflection from a Class object
- * passed to the constructor but this is probably overkill for the moment. Note
+ * Note
  * that Factory is only concerned with retrieving records from the database. It
  * can therefore be used with read-only tables populated from elsewhere.
  * <p>
@@ -798,8 +795,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	/** An {@link AcceptFilter} version of DestFilter
 	 * 
 	 * @author spb
-	 * @see DestFilter
-	 * @param <T>
+	 * @param <T> type of filter
 	 */
 
 
@@ -937,7 +933,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     /** get all {@link Composite}s for this factory.
      * @return {@link Collection}
      */
-	public Collection<Composite<BDO,?>> getComposites() {
+	public final Collection<Composite<BDO,?>> getComposites() {
 		return composites.values();
 	}
     /** get a specific {@link Composite} based on its  registration type.
@@ -946,13 +942,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      * @return {@link Composite}
      */
 	@SuppressWarnings("unchecked")
-	public <X extends Composite> X getComposite(Class<? super X> clazz){
+	public final <X extends Composite> X getComposite(Class<? super X> clazz){
 		X found = (X) composites.get(clazz);
 		assert( found == null || checkComposite(clazz));
 		return found;
 	}
 	
-	public <X extends Composite> boolean checkComposite(Class<? super X> clazz) {
+	private final <X extends Composite> boolean checkComposite(Class<? super X> clazz) {
 		if( clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) {
 			return true; // can't check
 		}
@@ -966,7 +962,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		return false;
 	}
 	
-	public <X extends Composite> boolean hasComposite(Class<X> clazz){
+	public final  <X extends Composite> boolean hasComposite(Class<X> clazz){
 		return composites.containsKey(clazz);
 	}
 	/** Get all composites that are assignable to a particular type.
@@ -974,7 +970,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param template
 	 * @return
 	 */
-	public <Y> Collection<Y> getComposites(Class<Y> template){
+	public final  <Y> Collection<Y> getComposites(Class<Y> template){
 		LinkedList<Y> result = new LinkedList<>();
 		for( Composite<BDO,?> c : composites.values()){
 			if( template.isAssignableFrom(c.getClass()) ){
@@ -1598,21 +1594,13 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return Map<String,String>
 	 * @see DataObjectFormFactory
 	 */
+	@Deprecated
 	protected Map<String, String> getTranslations() {
 		// default to no translations override this method in sub-classes
 		return new HashMap<>();
 	}
 
-	/**
-	 * return a class-default set of help-text for form fields.
-	 * 
-	 * 
-	 * @return Hashtable
-	 */
-	protected Map<String, String> getFieldHelp() {
-		// default to no translations override this method in sub-classes
-		return new HashMap<>();
-	}
+	
 	// name of table index
 	/**
 	 * Get the unique ID field name for the target object.
@@ -2256,7 +2244,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param p
 	 * @return
 	 */
-	public final AcceptFilter<BDO> getFilter(Predicate<BDO> p){
+	public final AcceptFilter<BDO> getPredicateFilter(Predicate<BDO> p){
 		return (o) -> p.test(o);
 	}
 	/** create a {@link AndFilter} for this factory

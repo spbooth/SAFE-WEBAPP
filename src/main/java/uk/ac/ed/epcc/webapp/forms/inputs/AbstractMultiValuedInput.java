@@ -9,7 +9,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
  * 
  * @author Stephen Booth
  *
- * @param <T>
+ * @param <T> type of item
  */
 public abstract  class AbstractMultiValuedInput<T> extends MultiInput<String, BooleanInput> implements MultiValueInput<T>{
     private final Set<T> allowed;

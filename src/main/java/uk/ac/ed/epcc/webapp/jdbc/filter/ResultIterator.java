@@ -108,10 +108,10 @@ public abstract class ResultIterator<O> extends SQLResultIterator<O,O> implement
 		
 		/** method to do the initialisation
 		 * 
-		 * @param f
-		 * @param start
-		 * @param max
-		 * @throws DataFault
+		 * @param f {@link BaseFilter}
+		 * @param start starting record
+		 * @param max maximum number of records to return
+		 * @throws DataException
 		 */
 		@Override
 		protected void setup(BaseFilter<O> f, int start, int max) throws DataException {

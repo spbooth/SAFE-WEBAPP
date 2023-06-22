@@ -25,17 +25,16 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
  * 
  * @author spb
  *
- * @param <X>
+ * @param <X> type of object created
  */
 public abstract class CreatorTransition<X> extends AbstractTargetLessTransition<X> {
-	protected final String type_name;
-	public CreatorTransition(String type_name){
-		this.type_name=type_name;
+	
+	public CreatorTransition(){
 	}
 	public void buildForm(Form f, AppContext ctx) throws TransitionException {
 		FormCreator c = getCreator(ctx);
 		try {
-			c.buildCreationForm(type_name,f);
+			c.buildCreationForm(f);
 		} catch (Exception e) {
 			ctx.error(e,"Error building Creation form");
 			throw new TransitionException("Internal error");

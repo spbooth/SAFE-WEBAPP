@@ -18,6 +18,9 @@ package uk.ac.ed.epcc.webapp.model;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -66,5 +69,14 @@ public class DummyTest extends WebappTestBase {
 		}finally{
 			t.delete();
 		}
+	}
+	
+	@Test
+	public void testConfigTags() throws Exception {
+		Map<String,String> config = new HashMap<>();
+		fac.addConfigTags(config);
+		assertEquals("Dummy", config.get(Dummy1.MANDATORY));
+		assertEquals("Dummy", config.get(Dummy1.Factory.BASE));
+		assertEquals("Dummy", config.get(Dummy1.NAME));
 	}
 }

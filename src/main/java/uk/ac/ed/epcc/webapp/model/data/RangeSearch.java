@@ -21,9 +21,7 @@ import java.util.Set;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.expr.SQLGroupMapper;
-import uk.ac.ed.epcc.webapp.jdbc.filter.FilterFinder;
-import uk.ac.ed.epcc.webapp.jdbc.filter.MatchCondition;
-import uk.ac.ed.epcc.webapp.jdbc.filter.SQLAndFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
@@ -135,6 +133,7 @@ public class RangeSearch<D extends DataObject> {
 	private final DataObjectFactory<D> fac;
 	private final String field_name;
 	private final InfoFinder finder;
+	private SQLFilter<D> search_fil=null;
 	/**
 	 * 
 	 */
@@ -199,9 +198,27 @@ public class RangeSearch<D extends DataObject> {
 	}
 	
 	private Info query(long min, long max) throws DataException {
-		return finder.find(fac.getSQLAndFilter( 
+		SQLAndFilter<D> fil = fac.getSQLAndFilter( 
 				new SQLValueFilter<D>(fac.res, field_name, MatchCondition.GE, min),
 				new SQLValueFilter<D>(fac.res, field_name, MatchCondition.LE, max)
-				));
+				);
+		if( search_fil != null) {
+			fil.addFilter(search_fil);
+		}
+		return finder.find(fil);
+	}
+
+	public SQLFilter<D> getSearchFil() {
+		return search_fil;
+	}
+
+	/** set an additional search filter to restrict 
+	 * which records count as clashing. This requires any unique
+	 * keys for the target table to allow any resulting duplicates.
+	 * 
+	 * @param search_fil
+	 */
+	public void setSearchFil(SQLFilter<D> search_fil) {
+		this.search_fil = search_fil;
 	}
 }

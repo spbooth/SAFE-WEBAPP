@@ -23,12 +23,12 @@ import uk.ac.ed.epcc.webapp.time.Period;
  * a pie-chart of bar-chart.
  * 
  * Unlike {@link TimeChart}s only a single dataset is plotted. This defaults to the
- * last created {@link Plot} but can be reset using the {@link #setPlot(PeriodSetPlot)} method.
+ * last created {@link Plot} but can be reset using the {@link #setPlot(PeriodPlot)} method.
  * 
  * 
  * @author spb
  *
- * @param <P>
+ * @param <P> type of plot
  */
 public abstract class SetPeriodChart<P extends PeriodPlot> extends PeriodChart<P> {
 

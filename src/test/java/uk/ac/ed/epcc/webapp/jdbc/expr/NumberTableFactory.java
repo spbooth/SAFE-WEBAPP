@@ -88,8 +88,7 @@ public class NumberTableFactory extends DataObjectFactory<NumberTableFactory.Num
 	public class ReductionFinder extends AbstractFinder<Double>{
 
 		/**
-		 * @param c
-		 * @param target
+		 * @param exp
 		 */
 		public ReductionFinder( SQLExpression<Double> exp) {
 			super();

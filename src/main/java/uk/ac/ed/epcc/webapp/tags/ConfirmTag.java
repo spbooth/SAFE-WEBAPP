@@ -84,31 +84,20 @@ public class ConfirmTag extends TagSupport implements Tag{
 		if( message_type != null ){
 			MessageBundleService serv = conn.getService(MessageBundleService.class);
 			ResourceBundle mess = serv.getBundle("confirm");
-		  yes_text = mess.getString("yes");
-		  try {
+		    yes_text = mess.getString("yes");
+		    if( mess.containsKey(message_type+".yes")) {
 			  yes_text = mess.getString(message_type+".yes");
-		  }catch(MissingResourceException e) {
-			  // optional
-		  }
-		  no_text = mess.getString("no");
-		  try {
+		    }
+		    no_text = mess.getString("no");
+		    if( mess.containsKey(message_type+".no")) {
 			  no_text = mess.getString(message_type+".no");
-		  }catch(MissingResourceException e) {
-			  // optional
-		  }
+		    }
+		  
 		  if( message_title == null ){
-			  try{
-				  message_title = new PreDefinedContent(conn,mess,message_type + ".title",args);
-			  }catch(MissingResourceException e){
-				  log.error("missing confirm title for "+message_type,e);
-			  }
+			  message_title = new PreDefinedContent(conn,mess,message_type + ".title",args);
 		  }
 		  if( message_text == null ){
-			  try{
-				  message_text = new PreDefinedContent(conn,mess,message_type + ".text",args);
-			  }catch(MissingResourceException e){
-				  log.error("missing confirm text for "+message_type,e);
-			  }
+			message_text = new PreDefinedContent(conn,mess,message_type + ".text",args);
 		  }
 		}
 			if( message_title == null ){

@@ -79,7 +79,7 @@ public class AddStdIndexTransition<T extends DataObjectFactory> extends EditTabl
 				try(java.sql.PreparedStatement stmt = sql.getConnection().prepareStatement(query.toString())){
 					int pos=1;
 					for(Object o: args){
-						stmt.setObject(pos++, o);
+						Repository.setObject(stmt,pos++, o);
 					}
 					stmt.execute();
 				}

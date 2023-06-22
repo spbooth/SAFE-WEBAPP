@@ -12,7 +12,7 @@ import uk.ac.ed.epcc.webapp.servlet.ViewTransitionKey;
  * 
  * @author Stephen Booth
  *
- * @param <T>
+ * @param <T> type of transition target
  */
 public class ViewOnlyTransitionKey<T> extends TransitionKey<T> implements ViewTransitionKey<T> {
 

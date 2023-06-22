@@ -593,8 +593,8 @@ public class Table<C, R> {
 	 * object that implements either {@link XMLGenerator} or {@link UIGenerator}
 	 * 
 	 * @author spb
-	 * @param <C> 
-	 * @param <R> 
+	 * @param <C> type of column key
+	 * @param <R> type of row key
 	 * 
 	 */
 	public static interface Formatter<C, R> {
@@ -607,7 +607,7 @@ public class Table<C, R> {
 	 * or Numbers
 	 * 
 	 * @author spb
-	 * @param <C> 
+	 * @param <C> type of column key
 	 * 
 	 */
 	public static class Sorter<C> implements Comparator {
@@ -722,8 +722,8 @@ public class Table<C, R> {
 	 * Adapter to convert a Transform into a Formatter
 	 * 
 	 * @author spb
-	 * @param <C> 
-	 * @param <R> 
+	 * @param <C> type of column key
+	 * @param <R> type of row key
 	 * 
 	 */
 	public static class TransformFormatter<C, R> implements Formatter<C, R> {
@@ -828,7 +828,7 @@ public class Table<C, R> {
 	/** Add contents from donor table transforming the row keys
 	 * 
 	 * @param key_transform {@link Transform} to map donor rows to local rows
-	 * @param table
+	 * @param donor {@link Table}
 	 */
 	public <X> void addTable(Transform key_transform,Table<C,X> donor ) {
 		for(X donor_row : donor.row_keys) {
@@ -852,7 +852,7 @@ public class Table<C, R> {
 	 * The key_col is not imported from the donor.
 	 * 
 	 * @param key_col column in donor table containing row key values to use
-	 * @param table
+	 * @param donor {@link Table}
 	 */
 	public <X> void addTable(C key_col,Table<C,X> donor ) {
 

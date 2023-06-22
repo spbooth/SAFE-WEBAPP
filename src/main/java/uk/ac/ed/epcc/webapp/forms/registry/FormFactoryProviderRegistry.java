@@ -28,6 +28,7 @@ import uk.ac.ed.epcc.webapp.content.ContentBuilder;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.RedirectChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 import uk.ac.ed.epcc.webapp.servlet.TransitionServlet;
@@ -173,28 +174,14 @@ public ContentBuilder addContent(ContentBuilder builder) {
 			seen=true;
 		}
 		if( t.canCreate(session_service) ){
-			FormResult res = new ChainedTransitionResult<T,FormOperations>(getTransitionProvider(t),null,FormOperations.Create){
-
-				@Override
-				public boolean useURL() {
-					return true;
-				}
-				
-			};
+			FormResult res = new RedirectChainedTransitionResult<T,FormOperations>(getTransitionProvider(t),null,FormOperations.Create);
 			buttons.addButton(conn, "Create New "+t.getName(), res);
 		}
 	}
 	for(Iterator<T> it=getTypes(); it.hasNext(); ){
 		T t=  it.next();
 		if( t.canUpdate(session_service) ){
-			FormResult res = new ChainedTransitionResult<T,FormOperations>(getTransitionProvider(t),null,FormOperations.Update){
-
-				@Override
-				public boolean useURL() {
-					return true;
-				}
-				
-			};
+			FormResult res = new RedirectChainedTransitionResult<T,FormOperations>(getTransitionProvider(t),null,FormOperations.Update);
 			buttons.addButton(conn, "Update "+t.getName(), res);
 		}
 	}

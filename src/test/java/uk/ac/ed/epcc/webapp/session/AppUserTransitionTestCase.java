@@ -415,6 +415,35 @@ public class AppUserTransitionTestCase<A extends AppUser> extends AbstractTransi
 		checkDiff("/cleanup.xsl", "roles.xml");
 	}
 	
+	
+	@Test
+	public void testUnSetRoleTransition() throws ConsistencyError, Exception {
+		MockTansport.clear();
+		takeBaseline();
+		AppUserFactory<A> fac = ctx.getService(SessionService.class).getLoginFactory();
+		A user =  fac.makeBDO();
+	
+		user.setEmail("fred@example.com");
+		user.commit();
+		
+		SessionService<A> sess = ctx.getService(SessionService.class);
+		sess.setRole(user,AppUserTransitionProvider.SET_ROLES_ROLE, true);
+		sess.setCurrentPerson(user);
+		assertTrue(sess.haveCurrentUser());
+		
+		A target = fac.makeBDO();
+		target.setEmail("bill@example.com");
+		target.commit();
+		sess.setRole(target, "Pig", true);
+		
+		AppUserTransitionProvider provider = AppUserTransitionProvider.getInstance(ctx);
+		setTransition(provider, AppUserTransitionProvider.SET_ROLE_KEY, target);
+		checkFormContent(null, "unset_roles_form.xml");
+		clearParam("Pig");
+		runTransition();
+		checkMessage("roles_updated");
+		checkDiff("/cleanup.xsl", "remove_roles.xml");
+	}
 	@Test
 	@ConfigFixtures("email_status.properties")
 	public void testMarkEmailInvalid() throws Exception {

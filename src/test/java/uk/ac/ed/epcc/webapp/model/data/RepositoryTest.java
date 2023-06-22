@@ -23,8 +23,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -483,7 +482,7 @@ public class RepositoryTest extends WebappTestBase {
 	}
 	
 	@Test
-	public void testBlobField() throws DataException{
+	public void testBlobField() throws DataException, IOException{
 		Record r = res.new Record();
 		r.put("Name","Blobby");
 		ByteArrayStreamData data = new ByteArrayStreamData();
@@ -513,7 +512,9 @@ public class RepositoryTest extends WebappTestBase {
 		
 		StreamData newdata =p.getStreamDataProperty("Blob");
 		assertEquals("Hello world".length(), newdata.getLength());
-		assertEquals("Hello world", newdata.toString());
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		newdata.write(bos);
+		assertEquals("Hello world", bos.toString());
 		
 		assertNull(p.getStreamDataProperty("Wonka"));
 		

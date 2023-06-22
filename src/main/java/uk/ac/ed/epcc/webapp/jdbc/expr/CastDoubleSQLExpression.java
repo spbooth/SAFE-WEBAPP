@@ -103,4 +103,9 @@ public class CastDoubleSQLExpression<N extends Number> implements SQLExpression<
 		return expr.getFilterTag();
 	}
 
+	@Override
+	public String toString() {
+		return "CastDoubleSQLExpression(" + expr + ")";
+	}
+
 }

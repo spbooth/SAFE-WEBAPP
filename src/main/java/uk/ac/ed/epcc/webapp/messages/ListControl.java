@@ -21,7 +21,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
-/** A {@link ResourceBundle.Control} that allows multiple bundles to 
+/** A {@link java.util.ResourceBundle.Control} that allows multiple bundles to 
  * be specified as a comma separated list. contents will be merged 
  * into a single bundle.
  * @author spb

@@ -36,7 +36,7 @@ public class Joiner<T extends DataObject, BDO extends DataObject> extends SQLAnd
 	 * This constructor is private to ensure the static factory methods are called to ensure
 	 * that one of the static methods defined in this class is used
 	 * 
-	 * @param target  tag to use for type checking
+	 * @param tag construction tag for owning factory
 	 */
 	private Joiner(String tag) {
 		super(tag);

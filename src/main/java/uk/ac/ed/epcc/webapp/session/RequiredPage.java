@@ -72,8 +72,6 @@ public interface RequiredPage<U extends AppUser> {
     /** If a notification email is being sent (possibly triggered 
      * by a different required page). Is there any message we want to add.
      * 
-     * @param person
-     * @return
      */
     default void addNotifyText(Set<String> notices,U person) {
     

@@ -40,7 +40,7 @@ public class PatternArg implements PatternArgument{
 	}
 	public void addArg(PreparedStatement stmt,int pos) throws SQLException{
 		if(res == null){
-			stmt.setObject(pos, arg);
+			Repository.setObject(stmt,pos, arg);
 			return;
 		}
 		res.setObject(stmt, pos, field, res.convert(field, arg));

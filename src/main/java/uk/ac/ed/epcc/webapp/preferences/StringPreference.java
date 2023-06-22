@@ -25,12 +25,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
  */
 public class StringPreference extends StringSetting implements PreferenceSetting<String> {
 
-	/**
-	 * @param clazz
-	 * @param name
-	 * @param def
-	 * @param description
-	 */
+	
 	public StringPreference(String name, String description, String ... options) {
 		super(name, description, options);
 	}

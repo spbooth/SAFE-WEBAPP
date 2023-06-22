@@ -41,9 +41,7 @@ public class IsMessageVisitor extends AbstractVisitor {
 	public boolean testMessage() {
 		return is_message;
 	}
-	/**
-	 * @param is_message the is_message to set
-	 */
+	
 	public void reset() {
 		this.is_message = false;
 	}

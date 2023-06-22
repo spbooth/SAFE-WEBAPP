@@ -97,9 +97,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 			super(null, fil);
 		}
 
-		/**
-		 * @param target
-		 */
+	
 		public TupleAndFilter() {
 			super(null);
 
@@ -313,11 +311,7 @@ public class TupleFactory<A extends DataObject, AF extends DataObjectFactory<A>,
 			setMapper(mapper);
 			setQualify(true);
     	}
-		/**
-		 * @param c
-		 * @param target
-		 * @throws DataFault 
-		 */
+		
 		public TupleIterator(BaseFilter<T> fil, int start, int max) throws DataFault {
 			this();
 			try {

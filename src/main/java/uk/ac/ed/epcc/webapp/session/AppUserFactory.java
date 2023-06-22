@@ -88,7 +88,8 @@ import uk.ac.ed.epcc.webapp.model.lifecycle.ActionList;
 import uk.ac.ed.epcc.webapp.model.lifecycle.LifeCycleException;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
-import uk.ac.ed.epcc.webapp.servlet.RemoteAuthServlet;
+import uk.ac.ed.epcc.webapp.servlet.RegisterServlet;
+import uk.ac.ed.epcc.webapp.servlet.ServletService;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
 
@@ -195,9 +196,7 @@ Targetted<AU>
 			sb.append("))");
 			return sb;
 		}
-		/**
-		 * @param sbFROM
-		 */
+		
 		public void addRolePattern(StringBuilder sb,String test_role) {
 			ctx.quoteQualified(sb, AbstractSessionService.ROLE_TABLE, AbstractSessionService.ROLE_FIELD);
 			sb.append("=?");
@@ -431,6 +430,10 @@ Targetted<AU>
 	 * @return boolean
 	 */
 	public boolean needDetailsUpdate(AU user){
+		if( ! AppUserTransitionProvider.USER_SELF_UPDATE_FEATURE.isEnabled(getContext())) {
+			// user cannot update details
+			return false;
+		}
 		if( REQUIRE_PERSON_UPDATE_FEATURE.isEnabled(getContext())){
 			Form f = new BaseForm(getContext());
 			try {
@@ -440,7 +443,7 @@ Targetted<AU>
 				StandAloneFormUpdate<AU> u = (StandAloneFormUpdate<AU>) getFormUpdate(getContext());
 				
 				SessionService service = user.getContext().getService(SessionService.class);
-				u.buildUpdateForm("Person", f, user,service);
+				u.buildUpdateForm(f, user,service);
 				if( ! service.hasRole(SessionService.ADMIN_ROLE)){
 					f.removeField(ALLOW_EMAIL_FIELD);
 				}
@@ -559,6 +562,12 @@ Targetted<AU>
 	}
 	
 	private Map<String,AppUserNameFinder> realms=null;
+	/** key for a session attibute holding a newly registered user.
+	 * This is to support users being able to link external identities
+	 * in the same session after registration
+	 * 
+	 */
+	public static final String EXTAUTH_REGISTER_ID_ATTR = "EXTAUTH_REGISTER_ID_ATTR";
 	private  Map<String,AppUserNameFinder> getRealmMap(){
 		if( realms == null){
 			// Generate lazily only want to do this AFTER factory is constructed
@@ -862,8 +871,8 @@ Targetted<AU>
 	}
 
 
-	/**
-	 * randomise a persons SAF password and send new password in an Email
+	/** Actions to perform on a newly signed up user.
+	 * 
 	 * @throws Exception 
 	 * 
 	 */
@@ -873,19 +882,15 @@ Targetted<AU>
 		}
 		// Will force update on first login otherwise 
 		user.markDetailsUpdated();
+		registerNewUser(getContext(), user);
 	}
 	
 	/** Get a {@link FormCreator} to use when users sign-up
-	 * Optionally a name and a realm can be supplied which will be set as part of signup.
-	 * This is needed for external auth when the name is known but other details need to be
-	 * gathered via the form.
-	 * 
-	 * @param realm     String realm to set webname in (may be null)
-	 * @param webname   String name to set 
+	
 	 * @return
 	 */
-	public final FormCreator getSignupFormCreator(String realm,String webname) {
-				return new SignupFormCreator<>(this,realm,webname);
+	public final FormCreator getSignupFormCreator() {
+				return new SignupFormCreator<>(this);
 		
 	}
 	/** Form for first time visitors to self register
@@ -913,8 +918,18 @@ Targetted<AU>
 		@Override
 		public void preCommit(T dat, Form f) throws DataException, ActionException {
 			super.preCommit(dat, f);
-			if( realm != null && realm.trim().length() > 0  && webname != null && webname.trim().length() > 0){
-				dat.setRealmName(realm,webname);
+			// if we have external auth configured for the RegisterServlet and
+			// and an id is generated then set the appropriate realm
+			String realm = RegisterServlet.getRealm(getContext());
+			if( realm != null && realm.trim().length() > 0  ) {
+				ServletService serv = getContext().getService(ServletService.class);
+				if( serv != null) {
+					String webname = serv.getWebName();
+					if( webname != null && webname.trim().length() > 0){
+
+						dat.setRealmName(realm,webname);
+					}
+				}
 			}
 			getAppUserFactory().postRegister(dat);
 		}
@@ -922,9 +937,6 @@ Targetted<AU>
 		public void postCreate(T dat, Form f) throws Exception {
 			super.postCreate(dat, f);
 			getAppUserFactory().newSignup(dat);
-			// Store user in session so we can bind remote-ids and
-			// login if the user has a valid external id to bind.
-			RemoteAuthServlet.registerNewUser(getContext(), dat);
 			
 		}
 		/**
@@ -934,39 +946,49 @@ Targetted<AU>
 			return (AppUserFactory<T>)getFactory();
 		}
 		@Override
-		public void setAction(String type_name,Form f) {
+		public void addActions(Form f) {
 			// Check for a placeholder record and update that instead if it exists
-			if( webname != null && ! webname.isEmpty()){
-				T existing = getAppUserFactory().getRealmFinder(realm).findFromString(webname);
-				if( existing != null ){
-					f.addAction(REGISTER_ACTION, new UpdateAction<>("Person", this, existing));
-					return;
-				}
+			T existing = existingUser();
+
+			if( existing != null ){
+				f.addAction(REGISTER_ACTION, new UpdateAction<>( this, existing));
+				return;
 			}
-			f.addAction(REGISTER_ACTION, new CreateAction<>(type_name,this));
+
+			f.addAction(REGISTER_ACTION, new CreateAction<>(this));
 		}
-		String realm;
-		String webname;
-      
+		
+		private T existingUser() {
+			String realm=RegisterServlet.getRealm(getContext());
+			if( realm == null || realm.trim().isEmpty()) {
+				return null;
+			}
+			ServletService serv = getContext().getService(ServletService.class);
+			if( serv != null) {
+				String webname = serv.getWebName();
+				if( webname != null && ! webname.trim().isEmpty()) {
+					AppUserNameFinder<T, ?> finder = getAppUserFactory().getRealmFinder(realm);
+					return finder.findFromString(webname);
+				}
+				
+			}
+			return null;
+		}
 		/**
 		 * 
 		 * @param fac  {@link AppUserFactory}
-		 * @param realm String realm to set webname in
-		 * @param name  String webname from external authentication.
 		 */
-		public SignupFormCreator(AppUserFactory<T> fac,String realm, String name) {
+		public SignupFormCreator(AppUserFactory<T> fac) {
 			super(fac);
-			this.realm=realm;
-			webname = name;
 		}
 
 
 		@Override
-		public FormResult getResult(String type_name,T dat, Form f) {
+		public FormResult getResult(T dat, Form f) {
 			if( getFactory().getComposite(PasswordAuthComposite.class)!=null){			
-				return new MessageResult("signup_ok_password",type_name);
+				return new MessageResult("signup_ok_password");
 			}else{
-				return new MessageResult("signup_ok",type_name);
+				return new MessageResult("signup_ok");
 			}
 		}
 		
@@ -1288,6 +1310,30 @@ Targetted<AU>
 	@Override
 	public Class<AU> getTarget() {
 		return (Class<AU>) AppUser.class;
+	}
+	/** Set the user that should be registered (and logged in) if the
+	 * external authentication succeeds. This is for when a user registers
+	 * and id given an opportunity to bind an existing id. If the binding succeeds the
+	 * user has a proven id (even though the email is not verified) and can be logged in
+	 * if the external auth succeeds.
+	 * 
+	 * If the session already contains a user this user must match the
+	 * supplied arguement.
+	 * 
+	 * @param conn
+	 * @param user
+	 * @return true if binding should be offered.
+	 */
+	public static boolean registerNewUser(AppContext conn, AppUser user){
+		SessionService sess = conn.getService(SessionService.class);
+		if( sess.haveCurrentUser()){
+			// This is probably a user created via a form rather than a real reggistration
+			return sess.isCurrentPerson(user);
+		}else{
+			// Save the user-id for use in linking steps
+			sess.setAttribute(EXTAUTH_REGISTER_ID_ATTR, user.getID());
+			return true;
+		}
 	}
 	
 	

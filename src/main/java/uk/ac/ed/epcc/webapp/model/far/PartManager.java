@@ -239,7 +239,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		}
 
 		@Override
-		public FormResult getResult(String typeName, P dat, Form f) {
+		public FormResult getResult(P dat, Form f) {
 			if( dat.hasConfig()){
 				return new ChainedTransitionResult<P, PartTransitionKey<P>>(form_manager.getPartPathProvider(), dat, PartPathTransitionProvider.CONFIG);
 			}else{
@@ -256,9 +256,7 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 			return dat.getViewResult();
 		}
 
-		/**
-		 * @param dataObjectFactory
-		 */
+	
 		public PartUpdater() {
 			super(PartManager.this);
 		}
@@ -284,14 +282,11 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		}
 
 		@Override
-		public void setAction(String type_name, Form f) {
+		public void addActions(Form f) {
 			f.addAction("Create", new ChildCreateAction(owner));
 		}
 
-		/**
-		 * @param dataObjectFactory
-		 * @param owner
-		 */
+		
 		public PartCreator(O owner) {
 			super(PartManager.this);
 			this.owner = owner;

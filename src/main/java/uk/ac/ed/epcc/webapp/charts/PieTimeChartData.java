@@ -15,10 +15,9 @@ package uk.ac.ed.epcc.webapp.charts;
 
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
-/**
+/** 
  * @author spb
- * @param <C> 
- * @param <P> 
+ * @param <P> type of plot
  *
  */
 

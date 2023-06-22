@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><transition_page>
+<Title>Set roles</Title>
+<PageHeading>Set roles</PageHeading>
+<SummaryContent/>
+<Form>
+<table class="form">
+<tr class="even">
+<th>
+<label for="transition_Admin" class="required">Admin</label>
+</th>
+<td>
+<input id="transition_Admin" type="checkbox" name="Admin" value="Y" class="input"/>
+</td>
+</tr>
+<tr class="odd">
+<th>
+<label for="transition_Manager" class="required">Manager</label>
+</th>
+<td>
+<input id="transition_Manager" type="checkbox" name="Manager" value="Y" class="input"/>
+</td>
+</tr>
+<tr class="even">
+<th>
+<label for="transition_Pig" class="required">Pig</label>
+</th>
+<td>
+<input id="transition_Pig" type="checkbox" name="Pig" value="Y" checked="checked" class="input"/>
+</td>
+</tr>
+<tr class="odd">
+<th>
+<label for="transition_Penguin" class="required">Penguin</label>
+</th>
+<td>
+<input id="transition_Penguin" type="checkbox" name="Penguin" value="Y" class="input"/>
+</td>
+</tr>
+<tr class="even">
+<th>
+<label for="transition_Python" class="required">Python</label>
+</th>
+<td>
+<input id="transition_Python" type="checkbox" name="Python" value="Y" class="input"/>
+</td>
+</tr>
+</table>
+<fieldset class="action_buttons">
+<input class="input_button" type="submit" name="Update" value="Update"/>
+</fieldset>
+</Form>
+</transition_page>

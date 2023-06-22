@@ -62,9 +62,7 @@ public abstract class AbstractMessageHandlerFactory<H extends AbstractMessageHan
 		setContext(conn, table);
 	}
 	public static class Status extends BasicType<Status.Value>{
-		/**
-		 * @param field
-		 */
+		
 		protected Status() {
 			super("Status");
 		}
@@ -72,7 +70,6 @@ public abstract class AbstractMessageHandlerFactory<H extends AbstractMessageHan
 		public class Value extends BasicType.Value{
 
 			/**
-			 * @param parent
 			 * @param tag
 			 * @param name
 			 */

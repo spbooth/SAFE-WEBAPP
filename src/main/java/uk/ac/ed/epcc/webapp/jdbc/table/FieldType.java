@@ -24,7 +24,7 @@ package uk.ac.ed.epcc.webapp.jdbc.table;
  * will have to be reflected in database specific implementation code.
  * @author spb
  *
- * @param <T>
+ * @param <T> type of field
  */
 public  abstract class FieldType<T> {
    public abstract void accept(FieldTypeVisitor vis);

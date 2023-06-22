@@ -108,7 +108,7 @@ public class HTMLForm extends BaseHTMLForm {
 	 * (assume these are the default values of a creation form).
 	 * 
 	 * For an update form where the initial state should be validated
-	 * use {@link #getHtmlFieldTable(HtmlPrinter)} if there are no errors in the request
+	 * use {@link #getHtmlFieldTable(XMLContentBuilder)} if there are no errors in the request
 	 * 
 	 * @param req
 	 *            HttpServletRequest
@@ -128,7 +128,7 @@ public class HTMLForm extends BaseHTMLForm {
 	 * (assume these are the default values of a creation form).
 	 * 
 	 * For an update form where the initial state should be validated
-	 * use {@link #getHtmlFieldTable(HtmlPrinter)} if there are no errors in the request
+	 * use {@link #getHtmlFieldTable(XMLContentBuilder)} if there are no errors in the request
 	 * 
 	 * @praram result HtmlPrinter to add report to
 	 * @param req

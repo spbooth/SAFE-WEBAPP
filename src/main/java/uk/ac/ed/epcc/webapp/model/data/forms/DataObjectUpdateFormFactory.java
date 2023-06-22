@@ -23,16 +23,11 @@ import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.content.UIProvider;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.Identified;
+import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionValidationException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFormFactory;
-import uk.ac.ed.epcc.webapp.model.data.RestrictedRetirable;
-import uk.ac.ed.epcc.webapp.model.data.Retirable;
-import uk.ac.ed.epcc.webapp.model.data.TableStructureContributer;
-import uk.ac.ed.epcc.webapp.model.data.UnRetirable;
+import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -94,16 +89,23 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 		}
 	}
 
-	public final void buildUpdateForm(String type_name, Form f, BDO dat, SessionService<?> operator)
-			throws DataFault {
-				HashMap fixtures = new HashMap();
-				if( dat != null) {
-					Map data = dat.getMap();
-					for(String field : getSupress()) {
-						fixtures.put(field,data.get(field));
-					}
+	public HashMap getFixtures(BDO dat) {
+		HashMap fixtures = new HashMap();
+		if( dat != null) {
+			Map data = dat.getMap();
+			for(String field : getSupress()) {
+				Object value = data.get(field);
+				if( value != null) {
+					fixtures.put(field,value);
 				}
-			    boolean complete = buildForm(f,fixtures);
+			}
+		}
+		return fixtures;
+	}
+	public final void buildUpdateForm(Form f, BDO dat, SessionService<?> operator)
+			throws DataFault {
+				
+			    boolean complete = buildForm(f,getFixtures(dat));
 				//customiseForm(f);
 			    
 			    // set values before customise as it is common
@@ -126,8 +128,8 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 				
 				if( complete ) {
 					customiseCompleteUpdateForm(f, dat);
-					f.addAction(getUpdateActionName(), new UpdateAction<>(type_name,this, dat));
-					addRetireAction(type_name, f, dat, operator);
+					f.addAction(getUpdateActionName(), new UpdateAction<>(this, dat));
+					addRetireAction( f, dat, operator);
 				}
 				
 				
@@ -141,29 +143,35 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 	public void customiseCompleteUpdateForm(Form f, BDO o) {
 		
 	}
+	
+	
 	protected String getUpdateActionName() {
 		return UPDATE;
 	}
 
 	/**
-	 * @param type_name
 	 * @param f
 	 * @param dat
 	 * @param operator
 	 */
-	protected void addRetireAction(String type_name, Form f, BDO dat, SessionService<?> operator) {
+	protected void addRetireAction(Form f, BDO dat, SessionService<?> operator) {
 		if (dat instanceof Retirable && ( ! (dat instanceof RestrictedRetirable)  || ((RestrictedRetirable)dat).allowRetire(operator))){
 			Retirable retirable = (Retirable) dat;
 			if( retirable.useAction()) {
 				if(retirable.canRetire()) {
-					f.addAction(RETIRE, new RetireAction(type_name, dat));
+					f.addAction(RETIRE, new RetireAction(getTypeName(), dat));
 				}else if( dat instanceof UnRetirable && ((UnRetirable)dat).canRestore()){
-					f.addAction(UN_RETIRE, new UnRetireAction(type_name, dat));
+					f.addAction(UN_RETIRE, new UnRetireAction(getTypeName(), dat));
 				}
 			}
 		}
 	}
-
+	@Override
+	public void preCommit(BDO dat,Form f,Map<String,Object> orig) throws DataException, TransitionValidationException{
+		for(UpdateContributor<BDO> comp : getFactory().getComposites(UpdateContributor.class)) {
+			comp.preCommit(dat, f, orig);
+		}
+	}
 	@Override
 	public void postUpdate(BDO o, Form f, Map<String,Object> origs,boolean changed)
 			throws DataException {
@@ -183,12 +191,15 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 	}
 
 	@Override
-	public FormResult getResult(String typeName, BDO dat, Form f) {
-		Object thing = typeName;
+	public FormResult getResult(BDO dat, Form f) {
+		Object thing = getTypeName();
 		if( dat instanceof UIGenerator || dat instanceof UIProvider || dat instanceof Identified) {
 			thing = dat;
 		}
-		return new MessageResult("object_updated",typeName,thing);
+		return new MessageResult("object_updated",getTypeName(),thing);
+	}
+	protected String getTypeName() {
+		return getFactory().getTag();
 	}
 
 }

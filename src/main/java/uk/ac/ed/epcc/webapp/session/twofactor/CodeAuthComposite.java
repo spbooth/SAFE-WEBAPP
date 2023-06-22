@@ -24,10 +24,7 @@ import uk.ac.ed.epcc.webapp.session.AppUserFactory;
  */
 public abstract class CodeAuthComposite<AU extends AppUser,T> extends FormAuthComposite<AU> {
 
-	/**
-	 * 
-	 */
-	protected static final String VERIFICATION_CODE_LABEL = "Verification code from Authenticator App";
+	
 	/** form field for autentication code in augmented forms.
 	 * 
 	 */
@@ -46,7 +43,7 @@ public abstract class CodeAuthComposite<AU extends AppUser,T> extends FormAuthCo
 	 */
 	@Override
 	public void modifyForm(AU user,Form f) {
-		f.addInput(CODE, VERIFICATION_CODE_LABEL, getInput());
+		f.addInput(CODE, getInput());
 		f.getField(CODE).addValidator(new TokenFieldValidator(this, user));
 		f.setAutoFocus(CODE);
 	}

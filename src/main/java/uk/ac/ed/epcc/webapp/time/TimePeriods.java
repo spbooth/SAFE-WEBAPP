@@ -314,9 +314,7 @@ public class TimePeriods implements Iterable<TimePeriods.Period>{
 	 * threshold duration is exceeded in the time period.
 	 * returns null if the threshold is not exceeded.
 	 * 
-	 * 
-	 * @param seconds
-	 * @return Date
+	
 	 */
 	public Date getThresholdDate(Duration threshold) {
 		long millis = threshold.getMilliseconds();

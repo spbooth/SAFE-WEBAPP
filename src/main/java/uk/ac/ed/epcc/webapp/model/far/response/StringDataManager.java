@@ -38,10 +38,7 @@ public class StringDataManager<R extends Response<F>,F extends DynamicForm, M ex
 extends ResponseDataManager<M, R, F> {
 
 	private static final String DATA_FIELD="Data";
- 	/**
-	 * @param manager
-	 * @param data_tag
-	 */
+ 	
 	public StringDataManager(ResponseManager<R, F> manager) {
 		super(manager, "StringData");
 	}

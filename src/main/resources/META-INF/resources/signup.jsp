@@ -70,7 +70,7 @@ This is the <%=service_name%> <%=website_name%>.
 <%
 String default_charset = conn.getService(ServletService.class).defaultCharset();
 AppUserFactory<?> person_fac =  session_service.getLoginFactory();
-HTMLCreationForm creator = new HTMLCreationForm("Signup",person_fac.getSignupFormCreator(RegisterServlet.getRealm(conn),conn.getService(ServletService.class).getWebName()));
+HTMLCreationForm creator = new HTMLCreationForm(person_fac.getSignupFormCreator());
 boolean multi = creator.useMultiPart();
 %>
 <div class="block" role="main">

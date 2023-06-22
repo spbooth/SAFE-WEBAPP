@@ -36,7 +36,7 @@ public class MockRandomService extends RandomService {
 	 * @see uk.ac.ed.epcc.webapp.session.RandomService#randomInt(int)
 	 */
 	@Override
-	protected int randomInt(int total_chars) {
+	public int randomInt(int total_chars) {
 		return (i++) % total_chars;
 	}
 	@Override

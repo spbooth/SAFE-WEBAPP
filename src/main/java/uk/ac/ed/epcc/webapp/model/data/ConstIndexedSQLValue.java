@@ -58,6 +58,10 @@ public class ConstIndexedSQLValue<T extends DataObject,I extends DataObject> imp
 	private final AppContext conn;
 	
 	private final IndexedReference<I> val;
+	
+	public IndexedReference<I> getReference(){
+		return val;
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.jdbc.expr.SQLValue#add(java.lang.StringBuilder, boolean)
 	 */

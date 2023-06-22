@@ -20,7 +20,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 /** An input that corresponds to a text box.
  * 
  * @author spb
- * @param <T> 
+ * @param <T> type of input
  *
  */
 public interface LengthInput<T> extends ParseInput<T>{

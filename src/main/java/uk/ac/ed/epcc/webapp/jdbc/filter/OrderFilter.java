@@ -22,7 +22,7 @@ import java.util.List;
  * 
  * @author spb
  *
- * @param <T>
+ * @param <T> type of filter/target
  */
 public interface OrderFilter<T> extends BaseSQLFilter<T> {
 	/**

@@ -1,0 +1,17 @@
+%%begin{Subject}%%
+%%service.name%% A new 2FA recovery token has been created
+%%end{Subject}%%
+Dear %%person.name%%,
+
+A new recovery token has been created for the %%service.name%% %%service.website-name=Web-site%%.
+%%service.saf.url%%
+This replaces any previous recovery tokens you may have generated for your account.
+
+If you did not create this (or request it be created on your behalf) this may
+indicate a compromise of your account. Please contact our helpdesk for assistance
+in recovering access to your account. 
+
+Regards
+
+  The %%service.name%% Team
+

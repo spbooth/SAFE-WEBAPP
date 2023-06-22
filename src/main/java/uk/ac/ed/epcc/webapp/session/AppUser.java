@@ -21,23 +21,15 @@
 package uk.ac.ed.epcc.webapp.session;
 
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.CurrentTimeService;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.content.Table;
-import uk.ac.ed.epcc.webapp.model.IndexTableContributor;
-import uk.ac.ed.epcc.webapp.model.data.Composite;
-import uk.ac.ed.epcc.webapp.model.data.DataObject;
-import uk.ac.ed.epcc.webapp.model.data.Owned;
-import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.model.data.*;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.history.PersonHistoryFactory;
-import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
 
 
 /**
@@ -256,37 +248,6 @@ public class AppUser extends DataObject implements java.security.Principal, Owne
 	}
 
 
-	/**
-	 * 
-	 * return name and SU identity if it exists.
-	 * 
-	 * We need to query the session to do this. This is used when logging
-	 * resource allocations so we can tell the difference between something done
-	 * by a user or and admin SU'd as that user.
-	 * 
-	 * @param req
-	 *            Request object
-	 * @return String
-	 * 
-	 */
-	public String getLogName() {
-		String result = getName();
-		if (logname == null ) {
-			SessionService serv = (SessionService) getContext().getService(SessionService.class);
-			if( serv instanceof ServletSessionService){
-				@SuppressWarnings("unchecked")
-				ServletSessionService<?> sss = (ServletSessionService) serv;
-				if( sss.isSU()){
-					AppUser p = sss.getSuperPerson();
-					logname = "(" + p.getName() + ")";
-				}
-			}
-		}
-		if( logname != null){
-			result = result + logname;
-		}
-		return result;
-	}
 	
 	/**
 	 * 

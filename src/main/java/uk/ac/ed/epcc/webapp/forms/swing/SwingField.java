@@ -620,8 +620,6 @@ public class SwingField<I>  {
 	/**
 	 * Synchronize the GUI components with the value of the Input
 	 * 
-	 * @param c
-	 * @param val
 	 * @throws Exception 
 	 */
 	@SuppressWarnings("unchecked")

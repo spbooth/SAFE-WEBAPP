@@ -52,11 +52,10 @@ public class FilterSelect<T> {
 		}
 	}
 	/**  create the WHERE clause for the filter
-   * 
-   * @param my_filter
-   * @param query
-   * @param qualify
-	 * @throws Exception 
+   * @param tables  set of {@link Repository}s used for the query
+   * @param my_filter the {@link BaseFilter} optional can be null
+   * @param query a {@link StringBuilder} to add where clause to
+   * @param qualify should the field names be qualified with table names
    */
   protected void makeWhere(Set<Repository> tables,BaseFilter<? super T> my_filter,StringBuilder query,boolean qualify){
 	  if( my_filter == null){

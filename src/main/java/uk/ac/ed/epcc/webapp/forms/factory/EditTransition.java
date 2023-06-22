@@ -30,18 +30,18 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * 
  * @author spb
  *
- * @param <X>
+ * @param <X> type of object edited
  */
 public abstract class EditTransition<X> implements
 		ValidatingFormTransition<X> , ExtraContent<X>{
-	private String type_name;
-	public EditTransition(String type_name){
-		this.type_name=type_name;
+	
+	public EditTransition(){
+		
 	}
 	public void buildForm(Form f,X dat, AppContext c) throws TransitionException {
 		EditFormBuilder<X> update = getUpdate(c,dat);
 		try {
-			update.buildUpdateForm(type_name,f, dat,c.getService(SessionService.class));
+			update.buildUpdateForm(f, dat,c.getService(SessionService.class));
 		} catch (Exception e) {
 			update.getContext().getService(LoggerService.class).getLogger(getClass()).error("Error updating object",e);
 			throw new TransitionException("Update failed");

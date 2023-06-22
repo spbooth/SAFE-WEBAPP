@@ -111,7 +111,11 @@ public class RadioButtonInput<V, T> implements ListInput<V, T>, ParseInput<V> {
 		nested.validate();
 
 	}
+	@Override
+	public void validate(V value) throws FieldException {
+		nested.validate(value);
 
+	}
 	@Override
 	public <R> R accept(InputVisitor<R> vis) throws Exception {
 		return vis.visitRadioButtonInput(this);

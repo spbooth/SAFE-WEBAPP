@@ -28,7 +28,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.SQLFilter;
  * 
  * @author spb
  *
- * @param <O>
+ * @param <O> type of SQLValue
  */
 
 

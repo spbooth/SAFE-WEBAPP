@@ -55,6 +55,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.DirectTransition;
@@ -66,20 +67,13 @@ import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.FilterAdd;
 import uk.ac.ed.epcc.webapp.servlet.QRServlet;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
 import uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService;
-import uk.ac.ed.epcc.webapp.session.AppUser;
-import uk.ac.ed.epcc.webapp.session.AppUserFactory;
-import uk.ac.ed.epcc.webapp.session.AppUserKey;
-import uk.ac.ed.epcc.webapp.session.AppUserTransitionContributor;
-import uk.ac.ed.epcc.webapp.session.AppUserTransitionProvider;
-import uk.ac.ed.epcc.webapp.session.CurrentUserKey;
-import uk.ac.ed.epcc.webapp.session.RequiredPage;
-import uk.ac.ed.epcc.webapp.session.RequiredPageProvider;
-import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.session.*;
 
 /**  A {@link FormAuthComposite} that implements time-based authentication codes compatible
  * with google authenticator
@@ -91,13 +85,17 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  *
  */
 public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<A,Integer> implements AppUserTransitionContributor, SummaryContributer<A>, RequiredPageProvider<A>, AnonymisingComposite<A> {
+	private static final int MAX_NORMAL_CODE = 999999;
+	private static final int MAX_RECOVERY_CODE = 99999999;
 	public static final Feature REQUIRED_TWO_FACTOR= new Feature("two_factor.required",false,"Is two factor authentication required");
 	public static final Feature VERIFY_OLD_CODE=new Feature("two_factor.verify_previous_code",true,"Verify current code on key change");
 	private static final String SECRET_FIELD="AuthCodeSecret";
 	private static final String LAST_USED_FIELD="LastAuthCodeUsed";
 	private static final String FAIL_COUNT="AuthCodeFails";
 	public static final String REMOVE_KEY_ROLE="RemoveTwoFactor";
+	public static final String MAKE_RECOVERY_CODE_ROLE="MakeRecoveryCode";
 	public static final String USED_COUNTER_ATTR="UsedCounter";
+	public static final String RECOVERY_FIELD="AuthCodeRecover";
 	
 	public static final Feature NOTIFY_MFA_LOCK = new Feature("mfa.notify-lock",true,"Notify by email if maximum mfa attempts are exceeded");
 
@@ -113,7 +111,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	 * @see uk.ac.ed.epcc.webapp.session.twofactor.CodeAuthComposite#enabled(uk.ac.ed.epcc.webapp.session.AppUser)
 	 */
 	@Override
-	protected boolean enabled(A user) {
+	public boolean enabled(A user) {
 		if( enabled()) {
 			try {
 				return hasKey(user);
@@ -170,8 +168,11 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	 * @param user
 	 */
 	public void clearSecret(A user) {
-		getRecord(user).setProperty(SECRET_FIELD, null);
+		Record record = getRecord(user);
+		record.setProperty(SECRET_FIELD, null);
+		record.setOptionalProperty(RECOVERY_FIELD, null);
 	}
+	
     public Key decodeKey(String enc) {
     	if( enc == null || enc.isEmpty()) {
     		return null;
@@ -184,6 +185,12 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 			return null;
 		}
 		return decodeKey(secret);
+	}
+	public int getRecoveryCode(A user) {
+		return getRecord(user).getIntProperty(RECOVERY_FIELD, -1);
+	}
+	public void setRecoveryCode(A user, int code) {
+		getRecord(user).setProperty(RECOVERY_FIELD, code);
 	}
 	public String getEncodedSecret(Key key) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeySpecException {
 		if( key == null) {
@@ -223,7 +230,11 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	public Input<Integer> getInput() {
 		IntegerInput input = new IntegerInput();
 		input.setMin(0);
-		input.setMax(999999);
+		if(useRecoveryCode()) {
+			input.setMax(MAX_RECOVERY_CODE);
+		}else {
+			input.setMax(MAX_NORMAL_CODE);
+		}
 		input.setBoxWidth(8); // use longer box as many browsers reduce size with added number picker
 		return input;
 	}
@@ -261,6 +272,22 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	@Override
 	public boolean verify(A user,Integer value) {
 		try {
+			int recovery = getRecoveryCode(user);
+			if( recovery > 999999 && value.intValue() > MAX_NORMAL_CODE) {
+				if( recovery == value.intValue() ) {
+					clearSecret(user);
+					user.commit();
+					try {
+						Emailer m = Emailer.getFactory(getContext());
+						m.userNotification(user,"mfa_used_recovery_token.txt");
+					} catch (Exception e) {
+						getLogger().error("Failed to notify of use of recovery token", e);
+					}
+					return true;
+				}else {
+					doFail(user);
+				}
+			}
 			return verify(user,getSecret(user),value);
 		} catch (Exception e) {
 			getLogger().error("Error getting secret", e);
@@ -335,12 +362,15 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	public int getMaxFail() {
 		return getContext().getIntegerParameter("totp.max_fail",100);
 	}
-
+	public boolean useRecoveryCode() {
+		return getRepository().hasField(RECOVERY_FIELD);
+	}
 	@Override
 	public TableSpecification modifyDefaultTableSpecification(TableSpecification spec, String table) {
 		spec.setOptionalField(SECRET_FIELD, new StringFieldType(true, null, 32));
 		spec.setOptionalField(LAST_USED_FIELD, new LongFieldType(true, null));
 		spec.setOptionalField(FAIL_COUNT, new IntegerFieldType(true, 0));
+		spec.setOptionalField(RECOVERY_FIELD, new IntegerFieldType(true, null));
 		return spec;
 	}
 
@@ -349,6 +379,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		suppress.add(SECRET_FIELD);
 		suppress.add(LAST_USED_FIELD);
 		suppress.add(FAIL_COUNT);
+		suppress.add(RECOVERY_FIELD);
 		return suppress;
 	}
 
@@ -482,8 +513,8 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 				}
 				Key key2 = getKey();
 				String enc = getEncodedSecret(key2);
-				f.addInput(KEY, "New key", new ConstantInput<>(enc,enc));
-				f.addInput(NEW_CODE, "Verification code (New key)", getInput());
+				f.addInput(KEY, new ConstantInput<>(enc,enc));
+				f.addInput(NEW_CODE,  getInput());
 				f.getField(NEW_CODE).addValidator(new CodeValidator(key2));
 				if( ! verify ) {
 					// will be single field
@@ -562,6 +593,27 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 			return (op.hasRole(REMOVE_KEY_ROLE) || op.isCurrentPerson(user)) && allowState(user, op);
 		}
 	};
+	public static final AppUserKey RECOVERY = new CurrentUserKey("RecoveryCode","Generate 2 factor recovery code","Generate a two-factor recovery code for this account ?") {
+		
+		@Override
+		public boolean allowState(AppUser user, SessionService op) {
+			if( REQUIRED_TWO_FACTOR.isEnabled(op.getContext())) {
+				// role access allows removal of required key.
+				// user will be forces to set on next login
+				return op.hasRole(MAKE_RECOVERY_CODE_ROLE);
+			}
+			TotpCodeAuthComposite comp = (TotpCodeAuthComposite) op.getLoginFactory().getComposite(FormAuthComposite.class);
+			if( comp == null || ! comp.hasKey(user)) {
+				return false;
+			}
+			return true;
+		}
+
+		@Override
+		public boolean allow(AppUser user, SessionService op) {
+			return (op.hasRole(MAKE_RECOVERY_CODE_ROLE) || op.isCurrentPerson(user)) && allowState(user, op);
+		}
+	};
 	public class DirectClearKeyTransition extends AbstractDirectTransition<A>{
 		/**
 		 * @param prov
@@ -588,6 +640,62 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 		}
 		
 	}
+	public class RecoveryCodeTransition extends AbstractFormTransition<A> implements ExtraContent<A>{
+		private static final int MAX_RECOVERY_CODE = 99999999;
+
+		public RecoveryCodeTransition(AppUserTransitionProvider prov) {
+			super();
+			this.prov = prov;
+		}
+
+		private final AppUserTransitionProvider prov;
+		
+		@Override
+		public void buildForm(Form f, A target, AppContext conn) throws TransitionException {
+			FormAction set = new FormAction() {
+				
+				@Override
+				public FormResult action(Form f) throws ActionException {
+					try {
+						RandomService rand = getContext().getService(RandomService.class);
+						int new_code = rand.randomInt(MAX_RECOVERY_CODE-MAX_NORMAL_CODE-1)+1+MAX_NORMAL_CODE;
+						setRecoveryCode(target, new_code);
+						target.commit();
+						try {
+							Emailer m = Emailer.getFactory(getContext());
+							m.userNotification(target,"mfa_new_recovery_token.txt");
+						} catch (Exception e) {
+							getLogger().error("Failed to notify of new recovery token", e);
+						}
+						return new MessageResult("recovery_token_set", String.format("%08d", new_code));
+					}catch(Exception e) {
+						throw new ActionException("Error making recovery code", e);
+					}
+				}
+			};
+			f.addAction("CreateCode", set);
+			FormAction cancel = new FormAction() {
+				
+				@Override
+				public FormResult action(Form f) throws ActionException {
+					return prov.new ViewResult(target);
+				}
+			};
+			cancel.setMustValidate(false);
+			f.addAction("Cancel", cancel);
+			
+		}
+
+		@Override
+		public <X extends ContentBuilder> X getExtraHtml(X cb, SessionService<?> op, A target) {
+			cb.addText("Do you wish to create a single-use recovery code for this account?");
+			if( getRecoveryCode(target) > MAX_NORMAL_CODE) {
+				cb.addText("This will replace the existing recovery code");
+			}
+			return cb;
+		}
+		
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.session.AppUserTransitionContributor#getTransitions()
 	 */
@@ -598,7 +706,9 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 			
 			map.put(SET_KEY,(Transition<AppUser>) new SetToptTransition(prov));
 			map.put(CLEAR_KEY,new AuthorisedConfirmTransition<AppUser,AppUser>("Disable 2-factor authentication", (DirectTransition<AppUser>) new DirectClearKeyTransition(prov), prov.new ViewTransition(),REMOVE_KEY_ROLE));
-		
+			if( useRecoveryCode()) {
+				map.put(RECOVERY, (Transition<AppUser>) new RecoveryCodeTransition(prov));
+			}
 		}
 		return map;
 	}
@@ -721,7 +831,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 				if( NOTIFY_MFA_LOCK.isEnabled(getContext())) {
 					try {
 						Emailer m = Emailer.getFactory(getContext());
-						m.mfaFailsExceeded(target);
+						m.userNotification(target,"mfa_fails_exceeded.txt");
 					} catch (Exception e) {
 						getLogger().error("Failed to notify of mfa lock", e);
 					}

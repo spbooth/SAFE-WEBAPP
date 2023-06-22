@@ -195,6 +195,13 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		internal.validate();
 	}
 	@Override
+	public void validate(Integer value) throws FieldException {
+		if( value.equals(NULL_VALUE)){
+			return;
+		}
+		internal.validate(value);
+	}
+	@Override
 	public String getString() {
 	    if( internal.getValue() == NULL_VALUE){
 	    	return NULLTAG;
@@ -258,11 +265,8 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		
 	}
 	
-	/** wrap any Selector with a compatible inptu
+	/** wrap any Selector with a compatible input
 	 * 
-	 * @param <T>
-	 * @param s
-	 * @return
 	 */
 	public static  Selector getSelector(Selector s){
 		if( s == null) {

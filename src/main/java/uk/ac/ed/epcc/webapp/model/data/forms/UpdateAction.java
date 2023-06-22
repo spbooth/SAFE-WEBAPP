@@ -46,11 +46,9 @@ public class UpdateAction<BDO extends DataObject> extends FormAction {
  */
 protected final UpdateTemplate<BDO> updater;
 	protected BDO dat;
-    protected String type_name;
-	public UpdateAction(String type_name,UpdateTemplate<BDO> u, BDO dat) {
+	public UpdateAction(UpdateTemplate<BDO> u, BDO dat) {
 		updater = u;
 		this.dat = dat;
-		this.type_name=type_name;
 	}
 
 	@Override
@@ -70,7 +68,7 @@ protected final UpdateTemplate<BDO> updater;
 			
 			postUpdate(dat,f,orig, changed);
 			
-			return updater.getResult(type_name, dat, f);
+			return updater.getResult( dat, f);
 			
 		} catch (Exception e) {
 			throw new ActionException("Update failed", e);

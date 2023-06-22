@@ -11,8 +11,8 @@
 //| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.|
 //| See the License for the specific language governing permissions and     |
 //| limitations under the License.                                          |
-/** A {@link Logger} that wraps a nested logger but also builds 
- * a {@link StringBuffer} representation so the log can be included in 
+/** Logging that wraps a nested logger but also builds 
+ * a string representation so the log can be included in 
  * the output page for on-line debugging.
  * @author spb
  *

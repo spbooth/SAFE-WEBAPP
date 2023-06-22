@@ -11,6 +11,8 @@
 <%--| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. |--%>
 <%--| See the License for the specific language governing permissions and      |--%>
 <%--| limitations under the License.                                           |--%>
+<%@page import="uk.ac.ed.epcc.webapp.servlet.DefaultServletService"%>
+<%@page import="uk.ac.ed.epcc.webapp.servlet.RemoteAuthServlet"%>
 <%@ page session="false"%>
 <%-- 
   login.jsp - The main login page for service users are directed here when not authenticated
@@ -35,6 +37,7 @@
 <%@ page import="uk.ac.ed.epcc.webapp.content.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.logging.*" %>
 <%@ page import="uk.ac.ed.epcc.webapp.Feature" %>
+<%@page import="uk.ac.ed.epcc.webapp.tags.WebappHeadTag"%>
 <%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
 <wb:ServiceInit/>
 <%
@@ -52,7 +55,7 @@
 %>
 <%
     SessionService<?> serv = conn.getService(SessionService.class);
-	if( serv == null ){
+	if( serv == null || ! LoginServlet.BUILT_IN_LOGIN.isEnabled(conn) ){
 %>
 <jsp:forward page="/messages.jsp">
 <jsp:param name="message_type" value="internal_error"/>
@@ -80,6 +83,14 @@
 		return;
 	}
 	log.debug("Showing login page");
+	for(String name : conn.getInitParameter("login-page.login-content","").split(",") ){
+		if( name.trim().length() > 0 ){
+			ScriptUIGenerator content = conn.makeObjectWithDefault(ScriptUIGenerator.class,null,name.trim());
+			if(content != null ){
+				WebappHeadTag.addScript(conn,request,content.getScript());
+			}
+		}
+	}
 	String page_title = service_name+" "+website_name+" Login";
 %>
 <%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
@@ -91,7 +102,7 @@
 <%
     PasswordAuthComposite password_auth = fac.getComposite(PasswordAuthComposite.class);
     boolean use_reset_page = LoginServlet.RESET_PASSWORD_PAGE.isEnabled(conn);
-	if( password_auth == null ){
+	if( password_auth == null && (DefaultServletService.EXTERNAL_AUTH_ONLY_FEATURE.isEnabled(conn) || DefaultServletService.ALLOW_EXTERNAL_AUTH_FEATURE.isEnabled(conn))){
       String webname = conn.getService(ServletService.class).getWebName(); 
       if( webname==null || webname.trim().length() == 0  ){ %>
 <div class="block">
@@ -115,7 +126,7 @@ This service is only available to pre-registered users.
 <p> Please fill in this form to register with this service</p>
 </div>
 <%
-     HTMLCreationForm person_form = new HTMLCreationForm("Person",fac.getSignupFormCreator(RegisterServlet.getRealm(conn),webname));
+     HTMLCreationForm person_form = new HTMLCreationForm(fac.getSignupFormCreator());
 %>
 <wb:FormContext />
 <div class="block">
@@ -131,7 +142,7 @@ This service is only available to pre-registered users.
 
 <% }
    }else{ 
-      // offer password based login   
+      // offer password or link based login   
 %>
 <div class="block" role="main">
 <h1><%=page_title %></h1>
@@ -148,6 +159,7 @@ This service is only available to pre-registered users.
 <h3>Database error</h3>
 <p><b>please try again later</b></p>
 <% } %>
+<div id="additional-login">
 <% 
 for(String name : conn.getInitParameter("login-page.login-content","").split(",") ){
 	if( name.trim().length() > 0 ){
@@ -163,7 +175,10 @@ for(String name : conn.getInitParameter("login-page.login-content","").split(","
 		}
 	}
 }
-
+%>
+</div>
+<% 
+if( password_auth != null){
 %>
 <form method="post" action="<%=web_path%>/LoginServlet">
    <table class="form">
@@ -195,7 +210,9 @@ for(String name : conn.getInitParameter("login-page.login-content","").split(","
 
 <% if( RegisterServlet.ALLOW_SIGNUPS.isEnabled(conn)){ %>
 <a title='Go to registration/signup page' href='<%= web_path%>/signup.jsp'>Create an account</a>
-<% } %>
+<% } 
+}
+%>
 <p>
 <small><small>As part of its normal functioning when you log in the <%=website_name %> will install a temporary session cookie that will be removed when you log off or close your browser. If you do not wish this cookie 
 to be set, disable cookies in your browser settings.</small></small>

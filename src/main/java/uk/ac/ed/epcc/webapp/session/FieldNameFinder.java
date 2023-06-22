@@ -42,6 +42,7 @@ import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
  * <li> <em><b>NameFinder.</b>realm<b>.user_supplied</b></em> Is name user supplied default false</li> 
  * <li> <em><b>NameFinder.</b>realm<b>.user_visible</b></em> Is name user visible default as <b>user_supplied</b></li> 
  * <li> <em><b>NameFinder.</b>realm<b>.length</b></em> field width.</li> 
+ * </ul>
  * @author spb
  *
  */
@@ -76,7 +77,7 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	/** If there are varient forms of the names this normalises the name to the form stored in the database
 	 * 
 	 * @param name
-	 * @return
+	 * @return normalised name
 	 */
 	protected String normalizeName(String name){
 		return name;
@@ -124,7 +125,7 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 
 	/** default filed length when creating table.
 	 * 
-	 * @return
+	 * @return length
 	 */
 	protected int defaultFieldLength() {
 		return 128;
@@ -157,7 +158,7 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 
 	/** Does the user get to choose this name
 	 * 
-	 * @return
+	 * @return boolean
 	 */
 	protected boolean userSet() {
 		return getContext().getBooleanParameter(PROPERTY_PREFIX+getRealm()+".user_supplied", false);
@@ -196,7 +197,7 @@ public class FieldNameFinder<AU extends AppUser, F extends FieldNameFinder> exte
 	/**
 	 * @return the field
 	 */
-	private String getField() {
+	protected String getField() {
 		return getContext().getInitParameter(PROPERTY_PREFIX+getRealm()+".field", getRealm());
 	}
 

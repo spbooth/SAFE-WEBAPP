@@ -44,8 +44,7 @@ public class ValueFilter<BDO extends DataObject> extends SQLValueFilter<BDO> {
 	}
 
 	/**
-	 * @param target
-	 * @param res
+	 * @param fac
 	 * @param field
 	 * @param peer
 	 * @param negate
@@ -56,8 +55,7 @@ public class ValueFilter<BDO extends DataObject> extends SQLValueFilter<BDO> {
 	}
 
 	/**
-	 * @param target
-	 * @param res
+	 * @param fac
 	 * @param field
 	 * @param peer
 	 */

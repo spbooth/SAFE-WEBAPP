@@ -17,18 +17,14 @@
 package uk.ac.ed.epcc.webapp.model.data;
 
 import java.sql.Types;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
+import uk.ac.ed.epcc.webapp.forms.factory.FormBuilder;
 import uk.ac.ed.epcc.webapp.forms.factory.FormFactory;
 import uk.ac.ed.epcc.webapp.forms.inputs.BooleanInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.DateInput;
@@ -43,14 +39,15 @@ import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TimeStampInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.convert.TypeProducer;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.registry.IndexedFormEntry;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 /** Base class for Forms based on DataObject fields such as create/update forms.
  * This class is intended to hold code common to both create and update forms which can 
  * customise their behaviour by overriding the various methods.
@@ -68,30 +65,12 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  *
  * @param <BDO>
  */
-public  abstract class DataObjectFormFactory<BDO extends DataObject> implements FormFactory, IndexedProducer<BDO>{
-   public static final String FORM_LABEL_PREFIX = "form.label.";
-
-
-public static final Feature DEFAULT_FORBID_HTML = new Feature("form_factory.default_forbid_html_text",true,"Forbid HTML in auto generated text inputs for database fields");
-
-
-protected final DataObjectFactory<BDO> factory;
-
-
+public  abstract class DataObjectFormFactory<BDO extends DataObject> extends DataObjectLabeller<BDO> implements FormFactory, FormBuilder, IndexedProducer<BDO>{
+   public static final Feature DEFAULT_FORBID_HTML = new Feature("form_factory.default_forbid_html_text",true,"Forbid HTML in auto generated text inputs for database fields");
+   public static final Feature DEFER_CONTENT = new Feature("form_factory.defer_content",true,"Defer form label generation till needed.");
 
 protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
-	   assert( fac != null );
-	   factory=fac;
-   }
-   @Override
-public final AppContext getContext(){
-	   return factory.getContext();
-   }
-   public final DataObjectFactory<BDO> getFactory() {
-		return factory;
-	}
-   protected final Logger getLogger(){
-	   return factory.getContext().getService(LoggerService.class).getLogger(getClass());
+	 super(fac);
    }
    /**
 	 * builds a default Form for editing the DataObjects belonging to this
@@ -100,17 +79,20 @@ public final AppContext getContext(){
 	 * @param f
 	 *            Form to build
 	 * @throws DataFault
- * @throws TransitionException 
 	 */
 	public final boolean buildForm(Form f) throws DataFault{
 		return buildForm(f,null);
 	}
-
+	@Override
 	public final boolean buildForm(Form f,HashMap fixtures) throws DataFault{
-		boolean complete = buildForm(getContext(), factory.res,getFields(),f,getOptional(),getSelectors(),getFieldConstraints(),getTranslations(),getFieldHelp(),fixtures);
-		customiseForm(f);
-		f.setContents(getDefaults());
-		return complete;
+		try(TimeClosable build = new TimeClosable(getContext(), "buildForm")){
+			f.setFormTextGenerator(this);
+			boolean defer = DEFER_CONTENT.isEnabled(getContext());
+			boolean complete = buildForm(getContext(), factory.res,getFields(),f,getOptional(), getSelectors(),getFieldConstraints(),defer ? null :getTranslations(),defer ? null :getFieldHelp(),fixtures);
+			customiseForm(f);
+			f.setContents(getDefaults());
+			return complete;
+		}
 	}
 	public static final boolean buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
 			Set<String> optional, Map<String,Selector> selectors,Map<String,String> labels) throws DataFault {
@@ -133,7 +115,7 @@ public final AppContext getContext(){
 	 * @param labels
 	 * 	          Map of field names to form labels
 	 * @throws DataFault
-	 * @throws TransitionException 
+	
 	 */
 	public static final boolean buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
 			Set<String> optional, Map<String,Selector> selectors,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips) throws DataFault {
@@ -151,8 +133,6 @@ public final AppContext getContext(){
 	 * 
 	 * @param f
 	 *            Form to build
-	 * @param supress_fields
-	 *            Vector of fields to supress in the form
 	 * @param optional
 	 *            Vector marking fields as optional
 	 * @param selectors
@@ -162,13 +142,11 @@ public final AppContext getContext(){
 	 * @param tooltips 
 	 * 			  Map of tooltip/help text for form labels
 	 * @throws DataFault
-	 * @throws TransitionException 
 	 */
-	public static final boolean buildForm(AppContext conn, Repository res, Set<String> keys, Form f, 
+	public static boolean buildForm(AppContext conn,Repository res, Set<String> keys, Form f, 
 				Set<String> optional, Map<String,Selector> selectors,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips,HashMap fixtures) throws DataFault {
 		//
 		String table = res.getTag();
-		
 		boolean support_multi_stage = f.supportsMultiStage();
 		if( fixtures == null && constraints != null ) {
 			fixtures = new HashMap();
@@ -256,23 +234,41 @@ public final AppContext getContext(){
 							}
 						}
 					}
-					String lab = name;
-					if (labels != null && labels.containsKey(name)) {
-						lab = labels.get(name);
-					}else{
-						lab = conn.getInitParameter(FORM_LABEL_PREFIX+table+"."+name,name);
+					String lab = null;
+					if (labels != null ) {
+						if( labels.containsKey(name)) {
+
+							lab = labels.get(name);
+						}else{
+							// This is a fall-back that should only be invoked if the static methods
+							// are called by an external class
+							// a null labels param turns this off as it implied label generation is deferred
+							lab = getTranslationFromConfig(conn,conn.getService(MessageBundleService.class).getBundle("form_content"),table, name);
+						}
 					}
 					String tooltip=null;
-					if( tooltips != null && tooltips.containsKey(name)) {
-						tooltip = tooltips.get(name);
-					}else {
-						tooltip = conn.getInitParameter("form.tooltip."+table+"."+name);
+					if( tooltips != null ) {
+						if( tooltips.containsKey(name)) {
+
+							tooltip = tooltips.get(name);
+						}else {
+							// This is a fall-back that should only be invoked if the static methods
+							// are called by an external class
+							// a null tooltips param turns this off as it implied label generation is deferred
+							tooltip = getHelpTextFromConfig(conn,conn.getService(MessageBundleService.class).getBundle("form_content"),table, name);
+						}
 					}
 					f.addInput(name, lab,tooltip, input).setOptional(is_optional);
-					if( f.isFixed(name) && fixtures != null) {
-						// pre-emptive copy to fixtures
-						f.getField(name).lock();
-						fixtures.put(name,f.get(name));
+					if( fixtures != null ) {
+						if( f.isFixed(name) ) {
+							// pre-emptive copy of fixed value to fixtures
+							f.getField(name).lock();
+							fixtures.put(name,f.get(name));
+						}else if ( fixtures.containsKey(name)) {
+							// externally supplied fixture 
+							f.put(name, fixtures.get(name));
+							f.getField(name).lock();
+						}
 					}
 					it.remove(); // field has been processed
 				}
@@ -433,38 +429,6 @@ public final AppContext getContext(){
 		return sel;
 		
 	}
-	/** Add default translations for reference fields using the table name in
-	 * preference to the field name.
-	 * 
-	 * @param conn
-	 * @param trans
-	 * @param res
-	 * @return Map of translations
-	 */
-	public static Map<String,String> addTranslations(AppContext conn,Map<String,String> trans,Repository res){
-		if( trans == null ){
-			trans = new HashMap<>();
-		}
-		for(String field : res.getFields()){
-			if( ! trans.containsKey(field)){
-				Repository.FieldInfo info = res.getInfo(field);
-				String ref_table = info.getReferencedTable();
-				if( ref_table != null ){
-					if( trans.get(field)==null){
-						trans.put(field,ref_table);
-					}
-				}
-				
-			}
-			// allow config to override.
-			String override=conn.getInitParameter(FORM_LABEL_PREFIX+res.getTag()+"."+field);
-			if( override != null){
-				trans.put(field, override);
-			}
-		}
-		return trans;
-		
-	}
 	/**
 	 * Extension hook to allow additional Form customisation generic to all
 	 * types of Form For example adding a FormValidator or adding min, max
@@ -525,37 +489,6 @@ public final AppContext getContext(){
 		}
 		return result;
 	}
-	/**
-	 * return a default set of translation between field names and text labels.
-	 * 
-	 * @return Map
-	 */
-	protected  Map<String,String> getTranslations() {
-		Map<String, String> translations = factory.getTranslations();
-		if( translations == null){
-			translations=new HashMap<>();
-		}
-		for(TableStructureContributer c : factory.getTableStructureContributers()){
-			translations=c.addTranslations(translations);
-		}
-		return addTranslations(getContext(),translations,factory.res);
-	}
-	/** create additional tooltip help text for form fields.
-	 * 
-	 * @return
-	 */
-	protected  Map<String,String> getFieldHelp() {
-		Map<String, String> help = factory.getFieldHelp();
-		if( help == null){
-			help=new HashMap<>();
-		}
-		for(TableStructureContributer c : factory.getTableStructureContributers()){
-			Map mod = c.addFieldHelp(help);
-			assert(mod != null);
-		}
-		return help;
-	}
-	
 	/**
 	 * Generate the set of optional fields to be used in form creation/update
 	 * default behaviour is to take the set defined by the factory

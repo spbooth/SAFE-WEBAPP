@@ -27,10 +27,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
-import uk.ac.ed.epcc.webapp.forms.result.ConfirmTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 //import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataException;
 import uk.ac.ed.epcc.webapp.servlet.ServletService;
@@ -51,11 +48,10 @@ public class HTMLCreationForm {
 	private HTMLForm form = null;
 
 	private boolean use_multipart = false;
-	private String type_name;
 
-	public HTMLCreationForm(String type_name,FormCreator c) {
+
+	public HTMLCreationForm(FormCreator c) {
 		creator = c;
-		this.type_name=type_name;
 	}
 
 	public HTMLForm getForm() {
@@ -63,7 +59,7 @@ public class HTMLCreationForm {
 			return form;
 		form = new HTMLForm( creator.getContext());
 		try {
-			creator.buildCreationForm(type_name,form);
+			creator.buildCreationForm(form);
 		} catch (Exception e) {
 			creator.getContext().error(e, "Error building Form");
 		}

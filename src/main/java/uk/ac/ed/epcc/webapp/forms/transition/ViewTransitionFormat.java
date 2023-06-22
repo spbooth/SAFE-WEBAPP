@@ -22,8 +22,8 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * The object can be either the transition target type or an {@link IndexedReference} to that type.
  * @author spb
  *
- * @param <K>
- * @param <T>
+ * @param <K> type of transition key
+ * @param <T> type of transition target
  */
 
 

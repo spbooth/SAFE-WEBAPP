@@ -24,20 +24,10 @@ package uk.ac.ed.epcc.webapp;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeMap;
 
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.DefaultConfigService;
@@ -127,34 +117,34 @@ TargetType t = conn.makeObject(TargetType.class,"tag-name");
  *  by different tag-names. Factory classes that correspond to different database tables often follow this pattern, using the table name as the tag.
  *  If a class implements the {@link Tagged} interface the value returned by the {@link Tagged#getTag()} method should be the same
  *  as the tag used to construct the object.
- * <p>
  * 
  * 
- * <p>
+ * 
+ * 
  *<h3>Configuration parameters</h3>
  *The AppContext provides mechanisms for retrieving configuration parameters. e.g.
- *<code>
  *<pre>
+ *<code>
    AppContext c;
    String param1 = c.getInitParameter("param1");
    String param2 = c.getInitParameter("param2","Default value");
    int int_param = c.getIntegerParameter("param3",13); // default to 13
- * </pre>
  * </code>
+ * </pre>
  * These methods use an underlying {@link ConfigService}.
  * 
  
  *<h3>Error reporting</h3>
  * The AppContext provides error reporting methods
- * <code>
-<pre>
+ * <pre>
+<code>
   try{
     ....
   }catch(Exception e){
     c.error(e,"An error occurred");
   }
- </pre> 
- * </code>
+ </code> 
+ * </pre>
  * These are forwarded onto an underlying {@link LoggerService} if one is available but converts the error to a fatal error otherwise.
  * Normally it is better to use a {@link Logger} specific to 
  * the class where the exception is caught unless reporting error from within a {@link AppContextService}.
@@ -692,8 +682,23 @@ public final class AppContext {
 		}
 		return res;
 	}
+   
 
-
+    public Date getDateParameter(String name, Date def) {
+    	String param = getInitParameter(name);
+    	if( param == null || param.isEmpty()) {
+    		return def;
+    	}
+    	Date res = def;
+    	try {
+    		// local as not thread safe
+    		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    		res = df.parse(param);
+    	}catch(Exception e) {
+    		error(e,"badly formatted parameter "+name+" value ["+param+"]");
+    	}
+    	return res;
+    }
 	/**
 	 * return a copy of the Service properties associated with the AppContext
 	 * 

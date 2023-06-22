@@ -19,7 +19,7 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
-/** A concrete example of a {@link TableStructureDataObjectFactory} for testing.
+/** A concrete example of a factory for testing table structure functionality
  * @author spb
  *
  */

@@ -15,8 +15,8 @@
  * Copyright (c) - The University of Edinburgh 2010
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
+import java.util.Date;
 
-import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 /** A text input for {@link Date}s on day boundaries-
  * 

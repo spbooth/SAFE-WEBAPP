@@ -258,7 +258,6 @@ public abstract class SQLResultIterator<T,O> extends FilterReader<T,O> implement
 		}
 
 		/** close the underlying statement etc. to free resources
-		 * @throws SQLException 
 		 * 
 		 */
 		@Override

@@ -25,8 +25,8 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 
 public class FormCreatorTransition<X> extends CreatorTransition<X> implements ExtraContent<X>{
     private final FormCreator creator;
-    public FormCreatorTransition(String type_name,FormCreator creator){
-    	super(type_name);
+    public FormCreatorTransition(FormCreator creator){
+    	super();
     	assert(creator != null);
     	this.creator=creator;
     }

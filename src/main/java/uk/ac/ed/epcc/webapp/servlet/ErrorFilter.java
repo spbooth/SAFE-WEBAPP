@@ -276,7 +276,6 @@ public class ErrorFilter implements Filter {
 				
 				
 				if( interactive && CLEANUP_THREAD_FEATURE.isEnabled(conn) && cleanup != null && cleanup.hasActions()){
-					conn.clearService(CleanupService.class);
 					// request no longer valid so make sure its not available
 					// the ServletEmailLoggerService should cope is no service returned
 					conn.clearService(ServletService.class);

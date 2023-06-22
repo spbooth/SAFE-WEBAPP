@@ -31,13 +31,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.SerializableFormResult;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.session.AppUser;
-import uk.ac.ed.epcc.webapp.session.AppUserFactory;
-import uk.ac.ed.epcc.webapp.session.AppUserNameFinder;
-import uk.ac.ed.epcc.webapp.session.Hash;
-import uk.ac.ed.epcc.webapp.session.RandomService;
-import uk.ac.ed.epcc.webapp.session.SessionService;
-import uk.ac.ed.epcc.webapp.session.WebNameFinder;
+import uk.ac.ed.epcc.webapp.session.*;
 import uk.ac.ed.epcc.webapp.session.twofactor.TwoFactorHandler;
 
 /**
@@ -62,7 +56,7 @@ import uk.ac.ed.epcc.webapp.session.twofactor.TwoFactorHandler;
  *<ul>
  *<li><b>remote_auth_server.url</b> A URL of a remote server the user will be redirected to. </li>
  *<li><b>remote_auth_server.secret</b> The shared secret.</li>
- *<li><b>remote_auth_server.hash</b> The name of the {@link Hash} to use defaults to SHA512</i>
+ *<li><b>remote_auth_server.hash</b> The name of the {@link Hash} to use defaults to SHA512</li>
  *<li><b>remote_auth_server.token_len</b> The length of the session token defaults to 64 </li>
  *</ul>
  *
@@ -73,16 +67,19 @@ import uk.ac.ed.epcc.webapp.session.twofactor.TwoFactorHandler;
 
 public class RemoteAuthServlet extends WebappServlet {
 
+	/** prefix for a session attribute (sufficed by the realm name) giving an
+	 * authenticated remote identity in a given realm. 
+	 * This is used for sucessful athentication that don't match a known user
+	 * to allow automatic linking e.g. if the user registers from the same session
+	 * 
+	 */
+	public static final String REMOTE_AUTH_NAME_PREFIX = "remote_auth_name.";
+
+
 	/**
 	 * 
 	 */
 	private static final String REMOTE_AUTH_ALLOW_LOGIN_PREFIX = "remote_auth.allow_login.";
-
-
-	/**
-	 * 
-	 */
-	private static final String EXTAUTH_REGISTER_ID_ATTR = "EXTAUTH_REGISTER_ID_ATTR";
 
 
 	/**
@@ -208,6 +205,11 @@ public class RemoteAuthServlet extends WebappServlet {
 			if (person == null) {
 				person = parser.findFromString(web_name);
 				if (person == null) {
+						if( allow_login) {
+							// Save the web-name for this realm. We may be able to add this
+							// if the user registers or logs in later in this session
+							session_service.setAttribute(REMOTE_AUTH_NAME_PREFIX+remote_auth_realm, web_name); 
+						}
 						String register_text = session_service.getContext().getInitParameter(SERVICE_WEB_LOGIN_UPDATE_TEXT,REGISTER_IDENTITY_DEFAULT_TEXT);
 						message(conn, req, res, "unknown_web_login", register_text);
 						return;
@@ -305,30 +307,7 @@ public class RemoteAuthServlet extends WebappServlet {
 		return (SerializableFormResult) session_service.getAttribute(REMOTE_AUTH_NEXT_URL);
 	}
 
-	/** Set the user that should be registered (and logged in) if the
-	 * external authentication succeeds. This is for when a user registers
-	 * and id given an opportunity to bind an existing id. If the binding succeeds the
-	 * user has a proven id (even though the email is not verified) and can be logged in
-	 * if the external auth succeeds.
-	 * 
-	 * If the session already contains a user this user must match the
-	 * supplied arguement.
-	 * 
-	 * @param conn
-	 * @param user
-	 * @return true if binding should be offered.
-	 */
-    public static boolean registerNewUser(AppContext conn, AppUser user){
-    	SessionService sess = conn.getService(SessionService.class);
-    	if( sess.haveCurrentUser()){
-    		return sess.isCurrentPerson(user);
-    	}else{
-    		sess.setAttribute(EXTAUTH_REGISTER_ID_ATTR, user.getID());
-    		return true;
-    	}
-    }
-    
-    /** Test if the bind external id should be offered 
+	/** Test if the bind external id should be offered 
      * ie is there an existing session user or a stored newly registered user.
      * 
      * @param conn
@@ -340,21 +319,30 @@ public class RemoteAuthServlet extends WebappServlet {
     			sess != null && 
     			( 
     			sess.haveCurrentUser() || 
-    			sess.getAttribute(EXTAUTH_REGISTER_ID_ATTR) != null
+    			sess.getAttribute(AppUserFactory.EXTAUTH_REGISTER_ID_ATTR) != null
     			);
     }
     
     public static boolean canLogin(AppContext conn, String realm) {
     	return conn.getBooleanParameter(REMOTE_AUTH_ALLOW_LOGIN_PREFIX+realm, true);
     }
+    /** Get the {@link AppUser} to link identities to.
+     * This is either the current logged in user or a saved
+     * id from a user registration in the same session
+     * 
+     * @param <A>
+     * @param sess
+     * @return
+     */
     private <A extends AppUser> A getTargetAppUser(SessionService<A> sess){
    
     	A person = sess.getCurrentPerson();
     	if( person != null ){
     		return person;
     	}
-    	Integer register_id = (Integer) sess.getAttribute(EXTAUTH_REGISTER_ID_ATTR);
+    	Integer register_id = (Integer) sess.getAttribute(AppUserFactory.EXTAUTH_REGISTER_ID_ATTR);
     	if( register_id != null){
+    		sess.removeAttribute(AppUserFactory.EXTAUTH_REGISTER_ID_ATTR);
     		A user = sess.getLoginFactory().find(register_id);
     		// Log the user in if no two factor required
     		// otherwise we will still link the ID but not auto login.

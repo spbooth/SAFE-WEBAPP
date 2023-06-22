@@ -101,11 +101,7 @@ public class AddDataTransitionProvider extends SimpleViewTransitionProvider<Test
 		
 	}
 	
-	/**
-	 * @param c
-	 * @param fac
-	 * @param target_name
-	 */
+	
 	public AddDataTransitionProvider(AppContext c,  String target_name) {
 		super(c, new TestFactory(c), target_name);
 		addTransition(ADD, new AddTransition());

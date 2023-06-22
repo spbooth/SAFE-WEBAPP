@@ -32,7 +32,6 @@ public abstract class PersonalDataComposite<AU extends AppUser,X extends Persona
 	/** Add the set of form fields that should be suppressed if the
 	 * characteristic is not requested
 	 * 
-	 * @return
 	 */
 	public abstract void  addFields(Set<String> fields);
 	/** Get the set of form fields that should be suppressed if the

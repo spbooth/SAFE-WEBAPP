@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.Contexed;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -40,37 +41,39 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * You <i>can</i> create the composite during field initialisation. If you do this you <em>MUST</em>
  * call the setContext method from the constructor body in the same class not recurse to the superclass constructor that calls setContext.
  * This is because superclass constructors run before field initialisation but local constructor bodies run afterwards.
- * 
+ * </p>
  * <p>
  * {@link Composite}s that have a <b>public</b> constructor that takes the 
  * {@link DataObjectFactory} as the argument (optionally followed by a String), can be added to a factory 
  * by setting a (comma separated) list of classdef or property class names in the parameter <em>factory-tag</em><b>.composites</b>
  * and these will be added in the {@link DataObjectFactory#setContext(uk.ac.ed.epcc.webapp.AppContext, String)} method and can therefore 
  * modify the table specification. If the constructor takes the String parameter the construction tag of the <b>composite</b> will be passed. 
+ * </p>
  * <p>
- * The areas that {@link Composite}s can customise can be extended by having a factory check all composites for specific interfaces for example
- * {@link TableStructureDataObjectFactory} checks the composites for {@link TransitionSource}
+ * The areas that {@link Composite}s can customise can be extended by having a factory check all composites for specific interfaces 
  * If you find yourself testing for the existence of multiple composites at the same location consider extracting an interface for
  * that all the contributing composites can implement. 
+ * </p>
  * <p>
  * Each {@link Composite} provides a type {@link Class} that it is registered under. It should itself be assignable to that type. A factory cannot contain two {@link Composite}s registered under the same class.
  * Any functionality that should only be included once (but has many implementations) should use the same registration class (which should be an interface or abstract supertype representing the operation)
  * and can be retrieved by the registration type. Otherwise composites usually register under their own type. This does mean that if you want to add several copies of the same composite you need to introduce 
  * trivial sub-classes.
+ * </p>
  * <p>
  * Composites augment a {@link DataObjectFactory} so it is easiest to add behaviour to the factory rather than the {@link DataObject}.
  * To add behaviour to {@link DataObject} is easier if the object is an inner class or contains a reference to its factory.
  * You can also introduce additional handler classes that wrap the repository these can have the same relation to the {@link Composite}
  * as {@link DataObject} has to the {@link DataObjectFactory}.
- * <b>
+ * </p>
  * 
  * @author spb
  * @param <BDO> target type
- * @Param <X> type the {@link Composite} is registered under.
+ * @param <X> type the {@link Composite} is registered under.
  */
 @SuppressWarnings("javadoc")
 
-public abstract class Composite<BDO extends DataObject, X > implements Contexed, TableStructureContributer<BDO> {
+public abstract class Composite<BDO extends DataObject, X > implements Contexed, TableStructureContributer<BDO>{
 
 	protected final DataObjectFactory<BDO> fac;
 	protected Composite(DataObjectFactory<BDO> fac){
@@ -116,10 +119,7 @@ public abstract class Composite<BDO extends DataObject, X > implements Contexed,
 		return translations;
 	}
 	
-	@Override
-	public Map<String, String> addFieldHelp(Map<String, String> help) {
-		return help;
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.TableStructureContributer#addSelectors(java.util.Map)
 	 */
@@ -219,5 +219,14 @@ public abstract class Composite<BDO extends DataObject, X > implements Contexed,
 	 */
 	public String toString(){
 		return getClass().getSimpleName();
+	}
+	
+	/** Convert a BDO {@link BaseFilter} into a {@link BaseFilter} on a referenced factory.
+	 * 
+	 * @param fil
+	 * @return
+	 */
+	protected <T extends DataObject> BaseFilter<T> convertToDestinationFilter(DataObjectFactory<T> remote_fac, String link_field,BaseFilter<BDO> fil){
+		return getFactory().convertToDestinationFilter(remote_fac, link_field, fil);
 	}
 }

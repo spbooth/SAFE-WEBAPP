@@ -36,7 +36,8 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
  * 
  * @author spb
  *
- * @param <T>
+ * @param <T> type of expression
+ * @param <D> type of input expression
  */
 public class FuncExpression<T,D> implements SQLExpression<T> {
 	
@@ -127,6 +128,7 @@ public class FuncExpression<T,D> implements SQLExpression<T> {
 		switch(func) {
 		case AVG: 
 		case FLOOR:
+		case CEILING:
 		case COUNT:
 			return (T) rs.getObject(pos);
 		default:

@@ -41,11 +41,10 @@ public interface FormCreator extends FormFactory {
 	/**
 	 * build a form to create an object. This should include Action Buttons that
 	 * actually create the object
-	 * @param type_name NAme of target type as presented to user
 	 * 
 	 * @param f
 	 * @throws Exception 
 	 */
-	public void buildCreationForm(String type_name,Form f) throws Exception;
+	public void buildCreationForm(Form f) throws Exception;
 	
 }

@@ -43,10 +43,7 @@ public abstract class PrefixVisitor<M extends TextMailBuilder> extends AbstractV
 	}
 	static final String base_prefix=">";
 	protected String seperator="\n\n-----------------------------------------\n";
-	/** add text to the current content
-	 * 
-	 * @param text
-	 */
+	
 	protected abstract M getMailBuilder();
 	
 	protected void setPart(MessageWalker w, MimeBodyPart p){

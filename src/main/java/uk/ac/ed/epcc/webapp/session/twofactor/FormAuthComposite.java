@@ -72,7 +72,7 @@ public abstract class FormAuthComposite<AU extends AppUser> extends AppUserCompo
 		
 	}
 	
-	protected abstract boolean enabled(AU user);
+	public abstract boolean enabled(AU user);
 	
 	/** Add two factor fields to a form.
 	 * The added fields should not validate unless the correct authentication is applied
@@ -112,7 +112,6 @@ public abstract class FormAuthComposite<AU extends AppUser> extends AppUserCompo
 
 	/** action to perform when authentication completed
 	 * 
-	 * @param ok was it a successful authentication.
 	 */
 	public void authenticated() {
 		Logger logger = getLogger();

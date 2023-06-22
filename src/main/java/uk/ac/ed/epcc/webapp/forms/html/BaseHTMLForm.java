@@ -197,7 +197,6 @@ public abstract class BaseHTMLForm extends MapForm {
 	 * @param errors
 	 * @param post_params
 	 * @return string HTML fragment
-	 * @throws Exception 
 	 * 
 	 */
 	protected String getHtmlFieldTable(Collection<String> missing_fields, Map<String,String> errors,

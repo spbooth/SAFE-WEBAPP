@@ -770,7 +770,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 	 * method to call when from selector code normally the same as getLink but
 	 * may need to be overridden to automatically create objects (beware of
 	 * unwanted side effects in this case). Ususally want to Override
-	 * {@link #canCreate(uk.ac.ed.epcc.webapp.SessionService)} in that case.
+	 * {@link #canCreate(uk.ac.ed.epcc.webapp.session.SessionService)} in that case.
 	 * 
 	 * @param left_end
 	 * @param right_end

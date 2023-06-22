@@ -18,8 +18,8 @@ import java.util.Iterator;
 /**
  * @author Stephen Booth
  *
- * @param <V>
- * @param <T>
+  * @param <V> type of value object
+ * @param <T> type of Item object
  */
 public abstract class ListInputWrapper<V, T> extends WrappingInput<V> implements ListInput<V,T>{
 

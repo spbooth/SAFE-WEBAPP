@@ -71,16 +71,15 @@ public class MapForm extends BaseForm {
 	 * error display we re-parse the params to initialise the state of the
 	 * correct fields.
 	 * 
-	 * @param errors
+	 * @param errors A {@link Map} or errors keyed by field or {@link #GENERAL_ERROR}
 	 * @param params
 	 *            These may be Strings from POST parameters or objects from
 	 *            default values
 	 * @param skip_null skip null inputs if true.
 	 * @return boolean true if all OK
-	 * @throws FieldException
 	 * 
 	 */
-	protected boolean parsePost(Map<String,String> errors, Map<String,Object> params,boolean skip_null) {
+	public boolean parsePost(Map<String,String> errors, Map<String,Object> params,boolean skip_null) {
 		boolean ok = true;
 		for (Iterator<String> it = getFieldIterator(); it.hasNext();) {
 			String key = it.next();

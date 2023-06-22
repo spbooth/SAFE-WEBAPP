@@ -130,21 +130,10 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 		return spec;
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#addTranslations(java.util.Map)
-	 */
-	@Override
-	public Map<String, String> addTranslations(Map<String, String> translations) {
-		for(String name : names) {
-			String label = getLabel(name);
-			if( label != null) {
-				translations.put(name, label);
-			}
-		}
-		return translations;
-	}
+	
 
 	private String getLabel(String name) {
+		// compatible with DataObjectFormFactory
 		return getContext().getInitParameter(getFactory().getConfigTag()+"."+name+".label");
 	}
 

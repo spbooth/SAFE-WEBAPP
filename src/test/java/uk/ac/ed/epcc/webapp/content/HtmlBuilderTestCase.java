@@ -143,7 +143,7 @@ public class HtmlBuilderTestCase extends WebappTestBase {
 	}
 	
 	/**
-	 * Tests the method {@link AbstractXMLBuilder#clean(int)}.
+	 * Tests the method {@link AbstractXMLBuilder#clean(Number)}.
 	 */
 	@Test
 	public void testClean2() {

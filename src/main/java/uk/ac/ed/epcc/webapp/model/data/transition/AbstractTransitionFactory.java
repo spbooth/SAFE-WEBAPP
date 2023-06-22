@@ -32,8 +32,8 @@ import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
  * 
  * @author spb
  *
- * @param <T>
- * @param <K>
+ * @param <T> type of transition
+ * @param <K> type of transition key
  */
 
 public abstract class AbstractTransitionFactory<T , K extends TransitionKey<T>> extends AbstractContexed implements ContextCached, TransitionFactory<K,T>{

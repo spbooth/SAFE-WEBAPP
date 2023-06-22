@@ -36,12 +36,19 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedTypeProducer;
  * If the name starts with <b>name:</b> and the factory is a {@link NameFinder} then the remainder of
  * the name is passed to {@link NameFinder#getStringFinderFilter(String)}. 
  * Only references registered in the {@link Repository} can be de-referenced.
+ * 
+ * Dynamic filters can be defined using configuration properties of the form <b>use_filter.<i>name</i></b>
+ * This can be (AND/OR) combinations of other filters combined using (+/,).
+ * Dynamic filters are not included in the set of names returned by {@link #addFilterNames(Set)}
+ * 
+ * 
  * @author spb
  * @param <T> target type of filters
  *
  */
 public class NamedFilterWrapper<T extends DataObject> extends AbstractContexed implements NamedFilterProvider<T> {
 
+	private static final String USE_FILTER_PREFIX = "use_filter.";
 	/**
 	 * 
 	 */
@@ -136,7 +143,7 @@ public class NamedFilterWrapper<T extends DataObject> extends AbstractContexed i
 		}
 		try {
 			missing.add(name);
-			String defn = fac.getContext().getInitParameter("use_filter."+fac.getTag()+"."+name);
+			String defn = fac.getContext().getInitParameter(USE_FILTER_PREFIX+fac.getTag()+"."+name);
 			if( defn != null) {
 				return getNamedFilter(defn);
 			}

@@ -78,7 +78,7 @@ import uk.ac.ed.epcc.webapp.timer.TimeClosable;
  * <p>
  * The factory (or its {@link Composite}s) can implement {@link AccessRoleProvider} to provide relationships.
  * <p>
- * Roles of the form <i>field</i><b>-></b><i>remote_relationship</i> denotes a remote filter
+ * Roles of the form <i>field</i><b>-&gt;</b><i>remote_relationship</i> denotes a remote filter
  * joined via the reference field <i>field</i> A person has these relationships with the target object
  * if they have the <i>remote_relationship</i> on the object the target references. The remote relationship must be unqualified.
  * <p>
@@ -102,7 +102,7 @@ import uk.ac.ed.epcc.webapp.timer.TimeClosable;
  * @author spb
  * @see NamedFilterWrapper
  * @see RemoteAccessRoleProvider
- * @param <A>
+ * @param <A> type of AppUser
  */
 @PreRequisiteService(ConfigService.class)
 public abstract class AbstractSessionService<A extends AppUser> extends AbstractContexed implements SessionService<A>{
@@ -1043,9 +1043,9 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	/** get a {@link BaseFilter} for all {@link AppUser}s who
 	 * have access to a global role.
 	 * 
-	 * This is the same selection as {@link #canHaveRole(AppUser, String)
+	 * This is the same selection as {@link #canHaveRole(AppUser, String)}
 	 * 
-	 * @param role
+	 * @param roles
 	 * @return
 	 */
 	@Override
@@ -1126,7 +1126,11 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 	public boolean canHaveRole(A user, String role) {
 		return canHaveRole(null,user,role,true);
 	}
-	protected boolean canHaveRole(Set<String> skip, A user, String role,boolean expand_alias) {	
+	@Override
+	public boolean explicitRole(A user, String role) {
+		return canHaveRole(null,user,role,false);
+	}
+	public boolean canHaveRole(Set<String> skip, A user, String role,boolean expand_alias) {	
 		if( user == null || role == null || role.isEmpty()){
 			return false;
 		}
@@ -1201,6 +1205,20 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 			}
 		}
 		return false;
+	}
+	public String fromRole(A user, String original) {
+		if( explicitRole(user, original)) {
+			return null;
+		}
+		String list = mapRoleName(original);
+		if( ! list.equals(original)) {
+			for(String r : list.split("\\s*,\\s*")) {
+				if( canHaveRole(user, r)) {
+					return r;
+				}
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -1488,7 +1506,7 @@ public abstract class AbstractSessionService<A extends AppUser> extends Abstract
 		return apply_toggle;
 	}
 
-	/** Extension point for sub-classes used to implement  {@link #getGlobalRoleFilter(String)}
+	/** Extension point for sub-classes used to implement  {@link #getGlobalRoleFilter(String ...)}
 	 * 
 	 * @param role_list
 	 * @return

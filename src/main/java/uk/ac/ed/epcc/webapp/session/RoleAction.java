@@ -25,9 +25,7 @@ import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 public class RoleAction<U extends AppUser> extends FormAction{
 	U p ;
-    String type_name;
-	public RoleAction(String type_name,U dat) {
-		this.type_name=type_name;
+	public RoleAction(U dat) {
 		p=dat;
 	}
 
@@ -40,7 +38,7 @@ public class RoleAction<U extends AppUser> extends FormAction{
 			BinaryInput i = (BinaryInput) f.getInput(key);
 			try{
 				SessionService serv = p.getContext().getService(SessionService.class);
-				boolean old_val = serv.canHaveRole(p, key);
+				boolean old_val = serv.explicitRole(p, key);
 				boolean new_val = i.isChecked();
 				serv.setRole(p, key, new_val);
 				if( old_val != new_val) {

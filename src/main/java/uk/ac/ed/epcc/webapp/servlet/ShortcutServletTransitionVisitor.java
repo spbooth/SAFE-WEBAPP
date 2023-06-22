@@ -19,6 +19,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.RedirectChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractTransitionVisitor;
 import uk.ac.ed.epcc.webapp.forms.transition.BaseFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.DirectTransition;
@@ -102,13 +103,7 @@ public class ShortcutServletTransitionVisitor<K,T> extends AbstractTransitionVis
 		public FormResult doDirectTransition(DirectTransition<T> t) throws TransitionException {
 			if( tag instanceof ViewTransitionKey && ((ViewTransitionKey<T>)tag).isNonModifying(target) && params.containsKey(FROM_VIEW_PARAM)) {
 				// send redirect to a bookmarkable url
-				return new ChainedTransitionResult<T, K>(provider,target,tag){
-					@Override
-					public boolean useURL() {
-						return true;
-					}
-					
-				};
+				return new RedirectChainedTransitionResult<T, K>(provider,target,tag);
 			}
 			// DirectTransitions take a target so may have side effects.
 			return null;

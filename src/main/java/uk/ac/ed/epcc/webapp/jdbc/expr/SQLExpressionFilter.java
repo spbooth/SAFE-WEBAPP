@@ -91,7 +91,7 @@ public class SQLExpressionFilter<T,V> implements SQLFilter<T>, PatternFilter<T> 
 				if( expr instanceof FieldValue){
 					((FieldValue) expr).setObject(stmt, pos, value);
 				}else{
-					stmt.setObject(pos, value);
+					Repository.setObject(stmt,pos, value);
 				}
 			}
 

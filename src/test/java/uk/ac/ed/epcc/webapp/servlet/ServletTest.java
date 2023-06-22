@@ -13,45 +13,30 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.servlet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
-import java.text.MessageFormat;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Base64;
+import java.util.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
-
 
 import org.junit.After;
 import org.junit.Before;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Indexed;
-import uk.ac.ed.epcc.webapp.TestDataHelper;
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.OverrideConfigService;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
-import uk.ac.ed.epcc.webapp.content.HtmlContentFormat;
 import uk.ac.ed.epcc.webapp.content.PreDefinedContent;
 import uk.ac.ed.epcc.webapp.content.SimpleXMLBuilder;
 import uk.ac.ed.epcc.webapp.forms.Form;
@@ -62,41 +47,19 @@ import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
 import uk.ac.ed.epcc.webapp.forms.html.PageHTMLForm;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
-import uk.ac.ed.epcc.webapp.forms.result.CustomPage;
-import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.forms.transition.BaseFormTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.CustomFormContent;
-import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
-import uk.ac.ed.epcc.webapp.forms.transition.NavigationProvider;
-import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
-import uk.ac.ed.epcc.webapp.forms.transition.TitleTransitionFactory;
-import uk.ac.ed.epcc.webapp.forms.transition.Transition;
-import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
-import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
+import uk.ac.ed.epcc.webapp.forms.result.*;
+import uk.ac.ed.epcc.webapp.forms.transition.*;
 import uk.ac.ed.epcc.webapp.jdbc.config.DataBaseConfigService;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.filter.GetListFilterVisitor;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.logging.debug.DebugLoggerService;
 import uk.ac.ed.epcc.webapp.logging.print.PrintLoggerService;
 import uk.ac.ed.epcc.webapp.messages.MessageBundleService;
-import uk.ac.ed.epcc.webapp.mock.MockPart;
-import uk.ac.ed.epcc.webapp.mock.MockRequest;
-import uk.ac.ed.epcc.webapp.mock.MockResponse;
-import uk.ac.ed.epcc.webapp.mock.MockServletContext;
-import uk.ac.ed.epcc.webapp.mock.MockSession;
-import uk.ac.ed.epcc.webapp.model.ClassificationFactory;
+import uk.ac.ed.epcc.webapp.mock.*;
 import uk.ac.ed.epcc.webapp.model.data.XMLDataUtils;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
-import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayMimeStreamData;
-import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.servlet.session.ServletSessionService;
-import uk.ac.ed.epcc.webapp.session.AbstractSessionService;
-import uk.ac.ed.epcc.webapp.session.AppUser;
-import uk.ac.ed.epcc.webapp.session.AppUserFactory;
-import uk.ac.ed.epcc.webapp.session.SessionService;
-import uk.ac.ed.epcc.webapp.session.SimpleSessionService;
+import uk.ac.ed.epcc.webapp.session.*;
 import uk.ac.ed.epcc.webapp.tags.ConfirmTag;
 import uk.ac.ed.epcc.webapp.timer.DefaultTimerService;
 /** This is an abstract test class for performing high
@@ -452,13 +415,18 @@ public abstract class ServletTest extends WebappTestBase{
 	
 	protected final void doPost() throws ServletException, IOException{
 		servlet.doPost(req, res);
+		deferredActions();
+
+	}
+	protected final void doPostDeferredEmail() throws ServletException, IOException{
+		servlet.doPost(req, res);
 		deferredEmails();
 
 	}
 	protected final void doGet() throws ServletException, IOException{
 		req.method="GET";
 		servlet.doGet(req, res);
-		deferredEmails();
+		deferredActions();
 
 	}
 
@@ -498,8 +466,8 @@ public abstract class ServletTest extends WebappTestBase{
 	 * output and compared with a file of expected output.
 	 * 
 	 * 
-	 * @param normalise_transform
-	 * @param expected
+	 * @param normalize_transform
+	 * @param expected_xml
 
 	 * @throws Exception 
 	 */
@@ -517,6 +485,19 @@ public abstract class ServletTest extends WebappTestBase{
 		String content = builder.toString();
 		 checkContent(normalize_transform, expected_xml, content);
 		
+	}
+	/** Get any scripts defined by a custom apge
+	 * 
+	 * @return Set or null
+	 */
+	public Set<String> getCustomPageScripts(){
+		checkForward("/scripts/view_custom_page.jsp");
+		CustomPage custom_page =(CustomPage) req.getAttribute(CustomPage.CUSTOM_PAGE_TAG);
+		assertNotNull(custom_page);
+		if( custom_page instanceof ScriptCustomPage) {
+			return ((ScriptCustomPage)custom_page).getAdditionalScript();
+		}
+		return null;
 	}
 
 	/** Process a {@link FormResult} directly
@@ -597,8 +578,8 @@ public abstract class ServletTest extends WebappTestBase{
 	 * output and compared with a file of expected output.
 	 * 
 	 * 
-	 * @param normalise_transform
-	 * @param expected
+	 * @param normalize_transform
+	 * @param expected_xml
 	 * @throws Exception 
 	 */
 	public <K,T> void checkPageFormContent(String normalize_transform, String expected_xml) throws Exception{

@@ -9,6 +9,7 @@
 <AuthCodeSecret type='String' nullable='true' max='32'/>
 <LastAuthCodeUsed type='Long' nullable='true'/>
 <AuthCodeFails type='Integer' nullable='true'/>
+<AuthCodeRecover type='Integer' nullable='true'/>
 <Email_index type='Index' unique='true'><Column name='Email'/></Email_index>
 </TableSpecification>
 <Person id='1'>

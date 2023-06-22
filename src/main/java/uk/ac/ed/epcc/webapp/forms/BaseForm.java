@@ -65,6 +65,7 @@ public class BaseForm implements Form {
 	protected Set<FormValidator> validators = new LinkedHashSet<>();
 
 	private String form_id="form";
+	private FormTextGenerator text=null;
 	
 	private String auto_focus=null;
 
@@ -116,9 +117,7 @@ public class BaseForm implements Form {
 		if( s == null ){
 			return null;
 		}
-		if (label == null) {
-			label = key;
-		}
+		
 		Field f =  makeField(key, label, s);
 		s.setKey(key);
 		fields.put(key, f);
@@ -422,6 +421,9 @@ public class BaseForm implements Form {
 	/**
 	 * set the contents of a Form from a Map
 	 * 
+	 * for optional fields non-validating values are omitted. This is to
+	 * handle objects that use non-null values to indicate un-set
+	 * 
 	 * @param m
 	 *            Map of values
 	 */
@@ -434,7 +436,22 @@ public class BaseForm implements Form {
 			if (m.containsKey(key) ) {
 				Object value = m.get(key);
 				if( value != null ) {
-					put(key, value);
+					Field f = getField(key);
+					if( f.isOptional()) {
+						try {
+							Input input = f.getInput();
+							value = input.convert(value);
+							input.validate(value);
+							put(key, value);
+						} catch (Exception e) {
+							// Only populate "valid" values
+							// invalid values are supressed for optional fields
+							// in case the object is unsing a non-null value to indicate unset
+							getLogger().warn("Invalid object in setContents "+key+" "+value, e);
+						}
+					}else {
+						put(key, value);
+					}
 				}
 			}
 
@@ -447,7 +464,6 @@ public class BaseForm implements Form {
 	 * 
 	 * @param v
 	 *            The FormValidator to set.
-	 * @return The previous FormValidator
 	 */
 	@Override
 	public final void addValidator(FormValidator v) {
@@ -560,7 +576,6 @@ public class BaseForm implements Form {
 	 * will return as soon as <b>any</b> validation condition fails.
 	 * 
 	 * @return boolean true if valid
-	 * @throws ValidateException
 	 */
 	@Override
 	public final boolean validate()  {
@@ -628,6 +643,15 @@ public class BaseForm implements Form {
 		return form_id;
 	}
 
+	@Override
+	public void setFormTextGenerator(FormTextGenerator gen) {
+		text=gen;
+	}
+	@Override
+	public FormTextGenerator getFormTextGenerator() {
+		return text;
+	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.Form#setAutoFocus(java.lang.String)
 	 */

@@ -83,7 +83,7 @@ public class TypeProducerFieldValue<T extends DataObject,O,D> implements FieldVa
 	}
 	public void setObject(PreparedStatement stmt, int pos,
 			O value) throws SQLException {
-		stmt.setObject(pos,producer.getIndex(value));
+		Repository.setObject(stmt,pos,producer.getIndex(value));
 		
 	}
 	public Class<O> getTarget() {

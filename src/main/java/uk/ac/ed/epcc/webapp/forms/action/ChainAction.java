@@ -27,7 +27,7 @@ import uk.ac.ed.epcc.webapp.forms.transition.DirectTransition;
  * 
  * @author spb
  *
- * @param <T>
+ * @param <T> type of transition
  */
 
 

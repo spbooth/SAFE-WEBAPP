@@ -36,10 +36,7 @@ public abstract class AppUserKey<AU extends AppUser> extends TransitionKey<AU> i
 		super(AppUser.class, name, help);
 		button_text=text;
 	}
-	/**
-	 * @param t
-	 * @param name
-	 */
+	
 	public AppUserKey( String name) {
 		super(AppUser.class, name);
 		button_text=null;

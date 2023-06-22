@@ -16,12 +16,14 @@ package uk.ac.ed.epcc.webapp.jdbc.filter;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import uk.ac.ed.epcc.webapp.model.data.Repository;
+
 
 /** A constant value {@link PatternArgument}.
  * 
  * @author spb
  *
- * @param <T>
+ * @param <T> type of argument
  */
 public class ConstPatternArgument<T> implements PatternArgument {
 
@@ -37,7 +39,7 @@ public class ConstPatternArgument<T> implements PatternArgument {
 		this.log=log;
 	}
 	public void addArg(PreparedStatement stmt, int pos) throws SQLException {
-		stmt.setObject(pos,value);
+		Repository.setObject(stmt,pos,value);
 	}
 
 	public String getField() {

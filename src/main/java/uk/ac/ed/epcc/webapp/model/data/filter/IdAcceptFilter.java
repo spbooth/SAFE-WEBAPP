@@ -21,9 +21,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
  */
 public class IdAcceptFilter<T> implements AcceptFilter<T> {
 
-	/**
-	 * @param target
-	 */
+	
 	public IdAcceptFilter(T obj) {
 		this.obj=obj;
 	}

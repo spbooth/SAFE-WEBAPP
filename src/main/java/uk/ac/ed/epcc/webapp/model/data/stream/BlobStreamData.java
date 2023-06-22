@@ -16,7 +16,6 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data.stream;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.Blob;
@@ -24,7 +23,6 @@ import java.sql.SQLException;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
-import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 
 
@@ -59,6 +57,7 @@ public class BlobStreamData implements StreamData {
 
 	public OutputStream getOutputStream()  {
 		try {
+			blob.truncate(0L);
 			return blob.setBinaryStream(0);
 		} catch (SQLException e) {
 			c.getService(DatabaseService.class).logError("Failed to get stream from blob", e);
@@ -66,36 +65,8 @@ public class BlobStreamData implements StreamData {
 		}
 	}
 
-	public void read(InputStream in) throws DataFault, IOException {
-		OutputStream out = getOutputStream();
-		int i;
+	
 
-		while ((i = in.read()) != -1) {
-			out.write(i);
-		}
-		in.close();
-		out.close();
-
-
-	}
-
-	public void write(OutputStream out) throws DataFault, IOException {
-		append(out);
-		out.close();
-
-	}
-
-	/**
-	 * @param out
-	 * @throws IOException
-	 */
-	public void append(OutputStream out) throws IOException {
-		try(InputStream in = getInputStream()){
-			int i;
-
-			while ((i = in.read()) != -1) {
-				out.write(i);
-			}
-		}
-	}
+	
+	
 }

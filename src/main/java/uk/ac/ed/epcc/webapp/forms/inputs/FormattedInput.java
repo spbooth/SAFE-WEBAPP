@@ -23,7 +23,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
  * 
  * @author spb
  *
- * @param <N>
+ * @param <N> type of input
  */
 
 

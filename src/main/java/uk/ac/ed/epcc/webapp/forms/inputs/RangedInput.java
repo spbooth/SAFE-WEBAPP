@@ -18,7 +18,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
  * This can be used to add HTML5 validation 
  * @author spb
  *
- * @param <N>
+ * @param <N> type of input
  */
 
 public interface RangedInput<N extends Number> extends BoundedInput<N>{

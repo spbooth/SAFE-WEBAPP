@@ -110,7 +110,7 @@ public interface SimpleXMLBuilder {
 	 */
 	public boolean setEscapeUnicode(boolean escape_unicode);
 	
-	/** Add an object depending on its type. This should always map to {@link #addParent()}
+	/** Add an object depending on its type. This should always map to {@link #appendParent()}
 	 * on child objects.
 	 * 
 	 * @param target

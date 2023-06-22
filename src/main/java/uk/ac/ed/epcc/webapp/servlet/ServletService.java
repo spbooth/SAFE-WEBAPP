@@ -60,7 +60,6 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * re-written if the request is forwarded to a different servlet/jsp.
 	 * 
 	 * @return String URL relative to context root.
-	 * @return
 	 */
 	public String encodePage();
 	
@@ -87,8 +86,7 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * 
 	 * @param url
 	 *            String page to forward to relative to the context path
-	
-	 * @throws ServletException
+
 	 * @throws IOException
 	 */
     public void redirect(String url) throws IOException ;
@@ -107,7 +105,6 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * and to allow the application specific customisation.
 	 * 
 	 * @return Map of parameters
-	 * @throws DataFault
 	 */
 	
 	public Map<String,Object> getParams() ;
@@ -193,7 +190,7 @@ public interface ServletService extends AppContextService<ServletService>, Conte
 	 * filter may be in place.
 	 * 
 	 * 
-	 * @param ServletRequest
+	 * @param req The {@link ServletRequest}
 	 * @return String webname
 	 */
 	public String getWebName(ServletRequest req);

@@ -44,7 +44,6 @@ public interface GroupingSQLValue<T> extends SQLValue<T> {
 	 * @param sb
 	 * @param qualify
 	 * @return actual number of fields added
-	 * @throws CannotGroupException 
 	 */
 	default public int addGroup(StringBuilder sb,boolean qualify) {
 		return add(sb, qualify);

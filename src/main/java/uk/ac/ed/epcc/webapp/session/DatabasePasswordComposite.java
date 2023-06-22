@@ -34,6 +34,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.*;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
+import uk.ac.ed.epcc.webapp.model.SummaryContributer;
 import uk.ac.ed.epcc.webapp.model.data.BasicType;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
@@ -49,7 +50,7 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  *
  */
 
-public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthComposite<T> implements  AnonymisingComposite<T>{
+public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthComposite<T> implements  AnonymisingComposite<T>, SummaryContributer<T>{
 	protected static class PasswordStatus extends BasicType<PasswordStatus.Value> {
 	    class Value extends BasicType.Value {
 			private Value(String tag, String name) {
@@ -65,7 +66,7 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	protected static final Feature SALT_FIRST_FEATURE = new Feature("salt_first", false, "Salt comes first in password hash");
 	public static final Feature NON_RANDOM_PASSWORD = new Feature("password.non-random",false,"Force randomly chosen passwords to be a series of x's (for bootstapping without email access)");
 	public static final Feature LOG_RANDOM_PASSWORD = new Feature("password.log-random",false,"Log randomly generated passwords (for bootstrapping without email access)");
-	public static final Feature NOTIFY_PASSWORD_LOCK = new Feature("password.notify-lock",true,"Notify be email if maximum password attempts are exceeded");
+	public static final Feature NOTIFY_PASSWORD_LOCK = new Feature("password.notify-lock",true,"Notify by email if maximum password attempts are exceeded");
 	public static final Feature CHANGE_OLD_HASH = new Feature("passord.change_old_hash",true,"Force change for non enabled hash values");
 	/** config parameter name for maximum age of password.
 	 * 
@@ -926,6 +927,22 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	@Override
 	public void anonymise(T target) {
 		lockPassword(target);
+		
+	}
+
+	@Override
+	public void addAttributes(Map<String, Object> attributes, T target) {
+		Handler h = getHandler(target);
+		if( h.passwordFailsExceeded()) {
+			attributes.put("Max password fails exceeded", true);
+		}
+		int fails = h.getFailCount();
+		if( fails > 0 ) {
+			attributes.put("Bad password count", fails);
+		}
+		if( canResetPassword(target) &&  h.mustChangePassword()) {
+			attributes.put("Must change password", true);
+		}
 		
 	}
 }

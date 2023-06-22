@@ -65,11 +65,11 @@ public class CommandLauncher extends AbstractContexed{
 	  private PrintStream err = System.out;
 	  public CommandLauncher(AppContext conn){
 		  super(conn);
+		  AppContext.setContext(conn);
 	  }
 	  
 	  public static void main(String[] args){
 		  AppContext conn = new AppContext();
-		  AppContext.setContext(conn);
 		  conn.setService( new CommandLineLoggerService());
 		  CommandLauncher laucher=new CommandLauncher(conn);
 		  laucher.run(args);
@@ -126,7 +126,6 @@ public class CommandLauncher extends AbstractContexed{
 	 * 
 	 * @param comm
 	 * @param args
-	 * @throws Exception 
 	 */
 	public void run(Class<? extends Command> comm, String args[]) {
 		LinkedList<String> data = new LinkedList<>();

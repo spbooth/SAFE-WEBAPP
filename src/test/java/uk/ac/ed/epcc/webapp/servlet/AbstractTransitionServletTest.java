@@ -27,6 +27,7 @@ import javax.servlet.ServletException;
 import org.junit.Before;
 
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
+import uk.ac.ed.epcc.webapp.forms.SimpleFormTextGenerator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.html.BaseHTMLForm;
 import uk.ac.ed.epcc.webapp.forms.html.HTMLForm;
@@ -251,8 +252,8 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	 * output and compared with a file of expected output.
 	 * 
 	 * 
-	 * @param normalise_transform
-	 * @param expected
+	 * @param normalize_transform
+	 * @param expected_xml
 	 * @throws Exception 
 	 */
 	public <K,T> void checkFormContent(String normalize_transform, String expected_xml) throws Exception{
@@ -278,6 +279,8 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 			key = (K) factory.lookupTransition(target, req.getParameter(TransitionServlet.TRANSITION_KEY_ATTR));
 		 }
 		 assertNotNull("No transition found for key "+key,key);
+		 assertTrue("Access denied",factory.allowTransition(getContext(), target, key));
+		
 		 if( factory instanceof TitleTransitionFactory){
 			 // could do this for all transitions but
 			 // would need to update results for all non Title factories
@@ -305,6 +308,8 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 		 
 		 HTMLForm f = new HTMLForm(getContext(),new ChainedTransitionResult<T, K>(factory, target, key));
 		 f.setFormID("transition_");
+		 f.setFormTextGenerator(new SimpleFormTextGenerator(getContext(), factory.getFormTag(key),factory.getTargetName()));
+		 
 		 if( t instanceof BaseFormTransition ){
 		 	BaseFormTransition ft = (BaseFormTransition) t;
 		 	ft.buildForm(f,target,getContext());
@@ -347,8 +352,8 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 	 * This works in the context of the current request so if called after running
 	 * a stage of a multi-stage transition it will use the request cached form state.
 	 * 
-	 * @param normalise_transform
-	 * @param expected
+	 * @param normalize_transform
+	 * @param expected_xml
 	 * @return view target
 	 * @throws Exception 
 	 */

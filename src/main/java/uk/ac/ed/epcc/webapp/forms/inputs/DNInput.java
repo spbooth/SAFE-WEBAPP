@@ -51,7 +51,7 @@ public class DNInput extends ParseAbstractInput<String> implements ItemInput<Str
 			
 			@Override
 			public void validate(String val) throws FieldException {
-				if( val == null || value.trim().length()==0){
+				if( val == null || val.trim().length()==0){
 					// have to check optional again as superclass accepts spaces
 					return;
 				}

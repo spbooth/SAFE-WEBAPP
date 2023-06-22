@@ -16,7 +16,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 
-/**
+/** An Input that wraps another input
  * @author Stephen Booth
  *
  */
@@ -99,7 +99,11 @@ public abstract class WrappingInput<V> implements Input<V> {
 		nested.validate();
 		
 	}
-
+	@Override
+	public void validate(V value) throws FieldException {
+		nested.validate(value);
+		
+	}
 	
 
 	/* (non-Javadoc)

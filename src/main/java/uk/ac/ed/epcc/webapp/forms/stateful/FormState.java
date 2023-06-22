@@ -36,7 +36,6 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
  * inputs are added in stages (being validated and locked on each stage transition)
  * allowing the values chosen in early stages to be used to customise the form contents in later stages.
  * 
- * @see RedisplayResult
  * @author Stephen Booth
  *
  */

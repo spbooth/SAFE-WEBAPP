@@ -16,15 +16,19 @@ package uk.ac.ed.epcc.webapp.session.twofactor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+import java.io.IOException;
+import java.util.Calendar;
+
 import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.TestTimeService;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.forms.html.RedirectResult;
+import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
-import uk.ac.ed.epcc.webapp.servlet.AbstractLoginServletTest;
-import uk.ac.ed.epcc.webapp.servlet.LoginServlet;
-import uk.ac.ed.epcc.webapp.servlet.LoginServletTest;
+import uk.ac.ed.epcc.webapp.junit4.DataBaseFixtures;
+import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
+import uk.ac.ed.epcc.webapp.servlet.*;
 import uk.ac.ed.epcc.webapp.session.AppUser;
 import uk.ac.ed.epcc.webapp.session.AppUserFactory;
 import uk.ac.ed.epcc.webapp.session.PasswordAuthComposite;
@@ -69,4 +73,5 @@ public class TwoFactorLoginServletTests<A extends AppUser> extends AbstractLogin
 		checkDiff("/cleanup.xsl", "initial_auth.xml");
 		
 	}
+	
 }

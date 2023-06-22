@@ -166,8 +166,7 @@ public interface SQLContext extends Contexed{
 	
 	/** Is this a read-only connection
 	 * 
-	 * @return
-	 * @throws DataException 
+	 * @return boolean
 	 */
 	public boolean isReadOnly();
 }

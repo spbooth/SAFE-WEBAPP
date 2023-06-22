@@ -29,6 +29,7 @@ import java.util.LinkedHashSet;
 public class CleanupService extends AbstractContexed implements AppContextService<CleanupService>{
 
 	private final LinkedHashSet<Runnable> actions;
+	private LinkedHashSet<Runnable> tail=null;
 	
 	public CleanupService(AppContext conn){
 		super(conn);
@@ -49,7 +50,12 @@ public class CleanupService extends AbstractContexed implements AppContextServic
 				conn.getService(x);
 			}
 		}
-		actions.add(r);
+		if( tail != null ) {
+			// Adding an action from an action
+			tail.add(r);
+		}else {
+			actions.add(r);
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -64,18 +70,27 @@ public class CleanupService extends AbstractContexed implements AppContextServic
 	 * 
 	 */
 	
-	public   void action(){
-		action(null);
+	public int action(){
+		return action(null);
 	}
-	public synchronized  void action(Class template){
-
-		for(Iterator<Runnable> it = actions.iterator() ; it.hasNext(); ){
-			Runnable r = it.next();
-			if( template == null || template.isAssignableFrom(r.getClass())) {
-				r.run();
-				it.remove();
+	public synchronized  int action(Class template){
+		int count=0;
+		tail = new LinkedHashSet<>();
+		do {
+			tail.clear();
+			for(Iterator<Runnable> it = actions.iterator() ; it.hasNext(); ){
+				Runnable r = it.next();
+				if( template == null || template.isAssignableFrom(r.getClass())) {
+					r.run();
+					it.remove();
+					count++;
+				}
 			}
-		}
+			// add any actions added in the above stage.
+			actions.addAll(tail);
+		}while( ! tail.isEmpty());
+		tail = null;
+		return count;
 	}
 
 	public boolean hasActions(){

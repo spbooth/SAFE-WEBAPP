@@ -103,13 +103,14 @@ public class EmailLoggerService implements Contexed, LoggerService {
 		SessionService service = conn.getService(SessionService.class);
 		//Logger l = nested.getLogger(getClass());
 		if(service !=null){
+			String name = service.getName();
+			if(name != null ){
+				props.put("person", name);
+			}
 			AppUser person = service.getCurrentPerson();
 			if (person != null) {
 				props.put("person_id", "" + person.getID());
-				String name = person.getLogName();
-				if(name != null ){
-					props.put("person", name);
-				}
+				
 				String email = person.getEmail();
 				if( email != null ){
 					props.put("person.email", email);
@@ -150,7 +151,7 @@ public class EmailLoggerService implements Contexed, LoggerService {
 				Object key = e.nextElement();
 				Object value = p.getProperty(key.toString());
 				//l.debug("key="+key+" value="+value);
-				if( value != null ){
+				if( value != null && key.toString().startsWith("service.")){
 					props.put(key.toString(), value);
 				}
 			}

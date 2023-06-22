@@ -19,7 +19,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
  * Note this does not include any required filter needed by the {@link SQLExpression}
  * @author spb
  *
- * @param <T>
+ * @param <T> type of expression
  */
 public class SQLExpressionOrderClause<T> implements OrderClause {
 

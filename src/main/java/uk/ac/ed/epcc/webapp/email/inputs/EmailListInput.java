@@ -53,7 +53,7 @@ public class EmailListInput extends TextInput implements MultipleInput, FormatHi
 				// must be optional
 				return;
 			}
-			if (!Emailer.checkAddressList(getString())) {
+			if (!Emailer.checkAddressList(email)) {
 				throw new ValidateException("Expecting comma seperated email addresses");
 			}
 			

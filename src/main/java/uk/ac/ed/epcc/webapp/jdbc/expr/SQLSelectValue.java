@@ -32,7 +32,7 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
  * 
  * @author spb
  *
- * @param <T>
+ * @param <T> type of SQLValue
  */
 public class SQLSelectValue<T> implements GroupingSQLValue<T> {
     private final Class<T> target;

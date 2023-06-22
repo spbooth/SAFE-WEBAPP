@@ -74,8 +74,23 @@ public interface Form extends Iterable<Field>, Contexed{
 	 * 
 	 * @param key
 	 *            key to use to refer to field
+	 * @param s
+	 *            Input to add
+	 * @return Field object created
+	 */
+	default public <I> Field addInput(String key, Input<I> s) {
+		return addInput(key, null, s);
+	}
+	/**
+	 * Add and input to the next slot in the form
+	 * 
+	 * * Note that unless the label is dynamically generated it may be better
+	 * to set it via the form_content bundle
+	 * 
+	 * @param key
+	 *            key to use to refer to field
 	 * @param label
-	 *            String to display to user
+	 *            String to display to user. If null use the {@link FormTextGenerator}
 	 * @param s
 	 *            Input to add
 	 * @return Field object created
@@ -83,14 +98,17 @@ public interface Form extends Iterable<Field>, Contexed{
 	public <I> Field addInput(String key, String label, Input<I> s); 
 
 	/**
-	 * Add and input to the next slot in the form
+	 * Add and input to the next slot in the form.
+	 * 
+	 * Note that unless the label and help string are dynamically generated it may be better
+	 * to set these via the form_content bundle
 	 * 
 	 * @param key
 	 *            key to use to refer to field
 	 * @param label
-	 *            String to display to user
+	 *            String to display to user. If null use the {@link FormTextGenerator}
 	 * @param  help
-	 *            tooltip String
+	 *            tooltip String. If null use the {@link FormTextGenerator}
 	 * @param s
 	 *            Input to add
 	 * @return Field object created
@@ -293,7 +311,7 @@ public interface Form extends Iterable<Field>, Contexed{
 	default public boolean supportsMultiStage() {
 		return false;
 	}
-	/** returns the last value returned by {@link #poll(FormResult)}
+	/** returns the last value returned by {@link #poll()}
 	 * 
 	 * @return
 	 */
@@ -325,6 +343,18 @@ public interface Form extends Iterable<Field>, Contexed{
 	 * @return
 	 */
 	public String getFormID();
+	
+	/** Set a {@link FormTextGenerator} for generating form text.
+	 * 
+	 * @param gen
+	 */
+	public void setFormTextGenerator(FormTextGenerator gen);
+	
+	/** Get a {@link FormTextGenerator} for generating form text.
+	 *  
+	 * @return
+	 */
+	public FormTextGenerator getFormTextGenerator();
 	
 	/** set field for auto-focus
 	 * 

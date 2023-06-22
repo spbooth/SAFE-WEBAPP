@@ -112,17 +112,17 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * The {@link #getParamTag()} method returns a String to be used in looking up configuration parameters for the
  * enclosing object. This defaults to tag but can be overridden by setting the <b>config.</b><em>tag</em> property.
  * <p>
- * If the <b>table_alias.<i>tag</i><\b> property is set this is used as an alias string when constructing SQL statements.
+ * If the <b>table_alias.<i>tag</i></b> property is set this is used as an alias string when constructing SQL statements.
  * This is needed because the join filter classes assume a single reference between tables. If you have multiple fields that reference the same table
  * you can register the same table under different tags with different aliases allowing multiple joins to the same table.
- * <p> 
+ * </p> 
  * New <code>Repository</code> objects are obtained using a static method.
- * <code>
- <pre>
+ * <pre>
+ <code>
  AppContext c;
  Repository rep = Repository.getInstance(c,tag_name);
- </pre>
  </code>
+ </pre>
  *
  * Repositories created in this way are cached in the <code>AppContext</code> so only a single <code>Repository</code> 
  * for each tag is ever created per <code>AppContext</code>. The tag is normally the same as the database table
@@ -142,13 +142,13 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * 
  * The cache only holds non-dirty data so could hold normal Map objects rather than actual Records.
  * Currently this is left as a future optimisation.
- * <p>
+ * </p>
  * Note that lookups via a {@link TypeProducer} may also	utilise this caching mechanism.
  * <p>
  * Repositories are intended to be local to a parent AppContext which should represent a
  * single thread of execution. However synchronisation is implemented within the code.
  * The cost of this should be quite low and it also seems to prevent optimisation bugs in some JVMs
- * <p>
+ * </p>
  * The Repository class implements some additional automatic type conversions beyond those implemented in
  * JDBC.
  * <ul>
@@ -368,7 +368,7 @@ public final class Repository implements AppContextCleanup{
         	return type==Types.DOUBLE||type==Types.FLOAT|| type==Types.INTEGER|| type==Types.BIGINT|| type == Types.REAL;
         }
         public boolean isData(){
-        	return type==Types.BLOB || type == Types.VARBINARY || type == Types.LONGVARBINARY;
+        	return type==Types.BLOB || type == Types.VARBINARY || type == Types.LONGVARBINARY || type == Types.BINARY;
         }
         
         /** Get the tag that will-be/has-been used to create the referenced {@link IndexedTypeProducer}.
@@ -410,7 +410,7 @@ public final class Repository implements AppContextCleanup{
         	return type==Types.DATE||type==Types.TIMESTAMP || type == Types.TIME;
         }
         public boolean isBoolean(){
-        	return type==Types.BIT||type==Types.TINYINT;
+        	return type==Types.BIT||type==Types.TINYINT || type==Types.BOOLEAN;
         }
         public boolean isIndexed(){
         	return indexed;
@@ -579,10 +579,10 @@ public final class Repository implements AppContextCleanup{
  * the DB layer and the DB schema. Note that different DB drivers will handle
  * the same schema in different ways, for example different mysql
  * drivers/versions returned Integers or Longs for the same field.
- * <p>
+ * </p>
  * Record supports a default conversion between integer and Date properties/Fields
  * based on the Repository Resolution property. The resolution defaults to 1 second
- * but can be set using the <b>repository.resolution.<it>[table-name]</it></b> property. Provided that the
+ * but can be set using the <b>repository.resolution.<i>[table-name]</i></b> property. Provided that the
  * java side consistently uses Date or integers the java code does not need to know the
  * conversion factor explicitly.
 	 * <p>
@@ -592,7 +592,7 @@ public final class Repository implements AppContextCleanup{
 	 * retrieved by using the <code>setID</code> method on an empty Record.
 	 *  In all cases no changes are written to
 	 * the database until the <code>commit()</code> method is called.
-	 * <p>
+	 * </p>
 	 * The class also supports get/set Property methods that support
 	 * additional type conversions and casting. These are more useful than the 
 	 * <code>put</code>/<code>get</code> calls in the <code>Map</code> interface 
@@ -600,8 +600,8 @@ public final class Repository implements AppContextCleanup{
 	 * is changed.
 	 * <p>
 	 * For Example:
-<code>
 <pre>
+<code>
      Repository res = Repository.getInstance(ctx,"my_table");
      Record rec = res.new Record();
      rec.setProperty("Number",12.0);
@@ -612,8 +612,8 @@ public final class Repository implements AppContextCleanup{
      Record rec2 = res.new Record();
      rec2.setID(rec.getID()); // retrieve new copy from DB by ID.
      double d = rec2.getDoubleProperty("Number"); // should be 24.0
-</pre>
 </code>
+</pre>
      *
      *In many cases the values of a database field are actually codes denoting one of a
      *finite set of objects.In this case a class implementing <code>TypeProducer</code> should be 
@@ -628,7 +628,7 @@ public final class Repository implements AppContextCleanup{
      *
 	 * The intention is that this class is more database facing and that model
 	 * classes contain an instance of Record rather than sub-classing it.
-	 * 
+	 * </p>
 	 * 
 	 * @author spb
 	 * 
@@ -1587,7 +1587,7 @@ public final class Repository implements AppContextCleanup{
 		 * @param buff
 		 *            query buffer. We append additional info to this to provide
 		 *            better debug messages
-		 * @param stms
+		 * @param stmt
 		 *            PreparedStatement fo populate
 		 * @param pos
 		 *            statement position to set
@@ -2659,7 +2659,6 @@ public final class Repository implements AppContextCleanup{
 	}
 	/** get a {@link NumberFieldExpression} for a field.
 	 * 
-	 * @param filter_type type of the hosting object
 	 * @param target desired numeric type for the field.
 	 * @param key field name
 	 * @return {@link NumberFieldExpression}
@@ -2673,7 +2672,6 @@ public final class Repository implements AppContextCleanup{
 	}
 	/** get a {@link BooleanFieldExpression} for a field
 	 * 
-	 * @param filter_type type of hosting object
 	 * @param key field name
 	 * @return {@link BooleanFieldExpression}
 	 */
@@ -2687,7 +2685,6 @@ public final class Repository implements AppContextCleanup{
 	}
 	/** get a {@link StringFieldExpression} for a field
 	 * 
-	 * @param filter_type type of hosting object
 	 * @param key field name
 	 * @return {@link StringFieldExpression}
 	 */
@@ -2706,7 +2703,6 @@ public final class Repository implements AppContextCleanup{
 	 * 
 	 * The underlying database field may be a time-stamp or a numeric field.
 	 * 
-	 * @param target type of hosting object
 	 * @param key field name
 	 * @return {@link FieldValue}
 	 */
@@ -2750,7 +2746,6 @@ public final class Repository implements AppContextCleanup{
 	}
 	/** Get a {@link IndexedFieldValue} for a field
 	 * The field does not have to be tagged as a reference field
-	 * @param self 
 	 * @param key
 	 * @param prod
 	 * @return IndexedFieldValue
@@ -2961,11 +2956,14 @@ public final class Repository implements AppContextCleanup{
 				
 				
 				if (value != null) {
-					if (info.getType() == Types.BLOB) {
+					if (info.isData()) {
 						if (value instanceof Blob) {
 							value = new BlobStreamData(ctx, (Blob) value);
+						}else if( value instanceof byte[]) {
+							
+							value = new ByteArrayStreamData((byte[]) value);
 						} else {
-							throw new DataFault("Unexpected Blob type "
+							throw new DataFault("Unexpected Blob/data type "
 									+ value.getClass().getName());
 						}
 					}
@@ -3205,6 +3203,9 @@ public final class Repository implements AppContextCleanup{
 					.getLength());
 			return;
 		}
+		if( value instanceof Duration) {
+			stmt.setLong(pos, ((Duration)value).longValue());
+		}
 		FieldInfo f = getInfo(key);
 		//Logger log = ctx.getService(LoggerService.class).getLogger(getClass());
 		if (f != null) {
@@ -3212,7 +3213,7 @@ public final class Repository implements AppContextCleanup{
 			stmt.setObject(pos, f.truncate(value), f.getType());
 		} else {
 			//log.debug("setObject "+pos+","+value);
-			stmt.setObject(pos, value);
+			setObject(stmt,pos, value);
 		}
 	}
 
@@ -3498,5 +3499,26 @@ public final class Repository implements AppContextCleanup{
     	case(Types.LONGVARBINARY): return "LongVarBinary";
     	default: return "Unknown";
     	}
+    }
+    /** Static wrapper of {@link PreparedStatement#setObject(int, Object)}
+     * This is to apply our own type mappings where a field type is not knows
+     * 
+     * @param stmt
+     * @param pos
+     * @param val
+     * @throws SQLException
+     */
+    public static void setObject(PreparedStatement stmt,int pos,Object val) throws SQLException {
+    	if (val instanceof StreamData) {
+			StreamData s = (StreamData) val;
+			stmt.setBinaryStream(pos, s.getInputStream(), (int) s
+					.getLength());
+			return;
+		}
+    	if( val instanceof Duration) {
+    		stmt.setLong(pos, ((Duration)val).longValue());
+    		return;
+    	}
+    	stmt.setObject(pos, val);
     }
 }

@@ -55,10 +55,13 @@ import uk.ac.ed.epcc.webapp.AppContext;
  * returned. For example suppose we construct a <code>FilteredProperties</code>
  * object with the current properties (in an object called <em>myProperties</em>
  * ):
- * 
- * <blockquote> myapp.prop1 = val1 <br/>
- * myapp.mode1.prop2 = val2 <br/>
- * myapp.mode2.prop2 = val3 </blockquote>
+ * <pre>
+ * <code>
+ * myapp.prop1 = val1
+ * myapp.mode1.prop2 = val2
+ * myapp.mode2.prop2 = val3
+ * </code>
+ * </pre>
  * 
  * using the constructor
  * 

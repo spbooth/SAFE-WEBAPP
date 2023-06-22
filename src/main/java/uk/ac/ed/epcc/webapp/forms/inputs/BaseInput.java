@@ -101,10 +101,14 @@ public abstract class BaseInput<V> implements Input<V> {
 			return;
 		}
 		V v = getValue();
-		for(FieldValidator<V> val : validators) {
-			val.validate(v);
-		}
+		validate(v);
 	}
+    
+    public final void validate(V value) throws FieldException {
+    	for(FieldValidator<V> val : validators) {
+			val.validate(value);
+		}
+    }
     /** Extension point to add validation to sub-class specific inner-state
      * 
      * @throws FieldException
