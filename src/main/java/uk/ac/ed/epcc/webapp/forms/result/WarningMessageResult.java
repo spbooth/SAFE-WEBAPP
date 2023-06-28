@@ -14,36 +14,28 @@
 /*******************************************************************************
  * Copyright (c) - The University of Edinburgh 2010
  *******************************************************************************/
-package uk.ac.ed.epcc.webapp.jdbc.table;
+package uk.ac.ed.epcc.webapp.forms.result;
 
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
-import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.forms.result.InternalErrorResult;
-import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
-import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
-import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
+/** Form result that displays a message from the message catalogue.
+ * This is functionally identical to a {@link MessageResult} but is intended for
+ * transient warning messages that could be implemented as a pop-up rather than a message page.
+ * 
+ * @author spb
+ *
+ */
 
 
-
-public class DropTableTransition<T extends DataObjectFactory> extends
-		AbstractDirectTransition<T> {
-	AppContext conn;
-	public DropTableTransition(AppContext conn){
-		this.conn=conn;
+public class WarningMessageResult extends MessageResult {
+   
+	public WarningMessageResult(String mess){
+		super(mess);
 	}
-	public FormResult doTransition(T target,
-			AppContext c) throws TransitionException {
-		DataBaseHandlerService serv = conn.getService(DataBaseHandlerService.class);
-		try{
-		if( serv != null ){
-			serv.deleteTable(target.getTag());
-			return new TableListResult();
-		}
-		}catch(Exception e){
-			conn.error(e,"Error dropping table");
-		}
-		return new InternalErrorResult();
+	public WarningMessageResult(String mess, Object ... args){
+		super(mess,args);
+	}
+	@Override
+	public void accept(FormResultVisitor vis) throws Exception {
+		vis.visitWarningMessageResult(this);
 	}
 
 }

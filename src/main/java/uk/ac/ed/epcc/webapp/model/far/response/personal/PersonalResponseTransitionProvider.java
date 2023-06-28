@@ -20,6 +20,7 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.forms.result.InternalErrorResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractTargetLessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionProvider;
@@ -77,7 +78,7 @@ public class PersonalResponseTransitionProvider<T extends PersonalResponse<D>,D 
 					ResponseTransitionProvider<D, Response<D>> provider = getManager().getPathResponseProvider(); 
 					if( p == null ){
 						getLogger().error("null first child in form");
-						return new MessageResult("internal_error");
+						return new InternalErrorResult();
 					}
 					return provider.new ViewResult(new ResponseTarget(response, p));
 				} catch (DataException e) {

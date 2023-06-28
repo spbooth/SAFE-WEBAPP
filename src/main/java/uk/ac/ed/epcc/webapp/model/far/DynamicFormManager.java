@@ -27,6 +27,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.Input;
 import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInputWrapper;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
+import uk.ac.ed.epcc.webapp.forms.result.WarningMessageResult;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactory;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryCreator;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
@@ -168,7 +169,7 @@ public class DynamicFormManager<F extends DynamicFormManager.DynamicForm> extend
 		}
 		
 		public MessageResult activate() throws Exception {
-			MessageResult msg = new MessageResult("form_activation_failed");
+			MessageResult msg = new WarningMessageResult("form_activation_failed");
 			
 			if (isNew() || isRetired()) {
 				setStatus(ACTIVE);

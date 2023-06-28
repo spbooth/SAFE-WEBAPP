@@ -21,9 +21,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
-import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
-import uk.ac.ed.epcc.webapp.forms.result.FormResult;
-import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
+import uk.ac.ed.epcc.webapp.forms.result.*;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractTargetLessTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
 
@@ -71,7 +69,7 @@ public abstract class AbstractFormUpdateTransition<K, X> extends AbstractTargetL
 			X target = update.getSelected(f);
 			if (target == null) {
 				// TransitionException reported to user
-				return new MessageResult("no_select_target");
+				return new WarningMessageResult("no_select_target");
 			}
 			return new ChainedTransitionResult<>(tp, target, next);
 		}
