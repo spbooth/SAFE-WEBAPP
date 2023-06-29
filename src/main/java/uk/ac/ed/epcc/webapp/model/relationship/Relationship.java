@@ -32,6 +32,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.ReferenceFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableContentProvider;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
@@ -202,7 +203,7 @@ public class Relationship<A extends AppUser,B extends DataObject> extends
 		try {
 			s.new Index("Link", true, PERSON_ID, TARGET_ID);
 		} catch (InvalidArgument e) {
-			conn.error(e,"Error making index");
+			Logger.getLogger(Relationship.class).error("Error making index",e);
 			return;
 		}
 		// best we can do

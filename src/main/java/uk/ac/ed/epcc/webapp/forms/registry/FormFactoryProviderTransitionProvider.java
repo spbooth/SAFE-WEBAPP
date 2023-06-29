@@ -31,6 +31,8 @@ import uk.ac.ed.epcc.webapp.forms.transition.IndexTransitionProvider;
 import uk.ac.ed.epcc.webapp.forms.transition.Transition;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionFactoryVisitor;
 import uk.ac.ed.epcc.webapp.forms.transition.TransitionProvider;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.forms.registry.SummaryContentProvider;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 
@@ -141,7 +143,7 @@ public class FormFactoryProviderTransitionProvider<T> implements
 				}
 			}
 		}catch(Exception e){
-			c.error(e,"Error making transition");
+			getLogger().error("Error making transition",e);
 		}
 		return null;
 	}
@@ -168,5 +170,8 @@ public class FormFactoryProviderTransitionProvider<T> implements
 	public <R> R accept(TransitionFactoryVisitor<R,T, FormOperations> vis) {
 		return vis.visitTransitionProvider(this);
 	}
-
+	protected Logger getLogger() {
+		LoggerService ls = getContext().getService(LoggerService.class);
+		return ls.getLogger(getClass());
+	}
 }

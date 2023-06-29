@@ -18,6 +18,8 @@ package uk.ac.ed.epcc.webapp.logging;
 
 import java.util.function.Supplier;
 
+import uk.ac.ed.epcc.webapp.AppContext;
+
 /**
  * This is the Logger interface used by the Webapp classes. Its essentially a
  * wrapper around the subset of the log4J interface that we use but by wrapping
@@ -89,5 +91,9 @@ public interface Logger {
 	
 	public default void warn(Supplier<String> message, Throwable t) {
 		warn(message.get(),t);
+	}
+	
+	public static Logger getLogger(Class clazz) {
+		return AppContext.getContext().getService(LoggerService.class).getLogger(clazz);
 	}
 }

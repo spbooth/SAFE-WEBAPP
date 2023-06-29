@@ -161,7 +161,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 						}
 					}
 				}catch(Exception t){
-					conn.error(t,"Error commiting record "+current.getRepository().getTable()+":"+id);
+					getLogger().error("Error commiting record "+current.getRepository().getTable()+":"+id,t);
 				}finally{
 					res=null;
 					current=null;
@@ -173,7 +173,7 @@ public abstract class DumpParser extends AbstractContexed implements  ContentHan
 				try{
 					processSpecification(table_name, spec);
 				}catch(Exception t){
-					conn.error(t,"Error creating table");
+					getLogger().error("Error creating table",t);
 				}finally{
 					table_name=null;
 					spec=null;

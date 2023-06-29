@@ -28,6 +28,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractFormTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
@@ -83,7 +84,7 @@ public class MoveDateTransition<T extends TimePeriod,K> extends AbstractFormTran
 				}
 
 			}catch(Exception e){
-				tp.getContext().error(e,"Internal error");
+				Logger.getLogger(getClass()).error("Internal error",e);
 				throw new ActionException("Internal error");
 			}
 			return new ViewTransitionResult<>(tp, target);

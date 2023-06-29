@@ -19,6 +19,7 @@
 <%@page import="uk.ac.ed.epcc.webapp.servlet.ServletService" %>
 <%@page import="uk.ac.ed.epcc.webapp.session.RequiredPage" %>
 <%@page import="uk.ac.ed.epcc.webapp.servlet.navigation.NavigationMenuService" %>
+<%@page import = "uk.ac.ed.epcc.webapp.logging.Logger" %>
 <% 
    //  fragment to check for required pages. include from session
     try{
@@ -43,6 +44,6 @@
     		}
     	}
     }catch(Exception e){
-    	conn.error(e,"Error processing required pages");
+    	Logger.getLogger(getClass()).error("Error processing required pages",e);
     }
 %>

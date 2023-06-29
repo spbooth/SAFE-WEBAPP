@@ -24,6 +24,7 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.MessageResult;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.Retirable;
@@ -68,7 +69,7 @@ import uk.ac.ed.epcc.webapp.model.data.Retirable;
 					dat.delete();
 					return new MessageResult("object_deleted",type_name);
 				} catch (Exception e) {
-					dat.getContext().error(e, "error deleting object");
+					Logger.getLogger(getClass()).error( "error deleting object",e);
 					throw new ActionException("Error deleting object");
 				}
 			

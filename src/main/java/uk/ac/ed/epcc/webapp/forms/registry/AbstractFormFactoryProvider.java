@@ -22,6 +22,7 @@ import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreatorProducer;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdateProducer;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 /** 
@@ -202,5 +203,9 @@ public abstract class AbstractFormFactoryProvider<F extends Contexed, T> impleme
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+	protected Logger getLogger(AppContext conn) {
+		LoggerService ls = conn.getService(LoggerService.class);
+		return ls.getLogger(getClass());
 	}
 }

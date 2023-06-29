@@ -130,7 +130,7 @@ public abstract class WebappTestBase implements ContextHolder{
 			builder.appendParent();
 			//w.close();
 		}catch(Exception t){
-			ctx.error(t,"Error dumping fixtures");
+			ctx.error("Error dumping fixtures",t);
 		}
 
 	}
@@ -161,7 +161,7 @@ public abstract class WebappTestBase implements ContextHolder{
 			builder.appendParent();
 			//w.close();
 		}catch(Exception t){
-			ctx.error(t,"Error dumping fixtures");
+			ctx.error("Error dumping fixtures",t);
 		}
 
 	}

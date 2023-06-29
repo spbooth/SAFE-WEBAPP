@@ -93,7 +93,7 @@ public abstract class AbstractUserSettingFactory<D,T, S extends AbstractUserSett
 		try {
 			setting.commit();
 		} catch (DataFault e) {
-			getContext().error(e,"Error setting value");
+			getLogger().error("Error setting value",e);
 		}
 
 	}
@@ -120,7 +120,7 @@ public abstract class AbstractUserSettingFactory<D,T, S extends AbstractUserSett
 			}
 			return result;
 		} catch (DataException e) {
-			getContext().error(e,"Error getting setting");
+			getLogger().error("Error getting setting",e);
 		}
 		return null;
 	}

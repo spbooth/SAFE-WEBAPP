@@ -36,6 +36,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 /** A Text input for XML nodes.
  * 
  * @author spb
@@ -97,7 +98,7 @@ public class XMLDocumentInput extends TextInput implements ItemInput<String,Docu
 			transformer.transform(source, output);
 			setValue(output.getWriter().toString());
 		}catch(Exception e){
-			conn.error(e,"error setting Node as item");
+			Logger.getLogger(getClass()).error("error setting Node as item",e);
 		}
 	}
 

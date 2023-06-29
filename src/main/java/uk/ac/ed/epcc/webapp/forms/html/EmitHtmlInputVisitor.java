@@ -111,7 +111,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				hb.attr("id",id);
 			}
 		} catch (Exception e) {
-			conn.error(e,"Error getting id");
+			getLogger().error("Error getting id",e);
 		}
 		hb.attr("type","checkbox");
 		hb.attr("name",input.getKey());
@@ -152,7 +152,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				hb.attr("id",id);
 			}
 		} catch (Exception e) {
-			conn.error(e,"Error getting id");
+			getLogger().error("Error getting id",e);
 		}
 		hb.attr("type","file");
 		hb.attr("name",input.getKey());
@@ -192,7 +192,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 					hb.attr("id",id);
 				}
 			} catch (Exception e) {
-				conn.error(e,"Error getting id");
+				getLogger().error("Error getting id",e);
 			}
 			hb.attr("name",input.getKey());
 			hb.addClass("input");
@@ -393,7 +393,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		try {
 			id = makeID(input);
 		} catch (Exception e) {
-			conn.error(e,"Error getting id");
+			getLogger().error("Error getting id",e);
 		}
 		emitTextParam(hb, input,input.getKey(),id, input.getBoxWidth(), input
 				.getMaxResultLength(), input.getSingle(), true,def);
@@ -412,7 +412,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		try {
 			id = makeID(input);
 		} catch (Exception e) {
-			conn.error(e,"Error getting id");
+			getLogger().error("Error getting id",e);
 		}
 		
 		emitTextParam(hb, input,input.getKey(), id,input.getBoxWidth(), input

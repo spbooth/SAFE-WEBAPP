@@ -222,7 +222,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 					Number n = record.getNumberProperty(OPERATOR_ID);
 					return (AppUser) item_factory.user_factory.find(n);
 				} catch (Exception  e) {
-				    getContext().error(e,"Error making operator");
+				    getLogger().error("Error making operator",e);
 				    return null;
 				}
 		}
@@ -504,7 +504,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 					try {
 						serv.createTable(tab, prereq.get(tab));
 					} catch (DataFault e) {
-						c.error(e,"Error making prereq table");
+						getLogger().error("Error making prereq table",e);
 					}
 				}
 			}

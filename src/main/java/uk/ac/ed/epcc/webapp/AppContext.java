@@ -239,13 +239,12 @@ public final class AppContext {
 
 	/**
 	 * Report an application error.
-	 * 
-	 * @param e
-	 *            Exception generating error.
 	 * @param text
 	 *            Text of error.
+	 * @param e
+	 *            Exception generating error.
 	 */
-	public void error(Throwable e,String text){
+	void error(String text,Throwable e){
 		LoggerService serv = getService(LoggerService.class);
 		if( serv != null ){
 			Logger log = serv.getLogger(getClass());
@@ -513,8 +512,8 @@ public final class AppContext {
 		try {
 			res = Double.parseDouble(parm.trim());
 		} catch (NumberFormatException e) {
-			error(e, "badly fomatted parameter " + name + " value [" + parm
-					+ "]");
+			error("badly fomatted parameter " + name + " value [" + parm
+					+ "]", e);
 		}
 		return res;
 	}
@@ -622,7 +621,7 @@ public final class AppContext {
 			enum_name=enum_name.trim();
 			return (E) Enum.valueOf(clazz, enum_name);
 		}catch(Exception t){
-			error(t,"Error getting EnumParameter "+clazz.getCanonicalName()+" "+enum_name);
+			error("Error getting EnumParameter "+clazz.getCanonicalName()+" "+enum_name,t);
 			return fallback;
 		}
 	}
@@ -663,8 +662,8 @@ public final class AppContext {
 		try {
 			res = Integer.parseInt(parm.trim());
 		} catch (NumberFormatException e) {
-			error(e, "badly fomatted parameter " + name + " value [" + parm
-					+ "]");
+			error("badly fomatted parameter " + name + " value [" + parm
+					+ "]", e);
 		}
 		return res;
 	}
@@ -677,8 +676,8 @@ public final class AppContext {
 		try {
 			res = Long.parseLong(parm.trim());
 		} catch (NumberFormatException e) {
-			error(e, "badly fomatted parameter " + name + " value [" + parm
-					+ "]");
+			error("badly fomatted parameter " + name + " value [" + parm
+					+ "]", e);
 		}
 		return res;
 	}
@@ -695,7 +694,7 @@ public final class AppContext {
     		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     		res = df.parse(param);
     	}catch(Exception e) {
-    		error(e,"badly formatted parameter "+name+" value ["+param+"]");
+    		error("badly formatted parameter "+name+" value ["+param+"]",e);
     	}
     	return res;
     }
@@ -1135,7 +1134,7 @@ public final class AppContext {
 			}
 			return result;
 		}catch(Exception e){
-			error(e,"Error making class "+target.getCanonicalName());
+			error("Error making class "+target.getCanonicalName(),e);
 			return null;
 		}finally{
 			if(timer != null ){
@@ -1353,7 +1352,7 @@ public final class AppContext {
 				try {
 					t = Class.forName(class_name);
 				} catch (Exception e) {
-					error(e,"Class "+class_name+" not found");
+					error("Class "+class_name+" not found",e);
 				}
 				if(t != null ){
 					// don't check for composites here as we want a

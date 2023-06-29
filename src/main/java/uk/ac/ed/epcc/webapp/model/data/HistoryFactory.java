@@ -460,7 +460,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 				}
 				return peer;
 			} catch (DataException e) {
-				i.getContext().error(e,"Error getting peer");
+				getLogger().error("Error getting peer",e);
 				return null;
 			}
 		}

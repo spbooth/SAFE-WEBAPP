@@ -121,7 +121,7 @@ public class SwingFormComponentListener implements ComponentListener {
 					f.validate();
 				}
 			}catch(Exception e){
-				conn.error(e, "Error registering field");
+				log.error("Error registering field", e);
 			}
 		}
 		makeCompactGrid(panel, nrow, 2, 5, 5, 5, 5);
@@ -251,7 +251,7 @@ public class SwingFormComponentListener implements ComponentListener {
 			try {
 				field.setComponentValue();
 			} catch (Exception e) {
-				conn.error(e,"Error setting compoment: "+field.toString());
+				log.error("Error setting compoment: "+field.toString(),e);
 			}
 		}
 	}

@@ -129,7 +129,7 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractUserRe
 				em.newEmailRequest(user, req);
 				return new MessageResult("email_change_request_made");
 			} catch (Exception e) {
-				getContext().error(e,"Error making EmailChangeRequest");
+				getLogger().error("Error making EmailChangeRequest",e);
 				throw new ActionException("Internal Error");
 			}
 		}
@@ -154,7 +154,7 @@ public class EmailChangeRequestFactory<A extends AppUser> extends AbstractUserRe
 				em.newEmailRequest(user, req);
 				return new MessageResult("email_verify_request_made",user.getEmail());
 			} catch (Exception e) {
-				getContext().error(e,"Error making EmailChangeRequest");
+				getLogger().error("Error making EmailChangeRequest",e);
 				throw new ActionException("Internal Error");
 			}
 		}

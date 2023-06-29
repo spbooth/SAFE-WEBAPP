@@ -298,7 +298,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 						
 						throw new ValidateException("Object does not exist with id "+getTag()+":"+num);
 					} catch (DataException e) {
-					    getContext().error(e,"Error in DataObjectInput");
+					    getLogger().error("Error in DataObjectInput",e);
 					    throw new ValidateException("Internal error", e);
 					}
 					
@@ -320,7 +320,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				// force filter to be honoured as well
 				return  find(find_fil,true);
 			} catch (DataException e) {
-				getContext().error(e,"Error in getItemByValue");
+				getLogger().error("Error in getItemByValue",e);
 				return null;
 			}
 			
@@ -1093,7 +1093,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			// not necessarily an error
 			return null;
 		} catch (DataException e) {
-			getContext().error(e,"Error finding BDO");
+			getLogger().error("Error finding BDO",e);
 			return null;
 		}
 	}
@@ -1464,7 +1464,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
      * @return {@link Logger}
      */
 	protected Logger getLogger() {
-		return getContext().getService(LoggerService.class).getLogger(getClass());
+		AppContext context = getContext();
+		if( context == null) {
+			context = AppContext.getContext();
+		}
+		return context.getService(LoggerService.class).getLogger(getClass());
 	}
 
 	/** get the set of fields that can be null in the database.
@@ -1981,7 +1985,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				postCreateTableSetup(ctx,homeTable);
 				return true;
 			}catch(DataFault e){
-				ctx.error(e,"Error making table "+homeTable);
+				getLogger().error("Error making table "+homeTable,e);
 			}
 		}
 		return false;

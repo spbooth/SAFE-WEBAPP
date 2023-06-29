@@ -25,6 +25,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.ExtendedXMLBuilder;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataNotFoundException;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.model.serv.ServeDataProducer;
@@ -151,7 +152,7 @@ public class ServeDataServlet extends WebappServlet {
 			hb.attr("href", conn.getService(ServletService.class).encodeURL(getURL(conn, producer, args)));
 			hb.attr("target","_blank"); // always in new tab for download
 		} catch (Exception e) {
-			conn.error(e,"Error making URL");
+			conn.getService(LoggerService.class).getLogger(ServeDataServlet.class).error("Error making URL",e);
 		}
 		hb.clean(text);
 		hb.close();

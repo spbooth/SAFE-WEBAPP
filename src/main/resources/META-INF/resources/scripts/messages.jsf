@@ -22,6 +22,7 @@ AppContext text expansion.
 <%@page import="uk.ac.ed.epcc.webapp.messages.MessageBundleService"%>
 <%@page import="uk.ac.ed.epcc.webapp.content.PreDefinedContent" %>
 <%@page import="uk.ac.ed.epcc.webapp.content.*"%>
+<%@page import = "uk.ac.ed.epcc.webapp.logging.Logger" %>
 <%@page import="java.util.*" %>
 <%
 // Call strip on any text provided from the request to stop external entities inserting html such as javascript
@@ -45,7 +46,7 @@ AppContext text expansion.
 		 	 PreDefinedContent title = new PreDefinedContent(conn,mess,message_type + ".title",args);
 		 	 message_title = title.addContent((SimpleXMLBuilder) new HtmlBuilder()).toString();
 		  }catch(MissingResourceException e){
-			  conn.error(e,"missing message title for "+message_type);
+			  Logger.getLogger(getClass()).error("missing message title for "+message_type,e);
 		  }
 	  }
 	  if( message_text == null ){
@@ -54,7 +55,7 @@ AppContext text expansion.
 			  PreDefinedContent text = new PreDefinedContent(conn,mess,message_type + ".text",args);
 			  message_text = text.addContent((SimpleXMLBuilder)new HtmlBuilder()).toString();
 		  }catch(MissingResourceException e){
-			  conn.error(e,"missing message text for "+message_type);
+			  Logger.getLogger(getClass()).error("missing message text for "+message_type,e);
 		  }
 	  }
 	  if( message_extra == null ){
@@ -70,13 +71,13 @@ AppContext text expansion.
 	if( message_title == null ){
 		message_title="Information";
 		if( conn != null ){
-			conn.error("message without title");
+			Logger.getLogger(getClass()).error("message without title");
 		}
 	}
 	if( message_text == null ){
 		message_text = "";
 		if( conn != null ){
-			conn.error("message without text");
+			Logger.getLogger(getClass()).error("message without text");
 		}
 	}
 %>

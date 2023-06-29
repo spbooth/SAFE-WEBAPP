@@ -24,6 +24,8 @@ import javax.servlet.FilterConfig;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.ConfigServiceListener;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 /** ConfigService that augments the properties with Filter InitParams.
  * This needs to be added to the {@link AppContext} within the filter itself
  * after any caching {@link ConfigService}s and once the {@link FilterConfig} is available.
@@ -58,7 +60,7 @@ public class FilterConfigService implements ConfigService {
 					}
 				}
 			}catch(Exception e) {
-				c.error(e,"Error getting servlet properties");
+				getLogger().error("Error getting servlet properties",e);
 			}
 		return props;
 	}
@@ -89,7 +91,10 @@ public class FilterConfigService implements ConfigService {
 	public ConfigService getNested() {
 		return nested_service;
 	}
-
+	private Logger getLogger() {
+		LoggerService ls = getContext().getService(LoggerService.class);
+		return ls.getLogger(getClass());
+	}
 	
 	
 }

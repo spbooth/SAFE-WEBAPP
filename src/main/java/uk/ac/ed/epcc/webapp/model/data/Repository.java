@@ -49,10 +49,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Base64;
 
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.AppContextCleanup;
-import uk.ac.ed.epcc.webapp.Feature;
-import uk.ac.ed.epcc.webapp.Indexed;
+import uk.ac.ed.epcc.webapp.*;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
 import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
@@ -167,7 +164,7 @@ import uk.ac.ed.epcc.webapp.timer.TimerService;
  * 
  */
 
-public final class Repository implements AppContextCleanup{
+public final class Repository extends AbstractContexed implements AppContextCleanup {
 	/** config property prefix to mark that text fields should truncate 
 	 *  to the size of the field
 	 */
@@ -1056,7 +1053,7 @@ public final class Repository implements AppContextCleanup{
 			try {
 				return t.find(val);
 			} catch (Exception e) {
-				getContext().error(e,"Error converting via TypeProducer");
+				getLogger().error("Error converting via TypeProducer",e);
 				return def;
 			}
 		}
@@ -1128,7 +1125,7 @@ public final class Repository implements AppContextCleanup{
 				try {
 					s.write(dat);
 				} catch (Exception e) {
-					getContext().error(e, "error converting StreamData to string");
+					getLogger().error("error converting StreamData to string", e);
 					return null;
 				}
 				return dat.toString();
@@ -1628,14 +1625,14 @@ public final class Repository implements AppContextCleanup{
 		synchronized private boolean update() throws ConsistencyError, DataFault {
 			int pattern_count=1;
 
-			if( READ_ONLY_FEATURE.isEnabled(ctx)|| sql.isReadOnly()){
+			if( READ_ONLY_FEATURE.isEnabled(getContext())|| sql.isReadOnly()){
 				return false;
 			}
 			if (!isDirty()) {
 				return false;
 			}
 			
-			TimerService time = ctx.getService(TimerService.class);
+			TimerService time = getContext().getService(TimerService.class);
 			if( time != null ){
 				time.startTimer(getTag()+"-update");
 			}
@@ -1951,7 +1948,7 @@ public final class Repository implements AppContextCleanup{
 			return sb.toString();
 		}
 	}
-	final private AppContext ctx;
+	
 	final private SQLContext sql;
 
 	/**This is the tag used to find this repository.
@@ -2036,13 +2033,12 @@ public final class Repository implements AppContextCleanup{
 	 *            
 	 */
 	protected Repository(AppContext c, String tag) throws SQLException {
-		super();
-		ctx = c;
-		db_tag = ctx.getInitParameter("db-tag."+tag,null);
-		sql = ctx.getService(DatabaseService.class).getSQLContext(db_tag);
+		super(c);
+		db_tag = c.getInitParameter("db-tag."+tag,null);
+		sql = c.getService(DatabaseService.class).getSQLContext(db_tag);
 		tag_name=TableToTag(c, tag);
 		param_name=c.getInitParameter( CONFIG_TAG_PREFIX+tag,tag);
-		table_name = tagToTable(ctx,tag);
+		table_name = tagToTable(c,tag);
 		// Setting this allows multiple joins to the same table by
 		// having more than one tag for the same table with different aliases
 		alias_name = c.getInitParameter("table_alias."+tag, table_name);
@@ -2166,7 +2162,7 @@ public final class Repository implements AppContextCleanup{
     	Class<? extends IndexedProducer> clazz = getContext().getPropertyClass(IndexedProducer.class, null, getTag());	
     	if( clazz != null ){
     		// use lazy creation constructor
-    		producer = new IndexedTypeProducer(getUniqueIdName(),ctx,clazz,getTag());		
+    		producer = new IndexedTypeProducer(getUniqueIdName(),getContext(),clazz,getTag());		
     	}
     	return producer;
     }
@@ -2432,14 +2428,7 @@ public final class Repository implements AppContextCleanup{
 			}
 		}
 	}
-	/**
-	 * get the AppContext associated with this Repository.
-	 * 
-	 * @return the AppContext
-	 */
-	public AppContext getContext() {
-		return ctx;
-	}
+	
 
 	/** return the Record cache or null
 	 * Even if caching is enabled this may still return null under 
@@ -2757,7 +2746,7 @@ public final class Repository implements AppContextCleanup{
 		if( info == null || ! info.isNumeric() ){
 			throw new ConsistencyError("Invalid reference/numeric field "+getTag()+"."+key);
 		}
-		IndexedTypeProducer producer = new IndexedTypeProducer(ctx, key, prod);
+		IndexedTypeProducer producer = new IndexedTypeProducer(getContext(), key, prod);
 		TypeProducer typeProducer = info.getTypeProducer();
 		if( info.isReference() && ! typeProducer.equals(producer)){
 			throw new ConsistencyError("Incompatible producer specified for field "+getTag()+"."+key+" "+typeProducer.toString()+"!="+producer.toString());
@@ -2776,10 +2765,11 @@ public final class Repository implements AppContextCleanup{
 	 * @throws DataFault
 	 */
 	protected int insert(Record r) throws DataFault {
-			if( READ_ONLY_FEATURE.isEnabled(ctx) || sql.isReadOnly()){
+			AppContext c = getContext();
+			if( READ_ONLY_FEATURE.isEnabled(c) || sql.isReadOnly()){
 				return -1;
 			}
-			TimerService time = ctx.getService(TimerService.class);
+			TimerService time = c.getService(TimerService.class);
 			if( time != null ){
 				time.startTimer(getTag()+"-insert");
 			}
@@ -2816,7 +2806,7 @@ public final class Repository implements AppContextCleanup{
 			}
 			query.append(query_values.toString());
 			query.append(')');
-			if( ! atleastone && AT_LEAST_ONE.isEnabled(ctx)){
+			if( ! atleastone && AT_LEAST_ONE.isEnabled(getContext())){
 				throw new DataFault("Insert with no values");
 			}
 			
@@ -2958,7 +2948,7 @@ public final class Repository implements AppContextCleanup{
 				if (value != null) {
 					if (info.isData()) {
 						if (value instanceof Blob) {
-							value = new BlobStreamData(ctx, (Blob) value);
+							value = new BlobStreamData(getContext(), (Blob) value);
 						}else if( value instanceof byte[]) {
 							
 							value = new ByteArrayStreamData((byte[]) value);
@@ -3008,7 +2998,7 @@ public final class Repository implements AppContextCleanup{
 			Connection c = sql.getConnection();
 			try(Statement stmt=c.createStatement(); ResultSet rs = stmt.executeQuery(sb.toString())) {
 				setMetaData(rs);
-				setReferences(ctx,c);
+				setReferences(getContext(),c);
 				if(CHECK_INDEX.isEnabled(getContext())) {
 					setIndexes();
 				}
@@ -3168,7 +3158,7 @@ public final class Repository implements AppContextCleanup{
 	 * 
 	 */
 	public String dbFieldtoTag(String name){
-		return ctx.getInitParameter("rename."+table_name+"."+name, name);
+		return getContext().getInitParameter("rename."+table_name+"."+name, name);
 	}
 	
 	/** Map a tag name to the actual database table.
@@ -3371,7 +3361,7 @@ public final class Repository implements AppContextCleanup{
 				r = new Repository(c, tag);
 				c.setAttribute(key, r);
 			}catch(Exception e){
-				c.error(e,"Error making repository");
+				Logger.getLogger(Repository.class).error("Error making repository",e);
 				return null;
 			}
 		}
@@ -3477,7 +3467,7 @@ public final class Repository implements AppContextCleanup{
 				find_statement.close();
 			}
 		} catch (SQLException e) {
-			ctx.getService(DatabaseService.class).logError("Error closing find_Statement",e);
+			getContext().getService(DatabaseService.class).logError("Error closing find_Statement",e);
 		}
 		find_statement=null;
 	}

@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.model.data.forms.registry;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.registry.AbstractFormFactoryProvider;
 import uk.ac.ed.epcc.webapp.forms.registry.FormPolicy;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
@@ -51,7 +52,7 @@ public abstract class DynamicFormEntry<T extends DataObject> extends AbstractFor
 			DataObjectFactory<T> fac = getFactory(c);
 			return fac.isMine(target);
 		}catch(Exception e){
-			c.error(e,"Error getting owner");
+			Logger.getLogger(getClass()).error("Error getting owner",e);
 		}
 		return false;
 	}

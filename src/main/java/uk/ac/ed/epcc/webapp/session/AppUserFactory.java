@@ -406,7 +406,7 @@ Targetted<AU>
 					}
 				}
 			}catch(Exception t){
-				ctx.error(t,"Error adding Admin to first user");
+				getLogger().error("Error adding Admin to first user",t);
 			}
 		}
 	}
@@ -479,7 +479,7 @@ Targetted<AU>
 						}
 					}
 				}catch(Exception t){
-					getContext().error(t,"Error checking force_time");
+					getLogger().error("Error checking force_time",t);
 				}
 				return last.before(target_time);
 			}
@@ -1240,7 +1240,7 @@ Targetted<AU>
 				fac.update(p);
 				fac.terminate(p);
 			} catch (Exception e) {
-				conn.error(e, "Error updating PersonHistory");
+				getLogger().error("Error updating PersonHistory", e);
 				return;
 			}
 		}

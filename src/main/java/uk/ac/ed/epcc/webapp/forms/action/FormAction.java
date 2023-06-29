@@ -16,12 +16,15 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.action;
 
+import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.content.UIProvider;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 
 /**
@@ -122,4 +125,8 @@ public abstract class FormAction{
 	public void setMustValidate(boolean validate){
 		this.must_validate=validate;
 	}
+	public Logger getxLogger(AppContext conn) {
+		return conn.getService(LoggerService.class).getLogger(getClass());
+	}
+
 }

@@ -659,7 +659,7 @@ public abstract class LinkManager<T extends LinkManager.Link<L,R>,L extends Data
 			s.new Index("LeftKey",false,leftField);
 			s.new Index("RightKey",false,rightField);
 		} catch (InvalidArgument e) {
-			getContext().error(e,"Error making index");
+			getLogger().error("Error making index",e);
 		}
 		return s;
 	}

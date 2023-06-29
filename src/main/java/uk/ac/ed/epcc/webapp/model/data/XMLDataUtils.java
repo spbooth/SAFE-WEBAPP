@@ -315,7 +315,7 @@ public class XMLDataUtils extends AbstractContexed{
 				}
 			}
 		}catch(Exception t){
-			c.error(t,"Error in dropAllTables");
+			getLogger().error("Error in dropAllTables",t);
 		}finally{
 			if( timer != null ){ timer.stopTimer("dropAllTables");}
 		}

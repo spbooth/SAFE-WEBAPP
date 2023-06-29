@@ -325,7 +325,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 					listener.setPassword(user, new_password);
 				}
 			}catch(Exception t){
-				getLogger().error("Error calling PasswordChangeListener", t);
+				getLogger().error( "Error calling PasswordChangeListener",t);
 			}
 			SessionService<U> service = getContext().getService(SessionService.class);
 			FormResult next_result = null;
@@ -354,7 +354,7 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
 						Emailer emailer = Emailer.getFactory(getContext());
 						emailer.passwordChanged(user);
 					}catch(Exception t) {
-						getLogger().error("Error in email notification", t);
+						getLogger().error("Error in email notification",t);
 					}
 				}
 			}

@@ -23,6 +23,7 @@ import java.sql.SQLException;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 
 
 
@@ -41,7 +42,7 @@ public class BlobStreamData implements StreamData {
 		try {
 			return blob.length();
 		} catch (SQLException e) {
-			c.error(e,"Failed to get length from Blob");
+			Logger.getLogger(getClass()).error("Failed to get length from Blob",e);
 			return 0L;
 		}
 	}

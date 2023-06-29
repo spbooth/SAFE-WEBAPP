@@ -35,6 +35,8 @@ import uk.ac.ed.epcc.webapp.jdbc.SQLContext;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 
 
@@ -147,7 +149,7 @@ public class DataBaseConfigService implements ConfigService {
     			// setup has failed
     			// try to report and carry on. 
     			// However this will leave incomplete data in any upper caches.
-    			ctx.error(e, "Error setting up property table");
+    			getLogger().error("Error setting up property table", e);
     			// If something went wrong don't cache anything.
     			sql=null;
     		}finally{
@@ -214,7 +216,7 @@ public class DataBaseConfigService implements ConfigService {
 						sql.getService().handleError("Error getting properties", se);
 					}
 				} catch (Exception e) {
-					conn.error(e,"Error reading property table");
+					getLogger().error("Error reading property table",e);
 					db_props= null; // DB props are required, this may be a transient error so try again later.
 					ctx.getService(ConfigService.class).clearServiceProperties();
 					return nested.getServiceProperties();
@@ -304,7 +306,7 @@ public class DataBaseConfigService implements ConfigService {
 					}
 				}
 			}catch(Exception e){
-				getContext().error(e,"Error setting database parameter");
+				getLogger().error("Error setting database parameter",e);
 			}
 			notifyListeners();
 		}
@@ -339,4 +341,8 @@ public class DataBaseConfigService implements ConfigService {
 		return nested;
 	}
 
+	private Logger getLogger() {
+		LoggerService ls = getContext().getService(LoggerService.class);
+		return ls.getLogger(getClass());
+	}
 }

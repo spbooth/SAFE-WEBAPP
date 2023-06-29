@@ -263,7 +263,7 @@ public class XMLOverlay<X extends XMLOverlay.XMLFile> extends TextFileOverlay<X>
 				try {
 					doc=getXMLFile().getDocument();
 				} catch (Exception e) {
-					getContext().error(e,"Error getting document");
+					getLogger().error("Error getting document",e);
 					return null;
 				}
 			}

@@ -132,7 +132,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 					return stream;
 				}
 				}catch(Exception e){
-					conn.error(e,"Error getting resource stream for TextFile");
+					Logger.getLogger(TextFileOverlay.class).error("Error getting resource stream for TextFile",e);
 				}
 			}
 		}
@@ -168,7 +168,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 					log.debug("returning url "+url);
 					return url;
 				} catch (MalformedURLException e) {
-					conn.error(e,"Error making URL from base");
+					getLogger().error("Error making URL from base",e);
 				}
 			}
 			
@@ -267,7 +267,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 				InputStream stream = getResourceStream();
 				return getStringFromStream(getContext(),stream);
 			} catch (Exception e) {
-				getContext().error(e, "Error getting stream resource");
+				getLogger().error("Error getting stream resource", e);
 				return null;
 			}
 		}
@@ -469,7 +469,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			try {
 				dat.commit();
 			} catch (DataFault e) {
-				dat.getContext().error(e,"Update failed");
+				Logger.getLogger(getClass()).error("Update failed",e);
 				throw new ActionException("Update failed");
 			}
 			return new MessageResult("object_updated",type_name,dat);
@@ -494,7 +494,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			try {
 				dat.commit();
 			} catch (DataFault e) {
-				dat.getContext().error(e,"Revert failed");
+				Logger.getLogger(getClass()).error("Revert failed",e);
 				throw new ActionException("Revert failed");
 			}
 			return new MessageResult("object_updated",type_name,dat);
@@ -632,7 +632,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		try {
 			s.new Index("find_key", true, GROUP,NAME);
 		} catch (InvalidArgument e) {
-			c.error(e,"Error making find_key");
+			getLogger().error("Error making find_key",e);
 		}
 		return s;
 	}
@@ -658,7 +658,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 					return;
 				}
 			} catch (DataFault e) {
-				getContext().error(e,"Error looking for TextFile");
+				getLogger().error("Error looking for TextFile",e);
 			}
 			throw new ValidateException("Target file already exists");
 		}

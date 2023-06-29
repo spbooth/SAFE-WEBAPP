@@ -59,7 +59,7 @@ public class ClassTableCreator {
 					}
 				}
 			}catch(Exception tr){
-				conn.error(tr,"Error making documentation table for "+s);
+				conn.error("Error making documentation table for "+s,tr);
 			}
 		}
 		

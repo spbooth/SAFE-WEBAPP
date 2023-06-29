@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ViewTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.transition.AbstractDirectTransition;
 import uk.ac.ed.epcc.webapp.forms.transition.ViewTransitionFactory;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.time.TimePeriod;
 
@@ -66,7 +67,7 @@ public class MergeTransition<T extends TimePeriod,K> extends AbstractDirectTrans
 			return new ViewTransitionResult<>(tp, fac.merge(peer,target)); 
 		}
 		}catch(Exception t){
-			tp.getContext().error(t,"Error in merge");
+			Logger.getLogger(getClass()).error("Error in merge",t);
 			throw new TransitionException("Internal error");
 		}
 	}

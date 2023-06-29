@@ -277,7 +277,8 @@ public abstract class WebappServlet extends HttpServlet {
 	public static void messageWithArgs(AppContext context, HttpServletRequest req,
 				HttpServletResponse res, String message_type, Object args[])
 				throws ServletException, IOException {
-		context.getService(LoggerService.class).getLogger(context.getClass()).debug("sending message " + message_type);
+		Logger log = context.getService(LoggerService.class).getLogger(context.getClass());
+		log.debug("sending message " + message_type);
 		// verify the message is valid
 		try {
 			MessageBundleService serv = context.getService(MessageBundleService.class);
@@ -286,7 +287,7 @@ public abstract class WebappServlet extends HttpServlet {
 			mess.getString(message_type + ".text");
 		} catch (MissingResourceException e) {
 			// report the bad message including call site
-			context.error(e, "Bad message " + message_type);
+			log.error("Bad message " + message_type, e);
 		}
 		req.setAttribute(MESSAGE_TYPE_ATTR, message_type);
 		if( args != null ) {

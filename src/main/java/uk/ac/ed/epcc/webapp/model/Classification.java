@@ -27,6 +27,7 @@ import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.HistoryFactory;
 import uk.ac.ed.epcc.webapp.model.data.Owned;
@@ -98,7 +99,7 @@ public class Classification extends DataObject implements Principal, Comparable<
     	try {
 			s.new Index("name_key",true,ClassificationFactory.NAME);
 		} catch (InvalidArgument e) {
-			c.error(e,"Error making classification key");
+			Logger.getLogger(Classification.class).error("Error making classification key",e);
 		}
     	return s;
     }
@@ -131,7 +132,7 @@ public class Classification extends DataObject implements Principal, Comparable<
 					hist_fac.update(this);
 				}
 				catch (DataException ex) {
-					getContext().error(ex, "Error updating history table");
+					getLogger().error("Error updating history table", ex);
 				}
 			}
 		}

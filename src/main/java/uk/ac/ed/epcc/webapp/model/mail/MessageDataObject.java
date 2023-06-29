@@ -107,7 +107,7 @@ public abstract class MessageDataObject extends DataObject implements
     			   }
     			   this.hash = (int) hash;
     		   } catch (Exception e) {
-    			   getContext().error(e,"Error making message hash");
+    			   getLogger().error("Error making message hash",e);
     			   hash=-1;
     		   }
     	   }
@@ -127,7 +127,7 @@ public abstract class MessageDataObject extends DataObject implements
 				return s;
 			}
 		} catch (Exception e) {
-			getContext().error(e, "Error getting subject");
+			getLogger().error("Error getting subject", e);
 		}
 		return "";
 	}
@@ -152,7 +152,7 @@ public abstract class MessageDataObject extends DataObject implements
 			}
 			return sb.toString();
 		} catch (Exception e) {
-			getContext().error(e, "Error getting recipients");
+			getLogger().error("Error getting recipients", e);
 		}
 		return "";
 	}
@@ -179,7 +179,7 @@ public abstract class MessageDataObject extends DataObject implements
 				m=null; // force re-read 
 			}
 		} catch (Exception e) {
-			getContext().error(e, "Error writing mail message");
+			getLogger().error("Error writing mail message", e);
 		}
 	}
 

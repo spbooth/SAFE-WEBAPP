@@ -8,6 +8,7 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormBuilder;
 import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.CreateAction;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFormFactory;
@@ -35,7 +36,7 @@ public interface CreateTransitionInterface<BDO extends DataObject> extends Targe
 				comp.customiseCreationForm(f);		
 			}
 		} catch (Exception e) {
-			getContext().error(e,"Error creating object");
+			Logger.getLogger(getClass()).error("Error creating object",e);
 			throw new TransitionException("Error creating object");
 		}
 		

@@ -56,7 +56,7 @@ public class JNDIDatabaseService extends DefaultDataBaseService {
 					}
 					return new MysqlSQLContext(getContext(),this,conn);
 				} catch (Exception e) {
-					getContext().error(e, "error attaching to connection pool " + lookup);
+					getLogger().error("error attaching to connection pool " + lookup, e);
 				}
 			}
 		}

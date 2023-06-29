@@ -21,6 +21,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import uk.ac.ed.epcc.webapp.AppContext;
+import uk.ac.ed.epcc.webapp.logging.Logger;
+import uk.ac.ed.epcc.webapp.logging.LoggerService;
 /** StreamData Object wrapping a file.
  * 
  * @author spb
@@ -44,16 +46,19 @@ public class FileStreamData implements StreamData {
 		try {
 			return new FileInputStream(file);
 		} catch (FileNotFoundException e) {
-			conn.error(e,"Failed to open file for input");
+			getLogger().error("Failed to open file for input",e);
 			return null;
 		}
+	}
+	Logger getLogger() {
+		return conn.getService(LoggerService.class).getLogger(getClass());
 	}
 
 	public OutputStream getOutputStream() {
 		try {
 			return new FileOutputStream(file);
 		} catch (FileNotFoundException e) {
-			conn.error(e,"Failed ot open file for output");
+			getLogger().error("Failed ot open file for output",e);
 			return null;
 		}
 		

@@ -250,7 +250,7 @@ public class HTMLForm extends BaseHTMLForm {
 			}
 			ctx.getService(ServletService.class).forward(form_url);
 		} catch (Exception e) {
-			ctx.error(e, "Exception dispatching form error");
+			ctx.getService(LoggerService.class).getLogger(HTMLForm.class).error("Exception dispatching form error", e);
 
 		}
 	}

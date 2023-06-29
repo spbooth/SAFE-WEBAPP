@@ -149,7 +149,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 						// cast to avoid generic problems as we don't know the real link type here
 						((LinkHistoryHandler) manager.getHistoryHandler()).update(this);
 					} catch (Exception e) {
-						getContext().error(e, "Error updating Link History");
+						getLogger().error("Error updating Link History", e);
 					}
 				}
 			}
@@ -508,7 +508,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		try {
 			s.new Index("Link", true, leftField, rightField);
 		} catch (InvalidArgument e) {
-			getContext().error(e,"Error making index");
+			getLogger().error("Error making index",e);
 		}
 		return s;
 	}
@@ -829,7 +829,7 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 				h.update(val);
 			}
 		} catch (Exception e) {
-		    getContext().error(e,"Error updating history");
+		    getLogger().error("Error updating history",e);
 		}
 	}
 

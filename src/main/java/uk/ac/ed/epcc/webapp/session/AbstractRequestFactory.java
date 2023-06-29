@@ -154,7 +154,7 @@ public abstract class AbstractRequestFactory<R extends AbstractRequestFactory.Ab
 			log.debug("output is"+output.toString());
 			return output.toString();
 		} catch (NoSuchAlgorithmException e) {
-			getContext().error(e,"Error making digest");
+			getLogger().error("Error making digest",e);
 			return input.toString();
 		}
 	}

@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.jdbc.expr.IndexedSQLValue;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.IndexedError;
 
@@ -73,17 +74,20 @@ private final int id;
 	  IndexedProducer<I> producer;
 	  producer =  makeIndexedProducer(c,clazz,table);
 	  if( producer == null){
-		  c.getService(LoggerService.class).getLogger(getClass()).error("Failed to make producer class="+clazz.getCanonicalName()+" table "+table);
+		  getLogger(c).error("Failed to make producer class="+clazz.getCanonicalName()+" table "+table);
 		  return null;
 	  }else{
 		  return producer.find(id);
 	  }
 	  }catch(Exception e){
-		  c.error(e,"Exception making indexed");
+		  getLogger(c).error("Exception making indexed",e);
 		  return null;
 	  }
 	 
   }
+protected Logger getLogger(AppContext c) {
+	return c.getService(LoggerService.class).getLogger(getClass());
+}
  
 @SuppressWarnings("unchecked")
 public static <I extends Indexed> IndexedProducer<I> makeIndexedProducer(AppContext c, Class<? extends IndexedProducer> clazz, String table)  {
@@ -91,7 +95,7 @@ public static <I extends Indexed> IndexedProducer<I> makeIndexedProducer(AppCont
 	  try{
 		  return c.makeObject(clazz, table);
 	  }catch(Exception e){
-		  c.error(e,"Exception making IndexedProducer");
+		  Logger.getLogger(IndexedReference.class).error("Exception making IndexedProducer",e);
 		  return null;
 	  }
 
@@ -158,7 +162,7 @@ public static <I extends Indexed> IndexedReference<I> parseIndexedReference(AppC
 			try {
 				clazz = (Class<? extends IndexedProducer<I>>) Class.forName(classname);
 			} catch (ClassNotFoundException e) {
-				c.error(e,"Error parsing IndexedReference class");
+				Logger.getLogger(IndexedReference.class).error("Error parsing IndexedReference class",e);
 			}
 		}
 		String tag = m.group(3);

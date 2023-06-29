@@ -57,7 +57,7 @@ public final class AutoNamePolicy<AU extends AppUser> extends FieldNameFinder<AU
 					return name;
 				}
 			} catch (DataException e) {
-				getContext().error(e,"Error checking for unique wikiname");
+				getLogger().error("Error checking for unique wikiname",e);
 				return name;
 			}
 		}

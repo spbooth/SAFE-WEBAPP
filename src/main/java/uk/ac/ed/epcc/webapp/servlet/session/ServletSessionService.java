@@ -200,7 +200,7 @@ protected A lookupPerson() {
 					}
 				}
 			}catch(Exception e){
-				getContext().error(e, "Error updating Wtmp");
+				getLogger().error("Error updating Wtmp", e);
 				removeAttribute(WTMP_EXPIRY_DATE);
 				removeAttribute(WTMP_ID);
 			}
@@ -232,7 +232,7 @@ public void clearCurrentPerson() {
 			}
 		}
 	}catch(Exception e){
-		getContext().error(e,"Error in Wtmp logoff");
+		getLogger().error("Error in Wtmp logoff",e);
 	}finally{
 		removeAttribute(WTMP_EXPIRY_DATE);
 		removeAttribute(WTMP_ID);
@@ -268,7 +268,7 @@ public void logOut(){
 			setCookie(false, "");
 		}
 	}catch(Exception t){
-		getContext().error(t, "Error closing Wtmp");
+		getLogger().error("Error closing Wtmp", t);
 	}
 	if( ss instanceof DefaultServletService){
 		DefaultServletService defss = (DefaultServletService)ss;
@@ -309,7 +309,7 @@ public void setCurrentPerson(A person) {
 				}
 			}
 		} catch (DataException e) {
-			getContext().error(e,"Error setting wtmp");
+			getLogger().error("Error setting wtmp",e);
 			removeAttribute(WTMP_EXPIRY_DATE);
 			removeAttribute(WTMP_ID);
 		}
@@ -372,7 +372,7 @@ public void setCrossCookie(WtmpManager man, Wtmp w)  {
 			}
 		}
 	}catch(Exception t){
-		getContext().error(t,"Error setting cross app cookie");
+		getLogger().error("Error setting cross app cookie",t);
 	}
 }
 
@@ -466,7 +466,7 @@ protected Integer getPersonID() {
 							}
 						}
 					}catch(Exception t){
-						getContext().error(t,"Error reading cross app cookie");
+						getLogger().error("Error reading cross app cookie",t);
 					}
 				}
 			}finally {
@@ -479,7 +479,7 @@ protected Integer getPersonID() {
 		// non-valid best to slow down unregistered users.
 		clearCurrentPerson();
 	}catch(Exception t){
-		getContext().error(t, "Error populating session");
+		getLogger().error("Error populating session", t);
 	}
 	return 0;
 }

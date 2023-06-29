@@ -54,6 +54,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.TransientDataFault;
  * @author spb
  *
  */
+import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 
 @PreRequisiteService(ConfigService.class)
 public class DefaultDataBaseService implements DatabaseService {
@@ -513,5 +514,8 @@ public class DefaultDataBaseService implements DatabaseService {
         }
 		
 		return map;
+	}
+	protected Logger getLogger() {
+		return getContext().getService(LoggerService.class).getLogger(getClass());
 	}
 }

@@ -641,7 +641,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 			JPanel panel = listener.getPanel(f, validate);
 			content.add(panel,BorderLayout.CENTER);
 		} catch (Exception e) {
-			conn.error(e,"Error adding panel");
+			getLogger().error("Error adding panel",e);
 		}
 		
 	}
@@ -655,7 +655,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 		try {
 			field.addLabel(content);
 		} catch (Exception e) {
-			conn.error(e,"Error adding label");
+			getLogger().error("Error adding label",e);
 		}
 		}
 	}
@@ -666,7 +666,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 		try {
 			field.addError(content);
 		} catch (Exception e) {
-			conn.error(e,"Error adding label");
+			getLogger().error("Error adding label",e);
 		}
 		}
 	}
@@ -680,7 +680,7 @@ public class SwingContentBuilder  implements ContentBuilder{
 		try {
 			field.addInput(content,radio_selector);
 		} catch (Exception e) {
-			conn.error(e,"Error adding label");
+			getLogger().error("Error adding label",e);
 		}
 		}
 	}

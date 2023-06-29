@@ -127,7 +127,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
     				T obj = makeFromString(name);
     				obj.commit();
     			}catch(Exception e){
-    				c.error(e,"Error in classification bootstrap "+table);
+    				getLogger().error("Error in classification bootstrap "+table,e);
     			}
     		}
     	}
@@ -148,7 +148,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		try {
 			return find(getStringFinderFilter(name),true);
 		} catch (DataException e) {
-			getContext().error(e,"Error in findByName");
+			getLogger().error("Error in findByName",e);
 			return null;
 		}
 	}
@@ -233,7 +233,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			try {
 				return new FilterIterator(fil);
 			} catch (DataFault e) {
-				getContext().error(e,"Error getting item iterator");
+				getLogger().error("Error getting item iterator",e);
 				return null;
 			}
 		}
@@ -243,7 +243,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			try{
 				return (int) ClassificationFactory.this.getCount(fil);
 			}catch(Exception e){
-				getContext().error(e,"Error getting select count");
+				getLogger().error("Error getting select count",e);
 				return 0;
 			}
 		}

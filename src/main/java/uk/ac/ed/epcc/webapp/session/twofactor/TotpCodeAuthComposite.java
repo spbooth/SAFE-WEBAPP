@@ -665,7 +665,7 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 							Emailer m = Emailer.getFactory(getContext());
 							m.userNotification(target,"mfa_new_recovery_token.txt");
 						} catch (Exception e) {
-							getLogger().error("Failed to notify of new recovery token", e);
+							getLogger().error( "Failed to notify of new recovery token",e);
 						}
 						return new MessageResult("recovery_token_set", String.format("%08d", new_code));
 					}catch(Exception e) {

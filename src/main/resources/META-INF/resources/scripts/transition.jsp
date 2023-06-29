@@ -32,6 +32,7 @@ the form could just submit to self. This might break form error reporting though
 <%@ page import="uk.ac.ed.epcc.webapp.session.SessionService" %>
 <%@ page import="uk.ac.ed.epcc.webapp.servlet.ServletService" %>
 <%@ page import="uk.ac.ed.epcc.webapp.servlet.TransitionServlet" %>
+<%@page import = "uk.ac.ed.epcc.webapp.logging.Logger" %>
 <%@ taglib uri="http://safe.epcc.ed.ac.uk/webapp" prefix="wb" %>
 <wb:ServiceInit/>
 <%
@@ -133,7 +134,7 @@ if( ! HTMLForm.hasError(request) && t instanceof ValidatingFormTransition){
 <%
 		}else{
 		  if( extra == null){
-		  	conn.error("Null builder from ExtraContent in transition.jsp ");
+		  	Logger.getLogger(getClass()).error("Null builder from ExtraContent in transition.jsp ");
 		  }
     	}
 	}

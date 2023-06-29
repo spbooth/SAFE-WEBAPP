@@ -189,14 +189,14 @@ public class SwingFormResultVisitor implements FormResultVisitor,Contexed {
 			  try{
 				  message_title = MessageFormat.format(mess.getString(message_type + ".title"),args);
 			  }catch(MissingResourceException e){
-				  conn.error(e,"missing confirm title for "+message_type);
+				  Logger.getLogger(SwingFormResultVisitor.class).error("missing confirm title for "+message_type,e);
 			  }
 		  
 		  
 			  try{
 				  message_text = MessageFormat.format(mess.getString(message_type + ".text"),args);
 			  }catch(MissingResourceException e){
-				  conn.error(e,"missing confirm text for "+message_type);
+				  Logger.getLogger(SwingFormResultVisitor.class).error("missing confirm text for "+message_type,e);
 			  }
 			  int n = JOptionPane.showOptionDialog(parent, message_text, message_title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{yes_text,no_text}, no_text);
 			  boolean ok = (n == 0);
@@ -226,13 +226,13 @@ public class SwingFormResultVisitor implements FormResultVisitor,Contexed {
 		 try{
 			  message_title = MessageFormat.format(conn.expandText(mess.getString(message_type + ".title")),args);
 		  }catch(MissingResourceException e){
-			  conn.error(e,"missing message title for "+message_type);
+			  log.error("missing message title for "+message_type,e);
 		  }
 		  try{
 			  message_text = MessageFormat.format(conn.expandText(mess.getString(message_type + ".text")),args);
 			  body = message_text;
 		  }catch(MissingResourceException e){
-			  conn.error(e,"missing message text for "+message_type);
+			  log.error("missing message text for "+message_type,e);
 		  }
 		  try{
 			  message_extra = MessageFormat.format(conn.expandText(mess.getString(message_type + ".extra")),args);

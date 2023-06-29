@@ -113,7 +113,7 @@ public class PropertyFactory extends DataObjectFactory<Property> {
 		try {
 			s.new Index("name_key", true, Property.NAME);
 		} catch (InvalidArgument e) {
-			c.error(e,"Failed to create name key");
+			getLogger().error("Failed to create name key",e);
 		}
 		return s;
     }

@@ -85,7 +85,7 @@ public class DefaultCrsfTokenService extends AbstractContexed implements CrsfTok
 			md.update(tag.getBytes());
 			return Hash.getHex(md.digest());
 		} catch (Exception e) {
-			getContext().error(e, "Error making crsf value");
+			getLogger().error("Error making crsf value", e);
 			return null;
 		}
 		
