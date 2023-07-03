@@ -73,14 +73,10 @@ body header , body footer{
 
 body > div.block , body div.bar{
 	border: none;
-}
-
-
-
-
-body > div.block {
 	padding: 0;
 }
+
+
 
 
 /* we use three levels of header as standard 
