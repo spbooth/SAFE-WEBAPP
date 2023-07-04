@@ -9,12 +9,11 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormBuilder;
 import uk.ac.ed.epcc.webapp.forms.transition.TargetLessTransition;
 import uk.ac.ed.epcc.webapp.logging.Logger;
-import uk.ac.ed.epcc.webapp.model.data.CreateAction;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.DataObjectFormFactory;
 
 /** An interface that can be added to a {@link DataObjectUpdateFormFactory} to convert it into
- * a create transition. This is to help support common customised superclasses for differett types of 
+ * a create transition. This is to help support common customised superclasses for differet types of 
  * {@link DataObjectFormFactory}
  * @author Stephen Booth
  * @see CreatorInterface
