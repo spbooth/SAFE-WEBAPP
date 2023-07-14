@@ -123,6 +123,7 @@ public class PasswordPolicy extends AbstractContexed implements FieldValidator<S
 		PasswordInput input = new PasswordInput();
 		input.setMinimumLength(minPasswordLength());
 		input.addValidator(this);
+		input.setAutoCompleteHint("new-password");
 		return input;
 	}
 }

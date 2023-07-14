@@ -16,18 +16,9 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.IsForcedVisitor;
-import uk.ac.ed.epcc.webapp.forms.inputs.LockedInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
-import uk.ac.ed.epcc.webapp.forms.inputs.UnmodifiableInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 
 /**

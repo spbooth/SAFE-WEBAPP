@@ -16,6 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 
@@ -147,4 +149,10 @@ public interface Input<V> {
 	 * @param val
 	 */
 	public void removeValidator(FieldValidator<V> val);
+	
+	/** Get the current set of Validators.
+	 * 
+	 * @return
+	 */
+	public Set<FieldValidator<V>> getValidators();
 }

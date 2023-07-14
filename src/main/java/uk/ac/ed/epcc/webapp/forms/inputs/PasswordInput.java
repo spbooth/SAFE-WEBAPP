@@ -29,9 +29,10 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  */
 
 
-public class PasswordInput extends TextInput {
+public class PasswordInput extends TextInput implements AutoCompleteHint {
 
 	private int minimum_length=0;
+	private String autocomplete=null;
 
 	/**
 	 * 
@@ -64,4 +65,12 @@ public class PasswordInput extends TextInput {
 		return minimum_length;
 	}
 
+
+	@Override
+	public String getAutoCompleteHint() {
+		return autocomplete;
+	}
+	public void setAutoCompleteHint(String val) {
+		autocomplete=val;
+	}
 }

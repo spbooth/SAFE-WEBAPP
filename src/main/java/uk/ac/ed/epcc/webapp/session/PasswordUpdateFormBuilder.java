@@ -201,7 +201,9 @@ public class PasswordUpdateFormBuilder<U extends AppUser>  extends AbstractFormT
     	SessionService<U> sess = conn.getService(SessionService.class);
     	boolean logged_in = sess != null && sess.haveCurrentUser();
     	if( check_old ){
-    		f.addInput(PASSWORD_FIELD, "Current Password:", new PasswordInput());
+    		PasswordInput s = new PasswordInput();
+    		s.setAutoCompleteHint("current-password");
+			f.addInput(PASSWORD_FIELD, "Current Password:", s);
     		f.getField(PASSWORD_FIELD).addValidator(new MatchValidator(user));
     		f.addValidator(new ChangeValidator());
     	}

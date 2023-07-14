@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import java.util.Set;
+
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 
@@ -122,6 +124,11 @@ public abstract class WrappingInput<V> implements Input<V> {
 	public void removeValidator(FieldValidator<V> val) {
 		nested.removeValidator(val);
 		
+	}
+
+	@Override
+	public Set<FieldValidator<V>> getValidators() {
+		return nested.getValidators();
 	}
 
 	@Override

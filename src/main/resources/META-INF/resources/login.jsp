@@ -184,13 +184,13 @@ if( password_auth != null){
    <table class="form">
 	<tr>
 		<th><label class='required' for="username"><%=fac.getNameLabel() %>:</label></th>
-		<td><input id="username" type="text" class="input" name="username" required/></td>
+		<td><input id="username" type="text" class="input" name="username" autocomplete="username" required/></td>
 		<td></td>
 	</tr>
 	<tr>
 
 		<th><label <%= use_reset_page ? "class='required'":""%> for="password">Password</label></th>
-		<td><input id="password" type="password" class="input" name="password" <%= use_reset_page ? "required" :"" %>/></td>
+		<td><input id="password" type="password" autocomplete="current-password" class="input" name="password" <%= use_reset_page ? "required" :"" %>/></td>
 		<td>
 		    <input class="input_button login" type="submit" title="Login using password" value="Login" />
 		    <% if( password_auth.canResetPassword(null) && use_reset_page){ %>

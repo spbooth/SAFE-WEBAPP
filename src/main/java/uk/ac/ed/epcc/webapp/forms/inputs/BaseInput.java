@@ -116,4 +116,9 @@ public abstract class BaseInput<V> implements Input<V> {
     protected void validateInner() throws FieldException{
     	
     }
+
+	@Override
+	public Set<FieldValidator<V>> getValidators() {
+		return validators;
+	}
 }

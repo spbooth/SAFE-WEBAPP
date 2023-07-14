@@ -14,6 +14,7 @@
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
@@ -204,7 +205,10 @@ public class RadioButtonInput<V, T> implements ListInput<V, T>, ParseInput<V> {
 	@Override
 	public void removeValidator(FieldValidator<V> val) {
 		nested.removeValidator(val);
-		
+	}
+	@Override
+	public Set<FieldValidator<V>> getValidators() {
+		return nested.getValidators();
 	}
 	@Override
 	public String toString() {

@@ -19,7 +19,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
 /**
- * extended version of Input that supports parsing a String represenatation of
+ * extended version of Input that supports parsing a String representation of
  * the input
  * 
  * @author spb

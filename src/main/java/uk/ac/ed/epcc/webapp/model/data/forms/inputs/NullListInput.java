@@ -18,6 +18,7 @@ package uk.ac.ed.epcc.webapp.model.data.forms.inputs;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.Indexed;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
@@ -264,7 +265,10 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		internal.removeValidator(val);
 		
 	}
-	
+	@Override
+	public Set<FieldValidator<Integer>> getValidators() {
+		return internal.getValidators();
+	}
 	/** wrap any Selector with a compatible input
 	 * 
 	 */

@@ -656,6 +656,12 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				// add list attribute
 				result.attr("list", name + "_list");
 			}
+			if( input instanceof AutoCompleteHint) {
+				String hint = ((AutoCompleteHint)input).getAutoCompleteHint();
+				if( hint != null && ! hint.isEmpty()) {
+					result.attr("autocomplete",hint);
+				}
+			}
 			// Now for html verification
 			if( use_html5){
 				if( input instanceof PatternInput){
