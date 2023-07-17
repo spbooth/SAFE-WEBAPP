@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidationSet;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 
@@ -28,7 +29,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 public abstract class BaseInput<V> implements Input<V> {
 
 	String key;
-	protected Set<FieldValidator<V>> validators=new LinkedHashSet<>();
+	protected FieldValidationSet<V> validators=new FieldValidationSet<>();
 
 	/**
 	 * 
@@ -40,6 +41,14 @@ public abstract class BaseInput<V> implements Input<V> {
 	@Override
 	public final void addValidator(FieldValidator<V> val) {
 		validators.add(val);
+	}
+
+	@Override
+	public void addValidatorSet(FieldValidationSet<V> set) {
+		if( set == null) {
+			return;
+		}
+		validators.addAll(set);
 	}
 
 	@Override
@@ -118,7 +127,7 @@ public abstract class BaseInput<V> implements Input<V> {
     }
 
 	@Override
-	public Set<FieldValidator<V>> getValidators() {
+	public FieldValidationSet<V> getValidators() {
 		return validators;
 	}
 }

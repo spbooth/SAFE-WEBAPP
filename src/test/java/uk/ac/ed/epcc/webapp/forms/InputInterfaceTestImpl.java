@@ -27,6 +27,7 @@ import javax.swing.JFrame;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.ContextHolder;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
@@ -60,7 +61,7 @@ public class InputInterfaceTestImpl<T,I extends Input<T>,X extends TestDataProvi
 		Input<T> input = target.getInput();
 		input.setKey("test");
 		HtmlBuilder hb = new HtmlBuilder();
-		EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(null,false,hb, false, new HashMap() ,null);
+		EmitHtmlInputVisitor vis = new EmitHtmlInputVisitor(AppContext.getContext(),false,hb, false, new HashMap() ,null);
 		input.accept(vis);
 	}
 	

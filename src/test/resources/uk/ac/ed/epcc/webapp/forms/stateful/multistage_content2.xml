@@ -12,7 +12,7 @@
 <label for="transition_Tens" class="required">Tens</label>
 </th>
 <td>
-<input id="transition_Tens" type="number" size="32" maxlength="32" name="Tens" class="input" min="700" max="790" step="10" required="required"/>
+<input id="transition_Tens" type="number" name="Tens" class="input" min="700" max="790" step="10" required="required"/>
 </td>
 </tr>
 </table>

@@ -36,6 +36,7 @@ import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.MaxLengthValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 /** A Text input for XML nodes.
@@ -52,7 +53,7 @@ public class NodeInput extends TextInput implements ItemInput<String,Node>{
 	public NodeInput(AppContext conn,Document doc,TransformerFactory fac,Schema schema) throws TransformerConfigurationException {
 		super();
 		setSingle(false);
-		setMaxResultLength(1<<24);
+		addValidator(new MaxLengthValidator(1<<24));
 		this.conn=conn;
 		this.doc=doc;
 		this.schema=schema;

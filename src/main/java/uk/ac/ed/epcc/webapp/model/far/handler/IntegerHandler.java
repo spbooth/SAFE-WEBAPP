@@ -44,7 +44,6 @@ public class IntegerHandler implements QuestionFormHandler<Integer> {
 		
 		TextInput unit_input = new TextInput();
 		unit_input.setSingle(true);
-		unit_input.setMaxResultLength(16);
 		f.addInput(UNIT, "Unit", unit_input);
 		f.getField(UNIT).setOptional(true);
 		

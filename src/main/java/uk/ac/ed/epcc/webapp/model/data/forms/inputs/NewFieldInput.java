@@ -58,7 +58,6 @@ public class NewFieldInput extends TextInput {
 	public NewFieldInput(Repository res) {
 		super();
 		setBoxWidth(32);
-		setMaxResultLength(32);
 		setSingle(true);
 		addValidator(new NewFieldValidator(res));
 	}

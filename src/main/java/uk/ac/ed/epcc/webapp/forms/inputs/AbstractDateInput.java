@@ -68,7 +68,6 @@ public abstract class AbstractDateInput extends ParseAbstractInput<Date> impleme
 
 		}
 		setBoxWidth(length);
-		setMaxResultLength(length);
 		addValidator(new FieldValidator<Date>() {
 			
 			@Override

@@ -6,7 +6,7 @@
 <label for="transition_Hundreds" class="required">Hundreds</label>
 </th>
 <td>
-<input id="transition_Hundreds" type="number" size="32" maxlength="32" name="Hundreds" class="input" min="0" max="1000" step="100" required="required"/>
+<input id="transition_Hundreds" type="number" name="Hundreds" class="input" min="0" max="1000" step="100" required="required"/>
 </td>
 </tr>
 </table>

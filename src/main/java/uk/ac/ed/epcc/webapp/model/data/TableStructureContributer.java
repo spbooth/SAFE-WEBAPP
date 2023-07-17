@@ -16,6 +16,8 @@ package uk.ac.ed.epcc.webapp.model.data;
 import java.util.Map;
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidationSet;
+import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -104,6 +106,15 @@ public interface TableStructureContributer<BDO extends DataObject> extends FormL
 	 */
 	default Map<String,FieldConstraint> addFieldConstraints(Map<String,FieldConstraint> constraints){
 		return constraints;
+	}
+	/** Add any {@link FieldValidationSet}s 
+	 * Note there might be multiple {@link FieldValidator}s so existing values should be merged.
+	 * 
+	 * @param validators
+	 * @return
+	 */
+	default Map<String,FieldValidationSet> addFieldValidations(Map<String,FieldValidationSet> validators){
+		return validators;
 	}
 	/**
 	 * Extension hook to allow additional Form customisation generic to all

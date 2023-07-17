@@ -395,8 +395,9 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		} catch (Exception e) {
 			getLogger().error("Error getting id",e);
 		}
-		emitTextParam(hb, input,input.getKey(),id, input.getBoxWidth(), input
-				.getMaxResultLength(), input.getSingle(), true,def);
+		emitTextParam(hb, input,input.getKey(),id, input.getBoxWidth(), 
+				MaxLengthValidator.getMaxLength(input.getValidators()), 
+				input.getSingle(), true,def);
 	
 	}
 
@@ -415,8 +416,9 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 			getLogger().error("Error getting id",e);
 		}
 		
-		emitTextParam(hb, input,input.getKey(), id,input.getBoxWidth(), input
-				.getMaxResultLength(), input.getSingle(), false,def);
+		emitTextParam(hb, input,input.getKey(), id,input.getBoxWidth(), 
+				MaxLengthValidator.getMaxLength(input.getValidators()),
+				input.getSingle(), false,def);
 		if( input instanceof UnitInput){
 			String unit = ((UnitInput) input).getUnit();
 			if (unit  != null) {
@@ -608,13 +610,16 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		if( input instanceof FormatHintInput){
 			format_hint = ((FormatHintInput)input).getFormatHint();
 		}
+		if( force_password ) {
+			force_single=true; // passwords always single
+		}
+		if( boxwid <=0 ) {
+			force_single=true;
+		}
 		boolean old_escape = result.setEscapeUnicode(! force_password && ESCAPE_UNICODE_FEATURE.isEnabled(conn));
 		// max_result_length <= 0 is unlimited
 		if (force_single || ( max_result_length > 0 && max_result_length <= 2 * boxwid)) {
-			int size = max_result_length;
-			if (max_result_length > boxwid) {
-				size = boxwid;
-			}
+			
 			boolean autocomplete = input instanceof AutoComplete && ((AutoComplete)input).useAutoComplete();
 			boolean use_datalist = autocomplete && use_html5 && USE_DATALIST.isEnabled(conn);
 			
@@ -638,6 +643,13 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				type="password";
 			}
 			result.attr( "type",type);
+			
+			int size = max_result_length;
+			if( boxwid > 0 ) {
+				if (max_result_length > boxwid || max_result_length <= 0) {
+					size = boxwid;
+				}
+			}
 			if( size > 0 ){
 				result.attr("size",Integer.toString(size));
 			}

@@ -61,7 +61,6 @@ public class RegularPeriodInput extends MultiInput<RegularSplitPeriod, Input> {
 			end.setValue(cal.getTime());
 			cal.add(Calendar.MONTH, -1);
 			splits.setBoxWidth(2);
-			splits.setMaxResultLength(3);
 			splits.setValue(4);
 			splits.setMin(0);
 			splits.setMax(PERIOD_INPUT_MAX_SPLITS);

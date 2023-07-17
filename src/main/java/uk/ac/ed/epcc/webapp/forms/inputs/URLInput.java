@@ -47,7 +47,6 @@ public class URLInput extends TextInput implements HTML5Input{
 		super();
 		setSingle(true);
 		setTrim(true);
-		setMaxResultLength(128);
 		addValidator(new URLValidator());
 	}
 

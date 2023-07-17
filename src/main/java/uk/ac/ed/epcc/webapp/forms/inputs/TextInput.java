@@ -16,10 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
 
 
@@ -31,22 +28,7 @@ public class TextInput extends ParseAbstractInput<String> {
 	private boolean trim=true;
 	public TextInput() {
 		super();
-		addValidator(new FieldValidator<String>() {
-			
-			@Override
-			public void validate(String v) throws FieldException {
-				if (v != null && !(v instanceof String)) {
-					throw new ValidateException("Invalid input type in TextInput "+v.getClass().getCanonicalName());
-				}
-				String s = (String) v;
-				if (s != null && s.length() > getMaxResultLength() && getMaxResultLength() > 0) {
-					throw new ValidateException("Input too long "+s.length()+">"+getMaxResultLength());
-				}
-				
-				
-				
-			}
-		});
+		
 	}
 
 	@Override

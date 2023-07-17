@@ -22,6 +22,7 @@ import java.util.*;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.Field;
+import uk.ac.ed.epcc.webapp.forms.FieldValidationSet;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormBuilder;
@@ -77,15 +78,15 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 		try(TimeClosable build = new TimeClosable(getContext(), "buildForm")){
 			f.setFormTextGenerator(this);
 			boolean defer = DEFER_CONTENT.isEnabled(getContext());
-			boolean complete = buildForm(getContext(), factory.res,getFields(),f,getOptional(), getSelectors(),getFieldConstraints(),defer ? null :getTranslations(),defer ? null :getFieldHelp(),fixtures);
+			boolean complete = buildForm(getContext(), factory.res,getFields(),f,getOptional(), getSelectors(),getValidators(),getFieldConstraints(),defer ? null :getTranslations(),defer ? null :getFieldHelp(),fixtures);
 			customiseForm(f);
 			f.setContents(getDefaults());
 			return complete;
 		}
 	}
 	public static final boolean buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
-			Set<String> optional, Map<String,Selector> selectors,Map<String,String> labels) throws DataFault {
-		return buildForm(conn, res, f, supress_fields, optional, selectors,null, labels, null);
+			Set<String> optional, Map<String,Selector> selectors,Map<String,FieldValidationSet> validators,Map<String,String> labels) throws DataFault {
+		return buildForm(conn, res, f, supress_fields, optional, selectors,validators,null, labels, null);
 	}
 	/**
 	 * Construct an edit Form for the associated DataObject based on database
@@ -107,12 +108,12 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	
 	 */
 	public static final boolean buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
-			Set<String> optional, Map<String,Selector> selectors,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips) throws DataFault {
+			Set<String> optional, Map<String,Selector> selectors,Map<String,FieldValidationSet>validators, Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips) throws DataFault {
 		Set<String> keys = new LinkedHashSet<String>(res.getFields());
 		if( supress_fields != null ) {
 			keys.removeAll(supress_fields);
 		}
-		return buildForm(conn, res, keys,f, optional, selectors,constraints,labels, tooltips, null);
+		return buildForm(conn, res, keys,f, optional, selectors,validators,constraints,labels, tooltips, null);
 	}
 	/**
 	 * Construct an edit Form for the associated DataObject based on database
@@ -133,7 +134,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	 * @throws DataFault
 	 */
 	public static boolean buildForm(AppContext conn,Repository res, Set<String> keys, Form f, 
-				Set<String> optional, Map<String,Selector> selectors,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips,HashMap fixtures) throws DataFault {
+				Set<String> optional, Map<String,Selector> selectors,Map<String,FieldValidationSet> validators,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips,HashMap fixtures) throws DataFault {
 		//
 		String table = res.getTag();
 		boolean support_multi_stage = f.supportsMultiStage();
@@ -208,21 +209,11 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 
 				if( emit_input ) {
 					Input<?> input = sel.getInput();
+					
 					if( input == null) {
 						throw new DataFault("Unable to create input for "+name);
 					}
-					if( input instanceof TextInput){
-						// If MaxResultLength out of range then
-						// set from the DB.
-						TextInput ti = (TextInput) input;
-						int length=ti.getMaxResultLength();
-						if( info != null ) {
-							int max = info.getMax();
-							if( max > 0 && (length <= 0 || length > max)){
-								ti.setMaxResultLength(max);
-							}
-						}
-					}
+					input.addValidatorSet(validators.get(name));
 					String lab = null;
 					if (labels != null ) {
 						if( labels.containsKey(name)) {
@@ -318,7 +309,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 			}else{
 				ti= new TextInput();
 			}
-			ti.setMaxResultLength(info.getMax());
+			ti.addValidator(new MaxLengthValidator(info.getMax()));
 			int maxwid = conn.getIntegerParameter("forms.max_text_input_width", 64);
 			ti.setBoxWidth(maxwid);
 			return ti;
@@ -400,22 +391,29 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 					}
 				}
 				
-			}else{
-				// check for consistency against repo don't allow values that will overflow field.
-				Object input =  sel.get(field);
-				if( input instanceof TextInput && info.isString()){
-					int len = info.getMax();
-					TextInput text_input = (TextInput)input;
-					if( text_input.getMaxResultLength() > len){
-						text_input.setMaxResultLength(len);
-					}
-					if( text_input.getBoxWidth() > len){
-						text_input.setBoxWidth(len);
-					}
-				}
 			}
 		}
 		return sel;
+		
+	}
+	
+	/** Add validators based on the database
+	 * @param conn 
+	 * @param val 
+	 * @param res
+	 * @return modified map
+	 */
+	public static Map<String,FieldValidationSet> addValidators(AppContext conn,Map<String,FieldValidationSet> val,Repository res){
+		if( val == null ){
+			val = new HashMap<>();
+		}
+		for(String field : res.getFields()){
+			Repository.FieldInfo info = res.getInfo(field);
+			if( info.isString() && ! info.isTruncate()) {
+				FieldValidationSet.add(val, field, new MaxLengthValidator(info.getMax()));
+			}
+		}
+		return val;
 		
 	}
 	/**
@@ -447,6 +445,22 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 			sel = c.addSelectors(sel);
 		}
 		return addSelectors(getContext(), sel, factory.res);
+	}
+	
+	/**
+	 * Get a Map of {@link FieldValidationSet} to use for forms of this type.
+	 * 
+	 * @return Map
+	 */
+	protected  Map<String,FieldValidationSet> getValidators() {
+		Map<String,FieldValidationSet>val = factory.getValidators();
+		if( val == null ){
+			val = new HashMap<String, FieldValidationSet>();
+		}
+		for(TableStructureContributer c : factory.getTableStructureContributers()){
+			val = c.addFieldValidations(val);
+		}
+		return addValidators(getContext(), val, factory.res);
 	}
 	/**
 	 * generate the set of suppressed fields to be used in form creation/update

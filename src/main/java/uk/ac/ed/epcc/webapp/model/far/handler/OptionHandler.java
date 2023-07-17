@@ -2,9 +2,7 @@
 package uk.ac.ed.epcc.webapp.model.far.handler;
 
 import uk.ac.ed.epcc.webapp.forms.Form;
-import uk.ac.ed.epcc.webapp.forms.inputs.RadioButtonInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.SetInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseDataManager;
 import uk.ac.ed.epcc.webapp.model.far.response.StringDataManager;
 
@@ -25,7 +23,7 @@ public class OptionHandler implements QuestionFormHandler<String> {
 	public void buildConfigForm(Form f) {
 		TextInput options = new TextInput();
 		options.setSingle(false);
-		options.setMaxResultLength(256);
+		options.addValidator(new MaxLengthValidator(256));
 		f.addInput(OPTIONS, "Options", options);
 	}
 

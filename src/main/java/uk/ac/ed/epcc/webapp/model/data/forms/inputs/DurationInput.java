@@ -48,7 +48,6 @@ public class DurationInput extends ParseAbstractInput<Duration> implements Forma
 	public DurationInput(long resolution) {
 		super();
 		setBoxWidth(10);
-		setMaxResultLength(16);
 		setSingle(true);
 		this.resolution=resolution;
 		addValidator(new FieldValidator<Duration>() {

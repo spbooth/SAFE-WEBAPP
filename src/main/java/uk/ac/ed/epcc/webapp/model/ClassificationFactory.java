@@ -25,19 +25,12 @@ import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.forms.FieldValidationSet;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
-import uk.ac.ed.epcc.webapp.forms.inputs.CodeListInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.NameInputProvider;
-import uk.ac.ed.epcc.webapp.forms.inputs.NoHtmlInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.NoSpaceFieldValidator;
-import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
-import uk.ac.ed.epcc.webapp.forms.inputs.UnusedNameInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.*;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -68,6 +61,8 @@ import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
 
 public class ClassificationFactory<T extends Classification> extends DataObjectFactory<T> implements Comparable<ClassificationFactory>, HistoryFieldContributor, NameFinder<T>,NameInputProvider<T>,FieldHandler{
 	
+	
+
 	/** Maximum size of pull-down menu in update form.
 	 * 
 	 */
@@ -334,6 +329,13 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 			return find(val);
 		}	
 	}
+	@Override
+	protected Map<String, FieldValidationSet> getValidators() {
+		Map<String, FieldValidationSet> validators = super.getValidators();
+		// Description is likely to be displayed to user so inhibit html by default
+		FieldValidationSet.add(validators, DESCRIPTION, new NoHtmlValidator());
+		return validators;
+	}
 	public  class ClassificationCreator extends Creator<T>{
 
 		public ClassificationCreator() {
@@ -355,27 +357,12 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 					// done here as only the create form can check that the name does not exist
 					// the update form has to rely on the sql update generating an error.
 					UnusedNameInput<T> input = new UnusedNameInput<>(ClassificationFactory.this);
-					input.setMaxResultLength(res.getInfo(ClassificationFactory.NAME).getMax());
 					input.setTrim(true);
 					return input;
 				}
 				
 			});
 			
-			// Description is likely to be displayed to user so inhibit html by default
-			
-			result.put(ClassificationFactory.DESCRIPTION,new Selector() {
-
-				@Override
-				public Input getInput() {
-					NoHtmlInput desc_input = new NoHtmlInput();
-					if( res.hasField(ClassificationFactory.DESCRIPTION)){
-						desc_input.setMaxResultLength(res.getInfo(ClassificationFactory.DESCRIPTION).getMax());
-					}
-					return desc_input;
-				}
-				
-			});
 			return result;
 		}
 		

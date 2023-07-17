@@ -19,7 +19,7 @@
 <label for="transition_Value" class="required">Value</label>
 </th>
 <td>
-<input id="transition_Value" type="number" size="32" maxlength="32" name="Value" class="input" min="1" max="100" step="1" required="required"/>
+<input id="transition_Value" type="number" name="Value" class="input" min="1" max="100" step="1" required="required"/>
 </td>
 </tr>
 </table>

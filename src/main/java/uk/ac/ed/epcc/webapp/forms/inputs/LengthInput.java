@@ -19,18 +19,15 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 /** An input that corresponds to a text box.
  * 
+ * These methods allow fine-tuning of the appearance of the text box only.
+ * Constraints on the permitted values should use a {@link MaxLengthValidator}
+ * 
  * @author spb
  * @param <T> type of input
  *
  */
 public interface LengthInput<T> extends ParseInput<T>{
-	/**
-	 * Get the input length for this Parameter as a text box.
-	 * A value of zero or less implies no limit
-	 * 
-	 * @return int input length
-	 */
-	public int getMaxResultLength();
+	
 
 	/**
 	 * Get the input width for this Parameter as a text box.
@@ -39,16 +36,6 @@ public interface LengthInput<T> extends ParseInput<T>{
 	 */
 	public int getBoxWidth();
 
-	/**
-	 * set the input length for this parameter as a text box.
-	 * This is the maximum allowed length of the result string.
-	 * A value of zero or less implies no limit
-	 * 
-	 * 
-	 * @param l
-	 *            int input_length
-	 */
-	public void setMaxResultLength(int l);
 
 	/**
 	 * set the input width for this parameter as a text box.

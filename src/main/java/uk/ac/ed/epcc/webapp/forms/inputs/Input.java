@@ -18,22 +18,36 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidationSet;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 
 /**
  * Input represents a input box/pulldown etc for a form. It has internal state
  * holding the Object representing its current value.
- * A Input is used to get the Value of an Object from the user. Each Input
- * also has an identifying key that should be unique within the form. This can
- * be used to produce parameter names etc.
+ * A Input is used to get the Value of an Object from the user. 
  * 
- * Selectors may be composite, for example a date selector constructed from
+ * Each Input also has an identifying key that should be unique within the form. This can
+ * be used to produce parameter names etc. It is arguable that this is unnecessary because inputs are usually stored
+ * indexed by their key so the key is usually available anyway.
+ * 
+ * The primary role of an Input is to customise the user interface. Constraints on permitted values should
+ * normally be encoded in an embedded {@link FieldValidator}. Value constraints are frequently a higher level concern
+ * and may need to be specified independently of the user interface. However the user interface needs to be aware of them (for example 
+ * we want the browser to be able to validate what it can before form submission) and to introduce its own constraints (for example a 
+ * multi-stage form where an earlier stage constrains permitted values later on).
+ * 
+ * 
+ * 
+ * Inputs may be composite, for example a date selector constructed from
  * pull-downs for year, month and day.
  * 
- * The Input classes are kept generic to all different types of Form. The Form
+ * The Input classes are kept generic to all different types of Form. However
+ * our primary interface is html and some html specific  enhancements can be included 
+ * by implementing specific interfaces.
+ * The Form
  * class has to implement the different types of edit operation depending on the
- * kind of selector. This allows us to use inheritance between different types
+ * kind of selector. Having general input types allows us to use inheritance between different types
  * of Input. If we sub-classed Inputs by Form type each new Input type would need
  * to be sub-classed for every Form type. Where we subclass an Input by type
  * there is a reasonable chance that the inherited edit code will be sufficient
@@ -144,6 +158,12 @@ public interface Input<V> {
 	 * @param val
 	 */
 	public void addValidator(FieldValidator<V> val) ;
+	
+	/** Add a {@link FieldValidationSet} to this input
+	 * 
+	 * @param set
+	 */
+	public void addValidatorSet(FieldValidationSet<V> set);
 	/** Remove a {@link FieldValidator} from this input
 	 * 
 	 * @param val
@@ -154,5 +174,5 @@ public interface Input<V> {
 	 * 
 	 * @return
 	 */
-	public Set<FieldValidator<V>> getValidators();
+	public FieldValidationSet<V> getValidators();
 }

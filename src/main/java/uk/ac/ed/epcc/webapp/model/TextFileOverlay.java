@@ -712,7 +712,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 			@Override
 			public Input getInput() {
 				TextInput text = new TextInput();
-				text.setMaxResultLength(1<<24);
+				text.addValidator(new MaxLengthValidator(1<<24));
 				return text;
 			}
 			

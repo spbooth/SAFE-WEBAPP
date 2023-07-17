@@ -13,10 +13,7 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,7 +25,6 @@ import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 /** A {@link TextInput} to input Globus/LDAP DN names.
  * 
  * for historical reasons the canonical {@link String} representation is the
@@ -44,7 +40,6 @@ public class DNInput extends ParseAbstractInput<String> implements ItemInput<Str
 	//private static final Pattern valid_pattern = Pattern.compile("(/\\w+=[^/=]+)+");
 	public DNInput() {
 		super();
-		setMaxResultLength(256);
 		setBoxWidth(64);
 		setSingle(true);
 		addValidator(new FieldValidator<String>() {

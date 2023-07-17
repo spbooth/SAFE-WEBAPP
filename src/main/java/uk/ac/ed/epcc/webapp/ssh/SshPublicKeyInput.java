@@ -21,10 +21,7 @@ import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.forms.inputs.ItemInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
 
 
@@ -39,7 +36,7 @@ public class SshPublicKeyInput extends ParseAbstractInput<String> implements Ite
 		super();
 		setBoxWidth(48);
 		setSingle(true);
-		setMaxResultLength(4096);
+		addValidator(new MaxLengthValidator(4096));
 		addValidator(new FieldValidator<String>() {
 			
 			@Override

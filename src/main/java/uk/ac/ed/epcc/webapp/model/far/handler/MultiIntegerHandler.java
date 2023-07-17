@@ -4,12 +4,7 @@ package uk.ac.ed.epcc.webapp.model.far.handler;
 import java.util.Iterator;
 
 import uk.ac.ed.epcc.webapp.forms.Form;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseDataManager;
 import uk.ac.ed.epcc.webapp.model.far.response.StringDataManager;
 
@@ -101,7 +96,7 @@ public class MultiIntegerHandler implements QuestionFormHandler<MultiInput> {
 		
 		TextInput labels = new TextInput();
 		labels.setSingle(false);
-		labels.setMaxResultLength(256);
+		labels.addValidator(new MaxLengthValidator(256));
 		f.addInput(LABELS, "Labels", labels);
 	}
 

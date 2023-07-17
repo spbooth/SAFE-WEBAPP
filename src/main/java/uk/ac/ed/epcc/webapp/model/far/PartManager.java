@@ -370,7 +370,6 @@ public abstract class PartManager<O extends PartOwner,P extends PartManager.Part
 		public UnusedNameInput(O parent,String existing){
 			this.parent=parent;
 			this.existing=existing;
-			setMaxResultLength(MAX_NAME_LENGTH);
 			addValidator(new FieldValidator<String>() {
 				
 				@Override

@@ -15,10 +15,7 @@ package uk.ac.ed.epcc.webapp.model.far.handler;
 
 import uk.ac.ed.epcc.webapp.email.inputs.EmailListInput;
 import uk.ac.ed.epcc.webapp.forms.Form;
-import uk.ac.ed.epcc.webapp.forms.inputs.BooleanInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.IntegerInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseDataManager;
 import uk.ac.ed.epcc.webapp.model.far.response.StringDataManager;
 
@@ -89,11 +86,11 @@ public class EmailListHandler implements QuestionFormHandler<String> {
 		input.setSingle((Boolean)f.get(SINGLE_CONF));
 		Integer max_result = (Integer) f.get(MAX_RESULT_CONF);
 		if( max_result != null ){
-			input.setMaxResultLength(max_result);
+			input.addValidator(new MaxLengthValidator(max_result));
 		}
 		Integer max_box = (Integer) f.get(BOX_LENGTH_CONF);
 		if( max_box != null ){
-			input.setMaxResultLength(max_box);
+			input.setBoxWidth(max_box);
 		}
 		return input;
 	}

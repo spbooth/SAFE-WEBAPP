@@ -85,7 +85,6 @@ public abstract class AbstractCalendarMultiInput extends MultiInput<Date, Input<
     		month_input=null;
     	}
     	year_input = new IntegerInput();
-    	year_input.setMaxResultLength(4);
     	year_input.setBoxWidth(4);
     	addInput("year", year_input);
     	

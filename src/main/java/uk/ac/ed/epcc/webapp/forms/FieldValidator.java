@@ -20,7 +20,11 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
 
 /**
- * Interface for an additional external validator that can be added to a Field.
+ * Interface that validates a value. These are most frequently used to validate
+ * permitted values in UI forms. However they could also be used to validate constraints on the 
+ * data model itself (these map to form field validation in edit/update forms but could also apply
+ * be used for API validation.
+ * 
  * 
  * As {@link FieldValidator}s are stored in Sets it is good practice to implement
  * <b>hashCode()</b> and <b>equals(Object)</b>.

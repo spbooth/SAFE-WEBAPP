@@ -65,7 +65,7 @@
 <label for="transition_PersonalCertificate" class="optional" title="This is the DN of your default X509 certificate for use with Globus or GridFTP">PersonalCertificate</label>
 </th>
 <td>
-<input id="transition_PersonalCertificate" type="text" size="64" maxlength="256" name="PersonalCertificate" value="/c=UK/o=eScience/ou=Edinburgh/l=NeSC/cn=stephen booth" class="input"/>
+<input id="transition_PersonalCertificate" type="text" size="64" maxlength="200" name="PersonalCertificate" value="/c=UK/o=eScience/ou=Edinburgh/l=NeSC/cn=stephen booth" class="input"/>
 </td>
 </tr>
 </table>

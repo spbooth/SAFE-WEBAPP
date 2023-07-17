@@ -39,6 +39,7 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileUploadDecorator;
+import uk.ac.ed.epcc.webapp.forms.inputs.MaxLengthValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.IndexTransitionResult;
@@ -245,7 +246,7 @@ public class TableTransitionProvider  extends AbstractContexed implements ViewTr
 		@Override
 		public void buildForm(Form f, AppContext c) throws TransitionException {
 			TextInput update_input = new TextInput();
-			update_input.setMaxResultLength(23*1024*2024);
+			update_input.addValidator(new MaxLengthValidator(23*1024*2024));
 			FileUploadDecorator decorator = new FileUploadDecorator(update_input);
 			f.addInput("data", "Update text", decorator);
 			f.addAction("Update", new FormAction() {

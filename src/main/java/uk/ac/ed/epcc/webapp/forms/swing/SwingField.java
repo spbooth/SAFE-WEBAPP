@@ -17,54 +17,16 @@
 package uk.ac.ed.epcc.webapp.forms.swing;
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
+import java.awt.event.*;
+import java.util.*;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.plaf.ListUI;
+import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.Field;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.forms.inputs.BinaryInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.BooleanInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
-import uk.ac.ed.epcc.webapp.forms.inputs.LengthInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.MultiInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.OptionalListInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.ParseInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.ParseMultiInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.PasswordInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
-import uk.ac.ed.epcc.webapp.forms.inputs.UnmodifiableInput;
+import uk.ac.ed.epcc.webapp.forms.exceptions.*;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.model.data.stream.FileStreamData;
 
 
@@ -364,7 +326,10 @@ public class SwingField<I>  {
 			if (o != null) {
 				def = o.toString();
 			}
-			int len = input.getMaxResultLength();
+			int len = MaxLengthValidator.getMaxLength(input.getValidators());
+			if( len <= 0 ) {
+				len=32;
+			}
 			JTextComponent result;
 			// Use a single text box up to twice maxwid
 			// above that use a textarea
@@ -421,7 +386,7 @@ public class SwingField<I>  {
 		public JComponent visitPasswordInput(PasswordInput input)
 				throws Exception {
 			JPasswordField p = new JPasswordField();
-			p.setColumns(input.getMaxResultLength());
+			p.setColumns(MaxLengthValidator.getMaxLength(input.getValidators()));
 			p.addActionListener(new TextActionListener(input));
 			p.addFocusListener(new TextFocusListener(input));
 			return p;

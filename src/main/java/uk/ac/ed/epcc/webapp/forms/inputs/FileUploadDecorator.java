@@ -37,8 +37,10 @@ public class FileUploadDecorator extends ParseMultiInput<String,Input> implement
 		addInput("Text", input);
 		file = new FileInput();
 	
-		if( input instanceof LengthInput){
-			file.setMaxUpload(((LengthInput)input).getMaxResultLength());
+		
+		int max = MaxLengthValidator.getMaxLength(input.getValidators());
+		if( max > 0){
+			file.setMaxUpload(max);
 		}
 		addInput("File", file);
 		setLineBreaks(true);

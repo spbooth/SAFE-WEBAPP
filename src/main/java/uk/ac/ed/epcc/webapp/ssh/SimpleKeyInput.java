@@ -15,8 +15,8 @@ package uk.ac.ed.epcc.webapp.ssh;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.forms.inputs.MaxLengthValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
-import uk.ac.ed.epcc.webapp.session.SingleKeyComposite;
 
 public class SimpleKeyInput extends TextInput{
 	
@@ -24,7 +24,7 @@ public class SimpleKeyInput extends TextInput{
 	
 	public SimpleKeyInput(AppContext conn) {
 		setBoxWidth(48);
-		setMaxResultLength(4096);
+		addValidator(new MaxLengthValidator(4096));
 		setSingle(true);
 		this.val = new AuthorizedKeyValidator(conn);
 		

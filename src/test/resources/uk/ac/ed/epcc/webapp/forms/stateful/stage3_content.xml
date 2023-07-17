@@ -18,7 +18,7 @@
 <label for="transition_Units" class="required">Units</label>
 </th>
 <td>
-<input id="transition_Units" type="number" size="32" maxlength="32" name="Units" class="input" min="730" max="739" step="1" required="required"/>
+<input id="transition_Units" type="number" name="Units" class="input" min="730" max="739" step="1" required="required"/>
 </td>
 </tr>
 </table>

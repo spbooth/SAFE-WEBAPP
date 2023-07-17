@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import java.util.Collections;
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidationSet;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
@@ -109,7 +110,11 @@ public class InfoInput implements Input<String>, UnmodifiableInput{
 		
 	}
 	@Override
-	public Set<FieldValidator<String>> getValidators() {
-		return Collections.emptySet();
+	public FieldValidationSet<String> getValidators() {
+		return null;
+	}
+	@Override
+	public void addValidatorSet(FieldValidationSet<String> set) {
+		
 	}
 }

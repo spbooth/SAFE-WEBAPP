@@ -27,6 +27,7 @@ import java.util.function.Predicate;
 import uk.ac.ed.epcc.webapp.*;
 import uk.ac.ed.epcc.webapp.content.Labeller;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
+import uk.ac.ed.epcc.webapp.forms.FieldValidationSet;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
@@ -1531,6 +1532,17 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	protected Map<String,Selector> getSelectors() {
 
 		return new HashMap<>();
+	}
+	/** Get a {@link Map} of {@link FieldValidationSet}s to enforce for this type.
+	 * These will be applied when generating create/update forms but could also be applied
+	 * more generally e.g. to validate APIs and should be considered as validating object state
+	 * rather than a particular piece of the UI
+	 * 
+	 * @return Map
+	 * @see DataObjectFormFactory
+	 */
+	protected Map<String,FieldValidationSet> getValidators(){
+		return new LinkedHashMap<>();
 	}
 	/**
 	 * generate the class specific set of suppressed fields to be used in form creation/update

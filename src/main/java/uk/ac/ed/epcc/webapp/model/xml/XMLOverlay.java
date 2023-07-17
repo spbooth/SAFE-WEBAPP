@@ -51,6 +51,7 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
+import uk.ac.ed.epcc.webapp.forms.inputs.MaxLengthValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.transition.ExtraContent;
@@ -335,7 +336,7 @@ public class XMLOverlay<X extends XMLOverlay.XMLFile> extends TextFileOverlay<X>
 					getLogger().error("Error making input",e);
 					TextInput input = new TextInput();
 					input.setSingle(false);
-					input.setMaxResultLength(1<<24);
+					input.addValidator(new MaxLengthValidator(1<<24));
 					return input;
 				}
 			}

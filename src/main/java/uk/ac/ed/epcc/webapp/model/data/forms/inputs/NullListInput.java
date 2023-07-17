@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.Indexed;
+import uk.ac.ed.epcc.webapp.forms.FieldValidationSet;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
@@ -257,6 +258,11 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		internal.addValidator(val);
 		
 	}
+	@Override
+	public void addValidatorSet(FieldValidationSet<Integer> val) {
+		internal.addValidatorSet(val);
+		
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#removeValidator(uk.ac.ed.epcc.webapp.forms.FieldValidator)
 	 */
@@ -266,7 +272,7 @@ public class NullListInput<T extends Indexed>   implements ListInput<Integer,Obj
 		
 	}
 	@Override
-	public Set<FieldValidator<Integer>> getValidators() {
+	public FieldValidationSet<Integer> getValidators() {
 		return internal.getValidators();
 	}
 	/** wrap any Selector with a compatible input

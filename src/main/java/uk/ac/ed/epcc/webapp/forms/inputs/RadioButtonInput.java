@@ -16,6 +16,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import java.util.Iterator;
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidationSet;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
@@ -199,6 +200,11 @@ public class RadioButtonInput<V, T> implements ListInput<V, T>, ParseInput<V> {
 	public void addValidator(FieldValidator<V> val) {
 		nested.addValidator(val);
 	}
+	
+	@Override
+	public void addValidatorSet(FieldValidationSet<V> set) {
+		nested.addValidatorSet(set);
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.Input#removeValidator(uk.ac.ed.epcc.webapp.forms.FieldValidator)
 	 */
@@ -207,7 +213,7 @@ public class RadioButtonInput<V, T> implements ListInput<V, T>, ParseInput<V> {
 		nested.removeValidator(val);
 	}
 	@Override
-	public Set<FieldValidator<V>> getValidators() {
+	public FieldValidationSet<V> getValidators() {
 		return nested.getValidators();
 	}
 	@Override

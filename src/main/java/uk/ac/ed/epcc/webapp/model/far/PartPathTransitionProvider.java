@@ -29,6 +29,7 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.factory.EditFormBuilder;
 import uk.ac.ed.epcc.webapp.forms.factory.EditTransition;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileUploadDecorator;
+import uk.ac.ed.epcc.webapp.forms.inputs.MaxLengthValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
@@ -433,7 +434,7 @@ public class PartPathTransitionProvider<O extends PartOwner,T extends PartManage
 		public void buildForm(Form f, T target, AppContext conn)
 				throws TransitionException {
 			TextInput input = new TextInput();
-			input.setMaxResultLength(8*1024*1024);
+			input.addValidator(new MaxLengthValidator(8*1024*1024));
 			f.addInput(DATA, "Upload XML Data", new FileUploadDecorator(input));
 			f.addAction("Add", new XMLUploadAction(target));
 		}

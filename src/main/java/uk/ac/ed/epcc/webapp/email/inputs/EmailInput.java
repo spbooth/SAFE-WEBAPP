@@ -20,9 +20,7 @@ import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
 /**
@@ -42,7 +40,8 @@ public class EmailInput extends TextInput implements HTML5Input , FormatHintInpu
 	public EmailInput(){
 		super();
 		setBoxWidth(32); // 64 is too long for EmailChangeRequest page
-		setMaxResultLength(MAX_EMAIL_LENGTH);
+		addValidator(new MaxLengthValidator(MAX_EMAIL_LENGTH));
+
 		setSingle(true);
 		addValidator(new FieldValidator<String>() {
 			

@@ -24,11 +24,7 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
-import uk.ac.ed.epcc.webapp.forms.inputs.FileUploadDecorator;
-import uk.ac.ed.epcc.webapp.forms.inputs.Input;
-import uk.ac.ed.epcc.webapp.forms.inputs.NoSpaceFieldValidator;
-import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.UnusedNameInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
 import uk.ac.ed.epcc.webapp.forms.result.ServeDataResult;
@@ -366,7 +362,7 @@ public class DynamicFormTransitionProvider<T extends DynamicForm> extends
 		public void buildForm(Form f, T target, AppContext conn)
 				throws TransitionException {
 			TextInput input = new TextInput();
-			input.setMaxResultLength(8*1024*1024);
+			input.addValidator(new MaxLengthValidator(8*1024*1024));
 			f.addInput(DATA, "Upload XML Data", new FileUploadDecorator(input));
 			f.addAction("Add", new XMLUploadAction(target));
 		}

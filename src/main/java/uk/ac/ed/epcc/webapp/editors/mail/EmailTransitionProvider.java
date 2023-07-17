@@ -31,6 +31,7 @@ import uk.ac.ed.epcc.webapp.forms.action.FormAction;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ActionException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileInput;
+import uk.ac.ed.epcc.webapp.forms.inputs.MaxLengthValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
@@ -373,7 +374,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 				throws TransitionException {
 			TextInput input = new TextInput();
 			input.setBoxWidth(SUBJECT_BOX_WIDTH);
-			input.setMaxResultLength(SUBJECT_MAX_WIDTH);
+			input.addValidator(new MaxLengthValidator(SUBJECT_MAX_WIDTH));
 			input.setSingle(true);
 			f.addInput(DATA_FORM_FIELD, "Subject", input);
 			f.addAction(EditAction.Update.toString(), new EditFormAction(target, EditAction.Update));
@@ -390,7 +391,7 @@ public class EmailTransitionProvider implements ViewPathTransitionProvider<EditA
 				throws TransitionException {
 			TextInput input = new TextInput();
 			input.setBoxWidth(80);
-			input.setMaxResultLength(81920);
+			input.addValidator(new MaxLengthValidator(81920));
 			input.setSingle(false);
 			f.addInput(DATA_FORM_FIELD, "Text", input);
 			f.addAction(EditAction.Update.toString(), new EditFormAction(target, EditAction.Update));

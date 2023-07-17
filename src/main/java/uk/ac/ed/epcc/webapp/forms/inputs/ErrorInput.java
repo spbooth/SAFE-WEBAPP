@@ -19,6 +19,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import java.util.Collections;
 import java.util.Set;
 
+import uk.ac.ed.epcc.webapp.forms.FieldValidationSet;
 import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
@@ -105,8 +106,14 @@ public class ErrorInput<T> implements UnmodifiableInput, Input<T> {
 		
 	}
 	@Override
-	public Set<FieldValidator<T>> getValidators() {
-		return Collections.emptySet();
+	public FieldValidationSet<T> getValidators() {
+		return null;
+	}
+	
+	@Override
+	public void addValidatorSet(FieldValidationSet<T> set) {
+		
+		
 	}
 	@Override
 	public void setNull() {
