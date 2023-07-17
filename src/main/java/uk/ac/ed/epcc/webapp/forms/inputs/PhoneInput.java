@@ -13,8 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
-
 /** Input for phone numbers
  * @author spb
  *

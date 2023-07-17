@@ -20,7 +20,7 @@ import java.util.Iterator;
 
 
 
-/**
+/** An {@link AlternateInput} for composing {@link ItemInput}s
  * 
  * @author spb
  *

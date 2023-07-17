@@ -26,7 +26,7 @@ public abstract class ListInputWrapper<V, T> extends WrappingInput<V> implements
 	/**
 	 * @param nested
 	 */
-	public ListInputWrapper(Input nested) {
+	public ListInputWrapper(ListInput<V, T> nested) {
 		super(nested);
 	}
 

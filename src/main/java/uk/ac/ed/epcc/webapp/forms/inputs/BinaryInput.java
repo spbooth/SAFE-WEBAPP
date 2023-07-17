@@ -40,4 +40,7 @@ public interface BinaryInput<I> extends Input<I> {
 	 */
 	public abstract String getChecked();
 
+	public default <R> R accept(InputVisitor<R> vis) throws Exception{
+		return vis.visitBinaryInput(this);
+	}
 }
