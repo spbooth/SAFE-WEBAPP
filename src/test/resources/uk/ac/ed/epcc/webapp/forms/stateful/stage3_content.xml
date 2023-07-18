@@ -1,4 +1,4 @@
 <transition_page><Form><table class='form'><tr class='even'><th><span class='required'>Hundreds</span></th><td>700</td></tr>
 <tr class='odd'><th><span class='required'>Tens</span></th><td>730</td></tr>
-<tr class='even'><th><label for='transition_Units' class='required'>Units</label></th><td><input id='transition_Units' type='number' size='64' name='Units' class='input' min='730' max='739' step='1' required='required'/></td></tr>
+<tr class='even'><th><label for='transition_Units' class='required'>Units</label></th><td><input id='transition_Units' type='number' size='32' name='Units' class='input' min='730' max='739' step='1' required='required'/></td></tr>
 </table><fieldset class='action_buttons'><input class='input_button' type='submit' formnovalidate='formnovalidate' title='Delete saved state and return the form to its initial stage' name='Reset' value='Reset'/><input class='input_button' type='submit' name='Create' value='Create'/></fieldset></Form></transition_page>

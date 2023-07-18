@@ -616,12 +616,16 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		if( boxwid <=0 ) {
 			force_single=true;
 		}
+		boolean autocomplete = input instanceof AutoComplete && ((AutoComplete)input).useAutoComplete();
+		boolean use_datalist = autocomplete && use_html5 && USE_DATALIST.isEnabled(conn);
+		if(autocomplete) {
+			force_single=true;
+		}
 		boolean old_escape = result.setEscapeUnicode(! force_password && ESCAPE_UNICODE_FEATURE.isEnabled(conn));
 		// max_result_length <= 0 is unlimited
 		if (force_single || ( max_result_length > 0 && max_result_length <= 2 * boxwid)) {
 			
-			boolean autocomplete = input instanceof AutoComplete && ((AutoComplete)input).useAutoComplete();
-			boolean use_datalist = autocomplete && use_html5 && USE_DATALIST.isEnabled(conn);
+			
 			
 			
 			

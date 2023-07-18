@@ -67,6 +67,7 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 		this.autocomplete = autocomplete;
 		this.restrict=restrict;
 		this.use_autocomplete = use_autocomplete;
+		setSingle(true);
 		addValidator(new FieldValidator<Integer>() {
 			
 			@Override

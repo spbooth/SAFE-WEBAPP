@@ -46,6 +46,7 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 	public NumberInput(){
 		super();
 		setSingle(true);
+		setBoxWidth(32);
 		addValidator(new FieldValidator<N>() {
 
 			@Override
