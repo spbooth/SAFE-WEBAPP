@@ -30,7 +30,7 @@ public abstract class ParseAbstractInput<V> extends AbstractInput<V> implements
 		 LengthInput<V> {
 
 	// input width
-	int maxwid = -1;
+	int maxwid = 64;
 
 	boolean force_single = false;
 
