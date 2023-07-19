@@ -70,4 +70,13 @@ public class TextInput extends ParseAbstractInput<String> {
 		return super.isEmpty() || getValue().length() == 0;
 	}
 
+	/** Adds a {@link MaxLengthValidator} to the input.
+	 * 
+	 * 
+	 * 
+	 * @param len
+	 */
+	public void setMaxResultLength(int len) {
+		addValidator(new MaxLengthValidator(len));
+	}
 }

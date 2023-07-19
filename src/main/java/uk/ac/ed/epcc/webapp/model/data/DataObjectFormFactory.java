@@ -88,6 +88,10 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 			Set<String> optional, Map<String,Selector> selectors,Map<String,FieldValidationSet> validators,Map<String,String> labels) throws DataFault {
 		return buildForm(conn, res, f, supress_fields, optional, selectors,validators,null, labels, null);
 	}
+	public static final boolean buildForm(AppContext conn, Repository res, Form f, Set<String> supress_fields,
+			Set<String> optional, Map<String,Selector> selectors,Map<String,String> labels) throws DataFault {
+		return buildForm(conn, res, f, supress_fields, optional, selectors,new LinkedHashMap<>(),null, labels, null);
+	}
 	/**
 	 * Construct an edit Form for the associated DataObject based on database
 	 * meta-data
