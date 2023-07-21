@@ -13,9 +13,6 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.model.data.convert;
 
-import uk.ac.ed.epcc.webapp.Targetted;
-
-
 /** Interface for objects that implement a type conversion
  * from an underlying data representation.
  * e.g. converting an integer from a DB field into a reference.

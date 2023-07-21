@@ -29,7 +29,6 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.factory.EditFormBuilder;
 import uk.ac.ed.epcc.webapp.forms.factory.EditTransition;
 import uk.ac.ed.epcc.webapp.forms.inputs.FileUploadDecorator;
-import uk.ac.ed.epcc.webapp.forms.inputs.MaxLengthValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.forms.result.ChainedTransitionResult;
 import uk.ac.ed.epcc.webapp.forms.result.FormResult;
@@ -45,6 +44,7 @@ import uk.ac.ed.epcc.webapp.model.far.DynamicFormManager.DynamicForm;
 import uk.ac.ed.epcc.webapp.model.far.PartManager.Part;
 import uk.ac.ed.epcc.webapp.model.far.handler.PartConfigFactory;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
 
 /** A {@link PathTransitionProvider} for editing the components of a {@link DynamicForm}
  * @author spb

@@ -27,8 +27,6 @@ import java.util.function.Predicate;
 import uk.ac.ed.epcc.webapp.*;
 import uk.ac.ed.epcc.webapp.content.Labeller;
 import uk.ac.ed.epcc.webapp.exceptions.ConsistencyError;
-import uk.ac.ed.epcc.webapp.forms.FieldValidationSet;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
@@ -63,6 +61,9 @@ import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 import uk.ac.ed.epcc.webapp.session.SessionService;
 import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationVisitor;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /**
  * Factory object for producing DataObjects.
@@ -171,6 +172,81 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 
    
 
+    /** A {@link FieldValidator} that checks the reference belongs to
+     * a record that maches the filter
+     * 
+     */
+    public class DataObjectFieldValidator implements FieldValidator<Integer>{
+        public DataObjectFieldValidator(BaseFilter<BDO> fil) {
+			super();
+			this.fil = fil;
+		}
+		private final BaseFilter<BDO> fil;
+		@Override
+		public void validate(Integer data) throws FieldException {
+			AndFilter<BDO> validate_fil = getValidateFilter(data);
+			try {
+				if( exists(validate_fil)){
+					return;
+				}
+			} catch (DataNotFoundException e) {
+				
+				throw new ValidateException("Object does not exist with id "+getTag()+":"+data);
+			} catch (DataException e) {
+			    getLogger().error("Error in DataObjectFieldValidator",e);
+			    throw new ValidateException("Internal error", e);
+			}
+
+
+
+			throw new ValidateException("Invalid input does not match selection filter");
+		}
+		/** 
+		 * @param num
+		 * @return
+		 */
+		private AndFilter<BDO> getValidateFilter(Integer num) {
+			return getAndFilter(getFilter(), getMatchFilter(num));
+		}
+		/** Method to convert the field value into a filter.
+		 * 
+		 * @param num
+		 * @return
+		 */
+		public BaseFilter<BDO> getMatchFilter(int num) {
+			return new SQLIdFilter<>(res, num);
+		}
+		public BaseFilter<BDO> getFilter(){
+			return fil;
+		}
+		/** Add this to a {@link FieldValidationSet} with merge
+		 * 
+		 * @param set
+		 */
+		public void addTo(FieldValidationSet<Integer> set) {
+			AndFilter<BDO> fil = null;
+			for(FieldValidator<Integer> v : set) {
+				if( v instanceof DataObjectFactory.DataObjectFieldValidator) {
+					DataObjectFieldValidator dv = (DataObjectFactory<BDO>.DataObjectFieldValidator) v;
+					if( fil == null ) {
+						fil = getAndFilter(getFilter(),dv.getFilter());
+					}else {
+						fil.addFilter(dv.getFilter());
+					}
+				}
+			}
+			if( fil == null ) {
+				set.add(this); // no merge
+			}else {
+				set.add(new DataObjectFieldValidator(fil)); // add merged
+			}
+		}
+		@Override
+		public <X> X accept(FieldValidationVisitor<X, Integer> vis) {
+			return vis.visitDataObjectFieldValidator(this);
+		}
+    	
+    }
 	/** A basic form Input for selecting objects using their ID value as text.
      * Only use this where the table is too large to support a pull-down.
      * 
@@ -259,7 +335,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 *
 	 */
 	public abstract class AbstractDataObjectInput extends DataObjectIntegerInput implements PreSelectInput<Integer,BDO>{
-		private BaseFilter<BDO> fil;
+		private BaseFilter<BDO> select_fil=null; // narrow selection without restircting parse
 		private int max_identifier=DataObject.MAX_IDENTIFIER;
         boolean restrict_parse=true;  // does filter apply to parse as well as offered choice
         boolean allow_pre_select=true;
@@ -268,43 +344,23 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			this(f,true);
 		}
 		public AbstractDataObjectInput(BaseFilter<BDO> f,boolean restrict_parse) {
+			BaseFilter<BDO> fil;
 			try{ 
 				fil = FilterConverter.convert(f);
 			}catch(NoSQLFilterException e){
 				fil = f;
 			}
 			this.restrict_parse = restrict_parse;
+			if( restrict_parse) {
+				addValidator(getValidator(fil));
+			}else {
+				select_fil=fil;
+			}
+			
 			AppContext con = getContext();
 			max_identifier = con.getIntegerParameter(getConfigTag()+".maxIdentifier", con.getIntegerParameter("DataObject.MaxIdentifier", DataObject.MAX_IDENTIFIER));
 			allow_pre_select = con.getBooleanParameter(getConfigTag()+".allowPreSelect", true);
-			addValidator(new FieldValidator<Integer>() {
-				
-				@Override
-				public void validate(Integer num) throws FieldException {
-					try {
-						
-						if (restrict_parse && fil != null ){
-							AndFilter<BDO> validate_fil = getValidateFilter(num);
-							if( exists(validate_fil)){
-								return;
-							}
-
-
-
-							throw new ValidateException("Invalid input does not match selection filter");
-						}else{
-							BDO o = getItembyValue(num.intValue());
-						}
-					} catch (DataNotFoundException e) {
-						
-						throw new ValidateException("Object does not exist with id "+getTag()+":"+num);
-					} catch (DataException e) {
-					    getLogger().error("Error in DataObjectInput",e);
-					    throw new ValidateException("Internal error", e);
-					}
-					
-				}
-			});
+			
 		}
 
 		@Override
@@ -313,18 +369,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				// could be optional
 				return null;
 			}
-			if( fil == null || ! restrict_parse){
-				return find(id);
-			}
-			AndFilter<BDO> find_fil = getValidateFilter(id);
-			try {
-				// force filter to be honoured as well
-				return  find(find_fil,true);
-			} catch (DataException e) {
-				getLogger().error("Error in getItemByValue",e);
-				return null;
-			}
-			
+			return find(id);	
 		}
 
 		@Override
@@ -341,7 +386,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		@Override
 		public int getCount(){
 			try {
-				return (int) DataObjectFactory.this.getCount(fil);
+				return (int) DataObjectFactory.this.getCount(getFil());
 			} catch (DataException e) {
 				getLogger().error("Error counting items",e);
 				return 0;
@@ -351,7 +396,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		@Override
 		public Iterator<BDO> getItems() {
 			try {
-				return new FilterIterator(fil);
+				return new FilterIterator(getFil());
 			} catch (DataFault e) {
 				getLogger().error("Error making select Iterator",e);
 				return new EmptyIterator<>();
@@ -384,14 +429,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return result;
 		}
 		
-		/** 
-		 * @param num
-		 * @return
-		 */
-		private AndFilter<BDO> getValidateFilter(Number num) {
-			return getAndFilter(fil, 
-					getMatchFilter(num.intValue()));
-		}
+		
 		/** get the Value from an Item
 		 * 
 		 * @param item
@@ -403,12 +441,14 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		public String getTagByItem(BDO item) {
 			return Integer.toString(getValueFromItem(item));
 		}
-		/** The filter that selects records by input id
+		/** convert a {@link BaseFilter} on item types into a {@link FieldValidator}
 		 * 
-		 * @param value
+		 * 
+		 * 
+		 * @param fil
 		 * @return
 		 */
-		protected abstract BaseFilter<BDO> getMatchFilter(int value);
+		protected abstract FieldValidator getValidator(BaseFilter<BDO> fil);
 		@Override
 		public <R> R accept(InputVisitor<R> vis) throws Exception {
 			return vis.visitListInput(this);
@@ -431,10 +471,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				return false;
 			}
 			try {
-				return exists(getValidateFilter(item.getID()));
-			} catch (DataException e) {
+				validate(item.getID());
+			} catch (FieldException e) {
 				return false;
 			}
+			return true;
 		}
 		public int getMaxIdentifier() {
 			return max_identifier;
@@ -447,6 +488,15 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		}
 		public void setLabeller(Labeller<? super BDO, String> labeller) {
 			this.labeller = labeller;
+		}
+		private BaseFilter<BDO> getFil() {
+			AndFilter and = getAndFilter(select_fil);
+			for(FieldValidator<Integer> v : getValidators()) {
+				if(v instanceof DataObjectFactory.DataObjectFieldValidator) {
+					and.addFilter(((DataObjectFactory.DataObjectFieldValidator)v).getFilter());
+				}
+			}
+			return and;
 		}
 	}
     /** A form Input used to select objects produced by the owning factory using the record id
@@ -474,10 +524,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory.AbstractDataObjectInput#getMatchFilter(int)
 		 */
-		@Override
-		protected BaseFilter<BDO> getMatchFilter(int value) {
-			return new SQLIdFilter<>( res, value);
-		}
+		
 
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory.AbstractDataObjectInput#getValueFromItem(uk.ac.ed.epcc.webapp.model.data.DataObject)
@@ -485,6 +532,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		@Override
 		public Integer getValueFromItem(BDO item) {
 			return item.getID();
+		}
+
+		@Override
+		protected FieldValidator getValidator(BaseFilter<BDO> fil) {
+			return new DataObjectFieldValidator(fil);
 		}
 		
 	}

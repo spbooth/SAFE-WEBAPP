@@ -23,9 +23,9 @@ import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Tagged;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** Input to select a objects dynamically constructed from the configuration service 
  * This defaults to the set of <b>class.</b> definitions {@link AppContext#makeObject(Class, String)}

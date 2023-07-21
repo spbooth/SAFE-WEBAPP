@@ -72,7 +72,7 @@ public class DoubleInput extends NumberInput<Double> {
 			if (nf != null) {
 				i = normalise(nf.parse(v.trim()).doubleValue());
 			} else {
-				i = new Double(Double.parseDouble(v.trim()));
+				i = Double.valueOf(v.trim());
 			}
 			return i;
 		} catch (NumberFormatException e) {

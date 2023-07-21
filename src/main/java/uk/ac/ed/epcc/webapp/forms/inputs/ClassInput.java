@@ -22,10 +22,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** Input to select a target class from the set of definitions from the configuration service.
  * This defaults to the set of <b>classdef</b> definitions {@link AppContext#getPropertyClass(Class,String)}

@@ -22,7 +22,6 @@ import java.util.*;
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.Field;
-import uk.ac.ed.epcc.webapp.forms.FieldValidationSet;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormBuilder;
@@ -38,6 +37,8 @@ import uk.ac.ed.epcc.webapp.model.data.forms.registry.IndexedFormEntry;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 import uk.ac.ed.epcc.webapp.timer.TimeClosable;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
+import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
 /** Base class for Forms based on DataObject fields such as create/update forms.
  * This class is intended to hold code common to both create and update forms which can 
  * customise their behaviour by overriding the various methods.
@@ -135,6 +136,8 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	 * 	          Map of field names to form labels
 	 * @param tooltips 
 	 * 			  Map of tooltip/help text for form labels
+	 * 
+	 * @return boolean true if the form is complete.
 	 * @throws DataFault
 	 */
 	public static boolean buildForm(AppContext conn,Repository res, Set<String> keys, Form f, 

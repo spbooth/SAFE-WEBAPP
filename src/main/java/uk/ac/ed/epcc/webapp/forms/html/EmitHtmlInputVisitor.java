@@ -28,6 +28,8 @@ import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.preferences.Preference;
 import uk.ac.ed.epcc.webapp.timer.TimeClosable;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
+import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
 
 public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisitor<Object>{
 	/**
@@ -466,6 +468,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 	public <V,T extends Input> Object visitMultiInput(MultiInput<V,T> input) throws Exception {
 		boolean saved = optional;
 		try {
+			input.setBounds();  // may be reflected in teh html
 			// if we don't require all sub-inputs they must be shown as optional
 			optional = optional || !input.requireAll();
 		
@@ -589,6 +592,42 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		}
 		return null;
 	}
+	
+	private <T> String getHtml5Type(Input<T> input) {
+		if( input instanceof HTML5Input) {
+			String t = ((HTML5Input)input).getType();
+			if( t != null ) {
+				return t;
+			}
+		}
+		for(FieldValidator<T> v : input.getValidators()) {
+			if( v instanceof HTML5Input) {
+				String t = ((HTML5Input)v).getType();
+				if( t != null ) {
+					return t;
+				}
+			}
+		}
+		return null;
+	}
+	private <T> String getFormatHint(Input<T> input) {
+		if( input instanceof FormatHintInput) {
+			String t = ((FormatHintInput)input).getFormatHint();
+			if( t != null ) {
+				return t;
+			}
+		}
+		for(FieldValidator<T> v : input.getValidators()) {
+			if( v instanceof FormatHintInput) {
+				String t = ((FormatHintInput)v).getFormatHint();
+				if( t != null ) {
+					return t;
+				}
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * output HTML for a text parameter field
 	 * @param result 
@@ -606,24 +645,22 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 	private void emitTextParam(ExtendedXMLBuilder result,Input input,String name, String id, int boxwid, int max_result_length,
 			boolean force_single, boolean force_password,String default_value) {
 	
-		String format_hint=null;
-		if( input instanceof FormatHintInput){
-			format_hint = ((FormatHintInput)input).getFormatHint();
-		}
+		String format_hint=getFormatHint(input);
+		
 		if( force_password ) {
 			force_single=true; // passwords always single
 		}
 		if( boxwid <=0 ) {
-			force_single=true;
+			force_single=true; // unspecified width defaults to single
 		}
 		boolean autocomplete = input instanceof AutoComplete && ((AutoComplete)input).useAutoComplete();
 		boolean use_datalist = autocomplete && use_html5 && USE_DATALIST.isEnabled(conn);
 		if(autocomplete) {
-			force_single=true;
+			force_single=true; // autocomplete (via list) is single
 		}
 		boolean old_escape = result.setEscapeUnicode(! force_password && ESCAPE_UNICODE_FEATURE.isEnabled(conn));
 		// max_result_length <= 0 is unlimited
-		if (force_single || ( max_result_length > 0 && max_result_length <= 2 * boxwid)) {
+		if (force_single || ( max_result_length > 0 && (max_result_length <= 2 * boxwid || max_result_length < 64))) {
 			
 			
 			
@@ -637,8 +674,8 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				result.attr("autofocus",null);
 			}
 			String type="text";
-			if( use_html5 && input instanceof HTML5Input){
-				String tmp = ((HTML5Input)input).getType();
+			if( use_html5 ){
+				String tmp = getHtml5Type(input);
 				if( tmp != null ){
 					type=tmp;
 				}
@@ -691,11 +728,11 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 					if( bounded.getType() != null){
 						Object min = bounded.getMin();
 						if( min != null ){
-							result.attr("min",bounded.formatRange(min));
+							result.attr("min",bounded.formatRange((Comparable) min));
 						}
 						Object max = bounded.getMax();
 						if( max != null){
-							result.attr("max", bounded.formatRange(max));
+							result.attr("max", bounded.formatRange((Comparable) max));
 						}
 						if( input instanceof RangedInput){
 							RangedInput ranged = (RangedInput)input;
@@ -703,7 +740,7 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 							if( step == null ){
 								result.attr("step", "any");
 							}else{
-								result.attr("step",ranged.formatRange(step));
+								result.attr("step",ranged.formatRange((Comparable) step));
 							}
 						}
 					}

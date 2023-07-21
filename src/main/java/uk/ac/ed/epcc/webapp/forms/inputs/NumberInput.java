@@ -18,9 +18,10 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 
 import java.text.NumberFormat;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import java.util.Set;
+
+import uk.ac.ed.epcc.webapp.forms.exceptions.*;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /**
  * superclass for all Inputs that return Numbers
@@ -29,12 +30,8 @@ import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
  * @param <N> type of result object
  * 
  */
-public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N> implements UnitInput, RangedInput<N> {
+public abstract class NumberInput<N extends Number & Comparable<N>> extends ParseAbstractInput<N> implements UnitInput, RangedInput<N> {
 	
-
-	private N min = null;
-
-	private N max = null;
 	// step value for use in html5 input
 	// this only controls the html5 control not the validation
 	private N step = null;
@@ -47,26 +44,20 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 		super();
 		setSingle(true);
 		setBoxWidth(32);
-		addValidator(new FieldValidator<N>() {
-
-			@Override
-			public void validate(N data) throws FieldException {
-				if (!(data instanceof Number)) {
-					throw new ValidateException("Invalid input");
-				}
-				Number n = (Number) data;
-				if (min != null && n.doubleValue() < min.doubleValue()) {
-					throw new ValidateException("Too small minimum value="+getString(min));
-				}
-				if (max != null && n.doubleValue() > max.doubleValue()) {
-					throw new ValidateException("Too large maximum value="+getString(max));
-				}
-				
-			}
-		});
 	}
 
-	
+	 protected void decorate(FieldException e) throws FieldException{
+		    // re-write generic message for numbers
+		    if( e instanceof MinimumValueException) {
+		    	N min = (N) ((MinimumValueException)e).getMin();
+		    	throw new MinimumValueException("Too small minimum value="+getString(min), (Comparable) min);
+		    }
+		    if( e instanceof MaximumValueException) {
+		    	N max = (N) ((MaximumValueException)e).getMax();
+		    	throw new MinimumValueException("Too large maximum value="+getString(max), (Comparable) max);
+		    }
+	    	throw e;
+	 }
 	
 	/**
 	 * return unit this field is in.
@@ -78,13 +69,7 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 		return unit;
 	}
 
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.RangedInput#getMin()
-	 */
-	@Override
-	public N getMin(){
-		return min;
-	}
+	
 
 	@Override
 	public N getStep(){
@@ -105,26 +90,9 @@ public abstract class NumberInput<N extends Number> extends ParseAbstractInput<N
 	public void setStep(N s){
 		this.step=s;
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.RangedInput#getMax()
-	 */
-	@Override
-	public N getMax(){
-		return max;
-	}
-	@Override
-	public N setMax(N m) {
-		N old = max;
-		max = m;
-		return old;
-	}
+	
 
-	@Override
-	public N setMin(N m) {
-		N old = min;
-		min = m;
-		return old;
-	}
+	
 
 	/**
 	 * Set a number format for use with the input

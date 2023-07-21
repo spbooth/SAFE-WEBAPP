@@ -16,11 +16,10 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.*;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 /** An input that selects a timestamp using pull down menus.
  * The class also implements ParseInput to support setting 
  * default values.
@@ -42,8 +41,7 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements B
     private final DateFormat df;
 
     Calendar c=null;
-    private Date min_date=null;
-    private Date max_date=null;
+ 
     public TimeStampMultiInput(Date now){
     	this(now,1000L,Calendar.SECOND);
     }
@@ -79,26 +77,20 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements B
     		date_format.append(time_format);
     	}
     	df = new RelativeDateFormat(now,date_format.toString());
-    	addValidator(new FieldValidator<Date>() {
-			
-			@Override
-			public void validate(Date val) throws FieldException {
-				if( min_date != null && min_date.after(val)){
-					if( (min_date.getTime() - val.getTime()) < 1000L  ) {
-						// This is a boundary case min and value will format the same
-						// even though min is technically after value
-						throw new ValidateException("Must be after "+df.format(min_date));
-					}
-					throw new ValidateException("Before "+df.format(min_date));
-				}
-				if( max_date != null && max_date.before(val)){
-					// boundary ok as will format as day before
-					throw new ValidateException("After "+df.format(max_date));
-				}
-				
-			}
-		});
+    
     }
+    protected void decorate(FieldException e) throws FieldException{
+	    // re-write generic message for numbers
+	    if( e instanceof MinimumValueException) {
+	    	Date min = (Date) ((MinimumValueException)e).getMin();
+	    	throw new MinimumValueException("Before "+df.format(min), min);
+	    }
+	    if( e instanceof MaximumValueException) {
+	    	Date max = (Date) ((MaximumValueException)e).getMax();
+	    	throw new MinimumValueException("After "+df.format(max), max);
+	    }
+    	throw e;
+ }
 	@Override
 	public Date convert(Object v) throws TypeException {
 		if( v == null ){
@@ -149,18 +141,7 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements B
 		}
 		return old;
 	}
-	public Date setMinDate(Date d){
-		Date old = min_date;
-		min_date=d;
-		setBounds();
-		return old;
-	}
-	public Date setMaxDate(Date d){
-		Date old = max_date;
-		max_date=d;
-		setBounds();
-		return old;
-	}
+	
 	@Override
 	public Date parseValue(String v) throws ParseException {
 		if (v == null) {
@@ -181,20 +162,7 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements B
 		return df.format(val);
 	}
 	
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput#getMin()
-	 */
-	@Override
-	public Date getMin() {
-		return min_date;
-	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput#getMax()
-	 */
-	@Override
-	public Date getMax() {
-		return max_date;
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput#formatRange(java.lang.Object)
 	 */
@@ -202,21 +170,11 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements B
 	public String formatRange(Date n) {
 		return getString(n);
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput#setMin(java.lang.Object)
-	 */
-	@Override
-	public Date setMin(Date val) {
-		return setMinDate(val);
-	}
-	protected void setBounds() {
+	
+	public void setBounds() {
+		Date min_date = getMin();
+		Date max_date = getMax();
 		if( min_date == null && max_date == null ) {
-			year_input.setMin(null);
-			month_input.setMin(null);
-			day_input.setMin(null);
-			year_input.setMax(null);
-			month_input.setMax(null);
-			day_input.setMax(null);
 			return;
 		}
 		Calendar min_cal=null;
@@ -225,19 +183,11 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements B
 			min_cal = Calendar.getInstance();
 			min_cal.setTime(min_date);
 			year_input.setMin(min_cal.get(Calendar.YEAR));
-		}else {
-			year_input.setMin(null);
-			month_input.setMin(null);
-			day_input.setMin(null);
 		}
 		if( max_date != null) {
 			max_cal = Calendar.getInstance();
 			max_cal.setTime(max_date);
 			year_input.setMax(max_cal.get(Calendar.YEAR));
-		}else {
-			year_input.setMax(null);
-			month_input.setMax(null);
-			day_input.setMax(null);
 		}
 		// if same year set month min/max
 		if( min_cal != null && max_cal != null && min_cal.get(Calendar.YEAR) == max_cal.get(Calendar.YEAR)) {
@@ -253,13 +203,7 @@ public class TimeStampMultiInput extends AbstractCalendarMultiInput implements B
 		}
 		
 	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.BoundedInput#setMax(java.lang.Object)
-	 */
-	@Override
-	public Date setMax(Date val) {
-		return setMaxDate(val);
-	}
+	
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.forms.inputs.AbstractCalendarMultiInput#setNull()
 	 */

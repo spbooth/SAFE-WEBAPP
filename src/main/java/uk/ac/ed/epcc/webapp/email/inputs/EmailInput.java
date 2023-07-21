@@ -16,22 +16,18 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.email.inputs;
 
-import uk.ac.ed.epcc.webapp.email.Emailer;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.*;
-import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
 
 /**
- * test input that must be a valid email address
+ * text input that must be a valid email address
  * 
  * @author spb
  * 
  */
 
 
-public class EmailInput extends TextInput implements HTML5Input , FormatHintInput{
+public class EmailInput extends TextInput {
 
 	/**
 	 * 
@@ -43,33 +39,9 @@ public class EmailInput extends TextInput implements HTML5Input , FormatHintInpu
 		addValidator(new MaxLengthValidator(MAX_EMAIL_LENGTH));
 
 		setSingle(true);
-		addValidator(new FieldValidator<String>() {
-			
-			@Override
-			public void validate(String email) throws FieldException {
-				if( email == null || email.trim().length()==0){
-					// must be optional
-					return;
-				}
-				if (!Emailer.checkAddress(getString())) {
-					throw new ValidateException("Invalid email address");
-				}
-				
-			}
-		});
+		addValidator(new EmailFieldValidator(this));
 	}
 	
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.HTML5Input#getType()
-	 */
-	public String getType() {
-		return "email";
-	}
-	/* (non-Javadoc)
-	 * @see uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput#getFormatHint()
-	 */
-	@Override
-	public String getFormatHint() {
-		return "name@example.com";
-	}
+	
+	
 }

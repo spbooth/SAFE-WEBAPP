@@ -21,6 +21,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.FieldType;
 import uk.ac.ed.epcc.webapp.model.data.BasicType;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 
 
@@ -49,5 +50,13 @@ public interface TypeProducer<T,D> extends TypeConverter<T,D>, Selector<Input<? 
    * @return FieldType
    */
   public FieldType<? extends D> getFieldType(T def);
+  
+  /** Get a {@link FieldValidator} that validates the underlying objects
+   * 
+   * @return
+   */
+  default public FieldValidator<D> getFieldValidator(){
+	  return new TypeProducerFieldValidator<>(this);
+  }
  
 }

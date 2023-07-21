@@ -18,7 +18,6 @@ package uk.ac.ed.epcc.webapp.model.data.forms.inputs;
 
 import java.util.StringTokenizer;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
@@ -27,6 +26,7 @@ import uk.ac.ed.epcc.webapp.forms.inputs.FormatHintInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
 import uk.ac.ed.epcc.webapp.model.data.Duration;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 /** Input for a {@link Duration} in  HH:mm::ss format.
  *  @see ElapsedSecondInput
  * 

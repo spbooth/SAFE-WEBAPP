@@ -16,10 +16,10 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import java.util.Iterator;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidationSet;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 /** Wrapper class to convert a ListInput to be displayed as a
  * RadioButton. The input is assumed not to be optional.
  * 

@@ -21,8 +21,6 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.Indexed;
-import uk.ac.ed.epcc.webapp.forms.FieldValidationSet;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.inputs.Input;
@@ -38,6 +36,8 @@ import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.SQLMatcher;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 /** This is a wrapper round some other class that implements ListInput intended to
  * add a null-value option to the list. This is for use in SQLFormFilters to allow for null fields to be searched for
  * The null-value entry corresponds to -1 so the internal input must not support that value.

@@ -14,9 +14,9 @@
 package uk.ac.ed.epcc.webapp.session;
 
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.model.ParseFactory;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** An {@link FieldValidator} that checks the value does not already resolve in a {@link ParseFactory}.
  * 

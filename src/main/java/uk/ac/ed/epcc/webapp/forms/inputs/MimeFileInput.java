@@ -15,11 +15,11 @@
  * Copyright (c) - The University of Edinburgh 2010
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.model.data.stream.MimeStreamData;
 import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** FileInput that does not allow html uploads
  * (where mime type is known)

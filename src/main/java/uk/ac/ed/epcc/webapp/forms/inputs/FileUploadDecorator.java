@@ -20,6 +20,7 @@ import java.util.Map;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.model.data.stream.StreamData;
+import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
 
 /** A Input that decorated a String Input with a file-upload button
  * @author spb

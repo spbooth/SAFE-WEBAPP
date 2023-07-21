@@ -14,7 +14,7 @@
 /*******************************************************************************
  * Copyright (c) - The University of Edinburgh 2010
  *******************************************************************************/
-package uk.ac.ed.epcc.webapp.forms;
+package uk.ac.ed.epcc.webapp.validation;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
@@ -39,4 +39,9 @@ public interface FieldValidator<D> {
 
 	public  void validate(D data)
 			throws FieldException;
+	
+	
+	default public <X> X accept(FieldValidationVisitor<X,D> vis){
+		return vis.visitGenericFieldValidator(this);
+	}
 }

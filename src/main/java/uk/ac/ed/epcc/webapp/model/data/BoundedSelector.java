@@ -9,7 +9,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
  * @param <N> type of bound/value
  * @param <I> type of input
  */
-public interface BoundedSelector<N,I extends BoundedInput<N>> extends Selector<I> {
+public interface BoundedSelector<N extends Comparable<N>,I extends BoundedInput<N>> extends Selector<I> {
 
 	/** Create a new {@link BoundedSelector} with the select range
 	 * of the produced input further restricted by additional bounds

@@ -17,6 +17,7 @@ import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.model.far.response.ResponseDataManager;
 import uk.ac.ed.epcc.webapp.model.far.response.StringDataManager;
+import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
 
 /** A {@link QuestionFormHandler} for text input questions
  * @author spb

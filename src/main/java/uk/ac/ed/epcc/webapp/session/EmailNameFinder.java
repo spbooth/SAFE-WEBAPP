@@ -32,7 +32,6 @@ import uk.ac.ed.epcc.webapp.email.Emailer;
 import uk.ac.ed.epcc.webapp.email.inputs.EmailInput;
 import uk.ac.ed.epcc.webapp.email.inputs.ServiceAllowedEmailFieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Field;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
@@ -64,6 +63,7 @@ import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
 import uk.ac.ed.epcc.webapp.model.lifecycle.ActionList;
 import uk.ac.ed.epcc.webapp.servlet.session.token.Scopes;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /**
  * A {@link AppUserNameFinder} to handle users canonical Email
@@ -136,8 +136,6 @@ public class EmailNameFinder<AU extends AppUser> extends AppUserNameFinder<AU, E
 
 	@Override
 	public Map<String, Selector> addSelectors(Map<String, Selector> selectors) {
-		EmailInput email = new EmailInput();
-		email.setBoxWidth(getContext().getIntegerParameter(EMAIL_MAXWIDTH_PROP, 32));
 		selectors.put(EMAIL, new Selector() {
 
 			@Override

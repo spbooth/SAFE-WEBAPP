@@ -17,12 +17,12 @@
 package uk.ac.ed.epcc.webapp.model.data.forms.inputs;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.NoSpaceFieldValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.jdbc.table.DataBaseHandlerService;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 /** Input to generate a name for a new database table.
  * 
  * @author spb

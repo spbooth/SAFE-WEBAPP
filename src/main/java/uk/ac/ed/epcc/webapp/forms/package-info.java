@@ -52,7 +52,7 @@ Form validation code is also the same for all form types.
 </P>
 <P>There are 2 levels of validation. Each field/Input can validate
 its own inputs independently and generate field specific errors. Every Input class has its own
-built in validation code and this can be augmented by adding a {@link uk.ac.ed.epcc.webapp.forms.FieldValidator} to the corresponding field of the form.
+built in validation code and this can be augmented by adding a {@link uk.ac.ed.epcc.webapp.validation.FieldValidator} to the corresponding field of the form.
 The overall form can also be validated and generate a generic error. This
 is done by adding a {@link uk.ac.ed.epcc.webapp.forms.FormValidator} object to the form. These can be used to validate constraints that affect multiple fields for example if
 one value should be less than another.

@@ -86,9 +86,9 @@ BoundedInputInterfaceTest<Date, TimeStampMultiInput, TimeStampMultiInputTestCase
 		Calendar c = Calendar.getInstance();
 		TimeStampMultiInput input = new TimeStampMultiInput(c.getTime());
 		c.add(Calendar.YEAR,-1);
-		input.setMinDate(c.getTime());
+		input.setMin(c.getTime());
 		c.add(Calendar.YEAR,2);
-		input.setMaxDate(c.getTime());
+		input.setMax(c.getTime());
 		return input;
 	}
 

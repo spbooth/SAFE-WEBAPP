@@ -16,6 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
 
 /** An input that corresponds to a text box.
  * 

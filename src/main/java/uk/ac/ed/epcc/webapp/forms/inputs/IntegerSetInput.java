@@ -17,9 +17,9 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** An integer input that selects an integer from a set as a pull down
  * 
@@ -95,20 +95,20 @@ public class IntegerSetInput extends IntegerInput implements ListInput<Integer,I
 
 	@Override
 	public Iterator<Integer> getItems() {
-		Number min = getMin();
-		Number max = getMax();
-		if( min != null || max != null) {
-			// return items that are in range
-			LinkedHashSet<Integer> tmp = new LinkedHashSet<>();
-			for(Integer i : values) {
-				if( (min == null || i.intValue() >= min.intValue()) &&
-					(max == null || i.intValue() <= max.intValue())) {
-					tmp.add(i);
-				}
+
+		// return items that are valid
+		LinkedHashSet<Integer> tmp = new LinkedHashSet<>();
+		for(Integer i : values) {
+			try {
+				validate(i);
+				tmp.add(i);
+			}catch(FieldException e) {
+
 			}
-			return tmp.iterator();
 		}
-		return values.iterator();
+		return tmp.iterator();
+
+
 	}
 	@Override
 	public int getCount(){

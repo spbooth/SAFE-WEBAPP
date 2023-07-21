@@ -54,9 +54,9 @@ public class LongInput extends NumberInput<Long> {
 		try {
 			Long i;
 			if (nf != null) {
-				i = new Long(nf.parse(v.trim()).longValue());
+				i = Long.valueOf(nf.parse(v.trim()).longValue());
 			} else {
-				i = new Long(Long.parseLong(v.trim()));
+				i = Long.valueOf(v.trim());
 			}
 			return i;
 		} catch (NumberFormatException e) {
@@ -72,7 +72,7 @@ public class LongInput extends NumberInput<Long> {
 			return (Long) v;
 		}
 		if( v instanceof Number ){
-			return new Long(((Number)v).longValue());
+			return Long.valueOf(((Number)v).longValue());
 		}
 		if( v instanceof String){
 			try {

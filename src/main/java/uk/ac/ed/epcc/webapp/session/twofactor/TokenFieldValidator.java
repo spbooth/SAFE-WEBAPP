@@ -13,10 +13,10 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.session.twofactor;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.session.AppUser;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /**
  * @author Stephen Booth

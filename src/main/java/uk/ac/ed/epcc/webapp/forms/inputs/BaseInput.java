@@ -17,9 +17,9 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidationSet;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /**
  * @author Stephen Booth
@@ -40,7 +40,8 @@ public abstract class BaseInput<V> implements Input<V> {
 
 	@Override
 	public final void addValidator(FieldValidator<V> val) {
-		validators.add(val);
+		// add with merge.
+		validators.addValidator(val);
 	}
 
 	@Override
@@ -48,7 +49,9 @@ public abstract class BaseInput<V> implements Input<V> {
 		if( set == null) {
 			return;
 		}
-		validators.addAll(set);
+		for(FieldValidator<V> v : set) {
+			validators.addValidator(v);
+		}
 	}
 
 	@Override
@@ -114,9 +117,21 @@ public abstract class BaseInput<V> implements Input<V> {
 	}
     
     public final void validate(V value) throws FieldException {
-    	for(FieldValidator<V> val : validators) {
-			val.validate(value);
-		}
+    	try {
+    		for(FieldValidator<V> val : validators) {
+    			val.validate(value);
+    		}
+    	}catch(FieldException e) {
+    		decorate(e);
+    	}
+    }
+    /** Extension point to allow an input to improve the message text in a {@link FieldException}
+     * 
+     * @param e
+     * @throws FieldException
+     */
+    protected void decorate(FieldException e) throws FieldException{
+    	throw e;
     }
     /** Extension point to add validation to sub-class specific inner-state
      * 

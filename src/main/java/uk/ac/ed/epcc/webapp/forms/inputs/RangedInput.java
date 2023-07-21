@@ -21,7 +21,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
  * @param <N> type of input
  */
 
-public interface RangedInput<N extends Number> extends BoundedInput<N>{
+public interface RangedInput<N extends Number & Comparable<N>> extends BoundedInput<N>{
 
 	
 	/** Step value

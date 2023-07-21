@@ -19,10 +19,10 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
 import java.util.Collections;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidationSet;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** An ErrorInput is an unmodifiable input that never validates.
  * It can used to indicate that no valid selections are possible for the user

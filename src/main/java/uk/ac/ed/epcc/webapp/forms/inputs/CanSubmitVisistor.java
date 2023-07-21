@@ -19,6 +19,8 @@ import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
+import uk.ac.ed.epcc.webapp.validation.MaxValueValidator;
+import uk.ac.ed.epcc.webapp.validation.MinValueValidator;
 
 /** An {@link InputVisitor} that detects any input that  is impossible to validate
  * @author Stephen Booth
@@ -86,14 +88,16 @@ public class CanSubmitVisistor implements InputVisitor<Boolean> {
 //		if( input.getMaxResultLength() < 1) {
 //			return false;
 //		}
-		if( input instanceof RangedInput) {
-			RangedInput<?> r = (RangedInput<?>)input;
-			Number min = r.getMin();
-			Number max = r.getMax();
-			if( min != null && max !=null && min.doubleValue()>max.doubleValue()) {
-				return false;
-			}
+
+		Comparable min = MinValueValidator.getMin(input.getValidators());
+		Comparable max = MaxValueValidator.getMax(input.getValidators());
+
+
+		// min == max is ok as this is jut a forced result.
+		if( min != null && max !=null && min.compareTo(max) > 0) {
+			return false;
 		}
+		
 		return true;
 	}
 

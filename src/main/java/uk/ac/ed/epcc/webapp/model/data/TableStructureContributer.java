@@ -16,8 +16,6 @@ package uk.ac.ed.epcc.webapp.model.data;
 import java.util.Map;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidationSet;
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
@@ -25,6 +23,8 @@ import uk.ac.ed.epcc.webapp.model.data.forms.FieldHelpProvider;
 import uk.ac.ed.epcc.webapp.model.data.forms.FormLabelProvider;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** An interface for objects that contribute fields etc. to the structure of a table and control the default form generation
  * of those fields. 

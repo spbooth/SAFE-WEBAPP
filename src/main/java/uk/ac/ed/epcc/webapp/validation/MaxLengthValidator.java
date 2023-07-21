@@ -1,9 +1,8 @@
-package uk.ac.ed.epcc.webapp.forms.inputs;
+package uk.ac.ed.epcc.webapp.validation;
 
 import java.util.Iterator;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 
@@ -95,6 +94,13 @@ public final class MaxLengthValidator implements FieldValidator<String> {
 			validators.add(new MaxLengthValidator(max));
 		}
 		return max;
+	}
+	public boolean dominates(MaxLengthValidator v) {
+		return max < v.max;
+	}
+	@Override
+	public <X> X accept(FieldValidationVisitor<X, String> vis) {
+		return vis.visitMaxLengthValidator(this);
 	}
 	
 	

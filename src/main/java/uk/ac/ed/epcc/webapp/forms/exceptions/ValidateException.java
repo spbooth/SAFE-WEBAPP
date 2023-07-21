@@ -16,12 +16,19 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.exceptions;
 
+import uk.ac.ed.epcc.webapp.forms.FormValidator;
 import uk.ac.ed.epcc.webapp.forms.action.FormAction;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 
 /**
- * Exception to indicate some kind of problem with the input to this field. The
+ * Exception to indicate some kind of problem with form validation. The
  * message text should be for the End user.
+ * This can either be thrown from a {@link FieldValidator} or a {@link FormValidator}.
+ * If thrown from a {@link FormValidator} the error is a generic error unless
+ * the field in specified explicitly in the exception.
+ * 
+ * 
  * 
  * If it is more convenient to perform validation as part of the {@link FormAction}
  * then you can throw a {@link TransitionValidationException} there instead.

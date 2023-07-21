@@ -16,11 +16,11 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model.data.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.forms.FieldValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
 import uk.ac.ed.epcc.webapp.model.data.Repository;
+import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 /** Input to select a name that is not one of the current fields of a Repository
  * 
  * @author spb

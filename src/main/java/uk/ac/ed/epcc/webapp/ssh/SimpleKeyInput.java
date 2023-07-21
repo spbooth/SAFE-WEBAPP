@@ -15,8 +15,8 @@ package uk.ac.ed.epcc.webapp.ssh;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.forms.inputs.MaxLengthValidator;
 import uk.ac.ed.epcc.webapp.forms.inputs.TextInput;
+import uk.ac.ed.epcc.webapp.validation.MaxLengthValidator;
 
 public class SimpleKeyInput extends TextInput{
 	

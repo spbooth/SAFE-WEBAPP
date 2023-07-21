@@ -21,7 +21,7 @@ import uk.ac.ed.epcc.webapp.forms.TestDataProvider;
  * @author Stephen Booth
  *
  */
-public interface BoundedInputDataProvider<T, I extends BoundedInput<T>> extends TestDataProvider<T, I> {
+public interface BoundedInputDataProvider<T extends Comparable<T>, I extends BoundedInput<T>> extends TestDataProvider<T, I> {
 
 	/** get a lower bound
 	 * 

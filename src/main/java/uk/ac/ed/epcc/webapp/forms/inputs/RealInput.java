@@ -51,9 +51,9 @@ public class RealInput extends NumberInput<Float> {
 		try {
 			Float i;
 			if (nf != null) {
-				i = new Float(nf.parse(v.trim()).floatValue());
+				i = Float.valueOf(nf.parse(v.trim()).floatValue());
 			} else {
-				i = new Float(Float.parseFloat(v.trim()));
+				i = Float.valueOf(v.trim());
 			}
 			return i;
 		} catch (NumberFormatException e) {
