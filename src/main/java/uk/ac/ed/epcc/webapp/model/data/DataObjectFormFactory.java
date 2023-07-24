@@ -64,24 +64,33 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	 super(fac);
    }
    /**
-	 * builds a default Form for editing the DataObjects belonging to this
-	 * DataObjectFactory The state of the Form is initialised using getDefaults
+	 * builds a default Form for creating new objects.
+	 * default values are taken from {@link #getCreationDefaults()}
 	 * 
 	 * @param f
 	 *            Form to build
 	 * @throws DataFault
 	 */
 	public final boolean buildForm(Form f) throws DataFault{
-		return buildForm(f,null);
+		return buildForm(f,null,getCreationDefaults());
 	}
+	
+	/** builds a default Form for editing the DataObjects belonging to this
+	 * {@link DataObjectFactory}
+	 * 
+	 * @param f {@link Form} to build
+	 * @param fixtures Map of fixed form values
+	 * @param defaults Map of default values for editable fields
+	 *   
+	 * @throws DataFault
+	 */
 	@Override
-	public final boolean buildForm(Form f,HashMap fixtures) throws DataFault{
+	public final boolean buildForm(Form f,HashMap fixtures,Map<String,Object> defaults) throws DataFault{
 		try(TimeClosable build = new TimeClosable(getContext(), "buildForm")){
 			f.setFormTextGenerator(this);
 			boolean defer = DEFER_CONTENT.isEnabled(getContext());
-			boolean complete = buildForm(getContext(), factory.res,getFields(),f,getOptional(), getSelectors(),getValidators(),getFieldConstraints(),defer ? null :getTranslations(),defer ? null :getFieldHelp(),fixtures);
+			boolean complete = buildForm(getContext(), factory.res,getFields(),f,getOptional(), getSelectors(),getValidators(),getFieldConstraints(),defer ? null :getTranslations(),defer ? null :getFieldHelp(),fixtures,defaults);
 			customiseForm(f);
-			f.setContents(getDefaults());
 			return complete;
 		}
 	}
@@ -118,7 +127,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 		if( supress_fields != null ) {
 			keys.removeAll(supress_fields);
 		}
-		return buildForm(conn, res, keys,f, optional, selectors,validators,constraints,labels, tooltips, null);
+		return buildForm(conn, res, keys,f, optional, selectors,validators,constraints,labels, tooltips, null,null);
 	}
 	/**
 	 * Construct an edit Form for the associated DataObject based on database
@@ -141,13 +150,26 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	 * @throws DataFault
 	 */
 	public static boolean buildForm(AppContext conn,Repository res, Set<String> keys, Form f, 
-				Set<String> optional, Map<String,Selector> selectors,Map<String,FieldValidationSet> validators,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips,HashMap fixtures) throws DataFault {
+				Set<String> optional, Map<String,Selector> selectors,Map<String,FieldValidationSet> validators,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips,HashMap fixtures,Map<String,Object> defaults) throws DataFault {
 		//
 		String table = res.getTag();
 		boolean support_multi_stage = f.supportsMultiStage();
 		if( fixtures == null && constraints != null ) {
 			fixtures = new HashMap();
 		}
+		// copy defaults to fixtures for any
+		// value not in the key-set or not already set as fixtures.
+		// This is to allow an update form with supressed fields access
+		// to the supressed data in FieldConstraints
+		if( defaults != null) {
+			for(Map.Entry e : defaults.entrySet()) {
+				if( ! keys.contains(e.getKey())  && ! fixtures.containsKey(e.getKey())) {
+					fixtures.put(e.getKey(), e.getValue());
+				}
+			}
+		}
+		
+		
 		// Try multiple form stages until we have no fields left
 		while( ! keys.isEmpty() ) {
 			int start = keys.size();
@@ -189,7 +211,11 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 					};
 				}
 				boolean emit_input = true;
-
+				Object def = null;
+				if( defaults != null) {
+					def = defaults.get(name);
+					
+				}
 				// Consider field constraints
 				if( constraints != null && constraints.containsKey(name)) {
 					FieldConstraint fc = constraints.get(name);
@@ -211,6 +237,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 								multi_stage=true;  // do the request
 							}
 						}
+						def = fc.defaultValue(name, def, f, fixtures);
 					}
 				}
 
@@ -246,6 +273,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 						}
 					}
 					f.addInput(name, lab,tooltip, input).setOptional(is_optional);
+					
 					if( fixtures != null ) {
 						if( f.isFixed(name) ) {
 							// pre-emptive copy of fixed value to fixtures
@@ -256,6 +284,9 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 							f.put(name, fixtures.get(name));
 							f.getField(name).lock();
 						}
+					}
+					if( def != null ) {
+						f.put(name, def);
 					}
 					it.remove(); // field has been processed
 				}
@@ -540,7 +571,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	 * 
 	 * @return Map of defaults
 	 */
-	public  Map<String, Object> getDefaults() {
+	public  Map<String, Object> getCreationDefaults() {
 		Map<String, Object> defaults = factory.getDefaults();
 		if( defaults == null){
 			defaults=new HashMap<>();

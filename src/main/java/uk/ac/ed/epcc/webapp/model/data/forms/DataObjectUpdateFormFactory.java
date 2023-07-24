@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.jfree.data.xy.DefaultTableXYDataset;
+
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.content.UIProvider;
@@ -105,21 +107,13 @@ public abstract  class DataObjectUpdateFormFactory<BDO extends DataObject> exten
 	public final void buildUpdateForm(Form f, BDO dat, SessionService<?> operator)
 			throws DataFault {
 				
-			    boolean complete = buildForm(f,getFixtures(dat));
-				//customiseForm(f);
-			    
+			    boolean complete = buildForm(f,getFixtures(dat), dat == null ? getCreationDefaults(): dat.getMap());
+			
 			    // set values before customise as it is common
 				// for the customise methods to lock fields
 				// and the values need to be in place before then.
 			    //
-			    // if buildForm is creating a multi-stage form then some of
-			    // the fields may already be locked and should NOT
-			    // be updated by the following
-				f.setContents(getDefaults());
-				if( dat != null ){
-					//this should never be called with dat null except from a unit test
-				   f.setContents(dat.getMap());
-				}
+			   
 				for(TableStructureContributer<BDO> contrib : factory.getTableStructureContributers()){
 					contrib.customiseUpdateForm(f, dat, operator);
 				}

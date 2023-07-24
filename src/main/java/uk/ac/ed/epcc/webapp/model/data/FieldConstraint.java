@@ -69,6 +69,22 @@ public interface FieldConstraint {
 	default public <I extends Input>  boolean suppress(String field, Selector<I> original, Form form,HashMap fixtures) {
 		return false;
 	}
+	/** Mutate a field default/initial value based on  other form fields. 
+	 * Note for update forms the original value is the current value of the form so
+	 * this should only be changed if an earlier choice invalidates that value and
+	 * there is a sensible new default that could be suggested as a replacement.
+	 * 
+	 * @param <D>
+	 * @param <I>
+	 * @param field
+	 * @param original
+	 * @param form
+	 * @param fixtures
+	 * @return
+	 */
+	default public <D,I extends Input<D>> D defaultValue(String field, D original, Form form, HashMap fixtures) {
+		return original;
+	}
 	/** Merge two {@link FieldConstraint}s
 	 *  values can be null
 	 * 

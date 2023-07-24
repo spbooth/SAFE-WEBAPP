@@ -105,6 +105,22 @@ public class ConstrainedFactory extends DataObjectFactory<ConstrainedFactory.Con
 				}
 				return original;
 			}
+
+			@Override
+			public <D, I extends Input<D>> D defaultValue(String field, D original, Form form, HashMap fixtures) {
+				Integer min = (Integer) fixtures.get(MIN);
+				Integer max = (Integer) fixtures.get(MAX);
+				Integer val = (Integer) original;
+				
+				if( original != null && min != null && val.intValue() < min.intValue()) {
+					return (D) min;
+				}
+
+				if( original != null && max != null && val.intValue() > max.intValue()) {
+					return (D) max;
+				}
+				return original;
+			}
 		});
 		return cst;
 	}
@@ -158,5 +174,14 @@ public class ConstrainedFactory extends DataObjectFactory<ConstrainedFactory.Con
 	protected Set<String> getOptional() {
 		
 		return new HashSet<String>();
+	}
+
+	@Override
+	protected Map<String, Object> getDefaults() {
+		
+		Map<String, Object> defaults = super.getDefaults();
+		defaults.put(MIN, 1);
+		defaults.put(MAX, 100);
+		return defaults;
 	}
 }

@@ -100,7 +100,7 @@ public interface CreateTemplate<BDO extends DataObject> extends CreateCustomizer
 	 * 
 	 * @return MAp
 	 */
-	public Map<String,Object> getDefaults();
+	public Map<String,Object> getCreationDefaults();
 	
 	
 }

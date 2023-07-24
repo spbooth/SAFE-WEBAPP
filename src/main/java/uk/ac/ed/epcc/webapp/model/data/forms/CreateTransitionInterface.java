@@ -1,6 +1,7 @@
 package uk.ac.ed.epcc.webapp.model.data.forms;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Contexed;
@@ -26,7 +27,7 @@ public interface CreateTransitionInterface<BDO extends DataObject> extends Targe
 	public default void buildForm(Form f, AppContext c) throws TransitionException {
 		try {
 			
-			if( buildForm(f,getInitialFixtures())) {
+			if( buildForm(f,getInitialFixtures(),getCreationDefaults())) {
 				customiseCompleteCreationForm(f);
 				addActions(f);
 			}
@@ -46,7 +47,9 @@ public interface CreateTransitionInterface<BDO extends DataObject> extends Targe
 		return null;
 	}
 	
-
+	default public Map<String,Object> getCreationDefaults(){
+		return null;
+	}
 	
 	
 	

@@ -1008,8 +1008,8 @@ Targetted<AU>
 		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFormFactory#getDefaults()
 		 */
 		@Override
-		public Map<String, Object> getDefaults() {
-			Map<String, Object> defaults = super.getDefaults();
+		public Map<String, Object> getCreationDefaults() {
+			Map<String, Object> defaults = super.getCreationDefaults();
 			defaults.put(ALLOW_EMAIL_FIELD, Boolean.TRUE);
 			
 			// look for defaults set in properties

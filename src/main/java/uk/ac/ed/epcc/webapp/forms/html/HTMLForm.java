@@ -190,6 +190,7 @@ public class HTMLForm extends BaseHTMLForm {
 	 * @return boolean true if all ok
 	 */
 	public boolean parsePost(HttpServletRequest req) {
+
 		AppContext c = getContext();
 		Map<String,Object> params;
 		params = c.getService(ServletService.class).getParams();

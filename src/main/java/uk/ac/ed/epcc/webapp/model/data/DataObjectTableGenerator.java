@@ -20,8 +20,7 @@ public class DataObjectTableGenerator<T extends DataObject> extends DataObjectFo
 
 	public Table<String,String> getTable(T obj) throws DataFault {
 		Form f = new BaseForm(getContext());
-		buildForm(f);
-		f.setContents(obj.getMap());
+		buildForm(f,null,obj.getMap());
 		return f.getTable();
 	}
 }

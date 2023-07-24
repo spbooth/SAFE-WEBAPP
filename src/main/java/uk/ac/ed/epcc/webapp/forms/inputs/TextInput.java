@@ -80,4 +80,5 @@ public class TextInput extends ParseAbstractInput<String> {
 	public void setMaxResultLength(int len) {
 		addValidator(new MaxLengthValidator(len));
 	}
+	
 }

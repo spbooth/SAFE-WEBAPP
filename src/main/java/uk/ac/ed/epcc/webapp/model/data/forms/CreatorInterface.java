@@ -1,6 +1,7 @@
 package uk.ac.ed.epcc.webapp.model.data.forms;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.content.UIGenerator;
 import uk.ac.ed.epcc.webapp.content.UIProvider;
@@ -29,7 +30,7 @@ public interface CreatorInterface<BDO extends DataObject> extends FormCreator, C
 	}
 	@Override
 	default public void buildCreationForm(Form f) throws Exception {
-		if( buildForm(f,getInitialFixtures()) ) {
+		if( buildForm(f,getInitialFixtures(),getCreationDefaults()) ) {
 			customiseCompleteCreationForm(f);
 			addActions(f);
 		}
@@ -76,6 +77,9 @@ public interface CreatorInterface<BDO extends DataObject> extends FormCreator, C
 	}
 	
 	default public HashMap getInitialFixtures() {
+		return null;
+	}
+	default public Map<String,Object> getCreationDefaults(){
 		return null;
 	}
 }
