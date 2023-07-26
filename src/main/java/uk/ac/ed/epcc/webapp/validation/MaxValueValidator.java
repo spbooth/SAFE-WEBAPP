@@ -45,10 +45,16 @@ public final class MaxValueValidator<D extends Comparable> implements FieldValid
 		return val;
 	}
 	public boolean dominates(MaxValueValidator<D> v) {
+		if( val == null || v.val == null ) {
+			return false;
+		}
 		return val.compareTo(v.val) < 0;
 	}
 	@Override
 	public void validate(D data) throws FieldException {
+		if( data == null || val == null ) {
+			return;
+		}
 		if( data.compareTo(val) > 0 ) {
 			throw new MaximumValueException("Value to large, needs to be below "+val, val);
 		}

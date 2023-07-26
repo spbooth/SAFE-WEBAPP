@@ -46,10 +46,16 @@ public final class MinValueValidator<D extends Comparable> implements FieldValid
 		return val;
 	}
 	public boolean dominates(MinValueValidator<D> v) {
+		if( val == null || v.val == null ) {
+			return false;
+		}
 		return val.compareTo(v.val) > 0;
 	}
 	@Override
 	public void validate(D data) throws FieldException {
+		if( data == null || val == null ) {
+			return;
+		}
 		if( data.compareTo(val) < 0 ) {
 			throw new MinimumValueException("Value to small, needs to be above "+val, val);
 		}

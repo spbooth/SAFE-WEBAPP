@@ -62,6 +62,9 @@ public interface BoundedInput<T extends Comparable<T>> extends HTML5Input, Input
 	 * @param val
 	 */
 	default public void setMin(T val) {
+		if( val == null) {
+			return;
+		}
 		addValidator(new MinValueValidator<T>(val));
 	}
 	/** set the maximum value
@@ -69,6 +72,9 @@ public interface BoundedInput<T extends Comparable<T>> extends HTML5Input, Input
 	 * @param val
 	 */
 	default public void setMax(T val) {
+		if( val == null) {
+			return;
+		}
 		addValidator(new MaxValueValidator<T>(val));
 	}
 }
