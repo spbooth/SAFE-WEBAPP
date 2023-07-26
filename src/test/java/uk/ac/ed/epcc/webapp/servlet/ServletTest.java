@@ -31,9 +31,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import org.junit.After;
 import org.junit.Before;
 
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.Indexed;
-import uk.ac.ed.epcc.webapp.WebappTestBase;
+import uk.ac.ed.epcc.webapp.*;
 import uk.ac.ed.epcc.webapp.config.ConfigService;
 import uk.ac.ed.epcc.webapp.config.OverrideConfigService;
 import uk.ac.ed.epcc.webapp.content.HtmlBuilder;
@@ -160,7 +158,7 @@ public abstract class ServletTest extends WebappTestBase{
 	public MockResponse res=null;
 	public MockServletContext serv_ctx;
 	
-	
+	public static final Feature CHECK_REDUNDENT = new Feature("tests.check_redundant_param",true,"Throw error if redundant form parameter set");
 	
 	/** setup the mock objects for a test
 	 * 
@@ -359,8 +357,16 @@ public abstract class ServletTest extends WebappTestBase{
  */
 	public void addParam(String name, String value) {
 		req.removeAttribute(DefaultServletService.PARAMS_KEY_NAME);
+		Object prev = req.params.get(name);
+		if( CHECK_REDUNDENT.isEnabled(ctx) && prev != null ) {
+			assertFalse("Redundant parameter set in test", value.equals(prev));
+		}
 		req.params.put(name, value);
 		req.method="POST";
+	}
+	
+	public void checkParam(String name,String value) {
+		assertEquals("Unexpected form parameter",value, req.params.get(name));
 	}
 	/** Add the form parameters corresponding to an Input.
 	 * The Input key value must be set to the base parameter name
@@ -403,6 +409,9 @@ public abstract class ServletTest extends WebappTestBase{
 	 */
 	public void addParam(String name,Indexed i){
 		addParam(name, Integer.toString(i.getID()));
+	}
+	public void checkParam(String name,Indexed i){
+		checkParam(name, Integer.toString(i.getID()));
 	}
 	/** Set the form action. This only needs to be called when there is more than one action (submit button) specified 
 	 * 
