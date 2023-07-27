@@ -29,7 +29,10 @@ public class TextInput extends ParseAbstractInput<String> {
 	private boolean trim=true;
 	public TextInput() {
 		super();
-		
+	}
+	public TextInput(boolean single) {
+		super();
+		setSingle(single);
 	}
 
 	@Override
