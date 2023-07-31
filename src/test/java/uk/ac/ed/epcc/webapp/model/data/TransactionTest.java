@@ -19,12 +19,14 @@ import org.junit.Test;
 
 import uk.ac.ed.epcc.webapp.WebappTestBase;
 import uk.ac.ed.epcc.webapp.jdbc.DatabaseService;
+import uk.ac.ed.epcc.webapp.junit4.ConfigFixtures;
 import uk.ac.ed.epcc.webapp.model.Dummy1;
 
 /**
  * @author Stephen Booth
  *
  */
+@ConfigFixtures("nomemory.properties")
 public class TransactionTest extends WebappTestBase {
 
 
