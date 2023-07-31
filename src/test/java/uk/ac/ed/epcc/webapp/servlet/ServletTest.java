@@ -355,10 +355,14 @@ public abstract class ServletTest extends WebappTestBase{
  * @param name
  * @param value
  */
+	
 	public void addParam(String name, String value) {
+		addParam(name,value,CHECK_REDUNDENT.isEnabled(ctx));
+	}
+	public void addParam(String name, String value,boolean check_redundant) {
 		req.removeAttribute(DefaultServletService.PARAMS_KEY_NAME);
 		Object prev = req.params.get(name);
-		if( CHECK_REDUNDENT.isEnabled(ctx) && prev != null ) {
+		if( check_redundant && prev != null ) {
 			assertFalse("Redundant parameter set in test", value.equals(prev));
 		}
 		req.params.put(name, value);
