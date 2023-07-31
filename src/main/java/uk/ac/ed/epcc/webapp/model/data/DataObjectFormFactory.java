@@ -161,7 +161,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 		// value not in the key-set or not already set as fixtures.
 		// This is to allow an update form with supressed fields access
 		// to the supressed data in FieldConstraints
-		if( defaults != null) {
+		if( defaults != null && fixtures != null) {
 			for(Map.Entry e : defaults.entrySet()) {
 				if( ! keys.contains(e.getKey())  && ! fixtures.containsKey(e.getKey())) {
 					fixtures.put(e.getKey(), e.getValue());
