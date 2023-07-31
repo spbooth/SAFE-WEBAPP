@@ -359,6 +359,7 @@ public abstract class AbstractTransitionServletTest extends ServletTest {
 					ff.getInput().accept(vis); 
 				 }
 			 }
+			 req.removeAttribute(DefaultServletService.PARAMS_KEY_NAME);
 		 }
         
 		 if( factory instanceof NavigationProvider){

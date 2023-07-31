@@ -366,7 +366,9 @@ public abstract class ServletTest extends WebappTestBase{
 	}
 	
 	public void checkParam(String name,String value) {
+		req.removeAttribute(DefaultServletService.PARAMS_KEY_NAME);
 		assertEquals("Unexpected form parameter",value, req.params.get(name));
+		req.method="POST";
 	}
 	/** Add the form parameters corresponding to an Input.
 	 * The Input key value must be set to the base parameter name
