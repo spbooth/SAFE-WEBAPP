@@ -256,7 +256,7 @@ public abstract class DataObject implements ContextIndexed, Identified, Releasab
 	 * 
 	 * @return Hashtable
 	 */
-	public final Map<String,Object> getMap() {
+	public  Map<String,Object> getMap() {
 		return getMap(false);
 	}
 	public final Map<String,Object> getMap(boolean include_null) {
