@@ -38,8 +38,8 @@ public final class MaxValueValidator<D extends Comparable> implements FieldValid
 		return true;
 	}
 	private final D val;
-	public MaxValueValidator(D min) {
-		this.val=min;
+	public MaxValueValidator(D max) {
+		this.val=max;
 	}
 	public D getMax() {
 		return val;

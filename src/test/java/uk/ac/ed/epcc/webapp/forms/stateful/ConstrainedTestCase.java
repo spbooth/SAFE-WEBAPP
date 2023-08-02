@@ -92,7 +92,7 @@ public class ConstrainedTestCase extends AbstractTransitionServletTest {
 		setTransition(provider, ConstraintProvider.CREATE_KEY, null);
 		checkFormContent(null, "constrained_form_nomulti.xml");
 		addParam("Min", 100);
-		addParam("Max", 1);
+		addParam("Max", 110);
 		addParam("Value",12);
 		runTransition();
 		checkGeneralError("Value too small");

@@ -23,6 +23,7 @@ import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.Field;
 import uk.ac.ed.epcc.webapp.forms.Form;
+import uk.ac.ed.epcc.webapp.forms.FormValidator;
 import uk.ac.ed.epcc.webapp.forms.exceptions.TransitionException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormBuilder;
 import uk.ac.ed.epcc.webapp.forms.factory.FormFactory;
@@ -144,25 +145,24 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 	 * @throws DataFault
 	 */
 	public static boolean buildForm(AppContext conn,Repository res, Set<String> keys, Form f, 
-				Set<String> optional, Map<String,Selector> selectors,Map<String,FieldValidationSet> validators,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips,HashMap fixtures,Map<String,Object> defaults) throws DataFault {
+				Set<String> optional, Map<String,Selector> selectors,Map<String,FieldValidationSet> validators,Map<String,FieldConstraint> constraints,Map<String,String> labels,Map<String,String> tooltips,Map<String,Object> fixtures,Map<String,Object> defaults) throws DataFault {
 		//
 		String table = res.getTag();
 		boolean support_multi_stage = f.supportsMultiStage();
 		if( fixtures == null && constraints != null ) {
-			fixtures = new HashMap();
+			fixtures = new HashMap<>();
 		}
 		// copy defaults to fixtures for any
 		// value not in the key-set or not already set as fixtures.
 		// This is to allow an update form with supressed fields access
 		// to the supressed data in FieldConstraints
 		if( defaults != null && fixtures != null) {
-			for(Map.Entry e : defaults.entrySet()) {
+			for(Map.Entry<String,Object> e : defaults.entrySet()) {
 				if( ! keys.contains(e.getKey())  && ! fixtures.containsKey(e.getKey())) {
 					fixtures.put(e.getKey(), e.getValue());
 				}
 			}
 		}
-		
 		
 		// Try multiple form stages until we have no fields left
 		while( ! keys.isEmpty() ) {
@@ -210,28 +210,32 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 					def = defaults.get(name);
 					
 				}
+				FieldValidationSet validator_set = validators.get(name);
+				if( validator_set == null) {
+					validator_set= new FieldValidationSet<>();
+				}
 				// Consider field constraints
 				if( constraints != null && constraints.containsKey(name)) {
 					FieldConstraint fc = constraints.get(name);
-					if( fc.suppress(name, sel, f, fixtures)) {
+					if( fc.suppress(fixtures)) {
 						emit_input=false;
 						it.remove();
-					}else {
-						Selector new_sel = fc.apply(support_multi_stage,name, sel, f,fixtures);
-						if( new_sel != null ) {
-							// constraint applied
-							sel = new_sel;
-							if( support_multi_stage) {
-								is_optional = fc.changeOptional(name, is_optional,f,fixtures);
-							}
+					}else if( fc.requestMultiStage(fixtures)) {
+						// multi-stage requested
+						if( support_multi_stage ) {
+							emit_input=false;  // skip this input
+							multi_stage=true;  // do the request
 						}else {
-							// multi-stage requested
-							if( support_multi_stage ) {
-								emit_input=false;  // skip this input
-								multi_stage=true;  // do the request
+							FormValidator fv = fc.getFormValidator();
+							if( fc != null) {
+								f.addValidator(fv);
 							}
 						}
-						def = fc.defaultValue(name, def, f, fixtures);
+					}else {
+						Selector new_sel = fc.changeSelector(sel, fixtures);
+						is_optional = fc.changeOptional( is_optional,fixtures);
+						def = fc.defaultValue(def, fixtures);
+						validator_set = fc.validationSet(validator_set, fixtures);
 					}
 				}
 
@@ -241,7 +245,8 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 					if( input == null) {
 						throw new DataFault("Unable to create input for "+name);
 					}
-					input.addValidatorSet(validators.get(name));
+					
+					input.addValidatorSet(validator_set);
 					String lab = null;
 					if (labels != null ) {
 						if( labels.containsKey(name)) {

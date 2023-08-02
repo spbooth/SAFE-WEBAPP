@@ -31,6 +31,9 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.FieldConstraint;
 import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
+import uk.ac.ed.epcc.webapp.validation.MaxValueValidator;
+import uk.ac.ed.epcc.webapp.validation.MinValueValidator;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 
 /**
@@ -60,67 +63,64 @@ public class ConstrainedFactory extends DataObjectFactory<ConstrainedFactory.Con
 	@Override
 	protected Map<String, FieldConstraint> getFieldConstraints() {
 		Map<String, FieldConstraint> cst = super.getFieldConstraints();
-		cst.put(VALUE,new FieldConstraint() {
-			
+		cst.put(VALUE,new FieldConstraint<Integer>() {
 			@Override
-			public <I extends Input> Selector<I> apply(boolean support_multi_stage, String field, Selector<I> original,
-					Form form,HashMap fixtures) {
-				if( support_multi_stage ) {
-					if( ! (form.isFixed(MIN) && form.isFixed(MAX))){
-						// request a form stage
-						return null;
-					}
-					Integer min = (Integer) fixtures.get(MIN);
-					Integer max = (Integer) fixtures.get(MAX);
-					return new Selector() {
-
-						@Override
-						public Input getInput() {
-							IntegerInput input = (IntegerInput) original.getInput();
-							input.setMin(min);
-							input.setMax(max);
-							return input;
-						}
-						
-					};
-					
-				}else {
-					// fall back form validator
-					form.addValidator(new FormValidator() {
-						
-						@Override
-						public void validate(Form f) throws ValidateException {
-							Integer min = (Integer) f.get(MIN);
-							Integer value = (Integer) f.get(VALUE);
-							Integer max = (Integer) f.get(MAX);
-							if( value.intValue() < min.intValue()) {
-								throw new ValidateException("Value too small");
-							}
-							if( value.intValue() > max.intValue()) {
-								throw new ValidateException("Value too large");
-							}
-							
-						}
-					});
+			public boolean requestMultiStage(Map fixtures) {
+				if( fixtures.containsKey(MIN) && fixtures.containsKey(MAX)) {
+					return false;
 				}
-				return original;
+				return true;
 			}
+			@Override
+			public FieldValidationSet<Integer> validationSet(FieldValidationSet<Integer> original, Map<String,Object> fixtures) {
+				Integer min = (Integer) fixtures.get(MIN);
+				if( min != null ) {
+					original.addValidator(new MinValueValidator<Integer>(min));
+				}
+				Integer max = (Integer) fixtures.get(MAX);
+				if( max != null) {
+					original.addValidator(new MaxValueValidator<Integer>(max));
+				}
+				return FieldConstraint.super.validationSet(original, fixtures);
+			}
+			@Override
+			public FormValidator getFormValidator() {
+				return new FormValidator() {
+					
+					@Override
+					public void validate(Form f) throws ValidateException {
+						Integer min = (Integer) f.get(MIN);
+						Integer value = (Integer) f.get(VALUE);
+						Integer max = (Integer) f.get(MAX);
+						if( value.intValue() < min.intValue()) {
+							throw new ValidateException("Value too small");
+						}
+						if( value.intValue() > max.intValue()) {
+							throw new ValidateException("Value too large");
+						}
+						
+					}
+				};
+			}
+			
 
 			@Override
-			public <D, I extends Input<D>> D defaultValue(String field, D original, Form form, HashMap fixtures) {
+			public Integer defaultValue( Integer original,Map<String,Object> fixtures) {
 				Integer min = (Integer) fixtures.get(MIN);
 				Integer max = (Integer) fixtures.get(MAX);
 				Integer val = (Integer) original;
 				
 				if( original != null && min != null && val.intValue() < min.intValue()) {
-					return (D) min;
+					return min;
 				}
 
 				if( original != null && max != null && val.intValue() > max.intValue()) {
-					return (D) max;
+					return max;
 				}
 				return original;
 			}
+
+			
 		});
 		return cst;
 	}
