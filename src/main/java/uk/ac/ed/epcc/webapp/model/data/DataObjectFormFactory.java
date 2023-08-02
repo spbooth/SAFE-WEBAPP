@@ -232,7 +232,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 							}
 						}
 					}else {
-						Selector new_sel = fc.changeSelector(sel, fixtures);
+						sel = fc.changeSelector(sel, fixtures);
 						is_optional = fc.changeOptional( is_optional,fixtures);
 						def = fc.defaultValue(def, fixtures);
 						validator_set = fc.validationSet(validator_set, fixtures);

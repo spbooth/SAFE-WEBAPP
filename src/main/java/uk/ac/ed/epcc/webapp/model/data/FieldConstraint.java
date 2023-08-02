@@ -52,7 +52,7 @@ public interface FieldConstraint<D> {
 	 * @param fixtures
 	 * @return
 	 */
-	default boolean requestMultiStage(Map<String,Object> fixtures) {
+	default public boolean requestMultiStage(Map<String,Object> fixtures) {
 		return false;
 	}
 	
