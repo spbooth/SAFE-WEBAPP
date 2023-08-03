@@ -227,7 +227,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 							multi_stage=true;  // do the request
 						}else {
 							FormValidator fv = fc.getFormValidator();
-							if( fc != null) {
+							if( fv != null) {
 								f.addValidator(fv);
 							}
 						}

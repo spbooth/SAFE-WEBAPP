@@ -107,7 +107,7 @@ public class FieldValidationSet<T> extends LinkedHashSet<FieldValidator<T>> {
 			prev = new FieldValidationSet<>();
 			map.put(name, prev);
 		}
-		prev.add(val);
+		prev.addValidator(val);
 		return prev;
 	}
 	/** Add {@link FieldValidator} with merge
