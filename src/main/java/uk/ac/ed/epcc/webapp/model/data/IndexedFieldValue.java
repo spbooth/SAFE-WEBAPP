@@ -194,15 +194,6 @@ public class IndexedFieldValue<T extends DataObject,I extends DataObject> implem
 	}
 
 	@Override
-	public DataObjectSelector<I> narrowSelector(BaseFilter<I> fil, boolean new_restrict) {
-		try {
-			return getFactory().narrowSelector(fil,new_restrict);
-		} catch (Exception e) {
-			getLogger().error("Error getting factory",e);
-		}
-		return null;
-	}
-	@Override
 	public DataObjectFactory<I> getFactory() throws Exception {
 		return (DataObjectFactory<I>) producer.getProducer();
 	}

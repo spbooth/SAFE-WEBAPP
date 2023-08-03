@@ -337,24 +337,28 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	public abstract class AbstractDataObjectInput extends DataObjectIntegerInput implements PreSelectInput<Integer,BDO>{
 		private BaseFilter<BDO> select_fil=null; // narrow selection without restircting parse
 		private int max_identifier=DataObject.MAX_IDENTIFIER;
-        boolean restrict_parse=true;  // does filter apply to parse as well as offered choice
+      
         boolean allow_pre_select=true;
         private Labeller<? super BDO, String> labeller=null;
 		public AbstractDataObjectInput(BaseFilter<BDO> f) {
-			this(f,true);
+			this(null,f);
 		}
-		public AbstractDataObjectInput(BaseFilter<BDO> f,boolean restrict_parse) {
-			BaseFilter<BDO> fil;
-			try{ 
-				fil = FilterConverter.convert(f);
-			}catch(NoSQLFilterException e){
-				fil = f;
+		public AbstractDataObjectInput(BaseFilter<BDO> view_fil,BaseFilter<BDO> restrict_fil) {
+			if( view_fil != null) {
+				BaseFilter<BDO> fil;
+				try{ 
+					fil = FilterConverter.convert(view_fil);
+				}catch(NoSQLFilterException e){
+					fil = view_fil;
+				}
+				select_fil = fil;
 			}
-			this.restrict_parse = restrict_parse;
-			if( restrict_parse) {
-				addValidator(getValidator(fil));
-			}else {
-				select_fil=fil;
+			if( restrict_fil != null) {
+				try {
+					addValidator(getValidator(FilterConverter.convert(restrict_fil)));
+				}catch(NoSQLFilterException e) {
+					addValidator(getValidator(restrict_fil));
+				}
 			}
 			
 			AppContext con = getContext();
@@ -507,11 +511,12 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	public class DataObjectInput extends AbstractDataObjectInput {
 
 		/**
-		 * @param f
-		 * @param restrict_parse
+		 * 
+		 * @param view_fil
+		 * @param restrict_fil
 		 */
-		public DataObjectInput(BaseFilter<BDO> f, boolean restrict_parse) {
-			super(f, restrict_parse);
+		public DataObjectInput(BaseFilter<BDO> view_fil, BaseFilter<BDO> restrict_fil) {
+			super(view_fil, restrict_fil);
 		}
 
 		/**
@@ -564,7 +569,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			};
 		}
 		public SortingDataObjectInput( BaseFilter<BDO> f,boolean restrict_parse,Comparator<? super BDO> comp) {
-			super(f,restrict_parse);
+			super(restrict_parse? null : f, restrict_parse ? f : null);
+			this.comp=comp;
+		}
+		public SortingDataObjectInput( BaseFilter<BDO> f,BaseFilter<BDO> restrict_fil,Comparator<? super BDO> comp) {
+			super(f,restrict_fil);
 			this.comp=comp;
 		}
 		@Override
@@ -1345,7 +1354,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 */
 	@Override
 	public DataObjectItemInput<BDO> getInput() {
-		return getInput(getFinalSelectFilter(),restrictDefaultInput());
+		return getInput(getFinalSelectFilter(),restrictDefaultInput()? getFinalSelectFilter(): null);
 	}
 	
 	/** Create an {@link Input} from a filter.
@@ -1355,7 +1364,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return {@link DataObjectItemInput}
 	 */
 	public final DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil){
-		return getInput(fil,true);
+		return getInput(null,fil);
 	}
 	/** Generate the default input type. This is usually a {@link ListInput}
 	 * but can be overidden to return an auto-complete input.
@@ -1367,18 +1376,34 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return
 	 */
 	public DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil,boolean restrict){
+		if( restrict) {
+			return getInput(null, fil);
+		}else {
+			return getInput(fil,null);
+		}
+	}
+	public DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil,BaseFilter<BDO> restrict){
 		return new DataObjectInput(fil,restrict);
 	}
 	public class FilterSelector implements DataObjectSelector<BDO>{
-		private final boolean restrict;
-		public FilterSelector(BaseFilter<BDO> fil,boolean restrict) {
+		
+		public FilterSelector(BaseFilter<BDO> fil,BaseFilter<BDO> restrict) {
 			super();
 			this.fil = fil;
 			this.restrict=restrict;
 		}
-
+		public FilterSelector(BaseFilter<BDO> fil,boolean use_restrict) {
+			super();
+			if( use_restrict) {
+				this.fil=null;
+				this.restrict=fil;
+			}else {
+				this.fil=fil;
+				this.restrict=null;
+			}
+		}
 		private final BaseFilter<BDO> fil;
-
+		private final BaseFilter<BDO>restrict;
 		/* (non-Javadoc)
 		 * @see uk.ac.ed.epcc.webapp.model.data.forms.Selector#getInput()
 		 */
@@ -1387,16 +1412,10 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return DataObjectFactory.this.getInput(fil,restrict);
 		}
 
-		/* (non-Javadoc)
-		 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectSelector#getSelector(uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter)
-		 */
+		
 		@Override
 		public DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> filter) {
 			return new FilterSelector(getAndFilter(fil, filter), restrict);
-		}
-		@Override
-		public DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> filter,boolean new_restrict) {
-			return new FilterSelector(getAndFilter(fil, filter), new_restrict);
 		}
 	}
 	/** create a {@link Selector} from a filter.
@@ -1406,19 +1425,15 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return {@link Selector}
 	 */
 	public final DataObjectSelector<BDO> getSelector(BaseFilter<BDO> fil){
-		return new FilterSelector(fil,true);
+		return new FilterSelector(null,fil);
 	}
 	
 	@Override
 	public final DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> fil){
 		// This should narrow the default selector of this class
-		return new FilterSelector(getAndFilter(getFinalSelectFilter(),fil),restrictDefaultInput());
+		return new FilterSelector(fil,getFinalSelectFilter());
 	}
-	@Override
-	public final DataObjectSelector<BDO> narrowSelector(BaseFilter<BDO> fil, boolean new_restrict){
-		// This should narrow the default selector of this class
-		return new FilterSelector(getAndFilter(getFinalSelectFilter(),fil),new_restrict);
-	}
+	
 	/** create a {@link Selector} from a filter.
 	 * 
 	 * @param fil      {@link BaseFilter} for selection
@@ -1426,7 +1441,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @return {@link Selector}
 	 */
 	public final Selector<DataObjectItemInput<BDO>> getSelector(BaseFilter<BDO> fil,boolean restrict){
-		return new FilterSelector(fil,restrict);
+		if( restrict ) {
+			return new FilterSelector(null,fil);
+		}else {
+			return new FilterSelector(fil,null);
+		}
 	}
 	/** Create a {@link FilterResult} from a filter
 	 * 
