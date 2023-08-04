@@ -640,7 +640,7 @@ Targetted<AU>
 		 * @param restrict
 		 * @param autocomplete
 		 */
-		public AppUserNameInput(AppUserFactory<A> factory,NameFinder<A>finder, boolean create, boolean use_autocomplete,boolean restrict,
+		public AppUserNameInput(AppUserFactory<A> factory,NameFinder<A>finder, boolean create, boolean use_autocomplete,BaseFilter<A> restrict,
 				BaseFilter<A> autocomplete) {
 			super(factory, finder,create,use_autocomplete, restrict, autocomplete);
 		}
@@ -691,11 +691,12 @@ Targetted<AU>
 		return getInput(restrictDefaultInput());
 	}
 	public DataObjectItemInput<AU> getInput(boolean restrict) {
+		BaseFilter<AU> fil = getFinalSelectFilter();
 		if( useAutoCompleteForSelect()) {
 			//return getNameInput(getFinalSelectFilter(),false, restrictDefaultInput() );
-			return getNameInput(getFinalSelectFilter(),getRealmFinder(getDefaultRealm()),false,true, restrict );
+			return getNameInput(fil,getRealmFinder(getDefaultRealm()),false,true, restrict?fil:null );
 		}
-		return super.getInput(getFinalSelectFilter(),restrict);
+		return super.getInput(fil,restrict);
 	}
 	/** Are we using an auto-complete input for {@link #getInput()}
 	 * 
@@ -707,7 +708,7 @@ Targetted<AU>
 		return AUTO_COMPLETE_APPUSER_INPUT.isEnabled(getContext());
 	}
 	
-	public final DataObjectItemInput<AU> getNameInput(BaseFilter<AU> fil,NameFinder<AU> finder,boolean create,boolean use_autocomplete,boolean restrict){
+	public final DataObjectItemInput<AU> getNameInput(BaseFilter<AU> fil,NameFinder<AU> finder,boolean create,boolean use_autocomplete,BaseFilter<AU> restrict){
 		return new AppUserNameInput<>(this, finder,create, use_autocomplete,restrict, fil);
 	}
 	/* (non-Javadoc)

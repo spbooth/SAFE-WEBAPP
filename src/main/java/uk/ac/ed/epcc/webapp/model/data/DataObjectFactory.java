@@ -1375,7 +1375,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	 * @param restrict boolean should filter restrict results
 	 * @return
 	 */
-	public DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil,boolean restrict){
+	public final DataObjectItemInput<BDO> getInput(BaseFilter<BDO> fil,boolean restrict){
 		if( restrict) {
 			return getInput(null, fil);
 		}else {

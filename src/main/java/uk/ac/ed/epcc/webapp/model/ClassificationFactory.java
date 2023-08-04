@@ -511,7 +511,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	public String getCanonicalName(T object) {
 		return object.getName();
 	}
-	public final DataObjectItemInput<T> getAutocompleteInput(BaseFilter<T> fil,boolean create,boolean restrict){
+	public final DataObjectItemInput<T> getAutocompleteInput(BaseFilter<T> fil,boolean create,BaseFilter<T> restrict){
 		NameFinderInput<T, ClassificationFactory<T>> input = new NameFinderInput<>(this, this,create, restrict, fil);
 		return input;
 	}
@@ -543,7 +543,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getInput()
 	 */
 	@Override
-	public DataObjectItemInput<T> getInput(BaseFilter<T> fil, boolean restrict) {
+	public DataObjectItemInput<T> getInput(BaseFilter<T> fil, BaseFilter<T> restrict) {
 		if( useAutoCompleteInput(fil)) {
 			return new NameFinderInput<>(this,this, false, restrict, fil);
 		}

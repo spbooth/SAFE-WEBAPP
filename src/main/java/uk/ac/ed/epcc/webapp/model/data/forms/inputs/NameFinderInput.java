@@ -4,13 +4,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
-import uk.ac.ed.epcc.webapp.forms.inputs.AutoComplete;
-import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeError;
-import uk.ac.ed.epcc.webapp.forms.inputs.TypeException;
+import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
 import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
@@ -20,7 +15,6 @@ import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
-import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 /** An {@link DataObjectItemInput} for {@link NameFinder} factories.
  * 
@@ -47,18 +41,18 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 	 * @param autocomplete  suggestions/restrict filter
 	 * @param factory {@link DataObjectFactory} and {@link NameFinder}
 	 */
-	public NameFinderInput(F factory, NameFinder<T> finder,boolean create, boolean restrict,BaseFilter<T> autocomplete) {
+	public NameFinderInput(F factory, NameFinder<T> finder,boolean create, BaseFilter<T> restrict,BaseFilter<T> autocomplete) {
 		this(factory,finder,create,true,restrict,autocomplete);
 	}
 	/** create input
 	 * 
 	 * @param create   make entry if not found
 	 * @param use_autocomplete   use autocomplete input or a simple text input
-	 * @param restrict  restrict with filter
-	 * @param autocomplete  suggestions/restrict filter
+	 * @param restrict  restrict filter
+	 * @param autocomplete  suggestions filter
 	 * @param factory {@link DataObjectFactory} and {@link NameFinder}
 	 */
-	public NameFinderInput(F factory, NameFinder<T> finder,boolean create, boolean use_autocomplete, boolean restrict,BaseFilter<T> autocomplete) {
+	public NameFinderInput(F factory, NameFinder<T> finder,boolean create, boolean use_autocomplete, BaseFilter<T> restrict,BaseFilter<T> autocomplete) {
 
 		super();
 		this.factory = factory;
@@ -68,28 +62,10 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 		this.restrict=restrict;
 		this.use_autocomplete = use_autocomplete;
 		setSingle(true);
-		addValidator(new FieldValidator<Integer>() {
-			
-			@Override
-			public void validate(Integer data) throws FieldException {
-				T item = getItembyValue(data);
-				if( item == null) {
-					throw new ValidateException("Value does not correspond to item");
-				}
-				if( restrict){
-					
-					if( ! factory.matches(autocomplete, item)){
-						if( match_error != null) {
-							throw new ValidateException(match_error);
-						}
-						throw new ValidateException("Input does not match required filter");
-					}
-				}
-			}
-		});
+		addValidator(factory.new DataObjectFieldValidator(restrict));
 	}
 	private boolean create;
-	private final boolean restrict;
+	private final BaseFilter<T> restrict;
 	private boolean use_autocomplete;  // allow autocomplete to be turned off while keeping the filter for restrictions.
 	private final BaseFilter<T> autocomplete;
 	
@@ -125,8 +101,8 @@ public class NameFinderInput<T extends DataObject,F extends DataObjectFactory<T>
 			// probably will as a result of the operation.
 			// we assume if creating a new object is requested then
 			// any newly created object is a valid result
-			if( restrict && autocomplete != null && ! created) {
-				if( ! factory.matches(autocomplete, target)) {
+			if( restrict != null && ! created) {
+				if( ! factory.matches(restrict, target)) {
 					throw new ParseException("["+v+"] Not valid");
 				}
 			}

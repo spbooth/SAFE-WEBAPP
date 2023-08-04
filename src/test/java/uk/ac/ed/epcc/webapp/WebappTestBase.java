@@ -71,6 +71,7 @@ import uk.ac.ed.epcc.webapp.model.data.UnDumper;
 import uk.ac.ed.epcc.webapp.model.data.XMLDataUtils;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.stream.ByteArrayStreamData;
+import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 
 /** A base class for Junit4 tests that require an {@link AppContext}
@@ -247,67 +248,71 @@ public abstract class WebappTestBase implements ContextHolder{
 	public final void checkDiff(String normalize_transform,String expected_xml) throws DataException, Exception{
 		XMLPrinter diff = new XMLPrinter();	
 		TimerService timer = ctx.getService(TimerService.class);
-		if( timer !=null){ timer.startTimer("diff"); }
-		diff.open("Diff");
-	    StringReader reader = new StringReader(baseline.toString());
-		utils.getDiff(diff, new InputSource(reader));
-		diff.close();
-		//System.out.println(diff.toString());
-		
-		String expected;
-		String raw=diff.toString();
-		String result;
-		expected_xml = ctx.expandText(expected_xml);
-		if( normalize_transform != null ) {
-			
-			String expected_text = XMLDataUtils.readResourceAsString(getClass(),expected_xml);
-			// Do a shortcut test in case the two are identical
-			if( expected_text.trim().equals(raw.trim())) {
-				System.out.println("@@@@@@ Shortcut Diff @@@@@@");
-				return;
-			}
-			
-			
-			//This is a XSL transform to edit the dates in the project log as these will depend on the time the test is run.
-			TransformerFactory tfac = TransformerFactory.newInstance();
-			
-			Source source = XMLDataUtils.readResourceAsSource(getClass(), normalize_transform);
-			if( timer !=null){ timer.stopTimer("diff"); }
-			assertNotNull(source);
-			Transformer t = tfac.newTransformer(source);
-			assertNotNull(t);
+		try(TimeClosable difft = new TimeClosable(timer, "diff")){
+			diff.open("Diff");
+			StringReader reader = new StringReader(baseline.toString());
+			utils.getDiff(diff, new InputSource(reader));
+			diff.close();
+			//System.out.println(diff.toString());
 
-			
-			expected = XMLDataUtils.transform(t,new StreamSource(new StringReader(expected_text)));
-			result = XMLDataUtils.transform(t, raw);
-		}else {
-			result = raw.trim();
-			expected = XMLDataUtils.readResourceAsString(getClass(), expected_xml);
-			expected.trim();
-			// Do a shortcut test in case the two are identical
-			if( expected.equals(result)) {
-				System.out.println("@@@@@@ Shortcut Diff @@@@@@");
-				return;
+			String expected;
+			String raw=diff.toString();
+			String result;
+			expected_xml = ctx.expandText(expected_xml);
+			if( normalize_transform != null ) {
+
+				String expected_text = XMLDataUtils.readResourceAsString(getClass(),expected_xml);
+				// Do a shortcut test in case the two are identical
+				if( expected_text.trim().equals(raw.trim())) {
+					System.out.println("@@@@@@ Shortcut Diff @@@@@@");
+					return;
+				}
+
+				if(timer != null )timer.startTimer("diff-normalize");
+				//This is a XSL transform to edit the dates in the project log as these will depend on the time the test is run.
+				TransformerFactory tfac = TransformerFactory.newInstance();
+
+				Source source = XMLDataUtils.readResourceAsSource(getClass(), normalize_transform);
+
+				assertNotNull(source);
+				Transformer t = tfac.newTransformer(source);
+				assertNotNull(t);
+
+
+				expected = XMLDataUtils.transform(t,new StreamSource(new StringReader(expected_text)));
+				result = XMLDataUtils.transform(t, raw);
+				if(timer != null )timer.stopTimer("diff-normalize");
+			}else {
+				result = raw.trim();
+				expected = XMLDataUtils.readResourceAsString(getClass(), expected_xml);
+				expected.trim();
+				// Do a shortcut test in case the two are identical
+				if( expected.equals(result)) {
+					System.out.println("@@@@@@ Shortcut Diff @@@@@@");
+					return;
+				}
 			}
+			//System.out.println(result);
+			if(timer != null )timer.startTimer("CheckDiff.diff");
+			String differ = TestDataHelper.diff(expected, result);
+			if(timer != null )timer.stopTimer("CheckDiff.diff");
+			boolean same = differ.trim().length()==0;
+			if( ! same){
+
+				//FileWriter w = new FileWriter(expected_xml);
+				//w.write(raw);
+				//w.close();
+
+
+				System.out.println("Got: "+result);
+				System.out.println("--------------------------------------------------------------------");
+				System.out.println("Expected: "+expected);
+				System.out.println("====================================================================");
+				System.out.println("Raw:");
+				System.out.println(raw);
+			}
+			assertEquals("Unexpected result:"+expected_xml+"\n"+differ,expected,result);
 		}
-		//System.out.println(result);
-		String differ = TestDataHelper.diff(expected, result);
-		boolean same = differ.trim().length()==0;
-		if( ! same){
-		
-			//FileWriter w = new FileWriter(expected_xml);
-			//w.write(raw);
-			//w.close();
-			
-			
-			System.out.println("Got: "+result);
-			System.out.println("--------------------------------------------------------------------");
-			System.out.println("Expected: "+expected);
-			System.out.println("====================================================================");
-			System.out.println("Raw:");
-			System.out.println(raw);
-		}
-		assertEquals("Unexpected result:"+expected_xml+"\n"+differ,expected,result);
 	}
 	/** Check database has not changed.
 	 * 
