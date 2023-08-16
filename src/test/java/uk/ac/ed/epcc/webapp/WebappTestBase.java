@@ -413,7 +413,7 @@ protected void writeFile(String file_name, byte data[]) throws IOException {
 	 */
 	public void checkContent(String normalize_transform, String expected_xml, String content)
 			throws TransformerFactoryConfigurationError, TransformerConfigurationException, TransformerException, IOException {
-		
+		expected_xml = ctx.expandText(expected_xml);
 		String expected_text = XMLDataUtils.readResourceAsString(getClass(), expected_xml);
 		// shortcut test
 		if( content.trim().equals(expected_text.trim())) {

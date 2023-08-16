@@ -94,7 +94,11 @@ public class XMLDataUtils extends AbstractContexed{
 			
 			InputStream stm = clazz.getResourceAsStream(fixture_name);
 			if( stm != null ){
+				try {
 				r.parse(new InputSource(stm));
+				}catch(Throwable e) {
+					throw new DataFault("Error loading "+fixture_name, e);
+				}
 			}else{
 				throw new DataFault("Resource not found "+fixture_name);
 			}
