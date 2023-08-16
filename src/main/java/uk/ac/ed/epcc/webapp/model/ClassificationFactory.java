@@ -544,7 +544,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	 */
 	@Override
 	public DataObjectItemInput<T> getInput(BaseFilter<T> fil, BaseFilter<T> restrict) {
-		if( useAutoCompleteInput(fil)) {
+		if( useAutoCompleteInput(getAndFilter(fil,restrict))) {
 			return new NameFinderInput<>(this,this, false, restrict, fil);
 		}
 		return super.getInput(fil,restrict);
