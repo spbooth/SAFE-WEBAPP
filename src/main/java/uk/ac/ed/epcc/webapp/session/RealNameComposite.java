@@ -9,6 +9,7 @@ import uk.ac.ed.epcc.webapp.jdbc.filter.OrderClause;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
+import uk.ac.ed.epcc.webapp.model.data.ConfigTag;
 import uk.ac.ed.epcc.webapp.model.history.HistoryFieldContributor;
 
 
@@ -16,6 +17,7 @@ public class RealNameComposite<AU extends AppUser> extends AppUserComposite<AU, 
 
 	public static final String TITLE = "Title";
 	public static final String FIRSTNAME = "Firstname";
+	@ConfigTag("RealNameComposite")
 	public static final String INITIALS = "Initials";
 	public static final String LASTNAME = "Lastname";
 

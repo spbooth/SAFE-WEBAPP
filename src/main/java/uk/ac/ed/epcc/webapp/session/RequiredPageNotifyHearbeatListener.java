@@ -23,7 +23,7 @@ import uk.ac.ed.epcc.webapp.model.cron.LockFactory;
 import uk.ac.ed.epcc.webapp.model.cron.LockFactory.Lock;
 import uk.ac.ed.epcc.webapp.model.data.FilterResult;
 
-/**
+/** a {@link HeartbeatListener} to send required page notifications
  * @author Stephen Booth
  *
  */

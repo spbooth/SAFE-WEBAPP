@@ -279,6 +279,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		 */
 		public NameItemInput() {
 			super();
+			setSingle(true);
 		}
 
 		/* (non-Javadoc)
