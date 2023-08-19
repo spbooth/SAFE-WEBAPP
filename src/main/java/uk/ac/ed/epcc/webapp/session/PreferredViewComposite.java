@@ -45,8 +45,8 @@ public class PreferredViewComposite<AU extends AppUser> extends AppUserComposite
 	private static final String PREFERRED_VIEW_PROP = "prefered_view_default";
 	public static final String PREFERRED_VIEW = "PreferredView";
 
-	public PreferredViewComposite(AppUserFactory<AU> fac) {
-		super(fac);
+	public PreferredViewComposite(AppUserFactory<AU> fac,String tag) {
+		super(fac,tag);
 	}
 	
 	PreferedViewFactory pvf= null;

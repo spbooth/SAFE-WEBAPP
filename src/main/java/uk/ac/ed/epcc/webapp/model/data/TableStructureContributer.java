@@ -145,4 +145,9 @@ public interface TableStructureContributer<BDO extends DataObject> extends FormL
 	 */
 	void postUpdate(BDO o, Form f, Map<String, Object> orig, boolean changed) throws DataException;
 
+	/** Get an additional config tag to use for fields added by this {@link TableStructureContributer}
+	 * 
+	 * @return
+	 */
+	public String getConfigTag();
 }

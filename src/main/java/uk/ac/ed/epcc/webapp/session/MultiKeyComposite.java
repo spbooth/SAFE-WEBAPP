@@ -15,12 +15,10 @@ package uk.ac.ed.epcc.webapp.session;
 
 import java.io.IOException;
 import java.security.PublicKey;
-import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.Feature;
 import uk.ac.ed.epcc.webapp.forms.inputs.ParseAbstractInput;
-import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
 import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil;
+import uk.ac.ed.epcc.webapp.ssh.PublicKeyReaderUtil.PublicKeyParseException;
 import uk.ac.ed.epcc.webapp.ssh.RsaPublicKeyArrayInput;
 import uk.ac.ed.epcc.webapp.ssh.SshPublicKeyArrayInput;
 
@@ -33,8 +31,8 @@ public class MultiKeyComposite extends PublicKeyComposite<PublicKey[]> {
 	/**
 	 * @param fac
 	 */
-	public MultiKeyComposite(AppUserFactory fac) {
-		super(fac);
+	public MultiKeyComposite(AppUserFactory fac,String tag) {
+		super(fac,tag);
 		
 	}
 

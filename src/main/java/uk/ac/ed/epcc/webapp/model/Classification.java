@@ -21,13 +21,7 @@ package uk.ac.ed.epcc.webapp.model;
 
 import java.security.Principal;
 
-import uk.ac.ed.epcc.webapp.AppContext;
-import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
-import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
-import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.DataObject;
 import uk.ac.ed.epcc.webapp.model.data.HistoryFactory;
 import uk.ac.ed.epcc.webapp.model.data.Owned;
@@ -84,26 +78,7 @@ public class Classification extends DataObject implements Principal, Comparable<
 	public String toString(){
     	return getName();
     }
-    /** Generate a default {@link TableSpecification} for a Classification table
-     * 
-     * @param c
-     * @return TableSpecification
-     */
-    public static TableSpecification getTableSpecification(AppContext c,String table){
-    	TableSpecification s = new TableSpecification();
-    	s.setField(ClassificationFactory.NAME, new StringFieldType(false, null, c.getIntegerParameter(table+".name.length", c.getIntegerParameter("classifier.name.length", 32))));
-    	if( c.getBooleanParameter(table+".use_description", true)){
-    		s.setField(ClassificationFactory.DESCRIPTION, new StringFieldType(true, null, c.getIntegerParameter(table+".description.length", c.getIntegerParameter("classifier.description.length", 255))));
-    	}
-    	s.setOptionalField(ClassificationFactory.SORT_ORDER, new IntegerFieldType(false, 0));
-    	try {
-			s.new Index("name_key",true,ClassificationFactory.NAME);
-		} catch (InvalidArgument e) {
-			Logger.getLogger(Classification.class).error("Error making classification key",e);
-		}
-    	return s;
-    }
-	/* (non-Javadoc)
+    /* (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	public int compareTo(Classification o) {

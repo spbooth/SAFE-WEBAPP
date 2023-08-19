@@ -19,8 +19,8 @@ import uk.ac.ed.epcc.webapp.model.data.Composite;
  */
 public abstract class PersonalDataComposite<AU extends AppUser,X extends PersonalDataComposite> extends AppUserComposite<AU,X> implements SignupCustomiser, SummaryContributer<AU>{
 	public static final String PREFER_NOT_TO_SPECIFY = "Prefer not to specify";
-	public PersonalDataComposite(AppUserFactory<AU> fac) {
-		super(fac);
+	public PersonalDataComposite(AppUserFactory<AU> fac,String tag) {
+		super(fac,tag);
 	
 	}
 	/** The name of the characteristic

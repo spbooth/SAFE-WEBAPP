@@ -34,8 +34,8 @@ public abstract class CodeAuthComposite<AU extends AppUser,T> extends FormAuthCo
 	/**
 	 * @param fac
 	 */
-	public CodeAuthComposite(AppUserFactory<AU> fac) {
-		super(fac);
+	public CodeAuthComposite(AppUserFactory<AU> fac,String tag) {
+		super(fac,tag);
 	}
 
 	/* (non-Javadoc)

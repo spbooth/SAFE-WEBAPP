@@ -32,13 +32,13 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  *
  * @param <A>
  */
-public class MaxNotifyComposite<A extends AppUser> extends Composite<A, MaxNotifyComposite> implements LoginObserver<A> , AppUserTransitionContributor<A>{
+public final class MaxNotifyComposite<A extends AppUser> extends Composite<A, MaxNotifyComposite> implements LoginObserver<A> , AppUserTransitionContributor<A>{
 
 	private static final String NOTIFY_COUNT_FIELD = "NotifyCount";
 	private static final String LAST_NOTIFY__FIELD = "LastNotify";
 
-	public MaxNotifyComposite(DataObjectFactory<A> fac) {
-		super(fac);
+	public MaxNotifyComposite(DataObjectFactory<A> fac,String tag) {
+		super(fac,tag);
 	}
 
 	@Override

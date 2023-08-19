@@ -61,7 +61,7 @@ HistoryFieldContributor
 	 * @param fac
 	 */
 	public ShibAttributeListener(AppUserFactory fac,String tag) {
-		super(fac);
+		super(fac,tag);
 		this.tag=tag;
 		this.attr=fac.getContext().getInitParameter(tag+".attributes", "").split("\\s*,\\s*");
 		String list = fac.getContext().getInitParameter(tag+".realm", WebNameFinder.WEB_NAME);

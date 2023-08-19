@@ -29,8 +29,8 @@ public class SingleKeyComposite extends PublicKeyComposite<String> {
 	/**
 	 * @param fac
 	 */
-	public SingleKeyComposite(AppUserFactory fac) {
-		super(fac);
+	public SingleKeyComposite(AppUserFactory fac,String tag) {
+		super(fac,tag);
 	}
 	
 	@Override

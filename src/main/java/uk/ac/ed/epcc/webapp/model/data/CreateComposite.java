@@ -27,8 +27,8 @@ public abstract class CreateComposite<BDO extends DataObject, X extends Composit
 	/**
 	 * @param fac
 	 */
-	protected CreateComposite(DataObjectFactory<BDO> fac) {
-		super(fac);
+	protected CreateComposite(DataObjectFactory<BDO> fac,String tag) {
+		super(fac,tag);
 	}
 
 	/* (non-Javadoc)

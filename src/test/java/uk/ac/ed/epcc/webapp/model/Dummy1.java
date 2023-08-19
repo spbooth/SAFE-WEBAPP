@@ -41,9 +41,10 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  *
  */
 public class Dummy1 extends DataObject implements Removable {
-	@ConfigTag("Dummy")
+	private static final String DUMMY_CONFIG_TAG = "Dummy";
+	@ConfigTag(DUMMY_CONFIG_TAG)
 	public static final String NAME = "Name";
-	@ConfigTag("Dummy")
+	@ConfigTag(DUMMY_CONFIG_TAG)
 	public static final String MANDATORY ="Mandatory";
 	public static final String NUMBER = "Number";
 	public static final String UNSIGNED = "UnsignedInt";
@@ -112,8 +113,8 @@ public class Dummy1 extends DataObject implements Removable {
 	
     public static class Factory extends DataObjectFactory<Dummy1> implements TestComposable, FieldHandler{
     	
-    	@ConfigTag("Dummy")
-    	public static final String BASE="Base";
+    	
+    	
     	 /**
 		 * 
 		 */
@@ -268,6 +269,7 @@ public class Dummy1 extends DataObject implements Removable {
 		protected TableSpecification getDefaultTableSpecification(AppContext c,
 				String table) {
 			TableSpecification spec = new TableSpecification();
+			spec.setCurrentTag(DUMMY_CONFIG_TAG);
 			spec.setField(NAME, new StringFieldType(true, "", 32));
 			spec.setField(NUMBER, new DoubleFieldType(true, 0.0));
 			spec.setField(UNSIGNED, new LongFieldType(true, 0L));
@@ -275,6 +277,7 @@ public class Dummy1 extends DataObject implements Removable {
 			spec.setField(TIME,new DateFieldType(true, null));
 			spec.setField(beatles.getField(), beatles.getFieldType(Beatle.Paul));
 			spec.setField(ruttles.getField(), ruttles.getFieldType(Beatle.Ringo));
+			spec.clearCurrentTag();
 			return spec;
 		}
 		public Set<String> getNullFields(){
@@ -303,11 +306,7 @@ public class Dummy1 extends DataObject implements Removable {
 		public FilterUpdate<Dummy1> getUpdate(){
 			return new FilterUpdate<>(res);
 		}
-		@Override
-		public void addConfigTags(Map<String, String> config_tags) throws Exception {
-			FieldHandler.addConfigTags(getClass(),config_tags);
-			FieldHandler.addConfigTags(Dummy1.class,config_tags);
-		}
+		
     }
 
 

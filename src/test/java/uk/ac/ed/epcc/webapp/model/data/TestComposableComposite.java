@@ -22,8 +22,8 @@ public class TestComposableComposite<BDO extends DataObject> extends Composite<B
 	/**
 	 * @param fac
 	 */
-	public TestComposableComposite(DataObjectFactory<BDO> fac) {
-		super(fac);
+	public TestComposableComposite(DataObjectFactory<BDO> fac,String tag) {
+		super(fac,tag);
 		
 	}
 

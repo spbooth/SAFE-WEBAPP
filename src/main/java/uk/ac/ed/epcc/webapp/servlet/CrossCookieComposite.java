@@ -44,8 +44,8 @@ public class CrossCookieComposite extends Composite<WtmpManager.Wtmp,CrossCookie
 	/**
 	 * @param fac
 	 */
-	public CrossCookieComposite(WtmpManager fac) {
-		super(fac);
+	public CrossCookieComposite(WtmpManager fac,String tag) {
+		super(fac,tag);
 	}
 
 	/* (non-Javadoc)

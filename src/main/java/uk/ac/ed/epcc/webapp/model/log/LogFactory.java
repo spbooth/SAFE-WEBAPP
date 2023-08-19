@@ -528,6 +528,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 	}
 	protected TableSpecification getDefaultTableSpecification(AppContext c,LogOwner<O> fac,AppUserFactory<?>uf,String homeTable){
 		TableSpecification spec = new TableSpecification("LogID");
+		spec.setCurrentTag("LogFactory");
 		spec.setField(DATE, new DateFieldType(true, null));
 		spec.setField(OWNER_ID, new ReferenceFieldType(fac.getTag()));
 		spec.setField(OPERATOR_ID, new ReferenceFieldType(uf.getTag()));
@@ -537,6 +538,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		} catch (InvalidArgument e) {
 			getLogger().error("Error making key",e);
 		}
+		spec.clearCurrentTag();
 		return spec;
 	}
 	

@@ -79,8 +79,8 @@ public class CertificateComposite extends AppUserComposite<AppUser, CertificateC
 	@ConfigTag("CertificateComposite")
 	public static final String PERSONAL_CERTIFICATE = "PersonalCertificate";
 
-	public CertificateComposite(AppUserFactory fac) {
-		super(fac);
+	public CertificateComposite(AppUserFactory fac,String tag) {
+		super(fac,tag);
 		
 	}
 	public String getPersonalCertificateDn(AppUser person){

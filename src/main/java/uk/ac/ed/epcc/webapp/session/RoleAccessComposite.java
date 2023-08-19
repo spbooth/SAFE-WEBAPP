@@ -21,8 +21,8 @@ public class RoleAccessComposite<BDO extends DataObject,A extends AppUser> exten
 	@ConfigTag("RoleAccessComposite")
 	protected final static String ACCESS_ROLE="AccessRole";
 	public static final String ROLE_BASED_ACCESS_RELATIONSHIP ="RoleAccess";
-	public RoleAccessComposite(DataObjectFactory<BDO> fac) {
-		super(fac);
+	public RoleAccessComposite(DataObjectFactory<BDO> fac,String tag) {
+		super(fac,tag);
 	}
 
 	@Override

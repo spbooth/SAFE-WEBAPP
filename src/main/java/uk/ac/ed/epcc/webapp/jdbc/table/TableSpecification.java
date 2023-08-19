@@ -16,14 +16,8 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.jdbc.table;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.UnaryOperator;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.AppContext;
@@ -38,6 +32,10 @@ import uk.ac.ed.epcc.webapp.model.data.DataObject;
  * 
  * We can also store optional fields. These are not created by default but might
  * be presented as options when editing the table structure.
+ * 
+ * Though the primary purpose of this class is to define a table specification for creating tables, it
+ * also provides a mechanism for associating database fields with additional configuration tags (corresponding to the class that adds the field to the specification).
+ * 
  * 
  * Normally a handler class will create this programmatically which can be used to create the underlying table if it does not
  * exist. This can be customised by setting configuration parameters though obviously these need to be in place 
@@ -69,6 +67,8 @@ public class TableSpecification {
 	private final LinkedHashMap<String,FieldType> all_fields;
 	private final Set<String> required_field_names;
 	private LinkedHashSet<IndexType> indexes;
+	private LinkedHashMap<String,String> config_tags;
+	private String current_tag=null;
 	private final Pattern field_pattern = Pattern.compile("[A-Za-z][A-Za-z0-9_]*");
 	public TableSpecification(String key){
 		this.primary_key=key;
@@ -76,9 +76,21 @@ public class TableSpecification {
 		required_field_names=new HashSet<>();
 		
 		indexes=new LinkedHashSet<>();
+		config_tags = new LinkedHashMap<>();
 	}
 	public TableSpecification(){
 		this("PrimaryRecordID");
+	}
+	public String setCurrentTag(String tag) {
+		String prev = current_tag;
+		current_tag=tag;
+		return prev;
+	}
+	public void clearCurrentTag() {
+		current_tag=null;
+	}
+	public Map<String,String> getConfigTags(){
+		return config_tags;
 	}
 	public TableSpecification(TableSpecification spec){
 		this.primary_key=spec.primary_key;
@@ -134,6 +146,9 @@ public class TableSpecification {
 		all_fields.put(name, type);
 		if(! optional){
 			required_field_names.add(name);
+		}
+		if( current_tag != null ) {
+			config_tags.put(name, current_tag);
 		}
 	}
 	/** add a {@link FieldType} to the specificationas an optional field

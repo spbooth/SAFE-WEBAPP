@@ -47,8 +47,8 @@ public abstract class PublicKeyComposite<X> extends AppUserComposite<AppUser, Pu
 	
 	public static final String PUBLIC_KEY = PUBLIC_KEY_META_ATTR;
 	
-	public PublicKeyComposite(AppUserFactory fac) {
-		super(fac);
+	public PublicKeyComposite(AppUserFactory fac,String tag) {
+		super(fac,tag);
 	}
 
 	@Override

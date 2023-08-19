@@ -102,8 +102,8 @@ public class TotpCodeAuthComposite<A extends AppUser> extends CodeAuthComposite<
 	/**
 	 * @param fac
 	 */
-	public TotpCodeAuthComposite(AppUserFactory<A> fac) {
-		super(fac);
+	public TotpCodeAuthComposite(AppUserFactory<A> fac,String tag) {
+		super(fac,tag);
 		
 	}
 

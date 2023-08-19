@@ -54,7 +54,7 @@ public abstract class AppUserNameFinder<AU extends AppUser, X extends AppUserNam
 	 * @param realm   The realm to implement (can be prefixed by <b>Namefinder.</b>)
 	 */
 	public AppUserNameFinder(AppUserFactory<AU> factory,String realm) {
-		super(factory);
+		super(factory,realm);
 		if( realm.contains(".")){
 			// realm names should be unqualified so strip of any qualifying prefix.
 			realm=realm.substring(realm.lastIndexOf('.')+1);

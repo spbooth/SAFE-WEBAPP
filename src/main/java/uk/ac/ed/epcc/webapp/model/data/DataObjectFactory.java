@@ -160,7 +160,7 @@ import uk.ac.ed.epcc.webapp.validation.FieldValidator;
  * @param <BDO> type produced by factory
  */
 @SuppressWarnings("javadoc")
-public abstract class DataObjectFactory<BDO extends DataObject> implements Tagged, ContextCached, Owner<BDO>, IndexedProducer<BDO>, DataObjectSelector<BDO> , FormCreatorProducer,FormUpdateProducer<BDO>,FilterMatcher<BDO>{
+public abstract class DataObjectFactory<BDO extends DataObject> implements Tagged, ContextCached, Owner<BDO>, IndexedProducer<BDO>, DataObjectSelector<BDO> , FormCreatorProducer,FormUpdateProducer<BDO>,FilterMatcher<BDO>,FieldHandler{
     /**
 	 * 
 	 */
@@ -2014,7 +2014,10 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		TableSpecification spec = getDefaultTableSpecification(ctx, homeTable);
 		if( spec != null ){
 			for(TableStructureContributer c : getTableStructureContributers()){
+				
+				spec.setCurrentTag(c.getConfigTag());
 				spec = c.modifyDefaultTableSpecification(spec, homeTable);
+				spec.clearCurrentTag();
 			}
 		}
 		return spec;
@@ -2370,5 +2373,16 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	@SafeVarargs
 	public final SQLOrFilter<BDO> getSQLOrFilter(SQLFilter<? super BDO> ... filters){
 		return new SQLOrFilter<>(getTag(), filters);
+	}
+
+	@Override
+	public final void addConfigTags(Map<String, String> config_tags) throws Exception {
+		TableSpecification spec = getFinalTableSpecification(getContext(), getTag());
+		if( spec != null) {
+			Map<String,String> tags = spec.getConfigTags();
+			if( tags != null) {
+				config_tags.putAll(tags);
+			}
+		}
 	}
 }

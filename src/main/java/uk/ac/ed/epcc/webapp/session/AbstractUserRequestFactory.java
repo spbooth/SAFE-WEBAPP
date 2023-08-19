@@ -40,8 +40,9 @@ public abstract class AbstractUserRequestFactory<A extends AppUser,R extends Abs
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c, String table) {
 		TableSpecification spec = super.getDefaultTableSpecification(c, table);
+		spec.setCurrentTag("AbstractUserRequestFactory");
 		spec.setField(USER_ID, new IntegerFieldType());
-		
+		spec.clearCurrentTag();
 		return spec;
 	}
 	public final AppUserFactory<A> getAppUserFactory() {

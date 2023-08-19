@@ -41,8 +41,8 @@ public abstract class FormAuthComposite<AU extends AppUser> extends AppUserCompo
 	/**
 	 * @param fac
 	 */
-	protected FormAuthComposite(AppUserFactory<AU> fac) {
-		super(fac);
+	protected FormAuthComposite(AppUserFactory<AU> fac,String tag) {
+		super(fac,tag);
 		re_auth_minutes = getContext().getIntegerParameter(getConfigPrefix()+".re_auth_minutes", 30);
 	}
 

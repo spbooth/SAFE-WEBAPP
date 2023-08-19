@@ -120,8 +120,8 @@ public class LdapPasswordComposite<T extends AppUser> extends PasswordAuthCompos
 	/**
 	 * @param fac
 	 */
-	public LdapPasswordComposite(AppUserFactory<T> fac) {
-		super(fac);
+	public LdapPasswordComposite(AppUserFactory<T> fac,String tag) {
+		super(fac,tag);
 		AppContext context = fac.getContext();
 		ldap_url = context.getInitParameter(AUTHENTICATION_LDAP_URL);
 		use_ssl = context.getBooleanParameter(AUTHENTICATION_LDAP_SSL, ldap_url == null ? false : ldap_url.startsWith("ldaps"));

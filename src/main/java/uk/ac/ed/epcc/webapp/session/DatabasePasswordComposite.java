@@ -662,8 +662,8 @@ public class DatabasePasswordComposite<T extends AppUser> extends PasswordAuthCo
 	/**
 	 * @param fac
 	 */
-	public DatabasePasswordComposite(AppUserFactory<T> fac) {
-		super(fac);
+	public DatabasePasswordComposite(AppUserFactory<T> fac,String tag) {
+		super(fac,tag);
 	}
 
 	@Override

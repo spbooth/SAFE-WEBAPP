@@ -27,8 +27,8 @@ public class FixedCodeAuthComposite<A extends AppUser> extends CodeAuthComposite
 	/**
 	 * @param fac
 	 */
-	public FixedCodeAuthComposite(AppUserFactory<A> fac) {
-		super(fac);
+	public FixedCodeAuthComposite(AppUserFactory<A> fac,String tag) {
+		super(fac,tag);
 	}
 
 	private String getAuthCode() {

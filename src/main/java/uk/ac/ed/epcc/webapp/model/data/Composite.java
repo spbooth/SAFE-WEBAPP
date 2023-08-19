@@ -76,11 +76,18 @@ import uk.ac.ed.epcc.webapp.session.SessionService;
 public abstract class Composite<BDO extends DataObject, X > implements Contexed, TableStructureContributer<BDO>{
 
 	protected final DataObjectFactory<BDO> fac;
-	protected Composite(DataObjectFactory<BDO> fac){
+	private final String composite_tag;
+	protected Composite(DataObjectFactory<BDO> fac,String composite_tag){
 		this.fac=fac;
+		this.composite_tag=composite_tag;
 		preRegister();
 		fac.registerComposite(this);
 	}
+	@Override
+	public String getConfigTag() {
+		return composite_tag;
+	}
+	
 	/** extension point called before the composite is registered. This is to allow the class setup to be completed
 	 * that can't wait till after registration.
 	 * 

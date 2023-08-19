@@ -625,6 +625,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c, String table){
 		TableSpecification s = new TableSpecification();
+		s.setCurrentTag("TextFileOverlay");
 		// mysql (5.1 at least) has a 1000 byte limit on index size for MyISAM
 		// and its 3 bytes per char
 		s.setField(GROUP, new StringFieldType(false, null, 64));
@@ -635,6 +636,7 @@ public class TextFileOverlay<T extends TextFileOverlay.TextFile> extends DataObj
 		} catch (InvalidArgument e) {
 			getLogger().error("Error making find_key",e);
 		}
+		s.clearCurrentTag();
 		return s;
 	}
 	public FilterResult<T> allbyGroup(String groupName) throws DataFault {		

@@ -161,9 +161,10 @@ public abstract class AbstractRequestFactory<R extends AbstractRequestFactory.Ab
 	@Override
 	protected TableSpecification getDefaultTableSpecification(AppContext c, String table) {
 		TableSpecification spec = new TableSpecification();
-		
+		spec.setCurrentTag("AbstractRequestFactory");
 		spec.setField(EXPIRES, new DateFieldType(true, null));
 		spec.setField(TAG, new StringFieldType(false, "", 256));
+		spec.clearCurrentTag();
 		return spec;
 	}
 

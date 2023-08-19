@@ -16,15 +16,12 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.model;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.Feature;
+import uk.ac.ed.epcc.webapp.exceptions.InvalidArgument;
 import uk.ac.ed.epcc.webapp.forms.Form;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.factory.FormCreator;
@@ -32,18 +29,18 @@ import uk.ac.ed.epcc.webapp.forms.factory.FormUpdate;
 import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.jdbc.exception.DataException;
 import uk.ac.ed.epcc.webapp.jdbc.filter.*;
+import uk.ac.ed.epcc.webapp.jdbc.table.IntegerFieldType;
+import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
+import uk.ac.ed.epcc.webapp.logging.Logger;
 import uk.ac.ed.epcc.webapp.model.data.*;
+import uk.ac.ed.epcc.webapp.model.data.Repository.Record;
 import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Creator;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 import uk.ac.ed.epcc.webapp.model.data.forms.Updater;
-import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectAlternateInput;
-import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
-import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemParseInput;
-import uk.ac.ed.epcc.webapp.model.data.forms.inputs.NameFinderInput;
+import uk.ac.ed.epcc.webapp.model.data.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedDataCache;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
@@ -63,6 +60,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	
 	
 
+	static final String CLASSIFICATION_CONFIG_TAG = "Classification";
 	/** Maximum size of pull-down menu in update form.
 	 * 
 	 */
@@ -70,14 +68,14 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	private static final Pattern WHITESPACE = Pattern.compile("\\s");
 	
 	private HistoryFactory<T,HistoryFactory.HistoryRecord<T>> hist_fac=null;
-	@ConfigTag("Classification")
+	@ConfigTag(CLASSIFICATION_CONFIG_TAG)
 	public static final String NAME = "Name";
-	@ConfigTag("Classification")
+	@ConfigTag(CLASSIFICATION_CONFIG_TAG)
 	public static final String DESCRIPTION = "Description";
 	/**
 	 * 
 	 */
-	@ConfigTag("Classification")
+	@ConfigTag(CLASSIFICATION_CONFIG_TAG)
 	public static final String SORT_ORDER = "SortOrder";
 	
 	
@@ -107,8 +105,8 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
     
     @Override
     public TableSpecification getDefaultTableSpecification(AppContext c,String homeTable){
-      TableSpecification spec = Classification.getTableSpecification(c,homeTable);
-	return spec;	
+    	TableSpecification spec = ClassificationFactory.getTableSpecification(c,homeTable);
+    	return spec;	
     }
     
 	
@@ -564,5 +562,26 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 				spec.setField(field, ts.getField(field));
 			}
 		}
+	}
+	/** Generate a default {@link TableSpecification} for a Classification table
+	 * 
+	 * @param c
+	 * @return TableSpecification
+	 */
+	public static TableSpecification getTableSpecification(AppContext c,String table){
+		TableSpecification s = new TableSpecification();
+		String prev = s.setCurrentTag(ClassificationFactory.CLASSIFICATION_CONFIG_TAG);
+		s.setField(ClassificationFactory.NAME, new StringFieldType(false, null, c.getIntegerParameter(table+".name.length", c.getIntegerParameter("classifier.name.length", 32))));
+		if( c.getBooleanParameter(table+".use_description", true)){
+			s.setField(ClassificationFactory.DESCRIPTION, new StringFieldType(true, null, c.getIntegerParameter(table+".description.length", c.getIntegerParameter("classifier.description.length", 255))));
+		}
+		s.setOptionalField(ClassificationFactory.SORT_ORDER, new IntegerFieldType(false, 0));
+		try {
+			s.new Index("name_key",true,ClassificationFactory.NAME);
+		} catch (InvalidArgument e) {
+			Logger.getLogger(Classification.class).error("Error making classification key",e);
+		}
+		s.setCurrentTag(prev);
+		return s;
 	}
 }

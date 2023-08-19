@@ -31,8 +31,8 @@ public class OldSingleKeyComposite extends PublicKeyComposite<PublicKey> {
 	/**
 	 * @param fac
 	 */
-	public OldSingleKeyComposite(AppUserFactory fac) {
-		super(fac);
+	public OldSingleKeyComposite(AppUserFactory fac,String tag) {
+		super(fac,tag);
 		
 	}
 	protected ParseAbstractInput<String> getInput(){

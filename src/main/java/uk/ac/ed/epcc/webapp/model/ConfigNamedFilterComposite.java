@@ -58,7 +58,7 @@ public class ConfigNamedFilterComposite<BDO extends DataObject> extends Composit
 	 * @param fac
 	 */
 	public ConfigNamedFilterComposite(DataObjectFactory<BDO> fac,String comp_tag) {
-		super(fac);
+		super(fac,comp_tag);
 		String name_list = getContext().getInitParameter(fac.getConfigTag()+".config_namefilters");
 		if( name_list != null ) {
 			for( String name : name_list.split("\\s*,\\s*")) {
