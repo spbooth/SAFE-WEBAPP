@@ -1,12 +1,15 @@
 package uk.ac.ed.epcc.webapp.session;
 
-import java.util.Map;
 import java.util.Set;
 
-import uk.ac.ed.epcc.webapp.jdbc.filter.*;
+import uk.ac.ed.epcc.webapp.jdbc.filter.AcceptFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.BaseFilter;
+import uk.ac.ed.epcc.webapp.jdbc.filter.FalseFilter;
 import uk.ac.ed.epcc.webapp.jdbc.table.StringFieldType;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
-import uk.ac.ed.epcc.webapp.model.data.*;
+import uk.ac.ed.epcc.webapp.model.data.Composite;
+import uk.ac.ed.epcc.webapp.model.data.DataObject;
+import uk.ac.ed.epcc.webapp.model.data.DataObjectFactory;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
 
@@ -18,7 +21,6 @@ import uk.ac.ed.epcc.webapp.model.relationship.AccessRoleProvider;
  * @param <BDO>
  */
 public class RoleAccessComposite<BDO extends DataObject,A extends AppUser> extends Composite<BDO, RoleAccessComposite> implements AccessRoleProvider<A, BDO>{
-	@ConfigTag("RoleAccessComposite")
 	protected final static String ACCESS_ROLE="AccessRole";
 	public static final String ROLE_BASED_ACCESS_RELATIONSHIP ="RoleAccess";
 	public RoleAccessComposite(DataObjectFactory<BDO> fac,String tag) {

@@ -42,9 +42,9 @@ import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
  */
 public class Dummy1 extends DataObject implements Removable {
 	private static final String DUMMY_CONFIG_TAG = "Dummy";
-	@ConfigTag(DUMMY_CONFIG_TAG)
+
 	public static final String NAME = "Name";
-	@ConfigTag(DUMMY_CONFIG_TAG)
+	
 	public static final String MANDATORY ="Mandatory";
 	public static final String NUMBER = "Number";
 	public static final String UNSIGNED = "UnsignedInt";
@@ -111,7 +111,7 @@ public class Dummy1 extends DataObject implements Removable {
 	}
 	
 	
-    public static class Factory extends DataObjectFactory<Dummy1> implements TestComposable, FieldHandler{
+    public static class Factory extends DataObjectFactory<Dummy1> implements TestComposable{
     	
     	
     	

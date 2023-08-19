@@ -160,7 +160,7 @@ import uk.ac.ed.epcc.webapp.validation.FieldValidator;
  * @param <BDO> type produced by factory
  */
 @SuppressWarnings("javadoc")
-public abstract class DataObjectFactory<BDO extends DataObject> implements Tagged, ContextCached, Owner<BDO>, IndexedProducer<BDO>, DataObjectSelector<BDO> , FormCreatorProducer,FormUpdateProducer<BDO>,FilterMatcher<BDO>,FieldHandler{
+public abstract class DataObjectFactory<BDO extends DataObject> implements Tagged, ContextCached, Owner<BDO>, IndexedProducer<BDO>, DataObjectSelector<BDO> , FormCreatorProducer,FormUpdateProducer<BDO>,FilterMatcher<BDO>{
     /**
 	 * 
 	 */
@@ -2375,14 +2375,11 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		return new SQLOrFilter<>(getTag(), filters);
 	}
 
-	@Override
-	public final void addConfigTags(Map<String, String> config_tags) throws Exception {
+	public final Map<String,String> getConfigTags() throws Exception {
 		TableSpecification spec = getFinalTableSpecification(getContext(), getTag());
 		if( spec != null) {
-			Map<String,String> tags = spec.getConfigTags();
-			if( tags != null) {
-				config_tags.putAll(tags);
-			}
+			return spec.getConfigTags();
 		}
+		return null;
 	}
 }

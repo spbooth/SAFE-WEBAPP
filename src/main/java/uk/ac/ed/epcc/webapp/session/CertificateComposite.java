@@ -14,11 +14,9 @@ import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification;
 import uk.ac.ed.epcc.webapp.model.AnonymisingComposite;
 import uk.ac.ed.epcc.webapp.model.MetaDataContributer;
 import uk.ac.ed.epcc.webapp.model.SummaryContributer;
-import uk.ac.ed.epcc.webapp.model.data.ConfigTag;
-import uk.ac.ed.epcc.webapp.model.data.FieldHandler;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 
-public class CertificateComposite extends AppUserComposite<AppUser, CertificateComposite> implements AnonymisingComposite<AppUser>, SummaryContributer<AppUser>,MetaDataContributer<AppUser>,TemplateContributor<AppUser>,FieldHandler {
+public class CertificateComposite extends AppUserComposite<AppUser, CertificateComposite> implements AnonymisingComposite<AppUser>, SummaryContributer<AppUser>,MetaDataContributer<AppUser>,TemplateContributor<AppUser> {
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.Composite#addOptional(java.util.Set)
 	 */
@@ -76,7 +74,7 @@ public class CertificateComposite extends AppUserComposite<AppUser, CertificateC
 
 	private static final Feature OPTIONAL_CERTIFICATE_FEATURE = new Feature("optional.person-certificate",true,"Are personal certificates optional");
 	private static final Feature NOTIFY_CERTIFICATE_CHANGE_FEATURE = new Feature("person.notify-certificate-change",false,"Generate notify ticket if user changes certificate DN");
-	@ConfigTag("CertificateComposite")
+	
 	public static final String PERSONAL_CERTIFICATE = "PersonalCertificate";
 
 	public CertificateComposite(AppUserFactory fac,String tag) {

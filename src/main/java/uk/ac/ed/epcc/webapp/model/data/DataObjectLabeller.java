@@ -179,18 +179,12 @@ public class DataObjectLabeller<BDO extends DataObject> extends AbstractFormText
 	 */
 	protected Map<String,String> getConfigTags() {
 		if( config_tags == null) {
-			config_tags = new HashMap<>();
 			try {
-				if( factory instanceof FieldHandler) {
-					((FieldHandler)factory).addConfigTags(config_tags);
-				}
-				for(FieldHandler h : factory.getComposites(FieldHandler.class)) {
-					h.addConfigTags(config_tags);
-				}
+				config_tags = factory.getConfigTags();
+				config_tags = Collections.unmodifiableMap(config_tags);
 			}catch(Exception e) {
-				getLogger().error("Error getting config tags", e);
+				getLogger().error("Error making config tags",e);
 			}
-			config_tags = Collections.unmodifiableMap(config_tags);
 		}
 		return config_tags;
 	}

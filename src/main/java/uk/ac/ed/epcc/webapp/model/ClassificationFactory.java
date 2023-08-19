@@ -56,7 +56,7 @@ import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
  */
 
 
-public class ClassificationFactory<T extends Classification> extends DataObjectFactory<T> implements Comparable<ClassificationFactory>, HistoryFieldContributor, NameFinder<T>,NameInputProvider<T>,FieldHandler{
+public class ClassificationFactory<T extends Classification> extends DataObjectFactory<T> implements Comparable<ClassificationFactory>, HistoryFieldContributor, NameFinder<T>,NameInputProvider<T>{
 	
 	
 
@@ -68,14 +68,13 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	private static final Pattern WHITESPACE = Pattern.compile("\\s");
 	
 	private HistoryFactory<T,HistoryFactory.HistoryRecord<T>> hist_fac=null;
-	@ConfigTag(CLASSIFICATION_CONFIG_TAG)
+	
 	public static final String NAME = "Name";
-	@ConfigTag(CLASSIFICATION_CONFIG_TAG)
+
 	public static final String DESCRIPTION = "Description";
 	/**
 	 * 
 	 */
-	@ConfigTag(CLASSIFICATION_CONFIG_TAG)
 	public static final String SORT_ORDER = "SortOrder";
 	
 	
