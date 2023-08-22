@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.forms.inputs.*;
 import uk.ac.ed.epcc.webapp.model.data.convert.EnumeratingTypeConverter;
@@ -193,6 +194,16 @@ public class TypeProducerInput<T> extends AbstractInput<String> implements PreSe
 			}
 		}
 		return false;
+	}
+	@Override
+	public String parseValue(String v) throws ParseException {
+		if( v == null || v.trim().isEmpty()) {
+			return null;
+		}
+		if( t.find(v) == null) {
+			throw new ParseException("Invalid input "+v);
+		}
+		return v;
 	}
 
 }

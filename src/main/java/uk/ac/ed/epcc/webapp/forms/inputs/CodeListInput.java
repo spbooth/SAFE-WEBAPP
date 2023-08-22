@@ -16,8 +16,7 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
-import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 
 /** Abstract class to implement ListInput where we want
  * the input to generate a String code for each item.
@@ -99,4 +98,24 @@ public abstract class CodeListInput<O> extends BaseInput<String> implements List
 		item=null;
 	}
 
+
+	public O parseToItem(String v) throws ParseException{
+		O i = getItembyValue(v);
+		if( i == null ) {
+			throw new ParseException("Invalid code "+v);
+		}
+		return i;
+	}
+	@Override
+	public String parseValue(String v) throws ParseException {
+		if( v == null) {
+			return null;
+		}
+		
+		return getTagByItem(parseToItem(v));
+	}
+	public void parse(String v) throws ParseException{
+		item = parseToItem(v);
+	}
+		
 }

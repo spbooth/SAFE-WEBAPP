@@ -32,10 +32,11 @@ public interface ParseInput<T> extends Input<T> {
 	 * This may apply tighter validation constraints than the {@link #convert(Object)}
 	 * method applied to a String
 	 * 
-	 * This must be compatible with the {@link #getString(Object)} method.
+	 * This must be compatible with the {@link #getString(Object)} method but may be able to parse 
+	 * other representations as well.
 	 * 
 	 * @param v
-	 * @return
+	 * @return  parsed value.
 	 * @throws ParseException
 	 */
 	

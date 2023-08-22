@@ -40,10 +40,12 @@ import uk.ac.ed.epcc.webapp.model.data.forms.inputs.DataObjectItemInput;
 public class Updater<BDO extends DataObject> extends DataObjectUpdateFormFactory<BDO> implements StandAloneFormUpdate<BDO>, UpdateTemplate<BDO>{
 
 	
-	/** Form key used for object selections
+	/** Form key used for object selections. 
+	 * We mutate with factory tag to have different auto-complete spaces
+	 * 
 	 * 
 	 */
-	public static final String TARGET = "Target";
+	public static final String TARGET = "Target_";
 	/**
 	 * @param dataObjectFactory
 	 */
@@ -54,7 +56,7 @@ public class Updater<BDO extends DataObject> extends DataObjectUpdateFormFactory
 	public void buildSelectForm(Form f, String label, BDO dat) {
 		Input<Integer> i = getSelectInput();
 
-		f.addInput(TARGET, label, i);
+		f.addInput(TARGET+getFactory().getTag(), label, i);
 		if (dat != null && getFactory().isMine(dat)) {
 		    try {
 				i.setValue(Integer.valueOf(dat.getID()));
@@ -70,7 +72,7 @@ public class Updater<BDO extends DataObject> extends DataObjectUpdateFormFactory
 	@SuppressWarnings("unchecked")
 	public BDO getSelected(Form f) {
 		//DataObjectItemInput<BDO> i = (DataObjectItemInput<BDO>) f.getInput(TARGET);
-		return (BDO) f.getItem(TARGET);
+		return (BDO) f.getItem(TARGET+getFactory().getTag());
 	}
 
 	

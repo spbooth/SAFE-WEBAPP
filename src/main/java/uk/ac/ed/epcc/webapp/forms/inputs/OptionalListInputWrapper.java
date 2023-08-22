@@ -13,6 +13,8 @@
 //| limitations under the License.                                          |
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
+
 /** Adapter to convert a {@link ListInput} into a {@link OptionalListInput}
  * returning null on not selected.
  * This also allows the un-selected text to be customised.
@@ -50,6 +52,16 @@ public class OptionalListInputWrapper<V,T> extends ListInputWrapper<V, T> implem
 		}
 		return getInner().convert(v);
 	}
+	@Override
+	public V parseValue(String v) throws ParseException {
+		if( v == null){
+			return null;
+		}
+		if( v.trim().isEmpty() || unselected.equals(v)) {
+			return null;
+		}
+		return getInner().parseValue(v);
+	}
 	
 	@Override
 	public String getUnselectedText() {
@@ -60,4 +72,5 @@ public class OptionalListInputWrapper<V,T> extends ListInputWrapper<V, T> implem
 		unselected=text;
 		
 	}
+	
 }

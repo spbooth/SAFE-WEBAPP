@@ -22,6 +22,7 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.inputs.BaseInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
@@ -150,6 +151,16 @@ public class RepositoryForeignKeyInput extends BaseInput<String> implements List
 	public void setNull() {
 		item=null;
 		
+	}
+	@Override
+	public String parseValue(String v) throws ParseException {
+		if( v == null || v.trim().isEmpty()) {
+			return null;
+		}
+		if( ! data.containsKey(v)) {
+			throw new ParseException("Invalid foreign key "+v);
+		}
+		return v;
 	}
 
 }

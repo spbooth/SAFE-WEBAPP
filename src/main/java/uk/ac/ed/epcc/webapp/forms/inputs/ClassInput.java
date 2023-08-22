@@ -23,6 +23,7 @@ import java.util.Map;
 
 import uk.ac.ed.epcc.webapp.AppContext;
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.ValidateException;
 import uk.ac.ed.epcc.webapp.logging.LoggerService;
 import uk.ac.ed.epcc.webapp.validation.FieldValidator;
@@ -38,7 +39,7 @@ import uk.ac.ed.epcc.webapp.validation.FieldValidator;
  */
 
 
-public class ClassInput<T> extends AbstractInput<String> implements ListInput<String,Class<? extends T>>{
+public class ClassInput<T> extends AbstractStringInput implements ListInput<String,Class<? extends T>>{
     private final AppContext c;
     private final String prefix;
     
@@ -158,5 +159,5 @@ public class ClassInput<T> extends AbstractInput<String> implements ListInput<St
 	public boolean isValid(Class<? extends T> item) {
 		return reg.values().contains(item);
 	}
-
+   
 }

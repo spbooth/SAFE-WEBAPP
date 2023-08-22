@@ -20,6 +20,7 @@ import java.util.Iterator;
 
 import uk.ac.ed.epcc.webapp.forms.exceptions.FieldException;
 import uk.ac.ed.epcc.webapp.forms.exceptions.MissingFieldException;
+import uk.ac.ed.epcc.webapp.forms.exceptions.ParseException;
 import uk.ac.ed.epcc.webapp.forms.inputs.BaseInput;
 import uk.ac.ed.epcc.webapp.forms.inputs.InputVisitor;
 import uk.ac.ed.epcc.webapp.forms.inputs.ListInput;
@@ -121,6 +122,16 @@ public class RepositoryFieldInput extends BaseInput<String> implements ListInput
 	public void setNull() {
 		item=null;
 		
+	}
+	@Override
+	public String parseValue(String v) throws ParseException {
+		if( v == null || v.trim().isEmpty()) {
+			return null;
+		}
+		if( ! res.hasField(v)) {
+			throw new ParseException("Invalid field "+v);
+		}
+		return v;
 	}
 	
 

@@ -38,7 +38,7 @@ import uk.ac.ed.epcc.webapp.validation.FieldValidator;
  */
 
 
-public class ConstructedObjectInput<T> extends AbstractInput<String> implements ListInput<String,T>{
+public class ConstructedObjectInput<T> extends AbstractStringInput implements ListInput<String,T>{
     private final AppContext c;
     private Class<T> clazz;
     private Map<String,Class> reg;

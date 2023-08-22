@@ -61,10 +61,14 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	
 
 	static final String CLASSIFICATION_CONFIG_TAG = "Classification";
-	/** Maximum size of pull-down menu in update form.
+	/** Maximum size of pull-down menu for this type
 	 * 
 	 */
-	private static final int CLASSIFICATION_MAX_MENU = 200;
+	private static final int CLASSIFICATION_MAX_MENU = 100;
+	/** MAximum size of datalist for this type.
+	 * 
+	 */
+	private static final int CLASSIFICATION_MAX_DATALIST = 200;
 	private static final Pattern WHITESPACE = Pattern.compile("\\s");
 	
 	private HistoryFactory<T,HistoryFactory.HistoryRecord<T>> hist_fac=null;
@@ -201,7 +205,7 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 	protected boolean allowSpacesInName(){
 		return getContext().getBooleanParameter(getConfigTag()+".allow_space_in_name", false);
 	}
-	/**
+	/** A String valued {@link ItemInput} for {@link Classification}s that generates the classification name. 
 	 * @author Stephen Booth
 	 *
 	 */
@@ -446,21 +450,18 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		@Override
 		public DataObjectItemInput<C> getSelectInput() {
 			try{
+				// for update we want name inputs so we can access old entries.
+				// use auto-complete if sufficiently small
 				ClassificationFactory<C> cf = getClassificationFactory();
 				BaseFilter<C> finalSelectFilter = cf.getFinalSelectFilter();
-				if( cf.getCount(finalSelectFilter) < getContext().getIntegerParameter(cf.getConfigTag()+".max_autocomplete", CLASSIFICATION_MAX_MENU)){
-
-					if( cf.useAutoCompleteInput(finalSelectFilter)) {
-						return cf.getInput();
-					}
-					DataObjectAlternateInput<C, DataObjectItemParseInput<C>> input = new DataObjectAlternateInput<>();
-					input.addInput("Menu", "Select ", super.getSelectInput());
-					input.addInput("Name", " or specify name ", cf.new NameItemInput());
-					return input;
+				
+				if( cf.getCount(finalSelectFilter) < cf.getMaxDataList()) {
+					return new NameFinderInput<C, ClassificationFactory<C>>(cf, cf, false, null, finalSelectFilter);
 				}
 			}catch(Exception e){
-				getLogger().error("Error making alt input", e);;
+				getLogger().error("Error making input", e);;
 			}
+			// fall back to name lookup without suggestions
 			return getClassificationFactory().new NameItemInput();
 		}
 
@@ -526,26 +527,39 @@ public class ClassificationFactory<T extends Classification> extends DataObjectF
 		}
 	}
 	
-	public boolean useAutoCompleteInput(BaseFilter<T> fil) {
-		if( Feature.checkDynamicFeature(getContext(), getConfigTag()+".use_list_input", false)) {
-			return false;
-		}
-		try {
-			return getCount(fil) > getContext().getIntegerParameter(getConfigTag()+".max_pulldown", 100);
-		} catch (DataException e) {
-			getLogger().error("Error checking option count", e);
-			return false;
-		}
+	
+	int getMaxDataList() {
+		return getContext().getIntegerParameter(getConfigTag()+".max_datalist", CLASSIFICATION_MAX_DATALIST);
+	}
+	
+	int getMaxPulldown() {
+		return getContext().getIntegerParameter(getConfigTag()+".max_pulldown", CLASSIFICATION_MAX_MENU);
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ed.epcc.webapp.model.data.DataObjectFactory#getInput()
 	 */
 	@Override
 	public DataObjectItemInput<T> getInput(BaseFilter<T> fil, BaseFilter<T> restrict) {
-		if( useAutoCompleteInput(getAndFilter(fil,restrict))) {
-			return new NameFinderInput<>(this,this, false, restrict, fil);
+		// Filter for narrowed suggestions.
+		try {
+			AndFilter<T> total = getAndFilter(fil,restrict);
+			long count = getCount(total);
+			boolean use_list = Feature.checkDynamicFeature(getContext(), getConfigTag()+".use_list_input", false);
+			if( count < getMaxDataList()) {
+				if( use_list || count < getMaxPulldown()) {
+					return super.getInput(fil,restrict);
+				}
+				return new NameFinderInput<>(this,this, false, restrict, fil);
+			}
+
+		}catch(Exception e) {
+			getLogger().error("Error mutating input",e);
 		}
-		return super.getInput(fil,restrict);
+		
+		// fall back to a name input with restrictions.
+		NameItemInput input = new NameItemInput();
+		input.addValidator(new DataObjectFieldValidator(restrict));
+		return input;
 	}
 
 	/* (non-Javadoc)

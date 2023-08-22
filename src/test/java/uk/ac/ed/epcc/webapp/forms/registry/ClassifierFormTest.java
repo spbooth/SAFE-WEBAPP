@@ -61,7 +61,7 @@ public class ClassifierFormTest extends AbstractTransitionServletTest {
 		TransitionFactory provider = TransitionServlet.getProviderFromName(getContext(), "Classifiers:TestClassification");
 		takeBaseline();
 		setTransition(provider, FormOperations.Update, null);
-		addParam(Updater.TARGET, test_pool);
+		addParam(Updater.TARGET+fac.getTag(), test_pool);
 		runTransition();
 		checkForwardToTransition(provider, FormOperations.Edit, test_pool);
 		
@@ -108,7 +108,7 @@ public class ClassifierFormTest extends AbstractTransitionServletTest {
 		TransitionFactory provider = TransitionServlet.getProviderFromName(getContext(), "Classifiers:TestClassification");
 		takeBaseline();
 		setTransition(provider, FormOperations.Update, null);
-		addParam(Updater.TARGET, test_pool);
+		addParam(Updater.TARGET+fac.getTag(), test_pool);
 		runTransition();
 		checkForwardToTransition(provider, FormOperations.Edit, test_pool);
 	

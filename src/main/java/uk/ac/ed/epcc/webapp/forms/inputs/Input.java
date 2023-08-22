@@ -99,7 +99,7 @@ public interface Input<V> {
 	 */
 	public abstract void setNull();
 	/** Perform any supported type conversions to to generate a value of the
-	 * target type
+	 * target type. This does not check the converted value will pass validation.
 	 * 
 	 * @param v Object input
 	 * @return target type
@@ -123,7 +123,9 @@ public interface Input<V> {
      * @param value
      * @return String
      */
-	public abstract String getPrettyString(V value);
+	default public String getPrettyString(V value) {
+		return getString(value);
+	}
 
 	/**
 	 * Check the validity of the current state of the Object.

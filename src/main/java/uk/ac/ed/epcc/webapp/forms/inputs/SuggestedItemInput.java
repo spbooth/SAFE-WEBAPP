@@ -17,11 +17,12 @@ import java.util.Iterator;
 
 /** An {@link ItemInput} that suggests possible items.
  * 
- * The input may also allow additional items beyond the suggested set
+ * The input may also allow additional items beyond the suggested set but the suggestions should
+ * not include invalid items.
  * @author Stephen Booth
  *
  */
-public interface SuggestedItemInput<V, T> extends ItemInput<V, T> {
+public interface SuggestedItemInput<V, T> extends ItemInput<V, T> , ParseInput<V>{
 	/**
 	 * get a list of domain objects that are being selected
 	 * 

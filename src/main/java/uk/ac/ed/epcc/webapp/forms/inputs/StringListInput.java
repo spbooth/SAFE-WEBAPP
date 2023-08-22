@@ -19,7 +19,7 @@ package uk.ac.ed.epcc.webapp.forms.inputs;
  * @author Stephen Booth
  *
  */
-public abstract class StringListInput extends AbstractInput<String> implements ListInput<String, String> {
+public abstract class StringListInput extends AbstractStringInput implements ListInput<String, String> {
 
 	
 	/**

@@ -16,8 +16,11 @@
  *******************************************************************************/
 package uk.ac.ed.epcc.webapp.forms.inputs;
 
-/**
- * an input that has some Domain Object associated with its values
+/** An input that has some Domain Object associated with its values
+ * 
+ * Our normal convention for automatic forms is to have the input value correspond to the database field value. 
+ * Reference fields and type-producer fields can use ItemInputs to work with the referenced object
+ * 
  * 
  * @author spb
  * @param <V> type of input
