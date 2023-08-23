@@ -352,6 +352,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 			}
 			ti.addValidator(new MaxLengthValidator(info.getMax()));
 			int maxwid = conn.getIntegerParameter("forms.max_text_input_width", 64);
+			maxwid = conn.getIntegerParameter(info.getName(true)+".maxwid", maxwid);
 			ti.setBoxWidth(maxwid);
 			return ti;
 			
@@ -434,7 +435,7 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 					// Can we get anything from the TableSpecification
 					FieldType t = ts.getField(field);
 					if ( t != null ) {
-						MakeSelectorVisitor vis = new MakeSelectorVisitor(res);
+						MakeSelectorVisitor vis = new MakeSelectorVisitor(res,field);
 						t.accept(vis);
 						auto = vis.getSelector();
 					}
@@ -479,7 +480,8 @@ protected DataObjectFormFactory(DataObjectFactory<BDO> fac){
 		for(String field : res.getFields()){
 			Repository.FieldInfo info = res.getInfo(field);
 			if( info.isString() && ! info.isTruncate()) {
-				FieldValidationSet.add(val, field, new MaxLengthValidator(info.getMax()));
+				int max = info.getMax();
+				FieldValidationSet.add(val, field, new MaxLengthValidator(max));
 			}
 		}
 		return val;

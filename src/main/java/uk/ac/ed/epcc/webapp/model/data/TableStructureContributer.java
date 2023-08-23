@@ -71,6 +71,10 @@ public interface TableStructureContributer<BDO extends DataObject> extends FormL
 	 * 
 	 * This method provides a class specific set of defaults but the specific form classes can
 	 * override this.
+	 * 
+	 * While this is necessary in some cases it is better to encode customisation as {@link FieldValidator}s
+	 * as these are composable. 
+	 * 
 	 * @param selectors
 	 * @return {@link Map} of modified selectors/inputs
 	 */

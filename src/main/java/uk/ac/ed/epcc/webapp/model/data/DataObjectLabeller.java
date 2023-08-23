@@ -44,12 +44,15 @@ public class DataObjectLabeller<BDO extends DataObject> extends AbstractFormText
 		}
 		for(String field : factory.res.getFields()){
 			if( ! trans.containsKey(field)){  // no explicit translation
-				
-				// look for a secondary config value
-				String cfg = getConfigTags().get(field);
 				String label = null;
-				if( cfg != null ) {
-					label = getTranslationFromConfig(cfg, field);
+				// look for a secondary config value
+				Map<String, String> configTags = getConfigTags();
+				if( configTags != null ) {
+					String cfg = configTags.get(field);
+
+					if( cfg != null ) {
+						label = getTranslationFromConfig(cfg, field);
+					}
 				}
 				if( label != null ) {
 					trans.put(field, label);
@@ -88,13 +91,16 @@ public class DataObjectLabeller<BDO extends DataObject> extends AbstractFormText
 			if( ! help.containsKey(field)){  // no explicit translation
 				
 				// look for a secondary config value
-				String cfg = getConfigTags().get(field);
-				String label = null;
-				if( cfg != null ) {
-					label = getHelpTextFromConfig(cfg, field);
-				}
-				if( label != null ) {
-					help.put(field, label);
+				Map<String, String> configTags = getConfigTags();
+				if( configTags != null ) {
+					String cfg = configTags.get(field);
+					String label = null;
+					if( cfg != null ) {
+						label = getHelpTextFromConfig(cfg, field);
+					}
+					if( label != null ) {
+						help.put(field, label);
+					}
 				}
 			}
 			// allow config to override if using factory tag.
@@ -136,14 +142,17 @@ public class DataObjectLabeller<BDO extends DataObject> extends AbstractFormText
 			if( translations == null){
 				translations=new HashMap<>();
 			}
-			if( factory instanceof FormLabelProvider) {
-				((FormLabelProvider)factory).addTranslations(translations);
+			try {
+				if( factory instanceof FormLabelProvider) {
+					((FormLabelProvider)factory).addTranslations(translations);
+				}
+				for(FormLabelProvider c : factory.getComposites(FormLabelProvider.class)){
+					translations=c.addTranslations(translations);
+				}
+				addTranslations(translations);
+			}catch(Exception e) {
+				getLogger().error("Error generating translations",e);
 			}
-			for(FormLabelProvider c : factory.getComposites(FormLabelProvider.class)){
-				translations=c.addTranslations(translations);
-			}
-			addTranslations(translations);
-
 			translation_set = Collections.unmodifiableMap(translations);
 		}
 		return translation_set;
@@ -156,14 +165,18 @@ public class DataObjectLabeller<BDO extends DataObject> extends AbstractFormText
 	protected final Map<String,String> getFieldHelp() {
 		if( help_map == null) {
 			Map<String, String> help = new HashMap<>();
-			if( factory instanceof FieldHelpProvider) {
-				((FieldHelpProvider)factory).addFieldHelp(help);
+			try {
+				if( factory instanceof FieldHelpProvider) {
+					((FieldHelpProvider)factory).addFieldHelp(help);
+				}
+				for(FieldHelpProvider c : factory.getComposites(FieldHelpProvider.class)){
+					Map mod = c.addFieldHelp(help);
+					assert(mod != null);
+				}
+				addHelpText(help);
+			}catch(Exception e) {
+				getLogger().error("Error generating field help",e);
 			}
-			for(FieldHelpProvider c : factory.getComposites(FieldHelpProvider.class)){
-				Map mod = c.addFieldHelp(help);
-				assert(mod != null);
-			}
-			addHelpText(help);
 			help_map = Collections.unmodifiableMap(help);
 		}
 		return help_map;

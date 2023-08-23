@@ -576,7 +576,7 @@ public class HistoryFactory<P extends DataObject,H extends HistoryFactory.Histor
 	protected void setPeerFactory(DataObjectFactory<P> fac) {
 		peer_factory=fac;
 		if( ! res.hasTypeProducer(getPeerName())){
-			res.addTypeProducer(new IndexedTypeProducer(getContext(),getPeerName(), fac));
+			registerTypeProducer(new IndexedTypeProducer(getContext(),getPeerName(), fac));
 		}
 	}
 	/** Constructor for Stand alone history factories. 

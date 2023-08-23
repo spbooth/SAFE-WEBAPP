@@ -478,7 +478,7 @@ public abstract class LogFactory<T extends LogFactory.Entry, O extends Indexed>
 		AppContext ctx = fac.getContext();
 		use_type=new ItemType<>(getStaticItemType());
 		if( DataObjectFactory.AUTO_CREATE_TABLES_FEATURE.isEnabled(ctx)){
-    		if( setContextWithMake(ctx, table,getDefaultTableSpecification(ctx,fac,uf,table))){
+    		if( setContextWithMake(ctx, table,()->getDefaultTableSpecification(ctx,fac,uf,table))){
     			// table created
     			setupItems(ctx, table);
     		}

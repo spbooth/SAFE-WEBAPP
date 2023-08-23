@@ -38,6 +38,9 @@ public class BooleanInput extends AbstractInput<Boolean> implements ParseInput<B
 	@Override
 	public Boolean convert(Object v) {
 		if( v instanceof String ){
+			if( "Y".equals(v)) {
+				return Boolean.TRUE;
+			}
 		    return Boolean.valueOf((String) v);
 		}
 		if( v instanceof Boolean){

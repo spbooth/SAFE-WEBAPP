@@ -7,6 +7,7 @@ import uk.ac.ed.epcc.webapp.jdbc.table.*;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.FullTextIndex;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.Index;
 import uk.ac.ed.epcc.webapp.jdbc.table.TableSpecification.IndexType;
+import uk.ac.ed.epcc.webapp.model.data.forms.CheckboxSelector;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
 /** A {@link FieldTypeVisitor} that generates a {@link Selector} for the database field.
  * 
@@ -18,8 +19,10 @@ public class MakeSelectorVisitor implements FieldTypeVisitor {
 
 	private final Repository res;
 	private Selector sel=null;
-	public MakeSelectorVisitor(Repository res) {
+	private final String field;
+	public MakeSelectorVisitor(Repository res,String field) {
 		this.res=res;
+		this.field=field;
 	}
 	public Selector getSelector() {
 		return sel;
@@ -48,7 +51,11 @@ public class MakeSelectorVisitor implements FieldTypeVisitor {
 
 	@Override
 	public void visitBooleanFieldType(BooleanFieldType booleanFieldType) {
-		sel = BooleanInput::new;
+		if( res.getInfo(field).isString()) {
+			sel = new CheckboxSelector();
+		}else {
+			sel = BooleanInput::new;
+		}
 	}
 
 	@Override

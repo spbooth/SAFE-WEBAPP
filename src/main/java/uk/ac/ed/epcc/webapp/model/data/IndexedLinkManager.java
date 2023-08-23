@@ -478,12 +478,12 @@ public abstract class IndexedLinkManager<T extends IndexedLinkManager.Link<L,R>,
 		this.right_field = right_field;
 		if( DataObjectFactory.AUTO_CREATE_TABLES_FEATURE.isEnabled(c)){
 			setComposites(c, table);
-			setContextWithMake(c, table,getFinalTableSpecification(c,table,left_fac,left_field,right_fac,right_field));
+			setContextWithMake(c, table,()->getFinalTableSpecification(c,table,left_fac,left_field,right_fac,right_field));
 		}else{
 			setContext(c, table,false);
 		}
-		res.addTypeProducer(new IndexedTypeProducer<>(c,left_field, left_fac));
-		res.addTypeProducer(new IndexedTypeProducer<>(c,right_field, right_fac));
+		registerTypeProducer(new IndexedTypeProducer<>(c,left_field, left_fac));
+		registerTypeProducer(new IndexedTypeProducer<>(c,right_field, right_fac));
 	}
 
 	// make final to stop people overriding the wrong method.

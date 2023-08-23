@@ -39,6 +39,7 @@ import uk.ac.ed.epcc.webapp.model.data.Exceptions.DataFault;
 import uk.ac.ed.epcc.webapp.model.data.filter.NullFieldFilter;
 import uk.ac.ed.epcc.webapp.model.data.filter.SQLValueFilter;
 import uk.ac.ed.epcc.webapp.model.data.forms.Selector;
+import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
 import uk.ac.ed.epcc.webapp.validation.FieldValidator;
 
 
@@ -57,12 +58,13 @@ public class BadKeyFactory extends DataObjectFactory<BadKeyFactory.BadKey> imple
 	@Override
 	protected Map<String, Selector> getSelectors() {
 		Map<String, Selector> selectors = super.getSelectors();
+		// The input also does key normalisation
 		selectors.put(PUBLIC_KEY,()->{
 			return new SimpleKeyInput(getContext());
 		});
 		return selectors;
 	}
-
+	
 	/**
 	 * 
 	 */

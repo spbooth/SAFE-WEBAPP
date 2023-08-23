@@ -39,7 +39,7 @@ public class EmailInput extends TextInput {
 		addValidator(new MaxLengthValidator(MAX_EMAIL_LENGTH));
 
 		setSingle(true);
-		addValidator(new EmailFieldValidator(this));
+		addValidator(new EmailFieldValidator());
 	}
 	
 	

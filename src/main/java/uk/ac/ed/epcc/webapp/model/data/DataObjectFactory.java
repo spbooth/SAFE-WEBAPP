@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import uk.ac.ed.epcc.webapp.*;
 import uk.ac.ed.epcc.webapp.content.Labeller;
@@ -59,6 +60,7 @@ import uk.ac.ed.epcc.webapp.model.data.iterator.SortingIterator;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedProducer;
 import uk.ac.ed.epcc.webapp.model.data.reference.IndexedReference;
 import uk.ac.ed.epcc.webapp.session.SessionService;
+import uk.ac.ed.epcc.webapp.session.UnknownRelationshipException;
 import uk.ac.ed.epcc.webapp.timer.TimeClosable;
 import uk.ac.ed.epcc.webapp.timer.TimerService;
 import uk.ac.ed.epcc.webapp.validation.FieldValidationSet;
@@ -246,6 +248,23 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 			return vis.visitDataObjectFieldValidator(this);
 		}
     	
+    }
+    /** A DataObjectFieldValidator that enforces a relationship with the selected object
+     * 
+     */
+    public class RelationshipFieldValidator extends DataObjectFieldValidator{
+    	public RelationshipFieldValidator(String relationship) throws UnknownRelationshipException {
+    		this(DataObjectFactory.this.getContext().getService(SessionService.class),relationship);
+    	}
+    	public RelationshipFieldValidator(String relationship,BaseFilter<BDO> fallback) {
+    		this(DataObjectFactory.this.getContext().getService(SessionService.class),relationship,fallback);
+    	}
+    	public RelationshipFieldValidator(SessionService sess,String relationship) throws UnknownRelationshipException {
+    		super(sess.getRelationshipRoleFilter(DataObjectFactory.this, relationship));
+    	}
+    	public RelationshipFieldValidator(SessionService sess,String relationship,BaseFilter<BDO> fallback) {
+    		super(sess.getRelationshipRoleFilter(DataObjectFactory.this, relationship,fallback));
+    	}
     }
 	/** A basic form Input for selecting objects using their ID value as text.
      * Only use this where the table is too large to support a pull-down.
@@ -973,6 +992,21 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
     		observeComposite(c);
     	}
     }
+    /**  register a {@link TypeProducer} used by a sub-class.
+     * 
+     * Registering a static TypeProducer when a factory is constructed will
+     * automatically configure the appropriate input for automatic forms
+     * 
+     * The initial implementation just registers with the Repository but
+     * encapsulating this in a method makes later refactoring easier.
+     * 
+     * @param <T>
+     * @param <D>
+     * @param producer
+     */
+    protected final  <T,D>  void registerTypeProducer(TypeProducer<T , D> producer){
+    	res.addTypeProducer(producer);
+    }
     /** Observer {@link Composite}s as they are registered.
      * 
      * Note that as this can be called during factory construction no assumptions can be made about
@@ -1593,10 +1627,14 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	}
 
 	/**
-	 * Get a Map of selectors to use for forms of this type.
+	 * Get a Map of {@link Selector}s to use for forms of this type.
 	 * 
 	 * This method provides a class specific set of defaults but the specific form classes can
 	 * override this.
+	 * 
+	 * While this is necessary in some cases it is better to encode customisation as {@link FieldValidator}s
+	 * as these are composable. 
+	 * 
 	 * @return Map
 	 * @see DataObjectFormFactory
 	 */
@@ -1896,9 +1934,46 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	   setContext(ctx, homeTable, AUTO_CREATE_TABLES_FEATURE.isEnabled(ctx));
 	}
 	protected void postSetContext() {
+		for(Composite c : getComposites()) {
+			c.postSetContext();
+		}
 		
 	}
+	/** Set the AppContext optionally creating the table
+	 * 
+	 * @param ctx
+	 * @param homeTable
+	 * @param create
+	 * @return true if factory expected to be valid now
+	 */
 	protected final boolean setContext(AppContext ctx, String homeTable,boolean create) {
+		return setContextWithMake(ctx, homeTable, create ? ()->getFinalTableSpecification(ctx, homeTable) : null);
+	}
+	/** Initialise Repository with customised table creation.
+	 * This is called directly where the table specification depends on the constructor parameters, 
+	 * 
+	 * @param ctx
+	 * @param homeTable
+	 * @param spec {@link TableSpecification}
+	 * @return true if table created
+	 */
+	protected final boolean setContextWithMake(AppContext ctx, String homeTable,TableSpecification spec) {
+		return setContextWithMake(ctx, homeTable, spec == null ? null : ()->spec);
+	}
+	/** Initialise Repository with customised table creation.
+	 * 
+	 * If Table creation is to be attempted a {@link Supplier} is passed. (If the table already exists the
+	 * supplier is not called allowing specification generation to be avoided.
+	 * Also note that {@link #setComposites(AppContext, String)} is called by this routine which needs to happen
+	 * before the specification is generated
+	 * 
+	 * @param ctx
+	 * @param homeTable
+	 * @param specgen {@link Supplier} or null
+	 * @return true if table created
+	 */
+	protected final boolean setContextWithMake(AppContext ctx, String homeTable,Supplier<TableSpecification> specgen) {
+	
 		if (res != null  ){
 			getLogger().debug("Attempt to reset Repository");
 			return false;
@@ -1906,46 +1981,60 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 		if (homeTable == null) {
 			throw new ConsistencyError("No table specified");
 		}
-		
+
 		TimerService timer = ctx.getService(TimerService.class);
 		if( timer != null ){ timer.startTimer("setContext"); timer.startTimer("setContext:"+homeTable);}
 		try{
-		// This sets the AppContext if not already set.
-		setComposites(ctx, homeTable);
-		
-		res = Repository.getInstance(ctx, homeTable);
-		if( create){
-			if( ! isValid()){
-				// Make sure we don't attempt this more than once per context
-				// Reference fields should trigger creation of targets and
-				// we need to worry about mutual cross references
-				String create_tag = "auto_create_"+homeTable;
-				if( ctx.getAttribute(create_tag) != null){
-					return false;
-				}
-				ctx.setAttribute(create_tag, Boolean.TRUE);
-				TableSpecification spec = getFinalTableSpecification(ctx,
-						homeTable);
-				if( spec != null ){
-					try {
-						if( ctx.getService(DatabaseService.class).getSQLContext().isReadOnly()) {
-							throw new DataError("Cannot create table, read-only connection");
+			// This sets the AppContext if not already set.
+			setComposites(ctx, homeTable);
+
+			res = Repository.getInstance(ctx, homeTable);
+			if( specgen != null ){
+				if( ! isValid()){
+					// Make sure we don't attempt this more than once per context
+					// Reference fields should trigger creation of targets and
+					// we need to worry about mutual cross references
+					String create_tag = "auto_create_"+homeTable;
+					if( ctx.getAttribute(create_tag) != null){
+						return false;
+					}
+					ctx.setAttribute(create_tag, Boolean.TRUE);
+					TableSpecification spec = specgen.get();
+					if( spec != null ){
+						try {
+							if( ctx.getService(DatabaseService.class).getSQLContext().isReadOnly()) {
+								throw new DataError("Cannot create table, read-only connection");
+							}
+						} catch (SQLException e) {
+							throw new FatalDataError("Cannot retreive SQLContext", e);
 						}
-					} catch (SQLException e) {
-						throw new FatalDataError("Cannot retreive SQLContext", e);
+						if( timer != null ){ timer.startTimer("makeTable"); timer.startTimer("makeTable:"+homeTable);}
+						try{
+							if( makeTable(ctx, homeTable, spec) ) {
+								postSetContext();
+								return true;
+							}else {
+								// failed to make table
+								return false;
+							}
+						}finally{
+							if( timer != null ){ timer.stopTimer("makeTable"); timer.stopTimer("makeTable:"+homeTable);}
+						}
 					}
-					if( timer != null ){ timer.startTimer("makeTable"); timer.startTimer("makeTable:"+homeTable);}
-					try{
-						return makeTable(ctx, homeTable, spec);
-					}finally{
-						if( timer != null ){ timer.stopTimer("makeTable"); timer.stopTimer("makeTable:"+homeTable);}
-					}
+				}else {
+					// table already exists
+					postSetContext();
+					return true;
+				}
+			}else {
+				// No table specification only works if table exists
+				if( isValid()) {
+					postSetContext();
+					return true;
 				}
 			}
-		}
 		}finally{
 			if( timer != null ){ timer.stopTimer("setContext:"+homeTable); timer.stopTimer("setContext");}
-			postSetContext();
 		}
 		return false;
 
@@ -2043,22 +2132,7 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 	protected TableSpecification getDefaultTableSpecification(AppContext c, String table){
 		return null;
 	}
-	/** Initialise Repository with customised table creation.
-	 * This is for use where the table specification depends on the constructor parameters,
-	 * or if we want to override the auto_create.tables feature
-	 * 
-	 * @param ctx
-	 * @param homeTable
-	 * @param spec
-	 * @return true if table created
-	 */
-	protected final boolean setContextWithMake(AppContext ctx, String homeTable,TableSpecification spec) {
-		setContext(ctx, homeTable,false);
-		if( ! isValid() && (spec != null)){
-			return makeTable(ctx, homeTable, spec);
-		}
-		return false;
-	}
+	
 	private boolean makeTable(AppContext ctx, String homeTable,TableSpecification spec){
 		DataBaseHandlerService dbh = ctx.getService(DataBaseHandlerService.class);
 		if( dbh != null ){
@@ -2067,7 +2141,9 @@ public abstract class DataObjectFactory<BDO extends DataObject> implements Tagge
 				// Create the table name repository tried to access before.
 				dbh.createTable(Repository.tagToTable(ctx, homeTable), spec);
 			    // repository should re-try to get metadata if failed previously
-				assert(isValid());
+				if( ! isValid()) {
+					throw new ConsistencyError("Failed to make table "+homeTable);
+				}
 				postCreateTableSetup(ctx,homeTable);
 				return true;
 			}catch(DataFault e){

@@ -629,6 +629,21 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 		}
 		return null;
 	}
+	private <T> boolean useMultiple(Input<T> input) {
+		if( input instanceof MultipleInput) {
+			if( ((MultipleInput)input).isMultiple()) {
+				return true;
+			}
+		}
+		for(FieldValidator<T> v : input.getValidators()) {
+			if( v instanceof MultipleInput) {
+				if( ((MultipleInput)v).isMultiple()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 	private <T> String getFormatHint(Input<T> input) {
 		if( input instanceof FormatHintInput) {
 			String t = ((FormatHintInput)input).getFormatHint();
@@ -774,10 +789,8 @@ public class EmitHtmlInputVisitor extends AbstractContexed implements InputVisit
 				if( use_html5 && format_hint != null){
 					result.attr("placeholder",format_hint);
 				}
-				if( use_html5 && input instanceof MultipleInput){
-					if(((MultipleInput)input).isMultiple()){
-						result.attr("multiple", "multiple");
-					}
+				if( use_html5 && useMultiple(input)){
+					result.attr("multiple", "multiple");
 				}
 			}
 			result.close();
